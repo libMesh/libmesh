@@ -2832,6 +2832,7 @@ src/mesh/exodusII_io.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/geom/elem.h\
     include/geom/point.h\
+    include/mesh/boundary_info.h\
     include/mesh/exodusII_io.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_input.h\
