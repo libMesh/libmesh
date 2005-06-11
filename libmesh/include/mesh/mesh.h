@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.14 2005-05-09 20:38:41 jwpeterson Exp $
+// $Id: mesh.h,v 1.15 2005-06-11 05:11:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,8 @@
 // Local Includes -----------------------------------
 #include "mesh_base.h"
 
+// Forward Declarations
+class MeshData;
 
 
 /**

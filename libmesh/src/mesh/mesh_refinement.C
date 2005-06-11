@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.40 2005-06-06 16:24:15 knezed01 Exp $
+// $Id: mesh_refinement.C,v 1.41 2005-06-11 05:11:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,7 @@
 #include "mesh_refinement.h"
 #include "elem.h"
 #include "libmesh_logging.h"
+#include "boundary_info.h"
 
 
 
@@ -686,7 +687,7 @@ bool MeshRefinement::_coarsen_elements ()
 
 	  // Remove any boundary information associated
 	  // with this element
-	  _mesh.boundary_info.remove (elem);
+	  _mesh.boundary_info->remove (elem);
 	      
 	  // Add this iterator to the _unused_elements
 	  // data structure so we might fill it.

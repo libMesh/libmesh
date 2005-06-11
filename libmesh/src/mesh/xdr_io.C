@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.11 2005-05-24 17:30:30 benkirk Exp $
+// $Id: xdr_io.C,v 1.12 2005-06-11 05:11:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -36,6 +36,7 @@
 #include "enum_elem_type.h"
 #include "o_f_stream.h"
 #include "utility.h"
+#include "boundary_info.h"
 
 #ifdef HAVE_XDR
 #  include <rpc/rpc.h>
@@ -2185,7 +2186,7 @@ void XdrIO::read_mesh (const std::string& name,
   
       // Add to the boundary_info
       for (int ibc=0; ibc < numBCs; ibc++)
-	mesh.boundary_info.add_side(bcs[0+ibc*3], bcs[1+ibc*3], bcs[2+ibc*3]);
+	mesh.boundary_info->add_side(bcs[0+ibc*3], bcs[1+ibc*3], bcs[2+ibc*3]);
     }
 }
 
@@ -2223,7 +2224,7 @@ void XdrIO::write_mesh (const std::string& name,
   std::vector<ElemType> etypes;
   
   const int                   numElem = mesh.n_elem();       
-  const int                   numBCs  = mesh.boundary_info.n_boundary_conds();
+  const int                   numBCs  = mesh.boundary_info->n_boundary_conds();
   MeshTools::elem_types(mesh, etypes);
   neeb.resize(etypes.size());
 	
@@ -2361,7 +2362,7 @@ void XdrIO::write_mesh (const std::string& name,
       std::vector<unsigned short int> side_list;
       std::vector<short int> elem_id_list;
       
-      mesh.boundary_info.build_side_list (elem_list, side_list, elem_id_list);
+      mesh.boundary_info->build_side_list (elem_list, side_list, elem_id_list);
     
       for (int ibc=0;  ibc<numBCs; ibc++)
 	{
@@ -2464,7 +2465,7 @@ void XdrIO::write_soln (const std::string& name,
   sh.setWrtVar(var_names.size());
   sh.setNumVar(var_names.size());
   sh.setNumNodes(mesh.n_nodes());
-  sh.setNumBCs(mesh.boundary_info.n_boundary_conds());
+  sh.setNumBCs(mesh.boundary_info->n_boundary_conds());
   sh.setMeshCnt(0);
   sh.setKstep(0);
   sh.setTime(0.);

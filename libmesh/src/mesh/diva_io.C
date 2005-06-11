@@ -1,4 +1,4 @@
-// $Id: diva_io.C,v 1.8 2005-05-10 21:37:17 benkirk Exp $
+// $Id: diva_io.C,v 1.9 2005-06-11 05:11:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 #include "boundary_mesh.h"
 #include "mesh_tools.h"
 #include "elem.h"
+#include "boundary_info.h"
 
 // ------------------------------------------------------------
 // DivaIO class members
@@ -85,7 +86,7 @@ void DivaIO::write_stream (std::ostream& out)
 
 
   BoundaryMesh boundary_mesh (mesh.mesh_dimension()-1);
-  mesh.boundary_info.sync(boundary_mesh);
+  mesh.boundary_info->sync(boundary_mesh);
   
 
   /**
@@ -228,7 +229,7 @@ void DivaIO::write_stream (std::ostream& out)
 	      if ((side->type() == TRI3) ||
 		  (side->type() == TRI6)  )
 
-		out << mesh.boundary_info.boundary_id(mesh.elem(e), s)
+		out << mesh.boundary_info->boundary_id(mesh.elem(e), s)
 		    << '\n';
 	    }
 
@@ -247,7 +248,7 @@ void DivaIO::write_stream (std::ostream& out)
 		  (side->type() == QUAD8) ||
 		  (side->type() == QUAD9)  )
 		
-		out << mesh.boundary_info.boundary_id(mesh.elem(e), s);
+		out << mesh.boundary_info->boundary_id(mesh.elem(e), s);
 	    }
   }
 

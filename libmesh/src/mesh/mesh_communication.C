@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.19 2005-06-02 18:25:43 benkirk Exp $
+// $Id: mesh_communication.C,v 1.20 2005-06-11 05:11:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -111,7 +111,7 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
     return;
   
   this->broadcast_mesh (mesh);
-  this->broadcast_bcs  (mesh, mesh.boundary_info);
+  this->broadcast_bcs  (mesh, *(mesh.boundary_info));
 }
 
 

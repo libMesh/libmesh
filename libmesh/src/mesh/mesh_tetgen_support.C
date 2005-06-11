@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.19 2005-05-12 17:01:25 spetersen Exp $
+// $Id: mesh_tetgen_support.C,v 1.20 2005-06-11 05:11:31 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 
 // C++ includes
 #include <sstream>
-
+#include <set>
 
 // Local includes
 #include "mesh_tetgen_support.h"

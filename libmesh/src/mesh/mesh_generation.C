@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.38 2005-06-10 21:57:43 benkirk Exp $
+// $Id: mesh_generation.C,v 1.39 2005-06-11 05:11:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,6 +43,7 @@
 #include "cell_prism15.h"
 #include "cell_prism18.h"
 #include "libmesh_logging.h"
+#include "boundary_info.h"
 
 
 // ------------------------------------------------------------
@@ -495,16 +496,16 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 		    elem->set_node(3) = mesh.node_ptr(idx(type,nx,i,j+1)  );
 
 		    if (j == 0)
-		      mesh.boundary_info.add_side(elem, 0, 0);
+		      mesh.boundary_info->add_side(elem, 0, 0);
 		  
 		    if (j == (ny-1))
-		      mesh.boundary_info.add_side(elem, 2, 2);
+		      mesh.boundary_info->add_side(elem, 2, 2);
 		  
 		    if (i == 0)
-		      mesh.boundary_info.add_side(elem, 3, 3);
+		      mesh.boundary_info->add_side(elem, 3, 3);
 		  
 		    if (i == (nx-1))
-		      mesh.boundary_info.add_side(elem, 1, 1);
+		      mesh.boundary_info->add_side(elem, 1, 1);
 		  }
 	      break;
 	    }
@@ -558,16 +559,16 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 		  
 
 		    if (j == 0)
-		      mesh.boundary_info.add_side(elem, 0, 0);
+		      mesh.boundary_info->add_side(elem, 0, 0);
 		  
 		    if (j == 2*(ny-1))
-		      mesh.boundary_info.add_side(elem, 2, 2);
+		      mesh.boundary_info->add_side(elem, 2, 2);
 		  
 		    if (i == 0)
-		      mesh.boundary_info.add_side(elem, 3, 3);
+		      mesh.boundary_info->add_side(elem, 3, 3);
 		  
 		    if (i == 2*(nx-1))
-		      mesh.boundary_info.add_side(elem, 1, 1);
+		      mesh.boundary_info->add_side(elem, 1, 1);
 		  }
 	      break;
 	    }
@@ -832,22 +833,22 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 		      elem->set_node(7) = mesh.node_ptr(idx(type,nx,ny,i,j+1,k+1)  );
 			
 		      if (k == 0)
-			mesh.boundary_info.add_side(elem, 0, 0);
+			mesh.boundary_info->add_side(elem, 0, 0);
 			
 		      if (k == (nz-1))
-			mesh.boundary_info.add_side(elem, 5, 5);
+			mesh.boundary_info->add_side(elem, 5, 5);
 			
 		      if (j == 0)
-			mesh.boundary_info.add_side(elem, 1, 1);
+			mesh.boundary_info->add_side(elem, 1, 1);
 
 		      if (j == (ny-1))
-			mesh.boundary_info.add_side(elem, 3, 3);
+			mesh.boundary_info->add_side(elem, 3, 3);
  			
 		      if (i == 0)
-			mesh.boundary_info.add_side(elem, 4, 4);
+			mesh.boundary_info->add_side(elem, 4, 4);
  			
 		      if (i == (nx-1))
-			mesh.boundary_info.add_side(elem, 2, 2);
+			mesh.boundary_info->add_side(elem, 2, 2);
 		    }
 	      break;
 	    }
@@ -934,22 +935,22 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 			
 			
 		      if (k == 0)
-			mesh.boundary_info.add_side(elem, 0, 0);
+			mesh.boundary_info->add_side(elem, 0, 0);
 			
 		      if (k == 2*(nz-1))
-			mesh.boundary_info.add_side(elem, 5, 5);
+			mesh.boundary_info->add_side(elem, 5, 5);
 			
 		      if (j == 0)
-			mesh.boundary_info.add_side(elem, 1, 1);
+			mesh.boundary_info->add_side(elem, 1, 1);
 
 		      if (j == 2*(ny-1))
-			mesh.boundary_info.add_side(elem, 3, 3);
+			mesh.boundary_info->add_side(elem, 3, 3);
  			
 		      if (i == 0)
-			mesh.boundary_info.add_side(elem, 4, 4);
+			mesh.boundary_info->add_side(elem, 4, 4);
  			
 		      if (i == 2*(nx-1))
-			mesh.boundary_info.add_side(elem, 2, 2);
+			mesh.boundary_info->add_side(elem, 2, 2);
 		    }
 	      break;
 	    }
