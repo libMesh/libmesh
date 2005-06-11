@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.60 2005-06-11 05:11:31 jwpeterson Exp $
+// $Id: mesh.C,v 1.61 2005-06-11 06:09:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -221,9 +221,28 @@ void Mesh::delete_elem(Elem* e)
 {
   assert (e != NULL);
 
-  std::vector<Elem*>::iterator pos = std::find (_elements.begin(),
-						_elements.end(),
-						e);
+  // Initialize an iterator to eventually point to the element we want to delete
+  std::vector<Elem*>::iterator pos = _elements.end();
+  
+  // In many cases, e->id() gives us a clue as to where e
+  // is located in the _elements vector.  Try that first
+  // before trying the O(n_elem) search.
+  assert (e->id() < _elements.size());
+
+  if (_elements[e->id()] == e)
+    {
+      // We found it!
+      pos = _elements.begin();
+      std::advance(pos, e->id());
+    }
+
+  else
+    {
+      // This search is O(n_elem)
+      pos = std::find (_elements.begin(),
+		       _elements.end(),
+		       e);
+    }
 
   // Huh? Element not in the vector?
   assert (pos != _elements.end());
