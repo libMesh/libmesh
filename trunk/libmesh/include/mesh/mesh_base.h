@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.46 2005-05-10 21:37:17 benkirk Exp $
+// $Id: mesh_base.h,v 1.47 2005-06-11 05:11:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,26 +25,21 @@
 
 
 // C++ Includes   -----------------------------------
-#include <algorithm>
-#include <vector>
 #include <string>
-
 
 // forward declarations
 class Elem;
-class EquationSystems;
 class Node;
 class Point;
+class Partitioner;
+class BoundaryInfo;
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
-#include "boundary_info.h"
 #include "enum_elem_type.h"
-#include "enum_order.h"
-#include "partitioner.h"
 #include "variant_filter_iterator.h"
 #include "multi_predicates.h"
-
+#include "auto_ptr.h"
 
 
 
@@ -61,8 +56,8 @@ class Point;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2005-05-10 21:37:17 $
- * \version $Revision: 1.46 $
+ * \date    $Date: 2005-06-11 05:11:30 $
+ * \version $Revision: 1.47 $
  */
 
 
@@ -92,7 +87,7 @@ public:
    * and faces with a corresponding id that facilitates setting boundary
    * conditions.
    */
-  BoundaryInfo boundary_info;
+  AutoPtr<BoundaryInfo> boundary_info;
   
   /**
    * Deletes all the data that are currently stored.

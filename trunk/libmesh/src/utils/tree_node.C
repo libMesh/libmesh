@@ -1,4 +1,4 @@
-// $Id: tree_node.C,v 1.18 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: tree_node.C,v 1.19 2005-06-11 05:11:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,7 @@
 
 
 // C++ includes
+#include <set>
 
 // Local includes
 #include "libmesh_config.h"

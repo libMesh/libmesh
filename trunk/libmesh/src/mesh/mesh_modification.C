@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.12 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: mesh_modification.C,v 1.13 2005-06-11 05:11:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -40,6 +40,7 @@
 #include "cell_inf_hex16.h"
 #include "cell_inf_hex18.h"
 #include "libmesh_logging.h"
+#include "boundary_info.h"
 
 
 
@@ -448,10 +449,10 @@ void Mesh::all_second_order (const bool full_ordered)
 	for (unsigned int s=0; s<lo_elem->n_sides(); s++)
 	  {
 	    const short int boundary_id =
-	      this->boundary_info.boundary_id (lo_elem, s);
+	      this->boundary_info->boundary_id (lo_elem, s);
 	    
-	    if (boundary_id != this->boundary_info.invalid_id)
-	      this->boundary_info.add_side (so_elem, s, boundary_id);
+	    if (boundary_id != this->boundary_info->invalid_id)
+	      this->boundary_info->add_side (so_elem, s, boundary_id);
 	  }
 	
 	/**
@@ -460,7 +461,7 @@ void Mesh::all_second_order (const bool full_ordered)
 	 * the low-ordered element, we should first un-associate
 	 * any boundary conditions it has.
 	 */
-	this->boundary_info.remove (lo_elem);
+	this->boundary_info->remove (lo_elem);
       }
 
       

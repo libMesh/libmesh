@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.59 2005-06-06 19:10:17 benkirk Exp $
+// $Id: mesh.C,v 1.60 2005-06-11 05:11:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 #include "mesh_communication.h"
 #include "libmesh_logging.h"
 #include "elem.h"
+#include "boundary_info.h"
 
 #include "diva_io.h"
 #include "exodusII_io.h"
@@ -576,7 +577,7 @@ void Mesh::renumber_nodes_and_elements ()
 
 	// remove any boundary information associated with
 	// this node
-	this->boundary_info.remove (*it);
+	this->boundary_info->remove (*it);
 	
 	// delete the node
 	delete *it;
@@ -912,11 +913,11 @@ void Mesh::create_submesh (Mesh& new_mesh,
       // Maybe add boundary conditions for this element
       for (unsigned int s=0; s<old_elem->n_sides(); s++)
 	if (old_elem->neighbor(s) == NULL)
-	  if (this->boundary_info.boundary_id (old_elem, s) !=
-	      this->boundary_info.invalid_id)
-	    new_mesh.boundary_info.add_side (new_elem,
+	  if (this->boundary_info->boundary_id (old_elem, s) !=
+	      this->boundary_info->invalid_id)
+	    new_mesh.boundary_info->add_side (new_elem,
 					     s,
-					     this->boundary_info.boundary_id (old_elem, s));
+					     this->boundary_info->boundary_id (old_elem, s));
     } // end loop over elements
   
 

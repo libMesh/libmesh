@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.94 2005-05-10 21:37:17 benkirk Exp $
+// $Id: mesh_base.C,v 1.95 2005-06-11 05:11:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -33,13 +33,14 @@
 #include "libmesh_logging.h"
 #include "metis_partitioner.h" // for default partitioning
 #include "elem.h"
+#include "boundary_info.h"
 
 
 
 // ------------------------------------------------------------
 // MeshBase class member functions
 MeshBase::MeshBase (unsigned int d) :
-  boundary_info (*this),
+  boundary_info (new BoundaryInfo(*this)),
   _n_sbd        (1),
   _n_parts      (1),
   _dim          (d),
@@ -53,7 +54,7 @@ MeshBase::MeshBase (unsigned int d) :
 
 
 MeshBase::MeshBase (const MeshBase& other_mesh) :
-  boundary_info      (*this),
+  boundary_info      (new BoundaryInfo(*this)), // no copy constructor defined for BoundaryInfo?
   _n_sbd             (other_mesh._n_sbd),
   _n_parts           (other_mesh._n_parts),
   _dim               (other_mesh._dim),
@@ -121,7 +122,7 @@ void MeshBase::clear ()
   _is_prepared = false;
 
   // Clear boundary information
-  this->boundary_info.clear();
+  this->boundary_info->clear();
 }
 
 

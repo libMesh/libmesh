@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.14 2005-06-08 04:10:19 roystgnr Exp $
+// $Id: system.h,v 1.15 2005-06-11 05:11:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -499,7 +499,7 @@ private:
    * Data structure describing the relationship between
    * nodes, variables, etc... and degrees of freedom.
    */
-  DofMap* _dof_map;
+  AutoPtr<DofMap> _dof_map;
 
   /**
    * Constant reference to the \p EquationSystems object
