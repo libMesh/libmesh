@@ -1,4 +1,4 @@
-// $Id: exodusII_io.C,v 1.8 2005-04-20 13:34:41 benkirk Exp $
+// $Id: exodusII_io.C,v 1.9 2005-06-11 15:02:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 
 // Local includes
 #include "exodusII_io.h"
+#include "boundary_info.h"
 #include "mesh_base.h"
 #include "enum_elem_type.h"
 #include "elem.h"
@@ -1126,9 +1127,9 @@ void ExodusII_IO::read (const std::string& fname)
 	const ExodusII::Conversion conv =
 	  em.assign_conversion(mesh.elem(elem_list[e]-1)->type());
 	
-	mesh.boundary_info.add_side (elem_list[e]-1,
-				     conv.get_side_map(side_list[e]-1),
-				     id_list[e]);
+	mesh.boundary_info->add_side (elem_list[e]-1,
+				      conv.get_side_map(side_list[e]-1),
+				      id_list[e]);
       }
   }
     
