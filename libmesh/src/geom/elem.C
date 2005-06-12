@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.43 2005-06-06 16:24:13 knezed01 Exp $
+// $Id: elem.C,v 1.44 2005-06-12 18:36:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,30 +35,22 @@
 #include "face_quad4.h"
 #include "face_quad8.h"
 #include "face_quad9.h"
-#include "face_inf_quad.h"
 #include "face_inf_quad4.h"
 #include "face_inf_quad6.h"
-#include "cell_tet.h"
 #include "cell_tet4.h"
 #include "cell_tet10.h"
-#include "cell_hex.h"
 #include "cell_hex8.h"
 #include "cell_hex20.h"
 #include "cell_hex27.h"
-#include "cell_inf_hex.h"
 #include "cell_inf_hex8.h"
 #include "cell_inf_hex16.h"
 #include "cell_inf_hex18.h"
-#include "cell_prism.h"
 #include "cell_prism6.h"
 #include "cell_prism15.h"
 #include "cell_prism18.h"
-#include "cell_inf_prism.h"
 #include "cell_inf_prism6.h"
 #include "cell_inf_prism12.h"
-#include "cell_pyramid.h"
 #include "cell_pyramid5.h"
-#include "multi_predicates.h"
 
 
 // ------------------------------------------------------------

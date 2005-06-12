@@ -1,4 +1,4 @@
-// $Id: partitioner_factory.C,v 1.11 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: partitioner_factory.C,v 1.12 2005-06-12 18:36:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,12 +23,10 @@
 
 // Local Includes -----------------------------------
 #include "libmesh_config.h"
-#include "partitioner.h"
 #include "centroid_partitioner.h"
 #include "metis_partitioner.h"
 #include "parmetis_partitioner.h"
 #include "linear_partitioner.h"
-#include "sfc_partitioner.h"
 #include "hilbert_sfc_partitioner.h"
 #include "morton_sfc_partitioner.h"
 #include "factory.h"

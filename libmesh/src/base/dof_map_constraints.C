@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.17 2005-06-06 16:23:58 knezed01 Exp $
+// $Id: dof_map_constraints.C,v 1.18 2005-06-12 18:36:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,12 +25,10 @@
 
 // Local Includes -----------------------------------
 #include "dof_map.h"
-#include "elem.h"
 #include "mesh_base.h"
 #include "fe_interface.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
-#include "libmesh.h"
 #include "libmesh_logging.h"
 
 

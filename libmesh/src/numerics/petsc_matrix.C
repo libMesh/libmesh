@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.C,v 1.26 2005-05-11 23:12:00 benkirk Exp $
+// $Id: petsc_matrix.C,v 1.27 2005-06-12 18:36:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -19,15 +19,14 @@
 
 
 // C++ includes
-
-// Local includes
-#include "petsc_matrix.h"
-#include "petsc_vector.h"
+#include "libmesh_config.h"
 
 #ifdef HAVE_PETSC
 
+// Local includes
+#include "petsc_matrix.h"
 #include "dof_map.h"
-
+#include "dense_matrix.h"
 
 
 
@@ -288,6 +287,35 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
 
 
 
+
+template <typename T>
+void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
+				const std::vector<unsigned int>& rows,
+				const std::vector<unsigned int>& cols)
+{
+  assert (this->initialized());
+  
+  const unsigned int m = dm.m();
+  const unsigned int n = dm.n();
+
+  assert (rows.size() == m);
+  assert (cols.size() == n);
+  
+  int ierr=0;
+
+  // These casts are required for PETSc <= 2.1.5
+  ierr = MatSetValues(_mat,
+		      m, (int*) &rows[0],
+		      n, (int*) &cols[0],
+		      (PetscScalar*) &dm.get_values()[0],
+		      ADD_VALUES);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+}
+
+
+
+
+
 template <typename T>
 void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
 				    const std::vector<unsigned int> &rows,
@@ -331,6 +359,9 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
   ierr = ISDestroy(isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = ISDestroy(iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
+
+
+
 
 
 

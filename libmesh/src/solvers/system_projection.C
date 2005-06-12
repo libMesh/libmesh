@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.25 2005-06-08 23:59:31 benkirk Exp $
+// $Id: system_projection.C,v 1.26 2005-06-12 18:36:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,18 +26,15 @@
 #include "system.h"
 #include "mesh.h"
 #include "elem.h"
-#include "libmesh.h"
 #include "dof_map.h"
-#include "fe.h"
-#include "fe_type.h"
 #include "fe_interface.h"
 #include "numeric_vector.h"
 #include "libmesh_logging.h"
 
 #include "dense_matrix.h"
-#include "mesh_base.h"
 #include "fe_base.h"
 #include "quadrature_gauss.h"
+#include "dense_vector.h"
 
 
 

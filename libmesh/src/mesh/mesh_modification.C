@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.13 2005-06-11 05:11:31 jwpeterson Exp $
+// $Id: mesh_modification.C,v 1.14 2005-06-12 18:36:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,17 +28,8 @@
 #include "mesh_tools.h"
 #include "mesh_modification.h"
 #include "mesh.h"
-#include "libmesh.h"
-#include "elem.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
-#include "face_inf_quad4.h"
-#include "face_inf_quad6.h"
-#include "cell_inf_prism6.h"
-#include "cell_inf_prism12.h"
-#include "cell_inf_hex8.h"
-#include "cell_inf_hex16.h"
-#include "cell_inf_hex18.h"
 #include "libmesh_logging.h"
 #include "boundary_info.h"
 

@@ -31,7 +31,6 @@ ex0.$(obj-suffix):\
     ../../include/geom/edge_edge3.h\
     ../../include/geom/elem.h\
     ../../include/geom/point.h\
-    ../../include/mesh/boundary_info.h\
     ../../include/mesh/gnuplot_io.h\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
@@ -52,7 +51,6 @@ ex0.$(obj-suffix):\
     ../../include/numerics/type_tensor.h\
     ../../include/numerics/type_vector.h\
     ../../include/numerics/vector_value.h\
-    ../../include/partitioning/partitioner.h\
     ../../include/quadrature/quadrature.h\
     ../../include/quadrature/quadrature_gauss.h\
     ../../include/solvers/equation_systems.h\

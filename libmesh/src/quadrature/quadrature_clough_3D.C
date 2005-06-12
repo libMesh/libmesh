@@ -1,4 +1,4 @@
-// $Id: quadrature_clough_3D.C,v 1.2 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: quadrature_clough_3D.C,v 1.3 2005-06-12 18:36:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,6 @@
 
 // Local includes
 #include "quadrature_clough.h"
-#include "quadrature_gauss.h"
 
 
 void QClough::init_3D(const ElemType _type)

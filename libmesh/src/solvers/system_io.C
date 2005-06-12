@@ -1,4 +1,4 @@
-// $Id: system_io.C,v 1.10 2005-06-03 15:49:58 jwpeterson Exp $
+// $Id: system_io.C,v 1.11 2005-06-12 18:36:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,6 @@
 
 // Local Includes
 #include "system.h"
-#include "libmesh.h"
 #include "mesh.h"
 #include "elem.h"
 #include "xdr_cxx.h"

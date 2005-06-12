@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.30 2005-05-24 15:24:12 jwpeterson Exp $
+// $Id: fe_base.C,v 1.31 2005-06-12 18:36:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,8 +21,6 @@
 
 // Local includes
 #include "fe.h"
-#include "libmesh.h"
-#include "quadrature.h"
 #include "inf_fe.h"
 #include "libmesh_logging.h"
 
