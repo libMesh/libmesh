@@ -29,7 +29,6 @@ ex5.$(obj-suffix):\
     ../../include/fe/fe_type.h\
     ../../include/geom/elem.h\
     ../../include/geom/point.h\
-    ../../include/mesh/boundary_info.h\
     ../../include/mesh/gmv_io.h\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
@@ -47,7 +46,6 @@ ex5.$(obj-suffix):\
     ../../include/numerics/type_tensor.h\
     ../../include/numerics/type_vector.h\
     ../../include/numerics/vector_value.h\
-    ../../include/partitioning/partitioner.h\
     ../../include/quadrature/quadrature.h\
     ../../include/quadrature/quadrature_rules.h\
     ../../include/solvers/equation_systems.h\

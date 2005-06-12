@@ -1,4 +1,4 @@
-// $Id: quadrature_grid_3D.C,v 1.1 2005-01-13 21:54:03 roystgnr Exp $
+// $Id: quadrature_grid_3D.C,v 1.2 2005-06-12 18:36:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,6 @@
 
 // Local includes
 #include "quadrature_grid.h"
-#include "quadrature_jacobi.h"
 
 
 void QGrid::init_3D(const ElemType _type)

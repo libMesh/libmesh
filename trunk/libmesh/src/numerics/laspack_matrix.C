@@ -1,4 +1,4 @@
-// $Id: laspack_matrix.C,v 1.21 2005-05-24 12:54:57 jwpeterson Exp $
+// $Id: laspack_matrix.C,v 1.22 2005-06-12 18:36:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,11 +22,11 @@
 // C++ includes
 
 // Local includes
-#include "laspack_matrix.h"
-
+#include "libmesh_config.h"
 
 #ifdef HAVE_LASPACK
 
+#include "laspack_matrix.h"
 #include "dof_map.h"
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.C,v 1.5 2005-05-06 20:58:41 benkirk Exp $
+// $Id: mesh_triangle_support.C,v 1.6 2005-06-12 18:36:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,6 @@
 
 #include "mesh_triangle_support.h"
 #include "mesh.h"
-#include "elem.h"
 #include "face_tri3.h"
 #include "mesh_generation.h"
 #include "mesh_smoother_laplace.h"

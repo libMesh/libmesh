@@ -1,4 +1,4 @@
-// $Id: analytic_function.C,v 1.5 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: analytic_function.C,v 1.6 2005-06-12 18:36:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,6 @@
 
 // Local Includes
 #include "analytic_function.h"
-#include "dense_vector.h"
 
 
 

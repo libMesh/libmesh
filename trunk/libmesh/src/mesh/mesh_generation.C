@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.39 2005-06-11 05:11:31 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.40 2005-06-12 18:36:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 // Local includes
 #include "mesh_generation.h"
 #include "mesh.h"
-#include "elem.h"
+// #include "elem.h"
 // #include "mesh_refinement.h"
 #include "edge_edge2.h"
 #include "edge_edge3.h"

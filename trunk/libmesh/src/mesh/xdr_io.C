@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.12 2005-06-11 05:11:31 jwpeterson Exp $
+// $Id: xdr_io.C,v 1.13 2005-06-12 18:36:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -33,9 +33,7 @@
 #include "mesh_tools.h"
 #include "cell_hex27.h" // Needed for MGF-style Hex27 meshes
 #include "xdr_io.h"
-#include "enum_elem_type.h"
 #include "o_f_stream.h"
-#include "utility.h"
 #include "boundary_info.h"
 
 #ifdef HAVE_XDR

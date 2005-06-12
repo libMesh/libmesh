@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.h,v 1.15 2005-06-02 18:25:42 benkirk Exp $
+// $Id: petsc_matrix.h,v 1.16 2005-06-12 18:36:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,8 +35,9 @@
 
 // Local includes
 #include "sparse_matrix.h"
-#include "dense_matrix.h"
 
+// Forward Declarations
+template <typename T> class DenseMatrix;
 
 
 /**
@@ -488,30 +489,6 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 
 
-template <typename T>
-inline
-void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-				const std::vector<unsigned int>& rows,
-				const std::vector<unsigned int>& cols)
-{
-  assert (this->initialized());
-  
-  const unsigned int m = dm.m();
-  const unsigned int n = dm.n();
-
-  assert (rows.size() == m);
-  assert (cols.size() == n);
-  
-  int ierr=0;
-
-  // These casts are required for PETSc <= 2.1.5
-  ierr = MatSetValues(_mat,
-		      m, (int*) &rows[0],
-		      n, (int*) &cols[0],
-		      (PetscScalar*) &dm.get_values()[0],
-		      ADD_VALUES);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-}
 
 
 

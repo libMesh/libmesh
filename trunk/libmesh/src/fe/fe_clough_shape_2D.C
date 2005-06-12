@@ -1,4 +1,4 @@
-// $Id: fe_clough_shape_2D.C,v 1.4 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: fe_clough_shape_2D.C,v 1.5 2005-06-12 18:36:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,6 @@
 // Local includes
 #include "fe.h"
 #include "elem.h"
-//#include "utility.h"
 
 
 // Anonymous namespace for persistant variables.

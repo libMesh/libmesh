@@ -1,4 +1,4 @@
-// $Id: transient_system.C,v 1.8 2005-06-03 15:49:58 jwpeterson Exp $
+// $Id: transient_system.C,v 1.9 2005-06-12 18:36:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,9 +23,9 @@
 
 // Local includes
 #include "transient_system.h"
-#include "implicit_system.h"
-#include "explicit_system.h"
-#include "libmesh_logging.h"
+//#include "implicit_system.h"
+//#include "explicit_system.h"
+//#include "libmesh_logging.h"
 #include "utility.h"
 #include "dof_map.h"
 #include "numeric_vector.h"

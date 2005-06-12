@@ -1,4 +1,4 @@
-// $Id: nonlinear.h,v 1.3 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: nonlinear.h,v 1.4 2005-06-12 18:36:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,6 @@
 #include "libmesh_common.h"
 #include "numeric_vector.h"
 #include "linear.h"
-
 
 /**
  * This is a generic class that defines a nonlinear to be used in a

@@ -1,4 +1,4 @@
-// $Id: inf_fe.C,v 1.30 2005-02-22 22:17:37 jwpeterson Exp $
+// $Id: inf_fe.C,v 1.31 2005-06-12 18:36:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 #include "inf_fe.h"
 #include "quadrature_gauss.h"
 #include "elem.h"
-#include "fe.h"
 #include "libmesh_logging.h"
 
 

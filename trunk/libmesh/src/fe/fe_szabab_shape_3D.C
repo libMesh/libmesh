@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_3D.C,v 1.3 2005-02-22 22:17:37 jwpeterson Exp $
+// $Id: fe_szabab_shape_3D.C,v 1.4 2005-06-12 18:36:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
 #include "fe.h"
-#include "elem.h"
 
 
 template <>

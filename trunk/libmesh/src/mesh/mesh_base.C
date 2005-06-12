@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.95 2005-06-11 05:11:31 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.96 2005-06-12 18:36:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,6 @@
 
 // Local includes
 #include "mesh_base.h"
-#include "libmesh_logging.h"
 #include "metis_partitioner.h" // for default partitioning
 #include "elem.h"
 #include "boundary_info.h"

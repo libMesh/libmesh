@@ -1,4 +1,4 @@
-// $Id: plt_loader_write.C,v 1.6 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: plt_loader_write.C,v 1.7 2005-06-12 18:36:42 jwpeterson Exp $
 
 // Copyright (C) 2002-2005  Benjamin S. Kirk
   
@@ -22,7 +22,6 @@
 #include <fstream>
 
 // Local includes
-#include "utility.h"
 #include "plt_loader.h"
 
 

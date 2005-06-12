@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic.C,v 1.21 2005-05-06 17:43:44 roystgnr Exp $
+// $Id: fe_hierarchic.C,v 1.22 2005-06-12 18:36:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -20,14 +20,9 @@
 
 
 // Local includes
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "dof_map.h"
 #include "elem.h"
 #include "fe.h"
 #include "fe_macro.h"
-#include "fe_interface.h"
-#include "quadrature_gauss.h"
 
 
 

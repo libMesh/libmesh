@@ -1,4 +1,4 @@
-// $Id: linear_solver.C,v 1.3 2005-05-02 13:12:29 spetersen Exp $
+// $Id: linear_solver.C,v 1.4 2005-06-12 18:36:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,6 @@
 #include "linear_solver.h"
 #include "laspack_linear_solver.h"
 #include "petsc_linear_solver.h"
-#include "auto_ptr.h"
 
 
 //------------------------------------------------------------------
