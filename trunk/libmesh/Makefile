@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.50 2005-06-01 21:43:38 benkirk Exp $
+# $Id: Makefile,v 1.51 2005-06-12 19:04:22 jwpeterson Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -123,6 +123,12 @@ echo:
 	@echo -e "LDFLAGS:\n$(LDFLAGS)\n"
 	@echo -e "DLFLAGS:\n$(DLFLAGS)\n"
 	@echo -e "EXAMPLES:\n$(examplesrcfiles)\n"
+
+#
+# Print the name of the C++ compiler, padded with whitespace
+#
+echo_cxx:
+	@echo -n " " $(CXX) " "
 
 #
 # Print the flags used for C++ compilation, padded with whitespace

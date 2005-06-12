@@ -26,6 +26,10 @@ echo_list=""
 #
 while [ "x$1" != "x" ]; do
     case "$1" in
+	"--cxx")
+	    echo_list="echo_cxx $echo_list"
+	    ;;
+
 	"--cxxflags")
 	    echo_list="echo_cxxflags $echo_list"
 	    ;;
