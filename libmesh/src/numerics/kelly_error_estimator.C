@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.15 2005-06-11 03:59:18 jwpeterson Exp $
+// $Id: kelly_error_estimator.C,v 1.16 2005-06-13 21:04:43 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -97,18 +97,26 @@ void KellyErrorEstimator::estimate_error (const System& system,
   std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
 
 
-  // Check for a valid component_mask
-  if (!component_mask.empty())
-    if (component_mask.size() != n_vars)
-      {
-	std::cerr << "ERROR: component_mask is the wrong size:"
-		  << std::endl
-		  << " component_mask.size()=" << component_mask.size()
-		  << std::endl
-		  << " n_vars=" << n_vars
-		  << std::endl;
-	error();
-      }
+  // Check for a valid component_scale
+  if (!component_scale.empty())
+    {
+      if (component_scale.size() != n_vars)
+	{
+	  std::cerr << "ERROR: component_scale is the wrong size:"
+		    << std::endl
+		    << " component_scale.scale()=" << component_scale.size()
+		    << std::endl
+		    << " n_vars=" << n_vars
+		    << std::endl;
+	  error();
+	}
+    }
+  else
+    {
+      // No specified scaling.  Scale all variables by one.
+      component_scale.resize (n_vars);
+      std::fill (component_scale.begin(), component_scale.end(), 1.0);
+    }
   
 
 
@@ -118,8 +126,8 @@ void KellyErrorEstimator::estimate_error (const System& system,
     for(unsigned int var=0; var<n_vars; var++)
     {
       // Possibly skip this variable
-      if (!component_mask.empty())
-        if (component_mask[var] == false) continue;
+      if (!component_scale.empty())
+        if (component_scale[var] == 0.0) continue;
 
       // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);
@@ -221,13 +229,13 @@ void KellyErrorEstimator::estimate_error (const System& system,
 #ifndef USE_COMPLEX_NUMBERS
               error += jump*jump;
 #else
-	      error +=std::norm(jump);
+	      error += std::norm(jump);
 #endif
               // Add the error contribution to element e
               assert(e_id < error_per_cell.size());
               assert(f_id < error_per_cell.size());
-              error_per_cell[e_id] += h_e*error;
-              error_per_cell[f_id] += h_f*error;
+              error_per_cell[e_id] += h_e*error*component_scale[var];
+              error_per_cell[f_id] += h_f*error*component_scale[var];
             } // end if(f->active()...
           } // end e->neighbor(n_e) != NULL
         } // end loop over neighbors
@@ -255,8 +263,8 @@ void KellyErrorEstimator::estimate_error (const System& system,
   for (unsigned int var=0; var<n_vars; var++)
     {
       // Possibly skip this variable
-      if (!component_mask.empty())
-	if (component_mask[var] == false) continue;
+      if (!component_scale.empty())
+	if (component_scale[var] == 0.0) continue;
 
       // The (string) name of this variable
       const std::string& var_name = system.variable_name(var);
@@ -412,8 +420,8 @@ void KellyErrorEstimator::estimate_error (const System& system,
 		      // Add the error contribution to elements e & f
                       assert(e_id < error_per_cell.size());
                       assert(f_id < error_per_cell.size());
-		      error_per_cell[e_id] += error;
-		      error_per_cell[f_id] += error;
+		      error_per_cell[e_id] += error*component_scale[var];
+		      error_per_cell[f_id] += error*component_scale[var];
 		    } // end if case 1 or case 2
 		} // if (e->neigbor(n_e) != NULL)
 
@@ -509,7 +517,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
 
 			  // Add the error contribution to elements e & f
                           assert(e_id < error_per_cell.size());
-			  error_per_cell[e_id] += error;
+			  error_per_cell[e_id] += error*component_scale[var];
 			  
 			} // end if side on flux boundary
 		      

@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.10 2005-06-11 03:59:18 jwpeterson Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.11 2005-06-13 21:04:43 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -62,13 +62,13 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
   std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
 
 
-  // Check for a valid component_mask
-  if (!component_mask.empty())
-    if (component_mask.size() != n_vars)
+  // Check for a valid component_scale
+  if (!component_scale.empty())
+    if (component_scale.size() != n_vars)
       {
-	std::cerr << "ERROR: component_mask is the wrong size:"
+	std::cerr << "ERROR: component_scale is the wrong size:"
 		  << std::endl
-		  << " component_mask.size()=" << component_mask.size()
+		  << " component_scale.size()=" << component_scale.size()
 		  << std::endl
 		  << ", n_vars=" << n_vars
 		  << std::endl;
@@ -102,8 +102,8 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
       for (unsigned int var=0; var<n_vars; var++)
 	{
 	  // Possibly skip this variable
-	  if (!component_mask.empty())
-	    if (component_mask[var] == false) continue;
+	  if (!component_scale.empty())
+	    if (component_scale[var] == 0.0) continue;
 	  
 	  // The type of finite element to use for this variable
 	  const FEType& fe_type = dof_map.variable_type (var);

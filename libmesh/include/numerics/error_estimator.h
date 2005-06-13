@@ -1,4 +1,4 @@
-// $Id: error_estimator.h,v 1.8 2005-06-11 03:59:17 jwpeterson Exp $
+// $Id: error_estimator.h,v 1.9 2005-06-13 21:04:40 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -77,14 +77,13 @@ public:
 //   { this->estimate_error (es.get_system<SteadySystem>(name), error_per_cell); }
 
   /**
-   * This vector can be used to "mask" certain
+   * This vector can be used to "scale" certain
    * variables in a system.  If the mask is empty then the error
    * will be calculated for all variables in the system.  If
-   * the mask is not empty the error will be calculated only
-   * for those components for which \p component_mask[c] is
-   * true.
+   * the mask is not empty the error for each component will be
+   * scaled by component_scale[c].
    */
-  std::vector<bool> component_mask;
+  std::vector<float> component_scale;
 
 protected:
 
