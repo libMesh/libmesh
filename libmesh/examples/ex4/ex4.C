@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.44 2005-06-06 16:23:55 knezed01 Exp $ */
+/* $Id: ex4.C,v 1.45 2005-06-13 01:31:33 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -76,6 +76,11 @@
 // The definition of a geometric element
 #include "elem.h"
 
+#include "string_to_enum.h"
+#include "getpot.h"
+
+
+
 // Function prototype.  This is the function that will assemble
 // the linear system for our Poisson problem.  Note that the
 // function will take the \p EquationSystems object and the
@@ -101,10 +106,14 @@ int main (int argc, char** argv)
   
   // Braces are used to force object scope, like in example 2
   {
+    // Create a GetPot object to parse the command line
+    GetPot command_line (argc, argv);
+    
     // Check for proper calling arguments.
     if (argc < 3)
       {
-	std::cerr << "Usage: " << argv[0] << " -d 2(3)" << " -n 15"
+	std::cerr << "Usage:\n"
+		  <<"\t " << argv[0] << " -d 2(3)" << " -n 15"
 		  << std::endl;
 
 	// This handy function will print the file name, line number,
@@ -158,16 +167,25 @@ int main (int argc, char** argv)
     // Declare the system and its variables.
     {
       // Creates a system named "Poisson"
-      equation_systems.add_system<LinearImplicitSystem> ("Poisson");
-      
+      LinearImplicitSystem& system =
+	equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
+      // Look for user-specified interpolation orders &
+      // Finite Element specification
+      const std::string
+	order  = command_line("Order",    "SECOND"),
+	family = command_line("FEFamily", "LAGRANGE");
+      
+      
       // Adds the variable "u" to "Poisson".  "u"
       // will be approximated using second-order approximation.
-      equation_systems.get_system("Poisson").add_variable("u", SECOND);
+      system.add_variable("u",
+			  Utility::string_to_enum<Order>   (order),
+			  Utility::string_to_enum<FEFamily>(family));
 
       // Give the system a pointer to the matrix assembly
       // function.
-      equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
+      system.attach_assemble_function (assemble_poisson);
       
       // Initialize the data structures for the equation system.
       equation_systems.init();
