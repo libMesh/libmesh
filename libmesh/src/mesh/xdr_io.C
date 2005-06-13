@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.13 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: xdr_io.C,v 1.14 2005-06-13 09:17:07 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,10 @@
 #include "xdr_io.h"
 #include "o_f_stream.h"
 #include "boundary_info.h"
+
+#ifdef USE_COMPLEX_NUMBERS
+#include "utility.h"
+#endif
 
 #ifdef HAVE_XDR
 #  include <rpc/rpc.h>
