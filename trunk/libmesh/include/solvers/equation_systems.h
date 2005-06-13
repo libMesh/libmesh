@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.16 2005-06-06 14:53:18 jwpeterson Exp $
+// $Id: equation_systems.h,v 1.17 2005-06-13 20:24:33 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -153,25 +153,25 @@ public:
    */
   System & get_system (const unsigned int num);
   
-  /**
-   * @returns a reference to the system named \p name.
-   */
-  System & operator () (const std::string& name);
+//   /**
+//    * @returns a reference to the system named \p name.
+//    */
+//   System & operator () (const std::string& name);
  
-  /**
-   * @returns a constant reference to the system name
-   */
-  const System & operator () (const std::string& name) const;
+//   /**
+//    * @returns a constant reference to the system name
+//    */
+//   const System & operator () (const std::string& name) const;
  
-  /**
-   * @returns a reference to system number \p num.
-   */
-  System & operator () (const unsigned int num);
+//   /**
+//    * @returns a reference to system number \p num.
+//    */
+//   System & operator () (const unsigned int num);
  
-  /**
-   * @returns a constant reference to system number \p num.
-   */
-  const System & operator () (const unsigned int num) const;
+//   /**
+//    * @returns a constant reference to system number \p num.
+//    */
+//   const System & operator () (const unsigned int num) const;
   
   /**
    * Add the system of type \p system_type named \p name to the
@@ -622,38 +622,38 @@ System & EquationSystems::get_system (const unsigned int num)
 
 
 
-inline
-System & EquationSystems::operator () (const std::string& name)
-{
-  deprecated(); // Use the get_system() interface directly instead.
-  return this->get_system (name);
-}
+// inline
+// System & EquationSystems::operator () (const std::string& name)
+// {
+//   deprecated(); // Use the get_system() interface directly instead.
+//   return this->get_system (name);
+// }
   
  
-inline
-const System & EquationSystems::operator () (const std::string& name) const
-{
-  deprecated(); // Use the get_system() interface directly instead.
-  return this->get_system (name);
-}
+// inline
+// const System & EquationSystems::operator () (const std::string& name) const
+// {
+//   deprecated(); // Use the get_system() interface directly instead.
+//   return this->get_system (name);
+// }
   
  
  
-inline
-System & EquationSystems::operator () (const unsigned int num)
-{
-  deprecated(); // Use the get_system() interface directly instead.
-  return this->get_system (num);
-}
+// inline
+// System & EquationSystems::operator () (const unsigned int num)
+// {
+//   deprecated(); // Use the get_system() interface directly instead.
+//   return this->get_system (num);
+// }
 
 
 
-inline
-const System & EquationSystems::operator () (const unsigned int num) const
-{
-  deprecated(); // Use the get_system() interface directly instead.
-  return this->get_system (num);
-}
+// inline
+// const System & EquationSystems::operator () (const unsigned int num) const
+// {
+//   deprecated(); // Use the get_system() interface directly instead.
+//   return this->get_system (num);
+// }
 
 
 
