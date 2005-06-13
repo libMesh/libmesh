@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.25 2005-05-06 17:43:44 roystgnr Exp $
+// $Id: fe_lagrange.C,v 1.26 2005-06-13 14:54:32 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -63,6 +63,19 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 
 	      return;
 	    }
+
+          case EDGE4:
+            {
+              assert(elem_soln.size() == 2);
+              assert(nodal_soln.size() == 4);
+
+              nodal_soln[0] = elem_soln[0];
+              nodal_soln[1] = elem_soln[1];
+              nodal_soln[2] = (2.*elem_soln[0] + elem_soln[1])/3.;
+              nodal_soln[3] = (elem_soln[0] + 2.*elem_soln[1])/3.;
+
+              return;
+            }
 
 	    
 	  case TRI6:
@@ -225,6 +238,37 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	  }
       }
 
+    case SECOND:
+      {
+	switch (type)
+	  {
+	  case EDGE4:
+            {
+              assert(elem_soln.size()  == 3);
+              assert(nodal_soln.size() == 4);
+
+              // Project quadratic solution onto cubic element nodes
+              nodal_soln[0] = elem_soln[0];
+              nodal_soln[1] = elem_soln[1];
+              nodal_soln[2] = (2.*elem_soln[0] - elem_soln[1] + 
+                               8.*elem_soln[2])/9.;
+              nodal_soln[3] = (-elem_soln[0] + 2*elem_soln[1] +
+                               8.*elem_soln[2])/9.;
+              return;
+            }
+
+          default:
+            {
+	      // By default the element solution _is_ nodal,
+	      // so just copy it.
+	      nodal_soln = elem_soln;
+	      
+	      return;
+            }
+          }
+        }
+
+
 
       
     default:
@@ -254,6 +298,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  {
 	  case EDGE2:
 	  case EDGE3:
+          case EDGE4:
 	    return 2;
 
 	  case TRI3:
@@ -339,6 +384,24 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  }
       }
 
+    case THIRD:
+      {
+        switch (t)
+        {
+          case EDGE4:
+            return 4;
+
+          default:
+            {
+#ifdef DEBUG
+              std::cerr << "ERROR: Bad ElemType = " << t
+                << " for THIRD order approximation!" 
+                << std::endl;
+#endif
+              error();	
+            }
+        }
+      }
       
     default:
       error();
@@ -365,6 +428,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  {
 	  case EDGE2:
 	  case EDGE3:
+          case EDGE4:
 	    {
 	      switch (n)
 		{
@@ -499,7 +563,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
       {
 	switch (t)
 	  {
-	    // quadratic lagrange has one dof at each node
+	  // quadratic lagrange has one dof at each node
 	  case EDGE3:
 	  case TRI6:
 	  case QUAD8:
@@ -522,6 +586,26 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    }
 	  }
       }
+
+    case THIRD:
+      {
+        switch (t)
+          {
+            case EDGE4:
+              return 1;
+
+	  default:
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for THIRD order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    }
+          }
+      }
+
 
       
     default:
