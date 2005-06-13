@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.84 2005-06-08 15:07:52 roystgnr Exp $
+// $Id: dof_map.C,v 1.85 2005-06-13 20:01:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,11 @@
 #include "libmesh_logging.h"
 #include "fe_type.h"
 #include "coupling_matrix.h"
+#include "numeric_vector.h"
+#include "dense_vector_base.h"
+#include "dense_matrix.h"
+
+
 
 // ------------------------------------------------------------
 // DofMap member functions
@@ -1022,7 +1027,79 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   for (; pos != end; ++pos)
     (*pos)->update_sparsity_pattern (sparsity_pattern);     
 }
- 
+
+
+
+void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
+				   const std::vector<unsigned int>& dof_indices,
+				   DenseVectorBase<Number>& Ue) const
+{
+#ifdef ENABLE_AMR
+
+  // Trivial mapping
+  assert (dof_indices.size() == Ue.size());
+  bool has_constrained_dofs = false;
+
+  for (unsigned int il=0; il<dof_indices.size(); il++)
+    {
+      const unsigned int ig = dof_indices[il];
+
+      if (this->is_constrained_dof (ig)) has_constrained_dofs = true;
+      
+      assert ((il >= Ug.first_local_index()) &&
+	      (il <  Ug.last_local_index()));
+
+      Ue.el(il) = Ug(ig);
+    }
+
+  // If the element has any constrained DOFs then we need
+  // to account for them in the mapping.  This will handle
+  // the case that the input vector is not constrained.
+  if (has_constrained_dofs)
+    {
+      // Copy the input DOF indices.
+      std::vector<unsigned int> constrained_dof_indices(dof_indices);
+
+      DenseMatrix<Number> C;
+
+      this->build_constraint_matrix (C, constrained_dof_indices);
+
+      assert (dof_indices.size()             == C.m());
+      assert (constrained_dof_indices.size() == C.n());
+
+      // zero-out Ue
+      Ue.zero();
+
+      // compute Ue = C Ug, with proper mapping.
+      for (unsigned int i=0; i<dof_indices.size(); i++)
+	for (unsigned int j=0; j<constrained_dof_indices.size(); j++)
+	  {
+	    const unsigned int jg = constrained_dof_indices[j];
+
+	    assert ((jg >= Ug.first_local_index()) &&
+		    (jg <  Ug.last_local_index()));
+	    
+	    Ue.el(i) += C(i,j)*Ug(jg); 	    
+	  }
+    }  
+   
+#else
+  
+  // Trivial mapping
+  assert (dof_indices.size() == Ue.size());
+  
+  for (unsigned int il=0; il<dof_indices.size(); il++)
+    {
+      const unsigned int ig = dof_indices[il];
+      
+      assert ((ig >= Ug.first_local_index()) && (ig <  Ug.last_local_index()));
+
+      Ue.el(il) = Ug(ig);
+    }
+  
+#endif
+}
+
 
 
 void DofMap::dof_indices (const Elem* const elem,

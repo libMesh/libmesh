@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.13 2005-06-03 13:40:03 jwpeterson Exp $
+// $Id: dof_map.h,v 1.14 2005-06-13 20:01:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,9 +41,11 @@ class Elem;
 class MeshBase;
 class FEType;
 class CouplingMatrix;
+template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
 template <typename T> class SparseMatrix;
+template <typename T> class NumericVector;
 
 
 
@@ -205,6 +207,20 @@ public:
   void dof_indices (const Elem* const elem,
 		    std::vector<unsigned int>& di,
 		    const unsigned int vn = libMesh::invalid_uint) const;
+
+  /**
+   * Builds the local element vector \p Ue from the global vector \p Ug,
+   * accounting for any constrained degrees of freedom.  For an element
+   * without constrained degrees of freedom this is the trivial mapping
+   * \f$ Ue[i] = Ug[dof_indices[i]] \f$
+   *
+   * Note that the user must ensure that the element vector \p Ue is
+   * properly sized when calling this method.  This is because there
+   * is no \p resize() method in the \p DenseVectorBase<> class. 
+   */
+  void extract_local_vector (const NumericVector<Number>& Ug,
+			     const std::vector<unsigned int>& dof_indices,
+			     DenseVectorBase<Number>& Ue) const;
 
   
 #ifdef ENABLE_AMR
