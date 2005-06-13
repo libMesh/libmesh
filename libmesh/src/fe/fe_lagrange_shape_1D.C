@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_1D.C,v 1.13 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: fe_lagrange_shape_1D.C,v 1.14 2005-06-13 14:54:32 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -86,7 +86,6 @@ Real FE<1,LAGRANGE>::shape(const ElemType,
       // Lagrange cubics
     case THIRD:
       {
-	error();
 	assert (i<4);
 	
 	switch (i)
@@ -95,13 +94,13 @@ Real FE<1,LAGRANGE>::shape(const ElemType,
 	    return 9./16.*(1./9.-xi*xi)*(xi-1.);
 	   
 	  case 1:
-	    return 27./16.*(1.-xi*xi)*(1./3.-xi);
+	    return -9./16.*(1./9.-xi*xi)*(xi+1.);
 	   
 	  case 2:
-	    return 27./16.*(1.-xi*xi)*(1./3.+xi);
+	    return 27./16.*(1.-xi*xi)*(1./3.-xi);
 	   
 	  case 3:
-	    return -9./16.*(1./9.-xi*xi)*(xi+1.);
+	    return 27./16.*(1.-xi*xi)*(1./3.+xi);
 	   
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
@@ -198,7 +197,6 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
       // Lagrange cubic shape function derivatives
     case THIRD:
       {
-	error();
 	assert (i<4);
 	
 	switch (i)
@@ -207,14 +205,14 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
 	    return -9./16.*(3.*xi*xi-2.*xi-1./9.);
 	    
 	  case 1:
-	    return 27./16.*(3.*xi*xi-2./3.*xi-1.);
-	    
-	  case 2:
-	    return 27./16.*(-3.*xi*xi-2./3.*xi+1.);
-	    
-	  case 3:
 	    return -9./16.*(-3.*xi*xi-2.*xi+1./9.);
 	   
+	  case 2:
+	    return 27./16.*(3.*xi*xi-2./3.*xi-1.);
+	    
+	  case 3:
+	    return 27./16.*(-3.*xi*xi-2./3.*xi+1.);
+	    
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
 	    error();
@@ -256,11 +254,12 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
 					const Order order,
 					const unsigned int i,
 					const unsigned int j,
-					const Point&)
+					const Point& p)
 {
   // Don't need to switch on j.  1D shape functions
   // depend on xi only!
 
+  const Real xi = p(0);
   assert (j == 0);
   
   switch (order)
@@ -294,6 +293,32 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
 	    }
 	  }
       } // end case SECOND
+
+    case THIRD:
+     {
+      switch (i)
+        {
+        case 0:
+            return -9./16.*(6.*xi-2);
+            
+        case 1:
+            return -9./16.*(-6*xi-2.);
+
+        case 2:
+            return 27./16.*(6*xi-2./3.);
+            
+        case 3:
+            return 27./16.*(-6*xi-2./3.);
+            
+        default:
+          {
+            std::cerr << "Invalid shape function index requested!"
+                      << std::endl;
+            error();
+          }
+        }
+     } // end case THIRD
+
 
     default:
       {

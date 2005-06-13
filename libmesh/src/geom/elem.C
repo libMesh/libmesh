@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.44 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: elem.C,v 1.45 2005-06-13 14:54:32 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,7 @@
 #include "fe_interface.h"
 #include "edge_edge2.h"
 #include "edge_edge3.h"
+#include "edge_edge4.h"
 #include "edge_inf_edge2.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
@@ -72,6 +73,11 @@ AutoPtr<Elem> Elem::build(const ElemType type,
       {
 	elem = new Edge3(p);
 	break;
+      }
+    case EDGE4:
+      {
+        elem = new Edge4(p);
+        break;
       }
 
 

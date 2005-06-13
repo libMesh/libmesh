@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.40 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.41 2005-06-13 14:54:33 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 // #include "mesh_refinement.h"
 #include "edge_edge2.h"
 #include "edge_edge3.h"
-// #include "edge_edge4.h"
+#include "edge_edge4.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
 #include "face_quad4.h"
@@ -278,18 +278,18 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
               break;
               }
 
-//             case EDGE4:
-//               {
-//                 for (unsigned int i=0; i<nx; i++)
-//                 {
-//                   Elem* elem = mesh.add_elem (new Edge4);
-//                   elem->set_node(0) = mesh.node_ptr(3*i);
-//                   elem->set_node(2) = mesh.node_ptr(3*i+1);
-//                   elem->set_node(3) = mesh.node_ptr(3*i+2);
-//                   elem->set_node(1) = mesh.node_ptr(3*i+3);
-//                 }
-//               break;
-//               }
+            case EDGE4:
+              {
+                for (unsigned int i=0; i<nx; i++)
+                {
+                  Elem* elem = mesh.add_elem (new Edge4);
+                  elem->set_node(0) = mesh.node_ptr(3*i);
+                  elem->set_node(2) = mesh.node_ptr(3*i+1);
+                  elem->set_node(3) = mesh.node_ptr(3*i+2);
+                  elem->set_node(1) = mesh.node_ptr(3*i+3);
+                }
+              break;
+              }
 
             default:
               {

@@ -2215,6 +2215,31 @@ src/geom/edge_edge3.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/utils/perf_log.h
+src/geom/edge_edge4.$(obj-suffix):\
+    src/geom/edge_edge4.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/geom/edge.h\
+    include/geom/edge_edge4.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/utils/perf_log.h
 src/geom/edge_inf_edge2.$(obj-suffix):\
     src/geom/edge_inf_edge2.C\
     include/base/auto_ptr.h\
