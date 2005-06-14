@@ -1,4 +1,4 @@
-// $Id: inf_elem_builder.h,v 1.3 2005-06-11 03:59:17 jwpeterson Exp $
+// $Id: inf_elem_builder.h,v 1.4 2005-06-14 19:20:38 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,12 +29,14 @@
 // C++ includes
 #include <vector>
 #include <set>
+#include <utility>
 
 // Local includes
 #include "point.h"
 
 // Forward Declarations
 class MeshBase;
+class Node;
 
 /**
  * This class is used to build infinite elements on
