@@ -1,4 +1,4 @@
-// $Id: fe_macro.h,v 1.10 2005-05-10 17:48:40 spetersen Exp $
+// $Id: fe_macro.h,v 1.11 2005-06-14 20:38:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -57,13 +57,13 @@
                                template class FE< (_dim), XYZ>
 
 #define INSTANTIATE_IMAP(_dim) \
-  template void FE<_dim,CLOUGH>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&); \
-  template void FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
-  template void FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
-  template void FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
-  template void FE<_dim,BERNSTEIN>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
-  template void FE<_dim,SZABAB>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
-  template void FE<_dim,XYZ>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&)
+  template void  FE<_dim,CLOUGH>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&); \
+  template void  FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void  FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void  FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void  FE<_dim,BERNSTEIN>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void  FE<_dim,SZABAB>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
+  template void  FE<_dim,XYZ>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
 
 #endif //ENABLE_HIGHER_ORDER_SHAPES
 
@@ -75,5 +75,13 @@
   template unsigned int FE<_dim,_t>::n_dofs_per_elem(ElemType,Order);\
   template void         FE<_dim,_t>::nodal_soln(const Elem*,const Order,const std::vector<Number>&,std::vector<Number>&)
 
-
 #endif
+
+// The Intel 7.1 compiler out at TACC required these, but they are used
+// inside the inverse_map function so it seems like they should be instantiated
+// by the INSTANTIATE_IMAP macro above?  Also for some reason it did not
+// complain about map_zeta.
+#define INSTANTIATE_MAP(_dim) \
+  template Point FE<_dim,LAGRANGE>::map(const Elem*,const Point&);\
+  template Point FE<_dim,LAGRANGE>::map_xi(const Elem*,const Point&);\
+  template Point FE<_dim,LAGRANGE>::map_eta(const Elem*,const Point&)
