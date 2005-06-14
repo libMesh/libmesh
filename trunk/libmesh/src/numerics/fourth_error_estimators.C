@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.C,v 1.5 2005-06-11 03:59:18 jwpeterson Exp $
+// $Id: fourth_error_estimators.C,v 1.6 2005-06-14 00:14:56 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -108,26 +108,32 @@ void LaplacianErrorEstimator::estimate_error (const System& system,
 
 
   // Check for a valid component_mask
-  if (!component_mask.empty())
-    if (component_mask.size() != n_vars)
-      {
-	std::cerr << "ERROR: component_mask is the wrong size:"
-		  << std::endl
-		  << " component_mask.size()=" << component_mask.size()
-		  << std::endl
-		  << " n_vars=" << n_vars
-		  << std::endl;
-	error();
-      }
-  
-
+  if (!component_scale.empty())
+    {
+      if (component_scale.size() != n_vars)
+	{
+	  std::cerr << "ERROR: component_scale is the wrong size:"
+		    << std::endl
+		    << " component_scale.size()=" << component_scale.size()
+		    << std::endl
+		    << " n_vars=" << n_vars
+		    << std::endl;
+	  error();
+	}
+    }
+  else
+    {
+      // No specified scaling.  Scale all variables by one.
+      component_scale.resize (n_vars);
+      std::fill (component_scale.begin(), component_scale.end(), 1.0);
+    }
   
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_vars; var++)
     {
       // Possibly skip this variable
-      if (!component_mask.empty())
-	if (component_mask[var] == false) continue;
+      if (!component_scale.empty())
+	if (component_scale[var] == false) continue;
       
       // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);
