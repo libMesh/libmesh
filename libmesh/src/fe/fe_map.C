@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.35 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: fe_map.C,v 1.36 2005-06-14 20:38:44 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -944,3 +944,9 @@ void FE<Dim,T>::inverse_map (const Elem* elem,
 INSTANTIATE_IMAP(1);
 INSTANTIATE_IMAP(2);
 INSTANTIATE_IMAP(3);
+
+#if defined(__INTEL_COMPILER)
+INSTANTIATE_MAP(1);
+INSTANTIATE_MAP(2);
+INSTANTIATE_MAP(3);
+#endif
