@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.C,v 1.6 2005-06-14 00:14:56 jwpeterson Exp $
+// $Id: fourth_error_estimators.C,v 1.7 2005-06-14 00:16:27 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -133,7 +133,7 @@ void LaplacianErrorEstimator::estimate_error (const System& system,
     {
       // Possibly skip this variable
       if (!component_scale.empty())
-	if (component_scale[var] == false) continue;
+	if (component_scale[var] == 0.0) continue;
       
       // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);
