@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.26 2005-06-13 14:54:32 knezed01 Exp $
+// $Id: fe_lagrange.C,v 1.27 2005-06-14 16:30:43 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -252,7 +252,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
               nodal_soln[1] = elem_soln[1];
               nodal_soln[2] = (2.*elem_soln[0] - elem_soln[1] + 
                                8.*elem_soln[2])/9.;
-              nodal_soln[3] = (-elem_soln[0] + 2*elem_soln[1] +
+              nodal_soln[3] = (-elem_soln[0] + 2.*elem_soln[1] +
                                8.*elem_soln[2])/9.;
               return;
             }
