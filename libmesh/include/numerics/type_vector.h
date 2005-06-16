@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.13 2005-06-06 16:23:57 knezed01 Exp $
+// $Id: type_vector.h,v 1.14 2005-06-16 19:39:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -192,10 +192,16 @@ public:
   void zero();
 
   /**
-   * @returns \p true if two vectors occupy the same
+   * @returns \p true iff two vectors occupy the same
    * physical location in space.
    */
   bool operator == (const TypeVector<T>& rhs) const;
+  
+  /**
+   * @returns \p true iff two vectors do not occupy the same
+   * physical location in space.
+   */
+  bool operator != (const TypeVector<T>& rhs) const;
   
   /**
    * @returns \p true if this vector is "less"
@@ -690,6 +696,16 @@ bool TypeVector<Real>::operator == (const TypeVector<Real>& rhs) const
 }
 
 
+
+template <>
+inline
+bool TypeVector<Real>::operator != (const TypeVector<Real>& rhs) const
+{
+  return (!(*this == rhs));
+}
+
+
+
 #ifdef USE_COMPLEX_NUMBERS
 
 template <>
@@ -714,6 +730,15 @@ bool TypeVector<Complex>::operator == (const TypeVector<Complex>& rhs) const
 	  < 3.*TOLERANCE);
 #endif  
 }
+
+
+template <>
+inline
+bool TypeVector<Complex>::operator != (const TypeVector<Complex>& rhs) const
+{
+  return (!(*this == rhs));
+}
+
 
 #endif
 
