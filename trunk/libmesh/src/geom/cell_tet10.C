@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.22 2005-05-11 18:31:16 roystgnr Exp $
+// $Id: cell_tet10.C,v 1.23 2005-06-16 23:03:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -91,6 +91,28 @@ bool Tet10::is_node_on_edge(const unsigned int n,
       return true;
   return false;
 }
+
+
+
+bool Tet10::has_affine_map() const
+{
+  // Make sure edges are straight
+  if ((this->point(0) + this->point(1))/2 != this->point(4))
+    return false;
+  if ((this->point(1) + this->point(2))/2 != this->point(5))
+    return false;
+  if ((this->point(2) + this->point(0))/2 != this->point(6))
+    return false;
+  if ((this->point(3) + this->point(0))/2 != this->point(7))
+    return false;
+  if ((this->point(3) + this->point(1))/2 != this->point(8))
+    return false;
+  if ((this->point(3) + this->point(2))/2 != this->point(9))
+    return false;
+  return true;
+}
+
+
 
 AutoPtr<Elem> Tet10::build_side (const unsigned int i) const
 {

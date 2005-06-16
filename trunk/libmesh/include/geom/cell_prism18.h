@@ -1,4 +1,4 @@
-// $Id: cell_prism18.h,v 1.10 2005-05-11 18:31:17 roystgnr Exp $
+// $Id: cell_prism18.h,v 1.11 2005-06-16 23:03:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -122,6 +122,12 @@ public:
   virtual bool is_node_on_edge(const unsigned int n,
 			       const unsigned int e) const;
   
+  /*
+   * @returns true iff the element map is definitely affine within
+   * numerical tolerances
+   */
+  virtual bool has_affine_map () const;
+
   /**
    * @returns SECOND
    */

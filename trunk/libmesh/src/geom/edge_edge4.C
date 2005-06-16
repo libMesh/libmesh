@@ -1,4 +1,4 @@
-// $Id: edge_edge4.C,v 1.1 2005-06-13 14:54:32 knezed01 Exp $
+// $Id: edge_edge4.C,v 1.2 2005-06-16 23:03:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -74,12 +74,22 @@ bool Edge4::is_node_on_side(const unsigned int n,
 bool Edge4::is_node_on_edge(const unsigned int,
                             const unsigned int e) const
 {
-  here();
-  std::cerr << "What does this mean in 1D?" << std::endl;
-  error();
   assert(e == 0);
   return true;
 }
+
+
+
+bool Edge4::has_affine_map() const
+{
+  if ((this->point(0)*2 + this->point(1))/3 != this->point(2))
+    return false;
+  if ((this->point(0) + this->point(1)*2)/3 != this->point(3))
+    return false;
+  return true;
+}
+
+
 
 void Edge4::connectivity(const unsigned int sc,
 			 const IOPackage iop,
