@@ -1,4 +1,4 @@
-// $Id: cell_prism6.C,v 1.23 2005-05-11 18:31:16 roystgnr Exp $
+// $Id: cell_prism6.C,v 1.24 2005-06-16 23:03:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -91,6 +91,20 @@ bool Prism6::is_node_on_edge(const unsigned int n,
       return true;
   return false;
 }
+
+
+
+bool Prism6::has_affine_map() const
+{
+  // Make sure z edges are affine
+  Point v = this->point(3) - this->point(0);
+  if ((this->point(4) - this->point(1) != v)
+      || (this->point(5) - this->point(2) != v))
+    return false;
+  return true;
+}
+
+
 
 AutoPtr<Elem> Prism6::build_side (const unsigned int i) const
 {

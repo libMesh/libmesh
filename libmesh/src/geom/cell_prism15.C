@@ -1,4 +1,4 @@
-// $Id: cell_prism15.C,v 1.15 2005-05-11 18:31:16 roystgnr Exp $
+// $Id: cell_prism15.C,v 1.16 2005-06-16 23:03:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -95,6 +95,38 @@ bool Prism15::is_node_on_edge(const unsigned int n,
       return true;
   return false;
 }
+
+
+
+bool Prism15::has_affine_map() const
+{
+  // Make sure z edges are affine
+  Point v = this->point(3) - this->point(0);
+  if ((this->point(4) - this->point(1) != v)
+      || (this->point(5) - this->point(2) != v))
+    return false;
+  // Make sure edges are straight
+  v /= 2;
+  if ((this->point(9) - this->point(0) != v)
+      || (this->point(10) - this->point(1) != v)
+      || (this->point(11) - this->point(2) != v))
+    return false;
+  v = (this->point(1) - this->point(0))/2;
+  if ((this->point(6) - this->point(0) != v)
+      || (this->point(12) - this->point(3) != v))
+    return false;
+  v = (this->point(2) - this->point(0))/2;
+  if ((this->point(8) - this->point(0) != v)
+      || (this->point(14) - this->point(3) != v))
+    return false;
+  v = (this->point(2) - this->point(1))/2;
+  if ((this->point(7) - this->point(1) != v)
+      || (this->point(13) - this->point(4) != v))
+    return false;
+  return true;
+}
+
+
 
 AutoPtr<Elem> Prism15::build_side (const unsigned int i) const
 {

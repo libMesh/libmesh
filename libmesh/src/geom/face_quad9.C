@@ -1,4 +1,4 @@
-// $Id: face_quad9.C,v 1.24 2005-03-01 14:21:58 benkirk Exp $
+// $Id: face_quad9.C,v 1.25 2005-06-16 23:03:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -139,6 +139,29 @@ bool Quad9::is_node_on_side(const unsigned int n,
   return false;
 }
 
+
+
+bool Quad9::has_affine_map() const
+{
+  // make sure corners form a parallelogram
+  Point v = this->point(1) - this->point(0);
+  if (this->point(2) - this->point(3) != v)
+    return false;
+  // make sure sides are straight
+  v /= 2;
+  if ((this->point(4) - this->point(0) != v)
+      ||(this->point(6) - this->point(3) != v))
+    return false;
+  v = (this->point(3) - this->point(0))/2;
+  if ((this->point(7) - this->point(0) != v)
+      || (this->point(5) - this->point(1) != v)
+      || (this->point(6) - this->point(4) != v))
+    return false;
+  return true;
+}
+
+
+ 
 unsigned int Quad9::key (const unsigned int s) const
 {
   assert (s < this->n_sides());
