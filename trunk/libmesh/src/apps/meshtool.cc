@@ -32,6 +32,8 @@
 #include "xdr_io.h"
 #include "statistics.h"
 #include "inf_elem_builder.h"
+#include "mesh_data.h"
+#include "boundary_info.h"
 
 
 
@@ -866,10 +868,10 @@ int main (int argc, char** argv)
 	      boundary_name += names[1];
 	      
 	      if (write_bndry == BM_MESH_ONLY)
-		mesh.boundary_info.sync(boundary_mesh);
+		mesh.boundary_info->sync(boundary_mesh);
 	      
 	      else if  (write_bndry == BM_WITH_MESHDATA)
-		mesh.boundary_info.sync(boundary_mesh, &boundary_mesh_data, &mesh_data);
+		mesh.boundary_info->sync(boundary_mesh, &boundary_mesh_data, &mesh_data);
 
 	      else
 		error();

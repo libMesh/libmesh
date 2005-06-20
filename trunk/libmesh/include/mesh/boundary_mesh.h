@@ -1,4 +1,4 @@
-// $Id: boundary_mesh.h,v 1.6 2005-03-02 21:26:56 benkirk Exp $
+// $Id: boundary_mesh.h,v 1.7 2005-06-20 19:27:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -51,14 +51,6 @@ class BoundaryMesh : public Mesh
    * Destructor.
    */
   ~BoundaryMesh();
-
-  /**
-   * Deletes all the data that are currently stored.
-   * Note that it DOES NOT delete the \p _nodes since they
-   * are only pointers to data in the \p MeshBase class, that
-   * will be deleted by another object.
-   */
-  void clear();
 
  private:
 };
