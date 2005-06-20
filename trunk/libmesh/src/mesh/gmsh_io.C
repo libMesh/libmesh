@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.13 2005-06-06 14:53:19 jwpeterson Exp $
+// $Id: gmsh_io.C,v 1.14 2005-06-20 17:24:34 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,16 +21,31 @@
 
 // C++ includes
 #include <fstream>
+#include <set>
 
 // Local includes
 #include "libmesh_config.h"
 #include "gmsh_io.h"
 #include "elem.h"
 #include "mesh_base.h"
+#include "boundary_info.h"
+
 
 // anonymous namespace to hold local data
-namespace
+namespace 
 {
+  
+  /**
+   * Defines a structure to hold boundary element information.
+   *
+   * We use a set because it keeps the nodes unique and ordered, and can be
+   * easily compared to another set of nodes (the ones on the element side)
+   */
+  struct boundaryElementInfo {
+    std::set<unsigned int> nodes;
+    unsigned int id;
+  };
+
   /**
    * Defines mapping from libMesh element types to Gmsh element types.
    */
@@ -39,6 +54,8 @@ namespace
     std::vector<unsigned int> nodes;
     ElemType type;
     unsigned int exptype;
+    unsigned int dim;
+    unsigned int nnodes;
   };
 
 
@@ -73,6 +90,8 @@ namespace
 	// POINT (only Gmsh)
 	{
 	  eledef.exptype = 15;
+          eledef.dim     = 0;
+          eledef.nnodes  = 1;
 	  eledef.nodes.clear();
 	
           // import only
@@ -82,6 +101,8 @@ namespace
 	// EDGE2
 	{
 	  eledef.type    = EDGE2;
+          eledef.dim     = 1;
+          eledef.nnodes  = 2;
 	  eledef.exptype = 1;
 	  eledef.nodes.clear();
 	
@@ -92,6 +113,8 @@ namespace
 	// EDGE3
 	{
 	  eledef.type    = EDGE3;
+          eledef.dim     = 1;
+          eledef.nnodes  = 3;
 	  eledef.exptype = 8;
 	  eledef.nodes.clear();
 	  
@@ -102,6 +125,8 @@ namespace
 	// TRI3
 	{
           eledef.type    = TRI3;
+          eledef.dim     = 2;
+          eledef.nnodes  = 3;
 	  eledef.exptype = 2;
 	  eledef.nodes.clear();
 	  
@@ -112,6 +137,8 @@ namespace
 	// TRI6
 	{
           eledef.type    = TRI6;
+          eledef.dim     = 2;
+          eledef.nnodes  = 6;
 	  eledef.exptype = 9;
 	  eledef.nodes.clear();
 
@@ -122,6 +149,8 @@ namespace
 	// QUAD4
 	{
           eledef.type    = QUAD4;
+          eledef.dim     = 2;
+          eledef.nnodes  = 4;
 	  eledef.exptype = 3;
 	  eledef.nodes.clear();
 
@@ -133,6 +162,8 @@ namespace
         // TODO: what should be done with this on writing?
 	{
           eledef.type    = QUAD8;
+          eledef.dim     = 2;
+          eledef.nnodes  = 8;
 	  eledef.exptype = 100;
 	  const unsigned int nodes[] = {1,2,3,4,5,6,7,8};
 	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
@@ -145,6 +176,8 @@ namespace
 	// QUAD9
 	{
           eledef.type    = QUAD9;
+          eledef.dim     = 2;
+          eledef.nnodes  = 9;
 	  eledef.exptype = 10;
 	  eledef.nodes.clear();
 
@@ -155,6 +188,8 @@ namespace
 	// HEX8
 	{
           eledef.type    = HEX8;
+          eledef.dim     = 3;
+          eledef.nnodes  = 8;
 	  eledef.exptype = 5;
 	  eledef.nodes.clear();
 
@@ -166,6 +201,8 @@ namespace
         // TODO: what should be done with this on writing?
 	{
           eledef.type    = HEX20;
+          eledef.dim     = 3;
+          eledef.nnodes  = 20;
 	  eledef.exptype = 101;
 	  const unsigned int nodes[] = {1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15,16};
 	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
@@ -178,6 +215,8 @@ namespace
 	// HEX27
 	{
           eledef.type    = HEX27;
+          eledef.dim     = 3;
+          eledef.nnodes  = 27;
 	  eledef.exptype = 12;
           // export
           const unsigned int nodes_exp[] = {0,1,2,3,4,5,6,7,8,11,12,9,13,10,14,15,16,19,17,18,20,21,24,22,23,25,26};
@@ -194,6 +233,8 @@ namespace
 	// TET4
 	{
           eledef.type    = TET4;
+          eledef.dim     = 3;
+          eledef.nnodes  = 4;
 	  eledef.exptype = 4;
 	  eledef.nodes.clear();
 
@@ -204,6 +245,8 @@ namespace
 	// TET10
 	{
           eledef.type    = TET10;
+          eledef.dim     = 3;
+          eledef.nnodes  = 10;
 	  eledef.exptype = 11;
           // export
           const unsigned int nodes_exp[] = {0,1,2,3,4,5,6,7,9,8};
@@ -220,6 +263,8 @@ namespace
 	// PRISM6
 	{
           eledef.type    = PRISM6;
+          eledef.dim     = 3;
+          eledef.nnodes  = 6;
 	  eledef.exptype = 6;
 	  eledef.nodes.clear();
 	  
@@ -231,6 +276,8 @@ namespace
         // TODO: what should be done with this on writing?
 	{
           eledef.type    = PRISM15;
+          eledef.dim     = 3;
+          eledef.nnodes  = 15;
 	  eledef.exptype = 103;
 	  eledef.nodes.clear();
 	  
@@ -241,6 +288,8 @@ namespace
 	// PRISM18
 	{
           eledef.type    = PRISM18;
+          eledef.dim     = 3;
+          eledef.nnodes  = 18;
 	  eledef.exptype = 13;
           // export
           const unsigned int nodes_exp[] = {0,1,2,3,4,5,6,8,9,7,10,11,12,14,13,15,17,16};
@@ -257,6 +306,8 @@ namespace
 	// PYRAMID5
 	{
           eledef.type    = PYRAMID5;
+          eledef.dim     = 3;
+          eledef.nnodes  = 5;
 	  eledef.exptype = 7;
 	  eledef.nodes.clear();
 	  
@@ -292,6 +343,8 @@ void GmshIO::read_mesh(std::istream& in)
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
   mesh.clear();
 
+  const unsigned int dim = mesh.mesh_dimension();
+
   // some variables
   const int  bufLen = 256;
   char       buf[bufLen+1];
@@ -318,12 +371,12 @@ void GmshIO::read_mesh(std::istream& in)
             error();
           }
         }
-
+      
       // read the node block
       else if (!strncmp(buf,"$NOD",4) ||
-          !strncmp(buf,"$NOE",4) ||
-          !strncmp(buf,"$Nodes",6) 
-          )
+	       !strncmp(buf,"$NOE",4) ||
+	       !strncmp(buf,"$Nodes",6) 
+	       )
         {
           unsigned int numNodes = 0;
           in >> numNodes;
@@ -344,12 +397,24 @@ void GmshIO::read_mesh(std::istream& in)
           in >> buf;
         }
 
-      // read the element block
+      /**
+       * Read the element block
+       *
+       * If the element dimension is smaller than the mesh dimension, this is a
+       * boundary element and will be added to mesh.boundary_info.
+       *
+       * Because the elements might not yet exist, the sides are put on hold
+       * until the elements are created, and inserted once reading elements is
+       * finished
+       */
       else if (!strncmp(buf,"$ELM",4) ||
                !strncmp(buf,"$Elements",9)
                )
         {
           unsigned int numElem = 0;
+          std::vector< boundaryElementInfo > boundary_elem;
+
+          // read how many elements are there, and reserve space in the mesh
           in >> numElem;
           mesh.reserve_elem (numElem);
 
@@ -381,51 +446,146 @@ void GmshIO::read_mesh(std::istream& in)
 
               // consult the import element table which element to build
               const elementDefinition& eletype = eletypes_imp[type];
-    
-              // add the elements to the mesh
-              Elem* elem = mesh.add_elem(Elem::build(eletype.type).release());
+              numNodes = eletype.nnodes;
 
-              // check number of nodes. We cannot do that for version 2.0
-              if (version <= 1.0) 
+              // only elements that match the mesh dimension are added
+              // if the element dimension is one less than dim, the nodes and
+              // sides are added to the mesh.boundary_info
+              if (eletype.dim == dim)
                 {
-                  if (elem->n_nodes() != numNodes)
+                  // add the elements to the mesh
+                  Elem* elem = mesh.add_elem(Elem::build(eletype.type).release());
+
+                  // check number of nodes. We cannot do that for version 2.0
+                  if (version <= 1.0) 
                     {
-                      std::cerr << "Number of nodes for element " << id
-                                << " of type " << eletypes_imp[type].type
-                                << " (Gmsh type " << type  
-                                << ") does not match Libmesh definition. "
-                                << "I expected " << elem->n_nodes()
-                                << " nodes, but got " << numNodes << "\n";
-                      error();
+                      if (elem->n_nodes() != numNodes)
+                        {
+                          std::cerr << "Number of nodes for element " << id
+                                    << " of type " << eletypes_imp[type].type
+                                    << " (Gmsh type " << type  
+                                    << ") does not match Libmesh definition. "
+                                    << "I expected " << elem->n_nodes()
+                                    << " nodes, but got " << numNodes << "\n";
+                          error();
+                        }
                     }
-                }
 
-              // add node pointers to the elements
-              int nod = 0;
-              // if there is a node translation table, use it
-              if (eletype.nodes.size() > 0)
-                for (unsigned int i=0; i<numNodes; i++)
-                  {
-                    in >> nod;
-                    elem->set_node(i) = mesh.node_ptr(nodetrans[eletype.nodes[nod]]);
-                  }
-              else
+                  // add node pointers to the elements
+                  int nod = 0;
+                  // if there is a node translation table, use it
+                  if (eletype.nodes.size() > 0)
+                    for (unsigned int i=0; i<numNodes; i++)
+                      {
+                        in >> nod;
+                        elem->set_node(i) = mesh.node_ptr(nodetrans[eletype.nodes[nod]]);
+                      }
+                  else
+                    {
+                      for (unsigned int i=0; i<numNodes; i++)
+                        {
+                          in >> nod;
+                          elem->set_node(i) = mesh.node_ptr(nodetrans[nod]);
+                        }
+                    }
+                } // if element.dim == dim
+              // if this is a boundary
+              else if (eletype.dim == dim-1)
                 {
+                  /**
+                   * add the boundary element nodes to the set of nodes
+                   */
+
+                  boundaryElementInfo binfo;
+                  std::set<unsigned int>::iterator iter = binfo.nodes.begin();
+                  int nod = 0;
                   for (unsigned int i=0; i<numNodes; i++)
                     {
                       in >> nod;
-                      elem->set_node(i) = mesh.node_ptr(nodetrans[nod]);
+                      mesh.boundary_info->add_node(nodetrans[nod], physical);
+                      binfo.nodes.insert(iter, nodetrans[nod]);
                     }
+                  binfo.id = physical;
+                  boundary_elem.push_back(binfo);
                 }
-            }
+              /**
+               * If the element yet another dimension, just read in the nodes
+               * and throw them away
+               */
+              else
+                {
+                  int nod = 0;
+                  for (unsigned int i=0; i<numNodes; i++)
+                    in >> nod;
+                }
+            }//element loop
           // read the $ENDELM delimiter
           in >> buf;
-        }
-    
-    }
+
+          /**
+           * If any lower dimensional elements have been found in the file,
+           * try to add them to the mesh.boundary_info as sides and nodes with
+           * the respecitve id's (called "physical" in Gmsh).
+           */
+          if (boundary_elem.size() > 0)
+            {
+              // create a index of the boundary nodes to easily locate which
+              // element might have that boundary
+              std::map<unsigned int, std::vector<unsigned int> > node_index;
+              for (unsigned int i=0; i<boundary_elem.size(); i++)
+                {
+                  boundaryElementInfo binfo = boundary_elem[i];
+                  std::set<unsigned int>::iterator iter = binfo.nodes.begin();
+                  for (;iter!= binfo.nodes.end(); iter++)
+                    node_index[*iter].push_back(i);
+                }
+              
+              MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+              const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+              
+              // iterate over all elements and see which boundary element has
+              // the same set of nodes as on of the boundary elements previously read
+              for ( ; it != end; ++it)
+                {
+                  const Elem* elem = *it;
+                  for (unsigned int s=0; s<elem->n_sides(); s++)
+                    if (elem->neighbor(s) == NULL)
+                      {
+                        AutoPtr<Elem> side (elem->build_side(s));
+                        std::set<unsigned int> side_nodes;
+                        std::set<unsigned int>::iterator iter = side_nodes.begin();
+
+                        // make a set with all nodes from this side
+                        // this allows for easy comparison                        
+                        for (unsigned int ns=0; ns<side->n_nodes(); ns++)
+                          side_nodes.insert(iter, side->node(ns)); 
+
+                        // See whether one of the side node occurs in the list
+                        // of tagged nodes. If we would loop over all side
+                        // nodes, we would just get multiple hits, so taking
+                        // node 0 is enough to do the job
+                        unsigned int sn = side->node(0);
+                        if (node_index.count(sn) > 0)
+                          {
+                            // Loop over all tagged ("physical") "sides" which
+                            // contain the node sn (typically just 1 to
+                            // three). For each of these the set of nodes is
+                            // compared to the current element's side nodes
+                            for (unsigned int n=0; n<node_index[sn].size(); n++)
+                              {
+                                unsigned int bidx = node_index[sn][n];
+                                if (boundary_elem[bidx].nodes == side_nodes)
+                                  mesh.boundary_info->add_side(elem, s, boundary_elem[bidx].id);
+                              }
+                          }
+                      } // if elem->neighbor(s) == NULL
+                } // element loop
+            } // if boundary_elem.size() > 0
+        } // if $ELM
+
+    } // while !eof()
 
   }
-  //mesh.reserve_elem  (numElem);
 
 }
 
