@@ -1,4 +1,4 @@
-// $Id: boundary_mesh.C,v 1.15 2005-03-02 21:27:08 benkirk Exp $
+// $Id: boundary_mesh.C,v 1.16 2005-06-20 19:27:16 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,26 +39,3 @@ BoundaryMesh::~BoundaryMesh()
 {
   this->clear();
 }
-
-
-
-void BoundaryMesh::clear()
-{
-  // No need to delete the elements here.
-  // MeshBase::clear() will handle that for us.
-  
-  // Don't delete the nodes here... They are simply pointers
-  // to the nodes that were allocated by another mesh.
-  // However, we need to clear the vector, otherwise
-  // the MeshBase::clear() member will doubly-delete the nodes!
-  _nodes.clear();
-
-  MeshBase::clear();
-}
-
-
-
-
-
-
-

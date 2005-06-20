@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.43 2005-06-11 06:08:59 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.44 2005-06-20 19:27:16 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -156,25 +156,34 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 
   // The correct (but possibly slower) way to do this is
   // 1.) Delete all the nodes in the boundary mesh using node iterators
+  //     (note there should be no nodes because of boundary_mesh.clear() above!)
   // 2.) Make individual copies of all the nodes in the current mesh
   //     and add them to the boundary mesh.
-  {
-    MeshBase::node_iterator it  = boundary_mesh.nodes_begin();
-    MeshBase::node_iterator end = boundary_mesh.nodes_end();
-    for(; it != end; ++it)
-      {
-	Node* node = *it;
-	boundary_mesh.delete_node(node);
-      }
-  }
 
+  
+//   {
+//     MeshBase::node_iterator it  = boundary_mesh.nodes_begin();
+//     MeshBase::node_iterator end = boundary_mesh.nodes_end();
+//     for(; it != end; ++it)
+//       {
+// 	Node* node = *it;
+// 	boundary_mesh.delete_node(node);
+//       }
+//   }
+
+  // Make individual copies of all the nodes in the current mesh
+  // and add them to the boundary mesh.
   {
+    assert (boundary_mesh.n_nodes() == 0);
+    boundary_mesh.reserve_nodes(_mesh.n_nodes());
+    
     MeshBase::const_node_iterator it  = _mesh.nodes_begin();
     MeshBase::const_node_iterator end = _mesh.nodes_end();
+    
     for(; it != end; ++it)
       {
 	const Node* node = *it;
-	boundary_mesh.add_point( Point((*node)(0), (*node)(1), (*node)(2)) );
+	boundary_mesh.add_point(*node);
       }
   }
 
