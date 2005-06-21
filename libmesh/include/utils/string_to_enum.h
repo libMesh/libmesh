@@ -1,4 +1,4 @@
-// $Id: string_to_enum.h,v 1.1 2005-06-12 14:20:15 benkirk Exp $
+// $Id: string_to_enum.h,v 1.2 2005-06-21 21:53:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -42,6 +42,15 @@ namespace Utility {
    */
   template <typename T>
   T string_to_enum (const std::string& s);
+
+
+
+  /**
+   * Takes the enumeration \p e of type \p T
+   * and returns the matching string.
+   */
+  template <typename T>
+  std::string enum_to_string (const T e);
 }
 
 

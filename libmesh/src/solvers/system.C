@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.21 2005-06-12 18:36:42 jwpeterson Exp $
+// $Id: system.C,v 1.22 2005-06-21 21:53:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "equation_systems.h"
 #include "libmesh_logging.h"
 #include "utility.h"
+#include "string_to_enum.h"
 #include "dof_map.h"
 #include "numeric_vector.h"
 #include "mesh.h"
@@ -605,39 +606,46 @@ std::string System::get_info() const
      
   out << '\n';
 
+  out << "    Finite Element Types=";
 #ifndef ENABLE_INFINITE_ELEMENTS
-  out << "    Finite Element Types=";
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
-  {
-      out << "\"" << this->get_dof_map().variable_type(vn).family << "\" ";
-  }
+    out << "\""
+	<< Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_type(vn).family)
+	<< "\" ";  
 #else
-  out << "    Finite Element Types=";
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
-  {
-      out << "\"" << this->get_dof_map().variable_type(vn).family << "\", ";
-      out << "\"" << this->get_dof_map().variable_type(vn).radial_family << "\" ";
-  }
+    {
+      out << "\""
+	  << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_type(vn).family)
+	  << "\", \""
+	  << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_type(vn).radial_family)
+	  << "\" ";
+    }
 
   out << '\n' << "    Infinite Element Mapping=";
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
-  {
-      out << "\"" << this->get_dof_map().variable_type(vn).inf_map << "\" ";
-  }
+    out << "\""
+	<< Utility::enum_to_string<InfMapType>(this->get_dof_map().variable_type(vn).inf_map)
+	<< "\" ";
 #endif      
 
   out << '\n';
       
   out << "    Approximation Orders=";
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
-  {
+    {
 #ifndef ENABLE_INFINITE_ELEMENTS
-      out << "\"" << this->get_dof_map().variable_type(vn).order << "\" ";
+      out << "\""
+	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_type(vn).order)
+	  << "\" ";
 #else
-      out << "\"" << this->get_dof_map().variable_type(vn).order << "\", ";
-      out << "\"" << this->get_dof_map().variable_type(vn).radial_order << "\" ";
+      out << "\""
+	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_type(vn).order)
+	  << "\", \""
+	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_type(vn).radial_order)
+	  << "\" ";
 #endif
-  }
+    }
 
   out << '\n';
       

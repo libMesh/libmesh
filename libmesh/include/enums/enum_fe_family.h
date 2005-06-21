@@ -1,4 +1,4 @@
-// $Id: enum_fe_family.h,v 1.8 2005-05-10 17:48:40 spetersen Exp $
+// $Id: enum_fe_family.h,v 1.9 2005-06-21 21:53:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,38 +22,35 @@
 #ifndef __enum_fe_family_h__
 #define __enum_fe_family_h__
 
-// C++ includes
-
-// Local includes
-#include "libmesh_config.h"
-
-
-
 // ------------------------------------------------------------
 // enum FEFamily definition
 namespace libMeshEnums {
   
   /**
-   * \enum libMeshEnums::FEFamily defines an \p enum for finite element families.
-   * Explicity assign numbers so that one can differentiate between enabled
-   * and disabled infinite elements even when these are disabled.
+   * \enum libMeshEnums::FEFamily defines an \p enum for finite
+   * element families. 
    */
+                 // vanilla C0 
   enum FEFamily {LAGRANGE     = 0,
 		 HIERARCHIC   = 1,
+
+		 // discontinuous, in local coordinates
 		 MONOMIAL     = 2,
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+		 // higher-order 
 		 BERNSTEIN    = 3,
 		 SZABAB       = 4,
-#endif
+
+		 // discontinuous, in global coordinates
 		 XYZ          = 5,
-		 
-#ifdef ENABLE_INFINITE_ELEMENTS
+
+		 // infinite element stuff
 		 INFINITE_MAP = 11,     //   for 1/r-map
 		 JACOBI_20_00 = 12,     //   i_max = 19
                  JACOBI_30_00 = 13,     //   i_max = 19
 		 LEGENDRE     = 14,     //   i_max = 19
-#endif
+
+		 // C1 elements
 		 CLOUGH       = 21,
 		 
 		 INVALID_FE   = 42};
@@ -68,9 +65,6 @@ namespace libMeshEnums {
 }
 
 using namespace libMeshEnums;
-
-
-
 
 #endif // #ifndef __fe_type_h__
 
