@@ -1,4 +1,4 @@
-// $Id: enum_order.h,v 1.4 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: enum_order.h,v 1.5 2005-06-21 21:53:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,9 +21,6 @@
 
 #ifndef __enum_order_h__
 #define __enum_order_h__
-
-// Local includes
-
 
 // ------------------------------------------------------------
 // enum Order definition
@@ -89,4 +86,4 @@ namespace libMeshEnums {
 
 using namespace libMeshEnums;
 
-#endif
+#endif // #define __enum_order_h__

@@ -1,4 +1,4 @@
-// $Id: enum_eigen_solver_type.h,v 1.1 2005-05-02 13:12:28 spetersen Exp $
+// $Id: enum_eigen_solver_type.h,v 1.2 2005-06-21 21:53:58 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,14 +21,6 @@
 
 #ifndef __enum_eigensolver_type_h__
 #define __enum_eigensolver_type_h__
-
-// C++ includes
-
-// Local includes
-#include "libmesh_config.h"
-#ifdef HAVE_SLEPC
-
-
 
 /*
  * The \p libMeshEnums namespace is the namespace all \p enum definitions
@@ -58,10 +50,7 @@ namespace libMeshEnums {
 
 using namespace libMeshEnums;
 
-#endif // HAVE_SLEPC
-
-
-#endif
+#endif // #define __enum_eigensolver_type_h__
 
 
 

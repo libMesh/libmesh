@@ -1,4 +1,4 @@
-// $Id: enum_solver_package.h,v 1.4 2005-05-02 13:12:28 spetersen Exp $
+// $Id: enum_solver_package.h,v 1.5 2005-06-21 21:53:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,14 +22,6 @@
 #ifndef __enum_solver_package_h__
 #define __enum_solver_package_h__
 
-// C++ includes
-
-// Local includes
-#include "libmesh_config.h"
-
-
-
-
 /*
  * The \p libMeshEnums namespace is the namespace all \p enum definitions
  * should be put into.
@@ -46,15 +38,9 @@ namespace libMeshEnums {
    */
   enum SolverPackage
     { 
-#ifdef HAVE_PETSC
-      PETSC_SOLVERS,
-#endif
-#ifdef HAVE_LASPACK
+      PETSC_SOLVERS=0,
       LASPACK_SOLVERS,
-#endif
-#if defined(HAVE_SLEPC) && defined(HAVE_PETSC)
       SLEPC_SOLVERS,
-#endif
       
       INVALID_SOLVER_PACKAGE
     };
@@ -63,9 +49,4 @@ namespace libMeshEnums {
 using namespace libMeshEnums;
 
 
-
-#endif
-
-
-
-
+#endif // #define __enum_solver_package_h__
