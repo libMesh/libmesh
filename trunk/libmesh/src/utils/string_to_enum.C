@@ -1,4 +1,4 @@
-// $Id: string_to_enum.C,v 1.2 2005-06-21 21:53:58 benkirk Exp $
+// $Id: string_to_enum.C,v 1.3 2005-06-22 14:04:47 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -241,7 +241,6 @@ namespace {
 
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
   //---------------------------------------------------  
   std::map<std::string, InfMapType> inf_map_type_to_enum;
 
@@ -278,7 +277,6 @@ namespace {
 		enum_to_inf_map_type.size());
       }
   }
-#endif // #ifdef ENABLE_INFINITE_ELEMENTS
 } // end anonymous namespace
 
 
