@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.16 2005-06-12 18:36:42 jwpeterson Exp $
+// $Id: exact_solution.C,v 1.17 2005-06-22 18:24:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -213,17 +213,19 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // FIXME!!!
   // const Real time = 0.;//_equation_systems.parameter("time");  
 
-  // Construct finite element object
+  // Construct Quadrature rule based on default quadrature order
   const unsigned int var = computed_system.variable_number(unknown_name);
+  const FEType& fe_type  = computed_dof_map.variable_type(var);
+
+  AutoPtr<QBase> qrule =
+    fe_type.default_quadrature_rule (_mesh.mesh_dimension());
+
+  // Construct finite element object
   
-  const FEType& fe_type   = computed_dof_map.variable_type(var);
   AutoPtr<FEBase> fe(FEBase::build(_mesh.mesh_dimension(), fe_type));
 
-  // Construct Quadrature rule based on default quadrature order
-  QGauss qrule (_mesh.mesh_dimension(), fe_type.default_quadrature_order());
-
   // Attach quadrature rule to FE object
-  fe->attach_quadrature_rule (&qrule);
+  fe->attach_quadrature_rule (qrule.get());
   
   // The Jacobian*weight at the quadrature points.
   const std::vector<Real>& JxW                               = fe->get_JxW();
@@ -263,7 +265,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
       computed_dof_map.dof_indices    (elem, dof_indices, var);
       
       // The number of quadrature points
-      const unsigned int n_qp = qrule.n_points();
+      const unsigned int n_qp = qrule->n_points();
 
       // The number of shape functions
       const unsigned int n_sf = FEInterface::n_shape_functions (_mesh.mesh_dimension(),
