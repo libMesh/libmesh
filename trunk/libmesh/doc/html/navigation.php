@@ -41,6 +41,7 @@ function load_style($root)
                 }
             } ?>
 
+    <?php echo "<a class=\"L1\" href = \"", $root, "wiki/index.php/Gallery\">Gallery</a><BR>"; ?>
     <?php echo "<a class=\"L1\" href = \"", $root, "applications.php\">Applications</a><BR>"; ?>
     <?php if ($mode=="applications") { ?>
     <?php echo "<a class=\"L2\" href = \"", $root, "application1.php\" title=\"Application 1\">Application 1</a><BR>"; ?>
