@@ -1,4 +1,4 @@
-// $Id: perf_log.h,v 1.6 2005-05-24 14:01:34 jwpeterson Exp $
+// $Id: perf_log.h,v 1.7 2005-06-28 16:24:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 
 // Local includes
 #include "libmesh_common.h"
+#include "o_string_stream.h"
 
 // C++ includes
 #include <string>
@@ -34,6 +35,9 @@
 #ifdef HAVE_LOCALE
 #include <locale>
 #endif
+
+// Forward Declarations
+// class OStringStream;
 
 
 /**
@@ -206,13 +210,21 @@ class PerfLog
   std::map<std::pair<std::string,
 		     std::string>,
 	   PerfData> log;
-
+  
   /**
    * Flag indicating if print_log() has been called.
    * This is used to print a header with machine-specific
    * data the first time that print_log() is called.
    */
   static bool called;
+
+  /**
+   * Prints a line of 'n' repeated characters 'c'
+   * to the output string stream "out".
+   */
+  void _character_line(const unsigned int n,
+		       const char c,
+		       OStringStream& out) const;
 };
 
 
