@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.45 2005-06-13 14:54:32 knezed01 Exp $
+// $Id: elem.C,v 1.46 2005-06-28 18:53:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -318,7 +318,7 @@ bool Elem::operator == (const DofObject& rhs) const
     const Elem* rhs_elem = dynamic_cast<const Elem*>(&rhs);
 
     // If we cannot cast to an Elem*, rhs must be a Node
-    if(rhs_elem == NULL)
+    if(rhs_elem == static_cast<const Elem*>(NULL))
         return false;
 
 //   assert (n_nodes());
