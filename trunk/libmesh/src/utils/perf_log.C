@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.24 2005-05-24 14:01:54 jwpeterson Exp $
+// $Id: perf_log.C,v 1.25 2005-06-28 16:24:54 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,10 +27,10 @@
 #include <sys/utsname.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <vector>
 
 // Local includes
 #include "perf_log.h"
-#include "o_string_stream.h"
 
 
 
@@ -114,25 +114,72 @@ std::string PerfLog::get_info_header() const
       
       // Get user information
       struct passwd* p = getpwuid(getuid());
-      out << '\n'
-	  << " ----------------------------------------------------------------------------\n";
-      
+      out << "\n";
+
+      // Construct string stream objects for each of the outputs
+      OStringStream pid_stream;
+      OStringStream nprocs_stream;
+      OStringStream time_stream;
+      OStringStream os_stream;
+      OStringStream host_stream;
+      OStringStream osrel_stream;
+      OStringStream osver_stream;
+      OStringStream machine_stream;
+      OStringStream user_stream;
+
+      // Put pointers to these streams in a vector
+      std::vector<OStringStream*> v(9);
+      v[0] = &pid_stream;
+      v[1] = &nprocs_stream;
+      v[2] = &time_stream;
+      v[3] = &os_stream;
+      v[4] = &host_stream;
+      v[5] = &osrel_stream;
+      v[6] = &osver_stream;
+      v[7] = &machine_stream;
+      v[8] = &user_stream;
+
+      // Fill string stream objects
       if (libMesh::n_processors() > 1)
 	{
-      out << "| Processor id:   " << libMesh::processor_id() << '\n'
-	  << "| Num Processors: " << libMesh::n_processors() << '\n';
+	  pid_stream     << "| Processor id:   " << libMesh::processor_id(); 
+	  nprocs_stream  << "| Num Processors: " << libMesh::n_processors();
 	}
       
-#ifdef HAVE_LOCALE
-      out << "| Time:           " << dateStr.str()               << '\n';
-#endif
-      out << "| OS:             " << sysInfo.sysname             << '\n'
-	  << "| HostName:       " << sysInfo.nodename            << '\n'
-	  << "| OS Release      " << sysInfo.release             << '\n'
-	  << "| OS Version:     " << sysInfo.version             << '\n'
-	  << "| Machine:        " << sysInfo.machine             << '\n'
-	  << "| Username:       " << p->pw_name                  << '\n' 
-	  << " ----------------------------------------------------------------------------\n";
+#ifdef HAVE_LOCALE						       
+      time_stream    << "| Time:           " << dateStr.str()          ; 
+#endif								       
+      
+      os_stream      << "| OS:             " << sysInfo.sysname        ; 
+      host_stream    << "| HostName:       " << sysInfo.nodename       ; 
+      osrel_stream   << "| OS Release:     " << sysInfo.release        ; 
+      osver_stream   << "| OS Version:     " << sysInfo.version        ; 
+      machine_stream << "| Machine:        " << sysInfo.machine        ; 
+      user_stream    << "| Username:       " << p->pw_name             ; 
+      
+      // Find the longest string, use that to set the line length for formatting.
+      unsigned int max_length = 0;
+      for (unsigned int i=0; i<v.size(); ++i)
+	if (v[i]->str().size() > max_length)
+	  max_length = v[i]->str().size();
+      
+      // Print dashed line
+      this->_character_line(max_length+2, '-', out);
+      out << '\n';
+
+      // Loop over all the strings and print them out with end-formatting
+      for (unsigned int i=0; i<v.size(); ++i)
+	{
+	  if (v[i]->str().size() > 0)
+	    {
+	      out << v[i]->str();
+	      OSSStringright(out, max_length+4 - v[i]->str().size(), "|\n");
+	    }
+	}
+
+      // Print dashed line
+      this->_character_line(max_length+2, '-', out);
+      out << '\n';
     }
 
   return out.str();
@@ -147,6 +194,7 @@ std::string PerfLog::get_perf_info() const
   
   if (log_events && !log.empty())
     {
+      // Stop timing for this event.
       struct timeval tstop;
       
       gettimeofday (&tstop, NULL);
@@ -154,28 +202,86 @@ std::string PerfLog::get_perf_info() const
       const double elapsed_time = (static_cast<double>(tstop.tv_sec  - tstart.tv_sec) +
 				   static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);
 
-      out << " ----------------------------------------------------------------------------\n";
-      out << "| " << label_name << " Performance: Alive time=" << elapsed_time
-	  << ", Active time=" << total_time << '\n';
-      out << " ----------------------------------------------------------------------------\n";
+      // Figure out the formatting required based on the event names
+      // Unsigned ints for each of the column widths
+      unsigned int event_col_width            = 30;
+      const unsigned int ncalls_col_width     = 10;
+      const unsigned int tot_time_col_width   = 12;
+      const unsigned int avg_time_col_width   = 12;
+      const unsigned int pct_active_col_width = 13;
+      
+      // Iterator to be used to loop over the map of timed events
+      std::map<std::pair<std::string,std::string>, PerfData>::const_iterator pos;
+      
+      // Reset the event column width based on the longest event name plus
+      // a possible 2-character indentation, plus a space.
+      for (pos = log.begin(); pos != log.end(); ++pos)
+	if (pos->first.second.size()+3 > event_col_width)
+	  event_col_width = pos->first.second.size()+3;
+
+      // Set the total width of the column
+      const unsigned int total_col_width =
+	event_col_width     +
+	ncalls_col_width    +
+	tot_time_col_width  +
+	avg_time_col_width  +
+	pct_active_col_width+1;
+
+      // Print dashed line
+      out << ' ';
+      this->_character_line(total_col_width, '-', out);
+      out << '\n';
+            
+      {
+	// Construct temporary message string
+	OStringStream temp;
+	temp << "| " << label_name << " Performance: Alive time=" << elapsed_time
+	     << ", Active time=" << total_time;
+
+	// Get the size of the temporary string
+	const unsigned int temp_size = temp.str().size();
+
+	// Send the temporary message to the output
+	out << temp.str();
+
+	// If this string is longer than the previously computed total
+	// column width, skip the additional formatting... this shouldn't
+	// happen often, hopefully.  Add two additional characters for a
+	// space and a "|" character at the end.
+	if (temp_size < total_col_width+2)
+	  {
+	    OSSStringright(out, total_col_width-temp_size+2, "|");
+	  }
+	
+	out << '\n';
+      }
+      
+      // Print dashed line
+      out << ' ';
+      this->_character_line(total_col_width, '-', out);
+      out << '\n';
+
+      
+      // Write out the header for the events listing
       out << "| ";
-      OSSStringleft(out,30,"Event");      
-      OSSStringleft(out,8,"nCalls");      
-      OSSStringleft(out,12,"Total");      
-      OSSStringleft(out,12,"Avg");      
-      OSSStringleft(out,13,"Percent of");      
+      OSSStringleft(out,event_col_width,"Event");      
+      OSSStringleft(out,ncalls_col_width,"nCalls");      
+      OSSStringleft(out,tot_time_col_width,"Total");      
+      OSSStringleft(out,avg_time_col_width,"Avg");      
+      OSSStringleft(out,pct_active_col_width,"Percent of");      
       out << "|\n";      
       out << "| ";
-      OSSStringleft(out,30,"");
-      OSSStringleft(out,8,"");
-      OSSStringleft(out,12,"Time");
-      OSSStringleft(out,12,"Time");
-      OSSStringleft(out,13,"Active Time");
+      OSSStringleft(out,event_col_width,"");
+      OSSStringleft(out,ncalls_col_width,"");
+      OSSStringleft(out,tot_time_col_width,"Time");
+      OSSStringleft(out,avg_time_col_width,"Time");
+      OSSStringleft(out,pct_active_col_width,"Active Time");
       
+      out << "|\n|";
+      this->_character_line(total_col_width, '-', out);
+      out << "|\n|";
+      this->_character_line(total_col_width, ' ', out);
       out << "|\n";
-      out << "|----------------------------------------------------------------------------|\n"
-	  << "|                                                                            |\n";
-      
       
       unsigned int summed_function_calls = 0;
       double       summed_total_time     = 0;
@@ -183,8 +289,7 @@ std::string PerfLog::get_perf_info() const
       
       std::string last_header("");
 	  
-      for (std::map<std::pair<std::string,std::string>, PerfData>::const_iterator
-	     pos = log.begin(); pos != log.end(); ++pos)
+      for (pos = log.begin(); pos != log.end(); ++pos)
 	{
 	  const PerfData& perf_data = pos->second;
 
@@ -204,7 +309,7 @@ std::string PerfLog::get_perf_info() const
 	      if (pos->first.first == "")
 		{
 		  out << "| ";
-		  OSSStringleft(out,30,pos->first.second);
+		  OSSStringleft(out,event_col_width,pos->first.second);
 		}
 	      else
 		{
@@ -212,61 +317,76 @@ std::string PerfLog::get_perf_info() const
 		    {
 		      last_header = pos->first.first;
 
-		      out << "| ";
-		      OSSStringright(out,76,"|");
-		      out << '\n';
-		      
-		      out << "| ";
-		      OSSStringleft(out,75,pos->first.first);
+		      // print blank line
 		      out << "|";
-		      out << '\n';
+		      this->_character_line(total_col_width, ' ', out);
+		      out << "|\n";
+
+		      // print header name (account for additional space before
+		      // the header)
+		      out << "| ";
+		      OSSStringleft(out, total_col_width-1, pos->first.first);
+		      out << "|\n";
 		    }
 
 		  out << "|   ";
-		  OSSStringleft(out,28,pos->first.second);
+		  OSSStringleft(out, event_col_width-2, pos->first.second);
 		}
 	      
 
-	      // Print the number of calls to the event
-	      OSSInt(out,8,perf_count);
+	      // Print the number of calls to the event.  
+	      OSSInt(out,ncalls_col_width,perf_count);
 
 	      // Print the total time spent in the event
 	      out.setf(std::ios::fixed);
-	      OSSRealleft(out,12,4,perf_time);
+	      OSSRealleft(out,tot_time_col_width,4,perf_time);
 
 	      // Print the average time per function call
-	      OSSRealleft(out,12,6,perf_avg_time);
+	      OSSRealleft(out,avg_time_col_width,6,perf_avg_time);
 
 	      // Print the percentage of the time spent in the event
-	      OSSRealleft(out,13,2,perf_percent);
+	      OSSRealleft(out,pct_active_col_width,2,perf_percent);
 	      
 	      out << "|";
 	      out << '\n';
 	    }
 	}
-      
-      out << " ----------------------------------------------------------------------------\n";
+
+      out << ' ';
+      this->_character_line(total_col_width, '-', out);
+      out << '\n';
       out << "| ";
-      OSSStringleft(out,30,"Totals:");
+      OSSStringleft(out,event_col_width,"Totals:");
 
       // Print the total number of logged function calls
-      OSSInt(out,8,summed_function_calls);
-
+      // For routines which are called many times, summed_function_calls may
+      // exceed 7 digits.  If this happens use, scientific notation.
+      if (summed_function_calls < 9999999)
+	{
+	  OSSInt(out,ncalls_col_width,summed_function_calls);
+	}
+      
+      else
+	{
+	  out.setf(std::ios::scientific);
+	  OSSRealleft(out, ncalls_col_width, 3, static_cast<Real>(summed_function_calls));
+	  out.unsetf(std::ios::scientific);
+	}
+	
       // Print the total time spent in logged function calls
       out.setf(std::ios::fixed);
-      OSSRealleft(out,12,4,summed_total_time);
+      OSSRealleft(out,tot_time_col_width,4,summed_total_time);
 
       // Null, the average time doesn't make sense as a total
-      out.width(12);
+      out.width(avg_time_col_width);
       out << "";
 
       // Print the total percentage
-      OSSRealleft(out,13,2,summed_percentage);
+      OSSRealleft(out,pct_active_col_width,2,summed_percentage);
       
-      out << "|";
+      out << "|\n ";
+      this->_character_line(total_col_width, '-', out);
       out << '\n';
-      
-      out << " ----------------------------------------------------------------------------\n";
     }
 
   return out.str();
@@ -421,4 +541,15 @@ void PerfLog::restart_event(const std::string &label,
       
       gettimeofday (&perf_data.tstart, NULL);
     }
+}
+
+
+
+
+void PerfLog::_character_line(const unsigned int n,
+			      const char c,
+			      OStringStream& out) const
+{
+  for (unsigned int i=0; i<n; ++i)
+    out << c;
 }
