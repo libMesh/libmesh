@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.16 2005-06-13 21:04:43 benkirk Exp $
+// $Id: kelly_error_estimator.C,v 1.17 2005-06-28 18:52:23 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -96,7 +96,20 @@ void KellyErrorEstimator::estimate_error (const System& system,
   error_per_cell.resize (mesh.n_elem());
   std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
 
-
+  // Declare a vector of floats which is as long as
+  // error_per_cell above, and fill with zeros.  This vector will be
+  // used to keep track of the number of edges (faces) on each active
+  // element which are either:
+  // 1) an internal edge
+  // 2) an edge on a Neumann boundary for which a boundary condition
+  //    function has been specified.
+  // The error estimator can be scaled by the number of flux edges (faces)
+  // which the element actually has to obtain a more uniform measure
+  // of the error.  Use floats instead of ints since in case 2 (above)
+  // f gets 1/2 of a flux face contribution from each of his
+  // neighbors
+  std::vector<float> n_flux_faces (error_per_cell.size());
+  
   // Check for a valid component_scale
   if (!component_scale.empty())
     {
@@ -123,7 +136,16 @@ void KellyErrorEstimator::estimate_error (const System& system,
   // Implement 1D Kelly estimator separately
   if(dim == 1)
   {
-    for(unsigned int var=0; var<n_vars; var++)
+    // Declare temporary vectors which represent the locations
+    // (on the reference element) of the left and right nodes.
+    // These are used to trick the FE reinit() functions into
+    // recomputing finite element data at the nodes.
+    std::vector<Point> left_edge (1);
+    std::vector<Point> right_edge(1);
+    left_edge[0]  = Point(-1., 0., 0.);
+    right_edge[0] = Point( 1., 0., 0.);
+    
+    for (unsigned int var=0; var<n_vars; var++)
     {
       // Possibly skip this variable
       if (!component_scale.empty())
@@ -136,10 +158,6 @@ void KellyErrorEstimator::estimate_error (const System& system,
       // different sides
       AutoPtr<FEBase> fe_e (FEBase::build (dim, fe_type));
       AutoPtr<FEBase> fe_f (FEBase::build (dim, fe_type));
-
-      QGauss qrule(1, fe_type.default_quadrature_order());
-      fe_e->attach_quadrature_rule(&qrule);
-      fe_f->attach_quadrature_rule(&qrule);
 
       const std::vector<std::vector<RealGradient> > & dphi_e =
         fe_e->get_dphi();
@@ -156,7 +174,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
       const MeshBase::const_element_iterator elem_end = 
         mesh.active_local_elements_end(); 
 
-      for( ; elem_it != elem_end; ++elem_it)
+      for ( ; elem_it != elem_end; ++elem_it)
       {
         // e is necessarily an active element on the local processor
         const Elem* e = *elem_it;
@@ -169,74 +187,75 @@ void KellyErrorEstimator::estimate_error (const System& system,
 
             const Elem* f = e->neighbor(n_e);
             const unsigned int f_id = f->id();
+	    bool case1 = false, case2 = false;
 
-            if (   //-------------------------------------
-                ((f->active()) &&
-                 (f->level() == e->level()) &&
-                 (e_id < f_id))                 // Case 1.
+	    // Case 1.	    
+            if ( f->active() && (f->level() == e->level()) && (e_id < f_id))
+	      case1 = true;
 
-                || //-------------------------------------
+	    // Case 2.
+            else if (f->level() < e->level())
+	      case2 = true;
 
-                (f->level() < e->level())       // Case 2.
+	    // Compute flux jumps if we are in case 1 or case 2.
+	    if (case1 || case2)
+	      {
+		Real error = 0.;
 
-               )  //-------------------------------------
-            {
-              float error = 0;
+		const Real h_e = e->hmax();
+		const Real h_f = f->hmax();
 
-              const Real h_e = e->hmax();
-              const Real h_f = f->hmax();
+		dof_map.dof_indices (e, dof_indices_e, var);
+		dof_map.dof_indices (f, dof_indices_f, var);
 
-              dof_map.dof_indices (e, dof_indices_e, var);
-              dof_map.dof_indices (f, dof_indices_f, var);
+		// The number of DOFS on each element
+		const unsigned int n_dofs_e = dof_indices_e.size();
+		const unsigned int n_dofs_f = dof_indices_f.size();
 
-              // The number of DOFS on each element
-              const unsigned int n_dofs_e = dof_indices_e.size();
-              const unsigned int n_dofs_f = dof_indices_f.size();
+		if (n_e == 0) // e is not the left edge of mesh
+		  {
+		    fe_e->reinit(e, &left_edge);
+		    fe_f->reinit(f, &right_edge);
+		  }
+	      
+		else if (n_e == 1) // e is not the right edge of the mesh
+		  {
+		    fe_e->reinit(e, &right_edge);
+		    fe_f->reinit(f, &left_edge);
+		  }
 
-              std::vector<Point> left_edge;
-              std::vector<Point> right_edge;
-              left_edge.clear();
-              right_edge.clear();
-              left_edge.push_back( Point(-1,0,0) );
-              right_edge.push_back( Point(1,0,0) );
+		else
+		  {
+		    std::cerr << "A 1D element cannot have more than 2 neighbors!"
+			      << std::endl;
+		    error();
+		  }
 
-              if(n_e == 0) // e is not the left edge of mesh
-              {
-                fe_e->reinit(e,&left_edge);
-                fe_f->reinit(f,&right_edge);
-              }
-              else
-              if(n_e == 1) // e is not the right edge of the mesh
-              {
-                fe_e->reinit(e,&right_edge);
-                fe_f->reinit(f,&left_edge);
-              }
+		// The solution gradient from each element
+		Gradient grad_e, grad_f;
 
-              // The solution gradient from each element
-              Gradient grad_e, grad_f;
+		// Compute the solution gradient at left edge of element e
+		for (unsigned int i=0; i<n_dofs_e; i++)
+		  grad_e.add_scaled (dphi_e[i][0],
+				     system.current_solution(dof_indices_e[i]));
 
-              // Compute the solution gradient at left edge of element e
-              for (unsigned int i=0; i<n_dofs_e; i++)
-                grad_e.add_scaled (dphi_e[i][0],
-                    system.current_solution(dof_indices_e[i]));
+		// Compute the solution gradient at right edge of element f
+		for (unsigned int i=0; i<n_dofs_f; i++)
+		  grad_f.add_scaled (dphi_f[i][0],
+				     system.current_solution(dof_indices_f[i]));
 
-              // Compute the solution gradient at right edge of element f
-              for (unsigned int i=0; i<n_dofs_f; i++)
-                grad_f.add_scaled (dphi_f[i][0],
-                    system.current_solution(dof_indices_f[i]));
-
-              Number jump = grad_e(0) - grad_f(0);
+		Number jump = grad_e(0) - grad_f(0);
 #ifndef USE_COMPLEX_NUMBERS
-              error += jump*jump;
+		error += jump*jump;
 #else
-	      error += std::norm(jump);
+		error += std::norm(jump);
 #endif
-              // Add the error contribution to element e
-              assert(e_id < error_per_cell.size());
-              assert(f_id < error_per_cell.size());
-              error_per_cell[e_id] += h_e*error*component_scale[var];
-              error_per_cell[f_id] += h_f*error*component_scale[var];
-            } // end if(f->active()...
+		// Add the error contribution to element e
+		assert(e_id < error_per_cell.size());
+		assert(f_id < error_per_cell.size());
+		error_per_cell[e_id] += h_e*error*component_scale[var];
+		error_per_cell[f_id] += h_f*error*component_scale[var];
+	      } // end if (case1 || case2)
           } // end e->neighbor(n_e) != NULL
         } // end loop over neighbors
       } // end loop over active elements
@@ -322,17 +341,18 @@ void KellyErrorEstimator::estimate_error (const System& system,
 		{
 		  const Elem* f           = e->neighbor(n_e);
 		  const unsigned int f_id = f->id();
-		
-		  if (   //-------------------------------------
-		      ((f->active()) &&
-		       (f->level() == e->level()) &&
-		       (e_id < f_id))                 // Case 1.
-		    
-		      || //-------------------------------------
-		    
-		      (f->level() < e->level())       // Case 2.
-		    
-		      )  //-------------------------------------
+		  bool case1 = false, case2 = false;
+
+		  // Case 1.	    
+		  if ( f->active() && (f->level() == e->level()) && (e_id < f_id))
+		    case1 = true;
+
+		  // Case 2.
+		  else if (f->level() < e->level())
+		    case2 = true;
+		  
+		  // Compute flux jumps if we are in case 1 or case 2.
+		  if (case1 || case2)
 		    {		    
                       // Update the shape functions on side s_e of
                       // element e
@@ -422,7 +442,33 @@ void KellyErrorEstimator::estimate_error (const System& system,
                       assert(f_id < error_per_cell.size());
 		      error_per_cell[e_id] += error*component_scale[var];
 		      error_per_cell[f_id] += error*component_scale[var];
-		    } // end if case 1 or case 2
+
+		      // Increment the number of flux faces for e
+		      n_flux_faces[e_id]++;
+
+		      // In case 1, e and f are at the same level, so
+		      // increment the number of flux faces for f as well.
+		      if (case1)
+			n_flux_faces[f_id]++;
+
+		      // In case 2, the number of additional flux faces for
+		      // f depends on the difference in levels between e and
+		      // f and the physical dimension of the mesh.  
+		      else if (case2)
+			{
+			  // With a difference of n levels between elements e and f,
+			  // We compute a fractional flux face for element f by adding:
+			  // 1/2^n in 2D
+			  // 1/4^n in 3D
+			  // each time.  This code will get hit 2^n times in 2D and 4^n
+			  // times in 3D so that the final flux face count for element f
+			  // will be an integer value.
+			  const unsigned int divisor = 1 << (dim-1)*(e->level() - f->level());
+			  
+			  // Add a fractional flux face to element f.
+			  n_flux_faces[f_id] += 1.0 / static_cast<Real>(divisor);
+			}
+		    } // end if (case1 || case2)
 		} // if (e->neigbor(n_e) != NULL)
 
 	      // Otherwise, e is on the boundary.  If it happens to
@@ -515,9 +561,12 @@ void KellyErrorEstimator::estimate_error (const System& system,
 			
 			    } // End quadrature point loop
 
-			  // Add the error contribution to elements e & f
+			  // Add the error contribution to element e 
                           assert(e_id < error_per_cell.size());
 			  error_per_cell[e_id] += error*component_scale[var];
+
+			  // Increment the number of flux faces for element e
+			  n_flux_faces[e_id]++;
 			  
 			} // end if side on flux boundary
 		      
@@ -529,6 +578,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
     } // End loop over variables
 
 
+  
   // Each processor has now computed the error contribuions
   // for its local elements.  We need to sum the vector
   // and then take the square-root of each component.  Note
@@ -537,7 +587,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
   // if the value is nonzero.  There will in general be many
   // zeros for the inactive elements.
 
-  // First sum the vector
+  // First sum the vector of estimated error values
   this->reduce_error(error_per_cell);
 
   // Compute the square-root of each component.
@@ -546,6 +596,30 @@ void KellyErrorEstimator::estimate_error (const System& system,
     if (error_per_cell[i] != 0.)
       error_per_cell[i] = std::sqrt(error_per_cell[i]);
   STOP_LOG("std::sqrt()", "KellyErrorEstimator");
+
+
+  if (this->scale_by_n_flux_faces)
+    {
+      // Sum the vector of flux face counts
+      this->reduce_error(n_flux_faces);
+
+      // Sanity check: Make sure the number of flux faces is
+      // always an integer value
+#ifdef DEBUG
+      for (unsigned int i=0; i<n_flux_faces.size(); ++i)
+	assert (n_flux_faces[i] == static_cast<float>(static_cast<unsigned int>(n_flux_faces[i])) );
+#endif
+  
+      // Scale the error by the number of flux faces for each element
+      for (unsigned int i=0; i<n_flux_faces.size(); ++i)
+	{
+	  if (n_flux_faces[i] == 0.0) // inactive or non-local element
+	    continue;
+      
+	  //std::cout << "Element " << i << " has " << n_flux_faces[i] << " flux faces." << std::endl;
+	  error_per_cell[i] /= static_cast<Real>(n_flux_faces[i]); 
+	}
+    }
   
   //  STOP_LOG("flux_jumps()", "KellyErrorEstimator");
 }
