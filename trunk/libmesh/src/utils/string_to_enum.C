@@ -1,4 +1,4 @@
-// $Id: string_to_enum.C,v 1.3 2005-06-22 14:04:47 benkirk Exp $
+// $Id: string_to_enum.C,v 1.4 2005-06-28 20:54:14 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,11 +29,26 @@
 #include "enum_order.h"
 #include "enum_fe_family.h"
 #include "enum_inf_map_type.h"
+#include "enum_quadrature_type.h"
+
 
 
 // ------------------------------------------------------------
 // Anonymous namespace to hold local data & methods
 namespace {
+
+  
+  // Reverse a map
+  template <typename MapIter, class MapType>
+  inline
+  void build_reverse_map (MapIter it, MapIter end, MapType& reverse)
+  {
+    reverse.clear();
+    
+    for (; it != end; ++it)
+      reverse.insert (std::make_pair(it->second, it->first));
+  }
+
 
   //----------------------------------------------------  
   std::map<std::string, ElemType> elem_type_to_enum;
@@ -93,15 +108,10 @@ namespace {
       {
 	// Initialize elem_type_to_enum on first call
 	init_elem_type_to_enum();
-	
-	std::map<std::string, ElemType>::iterator it =
-	  elem_type_to_enum.begin();
 
-	for  (; it != elem_type_to_enum.end(); ++it)
-	  enum_to_elem_type.insert (std::make_pair(it->second, it->first));
-
-	assert (elem_type_to_enum.size() ==
-		enum_to_elem_type.size());
+	build_reverse_map (elem_type_to_enum.begin(),
+			   elem_type_to_enum.end(),
+			   enum_to_elem_type);
       }
   }
 
@@ -179,15 +189,10 @@ namespace {
       {
 	// Initialize order_to_enum on first call
 	init_order_to_enum();
-	
-	std::map<std::string, Order>::iterator it =
-	  order_to_enum.begin();
 
-	for  (; it != order_to_enum.end(); ++it)
-	  enum_to_order.insert (std::make_pair(it->second, it->first));
-
-	assert (order_to_enum.size() ==
-		enum_to_order.size());
+	build_reverse_map (order_to_enum.begin(),
+			   order_to_enum.end(),
+			   enum_to_order);
       }
   }
 
@@ -227,15 +232,10 @@ namespace {
       {
 	// Initialize fefamily_to_enum on first call
 	init_fefamily_to_enum();
-	
-	std::map<std::string, FEFamily>::iterator it =
-	  fefamily_to_enum.begin();
 
-	for  (; it != fefamily_to_enum.end(); ++it)
-	  enum_to_fefamily.insert (std::make_pair(it->second, it->first));
-
-	assert (fefamily_to_enum.size() ==
-		enum_to_fefamily.size());
+	build_reverse_map (fefamily_to_enum.begin(),
+			   fefamily_to_enum.end(),
+			   enum_to_fefamily);
       }
   }
 
@@ -266,15 +266,48 @@ namespace {
       {
 	// Initialize inf_map_type_to_enum on first call
 	init_inf_map_type_to_enum();
-	
-	std::map<std::string, InfMapType>::iterator it =
-	  inf_map_type_to_enum.begin();
 
-	for  (; it != inf_map_type_to_enum.end(); ++it)
-	  enum_to_inf_map_type.insert (std::make_pair(it->second, it->first));
+	build_reverse_map (inf_map_type_to_enum.begin(),
+			   inf_map_type_to_enum.end(),
+			   enum_to_inf_map_type);
+      }
+  }
 
-	assert (inf_map_type_to_enum.size() ==
-		enum_to_inf_map_type.size());
+
+
+  //---------------------------------------------------  
+  std::map<std::string, QuadratureType> quadrature_type_to_enum;
+
+  // Initialize quadrature_type_to_enum on first call
+  void init_quadrature_type_to_enum ()
+  {
+    if (quadrature_type_to_enum.empty())
+      {
+	quadrature_type_to_enum["QGAUSS"     ]=QGAUSS;
+	quadrature_type_to_enum["QJACOBI_1_0"]=QJACOBI_1_0;
+	quadrature_type_to_enum["QJACOBI_2_0"]=QJACOBI_2_0;
+	quadrature_type_to_enum["QSIMPSON"   ]=QSIMPSON;
+	quadrature_type_to_enum["QTRAP"      ]=QTRAP;
+	quadrature_type_to_enum["QGRID"      ]=QGRID;
+	quadrature_type_to_enum["QCLOUGH"    ]=QCLOUGH;
+      }    
+  }
+
+
+  std::map<QuadratureType, std::string> enum_to_quadrature_type;
+  
+  // Initialize the enum_to_quadrature_type on first call
+  void init_enum_to_quadrature_type ()
+  {
+    // Build reverse map
+    if (enum_to_quadrature_type.empty())
+      {
+	// Initialize inf_map_type_to_enum on first call
+	init_quadrature_type_to_enum();
+
+	build_reverse_map (quadrature_type_to_enum.begin(),
+			   quadrature_type_to_enum.end(),
+			   enum_to_quadrature_type);
       }
   }
 } // end anonymous namespace
@@ -394,6 +427,34 @@ namespace Utility {
       error();
 
     return enum_to_inf_map_type[i];
+  }
+
+
+
+  //------------------------------------------------------
+  // QuadratureType specialization
+  template <>
+  QuadratureType string_to_enum<QuadratureType> (const std::string& s)
+  {
+    init_quadrature_type_to_enum();
+    
+    if (!quadrature_type_to_enum.count(s))
+      error();
+    
+    return quadrature_type_to_enum[s];
+  }
+
+
+  
+  template <>
+  std::string enum_to_string<QuadratureType> (const QuadratureType i)
+  {
+    init_enum_to_quadrature_type();
+
+    if (!enum_to_quadrature_type.count(i))
+      error();
+
+    return enum_to_quadrature_type[i];
   }
 }
 
