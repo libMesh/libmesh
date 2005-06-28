@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.49 2005-06-06 16:26:32 jwpeterson Exp $
+# $Id: Make.common.in,v 1.50 2005-06-28 18:54:58 jwpeterson Exp $
 
 
 ###############################################################################
@@ -232,6 +232,11 @@ ifeq ($(enable-shared),yes)
   DLFLAGS += $(RPATHFLAG)$(EXTERNAL_LIBDIR)
 endif
 
+
+# Include path for local boost header files.  Note, this
+# will probably not be an "optional" package if we really
+# do end up using it.
+INCLUDE += -I$(libmesh_dir)/contrib/boost
 
 #
 # Optional packages
