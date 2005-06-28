@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.h,v 1.7 2005-06-06 14:53:18 jwpeterson Exp $
+// $Id: kelly_error_estimator.h,v 1.8 2005-06-28 18:52:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,8 @@ public:
    * Constructor.  Responsible for initializing the _bc_function function
    * pointer to NULL.
    */
-  KellyErrorEstimator() : _bc_function(NULL) {}
+  KellyErrorEstimator() : scale_by_n_flux_faces(false),
+			  _bc_function(NULL) {}
   
   /**
    * Destructor.  
@@ -93,7 +94,16 @@ public:
   void attach_flux_bc_function (std::pair<bool,Real> fptr(const System& system,
 							  const Point& p,
 							  const std::string& var_name));
-
+  /**
+   * This boolean flag allows you to scale the error indicator
+   * result for each element by the number of "flux faces" the element
+   * actually has.  This tends to weight more evenly cells which are
+   * on the boundaries and thus have fewer contributions to their flux.
+   * The value is initialized to false, simply set it to true if you
+   * want to use the feature.
+   */
+  bool scale_by_n_flux_faces;
+  
 private:
   /**
    * Pointer to function that returns BC information.
