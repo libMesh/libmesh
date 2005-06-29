@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.36 2005-06-14 20:38:44 jwpeterson Exp $
+// $Id: fe_map.C,v 1.37 2005-06-29 22:38:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,16 +32,525 @@
 
 
 
+void FEBase::compute_affine_map(const std::vector<Real>& qw,
+			        const Elem* elem)
+{
+  assert (elem  != NULL);
+
+  const unsigned int        n_qp = qw.size();
+
+  switch (this->dim)
+    {
+      //--------------------------------------------------------------------
+      // 1D
+    case 1:
+      {
+	//------------------------------------------------------------------
+	// Compute the values at the quadrature points,
+	// the constant Jacobian
+	
+	// Resize the vectors to hold data at the quadrature points
+	{  
+	  xyz.resize(n_qp);
+	  dxyzdxi_map.resize(n_qp);
+	  dxidx_map.resize(n_qp);
+#ifdef ENABLE_SECOND_DERIVATIVES
+	  d2xyzdxi2_map.resize(n_qp);
+#endif
+	  
+	  JxW.resize(n_qp);
+	}
+	
+	// Clear the entities that will be summed
+	for (unsigned int p=0; p<n_qp; p++)
+	  xyz[p].zero();
+	dxyzdxi_map[0].zero();
+#ifdef ENABLE_SECOND_DERIVATIVES
+	d2xyzdxi2_map[0].zero();
+#endif
+	
+	
+	// compute x at the quadrature points, dxdxi once
+	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
+	  {
+	    // Reference to the point, helps eliminate
+	    // exessive temporaries in the inner loop
+	    const Point& elem_point = elem->point(i);
+	    
+	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point
+	      xyz[p].add_scaled        (elem_point, phi_map[i][p]    );
+	      
+	    dxyzdxi_map[0].add_scaled(elem_point, dphidxi_map[i][0]);
+#ifdef ENABLE_SECOND_DERIVATIVES
+	    d2xyzdxi2_map[0].add_scaled(elem_point, d2phidxi2_map[i][0]);
+#endif
+	  }
+
+	for (unsigned int p=1; p<n_qp; p++) // for each extra quadrature point
+          {
+	    dxyzdxi_map[p] = dxyzdxi_map[0];
+#ifdef ENABLE_SECOND_DERIVATIVES
+	    d2xyzdxi2_map[p] = d2xyzdxi2_map[0];
+#endif
+          }
+
+	/*
+        // Test the inverse map
+	for (unsigned int p=0; p<n_qp; p++)
+	{
+	const Point p_inv = inverse_map (elem, xyz[p]);
+	    
+	std::cout << "qp[p]   = ";
+	qrule->qp(p).print();
+	std::cout << "inv_map = ";
+	p_inv.print();
+	}
+	*/
+
+	// compute the jacobian once
+
+	// Symbolically, the matrix determinant is
+	//
+	// jac = | dx/dxi | = dx/dxi
+	//         
+	
+	// Compute the Jacobian.  This assumes the
+	// 1D edge lives in 1D space.
+	const Real jac = dxdxi_map(0);
+	    
+	if (jac <= 0.)
+	  {
+	    std::cerr << "ERROR: negative Jacobian: "
+		      << jac
+		      << std::endl;
+	    error();
+	  }
+	    
+	assert (dxdxi_map(0) != 0.);
+	    
+	dxidx_map[0] = 1./dxdxi_map(0);
+	JxW[0] = jac*qw[0];
+ 
+	for (unsigned int p=1; p<n_qp; p++)
+          {
+	    dxidx_map[p] = dxidx_map[0];
+	    JxW[p] = jac*qw[p];
+          }
+
+	// done computing the map
+	break;
+      }
+
+      
+      //--------------------------------------------------------------------
+      // 2D
+    case 2:
+      {
+	//------------------------------------------------------------------
+	// Compute the (x,y) values at the quadrature points,
+	// the Jacobian at the quadrature points
+
+	// Resize the vectors to hold data at the quadrature points
+	{  
+	  xyz.resize(n_qp);
+	  dxyzdxi_map.resize(n_qp);
+	  dxyzdeta_map.resize(n_qp);
+	  dxidx_map.resize(n_qp);
+	  dxidy_map.resize(n_qp);
+	  dxidz_map.resize(n_qp);
+	  detadx_map.resize(n_qp);
+	  detady_map.resize(n_qp);
+	  detadz_map.resize(n_qp);
+#ifdef ENABLE_SECOND_DERIVATIVES
+	  d2xyzdxi2_map.resize(n_qp);
+	  d2xyzdxideta_map.resize(n_qp);
+	  d2xyzdeta2_map.resize(n_qp);
+#endif
+	  
+	  JxW.resize(n_qp);
+	}
+	
+	// Clear the entities that will be summed
+	for (unsigned int p=0; p<n_qp; p++)
+	  xyz[p].zero();
+
+	dxyzdxi_map[0].zero();
+	dxyzdeta_map[0].zero();
+#ifdef ENABLE_SECOND_D0RIVATIVES
+	d2xyzdxi2_map[0].zero();
+	d2xyzdxideta_map[0].zero();
+	d2xyzdeta2_map[0].zero();
+#endif
+	
+	
+	// compute (x,y) at the quadrature points, derivatives once
+	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
+	  {
+	    // Reference to the point, helps eliminate
+	    // exessive temporaries in the inner loop
+	    const Point& elem_point = elem->point(i);
+	    
+	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point
+	      xyz[p].add_scaled          (elem_point, phi_map[i][p]     );
+
+	    dxyzdxi_map[0].add_scaled  (elem_point, dphidxi_map[i][0] );
+	    dxyzdeta_map[0].add_scaled (elem_point, dphideta_map[i][0]);
+#ifdef ENABLE_SECOND_DERIVATIVES
+	    d2xyzdxi2_map[0].add_scaled    (elem_point,
+					    d2phidxi2_map[i][0]);
+	    d2xyzdxideta_map[0].add_scaled (elem_point,
+					    d2phidxideta_map[i][0]);
+	    d2xyzdeta2_map[0].add_scaled   (elem_point,
+					    d2phideta2_map[i][0]);
+#endif
+	  }
+
+	for (unsigned int p=1; p<n_qp; p++) // for each extra quadrature point
+          {
+	    dxyzdxi_map[p] = dxyzdxi_map[0];
+	    dxyzdeta_map[p] = dxyzdeta_map[0];
+#ifdef ENABLE_SECOND_DERIVATIVES
+	    d2xyzdxi2_map[p] = d2xyzdxi2_map[0];
+	    d2xyzdxideta_map[p] = d2xyzdxideta_map[0];
+	    d2xyzdeta2_map[p] = d2xyzdeta2_map[0];
+#endif
+          }
+	
+	/*
+        // Test the inverse map
+	for (unsigned int p=0; p<n_qp; p++)
+	{
+	const Point p_inv = inverse_map (elem, xyz[p]);
+	
+	std::cout << "qp[p]   = ";
+	qrule->qp(p).print();
+	std::cout << "inv_map = ";
+	p_inv.print();
+	}
+	*/
+	
+	// compute the jacobian once
+	const Real dx_dxi = dxdxi_map(0), dx_deta = dxdeta_map(0),
+	           dy_dxi = dydxi_map(0), dy_deta = dydeta_map(0),
+	           dz_dxi = dzdxi_map(0), dz_deta = dzdeta_map(0);
+
+#if DIM == 2
+	// Compute the Jacobian.  This assumes the 2D face
+	// lives in 2D space
+	//
+	// Symbolically, the matrix determinant is
+	//
+	//         | dx/dxi  dx/deta |
+	// jac =   | dy/dxi  dy/deta |
+	//         
+	// jac = dx/dxi*dy/deta - dx/deta*dy/dxi 
+	const Real jac = (dx_dxi*dy_deta - dx_deta*dy_dxi);
+	    
+	if (jac <= 0.)
+	  {
+	    std::cerr << "ERROR: negative Jacobian: "
+		      << jac
+		      << std::endl;
+	    error();
+	  }
+	    
+	JxW[0] = jac*qw[0];
+	    
+	// Compute the shape function derivatives wrt x,y at the
+	// quadrature points
+	const Real inv_jac = 1./jac;
+	    
+	dxidx_map[0]  =  dy_deta*inv_jac; //dxi/dx  =  (1/J)*dy/deta
+	dxidy_map[0]  = -dx_deta*inv_jac; //dxi/dy  = -(1/J)*dx/deta
+	detadx_map[0] = -dy_dxi* inv_jac; //deta/dx = -(1/J)*dy/dxi
+	detady_map[0] =  dx_dxi* inv_jac; //deta/dy =  (1/J)*dx/dxi
+
+	dxidz_map[0] = detadz_map[0] = 0.;
+#else
+	// Compute the Jacobian.  This assumes a 2D face in
+	// 3D space.
+	//
+	// The transformation matrix T from local to global
+	// coordinates is
+	//
+	//         | dx/dxi  dx/deta |
+	//     T = | dy/dxi  dy/deta |
+	//         | dz/dxi  dz/deta |
+	// note det(T' T) = det(T')det(T) = det(T)det(T)
+	// so det(T) = std::sqrt(det(T' T))
+	//
+	//----------------------------------------------
+	// Notes:
+	//
+	//       dX = R dXi -> R'dX = R'R dXi
+	// (R^-1)dX =   dXi    [(R'R)^-1 R']dX = dXi 
+	//
+	// so R^-1 = (R'R)^-1 R'
+	//
+	// and R^-1 R = (R'R)^-1 R'R = I.
+	//
+	const Real g11 = (dx_dxi*dx_dxi +
+			  dy_dxi*dy_dxi +
+			  dz_dxi*dz_dxi);
+	    
+	const Real g12 = (dx_dxi*dx_deta +
+			  dy_dxi*dy_deta +
+			  dz_dxi*dz_deta);
+	    
+	const Real g21 = g12;
+	    
+	const Real g22 = (dx_deta*dx_deta +
+			  dy_deta*dy_deta +
+			  dz_deta*dz_deta);
+
+	const Real det = (g11*g22 - g12*g21);
+
+	if (det <= 0.)
+	  {
+	    std::cerr << "ERROR: negative Jacobian! "
+		      << std::endl;
+	    error();
+	  }
+	      
+	const Real inv_det = 1./det;
+	const Real jac = std::sqrt(det);
+	    
+	JxW[0] = jac*qw[0];
+
+	const Real g11inv =  g22*inv_det;
+	const Real g12inv = -g12*inv_det;
+	const Real g21inv = -g21*inv_det;
+	const Real g22inv =  g11*inv_det;
+
+	dxidx_map[0]  = g11inv*dx_dxi + g12inv*dx_deta;
+	dxidy_map[0]  = g11inv*dy_dxi + g12inv*dy_deta;
+	dxidz_map[0]  = g11inv*dz_dxi + g12inv*dz_deta;
+	    
+	detadx_map[0] = g21inv*dx_dxi + g22inv*dx_deta;
+	detady_map[0] = g21inv*dy_dxi + g22inv*dy_deta;
+	detadz_map[0] = g21inv*dz_dxi + g22inv*dz_deta;
+	    	    	    
+#endif
+	for (unsigned int p=1; p<n_qp; p++) // for each extra quadrature point
+          {
+	    JxW[p] = jac*qw[p];
+
+	    dxidx_map[p]  = g11inv*dx_dxi + g12inv*dx_deta;
+	    dxidy_map[p]  = g11inv*dy_dxi + g12inv*dy_deta;
+	    dxidz_map[p]  = g11inv*dz_dxi + g12inv*dz_deta;
+	    
+	    detadx_map[p] = g21inv*dx_dxi + g22inv*dx_deta;
+	    detady_map[p] = g21inv*dy_dxi + g22inv*dy_deta;
+	    detadz_map[p] = g21inv*dz_dxi + g22inv*dz_deta;
+	  }
+       
+	// done computing the map
+	break;
+      }
+
+
+      
+      //--------------------------------------------------------------------
+      // 3D
+    case 3:
+      {
+	//------------------------------------------------------------------
+	// Compute the (x,y,z) values at the quadrature points,
+	// the Jacobian at the quadrature points
+
+	// Resize the vectors to hold data at the quadrature points
+	{  
+	  xyz.resize           (n_qp);
+	  dxyzdxi_map.resize   (n_qp);
+	  dxyzdeta_map.resize  (n_qp);
+	  dxyzdzeta_map.resize (n_qp);
+	  dxidx_map.resize     (n_qp);
+	  dxidy_map.resize     (n_qp);
+	  dxidz_map.resize     (n_qp);
+	  detadx_map.resize    (n_qp);
+	  detady_map.resize    (n_qp);
+	  detadz_map.resize    (n_qp);
+	  dzetadx_map.resize   (n_qp);
+	  dzetady_map.resize   (n_qp);
+	  dzetadz_map.resize   (n_qp);
+#ifdef ENABLE_SECOND_DERIVATIVES
+	  d2xyzdxi2_map.resize(n_qp);
+	  d2xyzdxideta_map.resize(n_qp);
+	  d2xyzdxidzeta_map.resize(n_qp);
+	  d2xyzdeta2_map.resize(n_qp);
+	  d2xyzdetadzeta_map.resize(n_qp);
+	  d2xyzdzeta2_map.resize(n_qp);
+#endif
+	  
+	  JxW.resize (n_qp);
+	}
+    
+	// Clear the entities that will be summed
+	for (unsigned int p=0; p<n_qp; p++)
+	  xyz[p].zero           ();
+	dxyzdxi_map[0].zero   ();
+	dxyzdeta_map[0].zero  ();
+	dxyzdzeta_map[0].zero ();
+#ifdef ENABLE_SECOND_DERIVATIVES
+	d2xyzdxi2_map[0].zero();
+	d2xyzdxideta_map[0].zero();
+	d2xyzdxidzeta_map[0].zero();
+	d2xyzdeta2_map[0].zero();
+	d2xyzdetadzeta_map[0].zero();
+	d2xyzdzeta2_map[0].zero();
+#endif
+	
+	
+	// compute (x,y,z) at the quadrature points,
+        // dxdxi,   dydxi,   dzdxi,
+	// dxdeta,  dydeta,  dzdeta,
+	// dxdzeta, dydzeta, dzdzeta  all once
+	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
+	  {
+	    // Reference to the point, helps eliminate
+	    // exessive temporaries in the inner loop
+	    const Point& elem_point = elem->point(i);
+	    
+	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point
+	      xyz[p].add_scaled           (elem_point, phi_map[i][p]      );
+	    dxyzdxi_map[0].add_scaled   (elem_point, dphidxi_map[i][0]  );
+	    dxyzdeta_map[0].add_scaled  (elem_point, dphideta_map[i][0] );
+	    dxyzdzeta_map[0].add_scaled (elem_point, dphidzeta_map[i][0]);
+#ifdef ENABLE_SECOND_DERIVATIVES
+	    d2xyzdxi2_map[0].add_scaled      (elem_point,
+					      d2phidxi2_map[i][0]);
+	    d2xyzdxideta_map[0].add_scaled   (elem_point,
+					      d2phidxideta_map[i][0]);
+	    d2xyzdxidzeta_map[0].add_scaled  (elem_point,
+					      d2phidxidzeta_map[i][0]);
+	    d2xyzdeta2_map[0].add_scaled     (elem_point,
+					      d2phideta2_map[i][0]);
+	    d2xyzdetadzeta_map[0].add_scaled (elem_point,
+					      d2phidetadzeta_map[i][0]);
+	    d2xyzdzeta2_map[0].add_scaled    (elem_point,
+					      d2phidzeta2_map[i][0]);
+#endif
+	    for (unsigned int p=0; p<n_qp; p++) // for each extra quadrature point
+              {
+	        dxyzdxi_map[p] = dxyzdxi_map[0];
+	        dxyzdeta_map[p] = dxyzdeta_map[0];
+	        dxyzdzeta_map[p] = dxyzdzeta_map[0];
+#ifdef ENABLE_SECOND_DERIVATIVES
+	        d2xyzdxi2_map[p] = d2xyzdxi2_map[0];
+	        d2xyzdxideta_map[p] = d2xyzdxideta_map[0];
+	        d2xyzdxidzeta_map[p] = d2xyzdxidzeta_map[0];
+	        d2xyzdeta2_map[p] = d2xyzdeta2_map[0];
+	        d2xyzdetadzeta_map[p] = d2xyzdetadzeta_map[0];
+	        d2xyzdzeta2_map[p] = d2xyzdzeta2_map[0];
+#endif
+	      }
+	  }
+	
+	/*
+        // Test the inverse map
+	for (unsigned int p=0; p<n_qp; p++)
+	{
+	const Point p_inv = inverse_map (elem, xyz[p]);
+	    
+	std::cout << "qp[p]   = ";
+	qrule->qp(p).print();
+	std::cout << "inv_map = ";
+	p_inv.print();
+	}
+	*/
+	  
+	// compute the jacobian once
+	const Real
+	  dx_dxi   = dxdxi_map(0),   dy_dxi   = dydxi_map(0),   dz_dxi   = dzdxi_map(0),
+	  dx_deta  = dxdeta_map(0),  dy_deta  = dydeta_map(0),  dz_deta  = dzdeta_map(0),
+	  dx_dzeta = dxdzeta_map(0), dy_dzeta = dydzeta_map(0), dz_dzeta = dzdzeta_map(0);
+	    
+	// Symbolically, the matrix determinant is
+	//
+	//         | dx/dxi   dy/dxi   dz/dxi   |
+	// jac =   | dx/deta  dy/deta  dz/deta  |
+	//         | dx/dzeta dy/dzeta dz/dzeta |
+	// 
+	// jac = dx/dxi*(dy/deta*dz/dzeta - dz/deta*dy/dzeta) +
+	//       dy/dxi*(dz/deta*dx/dzeta - dx/deta*dz/dzeta) +
+	//       dz/dxi*(dx/deta*dy/dzeta - dy/deta*dx/dzeta)
+
+	const Real jac = (dx_dxi*(dy_deta*dz_dzeta - dz_deta*dy_dzeta)  +
+			  dy_dxi*(dz_deta*dx_dzeta - dx_deta*dz_dzeta)  +
+			  dz_dxi*(dx_deta*dy_dzeta - dy_deta*dx_dzeta));
+	    
+	if (jac <= 0.)
+	  {
+	    std::cerr << "ERROR: negative Jacobian: "
+		      << jac
+		      << std::endl;
+	    error();
+	  }
+
+	JxW[0] = jac*qw[0];
+	    
+	    // Compute the shape function derivatives wrt x,y at the
+	    // quadrature points
+	const Real inv_jac  = 1./jac;	    
+	    
+	dxidx_map[0]   = (dy_deta*dz_dzeta - dz_deta*dy_dzeta)*inv_jac;
+	dxidy_map[0]   = (dz_deta*dx_dzeta - dx_deta*dz_dzeta)*inv_jac;
+	dxidz_map[0]   = (dx_deta*dy_dzeta - dy_deta*dx_dzeta)*inv_jac;
+	    
+	detadx_map[0]  = (dz_dxi*dy_dzeta  - dy_dxi*dz_dzeta )*inv_jac;
+	detady_map[0]  = (dx_dxi*dz_dzeta  - dz_dxi*dx_dzeta )*inv_jac;
+	detadz_map[0]  = (dy_dxi*dx_dzeta  - dx_dxi*dy_dzeta )*inv_jac;
+	    
+	dzetadx_map[0] = (dy_dxi*dz_deta   - dz_dxi*dy_deta  )*inv_jac;
+	dzetady_map[0] = (dz_dxi*dx_deta   - dx_dxi*dz_deta  )*inv_jac;
+	dzetadz_map[0] = (dx_dxi*dy_deta   - dy_dxi*dx_deta  )*inv_jac;
+	
+	for (unsigned int p=0; p<n_qp; p++)
+	  {
+	    JxW[p] = jac*qw[p];
+ 
+	    dxidx_map[p]   = dxidx_map[0];
+	    dxidy_map[p]   = dxidy_map[0];
+	    dxidz_map[p]   = dxidz_map[0];
+   
+	    detadx_map[p]  = detadx_map[0];
+	    detady_map[p]  = detady_map[0];
+	    detadz_map[p]  = detadz_map[0];
+
+	    dzetadx_map[p] = dzetadx_map[0];
+	    dzetady_map[p] = dzetady_map[0];
+	    dzetadz_map[p] = dzetadz_map[0];
+	  }
+	// done computing the map
+	break;
+      }
+
+
+
+    default:
+      error();
+    }
+  
+}
+
+
+
 void FEBase::compute_map(const std::vector<Real>& qw,
 			 const Elem* elem)
 {
-  assert (elem  != NULL);
-  
    // Start logging the map computation.
   START_LOG("compute_map()", "FE");
+
+  if (elem->has_affine_map())
+    {
+      compute_affine_map(qw, elem);
+      STOP_LOG("compute_map()", "FE");  
+      return;
+    }
+  
+  assert (elem  != NULL);
   
   const unsigned int        n_qp = qw.size();
-
 
   switch (this->dim)
     {

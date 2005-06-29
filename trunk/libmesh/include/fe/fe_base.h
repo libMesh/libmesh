@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.13 2005-05-24 15:23:44 jwpeterson Exp $
+// $Id: fe_base.h,v 1.14 2005-06-29 22:38:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -518,6 +518,15 @@ protected:
    * as input, along with a pointer to the element.
    */
   virtual void compute_map(const std::vector<Real>& qw,
+		   const Elem* e);
+  
+  /**
+   * Compute the jacobian and some other additional
+   * data fields. Takes the integration weights
+   * as input, along with a pointer to the element.
+   * The element is assumed to have a constant Jacobian
+   */
+  virtual void compute_affine_map(const std::vector<Real>& qw,
 		   const Elem* e);
   
   /** 
