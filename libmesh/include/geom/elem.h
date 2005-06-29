@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.24 2005-06-16 23:03:34 roystgnr Exp $
+// $Id: elem.h,v 1.25 2005-06-29 18:58:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -420,7 +420,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns true iff the element map is definitely affine (i.e. the same at
    * every quadrature point) within numerical tolerances
    */
-  virtual bool affine_map () const { return false; }
+  virtual bool has_affine_map () const { return false; }
 
   /**
    * @returns \p true if the element is active (i.e. has no active
