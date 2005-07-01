@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.25 2005-02-22 22:17:41 jwpeterson Exp $
+// $Id: mesh_data_unv_support.C,v 1.26 2005-07-01 19:52:44 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -498,21 +498,21 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
        * takes care of \p dataset_location
        * and \p data_type.
        */
-      AutoPtr<MeshDataUnvHeader> my_header(new MeshDataUnvHeader);
-
+      MeshDataUnvHeader my_header;
+      
       /*
        * It remains to set the correct nvaldc...
        */
-      my_header->nvaldc = this->n_val_per_node();
-
+      my_header.nvaldc = this->n_val_per_node();
+      
       /*
        * and the correct data type.  By default
        * only distinguish complex or real data.
        */
 #ifdef USE_COMPLEX_NUMBERS
-      my_header->data_type = 5;
+      my_header.data_type = 5;
 #else
-      my_header->data_type = 2;
+      my_header.data_type = 2;
 #endif
 
       /*
@@ -520,8 +520,9 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
        * the AutoPtr go out of scope.  This 
        * will take care of memory management.
        */
-      my_header->write (out_file);
+      my_header.write (out_file);
     }
+
   else
     {
       /*
@@ -556,10 +557,10 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
 		    << "         so I use the value from the MeshDataUnvHeader."
 		    << std::endl;
 	}
-
       _unv_header->write (out_file);
     }
 
+  
   /*
    * Write the foreign node number and the respective data.
    */
@@ -604,7 +605,6 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
    * Write end of the dataset.
    */
   out_file << "    -1\n";
-
 }
 
 
@@ -646,6 +646,7 @@ MeshDataUnvHeader::MeshDataUnvHeader() :
 
 MeshDataUnvHeader::~MeshDataUnvHeader()
 {
+  // empty
 }
 
 
@@ -752,14 +753,18 @@ bool MeshDataUnvHeader::read (std::istream& in_file)
 
 void MeshDataUnvHeader::write (std::ostream& out_file)
 {
+  
+  
   char buf[81];
 
   sprintf(buf, "%6i\n",this->dataset_label);
+  
   out_file << buf;
  
   out_file << this->dataset_name << "\n";
 
   sprintf(buf, "%6i\n",this->dataset_location);
+  
   out_file << buf;
 
   for (unsigned int n=0; n<5; n++)
@@ -768,11 +773,13 @@ void MeshDataUnvHeader::write (std::ostream& out_file)
   sprintf(buf, "%10i%10i%10i%10i%10i%10i\n",
 	  model_type,  analysis_type, data_characteristic,
 	  result_type, data_type,     nvaldc);
+  
   out_file << buf;
 
   sprintf(buf, "%10i%10i%10i%10i%10i%10i%10i%10i\n",
 	  record_10[0], record_10[1], record_10[2], record_10[3],
 	  record_10[4], record_10[5], record_10[6], record_10[7]);
+  
   out_file << buf;
 
   sprintf(buf, "%10i%10i\n", record_11[0], record_11[1]);
@@ -781,13 +788,14 @@ void MeshDataUnvHeader::write (std::ostream& out_file)
   sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n",
 	  record_12[0], record_12[1], record_12[2],
 	  record_12[3], record_12[4], record_12[5]);
+  
   out_file << buf;
 
   sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n",
 	  record_13[0], record_13[1], record_13[2],
 	  record_13[3], record_13[4], record_13[5]);
+  
   out_file << buf;
-
 }
 
 
