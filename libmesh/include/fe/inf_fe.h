@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.7 2005-05-11 20:11:34 roystgnr Exp $
+// $Id: inf_fe.h,v 1.8 2005-07-01 16:36:22 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.7 $
+   * \version $Revision: 1.8 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.7 $
+   * \version $Revision: 1.8 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -362,13 +362,26 @@ public:
    * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$.
    * Once the base face point is determined, the radial local
    * coordinate is directly evaluated.
+   * If \p interpolated is true, the interpolated distance from the
+   * base element to the infinite element origin is used for the map
+   * in radial direction.
    */
   static Point inverse_map (const Elem* elem,
 			    const Point& p,
 			    const Real tolerance = TOLERANCE,
-			    const bool secure = true);
+			    const bool secure = true,
+			    const bool interpolated = true);
 
 
+  /**
+   * Takes a number points in physical space (in the \p physical_points
+   * vector) and finds their location on the reference element for the
+   * input element \p elem.  The values on the reference element are
+   * returned in the vector \p reference_points
+   */
+  static void inverse_map (const Elem* elem,
+			   const std::vector<Point>& physical_points,
+			   std::vector<Point>&       reference_points);
 
 
   //-------------------------------------------------------------
@@ -431,6 +444,7 @@ protected:
 
   //-------------------------------------------------------------
   // static members used by the "work-horses"
+
   /**
    * @returns the value of the \f$ i^{th} \f$ polynomial evaluated
    * at \p v.  This method provides the approximation

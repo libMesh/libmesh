@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.C,v 1.28 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: face_inf_quad6.C,v 1.29 2005-07-01 16:36:22 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "face_inf_quad6.h"
 #include "edge_edge3.h"
 #include "side.h"
+#include "edge_inf_edge2.h"
 
 
 
@@ -108,7 +109,7 @@ const float InfQuad6::_embedding_matrix[2][6][6] =
 
 AutoPtr<Elem> InfQuad6::build_side (const unsigned int i) const
 {
-  assert (i < this->n_sides());
+  // assert (i < this->n_sides());
 
   switch (i)
     {
@@ -120,7 +121,7 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i) const
     case 1:
     case 2:
       {
-	AutoPtr<Elem> ap(new Side<Edge3,InfQuad6>(this,i));
+	AutoPtr<Elem> ap(new Side<InfEdge2,InfQuad6>(this,i));
 	return ap;
       }
     default:
