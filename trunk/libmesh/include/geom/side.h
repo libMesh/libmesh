@@ -1,4 +1,4 @@
-// $Id: side.h,v 1.4 2005-05-11 18:19:46 roystgnr Exp $
+// $Id: side.h,v 1.5 2005-07-01 16:36:22 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,8 +43,8 @@ class Node;
  * does not store any.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2005-05-11 18:19:46 $
- * \version $Revision: 1.4 $
+ * \date    $Date: 2005-07-01 16:36:22 $
+ * \version $Revision: 1.5 $
  */
 
 // ------------------------------------------------------------
@@ -63,7 +63,8 @@ class Side : public SideType
     _side_number(side)
   {
     assert (parent != NULL);
-    assert (_side_number < this->parent()->n_sides());
+    assert (_side_number < this->parent()->n_sides() ||
+	    this->parent()->infinite());
     assert ((this->dim()+1) == this->parent()->dim());
   }
 
@@ -142,8 +143,8 @@ class Side : public SideType
  * cannot access the neighbors of a side since it does not store any.
  *
  * \author  Roy H. Stogner
- * \date    $Date: 2005-05-11 18:19:46 $
- * \version $Revision: 1.4 $
+ * \date    $Date: 2005-07-01 16:36:22 $
+ * \version $Revision: 1.5 $
  */
 
 // ------------------------------------------------------------

@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.7 2005-05-10 19:53:24 roystgnr Exp $
+// $Id: fe_interface.h,v 1.8 2005-07-01 16:36:22 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -148,7 +148,7 @@ public:
    * it is not trivial. The optional parameter \p tolerance defines
    * how close is "good enough."  The map inversion iteration
    * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
-   * terminated when \f$ \|\|p - p_n\|\| < \mbox{\texttt{tolerance}} \f$
+   * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
    */
   static Point inverse_map (const unsigned int dim,
 			    const FEType& fe_t,

@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.C,v 1.28 2005-06-07 16:33:48 spetersen Exp $
+// $Id: face_inf_quad4.C,v 1.29 2005-07-01 16:36:22 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -122,7 +122,7 @@ bool InfQuad4::contains_point (const Point& p) const
    * use size_sq() instead of size(), it is slightly faster
    */
   const Real min_distance_sq = std::min((Point(this->point(0)-origin)).size_sq(),
-				     (Point(this->point(1)-origin)).size_sq());
+					(Point(this->point(1)-origin)).size_sq());
 
   /*
    * work with 1% allowable deviation.  Can still fall
@@ -164,7 +164,7 @@ bool InfQuad4::contains_point (const Point& p) const
 
 AutoPtr<Elem> InfQuad4::build_side (const unsigned int i) const
 {
-  assert (i < this->n_sides());
+  // assert (i < this->n_sides());
 
   switch (i)
     {

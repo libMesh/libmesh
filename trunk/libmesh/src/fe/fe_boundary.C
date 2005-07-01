@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.35 2005-05-11 20:11:37 roystgnr Exp $
+// $Id: fe_boundary.C,v 1.36 2005-07-01 16:36:10 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -105,6 +105,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // Find where the integration points are located on the
   // full element.
   std::vector<Point> qp; this->inverse_map (elem, xyz, qp);
+  
   
   // compute the shape function and derivative values
   // at the points qp

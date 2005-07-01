@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.7 2005-05-24 13:35:41 jwpeterson Exp $
+// $Id: quadrature.h,v 1.8 2005-07-01 16:36:23 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -88,6 +88,11 @@ public:
    */    
   unsigned int n_points() const
     { assert (!_points.empty()); return _points.size(); }
+
+  /**
+   * @returns the dimension of the quadrature rule.
+   */
+  unsigned int get_dim() const { return _dim;  }
 
   /**
    * @returns a \p std::vector containing the quadrature point locations
