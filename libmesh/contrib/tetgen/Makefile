@@ -8,7 +8,7 @@ INCLUDE = -I.
 # overwrite the CXXFLAGS included from libmesh/Make.common to suppress
 # a bunch of warnings
 pkgname  := tetgen
-CXXFLAGS := -DNDEBUG -DTRILIBRARY
+CXXFLAGS := -DNDEBUG -DTRILIBRARY -fPIC
 
 # (Relative) Path to location of shared libs
 libpath := ../lib
