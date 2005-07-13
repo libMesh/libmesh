@@ -1,4 +1,4 @@
-// $Id: type_vector.C,v 1.10 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: type_vector.C,v 1.11 2005-07-13 21:43:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -80,7 +80,7 @@ void TypeVector<T>::print(std::ostream& os) const
 {
 #if DIM == 1
   
-  os << "x=" << (*this)(0) << std::endl;
+  os << "x=" << (*this)(0) << '\n';
   
 #endif
 #if DIM == 2
@@ -88,7 +88,7 @@ void TypeVector<T>::print(std::ostream& os) const
   os << "(x,y)=("
      << std::setw(8) << (*this)(0) << ", "
      << std::setw(8) << (*this)(1) << ")"
-     << std::endl;
+     << '\n';
 
 #endif
 #if DIM == 3
@@ -97,7 +97,7 @@ void TypeVector<T>::print(std::ostream& os) const
      << std::setw(8) << (*this)(0) << ", "
      << std::setw(8) << (*this)(1) << ", "
      << std::setw(8) << (*this)(2) << ")"
-     << std::endl;
+     << '\n';
 #endif
 }
 
