@@ -5,10 +5,8 @@ include ../../Make.common
 INCLUDE = -I.
 
 # Package name and additional flags required for library compilation
-# overwrite the CXXFLAGS included from libmesh/Make.common to suppress
-# a bunch of warnings
 pkgname  := tetgen
-CXXFLAGS := -DNDEBUG -DTRILIBRARY -fPIC
+CXXFLAGS += -DTRILIBRARY
 
 # (Relative) Path to location of shared libs
 libpath := ../lib
