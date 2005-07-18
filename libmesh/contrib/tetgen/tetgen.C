@@ -3169,7 +3169,7 @@ poolinit(int bytecount, int itemcount, enum wordtype wtype, int alignment)
   } else {
     alignbytes = wordsize;
   }
-  if (sizeof(void *) > alignbytes) {
+  if (static_cast<int>(sizeof(void *)) > alignbytes) {
     alignbytes = sizeof(void *);
   }
   itemwords = ((bytecount + alignbytes - 1) /  alignbytes)
@@ -3737,22 +3737,22 @@ int tetgenmesh::va[6] = { 2, 2, 0, 0, 1, 1 };
 //   'ver' as the second index.
 
 int tetgenmesh::locver2org[4][6]  = {
-  0, 1, 1, 2, 2, 0,
-  0, 3, 3, 1, 1, 0,
-  1, 3, 3, 2, 2, 1,
-  2, 3, 3, 0, 0, 2 
+  {0, 1, 1, 2, 2, 0,},
+  {0, 3, 3, 1, 1, 0,},
+  {1, 3, 3, 2, 2, 1,},
+  {2, 3, 3, 0, 0, 2 }
 };
 int tetgenmesh::locver2dest[4][6] = { 
-  1, 0, 2, 1, 0, 2,
-  3, 0, 1, 3, 0, 1,
-  3, 1, 2, 3, 1, 2,
-  3, 2, 0, 3, 2, 0
+  {1, 0, 2, 1, 0, 2,},
+  {3, 0, 1, 3, 0, 1,},
+  {3, 1, 2, 3, 1, 2,},
+  {3, 2, 0, 3, 2, 0 }
 };
 int tetgenmesh::locver2apex[4][6] = { 
-  2, 2, 0, 0, 1, 1,
-  1, 1, 0, 0, 3, 3,
-  2, 2, 1, 1, 3, 3,
-  0, 0, 2, 2, 3, 3
+  {2, 2, 0, 0, 1, 1,},
+  {1, 1, 0, 0, 3, 3,},
+  {2, 2, 1, 1, 3, 3,},
+  {0, 0, 2, 2, 3, 3 }
 };
 
 // For oppo() primitives, use 'loc' as the index.
@@ -7274,7 +7274,7 @@ void tetgenmesh::initializetetshpools()
   // If element neighbor graph is requested, make sure there's room to
   //   store an integer index in each element.  This integer index can
   //   occupy the same space as the subface pointers.
-  if (b->neighout && (elesize <= 8 * sizeof(tetrahedron))) {
+  if (b->neighout && (elesize <= static_cast<int>((8 * sizeof(tetrahedron))))) {
     elesize = 8 * sizeof(tetrahedron) + sizeof(int);
   }
   // Having determined the memory size of an element, initialize the pool.
@@ -9579,6 +9579,8 @@ void tetgenmesh::undoflip(badface *lastflip)
       // The reverse operation of T22 or T44 is again T22 or T44.
       flip22(&lastflip->tt, NULL);
       break;
+    default:
+      break;
     }
     // Go on and process the next transformation.
     lastflip = lastflip->previtem;
@@ -11441,6 +11443,8 @@ undosite(enum insertsiteresult insresult, triface* splittet, point torg,
   case SUCCESSONEDGE:
     // 'splittet' should be the tet with destination is 'newpoint'.
     unsplittetedge(splittet);
+    break;
+  default:
     break;
   }
 }
@@ -14500,7 +14504,7 @@ tetgenmesh::point tetgenmesh::getsplitpoint(face* splitseg, point refpoint)
   point ei, ej, ek, c;
   REAL v[3], r, split, epspp;
   bool acuteorg, acutedest;
-  int stype, ptmark;
+  int stype;
   int i;   
 
   // First determine the type of the segment (type-1, type-2, or type-3).
@@ -15180,7 +15184,7 @@ bool tetgenmesh::coplanartest(triface* cosphtet1, triface* cosphtet2, REAL eps)
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-void tetgenmesh::perturbcosphtet(triface* cosphtet, queue* flipqueue)
+void tetgenmesh::perturbcosphtet(triface* /* cosphtet */, queue* /* flipqueue */)
 { /*
   splittet = *cosphtet;
   sym(splittet, neightet);
@@ -19010,6 +19014,8 @@ void tetgenmesh::repairdegetets(REAL eps, REAL dihed)
         case DEGENEEDLE:
           assert(0);
           break;
+	default:
+	  break;
         }
       }
     }
@@ -19040,7 +19046,7 @@ void tetgenmesh::repairdegetets(REAL eps, REAL dihed)
   }
 
   if (b->verbose) {
-    printf("  %ld %s are removed.\n", total,
+    printf("  %d %s are removed.\n", total,
            dihed > 0.0 ? "slivers" : "degeneracies");
   }
 
@@ -20926,10 +20932,10 @@ void tetgenmesh::highorder()
   //   0 - (v0, v1), 1 - (v1, v2), 2 - (v2, v0)
   //   3 - (v3, v0), 4 - (v3, v1), 5 - (v3, v2)
   // Define an edgeindex map: (loc, ver)->edgeindex.
-  int edgeindexmap[4][6] = {0, 0, 1, 1, 2, 2,
-                            3, 3, 4, 4, 0, 0,
-                            4, 4, 5, 5, 1, 1,
-                            5, 5, 3, 3, 2, 2};
+  int edgeindexmap[4][6] = {{0, 0, 1, 1, 2, 2,},
+                            {3, 3, 4, 4, 0, 0,},
+                            {4, 4, 5, 5, 1, 1,},
+                            {5, 5, 3, 3, 2, 2 }};
 
   if (!b->quiet) {
     printf("Adding vertices for second-order tetrahedra.\n");

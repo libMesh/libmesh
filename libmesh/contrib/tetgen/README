@@ -1,3 +1,12 @@
+Fixed tetgen.C so that no warnings are issued under debug mode in libMesh.
+This allows us to use the libMesh CXXFLAGS for compilation, which is important
+for proper shared library generation.
+
+Benjamin Kirk
+Mon Jul 18 09:22:40 CDT 2005
+------------------------------------------------------------------------------
+
+
 
 The TetGen user's manual in files manual.pdf has been removed from this
 directory. Also, the .cxx files were renamed to .C. The original makefile
@@ -7,8 +16,10 @@ bottom of this file.
 
 Steffen Petersen
 Do Mai 12 19:41:19 CEST 2005
-
 ------------------------------------------------------------------------------
+
+
+
 
 TetGen
 A Quality Tetrahedral Mesh Generator and 3D Delaunay Triangulator
