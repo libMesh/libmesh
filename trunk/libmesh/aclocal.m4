@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.92 2005-06-09 19:16:38 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.93 2005-07-18 15:45:47 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -441,10 +441,10 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
               dnl        Well, duh, when the tested value is computed...  OK when it
               dnl        was from an assignment.
               CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
-              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
+              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CXXFLAGS_DVL="$CXXFLAGS_DBG"
               CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
-              CFLAGS_OPT="-O2 -unroll -w0 -ftz -vec_report0 -par_report0 -openmp_report0"
+              CFLAGS_OPT="-O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CFLAGS_DVL="$CFLAGS_DBG"
               ;;
           
