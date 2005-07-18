@@ -70,4 +70,4 @@ distclean:
 	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
 	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
 	@$(MAKE) -C triangle     $(MAKECMDGOALS)
-	@rm -rf lib/*_dbg lib/*_opt lib/*_pro
+	@rm -rf lib/*_dbg lib/*_opt lib/*_pro lib/*_devel

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.51 2005-06-12 19:04:22 jwpeterson Exp $
+# $Id: Makefile,v 1.52 2005-07-18 18:20:47 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -184,7 +184,7 @@ distclean:
 	@rm -rf doc/latex/doxygen
 	@rm -rf doc/latex/*/*.aux doc/latex/*/*~ doc/latex/*/*.log doc/latex/*/*.out
 	@rm -rf src/*/*.o
-	@rm -rf lib/*_opt lib/*_dbg lib/*_pro
+	@rm -rf lib/*_opt lib/*_dbg lib/*_pro lib/*_devel
 
 
 
