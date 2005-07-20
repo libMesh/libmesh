@@ -1,4 +1,4 @@
-// $Id: gnuplot_io.C,v 1.8 2005-07-20 19:21:44 knezed01 Exp $
+// $Id: gnuplot_io.C,v 1.9 2005-07-20 20:17:08 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,13 +28,13 @@
 #include "gnuplot_io.h"
 
 GnuPlotIO::GnuPlotIO(const MeshBase& mesh, const std::string& title, 
-                     bool grid, bool png_output)
+                     int mesh_properties = 0)
   :
   MeshOutput<MeshBase> (mesh),
-  _title(title),
-  _grid(grid),
-  _png_output(png_output)
+  _title(title)
 {
+  _grid       = (mesh_properties & GRID_ON);
+  _png_output = (mesh_properties & PNG_OUTPUT);
 }
 
 void GnuPlotIO::write(const std::string& fname)

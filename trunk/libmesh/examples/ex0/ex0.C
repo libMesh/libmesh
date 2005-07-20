@@ -1,4 +1,4 @@
-/* $Id: ex0.C,v 1.2 2005-06-09 01:09:37 benkirk Exp $ */
+/* $Id: ex0.C,v 1.3 2005-07-20 20:17:03 knezed01 Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -138,7 +138,7 @@ int main(int argc, char** argv)
     // Construct gnuplot plotting object, pass in mesh, title of plot
     // and boolean to indicate use of grid in plot. The grid is used to
     // show the edges of each element in the mesh.
-    GnuPlotIO plot(mesh,"Example 0",true);
+    GnuPlotIO plot(mesh,"Example 0", GnuPlotIO::GRID_ON);
 
     // Write out script to be called from within gnuplot:
     // Load gnuplot, then type "call 'gnuplot_script'" from gnuplot prompt
