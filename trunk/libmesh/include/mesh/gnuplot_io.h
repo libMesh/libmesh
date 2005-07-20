@@ -1,4 +1,4 @@
-// $Id: gnuplot_io.h,v 1.3 2005-07-20 20:17:08 knezed01 Exp $
+// $Id: gnuplot_io.h,v 1.4 2005-07-20 20:20:05 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -49,6 +49,9 @@ class GnuPlotIO : public MeshOutput<MeshBase>
     
   /**
    * Constructor.  Takes a reference to a constant mesh object.
+   * To set the properties, we input a bitwise OR of the
+   * GnuPlotIO::PlottingProperties enumerations,
+   * e.g. GnuPlotIO::GRID_ON | GnuPlotIO::PNG_OUTPUT
    */
   GnuPlotIO (const MeshBase&, const std::string& = "FE 1D Solution", 
              int properties);
