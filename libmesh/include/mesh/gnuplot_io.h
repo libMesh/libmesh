@@ -1,4 +1,4 @@
-// $Id: gnuplot_io.h,v 1.2 2005-07-20 19:21:33 knezed01 Exp $
+// $Id: gnuplot_io.h,v 1.3 2005-07-20 20:17:08 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -40,12 +40,18 @@ class MeshBase;
 class GnuPlotIO : public MeshOutput<MeshBase>
 {
  public:
+
+ /**
+  * Define enumerations to set plotting properties on construction
+  */
+  enum PlottingProperties { GRID_ON    = 1,
+                            PNG_OUTPUT = 2};
     
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    */
   GnuPlotIO (const MeshBase&, const std::string& = "FE 1D Solution", 
-             bool grid = false, bool png_output = false);
+             int properties);
 
   /**
    * Write the mesh to the specified file.

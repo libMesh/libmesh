@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.45 2005-06-13 01:31:33 benkirk Exp $ */
+/* $Id: ex4.C,v 1.46 2005-07-20 20:17:08 knezed01 Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -201,7 +201,7 @@ int main (int argc, char** argv)
     // to a GMV-formatted plot file.
     if(dim == 1)
     {        
-      GnuPlotIO plot(mesh,"Example 4, 1D",true);
+      GnuPlotIO plot(mesh,"Example 4, 1D",GnuPlotIO::GRID_ON);
       plot.write_equation_systems("out_1",equation_systems);
     }
     else
