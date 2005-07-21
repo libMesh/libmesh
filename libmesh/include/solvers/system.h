@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.15 2005-06-11 05:11:30 jwpeterson Exp $
+// $Id: system.h,v 1.16 2005-07-21 21:44:13 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -149,20 +149,6 @@ public:
    */
   virtual std::string system_type () const { return "BasicSystem"; }
 
-  /**
-   * Projects the vector defined on the old mesh onto the
-   * new mesh. 
-   */
-  void project_vector (NumericVector<Number>&) const;
-
-  /**
-   * Projects the vector defined on the old mesh onto the
-   * new mesh. The original vector is unchanged and the new vector
-   * is passed through the second argument.
-   */
-  void project_vector (const NumericVector<Number>&,
-		       NumericVector<Number>&) const;
-  
   /**
    * Projects the continuous functions onto the current solution. 
    */
@@ -468,13 +454,26 @@ public:
 
 protected:
 
-  
   /**
    * Initializes the data for the system.  Note that this is called
    * before any user-supplied intitialization function so that all
    * required storage will be available.
    */
   virtual void init_data ();
+
+  /**
+   * Projects the vector defined on the old mesh onto the
+   * new mesh. 
+   */
+  void project_vector (NumericVector<Number>&) const;
+
+  /**
+   * Projects the vector defined on the old mesh onto the
+   * new mesh. The original vector is unchanged and the new vector
+   * is passed through the second argument.
+   */
+  void project_vector (const NumericVector<Number>&,
+		       NumericVector<Number>&) const;
 
   // -------------------------------------------------
   // Necessary classes
