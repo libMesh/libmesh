@@ -1,4 +1,4 @@
-// $Id: gnuplot_io.C,v 1.9 2005-07-20 20:17:08 knezed01 Exp $
+// $Id: gnuplot_io.C,v 1.10 2005-07-21 21:14:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,8 +27,9 @@
 #include "mesh_base.h"
 #include "gnuplot_io.h"
 
-GnuPlotIO::GnuPlotIO(const MeshBase& mesh, const std::string& title, 
-                     int mesh_properties = 0)
+GnuPlotIO::GnuPlotIO(const MeshBase& mesh,
+		     const std::string& title, 
+                     int mesh_properties)
   :
   MeshOutput<MeshBase> (mesh),
   _title(title)
