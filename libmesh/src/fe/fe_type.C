@@ -1,5 +1,5 @@
 
-// $Id: fe_type.C,v 1.1 2005-06-08 20:54:53 roystgnr Exp $
+// $Id: fe_type.C,v 1.2 2005-07-22 18:33:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,9 +29,13 @@
 AutoPtr<QBase>
 FEType::default_quadrature_rule (const unsigned int dim) const
 {
+  // Clough elements have at least piecewise cubic functions
   if (family == CLOUGH)
     return AutoPtr<QBase>
-      (new QClough(dim, this->default_quadrature_order()));
+      (new QClough(dim,
+        static_cast<Order>
+          (std::max(static_cast<unsigned int>
+            (this->default_quadrature_order()),7u))));
   
   return AutoPtr<QBase>
       (new QGauss(dim, this->default_quadrature_order()));

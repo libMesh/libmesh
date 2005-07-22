@@ -1,4 +1,4 @@
-// $Id: fe_clough_shape_2D.C,v 1.5 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: fe_clough_shape_2D.C,v 1.6 2005-07-22 18:33:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 
 // Anonymous namespace for persistant variables.
 // This allows us to cache the global-to-local mapping transformation
-// This should also screw up multithreading royally
+// FIXME: This should also screw up multithreading royally
 namespace
 {
   static unsigned int old_elem_id = libMesh::invalid_uint;
@@ -42,6 +42,11 @@ namespace
   static Real d3xd3x, d3xd3y, d3xd1n, d3xd2n;
   static Real d3yd3x, d3yd3y, d3yd1n, d3yd2n;
   static Real d1nd1n, d2nd2n, d3nd3n;
+  // Normal vector naming: N01x is the x component of the
+  // unit vector at point 0 normal to (possibly curved) side 01
+  static Real N01x, N01y, N10x, N10y;
+  static Real N02x, N02y, N20x, N20y;
+  static Real N21x, N21y, N12x, N12y;
 
 Real clough_raw_shape_second_deriv(const unsigned int basis_num,
                                    const unsigned int deriv_type,
@@ -135,6 +140,37 @@ void clough_compute_coefs(const Elem* elem)
   Nlength = std::sqrt(static_cast<Real>(N3x*N3x + N3y*N3y));
   N3x /= Nlength; N3y /= Nlength;
 
+  // Calculate corner normal vectors (used for reduced element)
+  N01x = dydxi[0];
+  N01y = - dxdxi[0];
+  Nlength = std::sqrt(static_cast<Real>(N01x*N01x + N01y*N01y));
+  N01x /= Nlength; N01y /= Nlength;
+
+  N10x = dydxi[1];
+  N10y = - dxdxi[1];
+  Nlength = std::sqrt(static_cast<Real>(N10x*N10x + N10y*N10y));
+  N10x /= Nlength; N10y /= Nlength;
+
+  N02x = - dydeta[0];
+  N02y = dxdeta[0];
+  Nlength = std::sqrt(static_cast<Real>(N02x*N02x + N02y*N02y));
+  N02x /= Nlength; N02y /= Nlength;
+
+  N20x = - dydeta[2];
+  N20y = dxdeta[2];
+  Nlength = std::sqrt(static_cast<Real>(N20x*N20x + N20y*N20y));
+  N20x /= Nlength; N20y /= Nlength;
+
+  N12x = dydeta[1] - dydxi[1];
+  N12y = dxdxi[1] - dxdeta[1];
+  Nlength = std::sqrt(static_cast<Real>(N12x*N12x + N12y*N12y));
+  N12x /= Nlength; N12y /= Nlength;
+
+  N21x = dydeta[1] - dydxi[1];
+  N21y = dxdxi[1] - dxdeta[1];
+  Nlength = std::sqrt(static_cast<Real>(N21x*N21x + N21y*N21y));
+  N21x /= Nlength; N21y /= Nlength;
+
 //  for (int i=0; i != 6; ++i) {
 //    std::cerr << elem->node(i) << ' ';
 //  }
@@ -155,8 +191,9 @@ void clough_compute_coefs(const Elem* elem)
 //      std::cerr << " and " << elem->node(1);
 //      std::cerr << " around node " << elem->node(4);
 //      std::cerr << std::endl;
-      N1x = -N1x;
-      N1y = -N1y;
+      N1x = -N1x; N1y = -N1y;
+      N12x = -N12x; N12y = -N12y;
+      N21x = -N21x; N21y = -N21y;
     }
   else
     {
@@ -172,8 +209,9 @@ void clough_compute_coefs(const Elem* elem)
 //      std::cerr << " around node " << elem->node(5);
 //      std::cerr << std::endl;
 //      std::cerr << N2x << ' ' << N2y << std::endl;
-      N2x = -N2x;
-      N2y = -N2y;
+      N2x = -N2x; N2y = -N2y;
+      N02x = -N02x; N02y = -N02y;
+      N20x = -N20x; N20y = -N20y;
 //      std::cerr << N2x << ' ' << N2y << std::endl;
     }
   else
@@ -191,6 +229,8 @@ void clough_compute_coefs(const Elem* elem)
 //      std::cerr << std::endl;
       N3x = -N3x;
       N3y = -N3y;
+      N01x = -N01x; N01y = -N01y;
+      N10x = -N10x; N10y = -N10y;
     }
   else
     {
@@ -1422,6 +1462,85 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
   
   switch (order)
     {      
+      // 2nd-order restricted Clough-Tocher element
+    case SECOND:
+      {
+	switch (type)
+	  {
+	    // C1 functions on the Clough-Tocher triangle.
+	  case TRI6:
+	    {
+	      assert (i<9);
+            // FIXME: it would be nice to calculate (and cache)
+            // clough_raw_shape(j,p) only once per triangle, not 1-7
+            // times
+	      switch (i)
+		{
+	    // Note: these DoF numbers are "scrambled" because my
+	    // initial numbering conventions didn't match libMesh
+		case 0:
+		  return clough_raw_shape(0, p)
+                    + d1d2n * clough_raw_shape(10, p)
+                    + d1d3n * clough_raw_shape(11, p);
+		case 3:
+		  return clough_raw_shape(1, p)
+                    + d2d3n * clough_raw_shape(11, p)
+                    + d2d1n * clough_raw_shape(9, p);
+		case 6:
+		  return clough_raw_shape(2, p)
+                    + d3d1n * clough_raw_shape(9, p)
+                    + d3d2n * clough_raw_shape(10, p);
+                case 1:
+                  return d1xd1x * clough_raw_shape(3, p)
+                    + d1xd1y * clough_raw_shape(4, p)
+                    + d1xd2n * clough_raw_shape(10, p)
+                    + d1xd3n * clough_raw_shape(11, p)
+                    + 0.5 * N01x * d3nd3n * clough_raw_shape(11, p)
+                    + 0.5 * N02x * d2nd2n * clough_raw_shape(10, p);
+		case 2:
+                  return d1yd1y * clough_raw_shape(4, p)
+                    + d1yd1x * clough_raw_shape(3, p)
+                    + d1yd2n * clough_raw_shape(10, p)
+                    + d1yd3n * clough_raw_shape(11, p)
+                    + 0.5 * N01y * d3nd3n * clough_raw_shape(11, p)
+                    + 0.5 * N02y * d2nd2n * clough_raw_shape(10, p);
+		case 4:
+                  return d2xd2x * clough_raw_shape(5, p)
+                    + d2xd2y * clough_raw_shape(6, p)
+                    + d2xd3n * clough_raw_shape(11, p)
+                    + d2xd1n * clough_raw_shape(9, p)
+                    + 0.5 * N10x * d3nd3n * clough_raw_shape(11, p)
+                    + 0.5 * N12x * d1nd1n * clough_raw_shape(9, p);
+		case 5:
+                  return d2yd2y * clough_raw_shape(6, p)
+                    + d2yd2x * clough_raw_shape(5, p)
+                    + d2yd3n * clough_raw_shape(11, p)
+                    + d2yd1n * clough_raw_shape(9, p)
+                    + 0.5 * N10y * d3nd3n * clough_raw_shape(11, p)
+                    + 0.5 * N12y * d1nd1n * clough_raw_shape(9, p);
+		case 7:
+                  return d3xd3x * clough_raw_shape(7, p)
+                    + d3xd3y * clough_raw_shape(8, p)
+                    + d3xd1n * clough_raw_shape(9, p)
+                    + d3xd2n * clough_raw_shape(10, p)
+                    + 0.5 * N20x * d2nd2n * clough_raw_shape(10, p)
+                    + 0.5 * N21x * d1nd1n * clough_raw_shape(9, p);
+		case 8:
+                  return d3yd3y * clough_raw_shape(8, p)
+                    + d3yd3x * clough_raw_shape(7, p)
+                    + d3yd1n * clough_raw_shape(9, p)
+                    + d3yd2n * clough_raw_shape(10, p)
+                    + 0.5 * N20y * d2nd2n * clough_raw_shape(10, p)
+                    + 0.5 * N21y * d1nd1n * clough_raw_shape(9, p);
+		default:
+		  error();
+		}
+	    }
+	  default:
+            std::cerr << "ERROR: Unsupported element type!" << std::endl;
+	    error();
+	  }
+      }
       // 3rd-order Clough-Tocher element
     case THIRD:
       {
@@ -1541,6 +1660,85 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
   
   switch (order)
     {      
+      // 2nd-order restricted Clough-Tocher element
+    case SECOND:
+      {
+	switch (type)
+	  {
+	    // C1 functions on the Clough-Tocher triangle.
+	  case TRI6:
+	    {
+	      assert (i<9);
+            // FIXME: it would be nice to calculate (and cache)
+            // clough_raw_shape(j,p) only once per triangle, not 1-7
+            // times
+	      switch (i)
+		{
+	    // Note: these DoF numbers are "scrambled" because my
+	    // initial numbering conventions didn't match libMesh
+		case 0:
+		  return clough_raw_shape_deriv(0, j, p)
+                    + d1d2n * clough_raw_shape_deriv(10, j, p)
+                    + d1d3n * clough_raw_shape_deriv(11, j, p);
+		case 3:
+		  return clough_raw_shape_deriv(1, j, p)
+                    + d2d3n * clough_raw_shape_deriv(11, j, p)
+                    + d2d1n * clough_raw_shape_deriv(9, j, p);
+		case 6:
+		  return clough_raw_shape_deriv(2, j, p)
+                    + d3d1n * clough_raw_shape_deriv(9, j, p)
+                    + d3d2n * clough_raw_shape_deriv(10, j, p);
+                case 1:
+                  return d1xd1x * clough_raw_shape_deriv(3, j, p)
+                    + d1xd1y * clough_raw_shape_deriv(4, j, p)
+                    + d1xd2n * clough_raw_shape_deriv(10, j, p)
+                    + d1xd3n * clough_raw_shape_deriv(11, j, p)
+                    + 0.5 * N01x * d3nd3n * clough_raw_shape_deriv(11, j, p)
+                    + 0.5 * N02x * d2nd2n * clough_raw_shape_deriv(10, j, p);
+		case 2:
+                  return d1yd1y * clough_raw_shape_deriv(4, j, p)
+                    + d1yd1x * clough_raw_shape_deriv(3, j, p)
+                    + d1yd2n * clough_raw_shape_deriv(10, j, p)
+                    + d1yd3n * clough_raw_shape_deriv(11, j, p)
+                    + 0.5 * N01y * d3nd3n * clough_raw_shape_deriv(11, j, p)
+                    + 0.5 * N02y * d2nd2n * clough_raw_shape_deriv(10, j, p);
+		case 4:
+                  return d2xd2x * clough_raw_shape_deriv(5, j, p)
+                    + d2xd2y * clough_raw_shape_deriv(6, j, p)
+                    + d2xd3n * clough_raw_shape_deriv(11, j, p)
+                    + d2xd1n * clough_raw_shape_deriv(9, j, p)
+                    + 0.5 * N10x * d3nd3n * clough_raw_shape_deriv(11, j, p)
+                    + 0.5 * N12x * d1nd1n * clough_raw_shape_deriv(9, j, p);
+		case 5:
+                  return d2yd2y * clough_raw_shape_deriv(6, j, p)
+                    + d2yd2x * clough_raw_shape_deriv(5, j, p)
+                    + d2yd3n * clough_raw_shape_deriv(11, j, p)
+                    + d2yd1n * clough_raw_shape_deriv(9, j, p)
+                    + 0.5 * N10y * d3nd3n * clough_raw_shape_deriv(11, j, p)
+                    + 0.5 * N12y * d1nd1n * clough_raw_shape_deriv(9, j, p);
+		case 7:
+                  return d3xd3x * clough_raw_shape_deriv(7, j, p)
+                    + d3xd3y * clough_raw_shape_deriv(8, j, p)
+                    + d3xd1n * clough_raw_shape_deriv(9, j, p)
+                    + d3xd2n * clough_raw_shape_deriv(10, j, p)
+                    + 0.5 * N20x * d2nd2n * clough_raw_shape_deriv(10, j, p)
+                    + 0.5 * N21x * d1nd1n * clough_raw_shape_deriv(9, j, p);
+		case 8:
+                  return d3yd3y * clough_raw_shape_deriv(8, j, p)
+                    + d3yd3x * clough_raw_shape_deriv(7, j, p)
+                    + d3yd1n * clough_raw_shape_deriv(9, j, p)
+                    + d3yd2n * clough_raw_shape_deriv(10, j, p)
+                    + 0.5 * N20y * d2nd2n * clough_raw_shape_deriv(10, j, p)
+                    + 0.5 * N21y * d1nd1n * clough_raw_shape_deriv(9, j, p);
+		default:
+		  error();
+		}
+	    }
+	  default:
+            std::cerr << "ERROR: Unsupported element type!" << std::endl;
+	    error();
+	  }
+      }
       // 3rd-order Clough-Tocher element
     case THIRD:
       {
@@ -1643,6 +1841,85 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
   
   switch (order)
     {      
+      // 2nd-order restricted Clough-Tocher element
+    case SECOND:
+      {
+	switch (type)
+	  {
+	    // C1 functions on the Clough-Tocher triangle.
+	  case TRI6:
+	    {
+	      assert (i<9);
+            // FIXME: it would be nice to calculate (and cache)
+            // clough_raw_shape(j,p) only once per triangle, not 1-7
+            // times
+	      switch (i)
+		{
+	    // Note: these DoF numbers are "scrambled" because my
+	    // initial numbering conventions didn't match libMesh
+		case 0:
+		  return clough_raw_shape_second_deriv(0, j, p)
+                    + d1d2n * clough_raw_shape_second_deriv(10, j, p)
+                    + d1d3n * clough_raw_shape_second_deriv(11, j, p);
+		case 3:
+		  return clough_raw_shape_second_deriv(1, j, p)
+                    + d2d3n * clough_raw_shape_second_deriv(11, j, p)
+                    + d2d1n * clough_raw_shape_second_deriv(9, j, p);
+		case 6:
+		  return clough_raw_shape_second_deriv(2, j, p)
+                    + d3d1n * clough_raw_shape_second_deriv(9, j, p)
+                    + d3d2n * clough_raw_shape_second_deriv(10, j, p);
+                case 1:
+                  return d1xd1x * clough_raw_shape_second_deriv(3, j, p)
+                    + d1xd1y * clough_raw_shape_second_deriv(4, j, p)
+                    + d1xd2n * clough_raw_shape_second_deriv(10, j, p)
+                    + d1xd3n * clough_raw_shape_second_deriv(11, j, p)
+                    + 0.5 * N01x * d3nd3n * clough_raw_shape_second_deriv(11, j, p)
+                    + 0.5 * N02x * d2nd2n * clough_raw_shape_second_deriv(10, j, p);
+		case 2:
+                  return d1yd1y * clough_raw_shape_second_deriv(4, j, p)
+                    + d1yd1x * clough_raw_shape_second_deriv(3, j, p)
+                    + d1yd2n * clough_raw_shape_second_deriv(10, j, p)
+                    + d1yd3n * clough_raw_shape_second_deriv(11, j, p)
+                    + 0.5 * N01y * d3nd3n * clough_raw_shape_second_deriv(11, j, p)
+                    + 0.5 * N02y * d2nd2n * clough_raw_shape_second_deriv(10, j, p);
+		case 4:
+                  return d2xd2x * clough_raw_shape_second_deriv(5, j, p)
+                    + d2xd2y * clough_raw_shape_second_deriv(6, j, p)
+                    + d2xd3n * clough_raw_shape_second_deriv(11, j, p)
+                    + d2xd1n * clough_raw_shape_second_deriv(9, j, p)
+                    + 0.5 * N10x * d3nd3n * clough_raw_shape_second_deriv(11, j, p)
+                    + 0.5 * N12x * d1nd1n * clough_raw_shape_second_deriv(9, j, p);
+		case 5:
+                  return d2yd2y * clough_raw_shape_second_deriv(6, j, p)
+                    + d2yd2x * clough_raw_shape_second_deriv(5, j, p)
+                    + d2yd3n * clough_raw_shape_second_deriv(11, j, p)
+                    + d2yd1n * clough_raw_shape_second_deriv(9, j, p)
+                    + 0.5 * N10y * d3nd3n * clough_raw_shape_second_deriv(11, j, p)
+                    + 0.5 * N12y * d1nd1n * clough_raw_shape_second_deriv(9, j, p);
+		case 7:
+                  return d3xd3x * clough_raw_shape_second_deriv(7, j, p)
+                    + d3xd3y * clough_raw_shape_second_deriv(8, j, p)
+                    + d3xd1n * clough_raw_shape_second_deriv(9, j, p)
+                    + d3xd2n * clough_raw_shape_second_deriv(10, j, p)
+                    + 0.5 * N20x * d2nd2n * clough_raw_shape_second_deriv(10, j, p)
+                    + 0.5 * N21x * d1nd1n * clough_raw_shape_second_deriv(9, j, p);
+		case 8:
+                  return d3yd3y * clough_raw_shape_second_deriv(8, j, p)
+                    + d3yd3x * clough_raw_shape_second_deriv(7, j, p)
+                    + d3yd1n * clough_raw_shape_second_deriv(9, j, p)
+                    + d3yd2n * clough_raw_shape_second_deriv(10, j, p)
+                    + 0.5 * N20y * d2nd2n * clough_raw_shape_second_deriv(10, j, p)
+                    + 0.5 * N21y * d1nd1n * clough_raw_shape_second_deriv(9, j, p);
+		default:
+		  error();
+		}
+	    }
+	  default:
+            std::cerr << "ERROR: Unsupported element type!" << std::endl;
+	    error();
+	  }
+      }
       // 3rd-order Clough-Tocher element
     case THIRD:
       {
