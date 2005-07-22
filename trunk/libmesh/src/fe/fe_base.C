@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.31 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: fe_base.C,v 1.32 2005-07-22 16:31:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,9 +43,8 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	  {
 	  case CLOUGH:
 	    {
-	      std::cout << "ERROR: Clough-Tocher elements only support 2D" <<
-		      std::endl;
-	      error();
+	      AutoPtr<FEBase> ap(new FE<1,CLOUGH>(fet));
+	      return ap;
 	    }
 	    
 	  case LAGRANGE:
@@ -156,7 +155,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	  {
 	  case CLOUGH:
 	    {
-	      std::cout << "ERROR: Clough-Tocher elements only support 2D" <<
+	      std::cout << "ERROR: Clough-Tocher elements currently only support 1D and 2D" <<
 		      std::endl;
 	      error();
 	    }
