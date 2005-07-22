@@ -1,4 +1,4 @@
-// $Id: fe_clough.C,v 1.11 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: fe_clough.C,v 1.12 2005-07-22 18:33:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,9 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
   
   switch (order)
     {
-      // Piecewise cubic shape functions only
+      // Piecewise cubic shape functions with linear flux edges
+    case SECOND:
+      // Piecewise cubic shape functions
     case THIRD:
       {
 
@@ -87,6 +89,25 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 {
   switch (o)
     {
+      // Piecewise cubic shape functions with linear flux edges
+    case SECOND:
+      {
+	switch (t)
+	  {
+	  case TRI6:
+	    return 9;
+	    
+	  default:
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    }
+	  }
+      }
       // Piecewise cubic Clough-Tocher element
     case THIRD:
       {
@@ -126,6 +147,43 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 {
   switch (o)
     {
+      // Piecewise cubic shape functions with linear flux edges
+    case SECOND:
+      {
+	switch (t)
+	  {
+	    // The 2D Clough-Tocher defined on a 6-noded triangle
+	  case TRI6:
+	    {
+	      switch (n)
+		{
+		case 0:
+		case 1:
+		case 2:
+		  return 3;
+
+		case 3:
+		case 4:
+		case 5:
+		  return 0;
+
+		default:
+		  error();
+		}
+	    }
+
+	  default:
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    }
+	    
+	  }
+      }
       // The third-order hierarchic shape functions
     case THIRD:
       {
@@ -182,6 +240,8 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 {
   switch (o)
     {
+      // Piecewise cubic shape functions with linear flux edges
+    case SECOND:
       // The third-order Clough-Tocher shape functions
     case THIRD:
       {
