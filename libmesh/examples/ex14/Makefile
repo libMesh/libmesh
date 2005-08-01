@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2005-05-06 17:44:07 roystgnr Exp $
+# $Id: Makefile,v 1.3 2005-08-01 17:32:36 jwpeterson Exp $
 
 
 # The location of the mesh library
@@ -33,14 +33,19 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   := ./ex14
+ex_name := ex14
 
+ifeq ($(petsc-version), 2.3.0)
+target 	   := ./$(ex_name) -pc_type jacobi #ILU detects 0 pivot in petsc 2.3.0
+else
+target     := ./$(ex_name)
+endif
 
 all:: $(target)
 
 # Production rules:  how to make the target - depends on library configuration
 $(target): $(objects)
-	@echo "Linking "$@"..."
+	@echo "Linking "$(ex_name)"..."
 	@$(CXX) $(CXXFLAGS) $(objects) -o $@ $(LIBS) $(LDFLAGS) $(EXTERNAL_FLAGS)
 
 
@@ -50,7 +55,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out*.gmv
+	@rm -f $(ex_name) out*.gmv
 
 distclean:
 	@$(MAKE) clobber
