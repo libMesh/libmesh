@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.10 2005-06-06 16:23:55 knezed01 Exp $
+// $Id: dof_object.h,v 1.11 2005-08-01 21:05:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -51,7 +51,7 @@ class DofObject;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.11 $
  */
 
 class DofObject : public ReferenceCountedObject<DofObject>
@@ -341,98 +341,6 @@ DofObject::DofObject () :
 }
 
 
-
-inline
-DofObject::DofObject (const DofObject& dof_obj) :
-  ReferenceCountedObject<DofObject>(),
-#ifdef ENABLE_AMR
-  old_dof_object (NULL),
-#endif
-  _id            (dof_obj._id),
-  _processor_id  (dof_obj._processor_id),
-  _n_systems     (dof_obj._n_systems),
-  _n_vars        (NULL),
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-  _n_comp        (NULL),
-#endif
-  _dof_ids       (NULL)
-{
-
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
-  // Allocate storage for the dof numbers and copy
-  // the values. 
-  // IT IS UNDEFINED BEHAVIOR TO ALLOCATE AN ARRAY WITH ZERO ENTRIES,
-  // IF n_systems==0, leave _n_vars, _n_comp, and _dof_ids NULL.
-  if (this->n_systems() > 0)
-  {
-    _n_vars  = new unsigned char  [this->n_systems()];
-    _n_comp  = new unsigned char* [this->n_systems()];
-    _dof_ids = new unsigned int** [this->n_systems()];
-  }
-
-  for (unsigned int s=0; s<this->n_systems(); s++)
-    {      
-      _n_vars[s]  = dof_obj.n_vars(s);
-      _n_comp[s]  = new unsigned char [this->n_vars(s)];
-      _dof_ids[s] = new unsigned int* [this->n_vars(s)];
-  
-      for (unsigned int v=0; v<this->n_vars(s); v++)
-	{
-	  _n_comp[s][v]  = dof_obj.n_comp(s,v);
-	  
-	  _dof_ids[s][v] = new unsigned int [this->n_comp(s,v)];
-	  
-	  for (unsigned int c=0; c<this->n_comp(s,v); c++)
-	    _dof_ids[s][v][c] = dof_obj.dof_number(s,v,c);
-	}
-    }
-
-#else
-
-  // Allocate storage for the dof numbers and copy
-  // the values. See warning above about allocating arrays with zero entries.
-  if (this->n_systems() > 0)
-  {
-    _n_vars  = new unsigned char [this->n_systems()];
-    _dof_ids = new unsigned int* [this->n_systems()];
-  }
-
-  for (unsigned int s=0; s<this->n_systems(); s++)
-    {  
-      _n_vars[s]  = dof_obj.n_vars(s);
-      _dof_ids[s] = new unsigned int [this->n_vars(s)];
-  
-      for (unsigned int v=0; v<this->n_vars(s); v++)
-	for (unsigned int c=0; c<this->n_comp(s,v); c++)
-	  {
-	    assert (c == 0);
-	    _dof_ids[s][v] = dof_obj.dof_number(s,v,c);
-	  }
-    }
-  
-#endif
-
-  // Check that everything worked
-#ifdef DEBUG
-
-  assert (this->n_systems() == dof_obj.n_systems());
-
-  for (unsigned int s=0; s<this->n_systems(); s++)
-    {
-      assert (this->n_vars(s) == dof_obj.n_vars(s));
-
-      for (unsigned int v=0; v<this->n_vars(s); v++)
-	{
-	  assert (this->n_comp(s,v) == dof_obj.n_comp(s,v));
-
-	  for (unsigned int c=0; c<this->n_comp(s,v); c++)
-	    assert (this->dof_number(s,v,c) == dof_obj.dof_number(s,v,c));
-	}
-    }
-  
-#endif
-}
 
 
 

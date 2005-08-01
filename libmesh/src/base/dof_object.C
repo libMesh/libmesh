@@ -1,4 +1,4 @@
-// $Id: dof_object.C,v 1.12 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: dof_object.C,v 1.13 2005-08-01 21:06:24 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -36,6 +36,117 @@ const unsigned short int DofObject::invalid_processor_id = static_cast<unsigned 
 
 // ------------------------------------------------------------
 // DofObject class members
+// Copy Constructor
+DofObject::DofObject (const DofObject& dof_obj) :
+  ReferenceCountedObject<DofObject>(),
+#ifdef ENABLE_AMR
+  old_dof_object (NULL),
+#endif
+  _id            (dof_obj._id),
+  _processor_id  (dof_obj._processor_id),
+  _n_systems     (dof_obj._n_systems),
+  _n_vars        (NULL),
+#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
+  _n_comp        (NULL),
+#endif
+  _dof_ids       (NULL)
+{
+
+#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
+
+  // Allocate storage for the dof numbers and copy
+  // the values. 
+  // IT IS UNDEFINED BEHAVIOR TO ALLOCATE AN ARRAY WITH ZERO ENTRIES,
+  // IF n_systems==0, leave _n_vars, _n_comp, and _dof_ids NULL.
+  if (this->n_systems() > 0)
+  {
+    _n_vars  = new unsigned char  [this->n_systems()];
+    _n_comp  = new unsigned char* [this->n_systems()];
+    _dof_ids = new unsigned int** [this->n_systems()];
+  }
+
+  // If n_systems==0, we don't enter this for loop.
+  for (unsigned int s=0; s<this->n_systems(); s++)
+    {      
+      _n_vars[s]  = dof_obj.n_vars(s);
+
+      // In case you have a system with no variables, it is undefined
+      // behavior (UB) to allocate a zero-length array here.
+      if (this->n_vars(s) > 0)
+	{
+	  _n_comp[s]  = new unsigned char [this->n_vars(s)]; 
+	  _dof_ids[s] = new unsigned int* [this->n_vars(s)];
+	}
+      
+      for (unsigned int v=0; v<this->n_vars(s); v++)
+	{
+	  _n_comp[s][v]  = dof_obj.n_comp(s,v);
+
+	  // In case your variable has zero components (Lagrange?), it is
+	  // UB to allocate a zero-length array here.
+	  if (this->n_comp(s,v) > 0)
+	    {
+	      _dof_ids[s][v] = new unsigned int [this->n_comp(s,v)]; 
+	      
+	      for (unsigned int c=0; c<this->n_comp(s,v); c++)
+		_dof_ids[s][v][c] = dof_obj.dof_number(s,v,c);
+	    }
+	}
+    }
+
+#else
+
+  // Allocate storage for the dof numbers and copy
+  // the values. See warning above about allocating arrays with zero entries.
+  if (this->n_systems() > 0)
+  {
+    _n_vars  = new unsigned char [this->n_systems()];
+    _dof_ids = new unsigned int* [this->n_systems()];
+  }
+
+  // If n_systems==0, we don't enter this for loop.
+  for (unsigned int s=0; s<this->n_systems(); s++)
+    {  
+      _n_vars[s]  = dof_obj.n_vars(s);
+
+      // Only allocate if there are variables in the system
+      if (this->n_vars(s) > 0)
+	_dof_ids[s] = new unsigned int [this->n_vars(s)];  
+      
+      for (unsigned int v=0; v<this->n_vars(s); v++)
+	for (unsigned int c=0; c<this->n_comp(s,v); c++)
+	  {
+	    assert (c == 0);
+	    _dof_ids[s][v] = dof_obj.dof_number(s,v,c);
+	  }
+    }
+  
+#endif
+
+  // Check that everything worked
+#ifdef DEBUG
+
+  assert (this->n_systems() == dof_obj.n_systems());
+
+  for (unsigned int s=0; s<this->n_systems(); s++)
+    {
+      assert (this->n_vars(s) == dof_obj.n_vars(s));
+
+      for (unsigned int v=0; v<this->n_vars(s); v++)
+	{
+	  assert (this->n_comp(s,v) == dof_obj.n_comp(s,v));
+
+	  for (unsigned int c=0; c<this->n_comp(s,v); c++)
+	    assert (this->dof_number(s,v,c) == dof_obj.dof_number(s,v,c));
+	}
+    }
+  
+#endif
+}
+
+
+
+
 #ifdef ENABLE_AMR
 
 void  DofObject::clear_old_dof_object ()
@@ -44,8 +155,8 @@ void  DofObject::clear_old_dof_object ()
   // prevent a memory leak
   if (old_dof_object != NULL)
     {
-      delete old_dof_object;
-      old_dof_object = NULL;
+      delete this->old_dof_object;
+      this->old_dof_object = NULL;
     }  
 }
 
@@ -55,10 +166,11 @@ void DofObject::set_old_dof_object ()
 {
   this->clear_old_dof_object();
 
-  assert (old_dof_object == NULL);
+  assert (this->old_dof_object == NULL);
   
-  // Make a new DofObject, assign a copy of \p this
-  old_dof_object = new DofObject(*this);
+  // Make a new DofObject, assign a copy of \p this.
+  // Make sure the copy ctor for DofObject works!!
+  this->old_dof_object = new DofObject(*this);
 }
 
 #endif
