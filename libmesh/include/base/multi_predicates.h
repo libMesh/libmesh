@@ -1,4 +1,4 @@
-// $Id: multi_predicates.h,v 1.5 2005-03-21 15:19:26 benkirk Exp $
+// $Id: multi_predicates.h,v 1.6 2005-08-02 21:44:02 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -104,7 +104,18 @@ namespace Predicates
   
   
 
-
+  // Instantiation of the IsNull abstract_multi_predicate.
+  // This would be used to iterate over NULL entries in a container.
+  template <typename T>
+  struct IsNull : abstract_multi_predicate<T>
+  {
+    // Constructor, pushes back a single predicate
+    IsNull()
+    {
+      this->_predicates.push_back(new is_null<T>);
+    }
+  };
+  
 
 
 
