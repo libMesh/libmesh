@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.14 2005-06-13 09:17:07 spetersen Exp $
+// $Id: xdr_io.C,v 1.15 2005-08-04 17:57:29 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -654,9 +654,10 @@ namespace
     friend class XdrMESH;
   public:
     /**
-     * Constructor.
+     * Constructor.  Initializes the number of blocks in the mesh to 1
+     * and the number of levels to zero.
      */
-    XdrMHEAD()                           {}
+    XdrMHEAD() : _n_blocks(1), _n_levels(0) {}
 
     /**
      * Destructor.
@@ -695,13 +696,26 @@ namespace
      *
      * @return The number of mesh blocks.
      */
-    unsigned int get_n_blocks() const { return n_blocks; }
+    unsigned int get_n_blocks() const { return _n_blocks; }
 
     /**
      * Sets the number of mesh blocks.
      */
-    void set_n_blocks(const unsigned int nb) { n_blocks = nb; }
+    void set_n_blocks(const unsigned int nb) { this->_n_blocks = nb; }
 
+    /**
+     * Get the maximum number of levels of refinement in this mesh.
+     * A value of zero here indicates a uniform mesh (i.e. all elements
+     * are at level 0).
+     */
+    unsigned int get_num_levels() { return this->_n_levels; }
+
+    /**
+     * Set the number of levels of refinement in this mesh.
+     * A value of zero here indicates a uniform mesh.
+     */
+    void set_num_levels(const unsigned int n_levels) { this->_n_levels = n_levels; }
+    
     /**
      * Element block types are defined in elem_type.h.
      * They may be for example TRI3, TRI6, QUAD4, etc.
@@ -741,7 +755,13 @@ namespace
      * contains only a single type of
      * element.
      */
-    unsigned int n_blocks;
+    unsigned int _n_blocks;
+
+    /**
+     * Max level represented in this mesh.  0 means there
+     * was no adaptivity in the mesh.
+     */
+    unsigned int _n_levels;
 
     /**
      * A vector of length n_blocks
@@ -760,6 +780,7 @@ namespace
      * in each block.
      */
     std::vector<unsigned int> num_elem_each_block;
+
   };
 
 
@@ -1350,7 +1371,9 @@ namespace
 	  case (XdrMGF::ENCODE):
 	  case (XdrMGF::DECODE):
 	    {
-	      xdr_u_int(mp_xdr_handle, &(hd->n_blocks));
+	      unsigned int temp_n_blocks=0;
+	      xdr_u_int(mp_xdr_handle, &temp_n_blocks);
+	      hd->set_n_blocks(temp_n_blocks);
 	      break;
 	    }
 
@@ -1358,15 +1381,17 @@ namespace
 	  
 	  case (XdrMGF::W_ASCII):
 	    {
-	      mp_out << hd->n_blocks << "\t # Num. Element Blocks.\n";
+	      mp_out << hd->get_n_blocks() << "\t # Num. Element Blocks.\n";
 	      break;
 	    }
 
 	  case (XdrMGF::R_ASCII):
 	    {
 	      assert (mp_in.good());
-	
-	      mp_in >> hd->n_blocks; mp_in.getline(comment, comm_len);
+	      unsigned int temp_n_blocks=0;
+	      mp_in >> temp_n_blocks;
+	      hd->set_n_blocks(temp_n_blocks);
+	      mp_in.getline(comment, comm_len);
 	      break;
 	    }
 
@@ -1380,7 +1405,8 @@ namespace
 	hd->get_block_elt_types(et);
       
 	// Note:  If DECODING or READING, allocate space in the vector
-	if ((m_type == DECODE) || (m_type == R_ASCII)) et.resize(hd->n_blocks);  
+	if ((m_type == DECODE) || (m_type == R_ASCII))
+	  et.resize(hd->get_n_blocks());  
 
 	switch (m_type)
 	  {
@@ -1402,7 +1428,7 @@ namespace
 
 	  case (XdrMGF::W_ASCII):
 	    {
-	      for (unsigned int i=0; i<hd->n_blocks; i++)
+	      for (unsigned int i=0; i<hd->get_n_blocks(); i++)
 		mp_out << et[i] << " ";
 	      
 	      mp_out << "\t # Element types in each block.\n";
@@ -1413,7 +1439,7 @@ namespace
 	    {
 	      assert (mp_in.good());
 	
-	      for (unsigned int i=0; i<hd->n_blocks; i++)
+	      for (unsigned int i=0; i<hd->get_n_blocks(); i++)
 		{
 		  // convoluted way of doing it to
 		  // satisfy icc
@@ -1442,7 +1468,8 @@ namespace
 	hd->get_num_elem_each_block(neeb);
 
 	// If DECODING or READING, allocate space for the vector 
-	if ((m_type == DECODE) || (m_type == R_ASCII)) neeb.resize(hd->n_blocks);
+	if ((m_type == DECODE) || (m_type == R_ASCII))
+	  neeb.resize(hd->get_n_blocks());
 
 	switch (m_type)
 	  {
@@ -1463,7 +1490,7 @@ namespace
 	  
 	  case (XdrMGF::W_ASCII):
 	    {
-	      for (unsigned int i=0; i<hd->n_blocks; i++)
+	      for (unsigned int i=0; i<hd->get_n_blocks(); i++)
 		mp_out << neeb[i] << " ";
 	      
 	      mp_out << "\t # Num. of elements in each block.\n";
@@ -1473,11 +1500,45 @@ namespace
 	  case (XdrMGF::R_ASCII):
 	    {
 	      assert (mp_in.good());
-	
-	      for (unsigned int i=0; i<hd->n_blocks; i++)
-		mp_in >> neeb[i] ;
-	      
+
+	      // We will treat this line as containing
+	      // 1.) The number of elements in each block OR
+	      // 2.) The number of elements at each level in each block
+	      // Therefore, we don't know a-priori how many ints to read.
+
+	      // Get the full line from the stream up to the newline
 	      mp_in.getline(comment, comm_len);
+
+	      // Construct a char buffer to hold the tokens as we
+	      // process them, and construct a std::string object and
+	      // a std::stringstream object for tokenizing this line.
+	      char token[comm_len];
+	      std::string s_temp(comment);
+	      std::stringstream ss(s_temp);
+
+	      // Resize the neeb vector to zero so we can push back
+	      // values onto it.
+	      neeb.resize(0);
+	      
+	      // Process the tokens one at a time
+	      while (ss >> token)
+		{
+		  // If you reach the hash, the rest of the line is a comment,
+		  // so quit reading.
+		  if (token[0] == '#') 
+		    break;
+		  
+		  // If you reach an alphabetic character, this is an error
+		  if (isalpha(token[0]))
+		    {
+		      std::cerr << "Error: Unrecognized character detected." << std::endl;
+		      error();
+		    }
+		  
+		  // Otherwise, add the value to the neeb vector
+		  neeb.push_back( atoi(token) );
+		}
+	      
 	      break;
 	    }
 
