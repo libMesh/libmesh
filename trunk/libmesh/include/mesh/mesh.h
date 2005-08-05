@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.15 2005-06-11 05:11:30 jwpeterson Exp $
+// $Id: mesh.h,v 1.16 2005-08-05 20:49:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -219,8 +219,14 @@ public:
   element_iterator active_elements_begin ();
   element_iterator active_elements_end   ();
 
+  element_iterator subactive_elements_begin ();
+  element_iterator subactive_elements_end   ();
+
   element_iterator not_active_elements_begin ();
   element_iterator not_active_elements_end   ();
+
+  element_iterator not_subactive_elements_begin ();
+  element_iterator not_subactive_elements_end   ();
 
   element_iterator local_elements_begin ();
   element_iterator local_elements_end   ();
@@ -257,8 +263,14 @@ public:
   const_element_iterator active_elements_begin() const;
   const_element_iterator active_elements_end()   const;
   
+  const_element_iterator subactive_elements_begin() const;
+  const_element_iterator subactive_elements_end()   const;
+  
   const_element_iterator not_active_elements_begin() const;
   const_element_iterator not_active_elements_end()   const;
+
+  const_element_iterator not_subactive_elements_begin() const;
+  const_element_iterator not_subactive_elements_end()   const;
 
   const_element_iterator local_elements_begin () const;
   const_element_iterator local_elements_end   () const;
