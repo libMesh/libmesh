@@ -1,4 +1,4 @@
-// $Id: multi_predicates.h,v 1.6 2005-08-02 21:44:02 jwpeterson Exp $
+// $Id: multi_predicates.h,v 1.7 2005-08-05 20:49:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -163,8 +163,36 @@ namespace Predicates
   };
 
 
+  
+
+  // Instantiation for the SubActive abstract_multi_predicate
+  template <typename T>
+  struct SubActive : abstract_multi_predicate<T>
+  {
+    // Constructor, pushes back two single predicates
+    SubActive()
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new subactive<T>);
+    }
+  };
 
 
+  
+
+  // Instantiation for the NotSubActive abstract_multi_predicate
+  template <typename T>
+  struct NotSubActive : abstract_multi_predicate<T>
+  {
+    // Constructor, pushes back two single predicates
+    NotSubActive()
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new not_subactive<T>);
+    }
+  };
+
+  
   
   // Instantiation for the Local abstract_multi_predicate
   template <typename T>

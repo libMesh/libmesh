@@ -1,4 +1,4 @@
-// $Id: mesh_iterators.C,v 1.6 2005-05-09 20:38:42 jwpeterson Exp $
+// $Id: mesh_iterators.C,v 1.7 2005-08-05 20:49:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,6 +54,24 @@ Mesh::element_iterator
 Mesh::not_active_elements_begin ()
 {
   Predicates::NotActive<elem_iterator_imp> p;
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+// subactive elements begin() accessor
+Mesh::element_iterator
+Mesh::subactive_elements_begin ()
+{
+  Predicates::SubActive<elem_iterator_imp> p;
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+// not subactive elements begin() accessor
+Mesh::element_iterator
+Mesh::not_subactive_elements_begin ()
+{
+  Predicates::NotSubActive<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -165,6 +183,24 @@ Mesh::const_element_iterator
 Mesh::not_active_elements_begin () const
 {
   Predicates::NotActive<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+// const subactive begin() accessor
+Mesh::const_element_iterator
+Mesh::subactive_elements_begin () const
+{
+  Predicates::SubActive<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+// const not subactive begin() accessor
+Mesh::const_element_iterator
+Mesh::not_subactive_elements_begin () const
+{
+  Predicates::NotSubActive<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -286,6 +322,26 @@ Mesh::not_active_elements_end ()
 
 
 
+// subactive end() accessor
+Mesh::element_iterator
+Mesh::subactive_elements_end ()
+{
+  Predicates::SubActive<elem_iterator_imp> p;
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
+// subactive end() accessor
+Mesh::element_iterator
+Mesh::not_subactive_elements_end ()
+{
+  Predicates::NotSubActive<elem_iterator_imp> p;
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
 // local end() accessor
 Mesh::element_iterator
 Mesh::local_elements_end ()
@@ -400,6 +456,26 @@ Mesh::const_element_iterator
 Mesh::not_active_elements_end () const
 {
   Predicates::NotActive<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
+// subactive const end() accessor
+Mesh::const_element_iterator
+Mesh::subactive_elements_end () const
+{
+  Predicates::SubActive<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
+// not subactive const end() accessor
+Mesh::const_element_iterator
+Mesh::not_subactive_elements_end () const
+{
+  Predicates::NotSubActive<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 

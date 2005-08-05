@@ -1,4 +1,4 @@
-// $Id: single_predicates.h,v 1.4 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: single_predicates.h,v 1.5 2005-08-05 20:49:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -97,6 +97,28 @@ namespace Predicates
 
   protected:
     virtual predicate<T>* clone() const { return new not_active<T>(*this); }
+  };
+
+
+  // The subactive predicate returns true if the pointer is subactive.
+  template <typename T>
+  struct subactive : predicate<T>
+  {
+    virtual ~subactive() {}
+    virtual bool operator()(const T& it) const { return (*it)->subactive(); }
+    
+  protected:
+    virtual predicate<T>* clone() const { return new subactive<T>(*this); }
+  };
+
+  // The not_subactive predicate returns true when the pointer is not subactive
+  template <typename T>
+  struct not_subactive : subactive<T>
+  {
+    virtual bool operator()(const T& it) const { return !subactive<T>::operator()(it); }
+
+  protected:
+    virtual predicate<T>* clone() const { return new not_subactive<T>(*this); }
   };
 
 
