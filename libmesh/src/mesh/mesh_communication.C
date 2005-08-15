@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.21 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: mesh_communication.C,v 1.22 2005-08-15 21:30:38 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -137,7 +137,10 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
   // Get important sizes
   unsigned int n_nodes      = mesh.n_nodes();
   unsigned int n_elem       = mesh.n_elem();
-  unsigned int total_weight = MeshTools::total_weight(mesh);
+  unsigned int n_levels     = MeshTools::n_levels(mesh);
+
+  // For adaptive meshes, need to store parent and self IDs as well
+  unsigned int total_weight = MeshTools::total_weight(mesh) + 2*n_elem;
 
   // Broadcast the sizes
   {
@@ -215,31 +218,50 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     // The conn array contains the information needed to construct each element.
     // Pack all this information into one communication to avoid two latency hits
     // For each element it is of the form
-    // [ etype subdomain_id node_0 node_1 ... node_n ]
-    std::vector<unsigned int> conn;
+    // [ etype subdomain_id node_0 node_1 ... node_n self_ID parent_ID]
+    // We cannot use unsigned int because parent_ID can be negative
+    std::vector<int> conn;
 
     // If we are processor 0, we must populate this vector and
     // broadcast it to the other processors.
     if (libMesh::processor_id() == 0)
+    {
+      conn.reserve (2*n_elem + total_weight);
+
+      // We start from level 0. This is a bit simpler than in xdr_io.C
+      // because we do not have to worry about economizing by group elements
+      // of the same type. Element type is simply specified as an
+      // entry in the connectivity vector, "conn".
+      // By filling conn in order of levels, parents should exist before children
+      // are built when we reconstruct the elements on the other processors.
+
+      for(unsigned int level=0; level<=n_levels; ++level)
       {
-	conn.reserve (2*n_elem + total_weight);
+        MeshBase::element_iterator it = mesh.level_elements_begin(level);
+        const MeshBase::element_iterator it_end = mesh.level_elements_end(level);
 
-	MeshBase::element_iterator       it     = mesh.elements_begin();
-	const MeshBase::element_iterator it_end = mesh.elements_end();
+        for (; it != it_end; ++it)
+        {
+          const Elem* elem = *it;
 
-	for (; it != it_end; ++it)
-	  {
-	    const Elem* elem = *it;
-	    
-	    assert (elem != NULL);
-	    
-	    conn.push_back (static_cast<unsigned int>(elem->type()));
-	    conn.push_back (static_cast<unsigned int>(elem->subdomain_id()));
-	    
-	    for (unsigned int n=0; n<elem->n_nodes(); n++)
-	      conn.push_back (elem->node(n));
-	  }
+          assert (elem != NULL);
+
+          conn.push_back (static_cast<unsigned int>(elem->type()));
+          conn.push_back (static_cast<unsigned int>(elem->subdomain_id()));
+
+          for (unsigned int n=0; n<elem->n_nodes(); n++)
+            conn.push_back (elem->node(n));
+
+          conn.push_back(elem->id());
+
+          // use parent_ID of -1 to indicate a level 0 element
+          if(level==0)
+            conn.push_back(-1);
+          else
+            conn.push_back(elem->parent()->id());
+        }
       }
+    }
     else
       conn.resize (2*n_elem + total_weight);
     
@@ -259,12 +281,64 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 
 	while (cnt < conn.size())
 	  {
-	    // Build the element
-	    Elem* elem = 
-	      mesh.add_elem (Elem::build(static_cast<ElemType>(conn[cnt++])).release());
+	    // Declare the element that we will add
+            Elem* elem;
+            
+            unsigned int elem_type = conn[cnt++];
+            AutoPtr<Elem> temp_elem = 
+              Elem::build(static_cast<ElemType>(elem_type));
+              
+	    // Get the subdomain id
+	    unsigned int subdomain_id = conn[cnt++];
 
-	    // Set the subdomain id
-	    elem->subdomain_id() = static_cast<unsigned char>(conn[cnt++]);
+            // get ID info
+            int self_ID   = conn[cnt + temp_elem->n_nodes()];
+            int parent_ID = conn[cnt + temp_elem->n_nodes()+1];
+
+            if(parent_ID != -1) // Do a linear search for the parent
+            {
+              Elem* my_parent;
+
+              MeshBase::element_iterator it        = mesh.elements_begin(); 
+              const MeshBase::element_iterator end = mesh.elements_end(); 
+              bool parent_found = false;
+
+              for (; it != end; ++it)
+              {
+                Elem* possible_parent = *it;
+                if (static_cast<int>(possible_parent->id()) == parent_ID)
+                {
+                  my_parent = possible_parent;
+                  parent_found = true;
+                  break;
+                }
+              }
+
+              if (!parent_found)
+              {
+                std::cerr << "Parent element with ID " << parent_ID 
+                  << " not found." << std::endl; 
+                error();
+              }
+
+              assert (static_cast<int>(my_parent->id()) == parent_ID);
+              my_parent->set_refinement_flag(Elem::INACTIVE);
+
+              elem = mesh.add_elem(Elem::build(static_cast<ElemType>(elem_type),
+                  my_parent).release());
+              elem->set_refinement_flag(Elem::JUST_REFINED); 
+              my_parent->add_child(elem);
+              assert (my_parent->type() == elem->type());
+            }
+
+            else // level 0 element has no parent
+            {
+              // should be able to just use the integer elem_type
+              elem = mesh.add_elem
+                (Elem::build(static_cast<ElemType>(elem_type)).release());
+            }
+            elem->set_id() = self_ID;
+            elem->subdomain_id() = subdomain_id;
 
 	    // Assign the connectivity
 	    for (unsigned int n=0; n<elem->n_nodes(); n++)
@@ -273,6 +347,10 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 		
 		elem->set_node(n) = mesh.node_ptr (conn[cnt++]);
 	      }
+
+            // increment cnt twice to skip over ID information
+            cnt += 2;
+
 	  }
       }
     

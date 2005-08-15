@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.9 2005-05-03 23:22:24 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.10 2005-08-15 21:30:38 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -386,20 +386,23 @@ private:
   
   map_type _new_nodes_map;
 
-  /**
-   * Data structure that holds iterators to elements
-   * that have been removed from the mesh but not
-   * yet removed from the \p _elements vector.
-   */
-  // This optimization is currently turned off...turn back
-  // on when new iterators are working.
-  // std::list<std::vector<Elem*>::iterator> _unused_elements;
-  // std::list<Elem*> _unused_elements;
 
   /**
    * Reference to the mesh.
    */
   MeshBase& _mesh;
+
+
+  /**
+   * Data structure to hold the nodes for the initial 
+   * mesh before any refinements.  Filled possibly in constructor
+   * if the MeshRefinement object is created after the Mesh has been
+   * initialized.  
+   * 
+   * TODO: We need to make sure this is initialized even
+   * if the MeshRefinement object is constructed on an uninitialized Mesh.
+   */
+   std::vector<Node*> _initial_nodes;
 };
 
 #endif // end #ifdef ENABLE_AMR

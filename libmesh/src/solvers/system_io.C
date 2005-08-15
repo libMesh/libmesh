@@ -1,4 +1,4 @@
-// $Id: system_io.C,v 1.11 2005-06-12 18:36:42 jwpeterson Exp $
+// $Id: system_io.C,v 1.12 2005-08-15 21:30:38 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,10 +23,12 @@
 
 // C++ Includes
 #include <cstdio> // for sprintf
+#include <set>
 
 // Local Includes
 #include "system.h"
 #include "mesh.h"
+#include "mesh_tools.h"
 #include "elem.h"
 #include "xdr_cxx.h"
 #include "numeric_vector.h"
@@ -261,8 +263,8 @@ void System::read_data (Xdr& io,
      */
     reordered_vector.resize(global_vector.size());
 
-    std::cout << "global_vector.size()=" << global_vector.size() << std::endl;
-    std::cout << "this->n_dofs()=" << this->n_dofs() << std::endl;
+    //std::cout << "global_vector.size()=" << global_vector.size() << std::endl;
+    //std::cout << "this->n_dofs()=" << this->n_dofs() << std::endl;
     
     assert (global_vector.size() == this->n_dofs());
 	
@@ -272,7 +274,7 @@ void System::read_data (Xdr& io,
     const unsigned int n_vars  = this->n_vars();
     const unsigned int n_nodes = _mesh.n_nodes();
     const unsigned int n_elem  = _mesh.n_elem();
-	
+
     for (unsigned int var=0; var<n_vars; var++)
       {
 	// First reorder the nodal DOF values
@@ -282,9 +284,9 @@ void System::read_data (Xdr& io,
 	      assert (_mesh.node(node).dof_number(sys, var, index) !=
 		      DofObject::invalid_id);
 
-	      assert (cnt < global_vector.size());
-		  
-	      reordered_vector[_mesh.node(node).dof_number(sys, var, index)] =
+              assert (cnt < global_vector.size());
+              
+              reordered_vector[_mesh.node(node).dof_number(sys, var, index)] =
 		  global_vector[cnt++]; 
 	    }
 
@@ -704,6 +706,7 @@ void System::write_data (Xdr& io,
    * Collect the global solution on one processor
    */
   this->solution->localize_to_one (global_vector, 0);       
+
     
 
   /**
@@ -728,23 +731,37 @@ void System::write_data (Xdr& io,
 
       const unsigned int sys_num = this->number();
       const unsigned int n_vars  = this->n_vars();
-      const unsigned int n_nodes = _mesh.n_nodes();
       const unsigned int n_elem  = _mesh.n_elem();
 
+      // Build a set of non subactive node indices. 
+      std::set<unsigned int> not_subactive_node_ids;
+      MeshTools::get_not_subactive_node_ids(_mesh, not_subactive_node_ids);
+
+      // Loop over each variable and each node, and write out the value.
       for (unsigned int var=0; var<n_vars; var++)
         {		
 	  // First write the nodal DOF values
-	  for (unsigned int node=0; node<n_nodes; node++)
+          std::set<unsigned int>::iterator it = not_subactive_node_ids.begin();
+          const std::set<unsigned int>::iterator end = not_subactive_node_ids.end();
+          
+          for (; it != end; ++it)
+          {
+            // Get the global index of this node
+            const unsigned int node = *it;
+            // std::cout << "Setting value for node " << node << std::endl;
 	    for (unsigned int index=0; index<_mesh.node(node).n_comp(sys_num, var); index++)
-	      {
+            {
+                assert (_mesh.node(node).id() == node);
+
 		assert (_mesh.node(node).dof_number(sys_num, var, index) !=
 			DofObject::invalid_id);
 		      
 		assert (cnt < reordered_soln.size());
-		      
+		    
 		reordered_soln[cnt++] = 
 		    global_vector[_mesh.node(node).dof_number(sys_num, var, index)];
-	      }
+            }
+          }
 
 	  // Then write the element DOF values
 	  for (unsigned int elem=0; elem<n_elem; elem++)
@@ -761,7 +778,6 @@ void System::write_data (Xdr& io,
 		}
 	}
 
-	    
       /**
        * 14.)
        *

@@ -1,4 +1,4 @@
-// $Id: mesh_tools.h,v 1.3 2005-05-10 21:37:17 benkirk Exp $
+// $Id: mesh_tools.h,v 1.4 2005-08-15 21:30:38 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,18 +26,17 @@
 
 // C++ Includes   -----------------------------------
 #include <vector>
+#include <set>
 
 // Local Includes -----------------------------------
 #include "libmesh.h"
 #include "enum_elem_type.h"
-
+#include "mesh_base.h"
 
 // forward declarations
-class MeshBase;
 class Sphere;
 class Point;
 class Elem;
-
 
 /**
  * Utility functions for operations on a \p Mesh object.  Here is where
@@ -47,7 +46,7 @@ class Elem;
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  */
 
 
@@ -167,7 +166,40 @@ namespace MeshTools
   unsigned int n_active_elem_of_type (const MeshBase& mesh,
 				      const ElemType type);
 
-  
+  /**
+   * Return the number of elements of type \p type at the specified
+   * refinement level.
+   *
+   * TODO: Replace all of the n_xxx_elem() functions like this with
+   * a single function which takes a range of iterators and returns the
+   * std::distance between them.
+   */
+  unsigned int n_non_subactive_elem_of_type_at_level(const MeshBase& mesh,
+                                                     const ElemType type,
+                                                     const unsigned int level);
+
+  /**
+   * Return the number of levels of refinement in the mesh.
+   * Implemented by looping over all the elements and finding the maximum
+   * level.
+   */
+  unsigned int n_levels(const MeshBase& mesh);
+ 
+  /**
+   * Builds a set of node IDs for nodes which belong to non-subactive
+   * elements.  Non-subactive elements are those which are either active
+   * or inactive.  This is useful for determining which nodes should be
+   * written to a data file, and is used by the XDA mesh writing methods.
+   */
+  void get_not_subactive_node_ids(const MeshBase& mesh, 
+                                  std::set<unsigned int>& not_subactive_node_ids);
+
+  /**
+   * Count up the number of elements of a specific type (as defined by an iterator range).
+   */
+   unsigned int n_elem (MeshBase::element_iterator& begin,
+                        MeshBase::element_iterator& end);
+
 } // end namespace MeshTools
 
 
