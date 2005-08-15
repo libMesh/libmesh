@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.46 2005-06-28 18:53:18 jwpeterson Exp $
+// $Id: elem.C,v 1.47 2005-08-15 21:30:38 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -519,6 +519,56 @@ Real Elem::quality (const ElemQuality q) const
 
 
 #ifdef ENABLE_AMR
+
+
+
+bool Elem::ancestor() const
+{
+#ifdef ENABLE_AMR
+
+  if (this->active())
+    return false;
+
+if (!this->has_children())
+    return false;
+  if (this->child(0)->active())
+    return true;
+
+  return this->child(0)->ancestor();
+#else
+  return false;
+#endif
+}
+
+
+
+void Elem::add_child (Elem* elem)
+{
+  if(_children == NULL)
+  {
+    _children = new Elem*[this->n_children()];
+    
+    for (unsigned int c=0; c<this->n_children(); c++)
+      _children[c] = NULL;
+  }
+
+  for (unsigned int c=0; c<this->n_children(); c++)
+  {
+    if(_children[c] == NULL)
+    {
+      _children[c] = elem;
+      return;
+    }
+  }
+
+  std::cerr << "Error: Tried to add a child to an element with full children array"
+            << std::endl;
+  error();
+}
+
+
+
+
 
 void Elem::family_tree (std::vector<const Elem*>& family,
 			const bool reset) const

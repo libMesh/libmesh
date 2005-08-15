@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.62 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: mesh.C,v 1.63 2005-08-15 21:30:38 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -445,29 +445,32 @@ void Mesh::find_neighbors()
       Elem* elem = *el;
 
       assert (elem->parent() != NULL);
-
       for (unsigned int s=0; s < elem->n_neighbors(); s++)
-	if (elem->neighbor(s) == NULL)
-	  {	    
-	    elem->set_neighbor(s, elem->parent()->neighbor(s));
-	    
+        if (elem->neighbor(s) == NULL)
+        {	    
+          elem->set_neighbor(s, elem->parent()->neighbor(s));
+
 #ifdef DEBUG	    
-            Elem *neigh = elem->neighbor(s);
-	    if (neigh != NULL)
-	      if (!neigh->active())
-		{
-		  std::cerr << "ERROR: " 
-                    << (elem->active()?"Active":"Ancestor")
-                    << " Element at level "
-                    << elem->level() << " found "
-		    << (neigh->subactive()?"subactive":"ancestor")
-                    << " neighbor at level " << neigh->level()
-                    << std::endl;
-		  GMVIO(*dynamic_cast<Mesh*>(this)).write ("bad_mesh.gmv");
-		  error();
-		}
+          Elem *neigh = elem->neighbor(s);
+          if (neigh != NULL)
+            // We ignore subactive elements here because
+            // we don't care about neighbors of subactive element.
+            if ((!neigh->active()) && (!elem->subactive()))
+            {
+              std::cerr << "Bad element ID = " << elem->id() 
+                << ", Bad neighbor ID = " << neigh->id();
+              std::cerr << "ERROR: " 
+                << (elem->active()?"Active":"Ancestor")
+                << " Element at level "
+                << elem->level() << " found "
+                << (neigh->subactive()?"subactive":"ancestor")
+                << " neighbor at level " << neigh->level()
+                << std::endl;
+              GMVIO(*dynamic_cast<Mesh*>(this)).write ("bad_mesh.gmv");
+              error();
+            }
 #endif // DEBUG
-	  }
+        }
     }
   
 #endif // AMR
@@ -624,6 +627,8 @@ void Mesh::read (const std::string& name,
 {
   START_LOG("read()", "Mesh");
 
+  bool read_xda_file = false;
+
   
   // Read the file based on extension.  Only processor 0
   // needs to read the mesh.  It will then broadcast it and
@@ -643,9 +648,17 @@ void Mesh::read (const std::string& name,
 	       (name.rfind(".ogl")  < name.size()) ||
 	       (name.rfind(".oogl") < name.size()))
 	OFFIO(*this).read (name);
-      
+     
       else if (name.rfind(".xda") < name.size())
+      {
 	XdrIO(*this).read (name);
+        // Set the read_xda_file flag.  This ensures that 
+        // renumber_nodes_and_elements is *not* called during
+        // prepare_for_use().  This is required in cases 
+        // where there is a associated solution file which expect
+        // a certain ordering of the nodes.
+        read_xda_file = true;
+      }
       
       else if (name.rfind(".xdr")  < name.size())
 	XdrIO(*this,true).read (name);
@@ -700,9 +713,9 @@ void Mesh::read (const std::string& name,
     mesh_communication.broadcast (*this);
   }
 
-
   // Done reading the mesh.  Now prepare it for use.
-  this->prepare_for_use();
+  this->prepare_for_use(read_xda_file);
+
 }
 
 

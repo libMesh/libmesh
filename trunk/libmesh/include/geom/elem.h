@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.25 2005-06-29 18:58:43 roystgnr Exp $
+// $Id: elem.h,v 1.26 2005-08-15 21:30:38 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -532,6 +532,15 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   Elem* child (const unsigned int i) const;
 
+
+  /**
+   * Adds a child pointer to the array of children of this element.
+   * If this is the first child to be added, this method allocates 
+   * memory in the parent's _children array, otherwise, it just sets
+   * the pointer.
+   */
+  void add_child (Elem* elem);
+
   /**
    * Fills the vector \p family with the children of this element,
    * recursively.  So, calling this method on a twice-refined element
@@ -992,22 +1001,6 @@ bool Elem::active() const
 
 
 
-inline
-bool Elem::ancestor() const
-{
-#ifdef ENABLE_AMR
-  if (this->active())
-    return false;
-  if (!this->has_children())
-    return false;
-  if (this->child(0)->active())
-    return true;
-  return this->child(0)->ancestor();
-#else
-  return false;
-#endif
-}
-
 
 
 inline
@@ -1103,6 +1096,7 @@ Elem* Elem::child (const unsigned int i) const
   
   return _children[i];
 }
+
 
 
 

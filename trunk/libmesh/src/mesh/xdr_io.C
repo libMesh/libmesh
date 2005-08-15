@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.15 2005-08-04 17:57:29 jwpeterson Exp $
+// $Id: xdr_io.C,v 1.16 2005-08-15 21:30:38 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -86,6 +86,7 @@ namespace
     enum XdrIO_TYPE {UNKNOWN = -1, ENCODE=0, DECODE,
 		     W_ASCII , R_ASCII};
 
+     
     /**
      * Constructor.  Intializes
      * the access type, \p xdr file
@@ -99,83 +100,11 @@ namespace
      * standard C header \p rpc/rpc.h.
      */
 #ifdef HAVE_XDR
-    XdrMGF() : m_type(UNKNOWN), mp_xdr_handle(0), orig_flag(0), mp_fp(0) {}
+    XdrMGF() : _num_levels(0), m_type(UNKNOWN), mp_xdr_handle(0), orig_flag(XdrIO::LIBM), mp_fp(0) {}
 #else
-    XdrMGF() : m_type(UNKNOWN), orig_flag(0), mp_fp(0) {}
+    XdrMGF() : _num_levels(0), m_type(UNKNOWN), orig_flag(XdrIO::LIBM), mp_fp(0) {}
 #endif
     
-    //-------------------------------------------------------------------------
-    /**
-     * This is a helper class for XdrMGF.
-     * It defines a data structure which
-     * contains information (name,
-     * major version number, minor version
-     * number) about the software which
-     * originally wrote (or is writing)
-     * the current XDR file.
-     *
-     * @author John W. Peterson, 2002
-     */	     
-    class Originator
-    {
-    public:
-  
-      /**
-       * Initialization constructor.
-       * Sets the name, major, and
-       * minor version numbers of
-       * the Originator data structure.
-       * Use this one!
-       */
-      Originator(const char* theName,
-		 int   theMajorVersion,
-		 int   theMinorVersion)  : name(theName),
-					   major_version(theMajorVersion),
-					   minor_version(theMinorVersion)
-      {}
-
-      /**
-       * Destructor.
-       */
-      ~Originator() {} 
-
-      /**
-       * Overloads equality operator.
-       * Useful for checking to see
-       * if the Originator read from
-       * the XDR file is the same as
-       * another Originator.
-       * @return True when two Originators are equivalent
-       */
-      bool operator == (const Originator &rhs) const;
-
-      /**
-       * @return Name of the code, generally only four chars
-       */
-      const char* get_name() const { return name; }
-
-      /**
-       * @return Major version number of the code.
-       */
-      int get_major()  const { return major_version; }
-
-      /**
-       * @return Minor version number of the code.
-       */
-      int get_minor()  const { return minor_version; }
-  
-    private:
-
-      /**
-       * Default constructor -- you aren't allowed to call this.
-       */
-      Originator() {}
-  
-      const char* name;
-      int   major_version;
-      int   minor_version;
-    };
-
     /**
      * Initialization of the \p xdr file.
      * This function performs the following
@@ -228,23 +157,32 @@ namespace
     int dataBlk(REAL* array, int numvar, int size);
 
     /**
-     * Return an Originator data structure
-     * for this code. We're using Deal 3.3
-     * as our originator signature.
-     */
-    Originator get_originator();
-
-    /**
      * Get the originator flag.
      */
-    int get_orig_flag() const { return orig_flag; }
+    XdrIO::FileFormat get_orig_flag() const { return orig_flag; }
 
     /**
      * Set the originator flag.
      */
-    void set_orig_flag(const unsigned int in_orig_flag) { orig_flag=in_orig_flag; }
+    void set_orig_flag(XdrIO::FileFormat in_orig_flag) { orig_flag = in_orig_flag; }
+
+
+   /**
+    * Set number of levels
+    */
+   void set_num_levels(unsigned int num_levels) { _num_levels = num_levels; }
+
+   /**
+    * Get number of levels
+    */
+   unsigned int get_num_levels() { return _num_levels; }
   
   protected:
+
+    /**
+     * Number of levels of refinement in the mesh
+     */
+     unsigned int _num_levels;
 
     /**
      * Specifies the read/write
@@ -286,7 +224,7 @@ namespace
      * @item 1: It's a MGF style mesh
      * @end{itemize}
      */
-    int orig_flag;
+    XdrIO::FileFormat orig_flag;
 
     /**
      * An input file stream object
@@ -384,6 +322,7 @@ namespace
      * @return 3*size
      */
     int BC(int* array, int size)                { return dataBlk(array, 3, size);}
+
 
   private:
 
@@ -657,7 +596,7 @@ namespace
      * Constructor.  Initializes the number of blocks in the mesh to 1
      * and the number of levels to zero.
      */
-    XdrMHEAD() : _n_blocks(1), _n_levels(0) {}
+    XdrMHEAD() : _n_blocks(1) {}
 
     /**
      * Destructor.
@@ -704,19 +643,6 @@ namespace
     void set_n_blocks(const unsigned int nb) { this->_n_blocks = nb; }
 
     /**
-     * Get the maximum number of levels of refinement in this mesh.
-     * A value of zero here indicates a uniform mesh (i.e. all elements
-     * are at level 0).
-     */
-    unsigned int get_num_levels() { return this->_n_levels; }
-
-    /**
-     * Set the number of levels of refinement in this mesh.
-     * A value of zero here indicates a uniform mesh.
-     */
-    void set_num_levels(const unsigned int n_levels) { this->_n_levels = n_levels; }
-    
-    /**
      * Element block types are defined in elem_type.h.
      * They may be for example TRI3, TRI6, QUAD4, etc.
      *
@@ -757,11 +683,6 @@ namespace
      */
     unsigned int _n_blocks;
 
-    /**
-     * Max level represented in this mesh.  0 means there
-     * was no adaptivity in the mesh.
-     */
-    unsigned int _n_levels;
 
     /**
      * A vector of length n_blocks
@@ -928,31 +849,6 @@ namespace
 
 
 
-  XdrMGF::Originator XdrMGF::get_originator()
-  {
-    switch (orig_flag)
-      {
-      case 0:
-	{
-	  const Originator orig_deal("DEAL", 3, 3);
-	  return orig_deal;
-	}
-
-      case 1:
-	{
-	  const Originator orig_mgf("MGF ", 2, 0);
-	  return orig_mgf;
-	}
-      }
-
-  
-    // Huh?  
-    std::cerr << "orig_flag set to unknown value: "
-	      << orig_flag << std::endl;
-    error();
-    Originator never ("ERROR", 0, 0);
-    return never;
-  }
 
 
 
@@ -1053,13 +949,25 @@ namespace
       case (XdrMGF::ENCODE):
 	{
 	  char* p = &buf[0];
-	  const Originator orig = this->get_originator();
-	
-	  sprintf(&buf[0], "%s %03d:%03d",
-		  orig.get_name(),
-		  orig.get_major(),
-		  orig.get_minor());
-	  xdr_string(mp_xdr_handle, &p, bufLen);  // Writes binary signature
+	  const XdrIO::FileFormat orig = this->get_orig_flag();
+
+          std::ostringstream name;
+          if (orig == XdrIO::DEAL)
+            name << "DEAL 003:003";
+          
+          else if (orig == XdrIO::MGF)
+            name << "MGF  002:000";
+          
+          else if (orig == XdrIO::LIBM)
+            name << "LIBM " << this->get_num_levels();
+
+          else
+            error();
+
+          // Fill the buffer
+	  sprintf(&buf[0], "%s", name.str().c_str());
+	  
+          xdr_string(mp_xdr_handle, &p, bufLen);  // Writes binary signature
 
 	  break;
 	}
@@ -1076,11 +984,17 @@ namespace
       
       case (XdrMGF::W_ASCII):
 	{
-	  const Originator orig = this->get_originator();
-	  sprintf(&buf[0], "%s %03d:%03d",
-		  orig.get_name(),
-		  orig.get_major(),
-		  orig.get_minor());
+	  const XdrIO::FileFormat orig = this->get_orig_flag();
+
+          if (orig == XdrIO::DEAL)
+	    sprintf(&buf[0], "%s %03d:%03d", "DEAL", 3, 3);
+          
+          else if (orig == XdrIO::MGF)
+	    sprintf(&buf[0], "%s %03d:%03d", "MGF ", 2, 0);
+
+          else if (orig == XdrIO::LIBM)
+            sprintf(&buf[0], "%s %d", "LIBM", this->get_num_levels());
+          
 	  mp_out << buf << '\n';
 	
 	  break;
@@ -1100,7 +1014,26 @@ namespace
 
 	  buf_buf.copy (buf, std::string::npos);
 #else
+
+          // Here we first use getline() to grab the very 
+          // first line of the file into a char buffer.  Then
+          // this line is tokenized to look for:
+          // 1.) The name LIBM, which specifies the new Mesh style.
+          // 2.) The number of levels in the Mesh which is being read.
+          // Note that "buf" will be further processed below, here we
+          // are just attempting to get the number of levels.
 	  mp_in.getline(buf, bufLen+1);
+
+          std::string buf_str(buf);
+          std::stringstream ss(buf_str);
+
+          char token[256];
+          ss >> token;
+          if(strcmp(token,"LIBM") == 0)
+          {
+            ss >> token;
+            _num_levels = atoi(token);
+          }
 #endif
 
 	  break;
@@ -1115,31 +1048,27 @@ namespace
     // If you are reading or decoding, process the signature
     if ((m_type == R_ASCII) || (m_type == DECODE))
       {
-	const Originator deal("DEAL", 3, 3);
-	const Originator mgf("MGF ", 2, 0);
-	int major =-1, minor = -1;
 	char name[5];
 	strncpy(name, &buf[0], 4);
 	name[4] = '\0';
-	sscanf(&buf[4], "%d:%d",&major,&minor);
 
-	const Originator fromSig(name, major, minor);
+	if (strcmp (name, "DEAL") == 0)
+	  {
+	    this->orig_flag = XdrIO::DEAL; // 0 is the DEAL identifier by definition
+	  }
+	else if (strcmp (name, "MGF ") == 0)
+	  {
+	    this->orig_flag = XdrIO::MGF; // 1 is the MGF identifier by definition
+	  }
+        else if (strcmp (name, "LIBM") == 0)
+          {
+            this->orig_flag = XdrIO::LIBM; // the New and Improved XDA
+          }
 
-	if (fromSig == deal)
-	  {
-	    orig_flag = 0; // 0 is the DEAL identifier by definition
-	  }
-	else if (fromSig == mgf)
-	  {
-	    orig_flag = 1; // 1 is the MGF identifier by definition
-	  }
 	else
 	  {
-	    std::cerr << "No originating software can be determined. Error." << std::endl;
-	    std::cerr << "Values found in signature were: " << std::endl;
-	    std::cerr << "Software name: " << fromSig.get_name() << std::endl;
-	    std::cerr << "Major Verison: " << fromSig.get_major() << std::endl;
-	    std::cerr << "Minor Version: " << fromSig.get_minor() << std::endl;
+	    std::cerr << "No originating software can be determined. Error." 
+                      << std::endl;
 	    error();
 	  }
       }
@@ -1191,7 +1120,9 @@ namespace
 	  for (int i=0; i<size; i++)
 	    {
 	      for (int j=0; j<numvar; j++)
+              {
 		mp_in >> array[i*numvar + j];
+              }
 	  
 	      mp_in.ignore(); // Read newline
 	    }
@@ -1278,26 +1209,6 @@ namespace
 
 
 
-  // ------------------------------------------------------------
-  // XdrMGF::Originator members
-  bool XdrMGF::Originator::operator == (const XdrMGF::Originator &rhs) const
-  {
-    bool b=false;
-  
-    //std::cout << "Values being compared are: \"" << this->get_name() <<
-    //  "\" and \"" << rhs.get_name() << "\"" << std::endl;
-  
-    //int dbug = strncmp(this->get_name(), rhs.get_name(), 4);
-    //std::cout << "Value of string comparison was: " << dbug << std::endl;
-  
-    if ( (!strncmp(this->get_name(), rhs.get_name(), 4)) &&
-	 (this->get_major() == rhs.get_major())      &&
-	 (this->get_minor() == rhs.get_minor()) )
-      b=true;
-  
-    return b;
-  }
-
 
 
   // ------------------------------------------------------------
@@ -1358,9 +1269,10 @@ namespace
       }
   
     // Let's write the augmented header information
-    // before we write the title and id strings.
-  
-    if (orig_flag == 0) // DEAL originator, has augmented header
+    // before we write the title and id string
+
+    // Both DEAL and LIBM style files have augmented headers.
+    if ((orig_flag == 0) || (orig_flag == 2)) 
       {
 
 	switch (m_type)
@@ -1460,8 +1372,10 @@ namespace
 
 
       
-	// Note:  If DECODING or READING, you need to set the value in the header data structure.
-	if ((m_type == DECODE) || (m_type == R_ASCII)) hd->set_block_elt_types(et);
+	// Note:  If DECODING or READING, you need to set the value 
+        // in the header data structure.
+	if ((m_type == DECODE) || (m_type == R_ASCII)) 
+          hd->set_block_elt_types(et);
 
 
 	std::vector<unsigned int> neeb;
@@ -1490,64 +1404,70 @@ namespace
 	  
 	  case (XdrMGF::W_ASCII):
 	    {
-	      for (unsigned int i=0; i<hd->get_n_blocks(); i++)
+	      for (unsigned int i=0; i<neeb.size(); i++)
 		mp_out << neeb[i] << " ";
 	      
-	      mp_out << "\t # Num. of elements in each block.\n";
+	      mp_out << "\t # Num. of elements in each block at each level.\n";
 	      break;
 	    }
 
 	  case (XdrMGF::R_ASCII):
-	    {
-	      assert (mp_in.good());
+            {
 
-	      // We will treat this line as containing
-	      // 1.) The number of elements in each block OR
-	      // 2.) The number of elements at each level in each block
-	      // Therefore, we don't know a-priori how many ints to read.
+              // We will treat this line as containing
+              // 1.) The number of elements in each block OR
+              // 2.) The number of elements at each level in each block
+              // Therefore, we don't know a-priori how many ints to read.
 
-	      // Get the full line from the stream up to the newline
-	      mp_in.getline(comment, comm_len);
+              // Get the full line from the stream up to the newline
+              mp_in.getline(comment, comm_len);
 
-	      // Construct a char buffer to hold the tokens as we
-	      // process them, and construct a std::string object and
-	      // a std::stringstream object for tokenizing this line.
-	      char token[comm_len];
-	      std::string s_temp(comment);
-	      std::stringstream ss(s_temp);
+              // Construct a char buffer to hold the tokens as we
+              // process them, and construct a std::string object and
+              // a std::stringstream object for tokenizing this line.
+              char token[comm_len];
+              std::string s_temp(comment);
+              std::stringstream ss(s_temp);
 
-	      // Resize the neeb vector to zero so we can push back
-	      // values onto it.
-	      neeb.resize(0);
-	      
-	      // Process the tokens one at a time
-	      while (ss >> token)
-		{
-		  // If you reach the hash, the rest of the line is a comment,
-		  // so quit reading.
-		  if (token[0] == '#') 
-		    break;
-		  
-		  // If you reach an alphabetic character, this is an error
-		  if (isalpha(token[0]))
-		    {
-		      std::cerr << "Error: Unrecognized character detected." << std::endl;
-		      error();
-		    }
-		  
-		  // Otherwise, add the value to the neeb vector
-		  neeb.push_back( atoi(token) );
-		}
-	      
-	      break;
-	    }
+              // Resize the neeb vector to zero so we can push back
+              // values onto it.  Note that we are using a tokenizer
+              // scheme again here to read the line, but it's not entirely
+              // necessary since we know the size neeb should have.
+              neeb.resize(0);
 
-	  default:
-	    // Unknown access type
-	    error();
-	  }
-      
-	if ((m_type == DECODE) || (m_type == R_ASCII)) hd->set_num_elem_each_block(neeb);      
+              // Process the tokens one at a time
+              while (ss >> token)
+              {
+                // If you reach the hash, the rest of the line is a comment,
+                // so quit reading.
+                if (token[0] == '#')
+                  break;
+
+                // If you reach an alphabetic character, this is an error
+                if (!isdigit(token[0]))
+                {
+                  std::cerr << "Error: Unrecognized character detected." 
+                            << std::endl;
+                  error();
+                }
+
+                // Otherwise, add the value to the neeb vector
+                neeb.push_back( atoi(token) );
+              }
+              
+              // Be sure you have the right number of entries in neeb
+              assert (neeb.size() == (hd->get_n_blocks() * (this->get_num_levels()+1)));
+
+              break;
+            }
+
+          default:
+            // Unknown access type
+            error();
+          }
+
+	if ((m_type == DECODE) || (m_type == R_ASCII)) 
+          hd->set_num_elem_each_block(neeb);      
       }
 
 
@@ -1863,9 +1783,9 @@ void XdrIO::read (const std::string& name)
 void XdrIO::read_mgf (const std::string& name)
 {
   if (this->binary())
-    this->read_binary (name, 1);
+    this->read_binary (name, XdrIO::MGF);
   else
-    this->read_ascii  (name, 1);
+    this->read_ascii  (name, XdrIO::MGF);
 }
 
 
@@ -1883,9 +1803,9 @@ void XdrIO::write (const std::string& name)
 void XdrIO::write_mgf (const std::string& name)
 {
   if (this->binary())
-    this->write_binary (name, 1);
+    this->write_binary (name, XdrIO::MGF);
   else
-    this->write_ascii  (name, 1);
+    this->write_ascii  (name, XdrIO::MGF);
 }
 
 
@@ -1956,7 +1876,7 @@ void XdrIO::write_mgf_soln (const std::string& name,
 
 
 
-void XdrIO::read_ascii (const std::string& name, const unsigned int originator)
+void XdrIO::read_ascii (const std::string& name, const XdrIO::FileFormat originator)
 {
   // get a writeable reference to the underlying mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -1970,7 +1890,7 @@ void XdrIO::read_ascii (const std::string& name, const unsigned int originator)
 
 
 
-void XdrIO::read_binary (const std::string& name, const unsigned int originator)
+void XdrIO::read_binary (const std::string& name, const XdrIO::FileFormat originator)
 {
 #ifndef HAVE_XDR
 
@@ -1995,14 +1915,14 @@ void XdrIO::read_binary (const std::string& name, const unsigned int originator)
 
 
 
-void XdrIO::write_ascii (const std::string& name, const unsigned int originator)
+void XdrIO::write_ascii (const std::string& name, const XdrIO::FileFormat originator)
 {
   this->write_mesh (name, originator);
 }
 
 
 
-void XdrIO::write_binary (const std::string& name, const unsigned int originator)
+void XdrIO::write_binary (const std::string& name, const XdrIO::FileFormat originator)
 {
 #ifndef HAVE_XDR
 
@@ -2021,7 +1941,7 @@ void XdrIO::write_binary (const std::string& name, const unsigned int originator
 
 
 void XdrIO::read_mesh (const std::string& name,
-		       const unsigned int mgf_originator,
+		       const XdrIO::FileFormat originator,
 		       MeshData* mesh_data)
 {
   // get a writeable reference to the mesh
@@ -2044,7 +1964,7 @@ void XdrIO::read_mesh (const std::string& name,
   //
   // Note 2: Has to do the right thing for
   // both binary and ASCII files.
-  m.set_orig_flag(mgf_originator);
+  m.set_orig_flag(originator);
   m.init((this->binary() ? XdrMGF::DECODE : XdrMGF::R_ASCII), name.c_str(), 0); // mesh files are always number 0 ...
 
   // From here on, things depend
@@ -2053,6 +1973,12 @@ void XdrIO::read_mesh (const std::string& name,
   // header variables that may
   // be read OR written.
   unsigned int              n_blocks = 0;
+  unsigned int              n_levels = 0;
+  
+  if (m.get_orig_flag() == XdrIO::LIBM)
+    n_levels = m.get_num_levels();
+  
+  
   std::vector<ElemType>     etypes;
   std::vector<unsigned int> neeb;
 	
@@ -2070,7 +1996,7 @@ void XdrIO::read_mesh (const std::string& name,
   const int numBCs      = mh.getNumBCs();
   
   // If a libMesh-type mesh, read the augmented mesh information
-  if (m.get_orig_flag() == 0)
+  if ((m.get_orig_flag() == XdrIO::DEAL) || (m.get_orig_flag() == XdrIO::LIBM))
     {
       // Read augmented header
       n_blocks = mh.get_n_blocks();
@@ -2078,8 +2004,7 @@ void XdrIO::read_mesh (const std::string& name,
       etypes.resize(n_blocks);
       mh.get_block_elt_types(etypes);
       
-      neeb.resize(n_blocks);
-      mh.get_num_elem_each_block(neeb);
+      mh.get_num_elem_each_block(neeb); 
     }
 
   
@@ -2107,18 +2032,24 @@ void XdrIO::read_mesh (const std::string& name,
   // connectivity array.
   
   // Note: This section now depends on
-  // whether we are reading a libMesh or
-  // MGF style mesh.  
-  if (m.get_orig_flag() == 0) // libMesh 
+  // whether we are reading an old-style libMesh, 
+  // MGF, or a new-style libMesh mesh.  
+  if (m.get_orig_flag() == XdrIO::DEAL) 
     {
       conn.resize(totalWeight);
       m.Icon(&conn[0], 1, totalWeight);
     }
   
-  else if (m.get_orig_flag() == 1) // MGF
+  else if (m.get_orig_flag() == XdrIO::MGF) 
     {
       conn.resize(totalWeight+(2*numElem));
       m.Icon(&conn[0], 1, totalWeight+(2*numElem));
+    }
+
+  else if (m.get_orig_flag() == XdrIO::LIBM)
+    {
+      conn.resize(totalWeight);
+      m.Icon(&conn[0], 1, totalWeight);
     }
   
   else
@@ -2126,11 +2057,14 @@ void XdrIO::read_mesh (const std::string& name,
       // I don't know what type of mesh it is.
       error();
     }
-    
+
+
   // read in the nodal coordinates and form points.
   {
     std::vector<Real> coords(numNodes*mesh.spatial_dimension()); // Always use three coords per node
     m.coord(&coords[0], mesh.spatial_dimension(), numNodes);
+
+
   
     // Form Nodes out of
     // the coordinates.  If the    
@@ -2170,36 +2104,109 @@ void XdrIO::read_mesh (const std::string& name,
   // had to change now that elements store pointers to
   // nodes.  The nodes must exist before we assign them to
   // the elements. BSK, 1/13/2003)
-  if (m.get_orig_flag() == 0) // libMesh-style (0) hybrid mesh possible
+  if ((m.get_orig_flag() == XdrIO::DEAL) || (m.get_orig_flag() == XdrIO::LIBM)) 
     {
       unsigned int lastConnIndex = 0;
       unsigned int lastFaceIndex = 0;
-      
-      for (unsigned int idx=0; idx<etypes.size(); idx++)  
-	{             
-	  for (unsigned int e=lastFaceIndex; e<lastFaceIndex+neeb[idx]; e++)  
-	    {
-	      Elem* elem = mesh.add_elem(Elem::build(etypes[idx]).release());
-	      
-	      // Add elements with the same id as in libMesh.  
-	      // Provided the data files that MeshData reads    
-	      // were only written with MeshData, then this      
-	      // should work properly.  This is an inline
-	      // function, so that for disabled MeshData, this
-	      // should not induce too much cost
-	      if (mesh_data != NULL)
-		mesh_data->add_foreign_elem_id (elem, e);
-	      
-	      for (unsigned int innd=0; innd < elem->n_nodes(); innd++)
-		elem->set_node(innd) = mesh.node_ptr(conn[innd+lastConnIndex]);
-	      
-	      lastConnIndex += elem->n_nodes();
-	    }
-	  lastFaceIndex += neeb[idx];
-	}
+
+      for (unsigned int level=0; level<=n_levels; level++)
+      {
+        for (unsigned int idx=0; idx<n_blocks; idx++)  
+        {
+          for (unsigned int e=lastFaceIndex; e<lastFaceIndex+neeb[level*n_blocks+idx]; e++)  
+          {
+            // Build a temporary element of the right type, so we know how
+            // connectivity entries will be on the line for this element.
+            AutoPtr<Elem> temp_elem = Elem::build(etypes[idx]);
+
+            // A pointer to the element which will eventually be added to the mesh.
+            Elem* elem;
+
+            // New-style libMesh mesh
+            if (m.get_orig_flag() == XdrIO::LIBM)
+            {
+              int self_ID   = conn[lastConnIndex + temp_elem->n_nodes()];
+              int parent_ID = conn[lastConnIndex + temp_elem->n_nodes()+1];
+
+
+              if (level > 0)
+              {
+                // Do a linear search for the parent
+                Elem* my_parent;
+
+                MeshBase::element_iterator it        = mesh.elements_begin(); 
+                const MeshBase::element_iterator end = mesh.elements_end(); 
+                bool parent_found = false;
+
+                for (; it != end; ++it)
+                {
+                  Elem* possible_parent = *it;
+                  if (static_cast<int>(possible_parent->id()) == parent_ID)
+                  {
+                    my_parent = possible_parent;
+                    parent_found = true;
+                    break;
+                  }
+                }
+
+                if (!parent_found)
+                {
+                  std::cerr << "Parent element with ID " << parent_ID 
+                    << " not found." << std::endl; 
+                  error();
+                }
+
+                assert (static_cast<int>(my_parent->id()) == parent_ID);
+                my_parent->set_refinement_flag(Elem::INACTIVE);
+                
+                elem = mesh.add_elem(Elem::build(etypes[idx],my_parent).release());
+                elem->set_refinement_flag(Elem::JUST_REFINED); 
+                my_parent->add_child(elem);
+                assert (my_parent->type() == elem->type());
+              }
+
+              // Old-style libMesh meshes
+              else
+              {
+                elem = mesh.add_elem(Elem::build(etypes[idx]).release());
+              }
+
+              // Assign the newly-added element's ID so that future 
+              // children which may be added can find it correctly.
+              elem->set_id() = self_ID;
+            }
+
+            // MGF-style meshes
+            else
+            {
+              elem = mesh.add_elem(Elem::build(etypes[idx]).release());
+            }
+            
+            // Add elements with the same id as in libMesh.  
+            // Provided the data files that MeshData reads    
+            // were only written with MeshData, then this      
+            // should work properly.  This is an inline
+            // function, so that for disabled MeshData, this
+            // should not induce too much cost
+            if (mesh_data != NULL)
+              mesh_data->add_foreign_elem_id (elem, e);
+
+            // Set the node pointers of the newly-created element
+            for (unsigned int innd=0; innd < elem->n_nodes(); innd++)
+            {
+              elem->set_node(innd) = mesh.node_ptr(conn[innd+lastConnIndex]);
+            }
+
+            lastConnIndex += (m.get_orig_flag() == XdrIO::LIBM) ? (elem->n_nodes()+2) : elem->n_nodes();
+          }
+          lastFaceIndex += neeb[idx];
+        }
+        
+      }
     }
-  
-  else if (m.get_orig_flag() == 1) // MGF-style (1) Hex27 mesh
+ 
+  // MGF-style (1) Hex27 mesh
+  else if (m.get_orig_flag() == XdrIO::MGF) 
     {
       
 #ifdef DEBUG
@@ -2256,10 +2263,12 @@ void XdrIO::read_mesh (const std::string& name,
 
 
 void XdrIO::write_mesh (const std::string& name,
-			const unsigned int mgf_originator)
+			const XdrIO::FileFormat originator)
 {
   // get a read-only reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+
   
   // Create an XdrMESH object.
   XdrMESH m;
@@ -2275,8 +2284,7 @@ void XdrIO::write_mesh (const std::string& name,
   //
   // Note 2: Has to do the right thing for
   // both binary and ASCII files.
-  m.set_orig_flag(mgf_originator);
-  m.init((this->binary() ? XdrMGF::ENCODE : XdrMGF::W_ASCII), name.c_str(), 0); // mesh files are always number 0 ...
+  m.set_orig_flag(originator);
 
   // From here on, things depend
   // on whether we are reading or
@@ -2286,13 +2294,55 @@ void XdrIO::write_mesh (const std::string& name,
   std::vector<unsigned int> neeb;
   std::vector<ElemType> etypes;
   
-  const int                   numElem = mesh.n_elem();       
-  const int                   numBCs  = mesh.boundary_info->n_boundary_conds();
+
+  int n_non_subactive = 0;
+  int non_subactive_weight = 0;
+
+  // For each non-subactive element:
+  // 1.) Increment the number of non subactive elements
+  // 2.) Accumulate the total weight
+  // 3.) Add the node ids to a set of non subactive node ids 
+  std::set<unsigned int> not_subactive_node_ids;
+  MeshBase::const_element_iterator el = mesh.elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.elements_end();
+  for( ; el != end_el; ++el)
+  {
+    Elem* elem = (*el);
+    if(!elem->subactive())
+    {
+      n_non_subactive++;
+      non_subactive_weight += elem->n_nodes();
+
+      for (unsigned int n=0; n<elem->n_nodes(); ++n)
+        not_subactive_node_ids.insert(elem->node(n));
+    }
+  }
+
+  const int                   numElem  = n_non_subactive;       
+  const int                   numBCs   = mesh.boundary_info->n_boundary_conds();
+  const unsigned int          n_levels = MeshTools::n_levels(mesh);
+  
+  // Fill the etypes vector with all of the element types found in the mesh
   MeshTools::elem_types(mesh, etypes);
-  neeb.resize(etypes.size());
+  
+  // store number of elements in each block at each refinement level
+  neeb.resize((n_levels+1)*etypes.size()); 
+
+  // Store a variable for the number of element types                   
+  const unsigned int n_el_types = etypes.size();
 	
-  for (unsigned int i=0; i<etypes.size(); i++)
-    neeb[i] = MeshTools::n_elem_of_type(mesh, etypes[i]);
+  m.set_num_levels(n_levels);
+
+  // The last argument is zero because mesh files are always number 0 ...
+  m.init((this->binary() ? XdrMGF::ENCODE : XdrMGF::W_ASCII), name.c_str(), 0); 
+
+  // Loop over all levels and all element types to set the entries of neeb
+  for(unsigned int level=0; level<=n_levels; level++)
+    for (unsigned int el_type=0; el_type<n_el_types; el_type++)
+      neeb[level*n_el_types + el_type] = 
+        MeshTools::n_non_subactive_elem_of_type_at_level(mesh, etypes[el_type], level);
+        // gotta change this function name!!!
+
 
   // Now we check to see if we're doing
   // MGF-style headers or libMesh-style
@@ -2302,7 +2352,7 @@ void XdrIO::write_mesh (const std::string& name,
   // allowing us to optimize storage
   // and minimize IO requirements
   // for these meshes.
-  if (m.get_orig_flag() == 0)
+  if ((m.get_orig_flag() == XdrIO::DEAL) || (m.get_orig_flag() == XdrIO::LIBM))
     {
       mh.set_n_blocks(etypes.size());
       mh.set_block_elt_types(etypes);
@@ -2312,78 +2362,121 @@ void XdrIO::write_mesh (const std::string& name,
     assert(etypes.size() == 1);
   
   mh.setNumEl(numElem);
-  mh.setNumNodes(mesh.n_nodes());
+  mh.setNumNodes(not_subactive_node_ids.size());
   mh.setStrSize(65536);
-  
-  if (m.get_orig_flag() == 0)
-    mh.setSumWghts(MeshTools::total_weight(mesh));
-  else if (m.get_orig_flag() == 1)
-    mh.setSumWghts(MeshTools::total_weight(mesh)+2*numElem);
+ 
+  // set a local variable for the total weight of the mesh
+  int totalWeight =0;
+
+  if (m.get_orig_flag() == XdrIO::DEAL)  // old-style LibMesh
+    totalWeight=MeshTools::total_weight(mesh);
+
+  else if (m.get_orig_flag() == XdrIO::MGF) // MGF-style
+    totalWeight = MeshTools::total_weight(mesh)+2*numElem;
+
+  else if (m.get_orig_flag() == XdrIO::LIBM) // new-style LibMesh
+    totalWeight = non_subactive_weight+2*numElem;
+
   else
     error();
+    
+  // Set the total weight in the header
+  mh.setSumWghts(totalWeight);
         
   mh.setNumBCs(numBCs);
-  mh.setId("Id String");	   // Ignored
-  mh.setTitle("Title String"); // Ignored
+  mh.setId("Id String");       // You can put whatever you want, it will be ignored 
+  mh.setTitle("Title String"); // You can put whatever you want, it will be ignored 
   
   // Put the information
   // in the XDR file.
-  m.header(&mh); // Needs to work for both types of file
+  m.header(&mh); 
   
   
   // Write the connectivity  
   {
     std::vector<int> conn;
-    int orig_type = m.get_orig_flag();
-    int totalWeight =0;
-    
-    if (orig_type == 0)
-      totalWeight = MeshTools::total_weight(mesh);
-    else if(orig_type == 1)
-      totalWeight = MeshTools::total_weight(mesh)+2*mh.getNumEl();
-    else
-      error();
-    
+    XdrIO::FileFormat orig_type = m.get_orig_flag();
+   
+    // Resize the connectivity vector to hold all the connectivity for the mesh
     conn.resize(totalWeight);
     
-    //std::cout << orig_type << std::endl;
-    	
     unsigned int lastConnIndex = 0;
     unsigned int nn = 0;
-    
-    for (unsigned int idx=0; idx<etypes.size(); idx++)
+   
+    // Loop over levels and types again, write connectivity information to conn.
+    for (unsigned int level=0; level<=n_levels; level++)
+      for (unsigned int idx=0; idx<etypes.size(); idx++)
       {
-	nn = lastConnIndex = 0;
-	
-	for (unsigned int e=0; e<mesh.n_elem(); e++)
-	  if (mesh.elem(e)->type() == etypes[idx])
-	    {
-	      int nstart=0;
-	      if (orig_type == 0)
-		nn = mesh.elem(e)->n_nodes();
-	      else if (orig_type == 1)
-		{
-		  nstart=2;
-		  nn = mesh.elem(e)->n_nodes()+2;
-		  conn[lastConnIndex + 0] = 27;
-		  conn[lastConnIndex + 1] = 0;
-		}
-	      else
-		error();
-                  
-	      //std::cout << " HERE " << std::endl;
-	      //std::cout << e << std::endl;
-        
-	      for (unsigned int n=nstart; n<nn; n++)
-		conn[lastConnIndex + n] = mesh.elem(e)->node(n-nstart);
-		  
-	      lastConnIndex += nn;
-	    }
-	    
-	// Send conn to the XDR file
-	// std::cout << nn << " " << lastConnIndex/nn << std::endl;
-	// m.Icon(&conn[0], nn, totalWeight/nn);
-	m.Icon(&conn[0], nn, lastConnIndex/nn);
+        nn = lastConnIndex = 0;
+
+        for (unsigned int e=0; e<mesh.n_elem(); e++)
+          if ((mesh.elem(e)->type()  == etypes[idx]) && 
+              (mesh.elem(e)->level() == level)       &&
+              !mesh.elem(e)->subactive())
+          {
+            int nstart=0;
+            
+            if (orig_type == 0)
+              nn = mesh.elem(e)->n_nodes();
+
+            else if (orig_type == 1)
+            {
+              nstart=2; // ignore the 27 and 0 entries
+              nn = mesh.elem(e)->n_nodes()+2;
+              conn[lastConnIndex + 0] = 27;
+              conn[lastConnIndex + 1] = 0;
+            }
+
+            else if (orig_type == 2) // LIBMESH format
+              nn = mesh.elem(e)->n_nodes() + 2;
+
+            else
+              error();
+
+            // Loop over the connectivity entries for this element and write to conn.
+            const unsigned int loopmax = (orig_type==2) ? nn-2 : nn;
+            for (unsigned int n=nstart; n<loopmax; n++)
+            {
+              unsigned int connectivity_value=0;
+
+              // old-style Libmesh and MGF meshes
+              if (orig_type != 2)
+                connectivity_value = mesh.elem(e)->node(n-nstart);
+
+              // new-style libMesh meshes: compress the connectivity entries to account for
+              // subactive nodes that will not be in the mesh we write out.
+              else
+              {
+                std::set<unsigned int>::iterator pos = 
+                  not_subactive_node_ids.find(mesh.elem(e)->node(n-nstart));
+
+                assert (pos != not_subactive_node_ids.end());
+
+                connectivity_value = std::distance(not_subactive_node_ids.begin(), pos);
+              }
+              conn[lastConnIndex + n] = connectivity_value;
+            }
+
+            // In the case of an adaptive mesh, set last 2 entries to this ID and parent ID
+            if (orig_type == 2)
+            {
+              int self_ID = mesh.elem(e)->id();
+              int parent_ID = -1;
+              if(level != 0)
+                parent_ID = mesh.elem(e)->parent()->id();
+
+              // Self ID is the second-to-last entry, Parent ID is the last
+              // entry on each connectivity line
+              conn[lastConnIndex+nn-2] = self_ID;
+              conn[lastConnIndex+nn-1] = parent_ID;
+            }
+
+            lastConnIndex += nn;
+          }
+
+        // Send conn to the XDR file
+        if(nn != 0)
+          m.Icon(&conn[0], nn, lastConnIndex/nn);
       }
   }
     
@@ -2392,21 +2485,23 @@ void XdrIO::write_mesh (const std::string& name,
   {
     std::vector<Real> coords;
     
-    coords.resize(mesh.spatial_dimension()*mesh.n_nodes()); 
+    coords.resize(mesh.spatial_dimension()*not_subactive_node_ids.size());
     int lastIndex=0;
-    for (unsigned int i=0; i<mesh.n_nodes(); i++)
+
+    std::set<unsigned int>::iterator it = not_subactive_node_ids.begin();
+    const std::set<unsigned int>::iterator end = not_subactive_node_ids.end();
+    for (; it != end; ++it)
       {
-	const Point& p = mesh.node(i);
-	
-	coords[lastIndex+0] = p(0);
-	coords[lastIndex+1] = p(1);
-	coords[lastIndex+2] = p(2);
-	
-	lastIndex += 3;
+        const Point& p = mesh.node(*it);
+
+        coords[lastIndex+0] = p(0);
+        coords[lastIndex+1] = p(1);
+        coords[lastIndex+2] = p(2);
+        lastIndex += 3;
       }
-	  
+   
     // Put the nodes in the XDR file
-    m.coord(&coords[0], mesh.spatial_dimension(), mesh.n_nodes()); 
+    m.coord(&coords[0], mesh.spatial_dimension(), not_subactive_node_ids.size()); 
   }
 
   

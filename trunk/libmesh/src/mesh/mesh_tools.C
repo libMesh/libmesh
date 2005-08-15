@@ -1,4 +1,4 @@
-// $Id: mesh_tools.C,v 1.3 2005-05-10 21:37:17 benkirk Exp $
+// $Id: mesh_tools.C,v 1.4 2005-08-15 21:30:38 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,7 @@
 
 
 // C++ includes
+#include <set>
 
 // Local includes
 #include "mesh_tools.h"
@@ -272,15 +273,6 @@ unsigned int MeshTools::n_elem_of_type (const MeshBase& mesh,
 {
   return static_cast<unsigned int>(std::distance(mesh.type_elements_begin(type),
 						 mesh.type_elements_end  (type)));
-//   unsigned int cnt=0;
-
-//   MeshBase::const_element_iterator       el  = mesh.type_elements_begin(type);
-//   const MeshBase::const_element_iterator end = mesh.type_elements_end(type);
-
-//   for (; el!=end; ++el)
-//     cnt++;
-  
-//   return cnt;
 }
 
 
@@ -290,13 +282,59 @@ unsigned int MeshTools::n_active_elem_of_type (const MeshBase& mesh,
 {
   return static_cast<unsigned int>(std::distance(mesh.active_type_elements_begin(type),
 						 mesh.active_type_elements_end  (type)));
-//   unsigned int cnt=0;
-
-//   MeshBase::const_element_iterator       el  = mesh.active_type_elements_begin(type);
-//   const MeshBase::const_element_iterator end = mesh.active_type_elements_end(type);
-  
-//   for (; el!=end; ++el)
-//     cnt++;
-    
-//   return cnt;
 }
+
+unsigned int MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase& mesh,
+                                                const ElemType type,
+                                                const unsigned int level)
+{
+  unsigned int cnt = 0;
+  // iterate over the elements of the specified type
+  MeshBase::const_element_iterator el = mesh.type_elements_begin(type);
+  const MeshBase::const_element_iterator end = mesh.type_elements_end(type);
+
+  for(; el!=end; ++el)
+    if( ((*el)->level() == level) && !(*el)->subactive())
+      cnt++;
+
+  return cnt;
+}
+
+
+unsigned int MeshTools::n_levels(const MeshBase& mesh)
+{
+  unsigned int max_level = 0;
+
+  MeshBase::const_element_iterator el = mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_elements_end();
+
+  for( ; el != end_el; ++el)
+    max_level = std::max((*el)->level(), max_level);
+
+  return max_level;
+}
+   
+
+
+void MeshTools::get_not_subactive_node_ids(const MeshBase& mesh,
+    std::set<unsigned int>& not_subactive_node_ids)
+{
+  MeshBase::const_element_iterator el           = mesh.elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.elements_end();
+  for( ; el != end_el; ++el)
+  {
+    Elem* elem = (*el);
+    if(!elem->subactive())
+      for (unsigned int n=0; n<elem->n_nodes(); ++n)
+        not_subactive_node_ids.insert(elem->node(n));
+  }
+}
+
+
+
+unsigned int MeshTools::n_elem (MeshBase::element_iterator& begin,
+                                MeshBase::element_iterator& end)
+{
+  return std::distance(begin, end);
+}
+

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.48 2005-08-05 20:49:31 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.49 2005-08-15 21:30:38 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,8 +56,8 @@ class BoundaryInfo;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2005-08-05 20:49:31 $
- * \version $Revision: 1.48 $
+ * \date    $Date: 2005-08-15 21:30:38 $
+ * \version $Revision: 1.49 $
  */
 
 
@@ -273,8 +273,13 @@ public:
    *  1.) call \p find_neighbors()
    *  2.) call \p partition()
    *  3.) call \p renumber_nodes_and_elements() 
+   *
+   * The read_xda_file boolean flag is true when prepare_for_use
+   * is called from Mesh::read after reading an xda file.  It prevents
+   * the renumbering of nodes and elements.  In general, leave this at
+   * the default value of false.
    */
-  void prepare_for_use ();
+  void prepare_for_use (const bool read_xda_file=false);
   
   /**
    * Call the default partitioner (currently \p metis_partition()).
