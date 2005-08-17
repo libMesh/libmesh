@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.8 2005-06-12 18:36:42 jwpeterson Exp $
+// $Id: equation_systems_io.C,v 1.9 2005-08-17 19:26:08 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -37,9 +37,7 @@
 // EquationSystem class implementation
 void EquationSystems::read (const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
-			    const bool read_header,
-			    const bool read_data,
-			    const bool read_additional_data)
+                            const unsigned int read_flags)
 {
   /**
    * This program implements the output of an 
@@ -119,6 +117,12 @@ void EquationSystems::read (const std::string& name,
    * ASCII output.  Thus this one section of code will read XDR or ASCII
    * files with no changes.
    */
+
+   // Set booleans from the read_flags argument
+   const bool read_header = read_flags & EquationSystems::READ_HEADER;
+   const bool read_data   = read_flags & EquationSystems::READ_DATA;
+   const bool read_additional_data 
+                          = read_flags & EquationSystems::READ_ADDITIONAL_DATA;
 
   
   Xdr io (name, mode);
@@ -287,8 +291,7 @@ void EquationSystems::read (const std::string& name,
 
 void EquationSystems::write(const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
-			    const bool write_data,
-			    const bool write_additional_data) const
+                            const unsigned int write_flags) const
 {
   /**
    * This program implements the output of an 
@@ -368,6 +371,11 @@ void EquationSystems::write(const std::string& name,
    * ASCII output.  Thus this one section of code will write XDR or ASCII
    * files with no changes.
    */
+
+   // set booleans from write_flags argument
+   const bool write_data = write_flags & EquationSystems::WRITE_DATA;
+   const bool write_additional_data 
+                         = write_flags & EquationSystems::WRITE_ADDITIONAL_DATA;
 
   Xdr io(name, mode);
 
