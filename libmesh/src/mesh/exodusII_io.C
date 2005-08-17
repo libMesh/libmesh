@@ -1,4 +1,4 @@
-// $Id: exodusII_io.C,v 1.9 2005-06-11 15:02:11 benkirk Exp $
+// $Id: exodusII_io.C,v 1.10 2005-08-17 21:20:22 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -811,29 +811,32 @@ namespace
   void ExodusII::read_sideset_info()
   {
     ss_ids.resize(num_side_sets);
-    ex_err = exII::ex_get_side_set_ids(ex_id,
-				       &ss_ids[0]);
-    check_err(ex_err, "Error retrieving sideset information.");
-    message("All sideset information retrieved successfully."); 
+    if (num_side_sets > 0)
+      {
+	ex_err = exII::ex_get_side_set_ids(ex_id,
+					   &ss_ids[0]);
+	check_err(ex_err, "Error retrieving sideset information.");
+	message("All sideset information retrieved successfully."); 
 
-    // Resize appropriate data structures -- only do this once outside the loop
-    num_sides_per_set.resize(num_side_sets);
-    num_df_per_set.resize(num_side_sets);
+	// Resize appropriate data structures -- only do this once outside the loop
+	num_sides_per_set.resize(num_side_sets);
+	num_df_per_set.resize(num_side_sets);
   
-    req_info = EX_INQ_SS_ELEM_LEN; // Inquire about the length of the
-    // concatenated side sets element list
-    ex_err = exII::ex_inquire(ex_id,
-			      req_info,
-			      &ret_int,
-			      &ret_float,
-			      &ret_char);
-    check_err(ex_err, "Error inquiring about side set element list length.");
+	req_info = EX_INQ_SS_ELEM_LEN; // Inquire about the length of the
+	// concatenated side sets element list
+	ex_err = exII::ex_inquire(ex_id,
+				  req_info,
+				  &ret_int,
+				  &ret_float,
+				  &ret_char);
+	check_err(ex_err, "Error inquiring about side set element list length.");
 
-    //std::cout << "Value returned by ex_inquire was: " << ret_int << std::endl;
-    num_elem_all_sidesets = ret_int;
-    elem_list.resize (num_elem_all_sidesets);
-    side_list.resize (num_elem_all_sidesets);
-    id_list.resize   (num_elem_all_sidesets);
+	//std::cout << "Value returned by ex_inquire was: " << ret_int << std::endl;
+	num_elem_all_sidesets = ret_int;	
+	elem_list.resize (num_elem_all_sidesets);
+	side_list.resize (num_elem_all_sidesets);
+	id_list.resize   (num_elem_all_sidesets);
+      }
   }
 
 
