@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.17 2005-06-13 20:24:33 benkirk Exp $
+// $Id: equation_systems.h,v 1.18 2005-08-17 19:26:07 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,6 +66,19 @@ class Mesh;
 class EquationSystems
 {
 public:
+
+  /**
+   * Define enumeration to set properties in EquationSystems::read()
+   */
+  enum ReadFlags { READ_HEADER          = 1,
+                   READ_DATA            = 2,
+                   READ_ADDITIONAL_DATA = 4 };
+
+  /**
+   * Define enumeration to set properties in EquationSystems::write()
+   */
+  enum WriteFlags { WRITE_DATA            = 1,
+                    WRITE_ADDITIONAL_DATA = 2 };
   
   /**
    * Constructor.
@@ -248,27 +261,34 @@ public:
    * Read & initialize the systems from disk using the XDR data format.
    * This format allows for machine-independent binary output.
    *
+   * Set which sections of the file to read by bitwise OR'ing the 
+   * EquationSystems::ReadFlags enumeration together. For example, to 
+   * read all sections of the file, set read_flags to:
+   * (READ_HEADER | READ_DATA | READ_ADDITIONAL_DATA)
+   *
    * Note that the equation system can be defined without initializing
    * the data vectors to any solution values.  This can be done
-   * by calling the routine with the read_data flag set to false.
+   * by omitting READ_DATA in the read_flags parameter.
    */
   void read (const std::string& name,
 	     const libMeshEnums::XdrMODE,
-	     const bool read_header=true,
-	     const bool read_data=true,
-	     const bool read_additional_data=false);
+             const unsigned int read_flags=(READ_HEADER | READ_DATA));
 
   /**
    * Write the systems to disk using the XDR data format.
    * This format allows for machine-independent binary output.
    *
+   * Set the writing properties using the EquationSystems::WriteFlags
+   * enumeration. Set which sections to write out by bitwise OR'ing
+   * the enumeration values. Write everything by setting write_flags to:
+   * (WRITE_DATA | WRITE_ADDITIONAL_DATA)
+   *
    * Note that the solution data can be omitted by calling
-   * this routine with the write_data flag set to false.
+   * this routine with WRITE_DATA omitted in the write_flags argument.
    */
   void write (const std::string& name,
 	      const libMeshEnums::XdrMODE,
-	      const bool write_data=true,
-	      const bool write_additional_data=false) const;
+              const unsigned int write_flags=WRITE_DATA) const;
 
   /**
    * @returns \p true when this equation system contains
