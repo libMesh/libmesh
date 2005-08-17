@@ -1,7 +1,7 @@
-DEAL 003:003
+LIBM 0
 1	 # Num. Elements
 6	 # Num. Nodes
-6	 # Sum of Element Weights
+8	 # Sum of Element Weights
 3	 # Num. Boundary Conds.
 65536	 # String Size (ignore) 
 1	 # Num. Element Blocks.
@@ -9,7 +9,7 @@ DEAL 003:003
 1 	 # Num. of elements in each block.
 Id String
 Title String
-0 1 2 3 4 5
+0 1 2 3 4 5 0 -1
 0. 0. 0. 
 1. 0. 0. 
 0. 1. 0.
