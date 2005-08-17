@@ -31,7 +31,7 @@ pdfpagelabels,
 \title{Description of the XDA/XDR mesh format used in libMesh}
 \author{Benjamin S. Kirk, John W. Peterson, David J. Knezevic \\
         \texttt{libmesh-devel@lists.sourceforge.net} \\
-	$$Revision: 1.2 $$} 
+	$$Revision: 1.3 $$} 
 \maketitle
 
 \section{Background}
@@ -65,29 +65,29 @@ The header of an XDR/XDA file looks something like this:
 \normalsize
 The header defines several important sizes that are used to enable efficient, block-reading of the data section. A line-by-line description of the header follows:
 
-The first line of the file is a string that defines what code wrote the file. There are three possibilies: (1) MGF, (2) DEAL and (3) LIBM. The reason for this first line is backwards-compatibility. In this document we will mostly discuss the ``LIBM'' format. This is the most flexible of the three formats; it allows hybrid meshes and adaptive mesh refinement information to be written out. The number following the string "LIBM" on the first line indicates the number of levels of refinement in the mesh. The mesh in the above example has no refinement structure, so this number is zero.
+The first line of the file is a string that defines what code wrote the file. There are three possibilies: MGF, DEAL and LIBM. The reason for this first line is backwards-compatibility. In this document we will mostly discuss the ``LIBM'' format. This is the newest and most flexible of the three formats; it allows hybrid meshes and adaptive mesh refinement information to be written out. The number following the string "LIBM" on the first line indicates the number of levels of refinement in the mesh. The mesh in the above example has no refinement structure, so this number is zero.
 
 The next line contains a single integer that defines the number of elements in the mesh.  Anything after the \# is ignored and may be used as a comment.
 
-The next line contains the length of the connectivity array, which is the array that contains all the data in the connectivity section of the XDA file, discussed below. This size is important since it allows us to read in the entire connectivity array for the mesh into a buffer of this length.
+The next line contains the length of the connectivity array which is the array that contains all the data in the connectivity section of the XDA file, discussed below. This size is important since it allows us to read in the entire connectivity array for the mesh into a buffer of this length.
 
-The number of boundary condition describes just that.  In libMesh boundary conditions are assigned to specific faces of elements.  The format for specifying boundary conditions will be discussed in the data section. We only specify boundary conditions for level 0 elements (i.e. elements with no parents), and the boundary information of all other elements in the mesh is inferred from these elements.
+The number of boundary condition describes just that.  In libMesh boundary conditions are assigned to specific faces of elements.  The format for specifying boundary conditions will be discussed in the data section. We only specify boundary conditions for level 0 elements (i.e. elements with no parents). From the level 0 elements we can infer the boundary information of all other elements in the mesh.
 
 The next line defines the maximum string size for the subsequent identification strings \texttt{Id~String} and \texttt{Title~String}. This is used to prevent buffer-overruns when reading ridiculously long titles (I think).  It may safely be ignored.  These strings may be used for identification purposes.
 
 \subsubsection{Augmented Header}
 The three lines after the string size are not read in for the MGF format, since these lines are related only to hybrid meshes (the MGF format does not support hybrid meshes).
 
-When reading and writing meshes, libMesh orders the elements into contiguous blocks based on refinement level and element type.  For instance, consider a mesh with two levels of refinement (i.e. level 0 elements and level 1 elements) and with both quadrilaterals and triangles. First, elements are grouped according to their refinement level, so all the level 0 elements are written first, followed by the level 1 elements. Within each block of elements of a given level, they are written in blocks based on element type. So the level 0 triangles will be written together, as will the level 0 quadrilaterals. In this case the ``number of element types'' line in the header would be 2, since there are both quadrilaterals and triangles in the mesh.  For the \texttt{one\_quad.xda} example, there is only one element type.
+When reading and writing meshes, libMesh orders the elements into contiguous blocks based on refinement level and element type.  For instance, consider a mesh with two levels of refinement (i.e. level 0 elements and level 1 elements) and with both quadrilaterals and triangles. First, elements are grouped according to their refinement level, so all the level 0 elements are written first, followed by the level 1 elements. Within each block of elements at a given level, they are written in blocks based on element type. So the level 0 triangles will be grouped together, as will the level 0 quadrilaterals. In this case since the mesh contains both quadrilaterals and triangles, the ``number of element types'' line in the header would be 2.  For the \texttt{one\_quad.xda} example, there is only one element type.
 
-The reason for grouping elements in the way described above is efficiency.  It would be possible to write the elements in any order, but then two additional IDs would be necessary to define the element type and its refinement level.  Writing the elements in blocks like this allows a savings of \texttt{2*n\_elem} integers, or $2*4*$\texttt{n\_elem} bytes. Also, it makes sense to write out the elements in order of level because when we read in an XDA file and reconstruct the refinement hierarchy, we need to build the level 0 elements first, followed by the level 1 elements and so forth.
+The reason for grouping elements in the way described above is efficiency.  It would be possible to write the elements in any order, but then two additional IDs would be necessary to define the element type and its refinement level.  Writing the elements in blocks like this allows a savings of \texttt{2*n\_elem} integers, or $2*4*$\texttt{n\_elem} bytes. Also, it makes sense to write out the elements in order of increasing refinement level because when we read in an XDA file and reconstruct the refinement hierarchy, we need to build the level 0 elements first, followed by the level 1 elements and so forth.
 
-The next line defines the type of element that is written in each block.  There should be an entry on this line for each block.  The value here corresponds to the integer representation of the \texttt{enum} \texttt{ElemTypes}.  Valid values of this \texttt{enum} may be found \href{http://libmesh.sourceforge.net/doxygen/namespacelibMeshEnums.html#a145}{on the documentation page}.
+The next line defines the element types that the mesh contains.  The value here corresponds to the integer representation of the \texttt{enum} \texttt{ElemTypes}.  Valid values of this \texttt{enum} may be found \href{http://libmesh.sourceforge.net/doxygen/namespacelibMeshEnums.html#a145}{on the documentation page}.
 
-The final line defines the number of elements in each block of elements (of the same type) at each level. There should be an entry for each block, so this line
+The final line defines the number of elements in each block of elements of the same type at each level. This line
 should contain (Number of levels) $\times$ (Number of element types) entries, 
 and the sum of these values should be the number of elements in the mesh 
-(defined previously).
+(defined in the second line of the header).
 
 \subsection{Data}
 The data section for this example is as follows:
@@ -109,11 +109,9 @@ The data section for this example is as follows:
 The data section consists of two mandatory and one optional section.  The mandatory sections are the element connectivity and the nodal locations.  The optional section defines the boundary conditions (note that if the number of boundary conditions is set to 0 in the header then the boundary condition section will not be read).
 
 \subsubsection{Connectivity}
-The connectivity section has two roles: (i) to define which nodes are connected to which elements, and (ii) to define the refinement hierarchy by specifying element IDs and their parent IDs.
+The connectivity section has two roles: (i) to define which nodes are connected to which elements, and (ii) to define the refinement hierarchy by specifying element and parent IDs.
 
-Each element has its own line in this section. Suppose a given element has $N$ nodes, then the first $N$ entries on that element's line specify which nodes the element is connected to, and the last two entries specify the element's ID and its parent's ID respectively. In this case there is only one element, so the connectivity section contains only one line.  For this example the local nodes on the first element map to the global nodes 0, 1, 2, and 3, and the element has an ID of 0, and it has no parent (it is a level 0 element) so its parent ID is -1.  More complicated examples may be found in the Appendix.
-
-Note that the number of lines on the connectivity section is the number of elements in the mesh, and the total number of individual values in the connectivity section is identical to the total weight specified in the header.  This allows the entire connectivity array to be read at once, if so desired.
+Each element has its own line in this section. Suppose a given element has $N$ nodes, then the first $N$ entries on that element's line specify which nodes the element is connected to, and the last two entries specify the element's ID and its parent's ID respectively. In this case there is only one element, so the connectivity section contains only one line.  For this example the local nodes on the first element map to the global nodes 0, 1, 2, and 3. The element has an ID of 0, and it has no parent (it is a level 0 element) so its parent ID is -1.  More complicated example meshes may be found in the Appendix.
 
 Unlike many unstructured mesh formats, libMesh stores the element connectivity first.  The reason for this is that, for parallel meshes, libMesh partitions on \emph{elements}.  That is to say, each element ``belongs'' to one \emph{and only one} processor.  By storing the element connectivity first elements may be distributed to various processors before the nodal locations are read.  When the nodes are read they are only sent to the processors that need them.
 
@@ -123,7 +121,7 @@ The next section simply consists of $(x,y,z)$ triples defining the location of e
 For the XDR binary format the coordinates are treated as libMesh \texttt{real} numbers, which are defined at compile-time to be either \texttt{float}s or \texttt{double}s.  \textbf{Note:} In the future, nodes may be written as \texttt{float}s and then cast to \texttt{real}s for space savings.  In other words, don't rely on double precision for your nodal coordinates.
 
 \subsubsection{Boundary Conditions}
-Each boundary condition is defined by three integer numbers:  the element number, the side number on that element, and the boundary condition number.  There will be a line in this section for each boundary condition, up to the number of boundary conditions specified.  The boundary condition number may be any value which fits in a \texttt{short int}. As mentioned above, in a mesh with refinement hierarchy boundary conditions are only stored on for the level 0 elements. A non-level 0 element can obtain boundary information from its level 0 ancestor.
+Each boundary condition is defined by three integer numbers:  the element number, the side number on that element, and the boundary condition number.  There will be a line in this section for each boundary condition, up to the number of boundary conditions specified.  The boundary condition number may be any value which fits in a \texttt{short int}. As mentioned above, in a mesh with refinement hierarchy boundary conditions are only stored on for the level 0 elements. A non-level 0 element obtains boundary information from its level 0 ancestor.
 
 Note that the boundary condition numbers mean nothing to libMesh, they are simply specified for certain faces of certain elements.  The \href{http://libmesh.sourceforge.net/doxygen/classBoundaryInfo.html}{\texttt{BoundaryInfo}} class may be used to access the boundary condition numbers assigned to a particular element face.  The user may use these boundary conditions in their code to impose boundary conditions.  There are no ``automatic'' boundary conditions in libMesh, that is there are no special boundary condition IDs that may be specified such that a certain boundary condition is imposed.  Since libMesh is a framework rather than a simulation tool it leaves the responsibility of assigning boundary conditions with the user.
 
