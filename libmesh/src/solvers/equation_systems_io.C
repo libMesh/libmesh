@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.9 2005-08-17 19:26:08 knezed01 Exp $
+// $Id: equation_systems_io.C,v 1.10 2005-08-18 19:12:31 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -210,7 +210,7 @@ void EquationSystems::read (const std::string& name,
     unsigned int n_sys=0;
   
     io.data (n_sys);
-  
+
     for (unsigned int sys=0; sys<n_sys; sys++)
       {
 	/**
