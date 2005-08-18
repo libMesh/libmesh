@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.16 2005-08-15 21:30:38 knezed01 Exp $
+// $Id: xdr_io.C,v 1.17 2005-08-18 14:58:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -241,6 +241,25 @@ namespace
   
   private:
     FILE* mp_fp;
+
+    /**
+     * This function allows us to set the number of levels in
+     * the mesh when reading.
+     */
+    void tokenize_first_line(const char* p)
+    {
+      std::string buf_str(p);
+      std::stringstream ss(buf_str);
+
+      char token[256];
+      ss >> token;
+      if(strcmp(token,"LIBM") == 0)
+      {
+        ss >> token;
+        _num_levels = atoi(token);
+      }
+
+    }
   };
 
 
@@ -976,7 +995,10 @@ namespace
 	{
 	  char* p = &buf[0];
 	  xdr_string(mp_xdr_handle, &p, bufLen); // Reads binary signature
-	
+         
+          // Set the number of levels used in the mesh
+          this->tokenize_first_line(p);
+
 	  break;
 	}
       
@@ -1024,17 +1046,10 @@ namespace
           // are just attempting to get the number of levels.
 	  mp_in.getline(buf, bufLen+1);
 
-          std::string buf_str(buf);
-          std::stringstream ss(buf_str);
-
-          char token[256];
-          ss >> token;
-          if(strcmp(token,"LIBM") == 0)
-          {
-            ss >> token;
-            _num_levels = atoi(token);
-          }
 #endif
+
+          // Determine the number of levels in this mesh
+          this->tokenize_first_line(buf);
 
 	  break;
 	}
@@ -1283,9 +1298,15 @@ namespace
 	  case (XdrMGF::ENCODE):
 	  case (XdrMGF::DECODE):
 	    {
-	      unsigned int temp_n_blocks=0;
+              // this used to be 0.  How did that work?
+	      unsigned int temp_n_blocks = hd->get_n_blocks(); 
 	      xdr_u_int(mp_xdr_handle, &temp_n_blocks);
 	      hd->set_n_blocks(temp_n_blocks);
+
+              // The number of blocks (i.e. the number of element types)
+              // for any mesh must always
+              // be at least 1.
+              assert(hd->get_n_blocks() != 0);
 	      break;
 	    }
 
@@ -1315,10 +1336,12 @@ namespace
       
 	std::vector<ElemType> et;
 	hd->get_block_elt_types(et);
+
       
 	// Note:  If DECODING or READING, allocate space in the vector
 	if ((m_type == DECODE) || (m_type == R_ASCII))
 	  et.resize(hd->get_n_blocks());  
+
 
 	switch (m_type)
 	  {
@@ -1383,7 +1406,7 @@ namespace
 
 	// If DECODING or READING, allocate space for the vector 
 	if ((m_type == DECODE) || (m_type == R_ASCII))
-	  neeb.resize(hd->get_n_blocks());
+	  neeb.resize( hd->get_n_blocks()*(this->get_num_levels()+1) );
 
 	switch (m_type)
 	  {

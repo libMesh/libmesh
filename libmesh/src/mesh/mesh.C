@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.64 2005-08-16 13:35:30 benkirk Exp $
+// $Id: mesh.C,v 1.65 2005-08-18 14:58:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -627,13 +627,13 @@ void Mesh::read (const std::string& name,
 {
   START_LOG("read()", "Mesh");
   
-  // Set the read_xda_file flag on all processors.
+  // Set the read_xd_file flag on all processors.
   // This ensures that renumber_nodes_and_elements is *not* called
   // during prepare_for_use().  This is required in cases 
   // where there is a associated solution file which expect
   // a certain ordering of the nodes.
-  const bool read_xda_file =
-    name.rfind(".xda") < name.size();
+  const bool read_xd_file =
+    ((name.rfind(".xda") < name.size()) || (name.rfind(".xdr")  < name.size()));
   
   // Read the file based on extension.  Only processor 0
   // needs to read the mesh.  It will then broadcast it and
@@ -711,7 +711,7 @@ void Mesh::read (const std::string& name,
   }
 
   // Done reading the mesh.  Now prepare it for use.
-  this->prepare_for_use(read_xda_file);
+  this->prepare_for_use(read_xd_file);
 
 }
 
