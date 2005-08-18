@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2005-08-01 17:32:36 jwpeterson Exp $
+# $Id: Makefile,v 1.4 2005-08-18 15:56:17 knezed01 Exp $
 
 
 # The location of the mesh library
@@ -33,19 +33,17 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-ex_name := ex14
+target  := ex14
 
 ifeq ($(petsc-version), 2.3.0)
-target 	   := ./$(ex_name) -pc_type jacobi #ILU detects 0 pivot in petsc 2.3.0
-else
-target     := ./$(ex_name)
+args := -pc_type jacobi #ILU detects 0 pivot in petsc 2.3.0
 endif
 
 all:: $(target)
 
 # Production rules:  how to make the target - depends on library configuration
 $(target): $(objects)
-	@echo "Linking "$(ex_name)"..."
+	@echo "Linking "$(target)"..."
 	@$(CXX) $(CXXFLAGS) $(objects) -o $@ $(LIBS) $(LDFLAGS) $(EXTERNAL_FLAGS)
 
 
@@ -55,7 +53,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(ex_name) out*.gmv
+	@rm -f $(target) out*.gmv
 
 distclean:
 	@$(MAKE) clobber
@@ -63,13 +61,13 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(target)
+	@echo "* Running Example " $(target) $(args)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target)
+	@$(target) $(args)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target)
+	@echo "* Done Running Example " $(target) $(args)
 	@echo "***************************************************************"
 #
 # Dependencies
