@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.23 2005-08-16 14:13:13 benkirk Exp $
+// $Id: mesh_communication.C,v 1.24 2005-08-18 19:12:31 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -278,6 +278,10 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	
 	unsigned int cnt = 0;
 
+        // This map keeps track of elements we've previously added to the mesh 
+        // to avoid O(n) lookup times for parent pointers.
+        std::map<unsigned int, Elem*> parents;
+
 	while (cnt < conn.size())
 	  {
 	    // Declare the element that we will add
@@ -293,33 +297,24 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
             const int parent_ID    = conn[cnt++];
 	    
 	    
-            if (parent_ID != -1) // Do a linear search for the parent
+            if (parent_ID != -1) // Do a log(n) search for the parent
 	      {
 		Elem* my_parent;
+                
+                // Search for parent in the parents map (log(n))
+                std::map<unsigned int, Elem*>::iterator it = parents.find(parent_ID);
+                
+                // If the parent was not previously added, we cannot continue.
+                if (it == parents.end())
+                {
+                  std::cerr << "Parent element with ID " << parent_ID 
+                            << " not found." << std::endl; 
+                  error();
+                }
+
+                // Set the my_parent pointer
+                my_parent = (*it).second;
 		
-		MeshBase::element_iterator it        = mesh.elements_begin(); 
-		const MeshBase::element_iterator end = mesh.elements_end(); 
-		bool parent_found = false;
-
-		for (; it != end; ++it)
-		  {
-		    Elem* possible_parent = *it;
-		    if (static_cast<int>(possible_parent->id()) == parent_ID)
-		      {
-			my_parent = possible_parent;
-			parent_found = true;
-			break;
-		      }
-		  }
-
-		if (!parent_found)
-		  {
-		    std::cerr << "Parent element with ID " << parent_ID 
-			      << " not found." << std::endl; 
-		    error();
-		  }
-
-		assert (static_cast<int>(my_parent->id()) == parent_ID);
 		my_parent->set_refinement_flag(Elem::INACTIVE);
 		
 		elem = mesh.add_elem(Elem::build(elem_type,my_parent).release());
@@ -337,6 +332,10 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	    // Assign the IDs
             elem->subdomain_id() = subdomain_id;
             elem->set_id() = self_ID;
+
+            // Add elem to the map of parents, since it may have
+            // children to be added later
+            parents[self_ID] = elem;
 	    
 	    // Assign the connectivity
 	    for (unsigned int n=0; n<elem->n_nodes(); n++)

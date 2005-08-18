@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.17 2005-08-18 14:58:56 knezed01 Exp $
+// $Id: xdr_io.C,v 1.18 2005-08-18 19:12:31 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,7 @@
 #include "xdr_io.h"
 #include "o_f_stream.h"
 #include "boundary_info.h"
+#include "libmesh_logging.h"
 
 #ifdef USE_COMPLEX_NUMBERS
 #include "utility.h"
@@ -2132,6 +2133,10 @@ void XdrIO::read_mesh (const std::string& name,
       unsigned int lastConnIndex = 0;
       unsigned int lastFaceIndex = 0;
 
+      // This map keeps track of elements we've previously added to the mesh 
+      // to avoid O(n) lookup times for parent pointers.
+      std::map<unsigned int, Elem*> parents;
+
       for (unsigned int level=0; level<=n_levels; level++)
       {
         for (unsigned int idx=0; idx<n_blocks; idx++)  
@@ -2157,38 +2162,39 @@ void XdrIO::read_mesh (const std::string& name,
                 // Do a linear search for the parent
                 Elem* my_parent;
 
-                MeshBase::element_iterator it        = mesh.elements_begin(); 
-                const MeshBase::element_iterator end = mesh.elements_end(); 
-                bool parent_found = false;
-
-                for (; it != end; ++it)
-                {
-                  Elem* possible_parent = *it;
-                  if (static_cast<int>(possible_parent->id()) == parent_ID)
-                  {
-                    my_parent = possible_parent;
-                    parent_found = true;
-                    break;
-                  }
-                }
-
-                if (!parent_found)
+                // Search for parent in the parents map (log(n))
+                START_LOG("log(n) search for parent", "XdrIO::read_mesh");
+                std::map<unsigned int, Elem*>::iterator it = parents.find(parent_ID);
+                STOP_LOG("log(n) search for parent", "XdrIO::read_mesh");
+                
+                // If the parent was not previously added, we cannot continue.
+                if (it == parents.end())
                 {
                   std::cerr << "Parent element with ID " << parent_ID 
-                    << " not found." << std::endl; 
+                            << " not found." << std::endl; 
                   error();
                 }
 
-                assert (static_cast<int>(my_parent->id()) == parent_ID);
+                // Set the my_parent pointer
+                my_parent = (*it).second;
+
+                // my_parent is now INACTIVE, since he has children
                 my_parent->set_refinement_flag(Elem::INACTIVE);
-                
+               
+                // Now that we know the parent, build the child and add it to the mesh 
                 elem = mesh.add_elem(Elem::build(etypes[idx],my_parent).release());
+
+                // The new child is marked as JUST_REFINED
                 elem->set_refinement_flag(Elem::JUST_REFINED); 
+                
+                // Tell the parent about his new child
                 my_parent->add_child(elem);
+
+                // sanity check
                 assert (my_parent->type() == elem->type());
               }
 
-              // Old-style libMesh meshes
+              // Add level-0 elements to the mesh 
               else
               {
                 elem = mesh.add_elem(Elem::build(etypes[idx]).release());
@@ -2197,6 +2203,11 @@ void XdrIO::read_mesh (const std::string& name,
               // Assign the newly-added element's ID so that future 
               // children which may be added can find it correctly.
               elem->set_id() = self_ID;
+                
+              // Add this element to the map, it may be a parent for a future element
+              START_LOG("insert elem into map", "XdrIO::read_mesh");
+              parents[self_ID] = elem;
+              STOP_LOG("insert elem into map", "XdrIO::read_mesh");
             }
 
             // MGF-style meshes
@@ -2321,25 +2332,41 @@ void XdrIO::write_mesh (const std::string& name,
   int n_non_subactive = 0;
   int non_subactive_weight = 0;
 
-  // For each non-subactive element:
-  // 1.) Increment the number of non subactive elements
-  // 2.) Accumulate the total weight
-  // 3.) Add the node ids to a set of non subactive node ids 
-  std::set<unsigned int> not_subactive_node_ids;
-  MeshBase::const_element_iterator el = mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.elements_end();
-  for( ; el != end_el; ++el)
-  {
-    Elem* elem = (*el);
-    if(!elem->subactive())
-    {
-      n_non_subactive++;
-      non_subactive_weight += elem->n_nodes();
+  // This map will associate 
+  // the distance from the beginning of the set
+  // to each node ID with the node ID itself.
+  std::map<unsigned int, unsigned int> node_map;
 
-      for (unsigned int n=0; n<elem->n_nodes(); ++n)
-        not_subactive_node_ids.insert(elem->node(n));
+  {
+    // For each non-subactive element:
+    // 1.) Increment the number of non subactive elements
+    // 2.) Accumulate the total weight
+    // 3.) Add the node ids to a set of non subactive node ids 
+    std::set<unsigned int> not_subactive_node_ids;
+    MeshBase::const_element_iterator el = mesh.elements_begin();
+    const MeshBase::const_element_iterator end_el = mesh.elements_end();
+    for( ; el != end_el; ++el)
+    {
+      Elem* elem = (*el);
+      if(!elem->subactive())
+      {
+        n_non_subactive++;
+        non_subactive_weight += elem->n_nodes();
+
+        for (unsigned int n=0; n<elem->n_nodes(); ++n)
+          not_subactive_node_ids.insert(elem->node(n));
+      }
     }
+
+    // Now that the set is built, most of the hard work is done.  We build
+    // the map next and let the set go out of scope.
+    std::set<unsigned int>::iterator it = not_subactive_node_ids.begin();
+    const std::set<unsigned int>::iterator end = not_subactive_node_ids.end();
+    unsigned int cnt=0;
+    for (; it!=end; ++it)
+      node_map[*it] = cnt++;
   }
+
 
   const int                   numElem  = n_non_subactive;       
   const int                   numBCs   = mesh.boundary_info->n_boundary_conds();
@@ -2385,7 +2412,7 @@ void XdrIO::write_mesh (const std::string& name,
     assert(etypes.size() == 1);
   
   mh.setNumEl(numElem);
-  mh.setNumNodes(not_subactive_node_ids.size());
+  mh.setNumNodes(node_map.size());
   mh.setStrSize(65536);
  
   // set a local variable for the total weight of the mesh
@@ -2439,10 +2466,10 @@ void XdrIO::write_mesh (const std::string& name,
           {
             int nstart=0;
             
-            if (orig_type == 0)
+            if (orig_type == XdrIO::DEAL)
               nn = mesh.elem(e)->n_nodes();
 
-            else if (orig_type == 1)
+            else if (orig_type == XdrIO::MGF)
             {
               nstart=2; // ignore the 27 and 0 entries
               nn = mesh.elem(e)->n_nodes()+2;
@@ -2450,38 +2477,40 @@ void XdrIO::write_mesh (const std::string& name,
               conn[lastConnIndex + 1] = 0;
             }
 
-            else if (orig_type == 2) // LIBMESH format
+            else if (orig_type == XdrIO::LIBM) // LIBMESH format
               nn = mesh.elem(e)->n_nodes() + 2;
 
             else
               error();
 
             // Loop over the connectivity entries for this element and write to conn.
-            const unsigned int loopmax = (orig_type==2) ? nn-2 : nn;
+            START_LOG("set connectivity", "XdrIO::write_mesh");
+            const unsigned int loopmax = (orig_type==XdrIO::LIBM) ? nn-2 : nn;
             for (unsigned int n=nstart; n<loopmax; n++)
             {
               unsigned int connectivity_value=0;
 
               // old-style Libmesh and MGF meshes
-              if (orig_type != 2)
+              if (orig_type != XdrIO::LIBM)
                 connectivity_value = mesh.elem(e)->node(n-nstart);
 
               // new-style libMesh meshes: compress the connectivity entries to account for
               // subactive nodes that will not be in the mesh we write out.
               else
               {
-                std::set<unsigned int>::iterator pos = 
-                  not_subactive_node_ids.find(mesh.elem(e)->node(n-nstart));
+                std::map<unsigned int, unsigned int>::iterator pos = 
+                  node_map.find(mesh.elem(e)->node(n-nstart));
 
-                assert (pos != not_subactive_node_ids.end());
+                assert (pos != node_map.end());
 
-                connectivity_value = std::distance(not_subactive_node_ids.begin(), pos);
+                connectivity_value = (*pos).second;
               }
               conn[lastConnIndex + n] = connectivity_value;
             }
+            STOP_LOG("set connectivity", "XdrIO::write_mesh");
 
             // In the case of an adaptive mesh, set last 2 entries to this ID and parent ID
-            if (orig_type == 2)
+            if (orig_type == XdrIO::LIBM)
             {
               int self_ID = mesh.elem(e)->id();
               int parent_ID = -1;
@@ -2497,8 +2526,9 @@ void XdrIO::write_mesh (const std::string& name,
             lastConnIndex += nn;
           }
 
-        // Send conn to the XDR file
-        if(nn != 0)
+        // Send conn to the XDR file.  If there are no elements of this level and type,
+        // then nn will be zero, and we there is no connectivity to write. 
+        if (nn != 0)
           m.Icon(&conn[0], nn, lastConnIndex/nn);
       }
   }
@@ -2508,14 +2538,14 @@ void XdrIO::write_mesh (const std::string& name,
   {
     std::vector<Real> coords;
     
-    coords.resize(mesh.spatial_dimension()*not_subactive_node_ids.size());
+    coords.resize(mesh.spatial_dimension()*node_map.size());
     int lastIndex=0;
 
-    std::set<unsigned int>::iterator it = not_subactive_node_ids.begin();
-    const std::set<unsigned int>::iterator end = not_subactive_node_ids.end();
+    std::map<unsigned int,unsigned int>::iterator it = node_map.begin();
+    const std::map<unsigned int,unsigned int>::iterator end = node_map.end();
     for (; it != end; ++it)
       {
-        const Point& p = mesh.node(*it);
+        const Point& p = mesh.node((*it).first);
 
         coords[lastIndex+0] = p(0);
         coords[lastIndex+1] = p(1);
@@ -2524,7 +2554,7 @@ void XdrIO::write_mesh (const std::string& name,
       }
    
     // Put the nodes in the XDR file
-    m.coord(&coords[0], mesh.spatial_dimension(), not_subactive_node_ids.size()); 
+    m.coord(&coords[0], mesh.spatial_dimension(), node_map.size()); 
   }
 
   
