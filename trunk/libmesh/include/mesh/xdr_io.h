@@ -1,4 +1,4 @@
-// $Id: xdr_io.h,v 1.5 2005-08-15 21:30:38 knezed01 Exp $
+// $Id: xdr_io.h,v 1.6 2005-08-18 14:58:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -153,7 +153,7 @@ class XdrIO : public MeshInput<MeshBase>,
    * mesh file formats.  This method
    * expects an XDR-encoded binary file.
    */
-  void read_binary (const std::string&, const XdrIO::FileFormat = XdrIO::DEAL);
+  void read_binary (const std::string&, const XdrIO::FileFormat = XdrIO::LIBM);
 
   
   
@@ -174,7 +174,7 @@ class XdrIO : public MeshInput<MeshBase>,
    * meshes in general since they will be
    * hybrid meshes.
    */
-  void write_binary (const std::string&, const XdrIO::FileFormat = XdrIO::DEAL);
+  void write_binary (const std::string&, const XdrIO::FileFormat = XdrIO::LIBM);
 
 
   /**

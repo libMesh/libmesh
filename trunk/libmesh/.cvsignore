@@ -47,3 +47,4 @@ so_locations
 libmesh-devel-mailing-list
 config.status
 *.lay
+*.swp

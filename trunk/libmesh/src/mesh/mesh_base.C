@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.97 2005-08-15 21:30:38 knezed01 Exp $
+// $Id: mesh_base.C,v 1.98 2005-08-18 14:58:56 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -73,14 +73,14 @@ MeshBase::~MeshBase()
 
 
 
-void MeshBase::prepare_for_use (const bool read_xda_file)
+void MeshBase::prepare_for_use (const bool read_xd_file)
 {
   // Renumber the nodes and elements so that they in
   // contiguous blocks.  Note that we skip this step if prepare_for_use()
-  // has just been called from Mesh::read while reading an xda file.  In
+  // has just been called from Mesh::read while reading an xda or xdr file. In
   // this case, the ordering of the nodes may depend on an accompanying
   // solution, and the node ordering cannot be changed.
-  if(!read_xda_file)
+  if(!read_xd_file)
     this->renumber_nodes_and_elements();
   
   // Let all the elements find their neighbors
