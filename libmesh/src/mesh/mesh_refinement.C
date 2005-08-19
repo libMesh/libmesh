@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.42 2005-08-15 21:30:38 knezed01 Exp $
+// $Id: mesh_refinement.C,v 1.43 2005-08-19 20:20:36 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -59,8 +59,11 @@ MeshRefinement::MeshRefinement (MeshBase& m) :
     error();
   }
 
+  // Make our own copy of all the initial nodes.  This is to prevent
+  // corruption of the Node pointers in case the Mesh deletes some of 
+  // its original nodes due to coarsening.
   for (; it != end; ++it)
-    _initial_nodes.push_back(*it);
+    _initial_nodes.push_back( new Node(**it) );
 }
 
 
@@ -68,6 +71,12 @@ MeshRefinement::MeshRefinement (MeshBase& m) :
 MeshRefinement::~MeshRefinement ()
 {
   this->clear();  
+  
+  // Delete the memory allocated for the initial nodes list.
+  for (unsigned int i=0; i<_initial_nodes.size(); ++i)
+    delete _initial_nodes[i];
+
+  _initial_nodes.clear();
 }
 
 
@@ -75,7 +84,6 @@ MeshRefinement::~MeshRefinement ()
 void MeshRefinement::clear ()
 {
   _new_nodes_map.clear();
-  // _unused_elements.clear();
 }
 
 
@@ -88,8 +96,39 @@ Node* MeshRefinement::add_point (const Point& p, const unsigned int key)
   for (unsigned int i=0; i<_initial_nodes.size(); ++i)
   {
     Node* node = _initial_nodes[i];
-    if(p == *node)
-      return node;
+    if (p == *node)
+    {
+      // OK, we found a matching node, but is it really still in the Mesh?
+      // It may have been deleted due to coarsening, but the MeshRefinement
+      // object would not know about this.
+      // Use the node's ID as a hint as to where it might be located in the
+      // Mesh's _nodes vector.
+      if (node->id() < _mesh.n_nodes())
+        {
+          // Using node->id() as a hint, check to see if this initial node 
+          // is still in the Mesh's _nodes vector 
+          if (_mesh.node(node->id()) == *node)
+            return _mesh.node_ptr(node->id());
+        }
+
+      // If we reach this point without returning, 
+      // perform a linear search to be certain that the 
+      // node is still in the Mesh.
+      MeshBase::node_iterator it = _mesh.nodes_begin();
+      const MeshBase::node_iterator end = _mesh.nodes_end();
+
+      for (; it != end; ++it)
+      {
+        if (*node == **it)
+          return *it; 
+      }
+
+      // We didn't find the node even after an exhaustive linear search,
+      // so it has really been deleted from the Mesh's _nodes vector.  In this
+      // case, we break out of
+      // the for loop, and we allow the node to be added via the _new_nodes_map.
+      break;
+    }
   }
 
 
