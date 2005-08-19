@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.10 2005-08-15 21:30:38 knezed01 Exp $
+// $Id: mesh_refinement.h,v 1.11 2005-08-19 20:20:35 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,9 +44,11 @@
 #include "libmesh_common.h"
 #include "libmesh.h" // libMesh::invalid_uint
 
+#include "node.h" // remove this when debugging is done, only need forward dec.
+
 class MeshBase;
 class Point;
-class Node;
+//class Node;
 class Elem;
 class ErrorVector;
 
@@ -70,6 +72,15 @@ public:
    * Constructor.
    */
   MeshRefinement (MeshBase& mesh);
+
+private:
+  // Both the copy ctor and the assignment operator are 
+  // declared private but not implemented.  This is the 
+  // standard practice to prevent them from being used.
+  MeshRefinement (const MeshRefinement&);
+  MeshRefinement& operator=(const MeshRefinement&);
+
+public:
 
   /**
    * Destructor. Deletes all the elements that are currently stored.
@@ -180,7 +191,6 @@ public:
    * with this object.
    */
   MeshBase&       get_mesh ()       { return _mesh; }
-
 
 
 

@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.65 2005-08-18 14:58:56 knezed01 Exp $
+// $Id: mesh.C,v 1.66 2005-08-19 20:20:36 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -485,38 +485,6 @@ void Mesh::find_neighbors()
 
 void Mesh::renumber_nodes_and_elements ()
 {
-  // Only renumber the nodes & trim the element vector
-  // if we have performed some local coarsening.  This
-  // will be the case if the element vector is not the
-  // same size as the number of active elements.
-  //
-  // In this case simply number the elements (in case this
-  // was not already done) and return.
-  if (_elements.size() == this->n_active_elem())
-    { 
-      START_LOG("renumber_nodes_and_elem()", "Mesh");
-      
-      // Number the elements
-      {
-	element_iterator       it  = this->elements_begin();
-	const element_iterator end = this->elements_end();
-
-	for (unsigned int id=0; it != end; ++it)
-	  (*it)->set_id() = id++;
-      }
-
-      // Number the nodes
-      {
-	node_iterator       it  = this->nodes_begin();
-	const node_iterator end = this->nodes_end();
-
-	for (unsigned int id=0; it != end; ++it)
-	  (*it)->set_id() = id++;
-      }      
-      
-      STOP_LOG("renumber_nodes_and_elem()", "Mesh");
-      return;
-    }
   
   START_LOG("renumber_nodes_and_elem()", "Mesh");
   
@@ -604,7 +572,7 @@ void Mesh::renumber_nodes_and_elements ()
 	delete *it;
 	*it = NULL;
       }
-    
+
     _nodes.erase (nd, end);
   }
   
