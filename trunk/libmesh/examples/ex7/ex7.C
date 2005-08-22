@@ -1,4 +1,4 @@
-/* $Id: ex7.C,v 1.41 2005-06-11 03:59:17 jwpeterson Exp $ */
+/* $Id: ex7.C,v 1.42 2005-08-22 14:06:37 spetersen Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -295,7 +295,7 @@ void assemble_helmholtz(EquationSystems& es,
   
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
-  const FEType fe_type = dof_map.variable_type(0);
+  const FEType& fe_type = dof_map.variable_type(0);
 
   // For the admittance boundary condition,
   // get the fluid density
