@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.47 2005-08-15 21:30:38 knezed01 Exp $
+// $Id: elem.C,v 1.48 2005-08-22 18:57:32 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -53,6 +53,9 @@
 #include "cell_inf_prism12.h"
 #include "cell_pyramid5.h"
 
+// Initialize static member variables
+const unsigned int Elem::_bp1 = 65449;
+const unsigned int Elem::_bp2 = 48661;
 
 // ------------------------------------------------------------
 // Elem class member funcions

@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.7 2005-06-06 16:23:55 knezed01 Exp $
+// $Id: node.h,v 1.8 2005-08-22 18:57:31 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ class MeshRefinement;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 class Node : public Point,
@@ -154,6 +154,7 @@ private:
    * but no one else should be able to mess with it.
    */
   friend class MeshRefinement;
+  friend class Elem;
 };
 
 

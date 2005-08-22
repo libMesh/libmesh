@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.16 2005-05-31 20:22:06 roystgnr Exp $
+// $Id: elem_refinement.C,v 1.17 2005-08-22 18:57:32 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,12 +41,6 @@ void Elem::refine (MeshRefinement& mesh_refinement)
   assert (this->refinement_flag() == Elem::REFINE);
   assert (this->active());
   
-  // Two big prime numbers less than
-  // sqrt(max_unsigned_int) for key creation.
-  const unsigned int bp1 = 65449;
-  const unsigned int bp2 = 48661;
-  
-  
   // Create my children if necessary
   if (!_children)
     {
@@ -74,7 +68,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 	  p[c].resize    (this->child(c)->n_nodes());
 	  keys[c].resize (this->child(c)->n_nodes());
 	  nodes[c].resize(this->child(c)->n_nodes());
-	
+
 	  for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
 	    {
 	      // zero entries
@@ -99,36 +93,14 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 		      // Otherwise build the key to look for the node
 		      else
 		        {
-			  // An unsigned int associated with the
-			  // address of the node n.  We can't use the
-			  // node number since they can change.
-			
-#if SIZEOF_INT == SIZEOF_VOID_P
-			
-			  // 32-bit machines
-			  const unsigned int n_id =
-			    reinterpret_cast<unsigned int>(this->get_node(n));
-		      
-#elif SIZEOF_LONG_INT == SIZEOF_VOID_P
-
-			  // 64-bit machines 
-			  // Another big prime number less than max_unsigned_int
-			  // for key creation on 64-bit machines
-			  const unsigned int bp3 = 4294967291;
-			  const unsigned int n_id =			
-			    reinterpret_cast<long unsigned int>(this->get_node(n))%bp3;
-			
-#else
-			  // Huh?
-#error			WHAT KIND OF CRAZY MACHINE IS THIS? CANNOT COMPILE
-			
-#endif
-			  // Compute the key for this new node nc.  This will
+                          const unsigned int n_id = _cast_node_address_to_unsigned_int(n);
+			  
+                          // Compute the key for this new node nc.  This will
 			  // be used to locate the node if it already exists
 			  // in the mesh.
 			  keys[c][nc] +=
-			  (((static_cast<unsigned int>(em_val*100000.)%bp1) *
-			    (n_id%bp1))%bp1)*bp2;
+			  (((static_cast<unsigned int>(em_val*100000.)%_bp1) *
+			    (n_id%_bp1))%_bp1)*_bp2;
 		        }
 		    }
 	        }
@@ -174,6 +146,95 @@ void Elem::refine (MeshRefinement& mesh_refinement)
     }
   assert (this->ancestor());
 }
+
+
+
+
+void Elem::compute_children_node_keys()
+{
+  // No node keys need to be set if I have no children 
+  if (!_children)
+    return;
+
+  // Temporary storage for keys. 
+  std::vector<std::vector<unsigned int> > keys (this->n_children());
+
+
+  // compute new nodal locations
+  for (unsigned int c=0; c<this->n_children(); c++)
+  {	
+    keys[c].resize (this->child(c)->n_nodes());
+
+    for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
+    {
+      for (unsigned int n=0; n<this->n_nodes(); n++)
+      {
+        // The value from the embedding matrix
+        const float em_val = this->embedding_matrix(c,nc,n);
+         
+        // The node location is somewhere between existing vertices
+        if ((em_val != 0.) && (em_val != 1.)) 
+        {
+          const unsigned int n_id = _cast_node_address_to_unsigned_int(n);
+
+          // Compute the key for this new node nc.  This will
+          // be used to locate the node if it already exists
+          // in the mesh.
+          keys[c][nc] +=
+            (((static_cast<unsigned int>(em_val*100000.)%_bp1) *
+              (n_id%_bp1))%_bp1)*_bp2;
+        }
+      }
+    }
+  }
+
+  // By now, all the keys for the child nodes have been computed.
+  // keys[c][nc] will have zero entries for nodes that already belonged
+  // to the parent.
+  for (unsigned int c=0; c<this->n_children(); c++)
+    for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
+      if (keys[c][nc] != 0)
+        this->child(c)->get_node(nc)->set_key() = keys[c][nc];
+}
+
+
+
+
+
+
+unsigned int Elem::_cast_node_address_to_unsigned_int(const unsigned int n)
+{
+  // An unsigned int associated with the
+  // address of the node n.  We can't use the
+  // node number since they can change, so we use the
+  // Node's address.  (We also can't use the x,y,z
+  // location of the node since that can change too!)
+
+#if SIZEOF_INT == SIZEOF_VOID_P
+
+  // 32-bit machines
+  const unsigned int n_id =
+    reinterpret_cast<unsigned int>(this->get_node(n));
+
+#elif SIZEOF_LONG_INT == SIZEOF_VOID_P
+
+  // 64-bit machines 
+  // Another big prime number less than max_unsigned_int
+  // for key creation on 64-bit machines
+  const unsigned int bp3 = 4294967291;
+  const unsigned int n_id =			
+    reinterpret_cast<long unsigned int>(this->get_node(n))%bp3;
+
+#else
+  // Huh?
+#error			WHAT KIND OF CRAZY MACHINE IS THIS? CANNOT COMPILE
+
+#endif
+
+  return n_id;
+}
+
+
 
 
 

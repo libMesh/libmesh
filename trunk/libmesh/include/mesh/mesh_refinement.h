@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.11 2005-08-19 20:20:35 knezed01 Exp $
+// $Id: mesh_refinement.h,v 1.12 2005-08-22 18:57:31 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -402,17 +402,6 @@ private:
    */
   MeshBase& _mesh;
 
-
-  /**
-   * Data structure to hold the nodes for the initial 
-   * mesh before any refinements.  Filled possibly in constructor
-   * if the MeshRefinement object is created after the Mesh has been
-   * initialized.  
-   * 
-   * TODO: We need to make sure this is initialized even
-   * if the MeshRefinement object is constructed on an uninitialized Mesh.
-   */
-   std::vector<Node*> _initial_nodes;
 };
 
 #endif // end #ifdef ENABLE_AMR
