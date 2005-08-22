@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.26 2005-08-15 21:30:38 knezed01 Exp $
+// $Id: elem.h,v 1.27 2005-08-22 18:57:31 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -575,7 +575,14 @@ class Elem : public ReferenceCountedObject<Elem>,
    * Refine the element.
    */
   virtual void refine (MeshRefinement& mesh_refinement);
-  
+ 
+  /**
+   * For an element with children, this function calculates
+   * and sets the key values for the nodes introduced by the
+   * children (e.g. mid-edge/mid-face nodes)
+   */
+  void compute_children_node_keys();
+ 
   /**
    * Coarsen the element.  This is not
    * virtual since it is the same for all
@@ -771,6 +778,17 @@ public:
    */
   friend class MeshRefinement;    // (Elem::nullify_neighbors)
 
+ private:
+  /**
+   * This function is used internally for node key generation.
+   * It handles casting of pointers on various architectures.
+   */
+  unsigned int _cast_node_address_to_unsigned_int(const unsigned int n);
+
+  // Prime numbers used for computing node keys.  These are the same
+  // for every instance of the Elem class.
+  static const unsigned int _bp1;
+  static const unsigned int _bp2;
 };
 
 
@@ -1328,6 +1346,7 @@ private:
   
   // Pointer to the parent Elem class which generated this iterator
   const Elem* _parent;
+
 };
 
 

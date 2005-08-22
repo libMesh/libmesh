@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.18 2005-08-18 19:12:31 knezed01 Exp $
+// $Id: xdr_io.C,v 1.19 2005-08-22 18:57:32 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -2237,6 +2237,14 @@ void XdrIO::read_mesh (const std::string& name,
         }
         
       }
+
+      // All the elements at each level have been added, and their node pointers
+      // have been set.  Now compute the node keys to put the mesh into a state consistent
+      // with the state after being constructed through normal refinements. 
+      MeshBase::element_iterator it = mesh.elements_begin();
+      const MeshBase::element_iterator end = mesh.elements_end();
+      for (; it!=end; ++it)
+        (*it)->compute_children_node_keys();
     }
  
   // MGF-style (1) Hex27 mesh
