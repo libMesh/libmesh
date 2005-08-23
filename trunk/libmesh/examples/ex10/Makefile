@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.5 2005-05-06 17:44:06 roystgnr Exp $
+# $Id: Makefile,v 1.6 2005-08-23 19:31:17 knezed01 Exp $
 
 
 # The location of the mesh library
@@ -33,8 +33,10 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   := ./ex10
+target 	    := ./ex10
 
+# Specify the number of timesteps to do when we call "make run"
+n_timesteps := 25
 
 all:: $(target)
 
@@ -55,12 +57,19 @@ distclean:
 	@$(MAKE) clobber
 	@rm -f *.o *.g.o *.pg.o
 
+
 run: $(target)
 	@echo "***************************************************************"
 	@echo "* Running Example " $(target)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target)
+	@$(target) -n_timesteps $(n_timesteps) -init_timestep 0
+	@echo " "
+	@echo "***** Finished first" $(n_timesteps) "steps, now read in" \
+	       "saved solution and continue *****"
+	@echo " "
+	@$(target) -read_solution -n_timesteps $(n_timesteps) \
+                   -init_timestep $(n_timesteps)
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)

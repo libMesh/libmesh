@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.22 2005-06-08 20:37:15 benkirk Exp $ */
+/* $Id: ex10.C,v 1.23 2005-08-23 19:31:17 knezed01 Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -25,6 +25,10 @@
   // velocity.  The initial condition is given, and the
   // solution is advanced in time with a standard Crank-Nicholson
   // time-stepping strategy.
+  //
+  // Also, we use this example to demonstrate writing out and reading
+  // in of solutions. We do 25 time steps, then save the solution
+  // and do another 25 time steps starting from the saved solution.
  
 // C++ include files that we need
 #include <iostream>
@@ -44,6 +48,8 @@
 #include "numeric_vector.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
+
+#include "getpot.h"
 
 // Some (older) compilers do not offer full stream 
 // functionality, \p OStringStream works around this.
@@ -110,49 +116,168 @@ int main (int argc, char** argv)
   libMesh::init (argc, argv);
 
   {    
+
+    // Check for proper calling arguments.
+    if (argc > 6)
+    {
+      // Use commandline parameter to specify if we are to
+      // read in an initial solution or generate it ourself
+      std::cerr << "Usage:\n"
+        <<"\t " << argv[0] << " -init_timestep 0\n"
+        << "OR\n"
+        <<"\t " << argv[0] << " -read_solution -init_timestep 26\n"
+        << std::endl;
+
+      // This handy function will print the file name, line number,
+      // and then abort.  Currrently the library does not use C++
+      // exception handling.
+      error();
+    }
+
+    // Brief message to the user regarding the program name
+    // and command line arguments.
+    else 
+    {
+      std::cout << "Running " << argv[0];
+
+      for (int i=1; i<argc; i++)
+        std::cout << " " << argv[i];
+
+      std::cout << std::endl << std::endl;
+    }
+
+    // Create a GetPot object to parse the command line
+    GetPot command_line (argc, argv);
+
+
+    // This boolean value is obtained from the command line, it is true
+    // if the flag "-read_solution" is present, false otherwise.
+    // It indicates whether we are going to read in
+    // the mesh and solution files "saved_mesh.xda" and "saved_solution.xda"
+    // or whether we are going to start from scratch by just reading
+    // "mesh.xda"
+    const bool read_solution   = command_line.search("-read_solution");
+
+    // This value is also obtained from the commandline and it specifies the
+    // initial value for the t_step looping variable. We must
+    // distinguish between the two cases here, whether we read in the 
+    // solution or we started from scratch, so that we do not overwrite the
+    // gmv output files.
+    unsigned int init_timestep = 0;
     
+    // Search the command line for the "init_timestep" flag and if it is
+    // present, set init_timestep accordingly.
+    if(command_line.search("-init_timestep"))
+      init_timestep = command_line.next(0);
+    else
+    {
+      std::cerr << "ERROR: Initial timestep not specified\n" << std::endl;
+      error();
+    }
+
+
+
+    // This value is also obtained from the command line, and specifies
+    // the number of time steps to take.
+    unsigned int n_timesteps = 0;
+
+    // Again do a search on the command line for the argument
+    if(command_line.search("-n_timesteps"))
+      n_timesteps = command_line.next(0);
+    else
+    {
+      std::cerr << "ERROR: Number of timesteps not specified\n" << std::endl;
+      error();
+    }
+
+
     // Create a two-dimensional mesh.
     Mesh mesh (2);
-    
-    // Read the mesh from file.
-    mesh.read ("mesh.xda");
-    
-    // Create an object to handle mesh refinement.
-    MeshRefinement mesh_refinement (mesh);
-    
-    // Uniformly refine the mesh 5 times.
-    mesh_refinement.uniformly_refine (5);
-    
-    // Print information about the mesh to the screen.
-    mesh.print_info();
-    
+
     // Create an equation systems object.
     EquationSystems equation_systems (mesh);
-    
-    // Declare the system and its variables.
-    // Begin by creating a transient system
-    // named "Convection-Diffusion".
-    TransientLinearImplicitSystem & system = 
-      equation_systems.add_system<TransientLinearImplicitSystem> ("Convection-Diffusion");
+    MeshRefinement mesh_refinement (mesh);
+
+    // First we process the case where we do not read in the solution
+    if(!read_solution)
+    {
+      // Read the mesh from file.
+      mesh.read ("mesh.xda");
+
+      // Uniformly refine the mesh 5 times
+      if(!read_solution)
+        mesh_refinement.uniformly_refine (5);
+
+      // Print information about the mesh to the screen.
+      mesh.print_info();
       
-    // Adds the variable "u" to "Convection-Diffusion".  "u"
-    // will be approximated using first-order approximation.
-    system.add_variable ("u", FIRST);
       
-    // Give the system a pointer to the matrix assembly
-    // and initialization functions.
-    system.attach_assemble_function (assemble_cd);
-    system.attach_init_function (init_cd);
-    
-    // Initialize the data structures for the equation system.
-    equation_systems.init ();
-    
+      // Declare the system and its variables.
+      // Begin by creating a transient system
+      // named "Convection-Diffusion".
+      TransientLinearImplicitSystem & system = 
+        equation_systems.add_system<TransientLinearImplicitSystem> 
+        ("Convection-Diffusion");
+
+      // Adds the variable "u" to "Convection-Diffusion".  "u"
+      // will be approximated using first-order approximation.
+      system.add_variable ("u", FIRST);
+
+      // Give the system a pointer to the matrix assembly
+      // and initialization functions.
+      system.attach_assemble_function (assemble_cd);
+      system.attach_init_function (init_cd);
+
+      // Initialize the data structures for the equation system.
+      equation_systems.init ();
+    }
+
+    // Otherwise we read in the solution and mesh
+    else 
+    {
+      // Read in the mesh stored in "saved_mesh.xda"
+      mesh.read("saved_mesh.xda");
+
+      // Print information about the mesh to the screen.
+      mesh.print_info();
+
+      // Read in the solution stored in "saved_solution.xda"
+      equation_systems.read("saved_solution.xda", libMeshEnums::READ);
+
+      // Get a reference to the system so that we can call update() on it
+      TransientLinearImplicitSystem & system = 
+        equation_systems.get_system<TransientLinearImplicitSystem> 
+        ("Convection-Diffusion");
+
+      // We need to call update to put system in a consistent state
+      // with the solution that was read in
+      system.update();
+
+      // Attach the same matrix assembly function as above. Note, we do not
+      // have to attach an init() function since we are initializing the
+      // system by reading in "saved_solution.xda"
+      system.attach_assemble_function (assemble_cd);
+    }
+
     // Prints information about the system to the screen.
     equation_systems.print_info();
+
+    
+    equation_systems.parameters.set<unsigned int>
+      ("linear solver maximum iterations") = 250;
+    equation_systems.parameters.set<Real>
+      ("linear solver tolerance") = 1.e-6;
       
-    // Write out the initial conditions.
-    GMVIO(mesh).write_equation_systems ("out.gmv.000",
-					equation_systems);
+    if(!read_solution)
+      // Write out the initial condition
+      GMVIO(mesh).write_equation_systems ("out.gmv.000",
+					  equation_systems);
+    else
+      // Write out the solution that was read in
+      GMVIO(mesh).write_equation_systems ("solution_read_in.gmv",
+					  equation_systems);
+
+      
     
     // The Convection-Diffusion system requires that we specify
     // the flow velocity.  We will specify it as a RealVectorValue
@@ -166,9 +291,13 @@ int main (int argc, char** argv)
     // \p solve() member at each time step.  This will assemble the
     // system and call the linear solver.
     const Real dt = 0.025;
-    Real time     = 0.;
+    Real time     = init_timestep*dt;
     
-    for (unsigned int t_step = 0; t_step < 50; t_step++)
+    // We do 25 timesteps both before and after writing out the
+    // intermediate solution
+    for(unsigned int t_step=init_timestep; 
+                     t_step<(init_timestep+n_timesteps); 
+                     t_step++)
       {
 	// Increment the time counter, set the time and the
 	// time step size as parameters in the EquationSystem.
@@ -274,6 +403,12 @@ int main (int argc, char** argv)
 	    GMVIO(mesh).write_equation_systems (file_name.str(),
 						equation_systems);
 	  }
+      }
+
+      if(!read_solution)
+      {
+        mesh.write("saved_mesh.xda");
+        equation_systems.write("saved_solution.xda", libMeshEnums::WRITE);
       }
   }
   
