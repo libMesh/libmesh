@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.16 2005-07-21 21:44:13 roystgnr Exp $
+// $Id: system.h,v 1.17 2005-08-23 16:50:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -253,8 +253,13 @@ public:
    * allowed @e prior to \p init().  All the additional vectors
    * are similarly distributed, like the \p solution,
    * and inititialized to zero.
+   * 
+   * By default vectors added by add_vector are projected to changed grids by
+   * reinit().  To zero them instead (more efficient), pass "false" as the
+   * second argument
    */
-  NumericVector<Number> & add_vector (const std::string& vec_name);
+  NumericVector<Number> & add_vector (const std::string& vec_name,
+				      const bool projections=true);
 
   /**
    * @returns \p true if this \p System has a vector associated with the
@@ -552,6 +557,12 @@ private:
    * in the same way as the solution vector.
    */
   std::map<std::string, NumericVector<Number>* > _vectors;
+
+  /**
+   * Holds true if a vector by that name should be projected
+   * onto a changed grid, false if it should be zeroed.
+   */
+  std::map<std::string, bool> _vector_projections;
 
   /**
    * \p true when additional vectors may still be added, \p false otherwise.

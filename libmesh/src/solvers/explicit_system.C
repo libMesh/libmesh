@@ -1,4 +1,4 @@
-// $Id: explicit_system.C,v 1.7 2005-03-18 16:56:12 benkirk Exp $
+// $Id: explicit_system.C,v 1.8 2005-08-23 16:50:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -105,7 +105,7 @@ void ExplicitSystem::add_system_rhs ()
   // Only need to add the rhs if it isn't there
   // already!
   if (rhs == NULL)
-    rhs = &(this->add_vector ("RHS Vector"));
+    rhs = &(this->add_vector ("RHS Vector", false));
 
   assert (rhs != NULL);
 }

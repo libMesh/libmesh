@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.22 2005-06-21 21:53:58 benkirk Exp $
+// $Id: system.C,v 1.23 2005-08-23 16:50:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -144,6 +144,7 @@ void System::clear ()
       }
     
     _vectors.clear();
+    _vector_projections.clear();
     _can_add_vectors = true;
   }
 
@@ -198,32 +199,39 @@ void System::restrict_vectors ()
   // Restrict the _vectors on the coarsened cells
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
     {
-      //this->project_vector (*(pos->second));
-
-      //TODO:[BSK] Make projection work properly for distributed vectors 
-      // Right now we must localize distributed
-      // vectors before projection will work.
       NumericVector<Number>* v = pos->second;
       
-      if (v->size() == v->local_size())
-	this->project_vector (*v);
+      if (_vector_projections[pos->first])
+        {
+          //this->project_vector (*(pos->second));
+
+          //TODO:[BSK] Make projection work properly for distributed vectors 
+          // Right now we must localize distributed
+          // vectors before projection will work.
+          if (v->size() == v->local_size())
+	    this->project_vector (*v);
       
-      else
-	{
-	  AutoPtr<NumericVector<Number> > v_local (NumericVector<Number>::build());
-	  v_local->init (v->size(), v->size());
-	  v->localize(*v_local);
-	  v_local->close();
-	  this->project_vector(*v_local);
+          else
+	    {
+	      AutoPtr<NumericVector<Number> > v_local (NumericVector<Number>::build());
+	      v_local->init (v->size(), v->size());
+	      v->localize(*v_local);
+	      v_local->close();
+	      this->project_vector(*v_local);
 	  
-	  v->init(this->n_dofs(), this->n_local_dofs());
+	      v->init(this->n_dofs(), this->n_local_dofs());
 
-	  for (unsigned int i=v->first_local_index();
-	       i<v->last_local_index(); i++)
-	    v->set(i, (*v_local)(i));
+	      for (unsigned int i=v->first_local_index();
+	           i<v->last_local_index(); i++)
+	        v->set(i, (*v_local)(i));
 
-	  v->close();
-	}
+	      v->close();
+	    }
+          }
+        else
+          {
+            v->init (this->n_dofs(), this->n_local_dofs());
+          }
     }
 
   // Restrict the current local solution on the coarsened cells
@@ -470,7 +478,8 @@ void System::update_global_solution (std::vector<Number>& global_soln,
 
 
 
-NumericVector<Number> & System::add_vector (const std::string& vec_name)
+NumericVector<Number> & System::add_vector (const std::string& vec_name,
+                                            const bool projections)
 {
   // only add vectors before initializing...
   if (!_can_add_vectors)
@@ -491,6 +500,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name)
   // Otherwise build the vector and return it.
   NumericVector<Number>* buf = NumericVector<Number>::build().release();
   _vectors.insert (std::make_pair (vec_name, buf));
+  _vector_projections.insert (std::make_pair (vec_name, projections));
 
   return *buf;
 }
