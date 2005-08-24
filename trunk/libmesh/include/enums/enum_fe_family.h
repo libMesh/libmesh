@@ -1,4 +1,4 @@
-// $Id: enum_fe_family.h,v 1.9 2005-06-21 21:53:58 benkirk Exp $
+// $Id: enum_fe_family.h,v 1.10 2005-08-24 15:12:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -52,6 +52,7 @@ namespace libMeshEnums {
 
 		 // C1 elements
 		 CLOUGH       = 21,
+		 HERMITE      = 22,
 		 
 		 INVALID_FE   = 42};
 
