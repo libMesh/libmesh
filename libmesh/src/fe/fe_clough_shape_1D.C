@@ -1,4 +1,4 @@
-// $Id: fe_clough_shape_1D.C,v 1.3 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: fe_clough_shape_1D.C,v 1.4 2005-08-24 15:42:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -87,8 +87,7 @@ void clough_compute_coefs(const Elem* elem)
 }
 
 
-  // Return shape function second derivatives on the unit right
-  // triangle
+  // Return shape function second derivatives on the unit interval
 Real clough_raw_shape_second_deriv(const unsigned int basis_num,
                             const unsigned int deriv_type,
                             const Point& p)
