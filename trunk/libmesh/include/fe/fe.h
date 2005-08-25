@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.16 2005-05-11 20:11:34 roystgnr Exp $
+// $Id: fe.h,v 1.17 2005-08-25 18:31:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 //-------------------------------------------------------------
@@ -423,7 +423,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 //-------------------------------------------------------------
@@ -443,12 +443,47 @@ public:
 
 
 /**
+ * Hermite finite elements.  Still templated on the dimension,
+ * \p Dim.  
+ *
+ * \author Roy Stogner
+ * \date 2005
+ * \version $Revision: 1.17 $
+ */
+
+//-------------------------------------------------------------
+// FEHierarchic class definition
+template <unsigned int Dim>
+class FEHermite : public FE<Dim,HERMITE>
+{
+public:
+
+  /**
+   * Constructor. Creates a hierarchic finite element
+   * to be used in dimension \p Dim.
+   */
+  FEHermite(const FEType& fet);
+
+  /**
+   * 1D hermite functions on unit interval
+   */
+  static Real hermite_raw_shape_second_deriv(const unsigned int basis_num,
+					     const Real xi);
+  static Real hermite_raw_shape_deriv(const unsigned int basis_num,
+				      const Real xi);
+  static Real hermite_raw_shape(const unsigned int basis_num,
+				const Real xi);
+};
+
+
+
+/**
  * Hierarchic finite elements.  Still templated on the dimension,
  * \p Dim.  
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 //-------------------------------------------------------------
@@ -473,7 +508,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 //-------------------------------------------------------------
@@ -498,7 +533,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 //-------------------------------------------------------------
@@ -524,7 +559,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.16 $
+ * \version $Revision: 1.17 $
  */
 
 //-------------------------------------------------------------
@@ -557,7 +592,7 @@ public:
 
 
 protected:
-    
+
   /** 
    * Update the various member data fields \p phi,
    * \p dphidxi, \p dphideta, \p dphidzeta, etc.
@@ -683,6 +718,17 @@ template <unsigned int Dim>
 inline
 FEClough<Dim>::FEClough (const FEType& fet) :
   FE<Dim,CLOUGH> (fet)
+{
+}
+
+
+
+// ------------------------------------------------------------
+// FEHermite class inline members
+template <unsigned int Dim>
+inline
+FEHermite<Dim>::FEHermite (const FEType& fet) :
+  FE<Dim,HERMITE> (fet)
 {
 }
 

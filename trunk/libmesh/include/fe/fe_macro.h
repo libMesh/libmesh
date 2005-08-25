@@ -1,4 +1,4 @@
-// $Id: fe_macro.h,v 1.12 2005-06-14 20:44:05 jwpeterson Exp $
+// $Id: fe_macro.h,v 1.13 2005-08-25 18:31:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,7 @@
 #ifndef ENABLE_HIGHER_ORDER_SHAPES
 
 #define INSTANTIATE_FE(_dim)   template class FE< (_dim), CLOUGH>; \
+                               template class FE< (_dim), HERMITE>;    \
                                template class FE< (_dim), HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
@@ -41,6 +42,7 @@
 
 #define INSTANTIATE_IMAP(_dim) \
   template void FE<_dim,CLOUGH>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&); \
+  template void FE<_dim,HERMITE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&); \
   template void FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
   template void FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
   template void FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
@@ -49,6 +51,7 @@
 #else //ENABLE_HIGHER_ORDER_SHAPES
 
 #define INSTANTIATE_FE(_dim)   template class FE< (_dim), CLOUGH>; \
+                               template class FE< (_dim), HERMITE>;    \
                                template class FE< (_dim), HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
@@ -58,6 +61,7 @@
 
 #define INSTANTIATE_IMAP(_dim) \
   template void  FE<_dim,CLOUGH>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&); \
+  template void  FE<_dim,HERMITE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&); \
   template void  FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
   template void  FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
   template void  FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&);\
