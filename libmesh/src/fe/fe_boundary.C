@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.36 2005-07-01 16:36:10 spetersen Exp $
+// $Id: fe_boundary.C,v 1.37 2005-08-25 18:31:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,6 +45,8 @@ void FE<1,_type>::_func(const Elem*,        \
 
 REINIT_1D_ERROR(CLOUGH, reinit)
 REINIT_1D_ERROR(CLOUGH, edge_reinit)
+REINIT_1D_ERROR(HERMITE, reinit)
+REINIT_1D_ERROR(HERMITE, edge_reinit)
 REINIT_1D_ERROR(HIERARCHIC, reinit)
 REINIT_1D_ERROR(HIERARCHIC, edge_reinit)
 REINIT_1D_ERROR(LAGRANGE, reinit)
@@ -607,6 +609,8 @@ template void FE<2,HIERARCHIC>::reinit(Elem const*, unsigned int);
 template void FE<2,HIERARCHIC>::edge_reinit(Elem const*, unsigned int);
 template void FE<2,CLOUGH>::reinit(Elem const*, unsigned int);
 template void FE<2,CLOUGH>::edge_reinit(Elem const*, unsigned int);
+template void FE<2,HERMITE>::reinit(Elem const*, unsigned int);
+template void FE<2,HERMITE>::edge_reinit(Elem const*, unsigned int);
 template void FE<2,MONOMIAL>::reinit(Elem const*, unsigned int);
 template void FE<2,MONOMIAL>::edge_reinit(Elem const*, unsigned int);
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
@@ -623,6 +627,8 @@ template void FE<3,HIERARCHIC>::reinit(Elem const*, unsigned int);
 template void FE<3,HIERARCHIC>::edge_reinit(Elem const*, unsigned int);
 template void FE<3,CLOUGH>::reinit(Elem const*, unsigned int);
 template void FE<3,CLOUGH>::edge_reinit(Elem const*, unsigned int);
+template void FE<3,HERMITE>::reinit(Elem const*, unsigned int);
+template void FE<3,HERMITE>::edge_reinit(Elem const*, unsigned int);
 template void FE<3,MONOMIAL>::reinit(Elem const*, unsigned int);
 template void FE<3,MONOMIAL>::edge_reinit(Elem const*, unsigned int);
 #ifdef ENABLE_HIGHER_ORDER_SHAPES

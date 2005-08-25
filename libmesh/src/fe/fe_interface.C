@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.35 2005-07-22 16:31:53 roystgnr Exp $
+// $Id: fe_interface.C,v 1.36 2005-08-25 18:31:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -67,6 +67,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	  case CLOUGH:
 	    return FE<1,CLOUGH>::n_shape_functions(t, o);
 	    
+	  case HERMITE:
+	    return FE<1,HERMITE>::n_shape_functions(t, o);
+	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::n_shape_functions(t, o);
 	    
@@ -104,6 +107,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	  case CLOUGH:
 	    return FE<2,CLOUGH>::n_shape_functions(t, o);
 	    
+	  case HERMITE:
+	    return FE<2,HERMITE>::n_shape_functions(t, o);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::n_shape_functions(t, o);
 	    
@@ -137,6 +143,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case HERMITE:
+	    return FE<3,HERMITE>::n_shape_functions(t, o);
+	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::n_shape_functions(t, o);
 	    
@@ -201,6 +210,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	  case CLOUGH:
 	    return FE<1,CLOUGH>::n_dofs(t, o);
 	    
+	  case HERMITE:
+	    return FE<1,HERMITE>::n_dofs(t, o);
+	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::n_dofs(t, o);
 	    
@@ -237,6 +249,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	  case CLOUGH:
 	    return FE<2,CLOUGH>::n_dofs(t, o);
 	    
+	  case HERMITE:
+	    return FE<2,HERMITE>::n_dofs(t, o);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::n_dofs(t, o);
 	    
@@ -270,6 +285,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case HERMITE:
+	    return FE<3,HERMITE>::n_dofs(t, o);
+	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::n_dofs(t, o);
 	    
@@ -334,6 +352,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	  case CLOUGH:
 	    return FE<1,CLOUGH>::n_dofs_at_node(t, o, n);
 	    
+	  case HERMITE:
+	    return FE<1,HERMITE>::n_dofs_at_node(t, o, n);
+	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::n_dofs_at_node(t, o, n);
 	    
@@ -370,6 +391,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	  case CLOUGH:
 	    return FE<2,CLOUGH>::n_dofs_at_node(t, o, n);
 	    
+	  case HERMITE:
+	    return FE<2,HERMITE>::n_dofs_at_node(t, o, n);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::n_dofs_at_node(t, o, n);
 	    
@@ -403,6 +427,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case HERMITE:
+	    return FE<3,HERMITE>::n_dofs_at_node(t, o, n);
+	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::n_dofs_at_node(t, o, n);
 	    
@@ -467,6 +494,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	  case CLOUGH:
 	    return FE<1,CLOUGH>::n_dofs_per_elem(t, o);
 	    
+	  case HERMITE:
+	    return FE<1,HERMITE>::n_dofs_per_elem(t, o);
+	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::n_dofs_per_elem(t, o);
 	    
@@ -503,6 +533,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	  case CLOUGH:
 	    return FE<2,CLOUGH>::n_dofs_per_elem(t, o);
 	    
+	  case HERMITE:
+	    return FE<2,HERMITE>::n_dofs_per_elem(t, o);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::n_dofs_per_elem(t, o);
 	    
@@ -536,6 +569,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case HERMITE:
+	    return FE<3,HERMITE>::n_dofs_per_elem(t, o);
+	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::n_dofs_per_elem(t, o);
 	    
@@ -595,6 +631,10 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 	    FE<1,CLOUGH>::dofs_on_side(elem, o, s, di);
             return;
 	    
+	  case HERMITE:
+	    FE<1,HERMITE>::dofs_on_side(elem, o, s, di);
+            return;
+	    
 	  case HIERARCHIC:
 	    FE<1,HIERARCHIC>::dofs_on_side(elem, o, s, di);
             return;
@@ -638,6 +678,10 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 	    FE<2,CLOUGH>::dofs_on_side(elem, o, s, di);
             return;
 	    
+	  case HERMITE:
+	    FE<2,HERMITE>::dofs_on_side(elem, o, s, di);
+            return;
+	    
 	  case HIERARCHIC:
 	    FE<2,HIERARCHIC>::dofs_on_side(elem, o, s, di);
             return;
@@ -677,6 +721,10 @@ void FEInterface::dofs_on_side(const Elem* const elem,
       {
 	switch (fe_t.family)
 	  {
+	  case HERMITE:
+	    FE<3,HERMITE>::dofs_on_side(elem, o, s, di);
+            return;
+	    
 	  case HIERARCHIC:
 	    FE<3,HIERARCHIC>::dofs_on_side(elem, o, s, di);
             return;
@@ -739,6 +787,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 	    FE<1,CLOUGH>::dofs_on_edge(elem, o, e, di);
             return;
 	    
+	  case HERMITE:
+	    FE<1,HERMITE>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
 	  case HIERARCHIC:
 	    FE<1,HIERARCHIC>::dofs_on_edge(elem, o, e, di);
             return;
@@ -782,6 +834,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 	    FE<2,CLOUGH>::dofs_on_edge(elem, o, e, di);
             return;
 	    
+	  case HERMITE:
+	    FE<2,HERMITE>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
 	  case HIERARCHIC:
 	    FE<2,HIERARCHIC>::dofs_on_edge(elem, o, e, di);
             return;
@@ -821,6 +877,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
       {
 	switch (fe_t.family)
 	  {
+	  case HERMITE:
+	    FE<3,HERMITE>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
 	  case HIERARCHIC:
 	    FE<3,HIERARCHIC>::dofs_on_edge(elem, o, e, di);
             return;
@@ -895,6 +955,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 				     elem_soln, nodal_soln);
 	    return;
 	    
+	  case HERMITE:
+	    FE<1,HERMITE>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+	    
 	  case HIERARCHIC:
 	    FE<1,HIERARCHIC>::nodal_soln(elem, order,
 					 elem_soln, nodal_soln);
@@ -945,6 +1010,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 				     elem_soln, nodal_soln);
 	    return;
 	    
+	  case HERMITE:
+	    FE<2,HERMITE>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+	    
 	  case HIERARCHIC:
 	    FE<2,HIERARCHIC>::nodal_soln(elem, order,
 					 elem_soln, nodal_soln);
@@ -990,6 +1060,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case HERMITE:
+	    FE<3,HERMITE>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+	    
 	  case HIERARCHIC:
 	    FE<3,HIERARCHIC>::nodal_soln(elem, order,
 					 elem_soln, nodal_soln);
@@ -1062,6 +1137,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	  case CLOUGH:
 	    return FE<1,CLOUGH>::inverse_map(elem, p, tolerance, secure);
 	    
+	  case HERMITE:
+	    return FE<1,HERMITE>::inverse_map(elem, p, tolerance, secure);
+	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
 	    
@@ -1098,6 +1176,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	  case CLOUGH:
 	    return FE<2,CLOUGH>::inverse_map(elem, p, tolerance, secure);
 	    
+	  case HERMITE:
+	    return FE<2,HERMITE>::inverse_map(elem, p, tolerance, secure);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
 	    
@@ -1130,6 +1211,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case HERMITE:
+	    return FE<3,HERMITE>::inverse_map(elem, p, tolerance, secure);
+	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
 	    
@@ -1215,6 +1299,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    FE<1,CLOUGH>::inverse_map(elem, physical_points, reference_points);
 	    return;
 	    
+	  case HERMITE:
+	    FE<1,HERMITE>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
 	  case HIERARCHIC:
 	    FE<1,HIERARCHIC>::inverse_map(elem, physical_points, reference_points);
 	    return;
@@ -1258,6 +1346,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    FE<2,CLOUGH>::inverse_map(elem, physical_points, reference_points);
 	    return;
 	    
+	  case HERMITE:
+	    FE<2,HERMITE>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
 	  case HIERARCHIC:
 	    FE<2,HIERARCHIC>::inverse_map(elem, physical_points, reference_points);
 	    return;
@@ -1297,6 +1389,10 @@ void FEInterface::inverse_map (const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case HERMITE:
+	    FE<3,HERMITE>::inverse_map(elem, physical_points, reference_points);
+	    return;
+	    
 	  case HIERARCHIC:
 	    FE<3,HIERARCHIC>::inverse_map(elem, physical_points, reference_points);
 	    return;
@@ -1377,6 +1473,9 @@ Real FEInterface::shape(const unsigned int dim,
 	  case CLOUGH:
 	    return FE<1,CLOUGH>::shape(t,o,i,p);
 	    
+	  case HERMITE:
+	    return FE<1,HERMITE>::shape(t,o,i,p);
+	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::shape(t,o,i,p);
 	    
@@ -1413,6 +1512,9 @@ Real FEInterface::shape(const unsigned int dim,
 	  case CLOUGH:
 	    return FE<2,CLOUGH>::shape(t,o,i,p);
 	    
+	  case HERMITE:
+	    return FE<2,HERMITE>::shape(t,o,i,p);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::shape(t,o,i,p);
 	    
@@ -1446,6 +1548,9 @@ Real FEInterface::shape(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case HERMITE:
+	    return FE<3,HERMITE>::shape(t,o,i,p);
+	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::shape(t,o,i,p);
 	    
@@ -1511,6 +1616,9 @@ Real FEInterface::shape(const unsigned int dim,
 	  case CLOUGH:
 	    return FE<1,CLOUGH>::shape(elem,o,i,p);
 	    
+	  case HERMITE:
+	    return FE<1,HERMITE>::shape(elem,o,i,p);
+	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::shape(elem,o,i,p);
 	    
@@ -1547,6 +1655,9 @@ Real FEInterface::shape(const unsigned int dim,
 	  case CLOUGH:
 	    return FE<2,CLOUGH>::shape(elem,o,i,p);
 	    
+	  case HERMITE:
+	    return FE<2,HERMITE>::shape(elem,o,i,p);
+	    
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::shape(elem,o,i,p);
 	    
@@ -1580,6 +1691,9 @@ Real FEInterface::shape(const unsigned int dim,
       {
 	switch (fe_t.family)
 	  {
+	  case HERMITE:
+	    return FE<3,HERMITE>::shape(elem,o,i,p);
+	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::shape(elem,o,i,p);
 	    
@@ -1680,6 +1794,12 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 					       variable_number,
 					       elem); return;
 
+	  case HERMITE:
+	    FE<2,HERMITE>::compute_constraints (constraints,
+					        dof_map,
+					        variable_number,
+					        elem); return;
+
 	  case LAGRANGE:
 	    FE<2,LAGRANGE>::compute_constraints (constraints,
 						 dof_map,
@@ -1702,6 +1822,12 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
       {
 	switch (fe_t.family)
 	  {
+	  case HERMITE:
+	    FE<3,HERMITE>::compute_constraints (constraints,
+					        dof_map,
+					        variable_number,
+					        elem); return;
+
 	  case LAGRANGE:
 	    FE<3,LAGRANGE>::compute_constraints (constraints,
 					         dof_map,
@@ -1738,6 +1864,7 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
       case XYZ:
 	return false;
       case CLOUGH:
+      case HERMITE:
       case HIERARCHIC:
       default:
 	return true;
