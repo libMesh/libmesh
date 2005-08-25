@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_1D.C,v 1.1 2005-08-25 18:31:37 roystgnr Exp $
+// $Id: fe_hermite_shape_1D.C,v 1.2 2005-08-25 19:07:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -80,10 +80,9 @@ void hermite_compute_coefs(const Elem* elem)
 
 
 
-  // Return shape function second derivatives on the unit right
-  // triangle
-Real hermite_raw_shape_second_deriv(const unsigned int basis_num,
-                                    const Real xi)
+template<>
+Real FEHermite<1>::hermite_raw_shape_second_deriv
+ (const unsigned int basis_num, const Real xi)
 {
   switch (basis_num)
     {
@@ -103,8 +102,9 @@ Real hermite_raw_shape_second_deriv(const unsigned int basis_num,
 
 
 
-Real hermite_raw_shape_deriv(const unsigned int basis_num,
-                             const Real xi)
+template<>
+Real FEHermite<1>::hermite_raw_shape_deriv
+ (const unsigned int basis_num, const Real xi)
 {
   switch (basis_num)
     {
@@ -122,8 +122,9 @@ Real hermite_raw_shape_deriv(const unsigned int basis_num,
   return 0.;
 }
 
-Real hermite_raw_shape(const unsigned int basis_num,
-                       const Real xi)
+template<>
+Real FEHermite<1>::hermite_raw_shape
+ (const unsigned int basis_num, const Real xi)
 {
   switch (basis_num)
     {
@@ -187,13 +188,13 @@ Real FE<1,HERMITE>::shape(const Elem* elem,
 	      switch (i)
 		{
 		case 0:
-		  return hermite_raw_shape(0, p(0));
+		  return FEHermite<1>::hermite_raw_shape(0, p(0));
 		case 1:
-		  return d1xd1x * hermite_raw_shape(2, p(0));
+		  return d1xd1x * FEHermite<1>::hermite_raw_shape(2, p(0));
 		case 2:
-		  return hermite_raw_shape(1, p(0));
+		  return FEHermite<1>::hermite_raw_shape(1, p(0));
 		case 3:
-                  return d2xd2x * hermite_raw_shape(3, p(0));
+                  return d2xd2x * FEHermite<1>::hermite_raw_shape(3, p(0));
 		default:
 		  error();
 		}
@@ -236,7 +237,7 @@ template <>
 Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
 				const Order order,
 				const unsigned int i,
-				const unsigned int j,
+				const unsigned int,
 				const Point& p)
 {
   assert (elem != NULL);
@@ -259,13 +260,13 @@ Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
 	      switch (i)
 		{
 		case 0:
-		  return hermite_raw_shape_deriv(0, p(0));
+		  return FEHermite<1>::hermite_raw_shape_deriv(0, p(0));
 		case 1:
-		  return d1xd1x * hermite_raw_shape_deriv(2, p(0));
+		  return d1xd1x * FEHermite<1>::hermite_raw_shape_deriv(2, p(0));
 		case 2:
-		  return hermite_raw_shape_deriv(1, p(0));
+		  return FEHermite<1>::hermite_raw_shape_deriv(1, p(0));
 		case 3:
-                  return d2xd2x * hermite_raw_shape_deriv(3, p(0));
+                  return d2xd2x * FEHermite<1>::hermite_raw_shape_deriv(3, p(0));
 		default:
 		  error();
 		}
@@ -291,7 +292,7 @@ template <>
 Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
                                        const Order order,
                                        const unsigned int i,
-                                       const unsigned int j,
+                                       const unsigned int,
                                        const Point& p)
 {
   assert (elem != NULL);
@@ -314,13 +315,13 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
 	      switch (i)
 		{
 		case 0:
-		  return hermite_raw_shape_second_deriv(0, p(0));
+		  return FEHermite<1>::hermite_raw_shape_second_deriv(0, p(0));
 		case 1:
-		  return d1xd1x * hermite_raw_shape_second_deriv(2, p(0));
+		  return d1xd1x * FEHermite<1>::hermite_raw_shape_second_deriv(2, p(0));
 		case 2:
-		  return hermite_raw_shape_second_deriv(1, p(0));
+		  return FEHermite<1>::hermite_raw_shape_second_deriv(1, p(0));
 		case 3:
-                  return d2xd2x * hermite_raw_shape_second_deriv(3, p(0));
+                  return d2xd2x * FEHermite<1>::hermite_raw_shape_second_deriv(3, p(0));
 		default:
 		  error();
 		}
