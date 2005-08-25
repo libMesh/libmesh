@@ -1,4 +1,4 @@
-// $Id: string_to_enum.C,v 1.4 2005-06-28 20:54:14 benkirk Exp $
+// $Id: string_to_enum.C,v 1.5 2005-08-25 19:15:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -217,6 +217,7 @@ namespace {
 	fefamily_to_enum["JACOBI_30_00"]=JACOBI_30_00;
 	fefamily_to_enum["LEGENDRE"    ]=LEGENDRE;
 	fefamily_to_enum["CLOUGH"      ]=CLOUGH;
+	fefamily_to_enum["HERMITE"      ]=HERMITE;
       }
     
   }
