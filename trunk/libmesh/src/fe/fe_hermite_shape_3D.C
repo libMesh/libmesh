@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_3D.C,v 1.1 2005-08-25 18:31:37 roystgnr Exp $
+// $Id: fe_hermite_shape_3D.C,v 1.2 2005-08-26 06:26:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -59,6 +59,9 @@ void hermite_compute_coefs(const Elem* elem)
 
   for (int p = 0; p != 2; ++p)
     {
+      dxdxi[0] = 0;
+      dydeta[0] = 0;
+      dzdzeta[0] = 0;
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
           const Real ddxi = FE<3,LAGRANGE>::shape_deriv 

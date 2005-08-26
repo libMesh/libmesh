@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_2D.C,v 1.1 2005-08-25 18:31:37 roystgnr Exp $
+// $Id: fe_hermite_shape_2D.C,v 1.2 2005-08-26 06:26:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,9 +31,9 @@
 namespace
 {
   static unsigned int old_elem_id = libMesh::invalid_uint;
-  // Coefficient naming: d1xd1x is the derivative of x with respect to
-  // xi at xi=0, d2xd2x is at xi=1, similarly for y/eta
-  static Real d1xd1x, d2xd2x, d1yd1y, d2yd2y;
+  // Mapping functions - derivatives at each dofpt
+  std::vector<Real> dxdxi(2), dydeta(2);
+
 
 
 // Compute the static coefficients for an element
@@ -55,11 +55,10 @@ void hermite_compute_coefs(const Elem* elem)
   dofpt.push_back(Point(1,0));
   dofpt.push_back(Point(0,1));
 
-  // Mapping functions - derivatives at each dofpt
-  std::vector<Real> dxdxi(2), dydeta(2);
-
   for (int p = 0; p != 2; ++p)
     {
+      dxdxi[p] = 0;
+      dydeta[p] = 0;
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
           const Real ddxi = FE<2,LAGRANGE>::shape_deriv 
@@ -72,11 +71,6 @@ void hermite_compute_coefs(const Elem* elem)
           dydeta[p] += elem->point(i)(1) * ddeta;
         }
     }
-
-  d1xd1x = dxdxi[0];
-  d2xd2x = dxdxi[1];
-  d1yd1y = dydeta[0];
-  d2yd2y = dydeta[1];
 }
 
 
@@ -125,60 +119,44 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 	    {
 	      assert (i<16);
 
-	      switch (i)
+              // Is node at maximum x/y plane?
+              unsigned int xmax, ymax, xbasis, ybasis;
+
+              switch (i/4) // Node number
 		{
-		case 0:
-		  return FEHermite<1>::hermite_raw_shape(0,p(0)) *
-                         FEHermite<1>::hermite_raw_shape(0,p(1));
-		case 1:
-		  return d1xd1x * FEHermite<1>::hermite_raw_shape(2,p(0)) *
-                         FEHermite<1>::hermite_raw_shape(0,p(1));
-		case 2:
-		  return FEHermite<1>::hermite_raw_shape(0,p(0)) *
-                         d1yd1y * FEHermite<1>::hermite_raw_shape(2,p(1));
-		case 3:
-		  return d1xd1x * FEHermite<1>::hermite_raw_shape(2,p(0)) *
-                         d1yd1y * FEHermite<1>::hermite_raw_shape(2,p(1));
-		case 4:
-		  return FEHermite<1>::hermite_raw_shape(1,p(0)) *
-                         FEHermite<1>::hermite_raw_shape(0,p(1));
-		case 5:
-		  return d2xd2x * FEHermite<1>::hermite_raw_shape(3,p(0)) *
-                         FEHermite<1>::hermite_raw_shape(0,p(1));
-		case 6:
-		  return FEHermite<1>::hermite_raw_shape(1,p(0)) *
-                         d1yd1y * FEHermite<1>::hermite_raw_shape(2,p(1));
-		case 7:
-		  return d2xd2x * FEHermite<1>::hermite_raw_shape(3,p(0)) *
-                         d1yd1y * FEHermite<1>::hermite_raw_shape(2,p(1));
-		case 8:
-		  return FEHermite<1>::hermite_raw_shape(1,p(0)) *
-                         FEHermite<1>::hermite_raw_shape(1,p(1));
-		case 9:
-		  return d2xd2x * FEHermite<1>::hermite_raw_shape(3,p(0)) *
-                         FEHermite<1>::hermite_raw_shape(1,p(1));
-		case 10:
-		  return FEHermite<1>::hermite_raw_shape(1,p(0)) *
-                         d2yd2y * FEHermite<1>::hermite_raw_shape(3,p(1));
-		case 11:
-		  return d2xd2x * FEHermite<1>::hermite_raw_shape(3,p(0)) *
-                         d2yd2y * FEHermite<1>::hermite_raw_shape(3,p(1));
-		case 12:
-		  return FEHermite<1>::hermite_raw_shape(0,p(0)) *
-                         FEHermite<1>::hermite_raw_shape(1,p(1));
-		case 13:
-		  return d1xd1x * FEHermite<1>::hermite_raw_shape(2,p(0)) *
-                         FEHermite<1>::hermite_raw_shape(1,p(1));
-		case 14:
-		  return FEHermite<1>::hermite_raw_shape(0,p(0)) *
-                         d2yd2y * FEHermite<1>::hermite_raw_shape(3,p(1));
-		case 15:
-		  return d1xd1x * FEHermite<1>::hermite_raw_shape(2,p(0)) *
-                         d2yd2y * FEHermite<1>::hermite_raw_shape(3,p(1));
-		  
-		default:
-		  error();
-		}
+                case 0:
+                  xmax = 0; ymax = 0; break;
+                case 1:
+                  xmax = 1; ymax = 0; break;
+                case 2:
+                  xmax = 1; ymax = 1; break;
+                case 3:
+                  xmax = 0; ymax = 1; break;
+                }
+
+              Real coef;
+              switch (i%4) // DoF type
+                {
+                case 0:
+                  xbasis = xmax; ybasis = ymax;
+                  coef = 1.0;
+                  break;
+                case 1:
+                  xbasis = 2+xmax; ybasis = ymax;
+                  coef = dxdxi[xmax];
+                  break;
+                case 2:
+                  xbasis = xmax; ybasis = 2+ymax;
+                  coef = dydeta[ymax];
+                  break;
+                case 3:
+                  xbasis = 2+xmax; ybasis = 2+ymax;
+                  coef = dxdxi[xmax]*dydeta[ymax];
+                  break;
+                }
+
+              return coef * FEHermite<1>::hermite_raw_shape(xbasis,p(0)) *
+                     FEHermite<1>::hermite_raw_shape(ybasis,p(1));
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
@@ -241,171 +219,53 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
 	    {
 	      assert (i<16);
 
-	      switch (i)
+              // Is node at maximum x/y plane?
+              unsigned int xmax, ymax, xbasis, ybasis;
+
+              switch (i/4) // Node number
 		{
-		case 0:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_deriv(0,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(0,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape(0,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(0,p(1));
-                    }
-		case 1:
-	          switch (j)
-		    {
-                  case 0:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape_deriv(2,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(0,p(1));
-                  case 1:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape(2,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(0,p(1));
-                    }
-		case 2:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_deriv(0,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape(2,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape(0,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape_deriv(2,p(1));
-                    }
-		case 3:
-	          switch (j)
-		    {
-                  case 0:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape_deriv(2,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape(2,p(1));
-                  case 1:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape(2,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape_deriv(2,p(1));
-                    }
-		case 4:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_deriv(1,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(0,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape(1,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(0,p(1));
-                    }
-		case 5:
-	          switch (j)
-		    {
-                  case 0:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape_deriv(3,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(0,p(1));
-                  case 1:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape(3,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(0,p(1));
-                    }
-		case 6:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_deriv(1,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape(2,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape(1,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape_deriv(2,p(1));
-                    }
-		case 7:
-	          switch (j)
-		    {
-                  case 0:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape_deriv(3,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape(2,p(1));
-                  case 1:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape(3,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape_deriv(2,p(1));
-                    }
-		case 8:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_deriv(1,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(1,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape(1,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(1,p(1));
-                    }
-		case 9:
-	          switch (j)
-		    {
-                  case 0:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape_deriv(3,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(1,p(1));
-                  case 1:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape(3,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(1,p(1));
-                    }
-		case 10:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_deriv(1,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape(3,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape(1,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape_deriv(3,p(1));
-                    }
-		case 11:
-	          switch (j)
-		    {
-                  case 0:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape_deriv(3,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape(3,p(1));
-                  case 1:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape(3,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape_deriv(3,p(1));
-                    }
-		case 12:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_deriv(0,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(1,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape(0,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(1,p(1));
-                    }
-		case 13:
-	          switch (j)
-		    {
-                  case 0:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape_deriv(2,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(1,p(1));
-                  case 1:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape(2,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(1,p(1));
-                    }
-		case 14:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_deriv(0,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape(3,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape(0,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape_deriv(3,p(1));
-                    }
-		case 15:
-	          switch (j)
-		    {
-                  case 0:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape_deriv(2,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape(3,p(1));
-                  case 1:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape(2,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape_deriv(3,p(1));
-                    }
-		default:
-		      error();
-		}
+                case 0:
+                  xmax = 0; ymax = 0; break;
+                case 1:
+                  xmax = 1; ymax = 0; break;
+                case 2:
+                  xmax = 1; ymax = 1; break;
+                case 3:
+                  xmax = 0; ymax = 1; break;
+                }
+
+              Real coef;
+              switch (i%4) // DoF type
+                {
+                case 0:
+                  xbasis = xmax; ybasis = ymax;
+                  coef = 1.0;
+                  break;
+                case 1:
+                  xbasis = 2+xmax; ybasis = ymax;
+                  coef = dxdxi[xmax];
+                  break;
+                case 2:
+                  xbasis = xmax; ybasis = 2+ymax;
+                  coef = dydeta[ymax];
+                  break;
+                case 3:
+                  xbasis = 2+xmax; ybasis = 2+ymax;
+                  coef = dxdxi[xmax]*dydeta[ymax];
+                  break;
+                }
+
+              switch (j)
+                {
+                case 0:
+                  return coef *
+                    FEHermite<1>::hermite_raw_shape_deriv(xbasis,p(0)) *
+                    FEHermite<1>::hermite_raw_shape(ybasis,p(1));
+                case 1:
+                  return coef *
+                    FEHermite<1>::hermite_raw_shape(xbasis,p(0)) *
+                    FEHermite<1>::hermite_raw_shape_deriv(ybasis,p(1));
+                }
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
@@ -451,219 +311,57 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
 	    {
 	      assert (i<16);
 
-	      switch (i)
+              // Is node at maximum x/y plane?
+              unsigned int xmax, ymax, xbasis, ybasis;
+
+              switch (i/4) // Node number
 		{
-		case 0:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_second_deriv(0,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(0,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape_deriv(0,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(0,p(1));
-                  case 2:
-		      return FEHermite<1>::hermite_raw_shape(0,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_second_deriv(0,p(1));
-                    }
-		case 1:
-	          switch (j)
-		    {
-                  case 0:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape_second_deriv(2,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(0,p(1));
-                  case 1:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape_deriv(2,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(0,p(1));
-                  case 2:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape(2,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_second_deriv(0,p(1));
-                    }
-		case 2:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_second_deriv(0,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape(2,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape_deriv(0,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape_deriv(2,p(1));
-                  case 2:
-		      return FEHermite<1>::hermite_raw_shape(0,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape_second_deriv(2,p(1));
-                    }
-		case 3:
-	          switch (j)
-		    {
-                  case 0:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape_second_deriv(2,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape(2,p(1));
-                  case 1:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape_deriv(2,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape_deriv(2,p(1));
-                  case 2:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape(2,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape_second_deriv(2,p(1));
-                    }
-		case 4:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_second_deriv(1,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(0,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape_deriv(1,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(0,p(1));
-                  case 2:
-		      return FEHermite<1>::hermite_raw_shape(1,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_second_deriv(0,p(1));
-                    }
-		case 5:
-	          switch (j)
-		    {
-                  case 0:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape_second_deriv(3,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(0,p(1));
-                  case 1:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape_deriv(3,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(0,p(1));
-                  case 2:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape(3,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_second_deriv(0,p(1));
-                    }
-		case 6:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_second_deriv(1,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape(2,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape_deriv(1,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape_deriv(2,p(1));
-                  case 2:
-		      return FEHermite<1>::hermite_raw_shape(1,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape_second_deriv(2,p(1));
-                    }
-		case 7:
-	          switch (j)
-		    {
-                  case 0:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape_second_deriv(3,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape(2,p(1));
-                  case 1:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape_deriv(3,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape_deriv(2,p(1));
-                  case 2:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape(3,p(0)) *
-                             d1yd1y * FEHermite<1>::hermite_raw_shape_second_deriv(2,p(1));
-                    }
-		case 8:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_second_deriv(1,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(1,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape_deriv(1,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(1,p(1));
-                  case 2:
-		      return FEHermite<1>::hermite_raw_shape(1,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_second_deriv(1,p(1));
-                    }
-		case 9:
-	          switch (j)
-		    {
-                  case 0:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape_second_deriv(3,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(1,p(1));
-                  case 1:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape_deriv(3,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(1,p(1));
-                  case 2:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape(3,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_second_deriv(1,p(1));
-                    }
-		case 10:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_second_deriv(1,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape(3,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape_deriv(1,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape_deriv(3,p(1));
-                  case 2:
-		      return FEHermite<1>::hermite_raw_shape(1,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape_second_deriv(3,p(1));
-                    }
-		case 11:
-	          switch (j)
-		    {
-                  case 0:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape_second_deriv(3,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape(3,p(1));
-                  case 1:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape_deriv(3,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape_deriv(3,p(1));
-                  case 2:
-		      return d2xd2x * FEHermite<1>::hermite_raw_shape(3,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape_second_deriv(3,p(1));
-                    }
-		case 12:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_second_deriv(0,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(1,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape_deriv(0,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(1,p(1));
-                  case 2:
-		      return FEHermite<1>::hermite_raw_shape(0,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_second_deriv(1,p(1));
-                    }
-		case 13:
-	          switch (j)
-		    {
-                  case 0:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape_second_deriv(2,p(0)) *
-                             FEHermite<1>::hermite_raw_shape(1,p(1));
-                  case 1:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape_deriv(2,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_deriv(1,p(1));
-                  case 2:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape(2,p(0)) *
-                             FEHermite<1>::hermite_raw_shape_second_deriv(1,p(1));
-                    }
-		case 14:
-	          switch (j)
-		    {
-                  case 0:
-		      return FEHermite<1>::hermite_raw_shape_second_deriv(0,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape(3,p(1));
-                  case 1:
-		      return FEHermite<1>::hermite_raw_shape_deriv(0,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape_deriv(3,p(1));
-                  case 2:
-		      return FEHermite<1>::hermite_raw_shape(0,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape_second_deriv(3,p(1));
-                    }
-		case 15:
-	          switch (j)
-		    {
-                  case 0:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape_second_deriv(2,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape(3,p(1));
-                  case 1:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape_deriv(2,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape_deriv(3,p(1));
-                  case 2:
-		      return d1xd1x * FEHermite<1>::hermite_raw_shape(2,p(0)) *
-                             d2yd2y * FEHermite<1>::hermite_raw_shape_second_deriv(3,p(1));
-                    }
-		default:
-		      error();
-		}
+                case 0:
+                  xmax = 0; ymax = 0; break;
+                case 1:
+                  xmax = 1; ymax = 0; break;
+                case 2:
+                  xmax = 1; ymax = 1; break;
+                case 3:
+                  xmax = 0; ymax = 1; break;
+                }
+
+              Real coef;
+              switch (i%4) // DoF type
+                {
+                case 0:
+                  xbasis = xmax; ybasis = ymax;
+                  coef = 1.0;
+                  break;
+                case 1:
+                  xbasis = 2+xmax; ybasis = ymax;
+                  coef = dxdxi[xmax];
+                  break;
+                case 2:
+                  xbasis = xmax; ybasis = 2+ymax;
+                  coef = dydeta[ymax];
+                  break;
+                case 3:
+                  xbasis = 2+xmax; ybasis = 2+ymax;
+                  coef = dxdxi[xmax]*dydeta[ymax];
+                  break;
+                }
+
+              switch (j)
+                {
+                case 0:
+                  return coef *
+                    FEHermite<1>::hermite_raw_shape_second_deriv(xbasis,p(0)) *
+                    FEHermite<1>::hermite_raw_shape(ybasis,p(1));
+                case 1:
+                  return coef *
+                    FEHermite<1>::hermite_raw_shape_deriv(xbasis,p(0)) *
+                    FEHermite<1>::hermite_raw_shape_deriv(ybasis,p(1));
+                case 2:
+                  return coef *
+                    FEHermite<1>::hermite_raw_shape(xbasis,p(0)) *
+                    FEHermite<1>::hermite_raw_shape_second_deriv(ybasis,p(1));
+                }
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
