@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_1D.C,v 1.2 2005-08-25 19:07:15 roystgnr Exp $
+// $Id: fe_hermite_shape_1D.C,v 1.3 2005-08-26 06:26:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -62,6 +62,7 @@ void hermite_compute_coefs(const Elem* elem)
 
   for (int p = 0; p != 2; ++p)
     {
+      dxdxi[p] = 0;
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
           const Real ddxi = FE<1,LAGRANGE>::shape_deriv 
@@ -87,13 +88,13 @@ Real FEHermite<1>::hermite_raw_shape_second_deriv
   switch (basis_num)
     {
       case 0:
-        return -6 + 12*xi;
+        return 1.5 * xi;
       case 1:
-        return 6 - 12*xi;
+        return -1.5 * xi;
       case 2:
-        return -4 + 6*xi;
+        return 0.5 * (-1. + 3.*xi);
       case 3:
-        return -2 + 6*xi;
+        return 0.5 * (1. + 3.*xi);
     }
 
   error();
@@ -109,13 +110,13 @@ Real FEHermite<1>::hermite_raw_shape_deriv
   switch (basis_num)
     {
       case 0:
-        return -6*xi + 6*xi*xi;
+        return 0.75 * (-1. + xi*xi);
       case 1:
-        return 6*xi - 6*xi*xi;
+        return 0.75 * (1. - xi*xi);
       case 2:
-        return 1 - 4*xi + 3*xi*xi;
+        return 0.25 * (-1. - 2.*xi + 3.*xi*xi);
       case 3:
-        return -2*xi + 3*xi*xi;
+        return 0.25 * (-1. + 2.*xi + 3.*xi*xi);
     }
 
   error();
@@ -129,13 +130,13 @@ Real FEHermite<1>::hermite_raw_shape
   switch (basis_num)
     {
       case 0:
-        return 1 - 3*xi*xi + 2*xi*xi*xi;
+        return 0.25 * (2. - 3.*xi + xi*xi*xi);
       case 1:
-        return 3*xi*xi - 2*xi*xi*xi;
+        return 0.25 * (2. + 3.*xi - xi*xi*xi);
       case 2:
-        return xi - 2*xi*xi + xi*xi*xi;
+        return 0.25 * (1. - xi - xi*xi + xi*xi*xi);
       case 3:
-        return -xi*xi + xi*xi*xi;
+        return 0.25 * (-1. - xi + xi*xi + xi*xi*xi);
     }
 
   error();
