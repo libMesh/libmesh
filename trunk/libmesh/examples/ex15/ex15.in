@@ -1,2 +1,19 @@
 # Maximum number of refinement steps
-max_r_steps = 3
+max_r_steps = 7
+
+# Maximum refinement level for an element.
+max_r_level = 7
+
+# Percentage of elements to refine at each step
+refine_percentage = 0.7
+
+# Percentage of elements to (attempt to) coarsen at each step
+coarsen_percentage = 0.0
+
+# Option to uniformly or adaptively refine.
+# If set equal to 1, uniform refinement is done.
+# If set equal to 0, adaptive refinement is done.
+uniform_refine = 0
+
+# Polynomial approximation type
+approx_type = CLOUGH
