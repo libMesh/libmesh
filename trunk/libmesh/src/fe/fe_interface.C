@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.36 2005-08-25 18:31:37 roystgnr Exp $
+// $Id: fe_interface.C,v 1.37 2005-08-26 13:21:32 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1281,9 +1281,12 @@ void FEInterface::inverse_map (const unsigned int dim,
 
   if ( is_InfFE_elem(elem->type()) )
     {
-      std::cerr << "ERROR: Not implemented!"
-		<< std::endl;
-      error();
+      ifem_inverse_map(dim, fe_t, elem, physical_points, reference_points);
+      return;
+
+//       std::cerr << "ERROR: Not implemented!"
+// 		<< std::endl;
+//       error();
     }
   
 #endif

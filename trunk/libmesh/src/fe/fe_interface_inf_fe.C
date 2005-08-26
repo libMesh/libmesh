@@ -1,4 +1,4 @@
-// $Id: fe_interface_inf_fe.C,v 1.11 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: fe_interface_inf_fe.C,v 1.12 2005-08-26 13:21:32 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -576,6 +576,72 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
   Point pt;
   return pt;
 }
+
+
+
+void FEInterface::ifem_inverse_map (const unsigned int dim,
+				    const FEType& fe_t,
+				    const Elem* elem,
+				    const std::vector<Point>& physical_points,
+				    std::vector<Point>&       reference_points)
+{
+  switch (dim)
+    {
+      // 1D
+    case 1:
+      {
+	switch (fe_t.inf_map)
+	  {
+	  case CARTESIAN:
+	    InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points);
+	    return;
+
+	  default:
+	    error();
+	  }
+      }
+
+      
+      // 2D
+    case 2:
+      {
+	switch (fe_t.inf_map)
+	  {
+	  case CARTESIAN:
+	   InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points);
+	   return;
+
+	  default:
+	    error();
+	  }
+
+      }
+
+      
+      // 3D
+    case 3:
+      {
+	switch (fe_t.inf_map)
+	  {
+	  case CARTESIAN:
+	   InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points);
+	   return;
+
+	  default:
+	    error();
+	  }
+
+      }
+
+
+    default:
+      error();
+    }
+
+  error();
+  return;
+}
+
 
 
 
