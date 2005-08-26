@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.8 2005-07-01 16:36:22 spetersen Exp $
+// $Id: fe_interface.h,v 1.9 2005-08-26 13:21:32 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -284,6 +284,13 @@ private:
 				 const Point& p,
 				 const Real tolerance,
 				 const bool secure = true);
+  
+  static void ifem_inverse_map (const unsigned int dim,
+				const FEType& fe_t,
+				const Elem* elem,
+				const std::vector<Point>& physical_points,
+				std::vector<Point>&       reference_points);
+    
 
   static bool ifem_on_reference_element(const Point& p,
 					const ElemType t,
