@@ -1,4 +1,4 @@
-/* $Id: ex15.C,v 1.5 2005-06-06 14:53:15 jwpeterson Exp $ */
+/* $Id: ex15.C,v 1.6 2005-08-26 20:22:08 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -40,15 +40,15 @@
 #include "equation_systems.h"
 #include "linear_implicit_system.h"
 #include "gmv_io.h"
-#include "tecplot_io.h"
 #include "fe.h"
-#include "quadrature_clough.h"
+#include "quadrature.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
 #include "sparse_matrix.h"
+#include "mesh_modification.h"
 #include "mesh_refinement.h"
 #include "error_vector.h"
-#include "kelly_error_estimator.h"
+#include "fourth_error_estimators.h"
 #include "getpot.h"
 #include "exact_solution.h"
 #include "dof_map.h"
@@ -111,14 +111,34 @@ int main(int argc, char** argv)
     GetPot input_file("ex15.in");
 
     // Read in parameters from the input file
-    const unsigned int max_r_steps = input_file("max_r_steps", 3);
+    const unsigned int max_r_level = input_file("max_r_level", 10);
+    const unsigned int max_r_steps = input_file("max_r_steps", 4);
+    const std::string approx_type = input_file("approx_type",
+                                               "CLOUGH");
+    const unsigned int uniform_refine =
+		    input_file("uniform_refine", 0);
+    const Real refine_percentage =
+		    input_file("refine_percentage", 0.5);
+    const Real coarsen_percentage =
+		    input_file("coarsen_percentage", 0.5);
 
     std::cerr.setf(std::ios::scientific);
     std::cerr.precision(3);
     
     // Output file for plotting the error 
-    std::string output_file = "clough_uniform.m";
-    
+    std::string output_file = "";
+    if (approx_type == "HERMITE")
+      output_file += "hermite_";
+    else if (approx_type == "SECOND")
+      output_file += "reducedclough_";
+    else
+      output_file += "clough_";
+
+    if (uniform_refine == 0)
+      output_file += "adaptive.m";
+    else
+      output_file += "uniform.m";
+
     std::ofstream out (output_file.c_str());
     out << "% dofs     L2-error     H1-error" << std::endl;
     out << "e = [" << std::endl;
@@ -126,9 +146,13 @@ int main(int argc, char** argv)
     // Read in the mesh
     mesh.read("domain.xda");
 
+    // Convert it to triangles if necessary
+    if (approx_type != "HERMITE")
+      MeshTools::Modification::all_tri(mesh);
+
     // Mesh Refinement object
     MeshRefinement mesh_refinement(mesh);
-    
+
     // Create an equation systems object.
     EquationSystems equation_systems (mesh);
 
@@ -139,8 +163,14 @@ int main(int argc, char** argv)
 	equation_systems.add_system<LinearImplicitSystem> ("Biharmonic");
 
       // Adds the variable "u" to "Biharmonic".  "u"
-      // will be approximated using Clough-Tocher cubic C1 triangles
-      system.add_variable("u", THIRD, CLOUGH);
+      // will be approximated using Hermite tensor product squares
+      // or (possibly reduced) cubic Clough-Tocher triangles
+      if (approx_type == "HERMITE")
+        system.add_variable("u", THIRD, HERMITE);
+      else if (approx_type == "SECOND")
+        system.add_variable("u", SECOND, CLOUGH);
+      else if (approx_type == "CLOUGH")
+        system.add_variable("u", THIRD, CLOUGH);
       
       // Give the system a pointer to the matrix assembly
       // function.
@@ -152,11 +182,11 @@ int main(int argc, char** argv)
 
       // Set linear solver max iterations
       equation_systems.parameters.set<unsigned int>
-		      ("linear solver maximum iterations") = 1000;
+		      ("linear solver maximum iterations") = 10000;
 
       // Linear solver tolerance.
       equation_systems.parameters.set<Real>
-		      ("linear solver tolerance") = 1.e-13;
+		      ("linear solver tolerance") = 1.e-12;
       
       // Prints information about the system to the screen.
       equation_systems.print_info();
@@ -180,7 +210,7 @@ int main(int argc, char** argv)
 	system.solve();
 
 	std::cout << "System has: " << equation_systems.n_active_dofs()
-		  << " degrees of freedom."
+		  << " active degrees of freedom."
 		  << std::endl;
 	
 	std::cout << "Linear solver converged at step: "
@@ -188,7 +218,7 @@ int main(int argc, char** argv)
 		  << ", final residual: "
 		  << system.final_linear_residual()
 		  << std::endl;
-	
+
 	// Compute the error.
 	exact_sol.compute_error("Biharmonic", "u");
 
@@ -211,7 +241,28 @@ int main(int argc, char** argv)
 	  {
 	    std::cout << "  Refining the mesh..." << std::endl;
 
-            mesh_refinement.uniformly_refine(1);
+	    if (uniform_refine == 0)
+	      {
+		ErrorVector error;
+		LaplacianErrorEstimator error_estimator;
+
+		error_estimator.estimate_error(system, error);
+                mesh_refinement.flag_elements_by_error_fraction
+				(error, refine_percentage,
+				 coarsen_percentage, max_r_level);
+
+		std::cerr << "Mean Error: " << error.mean() <<
+				std::endl;
+		std::cerr << "Error Variance: " << error.variance() <<
+				std::endl;
+
+		mesh_refinement.refine_and_coarsen_elements();
+              }
+	    else
+	      {
+                mesh_refinement.uniformly_refine(1);
+              }
+		
 	    
 	    // This call reinitializes the \p EquationSystems object for
 	    // the newly refined mesh.  One of the steps in the
@@ -265,7 +316,7 @@ Number exact_solution(const Point& p,
   const Real x = p(0);
   const Real y = p(1);
   
-  return sin(x*y);
+  return (x-x*x)*(x-x*x)*(y-y*y)*(y-y*y);
 }
 
 
@@ -274,8 +325,8 @@ Number forcing_function(const Point& p)
   const Real x = p(0);
   const Real y = p(1);
 
-  return (x*x + y*y) * (x*x + y*y) * sin(x*y) -
-		  8*x*y*cos(x*y) - 4*sin(x*y);
+  return 8 * (3*((y-y*y)*(y-y*y)+(x-x*x)*(x-x*x))
+              + (1-6*x+6*x*x)*(1-6*y+6*y*y));
 }
 
 
@@ -294,8 +345,10 @@ Gradient exact_derivative(const Point& p,
   const Real x = p(0);
   const Real y = p(1);
 
-  gradu(0) = y * cos(x*y);
-  gradu(1) = x * cos(x*y);
+//  gradu(0) = y * cos(x*y);
+//  gradu(1) = x * cos(x*y);
+  gradu(0) = 2*(x-x*x)*(1-2*x)*(y-y*y)*(y-y*y);
+  gradu(1) = 2*(x-x*x)*(x-x*x)*(y-y*y)*(1-2*y);
 
   return gradu;
 }
@@ -350,13 +403,13 @@ void assemble_biharmonic(EquationSystems& es,
   // of as a pointer that will clean up after itself.
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
   
-  // A 7th order Clough quadrature rule for numerical integration.
+  // Quadrature rule for numerical integration.
   // With 2D triangles, the Clough quadrature rule puts a Gaussian
   // quadrature rule on each of the 3 subelements
-  QClough qrule (dim, SEVENTH);
+  AutoPtr<QBase> qrule(fe_type.default_quadrature_rule(dim));
 
   // Tell the finite element object to use our quadrature rule.
-  fe->attach_quadrature_rule (&qrule);
+  fe->attach_quadrature_rule (qrule.get());
 
   // Declare a special finite element object for
   // boundary integration.
@@ -366,11 +419,11 @@ void assemble_biharmonic(EquationSystems& es,
   // with dimensionality one less than the dimensionality
   // of the element.
   // In 1D, the Clough and Gauss quadrature rules are identical.
-  QClough qface(dim-1, SIXTH);
-  
+  AutoPtr<QBase> qface(fe_type.default_quadrature_rule(dim-1));
+
   // Tell the finte element object to use our
   // quadrature rule.
-  fe_face->attach_quadrature_rule (&qface);
+  fe_face->attach_quadrature_rule (qface.get());
 
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
@@ -456,12 +509,11 @@ void assemble_biharmonic(EquationSystems& es,
       // Now start logging the element matrix computation
       perf_log.start_event ("Ke");
 
-      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+      for (unsigned int qp=0; qp<qrule->n_points(); qp++)
 	for (unsigned int i=0; i<phi.size(); i++)
 	  for (unsigned int j=0; j<phi.size(); j++)
 	    Ke(i,j) += JxW[qp]*(d2phi[i][qp](0,0)+d2phi[i][qp](1,1))
 			    *(d2phi[j][qp](0,0)+d2phi[j][qp](1,1));
-	    
 
       // Stop logging the matrix computation
       perf_log.stop_event ("Ke");
@@ -515,7 +567,7 @@ void assemble_biharmonic(EquationSystems& es,
               fe_face->reinit(elem, s);
                                                                                 
               // Loop over the face quagrature points for integration.
-              for (unsigned int qp=0; qp<qface.n_points(); qp++)
+              for (unsigned int qp=0; qp<qface->n_points(); qp++)
                 {
                   // The boundary value.
 		  const Number value = exact_solution(qface_point[qp],
@@ -556,7 +608,7 @@ void assemble_biharmonic(EquationSystems& es,
 	perf_log.stop_event ("BCs");
       } 
 
-      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+      for (unsigned int qp=0; qp<qrule->n_points(); qp++)
 	for (unsigned int i=0; i<phi.size(); i++)
 	  Fe(i) += JxW[qp]*phi[i][qp]*forcing_function(q_point[qp]);
 	    
