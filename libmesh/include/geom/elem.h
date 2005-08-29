@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.27 2005-08-22 18:57:31 knezed01 Exp $
+// $Id: elem.h,v 1.28 2005-08-29 20:43:00 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -674,6 +674,20 @@ public:
   static AutoPtr<Elem> build (const ElemType type,
 			      const Elem* p=NULL);
 
+#ifdef ENABLE_AMR
+  
+  /**
+   * Matrix that transforms the parents nodes into the children's
+   * nodes
+   */
+  virtual float embedding_matrix (const unsigned int i,
+				  const unsigned int j,
+				  const unsigned int k) const = 0;
+
+#endif
+  
+
+
  protected:
 
   //-------------------------------------------------------
@@ -715,18 +729,6 @@ public:
    * element.
    */
   void nullify_neighbors ();
-  
-#ifdef ENABLE_AMR
-  
-  /**
-   * Matrix that transforms the parents nodes into the children's
-   * nodes
-   */
-  virtual float embedding_matrix (const unsigned int i,
-				  const unsigned int j,
-				  const unsigned int k) const = 0;
-
-#endif
   
   /**
    * Pointers to the nodes we are conneted to.
