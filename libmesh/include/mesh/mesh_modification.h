@@ -1,4 +1,4 @@
-// $Id: mesh_modification.h,v 1.5 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: mesh_modification.h,v 1.6 2005-08-29 21:46:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.5 $
+   * \version $Revision: 1.6 $
    */  
   namespace Modification
   {
@@ -99,6 +99,11 @@ namespace MeshTools
      * have been refined previously.
      */
     void all_tri (MeshBase& mesh);
+
+    /**
+     * Smooth a mesh.
+     */ 
+    void smooth(MeshBase&, unsigned int, Real);
     
   } // end namespace Meshtools::Modification
 } // end namespace MeshTools
