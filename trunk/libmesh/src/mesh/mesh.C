@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.66 2005-08-19 20:20:36 knezed01 Exp $
+// $Id: mesh.C,v 1.67 2005-08-29 21:46:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,7 @@
 
 
 // C++ includes
+#include <fstream>
 
 // Local includes
 #include "mesh.h"
@@ -593,6 +594,22 @@ void Mesh::renumber_nodes_and_elements ()
 void Mesh::read (const std::string& name,
 		 MeshData* mesh_data)
 {
+  // See if the file exists.  Perform this check on all processors
+  // so that the code is terminated properly in the case that the
+  // file does not exist.
+  {
+    std::ifstream in (name.c_str());
+    
+    if (!in.good())
+      {
+	std::cerr << "ERROR: cannot locate specified file:\n\t"
+		  << name
+		  << std::endl;
+	error();
+      }
+  }
+
+  
   START_LOG("read()", "Mesh");
   
   // Set the read_xd_file flag on all processors.
