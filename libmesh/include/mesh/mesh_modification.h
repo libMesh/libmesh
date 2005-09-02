@@ -1,4 +1,4 @@
-// $Id: mesh_modification.h,v 1.6 2005-08-29 21:46:11 benkirk Exp $
+// $Id: mesh_modification.h,v 1.7 2005-09-02 13:40:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.6 $
+   * \version $Revision: 1.7 $
    */  
   namespace Modification
   {
@@ -101,7 +101,16 @@ namespace MeshTools
     void all_tri (MeshBase& mesh);
 
     /**
-     * Smooth a mesh.
+     * Smooth the mesh with a simple Laplace smoothing algorithm.  The mesh is
+     * smoothed \p n_iterations times.  If the parameter \p power is 0, each
+     * node is moved to the average postition of the neighboring connected
+     * nodes. If \p power > 0, the node positions are weighted by their
+     * distance.  The positions of higher order nodes, and nodes living in
+     * refined elements, are calculated from the vertex positions of their
+     * parent nodes.
+     *
+     * \author Martin Lüthi
+     * \date 2005
      */ 
     void smooth(MeshBase&, unsigned int, Real);
     

@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.25 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.26 2005-09-02 13:40:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -170,7 +170,7 @@ namespace
       
 	// TET10
 	{
-	  eledef.label = "tet10 10";
+	  eledef.label = "ptet10 10";
 	  const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,9};
 	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
 	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
