@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_2D.C,v 1.2 2005-08-26 06:26:29 roystgnr Exp $
+// $Id: fe_hermite_shape_2D.C,v 1.3 2005-09-02 18:48:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,10 @@ namespace
 {
   static unsigned int old_elem_id = libMesh::invalid_uint;
   // Mapping functions - derivatives at each dofpt
-  std::vector<Real> dxdxi(2), dydeta(2);
+  std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
+#ifdef DEBUG
+  std::vector<Real> dxdeta(2), dydxi(2);
+#endif
 
 
 
@@ -52,13 +55,17 @@ void hermite_compute_coefs(const Elem* elem)
 				      mapping_order);
 
   std::vector<Point> dofpt;
-  dofpt.push_back(Point(1,0));
-  dofpt.push_back(Point(0,1));
+  dofpt.push_back(Point(-1,-1));
+  dofpt.push_back(Point(1,1));
 
   for (int p = 0; p != 2; ++p)
     {
-      dxdxi[p] = 0;
-      dydeta[p] = 0;
+      dxdxi[0][p] = 0;
+      dxdxi[1][p] = 0;
+#ifdef DEBUG
+      dxdeta[p] = 0;
+      dydxi[p] = 0;
+#endif
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
           const Real ddxi = FE<2,LAGRANGE>::shape_deriv 
@@ -66,10 +73,22 @@ void hermite_compute_coefs(const Elem* elem)
           const Real ddeta = FE<2,LAGRANGE>::shape_deriv 
             (mapping_elem_type, mapping_order, i, 1, dofpt[p]);
 
+          dxdxi[0][p] += elem->point(i)(0) * ddxi;
+          dxdxi[1][p] += elem->point(i)(1) * ddeta;
 // dxdeta and dydxi should be 0!
-          dxdxi[p] += elem->point(i)(0) * ddxi;
-          dydeta[p] += elem->point(i)(1) * ddeta;
+#ifdef DEBUG
+          dxdeta[p] += elem->point(i)(0) * ddeta;
+          dydxi[p] += elem->point(i)(1) * ddxi;
+#endif
         }
+      // No singular elements!
+      assert(dxdxi[0][p]);
+      assert(dxdxi[1][p]);
+      // No non-rectilinear or non-axis-aligned elements!
+#ifdef DEBUG
+      assert(std::abs(dxdeta[p]) < 1e-9);
+      assert(std::abs(dydxi[p]) < 1e-9);
+#endif
     }
 }
 
@@ -119,44 +138,12 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 	    {
 	      assert (i<16);
 
-              // Is node at maximum x/y plane?
-              unsigned int xmax, ymax, xbasis, ybasis;
+              std::vector<unsigned int> bases1D;
 
-              switch (i/4) // Node number
-		{
-                case 0:
-                  xmax = 0; ymax = 0; break;
-                case 1:
-                  xmax = 1; ymax = 0; break;
-                case 2:
-                  xmax = 1; ymax = 1; break;
-                case 3:
-                  xmax = 0; ymax = 1; break;
-                }
+              Real coef = FEHermite<1>::hermite_bases(bases1D, dxdxi, i, 2);
 
-              Real coef;
-              switch (i%4) // DoF type
-                {
-                case 0:
-                  xbasis = xmax; ybasis = ymax;
-                  coef = 1.0;
-                  break;
-                case 1:
-                  xbasis = 2+xmax; ybasis = ymax;
-                  coef = dxdxi[xmax];
-                  break;
-                case 2:
-                  xbasis = xmax; ybasis = 2+ymax;
-                  coef = dydeta[ymax];
-                  break;
-                case 3:
-                  xbasis = 2+xmax; ybasis = 2+ymax;
-                  coef = dxdxi[xmax]*dydeta[ymax];
-                  break;
-                }
-
-              return coef * FEHermite<1>::hermite_raw_shape(xbasis,p(0)) *
-                     FEHermite<1>::hermite_raw_shape(ybasis,p(1));
+              return coef * FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
+                     FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
@@ -219,52 +206,20 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
 	    {
 	      assert (i<16);
 
-              // Is node at maximum x/y plane?
-              unsigned int xmax, ymax, xbasis, ybasis;
+              std::vector<unsigned int> bases1D;
 
-              switch (i/4) // Node number
-		{
-                case 0:
-                  xmax = 0; ymax = 0; break;
-                case 1:
-                  xmax = 1; ymax = 0; break;
-                case 2:
-                  xmax = 1; ymax = 1; break;
-                case 3:
-                  xmax = 0; ymax = 1; break;
-                }
-
-              Real coef;
-              switch (i%4) // DoF type
-                {
-                case 0:
-                  xbasis = xmax; ybasis = ymax;
-                  coef = 1.0;
-                  break;
-                case 1:
-                  xbasis = 2+xmax; ybasis = ymax;
-                  coef = dxdxi[xmax];
-                  break;
-                case 2:
-                  xbasis = xmax; ybasis = 2+ymax;
-                  coef = dydeta[ymax];
-                  break;
-                case 3:
-                  xbasis = 2+xmax; ybasis = 2+ymax;
-                  coef = dxdxi[xmax]*dydeta[ymax];
-                  break;
-                }
+              Real coef = FEHermite<1>::hermite_bases(bases1D, dxdxi, i, 2);
 
               switch (j)
                 {
                 case 0:
                   return coef *
-                    FEHermite<1>::hermite_raw_shape_deriv(xbasis,p(0)) *
-                    FEHermite<1>::hermite_raw_shape(ybasis,p(1));
+                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
+                    FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
                 case 1:
                   return coef *
-                    FEHermite<1>::hermite_raw_shape(xbasis,p(0)) *
-                    FEHermite<1>::hermite_raw_shape_deriv(ybasis,p(1));
+                    FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
+                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1));
                 }
 	    }
 	  default:
@@ -311,56 +266,24 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
 	    {
 	      assert (i<16);
 
-              // Is node at maximum x/y plane?
-              unsigned int xmax, ymax, xbasis, ybasis;
+              std::vector<unsigned int> bases1D;
 
-              switch (i/4) // Node number
-		{
-                case 0:
-                  xmax = 0; ymax = 0; break;
-                case 1:
-                  xmax = 1; ymax = 0; break;
-                case 2:
-                  xmax = 1; ymax = 1; break;
-                case 3:
-                  xmax = 0; ymax = 1; break;
-                }
-
-              Real coef;
-              switch (i%4) // DoF type
-                {
-                case 0:
-                  xbasis = xmax; ybasis = ymax;
-                  coef = 1.0;
-                  break;
-                case 1:
-                  xbasis = 2+xmax; ybasis = ymax;
-                  coef = dxdxi[xmax];
-                  break;
-                case 2:
-                  xbasis = xmax; ybasis = 2+ymax;
-                  coef = dydeta[ymax];
-                  break;
-                case 3:
-                  xbasis = 2+xmax; ybasis = 2+ymax;
-                  coef = dxdxi[xmax]*dydeta[ymax];
-                  break;
-                }
+              Real coef = FEHermite<1>::hermite_bases(bases1D, dxdxi, i, 2);
 
               switch (j)
                 {
                 case 0:
                   return coef *
-                    FEHermite<1>::hermite_raw_shape_second_deriv(xbasis,p(0)) *
-                    FEHermite<1>::hermite_raw_shape(ybasis,p(1));
+                    FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[0],p(0)) *
+                    FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
                 case 1:
                   return coef *
-                    FEHermite<1>::hermite_raw_shape_deriv(xbasis,p(0)) *
-                    FEHermite<1>::hermite_raw_shape_deriv(ybasis,p(1));
+                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
+                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1));
                 case 2:
                   return coef *
-                    FEHermite<1>::hermite_raw_shape(xbasis,p(0)) *
-                    FEHermite<1>::hermite_raw_shape_second_deriv(ybasis,p(1));
+                    FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
+                    FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[1],p(1));
                 }
 	    }
 	  default:

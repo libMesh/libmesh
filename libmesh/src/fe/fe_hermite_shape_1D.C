@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_1D.C,v 1.3 2005-08-26 06:26:27 roystgnr Exp $
+// $Id: fe_hermite_shape_1D.C,v 1.4 2005-09-02 18:48:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -141,6 +141,76 @@ Real FEHermite<1>::hermite_raw_shape
 
   error();
   return 0.;
+}
+
+
+template<>
+Real FEHermite<1>::hermite_bases
+ (std::vector<unsigned int> &bases1D,
+  const std::vector<std::vector<Real> > &dxdxi,
+  unsigned int index,
+  unsigned int dim)
+{
+  unsigned int pow2[4] = {1, 2, 4, 8};
+  assert (dim < 4);
+
+  bases1D.clear();
+  bases1D.resize(dim,0);
+
+  switch (index/pow2[dim]) // Node number
+    {
+    case 0:
+      break;
+    case 1:
+      bases1D[0] = 1; break;
+    case 2:
+      bases1D[0] = 1; bases1D[1] = 1; break;
+    case 3:
+      bases1D[1] = 1; break;
+    case 4:
+      bases1D[2] = 1; break;
+    case 5:
+      bases1D[0] = 1; bases1D[2] = 1; break;
+    case 6:
+      bases1D[0] = 1; bases1D[1] = 1; bases1D[2] = 1; break;
+    case 7:
+      bases1D[1] = 1; bases1D[2] = 1; break;
+    default:
+      error();
+    }
+
+  Real coef;
+  switch (index%pow2[dim]) // DoF type
+    {
+    case 0: // DoF = value at node
+      coef = 1.0;
+      break;
+    case 1: // DoF = x derivative at node
+      coef = dxdxi[0][bases1D[0]];
+      bases1D[0] += 2; break;
+    case 2: // DoF = y derivative at node
+      coef = dxdxi[1][bases1D[1]];
+      bases1D[1] += 2; break;
+    case 3: // DoF = xy derivative at node
+      coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]];
+      bases1D[0] += 2; bases1D[1] += 2; break;
+    case 4: // DoF = z derivative at node
+      coef = dxdxi[2][bases1D[2]];
+      bases1D[2] += 2; break;
+    case 5: // DoF = xz derivative at node
+      coef = dxdxi[0][bases1D[0]] * dxdxi[2][bases1D[2]];
+      bases1D[0] += 2; bases1D[2] += 2; break;
+    case 6: // DoF = yz derivative at node
+      coef = dxdxi[1][bases1D[1]] * dxdxi[2][bases1D[2]];
+      bases1D[1] += 2; bases1D[2] += 2; break;
+    case 7: // DoF = xyz derivative at node
+      coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]] * dxdxi[2][bases1D[2]];
+      bases1D[0] += 2; bases1D[1] += 2; bases1D[2] += 2; break;
+    }
+
+  // No singular elements
+  assert(coef);
+  return coef;
 }
 
   
