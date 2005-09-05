@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.93 2005-07-18 15:45:47 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.94 2005-09-05 21:27:41 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -103,10 +103,14 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
       else
   
         dnl Intel's ICC C++ compiler?
-        is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
+        is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
         if test "x$is_intel_icc" != "x" ; then
           GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
           case "$GXX_VERSION_STRING" in
+            *9.0*)
+              AC_MSG_RESULT(<<< C++ compiler is Intel ICC 9.0 >>>)
+  	      GXX_VERSION=intel_icc_v9.0
+              ;;
             *8.1*)
               AC_MSG_RESULT(<<< C++ compiler is Intel ICC 8.1 >>>)
   	      GXX_VERSION=intel_icc_v8.1
@@ -395,7 +399,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
         dnl Specific flags for specific versions
         case "$GXX_VERSION" in
           dnl Intel ICC >= 8.1	
-          intel_icc_v8.1)	
+          intel_icc_v8.1 | intel_icc_v9.0)	
               dnl Disable some warning messages:
               dnl #266: 'function declared implicitly'
               dnl       Metis function "GKfree" caused this error
