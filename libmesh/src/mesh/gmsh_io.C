@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.14 2005-06-20 17:24:34 benkirk Exp $
+// $Id: gmsh_io.C,v 1.15 2005-09-05 22:48:16 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -166,8 +166,7 @@ namespace
           eledef.nnodes  = 8;
 	  eledef.exptype = 100;
 	  const unsigned int nodes[] = {1,2,3,4,5,6,7,8};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+	  std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
 	  eletypes_exp[QUAD8] = eledef;
           eletypes_imp[10]    = eledef;
@@ -205,8 +204,7 @@ namespace
           eledef.nnodes  = 20;
 	  eledef.exptype = 101;
 	  const unsigned int nodes[] = {1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15,16};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+	  std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
 	  eletypes_exp[HEX20] = eledef;
           eletypes_imp[12]    = eledef;
@@ -218,15 +216,11 @@ namespace
           eledef.dim     = 3;
           eledef.nnodes  = 27;
 	  eledef.exptype = 12;
-          // export
-          const unsigned int nodes_exp[] = {0,1,2,3,4,5,6,7,8,11,12,9,13,10,14,15,16,19,17,18,20,21,24,22,23,25,26};
-          unsigned int nnodes = sizeof(nodes_exp)/sizeof(nodes_exp[0]);
-	  std::vector<unsigned int>(nodes_exp, nodes_exp+nnodes).swap(eledef.nodes);
-	  eletypes_exp[HEX27] = eledef;
+          const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,11,12,9,13,10,14,
+                                        15,16,19,17,18,20,21,24,22,23,25,26};
+	  std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
-          // import 
-          const unsigned int nodes_imp[] = {1,2,3,4,5,6,7,8,9,12,14,10,11,13,15,16,17,19,20,18,21,22,24,25,23,26,27};
-          std::vector<unsigned int>(nodes_imp, nodes_imp+nnodes).swap(eledef.nodes);
+	  eletypes_exp[HEX27] = eledef;
           eletypes_imp[12]    = eledef;
 	}
       
@@ -248,15 +242,9 @@ namespace
           eledef.dim     = 3;
           eledef.nnodes  = 10;
 	  eledef.exptype = 11;
-          // export
-          const unsigned int nodes_exp[] = {0,1,2,3,4,5,6,7,9,8};
-          unsigned int nnodes = sizeof(nodes_exp)/sizeof(nodes_exp[0]);
-	  std::vector<unsigned int>(nodes_exp, nodes_exp+nnodes).swap(eledef.nodes);
+          const unsigned int nodes[] = {0,1,2,3,4,5,6,7,9,8};
+	  std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 	  eletypes_exp[TET10] = eledef;
-
-          // import 
-          const unsigned int nodes_imp[] = {1,2,3,4,5,6,7,8,10,9};
-          std::vector<unsigned int>(nodes_imp, nodes_imp+nnodes).swap(eledef.nodes);
           eletypes_imp[11]    = eledef;
 	}
       
@@ -291,15 +279,11 @@ namespace
           eledef.dim     = 3;
           eledef.nnodes  = 18;
 	  eledef.exptype = 13;
-          // export
-          const unsigned int nodes_exp[] = {0,1,2,3,4,5,6,8,9,7,10,11,12,14,13,15,17,16};
-          unsigned int nnodes = sizeof(nodes_exp)/sizeof(nodes_exp[0]);
-	  std::vector<unsigned int>(nodes_exp, nodes_exp+nnodes).swap(eledef.nodes);
-	  eletypes_exp[PRISM18] = eledef;
+          const unsigned int nodes[] = {0,1,2,3,4,5,6,8,9,7,10,11,
+                                        12,14,13,15,17,16};
+	  std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
-          // import 
-          const unsigned int nodes_imp[] = {1,2,3,4,5,6,7,10,8,9,11,12,13,15,14,16,18,17};
-          std::vector<unsigned int>(nodes_imp, nodes_imp+nnodes).swap(eledef.nodes);
+	  eletypes_exp[PRISM18] = eledef;
           eletypes_imp[13]      = eledef;
 	}
 
@@ -421,16 +405,18 @@ void GmshIO::read_mesh(std::istream& in)
           // read the elements
           for (unsigned int iel=0; iel<numElem; ++iel)      
             {
-              unsigned int id, type, physical, elementary, partition = 1, numNodes, numTags;
+              unsigned int id, type, physical, elementary,
+                partition = 1, nnodes, ntags;
+
               if(version <= 1.0)
                 {
-                  in >> id >> type >> physical >> elementary >> numNodes;
+                  in >> id >> type >> physical >> elementary >> nnodes;
                 }
               else
                 {
-                  in >> id >> type >> numTags;
+                  in >> id >> type >> ntags;
                   elementary = physical = partition = 1;
-                  for(unsigned int j = 0; j < numTags; j++)
+                  for(unsigned int j = 0; j < ntags; j++)
                     {
                       int tag;
                       in >> tag;
@@ -446,7 +432,7 @@ void GmshIO::read_mesh(std::istream& in)
 
               // consult the import element table which element to build
               const elementDefinition& eletype = eletypes_imp[type];
-              numNodes = eletype.nnodes;
+              nnodes = eletype.nnodes;
 
               // only elements that match the mesh dimension are added
               // if the element dimension is one less than dim, the nodes and
@@ -459,14 +445,14 @@ void GmshIO::read_mesh(std::istream& in)
                   // check number of nodes. We cannot do that for version 2.0
                   if (version <= 1.0) 
                     {
-                      if (elem->n_nodes() != numNodes)
+                      if (elem->n_nodes() != nnodes)
                         {
                           std::cerr << "Number of nodes for element " << id
                                     << " of type " << eletypes_imp[type].type
                                     << " (Gmsh type " << type  
                                     << ") does not match Libmesh definition. "
                                     << "I expected " << elem->n_nodes()
-                                    << " nodes, but got " << numNodes << "\n";
+                                    << " nodes, but got " << nnodes << "\n";
                           error();
                         }
                     }
@@ -475,14 +461,14 @@ void GmshIO::read_mesh(std::istream& in)
                   int nod = 0;
                   // if there is a node translation table, use it
                   if (eletype.nodes.size() > 0)
-                    for (unsigned int i=0; i<numNodes; i++)
+                    for (unsigned int i=0; i<nnodes; i++)
                       {
                         in >> nod;
-                        elem->set_node(i) = mesh.node_ptr(nodetrans[eletype.nodes[nod]]);
+                        elem->set_node(eletype.nodes[i]) = mesh.node_ptr(nodetrans[nod]);
                       }
                   else
                     {
-                      for (unsigned int i=0; i<numNodes; i++)
+                      for (unsigned int i=0; i<nnodes; i++)
                         {
                           in >> nod;
                           elem->set_node(i) = mesh.node_ptr(nodetrans[nod]);
@@ -499,7 +485,7 @@ void GmshIO::read_mesh(std::istream& in)
                   boundaryElementInfo binfo;
                   std::set<unsigned int>::iterator iter = binfo.nodes.begin();
                   int nod = 0;
-                  for (unsigned int i=0; i<numNodes; i++)
+                  for (unsigned int i=0; i<nnodes; i++)
                     {
                       in >> nod;
                       mesh.boundary_info->add_node(nodetrans[nod], physical);
@@ -515,7 +501,7 @@ void GmshIO::read_mesh(std::istream& in)
               else
                 {
                   int nod = 0;
-                  for (unsigned int i=0; i<numNodes; i++)
+                  for (unsigned int i=0; i<nnodes; i++)
                     in >> nod;
                 }
             }//element loop
@@ -583,7 +569,7 @@ void GmshIO::read_mesh(std::istream& in)
             } // if boundary_elem.size() > 0
         } // if $ELM
 
-    } // while !eof()
+    } // while !in.eof()
 
   }
 
@@ -652,7 +638,7 @@ void GmshIO::write_mesh (std::ostream& out)
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
     
-    // the element number
+    // loop over the elements
     for ( ; it != end; ++it)
       {
         const Elem* elem = *it;
@@ -661,12 +647,12 @@ void GmshIO::write_mesh (std::ostream& out)
 	// the current element type.
 	assert (eletypes_exp.count(elem->type()));
 
-        // consult the import element table 
+        // consult the export element table 
         const elementDefinition& eletype = eletypes_exp[elem->type()];
 
 	// The element mapper better not require any more nodes
 	// than are present in the current element!
-	assert (eletype.nodes.size() <= elem->n_nodes());
+        assert (eletype.nodes.size() <= elem->n_nodes());
 	
         // elements ids are 1 based in Gmsh
         out << elem->id()+1 << " ";
@@ -684,7 +670,7 @@ void GmshIO::write_mesh (std::ostream& out)
         // if there is a node translation table, use it
         if (eletype.nodes.size() > 0)
           for (unsigned int i=0; i < elem->n_nodes(); i++)
-            out << elem->node(eletype.nodes[i])+1 << " ";   // gmsh is 1-based 
+            out << elem->node(eletype.nodes[i])+1 << " "; // gmsh is 1-based 
         // otherwise keep the same node order
         else
           for (unsigned int i=0; i < elem->n_nodes(); i++)
