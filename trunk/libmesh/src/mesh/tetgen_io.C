@@ -1,4 +1,4 @@
-// $Id: tetgen_io.C,v 1.13 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: tetgen_io.C,v 1.14 2005-09-05 22:48:16 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -147,12 +147,16 @@ void TetGenIO::node_in (std::istream& node_stream)
 	node_stream >> dummy;
 
       // Store the new position of the node under its label.
-      _assign_nodes.insert (std::make_pair(node_lab,i));
+      //_assign_nodes.insert (std::make_pair(node_lab,i));
+      _assign_nodes[node_lab] = i;
+
+      // do this irrespective whether MeshData exists
+      Node* newnode = mesh.add_point(xyz);
 
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
       if (this->_mesh_data != NULL)
-	this->_mesh_data->add_foreign_node_id (mesh.add_point(xyz), node_lab);
+	this->_mesh_data->add_foreign_node_id (newnode, node_lab);
     }
 }
 
@@ -203,10 +207,12 @@ void TetGenIO::element_in (std::istream& ele_stream)
 	elem->set_node(assign_elm_nodes[j]) =
 	  mesh.node_ptr(_assign_nodes[node_labels[j]]);
 
+      Elem* newelem =mesh.add_elem(elem);
+
       // Add the element to the mesh &
       // tell the MeshData object the foreign element id
       if (this->_mesh_data != NULL)
-	this->_mesh_data->add_foreign_elem_id (mesh.add_elem(elem), element_lab);
+	this->_mesh_data->add_foreign_elem_id (newelem, element_lab);
     }
 }
 
@@ -261,8 +267,8 @@ void TetGenIO::write (const std::string& fname)
     const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
       
     for ( ; it != end; ++it)
-      out << "1\n" // no. of facet polygons
-	  << (*it)->n_nodes() << " "
+      out << "1\n3 " // no. of facet polygons
+        //	  << (*it)->n_nodes() << " "
 	  << (*it)->node(0)   << " "
 	  << (*it)->node(1)   << " "
 	  << (*it)->node(2)   << "\n";
