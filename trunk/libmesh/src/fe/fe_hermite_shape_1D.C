@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_1D.C,v 1.4 2005-09-02 18:48:55 roystgnr Exp $
+// $Id: fe_hermite_shape_1D.C,v 1.5 2005-09-06 00:45:15 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -179,7 +179,7 @@ Real FEHermite<1>::hermite_bases
       error();
     }
 
-  Real coef;
+  Real coef=0;
   switch (index%pow2[dim]) // DoF type
     {
     case 0: // DoF = value at node
