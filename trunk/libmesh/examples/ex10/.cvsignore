@@ -12,3 +12,4 @@ so_locations
 gmon.out
 *gmv*
 *.swp
+saved_*.xda
