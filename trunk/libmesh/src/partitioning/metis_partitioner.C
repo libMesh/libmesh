@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.20 2005-05-09 20:38:42 jwpeterson Exp $
+// $Id: metis_partitioner.C,v 1.21 2005-09-09 12:26:51 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -237,8 +237,6 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   // the processor id for each active element, but in terms of
   // the contiguous indexing we defined above
   {
- //    active_elem_iterator       elem_it (mesh.elements_begin());
-//     const active_elem_iterator elem_end(mesh.elements_end());
 
     MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
