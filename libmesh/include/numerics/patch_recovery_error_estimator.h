@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.h,v 1.6 2005-06-11 03:59:17 jwpeterson Exp $
+// $Id: patch_recovery_error_estimator.h,v 1.7 2005-09-11 01:38:26 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,9 +29,11 @@
 
 // Local Includes
 #include "error_estimator.h"
+#include "enum_order.h"
 
 // Forward Declarations
 class Elem;
+
 
 
 /**
@@ -82,7 +84,36 @@ private:
   void build_patch_from_local_neighbors (const Elem* elem,
 					 std::set<const Elem*> patch,
 					 const unsigned int target_patch_size = 10);
+
+  /**
+   * Computes the factorial of n-used for determining matrix size
+   */  
+  unsigned int factorial(const unsigned int n);
+
+  /**
+   * Returns the spectral polynomial basis function values at a point x,y,z
+   */
+  
+  std::vector<Real> specpoly(const unsigned int dim,
+			     const Order order,
+			     const Real x,
+			     const Real y,
+			     const Real z,
+			     const unsigned int matsize);
 };
 
 
-#endif
+
+//-----------------------------------------------------------------
+// PatchRecoveryErrorEstimator implementations
+inline
+unsigned int PatchRecoveryErrorEstimator::factorial (const unsigned int n)
+{
+  unsigned int fac=1;
+  for (int i=n; i>0; i--) fac *= i;
+  return fac;
+}
+
+
+
+#endif // #define __patch_recovery_error_estimator_h__
