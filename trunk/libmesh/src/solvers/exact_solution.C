@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.17 2005-06-22 18:24:24 roystgnr Exp $
+// $Id: exact_solution.C,v 1.18 2005-09-28 00:49:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -101,7 +101,8 @@ std::pair<Number, Number>& ExactSolution::_check_inputs(const std::string& sys_n
   
   if (sys_iter == _errors.end())
     {
-      std::cerr << "Sorry, couldn't find the requested system."
+      std::cerr << "Sorry, couldn't find the requested system '"
+                << sys_name << "'."
 		<< std::endl;
       error();
     }
@@ -111,7 +112,8 @@ std::pair<Number, Number>& ExactSolution::_check_inputs(const std::string& sys_n
 
   if (var_iter == (*sys_iter).second.end())
     {
-      std::cerr << "Sorry, couldn't find the requested variable."
+      std::cerr << "Sorry, couldn't find the requested variable '"
+                << unknown_name << "'."
 		<< std::endl;
       error();
     }
