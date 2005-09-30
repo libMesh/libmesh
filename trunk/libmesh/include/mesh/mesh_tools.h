@@ -1,4 +1,4 @@
-// $Id: mesh_tools.h,v 1.4 2005-08-15 21:30:38 knezed01 Exp $
+// $Id: mesh_tools.h,v 1.5 2005-09-30 19:55:22 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,10 +32,10 @@
 #include "libmesh.h"
 #include "enum_elem_type.h"
 #include "mesh_base.h"
-
+#include "point.h" // some compilers want the full definition - I think so they can do 
+                   // return-value-optimization for BoundingBox'es - BSK
 // forward declarations
 class Sphere;
-class Point;
 class Elem;
 
 /**
@@ -46,7 +46,7 @@ class Elem;
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 

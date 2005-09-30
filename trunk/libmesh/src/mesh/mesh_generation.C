@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.41 2005-06-13 14:54:33 knezed01 Exp $
+// $Id: mesh_generation.C,v 1.42 2005-09-30 19:55:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -135,7 +135,7 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
               for (unsigned int i=0; i<=nx; i++)
               {
                 if (gauss_lobatto_grid)
-                  mesh.add_point (Point(0.5*(cos(libMesh::pi*static_cast<Real>(nx-i)/static_cast<Real>(nx))+1.0),
+                  mesh.add_point (Point(0.5*(std::cos(libMesh::pi*static_cast<Real>(nx-i)/static_cast<Real>(nx))+1.0),
                         0, 
                         0));
                 else
@@ -159,7 +159,7 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
                   const Real pi = libMesh::pi;
 
                   // Shortcut quantities (do not depend on i)
-                  const Real c = cos( pi*i / static_cast<Real>(2*nx) );
+                  const Real c = std::cos( pi*i / static_cast<Real>(2*nx) );
 
                   // If i is even, compute a normal Gauss-Lobatto point
                   if (i%2 == 0)
@@ -168,8 +168,8 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
                   // Otherwise, it is the average of the previous and next points
                   else
                   {
-                    Real cmin = cos( pi*(i-1) / static_cast<Real>(2*nx) );
-                    Real cmax = cos( pi*(i+1) / static_cast<Real>(2*nx) );
+                    Real cmin = std::cos( pi*(i-1) / static_cast<Real>(2*nx) );
+                    Real cmax = std::cos( pi*(i+1) / static_cast<Real>(2*nx) );
                     
                     Real xmin = 0.5*(1.0 - cmin);
                     Real xmax = 0.5*(1.0 - cmax);
@@ -198,7 +198,7 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
                   const Real pi = libMesh::pi;
 
                   // Shortcut quantities
-                  const Real c = cos( pi*i / static_cast<Real>(3*nx) );
+                  const Real c = std::cos( pi*i / static_cast<Real>(3*nx) );
 
                   // If i is multiple of 3, compute a normal Gauss-Lobatto point
                   if (i%3 == 0)
@@ -209,8 +209,8 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
                   {
                     if(i%3 == 1)
                     {
-                      Real cmin = cos( pi*(i-1) / static_cast<Real>(3*nx) );
-                      Real cmax = cos( pi*(i+2) / static_cast<Real>(3*nx) );
+                      Real cmin = std::cos( pi*(i-1) / static_cast<Real>(3*nx) );
+                      Real cmax = std::cos( pi*(i+2) / static_cast<Real>(3*nx) );
 
                       Real xmin = 0.5*(1.0 - cmin);
                       Real xmax = 0.5*(1.0 - cmax);
@@ -220,8 +220,8 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
                     else
                     if(i%3 == 2)
                     {
-                      Real cmin = cos( pi*(i-2) / static_cast<Real>(3*nx) );
-                      Real cmax = cos( pi*(i+1) / static_cast<Real>(3*nx) );
+                      Real cmin = std::cos( pi*(i-2) / static_cast<Real>(3*nx) );
+                      Real cmax = std::cos( pi*(i+1) / static_cast<Real>(3*nx) );
 
                       Real xmin = 0.5*(1.0 - cmin);
                       Real xmax = 0.5*(1.0 - cmax);
@@ -398,8 +398,8 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 			// Shortcut variable
 			const Real pi = libMesh::pi;
 
-			mesh.add_point (Point(0.5*(1.0 - cos(pi*static_cast<Real>(i)/static_cast<Real>(nx))),
-					      0.5*(1.0 - cos(pi*static_cast<Real>(j)/static_cast<Real>(ny))),
+			mesh.add_point (Point(0.5*(1.0 - std::cos(pi*static_cast<Real>(i)/static_cast<Real>(nx))),
+					      0.5*(1.0 - std::cos(pi*static_cast<Real>(j)/static_cast<Real>(ny))),
 					      0.));
 		      }
 		  
@@ -428,12 +428,12 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 			const Real pi = libMesh::pi;
 			
 			// Shortcut quantities (do not depend on i,j)
-			const Real a = cos( pi / static_cast<Real>(2*nx) );
-			const Real b = cos( pi / static_cast<Real>(2*ny) );
+			const Real a = std::cos( pi / static_cast<Real>(2*nx) );
+			const Real b = std::cos( pi / static_cast<Real>(2*ny) );
 
 			// Shortcut quantities (depend on i,j)
-			const Real c = cos( pi*i / static_cast<Real>(2*nx) );
-			const Real d = cos( pi*j / static_cast<Real>(2*ny) );
+			const Real c = std::cos( pi*i / static_cast<Real>(2*nx) );
+			const Real d = std::cos( pi*j / static_cast<Real>(2*ny) );
 			
 			// If i is even, compute a normal Gauss-Lobatto point
 			if (i%2 == 0)
@@ -722,9 +722,9 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 			  // Shortcut variable
 			  const Real pi = libMesh::pi;
 
-			  mesh.add_point (Point(0.5*(1.0 - cos(pi*static_cast<Real>(i)/static_cast<Real>(nx))),
-						0.5*(1.0 - cos(pi*static_cast<Real>(j)/static_cast<Real>(ny))),
-						0.5*(1.0 - cos(pi*static_cast<Real>(k)/static_cast<Real>(nz)))));
+			  mesh.add_point (Point(0.5*(1.0 - std::cos(pi*static_cast<Real>(i)/static_cast<Real>(nx))),
+						0.5*(1.0 - std::cos(pi*static_cast<Real>(j)/static_cast<Real>(ny))),
+						0.5*(1.0 - std::cos(pi*static_cast<Real>(k)/static_cast<Real>(nz)))));
 			}
 		      
 		      else
@@ -753,16 +753,16 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 			  Real x=0., y=0., z=0.;
 
 			  // Shortcut quantities (do not depend on i,j)
-			  const Real a = cos( pi / static_cast<Real>(2*nx) );
-			  const Real b = cos( pi / static_cast<Real>(2*ny) );
+			  const Real a = std::cos( pi / static_cast<Real>(2*nx) );
+			  const Real b = std::cos( pi / static_cast<Real>(2*ny) );
 
 			  // Shortcut quantities (depend on i,j)
-			  const Real c = cos( pi*i / static_cast<Real>(2*nx) );
-			  const Real d = cos( pi*j / static_cast<Real>(2*ny) );
+			  const Real c = std::cos( pi*i / static_cast<Real>(2*nx) );
+			  const Real d = std::cos( pi*j / static_cast<Real>(2*ny) );
 			  
 			  // Additional shortcut quantities (for 3D)
-			  const Real e = cos( pi / static_cast<Real>(2*nz) );
-			  const Real f = cos( pi*k / static_cast<Real>(2*nz) );
+			  const Real e = std::cos( pi / static_cast<Real>(2*nz) );
+			  const Real f = std::cos( pi*k / static_cast<Real>(2*nz) );
 			  
 			  // If i is even, compute a normal Gauss-Lobatto point
 			  if (i%2 == 0)

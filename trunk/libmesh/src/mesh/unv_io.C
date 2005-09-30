@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.22 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: unv_io.C,v 1.23 2005-09-30 19:55:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 // C++ includes
 #include <iomanip>
-#include <cstdio>   // for sprintf
+#include <cstdio>   // for std::sprintf
 #include <algorithm> // for std::sort
 #include <fstream>
 
@@ -955,9 +955,6 @@ void UNVIO::node_out (std::ostream& out_file)
   // A reference to the parent class's mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
-//   const_node_iterator       nd  (mesh.nodes_begin());
-//   const const_node_iterator end (mesh.nodes_end());
-
   MeshBase::const_node_iterator       nd  = mesh.nodes_begin();
   const MeshBase::const_node_iterator end = mesh.nodes_end();
 
@@ -966,26 +963,26 @@ void UNVIO::node_out (std::ostream& out_file)
       const Node* current_node = *nd;
       
       char buf[78];
-      sprintf(buf, "%10d%10d%10d%10d\n", 
-	      this->_mesh_data.node_to_foreign_id(current_node),
-	      exp_coord_sys_dummy,
-	      disp_coord_sys_dummy,
-	      color_dummy);
+      std::sprintf(buf, "%10d%10d%10d%10d\n", 
+		   this->_mesh_data.node_to_foreign_id(current_node),
+		   exp_coord_sys_dummy,
+		   disp_coord_sys_dummy,
+		   color_dummy);
       out_file << buf;
 
       // the coordinates
       if (mesh.spatial_dimension() == 3)
-	sprintf(buf, "%25.16E%25.16E%25.16E\n", 
-		(*current_node)(0),
-		(*current_node)(1),
-		(*current_node)(2));
+	std::sprintf(buf, "%25.16E%25.16E%25.16E\n", 
+		     (*current_node)(0),
+		     (*current_node)(1),
+		     (*current_node)(2));
       else if (mesh.spatial_dimension() == 2)
-	sprintf(buf, "%25.16E%25.16E\n", 
-		(*current_node)(0),
-		(*current_node)(1));
+	std::sprintf(buf, "%25.16E%25.16E\n", 
+		     (*current_node)(0),
+		     (*current_node)(1));
       else
-	sprintf(buf, "%25.16E\n", 
-		(*current_node)(0));
+	std::sprintf(buf, "%25.16E\n", 
+		     (*current_node)(0));
       
       out_file << buf;
     }
@@ -1039,9 +1036,6 @@ void UNVIO::element_out(std::ostream& out_file)
 
   // A reference to the parent class's mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
-
-//   const_elem_iterator        it  (mesh.elements_begin());
-//   const const_elem_iterator  end (mesh.elements_end());
 
   MeshBase::const_element_iterator it  = mesh.elements_begin();
   const MeshBase::const_element_iterator end = mesh.elements_end();

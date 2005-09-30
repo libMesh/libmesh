@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.46 2005-07-20 20:17:08 knezed01 Exp $ */
+/* $Id: ex4.C,v 1.47 2005-09-30 19:55:22 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -135,10 +135,10 @@ int main (int argc, char** argv)
       }
     
     // Get the dimensionality of the mesh from argv[2]
-    const unsigned int dim = atoi(argv[2]);     
+    const unsigned int dim = std::atoi(argv[2]);     
     
     // Get the problem size from argv[4]
-    const unsigned int ps = atoi(argv[4]);
+    const unsigned int ps = std::atoi(argv[4]);
     
     // Create a mesh with user-defined dimension.
     Mesh mesh (dim);

@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.26 2005-09-02 13:40:06 benkirk Exp $
+// $Id: gmv_io.C,v 1.27 2005-09-30 19:55:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,8 +26,8 @@
 // C++ includes
 #include <iomanip>
 #include <fstream>
-#include <cstring> // for strcpy, memcpy
-#include <cstdio>  // for sprintf
+#include <cstring> // for std::strcpy, std::memcpy
+#include <cstdio>  // for std::sprintf
 #include <vector>
 
 // Local includes
@@ -735,23 +735,23 @@ void GMVIO::write_binary (const std::string& fname,
   // Begin interfacing with the GMV data file
   {
     // write the nodes
-    strcpy(buf, "gmvinput");
-    out.write(buf, strlen(buf));
+    std::strcpy(buf, "gmvinput");
+    out.write(buf, std::strlen(buf));
 	      
-    strcpy(buf, "ieeei4r4");
-    out.write(buf, strlen(buf));
+    std::strcpy(buf, "ieeei4r4");
+    out.write(buf, std::strlen(buf));
   }
 
 
   
   // write the nodes
   {
-    strcpy(buf, "nodes   ");
-    out.write(buf, strlen(buf));
+    std::strcpy(buf, "nodes   ");
+    out.write(buf, std::strlen(buf));
 
     unsigned int tempint = mesh.n_nodes();
     
-    memcpy(buf, &tempint, sizeof(unsigned int));
+    std::memcpy(buf, &tempint, sizeof(unsigned int));
 
     out.write(buf, sizeof(unsigned int));
 
@@ -777,12 +777,12 @@ void GMVIO::write_binary (const std::string& fname,
 
   // write the connectivity
   {
-    strcpy(buf, "cells   ");
-    out.write(buf, strlen(buf));
+    std::strcpy(buf, "cells   ");
+    out.write(buf, std::strlen(buf));
 
     unsigned int tempint = mesh.n_active_elem();
     
-    memcpy(buf, &tempint, sizeof(unsigned int));
+    std::memcpy(buf, &tempint, sizeof(unsigned int));
     
     out.write(buf, sizeof(unsigned int));
 
@@ -796,11 +796,11 @@ void GMVIO::write_binary (const std::string& fname,
         for ( ; it != end; ++it)
           for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
             {
-              strcpy(buf, "line    ");
-              out.write(buf, strlen(buf));
+              std::strcpy(buf, "line    ");
+              out.write(buf, std::strlen(buf));
 	      
               tempint = 2;
-              memcpy(buf, &tempint, sizeof(unsigned int));
+              std::memcpy(buf, &tempint, sizeof(unsigned int));
               out.write(buf, sizeof(unsigned int));
 
               std::vector<unsigned int> conn;
@@ -817,10 +817,10 @@ void GMVIO::write_binary (const std::string& fname,
         for ( ; it != end; ++it)
           for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
             {
-              strcpy(buf, "quad    ");
-              out.write(buf, strlen(buf));
+              std::strcpy(buf, "quad    ");
+              out.write(buf, std::strlen(buf));
               tempint = 4;
-              memcpy(buf, &tempint, sizeof(unsigned int));
+              std::memcpy(buf, &tempint, sizeof(unsigned int));
               out.write(buf, sizeof(unsigned int));
               std::vector<unsigned int> conn;
               (*it)->connectivity(se,TECPLOT,conn);
@@ -831,10 +831,10 @@ void GMVIO::write_binary (const std::string& fname,
         for ( ; it != end; ++it)
           for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
             {
-              strcpy(buf, "phex8   ");
-              out.write(buf, strlen(buf));
+              std::strcpy(buf, "phex8   ");
+              out.write(buf, std::strlen(buf));
               tempint = 8;
-              memcpy(buf, &tempint, sizeof(unsigned int));
+              std::memcpy(buf, &tempint, sizeof(unsigned int));
               out.write(buf, sizeof(unsigned int));
               std::vector<unsigned int> conn;
               (*it)->connectivity(se,TECPLOT,conn);
@@ -852,21 +852,21 @@ void GMVIO::write_binary (const std::string& fname,
   // optionally write the partition information
   if (this->partitioning())
     {
-      strcpy(buf, "material");
-      out.write(buf, strlen(buf));
+      std::strcpy(buf, "material");
+      out.write(buf, std::strlen(buf));
       
       unsigned int tmpint = mesh.n_processors();
-      memcpy(buf, &tmpint, sizeof(unsigned int));
+      std::memcpy(buf, &tmpint, sizeof(unsigned int));
       out.write(buf, sizeof(unsigned int));
 
       tmpint = 0; // IDs are cell based
-      memcpy(buf, &tmpint, sizeof(unsigned int));
+      std::memcpy(buf, &tmpint, sizeof(unsigned int));
       out.write(buf, sizeof(unsigned int));
 
 
       for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
         {
-          sprintf(buf, "proc_%d", proc);
+          std::sprintf(buf, "proc_%d", proc);
           out.write(buf, 8);
         }
 
@@ -892,8 +892,8 @@ void GMVIO::write_binary (const std::string& fname,
   if ((solution_names != NULL) &&
       (vec != NULL))
     {
-      strcpy(buf, "variable");
-      out.write(buf, strlen(buf));
+      std::strcpy(buf, "variable");
+      out.write(buf, std::strlen(buf));
       
       float *temp = new float[mesh.n_nodes()];
 
@@ -907,13 +907,13 @@ void GMVIO::write_binary (const std::string& fname,
 
 
           // Real part
-          strcpy(buf, "r_");
+          std::strcpy(buf, "r_");
           out.write(buf, 2);
-          strcpy(buf, (*solution_names)[c].c_str());
+          std::strcpy(buf, (*solution_names)[c].c_str());
           out.write(buf, 6);
 	  
           unsigned int tempint = 1; // always do nodal data
-          memcpy(buf, &tempint, sizeof(unsigned int));
+          std::memcpy(buf, &tempint, sizeof(unsigned int));
           out.write(buf, sizeof(unsigned int));
 	  
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
@@ -923,12 +923,12 @@ void GMVIO::write_binary (const std::string& fname,
 
 
           // imaginary part
-          strcpy(buf, "i_");
+          std::strcpy(buf, "i_");
           out.write(buf, 2);
-          strcpy(buf, (*solution_names)[c].c_str());
+          std::strcpy(buf, (*solution_names)[c].c_str());
           out.write(buf, 6);
 	  
-          memcpy(buf, &tempint, sizeof(unsigned int));
+          std::memcpy(buf, &tempint, sizeof(unsigned int));
           out.write(buf, sizeof(unsigned int));
 	  
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
@@ -937,12 +937,12 @@ void GMVIO::write_binary (const std::string& fname,
           out.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
 
           // magnitude
-          strcpy(buf, "a_");
+          std::strcpy(buf, "a_");
           out.write(buf, 2);
-          strcpy(buf, (*solution_names)[c].c_str());
+          std::strcpy(buf, (*solution_names)[c].c_str());
           out.write(buf, 6);
 	  
-          memcpy(buf, &tempint, sizeof(unsigned int));
+          std::memcpy(buf, &tempint, sizeof(unsigned int));
           out.write(buf, sizeof(unsigned int));
 	  
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
@@ -953,11 +953,11 @@ void GMVIO::write_binary (const std::string& fname,
 #else
 
 
-          strcpy(buf, (*solution_names)[c].c_str());
+          std::strcpy(buf, (*solution_names)[c].c_str());
           out.write(buf, 8);
 	  
           unsigned int tempint = 1; // always do nodal data
-          memcpy(buf, &tempint, sizeof(unsigned int));
+          std::memcpy(buf, &tempint, sizeof(unsigned int));
           out.write(buf, sizeof(unsigned int));
 	  
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
@@ -973,14 +973,14 @@ void GMVIO::write_binary (const std::string& fname,
     
       delete [] temp;
       
-      strcpy(buf, "endvars ");
-      out.write(buf, strlen(buf));
+      std::strcpy(buf, "endvars ");
+      out.write(buf, std::strlen(buf));
 
     }
 
   // end the file
-  strcpy(buf, "endgmv  ");
-  out.write(buf, strlen(buf));
+  std::strcpy(buf, "endgmv  ");
+  out.write(buf, std::strlen(buf));
 }
 
 

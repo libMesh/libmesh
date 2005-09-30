@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.12 2005-09-11 01:38:27 benkirk Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.13 2005-09-30 19:55:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 // C++ includes
 #include <algorithm> // for std::fill
-#include <cmath>     // for sqrt pow fabs
+#include <cmath>     // for std::sqrt std::pow std::abs
 
 
 // Local Includes
@@ -64,7 +64,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	    for (int xexp=poly_deg; xexp >= 0; xexp--) // use an int for xexp since we -- it
 	      for (int yexp=poly_deg-xexp; yexp >= 0; yexp--) // use an int for yexp since we -- it
 		for (int zexp=poly_deg-xexp-yexp; zexp >=0; zexp--) // use an int for zexp since we -- it
-		  psi.push_back(pow(x,xexp)*pow(y,yexp)*pow(z,zexp));
+		  psi.push_back(std::pow(x,xexp)*std::pow(y,yexp)*std::pow(z,zexp));
 	    break;
 	  }
 
@@ -73,7 +73,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	  {
 	    for (int xexp=poly_deg; xexp >= 0; xexp--) // use an int for xexp since we -- it
 	      for (int yexp=poly_deg-xexp; yexp >= 0; yexp--) // use an int for yexp since we -- it
-		psi.push_back(pow(x,xexp)*pow(y,yexp));
+		psi.push_back(std::pow(x,xexp)*std::pow(y,yexp));
 	    break;
 	  }
 
@@ -81,7 +81,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	case 1:
 	  {
 	    for (int xexp=poly_deg; xexp >= 0; xexp--) // use an int for xexp since we -- it
-	      psi.push_back(pow(x,xexp));
+	      psi.push_back(std::pow(x,xexp));
 	    break;
 	  }
 	  
@@ -314,9 +314,9 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 		  temperry -= grad_u_h(1);
 		  temperrz -= grad_u_h(2);
 		  
-		  temperrx = fabs(temperrx);
-		  temperry = fabs(temperry);
-		  temperrz = fabs(temperrz);
+		  temperrx = std::abs(temperrx);
+		  temperry = std::abs(temperry);
+		  temperrz = std::abs(temperrz);
 		  
 		  error = std::max(temperrz,std::max(temperry,temperrx));
 		} // end vertex loop
@@ -364,9 +364,9 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 		  temperry -= grad_u_h(1);
 		  temperrz -= grad_u_h(2);
 		  
-		  temperrx = fabs(temperrx);
-		  temperry = fabs(temperry);
-		  temperrz = fabs(temperrz);
+		  temperrx = std::abs(temperrx);
+		  temperry = std::abs(temperry);
+		  temperrz = std::abs(temperrz);
 		  
 		  error = std::max(temperrz,std::max(temperry,temperrx));		  
 		} // end sample_point_loop

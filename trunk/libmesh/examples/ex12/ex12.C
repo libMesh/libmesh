@@ -1,4 +1,4 @@
-/* $Id: ex12.C,v 1.11 2005-06-06 14:53:15 jwpeterson Exp $ */
+/* $Id: ex12.C,v 1.12 2005-09-30 19:55:21 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -110,7 +110,7 @@ int main (int argc, char** argv)
       }
 
     // Get the dimensionality of the mesh from argv[2]
-    const unsigned int dim = atoi(argv[2]);
+    const unsigned int dim = std::atoi(argv[2]);
     
     // The filename of the mesh
     const std::string mesh_file = argv[3];

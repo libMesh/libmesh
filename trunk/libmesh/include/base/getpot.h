@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.8 2005-01-28 21:29:44 benkirk Exp $
+// $Id: getpot.h,v 1.9 2005-09-30 19:55:22 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -274,14 +274,14 @@ class GetPot {
 
   std::string  __double2string(double Value) const { 
     char* tmp = new char[128];
-    sprintf(tmp, "%e", Value);
+    std::sprintf(tmp, "%e", Value);
     std::string result(tmp);
     delete [] tmp;
     return result;
   }
   std::string  __int2string(const int& Value) const { 
     char* tmp = new char[128];
-    sprintf(tmp, "%i", Value);
+    std::sprintf(tmp, "%i", Value);
     std::string result(tmp);
     delete [] tmp;
     return result;
@@ -697,7 +697,7 @@ inline double
 GetPot::__convert_to_type(const std::string& String, double Default) const
 {
   double tmp;
-  if( sscanf(String.c_str(),"%lf", &tmp) != 1 ) return Default;
+  if( std::sscanf(String.c_str(),"%lf", &tmp) != 1 ) return Default;
   return tmp;
 }
 
@@ -708,7 +708,7 @@ inline int
 GetPot::__convert_to_type(const std::string& String, int Default) const
 {
   int tmp;
-  if( sscanf(String.c_str(),"%i", &tmp) != 1 ) return Default;
+  if( std::sscanf(String.c_str(),"%i", &tmp) != 1 ) return Default;
   return tmp;    
 }
 
@@ -795,7 +795,7 @@ GetPot::search(unsigned No, const char* P, ...)
     if( search(P) == true ) return true;
     
     // start interpreting variable argument list
-    va_list ap;
+    std::va_list ap;
     va_start(ap, P);
     for(unsigned i=1; i<No; i++) {
 	char* Opt = va_arg(ap, char *);
@@ -963,7 +963,7 @@ GetPot::follow(const char* Default, const char* Option)
     if( No == 0 ) return Default;
     if( search(P) == true ) return next(Default);
   
-    va_list ap;
+    std::va_list ap;
     va_start(ap, P);
     for(unsigned i=1; i<No; i++) {
       char* Opt = va_arg(ap, char *);
@@ -984,7 +984,7 @@ GetPot::follow(const char* Default, const char* Option)
     if( No == 0 ) return Default;
     if( search(P) == true ) return next(Default);
   
-    va_list ap;
+    std::va_list ap;
     va_start(ap, P);
     for(unsigned i=1; i<No; i++) {
       char* Opt = va_arg(ap, char *);
@@ -1005,7 +1005,7 @@ GetPot::follow(const char* Default, const char* Option)
     if( No == 0 ) return Default;
     if( search(P) == true ) return next(Default);
   
-    va_list ap;
+    std::va_list ap;
     va_start(ap, P);
     for(unsigned i=1; i<No; i++) {
       char* Opt = va_arg(ap, char *);
@@ -1066,7 +1066,7 @@ GetPot::__match_starting_string(const char* StartString)
   //          the match inside the found argument starts.
   // 0        no argument matches the starting string.
 {
-  const unsigned N = strlen(StartString);
+  const unsigned N = std::strlen(StartString);
   unsigned OldCursor = cursor;
   if( OldCursor >= argv.size() ) OldCursor = argv.size() - 1;
   search_failed_f = true;
@@ -1074,7 +1074,7 @@ GetPot::__match_starting_string(const char* StartString)
   // (*) first loop from cursor position until end
   unsigned c = cursor;
   for(; c < argv.size(); c++) {
-    if( strncmp(StartString, argv[c].c_str(), N) == 0)
+    if( std::strncmp(StartString, argv[c].c_str(), N) == 0)
     { cursor = c; search_failed_f = false; return &(argv[c].c_str()[N]); }
   }
 
@@ -1082,7 +1082,7 @@ GetPot::__match_starting_string(const char* StartString)
 
   // (*) second loop from 0 to old cursor position
   for(c = 1; c < OldCursor; c++) {
-    if( strncmp(StartString, argv[c].c_str(), N) == 0)
+    if( std::strncmp(StartString, argv[c].c_str(), N) == 0)
     { cursor = c; search_failed_f = false; return &(argv[c].c_str()[N]); }
   }
   return 0;
@@ -1509,7 +1509,7 @@ GetPot::__DBE_get_variable(const std::string& VarName)
 
   // error occured => variable name == ""
   char* tmp = new char[VarName.length() + 25];
-  sprintf(tmp, "<<${ } variable '%s' undefined>>", VarName.c_str());
+  std::sprintf(tmp, "<<${ } variable '%s' undefined>>", VarName.c_str());
   ev.name = "";
   ev.original = std::string(tmp);
   delete [] tmp;
@@ -1766,7 +1766,7 @@ GetPot::__search_string_vector(const std::vector<std::string>& VecStr, const std
     // (1) create a vector of known arguments
     if( Number == 0 ) return std::vector<std::string>();
   
-    va_list ap;
+    std::va_list ap;
     va_start(ap, KnownArgument1);
     known_arguments.push_back(std::string(KnownArgument1));
     for(unsigned i=1; i<Number; i++)
@@ -1786,7 +1786,7 @@ GetPot::__search_string_vector(const std::vector<std::string>& VecStr, const std
     // (1) create a vector of known arguments
     if( Number == 0 ) return std::vector<std::string>();
   
-    va_list ap;
+    std::va_list ap;
     va_start(ap, KnownOption1);
     known_options.push_back(std::string(KnownOption1));
     for(unsigned i=1; i<Number; i++)
@@ -1805,7 +1805,7 @@ GetPot::__search_string_vector(const std::vector<std::string>& VecStr, const std
     // create vector of known arguments
     if( Number == 0 ) return std::vector<std::string>();
   
-    va_list ap;
+    std::va_list ap;
     va_start(ap, KnownVariable1);
     known_variables.push_back(std::string(KnownVariable1));
     for(unsigned i=1; i<Number; i++)
@@ -1824,7 +1824,7 @@ GetPot::__search_string_vector(const std::vector<std::string>& VecStr, const std
     // (1) create a vector of known arguments
     if( Number == 0 ) return std::vector<std::string>();
   
-    va_list ap;
+    std::va_list ap;
     va_start(ap, KnownSection1);
     known_sections.push_back(std::string(KnownSection1));
     for(unsigned i=1; i<Number; i++) {
@@ -1846,7 +1846,7 @@ GetPot::__search_string_vector(const std::vector<std::string>& VecStr, const std
     // create vector of known arguments
     if( Number == 0 ) return std::vector<std::string>();
   
-    va_list ap;
+    std::va_list ap;
     va_start(ap, Known);
     known_nominuses.push_back(std::string(Known));
     for(unsigned i=1; i<Number; i++) {
@@ -2082,13 +2082,13 @@ GetPot::variable::take(const char* Value)
   // thread safe usage of strtok (no static members)
   char* spt = 0; 
   // make a copy of the 'Value'
-  char* copy = new char[strlen(Value)+1];
-  strcpy(copy, Value);
-  char* follow_token = strtok_r(copy, " \t\n", &spt);
+  char* copy = new char[std::strlen(Value)+1];
+  std::strcpy(copy, Value);
+  char* follow_token = std::strtok_r(copy, " \t\n", &spt);
   if( value.size() != 0 ) value.erase(value.begin(), value.end());
   while(follow_token != 0) {
     value.push_back(std::string(follow_token));
-    follow_token = strtok_r(NULL, " \t\n", &spt);
+    follow_token = std::strtok_r(NULL, " \t\n", &spt);
   }
 
   delete [] copy;

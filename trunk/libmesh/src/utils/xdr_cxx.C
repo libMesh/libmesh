@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.23 2005-05-25 16:22:16 benkirk Exp $\n"
+// "$Id: xdr_cxx.C,v 1.24 2005-09-30 19:55:24 benkirk Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1494,7 +1494,7 @@ void Xdr::data (std::string& s, const char* comment)
 	  
 	  xdr_string(xdrs,
 		     &sptr,
-		     strlen(sptr));
+		     std::strlen(sptr));
 
 	  delete [] sptr;
 	}
@@ -1526,7 +1526,7 @@ void Xdr::data (std::string& s, const char* comment)
 		     &sptr,
 		     xdr_MAX_STRING_LENGTH);
 
-	  s.resize(strlen(sptr));
+	  s.resize(std::strlen(sptr));
 
 	  for (unsigned int c=0; c<s.size(); c++)
 	    s[c] = sptr[c];
@@ -1560,7 +1560,7 @@ void Xdr::data (std::string& s, const char* comment)
 	s = "";
 //#endif
 
-	for (unsigned int c=0; c<strlen(comm); c++)
+	for (unsigned int c=0; c<std::strlen(comm); c++)
 	  {
 	    if (comm[c] == '\t') 
 	      break;

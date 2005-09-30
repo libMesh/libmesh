@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.29 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: laspack_vector.C,v 1.30 2005-09-30 19:55:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -169,7 +169,6 @@ void LaspackVector<T>::add_vector (const DenseVector<T>& V,
 
 
 template <typename T> 
-inline
 void LaspackVector<T>::insert (const std::vector<T>& v,
 			       const std::vector<unsigned int>& dof_indices)
 {

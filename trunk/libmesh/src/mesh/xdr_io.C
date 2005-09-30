@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.19 2005-08-22 18:57:32 knezed01 Exp $
+// $Id: xdr_io.C,v 1.20 2005-09-30 19:55:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,8 +22,8 @@
 // C++ includes
 #include <iostream>
 #include <iomanip>
-#include <cstdio>  // for FILE
-#include <cstring> // for strncmp
+#include <cstdio>  // for std::FILE
+#include <cstring> // for std::strncmp
 #include <vector>
 #include <string>
 
@@ -241,7 +241,7 @@ namespace
     OFStream mp_out;
   
   private:
-    FILE* mp_fp;
+    std::FILE* mp_fp;
 
     /**
      * This function allows us to set the number of levels in
@@ -254,10 +254,10 @@ namespace
 
       char token[256];
       ss >> token;
-      if(strcmp(token,"LIBM") == 0)
+      if(std::strcmp(token,"LIBM") == 0)
       {
         ss >> token;
-        _num_levels = atoi(token);
+        _num_levels = std::atoi(token);
       }
 
     }
@@ -583,7 +583,7 @@ namespace
     Real m_time;
 
     /**
-     * Uses memcpy to create an exact
+     * Uses std::memcpy to create an exact
      * copy of \p src, then returns
      * that copy.  Note: I don't know
      * where the memory allocated
@@ -860,8 +860,8 @@ namespace
     if (mp_fp)
       {
 	//std::cout << "Closing file." << std::endl;
-	fflush(mp_fp);
-	fclose(mp_fp);
+	std::fflush(mp_fp);
+	std::fclose(mp_fp);
       }
 
     mp_fp = NULL;
@@ -985,7 +985,7 @@ namespace
             error();
 
           // Fill the buffer
-	  sprintf(&buf[0], "%s", name.str().c_str());
+	  std::sprintf(&buf[0], "%s", name.str().c_str());
 	  
           xdr_string(mp_xdr_handle, &p, bufLen);  // Writes binary signature
 
@@ -1010,13 +1010,13 @@ namespace
 	  const XdrIO::FileFormat orig = this->get_orig_flag();
 
           if (orig == XdrIO::DEAL)
-	    sprintf(&buf[0], "%s %03d:%03d", "DEAL", 3, 3);
+	    std::sprintf(&buf[0], "%s %03d:%03d", "DEAL", 3, 3);
           
           else if (orig == XdrIO::MGF)
-	    sprintf(&buf[0], "%s %03d:%03d", "MGF ", 2, 0);
+	    std::sprintf(&buf[0], "%s %03d:%03d", "MGF ", 2, 0);
 
           else if (orig == XdrIO::LIBM)
-            sprintf(&buf[0], "%s %d", "LIBM", this->get_num_levels());
+            std::sprintf(&buf[0], "%s %d", "LIBM", this->get_num_levels());
           
 	  mp_out << buf << '\n';
 	
@@ -1065,18 +1065,18 @@ namespace
     if ((m_type == R_ASCII) || (m_type == DECODE))
       {
 	char name[5];
-	strncpy(name, &buf[0], 4);
+	std::strncpy(name, &buf[0], 4);
 	name[4] = '\0';
 
-	if (strcmp (name, "DEAL") == 0)
+	if (std::strcmp (name, "DEAL") == 0)
 	  {
 	    this->orig_flag = XdrIO::DEAL; // 0 is the DEAL identifier by definition
 	  }
-	else if (strcmp (name, "MGF ") == 0)
+	else if (std::strcmp (name, "MGF ") == 0)
 	  {
 	    this->orig_flag = XdrIO::MGF; // 1 is the MGF identifier by definition
 	  }
-        else if (strcmp (name, "LIBM") == 0)
+        else if (std::strcmp (name, "LIBM") == 0)
           {
             this->orig_flag = XdrIO::LIBM; // the New and Improved XDA
           }
@@ -1476,7 +1476,7 @@ namespace
                 }
 
                 // Otherwise, add the value to the neeb vector
-                neeb.push_back( atoi(token) );
+                neeb.push_back( std::atoi(token) );
               }
               
               // Be sure you have the right number of entries in neeb
@@ -1516,13 +1516,13 @@ namespace
       case (XdrMGF::DECODE):
 	{
 	  char* temp = hd->cpyString(hd->getId());
-	  xdr_string(mp_xdr_handle,&temp, ((m_type == XdrMGF::ENCODE) ? strlen(temp) : hd->m_strSize));
+	  xdr_string(mp_xdr_handle,&temp, ((m_type == XdrMGF::ENCODE) ? std::strlen(temp) : hd->m_strSize));
 	  hd->setId(temp);
 	  delete [] temp;
 
 	  temp = hd->cpyString(hd->getTitle());
 
-	  xdr_string(mp_xdr_handle,&temp, ((m_type == XdrMGF::ENCODE) ? strlen(temp) : hd->m_strSize));
+	  xdr_string(mp_xdr_handle,&temp, ((m_type == XdrMGF::ENCODE) ? std::strlen(temp) : hd->m_strSize));
 	  hd->setTitle(temp);
 	  delete [] temp;
 	  break;
@@ -1604,9 +1604,9 @@ namespace
     if(src)
       {
 	if (myLen == -1)
-	  myLen = strlen(src)+1;
+	  myLen = std::strlen(src)+1;
 	temp = new char[myLen];
-	temp = (char *) memcpy(temp, (char *) src, (myLen)*sizeof(char));
+	temp = (char *) std::memcpy(temp, (char *) src, (myLen)*sizeof(char));
       }
     return temp;
   }
@@ -1644,17 +1644,17 @@ namespace
 
 	  char* temp = const_cast<char *>(hd->getId());
 	  xdr_string(mp_xdr_handle,&(temp),
-		     ((m_type == XdrMGF::ENCODE) ? strlen(temp)    : hd->m_strSize));
+		     ((m_type == XdrMGF::ENCODE) ? std::strlen(temp)    : hd->m_strSize));
 	  hd->setId(temp);
 	
 	  temp = const_cast<char *>(hd->getTitle());
 	  xdr_string(mp_xdr_handle,&(temp),
-		     ((m_type == XdrMGF::ENCODE) ? strlen(temp) : hd->m_strSize));
+		     ((m_type == XdrMGF::ENCODE) ? std::strlen(temp) : hd->m_strSize));
 	  hd->setTitle(temp);
 
 	  temp = const_cast<char *>(hd->getUserTitle());
 	  xdr_string(mp_xdr_handle,&(temp),
-		     ((m_type == XdrMGF::ENCODE) ? strlen(temp) : hd->m_strSize));
+		     ((m_type == XdrMGF::ENCODE) ? std::strlen(temp) : hd->m_strSize));
 	  hd->setUserTitle(temp);
 		
 	
@@ -1665,19 +1665,19 @@ namespace
 	    {
 	      int tempSize = 0;
 	      xdr_string(mp_xdr_handle, &tempTitle, hd->m_strSize*m_wrtVar);
-	      int olen= strlen(tempTitle);
+	      int olen= std::strlen(tempTitle);
 	      char *p;
 	      char *top = tempTitle;
 	      for (int ivar = 0; ivar < m_wrtVar; ++ivar)
 		{
 		  p = strchr(tempTitle,' ');
 		  *p = '\0';
-		  tempSize = strlen(tempTitle) ;
+		  tempSize = std::strlen(tempTitle) ;
 		  tempTitle+=tempSize+1;
 		}
 	      tempTitle = top;
 	      hd->mp_varTitle = new char[olen];
-	      memcpy(hd->mp_varTitle,tempTitle,olen*sizeof(char));
+	      std::memcpy(hd->mp_varTitle,tempTitle,olen*sizeof(char));
 	    }
 	  else if (m_type == XdrMGF::ENCODE)
 	    {
@@ -1685,9 +1685,9 @@ namespace
 	      char *top = tempTitle;
 	      for (int ivar = 0; ivar < m_wrtVar; ++ivar)
 		{
-		  int tempSize = strlen(p) + 1;
-		  memcpy(tempTitle,p,tempSize*sizeof(char));
-		  tempSize = strlen(tempTitle);
+		  int tempSize = std::strlen(p) + 1;
+		  std::memcpy(tempTitle,p,tempSize*sizeof(char));
+		  tempSize = std::strlen(tempTitle);
 		  tempTitle[tempSize] = ' ';
 		  tempTitle += tempSize+1;
 		  p += tempSize+1;
@@ -1767,7 +1767,7 @@ namespace
 	    for (int var=0; var<hd->m_wrtVar ; var++)
 	      {
 		mp_out << p << " ";
-		p += strlen(p)+1;
+		p += std::strlen(p)+1;
 	      }	  
 	    mp_out << "\t # Variable Names\n";
 	  }
@@ -2646,7 +2646,7 @@ void XdrIO::read_soln (const std::string& name,
     for (int i=0; i<numVar; i++)
       {
 	var_names[i] = p;
-	p += strlen(p) + 1;
+	p += std::strlen(p) + 1;
       }
   }
   

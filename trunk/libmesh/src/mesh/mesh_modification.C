@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.16 2005-08-29 20:43:00 benkirk Exp $
+// $Id: mesh_modification.C,v 1.17 2005-09-30 19:55:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <cmath> // for acos()
+#include <cmath> // for std::acos()
 #include <algorithm>
 #include <map>
 
@@ -76,7 +76,7 @@ void MeshTools::Modification::distort (MeshBase& mesh,
     const unsigned int seed = 123456;
     
     // seed the random number generator
-    srand(seed);
+    std::srand(seed);
     
     // If the node is on the boundary or
     // the node is not used by any element (hmin[n]<1.e20)
@@ -88,10 +88,10 @@ void MeshTools::Modification::distort (MeshBase& mesh,
 	{
 	  // the direction, random but unit normalized
 	  
-	  Point dir( static_cast<Real>(rand())/static_cast<Real>(RAND_MAX),
-		     static_cast<Real>(rand())/static_cast<Real>(RAND_MAX),
+	  Point dir( static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX),
+		     static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX),
 		     ((mesh.mesh_dimension() == 3) ?
-		      static_cast<Real>(rand())/static_cast<Real>(RAND_MAX) :
+		      static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX) :
 		      0.)
 		     );
 	  
@@ -133,7 +133,7 @@ void MeshTools::Modification::translate (MeshBase& mesh,
 // {
 //   assert (mesh.mesh_dimension() != 1);
 
-//   const Real pi = acos(-1);
+//   const Real pi = std::acos(-1);
 //   const Real  a = alpha/180.*pi;
 //   for (unsigned int n=0; n<mesh.n_nodes(); n++)
 //     {
@@ -141,8 +141,8 @@ void MeshTools::Modification::translate (MeshBase& mesh,
 //       const Real  x = p(0);
 //       const Real  y = p(1);
 //       const Real  z = p(2);
-//       mesh.node(n) = Point(cos(a)*x - sin(a)*y,
-//                            sin(a)*x + cos(a)*y,
+//       mesh.node(n) = Point(std::cos(a)*x - std::sin(a)*y,
+//                            std::sin(a)*x + std::cos(a)*y,
 //                            z);
 //     }
 
@@ -157,13 +157,13 @@ void MeshTools::Modification::rotate (MeshBase& mesh,
 {
   assert (mesh.mesh_dimension() != 1);
 
-  const Real pi = acos(-1.);
+  const Real pi = std::acos(-1.);
   const Real  p = -phi/180.*pi;
   const Real  t = -theta/180.*pi;
   const Real  s = -psi/180.*pi;
-  const Real sp = sin(p), cp = cos(p);
-  const Real st = sin(t), ct = cos(t);
-  const Real ss = sin(s), cs = cos(s);
+  const Real sp = std::sin(p), cp = std::cos(p);
+  const Real st = std::sin(t), ct = std::cos(t);
+  const Real ss = std::sin(s), cs = std::cos(s);
 
   for (unsigned int n=0; n<mesh.n_nodes(); n++)
     {
@@ -736,7 +736,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                           if (power > 0)
                             {
                               Point diff = (*node0)-(*node1);
-                              node_weight = pow( diff.size(), power );
+                              node_weight = std::pow( diff.size(), power );
                             }
 
                           const unsigned int id0 = node0->id(), id1 = node1->id();

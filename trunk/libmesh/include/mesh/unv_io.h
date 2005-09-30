@@ -1,4 +1,4 @@
-// $Id: unv_io.h,v 1.7 2005-06-11 03:59:17 jwpeterson Exp $
+// $Id: unv_io.h,v 1.8 2005-09-30 19:55:22 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -330,7 +330,7 @@ Real UNVIO::D_to_e (std::string& number) const
   assert (position != std::string::npos);
   number.replace(position, 1, "e"); 
 
-  return atof (number.c_str());
+  return std::atof (number.c_str());
 }
 
 
