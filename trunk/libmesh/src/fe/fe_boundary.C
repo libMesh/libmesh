@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.37 2005-08-25 18:31:37 roystgnr Exp $
+// $Id: fe_boundary.C,v 1.38 2005-09-30 13:39:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -295,9 +295,9 @@ void FE<Dim,T>::init_edge_shape_functions(const std::vector<Point>& qp,
       // (Lagrange shape functions are used for the mapping)
       for (unsigned int p=0; p<n_qp; p++)
 	{
-	  psi_map[i][p]        = FE<Dim-1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
-	  dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
-	  d2psidxi2_map[i][p]  = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
+	  psi_map[i][p]        = FE<1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
+	  dpsidxi_map[i][p]    = FE<1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
+	  d2psidxi2_map[i][p]  = FE<1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
 	}
     }
   
