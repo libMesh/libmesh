@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.52 2005-07-18 18:20:47 benkirk Exp $
+# $Id: Makefile,v 1.53 2005-09-30 16:53:55 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -193,6 +193,10 @@ distclean:
 #
 doc:
 	$(doxygen) ./doc/Doxyfile
+	@rm -rf doc/html/doxygen/*.map
+	@rm -rf doc/html/doxygen/*.md5
+	@rm -rf doc/html/doxygen/*.dot
+	@rm -rf doc/html/doxygen/formula.repository
 
 #
 # Upload the web page to sourceforge

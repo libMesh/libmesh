@@ -830,12 +830,17 @@ QVector *Mul_QV(QMatrix *Q, QVector *V)
                     MultiplDV = Q->MultiplD * V->Multipl;
                     MultiplUV = Q->MultiplU * V->Multipl;
                     MultiplLV = Q->MultiplL * V->Multipl;
-                    MultiplDVIsZero = _LPIsZeroNumber(MultiplDV);
-                    MultiplUVIsZero = _LPIsZeroNumber(MultiplUV);
-                    MultiplLVIsZero = _LPIsZeroNumber(MultiplLV);
-                    MultiplDVIsOne = _LPIsOneNumber(MultiplDV);
-                    MultiplUVIsOne = _LPIsOneNumber(MultiplUV);
-                    MultiplLVIsOne = _LPIsOneNumber(MultiplLV);
+		    /*
+		      these casts are not necessary when _LPBoolean is a bool,
+		      but when _LPBoolean is a struct it avoids a warning
+		      on some compilers
+		    */
+                    MultiplDVIsZero = (_LPBoolean) _LPIsZeroNumber(MultiplDV);
+                    MultiplUVIsZero = (_LPBoolean) _LPIsZeroNumber(MultiplUV);
+                    MultiplLVIsZero = (_LPBoolean) _LPIsZeroNumber(MultiplLV);
+                    MultiplDVIsOne  = (_LPBoolean) _LPIsOneNumber(MultiplDV);
+                    MultiplUVIsOne  = (_LPBoolean) _LPIsOneNumber(MultiplUV);
+                    MultiplLVIsOne  = (_LPBoolean) _LPIsOneNumber(MultiplLV);
                     if (!_LPIsZeroNumber(MultiplDV) && _LPIsOneNumber(MultiplUV / MultiplDV)
 			&& _LPIsOneNumber(MultiplLV / MultiplDV)) {
                         MultiplDULVEquals = _LPTrue;
@@ -1097,14 +1102,19 @@ QVector *MulInv_QV(QMatrix *Q, QVector *V)
                     MultiplL = Q->MultiplL;
                     MultiplV = V->Multipl;
                     MultiplDV = V->Multipl / Q->MultiplD;  /* attention here !!! */
-                    MultiplDIsZero = _LPIsZeroNumber(MultiplD);
-                    MultiplUIsZero = _LPIsZeroNumber(MultiplU);
-                    MultiplLIsZero = _LPIsZeroNumber(MultiplL);
-                    MultiplDIsOne = _LPIsOneNumber(MultiplD);
-                    MultiplUIsOne = _LPIsOneNumber(MultiplU);
-                    MultiplLIsOne = _LPIsOneNumber(MultiplL);
-                    MultiplVIsOne = _LPIsOneNumber(MultiplV);
-                    MultiplDVIsOne = _LPIsOneNumber(MultiplDV);
+		    /*
+		      these casts are not necessary when _LPBoolean is a bool,
+		      but when _LPBoolean is a struct it avoids a warning
+		      on some compilers
+		    */
+                    MultiplDIsZero = (_LPBoolean) _LPIsZeroNumber(MultiplD);
+                    MultiplUIsZero = (_LPBoolean) _LPIsZeroNumber(MultiplU);
+                    MultiplLIsZero = (_LPBoolean) _LPIsZeroNumber(MultiplL);
+                    MultiplDIsOne  = (_LPBoolean) _LPIsOneNumber(MultiplD);
+                    MultiplUIsOne  = (_LPBoolean) _LPIsOneNumber(MultiplU);
+                    MultiplLIsOne  = (_LPBoolean) _LPIsOneNumber(MultiplL);
+                    MultiplVIsOne  = (_LPBoolean) _LPIsOneNumber(MultiplV);
+                    MultiplDVIsOne = (_LPBoolean) _LPIsOneNumber(MultiplDV);
 
                     /* multiplication of the vector V by the inverse matrix
                        of the diagonal of M */
