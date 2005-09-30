@@ -1,4 +1,4 @@
-// $Id: face_tri.C,v 1.20 2005-06-06 16:24:14 knezed01 Exp $
+// $Id: face_tri.C,v 1.21 2005-09-30 19:55:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -130,10 +130,10 @@ Real Tri::quality (const ElemQuality q) const
         if ((l1 <=0.) || (l2 <= 0.) || (l3 <= 0.))
           return 0.;
 
-        const Real s1 = sin(acos(v1*v2/l1/l2)/2.);
+        const Real s1 = std::sin(std::acos(v1*v2/l1/l2)/2.);
         v1 *= -1;
-        const Real s2 = sin(acos(v1*v3/l1/l3)/2.);
-        const Real s3 = sin(acos(v2*v3/l2/l3)/2.);
+        const Real s2 = std::sin(std::acos(v1*v3/l1/l3)/2.);
+        const Real s3 = std::sin(std::acos(v2*v3/l2/l3)/2.);
         
         return 8. * s1 * s2 * s3;
         

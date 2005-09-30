@@ -1,4 +1,4 @@
-// $Id: plt_loader_read.C,v 1.6 2005-05-24 13:35:41 jwpeterson Exp $
+// $Id: plt_loader_read.C,v 1.7 2005-09-30 19:55:24 benkirk Exp $
 
 // Copyright (C) 2002-2005  Benjamin S. Kirk
   
@@ -39,7 +39,7 @@ void PltLoader::read (const std::string& name)
       std::cerr << "Error reading input file " << name
 		<< std::endl;
 
-      abort();
+      std::abort();
     }
     
 
@@ -98,7 +98,7 @@ void PltLoader::read_header (std::istream& in)
       {
 	int one = 0;	
 	in.read (buf, SIZEOF_INT);
-	memcpy  (&one, buf, SIZEOF_INT);
+	std::memcpy  (&one, buf, SIZEOF_INT);
 	
 	if (one != 1)
 	  {
@@ -126,7 +126,7 @@ void PltLoader::read_header (std::istream& in)
 	do
 	  {
 	    in.read (buf, SIZEOF_INT);
-	    memcpy  (&i, buf, SIZEOF_INT);
+	    std::memcpy  (&i, buf, SIZEOF_INT);
 	    rb(i);
 
 	    // Don't add trailing \0
@@ -140,7 +140,7 @@ void PltLoader::read_header (std::istream& in)
       {
 	int nv;
 	in.read (buf, SIZEOF_INT);
-	memcpy  (&nv, buf, SIZEOF_INT);
+	std::memcpy  (&nv, buf, SIZEOF_INT);
 	rb(nv);
 	
 	this->set_n_vars (nv);
@@ -157,7 +157,7 @@ void PltLoader::read_header (std::istream& in)
 	  do
 	    {
 	      in.read (buf, SIZEOF_INT);
-	      memcpy  (&i, buf, SIZEOF_INT);
+	      std::memcpy  (&i, buf, SIZEOF_INT);
 	      rb(i);
 	      
 	      // Don't add trailing \0
@@ -186,7 +186,7 @@ void PltLoader::read_header (std::istream& in)
 	      {
 		f = 0.;
 		in.read (buf, SIZEOF_FLOAT);
-		memcpy  (&f, buf, SIZEOF_FLOAT);
+		std::memcpy  (&f, buf, SIZEOF_FLOAT);
 		rb(f);
 	      }
 	    while ((f != 299.) &&
@@ -199,7 +199,7 @@ void PltLoader::read_header (std::istream& in)
 	      {
 		std::cerr << "ERROR: Unexpected end-of-file!"
 			  << std::endl;
-		abort();
+		std::abort();
 	      }    
 	  
 	    // Found a Zone marker
@@ -216,7 +216,7 @@ void PltLoader::read_header (std::istream& in)
 		  do
 		    {
 		      in.read (buf, SIZEOF_INT);
-		      memcpy  (&i, buf, SIZEOF_INT);
+		      std::memcpy  (&i, buf, SIZEOF_INT);
 		      rb(i);
 		      
 		      // Don't add trailing \0
@@ -232,7 +232,7 @@ void PltLoader::read_header (std::istream& in)
 		{
 		  int zt;
 		  in.read (buf, SIZEOF_INT);
-		  memcpy  (&zt, buf, SIZEOF_INT);
+		  std::memcpy  (&zt, buf, SIZEOF_INT);
 		  rb(zt);
 		  
 		  ztype.push_back(zt);
@@ -244,7 +244,7 @@ void PltLoader::read_header (std::istream& in)
 		  int zc=0;
 	    
 		  in.read (buf, SIZEOF_INT);
-		  memcpy  (&zc, buf, SIZEOF_INT);
+		  std::memcpy  (&zc, buf, SIZEOF_INT);
 		  rb(zc);
 		  
 		  //std::cout << "zone color=" << zc << std::endl;
@@ -258,15 +258,15 @@ void PltLoader::read_header (std::istream& in)
 		    kmax=0;
 	    
 		  in.read (buf, SIZEOF_INT);
-		  memcpy  (&imax, buf, SIZEOF_INT);
+		  std::memcpy  (&imax, buf, SIZEOF_INT);
 		  rb(imax);
 		  
 		  in.read (buf, SIZEOF_INT);
-		  memcpy  (&jmax, buf, SIZEOF_INT);
+		  std::memcpy  (&jmax, buf, SIZEOF_INT);
 		  rb(jmax);
 		  
 		  in.read (buf, SIZEOF_INT);
-		  memcpy  (&kmax, buf, SIZEOF_INT);
+		  std::memcpy  (&kmax, buf, SIZEOF_INT);
 		  rb(kmax);
 		  
 		  zimax.push_back (imax);
@@ -305,7 +305,7 @@ void PltLoader::read_header (std::istream& in)
 	int one = 0;
 	
 	in.read (buf, SIZEOF_INT);
-	memcpy  (&one, buf, SIZEOF_INT);
+	std::memcpy  (&one, buf, SIZEOF_INT);
 	
 	if (one != 1)
 	  {
@@ -332,7 +332,7 @@ void PltLoader::read_header (std::istream& in)
 	do
 	  {
 	    in.read (buf, SIZEOF_INT);
-	    memcpy  (&i, buf, SIZEOF_INT);
+	    std::memcpy  (&i, buf, SIZEOF_INT);
 	    rb(i);
 	    
 	    // Don't add trailing \0
@@ -346,7 +346,7 @@ void PltLoader::read_header (std::istream& in)
       {
 	int nv;
 	in.read (buf, SIZEOF_INT);
-	memcpy  (&nv, buf, SIZEOF_INT);
+	std::memcpy  (&nv, buf, SIZEOF_INT);
 	rb(nv);
 	
 	this->set_n_vars (nv);
@@ -363,7 +363,7 @@ void PltLoader::read_header (std::istream& in)
 	  do
 	    {
 	      in.read (buf, SIZEOF_INT);
-	      memcpy  (&i, buf, SIZEOF_INT);
+	      std::memcpy  (&i, buf, SIZEOF_INT);
 	      rb(i);
 	      
 	      // Don't add trailing \0
@@ -392,7 +392,7 @@ void PltLoader::read_header (std::istream& in)
 	      {
 		f = 0.;
 		in.read (buf, SIZEOF_FLOAT);
-		memcpy  (&f, buf, SIZEOF_FLOAT);
+		std::memcpy  (&f, buf, SIZEOF_FLOAT);
 		rb(f);
 	      }
 	    while ((f != 299.) &&
@@ -405,7 +405,7 @@ void PltLoader::read_header (std::istream& in)
 	      {
 		std::cerr << "ERROR: Unexpected end-of-file!"
 			  << std::endl;
-		abort();
+		std::abort();
 	      }    
 	  
 	    // Found a Zone marker
@@ -422,7 +422,7 @@ void PltLoader::read_header (std::istream& in)
 		  do
 		    {
 		      in.read (buf, SIZEOF_INT);
-		      memcpy  (&i, buf, SIZEOF_INT);
+		      std::memcpy  (&i, buf, SIZEOF_INT);
 		      rb(i);
 		  
 		      // Don't add trailing \0
@@ -438,7 +438,7 @@ void PltLoader::read_header (std::istream& in)
 		{
 		  int zc=0;	    
 		  in.read (buf, SIZEOF_INT);
-		  memcpy  (&zc, buf, SIZEOF_INT);
+		  std::memcpy  (&zc, buf, SIZEOF_INT);
 		  rb(zc);
 		}
 	      
@@ -446,7 +446,7 @@ void PltLoader::read_header (std::istream& in)
 		{
 		  int zt;
 		  in.read (buf, SIZEOF_INT);
-		  memcpy  (&zt, buf, SIZEOF_INT);
+		  std::memcpy  (&zt, buf, SIZEOF_INT);
 		  rb(zt);
 		  
 		  ztype.push_back(zt);
@@ -456,7 +456,7 @@ void PltLoader::read_header (std::istream& in)
 		{
 		  int dp=0;
 		  in.read (buf, SIZEOF_INT);
-		  memcpy (&dp, buf, SIZEOF_INT);
+		  std::memcpy (&dp, buf, SIZEOF_INT);
 		  rb(dp);
 
 		  zpack.push_back (dp);
@@ -467,14 +467,14 @@ void PltLoader::read_header (std::istream& in)
 		  int svl=0;
 		  int  vl=0;
 		  in.read (buf, SIZEOF_INT);
-		  memcpy  (&svl, buf, SIZEOF_INT);
+		  std::memcpy  (&svl, buf, SIZEOF_INT);
 		  rb(svl);
 		  
 		  if (svl)
 		    for (unsigned int v=0; v<this->n_vars(); v++)
 		      {
 			in.read (buf, SIZEOF_INT);
-			memcpy  (&vl, buf, SIZEOF_INT);
+			std::memcpy  (&vl, buf, SIZEOF_INT);
 			rb(vl);
 			assert (vl == 0); // Only know about node-based data
 			                  // right now
@@ -486,7 +486,7 @@ void PltLoader::read_header (std::istream& in)
 		{
 		  int fn=0;
 		  in.read (buf, SIZEOF_INT);
-		  memcpy  (&fn, buf, SIZEOF_INT);
+		  std::memcpy  (&fn, buf, SIZEOF_INT);
 		  rb(fn);
 		}
 	  
@@ -497,11 +497,11 @@ void PltLoader::read_header (std::istream& in)
 		      int np=0, ne=0;
 
 		      in.read (buf, SIZEOF_INT);
-		      memcpy  (&np, buf, SIZEOF_INT);
+		      std::memcpy  (&np, buf, SIZEOF_INT);
 		      rb(np);
 
 		      in.read (buf, SIZEOF_INT);
-		      memcpy  (&ne, buf, SIZEOF_INT);
+		      std::memcpy  (&ne, buf, SIZEOF_INT);
 		      rb(ne);
 		    }
 
@@ -512,15 +512,15 @@ void PltLoader::read_header (std::istream& in)
 		    kmax=0;
 		  
 		  in.read (buf, SIZEOF_INT);
-		  memcpy  (&imax, buf, SIZEOF_INT);
+		  std::memcpy  (&imax, buf, SIZEOF_INT);
 		  rb(imax);
 		  
 		  in.read (buf, SIZEOF_INT);
-		  memcpy  (&jmax, buf, SIZEOF_INT);
+		  std::memcpy  (&jmax, buf, SIZEOF_INT);
 		  rb(jmax);
 		  
 		  in.read (buf, SIZEOF_INT);
-		  memcpy  (&kmax, buf, SIZEOF_INT);
+		  std::memcpy  (&kmax, buf, SIZEOF_INT);
 		  rb(kmax);
 		  
 		  zimax.push_back (imax);
@@ -556,7 +556,7 @@ void PltLoader::read_header (std::istream& in)
 		<< std::endl
 		<< this->version()
 		<< std::endl;
-      abort();
+      std::abort();
     }
   
 
@@ -640,7 +640,7 @@ void PltLoader::read_data (std::istream& in)
 	    {
 	      f = 0.;
 	      in.read (buf, SIZEOF_FLOAT);
-	      memcpy  (&f, buf, SIZEOF_FLOAT);
+	      std::memcpy  (&f, buf, SIZEOF_FLOAT);
 	      rb(f);
 	    }
 	  while ((f != 299.) && in.good());
@@ -650,7 +650,7 @@ void PltLoader::read_data (std::istream& in)
 	    {
 	      std::cerr << "ERROR: Unexpected end-of-file!"
 			<< std::endl;
-	      abort();
+	      std::abort();
 	    }
 
 	  // Get the number of repeated vars.
@@ -659,7 +659,7 @@ void PltLoader::read_data (std::istream& in)
 	
 	  {	
 	    in.read (buf, SIZEOF_INT);
-	    memcpy  (&n_rep_vars, buf, SIZEOF_INT);
+	    std::memcpy  (&n_rep_vars, buf, SIZEOF_INT);
 	    rb(n_rep_vars);
 
 	    rep_vars.resize (n_rep_vars);
@@ -669,10 +669,10 @@ void PltLoader::read_data (std::istream& in)
 	      {
 		std::cerr << "ERROR:  I don't understand repeated variables yet!"
 			  << std::endl;
-		abort();
+		std::abort();
 	    
 		in.read (buf, SIZEOF_INT);
-		memcpy  (&rep_vars[v], buf, SIZEOF_INT);
+		std::memcpy  (&rep_vars[v], buf, SIZEOF_INT);
 		rb(rep_vars[v]);
 	      }	
 	  }
@@ -682,7 +682,7 @@ void PltLoader::read_data (std::istream& in)
 	  for (unsigned int v=0; v<this->n_vars(); v++)
 	    {
 	      in.read (buf, SIZEOF_INT);
-	      memcpy  (&this->var_type(v), buf, SIZEOF_INT);
+	      std::memcpy  (&this->var_type(v), buf, SIZEOF_INT);
 	      rb(this->var_type(v));
 
 	      //std::cout << this->var_type(v) << " ";
@@ -735,7 +735,7 @@ void PltLoader::read_data (std::istream& in)
 		std::cerr << "ERROR: Unsupported Zone type: "
 			  << this->zone_type(zone)
 			  << std::endl;
-		abort();
+		std::abort();
 	      }
 	    } // end switch on zone type
 	}
@@ -752,7 +752,7 @@ void PltLoader::read_data (std::istream& in)
 	    {
 	      f = 0.;
 	      in.read (buf, SIZEOF_FLOAT);
-	      memcpy  (&f, buf, SIZEOF_FLOAT);
+	      std::memcpy  (&f, buf, SIZEOF_FLOAT);
 	      rb(f);
 	    }
 	  while ((f != 299.) && in.good());
@@ -762,14 +762,14 @@ void PltLoader::read_data (std::istream& in)
 	    {
 	      std::cerr << "ERROR: Unexpected end-of-file!"
 			<< std::endl;
-	      abort();
+	      std::abort();
 	    }
 
 	  // Get the variable data type
 	  for (unsigned int v=0; v<this->n_vars(); v++)
 	    {
 	      in.read (buf, SIZEOF_INT);
-	      memcpy  (&this->var_type(v), buf, SIZEOF_INT);
+	      std::memcpy  (&this->var_type(v), buf, SIZEOF_INT);
 	      rb(this->var_type(v));
 
 	      //std::cout << this->var_type(v) << " ";
@@ -781,7 +781,7 @@ void PltLoader::read_data (std::istream& in)
 	    int sv=0;
 
 	    in.read (buf, SIZEOF_INT);
-	    memcpy  (&vs, buf, SIZEOF_INT);
+	    std::memcpy  (&vs, buf, SIZEOF_INT);
 	    rb(vs);
 
 	    if (vs)
@@ -789,14 +789,14 @@ void PltLoader::read_data (std::istream& in)
 		for (unsigned int v=0; v<this->n_vars(); v++)
 		  {
 		    in.read (buf, SIZEOF_INT);
-		    memcpy  (&sv, buf, SIZEOF_INT);
+		    std::memcpy  (&sv, buf, SIZEOF_INT);
 		    rb(sv);
 		    
 		    if (sv != -1)
 		      {
 			std::cerr << "ERROR:  I don't understand variable sharing!"
 				  << std::endl;
-			abort();
+			std::abort();
 		      }
 		  }
 	      }
@@ -806,7 +806,7 @@ void PltLoader::read_data (std::istream& in)
 	  {
 	    int sc=0;
 	    in.read (buf, SIZEOF_INT);
-	    memcpy  (&sc, buf, SIZEOF_INT);
+	    std::memcpy  (&sc, buf, SIZEOF_INT);
 	    rb(sc);
 	    
 	    assert (sc == -1);
@@ -825,7 +825,7 @@ void PltLoader::read_data (std::istream& in)
 		this->read_point_data (in, zone);
 
 	      else
-		abort();
+		std::abort();
 	    }
 	  else
 	    {
@@ -838,7 +838,7 @@ void PltLoader::read_data (std::istream& in)
 		this->read_fepoint_data (in, zone);
 
 	      else
-		abort();
+		std::abort();
 	    }
 	}
 
@@ -852,7 +852,7 @@ void PltLoader::read_data (std::istream& in)
 		    << std::endl
 		    << this->version()
 		    << std::endl;
-	  abort();
+	  std::abort();
 	}
       
     } // end loop on zones
@@ -921,7 +921,7 @@ void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
 	    std::cerr << "ERROR: Unsupported data type: "
 		      << this->var_type(var)
 		      << std::endl;
-	    abort();
+	    std::abort();
 	  }
 	}
     }
@@ -959,7 +959,7 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
 	      assert (in.good());
 	      
 	      in.read (buf, SIZEOF_FLOAT);
-	      memcpy  (&f, buf, SIZEOF_FLOAT);
+	      std::memcpy  (&f, buf, SIZEOF_FLOAT);
 	      rb(f);
 		    
 	      _data[zone][var].push_back(f);			
@@ -971,7 +971,7 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
 	      assert (in.good());
 	      
 	      in.read (buf, SIZEOF_DOUBLE);
-	      memcpy  (&d, buf, SIZEOF_DOUBLE);
+	      std::memcpy  (&d, buf, SIZEOF_DOUBLE);
 	      rb(d);
 	      
 	      _data[zone][var].push_back(d);			
@@ -981,7 +981,7 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
 	      std::cerr << "ERROR: unsupported data type: "
 			<< this->var_type(var)
 			<< std::endl;
-	      abort();
+	      std::abort();
 	    }
 }
 
@@ -1039,7 +1039,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
 	    std::cerr << "ERROR: Unsupported data type: "
 		      << this->var_type(var)
 		      << std::endl;
-	    abort();
+	    std::abort();
 	  }
 	}
     }
@@ -1055,7 +1055,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
       {
 	std::cerr << "ERROR:  Repeated connectivity not supported!"
 		  << std::endl;
-	abort();
+	std::abort();
       }
 
     // Read the connectivity
@@ -1102,7 +1102,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
 	  assert (in.good());
 	  
 	  in.read (buf, SIZEOF_FLOAT);
-	  memcpy  (&f, buf, SIZEOF_FLOAT);
+	  std::memcpy  (&f, buf, SIZEOF_FLOAT);
 	  rb(f);
 	  
 	  _data[zone][var].push_back(f);			
@@ -1114,7 +1114,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
 	  assert (in.good());
 	  
 	  in.read (buf, SIZEOF_DOUBLE);
-	  memcpy  (&d, buf, SIZEOF_DOUBLE);
+	  std::memcpy  (&d, buf, SIZEOF_DOUBLE);
 	  rb(d);
 	  
 	  _data[zone][var].push_back(d);			
@@ -1124,7 +1124,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
 	  std::cerr << "ERROR: unsupported data type: "
 		    << this->var_type(var)
 		    << std::endl;
-	  abort();
+	  std::abort();
 	}
 
   // Read the connectivity
@@ -1139,7 +1139,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
       {
 	std::cerr << "ERROR:  Repeated connectivity not supported!"
 		  << std::endl;
-	abort();
+	std::abort();
       }
 
     // Read the connectivity

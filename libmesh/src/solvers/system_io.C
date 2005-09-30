@@ -1,4 +1,4 @@
-// $Id: system_io.C,v 1.12 2005-08-15 21:30:38 knezed01 Exp $
+// $Id: system_io.C,v 1.13 2005-09-30 19:55:24 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,7 @@
 
 
 // C++ Includes
-#include <cstdio> // for sprintf
+#include <cstdio> // for std::sprintf
 #include <set>
 
 // Local Includes
@@ -493,7 +493,7 @@ void System::write(Xdr& io,
 	// set up the comment
       {
 	comment  = "# Name, Variable No. ";
-	sprintf(buf, "%d", var);
+	std::sprintf(buf, "%d", var);
 	comment += buf;
 	comment += ", System \"";
 	comment += this->name();
@@ -515,7 +515,7 @@ void System::write(Xdr& io,
       // set up the comment
       {
 	comment = "# Approximation Order, Variable \"";
-	sprintf(buf, "%s", var_name.c_str());
+	std::sprintf(buf, "%s", var_name.c_str());
 	comment += buf;
 	comment += "\", System \"";
 	comment += this->name();
@@ -534,7 +534,7 @@ void System::write(Xdr& io,
        */
       {
 	comment = "# Radial Approximation Order, Variable \"";
-	sprintf(buf, "%s", var_name.c_str());
+	std::sprintf(buf, "%s", var_name.c_str());
 	comment += buf;
 	comment += "\", System \"";
 	comment += this->name();
@@ -557,7 +557,7 @@ void System::write(Xdr& io,
       // set up the comment
       {
 	comment = "# FE Family, Variable \"";
-	sprintf(buf, "%s", var_name.c_str());
+	std::sprintf(buf, "%s", var_name.c_str());
 	comment += buf;
 	comment += "\", System \"";
 	comment += this->name();
@@ -575,7 +575,7 @@ void System::write(Xdr& io,
 
       {
 	comment = "# Radial FE Family, Variable \"";
-	sprintf(buf, "%s", var_name.c_str());
+	std::sprintf(buf, "%s", var_name.c_str());
 	comment += buf;
 	comment += "\", System \"";
 	comment += this->name();
@@ -589,7 +589,7 @@ void System::write(Xdr& io,
 
       {
 	comment = "# Infinite Mapping Type, Variable \"";
-	sprintf(buf, "%s", var_name.c_str());
+	std::sprintf(buf, "%s", var_name.c_str());
 	comment += buf;
 	comment += "\", System \"";
 	comment += this->name();
@@ -645,7 +645,7 @@ void System::write(Xdr& io,
 	     * write the name of the cnt-th additional vector
 	     */
 	    comment =  "# Name of ";
-	    sprintf(buf, "%d", cnt++);
+	    std::sprintf(buf, "%d", cnt++);
 	    comment += buf;
 	    comment += "th vector";
 	    std::string vec_name = vec_pos->first;

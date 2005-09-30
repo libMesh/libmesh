@@ -1,4 +1,4 @@
-// $Id: parameters.h,v 1.5 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: parameters.h,v 1.6 2005-09-30 19:55:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 // ------------------------------------------------------------
@@ -186,7 +186,7 @@ private:
     /**
      * Clone this value.  Useful in copy-construction.
      */
-    virtual Value* clone () const;
+    virtual Value* clone () const; 
     
   private:
 
@@ -238,8 +238,11 @@ template <typename T>
 inline
 Parameters::Value* Parameters::Parameter<T>::clone () const
 {
-  Parameters::Parameter<T>
-    *copy = new Parameters::Parameter<T>;
+  // No good for Solaris C++! - BSK
+//  Parameters::Parameter<T>
+//    *copy = new Parameters::Parameter<T>;
+  Parameter<T>
+    *copy = new Parameter<T>;
 
   assert (copy != NULL);
   

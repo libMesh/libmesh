@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.26 2005-07-01 19:52:44 jwpeterson Exp $
+// $Id: mesh_data_unv_support.C,v 1.27 2005-09-30 19:55:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -20,7 +20,7 @@
 
 
 // C++ includes
-#include <cstdio> // for sprintf
+#include <cstdio> // for std::sprintf
 #include <fstream>
 
 // Local includes
@@ -314,9 +314,9 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 		      in_file >> buf;
 		      MeshDataUnvHeader::need_D_to_e(buf);
 #ifdef USE_COMPLEX_NUMBERS
-		      values[data_cnt] = Complex(atof(buf.c_str()), 0.);
+		      values[data_cnt] = Complex(std::atof(buf.c_str()), 0.);
 #else
-		      values[data_cnt] = atof(buf.c_str());
+		      values[data_cnt] = std::atof(buf.c_str());
 #endif
 		    }
 
@@ -331,14 +331,14 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 
 		      if (MeshDataUnvHeader::need_D_to_e(buf))
 		        {
-			  re_val = atof(buf.c_str());
+			  re_val = std::atof(buf.c_str());
 			  in_file >> buf;
 			  MeshDataUnvHeader::need_D_to_e(buf);
-			  im_val = atof(buf.c_str()); 
+			  im_val = std::atof(buf.c_str()); 
 			}
 		      else
 		        {
-			  re_val = atof(buf.c_str());
+			  re_val = std::atof(buf.c_str());
 			  in_file >> im_val;
 			}
 
@@ -573,7 +573,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
       const Node* node = (*nit).first;
 
       unsigned int f_n_id = node_to_foreign_id (node);
-      sprintf(buf, "%10i\n", f_n_id);
+      std::sprintf(buf, "%10i\n", f_n_id);
       out_file << buf;
 
       /* since we are iterating over our own map, this assert
@@ -587,11 +587,11 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
       for (unsigned int v_cnt=0; v_cnt<values.size(); v_cnt++)
 	{
 #ifdef USE_COMPLEX_NUMBERS
-	  sprintf(buf, "%13.5E%13.5E", values[v_cnt].real(),
-		                       values[v_cnt].imag());
+	  std::sprintf(buf, "%13.5E%13.5E", values[v_cnt].real(),
+		                            values[v_cnt].imag());
 	  out_file << buf;
 #else
-	  sprintf(buf, "%13.5E", values[v_cnt]);
+	  std::sprintf(buf, "%13.5E", values[v_cnt]);
 	  out_file << buf;
 #endif
 	}
@@ -704,7 +704,7 @@ bool MeshDataUnvHeader::read (std::istream& in_file)
    * There are UNV-files where floats are 
    * written with 'D' as the 10th-power 
    * character. Replace this 'D' by 'e',
-   * so that atof() can work fine.
+   * so that std::atof() can work fine.
    */
   std::string buf;
   in_file >> buf;
@@ -712,26 +712,26 @@ bool MeshDataUnvHeader::read (std::istream& in_file)
   if (need_D_to_e(buf))
     {
       // have to convert _all_ 'D' to 'e'
-      this->record_12[0] = atof(buf.c_str());
+      this->record_12[0] = std::atof(buf.c_str());
 
       for (unsigned int i=1; i<6; i++)
         {
 	  in_file >> buf;
 	  need_D_to_e(buf);
-	  this->record_12[i] = atof(buf.c_str());
+	  this->record_12[i] = std::atof(buf.c_str());
         }
 
       for (unsigned int i=0; i<6; i++)
         {
 	  in_file >> buf;
 	  need_D_to_e(buf);
-	  this->record_13[i] = atof(buf.c_str());
+	  this->record_13[i] = std::atof(buf.c_str());
         }
     }
   else
     {
       // no 'D', the stream will recognize the floats
-      this->record_12[0] = atof(buf.c_str());
+      this->record_12[0] = std::atof(buf.c_str());
 
       for (unsigned int i=1; i<6; i++)
 	  in_file >> this->record_12[i];
@@ -757,43 +757,43 @@ void MeshDataUnvHeader::write (std::ostream& out_file)
   
   char buf[81];
 
-  sprintf(buf, "%6i\n",this->dataset_label);
+  std::sprintf(buf, "%6i\n",this->dataset_label);
   
   out_file << buf;
  
   out_file << this->dataset_name << "\n";
 
-  sprintf(buf, "%6i\n",this->dataset_location);
+  std::sprintf(buf, "%6i\n",this->dataset_location);
   
   out_file << buf;
 
   for (unsigned int n=0; n<5; n++)
     out_file << this->id_lines_1_to_5[n] << "\n";
 
-  sprintf(buf, "%10i%10i%10i%10i%10i%10i\n",
-	  model_type,  analysis_type, data_characteristic,
-	  result_type, data_type,     nvaldc);
+  std::sprintf(buf, "%10i%10i%10i%10i%10i%10i\n",
+	       model_type,  analysis_type, data_characteristic,
+	       result_type, data_type,     nvaldc);
   
   out_file << buf;
 
-  sprintf(buf, "%10i%10i%10i%10i%10i%10i%10i%10i\n",
-	  record_10[0], record_10[1], record_10[2], record_10[3],
-	  record_10[4], record_10[5], record_10[6], record_10[7]);
+  std::sprintf(buf, "%10i%10i%10i%10i%10i%10i%10i%10i\n",
+	       record_10[0], record_10[1], record_10[2], record_10[3],
+	       record_10[4], record_10[5], record_10[6], record_10[7]);
   
   out_file << buf;
 
-  sprintf(buf, "%10i%10i\n", record_11[0], record_11[1]);
+  std::sprintf(buf, "%10i%10i\n", record_11[0], record_11[1]);
   out_file << buf;
 
-  sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n",
-	  record_12[0], record_12[1], record_12[2],
-	  record_12[3], record_12[4], record_12[5]);
+  std::sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n",
+	       record_12[0], record_12[1], record_12[2],
+	       record_12[3], record_12[4], record_12[5]);
   
   out_file << buf;
 
-  sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n",
-	  record_13[0], record_13[1], record_13[2],
-	  record_13[3], record_13[4], record_13[5]);
+  std::sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n",
+	       record_13[0], record_13[1], record_13[2],
+	       record_13[3], record_13[4], record_13[5]);
   
   out_file << buf;
 }

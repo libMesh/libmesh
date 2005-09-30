@@ -1,4 +1,4 @@
-/* $Id: ex1.C,v 1.8 2005-06-06 16:23:54 knezed01 Exp $ */
+/* $Id: ex1.C,v 1.9 2005-09-30 19:55:20 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -60,7 +60,7 @@ int main (int argc, char** argv)
       }
     
     // Get the dimensionality of the mesh from argv[2]
-    const unsigned int dim = atoi(argv[2]);
+    const unsigned int dim = std::atoi(argv[2]);
     
     // Create a mesh with the requested dimension.
     Mesh mesh(dim);

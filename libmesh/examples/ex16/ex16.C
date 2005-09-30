@@ -1,4 +1,4 @@
-// $Id: ex16.C,v 1.5 2005-06-07 14:04:18 spetersen Exp $
+// $Id: ex16.C,v 1.6 2005-09-30 19:55:21 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -101,7 +101,7 @@ int main (int argc, char** argv)
     const unsigned int dim = 2;
 
     // Get the number of eigen values to be computed from argv[2]
-    const unsigned int nev = atoi(argv[2]);
+    const unsigned int nev = std::atoi(argv[2]);
 
     // Create a dim-dimensional mesh.
     Mesh mesh (dim);

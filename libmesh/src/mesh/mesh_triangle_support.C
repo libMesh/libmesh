@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.C,v 1.6 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: mesh_triangle_support.C,v 1.7 2005-09-30 19:55:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -57,7 +57,7 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
   // Allocate memory for the initial points.  Stick to malloc here
   // so that all the accompanying 'destroy's work as well.
   input.numberofpoints = 2*(nx+ny-2);
-  input.pointlist      = static_cast<REAL*>(malloc(input.numberofpoints * 2 * sizeof(REAL)));
+  input.pointlist      = static_cast<REAL*>(std::malloc(input.numberofpoints * 2 * sizeof(REAL)));
 
   // The x and y spacing between boundary points
   const Real delta_x = (xmax-xmin) / static_cast<Real>(nx-1);
@@ -94,10 +94,10 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
   // all similar triangles.
 
   // Perform initial triangulation.
-  Triangle::triangulate("czBQ",
+  Triangle::triangulate(const_cast<char*>("czBQ"), // gives the desired char* 
 			&input,
 			&intermediate,
-			static_cast<Triangle::triangulateio*>(NULL));
+			NULL);
 
   // Final refined Triangle object.
   final.pointlist    = static_cast<Real*>(NULL);
@@ -187,20 +187,20 @@ void Triangle::init(Triangle::triangulateio& t)
 // Destroy helper routine defined in the Triangle namespace
 void Triangle::destroy(Triangle::triangulateio& t)
 {
-  free (t.pointlist                    );
-  free (t.pointattributelist           );
-  free (t.pointmarkerlist              );
-  free (t.trianglelist                 );
-  free (t.triangleattributelist        );
-  free (t.trianglearealist             );
-  free (t.neighborlist                 );
-  free (t.segmentlist                  );
-  free (t.segmentmarkerlist            );
-  free (t.holelist                     );
-  free (t.regionlist                   );
-  free (t.edgelist                     );
-  free (t.edgemarkerlist               );
-  free (t.normlist                     );
+  std::free (t.pointlist                    );
+  std::free (t.pointattributelist           );
+  std::free (t.pointmarkerlist              );
+  std::free (t.trianglelist                 );
+  std::free (t.triangleattributelist        );
+  std::free (t.trianglearealist             );
+  std::free (t.neighborlist                 );
+  std::free (t.segmentlist                  );
+  std::free (t.segmentmarkerlist            );
+  std::free (t.holelist                     );
+  std::free (t.regionlist                   );
+  std::free (t.edgelist                     );
+  std::free (t.edgemarkerlist               );
+  std::free (t.normlist                     );
 }
 #endif // HAVE_TRIANGLE
 

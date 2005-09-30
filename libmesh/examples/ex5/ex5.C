@@ -1,4 +1,4 @@
-/* $Id: ex5.C,v 1.32 2005-06-06 14:53:17 jwpeterson Exp $ */
+/* $Id: ex5.C,v 1.33 2005-09-30 19:55:22 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -137,7 +137,7 @@ int main (int argc, char** argv)
     
 
     // Set the quadrature rule type that the user wants from argv[2]
-    quad_type = static_cast<QuadratureType>(atoi(argv[2]));
+    quad_type = static_cast<QuadratureType>(std::atoi(argv[2]));
 
 
     // Independence of dimension has already been shown in

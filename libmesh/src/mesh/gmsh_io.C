@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.16 2005-09-30 16:53:56 benkirk Exp $
+// $Id: gmsh_io.C,v 1.17 2005-09-30 19:55:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -343,7 +343,7 @@ void GmshIO::read_mesh(std::istream& in)
     while (!in.eof()) {
       in >> buf;
 
-      if (!strncmp(buf,"$MeshFormat",11))
+      if (!std::strncmp(buf,"$MeshFormat",11))
         {
           in >> version >> format >> size;
           if(version != 2.0){
@@ -357,9 +357,9 @@ void GmshIO::read_mesh(std::istream& in)
         }
       
       // read the node block
-      else if (!strncmp(buf,"$NOD",4) ||
-	       !strncmp(buf,"$NOE",4) ||
-	       !strncmp(buf,"$Nodes",6) 
+      else if (!std::strncmp(buf,"$NOD",4) ||
+	       !std::strncmp(buf,"$NOE",4) ||
+	       !std::strncmp(buf,"$Nodes",6) 
 	       )
         {
           unsigned int numNodes = 0;
@@ -391,8 +391,8 @@ void GmshIO::read_mesh(std::istream& in)
        * until the elements are created, and inserted once reading elements is
        * finished
        */
-      else if (!strncmp(buf,"$ELM",4) ||
-               !strncmp(buf,"$Elements",9)
+      else if (!std::strncmp(buf,"$ELM",4) ||
+               !std::strncmp(buf,"$Elements",9)
                )
         {
           unsigned int numElem = 0;
@@ -850,7 +850,7 @@ void GmshIO::write_post (const std::string& fname,
           if (this->binary())
             {
               const int one = 1;
-              memcpy(buf, &one, sizeof(int));
+              std::memcpy(buf, &one, sizeof(int));
               out.write(buf, sizeof(int));
             }
 
@@ -858,7 +858,7 @@ void GmshIO::write_post (const std::string& fname,
           if (this->binary())
             {
               double one = 1;
-              memcpy(buf, &one, sizeof(double));
+              std::memcpy(buf, &one, sizeof(double));
               out.write(buf, sizeof(double));
             }
           else
@@ -881,7 +881,7 @@ void GmshIO::write_post (const std::string& fname,
                       if (this->binary())
                         {
                           double tmp = vertex(d);
-                          memcpy(buf, &tmp, sizeof(double));
+                          std::memcpy(buf, &tmp, sizeof(double));
                           out.write(reinterpret_cast<char *>(buf), sizeof(double));
                         }
                       else
@@ -904,7 +904,7 @@ void GmshIO::write_post (const std::string& fname,
 
 		    double tmp = (*v)[elem->node(i)*n_vars + ivar].real();
 #endif
-                    memcpy(buf, &tmp, sizeof(double));
+                    std::memcpy(buf, &tmp, sizeof(double));
                     out.write(reinterpret_cast<char *>(buf), sizeof(double));
                   }
                 else

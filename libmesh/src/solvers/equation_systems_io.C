@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.10 2005-08-18 19:12:31 knezed01 Exp $
+// $Id: equation_systems_io.C,v 1.11 2005-09-30 19:55:24 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,7 @@
 
 
 // C++ Includes
-#include <cstdio> // for sprintf
+#include <cstdio> // for std::sprintf
 
 // Local Includes
 #include "equation_systems.h"
@@ -422,7 +422,7 @@ void EquationSystems::write(const std::string& name,
 // 	for (; flag_pos!= flag_end; ++flag_pos)
 //           {
 // 	    comment =  "# Name, Flag ";
-// 	    sprintf(buf, "%d", cnt++);
+// 	    std::sprintf(buf, "%d", cnt++);
 // 	    comment += buf;
 // 	    std::string flag_name = *flag_pos;
 // 	    io.data (flag_name, comment.c_str());
@@ -455,13 +455,13 @@ void EquationSystems::write(const std::string& name,
 // 	for (; param_pos!= param_end; ++param_pos)
 //           {
 // 	    comment =  "# Name,  Parameter No. ";
-// 	    sprintf(buf, "%d", cnt);
+// 	    std::sprintf(buf, "%d", cnt);
 // 	    comment += buf;
 // 	    std::string param_name = param_pos->first;
 // 	    io.data (param_name, comment.c_str());
 
 // 	    comment = "# Value, Parameter No. ";
-// 	    sprintf(buf, "%d", cnt++);
+// 	    std::sprintf(buf, "%d", cnt++);
 // 	    comment += buf;
 // 	    Real param_value = param_pos->second;
 // 	    io.data (param_value, comment.c_str());
@@ -490,7 +490,7 @@ void EquationSystems::write(const std::string& name,
 	    std::string sys_name       = pos->first;
 
 	    comment =  "# Name, System No. ";
-	    sprintf(buf, "%d", sys_num);
+	    std::sprintf(buf, "%d", sys_num);
 	    comment += buf;
 	  
 	    io.data (sys_name, comment.c_str());
@@ -508,7 +508,7 @@ void EquationSystems::write(const std::string& name,
 	    std::string sys_type       = pos->second->system_type();
 
 	    comment =  "# Type, System No. ";
-	    sprintf(buf, "%d", sys_num);
+	    std::sprintf(buf, "%d", sys_num);
 	    comment += buf;
 	  
 	    io.data (sys_type, comment.c_str());

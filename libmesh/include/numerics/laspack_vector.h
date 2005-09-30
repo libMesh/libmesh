@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.8 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: laspack_vector.h,v 1.9 2005-09-30 19:55:22 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,7 @@
 
 
 // C++ includes
-#include <cstdio> // for sprintf
+#include <cstdio> // for std::sprintf
 
 // Local includes
 #include "numeric_vector.h"
@@ -432,7 +432,7 @@ void LaspackVector<T>::init (const unsigned int n,
 
   static int cnt = 0;
   char foo[80];
-  sprintf(foo,  "Vec-%d", cnt++); 
+  std::sprintf(foo,  "Vec-%d", cnt++); 
 
   V_Constr(&_vec, const_cast<char*>(foo), n, Normal, _LPTrue);
     

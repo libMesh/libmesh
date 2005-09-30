@@ -1,4 +1,4 @@
-// $Id: sphere.h,v 1.5 2005-05-17 15:26:17 benkirk Exp $
+// $Id: sphere.h,v 1.6 2005-09-30 19:55:22 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -195,10 +195,10 @@ Point Sphere::surface_coords (const Point& cart) const
   const Point c (cart-this->center());
 
   // phi: special care, so that it gives 0..2pi results
-  const Real phi = atan2(c(1), c(0));
+  const Real phi = std::atan2(c(1), c(0));
 
   return Point(/* radius */ c.size(),
-	       /* theta  */ atan2( std::sqrt( c(0)*c(0) + c(1)*c(1) ), c(2) ),
+	       /* theta  */ std::atan2( std::sqrt( c(0)*c(0) + c(1)*c(1) ), c(2) ),
 	       /* phi    */ ( (phi < 0)  ?  2.*libMesh::pi+phi  :  phi ) );
 }
 
@@ -212,9 +212,9 @@ Point Sphere::world_coords (const Point& sph) const
   const Real phi   = sph(2);
 
   // constant translation out of the origin
-  return Point (/* x */ r*sin(theta)*cos(phi) + this->center()(0),
-		/* y */ r*sin(theta)*sin(phi) + this->center()(1),
-		/* z */ r*cos(theta)          + this->center()(2));
+  return Point (/* x */ r*std::sin(theta)*std::cos(phi) + this->center()(0),
+		/* y */ r*std::sin(theta)*std::sin(phi) + this->center()(1),
+		/* z */ r*std::cos(theta)               + this->center()(2));
 }
 
 
