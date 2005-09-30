@@ -147,7 +147,7 @@
  
  
   - GNU GCC
-    - \p gcc 4.0.0-cvs
+    - \p gcc 4.0
     - \p gcc 3.x
     - \p gcc 2.95.x
     - \p gcc 2.96 (RedHat's compiler in the 7.x series)
@@ -159,12 +159,12 @@
     - Earlier versions (<= 5.0) not supported.
     
   - SGI Altix
-    - \p icc/ifort 8.x
+    - \p icc/ifort 9.0, 8.x
     - \p ecc/efc 7.1
     - \p MPT \p MPI 1.9.1
  
   - SGI IRIX 6.5 with  MIPSPro Compilers
-    - CC/cc version 7.4
+    - CC/cc version 7.4.2
 
   - Sun ONE Studio Compilers
     - Version 5.5 tested <code>(CXXFLAGS=-library=stlport4 CPPFLAGS=-library=stlport4 CXX=CC ./configure [...])</code>

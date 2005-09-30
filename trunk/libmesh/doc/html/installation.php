@@ -56,7 +56,7 @@ The library is known to work with the following compilers:
 <ul>
   <li>GNU GCC</li>
     <ul>
-      <li><code>gcc</code> 4.0.0-cvs</li>
+      <li><code>gcc</code> 4.0</li>
       <li><code>gcc</code> 3.x</li>
       <li><code>gcc</code> 2.95.3</li>
       <li><code>gcc</code> 2.96 (RedHat's compiler in the 7.x series)</li>
@@ -70,13 +70,13 @@ The library is known to work with the following compilers:
     </ul>
   <li>SGI Altix</li>
     <ul>
-      <li><code>icc/ifort</code> 8.x</li>
+      <li><code>icc/ifort</code> 9.0, 8.x</li>
       <li><code>ecc/efc</code> 7.1</li>
       <li><code>MPT MPI</code> 1.9.1</li>
     </ul>
   <li>SGI IRIX 6.5 with MIPSPro Compilers</li>
     <ul>
-      <li><code>CC/cc</code> version 7.4</li>
+      <li><code>CC/cc</code> version 7.4.2</li>
     </ul>
   <li>Sun ONE Studio Compilers</li>
     <ul>

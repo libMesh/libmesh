@@ -54,7 +54,7 @@ packages that are currently available. Currently the library supports
 <a href="http://www-unix.mcs.anl.gov/petsc/petsc-2">PETSc</a> is
 currently used for the solution of linear systems on both serial and
 parallel platforms, and
-<a href="http://www.tu-dresden.de/mwism/skalicky/laspack/laspack.html">LASPACK</a>
+<a href="http://www.tu-dresden.de/mwism/skalicky/laspack/laspack.html">LASPack</a>
 is included with the library to provide linear solver support on serial machines.
 
 <br>
