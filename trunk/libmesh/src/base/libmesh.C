@@ -1,4 +1,4 @@
-// $Id: libmesh.C,v 1.35 2005-05-17 18:38:26 benkirk Exp $
+// $Id: libmesh.C,v 1.36 2005-09-30 16:51:40 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,9 @@ extern "C"
 // Local anonymous namespace to hold miscelaneous variables
 namespace {
   AutoPtr<GetPot> command_line (NULL);
+#if defined(HAVE_MPI)
   bool libmesh_initialized_mpi = false;
+#endif
 }
 
 
