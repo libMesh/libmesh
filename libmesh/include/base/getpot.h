@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.9 2005-09-30 19:55:22 benkirk Exp $
+// $Id: getpot.h,v 1.10 2005-09-30 19:59:35 benkirk Exp $
 //
 // (with patches from Michael Anderson for more general variable types)
 
@@ -28,7 +28,7 @@
 #define __GETPOT_H__
 
 #if defined(WIN32) || defined(SOLARIS_RAW) || defined(__SUNPRO_CC) || (__GNUC__ == 2) || defined(__HP_aCC) || defined (__CYGWIN__)
-#  define strtok_r(a, b, c) strtok(a, b)
+#  define strtok_r(a, b, c) std::strtok(a, b)
 #endif // WINDOWS or SOLARIS or gcc 2.* or HP aCC or CYGWIN
 
 
@@ -2084,11 +2084,11 @@ GetPot::variable::take(const char* Value)
   // make a copy of the 'Value'
   char* copy = new char[std::strlen(Value)+1];
   std::strcpy(copy, Value);
-  char* follow_token = std::strtok_r(copy, " \t\n", &spt);
+  char* follow_token = strtok_r(copy, " \t\n", &spt);
   if( value.size() != 0 ) value.erase(value.begin(), value.end());
   while(follow_token != 0) {
     value.push_back(std::string(follow_token));
-    follow_token = std::strtok_r(NULL, " \t\n", &spt);
+    follow_token = strtok_r(NULL, " \t\n", &spt);
   }
 
   delete [] copy;
