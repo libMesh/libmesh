@@ -1342,6 +1342,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
           ac_config_files="$ac_config_files contrib/bin/create_libmesh_release"
 
+          ac_config_files="$ac_config_files doc/dot"
+
           ac_config_files="$ac_config_files include/base/libmesh_contrib_config.h"
 
           ac_config_headers="$ac_config_headers include/base/libmesh_config.h:include/base/libmesh_config.h.in"
@@ -2865,66 +2867,66 @@ echo "${ECHO_T}<<< C++ compiler is MIPSpro C++ compiler >>>" >&6
         GXX_VERSION=MIPSpro
       else
 
-                is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
-        if test "x$is_intel_icc" != "x" ; then
-          GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
+                is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Itanium(R)' | grep 'Compiler'`"
+        if test "x$is_intel_ecc" != "x" ; then
+          GXX_VERSION_STRING="`($CXX -V -help 2>&1) | grep 'Version '`"
           case "$GXX_VERSION_STRING" in
             *9.0*)
-              echo "$as_me:$LINENO: result: <<< C++ compiler is Intel ICC 9.0 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is Intel ICC 9.0 >>>" >&6
-  	      GXX_VERSION=intel_icc_v9.0
+              echo "$as_me:$LINENO: result: <<< C++ compiler is Intel Itanium ICC 9.0 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is Intel Itanium ICC 9.0 >>>" >&6
+  	      GXX_VERSION=intel_itanium_icc_v9.0
               ;;
             *8.1*)
-              echo "$as_me:$LINENO: result: <<< C++ compiler is Intel ICC 8.1 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is Intel ICC 8.1 >>>" >&6
-  	      GXX_VERSION=intel_icc_v8.1
+              echo "$as_me:$LINENO: result: <<< C++ compiler is Intel Itanium ICC 8.1 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is Intel Itanium ICC 8.1 >>>" >&6
+  	      GXX_VERSION=intel_itanium_icc_v8.1
               ;;
             *8.0*)
-              echo "$as_me:$LINENO: result: <<< C++ compiler is Intel ICC 8.0 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is Intel ICC 8.0 >>>" >&6
-  	      GXX_VERSION=intel_icc_v8.0
+              echo "$as_me:$LINENO: result: <<< C++ compiler is Intel Itanium ICC 8.0 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is Intel Itanium ICC 8.0 >>>" >&6
+  	      GXX_VERSION=intel_itanium_icc_v8.0
               ;;
             *7.1*)
-              echo "$as_me:$LINENO: result: <<< C++ compiler is Intel ICC 7.1 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is Intel ICC 7.1 >>>" >&6
-  	      GXX_VERSION=intel_icc_v7.1
+              echo "$as_me:$LINENO: result: <<< C++ compiler is Intel Itanium ICC 7.1 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is Intel Itanium ICC 7.1 >>>" >&6
+  	      GXX_VERSION=intel_itanium_icc_v7.1
               ;;
             *7.0*)
-              echo "$as_me:$LINENO: result: <<< C++ compiler is Intel ICC 7.0 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is Intel ICC 7.0 >>>" >&6
-  	      GXX_VERSION=intel_icc_v7.0
+              echo "$as_me:$LINENO: result: <<< C++ compiler is Intel Itanium ICC 7.0 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is Intel Itanium ICC 7.0 >>>" >&6
+  	      GXX_VERSION=intel_itanium_icc_v7.0
               ;;
           esac
         else
 
-                    is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R) C' | grep 'Itanium(R) Compiler'`"
-          if test "x$is_intel_ecc" != "x" ; then
-            GXX_VERSION_STRING="`($CXX -V -help 2>&1) | grep 'Version '`"
+                    is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
+          if test "x$is_intel_icc" != "x" ; then
+            GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
             case "$GXX_VERSION_STRING" in
               *9.0*)
-                echo "$as_me:$LINENO: result: <<< C++ compiler is Intel Itanium ICC 9.0 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is Intel Itanium ICC 9.0 >>>" >&6
-  	        GXX_VERSION=intel_itanium_icc_v9.0
+                echo "$as_me:$LINENO: result: <<< C++ compiler is Intel ICC 9.0 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is Intel ICC 9.0 >>>" >&6
+  	        GXX_VERSION=intel_icc_v9.0
                 ;;
               *8.1*)
-                echo "$as_me:$LINENO: result: <<< C++ compiler is Intel Itanium ICC 8.1 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is Intel Itanium ICC 8.1 >>>" >&6
-  	        GXX_VERSION=intel_itanium_icc_v8.1
+                echo "$as_me:$LINENO: result: <<< C++ compiler is Intel ICC 8.1 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is Intel ICC 8.1 >>>" >&6
+  	        GXX_VERSION=intel_icc_v8.1
                 ;;
               *8.0*)
-                echo "$as_me:$LINENO: result: <<< C++ compiler is Intel Itanium ICC 8.0 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is Intel Itanium ICC 8.0 >>>" >&6
-  	        GXX_VERSION=intel_itanium_icc_v8.0
+                echo "$as_me:$LINENO: result: <<< C++ compiler is Intel ICC 8.0 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is Intel ICC 8.0 >>>" >&6
+  	        GXX_VERSION=intel_icc_v8.0
                 ;;
               *7.1*)
-                echo "$as_me:$LINENO: result: <<< C++ compiler is Intel Itanium ICC 7.1 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is Intel Itanium ICC 7.1 >>>" >&6
-  	        GXX_VERSION=intel_itanium_icc_v7.1
+                echo "$as_me:$LINENO: result: <<< C++ compiler is Intel ICC 7.1 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is Intel ICC 7.1 >>>" >&6
+  	        GXX_VERSION=intel_icc_v7.1
                 ;;
               *7.0*)
-                echo "$as_me:$LINENO: result: <<< C++ compiler is Intel Itanium ICC 7.0 >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is Intel Itanium ICC 7.0 >>>" >&6
-  	        GXX_VERSION=intel_itanium_icc_v7.0
+                echo "$as_me:$LINENO: result: <<< C++ compiler is Intel ICC 7.0 >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is Intel ICC 7.0 >>>" >&6
+  	        GXX_VERSION=intel_icc_v7.0
                 ;;
             esac
           else
@@ -3089,8 +3091,8 @@ echo "${ECHO_T}proper compiler flags" >&6
           ;;
 
       MIPSpro)
-          CXXFLAGS_OPT="-LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -O2 -w"
-          CXXFLAGS_DBG="-LANG:std -LANG:libc_in_namespace_std=OFF -no_auto_include -ansi -g -woff 1460"
+          CXXFLAGS_OPT="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -O2 -w"
+          CXXFLAGS_DBG="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -g -woff 1460"
 	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
           CFLAGS_OPT="-O2 -w"
           CFLAGS_DBG="-g"
@@ -8225,7 +8227,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:8228:" \
+echo "$as_me:8230:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8419,7 +8421,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:8422: \"$ac_link\") >&5
+(eval echo $as_me:8424: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -8497,7 +8499,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:8500: \"$ac_link\") >&5
+(eval echo $as_me:8502: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -11010,7 +11012,8 @@ fi
   HAVE_DOT=NO
   if test "x$DOT" != x ; then
     HAVE_DOT=YES
-    DOTPATH=`dirname $DOT`
+    DOTPATH=$PWD/doc
+
 
   fi
 
@@ -11630,6 +11633,7 @@ do
   "contrib/bin/libmesh-config" ) CONFIG_FILES="$CONFIG_FILES contrib/bin/libmesh-config" ;;
   "contrib/bin/xda2mgf" ) CONFIG_FILES="$CONFIG_FILES contrib/bin/xda2mgf" ;;
   "contrib/bin/create_libmesh_release" ) CONFIG_FILES="$CONFIG_FILES contrib/bin/create_libmesh_release" ;;
+  "doc/dot" ) CONFIG_FILES="$CONFIG_FILES doc/dot" ;;
   "include/base/libmesh_contrib_config.h" ) CONFIG_FILES="$CONFIG_FILES include/base/libmesh_contrib_config.h" ;;
   "include/base/libmesh_config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/base/libmesh_config.h:include/base/libmesh_config.h.in" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
@@ -12051,6 +12055,7 @@ s,@abs_top_builddir@,$ac_abs_top_builddir,;t t
     contrib/bin/libmesh-config ) chmod +x contrib/bin/libmesh-config ;;
     contrib/bin/xda2mgf ) chmod +x contrib/bin/xda2mgf ;;
     contrib/bin/create_libmesh_release ) chmod +x contrib/bin/create_libmesh_release ;;
+    doc/dot ) chmod +x doc/dot ;;
   esac
 done
 _ACEOF

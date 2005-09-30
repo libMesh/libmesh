@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.60 2005-06-02 18:25:39 benkirk Exp $
+dnl $Id: configure.in,v 1.61 2005-09-30 16:53:55 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.60 $)
+AC_REVISION($Revision: 1.61 $)
 
 
 AC_INIT
@@ -18,6 +18,7 @@ AC_CONFIG_FILES(doc/Doxyfile)
 AC_CONFIG_FILES(contrib/bin/libmesh-config,         [chmod +x contrib/bin/libmesh-config])
 AC_CONFIG_FILES(contrib/bin/xda2mgf,                [chmod +x contrib/bin/xda2mgf])
 AC_CONFIG_FILES(contrib/bin/create_libmesh_release, [chmod +x contrib/bin/create_libmesh_release])
+AC_CONFIG_FILES(doc/dot,                            [chmod +x doc/dot])
 AC_CONFIG_FILES(include/base/libmesh_contrib_config.h)
 AC_CONFIG_HEADER(include/base/libmesh_config.h:include/base/libmesh_config.h.in)
 
@@ -568,7 +569,8 @@ if test "x$DOXYGEN" != x ; then
   HAVE_DOT=NO
   if test "x$DOT" != x ; then
     HAVE_DOT=YES
-    DOTPATH=`dirname $DOT`
+    DOTPATH=$PWD/doc
+    AC_SUBST(DOT)
     AC_SUBST(DOTPATH)
   fi
   AC_SUBST(HAVE_DOT)

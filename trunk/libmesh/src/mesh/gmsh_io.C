@@ -1,4 +1,4 @@
-// $Id: gmsh_io.C,v 1.15 2005-09-05 22:48:16 benkirk Exp $
+// $Id: gmsh_io.C,v 1.16 2005-09-30 16:53:56 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -406,8 +406,8 @@ void GmshIO::read_mesh(std::istream& in)
           for (unsigned int iel=0; iel<numElem; ++iel)      
             {
               unsigned int id, type, physical, elementary,
-                partition = 1, nnodes, ntags;
-
+                /* partition = 1,*/ nnodes, ntags;
+	      // note - partition was assigned but never used - BSK
               if(version <= 1.0)
                 {
                   in >> id >> type >> physical >> elementary >> nnodes;
@@ -415,7 +415,7 @@ void GmshIO::read_mesh(std::istream& in)
               else
                 {
                   in >> id >> type >> ntags;
-                  elementary = physical = partition = 1;
+                  elementary = physical = /* partition = */ 1;
                   for(unsigned int j = 0; j < ntags; j++)
                     {
                       int tag;
@@ -424,8 +424,8 @@ void GmshIO::read_mesh(std::istream& in)
                         physical = tag;
                       else if(j == 1)
                         elementary = tag;
-                      else if(j == 2)
-                        partition = tag;
+                      // else if(j == 2)
+                      //  partition = tag;
                       // ignore any other tags for now
                     }
                 }
