@@ -1,4 +1,4 @@
-// $Id: tree.C,v 1.11 2005-06-11 03:59:18 jwpeterson Exp $
+// $Id: tree.C,v 1.12 2005-09-30 15:03:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,6 @@
 
 // constructor
 template <unsigned int N>
-inline
 Tree<N>::Tree (const MeshBase& m,
 	       const unsigned int level,
 	       const BuildType bt) :
