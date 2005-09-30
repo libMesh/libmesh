@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.21 2005-09-09 12:26:51 jwpeterson Exp $
+// $Id: metis_partitioner.C,v 1.22 2005-09-30 20:14:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,10 @@
 #include "elem.h"
 
 #ifdef HAVE_METIS
+// MIPSPro 7.4.2 gets confused about these nested namespaces
+# ifdef __sgi
+#  include <cstdarg>
+# endif
   namespace Metis {
     extern "C" {
 #     include "metis.h"
