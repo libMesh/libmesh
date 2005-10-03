@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.13 2005-09-30 19:55:23 benkirk Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.14 2005-10-03 18:55:53 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -294,7 +294,8 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	      // loop over element vertices
 	      for (unsigned int n=0; n<elem->n_nodes(); n++)
 		{
-		  Real temperrx=0,temperry=0,temperrz=0;
+		  // Real temperrx=0,temperry=0,temperrz=0;
+		  Number temperrx=0,temperry=0,temperrz=0;
 		  const Point nodpt=elem->point(n);
 		  const Real
 		    x = nodpt(0),
@@ -314,11 +315,16 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 		  temperry -= grad_u_h(1);
 		  temperrz -= grad_u_h(2);
 		  
-		  temperrx = std::abs(temperrx);
-		  temperry = std::abs(temperry);
-		  temperrz = std::abs(temperrz);
+		  // temperrx = std::abs(temperrx);
+		  // temperry = std::abs(temperry);
+		  // temperrz = std::abs(temperrz);
 		  
-		  error = std::max(temperrz,std::max(temperry,temperrx));
+		  // error = std::max(temperrz,std::max(temperry,temperrx));
+
+		  error = std::max(std::abs(temperrz),
+				   std::max(std::abs(temperry),
+					    std::abs(temperrx)));
+
 		} // end vertex loop
 	    } // end piecewise linear case
 	  else
@@ -340,7 +346,8 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	      const unsigned int n_sp = samprule.n_points();
 	      for (unsigned int sp=0; sp< n_sp; sp++)
 		{
-		  Real temperrx=0,temperry=0,temperrz=0;
+		  // Real temperrx=0,temperry=0,temperrz=0;
+		  Number temperrx=0,temperry=0,temperrz=0;
 		  const Real
 		    x = samppt[sp](0),
 		    y = samppt[sp](1),
@@ -363,12 +370,17 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 		  temperrx -= grad_u_h(0);
 		  temperry -= grad_u_h(1);
 		  temperrz -= grad_u_h(2);
+
+		  // temperrx = std::abs(temperrx);
+		  // temperry = std::abs(temperry);
+		  // temperrz = std::abs(temperrz);
 		  
-		  temperrx = std::abs(temperrx);
-		  temperry = std::abs(temperry);
-		  temperrz = std::abs(temperrz);
-		  
-		  error = std::max(temperrz,std::max(temperry,temperrx));		  
+		  // error = std::max(temperrz,std::max(temperry,temperrx));		  
+
+		  error = std::max(std::abs(temperrz),
+				   std::max(std::abs(temperry),
+					    std::abs(temperrx)));
+
 		} // end sample_point_loop
 	    } // end P>1 Error loop
 	  const int e_id=elem->id();
