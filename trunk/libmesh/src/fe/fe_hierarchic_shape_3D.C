@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_3D.C,v 1.12 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: fe_hierarchic_shape_3D.C,v 1.13 2005-10-05 21:27:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1279,19 +1279,77 @@ Real FE<3,HIERARCHIC>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<3,HIERARCHIC>::shape_second_deriv(const Elem*,
-				          const Order,
-				          const unsigned int,
-				          const unsigned int,
-				          const Point&)
+Real FE<3,HIERARCHIC>::shape_second_deriv(const Elem* elem,
+				          const Order order,
+				          const unsigned int i,
+				          const unsigned int j,
+				          const Point& p)
 {
-  static bool warning_given = false;
+  assert (elem != NULL);
 
-  if (!warning_given)
-  std::cerr << "Second derivatives for 3D hierarchics "
-	    << " are not yet implemented!"
-	    << std::endl;
+  const Real eps = 1.e-6;
+  Point pp, pm;
+  unsigned int prevj = libMesh::invalid_uint;
 
-  warning_given = true;
-  return 0.;
+  switch (j)
+  {
+    //  d^2()/dxi^2
+    case 0:
+      {
+        pp = Point(p(0)+eps, p(1), p(2));
+        pm = Point(p(0)-eps, p(1), p(2));
+        prevj = 0;
+        break;
+      }
+
+    //  d^2()/dxideta
+    case 1:
+      {
+        pp = Point(p(0), p(1)+eps, p(2));
+        pm = Point(p(0), p(1)-eps, p(2));
+        prevj = 0;
+        break;
+      }
+
+    //  d^2()/deta^2
+    case 2:
+      {
+        pp = Point(p(0), p(1)+eps, p(2));
+        pm = Point(p(0), p(1)-eps, p(2));
+        prevj = 1;
+        break;
+      }
+
+    //  d^2()/dxidzeta
+    case 3:
+      {
+        pp = Point(p(0), p(1), p(2)+eps);
+        pm = Point(p(0), p(1), p(2)-eps);
+        prevj = 0;
+        break;
+      }
+
+    //  d^2()/detadzeta
+    case 4:
+      {
+        pp = Point(p(0), p(1), p(2)+eps);
+        pm = Point(p(0), p(1), p(2)-eps);
+        prevj = 1;
+        break;
+      }
+
+    //  d^2()/dzeta^2
+    case 5:
+      {
+        pp = Point(p(0), p(1), p(2)+eps);
+        pm = Point(p(0), p(1), p(2)-eps);
+        prevj = 2;
+        break;
+      }
+    default:
+      error();
+  }
+  return (FE<3,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pp) -
+          FE<3,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm))
+          / 2. / eps;
 }
