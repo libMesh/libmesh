@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_3D.C,v 1.13 2005-10-05 21:27:46 roystgnr Exp $
+// $Id: fe_hierarchic_shape_3D.C,v 1.14 2005-10-06 18:35:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -126,6 +126,7 @@ Real FE<3,HIERARCHIC>::shape(const Elem* elem,
 
 
 
+              if ((i0[i] >= 2) || (i1[i] >= 2) || (i2[i] >= 2))
 	      // handle the edge orientation
 	      {
 		// Edge 0
@@ -743,6 +744,7 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 
 
+              if ((i0[i] >= 2) || (i1[i] >= 2) || (i2[i] >= 2))
 	      // handle the edge orientation
 	      {
 		// Edge 0
