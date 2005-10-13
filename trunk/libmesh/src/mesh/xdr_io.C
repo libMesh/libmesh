@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.20 2005-09-30 19:55:23 benkirk Exp $
+// $Id: xdr_io.C,v 1.21 2005-10-13 16:36:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,9 +44,19 @@
 #ifdef HAVE_XDR
 #  include <rpc/rpc.h>
 #  ifndef SINGLE_PRECISION
-#    define xdr_REAL xdr_double
+#    ifdef TRIPLE_PRECISION
+// #      define xdr_REAL xdr_quadruple
+// For some reason my xdr implementation doesn't define
+// xdr_quadruple... - RHS
+#      define xdr_REAL xdr_double
+#      define xdr_Real double
+#    else
+#      define xdr_REAL xdr_double
+#      define xdr_Real Real
+#    endif
 #  else
 #    define xdr_REAL xdr_float
+#    define xdr_Real Real
 #  endif
 #endif
 
@@ -155,7 +165,7 @@ namespace
      * to/from the current \p xdr
      * file/file handle.
      */
-    int dataBlk(REAL* array, int numvar, int size);
+    int dataBlk(Real* array, int numvar, int size);
 
     /**
      * Get the originator flag.
@@ -580,7 +590,7 @@ namespace
     /**
      * Current solution time.
      */
-    Real m_time;
+    xdr_Real m_time;
 
     /**
      * Uses std::memcpy to create an exact
@@ -1156,7 +1166,7 @@ namespace
 
 
 
-  int XdrMGF::dataBlk(REAL* array, int numvar, int size)
+  int XdrMGF::dataBlk(Real* array, int numvar, int size)
   {
     int totalSize = numvar*size;
 
@@ -1174,10 +1184,12 @@ namespace
       case (XdrMGF::DECODE):
       case (XdrMGF::ENCODE):
 	{ 
+	  // FIXME - this is probably broken for Real == long double
+	  // RHS
 	  xdr_vector(mp_xdr_handle,
 		     (char *) &array[0],
 		     totalSize, 
-		     sizeof(REAL),
+		     sizeof(Real),
 		     (xdrproc_t) xdr_REAL);
 	}
       

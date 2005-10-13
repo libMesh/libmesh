@@ -1,4 +1,4 @@
-// $Id: unv_io.C,v 1.23 2005-09-30 19:55:23 benkirk Exp $
+// $Id: unv_io.C,v 1.24 2005-10-13 16:36:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -973,16 +973,16 @@ void UNVIO::node_out (std::ostream& out_file)
       // the coordinates
       if (mesh.spatial_dimension() == 3)
 	std::sprintf(buf, "%25.16E%25.16E%25.16E\n", 
-		     (*current_node)(0),
-		     (*current_node)(1),
-		     (*current_node)(2));
+		     static_cast<double>((*current_node)(0)),
+		     static_cast<double>((*current_node)(1)),
+		     static_cast<double>((*current_node)(2)));
       else if (mesh.spatial_dimension() == 2)
 	std::sprintf(buf, "%25.16E%25.16E\n", 
-		     (*current_node)(0),
-		     (*current_node)(1));
+		     static_cast<double>((*current_node)(0)),
+		     static_cast<double>((*current_node)(1)));
       else
 	std::sprintf(buf, "%25.16E\n", 
-		     (*current_node)(0));
+		     static_cast<double>((*current_node)(0)));
       
       out_file << buf;
     }

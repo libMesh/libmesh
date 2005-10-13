@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.27 2005-09-30 19:55:23 benkirk Exp $
+// $Id: mesh_data_unv_support.C,v 1.28 2005-10-13 16:36:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -591,7 +591,8 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
 		                            values[v_cnt].imag());
 	  out_file << buf;
 #else
-	  std::sprintf(buf, "%13.5E", values[v_cnt]);
+	  std::sprintf(buf, "%13.5E",
+	               static_cast<double>(values[v_cnt]));
 	  out_file << buf;
 #endif
 	}
@@ -786,14 +787,22 @@ void MeshDataUnvHeader::write (std::ostream& out_file)
   out_file << buf;
 
   std::sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n",
-	       record_12[0], record_12[1], record_12[2],
-	       record_12[3], record_12[4], record_12[5]);
+	       static_cast<double>(record_12[0]),
+               static_cast<double>(record_12[1]),
+               static_cast<double>(record_12[2]),
+               static_cast<double>(record_12[3]),
+               static_cast<double>(record_12[4]),
+               static_cast<double>(record_12[5]));
   
   out_file << buf;
 
   std::sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n",
-	       record_13[0], record_13[1], record_13[2],
-	       record_13[3], record_13[4], record_13[5]);
+               static_cast<double>(record_13[0]),
+               static_cast<double>(record_13[1]),
+               static_cast<double>(record_13[2]),
+               static_cast<double>(record_13[3]),
+               static_cast<double>(record_13[4]),
+               static_cast<double>(record_13[5]));
   
   out_file << buf;
 }

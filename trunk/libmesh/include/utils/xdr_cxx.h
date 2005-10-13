@@ -1,4 +1,4 @@
-// $Id: xdr_cxx.h,v 1.7 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: xdr_cxx.h,v 1.8 2005-10-13 16:36:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -201,6 +201,23 @@ public:
    */
   Xdr& operator >> (double& a) { assert (reading()); data(a); return *this; }
 
+  /**
+   * Inputs or outputs a single long double, but in double precision.
+   */
+  void data(long double& a, const char* comment="") 
+    { double ad = a;
+      data(ad, comment); }
+
+  /**
+   * Same, but provides an \p ostream like interface.
+   */
+  Xdr& operator << (long double& a) { assert (writing()); data(a); return *this; }
+
+  /**
+   * Same, but provides an \p istream like interface.
+   */
+  Xdr& operator >> (long double& a) { assert (reading()); data(a); return *this; }
+
 
 #ifdef USE_COMPLEX_NUMBERS
 
@@ -208,6 +225,24 @@ public:
    * Inputs or outputs a single complex<double>.
    */
   void data(std::complex<double>& a, const char* comment="");
+
+  /**
+   * Same, but provides an \p ostream like interface.
+   */
+  Xdr& operator << (std::complex<double>& a) { assert (writing()); data(a); return *this; }
+
+  /**
+   * Same, but provides an \p istream like interface.
+   */
+  Xdr& operator >> (std::complex<double>& a) { assert (reading()); data(a); return *this; }
+
+  /**
+   * Inputs or outputs a single complex<long double>, but in double
+   * precision.
+   */
+  void data(std::complex<long double>& a, const char* comment="");
+    { std::complex<double> ad = a;
+      data(ad, comment); }
 
   /**
    * Same, but provides an \p ostream like interface.
@@ -311,6 +346,27 @@ public:
    * Same, but provides an \p istream like interface.
    */
   Xdr& operator >> (std::vector<double>& v) { assert (reading()); data(v); return *this; }
+
+  /**
+   * Inputs or outputs a vector of long doubles, but in double
+   * precision.
+   */
+  void data(std::vector<long double>& v, const char* comment="")
+    { std::vector<double> vd;
+      vd.reserve(v.size());
+      for (unsigned int i = 0; i != v.size(); ++i)
+	vd[i] = static_cast<double>(v[i]);
+      data(vd, comment); }
+
+  /**
+   * Same, but provides an \p ostream like interface.
+   */
+  Xdr& operator << (std::vector<long double>& v) { assert (writing()); data(v); return *this; }
+
+  /**
+   * Same, but provides an \p istream like interface.
+   */
+  Xdr& operator >> (std::vector<long double>& v) { assert (reading()); data(v); return *this; }
 
 
 #ifdef USE_COMPLEX_NUMBERS

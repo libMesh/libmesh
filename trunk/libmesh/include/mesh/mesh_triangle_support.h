@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.h,v 1.3 2005-05-02 14:54:54 jwpeterson Exp $
+// $Id: mesh_triangle_support.h,v 1.4 2005-10-13 16:36:31 roystgnr Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,8 @@
 // Note: libmesh_common.h defines REAL, which is required by triangle.
 // Therefore, we need to include it first.
 #include "libmesh_common.h"
+
+typedef Real REAL;
 
 /**
  * A special namespace for wrapping the standard Triangle API,
