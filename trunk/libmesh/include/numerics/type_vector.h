@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.14 2005-06-16 19:39:02 roystgnr Exp $
+// $Id: type_vector.h,v 1.15 2005-10-13 22:28:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,34 @@
 
 // Local includes
 #include "libmesh_common.h"
+
+// Copy of boost enable_if_c
+
+namespace boostcopy {
+  template <bool B, class T = void>
+    struct enable_if_c {
+      typedef T type;
+    };
+
+  template <class T>
+    struct enable_if_c<false, T> {};
+
+}
+
+// Complete list of scalar classes, needed for disambiguation
+template <typename T>
+struct ScalarTraits {
+  const static bool value = false;
+};
+
+template<>
+struct ScalarTraits<float> { const static bool value = true; };
+
+template<>
+struct ScalarTraits<double> { const static bool value = true; };
+
+template<>
+struct ScalarTraits<long double> { const static bool value = true; };
 
 
 // Forward declaration for friend class
@@ -139,12 +167,17 @@ public:
   /**
    * Multiply a vector by a number, i.e. scale.
    */
-  TypeVector<T> operator * (const T) const;
+  template <typename Scalar>
+  typename boostcopy::enable_if_c<
+    ScalarTraits<Scalar>::value,
+    TypeVector<T> >::type
+  operator * (const Scalar) const;
 
   /**
    * Multiply this vector by a number, i.e. scale.
    */
-  const TypeVector<T> & operator *= (const T);
+  template <typename Scalar>
+  const TypeVector<T> & operator *= (const Scalar);
   
   /**
    * Divide a vector by a number, i.e. scale.
@@ -497,8 +530,12 @@ TypeVector<T> TypeVector<T>::operator - () const
 
 
 template <typename T>
+template <typename Scalar>
 inline
-TypeVector<T> TypeVector<T>::operator * (const T factor) const
+typename boostcopy::enable_if_c<
+  ScalarTraits<Scalar>::value,
+  TypeVector<T> >::type
+TypeVector<T>::operator * (const Scalar factor) const
 {
 
 #if DIM == 1
@@ -519,9 +556,13 @@ TypeVector<T> TypeVector<T>::operator * (const T factor) const
 
 
 
-template <typename T>
-TypeVector<T> operator * (const T factor,
-			  const TypeVector<T> &v)
+template <typename T, typename Scalar>
+inline
+typename boostcopy::enable_if_c<
+  ScalarTraits<Scalar>::value,
+  TypeVector<T> >::type
+operator * (const Scalar factor,
+            const TypeVector<T> &v)
 {
   return v * factor;
 }
@@ -529,8 +570,9 @@ TypeVector<T> operator * (const T factor,
 
 
 template <typename T>
+template <typename Scalar>
 inline
-const TypeVector<T> & TypeVector<T>::operator *= (const T factor)
+const TypeVector<T> & TypeVector<T>::operator *= (const Scalar factor)
 {
 #if DIM == 1
   _coords[0] *= factor;

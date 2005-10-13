@@ -1,4 +1,4 @@
-// $Id: type_tensor.h,v 1.5 2005-05-24 13:35:41 jwpeterson Exp $
+// $Id: type_tensor.h,v 1.6 2005-10-13 22:28:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -142,12 +142,17 @@ public:
   /**
    * Multiply a tensor by a number, i.e. scale.
    */
-  TypeTensor<T> operator * (const T) const;
+  template <typename Scalar>
+  typename boostcopy::enable_if_c<
+    ScalarTraits<Scalar>::value,
+    TypeVector<T> >::type
+  operator * (const Scalar) const;
   
   /**
    * Multiply this tensor by a number, i.e. scale.
    */
-  const TypeTensor<T> & operator *= (const T);
+  template <typename Scalar>
+  const TypeTensor<T> & operator *= (const Scalar);
   
   /**
    * Divide a tensor by a number, i.e. scale.
@@ -517,8 +522,12 @@ TypeTensor<T> TypeTensor<T>::operator - () const
 
 
 template <typename T>
+template <typename Scalar>
 inline
-TypeTensor<T> TypeTensor<T>::operator * (const T factor) const
+typename boostcopy::enable_if_c<
+  ScalarTraits<Scalar>::value,
+  TypeVector<T> >::type
+TypeTensor<T>::operator * (const Scalar factor) const
 {
 
 #if DIM == 1
@@ -547,10 +556,13 @@ TypeTensor<T> TypeTensor<T>::operator * (const T factor) const
 
 
 
-template <typename T>
+template <typename T, typename Scalar>
 inline
-const TypeTensor<T> operator * (const T factor,
-				const TypeTensor<T> &t)
+typename boostcopy::enable_if_c<
+  ScalarTraits<Scalar>::value,
+  const TypeVector<T> >::type
+operator * (const Scalar factor,
+	    const TypeTensor<T> &t)
 {
   return t * factor;
 }
@@ -558,8 +570,9 @@ const TypeTensor<T> operator * (const T factor,
 
 
 template <typename T>
+template <typename Scalar>
 inline
-const TypeTensor<T> & TypeTensor<T>::operator *= (const T factor)
+const TypeTensor<T> & TypeTensor<T>::operator *= (const Scalar factor)
 {
   for (unsigned int i=0; i<DIM*DIM; i++)
     _coords[i] *= factor;
