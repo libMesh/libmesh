@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.13 2005-06-06 14:53:18 jwpeterson Exp $
+// $Id: libmesh_common.h,v 1.14 2005-10-13 16:36:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -51,9 +51,9 @@
 #  undef Real
 #endif
 
-#ifdef REAL
-#  undef REAL
-#endif
+//#ifdef REAL
+//#  undef REAL
+//#endif
 
 #ifdef Complex
 #  undef Complex
@@ -78,12 +78,36 @@
    
 // Define the type to use for real numbers
 #ifndef SINGLE_PRECISION
-  typedef double Real;
-  typedef double REAL;
-# define MPI_REAL MPI_DOUBLE
+  #ifdef TRIPLE_PRECISION
+    typedef long double Real;
+//    typedef long double REAL;
+    namespace std {
+      inline long double max(long double a, double b)
+      { return (a>b?a:b); }
+      inline long double min(long double a, double b)
+      { return (a<b?a:b); }
+    }
+  # define MPI_REAL MPI_LONG_DOUBLE
+  #else
+    typedef double Real;
+//    typedef double REAL;
+  namespace std {
+    inline double max(float a, double b)
+    { return (a>b?a:b); }
+    inline double min(float a, double b)
+    { return (a<b?a:b); }
+  }
+  # define MPI_REAL MPI_DOUBLE
+  #endif
 #else
   typedef float Real;
-  typedef float REAL;
+//  typedef float REAL;
+  namespace std {
+    inline long double max(long double a, double b)
+    { return (a>b?a:b); }
+    inline long double min(long double a, double b)
+    { return (a<b?a:b); }
+  }
 # define MPI_REAL MPI_FLOAT
 #endif
 
