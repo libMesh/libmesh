@@ -1,4 +1,4 @@
-// $Id: edge_edge4.C,v 1.2 2005-06-16 23:03:52 roystgnr Exp $
+// $Id: edge_edge4.C,v 1.3 2005-10-13 20:19:47 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -82,9 +82,9 @@ bool Edge4::is_node_on_edge(const unsigned int,
 
 bool Edge4::has_affine_map() const
 {
-  if ((this->point(0)*2 + this->point(1))/3 != this->point(2))
+  if ((this->point(0)*2. + this->point(1))/3. != this->point(2))
     return false;
-  if ((this->point(0) + this->point(1)*2)/3 != this->point(3))
+  if ((this->point(0) + this->point(1)*2.)/3. != this->point(3))
     return false;
   return true;
 }
