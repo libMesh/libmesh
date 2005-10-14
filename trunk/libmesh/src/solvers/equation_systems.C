@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.28 2005-06-12 18:36:42 jwpeterson Exp $
+// $Id: equation_systems.C,v 1.29 2005-10-14 15:22:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@ EquationSystems::EquationSystems (Mesh& m, MeshData* mesh_data) :
   _mesh_data (mesh_data)
 {
   // Set default parameters
-  this->parameters.set<Real>        ("linear solver tolerance")          = 1.e-12;
+  this->parameters.set<Real>        ("linear solver tolerance") = TOLERANCE * TOLERANCE;
   this->parameters.set<unsigned int>("linear solver maximum iterations") = 5000;
 }
 
