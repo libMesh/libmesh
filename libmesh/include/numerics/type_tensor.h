@@ -1,4 +1,4 @@
-// $Id: type_tensor.h,v 1.6 2005-10-13 22:28:35 roystgnr Exp $
+// $Id: type_tensor.h,v 1.7 2005-10-14 19:44:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -145,7 +145,7 @@ public:
   template <typename Scalar>
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
-    TypeVector<T> >::type
+    TypeTensor<T> >::type
   operator * (const Scalar) const;
   
   /**
@@ -526,7 +526,7 @@ template <typename Scalar>
 inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
-  TypeVector<T> >::type
+  TypeTensor<T> >::type
 TypeTensor<T>::operator * (const Scalar factor) const
 {
 
