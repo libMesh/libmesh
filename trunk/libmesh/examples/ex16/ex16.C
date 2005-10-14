@@ -1,4 +1,4 @@
-// $Id: ex16.C,v 1.6 2005-09-30 19:55:21 benkirk Exp $
+// $Id: ex16.C,v 1.7 2005-10-14 15:31:08 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -148,7 +148,7 @@ int main (int argc, char** argv)
       eigen_system.eigen_solver->set_eigensolver_type(ARNOLDI);
 
       // Set the solver tolerance and the maximum number of iterations. 
-      equation_systems.parameters.set<Real>("linear solver tolerance") = 1.e-10;
+      equation_systems.parameters.set<Real>("linear solver tolerance") = pow(TOLERANCE, 5./3.);
       equation_systems.parameters.set<unsigned int>
 	("linear solver maximum iterations") = 1000;
 

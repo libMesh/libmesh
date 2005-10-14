@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.12 2005-06-06 14:53:15 jwpeterson Exp $ */
+/* $Id: ex13.C,v 1.13 2005-10-14 15:31:07 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -127,7 +127,7 @@ int main (int argc, char** argv)
       equation_systems.init ();
 
       equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
-      equation_systems.parameters.set<Real>        ("linear solver tolerance") = 1.e-3;
+      equation_systems.parameters.set<Real>        ("linear solver tolerance") = std::sqrt(TOLERANCE);
       
       // Prints information about the system to the screen.
       equation_systems.print_info();
