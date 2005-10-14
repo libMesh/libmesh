@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.23 2005-08-23 19:31:17 knezed01 Exp $ */
+/* $Id: ex10.C,v 1.24 2005-10-14 15:31:06 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -266,7 +266,7 @@ int main (int argc, char** argv)
     equation_systems.parameters.set<unsigned int>
       ("linear solver maximum iterations") = 250;
     equation_systems.parameters.set<Real>
-      ("linear solver tolerance") = 1.e-6;
+      ("linear solver tolerance") = TOLERANCE;
       
     if(!read_solution)
       // Write out the initial condition
