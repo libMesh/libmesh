@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.14 2005-10-13 16:36:31 roystgnr Exp $
+// $Id: libmesh_common.h,v 1.15 2005-10-14 15:19:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -77,6 +77,12 @@
 
    
 // Define the type to use for real numbers
+
+// Define a corresponding tolerance.  This is what should be
+// considered "good enough" when doing floating point comparisons.
+// For example, v == 0 is changed to std::abs(v) < TOLERANCE.
+
+
 #ifndef SINGLE_PRECISION
   #ifdef TRIPLE_PRECISION
     typedef long double Real;
@@ -87,6 +93,7 @@
       inline long double min(long double a, double b)
       { return (a<b?a:b); }
     }
+  # define TOLERANCE 1.e-8
   # define MPI_REAL MPI_LONG_DOUBLE
   #else
     typedef double Real;
@@ -97,6 +104,7 @@
     inline double min(float a, double b)
     { return (a<b?a:b); }
   }
+  # define TOLERANCE 1.e-6
   # define MPI_REAL MPI_DOUBLE
   #endif
 #else
@@ -108,6 +116,7 @@
     inline long double min(long double a, double b)
     { return (a<b?a:b); }
   }
+  # define TOLERANCE 1.e-3
 # define MPI_REAL MPI_FLOAT
 #endif
 
@@ -170,12 +179,6 @@ namespace libMesh
 #  define DIM 3
 #endif
 
-
-
-// Define a tolerance.  This is what should be considered "good enough"
-// when doing floating point comparisons.  For example, v == 0 is
-// changed to std::abs(v) < TOLERANCE.
-#define TOLERANCE 1.e-6
 
 
 
