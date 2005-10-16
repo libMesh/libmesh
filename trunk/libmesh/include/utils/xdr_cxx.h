@@ -1,4 +1,4 @@
-// $Id: xdr_cxx.h,v 1.8 2005-10-13 16:36:31 roystgnr Exp $
+// $Id: xdr_cxx.h,v 1.9 2005-10-16 10:08:58 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -240,19 +240,19 @@ public:
    * Inputs or outputs a single complex<long double>, but in double
    * precision.
    */
-  void data(std::complex<long double>& a, const char* comment="");
-    { std::complex<double> ad = a;
+  void data(std::complex<long double>& a, const char* comment="")
+    { std::complex<double> ad (a);
       data(ad, comment); }
 
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (std::complex<double>& a) { assert (writing()); data(a); return *this; }
+  Xdr& operator << (std::complex<long double>& a) { assert (writing()); data(a); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (std::complex<double>& a) { assert (reading()); data(a); return *this; }
+  Xdr& operator >> (std::complex<long double>& a) { assert (reading()); data(a); return *this; }
 
 #endif
 
