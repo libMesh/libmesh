@@ -1,4 +1,4 @@
-// $Id: mesh_data.C,v 1.27 2005-04-14 17:11:38 spetersen Exp $
+// $Id: mesh_data.C,v 1.28 2005-10-18 06:53:04 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -246,32 +246,35 @@ void MeshData::read (const std::string& name)
 #endif
 
   // Read the file based on extension
-  {
-    if (name.rfind(".xta") < name.size())
-      this->read_xdr (name, READ);
-
-    else if (name.rfind(".xtr")  < name.size())
-      this->read_xdr (name, DECODE);
-
-    else if (name.rfind(".unv") < name.size())
-      this->read_unv (name);
-
-    else if ((name.rfind(".node") < name.size()) ||
-	     (name.rfind(".ele") < name.size()))
-      this->read_tetgen (name);
-
-    else
-      {
-	std::cerr << " ERROR: Unrecognized file extension: " << name
-		  << "\n   I understand the following:\n\n"
-		  << "     *.xta  -- Internal ASCII data format\n"
-		  << "     *.xtr  -- Internal binary data format\n"
-		  << "     *.unv  -- I-deas format\n"
-		  << std::endl;
-	error();
-
-      }    
-  }
+  // For now, only processor 0 should read the
+  // mesh data.
+  if (libMesh::processor_id() == 0)
+    {
+      if (name.rfind(".xta") < name.size())
+	this->read_xdr (name, READ);
+      
+      else if (name.rfind(".xtr")  < name.size())
+	this->read_xdr (name, DECODE);
+      
+      else if (name.rfind(".unv") < name.size())
+	this->read_unv (name);
+      
+      else if ((name.rfind(".node") < name.size()) ||
+	       (name.rfind(".ele") < name.size()))
+	this->read_tetgen (name);
+      
+      else
+	{
+	  std::cerr << " ERROR: Unrecognized file extension: " << name
+		    << "\n   I understand the following:\n\n"
+		    << "     *.xta  -- Internal ASCII data format\n"
+		    << "     *.xtr  -- Internal binary data format\n"
+		    << "     *.unv  -- I-deas format\n"
+		    << std::endl;
+	  error();
+	  
+	}    
+    }
   STOP_LOG("read()", "MeshData");
 }
 
