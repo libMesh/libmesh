@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.47 2005-09-30 19:55:22 benkirk Exp $ */
+/* $Id: ex4.C,v 1.48 2005-10-18 15:59:23 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -134,12 +134,36 @@ int main (int argc, char** argv)
 	std::cout << std::endl << std::endl;
       }
     
-    // Get the dimensionality of the mesh from argv[2]
-    const unsigned int dim = std::atoi(argv[2]);     
+
+    // Read problem dimension from command line.  Use int
+    // instead of unsigned since the GetPot overload is ambiguous
+    // otherwise.
+    int dim = 2;
+    if ( command_line.search(1, "-d") )
+      dim = command_line.next(dim);
     
-    // Get the problem size from argv[4]
-    const unsigned int ps = std::atoi(argv[4]);
+    // Read number of elements from command line
+    int ps = 15;
+    if ( command_line.search(1, "-n") )
+      ps = command_line.next(ps);
     
+    // Read FE order from command line
+    std::string order = "SECOND"; 
+    if ( command_line.search(2, "-Order", "-o") )
+      order = command_line.next(order);
+
+    // Read FE Family from command line
+    std::string family = "LAGRANGE"; 
+    if ( command_line.search(2, "-FEFamily", "-f") )
+      family = command_line.next(family);
+    
+    // Cannot use dicontinuous basis.
+    if ((family == "MONOMIAL") || (family == "XYZ"))
+      {
+	std::cerr << "ex4 currently requires a C^0 (or higher) FE basis." << std::endl;
+	error();
+      }
+      
     // Create a mesh with user-defined dimension.
     Mesh mesh (dim);
     
@@ -149,14 +173,31 @@ int main (int argc, char** argv)
     // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
     // elements in 3D.  Building these higher-order elements allows
     // us to use higher-order approximation, as in example 3.
-    MeshTools::Generation::build_cube (mesh,
-				       ps, ps, ps,
-				       -1., 1.,
-				       -1., 1.,
-				       -1., 1.,
-				       (dim==1)    ? EDGE3 : 
-                                       ((dim == 2) ? QUAD9 : HEX27));
+    if ((family == "LAGRANGE") && (order == "FIRST"))
+      {
+	// No reason to use high-order geometric elements if we are
+	// solving with low-order finite elements.
+	MeshTools::Generation::build_cube (mesh,
+					   ps, ps, ps,
+					   -1., 1.,
+					   -1., 1.,
+					   -1., 1.,
+					   (dim==1)    ? EDGE2 : 
+					   ((dim == 2) ? QUAD4 : HEX8));
+      }
+    
+    else
+      {
+	MeshTools::Generation::build_cube (mesh,
+					   ps, ps, ps,
+					   -1., 1.,
+					   -1., 1.,
+					   -1., 1.,
+					   (dim==1)    ? EDGE3 : 
+					   ((dim == 2) ? QUAD9 : HEX27));
+      }
 
+    
     // Print information about the mesh to the screen.
     mesh.print_info();
     
@@ -170,12 +211,6 @@ int main (int argc, char** argv)
       LinearImplicitSystem& system =
 	equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
-      // Look for user-specified interpolation orders &
-      // Finite Element specification
-      const std::string
-	order  = command_line("Order",    "SECOND"),
-	family = command_line("FEFamily", "LAGRANGE");
-      
       
       // Adds the variable "u" to "Poisson".  "u"
       // will be approximated using second-order approximation.
@@ -323,9 +358,6 @@ void assemble_poisson(EquationSystems& es,
   // its components of the global matrix.
   //
   // "PARALLEL CHANGE"
-//   const_local_elem_iterator           el (mesh.elements_begin());
-//   const const_local_elem_iterator end_el (mesh.elements_end());
-
   MeshBase::const_element_iterator       el     = mesh.local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
 
