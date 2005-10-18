@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.16 2005-06-06 16:23:55 knezed01 Exp $
+# $Id: Makefile,v 1.17 2005-10-18 15:59:24 jwpeterson Exp $
 
 
 # The location of the mesh library
@@ -50,7 +50,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out_*.gmv
+	@rm -f $(target) out_*
 
 distclean:
 	@$(MAKE) clobber
