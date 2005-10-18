@@ -1,4 +1,4 @@
-// $Id: fe_monomial_shape_2D.C,v 1.13 2005-02-22 22:17:37 jwpeterson Exp $
+// $Id: fe_monomial_shape_2D.C,v 1.14 2005-10-18 15:38:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -340,7 +340,7 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
 #if DIM > 1
 
   
-  assert (j<2);
+  assert (j<=2);
 
   switch (order)
     {
