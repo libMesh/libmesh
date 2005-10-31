@@ -1,4 +1,4 @@
-// $Id: dense_vector.h,v 1.5 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: dense_vector.h,v 1.6 2005-10-31 20:34:05 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -120,6 +120,39 @@ public:
   void add (const T factor,
 	    const DenseVector<T>& vec);
 
+  /**
+   * @returns the minimum element in the vector.
+   * In case of complex numbers, this returns the minimum
+   * Real part.
+   */
+  Real min () const;
+
+  /**
+   * @returns the maximum element in the vector.
+   * In case of complex numbers, this returns the maximum
+   * Real part.
+   */
+  Real max () const;
+
+  /**
+   * @returns the \f$l_1\f$-norm of the vector, i.e.
+   * the sum of the absolute values.
+   */
+  Real l1_norm () const;
+
+  /**
+   * @returns the \f$l_2\f$-norm of the vector, i.e.
+   * the square root of the sum of the
+   * squares of the elements.
+   */
+  Real l2_norm () const;
+
+  /**
+   * @returns the maximum absolute value of the
+   * elements of this vector, which is the
+   * \f$l_\infty\f$-norm of a vector.
+   */
+  Real linfty_norm () const;
 
 #ifdef USE_COMPLEX_NUMBERS
 
@@ -259,6 +292,96 @@ void DenseVector<T>::add (const T factor,
 
   for (unsigned int i=0; i<this->size(); i++)
     (*this)(i) += factor*vec(i);
+}
+
+
+template<typename T> inline T libmesh_real(T a) { return a; }
+template<typename T> inline T libmesh_norm(T a) { return a*a; }
+
+#ifdef USE_COMPLEX_NUMBERS
+template<typename T>
+inline T libmesh_real(std::complex<T> a) { return std::real(a); }
+
+template<typename T>
+inline T libmesh_norm(std::complex<T> a) { return std::norm(a); }
+#endif // USE_COMPLEX_NUMBERS
+
+template<typename T>
+inline
+Real DenseVector<T>::min () const
+{
+  assert (this->size());
+  Real my_min = libmesh_real((*this)(0));
+
+  for (unsigned int i=1; i!=this->size(); i++)
+    {
+      Real current = libmesh_real((*this)(i));
+      my_min = (my_min < current? my_min : current);
+    }
+  return my_min;
+}
+
+
+
+template<typename T>
+inline
+Real DenseVector<T>::max () const
+{
+  assert (this->size());
+  Real my_max = libmesh_real((*this)(0));
+
+  for (unsigned int i=1; i!=this->size(); i++)
+    {
+      Real current = libmesh_real((*this)(i));
+      my_max = (my_max > current? my_max : current);
+    }
+  return my_max;
+}
+
+
+
+template<typename T>
+inline
+Real DenseVector<T>::l1_norm () const
+{
+  Real my_norm = 0.;
+  for (unsigned int i=0; i!=this->size(); i++)
+    {
+      my_norm += std::abs((*this)(i));
+    }
+  return my_norm;
+}
+
+
+
+template<typename T>
+inline
+Real DenseVector<T>::l2_norm () const
+{
+  Real my_norm = 0.;
+  for (unsigned int i=0; i!=this->size(); i++)
+    {
+      my_norm += libmesh_norm((*this)(i));
+    }
+  return my_norm;
+}
+
+
+
+template<typename T>
+inline
+Real DenseVector<T>::linfty_norm () const
+{
+  if (!this->size())
+    return 0.;
+  Real my_norm = libmesh_norm((*this)(0));
+
+  for (unsigned int i=1; i!=this->size(); i++)
+    {
+      Real current = libmesh_norm((*this)(i));
+      my_norm = (my_norm > current? my_norm : current);
+    }
+  return sqrt(my_norm);
 }
 
 
