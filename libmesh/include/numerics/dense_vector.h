@@ -1,4 +1,4 @@
-// $Id: dense_vector.h,v 1.6 2005-10-31 20:34:05 roystgnr Exp $
+// $Id: dense_vector.h,v 1.7 2005-10-31 20:47:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -363,7 +363,7 @@ Real DenseVector<T>::l2_norm () const
     {
       my_norm += libmesh_norm((*this)(i));
     }
-  return my_norm;
+  return sqrt(my_norm);
 }
 
 
