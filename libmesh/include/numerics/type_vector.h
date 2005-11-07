@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.15 2005-10-13 22:28:35 roystgnr Exp $
+// $Id: type_vector.h,v 1.16 2005-11-07 20:30:45 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -55,6 +55,15 @@ struct ScalarTraits<double> { const static bool value = true; };
 
 template<>
 struct ScalarTraits<long double> { const static bool value = true; };
+
+template<>
+struct ScalarTraits<std::complex<float> > { const static bool value = true; };
+
+template<>
+struct ScalarTraits<std::complex<double> > { const static bool value = true; };
+
+template<>
+struct ScalarTraits<std::complex<long double> > { const static bool value = true; };
 
 
 // Forward declaration for friend class
