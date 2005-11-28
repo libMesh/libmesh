@@ -1,4 +1,4 @@
-// $Id: exact_solution.h,v 1.7 2005-06-11 03:59:18 jwpeterson Exp $
+// $Id: exact_solution.h,v 1.8 2005-11-28 20:24:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,9 +23,11 @@
 
 // C++ includes
 #include <map>
+#include <vector>
 
 // Local Includes
 #include "vector_value.h" // for RealGradient
+#include "tensor_value.h"
 
 // Forward Declarations
 class Point;
@@ -87,10 +89,22 @@ public:
 					  const std::string& unknown_name));
 
   /**
-   * Computes and stores the error in the solution value e = u-u_h
-   * and the gradient grad(e) = grad(u) - grad(u_h).  Does not return
-   * any value.  For that you need to call the l2_error() or h1_error()
-   * functions respectively.
+   * Attach function similar to system.h which
+   * allows the user to attach an arbitrary function
+   * which computes the exact second derivatives of the solution
+   * at any point.
+   */
+  void attach_exact_hessian ( Tensor fptr(const Point& p,
+					  const Parameters& parameters,
+					  const std::string& sys_name,
+					  const std::string& unknown_name));
+
+  /**
+   * Computes and stores the error in the solution value e = u-u_h,
+   * the gradient grad(e) = grad(u) - grad(u_h), and possibly the hessian
+   * grad(grad(e)) = grad(grad(u)) - grad(grad(u_h)).  Does not return
+   * any value.  For that you need to call the l2_error(), h1_error()
+   * or h2_error() functions respectively.
    */
   void compute_error(const std::string& sys_name,
 		     const std::string& unknown_name);
@@ -100,16 +114,24 @@ public:
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Number l2_error(const std::string& sys_name,
-		  const std::string& unknown_name);
+  Real l2_error(const std::string& sys_name,
+		const std::string& unknown_name);
   
   /**
-   * This function computes and returns the H1 (energy) error for the system
+   * This function computes and returns the H1 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Number h1_error(const std::string& sys_name,
-		  const std::string& unknown_name);
+  Real h1_error(const std::string& sys_name,
+		const std::string& unknown_name);
+  
+  /**
+   * This function computes and returns the H2 error for the system
+   * sys_name for the unknown unknown_name.  Note that no error computations
+   * are actually performed, you must call compute_error() for that.
+   */
+  Real h2_error(const std::string& sys_name,
+		const std::string& unknown_name);
   
 private:
   
@@ -121,15 +143,15 @@ private:
    */
   void _compute_error(const std::string& sys_name,
 		      const std::string& unknown_name,
-		      std::pair<Number, Number>& error_pair);
+		      std::vector<Real>& error_vals);
 
   /**
    * This function is responsible for checking the validity of
    * the sys_name and unknown_name inputs, and returning a
-   * reference to the proper pair for storing the values.
+   * reference to the proper vector for storing the values.
    */
-  std::pair<Number, Number>& _check_inputs(const std::string& sys_name,
-					   const std::string& unknown_name);
+  std::vector<Real>& _check_inputs(const std::string& sys_name,
+				   const std::string& unknown_name);
   
   /**
    * Function pointer to user-provided function which
@@ -150,6 +172,15 @@ private:
 			     const std::string& unknown_name);
 
   /**
+   * Function pointer to user-provided function which
+   * computes the exact hessian of the solution.
+   */
+  Tensor (* _exact_hessian) (const Point& p,
+			     const Parameters& parameters,
+			     const std::string& sys_name,
+			     const std::string& unknown_name);
+
+  /**
    * Data structure which stores the errors:
    * ||e|| = ||u - u_h||
    * ||grad(e)|| = ||grad(u) - grad(u_h)||
@@ -157,7 +188,7 @@ private:
    * The name of the unknown is
    * the key for the map.
    */
-  typedef std::map<std::string, std::pair<Number, Number> > SystemErrorMap;
+  typedef std::map<std::string, std::vector<Real> > SystemErrorMap;
 
   /**
    * A map of SystemErrorMaps, which contains entries
