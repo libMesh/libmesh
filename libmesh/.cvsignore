@@ -17,6 +17,7 @@ cvs_log
 *_ens*
 *~
 .*~
+.*.swp
 .rsync
 .tvdrc
 _*
