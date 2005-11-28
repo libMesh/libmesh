@@ -1,4 +1,4 @@
-// $Id: tensor_value.h,v 1.2 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: tensor_value.h,v 1.3 2005-11-28 20:12:13 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -69,7 +69,7 @@ public:
 
 #ifdef USE_COMPLEX_NUMBERS
   /**
-   * Constructor that takes two \p TypeVecor<Real>
+   * Constructor that takes two \p TypeTensor<Real>
    * representing the real and imaginary part as
    * arguments.
    */
