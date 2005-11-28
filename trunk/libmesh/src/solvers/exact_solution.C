@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.18 2005-09-28 00:49:28 roystgnr Exp $
+// $Id: exact_solution.C,v 1.19 2005-11-28 20:24:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -53,7 +53,7 @@ ExactSolution::ExactSolution(EquationSystems& es) :
 	{
 	  // The name of this variable
 	  const std::string& var_name = system.variable_name(var);
-	  sem[var_name] = std::make_pair(0., 0.);
+	  sem[var_name] = std::vector<Real>(3, 0.);
 	}
       
       _errors[sys_name] = sem;
@@ -81,10 +81,20 @@ void ExactSolution::attach_exact_deriv (Gradient fptr(const Point& p,
 }
 
 
+void ExactSolution::attach_exact_hessian (Tensor fptr(const Point& p,
+						      const Parameters& parameters,
+						      const std::string& sys_name,
+						      const std::string& unknown_name))
+{
+  assert (fptr != NULL);
+  _exact_hessian = fptr;
+}
 
 
-std::pair<Number, Number>& ExactSolution::_check_inputs(const std::string& sys_name,
-							const std::string& unknown_name)
+
+
+std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
+						const std::string& unknown_name)
 {
   // Be sure that an exact_value function has been attached
   if (_exact_value == NULL)
@@ -132,11 +142,11 @@ void ExactSolution::compute_error(const std::string& sys_name,
 {
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::pair<Number,Number>& error_pair = this->_check_inputs(sys_name,
-							     unknown_name);
+  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
+						      unknown_name);
   this->_compute_error(sys_name,
 		       unknown_name,
-		       error_pair);
+		       error_vals);
 }
 
 
@@ -149,12 +159,12 @@ Number ExactSolution::l2_error(const std::string& sys_name,
   
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::pair<Number,Number>& error_pair = this->_check_inputs(sys_name,
-							     unknown_name);
+  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
+						      unknown_name);
   
   // Return the square root of the first component of the
   // computed error.
-  return std::sqrt(error_pair.first);
+  return std::sqrt(error_vals[0]);
 }
 
 
@@ -177,11 +187,39 @@ Number ExactSolution::h1_error(const std::string& sys_name,
   
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::pair<Number,Number>& error_pair = this->_check_inputs(sys_name,
-							     unknown_name);
+  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
+						      unknown_name);
   
   // Return the square root of the sum of the computed errors.
-  return std::sqrt(error_pair.first + error_pair.second);
+  return std::sqrt(error_vals[0] + error_vals[1]);
+}
+
+
+
+
+
+
+
+Number ExactSolution::h2_error(const std::string& sys_name,
+			     const std::string& unknown_name)
+{
+  // Check to be sure the user has supplied the exact derivative function
+  if (_exact_deriv == NULL || _exact_hessian == NULL)
+    {
+      std::cerr << "Cannot compute H2 error, you must provide functions "
+		<< "which computes the gradient and hessian of the "
+                << "exact solution."
+		<< std::endl;
+      error();
+    }
+  
+  // Check the inputs for validity, and get a reference
+  // to the proper location to store the error
+  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
+						      unknown_name);
+  
+  // Return the square root of the sum of the computed errors.
+  return std::sqrt(error_vals[0] + error_vals[1] + error_vals[2]);
 }
 
 
@@ -193,7 +231,7 @@ Number ExactSolution::h1_error(const std::string& sys_name,
 
 void ExactSolution::_compute_error(const std::string& sys_name,
 				   const std::string& unknown_name,
-				   std::pair<Number, Number>& error_pair)
+				   std::vector<Real>& error_vals)
 {
   // Get a reference to the system whose error is being computed.
   const System& computed_system
@@ -203,8 +241,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   const DofMap& computed_dof_map = computed_system.get_dof_map();
 
   // Zero the error before summation
-  error_pair.first                  = 0.;
-  error_pair.second                 = 0.;
+  error_vals = std::vector<Real>(3, 0.);
 
   // get the EquationSystems parameters
   const Parameters& parameters = this->_equation_systems.parameters;
@@ -238,6 +275,11 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   
   // The value of the shape function gradients at the quadrature points
   const std::vector<std::vector<RealGradient> >& dphi_values = fe->get_dphi();
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+  // The value of the shape function second derivatives at the quadrature points
+  const std::vector<std::vector<RealTensor> >& d2phi_values = fe->get_d2phi();
+#endif
   
   // The XYZ locations (in physical space) of the quadrature points
   const std::vector<Point>& q_point                          = fe->get_xyz();
@@ -292,6 +334,15 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	 RealGradient grad_u_h_re;
 	 RealGradient grad_u_h_im;
 #endif
+#ifdef ENABLE_SECOND_DERIVATIVES
+  #ifndef USE_COMPLEX_NUMBERS
+	 RealTensor grad2_u_h;
+  #else
+	 RealTensor grad2_u_h_re;
+	 RealTensor grad2_u_h_im;
+  #endif
+#endif
+  
 
 	  // Compute solution values at the current
 	  // quadrature point.  This reqiures a sum
@@ -307,10 +358,21 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	      grad_u_h_re += dphi_values[i][qp]*computed_system.current_solution (dof_indices[i]).real();
 	      grad_u_h_im += dphi_values[i][qp]*computed_system.current_solution (dof_indices[i]).imag();
 #endif
+#ifdef ENABLE_SECOND_DERIVATIVES
+  #ifndef USE_COMPLEX_NUMBERS
+	      grad2_u_h += d2phi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
+  #else
+	      grad2_u_h_re += d2phi_values[i][qp]*computed_system.current_solution (dof_indices[i]).real();
+	      grad2_u_h_im += d2phi_values[i][qp]*computed_system.current_solution (dof_indices[i]).imag();
+  #endif
+#endif
 	    }
 
 #ifdef USE_COMPLEX_NUMBERS
 	  Gradient grad_u_h (grad_u_h_re, grad_u_h_im);
+  #ifdef ENABLE_SECOND_DERIVATIVES
+	  Tensor grad2_u_h (grad2_u_h_re, grad2_u_h_im);
+  #endif
 #endif
 
 	  // Compute the value of the error at this quadrature point
@@ -331,11 +393,27 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 						    sys_name,
 						    unknown_name));
 	    }
+
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+	  // Compute the value of the error in the hessian at this quadrature point
+	  Tensor grad2_error;
+
+	  if (_exact_hessian != NULL)
+	    {
+	      grad2_error = (grad2_u_h - _exact_hessian(q_point[qp],
+						        parameters,
+						        sys_name,
+						        unknown_name));
+	    }
+
+	  error_vals[2] += JxW[qp]*(grad2_error.contract(grad2_error));
+#endif
 	  
 	  
 	  // Add the squares of the error to each contribution
-	  error_pair.first  += JxW[qp]*(val_error*val_error);
-	  error_pair.second += JxW[qp]*(grad_error*grad_error);
+	  error_vals[0] += JxW[qp]*(val_error*val_error);
+	  error_vals[1] += JxW[qp]*(grad_error*grad_error);
 	} // end qp loop
     } // end element loop
 
@@ -344,13 +422,14 @@ void ExactSolution::_compute_error(const std::string& sys_name,
     {
       
 #ifndef USE_COMPLEX_NUMBERS
-      std::vector<Real> local_errors(2);
+      std::vector<Real> local_errors(3);
 
       // Set local error entries.
-      local_errors[0] = error_pair.first;
-      local_errors[1] = error_pair.second;
+      local_errors[0] = error_vals[0];
+      local_errors[1] = error_vals[1];
+      local_errors[2] = error_vals[2];
       
-      std::vector<Real> global_errors(2);
+      std::vector<Real> global_errors(3);
       
       
       MPI_Allreduce (&local_errors[0],
@@ -361,12 +440,14 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 		     libMesh::COMM_WORLD);
 
       // Store result back in the pair
-      error_pair.first  = global_errors[0];
-      error_pair.second = global_errors[1];
+      error_vals[0] = global_errors[0];
+      error_vals[1] = global_errors[1];
+      error_vals[2] = global_errors[2];
 
       // Sanity check
       assert (global_errors[0] >= local_errors[0]);
       assert (global_errors[1] >= local_errors[1]);
+      assert (global_errors[2] >= local_errors[2]);
 
 #endif
       
