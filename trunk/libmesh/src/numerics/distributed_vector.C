@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.25 2005-05-11 23:11:58 benkirk Exp $
+// $Id: distributed_vector.C,v 1.26 2005-11-29 15:46:45 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -287,6 +287,38 @@ void DistributedVector<T>::scale (const T factor)
   for (unsigned int i=0; i<local_size(); i++)
     _values[i] *= factor;  
 }
+
+
+
+template <typename T>
+Real DistributedVector<T>::dot (const NumericVector<T>& V) const
+{
+  // Make sure the NumericVector passed in is really a DistributedVector
+  const DistributedVector<T>* v = dynamic_cast<const DistributedVector<T>*>(&V);
+  assert (v != NULL);
+
+  // Make sure that the two vectors are distributed in the same way.
+  assert ( this->first_local_index() == v->first_local_index() );
+  assert ( this->last_local_index()  == v->last_local_index()  );
+  
+  // The result of dotting together the local parts of the vector.
+  Real local_dot = 0;
+
+  for (unsigned int i=0; i<this->local_size(); i++)
+    local_dot += this->_values[i] * v->_values[i];
+
+  // The local dot products are now summed via MPI
+  Real global_dot = 0;
+
+  MPI_Allreduce(&local_dot,       // sendbuf 
+		&global_dot,      // recvbuf
+		1,                // count
+		MPI_DOUBLE,       // MPI_Datatype
+		MPI_SUM,          // MPI_Op
+		libMesh::COMM_WORLD);
+
+  return global_dot;
+} 
 
 
 

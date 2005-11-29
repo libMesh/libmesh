@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.37 2005-05-11 23:12:00 benkirk Exp $
+// $Id: petsc_vector.C,v 1.38 2005-11-29 15:46:45 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -331,6 +331,30 @@ void PetscVector<T>::scale (const T factor_in)
 
 #endif
 }
+
+
+
+
+template <typename T>
+Real PetscVector<T>::dot (const NumericVector<T>& V) const
+{
+  // Error flag
+  int ierr = 0;
+  
+  // Return value
+  Real value=0.;
+  
+  // Make sure the NumericVector passed in is really a PetscVector
+  const PetscVector<T>* v = dynamic_cast<const PetscVector<T>*>(&V);
+  assert (v != NULL);
+
+  // 2.3.x (at least) style.  Untested for previous versions.
+  ierr = VecDot(this->_vec, v->_vec, &value);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  return value;
+}
+
 
 
 
