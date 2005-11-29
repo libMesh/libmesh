@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.11 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: numeric_vector.h,v 1.12 2005-11-29 15:46:45 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -343,6 +343,11 @@ public:
    */
   virtual void scale (const T factor) = 0;
 
+  /**
+   * Computes the dot product, p = U.V
+   */
+  virtual Real dot(const NumericVector<T>&) const = 0;
+  
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.

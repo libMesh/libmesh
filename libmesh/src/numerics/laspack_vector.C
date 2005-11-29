@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.30 2005-09-30 19:55:23 benkirk Exp $
+// $Id: laspack_vector.C,v 1.31 2005-11-29 15:46:45 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -229,6 +229,21 @@ void LaspackVector<T>::scale (const T factor)
   assert (this->initialized());
   
   Mul_SV (factor, &_vec);
+}
+
+
+
+template <typename T>
+Real LaspackVector<T>::dot (const NumericVector<T>& V) const
+{
+  assert (this->initialized());
+
+  // Make sure the NumericVector passed in is really a LasPackVector
+  const LaspackVector<T>* v = dynamic_cast<const LaspackVector<T>*>(&V);
+  assert (v != NULL);
+  
+  return Mul_VV (const_cast<QVector*>(&(this->_vec)),
+		 const_cast<QVector*>(&(v->_vec)));
 }
 
 

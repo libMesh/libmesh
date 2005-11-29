@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.9 2005-09-30 19:55:22 benkirk Exp $
+// $Id: laspack_vector.h,v 1.10 2005-11-29 15:46:45 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -322,7 +322,12 @@ class LaspackVector : public NumericVector<T>
    * vector by the given factor.
    */
   void scale (const T factor);
-    
+
+  /**
+   * Computes the dot product, p = U.V
+   */
+  virtual Real dot(const NumericVector<T>& V) const;
+
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
