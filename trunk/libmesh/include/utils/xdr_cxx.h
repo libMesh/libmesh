@@ -1,4 +1,4 @@
-// $Id: xdr_cxx.h,v 1.9 2005-10-16 10:08:58 spetersen Exp $
+// $Id: xdr_cxx.h,v 1.10 2005-11-30 00:31:04 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -352,8 +352,7 @@ public:
    * precision.
    */
   void data(std::vector<long double>& v, const char* comment="")
-    { std::vector<double> vd;
-      vd.reserve(v.size());
+    { std::vector<double> vd(v.size());
       for (unsigned int i = 0; i != v.size(); ++i)
 	vd[i] = static_cast<double>(v[i]);
       data(vd, comment); }
