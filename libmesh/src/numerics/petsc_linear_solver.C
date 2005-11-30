@@ -1,4 +1,4 @@
-// $Id: petsc_linear_solver.C,v 1.5 2005-05-11 23:12:00 benkirk Exp $
+// $Id: petsc_linear_solver.C,v 1.6 2005-11-30 00:00:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -315,7 +315,7 @@ void PetscLinearSolver<T>::get_residual_history(std::vector<double>& hist)
   // methods, the number of residuals returned in the history
   // vector may be different from what you are expecting.  For
   // example, TFQMR returns two residual values per iteration step.
-  double* p;
+  PetscReal* p;
   ierr = KSPGetResidualHistory(_ksp, &p, &its);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -348,7 +348,7 @@ Real PetscLinearSolver<T>::get_initial_residual()
   // methods, the number of residuals returned in the history
   // vector may be different from what you are expecting.  For
   // example, TFQMR returns two residual values per iteration step.
-  double* p;
+  PetscReal* p;
   ierr = KSPGetResidualHistory(_ksp, &p, &its);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 

@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.38 2005-11-29 15:46:45 jwpeterson Exp $
+// $Id: petsc_vector.C,v 1.39 2005-11-30 00:00:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -53,7 +53,7 @@ Real PetscVector<T>::l1_norm () const
   assert(this->closed());
   
   int ierr=0;
-  double value=0.;
+  PetscReal value=0.;
   
   ierr = VecNorm (_vec, NORM_1, &value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -69,7 +69,7 @@ Real PetscVector<T>::l2_norm () const
   assert(this->closed());
   
   int ierr=0;
-  double value=0.;
+  PetscReal value=0.;
   
   ierr = VecNorm (_vec, NORM_2, &value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -86,7 +86,7 @@ Real PetscVector<T>::linfty_norm () const
   assert(this->closed());
   
   int ierr=0;
-  double value=0.;
+  PetscReal value=0.;
   
   ierr = VecNorm (_vec, NORM_INFINITY, &value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
