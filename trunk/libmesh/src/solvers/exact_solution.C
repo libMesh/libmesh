@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.19 2005-11-28 20:24:18 roystgnr Exp $
+// $Id: exact_solution.C,v 1.20 2005-11-30 19:11:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -435,7 +435,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
       MPI_Allreduce (&local_errors[0],
 		     &global_errors[0],
 		     local_errors.size(),
-		     MPI_DOUBLE,
+		     MPI_REAL,
 		     MPI_SUM,
 		     libMesh::COMM_WORLD);
 
