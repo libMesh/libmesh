@@ -1,4 +1,4 @@
-// $Id: xdr_cxx.h,v 1.10 2005-11-30 00:31:04 roystgnr Exp $
+// $Id: xdr_cxx.h,v 1.11 2005-11-30 00:41:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -355,7 +355,11 @@ public:
     { std::vector<double> vd(v.size());
       for (unsigned int i = 0; i != v.size(); ++i)
 	vd[i] = static_cast<double>(v[i]);
-      data(vd, comment); }
+      data(vd, comment);
+      v.resize(v.size());
+      for (unsigned int i = 0; i != vd.size(); ++i)
+	v[i] = static_cast<long double>(vd[i]);
+    }
 
   /**
    * Same, but provides an \p ostream like interface.
