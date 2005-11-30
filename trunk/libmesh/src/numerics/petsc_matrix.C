@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.C,v 1.27 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: petsc_matrix.C,v 1.28 2005-11-30 00:00:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -193,7 +193,7 @@ Real PetscMatrix<T>::l1_norm () const
   assert (this->initialized());
   
   int ierr=0;
-  double petsc_value;
+  PetscReal petsc_value;
   Real value;
   
   assert (this->closed());
@@ -214,7 +214,7 @@ Real PetscMatrix<T>::linfty_norm () const
   assert (this->initialized());
   
   int ierr=0;
-  double petsc_value;
+  PetscReal petsc_value;
   Real value;
   
   assert (this->closed());
