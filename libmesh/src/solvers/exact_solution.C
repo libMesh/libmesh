@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.20 2005-11-30 19:11:48 roystgnr Exp $
+// $Id: exact_solution.C,v 1.21 2005-11-30 20:33:47 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,7 @@
 ExactSolution::ExactSolution(EquationSystems& es) :
   _exact_value (NULL),
   _exact_deriv (NULL),
+  _exact_hessian (NULL),
   _equation_systems(es),
   _mesh(es.get_mesh())
 {
@@ -382,38 +383,35 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 						       sys_name,
 						       unknown_name));
 
-	  // Compute the value of the error in the gradient at this quadrature point
-	  // RealGradient grad_error;
-	  Gradient grad_error;
+	  // Add the squares of the error to each contribution
+	  error_vals[0] += JxW[qp]*(val_error*val_error);
 
+	  // Compute the value of the error in the gradient at this quadrature point
 	  if (_exact_deriv != NULL)
 	    {
-	      grad_error = (grad_u_h - _exact_deriv(q_point[qp],
-						    parameters,
-						    sys_name,
-						    unknown_name));
+	      Gradient grad_error = (grad_u_h - _exact_deriv(q_point[qp],
+						             parameters,
+						             sys_name,
+						             unknown_name));
+
+	      error_vals[1] += JxW[qp]*(grad_error*grad_error);
 	    }
 
 
 #ifdef ENABLE_SECOND_DERIVATIVES
 	  // Compute the value of the error in the hessian at this quadrature point
-	  Tensor grad2_error;
-
 	  if (_exact_hessian != NULL)
 	    {
-	      grad2_error = (grad2_u_h - _exact_hessian(q_point[qp],
-						        parameters,
-						        sys_name,
-						        unknown_name));
+	      Tensor grad2_error = (grad2_u_h - _exact_hessian(q_point[qp],
+						               parameters,
+						               sys_name,
+						               unknown_name));
+
+	      error_vals[2] += JxW[qp]*(grad2_error.contract(grad2_error));
 	    }
 
-	  error_vals[2] += JxW[qp]*(grad2_error.contract(grad2_error));
 #endif
 	  
-	  
-	  // Add the squares of the error to each contribution
-	  error_vals[0] += JxW[qp]*(val_error*val_error);
-	  error_vals[1] += JxW[qp]*(grad_error*grad_error);
 	} // end qp loop
     } // end element loop
 
