@@ -1,4 +1,4 @@
-// $Id: numeric_vector.C,v 1.17 2005-10-14 15:20:31 roystgnr Exp $
+// $Id: numeric_vector.C,v 1.18 2005-11-30 00:28:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -123,6 +123,32 @@ int NumericVector<double>::compare (const NumericVector<double> &other_vector,
   return rvalue;
 }
 
+#ifdef TRIPLE_PRECISION
+// Full specialization for long double datatypes
+template <>
+int NumericVector<long double>::compare (const NumericVector<long double> &other_vector,
+				         const Real threshold) const
+{
+  assert (this->initialized());
+  assert (other_vector.initialized());
+  assert (this->first_local_index() == other_vector.first_local_index());
+  assert (this->last_local_index()  == other_vector.last_local_index());
+
+  int rvalue     = -1;
+  unsigned int i = first_local_index();
+
+  do
+    {
+      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
+	rvalue = i;
+      else
+	i++;
+    }
+  while (rvalue==-1 && i<last_local_index());
+
+  return rvalue;
+}
+#endif
 
 
 // Full specialization for Complex datatypes
