@@ -1,4 +1,4 @@
-// $Id: parameters.h,v 1.6 2005-09-30 19:55:23 benkirk Exp $
+// $Id: parameters.h,v 1.7 2005-12-01 02:31:47 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 // ------------------------------------------------------------
@@ -320,6 +320,18 @@ void Parameters::print (std::ostream& os) const
 
 
 
+// Declare this now that Paramers::print() is defined.
+// By declaring this early we can use it in subsequent
+// methods.  Required for gcc-4.0.2 -- 11/30/2005, BSK
+inline
+std::ostream& operator << (std::ostream& os, const Parameters& p)
+{
+  p.print(os);
+  return os;
+}
+
+
+
 template <typename T>
 inline
 bool Parameters::have_parameter (const std::string& name) const
@@ -409,14 +421,6 @@ unsigned int Parameters::n_parameters () const
       cnt++;
 
   return cnt;	 
-}
-
-
-inline
-std::ostream& operator << (std::ostream& os, const Parameters& p)
-{
-  p.print(os);
-  return os;
 }
 
 #endif // #define __parameters_h__
