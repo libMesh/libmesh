@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.39 2005-11-30 00:00:01 roystgnr Exp $
+// $Id: petsc_vector.C,v 1.40 2005-12-06 16:53:19 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -342,7 +342,7 @@ Real PetscVector<T>::dot (const NumericVector<T>& V) const
   int ierr = 0;
   
   // Return value
-  Real value=0.;
+  PetscReal value=0.;
   
   // Make sure the NumericVector passed in is really a PetscVector
   const PetscVector<T>* v = dynamic_cast<const PetscVector<T>*>(&V);
@@ -352,7 +352,7 @@ Real PetscVector<T>::dot (const NumericVector<T>& V) const
   ierr = VecDot(this->_vec, v->_vec, &value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  return value;
+  return static_cast<Real>(value);
 }
 
 
