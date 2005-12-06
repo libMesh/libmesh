@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.18 2005-10-14 15:31:07 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.19 2005-12-06 20:52:13 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -547,7 +547,7 @@ void assemble_laplace(EquationSystems& es,
 	perf_log.start_event ("BCs");
 
 	// The penalty value.  
-	const Real penalty = 1.e30;
+	const Real penalty = 1.e10;
 
 	// The following loops over the sides of the element.
 	// If the element has no neighbor on a side then that
