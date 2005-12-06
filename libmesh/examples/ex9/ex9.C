@@ -1,4 +1,4 @@
-/* $Id: ex9.C,v 1.19 2005-06-08 20:37:16 benkirk Exp $ */
+/* $Id: ex9.C,v 1.20 2005-12-06 20:52:13 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -445,7 +445,7 @@ void assemble_cd (EquationSystems& es,
       // side MUST live on a boundary of the domain.
       {
 	// The penalty value.  
-	const Real penalty = 1.e30;
+	const Real penalty = 1.e10;
 
 	// The following loops over the sides of the element.
 	// If the element has no neighbor on a side then that
