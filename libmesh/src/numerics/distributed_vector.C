@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.26 2005-11-29 15:46:45 jwpeterson Exp $
+// $Id: distributed_vector.C,v 1.27 2005-12-07 15:51:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -308,14 +308,16 @@ Real DistributedVector<T>::dot (const NumericVector<T>& V) const
     local_dot += this->_values[i] * v->_values[i];
 
   // The local dot products are now summed via MPI
-  Real global_dot = 0;
+  Real global_dot = local_dot;
 
+#ifdef HAVE_MPI
   MPI_Allreduce(&local_dot,       // sendbuf 
 		&global_dot,      // recvbuf
 		1,                // count
 		MPI_DOUBLE,       // MPI_Datatype
 		MPI_SUM,          // MPI_Op
 		libMesh::COMM_WORLD);
+#endif
 
   return global_dot;
 } 
