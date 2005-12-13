@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.16 2005-05-03 23:22:24 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.17 2005-12-13 21:15:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -245,10 +245,15 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
   const Real bottom_frac = (bottom_error - min_error)/delta;
     
   
-
   // Call the other refinement scheme
-  this->flag_elements_by_error_fraction  (error_per_cell, top_frac,
-					  bottom_frac, max_level);
+  // If all elements have the same error value, refine them all
+  if (!delta)
+    this->flag_elements_by_error_fraction  (error_per_cell, 1.,
+					    0., max_level);
+  // Otherwise, refine the calculated fractions
+  else
+    this->flag_elements_by_error_fraction  (error_per_cell, top_frac,
+					    bottom_frac, max_level);
 }
 
 
