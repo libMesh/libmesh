@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.15 2005-10-14 15:19:29 roystgnr Exp $
+// $Id: libmesh_common.h,v 1.16 2005-12-15 19:12:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -77,6 +77,8 @@
 
    
 // Define the type to use for real numbers
+
+#define DOUBLE_PRECISION
 
 // Define a corresponding tolerance.  This is what should be
 // considered "good enough" when doing floating point comparisons.
