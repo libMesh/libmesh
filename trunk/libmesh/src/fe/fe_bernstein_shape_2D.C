@@ -1,4 +1,4 @@
-// $Id: fe_bernstein_shape_2D.C,v 1.1 2005-05-10 17:48:41 spetersen Exp $
+// $Id: fe_bernstein_shape_2D.C,v 1.2 2005-12-22 18:16:59 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -210,12 +210,12 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	case QUAD9:
 	  {
 	    // Compute quad shape functions as a tensor-product
-	    const Real xi  = p(0);
-	    const Real eta = p(1);
+	    Real xi  = p(0);
+	    Real eta = p(1);
 	    
 	    assert (i < 16);
 	    
-	    //                            0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
+	    //                                    0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 	    static const unsigned int i0_reg[] = {0,  1,  1,  0,  2,  3,  1,  1,  2,  3,  0,  0,  2,  3,  2,  3};
 	    static const unsigned int i1_reg[] = {0,  0,  1,  1,  0,  0,  2,  3,  1,  1,  2,  3,  2,  2,  3,  3};
 	    
@@ -226,6 +226,71 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    if((i== 6||i== 7) && elem->node(1) > elem->node(2)) i1=5-i1;
 	    if((i== 8||i== 9) && elem->node(3) > elem->node(2)) i0=5-i0;
 	    if((i==10||i==11) && elem->node(0) > elem->node(3)) i1=5-i1;
+
+	    // element dof orientation is needed when used with ifems
+	    if(i > 11)
+	      {
+		const unsigned int min_node = std::min(elem->node(1),
+						       std::min(elem->node(2),
+								std::min(elem->node(0),
+									 elem->node(3))));
+		if (elem->node(0) == min_node)
+		  if (elem->node(1) == std::min(elem->node(1), elem->node(3)))
+		    {
+		      // Case 1
+		      xi  = xi;
+		      eta = eta;
+		    }
+		  else
+		    {
+		      // Case 2
+		      xi  = eta;
+		      eta = xi;
+		    }
+		
+		else if (elem->node(3) == min_node)
+		  if (elem->node(0) == std::min(elem->node(0), elem->node(2)))
+		    {
+		      // Case 3
+		      xi  = -eta;
+		      eta = xi;
+		    }
+		  else
+		    {
+		      // Case 4
+		      xi  = xi;
+		      eta = -eta;
+		    }
+		
+		else if (elem->node(2) == min_node)
+		  if (elem->node(3) == std::min(elem->node(3), elem->node(1)))
+		    {
+		      // Case 5
+		      xi  = -xi;
+		      eta = -eta;
+		    }
+		  else
+		    {
+		      // Case 6
+		      xi  = -eta;
+		      eta = -xi;
+		    }
+		
+		else if (elem->node(1) == min_node)
+		  if (elem->node(2) == std::min(elem->node(2), elem->node(0)))
+		    {
+		      // Case 7
+		      xi  = eta;
+		      eta = -xi;
+		    }
+		  else
+		    {
+		      // Case 8
+		      xi  = -xi;
+		      eta = eta;
+		    }
+	      }
+		
 	    
 	    return (FE<1,BERNSTEIN>::shape(EDGE3, order, i0, xi)*
 		    FE<1,BERNSTEIN>::shape(EDGE3, order, i1, eta));
