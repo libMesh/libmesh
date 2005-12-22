@@ -1,4 +1,4 @@
-// $Id: ex16.C,v 1.7 2005-10-14 15:31:08 roystgnr Exp $
+// $Id: ex16.C,v 1.8 2005-12-22 18:06:07 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -218,7 +218,7 @@ void assemble_mass(EquationSystems& es,
   FEType fe_type = eigen_system.get_dof_map().variable_type(0);
 
   // A reference to the system matrix
-  SparseMatrix<Number>&  matrix_A = *eigen_system.matrix;
+  SparseMatrix<Number>&  matrix_A = *eigen_system.matrix_A;
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
