@@ -1,4 +1,4 @@
-// $Id: slepc_eigen_solver.h,v 1.1 2005-05-02 13:12:28 spetersen Exp $
+// $Id: slepc_eigen_solver.h,v 1.2 2005-12-22 18:06:55 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "eigen_solver.h"
 #include "petsc_vector.h"
 #include "petsc_matrix.h"
+
 
 /**
  * SLEPc include files. SLEPs can only be used
@@ -91,12 +92,32 @@ public:
    * number of the iterations carried out by the eigen
    * solver.
    */    
-  std::pair<unsigned int, unsigned int>  solve (SparseMatrix<T> &matrix_A,
-						int nev,
-						int ncv,
-						const double tol,
-						const unsigned int m_its);
+  std::pair<unsigned int, unsigned int>  solve_standard (SparseMatrix<T> &matrix_A,
+							 int nev,
+							 int ncv,
+							 const double tol,
+							 const unsigned int m_its);
+  
 
+/**
+   * This function calls the SLEPc solver to compute
+   * the eigenpairs of matrix matrix_A provided the matrix B.
+   * in case of a generalized eigenproblem \p nev is
+   * the number of eigenpairs to be computed and
+   * \p ncv is the number of basis vectors to be
+   * used in the solution procedure. Return values
+   * are the number of converged eigen values and the
+   * number of the iterations carried out by the eigen
+   * solver.
+   */    
+  std::pair<unsigned int, unsigned int>  solve_generalized(SparseMatrix<T> &matrix_A,
+							   SparseMatrix<T> &matrix_B,
+							   int nev,
+							   int ncv,
+							   const double tol,
+							   const unsigned int m_its);
+
+ 
  
   /**
    * This function returns the real and imaginary part of the
@@ -109,7 +130,7 @@ public:
 
   /**
    * @computes and returns the relative error ||A*x-lambda*x||/|lambda*x|
-   * of the ith eigenpair.
+   * of the ith eigenpair. (or the equivalent for a general eigenvalue problem)
    */                
   Real get_relative_error (unsigned int i);
 
@@ -123,6 +144,19 @@ private:
   void set_slepc_solver_type ();
 
   /**
+   * Tells Slepc to deal with the type of problem stored in
+   * \p _eigen_problem_type
+   */
+  void set_slepc_problem_type ();
+
+  /**
+   * Tells Slepc to compute the spectrum at the position
+   * stored in \p _position_of_spectrum
+   */
+  void set_slepc_position_of_spectrum();
+  
+  
+  /**
    * Eigenproblem solver context
    */
   EPS _eps;
@@ -135,7 +169,8 @@ template <typename T>
 inline
 SlepcEigenSolver<T>::SlepcEigenSolver ()
 {
-  this->_eigen_solver_type = ARNOLDI;
+  this->_eigen_solver_type  = ARNOLDI;
+  this->_eigen_problem_type = NHEP;
 }
 
 

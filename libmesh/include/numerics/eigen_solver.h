@@ -1,4 +1,4 @@
-// $Id: eigen_solver.h,v 1.1 2005-05-02 13:12:28 spetersen Exp $
+// $Id: eigen_solver.h,v 1.2 2005-12-22 18:06:55 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,9 +41,6 @@ template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 
 
-
-
-
 /**
  * This class provides an interface to solvers for eigenvalue
  * problems.
@@ -77,6 +74,7 @@ public:
    */
   bool initialized () const { return _is_initialized; }
   
+  
   /**
    * Release all memory and clear data structures.
    */
@@ -93,23 +91,60 @@ public:
   EigenSolverType eigen_solver_type () const { return _eigen_solver_type; }
 
   /**
+   * Returns the type of the eigen problem.
+   */
+  EigenProblemType eigen_problem_type () const { return _eigen_problem_type;}
+
+  /**
+   * Returns the position of the spectrum to compute.
+   */
+  PositionOfSpectrum postition_of_spectrum () const
+    { return _position_of_spectrum;}
+
+  /**
    * Sets the type of eigensolver to use.
    */
   void set_eigensolver_type (const EigenSolverType est)
-  { _eigen_solver_type = est; }
+    { _eigen_solver_type = est; }
 
+  /**
+   * Sets the type of the eigenproblem.
+   */
+  void set_eigenproblem_type ( EigenProblemType ept) 
+    {_eigen_problem_type = ept;}
 
-  
+  /**
+   * Sets the position of the spectrum.
+   */
+  void set_position_of_spectrum (PositionOfSpectrum pos)
+    {_position_of_spectrum= pos;}
+
   /**
    * Solves the standard eigen problem and returns the
    * number of converged eigenpairs and the number
    * of iterations.
    */
-  virtual std::pair<unsigned int, unsigned int> solve (SparseMatrix<T> &matrix_A,  // System Matrix
-						       int nev,
-						       int ncv,
-						       const double tol,
-						       const unsigned int m_its) = 0;
+  virtual std::pair<unsigned int, unsigned int> solve_standard (SparseMatrix<T> &matrix_A,  
+								int nev,
+								int ncv,
+								const double tol,
+								const unsigned int m_its) = 0;
+
+
+  
+  /**
+   * Solves the generalized eigen problem and returns the
+   * number of converged eigenpairs and the number
+   * of iterations.
+   */
+  virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> &matrix_A, 
+								   SparseMatrix<T> &matrix_B,  
+								   int nev,
+								   int ncv,
+								   const double tol,
+								   const unsigned int m_its) = 0;
+
+
 
   /**
    * Returns the \p ith eigenvalue (real and imaginary part),
@@ -121,17 +156,26 @@ public:
   
 protected:
 
-  
   /**
    * Enum stating which type of eigensolver to use.
    */
   EigenSolverType _eigen_solver_type;
 
+  /**
+   * Enum stating which type of eigen problem we deal with.
+   */
+  EigenProblemType _eigen_problem_type;
+
+  /**
+   * Enum stating where to evaluate the spectrum.
+   */
+  PositionOfSpectrum _position_of_spectrum;	
 
   /**
    * Flag indicating if the data structures have been initialized.
    */
   bool _is_initialized;
+
 };
 
 
@@ -142,8 +186,10 @@ template <typename T>
 inline
 EigenSolver<T>::EigenSolver () :
   
-  _eigen_solver_type   (ARNOLDI),
-  _is_initialized      (false)
+  _eigen_solver_type    (ARNOLDI),
+  _eigen_problem_type   (NHEP),
+  _position_of_spectrum (LARGEST_MAGNITUDE),
+  _is_initialized       (false)
 {
 }
 

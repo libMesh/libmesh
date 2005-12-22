@@ -1,4 +1,4 @@
-// $Id: eigen_system.C,v 1.3 2005-06-07 12:51:59 spetersen Exp $
+// $Id: eigen_system.C,v 1.4 2005-12-22 18:06:56 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,12 +39,16 @@
 // EigenSystem implementation
 EigenSystem::EigenSystem (EquationSystems& es,
 			  const std::string& name,
-			  const unsigned int number) :
+			  const unsigned int number
+			  ) :
   Parent           (es, name, number),
-  matrix           (NULL),
+  matrix_A         (NULL),
+  matrix_B         (NULL),
   eigen_solver     (EigenSolver<Number>::build()),
   _n_converged_eigenpairs (0),
-  _n_iterations           (0)
+  _n_iterations           (0),
+  _is_generalized_eigenproblem (false),
+  _eigen_problem_type (NHEP)
 {
 }
 
@@ -63,16 +67,48 @@ void EigenSystem::clear ()
   // Clear the parent data
   Parent::clear();
 
-  // delete the matrix
-  delete matrix;
+  // delete the matricies
+  delete matrix_A;
+  delete matrix_B;
 
-  // NULL-out the matrix.
-  matrix = NULL;
+  // NULL-out the matricies.
+  matrix_A = NULL;
+  matrix_B = NULL;
 
   // clear the solver
   eigen_solver->clear();
 
 }
+
+
+void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
+{
+  _eigen_problem_type = ept;
+
+  eigen_solver->set_eigenproblem_type(ept);
+
+  std::cout<< "The Problem type is set to be: "<<std::endl;
+
+  switch (_eigen_problem_type)
+    {
+    case HEP: std::cout<<"Hermitian"<<std::endl;
+      break;
+      
+    case NHEP: std::cout<<"Non-Hermitian"<<std::endl;
+      break;
+      
+    case GHEP: std::cout<<"Gerneralized Hermitian"<<std::endl;
+      break;
+      
+    case GNHEP: std::cout<<"Generalized Non-Hermitian"<<std::endl;
+      break;
+      
+    default: std::cout<<"not properly specified"<<std::endl;
+      break;
+      
+    } 
+}
+
 
 
 
@@ -81,21 +117,45 @@ void EigenSystem::init_data ()
  
   // initialize parent data
   Parent::init_data();
+  
+  // define the type of eigenproblem
+  if (_eigen_problem_type == GNHEP || _eigen_problem_type == GHEP) 
+    {
+      _is_generalized_eigenproblem = true;
+      
+      std::cout << "We're dealing with a generalized eigenproblem!" << std::endl;
+    }
 
   // build the system matrix
-  matrix = SparseMatrix<Number>::build().release();
+  matrix_A = SparseMatrix<Number>::build().release();
 
   // add matrix to the _dof_map
   // and compute the sparsity
   DofMap& dof_map = this->get_dof_map();
 
-  dof_map.attach_matrix(*matrix);
+  dof_map.attach_matrix(*matrix_A);
+  
+  // build matrix_B only in case of a
+  // generalized problem
+  if (_is_generalized_eigenproblem)
+    {
+      matrix_B = SparseMatrix<Number>::build().release();
+      dof_map.attach_matrix(*matrix_B);
+    }
+  
   dof_map.compute_sparsity(this->get_mesh());
-
+  
   // initialize and zero system matrix
-  matrix->init();
-  matrix->zero();
-
+  matrix_A->init();
+  matrix_A->zero();
+  
+  // eventually initialize and zero system matrix_B  
+  if (_is_generalized_eigenproblem)
+    {
+      matrix_B->init();
+      matrix_B->zero();
+    }	
+  
 }
 
 
@@ -136,14 +196,29 @@ void EigenSystem::solve ()
 
   const unsigned int ncv    =
     es.parameters.get<unsigned int>("basis vectors");
+    
+  std::pair<unsigned int, unsigned int> solve_data;
 
-  // call the solver
-  const std::pair<unsigned int, unsigned int> solve_data =
-  eigen_solver->solve(*matrix, nev, ncv, tol, maxits);
-
+  // call the solver depending on the type of eigenproblem
+  if (_is_generalized_eigenproblem)
+    { 
+      //in case of a generalized eigenproblem
+      solve_data = eigen_solver->solve_generalized (*matrix_A,*matrix_B, nev, ncv, tol, maxits);
+      
+    }
+  
+  else
+    {
+      assert (matrix_B == NULL);
+      
+      //in case of a standard eigenproblem
+      solve_data = eigen_solver->solve_standard (*matrix_A, nev, ncv, tol, maxits);
+      
+    }
+  
   this->_n_converged_eigenpairs = solve_data.first;
   this->_n_iterations           = solve_data.second;
-
+  
 }
 
 

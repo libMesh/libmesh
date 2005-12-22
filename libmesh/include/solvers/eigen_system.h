@@ -1,4 +1,4 @@
-// $Id: eigen_system.h,v 1.1 2005-05-02 13:12:28 spetersen Exp $
+// $Id: eigen_system.h,v 1.2 2005-12-22 18:06:55 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,8 +41,9 @@ template <typename T> class SparseMatrix;
 /**
  * This class provides a specific system class.  It aims
  * at solving eigenvalue problems.  Currently, this class
- * is restricted to handle standard eigenvalue problems
- * \p A*x=lambda*x .
+ * is able  to handle standard eigenvalue problems
+ * \p A*x=lambda*x  and generalited eigenvalue problems 
+ * \p A*x=lambda*B*x.
  */
 
 // ------------------------------------------------------------
@@ -125,9 +126,30 @@ public:
   unsigned int get_n_iterations () const {return _n_iterations;}
   
   /**
+   * Sets the type of the current eigen problem.
+   */
+  void set_eigenproblem_type (EigenProblemType ept);
+  
+  /**
+   * @returns the eigen problem type.
+   */
+  EigenProblemType get_eigenproblem_type () const {return _eigen_problem_type;}
+  
+  /**
+   * @returns true if the underlying problem is generalized
+   * , false otherwise.
+   */
+  bool generalized () const { return _is_generalized_eigenproblem; }
+  
+  /**
    * The system matrix for standard eigenvalue problems.
    */
-  SparseMatrix<Number> *matrix;
+  SparseMatrix<Number> *matrix_A;
+
+  /**
+   * A second system matrix for generalized eigenvalue problems.
+   */
+  SparseMatrix<Number> *matrix_B;
 
   /**
    * The EigenSolver, definig which interface, i.e solver
@@ -144,10 +166,11 @@ protected:
    * the system, so that, e.g., \p assemble() may be used.
    */
   virtual void init_data ();
-
-  
+ 
 private:
 
+ 
+  
   /**
    * The number of converged eigenpairs.
    */
@@ -157,7 +180,19 @@ private:
    * The number of iterations of the eigen solver algorithm.
    */
   unsigned int _n_iterations;
-
+  
+  /**
+   * A bool indecation wheather we are dealing with a generalized
+   * eigenvalue problem.
+   */
+  bool _is_generalized_eigenproblem;
+  
+  /**
+   * The type of the eigenvalue problem.
+   */
+  EigenProblemType _eigen_problem_type;
+  
+  
 };
 
 

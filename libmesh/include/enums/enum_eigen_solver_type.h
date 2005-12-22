@@ -1,4 +1,4 @@
-// $Id: enum_eigen_solver_type.h,v 1.2 2005-06-21 21:53:58 benkirk Exp $
+// $Id: enum_eigen_solver_type.h,v 1.3 2005-12-22 18:06:55 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -46,6 +46,33 @@ namespace libMeshEnums {
 			// EPSTRLAN,
 		   
 			INVALID_EIGENSOLVER};
+
+  /**
+   * Defines an \p enum for  eigenproblem  types.
+   * This can be Hermitian (HEP), generalized Hermitian (GHEP), 
+   * non-Hermitian (NHEP), and generalized non-Hermitian (GNHEP)
+   */
+  enum EigenProblemType {NHEP=0,
+			 HEP,
+			 GNHEP,
+			 GHEP,
+		   
+			 INVALID_EIGENPROBLEMTYPE};
+
+
+
+  /**
+   * Defines an \p enum for the position of
+   * the spectrum, i.e. the eigenvalues to be computed.
+   */
+  enum PositionOfSpectrum {LARGEST_MAGNITUDE=0,
+			   SMALLEST_MAGNITUDE,
+			   LARGEST_REAL,
+			   SMALLEST_REAL,
+			   LARGEST_IMAGINARY,
+			   SMALLEST_IMAGINARY,
+			
+			   INVALID_Postion_of_Spectrum};
 }
 
 using namespace libMeshEnums;
