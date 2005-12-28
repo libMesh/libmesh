@@ -1,4 +1,4 @@
-// $Id: exact_solution.h,v 1.8 2005-11-28 20:24:18 roystgnr Exp $
+// $Id: exact_solution.h,v 1.9 2005-12-28 13:47:10 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -114,7 +114,7 @@ public:
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Real l2_error(const std::string& sys_name,
+  Number l2_error(const std::string& sys_name,
 		const std::string& unknown_name);
   
   /**
@@ -122,7 +122,7 @@ public:
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Real h1_error(const std::string& sys_name,
+  Number h1_error(const std::string& sys_name,
 		const std::string& unknown_name);
   
   /**
@@ -130,7 +130,7 @@ public:
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Real h2_error(const std::string& sys_name,
+  Number h2_error(const std::string& sys_name,
 		const std::string& unknown_name);
   
 private:
@@ -143,15 +143,15 @@ private:
    */
   void _compute_error(const std::string& sys_name,
 		      const std::string& unknown_name,
-		      std::vector<Real>& error_vals);
+		      std::vector<Number>& error_vals);
 
   /**
    * This function is responsible for checking the validity of
    * the sys_name and unknown_name inputs, and returning a
    * reference to the proper vector for storing the values.
    */
-  std::vector<Real>& _check_inputs(const std::string& sys_name,
-				   const std::string& unknown_name);
+  std::vector<Number>& _check_inputs(const std::string& sys_name,
+				     const std::string& unknown_name);
   
   /**
    * Function pointer to user-provided function which
@@ -188,7 +188,7 @@ private:
    * The name of the unknown is
    * the key for the map.
    */
-  typedef std::map<std::string, std::vector<Real> > SystemErrorMap;
+  typedef std::map<std::string, std::vector<Number> > SystemErrorMap;
 
   /**
    * A map of SystemErrorMaps, which contains entries

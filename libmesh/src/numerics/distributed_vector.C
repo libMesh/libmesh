@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.27 2005-12-07 15:51:55 roystgnr Exp $
+// $Id: distributed_vector.C,v 1.28 2005-12-28 13:47:10 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -291,7 +291,7 @@ void DistributedVector<T>::scale (const T factor)
 
 
 template <typename T>
-Real DistributedVector<T>::dot (const NumericVector<T>& V) const
+Number DistributedVector<T>::dot (const NumericVector<T>& V) const
 {
   // Make sure the NumericVector passed in is really a DistributedVector
   const DistributedVector<T>* v = dynamic_cast<const DistributedVector<T>*>(&V);

@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.40 2005-12-06 16:53:19 jwpeterson Exp $
+// $Id: petsc_vector.C,v 1.41 2005-12-28 13:47:10 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -336,13 +336,13 @@ void PetscVector<T>::scale (const T factor_in)
 
 
 template <typename T>
-Real PetscVector<T>::dot (const NumericVector<T>& V) const
+Number PetscVector<T>::dot (const NumericVector<T>& V) const
 {
   // Error flag
   int ierr = 0;
   
   // Return value
-  PetscReal value=0.;
+  PetscScalar value=0.;
   
   // Make sure the NumericVector passed in is really a PetscVector
   const PetscVector<T>* v = dynamic_cast<const PetscVector<T>*>(&V);
@@ -352,7 +352,7 @@ Real PetscVector<T>::dot (const NumericVector<T>& V) const
   ierr = VecDot(this->_vec, v->_vec, &value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  return static_cast<Real>(value);
+  return static_cast<Number>(value);
 }
 
 
