@@ -1,4 +1,4 @@
-// $Id: fe_szabab.C,v 1.7 2005-05-10 17:48:41 spetersen Exp $
+// $Id: fe_szabab.C,v 1.8 2005-12-28 13:44:48 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -152,6 +152,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	    return 6;
 
 	  case QUAD8:
+	    return 8;
 	  case QUAD9:
 	    return 9;
 	    
@@ -930,7 +931,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	    // The 2D tensor-product Szabo-Babuska defined on a
 	    // eight-noded quadrilateral.
 	  case QUAD8:
-	    return 1;
+	    return 0;
 
 	    // The 2D tensor-product Szabo-Babuska defined on a
 	    // nine-noded quadrilateral.
