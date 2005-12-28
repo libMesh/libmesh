@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.21 2005-11-30 20:33:47 roystgnr Exp $
+// $Id: exact_solution.C,v 1.22 2005-12-28 13:47:10 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ ExactSolution::ExactSolution(EquationSystems& es) :
 	{
 	  // The name of this variable
 	  const std::string& var_name = system.variable_name(var);
-	  sem[var_name] = std::vector<Real>(3, 0.);
+	  sem[var_name] = std::vector<Number>(3, 0.);
 	}
       
       _errors[sys_name] = sem;
@@ -94,8 +94,8 @@ void ExactSolution::attach_exact_hessian (Tensor fptr(const Point& p,
 
 
 
-std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
-						const std::string& unknown_name)
+std::vector<Number>& ExactSolution::_check_inputs(const std::string& sys_name,
+						  const std::string& unknown_name)
 {
   // Be sure that an exact_value function has been attached
   if (_exact_value == NULL)
@@ -143,8 +143,8 @@ void ExactSolution::compute_error(const std::string& sys_name,
 {
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
-						      unknown_name);
+  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
+							unknown_name);
   this->_compute_error(sys_name,
 		       unknown_name,
 		       error_vals);
@@ -160,8 +160,8 @@ Number ExactSolution::l2_error(const std::string& sys_name,
   
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
-						      unknown_name);
+  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
+							unknown_name);
   
   // Return the square root of the first component of the
   // computed error.
@@ -175,7 +175,7 @@ Number ExactSolution::l2_error(const std::string& sys_name,
 
 
 Number ExactSolution::h1_error(const std::string& sys_name,
-			     const std::string& unknown_name)
+			       const std::string& unknown_name)
 {
   // Check to be sure the user has supplied the exact derivative function
   if (_exact_deriv == NULL)
@@ -188,8 +188,8 @@ Number ExactSolution::h1_error(const std::string& sys_name,
   
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
-						      unknown_name);
+  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
+							unknown_name);
   
   // Return the square root of the sum of the computed errors.
   return std::sqrt(error_vals[0] + error_vals[1]);
@@ -202,7 +202,7 @@ Number ExactSolution::h1_error(const std::string& sys_name,
 
 
 Number ExactSolution::h2_error(const std::string& sys_name,
-			     const std::string& unknown_name)
+			       const std::string& unknown_name)
 {
   // Check to be sure the user has supplied the exact derivative function
   if (_exact_deriv == NULL || _exact_hessian == NULL)
@@ -216,7 +216,7 @@ Number ExactSolution::h2_error(const std::string& sys_name,
   
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
+  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
 						      unknown_name);
   
   // Return the square root of the sum of the computed errors.
@@ -232,7 +232,7 @@ Number ExactSolution::h2_error(const std::string& sys_name,
 
 void ExactSolution::_compute_error(const std::string& sys_name,
 				   const std::string& unknown_name,
-				   std::vector<Real>& error_vals)
+				   std::vector<Number>& error_vals)
 {
   // Get a reference to the system whose error is being computed.
   const System& computed_system
@@ -242,7 +242,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   const DofMap& computed_dof_map = computed_system.get_dof_map();
 
   // Zero the error before summation
-  error_vals = std::vector<Real>(3, 0.);
+  error_vals = std::vector<Number>(3, 0.);
 
   // get the EquationSystems parameters
   const Parameters& parameters = this->_equation_systems.parameters;

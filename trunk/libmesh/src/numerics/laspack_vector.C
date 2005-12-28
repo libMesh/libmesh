@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.31 2005-11-29 15:46:45 jwpeterson Exp $
+// $Id: laspack_vector.C,v 1.32 2005-12-28 13:47:10 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -232,9 +232,8 @@ void LaspackVector<T>::scale (const T factor)
 }
 
 
-
 template <typename T>
-Real LaspackVector<T>::dot (const NumericVector<T>& V) const
+Number LaspackVector<T>::dot (const NumericVector<T>& V) const
 {
   assert (this->initialized());
 
