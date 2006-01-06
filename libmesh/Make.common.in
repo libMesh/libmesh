@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.50 2005-06-28 18:54:58 jwpeterson Exp $
+# $Id: Make.common.in,v 1.51 2006-01-06 19:18:12 spetersen Exp $
 
 
 ###############################################################################
@@ -287,12 +287,23 @@ ifeq ($(enable-optional),yes)
   #############################################################################
   # SLEPc
   ifeq ($(enable-slepc),yes)
-
-    include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/packages
+    # The configure script checks that only corresponding
+    # versions of PETSc and SLEPc can be used. Hence,
+    # petsc-major-minor is also used to identify the SLEPc version 
+    ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x & newer style
+      include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/slepcconf
+    else
+      include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/packages
+    endif
 
     INCLUDE += -I$(SLEPC_DIR)/include
 
-    SLEPC_LIB = $(SLEPC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
+    # Depending on petsc version, libs live in different locations
+    ifneq (,$(findstring 2.3.x, $(petsc-major-minor))) # 2.3.x & newer does not use BOPT
+      SLEPC_LIB = $(SLEPC_DIR)/lib/$(PETSC_ARCH)
+    else
+      SLEPC_LIB = $(SLEPC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
+    endif
 
     libs-SLEPC = -L$(SLEPC_LIB) \
                  -lslepc
