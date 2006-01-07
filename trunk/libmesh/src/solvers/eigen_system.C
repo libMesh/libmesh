@@ -1,4 +1,4 @@
-// $Id: eigen_system.C,v 1.4 2005-12-22 18:06:56 spetersen Exp $
+// $Id: eigen_system.C,v 1.5 2006-01-07 20:24:59 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -87,23 +87,24 @@ void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
 
   eigen_solver->set_eigenproblem_type(ept);
 
-  std::cout<< "The Problem type is set to be: "<<std::endl;
+  // std::cout<< "The Problem type is set to be: "<<std::endl;
 
   switch (_eigen_problem_type)
     {
-    case HEP: std::cout<<"Hermitian"<<std::endl;
+    case HEP: // std::cout<<"Hermitian"<<std::endl;
       break;
       
-    case NHEP: std::cout<<"Non-Hermitian"<<std::endl;
+    case NHEP: // std::cout<<"Non-Hermitian"<<std::endl;
       break;
       
-    case GHEP: std::cout<<"Gerneralized Hermitian"<<std::endl;
+    case GHEP: // std::cout<<"Gerneralized Hermitian"<<std::endl;
       break;
       
-    case GNHEP: std::cout<<"Generalized Non-Hermitian"<<std::endl;
+    case GNHEP: // std::cout<<"Generalized Non-Hermitian"<<std::endl;
       break;
       
-    default: std::cout<<"not properly specified"<<std::endl;
+    default: // std::cout<<"not properly specified"<<std::endl;
+      error();
       break;
       
     } 
@@ -120,12 +121,8 @@ void EigenSystem::init_data ()
   
   // define the type of eigenproblem
   if (_eigen_problem_type == GNHEP || _eigen_problem_type == GHEP) 
-    {
-      _is_generalized_eigenproblem = true;
-      
-      std::cout << "We're dealing with a generalized eigenproblem!" << std::endl;
-    }
-
+    _is_generalized_eigenproblem = true;
+  
   // build the system matrix
   matrix_A = SparseMatrix<Number>::build().release();
 
