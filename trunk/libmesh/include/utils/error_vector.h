@@ -1,4 +1,4 @@
-// $Id: error_vector.h,v 1.3 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: error_vector.h,v 1.4 2006-01-11 20:56:51 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 // Local Includes
 #include "statistics.h"
 
+typedef float ErrorVectorReal;
 
 // Forward Declarations
 
@@ -43,11 +44,22 @@
  *
  * @author Benjamin S. Kirk, 2003.
  */
-class ErrorVector : public StatisticsVector<float>
+class ErrorVector : public StatisticsVector<ErrorVectorReal>
 {
   
 public:
   
+  /**
+   * Call the StatisticsVector constructor.
+   */
+  ErrorVector(unsigned int i=0) : StatisticsVector<ErrorVectorReal> (i) {}
+  
+  /**
+   * Call the StatisticsVector constructor, fill each entry with \p val
+   */
+  ErrorVector(unsigned int i, ErrorVectorReal val) :
+      StatisticsVector<ErrorVectorReal> (i,val) {}
+
   /**
    * Returns the minimum nonzero value in the data set.
    */
