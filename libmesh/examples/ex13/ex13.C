@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.13 2005-10-14 15:31:07 roystgnr Exp $ */
+/* $Id: ex13.C,v 1.14 2006-01-14 15:56:08 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -415,7 +415,7 @@ void assemble_stokes (EquationSystems& es,
       //         -           -          -  -
       //        | Kuu Kuv Kup |        | Fu |
       //   Ke = | Kvu Kvv Kvp |;  Fe = | Fv |
-      //        | Kpu Kpv Kpp |        | Fv |
+      //        | Kpu Kpv Kpp |        | Fp |
       //         -           -          -  -
       //
       // The \p DenseSubMatrix.repostition () member takes the
