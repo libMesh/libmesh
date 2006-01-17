@@ -1,4 +1,4 @@
-// $Id: enum_eigen_solver_type.h,v 1.3 2005-12-22 18:06:55 spetersen Exp $
+// $Id: enum_eigen_solver_type.h,v 1.4 2006-01-17 13:36:56 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -38,6 +38,7 @@ namespace libMeshEnums {
 			LAPACK,
 			SUBSPACE,
 			ARNOLDI,
+			LANCZOS,
 			// SLEPc optional packages
 			// EPSARPACK,
 			// EPSLAPACK,

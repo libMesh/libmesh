@@ -1,4 +1,4 @@
-// $Id: slepc_eigen_solver.C,v 1.3 2005-12-22 18:06:55 spetersen Exp $
+// $Id: slepc_eigen_solver.C,v 1.4 2006-01-17 13:36:55 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -362,10 +362,10 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
       ierr = EPSSetType (_eps, (char*) EPSLAPACK);   CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
     case ARNOLDI:
       ierr = EPSSetType (_eps, (char*) EPSARNOLDI);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    case LANCZOS:
+      ierr = EPSSetType (_eps, (char*) EPSLANCZOS);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
       // case ARPACK:
       // ierr = EPSSetType (_eps, (char*) EPSARPACK);   CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-      // case LANCZOS:
-      // ierr = EPSSetType (_eps, (char*) EPSLANCZOS);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
       
     default:
       std::cerr << "ERROR:  Unsupported SLEPc Eigen Solver: "
