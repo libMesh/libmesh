@@ -1,4 +1,4 @@
-// $Id: linear_implicit_system.C,v 1.4 2005-06-12 18:36:42 jwpeterson Exp $
+// $Id: linear_implicit_system.C,v 1.5 2006-02-16 22:17:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -74,8 +74,9 @@ void LinearImplicitSystem::reinit ()
 
 void LinearImplicitSystem::solve ()
 {
-  // Assemble the linear system
-  this->assemble (); 
+  if (this->assemble_before_solve)
+    // Assemble the linear system
+    this->assemble (); 
 
   // Log how long the linear solve takes.
   START_LOG("solve()", "System");
