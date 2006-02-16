@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.23 2005-08-23 16:50:54 roystgnr Exp $
+// $Id: system.C,v 1.24 2006-02-16 22:17:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,8 @@
 System::System (EquationSystems& es,
 		const std::string& name,
 		const unsigned int number) :
-  
+
+  assemble_before_solve    (true),
   solution                 (NumericVector<Number>::build()),
   current_local_solution   (NumericVector<Number>::build()),
   _init_system             (NULL),

@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.17 2005-08-23 16:50:55 roystgnr Exp $
+// $Id: system.h,v 1.18 2006-02-16 22:17:57 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -428,6 +428,26 @@ public:
    */
   virtual void prolong_vectors ();
 
+  /**
+   * Flag which tells the system to whether or not to
+   * call the user assembly function during each call to solve().
+   * By default, every call to solve() begins with a call to the
+   * user assemble, so this flag is true.  (For explicit systems,
+   * "solving" the system occurs during the assembly step, so this
+   * flag is always true for explicit systems.)  
+   * 
+   * You will only want to set this to false if you need direct
+   * control over when the system is assembled, and are willing to
+   * track the state of its assembly yourself.  An example of such a
+   * case is an implicit system with multiple right hand sides.  In
+   * this instance, a single assembly would likely be followed with
+   * multiple calls to solve.
+   *
+   * The frequency system and Newmark system have their own versions
+   * of this flag, called _finished_assemble, which might be able to
+   * be replaced with this more general concept.
+   */
+  bool assemble_before_solve;
 
 
   //--------------------------------------------------

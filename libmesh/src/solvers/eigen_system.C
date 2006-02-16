@@ -1,4 +1,4 @@
-// $Id: eigen_system.C,v 1.5 2006-01-07 20:24:59 spetersen Exp $
+// $Id: eigen_system.C,v 1.6 2006-02-16 22:17:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -176,8 +176,9 @@ void EigenSystem::solve ()
   assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
   assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
 
-  // Assemble the linear system
-  this->assemble ();
+  if (this->assemble_before_solve)
+    // Assemble the linear system
+    this->assemble ();
 
   // Get the tolerance for the solver and the maximum
   // number of iterations. Here, we simply adopt the linear solver
