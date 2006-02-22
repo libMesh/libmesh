@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.C,v 1.7 2005-06-14 00:16:27 jwpeterson Exp $
+// $Id: fourth_error_estimators.C,v 1.8 2006-02-22 20:55:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -143,12 +143,12 @@ void LaplacianErrorEstimator::estimate_error (const System& system,
       AutoPtr<FEBase> fe_e (FEBase::build (dim, fe_type));
       AutoPtr<FEBase> fe_f (FEBase::build (dim, fe_type));
 
-      // Build an appropriate Clough-Tocher quadrature rule
-      QClough qrule (dim-1, fe_type.default_quadrature_order());
+      // Build an appropriate quadrature rule
+      AutoPtr<QBase> qrule(fe_type.default_quadrature_rule(dim-1));
 
       // Tell the finite element for element e about the quadrature
       // rule.  The finite element for element f need not know about it
-      fe_e->attach_quadrature_rule (&qrule);
+      fe_e->attach_quadrature_rule (qrule.get());
       
       // By convention we will always do the integration
       // on the face of element e.  Get its Jacobian values, etc..
@@ -223,7 +223,7 @@ void LaplacianErrorEstimator::estimate_error (const System& system,
 		    const unsigned int n_dofs_f = dof_indices_f.size();
 
 		    // The number of quadrature points
-		    const unsigned int n_qp = qrule.n_points();
+		    const unsigned int n_qp = qrule->n_points();
 
 		    // Find the location of the quadrature points
 		    // on element f
