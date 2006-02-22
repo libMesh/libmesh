@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_3D.C,v 1.3 2005-09-02 18:48:55 roystgnr Exp $
+// $Id: fe_hermite_shape_3D.C,v 1.4 2006-02-22 22:30:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -316,8 +316,8 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
                   break;
 		case 2:
                   return coef *
-                    FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[0],p(0)) * 
-                    FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) * 
+                    FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) * 
+                    FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[1],p(1)) * 
                     FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
                   break;
 		case 3:
