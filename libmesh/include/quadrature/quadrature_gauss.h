@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss.h,v 1.3 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: quadrature_gauss.h,v 1.4 2006-02-23 21:38:50 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,8 +30,8 @@
 
 /**
  * This class implemenets specific orders of Gauss quadrature.
- * Gauss quadrature rules of order \p p have the property of
- * integrating polynomials of degree \p 2p-1 exactly.
+ * Gauss quadrature rules of Order \p p have the property of
+ * integrating polynomials of degree \p p exactly.
  */
 
 // ------------------------------------------------------------
