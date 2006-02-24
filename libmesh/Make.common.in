@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.51 2006-01-06 19:18:12 spetersen Exp $
+# $Id: Make.common.in,v 1.52 2006-02-24 20:02:19 benkirk Exp $
 
 
 ###############################################################################
@@ -391,8 +391,10 @@ ifeq ($(enable-optional),yes)
 		   -lpetsc
     endif
 
-    LIBS += $(libs-PETSC) $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) \
-	    $(HYPRE_LIB) $(BLASLAPACK_LIB) $(X11_LIB) $(MATLAB_LIB) \
+    LIBS += $(libs-PETSC) \
+            $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) $(HYPRE_LIB) \
+            ${SUPERLU_DIST_LIB} ${UMFPACK_LIB} ${SUPERLU_LIB} \
+            $(BLASLAPACK_LIB) $(X11_LIB) $(MATLAB_LIB) \
             $(FLIBS)
 
     EXTERNAL_FLAGS += $(libs-PETSC) $(MPI_LIB) $(BLASLAPACK_LIB) \
