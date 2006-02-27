@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.52 2006-02-24 20:02:19 benkirk Exp $
+# $Id: Make.common.in,v 1.53 2006-02-27 07:11:50 spetersen Exp $
 
 
 ###############################################################################
@@ -402,6 +402,14 @@ ifeq ($(enable-optional),yes)
 
   endif #end ifeq ($(enable-petsc),yes)
 
+  #############################################################################
+  # SLEPc again. When linking slepc-2.3.x to external libraries
+  # e.g. ARPACK this needs to be included after PETSc.
+  ifeq ($(enable-slepc),yes)
+    ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x & newer style
+      include $(SLEPC_DIR)/bmake/slepc_common_variables
+    endif
+  endif
 
   # MPI configuration when Petsc is absent
   LIBS    += $(MPI_LIB)
