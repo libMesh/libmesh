@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.19 2005-12-06 20:52:13 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.20 2006-03-01 21:43:27 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -145,12 +145,19 @@ int main(int argc, char** argv)
       LinearImplicitSystem& system =
 	equation_systems.add_system<LinearImplicitSystem> ("Laplace");
       
-      // Adds the variable "u" to "Laplace".  "u"
-      // will be approximated using second-order approximation.
+      // Adds the variable "u" to "Laplace", using 
+      // the finite element type and order specified
+      // in the config file
       if (approx_order == "FIRST")
 	system.add_variable("u", FIRST);
+      else if (approx_order == "SECOND")
+        system.add_variable("u", SECOND);
+      else if (approx_order == "HIERARCHIC")
+        system.add_variable("u", SECOND, HIERARCHIC);
+      else if (approx_order == "THIRD")
+        system.add_variable("u", THIRD, HIERARCHIC);
       else
-	system.add_variable("u", SECOND);
+	error();
       
       // Give the system a pointer to the matrix assembly
       // function.
