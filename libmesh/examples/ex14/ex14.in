@@ -16,4 +16,6 @@ coarsen_percentage = 0.0
 uniform_refine = 0
 
 # Polynomial approximation order
+# FIRST and SECOND construct linear or quadratic Lagrange elements
+# HIERARCHIC and THIRD construct quadratic or cubic Hierarchics
 approx_order = SECOND
