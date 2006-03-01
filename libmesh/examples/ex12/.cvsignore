@@ -11,3 +11,4 @@ so_locations
 gmon.out
 *.unv
 *.gz
+.nfs*

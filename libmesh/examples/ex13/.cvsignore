@@ -13,3 +13,4 @@ gmon.out
 *.gz
 *.gmv.*
 ex13
+.nfs*
