@@ -9,3 +9,4 @@ so_locations
 gmon.out
 gnuplot_script
 gnuplot_script_data
+.nfs*

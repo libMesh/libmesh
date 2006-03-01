@@ -11,3 +11,4 @@ so_locations
 gmon.out
 out_1
 out_1_data
+.nfs*
