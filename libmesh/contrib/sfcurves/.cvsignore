@@ -3,3 +3,4 @@
 *.pg.o
 ii_files
 so_locations
+.nfs*

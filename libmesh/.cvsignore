@@ -49,3 +49,4 @@ libmesh-devel-mailing-list
 config.status
 *.lay
 *.swp
+.nfs*
