@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_3D.C,v 1.4 2006-02-22 22:30:53 roystgnr Exp $
+// $Id: fe_hermite_shape_3D.C,v 1.5 2006-03-01 22:48:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -94,18 +94,19 @@ void hermite_compute_coefs(const Elem* elem)
           dydzeta[p] += elem->point(i)(1) * ddzeta;
 #endif
         }
+
       // No singular elements!
       assert(dxdxi[0][p]);
       assert(dxdxi[1][p]);
       assert(dxdxi[2][p]);
       // No non-rectilinear or non-axis-aligned elements!
 #ifdef DEBUG
-      assert(std::abs(dydxi[p]) < 1e-9);
-      assert(std::abs(dzdeta[p]) < 1e-9);
-      assert(std::abs(dxdzeta[p]) < 1e-9);
-      assert(std::abs(dzdxi[p]) < 1e-9);
-      assert(std::abs(dxdeta[p]) < 1e-9);
-      assert(std::abs(dydzeta[p]) < 1e-9);
+      assert(std::abs(dydxi[p]) < TOLERANCE);
+      assert(std::abs(dzdeta[p]) < TOLERANCE);
+      assert(std::abs(dxdzeta[p]) < TOLERANCE);
+      assert(std::abs(dzdxi[p]) < TOLERANCE);
+      assert(std::abs(dxdeta[p]) < TOLERANCE);
+      assert(std::abs(dydzeta[p]) < TOLERANCE);
 #endif
     }
 }
