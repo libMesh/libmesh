@@ -4,3 +4,4 @@ showme
 *.ele
 *.node
 triangle
+.nfs*

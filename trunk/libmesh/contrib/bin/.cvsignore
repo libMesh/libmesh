@@ -6,3 +6,4 @@ so_locations
 libmesh-config
 create_libmesh_release
 xda2mgf
+.nfs*

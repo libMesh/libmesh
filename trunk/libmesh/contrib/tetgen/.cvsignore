@@ -5,3 +5,4 @@ showme
 *.node
 triangle
 ii_files
+.nfs*
