@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.26 2006-03-03 15:03:24 benkirk Exp $ */
+/* $Id: ex10.C,v 1.27 2006-03-03 15:35:14 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -33,7 +33,7 @@
 // C++ include files that we need
 #include <iostream>
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
@@ -118,7 +118,7 @@ int main (int argc, char** argv)
   {    
 
     // Check for proper calling arguments.
-    if (argc < 3)
+    if (argc > 6)
     {
       // Use commandline parameter to specify if we are to
       // read in an initial solution or generate it ourself
