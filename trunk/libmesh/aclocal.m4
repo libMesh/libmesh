@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.95 2005-09-30 16:53:55 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.96 2006-03-03 15:03:23 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -107,6 +107,10 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
         if test "x$is_intel_ecc" != "x" ; then
           GXX_VERSION_STRING="`($CXX -V -help 2>&1) | grep 'Version '`"
           case "$GXX_VERSION_STRING" in
+            *9.1*)
+              AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 9.1 >>>)
+  	      GXX_VERSION=intel_itanium_icc_v9.1
+              ;;
             *9.0*)
               AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 9.0 >>>)
   	      GXX_VERSION=intel_itanium_icc_v9.0
@@ -135,6 +139,10 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
           if test "x$is_intel_icc" != "x" ; then
             GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
             case "$GXX_VERSION_STRING" in
+              *9.1*)
+                AC_MSG_RESULT(<<< C++ compiler is Intel ICC 9.1 >>>)
+  	        GXX_VERSION=intel_icc_v9.1
+                ;;
               *9.0*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel ICC 9.0 >>>)
   	        GXX_VERSION=intel_icc_v9.0
@@ -399,7 +407,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
         dnl Specific flags for specific versions
         case "$GXX_VERSION" in
           dnl Intel ICC >= 8.1	
-          intel_icc_v8.1 | intel_icc_v9.0)	
+          intel_icc_v8.1 | intel_icc_v9.0 | intel_icc_v9.1)	
               dnl Disable some warning messages:
               dnl #266: 'function declared implicitly'
               dnl       Metis function "GKfree" caused this error
@@ -432,7 +440,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
               ;;
           
           dnl Intel Itanium ICC >= v8.1
-          intel_itanium_icc_v9.0 | intel_itanium_icc_v8.1)
+          intel_itanium_icc_v8.1 | intel_itanium_icc_v9.0 | intel_itanium_icc_v9.1)
               dnl Disable some warning messages:
               dnl #266: 'function declared implicitly'
               dnl       Metis function "GKfree" caused this error

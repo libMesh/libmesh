@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.25 2005-12-06 20:52:12 roystgnr Exp $ */
+/* $Id: ex10.C,v 1.26 2006-03-03 15:03:24 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -118,7 +118,7 @@ int main (int argc, char** argv)
   {    
 
     // Check for proper calling arguments.
-    if (argc > 6)
+    if (argc < 3)
     {
       // Use commandline parameter to specify if we are to
       // read in an initial solution or generate it ourself
