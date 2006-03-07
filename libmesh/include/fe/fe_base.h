@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.14 2005-06-29 22:38:12 roystgnr Exp $
+// $Id: fe_base.h,v 1.15 2006-03-07 20:43:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -270,6 +270,13 @@ public:
    */
   const std::vector<RealGradient>& get_dxyzdeta() const
   { return dxyzdeta_map; }
+
+  /**
+   * @returns the element tangents in zeta-direction at the quadrature
+   * points.
+   */
+  const std::vector<RealGradient>& get_dxyzdzeta() const
+  { return dxyzdzeta_map; }
   
   /**
    * @returns the second partial derivatives in xi.
@@ -278,17 +285,43 @@ public:
   { return d2xyzdxi2_map; }
 
   /**
-   * @returns the second partial derivatives in xi-eta.
-   */
-  const std::vector<RealGradient>& get_d2xyzdxideta() const
-  { return d2xyzdxideta_map; }
-
-  /**
    * @returns the second partial derivatives in eta.
    */
   const std::vector<RealGradient>& get_d2xyzdeta2() const
   { return d2xyzdeta2_map; }
 
+#ifdef ENABLE_SECOND_DERIVATIVES
+  
+  /**
+   * @returns the second partial derivatives in zeta.
+   */
+  const std::vector<RealGradient>& get_d2xyzdzeta2() const
+  { return d2xyzdzeta2_map; }
+  
+#endif
+  
+  /**
+   * @returns the second partial derivatives in xi-eta.
+   */
+  const std::vector<RealGradient>& get_d2xyzdxideta() const
+  { return d2xyzdxideta_map; }
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+  
+  /**
+   * @returns the second partial derivatives in xi-zeta.
+   */
+  const std::vector<RealGradient>& get_d2xyzdxidzeta() const
+  { return d2xyzdxidzeta_map; }
+
+  /**
+   * @returns the second partial derivatives in eta-zeta.
+   */
+  const std::vector<RealGradient>& get_d2xyzdetadzeta() const
+  { return d2xyzdetadzeta_map; }
+
+#endif
+  
   /**
    * @returns the dxi/dx entry in the transformation
    * matrix from physical to local coordinates. 
