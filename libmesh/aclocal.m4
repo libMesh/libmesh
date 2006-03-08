@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.96 2006-03-03 15:03:23 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.97 2006-03-08 16:31:18 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -22,6 +22,14 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
+      *4.2*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.2 >>>)
+  	GXX_VERSION=gcc4.2
+  	;;
+      *4.1*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.1 >>>)
+  	GXX_VERSION=gcc4.1
+  	;;
       *4.0*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-4.0 >>>)
   	GXX_VERSION=gcc4.0

@@ -147,7 +147,7 @@
  
  
   - GNU GCC
-    - \p gcc 4.0
+    - \p gcc 4.x
     - \p gcc 3.x
     - \p gcc 2.95.x
     - \p gcc 2.96 (RedHat's compiler in the 7.x series)
