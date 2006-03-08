@@ -23,6 +23,7 @@ examples:
 	@$(MAKE) -C ex14 $(MAKECMDGOALS)
 	@$(MAKE) -C ex15 $(MAKECMDGOALS)
 	@$(MAKE) -C ex16 $(MAKECMDGOALS)
+	@$(MAKE) -C ex17 $(MAKECMDGOALS)
 	@echo "----------------------------------------------"
 	@echo "------- Done Building Example Programs -------"
 	@echo "----------------------------------------------"
@@ -71,6 +72,7 @@ clobber:
 	@$(MAKE) -C ex14 $(MAKECMDGOALS)
 	@$(MAKE) -C ex15 $(MAKECMDGOALS)
 	@$(MAKE) -C ex16 $(MAKECMDGOALS)
+	@$(MAKE) -C ex17 $(MAKECMDGOALS)
 #
 # Make the example program directories look
 # like a clean distribution
@@ -92,6 +94,7 @@ distclean:
 	@$(MAKE) -C ex14 $(MAKECMDGOALS)
 	@$(MAKE) -C ex15 $(MAKECMDGOALS)
 	@$(MAKE) -C ex16 $(MAKECMDGOALS)
+	@$(MAKE) -C ex17 $(MAKECMDGOALS)
 
 #
 # Link the example programs
@@ -113,6 +116,7 @@ link: $(wildcard examples/ex*/ex*.C)
 	@$(MAKE) -C ex14 ex14 
 	@$(MAKE) -C ex15 ex15 
 	@$(MAKE) -C ex16 ex16 
+	@$(MAKE) -C ex17 ex17 
 
 #
 # Run the example programs to see if shared lib's get properly loaded
@@ -134,6 +138,7 @@ run: $(wildcard examples/ex*/ex*.C)
 	@$(MAKE) -C ex14 $(MAKECMDGOALS)
 	@$(MAKE) -C ex15 $(MAKECMDGOALS)
 	@$(MAKE) -C ex16 $(MAKECMDGOALS)
+	@$(MAKE) -C ex17 $(MAKECMDGOALS)
 
 #
 # Rebuild the dependencies for the examples
@@ -155,3 +160,4 @@ run: $(wildcard examples/ex*/ex*.C)
 	@$(MAKE) -C ex14 $(MAKECMDGOALS)
 	@$(MAKE) -C ex15 $(MAKECMDGOALS)
 	@$(MAKE) -C ex16 $(MAKECMDGOALS)
+	@$(MAKE) -C ex17 $(MAKECMDGOALS)
