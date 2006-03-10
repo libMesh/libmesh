@@ -1,19 +1,24 @@
 # Maximum number of refinement steps
-max_r_steps = 7
+max_r_steps = 5
 
 # Maximum refinement level for an element.
-max_r_level = 7
+max_r_level = 8
 
-# Percentage of elements to refine at each step
-refine_percentage = 0.7
+# Percentage of elements to refine at each adaptive step
+refine_percentage = 0.25
 
-# Percentage of elements to (attempt to) coarsen at each step
+# Percentage to (attempt to) coarsen at each adaptive step
 coarsen_percentage = 0.0
 
 # Option to uniformly or adaptively refine.
 # If set equal to 1, uniform refinement is done.
 # If set equal to 0, adaptive refinement is done.
-uniform_refine = 0
+uniform_refine = 1
 
-# Polynomial approximation type
-approx_type = CLOUGH
+# Polynomial approximation type (SECOND, CLOUGH, or HERMITE)
+approx_type = HERMITE
+
+# Domain dimension (3D is only supported with HERMITE elements)
+dimension = 2
+
+max_linear_iterations = 100000
