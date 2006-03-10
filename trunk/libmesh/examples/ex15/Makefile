@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2005-09-12 16:53:59 roystgnr Exp $
+# $Id: Makefile,v 1.4 2006-03-10 20:44:00 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -50,7 +50,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out*.gmv
+	@rm -f $(target) *.gmv *.m
 
 distclean:
 	@$(MAKE) clobber
@@ -72,7 +72,7 @@ tfqmr: $(target)
 	@echo "* Running Example " $(target) -ksp_type tfqmr
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) -ksp_type tfqmr
+	@$(target) -ksp_type tfqmr -pc_factor_zeropivot 0
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)
@@ -94,7 +94,7 @@ lu: $(target)
 	@echo "* Running Example " $(target)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) -pc_type lu
+	@$(target) -pc_type lu -pc_factor_zeropivot 0
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)
