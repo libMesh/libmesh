@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.C,v 1.8 2006-02-22 20:55:24 roystgnr Exp $
+// $Id: fourth_error_estimators.C,v 1.9 2006-03-10 22:42:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -250,8 +250,16 @@ void LaplacianErrorEstimator::estimate_error (const System& system,
 			  {
 			  lap_e += d2phi_e[i][qp](0,0) *
 				system.current_solution(dof_indices_e[i]);
+                          if (dim > 1)
+                            {
 			  lap_e += d2phi_e[i][qp](1,1) *
 				system.current_solution(dof_indices_e[i]);
+                            }
+                          if (dim > 2)
+                            {
+			  lap_e += d2phi_e[i][qp](2,2) *
+				system.current_solution(dof_indices_e[i]);
+                            }
 			  }
 			
 			// Compute the solution gradient on element f
@@ -259,8 +267,16 @@ void LaplacianErrorEstimator::estimate_error (const System& system,
 			  {
 			  lap_f += d2phi_f[i][qp](0,0) *
 				system.current_solution(dof_indices_f[i]);
+                          if (dim > 1)
+                            {
 			  lap_f += d2phi_f[i][qp](1,1) *
 				system.current_solution(dof_indices_f[i]);
+                            }
+                          if (dim > 2)
+                            {
+			  lap_f += d2phi_f[i][qp](2,2) *
+				system.current_solution(dof_indices_f[i]);
+                            }
 			  }
 			
 
