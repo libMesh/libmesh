@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.53 2006-02-27 07:11:50 spetersen Exp $
+# $Id: Make.common.in,v 1.54 2006-03-10 13:45:25 benkirk Exp $
 
 
 ###############################################################################
@@ -393,7 +393,8 @@ ifeq ($(enable-optional),yes)
 
     LIBS += $(libs-PETSC) \
             $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) $(HYPRE_LIB) \
-            ${SUPERLU_DIST_LIB} ${UMFPACK_LIB} ${SUPERLU_LIB} \
+            $(SUPERLU_DIST_LIB) $(UMFPACK_LIB) $(SUPERLU_LIB) \
+            $(BLOPEX_LIB) \
             $(BLASLAPACK_LIB) $(X11_LIB) $(MATLAB_LIB) \
             $(FLIBS)
 
