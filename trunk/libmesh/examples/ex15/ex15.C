@@ -1,4 +1,4 @@
-/* $Id: ex15.C,v 1.8 2006-03-10 20:44:47 roystgnr Exp $ */
+/* $Id: ex15.C,v 1.9 2006-03-13 17:36:09 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -380,14 +380,15 @@ int main(int argc, char** argv)
     GMVIO (mesh).write_equation_systems (gmv_file,
     					 equation_systems);
     // Close up the output file.
-    out << "];" << std::endl;
-    out << "hold on" << std::endl;
-    out << "plot(e(:,1), e(:,2), 'bo-');" << std::endl;
-    out << "plot(e(:,1), e(:,3), 'ro-');" << std::endl;
-    out << "plot(e(:,1), e(:,3), 'go-');" << std::endl;
-    out << "xlabel('dofs');" << std::endl;
-    out  << "title('C1 elements');" << std::endl;
-    out << "legend('L2-error', 'H1-error', 'H2-error');" << std::endl;
+    out << "];\n"
+	<< "hold on\n"
+	<< "loglog(e(:,1), e(:,2), 'bo-');\n"
+	<< "loglog(e(:,1), e(:,3), 'ro-');\n"
+	<< "loglog(e(:,1), e(:,4), 'go-');\n"
+	<< "xlabel('log(dofs)');\n"
+	<< "ylabel('log(error)');\n"
+	<< "title('C1 elements');\n"
+	<< "legend('L2-error', 'H1-error', 'H2-error');\n";
   }
   
   // All done.  
@@ -638,7 +639,6 @@ void assemble_biharmonic(EquationSystems& es,
   // quadrature points.  Note that for the simple biharmonic, shape
   // function first derivatives are unnecessary.
   const std::vector<std::vector<RealTensor> >& d2phi = fe->get_d2phi();
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
   // For efficiency we will compute shape function laplacians n times,
   // not n^2
