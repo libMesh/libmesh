@@ -1,4 +1,4 @@
-// $Id: tetgen_io.C,v 1.14 2005-09-05 22:48:16 benkirk Exp $
+// $Id: tetgen_io.C,v 1.15 2006-03-13 17:13:30 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 #include "tetgen_io.h"
 #include "mesh_base.h"
 #include "cell_tet4.h"
+#include "cell_tet10.h"
 #include "mesh_data.h"
 
 // ------------------------------------------------------------
@@ -62,7 +63,7 @@ void TetGenIO::read (const std::string& name)
 		<< name << std::endl;
       error();
     }
-
+	
 
   
   // Set the streams from which to read in
@@ -77,6 +78,7 @@ void TetGenIO::read (const std::string& name)
 		<< name_ele  << std::endl;
       error();
     }
+  std::cout<< "found the tetgen files to read " <<std::endl; 
 
   // Skip the comment lines at the beginning
   this->skip_comment_lines (node_stream, '#');
@@ -84,6 +86,7 @@ void TetGenIO::read (const std::string& name)
 
   // Read the nodes and elements from the streams
   this->read_nodes_and_elem (node_stream, ele_stream);
+  std::cout<< "read in nodes and elements " <<std::endl; 
 }
 
 
@@ -133,6 +136,9 @@ void TetGenIO::node_in (std::istream& node_stream)
 
   for (unsigned int i=0; i<_num_nodes; i++)
     {
+      // Check input buffer
+      assert (node_stream.good());
+      
       node_stream >> node_lab  // node number
 		  >> xyz(0)    // x-coordinate value
 		  >> xyz(1)    // y-coordinate value
@@ -171,48 +177,66 @@ void TetGenIO::element_in (std::istream& ele_stream)
 
   // Get a reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
-  
+
   // Read the elements from the ele_stream (*.ele file). 
-  unsigned int element_lab, n_nodes, nAttri=0;
+  unsigned int element_lab=0, n_nodes=0, nAttri=0;
   Real dummy=0.0;
-  unsigned long int node_labels[4]; // Vector that temporarily holds the node labels defining element.
-		
+
   ele_stream >> _num_elements // Read the number of tetrahedrons from the stream.
 	     >> n_nodes       // Read the number of nodes per tetrahedron from the stream (defaults to 4).
 	     >> nAttri;       // Read the number of attributes from stream.
-    
+
   // Vector that assigns element nodes to their correct position.
   // TetGen is normaly 0-based
   // (right now this is strictly not necessary since it is the identity map,
   //  but in the future TetGen could change their numbering scheme.)
-  static const unsigned int assign_elm_nodes[] = { 0, 1, 2, 3};
-			
+  static const unsigned int assign_elm_nodes[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
   for (unsigned int i=0; i<_num_elements; i++)
     {
-      ele_stream >> element_lab;
-			
-      // TetGen only supports Tet4 elements.
-      Elem* elem = new Tet4;
+      assert (ele_stream.good());
       
-      // Read node labels
-      for (unsigned int j=0; j<n_nodes; j++)
-	ele_stream >> node_labels[j];
-			
-      // Read attributes from the stream.
-      for (unsigned int j=0; j<nAttri; j++)
-	ele_stream >> dummy;
-			
-      // nodes are being stored in element
-      for (unsigned int j=0; j<n_nodes; j++)
-	elem->set_node(assign_elm_nodes[j]) =
-	  mesh.node_ptr(_assign_nodes[node_labels[j]]);
+      // TetGen only supports Tet4 and Tet10 elements.
+      Elem* elem = NULL;
+      
+      if (n_nodes==4)
+	elem = mesh.add_elem (new Tet4);
+      
+      else if (n_nodes==10)
+	elem = mesh.add_elem (new Tet10);
+      
+      else
+	{
+	  std::cerr << "Elements with " << n_nodes
+		    << " nodes are not supported in the LibMesh tetgen module\n";
+	  error();
+	}
 
-      Elem* newelem =mesh.add_elem(elem);
+      assert (elem != NULL);
+      assert (elem->n_nodes() == n_nodes);
+
+      // Read the element label
+      ele_stream >> element_lab;
 
       // Add the element to the mesh &
       // tell the MeshData object the foreign element id
       if (this->_mesh_data != NULL)
-	this->_mesh_data->add_foreign_elem_id (newelem, element_lab);
+	this->_mesh_data->add_foreign_elem_id (elem, element_lab);
+      
+      // Read node labels
+      for (unsigned int j=0; j<n_nodes; j++)
+	{
+	  unsigned long int node_label;
+	  ele_stream >> node_label;
+
+	  // Assign node to element
+	  elem->set_node(assign_elm_nodes[j]) =
+	    mesh.node_ptr(_assign_nodes[node_label]);
+	}
+
+      // Read attributes from the stream.
+      for (unsigned int j=0; j<nAttri; j++)
+	ele_stream >> dummy;
     }
 }
 
@@ -278,3 +302,4 @@ void TetGenIO::write (const std::string& fname)
   out << "0\n"; // no holes output!
   out << "\n\n# end of file\n";
 }
+
