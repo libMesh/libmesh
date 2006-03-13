@@ -1,4 +1,4 @@
-// $Id: ex17.C,v 1.1 2006-02-27 07:11:50 spetersen Exp $
+// $Id: ex17.C,v 1.2 2006-03-13 17:14:05 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,7 @@
 
 
 
-// <h1>Example 16 - Solving a generalized Eigen Problem</h1>
+// <h1>Example 17 - Solving a generalized Eigen Problem</h1>
 //
 // This example shows how the previous EigenSolver example 
 // can be adapted to solve generailzed eigenvalue problems.
