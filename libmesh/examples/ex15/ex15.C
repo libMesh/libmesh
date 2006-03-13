@@ -1,4 +1,4 @@
-/* $Id: ex15.C,v 1.9 2006-03-13 17:36:09 benkirk Exp $ */
+/* $Id: ex15.C,v 1.10 2006-03-13 17:52:12 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -147,8 +147,8 @@ int main(int argc, char** argv)
     // Read in parameters from the input file
     const unsigned int max_r_level = input_file("max_r_level", 10);
     const unsigned int max_r_steps = input_file("max_r_steps", 4);
-    const std::string approx_type = input_file("approx_type",
-                                               "HERMITE");
+    const std::string approx_type  = input_file("approx_type",
+						"HERMITE");
     const unsigned int uniform_refine =
 		    input_file("uniform_refine", 0);
     const Real refine_percentage =
@@ -168,8 +168,6 @@ int main(int argc, char** argv)
 
     // Create a dim-dimensional mesh.
     Mesh mesh (dim);
-    std::cerr.setf(std::ios::scientific);
-    std::cerr.precision(3);
     
     // Output file for plotting the error 
     std::string output_file = "";
@@ -196,8 +194,8 @@ int main(int argc, char** argv)
     output_file += ".m";
 
     std::ofstream out (output_file.c_str());
-    out << "% dofs     L2-error     H1-error" << std::endl;
-    out << "e = [" << std::endl;
+    out << "% dofs     L2-error     H1-error\n"
+	<< "e = [\n";
     
     // Set up the dimension-dependent coarse mesh and solution
     if (dim == 2)
@@ -387,7 +385,7 @@ int main(int argc, char** argv)
 	<< "loglog(e(:,1), e(:,4), 'go-');\n"
 	<< "xlabel('log(dofs)');\n"
 	<< "ylabel('log(error)');\n"
-	<< "title('C1 elements');\n"
+	<< "title('C1 " << approx_type << " elements');\n"
 	<< "legend('L2-error', 'H1-error', 'H2-error');\n";
   }
   
@@ -845,7 +843,7 @@ void assemble_biharmonic(EquationSystems& es,
   // PerfLog.  When it goes out of scope (at this function return)
   // it will print its log to the screen. Pretty easy, huh?
 
-  #else
+#else
 
 #endif
 
