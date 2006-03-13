@@ -196,8 +196,8 @@ Read in parameters from the input file
 <pre>
             const unsigned int max_r_level = input_file("max_r_level", 10);
             const unsigned int max_r_steps = input_file("max_r_steps", 4);
-            const std::string approx_type = input_file("approx_type",
-                                                       "HERMITE");
+            const std::string approx_type  = input_file("approx_type",
+        						"HERMITE");
             const unsigned int uniform_refine =
         		    input_file("uniform_refine", 0);
             const Real refine_percentage =
@@ -238,8 +238,6 @@ Create a dim-dimensional mesh.
 <div class ="fragment">
 <pre>
             Mesh mesh (dim);
-            std::cerr.setf(std::ios::scientific);
-            std::cerr.precision(3);
             
 </pre>
 </div>
@@ -273,8 +271,8 @@ Output file for plotting the error
             output_file += ".m";
         
             std::ofstream out (output_file.c_str());
-            out &lt;&lt; "% dofs     L2-error     H1-error" &lt;&lt; std::endl;
-            out &lt;&lt; "e = [" &lt;&lt; std::endl;
+            out &lt;&lt; "% dofs     L2-error     H1-error\n"
+        	&lt;&lt; "e = [\n";
             
 </pre>
 </div>
@@ -639,14 +637,15 @@ Close up the output file.
 
 <div class ="fragment">
 <pre>
-            out &lt;&lt; "];" &lt;&lt; std::endl;
-            out &lt;&lt; "hold on" &lt;&lt; std::endl;
-            out &lt;&lt; "plot(e(:,1), e(:,2), 'bo-');" &lt;&lt; std::endl;
-            out &lt;&lt; "plot(e(:,1), e(:,3), 'ro-');" &lt;&lt; std::endl;
-            out &lt;&lt; "plot(e(:,1), e(:,3), 'go-');" &lt;&lt; std::endl;
-            out &lt;&lt; "xlabel('dofs');" &lt;&lt; std::endl;
-            out  &lt;&lt; "title('C1 elements');" &lt;&lt; std::endl;
-            out &lt;&lt; "legend('L2-error', 'H1-error', 'H2-error');" &lt;&lt; std::endl;
+            out &lt;&lt; "];\n"
+        	&lt;&lt; "hold on\n"
+        	&lt;&lt; "loglog(e(:,1), e(:,2), 'bo-');\n"
+        	&lt;&lt; "loglog(e(:,1), e(:,3), 'ro-');\n"
+        	&lt;&lt; "loglog(e(:,1), e(:,4), 'go-');\n"
+        	&lt;&lt; "xlabel('log(dofs)');\n"
+        	&lt;&lt; "ylabel('log(error)');\n"
+        	&lt;&lt; "title('C1 " &lt;&lt; approx_type &lt;&lt; " elements');\n"
+        	&lt;&lt; "legend('L2-error', 'H1-error', 'H2-error');\n";
           }
           
 </pre>
@@ -1177,7 +1176,6 @@ function first derivatives are unnecessary.
 <div class ="fragment">
 <pre>
           const std::vector&lt;std::vector&lt;RealTensor&gt; &gt;& d2phi = fe-&gt;get_d2phi();
-          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
         
 </pre>
 </div>
@@ -1596,7 +1594,7 @@ it will print its log to the screen. Pretty easy, huh?
 
 <div class ="fragment">
 <pre>
-          #else
+        #else
         
         #endif
         
@@ -1705,8 +1703,8 @@ it will print its log to the screen. Pretty easy, huh?
   
       <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> max_r_level = input_file(<FONT COLOR="#BC8F8F"><B>&quot;max_r_level&quot;</FONT></B>, 10);
       <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> max_r_steps = input_file(<FONT COLOR="#BC8F8F"><B>&quot;max_r_steps&quot;</FONT></B>, 4);
-      <FONT COLOR="#228B22"><B>const</FONT></B> std::string approx_type = input_file(<FONT COLOR="#BC8F8F"><B>&quot;approx_type&quot;</FONT></B>,
-                                                 <FONT COLOR="#BC8F8F"><B>&quot;HERMITE&quot;</FONT></B>);
+      <FONT COLOR="#228B22"><B>const</FONT></B> std::string approx_type  = input_file(<FONT COLOR="#BC8F8F"><B>&quot;approx_type&quot;</FONT></B>,
+  						<FONT COLOR="#BC8F8F"><B>&quot;HERMITE&quot;</FONT></B>);
       <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> uniform_refine =
   		    input_file(<FONT COLOR="#BC8F8F"><B>&quot;uniform_refine&quot;</FONT></B>, 0);
       <FONT COLOR="#228B22"><B>const</FONT></B> Real refine_percentage =
@@ -1723,8 +1721,6 @@ it will print its log to the screen. Pretty easy, huh?
       assert (dim == 2 || approx_type == <FONT COLOR="#BC8F8F"><B>&quot;HERMITE&quot;</FONT></B>);
   
       Mesh mesh (dim);
-      std::cerr.setf(std::ios::scientific);
-      std::cerr.precision(3);
       
       std::string output_file = <FONT COLOR="#BC8F8F"><B>&quot;&quot;</FONT></B>;
   
@@ -1750,8 +1746,8 @@ it will print its log to the screen. Pretty easy, huh?
       output_file += <FONT COLOR="#BC8F8F"><B>&quot;.m&quot;</FONT></B>;
   
       std::ofstream out (output_file.c_str());
-      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;% dofs     L2-error     H1-error&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;e = [&quot;</FONT></B> &lt;&lt; std::endl;
+      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;% dofs     L2-error     H1-error\n&quot;</FONT></B>
+  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;e = [\n&quot;</FONT></B>;
       
       <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 2)
         {
@@ -1897,14 +1893,15 @@ it will print its log to the screen. Pretty easy, huh?
       
       GMVIO (mesh).write_equation_systems (gmv_file,
       					 equation_systems);
-      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;];&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;hold on&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;plot(e(:,1), e(:,2), 'bo-');&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;plot(e(:,1), e(:,3), 'ro-');&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;plot(e(:,1), e(:,3), 'go-');&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;xlabel('dofs');&quot;</FONT></B> &lt;&lt; std::endl;
-      out  &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;title('C1 elements');&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;legend('L2-error', 'H1-error', 'H2-error');&quot;</FONT></B> &lt;&lt; std::endl;
+      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;];\n&quot;</FONT></B>
+  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;hold on\n&quot;</FONT></B>
+  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;loglog(e(:,1), e(:,2), 'bo-');\n&quot;</FONT></B>
+  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;loglog(e(:,1), e(:,3), 'ro-');\n&quot;</FONT></B>
+  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;loglog(e(:,1), e(:,4), 'go-');\n&quot;</FONT></B>
+  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;xlabel('log(dofs)');\n&quot;</FONT></B>
+  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;ylabel('log(error)');\n&quot;</FONT></B>
+  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;title('C1 &quot;</FONT></B> &lt;&lt; approx_type &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; elements');\n&quot;</FONT></B>
+  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;legend('L2-error', 'H1-error', 'H2-error');\n&quot;</FONT></B>;
     }
     
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
@@ -2086,7 +2083,6 @@ it will print its log to the screen. Pretty easy, huh?
     <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
   
     <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealTensor&gt; &gt;&amp; d2phi = fe-&gt;get_d2phi();
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
   
     std::vector&lt;Real&gt; shape_laplacian;
   
@@ -2208,7 +2204,7 @@ it will print its log to the screen. Pretty easy, huh?
       }
   
   
-    #<B><FONT COLOR="#A020F0">else</FONT></B>
+  #<B><FONT COLOR="#A020F0">else</FONT></B>
   
   #endif
   
@@ -2218,8 +2214,6 @@ it will print its log to the screen. Pretty easy, huh?
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
 Compiling C++ (in debug mode) ex15.C...
-ex15.C: In function `void assemble_biharmonic(EquationSystems&, const std::string&)':
-ex15.C:641: warning: unused variable 'dphi'
 Linking ex15...
 /local/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
 : warning: the use of `mktemp' is dangerous, better use `mkstemp'
