@@ -1,4 +1,4 @@
-// $Id: petsc_linear_solver.h,v 1.2 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: petsc_linear_solver.h,v 1.3 2006-03-14 17:09:47 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -130,6 +130,13 @@ public:
    * if you desire.  Just don't do anything crazy like calling PCDestroy()!
    */
   PC pc() { this->init(); return _pc; }
+
+  /**
+   * Returns the raw PETSc ksp context pointer.  This is useful if
+   * you are for example setting a custom convergence test with
+   * KSPSetConvergenceTest().
+   */
+  KSP ksp() { this->init(); return _ksp; }
   
   /**
    * Fills the input vector with the sequence of residual norms
