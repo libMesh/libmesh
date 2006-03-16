@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.18 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: dof_map_constraints.C,v 1.19 2006-03-16 21:04:00 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -86,13 +86,18 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
 
 
 void DofMap::add_constraint_row (const unsigned int dof_number,
-				 const DofConstraintRow& constraint_row)
+				 const DofConstraintRow& constraint_row,
+				 const bool forbid_constraint_overwrite)
 {
-
-  if (this->is_constrained_dof(dof_number))
-    std::cerr << "WARNING: DOF " << dof_number << " was already constrained!"
-	      << std::endl;
-
+  // Optionally allow the user to overwrite constraints.  Defaults to false.
+  if (forbid_constraint_overwrite)
+    if (this->is_constrained_dof(dof_number))
+      {
+	std::cerr << "ERROR: DOF " << dof_number << " was already constrained!"
+		  << std::endl;
+	error();
+      }
+  
   std::pair<unsigned int, DofConstraintRow> kv(dof_number, constraint_row);
 
   _dof_constraints.insert(kv);

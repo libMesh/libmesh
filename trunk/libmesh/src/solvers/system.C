@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.24 2006-02-16 22:17:58 jwpeterson Exp $
+// $Id: system.C,v 1.25 2006-03-16 21:04:00 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,6 +45,7 @@ System::System (EquationSystems& es,
   current_local_solution   (NumericVector<Number>::build()),
   _init_system             (NULL),
   _assemble_system         (NULL),
+  _constrain_system        (NULL),
   _dof_map                 (new DofMap(number)),
   _equation_systems        (es),
   _mesh                    (es.get_mesh()),
@@ -175,6 +176,9 @@ void System::init_data ()
   _dof_map->create_dof_constraints(this->get_mesh());
 
 #endif
+  
+  // Apply any user-defined constraints
+  this->user_constrain();
 
   // Resize the solution conformal to the current mesh
   solution->init (this->n_dofs(), this->n_local_dofs());
@@ -257,6 +261,9 @@ void System::reinit ()
 #ifdef ENABLE_AMR
   // Recreate any hanging node constraints
   _dof_map->create_dof_constraints(this->get_mesh());
+
+  // Apply any user-defined constraints
+  this->user_constrain();
 
   // Update the solution based on the projected
   // current_local_solution.
@@ -694,6 +701,16 @@ void System::attach_assemble_function (void fptr(EquationSystems& es,
 
 
 
+void System::attach_constraint_function(void fptr(EquationSystems& es,
+						  const std::string& name))
+{
+  assert (fptr != NULL);
+  
+  _constrain_system = fptr;  
+}
+
+
+
 void System::user_initialization ()
 {
   // Call the user-provided intialization function,
@@ -703,7 +720,6 @@ void System::user_initialization ()
 }
 
 
-
 void System::user_assembly ()
 {
   // Call the user-provided assembly function,
@@ -711,4 +727,14 @@ void System::user_assembly ()
   if (_assemble_system != NULL)
     this->_assemble_system (_equation_systems, this->name());
 }
-  
+
+
+
+void System::user_constrain ()
+{
+  // Call the user-provided constraint function, 
+  // if it was provided
+  if(_constrain_system!= NULL)
+    this->_constrain_system(_equation_systems, this->name());
+}
+

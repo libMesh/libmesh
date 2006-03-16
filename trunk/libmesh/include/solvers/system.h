@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.18 2006-02-16 22:17:57 jwpeterson Exp $
+// $Id: system.h,v 1.19 2006-03-16 21:03:59 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -396,20 +396,29 @@ public:
    */
   void attach_assemble_function (void fptr(EquationSystems& es,
 					   const std::string& name));
-
-
+  
+  /**
+   * Register a user function for imposing constraints.
+   */
+  void attach_constraint_function (void fptr(EquationSystems& es,
+					     const std::string& name));
+  
   /**
    * User-provided initialization function.  Can be overloaded
    * in derived classes.
    */
   virtual void user_initialization ();
-
   
   /**
    * User-provided  assembly function.  Can be overloaded
    * in derived classes.
    */
   virtual void user_assembly ();
+  
+  /**
+   * User provided constraint function.
+   */
+  virtual void user_constrain ();
 
   /**
    * Re-update the local values when the mesh has changed.
@@ -518,7 +527,14 @@ private:
    */
   void (* _assemble_system) (EquationSystems& es,
 			     const std::string& name);
-  
+
+  /**
+   * Function to impose constraints.
+   */
+  void (* _constrain_system) (EquationSystems& es, 
+			      const std::string& name
+			      );
+
   /**
    * Data structure describing the relationship between
    * nodes, variables, etc... and degrees of freedom.
