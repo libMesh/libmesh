@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.85 2005-06-13 20:01:58 benkirk Exp $
+// $Id: dof_map.C,v 1.86 2006-03-16 00:00:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -438,44 +438,47 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
 		{
 		  Node* node = elem->get_node(n);
 		  
-		  for (unsigned int index=0; index<node->n_comp(sys_num,var);
-		       index++)
-		    
-		    // only assign a dof number if there isn't one
-		    // already there
-		    if (node->dof_number(sys_num,var,index) ==
-			DofObject::invalid_id)
-		      {
-			node->set_dof_number(sys_num,
-					     var,
-					     index,
-					     next_free_dof++);
+		  // assign dof numbers (all at once) if they aren't
+		  // already there
+		  if ((node->n_comp(sys_num,var) > 0) &&
+                      (node->dof_number(sys_num,var,0) ==
+		       DofObject::invalid_id))
+		    {
+		      node->set_dof_number(sys_num,
+					   var,
+					   0,
+					   next_free_dof);
+                      next_free_dof += node->n_comp(sys_num,var);
 
-			// If this DOF is on the local processor add it
-			// to the _send_list
-			if (processor == proc_id)
+		      // If these DOFs are on the local processor add 
+		      // them to the _send_list
+		      if (processor == proc_id)
+		        for (unsigned int index=0; index<node->n_comp(sys_num,var);
+		             index++)
 			  _send_list.push_back(node->dof_number(sys_num,
 								var,
 								index));
-		      }
+		    }
 		}
 		  
 	      // Now number the element DOFS
-	      for (unsigned int index=0; index<elem->n_comp(sys_num,var);
-		   index++)
-		{		  
-		  // No way we could have already numbered this DOF!
-		  assert (elem->dof_number(sys_num,var,index) ==
+              if (elem->n_comp(sys_num,var) > 0)
+                {
+		  assert (elem->dof_number(sys_num,var,0) ==
 			  DofObject::invalid_id);
-		  
+
 		  elem->set_dof_number(sys_num,
 				       var,
-				       index,
-				       next_free_dof++);
+				       0,
+				       next_free_dof);
+
+		  next_free_dof += elem->n_comp(sys_num,var);
 		  
-		  // If this DOF is on the local processor add it
+		if (processor == proc_id)
+	          for (unsigned int index=0; index<elem->n_comp(sys_num,var);
+		       index++)
+		  // If these DOFs are on the local processor add them
 		  // to the _send_list
-		  if (processor == proc_id)
 		    _send_list.push_back(elem->dof_number(sys_num,
 							  var,
 							  index));
@@ -588,52 +591,54 @@ void DofMap::distribute_dofs_node_major (MeshBase& mesh)
 	  for (unsigned int n=0; n<n_nodes; n++)
 	    {
 	      Node* node = elem->get_node(n);
-	      
+		  
 	      for (unsigned var=0; var<n_vars; var++)
-		for (unsigned int index=0; index<node->n_comp(sys_num,var);
-		     index++)
-		  {  
-		    // only assign a dof number if there isn't one
-		    // already there
-		    if (node->dof_number(sys_num,var,index) ==
-			DofObject::invalid_id)
-		      {
-			node->set_dof_number(sys_num,
-					     var,
-					     index,
-					     next_free_dof++);
-			
-			// If this DOF is used by the local processor add it
-			// to the _send_list
-			if (processor == proc_id)
-			  _send_list.push_back(node->dof_number(sys_num,
-								var,
-								index));
-		      }
-		  }
+	      // assign dof numbers (all at once) if they aren't
+	      // already there
+	        if ((node->n_comp(sys_num,var) > 0) &&
+                    (node->dof_number(sys_num,var,0) ==
+	             DofObject::invalid_id))
+	          {
+	            node->set_dof_number(sys_num,
+				         var,
+				         0,
+				         next_free_dof);
+                    next_free_dof += node->n_comp(sys_num,var);
+  
+	            // If these DOFs are on the local processor add 
+	            // them to the _send_list
+	            if (processor == proc_id)
+	              for (unsigned int index=0; index<node->n_comp(sys_num,var);
+	                   index++)
+		        _send_list.push_back(node->dof_number(sys_num,
+							      var,
+							      index));
+	          }
 	    }
 	    
 	  // Now number the element DOFS
 	  for (unsigned var=0; var<n_vars; var++)
-	    for (unsigned int index=0; index<elem->n_comp(sys_num,var);
-		 index++)
-	      {		  
-		// No way we could have already numbered this DOF!
-		assert (elem->dof_number(sys_num,var,index) ==
+            if (elem->n_comp(sys_num,var) > 0)
+              {
+		assert (elem->dof_number(sys_num,var,0) ==
 			DofObject::invalid_id);
-		
+
 		elem->set_dof_number(sys_num,
 				     var,
-				     index,
-				     next_free_dof++);
-		
-		// If this DOF is on the local processor add it
-		// to the _send_list
+				     0,
+				     next_free_dof);
+
+		next_free_dof += elem->n_comp(sys_num,var);
+		  
 		if (processor == proc_id)
-		  _send_list.push_back(elem->dof_number(sys_num,
-							var,
-							index));
-	      }
+	          for (unsigned int index=0; index<elem->n_comp(sys_num,var);
+		       index++)
+		      // If these DOFs are on the local processor add them
+		      // to the _send_list
+		      _send_list.push_back(elem->dof_number(sys_num,
+							    var,
+							    index));
+               }
 	}
       
       _last_df[processor] = (next_free_dof-1);
