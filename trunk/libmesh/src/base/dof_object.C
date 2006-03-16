@@ -1,4 +1,4 @@
-// $Id: dof_object.C,v 1.14 2006-03-16 00:00:47 roystgnr Exp $
+// $Id: dof_object.C,v 1.15 2006-03-16 20:52:08 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -109,11 +109,7 @@ DofObject::DofObject (const DofObject& dof_obj) :
 	_dof_ids[s] = new unsigned int [this->n_vars(s)];  
       
       for (unsigned int v=0; v<this->n_vars(s); v++)
-	for (unsigned int c=0; c<this->n_comp(s,v); c++)
-	  {
-	    assert (c == 0);
-	    _dof_ids[s][v] = dof_obj.dof_number(s,v,c);
-	  }
+	_dof_ids[s][v] = dof_obj._dof_ids[s][v];
     }
   
 #endif
