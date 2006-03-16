@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.11 2005-08-01 21:05:58 jwpeterson Exp $
+// $Id: dof_object.h,v 1.12 2006-03-16 00:00:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -51,7 +51,7 @@ class DofObject;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.11 $
+ * \version $Revision: 1.12 $
  */
 
 class DofObject : public ReferenceCountedObject<DofObject>
@@ -301,22 +301,13 @@ private:
    */
   unsigned char **_n_comp;
 
-  /**
-   * The global degree of freedom numbers for each component
-   * of each variable of each system.
-   */
-  unsigned int ***_dof_ids;
-
-#else
-
-  /**
-   * The global degree of freedom numbers for each variable
-   * of each system. (Only one component allowed.)
-   */
-  unsigned int **_dof_ids;
-
 #endif
 
+  /**
+   * The first global degree of freedom number
+   * for each variable of each system.
+   */
+  unsigned int **_dof_ids;
 };
 
 
@@ -359,6 +350,8 @@ DofObject::~DofObject ()
 inline
 void DofObject::invalidate_dofs (const unsigned int sys_num)
 {
+  // FIXME - this should no longer need to loop over c - RHS
+
   // If the user does not specify the system number...
   if (sys_num >= this->n_systems()) 
     for (unsigned int s=0; s<n_systems(); s++)
@@ -412,12 +405,6 @@ void DofObject::clear_dofs ()
       for (unsigned int s=0; s<this->n_systems(); s++)
 	if (this->n_vars(s) != 0) // This has only been allocated if 
 	  {                       // variables were declared
-	    for (unsigned int v=0; v<this->n_vars(s); v++)
-	      if (this->n_comp(s,v) != 0)
-		{
-		  assert (_dof_ids[s][v] != NULL); delete [] _dof_ids[s][v]; _dof_ids[s][v] = NULL;
-		}
-	  
 	    assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
 	    assert (_n_comp[s]  != NULL); delete [] _n_comp[s];  _n_comp[s]  = NULL;
 	  }
@@ -627,17 +614,13 @@ unsigned int DofObject::dof_number(const unsigned int s,
   assert (_dof_ids != NULL);
   assert (_dof_ids[s] != NULL);
   
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
-  assert (_dof_ids[s][var] != NULL);
-  
-  return _dof_ids[s][var][comp];
-
-#else
-
-  return _dof_ids[s][var];
-
+#ifndef ENABLE_EXPENSIVE_DATA_STRUCTURES
+  assert (comp == 0);
 #endif
+  if (_dof_ids[s][var] == invalid_id)
+    return invalid_id;
+  else
+    return (_dof_ids[s][var] + comp);
 }
   
 
