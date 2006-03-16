@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.14 2005-06-13 20:01:52 benkirk Exp $
+// $Id: dof_map.h,v 1.15 2006-03-16 21:03:58 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -261,10 +261,11 @@ public:
 
   /**
    * Adds the user-defined row to the constraint matrix.
-   * Issues a warning if the DOF was already constrained.
+   * By default, produces an error if the DOF was already constrained.
    */
   void add_constraint_row (const unsigned int dof_number,
-			   const DofConstraintRow& constraint_row);
+			   const DofConstraintRow& constraint_row,
+			   const bool forbid_constraint_overwrite = true);
   
   /**
    * @returns true if the degree of freedom dof is constrained,
