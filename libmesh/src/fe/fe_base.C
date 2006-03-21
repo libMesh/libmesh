@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.33 2005-08-25 18:31:37 roystgnr Exp $
+// $Id: fe_base.C,v 1.34 2006-03-21 21:42:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -543,38 +543,46 @@ void FEBase::compute_shape_functions (const Elem*)
   // Start logging the shape function computation
   START_LOG("compute_shape_functions()", "FE");
 
+  calculations_started = true;
+
   // Compute the value of the derivative shape function i at quadrature point p
   switch (dim)
     {
       
     case 1:
       {
-	for (unsigned int i=0; i<phi.size(); i++)
-	  for (unsigned int p=0; p<phi[i].size(); p++)
-	    {
-	      // dphi/dx    = (dphi/dxi)*(dxi/dx)
-	      dphi[i][p](0) =
-		dphidx[i][p] = dphidxi[i][p]*dxidx_map[p];
+	if (calculate_dphi)
+	  for (unsigned int i=0; i<dphi.size(); i++)
+	    for (unsigned int p=0; p<dphi[i].size(); p++)
+	      {
+	        // dphi/dx    = (dphi/dxi)*(dxi/dx)
+	        dphi[i][p](0) =
+		  dphidx[i][p] = dphidxi[i][p]*dxidx_map[p];
 	      
-	      dphi[i][p](1) = dphidy[i][p] = 0.;
-	      dphi[i][p](2) = dphidz[i][p] = 0.;
+	        dphi[i][p](1) = dphidy[i][p] = 0.;
+	        dphi[i][p](2) = dphidz[i][p] = 0.;
+	      }
 #ifdef ENABLE_SECOND_DERIVATIVES
-	      d2phi[i][p](0,0) = d2phidx2[i][p] = 
-		d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p];
+	if (calculate_d2phi)
+	  for (unsigned int i=0; i<d2phi.size(); i++)
+	    for (unsigned int p=0; p<d2phi[i].size(); p++)
+	      {
+	        d2phi[i][p](0,0) = d2phidx2[i][p] = 
+		  d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p];
 #if DIM>1
-	      d2phi[i][p](0,1) = d2phidxdy[i][p] = 
-		d2phi[i][p](1,0) = 0.;
-	      d2phi[i][p](1,1) = d2phidy2[i][p] = 0.;
+	        d2phi[i][p](0,1) = d2phidxdy[i][p] = 
+		  d2phi[i][p](1,0) = 0.;
+	        d2phi[i][p](1,1) = d2phidy2[i][p] = 0.;
 #if DIM>2
-	      d2phi[i][p](0,2) = d2phidxdz[i][p] =
-		d2phi[i][p](2,0) = 0.;
-	      d2phi[i][p](1,2) = d2phidydz[i][p] = 
-		d2phi[i][p](2,1) = 0.;
-	      d2phi[i][p](2,2) = d2phidz2[i][p] = 0.;
+	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
+		  d2phi[i][p](2,0) = 0.;
+	        d2phi[i][p](1,2) = d2phidydz[i][p] = 
+		  d2phi[i][p](2,1) = 0.;
+	        d2phi[i][p](2,2) = d2phidz2[i][p] = 0.;
 #endif
 #endif
+	      }
 #endif
-	    }
 
 	// All done
 	break;
@@ -582,61 +590,67 @@ void FEBase::compute_shape_functions (const Elem*)
 
     case 2:
       {
-	for (unsigned int i=0; i<phi.size(); i++)
-	  for (unsigned int p=0; p<phi[i].size(); p++)
-	    {
-	      // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx)
-	      dphi[i][p](0) =
-		dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
-				dphideta[i][p]*detadx_map[p]);
+	if (calculate_dphi)
+	  for (unsigned int i=0; i<dphi.size(); i++)
+	    for (unsigned int p=0; p<dphi[i].size(); p++)
+	      {
+	        // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx)
+	        dphi[i][p](0) =
+		  dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
+				  dphideta[i][p]*detadx_map[p]);
 	      
-	      // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy)
-	      dphi[i][p](1) =
-		dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
-				dphideta[i][p]*detady_map[p]);
+	        // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy)
+	        dphi[i][p](1) =
+		  dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
+				  dphideta[i][p]*detady_map[p]);
 	      
-	      // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz)
+	        // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz)
 #if DIM == 3  
-	      dphi[i][p](2) = // can only assign to the Z component if DIM==3
+	        dphi[i][p](2) = // can only assign to the Z component if DIM==3
 #endif
 		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
 				dphideta[i][p]*detadz_map[p]);
+	      }
 
 #ifdef ENABLE_SECOND_DERIVATIVES
-	      d2phi[i][p](0,0) = d2phidx2[i][p] = 
-		d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p] +
-		2*d2phidxideta[i][p]*dxidx_map[p]*detadx_map[p] +
-		d2phideta2[i][p]*detadx_map[p]*detadx_map[p];
-	      d2phi[i][p](0,1) = d2phidxdy[i][p] =
-		d2phi[i][p](1,0) = 
-		d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p] +
-		d2phidxideta[i][p]*dxidx_map[p]*detady_map[p] +
-		d2phideta2[i][p]*detadx_map[p]*detady_map[p] +
-		d2phidxideta[i][p]*detadx_map[p]*dxidy_map[p];
-	      d2phi[i][p](1,1) = d2phidy2[i][p] =
-		d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +
-		2*d2phidxideta[i][p]*dxidy_map[p]*detady_map[p] +
-		d2phideta2[i][p]*detady_map[p]*detady_map[p];
+	if (calculate_d2phi)
+	  for (unsigned int i=0; i<d2phi.size(); i++)
+	    for (unsigned int p=0; p<d2phi[i].size(); p++)
+	      {
+	        d2phi[i][p](0,0) = d2phidx2[i][p] = 
+		  d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p] +
+		  2*d2phidxideta[i][p]*dxidx_map[p]*detadx_map[p] +
+		  d2phideta2[i][p]*detadx_map[p]*detadx_map[p];
+	        d2phi[i][p](0,1) = d2phidxdy[i][p] =
+		  d2phi[i][p](1,0) = 
+		  d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p] +
+		  d2phidxideta[i][p]*dxidx_map[p]*detady_map[p] +
+		  d2phideta2[i][p]*detadx_map[p]*detady_map[p] +
+		  d2phidxideta[i][p]*detadx_map[p]*dxidy_map[p];
+	        d2phi[i][p](1,1) = d2phidy2[i][p] =
+		  d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +
+		  2*d2phidxideta[i][p]*dxidy_map[p]*detady_map[p] +
+		  d2phideta2[i][p]*detady_map[p]*detady_map[p];
 #if DIM == 3  
-	      d2phi[i][p](0,2) = d2phidxdz[i][p] = 
-		d2phi[i][p](2,0) = 
-		d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
-		d2phidxideta[i][p]*dxidx_map[p]*detadz_map[p] +
-		d2phideta2[i][p]*detadx_map[p]*detadz_map[p] +
-		d2phidxideta[i][p]*detadx_map[p]*dxidz_map[p];
-	      d2phi[i][p](1,2) = d2phidydz[i][p] = 
-		d2phi[i][p](2,1) =
-		d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p] +
-		d2phidxideta[i][p]*dxidy_map[p]*detadz_map[p] +
-		d2phideta2[i][p]*detady_map[p]*detadz_map[p] +
-		d2phidxideta[i][p]*detady_map[p]*dxidz_map[p];
-	      d2phi[i][p](2,2) = d2phidz2[i][p] =
-		d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p] +
-		2*d2phidxideta[i][p]*dxidz_map[p]*detadz_map[p] +
-		d2phideta2[i][p]*detadz_map[p]*detadz_map[p];
+	        d2phi[i][p](0,2) = d2phidxdz[i][p] = 
+		  d2phi[i][p](2,0) = 
+		  d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
+		  d2phidxideta[i][p]*dxidx_map[p]*detadz_map[p] +
+		  d2phideta2[i][p]*detadx_map[p]*detadz_map[p] +
+		  d2phidxideta[i][p]*detadx_map[p]*dxidz_map[p];
+	        d2phi[i][p](1,2) = d2phidydz[i][p] = 
+		  d2phi[i][p](2,1) =
+		  d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p] +
+		  d2phidxideta[i][p]*dxidy_map[p]*detadz_map[p] +
+		  d2phideta2[i][p]*detady_map[p]*detadz_map[p] +
+		  d2phidxideta[i][p]*detady_map[p]*dxidz_map[p];
+	        d2phi[i][p](2,2) = d2phidz2[i][p] =
+		  d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p] +
+		  2*d2phidxideta[i][p]*dxidz_map[p]*detadz_map[p] +
+		  d2phideta2[i][p]*detadz_map[p]*detadz_map[p];
 #endif
+	      }
 #endif
-	    }
 
 	// All done
 	break;
@@ -644,87 +658,90 @@ void FEBase::compute_shape_functions (const Elem*)
     
     case 3:
       {
-	for (unsigned int i=0; i<phi.size(); i++)
-	  for (unsigned int p=0; p<phi[i].size(); p++)
-	    {
-	      // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);
-	      dphi[i][p](0) =
-		dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
-				dphideta[i][p]*detadx_map[p] +
-				dphidzeta[i][p]*dzetadx_map[p]);
+	if (calculate_dphi)
+	  for (unsigned int i=0; i<dphi.size(); i++)
+	    for (unsigned int p=0; p<dphi[i].size(); p++)
+	      {
+	        // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);
+	        dphi[i][p](0) =
+		  dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
+				  dphideta[i][p]*detadx_map[p] +
+				  dphidzeta[i][p]*dzetadx_map[p]);
 		
-	      // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy) + (dphi/dzeta)*(dzeta/dy);
-	      dphi[i][p](1) =
-		dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
-				dphideta[i][p]*detady_map[p] +
-				dphidzeta[i][p]*dzetady_map[p]);
+	        // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy) + (dphi/dzeta)*(dzeta/dy);
+	        dphi[i][p](1) =
+		  dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
+				  dphideta[i][p]*detady_map[p] +
+				  dphidzeta[i][p]*dzetady_map[p]);
 		
-	      // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz) + (dphi/dzeta)*(dzeta/dz);
-	      dphi[i][p](2) =
-		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
-				dphideta[i][p]*detadz_map[p] +
-				dphidzeta[i][p]*dzetadz_map[p]);	      
+	        // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz) + (dphi/dzeta)*(dzeta/dz);
+	        dphi[i][p](2) =
+		  dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
+				  dphideta[i][p]*detadz_map[p] +
+				  dphidzeta[i][p]*dzetadz_map[p]);	      
+	      }
 
 #ifdef ENABLE_SECOND_DERIVATIVES
-	      d2phi[i][p](0,0) = d2phidx2[i][p] = 
-		d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p] +
-		2*d2phidxideta[i][p]*dxidx_map[p]*detadx_map[p] +
-		2*d2phidxidzeta[i][p]*dxidx_map[p]*dzetadx_map[p] +
-		2*d2phidetadzeta[i][p]*detadx_map[p]*dzetadx_map[p] +
-		d2phideta2[i][p]*detadx_map[p]*detadx_map[p] +
-		d2phidzeta2[i][p]*dzetadx_map[p]*dzetadx_map[p];
-	      d2phi[i][p](0,1) = d2phidxdy[i][p] =
-		d2phi[i][p](1,0) = 
-		d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p] +
-		d2phidxideta[i][p]*dxidx_map[p]*detady_map[p] +
-		d2phidxidzeta[i][p]*dxidx_map[p]*dzetady_map[p] +
-		d2phideta2[i][p]*detadx_map[p]*detady_map[p] +
-		d2phidxideta[i][p]*detadx_map[p]*dxidy_map[p] +
-		d2phidetadzeta[i][p]*detadx_map[p]*dzetady_map[p] +
-		d2phidzeta2[i][p]*dzetadx_map[p]*dzetady_map[p] +
-		d2phidxidzeta[i][p]*dzetadx_map[p]*dxidy_map[p] +
-		d2phidetadzeta[i][p]*dzetadx_map[p]*detady_map[p];
-	      d2phi[i][p](0,2) = d2phidxdz[i][p] = 
-		d2phi[i][p](2,0) = 
-		d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
-		d2phidxideta[i][p]*dxidx_map[p]*detadz_map[p] +
-		d2phidxidzeta[i][p]*dxidx_map[p]*dzetadz_map[p] +
-		d2phideta2[i][p]*detadx_map[p]*detadz_map[p] +
-		d2phidxideta[i][p]*detadx_map[p]*dxidz_map[p] +
-		d2phidetadzeta[i][p]*detadx_map[p]*dzetadz_map[p] +
-		d2phidzeta2[i][p]*dzetadx_map[p]*dzetadz_map[p] +
-		d2phidxidzeta[i][p]*dzetadx_map[p]*dxidz_map[p] +
-		d2phidetadzeta[i][p]*dzetadx_map[p]*detadz_map[p];
-	      d2phi[i][p](1,1) = d2phidy2[i][p] =
-		d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +
-		2*d2phidxideta[i][p]*dxidy_map[p]*detady_map[p] +
-		2*d2phidxidzeta[i][p]*dxidy_map[p]*dzetady_map[p] +
-		2*d2phidetadzeta[i][p]*detady_map[p]*dzetady_map[p] +
-		d2phideta2[i][p]*detady_map[p]*detady_map[p] +
-		d2phidzeta2[i][p]*dzetady_map[p]*dzetady_map[p];
-	      d2phi[i][p](1,2) = d2phidydz[i][p] = 
-		d2phi[i][p](2,1) =
-		d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p] +
-		d2phidxideta[i][p]*dxidy_map[p]*detadz_map[p] +
-		d2phidxidzeta[i][p]*dxidy_map[p]*dzetadz_map[p] +
-		d2phideta2[i][p]*detady_map[p]*detadz_map[p] +
-		d2phidxideta[i][p]*detady_map[p]*dxidz_map[p] +
-		d2phidetadzeta[i][p]*detady_map[p]*dzetadz_map[p] +
-		d2phidzeta2[i][p]*dzetady_map[p]*dzetadz_map[p] +
-		d2phidxidzeta[i][p]*dzetady_map[p]*dxidz_map[p] +
-		d2phidetadzeta[i][p]*dzetady_map[p]*detadz_map[p];
-	      d2phi[i][p](2,2) = d2phidz2[i][p] =
-		d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p] +
-		2*d2phidxideta[i][p]*dxidz_map[p]*detadz_map[p] +
-		2*d2phidxidzeta[i][p]*dxidz_map[p]*dzetadz_map[p] +
-		2*d2phidetadzeta[i][p]*detadz_map[p]*dzetadz_map[p] +
-		d2phideta2[i][p]*detadz_map[p]*detadz_map[p] +
-		d2phidzeta2[i][p]*dzetadz_map[p]*dzetadz_map[p];
+	if (calculate_d2phi)
+	  for (unsigned int i=0; i<d2phi.size(); i++)
+	    for (unsigned int p=0; p<d2phi[i].size(); p++)
+	      {
+	        d2phi[i][p](0,0) = d2phidx2[i][p] = 
+		  d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p] +
+		  2*d2phidxideta[i][p]*dxidx_map[p]*detadx_map[p] +
+		  2*d2phidxidzeta[i][p]*dxidx_map[p]*dzetadx_map[p] +
+		  2*d2phidetadzeta[i][p]*detadx_map[p]*dzetadx_map[p] +
+		  d2phideta2[i][p]*detadx_map[p]*detadx_map[p] +
+		  d2phidzeta2[i][p]*dzetadx_map[p]*dzetadx_map[p];
+	        d2phi[i][p](0,1) = d2phidxdy[i][p] =
+		  d2phi[i][p](1,0) = 
+		  d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p] +
+		  d2phidxideta[i][p]*dxidx_map[p]*detady_map[p] +
+		  d2phidxidzeta[i][p]*dxidx_map[p]*dzetady_map[p] +
+		  d2phideta2[i][p]*detadx_map[p]*detady_map[p] +
+		  d2phidxideta[i][p]*detadx_map[p]*dxidy_map[p] +
+		  d2phidetadzeta[i][p]*detadx_map[p]*dzetady_map[p] +
+		  d2phidzeta2[i][p]*dzetadx_map[p]*dzetady_map[p] +
+		  d2phidxidzeta[i][p]*dzetadx_map[p]*dxidy_map[p] +
+		  d2phidetadzeta[i][p]*dzetadx_map[p]*detady_map[p];
+	        d2phi[i][p](0,2) = d2phidxdz[i][p] = 
+		  d2phi[i][p](2,0) = 
+		  d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
+		  d2phidxideta[i][p]*dxidx_map[p]*detadz_map[p] +
+		  d2phidxidzeta[i][p]*dxidx_map[p]*dzetadz_map[p] +
+		  d2phideta2[i][p]*detadx_map[p]*detadz_map[p] +
+		  d2phidxideta[i][p]*detadx_map[p]*dxidz_map[p] +
+		  d2phidetadzeta[i][p]*detadx_map[p]*dzetadz_map[p] +
+		  d2phidzeta2[i][p]*dzetadx_map[p]*dzetadz_map[p] +
+		  d2phidxidzeta[i][p]*dzetadx_map[p]*dxidz_map[p] +
+		  d2phidetadzeta[i][p]*dzetadx_map[p]*detadz_map[p];
+	        d2phi[i][p](1,1) = d2phidy2[i][p] =
+		  d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +
+		  2*d2phidxideta[i][p]*dxidy_map[p]*detady_map[p] +
+		  2*d2phidxidzeta[i][p]*dxidy_map[p]*dzetady_map[p] +
+		  2*d2phidetadzeta[i][p]*detady_map[p]*dzetady_map[p] +
+		  d2phideta2[i][p]*detady_map[p]*detady_map[p] +
+		  d2phidzeta2[i][p]*dzetady_map[p]*dzetady_map[p];
+	        d2phi[i][p](1,2) = d2phidydz[i][p] = 
+		  d2phi[i][p](2,1) =
+		  d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p] +
+		  d2phidxideta[i][p]*dxidy_map[p]*detadz_map[p] +
+		  d2phidxidzeta[i][p]*dxidy_map[p]*dzetadz_map[p] +
+		  d2phideta2[i][p]*detady_map[p]*detadz_map[p] +
+		  d2phidxideta[i][p]*detady_map[p]*dxidz_map[p] +
+		  d2phidetadzeta[i][p]*detady_map[p]*dzetadz_map[p] +
+		  d2phidzeta2[i][p]*dzetady_map[p]*dzetadz_map[p] +
+		  d2phidxidzeta[i][p]*dzetady_map[p]*dxidz_map[p] +
+		  d2phidetadzeta[i][p]*dzetady_map[p]*detadz_map[p];
+	        d2phi[i][p](2,2) = d2phidz2[i][p] =
+		  d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p] +
+		  2*d2phidxideta[i][p]*dxidz_map[p]*detadz_map[p] +
+		  2*d2phidxidzeta[i][p]*dxidz_map[p]*dzetadz_map[p] +
+		  2*d2phidetadzeta[i][p]*detadz_map[p]*dzetadz_map[p] +
+		  d2phideta2[i][p]*detadz_map[p]*detadz_map[p] +
+		  d2phidzeta2[i][p]*dzetadz_map[p]*dzetadz_map[p];
+	      }
 #endif
-
-
-	    }
-
 	// All done
 	break;
       }
