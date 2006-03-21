@@ -1,4 +1,4 @@
-/* $Id: ex6.C,v 1.39 2005-06-06 14:53:17 jwpeterson Exp $ */
+/* $Id: ex6.C,v 1.40 2006-03-21 21:35:11 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -348,13 +348,6 @@ void assemble_wave(EquationSystems& es,
 	  } // end boundary condition section	     
 	} // else ( if (elem->infinite())) )
 
-      // Now this is all independent of whether we use an \p FE
-      // or an \p InfFE.  Nice, hm? ;-)
-      //
-      // Compute the element-specific data, as described
-      // in previous examples.       
-      cfe->reinit (elem);
-      
       // This is slightly different from the Poisson solver:
       // Since the finite element object may change, we have to
       // initialize the constant references to the data fields
@@ -382,6 +375,13 @@ void assemble_wave(EquationSystems& es,
       const std::vector<Real>&         weight  = cfe->get_Sobolev_weight();
       const std::vector<RealGradient>& dweight = cfe->get_Sobolev_dweight();
 
+      // Now this is all independent of whether we use an \p FE
+      // or an \p InfFE.  Nice, hm? ;-)
+      //
+      // Compute the element-specific data, as described
+      // in previous examples.       
+      cfe->reinit (elem);
+      
       // Zero the element matrices.  Boundary conditions were already
       // processed in the \p FE-only section, see above.       
       Ke.resize (dof_indices.size(), dof_indices.size());
