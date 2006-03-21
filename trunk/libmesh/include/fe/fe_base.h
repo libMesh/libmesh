@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.15 2006-03-07 20:43:12 benkirk Exp $
+// $Id: fe_base.h,v 1.16 2006-03-21 21:42:13 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -119,13 +119,17 @@ public:
 
   /**
    * This is at the core of this class. Use this for each
-   * new element in the mesh.  Reinitializes all the physical 
+   * new element in the mesh.  Reinitializes the requested physical 
    * element-dependent data based on the current element 
-   * \p elem. By default the shape functions and associated
-   * data are computed at the quadrature points specified
-   * by the quadrature rule \p qrule, but may be any points
-   * specified on the reference element specified in the optional
+   * \p elem. By default the element data computed at the quadrature
+   * points specified by the quadrature rule \p qrule, but any set
+   * of points on the reference element may be specified in the optional
    * argument \p pts.
+   *
+   * Note that the FE classes decide which data to initialize based on
+   * which accessor functions such as \p get_phi() or \p get_d2phi() have
+   * been called, so all such accessors should be called before the first
+   * \p reinit().
    */
   virtual void reinit (const Elem* elem,
 		       const std::vector<Point>* const pts = NULL) = 0;
@@ -167,7 +171,8 @@ public:
    * on the element.
    */    
   const std::vector<std::vector<Real> >& get_phi() const
-  { return phi; }
+  { assert(!calculations_started || calculate_phi);
+    calculate_phi = true; return phi; }
   
   /**
    * @returns the element Jacobian times the quadrature weight for
@@ -181,28 +186,32 @@ public:
    * points.
    */
   const std::vector<std::vector<RealGradient> >& get_dphi() const
-  { return dphi; }
+  { assert(!calculations_started || calculate_dphi); 
+    calculate_dphi = true; return dphi; }
   
   /**
    * @returns the shape function x-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphidx() const
-  { return dphidx; }
+  { assert(!calculations_started || calculate_dphi); 
+    calculate_dphi = true; return dphidx; }
   
   /**
    * @returns the shape function y-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphidy() const
-  { return dphidy; }
+  { assert(!calculations_started || calculate_dphi); 
+    calculate_dphi = true; return dphidy; }
   
   /**
    * @returns the shape function z-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphidz() const
-  { return dphidz; }
+  { assert(!calculations_started || calculate_dphi);
+    calculate_dphi = true; return dphidz; }
 
 #ifdef ENABLE_SECOND_DERIVATIVES
 
@@ -211,49 +220,56 @@ public:
    * points.
    */
   const std::vector<std::vector<RealTensor> >& get_d2phi() const
-  { return d2phi; }
+  { assert(!calculations_started || calculate_d2phi); 
+    calculate_d2phi = true; return d2phi; }
   
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_d2phidx2() const
-  { return d2phidx2; }
+  { assert(!calculations_started || calculate_d2phi);
+    calculate_d2phi = true; return d2phidx2; }
   
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_d2phidxdy() const
-  { return d2phidxdy; }
+  { assert(!calculations_started || calculate_d2phi);
+    calculate_d2phi = true; return d2phidxdy; }
   
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_d2phidxdz() const
-  { return d2phidxdz; }
+  { assert(!calculations_started || calculate_d2phi);
+    calculate_d2phi = true; return d2phidxdz; }
   
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_d2phidy2() const
-  { return d2phidy2; }
+  { assert(!calculations_started || calculate_d2phi);
+    calculate_d2phi = true; return d2phidy2; }
   
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_d2phidydz() const
-  { return d2phidydz; }
+  { assert(!calculations_started || calculate_d2phi);
+    calculate_d2phi = true; return d2phidydz; }
   
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_d2phidz2() const
-  { return d2phidz2; }
+  { assert(!calculations_started || calculate_d2phi);
+    calculate_d2phi = true; return d2phidz2; }
 
 #endif
   
@@ -791,6 +807,27 @@ protected:
   std::vector<std::vector<Real> >   phi;
 
   /**
+   * Have calculations with this object already been started?
+   * Then all get_* functions should already have been called.
+   */
+  mutable bool calculations_started;
+
+  /**
+   * Should we calculate shape functions?
+   */
+  mutable bool calculate_phi;
+
+  /**
+   * Should we calculate shape function gradients?
+   */
+  mutable bool calculate_dphi;
+
+  /**
+   * Should we calculate shape function hessians?
+   */
+  mutable bool calculate_d2phi;
+
+  /**
    * Shape function derivative values.
    */
   std::vector<std::vector<RealGradient> >  dphi;
@@ -1105,6 +1142,10 @@ inline
 FEBase::FEBase(const unsigned int d,
 	       const FEType& fet) :
   dim(d),
+  calculations_started(false),
+  calculate_phi(false),
+  calculate_dphi(false),
+  calculate_d2phi(false),
   fe_type(fet),
   elem_type(INVALID_ELEM),
   qrule(NULL)
