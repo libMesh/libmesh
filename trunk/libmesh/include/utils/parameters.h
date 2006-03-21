@@ -1,4 +1,4 @@
-// $Id: parameters.h,v 1.7 2005-12-01 02:31:47 benkirk Exp $
+// $Id: parameters.h,v 1.8 2006-03-21 22:46:18 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.7 $
+ * \version $Revision: 1.8 $
  */
 
 // ------------------------------------------------------------
@@ -355,8 +355,8 @@ const T& Parameters::get (const std::string& name) const
     {
       std::cerr << "ERROR: no "
 		<< typeid(T).name()
-		<< " parameter named "
-		<< name << ":" << std::endl
+		<< " parameter named \""
+		<< name << "\":" << std::endl
 		<< *this;
       
       error();
