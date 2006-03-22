@@ -1,4 +1,4 @@
-// $Id: string_to_enum.C,v 1.5 2005-08-25 19:15:40 roystgnr Exp $
+// $Id: string_to_enum.C,v 1.6 2006-03-22 19:26:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -169,11 +169,11 @@ namespace {
 	order_to_enum["THIRTYSEVENTH"]=THIRTYSEVENTH;
 	order_to_enum["THIRTYEIGHTH" ]=THIRTYEIGHTH;
 	order_to_enum["THIRTYNINTH"  ]=THIRTYNINTH;
-	order_to_enum["FOURTIETH"    ]=FOURTIETH;
+	order_to_enum["FORTIETH"    ]=FORTIETH;
 			    			  
-	order_to_enum["FOURTYFIRST"  ]=FOURTYFIRST;
-	order_to_enum["FOURTYSECOND" ]=FOURTYSECOND;
-	order_to_enum["FOURTYTHIRD"  ]=FOURTYTHIRD;
+	order_to_enum["FORTYFIRST"  ]=FORTYFIRST;
+	order_to_enum["FORTYSECOND" ]=FORTYSECOND;
+	order_to_enum["FORTYTHIRD"  ]=FORTYTHIRD;
       }
   }
 
