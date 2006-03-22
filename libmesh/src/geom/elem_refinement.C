@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.18 2006-03-22 21:33:27 roystgnr Exp $
+// $Id: elem_refinement.C,v 1.19 2006-03-22 21:35:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -253,6 +253,8 @@ void Elem::coarsen()
     {	
       assert (this->child(c)->refinement_flag() == Elem::COARSEN);
       this->child(c)->set_refinement_flag(Elem::INACTIVE);
+      if (this->child(c)->p_level() > this->p_level())
+        this->set_p_level(this->child(c)->p_level());
     }
 
   this->set_refinement_flag(Elem::JUST_COARSENED);
