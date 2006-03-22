@@ -1,4 +1,4 @@
-// $Id: enum_order.h,v 1.5 2005-06-21 21:53:58 benkirk Exp $
+// $Id: enum_order.h,v 1.6 2006-03-22 19:08:26 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,8 +28,8 @@ namespace libMeshEnums {
 
   /**
    * \enum libMeshEnums::Order defines an \p enum for polynomial orders.
-   * Fixing each label to a specific int, since \p InfFE uses 
-   * \p static_cast<unsigned int>.
+   * Fixing each label to a specific int, since \p InfFE and p refinement
+   * may cast between them
    */
   enum Order {CONSTANT     =  0,
 	      FIRST        =  1,
@@ -74,11 +74,11 @@ namespace libMeshEnums {
 	      THIRTYSEVENTH = 37,
 	      THIRTYEIGHTH  = 38,
 	      THIRTYNINTH   = 39,
-	      FOURTIETH     = 40,
+	      FORTIETH     = 40,
 
-	      FOURTYFIRST   = 41,
-	      FOURTYSECOND  = 42,
-	      FOURTYTHIRD   = 43,
+	      FORTYFIRST   = 41,
+	      FORTYSECOND  = 42,
+	      FORTYTHIRD   = 43,
 
 	      INVALID_ORDER};
 
