@@ -1,4 +1,4 @@
-// $Id: dof_object.C,v 1.15 2006-03-16 20:52:08 roystgnr Exp $
+// $Id: dof_object.C,v 1.16 2006-03-22 20:46:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -444,15 +444,11 @@ void DofObject::set_n_comp(const unsigned int s,
   
 #endif
 
-  // Remember...  use (invalid_id - 1) to signify no
+  // We use (invalid_id - 1) to signify no
   // components for this object
   if (ncomp == 0)
     {
       _dof_ids[s][var] = (invalid_id - 1);
-    }
-  else if (ncomp == 1)
-    {      
-      _dof_ids[s][var] = invalid_id;
     }
   
 #ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
