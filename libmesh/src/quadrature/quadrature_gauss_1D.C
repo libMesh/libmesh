@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_1D.C,v 1.13 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: quadrature_gauss_1D.C,v 1.14 2006-03-22 19:26:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -671,8 +671,8 @@ void QGauss::init_1D(const ElemType)
 	return;
       }
 
-    case FOURTIETH:
-    case FOURTYFIRST:
+    case FORTIETH:
+    case FORTYFIRST:
       {
 	_points.resize (21);
 	_weights.resize(21);
@@ -724,8 +724,8 @@ void QGauss::init_1D(const ElemType)
 	return;
       }
 
-    case FOURTYSECOND:
-    case FOURTYTHIRD:
+    case FORTYSECOND:
+    case FORTYTHIRD:
       {
 	_points.resize (22);
 	_weights.resize(22);

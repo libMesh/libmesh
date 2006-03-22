@@ -1,4 +1,4 @@
-// $Id: quadrature_build.C,v 1.8 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: quadrature_build.C,v 1.9 2006-03-22 19:26:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,10 +41,10 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
       {
 
 #ifdef DEBUG
-	if (_order > FOURTYTHIRD)
+	if (_order > FORTYTHIRD)
 	  {
 	    std::cout << "WARNING: Gauss quadrature implemented" << std::endl
-		      << " up to FOURTYTHIRD order." << std::endl;
+		      << " up to FORTYTHIRD order." << std::endl;
 	  }
 #endif
 
