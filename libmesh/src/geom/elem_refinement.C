@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.17 2005-08-22 18:57:32 knezed01 Exp $
+// $Id: elem_refinement.C,v 1.18 2006-03-22 21:33:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -50,6 +50,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
         {
 	  _children[c] = Elem::build(this->type(), this).release();
 	  _children[c]->set_refinement_flag(Elem::JUST_REFINED);
+	  _children[c]->set_p_level(this->p_level());
         }
 
       // Compute new nodal locations
@@ -133,6 +134,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
         {	
           assert(this->child(c)->subactive());
           this->child(c)->set_refinement_flag(Elem::JUST_REFINED);
+          this->child(c)->set_p_level(this->p_level());
         }
     }
 

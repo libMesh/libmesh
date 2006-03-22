@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.28 2005-08-29 20:43:00 benkirk Exp $
+// $Id: elem.h,v 1.29 2006-03-22 21:33:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -572,6 +572,16 @@ class Elem : public ReferenceCountedObject<Elem>,
   void set_refinement_flag (const RefinementState rflag);
 
   /**
+   * Returns the value of the p refinement level for the element.
+   */
+  unsigned char p_level () const;
+
+  /**
+   * Sets the value of the p refinement level for the element.
+   */     
+  void set_p_level (const unsigned char p);
+
+  /**
    * Refine the element.
    */
   virtual void refine (MeshRefinement& mesh_refinement);
@@ -736,11 +746,6 @@ public:
   Node** _nodes;
 
   /**
-   * The subdomain to which this element belongs.
-   */
-  unsigned char _sbd_id;
-
-  /**
    * Pointers to this element's neighbors.
    */
   Elem** _neighbors;
@@ -759,12 +764,25 @@ public:
   Elem** _children;
 
   /**
-   * Refinement flag. This is stored as an unsigned char
+   * The subdomain to which this element belongs.
+   */
+  unsigned char _sbd_id;
+
+  /**
+   * h refinement flag. This is stored as an unsigned char
    * to save space.
    */
   unsigned char _rflag;
   //RefinementState _rflag;
   
+  /**
+   * p refinement level - the difference between the
+   * polynomial degree on this element and the minimum
+   * polynomial degree on the mesh.
+   * This is stored as an unsigned char to save space.
+   */
+  unsigned char _p_level;
+
 #endif
 
   /**
@@ -841,6 +859,8 @@ Elem::Elem(const unsigned int nn,
   _children = NULL;
 
   this->set_refinement_flag(Elem::DO_NOTHING);
+
+  this->set_p_level(0);
 
 #endif  
 }
@@ -1119,7 +1139,6 @@ Elem* Elem::child (const unsigned int i) const
 
 
 
-
 inline
 Elem::RefinementState Elem::refinement_flag () const
 {
@@ -1144,6 +1163,20 @@ void Elem::set_refinement_flag(RefinementState rflag)
 }
 
 
+
+inline
+unsigned char Elem::p_level() const
+{
+  return _p_level;
+}
+
+
+
+inline
+void Elem::set_p_level(unsigned char p)
+{
+  _p_level = p;
+}
 
 
 
