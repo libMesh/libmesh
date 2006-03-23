@@ -1,4 +1,4 @@
-// $Id: cell_prism.h,v 1.5 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: cell_prism.h,v 1.6 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@ public:
    * Default prismatic element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Prism(const unsigned int nn, const Elem* p);
+  Prism(const unsigned int nn, Elem* p);
   
   /**
    * @returns 6.  All prism-derivatives are guaranteed to have at
@@ -111,7 +111,7 @@ protected:
 // ------------------------------------------------------------
 // Prism class member functions
 inline
-Prism::Prism(const unsigned int nn, const Elem* p) :
+Prism::Prism(const unsigned int nn, Elem* p) :
   Cell(nn, Prism::n_sides(), p) 
 {
 }

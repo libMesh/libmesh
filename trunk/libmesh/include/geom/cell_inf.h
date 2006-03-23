@@ -1,4 +1,4 @@
-// $Id: cell_inf.h,v 1.3 2005-02-22 22:17:31 jwpeterson Exp $
+// $Id: cell_inf.h,v 1.4 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,7 @@ public:
    */
   InfCell (const unsigned int nn,
 	   const unsigned int ns,
-	   const Elem* p) :
+	   Elem* p) :
     Elem (nn, ns, p)
   {}
 

@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism6.h,v 1.11 2005-06-08 08:13:41 spetersen Exp $
+// $Id: cell_inf_prism6.h,v 1.12 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -63,7 +63,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  InfPrism6  (const Elem* p=NULL);
+  InfPrism6  (Elem* p=NULL);
     
   /**
    * @returns 6.  The \p InfPrism6 has 6 nodes.
@@ -199,7 +199,7 @@ protected:
 // ------------------------------------------------------------
 // InfPrism6 class member functions
 inline
-InfPrism6::InfPrism6(const Elem* p) :
+InfPrism6::InfPrism6(Elem* p) :
   InfPrism(InfPrism6::n_nodes(), p) 
 {
 }

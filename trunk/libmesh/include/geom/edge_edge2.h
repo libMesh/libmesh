@@ -1,4 +1,4 @@
-// $Id: edge_edge2.h,v 1.11 2005-06-16 23:03:34 roystgnr Exp $
+// $Id: edge_edge2.h,v 1.12 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,7 @@ class Edge2 : public Edge
   /**
    * Constructor.  By default this element has no parent.
    */
-  Edge2 (const Elem* p=NULL) :
+  Edge2 (Elem* p=NULL) :
     Edge(Edge2::n_nodes(), p) {} 
 
   /**
@@ -58,7 +58,7 @@ class Edge2 : public Edge
    */
   Edge2 (const unsigned int nn,
 	 const unsigned int ns,
-	 const Elem* p) :
+	 Elem* p) :
     Edge(nn, p) { assert (ns == 0); }
 
   /**

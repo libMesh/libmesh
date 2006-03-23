@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.29 2006-03-22 21:33:27 roystgnr Exp $
+// $Id: elem.h,v 1.30 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -93,7 +93,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    */ 
   Elem (const unsigned int n_nodes=0,
 	const unsigned int n_sides=0,
-	const Elem* parent=NULL);
+	Elem* parent=NULL);
 
  public:
 
@@ -450,10 +450,16 @@ class Elem : public ReferenceCountedObject<Elem>,
   bool has_children () const;
 
   /**
-   * @returns a pointer to the element's parent.  Returns \p NULL if
+   * @returns a const pointer to the element's parent.  Returns \p NULL if
    * the element was not created via refinement, i.e. was read from file.
    */
   const Elem* parent () const;
+
+  /**
+   * @returns a pointer to the element's parent.  Returns \p NULL if
+   * the element was not created via refinement, i.e. was read from file.
+   */
+  Elem* parent ();
 
   /**
    * @returns a pointer to the element's top-most (i.e. level-0) parent.
@@ -572,12 +578,25 @@ class Elem : public ReferenceCountedObject<Elem>,
   void set_refinement_flag (const RefinementState rflag);
 
   /**
-   * Returns the value of the p refinement level for the element.
+   * Returns the value of the p refinement flag for the element.
+   */
+  RefinementState p_refinement_flag () const;
+
+  /**
+   * Sets the value of the p refinement flag for the element.
+   */     
+  void set_p_refinement_flag (const RefinementState pflag);
+
+  /**
+   * Returns the value of the p refinement level for an active
+   * element, or of the descendants' lowest p refinement level
+   * for an ancestor element.
    */
   unsigned char p_level () const;
 
   /**
-   * Sets the value of the p refinement level for the element.
+   * Sets the value of the p refinement level for the element,
+   * and updates the p refinement information for the element's ancestors.
    */     
   void set_p_level (const unsigned char p);
 
@@ -682,7 +701,7 @@ public:
    * \p AutoPtr<>
    */
   static AutoPtr<Elem> build (const ElemType type,
-			      const Elem* p=NULL);
+			      Elem* p=NULL);
 
 #ifdef ENABLE_AMR
   
@@ -751,10 +770,9 @@ public:
   Elem** _neighbors;
  
   /**
-   * A pointer to this element's parent.  This is constant
-   * since there is no way it should be able to change!.
+   * A pointer to this element's parent.
    */
-  const Elem* const _parent;
+  Elem* const _parent;
 
 #ifdef ENABLE_AMR
   
@@ -776,10 +794,19 @@ public:
   //RefinementState _rflag;
   
   /**
+   * p refinement flag. This is stored as an unsigned char
+   * to save space.
+   */
+  unsigned char _pflag;
+  //RefinementState _pflag;
+  
+  /**
    * p refinement level - the difference between the
    * polynomial degree on this element and the minimum
    * polynomial degree on the mesh.
    * This is stored as an unsigned char to save space.
+   * In theory, these last four bytes might have
+   * been padding anyway.
    */
   unsigned char _p_level;
 
@@ -819,7 +846,7 @@ public:
 inline
 Elem::Elem(const unsigned int nn,
 	   const unsigned int ns,
-	   const Elem* p) :
+	   Elem* p) :
   _parent(p)
 {
   this->subdomain_id() = 0;
@@ -1083,6 +1110,14 @@ const Elem* Elem::parent () const
 
 
 inline
+Elem* Elem::parent ()
+{
+  return _parent;
+}
+
+
+
+inline
 const Elem* Elem::top_parent () const
 {
   const Elem* tp = this;
@@ -1152,14 +1187,39 @@ void Elem::set_refinement_flag(RefinementState rflag)
 {
   if (rflag != static_cast<RefinementState>(static_cast<unsigned char>(rflag)))
     {
-      std::cerr << "ERROR: unsigned int too small to hold Elem::_rflag!"
+      std::cerr << "ERROR: unsigned char too small to hold Elem::_rflag!"
 		<< std::endl
-		<< "Recompile with Elem:_flag set to something bigger!"
+		<< "Recompile with Elem:_*flag set to something bigger!"
 		<< std::endl;
       error();
     }
 
   _rflag = rflag;
+}
+
+
+
+inline
+Elem::RefinementState Elem::p_refinement_flag () const
+{
+  return static_cast<RefinementState>(_pflag);
+}
+
+
+
+inline
+void Elem::set_p_refinement_flag(RefinementState pflag)
+{
+  if (pflag != static_cast<RefinementState>(static_cast<unsigned char>(pflag)))
+    {
+      std::cerr << "ERROR: unsigned char too small to hold Elem::_pflag!"
+		<< std::endl
+		<< "Recompile with Elem:_*flag set to something bigger!"
+		<< std::endl;
+      error();
+    }
+
+  _pflag = pflag;
 }
 
 
@@ -1175,6 +1235,10 @@ unsigned char Elem::p_level() const
 inline
 void Elem::set_p_level(unsigned char p)
 {
+  if (this->parent() && 
+      this->parent()->p_level() > p)
+    this->parent()->set_p_level(p);
+
   _p_level = p;
 }
 
@@ -1285,7 +1349,7 @@ class Elem::SideIter
 public:
   // Constructor with arguments.
   SideIter(const unsigned int side_number,
-	   const Elem* parent)
+	   Elem* parent)
     : _side_number(side_number),
       _side_ptr(NULL),
       _parent(parent)
@@ -1380,7 +1444,7 @@ private:
   mutable Elem* _side_ptr;
   
   // Pointer to the parent Elem class which generated this iterator
-  const Elem* _parent;
+  Elem* _parent;
 
 };
 

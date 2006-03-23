@@ -1,4 +1,4 @@
-// $Id: face_tri.h,v 1.6 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: face_tri.h,v 1.7 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -63,7 +63,7 @@ public:
    * parent. Derived classes implement 'true' elements.
    */
   Tri (const unsigned int nn,
-       const Elem* p) :
+       Elem* p) :
     Face(nn, Tri::n_sides(), p) {}
  
   /**
@@ -72,7 +72,7 @@ public:
    */
   Tri (const unsigned int nn,
        const unsigned int ns,
-       const Elem* p) :
+       Elem* p) :
     Face(nn, ns, p) {}
     
   /**

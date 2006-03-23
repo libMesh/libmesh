@@ -1,4 +1,4 @@
-// $Id: cell_hex.h,v 1.5 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: cell_hex.h,v 1.6 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@ public:
    * Default brick element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Hex(const unsigned int nn, const Elem* p);
+  Hex(const unsigned int nn, Elem* p);
 
   /**
    * @returns 6
@@ -119,7 +119,7 @@ protected:
 // ------------------------------------------------------------
 // Hex class member functions
 inline
-Hex::Hex(const unsigned int nn, const Elem* p) :
+Hex::Hex(const unsigned int nn, Elem* p) :
   Cell(nn, Hex::n_sides(), p) 
 {
 }

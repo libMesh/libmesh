@@ -1,4 +1,4 @@
-// $Id: face_quad.h,v 1.6 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: face_quad.h,v 1.7 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ public:
    * Default quadrilateral element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Quad (const unsigned int nn, const Elem* p) :
+  Quad (const unsigned int nn, Elem* p) :
     Face(nn, Quad::n_sides(), p) {}
  
   /**
@@ -69,7 +69,7 @@ public:
    */
   Quad (const unsigned int nn,
 	const unsigned int ns,
-	const Elem* p) :
+	Elem* p) :
     Face(nn, ns, p) {}
 
   /**

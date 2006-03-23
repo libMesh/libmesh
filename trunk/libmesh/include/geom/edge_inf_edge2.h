@@ -1,4 +1,4 @@
-// $Id: edge_inf_edge2.h,v 1.8 2005-05-06 17:07:00 roystgnr Exp $
+// $Id: edge_inf_edge2.h,v 1.9 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,7 +56,7 @@ class InfEdge2 : public Edge
   /**
    * Constructor.  By default this element has no parent.
    */
-  InfEdge2 (const Elem* p=NULL) :
+  InfEdge2 (Elem* p=NULL) :
     Edge(InfEdge2::n_nodes(), p) {}
 
   /**
@@ -65,7 +65,7 @@ class InfEdge2 : public Edge
    */
   InfEdge2(const unsigned int nn,
 	   const unsigned int ns,
-	   const Elem* p) :
+	   Elem* p) :
     Edge(nn, ns, p) {}
 
   /**

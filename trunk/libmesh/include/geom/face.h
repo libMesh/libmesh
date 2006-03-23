@@ -1,4 +1,4 @@
-// $Id: face.h,v 1.5 2005-05-11 18:31:17 roystgnr Exp $
+// $Id: face.h,v 1.6 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -51,7 +51,7 @@ public:
    */
   Face (const unsigned int nn,
 	const unsigned int ns,
-	const Elem* p) :
+	Elem* p) :
     Elem(nn, ns, p) {}
 
   /**

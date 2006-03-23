@@ -1,4 +1,4 @@
-// $Id: face_inf_quad.h,v 1.7 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: face_inf_quad.h,v 1.8 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,7 @@ public:
    * Constructor.  Derived classes implement 'true' elements.
    */
   InfQuad (const unsigned int nn,
-	   const Elem* p) :
+	   Elem* p) :
     Elem(nn, InfQuad::n_sides(), p) {}
 
   /**
@@ -74,7 +74,7 @@ public:
    */
   InfQuad (const unsigned int nn,
 	   const unsigned int ns,
-	   const Elem* p) :
+	   Elem* p) :
     Elem(nn, ns, p) {}
  
   /**

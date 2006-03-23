@@ -1,4 +1,4 @@
-// $Id: cell_prism15.h,v 1.11 2005-06-16 23:03:34 roystgnr Exp $
+// $Id: cell_prism15.h,v 1.12 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -76,7 +76,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  Prism15  (const Elem* p=NULL);
+  Prism15  (Elem* p=NULL);
   
   /**
    * @returns \p PRISM15
@@ -198,7 +198,7 @@ protected:
 // ------------------------------------------------------------
 // Prism15 class member functions
 inline
-Prism15::Prism15(const Elem* p) :
+Prism15::Prism15(Elem* p) :
   Prism(Prism15::n_nodes(), p) 
 {
 }

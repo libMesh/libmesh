@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.h,v 1.10 2005-06-07 16:33:24 spetersen Exp $
+// $Id: face_inf_quad4.h,v 1.11 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -57,7 +57,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  InfQuad4 (const Elem* p=NULL) :
+  InfQuad4 (Elem* p=NULL) :
     InfQuad(InfQuad4::n_nodes(), p) {}
 
   /**
@@ -66,7 +66,7 @@ public:
    */
   InfQuad4 (const unsigned int nn,
 	    const unsigned int ns,
-	    const Elem* p) :
+	    Elem* p) :
     InfQuad(nn, ns, p) {}
   
   /**
