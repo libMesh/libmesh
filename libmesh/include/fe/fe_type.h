@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.4 2005-06-08 20:54:46 roystgnr Exp $
+// $Id: fe_type.h,v 1.5 2006-03-23 20:16:57 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -57,6 +57,7 @@ public:
 
 
   //TODO:[BSK] Could these data types all be const?  
+  // [RHS] Order can't in the case of p refinement!
   /**
    * The approximation order of the element.  
    */
