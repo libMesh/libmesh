@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism.h,v 1.6 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: cell_inf_prism.h,v 1.7 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -53,7 +53,7 @@ public:
    * Default infinite prism element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  InfPrism(const unsigned int nn, const Elem* p);
+  InfPrism(const unsigned int nn, Elem* p);
 
 //   /**
 //    * @returns 4 for the base \p s=0 and 2 for side faces. 
@@ -109,7 +109,7 @@ public:
 // ------------------------------------------------------------
 // InfPrism class member functions
 inline
-InfPrism::InfPrism(const unsigned int nn, const Elem* p) :
+InfPrism::InfPrism(const unsigned int nn, Elem* p) :
   InfCell(nn, InfPrism::n_sides(), p) 
 {
 }

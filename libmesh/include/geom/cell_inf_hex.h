@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex.h,v 1.6 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: cell_inf_hex.h,v 1.7 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ public:
    * Default infinite brick element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  InfHex(const unsigned int nn, const Elem* p);
+  InfHex(const unsigned int nn, Elem* p);
 
 //   /**
 //    * @returns 4 for the base \p s=0 and 2 for side faces. 
@@ -138,7 +138,7 @@ protected:
 // ------------------------------------------------------------
 // InfHex class member functions
 inline
-InfHex::InfHex(const unsigned int nn, const Elem* p) :
+InfHex::InfHex(const unsigned int nn, Elem* p) :
   InfCell(nn, InfHex::n_sides(), p) 
 {
 }

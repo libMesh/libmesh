@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.h,v 1.8 2005-05-11 18:31:17 roystgnr Exp $
+// $Id: cell_inf_hex18.h,v 1.9 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -76,7 +76,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  InfHex18  (const Elem* p=NULL);
+  InfHex18  (Elem* p=NULL);
     
   /**
    * @returns 18.  The \p InfHex18 has 18 nodes.
@@ -221,7 +221,7 @@ protected:
 // ------------------------------------------------------------
 // InfHex18 class member functions
 inline
-InfHex18::InfHex18(const Elem* p) :
+InfHex18::InfHex18(Elem* p) :
   InfHex(InfHex18::n_nodes(), p) 
 {
 }

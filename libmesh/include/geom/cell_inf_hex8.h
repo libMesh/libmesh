@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.h,v 1.10 2005-06-08 08:13:41 spetersen Exp $
+// $Id: cell_inf_hex8.h,v 1.11 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  InfHex8  (const Elem* p=NULL);
+  InfHex8  (Elem* p=NULL);
     
   /**
    * @returns 8.  The \p InfHex8 has 8 nodes.
@@ -198,7 +198,7 @@ protected:
 // ------------------------------------------------------------
 // InfHex8 class member functions
 inline
-InfHex8::InfHex8(const Elem* p) :
+InfHex8::InfHex8(Elem* p) :
   InfHex(InfHex8::n_nodes(), p) 
 {
 }

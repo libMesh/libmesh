@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.h,v 1.9 2005-05-11 18:31:17 roystgnr Exp $
+// $Id: cell_inf_prism12.h,v 1.10 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -67,7 +67,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  InfPrism12  (const Elem* p=NULL);
+  InfPrism12  (Elem* p=NULL);
 
   /**
    * @returns 12.  The \p InfPrism12 has 12 nodes.
@@ -210,7 +210,7 @@ private:
 // ------------------------------------------------------------
 // InfPrism12 class member functions
 inline
-InfPrism12::InfPrism12(const Elem* p) :
+InfPrism12::InfPrism12(Elem* p) :
   InfPrism(InfPrism12::n_nodes(), p) 
 {
 }

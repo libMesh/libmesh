@@ -1,4 +1,4 @@
-// $Id: cell_pyramid.h,v 1.4 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: cell_pyramid.h,v 1.5 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ public:
    * takes number of nodes and parent. 
    * Derived classes implement 'true' elements.
    */
-  Pyramid(const unsigned int nn, const Elem* p);
+  Pyramid(const unsigned int nn, Elem* p);
   
   /**
    * @returns 5.  All pyramid-derivatives are guaranteed to have at
@@ -113,7 +113,7 @@ public:
 // ------------------------------------------------------------
 // Pyramid class member functions
 inline
-Pyramid::Pyramid(const unsigned int nn, const Elem* p) :
+Pyramid::Pyramid(const unsigned int nn, Elem* p) :
   Cell(nn, Pyramid::n_sides(), p) 
 {
 }

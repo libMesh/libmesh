@@ -1,4 +1,4 @@
-// $Id: cell_tet.h,v 1.5 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: cell_tet.h,v 1.6 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@ public:
    * Default tetrahedral element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Tet  (const unsigned int nn, const Elem* p);
+  Tet  (const unsigned int nn, Elem* p);
 
   /**
    * @returns 4
@@ -104,7 +104,7 @@ public:
 // ------------------------------------------------------------
 // Tet class member functions
 inline
-Tet::Tet(const unsigned int nn, const Elem* p) :
+Tet::Tet(const unsigned int nn, Elem* p) :
   Cell(nn, Tet::n_sides(), p) 
 {
 }

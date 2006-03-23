@@ -1,4 +1,4 @@
-// $Id: side.h,v 1.6 2005-07-03 10:05:11 spetersen Exp $
+// $Id: side.h,v 1.7 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,8 +43,8 @@ class Node;
  * does not store any.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2005-07-03 10:05:11 $
- * \version $Revision: 1.6 $
+ * \date    $Date: 2006-03-23 20:24:36 $
+ * \version $Revision: 1.7 $
  */
 
 // ------------------------------------------------------------
@@ -59,7 +59,7 @@ class Side : public SideType
    */ 
   Side (const Elem* parent,
 	const unsigned int side) :
-    SideType(0,0,parent), // Allocate no storage for nodes or neighbors!
+    SideType(0,0,const_cast<Elem*>(parent)), // Allocate no storage for nodes or neighbors!
     _side_number(side)
   {
     assert (parent != NULL);
@@ -84,8 +84,7 @@ class Side : public SideType
   virtual Point & point (const unsigned int i)
   {
     assert (i < this->n_nodes());
-    //TODO:[BSK] figure out how to get rid of this hideous const_cast
-    return const_cast<Elem*>(this->parent())->point (ParentType::side_nodes_map[_side_number][i]);
+    return this->parent()->point (ParentType::side_nodes_map[_side_number][i]);
   }
   
   /**
@@ -112,8 +111,7 @@ class Side : public SideType
   virtual Node* & set_node (const unsigned int i)
   {
     assert (i < this->n_nodes());    
-    //TODO:[BSK] figure out how to get rid of this hideous const_cast
-    return const_cast<Elem*>(this->parent())->set_node (ParentType::side_nodes_map[_side_number][i]);
+    return this->parent()->set_node (ParentType::side_nodes_map[_side_number][i]);
   }
 
   /**
@@ -143,8 +141,8 @@ class Side : public SideType
  * cannot access the neighbors of a side since it does not store any.
  *
  * \author  Roy H. Stogner
- * \date    $Date: 2005-07-03 10:05:11 $
- * \version $Revision: 1.6 $
+ * \date    $Date: 2006-03-23 20:24:36 $
+ * \version $Revision: 1.7 $
  */
 
 // ------------------------------------------------------------
@@ -159,7 +157,7 @@ class SideEdge : public EdgeType
    */ 
   SideEdge (const Elem* parent,
 	    const unsigned int edge) :
-    EdgeType(0,0,parent), // Allocate no storage for nodes or neighbors!
+    EdgeType(0,0,const_cast<Elem*>(parent)), // Allocate no storage for nodes or neighbors!
     _edge_number(edge)
   {
     assert (parent != NULL);
@@ -183,8 +181,7 @@ class SideEdge : public EdgeType
   virtual Point & point (const unsigned int i)
   {
     assert (i < this->n_nodes());
-    //TODO:[BSK] figure out how to get rid of this hideous const_cast
-    return const_cast<Elem*>(this->parent())->point (ParentType::edge_nodes_map[_edge_number][i]);
+    return this->parent()->point (ParentType::edge_nodes_map[_edge_number][i]);
   }
   
   /**
@@ -211,8 +208,7 @@ class SideEdge : public EdgeType
   virtual Node* & set_node (const unsigned int i)
   {
     assert (i < this->n_nodes());    
-    //TODO:[BSK] figure out how to get rid of this hideous const_cast
-    return const_cast<Elem*>(this->parent())->set_node (ParentType::edge_nodes_map[_edge_number][i]);
+    return this->parent()->set_node (ParentType::edge_nodes_map[_edge_number][i]);
   }
 
   /**

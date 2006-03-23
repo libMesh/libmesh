@@ -1,4 +1,4 @@
-// $Id: face_quad9.h,v 1.10 2005-06-16 23:03:34 roystgnr Exp $
+// $Id: face_quad9.h,v 1.11 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
-  Quad9 (const Elem* p=NULL) :
+  Quad9 (Elem* p=NULL) :
     Quad(Quad9::n_nodes(), p) {}
 
   /**
@@ -69,7 +69,7 @@ public:
    */
   Quad9 (const unsigned int nn,
 	 const unsigned int ns,
-	 const Elem* p) :
+	 Elem* p) :
     Quad(nn, ns, p) {}
 
   /**

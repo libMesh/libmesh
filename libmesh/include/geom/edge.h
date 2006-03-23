@@ -1,4 +1,4 @@
-// $Id: edge.h,v 1.6 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: edge.h,v 1.7 2006-03-23 20:24:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -49,7 +49,7 @@ class Edge : public Elem
    * parent. Derived classes implement 'true' elements.
    */
   Edge (const unsigned int nn,
-	const Elem* p) :
+	Elem* p) :
     Elem(nn, Edge::n_sides(), p) {}
    
   /**
@@ -58,7 +58,7 @@ class Edge : public Elem
    */
   Edge (const unsigned int nn,
 	const unsigned int ns,
-	const Elem* p) :
+	Elem* p) :
     Elem(nn, ns, p) {}
 
   /**
