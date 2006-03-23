@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.48 2005-08-22 18:57:32 knezed01 Exp $
+// $Id: elem.C,v 1.49 2006-03-23 21:31:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ const unsigned int Elem::_bp2 = 48661;
 // ------------------------------------------------------------
 // Elem class member funcions
 AutoPtr<Elem> Elem::build(const ElemType type,
-			  const Elem* p)
+			  Elem* p)
 {
   Elem* elem = NULL;
  
