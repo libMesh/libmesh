@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.30 2006-03-23 20:24:36 roystgnr Exp $
+// $Id: elem.h,v 1.31 2006-03-24 00:04:26 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -588,15 +588,13 @@ class Elem : public ReferenceCountedObject<Elem>,
   void set_p_refinement_flag (const RefinementState pflag);
 
   /**
-   * Returns the value of the p refinement level for an active
-   * element, or of the descendants' lowest p refinement level
-   * for an ancestor element.
+   * Returns the value of the p refinement level of an active
+   * element
    */
   unsigned char p_level () const;
 
   /**
-   * Sets the value of the p refinement level for the element,
-   * and updates the p refinement information for the element's ancestors.
+   * Sets the value of the p refinement level for the element
    */     
   void set_p_level (const unsigned char p);
 
@@ -886,6 +884,8 @@ Elem::Elem(const unsigned int nn,
   _children = NULL;
 
   this->set_refinement_flag(Elem::DO_NOTHING);
+
+  this->set_p_refinement_flag(Elem::DO_NOTHING);
 
   this->set_p_level(0);
 
@@ -1235,10 +1235,6 @@ unsigned char Elem::p_level() const
 inline
 void Elem::set_p_level(unsigned char p)
 {
-  if (this->parent() && 
-      this->parent()->p_level() > p)
-    this->parent()->set_p_level(p);
-
   _p_level = p;
 }
 
