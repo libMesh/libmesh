@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.37 2005-08-26 13:21:32 spetersen Exp $
+// $Id: fe_interface.C,v 1.38 2006-03-25 23:56:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1852,6 +1852,259 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
       error();
     }
 }
+  
+
+
+unsigned int FEInterface::max_order(const FEType& fe_t,
+			            const Elem& elem)
+{
+  const ElemType type = elem.type();
+
+  switch (fe_t.family)
+    {
+      case LAGRANGE:
+	switch (type)
+	  {
+	    case EDGE2:
+	    case EDGE3:
+	    case EDGE4:
+	      return 3;
+	    case TRI3:
+	      return 1;
+	    case TRI6:
+	      return 2;
+	    case QUAD4:
+	      return 1;
+	    case QUAD8:
+	    case QUAD9:
+	      return 2;
+	    case TET4:
+	      return 1;
+	    case TET10:
+	      return 2;
+	    case HEX8:
+	      return 1;
+	    case HEX20:
+	    case HEX27:
+	      return 2;
+	    case PRISM6:
+	    case PRISM15:
+	      return 1;
+	    case PRISM18:
+	      return 2;
+	    case PYRAMID5:
+	      return 1;
+	    default:
+	      return 0;
+	  }
+	break;
+      case MONOMIAL:
+	switch (type)
+	  {
+	    case EDGE2:
+	    case EDGE3:
+	    case EDGE4:
+	    case TRI3:
+	    case TRI6:
+	    case QUAD4:
+	    case QUAD8:
+	    case QUAD9:
+	    case TET4:
+	    case TET10:
+	    case HEX8:
+	    case HEX20:
+	    case HEX27:
+	    case PRISM6:
+	    case PRISM15:
+	    case PRISM18:
+	    case PYRAMID5:
+	      return 4;
+	    default:
+	      return 0;
+	  }
+	break;
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+      case BERNSTEIN:
+	switch (type)
+	  {
+	    case EDGE2:
+	    case EDGE3:
+	    case EDGE4:
+	      return 6;
+	    case TRI3:
+	      return 0;
+	    case TRI6:
+	      return 6;
+	    case QUAD4:
+	      return 0;
+	    case QUAD8:
+	    case QUAD9:
+	      return 6;
+	    case TET4:
+	      return 1;
+	    case TET10:
+	      return 2;
+	    case HEX8:
+	      return 0;
+	    case HEX20:
+	      return 2;
+	    case HEX27:
+	      return 4;
+	    case PRISM6:
+	    case PRISM15:
+	    case PRISM18:
+	    case PYRAMID5:
+	    default:
+	      return 0;
+	  }
+	break;
+      case SZABAB:
+	switch (type)
+	  {
+	    case EDGE2:
+	    case EDGE3:
+	    case EDGE4:
+	      return 7;
+	    case TRI3:
+	      return 0;
+	    case TRI6:
+	      return 7;
+	    case QUAD4:
+	      return 0;
+	    case QUAD8:
+	    case QUAD9:
+	      return 7;
+	    case TET4:
+	    case TET10:
+	    case HEX8:
+	    case HEX20:
+	    case HEX27:
+	    case PRISM6:
+	    case PRISM15:
+	    case PRISM18:
+	    case PYRAMID5:
+	    default:
+	      return 0;
+	  }
+	break;
+#endif
+      case XYZ:
+	switch (type)
+	  {
+	    case EDGE2:
+	    case EDGE3:
+	    case EDGE4:
+	    case TRI3:
+	    case TRI6:
+	    case QUAD4:
+	    case QUAD8:
+	    case QUAD9:
+	    case TET4:
+	    case TET10:
+	    case HEX8:
+	    case HEX20:
+	    case HEX27:
+	    case PRISM6:
+	    case PRISM15:
+	    case PRISM18:
+	    case PYRAMID5:
+	    default:
+	      return 4;
+	  }
+	break;
+      case CLOUGH:
+	switch (type)
+	  {
+	    case EDGE2:
+	    case EDGE3:
+	      return 3;
+	    case EDGE4:
+	    case TRI3:
+	      return 0;
+	    case TRI6:
+	      return 3;
+	    case QUAD4:
+	    case QUAD8:
+	    case QUAD9:
+	    case TET4:
+	    case TET10:
+	    case HEX8:
+	    case HEX20:
+	    case HEX27:
+	    case PRISM6:
+	    case PRISM15:
+	    case PRISM18:
+	    case PYRAMID5:
+	    default:
+	      return 0;
+	  }
+	break;
+      case HERMITE:
+	switch (type)
+	  {
+	    case EDGE2:
+	    case EDGE3:
+	      return 3;
+	    case EDGE4:
+	    case TRI3:
+	    case TRI6:
+	      return 0;
+	    case QUAD4:
+	    case QUAD8:
+	    case QUAD9:
+	      return 3;
+	    case TET4:
+	    case TET10:
+	      return 0;
+	    case HEX8:
+	    case HEX20:
+	    case HEX27:
+	      return 3;
+	    case PRISM6:
+	    case PRISM15:
+	    case PRISM18:
+	    case PYRAMID5:
+	    default:
+	      return 0;
+	  }
+	break;
+      case HIERARCHIC:
+	switch (type)
+	  {
+	    case EDGE2:
+	    case EDGE3:
+	    case EDGE4:
+	      return 6;
+	    case TRI3:
+	      return 0;
+	    case TRI6:
+	      return 5;
+	    case QUAD4:
+	      return 0;
+	    case QUAD8:
+	    case QUAD9:
+	      return 5;
+	    case TET4:
+	    case TET10:
+	    case HEX8:
+	    case HEX20:
+	      return 0;
+	    case HEX27:
+	      return 3;
+	    case PRISM6:
+	    case PRISM15:
+	    case PRISM18:
+	    case PYRAMID5:
+	    default:
+	      return 0;
+	  }
+	break;
+      default:
+	return 0;
+	break;
+    }
+}
+
   
 
 bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
