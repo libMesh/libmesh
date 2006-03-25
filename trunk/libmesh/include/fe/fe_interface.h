@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.9 2005-08-26 13:21:32 spetersen Exp $
+// $Id: fe_interface.h,v 1.10 2006-03-25 23:56:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -227,6 +227,13 @@ public:
 				   DofMap &dof_map,
 				   const unsigned int variable_number,
 				   const Elem* elem);
+
+  /**
+   * Returns the maximum polynomial degree that the given finite
+   * element family can support on the given geometric element.
+   */
+  static unsigned int max_order (const FEType& fe_t,
+			         const Elem& elem);
 
   /**
    * Returns true if separate degrees of freedom must be allocated for
