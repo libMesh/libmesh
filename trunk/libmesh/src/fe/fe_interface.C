@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.38 2006-03-25 23:56:35 roystgnr Exp $
+// $Id: fe_interface.C,v 1.39 2006-03-26 00:12:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1856,14 +1856,12 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 
 
 unsigned int FEInterface::max_order(const FEType& fe_t,
-			            const Elem& elem)
+			            const ElemType& el_t)
 {
-  const ElemType type = elem.type();
-
   switch (fe_t.family)
     {
       case LAGRANGE:
-	switch (type)
+	switch (el_t)
 	  {
 	    case EDGE2:
 	    case EDGE3:
@@ -1899,7 +1897,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	  }
 	break;
       case MONOMIAL:
-	switch (type)
+	switch (el_t)
 	  {
 	    case EDGE2:
 	    case EDGE3:
@@ -1925,7 +1923,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	break;
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
       case BERNSTEIN:
-	switch (type)
+	switch (el_t)
 	  {
 	    case EDGE2:
 	    case EDGE3:
@@ -1959,7 +1957,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	  }
 	break;
       case SZABAB:
-	switch (type)
+	switch (el_t)
 	  {
 	    case EDGE2:
 	    case EDGE3:
@@ -1989,7 +1987,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	break;
 #endif
       case XYZ:
-	switch (type)
+	switch (el_t)
 	  {
 	    case EDGE2:
 	    case EDGE3:
@@ -2013,7 +2011,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	  }
 	break;
       case CLOUGH:
-	switch (type)
+	switch (el_t)
 	  {
 	    case EDGE2:
 	    case EDGE3:
@@ -2040,7 +2038,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	  }
 	break;
       case HERMITE:
-	switch (type)
+	switch (el_t)
 	  {
 	    case EDGE2:
 	    case EDGE3:
@@ -2069,7 +2067,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	  }
 	break;
       case HIERARCHIC:
-	switch (type)
+	switch (el_t)
 	  {
 	    case EDGE2:
 	    case EDGE3:
