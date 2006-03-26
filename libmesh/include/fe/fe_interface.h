@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.10 2006-03-25 23:56:33 roystgnr Exp $
+// $Id: fe_interface.h,v 1.11 2006-03-26 00:12:05 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -233,7 +233,7 @@ public:
    * element family can support on the given geometric element.
    */
   static unsigned int max_order (const FEType& fe_t,
-			         const Elem& elem);
+			         const ElemType& el_t);
 
   /**
    * Returns true if separate degrees of freedom must be allocated for
