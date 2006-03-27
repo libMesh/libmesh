@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.33 2006-03-27 20:24:10 roystgnr Exp $
+// $Id: elem.h,v 1.34 2006-03-27 22:47:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1243,8 +1243,9 @@ unsigned char Elem::p_level() const
 inline
 void Elem::set_p_level(unsigned char p)
 {
-  if (parent()->p_level() > p)
-    parent()->set_p_level(p);
+  if (this->parent() != NULL)
+    if (this->parent()->p_level() > p)
+      this->parent()->set_p_level(p);
 
   _p_level = p;
 }
