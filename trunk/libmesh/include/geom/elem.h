@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.31 2006-03-24 00:04:26 roystgnr Exp $
+// $Id: elem.h,v 1.32 2006-03-27 20:00:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -592,6 +592,13 @@ class Elem : public ReferenceCountedObject<Elem>,
    * element
    */
   unsigned char p_level () const;
+
+  /**
+   * Returns the minimum p refinement level of elements which 
+   * are descended from this and which share a side with the
+   * active \p neighbor
+   */
+  unsigned char min_p_level_by_neighbor (const Elem* neighbor) const;
 
   /**
    * Sets the value of the p refinement level for the element
@@ -1235,6 +1242,9 @@ unsigned char Elem::p_level() const
 inline
 void Elem::set_p_level(unsigned char p)
 {
+  if (parent()->p_level() > p)
+    parent()->set_p_level(p);
+
   _p_level = p;
 }
 

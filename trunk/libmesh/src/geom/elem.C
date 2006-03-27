@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.49 2006-03-23 21:31:58 roystgnr Exp $
+// $Id: elem.C,v 1.50 2006-03-27 20:00:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -825,4 +825,31 @@ bool Elem::is_child_on_side(const unsigned int c,
   Elem *child = this->child(c);
   return ((child->neighbor(s) == NULL) // on boundary
       || (child->neighbor(s)->parent() != this));
+}
+
+
+unsigned char min_p_level_by_neighbor(const Elem* neighbor,
+                                      unsigned char current_min) const
+{
+  assert(!this->subactive());
+  assert(neighbor->active());
+  assert(is_neighbor(neighbor));
+
+  // The p_level() of an ancestor element is already the minimum
+  // p_level() of its children - so if that's high enough, we don't
+  // need to examine any children.
+  if (current_min <= this->p_level())
+    return current_min;
+
+  unsigned char min_p_level = this->p_level();
+
+  if (!this->active())
+    for (unsigned int c=0; c<this->n_children(); c++)
+      {
+        const Elem* const child = this->child(c);
+        if (child->is_neighbor(neighbor))
+          min_p_level = child->min_p_level_by_neighbor(neighbor);
+      }
+
+  return min_p_level;
 }
