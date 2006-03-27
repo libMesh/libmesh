@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.50 2006-03-27 20:00:37 roystgnr Exp $
+// $Id: elem.C,v 1.51 2006-03-27 20:24:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -828,8 +828,8 @@ bool Elem::is_child_on_side(const unsigned int c,
 }
 
 
-unsigned char min_p_level_by_neighbor(const Elem* neighbor,
-                                      unsigned char current_min) const
+unsigned char Elem::min_p_level_by_neighbor(const Elem* neighbor,
+                                            unsigned char current_min) const
 {
   assert(!this->subactive());
   assert(neighbor->active());
