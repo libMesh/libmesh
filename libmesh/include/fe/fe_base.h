@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.16 2006-03-21 21:42:13 roystgnr Exp $
+// $Id: fe_base.h,v 1.17 2006-03-27 23:58:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1105,6 +1105,11 @@ protected:
    */
   QBase* qrule;
 
+  /**
+   * A flag indicating if current data structures
+   * correspond to quadratur rule points
+   */
+  bool shapes_on_quadrature;
 
 
 private:
@@ -1148,7 +1153,8 @@ FEBase::FEBase(const unsigned int d,
   calculate_d2phi(false),
   fe_type(fet),
   elem_type(INVALID_ELEM),
-  qrule(NULL)
+  qrule(NULL),
+  shapes_on_quadrature(false)
 {
 }
 
