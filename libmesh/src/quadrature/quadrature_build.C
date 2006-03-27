@@ -1,4 +1,4 @@
-// $Id: quadrature_build.C,v 1.9 2006-03-22 19:26:33 roystgnr Exp $
+// $Id: quadrature_build.C,v 1.10 2006-03-27 23:50:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 
 
 // Local includes
+#include "quadrature_clough.h"
 #include "quadrature_gauss.h"
 #include "quadrature_jacobi.h"
 #include "quadrature_simpson.h"
@@ -37,6 +38,20 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
   switch (_qt)
     {
       
+    case QCLOUGH:
+      {
+#ifdef DEBUG
+	if (_order > TWENTYTHIRD)
+	  {
+	    std::cout << "WARNING: Clough quadrature implemented" << std::endl
+		      << " up to TWENTYTHIRD order." << std::endl;
+	  }
+#endif
+
+	AutoPtr<QBase> ap(new QClough(_dim, _order));
+	return ap;
+      }
+
     case QGAUSS:
       {
 
