@@ -1,4 +1,4 @@
-// $Id: quadrature_clough_2D.C,v 1.2 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: quadrature_clough_2D.C,v 1.3 2006-03-28 00:39:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,11 +24,12 @@
 #include "quadrature_gauss.h"
 
 
-void QClough::init_2D(const ElemType _type)
+void QClough::init_2D(const ElemType _type,
+                      unsigned int p)
 {
 #if DIM > 1
   QGauss gauss_rule(2, _order);
-  gauss_rule.init(TRI6);
+  gauss_rule.init(TRI6, p);
   
   //-----------------------------------------------------------------------
   // 2D quadrature rules

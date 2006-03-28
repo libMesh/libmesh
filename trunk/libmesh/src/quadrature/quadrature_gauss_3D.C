@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_3D.C,v 1.16 2005-03-23 14:03:45 benkirk Exp $
+// $Id: quadrature_gauss_3D.C,v 1.17 2006-03-28 00:39:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,8 @@
 #include "quadrature_jacobi.h"
 
 
-void QGauss::init_3D(const ElemType _type)
+void QGauss::init_3D(const ElemType _type,
+                     unsigned int p)
 {
 #if DIM == 3
   
@@ -41,7 +42,7 @@ void QGauss::init_3D(const ElemType _type)
 	// We compute the 3D quadrature rule as a tensor
 	// product of the 1D quadrature rule.
 	QGauss q1D(1,_order);
-	q1D.init(EDGE2);
+	q1D.init(EDGE2,p);
 
 	tensor_product_hex( q1D );
 	
@@ -58,7 +59,7 @@ void QGauss::init_3D(const ElemType _type)
 	// Taken from pg. 222 of "The finite element method," vol. 1
 	// ed. 5 by Zienkiewicz & Taylor
 	      
-	switch(_order)
+	switch(_order + 2*p)
 	  {
 	  case CONSTANT:
 	  case FIRST:
@@ -379,9 +380,9 @@ void QGauss::init_3D(const ElemType _type)
 // 		    }
 	      
 	      // Define the quadrature rules...
-	      QGauss  gauss1D(1,_order);
-	      QJacobi jacA1D(1,_order,1,0);
-	      QJacobi jacB1D(1,_order,2,0);
+	      QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
+	      QJacobi jacA1D(1,static_cast<Order>(_order+2*p),1,0);
+	      QJacobi jacB1D(1,static_cast<Order>(_order+2*p),2,0);
 
 	      // The Gauss rule needs to be scaled to [0,1]
 	      std::pair<Real, Real> old_range(-1,1);
@@ -418,8 +419,8 @@ void QGauss::init_3D(const ElemType _type)
 	QGauss q2D(2,_order);
 
 	// Initialize 
-	q1D.init(EDGE2);
-	q2D.init(TRI3);
+	q1D.init(EDGE2,p);
+	q2D.init(TRI3,p);
 
 	tensor_product_prism(q1D, q2D);
 	
@@ -441,11 +442,11 @@ void QGauss::init_3D(const ElemType _type)
 
 	// Get a rule for the reference quad
 	QGauss q2D(2,_order); 
-	q2D.init(QUAD4);
+	q2D.init(QUAD4,p);
 	
 	// Get a rule for the interval [-1,1] 
 	QGauss q1D(1,_order);
-	q1D.init(EDGE2);
+	q1D.init(EDGE2,p);
 
 	// Storage for our temporary rule
 	std::vector<Real> pts(q1D.n_points());

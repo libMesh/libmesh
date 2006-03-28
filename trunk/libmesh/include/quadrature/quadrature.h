@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.8 2005-07-01 16:36:23 spetersen Exp $
+// $Id: quadrature.h,v 1.9 2006-03-28 00:39:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -132,7 +132,8 @@ public:
    * Initializes the data structures to contain a quadrature rule
    * for an object of type \p type.  
    */
-  void init (const ElemType _type=INVALID_ELEM);
+  void init (const ElemType _type=INVALID_ELEM,
+	     unsigned int p_level=0);
 
   /**
    * @returns the order of the quadrature rule.   
@@ -159,7 +160,8 @@ protected:
    * It is assumed that derived quadrature rules will at least
    * define the init_1D function, therefore it is pure virtual.
    */
-  virtual void init_1D (const ElemType _type=INVALID_ELEM) = 0;
+  virtual void init_1D (const ElemType _type=INVALID_ELEM,
+			unsigned int p_level=0) = 0;
 
   /**
    * Initializes the 2D quadrature rule by filling the points and
@@ -169,7 +171,8 @@ protected:
    * may only be defined in 1D.  If not redefined, gives an
    * error (when \p DEBUG defined) when called.
    */
-  virtual void init_2D (const ElemType)
+  virtual void init_2D (const ElemType,
+			unsigned int =0)
 #ifndef DEBUG
   {}
 #else
@@ -188,7 +191,8 @@ protected:
    * may only be defined in 1D.  If not redefined, gives an
    * error (when \p DEBUG defined) when called.
    */
-  virtual void init_3D (const ElemType)
+  virtual void init_3D (const ElemType,
+			unsigned int =0)
 #ifndef DEBUG
   {}
 #else
@@ -272,6 +276,12 @@ protected:
    * been computed.
    */
   ElemType _type;
+
+  /**
+   * The p level of element for which the current values have
+   * been computed.
+   */
+  unsigned int _p_level;
 
   /**
    * The reference element locations of the

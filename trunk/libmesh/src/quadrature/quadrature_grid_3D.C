@@ -1,4 +1,4 @@
-// $Id: quadrature_grid_3D.C,v 1.2 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: quadrature_grid_3D.C,v 1.3 2006-03-28 00:39:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,12 +23,15 @@
 #include "quadrature_grid.h"
 
 
-void QGrid::init_3D(const ElemType _type)
+void QGrid::init_3D(const ElemType _type,
+                    unsigned int)
 {
 #if DIM == 3
   
   //-----------------------------------------------------------------------
   // 3D quadrature rules
+
+  // We ignore p - the grid rule is just for experimentation
   switch (_type)
     {
       //---------------------------------------------

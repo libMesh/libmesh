@@ -1,4 +1,4 @@
-// $Id: quadrature_clough_1D.C,v 1.2 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: quadrature_clough_1D.C,v 1.3 2006-03-28 00:39:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,10 +27,11 @@
  
 
 
-void QClough::init_1D(const ElemType _elemtype)
+void QClough::init_1D(const ElemType _elemtype,
+                      unsigned int p)
 {
   QGauss gauss_rule(1, _order);
-  gauss_rule.init(_elemtype);
+  gauss_rule.init(_elemtype, p);
 
   _points.swap(gauss_rule.get_points());
   _weights.swap(gauss_rule.get_weights());

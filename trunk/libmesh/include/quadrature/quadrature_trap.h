@@ -1,4 +1,4 @@
-// $Id: quadrature_trap.h,v 1.3 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: quadrature_trap.h,v 1.4 2006-03-28 00:39:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -58,9 +58,12 @@ class QTrap : public QBase
 
  private:
 
-  void init_1D (const ElemType _type=INVALID_ELEM);
-  void init_2D (const ElemType _type=INVALID_ELEM);
-  void init_3D (const ElemType _type=INVALID_ELEM);
+  void init_1D (const ElemType _type=INVALID_ELEM,
+		unsigned int p_level=0);
+  void init_2D (const ElemType _type=INVALID_ELEM,
+		unsigned int p_level=0);
+  void init_3D (const ElemType _type=INVALID_ELEM,
+		unsigned int p_level=0);
 
 };
 
