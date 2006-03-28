@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.9 2006-03-28 00:39:54 roystgnr Exp $
+// $Id: quadrature.h,v 1.10 2006-03-28 01:22:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -84,6 +84,18 @@ public:
 			      const Order _order=INVALID_ORDER);
 
   /**
+   * @returns the current element type we're set up for
+   */    
+  ElemType get_elem_type() const
+    { return _type; }
+
+  /**
+   * @returns the current p refinement level we're initialized with
+   */    
+  unsigned int get_p_level() const
+    { return _p_level; }
+
+  /**
    * @returns the number of points associated with the quadrature rule.
    */    
   unsigned int n_points() const
@@ -138,7 +150,7 @@ public:
   /**
    * @returns the order of the quadrature rule.   
    */
-  Order get_order() const { return _order; }
+  Order get_order() const { return static_cast<Order>(_order + _p_level); }
   
   /**
    * Prints information relevant to the quadrature rule.
@@ -307,7 +319,8 @@ QBase::QBase(const unsigned int d,
 	     const Order o) :
   _dim(d),
   _order(o),
-  _type(INVALID_ELEM)
+  _type(INVALID_ELEM),
+  _p_level(0)
 {
 }
 
