@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.34 2006-03-27 22:47:10 benkirk Exp $
+// $Id: elem.h,v 1.35 2006-03-28 00:04:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -591,20 +591,21 @@ class Elem : public ReferenceCountedObject<Elem>,
    * Returns the value of the p refinement level of an active
    * element
    */
-  unsigned char p_level () const;
+  unsigned int p_level () const;
 
   /**
    * Returns the minimum p refinement level of elements which 
    * are descended from this and which share a side with the
    * active \p neighbor
    */
-  unsigned char min_p_level_by_neighbor (const Elem* neighbor,
-					 unsigned char current_min) const;
+  unsigned int min_p_level_by_neighbor (const Elem* neighbor,
+					unsigned int current_min) const;
 
   /**
    * Sets the value of the p refinement level for the element
+   * Note that the maximum p refinement level is currently 255
    */     
-  void set_p_level (const unsigned char p);
+  void set_p_level (const unsigned int p);
 
   /**
    * Refine the element.
@@ -1193,6 +1194,7 @@ Elem::RefinementState Elem::refinement_flag () const
 inline
 void Elem::set_refinement_flag(RefinementState rflag)
 {
+#ifdef DEBUG
   if (rflag != static_cast<RefinementState>(static_cast<unsigned char>(rflag)))
     {
       std::cerr << "ERROR: unsigned char too small to hold Elem::_rflag!"
@@ -1201,6 +1203,7 @@ void Elem::set_refinement_flag(RefinementState rflag)
 		<< std::endl;
       error();
     }
+#endif
 
   _rflag = rflag;
 }
@@ -1218,6 +1221,7 @@ Elem::RefinementState Elem::p_refinement_flag () const
 inline
 void Elem::set_p_refinement_flag(RefinementState pflag)
 {
+#ifdef DEBUG
   if (pflag != static_cast<RefinementState>(static_cast<unsigned char>(pflag)))
     {
       std::cerr << "ERROR: unsigned char too small to hold Elem::_pflag!"
@@ -1226,6 +1230,7 @@ void Elem::set_p_refinement_flag(RefinementState pflag)
 		<< std::endl;
       error();
     }
+#endif
 
   _pflag = pflag;
 }
@@ -1233,7 +1238,7 @@ void Elem::set_p_refinement_flag(RefinementState pflag)
 
 
 inline
-unsigned char Elem::p_level() const
+unsigned int Elem::p_level() const
 {
   return _p_level;
 }
@@ -1241,8 +1246,19 @@ unsigned char Elem::p_level() const
 
 
 inline
-void Elem::set_p_level(unsigned char p)
+void Elem::set_p_level(unsigned int p)
 {
+#ifdef DEBUG
+  if (p != static_cast<unsigned int>(static_cast<unsigned char>(p)))
+    {
+      std::cerr << "ERROR: unsigned char too small to hold Elem::_p_level!"
+		<< std::endl
+		<< "Recompile with Elem:_p_level set to something bigger!"
+		<< std::endl;
+      error();
+    }
+#endif
+
   if (this->parent() != NULL)
     if (this->parent()->p_level() > p)
       this->parent()->set_p_level(p);
