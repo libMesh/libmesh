@@ -1,4 +1,4 @@
-// $Id: quadrature_simpson_1D.C,v 1.8 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: quadrature_simpson_1D.C,v 1.9 2006-03-28 00:39:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,8 @@
  
 
 
-void QSimpson::init_1D(const ElemType)
+void QSimpson::init_1D(const ElemType,
+                       unsigned int)
 {
   //----------------------------------------------------------------------
   // 1D quadrature rules

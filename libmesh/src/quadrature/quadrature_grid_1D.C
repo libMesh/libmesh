@@ -1,4 +1,4 @@
-// $Id: quadrature_grid_1D.C,v 1.1 2005-01-13 21:54:03 roystgnr Exp $
+// $Id: quadrature_grid_1D.C,v 1.2 2006-03-28 00:39:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,10 +26,13 @@
  
 
 
-void QGrid::init_1D(const ElemType)
+void QGrid::init_1D(const ElemType,
+                    unsigned int)
 {
   //----------------------------------------------------------------------
   // 1D quadrature rules
+
+  // We ignore p - the grid rule is just for experimentation
 
   _points.resize(_order + 1);
   _weights.resize(_order + 1);

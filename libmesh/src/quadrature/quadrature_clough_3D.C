@@ -1,4 +1,4 @@
-// $Id: quadrature_clough_3D.C,v 1.3 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: quadrature_clough_3D.C,v 1.4 2006-03-28 00:39:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,8 @@
 #include "quadrature_clough.h"
 
 
-void QClough::init_3D(const ElemType _type)
+void QClough::init_3D(const ElemType _type,
+                      unsigned int p)
 {
 #if DIM == 3
   

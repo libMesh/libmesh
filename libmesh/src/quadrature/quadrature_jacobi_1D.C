@@ -1,4 +1,4 @@
-// $Id: quadrature_jacobi_1D.C,v 1.6 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: quadrature_jacobi_1D.C,v 1.7 2006-03-28 00:39:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,7 +24,8 @@
  
 
 
-void QJacobi::init_1D(const ElemType)
+void QJacobi::init_1D(const ElemType,
+                      unsigned int p)
 {
   //----------------------------------------------------------------------
   // 1D quadrature rules
@@ -37,7 +38,7 @@ void QJacobi::init_1D(const ElemType)
 
   if ((_alpha == 1) && (_beta == 0))
     {
-      switch(_order)
+      switch(_order + 2*p)
 	{
 	case CONSTANT:
 	case FIRST:
@@ -333,7 +334,7 @@ void QJacobi::init_1D(const ElemType)
   else if ((_alpha == 2) && (_beta == 0))
     {
       
-      switch(_order)
+      switch(_order + 2*p)
 	{
 	case CONSTANT:
 	case FIRST:

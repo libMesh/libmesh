@@ -1,4 +1,4 @@
-// $Id: quadrature.C,v 1.21 2005-03-23 20:24:48 benkirk Exp $
+// $Id: quadrature.C,v 1.22 2006-03-28 00:39:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,31 +23,35 @@
 // Local includes
 #include "quadrature.h"
 
-void QBase::init(const ElemType t)
+void QBase::init(const ElemType t,
+                 unsigned int p)
 {
   // check to see if we have already
   // done the work for this quadrature rule
-  if (t == _type)
+  if (t == _type && p == _p_level)
     return;
   else
-    _type = t;
+    {
+      _type = t;
+      _p_level = p;
+    }
     
   
   
   switch(_dim)
     {
     case 1:
-      this->init_1D(_type);
+      this->init_1D(_type,_p_level);
 
       return;
       
     case 2:
-      this->init_2D(_type);
+      this->init_2D(_type,_p_level);
 
       return;
 
     case 3:
-      this->init_3D(_type);
+      this->init_3D(_type,_p_level);
 
       return;
 

@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_1D.C,v 1.14 2006-03-22 19:26:33 roystgnr Exp $
+// $Id: quadrature_gauss_1D.C,v 1.15 2006-03-28 00:39:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,11 +26,12 @@
  
 
 
-void QGauss::init_1D(const ElemType)
+void QGauss::init_1D(const ElemType,
+                     unsigned int p)
 {
   //----------------------------------------------------------------------
   // 1D quadrature rules
-  switch(_order)
+  switch(_order + 2*p)
     {
     case CONSTANT:
     case FIRST:
