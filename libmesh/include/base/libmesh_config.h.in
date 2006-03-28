@@ -9,10 +9,6 @@
 /* Flag indicating if the library should be built with AMR support */
 #undef ENABLE_AMR
 
-/* Flag indicating if the library should be built with expensive data
-   structures */
-#undef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
 /* Flag indicating if the library should offer higher order p-FEM shapes */
 #undef ENABLE_HIGHER_ORDER_SHAPES
 

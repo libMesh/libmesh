@@ -1,4 +1,4 @@
-// $Id: dof_object.C,v 1.16 2006-03-22 20:46:07 roystgnr Exp $
+// $Id: dof_object.C,v 1.17 2006-03-28 00:43:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -46,13 +46,9 @@ DofObject::DofObject (const DofObject& dof_obj) :
   _processor_id  (dof_obj._processor_id),
   _n_systems     (dof_obj._n_systems),
   _n_vars        (NULL),
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
   _n_comp        (NULL),
-#endif
   _dof_ids       (NULL)
 {
-
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
 
   // Allocate storage for the dof numbers and copy
   // the values. 
@@ -88,31 +84,6 @@ DofObject::DofObject (const DofObject& dof_obj) :
 	    _dof_ids[s][v] = invalid_id;
 	}
     }
-
-#else
-
-  // Allocate storage for the dof numbers and copy
-  // the values. See warning above about allocating arrays with zero entries.
-  if (this->n_systems() > 0)
-  {
-    _n_vars  = new unsigned char [this->n_systems()];
-    _dof_ids = new unsigned int* [this->n_systems()];
-  }
-
-  // If n_systems==0, we don't enter this for loop.
-  for (unsigned int s=0; s<this->n_systems(); s++)
-    {  
-      _n_vars[s]  = dof_obj.n_vars(s);
-
-      // Only allocate if there are variables in the system
-      if (this->n_vars(s) > 0)
-	_dof_ids[s] = new unsigned int [this->n_vars(s)];  
-      
-      for (unsigned int v=0; v<this->n_vars(s); v++)
-	_dof_ids[s][v] = dof_obj._dof_ids[s][v];
-    }
-  
-#endif
 
   // Check that everything worked
 #ifdef DEBUG
@@ -193,11 +164,7 @@ void DofObject::set_n_systems (const unsigned int ns)
 
   // Set the new number of systems
   _n_systems = static_cast<unsigned char>(ns);
-
-
   
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
   // Allocate storage for the systems
   _n_vars    = new unsigned char  [this->n_systems()];
   _n_comp    = new unsigned char* [this->n_systems()];
@@ -210,29 +177,12 @@ void DofObject::set_n_systems (const unsigned int ns)
       _n_comp[s]  = NULL;
       _dof_ids[s] = NULL;
     }
-  
-#else
-  
-  // Allocate storage for the systems
-  _n_vars    = new unsigned char  [this->n_systems()];
-  _dof_ids   = new unsigned int*  [this->n_systems()];
- 
-  // No variables have been declared yet.
-  for (unsigned int s=0; s<this->n_systems(); s++)
-    {
-      _n_vars[s]  = 0;
-      _dof_ids[s] = NULL;
-    }
-    
-#endif
 }
 
 
 
 void DofObject::add_system()
 {
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
   if (this->n_systems() > 0)
     {
       // Copy the old systems to temporary storage
@@ -286,56 +236,6 @@ void DofObject::add_system()
   _n_vars[this->n_systems()]  = 0;
   _n_comp[this->n_systems()]  = NULL;
   _dof_ids[this->n_systems()] = NULL;
-
-#else
-
-  if (this->n_systems() > 0)
-    {
-      // Copy the old systems to temporary storage
-      unsigned char *old_n_vars  = new unsigned char [this->n_systems()];
-      unsigned int **old_dof_ids = new unsigned int* [this->n_systems()]; 
-      
-      for (unsigned int s=0; s<this->n_systems(); s++)
-	{
-	  old_n_vars[s]  = _n_vars[s];
-	  old_dof_ids[s] = _dof_ids[s];
-	}
-      
-      // Delete old storage
-      assert (_n_vars  != NULL); delete [] _n_vars;  _n_vars  = NULL;
-      assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
-      
-      // Allocate space for new system
-      _n_vars  = new unsigned char [this->n_systems()+1];
-      _dof_ids = new unsigned int* [this->n_systems()+1];
-      
-      // Copy the other systems
-      for (unsigned int s=0; s<this->n_systems(); s++)
-	{
-	  _n_vars[s]  = old_n_vars[s];
-	  _dof_ids[s] = old_dof_ids[s];
-	}
-
-      // Delete temporary storage
-      assert (old_n_vars  != NULL); delete [] old_n_vars;  old_n_vars  = NULL;
-      assert (old_dof_ids != NULL); delete [] old_dof_ids; old_dof_ids = NULL;
-    }
-  else
-    {
-      assert (_n_vars  == NULL);
-      assert (_dof_ids == NULL);
-      
-      // Allocate space for new system
-      _n_vars  = new unsigned char [this->n_systems()+1];
-      _dof_ids = new unsigned int* [this->n_systems()+1];
-    }
-  
-  // Initialize the new system
-  _n_vars[this->n_systems()]  = 0;
-  _dof_ids[this->n_systems()] = NULL;
-
-#endif
-
   
   // Done. Don't forget to increment the number of systems!
   _n_systems++;
@@ -364,8 +264,6 @@ void DofObject::set_n_vars(const unsigned int s,
 
   
   
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-  
   // If we already have memory allocated clear it.
   if (this->n_vars(s) != 0)
     {
@@ -388,33 +286,6 @@ void DofObject::set_n_vars(const unsigned int s,
 	  _dof_ids[s][v] = invalid_id - 1;
 	}
     }
-
-
-#else
-
-  // If we already have memory allocated clear it.
-  if (this->n_vars(s) > 0)
-    {
-      assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
-    }
-
-  // Reset the number of variables in the system    
-  _n_vars[s] = static_cast<unsigned char>(nvars);
-
-  if (this->n_vars(s) > 0)
-    {
-      _dof_ids[s] = new unsigned int [this->n_vars(s)];
-      
-      // We use (invalid_id - 1) to signify n_comp(s,var) = 0.
-      // This eliminates an additional array that would determine
-      // when a variable has no components or one component active
-      // on this object. Note that without expensive data structures
-      // these are the only possiblities.
-      for (unsigned int v=0; v<this->n_vars(s); v++)
-	_dof_ids[s][v] = invalid_id - 1;
-    }
-
-#endif
 }
 
 
@@ -451,24 +322,10 @@ void DofObject::set_n_comp(const unsigned int s,
       _dof_ids[s][var] = (invalid_id - 1);
     }
   
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
   assert (_n_comp != NULL);
   assert (_n_comp[s] != NULL);
     
   _n_comp[s][var]  = static_cast<unsigned char>(ncomp);
-
-#else
-
-  if (ncomp != 0 && ncomp != 1)
-    {
-      std::cerr << "ERROR: You must compile with --enable-expensive to have" << std::endl
-		<< "multiple components in a variable!" << std::endl;
-      
-      error();
-    }
-  
-#endif
 }
 
 
@@ -478,14 +335,11 @@ void DofObject::set_dof_number(const unsigned int s,
 			       const unsigned int comp,
 			       const unsigned int dn)
 {
-  //assert (dn != invalid_id);
   assert (s < this->n_systems());
   assert (var  < this->n_vars(s));
-  assert (comp < this->n_comp(s,var));
   assert (_dof_ids != NULL);
   assert (_dof_ids[s] != NULL);
-
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
+  assert (comp < this->n_comp(s,var));
   
   //We intend to change all dof numbers together or not at all
   if (comp)
@@ -494,14 +348,6 @@ void DofObject::set_dof_number(const unsigned int s,
   else
     _dof_ids[s][var] = dn;
 
-#else
 
-  // Reserve (invalid_id-1) to signify n_com(var) = 0.
-  assert (dn != (invalid_id-1));
-  
-  _dof_ids[s][var] = dn;
-
-#endif
-
-  assert(dof_number(s, var, comp) == dn);
+  assert(this->dof_number(s, var, comp) == dn);
 }
