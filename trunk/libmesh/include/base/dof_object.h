@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.12 2006-03-16 00:00:36 roystgnr Exp $
+// $Id: dof_object.h,v 1.13 2006-03-28 00:43:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -51,7 +51,7 @@ class DofObject;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.12 $
+ * \version $Revision: 1.13 $
  */
 
 class DofObject : public ReferenceCountedObject<DofObject>
@@ -292,16 +292,12 @@ private:
    */
   unsigned char *_n_vars;
 
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-  
   /**
    * The number of components for each variable of each system
    * associated with this \p DofObject.  This is stored as an
    * unsigned char for storage efficiency.
    */
   unsigned char **_n_comp;
-
-#endif
 
   /**
    * The first global degree of freedom number
@@ -323,9 +319,7 @@ DofObject::DofObject () :
   _processor_id (invalid_processor_id),
   _n_systems  (0),
   _n_vars (NULL),
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
   _n_comp (NULL),
-#endif
   _dof_ids (NULL)
 {
   this->invalidate();
@@ -397,8 +391,6 @@ void DofObject::invalidate ()
 inline
 void DofObject::clear_dofs ()
 {
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
   // Only clear if there is data
   if (this->n_systems() != 0)
     {
@@ -420,29 +412,6 @@ void DofObject::clear_dofs ()
   assert (_n_comp  == NULL);
   assert (_dof_ids == NULL);
   
-#else
-
-  // Only clear if there is data
-  if (this->n_systems() != 0)
-    {
-      for (unsigned int s=0; s<this->n_systems(); s++)
-	if (this->n_vars(s) != 0) // This has only been allocated if
-	  {                       // variables were declared
-	    assert(_dof_ids[s] != NULL); delete [] _dof_ids[s] ; _dof_ids[s] = NULL;
-	  }
-      
-      assert (_n_vars  != NULL); delete [] _n_vars;  _n_vars  = NULL; 
-      assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
-    }
-  
-  // Make sure we cleaned up
-  // (or there was nothing there)
-  assert (_n_vars  == NULL);
-  assert (_dof_ids == NULL);
-  
-#endif
-  
-
   // No systems now.
   _n_systems = 0;
 }
@@ -568,9 +537,6 @@ unsigned int DofObject::n_comp(const unsigned int s,
   assert (s < this->n_systems());
   assert (_dof_ids != NULL);
   assert (_dof_ids[s] != NULL);
-
-#ifdef ENABLE_EXPENSIVE_DATA_STRUCTURES
-
   assert (_n_comp != NULL);
   assert (_n_comp[s] != NULL);
 
@@ -588,17 +554,6 @@ unsigned int DofObject::n_comp(const unsigned int s,
 # endif
   
   return static_cast<unsigned int>(_n_comp[s][var]);
-
-#else
-
-  // If the dof isn't numbered yet there are effectively
-  // zero dofs for this variable
-  if (_dof_ids[s][var] == (invalid_id-1))
-    return 0;
-  
-  return 1;
-  
-#endif
 }
 
 
@@ -610,13 +565,10 @@ unsigned int DofObject::dof_number(const unsigned int s,
 {
   assert (s < this->n_systems());
   assert (var  < this->n_vars(s));
-  assert (comp < this->n_comp(s,var));
   assert (_dof_ids != NULL);
-  assert (_dof_ids[s] != NULL);
+  assert (_dof_ids[s] != NULL);  
+  assert (comp < this->n_comp(s,var));
   
-#ifndef ENABLE_EXPENSIVE_DATA_STRUCTURES
-  assert (comp == 0);
-#endif
   if (_dof_ids[s][var] == invalid_id)
     return invalid_id;
   else
