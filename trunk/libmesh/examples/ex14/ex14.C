@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.20 2006-03-01 21:43:27 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.21 2006-03-28 18:27:09 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -152,13 +152,15 @@ int main(int argc, char** argv)
 	system.add_variable("u", FIRST);
       else if (approx_order == "SECOND")
         system.add_variable("u", SECOND);
+      else if (approx_order == "FIRSTHIERARCHIC")
+        system.add_variable("u", FIRST, HIERARCHIC);
       else if (approx_order == "HIERARCHIC")
         system.add_variable("u", SECOND, HIERARCHIC);
       else if (approx_order == "THIRD")
         system.add_variable("u", THIRD, HIERARCHIC);
       else
 	error();
-      
+
       // Give the system a pointer to the matrix assembly
       // function.
       system.attach_assemble_function (assemble_laplace);
