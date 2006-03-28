@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.42 2006-03-21 21:42:21 roystgnr Exp $
+// $Id: fe.C,v 1.43 2006-03-28 00:02:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -136,6 +136,9 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
       // Initialize the shape functions
       this->init_shape_functions (*pts, elem);
+
+      // The shape functions do not correspond to the qrule
+      shapes_on_quadrature = false;
     }
   
   // update the type in accordance to the current cell
@@ -143,6 +146,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // the case of the hierarchics) the shape functions need
   // reinit, since they depend on the particular element
   else if ((this->get_type() != elem->type()) ||
+           !shapes_on_quadrature ||
 	   this->shapes_need_reinit())
     {
       // Set the element type
@@ -150,6 +154,9 @@ void FE<Dim,T>::reinit(const Elem* elem,
       
       // Initialize the shape functions
       this->init_shape_functions (qrule->get_points(), elem);
+
+      // The shape functions correspond to the qrule
+      shapes_on_quadrature = true;
     }
 
 
