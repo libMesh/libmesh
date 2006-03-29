@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.20 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: system.h,v 1.21 2006-03-29 20:45:03 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,6 @@
 #include "fe_type.h"
 #include "auto_ptr.h"
 #include "reference_counted_object.h"
-#include "vector_value.h" // for Gradient
 
 
 
@@ -43,6 +42,9 @@ class DofMap;
 class Parameters;
 class Point;
 template <typename T> class NumericVector;
+template <typename T> class VectorValue;
+typedef VectorValue<Number> NumberVectorValue;
+typedef NumberVectorValue Gradient;
 
 /**
  * This is the base class for classes which contain 
