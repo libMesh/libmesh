@@ -1,4 +1,4 @@
-// $Id: exact_solution.h,v 1.9 2005-12-28 13:47:10 spetersen Exp $
+// $Id: exact_solution.h,v 1.10 2006-03-29 19:57:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,14 +26,23 @@
 #include <vector>
 
 // Local Includes
-#include "vector_value.h" // for RealGradient
-#include "tensor_value.h"
+
+
 
 // Forward Declarations
 class Point;
 class EquationSystems;
 class Parameters;
 class Mesh;
+
+// Is there any way to simplify this?
+// All we need are Tensor and Gradient. - RHS
+template <typename T> class TensorValue;
+template <typename T> class VectorValue;
+typedef TensorValue<Number> NumberTensorValue;
+typedef NumberTensorValue   Tensor;
+typedef VectorValue<Number> NumberVectorValue;
+typedef NumberVectorValue   Gradient;
 
 /**
  * This class handles the computation of the L2 and/or H1
