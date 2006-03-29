@@ -1,4 +1,4 @@
-// $Id: nonlinear_implicit_system.h,v 1.2 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: nonlinear_implicit_system.h,v 1.3 2006-03-29 20:40:05 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,8 +26,10 @@
 
 // Local Includes
 #include "implicit_system.h"
-#include "nonlinear_solver.h"
 
+
+// Forward declarations
+template<typename T> class NonlinearSolver;
 
 
 /**
