@@ -1,4 +1,4 @@
-/* $Id: ex9.C,v 1.20 2005-12-06 20:52:13 roystgnr Exp $ */
+/* $Id: ex9.C,v 1.21 2006-03-29 21:02:56 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -53,6 +53,7 @@
 
 // This example will solve a linear transient system,
 // so we need to include the \p TransientLinearImplicitSystem definition.
+#include "linear_implicit_system.h"
 #include "transient_system.h"
 #include "vector_value.h"
 

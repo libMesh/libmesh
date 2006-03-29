@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.27 2006-03-03 15:35:14 benkirk Exp $ */
+/* $Id: ex10.C,v 1.28 2006-03-29 21:02:56 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -59,6 +59,7 @@
 // This example will solve a linear transient system,
 // so we need to include the \p TransientLinearImplicitSystem definition.
 #include "transient_system.h"
+#include "linear_implicit_system.h"
 #include "vector_value.h"
 
 // To refine the mesh we need an \p ErrorEstimator
