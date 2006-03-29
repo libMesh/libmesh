@@ -1,4 +1,4 @@
-// $Id: mesh_function.h,v 1.3 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: mesh_function.h,v 1.4 2006-03-29 19:41:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,11 +28,11 @@
 
 // Local Includes
 #include "function_base.h"
-#include "dense_vector.h"
 
 
 
 // Forward Declarations
+template <typename T> class DenseVector;
 class EquationSystems;
 template <typename T> class NumericVector;
 class DofMap;
