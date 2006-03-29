@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.8 2005-06-06 14:53:19 jwpeterson Exp $
+// $Id: mesh_function.C,v 1.9 2006-03-29 19:16:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 #include "fe_interface.h"
 #include "fe_compute_data.h"
 #include "mesh.h"
+#include "point.h"
 
 
 //------------------------------------------------------------------
