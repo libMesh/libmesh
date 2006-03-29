@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.23 2006-03-29 18:47:37 roystgnr Exp $
+// $Id: exact_solution.C,v 1.24 2006-03-29 19:57:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,14 +21,16 @@
 
 
 // Local includes
+#include "dof_map.h"
+#include "elem.h"
 #include "exact_solution.h"
 #include "equation_systems.h"
 #include "fe.h"
-#include "quadrature_gauss.h"
 #include "fe_interface.h"
-#include "elem.h"
-#include "dof_map.h"
 #include "mesh.h"
+#include "quadrature.h"
+#include "tensor_value.h"
+#include "vector_value.h"
 
 ExactSolution::ExactSolution(EquationSystems& es) :
   _exact_value (NULL),
