@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.29 2005-10-14 15:22:31 roystgnr Exp $
+// $Id: equation_systems.C,v 1.30 2006-03-29 20:56:45 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,10 +22,13 @@
 #include <sstream>
 
 // Local Includes
+#include "explicit_system.h"
 #include "fe_interface.h"
 #include "frequency_system.h"
+#include "linear_implicit_system.h"
 #include "mesh_refinement.h"
 #include "newmark_system.h"
+#include "nonlinear_implicit_system.h"
 #include "transient_system.h"
 #include "dof_map.h"
 #include "mesh.h"
