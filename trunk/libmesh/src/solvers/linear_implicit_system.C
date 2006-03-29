@@ -1,4 +1,4 @@
-// $Id: linear_implicit_system.C,v 1.5 2006-02-16 22:17:58 jwpeterson Exp $
+// $Id: linear_implicit_system.C,v 1.6 2006-03-29 20:01:47 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 
 // Local includes
 #include "linear_implicit_system.h"
+#include "linear_solver.h"
 #include "equation_systems.h"
 #include "libmesh_logging.h"
 
