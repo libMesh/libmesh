@@ -1,4 +1,4 @@
-// $Id: fe_clough_shape_1D.C,v 1.4 2005-08-24 15:42:18 roystgnr Exp $
+// $Id: fe_clough_shape_1D.C,v 1.5 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -197,8 +197,10 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
   clough_compute_coefs(elem);
 
   const ElemType type = elem->type();
+
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
   
-  switch (order)
+  switch (totalorder)
     {      
       // 3rd-order C1 cubic element
     case THIRD:
@@ -271,8 +273,10 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem* elem,
   clough_compute_coefs(elem);
 
   const ElemType type = elem->type();
+
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
   
-  switch (order)
+  switch (totalorder)
     {      
       // 3rd-order C1 cubic element
     case THIRD:
@@ -326,8 +330,10 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem* elem,
   clough_compute_coefs(elem);
 
   const ElemType type = elem->type();
+
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
   
-  switch (order)
+  switch (totalorder)
     {      
       // 3rd-order C1 cubic element
     case THIRD:

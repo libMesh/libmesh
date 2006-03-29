@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.17 2005-02-22 22:17:36 jwpeterson Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.18 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -57,8 +57,10 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
   using Utility::pow;
 
   const ElemType type = elem->type();
+
+  const Order totalorder = static_cast<Order>(order+elem->p_level());
   
-  switch (order)
+  switch (totalorder)
     {      
       // 1st & 2nd-order Hierarchics.
     case FIRST:
@@ -116,8 +118,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
 	      	      
-	      return (FE<1,HIERARCHIC>::shape(EDGE3, order, i0[i], xi)*
-		      FE<1,HIERARCHIC>::shape(EDGE3, order, i1[i], eta));
+	      return (FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0[i], xi)*
+		      FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1[i], eta));
 	      
 	    }
 
@@ -260,8 +262,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		f = f1;
 	      
 
-	      return f*(FE<1,HIERARCHIC>::shape(EDGE3, order, i0[i], xi)*
-			FE<1,HIERARCHIC>::shape(EDGE3, order, i1[i], eta));
+	      return f*(FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0[i], xi)*
+			FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1[i], eta));
 	    }
 
 	  default:
@@ -420,8 +422,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		f = f1;
 	      
 
-	      return f*(FE<1,HIERARCHIC>::shape(EDGE3, order, i0[i], xi)*
-			FE<1,HIERARCHIC>::shape(EDGE3, order, i1[i], eta));
+	      return f*(FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0[i], xi)*
+			FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1[i], eta));
 	    }
 
 	  default:
@@ -601,8 +603,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		f = f1;
 	      
 
-	      return f*(FE<1,HIERARCHIC>::shape(EDGE3, order, i0[i], xi)*
-			FE<1,HIERARCHIC>::shape(EDGE3, order, i1[i], eta));	      
+	      return f*(FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0[i], xi)*
+			FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1[i], eta));	      
 	    }
 
 	  default:
@@ -653,8 +655,10 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
   assert (elem != NULL);
 
   const ElemType type = elem->type();
+
+  const Order totalorder = static_cast<Order>(order+elem->p_level());
   
-  switch (order)
+  switch (totalorder)
     {
 
 
@@ -722,13 +726,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		      
-		  return (FE<1,HIERARCHIC>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			  FE<1,HIERARCHIC>::shape      (EDGE3, order, i1[i],    eta));
+		  return (FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			  FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1[i],    eta));
 
 		  // d()/deta
 		case 1:		      
-		  return (FE<1,HIERARCHIC>::shape      (EDGE3, order, i0[i],    xi)*
-			  FE<1,HIERARCHIC>::shape_deriv(EDGE3, order, i1[i], 0, eta));
+		  return (FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			  FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
 		  error();
@@ -843,13 +847,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		  		  
-		  return f*(FE<1,HIERARCHIC>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			    FE<1,HIERARCHIC>::shape      (EDGE3, order, i1[i],    eta));
+		  return f*(FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1[i],    eta));
 	      
 		  // d()/deta
 		case 1:		  		  
-		  return f*(FE<1,HIERARCHIC>::shape      (EDGE3, order, i0[i],    xi)*
-			    FE<1,HIERARCHIC>::shape_deriv(EDGE3, order, i1[i], 0, eta));
+		  return f*(FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			    FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
 		  error();
@@ -965,13 +969,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		  		  
-		  return f*(FE<1,HIERARCHIC>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			    FE<1,HIERARCHIC>::shape      (EDGE3, order, i1[i],    eta));
+		  return f*(FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1[i],    eta));
 	      
 		  // d()/deta
 		case 1:		  		  
-		  return f*(FE<1,HIERARCHIC>::shape      (EDGE3, order, i0[i],    xi)*
-			    FE<1,HIERARCHIC>::shape_deriv(EDGE3, order, i1[i], 0, eta));
+		  return f*(FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			    FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
 		  error();
@@ -1087,13 +1091,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		  		  
-		  return f*(FE<1,HIERARCHIC>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			    FE<1,HIERARCHIC>::shape      (EDGE3, order, i1[i],    eta));
+		  return f*(FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1[i],    eta));
 	      
 		  // d()/deta
 		case 1:		  		  
-		  return f*(FE<1,HIERARCHIC>::shape      (EDGE3, order, i0[i],    xi)*
-			    FE<1,HIERARCHIC>::shape_deriv(EDGE3, order, i1[i], 0, eta));
+		  return f*(FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			    FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
 		  error();

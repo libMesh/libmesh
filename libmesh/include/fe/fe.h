@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.18 2005-09-02 18:48:55 roystgnr Exp $
+// $Id: fe.h,v 1.19 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 //-------------------------------------------------------------
@@ -73,7 +73,9 @@ public:
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p.  This method allows you to specify the imension,
    * element type, and order directly.  This allows the method to
-   * be static.
+   * be static.  
+   *
+   * On a p-refined element, \p o should be the total order of the element.
    */
   static Real shape(const ElemType t,
 		    const Order o,
@@ -85,6 +87,8 @@ public:
    * point \p p.  This method allows you to specify the imension,
    * element type, and order directly.  This allows the method to
    * be static.
+   *
+   * On a p-refined element, \p o should be the base order of the element.
    */
   static Real shape(const Elem* elem,
 		    const Order o,
@@ -95,6 +99,8 @@ public:
    * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at point \p p.  This method allows you to
    * specify the dimension, element type, and order directly.
+   *
+   * On a p-refined element, \p o should be the total order of the element.
    */
   static Real shape_deriv(const ElemType t,
 			  const Order o,
@@ -105,6 +111,8 @@ public:
   /**
    * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function.  You must specify element type, and order directly.
+   *
+   * On a p-refined element, \p o should be the base order of the element.
    */
   static Real shape_deriv(const Elem* elem,
 			  const Order o,
@@ -123,21 +131,12 @@ public:
    * j = 4 ==> d^2 phi / deta dzeta
    * j = 5 ==> d^2 phi / dzeta^2
    *
-   * Note 1) Computing second derivatives is currently only supported
-   * for a few element types.  2D elements have support, since the second
-   * derivatives are needed for the computation of curvature in e.g. surface
-   * tension boundary conditions for deformed surfaces.  The 1D element type
-   * EDGE3 does have its second derivatives calculated since it is used in the
-   * tensor product for QUAD9.  Currently all 3D element types throw an error
-   * for the method.
+   * Note:  Computing second derivatives is not currently supported
+   * for all element types: C1 (Clough and Hermite), Lagrange,
+   * Hierarchic, and Monomial are supported.
+   * All other element types return an error when asked for second derivatives.
    *
-   * Note 2) We primarily need second derivatives for computing the curvature
-   * of element faces and for shape functions and mappings for C1 continuous
-   * elements.  Since only quadratic (and biquadratic) Lagrange shape functions
-   * are used to compute the map between the physical element and the reference
-   * element, only Lagrange second derivatives and C1 element second
-   * derivatives have been provided.  All other element types return an error
-   * when asked for second derivatives.
+   * On a p-refined element, \p o should be the total order of the element.
    */
   static Real shape_second_deriv(const ElemType t,
 				 const Order o,
@@ -156,21 +155,12 @@ public:
    * j = 4 ==> d^2 phi / deta dzeta
    * j = 5 ==> d^2 phi / dzeta^2
    *
-   * Note 1) Computing second derivatives is currently only supported
-   * for a few element types.  2D elements have support, since the second
-   * derivatives are needed for the computation of curvature in e.g. surface
-   * tension boundary conditions for deformed surfaces.  The 1D element type
-   * EDGE3 does have its second derivatives calculated since it is used in the
-   * tensor product for QUAD9.  Currently all 3D element types throw an error
-   * for the method.
+   * Note:  Computing second derivatives is not currently supported
+   * for all element types: C1 (Clough and Hermite), Lagrange,
+   * Hierarchic, and Monomial are supported.
+   * All other element types return an error when asked for second derivatives.
    *
-   * Note 2) We primarily need second derivatives for computing the curvature
-   * of element faces and for shape functions and mappings for C1 continuous
-   * elements.  Since only quadratic (and biquadratic) Lagrange shape functions
-   * are used to compute the map between the physical element and the reference
-   * element, only Lagrange second derivatives and C1 element second
-   * derivatives have been provided.  All other element types return an error
-   * when asked for second derivatives.
+   * On a p-refined element, \p o should be the base order of the element.
    */
   static Real shape_second_deriv(const Elem* elem,
 				 const Order o,
@@ -181,6 +171,8 @@ public:
   /**
    * Build the nodal soln from the element soln.
    * This is the solution that will be plotted.
+   *
+   * On a p-refined element, \p o should be the base order of the element.
    */
   static void nodal_soln(const Elem* elem, const Order o,
 			 const std::vector<Number>& elem_soln,
@@ -195,6 +187,8 @@ public:
   /**
    * @returns the number of shape functions associated with
    * a finite element of type \p t and approximation order \p o.
+   *
+   * On a p-refined element, \p o should be the total order of the element.
    */
   static unsigned int n_shape_functions (const ElemType t,
 					 const Order o)
@@ -203,6 +197,8 @@ public:
   /**
    * @returns the number of shape functions associated with this
    * finite element.
+   *
+   * On a p-refined element, \p o should be the total order of the element.
    */
   static unsigned int n_dofs(const ElemType t,
 			     const Order o);
@@ -210,6 +206,8 @@ public:
   /**
    * @returns the number of dofs at node \p n for a finite element
    * of type \p t and order \p o.
+   *
+   * On a p-refined element, \p o should be the total order of the element.
    */
   static unsigned int n_dofs_at_node(const ElemType t,
 				     const Order o,
@@ -218,6 +216,8 @@ public:
   /**
    * @returns the number of dofs interior to the element,
    * not associated with any interior nodes.
+   *
+   * On a p-refined element, \p o should be the total order of the element.
    */
   static unsigned int n_dofs_per_elem(const ElemType t,
 				      const Order o);
@@ -230,6 +230,8 @@ public:
   /**
    * Fills the vector di with the local degree of freedom indices
    * associated with side \p s of element \p elem
+   *
+   * On a p-refined element, \p o should be the base order of the element.
    */
   static void dofs_on_side(const Elem* const elem,
 		           const Order o,
@@ -238,6 +240,8 @@ public:
   /**
    * Fills the vector di with the local degree of freedom indices
    * associated with edge \p e of element \p elem
+   *
+   * On a p-refined element, \p o should be the base order of the element.
    */
   static void dofs_on_edge(const Elem* const elem,
 		           const Order o,
@@ -423,7 +427,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 //-------------------------------------------------------------
@@ -448,7 +452,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2005
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 //-------------------------------------------------------------
@@ -487,7 +491,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 //-------------------------------------------------------------
@@ -512,7 +516,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 //-------------------------------------------------------------
@@ -537,7 +541,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 //-------------------------------------------------------------
@@ -563,7 +567,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.18 $
+ * \version $Revision: 1.19 $
  */
 
 //-------------------------------------------------------------

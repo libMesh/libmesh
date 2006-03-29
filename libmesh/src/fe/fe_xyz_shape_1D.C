@@ -1,4 +1,4 @@
-// $Id: fe_xyz_shape_1D.C,v 1.5 2005-02-22 22:17:37 jwpeterson Exp $
+// $Id: fe_xyz_shape_1D.C,v 1.6 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -76,8 +76,9 @@ Real FE<1,XYZ>::shape(const Elem* elem,
   const Real xc = centroid(0);
   const Real dx = x - xc;
 
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
 	
-  switch (order)
+  switch (totalorder)
     {
       // monomials. since they are heirarchic we only need one case block.
     case FIRST:
@@ -168,8 +169,9 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
   const Real xc = centroid(0);
   const Real dx = x - xc;
 
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
 	
-  switch (order)
+  switch (totalorder)
     {      
       // monomials. since they are heirarchic we only need one case block.
     case CONSTANT:

@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.38 2005-09-30 13:39:58 roystgnr Exp $
+// $Id: fe_boundary.C,v 1.39 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -78,11 +78,13 @@ void FE<Dim,T>::reinit(const Elem* elem,
   const AutoPtr<Elem> side(elem->build_side(s));
 
   // initialize quadrature rule
-  qrule->init(side->type());
+  qrule->init(side->type(), elem->p_level());
 
   // The last side we computed the shape functions for
   static unsigned int last_s = libMesh::invalid_uint;
 
+  // FIXME - could this break if the same FE object was used
+  // for both volume and face integrals? - RHS
   // We might not need to reinitialize the shape functions
   if ((this->get_type() != elem->type()) ||
       (s != last_s) ||
@@ -132,7 +134,7 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
   const AutoPtr<Elem> edge(elem->build_edge(e));
 
   // initialize quadrature rule
-  qrule->init(edge->type());
+  qrule->init(edge->type(), elem->p_level());
 
   // The last edge we computed the shape functions for
   static unsigned int last_e = libMesh::invalid_uint;

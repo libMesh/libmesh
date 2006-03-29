@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.27 2005-06-14 16:30:43 spetersen Exp $
+// $Id: fe_lagrange.C,v 1.28 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,11 +41,13 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
 
+  const Order totalorder = static_cast<Order>(order+elem->p_level());
+
   nodal_soln.resize(n_nodes);
 
 
   
-  switch (order)
+  switch (totalorder)
     {
       // linear Lagrange shape functions
     case FIRST:
@@ -650,7 +652,8 @@ void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 
   assert (elem != NULL);
 
-  const FEType& fe_type = dof_map.variable_type(variable_number);
+  FEType fe_type = dof_map.variable_type(variable_number);
+  fe_type.order = static_cast<Order>(fe_type.order + elem->p_level());
 
   std::vector<unsigned int> my_dof_indices, parent_dof_indices;
 

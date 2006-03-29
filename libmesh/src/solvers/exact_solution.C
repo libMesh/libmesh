@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.22 2005-12-28 13:47:10 spetersen Exp $
+// $Id: exact_solution.C,v 1.23 2006-03-29 18:47:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -313,10 +313,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
       const unsigned int n_qp = qrule->n_points();
 
       // The number of shape functions
-      const unsigned int n_sf = FEInterface::n_shape_functions (_mesh.mesh_dimension(),
-								fe_type,
-								elem->type());
-      assert (n_sf == dof_indices.size());
+      const unsigned int n_sf = dof_indices.size();
 
       //
       // Begin the loop over the Quadrature points.

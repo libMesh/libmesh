@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.19 2006-03-16 21:03:59 benkirk Exp $
+// $Id: system.h,v 1.20 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -261,6 +261,14 @@ public:
   NumericVector<Number> & add_vector (const std::string& vec_name,
 				      const bool projections=true);
 
+  /**
+   * Tells the System whether or not to project the solution vector onto new
+   * grids when the system is reinitialized.  The solution will be projected
+   * unless project_solution_on_reinit(false) is called.
+   */
+  void project_solution_on_reinit(bool b)
+    { _solution_projection = b; }
+  
   /**
    * @returns \p true if this \p System has a vector associated with the
    * given name, \p false otherwise.
@@ -599,6 +607,13 @@ private:
    * onto a changed grid, false if it should be zeroed.
    */
   std::map<std::string, bool> _vector_projections;
+
+  /**
+   * Holds true if the solution vector should be projected
+   * onto a changed grid, false if it should be zeroed.
+   * This is true by default.
+   */
+  bool _solution_projection;
 
   /**
    * \p true when additional vectors may still be added, \p false otherwise.

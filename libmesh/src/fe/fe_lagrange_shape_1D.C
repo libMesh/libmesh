@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_1D.C,v 1.14 2005-06-13 14:54:32 knezed01 Exp $
+// $Id: fe_lagrange_shape_1D.C,v 1.15 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -130,7 +130,7 @@ Real FE<1,LAGRANGE>::shape(const Elem* elem,
 {
   assert (elem != NULL);
   
-  return FE<1,LAGRANGE>::shape(elem->type(), order, i, p);
+  return FE<1,LAGRANGE>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
 }
 
 
@@ -243,7 +243,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const Elem* elem,
   assert (elem != NULL);
   
   return FE<1,LAGRANGE>::shape_deriv(elem->type(),
-				     order, i, j, p);
+				     static_cast<Order>(order + elem->p_level()), i, j, p);
 }
 
 
@@ -343,5 +343,5 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const Elem* elem,
   assert (elem != NULL);
   
   return FE<1,LAGRANGE>::shape_second_deriv(elem->type(),
-				            order, i, j, p);
+				            static_cast<Order>(order + elem->p_level()), i, j, p);
 }

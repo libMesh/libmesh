@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.17 2006-03-27 23:58:23 roystgnr Exp $
+// $Id: fe_base.h,v 1.18 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -490,7 +490,7 @@ public:
   /**
    * @returns the approximation order of the finite element.
    */
-  Order get_order()  const { return fe_type.order; }
+  Order get_order()  const { return static_cast<Order>(fe_type.order + _p_level); }
 
   /**
    * @returns the continuity level of the finite element.
@@ -1101,6 +1101,12 @@ protected:
   ElemType elem_type;
 
   /**
+   * The p refinement level the current data structures are
+   * set up for.
+   */
+  unsigned int _p_level;
+
+  /**
    * A pointer to the quadrature rule employed
    */
   QBase* qrule;
@@ -1153,6 +1159,7 @@ FEBase::FEBase(const unsigned int d,
   calculate_d2phi(false),
   fe_type(fet),
   elem_type(INVALID_ELEM),
+  _p_level(0),
   qrule(NULL),
   shapes_on_quadrature(false)
 {

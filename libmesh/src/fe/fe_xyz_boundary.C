@@ -1,4 +1,4 @@
-// $Id: fe_xyz_boundary.C,v 1.4 2005-02-22 22:17:37 jwpeterson Exp $
+// $Id: fe_xyz_boundary.C,v 1.5 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
   const AutoPtr<Elem> side(elem->build_side(s));
 
   // initialize quadrature rule
-  this->qrule->init(side->type());
+  this->qrule->init(side->type(), elem->p_level());
 
   // We might not need to reinitialize the shape functions.
   // Note that the face shape functions are LAGRANGE and only
@@ -201,13 +201,13 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	  for (unsigned int p=0; p<n_qp; p++)
 	    {
-	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, this->xyz[p]);
+	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, this->xyz[p]);
 
 	      this->dphi[i][p](0) =
-		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, this->xyz[p]);
+		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, this->xyz[p]);
 	      
 	      this->dphi[i][p](1) =
-		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, this->xyz[p]);
+		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, this->xyz[p]);
 	      
 #if DIM == 3  
 	      this->dphi[i][p](2) = // can only assign to the Z component if DIM==3
@@ -324,16 +324,16 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	  for (unsigned int p=0; p<n_qp; p++)
 	    {
-	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->get_order(), i, this->xyz[p]);
+	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, this->xyz[p]);
 	       
 	      this->dphi[i][p](0) =
-		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 0, this->xyz[p]);
+		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, this->xyz[p]);
 		
 	      this->dphi[i][p](1) =
-		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 1, this->xyz[p]);
+		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, this->xyz[p]);
 		
 	      this->dphi[i][p](2) =
-		this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->get_order(), i, 2, this->xyz[p]);	      
+		this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 2, this->xyz[p]);	      
 	    }
 
 	// done computing face values

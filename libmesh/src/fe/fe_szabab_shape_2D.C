@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_2D.C,v 1.12 2005-05-12 17:01:24 spetersen Exp $
+// $Id: fe_szabab_shape_2D.C,v 1.13 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -71,11 +71,13 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
   
   const ElemType type = elem->type();
 
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
+
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
   using Utility::pow;
   
-  switch (order)
+  switch (totalorder)
     {      
       // 1st & 2nd-order Szabo-Babuska.
     case FIRST:
@@ -123,8 +125,8 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
 	      
-	      return (FE<1,SZABAB>::shape(EDGE3, order, i0[i], xi)*
-		      FE<1,SZABAB>::shape(EDGE3, order, i1[i], eta));
+	      return (FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
+		      FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
 	      
 	    }
 
@@ -220,8 +222,8 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		  break;
 		}	      
 	      
-	      return f*(FE<1,SZABAB>::shape(EDGE3, order, i0[i], xi)*
-			FE<1,SZABAB>::shape(EDGE3, order, i1[i], eta));
+	      return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
+			FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
 	    }
 
 	  default:
@@ -318,8 +320,8 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		  break;
 		}	      
    	      
-	      return f*(FE<1,SZABAB>::shape(EDGE3, order, i0[i], xi)*
-			FE<1,SZABAB>::shape(EDGE3, order, i1[i], eta));
+	      return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
+			FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
 	    }
 	    
 	  default:
@@ -429,8 +431,8 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		  break;
 		}	     
 	      
-	      return f*(FE<1,SZABAB>::shape(EDGE3, order, i0[i], xi)*
-			FE<1,SZABAB>::shape(EDGE3, order, i1[i], eta));	      
+	      return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
+			FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));	      
 
 	    } // case QUAD8/QUAD9
 
@@ -550,8 +552,8 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		  break;
 		}	     
 	      
-	      return f*(FE<1,SZABAB>::shape(EDGE3, order, i0[i], xi)*
-			FE<1,SZABAB>::shape(EDGE3, order, i1[i], eta));
+	      return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
+			FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
 
 	    } // case QUAD8/QUAD9
 
@@ -687,8 +689,8 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		  break;
 		}	     
 	      
-	      return f*(FE<1,SZABAB>::shape(EDGE3, order, i0[i], xi)*
-			FE<1,SZABAB>::shape(EDGE3, order, i1[i], eta));	      
+	      return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
+			FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));	      
 
 	    } // case QUAD8/QUAD9
 	    
@@ -742,8 +744,10 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
   assert (elem != NULL);
 
   const ElemType type = elem->type();
+
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
   
-  switch (order)
+  switch (totalorder)
     {
 
       // 1st & 2nd-order Szabo-Babuska.
@@ -810,13 +814,13 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		      
-		  return (FE<1,SZABAB>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			  FE<1,SZABAB>::shape      (EDGE3, order, i1[i],    eta));
+		  return (FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			  FE<1,SZABAB>::shape      (EDGE3, totalorder, i1[i],    eta));
 
 		  // d()/deta
 		case 1:		      
-		  return (FE<1,SZABAB>::shape      (EDGE3, order, i0[i],    xi)*
-			  FE<1,SZABAB>::shape_deriv(EDGE3, order, i1[i], 0, eta));
+		  return (FE<1,SZABAB>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			  FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
 		  error();
@@ -910,13 +914,13 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		  		  
-		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			    FE<1,SZABAB>::shape      (EDGE3, order, i1[i],    eta));
+		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			    FE<1,SZABAB>::shape      (EDGE3, totalorder, i1[i],    eta));
 	      
 		  // d()/deta
 		case 1:		  		  
-		  return f*(FE<1,SZABAB>::shape      (EDGE3, order, i0[i],    xi)*
-			    FE<1,SZABAB>::shape_deriv(EDGE3, order, i1[i], 0, eta));
+		  return f*(FE<1,SZABAB>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
 		  error();
@@ -1013,13 +1017,13 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		  		  
-		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			    FE<1,SZABAB>::shape      (EDGE3, order, i1[i],    eta));
+		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			    FE<1,SZABAB>::shape      (EDGE3, totalorder, i1[i],    eta));
 	      
 		  // d()/deta
 		case 1:		  		  
-		  return f*(FE<1,SZABAB>::shape      (EDGE3, order, i0[i],    xi)*
-			    FE<1,SZABAB>::shape_deriv(EDGE3, order, i1[i], 0, eta));
+		  return f*(FE<1,SZABAB>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
 		  error();
@@ -1120,13 +1124,13 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		  		  
-		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			    FE<1,SZABAB>::shape      (EDGE3, order, i1[i],    eta));
+		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			    FE<1,SZABAB>::shape      (EDGE3, totalorder, i1[i],    eta));
 	      
 		  // d()/deta
 		case 1:		  		  
-		  return f*(FE<1,SZABAB>::shape      (EDGE3, order, i0[i],    xi)*
-			    FE<1,SZABAB>::shape_deriv(EDGE3, order, i1[i], 0, eta));
+		  return f*(FE<1,SZABAB>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
 		  error();
@@ -1225,13 +1229,13 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		  		  
-		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			    FE<1,SZABAB>::shape      (EDGE3, order, i1[i],    eta));
+		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			    FE<1,SZABAB>::shape      (EDGE3, totalorder, i1[i],    eta));
 	      
 		  // d()/deta
 		case 1:		  		  
-		  return f*(FE<1,SZABAB>::shape      (EDGE3, order, i0[i],    xi)*
-			    FE<1,SZABAB>::shape_deriv(EDGE3, order, i1[i], 0, eta));
+		  return f*(FE<1,SZABAB>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
 		  error();
@@ -1334,13 +1338,13 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		  		  
-		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			    FE<1,SZABAB>::shape      (EDGE3, order, i1[i],    eta));
+		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			    FE<1,SZABAB>::shape      (EDGE3, totalorder, i1[i],    eta));
 		  
 		  // d()/deta
 		case 1:		  		  
-		  return f*(FE<1,SZABAB>::shape      (EDGE3, order, i0[i],    xi)*
-			    FE<1,SZABAB>::shape_deriv(EDGE3, order, i1[i], 0, eta));
+		  return f*(FE<1,SZABAB>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 		  
 		default:
 		  error();

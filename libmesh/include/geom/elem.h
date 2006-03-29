@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.35 2006-03-28 00:04:07 roystgnr Exp $
+// $Id: elem.h,v 1.36 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -182,6 +182,20 @@ class Elem : public ReferenceCountedObject<Elem>,
    * of this element, \p false otherwise.
    */
   bool is_neighbor (const Elem* elem) const;
+  
+  /**
+   * If the element \p elem in question is a neighbor
+   * of a child of this element, this returns a pointer
+   * to that child.  Otherwise it returns NULL.
+   */
+  Elem* child_neighbor (Elem* elem) const;
+  
+  /**
+   * If the element \p elem in question is a neighbor
+   * of a child of this element, this returns a pointer
+   * to that child.  Otherwise it returns NULL.
+   */
+  const Elem* child_neighbor (const Elem* elem) const;
   
   /**
    * @returns \p true if this element has a side coincident
@@ -896,7 +910,10 @@ Elem::Elem(const unsigned int nn,
 
   this->set_p_refinement_flag(Elem::DO_NOTHING);
 
-  this->set_p_level(0);
+  if (this->parent())
+    this->set_p_level(parent()->p_level());
+  else
+    this->set_p_level(0);
 
 #endif  
 }
@@ -1027,6 +1044,30 @@ bool Elem::is_neighbor (const Elem* elem) const
       return true;
 
   return false;
+}
+
+
+
+inline
+Elem* Elem::child_neighbor (Elem* elem) const
+{
+  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+    if (elem->neighbor(n)->parent() == this)
+      return elem->neighbor(n);
+
+  return NULL;
+}
+
+
+
+inline
+const Elem* Elem::child_neighbor (const Elem* elem) const
+{
+  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+    if (elem->neighbor(n)->parent() == this)
+      return elem->neighbor(n);
+
+  return NULL;
 }
 
 
