@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.12 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_interface.h,v 1.13 2006-03-29 19:16:39 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 #include <map>
 
 // Local includes
-#include "point.h"
+#include "libmesh_common.h"
 #include "enum_elem_type.h"
 
 
@@ -37,6 +37,7 @@ class DofMap;
 class Elem;
 class FEType;
 class FEComputeData;
+class Point;
 
 
 /**
