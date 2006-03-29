@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.13 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.14 2006-03-29 19:41:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,11 +44,11 @@
 #include "libmesh_common.h"
 #include "libmesh.h" // libMesh::invalid_uint
 
-#include "node.h" // remove this when debugging is done, only need forward dec.
+//#include "node.h" // remove this when debugging is done, only need forward dec.
 
 class MeshBase;
 class Point;
-//class Node;
+class Node;
 class Elem;
 class ErrorVector;
 

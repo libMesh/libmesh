@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.9 2006-03-29 19:16:40 roystgnr Exp $
+// $Id: mesh_function.C,v 1.10 2006-03-29 19:41:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 // Local Includes
 #include "mesh_function.h"
+#include "dense_vector.h"
 #include "equation_systems.h"
 #include "numeric_vector.h"
 #include "dof_map.h"
