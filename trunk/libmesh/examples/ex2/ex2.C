@@ -1,4 +1,4 @@
-/* $Id: ex2.C,v 1.18 2005-06-06 17:50:35 jwpeterson Exp $ */
+/* $Id: ex2.C,v 1.19 2006-03-29 21:00:56 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -52,7 +52,8 @@
 #include "mesh_generation.h"
 // Include file that defines (possibly multiple) systems of equations.
 #include "equation_systems.h"
-// Include file that defines a simple steady system
+// Include files that define a simple steady system
+#include "linear_implicit_system.h"
 #include "transient_system.h"
 
 int main (int argc, char** argv)
