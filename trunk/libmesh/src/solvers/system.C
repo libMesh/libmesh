@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.25 2006-03-16 21:04:00 benkirk Exp $
+// $Id: system.C,v 1.26 2006-03-29 18:47:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -52,6 +52,7 @@ System::System (EquationSystems& es,
   _sys_name                (name),
   _sys_number              (number),
   _active                  (true),
+  _solution_projection     (true),
   _can_add_vectors         (true),
   _additional_data_written (false)
 {
@@ -240,7 +241,14 @@ void System::restrict_vectors ()
     }
 
   // Restrict the current local solution on the coarsened cells
-  this->project_vector (*current_local_solution);
+  if (_solution_projection)
+    this->project_vector (*current_local_solution);
+  else
+    {
+      current_local_solution->clear();
+      current_local_solution->init(this->n_dofs(),
+                                   this->n_local_dofs());
+    }
 #endif
 }
 

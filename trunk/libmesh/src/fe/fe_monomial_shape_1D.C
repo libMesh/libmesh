@@ -1,4 +1,4 @@
-// $Id: fe_monomial_shape_1D.C,v 1.13 2005-02-22 22:17:37 jwpeterson Exp $
+// $Id: fe_monomial_shape_1D.C,v 1.14 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -90,7 +90,7 @@ Real FE<1,MONOMIAL>::shape(const Elem* elem,
 {
   assert (elem != NULL);
   
-  return FE<1,MONOMIAL>::shape(elem->type(), order, i, p);
+  return FE<1,MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
 }
 
 
@@ -167,7 +167,7 @@ Real FE<1,MONOMIAL>::shape_deriv(const Elem* elem,
   assert (elem != NULL);
   
   return FE<1,MONOMIAL>::shape_deriv(elem->type(),
-				     order, i, j, p);
+				     static_cast<Order>(order + elem->p_level()), i, j, p);
 }
 
 
@@ -242,5 +242,5 @@ Real FE<1,MONOMIAL>::shape_second_deriv(const Elem* elem,
   assert (elem != NULL);
   
   return FE<1,MONOMIAL>::shape_second_deriv(elem->type(),
-				            order, i, j, p);
+				            static_cast<Order>(order + elem->p_level()), i, j, p);
 }

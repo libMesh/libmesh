@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_2D.C,v 1.3 2005-09-02 18:48:55 roystgnr Exp $
+// $Id: fe_hermite_shape_2D.C,v 1.4 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -125,7 +125,9 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 
   const ElemType type = elem->type();
   
-  switch (order)
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  
+  switch (totalorder)
     {      
       // 3rd-order bicubic Hermite functions
     case THIRD:
@@ -193,7 +195,9 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
 
   const ElemType type = elem->type();
   
-  switch (order)
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  
+  switch (totalorder)
     {      
       // 3rd-order bicubic Hermite functions
     case THIRD:
@@ -253,7 +257,9 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
 
   const ElemType type = elem->type();
   
-  switch (order)
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  
+  switch (totalorder)
     {      
       // 3rd-order bicubic Hermite functions
     case THIRD:

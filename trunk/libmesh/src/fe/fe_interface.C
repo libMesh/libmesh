@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.39 2006-03-26 00:12:12 roystgnr Exp $
+// $Id: fe_interface.C,v 1.40 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1753,7 +1753,10 @@ void FEInterface::compute_data(const unsigned int dim,
 
 #endif
 
-  const unsigned int n_dof = n_dofs (dim, fe_t, elem->type());
+  FEType p_refined = fe_t;
+  p_refined.order = static_cast<Order>(p_refined.order + elem->p_level());
+
+  const unsigned int n_dof = n_dofs (dim, p_refined, elem->type());
   const Point&       p     = data.p;
   data.shape.resize(n_dof);
 
@@ -1761,7 +1764,7 @@ void FEInterface::compute_data(const unsigned int dim,
   data.init();
 
   for (unsigned int n=0; n<n_dof; n++)
-      data.shape[n] = shape(dim, fe_t, elem, n, p);
+      data.shape[n] = shape(dim, p_refined, elem, n, p);
 
    return;
 }

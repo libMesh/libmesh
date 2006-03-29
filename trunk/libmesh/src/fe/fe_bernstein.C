@@ -1,4 +1,4 @@
-// $Id: fe_bernstein.C,v 1.1 2005-05-10 17:48:41 spetersen Exp $
+// $Id: fe_bernstein.C,v 1.2 2006-03-29 18:47:23 roystgnr Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,9 +45,10 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 
   nodal_soln.resize(n_nodes);
 
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
 
   
-  switch (order)
+  switch (totalorder)
     {
       // Constant shape functions
     case CONSTANT:
@@ -74,7 +75,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
       {
 
 	const unsigned int n_sf =
-	  FE<Dim,T>::n_shape_functions(type, order);
+	  FE<Dim,T>::n_shape_functions(type, totalorder);
 	
 	for (unsigned int n=0; n<n_nodes; n++)
 	  {
@@ -1388,11 +1389,12 @@ template <unsigned int Dim, FEFamily T>
 bool FE<Dim,T>::shapes_need_reinit() const
 {
   // reinit is only necessary for
-  // approximation orders >= 3
-  if(this->fe_type.order == FIRST ||
-     this->fe_type.order == SECOND)
-    return false;
-  else
+  // approximation orders >= 3,
+  // but we might reach that with p refinement
+//  if(this->fe_type.order == FIRST ||
+//     this->fe_type.order == SECOND)
+//    return false;
+//  else
     return true;
 }
 

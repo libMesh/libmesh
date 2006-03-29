@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_3D.C,v 1.5 2006-03-01 22:48:28 roystgnr Exp $
+// $Id: fe_hermite_shape_3D.C,v 1.6 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -144,7 +144,9 @@ Real FE<3,HERMITE>::shape(const Elem* elem,
 
   const ElemType type = elem->type();
   
-  switch (order)
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  
+  switch (totalorder)
     {      
       // 3rd-order tricubic Hermite functions
     case THIRD:
@@ -214,7 +216,9 @@ Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
 
   const ElemType type = elem->type();
   
-  switch (order)
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  
+  switch (totalorder)
     {      
       // 3rd-order tricubic Hermite functions
     case THIRD:
@@ -284,7 +288,9 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
 
   const ElemType type = elem->type();
   
-  switch (order)
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  
+  switch (totalorder)
     {      
       // 3rd-order tricubic Hermite functions
     case THIRD:

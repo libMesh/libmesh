@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.12 2005-08-22 18:57:31 knezed01 Exp $
+// $Id: mesh_refinement.h,v 1.13 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -168,6 +168,17 @@ public:
    */
   void uniformly_coarsen (unsigned int n=1,
 			  const bool maintain_level_one=true);
+  
+  /**
+   * Uniformly p refines the mesh \p n times.
+   */
+  void uniformly_p_refine (unsigned int n=1);
+  
+  /**
+   * Attempts to uniformly p coarsen the mesh \p n times.
+   */
+  void uniformly_p_coarsen (unsigned int n=1,
+			    const bool maintain_level_one=true);
   
   /**
    * Add point \p p to the mesh. The function returns a pointer to

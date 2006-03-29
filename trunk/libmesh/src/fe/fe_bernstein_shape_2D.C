@@ -1,4 +1,4 @@
-// $Id: fe_bernstein_shape_2D.C,v 1.2 2005-12-22 18:16:59 spetersen Exp $
+// $Id: fe_bernstein_shape_2D.C,v 1.3 2006-03-29 18:47:23 roystgnr Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -53,12 +53,14 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
   assert (elem != NULL);
 
   const ElemType type = elem->type();
+
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
   
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
   using Utility::pow;
   
-  switch (order)
+  switch (totalorder)
     {      
       
     case FIRST:
@@ -94,8 +96,8 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    static const unsigned int i0[] = {0, 1, 1, 0};
 	    static const unsigned int i1[] = {0, 0, 1, 1};
 	    
-	    return (FE<1,BERNSTEIN>::shape(EDGE3, order, i0[i], xi)*
-		    FE<1,BERNSTEIN>::shape(EDGE3, order, i1[i], eta));
+	    return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi)*
+		    FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta));
 	    
 	  }
 	default:
@@ -138,11 +140,11 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
 	    static const Real scal[] = {-0.25, -0.25, -0.25, -0.25, 0.5, 0.5, 0.5, 0.5};
 	    
-	    return (FE<1,BERNSTEIN>::shape(EDGE3, order, i0[i], xi)*
-		    FE<1,BERNSTEIN>::shape(EDGE3, order, i1[i], eta)
+	    return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi)*
+		    FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta)
 		    +scal[i]*
-		    FE<1,BERNSTEIN>::shape(EDGE3, order, i0[8], xi)*
-		    FE<1,BERNSTEIN>::shape(EDGE3, order, i1[8], eta));
+		    FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[8], xi)*
+		    FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[8], eta));
 	    
 	    //B_t,i0(i)|xi * B_s,i1(i)|eta + scal(i) * B_t,2|xi * B_t,2|eta 
 	  }
@@ -160,8 +162,8 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
 	    static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
 	    
-	    return (FE<1,BERNSTEIN>::shape(EDGE3, order, i0[i], xi)*
-		    FE<1,BERNSTEIN>::shape(EDGE3, order, i1[i], eta));
+	    return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi)*
+		    FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta));
 	    
 	  }
 	default:
@@ -292,8 +294,8 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	      }
 		
 	    
-	    return (FE<1,BERNSTEIN>::shape(EDGE3, order, i0, xi)*
-		    FE<1,BERNSTEIN>::shape(EDGE3, order, i1, eta));
+	    return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0, xi)*
+		    FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1, eta));
 	    
 	  }
 	  
@@ -370,8 +372,8 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    if((i>=10&&i<=12) && elem->node(3) > elem->node(2)) i0=6-i0;
 	    if((i>=13&&i<=15) && elem->node(0) > elem->node(3)) i1=6-i1;
 	    
-	    return (FE<1,BERNSTEIN>::shape(EDGE3, order, i0, xi)*
-		    FE<1,BERNSTEIN>::shape(EDGE3, order, i1, eta));
+	    return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0, xi)*
+		    FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1, eta));
 	    
 	  }
 	  
@@ -453,8 +455,8 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    if((i>=12&&i<=15) && elem->node(3) > elem->node(2)) i0=7-i0;
 	    if((i>=16&&i<=19) && elem->node(0) > elem->node(3)) i1=7-i1;      
 	    
-	    return (FE<1,BERNSTEIN>::shape(EDGE3, order, i0, xi)*
-		    FE<1,BERNSTEIN>::shape(EDGE3, order, i1, eta));
+	    return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0, xi)*
+		    FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1, eta));
 	    
 	  }
 	default:
@@ -542,8 +544,8 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    if((i>=14&&i<=18) && elem->node(3) > elem->node(2)) i0=8-i0;
 	    if((i>=19&&i<=23) && elem->node(0) > elem->node(3)) i1=8-i1;      
 	    
-	    return (FE<1,BERNSTEIN>::shape(EDGE3, order, i0, xi)*
-		    FE<1,BERNSTEIN>::shape(EDGE3, order, i1, eta));
+	    return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0, xi)*
+		    FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1, eta));
 	    
 	  } // case QUAD8/9
 	  
@@ -592,8 +594,9 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
   
   const ElemType type = elem->type();
   
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
   
-  switch (order)
+  switch (totalorder)
     {            
       
       // 1st order Bernsteins are aquivalent to Lagrange elements.
@@ -657,13 +660,13 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		      
-		  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			  FE<1,BERNSTEIN>::shape      (EDGE3, order, i1[i],    eta));
+		  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			  FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta));
 		  
 		  // d()/deta
 		case 1:		      
-		  return (FE<1,BERNSTEIN>::shape      (EDGE3, order, i0[i],    xi)*
-			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i1[i], 0, eta));
+		  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 		  
 		default:
 		  error();
@@ -734,19 +737,19 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		      
-		  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			  FE<1,BERNSTEIN>::shape      (EDGE3, order, i1[i],    eta)
+		  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			  FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta)
 			  +scal[i]*
-			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i0[8], 0, xi)*
-			  FE<1,BERNSTEIN>::shape      (EDGE3, order, i1[8],    eta));
+			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[8], 0, xi)*
+			  FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[8],    eta));
 		  
 		  // d()/deta
 		case 1:		      
-		  return (FE<1,BERNSTEIN>::shape      (EDGE3, order, i0[i],    xi)*
-			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i1[i], 0, eta)
+		  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta)
 			  +scal[i]*
-			  FE<1,BERNSTEIN>::shape      (EDGE3, order, i0[8],    xi)*
-			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i1[8], 0, eta));
+			  FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[8],    xi)*
+			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[8], 0, eta));
 
 		default:
 		  error();
@@ -771,13 +774,13 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		      
-		  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i0[i], 0, xi)*
-			  FE<1,BERNSTEIN>::shape      (EDGE3, order, i1[i],    eta));
+		  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
+			  FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta));
 		  
 		  // d()/deta
 		case 1:		      
-		  return (FE<1,BERNSTEIN>::shape      (EDGE3, order, i0[i],    xi)*
-			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i1[i], 0, eta));
+		  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],    xi)*
+			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 		  
 		default:
 		  error();
@@ -823,8 +826,8 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		    const Point pp(p(0)+eps, p(1));
 		    const Point pm(p(0)-eps, p(1));
 
-		    return (FE<2,BERNSTEIN>::shape(elem, order, shape, pp) -
-			    FE<2,BERNSTEIN>::shape(elem, order, shape, pm))/2./eps;
+		    return (FE<2,BERNSTEIN>::shape(elem, totalorder, shape, pp) -
+			    FE<2,BERNSTEIN>::shape(elem, totalorder, shape, pm))/2./eps;
 		  }
 		  
 		  // d()/deta
@@ -833,8 +836,8 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		    const Point pp(p(0), p(1)+eps);
 		    const Point pm(p(0), p(1)-eps);
 		    
-		    return (FE<2,BERNSTEIN>::shape(elem, order, shape, pp) -
-			    FE<2,BERNSTEIN>::shape(elem, order, shape, pm))/2./eps;
+		    return (FE<2,BERNSTEIN>::shape(elem, totalorder, shape, pp) -
+			    FE<2,BERNSTEIN>::shape(elem, totalorder, shape, pm))/2./eps;
 		  }
 		  
 		  
@@ -871,13 +874,13 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		{
 			  // d()/dxi
 		case 0:		  		  
-		  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i0, 0, xi)*
-			  FE<1,BERNSTEIN>::shape      (EDGE3, order, i1,    eta));
+		  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0, 0, xi)*
+			  FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1,    eta));
 		  
 		  // d()/deta
 		case 1:		  		  
-		  return (FE<1,BERNSTEIN>::shape      (EDGE3, order, i0,    xi)*
-			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i1, 0, eta));
+		  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0,    xi)*
+			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 		  
 		default:
 		  error();
@@ -966,13 +969,13 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  {
 		    // d()/dxi
 		  case 0:		  		  
-		    return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i0, 0, xi)*
-			    FE<1,BERNSTEIN>::shape      (EDGE3, order, i1,    eta));
+		    return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0, 0, xi)*
+			    FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1,    eta));
 		    
 		  // d()/deta
 		  case 1:		  		  
-		    return (FE<1,BERNSTEIN>::shape      (EDGE3, order, i0,    xi)*
-			    FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i1, 0, eta));
+		    return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0,    xi)*
+			    FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 		    
 		default:
 		  error();
@@ -1061,13 +1064,13 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		      {
 			// d()/dxi
 		      case 0:		  		  
-			return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i0, 0, xi)*
-				FE<1,BERNSTEIN>::shape      (EDGE3, order, i1,    eta));
+			return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0, 0, xi)*
+				FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1,    eta));
 			
 			// d()/deta
 		      case 1:		  		  
-			return (FE<1,BERNSTEIN>::shape      (EDGE3, order, i0,    xi)*
-				FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i1, 0, eta));
+			return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0,    xi)*
+				FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 			
 		      default:
 			error();
@@ -1155,13 +1158,13 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		{
 		  // d()/dxi
 		case 0:		  		  
-		  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i0, 0, xi)*
-			  FE<1,BERNSTEIN>::shape      (EDGE3, order, i1,    eta));
+		  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0, 0, xi)*
+			  FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1,    eta));
 		  
 		  // d()/deta
 		case 1:		  		  
-		  return (FE<1,BERNSTEIN>::shape      (EDGE3, order, i0,    xi)*
-			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, order, i1, 0, eta));
+		  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0,    xi)*
+			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 
 		default:
 		  error();

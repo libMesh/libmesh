@@ -1,4 +1,4 @@
-// $Id: fe_clough_shape_3D.C,v 1.3 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: fe_clough_shape_3D.C,v 1.4 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -173,7 +173,7 @@ Real FE<3,CLOUGH>::shape(const ElemType,
 template <>
 Real FE<3,CLOUGH>::shape(const Elem* elem,
 			     const Order order,
-			     const unsigned int i,
+			     const unsigned int,
 			     const Point&)
 {
   assert (elem != NULL);
@@ -187,23 +187,13 @@ Real FE<3,CLOUGH>::shape(const Elem* elem,
 
   const ElemType type = elem->type();
   
-  switch (order)
+  switch (order+elem->p_level())
     {      
       // 3rd-order Clough-Tocher element
     case THIRD:
       {
 	switch (type)
 	  {
-	    // C1 functions on the Clough-Tocher triangle.
-	  case TRI6:
-	    {
-	      switch (i)
-		{
-		case 0:
-		default:
-		  error();
-		}
-	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
 	    error();
@@ -241,7 +231,7 @@ Real FE<3,CLOUGH>::shape_deriv(const ElemType,
 template <>
 Real FE<3,CLOUGH>::shape_deriv(const Elem* elem,
 				   const Order order,
-				   const unsigned int i,
+				   const unsigned int,
 				   const unsigned int,
 				   const Point&)
 {
@@ -256,23 +246,13 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem* elem,
 
   const ElemType type = elem->type();
   
-  switch (order)
+  switch (order+elem->p_level())
     {      
       // 3rd-order Clough-Tocher element
     case THIRD:
       {
 	switch (type)
 	  {
-	    // C1 functions on the Clough-Tocher triangle.
-	  case TRI6:
-	    {
-	      switch (i)
-		{
-		case 0:
-		default:
-		  error();
-		}
-	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
 	    error();
@@ -293,7 +273,7 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem* elem,
 template <>
 Real FE<3,CLOUGH>::shape_second_deriv(const Elem* elem,
                                       const Order order,
-                                      const unsigned int i,
+                                      const unsigned int,
                                       const unsigned int,
                                       const Point&)
 {
@@ -308,23 +288,13 @@ Real FE<3,CLOUGH>::shape_second_deriv(const Elem* elem,
 
   const ElemType type = elem->type();
   
-  switch (order)
+  switch (order+elem->p_level())
     {      
       // 3rd-order Clough-Tocher element
     case THIRD:
       {
 	switch (type)
 	  {
-	    // C1 functions on the Clough-Tocher triangle.
-	  case TRI6:
-	    {
-	      switch (i)
-		{
-		case 0:
-		default:
-		  error();
-		}
-	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
 	    error();

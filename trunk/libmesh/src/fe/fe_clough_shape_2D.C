@@ -1,4 +1,4 @@
-// $Id: fe_clough_shape_2D.C,v 1.6 2005-07-22 18:33:06 roystgnr Exp $
+// $Id: fe_clough_shape_2D.C,v 1.7 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1460,7 +1460,9 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
 
   const ElemType type = elem->type();
   
-  switch (order)
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
+
+  switch (totalorder)
     {      
       // 2nd-order restricted Clough-Tocher element
     case SECOND:
@@ -1658,7 +1660,9 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
 
   const ElemType type = elem->type();
   
-  switch (order)
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
+
+  switch (totalorder)
     {      
       // 2nd-order restricted Clough-Tocher element
     case SECOND:
@@ -1839,7 +1843,9 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
 
   const ElemType type = elem->type();
   
-  switch (order)
+  const Order totalorder = static_cast<Order>(order + elem->p_level());
+
+  switch (totalorder)
     {      
       // 2nd-order restricted Clough-Tocher element
     case SECOND:

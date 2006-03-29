@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.86 2006-03-16 00:00:46 roystgnr Exp $
+// $Id: dof_map.C,v 1.87 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -168,57 +168,58 @@ void DofMap::reinit(MeshBase& mesh)
   // Next allocate space for the DOF indices
   for (unsigned int var=0; var<this->n_variables(); var++)
     {
-      const FEType& fe_type = this->variable_type(var);
+      const FEType& base_fe_type = this->variable_type(var);
+	     
+      // This should be constant even on p-refined elements
+      const bool extra_hanging_dofs =
+	FEInterface::extra_hanging_dofs(base_fe_type);
 
       // For all the active elements
       MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
       const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
  
-      unsigned int vertex_dofs = 0;
-      bool extra_hanging_dofs =
-        FEInterface::extra_hanging_dofs(fe_type);
-
       // Count vertex degrees of freedom first
       for ( ; elem_it != elem_end; ++elem_it)
 	{
 	  Elem*    elem       = *elem_it;
 	  const ElemType type = elem->type();
+
+          FEType fe_type = base_fe_type;
+
+          // Make sure we haven't done more p refinement than we can
+          // handle
+          if (elem->p_level() > FEInterface::max_order(base_fe_type,
+                                                       type))
+            elem->set_p_level(FEInterface::max_order(base_fe_type,type));
+            
+
+	  fe_type.order = static_cast<Order>(fe_type.order +
+                                             elem->p_level());
 	     
 	  // Allocate the vertex DOFs
 	  for (unsigned int n=0; n<elem->n_nodes(); n++)
 	    {
 	      Node* node = elem->get_node(n);
 
-	      const unsigned int old_node_dofs =
-	        node->n_comp(this->sys_number(), var);
-
 	      if (elem->is_vertex(n))
 	        {
-                  if (!vertex_dofs)
-		    vertex_dofs = FEInterface::n_dofs_at_node(dim,
-							      fe_type,
-							      type,
-							      n);
-		  else
-		    assert(vertex_dofs ==
-			   FEInterface::n_dofs_at_node(dim, fe_type,
-						       type, n));
+	          const unsigned int old_node_dofs =
+	            node->n_comp(this->sys_number(), var);
+
+		  const unsigned int vertex_dofs =
+		    std::max(FEInterface::n_dofs_at_node(dim, fe_type,
+                                                         type, n),
+                             old_node_dofs);
 		  
 		  // Some discontinuous FEs have no vertex dofs
-		  if (vertex_dofs)
+		  if (vertex_dofs > old_node_dofs)
 		    {
-		      if (!old_node_dofs)
-			{
-			  node->set_n_comp(this->sys_number(),
-					   var,
-					   vertex_dofs);
-			  // Abusing dof_number to set a "this is a
-			  // vertex" flag
-			  node->set_dof_number(this->sys_number(),
-					       var, 0, 1);
-			}
-		      else
-			assert(vertex_dofs == old_node_dofs);
+		      node->set_n_comp(this->sys_number(), var,
+				       vertex_dofs);
+		      // Abusing dof_number to set a "this is a
+		      // vertex" flag
+		      node->set_dof_number(this->sys_number(),
+					   var, 0, vertex_dofs);
 		    }
 	        }
 	    }
@@ -231,6 +232,10 @@ void DofMap::reinit(MeshBase& mesh)
 	  Elem*    elem       = *elem_it;
 	  const ElemType type = elem->type();
 	     
+          FEType fe_type = base_fe_type;
+          fe_type.order = static_cast<Order>(fe_type.order +
+                                             elem->p_level());
+
 	  // Allocate the edge and face DOFs
 	  for (unsigned int n=0; n<elem->n_nodes(); n++)
 	    {
@@ -239,68 +244,61 @@ void DofMap::reinit(MeshBase& mesh)
 	      const unsigned int old_node_dofs =
 	        node->n_comp(this->sys_number(), var);
 
+              const unsigned int vertex_dofs = old_node_dofs?
+                node->dof_number (this->sys_number(),var,0):0;
+
 	      const unsigned int new_node_dofs =
 		FEInterface::n_dofs_at_node(dim, fe_type, type, n);
 
 	      // We've already allocated vertex DOFs
 	      if (elem->is_vertex(n))
 	        {
-		  assert(old_node_dofs >= new_node_dofs &&
-			 vertex_dofs == new_node_dofs);
+		  assert(old_node_dofs >= vertex_dofs);
+		  assert(vertex_dofs >= new_node_dofs);
 		}
 	      // We need to allocate the rest
 	      else
 	        {
-		  // If this has no dofs yet, it isn't another
-		  // element's vertex, so we just give it edge or face
-		  // dofs
+		  // If this has no dofs yet, it needs no vertex
+		  // dofs, so we just give it edge or face dofs
 		  if (!old_node_dofs)
-		    node->set_n_comp(this->sys_number(), var,
-				     new_node_dofs);
+                    {
+		      node->set_n_comp(this->sys_number(), var,
+				       new_node_dofs);
+		      // Abusing dof_number to set a "this has no
+		      // vertex dofs" flag
+                      if (new_node_dofs)
+		        node->set_dof_number(this->sys_number(),
+					     var, 0, 0);
+                    }
 
-		  // If this has dofs, but isn't another element's
-		  // unrevisited vertex, it should already have the
-		  // right number of edge or face dofs
+		  // If this has dofs, but has no vertex dofs,
+		  // it may still need more edge or face dofs if
+                  // we're p-refined.
 		  else if (node->dof_number(this->sys_number(), var, 0)
-			!= 1)
+			== 0)
 		    {
-		      if (extra_hanging_dofs)
-		        assert(old_node_dofs == new_node_dofs ||
-			       old_node_dofs == 
-			       vertex_dofs + new_node_dofs);
-		      else
-		        assert(old_node_dofs == new_node_dofs ||
-			       old_node_dofs == 
-			       std::max(vertex_dofs, new_node_dofs));
+                      if (new_node_dofs > old_node_dofs)
+		        node->set_n_comp(this->sys_number(), var,
+				         new_node_dofs);
 		    }
-		  // If this is another element's unrevisited vertex,
-		  // add any (non-overlapping) edge/face dofs if
+		  // If this is another element's vertex,
+		  // add more (non-overlapping) edge/face dofs if
 		  // necessary
 		  else if (extra_hanging_dofs)
 		    {
-		      assert(old_node_dofs == vertex_dofs);
-                      if (new_node_dofs)
+                      if (new_node_dofs > old_node_dofs - vertex_dofs)
 		        node->set_n_comp(this->sys_number(), var,
 				         vertex_dofs + new_node_dofs);
-                      else
-			node->set_dof_number(this->sys_number(),
-					     var, 0, 0);
-		      assert(node->dof_number(this->sys_number(), var,
-					      0) != 1);
 		    }
 		  // If this is another element's vertex, add any
 		  // (overlapping) edge/face dofs if necessary
 		  else
 		    {
-		      assert(old_node_dofs == vertex_dofs);
-                      if (new_node_dofs > vertex_dofs)
+		      assert(old_node_dofs >= vertex_dofs);
+                      if (new_node_dofs > old_node_dofs)
 		        node->set_n_comp(this->sys_number(), var,
 				         new_node_dofs);
-                      else
-			node->set_dof_number(this->sys_number(),
-					     var, 0, 0);
-		      assert(node->dof_number(this->sys_number(), var,
-					      0) != 1);
 		    }
 		}
 	    }
@@ -1136,7 +1134,10 @@ void DofMap::dof_indices (const Elem* const elem,
       { // Do this for all the variables if one was not specified
 	// or just for the specified variable
 
-	const FEType& fe_type = this->variable_type(v);
+        // Increase the polynomial order on p refined elements
+	FEType fe_type = this->variable_type(v);
+	fe_type.order = static_cast<Order>(fe_type.order +
+                                           elem->p_level());
 
 	const bool extra_hanging_dofs =
 	  FEInterface::extra_hanging_dofs(fe_type);
@@ -1152,7 +1153,7 @@ void DofMap::dof_indices (const Elem* const elem,
 	  {	    
 	    const Node* node      = elem->get_node(n);
 	    
-	    // There is a potential problem with AMR.  Imagine a
+	    // There is a potential problem with h refinement.  Imagine a
 	    // quad9 that has a linear FE on it.  Then, on the hanging side,
 	    // it can falsely identify a DOF at the mid-edge node. This is why
 	    // we call FEInterface instead of node->n_comp() directly.
@@ -1163,21 +1164,33 @@ void DofMap::dof_indices (const Elem* const elem,
 
 	    // If this is a non-vertex on a hanging node with extra
 	    // degrees of freedom, we use the non-vertex dofs (which
-	    // are numbered last)
-	    int dof_offset = 0;
+	    // come in reverse order starting from the end, to
+            // simplify p refinement)
 	    if (extra_hanging_dofs && !elem->is_vertex(n))
-	      dof_offset = node->n_comp(sys_num,v) - nc;
-	    
-	    // We should never have fewer dofs than necessary on a
-	    // node unless we're getting indices on a parent element,
-	    // and we should never need the indices on such a node
-	    if (dof_offset < 0)
-	      {
-		assert(!elem->active());
-		di.resize(di.size() + nc, DofObject::invalid_id);
-	      }
-	    else
-	      for (unsigned int i=dof_offset; i<nc+dof_offset; i++)
+              {
+		const int dof_offset = node->n_comp(sys_num,v) - nc;
+
+	        // We should never have fewer dofs than necessary on a
+	        // node unless we're getting indices on a parent element,
+	        // and we should never need the indices on such a node
+	        if (dof_offset < 0)
+	          {
+		    assert(!elem->active());
+		    di.resize(di.size() + nc, DofObject::invalid_id);
+	          }
+                else
+	          for (int i=node->n_comp(sys_num,v)-1; i>=dof_offset; i--)
+	            {
+		      assert (node->dof_number(sys_num,v,i) !=
+			      DofObject::invalid_id);
+		      di.push_back(node->dof_number(sys_num,v,i));
+	            }
+              }
+	    // If this is a vertex or an element without extra hanging
+            // dofs, our dofs come in forward order coming from the
+            // beginning
+            else
+	      for (unsigned int i=0; i<nc; i++)
 	        {
 		  assert (node->dof_number(sys_num,v,i) !=
 			  DofObject::invalid_id);
@@ -1194,7 +1207,7 @@ void DofMap::dof_indices (const Elem* const elem,
 	// and we should never need those indices
 	if (nc != 0)	  
 	  if (elem->n_systems() > sys_num &&
-	      nc == elem->n_comp(sys_num,v))
+	      nc <= elem->n_comp(sys_num,v))
 	    {
 	      for (unsigned int i=0; i<nc; i++)
 		{
@@ -1252,8 +1265,11 @@ void DofMap::old_dof_indices (const Elem* const elem,
       { // Do this for all the variables if one was not specified
 	// or just for the specified variable
 	
-	const FEType& fe_type = this->variable_type(v);
-	
+        // Increase the polynomial order on p refined elements
+	FEType fe_type = this->variable_type(v);
+	fe_type.order = static_cast<Order>(fe_type.order +
+                                           elem->p_level());
+
 	const bool extra_hanging_dofs =
 	  FEInterface::extra_hanging_dofs(fe_type);
 
@@ -1268,7 +1284,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
 	  {
 	    const Node* node      = elem->get_node(n);
 	    
-	    // There is a potential problem with AMR.  Imagine a
+	    // There is a potential problem with h refinement.  Imagine a
 	    // quad9 that has a linear FE on it.  Then, on the hanging side,
 	    // it can falsely identify a DOF at the mid-edge node. This is why
 	    // we call FEInterface instead of node->n_comp() directly.
@@ -1280,26 +1296,39 @@ void DofMap::old_dof_indices (const Elem* const elem,
 	    
 	    // If this is a non-vertex on a hanging node with extra
 	    // degrees of freedom, we use the non-vertex dofs (which
-	    // are numbered last)
-	    int dof_offset = 0;
+	    // come in reverse order starting from the end, to
+            // simplify p refinement)
 	    if (extra_hanging_dofs && !elem->is_vertex(n))
-	      dof_offset = node->old_dof_object->n_comp(sys_num,v) - nc;
+              {
+	        const int dof_offset = 
+                  node->old_dof_object->n_comp(sys_num,v) - nc;
 	    
-	    // We should never have fewer dofs than necessary on a
-	    // node unless we're getting indices on a parent element
-            // or a just-coarsened element
-	    if (dof_offset < 0)
-	      {
-		assert(!elem->active() || elem->refinement_flag() ==
-                       Elem::JUST_COARSENED);
-		di.resize(di.size() + nc, DofObject::invalid_id);
-	      }
-	    else
-	      for (unsigned int i=dof_offset; i<nc+dof_offset; i++)
+	        // We should never have fewer dofs than necessary on a
+	        // node unless we're getting indices on a parent element
+                // or a just-coarsened element
+	        if (dof_offset < 0)
+	          {
+		    assert(!elem->active() || elem->refinement_flag() ==
+                           Elem::JUST_COARSENED);
+		    di.resize(di.size() + nc, DofObject::invalid_id);
+	          }
+	        else
+	          for (int i=node->old_dof_object->n_comp(sys_num,v)-1;
+                       i>=dof_offset; i--)
+	            {
+		      assert (node->old_dof_object->dof_number(sys_num,v,i) !=
+			      DofObject::invalid_id);
+		      di.push_back(node->old_dof_object->dof_number(sys_num,v,i));
+	            }
+              }
+	    // If this is a vertex or an element without extra hanging
+            // dofs, our dofs come in forward order coming from the
+            // beginning
+            else
+	      for (unsigned int i=0; i<nc; i++)
 	        {
 		  assert (node->old_dof_object->dof_number(sys_num,v,i) !=
 			  DofObject::invalid_id);
-	
 		  di.push_back(node->old_dof_object->dof_number(sys_num,v,i));
 	        }
 	  }
@@ -1314,7 +1343,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
 	// or a just-coarsened element
 	if (nc != 0)
 	  if (elem->old_dof_object->n_systems() > sys_num &&
-	      nc == elem->old_dof_object->n_comp(sys_num,v))
+	      nc <= elem->old_dof_object->n_comp(sys_num,v))
 	    {
 	      assert (elem->old_dof_object != NULL);
 	      

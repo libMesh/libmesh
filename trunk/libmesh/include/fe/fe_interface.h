@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.11 2006-03-26 00:12:05 roystgnr Exp $
+// $Id: fe_interface.h,v 1.12 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -71,6 +71,8 @@ public:
    * @returns the number of shape functions associated with this
    * finite element of type \p fe_t. 
    * Automatically decides which finite element class to use.
+   *
+   * On a p-refined element, \p fe_t.order should be the total order of the element.
    */
   static unsigned int n_shape_functions(const unsigned int dim,
 					const FEType& fe_t,
@@ -80,6 +82,8 @@ public:
    * @returns the number of shape functions associated with this
    * finite element.
    * Automatically decides which finite element class to use.
+   *
+   * On a p-refined element, \p fe_t.order should be the total order of the element.
    */
   static unsigned int n_dofs(const unsigned int dim,
 			     const FEType& fe_t,
@@ -89,6 +93,8 @@ public:
    * @returns the number of dofs at node n for a finite element
    * of type \p fe_t.
    * Automatically decides which finite element class to use.
+   *
+   * On a p-refined element, \p fe_t.order should be the total order of the element.
    */
   static unsigned int n_dofs_at_node(const unsigned int dim,
 				     const FEType& fe_t,
@@ -99,6 +105,8 @@ public:
    * @returns the number of dofs interior to the element,
    * not associated with any interior nodes.
    * Automatically decides which finite element class to use.
+   *
+   * On a p-refined element, \p fe_t.order should be the total order of the element.
    */
   static unsigned int n_dofs_per_elem(const unsigned int dim,
 				      const FEType& fe_t,
@@ -108,6 +116,8 @@ public:
    * Fills the vector di with the local degree of freedom indices
    * associated with side \p s of element \p elem
    * Automatically decides which finite element class to use.
+   *
+   * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
   static void dofs_on_side(const Elem* const elem,
                            const unsigned int dim,
@@ -119,6 +129,8 @@ public:
    * Fills the vector di with the local degree of freedom indices
    * associated with edge \p e of element \p elem
    * Automatically decides which finite element class to use.
+   *
+   * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
   static void dofs_on_edge(const Elem* const elem,
                            const unsigned int dim,
@@ -134,6 +146,8 @@ public:
    * results from this specific implementation of
    * \p nodal_soln should not be used, the vector 
    * \p nodal_soln is returned empty.
+   *
+   * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
   static void nodal_soln(const unsigned int dim,
 			 const FEType& fe_t,
@@ -186,6 +200,8 @@ public:
    * point \p p. This method allows you to specify the dimension,
    * element type, and order directly. Automatically passes the
    * request to the appropriate finite element class member.
+   *
+   * On a p-refined element, \p fe_t.order should be the total order of the element.
    */
   static Real shape(const unsigned int dim,
 		    const FEType& fe_t,
@@ -198,6 +214,8 @@ public:
    * point \p p. This method allows you to specify the dimension,
    * element type, and order directly. Automatically passes the
    * request to the appropriate finite element class member.
+   *
+   * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
   static Real shape(const unsigned int dim,
 		    const FEType& fe_t,
@@ -211,6 +229,8 @@ public:
    * also through \p data.  See this as a generalization of \p shape().
    * Currently, with disabled infinite elements, returns a vector of
    * all shape functions of \p elem evaluated ap \p p.
+   *
+   * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
   static void compute_data(const unsigned int dim,
 			   const FEType& fe_t,

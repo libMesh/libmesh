@@ -1,4 +1,4 @@
-// $Id: inf_fe_boundary.C,v 1.12 2005-07-01 16:36:11 spetersen Exp $
+// $Id: inf_fe_boundary.C,v 1.13 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
   if (current_fe_type.radial_order != fe_type.radial_order)
     {
       current_fe_type.radial_order = fe_type.radial_order;
-      radial_qrule->init(EDGE2);
+      radial_qrule->init(EDGE2, inf_elem->p_level());
       radial_qrule_initialized = true;
     }
   
@@ -125,7 +125,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
   this->update_base_elem(inf_side);
 
   // Initialize the base quadratur rule
-  base_qrule->init(base_elem->type());
+  base_qrule->init(base_elem->type(), inf_side->p_level());
 
   // base_fe still corresponds to the (dim-1)-dimensional base of the InfFE object,
   // so update the fe_base.

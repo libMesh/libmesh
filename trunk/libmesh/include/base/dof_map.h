@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.15 2006-03-16 21:03:58 benkirk Exp $
+// $Id: dof_map.h,v 1.16 2006-03-29 18:47:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -266,6 +266,16 @@ public:
   void add_constraint_row (const unsigned int dof_number,
 			   const DofConstraintRow& constraint_row,
 			   const bool forbid_constraint_overwrite = true);
+  
+  /**
+   * Constrains degrees of freedom on side \p s of element \p elem which
+   * correspond to variable number \p var and to p refinement levels 
+   * above \p p.
+   */
+  void constrain_p_dofs (unsigned int var,
+			 const Elem *elem,
+			 unsigned int s,
+			 unsigned int p);
   
   /**
    * @returns true if the degree of freedom dof is constrained,

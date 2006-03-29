@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.43 2006-03-28 00:02:29 roystgnr Exp $
+// $Id: fe.C,v 1.44 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,8 @@
 template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_shape_functions () const
 {
-  return FE<Dim,T>::n_dofs (elem_type, fe_type.order);
+  return FE<Dim,T>::n_dofs (elem_type,
+           static_cast<Order>(fe_type.order + _p_level));
 }
 
 
@@ -75,7 +76,7 @@ void FE<Dim,T>::dofs_on_side(const Elem* const elem,
   for (unsigned int n = 0; n != n_nodes; ++n)
     {
       const unsigned int n_dofs = n_dofs_at_node(elem->type(),
-						 o, n);
+						 static_cast<Order>(o + elem->p_level()), n);
       if (elem->is_node_on_side(n, s))
 	for (unsigned int i = 0; i != n_dofs; ++i)
 	  di.push_back(nodenum++);
@@ -101,7 +102,7 @@ void FE<Dim,T>::dofs_on_edge(const Elem* const elem,
   for (unsigned int n = 0; n != n_nodes; ++n)
     {
       const unsigned int n_dofs = n_dofs_at_node(elem->type(),
-						 o, n);
+						 static_cast<Order>(o + elem->p_level()), n);
       if (elem->is_node_on_edge(n, e))
 	for (unsigned int i = 0; i != n_dofs; ++i)
 	  di.push_back(nodenum++);
@@ -118,21 +119,13 @@ void FE<Dim,T>::reinit(const Elem* elem,
 {
   assert (elem != NULL);
 
-  // Only need the quadrature rule if the user did not supply
-  // the evaluation points
-  if (pts == NULL)
-    {
-      assert (qrule   != NULL);
-      qrule->init(elem->type());
-    }
-
-  
   // Initialize the shape functions at the user-specified
   // points
   if (pts != NULL)
     {
-      // Set the element type
+      // Set the type and p level for this element
       elem_type = elem->type();
+      _p_level = elem->p_level();
 
       // Initialize the shape functions
       this->init_shape_functions (*pts, elem);
@@ -141,25 +134,39 @@ void FE<Dim,T>::reinit(const Elem* elem,
       shapes_on_quadrature = false;
     }
   
+  // If there are no user specified points, we use the
+  // quadrature rule
+  
   // update the type in accordance to the current cell
   // and reinit if the cell type has changed or (as in
   // the case of the hierarchics) the shape functions need
   // reinit, since they depend on the particular element
-  else if ((this->get_type() != elem->type()) ||
-           !shapes_on_quadrature ||
-	   this->shapes_need_reinit())
+  else 
     {
-      // Set the element type
-      elem_type = elem->type();
-      
-      // Initialize the shape functions
-      this->init_shape_functions (qrule->get_points(), elem);
+      assert (qrule   != NULL);
+      qrule->init(elem->type(), elem->p_level());
 
+      if (elem_type != elem->type() ||
+          _p_level != elem->p_level() ||
+          !shapes_on_quadrature ||
+	  this->shapes_need_reinit())
+        {
+          // Set the type and p level for this element
+          elem_type = elem->type();
+          _p_level = elem->p_level();
+          // Initialize the shape functions
+          this->init_shape_functions (qrule->get_points(), elem);
+        }
+      else
+        {
+          // Set the type and p level for this element
+          elem_type = elem->type();
+          _p_level = elem->p_level();
+        }
+      
       // The shape functions correspond to the qrule
       shapes_on_quadrature = true;
     }
-
-
   
   // Compute the map for this element.  In the future we can specify
   // different types of maps
@@ -391,16 +398,16 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 	if (calculate_phi)
 	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	    for (unsigned int p=0; p<n_qp; p++)
-	      phi[i][p]      = FE<Dim,T>::shape       (elem, this->get_order(), i,    qp[p]);
+	      phi[i][p]      = FE<Dim,T>::shape       (elem, fe_type.order, i,    qp[p]);
 	if (calculate_dphi)
 	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	    for (unsigned int p=0; p<n_qp; p++)
-	      dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, this->get_order(), i, 0, qp[p]);
+	      dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, fe_type.order, i, 0, qp[p]);
 #ifdef ENABLE_SECOND_DERIVATIVES
 	if (calculate_d2phi)
 	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	    for (unsigned int p=0; p<n_qp; p++)
-              d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->get_order(), i, 0, qp[p]);
+              d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 0, qp[p]);
 #endif // ifdef ENABLE_SECOND_DERIVATIVES
 	
 	// Compute the value of the mapping shape function i at quadrature point p
@@ -448,22 +455,22 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 	if (calculate_phi)
 	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	    for (unsigned int p=0; p<n_qp; p++)
-	      phi[i][p]      = FE<Dim,T>::shape       (elem, this->get_order(), i,    qp[p]);
+	      phi[i][p]      = FE<Dim,T>::shape       (elem, fe_type.order, i,    qp[p]);
 	if (calculate_dphi)
 	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	    for (unsigned int p=0; p<n_qp; p++)
 	      {
-	        dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, this->get_order(), i, 0, qp[p]);
-	        dphideta[i][p] = FE<Dim,T>::shape_deriv (elem, this->get_order(), i, 1, qp[p]);
+	        dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, fe_type.order, i, 0, qp[p]);
+	        dphideta[i][p] = FE<Dim,T>::shape_deriv (elem, fe_type.order, i, 1, qp[p]);
 	      }
 #ifdef ENABLE_SECOND_DERIVATIVES
 	if (calculate_d2phi)
 	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	    for (unsigned int p=0; p<n_qp; p++)
 	      {
-                d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->get_order(), i, 0, qp[p]);
-                d2phidxideta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->get_order(), i, 1, qp[p]);
-                d2phideta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->get_order(), i, 2, qp[p]);
+                d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 0, qp[p]);
+                d2phidxideta[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 1, qp[p]);
+                d2phideta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 2, qp[p]);
 	      }
 #endif // ifdef ENABLE_SECOND_DERIVATIVES
 	
@@ -521,26 +528,26 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 	if (calculate_phi)
 	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	    for (unsigned int p=0; p<n_qp; p++)
-	      phi[i][p]       = FE<Dim,T>::shape       (elem, this->get_order(), i,    qp[p]);
+	      phi[i][p]       = FE<Dim,T>::shape       (elem, fe_type.order, i,    qp[p]);
 	if (calculate_dphi)
 	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	    for (unsigned int p=0; p<n_qp; p++)
 	      {
-	        dphidxi[i][p]   = FE<Dim,T>::shape_deriv (elem, this->get_order(), i, 0, qp[p]);
-	        dphideta[i][p]  = FE<Dim,T>::shape_deriv (elem, this->get_order(), i, 1, qp[p]);
-	        dphidzeta[i][p] = FE<Dim,T>::shape_deriv (elem, this->get_order(), i, 2, qp[p]);
+	        dphidxi[i][p]   = FE<Dim,T>::shape_deriv (elem, fe_type.order, i, 0, qp[p]);
+	        dphideta[i][p]  = FE<Dim,T>::shape_deriv (elem, fe_type.order, i, 1, qp[p]);
+	        dphidzeta[i][p] = FE<Dim,T>::shape_deriv (elem, fe_type.order, i, 2, qp[p]);
 	      }
 #ifdef ENABLE_SECOND_DERIVATIVES
 	if (calculate_d2phi)
 	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	    for (unsigned int p=0; p<n_qp; p++)
 	      {
-                d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->get_order(), i, 0, qp[p]);
-                d2phidxideta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->get_order(), i, 1, qp[p]);
-                d2phideta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->get_order(), i, 2, qp[p]);
-                d2phidxidzeta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->get_order(), i, 3, qp[p]);
-                d2phidetadzeta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->get_order(), i, 4, qp[p]);
-                d2phidzeta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->get_order(), i, 5, qp[p]);
+                d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 0, qp[p]);
+                d2phidxideta[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 1, qp[p]);
+                d2phideta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 2, qp[p]);
+                d2phidxidzeta[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 3, qp[p]);
+                d2phidetadzeta[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 4, qp[p]);
+                d2phidzeta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 5, qp[p]);
 	      }
 #endif // ifdef ENABLE_SECOND_DERIVATIVES
 	
@@ -625,17 +632,23 @@ void FE<Dim,T>::compute_proj_constraints (DofConstraints &constraints,
 
   assert (elem != NULL);
 
-  const FEType& fe_type = dof_map.variable_type(variable_number);
+  const FEType& base_fe_type = dof_map.variable_type(variable_number);
 
-  AutoPtr<FEBase> my_fe (FEBase::build(Dim, fe_type));
+  // Increase polynomial order on p refined elements
+  FEType my_fe_type = base_fe_type;
+  my_fe_type.order = static_cast<Order>(my_fe_type.order +
+                                        elem->p_level());
+
+  // Construct FE objects for this element and its parent.
+  AutoPtr<FEBase> my_fe (FEBase::build(Dim, base_fe_type));
   const FEContinuity cont = my_fe->get_continuity();
   if (cont == DISCONTINUOUS)
     return;
   assert (cont == C_ZERO || cont == C_ONE);
 
-  AutoPtr<FEBase> parent_fe (FEBase::build(Dim, fe_type));
+  AutoPtr<FEBase> parent_fe (FEBase::build(Dim, base_fe_type));
 
-  QGauss my_qface(Dim-1, fe_type.default_quadrature_order());
+  QGauss my_qface(Dim-1, base_fe_type.default_quadrature_order());
   my_fe->attach_quadrature_rule (&my_qface);
   std::vector<Point> parent_qface;
 
@@ -671,113 +684,127 @@ void FE<Dim,T>::compute_proj_constraints (DofConstraints &constraints,
   // build constraints.
   for (unsigned int s=0; s<elem->n_sides(); s++)
     if (elem->neighbor(s) != NULL)
-      // constrain dofs shared between
-      // this element and ones coarser
-      // than this element.
-      if (elem->neighbor(s)->level() < elem->level()) 
-        {
-          // Get pointers to the elements of interest and its parent.
-          const Elem* parent = elem->parent();
-	  unsigned int s_parent = s;
+      {
+        // h refinement constraints:
+        // constrain dofs shared between
+        // this element and ones coarser
+        // than this element.
+        if (elem->neighbor(s)->level() < elem->level()) 
+          {
+            // Get pointers to the elements of interest and its parent.
+            const Elem* parent = elem->parent();
+	    unsigned int s_parent = s;
 
-          // This can't happen...  Only level-0 elements have NULL
-          // parents, and no level-0 elements can be at a higher
-          // level than their neighbors!
-          assert (parent != NULL);
+            // This can't happen...  Only level-0 elements have NULL
+            // parents, and no level-0 elements can be at a higher
+            // level than their neighbors!
+            assert (parent != NULL);
 
-	  my_fe->reinit(elem, s);
+	    my_fe->reinit(elem, s);
 
-	  dof_map.dof_indices (elem, child_dof_indices,
-			       variable_number);
-	  dof_map.dof_indices (parent, parent_dof_indices,
-			       variable_number);
+	    dof_map.dof_indices (elem, child_dof_indices,
+			         variable_number);
+	    dof_map.dof_indices (parent, parent_dof_indices,
+			         variable_number);
 
-	  const unsigned int n_qp = my_qface.n_points();
+	    const unsigned int n_qp = my_qface.n_points();
 
-	  FEInterface::inverse_map (Dim, fe_type, parent, q_point,
-				    parent_qface);
+	    FEInterface::inverse_map (Dim, base_fe_type, parent,
+                                      q_point, parent_qface);
 
-	  parent_fe->reinit(parent, &parent_qface);
+            // FIXME - we need to make the parent FE reinit with the
+            // child element's p_level, not the parent element's
+	    parent_fe->reinit(parent, &parent_qface);
 
-	  // We're only concerned with DOFs whose values (and/or first
-	  // derivatives for C1 elements) are supported on side nodes
-	  dofs_on_side(elem, fe_type.order, s, my_side_dofs);
-	  dofs_on_side(parent, fe_type.order, s_parent, parent_side_dofs);
-	  const unsigned int n_side_dofs = my_side_dofs.size();
-	  assert(n_side_dofs == parent_side_dofs.size());
+	    // We're only concerned with DOFs whose values (and/or first
+	    // derivatives for C1 elements) are supported on side nodes
+	    dofs_on_side(elem, my_fe_type.order, s, my_side_dofs);
+	    dofs_on_side(parent, my_fe_type.order, s_parent, parent_side_dofs);
+	    const unsigned int n_side_dofs = my_side_dofs.size();
+	    assert(n_side_dofs == parent_side_dofs.size());
 
-	  Ke.resize (n_side_dofs, n_side_dofs);
-	  Ue.resize(n_side_dofs);
+	    Ke.resize (n_side_dofs, n_side_dofs);
+	    Ue.resize(n_side_dofs);
 
-	  // Form the projection matrix, (inner product of fine basis
-	  // functions against fine test functions)
-	  for (unsigned int is = 0; is != n_side_dofs; ++is)
-	    {
-	      const unsigned int i = my_side_dofs[is];
-	      for (unsigned int js = 0; js != n_side_dofs; ++js)
-	        {
-	          const unsigned int j = my_side_dofs[js];
-		  for (unsigned int qp = 0; qp != n_qp; ++qp)
-                    {
-		      Ke(is,js) += JxW[qp] * (phi[i][qp] * phi[j][qp]);
-                      if (cont != C_ZERO)
-		        Ke(is,js) += JxW[qp] * (((*dphi)[i][qp] *
-					       (*face_normals)[qp]) *
-					      ((*dphi)[j][qp] *
-					       (*face_normals)[qp]));
-                    }
-		}
-	    }
+	    // Form the projection matrix, (inner product of fine basis
+	    // functions against fine test functions)
+	    for (unsigned int is = 0; is != n_side_dofs; ++is)
+	      {
+	        const unsigned int i = my_side_dofs[is];
+	        for (unsigned int js = 0; js != n_side_dofs; ++js)
+	          {
+	            const unsigned int j = my_side_dofs[js];
+		    for (unsigned int qp = 0; qp != n_qp; ++qp)
+                      {
+		        Ke(is,js) += JxW[qp] * (phi[i][qp] * phi[j][qp]);
+                        if (cont != C_ZERO)
+		          Ke(is,js) += JxW[qp] * (((*dphi)[i][qp] *
+					         (*face_normals)[qp]) *
+					        ((*dphi)[j][qp] *
+					         (*face_normals)[qp]));
+                      }
+		  }
+	      }
 
-	  // Form the right hand sides, (inner product of coarse basis
-	  // functions against fine test functions)
-	  for (unsigned int is = 0; is != n_side_dofs; ++is)
-	    {
-	      const unsigned int i = parent_side_dofs[is];
-	      Fe.resize (n_side_dofs);
-	      for (unsigned int js = 0; js != n_side_dofs; ++js)
-		{
-	          const unsigned int j = my_side_dofs[js];
-	          for (unsigned int qp = 0; qp != n_qp; ++qp)
-                    {
-		      Fe(js) += JxW[qp] * (parent_phi[i][qp] *
-					   phi[j][qp]);
-                      if (cont != C_ZERO)
-		        Fe(js) += JxW[qp] * (((*parent_dphi)[i][qp] *
-					      (*face_normals)[qp]) *
-					     ((*dphi)[j][qp] *
-					      (*face_normals)[qp]));
-                    }
-		}
-	      Ke.cholesky_solve(Fe, Ue[is]);
-	    }
-	  for (unsigned int is = 0; is != n_side_dofs; ++is)
-	    {
-	      const unsigned int i = parent_side_dofs[is];
-	      const unsigned int their_dof_g = parent_dof_indices[i];
-	      for (unsigned int js = 0; js != n_side_dofs; ++js)
-	        {
-	          const unsigned int j = my_side_dofs[js];
-	          const unsigned int my_dof_g = child_dof_indices[j];
-		  const Real their_dof_value = Ue[is](js);
-		  if (their_dof_g == my_dof_g)
-		    {
-		      assert(std::abs(their_dof_value-1.) < 1.e-5);
-		      for (unsigned int k = 0; k != n_side_dofs; ++k)
-		        assert(k == is || std::abs(Ue[k](is)) < 1.e-5);
+	    // Form the right hand sides, (inner product of coarse basis
+	    // functions against fine test functions)
+	    for (unsigned int is = 0; is != n_side_dofs; ++is)
+	      {
+	        const unsigned int i = parent_side_dofs[is];
+	        Fe.resize (n_side_dofs);
+	        for (unsigned int js = 0; js != n_side_dofs; ++js)
+		  {
+	            const unsigned int j = my_side_dofs[js];
+	            for (unsigned int qp = 0; qp != n_qp; ++qp)
+                      {
+		        Fe(js) += JxW[qp] * (parent_phi[i][qp] *
+					     phi[j][qp]);
+                        if (cont != C_ZERO)
+		          Fe(js) += JxW[qp] * (((*parent_dphi)[i][qp] *
+					        (*face_normals)[qp]) *
+					       ((*dphi)[j][qp] *
+					        (*face_normals)[qp]));
+                      }
+		  }
+	        Ke.cholesky_solve(Fe, Ue[is]);
+	      }
+	    for (unsigned int is = 0; is != n_side_dofs; ++is)
+	      {
+	        const unsigned int i = parent_side_dofs[is];
+	        const unsigned int their_dof_g = parent_dof_indices[i];
+	        for (unsigned int js = 0; js != n_side_dofs; ++js)
+	          {
+	            const unsigned int j = my_side_dofs[js];
+	            const unsigned int my_dof_g = child_dof_indices[j];
+		    const Real their_dof_value = Ue[is](js);
+		    if (their_dof_g == my_dof_g)
+		      {
+		        assert(std::abs(their_dof_value-1.) < 1.e-5);
+		        for (unsigned int k = 0; k != n_side_dofs; ++k)
+		          assert(k == is || std::abs(Ue[k](is)) < 1.e-5);
+		        continue;
+		      }
+		    if (std::abs(their_dof_value) < 1.e-5)
 		      continue;
-		    }
-		  if (std::abs(their_dof_value) < 1.e-5)
-		    continue;
 
-		  DofConstraintRow& constraint_row =
-				  constraints[my_dof_g];
+		    DofConstraintRow& constraint_row =
+                      constraints[my_dof_g];
 
-		  constraint_row.insert(std::make_pair(their_dof_g,
-						       their_dof_value));
-	        }
-	    }
-	}
+		    constraint_row.insert(std::make_pair(their_dof_g,
+						         their_dof_value));
+	          }
+	      }
+	  }
+        // p refinement constraints:
+        // constrain dofs shared between
+        // this element and neighbors with
+        // lower polynomial degrees
+        const unsigned int min_p_level =
+          elem->neighbor(s)->min_p_level_by_neighbor(elem, elem->p_level());
+        if (min_p_level < elem->p_level())
+          dof_map.constrain_p_dofs(variable_number, elem,
+                                   s, min_p_level);
+      }
 #endif
 }
 

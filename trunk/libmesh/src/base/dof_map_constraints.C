@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.19 2006-03-16 21:04:00 benkirk Exp $
+// $Id: dof_map_constraints.C,v 1.20 2006-03-29 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,8 +25,10 @@
 
 // Local Includes -----------------------------------
 #include "dof_map.h"
+#include "elem.h"
 #include "mesh_base.h"
 #include "fe_interface.h"
+#include "fe_type.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
 #include "libmesh_logging.h"
@@ -101,6 +103,59 @@ void DofMap::add_constraint_row (const unsigned int dof_number,
   std::pair<unsigned int, DofConstraintRow> kv(dof_number, constraint_row);
 
   _dof_constraints.insert(kv);
+}
+
+
+
+void DofMap::constrain_p_dofs (unsigned int var,
+                               const Elem *elem,
+                               unsigned int s,
+                               unsigned int p)
+{
+  // We're constraining dofs on elem which correspond to p refinement
+  // levels above p - this only makes sense if elem's p refinement
+  // level is above p.
+  assert(elem->p_level() > p);
+  assert(s < elem->n_sides());
+
+  const unsigned int sys_num = this->sys_number();
+  const unsigned int dim = elem->dim();
+  ElemType type = elem->type();
+  FEType low_p_fe_type = this->variable_type(var);
+  FEType high_p_fe_type = this->variable_type(var);
+  low_p_fe_type.order = static_cast<Order>(low_p_fe_type.order + p);
+  high_p_fe_type.order = static_cast<Order>(high_p_fe_type.order + 
+                                            elem->p_level());
+
+  const unsigned int n_nodes = elem->n_nodes();
+  for (unsigned int n = 0; n != n_nodes; ++n)
+    if (elem->is_node_on_side(n, s))
+      {
+        const Node * const node = elem->get_node(n);
+        const unsigned int low_nc =
+	  FEInterface::n_dofs_at_node (dim, low_p_fe_type, type, n);
+        const unsigned int high_nc =
+	  FEInterface::n_dofs_at_node (dim, high_p_fe_type, type, n);
+        if (elem->is_vertex(n))
+          {
+	    // Add "this is zero" constraint rows for high p vertex
+            // dofs
+            for (unsigned int i = low_nc; i != high_nc; ++i)
+              _dof_constraints[node->dof_number(sys_num,var,i)].clear();
+          }
+        else
+          {
+            const unsigned int total_dofs = node->n_comp(sys_num, var);
+            assert(total_dofs >= high_nc);
+	    // Add "this is zero" constraint rows for high p
+            // non-vertex dofs, which are numbered in reverse
+            for (unsigned int j = low_nc; j != high_nc; ++j)
+              {
+                const unsigned int i = total_dofs - j - 1;
+                _dof_constraints[node->dof_number(sys_num,var,i)].clear();
+              }
+          }
+      }
 }
 
 

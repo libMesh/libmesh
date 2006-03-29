@@ -1,4 +1,4 @@
-// $Id: fe_bernstein_shape_1D.C,v 1.1 2005-05-10 17:48:41 spetersen Exp $
+// $Id: fe_bernstein_shape_1D.C,v 1.2 2006-03-29 18:47:23 roystgnr Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -171,7 +171,7 @@ Real FE<1,BERNSTEIN>::shape(const Elem* elem,
 {
   assert (elem != NULL);
   
-  return FE<1,BERNSTEIN>::shape(elem->type(), order, i, p);
+  return FE<1,BERNSTEIN>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
 }
 
 
@@ -324,7 +324,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const Elem* elem,
   assert (elem != NULL);
   
   return FE<1,BERNSTEIN>::shape_deriv(elem->type(),
-				      order, i, j, p);
+				      static_cast<Order>(order + elem->p_level()), i, j, p);
 }
 
 
