@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_1D.C,v 1.16 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_hierarchic_shape_1D.C,v 1.17 2006-04-05 16:42:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,69 +34,64 @@ Real FE<1,HIERARCHIC>::shape(const ElemType,
 			     const unsigned int i,
 			     const Point& p)
 {
-  const Real xi = p(0);
-  
+  assert(i < order+1u);
+
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
   using Utility::pow;
 
-  switch (order)
+  const Real xi = p(0);
+
+  Real returnval = 1.;
+
+  switch (i)
     {
-      // Hierarchics. since they are heirarchic we only need one case block.
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
-    case FIFTH:
-    case SIXTH:
-      {
-	assert (i < 6);
-	
-	switch (i)
-	  {
-	  case 0:
-	    return .5*(1. - xi);
+    case 0:
+      returnval = .5*(1. - xi);
+      break;
+    case 1:
+      returnval = .5*(1.  + xi);
+      break;
+      // All even-terms have the same form.
+      // (xi^p - 1.)/p!
+    case 2:
+      returnval = (xi*xi - 1.)/2.;
+      break;
+    case 4:
+      returnval = (pow<4>(xi) - 1.)/24.;
+      break;
+    case 6:
+      returnval = (pow<6>(xi) - 1.)/720.;
+      break;
 
-	  case 1:
-	    return .5*(1.  + xi);
-
-	    // All even-terms have the same form.
-	    // (xi^p - 1.)/p!
-	  case 2:
-	    return (xi*xi - 1.)/2.;
-	    
-	  case 4:
-	    return (pow<4>(xi) - 1.)/24.;
-	    
-	  case 6:
-	    return (pow<6>(xi) - 1.)/720.;
-
-	    // All odd-terms have the same form.
-	    // (xi^p - xi)/p!
-	  case 3:
-	    return (xi*xi*xi - xi)/6.;
-
-	  case 5:
-	    return (pow<5>(xi) - xi)/120.;
-
-	  case 7:
-	    return (pow<7>(xi) - xi)/5040.;	    
-	    
-	  default:
-	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();	    
-	  }
-      }
-      
+      // All odd-terms have the same form.
+      // (xi^p - xi)/p!
+    case 3:
+      returnval = (xi*xi*xi - xi)/6.;
+      break;
+    case 5:
+      returnval = (pow<5>(xi) - xi)/120.;
+      break;
+    case 7:
+      returnval = (pow<7>(xi) - xi)/5040.;	    
+      break;
     default:
-      {
-	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-	error();
-      }
+      Real denominator = 1.;
+      for (unsigned int n=1; n <= i; ++n)
+        {
+          returnval *= xi;
+          denominator *= n;
+        }
+      // Odd:
+      if (i % 2)
+        returnval = (returnval - xi)/denominator;
+      // Even:
+      else
+        returnval = (returnval - 1.)/denominator;
+      break;
     }
 
-  error();
-  return 0.;
+  return returnval;
 }
 
 
@@ -124,6 +119,7 @@ Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
   // only d()/dxi in 1D!
   
   assert (j == 0);
+  assert(i < order+1u);
 
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
@@ -131,65 +127,55 @@ Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
 
   const Real xi = p(0);
 
-	
-  switch (order)
-    {      
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
-    case FIFTH:
-    case SIXTH:
-      {
-	assert (i < 6);
-	
-	switch (i)
-	  {
-	  case 0:
-	    return -.5;
-	    
-	  case 1:
-	    return  .5;
+  Real returnval = 1.;
 
-	    // All even-terms have the same form.
-	    // xi^(p-1)/(p-1)!
-	  case 2:
-	    return xi;
-	    
-	  case 4:
-	    return pow<3>(xi)/6.;
-	    
-	  case 6:
-	    return pow<5>(xi)/120.;
-
-	    // All odd-terms have the same form.
-	    // (p*xi^(p-1) - 1.)/p!
-	  case 3:
-	    return (3*xi*xi - 1.)/6.;
-
-	  case 5:
-	    return (5.*pow<4>(xi) - 1.)/120.;
-
-	  case 7:
-	    return (7.*pow<6>(xi) - 1.)/5040.;	    
-	    
-	  default:
-	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();	    
-	  }
-      }
-
-
-      
+  switch (i)
+    {
+    case 0:
+      returnval = -.5;
+      break;
+    case 1:
+      returnval =  .5;
+      break;
+      // All even-terms have the same form.
+      // xi^(p-1)/(p-1)!
+    case 2:
+      returnval = xi;
+      break;
+    case 4:
+      returnval = pow<3>(xi)/6.;
+      break;
+    case 6:
+      returnval = pow<5>(xi)/120.;
+      break;
+      // All odd-terms have the same form.
+      // (p*xi^(p-1) - 1.)/p!
+    case 3:
+      returnval = (3*xi*xi - 1.)/6.;
+      break;
+    case 5:
+      returnval = (5.*pow<4>(xi) - 1.)/120.;
+      break;
+    case 7:
+      returnval = (7.*pow<6>(xi) - 1.)/5040.;	    
+      break;
     default:
-      {
-	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-	error();
-      }
+      Real denominator = 1.;
+      for (unsigned int n=1; n != i; ++n)
+        {
+          returnval *= xi;
+          denominator *= n;
+        }
+      // Odd:
+      if (i % 2)
+        returnval = (i * returnval - 1.)/denominator/i;
+      // Even:
+      else
+        returnval = returnval/denominator;
+      break;
     }
 
-  error();
-  return 0.;
+  return returnval;
 }
 
 
@@ -219,68 +205,60 @@ Real FE<1,HIERARCHIC>::shape_second_deriv(const ElemType,
   // only d2()/d2xi in 1D!
   
   assert (j == 0);
+  assert (i < order+1u);
 
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
   using Utility::pow;
 
   const Real xi = p(0);
-
 	
-  switch (order)
-    {      
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
-    case FIFTH:
-    case SIXTH:
-      {
-	assert (i < 6);
-	
-	switch (i)
-	  {
-	  case 0:
-	  case 1:
-	    return  0;
+  Real returnval = 1.;
 
-	    // All terms have the same form.
-	    // xi^(p-2)/(p-2)!
-	  case 2:
-	    return 1;
-	    
-	  case 3:
-	    return xi;
-
-	  case 4:
-	    return pow<2>(xi)/2.;
-	    
-	  case 5:
-	    return pow<3>(xi)/6.;
-
-	  case 6:
-	    return pow<4>(xi)/24.;
-
-	  case 7:
-	    return pow<5>(xi)/120.;	    
-	    
-	  default:
-	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();	    
-	  }
-      }
-
-
-      
+  switch (i)
+    {
+    case 0:
+    case 1:
+      returnval = 0;
+      break;
+      // All terms have the same form.
+      // xi^(p-2)/(p-2)!
+    case 2:
+      returnval = 1;
+      break;
+    case 3:
+      returnval = xi;
+      break;
+    case 4:
+      returnval = pow<2>(xi)/2.;
+      break;
+    case 5:
+      returnval = pow<3>(xi)/6.;
+      break;
+    case 6:
+      returnval = pow<4>(xi)/24.;
+      break;
+    case 7:
+      returnval = pow<5>(xi)/120.;	    
+      break;
+    
     default:
-      {
-	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-	error();
-      }
+      Real denominator = 1.;
+      for (unsigned int n=1; n != i; ++n)
+        {
+          returnval *= xi;
+          denominator *= n;
+        }
+      // Odd:
+      if (i % 2)
+        returnval = (i * returnval - 1.)/denominator/i;
+      // Even:
+      else
+        returnval = returnval/denominator;
+      break;
     }
 
-  error();
-  return 0.;
+  return returnval;
 }
 
 

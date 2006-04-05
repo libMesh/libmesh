@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic.C,v 1.23 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_hierarchic.C,v 1.24 2006-04-05 16:42:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -61,11 +61,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 
       // For other bases do interpolation at the nodes
       // explicitly.
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
-    case FIFTH:
+    default:
       {
 
 	const unsigned int n_sf =
@@ -91,11 +87,6 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 
 	return;
       }
-      
-    default:
-      {
-	error();
-      }
     }
 }
 
@@ -104,172 +95,21 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 {
-  switch (o)
+  assert (o > 0);
+  switch (t)
     {
-      // Hierarchic 1st-order polynomials.
-    case FIRST:
-      {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 2;
-
-	  case TRI6:
-	    return 3;
-
-	  case QUAD8:
-	  case QUAD9:
-	    return 4;
-
-	  case HEX27:
-	    return 8;
-
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	  }
-      }
-
-
-      // Hierarchic 2nd-order polynomials.
-    case SECOND:
-      {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 3;
-
-	  case TRI6:
-	    return 6;
-
-	  case QUAD8:
-	  case QUAD9:
-	    return 9;
-	    
-	  case HEX27:
-	    return 27;
-
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	  }
-      }
-
-
-      // Hierarchic 3rd-order polynomials.
-    case THIRD:
-      {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 4;
-
-	  case TRI6:
-	    return 10;
-	    
-	  case QUAD8:
-	  case QUAD9:
-	    return 16;
-
-	  case HEX27:
-	    return 64;
-
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	  }
-      }
-
-
-      // Hierarchic 4th-order polynomials.
-    case FOURTH:
-      {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 5;
-
-	  case TRI6:
-	    return 15;
-	    
-	  case QUAD8:
-	  case QUAD9:
-	    return 25;
-
-	  case HEX27:
-	    return 125;
-
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	  }
-      }
-
-
-      // Hierarchic 5th-order polynomials.
-    case FIFTH:
-      {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 6;
-
-	  case TRI6:
-	    return 21;
-	      
-	  case QUAD8:
-	  case QUAD9:
-	    return 36;
-
-	  case HEX27:
-	    return 216;
-
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	  }
-      }
-
-      
+    case EDGE2:
+    case EDGE3:
+      return (o+1);
+    case QUAD8:
+    case QUAD9:
+      return ((o+1)*(o+1));
+    case HEX27:
+      return ((o+1)*(o+1)*(o+1));
+    case TRI6:
+      return ((o+1)*(o+2)/2);
     default:
-      {
-	error();
-      }
+      error();
     }
   
   error();  
@@ -283,664 +123,107 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 				       const Order o,
 				       const unsigned int n)
 {
-  switch (o)
+  assert (o > 0);
+  switch (t)
     {
-      // The first-order hierarchic shape functions
-    case FIRST:
-      {
-	switch (t)
-	  {
-	    // The 1D heirarchic defined on a three-noded edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 1;
+    case EDGE2:
+    case EDGE3:
+      switch (n)
+        {
+	case 0:
+	case 1:
+	  return 1;
+        // Internal DoFs are associated with the elem, not its nodes
+	case 2:
+	  return 0;
+	default:
+	  error();		  
+	}
+    case TRI6:
+      switch (n)
+	{
+	case 0:
+	case 1:
+	case 2:
+	  return 1;
 
-		case 2:
-		  return 0;
+	case 3:
+	case 4:
+	case 5:
+	  return (o-1);
+
+        // Internal DoFs are associated with the elem, not its nodes
+	default:
+	  error();
+	}
+    case QUAD8:
+    case QUAD9:
+      switch (n)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+	  return 1;
+
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	  return (o-1);
 		  
-		default:
-		  error();		  
-		}
-	    }
-
-	    
-	    // The 2D hierarchic defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		  return 1;
-
-		case 3:
-		case 4:
-		case 5:
-		  return 0;
-
-		default:
-		  error();
-		}
-	    }
-	    
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 0;
+        // Internal DoFs are associated with the elem, not its nodes
+	case 8:
+          return 0;
 		  
-		case 8:
-		  return 0;
+	default:
+	  error();
+	}
+    case HEX27:
+      switch (n)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	  return 1;
+
+	case 8:
+	case 9:
+	case 10:
+	case 11:
+	case 12:
+	case 13:
+	case 14:
+	case 15:
+	case 16:
+	case 17:
+	case 18:
+	case 19:
+	  return (o-1);
 		  
-		default:
-		  error();
-		}
-	    }
-
-	    // The 3D tensor-product hierarchics defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX8:
-	  case HEX20:
-	  case HEX27:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 1;
-
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		  return 0;
-		  
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		  return 0;
-		  
-		case 26:
-		  return 0;
-		}
-	    }
-	    
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	    
-	  }
-      }
-
-
-
-      // The second-order hierarchic shape functions
-    case SECOND:
-      {
-	switch (t)
-	  {
-	    // The 1D heirarchic defined on a three-noded edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 1;
-
-		case 2:
-		  return 1;
-		  
-		default:
-		  error();		  
-		}
-	    }
-
-	    
-	    // The 2D hierarchic defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		  return 1;
-
-		case 3:
-		case 4:
-		case 5:
-		  return 1;
-
-		default:
-		  error();
-		}
-	    }
-
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 1;
-		  
-		case 8:
-		  return 1;
-		  
-		default:
-		  error();
-		}
-	    }
-
-	    // The 3D tensor-product hierarchics defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 1;
-
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		  return 1;
-		  
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		  return 1;
-		  
-		case 26:
-		  return 1;
-		}
-	    }
-	    
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	    
-	  }
-      }
-
-
-
-      // The third-order hierarchic shape functions
-    case THIRD:
-      {
-	switch (t)
-	  {
-	    // The 1D heirarchic defined on a three-noded edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 1;
-
-		case 2:
-		  return 2;
-		  
-		default:
-		  error();		  
-		}
-	    }
-
-	    
-	    // The 2D hierarchic defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		  return 1;
-
-		case 3:
-		case 4:
-		case 5:
-		  return 2;
-
-		default:
-		  error();
-		}
-	    }
-
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 2;
-		  
-		case 8:
-		  return 4;
-		  
-		default:
-		  error();
-		}
-	    }
-
-	    // The 3D tensor-product hierarchics defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 1;
-
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		  return 2;
-		  
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		  return 4;
-		  
-		case 26:
-		  return 8;
-		}
-	    }
-	    
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	    
-	  }
-      }
-
-
-
-      // The fourth-order hierarchic shape functions
-    case FOURTH:
-      {
-	switch (t)
-	  {
-	    // The 1D heirarchic defined on a three-noded edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 1;
-
-		case 2:
-		  return 3;
-		  
-		default:
-		  error();		  
-		}
-	    }
-
-	    
-	    // The 2D hierarchic defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		  return 1;
-
-		case 3:
-		case 4:
-		case 5:
-		  return 3;
-
-		default:
-		  error();
-		}
-	    }
-
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 3;
-		  
-		case 8:
-		  return 9;
-		  
-		default:
-		  error();
-		}
-	    }
-
-	    // The 3D tensor-product hierarchics defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 1;
-
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		  return 3;
-		  
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		  return 9;
-		  
-		case 26:
-		  return 27;
-		}
-	    }
-	    
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	    
-	  }
-      }
-
-
-
-      // The fifth-order hierarchic shape functions
-    case FIFTH:
-      {
-	switch (t)
-	  {
-	    // The 1D heirarchic defined on a three-noded edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 1;
-
-		case 2:
-		  return 4;
-		  
-		default:
-		  error();		  
-		}
-	    }
-
-	    
-	    // The 2D hierarchic defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		  return 1;
-
-		case 3:
-		case 4:
-		case 5:
-		  return 4;
-
-		default:
-		  error();
-		}
-	    }
-
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 4;
-		  
-		case 8:
-		  return 16;
-		  
-		default:
-		  error();
-		}
-	    }
-
-	    // The 3D tensor-product hierarchics defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 1;
-
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		  return 4;
-		  
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		  return 16;
-		  
-		case 26:
-		  return 64;
-		}
-	    }
-	    
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	    
-	  }
-      }
-
-
-      
+	case 20:
+	case 21:
+	case 22:
+	case 23:
+	case 24:
+	case 25:
+	  return ((o-1)*(o-1));
+	 
+        // Internal DoFs are associated with the elem, not its nodes
+	case 26:
+	  return 0;
+        }
     default:
-      {
-	error();
-      }
+#ifdef DEBUG
+      std::cerr << "ERROR: Bad ElemType = " << t
+		<< std::endl;
+#endif
+      error();	    
     }
   
   error();
@@ -954,259 +237,25 @@ template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 					const Order o)
 {
-  switch (o)
+  assert (o > 0);
+  switch (t)
     {
-      // The first-order hierarchic shape functions
-    case FIRST:
-      {
-	switch (t)
-	  {
-	    // The 1D heirarchic defined on a two-noded edge
-	  case EDGE2:
-	    return 0;
-	    
-	    // The 1D heirarchic defined on a three-noded edge
-	  case EDGE3:
-	    return 0;
-	    
-	    // The 2D hierarchic defined on a 6-noded triangle
-	  case TRI6:
-	    return 0;
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	    return 0;
-	    
-	    // The 2D tensor-product hierarchics defined on a
-	    // nine-noded quadrilateral.
-	    
-	  case QUAD9:
-	    return 0;
-	    
-	    // The 3D tensor-product hierarchics defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX8:
-	  case HEX20:
-	  case HEX27:
-	    return 0;
-	    
-	    
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	    
-	  }
-      }
-
-
-
-      // The second-order hierarchic shape functions
-    case SECOND:
-      {
-	switch (t)
-	  {
-	    // The 1D heirarchic defined on a two-noded edge
-	  case EDGE2:
-	    return 1;
-	    
-	    // The 1D heirarchic defined on a three-noded edge
-	  case EDGE3:
-	    return 0;
-	    
-	    // The 2D hierarchic defined on a 6-noded triangle
-	  case TRI6:
-	    return 0;
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // eight-noded quadrilateral.
-	  case QUAD8:
-	    return 1;
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD9:
-	    return 0;
-	    
-	    // The 3D tensor-product hierarchics defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    return 0;
-
-
-	    
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	    
-	  }
-      }
-
-
-
-      // The third-order hierarchic shape functions
-    case THIRD:
-      {
-	switch (t)
-	  {
-	    // The 1D heirarchic defined on a two-noded edge
-	  case EDGE2:
-	    return 2;
-	    
-	    // The 1D heirarchic defined on a three-noded edge
-	  case EDGE3:
-	    return 0;
-	    
-	    // The 2D hierarchic defined on a 6-noded triangle
-	  case TRI6:
-	    return 1;
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // eight-noded quadrilateral.
-	  case QUAD8:
-	    return 4;
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD9:
-	    return 0;
-	    
-	    // The 3D tensor-product hierarchics defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    return 0;
-
-
-	    
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	    
-	  }
-      }
-
-
-
-      // The fourth-order hierarchic shape functions
-    case FOURTH:
-      {
-	switch (t)
-	  {
-	    // The 1D heirarchic defined on a two-noded edge
-	  case EDGE2:
-	    return 3;
-	    
-	    // The 1D heirarchic defined on a three-noded edge
-	  case EDGE3:
-	    return 0;
-	    
-	    // The 2D hierarchic defined on a 6-noded triangle
-	  case TRI6:
-	    return 3;
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // eight-noded quadrilateral.
-	  case QUAD8:
-	    return 9;
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD9:
-	    return 0;
-	    
-	    // The 3D tensor-product hierarchics defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    return 0;
-
-
-	    
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	    
-	  }
-      }
-
-
-
-      // The fifth-order hierarchic shape functions
-    case FIFTH:
-      {
-	switch (t)
-	  {
-	    // The 1D heirarchic defined on a two-noded edge
-	  case EDGE2:
-	    return 4;
-	    
-	    // The 1D heirarchic defined on a three-noded edge
-	  case EDGE3:
-	    return 0;
-	    
-	    // The 2D hierarchic defined on a 6-noded triangle
-	  case TRI6:
-	    return 6;
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // eight-noded quadrilateral.
-	  case QUAD8:
-	    return 16;
-
-	    // The 2D tensor-product hierarchics defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD9:
-	    return 0;
-	    
-	    // The 3D tensor-product hierarchics defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    return 0;
-
-
-	    
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	    
-	  }
-      }
-
-
-
-      
-      // Otherwise no DOFS per element
+    case EDGE2:
+    case EDGE3:
+      return (o-1);
+    case TRI6:
+      return ((o-1)*(o-2)/2);
+    case QUAD8:
+    case QUAD9:
+      return ((o-1)*(o-1));
+    case HEX27:
+      return ((o-1)*(o-1)*(o-1));
     default:
-      return 0;
+#ifdef DEBUG
+      std::cerr << "ERROR: Bad ElemType = " << t
+		<< std::endl;
+#endif
+      error();	    
     }
 }
 

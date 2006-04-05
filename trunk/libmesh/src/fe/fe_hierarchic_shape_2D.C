@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.18 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.19 2006-04-05 16:42:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,20 +56,16 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
   // from the Utility namespace.  This saves typing later.
   using Utility::pow;
 
-  const ElemType type = elem->type();
-
   const Order totalorder = static_cast<Order>(order+elem->p_level());
   
-  switch (totalorder)
+  switch (elem->type())
     {      
-      // 1st & 2nd-order Hierarchics.
-    case FIRST:
-    case SECOND:
+    case TRI6:
       {
-	switch (type)
+	switch (totalorder)
 	  {
-	    // Hierarchic shape functions on the triangle.
-	  case TRI6:
+	  case FIRST:
+	  case SECOND:
 	    {
 	      const Real zeta1 = p(0);
 	      const Real zeta2 = p(1);
@@ -102,43 +98,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		  error();
 		}
 	    }
-	    
 
-	    // Hierarchic shape functions on the quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      // Compute quad shape functions as a tensor-product
-	      const Real xi  = p(0);
-	      const Real eta = p(1);
-	      
-	      assert (i < 9);
-	      
-	      //                                0  1  2  3  4  5  6  7  8
-	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
-	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
-	      	      
-	      return (FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0[i], xi)*
-		      FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1[i], eta));
-	      
-	    }
-
-	    
-	  default:
-	    error();
-	  }
-      }
-	   
-
-      
-
-      // 3rd-order Hierarchics.
-    case THIRD:
-      {
-	switch (type)
-	  {
-	    // Hierarchic shape functions on the triangle.
-	  case TRI6:
+	  case THIRD:
 	    {
 	      const Real zeta1 = p(0);
 	      const Real zeta2 = p(1);
@@ -208,79 +169,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		  error();
 		}
 	    }
-	    
 
-	    // Hierarchic shape functions on the quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      // Compute quad shape functions as a tensor-product
-	      const Real xi  = p(0);
-	      const Real eta = p(1);
-	      
-	      assert (i < 16);
-
-	      //                                0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
-	      static const unsigned int i0[] = {0,  1,  1,  0,  2,  3,  1,  1,  2,  3,  0,  0,  2,  3,  2,  3};
-	      static const unsigned int i1[] = {0,  0,  1,  1,  0,  0,  2,  3,  1,  1,  2,  3,  2,  2,  3,  3};
-	      
-	      
-	      // Get the factors
-	      Real f0 = 1.;
-	      Real f1 = 1.;
-	      Real f2 = 1.;
-	      Real f3 = 1.;
-
-	      if (elem->node(0) > elem->node(1))
-		f0 = -1.;
-	      
-	      if (elem->node(1) > elem->node(2))
-		f1 = -1.;
-	      
-	      if (elem->node(3) > elem->node(2))
-		f2 = -1.;
-	      
-	      if (elem->node(0) > elem->node(3))
-		f3 = -1.;
-	      
-
-	      Real f = 1.;
-
-	      
-	      if ((i0[i] == 3) &&
-		  (i1[i] == 0))
-		f = f0;
-	      else if ((i0[i] == 3) &&
-		       (i1[i] == 1))
-		f = f2;
-	      
-	      if ((i1[i] == 3) &&
-		  (i0[i] == 0))
-		f = f3;
-	      else if ((i1[i] == 3) &&
-		       (i0[i] == 1))
-		f = f1;
-	      
-
-	      return f*(FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0[i], xi)*
-			FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1[i], eta));
-	    }
-
-	  default:
-	    error();
-	  }
-      }
-	   
-
-      
-
-      // 4th-order Hierarchics.
-    case FOURTH:
-      {
-	switch (type)
-	  {
-	    // Hierarchic shape functions on the triangle.
-	  case TRI6:
+	  case FOURTH:
 	    {
 	      const Real zeta1 = p(0);
 	      const Real zeta2 = p(1);
@@ -368,79 +258,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		  error();
 		}
 	    }
-	    
 
-	    // Hierarchic shape functions on the quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      // Compute quad shape functions as a tensor-product
-	      const Real xi  = p(0);
-	      const Real eta = p(1);
-	      
-	      assert (i < 25);
-
-	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
-	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4};
-	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4};
-	      
-	      
-	      // Get the factors
-	      Real f0 = 1.;
-	      Real f1 = 1.;
-	      Real f2 = 1.;
-	      Real f3 = 1.;
-
-	      if (elem->node(0) > elem->node(1))
-		f0 = -1.;
-	      
-	      if (elem->node(1) > elem->node(2))
-		f1 = -1.;
-	      
-	      if (elem->node(3) > elem->node(2))
-		f2 = -1.;
-	      
-	      if (elem->node(0) > elem->node(3))
-		f3 = -1.;
-	      
-
-	      Real f = 1.;
-
-	      
-	      if ((i0[i] == 3) &&
-		  (i1[i] == 0))
-		f = f0;
-	      else if ((i0[i] == 3) &&
-		       (i1[i] == 1))
-		f = f2;
-	      
-	      if ((i1[i] == 3) &&
-		  (i0[i] == 0))
-		f = f3;
-	      else if ((i1[i] == 3) &&
-		       (i0[i] == 1))
-		f = f1;
-	      
-
-	      return f*(FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0[i], xi)*
-			FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1[i], eta));
-	    }
-
-	  default:
-	    error();
-	  }
-      }
-	   
-
-      
-
-      // 5th-order Hierarchics.
-    case FIFTH:
-      {
-	switch (type)
-	  {
-	    // Hierarchic shape functions on the triangle.
-	  case TRI6:
+	  case FIFTH:
 	    {
 	      const Real zeta1 = p(0);
 	      const Real zeta2 = p(1);
@@ -549,80 +368,80 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 		  error();
 		}
 	    }
-	    
-
-	    // Hierarchic shape functions on the quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      // Compute quad shape functions as a tensor-product
-	      const Real xi  = p(0);
-	      const Real eta = p(1);
-	      
-	      assert (i < 36);
-
-	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
-	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
-	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
-	      
-	      
-	      // Get the factors
-	      Real f0 = 1.;
-	      Real f1 = 1.;
-	      Real f2 = 1.;
-	      Real f3 = 1.;
-
-	      if (elem->node(0) > elem->node(1))
-		f0 = -1.;
-	      
-	      if (elem->node(1) > elem->node(2))
-		f1 = -1.;
-	      
-	      if (elem->node(3) > elem->node(2))
-		f2 = -1.;
-	      
-	      if (elem->node(0) > elem->node(3))
-		f3 = -1.;
-	      
-
-	      Real f = 1.;
-
-	      
-	      if ( ((i0[i] == 3) || (i0[i] == 5)) &&
-		   (i1[i] == 0))
-		f = f0;
-	      else if ( ((i0[i] == 3) || (i0[i] == 5))&&
-			(i1[i] == 1))
-		f = f2;
-	      
-	      if ( ((i1[i] == 3) || (i1[i] == 5)) &&
-		   (i0[i] == 0))
-		f = f3;
-	      else if ( ((i1[i] == 3) || (i1[i] == 5)) &&
-			(i0[i] == 1))
-		f = f1;
-	      
-
-	      return f*(FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0[i], xi)*
-			FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1[i], eta));	      
-	    }
 
 	  default:
-	    error();
-	  }
+	    {
+              // by default throw an error
+              std::cerr << "ERROR: Unsupported polynomial order on TRI6!"
+                        << std::endl;
+              error();
+            }
+          }
       }
 
-
-
+    // Hierarchic shape functions on the quadrilateral.
+    case QUAD8:
+    case QUAD9:
+      {
+        // Compute quad shape functions as a tensor-product
+        const Real xi  = p(0);
+        const Real eta = p(1);
       
-      // by default throw an error
+        assert (totalorder > 0);
+        assert (i < (totalorder+1u)*(totalorder+1u));
+
+// Example i, i0, i1 values for totalorder = 5:
+//                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
+//  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
+//  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
+	      
+        unsigned int i0, i1;
+
+        // Vertex DoFs
+        if (i == 0)
+          { i0 = 0; i1 = 0; }
+        else if (i == 1)
+          { i0 = 1; i1 = 0; }
+        else if (i == 2)
+          { i0 = 1; i1 = 1; }
+        else if (i == 3)
+          { i0 = 0; i1 = 1; }
+        // Edge DoFs
+        else if (i < totalorder + 3u)
+          { i0 = i - 2; i1 = 0; }
+        else if (i < 2u*totalorder + 2)
+          { i0 = 1; i1 = i - totalorder - 1; }
+        else if (i < 3u*totalorder + 1u)
+          { i0 = i - 2u*totalorder; i1 = 1; }
+        else if (i < 4u*totalorder)
+          { i0 = 0; i1 = i - 3u*totalorder + 1; }
+        // Interior DoFs
+        else
+          { i0 = (i - 4*totalorder)%(totalorder-1) + 2;
+            i1 = (i - 4*totalorder)/(totalorder-1) + 2; }
+
+        // Flip odd degree of freedom values if necessary
+        // to keep continuity on sides
+        Real f = 1.;
+
+        if ((i0%2) && (i0 > 2) && (i1 == 0))
+	  f = (elem->node(0) > elem->node(1))?-1.:1.;
+        else if ((i0%2) && (i0>2) && (i1 == 1))
+	  f = (elem->node(3) > elem->node(2))?-1.:1.;
+        else if ((i0 == 0) && (i1%2) && (i1>2))
+	  f = (elem->node(0) > elem->node(3))?-1.:1.;
+        else if ((i0 == 1) && (i1%2) && (i1>2))
+	  f = (elem->node(1) > elem->node(2))?-1.:1.;
+	      
+        return f*(FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0, xi)*
+		  FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1, eta));	      
+      }
+
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      std::cerr << "ERROR: Unsupported element type!" << std::endl;
       error();
     }
 
-  
-  error();
   return 0.;
 }
 
@@ -657,469 +476,121 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order+elem->p_level());
+
+  assert (totalorder > 0);
   
-  switch (totalorder)
+  switch (type)
     {
-
-
       // 1st & 2nd-order Hierarchics.
-    case FIRST:
-    case SECOND:
+    case TRI6:
       {
-	switch (type)
+	const Real eps = 1.e-6;
+	      
+	assert (j < 2);
+	      
+	switch (j)
 	  {
-	    // Hierarchic shape functions on the triangle.
-	  case TRI6:
+	    //  d()/dxi
+	  case 0:
 	    {
-	      // I have been lazy here and am using finite differences
-	      // to compute the derivatives!
-	      const Real eps = 1.e-6;
-	      
-	      assert (i < 6);
-	      assert (j < 2);
-	      
-	      switch (j)
-		{
-		  //  d()/dxi
-		case 0:
-		  {
-		    const Point pp(p(0)+eps, p(1));
-		    const Point pm(p(0)-eps, p(1));
+	      const Point pp(p(0)+eps, p(1));
+	      const Point pm(p(0)-eps, p(1));
 
-		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
-			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  }
+	      return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
+		      FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
+	    }
 
-		  // d()/deta
-		case 1:
-		  {
-		    const Point pp(p(0), p(1)+eps);
-		    const Point pm(p(0), p(1)-eps);
+	     // d()/deta
+	  case 1:
+	    {
+	      const Point pp(p(0), p(1)+eps);
+	      const Point pm(p(0), p(1)-eps);
 
-		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
-			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  }
+	      return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
+		      FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
+	    }
 		  
-
-		default:
-		  error();
-		}
-	    }
-
-	    
-
-	    // Hierarchic shape functions on the quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      // Compute quad shape functions as a tensor-product
-	      const Real xi  = p(0);
-	      const Real eta = p(1);
-	      
-	      assert (i < 9);
-	      
-	      //                                0  1  2  3  4  5  6  7  8
-	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
-	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
-
-	      switch (j)
-		{
-		  // d()/dxi
-		case 0:		      
-		  return (FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
-			  FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1[i],    eta));
-
-		  // d()/deta
-		case 1:		      
-		  return (FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0[i],    xi)*
-			  FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
-
-		default:
-		  error();
-		}	      
-	    }
 
 	  default:
 	    error();
 	  }
       }
 
-      
-
-      // 3rd-order Hierarchics.
-    case THIRD:
+    case QUAD8:
+    case QUAD9:
       {
-	switch (type)
+	// Compute quad shape functions as a tensor-product
+	const Real xi  = p(0);
+	const Real eta = p(1);
+
+        assert (i < (totalorder+1u)*(totalorder+1u));
+
+// Example i, i0, i1 values for totalorder = 5:
+//                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
+//  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
+//  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
+	      
+        unsigned int i0, i1;
+
+        // Vertex DoFs
+        if (i == 0)
+          { i0 = 0; i1 = 0; }
+        else if (i == 1)
+          { i0 = 1; i1 = 0; }
+        else if (i == 2)
+          { i0 = 1; i1 = 1; }
+        else if (i == 3)
+          { i0 = 0; i1 = 1; }
+        // Edge DoFs
+        else if (i < totalorder + 3u)
+          { i0 = i - 2; i1 = 0; }
+        else if (i < 2u*totalorder + 2)
+          { i0 = 1; i1 = i - totalorder - 1; }
+        else if (i < 3u*totalorder + 1u)
+          { i0 = i - 2u*totalorder; i1 = 1; }
+        else if (i < 4u*totalorder)
+          { i0 = 0; i1 = i - 3u*totalorder + 1; }
+        // Interior DoFs
+        else
+          { i0 = (i - 4*totalorder)%(totalorder-1) + 2;
+            i1 = (i - 4*totalorder)/(totalorder-1) + 2; }
+
+        // Flip odd degree of freedom values if necessary
+        // to keep continuity on sides
+        Real f = 1.;
+
+        if ((i0%2) && (i0 > 2) && (i1 == 0))
+	  f = (elem->node(0) > elem->node(1))?-1.:1.;
+        else if ((i0%2) && (i0>2) && (i1 == 1))
+	  f = (elem->node(3) > elem->node(2))?-1.:1.;
+        else if ((i0 == 0) && (i1%2) && (i1>2))
+	  f = (elem->node(0) > elem->node(3))?-1.:1.;
+        else if ((i0 == 1) && (i1%2) && (i1>2))
+	  f = (elem->node(1) > elem->node(2))?-1.:1.;
+	      
+	switch (j)
 	  {
-	    // Hierarchic shape functions on the triangle.
-	  case TRI6:
-	    {
-	      // I have been lazy here and am using finite differences
-	      // to compute the derivatives!
-	      const Real eps = 1.e-6;
+	    // d()/dxi
+	  case 0:		  		  
+	    return f*(FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0, 0, xi)*
+		      FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1,    eta));
 	      
-	      assert (i < 10);
-	      assert (j < 2);
-	      
-	      switch (j)
-		{
-		  //  d()/dxi
-		case 0:
-		  {
-		    const Point pp(p(0)+eps, p(1));
-		    const Point pm(p(0)-eps, p(1));
-
-		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
-			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  }
-
-		  // d()/deta
-		case 1:
-		  {
-		    const Point pp(p(0), p(1)+eps);
-		    const Point pm(p(0), p(1)-eps);
-
-		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
-			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  }
-		  
-
-		default:
-		  error();
-		}
-	    }
-
-	    
-
-	    // Hierarchic shape functions on the quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      // Compute quad shape functions as a tensor-product
-	      const Real xi  = p(0);
-	      const Real eta = p(1);
-	      
-	      assert (i < 16);
-
-	      //                                0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
-	      static const unsigned int i0[] = {0,  1,  1,  0,  2,  3,  1,  1,  2,  3,  0,  0,  2,  3,  2,  3};
-	      static const unsigned int i1[] = {0,  0,  1,  1,  0,  0,  2,  3,  1,  1,  2,  3,  2,  2,  3,  3};
-	      
-	      
-	      // Get the factors
-	      Real f0 = 1.;
-	      Real f1 = 1.;
-	      Real f2 = 1.;
-	      Real f3 = 1.;
-
-	      if (elem->node(0) > elem->node(1))
-		f0 = -1.;
-	      
-	      if (elem->node(1) > elem->node(2))
-		f1 = -1.;
-	      
-	      if (elem->node(3) > elem->node(2))
-		f2 = -1.;
-	      
-	      if (elem->node(0) > elem->node(3))
-		f3 = -1.;
-	      
-
-	      Real f = 1.;
-
-	      
-	      if ((i0[i] == 3) &&
-		  (i1[i] == 0))
-		f = f0;
-	      else if ((i0[i] == 3) &&
-		       (i1[i] == 1))
-		f = f2;
-	      
-	      if ((i1[i] == 3) &&
-		  (i0[i] == 0))
-		f = f3;
-	      else if ((i1[i] == 3) &&
-		       (i0[i] == 1))
-		f = f1;
-
-	      
-	      switch (j)
-		{
-		  // d()/dxi
-		case 0:		  		  
-		  return f*(FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
-			    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1[i],    eta));
-	      
-		  // d()/deta
-		case 1:		  		  
-		  return f*(FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0[i],    xi)*
-			    FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
-
-		default:
-		  error();
-		}
-	    }
+	    // d()/deta
+	  case 1:		  		  
+	    return f*(FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0,    xi)*
+		      FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 
 	  default:
 	    error();
 	  }
+
       }
-	   
-
       
-
-      // 4th-order Hierarchics.
-    case FOURTH:
-      {
-	switch (type)
-	  {
-	    // Hierarchic shape functions on the triangle.
-	  case TRI6:
-	    {
-	      // I have been lazy here and am using finite differences
-	      // to compute the derivatives!
-	      const Real eps = 1.e-6;
-	      
-	      assert (i < 15);
-	      assert (j < 2);
-	      
-	      switch (j)
-		{
-		  //  d()/dxi
-		case 0:
-		  {
-		    const Point pp(p(0)+eps, p(1));
-		    const Point pm(p(0)-eps, p(1));
-
-		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
-			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  }
-
-		  // d()/deta
-		case 1:
-		  {
-		    const Point pp(p(0), p(1)+eps);
-		    const Point pm(p(0), p(1)-eps);
-
-		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
-			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  }
-		  
-
-		default:
-		  error();
-		}
-	    }
-
-	    
-
-	    // Hierarchic shape functions on the quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      // Compute quad shape functions as a tensor-product
-	      const Real xi  = p(0);
-	      const Real eta = p(1);
-	      
-	      assert (i < 25);
-
-	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
-	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4};
-	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4};
-	      
-	      
-	      // Get the factors
-	      Real f0 = 1.;
-	      Real f1 = 1.;
-	      Real f2 = 1.;
-	      Real f3 = 1.;
-
-	      if (elem->node(0) > elem->node(1))
-		f0 = -1.;
-	      
-	      if (elem->node(1) > elem->node(2))
-		f1 = -1.;
-	      
-	      if (elem->node(3) > elem->node(2))
-		f2 = -1.;
-	      
-	      if (elem->node(0) > elem->node(3))
-		f3 = -1.;
-	      
-
-	      Real f = 1.;
-
-	      
-	      if ((i0[i] == 3) &&
-		  (i1[i] == 0))
-		f = f0;
-	      else if ((i0[i] == 3) &&
-		       (i1[i] == 1))
-		f = f2;
-	      
-	      if ((i1[i] == 3) &&
-		  (i0[i] == 0))
-		f = f3;
-	      else if ((i1[i] == 3) &&
-		       (i0[i] == 1))
-		f = f1;	      
-
-	      
-	      switch (j)
-		{
-		  // d()/dxi
-		case 0:		  		  
-		  return f*(FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
-			    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1[i],    eta));
-	      
-		  // d()/deta
-		case 1:		  		  
-		  return f*(FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0[i],    xi)*
-			    FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
-
-		default:
-		  error();
-		}
-	    }
-
-	  default:
-	    error();
-	  }
-      }
-	   
-
-      
-
-      // 5th-order Hierarchics.
-    case FIFTH:
-      {
-	// Hierarchic shape functions on the quadrilateral.
-	switch (type)
-	  {
-	    // Hierarchic shape functions on the triangle.
-	  case TRI6:
-	    {
-	      // I have been lazy here and am using finite differences
-	      // to compute the derivatives!
-	      const Real eps = 1.e-6;
-	      
-	      assert (i < 21);
-	      assert (j < 2);
-	      
-	      switch (j)
-		{
-		  //  d()/dxi
-		case 0:
-		  {
-		    const Point pp(p(0)+eps, p(1));
-		    const Point pm(p(0)-eps, p(1));
-
-		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
-			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  }
-
-		  // d()/deta
-		case 1:
-		  {
-		    const Point pp(p(0), p(1)+eps);
-		    const Point pm(p(0), p(1)-eps);
-
-		    return (FE<2,HIERARCHIC>::shape(elem, order, i, pp) -
-			    FE<2,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-		  }
-		  
-
-		default:
-		  error();
-		}
-	    }
-
-	    
-
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      // Compute quad shape functions as a tensor-product
-	      const Real xi  = p(0);
-	      const Real eta = p(1);
-	      
-	      assert (i < 36);
-
-	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
-	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
-	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
-	      
-	      
-	      // Get the factors
-	      Real f0 = 1.;
-	      Real f1 = 1.;
-	      Real f2 = 1.;
-	      Real f3 = 1.;
-
-	      if (elem->node(0) > elem->node(1))
-		f0 = -1.;
-	      
-	      if (elem->node(1) > elem->node(2))
-		f1 = -1.;
-	      
-	      if (elem->node(3) > elem->node(2))
-		f2 = -1.;
-	      
-	      if (elem->node(0) > elem->node(3))
-		f3 = -1.;
-	      
-
-	      Real f = 1.;
-
-	      
-	      if ( ((i0[i] == 3) || (i0[i] == 5)) &&
-		   (i1[i] == 0))
-		f = f0;
-	      else if ( ((i0[i] == 3) || (i0[i] == 5))&&
-			(i1[i] == 1))
-		f = f2;
-	      
-	      if ( ((i1[i] == 3) || (i1[i] == 5)) &&
-		   (i0[i] == 0))
-		f = f3;
-	      else if ( ((i1[i] == 3) || (i1[i] == 5)) &&
-			(i0[i] == 1))
-		f = f1;	      
-
-	      
-	      switch (j)
-		{
-		  // d()/dxi
-		case 0:		  		  
-		  return f*(FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
-			    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1[i],    eta));
-	      
-		  // d()/deta
-		case 1:		  		  
-		  return f*(FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0[i],    xi)*
-			    FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
-
-		default:
-		  error();
-		}
-	    }
-
-	  default:
-	    error();
-	  }
-      }
-
-
-
-      
-      // by default throw an error;call the orientation-independent shape functions
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      std::cerr << "ERROR: Unsupported element type!" << std::endl;
       error();
     }
 
-  
-  error();
   return 0.;
 }
 

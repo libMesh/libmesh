@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_3D.C,v 1.15 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_hierarchic_shape_3D.C,v 1.16 2006-04-05 16:42:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,18 +24,608 @@
 #include "fe.h"
 #include "elem.h"
 
+// anonymous namespace for local helper functions
+namespace
+{
+
+const unsigned int get_min_node(const Elem *elem,
+                                unsigned int a,
+                                unsigned int b,
+                                unsigned int c,
+                                unsigned int d)
+{
+  return std::min(std::min(elem->node(a),elem->node(b)),
+                  std::min(elem->node(c),elem->node(d)));
+}
+
+void cube_indices(const Elem *elem,
+                  const unsigned int totalorder,
+                  const unsigned int i,
+                  Real &xi, Real &eta, Real &zeta,
+                  unsigned int &i0,
+                  unsigned int &i1,
+                  unsigned int &i2)
+{
+  // The only way to make any sense of this
+  // is to look at the mgflo/mg2/mgf documentation
+  // and make the cut-out cube!
+// Example i0 and i1 values for totalorder = 3:
+//     Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26 
+//     DOFS                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 18 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 60 62 63
+// static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3};
+// static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 2, 2, 3, 3, 0, 0, 0, 0, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3};
+// static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
+
+  // the number of DoFs per edge appears everywhere:
+  const unsigned int e = totalorder - 1u;
+
+  assert (i<(totalorder+1u)*(totalorder+1u)*(totalorder+1u));
+
+// Vertices:
+  if (i == 0)
+    {
+      i0 = 0;
+      i1 = 0;
+      i2 = 0;
+    }
+  else if (i == 1)
+    {
+      i0 = 1;
+      i1 = 0;
+      i2 = 0;
+    }
+  else if (i == 2)
+    {
+      i0 = 1;
+      i1 = 1;
+      i2 = 0;
+    }
+  else if (i == 3)
+    {
+      i0 = 0;
+      i1 = 1;
+      i2 = 0;
+    }
+  else if (i == 4)
+    {
+      i0 = 0;
+      i1 = 0;
+      i2 = 1;
+    }
+  else if (i == 5)
+    {
+      i0 = 1;
+      i1 = 0;
+      i2 = 1;
+    }
+  else if (i == 6)
+    {
+      i0 = 1;
+      i1 = 1;
+      i2 = 1;
+    }
+  else if (i == 7)
+    {
+      i0 = 0;
+      i1 = 1;
+      i2 = 1;
+    }
+  // Edge 0
+  else if (i < 8 + e)
+    {
+      i2 = i - 6;
+      i1 = 0;
+      i2 = 0;
+      if (elem->node(0) > elem->node(1))
+        xi = -xi;
+    }
+  // Edge 1
+  else if (i < 8 + 2*e)
+    {
+      i0 = 1;
+      i1 = i - e - 6;
+      i2 = 0;
+      if (elem->node(1) > elem->node(2))
+        eta = -eta;
+    }
+  // Edge 2
+  else if (i < 8 + 3*e)
+    {
+      i0 = i - 2*e - 6;
+      i1 = 1;
+      i2 = 0;
+      if (elem->node(3) > elem->node(2))
+        xi = -xi;
+    }
+  // Edge 3
+  else if (i < 8 + 4*e)
+    {
+      i0 = 0;
+      i1 = i - 3*e - 6;
+      i2 = 0;
+      if (elem->node(0) > elem->node(3))
+        eta = -eta;
+    }
+  // Edge 4
+  else if (i < 8 + 5*e)
+    {
+      i0 = 0;
+      i1 = 0;
+      i2 = i - 4*e - 6;
+      if (elem->node(0) > elem->node(4))
+        zeta = -zeta;
+    }                
+  // Edge 5
+  else if (i < 8 + 6*e)
+    {
+      i0 = 1;
+      i1 = 0;
+      i2 = i - 5*e - 6;
+      if (elem->node(1) > elem->node(5))
+        zeta = -zeta;
+    }                
+  // Edge 6
+  else if (i < 8 + 7*e)
+    {
+      i0 = 1;
+      i1 = 1;
+      i2 = i - 6*e - 6;
+      if (elem->node(2) > elem->node(6))
+        zeta = -zeta;
+    }
+  // Edge 7
+  else if (i < 8 + 8*e)
+    {
+      i0 = 0;
+      i1 = 1;
+      i2 = i - 7*e - 6;
+      if (elem->node(3) > elem->node(7))
+        zeta = -zeta;
+    }                
+  // Edge 8
+  else if (i < 8 + 9*e)
+    {
+      i0 = i - 8*e - 6;
+      i1 = 0;
+      i2 = 1;
+      if (elem->node(4) > elem->node(5))
+        xi = -xi;
+    }
+  // Edge 9
+  else if (i < 8 + 10*e)
+    {
+      i0 = 1;
+      i1 = i - 9*e - 6;
+      i2 = 1;
+      if (elem->node(5) > elem->node(6))
+        eta = -eta;
+    }                
+  // Edge 10
+  else if (i < 8 + 11*e)
+    {
+      i0 = i - 10*e - 6;
+      i1 = 1;
+      i2 = 1;
+      if (elem->node(7) > elem->node(6))
+        xi = -xi;
+    }
+  // Edge 11
+  else if (i < 8 + 12*e)
+    {
+      i0 = 0;
+      i1 = i - 11*e - 6;
+      i2 = 1;
+      if (elem->node(4) > elem->node(7))
+        eta = -eta;
+    }
+  // Face 0
+  else if (i < 8 + 12*e + e*e)
+    {
+      i0 = (i - 8 - 12*e)%e + 2;
+      i1 = (i - 8 - 12*e)/e + 2;
+      i2 = 0;
+      const unsigned int min_node = get_min_node(elem, 1, 2, 0, 3);
+
+      if (elem->node(0) == min_node)
+        if (elem->node(1) == std::min(elem->node(1), elem->node(3)))
+          {
+            // Case 1
+            xi  = xi;
+            eta = eta;
+          }
+        else
+          {
+            // Case 2
+            xi  = eta;
+            eta = xi;
+          }
+
+      else if (elem->node(3) == min_node)
+        if (elem->node(0) == std::min(elem->node(0), elem->node(2)))
+          {
+            // Case 3
+            xi  = -eta;
+            eta = xi;
+          }
+        else
+          {
+            // Case 4
+            xi  = xi;
+            eta = -eta;
+          }
+
+      else if (elem->node(2) == min_node)
+        if (elem->node(3) == std::min(elem->node(3), elem->node(1)))
+          {
+            // Case 5
+            xi  = -xi;
+            eta = -eta;
+          }
+        else
+          {
+            // Case 6
+            xi  = -eta;
+            eta = -xi;
+          }
+
+      else if (elem->node(1) == min_node)
+        if (elem->node(2) == std::min(elem->node(2), elem->node(0)))
+          {
+            // Case 7
+            xi  = eta;
+            eta = -xi;
+          }
+        else
+          {
+            // Case 8
+            xi  = -xi;
+            eta = eta;
+          }
+    }
+  // Face 1
+  else if (i < 8 + 12*e + 2*e*e)
+    {
+      i0 = (i - 8 - 12*e - e*e)%e + 2;
+      i1 = 0;
+      i2 = (i - 8 - 12*e - e*e)/e + 2;
+      const unsigned int min_node = get_min_node(elem, 0, 1, 5, 4);
+
+      if (elem->node(0) == min_node)
+        if (elem->node(1) == std::min(elem->node(1), elem->node(4)))
+          {
+            // Case 1
+            xi   = xi;
+            zeta = zeta;
+          }
+        else
+          {
+            // Case 2
+            xi   = zeta;
+            zeta = xi;
+          }
+
+      else if (elem->node(1) == min_node)
+        if (elem->node(5) == std::min(elem->node(5), elem->node(0)))
+          {
+            // Case 3
+            xi   = zeta;
+            zeta = -xi;
+          }
+        else
+          {
+            // Case 4
+            xi   = -xi;
+            zeta = zeta;
+          }
+
+      else if (elem->node(5) == min_node)
+        if (elem->node(4) == std::min(elem->node(4), elem->node(1)))
+          {
+            // Case 5
+            xi   = -xi;
+            zeta = -zeta;
+          }
+        else
+          {
+            // Case 6
+            xi   = -zeta;
+            zeta = -xi;
+          }
+
+      else if (elem->node(4) == min_node)
+        if (elem->node(0) == std::min(elem->node(0), elem->node(5)))
+          {
+            // Case 7
+            xi   = -xi;
+            zeta = zeta;
+          }
+        else
+          {
+            // Case 8
+            xi   = xi;
+            zeta = -zeta;
+          }
+    }
+  // Face 2
+  else if (i < 8 + 12*e + 3*e*e)
+    {
+      i0 = 1;
+      i1 = (i - 8 - 12*e - 2*e*e)%e + 2;
+      i2 = (i - 8 - 12*e - 2*e*e)/e + 2;
+      const unsigned int min_node = get_min_node(elem, 1, 2, 6, 5);
+
+      if (elem->node(1) == min_node)
+        if (elem->node(2) == std::min(elem->node(2), elem->node(5)))
+          {
+            // Case 1
+            eta  = eta;
+            zeta = zeta;
+          }
+        else
+          {
+            // Case 2
+            eta  = zeta;
+            zeta = eta;
+          }
+
+      else if (elem->node(2) == min_node)
+        if (elem->node(6) == std::min(elem->node(6), elem->node(1)))
+          {
+            // Case 3
+            eta  = zeta;
+            zeta = -eta;
+          }
+        else
+          {
+            // Case 4
+            eta  = -eta;
+            zeta = zeta;
+          }
+
+      else if (elem->node(6) == min_node)
+        if (elem->node(5) == std::min(elem->node(5), elem->node(2)))
+          {
+            // Case 5
+            eta  = -eta;
+            zeta = -zeta;
+          }
+        else
+          {
+            // Case 6
+            eta  = -zeta;
+            zeta = -eta;
+          }
+
+      else if (elem->node(5) == min_node)
+        if (elem->node(1) == std::min(elem->node(1), elem->node(6)))
+          {
+            // Case 7
+            eta  = -zeta;
+            zeta = eta;
+          }
+        else
+          {
+            // Case 8
+            eta   = eta;
+            zeta = -zeta;
+          }
+    }
+  // Face 3
+  else if (i < 8 + 12*e + 4*e*e)
+    {
+      i0 = (i - 8 - 12*e - 3*e*e)%e + 2;
+      i1 = 1;
+      i2 = (i - 8 - 12*e - 3*e*e)/e + 2;
+      const unsigned int min_node = get_min_node(elem, 2, 3, 7, 6);
+
+      if (elem->node(3) == min_node)
+        if (elem->node(2) == std::min(elem->node(2), elem->node(7)))
+          {
+            // Case 1
+            xi   = xi;
+            zeta = zeta;
+          }
+        else
+          {
+            // Case 2
+            xi   = zeta;
+            zeta = xi;
+          }
+
+      else if (elem->node(7) == min_node)
+        if (elem->node(3) == std::min(elem->node(3), elem->node(6)))
+          {
+            // Case 3
+            xi   = -zeta;
+            zeta = xi;
+          }
+        else
+          {
+            // Case 4
+            xi   = xi;
+            zeta = -zeta;
+          }
+
+      else if (elem->node(6) == min_node)
+        if (elem->node(7) == std::min(elem->node(7), elem->node(2)))
+          {
+            // Case 5
+            xi   = -xi;
+            zeta = -zeta;
+          }
+        else
+          {
+            // Case 6
+            xi   = -zeta;
+            zeta = -xi;
+          }
+
+      else if (elem->node(2) == min_node)
+        if (elem->node(6) == std::min(elem->node(3), elem->node(6)))
+          {
+            // Case 7
+            xi   = zeta;
+            zeta = -xi;
+          }
+        else
+          {
+            // Case 8
+            xi   = -xi;
+            zeta = zeta;
+          }
+    }
+  // Face 4
+  else if (i < 8 + 12*e + 5*e*e)
+    {
+      i0 = 0;
+      i1 = (i - 8 - 12*e - 4*e*e)%e + 2;
+      i2 = (i - 8 - 12*e - 4*e*e)/e + 2;
+      const unsigned int min_node = get_min_node(elem, 3, 0, 4, 7);
+
+      if (elem->node(0) == min_node)
+        if (elem->node(3) == std::min(elem->node(3), elem->node(4)))
+          {
+            // Case 1
+            eta  = eta;
+            zeta = zeta;
+          }
+        else
+          {
+            // Case 2
+            eta  = zeta;
+            zeta = eta;
+          }
+
+      else if (elem->node(4) == min_node)
+        if (elem->node(0) == std::min(elem->node(0), elem->node(7)))
+          {
+            // Case 3
+            eta  = -zeta;
+            zeta = eta;
+          }
+        else
+          {
+            // Case 4
+            eta  = eta;
+            zeta = -zeta;
+          }
+
+      else if (elem->node(7) == min_node)
+        if (elem->node(4) == std::min(elem->node(4), elem->node(3)))
+          {
+            // Case 5
+            eta  = -eta;
+            zeta = -zeta;
+          }
+        else
+          {
+            // Case 6
+            eta  = -zeta;
+            zeta = -eta;
+          }
+
+      else if (elem->node(3) == min_node)
+        if (elem->node(7) == std::min(elem->node(7), elem->node(0)))
+          {
+            // Case 7
+            eta   = zeta;
+            zeta = -eta;
+          }
+        else
+          {
+            // Case 8
+            eta  = -eta;
+            zeta = zeta;
+          }
+    }
+  // Face 5
+  else if (i < 8 + 12*e + 6*e*e)
+    {
+      i0 = (i - 8 - 12*e - 5*e*e)%e + 2;
+      i1 = (i - 8 - 12*e - 5*e*e)/e + 2;
+      i2 = 1;
+      const unsigned int min_node = get_min_node(elem, 4, 5, 6, 7);
+
+      if (elem->node(4) == min_node)
+        if (elem->node(5) == std::min(elem->node(5), elem->node(7)))
+          {
+            // Case 1
+            xi  = xi;
+            eta = eta;
+          }
+        else
+          {
+            // Case 2
+            xi  = eta;
+            eta = xi;
+          }
+
+      else if (elem->node(5) == min_node)
+        if (elem->node(6) == std::min(elem->node(6), elem->node(4)))
+          {
+            // Case 3
+            xi  = eta;
+            eta = -xi;
+          }
+        else
+          {
+            // Case 4
+            xi  = -xi;
+            eta = eta;
+          }
+
+      else if (elem->node(6) == min_node)
+        if (elem->node(7) == std::min(elem->node(7), elem->node(5)))
+          {
+            // Case 5
+            xi  = -xi;
+            eta = -eta;
+          }
+        else
+          {
+            // Case 6
+            xi  = -eta;
+            eta = -xi;
+          }
+
+      else if (elem->node(7) == min_node)
+        if (elem->node(4) == std::min(elem->node(4), elem->node(6)))
+          {
+            // Case 7
+            xi  = -eta;
+            eta = xi;
+          }
+        else
+          {
+            // Case 8
+            xi  = xi;
+            eta = eta;
+          }
+    }
+
+  // Internal DoFs
+  else 
+    {
+      i0 = (i - 8 - 12*e - 6*e*e)%e + 2;
+      i1 = ((i - 8 - 12*e - 6*e*e)/e)%e + 2;
+      i2 = (i - 8 - 12*e - 6*e*e)/(e*e) + 2;
+    }
+}
+
+}
+
 
 
 
 template <>
 Real FE<3,HIERARCHIC>::shape(const ElemType,
-			     const Order,
-			     const unsigned int,
-			     const Point&)
+                             const Order,
+                             const unsigned int,
+                             const Point&)
 {
   std::cerr << "Hierarchic polynomials require the element type\n"
-	    << "because edge and face orientation is needed."
-	    << std::endl;
+            << "because edge and face orientation is needed."
+            << std::endl;
   
   error();
   return 0.;
@@ -45,9 +635,9 @@ Real FE<3,HIERARCHIC>::shape(const ElemType,
 
 template <>
 Real FE<3,HIERARCHIC>::shape(const Elem* elem,
-			     const Order order,
-			     const unsigned int i,
-			     const Point& p)
+                             const Order order,
+                             const unsigned int i,
+                             const Point& p)
 {
 #if DIM == 3
   
@@ -56,560 +646,24 @@ Real FE<3,HIERARCHIC>::shape(const Elem* elem,
 
   const Order totalorder = static_cast<Order>(order+elem->p_level());
   
-  switch (totalorder)
+  switch (type)
     {
-
-      
-
-      // 1st & 2nd-order Hierarchics.
-    case FIRST:
-    case SECOND:
+    case HEX27:
       {
-	switch (type)
-	  {
-	    // Hierarchic shape functions on the hexahedral.
-	  case HEX27:
-	    {
-	      assert (i<27);
-	
-	      // Compute hex shape functions as a tensor-product
-	      const Real xi   = p(0);
-	      const Real eta  = p(1);
-	      const Real zeta = p(2);
-	
-	      // The only way to make any sense of this
-	      // is to look at the mgflo/mg2/mgf documentation
-	      // and make the cut-out cube!
-	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-	      static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
-	
-	      return (FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0[i], xi)*
-		      FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1[i], eta)*
-		      FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i2[i], zeta));
-	    }
+        assert (i<(totalorder+1u)*(totalorder+1u)*(totalorder+1u));
+        
+        // Compute hex shape functions as a tensor-product
+        Real xi   = p(0);
+        Real eta  = p(1);
+        Real zeta = p(2);
+        
+        unsigned int i0, i1, i2;
+        
+	cube_indices(elem, totalorder, i, xi, eta, zeta, i0, i1, i2);
 
-	    
-	  default:
-	    error();
-	  }
-	
-      }
-
-      
-
-      // 3rd-order Hierarchics.
-    case THIRD:
-      {
-	switch (type)
-	  {
-	    // Hierarchic shape functions on the hexahedral.
-	  case HEX27:
-	    {
-	      assert (i<64);
-	
-	      // Compute hex shape functions as a tensor-product
-	      const Real xi    = p(0);
-	      const Real eta   = p(1);
-	      const Real zeta  = p(2);
-	      Real xi_mapped   = p(0);
-	      Real eta_mapped  = p(1);
-	      Real zeta_mapped = p(2);
-	
-	      // The only way to make any sense of this
-	      // is to look at the mgflo/mg2/mgf documentation
-	      // and make the cut-out cube!
-	      //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26 
-	      //  DOFS                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 18 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 60 62 63
-	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3};
-	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 2, 2, 3, 3, 0, 0, 0, 0, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3};
-	      static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
-
-
-
-              if ((i0[i] >= 2) || (i1[i] >= 2) || (i2[i] >= 2))
-	      // handle the edge orientation
-	      {
-		// Edge 0
-		if ((i1[i] == 0) && (i2[i] == 0))
-		  {
-		    if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
-		      xi_mapped = -xi;
-		  }
-		// Edge 1
-		else if ((i0[i] == 1) && (i2[i] == 0))
-		  {
-		    if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
-		      eta_mapped = -eta;
-		  }
-		// Edge 2
-		else if ((i1[i] == 1) && (i2[i] == 0))
-		  {
-		    if (elem->node(3) != std::min(elem->node(3), elem->node(2)))
-		      xi_mapped = -xi;
-		  }
-		// Edge 3
-		else if ((i0[i] == 0) && (i2[i] == 0))
-		  {
-		    if (elem->node(0) != std::min(elem->node(0), elem->node(3)))
-		      eta_mapped = -eta;
-		  }
-		// Edge 4
-		else if ((i0[i] == 0) && (i1[i] == 0))
-		  {
-		    if (elem->node(0) != std::min(elem->node(0), elem->node(4)))
-		      zeta_mapped = -zeta;
-		  }		
-		// Edge 5
-		else if ((i0[i] == 1) && (i1[i] == 0))
-		  {
-		    if (elem->node(1) != std::min(elem->node(1), elem->node(5)))
-		      zeta_mapped = -zeta;
-		  }		
-		// Edge 6
-		else if ((i0[i] == 1) && (i1[i] == 1))
-		  {
-		    if (elem->node(2) != std::min(elem->node(2), elem->node(6)))
-		      zeta_mapped = -zeta;
-		  }
-		// Edge 7
-		else if ((i0[i] == 0) && (i1[i] == 1))
-		  {
-		    if (elem->node(3) != std::min(elem->node(3), elem->node(7)))
-		      zeta_mapped = -zeta;
-		  }		
-		// Edge 8
-		else if ((i1[i] == 0) && (i2[i] == 1))
-		  {
-		    if (elem->node(4) != std::min(elem->node(4), elem->node(5)))
-		      xi_mapped = -xi;
-		  }
-		// Edge 9
-		else if ((i0[i] == 1) && (i2[i] == 1))
-		  {
-		    if (elem->node(5) != std::min(elem->node(5), elem->node(6)))
-		      eta_mapped = -eta;
-		  }		
-		// Edge 10
-		else if ((i1[i] == 1) && (i2[i] == 1))
-		  {
-		    if (elem->node(7) != std::min(elem->node(7), elem->node(6)))
-		      xi_mapped = -xi;
-		  }
-		// Edge 11
-		else if ((i0[i] == 0) && (i2[i] == 1))
-		  {
-		    if (elem->node(4) != std::min(elem->node(4), elem->node(7)))
-		      eta_mapped = -eta;
-		  }
-	      }
-
-
-	      // handle the face orientation
-	      {
-		// Face 0
-		if (     (i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
-		  {
-		    const unsigned int min_node = std::min(elem->node(1),
-							   std::min(elem->node(2),
-								    std::min(elem->node(0),
-									     elem->node(3))));
-		    if (elem->node(0) == min_node)
-		      if (elem->node(1) == std::min(elem->node(1), elem->node(3)))
-			{
-			  // Case 1
-			  xi_mapped  = xi;
-			  eta_mapped = eta;
-			}
-		      else
-			{
-			  // Case 2
-			  xi_mapped  = eta;
-			  eta_mapped = xi;
-			}
-
-		    else if (elem->node(3) == min_node)
-		      if (elem->node(0) == std::min(elem->node(0), elem->node(2)))
-			{
-			  // Case 3
-			  xi_mapped  = -eta;
-			  eta_mapped = xi;
-			}
-		      else
-			{
-			  // Case 4
-			  xi_mapped  = xi;
-			  eta_mapped = -eta;
-			}
-
-		    else if (elem->node(2) == min_node)
-		      if (elem->node(3) == std::min(elem->node(3), elem->node(1)))
-			{
-			  // Case 5
-			  xi_mapped  = -xi;
-			  eta_mapped = -eta;
-			}
-		      else
-			{
-			  // Case 6
-			  xi_mapped  = -eta;
-			  eta_mapped = -xi;
-			}
-
-		    else if (elem->node(1) == min_node)
-		      if (elem->node(2) == std::min(elem->node(2), elem->node(0)))
-			{
-			  // Case 7
-			  xi_mapped  = eta;
-			  eta_mapped = -xi;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped  = -xi;
-			  eta_mapped = eta;
-			}
-		  }
-
-		
-		// Face 1
-		else if ((i1[i] == 0) && (i0[i] >= 2) && (i2[i] >= 2))
-		  {
-		    const unsigned int min_node = std::min(elem->node(0),
-							   std::min(elem->node(1),
-								    std::min(elem->node(5),
-									     elem->node(4))));
-		    if (elem->node(0) == min_node)
-		      if (elem->node(1) == std::min(elem->node(1), elem->node(4)))
-			{
-			  // Case 1
-			  xi_mapped   = xi;
-			  zeta_mapped = zeta;
-			}
-		      else
-			{
-			  // Case 2
-			  xi_mapped   = zeta;
-			  zeta_mapped = xi;
-			}
-
-		    else if (elem->node(1) == min_node)
-		      if (elem->node(5) == std::min(elem->node(5), elem->node(0)))
-			{
-			  // Case 3
-			  xi_mapped   = zeta;
-			  zeta_mapped = -xi;
-			}
-		      else
-			{
-			  // Case 4
-			  xi_mapped   = -xi;
-			  zeta_mapped = zeta;
-			}
-
-		    else if (elem->node(5) == min_node)
-		      if (elem->node(4) == std::min(elem->node(4), elem->node(1)))
-			{
-			  // Case 5
-			  xi_mapped   = -xi;
-			  zeta_mapped = -zeta;
-			}
-		      else
-			{
-			  // Case 6
-			  xi_mapped   = -zeta;
-			  zeta_mapped = -xi;
-			}
-
-		    else if (elem->node(4) == min_node)
-		      if (elem->node(0) == std::min(elem->node(0), elem->node(5)))
-			{
-			  // Case 7
-			  xi_mapped   = -xi;
-			  zeta_mapped = zeta;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped   = xi;
-			  zeta_mapped = -zeta;
-			}
-		  }
-
-		
-		// Face 2
-		else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] >= 2))
-		  {
-		    const unsigned int min_node = std::min(elem->node(1),
-							   std::min(elem->node(2),
-								    std::min(elem->node(6),
-									     elem->node(5))));
-		    if (elem->node(1) == min_node)
-		      if (elem->node(2) == std::min(elem->node(2), elem->node(5)))
-			{
-			  // Case 1
-			  eta_mapped  = eta;
-			  zeta_mapped = zeta;
-			}
-		      else
-			{
-			  // Case 2
-			  eta_mapped  = zeta;
-			  zeta_mapped = eta;
-			}
-
-		    else if (elem->node(2) == min_node)
-		      if (elem->node(6) == std::min(elem->node(6), elem->node(1)))
-			{
-			  // Case 3
-			  eta_mapped  = zeta;
-			  zeta_mapped = -eta;
-			}
-		      else
-			{
-			  // Case 4
-			  eta_mapped  = -eta;
-			  zeta_mapped = zeta;
-			}
-
-		    else if (elem->node(6) == min_node)
-		      if (elem->node(5) == std::min(elem->node(5), elem->node(2)))
-			{
-			  // Case 5
-			  eta_mapped  = -eta;
-			  zeta_mapped = -zeta;
-			}
-		      else
-			{
-			  // Case 6
-			  eta_mapped  = -zeta;
-			  zeta_mapped = -eta;
-			}
-
-		    else if (elem->node(5) == min_node)
-		      if (elem->node(1) == std::min(elem->node(1), elem->node(6)))
-			{
-			  // Case 7
-			  eta_mapped  = -zeta;
-			  zeta_mapped = eta;
-			}
-		      else
-			{
-			  // Case 8
-			  eta_mapped   = eta;
-			  zeta_mapped = -zeta;
-			}
-		  }
-
-		
-		// Face 3
-		else if ((i1[i] == 1) && (i0[i] >= 2) && (i2[i] >= 2))
-		  {
- 		    const unsigned int min_node = std::min(elem->node(2),
-							   std::min(elem->node(3),
-								    std::min(elem->node(7),
-									     elem->node(6))));
-		    if (elem->node(3) == min_node)
-		      if (elem->node(2) == std::min(elem->node(2), elem->node(7)))
-			{
-			  // Case 1
-			  xi_mapped   = xi;
-			  zeta_mapped = zeta;
-			}
-		      else
-			{
-			  // Case 2
-			  xi_mapped   = zeta;
-			  zeta_mapped = xi;
-			}
-
-		    else if (elem->node(7) == min_node)
-		      if (elem->node(3) == std::min(elem->node(3), elem->node(6)))
-			{
-			  // Case 3
-			  xi_mapped   = -zeta;
-			  zeta_mapped = xi;
-			}
-		      else
-			{
-			  // Case 4
-			  xi_mapped   = xi;
-			  zeta_mapped = -zeta;
-			}
-
-		    else if (elem->node(6) == min_node)
-		      if (elem->node(7) == std::min(elem->node(7), elem->node(2)))
-			{
-			  // Case 5
-			  xi_mapped   = -xi;
-			  zeta_mapped = -zeta;
-			}
-		      else
-			{
-			  // Case 6
-			  xi_mapped   = -zeta;
-			  zeta_mapped = -xi;
-			}
-
-		    else if (elem->node(2) == min_node)
-		      if (elem->node(6) == std::min(elem->node(3), elem->node(6)))
-			{
-			  // Case 7
-			  xi_mapped   = zeta;
-			  zeta_mapped = -xi;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped   = -xi;
-			  zeta_mapped = zeta;
-			}
-		  }
-
-		
-		// Face 4
-		else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] >= 2))
-		  {
- 		    const unsigned int min_node = std::min(elem->node(3),
-							   std::min(elem->node(0),
-								    std::min(elem->node(4),
-									     elem->node(7))));
-		    if (elem->node(0) == min_node)
-		      if (elem->node(3) == std::min(elem->node(3), elem->node(4)))
-			{
-			  // Case 1
-			  eta_mapped  = eta;
-			  zeta_mapped = zeta;
-			}
-		      else
-			{
-			  // Case 2
-			  eta_mapped  = zeta;
-			  zeta_mapped = eta;
-			}
-
-		    else if (elem->node(4) == min_node)
-		      if (elem->node(0) == std::min(elem->node(0), elem->node(7)))
-			{
-			  // Case 3
-			  eta_mapped  = -zeta;
-			  zeta_mapped = eta;
-			}
-		      else
-			{
-			  // Case 4
-			  eta_mapped  = eta;
-			  zeta_mapped = -zeta;
-			}
-
-		    else if (elem->node(7) == min_node)
-		      if (elem->node(4) == std::min(elem->node(4), elem->node(3)))
-			{
-			  // Case 5
-			  eta_mapped  = -eta;
-			  zeta_mapped = -zeta;
-			}
-		      else
-			{
-			  // Case 6
-			  eta_mapped  = -zeta;
-			  zeta_mapped = -eta;
-			}
-
-		    else if (elem->node(3) == min_node)
-		      if (elem->node(7) == std::min(elem->node(7), elem->node(0)))
-			{
-			  // Case 7
-			  eta_mapped   = zeta;
-			  zeta_mapped = -eta;
-			}
-		      else
-			{
-			  // Case 8
-			  eta_mapped  = -eta;
-			  zeta_mapped = zeta;
-			}
-		  }
-
-		
-		// Face 5
-		else if ((i2[i] == 1) && (i0[i] >= 2) && (i1[i] >= 2))
-		  {
- 		    const unsigned int min_node = std::min(elem->node(4),
-							   std::min(elem->node(5),
-								    std::min(elem->node(6),
-									     elem->node(7))));
-		    if (elem->node(4) == min_node)
-		      if (elem->node(5) == std::min(elem->node(5), elem->node(7)))
-			{
-			  // Case 1
-			  xi_mapped  = xi;
-			  eta_mapped = eta;
-			}
-		      else
-			{
-			  // Case 2
-			  xi_mapped  = eta;
-			  eta_mapped = xi;
-			}
-
-		    else if (elem->node(5) == min_node)
-		      if (elem->node(6) == std::min(elem->node(6), elem->node(4)))
-			{
-			  // Case 3
-			  xi_mapped  = eta;
-			  eta_mapped = -xi;
-			}
-		      else
-			{
-			  // Case 4
-			  xi_mapped  = -xi;
-			  eta_mapped = eta;
-			}
-
-		    else if (elem->node(6) == min_node)
-		      if (elem->node(7) == std::min(elem->node(7), elem->node(5)))
-			{
-			  // Case 5
-			  xi_mapped  = -xi;
-			  eta_mapped = -eta;
-			}
-		      else
-			{
-			  // Case 6
-			  xi_mapped  = -eta;
-			  eta_mapped = -xi;
-			}
-
-		    else if (elem->node(7) == min_node)
-		      if (elem->node(4) == std::min(elem->node(4), elem->node(6)))
-			{
-			  // Case 7
-			  xi_mapped  = -eta;
-			  eta_mapped = xi;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped  = xi;
-			  eta_mapped = eta;
-			}
-		  }
-
-		
-	      }
-		  
-	      
-	      return (FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0[i], xi_mapped)*
-		      FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1[i], eta_mapped)*
-		      FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i2[i], zeta_mapped));
-	    }
-
-	    
-	  default:
-	    error();
-	  }	
+        return (FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0, xi)*
+                FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1, eta)*
+                FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i2, zeta));
       }
 
     default:
@@ -627,14 +681,14 @@ Real FE<3,HIERARCHIC>::shape(const Elem* elem,
 
 template <>
 Real FE<3,HIERARCHIC>::shape_deriv(const ElemType,
-				   const Order,
-				   const unsigned int,
-				   const unsigned int,
-				   const Point& )
+                                   const Order,
+                                   const unsigned int,
+                                   const unsigned int,
+                                   const Point& )
 {
   std::cerr << "Hierarchic polynomials require the element type\n"
-	    << "because edge and face orientation is needed."
-	    << std::endl;
+            << "because edge and face orientation is needed."
+            << std::endl;
   error();
   
   return 0.;
@@ -644,10 +698,10 @@ Real FE<3,HIERARCHIC>::shape_deriv(const ElemType,
 
 template <>
 Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
-				   const Order order,
-				   const unsigned int i,
-				   const unsigned int j,
-				   const Point& p)
+                                   const Order order,
+                                   const unsigned int i,
+                                   const unsigned int j,
+                                   const Point& p)
 {
 #if DIM == 3
   assert (elem != NULL);
@@ -657,602 +711,45 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
 
   assert (j < 3);
   
-  switch (totalorder)
+  switch (type)
     {
-
-      
-
       // 1st & 2nd-order Hierarchics.
-    case FIRST:
-    case SECOND:
+    case HEX27:
       {
-	switch (type)
-	  {
-	    // Hierarchic shape functions on the hexahedral.
-	  case HEX27:
-	    {
-	      assert (i<27);
-	
-	      // Compute hex shape functions as a tensor-product
-	      const Real xi   = p(0);
-	      const Real eta  = p(1);
-	      const Real zeta = p(2);
-	
-	      // The only way to make any sense of this
-	      // is to look at the mgflo/mg2/mgf documentation
-	      // and make the cut-out cube!
-	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-	      static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
+        assert (i<(totalorder+1u)*(totalorder+1u)*(totalorder+1u));
+        
+        // Compute hex shape functions as a tensor-product
+        Real xi   = p(0);
+        Real eta  = p(1);
+        Real zeta = p(2);
+        
+        unsigned int i0, i1, i2;
+        
+        cube_indices(elem, totalorder, i, xi, eta, zeta, i0, i1, i2);
 
-	      switch (j)
-		{
-		  // d()/dxi
-		case 0:
-		  return (FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
-			  FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1[i],    eta)*
-			  FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i2[i],    zeta));
+        switch (j)
+          {
+            // d()/dxi
+          case 0:
+            return (FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0, 0, xi)*
+                    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1,    eta)*
+                    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i2,    zeta));
 
-		  // d()/deta
-		case 1:
-		  return (FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0[i],     xi)*
-			  FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta)*
-			  FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i2[i],    zeta));
+            // d()/deta
+          case 1:
+            return (FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0,    xi)*
+                    FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1, 0, eta)*
+                    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i2,    zeta));
 
-		  // d()/dzeta
-		case 2:
-		  return (FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0[i],    xi)*
-			  FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1[i],    eta)*
-			  FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta));
+            // d()/dzeta
+          case 2:
+            return (FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0,    xi)*
+                    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1,    eta)*
+                    FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i2, 0, zeta));
 
-		default:
-		  error();
-		}
-	    }
-
-
-	  default:
-	    error();
-	  }
-      }
-
-      
-
-      // 3rd-order Hierarchics.
-    case THIRD:
-      {
-	switch (type)
-	  {
-	    // Hierarchic shape functions on the hexahedral.
-	  case HEX27:
-	    {
-	      assert (i<64);
-	
-	      // Compute hex shape functions as a tensor-product
-	      const Real xi    = p(0);
-	      const Real eta   = p(1);
-	      const Real zeta  = p(2);
-	      Real xi_mapped   = p(0);
-	      Real eta_mapped  = p(1);
-	      Real zeta_mapped = p(2);
-	
-	      // The only way to make any sense of this
-	      // is to look at the mgflo/mg2/mgf documentation
-	      // and make the cut-out cube!
-	      //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26 
-	      //  DOFS                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 18 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 60 62 63
-	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3};
-	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 2, 2, 3, 3, 0, 0, 0, 0, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3};
-	      static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
-
-
-
-              if ((i0[i] >= 2) || (i1[i] >= 2) || (i2[i] >= 2))
-	      // handle the edge orientation
-	      {
-		// Edge 0
-		if ((i1[i] == 0) && (i2[i] == 0))
-		  {
-		    if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
-		      xi_mapped = -xi;
-		  }
-		// Edge 1
-		else if ((i0[i] == 1) && (i2[i] == 0))
-		  {
-		    if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
-		      eta_mapped = -eta;
-		  }
-		// Edge 2
-		else if ((i1[i] == 1) && (i2[i] == 0))
-		  {
-		    if (elem->node(3) != std::min(elem->node(3), elem->node(2)))
-		      xi_mapped = -xi;
-		  }
-		// Edge 3
-		else if ((i0[i] == 0) && (i2[i] == 0))
-		  {
-		    if (elem->node(0) != std::min(elem->node(0), elem->node(3)))
-		      eta_mapped = -eta;
-		  }
-		// Edge 4
-		else if ((i0[i] == 0) && (i1[i] == 0))
-		  {
-		    if (elem->node(0) != std::min(elem->node(0), elem->node(4)))
-		      zeta_mapped = -zeta;
-		  }		
-		// Edge 5
-		else if ((i0[i] == 1) && (i1[i] == 0))
-		  {
-		    if (elem->node(1) != std::min(elem->node(1), elem->node(5)))
-		      zeta_mapped = -zeta;
-		  }		
-		// Edge 6
-		else if ((i0[i] == 1) && (i1[i] == 1))
-		  {
-		    if (elem->node(2) != std::min(elem->node(2), elem->node(6)))
-		      zeta_mapped = -zeta;
-		  }
-		// Edge 7
-		else if ((i0[i] == 0) && (i1[i] == 1))
-		  {
-		    if (elem->node(3) != std::min(elem->node(3), elem->node(7)))
-		      zeta_mapped = -zeta;
-		  }		
-		// Edge 8
-		else if ((i1[i] == 0) && (i2[i] == 1))
-		  {
-		    if (elem->node(4) != std::min(elem->node(4), elem->node(5)))
-		      xi_mapped = -xi;
-		  }
-		// Edge 9
-		else if ((i0[i] == 1) && (i2[i] == 1))
-		  {
-		    if (elem->node(5) != std::min(elem->node(5), elem->node(6)))
-		      eta_mapped = -eta;
-		  }		
-		// Edge 10
-		else if ((i1[i] == 1) && (i2[i] == 1))
-		  {
-		    if (elem->node(7) != std::min(elem->node(7), elem->node(6)))
-		      xi_mapped = -xi;
-		  }
-		// Edge 11
-		else if ((i0[i] == 0) && (i2[i] == 1))
-		  {
-		    if (elem->node(4) != std::min(elem->node(4), elem->node(7)))
-		      eta_mapped = -eta;
-		  }
-	      }
-
-
-	      // handle the face orientation
-	      {
-		// Face 0
-		if (     (i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
-		  {
-		    const unsigned int min_node = std::min(elem->node(1),
-							   std::min(elem->node(2),
-								    std::min(elem->node(0),
-									     elem->node(3))));
-		    if (elem->node(0) == min_node)
-		      if (elem->node(1) == std::min(elem->node(1), elem->node(3)))
-			{
-			  // Case 1
-			  xi_mapped  = xi;
-			  eta_mapped = eta;
-			}
-		      else
-			{
-			  // Case 2
-			  xi_mapped  = eta;
-			  eta_mapped = xi;
-			}
-
-		    else if (elem->node(3) == min_node)
-		      if (elem->node(0) == std::min(elem->node(0), elem->node(2)))
-			{
-			  // Case 3
-			  xi_mapped  = -eta;
-			  eta_mapped = xi;
-			}
-		      else
-			{
-			  // Case 4
-			  xi_mapped  = xi;
-			  eta_mapped = -eta;
-			}
-
-		    else if (elem->node(2) == min_node)
-		      if (elem->node(3) == std::min(elem->node(3), elem->node(1)))
-			{
-			  // Case 5
-			  xi_mapped  = -xi;
-			  eta_mapped = -eta;
-			}
-		      else
-			{
-			  // Case 6
-			  xi_mapped  = -eta;
-			  eta_mapped = -xi;
-			}
-
-		    else if (elem->node(1) == min_node)
-		      if (elem->node(2) == std::min(elem->node(2), elem->node(0)))
-			{
-			  // Case 7
-			  xi_mapped  = eta;
-			  eta_mapped = -xi;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped  = -xi;
-			  eta_mapped = eta;
-			}
-		  }
-
-		
-		// Face 1
-		else if ((i1[i] == 0) && (i0[i] >= 2) && (i2[i] >= 2))
-		  {
-		    const unsigned int min_node = std::min(elem->node(0),
-							   std::min(elem->node(1),
-								    std::min(elem->node(5),
-									     elem->node(4))));
-		    if (elem->node(0) == min_node)
-		      if (elem->node(1) == std::min(elem->node(1), elem->node(4)))
-			{
-			  // Case 1
-			  xi_mapped   = xi;
-			  zeta_mapped = zeta;
-			}
-		      else
-			{
-			  // Case 2
-			  xi_mapped   = zeta;
-			  zeta_mapped = xi;
-			}
-
-		    else if (elem->node(1) == min_node)
-		      if (elem->node(5) == std::min(elem->node(5), elem->node(0)))
-			{
-			  // Case 3
-			  xi_mapped   = zeta;
-			  zeta_mapped = -xi;
-			}
-		      else
-			{
-			  // Case 4
-			  xi_mapped   = -xi;
-			  zeta_mapped = zeta;
-			}
-
-		    else if (elem->node(5) == min_node)
-		      if (elem->node(4) == std::min(elem->node(4), elem->node(1)))
-			{
-			  // Case 5
-			  xi_mapped   = -xi;
-			  zeta_mapped = -zeta;
-			}
-		      else
-			{
-			  // Case 6
-			  xi_mapped   = -zeta;
-			  zeta_mapped = -xi;
-			}
-
-		    else if (elem->node(4) == min_node)
-		      if (elem->node(0) == std::min(elem->node(0), elem->node(5)))
-			{
-			  // Case 7
-			  xi_mapped   = -xi;
-			  zeta_mapped = zeta;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped   = xi;
-			  zeta_mapped = -zeta;
-			}
-		  }
-
-		
-		// Face 2
-		else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] >= 2))
-		  {
-		    const unsigned int min_node = std::min(elem->node(1),
-							   std::min(elem->node(2),
-								    std::min(elem->node(6),
-									     elem->node(5))));
-		    if (elem->node(1) == min_node)
-		      if (elem->node(2) == std::min(elem->node(2), elem->node(5)))
-			{
-			  // Case 1
-			  eta_mapped  = eta;
-			  zeta_mapped = zeta;
-			}
-		      else
-			{
-			  // Case 2
-			  eta_mapped  = zeta;
-			  zeta_mapped = eta;
-			}
-
-		    else if (elem->node(2) == min_node)
-		      if (elem->node(6) == std::min(elem->node(6), elem->node(1)))
-			{
-			  // Case 3
-			  eta_mapped  = zeta;
-			  zeta_mapped = -eta;
-			}
-		      else
-			{
-			  // Case 4
-			  eta_mapped  = -eta;
-			  zeta_mapped = zeta;
-			}
-
-		    else if (elem->node(6) == min_node)
-		      if (elem->node(5) == std::min(elem->node(5), elem->node(2)))
-			{
-			  // Case 5
-			  eta_mapped  = -eta;
-			  zeta_mapped = -zeta;
-			}
-		      else
-			{
-			  // Case 6
-			  eta_mapped  = -zeta;
-			  zeta_mapped = -eta;
-			}
-
-		    else if (elem->node(5) == min_node)
-		      if (elem->node(1) == std::min(elem->node(1), elem->node(6)))
-			{
-			  // Case 7
-			  eta_mapped  = -zeta;
-			  zeta_mapped = eta;
-			}
-		      else
-			{
-			  // Case 8
-			  eta_mapped   = eta;
-			  zeta_mapped = -zeta;
-			}
-		  }
-
-		
-		// Face 3
-		else if ((i1[i] == 1) && (i0[i] >= 2) && (i2[i] >= 2))
-		  {
-		    const unsigned int min_node = std::min(elem->node(2),
-							   std::min(elem->node(3),
-								    std::min(elem->node(7),
-									     elem->node(6))));
-		    if (elem->node(3) == min_node)
-		      if (elem->node(2) == std::min(elem->node(2), elem->node(7)))
-			{
-			  // Case 1
-			  xi_mapped   = xi;
-			  zeta_mapped = zeta;
-			}
-		      else
-			{
-			  // Case 2
-			  xi_mapped   = zeta;
-			  zeta_mapped = xi;
-			}
-
-		    else if (elem->node(7) == min_node)
-		      if (elem->node(3) == std::min(elem->node(3), elem->node(6)))
-			{
-			  // Case 3
-			  xi_mapped   = -zeta;
-			  zeta_mapped = xi;
-			}
-		      else
-			{
-			  // Case 4
-			  xi_mapped   = xi;
-			  zeta_mapped = -zeta;
-			}
-
-		    else if (elem->node(6) == min_node)
-		      if (elem->node(7) == std::min(elem->node(7), elem->node(2)))
-			{
-			  // Case 5
-			  xi_mapped   = -xi;
-			  zeta_mapped = -zeta;
-			}
-		      else
-			{
-			  // Case 6
-			  xi_mapped   = -zeta;
-			  zeta_mapped = -xi;
-			}
-
-		    else if (elem->node(2) == min_node)
-		      if (elem->node(6) == std::min(elem->node(3), elem->node(6)))
-			{
-			  // Case 7
-			  xi_mapped   = zeta;
-			  zeta_mapped = -xi;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped   = -xi;
-			  zeta_mapped = zeta;
-			}
-		  }
-
-		
-		// Face 4
-		else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] >= 2))
-		  {
-		    const unsigned int min_node = std::min(elem->node(3),
-							   std::min(elem->node(0),
-								    std::min(elem->node(4),
-									     elem->node(7))));
-		    if (elem->node(0) == min_node)
-		      if (elem->node(3) == std::min(elem->node(3), elem->node(4)))
-			{
-			  // Case 1
-			  eta_mapped  = eta;
-			  zeta_mapped = zeta;
-			}
-		      else
-			{
-			  // Case 2
-			  eta_mapped  = zeta;
-			  zeta_mapped = eta;
-			}
-
-		    else if (elem->node(4) == min_node)
-		      if (elem->node(0) == std::min(elem->node(0), elem->node(7)))
-			{
-			  // Case 3
-			  eta_mapped  = -zeta;
-			  zeta_mapped = eta;
-			}
-		      else
-			{
-			  // Case 4
-			  eta_mapped  = eta;
-			  zeta_mapped = -zeta;
-			}
-
-		    else if (elem->node(7) == min_node)
-		      if (elem->node(4) == std::min(elem->node(4), elem->node(3)))
-			{
-			  // Case 5
-			  eta_mapped  = -eta;
-			  zeta_mapped = -zeta;
-			}
-		      else
-			{
-			  // Case 6
-			  eta_mapped  = -zeta;
-			  zeta_mapped = -eta;
-			}
-
-		    else if (elem->node(3) == min_node)
-		      if (elem->node(7) == std::min(elem->node(7), elem->node(0)))
-			{
-			  // Case 7
-			  eta_mapped   = zeta;
-			  zeta_mapped = -eta;
-			}
-		      else
-			{
-			  // Case 8
-			  eta_mapped  = -eta;
-			  zeta_mapped = zeta;
-			}
-		  }
-
-		
-		// Face 5
-		else if ((i2[i] == 1) && (i0[i] >= 2) && (i1[i] >= 2))
-		  {
-		    const unsigned int min_node = std::min(elem->node(4),
-							   std::min(elem->node(5),
-								    std::min(elem->node(6),
-									     elem->node(7))));
-		    if (elem->node(4) == min_node)
-		      if (elem->node(5) == std::min(elem->node(5), elem->node(7)))
-			{
-			  // Case 1
-			  xi_mapped  = xi;
-			  eta_mapped = eta;
-			}
-		      else
-			{
-			  // Case 2
-			  xi_mapped  = eta;
-			  eta_mapped = xi;
-			}
-
-		    else if (elem->node(5) == min_node)
-		      if (elem->node(6) == std::min(elem->node(6), elem->node(4)))
-			{
-			  // Case 3
-			  xi_mapped  = eta;
-			  eta_mapped = -xi;
-			}
-		      else
-			{
-			  // Case 4
-			  xi_mapped  = -xi;
-			  eta_mapped = eta;
-			}
-
-		    else if (elem->node(6) == min_node)
-		      if (elem->node(7) == std::min(elem->node(7), elem->node(5)))
-			{
-			  // Case 5
-			  xi_mapped  = -xi;
-			  eta_mapped = -eta;
-			}
-		      else
-			{
-			  // Case 6
-			  xi_mapped  = -eta;
-			  eta_mapped = -xi;
-			}
-
-		    else if (elem->node(7) == min_node)
-		      if (elem->node(4) == std::min(elem->node(4), elem->node(6)))
-			{
-			  // Case 7
-			  xi_mapped  = -eta;
-			  eta_mapped = xi;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped  = xi;
-			  eta_mapped = eta;
-			}
-		  }
-
-		
-	      }
-		  
-	      
-
-	      assert (j < 3);
-
-	      switch (j)
-		{
-		  // d()/dxi
-		case 0:
-		  return (FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi_mapped)*
-			  FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1[i],    eta_mapped)*
-			  FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i2[i],    zeta_mapped));
-
-		  // d()/deta
-		case 1:
-		  return (FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0[i],    xi_mapped)*
-			  FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta_mapped)*
-			  FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i2[i],    zeta_mapped));
-
-		  // d()/dzeta
-		case 2:
-		  return (FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0[i],    xi_mapped)*
-			  FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1[i],    eta_mapped)*
-			  FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta_mapped));
-
-		default:
-		  error();
-		}
-	    }
-
-	    
-	  default:
-	    error();
-	  }
+          default:
+            error();
+          }
       }
 
     default:
@@ -1269,14 +766,14 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
 
 template <>
 Real FE<3,HIERARCHIC>::shape_second_deriv(const ElemType,
-				          const Order,
-				          const unsigned int,
-				          const unsigned int,
-				          const Point& )
+                                          const Order,
+                                          const unsigned int,
+                                          const unsigned int,
+                                          const Point& )
 {
   std::cerr << "Hierarchic polynomials require the element type\n"
-	    << "because edge and face orientation is needed."
-	    << std::endl;
+            << "because edge and face orientation is needed."
+            << std::endl;
   error();
   
   return 0.;
@@ -1286,10 +783,10 @@ Real FE<3,HIERARCHIC>::shape_second_deriv(const ElemType,
 
 template <>
 Real FE<3,HIERARCHIC>::shape_second_deriv(const Elem* elem,
-				          const Order order,
-				          const unsigned int i,
-				          const unsigned int j,
-				          const Point& p)
+                                          const Order order,
+                                          const unsigned int i,
+                                          const unsigned int j,
+                                          const Point& p)
 {
   assert (elem != NULL);
 

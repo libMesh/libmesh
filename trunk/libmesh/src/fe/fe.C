@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.44 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe.C,v 1.45 2006-04-05 16:42:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -634,11 +634,6 @@ void FE<Dim,T>::compute_proj_constraints (DofConstraints &constraints,
 
   const FEType& base_fe_type = dof_map.variable_type(variable_number);
 
-  // Increase polynomial order on p refined elements
-  FEType my_fe_type = base_fe_type;
-  my_fe_type.order = static_cast<Order>(my_fe_type.order +
-                                        elem->p_level());
-
   // Construct FE objects for this element and its parent.
   AutoPtr<FEBase> my_fe (FEBase::build(Dim, base_fe_type));
   const FEContinuity cont = my_fe->get_continuity();
@@ -695,10 +690,29 @@ void FE<Dim,T>::compute_proj_constraints (DofConstraints &constraints,
             const Elem* parent = elem->parent();
 	    unsigned int s_parent = s;
 
+            // Find the minimum p level; we build the h constraint
+            // matrix with this and then constrain away all higher p
+            // DoFs.
+            assert(elem->neighbor(s)->active());
+            const unsigned int min_p_level =
+              std::min(elem->p_level(), elem->neighbor(s)->p_level());
+
             // This can't happen...  Only level-0 elements have NULL
             // parents, and no level-0 elements can be at a higher
             // level than their neighbors!
             assert (parent != NULL);
+
+            // we may need to make the FE objects reinit with the
+            // minimum shared p_level
+            // FIXME - I hate using const_cast<> and avoiding
+            // accessor functions; there's got to be a
+            // better way to do this!
+            const unsigned int old_elem_level = elem->p_level();
+            if (old_elem_level != min_p_level)
+              (const_cast<Elem *>(elem))->hack_p_level(min_p_level);
+            const unsigned int old_parent_level = parent->p_level();
+            if (old_parent_level != min_p_level)
+              (const_cast<Elem *>(parent))->hack_p_level(min_p_level);
 
 	    my_fe->reinit(elem, s);
 
@@ -712,14 +726,20 @@ void FE<Dim,T>::compute_proj_constraints (DofConstraints &constraints,
 	    FEInterface::inverse_map (Dim, base_fe_type, parent,
                                       q_point, parent_qface);
 
-            // FIXME - we need to make the parent FE reinit with the
-            // child element's p_level, not the parent element's
 	    parent_fe->reinit(parent, &parent_qface);
 
 	    // We're only concerned with DOFs whose values (and/or first
 	    // derivatives for C1 elements) are supported on side nodes
-	    dofs_on_side(elem, my_fe_type.order, s, my_side_dofs);
-	    dofs_on_side(parent, my_fe_type.order, s_parent, parent_side_dofs);
+	    dofs_on_side(elem, base_fe_type.order, s, my_side_dofs);
+	    dofs_on_side(parent, base_fe_type.order, s_parent, parent_side_dofs);
+
+            // We're done with functions that examine Elem::p_level(),
+            // so let's unhack those levels
+            if (elem->p_level() != old_elem_level)
+              (const_cast<Elem *>(elem))->hack_p_level(old_elem_level);
+            if (parent->p_level() != old_parent_level)
+              (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
+
 	    const unsigned int n_side_dofs = my_side_dofs.size();
 	    assert(n_side_dofs == parent_side_dofs.size());
 
