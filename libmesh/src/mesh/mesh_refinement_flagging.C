@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.17 2005-12-13 21:15:46 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.18 2006-04-05 16:43:56 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -326,6 +326,39 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
 
 
 
+void MeshRefinement::switch_h_to_p_refinement ()
+{
+  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.elements_end(); 
+
+  for ( ; elem_it != elem_end; ++elem_it)
+    {
+      if ((*elem_it)->active())
+        {
+          (*elem_it)->set_p_refinement_flag((*elem_it)->refinement_flag());
+          (*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+        } 
+      else
+        {
+          (*elem_it)->set_p_refinement_flag((*elem_it)->refinement_flag());
+          (*elem_it)->set_refinement_flag(Elem::INACTIVE);
+        } 
+    }
+}
+
+
+
+void MeshRefinement::add_p_to_h_refinement ()
+{
+  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.elements_end(); 
+
+  for ( ; elem_it != elem_end; ++elem_it)
+    (*elem_it)->set_p_refinement_flag((*elem_it)->refinement_flag());
+}
+
+
+
 void MeshRefinement::clean_refinement_flags ()
 {
   // Possibly clean up the refinement flags from
@@ -339,9 +372,15 @@ void MeshRefinement::clean_refinement_flags ()
   for ( ; elem_it != elem_end; ++elem_it)
     {
       if ((*elem_it)->active())
-        (*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+        {
+          (*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+          (*elem_it)->set_p_refinement_flag(Elem::DO_NOTHING);
+        } 
       else
-        (*elem_it)->set_refinement_flag(Elem::INACTIVE);
+        {
+          (*elem_it)->set_refinement_flag(Elem::INACTIVE);
+          (*elem_it)->set_p_refinement_flag(Elem::INACTIVE);
+        } 
     }
 }
 

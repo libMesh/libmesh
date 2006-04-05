@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.14 2006-03-29 19:41:01 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.15 2006-04-05 16:43:56 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -128,7 +128,19 @@ public:
 				     const Real refine_fraction  = 1.0,
 				     const Real coarsen_fraction = 0.0,
 				     const unsigned int max_level = libMesh::invalid_uint);
-		      
+
+  /**
+   * Takes a mesh whose elements are flagged for h refinement and coarsening,
+   * and switches those flags to request p refinement and coarsening instead.
+   */
+  void switch_h_to_p_refinement();
+
+  /**
+   * Takes a mesh whose elements are flagged for h refinement and coarsening,
+   * and adds flags to request p refinement and coarsening of the same elements.
+   */
+  void add_p_to_h_refinement();
+
   /**
    * Refines and coarsens user-requested elements. Will also
    * refine/coarsen additional elements to satisy level-one rule.
