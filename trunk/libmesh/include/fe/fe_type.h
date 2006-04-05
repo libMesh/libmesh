@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.5 2006-03-23 20:16:57 roystgnr Exp $
+// $Id: fe_type.h,v 1.6 2006-04-05 16:14:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -136,9 +136,11 @@ public:
   /**
    * @returns a quadrature rule of appropriate type and order for this \p
    * FEType.  The default quadrature rule is based on integrating the mass
-   * matrix for such an element exactly.
+   * matrix for such an element exactly.  Higher or lower degree rules can
+   * be chosen by changing the extraorder parameter.
    */
-  AutoPtr<QBase> default_quadrature_rule (const unsigned int dim) const;
+  AutoPtr<QBase> default_quadrature_rule (const unsigned int dim,
+					  const int extraorder=0) const;
 
   
 private:  

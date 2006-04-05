@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.24 2006-03-29 19:57:52 roystgnr Exp $
+// $Id: exact_solution.C,v 1.25 2006-04-05 16:14:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,8 @@ ExactSolution::ExactSolution(EquationSystems& es) :
   _exact_deriv (NULL),
   _exact_hessian (NULL),
   _equation_systems(es),
-  _mesh(es.get_mesh())
+  _mesh(es.get_mesh()),
+  _extra_order(0)
 {
   // Initialize the _errors data structure which holds all
   // the eventual values of the error.
@@ -260,7 +261,8 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   const FEType& fe_type  = computed_dof_map.variable_type(var);
 
   AutoPtr<QBase> qrule =
-    fe_type.default_quadrature_rule (_mesh.mesh_dimension());
+    fe_type.default_quadrature_rule (_mesh.mesh_dimension(),
+                                     _extra_order);
 
   // Construct finite element object
   
