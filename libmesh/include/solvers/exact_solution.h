@@ -1,4 +1,4 @@
-// $Id: exact_solution.h,v 1.10 2006-03-29 19:57:52 roystgnr Exp $
+// $Id: exact_solution.h,v 1.11 2006-04-05 16:14:26 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -109,6 +109,13 @@ public:
 					  const std::string& unknown_name));
 
   /**
+   * Increases or decreases the order of the quadrature rule used for numerical
+   * integration.
+   */
+  void extra_quadrature_order (const int extraorder)
+    { _extra_order = extraorder; }
+
+  /**
    * Computes and stores the error in the solution value e = u-u_h,
    * the gradient grad(e) = grad(u) - grad(u_h), and possibly the hessian
    * grad(grad(e)) = grad(grad(u)) - grad(grad(u_h)).  Does not return
@@ -217,6 +224,11 @@ private:
    * Constant reference to the mesh in the EquationSystems object.
    */
   const Mesh& _mesh;
+
+  /**
+   * Extra order to use for quadrature rule
+   */
+  int _extra_order;
 };
 
 
