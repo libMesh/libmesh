@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.40 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_interface.C,v 1.41 2006-04-05 16:42:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1861,6 +1861,14 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 unsigned int FEInterface::max_order(const FEType& fe_t,
 			            const ElemType& el_t)
 {
+  // Yeah, I know, infinity is much larger than 11, but our
+  // solvers don't seem to like high degree polynomials.
+  const unsigned int unlimited = 11;
+
+  // If we used 0 as a default, then elements missing from this 
+  // table (e.g. infinite elements) would be considered broken.
+  const unsigned int unknown = 11;
+
   switch (fe_t.family)
     {
       case LAGRANGE:
@@ -1896,7 +1904,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PYRAMID5:
 	      return 1;
 	    default:
-	      return 0;
+	      return unknown;
 	  }
 	break;
       case MONOMIAL:
@@ -1921,7 +1929,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PYRAMID5:
 	      return 4;
 	    default:
-	      return 0;
+	      return unknown;
 	  }
 	break;
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
@@ -1955,8 +1963,9 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
-	    default:
 	      return 0;
+	    default:
+	      return unknown;
 	  }
 	break;
       case SZABAB:
@@ -1984,8 +1993,9 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
-	    default:
 	      return 0;
+	    default:
+	      return unknown;
 	  }
 	break;
 #endif
@@ -2009,8 +2019,9 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
-	    default:
 	      return 4;
+	    default:
+	      return unknown;
 	  }
 	break;
       case CLOUGH:
@@ -2036,8 +2047,9 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
-	    default:
 	      return 0;
+	    default:
+	      return unknown;
 	  }
 	break;
       case HERMITE:
@@ -2065,8 +2077,9 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
-	    default:
 	      return 0;
+	    default:
+	      return unknown;
 	  }
 	break;
       case HIERARCHIC:
@@ -2075,7 +2088,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case EDGE2:
 	    case EDGE3:
 	    case EDGE4:
-	      return 6;
+	      return unlimited;
 	    case TRI3:
 	      return 0;
 	    case TRI6:
@@ -2084,7 +2097,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	      return 0;
 	    case QUAD8:
 	    case QUAD9:
-	      return 5;
+	      return unlimited;
 	    case TET4:
 	    case TET10:
 	    case HEX8:
@@ -2096,8 +2109,9 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
-	    default:
 	      return 0;
+	    default:
+	      return unknown;
 	  }
 	break;
       default:
