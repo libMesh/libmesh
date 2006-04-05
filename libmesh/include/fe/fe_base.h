@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.18 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_base.h,v 1.19 2006-04-05 16:18:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1113,7 +1113,7 @@ protected:
 
   /**
    * A flag indicating if current data structures
-   * correspond to quadratur rule points
+   * correspond to quadrature rule points
    */
   bool shapes_on_quadrature;
 
