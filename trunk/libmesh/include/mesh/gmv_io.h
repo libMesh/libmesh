@@ -1,4 +1,4 @@
-// $Id: gmv_io.h,v 1.8 2005-02-22 22:17:33 jwpeterson Exp $
+// $Id: gmv_io.h,v 1.9 2006-04-05 16:23:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -93,6 +93,12 @@ class GMVIO : public MeshOutput<MeshBase>
   bool & partitioning();
   
   /**
+   * Flag indicating whether or not to write p level
+   * information for p refined meshes
+   */
+  bool & p_levels();
+  
+  /**
    * Writes a GMV file with discontinuous data
    */ 
   void write_discontinuous_gmv (const std::string& name, 
@@ -153,6 +159,11 @@ private:
    * Flag to write the mesh partitioning.
    */
   bool _partitioning;
+ 
+  /**
+   * Flag to write the mesh p refinement levels.
+   */
+  bool _p_levels;
 };
 
 
@@ -164,7 +175,8 @@ GMVIO::GMVIO (const MeshBase& mesh) :
   MeshOutput<MeshBase> (mesh),
   _binary        (false),
   _discontinuous (false),  
-  _partitioning  (true)
+  _partitioning  (true),
+  _p_levels      (true)
 {
 }
 
@@ -191,6 +203,15 @@ bool & GMVIO::partitioning ()
 {
   return _partitioning;
 }
+
+
+
+inline
+bool & GMVIO::p_levels()
+{
+  return _p_levels;
+}
+
 
 
 template <typename T>
