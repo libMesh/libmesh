@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.20 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.21 2006-04-05 16:16:56 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -294,7 +294,8 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 	    
 	    const DofConstraintRow& constraint_row = pos->second;
 	    
-	    assert (!constraint_row.empty());
+// p refinement creates empty constraint rows
+//	    assert (!constraint_row.empty());
 	    
 	    for (DofConstraintRow::const_iterator
 		   it=constraint_row.begin(); it != constraint_row.end();
@@ -459,6 +460,8 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
   typedef std::set<unsigned int> RCSet;
   RCSet dof_set;
 
+  bool we_have_constraints = false;
+
   // Next insert any other dofs the current dofs might be constrained
   // in terms of.  Note that in this case we may not be done: Those
   // may in turn depend on others.  So, we need to repeat this process
@@ -467,6 +470,8 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
   for (unsigned int i=0; i<elem_dofs.size(); i++)
     if (this->is_constrained_dof(elem_dofs[i]))
       {
+        we_have_constraints = true;
+
 	// If the DOF is constrained
 	DofConstraints::const_iterator
 	  pos = _dof_constraints.find(elem_dofs[i]);
@@ -475,7 +480,8 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 	
 	const DofConstraintRow& constraint_row = pos->second;
 	
-	assert (!constraint_row.empty());
+// Constraint rows in p refinement may be empty
+//	assert (!constraint_row.empty());
 	
 	for (DofConstraintRow::const_iterator
 	       it=constraint_row.begin(); it != constraint_row.end();
@@ -485,7 +491,7 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 
   // May be safe to return at this point
   // (but remember to stop the perflog)
-  if (dof_set.empty())
+  if (!we_have_constraints)
     {
       STOP_LOG("build_constraint_matrix()", "DofMap");
       return;
@@ -526,7 +532,8 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 	    
 	    const DofConstraintRow& constraint_row = pos->second;
 	    
-	    assert (!constraint_row.empty());
+// p refinement creates empty constraint rows
+//	    assert (!constraint_row.empty());
 	    
 	    for (DofConstraintRow::const_iterator
 		   it=constraint_row.begin(); it != constraint_row.end();
