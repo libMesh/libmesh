@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.27 2005-09-30 19:55:23 benkirk Exp $
+// $Id: gmv_io.C,v 1.28 2006-04-05 16:23:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -253,6 +253,8 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
   // Get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
+  unsigned int mesh_max_p_level = 0;
+
   // Begin interfacing with the GMV data file
   {
     out << "gmvinput ascii\n\n";
@@ -286,6 +288,9 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
       {
         const Elem* elem = *it;
 
+        mesh_max_p_level = std::max(mesh_max_p_level,
+                                    elem->p_level());
+
 	// Make sure we have a valid entry for
 	// the current element type.
 	assert (eletypes.count(elem->type()));
@@ -317,11 +322,39 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
+      // FIXME - don't we need to use an elementDefinition here? - RHS
       for ( ; it != end; ++it)
         out << (*it)->processor_id()+1 << "\n";
       out << "\n";
     }
+  
+  if ((this->p_levels() && mesh_max_p_level) || 
+    ((solution_names != NULL) && (v != NULL)))
+    out << "variable\n";
 
+  // optionally write the partition information
+  if (this->p_levels() && mesh_max_p_level)
+    {
+      out << "p_level 0\n";
+
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+      for ( ; it != end; ++it)
+        {
+          const Elem* elem = *it;
+
+          const elementDefinition& ele = eletypes[elem->type()];
+
+	  // The element mapper better not require any more nodes
+	  // than are present in the current element!
+	  assert (ele.nodes.size() <= elem->n_nodes());
+
+          for (unsigned int i=0; i < ele.nodes.size(); i++)
+            out << elem->p_level() << " ";
+        }
+      out << "\n\n";
+    }
 
   // optionally write the data
   if ((solution_names != NULL) && (v != NULL))
@@ -336,8 +369,6 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
                   << "\n";
       
       assert (v->size() == mesh.n_nodes()*n_vars);
-
-      out << "variable" << "\n";
 
       for (unsigned int c=0; c<n_vars; c++)
         {
@@ -406,6 +437,8 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 
   // Get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+  unsigned int mesh_max_p_level = 0;
   
   // Begin interfacing with the GMV data file
   {
@@ -447,15 +480,20 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 	  std::vector<unsigned int> conn;
 
 	  for ( ; it != end; ++it)
-	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-	      {
-		out << "line 2\n";
-		(*it)->connectivity(se, TECPLOT, conn);
-		for (unsigned int i=0; i<conn.size(); i++)
-		  out << conn[i] << " ";
+            {
+              mesh_max_p_level = std::max(mesh_max_p_level,
+                                          (*it)->p_level());
+
+	      for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	        {
+		  out << "line 2\n";
+		  (*it)->connectivity(se, TECPLOT, conn);
+		  for (unsigned int i=0; i<conn.size(); i++)
+		    out << conn[i] << " ";
 		
-		out << '\n';
-	      }
+		  out << '\n';
+	        }
+            }
 	  break;
 	}
 	
@@ -465,41 +503,45 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 	  std::vector<unsigned int> conn;
 	  
 	  for ( ; it != end; ++it)
-	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-	      {
-		// Quad elements
-		if (((*it)->type() == QUAD4) ||
-		    ((*it)->type() == QUAD8) ||
-		    ((*it)->type() == QUAD9)
-#ifdef ENABLE_INFINITE_ELEMENTS
-		    || ((*it)->type() == INFQUAD4)
-		    || ((*it)->type() == INFQUAD6)
-#endif
-		    )
-		  {
-		    out << "quad 4\n";
-		    (*it)->connectivity(se, TECPLOT, conn);
-		    for (unsigned int i=0; i<conn.size(); i++)
-		      out << conn[i] << " ";
-		  }
+            {
+              mesh_max_p_level = std::max(mesh_max_p_level,
+                                          (*it)->p_level());
 
-		// Triangle elements
-		else if (((*it)->type() == TRI3) ||
-			 ((*it)->type() == TRI6))
-		  {
-		    out << "tri 3\n";
-		    (*it)->connectivity(se, TECPLOT, conn);
-		    for (unsigned int i=0; i<3; i++)
-		      out << conn[i] << " ";
-		  }
+	      for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	        {
+		  // Quad elements
+		  if (((*it)->type() == QUAD4) ||
+		      ((*it)->type() == QUAD8) ||
+		      ((*it)->type() == QUAD9)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		      || ((*it)->type() == INFQUAD4)
+		      || ((*it)->type() == INFQUAD6)
+#endif
+		      )
+		    {
+		      out << "quad 4\n";
+		      (*it)->connectivity(se, TECPLOT, conn);
+		      for (unsigned int i=0; i<conn.size(); i++)
+		        out << conn[i] << " ";
+		    }
+
+		  // Triangle elements
+		  else if (((*it)->type() == TRI3) ||
+			   ((*it)->type() == TRI6))
+		    {
+		      out << "tri 3\n";
+		      (*it)->connectivity(se, TECPLOT, conn);
+		      for (unsigned int i=0; i<3; i++)
+		        out << conn[i] << " ";
+		    }
+		  else
+		    {
+		      error();
+		    }
 		
-		else
-		  {
-		    error();
-		  }
-		
-		out << '\n';
-	      }
+		  out << '\n';
+	        }
+            }
 	  
 	  break;
 	}
@@ -511,106 +553,111 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 	  std::vector<unsigned int> conn;
 	  
 	  for ( ; it != end; ++it)
-	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-	      {
+            {
+              mesh_max_p_level = std::max(mesh_max_p_level,
+                                          (*it)->p_level());
+
+	      for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	        {
 
 #ifndef  ENABLE_INFINITE_ELEMENTS
-		if (((*it)->type() == HEX8)   ||    
-		    ((*it)->type() == HEX27))
-		  {
-		    out << "phex8 8\n";
-		    (*it)->connectivity(se, TECPLOT, conn);
-		    for (unsigned int i=0; i<conn.size(); i++)
-		      out << conn[i] << " ";
-		  }
-		
-		else if ((*it)->type() == HEX20)
-		  {
-		    out << "phex20 20\n";
-		    out << (*it)->node(0)+1  << " "
-			<< (*it)->node(1)+1  << " "
-			<< (*it)->node(2)+1  << " "
-			<< (*it)->node(3)+1  << " "
-			<< (*it)->node(4)+1  << " "
-			<< (*it)->node(5)+1  << " "
-			<< (*it)->node(6)+1  << " "
-			<< (*it)->node(7)+1  << " "
-			<< (*it)->node(8)+1  << " "
-			<< (*it)->node(9)+1  << " "
-			<< (*it)->node(10)+1 << " "
-			<< (*it)->node(11)+1 << " "
-			<< (*it)->node(16)+1 << " "
-			<< (*it)->node(17)+1 << " "
-			<< (*it)->node(18)+1 << " "
-			<< (*it)->node(19)+1 << " "
-			<< (*it)->node(12)+1 << " "
-			<< (*it)->node(13)+1 << " "
-			<< (*it)->node(14)+1 << " "
-			<< (*it)->node(15)+1 << " ";
-		  }
-#else
-		/*
-		 * In case of infinite elements, HEX20
-		 * should be handled just like the
-		 * INFHEX16, since these connect to each other
-		 */
-		if (((*it)->type() == HEX8)     ||
-		    ((*it)->type() == HEX27)    ||
-		    ((*it)->type() == INFHEX8)  ||
-		    ((*it)->type() == INFHEX16) ||
-		    ((*it)->type() == INFHEX18) ||
-		    ((*it)->type() == HEX20))
-		  {
-		    out << "phex8 8\n";
-		    (*it)->connectivity(se, TECPLOT, conn);
-		    for (unsigned int i=0; i<conn.size(); i++)
-		      out << conn[i] << " ";
-		  }
-#endif
-		
-		else if (((*it)->type() == TET4)  ||
-			 ((*it)->type() == TET10))
-		  {
-		    out << "tet 4\n";
-		    (*it)->connectivity(se, TECPLOT, conn);
-		    out << conn[0] << " "
-			<< conn[2] << " "
-			<< conn[1] << " "
-			<< conn[4] << " ";
+		  if (((*it)->type() == HEX8)   ||    
+		      ((*it)->type() == HEX27))
+		    {
+		      out << "phex8 8\n";
+		      (*it)->connectivity(se, TECPLOT, conn);
+		      for (unsigned int i=0; i<conn.size(); i++)
+		        out << conn[i] << " ";
 		    }
-#ifndef  ENABLE_INFINITE_ELEMENTS
-		else if (((*it)->type() == PRISM6)  ||
-			 ((*it)->type() == PRISM15) ||
-			 ((*it)->type() == PRISM18))
+		
+		  else if ((*it)->type() == HEX20)
+		    {
+		      out << "phex20 20\n";
+		      out << (*it)->node(0)+1  << " "
+			  << (*it)->node(1)+1  << " "
+			  << (*it)->node(2)+1  << " "
+			  << (*it)->node(3)+1  << " "
+			  << (*it)->node(4)+1  << " "
+			  << (*it)->node(5)+1  << " "
+			  << (*it)->node(6)+1  << " "
+			  << (*it)->node(7)+1  << " "
+			  << (*it)->node(8)+1  << " "
+			  << (*it)->node(9)+1  << " "
+			  << (*it)->node(10)+1 << " "
+			  << (*it)->node(11)+1 << " "
+			  << (*it)->node(16)+1 << " "
+			  << (*it)->node(17)+1 << " "
+			  << (*it)->node(18)+1 << " "
+			  << (*it)->node(19)+1 << " "
+			  << (*it)->node(12)+1 << " "
+			  << (*it)->node(13)+1 << " "
+			  << (*it)->node(14)+1 << " "
+			  << (*it)->node(15)+1 << " ";
+		    }
 #else
-		else if (((*it)->type() == PRISM6)     ||
-			 ((*it)->type() == PRISM15)    ||
-			 ((*it)->type() == PRISM18)    ||
-			 ((*it)->type() == INFPRISM6)  ||
-			 ((*it)->type() == INFPRISM12))
+		  /*
+		   * In case of infinite elements, HEX20
+		   * should be handled just like the
+		   * INFHEX16, since these connect to each other
+		   */
+		  if (((*it)->type() == HEX8)     ||
+		      ((*it)->type() == HEX27)    ||
+		      ((*it)->type() == INFHEX8)  ||
+		      ((*it)->type() == INFHEX16) ||
+		      ((*it)->type() == INFHEX18) ||
+		      ((*it)->type() == HEX20))
+		    {
+		      out << "phex8 8\n";
+		      (*it)->connectivity(se, TECPLOT, conn);
+		      for (unsigned int i=0; i<conn.size(); i++)
+		        out << conn[i] << " ";
+		    }
 #endif
-		  {
-		    /**
-		     * Note that the prisms are treated as
-		     * degenerated phex8's.
-		     */
-		    out << "phex8 8\n";
-		    (*it)->connectivity(se, TECPLOT, conn);
-		    for (unsigned int i=0; i<conn.size(); i++)
-		      out << conn[i] << " ";
-		  }
 		
-		else
-		  {
-		    std::cout << "Encountered an unrecognized element "
-			      << "type.  Possibly a dim-1 dimensional "
-			      << "element?  Aborting..."
-			      << std::endl;
-		    error();
-		  }
+		  else if (((*it)->type() == TET4)  ||
+			   ((*it)->type() == TET10))
+		    {
+		      out << "tet 4\n";
+		      (*it)->connectivity(se, TECPLOT, conn);
+		      out << conn[0] << " "
+			  << conn[2] << " "
+			  << conn[1] << " "
+			  << conn[4] << " ";
+		      }
+#ifndef  ENABLE_INFINITE_ELEMENTS
+		  else if (((*it)->type() == PRISM6)  ||
+			   ((*it)->type() == PRISM15) ||
+			   ((*it)->type() == PRISM18))
+#else
+		  else if (((*it)->type() == PRISM6)     ||
+			   ((*it)->type() == PRISM15)    ||
+			   ((*it)->type() == PRISM18)    ||
+			   ((*it)->type() == INFPRISM6)  ||
+			   ((*it)->type() == INFPRISM12))
+#endif
+		    {
+		      /**
+		       * Note that the prisms are treated as
+		       * degenerated phex8's.
+		       */
+		      out << "phex8 8\n";
+		      (*it)->connectivity(se, TECPLOT, conn);
+		      for (unsigned int i=0; i<conn.size(); i++)
+		        out << conn[i] << " ";
+		    }
 		
-		out << '\n';
-	      }
+		  else
+		    {
+		      std::cout << "Encountered an unrecognized element "
+			        << "type.  Possibly a dim-1 dimensional "
+			        << "element?  Aborting..."
+			        << std::endl;
+		      error();
+		    }
+		
+		  out << '\n';
+	        }
+            }
 	  
 	  break;
 	}
@@ -645,6 +692,23 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
     }
 
 
+  if ((this->p_levels() && mesh_max_p_level) || 
+    ((solution_names != NULL) && (v != NULL)))
+    out << "variable\n";
+
+  // optionally write the partition information
+  if (this->p_levels() && mesh_max_p_level)
+    {
+      out << "p_level 0\n";
+
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+      for ( ; it != end; ++it)
+	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+          out << (*it)->p_level() << " ";
+      out << "\n\n";
+    }
   
   // optionally write the data
   if ((solution_names != NULL) &&
@@ -660,9 +724,6 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 		  << std::endl;
       
       assert (v->size() == mesh.n_nodes()*n_vars);
-
-      out << "variable\n";
-
 
       for (unsigned int c=0; c<n_vars; c++)
 	{
@@ -729,6 +790,8 @@ void GMVIO::write_binary (const std::string& fname,
 
   // get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+  unsigned int mesh_max_p_level = 0;
   
   char buf[80];
 
@@ -794,52 +857,64 @@ void GMVIO::write_binary (const std::string& fname,
 
       case 1:
         for ( ; it != end; ++it)
-          for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
-            {
-              std::strcpy(buf, "line    ");
-              out.write(buf, std::strlen(buf));
-	      
-              tempint = 2;
-              std::memcpy(buf, &tempint, sizeof(unsigned int));
-              out.write(buf, sizeof(unsigned int));
+          {
+            mesh_max_p_level = std::max(mesh_max_p_level,
+                                        (*it)->p_level());
 
-              std::vector<unsigned int> conn;
-              (*it)->connectivity(se,TECPLOT,conn);
+            for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+              {
+                std::strcpy(buf, "line    ");
+                out.write(buf, std::strlen(buf));
 	      
-              out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-            }
-	
+                tempint = 2;
+                std::memcpy(buf, &tempint, sizeof(unsigned int));
+                out.write(buf, sizeof(unsigned int));
 
+                std::vector<unsigned int> conn;
+                (*it)->connectivity(se,TECPLOT,conn);
+	      
+                out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+              }
+          }
         break;
 	
       case 2:
-       
         for ( ; it != end; ++it)
-          for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
-            {
-              std::strcpy(buf, "quad    ");
-              out.write(buf, std::strlen(buf));
-              tempint = 4;
-              std::memcpy(buf, &tempint, sizeof(unsigned int));
-              out.write(buf, sizeof(unsigned int));
-              std::vector<unsigned int> conn;
-              (*it)->connectivity(se,TECPLOT,conn);
-              out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-            }
+          {
+            mesh_max_p_level = std::max(mesh_max_p_level,
+                                        (*it)->p_level());
+
+            for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+              {
+                std::strcpy(buf, "quad    ");
+                out.write(buf, std::strlen(buf));
+                tempint = 4;
+                std::memcpy(buf, &tempint, sizeof(unsigned int));
+                out.write(buf, sizeof(unsigned int));
+                std::vector<unsigned int> conn;
+                (*it)->connectivity(se,TECPLOT,conn);
+                out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+              }
+          }
         break;
       case 3:
         for ( ; it != end; ++it)
-          for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
-            {
-              std::strcpy(buf, "phex8   ");
-              out.write(buf, std::strlen(buf));
-              tempint = 8;
-              std::memcpy(buf, &tempint, sizeof(unsigned int));
-              out.write(buf, sizeof(unsigned int));
-              std::vector<unsigned int> conn;
-              (*it)->connectivity(se,TECPLOT,conn);
-              out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-            }
+          {
+            mesh_max_p_level = std::max(mesh_max_p_level,
+                                        (*it)->p_level());
+
+            for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+              {
+                std::strcpy(buf, "phex8   ");
+                out.write(buf, std::strlen(buf));
+                tempint = 8;
+                std::memcpy(buf, &tempint, sizeof(unsigned int));
+                out.write(buf, sizeof(unsigned int));
+                std::vector<unsigned int> conn;
+                (*it)->connectivity(se,TECPLOT,conn);
+                out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+              }
+          }
         break;
       default:
         error();
@@ -887,14 +962,49 @@ void GMVIO::write_binary (const std::string& fname,
     }
 
 
+  if ((this->p_levels() && mesh_max_p_level) || 
+    ((solution_names != NULL) && (vec != NULL)))
+    {
+      std::strcpy(buf, "variable");
+      out.write(buf, std::strlen(buf));
+    }
+
+  // optionally write the partition information
+  if (this->p_levels() && mesh_max_p_level)
+    {
+      unsigned int n_floats = mesh.n_active_elem();
+      for (unsigned int i=0; i != mesh.mesh_dimension(); ++i)
+        n_floats *= 2;
+
+      float *temp = new float[n_floats];
+
+      std::strcpy(buf, "p_level");
+      out.write(buf, std::strlen(buf));
+
+      unsigned int tempint = 0; // p levels are cell data
+
+      std::memcpy(buf, &tempint, sizeof(unsigned int));
+      out.write(buf, sizeof(unsigned int));
+
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+      unsigned int n=0;
+
+      for (; it != end; ++it)
+        for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+          temp[n++] = static_cast<float>( (*it)->p_level() );
+
+      out.write(reinterpret_cast<char *>(temp),
+                sizeof(float)*n_floats);
+
+      delete [] temp;
+    }
+  
   
   // optionally write the data
   if ((solution_names != NULL) &&
       (vec != NULL))
     {
-      std::strcpy(buf, "variable");
-      out.write(buf, std::strlen(buf));
-      
       float *temp = new float[mesh.n_nodes()];
 
       const unsigned int n_vars = solution_names->size();
