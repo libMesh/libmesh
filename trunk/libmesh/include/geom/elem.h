@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.36 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: elem.h,v 1.37 2006-04-05 16:21:19 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -620,6 +620,12 @@ class Elem : public ReferenceCountedObject<Elem>,
    * Note that the maximum p refinement level is currently 255
    */     
   void set_p_level (const unsigned int p);
+
+  /**
+   * Sets the value of the p refinement level for the element
+   * without altering the p level of its ancestors
+   */     
+  void hack_p_level (const unsigned int p);
 
   /**
    * Refine the element.
@@ -1300,10 +1306,41 @@ void Elem::set_p_level(unsigned int p)
     }
 #endif
 
+  // Maintain the parent's p level as the minimum of it's children
   if (this->parent() != NULL)
-    if (this->parent()->p_level() > p)
-      this->parent()->set_p_level(p);
+    {
+      unsigned int parent_p_level = this->parent()->p_level();
 
+      // If our new p level is less than our parents, our parents drops
+      if (parent_p_level > p)
+	{
+          this->parent()->set_p_level(p);
+	}
+      // If we are the lowest p level and it increases, so might
+      // our parent's, but we have to check every other child to see
+      else if (parent_p_level == _p_level && _p_level < p)
+	{
+	  _p_level = p;
+	  parent_p_level = p;
+	  for (unsigned int c=0; c != this->parent()->n_children(); c++)
+	    parent_p_level = std::min(parent_p_level,
+				      this->parent()->child(c)->p_level());
+
+	  if (parent_p_level != this->parent()->p_level())
+	    this->parent()->set_p_level(parent_p_level);
+
+	  return;
+	}
+    }
+
+  _p_level = p;
+}
+
+
+
+inline
+void Elem::hack_p_level(unsigned int p)
+{
   _p_level = p;
 }
 
