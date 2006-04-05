@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.88 2006-03-30 00:05:49 roystgnr Exp $
+// $Id: dof_map.C,v 1.89 2006-04-05 16:16:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -276,12 +276,15 @@ void DofMap::reinit(MeshBase& mesh)
 		  // If this has dofs, but has no vertex dofs,
 		  // it may still need more edge or face dofs if
                   // we're p-refined.
-		  else if (node->dof_number(this->sys_number(), var, 0)
-			== 0)
+		  else if (vertex_dofs == 0)
 		    {
                       if (new_node_dofs > old_node_dofs)
-		        node->set_n_comp(this->sys_number(), var,
-				         new_node_dofs);
+                        {
+		          node->set_n_comp(this->sys_number(), var,
+				           new_node_dofs);
+		          node->set_dof_number(this->sys_number(),
+					       var, 0, vertex_dofs);
+                        }
 		    }
 		  // If this is another element's vertex,
 		  // add more (non-overlapping) edge/face dofs if
@@ -289,8 +292,12 @@ void DofMap::reinit(MeshBase& mesh)
 		  else if (extra_hanging_dofs)
 		    {
                       if (new_node_dofs > old_node_dofs - vertex_dofs)
-		        node->set_n_comp(this->sys_number(), var,
-				         vertex_dofs + new_node_dofs);
+                        {
+		          node->set_n_comp(this->sys_number(), var,
+				           vertex_dofs + new_node_dofs);
+		          node->set_dof_number(this->sys_number(),
+					       var, 0, vertex_dofs);
+                        }
 		    }
 		  // If this is another element's vertex, add any
 		  // (overlapping) edge/face dofs if necessary
@@ -298,8 +305,12 @@ void DofMap::reinit(MeshBase& mesh)
 		    {
 		      assert(old_node_dofs >= vertex_dofs);
                       if (new_node_dofs > old_node_dofs)
-		        node->set_n_comp(this->sys_number(), var,
-				         new_node_dofs);
+                        {
+		          node->set_n_comp(this->sys_number(), var,
+				           new_node_dofs);
+		          node->set_dof_number(this->sys_number(),
+					       var, 0, vertex_dofs);
+                        }
 		    }
 		}
 	    }
@@ -1464,7 +1475,9 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 	
 	const DofConstraintRow& constraint_row = pos->second;
 	
-	assert (!constraint_row.empty());
+// adaptive p refinement currently gives us lots of empty constraint
+// rows - we should optimize those DoFs away in the future.  [RHS]
+//	assert (!constraint_row.empty());
 	
 	DofConstraintRow::const_iterator it     = constraint_row.begin();
 	DofConstraintRow::const_iterator it_end = constraint_row.end();
