@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.54 2006-03-29 18:47:37 roystgnr Exp $
+// $Id: elem.C,v 1.55 2006-04-07 16:04:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -672,6 +672,47 @@ unsigned short int Elem::second_order_adjacent_vertex (const unsigned int,
   return 0;
 }
 
+
+
+
+ElemType Elem::first_order_equivalent_type (const ElemType et)
+{ 
+  switch (et)
+    {
+    case EDGE4:
+    case EDGE3:
+      return EDGE2;
+    case TRI6:
+      return TRI3;
+    case QUAD8:
+    case QUAD9:
+      return QUAD4;
+    case TET10:
+      return TET4;
+    case HEX27:
+    case HEX20:
+      return HEX8;
+    case PRISM15:
+    case PRISM18:
+      return PRISM6;
+
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+    case INFQUAD6:
+      return INFQUAD4;
+    case INFHEX16:
+    case INFHEX18:
+      return INFHEX8;
+    case INFPRISM12:
+      return INFPRISM6;
+
+#endif
+
+    default:
+      // first-order or unknown element
+      return INVALID_ELEM;
+    }
+}
 
 
 

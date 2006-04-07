@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.37 2006-04-05 16:21:19 roystgnr Exp $
+// $Id: elem.h,v 1.38 2006-04-07 16:04:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -523,6 +523,15 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   static ElemType second_order_equivalent_type (const ElemType et,
 						const bool full_ordered=true);
+
+  /**
+   * @returns the element type of the associated first-order element,
+   * e.g. when \p this is a \p TET10, then \p TET4 is returned.  Returns
+   * \p INVALID_ELEM for first order or other elements that should not
+   * or cannot be converted into lower order equivalents.
+   */
+  static ElemType first_order_equivalent_type (const ElemType et);
+					       
 
   /**
    * @returns the refinement level of the current element.  If the
