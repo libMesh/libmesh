@@ -1,4 +1,4 @@
-// $Id: gmv_io.h,v 1.9 2006-04-05 16:23:23 roystgnr Exp $
+// $Id: gmv_io.h,v 1.10 2006-04-07 16:22:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -93,6 +93,12 @@ class GMVIO : public MeshOutput<MeshBase>
   bool & partitioning();
   
   /**
+   * Flag indicating whether or not to subdivide second order
+   * elements
+   */
+  bool & subdivide_second_order();
+  
+  /**
    * Flag indicating whether or not to write p level
    * information for p refined meshes
    */
@@ -161,6 +167,11 @@ private:
   bool _partitioning;
  
   /**
+   * Flag to subdivide second order elements
+   */
+  bool _subdivide_second_order;
+ 
+  /**
    * Flag to write the mesh p refinement levels.
    */
   bool _p_levels;
@@ -172,11 +183,12 @@ private:
 // GMVIO inline members
 inline
 GMVIO::GMVIO (const MeshBase& mesh) :
-  MeshOutput<MeshBase> (mesh),
-  _binary        (false),
-  _discontinuous (false),  
-  _partitioning  (true),
-  _p_levels      (true)
+  MeshOutput<MeshBase>    (mesh),
+  _binary                 (false),
+  _discontinuous          (false),  
+  _partitioning           (true),
+  _subdivide_second_order (true),
+  _p_levels               (true)
 {
 }
 
@@ -202,6 +214,14 @@ inline
 bool & GMVIO::partitioning ()
 {
   return _partitioning;
+}
+
+
+
+inline
+bool & GMVIO::subdivide_second_order ()
+{
+  return _subdivide_second_order;
 }
 
 
