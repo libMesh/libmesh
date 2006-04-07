@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.28 2006-04-05 16:23:23 roystgnr Exp $
+// $Id: gmv_io.C,v 1.29 2006-04-07 16:22:47 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -441,6 +441,10 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   unsigned int mesh_max_p_level = 0;
   
   // Begin interfacing with the GMV data file
+
+  // FIXME - if subdivide_second_order() is off,
+  // we probably should only be writing the
+  // vertex nodes - RHS
   {
     // write the nodes
     
@@ -467,11 +471,16 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   {
     // write the connectivity
     
-    out << "cells " << mesh.n_active_sub_elem() << '\n';
+    out << "cells ";
+    if (this->subdivide_second_order())
+      out << mesh.n_active_sub_elem();
+    else
+      out << mesh.n_active_elem();
+    out << '\n';
 
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
-    
+
     switch (mesh.mesh_dimension())
       {
       case 1:
@@ -484,15 +493,34 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
               mesh_max_p_level = std::max(mesh_max_p_level,
                                           (*it)->p_level());
 
-	      for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-	        {
+              if (this->subdivide_second_order())
+	        for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	          {
+		    out << "line 2\n";
+		    (*it)->connectivity(se, TECPLOT, conn);
+		    for (unsigned int i=0; i<conn.size(); i++)
+		      out << conn[i] << " ";
+		
+		    out << '\n';
+	          }
+              else
+                {
 		  out << "line 2\n";
-		  (*it)->connectivity(se, TECPLOT, conn);
+                  if ((*it)->default_order() == FIRST)
+		    (*it)->connectivity(0, TECPLOT, conn);
+                  else
+                    {
+                      AutoPtr<Elem> lo_elem = Elem::build(
+                        Elem::first_order_equivalent_type((*it)->type()));
+                      for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
+                        lo_elem->set_node(i) = (*it)->get_node(i);
+		      lo_elem->connectivity(0, TECPLOT, conn);
+                    }
 		  for (unsigned int i=0; i<conn.size(); i++)
 		    out << conn[i] << " ";
 		
 		  out << '\n';
-	        }
+                }
             }
 	  break;
 	}
@@ -507,36 +535,84 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
               mesh_max_p_level = std::max(mesh_max_p_level,
                                           (*it)->p_level());
 
-	      for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-	        {
+              if (this->subdivide_second_order())
+	        for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	          {
+		    // Quad elements
+		    if (((*it)->type() == QUAD4) ||
+		        ((*it)->type() == QUAD8) ||
+		        ((*it)->type() == QUAD9)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		        || ((*it)->type() == INFQUAD4)
+		        || ((*it)->type() == INFQUAD6)
+#endif
+		        )
+                      {
+		        out << "quad 4\n";
+		        (*it)->connectivity(se, TECPLOT, conn);
+		        for (unsigned int i=0; i<conn.size(); i++)
+		          out << conn[i] << " ";
+		      }
+
+		    // Triangle elements
+		    else if (((*it)->type() == TRI3) ||
+			     ((*it)->type() == TRI6))
+		      {
+		        out << "tri 3\n";
+		        (*it)->connectivity(se, TECPLOT, conn);
+		        for (unsigned int i=0; i<3; i++)
+		          out << conn[i] << " ";
+		      }
+		    else
+		      error();
+                  }
+              else // !this->subdivide_second_order()
+                {
 		  // Quad elements
-		  if (((*it)->type() == QUAD4) ||
-		      ((*it)->type() == QUAD8) ||
-		      ((*it)->type() == QUAD9)
+		  if (((*it)->type() == QUAD4)
 #ifdef ENABLE_INFINITE_ELEMENTS
 		      || ((*it)->type() == INFQUAD4)
-		      || ((*it)->type() == INFQUAD6)
 #endif
 		      )
-		    {
+                    {
+		      (*it)->connectivity(0, TECPLOT, conn);
 		      out << "quad 4\n";
-		      (*it)->connectivity(se, TECPLOT, conn);
 		      for (unsigned int i=0; i<conn.size(); i++)
 		        out << conn[i] << " ";
 		    }
-
-		  // Triangle elements
-		  else if (((*it)->type() == TRI3) ||
-			   ((*it)->type() == TRI6))
+		  else if (((*it)->type() == QUAD8) ||
+		           ((*it)->type() == QUAD9)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		           || ((*it)->type() == INFQUAD6)
+#endif
+		          )
 		    {
+                      AutoPtr<Elem> lo_elem = Elem::build(
+                        Elem::first_order_equivalent_type((*it)->type()));
+                      for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
+                        lo_elem->set_node(i) = (*it)->get_node(i);
+		      lo_elem->connectivity(0, TECPLOT, conn);
+		      out << "quad 4\n";
+		      for (unsigned int i=0; i<conn.size(); i++)
+		        out << conn[i] << " ";
+		    }
+		  else if ((*it)->type() == TRI3)
+		    {
+		      (*it)->connectivity(0, TECPLOT, conn);
 		      out << "tri 3\n";
-		      (*it)->connectivity(se, TECPLOT, conn);
 		      for (unsigned int i=0; i<3; i++)
 		        out << conn[i] << " ";
 		    }
-		  else
+		  else if ((*it)->type() == TRI6)
 		    {
-		      error();
+                      AutoPtr<Elem> lo_elem = Elem::build(
+                        Elem::first_order_equivalent_type((*it)->type()));
+                      for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
+                        lo_elem->set_node(i) = (*it)->get_node(i);
+		      lo_elem->connectivity(0, TECPLOT, conn);
+		      out << "tri 3\n";
+		      for (unsigned int i=0; i<3; i++)
+		        out << conn[i] << " ";
 		    }
 		
 		  out << '\n';
@@ -685,8 +761,11 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
       const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
       for ( ; it != end; ++it)
-	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+        if (this->subdivide_second_order())
+	  for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 	    out << (*it)->processor_id()+1 << '\n';
+        else
+	  out << (*it)->processor_id()+1 << '\n';
       
       out << '\n';
     }
@@ -705,7 +784,10 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
       const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
       for ( ; it != end; ++it)
-	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+        if (this->subdivide_second_order())
+	  for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+            out << (*it)->p_level() << " ";
+        else
           out << (*it)->p_level() << " ";
       out << "\n\n";
     }
