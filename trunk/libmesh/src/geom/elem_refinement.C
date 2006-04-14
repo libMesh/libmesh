@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.19 2006-03-22 21:35:02 roystgnr Exp $
+// $Id: elem_refinement.C,v 1.20 2006-04-14 22:31:50 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -46,11 +46,13 @@ void Elem::refine (MeshRefinement& mesh_refinement)
     {
       _children = new Elem*[this->n_children()];
 
+      unsigned int parent_p_level = this->p_level();
       for (unsigned int c=0; c<this->n_children(); c++)
         {
 	  _children[c] = Elem::build(this->type(), this).release();
 	  _children[c]->set_refinement_flag(Elem::JUST_REFINED);
-	  _children[c]->set_p_level(this->p_level());
+	  _children[c]->set_p_level(parent_p_level);
+	  _children[c]->set_p_refinement_flag(this->p_refinement_flag());
         }
 
       // Compute new nodal locations
@@ -130,16 +132,19 @@ void Elem::refine (MeshRefinement& mesh_refinement)
     }
   else
     {
+      unsigned int parent_p_level = this->p_level();
       for (unsigned int c=0; c<this->n_children(); c++)
         {	
           assert(this->child(c)->subactive());
           this->child(c)->set_refinement_flag(Elem::JUST_REFINED);
-          this->child(c)->set_p_level(this->p_level());
+          this->child(c)->set_p_level(parent_p_level);
+          this->child(c)->set_p_refinement_flag(this->p_refinement_flag());
         }
     }
 
   // Un-set my refinement flag now
   this->set_refinement_flag(Elem::INACTIVE);
+  this->set_p_refinement_flag(Elem::INACTIVE);
 
   for (unsigned int c=0; c<this->n_children(); c++)
     {	
@@ -249,15 +254,17 @@ void Elem::coarsen()
   // delete [] _children;
   // _children = NULL;
 
+  unsigned int parent_p_level = 0;
   for (unsigned int c=0; c<this->n_children(); c++)
     {	
       assert (this->child(c)->refinement_flag() == Elem::COARSEN);
       this->child(c)->set_refinement_flag(Elem::INACTIVE);
-      if (this->child(c)->p_level() > this->p_level())
-        this->set_p_level(this->child(c)->p_level());
+      if (this->child(c)->p_level() > parent_p_level)
+        parent_p_level = this->child(c)->p_level();
     }
 
   this->set_refinement_flag(Elem::JUST_COARSENED);
+  this->set_p_level(parent_p_level);
 
   assert (this->active());
 }
