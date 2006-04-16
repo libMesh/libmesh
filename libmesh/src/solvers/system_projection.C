@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.26 2005-06-12 18:36:42 jwpeterson Exp $
+// $Id: system_projection.C,v 1.27 2006-04-16 03:41:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -114,14 +114,17 @@ void System::project_vector (const NumericVector<Number>& old_vector,
   for (unsigned int var=0; var<n_variables; var++)
     {
       // Get FE objects of the appropriate type
-      const FEType& fe_type = dof_map.variable_type(var);     
-      AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));      
-      AutoPtr<FEBase> fe_coarse (FEBase::build(dim, fe_type));      
+      const FEType& base_fe_type = dof_map.variable_type(var);     
+      AutoPtr<FEBase> fe (FEBase::build(dim, base_fe_type));      
+      AutoPtr<FEBase> fe_coarse (FEBase::build(dim, base_fe_type));      
+
+      // Create FE objects with potentially different p_level
+      FEType fe_type, temp_fe_type;
 
       // Prepare variables for non-Lagrange projection
-      AutoPtr<QBase> qrule     (fe_type.default_quadrature_rule(dim));
-      AutoPtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
-      AutoPtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
+      AutoPtr<QBase> qrule     (base_fe_type.default_quadrature_rule(dim));
+      AutoPtr<QBase> qedgerule (base_fe_type.default_quadrature_rule(1));
+      AutoPtr<QBase> qsiderule (base_fe_type.default_quadrature_rule(dim-1));
       std::vector<Point> coarse_qpoints;
 
       // The values of the shape functions at the quadrature
@@ -176,6 +179,14 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	  const Elem* elem = *elem_it;
 	  const Elem* parent = elem->parent();
 
+          // Adjust the FE type for p-refined elements
+          fe_type = base_fe_type;
+          fe_type.order = static_cast<Order>(fe_type.order +
+                                             elem->p_level());
+
+          // We may need to remember the parent's p_level
+          unsigned int old_parent_level;
+
 	  // Update the DOF indices for this element based on
           // the new mesh
 	  dof_map.dof_indices (elem, new_dof_indices, var);
@@ -211,19 +222,31 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	  if (elem->refinement_flag() == Elem::JUST_REFINED)
 	    {
 	      assert (parent != NULL);
+              old_parent_level = parent->p_level();
+
+              // We may have done p refinement or coarsening as well;
+              // if so then we need to reset the parent's p level
+              // so we can get the right DoFs from it
+              if (elem->p_refinement_flag() == Elem::JUST_REFINED)
+                {
+                  assert(elem->p_level() > 0);
+                  (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() - 1);
+                }
+              else if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
+                {
+                  (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() + 1);
+                }
 	 
 	      dof_map.old_dof_indices (parent, old_dof_indices, var);
-            }
-	  else if (elem->refinement_flag() == Elem::JUST_COARSENED
-                   && fe_type.family != LAGRANGE)
-	    {
-	      assert (elem->has_children());
             }
 	  else
 	    {
 	      dof_map.old_dof_indices (elem, old_dof_indices, var);
 
-	      assert (old_dof_indices.size() == new_n_dofs);
+              if (elem->p_refinement_flag() == Elem::DO_NOTHING)
+	        assert (old_dof_indices.size() == new_n_dofs);
+              if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
+	        assert (elem->has_children());
 	    }
 
 	  unsigned int old_n_dofs = old_dof_indices.size();
@@ -232,6 +255,9 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
 	    // For refined non-Lagrange elements, we do an L2
             // projection
+            // FIXME: this will be a suboptimal and ill-defined
+            // result if we're using non-nested finite element
+            // spaces or if we're on a p-coarsened element!
 	    if (elem->refinement_flag() == Elem::JUST_REFINED)
 	      {
 	        // Update the fe object based on the current child
@@ -287,6 +313,9 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	          } // end qp loop
 
                 Ke.cholesky_solve(Fe, Ue);
+
+                // Fix up the parent's p level in case we changed it
+                (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
 	      }
             else if (elem->refinement_flag() == Elem::JUST_COARSENED)
 	      {
@@ -298,21 +327,32 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                 // hold those fixed and project interiors
 
                 // Copy node values first
-		dof_map.old_dof_indices (elem, old_dof_indices, var);
-	        old_n_dofs = old_dof_indices.size();
                 unsigned int current_dof = 0;
                 for (unsigned int n=0; n!= n_nodes; ++n)
                   {
                     // FIXME: this should go through the DofMap,
                     // not duplicate dof_indices code badly!
-		    const unsigned int nc =
+                    // We're also assuming here that child n shares
+                    // node n
+		    const unsigned int my_nc =
 		      FEInterface::n_dofs_at_node (dim, fe_type,
                                                    elem_type, n);
                     if (!elem->is_vertex(n))
                       {
-                        current_dof += nc;
+                        current_dof += my_nc;
                         continue;
                       }
+
+                    if (elem->child(n)->p_level() < elem->p_level())
+                      {
+                        temp_fe_type = base_fe_type;
+                        temp_fe_type.order = 
+                          static_cast<Order>(temp_fe_type.order +
+                                             elem->child(n)->p_level());
+                      }
+		    const unsigned int nc =
+		      FEInterface::n_dofs_at_node (dim, temp_fe_type,
+                                                   elem_type, n);
                     for (unsigned int i=0; i!= nc; ++i)
                       {
 			Ue(current_dof) =
@@ -352,8 +392,14 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 			  dof_map.old_dof_indices (child,
                             old_dof_indices, var);
 	                  old_n_dofs = old_dof_indices.size();
+
+                          temp_fe_type = base_fe_type;
+                          temp_fe_type.order = 
+                            static_cast<Order>(temp_fe_type.order +
+                                               child->p_level());
+
 			  FEInterface::dofs_on_edge(child, dim,
-			    fe_type, e, old_side_dofs);
+			    temp_fe_type, e, old_side_dofs);
 
                           // Initialize both child and parent FE data
                           // on the child's edge
@@ -482,8 +528,14 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 			  dof_map.old_dof_indices (child,
                             old_dof_indices, var);
 	                  old_n_dofs = old_dof_indices.size();
+
+                          temp_fe_type = base_fe_type;
+                          temp_fe_type.order = 
+                            static_cast<Order>(temp_fe_type.order +
+                                               child->p_level());
+
 			  FEInterface::dofs_on_side(child, dim,
-			    fe_type, s, old_side_dofs);
+			    temp_fe_type, s, old_side_dofs);
 
                           // Initialize both child and parent FE data
                           // on the child's side
@@ -695,8 +747,57 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 	    // For unrefined uncoarsened elements, we just copy DoFs
 	    else
 	      {
-		for (unsigned int i=0; i<new_n_dofs; i++)
-		  Ue(i) = old_vector(old_dof_indices[i]);
+                // FIXME - I'm sure this function would be about half
+                // the size if anyone ever figures out how to improve
+                // the DofMap interface... - RHS
+                if (elem->p_refinement_flag() == Elem::JUST_REFINED)
+                  {
+                    assert (elem->p_level() > 0);
+                    temp_fe_type = fe_type;
+                    temp_fe_type.order =
+                      static_cast<Order>(temp_fe_type.order - 1);
+                    unsigned int old_index = 0, new_index = 0;
+                    for (unsigned int n=0; n != elem->n_nodes(); ++n)
+                      {
+		        const unsigned int nc =
+		          FEInterface::n_dofs_at_node (dim, temp_fe_type,
+                                                       elem_type, n);
+                        for (unsigned int i=0; i != nc; ++i)
+                          {
+                            Ue(new_index + i) =
+                              old_vector(old_dof_indices[old_index++]);
+                          }
+                        new_index +=
+		          FEInterface::n_dofs_at_node (dim, fe_type,
+                                                       elem_type, n);
+                      }
+                  }
+                else if (elem->p_refinement_flag() ==
+                         Elem::JUST_COARSENED)
+                  {
+                    temp_fe_type = fe_type;
+                    temp_fe_type.order =
+                      static_cast<Order>(temp_fe_type.order + 1);
+                    unsigned int old_index = 0, new_index = 0;
+                    for (unsigned int n=0; n != elem->n_nodes(); ++n)
+                      {
+		        const unsigned int nc =
+		          FEInterface::n_dofs_at_node (dim, fe_type,
+                                                       elem_type, n);
+                        for (unsigned int i=0; i != nc; ++i)
+                          {
+                            Ue(new_index++) =
+                              old_vector(old_dof_indices[old_index+i]);
+                          }
+                        old_index +=
+		          FEInterface::n_dofs_at_node (dim, temp_fe_type,
+                                                       elem_type, n);
+                      }
+                  }
+                else
+                  // If there's no p refinement, we can copy every DoF
+		  for (unsigned int i=0; i<new_n_dofs; i++)
+		    Ue(i) = old_vector(old_dof_indices[i]);
 	      }
           } 
 	  else { // fe type is Lagrange
@@ -755,8 +856,11 @@ void System::project_vector (const NumericVector<Number>& old_vector,
 
 		    Ue(new_local_dof) = old_vector(old_global_dof);
 		  }
-             } // end local DOF loop
+              } // end local DOF loop
 
+            // We may have to clean up a parent's p_level
+	    if (elem->refinement_flag() == Elem::JUST_REFINED)
+              (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
           }  // end fe_type if()
 
 	  for (unsigned int i = 0; i < new_n_dofs; i++) 
