@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.89 2006-04-05 16:16:02 roystgnr Exp $
+// $Id: dof_map.C,v 1.90 2006-04-16 03:15:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1277,10 +1277,23 @@ void DofMap::old_dof_indices (const Elem* const elem,
       { // Do this for all the variables if one was not specified
 	// or just for the specified variable
 	
-        // Increase the polynomial order on p refined elements
+        // Increase the polynomial order on p refined elements,
+        // but make sure you get the right polynomial order for
+        // the OLD degrees of freedom
+        int p_adjustment = 0;
+        if (elem->p_refinement_flag() == Elem::JUST_REFINED)
+          {
+            assert (elem->p_level() > 0);
+            p_adjustment = -1;
+          }
+        else if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
+          {
+            p_adjustment = 1;
+          }
 	FEType fe_type = this->variable_type(v);
 	fe_type.order = static_cast<Order>(fe_type.order +
-                                           elem->p_level());
+                                           elem->p_level() +
+                                           p_adjustment);
 
 	const bool extra_hanging_dofs =
 	  FEInterface::extra_hanging_dofs(fe_type);
