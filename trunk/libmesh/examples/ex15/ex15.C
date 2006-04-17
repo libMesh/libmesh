@@ -1,4 +1,4 @@
-/* $Id: ex15.C,v 1.10 2006-03-13 17:52:12 benkirk Exp $ */
+/* $Id: ex15.C,v 1.11 2006-04-17 16:03:20 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
     output_file += ".m";
 
     std::ofstream out (output_file.c_str());
-    out << "% dofs     L2-error     H1-error\n"
+    out << "% dofs     L2-error     H1-error      H2-error\n"
 	<< "e = [\n";
     
     // Set up the dimension-dependent coarse mesh and solution
