@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.5 2005-08-29 09:07:40 spetersen Exp $
+# $Id: Makefile,v 1.6 2006-04-17 02:35:19 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -36,7 +36,8 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 target  := ./ex14
 
 ifeq ($(petsc-version), 2.3.0)
-args := -pc_type jacobi #ILU detects 0 pivot in petsc 2.3.0
+#args := -pc_type jacobi #ILU detects 0 pivot in petsc 2.3.0
+args := -pc_type ilu -pc_ilu_levels 4 -pc_factor_zeropivot 0
 endif
 
 all:: $(target)
