@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.38 2006-04-07 16:04:16 roystgnr Exp $
+// $Id: elem.h,v 1.39 2006-04-17 23:44:13 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -625,6 +625,15 @@ class Elem : public ReferenceCountedObject<Elem>,
 					unsigned int current_min) const;
 
   /**
+   * Returns the minimum new p refinement level (i.e. after
+   * refinement and coarsening is done) of elements which are
+   * descended from this and which share a side with the
+   * active \p neighbor
+   */
+  unsigned int min_new_p_level_by_neighbor (const Elem* neighbor,
+					    unsigned int current_min) const;
+
+  /**
    * Sets the value of the p refinement level for the element
    * Note that the maximum p refinement level is currently 255
    */     
@@ -1067,7 +1076,8 @@ inline
 Elem* Elem::child_neighbor (Elem* elem) const
 {
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
-    if (elem->neighbor(n)->parent() == this)
+    if (elem->neighbor(n) &&
+	elem->neighbor(n)->parent() == this)
       return elem->neighbor(n);
 
   return NULL;
@@ -1079,7 +1089,8 @@ inline
 const Elem* Elem::child_neighbor (const Elem* elem) const
 {
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
-    if (elem->neighbor(n)->parent() == this)
+    if (elem->neighbor(n) &&
+	elem->neighbor(n)->parent() == this)
       return elem->neighbor(n);
 
   return NULL;

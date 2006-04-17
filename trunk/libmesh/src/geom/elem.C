@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.55 2006-04-07 16:04:15 roystgnr Exp $
+// $Id: elem.C,v 1.56 2006-04-17 23:44:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -901,6 +901,44 @@ unsigned int Elem::min_p_level_by_neighbor(const Elem* neighbor,
 	    child->min_p_level_by_neighbor(child_neighbor,
                                            min_p_level);
       }
+
+  return min_p_level;
+}
+
+
+unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
+                                               unsigned int current_min) const
+{
+  assert(!this->subactive());
+  assert(neighbor->active());
+
+  // If we're an active element this is simple
+  if (this->active())
+    {
+      unsigned int new_p_level = this->p_level();
+      if (this->p_refinement_flag() == Elem::REFINE)
+        new_p_level += 1;
+      if (this->p_refinement_flag() == Elem::COARSEN)
+        {
+          assert (new_p_level > 0);
+          new_p_level -= 1;
+        }
+      return std::min(current_min, new_p_level);
+    }
+
+  assert(is_neighbor(neighbor));
+
+  unsigned int min_p_level = current_min;
+
+  for (unsigned int c=0; c<this->n_children(); c++)
+    {
+      const Elem* const child = this->child(c);
+      const Elem* child_neighbor = child->child_neighbor(neighbor);
+      if (child_neighbor)
+        min_p_level =
+	  child->min_p_level_by_neighbor(child_neighbor,
+                                         min_p_level);
+    }
 
   return min_p_level;
 }
