@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.45 2006-03-29 18:47:37 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.46 2006-04-17 19:54:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -163,17 +163,20 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 
   for ( ; elem_it != elem_end; ++elem_it)
     {
+      // Pointer to the element
+      Elem *elem = *elem_it;
+
       // Set refinement flag to INACTIVE if the
       // element isn't active
-      if ( !(*elem_it)->active())
+      if ( !elem->active())
         {
-	  (*elem_it)->set_refinement_flag(Elem::INACTIVE);
-	  (*elem_it)->set_p_refinement_flag(Elem::INACTIVE);
+	  elem->set_refinement_flag(Elem::INACTIVE);
+	  elem->set_p_refinement_flag(Elem::INACTIVE);
         }
 
       // This might be left over from the last step
-      if ((*elem_it)->refinement_flag() == Elem::JUST_REFINED)
-	(*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+      if (elem->refinement_flag() == Elem::JUST_REFINED)
+	elem->set_refinement_flag(Elem::DO_NOTHING);
     }
 
   
@@ -324,17 +327,20 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
 
   for ( ; elem_it != elem_end; ++elem_it)
     {
+      // Pointer to the element
+      Elem *elem = *elem_it;
+
       // Set refinement flag to INACTIVE if the
       // element isn't active
-      if ( !(*elem_it)->active())
+      if ( !elem->active())
         {
-	  (*elem_it)->set_refinement_flag(Elem::INACTIVE);
-	  (*elem_it)->set_p_refinement_flag(Elem::INACTIVE);
+	  elem->set_refinement_flag(Elem::INACTIVE);
+	  elem->set_p_refinement_flag(Elem::INACTIVE);
         }
 
       // This might be left over from the last step
-      if ((*elem_it)->refinement_flag() == Elem::JUST_REFINED)
-	(*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+      if (elem->refinement_flag() == Elem::JUST_REFINED)
+	elem->set_refinement_flag(Elem::DO_NOTHING);
     }
 
   
