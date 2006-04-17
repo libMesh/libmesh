@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_smoothing.C,v 1.11 2005-05-18 18:07:36 roystgnr Exp $
+// $Id: mesh_refinement_smoothing.C,v 1.12 2006-04-17 21:18:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -148,8 +148,8 @@ bool MeshRefinement::eliminate_unrefined_patches ()
 	// if the neighbor is active and will not be refined;
 	// then we do not need to refine ourselves.
 	if (elem->neighbor(n) == NULL ||
-	    ((elem->neighbor(n)->level() <= my_level) &&
-	     (elem->neighbor(n)->active()) &&
+	    (elem->neighbor(n)->level() < my_level) ||
+	    ((elem->neighbor(n)->active()) &&
 	     (elem->neighbor(n)->refinement_flag() != Elem::REFINE))
             || (elem->neighbor(n)->refinement_flag() ==
                 Elem::COARSEN_INACTIVE))
