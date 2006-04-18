@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.21 2006-03-28 18:27:09 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.22 2006-04-18 04:03:32 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -56,6 +56,7 @@
 #include "sparse_matrix.h"
 #include "mesh_refinement.h"
 #include "error_vector.h"
+#include "exact_error_estimator.h"
 #include "kelly_error_estimator.h"
 #include "getpot.h"
 #include "exact_solution.h"
@@ -87,6 +88,11 @@ Gradient exact_derivative(const Point& p,
 			  const std::string&); // unk_name, not needed);
 
 
+// Set the dimensionality of the mesh
+// This is non-const because the input file may change it,
+// It is global because our exact_* functions use it.
+// It is 2 because our 3D hierarchics are broken... ;-)
+const unsigned int dim = 2;
 
 
 
@@ -96,12 +102,6 @@ int main(int argc, char** argv)
   libMesh::init (argc, argv);
 
   {
-    // Set the dimensionality of the mesh = 2
-    const unsigned int dim = 2;
-
-    // Create a two-dimensional mesh.
-    Mesh mesh (dim);
-    
     // Parse the input file
     GetPot input_file("ex14.in");
 
@@ -111,7 +111,11 @@ int main(int argc, char** argv)
     const Real refine_percentage   = input_file("refine_percentage", 0.5);
     const Real coarsen_percentage  = input_file("coarsen_percentage", 0.5);
     const unsigned int uniform_refine = input_file("uniform_refine",0);
+    const std::string refine_type    = input_file("refinement_type", "h");
     const std::string approx_order    = input_file("approx_order", "FIRST");
+// FIXME - 3D hierarchics are currently broken
+//    dim = input_file("dimension", 2);
+    const bool exact_indicator = input_file("exact_indicator", false);
     
     // Output file for plotting the error as a function of
     // the number of degrees of freedom.
@@ -130,12 +134,18 @@ int main(int argc, char** argv)
     out << "% dofs     L2-error     H1-error" << std::endl;
     out << "e = [" << std::endl;
     
+    // Create an n-dimensional mesh.
+    Mesh mesh (dim);
+    
     // Read in the mesh
-    mesh.read("lshaped.xda");
+    if (dim == 2)
+      mesh.read("lshaped.xda");
+    else
+      mesh.read("lshaped3D.xda");
 
     // Mesh Refinement object
     MeshRefinement mesh_refinement(mesh);
-    
+
     // Create an equation systems object.
     EquationSystems equation_systems (mesh);
 
@@ -164,21 +174,22 @@ int main(int argc, char** argv)
       // Give the system a pointer to the matrix assembly
       // function.
       system.attach_assemble_function (assemble_laplace);
-      
+
       // Initialize the data structures for the equation system.
       equation_systems.init();
 
       // Set linear solver max iterations
-      equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 100;
+      equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 5000;
 
       // Linear solver tolerance.
-      equation_systems.parameters.set<Real>("linear solver tolerance") = TOLERANCE * TOLERANCE;
+      equation_systems.parameters.set<Real>("linear solver tolerance") =
+        TOLERANCE * TOLERANCE * TOLERANCE;
       
       // Prints information about the system to the screen.
       equation_systems.print_info();
     }
 
-    // Construct ExactSolution object and attach function to compute exact solution
+    // Construct ExactSolution object and attach solution functions
     ExactSolution exact_sol(equation_systems);
     exact_sol.attach_exact_value(exact_solution);
     exact_sol.attach_exact_deriv(exact_derivative);
@@ -233,18 +244,39 @@ int main(int argc, char** argv)
 		// for computing error information on a finite element mesh.
 		ErrorVector error;
 		
-		// The \p ErrorEstimator class interrogates a finite element
-		// solution and assigns to each element a positive error value.
-		// This value is used for deciding which elements to refine
-		// and which to coarsen.
-		KellyErrorEstimator error_estimator;
-		
-		// Compute the error for each active element using the provided
-		// \p flux_jump indicator.  Note in general you will need to
-		// provide an error estimator specifically designed for your
-		// application.
-		error_estimator.estimate_error (system,
-						error);
+                if (exact_indicator)
+                  {
+		    // The \p ErrorEstimator class interrogates a
+                    // finite element solution and assigns to each
+                    // element a positive error value.
+		    // This value is used for deciding which elements to
+                    // refine and which to coarsen.
+                    // For these simple test problems, we can use
+                    // numerical quadrature of the exact error between
+                    // the approximate and analytic solutions.
+                    ExactErrorEstimator error_estimator;
+
+                    error_estimator.attach_exact_value(exact_solution);
+                    error_estimator.attach_exact_deriv(exact_derivative);
+
+                    // We optimize in H1 norm
+                    error_estimator.sobolev_order() = 1;
+
+		    // Compute the error for each active element using
+		    // the provided indicator.  Note in general you
+		    // will need to provide an error estimator
+                    // specifically designed for your application.
+		    error_estimator.estimate_error (system, error);
+                  }
+                else
+                  {
+                    // For real problems, we would need an error
+                    // indicator which only relies on the approximate
+                    // solution.
+		    KellyErrorEstimator error_estimator;
+
+		    error_estimator.estimate_error (system, error);
+                  }
 		
 		// This takes the error in \p error and decides which elements
 		// will be coarsened or refined.  Any element within 20% of the
@@ -257,6 +289,15 @@ int main(int argc, char** argv)
 								 refine_percentage,
 								 coarsen_percentage,
 								 max_r_level);
+
+                // If we are doing adaptive p refinement, we want
+                // elements flagged for that instead.
+                if (refine_type == "p")
+                  mesh_refinement.switch_h_to_p_refinement();
+                // If we are doing hp refinement, we currently
+                // flag elements for both h and p
+                if (refine_type == "hp")
+                  mesh_refinement.add_p_to_h_refinement();
 		
 		// This call actually refines and coarsens the flagged
 		// elements.
@@ -264,7 +305,12 @@ int main(int argc, char** argv)
 	      }
 
 	    else if (uniform_refine == 1)
-              mesh_refinement.uniformly_refine(1);
+              {
+                if (refine_type == "h" || refine_type == "hp")
+                  mesh_refinement.uniformly_refine(1);
+                if (refine_type == "p" || refine_type == "hp")
+                  mesh_refinement.uniformly_p_refine(1);
+              }
 	    
 	    // This call reinitializes the \p EquationSystems object for
 	    // the newly refined mesh.  One of the steps in the
@@ -329,8 +375,11 @@ Number exact_solution(const Point& p,
   // Make sure 0 <= theta <= 2*pi
   if (theta < 0)
     theta += 2. * libMesh::pi;
+
+  // Make the 3D solution similar but slightly less boring
+  const Real z = (dim > 2) ? p(2) : 0;
 		  
-  return pow(x*x + y*y, 1./3.)*sin(2./3.*theta);
+  return pow(x*x + y*y, 1./3.)*sin(2./3.*theta) + z;
 }
 
 
@@ -375,7 +424,10 @@ Gradient exact_derivative(const Point& p,
 
   // du/dy
   gradu(1) = tt*y*pow(r2,-tt)*sin(tt*theta) + pow(r2,ot)*cos(tt*theta)*tt/(1.+y*y/x/x)*1./x;
-    
+
+  if (dim > 2)
+    gradu(2) = 1.;
+
   return gradu;
 }
 
@@ -534,7 +586,6 @@ void assemble_laplace(EquationSystems& es,
 	for (unsigned int i=0; i<phi.size(); i++)
 	  for (unsigned int j=0; j<phi.size(); j++)
 	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-	    
 
       // Stop logging the matrix computation
       perf_log.stop_event ("Ke");
