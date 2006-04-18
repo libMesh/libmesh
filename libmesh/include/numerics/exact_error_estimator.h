@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.h,v 1.1 2006-04-10 18:06:18 roystgnr Exp $
+// $Id: exact_error_estimator.h,v 1.2 2006-04-18 03:34:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -19,8 +19,8 @@
 
 
 
-#ifndef __kelly_error_estimator_h__
-#define __kelly_error_estimator_h__
+#ifndef __exact_error_estimator_h__
+#define __exact_error_estimator_h__
 
 // C++ includes
 #include <vector>
