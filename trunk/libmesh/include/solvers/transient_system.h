@@ -1,4 +1,4 @@
-// $Id: transient_system.h,v 1.8 2006-03-29 20:56:45 roystgnr Exp $
+// $Id: transient_system.h,v 1.9 2006-04-18 16:24:09 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -59,7 +59,7 @@ public:
   /**
    * Destructor.
    */
-  ~TransientSystem ();
+  virtual ~TransientSystem ();
   
   /**
    * The type of system.
