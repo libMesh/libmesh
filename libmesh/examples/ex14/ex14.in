@@ -1,7 +1,7 @@
 # Maximum number of refinement steps
-max_r_steps = 15
+max_r_steps = 10
 
-# Maximum refinement level for an element.
+# Maximum h refinement level for an element.
 max_r_level = 15
 
 # Percentage of elements to refine at each step
@@ -17,5 +17,20 @@ uniform_refine = 0
 
 # Polynomial approximation order
 # FIRST and SECOND construct linear or quadratic Lagrange elements
-# HIERARCHIC and THIRD construct quadratic or cubic Hierarchics
+# FIRSTHIERARCHIC, HIERARCHIC and THIRD construct
+# linear, quadratic or cubic Hierarchics
 approx_order = SECOND
+
+# Use exact error estimator instead of gradient jumps?
+exact_indicator = false
+
+# Mesh refinement type: h, p, or hp
+# Use a hierarchic approx_order with p or hp,
+# Use an exact indicator with hp.
+# Currently hp refinement stupidly does both or neither on every
+# element
+refinement_type = h
+
+# Mesh dimensionality - NOT YET IMPLEMENTED
+# We load lshaped.xda for 2 dimensional problems, lshaped3D.xda for 3
+dimension = 2
