@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_smoothing.C,v 1.12 2006-04-17 21:18:09 roystgnr Exp $
+// $Id: mesh_refinement_smoothing.C,v 1.13 2006-04-18 03:44:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -40,6 +40,7 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 
   // Vector holding the maximum element level that touches a node.
   std::vector<unsigned char> max_level_at_node (_mesh.n_nodes(), 0);
+  std::vector<unsigned char> max_p_level_at_node (_mesh.n_nodes(), 0);
 
 
   // Loop over all the active elements & fill the vector
@@ -55,6 +56,8 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 	const Elem* elem = *elem_it;	
 	const unsigned char elem_level =
 	  elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
+	const unsigned char elem_p_level =
+	  elem->p_level() + ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0);
 
 	// Set the max_level at each node
 	for (unsigned int n=0; n<elem->n_nodes(); n++)
@@ -65,6 +68,8 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 	    
 	    max_level_at_node[node_number] =
 	      std::max (max_level_at_node[node_number], elem_level);
+	    max_p_level_at_node[node_number] =
+	      std::max (max_p_level_at_node[node_number], elem_p_level);
 	  }
       }     
   }
@@ -83,9 +88,11 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
       {
 	Elem* elem = *elem_it;	
 	const unsigned int elem_level = elem->level();
+	const unsigned int elem_p_level = elem->p_level();
 	
-	// Skip the element if it is already flagged
-	if (elem->refinement_flag() == Elem::REFINE)
+	// Skip the element if it is already fully flagged
+	if (elem->refinement_flag() == Elem::REFINE &&
+            elem->p_refinement_flag() == Elem::REFINE)
 	  continue;
 
 	// Loop over the nodes, check for possible mismatch
@@ -95,9 +102,16 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 
 	    // Flag the element for refinement if it violates
 	    // the requested level mismatch
-	    if ( (elem_level + max_mismatch) < max_level_at_node[node_number])
+	    if ( (elem_level + max_mismatch) < max_level_at_node[node_number]
+                 && elem->refinement_flag() != Elem::REFINE)
 	      {
 		elem->set_refinement_flag (Elem::REFINE);
+		flags_changed = true;
+	      }
+	    if ( (elem_p_level + max_mismatch) < max_p_level_at_node[node_number]
+                 && elem->p_refinement_flag() != Elem::REFINE)
+	      {
+		elem->set_p_refinement_flag (Elem::REFINE);
 		flags_changed = true;
 	      }
 	  }
@@ -123,42 +137,104 @@ bool MeshRefinement::eliminate_unrefined_patches ()
   for (; elem_it != elem_end; ++elem_it)
     {
       Elem* elem = *elem_it;
-      const unsigned int my_level = elem->level();
-      bool flag_me = true;
+      bool h_flag_me = true,
+           p_flag_me = true;
 
 
-      // Skip the element if it is already flagged for refinement
+      // Skip the element if it is already fully flagged for refinement
+      if (elem->p_refinement_flag() == Elem::REFINE)
+	p_flag_me = false;
       if (elem->refinement_flag() == Elem::REFINE)
-	continue;
-      
-      // Test the parent if that is already flagged for coarsening
-      if (elem->refinement_flag() == Elem::COARSEN)
         {
-          assert(elem->parent());
-          // FIXME: this is reasonable, but why don't we have a non-const
-          // Elem::parent() to begin with?
-	  elem = const_cast<Elem *>(elem->parent());
-          if (elem->refinement_flag() != Elem::COARSEN_INACTIVE)
+          h_flag_me = false;
+          if (!p_flag_me)
             continue;
         }
+      // Test the parent if that is already flagged for coarsening
+      else if (elem->refinement_flag() == Elem::COARSEN)
+        {
+          assert(elem->parent());
+	  elem = elem->parent();
+          // FIXME - this doesn't seem right - RHS
+          if (elem->refinement_flag() != Elem::COARSEN_INACTIVE)
+            continue;
+          p_flag_me = false;
+        }
+
+      const unsigned int my_level = elem->level();
+      int my_p_adjustment = 0;
+      if (elem->p_refinement_flag() == Elem::REFINE)
+        my_p_adjustment = 1;
+      else if (elem->p_refinement_flag() == Elem::COARSEN)
+        {
+          assert(elem->p_level() > 0);
+          my_p_adjustment = -1;
+        }
+      const unsigned int my_new_p_level = elem->p_level() +
+                                          my_p_adjustment;
 
       // Check all the element neighbors
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
-	// Quit if the element is on the boundary, or
-	// if the neighbor is active and will not be refined;
-	// then we do not need to refine ourselves.
-	if (elem->neighbor(n) == NULL ||
-	    (elem->neighbor(n)->level() < my_level) ||
-	    ((elem->neighbor(n)->active()) &&
-	     (elem->neighbor(n)->refinement_flag() != Elem::REFINE))
-            || (elem->neighbor(n)->refinement_flag() ==
-                Elem::COARSEN_INACTIVE))
-          {
-	    flag_me = false;
-            break;
-          }
+        {
+          const Elem *neighbor = elem->neighbor(n);
+	  // Quit if the element is on the boundary
+	  if (neighbor == NULL)
+            {
+              h_flag_me = false;
+              p_flag_me = false;
+              break;
+            }
+	  // if the neighbor will be equally or less refined
+	  // than we are, then we do not need to h refine ourselves.
+	  if (h_flag_me && 
+              (neighbor->level() < my_level) ||
+	      ((neighbor->active()) &&
+	       (neighbor->refinement_flag() != Elem::REFINE))
+              || (neighbor->refinement_flag() ==
+                  Elem::COARSEN_INACTIVE))
+            {
+	      h_flag_me = false;
+              if (!p_flag_me)
+                break;
+            }
+	  if (p_flag_me)
+            {
+	  // if active neighbors will have a p level
+          // equal to or lower than ours, then we do not need to p refine
+          // ourselves.
+              if (neighbor->active())
+                {
+                  int p_adjustment = 0;
+                  if (neighbor->p_refinement_flag() == Elem::REFINE)
+                    p_adjustment = 1;
+                  else if (neighbor->p_refinement_flag() == Elem::COARSEN)
+                    {
+                      assert(neighbor->p_level() > 0);
+                      p_adjustment = -1;
+                    }
+                  if (my_new_p_level >= neighbor->p_level() + p_adjustment)
+                    {
+                      p_flag_me = false;
+                      if (!h_flag_me)
+                        break;
+                    }
+                }
+              // If we have inactive neighbors, we need to
+              // test all their active descendants which neighbor us
+              else
+                {
+                  if (neighbor->min_new_p_level_by_neighbor(elem,
+                      my_new_p_level + 2) <= my_new_p_level)
+                    {
+                      p_flag_me = false;
+                      if (!h_flag_me)
+                        break;
+                    }
+                }
+            }
+        }
 
-      if (flag_me)
+      if (h_flag_me)
 	{
 	  // Parents that would create islands should no longer
           // coarsen
@@ -174,6 +250,11 @@ bool MeshRefinement::eliminate_unrefined_patches ()
             }
           else
 	    elem->set_refinement_flag(Elem::REFINE);
+	  flags_changed = true;
+	}      
+      if (p_flag_me)
+	{
+	  elem->set_p_refinement_flag(Elem::REFINE);
 	  flags_changed = true;
 	}      
     }
