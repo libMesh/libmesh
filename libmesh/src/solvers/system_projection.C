@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.27 2006-04-16 03:41:07 roystgnr Exp $
+// $Id: system_projection.C,v 1.28 2006-04-18 17:14:39 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -185,7 +185,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                                              elem->p_level());
 
           // We may need to remember the parent's p_level
-          unsigned int old_parent_level;
+          unsigned int old_parent_level = 0;
 
 	  // Update the DOF indices for this element based on
           // the new mesh
