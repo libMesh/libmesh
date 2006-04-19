@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.22 2006-04-18 04:03:32 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.23 2006-04-19 23:01:17 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -58,6 +58,7 @@
 #include "error_vector.h"
 #include "exact_error_estimator.h"
 #include "kelly_error_estimator.h"
+#include "mesh_modification.h"
 #include "getpot.h"
 #include "exact_solution.h"
 #include "dof_map.h"
@@ -106,29 +107,41 @@ int main(int argc, char** argv)
     GetPot input_file("ex14.in");
 
     // Read in parameters from the input file
-    const unsigned int max_r_steps = input_file("max_r_steps", 3);
-    const unsigned int max_r_level = input_file("max_r_level", 3);
-    const Real refine_percentage   = input_file("refine_percentage", 0.5);
-    const Real coarsen_percentage  = input_file("coarsen_percentage", 0.5);
+    const unsigned int max_r_steps    = input_file("max_r_steps", 3);
+    const unsigned int max_r_level    = input_file("max_r_level", 3);
+    const Real refine_percentage      = input_file("refine_percentage", 0.5);
+    const Real coarsen_percentage     = input_file("coarsen_percentage", 0.5);
     const unsigned int uniform_refine = input_file("uniform_refine",0);
-    const std::string refine_type    = input_file("refinement_type", "h");
-    const std::string approx_order    = input_file("approx_order", "FIRST");
+    const std::string refine_type     = input_file("refinement_type", "h");
+    const std::string approx_type     = input_file("approx_type", "LAGRANGE");
+    const unsigned int approx_order   = input_file("approx_order", 1);
+    const std::string element_type    = input_file("element_type", "tensor");
+    const int extra_error_quadrature  = input_file("extra_error_quadrature", 0);
 // FIXME - 3D hierarchics are currently broken
 //    dim = input_file("dimension", 2);
     const bool exact_indicator = input_file("exact_indicator", false);
     
     // Output file for plotting the error as a function of
     // the number of degrees of freedom.
-    std::string output_file = "bi";
-    if (approx_order == "FIRST")
-      output_file += "linear_";
-    else
-      output_file += "quadratic_";
+    std::string approx_name = "";
+    if (element_type == "tensor")
+      approx_name += "bi";
+    if (approx_order == 1)
+      approx_name += "linear";
+    else if (approx_order == 2)
+      approx_name += "quadratic";
+    else if (approx_order == 3)
+      approx_name += "cubic";
+    else if (approx_order == 4)
+      approx_name += "quartic";
 
+    std::string output_file = approx_name;
+    output_file += "_";
+    output_file += refine_type;
     if (uniform_refine == 0)
-      output_file += "adaptive.m";
+      output_file += "_adaptive.m";
     else
-      output_file += "uniform.m";
+      output_file += "_uniform.m";
     
     std::ofstream out (output_file.c_str());
     out << "% dofs     L2-error     H1-error" << std::endl;
@@ -142,6 +155,9 @@ int main(int argc, char** argv)
       mesh.read("lshaped.xda");
     else
       mesh.read("lshaped3D.xda");
+
+    if (element_type == "simplex")
+      MeshTools::Modification::all_tri(mesh);
 
     // Mesh Refinement object
     MeshRefinement mesh_refinement(mesh);
@@ -158,18 +174,17 @@ int main(int argc, char** argv)
       // Adds the variable "u" to "Laplace", using 
       // the finite element type and order specified
       // in the config file
-      if (approx_order == "FIRST")
-	system.add_variable("u", FIRST);
-      else if (approx_order == "SECOND")
-        system.add_variable("u", SECOND);
-      else if (approx_order == "FIRSTHIERARCHIC")
-        system.add_variable("u", FIRST, HIERARCHIC);
-      else if (approx_order == "HIERARCHIC")
-        system.add_variable("u", SECOND, HIERARCHIC);
-      else if (approx_order == "THIRD")
-        system.add_variable("u", THIRD, HIERARCHIC);
+      if (approx_type == "LAGRANGE")
+	system.add_variable("u", static_cast<Order>(approx_order));
+      else if (approx_type == "HIERARCHIC")
+        system.add_variable("u", static_cast<Order>(approx_order),
+                            HIERARCHIC);
       else
-	error();
+        {
+          std::cerr << "Bad approximation type: " <<
+                       approx_type << std::endl;
+	  error();
+        }
 
       // Give the system a pointer to the matrix assembly
       // function.
@@ -193,6 +208,9 @@ int main(int argc, char** argv)
     ExactSolution exact_sol(equation_systems);
     exact_sol.attach_exact_value(exact_solution);
     exact_sol.attach_exact_deriv(exact_derivative);
+
+    // Use higher quadrature order for more accurate error results
+    exact_sol.extra_quadrature_order(extra_error_quadrature);
 
     // Convenient reference to the system
     LinearImplicitSystem& system =
@@ -338,10 +356,7 @@ int main(int argc, char** argv)
     //    out << "set(gca,'XScale', 'Log');" << std::endl;
     //    out << "set(gca,'YScale', 'Log');" << std::endl;
     out << "xlabel('dofs');" << std::endl;
-    if (approx_order == "FIRST")
-      out << "title('Bilinear elements');" << std::endl;
-    else
-      out  << "title('Biquadratic elements');" << std::endl;
+    out << "title('" << approx_name << " elements');" << std::endl;
     out << "legend('L2-error', 'H1-error');" << std::endl;
     //     out << "disp('L2-error linear fit');" << std::endl;
     //     out << "polyfit(log10(e(:,1)), log10(e(:,2)), 1)" << std::endl;
@@ -502,7 +517,8 @@ void assemble_laplace(EquationSystems& es,
   // const std::vector<Point>& q_point = fe->get_xyz();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  // For this simple problem we only need them on element boundaries.
+  // const std::vector<std::vector<Real> >& phi = fe->get_phi();
   const std::vector<std::vector<Real> >& psi = fe_face->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
@@ -583,8 +599,8 @@ void assemble_laplace(EquationSystems& es,
       perf_log.start_event ("Ke");
 
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	for (unsigned int i=0; i<phi.size(); i++)
-	  for (unsigned int j=0; j<phi.size(); j++)
+	for (unsigned int i=0; i<dphi.size(); i++)
+	  for (unsigned int j=0; j<dphi.size(); j++)
 	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 
       // Stop logging the matrix computation
