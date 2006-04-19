@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic.C,v 1.24 2006-04-05 16:42:27 roystgnr Exp $
+// $Id: fe_hierarchic.C,v 1.25 2006-04-19 23:04:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -243,6 +243,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
     case EDGE2:
     case EDGE3:
       return (o-1);
+    case TRI3:
+    case QUAD4:
+      return 0;
     case TRI6:
       return ((o-1)*(o-2)/2);
     case QUAD8:

@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.19 2006-04-05 16:42:28 roystgnr Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.20 2006-04-19 23:04:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -57,329 +57,108 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
   using Utility::pow;
 
   const Order totalorder = static_cast<Order>(order+elem->p_level());
+  assert(totalorder > 0);
   
   switch (elem->type())
     {      
+    case TRI3:
     case TRI6:
       {
-	switch (totalorder)
-	  {
-	  case FIRST:
-	  case SECOND:
-	    {
-	      const Real zeta1 = p(0);
-	      const Real zeta2 = p(1);
-	      const Real zeta0 = 1. - zeta1 - zeta2;
+	const Real zeta1 = p(0);
+	const Real zeta2 = p(1);
+	const Real zeta0 = 1. - zeta1 - zeta2;
 	      
-	      assert (i<6);
+	assert (i<(totalorder+1u)*(totalorder+2u)/2);
+	assert (elem->type() == TRI6 || totalorder < 2);
 
-
-	      switch (i)
-		{
-		case 0:
-		  return zeta0;
-		  
-		case 1:
-		  return zeta1;
-		  
-		case 2:
-		  return zeta2;
-		  
-		case 3:
-		  return (pow<2>(zeta1 - zeta0) - pow<2>(zeta0 + zeta1))/2.;
-		  
-		case 4:
-		  return (pow<2>(zeta2 - zeta1) - pow<2>(zeta1 + zeta2))/2.;
-		  
-		case 5:
-		  return (pow<2>(zeta0 - zeta2) - pow<2>(zeta2 + zeta0))/2.;
-
-		default:
-		  error();
-		}
-	    }
-
-	  case THIRD:
-	    {
-	      const Real zeta1 = p(0);
-	      const Real zeta2 = p(1);
-	      const Real zeta0 = 1. - zeta1 - zeta2;
+        // Vertex DoFs
+        if (i == 0)
+          return zeta0;
+        else if (i == 1)
+          return zeta1;
+        else if (i == 2)
+          return zeta2;
+        // Edge DoFs
+        else if (i < totalorder + 2u)
+          {
+            const unsigned int basisorder = i - 1;
+	    // Get factors to account for edge-flipping
+	    Real f0 = 1;
+	    if (basisorder%2 && (elem->node(0) > elem->node(1)))
+	      f0 = -1.;
 	      
-	      assert (i<10);
+            Real edgeval = (zeta1 - zeta0) / (zeta1 + zeta0);
+            Real crossfunc = zeta0 + zeta1;
+            for (unsigned int n=1; n != basisorder; ++n)
+              crossfunc *= (zeta0 + zeta1);
 
-	      // Get  factors to account for edge-flipping
-	      Real f0 = 1;
-	      Real f1 = 1;
-	      Real f2 = 1;
-
-	      if (elem->node(0) > elem->node(1))
-		f0 = -1.;
+            return f0 * crossfunc *
+                   FE<1,HIERARCHIC>::shape(EDGE3, totalorder,
+                                           basisorder, edgeval);
+          }
+        else if (i < 2u*totalorder + 1)
+          {
+            const unsigned int basisorder = i - totalorder;
+	    // Get factors to account for edge-flipping
+	    Real f1 = 1;
+	    if (basisorder%2 && (elem->node(1) > elem->node(2)))
+	      f1 = -1.;
 	      
-	      if (elem->node(1) > elem->node(2))
-		f1 = -1.;
-	      
-	      if (elem->node(2) > elem->node(0))
-		f2 = -1.;
+            Real edgeval = (zeta2 - zeta1) / (zeta2 + zeta1);
+            Real crossfunc = zeta2 + zeta1;
+            for (unsigned int n=1; n != basisorder; ++n)
+              crossfunc *= (zeta2 + zeta1);
 
+            return f1 * crossfunc *
+                   FE<1,HIERARCHIC>::shape(EDGE3, totalorder,
+                                           basisorder, edgeval);
+          }
+        else if (i < 3u*totalorder)
+          {
+            const unsigned int basisorder = i - (2u*totalorder) + 1;
+	    // Get factors to account for edge-flipping
+	    Real f2 = 1;
+	    if (basisorder%2 && (elem->node(2) > elem->node(0)))
+	      f2 = -1.;
 
-	      
-	      switch (i)
-		{
-		case 0:
-		  return zeta0;
-		  
-		case 1:
-		  return zeta1;
-		  
-		case 2:
-		  return zeta2;
-		  
-		  // Shape functions for edge 0
-		case 3:
-		  return    (pow<2>(zeta1 - zeta0) -
-			     pow<2>(zeta0 + zeta1))/2.;
+            Real edgeval = (zeta0 - zeta2) / (zeta0 + zeta2);
+            Real crossfunc = zeta0 + zeta2;
+            for (unsigned int n=1; n != basisorder; ++n)
+              crossfunc *= (zeta0 + zeta2);
 
-		case 4:
-		  return f0*(pow<3>(zeta1 - zeta0) -
-			     (zeta1 - zeta0)*pow<2>(zeta0 + zeta1))/6.;
-		  
-		  // Shape functions for edge 1
-		case 5:
-		  return    (pow<2>(zeta2 - zeta1) -
-			     pow<2>(zeta1 + zeta2))/2.;
+            return f2 * crossfunc *
+                   FE<1,HIERARCHIC>::shape(EDGE3, totalorder,
+                                           basisorder, edgeval);
+          }
+        // Interior DoFs
+        else
+          {
+            const unsigned int basisnum = i - (3u*totalorder);
+            // FIXME - there has to be a better way to get
+            // exponent combinations from indices
+            unsigned int exp0 = totalorder-2u, firstbasis = 0;
+            while (firstbasis + totalorder - exp0 - 1 <= basisnum)
+              {
+                firstbasis += totalorder - exp0 - 1;
+                assert(exp0 > 0);
+                exp0--;
+              }
+            unsigned int exp1 = basisnum - firstbasis + 1;
+            unsigned int exp2 = totalorder - exp0 - exp1;
 
-		case 6:
-		  return f1*(pow<3>(zeta2 - zeta1) -
-			     (zeta2 - zeta1)*pow<2>(zeta1 + zeta2))/6.;
-		  
-		  // Shape functions for edge 2
-		case 7:
-		  return    (pow<2>(zeta0 - zeta2) -
-			     pow<2>(zeta2 + zeta0))/2.;
-
-		case 8:
-		  return f2*(pow<3>(zeta0 - zeta2) -
-			     (zeta0 - zeta2)*pow<2>(zeta2 + zeta0))/6.;
-
-		  // interior shape functions
-		case 9:
-		  return    (zeta0*zeta1*zeta2);
-		  
-		default:
-		  error();
-		}
-	    }
-
-	  case FOURTH:
-	    {
-	      const Real zeta1 = p(0);
-	      const Real zeta2 = p(1);
-	      const Real zeta0 = 1. - zeta1 - zeta2;
-	      
-	      assert (i<15);
-
-	      // Get  factors to account for edge-flipping
-	      Real f0 = 1;
-	      Real f1 = 1;
-	      Real f2 = 1;
-
-	      if (elem->node(0) > elem->node(1))
-		f0 = -1.;
-	      
-	      if (elem->node(1) > elem->node(2))
-		f1 = -1.;
-	      
-	      if (elem->node(2) > elem->node(0))
-		f2 = -1.;
-
-
-	      
-	      switch (i)
-		{
-		case 0:
-		  return zeta0;
-		  
-		case 1:
-		  return zeta1;
-		  
-		case 2:
-		  return zeta2;
-
-		  // Shape functions for edge 0
-		case 3:
-		  return    (pow<2>(zeta1 - zeta0) -
-			     pow<2>(zeta0 + zeta1))/2.;
-		   
-		case 4:
-		  return f0*(pow<3>(zeta1 - zeta0) -
-			     (zeta1 - zeta0)*pow<2>(zeta0 + zeta1))/6.;
-
-		case 5:
-		  return    (pow<4>(zeta1 - zeta0) -
-			     pow<4>(zeta0 + zeta1))/24.;
-		  
-		  // Shape functions for edge 1
-		case 6:
-		  return    (pow<2>(zeta2 - zeta1) -
-			     pow<2>(zeta1 + zeta2))/2.;
-
-		case 7:
-		  return f1*(pow<3>(zeta2 - zeta1) -
-			     (zeta2 - zeta1)*pow<2>(zeta1 + zeta2))/6.;
-
-		case 8:
-		  return    (pow<4>(zeta2 - zeta1) -
-			     pow<4>(zeta1 + zeta2))/24.;
-		  
-		  // Shape functions for edge 2
-		case 9:
-		  return    (pow<2>(zeta0 - zeta2) -
-			     pow<2>(zeta2 + zeta0))/2.;
-
-		case 10:
-		  return f2*(pow<3>(zeta0 - zeta2) -
-			     (zeta0 - zeta2)*pow<2>(zeta2 + zeta0))/6.;
-
-		case 11:
-		  return    (pow<4>(zeta0 - zeta2) -
-			     pow<4>(zeta2 + zeta0))/24.;
-
-		  // interior shape functions
-		case 12:
-		  return    (zeta0*zeta0*zeta1*zeta2);
-
-		case 13:
-		  return    (zeta0*zeta1*zeta1*zeta2);
-		  
-		case 14:
-		  return    (zeta0*zeta1*zeta2*zeta2);
-		  
-		default:
-		  error();
-		}
-	    }
-
-	  case FIFTH:
-	    {
-	      const Real zeta1 = p(0);
-	      const Real zeta2 = p(1);
-	      const Real zeta0 = 1. - zeta1 - zeta2;
-	      
-	      assert (i<21);
-
-	      // Get  factors to account for edge-flipping
-	      Real f0 = 1;
-	      Real f1 = 1;
-	      Real f2 = 1;
-
-	      if (elem->node(0) > elem->node(1))
-		f0 = -1.;
-	      
-	      if (elem->node(1) > elem->node(2))
-		f1 = -1.;
-	      
-	      if (elem->node(2) > elem->node(0))
-		f2 = -1.;
-
-
-	      
-	      switch (i)
-		{
-		case 0:
-		  return zeta0;
-		  
-		case 1:
-		  return zeta1;
-		  
-		case 2:
-		  return zeta2;
-
-		  // Shape functions for edge 0
-		case 3:
-		  return    (pow<2>(zeta1 - zeta0) -
-			     pow<2>(zeta0 + zeta1))/2.;
-		   
-		case 4:
-		  return f0*(pow<3>(zeta1 - zeta0) -
-			     (zeta1 - zeta0)*pow<2>(zeta0 + zeta1))/6.;
-
-		case 5:
-		  return    (pow<4>(zeta1 - zeta0) -
-			     pow<4>(zeta0 + zeta1))/24.;
-
-		case 6:
-		  return f0*(pow<5>(zeta1 - zeta0) -
-			     (zeta1 - zeta0)*pow<4>(zeta0 + zeta1))/120.;
-		  		  
-		  // Shape functions for edge 1
-		case 7:
-		  return    (pow<2>(zeta2 - zeta1) -
-			     pow<2>(zeta1 + zeta2))/2.;
-
-		case 8:
-		  return f1*(pow<3>(zeta2 - zeta1) -
-			     (zeta2 - zeta1)*pow<2>(zeta1 + zeta2))/6.;
-
-		case 9:
-		  return    (pow<4>(zeta2 - zeta1) -
-			     pow<4>(zeta1 + zeta2))/24.;
-
-		case 10:
-		  return f1*(pow<5>(zeta2 - zeta1) -
-			     (zeta2 - zeta1)*pow<4>(zeta1 + zeta2))/120.;
-		  
-		  // Shape functions for edge 2
-		case 11:
-		  return    (pow<2>(zeta0 - zeta2) -
-			     pow<2>(zeta2 + zeta0))/2.;
-
-		case 12:
-		  return f2*(pow<3>(zeta0 - zeta2) -
-			     (zeta0 - zeta2)*pow<2>(zeta2 + zeta0))/6.;
-
-		case 13:
-		  return    (pow<4>(zeta0 - zeta2) -
-			     pow<4>(zeta2 + zeta0))/24.;
-
-		case 14:
-		  return f2*(pow<5>(zeta0 - zeta2) -
-			     (zeta0 - zeta2)*pow<4>(zeta2 + zeta0))/120.;
-		  
-		  // interior shape functions
-		case 15:
-		  return    pow<3>(zeta0)*zeta1*zeta2;
-
-		case 16:
-		  return    zeta0*pow<3>(zeta1)*zeta2;
-		  
-		case 17:
-		  return    zeta0*zeta1*pow<3>(zeta2);
-
-		case 18:
-		  return    pow<2>(zeta0*zeta1)*zeta2;
-		  
-		case 19:
-		  return    zeta0*pow<2>(zeta1*zeta2);
-		  
-		case 20:
-		  return    zeta1*pow<2>(zeta0*zeta2);
-		  
-		default:
-		  error();
-		}
-	    }
-
-	  default:
-	    {
-              // by default throw an error
-              std::cerr << "ERROR: Unsupported polynomial order on TRI6!"
-                        << std::endl;
-              error();
-            }
+            Real returnval = 1;
+            for (unsigned int n = 0; n != exp0; ++n)
+              returnval *= zeta0;
+            for (unsigned int n = 0; n != exp1; ++n)
+              returnval *= zeta1;
+            for (unsigned int n = 0; n != exp2; ++n)
+              returnval *= zeta2;
+            return returnval;
           }
       }
 
     // Hierarchic shape functions on the quadrilateral.
+    case QUAD4:
     case QUAD8:
     case QUAD9:
       {
@@ -387,7 +166,7 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
         const Real xi  = p(0);
         const Real eta = p(1);
       
-        assert (totalorder > 0);
+	assert (elem->type() != QUAD4 || totalorder < 2);
         assert (i < (totalorder+1u)*(totalorder+1u));
 
 // Example i, i0, i1 values for totalorder = 5:
@@ -411,7 +190,7 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
           { i0 = i - 2; i1 = 0; }
         else if (i < 2u*totalorder + 2)
           { i0 = 1; i1 = i - totalorder - 1; }
-        else if (i < 3u*totalorder + 1u)
+        else if (i < 3u*totalorder + 1)
           { i0 = i - 2u*totalorder; i1 = 1; }
         else if (i < 4u*totalorder)
           { i0 = 0; i1 = i - 3u*totalorder + 1; }
@@ -482,6 +261,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
   switch (type)
     {
       // 1st & 2nd-order Hierarchics.
+    case TRI3:
     case TRI6:
       {
 	const Real eps = 1.e-6;
@@ -516,6 +296,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	  }
       }
 
+    case QUAD4:
     case QUAD8:
     case QUAD9:
       {
