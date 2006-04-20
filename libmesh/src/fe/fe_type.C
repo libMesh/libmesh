@@ -1,5 +1,5 @@
 
-// $Id: fe_type.C,v 1.3 2006-04-05 16:14:28 roystgnr Exp $
+// $Id: fe_type.C,v 1.4 2006-04-20 17:06:53 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,13 +30,20 @@ AutoPtr<QBase>
 FEType::default_quadrature_rule (const unsigned int dim,
                                  const int extraorder) const
 {
+
   // Clough elements have at least piecewise cubic functions
   if (family == CLOUGH)
-    return AutoPtr<QBase>
-      (new QClough(dim,
-        static_cast<Order>
-          (std::max(static_cast<unsigned int>
-            (this->default_quadrature_order()),7 + extraorder))));
+    {
+      // this seems ridiculous but for some reason gcc 3.3.5 wants
+      // this when using complex numbers (spetersen 04/20/06)
+      const unsigned int seven = 7;
+
+      return AutoPtr<QBase>
+	(new QClough(dim,
+		     static_cast<Order>
+		     (std::max(static_cast<unsigned int>
+			       (this->default_quadrature_order()), seven + extraorder))));
+    }
   
   return AutoPtr<QBase>
     (new QGauss(dim, static_cast<Order>(this->default_quadrature_order()

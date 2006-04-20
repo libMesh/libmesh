@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.C,v 1.1 2006-04-10 18:06:20 roystgnr Exp $
+// $Id: exact_error_estimator.C,v 1.2 2006-04-20 17:06:52 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -244,7 +244,11 @@ void ExactErrorEstimator::estimate_error (const System& system,
                                                            var_name));
 
               // Add the squares of the error to each contribution
+#ifndef USE_COMPLEX_NUMBERS
               L2normsq += JxW[qp]*(val_error*val_error);
+#else
+	      L2normsq += JxW[qp]*std::norm(val_error);
+#endif
 
 	      // Compute the value of the error in the gradient at this
               // quadrature point
@@ -255,7 +259,11 @@ void ExactErrorEstimator::estimate_error (const System& system,
                                                                  sys_name,
                                                                  var_name));
 
+#ifndef USE_COMPLEX_NUMBERS
                   H1seminormsq += JxW[qp]*(grad_error*grad_error);
+#else
+                  H1seminormsq += JxW[qp]*std::abs(grad_error*grad_error);
+#endif
                 }
 
 
@@ -298,11 +306,11 @@ void ExactErrorEstimator::estimate_error (const System& system,
   this->reduce_error(error_per_cell);
 
   // Compute the square-root of each component.
-  START_LOG("std::sqrt()", "KellyErrorEstimator");
+  START_LOG("std::sqrt()", "ExactErrorEstimator");
   for (unsigned int i=0; i<error_per_cell.size(); i++)
     if (error_per_cell[i] != 0.)
       error_per_cell[i] = std::sqrt(error_per_cell[i]);
-  STOP_LOG("std::sqrt()", "KellyErrorEstimator");
+  STOP_LOG("std::sqrt()", "ExactErrorEstimator");
 
   //  STOP_LOG("flux_jumps()", "KellyErrorEstimator");
 }
