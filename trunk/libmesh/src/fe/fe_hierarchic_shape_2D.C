@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.21 2006-04-20 19:41:23 roystgnr Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.22 2006-04-20 22:40:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -18,49 +18,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ inlcludes
+// C++ includes
 
 // Local includes
 #include "fe.h"
 #include "elem.h"
+#include "number_lookups.h"
 #include "utility.h"
 
-// Anonymous namespace for lookup tables
-namespace
-{
-  // These numbers need to go up to at least maximum_totalorder - 2
-  const unsigned char triangular_number_row[] = {
- 0,
- 1, 1,
- 2, 2, 2,
- 3, 3, 3, 3,
- 4, 4, 4, 4, 4,
- 5, 5, 5, 5, 5, 5,
- 6, 6, 6, 6, 6, 6, 6,
- 7, 7, 7, 7, 7, 7, 7, 7,
- 8, 8, 8, 8, 8, 8, 8, 8, 8,
- 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-10,10,10,10,10,10,10,10,10,10,10,
-11,11,11,11,11,11,11,11,11,11,11,11,
-12,12,12,12,12,12,12,12,12,12,12,12,12
-};
-  const unsigned char triangular_number_column[] = {
- 0,
- 0, 1,
- 0, 1, 2,
- 0, 1, 2, 3,
- 0, 1, 2, 3, 4,
- 0, 1, 2, 3, 4, 5,
- 0, 1, 2, 3, 4, 5, 6,
- 0, 1, 2, 3, 4, 5, 6, 7,
- 0, 1, 2, 3, 4, 5, 6, 7, 8,
- 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
- 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
- 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,
- 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12
-};
-
-}
 
 template <>
 Real FE<2,HIERARCHIC>::shape(const ElemType,
@@ -168,18 +133,16 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
         else
           {
             const unsigned int basisnum = i - (3u*totalorder);
-            unsigned int exp0 = totalorder - 2u -
-              triangular_number_row[basisnum];
-            unsigned int exp1 = triangular_number_column[basisnum] + 1;
-            unsigned int exp2 = totalorder - exp0 - exp1;
+            unsigned int exp0 = triangular_number_column[basisnum] + 1;
+            unsigned int exp1 = triangular_number_row[basisnum] + 1 -
+                                triangular_number_column[basisnum];
 
             Real returnval = 1;
             for (unsigned int n = 0; n != exp0; ++n)
               returnval *= zeta0;
             for (unsigned int n = 0; n != exp1; ++n)
               returnval *= zeta1;
-            for (unsigned int n = 0; n != exp2; ++n)
-              returnval *= zeta2;
+            returnval *= zeta2;
             return returnval;
           }
       }
@@ -198,8 +161,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 
 // Example i, i0, i1 values for totalorder = 5:
 //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
-//  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
-//  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
+//  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 3, 2, 4, 4, 4, 3, 2, 5, 5, 5, 5, 4, 3, 2};
+//  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 3, 3, 2, 3, 4, 4, 4, 2, 3, 4, 5, 5, 5, 5};
 	      
         unsigned int i0, i1;
 
@@ -223,8 +186,11 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
           { i0 = 0; i1 = i - 3u*totalorder + 1; }
         // Interior DoFs
         else
-          { i0 = (i - 4*totalorder)%(totalorder-1) + 2;
-            i1 = (i - 4*totalorder)/(totalorder-1) + 2; }
+          {
+            unsigned int basisnum = i - 4*totalorder;
+            i0 = square_number_row[basisnum] + 2;
+            i1 = square_number_column[basisnum] + 2;
+          }
 
         // Flip odd degree of freedom values if necessary
         // to keep continuity on sides

@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_3D.C,v 1.16 2006-04-05 16:42:28 roystgnr Exp $
+// $Id: fe_hierarchic_shape_3D.C,v 1.17 2006-04-20 22:40:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 // Local includes
 #include "fe.h"
 #include "elem.h"
+#include "number_lookups.h"
 
 // anonymous namespace for local helper functions
 namespace
@@ -50,6 +51,8 @@ void cube_indices(const Elem *elem,
   // is to look at the mgflo/mg2/mgf documentation
   // and make the cut-out cube!
 // Example i0 and i1 values for totalorder = 3:
+// FIXME - these examples are incorrect now that we've got truly
+// hierarchic basis functions
 //     Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26 
 //     DOFS                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 18 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 60 62 63
 // static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3};
@@ -221,8 +224,9 @@ void cube_indices(const Elem *elem,
   // Face 0
   else if (i < 8 + 12*e + e*e)
     {
-      i0 = (i - 8 - 12*e)%e + 2;
-      i1 = (i - 8 - 12*e)/e + 2;
+      unsigned int basisnum = i - 8 - 12*e;
+      i0 = square_number_row[basisnum] + 2;
+      i1 = square_number_column[basisnum] + 2;
       i2 = 0;
       const unsigned int min_node = get_min_node(elem, 1, 2, 0, 3);
 
@@ -285,9 +289,10 @@ void cube_indices(const Elem *elem,
   // Face 1
   else if (i < 8 + 12*e + 2*e*e)
     {
-      i0 = (i - 8 - 12*e - e*e)%e + 2;
+      unsigned int basisnum = i - 8 - 12*e - e*e;
+      i0 = square_number_row[basisnum] + 2;
       i1 = 0;
-      i2 = (i - 8 - 12*e - e*e)/e + 2;
+      i2 = square_number_column[basisnum] + 2;
       const unsigned int min_node = get_min_node(elem, 0, 1, 5, 4);
 
       if (elem->node(0) == min_node)
@@ -349,9 +354,10 @@ void cube_indices(const Elem *elem,
   // Face 2
   else if (i < 8 + 12*e + 3*e*e)
     {
+      unsigned int basisnum = i - 8 - 12*e - 2*e*e;
       i0 = 1;
-      i1 = (i - 8 - 12*e - 2*e*e)%e + 2;
-      i2 = (i - 8 - 12*e - 2*e*e)/e + 2;
+      i1 = square_number_row[basisnum] + 2;
+      i2 = square_number_column[basisnum] + 2;
       const unsigned int min_node = get_min_node(elem, 1, 2, 6, 5);
 
       if (elem->node(1) == min_node)
@@ -413,9 +419,10 @@ void cube_indices(const Elem *elem,
   // Face 3
   else if (i < 8 + 12*e + 4*e*e)
     {
-      i0 = (i - 8 - 12*e - 3*e*e)%e + 2;
+      unsigned int basisnum = i - 8 - 12*e - 3*e*e;
+      i0 = square_number_row[basisnum] + 2;
       i1 = 1;
-      i2 = (i - 8 - 12*e - 3*e*e)/e + 2;
+      i2 = square_number_column[basisnum] + 2;
       const unsigned int min_node = get_min_node(elem, 2, 3, 7, 6);
 
       if (elem->node(3) == min_node)
@@ -477,9 +484,10 @@ void cube_indices(const Elem *elem,
   // Face 4
   else if (i < 8 + 12*e + 5*e*e)
     {
+      unsigned int basisnum = i - 8 - 12*e - 4*e*e;
       i0 = 0;
-      i1 = (i - 8 - 12*e - 4*e*e)%e + 2;
-      i2 = (i - 8 - 12*e - 4*e*e)/e + 2;
+      i1 = square_number_row[basisnum] + 2;
+      i2 = square_number_column[basisnum] + 2;
       const unsigned int min_node = get_min_node(elem, 3, 0, 4, 7);
 
       if (elem->node(0) == min_node)
@@ -541,8 +549,9 @@ void cube_indices(const Elem *elem,
   // Face 5
   else if (i < 8 + 12*e + 6*e*e)
     {
-      i0 = (i - 8 - 12*e - 5*e*e)%e + 2;
-      i1 = (i - 8 - 12*e - 5*e*e)/e + 2;
+      unsigned int basisnum = i - 8 - 12*e - 5*e*e;
+      i0 = square_number_row[basisnum] + 2;
+      i1 = square_number_column[basisnum] + 2;
       i2 = 1;
       const unsigned int min_node = get_min_node(elem, 4, 5, 6, 7);
 
@@ -606,9 +615,10 @@ void cube_indices(const Elem *elem,
   // Internal DoFs
   else 
     {
-      i0 = (i - 8 - 12*e - 6*e*e)%e + 2;
-      i1 = ((i - 8 - 12*e - 6*e*e)/e)%e + 2;
-      i2 = (i - 8 - 12*e - 6*e*e)/(e*e) + 2;
+      unsigned int basisnum = i - 8 - 12*e - 6*e*e;
+      i0 = cube_number_row[basisnum] + 2;
+      i1 = cube_number_column[basisnum] + 2;
+      i2 = cube_number_page[basisnum] + 2;
     }
 }
 
