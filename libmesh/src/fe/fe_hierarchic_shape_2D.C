@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.20 2006-04-19 23:04:33 roystgnr Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.21 2006-04-20 19:41:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,8 +25,42 @@
 #include "elem.h"
 #include "utility.h"
 
+// Anonymous namespace for lookup tables
+namespace
+{
+  // These numbers need to go up to at least maximum_totalorder - 2
+  const unsigned char triangular_number_row[] = {
+ 0,
+ 1, 1,
+ 2, 2, 2,
+ 3, 3, 3, 3,
+ 4, 4, 4, 4, 4,
+ 5, 5, 5, 5, 5, 5,
+ 6, 6, 6, 6, 6, 6, 6,
+ 7, 7, 7, 7, 7, 7, 7, 7,
+ 8, 8, 8, 8, 8, 8, 8, 8, 8,
+ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+10,10,10,10,10,10,10,10,10,10,10,
+11,11,11,11,11,11,11,11,11,11,11,11,
+12,12,12,12,12,12,12,12,12,12,12,12,12
+};
+  const unsigned char triangular_number_column[] = {
+ 0,
+ 0, 1,
+ 0, 1, 2,
+ 0, 1, 2, 3,
+ 0, 1, 2, 3, 4,
+ 0, 1, 2, 3, 4, 5,
+ 0, 1, 2, 3, 4, 5, 6,
+ 0, 1, 2, 3, 4, 5, 6, 7,
+ 0, 1, 2, 3, 4, 5, 6, 7, 8,
+ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,
+ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12
+};
 
-
+}
 
 template <>
 Real FE<2,HIERARCHIC>::shape(const ElemType,
@@ -134,16 +168,9 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
         else
           {
             const unsigned int basisnum = i - (3u*totalorder);
-            // FIXME - there has to be a better way to get
-            // exponent combinations from indices
-            unsigned int exp0 = totalorder-2u, firstbasis = 0;
-            while (firstbasis + totalorder - exp0 - 1 <= basisnum)
-              {
-                firstbasis += totalorder - exp0 - 1;
-                assert(exp0 > 0);
-                exp0--;
-              }
-            unsigned int exp1 = basisnum - firstbasis + 1;
+            unsigned int exp0 = totalorder - 2u -
+              triangular_number_row[basisnum];
+            unsigned int exp1 = triangular_number_column[basisnum] + 1;
             unsigned int exp2 = totalorder - exp0 - exp1;
 
             Real returnval = 1;
