@@ -35,6 +35,7 @@ refinement_type = h
 dimension = 2
 
 # Element type - tensor or simplex
+# simplex is currently only supported in 2D
 element_type = tensor
 
 # Use higher quadrature order when computing errors?
