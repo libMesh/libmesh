@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_3D.C,v 1.18 2006-04-21 19:36:58 roystgnr Exp $
+// $Id: fe_hierarchic_shape_3D.C,v 1.19 2006-04-21 20:10:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -122,7 +122,7 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = 0;
       i2 = 0;
       if (elem->node(0) > elem->node(1))
-        xi = -xi;
+        xi = -xi_saved;
     }
   // Edge 1
   else if (i < 8 + 2*e)
@@ -131,7 +131,7 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = i - e - 6;
       i2 = 0;
       if (elem->node(1) > elem->node(2))
-        eta = -eta;
+        eta = -eta_saved;
     }
   // Edge 2
   else if (i < 8 + 3*e)
@@ -140,7 +140,7 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = 1;
       i2 = 0;
       if (elem->node(3) > elem->node(2))
-        xi = -xi;
+        xi = -xi_saved;
     }
   // Edge 3
   else if (i < 8 + 4*e)
@@ -149,7 +149,7 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = i - 3*e - 6;
       i2 = 0;
       if (elem->node(0) > elem->node(3))
-        eta = -eta;
+        eta = -eta_saved;
     }
   // Edge 4
   else if (i < 8 + 5*e)
@@ -158,7 +158,7 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = 0;
       i2 = i - 4*e - 6;
       if (elem->node(0) > elem->node(4))
-        zeta = -zeta;
+        zeta = -zeta_saved;
     }                
   // Edge 5
   else if (i < 8 + 6*e)
@@ -167,7 +167,7 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = 0;
       i2 = i - 5*e - 6;
       if (elem->node(1) > elem->node(5))
-        zeta = -zeta;
+        zeta = -zeta_saved;
     }                
   // Edge 6
   else if (i < 8 + 7*e)
@@ -176,7 +176,7 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = 1;
       i2 = i - 6*e - 6;
       if (elem->node(2) > elem->node(6))
-        zeta = -zeta;
+        zeta = -zeta_saved;
     }
   // Edge 7
   else if (i < 8 + 8*e)
@@ -185,7 +185,7 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = 1;
       i2 = i - 7*e - 6;
       if (elem->node(3) > elem->node(7))
-        zeta = -zeta;
+        zeta = -zeta_saved;
     }                
   // Edge 8
   else if (i < 8 + 9*e)
@@ -194,7 +194,7 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = 0;
       i2 = 1;
       if (elem->node(4) > elem->node(5))
-        xi = -xi;
+        xi = -xi_saved;
     }
   // Edge 9
   else if (i < 8 + 10*e)
@@ -203,7 +203,7 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = i - 9*e - 6;
       i2 = 1;
       if (elem->node(5) > elem->node(6))
-        eta = -eta;
+        eta = -eta_saved;
     }                
   // Edge 10
   else if (i < 8 + 11*e)
@@ -212,7 +212,7 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = 1;
       i2 = 1;
       if (elem->node(7) > elem->node(6))
-        xi = -xi;
+        xi = -xi_saved;
     }
   // Edge 11
   else if (i < 8 + 12*e)
@@ -221,7 +221,7 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = i - 11*e - 6;
       i2 = 1;
       if (elem->node(4) > elem->node(7))
-        eta = -eta;
+        eta = -eta_saved;
     }
   // Face 0
   else if (i < 8 + 12*e + e*e)
@@ -236,56 +236,56 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
         if (elem->node(1) == std::min(elem->node(1), elem->node(3)))
           {
             // Case 1
-            xi  = xi;
-            eta = eta;
+            xi  = xi_saved;
+            eta = eta_saved;
           }
         else
           {
             // Case 2
-            xi  = eta;
-            eta = xi;
+            xi  = eta_saved;
+            eta = xi_saved;
           }
 
       else if (elem->node(3) == min_node)
         if (elem->node(0) == std::min(elem->node(0), elem->node(2)))
           {
             // Case 3
-            xi  = -eta;
-            eta = xi;
+            xi  = -eta_saved;
+            eta = xi_saved;
           }
         else
           {
             // Case 4
-            xi  = xi;
-            eta = -eta;
+            xi  = xi_saved;
+            eta = -eta_saved;
           }
 
       else if (elem->node(2) == min_node)
         if (elem->node(3) == std::min(elem->node(3), elem->node(1)))
           {
             // Case 5
-            xi  = -xi;
-            eta = -eta;
+            xi  = -xi_saved;
+            eta = -eta_saved;
           }
         else
           {
             // Case 6
-            xi  = -eta;
-            eta = -xi;
+            xi  = -eta_saved;
+            eta = -xi_saved;
           }
 
       else if (elem->node(1) == min_node)
         if (elem->node(2) == std::min(elem->node(2), elem->node(0)))
           {
             // Case 7
-            xi  = eta;
-            eta = -xi;
+            xi  = eta_saved;
+            eta = -xi_saved;
           }
         else
           {
             // Case 8
-            xi  = -xi;
-            eta = eta;
+            xi  = -xi_saved;
+            eta = eta_saved;
           }
     }
   // Face 1
@@ -301,56 +301,56 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
         if (elem->node(1) == std::min(elem->node(1), elem->node(4)))
           {
             // Case 1
-            xi   = xi;
-            zeta = zeta;
+            xi   = xi_saved;
+            zeta = zeta_saved;
           }
         else
           {
             // Case 2
-            xi   = zeta;
-            zeta = xi;
+            xi   = zeta_saved;
+            zeta = xi_saved;
           }
 
       else if (elem->node(1) == min_node)
         if (elem->node(5) == std::min(elem->node(5), elem->node(0)))
           {
             // Case 3
-            xi   = zeta;
-            zeta = -xi;
+            xi   = zeta_saved;
+            zeta = -xi_saved;
           }
         else
           {
             // Case 4
-            xi   = -xi;
-            zeta = zeta;
+            xi   = -xi_saved;
+            zeta = zeta_saved;
           }
 
       else if (elem->node(5) == min_node)
         if (elem->node(4) == std::min(elem->node(4), elem->node(1)))
           {
             // Case 5
-            xi   = -xi;
-            zeta = -zeta;
+            xi   = -xi_saved;
+            zeta = -zeta_saved;
           }
         else
           {
             // Case 6
-            xi   = -zeta;
-            zeta = -xi;
+            xi   = -zeta_saved;
+            zeta = -xi_saved;
           }
 
       else if (elem->node(4) == min_node)
         if (elem->node(0) == std::min(elem->node(0), elem->node(5)))
           {
             // Case 7
-            xi   = -xi;
-            zeta = zeta;
+            xi   = -xi_saved;
+            zeta = zeta_saved;
           }
         else
           {
             // Case 8
-            xi   = xi;
-            zeta = -zeta;
+            xi   = xi_saved;
+            zeta = -zeta_saved;
           }
     }
   // Face 2
@@ -366,56 +366,56 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
         if (elem->node(2) == std::min(elem->node(2), elem->node(5)))
           {
             // Case 1
-            eta  = eta;
-            zeta = zeta;
+            eta  = eta_saved;
+            zeta = zeta_saved;
           }
         else
           {
             // Case 2
-            eta  = zeta;
-            zeta = eta;
+            eta  = zeta_saved;
+            zeta = eta_saved;
           }
 
       else if (elem->node(2) == min_node)
         if (elem->node(6) == std::min(elem->node(6), elem->node(1)))
           {
             // Case 3
-            eta  = zeta;
-            zeta = -eta;
+            eta  = zeta_saved;
+            zeta = -eta_saved;
           }
         else
           {
             // Case 4
-            eta  = -eta;
-            zeta = zeta;
+            eta  = -eta_saved;
+            zeta = zeta_saved;
           }
 
       else if (elem->node(6) == min_node)
         if (elem->node(5) == std::min(elem->node(5), elem->node(2)))
           {
             // Case 5
-            eta  = -eta;
-            zeta = -zeta;
+            eta  = -eta_saved;
+            zeta = -zeta_saved;
           }
         else
           {
             // Case 6
-            eta  = -zeta;
-            zeta = -eta;
+            eta  = -zeta_saved;
+            zeta = -eta_saved;
           }
 
       else if (elem->node(5) == min_node)
         if (elem->node(1) == std::min(elem->node(1), elem->node(6)))
           {
             // Case 7
-            eta  = -zeta;
-            zeta = eta;
+            eta  = -zeta_saved;
+            zeta = eta_saved;
           }
         else
           {
             // Case 8
-            eta   = eta;
-            zeta = -zeta;
+            eta   = eta_saved;
+            zeta = -zeta_saved;
           }
     }
   // Face 3
@@ -431,56 +431,56 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
         if (elem->node(2) == std::min(elem->node(2), elem->node(7)))
           {
             // Case 1
-            xi   = xi;
-            zeta = zeta;
+            xi   = xi_saved;
+            zeta = zeta_saved;
           }
         else
           {
             // Case 2
-            xi   = zeta;
-            zeta = xi;
+            xi   = zeta_saved;
+            zeta = xi_saved;
           }
 
       else if (elem->node(7) == min_node)
         if (elem->node(3) == std::min(elem->node(3), elem->node(6)))
           {
             // Case 3
-            xi   = -zeta;
-            zeta = xi;
+            xi   = -zeta_saved;
+            zeta = xi_saved;
           }
         else
           {
             // Case 4
-            xi   = xi;
-            zeta = -zeta;
+            xi   = xi_saved;
+            zeta = -zeta_saved;
           }
 
       else if (elem->node(6) == min_node)
         if (elem->node(7) == std::min(elem->node(7), elem->node(2)))
           {
             // Case 5
-            xi   = -xi;
-            zeta = -zeta;
+            xi   = -xi_saved;
+            zeta = -zeta_saved;
           }
         else
           {
             // Case 6
-            xi   = -zeta;
-            zeta = -xi;
+            xi   = -zeta_saved;
+            zeta = -xi_saved;
           }
 
       else if (elem->node(2) == min_node)
         if (elem->node(6) == std::min(elem->node(3), elem->node(6)))
           {
             // Case 7
-            xi   = zeta;
-            zeta = -xi;
+            xi   = zeta_saved;
+            zeta = -xi_saved;
           }
         else
           {
             // Case 8
-            xi   = -xi;
-            zeta = zeta;
+            xi   = -xi_saved;
+            zeta = zeta_saved;
           }
     }
   // Face 4
@@ -496,56 +496,56 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
         if (elem->node(3) == std::min(elem->node(3), elem->node(4)))
           {
             // Case 1
-            eta  = eta;
-            zeta = zeta;
+            eta  = eta_saved;
+            zeta = zeta_saved;
           }
         else
           {
             // Case 2
-            eta  = zeta;
-            zeta = eta;
+            eta  = zeta_saved;
+            zeta = eta_saved;
           }
 
       else if (elem->node(4) == min_node)
         if (elem->node(0) == std::min(elem->node(0), elem->node(7)))
           {
             // Case 3
-            eta  = -zeta;
-            zeta = eta;
+            eta  = -zeta_saved;
+            zeta = eta_saved;
           }
         else
           {
             // Case 4
-            eta  = eta;
-            zeta = -zeta;
+            eta  = eta_saved;
+            zeta = -zeta_saved;
           }
 
       else if (elem->node(7) == min_node)
         if (elem->node(4) == std::min(elem->node(4), elem->node(3)))
           {
             // Case 5
-            eta  = -eta;
-            zeta = -zeta;
+            eta  = -eta_saved;
+            zeta = -zeta_saved;
           }
         else
           {
             // Case 6
-            eta  = -zeta;
-            zeta = -eta;
+            eta  = -zeta_saved;
+            zeta = -eta_saved;
           }
 
       else if (elem->node(3) == min_node)
         if (elem->node(7) == std::min(elem->node(7), elem->node(0)))
           {
             // Case 7
-            eta   = zeta;
-            zeta = -eta;
+            eta   = zeta_saved;
+            zeta = -eta_saved;
           }
         else
           {
             // Case 8
-            eta  = -eta;
-            zeta = zeta;
+            eta  = -eta_saved;
+            zeta = zeta_saved;
           }
     }
   // Face 5
@@ -561,56 +561,56 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
         if (elem->node(5) == std::min(elem->node(5), elem->node(7)))
           {
             // Case 1
-            xi  = xi;
-            eta = eta;
+            xi  = xi_saved;
+            eta = eta_saved;
           }
         else
           {
             // Case 2
-            xi  = eta;
-            eta = xi;
+            xi  = eta_saved;
+            eta = xi_saved;
           }
 
       else if (elem->node(5) == min_node)
         if (elem->node(6) == std::min(elem->node(6), elem->node(4)))
           {
             // Case 3
-            xi  = eta;
-            eta = -xi;
+            xi  = eta_saved;
+            eta = -xi_saved;
           }
         else
           {
             // Case 4
-            xi  = -xi;
-            eta = eta;
+            xi  = -xi_saved;
+            eta = eta_saved;
           }
 
       else if (elem->node(6) == min_node)
         if (elem->node(7) == std::min(elem->node(7), elem->node(5)))
           {
             // Case 5
-            xi  = -xi;
-            eta = -eta;
+            xi  = -xi_saved;
+            eta = -eta_saved;
           }
         else
           {
             // Case 6
-            xi  = -eta;
-            eta = -xi;
+            xi  = -eta_saved;
+            eta = -xi_saved;
           }
 
       else if (elem->node(7) == min_node)
         if (elem->node(4) == std::min(elem->node(4), elem->node(6)))
           {
             // Case 7
-            xi  = -eta;
-            eta = xi;
+            xi  = -eta_saved;
+            eta = xi_saved;
           }
         else
           {
             // Case 8
-            xi  = xi;
-            eta = eta;
+            xi  = xi_saved;
+            eta = eta_saved;
           }
     }
 
@@ -622,14 +622,6 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
       i1 = cube_number_column[basisnum] + 2;
       i2 = cube_number_page[basisnum] + 2;
     }
-
-//  std::cerr << "i,i0,i1,i2 = " << i << ", " <<
-//    i0 << ", " <<
-//    i1 << ", " <<
-//    i2 << std::endl;
-
-// FIXME - without this we're not getting linearly independent bases!?
-xi = xi_saved; eta = eta_saved; zeta = zeta_saved;
 }
 
 }
