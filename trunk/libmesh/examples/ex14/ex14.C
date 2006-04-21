@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.23 2006-04-19 23:01:17 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.24 2006-04-21 17:19:28 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -156,8 +156,15 @@ int main(int argc, char** argv)
     else
       mesh.read("lshaped3D.xda");
 
+    // Use triangles if the config file says so
     if (element_type == "simplex")
       MeshTools::Modification::all_tri(mesh);
+
+    // We used first order elements to describe the geometry,
+    // but we may need second order elements to hold the degrees
+    // of freedom
+    if (approx_order > 1 || refine_type != "h")
+      mesh.all_second_order();
 
     // Mesh Refinement object
     MeshRefinement mesh_refinement(mesh);
