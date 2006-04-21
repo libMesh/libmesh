@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.42 2006-04-19 23:04:33 roystgnr Exp $
+// $Id: fe_interface.C,v 1.43 2006-04-21 19:36:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1862,8 +1862,9 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 			            const ElemType& el_t)
 {
   // Yeah, I know, infinity is much larger than 11, but our
-  // solvers don't seem to like high degree polynomials and our
-  // quadrature rules need to go up higher.
+  // solvers don't seem to like high degree polynomials, and our
+  // quadrature rules and number_lookups tables
+  // need to go up higher.
   const unsigned int unlimited = 11;
 
   // If we used 0 as a default, then elements missing from this 
@@ -2091,21 +2092,22 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case EDGE4:
 	      return unlimited;
 	    case TRI3:
-	      return 2;
+	      return 1;
 	    case TRI6:
 	      return unlimited;
 	    case QUAD4:
-	      return 2;
+	      return 1;
 	    case QUAD8:
 	    case QUAD9:
 	      return unlimited;
 	    case TET4:
 	    case TET10:
+	      return 0;
 	    case HEX8:
 	    case HEX20:
-	      return 0;
+	      return 1;
 	    case HEX27:
-	      return 3;
+	      return unlimited;
 	    case PRISM6:
 	    case PRISM15:
 	    case PRISM18:
