@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_3D.C,v 1.17 2006-04-20 22:40:11 roystgnr Exp $
+// $Id: fe_hierarchic_shape_3D.C,v 1.18 2006-04-21 19:36:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -64,6 +64,8 @@ void cube_indices(const Elem *elem,
 
   assert (i<(totalorder+1u)*(totalorder+1u)*(totalorder+1u));
 
+Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
+
 // Vertices:
   if (i == 0)
     {
@@ -116,7 +118,7 @@ void cube_indices(const Elem *elem,
   // Edge 0
   else if (i < 8 + e)
     {
-      i2 = i - 6;
+      i0 = i - 6;
       i1 = 0;
       i2 = 0;
       if (elem->node(0) > elem->node(1))
@@ -620,6 +622,14 @@ void cube_indices(const Elem *elem,
       i1 = cube_number_column[basisnum] + 2;
       i2 = cube_number_page[basisnum] + 2;
     }
+
+//  std::cerr << "i,i0,i1,i2 = " << i << ", " <<
+//    i0 << ", " <<
+//    i1 << ", " <<
+//    i2 << std::endl;
+
+// FIXME - without this we're not getting linearly independent bases!?
+xi = xi_saved; eta = eta_saved; zeta = zeta_saved;
 }
 
 }
@@ -658,6 +668,9 @@ Real FE<3,HIERARCHIC>::shape(const Elem* elem,
   
   switch (type)
     {
+    case HEX8:
+    case HEX20:
+      assert(totalorder < 2);
     case HEX27:
       {
         assert (i<(totalorder+1u)*(totalorder+1u)*(totalorder+1u));
@@ -715,57 +728,45 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
 {
 #if DIM == 3
   assert (elem != NULL);
-  const ElemType type = elem->type();
-
-  const Order totalorder = static_cast<Order>(order+elem->p_level());
 
   assert (j < 3);
   
-  switch (type)
+  // cheat by using finite difference approximations:
+  const Real eps = 1.e-6;
+  Point pp, pm;
+        
+  switch (j)
+  {
+    // d()/dxi
+  case 0:
     {
-      // 1st & 2nd-order Hierarchics.
-    case HEX27:
-      {
-        assert (i<(totalorder+1u)*(totalorder+1u)*(totalorder+1u));
-        
-        // Compute hex shape functions as a tensor-product
-        Real xi   = p(0);
-        Real eta  = p(1);
-        Real zeta = p(2);
-        
-        unsigned int i0, i1, i2;
-        
-        cube_indices(elem, totalorder, i, xi, eta, zeta, i0, i1, i2);
-
-        switch (j)
-          {
-            // d()/dxi
-          case 0:
-            return (FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0, 0, xi)*
-                    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1,    eta)*
-                    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i2,    zeta));
-
-            // d()/deta
-          case 1:
-            return (FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0,    xi)*
-                    FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1, 0, eta)*
-                    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i2,    zeta));
-
-            // d()/dzeta
-          case 2:
-            return (FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i0,    xi)*
-                    FE<1,HIERARCHIC>::shape      (EDGE3, totalorder, i1,    eta)*
-                    FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i2, 0, zeta));
-
-          default:
-            error();
-          }
-      }
-
-    default:
-      error();
+      pp = Point(p(0)+eps, p(1), p(2));
+      pm = Point(p(0)-eps, p(1), p(2));
+      break;
     }
 
+    // d()/deta
+  case 1:
+    {
+      pp = Point(p(0), p(1)+eps, p(2));
+      pm = Point(p(0), p(1)-eps, p(2));
+      break;
+    }
+
+    // d()/dzeta
+  case 2:
+    {
+      pp = Point(p(0), p(1), p(2)+eps);
+      pm = Point(p(0), p(1), p(2)-eps);
+      break;
+    }
+
+  default:
+    error();
+  }
+
+  return (FE<3,HIERARCHIC>::shape(elem, order, i, pp) -
+          FE<3,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
 #endif
   
   error();

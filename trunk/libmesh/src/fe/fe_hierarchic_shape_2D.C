@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.22 2006-04-20 22:40:11 roystgnr Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.23 2006-04-21 19:36:57 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -149,6 +149,7 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 
     // Hierarchic shape functions on the quadrilateral.
     case QUAD4:
+      assert (totalorder < 2);
     case QUAD8:
     case QUAD9:
       {
@@ -156,7 +157,6 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
         const Real xi  = p(0);
         const Real eta = p(1);
       
-	assert (elem->type() != QUAD4 || totalorder < 2);
         assert (i < (totalorder+1u)*(totalorder+1u));
 
 // Example i, i0, i1 values for totalorder = 5:
@@ -290,6 +290,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
       }
 
     case QUAD4:
+      assert (totalorder < 2);
     case QUAD8:
     case QUAD9:
       {

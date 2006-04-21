@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic.C,v 1.25 2006-04-19 23:04:33 roystgnr Exp $
+// $Id: fe_hierarchic.C,v 1.26 2006-04-21 19:36:57 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -101,9 +101,15 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
     case EDGE2:
     case EDGE3:
       return (o+1);
+    case QUAD4:
+      assert(o < 2);
     case QUAD8:
     case QUAD9:
       return ((o+1)*(o+1));
+    case HEX8:
+      assert(o < 2);
+    case HEX20:
+      assert(o < 2);
     case HEX27:
       return ((o+1)*(o+1)*(o+1));
     case TRI6:
@@ -156,6 +162,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	default:
 	  error();
 	}
+    case QUAD4:
+      assert (n < 4);
+      assert (o < 2);
     case QUAD8:
     case QUAD9:
       switch (n)
@@ -179,6 +188,12 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	default:
 	  error();
 	}
+    case HEX8:
+      assert (n < 8);
+      assert (o < 2);
+    case HEX20:
+      assert (n < 20);
+      assert (o < 2);
     case HEX27:
       switch (n)
 	{
@@ -217,6 +232,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
         // Internal DoFs are associated with the elem, not its nodes
 	case 26:
 	  return 0;
+	default:
+	  error();
         }
     default:
 #ifdef DEBUG
@@ -251,6 +268,10 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
     case QUAD8:
     case QUAD9:
       return ((o-1)*(o-1));
+    case HEX8:
+    case HEX20:
+      assert(o < 2);
+      return 0;
     case HEX27:
       return ((o-1)*(o-1)*(o-1));
     default:
