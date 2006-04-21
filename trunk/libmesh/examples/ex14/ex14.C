@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.24 2006-04-21 17:19:28 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.25 2006-04-21 19:35:22 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -92,8 +92,7 @@ Gradient exact_derivative(const Point& p,
 // Set the dimensionality of the mesh
 // This is non-const because the input file may change it,
 // It is global because our exact_* functions use it.
-// It is 2 because our 3D hierarchics are broken... ;-)
-const unsigned int dim = 2;
+unsigned int dim = 2;
 
 
 
@@ -117,8 +116,7 @@ int main(int argc, char** argv)
     const unsigned int approx_order   = input_file("approx_order", 1);
     const std::string element_type    = input_file("element_type", "tensor");
     const int extra_error_quadrature  = input_file("extra_error_quadrature", 0);
-// FIXME - 3D hierarchics are currently broken
-//    dim = input_file("dimension", 2);
+    dim = input_file("dimension", 2);
     const bool exact_indicator = input_file("exact_indicator", false);
     
     // Output file for plotting the error as a function of
