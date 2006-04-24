@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.23 2006-04-21 19:36:57 roystgnr Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.24 2006-04-24 22:43:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -188,8 +188,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
         else
           {
             unsigned int basisnum = i - 4*totalorder;
-            i0 = square_number_row[basisnum] + 2;
-            i1 = square_number_column[basisnum] + 2;
+            i0 = square_number_column[basisnum] + 2;
+            i1 = square_number_row[basisnum] + 2;
           }
 
         // Flip odd degree of freedom values if necessary
