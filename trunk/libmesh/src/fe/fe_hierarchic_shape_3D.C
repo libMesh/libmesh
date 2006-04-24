@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_3D.C,v 1.19 2006-04-21 20:10:48 roystgnr Exp $
+// $Id: fe_hierarchic_shape_3D.C,v 1.20 2006-04-24 22:43:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -618,8 +618,8 @@ Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
   else 
     {
       unsigned int basisnum = i - 8 - 12*e - 6*e*e;
-      i0 = cube_number_row[basisnum] + 2;
-      i1 = cube_number_column[basisnum] + 2;
+      i0 = cube_number_column[basisnum] + 2;
+      i1 = cube_number_row[basisnum] + 2;
       i2 = cube_number_page[basisnum] + 2;
     }
 }
