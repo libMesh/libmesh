@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.43 2006-04-21 19:36:58 roystgnr Exp $
+// $Id: fe_interface.C,v 1.44 2006-04-25 22:31:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -2059,22 +2059,24 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	  {
 	    case EDGE2:
 	    case EDGE3:
-	      return 3;
+	      return unlimited;
 	    case EDGE4:
 	    case TRI3:
 	    case TRI6:
 	      return 0;
 	    case QUAD4:
+	      return 3;
 	    case QUAD8:
 	    case QUAD9:
-	      return 3;
+	      return unlimited;
 	    case TET4:
 	    case TET10:
 	      return 0;
 	    case HEX8:
+	      return 3;
 	    case HEX20:
 	    case HEX27:
-	      return 3;
+	      return unlimited;
 	    case PRISM6:
 	    case PRISM15:
 	    case PRISM18:

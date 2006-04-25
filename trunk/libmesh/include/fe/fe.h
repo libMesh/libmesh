@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.19 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe.h,v 1.20 2006-04-25 22:31:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 //-------------------------------------------------------------
@@ -427,7 +427,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 //-------------------------------------------------------------
@@ -452,7 +452,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2005
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 //-------------------------------------------------------------
@@ -477,10 +477,6 @@ public:
 				      const Real xi);
   static Real hermite_raw_shape(const unsigned int basis_num,
 				const Real xi);
-  static Real hermite_bases(std::vector<unsigned int> &bases1D,
-			    const std::vector<std::vector<Real> > &dxdxi,
-			    unsigned int index,
-			    unsigned int dim);
 };
 
 
@@ -491,7 +487,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 //-------------------------------------------------------------
@@ -516,7 +512,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 //-------------------------------------------------------------
@@ -541,7 +537,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 //-------------------------------------------------------------
@@ -567,7 +563,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.19 $
+ * \version $Revision: 1.20 $
  */
 
 //-------------------------------------------------------------

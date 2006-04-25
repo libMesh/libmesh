@@ -1,4 +1,4 @@
-// $Id: fe_hermite.C,v 1.2 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_hermite.C,v 1.3 2006-04-25 22:31:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,40 +43,25 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 
   const Order totalorder = static_cast<Order>(order + elem->p_level());
   
-  switch (totalorder)
-    {
-      // Piecewise (bi/tri)cubic shape functions
-    case THIRD:
-      {
-
-	const unsigned int n_sf =
-	  FE<Dim,T>::n_shape_functions(type, totalorder);
+  const unsigned int n_sf =
+    FE<Dim,T>::n_shape_functions(type, totalorder);
 	
-	for (unsigned int n=0; n<n_nodes; n++)
-	  {
-	    const Point mapped_point = FE<Dim,T>::inverse_map(elem,
-							      elem->point(n));
+  for (unsigned int n=0; n<n_nodes; n++)
+    {
+      const Point mapped_point = FE<Dim,T>::inverse_map(elem,
+							elem->point(n));
 
-	    assert (elem_soln.size() == n_sf);
+      assert (elem_soln.size() == n_sf);
 
-	    // Zero before summation
-	    nodal_soln[n] = 0;
+      // Zero before summation
+      nodal_soln[n] = 0;
 
-	    // u_i = Sum (alpha_i phi_i)
-	    for (unsigned int i=0; i<n_sf; i++)
-	      nodal_soln[n] += elem_soln[i]*FE<Dim,T>::shape(elem,
-							     order,
-							     i,
-							     mapped_point);	    
-	  }
-
-	return;
-      }
-      
-    default:
-      {
-	error();
-      }
+      // u_i = Sum (alpha_i phi_i)
+      for (unsigned int i=0; i<n_sf; i++)
+        nodal_soln[n] += elem_soln[i]*FE<Dim,T>::shape(elem,
+						       order,
+						       i,
+						       mapped_point);	    
     }
 }
 
@@ -85,42 +70,35 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 {
-  switch (o)
+  assert (o > 2);
+  // Piecewise (bi/tri)cubic C1 Hermite splines
+  switch (t)
     {
-      // Piecewise (bi/tri)cubic Hermite splines
-    case THIRD:
-      {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 4;
+    case EDGE2:
+      assert (o < 4);
+    case EDGE3:
+      return (o+1);
 	    
-	  case QUAD4:
-	  case QUAD8:
-	  case QUAD9:
-	    return 16;
+    case QUAD4:
+    case QUAD8:
+      assert (o < 4);
+    case QUAD9:
+      return ((o+1)*(o+1));
 	    
-	  case HEX8:
-	  case HEX20:
-	  case HEX27:
-	    return 64;
+    case HEX8:
+    case HEX20:
+      assert (o < 4);
+    case HEX27:
+      return ((o+1)*(o+1)*(o+1));
 	    
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	  }
-      }
-      
     default:
       {
-	error();
+#ifdef DEBUG
+        std::cerr << "ERROR: Bad ElemType = " << t
+		  << " for " << o << "th order approximation!" 
+		  << std::endl;
+#endif
+        error();	    
       }
     }
   
@@ -135,109 +113,116 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 				       const Order o,
 				       const unsigned int n)
 {
-  switch (o)
+  assert (o > 2);
+  // Piecewise (bi/tri)cubic C1 Hermite splines
+  switch (t)
     {
-      // Piecewise (bi/tri)cubic Hermite splines
-    case THIRD:
+    case EDGE2:
+    case EDGE3:
       {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 2;
-		case 3:
-		  return 0;
+        switch (n)
+	{
+	  case 0:
+	  case 1:
+	    return 2;
+	  case 3:
+//          Interior DoFs are carried on Elems
+//	    return (o-3);
+            return 0;
 
-		default:
-		  error();
-		}
-	    }
-	    
-	  case QUAD4:
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 4;
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		  return 0;
-
-		default:
-		  error();
-		}
-	    }
-	    
-	  case HEX8:
-	  case HEX20:
-	  case HEX27:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 8;
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		case 26:
-		  return 0;
-
-		default:
-		  error();
-		}
-	    }
-	    
 	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
+	    error();
+	}
+      }
 	    
+    case QUAD4:
+      assert (o < 4);
+    case QUAD8:
+    case QUAD9:
+      {
+	switch (n)
+	  {
+          // Vertices
+	  case 0:
+	  case 1:
+	  case 2:
+	  case 3:
+	    return 4;
+          // Edges
+	  case 4:
+	  case 5:
+	  case 6:
+	  case 7:
+	    return (2*(o-3));
+	  case 8:
+//          Interior DoFs are carried on Elems
+//	    return ((o-3)*(o-3));
+            return 0;
+
+	  default:
+	    error();
 	  }
       }
+	    
+    case HEX8:
+    case HEX20:
+      assert (o < 4);
+    case HEX27:
+      {
+        switch (n)
+	  {
+          // Vertices
+	  case 0:
+	  case 1:
+	  case 2:
+	  case 3:
+	  case 4:
+	  case 5:
+	  case 6:
+	  case 7:
+	    return 8;
+          // Edges
+	  case 8:
+	  case 9:
+	  case 10:
+	  case 11:
+	  case 12:
+	  case 13:
+	  case 14:
+	  case 15:
+	  case 16:
+	  case 17:
+	  case 18:
+	  case 19:
+	    return (4*(o-3));
+          // Faces
+	  case 20:
+	  case 21:
+	  case 22:
+	  case 23:
+	  case 24:
+	  case 25:
+	    return (2*(o-3)*(o-3));
+	  case 26:
+          // Interior DoFs are carried on Elems
+//	    return ((o-3)*(o-3)*(o-3));
+	    return 0;
+
+	  default:
+	    error();
+	  }
+      }
+	    
     default:
       {
-	error();
+#ifdef DEBUG
+        std::cerr << "ERROR: Bad ElemType = " << t
+		  << " for " << o << "th order approximation!" 
+		  << std::endl;
+#endif
+        error();	    
       }
+	    
     }
   
   error();
@@ -251,39 +236,33 @@ template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 					const Order o)
 {
-  switch (o)
-    {
-      // Piecewise (bi/tri)cubic Hermite splines
-    case THIRD:
-      {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	  case QUAD4:
-	  case QUAD8:
-	  case QUAD9:
-	  case HEX8:
-	  case HEX20:
-	  case HEX27:
-	    return 0;
+  assert (o > 2);
 
-	  default:
-	    {
-#ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
-#endif
-	      error();	    
-	    }
-	    
-	  }
-      }
-      // Otherwise no DOFS per element
+  switch (t)
+    {
+    case EDGE2:
+    case EDGE3:
+      return (o-3);
+    case QUAD4:
+      assert (o < 4);
+    case QUAD8:
+    case QUAD9:
+      return ((o-3)*(o-3));
+    case HEX8:
+      assert (o < 4);
+    case HEX20:
+    case HEX27:
+      return ((o-3)*(o-3)*(o-3));
+
     default:
-      error();	    
-      return 0;
+      {
+#ifdef DEBUG
+        std::cerr << "ERROR: Bad ElemType = " << t
+		  << " for " << o << "th order approximation!" 
+		  << std::endl;
+#endif
+        error();	    
+      }
     }
 }
 
