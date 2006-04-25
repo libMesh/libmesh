@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_3D.C,v 1.6 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_hermite_shape_3D.C,v 1.7 2006-04-25 22:31:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 // Local includes
 #include "fe.h"
 #include "elem.h"
+#include "number_lookups.h"
 
 
 // Anonymous namespace for persistant variables.
@@ -112,6 +113,264 @@ void hermite_compute_coefs(const Elem* elem)
 }
 
 
+
+Real hermite_bases_3D
+ (std::vector<unsigned int> &bases1D,
+  const std::vector<std::vector<Real> > &dxdxi,
+  const Order &o,
+  unsigned int i)
+{
+  bases1D.clear();
+  bases1D.resize(3,0);
+  Real coef = 1.0;
+
+  unsigned int e = o-2;
+
+  // Nodes
+  if (i < 64)
+    {
+      switch (i / 8)
+        {
+        case 0:
+          break;
+        case 1:
+          bases1D[0] = 1;
+          break;
+        case 2:
+          bases1D[0] = 1;
+          bases1D[1] = 1;
+          break;
+        case 3:
+          bases1D[1] = 1;
+          break;
+        case 4:
+          bases1D[2] = 1;
+          break;
+        case 5:
+          bases1D[0] = 1;
+          bases1D[2] = 1;
+          break;
+        case 6:
+          bases1D[0] = 1;
+          bases1D[1] = 1;
+          bases1D[2] = 1;
+          break;
+        case 7:
+          bases1D[1] = 1;
+          bases1D[2] = 1;
+          break;
+        }
+
+      unsigned int basisnum = i%8;
+      switch (basisnum) // DoF type
+        {
+        case 0: // DoF = value at node
+          coef = 1.0;
+          break;
+        case 1: // DoF = x derivative at node
+          coef = dxdxi[0][bases1D[0]];
+          bases1D[0] += 2; break;
+        case 2: // DoF = y derivative at node
+          coef = dxdxi[1][bases1D[1]];
+          bases1D[1] += 2; break;
+        case 3: // DoF = xy derivative at node
+          coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]];
+          bases1D[0] += 2; bases1D[1] += 2; break;
+        case 4: // DoF = z derivative at node
+          coef = dxdxi[2][bases1D[2]];
+          bases1D[2] += 2; break;
+        case 5: // DoF = xz derivative at node
+          coef = dxdxi[0][bases1D[0]] * dxdxi[2][bases1D[2]];
+          bases1D[0] += 2; bases1D[2] += 2; break;
+        case 6: // DoF = yz derivative at node
+          coef = dxdxi[1][bases1D[1]] * dxdxi[2][bases1D[2]];
+          bases1D[1] += 2; bases1D[2] += 2; break;
+        case 7: // DoF = xyz derivative at node
+          coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]] * dxdxi[2][bases1D[2]];
+          bases1D[0] += 2; bases1D[1] += 2; bases1D[2] += 2; break;
+        }
+    }
+  // Edges
+  else if (i < 64 + 12*4*e)
+    {
+      unsigned int basisnum = (i - 64) % (4*e);
+      switch ((i - 64) / (4*e))
+        {
+        case 0:
+          bases1D[0] = basisnum / 4 + 4;
+          bases1D[1] = basisnum % 4 / 2 * 2;
+          bases1D[2] = basisnum % 2 * 2;
+          if (basisnum % 4 / 2)
+            coef *= dxdxi[1][0];
+          if (basisnum % 2)
+            coef *= dxdxi[2][0];
+          break;
+        case 1:
+          bases1D[0] = basisnum % 4 / 2 * 2 + 1;
+          bases1D[1] = basisnum / 4 + 4;
+          bases1D[2] = basisnum % 2 * 2;
+          if (basisnum % 4 / 2)
+            coef *= dxdxi[0][1];
+          if (basisnum % 2)
+            coef *= dxdxi[2][0];
+          break;
+        case 2:
+          bases1D[0] = basisnum / 4 + 4;
+          bases1D[1] = basisnum % 4 / 2 * 2 + 1;
+          bases1D[2] = basisnum % 2 * 2;
+          if (basisnum % 4 / 2)
+            coef *= dxdxi[1][1];
+          if (basisnum % 2)
+            coef *= dxdxi[2][0];
+          break;
+        case 3:
+          bases1D[0] = basisnum % 4 / 2 * 2;
+          bases1D[1] = basisnum / 4 + 4;
+          bases1D[2] = basisnum % 2 * 2;
+          if (basisnum % 4 / 2)
+            coef *= dxdxi[0][0];
+          if (basisnum % 2)
+            coef *= dxdxi[2][0];
+          break;
+        case 4:
+          bases1D[0] = basisnum % 4 / 2 * 2;
+          bases1D[1] = basisnum % 2 * 2;
+          bases1D[2] = basisnum / 4 + 4;
+          if (basisnum % 4 / 2)
+            coef *= dxdxi[0][0];
+          if (basisnum % 2)
+            coef *= dxdxi[1][0];
+          break;
+        case 5:
+          bases1D[0] = basisnum % 4 / 2 * 2 + 1;
+          bases1D[1] = basisnum % 2 * 2;
+          bases1D[2] = basisnum / 4 + 4;
+          if (basisnum % 4 / 2)
+            coef *= dxdxi[0][1];
+          if (basisnum % 2)
+            coef *= dxdxi[1][0];
+          break;
+        case 6:
+          bases1D[0] = basisnum % 4 / 2 * 2 + 1;
+          bases1D[1] = basisnum % 2 * 2 + 1;
+          bases1D[2] = basisnum / 4 + 4;
+          if (basisnum % 4 / 2)
+            coef *= dxdxi[0][1];
+          if (basisnum % 2)
+            coef *= dxdxi[1][1];
+          break;
+        case 7:
+          bases1D[0] = basisnum % 4 / 2 * 2;
+          bases1D[1] = basisnum % 2 * 2 + 1;
+          bases1D[2] = basisnum / 4 + 4;
+          if (basisnum % 4 / 2)
+            coef *= dxdxi[0][0];
+          if (basisnum % 2)
+            coef *= dxdxi[1][1];
+          break;
+        case 8:
+          bases1D[0] = basisnum / 4 + 4;
+          bases1D[1] = basisnum % 4 / 2 * 2;
+          bases1D[2] = basisnum % 2 * 2 + 1;
+          if (basisnum % 4 / 2)
+            coef *= dxdxi[1][0];
+          if (basisnum % 2)
+            coef *= dxdxi[2][1];
+          break;
+        case 9:
+          bases1D[0] = basisnum % 4 / 2 * 2 + 1;
+          bases1D[1] = basisnum / 4 + 4;
+          bases1D[2] = basisnum % 2 * 2;
+          if (basisnum % 4 / 2)
+            coef *= dxdxi[0][1];
+          if (basisnum % 2)
+            coef *= dxdxi[2][1];
+          break;
+        case 10:
+          bases1D[0] = basisnum / 4 + 4;
+          bases1D[1] = basisnum % 4 / 2 * 2 + 1;
+          bases1D[2] = basisnum % 2 * 2 + 1;
+          if (basisnum % 4 / 2)
+            coef *= dxdxi[1][1];
+          if (basisnum % 2)
+            coef *= dxdxi[2][1];
+          break;
+        case 11:
+          bases1D[0] = basisnum % 4 / 2 * 2;
+          bases1D[1] = basisnum / 4 + 4;
+          bases1D[2] = basisnum % 2 * 2 + 1;
+          if (basisnum % 4 / 2)
+            coef *= dxdxi[0][0];
+          if (basisnum % 2)
+            coef *= dxdxi[2][1];
+          break;
+        }
+    }
+  // Faces
+  else if (i < 64 + 12*4*e + 6*2*e*e)
+    {
+      unsigned int basisnum = (i - 64 - 12*4*e) % (2*e*e);
+      switch ((i - 64 - 12*4*e) / (2*e*e))
+        {
+        case 0:
+          bases1D[0] = square_number_column[basisnum / 2];
+          bases1D[1] = square_number_row[basisnum / 2];
+          bases1D[2] = basisnum % 2 * 2;
+          if (basisnum % 2)
+            coef *= dxdxi[2][0];
+          break;
+        case 1:
+          bases1D[0] = square_number_column[basisnum / 2];
+          bases1D[1] = basisnum % 2 * 2;
+          bases1D[2] = square_number_row[basisnum / 2];
+          if (basisnum % 2)
+            coef *= dxdxi[1][0];
+          break;
+        case 2:
+          bases1D[0] = basisnum % 2 * 2 + 1;
+          bases1D[1] = square_number_column[basisnum / 2];
+          bases1D[2] = square_number_row[basisnum / 2];
+          if (basisnum % 2)
+            coef *= dxdxi[0][1];
+          break;
+        case 3:
+          bases1D[0] = square_number_column[basisnum / 2];
+          bases1D[1] = basisnum % 2 * 2 + 1;
+          bases1D[2] = square_number_row[basisnum / 2];
+          if (basisnum % 2)
+            coef *= dxdxi[1][1];
+          break;
+        case 4:
+          bases1D[0] = basisnum % 2 * 2;
+          bases1D[1] = square_number_column[basisnum / 2];
+          bases1D[2] = square_number_row[basisnum / 2];
+          if (basisnum % 2)
+            coef *= dxdxi[0][0];
+          break;
+        case 5:
+          bases1D[0] = square_number_column[basisnum / 2];
+          bases1D[1] = square_number_row[basisnum / 2];
+          bases1D[2] = basisnum % 2 * 2 + 1;
+          if (basisnum % 2)
+            coef *= dxdxi[2][1];
+          break;
+        }
+    }
+  // Interior
+  else
+    {
+      unsigned int basisnum = i - 64 - 12*4*e;
+      bases1D[0] = cube_number_column[basisnum] + 4;
+      bases1D[1] = cube_number_row[basisnum] + 4;
+      bases1D[2] = cube_number_page[basisnum] + 4;
+    }
+
+  // No singular elements
+  assert(coef);
+  return coef;
+}
+
+
 } // end anonymous namespace
 
 
@@ -161,7 +420,7 @@ Real FE<3,HERMITE>::shape(const Elem* elem,
 
               std::vector<unsigned int> bases1D;
 
-              Real coef = FEHermite<1>::hermite_bases(bases1D, dxdxi, i, 3);
+              Real coef = hermite_bases_3D(bases1D, dxdxi, totalorder, i);
 
 	      return coef *
                      FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
@@ -233,7 +492,7 @@ Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
 
               std::vector<unsigned int> bases1D;
 
-              Real coef = FEHermite<1>::hermite_bases(bases1D, dxdxi, i, 3);
+              Real coef = hermite_bases_3D(bases1D, dxdxi, totalorder, i);
 
               switch (j) // Derivative type
 		{
@@ -305,7 +564,7 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
 
               std::vector<unsigned int> bases1D;
 
-              Real coef = FEHermite<1>::hermite_bases(bases1D, dxdxi, i, 3);
+              Real coef = hermite_bases_3D(bases1D, dxdxi, totalorder, i);
 
               switch (j) // Derivative type
 		{

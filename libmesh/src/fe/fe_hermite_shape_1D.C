@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_1D.C,v 1.6 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_hermite_shape_1D.C,v 1.7 2006-04-25 22:31:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 // Local includes
 #include "fe.h"
 #include "elem.h"
+#include "utility.h"
 
 
 // Anonymous namespace for persistant variables.
@@ -77,15 +78,18 @@ void hermite_compute_coefs(const Elem* elem)
   d2xd2x = dxdxi[1];
 }
 
+
 } // end anonymous namespace
 
 
 
 template<>
 Real FEHermite<1>::hermite_raw_shape_second_deriv
- (const unsigned int basis_num, const Real xi)
+ (const unsigned int i, const Real xi)
 {
-  switch (basis_num)
+  using Utility::pow;
+
+  switch (i)
     {
       case 0:
         return 1.5 * xi;
@@ -95,6 +99,23 @@ Real FEHermite<1>::hermite_raw_shape_second_deriv
         return 0.5 * (-1. + 3.*xi);
       case 3:
         return 0.5 * (1. + 3.*xi);
+      case 4:
+        return (8.*xi*xi + 4.*(xi*xi-1.))/24.;
+      case 5:
+        return (8.*xi*xi*xi + 12.*xi*(xi*xi-1.))/120.;
+//      case 6:
+//        return (8.*pow<4>(xi) + 20.*xi*xi*(xi*xi-1.) +
+//          2.*(xi*xi-1)*(xi*xi-1))/720.;
+      default:
+        Real denominator = 720., xipower = 1.;
+        for (unsigned n=6; n != i; ++n)
+          {
+            xipower *= xi;
+            denominator *= (n+1);
+          }
+        return (8.*pow<4>(xi)*xipower +
+                (8.*(i-4)+4.)*xi*xi*xipower*(xi*xi-1.) +
+                (i-4)*(i-5)*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
     }
 
   error();
@@ -105,9 +126,9 @@ Real FEHermite<1>::hermite_raw_shape_second_deriv
 
 template<>
 Real FEHermite<1>::hermite_raw_shape_deriv
- (const unsigned int basis_num, const Real xi)
+ (const unsigned int i, const Real xi)
 {
-  switch (basis_num)
+  switch (i)
     {
       case 0:
         return 0.75 * (-1. + xi*xi);
@@ -117,6 +138,21 @@ Real FEHermite<1>::hermite_raw_shape_deriv
         return 0.25 * (-1. - 2.*xi + 3.*xi*xi);
       case 3:
         return 0.25 * (-1. + 2.*xi + 3.*xi*xi);
+      case 4:
+        return 4.*xi * (xi*xi-1.)/24.;
+      case 5:
+        return (4*xi*xi*(xi*xi-1.) + (xi*xi-1.)*(xi*xi-1.))/120.;
+//      case 6:
+//        return (4*xi*xi*xi*(xi*xi-1.) + 2*xi*(xi*xi-1.)*(xi*xi-1.))/720.;
+      default:
+        Real denominator = 720., xipower = 1.;
+        for (unsigned n=6; n != i; ++n)
+          {
+            xipower *= xi;
+            denominator *= (n+1);
+          }
+        return (4*xi*xi*xi*xipower*(xi*xi-1.) +
+                (i-4)*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
     }
 
   error();
@@ -125,9 +161,9 @@ Real FEHermite<1>::hermite_raw_shape_deriv
 
 template<>
 Real FEHermite<1>::hermite_raw_shape
- (const unsigned int basis_num, const Real xi)
+ (const unsigned int i, const Real xi)
 {
-  switch (basis_num)
+  switch (i)
     {
       case 0:
         return 0.25 * (2. - 3.*xi + xi*xi*xi);
@@ -137,83 +173,28 @@ Real FEHermite<1>::hermite_raw_shape
         return 0.25 * (1. - xi - xi*xi + xi*xi*xi);
       case 3:
         return 0.25 * (-1. - xi + xi*xi + xi*xi*xi);
+      // All high order terms have the form x^(p-4)(x^2-1)^2/p!
+      case 4:
+        return (xi*xi-1.) * (xi*xi-1.)/24.;
+      case 5:
+        return xi * (xi*xi-1.) * (xi*xi-1.)/120.;
+//      case 6:
+//        return xi*xi * (xi*xi-1.) * (xi*xi-1.)/720.;
+      default:
+        Real denominator = 720., xipower = 1.;
+        for (unsigned n=6; n != i; ++n)
+          {
+            xipower *= xi;
+            denominator *= (n+1);
+          }
+        return (xi*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
+                
     }
 
   error();
   return 0.;
 }
 
-
-template<>
-Real FEHermite<1>::hermite_bases
- (std::vector<unsigned int> &bases1D,
-  const std::vector<std::vector<Real> > &dxdxi,
-  unsigned int index,
-  unsigned int dim)
-{
-  unsigned int pow2[4] = {1, 2, 4, 8};
-  assert (dim < 4);
-
-  bases1D.clear();
-  bases1D.resize(dim,0);
-
-  switch (index/pow2[dim]) // Node number
-    {
-    case 0:
-      break;
-    case 1:
-      bases1D[0] = 1; break;
-    case 2:
-      bases1D[0] = 1; bases1D[1] = 1; break;
-    case 3:
-      bases1D[1] = 1; break;
-    case 4:
-      bases1D[2] = 1; break;
-    case 5:
-      bases1D[0] = 1; bases1D[2] = 1; break;
-    case 6:
-      bases1D[0] = 1; bases1D[1] = 1; bases1D[2] = 1; break;
-    case 7:
-      bases1D[1] = 1; bases1D[2] = 1; break;
-    default:
-      error();
-    }
-
-  Real coef=0;
-  switch (index%pow2[dim]) // DoF type
-    {
-    case 0: // DoF = value at node
-      coef = 1.0;
-      break;
-    case 1: // DoF = x derivative at node
-      coef = dxdxi[0][bases1D[0]];
-      bases1D[0] += 2; break;
-    case 2: // DoF = y derivative at node
-      coef = dxdxi[1][bases1D[1]];
-      bases1D[1] += 2; break;
-    case 3: // DoF = xy derivative at node
-      coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]];
-      bases1D[0] += 2; bases1D[1] += 2; break;
-    case 4: // DoF = z derivative at node
-      coef = dxdxi[2][bases1D[2]];
-      bases1D[2] += 2; break;
-    case 5: // DoF = xz derivative at node
-      coef = dxdxi[0][bases1D[0]] * dxdxi[2][bases1D[2]];
-      bases1D[0] += 2; bases1D[2] += 2; break;
-    case 6: // DoF = yz derivative at node
-      coef = dxdxi[1][bases1D[1]] * dxdxi[2][bases1D[2]];
-      bases1D[1] += 2; bases1D[2] += 2; break;
-    case 7: // DoF = xyz derivative at node
-      coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]] * dxdxi[2][bases1D[2]];
-      bases1D[0] += 2; bases1D[1] += 2; bases1D[2] += 2; break;
-    }
-
-  // No singular elements
-  assert(coef);
-  return coef;
-}
-
-  
 
 template <>
 Real FE<1,HERMITE>::shape(const ElemType,
@@ -269,7 +250,7 @@ Real FE<1,HERMITE>::shape(const Elem* elem,
 		case 3:
                   return d2xd2x * FEHermite<1>::hermite_raw_shape(3, p(0));
 		default:
-		  error();
+		  return FEHermite<1>::hermite_raw_shape(i, p(0));
 		}
 	    }
 	  default:
@@ -343,7 +324,7 @@ Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
 		case 3:
                   return d2xd2x * FEHermite<1>::hermite_raw_shape_deriv(3, p(0));
 		default:
-		  error();
+		  return FEHermite<1>::hermite_raw_shape_deriv(i, p(0));
 		}
 	    }
 	  default:
@@ -400,7 +381,7 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
 		case 3:
                   return d2xd2x * FEHermite<1>::hermite_raw_shape_second_deriv(3, p(0));
 		default:
-		  error();
+		  return FEHermite<1>::hermite_raw_shape_second_deriv(i, p(0));
 		}
 	    }
 	  default:

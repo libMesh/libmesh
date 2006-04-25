@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_2D.C,v 1.4 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_hermite_shape_2D.C,v 1.5 2006-04-25 22:31:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 // Local includes
 #include "fe.h"
 #include "elem.h"
+#include "number_lookups.h"
 
 
 // Anonymous namespace for persistant variables.
@@ -93,6 +94,104 @@ void hermite_compute_coefs(const Elem* elem)
 }
 
 
+
+Real hermite_bases_2D
+ (std::vector<unsigned int> &bases1D,
+  const std::vector<std::vector<Real> > &dxdxi,
+  const Order &o,
+  unsigned int i)
+{
+  bases1D.clear();
+  bases1D.resize(2,0);
+  Real coef = 1.0;
+
+  unsigned int e = o-3;
+
+  // Nodes
+  if (i < 16)
+    {
+      switch (i / 4)
+        {
+        case 0:
+          break;
+        case 1:
+          bases1D[0] = 1;
+          break;
+        case 2:
+          bases1D[0] = 1;
+          bases1D[1] = 1;
+          break;
+        case 3:
+          bases1D[1] = 1;
+          break;
+        }
+
+      unsigned int basisnum = i%4;
+      switch (basisnum)
+        {
+          case 0: // DoF = value at node
+            coef = 1.0;
+            break;
+          case 1: // DoF = x derivative at node
+            coef = dxdxi[0][bases1D[0]];
+            bases1D[0] += 2; break;
+          case 2: // DoF = y derivative at node
+            coef = dxdxi[1][bases1D[1]];
+            bases1D[1] += 2; break;
+          case 3: // DoF = xy derivative at node
+            coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]];
+            bases1D[0] += 2; bases1D[1] += 2; break;
+          default:
+            error();
+        }
+    }
+  // Edges
+  else if (i < 16 + 4*2*e)
+    {
+      unsigned int basisnum = (i - 16) % (2*e);
+      switch ((i - 16) / (2*e))
+        {
+        case 0:
+          bases1D[0] = basisnum/2 + 4;
+          bases1D[1] = basisnum%2*2;
+          if (basisnum%2)
+            coef = dxdxi[1][0];
+          break;
+        case 1:
+          bases1D[0] = basisnum%2*2 + 1;
+          bases1D[1] = basisnum/2 + 4;
+          if (basisnum%2)
+            coef = dxdxi[0][1];
+          break;
+        case 2:
+          bases1D[0] = basisnum/2 + 4;
+          bases1D[1] = basisnum%2*2 + 1;
+          if (basisnum%2)
+            coef = dxdxi[1][1];
+          break;
+        case 3:
+          bases1D[0] = basisnum%2*2;
+          bases1D[1] = basisnum/2 + 4;
+          if (basisnum%2)
+            coef = dxdxi[0][0];
+          break;
+        default:
+          error();
+        }
+    }
+  // Interior
+  else
+    {
+      unsigned int basisnum = i - 16 - 8*e;
+      bases1D[0] = square_number_row[basisnum]+4;
+      bases1D[1] = square_number_column[basisnum]+4;
+    }
+
+  // No singular elements
+  assert(coef);
+  return coef;
+}
+
 } // end anonymous namespace
 
 
@@ -127,34 +226,24 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
   
   const Order totalorder = static_cast<Order>(order + elem->p_level());
   
-  switch (totalorder)
-    {      
-      // 3rd-order bicubic Hermite functions
-    case THIRD:
+  switch (type)
+    {
+    case QUAD4:
+      assert (totalorder < 4);
+    case QUAD8:
+    case QUAD9:
       {
-	switch (type)
-	  {
-	  case QUAD4:
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      assert (i<16);
+        assert (i<(totalorder+1u)*(totalorder+1u));
 
-              std::vector<unsigned int> bases1D;
+        std::vector<unsigned int> bases1D;
 
-              Real coef = FEHermite<1>::hermite_bases(bases1D, dxdxi, i, 2);
+        Real coef = hermite_bases_2D(bases1D, dxdxi, totalorder, i);
 
-              return coef * FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
-                     FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
-	    }
-	  default:
-            std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
-	  }
+        return coef * FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
+               FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
       }
-      // by default throw an error
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      std::cerr << "ERROR: Unsupported element type!" << std::endl;
       error();
     }
   
@@ -197,43 +286,35 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
   
   const Order totalorder = static_cast<Order>(order + elem->p_level());
   
-  switch (totalorder)
-    {      
-      // 3rd-order bicubic Hermite functions
-    case THIRD:
+  switch (type)
+    {
+    case QUAD4:
+      assert (totalorder < 4);
+    case QUAD8:
+    case QUAD9:
       {
-	switch (type)
-	  {
-	  case QUAD4:
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      assert (i<16);
+        assert (i<(totalorder+1u)*(totalorder+1u));
 
-              std::vector<unsigned int> bases1D;
+        std::vector<unsigned int> bases1D;
 
-              Real coef = FEHermite<1>::hermite_bases(bases1D, dxdxi, i, 2);
+        Real coef = hermite_bases_2D(bases1D, dxdxi, totalorder, i);
 
-              switch (j)
-                {
-                case 0:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
-                case 1:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1));
-                }
-	    }
-	  default:
-            std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
-	  }
+        switch (j)
+          {
+            case 0:
+              return coef *
+                FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
+                FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
+            case 1:
+              return coef *
+                FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
+                FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1));
+            default:
+              error();
+          }
       }
-      // by default throw an error
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      std::cerr << "ERROR: Unsupported element type!" << std::endl;
       error();
     }
   
@@ -259,47 +340,39 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
   
   const Order totalorder = static_cast<Order>(order + elem->p_level());
   
-  switch (totalorder)
-    {      
-      // 3rd-order bicubic Hermite functions
-    case THIRD:
+  switch (type)
+    {
+    case QUAD4:
+      assert (totalorder < 4);
+    case QUAD8:
+    case QUAD9:
       {
-	switch (type)
-	  {
-	  case QUAD4:
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      assert (i<16);
+        assert (i<(totalorder+1u)*(totalorder+1u));
 
-              std::vector<unsigned int> bases1D;
+        std::vector<unsigned int> bases1D;
 
-              Real coef = FEHermite<1>::hermite_bases(bases1D, dxdxi, i, 2);
+        Real coef = hermite_bases_2D(bases1D, dxdxi, totalorder, i);
 
-              switch (j)
-                {
-                case 0:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
-                case 1:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1));
-                case 2:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[1],p(1));
-                }
-	    }
-	  default:
-            std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
-	  }
+        switch (j)
+          {
+          case 0:
+            return coef *
+              FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[0],p(0)) *
+              FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
+          case 1:
+            return coef *
+              FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
+              FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1));
+          case 2:
+            return coef *
+              FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
+              FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[1],p(1));
+          default:
+            error();
+          }
       }
-      // by default throw an error
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      std::cerr << "ERROR: Unsupported element type!" << std::endl;
       error();
     }
   
