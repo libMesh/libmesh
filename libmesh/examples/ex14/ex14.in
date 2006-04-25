@@ -15,7 +15,7 @@ coarsen_percentage = 0.0
 # If set equal to 0, adaptive refinement is done.
 uniform_refine = 0
 
-# Basis function type (LAGRANGE or HIERARCHIC) and
+# Basis function type (LAGRANGE, HERMITE, or HIERARCHIC) and
 # minimum approximation order
 approx_type = LAGRANGE
 approx_order = 2
@@ -30,13 +30,17 @@ exact_indicator = false
 # element
 refinement_type = h
 
-# Mesh dimensionality - NOT YET IMPLEMENTED
+# Mesh dimensionality
 # We load lshaped.xda for 2 dimensional problems, lshaped3D.xda for 3
 dimension = 2
 
 # Element type - tensor or simplex
 # simplex is currently only supported in 2D
+# HERMITE is only supported with tensor
 element_type = tensor
 
 # Use higher quadrature order when computing errors?
 extra_error_quadrature = 0
+
+# Solve a singular or non-singular problem?
+singularity = true

@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.25 2006-04-21 19:35:22 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.26 2006-04-25 22:50:33 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -58,6 +58,7 @@
 #include "error_vector.h"
 #include "exact_error_estimator.h"
 #include "kelly_error_estimator.h"
+#include "mesh_generation.h"
 #include "mesh_modification.h"
 #include "getpot.h"
 #include "exact_solution.h"
@@ -89,11 +90,14 @@ Gradient exact_derivative(const Point& p,
 			  const std::string&); // unk_name, not needed);
 
 
-// Set the dimensionality of the mesh
-// This is non-const because the input file may change it,
+// These are non-const because the input file may change it,
 // It is global because our exact_* functions use it.
+
+// Set the dimensionality of the mesh
 unsigned int dim = 2;
 
+// Choose whether or not to use the singular solution
+bool singularity = true;
 
 
 int main(int argc, char** argv)
@@ -118,6 +122,7 @@ int main(int argc, char** argv)
     const int extra_error_quadrature  = input_file("extra_error_quadrature", 0);
     dim = input_file("dimension", 2);
     const bool exact_indicator = input_file("exact_indicator", false);
+    singularity = input_file("singularity", true);
     
     // Output file for plotting the error as a function of
     // the number of degrees of freedom.
@@ -184,6 +189,9 @@ int main(int argc, char** argv)
       else if (approx_type == "HIERARCHIC")
         system.add_variable("u", static_cast<Order>(approx_order),
                             HIERARCHIC);
+      else if (approx_type == "HERMITE")
+        system.add_variable("u", static_cast<Order>(approx_order),
+                            HERMITE);
       else
         {
           std::cerr << "Bad approximation type: " <<
@@ -232,7 +240,7 @@ int main(int argc, char** argv)
 	std::cout << "System has: " << equation_systems.n_active_dofs()
 		  << " degrees of freedom."
 		  << std::endl;
-	
+
 	std::cout << "Linear solver converged at step: "
 		  << system.n_linear_iterations()
 		  << ", final residual: "
@@ -388,18 +396,29 @@ Number exact_solution(const Point& p,
   const Real x = p(0);
   const Real y = p(1);
   
-  // The boundary value, given by the exact solution,
-  // u_exact = r^(2/3)*sin(2*theta/3).
-  Real theta = atan2(y,x);
+  if (singularity)
+    {
+      // The exact solution to the singular problem,
+      // u_exact = r^(2/3)*sin(2*theta/3).
+      Real theta = atan2(y,x);
 
-  // Make sure 0 <= theta <= 2*pi
-  if (theta < 0)
-    theta += 2. * libMesh::pi;
+      // Make sure 0 <= theta <= 2*pi
+      if (theta < 0)
+        theta += 2. * libMesh::pi;
 
-  // Make the 3D solution similar but slightly less boring
-  const Real z = (dim > 2) ? p(2) : 0;
+      // Make the 3D solution similar
+      const Real z = (dim > 2) ? p(2) : 0;
 		  
-  return pow(x*x + y*y, 1./3.)*sin(2./3.*theta) + z;
+      return pow(x*x + y*y, 1./3.)*sin(2./3.*theta) + z;
+    }
+  else
+    {
+      // The exact solution to a nonsingular problem,
+      // good for testing ideal convergence rates
+      const Real z = (dim > 2) ? p(2) : 0;
+
+      return cos(x) * exp(y) * (1. - z);
+    }
 }
 
 
@@ -421,32 +440,44 @@ Gradient exact_derivative(const Point& p,
   const Real x = p(0);
   const Real y = p(1);
 
-  // We can't compute the gradient at x=0, it is not defined.
-  assert (x != 0.);
+  if (singularity)
+    {
+      // We can't compute the gradient at x=0, it is not defined.
+      assert (x != 0.);
 
-  // For convenience...
-  const Real tt = 2./3.;
-  const Real ot = 1./3.;
+      // For convenience...
+      const Real tt = 2./3.;
+      const Real ot = 1./3.;
   
-  // The value of the radius, squared
-  const Real r2 = x*x + y*y;
+      // The value of the radius, squared
+      const Real r2 = x*x + y*y;
 
-  // The boundary value, given by the exact solution,
-  // u_exact = r^(2/3)*sin(2*theta/3).
-  Real theta = atan2(y,x);
+      // The boundary value, given by the exact solution,
+      // u_exact = r^(2/3)*sin(2*theta/3).
+      Real theta = atan2(y,x);
   
-  // Make sure 0 <= theta <= 2*pi
-  if (theta < 0)
-    theta += 2. * libMesh::pi;
+      // Make sure 0 <= theta <= 2*pi
+      if (theta < 0)
+        theta += 2. * libMesh::pi;
 
-  // du/dx
-  gradu(0) = tt*x*pow(r2,-tt)*sin(tt*theta) - pow(r2,ot)*cos(tt*theta)*tt/(1.+y*y/x/x)*y/x/x;
+      // du/dx
+      gradu(0) = tt*x*pow(r2,-tt)*sin(tt*theta) - pow(r2,ot)*cos(tt*theta)*tt/(1.+y*y/x/x)*y/x/x;
 
-  // du/dy
-  gradu(1) = tt*y*pow(r2,-tt)*sin(tt*theta) + pow(r2,ot)*cos(tt*theta)*tt/(1.+y*y/x/x)*1./x;
+      // du/dy
+      gradu(1) = tt*y*pow(r2,-tt)*sin(tt*theta) + pow(r2,ot)*cos(tt*theta)*tt/(1.+y*y/x/x)*1./x;
 
-  if (dim > 2)
-    gradu(2) = 1.;
+      if (dim > 2)
+        gradu(2) = 1.;
+    }
+  else
+    {
+      const Real z = (dim > 2) ? p(2) : 0;
+
+      gradu(0) = -sin(x) * exp(y) * (1. - z);
+      gradu(1) = cos(x) * exp(y) * (1. - z);
+      if (dim > 2)
+        gradu(2) = -cos(x) * exp(y);
+    }
 
   return gradu;
 }
