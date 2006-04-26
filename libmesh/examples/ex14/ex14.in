@@ -11,13 +11,17 @@ refine_percentage = 0.7
 coarsen_percentage = 0.0
 
 # Option to uniformly or adaptively refine.
-# If set equal to 1, uniform refinement is done.
-# If set equal to 0, adaptive refinement is done.
+# If uniform_refine == 1, uniform refinement is done.
+# If uniform_refine == 0, adaptive refinement is done.
 uniform_refine = 0
 
-# Basis function type (LAGRANGE, HERMITE, or HIERARCHIC) and
-# minimum approximation order
+# Basis function type (as named in enum_fe_family.h)
 approx_type = LAGRANGE
+
+# minimum approximation order
+# Use approx_order = 1 or 2 for LAGRANGE elements
+# Use approx_order = 2 or 3 for CLOUGH elements
+# Use approx_order = 3 or higher for HERMITE elements
 approx_order = 2
 
 # Use exact error estimator instead of gradient jumps?
@@ -36,7 +40,8 @@ dimension = 2
 
 # Element type - tensor or simplex
 # simplex is currently only supported in 2D
-# HERMITE is only supported with tensor
+# Use element_type = tensor for HERMITE elements
+# Use element_type = simplex for CLOUGH elements
 element_type = tensor
 
 # Use higher quadrature order when computing errors?
