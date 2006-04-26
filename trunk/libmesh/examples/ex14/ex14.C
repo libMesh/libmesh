@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.26 2006-04-25 22:50:33 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.27 2006-04-26 18:50:17 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -65,6 +65,7 @@
 #include "dof_map.h"
 #include "numeric_vector.h"
 #include "elem.h"
+#include "string_to_enum.h"
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our Laplace problem.  Note that the
@@ -184,20 +185,8 @@ int main(int argc, char** argv)
       // Adds the variable "u" to "Laplace", using 
       // the finite element type and order specified
       // in the config file
-      if (approx_type == "LAGRANGE")
-	system.add_variable("u", static_cast<Order>(approx_order));
-      else if (approx_type == "HIERARCHIC")
-        system.add_variable("u", static_cast<Order>(approx_order),
-                            HIERARCHIC);
-      else if (approx_type == "HERMITE")
-        system.add_variable("u", static_cast<Order>(approx_order),
-                            HERMITE);
-      else
-        {
-          std::cerr << "Bad approximation type: " <<
-                       approx_type << std::endl;
-	  error();
-        }
+      system.add_variable("u", static_cast<Order>(approx_order),
+                          Utility::string_to_enum<FEFamily>(approx_type));
 
       // Give the system a pointer to the matrix assembly
       // function.
@@ -532,13 +521,13 @@ void assemble_laplace(EquationSystems& es,
   AutoPtr<FEBase> fe      (FEBase::build(dim, fe_type));
   AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
   
-  // A 5th order Gauss quadrature rule for numerical integration.
-  QGauss qrule (dim,   fe_type.default_quadrature_order());
-  QGauss qface (dim-1, fe_type.default_quadrature_order());
+  // Quadrature rules for numerical integration.
+  AutoPtr<QBase> qrule(fe_type.default_quadrature_rule(dim));
+  AutoPtr<QBase> qface(fe_type.default_quadrature_rule(dim-1));
 
   // Tell the finite element object to use our quadrature rule.
-  fe->attach_quadrature_rule      (&qrule);
-  fe_face->attach_quadrature_rule (&qface);
+  fe->attach_quadrature_rule      (qrule.get());
+  fe_face->attach_quadrature_rule (qface.get());
 
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
@@ -634,7 +623,7 @@ void assemble_laplace(EquationSystems& es,
       // Now start logging the element matrix computation
       perf_log.start_event ("Ke");
 
-      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+      for (unsigned int qp=0; qp<qrule->n_points(); qp++)
 	for (unsigned int i=0; i<dphi.size(); i++)
 	  for (unsigned int j=0; j<dphi.size(); j++)
 	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
@@ -669,7 +658,7 @@ void assemble_laplace(EquationSystems& es,
 	    {
 	      fe_face->reinit(elem,s);
 	      
-	      for (unsigned int qp=0; qp<qface.n_points(); qp++)
+	      for (unsigned int qp=0; qp<qface->n_points(); qp++)
 		{
 		  const Number value = exact_solution (qface_points[qp],
 						       es.parameters,
