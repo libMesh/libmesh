@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.91 2006-04-26 18:50:50 roystgnr Exp $
+// $Id: dof_map.C,v 1.92 2006-04-26 20:05:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -192,7 +192,7 @@ void DofMap::reinit(MeshBase& mesh)
               FEInterface::max_order(base_fe_type, type))
             {
               assert(FEInterface::max_order(base_fe_type,type) >=
-                     base_fe_type.order);
+                     static_cast<unsigned int>(base_fe_type.order));
               elem->set_p_level(FEInterface::max_order(base_fe_type,type)
                                 - base_fe_type.order);
             }
