@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.45 2006-04-05 16:42:27 roystgnr Exp $
+// $Id: fe.C,v 1.46 2006-04-27 17:57:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -822,8 +822,13 @@ void FE<Dim,T>::compute_proj_constraints (DofConstraints &constraints,
         const unsigned int min_p_level =
           elem->neighbor(s)->min_p_level_by_neighbor(elem, elem->p_level());
         if (min_p_level < elem->p_level())
-          dof_map.constrain_p_dofs(variable_number, elem,
-                                   s, min_p_level);
+          {
+            // Adaptive p refinement of non-hierarchic bases will
+            // require more coding
+            assert(my_fe->is_hierarchic());
+            dof_map.constrain_p_dofs(variable_number, elem,
+                                     s, min_p_level);
+          }
       }
 #endif
 }

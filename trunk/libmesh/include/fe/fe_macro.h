@@ -1,4 +1,4 @@
-// $Id: fe_macro.h,v 1.13 2005-08-25 18:31:37 roystgnr Exp $
+// $Id: fe_macro.h,v 1.14 2006-04-27 17:57:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -76,6 +76,7 @@
   template unsigned int FE<_dim,_t>::n_dofs(ElemType,Order);\
   template bool         FE<_dim,_t>::shapes_need_reinit() const;\
   template FEContinuity FE<_dim,_t>::get_continuity() const;\
+  template bool         FE<_dim,_t>::is_hierarchic() const;\
   template unsigned int FE<_dim,_t>::n_dofs_per_elem(ElemType,Order);\
   template void         FE<_dim,_t>::nodal_soln(const Elem*,const Order,const std::vector<Number>&,std::vector<Number>&)
 

@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.8 2005-07-01 16:36:22 spetersen Exp $
+// $Id: inf_fe.h,v 1.9 2006-04-27 17:57:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.8 $
+ * \version $Revision: 1.9 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.8 $
+   * \version $Revision: 1.9 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.8 $
+   * \version $Revision: 1.9 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -338,6 +338,13 @@ public:
    */
   virtual FEContinuity get_continuity() const
     { return C_ZERO; }  // FIXME - is this true??
+
+  /**
+   * @returns true if the element's higher order shape functions are
+   * hierarchic
+   */
+  virtual bool is_hierarchic() const
+    { return false; }  // FIXME - Inf FEs don't handle p elevation yet
 
   /**
    * Usually, this method would build the nodal soln from the 
