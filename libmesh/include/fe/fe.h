@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.20 2006-04-25 22:31:33 roystgnr Exp $
+// $Id: fe.h,v 1.21 2006-04-27 17:57:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 //-------------------------------------------------------------
@@ -226,6 +226,12 @@ public:
    * @returns the continuity level of the finite element.
    */
   virtual FEContinuity get_continuity() const;
+				       
+  /**
+   * @returns true if the finite element's higher order shape functions are
+   * hierarchic
+   */
+  virtual bool is_hierarchic() const;
 				       
   /**
    * Fills the vector di with the local degree of freedom indices
@@ -427,7 +433,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 //-------------------------------------------------------------
@@ -452,7 +458,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2005
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 //-------------------------------------------------------------
@@ -487,7 +493,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 //-------------------------------------------------------------
@@ -512,7 +518,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 //-------------------------------------------------------------
@@ -537,7 +543,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 //-------------------------------------------------------------
@@ -563,7 +569,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.20 $
+ * \version $Revision: 1.21 $
  */
 
 //-------------------------------------------------------------

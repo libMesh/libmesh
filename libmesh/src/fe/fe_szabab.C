@@ -1,4 +1,4 @@
-// $Id: fe_szabab.C,v 1.9 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_szabab.C,v 1.10 2006-04-27 17:57:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1136,6 +1136,14 @@ template <unsigned int Dim, FEFamily T>
 FEContinuity FE<Dim,T>::get_continuity() const
 {
   return C_ZERO;
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
+bool FE<Dim,T>::is_hierarchic() const
+{
+  return false;
 }
 
 

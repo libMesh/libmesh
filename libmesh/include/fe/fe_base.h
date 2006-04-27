@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.19 2006-04-05 16:18:40 roystgnr Exp $
+// $Id: fe_base.h,v 1.20 2006-04-27 17:57:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -496,6 +496,12 @@ public:
    * @returns the continuity level of the finite element.
    */
   virtual FEContinuity get_continuity() const = 0;
+
+  /**
+   * @returns true if the finite element's higher order shape functions are
+   * hierarchic
+   */
+  virtual bool is_hierarchic() const = 0;
 
   /**
    * @returns the finite element family of this element.

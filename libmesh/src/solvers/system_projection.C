@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.28 2006-04-18 17:14:39 roystgnr Exp $
+// $Id: system_projection.C,v 1.29 2006-04-27 17:57:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -753,6 +753,9 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                 if (elem->p_refinement_flag() == Elem::JUST_REFINED)
                   {
                     assert (elem->p_level() > 0);
+                    // P refinement of non-hierarchic bases will
+                    // require a whole separate code path
+                    assert (fe->is_hierarchic());
                     temp_fe_type = fe_type;
                     temp_fe_type.order =
                       static_cast<Order>(temp_fe_type.order - 1);
@@ -775,6 +778,9 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                 else if (elem->p_refinement_flag() ==
                          Elem::JUST_COARSENED)
                   {
+                    // P coarsening of non-hierarchic bases will
+                    // require a whole separate code path
+                    assert (fe->is_hierarchic());
                     temp_fe_type = fe_type;
                     temp_fe_type.order =
                       static_cast<Order>(temp_fe_type.order + 1);
