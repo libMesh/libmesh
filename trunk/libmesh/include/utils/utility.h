@@ -1,4 +1,4 @@
-// $Id: utility.h,v 1.10 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: utility.h,v 1.11 2006-05-02 17:36:30 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -84,6 +84,26 @@ namespace Utility
   template <>
   inline
   Real pow<0>(const Real) { return 1.; }
+
+
+  //-------------------------------------------------------------------
+  /**
+   * A simple implementation of the factorial.
+   */
+  inline
+  unsigned int factorial(unsigned int n)
+    {
+
+      unsigned int factorial_n = 1;
+
+      if (n==0)
+	return factorial_n;
+      
+      for (unsigned int i=1; i<n; i++)
+	factorial_n *= i+1;
+
+      return factorial_n;
+    }
 
   
   

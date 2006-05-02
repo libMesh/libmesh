@@ -1,4 +1,4 @@
-// $Id: fe_bernstein.C,v 1.3 2006-04-27 17:57:29 roystgnr Exp $
+// $Id: fe_bernstein.C,v 1.4 2006-05-02 17:36:30 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -116,184 +116,231 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 {
-  switch (o)
+
+  switch (t)
     {
-      // Bernstein 1st-order polynomials.
-    case FIRST:
+    case EDGE2:
+    case EDGE3:
+      return (o+1);
+    case QUAD4:
+      assert(o < 2);
+    case QUAD8:
       {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 2;
-
-	  case TRI6:
-	    return 3;
-
-	  case QUAD8:
-	  case QUAD9:
-	    return 4;
-
-	  case TET4:
-	  case TET10:
-	    return 4;
-
-	  case HEX20:
-	  case HEX27:
-	    return 8;
-
-	  default:
-	    error();
-	  }
+	if (o == 2)
+	  return 8;
+	else
+	  error();  
       }
-
-
-      // Bernstein 2nd-order polynomials.
-    case SECOND:
+    case QUAD9:
+      return ((o+1)*(o+1));
+    case HEX8:
+      assert(o < 2);
+    case HEX20:
       {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 3;
+	if (o == 2)
+	  return 20;
+	else
+	  error();
+      }
+    case HEX27:
+      return ((o+1)*(o+1)*(o+1));
+    case TRI3:
+      assert (o<2);
+    case TRI6:
+      return ((o+1)*(o+2)/2);
+    case TET4:
+      assert (o<2);
+    case TET10:
+      {
+	assert (o<3);
+	return ((o+1)*(o+2)*(o+3)/6); 
+      }
+    default:
+      error();
+    }
 
-	  case TRI6:
-	    return 6;
+  error();
+  return 0;
 
-	  case QUAD8:
-	    return 8;
+  // old code
+//   switch (o)
+//     {
+//       // Bernstein 1st-order polynomials.
+//     case FIRST:
+//       {
+// 	switch (t)
+// 	  {
+// 	  case EDGE2:
+// 	  case EDGE3:
+// 	    return 2;
 
-	  case QUAD9:
-	    return 9;
+// 	  case TRI6:
+// 	    return 3;
 
-	  case TET10:
-	    return 10;
+// 	  case QUAD8:
+// 	  case QUAD9:
+// 	    return 4;
+
+// 	  case TET4:
+// 	  case TET10:
+// 	    return 4;
+
+// 	  case HEX20:
+// 	  case HEX27:
+// 	    return 8;
+
+// 	  default:
+// 	    error();
+// 	  }
+//       }
+
+
+//       // Bernstein 2nd-order polynomials.
+//     case SECOND:
+//       {
+// 	switch (t)
+// 	  {
+// 	  case EDGE2:
+// 	  case EDGE3:
+// 	    return 3;
+
+// 	  case TRI6:
+// 	    return 6;
+
+// 	  case QUAD8:
+// 	    return 8;
+
+// 	  case QUAD9:
+// 	    return 9;
+
+// 	  case TET10:
+// 	    return 10;
 	    
-	  case HEX20:
-	    return 20;
+// 	  case HEX20:
+// 	    return 20;
 
-	  case HEX27:
-	    return 27;
+// 	  case HEX27:
+// 	    return 27;
 
-	  default:
-	    error();
-	  }
-      }
+// 	  default:
+// 	    error();
+// 	  }
+//       }
 
 
-      // Bernstein 3rd-order polynomials.
-    case THIRD:
-      {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 4;
+//       // Bernstein 3rd-order polynomials.
+//     case THIRD:
+//       {
+// 	switch (t)
+// 	  {
+// 	  case EDGE2:
+// 	  case EDGE3:
+// 	    return 4;
 
-	  case TRI6:
-	    return 10;
+// 	  case TRI6:
+// 	    return 10;
 	    
-	  case QUAD8:
-	  case QUAD9:
-	    return 16;
+// 	  case QUAD8:
+// 	  case QUAD9:
+// 	    return 16;
 
-	  case TET10:
-	    return 20;
+// 	  case TET10:
+// 	    return 20;
 
-	  case HEX27:
-	    return 64;
+// 	  case HEX27:
+// 	    return 64;
 
-	  default:
-	    error();
-	  }
-      }
+// 	  default:
+// 	    error();
+// 	  }
+//       }
 
 
-      // Bernstein 4th-order polynomials.
-    case FOURTH:
-      {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 5;
+//       // Bernstein 4th-order polynomials.
+//     case FOURTH:
+//       {
+// 	switch (t)
+// 	  {
+// 	  case EDGE2:
+// 	  case EDGE3:
+// 	    return 5;
 
-	  case TRI6:
-	    return 15;
+// 	  case TRI6:
+// 	    return 15;
 	    
-	  case QUAD8:
-	  case QUAD9:
-	    return 25;
+// 	  case QUAD8:
+// 	  case QUAD9:
+// 	    return 25;
 
-	  case TET10:
-	    return 35;
+// 	  case TET10:
+// 	    return 35;
 
-	  case HEX27:
-	    return 125;
+// 	  case HEX27:
+// 	    return 125;
 
-	  default:
-	    error();
-	  }
-      }
+// 	  default:
+// 	    error();
+// 	  }
+//       }
 
 
-      // Bernstein 5th-order polynomials.
-    case FIFTH:
-      {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 6;
+//       // Bernstein 5th-order polynomials.
+//     case FIFTH:
+//       {
+// 	switch (t)
+// 	  {
+// 	  case EDGE2:
+// 	  case EDGE3:
+// 	    return 6;
 
-	  case TRI6:
-	    return 21;
+// 	  case TRI6:
+// 	    return 21;
 	      
-	  case QUAD8:
-	  case QUAD9:
-	    return 36;
+// 	  case QUAD8:
+// 	  case QUAD9:
+// 	    return 36;
 
-	  case HEX27:
-	    return 216;
+// 	  case HEX27:
+// 	    return 216;
 
-	  default:
-	    error();
-	  }
-      }
+// 	  default:
+// 	    error();
+// 	  }
+//       }
 
      
-      // Bernstein 6th-order polynomials.
-    case SIXTH:
-      {
-	switch (t)
-	  {
-	  case EDGE2:
-	  case EDGE3:
-	    return 7;
+//       // Bernstein 6th-order polynomials.
+//     case SIXTH:
+//       {
+// 	switch (t)
+// 	  {
+// 	  case EDGE2:
+// 	  case EDGE3:
+// 	    return 7;
 
-	  case TRI6:
-	    return 28;
+// 	  case TRI6:
+// 	    return 28;
 	      
-	  case QUAD8:
-	  case QUAD9:
-	    return 49;
+// 	  case QUAD8:
+// 	  case QUAD9:
+// 	    return 49;
 
-	  case HEX27:
-	    return 343;
+// 	  case HEX27:
+// 	    return 343;
 
-	  default:
-	    error();
-	  }
-      }
+// 	  default:
+// 	    error();
+// 	  }
+//       }
       
-    default:
-      {
-	error();
-      }
-    }
+//     default:
+//       {
+// 	error();
+//       }
+//     }
   
-  error();  
-  return 0;
+//   error();  
+//   return 0;
 }
 
 
@@ -303,786 +350,926 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 				       const Order o,
 				       const unsigned int n)
 {
-  switch (o)
+  switch (t)
     {
-      // The first-order Bernstein shape functions
-    case FIRST:
+
+    case EDGE2:
+    case EDGE3:
+      switch (n)
+        {
+	case 0:
+	case 1:
+	  return 1;
+	case 2:
+	  assert (o>1);
+	  return (o-1);
+	default:
+	  error();		  
+	}
+    case TRI6:
+      switch (n)
+	{
+	case 0:
+	case 1:
+	case 2:
+	  return 1;
+
+	case 3:
+	case 4:
+	case 5:
+	  return (o-1);
+        // Internal DoFs are associated with the elem, not its nodes
+	default:
+	  error();
+	}
+    case QUAD8:
+      assert (n<8);
+      assert (o<3);
+    case QUAD9:
       {
-	switch (t)
+	switch (n)
 	  {
-	    // The 1D Bernstein defined on a three-noded edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 1;
-
-		case 2:
-		  return 0;
-		  
-		default:
-		  error();		  
-		}
-	    }
-
+	  case 0:
+	  case 1:
+	  case 2:
+	  case 3:
+	    return 1;
 	    
-	    // The 2D Bernstein defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		  return 1;
-
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		  return 0;
-
-		default:
-		  error();
-		}
-	    }
+	  case 4:
+	  case 5:
+	  case 6:
+	  case 7:
+	    return (o-1);
 	    
-
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 0;
-		  
-		case 8:
-		  return 0;
-		  
-		default:
-		  error();
-		}
-	    }
-
-
-	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
-	  case TET4:
-	  case TET10:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:		 
-		case 8:
-		case 9:
-		  return 0;
-		  
-		default:
-		  error();
-		}
-	    }
-
-
-	    // The 3D Bernsteins defined on a hexahedral.
-	  case HEX20:
-	  case HEX27:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 1;
-
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		  return 0;
-		  
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		  return 0;
-		  
-		case 26:
-		  return 0;
-		}
-	    }
+	    // Internal DoFs are associated with the elem, not its nodes
+	  case 8:
+	    return 0;
 	    
 	  default:
-	    error();
-	    
+	    error();		  
 	  }
       }
+    case HEX8:
+      assert (n < 8);
+      assert (o < 2);
+    case HEX20:
+      assert (n < 20);
+      assert (o < 3);
+    case HEX27:
+      switch (n)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	  return 1;
 
-
-
-      // The second-order Bernstein shape functions
-    case SECOND:
-      {
-	switch (t)
-	  {
-	    // The 1D Bernstein defined on a three-noded edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      assert (n<3);
-	      return 1;
-	    }
-
-	    
-	    // The 2D Bernstein defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      assert (n<6);
-	      return 1;
-	    }
-
-	    // The 8-noded quadrilateral
-	  case QUAD8:
-	    {
-	      assert (n<8);
-	      return 1;
-	    }
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD9:
-	    {
-	      assert (n<9);
-	      return 1;
-	    }
-
-
-	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
-	  case TET10:
-	    {
-	      assert(n<10);
-	      return 1;
-	    }
-
-	    // The 3D Bernsteins defined on a
-	    // 20-noded hexahedral.
-	  case HEX20:
-	    {
-	      assert(n<20);
-	      return 1;
-	    }
-
-	    // The 3D tensor-product Bernsteins defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    {
-	      assert(n<27);
-	      return 1;
-	    }
-	    
-	  default:
-	    error();
-	    
-	  }
-      }
-
-
-
-      // The third-order Bernstein shape functions
-    case THIRD:
-      {
-	switch (t)
-	  {
-	    // The 1D Bernstein defined on a three-noded edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 1;
-
-		case 2:
-		  return 2;
+	case 8:
+	case 9:
+	case 10:
+	case 11:
+	case 12:
+	case 13:
+	case 14:
+	case 15:
+	case 16:
+	case 17:
+	case 18:
+	case 19:
+	  return (o-1);
 		  
-		default:
-		  error();		  
-		}
-	    }
-
-	    
-	    // The 2D Bernstein defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		  return 1;
-
-		case 3:
-		case 4:
-		case 5:
-		  return 2;
-
-		case 6:
-	      return 1;
-
-		default:
-		  error();
-		}
-	    }
-
-
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 2;
-		  
-		case 8:
-		  return 4;
-		  
-		default:
-		  error();
-		}
-	    }
-
-
-	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
-	  case TET10:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		  return 2;
-		  
-		default:
-		  error();
-		}
-	    }
-
-	    // The 3D tensor-product Bernsteins defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 1;
-
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		  return 2;
-		  
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		  return 4;
-		  
-		case 26:
-		  return 8;
-		}
-	    }
-	    
-	  default:
-	    error();
-	    
-	  }
-      }
-
-
-
-      // The fourth-order Bernstein shape functions
-    case FOURTH:
-      {
-	switch (t)
-	  {
-	    // The 1D Bernstein defined on a three-noded edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 1;
-
-		case 2:
-		  return 3;
-		  
-		default:
-		  error();		  
-		}
-	    }
-
-	    
-	    // The 2D Bernstein defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		  return 1;
-
-		case 3:
-		case 4:
-		case 5:
-		  return 3;
-
-		case 6:
-		  return 3;
-
-		default:
-		  error();
-		}
-	    }
-
-
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 3;
-		  
-		case 8:
-		  return 9;
-		  
-		default:
-		  error();
-		}
-	    }
-
-	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
-	  case TET10:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-        case 9:
-		  return 3;
-		  
-		default:
-		  error();
-		}
-	    }
-
-	    // The 3D tensor-product Bernsteins defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 1;
-
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		  return 3;
-		  
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		  return 9;
-		  
-		case 26:
-		  return 27;
-		}
-	    }
-	    
-	  default:
-	    error();
-	    
-	  }
-      }
-
-
-
-      // The fifth-order Bernstein shape functions
-    case FIFTH:
-      {
-	switch (t)
-	  {
-	    // The 1D  Bernstein defined on a three-noded edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 1;
-
-		case 2:
-		  return 4;
-		  
-		default:
-		  error();		  
-		}
-	    }
-
-	    
-	    // The 2D Bernstein defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		  return 1;
-
-		case 3:
-		case 4:
-		case 5:
-		  return 4;
-
-		case 6:
-		  return 6;
-
-		default:
-		  error();
-		}
-	    }
-
-
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 4;
-		  
-		case 8:
-		  return 16;
-		  
-		default:
-		  error();
-		}
-	    }
-
-	    // The 3D tensor-product Bernsteins defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 1;
-
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		  return 4;
-		  
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		  return 16;
-		  
-		case 26:
-		  return 64;
-		}
-	    }
-	    
-	  default:
-	    error();
-	    
-	  } // switch ElemType
-      } // case FIFTH
-
-
-      // The sixth-order Bernstein shape functions
-    case SIXTH:
-      {
-	switch (t)
-	  {
-	    // The 1D Bernstein defined on a three-noded edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		  return 1;
-
-		case 2:
-		  return 5;
-		  
-		default:
-		  error();		  
-		}
-	    }
-
-	    
-	    // The 2D Bernstein defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		  return 1;
-
-		case 3:
-		case 4:
-		case 5:
-		  return 5;
-
-		case 6:
-		  return 10;
-
-		default:
-		  error();
-		}
-	    }
-
-
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	  case QUAD9:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		  return 1;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 5;
-		  
-		case 8:
-		  return 25;
-		  
-		default:
-		  error();
-		}
-	    }
-
-	    // The 3D tensor-product Bernsteins defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    {
-	      switch (n)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 1;
-
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		  return 5;
-		  
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		  return 25;
-		  
-		case 26:
-		  return 125;
-		}
-	    }
-	    
-	  default:
-	    error();
-	    
-	  } // switch ElemType
-      } // case SIXTH
-
+	case 20:
+	case 21:
+	case 22:
+	case 23:
+	case 24:
+	case 25:
+	  return ((o-1)*(o-1));
+	 
+        // Internal DoFs are associated with the elem, not its nodes
+	case 26:
+	  return 0;
+	  
+	default:
+	  error();
+        }
+    case TET4:
+      assert(n<4);
+      assert(o<2);
+    case TET10:
+      assert (o<3);
+      assert (n<10);
+      switch (n)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+	  return 1;
+	  
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+	  return (o-1);
+	  
+	default:
+	  error();
+	}
       
     default:
-      {
-	error();
-      }
+      error();
+      
     }
-  
+
   error();
-  
   return 0;
+
+//   switch (o)
+//     {
+//       // The first-order Bernstein shape functions
+//     case FIRST:
+//       {
+// 	switch (t)
+// 	  {
+// 	    // The 1D Bernstein defined on a three-noded edge
+// 	  case EDGE2:
+// 	  case EDGE3:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		  return 1;
+
+// 		case 2:
+// 		  return 0;
+		  
+// 		default:
+// 		  error();		  
+// 		}
+// 	    }
+
+	    
+// 	    // The 2D Bernstein defined on a 6-noded triangle
+// 	  case TRI6:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		  return 1;
+
+// 		case 3:
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		  return 0;
+
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+	    
+
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD8:
+// 	  case QUAD9:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		  return 1;
+
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:
+// 		  return 0;
+		  
+// 		case 8:
+// 		  return 0;
+		  
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+
+
+// 	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
+// 	  case TET4:
+// 	  case TET10:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		  return 1;
+
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:		 
+// 		case 8:
+// 		case 9:
+// 		  return 0;
+		  
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+
+
+// 	    // The 3D Bernsteins defined on a hexahedral.
+// 	  case HEX20:
+// 	  case HEX27:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:
+// 		  return 1;
+
+// 		case 8:
+// 		case 9:
+// 		case 10:
+// 		case 11:
+// 		case 12:
+// 		case 13:
+// 		case 14:
+// 		case 15:
+// 		case 16:
+// 		case 17:
+// 		case 18:
+// 		case 19:
+// 		  return 0;
+		  
+// 		case 20:
+// 		case 21:
+// 		case 22:
+// 		case 23:
+// 		case 24:
+// 		case 25:
+// 		  return 0;
+		  
+// 		case 26:
+// 		  return 0;
+// 		}
+// 	    }
+	    
+// 	  default:
+// 	    error();
+	    
+// 	  }
+//       }
+
+
+
+//       // The second-order Bernstein shape functions
+//     case SECOND:
+//       {
+// 	switch (t)
+// 	  {
+// 	    // The 1D Bernstein defined on a three-noded edge
+// 	  case EDGE2:
+// 	  case EDGE3:
+// 	    {
+// 	      assert (n<3);
+// 	      return 1;
+// 	    }
+
+	    
+// 	    // The 2D Bernstein defined on a 6-noded triangle
+// 	  case TRI6:
+// 	    {
+// 	      assert (n<6);
+// 	      return 1;
+// 	    }
+
+// 	    // The 8-noded quadrilateral
+// 	  case QUAD8:
+// 	    {
+// 	      assert (n<8);
+// 	      return 1;
+// 	    }
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD9:
+// 	    {
+// 	      assert (n<9);
+// 	      return 1;
+// 	    }
+
+
+// 	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
+// 	  case TET10:
+// 	    {
+// 	      assert(n<10);
+// 	      return 1;
+// 	    }
+
+// 	    // The 3D Bernsteins defined on a
+// 	    // 20-noded hexahedral.
+// 	  case HEX20:
+// 	    {
+// 	      assert(n<20);
+// 	      return 1;
+// 	    }
+
+// 	    // The 3D tensor-product Bernsteins defined on a
+// 	    // twenty-seven noded hexahedral.
+// 	  case HEX27:
+// 	    {
+// 	      assert(n<27);
+// 	      return 1;
+// 	    }
+	    
+// 	  default:
+// 	    error();
+	    
+// 	  }
+//       }
+
+
+
+//       // The third-order Bernstein shape functions
+//     case THIRD:
+//       {
+// 	switch (t)
+// 	  {
+// 	    // The 1D Bernstein defined on a three-noded edge
+// 	  case EDGE2:
+// 	  case EDGE3:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		  return 1;
+
+// 		case 2:
+// 		  return 2;
+		  
+// 		default:
+// 		  error();		  
+// 		}
+// 	    }
+
+	    
+// 	    // The 2D Bernstein defined on a 6-noded triangle
+// 	  case TRI6:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		  return 1;
+
+// 		case 3:
+// 		case 4:
+// 		case 5:
+// 		  return 2;
+
+// 		case 6:
+// 	      return 1;
+
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+
+
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD8:
+// 	  case QUAD9:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		  return 1;
+
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:
+// 		  return 2;
+		  
+// 		case 8:
+// 		  return 4;
+		  
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+
+
+// 	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
+// 	  case TET10:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		  return 1;
+
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:
+// 		case 8:
+// 		case 9:
+// 		  return 2;
+		  
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+
+// 	    // The 3D tensor-product Bernsteins defined on a
+// 	    // twenty-seven noded hexahedral.
+// 	  case HEX27:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:
+// 		  return 1;
+
+// 		case 8:
+// 		case 9:
+// 		case 10:
+// 		case 11:
+// 		case 12:
+// 		case 13:
+// 		case 14:
+// 		case 15:
+// 		case 16:
+// 		case 17:
+// 		case 18:
+// 		case 19:
+// 		  return 2;
+		  
+// 		case 20:
+// 		case 21:
+// 		case 22:
+// 		case 23:
+// 		case 24:
+// 		case 25:
+// 		  return 4;
+		  
+// 		case 26:
+// 		  return 8;
+// 		}
+// 	    }
+	    
+// 	  default:
+// 	    error();
+	    
+// 	  }
+//       }
+
+
+
+//       // The fourth-order Bernstein shape functions
+//     case FOURTH:
+//       {
+// 	switch (t)
+// 	  {
+// 	    // The 1D Bernstein defined on a three-noded edge
+// 	  case EDGE2:
+// 	  case EDGE3:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		  return 1;
+
+// 		case 2:
+// 		  return 3;
+		  
+// 		default:
+// 		  error();		  
+// 		}
+// 	    }
+
+	    
+// 	    // The 2D Bernstein defined on a 6-noded triangle
+// 	  case TRI6:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		  return 1;
+
+// 		case 3:
+// 		case 4:
+// 		case 5:
+// 		  return 3;
+
+// 		case 6:
+// 		  return 3;
+
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+
+
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD8:
+// 	  case QUAD9:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		  return 1;
+
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:
+// 		  return 3;
+		  
+// 		case 8:
+// 		  return 9;
+		  
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+
+// 	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
+// 	  case TET10:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		  return 1;
+
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:
+// 		case 8:
+//         case 9:
+// 		  return 3;
+		  
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+
+// 	    // The 3D tensor-product Bernsteins defined on a
+// 	    // twenty-seven noded hexahedral.
+// 	  case HEX27:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:
+// 		  return 1;
+
+// 		case 8:
+// 		case 9:
+// 		case 10:
+// 		case 11:
+// 		case 12:
+// 		case 13:
+// 		case 14:
+// 		case 15:
+// 		case 16:
+// 		case 17:
+// 		case 18:
+// 		case 19:
+// 		  return 3;
+		  
+// 		case 20:
+// 		case 21:
+// 		case 22:
+// 		case 23:
+// 		case 24:
+// 		case 25:
+// 		  return 9;
+		  
+// 		case 26:
+// 		  return 27;
+// 		}
+// 	    }
+	    
+// 	  default:
+// 	    error();
+	    
+// 	  }
+//       }
+
+
+
+//       // The fifth-order Bernstein shape functions
+//     case FIFTH:
+//       {
+// 	switch (t)
+// 	  {
+// 	    // The 1D  Bernstein defined on a three-noded edge
+// 	  case EDGE2:
+// 	  case EDGE3:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		  return 1;
+
+// 		case 2:
+// 		  return 4;
+		  
+// 		default:
+// 		  error();		  
+// 		}
+// 	    }
+
+	    
+// 	    // The 2D Bernstein defined on a 6-noded triangle
+// 	  case TRI6:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		  return 1;
+
+// 		case 3:
+// 		case 4:
+// 		case 5:
+// 		  return 4;
+
+// 		case 6:
+// 		  return 6;
+
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+
+
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD8:
+// 	  case QUAD9:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		  return 1;
+
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:
+// 		  return 4;
+		  
+// 		case 8:
+// 		  return 16;
+		  
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+
+// 	    // The 3D tensor-product Bernsteins defined on a
+// 	    // twenty-seven noded hexahedral.
+// 	  case HEX27:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:
+// 		  return 1;
+
+// 		case 8:
+// 		case 9:
+// 		case 10:
+// 		case 11:
+// 		case 12:
+// 		case 13:
+// 		case 14:
+// 		case 15:
+// 		case 16:
+// 		case 17:
+// 		case 18:
+// 		case 19:
+// 		  return 4;
+		  
+// 		case 20:
+// 		case 21:
+// 		case 22:
+// 		case 23:
+// 		case 24:
+// 		case 25:
+// 		  return 16;
+		  
+// 		case 26:
+// 		  return 64;
+// 		}
+// 	    }
+	    
+// 	  default:
+// 	    error();
+	    
+// 	  } // switch ElemType
+//       } // case FIFTH
+
+
+//       // The sixth-order Bernstein shape functions
+//     case SIXTH:
+//       {
+// 	switch (t)
+// 	  {
+// 	    // The 1D Bernstein defined on a three-noded edge
+// 	  case EDGE2:
+// 	  case EDGE3:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		  return 1;
+
+// 		case 2:
+// 		  return 5;
+		  
+// 		default:
+// 		  error();		  
+// 		}
+// 	    }
+
+	    
+// 	    // The 2D Bernstein defined on a 6-noded triangle
+// 	  case TRI6:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		  return 1;
+
+// 		case 3:
+// 		case 4:
+// 		case 5:
+// 		  return 5;
+
+// 		case 6:
+// 		  return 10;
+
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+
+
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD8:
+// 	  case QUAD9:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		  return 1;
+
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:
+// 		  return 5;
+		  
+// 		case 8:
+// 		  return 25;
+		  
+// 		default:
+// 		  error();
+// 		}
+// 	    }
+
+// 	    // The 3D tensor-product Bernsteins defined on a
+// 	    // twenty-seven noded hexahedral.
+// 	  case HEX27:
+// 	    {
+// 	      switch (n)
+// 		{
+// 		case 0:
+// 		case 1:
+// 		case 2:
+// 		case 3:
+// 		case 4:
+// 		case 5:
+// 		case 6:
+// 		case 7:
+// 		  return 1;
+
+// 		case 8:
+// 		case 9:
+// 		case 10:
+// 		case 11:
+// 		case 12:
+// 		case 13:
+// 		case 14:
+// 		case 15:
+// 		case 16:
+// 		case 17:
+// 		case 18:
+// 		case 19:
+// 		  return 5;
+		  
+// 		case 20:
+// 		case 21:
+// 		case 22:
+// 		case 23:
+// 		case 24:
+// 		case 25:
+// 		  return 25;
+		  
+// 		case 26:
+// 		  return 125;
+// 		}
+// 	    }
+	    
+// 	  default:
+// 	    error();
+	    
+// 	  } // switch ElemType
+//       } // case SIXTH
+
+      
+//     default:
+//       error();
+//       
+//     }
+  
+//   error();
+//   return 0;
+
 }
 
 
@@ -1091,291 +1278,324 @@ template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 					const Order o)
 {
-  switch (o)
+  switch (t)
     {
-      // The first-order Bernstein shape functions
-    case FIRST:
-      {
-	switch (t)
-	  {
-	    // The 1D Bernstein defined on a two-noded edge
-	  case EDGE2:
-	    return 0;
-	    
-	    // The 1D Bernstein defined on a three-noded edge
-	  case EDGE3:
-	    return 0;
-	    
-	    // The 2D Bernstein defined on a 6-noded triangle
-	  case TRI6:
-	    return 0;
+    case EDGE2:
+    case EDGE3:
+      return 0;
+    case TRI3:
+    case QUAD4:
+      return 0;
+    case TRI6:
+      return ((o-1)*(o-2)/2);
+    case QUAD8:
+    case QUAD9:
+      return ((o-1)*(o-1));
+    case HEX8:
+      assert(o < 2);
+    case HEX20:
+      assert(o < 3);
+      return 0;
+    case HEX27:
+      return ((o-1)*(o-1)*(o-1));
+    case TET4:
+      assert (o<2);
+    case TET10:
+      assert (o<3);
+	return 0;
+    default:
+      error();
+    }
 
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD8:
-	    return 0;
-	    
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD9:
-	    return 0;
-	    
-	    // The 3D Bernsteins defined on a four-noded hexahedral.
-	  case TET4:
-	    return 0;
-	    
-	    // The 3D Bernsteins defined on a ten-noded hexahedral.
-	  case TET10:
-	    return 0;
-	    
-	    // The 3D Bernsteins defined on a 20-noded hexahedral.
-	  case HEX20:
-	    return 0;
+  error();
+  return 0;
 
-	    // The 3D tensor-product Bernsteins defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    return 0;
+//   switch (o)
+//     {
+//       // The first-order Bernstein shape functions
+//     case FIRST:
+//       {
+// 	switch (t)
+// 	  {
+// 	    // The 1D Bernstein defined on a two-noded edge
+// 	  case EDGE2:
+// 	    return 0;
+	    
+// 	    // The 1D Bernstein defined on a three-noded edge
+// 	  case EDGE3:
+// 	    return 0;
+	    
+// 	    // The 2D Bernstein defined on a 6-noded triangle
+// 	  case TRI6:
+// 	    return 0;
+
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD8:
+// 	    return 0;
+	    
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD9:
+// 	    return 0;
+	    
+// 	    // The 3D Bernsteins defined on a four-noded hexahedral.
+// 	  case TET4:
+// 	    return 0;
+	    
+// 	    // The 3D Bernsteins defined on a ten-noded hexahedral.
+// 	  case TET10:
+// 	    return 0;
+	    
+// 	    // The 3D Bernsteins defined on a 20-noded hexahedral.
+// 	  case HEX20:
+// 	    return 0;
+
+// 	    // The 3D tensor-product Bernsteins defined on a
+// 	    // twenty-seven noded hexahedral.
+// 	  case HEX27:
+// 	    return 0;
 	    
 	    
-	  default:
-	    error();
+// 	  default:
+// 	    error();
 	    
-	  }
-      }
+// 	  }
+//       }
 
 
 
-      // The second-order Bernstein shape functions
-    case SECOND:
-      {
-	switch (t)
-	  {
-	    // The 1D Bernstein defined on a two-noded edge
-	  case EDGE2:
-	    return 1;
+//       // The second-order Bernstein shape functions
+//     case SECOND:
+//       {
+// 	switch (t)
+// 	  {
+// 	    // The 1D Bernstein defined on a two-noded edge
+// 	  case EDGE2:
+// 	    return 1;
 	    
-	    // The 1D Bernstein defined on a three-noded edge
-	  case EDGE3:
-	    return 0;
+// 	    // The 1D Bernstein defined on a three-noded edge
+// 	  case EDGE3:
+// 	    return 0;
 	    
-	    // The 2D Bernstein defined on a 6-noded triangle
-	  case TRI6:
-	    return 0;
+// 	    // The 2D Bernstein defined on a 6-noded triangle
+// 	  case TRI6:
+// 	    return 0;
 
-	    // The 2D tensor-product Bernsteins defined on a
-	    // eight-noded quadrilateral.
-	  case QUAD8:
-	    return 0;
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // eight-noded quadrilateral.
+// 	  case QUAD8:
+// 	    return 0;
 
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD9:
-	    return 0;
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD9:
+// 	    return 0;
 	    	    
-	    // The 3D Bernsteins defined on a ten-noded hexahedral.
-	  case TET10:
-	    return 0;
+// 	    // The 3D Bernsteins defined on a ten-noded hexahedral.
+// 	  case TET10:
+// 	    return 0;
 	    	    
-	    // The 3D Bernsteins defined on a 20-noded hexahedral.
-	  case HEX20:
-	    return 0;
+// 	    // The 3D Bernsteins defined on a 20-noded hexahedral.
+// 	  case HEX20:
+// 	    return 0;
 
-	    // The 3D tensor-product Bernsteins defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    return 0;
+// 	    // The 3D tensor-product Bernsteins defined on a
+// 	    // twenty-seven noded hexahedral.
+// 	  case HEX27:
+// 	    return 0;
 
 
 	    
-	  default:
-	    error();
+// 	  default:
+// 	    error();
 	    
-	  }
-      }
+// 	  }
+//       }
 
 
 
-      // The third-order Bernstein shape functions
-    case THIRD:
-      {
-	switch (t)
-	  {
-	    // The 1D Bernstein defined on a two-noded edge
-	  case EDGE2:
-	    return 2;
+//       // The third-order Bernstein shape functions
+//     case THIRD:
+//       {
+// 	switch (t)
+// 	  {
+// 	    // The 1D Bernstein defined on a two-noded edge
+// 	  case EDGE2:
+// 	    return 2;
 	    
-	    // The 1D Bernstein defined on a three-noded edge
-	  case EDGE3:
-	    return 0;
+// 	    // The 1D Bernstein defined on a three-noded edge
+// 	  case EDGE3:
+// 	    return 0;
 	    
-	    // The 2D Bernstein defined on a 6-noded triangle
-	  case TRI6:
-	    return 1;
+// 	    // The 2D Bernstein defined on a 6-noded triangle
+// 	  case TRI6:
+// 	    return 1;
 	    
-	    // The 2D tensor-product Bernsteins defined on a
-	    // eight-noded quadrilateral.
-	  case QUAD8:
-	    return 4;
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // eight-noded quadrilateral.
+// 	  case QUAD8:
+// 	    return 4;
 
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD9:
-	    return 0;
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD9:
+// 	    return 0;
 	    	    
-	    // The 3D Bernsteins defined on a ten-noded hexahedral.
-	  case TET10:
-	    return 4;
+// 	    // The 3D Bernsteins defined on a ten-noded hexahedral.
+// 	  case TET10:
+// 	    return 4;
 	    
-	    // The 3D tensor-product Bernsteins defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    return 0;
+// 	    // The 3D tensor-product Bernsteins defined on a
+// 	    // twenty-seven noded hexahedral.
+// 	  case HEX27:
+// 	    return 0;
 
 
 	    
-	  default:
-	    error();
+// 	  default:
+// 	    error();
 	    
-	  }
-      }
+// 	  }
+//       }
 
 
 
-      // The fourth-order Bernstein shape functions
-    case FOURTH:
-      {
-	switch (t)
-	  {
-	    // The 1D Bernstein defined on a two-noded edge
-	  case EDGE2:
-	    return 3;
+//       // The fourth-order Bernstein shape functions
+//     case FOURTH:
+//       {
+// 	switch (t)
+// 	  {
+// 	    // The 1D Bernstein defined on a two-noded edge
+// 	  case EDGE2:
+// 	    return 3;
 	    
-	    // The 1D Bernstein defined on a three-noded edge
-	  case EDGE3:
-	    return 0;
+// 	    // The 1D Bernstein defined on a three-noded edge
+// 	  case EDGE3:
+// 	    return 0;
 	    
-	    // The 2D Bernstein defined on a 6-noded triangle
-	  case TRI6:
-	    return 3;
+// 	    // The 2D Bernstein defined on a 6-noded triangle
+// 	  case TRI6:
+// 	    return 3;
 	    
-	    // The 2D tensor-product Bernsteins defined on a
-	    // eight-noded quadrilateral.
-	  case QUAD8:
-	    return 9;
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // eight-noded quadrilateral.
+// 	  case QUAD8:
+// 	    return 9;
 
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD9:
-	    return 0;
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD9:
+// 	    return 0;
 	    
-	    // The 3D Bernsteins defined on a ten-noded hexahedral.
-	  case TET10:
-	    return 13;
+// 	    // The 3D Bernsteins defined on a ten-noded hexahedral.
+// 	  case TET10:
+// 	    return 13;
 	               	    
-	    // The 3D tensor-product Bernsteins defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    return 0;
+// 	    // The 3D tensor-product Bernsteins defined on a
+// 	    // twenty-seven noded hexahedral.
+// 	  case HEX27:
+// 	    return 0;
 
 
 	    
-	  default:
-	    error();
+// 	  default:
+// 	    error();
 	    
-	  }
-      }
+// 	  }
+//       }
 
 
 
-      // The fifth-order Bernstein shape functions
-    case FIFTH:
-      {
-	switch (t)
-	  {
-	    // The 1D Bernstein defined on a two-noded edge
-	  case EDGE2:
-	    return 4;
+//       // The fifth-order Bernstein shape functions
+//     case FIFTH:
+//       {
+// 	switch (t)
+// 	  {
+// 	    // The 1D Bernstein defined on a two-noded edge
+// 	  case EDGE2:
+// 	    return 4;
 	    
-	    // The 1D Bernstein defined on a three-noded edge
-	  case EDGE3:
-	    return 0;
+// 	    // The 1D Bernstein defined on a three-noded edge
+// 	  case EDGE3:
+// 	    return 0;
 	    
-	    // The 2D Bernstein defined on a 6-noded triangle
-	  case TRI6:
-	    return 6;
+// 	    // The 2D Bernstein defined on a 6-noded triangle
+// 	  case TRI6:
+// 	    return 6;
 	    
-	    // The 2D tensor-product Bernsteins defined on a
-	    // eight-noded quadrilateral.
-	  case QUAD8:
-	    return 16;
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // eight-noded quadrilateral.
+// 	  case QUAD8:
+// 	    return 16;
 
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD9:
-	    return 0;
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD9:
+// 	    return 0;
 	    
-	    // The 3D tensor-product Bernsteins defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    return 0;
-
-
-	    
-	  default:
-	    error();
-	    
-	  }
-      }
-
-
-
-      // The sixth-order Bernstein shape functions
-    case SIXTH:
-      {
-	switch (t)
-	  {
-	    // The 1D Bernstein defined on a two-noded edge
-	  case EDGE2:
-	    return 5;
-	    
-	    // The 1D Bernstein defined on a three-noded edge
-	  case EDGE3:
-	    return 0;
-	    
-	    // The 2D Bernstein defined on a 6-noded triangle
-	  case TRI6:
-	    return 10;
-	    
-	    // The 2D tensor-product Bernsteins defined on a
-	    // eight-noded quadrilateral.
-	  case QUAD8:
-	    return 25;
-
-	    // The 2D tensor-product Bernsteins defined on a
-	    // nine-noded quadrilateral.
-	  case QUAD9:
-	    return 0;
-	    
-	    // The 3D tensor-product Bernsteins defined on a
-	    // twenty-seven noded hexahedral.
-	  case HEX27:
-	    return 0;
+// 	    // The 3D tensor-product Bernsteins defined on a
+// 	    // twenty-seven noded hexahedral.
+// 	  case HEX27:
+// 	    return 0;
 
 
 	    
-	  default:
-	    error();
+// 	  default:
+// 	    error();
 	    
-	  }
-      }
+// 	  }
+//       }
+
+
+
+//       // The sixth-order Bernstein shape functions
+//     case SIXTH:
+//       {
+// 	switch (t)
+// 	  {
+// 	    // The 1D Bernstein defined on a two-noded edge
+// 	  case EDGE2:
+// 	    return 5;
+	    
+// 	    // The 1D Bernstein defined on a three-noded edge
+// 	  case EDGE3:
+// 	    return 0;
+	    
+// 	    // The 2D Bernstein defined on a 6-noded triangle
+// 	  case TRI6:
+// 	    return 10;
+	    
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // eight-noded quadrilateral.
+// 	  case QUAD8:
+// 	    return 25;
+
+// 	    // The 2D tensor-product Bernsteins defined on a
+// 	    // nine-noded quadrilateral.
+// 	  case QUAD9:
+// 	    return 0;
+	    
+// 	    // The 3D tensor-product Bernsteins defined on a
+// 	    // twenty-seven noded hexahedral.
+// 	  case HEX27:
+// 	    return 0;
+
+
+	    
+// 	  default:
+// 	    error();
+	    
+// 	  }
+//       }
 
 
       
-      // Otherwise no DOFS per element
-    default:
-      return 0;
-    }
+//       // Otherwise no DOFS per element
+//     default:
+//       return 0;
+//     }
+
 }
 
 template <unsigned int Dim, FEFamily T>
