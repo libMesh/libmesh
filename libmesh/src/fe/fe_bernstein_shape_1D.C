@@ -1,4 +1,4 @@
-// $Id: fe_bernstein_shape_1D.C,v 1.2 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_bernstein_shape_1D.C,v 1.3 2006-05-02 17:36:30 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,7 +35,7 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
 			    const unsigned int i,
 			    const Point& p)
 {
-  const Real xi = p(0);	   
+  const Real xi = p(0);
   using Utility::pow;
   
   switch (order)
@@ -152,7 +152,36 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
       
     default:
       {
-	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+	assert (order>6);
+
+	// Use this for arbitrary orders.
+	// Note that this implementation is less efficient.
+	const int p_order = static_cast<unsigned int>(order);
+	const int m       = p_order-i+1;
+	const int n       = (i-1);
+	
+	unsigned int binomial_p_i = 1;
+	
+	// the binomial coefficient (p choose n)
+	if (i>1)
+	  binomial_p_i = Utility::factorial(p_order)
+	    / (Utility::factorial(n)*Utility::factorial(p_order-n));
+	
+	
+	switch(i)
+	  {
+	  case 0:
+	    return binomial_p_i * std::pow((1.-xi)/2.,p_order);
+	  case 1:
+	    return binomial_p_i * std::pow((1.+xi)/2.,p_order);
+	  default:
+	    {
+	      return binomial_p_i * std::pow((1.+xi)/2.,n)
+		                  * std::pow((1.-xi)/2.,m);
+	    }
+	  }
+
+	// we should never get here
 	error();
       }
     }
@@ -303,9 +332,41 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
       
       
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
-      
+      {
+	assert (order>6);
+
+	// Use this for arbitrary orders
+	const int p_order = static_cast<unsigned int>(order);
+	const int m       = p_order-(i-1);
+	const int n       = (i-1);
+	
+	unsigned int binomial_p_i = 1;
+
+	// the binomial coefficient (p choose n)	
+	if (i>1)
+	  binomial_p_i = Utility::factorial(p_order)
+	    / (Utility::factorial(n)*Utility::factorial(p_order-n));
+	
+	
+	
+	switch(i)
+	  {
+	  case 0:
+	    return binomial_p_i * (-1./2.) * p_order * std::pow((1.-xi)/2.,p_order-1);
+	  case 1:
+	    return binomial_p_i * ( 1./2.) * p_order * std::pow((1.+xi)/2.,p_order-1);
+	    
+	  default:
+	    {
+	      return binomial_p_i * (1./2. * n * std::pow((1.+xi)/2.,n-1) * std::pow((1.-xi)/2.,m)
+				   - 1./2. * m * std::pow((1.+xi)/2.,n)   * std::pow((1.-xi)/2.,m-1));
+	    }
+	  }
+	
+	// we should never get here
+	error();
+      }      
+
     }
   
   error();
