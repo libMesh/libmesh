@@ -1,4 +1,4 @@
-// $Id: fe_bernstein.C,v 1.4 2006-05-02 17:36:30 spetersen Exp $
+// $Id: fe_bernstein.C,v 1.5 2006-05-15 09:06:58 spetersen Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -126,7 +126,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       assert(o < 2);
     case QUAD8:
       {
-	if (o == 2)
+	if (o == 1)
+	  return 4;
+	else if (o == 2)
 	  return 8;
 	else
 	  error();  
@@ -137,7 +139,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       assert(o < 2);
     case HEX20:
       {
-	if (o == 2)
+	if (o == 1)
+	  return 8;
+	else if (o == 2)
 	  return 20;
 	else
 	  error();
@@ -1289,6 +1293,8 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
     case TRI6:
       return ((o-1)*(o-2)/2);
     case QUAD8:
+      if (o <= 2)
+	return 0;
     case QUAD9:
       return ((o-1)*(o-1));
     case HEX8:
