@@ -1,0 +1,489 @@
+// $Id: hp_selector.C,v 1.1 2006-05-19 22:13:00 roystgnr Exp $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+// C++ includes
+#include <limits> // for std::numeric_limits::max
+#include <math.h>    // for sqrt
+
+
+// Local Includes
+#include "hp_selector.h"
+#include "dense_matrix.h"
+#include "dense_vector.h"
+#include "dof_map.h"
+#include "fe_base.h"
+#include "fe_interface.h"
+#include "libmesh_logging.h"
+#include "elem.h"
+#include "mesh.h"
+#include "quadrature.h"
+#include "system.h"
+
+//-----------------------------------------------------------------
+// HPSelector implementations
+
+void HPSelector::select_refinement (System &system)
+{
+  START_LOG("select_refinement()", "HPSelector");
+
+  // The current mesh
+  const Mesh& mesh = system.get_mesh();
+
+  // The dimensionality of the mesh
+  const unsigned int dim = mesh.mesh_dimension();
+  
+  // The number of variables in the system
+  const unsigned int n_vars = system.n_vars();
+  
+  // The DofMap for this system
+  const DofMap& dof_map = system.get_dof_map();
+
+  // The system number (for doing bad hackery)
+  const unsigned int sys_num = system.number();
+
+  // Check for a valid component_mask
+  if (!component_scale.empty())
+    {
+      if (component_scale.size() != n_vars)
+	{
+	  std::cerr << "ERROR: component_scale is the wrong size:"
+		    << std::endl
+		    << " component_scale.size()=" << component_scale.size()
+		    << std::endl
+		    << " n_vars=" << n_vars
+		    << std::endl;
+	  error();
+	}
+    }
+  else
+    {
+      // No specified scaling.  Scale all variables by one.
+      component_scale.resize (n_vars, 1.0);
+    }
+
+  // Resize the error_per_cell vectors to handle
+  // the number of elements, initialize them to 0.
+  std::vector<float> h_error_per_cell(mesh.n_elem(), 0.);
+  std::vector<float> p_error_per_cell(mesh.n_elem(), 0.);
+  
+  // Loop over all the variables in the system
+  for (unsigned int var=0; var<n_vars; var++)
+    {
+      // Possibly skip this variable
+      if (!component_scale.empty())
+	if (component_scale[var] == 0.0) continue;
+      
+      // The type of finite element to use for this variable
+      const FEType& fe_type = dof_map.variable_type (var);
+
+      FEType low_p_fe_type = fe_type;
+      FEType high_p_fe_type = fe_type;
+
+      // Finite element objects for a fine (and probably a coarse)
+      // element will be needed
+      AutoPtr<FEBase> fe (FEBase::build (dim, fe_type));
+      AutoPtr<FEBase> fe_coarse (FEBase::build (dim, fe_type));
+
+      const FEContinuity cont = fe->get_continuity();
+      assert (cont == DISCONTINUOUS || cont == C_ZERO || 
+	      cont == C_ONE);
+
+      // Build an appropriate quadrature rule
+      AutoPtr<QBase> qrule(fe_type.default_quadrature_rule(dim-1));
+
+      // Tell the refined finite element about the quadrature
+      // rule.  The coarse finite element need not know about it
+      fe->attach_quadrature_rule (qrule.get());
+
+      // We will always do the integration
+      // on the fine elements.  Get their Jacobian values, etc..
+      const std::vector<Real>&  JxW     = fe->get_JxW();
+      const std::vector<Point>& xyz_values  = fe->get_xyz();
+
+      // The quadrature points on the coarse element.  These will be
+      // computed from the quadrature points on the fine element.
+      std::vector<Point> coarse_qpoints;
+      
+      // The shape functions
+      const std::vector<std::vector<Real> > & phi = fe->get_phi();
+      const std::vector<std::vector<Real> > & phi_coarse =
+					      fe_coarse->get_phi();
+      // The shape function derivatives
+      const std::vector<std::vector<RealGradient> > *p_dphi, *p_dphi_coarse;
+      if (cont == C_ZERO || cont == C_ONE)
+	{
+	  p_dphi = &(fe->get_dphi());
+	  p_dphi_coarse = &(fe_coarse->get_dphi());
+	}
+      const std::vector<std::vector<RealGradient> > & dphi = *p_dphi;
+      const std::vector<std::vector<RealGradient> > & dphi_coarse = *p_dphi_coarse;
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+      // The shape function second derivatives
+      const std::vector<std::vector<RealTensor> > *p_d2phi, *p_d2phi_coarse;
+      if (cont == C_ONE)
+	{
+	  p_d2phi = &(fe->get_d2phi());
+	  p_d2phi_coarse = &(fe_coarse->get_d2phi());
+	}
+
+      const std::vector<std::vector<RealTensor> > & d2phi = *p_d2phi;
+      const std::vector<std::vector<RealTensor> > & d2phi_coarse = *p_d2phi_coarse;
+#endif // defined (ENABLE_SECOND_DERIVATIVES)
+
+      // The global DOF indices for the fine element
+      std::vector<unsigned int> dof_indices;
+
+      // The local projection problem for the coarse element
+      DenseMatrix<Number> Ke;
+      DenseVector<Number> Fe, Ue;
+
+      // The current coarse element
+      const Elem *coarse = NULL;
+
+      // Iterate over all the active elements in the mesh
+      // that live on this processor.
+
+      MeshBase::const_element_iterator       elem_it  =
+		      mesh.active_local_elements_begin();
+      const MeshBase::const_element_iterator elem_end =
+		      mesh.active_local_elements_end(); 
+
+      for (; elem_it != elem_end; ++elem_it)
+	{
+	  const Elem* elem = *elem_it;
+
+	  // We're only checking elements that are already flagged for h
+          // refinement
+          if (elem->refinement_flag() != Elem::REFINE)
+            continue;
+
+          const unsigned int e_id = elem->id();
+
+          // Find the projection onto the parent element,
+          // if necessary
+          if (elem->parent() && coarse != elem->parent())
+            {
+              coarse = elem->parent();
+              
+              // The number of DOFS on the coarse element
+              unsigned int n_coarse_dofs = 0;
+
+	      // FIXME - we need to integrate over all active
+	      // descendants, not all children!
+              for (unsigned int c = 0; c != coarse->n_children(); ++c)
+                {
+                  Elem *child = coarse->child(c);
+	          fe->reinit(child);
+
+                  dof_map.dof_indices(child, dof_indices, var);
+                  const unsigned int n_qp = qrule->n_points();
+
+                  // The number of DOFS on the fine element
+                  const unsigned int n_dofs = dof_indices.size();
+
+if (n_dofs > 8) assert(dof_indices[8] < 1000000);
+
+                  FEInterface::inverse_map (dim, fe_type, elem,
+                    xyz_values, coarse_qpoints);
+
+                  fe_coarse->reinit(coarse, &coarse_qpoints);
+
+                  if (!n_coarse_dofs)
+                    {
+                      n_coarse_dofs = phi_coarse.size();
+                      Ke.resize(n_coarse_dofs, n_coarse_dofs); Ke.zero();
+                      Fe.resize(n_coarse_dofs); Fe.zero();
+                    }
+                  assert(n_coarse_dofs == phi_coarse.size());
+
+                  // Loop over the quadrature points
+                  for (unsigned int qp=0; qp<n_qp; qp++)
+                    {
+                      // The solution value at the quadrature point
+                      Number val = libMesh::zero;
+                      Gradient grad;
+                      Tensor hess;
+
+                      for (unsigned int i=0; i != n_dofs; i++)
+                        {
+                          unsigned int dof_num = dof_indices[i];
+                          val += phi[i][qp] *
+                            system.current_solution(dof_num);
+                          if (cont == C_ZERO || cont == C_ONE)
+                            grad += dphi[i][qp] *
+                              system.current_solution(dof_num);
+                          if (cont == C_ONE)
+                            hess += d2phi[i][qp] *
+                              system.current_solution(dof_num);
+if (n_dofs > 8) assert(dof_indices[8] < 1000000);
+
+                        }
+
+                      // The projection matrix and vector
+                      for (unsigned int i=0; i != n_coarse_dofs; ++i)
+                        {
+                          Fe(i) += JxW[qp] * 
+                            phi_coarse[i][qp]*val;
+                          if (cont == C_ZERO || cont == C_ONE)
+                            Fe(i) += JxW[qp] *
+                              dphi_coarse[i][qp]*grad;
+                          if (cont == C_ONE)
+                            Fe(i) += JxW[qp] *
+                              d2phi_coarse[i][qp].contract(hess);
+
+                          for (unsigned int j=0; j != n_coarse_dofs; ++j)
+                            {
+                              Ke(i,j) += JxW[qp] *
+                                phi_coarse[i][qp]*phi_coarse[j][qp];
+                              if (cont == C_ZERO || cont == C_ONE)
+                                Ke(i,j) += JxW[qp] *
+                                  dphi_coarse[i][qp]*dphi_coarse[j][qp];
+                              if (cont == C_ONE)
+                                Ke(i,j) += JxW[qp] *
+                                  (d2phi_coarse[i][qp].contract(d2phi_coarse[j][qp]));
+                            }
+                        }
+                    }
+
+                }
+
+              // Solve the projection problem
+              Ke.cholesky_solve(Fe, Ue);
+            }
+
+	  fe->reinit(elem);
+	  
+          // Get the DOF indices for the fine element
+          dof_map.dof_indices (elem, dof_indices, var);
+
+          // The number of quadrature points
+          const unsigned int n_qp = qrule->n_points();
+
+          // The number of DOFS on the fine element
+          const unsigned int n_dofs = dof_indices.size();
+
+          // The number of nodes on the fine element
+          const unsigned int n_nodes = elem->n_nodes();
+
+	  // The average element value (used as an ugly hack
+          // when we have nothing p-coarsened to compare to)
+          Real average_val = 0.;
+
+	  // Calculate this variable's contribution to the p
+	  // refinement error
+
+	  if (elem->p_level() == 0)
+	    {
+              unsigned int n_vertices = 0;
+              for (unsigned int n = 0; n != n_nodes; ++n)
+                if (elem->is_vertex(n))
+                  {
+                    n_vertices++;
+                    const Node * const node = elem->get_node(n);
+                    average_val += system.current_solution
+                      (node->dof_number(sys_num,var,0));
+                  }
+              average_val /= n_vertices;
+	    }
+
+          // loop over the integration points on the fine element
+          for (unsigned int qp=0; qp<n_qp; qp++)
+            {
+              Number value_error = 0.;
+              Gradient grad_error;
+              Tensor hessian_error;
+	      if (elem->p_level() == 0)
+	        {
+                  for (unsigned int i=0; i<n_dofs; i++)
+                    {
+                      const unsigned int dof_num = dof_indices[i];
+                      value_error += phi[i][qp] *
+                        system.current_solution(dof_num);
+                      if (cont == C_ZERO || cont == C_ONE)
+                        grad_error += dphi[i][qp] *
+                          system.current_solution(dof_num);
+                      if (cont == C_ONE)
+                        hessian_error += d2phi[i][qp] *
+                          system.current_solution(dof_num);
+                    }
+	        }
+	      else
+	        {
+	          // Integration of only the highest order hierarchical
+	          // shape functions
+
+                  low_p_fe_type.order =
+		    static_cast<Order>(fe_type.order + elem->p_level() - 1);
+                  high_p_fe_type.order =
+                    static_cast<Order>(fe_type.order + elem->p_level());
+
+                  for (unsigned int n = 0; n != n_nodes; ++n)
+                    {
+                      const Node * const node = elem->get_node(n);
+                      const unsigned int low_nc = FEInterface::n_dofs_at_node
+                        (dim, low_p_fe_type, elem->type(), n);
+                      const unsigned int high_nc = FEInterface::n_dofs_at_node
+                        (dim, high_p_fe_type, elem->type(), n);
+
+                      if (elem->is_vertex(n))
+                        {
+                          // Sum high p vertex shape functions
+                          for (unsigned int i = low_nc; i != high_nc; ++i)
+                            {
+                              unsigned int dof_num = node->dof_number(sys_num,var,i);
+                              value_error += phi[i][qp] *
+                                system.current_solution(dof_num);
+                              if (cont == C_ZERO || cont == C_ONE)
+                                grad_error += dphi[i][qp] *
+                                  system.current_solution(dof_num);
+                              if (cont == C_ONE)
+                                hessian_error += d2phi[i][qp] *
+                                  system.current_solution(dof_num);
+                            }
+                          value_error -= average_val;
+                        }
+                      else
+                        {
+                          const unsigned int total_dofs = node->n_comp(sys_num, var);
+                          assert(total_dofs >= high_nc);
+			  // Sum high p non-vertex shape functions, which are
+                          // numbered in reverse
+                          for (unsigned int j = low_nc; j != high_nc; ++j)
+                            {
+                              const unsigned int i = total_dofs - j - 1;
+                              unsigned int dof_num = node->dof_number(sys_num,var,i);
+                              value_error += phi[i][qp] *
+                                system.current_solution(dof_num);
+                              if (cont == C_ZERO || cont == C_ONE)
+                                grad_error += dphi[i][qp] *
+                                  system.current_solution(dof_num);
+                              if (cont == C_ONE)
+                                hessian_error += d2phi[i][qp] *
+                                  system.current_solution(dof_num);
+                            }
+                        }
+
+                    }
+	        }
+
+	      p_error_per_cell[e_id] += component_scale[var] * JxW[qp] *
+                value_error * value_error;
+              if (cont == C_ZERO || cont == C_ONE)
+	        p_error_per_cell[e_id] += component_scale[var] * JxW[qp] *
+                  grad_error * grad_error;
+              if (cont == C_ONE)
+	        p_error_per_cell[e_id] += component_scale[var] * JxW[qp] *
+                  hessian_error.contract(hessian_error);
+            }
+
+	  // Calculate this variable's contribution to the h
+	  // refinement error
+
+          if (!elem->parent())
+            {
+              // For now, we'll always start with an h refinement
+              h_error_per_cell[e_id] = std::numeric_limits<float>::max() / 2;
+            }
+          else
+            {
+              FEInterface::inverse_map (dim, fe_type, elem,
+                xyz_values, coarse_qpoints);
+
+              fe_coarse->reinit(coarse, &coarse_qpoints);
+
+              // The number of DOFS on the coarse element
+              unsigned int n_coarse_dofs = phi_coarse.size();
+
+              // Loop over the quadrature points
+              for (unsigned int qp=0; qp<n_qp; qp++)
+                {
+                  // The solution difference at the quadrature point
+                  Number value_error = libMesh::zero;
+                  Gradient grad_error;
+                  Tensor hessian_error;
+
+                  for (unsigned int i=0; i != n_dofs; ++i)
+                    {
+                      const unsigned int dof_num = dof_indices[i];
+                      value_error += phi[i][qp] *
+                        system.current_solution(dof_num);
+                      if (cont == C_ZERO || cont == C_ONE)
+                        grad_error += dphi[i][qp] *
+                          system.current_solution(dof_num);
+                      if (cont == C_ONE)
+                        hessian_error += d2phi[i][qp] *
+                          system.current_solution(dof_num);
+                    }
+
+                  for (unsigned int i=0; i != n_coarse_dofs; ++i)
+                    {
+                      value_error -= phi[i][qp] * Ue(i);
+                      if (cont == C_ZERO || cont == C_ONE)
+                        grad_error -= dphi[i][qp] * Ue(i);
+                      if (cont == C_ONE)
+                        hessian_error -= d2phi[i][qp] * Ue(i);
+                    }
+
+	          h_error_per_cell[e_id] += component_scale[var] * JxW[qp] *
+                    value_error * value_error;
+                  if (cont == C_ZERO || cont == C_ONE)
+	            h_error_per_cell[e_id] += component_scale[var] * JxW[qp] *
+                      grad_error * grad_error;
+                  if (cont == C_ONE)
+	            h_error_per_cell[e_id] += component_scale[var] * JxW[qp] *
+                      hessian_error.contract(hessian_error);
+                }
+
+            }
+	}
+    }
+
+  // Now that we've got our approximations for p_error and h_error, let's see
+  // if we want to switch any h refinement flags to p refinement
+
+  // Iterate over all the active elements in the mesh
+  // that live on this processor.
+
+  MeshBase::const_element_iterator       elem_it  =
+		  mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator elem_end =
+		  mesh.active_local_elements_end(); 
+
+  for (; elem_it != elem_end; ++elem_it)
+    {
+      Elem* elem = *elem_it;
+
+      // We're only checking elements that are already flagged for h
+      // refinement
+      if (elem->refinement_flag() != Elem::REFINE)
+        continue;
+
+      const unsigned int e_id = elem->id();
+        
+      if (p_error_per_cell[e_id] > h_error_per_cell[e_id])
+        {
+          elem->set_p_refinement_flag(Elem::REFINE);
+          elem->set_refinement_flag(Elem::DO_NOTHING);
+        }
+    }
+
+  STOP_LOG("select_refinement()", "HPSelector");
+}
