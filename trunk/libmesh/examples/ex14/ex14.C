@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.27 2006-04-26 18:50:17 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.28 2006-05-19 22:13:32 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -58,6 +58,7 @@
 #include "error_vector.h"
 #include "exact_error_estimator.h"
 #include "kelly_error_estimator.h"
+#include "hp_selector.h"
 #include "mesh_generation.h"
 #include "mesh_modification.h"
 #include "getpot.h"
@@ -314,10 +315,17 @@ int main(int argc, char** argv)
                 // elements flagged for that instead.
                 if (refine_type == "p")
                   mesh_refinement.switch_h_to_p_refinement();
-                // If we are doing hp refinement, we currently
+                // If we are doing "matched hp" refinement, we
                 // flag elements for both h and p
-                if (refine_type == "hp")
+                if (refine_type == "matchedhp")
                   mesh_refinement.add_p_to_h_refinement();
+                // If we are doing hp refinement, we 
+                // try switching some elements from h to p
+                if (refine_type == "hp")
+	          {
+		    HPSelector hpselector;
+                    hpselector.select_refinement(system);
+	          }
 		
 		// This call actually refines and coarsens the flagged
 		// elements.
