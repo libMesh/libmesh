@@ -1,4 +1,4 @@
-// $Id: hp_selector.h,v 1.1 2006-05-19 22:13:00 roystgnr Exp $
+// $Id: hp_selector.h,v 1.2 2006-05-20 18:24:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -26,10 +26,24 @@
 #include <vector>
 
 // Local Includes
+#include "auto_ptr.h"
+#include "dense_matrix.h"
+#include "dense_vector.h"
 #include "libmesh_common.h"
 
 // Forward Declarations
+class Elem;
+class FEBase;
+class Point;
+class QBase;
 class System;
+template <typename T> class TensorValue;
+template <typename T> class VectorValue;
+typedef VectorValue<Real> RealVectorValue;
+typedef TensorValue<Real> RealTensorValue;
+typedef RealVectorValue RealGradient;
+typedef RealTensorValue RealTensor;
+
 
 /**
  * This class uses the error estimate given by different types of
@@ -72,6 +86,57 @@ public:
    * component_scale[c].
    */
   std::vector<float> component_scale;
+
+protected:
+  /**
+   * The helper function which adds individual fine element data to
+   * the coarse element projection
+   */
+  void add_projection(const System&, const Elem*, unsigned int var);
+
+  /**
+   * The coarse element on which a solution projection is cached
+   */
+  const Elem *coarse;
+
+  /**
+   * Global DOF indices for fine elements
+   */
+  std::vector<unsigned int> dof_indices;
+
+  /**
+   * The finite element objects for fine and coarse elements
+   */
+  AutoPtr<FEBase> fe, fe_coarse;
+
+  /**
+   * The shape functions and their derivatives
+   */
+  const std::vector<std::vector<Real> > *phi, *phi_coarse;
+  const std::vector<std::vector<RealGradient> > *dphi, *dphi_coarse;
+  const std::vector<std::vector<RealTensor> > *d2phi, *d2phi_coarse;
+
+  /**
+   * Mapping jacobians
+   */
+  const std::vector<Real> *JxW;
+
+  /**
+   * Quadrature locations
+   */
+  const std::vector<Point> *xyz_values;
+  std::vector<Point> coarse_qpoints;
+
+  /**
+   * The quadrature rule for the fine element
+   */
+  AutoPtr<QBase> qrule;
+
+  /**
+   * The linear projection to be done on coarse elements
+   */
+  DenseMatrix<Number> Ke;
+  DenseVector<Number> Fe, Ue;
 };
 
 
