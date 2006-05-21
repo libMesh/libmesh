@@ -1,4 +1,4 @@
-// $Id: hp_selector.C,v 1.2 2006-05-20 18:24:16 roystgnr Exp $
+// $Id: hp_selector.C,v 1.3 2006-05-21 16:38:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -52,12 +52,6 @@ void HPSelector::add_projection(const System &system,
       return;
     }
 
-  // The current mesh
-  const Mesh& mesh = system.get_mesh();
-
-  // The dimensionality of the mesh
-  const unsigned int dim = mesh.mesh_dimension();
-  
   // The DofMap for this system
   const DofMap& dof_map = system.get_dof_map();
 
@@ -69,13 +63,9 @@ void HPSelector::add_projection(const System &system,
   fe->reinit(elem);
 
   dof_map.dof_indices(elem, dof_indices, var);
-  const unsigned int n_qp = qrule->n_points();
 
-  // The number of DOFS on the fine element
-  const unsigned int n_dofs = dof_indices.size();
-
-  FEInterface::inverse_map (dim, fe_type, coarse,
-    *xyz_values, coarse_qpoints);
+  FEInterface::inverse_map (system.get_mesh().mesh_dimension(),
+    fe_type, coarse, *xyz_values, coarse_qpoints);
 
   fe_coarse->reinit(coarse, &coarse_qpoints);
 
@@ -89,14 +79,14 @@ void HPSelector::add_projection(const System &system,
   assert(Fe.size() == phi_coarse->size());
 
   // Loop over the quadrature points
-  for (unsigned int qp=0; qp<n_qp; qp++)
+  for (unsigned int qp=0; qp<qrule->n_points(); qp++)
     {
       // The solution value at the quadrature point
       Number val = libMesh::zero;
       Gradient grad;
       Tensor hess;
 
-      for (unsigned int i=0; i != n_dofs; i++)
+      for (unsigned int i=0; i != dof_indices.size(); i++)
         {
           unsigned int dof_num = dof_indices[i];
           val += (*phi)[i][qp] *
@@ -107,8 +97,6 @@ void HPSelector::add_projection(const System &system,
           if (cont == C_ONE)
             hess += (*d2phi)[i][qp] *
               system.current_solution(dof_num);
-if (n_dofs > 8) assert(dof_indices[8] < 1000000);
-
         }
 
       // The projection matrix and vector
@@ -202,6 +190,7 @@ void HPSelector::select_refinement (System &system)
 
       // Any cached coarse element results have expired
       coarse = NULL;
+      unsigned int cached_coarse_p_level = 0;
 
       const FEContinuity cont = fe->get_continuity();
       assert (cont == DISCONTINUOUS || cont == C_ZERO || 
@@ -260,13 +249,21 @@ void HPSelector::select_refinement (System &system)
 
           // Find the projection onto the parent element,
           // if necessary
-          if (elem->parent() && coarse != elem->parent())
+          if (elem->parent() &&
+              (coarse != elem->parent() ||
+               cached_coarse_p_level != elem->p_level()))
             {
 	      Fe.resize(0);
 
               coarse = elem->parent();
+              cached_coarse_p_level = elem->p_level();
+
+              unsigned int old_parent_level = coarse->p_level();
+              (const_cast<Elem *>(coarse))->hack_p_level(elem->p_level());
               
               this->add_projection(system, coarse, var);
+
+              (const_cast<Elem *>(coarse))->hack_p_level(old_parent_level);
 
               // Solve the projection problem
               Ke.cholesky_solve(Fe, Ue);
@@ -407,10 +404,15 @@ void HPSelector::select_refinement (System &system)
             }
           else
             {
-              FEInterface::inverse_map (dim, fe_type, elem,
+              FEInterface::inverse_map (dim, fe_type, coarse,
                 *xyz_values, coarse_qpoints);
 
+              unsigned int old_parent_level = coarse->p_level();
+              (const_cast<Elem *>(coarse))->hack_p_level(elem->p_level());
+
               fe_coarse->reinit(coarse, &coarse_qpoints);
+
+              (const_cast<Elem *>(coarse))->hack_p_level(old_parent_level);
 
               // The number of DOFS on the coarse element
               unsigned int n_coarse_dofs = phi_coarse->size();
@@ -438,11 +440,11 @@ void HPSelector::select_refinement (System &system)
 
                   for (unsigned int i=0; i != n_coarse_dofs; ++i)
                     {
-                      value_error -= (*phi)[i][qp] * Ue(i);
+                      value_error -= (*phi_coarse)[i][qp] * Ue(i);
                       if (cont == C_ZERO || cont == C_ONE)
-                        grad_error -= (*dphi)[i][qp] * Ue(i);
+                        grad_error -= (*dphi_coarse)[i][qp] * Ue(i);
                       if (cont == C_ONE)
-                        hessian_error -= (*d2phi)[i][qp] * Ue(i);
+                        hessian_error -= (*d2phi_coarse)[i][qp] * Ue(i);
                     }
 
 	          h_error_per_cell[e_id] += component_scale[var] * 
@@ -480,8 +482,46 @@ void HPSelector::select_refinement (System &system)
         continue;
 
       const unsigned int e_id = elem->id();
+
+      unsigned int dofs_per_elem = 0, dofs_per_p_elem = 0;
+
+      // Loop over all the variables in the system
+      for (unsigned int var=0; var<n_vars; var++)
+        {
+          // The type of finite element to use for this variable
+          const FEType& fe_type = dof_map.variable_type (var);
+
+          // FIXME: we're overestimating the number of DOFs added by h
+          // refinement
+          FEType elem_fe_type = fe_type;
+          elem_fe_type.order =
+            static_cast<Order>(fe_type.order + elem->p_level());
+          dofs_per_elem += 
+            FEInterface::n_dofs(dim, elem_fe_type, elem->type());
+
+          elem_fe_type.order =
+            static_cast<Order>(fe_type.order + elem->p_level() + 1);
+          dofs_per_p_elem += 
+            FEInterface::n_dofs(dim, elem_fe_type, elem->type());
+        }
+
+      const unsigned int new_h_dofs = dofs_per_elem *
+        (elem->n_children() - 1);
+
+      const unsigned int new_p_dofs = dofs_per_p_elem -
+        dofs_per_elem;
+      
+/*
+std::cerr << "Cell " << e_id << ": h = " << elem->hmax()
+          << ", p = " << elem->p_level() + 1 << "," << std::endl 
+          << "     h_error = " << h_error_per_cell[e_id] 
+          << ", p_error = " << p_error_per_cell[e_id] << std::endl
+          << "     new_h_dofs = " << new_h_dofs
+          << ", new_p_dofs = " << new_p_dofs << std::endl;
+*/
         
-      if (p_error_per_cell[e_id] > h_error_per_cell[e_id])
+      if ((p_error_per_cell[e_id] / new_p_dofs) > 
+          (h_error_per_cell[e_id] / new_h_dofs))
         {
           elem->set_p_refinement_flag(Elem::REFINE);
           elem->set_refinement_flag(Elem::DO_NOTHING);
