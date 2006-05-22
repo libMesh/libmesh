@@ -1,4 +1,4 @@
-// $Id: hp_selector.C,v 1.3 2006-05-21 16:38:31 roystgnr Exp $
+// $Id: hp_selector.C,v 1.4 2006-05-22 18:25:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -197,7 +197,7 @@ void HPSelector::select_refinement (System &system)
 	      cont == C_ONE);
 
       // Build an appropriate quadrature rule
-      qrule = fe_type.default_quadrature_rule(dim-1);
+      qrule = fe_type.default_quadrature_rule(dim);
 
       // Tell the refined finite element about the quadrature
       // rule.  The coarse finite element need not know about it
