@@ -1,4 +1,4 @@
-// $Id: hp_selector.C,v 1.4 2006-05-22 18:25:53 roystgnr Exp $
+// $Id: hp_selector.C,v 1.5 2006-05-23 20:30:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,7 @@
 #include "mesh.h"
 #include "quadrature.h"
 #include "system.h"
+#include "tensor_value.h"
 
 //-----------------------------------------------------------------
 // HPSelector implementations
