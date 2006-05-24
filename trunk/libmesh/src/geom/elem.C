@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.56 2006-04-17 23:44:14 roystgnr Exp $
+// $Id: elem.C,v 1.57 2006-05-24 20:36:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -895,10 +895,9 @@ unsigned int Elem::min_p_level_by_neighbor(const Elem* neighbor,
     for (unsigned int c=0; c<this->n_children(); c++)
       {
         const Elem* const child = this->child(c);
-        const Elem* child_neighbor = child->child_neighbor(neighbor);
-        if (child_neighbor)
+        if (child->is_neighbor(neighbor))
           min_p_level =
-	    child->min_p_level_by_neighbor(child_neighbor,
+	    child->min_p_level_by_neighbor(neighbor,
                                            min_p_level);
       }
 
@@ -933,11 +932,10 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
   for (unsigned int c=0; c<this->n_children(); c++)
     {
       const Elem* const child = this->child(c);
-      const Elem* child_neighbor = child->child_neighbor(neighbor);
-      if (child_neighbor)
+      if (child->is_neighbor(neighbor))
         min_p_level =
-	  child->min_p_level_by_neighbor(child_neighbor,
-                                         min_p_level);
+	  child->min_new_p_level_by_neighbor(neighbor,
+                                             min_p_level);
     }
 
   return min_p_level;
