@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.46 2006-04-17 19:54:48 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.47 2006-05-24 20:40:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -151,10 +151,72 @@ void MeshRefinement::update_nodes_map ()
 
 
 
+bool MeshRefinement::test_level_one (bool assert_pass)
+{
+  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+
+  for ( ; elem_it != elem_end; ++elem_it)
+    {
+      // Pointer to the element
+      Elem *elem = *elem_it;
+
+      for (unsigned int n=0; n<elem->n_neighbors(); n++)
+        {
+          Elem *neighbor = elem->neighbor(n);
+
+          if (!neighbor || !neighbor->active())
+            continue;
+
+          if ((neighbor->level() + 1 < elem->level()) ||
+              (neighbor->p_level() + 1 < elem->p_level()) ||
+              (neighbor->p_level() > elem->p_level() + 1))
+            {
+              // We didn't pass the level one test, so assert that 
+              // we're allowed not to
+              assert(!assert_pass);
+              return false;
+            }
+        }
+    }
+  return true;
+}
+
+
+
+bool MeshRefinement::test_unflagged (bool assert_pass)
+{
+  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+
+  for ( ; elem_it != elem_end; ++elem_it)
+    {
+      // Pointer to the element
+      Elem *elem = *elem_it;
+
+      if (elem->refinement_flag() == Elem::REFINE ||
+          elem->refinement_flag() == Elem::COARSEN ||
+          elem->p_refinement_flag() == Elem::REFINE ||
+          elem->p_refinement_flag() == Elem::COARSEN)
+        {
+          // We didn't pass the "elements are unflagged" test,
+          // so assert that we're allowed not to
+          assert(!assert_pass);
+          return false;
+        }
+    }
+  return true;
+}
+
+
+
 bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 {
   //assert (_mesh.mesh_dimension() != 1);
 
+  // We can't yet turn a non-level-one mesh into a level-one mesh
+  if (maintain_level_one)
+    assert(test_level_one(true));
 
   // Possibly clean up the refinement flags from
   // a previous step
@@ -204,6 +266,8 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   const bool coarsening_changed_mesh =
     this->_coarsen_elements ();
 
+  if (maintain_level_one)
+    assert(test_level_one(true));
   assert(this->make_coarsening_compatible(maintain_level_one));
   assert(this->make_refinement_compatible(maintain_level_one));
 // FIXME: This won't pass unless we add a redundant find_neighbors()
@@ -219,13 +283,14 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   const bool refining_changed_mesh =
     this->_refine_elements();
   
+  if (maintain_level_one)
+    assert(test_level_one(true));
+  assert(test_unflagged(true));
   assert(this->make_coarsening_compatible(maintain_level_one));
   assert(this->make_refinement_compatible(maintain_level_one));
 // FIXME: This won't pass unless we add a redundant find_neighbors()
 // call or replace find_neighbors() with on-the-fly neighbor updating
 // assert(!this->eliminate_unrefined_patches());
-
-
 
   // Finally, the new mesh needs to be prepared for use
   if (coarsening_changed_mesh || refining_changed_mesh)
@@ -252,6 +317,10 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 {
   //assert (_mesh.mesh_dimension() != 1);
   
+  // We can't yet turn a non-level-one mesh into a level-one mesh
+  if (maintain_level_one)
+    assert(test_level_one(true));
+
   // Possibly clean up the refinement flags from
   // a previous step
   MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
@@ -294,6 +363,8 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
   const bool mesh_changed = 
     this->_coarsen_elements ();
 
+  if (maintain_level_one)
+    assert(test_level_one(true));
   assert(this->make_coarsening_compatible(maintain_level_one));
 // FIXME: This won't pass unless we add a redundant find_neighbors()
 // call or replace find_neighbors() with on-the-fly neighbor updating
@@ -319,6 +390,9 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 bool MeshRefinement::refine_elements (const bool maintain_level_one)
 {
   //assert (_mesh.mesh_dimension() != 1);
+
+  if (maintain_level_one)
+    assert(test_level_one(true));
 
   // Possibly clean up the refinement flags from
   // a previous step
@@ -364,6 +438,8 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
   const bool mesh_changed = 
     this->_refine_elements();
 
+  if (maintain_level_one)
+    assert(test_level_one(true));
   assert(this->make_refinement_compatible(maintain_level_one));
 // FIXME: This won't pass unless we add a redundant find_neighbors()
 // call or replace find_neighbors() with on-the-fly neighbor updating

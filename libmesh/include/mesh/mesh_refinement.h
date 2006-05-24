@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.15 2006-04-05 16:43:56 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.16 2006-05-24 20:40:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -191,6 +191,23 @@ public:
    */
   void uniformly_p_coarsen (unsigned int n=1,
 			    const bool maintain_level_one=true);
+
+  /**
+   * Returns true if and only if the mesh is level one smooth
+   * Returns false otherwise
+   * Aborts the program if assert_yes is true and 
+   * the mesh is not level one smooth
+   */
+  bool test_level_one (bool assert_yes = false);
+  
+  /**
+   * Returns true if and only if the mesh has no elements
+   * flagged to be coarsened or refined
+   * Returns false otherwise
+   * Aborts the program if assert_yes is true and 
+   * the mesh has flagged elements
+   */
+  bool test_unflagged (bool assert_yes = false);
   
   /**
    * Add point \p p to the mesh. The function returns a pointer to
