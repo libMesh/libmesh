@@ -1,4 +1,4 @@
-// $Id: hp_selector.C,v 1.5 2006-05-23 20:30:22 roystgnr Exp $
+// $Id: hp_selector.C,v 1.6 2006-05-24 21:40:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -325,6 +325,7 @@ void HPSelector::select_refinement (System &system)
                         hessian_error += (*d2phi)[i][qp] *
                           system.current_solution(dof_num);
                     }
+                  value_error -= average_val;
 	        }
 	      else
 	        {
@@ -349,17 +350,26 @@ void HPSelector::select_refinement (System &system)
                           // Sum high p vertex shape functions
                           for (unsigned int i = low_nc; i != high_nc; ++i)
                             {
-                              unsigned int dof_num = node->dof_number(sys_num,var,i);
-                              value_error += (*phi)[i][qp] *
-                                system.current_solution(dof_num);
+                              const unsigned int global_dof_num =
+                                node->dof_number(sys_num,var,i);
+                              unsigned int local_dof_num = 0;
+                              while (dof_indices[local_dof_num] !=
+                                     global_dof_num)
+                                {
+                                  local_dof_num++;
+                                  assert(local_dof_num <
+                                         dof_indices.size());
+                                }
+        
+                              value_error += (*phi)[local_dof_num][qp] *
+                                system.current_solution(global_dof_num);
                               if (cont == C_ZERO || cont == C_ONE)
-                                grad_error += (*dphi)[i][qp] *
-                                  system.current_solution(dof_num);
+                                grad_error += (*dphi)[local_dof_num][qp] *
+                                  system.current_solution(global_dof_num);
                               if (cont == C_ONE)
-                                hessian_error += (*d2phi)[i][qp] *
-                                  system.current_solution(dof_num);
+                                hessian_error += (*d2phi)[local_dof_num][qp] *
+                                  system.current_solution(global_dof_num);
                             }
-                          value_error -= average_val;
                         }
                       else
                         {
@@ -370,18 +380,55 @@ void HPSelector::select_refinement (System &system)
                           for (unsigned int j = low_nc; j != high_nc; ++j)
                             {
                               const unsigned int i = total_dofs - j - 1;
-                              unsigned int dof_num = node->dof_number(sys_num,var,i);
-                              value_error += (*phi)[i][qp] *
-                                system.current_solution(dof_num);
+                              const unsigned int global_dof_num =
+                                node->dof_number(sys_num,var,i);
+                              unsigned int local_dof_num = 0;
+                              while (dof_indices[local_dof_num] !=
+                                     global_dof_num)
+                                {
+                                  local_dof_num++;
+                                  assert(local_dof_num <
+                                         dof_indices.size());
+                                }
+        
+                              value_error += (*phi)[local_dof_num][qp] *
+                                system.current_solution(global_dof_num);
                               if (cont == C_ZERO || cont == C_ONE)
-                                grad_error += (*dphi)[i][qp] *
-                                  system.current_solution(dof_num);
+                                grad_error += (*dphi)[local_dof_num][qp] *
+                                  system.current_solution(global_dof_num);
                               if (cont == C_ONE)
-                                hessian_error += (*d2phi)[i][qp] *
-                                  system.current_solution(dof_num);
+                                hessian_error += (*d2phi)[local_dof_num][qp] *
+                                  system.current_solution(global_dof_num);
                             }
                         }
 
+                    }
+
+                  const unsigned int low_nc = FEInterface::n_dofs_per_elem
+                    (dim, low_p_fe_type, elem->type());
+                  const unsigned int high_nc = FEInterface::n_dofs_per_elem
+                    (dim, high_p_fe_type, elem->type());
+                  for (unsigned int i = low_nc; i != high_nc; ++i)
+                    {
+                      const unsigned int global_dof_num =
+                        elem->dof_number(sys_num,var,i);
+                      unsigned int local_dof_num = 0;
+                        while (dof_indices[local_dof_num] !=
+                               global_dof_num)
+                          {
+                            local_dof_num++;
+                            assert(local_dof_num <
+                                   dof_indices.size());
+                          }
+        
+                      value_error += (*phi)[local_dof_num][qp] *
+                        system.current_solution(global_dof_num);
+                      if (cont == C_ZERO || cont == C_ONE)
+                        grad_error += (*dphi)[local_dof_num][qp] *
+                          system.current_solution(global_dof_num);
+                      if (cont == C_ONE)
+                        hessian_error += (*d2phi)[local_dof_num][qp] *
+                          system.current_solution(global_dof_num);
                     }
 	        }
 
@@ -512,14 +559,12 @@ void HPSelector::select_refinement (System &system)
       const unsigned int new_p_dofs = dofs_per_p_elem -
         dofs_per_elem;
       
-/*
 std::cerr << "Cell " << e_id << ": h = " << elem->hmax()
           << ", p = " << elem->p_level() + 1 << "," << std::endl 
           << "     h_error = " << h_error_per_cell[e_id] 
           << ", p_error = " << p_error_per_cell[e_id] << std::endl
           << "     new_h_dofs = " << new_h_dofs
           << ", new_p_dofs = " << new_p_dofs << std::endl;
-*/
         
       if ((p_error_per_cell[e_id] / new_p_dofs) > 
           (h_error_per_cell[e_id] / new_h_dofs))
