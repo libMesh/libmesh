@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_smoothing.C,v 1.13 2006-04-18 03:44:23 roystgnr Exp $
+// $Id: mesh_refinement_smoothing.C,v 1.14 2006-05-24 20:34:45 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -137,6 +137,9 @@ bool MeshRefinement::eliminate_unrefined_patches ()
   for (; elem_it != elem_end; ++elem_it)
     {
       Elem* elem = *elem_it;
+      // First assume that we'll have to flag this element for both h
+      // and p refinement, then change our minds if we see any
+      // neighbors that are as coarse or coarser than us.
       bool h_flag_me = true,
            p_flag_me = true;
 
@@ -199,9 +202,9 @@ bool MeshRefinement::eliminate_unrefined_patches ()
             }
 	  if (p_flag_me)
             {
-	  // if active neighbors will have a p level
-          // equal to or lower than ours, then we do not need to p refine
-          // ourselves.
+	      // if active neighbors will have a p level
+	      // equal to or lower than ours, then we do not need to p
+              // refine ourselves.
               if (neighbor->active())
                 {
                   int p_adjustment = 0;
@@ -254,7 +257,10 @@ bool MeshRefinement::eliminate_unrefined_patches ()
 	}      
       if (p_flag_me)
 	{
-	  elem->set_p_refinement_flag(Elem::REFINE);
+          if (elem->p_refinement_flag() == Elem::COARSEN)
+	    elem->set_p_refinement_flag(Elem::DO_NOTHING);
+          else 
+	    elem->set_p_refinement_flag(Elem::REFINE);
 	  flags_changed = true;
 	}      
     }
