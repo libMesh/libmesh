@@ -27,11 +27,11 @@ approx_order = 2
 # Use exact error estimator instead of gradient jumps?
 exact_indicator = false
 
-# Mesh refinement type: h, p, or hp
-# Use HIERARCHIC functions with p or hp,
-# Use an exact indicator with hp.
-# Currently hp refinement stupidly does both or neither on every
-# element
+# Mesh refinement type: h, p, matchedhp, or hp
+# Use HIERARCHIC functions with p/matchedhp/hp,
+# Use an exact indicator with matchedhp/hp.
+# matchedhp refinement stupidly does both h and p or neither
+# on every element; hp refinement tries to do one or the other
 refinement_type = h
 
 # Mesh dimensionality
