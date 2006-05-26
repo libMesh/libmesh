@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.46 2006-04-27 17:57:28 roystgnr Exp $
+// $Id: fe.C,v 1.47 2006-05-26 23:52:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -792,10 +792,12 @@ void FE<Dim,T>::compute_proj_constraints (DofConstraints &constraints,
 	      {
 	        const unsigned int i = parent_side_dofs[is];
 	        const unsigned int their_dof_g = parent_dof_indices[i];
+                assert(their_dof_g != DofObject::invalid_id);
 	        for (unsigned int js = 0; js != n_side_dofs; ++js)
 	          {
 	            const unsigned int j = my_side_dofs[js];
 	            const unsigned int my_dof_g = child_dof_indices[j];
+                    assert(my_dof_g != DofObject::invalid_id);
 		    const Real their_dof_value = Ue[is](js);
 		    if (their_dof_g == my_dof_g)
 		      {
@@ -817,17 +819,20 @@ void FE<Dim,T>::compute_proj_constraints (DofConstraints &constraints,
 	  }
         // p refinement constraints:
         // constrain dofs shared between
-        // this element and neighbors with
+        // active elements and neighbors with
         // lower polynomial degrees
-        const unsigned int min_p_level =
-          elem->neighbor(s)->min_p_level_by_neighbor(elem, elem->p_level());
-        if (min_p_level < elem->p_level())
+        if (elem->active())
           {
-            // Adaptive p refinement of non-hierarchic bases will
-            // require more coding
-            assert(my_fe->is_hierarchic());
-            dof_map.constrain_p_dofs(variable_number, elem,
-                                     s, min_p_level);
+            const unsigned int min_p_level =
+              elem->neighbor(s)->min_p_level_by_neighbor(elem, elem->p_level());
+            if (min_p_level < elem->p_level())
+              {
+                // Adaptive p refinement of non-hierarchic bases will
+                // require more coding
+                assert(my_fe->is_hierarchic());
+                dof_map.constrain_p_dofs(variable_number, elem,
+                                         s, min_p_level);
+              }
           }
       }
 #endif
