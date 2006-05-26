@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.97 2006-03-08 16:31:18 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.98 2006-05-26 10:19:29 roystgnr Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -281,7 +281,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
     CXXFLAGS_DVL="$CXXFLAGS_DVL -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized"
-    CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses"
+    CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized"
 
     CFLAGS_OPT="-O2"
     CFLAGS_DVL="$CFLAGS_OPT -g"
