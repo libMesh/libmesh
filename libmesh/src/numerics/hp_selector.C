@@ -1,4 +1,4 @@
-// $Id: hp_selector.C,v 1.7 2006-05-27 10:36:25 roystgnr Exp $
+// $Id: hp_selector.C,v 1.8 2006-05-27 14:49:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -70,14 +70,16 @@ void HPSelector::add_projection(const System &system,
 
   fe_coarse->reinit(coarse, &coarse_qpoints);
 
-  if (Fe.size() == 0)
+  if (Uc.size() == 0)
     {
       Ke.resize(phi_coarse->size(), phi_coarse->size());
       Ke.zero();
       Fe.resize(phi_coarse->size());
       Fe.zero();
+      Uc.resize(phi_coarse->size());
+      Uc.zero();
     }
-  assert(Fe.size() == phi_coarse->size());
+  assert(Uc.size() == phi_coarse->size());
 
   // Loop over the quadrature points
   for (unsigned int qp=0; qp<qrule->n_points(); qp++)
@@ -254,7 +256,7 @@ void HPSelector::select_refinement (System &system)
               (coarse != elem->parent() ||
                cached_coarse_p_level != elem->p_level()))
             {
-	      Fe.resize(0);
+	      Uc.resize(0);
 
               coarse = elem->parent();
               cached_coarse_p_level = elem->p_level();
@@ -266,8 +268,8 @@ void HPSelector::select_refinement (System &system)
 
               (const_cast<Elem *>(coarse))->hack_p_level(old_parent_level);
 
-              // Solve the projection problem
-              Ke.cholesky_solve(Fe, Ue);
+              // Solve the h-coarsening projection problem
+              Ke.cholesky_solve(Fe, Uc);
             }
 
 	  fe->reinit(elem);
@@ -304,6 +306,70 @@ void HPSelector::select_refinement (System &system)
                   }
               average_val /= n_vertices;
 	    }
+          else
+	    {
+              unsigned int old_elem_level = elem->p_level();
+              (const_cast<Elem *>(elem))->hack_p_level(old_elem_level - 1);
+              
+              fe_coarse->reinit(elem, &(qrule->get_points()));
+
+              (const_cast<Elem *>(elem))->hack_p_level(old_elem_level);
+
+              Ke.resize(phi_coarse->size(), phi_coarse->size());
+              Ke.zero();
+              Fe.resize(phi_coarse->size());
+              Fe.zero();
+
+              // Loop over the quadrature points
+              for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+                {
+                  // The solution value at the quadrature point
+                  Number val = libMesh::zero;
+                  Gradient grad;
+                  Tensor hess;
+
+                  for (unsigned int i=0; i != dof_indices.size(); i++)
+                    {
+                      unsigned int dof_num = dof_indices[i];
+                      val += (*phi)[i][qp] *
+                        system.current_solution(dof_num);
+                      if (cont == C_ZERO || cont == C_ONE)
+                        grad += (*dphi)[i][qp] *
+                          system.current_solution(dof_num);
+                      if (cont == C_ONE)
+                        hess += (*d2phi)[i][qp] *
+                          system.current_solution(dof_num);
+                    }
+
+                  // The projection matrix and vector
+                  for (unsigned int i=0; i != Fe.size(); ++i)
+                    {
+                      Fe(i) += (*JxW)[qp] *
+                        (*phi_coarse)[i][qp]*val;
+                      if (cont == C_ZERO || cont == C_ONE)
+                        Fe(i) += (*JxW)[qp] *
+                          (*dphi_coarse)[i][qp]*grad;
+                      if (cont == C_ONE)
+                        Fe(i) += (*JxW)[qp] *
+                          (*d2phi_coarse)[i][qp].contract(hess);
+
+                      for (unsigned int j=0; j != Fe.size(); ++j)
+                        {
+                          Ke(i,j) += (*JxW)[qp] *
+                            (*phi_coarse)[i][qp]*(*phi_coarse)[j][qp];
+                          if (cont == C_ZERO || cont == C_ONE)
+                            Ke(i,j) += (*JxW)[qp] *
+                              (*dphi_coarse)[i][qp]*(*dphi_coarse)[j][qp];
+                          if (cont == C_ONE)
+                            Ke(i,j) += (*JxW)[qp] *
+                              ((*d2phi_coarse)[i][qp].contract((*d2phi_coarse)[j][qp]));
+                        }
+                    }
+                }
+
+              // Solve the p-coarsening projection problem
+              Ke.cholesky_solve(Fe, Up);
+	    }
 
           // loop over the integration points on the fine element
           for (unsigned int qp=0; qp<n_qp; qp++)
@@ -311,126 +377,33 @@ void HPSelector::select_refinement (System &system)
               Number value_error = 0.;
               Gradient grad_error;
               Tensor hessian_error;
+              for (unsigned int i=0; i<n_dofs; i++)
+                {
+                  const unsigned int dof_num = dof_indices[i];
+                  value_error += (*phi)[i][qp] *
+                    system.current_solution(dof_num);
+                  if (cont == C_ZERO || cont == C_ONE)
+                    grad_error += (*dphi)[i][qp] *
+                      system.current_solution(dof_num);
+                  if (cont == C_ONE)
+                    hessian_error += (*d2phi)[i][qp] *
+                      system.current_solution(dof_num);
+                }
 	      if (elem->p_level() == 0)
 	        {
-                  for (unsigned int i=0; i<n_dofs; i++)
-                    {
-                      const unsigned int dof_num = dof_indices[i];
-                      value_error += (*phi)[i][qp] *
-                        system.current_solution(dof_num);
-                      if (cont == C_ZERO || cont == C_ONE)
-                        grad_error += (*dphi)[i][qp] *
-                          system.current_solution(dof_num);
-                      if (cont == C_ONE)
-                        hessian_error += (*d2phi)[i][qp] *
-                          system.current_solution(dof_num);
-                    }
                   value_error -= average_val;
 	        }
 	      else
 	        {
-	          // Integration of only the highest order hierarchical
-	          // shape functions
-
-                  low_p_fe_type.order =
-		    static_cast<Order>(fe_type.order + elem->p_level() - 1);
-                  high_p_fe_type.order =
-                    static_cast<Order>(fe_type.order + elem->p_level());
-
-                  for (unsigned int n = 0; n != n_nodes; ++n)
+                  for (unsigned int i=0; i<Up.size(); i++)
                     {
-                      const Node * const node = elem->get_node(n);
-                      const unsigned int low_nc = FEInterface::n_dofs_at_node
-                        (dim, low_p_fe_type, elem->type(), n);
-                      const unsigned int high_nc = FEInterface::n_dofs_at_node
-                        (dim, high_p_fe_type, elem->type(), n);
-
-                      if (elem->is_vertex(n))
-                        {
-                          // Sum high p vertex shape functions
-                          for (unsigned int i = low_nc; i != high_nc; ++i)
-                            {
-                              const unsigned int global_dof_num =
-                                node->dof_number(sys_num,var,i);
-                              unsigned int local_dof_num = 0;
-                              while (dof_indices[local_dof_num] !=
-                                     global_dof_num)
-                                {
-                                  local_dof_num++;
-                                  assert(local_dof_num <
-                                         dof_indices.size());
-                                }
-        
-                              value_error += (*phi)[local_dof_num][qp] *
-                                system.current_solution(global_dof_num);
-                              if (cont == C_ZERO || cont == C_ONE)
-                                grad_error += (*dphi)[local_dof_num][qp] *
-                                  system.current_solution(global_dof_num);
-                              if (cont == C_ONE)
-                                hessian_error += (*d2phi)[local_dof_num][qp] *
-                                  system.current_solution(global_dof_num);
-                            }
-                        }
-                      else
-                        {
-                          const unsigned int total_dofs = node->n_comp(sys_num, var);
-                          assert(total_dofs >= high_nc);
-			  // Sum high p non-vertex shape functions, which are
-                          // numbered in reverse
-                          for (unsigned int j = low_nc; j != high_nc; ++j)
-                            {
-                              const unsigned int i = total_dofs - j - 1;
-                              const unsigned int global_dof_num =
-                                node->dof_number(sys_num,var,i);
-                              unsigned int local_dof_num = 0;
-                              while (dof_indices[local_dof_num] !=
-                                     global_dof_num)
-                                {
-                                  local_dof_num++;
-                                  assert(local_dof_num <
-                                         dof_indices.size());
-                                }
-        
-                              value_error += (*phi)[local_dof_num][qp] *
-                                system.current_solution(global_dof_num);
-                              if (cont == C_ZERO || cont == C_ONE)
-                                grad_error += (*dphi)[local_dof_num][qp] *
-                                  system.current_solution(global_dof_num);
-                              if (cont == C_ONE)
-                                hessian_error += (*d2phi)[local_dof_num][qp] *
-                                  system.current_solution(global_dof_num);
-                            }
-                        }
-
-                    }
-
-                  const unsigned int low_nc = FEInterface::n_dofs_per_elem
-                    (dim, low_p_fe_type, elem->type());
-                  const unsigned int high_nc = FEInterface::n_dofs_per_elem
-                    (dim, high_p_fe_type, elem->type());
-                  for (unsigned int i = low_nc; i != high_nc; ++i)
-                    {
-                      const unsigned int global_dof_num =
-                        elem->dof_number(sys_num,var,i);
-                      unsigned int local_dof_num = 0;
-                        while (dof_indices[local_dof_num] !=
-                               global_dof_num)
-                          {
-                            local_dof_num++;
-                            assert(local_dof_num <
-                                   dof_indices.size());
-                          }
-        
-                      value_error += (*phi)[local_dof_num][qp] *
-                        system.current_solution(global_dof_num);
+                      value_error -= (*phi_coarse)[i][qp] * Up(i);
                       if (cont == C_ZERO || cont == C_ONE)
-                        grad_error += (*dphi)[local_dof_num][qp] *
-                          system.current_solution(global_dof_num);
+                        grad_error -= (*dphi_coarse)[i][qp] * Up(i);
                       if (cont == C_ONE)
-                        hessian_error += (*d2phi)[local_dof_num][qp] *
-                          system.current_solution(global_dof_num);
+                        hessian_error -= (*d2phi_coarse)[i][qp] * Up(i);
                     }
-	        }
+                }
 
 	      p_error_per_cell[e_id] += component_scale[var] * 
 		(*JxW)[qp] * value_error * value_error;
@@ -488,11 +461,11 @@ void HPSelector::select_refinement (System &system)
 
                   for (unsigned int i=0; i != n_coarse_dofs; ++i)
                     {
-                      value_error -= (*phi_coarse)[i][qp] * Ue(i);
+                      value_error -= (*phi_coarse)[i][qp] * Uc(i);
                       if (cont == C_ZERO || cont == C_ONE)
-                        grad_error -= (*dphi_coarse)[i][qp] * Ue(i);
+                        grad_error -= (*dphi_coarse)[i][qp] * Uc(i);
                       if (cont == C_ONE)
-                        hessian_error -= (*d2phi_coarse)[i][qp] * Ue(i);
+                        hessian_error -= (*d2phi_coarse)[i][qp] * Uc(i);
                     }
 
 	          h_error_per_cell[e_id] += component_scale[var] * 

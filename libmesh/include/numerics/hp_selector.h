@@ -1,4 +1,4 @@
-// $Id: hp_selector.h,v 1.3 2006-05-27 10:36:25 roystgnr Exp $
+// $Id: hp_selector.h,v 1.4 2006-05-27 14:49:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -139,10 +139,16 @@ protected:
   AutoPtr<QBase> qrule;
 
   /**
-   * The linear projection to be done on coarse elements
+   * Linear system for projections
    */
   DenseMatrix<Number> Ke;
-  DenseVector<Number> Fe, Ue;
+  DenseVector<Number> Fe;
+  /**
+   * Coefficients for projected coarse and projected 
+   * p-derefined solutions
+   */
+  DenseVector<Number> Uc;
+  DenseVector<Number> Up;
 };
 
 
