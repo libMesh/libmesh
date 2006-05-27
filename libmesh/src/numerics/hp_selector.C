@@ -1,4 +1,4 @@
-// $Id: hp_selector.C,v 1.6 2006-05-24 21:40:31 roystgnr Exp $
+// $Id: hp_selector.C,v 1.7 2006-05-27 10:36:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -566,10 +566,15 @@ std::cerr << "Cell " << e_id << ": h = " << elem->hmax()
           << "     new_h_dofs = " << new_h_dofs
           << ", new_p_dofs = " << new_p_dofs << std::endl;
         
-      if ((p_error_per_cell[e_id] / new_p_dofs) > 
-          (h_error_per_cell[e_id] / new_h_dofs))
+      if ((std::sqrt(p_error_per_cell[e_id]) * p_weight / new_p_dofs) 
+          > (std::sqrt(h_error_per_cell[e_id]) / new_h_dofs))
+/*
+      if (std::sqrt(p_error_per_cell[e_id]) * p_weight
+          > std::sqrt(h_error_per_cell[e_id]))
+*/
         {
           elem->set_p_refinement_flag(Elem::REFINE);
+//          elem->set_refinement_flag(Elem::COARSEN);
           elem->set_refinement_flag(Elem::DO_NOTHING);
         }
     }
