@@ -1,4 +1,4 @@
-// $Id: hp_selector.h,v 1.2 2006-05-20 18:24:16 roystgnr Exp $
+// $Id: hp_selector.h,v 1.3 2006-05-27 10:36:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ public:
   /**
    * Constructor.
    */
-  HPSelector() {}
+  HPSelector() : p_weight(1.0) {}
   
   /**
    * Destructor.  
@@ -86,6 +86,12 @@ public:
    * component_scale[c].
    */
   std::vector<float> component_scale;
+
+  /**
+   * Because the selector seems to always choose p refinement, we're
+   * providing an option to make h refinement more likely
+   */
+  Real p_weight;
 
 protected:
   /**
