@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.57 2006-05-24 20:36:02 roystgnr Exp $
+// $Id: elem.C,v 1.58 2006-05-27 10:51:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -875,31 +875,28 @@ unsigned int Elem::min_p_level_by_neighbor(const Elem* neighbor,
   assert(!this->subactive());
   assert(neighbor->active());
 
-  // Make sure we have the right level neighbor
-  while (this->level() < neighbor->level())
-    {
-      assert(neighbor->parent());
-      neighbor = neighbor->parent();
-    }
+  // If we're an active element this is simple
+  if (this->active())
+    return std::min(current_min, this->p_level());
 
   assert(is_neighbor(neighbor));
 
   // The p_level() of an ancestor element is already the minimum
   // p_level() of its children - so if that's high enough, we don't
   // need to examine any children.
-  unsigned char min_p_level = this->p_level();
-  if (current_min <= min_p_level)
+  if (current_min <= this->p_level())
     return current_min;
 
-  if (!this->active())
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-        const Elem* const child = this->child(c);
-        if (child->is_neighbor(neighbor))
-          min_p_level =
-	    child->min_p_level_by_neighbor(neighbor,
-                                           min_p_level);
-      }
+  unsigned int min_p_level = current_min;
+
+  for (unsigned int c=0; c<this->n_children(); c++)
+    {
+      const Elem* const child = this->child(c);
+      if (child->is_neighbor(neighbor))
+        min_p_level =
+	  child->min_p_level_by_neighbor(neighbor,
+                                         min_p_level);
+    }
 
   return min_p_level;
 }
