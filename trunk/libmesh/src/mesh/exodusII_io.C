@@ -1,4 +1,4 @@
-// $Id: exodusII_io.C,v 1.10 2005-08-17 21:20:22 benkirk Exp $
+// $Id: exodusII_io.C,v 1.11 2006-05-28 16:13:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -885,7 +885,7 @@ namespace
   // ExodusII::Conversion class members
   const ExodusII::Conversion ExodusII::ElementMaps::assign_conversion(const std::string type)
   {
-    if (type == "QUAD4") 
+    if ((type == "QUAD4") || (type == "QUAD"))
       return assign_conversion(QUAD4);
 
     else if (type == "QUAD8")
