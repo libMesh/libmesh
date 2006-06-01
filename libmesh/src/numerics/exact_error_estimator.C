@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.C,v 1.2 2006-04-20 17:06:52 spetersen Exp $
+// $Id: exact_error_estimator.C,v 1.3 2006-06-01 22:35:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -284,9 +284,9 @@ void ExactErrorEstimator::estimate_error (const System& system,
             } // end qp loop
 
           error_per_cell[e_id] = L2normsq;
-          if (_sobolev_order > 1)
+          if (_sobolev_order > 0)
             error_per_cell[e_id] += H1seminormsq;
-          if (_sobolev_order > 2)
+          if (_sobolev_order > 1)
             error_per_cell[e_id] += H2seminormsq;
 
 	} // End loop over active local elements
