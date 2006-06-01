@@ -1,0 +1,22 @@
+DEAL 003:003
+3	 # Num. Elements
+8	 # Num. Nodes
+12	 # Sum of Element Weights (= 3*4)
+0	 # Num. Boundary Conds.
+65536	 # String Size (ignore) 
+1	 # Num. Element Blocks.
+5 	 # Element types in each block.
+3 	 # Num. of elements in each block.
+Id String
+Title String
+3 4 1 0
+4 5 2 1
+6 7 4 3
+-1. 1. 0.
+0.  1. 0.
+1. 1. 0.
+-1. 0. 0.
+0. 0. 0.
+1. 0. 0.
+-1. -1. 0.
+0. -1. 0.
