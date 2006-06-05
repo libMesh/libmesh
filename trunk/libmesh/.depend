@@ -5561,6 +5561,33 @@ src/solvers/nonlinear_implicit_system.$(obj-suffix):\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
     include/utils/perf_log.h
+src/solvers/steady_solver.$(obj-suffix):\
+    src/solvers/steady_solver.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_order.h\
+    include/fe/fe_type.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_submatrix.h\
+    include/numerics/dense_subvector.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
+    include/solvers/diff_solver.h\
+    include/solvers/diff_system.h\
+    include/solvers/explicit_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/linear_implicit_system.h\
+    include/solvers/steady_solver.h\
+    include/solvers/system.h\
+    include/solvers/time_solver.h\
+    include/solvers/transient_system.h
 src/solvers/steady_system.$(obj-suffix):\
     src/solvers/steady_system.C
 src/solvers/system.$(obj-suffix):\
