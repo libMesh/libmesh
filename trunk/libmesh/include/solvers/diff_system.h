@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.3 2006-06-05 23:09:48 roystgnr Exp $
+// $Id: diff_system.h,v 1.4 2006-06-05 23:25:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -206,6 +206,18 @@ public:
    * This must be instantiated by the user before solving!
    */
   AutoPtr<TimeSolver> time_solver;
+
+  /**
+   * For time-dependent problems, this is the time t for which the current
+   * nonlinear_solution is defined.
+   */
+  Real time;
+
+  /**
+   * For time-dependent problems, this is the amount delta t to advance the
+   * solution in time.
+   */
+  Real deltat;
 
   /**
    * Local components of nonlinear_solution

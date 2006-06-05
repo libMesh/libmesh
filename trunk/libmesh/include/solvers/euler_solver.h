@@ -1,4 +1,4 @@
-// $Id: euler_solver.h,v 1.1 2006-06-05 21:51:15 roystgnr Exp $
+// $Id: euler_solver.h,v 1.2 2006-06-05 23:25:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -60,11 +60,6 @@ public:
    * Destructor.
    */
   virtual ~EulerSolver ();
-
-  /**
-   * Initialization.
-   */
-  virtual void init ();
 
   /**
    * This method uses the DifferentiableSystem's

@@ -18,15 +18,6 @@ EulerSolver::~EulerSolver ()
 
 
 
-void EulerSolver::init ()
-{
-  Parent::init();
-
-  _system.add_vector("_old_nonlinear_solution");
-}
-
-
-
 bool EulerSolver::element_residual (bool request_jacobian)
 {
   // Global nonlinear solution at old timestep
@@ -56,9 +47,9 @@ bool EulerSolver::element_residual (bool request_jacobian)
     _system.element_time_derivative(request_jacobian);
 
   // Scale the time-dependent residual and jacobian correctly
-  _system.elem_residual *= deltat;
+  _system.elem_residual *= _system.deltat;
   if (jacobian_computed)
-    _system.elem_jacobian *= theta * deltat;
+    _system.elem_jacobian *= theta * _system.deltat;
 
   // Add the mass term and constraint term
   jacobian_computed = _system.mass_residual(request_jacobian) &&
@@ -104,9 +95,9 @@ bool EulerSolver::side_residual (bool request_jacobian)
     _system.side_time_derivative(request_jacobian);
 
   // Scale the time-dependent residual and jacobian correctly
-  _system.elem_residual *= deltat;
+  _system.elem_residual *= _system.deltat;
   if (jacobian_computed)
-    _system.elem_jacobian *= theta * deltat;
+    _system.elem_jacobian *= theta * _system.deltat;
 
   // Add the constraint term (we shouldn't need a mass term on sides)
   jacobian_computed = _system.side_constraint(request_jacobian) &&
