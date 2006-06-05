@@ -248,19 +248,59 @@ void FEMSystem::compute_numerical_jacobian ()
   Real h = 1e-6;  // FIXME: How do we scale this?
 
   DenseVector<Number> original_residual(elem_residual);
+  DenseVector<Number> backwards_residual(elem_residual);
+  DenseMatrix<Number> numerical_jacobian(elem_jacobian);
 
   for (unsigned int j = 0; j != dof_indices.size(); ++j)
     {
       Number original_solution = elem_solution(j);
-      elem_solution(j) += h;
+      elem_solution(j) -= h;
+      elem_residual.zero();
       time_solver->element_residual(false);
+
+      for (side = 0; side != elem->n_sides(); ++side)
+        {
+          // Don't compute on non-boundary sides unless requested
+          if (!compute_internal_sides && elem->neighbor(side) != NULL)
+            continue;
+
+          std::map<FEType, FEBase *>::iterator fe_end = side_fe.end();
+          for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
+               i != fe_end; ++i)
+            {
+              i->second->reinit(elem, side);
+            }
+          time_solver->side_residual(false);
+        }
+      backwards_residual = elem_residual;
+
+      elem_solution(j) = original_solution + h;
+      elem_residual.zero();
+      time_solver->element_residual(false);
+
+      for (side = 0; side != elem->n_sides(); ++side)
+        {
+          // Don't compute on non-boundary sides unless requested
+          if (!compute_internal_sides && elem->neighbor(side) != NULL)
+            continue;
+
+          std::map<FEType, FEBase *>::iterator fe_end = side_fe.end();
+          for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
+               i != fe_end; ++i)
+            {
+              i->second->reinit(elem, side);
+            }
+          time_solver->side_residual(false);
+        }
+
       for (unsigned int i = 0; i != dof_indices.size(); ++i)
         {
-          elem_jacobian(i,j) =
-            (elem_residual(i) - original_residual(i)) / h;
+          numerical_jacobian(i,j) =
+            (elem_residual(i) - backwards_residual(i)) / 2 / h;
         }
       elem_solution(j) = original_solution;
     }
 
   elem_residual = original_residual;
+  elem_jacobian = numerical_jacobian;
 }
