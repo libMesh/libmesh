@@ -27,7 +27,7 @@ void DifferentiableSystem::init_data ()
   // FIXME - there really ought to be a way to just use the System
   // solution vector if the solver doesn't need an extra vector!
 
-  this->add_vector("nonlinear_iterate", false);
+  this->add_vector("_nonlinear_solution", false);
 
   // Next initialize ImplicitSystem data
   Parent::init_data();
