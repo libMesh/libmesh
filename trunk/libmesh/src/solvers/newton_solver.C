@@ -119,7 +119,7 @@ std::cout << "Taking full Newton step" << std::endl;
       _system.assembly(true, false);
 
       // backtrack if necessary
-      rhs.close()
+      rhs.close();
       current_residual = rhs.l2_norm();
       while (current_residual > last_residual)
         {
