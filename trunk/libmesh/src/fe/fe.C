@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.48 2006-05-27 10:55:11 roystgnr Exp $
+// $Id: fe.C,v 1.49 2006-06-05 21:04:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -194,6 +194,16 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 {
   assert (elem  != NULL);
   calculations_started = true;
+
+  // If the user forgot to request anything, we'll be safe and
+  // calculate everything:
+#ifdef ENABLE_SECOND_DERIVATIVES
+  if (!calculate_phi && !calculate_dphi && !calculate_d2phi)
+    calculate_phi = calculate_dphi = calculate_d2phi = true;
+#else
+  if (!calculate_phi && !calculate_dphi)
+    calculate_phi = calculate_dphi = true;
+#endif // ENABLE_SECOND_DERIVATIVES
   
   // Start logging the shape function initialization
   START_LOG("init_shape_functions()", "FE");
