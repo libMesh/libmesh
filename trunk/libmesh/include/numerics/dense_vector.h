@@ -1,4 +1,4 @@
-// $Id: dense_vector.h,v 1.7 2005-10-31 20:47:15 roystgnr Exp $
+// $Id: dense_vector.h,v 1.8 2006-06-05 23:09:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -115,11 +115,21 @@ public:
   void scale (const T factor);
   
   /**
-   * Adds \p factor to every element in the vector.
+   * Multiplies every element in the vector by \p factor.
+   */
+  DenseVector<T>& operator*= (const T factor);
+  
+  /**
+   * Adds \p factor times \p vec to this vector.
    */
   void add (const T factor,
 	    const DenseVector<T>& vec);
 
+  /**
+   * Adds \p vec to this vector.
+   */
+  DenseVector<T>& operator+= (const DenseVector<T> &vec);
+  
   /**
    * @returns the minimum element in the vector.
    * In case of complex numbers, this returns the minimum
@@ -282,6 +292,15 @@ void DenseVector<T>::scale (const T factor)
 
 
 
+template<typename T>
+inline
+DenseVector<T>& DenseVector<T>::operator*= (const T factor)
+{
+  this->scale(factor);
+  return *this;
+}
+
+
 
 template<typename T>
 inline
@@ -293,6 +312,21 @@ void DenseVector<T>::add (const T factor,
   for (unsigned int i=0; i<this->size(); i++)
     (*this)(i) += factor*vec(i);
 }
+
+
+
+template<typename T>
+inline
+DenseVector<T>& DenseVector<T>::operator+= (const DenseVector<T>& vec)
+{
+  assert (this->size() == vec.size());
+
+  for (unsigned int i=0; i<this->size(); i++)
+    (*this)(i) += vec(i);
+
+  return *this;
+}
+
 
 
 template<typename T> inline T libmesh_real(T a) { return a; }

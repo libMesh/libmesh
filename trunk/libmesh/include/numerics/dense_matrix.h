@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.11 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: dense_matrix.h,v 1.12 2006-06-05 23:09:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -122,6 +122,22 @@ public:
    * Multiplies every element in the matrix by \p factor.
    */
   void scale (const T factor);
+
+  /**
+   * Multiplies every element in the matrix by \p factor.
+   */
+  DenseMatrix<T>& operator *= (const T factor);
+
+  /**
+   * Adds \p factor times \p mat to this matrix.
+   */
+  void add (const T factor,
+            const DenseMatrix<T>& mat);
+
+  /**
+   * Adds \p mat to this matrix.
+   */
+  DenseMatrix<T>& operator+= (const DenseMatrix<T> &mat);
 
   /**
    * Left multiplies by the transpose of the matrix \p A.
@@ -407,6 +423,39 @@ void DenseMatrix<T>::scale (const T factor)
   for (unsigned int i=0; i<_val.size(); i++)
     _val[i] *= factor;
 }
+
+
+
+template<typename T>
+inline
+DenseMatrix<T>& DenseMatrix<T>::operator *= (const T factor)
+{
+  this->scale(factor);
+  return *this;
+}
+
+
+
+template<typename T>
+inline
+void DenseMatrix<T>::add (const T factor, const DenseMatrix<T>& mat)
+{
+  for (unsigned int i=0; i<_val.size(); i++)
+    _val[i] += factor * mat._val[i];
+}
+
+
+
+template<typename T>
+inline
+DenseMatrix<T>& DenseMatrix<T>::operator += (const DenseMatrix<T> &mat)
+{
+  for (unsigned int i=0; i<_val.size(); i++)
+    _val[i] += mat._val[i];
+
+  return *this;
+}
+
 
 
 
