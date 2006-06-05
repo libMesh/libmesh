@@ -62,7 +62,7 @@ const bool require_residual_reduction = false;
   newton_iterate.close();
 
   // Prepare to take incomplete steps
-  Real last_residual, first_residual;
+  Real last_residual=0., first_residual=0.;
 
   // Set starting linear tolerance
   Real current_linear_tolerance = linear_tolerance;
