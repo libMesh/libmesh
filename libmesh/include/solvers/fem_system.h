@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.1 2006-06-05 00:32:23 roystgnr Exp $
+// $Id: fem_system.h,v 1.2 2006-06-05 21:51:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -81,6 +81,34 @@ public:
    * Users should not need to reimplement this
    */
   void assembly (bool get_residual, bool get_jacobian);
+
+  /**
+   * Tells the FEMSystem that variable var is evolving with
+   * respect to time.  In general, the user's init() function
+   * should call time_evolving() for any variables which
+   * behave like du/dt = F(u), and should not call time_evolving()
+   * for any variables which behave like 0 = G(u).
+   *
+   * Most derived systems will not have to reimplment this function; however
+   * any system which reimplements mass_residual() may have to reimplement
+   * time_evolving() to prepare data structures.
+   */
+  virtual void time_evolving (unsigned int var);
+
+  /**
+   * Adds a mass vector contribution on \p elem to elem_residual.
+   * If this method receives request_jacobian = true, then it
+   * should compute elem_jacobian and return true if possible.  If
+   * elem_jacobian has not been computed then the method should
+   * return false.
+   *
+   * Most problems can use the FEMSystem::mass_residual implementation,
+   * which calculates the residual (u, phi_i) and jacobian (phi_i, phi_j);
+   * few users will need to reimplement this themselves.  Using a custom
+   * mass matrix (e.g. for divergence-free elements or mass lumping)
+   * requires reimplementing mass_residual().
+   */
+  virtual bool mass_residual (bool request_jacobian);
 
   /**
    * @returns \p "General".  Helps in identifying

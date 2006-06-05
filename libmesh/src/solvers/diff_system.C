@@ -22,16 +22,20 @@ DifferentiableSystem::~DifferentiableSystem ()
 
 void DifferentiableSystem::init_data ()
 {
-  // First, allocate a vector for the iterate in our quasi_Newton solver
+  // First, allocate a vector for the iterate in our quasi_Newton
+  // solver
 
   // FIXME - there really ought to be a way to just use the System
   // solution vector if the solver doesn't need an extra vector!
 
   this->add_vector("_nonlinear_solution", false);
 
+  // Next, give us flags for every variable that might be time
+  // evolving
+  _time_evolving.resize(this->n_vars(), false);
+
   // Next initialize ImplicitSystem data
   Parent::init_data();
-
 }
 
 

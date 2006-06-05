@@ -119,11 +119,12 @@ std::cout << "Taking full Newton step" << std::endl;
       Real steplength = 1.;
       _system.assembly(true, false);
 
+      rhs.close();
+      current_residual = rhs.l2_norm();
+
       // backtrack if necessary
       if (require_residual_reduction)
         {
-          rhs.close();
-          current_residual = rhs.l2_norm();
           while (current_residual > last_residual)
             {
               // Reduce step size to 1/2, 1/4, etc.

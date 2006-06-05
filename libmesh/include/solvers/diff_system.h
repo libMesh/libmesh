@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.1 2006-06-05 00:32:23 roystgnr Exp $
+// $Id: diff_system.h,v 1.2 2006-06-05 21:51:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -111,7 +111,7 @@ public:
    * return false.
    *
    * Users may need to reimplement this for their particular PDE.
-   * Given the constrain 0 = G(u), the user should
+   * Given the constraint 0 = G(u), the user should
    * examine u = _nonlinear_solution and add (G(u), phi_i) to 
    * elem_residual.
    */
@@ -158,6 +158,37 @@ public:
   }
  
   /**
+   * Tells the DiffSystem that variable var is evolving with
+   * respect to time.  In general, the user's init() function
+   * should call time_evolving() for any variables which
+   * behave like du/dt = F(u), and should not call time_evolving()
+   * for any variables which behave like 0 = G(u).
+   *
+   * Most derived systems will not have to reimplment this function; however
+   * any system which reimplements mass_residual() may have to reimplement
+   * time_evolving() to prepare data structures.
+   */
+  virtual void time_evolving (unsigned int var) {
+    assert(_time_evolving.size() > var);
+    _time_evolving[var] = true;
+  }
+
+  /**
+   * Adds a mass vector contribution on \p elem to elem_residual.
+   * If this method receives request_jacobian = true, then it
+   * should compute elem_jacobian and return true if possible.  If
+   * elem_jacobian has not been computed then the method should
+   * return false.
+   *
+   * Most problems can use the reimplementation in
+   * FEMSystem::mass_residual; few users will need to reimplement
+   * this themselves.
+   */
+  virtual bool mass_residual (bool request_jacobian) {
+    return request_jacobian;
+  }
+
+  /**
    * Invokes the solver associated with the system.  For steady state
    * solvers, this will find a root x where F(x) = 0.  For transient
    * solvers, this will integrate dx/dt = F(x).
@@ -182,6 +213,8 @@ protected:
    * the system, so that, e.g., \p assemble() may be used.
    */
   virtual void init_data ();
+
+  std::vector<bool> _time_evolving;
 };
 
 
