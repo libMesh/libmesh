@@ -4,15 +4,6 @@
 
 
 
-void SteadySolver::solve()
-{
-  // We only need to solve one (non)linear system
-  // to get the final result
-  diff_solver->solve();
-}
-
-
-
 bool SteadySolver::element_residual(bool request_jacobian)
 {
   bool jacobian_computed =

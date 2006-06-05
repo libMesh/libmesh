@@ -239,6 +239,16 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
       if (get_residual)
         this->rhs->add_vector (elem_residual, dof_indices);
     }
+
+/*
+  if (get_jacobian)
+    {
+      unsigned int old_precision = std::cerr.precision();
+      std::cerr.precision(15);
+      std::cerr << "J = " << *(this->matrix) << std::endl;
+      std::cerr.precision(old_precision);
+    }
+*/
 }
 
 
@@ -303,4 +313,60 @@ void FEMSystem::compute_numerical_jacobian ()
 
   elem_residual = original_residual;
   elem_jacobian = numerical_jacobian;
+}
+
+
+
+void FEMSystem::time_evolving (unsigned int var)
+{
+  // Call the parent function
+  Parent::time_evolving(var);
+
+  // Then make sure we're prepared to do mass integration
+  element_fe[this->variable_type(0)]->get_JxW();
+  element_fe[this->variable_type(var)]->get_phi();
+}
+
+
+
+bool FEMSystem::mass_residual (bool request_jacobian)
+{
+  const std::vector<Real> &JxW = 
+    element_fe[this->variable_type(0)]->get_JxW();
+
+  unsigned int n_qpoints = element_qrule->n_points();
+
+  for (unsigned int var = 0; var != this->n_vars(); ++var)
+    {
+      if (!_time_evolving[var])
+        continue;
+
+      const std::vector<std::vector<Real> > &phi =
+        element_fe[this->variable_type(var)]->get_phi();
+
+      const unsigned int n_dofs = dof_indices_var[var].size();
+
+      DenseSubVector<Number> &Fu = *elem_subresiduals[var];
+      DenseSubMatrix<Number> &Kuu = *elem_subjacobians[var][var];
+
+      for (unsigned int qp = 0; qp != n_qpoints; ++qp)
+        {
+          Number u = 0.;
+          for (unsigned int l = 0; l != n_dofs; ++l)
+            {
+              u += phi[l][qp] * (*elem_subsolutions[var])(l);
+            }
+          for (unsigned int i = 0; i != n_dofs; ++i)
+            {
+              Fu(i) += JxW[qp] * u * phi[i][qp];
+              if (request_jacobian)
+                for (unsigned int j = 0; j != n_dofs; ++j)
+                  {
+                    Kuu(i,j) += JxW[qp] * phi[i][qp] * phi[j][qp];
+                  }
+            }
+        }
+    }
+
+  return request_jacobian;
 }

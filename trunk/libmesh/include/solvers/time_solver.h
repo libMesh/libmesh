@@ -1,4 +1,4 @@
-// $Id: time_solver.h,v 1.1 2006-06-05 00:32:23 roystgnr Exp $
+// $Id: time_solver.h,v 1.2 2006-06-05 21:51:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -69,14 +69,15 @@ public:
    * The initialization function.  This method is used to
    * initialize internal data structures before a simulation begins.
    */
-  virtual void init () {}
+  virtual void init ();
 
   /**
-   * This method performs a solve.  What occurs in
-   * this method will depend on the type of solver.  See
-   * the subclasses for more details.
+   * This method solves one timestep (or solves for a
+   * steady-state solution).  Usually we will only need to solve
+   * one (non)linear system per timestep, but more complex subclasses
+   * may override this.
    */
-  virtual void solve () = 0;
+  virtual void solve ();
 
   /**
    * This method uses the DifferentiableSystem's
@@ -97,9 +98,27 @@ public:
   virtual bool side_residual (bool get_jacobian) = 0;
 
   /**
+   * This method is for subclasses or users to override
+   * to do arbitrary processing between timesteps
+   */
+  virtual void before_timestep () {}
+
+  /**
    * @returns a constant reference to the system we are solving.
    */
   const sys_type & system () const { return _system; }
+
+  /**
+   * For time-dependent problems, this is the time t for which the current
+   * nonlinear_solution is defined.
+   */
+  Real time;
+
+  /**
+   * For time-dependent problems, this is the amount delta t to advance the
+   * solution in time.
+   */
+  Real deltat;
 
 protected:
 
