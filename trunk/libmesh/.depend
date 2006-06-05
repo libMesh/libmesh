@@ -5098,6 +5098,48 @@ src/quadrature/quadrature_trap_3D.$(obj-suffix):\
     include/quadrature/quadrature_trap.h
 src/quadrature/quadrature_trap.$(obj-suffix):\
     src/quadrature/quadrature_trap.C
+src/solvers/diff_solver.$(obj-suffix):\
+    src/solvers/diff_solver.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_preconditioner_type.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
+    include/numerics/linear_solver.h\
+    include/solvers/diff_solver.h\
+    include/solvers/newton_solver.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/solvers/diff_system.$(obj-suffix):\
+    src/solvers/diff_system.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_order.h\
+    include/fe/fe_type.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_submatrix.h\
+    include/numerics/dense_subvector.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
+    include/solvers/diff_system.h\
+    include/solvers/explicit_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/linear_implicit_system.h\
+    include/solvers/system.h\
+    include/solvers/time_solver.h\
+    include/solvers/transient_system.h
 src/solvers/eigen_system.$(obj-suffix):\
     src/solvers/eigen_system.C\
     include/base/auto_ptr.h\
@@ -5269,6 +5311,64 @@ src/solvers/explicit_system.$(obj-suffix):\
     include/fe/fe_type.h\
     include/solvers/explicit_system.h\
     include/solvers/system.h
+src/solvers/fem_system.$(obj-suffix):\
+    src/solvers/fem_system.C\
+    include/base/auto_ptr.h\
+    include/base/dof_map.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_base.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_submatrix.h\
+    include/numerics/dense_subvector.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/quadrature/quadrature.h\
+    include/solvers/diff_system.h\
+    include/solvers/equation_systems.h\
+    include/solvers/explicit_system.h\
+    include/solvers/fem_system.h\
+    include/solvers/frequency_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/linear_implicit_system.h\
+    include/solvers/newmark_system.h\
+    include/solvers/steady_system.h\
+    include/solvers/system.h\
+    include/solvers/time_solver.h\
+    include/solvers/transient_system.h\
+    include/utils/o_string_stream.h\
+    include/utils/parameters.h\
+    include/utils/perf_log.h
 src/solvers/frequency_system.$(obj-suffix):\
     src/solvers/frequency_system.C\
     include/base/auto_ptr.h\
@@ -5384,6 +5484,47 @@ src/solvers/newmark_system.$(obj-suffix):\
     include/solvers/implicit_system.h\
     include/solvers/linear_implicit_system.h\
     include/solvers/newmark_system.h\
+    include/solvers/steady_system.h\
+    include/solvers/system.h\
+    include/solvers/transient_system.h\
+    include/utils/o_string_stream.h\
+    include/utils/parameters.h\
+    include/utils/perf_log.h
+src/solvers/newton_solver.$(obj-suffix):\
+    src/solvers/newton_solver.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_preconditioner_type.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_submatrix.h\
+    include/numerics/dense_subvector.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
+    include/numerics/linear_solver.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/sparse_matrix.h\
+    include/solvers/diff_solver.h\
+    include/solvers/diff_system.h\
+    include/solvers/equation_systems.h\
+    include/solvers/explicit_system.h\
+    include/solvers/frequency_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/linear_implicit_system.h\
+    include/solvers/newmark_system.h\
+    include/solvers/newton_solver.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
@@ -5540,6 +5681,16 @@ src/solvers/system_projection.$(obj-suffix):\
     include/solvers/system.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/solvers/time_solver.$(obj-suffix):\
+    src/solvers/time_solver.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/solvers/diff_solver.h\
+    include/solvers/time_solver.h
 src/solvers/transient_system.$(obj-suffix):\
     src/solvers/transient_system.C\
     include/base/auto_ptr.h\

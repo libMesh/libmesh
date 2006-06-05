@@ -84,6 +84,8 @@ void FEMSystem::init_data ()
   side_qrule =
     hardest_fe_type.default_quadrature_rule(dim-1).release();
 
+  dof_indices_var.resize(n_vars);
+
   // Next, create finite element objects
   for (unsigned int i=0; i != n_vars; ++i)
     {
@@ -113,7 +115,7 @@ void FEMSystem::init_data ()
 
       for (unsigned int j=0; j != n_vars; ++j)
         {
-          elem_subjacobians[j].push_back
+          elem_subjacobians[i].push_back
             (new DenseSubMatrix<Number>(elem_jacobian));
         }
     }
@@ -210,7 +212,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
             continue;
 
           fe_end = side_fe.end();
-          for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
+          for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
                i != fe_end; ++i)
             {
               i->second->reinit(elem, side);
