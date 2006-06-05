@@ -29,9 +29,9 @@ const unsigned int max_linear_iterations = 10000;
 
 // Stopping criteria for nonlinear iterations
 const Real nonlinear_abs_step_tolerance = 1.e-9;
-const Real nonlinear_rel_step_tolerance = 1.e-6;
+const Real nonlinear_rel_step_tolerance = 1.e-4;
 const Real nonlinear_abs_res_tolerance = 1.e-9;
-const Real nonlinear_rel_res_tolerance = 1.e-6;
+const Real nonlinear_rel_res_tolerance = 1.e-4;
 // Maximum amount by which to reduce Newton steps
 const Real minsteplength = 0.1;
 // Initial linear solver tolerance in main nonlinear solver

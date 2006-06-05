@@ -84,8 +84,6 @@ void FEMSystem::init_data ()
   side_qrule =
     hardest_fe_type.default_quadrature_rule(dim-1).release();
 
-  dof_indices_var.resize(n_vars);
-
   // Next, create finite element objects
   for (unsigned int i=0; i != n_vars; ++i)
     {
@@ -96,27 +94,6 @@ void FEMSystem::init_data ()
           element_fe[fe_type]->attach_quadrature_rule(element_qrule);
           side_fe[fe_type] = FEBase::build(dim, fe_type).release();
           side_fe[fe_type]->attach_quadrature_rule(side_qrule);
-        }
-    }
-
-  // Finally, create subvector and submatrix objects
-  elem_subsolutions.clear();
-  elem_subsolutions.reserve(n_vars);
-  elem_subresiduals.clear();
-  elem_subresiduals.reserve(n_vars);
-  elem_subjacobians.clear();
-  elem_subjacobians.resize(n_vars);
-  for (unsigned int i=0; i != n_vars; ++i)
-    {
-      elem_subsolutions.push_back(new DenseSubVector<Number>(elem_solution));
-      elem_subresiduals.push_back(new DenseSubVector<Number>(elem_residual));
-      elem_subjacobians[i].clear();
-      elem_subjacobians[i].reserve(n_vars);
-
-      for (unsigned int j=0; j != n_vars; ++j)
-        {
-          elem_subjacobians[i].push_back
-            (new DenseSubMatrix<Number>(elem_jacobian));
         }
     }
 }
