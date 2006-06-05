@@ -34,8 +34,37 @@ void DifferentiableSystem::init_data ()
   // evolving
   _time_evolving.resize(this->n_vars(), false);
 
+  // Do any initialization our solvers need
+  assert (time_solver.get() != NULL);
+  time_solver->init();
+
   // Next initialize ImplicitSystem data
   Parent::init_data();
+
+  // Finally initialize solution/residual/jacobian data structures
+  unsigned int n_vars = this->n_vars();
+
+  dof_indices_var.resize(n_vars);
+
+  elem_subsolutions.clear();
+  elem_subsolutions.reserve(n_vars);
+  elem_subresiduals.clear();
+  elem_subresiduals.reserve(n_vars);
+  elem_subjacobians.clear();
+  elem_subjacobians.resize(n_vars);
+  for (unsigned int i=0; i != n_vars; ++i)
+    {
+      elem_subsolutions.push_back(new DenseSubVector<Number>(elem_solution));
+      elem_subresiduals.push_back(new DenseSubVector<Number>(elem_residual));
+      elem_subjacobians[i].clear();
+      elem_subjacobians[i].reserve(n_vars);
+
+      for (unsigned int j=0; j != n_vars; ++j)
+        {
+          elem_subjacobians[i].push_back
+            (new DenseSubMatrix<Number>(elem_jacobian));
+        }
+    }
 }
 
 
@@ -49,6 +78,5 @@ void DifferentiableSystem::assemble ()
 
 void DifferentiableSystem::solve ()
 {
-  assert (time_solver.get() != NULL);
   time_solver->solve();
 }

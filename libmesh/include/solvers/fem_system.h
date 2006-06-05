@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.2 2006-06-05 21:51:15 roystgnr Exp $
+// $Id: fem_system.h,v 1.3 2006-06-05 23:09:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -153,30 +153,6 @@ protected:
    * Current element for side_* to examine
    */
   unsigned int side;
-
-  /**
-   * Local components of nonlinear_solution
-   */
-  DenseVector<Number> elem_solution;
-  std::vector<DenseSubVector<Number> *> elem_subsolutions;
-
-  /**
-   * Element residual vector and Jacobian matrix
-   */
-  DenseVector<Number> elem_residual;
-  DenseMatrix<Number> elem_jacobian;
-
-  /**
-   * Element residual subvectors and Jacobian submatrices
-   */
-  std::vector<DenseSubVector<Number> *> elem_subresiduals;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > elem_subjacobians;
-
-  /** 
-   * Global Degree of freedom index lists
-   */
-  std::vector<unsigned int> dof_indices;
-  std::vector<std::vector<unsigned int> > dof_indices_var;
 };
 
 
