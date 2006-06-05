@@ -1,4 +1,4 @@
-// $Id: gmv_io.h,v 1.10 2006-04-07 16:22:46 roystgnr Exp $
+// $Id: gmv_io.h,v 1.11 2006-06-05 16:46:53 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 // C++ includes
 #include <cstring>  // for memcpy
+#include <map>
 
 // Local includes
 #include "libmesh_common.h"
@@ -122,6 +123,20 @@ class GMVIO : public MeshOutput<MeshBase>
 			     const std::vector<Number>* = NULL,
 			     const std::vector<std::string>* = NULL);
 
+  /**
+   * Takes a vector of cell-centered data to be plotted.
+   * You must ensure that for every active element e,
+   * v[e->id()] is a valid number.  You can add an arbitrary
+   * number of different cell-centered data sets by calling
+   * this function multiple times.
+   *
+   * .) GMV does not like spaces in the cell_centered_data_name
+   * .) No matter what order you add cell-centered data, it will be
+   *    output alphabetically.
+   */
+  void add_cell_centered_data (const std::string&       cell_centered_data_name,
+			       const std::vector<Real>* cell_centered_data_vals);
+  
 private:
 
   /**
@@ -175,6 +190,14 @@ private:
    * Flag to write the mesh p refinement levels.
    */
   bool _p_levels;
+
+  /**
+   * Storage for arbitrary cell-centered data.  Ex: You can use this
+   * to plot the effectivity index for a given cell.  The map is
+   * between the string representing the variable name and a pointer
+   * to a vector containing the data.
+   */
+  std::map<std::string, const std::vector<Real>* > _cell_centered_data;
 };
 
 
