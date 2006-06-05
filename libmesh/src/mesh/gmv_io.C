@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.29 2006-04-07 16:22:47 roystgnr Exp $
+// $Id: gmv_io.C,v 1.30 2006-06-05 16:46:53 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -327,12 +327,33 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
         out << (*it)->processor_id()+1 << "\n";
       out << "\n";
     }
-  
-  if ((this->p_levels() && mesh_max_p_level) || 
-    ((solution_names != NULL) && (v != NULL)))
-    out << "variable\n";
 
-  // optionally write the partition information
+  // If there are *any* variables at all in the system (including
+  // p level, or arbitrary cell-based data)
+  // to write, the gmv file needs to contain the word "variable"
+  // on a line by itself.
+  bool write_variable = false;
+
+  // 1.) p-levels
+  if (this->p_levels() && mesh_max_p_level)
+    write_variable = true;
+
+  // 2.) solution data
+  if ((solution_names != NULL) && (v != NULL))
+    write_variable = true;
+
+  // 3.) cell-centered data
+  if ( !(this->_cell_centered_data.empty()) )
+    write_variable = true;
+  
+  if (write_variable)
+    out << "variable\n";
+  
+//   if ((this->p_levels() && mesh_max_p_level) || 
+//     ((solution_names != NULL) && (v != NULL)))
+//     out << "variable\n";
+
+  // optionally write the polynomial degree information
   if (this->p_levels() && mesh_max_p_level)
     {
       out << "p_level 0\n";
@@ -356,6 +377,45 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
       out << "\n\n";
     }
 
+
+  // optionally write cell-centered data
+  if ( !(this->_cell_centered_data.empty()) )
+    {
+      std::map<std::string, const std::vector<Real>* >::iterator       it  = this->_cell_centered_data.begin();
+      const std::map<std::string, const std::vector<Real>* >::iterator end = this->_cell_centered_data.end();      
+
+      for (; it != end; ++it)
+	{
+	  // write out the variable name, followed by a zero.
+	  out << (*it).first << " 0\n";
+
+	  const std::vector<Real>* the_array = (*it).second;
+	  
+	  // Loop over active elements, write out cell data.  If second-order cells
+	  // are split into sub-elements, the sub-elements inherit their parent's
+	  // cell-centered data.
+	  MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
+	  const MeshBase::const_element_iterator elem_end = mesh.active_elements_end(); 
+	  
+	  for ( ; elem_it != elem_end; ++elem_it)
+	    {
+	      const Elem* e = *elem_it;
+	      
+	      // If there's a seg-fault, it will probably be here!
+	      const Real the_value = the_array->operator[](e->id());
+	      
+	      if (this->subdivide_second_order())
+		for (unsigned int se=0; se < e->n_sub_elem(); se++)
+		  out << the_value << " ";
+	      else
+		out << the_value << " ";
+	    }
+	  
+	  out << "\n\n";
+	}
+    }
+
+  
   // optionally write the data
   if ((solution_names != NULL) && (v != NULL))
     {      
@@ -423,6 +483,9 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 
 #endif
 }
+
+
+
 
 
 
@@ -771,11 +834,29 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
     }
 
 
-  if ((this->p_levels() && mesh_max_p_level) || 
-    ((solution_names != NULL) && (v != NULL)))
+  // If there are *any* variables at all in the system (including
+  // p level, or arbitrary cell-based data)
+  // to write, the gmv file needs to contain the word "variable"
+  // on a line by itself.
+  bool write_variable = false;
+
+  // 1.) p-levels
+  if (this->p_levels() && mesh_max_p_level)
+    write_variable = true;
+
+  // 2.) solution data
+  if ((solution_names != NULL) && (v != NULL))
+    write_variable = true;
+
+  // 3.) cell-centered data
+  if ( !(this->_cell_centered_data.empty()) )
+    write_variable = true;
+  
+  if (write_variable)
     out << "variable\n";
 
-  // optionally write the partition information
+
+  // optionally write the p-level information
   if (this->p_levels() && mesh_max_p_level)
     {
       out << "p_level 0\n";
@@ -791,6 +872,49 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
           out << (*it)->p_level() << " ";
       out << "\n\n";
     }
+
+
+
+  
+  // optionally write cell-centered data
+  if ( !(this->_cell_centered_data.empty()) )
+    {
+      std::map<std::string, const std::vector<Real>* >::iterator       it  = this->_cell_centered_data.begin();
+      const std::map<std::string, const std::vector<Real>* >::iterator end = this->_cell_centered_data.end();      
+
+      for (; it != end; ++it)
+	{
+	  // write out the variable name, followed by a zero.
+	  out << (*it).first << " 0\n";
+
+	  const std::vector<Real>* the_array = (*it).second;
+	  
+	  // Loop over active elements, write out cell data.  If second-order cells
+	  // are split into sub-elements, the sub-elements inherit their parent's
+	  // cell-centered data.
+	  MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
+	  const MeshBase::const_element_iterator elem_end = mesh.active_elements_end(); 
+	  
+	  for ( ; elem_it != elem_end; ++elem_it)
+	    {
+	      const Elem* e = *elem_it;
+	      
+	      // If there's a seg-fault, it will probably be here!
+	      const Real the_value = the_array->operator[](e->id());
+	      
+	      if (this->subdivide_second_order())
+		for (unsigned int se=0; se < e->n_sub_elem(); se++)
+		  out << the_value << " ";
+	      else
+		out << the_value << " ";
+	    }
+	  
+	  out << "\n\n";
+	}
+    }
+
+
+
   
   // optionally write the data
   if ((solution_names != NULL) &&
@@ -859,6 +983,10 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   // end of the file
   out << "\nendgmv\n";
 }
+
+
+
+
 
 
 
@@ -1043,9 +1171,25 @@ void GMVIO::write_binary (const std::string& fname,
                 sizeof(unsigned int)*proc_id.size());
     }
 
+  // If there are *any* variables at all in the system (including
+  // p level, or arbitrary cell-based data)
+  // to write, the gmv file needs to contain the word "variable"
+  // on a line by itself.
+  bool write_variable = false;
 
-  if ((this->p_levels() && mesh_max_p_level) || 
-    ((solution_names != NULL) && (vec != NULL)))
+  // 1.) p-levels
+  if (this->p_levels() && mesh_max_p_level)
+    write_variable = true;
+
+  // 2.) solution data
+  if ((solution_names != NULL) && (vec != NULL))
+    write_variable = true;
+
+  // 3.) cell-centered data
+  if ( !(this->_cell_centered_data.empty()) )
+    write_variable = true;
+
+  if (write_variable)
     {
       std::strcpy(buf, "variable");
       out.write(buf, std::strlen(buf));
@@ -1081,6 +1225,58 @@ void GMVIO::write_binary (const std::string& fname,
 
       delete [] temp;
     }
+
+  
+   // optionally write cell-centered data
+   if ( !(this->_cell_centered_data.empty()) )
+     {
+       std::cerr << "Cell-centered data not (yet) supported in binary I/O mode!" << std::endl;
+       
+//        std::map<std::string, const std::vector<Real>* >::iterator       it  = this->_cell_centered_data.begin();
+//        const std::map<std::string, const std::vector<Real>* >::iterator end = this->_cell_centered_data.end();      
+
+//        for (; it != end; ++it)
+//  	{
+//  	  // Write out the variable name ...
+//  	  std::strcpy(buf, (*it).first.c_str());
+//  	  out.write(buf, std::strlen(buf));
+	  
+//  	  // ... followed by a zero.
+//  	  unsigned int tempint = 0; // 0 signifies cell data
+//  	  std::memcpy(buf, &tempint, sizeof(unsigned int));
+//  	  out.write(buf, sizeof(unsigned int));
+
+//  	  // Get a pointer to the array of cell-centered data values
+//  	  const std::vector<Real>* the_array = (*it).second;
+
+// 	  // Since the_array might contain zeros (for inactive elements) we need to
+// 	  // make a copy of it containing just values for active elements.
+// 	  const unsigned int n_floats = mesh.n_active_elem() * (1<<mesh.mesh_dimension());
+// 	  float *temp = new float[n_floats];
+
+// 	  MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
+// 	  const MeshBase::const_element_iterator elem_end = mesh.active_elements_end(); 
+// 	  unsigned int n=0;
+
+// 	  for (; elem_it != elem_end; ++elem_it)
+// 	    {
+// 	      // If there's a seg-fault, it will probably be here!
+// 	      const float the_value = static_cast<float>(the_array->operator[]((*elem_it)->id()));
+	      
+// 	      for (unsigned int se=0; se<(*elem_it)->n_sub_elem(); se++)
+// 		temp[n++] = the_value;
+// 	    }
+
+	  
+//  	  // Write "the_array" directly to the file
+//  	  out.write(reinterpret_cast<char *>(temp),
+//  		    sizeof(float)*n_floats);
+
+// 	  delete [] temp;
+//  	}
+     }
+
+  
   
   
   // optionally write the data
@@ -1174,6 +1370,10 @@ void GMVIO::write_binary (const std::string& fname,
   std::strcpy(buf, "endgmv  ");
   out.write(buf, std::strlen(buf));
 }
+
+
+
+
 
 
 
@@ -1352,6 +1552,13 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
     }
 
 
+  // Writing cell-centered data is not yet supported in discontinuous GMV files.
+  if ( !(this->_cell_centered_data.empty()) )
+    {
+      std::cerr << "Cell-centered data not (yet) supported for discontinuous GMV files!" << std::endl;
+    }
+
+  
   
   // write the data
   {
@@ -1435,3 +1642,14 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
   out << std::endl << "endgmv" << std::endl;
 }
 
+
+
+
+
+void GMVIO::add_cell_centered_data (const std::string&       cell_centered_data_name,
+				    const std::vector<Real>* cell_centered_data_vals)
+{
+  assert (cell_centered_data_vals != NULL);
+  assert (cell_centered_data_vals->size() == this->mesh().n_active_elem());
+  this->_cell_centered_data[cell_centered_data_name] = cell_centered_data_vals;
+}
