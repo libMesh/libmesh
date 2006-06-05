@@ -29,9 +29,9 @@ const unsigned int max_linear_iterations = 10000;
 
 // Stopping criteria for nonlinear iterations
 const Real nonlinear_abs_step_tolerance = 1.e-9;
-const Real nonlinear_rel_step_tolerance = 1.e-9;
+const Real nonlinear_rel_step_tolerance = 1.e-6;
 const Real nonlinear_abs_res_tolerance = 1.e-9;
-const Real nonlinear_rel_res_tolerance = 1.e-9;
+const Real nonlinear_rel_res_tolerance = 1.e-6;
 // Maximum amount by which to reduce Newton steps
 const Real minsteplength = 0.1;
 // Initial linear solver tolerance in main nonlinear solver
@@ -41,9 +41,10 @@ const Real linear_tolerance = 1.e-3;
 const Real relative_tolerance = 1.e-3;
 // We'll shut up eventually...
 const bool verbose_convergence_chatter = true;
+const bool require_residual_reduction = false;
 
 
-  EquationSystems equation_systems = _system.get_equation_systems();
+  EquationSystems &equation_systems = _system.get_equation_systems();
 
   equation_systems.parameters.set<unsigned int>
                    ("linear solver maximum iterations") =
@@ -119,28 +120,32 @@ std::cout << "Taking full Newton step" << std::endl;
       _system.assembly(true, false);
 
       // backtrack if necessary
-      rhs.close();
-      current_residual = rhs.l2_norm();
-      while (current_residual > last_residual)
+      if (require_residual_reduction)
         {
-          // Reduce step size to 1/2, 1/4, etc.
-          steplength /= 2.;
-          norm_delta /= 2.;
+          rhs.close();
+          current_residual = rhs.l2_norm();
+          while (current_residual > last_residual)
+            {
+              // Reduce step size to 1/2, 1/4, etc.
+              steplength /= 2.;
+              norm_delta /= 2.;
 std::cout << "Shrinking Newton step to " << steplength << std::endl;
               newton_iterate.add (steplength, solution);
               newton_iterate.close();
 
-          // Check residual with fractional Newton step
-          std::cout << "          Checking " << std::flush;
-          _system.assembly (true, false);
-          current_residual = rhs.l2_norm();
+              // Check residual with fractional Newton step
+              std::cout << "          Checking " << std::flush;
+              _system.assembly (true, false);
+              current_residual = rhs.l2_norm();
+              std::cout << "Current Residual: " << current_residual << std::endl;
 
-          if (steplength/2. < minsteplength && 
-              current_residual > last_residual)
-            {
+              if (steplength/2. < minsteplength && 
+                  current_residual > last_residual)
+                {
 std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
 
-              error();
+                  error();
+                }
             }
         }
 
