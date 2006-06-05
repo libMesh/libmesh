@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.30 2006-03-29 20:56:45 roystgnr Exp $
+// $Id: equation_systems.C,v 1.31 2006-06-05 02:31:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -74,7 +74,9 @@ void EquationSystems::clear ()
     {
       system_iterator pos = _systems.begin();
       
-      delete pos->second; pos->second = NULL;
+      System *sys = pos->second;
+      delete sys;
+      sys = NULL;
       
       _systems.erase (pos);
     }
