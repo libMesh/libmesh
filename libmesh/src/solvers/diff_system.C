@@ -8,7 +8,9 @@ DifferentiableSystem::DifferentiableSystem
                        const std::string& name,
                        const unsigned int number) :
   Parent      (es, name, number),
-  time_solver (NULL)
+  time_solver (NULL),
+  time(0.),
+  deltat(1.)
 {
 }
 

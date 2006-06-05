@@ -1,4 +1,4 @@
-// $Id: time_solver.h,v 1.2 2006-06-05 21:51:15 roystgnr Exp $
+// $Id: time_solver.h,v 1.3 2006-06-05 23:25:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -107,18 +107,6 @@ public:
    * @returns a constant reference to the system we are solving.
    */
   const sys_type & system () const { return _system; }
-
-  /**
-   * For time-dependent problems, this is the time t for which the current
-   * nonlinear_solution is defined.
-   */
-  Real time;
-
-  /**
-   * For time-dependent problems, this is the amount delta t to advance the
-   * solution in time.
-   */
-  Real deltat;
 
 protected:
 
