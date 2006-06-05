@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.34 2006-03-21 21:42:21 roystgnr Exp $
+// $Id: fe_base.C,v 1.35 2006-06-05 21:04:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -544,6 +544,16 @@ void FEBase::compute_shape_functions (const Elem*)
   START_LOG("compute_shape_functions()", "FE");
 
   calculations_started = true;
+
+  // If the user forgot to request anything, we'll be safe and
+  // calculate everything:
+#ifdef ENABLE_SECOND_DERIVATIVES
+  if (!calculate_phi && !calculate_dphi && !calculate_d2phi)
+    calculate_phi = calculate_dphi = calculate_d2phi = true;
+#else
+  if (!calculate_phi && !calculate_dphi)
+    calculate_phi = calculate_dphi = true;
+#endif // ENABLE_SECOND_DERIVATIVES
 
   // Compute the value of the derivative shape function i at quadrature point p
   switch (dim)
