@@ -69,6 +69,7 @@ const bool verbose_convergence_chatter = true;
   for (unsigned int l=0; l<max_nonlinear_steps; ++l)
     {
       _system.assembly(true, true);
+      rhs.close();
       Real current_residual = rhs.l2_norm();
       if (!l)
         first_residual = current_residual;
@@ -118,6 +119,7 @@ std::cout << "Taking full Newton step" << std::endl;
       _system.assembly(true, false);
 
       // backtrack if necessary
+      rhs.close()
       current_residual = rhs.l2_norm();
       while (current_residual > last_residual)
         {
