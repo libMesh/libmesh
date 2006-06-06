@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.14 2006-06-06 04:00:16 roystgnr Exp $
+// $Id: dense_matrix.h,v 1.15 2006-06-06 08:58:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -143,6 +143,45 @@ public:
    * Adds \p mat to this matrix.
    */
   DenseMatrix<T>& operator+= (const DenseMatrix<T> &mat);
+
+  /**
+   * @returns the minimum element in the matrix.
+   * In case of complex numbers, this returns the minimum
+   * Real part.
+   */
+  Real min () const;
+
+  /**
+   * @returns the maximum element in the matrix.
+   * In case of complex numbers, this returns the maximum
+   * Real part.
+   */
+  Real max () const;
+
+  /**
+   * Return the l1-norm of the matrix, that is
+   * \f$|M|_1=max_{all columns j}\sum_{all
+   * rows i} |M_ij|\f$,
+   * (max. sum of columns).
+   * This is the
+   * natural matrix norm that is compatible
+   * to the l1-norm for vectors, i.e.
+   * \f$|Mv|_1\leq |M|_1 |v|_1\f$.
+   */
+  Real l1_norm () const;
+
+  /**
+   * Return the linfty-norm of the
+   * matrix, that is
+   * \f$|M|_\infty=max_{all rows i}\sum_{all
+   * columns j} |M_ij|\f$,
+   * (max. sum of rows).
+   * This is the
+   * natural matrix norm that is compatible
+   * to the linfty-norm of vectors, i.e.
+   * \f$|Mv|_\infty \leq |M|_\infty |v|_\infty\f$.
+   */
+  Real linfty_norm () const;
 
   /**
    * Left multiplies by the transpose of the matrix \p A.
@@ -476,6 +515,100 @@ DenseMatrix<T>& DenseMatrix<T>::operator += (const DenseMatrix<T> &mat)
 }
 
 
+
+template<typename T>
+inline
+Real DenseMatrix<T>::min () const
+{
+  assert (this->_m);
+  assert (this->_n);
+  Real my_min = libmesh_real((*this)(0,0));
+
+  for (unsigned int i=0; i!=this->_m; i++)
+    {
+      for (unsigned int j=0; j!=this->_n; j++)
+        {
+          Real current = libmesh_real((*this)(i,j));
+          my_min = (my_min < current? my_min : current);
+        }
+    }
+  return my_min;
+}
+
+
+
+template<typename T>
+inline
+Real DenseMatrix<T>::max () const
+{
+  assert (this->_m);
+  assert (this->_n);
+  Real my_max = libmesh_real((*this)(0,0));
+
+  for (unsigned int i=0; i!=this->_m; i++)
+    {
+      for (unsigned int j=0; j!=this->_n; j++)
+        {
+          Real current = libmesh_real((*this)(i,j));
+          my_max = (my_max > current? my_max : current);
+        }
+    }
+  return my_max;
+}
+
+
+
+template<typename T>
+inline
+Real DenseMatrix<T>::l1_norm () const
+{
+  assert (this->_m);
+  assert (this->_n);
+
+  Real columnsum = 0.;
+  for (unsigned int i=0; i!=this->_m; i++)
+    {
+      columnsum += std::abs((*this)(i,0));
+    }
+  Real my_max = columnsum;
+  for (unsigned int j=1; j!=this->_n; j++)
+    {
+      columnsum = 0.;
+      for (unsigned int i=0; i!=this->_m; i++)
+        {
+          columnsum += std::abs((*this)(i,j));
+        }
+      my_max = (my_max > columnsum? my_max : columnsum);
+    }
+  return my_max;
+}
+
+
+
+template<typename T>
+inline
+Real DenseMatrix<T>::linfty_norm () const
+{
+  assert (this->_m);
+  assert (this->_n);
+
+  Real rowsum = 0.;
+  for (unsigned int j=0; j!=this->_n; j++)
+    {
+      rowsum += std::abs((*this)(0,j));
+    }
+  Real my_max = rowsum;
+  for (unsigned int i=1; i!=this->_m; i++)
+    {
+      rowsum = 0.;
+      for (unsigned int j=0; j!=this->_n; j++)
+        {
+          rowsum += std::abs((*this)(i,j));
+        }
+      my_max = (my_max > rowsum? my_max : rowsum);
+    }
+  return my_max;
+}
 
 
 
