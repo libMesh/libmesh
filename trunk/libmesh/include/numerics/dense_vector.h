@@ -1,4 +1,4 @@
-// $Id: dense_vector.h,v 1.8 2006-06-05 23:09:12 roystgnr Exp $
+// $Id: dense_vector.h,v 1.9 2006-06-06 03:59:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -103,6 +103,11 @@ public:
    * Assignment operator.
    */
   DenseVector<T>& operator = (const DenseVector<T>& other_vector);
+  
+  /**
+   * STL-like swap method
+   */
+  void swap(const DenseVector<T>& other_vector);
   
   /**
    * Resize the vector. Sets all elements to 0.
@@ -234,6 +239,15 @@ DenseVector<T>& DenseVector<T>::operator = (const DenseVector<T>& other_vector)
   _val = other_vector._val;
   
   return *this;
+}
+
+
+
+template<typename T>
+inline
+void DenseVector<T>::swap(const DenseVector<T>& other_vector)
+{
+  _val.swap(other_vector);
 }
 
 
