@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.13 2006-06-06 03:59:18 roystgnr Exp $
+// $Id: dense_matrix.h,v 1.14 2006-06-06 04:00:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -114,7 +114,7 @@ public:
   /**
    * STL-like swap method
    */
-  void swap(const DenseMatrix<T>& other_matrix);
+  void swap(DenseMatrix<T>& other_matrix);
   
   /**
    * Resize the matrix.  Will never free memory, but may
@@ -347,7 +347,7 @@ DenseMatrix<T>::DenseMatrix (const DenseMatrix<T>& other_matrix)
 
 template<typename T>
 inline
-void DenseMatrix<T>::swap(const DenseMatrix<T>& other_matrix)
+void DenseMatrix<T>::swap(DenseMatrix<T>& other_matrix)
 {
   std::swap(this->_m, other_matrix._m);
   std::swap(this->_n, other_matrix._n);
