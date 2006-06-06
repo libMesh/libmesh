@@ -4,6 +4,12 @@
 
 
 
+SteadySolver::~SteadySolver ()
+{
+}
+  
+
+
 bool SteadySolver::element_residual(bool request_jacobian)
 {
   bool jacobian_computed =

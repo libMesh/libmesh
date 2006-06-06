@@ -1,5 +1,5 @@
 
-// $Id: steady_solver.h,v 1.1 2006-06-05 04:23:20 roystgnr Exp $
+// $Id: steady_solver.h,v 1.2 2006-06-06 21:41:59 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -63,18 +63,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~SteadySolver () {}
-
-  /**
-   * The initialization function.  This method is used to
-   * initialize internal data structures before a simulation begins.
-   */
-  virtual void init () {}
-
-  /**
-   * This method performs a solve of the steady state problem.
-   */
-  virtual void solve ();
+  virtual ~SteadySolver ();
 
   /**
    * This method uses the DifferentiableSystem's

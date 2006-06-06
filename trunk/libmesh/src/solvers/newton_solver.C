@@ -1,14 +1,15 @@
 
 #include "diff_system.h"
-#include "equation_systems.h"
+#include "libmesh_logging.h"
 #include "linear_solver.h"
 #include "newton_solver.h"
 #include "numeric_vector.h"
 #include "sparse_matrix.h"
 
 
-NewtonSolver::NewtonSolver (sys_type& s) :
-  Parent(s), linear_solver(LinearSolver<Number>::build())
+NewtonSolver::NewtonSolver (sys_type& s)
+  : Parent(s),
+    linear_solver(LinearSolver<Number>::build())
 {
 }
 
@@ -22,6 +23,8 @@ NewtonSolver::~NewtonSolver ()
 
 void NewtonSolver::solve()
 {
+  START_LOG("solve", "NewtonSolver");
+
 // The number of steps and the stopping criterion
 // for the nonlinear iterations.
 const unsigned int max_nonlinear_steps = 100;
@@ -29,26 +32,17 @@ const unsigned int max_linear_iterations = 10000;
 
 // Stopping criteria for nonlinear iterations
 const Real nonlinear_abs_step_tolerance = 1.e-9;
-const Real nonlinear_rel_step_tolerance = 1.e-4;
-const Real nonlinear_abs_res_tolerance = 1.e-9;
-const Real nonlinear_rel_res_tolerance = 1.e-4;
+const Real nonlinear_rel_step_tolerance = 1.e-9;
+// Reduce Newton step length to keep residual from increasing?
+const bool require_residual_reduction = false;
 // Maximum amount by which to reduce Newton steps
 const Real minsteplength = 0.1;
-// Initial linear solver tolerance in main nonlinear solver
-const Real linear_tolerance = 1.e-3;
 // Amount by which nonlinear residual should exceed linear solver
 // tolerance
 const Real relative_tolerance = 1.e-3;
 // We'll shut up eventually...
 const bool verbose_convergence_chatter = true;
-const bool require_residual_reduction = false;
 
-
-  EquationSystems &equation_systems = _system.get_equation_systems();
-
-  equation_systems.parameters.set<unsigned int>
-                   ("linear solver maximum iterations") =
-                   max_linear_iterations;
 
   NumericVector<Number> &solution = *(_system.solution);
   NumericVector<Number> &newton_iterate =
@@ -65,7 +59,7 @@ const bool require_residual_reduction = false;
   Real last_residual=0., first_residual=0.;
 
   // Set starting linear tolerance
-  Real current_linear_tolerance = linear_tolerance;
+  Real current_linear_tolerance = initial_linear_tolerance;
 
   for (unsigned int l=0; l<max_nonlinear_steps; ++l)
     {
@@ -81,8 +75,12 @@ std::cout << "Nonlinear Residual: " << current_residual << std::endl;
       if (current_linear_tolerance > current_residual * relative_tolerance)
         {
           current_linear_tolerance = current_residual * relative_tolerance;
-          equation_systems.parameters.set<Real> 
-            ("linear solver tolerance") = current_linear_tolerance;
+        }
+
+      // But don't let it be zero
+      if (current_linear_tolerance < TOLERANCE * TOLERANCE)
+        {
+          current_linear_tolerance = TOLERANCE * TOLERANCE;
         }
 
       // At this point newton_iterate is the current guess, and
@@ -103,7 +101,7 @@ std::cout << "Linear solve starting" << std::endl;
                               current_linear_tolerance, 
                               max_linear_iterations);
 
-std::cout << "Linear solve converged, step " << rval.first
+std::cout << "Linear solve finished, step " << rval.first
           << ", residual " << rval.second
           << ", tolerance " << current_linear_tolerance << std::endl;
 
@@ -165,7 +163,7 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
       bool has_converged = false;
 
       // Is our absolute residual low enough?
-      if (current_residual < nonlinear_abs_res_tolerance)
+      if (current_residual < absolute_residual_tolerance)
         {
           std::cout << "  Nonlinear solver converged, step "
                     << l
@@ -179,12 +177,13 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
           std::cout << "  Nonlinear solver current_residual "
                     << current_residual
                     << " > "
-                    << (nonlinear_abs_res_tolerance)
+                    << (absolute_residual_tolerance)
                     << std::endl;
         }
 
       // Is our relative residual low enough?
-      if ((current_residual / first_residual) < nonlinear_rel_res_tolerance)
+      if ((current_residual / first_residual) <
+          relative_residual_tolerance)
         {
           std::cout << "  Nonlinear solver converged, step "
                     << l
@@ -198,7 +197,7 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
           std::cout << "  Nonlinear solver current/first residual "
                     << (current_residual / first_residual)
                     << " > "
-                    << nonlinear_rel_res_tolerance
+                    << relative_residual_tolerance
                     << std::endl;
         }
 
@@ -241,4 +240,12 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
           continue;
         }
     } // end nonlinear loop
+
+  // Copy the final nonlinear iterate into the current_solution,
+  // for other libMesh functions that expect it
+
+  solution = newton_iterate;
+  solution.close();
+
+  STOP_LOG("solve", "NewtonSolver");
 }

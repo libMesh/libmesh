@@ -1,4 +1,4 @@
-// $Id: diff_solver.h,v 1.1 2006-06-05 00:32:23 roystgnr Exp $
+// $Id: diff_solver.h,v 1.2 2006-06-06 21:41:59 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,8 +56,11 @@ public:
    * Constructor. Requires a reference to the system
    * to be solved.
    */
-  DiffSolver (sys_type& s) : _system (s) {}
-  
+  DiffSolver (sys_type& s)
+    : absolute_residual_tolerance(1e-9),
+      relative_residual_tolerance(1e-9),
+      initial_linear_tolerance(1e-3),
+      _system (s) {}
   /**
    * Factory.  Requires a reference to the system
    * to be solved.  Returns a NewtonSolver by default
@@ -86,6 +89,21 @@ public:
    * @returns a constant reference to the system we are solving.
    */
   const sys_type & system () const { return _system; }
+
+  /**
+   * The DiffSolver should exit after the residual 
+   * reduced to either less than absolute_residual_tolerance
+   * or less than relative_residual_tolerance times the
+   * initial residual
+   */
+  Real absolute_residual_tolerance;
+  Real relative_residual_tolerance;
+
+  /**
+   * Any required linear solves will be done with this tolerance;
+   * the DiffSolver may tighten the tolerance for later solves.
+   */
+  Real initial_linear_tolerance;
 
 protected:
 
