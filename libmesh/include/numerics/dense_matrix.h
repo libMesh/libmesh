@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.12 2006-06-05 23:09:12 roystgnr Exp $
+// $Id: dense_matrix.h,v 1.13 2006-06-06 03:59:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -110,6 +110,11 @@ public:
    * Assignment operator.
    */
   DenseMatrix<T>& operator = (const DenseMatrix<T>& other_matrix);
+  
+  /**
+   * STL-like swap method
+   */
+  void swap(const DenseMatrix<T>& other_matrix);
   
   /**
    * Resize the matrix.  Will never free memory, but may
@@ -340,6 +345,20 @@ DenseMatrix<T>::DenseMatrix (const DenseMatrix<T>& other_matrix)
 
 
 
+template<typename T>
+inline
+void DenseMatrix<T>::swap(const DenseMatrix<T>& other_matrix)
+{
+  std::swap(this->_m, other_matrix._m);
+  std::swap(this->_n, other_matrix._n);
+  _val.swap(other_matrix._val);
+  DecompositionType _temp = _decomposition_type;
+  _decomposition_type = other_matrix._decomposition_type;
+  other_matrix._decomposition_type = _temp;
+}
+
+
+  
 template<typename T>
 inline
 void DenseMatrix<T>::resize(const unsigned int m,
