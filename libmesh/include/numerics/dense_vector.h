@@ -1,4 +1,4 @@
-// $Id: dense_vector.h,v 1.10 2006-06-06 04:00:16 roystgnr Exp $
+// $Id: dense_vector.h,v 1.11 2006-06-06 04:01:20 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -247,7 +247,7 @@ template<typename T>
 inline
 void DenseVector<T>::swap(DenseVector<T>& other_vector)
 {
-  _val.swap(other_vector);
+  _val.swap(other_vector._val);
 }
 
 
