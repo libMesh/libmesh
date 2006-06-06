@@ -10,7 +10,11 @@ DifferentiableSystem::DifferentiableSystem
   Parent      (es, name, number),
   time_solver (NULL),
   time(0.),
-  deltat(1.)
+  deltat(1.),
+  print_residual_norms(false),
+  print_residuals(false),
+  print_jacobian_norms(false),
+  print_jacobians(false)
 {
 }
 

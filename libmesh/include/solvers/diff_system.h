@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.4 2006-06-05 23:25:32 roystgnr Exp $
+// $Id: diff_system.h,v 1.5 2006-06-06 21:41:59 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -218,6 +218,26 @@ public:
    * solution in time.
    */
   Real deltat;
+
+  /**
+   * Set print_residual_norm to true to print |F| whenever it is assembled.
+   */
+  bool print_residual_norms;
+
+  /**
+   * Set print_residual_norm to true to print |F| whenever it is assembled.
+   */
+  bool print_residuals;
+
+  /**
+   * Set print_residual_norm to true to print |F| whenever it is assembled.
+   */
+  bool print_jacobian_norms;
+
+  /**
+   * Set print_residual_norm to true to print |F| whenever it is assembled.
+   */
+  bool print_jacobians;
 
   /**
    * Local components of nonlinear_solution

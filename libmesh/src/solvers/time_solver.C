@@ -6,9 +6,9 @@
 
 
 
-TimeSolver::TimeSolver (sys_type& s) :
-  _system (s),
-  diff_solver(DiffSolver::build(s)) {}
+TimeSolver::TimeSolver (sys_type& s)
+  : diff_solver(DiffSolver::build(s)),
+    _system(s) {}
 
 
 
@@ -29,8 +29,12 @@ void TimeSolver::init ()
 
 void TimeSolver::solve ()
 {
-  _system.get_vector("_old_nonlinear_solution") =
+  NumericVector<Number> &old_nonlinear_solution =
+  _system.get_vector("_old_nonlinear_solution");
+  NumericVector<Number> &nonlinear_solution =
     _system.get_vector("_nonlinear_solution");
+
+  old_nonlinear_solution = nonlinear_solution;
 
   diff_solver->solve();
 

@@ -3,6 +3,7 @@
 #include "fe_base.h"
 #include "equation_systems.h"
 #include "fem_system.h"
+#include "libmesh_logging.h"
 #include "mesh.h"
 #include "numeric_vector.h"
 #include "quadrature.h"
@@ -102,21 +103,22 @@ void FEMSystem::init_data ()
 
 void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 {
+  START_LOG("assembly", "FEMSystem");
   assert(get_residual || get_jacobian);
 
   const Mesh& mesh = this->get_mesh();
 
   const DofMap& dof_map = this->get_dof_map();
 
+  // Global nonlinear solution
+  NumericVector<Number> &nonlinear_solution =
+    this->get_vector("_nonlinear_solution");
+
   // Is this definitely necessary? [RHS]
   if (get_jacobian)
     matrix->zero();
   if (get_residual)
     rhs->zero();
-
-  // Global nonlinear solution
-  NumericVector<Number> &nonlinear_solution =
-    this->get_vector("_nonlinear_solution");
 
   // In time-dependent problems, the nonlinear function we're trying
   // to solve at each timestep may depend on the particular solver
@@ -139,8 +141,8 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
       for (unsigned int i=0; i != n_dofs; ++i)
         elem_solution(i) = nonlinear_solution(dof_indices[i]);
 
-      elem_residual.resize(dof_indices.size());
-      elem_jacobian.resize(dof_indices.size(), dof_indices.size());
+      elem_residual.resize(n_dofs);
+      elem_jacobian.resize(n_dofs, n_dofs);
 
       unsigned int sub_dofs = 0;
 
@@ -217,21 +219,41 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
         this->rhs->add_vector (elem_residual, dof_indices);
     }
 
-/*
-  if (get_jacobian)
+
+  if (get_residual && print_residual_norms)
     {
+      this->rhs->close();
+      std::cerr << "|F| = " << this->rhs->l1_norm() << std::endl;
+    }
+  if (get_residual && print_residuals)
+    {
+      this->rhs->close();
       unsigned int old_precision = std::cerr.precision();
       std::cerr.precision(15);
-      std::cerr << "J = " << *(this->matrix) << std::endl;
+      std::cerr << "F = [" << *(this->rhs) << "];" << std::endl;
       std::cerr.precision(old_precision);
     }
-*/
+  if (get_jacobian && print_jacobian_norms)
+    {
+      this->matrix->close();
+      std::cerr << "|J| = " << this->matrix->l1_norm() << std::endl;
+    }
+  if (get_jacobian && print_jacobians)
+    {
+      this->matrix->close();
+      unsigned int old_precision = std::cerr.precision();
+      std::cerr.precision(15);
+      std::cerr << "J = [" << *(this->matrix) << "];" << std::endl;
+      std::cerr.precision(old_precision);
+    }
+  STOP_LOG("assembly", "FEMSystem");
 }
 
 
 
 void FEMSystem::compute_numerical_jacobian ()
 {
+  START_LOG("compute_numerical_jacobian", "FEMSystem");
   Real h = 1e-6;  // FIXME: How do we scale this?
 
   DenseVector<Number> original_residual(elem_residual);
@@ -290,6 +312,7 @@ void FEMSystem::compute_numerical_jacobian ()
 
   elem_residual = original_residual;
   elem_jacobian = numerical_jacobian;
+  STOP_LOG("compute_numerical_jacobian", "FEMSystem");
 }
 
 
@@ -300,7 +323,7 @@ void FEMSystem::time_evolving (unsigned int var)
   Parent::time_evolving(var);
 
   // Then make sure we're prepared to do mass integration
-  element_fe[this->variable_type(0)]->get_JxW();
+  element_fe[this->variable_type(var)]->get_JxW();
   element_fe[this->variable_type(var)]->get_phi();
 }
 
@@ -308,15 +331,15 @@ void FEMSystem::time_evolving (unsigned int var)
 
 bool FEMSystem::mass_residual (bool request_jacobian)
 {
-  const std::vector<Real> &JxW = 
-    element_fe[this->variable_type(0)]->get_JxW();
-
   unsigned int n_qpoints = element_qrule->n_points();
 
   for (unsigned int var = 0; var != this->n_vars(); ++var)
     {
       if (!_time_evolving[var])
         continue;
+
+      const std::vector<Real> &JxW = 
+        element_fe[this->variable_type(var)]->get_JxW();
 
       const std::vector<std::vector<Real> > &phi =
         element_fe[this->variable_type(var)]->get_phi();
