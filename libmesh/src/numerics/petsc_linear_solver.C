@@ -1,4 +1,4 @@
-// $Id: petsc_linear_solver.C,v 1.6 2005-11-30 00:00:01 roystgnr Exp $
+// $Id: petsc_linear_solver.C,v 1.7 2006-06-07 22:22:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 // C++ includes
 
 // Local Includes
+#include "libmesh_logging.h"
 #include "petsc_linear_solver.h"
 
 
@@ -168,6 +169,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 			     const double tol,
 			     const unsigned int m_its)
 {
+  START_LOG("solve", "PetscLinearSolver");
   this->init ();
   
   PetscMatrix<T>* matrix   = dynamic_cast<PetscMatrix<T>*>(&matrix_in);
@@ -297,6 +299,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 	 
 #endif
 
+  STOP_LOG("solve", "PetscLinearSolver");
   // return the # of its. and the final residual norm.
   return std::make_pair(its, final_resid);
 }

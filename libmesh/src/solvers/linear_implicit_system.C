@@ -1,4 +1,4 @@
-// $Id: linear_implicit_system.C,v 1.6 2006-03-29 20:01:47 roystgnr Exp $
+// $Id: linear_implicit_system.C,v 1.7 2006-06-07 22:22:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -80,7 +80,8 @@ void LinearImplicitSystem::solve ()
     this->assemble (); 
 
   // Log how long the linear solve takes.
-  START_LOG("solve()", "System");
+  // This gets done by the LinearSolver classes now [RHS]
+  // START_LOG("solve()", "System");
 
   // Get a reference to the EquationSystems
   const EquationSystems& es =
@@ -108,7 +109,8 @@ void LinearImplicitSystem::solve ()
   _final_linear_residual = rval.second;
     
   // Stop logging the linear solve
-  STOP_LOG("solve()", "System");
+  // This gets done by the LinearSolver classes now [RHS]
+  // STOP_LOG("solve()", "System");
 
   // Update the system after the solve
   this->update();  
