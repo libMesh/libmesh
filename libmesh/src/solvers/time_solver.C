@@ -7,7 +7,7 @@
 
 
 TimeSolver::TimeSolver (sys_type& s)
-  : diff_solver(DiffSolver::build(s)),
+  : diff_solver(NULL),
     _system(s) {}
 
 
@@ -20,6 +20,10 @@ TimeSolver::~TimeSolver ()
 
 void TimeSolver::init ()
 {
+  // If the user hasn't given us a solver to use,
+  // just build a default solver
+  if (diff_solver.get() == NULL)
+    diff_solver = DiffSolver::build(_system);
   diff_solver->init();
 
   _system.add_vector("_old_nonlinear_solution");
