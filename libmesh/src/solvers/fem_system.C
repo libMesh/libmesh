@@ -175,12 +175,15 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
         }
       assert(sub_dofs == n_dofs);
 
+      // Logging of FE::reinit is done in the FE functions
+      PAUSE_LOG("assembly", "FEMSystem");
       std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
       for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
            i != fe_end; ++i)
         {
           i->second->reinit(elem);
         }
+      RESTART_LOG("assembly", "FEMSystem");
       
       bool jacobian_computed = time_solver->element_residual(get_jacobian);
 
@@ -190,18 +193,22 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
           if (!compute_internal_sides && elem->neighbor(side) != NULL)
             continue;
 
+          // Logging of FE::reinit is done in the FE functions
+          PAUSE_LOG("assembly", "FEMSystem");
           fe_end = side_fe.end();
           for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
                i != fe_end; ++i)
             {
               i->second->reinit(elem, side);
             }
+          RESTART_LOG("assembly", "FEMSystem");
           jacobian_computed = time_solver->side_residual(get_jacobian)
                               && jacobian_computed;
         }
 
       if (get_jacobian && !jacobian_computed)
         {
+          // Logging of compute_numerical_jacobian is done separately
           PAUSE_LOG("assembly", "FEMSystem");
           this->compute_numerical_jacobian();
           RESTART_LOG("assembly", "FEMSystem");
