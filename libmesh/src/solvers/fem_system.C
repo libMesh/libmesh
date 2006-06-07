@@ -15,7 +15,8 @@
 FEMSystem::FEMSystem (EquationSystems& es,
                       const std::string& name,
                       const unsigned int number)
-  : Parent(es, name, number)
+  : Parent(es, name, number),
+    verify_analytic_jacobians(0.0)
 {
 }
 
@@ -103,7 +104,7 @@ void FEMSystem::init_data ()
 
 void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 {
-  START_LOG("assembly", "FEMSystem");
+  START_LOG("assembly()", "FEMSystem");
   assert(get_residual || get_jacobian);
 
   const Mesh& mesh = this->get_mesh();
@@ -176,14 +177,14 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
       assert(sub_dofs == n_dofs);
 
       // Logging of FE::reinit is done in the FE functions
-      PAUSE_LOG("assembly", "FEMSystem");
+      PAUSE_LOG("assembly()", "FEMSystem");
       std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
       for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
            i != fe_end; ++i)
         {
           i->second->reinit(elem);
         }
-      RESTART_LOG("assembly", "FEMSystem");
+      RESTART_LOG("assembly()", "FEMSystem");
       
       bool jacobian_computed = time_solver->element_residual(get_jacobian);
 
@@ -194,24 +195,55 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
             continue;
 
           // Logging of FE::reinit is done in the FE functions
-          PAUSE_LOG("assembly", "FEMSystem");
+          PAUSE_LOG("assembly()", "FEMSystem");
           fe_end = side_fe.end();
           for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
                i != fe_end; ++i)
             {
               i->second->reinit(elem, side);
             }
-          RESTART_LOG("assembly", "FEMSystem");
+          RESTART_LOG("assembly()", "FEMSystem");
           jacobian_computed = time_solver->side_residual(get_jacobian)
                               && jacobian_computed;
+        }
+
+      if (get_jacobian && jacobian_computed &&
+          verify_analytic_jacobians != 0.0)
+        {
+          DenseMatrix<Number> analytic_jacobian(elem_jacobian);
+
+          // Logging of compute_numerical_jacobian is done separately
+          PAUSE_LOG("assembly()", "FEMSystem");
+          this->compute_numerical_jacobian();
+          RESTART_LOG("assembly()", "FEMSystem");
+
+          Real analytic_norm = analytic_jacobian.l1_norm();
+          Real numerical_norm = elem_jacobian.l1_norm();
+
+          // If we can continue, we'll want to use the analytic jacobian
+          analytic_jacobian.swap(elem_jacobian);
+
+          // The matrix "analytic_jacobian" will now hold the error matrix
+          analytic_jacobian.add(-1.0, elem_jacobian);
+          Real error_norm = analytic_jacobian.l1_norm();
+
+          Real relative_error = error_norm /
+                                std::max(analytic_norm, numerical_norm);
+
+          if (relative_error > verify_analytic_jacobians)
+            {
+              std::cerr << "Relative error " << relative_error
+                        << " detected in analytic jacobian!";
+              error();
+            }
         }
 
       if (get_jacobian && !jacobian_computed)
         {
           // Logging of compute_numerical_jacobian is done separately
-          PAUSE_LOG("assembly", "FEMSystem");
+          PAUSE_LOG("assembly()", "FEMSystem");
           this->compute_numerical_jacobian();
-          RESTART_LOG("assembly", "FEMSystem");
+          RESTART_LOG("assembly()", "FEMSystem");
         }
 
       if (get_residual && get_jacobian)
@@ -257,14 +289,14 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
       std::cerr << "J = [" << *(this->matrix) << "];" << std::endl;
       std::cerr.precision(old_precision);
     }
-  STOP_LOG("assembly", "FEMSystem");
+  STOP_LOG("assembly()", "FEMSystem");
 }
 
 
 
 void FEMSystem::compute_numerical_jacobian ()
 {
-  START_LOG("compute_numerical_jacobian", "FEMSystem");
+  START_LOG("compute_numerical_jacobian()", "FEMSystem");
   Real h = 1e-6;  // FIXME: How do we scale this?
 
   DenseVector<Number> original_residual(elem_residual);
@@ -284,12 +316,15 @@ void FEMSystem::compute_numerical_jacobian ()
           if (!compute_internal_sides && elem->neighbor(side) != NULL)
             continue;
 
+          // Logging of FE::reinit is done in the FE functions
+          PAUSE_LOG("compute_numerical_jacobian()", "FEMSystem");
           std::map<FEType, FEBase *>::iterator fe_end = side_fe.end();
           for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
                i != fe_end; ++i)
             {
               i->second->reinit(elem, side);
             }
+          RESTART_LOG("compute_numerical_jacobian()", "FEMSystem");
           time_solver->side_residual(false);
         }
       backwards_residual = elem_residual;
@@ -304,12 +339,15 @@ void FEMSystem::compute_numerical_jacobian ()
           if (!compute_internal_sides && elem->neighbor(side) != NULL)
             continue;
 
+          // Logging of FE::reinit is done in the FE functions
+          PAUSE_LOG("compute_numerical_jacobian()", "FEMSystem");
           std::map<FEType, FEBase *>::iterator fe_end = side_fe.end();
           for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
                i != fe_end; ++i)
             {
               i->second->reinit(elem, side);
             }
+          RESTART_LOG("compute_numerical_jacobian()", "FEMSystem");
           time_solver->side_residual(false);
         }
 
@@ -323,7 +361,7 @@ void FEMSystem::compute_numerical_jacobian ()
 
   elem_residual = original_residual;
   elem_jacobian = numerical_jacobian;
-  STOP_LOG("compute_numerical_jacobian", "FEMSystem");
+  STOP_LOG("compute_numerical_jacobian()", "FEMSystem");
 }
 
 

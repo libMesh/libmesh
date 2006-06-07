@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.3 2006-06-05 23:09:48 roystgnr Exp $
+// $Id: fem_system.h,v 1.4 2006-06-07 23:31:51 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -115,6 +115,21 @@ public:
    * the system type in an equation system file.
    */
   virtual std::string system_type () const { return "PDE"; }
+
+  /**
+   * If verify_analytic_jacobian is equal to zero (as it is by
+   * default), no numeric jacobians will be calculated unless
+   * an overloaded element_time_derivative(), element_constraint(),
+   * side_time_derivative(), or side_constraint() function cannot
+   * provide an analytic jacobian upon request.
+   * 
+   * If verify_analytic_jacobian is equal to the positive value tol,
+   * then any time a full analytic element jacobian can be calculated
+   * it will be tested against a numerical jacobian on the same element,
+   * and the program will abort if the relative error (in matrix l1 norms)
+   * exceeds tol.
+   */
+  Real verify_analytic_jacobians;
 
 protected:
 
