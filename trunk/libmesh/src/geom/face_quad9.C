@@ -1,4 +1,4 @@
-// $Id: face_quad9.C,v 1.25 2005-06-16 23:03:52 roystgnr Exp $
+// $Id: face_quad9.C,v 1.26 2006-06-07 18:41:49 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -147,15 +147,18 @@ bool Quad9::has_affine_map() const
   Point v = this->point(1) - this->point(0);
   if (this->point(2) - this->point(3) != v)
     return false;
-  // make sure sides are straight
+  // make sure "horizontal" sides are straight
   v /= 2;
   if ((this->point(4) - this->point(0) != v)
-      ||(this->point(6) - this->point(3) != v))
+      || (this->point(6) - this->point(3) != v))
     return false;
+  // make sure "vertical" sides are straight
+  // and the center node is centered
   v = (this->point(3) - this->point(0))/2;
   if ((this->point(7) - this->point(0) != v)
-      || (this->point(5) - this->point(1) != v)
-      || (this->point(6) - this->point(4) != v))
+     || (this->point(5) - this->point(1) != v)
+     || (this->point(6) - this->point(3) != v)
+     || (this->point(8) - this->point(7) != v))
     return false;
   return true;
 }
