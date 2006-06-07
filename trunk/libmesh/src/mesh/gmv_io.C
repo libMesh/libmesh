@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.30 2006-06-05 16:46:53 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.31 2006-06-07 19:52:35 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -474,8 +474,11 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 #endif
         }
       
-      out << "endvars\n";
     }
+
+  // If we wrote any variables, we have to close the variable section now
+  if (write_variable)
+    out << "endvars\n";
 
   
   // end of the file
@@ -976,8 +979,11 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 #endif
 	}
       
-      out << "endvars\n";
     }
+  
+  // If we wrote any variables, we have to close the variable section now
+  if (write_variable)
+    out << "endvars\n";
 
   
   // end of the file
@@ -1185,9 +1191,9 @@ void GMVIO::write_binary (const std::string& fname,
   if ((solution_names != NULL) && (vec != NULL))
     write_variable = true;
 
-  // 3.) cell-centered data
-  if ( !(this->_cell_centered_data.empty()) )
-    write_variable = true;
+  //   // 3.) cell-centered data - unsupported
+  //   if ( !(this->_cell_centered_data.empty()) )
+  //     write_variable = true;
 
   if (write_variable)
     {
@@ -1361,9 +1367,13 @@ void GMVIO::write_binary (const std::string& fname,
     
       delete [] temp;
       
+    }
+
+  // If we wrote any variables, we have to close the variable section now
+  if (write_variable)
+    {
       std::strcpy(buf, "endvars ");
       out.write(buf, std::strlen(buf));
-
     }
 
   // end the file
