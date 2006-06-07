@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.37 2005-06-29 22:38:22 roystgnr Exp $
+// $Id: fe_map.C,v 1.38 2006-06-07 18:06:47 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,9 @@
 void FEBase::compute_affine_map(const std::vector<Real>& qw,
 			        const Elem* elem)
 {
+   // Start logging the map computation.
+  START_LOG("compute_affine_map()", "FE");  
+
   assert (elem  != NULL);
 
   const unsigned int        n_qp = qw.size();
@@ -531,6 +534,7 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
       error();
     }
   
+  STOP_LOG("compute_affine_map()", "FE");  
 }
 
 
@@ -538,16 +542,15 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
 void FEBase::compute_map(const std::vector<Real>& qw,
 			 const Elem* elem)
 {
-   // Start logging the map computation.
-  START_LOG("compute_map()", "FE");
-
   if (elem->has_affine_map())
     {
       compute_affine_map(qw, elem);
-      STOP_LOG("compute_map()", "FE");  
       return;
     }
   
+   // Start logging the map computation.
+  START_LOG("compute_map()", "FE");
+
   assert (elem  != NULL);
   
   const unsigned int        n_qp = qw.size();
