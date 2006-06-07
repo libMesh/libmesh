@@ -201,7 +201,11 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
         }
 
       if (get_jacobian && !jacobian_computed)
-        this->compute_numerical_jacobian();
+        {
+          PAUSE_LOG("assembly", "FEMSystem");
+          this->compute_numerical_jacobian();
+          RESTART_LOG("assembly", "FEMSystem");
+        }
 
       if (get_residual && get_jacobian)
         this->get_dof_map().constrain_element_matrix_and_vector
