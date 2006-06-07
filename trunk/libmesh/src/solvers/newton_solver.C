@@ -23,7 +23,7 @@ NewtonSolver::~NewtonSolver ()
 
 void NewtonSolver::solve()
 {
-  START_LOG("solve", "NewtonSolver");
+  START_LOG("solve()", "NewtonSolver");
 
 // The number of steps and the stopping criterion
 // for the nonlinear iterations.
@@ -63,9 +63,9 @@ const bool verbose_convergence_chatter = true;
 
   for (unsigned int l=0; l<max_nonlinear_steps; ++l)
     {
-      PAUSE_LOG("solve", "NewtonSolver");
+      PAUSE_LOG("solve()", "NewtonSolver");
       _system.assembly(true, true);
-      RESTART_LOG("solve", "NewtonSolver");
+      RESTART_LOG("solve()", "NewtonSolver");
       rhs.close();
       Real current_residual = rhs.l2_norm();
       if (!l)
@@ -91,7 +91,7 @@ std::cout << "Nonlinear Residual: " << current_residual << std::endl;
 
 std::cout << "Linear solve starting" << std::endl;
 
-      PAUSE_LOG("solve", "NewtonSolver");
+      PAUSE_LOG("solve()", "NewtonSolver");
       // Solve the linear system.  Two cases:
       const std::pair<unsigned int, Real> rval =
         (_system.have_matrix("Preconditioner")) ?
@@ -103,7 +103,7 @@ std::cout << "Linear solve starting" << std::endl;
         linear_solver->solve (matrix, solution, rhs,
                               current_linear_tolerance, 
                               max_linear_iterations);
-      RESTART_LOG("solve", "NewtonSolver");
+      RESTART_LOG("solve()", "NewtonSolver");
 
 std::cout << "Linear solve finished, step " << rval.first
           << ", residual " << rval.second
@@ -119,9 +119,9 @@ std::cout << "Taking full Newton step" << std::endl;
 
       // Check residual with full Newton step
       Real steplength = 1.;
-      PAUSE_LOG("solve", "NewtonSolver");
+      PAUSE_LOG("solve()", "NewtonSolver");
       _system.assembly(true, false);
-      RESTART_LOG("solve", "NewtonSolver");
+      RESTART_LOG("solve()", "NewtonSolver");
 
       rhs.close();
       current_residual = rhs.l2_norm();
@@ -140,9 +140,9 @@ std::cout << "Shrinking Newton step to " << steplength << std::endl;
 
               // Check residual with fractional Newton step
               std::cout << "          Checking " << std::flush;
-              PAUSE_LOG("solve", "NewtonSolver");
+              PAUSE_LOG("solve()", "NewtonSolver");
               _system.assembly (true, false);
-              RESTART_LOG("solve", "NewtonSolver");
+              RESTART_LOG("solve()", "NewtonSolver");
               current_residual = rhs.l2_norm();
               std::cout << "Current Residual: " << current_residual << std::endl;
 
@@ -255,5 +255,5 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
   solution = newton_iterate;
   solution.close();
 
-  STOP_LOG("solve", "NewtonSolver");
+  STOP_LOG("solve()", "NewtonSolver");
 }
