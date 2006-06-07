@@ -1,4 +1,4 @@
-// $Id: face_quad9.C,v 1.26 2006-06-07 18:41:49 roystgnr Exp $
+// $Id: face_quad9.C,v 1.27 2006-06-07 18:49:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -157,8 +157,7 @@ bool Quad9::has_affine_map() const
   v = (this->point(3) - this->point(0))/2;
   if ((this->point(7) - this->point(0) != v)
      || (this->point(5) - this->point(1) != v)
-     || (this->point(6) - this->point(3) != v)
-     || (this->point(8) - this->point(7) != v))
+     || (this->point(8) - this->point(4) != v))
     return false;
   return true;
 }
