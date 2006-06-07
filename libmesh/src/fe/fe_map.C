@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.38 2006-06-07 18:06:47 roystgnr Exp $
+// $Id: fe_map.C,v 1.39 2006-06-07 19:23:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -338,13 +338,13 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
           {
 	    JxW[p] = jac*qw[p];
 
-	    dxidx_map[p]  = g11inv*dx_dxi + g12inv*dx_deta;
-	    dxidy_map[p]  = g11inv*dy_dxi + g12inv*dy_deta;
-	    dxidz_map[p]  = g11inv*dz_dxi + g12inv*dz_deta;
+	    dxidx_map[p]  = dxidx_map[0];
+	    dxidy_map[p]  = dxidy_map[0];
+	    dxidz_map[p]  = dxidz_map[0];
 	    
-	    detadx_map[p] = g21inv*dx_dxi + g22inv*dx_deta;
-	    detady_map[p] = g21inv*dy_dxi + g22inv*dy_deta;
-	    detadz_map[p] = g21inv*dz_dxi + g22inv*dz_deta;
+	    detadx_map[p] = detadx_map[0];
+	    detady_map[p] = detady_map[0];
+	    detadz_map[p] = detadz_map[0];
 	  }
        
 	// done computing the map
