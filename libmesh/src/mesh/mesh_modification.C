@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.17 2005-09-30 19:55:23 benkirk Exp $
+// $Id: mesh_modification.C,v 1.18 2006-06-08 21:59:06 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -643,6 +643,10 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	  
 	  default:
 	    {
+	      std::cerr << "Warning, encountered 3D element in "
+			<< "MeshTools::Modification::all_tri(), hope that's OK..."
+			<< std::endl;
+	      
 	      // If not one of the QUAD* types, the Elem must
 	      // be a TRI* type already, or a 3D element, so just leave it.
 	    }
