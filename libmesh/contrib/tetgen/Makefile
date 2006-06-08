@@ -6,7 +6,8 @@ INCLUDE = -I.
 
 # Package name and additional flags required for library compilation
 pkgname  := tetgen
-CXXFLAGS += -DTRILIBRARY
+#CXXFLAGS += -DTRILIBRARY
+CXXFLAGS := -DNDEBUG -DTRILIBRARY -fPIC
 
 # (Relative) Path to location of shared libs
 libpath := ../lib
