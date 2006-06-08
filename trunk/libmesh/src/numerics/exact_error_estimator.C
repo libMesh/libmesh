@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.C,v 1.3 2006-06-01 22:35:21 roystgnr Exp $
+// $Id: exact_error_estimator.C,v 1.4 2006-06-08 21:28:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -259,6 +259,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
                                                                  sys_name,
                                                                  var_name));
 
+
 #ifndef USE_COMPLEX_NUMBERS
                   H1seminormsq += JxW[qp]*(grad_error*grad_error);
 #else
@@ -283,6 +284,9 @@ void ExactErrorEstimator::estimate_error (const System& system,
 
             } // end qp loop
 
+	  assert (L2normsq     >= 0.);
+	  assert (H1seminormsq >= 0.);
+	  
           error_per_cell[e_id] = L2normsq;
           if (_sobolev_order > 0)
             error_per_cell[e_id] += H1seminormsq;
@@ -308,8 +312,16 @@ void ExactErrorEstimator::estimate_error (const System& system,
   // Compute the square-root of each component.
   START_LOG("std::sqrt()", "ExactErrorEstimator");
   for (unsigned int i=0; i<error_per_cell.size(); i++)
-    if (error_per_cell[i] != 0.)
-      error_per_cell[i] = std::sqrt(error_per_cell[i]);
+    {
+      
+      if (error_per_cell[i] != 0.)
+	{
+	  assert (error_per_cell[i] > 0.);
+	  error_per_cell[i] = std::sqrt(error_per_cell[i]);
+	}
+      
+      
+    }
   STOP_LOG("std::sqrt()", "ExactErrorEstimator");
 
   //  STOP_LOG("flux_jumps()", "KellyErrorEstimator");
