@@ -1,4 +1,4 @@
-// $Id: laspack_linear_solver.C,v 1.3 2006-06-07 22:22:43 roystgnr Exp $
+// $Id: laspack_linear_solver.C,v 1.4 2006-06-08 00:05:08 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -110,7 +110,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
 			       const double tol,
 			       const unsigned int m_its)
 {
-  START_LOG("solve", "LaspackLinearSolver");
+  START_LOG("solve()", "LaspackLinearSolver");
   this->init ();
 
   LaspackMatrix<T>* matrix   = dynamic_cast<LaspackMatrix<T>*>(&matrix_in);
@@ -276,7 +276,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
       error();
     }
 
-  STOP_LOG("solve", "LaspackLinearSolver");
+  STOP_LOG("solve()", "LaspackLinearSolver");
   // Get the convergence step # and residual 
   return std::make_pair(GetLastNoIter(), GetLastAccuracy());
 }

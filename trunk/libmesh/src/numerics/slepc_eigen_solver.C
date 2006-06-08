@@ -1,4 +1,4 @@
-// $Id: slepc_eigen_solver.C,v 1.5 2006-06-07 22:22:43 roystgnr Exp $
+// $Id: slepc_eigen_solver.C,v 1.6 2006-06-08 00:05:08 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -92,7 +92,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
 				     const double tol,         // solver tolerance
 				     const unsigned int m_its) // maximum number of iterations
 {
-  START_LOG("solve_standard", "SlepcEigenSolver");
+  START_LOG("solve_standard()", "SlepcEigenSolver");
 
   this->init ();
   
@@ -202,7 +202,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif // DEBUG
 
-  STOP_LOG("solve_standard", "SlepcEigenSolver");
+  STOP_LOG("solve_standard()", "SlepcEigenSolver");
 
   // return the number of converged eigenpairs
   // and the number of iterations
@@ -223,7 +223,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 					const double tol,         // solver tolerance
 					const unsigned int m_its) // maximum number of iterations
 {
-  START_LOG("solve_generalized", "SlepcEigenSolver");
+  START_LOG("solve_generalized()", "SlepcEigenSolver");
 
   this->init ();
   
@@ -336,7 +336,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif // DEBUG
 
-  STOP_LOG("solve_generalized", "SlepcEigenSolver");
+  STOP_LOG("solve_generalized()", "SlepcEigenSolver");
 
   // return the number of converged eigenpairs
   // and the number of iterations
