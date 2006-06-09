@@ -1,4 +1,4 @@
-// $Id: diff_solver.h,v 1.3 2006-06-09 05:59:12 roystgnr Exp $
+// $Id: diff_solver.h,v 1.4 2006-06-09 18:46:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -59,9 +59,13 @@ public:
   DiffSolver (sys_type& s)
     : max_linear_iterations(1000),
       max_nonlinear_iterations(100),
-      absolute_residual_tolerance(1e-9),
-      relative_residual_tolerance(1e-9),
-      initial_linear_tolerance(1e-3),
+      absolute_residual_tolerance(0.),
+      relative_residual_tolerance(0.),
+      absolute_step_tolerance(0.),
+      relative_step_tolerance(0.),
+      initial_linear_tolerance(1e-12),
+      max_solution_norm(0.),
+      max_residual_norm(0.),
       _system (s) {}
   /**
    * Factory.  Requires a reference to the system
@@ -78,7 +82,7 @@ public:
    * The initialization function.  This method is used to
    * initialize internal data structures before a simulation begins.
    */
-  virtual void init () {}
+  virtual void init ();
 
   /**
    * This method performs a solve.  What occurs in
@@ -105,21 +109,48 @@ public:
   unsigned int max_nonlinear_iterations;
 
   /**
-   * The DiffSolver should exit after the residual 
+   * The DiffSolver should exit after the residual is
    * reduced to either less than absolute_residual_tolerance
    * or less than relative_residual_tolerance times the
-   * initial residual
+   * initial residual.
+   *
+   * Users should increase any of these tolerances that they want to use for a
+   * stopping condition.
    */
   Real absolute_residual_tolerance;
   Real relative_residual_tolerance;
+  /**
+   * The DiffSolver should exit after the full nonlinear step norm is
+   * reduced to either less than absolute_step_tolerance
+   * or less than relative_step_tolerance times the largest
+   * nonlinear solution which has been seen so far.
+   *
+   * Users should increase any of these tolerances that they want to use for a
+   * stopping condition.
+   */
+  Real absolute_step_tolerance;
+  Real relative_step_tolerance;
 
   /**
-   * Any required linear solves will be done with this tolerance;
+   * Any required linear solves will at first be done with this tolerance;
    * the DiffSolver may tighten the tolerance for later solves.
    */
   Real initial_linear_tolerance;
 
 protected:
+
+  /**
+   * The largest solution norm which the DiffSolver has yet seen will be stored
+   * here, to be used for stopping criteria based on relative_step_tolerance
+   */
+  Real max_solution_norm;
+
+  /**
+   * The largest nonlinear residual which the DiffSolver has yet seen will be
+   * stored here, to be used for stopping criteria based on
+   * relative_residual_tolerance
+   */
+  Real max_residual_norm;
 
   /**
    * @returns a writeable reference to the system we are solving.
