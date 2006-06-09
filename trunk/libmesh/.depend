@@ -4284,6 +4284,7 @@ src/numerics/laspack_linear_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
     include/enums/enum_preconditioner_type.h\
@@ -4496,6 +4497,7 @@ src/numerics/petsc_linear_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
     include/enums/enum_preconditioner_type.h\
@@ -4571,6 +4573,7 @@ src/numerics/slepc_eigen_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
     include/enums/enum_eigen_solver_type.h\
@@ -5351,6 +5354,7 @@ src/solvers/fem_system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/node.h\
     include/base/reference_counted_object.h\
@@ -5528,6 +5532,7 @@ src/solvers/newton_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
@@ -5536,7 +5541,6 @@ src/solvers/newton_solver.$(obj-suffix):\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_solver_type.h\
-    include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
@@ -5549,18 +5553,13 @@ src/solvers/newton_solver.$(obj-suffix):\
     include/numerics/sparse_matrix.h\
     include/solvers/diff_solver.h\
     include/solvers/diff_system.h\
-    include/solvers/equation_systems.h\
     include/solvers/explicit_system.h\
-    include/solvers/frequency_system.h\
     include/solvers/implicit_system.h\
     include/solvers/linear_implicit_system.h\
-    include/solvers/newmark_system.h\
     include/solvers/newton_solver.h\
-    include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
     include/utils/o_string_stream.h\
-    include/utils/parameters.h\
     include/utils/perf_log.h
 src/solvers/nonlinear_implicit_system.$(obj-suffix):\
     src/solvers/nonlinear_implicit_system.C\
