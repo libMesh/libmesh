@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.1 2006-06-09 06:14:07 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.2 2006-06-09 18:46:33 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -130,7 +130,7 @@ int main (int argc, char** argv)
     // And the nonlinear solver options
     DiffSolver &solver = *stokes_system.time_solver->diff_solver;
     solver.max_nonlinear_iterations = 15;
-    solver.relative_residual_tolerance = 1.e-6;
+    solver.relative_step_tolerance = 0.02;
 
     // And the linear solver options
     solver.max_linear_iterations = 250;
