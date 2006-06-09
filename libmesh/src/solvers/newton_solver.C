@@ -25,11 +25,6 @@ void NewtonSolver::solve()
 {
   START_LOG("solve()", "NewtonSolver");
 
-// The number of steps and the stopping criterion
-// for the nonlinear iterations.
-const unsigned int max_nonlinear_steps = 100;
-const unsigned int max_linear_iterations = 10000;
-
 // Stopping criteria for nonlinear iterations
 const Real nonlinear_abs_step_tolerance = 1.e-9;
 const Real nonlinear_rel_step_tolerance = 1.e-9;
@@ -61,7 +56,7 @@ const bool verbose_convergence_chatter = true;
   // Set starting linear tolerance
   Real current_linear_tolerance = initial_linear_tolerance;
 
-  for (unsigned int l=0; l<max_nonlinear_steps; ++l)
+  for (unsigned int l=0; l<max_nonlinear_iterations; ++l)
     {
       PAUSE_LOG("solve()", "NewtonSolver");
       _system.assembly(true, true);
@@ -197,6 +192,7 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
                     << l
                     << ", residual reduction "
                     << current_residual / first_residual
+                    << " < " << relative_residual_tolerance
                     << std::endl;
           has_converged = true;
         }
@@ -204,8 +200,7 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
         {
           std::cout << "  Nonlinear solver current/first residual "
                     << (current_residual / first_residual)
-                    << " > "
-                    << relative_residual_tolerance
+                    << " > " << relative_residual_tolerance
                     << std::endl;
         }
 
@@ -217,6 +212,7 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
                     << l
                     << ", absolute step size "
                     << norm_delta / steplength
+                    << " < " << nonlinear_abs_step_tolerance
                     << std::endl;
           has_converged = true;
         }
@@ -229,6 +225,7 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
                     << l
                     << ", relative step size "
                     << (norm_delta / steplength / norm_total)
+                    << " < " << nonlinear_rel_step_tolerance
                     << std::endl;
           has_converged = true;
         }
@@ -239,7 +236,7 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
         {
           break;
         }
-      if (l >= max_nonlinear_steps - 1)
+      if (l >= max_nonlinear_iterations - 1)
         {
           std::cout << "  Nonlinear solver DIVERGED at step "
                     << l

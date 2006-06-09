@@ -40,12 +40,15 @@ bool EulerSolver::element_residual (bool request_jacobian)
   // Temporarily replace elem_solution with theta_solution
   _system.elem_solution.swap(theta_solution);
 
-  // We're going to compute just the change in elem_residual,
-  // then add back the old elem_residual.
+  // We're going to compute just the change in elem_residual
+  // (and possibly elem_jacobian), then add back the old values
   DenseVector<Number> old_elem_residual(_system.elem_residual);
   DenseMatrix<Number> old_elem_jacobian;
   if (request_jacobian)
-    old_elem_jacobian = _system.elem_jacobian;
+    {
+      old_elem_jacobian = _system.elem_jacobian;
+      _system.elem_jacobian.zero();
+    }
   _system.elem_residual.zero();
 
   bool jacobian_computed =
@@ -58,25 +61,36 @@ bool EulerSolver::element_residual (bool request_jacobian)
 
   // Add the mass term for the old solution
   _system.elem_solution.swap(old_elem_solution);
-  // FIXME - this will break if mass_residual() edits
+  // FIXME - we should detect if mass_residual() edits
   // elem_jacobian and lies about it!
   _system.mass_residual(false);
 
   // Restore the elem_solution
   _system.elem_solution.swap(theta_solution);
 
-  // Add the mass term for the new solution
-  jacobian_computed = _system.mass_residual(request_jacobian) &&
+  // Subtract the mass term for the new solution
+  if (jacobian_computed)
+    _system.elem_jacobian *= -1.0;
+  _system.elem_residual *= -1.0;
+  jacobian_computed = _system.mass_residual(jacobian_computed) &&
     jacobian_computed;
+  if (jacobian_computed)
+    _system.elem_jacobian *= -1.0;
+  _system.elem_residual *= -1.0;
 
   // Add the constraint term
-  jacobian_computed = _system.element_constraint(request_jacobian) &&
+  jacobian_computed = _system.element_constraint(jacobian_computed) &&
     jacobian_computed;
 
   // Add back the old residual and jacobian
   _system.elem_residual += old_elem_residual;
   if (request_jacobian)
-    _system.elem_jacobian += old_elem_jacobian;
+    {
+      if (jacobian_computed)
+        _system.elem_jacobian += old_elem_jacobian;
+      else
+        _system.elem_jacobian.swap(old_elem_jacobian);
+    }
 
   return jacobian_computed;
 }
@@ -110,7 +124,10 @@ bool EulerSolver::side_residual (bool request_jacobian)
   DenseVector<Number> old_elem_residual(_system.elem_residual);
   DenseMatrix<Number> old_elem_jacobian;
   if (request_jacobian)
-    old_elem_jacobian = _system.elem_jacobian;
+    {
+      old_elem_jacobian = _system.elem_jacobian;
+      _system.elem_jacobian.zero();
+    }
   _system.elem_residual.zero();
 
   bool jacobian_computed =
@@ -125,13 +142,18 @@ bool EulerSolver::side_residual (bool request_jacobian)
   _system.elem_solution.swap(theta_solution);
 
   // Add the constraint term (we shouldn't need a mass term on sides)
-  jacobian_computed = _system.side_constraint(request_jacobian) &&
+  jacobian_computed = _system.side_constraint(jacobian_computed) &&
     jacobian_computed;
 
   // Add back the old residual and jacobian
   _system.elem_residual += old_elem_residual;
   if (request_jacobian)
-    _system.elem_jacobian += old_elem_jacobian;
+    {
+      if (jacobian_computed)
+        _system.elem_jacobian += old_elem_jacobian;
+      else
+        _system.elem_jacobian.swap(old_elem_jacobian);
+    }
 
   return jacobian_computed;
 }
