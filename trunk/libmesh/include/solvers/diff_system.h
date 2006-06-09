@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.5 2006-06-06 21:41:59 roystgnr Exp $
+// $Id: diff_system.h,v 1.6 2006-06-09 05:59:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -270,6 +270,10 @@ protected:
    */
   virtual void init_data ();
 
+  /**
+   * Stores bools to tell us which variables are evolving
+   * in time and which are just constraints
+   */
   std::vector<bool> _time_evolving;
 };
 

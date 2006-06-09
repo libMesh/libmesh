@@ -1,4 +1,4 @@
-// $Id: diff_solver.h,v 1.2 2006-06-06 21:41:59 roystgnr Exp $
+// $Id: diff_solver.h,v 1.3 2006-06-09 05:59:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -57,7 +57,9 @@ public:
    * to be solved.
    */
   DiffSolver (sys_type& s)
-    : absolute_residual_tolerance(1e-9),
+    : max_linear_iterations(1000),
+      max_nonlinear_iterations(100),
+      absolute_residual_tolerance(1e-9),
       relative_residual_tolerance(1e-9),
       initial_linear_tolerance(1e-3),
       _system (s) {}
@@ -89,6 +91,18 @@ public:
    * @returns a constant reference to the system we are solving.
    */
   const sys_type & system () const { return _system; }
+
+  /**
+   * Each linear solver step should exit after max_linear_iterations
+   * is exceeded.
+   */
+  unsigned int max_linear_iterations;
+
+  /**
+   * The DiffSolver should exit in failure if max_nonlinear_iterations
+   * is exceeded.
+   */
+  unsigned int max_nonlinear_iterations;
 
   /**
    * The DiffSolver should exit after the residual 

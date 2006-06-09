@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.4 2006-06-07 23:31:51 roystgnr Exp $
+// $Id: fem_system.h,v 1.5 2006-06-09 05:59:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -111,10 +111,55 @@ public:
   virtual bool mass_residual (bool request_jacobian);
 
   /**
+   * Returns the value of the solution variable \p at the quadrature
+   * point \qp on the current element interior
+   */
+  Number interior_value(unsigned int var, unsigned int qp);
+
+  /**
+   * Returns the value of the solution variable \p at the quadrature
+   * point \qp on the current element side
+   */
+  Number side_value(unsigned int var, unsigned int qp);
+
+  /**
+   * Returns the gradient of the solution variable \p at the quadrature
+   * point \qp on the current element interior
+   */
+  Gradient interior_gradient(unsigned int var, unsigned int qp);
+
+  /**
+   * Returns the gradient of the solution variable \p at the quadrature
+   * point \qp on the current element side
+   */
+  Gradient side_gradient(unsigned int var, unsigned int qp);
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+  /**
+   * Returns the hessian of the solution variable \p at the quadrature
+   * point \qp on the current element interior
+   */
+  Tensor interior_hessian(unsigned int var, unsigned int qp);
+
+  /**
+   * Returns the hessian of the solution variable \p at the quadrature
+   * point \qp on the current element side
+   */
+  Tensor side_hessian(unsigned int var, unsigned int qp);
+#endif // ENABLE_SECOND_DERIVATIVES
+
+  /**
    * @returns \p "General".  Helps in identifying
    * the system type in an equation system file.
    */
   virtual std::string system_type () const { return "PDE"; }
+
+  /**
+   * If calculating numeric jacobians is required, the FEMSystem
+   * will perturb each solution vector entry by numerical_jacobian_h
+   * when calculating finite differences.
+   */ 
+  Real numerical_jacobian_h;
 
   /**
    * If verify_analytic_jacobian is equal to zero (as it is by
@@ -141,9 +186,17 @@ protected:
 
   /**
    * Uses the results of multiple element_residual() calls
-   * to 
+   * to numerically differentiate the corresponding jacobian
+   * on an element.
    */
-  void compute_numerical_jacobian ();
+  void numerical_elem_jacobian ();
+
+  /**
+   * Uses the results of multiple side_residual() calls
+   * to numerically differentiate the corresponding jacobian
+   * on an element's side.
+   */
+  void numerical_side_jacobian ();
 
   /**
    * Finite element objects for each variable's interior and sides.
