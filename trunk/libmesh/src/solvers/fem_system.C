@@ -367,7 +367,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
         {
           // Make sure we didn't compute a jacobian and lie about it
           assert(elem_jacobian.l1_norm() == 0.0);
-          // Logging of compute_numerical_jacobian is done separately
+          // Logging of numerical jacobians is done separately
           PAUSE_LOG(log_name, "FEMSystem");
           this->numerical_elem_jacobian();
           RESTART_LOG(log_name, "FEMSystem");
@@ -381,7 +381,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
           DenseMatrix<Number> analytic_jacobian(elem_jacobian);
 
           elem_jacobian.zero();
-          // Logging of compute_numerical_jacobian is done separately
+          // Logging of numerical jacobians is done separately
           PAUSE_LOG(log_name, "FEMSystem");
           this->numerical_elem_jacobian();
           RESTART_LOG(log_name, "FEMSystem");
@@ -448,7 +448,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 	      // so we can make sure side_residual didn't compute a
               // jacobian and lie about it
               assert(elem_jacobian.l1_norm() == 0.0);
-              // Logging of compute_numerical_jacobian is done separately
+              // Logging of numerical jacobians is done separately
               PAUSE_LOG(log_name, "FEMSystem");
               this->numerical_side_jacobian();
               RESTART_LOG(log_name, "FEMSystem");
@@ -471,7 +471,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               DenseMatrix<Number> analytic_jacobian(elem_jacobian);
 
               elem_jacobian.zero();
-              // Logging of compute_numerical_jacobian is done separately
+              // Logging of numerical jacobians is done separately
               PAUSE_LOG(log_name, "FEMSystem");
               this->numerical_side_jacobian();
               RESTART_LOG(log_name, "FEMSystem");
