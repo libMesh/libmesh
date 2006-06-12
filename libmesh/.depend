@@ -34,7 +34,8 @@ src/base/dof_map.$(obj-suffix):\
     include/numerics/sparse_matrix.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
-    include/utils/perf_log.h
+    include/utils/perf_log.h\
+    include/utils/string_to_enum.h
 src/base/dof_map_constraints.$(obj-suffix):\
     src/base/dof_map_constraints.C\
     include/base/auto_ptr.h\
