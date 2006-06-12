@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.93 2006-04-27 17:57:28 roystgnr Exp $
+// $Id: dof_map.C,v 1.94 2006-06-12 22:51:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,7 @@
 #include "numeric_vector.h"
 #include "dense_vector_base.h"
 #include "dense_matrix.h"
+#include "string_to_enum.h"
 
 
 
@@ -195,13 +196,23 @@ void DofMap::reinit(MeshBase& mesh)
               if (FEInterface::max_order(base_fe_type,type) <
                   static_cast<unsigned int>(base_fe_type.order))
                 {
-                  std::cerr << "ERROR: Finite element " << base_fe_type.family
-                    << " on geometric element " << type << std::endl
+                  std::cerr << "ERROR: Finite element "
+                    << Utility::enum_to_string(base_fe_type.family)
+                    << " on geometric element "
+                    << Utility::enum_to_string(type) << std::endl
                     << "only supports FEInterface::max_order = " 
                     << FEInterface::max_order(base_fe_type,type)
                     << ", not fe_type.order = " << base_fe_type.order
                     << std::endl;
                 }
+
+              std::cerr << "WARNING: Finite element "
+                    << Utility::enum_to_string(base_fe_type.family)
+                    << " on geometric element "
+                    << Utility::enum_to_string(type) << std::endl
+                    << "could not be p refined past FEInterface::max_order = " 
+                    << FEInterface::max_order(base_fe_type,type)
+                    << std::endl;
 #endif
               elem->set_p_level(FEInterface::max_order(base_fe_type,type)
                                 - base_fe_type.order);
