@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.1 2006-06-12 19:25:38 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.2 2006-06-12 21:51:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,24 +24,27 @@
 
 
 // Local Includes
-#include "libmesh_common.h"
-#include "uniform_refinement_estimator.h"
 #include "dof_map.h"
+#include "elem.h"
+#include "equation_systems.h"
 #include "fe.h"
 #include "fe_interface.h"
-#include "quadrature.h"
+#include "libmesh_common.h"
 #include "libmesh_logging.h"
-#include "elem.h"
 #include "mesh.h"
 #include "mesh_refinement.h"
 #include "numeric_vector.h"
+#include "quadrature.h"
 #include "system.h"
+#include "uniform_refinement_estimator.h"
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
 void UniformRefinementEstimator::estimate_error (const System& _system,
 					  std::vector<float>& error_per_cell)
 {
+  START_LOG("estimate_error()", "UniformRefinementEstimator");
+
   // We have to break the rules here, because we can't refine a const System
   System& system = const_cast<System &>(_system);
 
@@ -83,6 +86,8 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
       std::fill (component_scale.begin(), component_scale.end(), 1.0);
     }
   
+  NumericVector<Number> * debugging;
+
   // Back up the coarse grid vectors
   std::map<std::string, NumericVector<Number> *> coarse_vectors;
   for (System::vectors_iterator vec = system.vectors_begin(); vec !=
@@ -91,7 +96,8 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
       // The (string) name of this vector
       const std::string& var_name = vec->first;
 
-      coarse_vectors[var_name] = vec->second->clone().get();
+      coarse_vectors[var_name] = vec->second->clone().release();
+      debugging = coarse_vectors[var_name];
     }
 
   // Find the number of coarse mesh elements, to make it possible
@@ -106,16 +112,18 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
 
   assert (number_h_refinements > 0 || number_p_refinements > 0);
 
+  // FIXME: this will probably break if there is more than one System
+  // on this mesh
   for (unsigned int i = 0; i != number_h_refinements; ++i)
     {
       mesh_refinement.uniformly_refine(1);
-      system.reinit();
+      system.get_equation_systems().reinit();
     }
       
   for (unsigned int i = 0; i != number_p_refinements; ++i)
     {
       mesh_refinement.uniformly_p_refine(1);
-      system.reinit();
+      system.get_equation_systems().reinit();
     }
 
   system.project_solution_on_reinit() = old_projection_setting;
@@ -125,8 +133,6 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
   AutoPtr<NumericVector<Number> > projected_solution = system.solution->clone();
 
   // Get the uniformly refined solution.
-  // FIXME: this will break if there is more than one System
-  // on this mesh and our system relies on data from the others
 
   system.solve();
   
@@ -306,6 +312,29 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
     } // End loop over variables
 
 
+  // Uniformly coarsen the mesh, without projecting the solution
+  old_projection_setting = system.project_solution_on_reinit();
+  system.project_solution_on_reinit() = false;
+
+  assert (number_h_refinements > 0 || number_p_refinements > 0);
+
+  for (unsigned int i = 0; i != number_h_refinements; ++i)
+    {
+      mesh_refinement.uniformly_coarsen(1);
+      // FIXME - should the reinits here be necessary? - RHS
+      system.get_equation_systems().reinit();
+    }
+      
+  for (unsigned int i = 0; i != number_p_refinements; ++i)
+    {
+      mesh_refinement.uniformly_p_coarsen(1);
+      system.get_equation_systems().reinit();
+    }
+
+  system.project_solution_on_reinit() = old_projection_setting;
+
+  // We should be back where we started
+  assert(n_coarse_elem == mesh.n_elem());
   
   // Each processor has now computed the error contribuions
   // for its local elements.  We need to sum the vector
@@ -337,4 +366,6 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
       coarse_vectors[var_name]->clear();
       delete coarse_vectors[var_name];
     }
+
+  STOP_LOG("estimate_error()", "UniformRefinementEstimator");
 }
