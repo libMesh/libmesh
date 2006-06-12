@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.21 2006-03-29 20:45:03 roystgnr Exp $
+// $Id: system.h,v 1.22 2006-06-12 19:25:38 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -251,6 +251,26 @@ public:
   typedef std::map<std::string, NumericVector<Number>* >::const_iterator const_vectors_iterator;
 
   /**
+   * Beginning of vectors container
+   */
+  vectors_iterator vectors_begin ();
+
+  /**
+   * Beginning of vectors container
+   */
+  const_vectors_iterator vectors_begin () const;
+
+  /**
+   * End of vectors container
+   */
+  vectors_iterator vectors_end ();
+
+  /**
+   * End of vectors container
+   */
+  const_vectors_iterator vectors_end () const;
+
+  /**
    * Adds the additional vector \p vec_name to this system.  Only
    * allowed @e prior to \p init().  All the additional vectors
    * are similarly distributed, like the \p solution,
@@ -266,10 +286,10 @@ public:
   /**
    * Tells the System whether or not to project the solution vector onto new
    * grids when the system is reinitialized.  The solution will be projected
-   * unless project_solution_on_reinit(false) is called.
+   * unless project_solution_on_reinit() = false is called.
    */
-  void project_solution_on_reinit(bool b)
-    { _solution_projection = b; }
+  bool& project_solution_on_reinit (void)
+    { return _solution_projection; }
   
   /**
    * @returns \p true if this \p System has a vector associated with the
@@ -766,10 +786,32 @@ bool System::have_vector (const std::string& vec_name) const
 inline
 unsigned int System::n_vectors () const
 {
- return _vectors.size(); 
+  return _vectors.size(); 
 }
 
+inline
+System::vectors_iterator System::vectors_begin ()
+{
+  return _vectors.begin();
+}
 
+inline
+System::const_vectors_iterator System::vectors_begin () const
+{
+  return _vectors.begin();
+}
+
+inline
+System::vectors_iterator System::vectors_end ()
+{
+  return _vectors.end();
+}
+
+inline
+System::const_vectors_iterator System::vectors_end () const
+{
+  return _vectors.end();
+}
 
 
 
