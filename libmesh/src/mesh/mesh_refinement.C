@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.47 2006-05-24 20:40:54 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.48 2006-06-12 21:08:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1073,8 +1073,15 @@ void MeshRefinement::uniformly_coarsen (unsigned int n,
       const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
 
       for ( ; elem_it != elem_end; ++elem_it)
-	(*elem_it)->set_refinement_flag(Elem::COARSEN);
+        {
+	  (*elem_it)->set_refinement_flag(Elem::COARSEN);
+          if ((*elem_it)->parent()) 
+	    (*elem_it)->parent()->set_refinement_flag(Elem::COARSEN_INACTIVE);
+        }
 
+      // We shouldn't be trying to maintain_level_one unless 
+      // we were level_one compatible in the first place
+/*
       bool coarsening_satisfied = false;
       do
         {
@@ -1082,9 +1089,10 @@ void MeshRefinement::uniformly_coarsen (unsigned int n,
 	    this->make_coarsening_compatible(maintain_level_one);
         }
       while (!coarsening_satisfied);
+*/
 
       // Coarsen all the elements we just flagged.
-      this->coarsen_elements();
+      this->_coarsen_elements();
 
       assert(this->make_coarsening_compatible(maintain_level_one));
     }
