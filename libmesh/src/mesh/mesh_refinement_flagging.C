@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.18 2006-04-05 16:43:56 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.19 2006-06-12 23:26:04 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -127,6 +127,58 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
 	if (elem->level() < max_level)
 	  elem->set_refinement_flag(Elem::REFINE);
     }
+}
+
+
+
+void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_per_cell_in,
+						       const Real global_tolerance,
+						       const Real coarsen_threshold,
+						       const Real refine_fraction,
+						       const Real coarsen_fraction)
+{
+  // How much error per cell will we tolerate?
+  const Real local_refinement_tolerance =
+    global_tolerance / _mesh.n_active_elem();
+  const Real local_coarsening_tolerance =
+    local_refinement_tolerance * coarsen_threshold;
+
+  // Count how many cells have too much or too little error
+  unsigned int n_refinable_elements = 0;
+  unsigned int n_coarsenable_elements = 0;
+
+  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
+
+  for (; elem_it != elem_end; ++elem_it)
+    {
+      const Elem* elem = *elem_it;
+      const unsigned int elem_number = elem->id();
+      const float        elem_error  = error_per_cell_in[elem_number];
+
+      if (elem_error > local_refinement_tolerance)
+        n_refinable_elements++;
+
+      if (elem_error < local_coarsening_tolerance)
+        n_coarsenable_elements++;
+    }
+
+  // If we have nothing to do, quit
+  if (!n_refinable_elements && !n_coarsenable_elements)
+    return;
+
+  // Flag by elem fraction after deciding how many cells to really refine
+  Real final_refine_fraction = std::min(refine_fraction,
+    static_cast<float>(n_refinable_elements) /
+    static_cast<float>(_mesh.n_active_elem()));
+
+  Real final_coarsen_fraction = std::min(coarsen_fraction,
+    static_cast<float>(n_coarsenable_elements) /
+    static_cast<float>(_mesh.n_active_elem()));
+
+  this->flag_elements_by_elem_fraction (error_per_cell_in,
+                                        final_refine_fraction,
+                                        final_coarsen_fraction);
 }
 
 
