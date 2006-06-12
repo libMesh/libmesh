@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.17 2006-06-12 21:22:13 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.18 2006-06-12 23:26:04 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -102,6 +102,24 @@ public:
 					const Real refine_fraction  = 0.3,
 					const Real coarsen_fraction = 0.0,
 					const unsigned int max_level = libMesh::invalid_uint);
+
+  /**
+   * Flags elements for coarsening and refinement based on
+   * the computed error passed in \p error_per_cell.  This method refines
+   * the worst elements with errors greater than
+   * \p global_tolerance / n_elem, flagging at most
+   * \p refine_fraction * n_elem.  It coarsens elements with errors less than
+   * \p coarsen_threshold * \p global_tolerance / n_elem, flagging at most
+   * \p coarsen_fraction * n_elem.
+   *
+   * The three fractions \p refine_fraction \p coarsen_fraction and
+   * \p coarsen_threshold should be in \f$ [0,1] \f$.
+   */
+  void flag_elements_by_error_tolerance (const ErrorVector& error_per_cell,
+					 const Real global_tolerance,
+					 const Real coarsen_threshold = 0.1,
+					 const Real refine_fraction  = 0.3,
+					 const Real coarsen_fraction = 0.3);
 
   /**
    * Flags elements for coarsening and refinement based on
