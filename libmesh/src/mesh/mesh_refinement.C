@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.49 2006-06-12 21:22:13 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.50 2006-06-12 22:50:41 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -985,7 +985,8 @@ bool MeshRefinement::_refine_elements ()
       Elem* elem = *it;
       if (elem->refinement_flag() == Elem::REFINE)
 	local_copy_of_elements.push_back(elem);
-      if (elem->p_refinement_flag() == Elem::REFINE)
+      if (elem->p_refinement_flag() == Elem::REFINE &&
+          elem->active())
         {
 	  elem->set_p_level(elem->p_level()+1);
 	  elem->set_p_refinement_flag(Elem::JUST_REFINED);
