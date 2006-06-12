@@ -8,7 +8,10 @@
 
 TimeSolver::TimeSolver (sys_type& s)
   : diff_solver(NULL),
-    _system(s) {}
+    _system(s),
+    first_solve(true)
+{
+}
 
 
 
@@ -33,6 +36,19 @@ void TimeSolver::init ()
 
 void TimeSolver::solve ()
 {
+  if (first_solve)
+    {
+      advance_timestep();
+      first_solve = false;
+    }
+
+  diff_solver->solve();
+}
+
+
+
+void TimeSolver::advance_timestep ()
+{
   NumericVector<Number> &old_nonlinear_solution =
   _system.get_vector("_old_nonlinear_solution");
   NumericVector<Number> &nonlinear_solution =
@@ -40,7 +56,6 @@ void TimeSolver::solve ()
 
   old_nonlinear_solution = nonlinear_solution;
 
-  diff_solver->solve();
-
-  _system.time += _system.deltat;
+  if (first_solve)
+    _system.time += _system.deltat;
 }

@@ -1,4 +1,4 @@
-// $Id: time_solver.h,v 1.4 2006-06-06 21:42:00 roystgnr Exp $
+// $Id: time_solver.h,v 1.5 2006-06-12 17:26:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -72,12 +72,21 @@ public:
   virtual void init ();
 
   /**
-   * This method solves one timestep (or solves for a
-   * steady-state solution).  Usually we will only need to solve
-   * one (non)linear system per timestep, but more complex subclasses
+   * This method solves for the solution at the next timestep (or solves for a
+   * steady-state solution).  Usually we will only need to solve one
+   * (non)linear system per timestep, but more complex subclasses
    * may override this.
    */
   virtual void solve ();
+
+  /**
+   * This method advances the solution to the next timestep, after a
+   * solve() has been performed.  Often this will be
+   * done after every TimeSolver::solve(), but adaptive mesh refinement
+   * and/or adaptive timestep selection may require some solve() steps
+   * to be repeated.
+   */
+  virtual void advance_timestep ();
 
   /**
    * This method uses the DifferentiableSystem's
@@ -124,6 +133,12 @@ protected:
    * A reference to the system we are solving.
    */
   sys_type& _system;
+
+  /**
+   * A bool that will be true the first time solve() is called,
+   * and false thereafter
+   */
+  bool first_solve;
 };
 
 
