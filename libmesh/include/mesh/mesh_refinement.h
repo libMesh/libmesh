@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.16 2006-05-24 20:40:54 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.17 2006-06-12 21:22:13 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -178,8 +178,7 @@ public:
   /**
    * Attempts to uniformly coarsen the mesh \p n times.
    */
-  void uniformly_coarsen (unsigned int n=1,
-			  const bool maintain_level_one=true);
+  void uniformly_coarsen (unsigned int n=1);
   
   /**
    * Uniformly p refines the mesh \p n times.
@@ -189,8 +188,7 @@ public:
   /**
    * Attempts to uniformly p coarsen the mesh \p n times.
    */
-  void uniformly_p_coarsen (unsigned int n=1,
-			    const bool maintain_level_one=true);
+  void uniformly_p_coarsen (unsigned int n=1);
 
   /**
    * Returns true if and only if the mesh is level one smooth
