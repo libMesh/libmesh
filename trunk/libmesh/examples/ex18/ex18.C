@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.2 2006-06-09 18:46:33 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.3 2006-06-12 17:26:52 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -148,6 +148,8 @@ int main (int argc, char** argv)
                   << stokes_system.time << std::endl;
 
         stokes_system.solve();
+
+        stokes_system.time_solver->advance_timestep();
 
         // Write out every nth timestep to file.
         const unsigned int write_interval = 1;
