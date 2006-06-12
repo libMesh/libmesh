@@ -4616,6 +4616,60 @@ src/numerics/type_vector.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/numerics/type_vector.h
+src/numerics/uniform_refinement_estimator.$(obj-suffix):\
+    src/numerics/uniform_refinement_estimator.C\
+    include/base/auto_ptr.h\
+    include/base/dof_map.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_interface.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_refinement.h\
+    include/numerics/error_estimator.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
+    include/numerics/type_vector.h\
+    include/numerics/uniform_refinement_estimator.h\
+    include/numerics/vector_value.h\
+    include/quadrature/quadrature.h\
+    include/solvers/equation_systems.h\
+    include/solvers/explicit_system.h\
+    include/solvers/frequency_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/linear_implicit_system.h\
+    include/solvers/newmark_system.h\
+    include/solvers/steady_system.h\
+    include/solvers/system.h\
+    include/solvers/transient_system.h\
+    include/utils/o_string_stream.h\
+    include/utils/parameters.h\
+    include/utils/perf_log.h
 src/partitioning/centroid_partitioner.$(obj-suffix):\
     src/partitioning/centroid_partitioner.C\
     include/base/auto_ptr.h\
