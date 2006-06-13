@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.21 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: mesh_tetgen_support.C,v 1.22 2006-06-13 18:29:26 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -370,11 +370,13 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh (const double quali
 
   // Initialize the current vector with element 0
   current.push_back(this->_mesh.elem(0));
-  
+
   while (!current.empty())
     {
       Elem* elem = current.back();
 
+      assert (elem != NULL);
+  
       // Attempt to insert this element into the visited set.
       visited.insert(elem);
 
@@ -494,10 +496,10 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
   oss << "pQ";
 
   if (quality_constraint != 0)
-    oss << "q" << quality_constraint;
+    oss << "q" << std::fixed << quality_constraint;
   
   if (volume_constraint != 0)
-    oss << "a" << volume_constraint;
+    oss << "a" << std::fixed << volume_constraint;
   
   std::string params = oss.str();
 
