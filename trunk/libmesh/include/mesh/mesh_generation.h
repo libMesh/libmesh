@@ -1,4 +1,4 @@
-// $Id: mesh_generation.h,v 1.8 2005-06-06 16:23:56 knezed01 Exp $
+// $Id: mesh_generation.h,v 1.9 2006-06-13 18:33:14 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.8 $
+   * \version $Revision: 1.9 $
    */
   namespace Generation
   {
@@ -176,6 +176,8 @@ namespace MeshTools
 
 	  case HEX20:
 	  case HEX27:
+	  case TET4:  // TET4's are created from an initial HEX27 discretization
+	  case TET10: // TET10's are created from an initial HEX27 discretization
 	  case PRISM15:
 	  case PRISM18:
 	    {
@@ -185,7 +187,7 @@ namespace MeshTools
 	  
 	  default:
 	    {
-	      std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
+	      std::cerr << "ERROR: Unrecognized element type." << std::endl;
 	      error();
 	    }
 	  }

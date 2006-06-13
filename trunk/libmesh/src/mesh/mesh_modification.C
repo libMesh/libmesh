@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.18 2006-06-08 21:59:06 jwpeterson Exp $
+// $Id: mesh_modification.C,v 1.19 2006-06-13 18:33:14 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -234,7 +234,7 @@ void Mesh::all_second_order (const bool full_ordered)
   // does this work also in parallel?
   // assert (this->n_processors() == 1);
 
-  START_LOG("all_second_order()", "MeshBase");
+  START_LOG("all_second_order()", "Mesh");
 
   /*
    * this map helps in identifying second order
@@ -470,7 +470,7 @@ void Mesh::all_second_order (const bool full_ordered)
   adj_vertices_to_so_nodes.clear();
 
 
-  STOP_LOG("all_second_order()", "MeshBase");
+  STOP_LOG("all_second_order()", "Mesh");
 
   // renumber nodes, elements etc
   this->prepare_for_use();

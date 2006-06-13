@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.42 2005-09-30 19:55:23 benkirk Exp $
+// $Id: mesh_generation.C,v 1.43 2006-06-13 18:33:14 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -42,6 +42,7 @@
 #include "cell_prism6.h"
 #include "cell_prism15.h"
 #include "cell_prism18.h"
+#include "cell_tet4.h"
 #include "libmesh_logging.h"
 #include "boundary_info.h"
 
@@ -652,6 +653,8 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 	  case HEX8:
 	  case HEX20:
 	  case HEX27:
+	  case TET4:  // TET4's are created from an initial HEX27 discretization
+	  case TET10: // TET10's are created from an initial HEX27 discretization
 	    {
 	      mesh.reserve_elem(nx*ny*nz);
 	      break;
@@ -689,6 +692,8 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 
 	  case HEX20:
 	  case HEX27:
+	  case TET4: // TET4's are created from an initial HEX27 discretization
+	  case TET10: // TET10's are created from an initial HEX27 discretization
 	  case PRISM15:
 	  case PRISM18:
 	    {
@@ -737,6 +742,8 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 	    
 	  case HEX20:
 	  case HEX27:
+	  case TET4: // TET4's are created from an initial HEX27 discretization
+	  case TET10: // TET10's are created from an initial HEX27 discretization
 	  case PRISM15:
 	  case PRISM18:
 	    {
@@ -893,6 +900,8 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 	    
 	  case HEX20:
 	  case HEX27:
+	  case TET4: // TET4's are created from an initial HEX27 discretization
+	  case TET10: // TET10's are created from an initial HEX27 discretization
 	    {
 	      for (unsigned int k=0; k<(2*nz); k += 2)
 		for (unsigned int j=0; j<(2*ny); j += 2)
@@ -922,7 +931,7 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 		      elem->set_node(17) = mesh.node_ptr(idx(type,nx,ny,i+2,j+1,k+2));
 		      elem->set_node(18) = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k+2));
 		      elem->set_node(19) = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k+2));
-		      if (type == HEX27)
+		      if ((type == HEX27) || (type == TET4) || (type == TET10))
 			{
 			  elem->set_node(20) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k)  );
 			  elem->set_node(21) = mesh.node_ptr(idx(type,nx,ny,i+1,j,  k+1));
@@ -1046,9 +1055,77 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 	    mesh.node(p)(2) = (mesh.node(p)(2))*(zmax-zmin) + zmin;
 	  }
 
+
+
+
+	// Additional work for TET4 and TET10: we take the existing HEX27 discretization
+	// and split each element into 24 sub tets.  This isn't the minimum-possible
+	// number of tets, but it obviates any concerns about the edge orientations
+	// between the various elements.
+	if ((type == TET4) || (type == TET10)) 
+	  {
+	    // Temporary storage for new elements. (24 per hex)
+	    std::vector<Elem*> new_elements;
+	    new_elements.reserve(24*mesh.n_elem());
+
+     
+	    // Create tetrahedra
+	    {
+	      MeshBase::element_iterator       el     = mesh.elements_begin();
+	      const MeshBase::element_iterator end_el = mesh.elements_end();
+
+	      for ( ; el != end_el;  ++el)
+		{
+		  // Get a pointer to the HEX27 element.
+		  Elem* base_hex = *el;
+
+		  // Get a pointer to the node located at the HEX27 centroid
+		  Node* apex_node = base_hex->get_node(26);
+	 
+		  for (unsigned int s=0; s<base_hex->n_sides(); ++s)
+		    {
+		      // Need to build the full-ordered side!
+		      AutoPtr<Elem> side = base_hex->build_side(s);
+	     
+		      for (unsigned int sub_tet=0; sub_tet<4; ++sub_tet)
+			{
+			  new_elements.push_back( new Tet4 );
+			  Elem* sub_elem = new_elements.back();
+			  sub_elem->set_node(0) = side->get_node(sub_tet);
+			  sub_elem->set_node(1) = side->get_node(8);                           // centroid of the face
+			  sub_elem->set_node(2) = side->get_node(sub_tet==3 ? 0 : sub_tet+1 ); // wrap-around
+			  sub_elem->set_node(3) = apex_node;                                   // apex node always used!
+			}
+		    }
+		}
+	    }
+	    
+
+	    // Delete the original HEX27 elements
+	    {
+	      MeshBase::element_iterator       el     = mesh.elements_begin();
+	      const MeshBase::element_iterator end_el = mesh.elements_end();
+       
+	      for ( ; el != end_el;  ++el)
+		mesh.delete_elem(*el);
+	    }
+
+	    // Add the new elements
+	    for (unsigned int i=0; i<new_elements.size(); ++i)
+	      mesh.add_elem(new_elements[i]);
+	    
+	  } // end if (type == TET4) || (type == TET10)
+
+
+	// Use all_second_order to convert the TET4's to TET10's
+	if (type == TET10)
+	  {
+	    mesh.all_second_order();
+	  }
+
 	
 	break;
-      }
+      } // end case dim==3
 
     default:
       {
