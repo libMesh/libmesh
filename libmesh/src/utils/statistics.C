@@ -1,4 +1,4 @@
-// $Id: statistics.C,v 1.16 2005-03-21 21:29:26 jwpeterson Exp $
+// $Id: statistics.C,v 1.17 2006-06-13 20:39:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,17 @@
 
 // ------------------------------------------------------------
 // StatisticsVector class member functions
+template <typename T>
+Real StatisticsVector<T>::l2_norm() const
+{
+  Real normsq = 0.;
+  for (unsigned i = 0; i != this->size(); ++i)
+    normsq += ((*this)[i] * (*this)[i]);
+
+  return std::sqrt(normsq);
+}
+
+
 template <typename T>
 T StatisticsVector<T>::minimum() const
 {

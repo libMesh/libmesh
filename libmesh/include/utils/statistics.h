@@ -1,4 +1,4 @@
-// $Id: statistics.h,v 1.5 2005-03-21 21:29:26 jwpeterson Exp $
+// $Id: statistics.h,v 1.6 2006-06-13 20:39:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -91,6 +91,11 @@ class StatisticsVector : public std::vector<T>
   virtual ~StatisticsVector () {}
 
 
+  /**
+   * Returns the l2 norm of the data set.
+   */
+  virtual Real l2_norm() const;
+  
   /**
    * Returns the minimum value in the data set.
    */
