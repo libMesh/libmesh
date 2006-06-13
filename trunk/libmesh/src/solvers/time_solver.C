@@ -56,6 +56,6 @@ void TimeSolver::advance_timestep ()
 
   old_nonlinear_solution = nonlinear_solution;
 
-  if (first_solve)
+  if (!first_solve)
     _system.time += _system.deltat;
 }
