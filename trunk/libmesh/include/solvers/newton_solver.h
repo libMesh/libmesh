@@ -1,4 +1,4 @@
-// $Id: newton_solver.h,v 1.1 2006-06-05 00:32:23 roystgnr Exp $
+// $Id: newton_solver.h,v 1.2 2006-06-13 22:22:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -55,6 +55,12 @@ public:
   virtual ~NewtonSolver ();
 
   typedef DiffSolver Parent;
+
+  /**
+   * The reinitialization function.  This method is used after
+   * changes in the mesh.
+   */
+  virtual void reinit ();
 
   /**
    * This method performs a solve.  What occurs in

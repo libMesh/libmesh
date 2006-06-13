@@ -1,4 +1,4 @@
-// $Id: time_solver.h,v 1.5 2006-06-12 17:26:52 roystgnr Exp $
+// $Id: time_solver.h,v 1.6 2006-06-13 22:22:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -70,6 +70,12 @@ public:
    * initialize internal data structures before a simulation begins.
    */
   virtual void init ();
+
+  /**
+   * The reinitialization function.  This method is used after
+   * changes in the mesh
+   */
+  virtual void reinit ();
 
   /**
    * This method solves for the solution at the next timestep (or solves for a

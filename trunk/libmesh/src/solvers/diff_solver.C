@@ -10,6 +10,12 @@ AutoPtr<DiffSolver> DiffSolver::build (sys_type& s)
 
 
 
+void DiffSolver::reinit ()
+{
+}
+
+
+
 void DiffSolver::init ()
 {
   // Reset the max_step_size and max_residual_norm for a new problem

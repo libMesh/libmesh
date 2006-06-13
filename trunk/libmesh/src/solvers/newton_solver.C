@@ -21,6 +21,15 @@ NewtonSolver::~NewtonSolver ()
 
 
 
+void NewtonSolver::reinit()
+{
+  Parent::reinit();
+
+  linear_solver->clear();
+}
+
+
+
 void NewtonSolver::solve()
 {
   START_LOG("solve()", "NewtonSolver");
@@ -94,6 +103,8 @@ std::cout << "Linear solve starting" << std::endl;
         linear_solver->solve (matrix, solution, rhs,
                               current_linear_tolerance, 
                               max_linear_iterations);
+      // We may need to localize a parallel solution
+      _system.update ();
       RESTART_LOG("solve()", "NewtonSolver");
 
 std::cout << "Linear solve finished, step " << rval.first

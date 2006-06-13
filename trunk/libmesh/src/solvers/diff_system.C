@@ -27,6 +27,15 @@ DifferentiableSystem::~DifferentiableSystem ()
 
 
 
+void DifferentiableSystem::reinit ()
+{
+  Parent::reinit();
+
+  time_solver->reinit();
+}
+
+
+
 void DifferentiableSystem::init_data ()
 {
   // First, allocate a vector for the iterate in our quasi_Newton
