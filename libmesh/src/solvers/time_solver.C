@@ -21,6 +21,13 @@ TimeSolver::~TimeSolver ()
 
 
 
+void TimeSolver::reinit ()
+{
+  diff_solver->reinit();
+}
+
+
+
 void TimeSolver::init ()
 {
   // If the user hasn't given us a solver to use,

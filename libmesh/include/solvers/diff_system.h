@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.6 2006-06-09 05:59:12 roystgnr Exp $
+// $Id: diff_system.h,v 1.7 2006-06-13 22:22:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -76,6 +76,12 @@ public:
    */
   typedef ImplicitSystem Parent;
   
+  /**
+   * Reinitializes the member data fields associated with
+   * the system, so that, e.g., \p assemble() may be used.
+   */
+  virtual void reinit ();
+   
   /**
    * Prepares \p matrix and \p rhs for matrix assembly.
    * Users should not reimplement this

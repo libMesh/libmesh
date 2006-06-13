@@ -1,4 +1,4 @@
-// $Id: diff_solver.h,v 1.4 2006-06-09 18:46:33 roystgnr Exp $
+// $Id: diff_solver.h,v 1.5 2006-06-13 22:22:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -83,6 +83,12 @@ public:
    * initialize internal data structures before a simulation begins.
    */
   virtual void init ();
+
+  /**
+   * The reinitialization function.  This method is used after
+   * changes in the mesh.
+   */
+  virtual void reinit ();
 
   /**
    * This method performs a solve.  What occurs in
