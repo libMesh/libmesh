@@ -501,6 +501,15 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               // rest of the accumulated jacobian
               elem_jacobian += old_jacobian;
             }
+	  // In DEBUG mode, we've set elem_jacobian == 0, and we
+          // may still need to add the old jacobian back
+#ifdef DEBUG
+	  if (get_jacobian && jacobian_computed &&
+              verify_analytic_jacobians == 0.0)
+            {
+              elem_jacobian += old_jacobian;
+            }
+#endif // ifdef DEBUG
         }
 
       if (get_residual && get_jacobian)
