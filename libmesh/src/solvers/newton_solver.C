@@ -87,7 +87,10 @@ std::cout << "Nonlinear Residual: " << current_residual << std::endl;
 
       // At this point newton_iterate is the current guess, and
       // solution is now about to become the NEGATIVE of the next
-      // Newton step
+      // Newton step.
+
+      // Our best initial guess for the solution is zero!
+      solution.zero();
 
 std::cout << "Linear solve starting" << std::endl;
 
