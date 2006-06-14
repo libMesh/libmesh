@@ -41,8 +41,6 @@ const Real minsteplength = 0.1;
 // Amount by which nonlinear residual should exceed linear solver
 // tolerance
 const Real relative_tolerance = 1.e-3;
-// We'll shut up eventually...
-const bool verbose_convergence_chatter = true;
 
 
   NumericVector<Number> &solution = *(_system.solution);
@@ -70,8 +68,10 @@ const bool verbose_convergence_chatter = true;
 
       max_residual_norm = std::max (current_residual,
                                     max_residual_norm);
-
-std::cout << "Nonlinear Residual: " << current_residual << std::endl;
+ 
+      if (!quiet)
+        std::cout << "Nonlinear Residual: "
+                  << current_residual << std::endl;
 
       // Make sure our linear tolerance is low enough
       if (current_linear_tolerance > current_residual * relative_tolerance)
@@ -92,7 +92,8 @@ std::cout << "Nonlinear Residual: " << current_residual << std::endl;
       // Our best initial guess for the solution is zero!
       solution.zero();
 
-std::cout << "Linear solve starting" << std::endl;
+      if (!quiet)
+        std::cout << "Linear solve starting" << std::endl;
 
       PAUSE_LOG("solve()", "NewtonSolver");
       // Solve the linear system.  Two cases:
@@ -110,15 +111,18 @@ std::cout << "Linear solve starting" << std::endl;
       _system.update ();
       RESTART_LOG("solve()", "NewtonSolver");
 
-std::cout << "Linear solve finished, step " << rval.first
-          << ", residual " << rval.second
-          << ", tolerance " << current_linear_tolerance << std::endl;
+      if (!quiet)
+        std::cout << "Linear solve finished, step " << rval.first
+                  << ", residual " << rval.second
+                  << ", tolerance " << current_linear_tolerance
+                  << std::endl;
 
       // Compute the l2 norm of the nonlinear update
       Real norm_delta = solution.l2_norm();
 
-std::cout << "Taking full Newton step" << std::endl;
-          // Take a full Newton step
+      if (!quiet)
+        std::cout << "Trying full Newton step" << std::endl;
+      // Take a full Newton step
       newton_iterate.add (-1., solution);
       newton_iterate.close();
 
@@ -139,22 +143,27 @@ std::cout << "Taking full Newton step" << std::endl;
               // Reduce step size to 1/2, 1/4, etc.
               steplength /= 2.;
               norm_delta /= 2.;
-std::cout << "Shrinking Newton step to " << steplength << std::endl;
+              if (!quiet)
+                std::cout << "Shrinking Newton step to "
+                          << steplength << std::endl;
               newton_iterate.add (steplength, solution);
               newton_iterate.close();
 
               // Check residual with fractional Newton step
-              std::cout << "          Checking " << std::flush;
               PAUSE_LOG("solve()", "NewtonSolver");
               _system.assembly (true, false);
               RESTART_LOG("solve()", "NewtonSolver");
               current_residual = rhs.l2_norm();
-              std::cout << "Current Residual: " << current_residual << std::endl;
+              if (!quiet)
+                std::cout << "Current Residual: "
+                          << current_residual << std::endl;
 
               if (steplength/2. < minsteplength && 
                   current_residual > last_residual)
                 {
-std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
+                  if (!quiet)
+                    std::cout << "Inexact Newton step FAILED at step "
+                              << l << std::endl;
 
                   error();
                 }
@@ -168,11 +177,11 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
 
       // Print out information for the 
       // nonlinear iterations.
-      std::cout << "    Nonlinear step: |du|/|u| = "
-                << norm_delta / norm_total
-                << ", |du| = "
-                << norm_delta
-                << std::endl;
+      if (!quiet)
+        std::cout << "    Nonlinear step: |du|/|u| = "
+                  << norm_delta / norm_total
+                  << ", |du| = " << norm_delta
+                  << std::endl;
 
       // We haven't converged unless we pass a convergence test
       bool has_converged = false;
@@ -180,81 +189,80 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
       // Is our absolute residual low enough?
       if (current_residual < absolute_residual_tolerance)
         {
-          std::cout << "  Nonlinear solver converged, step "
-                    << l
-                    << ", residual "
-                    << current_residual
-                    << std::endl;
+          if (!quiet)
+	    std::cout << "  Nonlinear solver converged, step " << l
+                      << ", residual " << current_residual
+                      << std::endl;
           has_converged = true;
         }
-      else if (verbose_convergence_chatter &&
-               absolute_residual_tolerance)
+      else if (absolute_residual_tolerance)
         {
-          std::cout << "  Nonlinear solver current_residual "
-                    << current_residual
-                    << " > "
-                    << (absolute_residual_tolerance)
-                    << std::endl;
+          if (!quiet)
+            std::cout << "  Nonlinear solver current_residual "
+                      << current_residual << " > "
+		      << (absolute_residual_tolerance) << std::endl;
         }
 
       // Is our relative residual low enough?
       if ((current_residual / max_residual_norm) <
           relative_residual_tolerance)
         {
-          std::cout << "  Nonlinear solver converged, step "
-                    << l
-                    << ", residual reduction "
-                    << current_residual / max_residual_norm
-                    << " < " << relative_residual_tolerance
-                    << std::endl;
+          if (!quiet)
+            std::cout << "  Nonlinear solver converged, step " << l
+                      << ", residual reduction "
+                      << current_residual / max_residual_norm
+                      << " < " << relative_residual_tolerance
+                      << std::endl;
           has_converged = true;
         }
-      else if (verbose_convergence_chatter &&
-               relative_residual_tolerance)
+      else if (relative_residual_tolerance)
         {
-          std::cout << "  Nonlinear solver relative residual "
-                    << (current_residual / max_residual_norm)
-                    << " > " << relative_residual_tolerance
-                    << std::endl;
+          if (!quiet)
+            std::cout << "  Nonlinear solver relative residual "
+                      << (current_residual / max_residual_norm)
+                      << " > " << relative_residual_tolerance
+                      << std::endl;
         }
 
       // Is our absolute Newton step size small enough?
       if (norm_delta / steplength < absolute_step_tolerance)
         {
-          std::cout << "  Nonlinear solver converged, step "
-                    << l
-                    << ", absolute step size "
-                    << norm_delta / steplength
-                    << " < " << absolute_step_tolerance
-                    << std::endl;
+          if (!quiet)
+            std::cout << "  Nonlinear solver converged, step " << l
+                      << ", absolute step size "
+                      << norm_delta / steplength
+                      << " < " << absolute_step_tolerance
+                      << std::endl;
           has_converged = true;
         }
-      else if (verbose_convergence_chatter && absolute_step_tolerance)
+      else if (absolute_step_tolerance)
         {
-          std::cout << "  Nonlinear solver absolute step size "
-                    << (norm_delta / steplength)
-                    << " > " << absolute_step_tolerance
-                    << std::endl;
+          if (!quiet)
+            std::cout << "  Nonlinear solver absolute step size "
+                      << (norm_delta / steplength)
+                      << " > " << absolute_step_tolerance
+                      << std::endl;
         }
 
       // Is our relative Newton step size small enough?
       if (norm_delta / steplength / max_solution_norm <
           relative_step_tolerance)
         {
-          std::cout << "  Nonlinear solver converged, step "
-                    << l
-                    << ", relative step size "
-                    << (norm_delta / steplength / max_solution_norm)
-                    << " < " << relative_step_tolerance
-                    << std::endl;
+          if (!quiet)
+            std::cout << "  Nonlinear solver converged, step " << l
+                      << ", relative step size "
+                      << (norm_delta / steplength / max_solution_norm)
+                      << " < " << relative_step_tolerance
+                      << std::endl;
           has_converged = true;
         }
-      else if (verbose_convergence_chatter && relative_step_tolerance)
+      else if (relative_step_tolerance)
         {
-          std::cout << "  Nonlinear solver relative step size "
-                    << (norm_delta / steplength / max_solution_norm)
-                    << " > " << relative_step_tolerance
-                    << std::endl;
+          if (!quiet)
+            std::cout << "  Nonlinear solver relative step size "
+                      << (norm_delta / steplength / max_solution_norm)
+                      << " > " << relative_step_tolerance
+                      << std::endl;
         }
 
       // Terminate the solution iteration if the difference between
@@ -265,9 +273,9 @@ std::cout << "Inexact Newton step FAILED at step " << l << std::endl;
         }
       if (l >= max_nonlinear_iterations - 1)
         {
-          std::cout << "  Nonlinear solver DIVERGED at step "
-                    << l
-                    << std::endl;
+          if (!quiet)
+            std::cout << "  Nonlinear solver DIVERGED at step " << l
+                      << std::endl;
           error();
           continue;
         }
