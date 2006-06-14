@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.2 2006-06-12 21:51:14 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.3 2006-06-14 20:44:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -86,8 +86,6 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
       std::fill (component_scale.begin(), component_scale.end(), 1.0);
     }
   
-  NumericVector<Number> * debugging;
-
   // Back up the coarse grid vectors
   std::map<std::string, NumericVector<Number> *> coarse_vectors;
   for (System::vectors_iterator vec = system.vectors_begin(); vec !=
@@ -97,8 +95,11 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
       const std::string& var_name = vec->first;
 
       coarse_vectors[var_name] = vec->second->clone().release();
-      debugging = coarse_vectors[var_name];
     }
+
+  // Back up the solution vector
+  AutoPtr<NumericVector<Number> > coarse_solution = system.solution->clone();
+  AutoPtr<NumericVector<Number> > coarse_local_solution = system.current_local_solution->clone();
 
   // Find the number of coarse mesh elements, to make it possible
   // to find correct coarse elem ids later
@@ -302,7 +303,7 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
           assert (L2normsq     >= 0.);
           assert (H1seminormsq >= 0.);
 
-          error_per_cell[e_id] = L2normsq;
+          error_per_cell[e_id] += L2normsq;
           if (_sobolev_order > 0)
             error_per_cell[e_id] += H1seminormsq;
           if (_sobolev_order > 1)
@@ -366,6 +367,9 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
       coarse_vectors[var_name]->clear();
       delete coarse_vectors[var_name];
     }
+
+  *system.solution = *coarse_solution;
+  *system.current_local_solution = *coarse_local_solution;
 
   STOP_LOG("estimate_error()", "UniformRefinementEstimator");
 }
