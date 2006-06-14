@@ -1,4 +1,4 @@
-// $Id: diff_solver.h,v 1.5 2006-06-13 22:22:00 roystgnr Exp $
+// $Id: diff_solver.h,v 1.6 2006-06-14 06:39:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,17 +56,8 @@ public:
    * Constructor. Requires a reference to the system
    * to be solved.
    */
-  DiffSolver (sys_type& s)
-    : max_linear_iterations(1000),
-      max_nonlinear_iterations(100),
-      absolute_residual_tolerance(0.),
-      relative_residual_tolerance(0.),
-      absolute_step_tolerance(0.),
-      relative_step_tolerance(0.),
-      initial_linear_tolerance(1e-12),
-      max_solution_norm(0.),
-      max_residual_norm(0.),
-      _system (s) {}
+  DiffSolver (sys_type& s);
+
   /**
    * Factory.  Requires a reference to the system
    * to be solved.  Returns a NewtonSolver by default
@@ -103,6 +94,12 @@ public:
   const sys_type & system () const { return _system; }
 
   /**
+   * The DiffSolver should not print anything to std::cout
+   * unless quiet is set to false
+   */
+  bool quiet;
+
+  /**
    * Each linear solver step should exit after max_linear_iterations
    * is exceeded.
    */
@@ -125,6 +122,7 @@ public:
    */
   Real absolute_residual_tolerance;
   Real relative_residual_tolerance;
+
   /**
    * The DiffSolver should exit after the full nonlinear step norm is
    * reduced to either less than absolute_step_tolerance
