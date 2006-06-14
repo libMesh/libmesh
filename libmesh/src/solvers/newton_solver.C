@@ -287,5 +287,8 @@ const Real relative_tolerance = 1.e-3;
   solution = newton_iterate;
   solution.close();
 
+  // We may need to localize a parallel solution
+  _system.update ();
+
   STOP_LOG("solve()", "NewtonSolver");
 }
