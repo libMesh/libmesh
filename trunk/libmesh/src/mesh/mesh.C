@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.67 2005-08-29 21:46:12 benkirk Exp $
+// $Id: mesh.C,v 1.68 2006-06-15 16:26:57 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -58,14 +58,48 @@ Mesh::Mesh (unsigned int d) :
 }
 
 
-Mesh::Mesh (const Mesh& other_mesh) :
-  MeshBase (other_mesh),
-  _nodes             (other_mesh._nodes),
-  _elements          (other_mesh._elements)
+
+Mesh::Mesh (const Mesh& other_mesh):MeshBase(other_mesh)
 {
+  //Copy in Nodes
+  {
+    //Preallocate Memory if necessary
+    _nodes.reserve(other_mesh._nodes.size());
+    
+    std::vector<Node*>::const_iterator it = other_mesh._nodes.begin();
+    const std::vector<Node*>::const_iterator end = other_mesh._nodes.end();
 
+    for (; it != end; ++it)
+      _nodes.push_back(new Node(*(*it))); //Create new nodes using the Node copy constructor.
+  }
+  
+  //Copy in Elements
+  {
+    //Preallocate Memory if necessary
+    _elements.reserve(other_mesh._elements.size());
+    
+    std::vector<Elem*>::const_iterator it = other_mesh._elements.begin();
+    const std::vector<Elem*>::const_iterator end = other_mesh._elements.end();
+  
+    for (; it != end; ++it)
+    {
+      //Build an element
+      Elem *newparent = (*it)->parent() ?
+          _elements[(*it)->parent()->id()] : NULL;
+      AutoPtr<Elem> ap = Elem::build((*it)->type(), newparent);
+      Elem * elem = ap.release();
+      
+      //Assign all the nodes
+      for(uint i=0;i<elem->n_nodes();i++)
+        elem->set_node(i) = _nodes[(*it)->node(i)];
+      
+      //Hold onto it
+      _elements.push_back(elem);
+    }
+  }
 }
-
+ 
+ 
 
 Mesh::~Mesh ()
 {
