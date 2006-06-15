@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.44 2005-06-20 19:27:16 benkirk Exp $
+// $Id: boundary_info.C,v 1.45 2006-06-15 16:38:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -98,6 +98,25 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 
   boundary_mesh.set_n_subdomains() = id_map.size();
 
+
+  // Make individual copies of all the nodes in the current mesh
+  // and add them to the boundary mesh.  Yes, this is overkill because
+  // all of the current mesh nodes will not end up in the the boundary
+  // mesh.  These nodes can be trimmed later via a call to prepare_for_use().
+  {
+    assert (boundary_mesh.n_nodes() == 0);
+    boundary_mesh.reserve_nodes(_mesh.n_nodes());
+    
+    MeshBase::const_node_iterator it  = _mesh.nodes_begin();
+    MeshBase::const_node_iterator end = _mesh.nodes_end();
+    
+    for(; it != end; ++it)
+      {
+	const Node* node = *it;
+	boundary_mesh.add_point(*node);
+      }
+  }
+
   // Add additional sides that aren't flagged with boundary conditions
   MeshBase::const_element_iterator       el     = _mesh.active_elements_begin();
   const MeshBase::const_element_iterator end_el = _mesh.active_elements_end(); 
@@ -140,52 +159,31 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 	      }
 
 	    // either the element wasn't found or side s
-	    // doesn't have a booundary condition
+	    // doesn't have a boundary condition
 	    if (pos.first == pos.second)
 	      {
 		side->subdomain_id() = id_map[invalid_id];
 	      }
 	    
 	    // Add the side
-	    boundary_mesh.add_elem(side.release());
+	    Elem* new_elem = boundary_mesh.add_elem(side.release());
+	    
+	    // This side's Node pointers still point to the nodes of the  original mesh.
+	    // We need to re-point them to the boundary mesh's nodes!  Since we copied *ALL* of
+	    // the original mesh's nodes over, we should be guaranteed to have the same ordering.
+	    for (unsigned int nn=0; nn<new_elem->n_nodes(); ++nn)
+	      {
+		// Get the correct node pointer, based on the id()
+		Node* new_node = boundary_mesh.node_ptr(new_elem->node(nn));
+		
+		// sanity check: be sure that the new Nodes global id really matches
+		assert (new_node->id() == new_elem->node(nn));
+
+		// Assign the new node pointer
+		new_elem->set_node(nn) = new_node;
+	      }
 	  }
-    }
-
-  // Copy over the nodes VIOLATION OF ENCAPSULATION!!!!
-  // boundary_mesh._nodes = _mesh._nodes;
-
-  // The correct (but possibly slower) way to do this is
-  // 1.) Delete all the nodes in the boundary mesh using node iterators
-  //     (note there should be no nodes because of boundary_mesh.clear() above!)
-  // 2.) Make individual copies of all the nodes in the current mesh
-  //     and add them to the boundary mesh.
-
-  
-//   {
-//     MeshBase::node_iterator it  = boundary_mesh.nodes_begin();
-//     MeshBase::node_iterator end = boundary_mesh.nodes_end();
-//     for(; it != end; ++it)
-//       {
-// 	Node* node = *it;
-// 	boundary_mesh.delete_node(node);
-//       }
-//   }
-
-  // Make individual copies of all the nodes in the current mesh
-  // and add them to the boundary mesh.
-  {
-    assert (boundary_mesh.n_nodes() == 0);
-    boundary_mesh.reserve_nodes(_mesh.n_nodes());
-    
-    MeshBase::const_node_iterator it  = _mesh.nodes_begin();
-    MeshBase::const_node_iterator end = _mesh.nodes_end();
-    
-    for(; it != end; ++it)
-      {
-	const Node* node = *it;
-	boundary_mesh.add_point(*node);
-      }
-  }
+    } // end loop over active elements
 
   
   
