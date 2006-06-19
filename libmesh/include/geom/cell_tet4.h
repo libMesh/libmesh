@@ -1,4 +1,4 @@
-// $Id: cell_tet4.h,v 1.12 2006-03-23 20:24:36 roystgnr Exp $
+// $Id: cell_tet4.h,v 1.13 2006-06-19 22:55:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -143,6 +143,11 @@ public:
    */
   static const unsigned int edge_nodes_map[6][2];
   
+  /**
+   * An optimized method for computing the area of a
+   * 4-node tetrahedron.
+   */
+  virtual Real volume () const;
   
  
 protected:

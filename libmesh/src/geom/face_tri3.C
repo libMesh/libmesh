@@ -1,4 +1,4 @@
-// $Id: face_tri3.C,v 1.20 2005-03-01 14:21:58 benkirk Exp $
+// $Id: face_tri3.C,v 1.21 2006-06-19 22:55:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,6 @@
 #include "side.h"
 #include "edge_edge2.h"
 #include "face_tri3.h"
-
 
 
 
@@ -184,4 +183,19 @@ void Tri3::connectivity(const unsigned int sf,
     }
 
   error();
+}
+
+
+
+
+
+
+Real Tri3::volume () const
+{
+  // 3-node triangles have the following formula for computing the area
+  Point v10 ( *(this->get_node(1)) - *(this->get_node(0)) );
+
+  Point v20 ( *(this->get_node(2)) - *(this->get_node(0)) );
+
+  return 0.5 * (v10.cross(v20)).size() ;
 }

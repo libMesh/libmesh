@@ -1,4 +1,4 @@
-// $Id: cell_tet4.C,v 1.23 2005-05-11 18:31:16 roystgnr Exp $
+// $Id: cell_tet4.C,v 1.24 2006-06-19 22:55:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -272,3 +272,22 @@ const float Tet4::_embedding_matrix[8][4][4] =
 };
 
 #endif // #ifdef ENABLE_AMR
+
+
+
+
+
+Real Tet4::volume () const
+{
+  // The volume of a tetrahedron is 1/6 the box product formed
+  // by its base and apex vectors
+  Point a ( *this->get_node(3) - *this->get_node(0) );
+
+  // b is the vector pointing from 0 to 1
+  Point b ( *this->get_node(1) - *this->get_node(0) );
+
+  // c is the vector pointing from 0 to 2
+  Point c ( *this->get_node(2) - *this->get_node(0) );
+
+  return (1.0 / 6.0) * (a * (b.cross(c)));
+}
