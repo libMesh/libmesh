@@ -1,4 +1,4 @@
-// $Id: face_tri3.h,v 1.11 2006-03-23 20:24:36 roystgnr Exp $
+// $Id: face_tri3.h,v 1.12 2006-06-19 22:55:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -132,6 +132,12 @@ public:
    * element node numbers.
    */
   static const unsigned int side_nodes_map[3][2];
+
+
+  /**
+   * An optimized method for computing the area of a 3-node triangle.
+   */
+  virtual Real volume () const;
 
   
 protected:

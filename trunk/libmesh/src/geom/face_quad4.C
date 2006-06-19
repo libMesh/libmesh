@@ -1,4 +1,4 @@
-// $Id: face_quad4.C,v 1.22 2006-06-07 19:19:26 roystgnr Exp $
+// $Id: face_quad4.C,v 1.23 2006-06-19 22:55:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -218,4 +218,21 @@ void Quad4::connectivity(const unsigned int sf,
     }
 
   error();
+}
+
+
+
+Real Quad4::volume () const
+{
+  // This is the Varignon parallelogram formula,
+  // http://softsurfer.com/Archive/algorithm_0101/algorithm_0101.htm#Quadrilaterals
+  
+  // First Diagonal vector
+  Point v20 ( *(this->get_node(2)) - *(this->get_node(0)) );
+
+  // Second Diagonal vector
+  Point v31 ( *(this->get_node(3)) - *(this->get_node(1)) );
+  
+  return 0.5 * (v20.cross(v31)).size() ;
+
 }

@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.39 2006-04-17 23:44:13 roystgnr Exp $
+// $Id: elem.h,v 1.40 2006-06-19 22:55:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -396,17 +396,18 @@ class Elem : public ReferenceCountedObject<Elem>,
   
   /**
    * @returns the minimum vertex separation for the element.  
-   * This method is overloadable since some derived elements 
-   * might want to use shortcuts to compute their centroid.
    */
   virtual Real hmin () const;
   
   /**
    * @returns the maximum vertex separation for the element.
-   * This method is overloadable since some derived elements 
-   * might want to use shortcuts to compute their centroid.
    */
   virtual Real hmax () const;
+
+  /**
+   * @return the (length/area/volume) of the geometric element.
+   */
+  virtual Real volume () const;
   
   /**
    * Based on the quality metric q specified by the user,

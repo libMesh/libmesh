@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.58 2006-05-27 10:51:23 roystgnr Exp $
+// $Id: elem.C,v 1.59 2006-06-19 22:55:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -52,6 +52,8 @@
 #include "cell_inf_prism6.h"
 #include "cell_inf_prism12.h"
 #include "cell_pyramid5.h"
+#include "fe_base.h"
+#include "quadrature_gauss.h"
 
 // Initialize static member variables
 const unsigned int Elem::_bp1 = 65449;
@@ -936,4 +938,36 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
     }
 
   return min_p_level;
+}
+
+
+
+
+Real Elem::volume () const
+{
+  // The default implementation builds a finite element of the correct
+  // order and sums up the JxW contributions.  This can be expensive,
+  // so the various element types can overload this method and compute
+  // the volume more efficiently.
+  FEType fe_type (this->default_order() , LAGRANGE);
+
+  AutoPtr<FEBase> fe (FEBase::build(this->dim(),
+				    fe_type));
+
+   const std::vector<Real>& JxW = fe->get_JxW();
+   
+  // The default quadrature rule should integrate the mass matrix,
+  // thus it should be plenty to compute the area
+  QGauss qrule (this->dim(), fe_type.default_quadrature_order());
+
+  fe->attach_quadrature_rule(&qrule);
+
+  fe->reinit(this);
+
+  Real vol=0.;
+  for (unsigned int qp=0; qp<qrule.n_points(); ++qp)
+    vol += JxW[qp];
+  
+  return vol;
+  
 }
