@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.C,v 1.20 2005-06-16 23:03:52 roystgnr Exp $
+// $Id: cell_pyramid5.C,v 1.21 2006-06-20 15:20:26 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -225,4 +225,48 @@ void Pyramid5::connectivity(const unsigned int sc,
     }
 
     error();
+}
+
+
+Real Pyramid5::volume () const
+{
+  // The formula for computing the volume of a pyramid is simple: (1/3)*A_b*h
+  // where A_b is the area of the base, and h is the vertical height.
+  // The formula does not depend on the shape of the base or the position of
+  // the apex relative to the base.  For example, the same formula works for
+  // a cone.  The trick is to find out what "h" is, for that we need to know
+  // the perpendicular distance from the point which forms the apex to the
+  // plane which forms the base of the pyramid.
+
+  // The equation of a plane is Ax + By + Cz + D = 0.  Given 3 points on the
+  // plane, we can find A,B,C,D:
+  Node* node0 = this->get_node(0);
+  Node* node1 = this->get_node(1); 
+  Node* node2 = this->get_node(2);
+  //Node* node3 = this->get_node(3);
+  Node* apex  = this->get_node(4);
+			      
+  Point x  ((*node0)(0), (*node1)(0), (*node2)(0));
+  Point y  ((*node0)(1), (*node1)(1), (*node2)(1));
+  Point z  ((*node0)(2), (*node1)(2), (*node2)(2));
+  Point one(1.,1.,1.);
+
+  const Real A = one * (  y.cross(z));
+  const Real B =  x  * (one.cross(z));
+  const Real C =  x  * (y.cross(one));
+  const Real D = -x  * (y.cross(  z));
+
+  // To find the distance from the base to the apex node, the formula is
+  // simple once you have A,B,C,D.  Note that h<0 since the apex is on the
+  // side of the plane opposite the normal vector.
+  const Real h = (A*(*apex)(0) + B*(*apex)(1) + C*(*apex)(2) + D) / sqrt(A*A + B*B + C*C);
+  assert (h<0.);
+  
+  // Area of the base: We can just use area formula for the Quad4...
+  const Real base_area = this->build_side(4)->volume();
+  assert (base_area>0.);
+  
+  // Finally, ready to return the volume!
+  return (-1./3.)*base_area*h;
+    
 }
