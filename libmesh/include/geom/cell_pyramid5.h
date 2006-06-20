@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.h,v 1.12 2006-03-23 20:24:36 roystgnr Exp $
+// $Id: cell_pyramid5.h,v 1.13 2006-06-20 15:20:26 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -136,6 +136,11 @@ public:
    * element node numbers.
    */
   static const unsigned int edge_nodes_map[8][2];
+
+  /**
+   * Specialization for computing the volume of a pyramid.
+   */
+  virtual Real volume () const;
 
   
 protected:
