@@ -1,4 +1,4 @@
-// $Id: cell_hex8.h,v 1.13 2006-06-20 14:08:02 jwpeterson Exp $
+// $Id: cell_hex8.h,v 1.14 2006-06-20 20:18:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -148,7 +148,7 @@ public:
    * A specialization for computing the area of a hexahedron
    * with flat sides.
    */
-  virtual Real volume () const;
+  // virtual Real volume () const;
   
   
 protected:

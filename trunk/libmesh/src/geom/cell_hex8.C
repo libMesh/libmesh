@@ -1,4 +1,4 @@
-// $Id: cell_hex8.C,v 1.25 2006-06-20 14:08:02 jwpeterson Exp $
+// $Id: cell_hex8.C,v 1.26 2006-06-20 20:18:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -365,26 +365,26 @@ const float Hex8::_embedding_matrix[8][8][8] =
 
 
 
-Real Hex8::volume () const
-{
-  // Method is based on the long diagonal (LD) decomposition
-  // of the Hex into tetrahedra.  See J. Grandy, "Efficient
-  // Computation of Volume of Hexahedral Cells"  LLNL, (1997)
+// Real Hex8::volume () const
+// {
+//   // Method is based on the long diagonal (LD) decomposition
+//   // of the Hex into tetrahedra.  See J. Grandy, "Efficient
+//   // Computation of Volume of Hexahedral Cells"  LLNL, (1997)
 
-  // Get the various diagonal and edge vectors
-  Point v60 ( *(this->get_node(6)) - *(this->get_node(0)) );
-  Point v10 ( *(this->get_node(1)) - *(this->get_node(0)) );
-  Point v25 ( *(this->get_node(2)) - *(this->get_node(5)) );
-  Point v40 ( *(this->get_node(4)) - *(this->get_node(0)) );
-  Point v57 ( *(this->get_node(5)) - *(this->get_node(7)) );
-  Point v30 ( *(this->get_node(3)) - *(this->get_node(0)) );
-  Point v72 ( *(this->get_node(7)) - *(this->get_node(2)) );
+//   // Get the various diagonal and edge vectors
+//   Point v60 ( *(this->get_node(6)) - *(this->get_node(0)) );
+//   Point v10 ( *(this->get_node(1)) - *(this->get_node(0)) );
+//   Point v25 ( *(this->get_node(2)) - *(this->get_node(5)) );
+//   Point v40 ( *(this->get_node(4)) - *(this->get_node(0)) );
+//   Point v57 ( *(this->get_node(5)) - *(this->get_node(7)) );
+//   Point v30 ( *(this->get_node(3)) - *(this->get_node(0)) );
+//   Point v72 ( *(this->get_node(7)) - *(this->get_node(2)) );
 
-  // Compute 3 box products
-  const Real bp0 = v60 * (v10.cross(v25));
-  const Real bp1 = v60 * (v40.cross(v57));
-  const Real bp2 = v60 * (v30.cross(v72));
+//   // Compute 3 box products
+//   const Real bp0 = v60 * (v10.cross(v25));
+//   const Real bp1 = v60 * (v40.cross(v57));
+//   const Real bp2 = v60 * (v30.cross(v72));
 
-  // Add up, scale, and return value
-  return (1./6.)*(bp0+bp1+bp2);
-}
+//   // Add up, scale, and return value
+//   return (1./6.)*(bp0+bp1+bp2);
+// }
