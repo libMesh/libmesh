@@ -1,4 +1,4 @@
-// $Id: cell_hex8.h,v 1.12 2006-03-23 20:24:36 roystgnr Exp $
+// $Id: cell_hex8.h,v 1.13 2006-06-20 14:08:02 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -143,8 +143,14 @@ public:
    * element node numbers.
    */
   static const unsigned int edge_nodes_map[12][2];
-  
 
+  /**
+   * A specialization for computing the area of a hexahedron
+   * with flat sides.
+   */
+  virtual Real volume () const;
+  
+  
 protected:
   
   
