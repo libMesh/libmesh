@@ -1,4 +1,4 @@
-// $Id: cell_prism6.C,v 1.24 2005-06-16 23:03:52 roystgnr Exp $
+// $Id: cell_prism6.C,v 1.25 2006-06-20 20:18:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -327,3 +327,29 @@ const float Prism6::_embedding_matrix[8][6][6] =
 };
 
 #endif
+
+
+
+// Real Prism6::volume () const
+// {
+//   // The volume of the prism is computed by splitting
+//   // it into 3 tetrahedra and summing their constitutive
+//   // volumes.
+
+//   // Get the various diagonal and edge vectors
+//   Point v40 ( *(this->get_node(4)) - *(this->get_node(0)) );
+//   Point v10 ( *(this->get_node(1)) - *(this->get_node(0)) );
+//   Point v20 ( *(this->get_node(2)) - *(this->get_node(0)) );
+//   Point v23 ( *(this->get_node(2)) - *(this->get_node(3)) );
+//   Point v53 ( *(this->get_node(5)) - *(this->get_node(3)) );
+//   Point v43 ( *(this->get_node(4)) - *(this->get_node(3)) );
+//   Point v30 ( *(this->get_node(3)) - *(this->get_node(0)) );
+
+//   // Compute box products
+//   const Real bp0 = v40 * (v10.cross(v20));  assert(bp0 > 0.);
+//   const Real bp1 = v23 * (v53.cross(v43));  assert(bp1 > 0.);
+//   const Real bp2 = v20 * (v30.cross(v40));  assert(bp2 > 0.);
+
+//   // Add up results, scale and return
+//   return (1./6.)*(bp0+bp1+bp2);
+// }
