@@ -9,6 +9,8 @@
 
 NewtonSolver::NewtonSolver (sys_type& s)
   : Parent(s),
+    require_residual_reduction(false),
+    minsteplength(0.0),
     linear_solver(LinearSolver<Number>::build())
 {
 }
@@ -34,10 +36,6 @@ void NewtonSolver::solve()
 {
   START_LOG("solve()", "NewtonSolver");
 
-// Reduce Newton step length to keep residual from increasing?
-const bool require_residual_reduction = false;
-// Maximum amount by which to reduce Newton steps
-const Real minsteplength = 0.1;
 // Amount by which nonlinear residual should exceed linear solver
 // tolerance
 const Real relative_tolerance = 1.e-3;
@@ -69,6 +67,11 @@ const Real relative_tolerance = 1.e-3;
       max_residual_norm = std::max (current_residual,
                                     max_residual_norm);
  
+      // Compute the l2 norm of the whole solution
+      Real norm_total = newton_iterate.l2_norm();
+
+      max_solution_norm = std::max(max_solution_norm, norm_total);
+
       if (!quiet)
         std::cout << "Nonlinear Residual: "
                   << current_residual << std::endl;
@@ -138,6 +141,10 @@ const Real relative_tolerance = 1.e-3;
       // backtrack if necessary
       if (require_residual_reduction)
         {
+          // but don't fiddle around if we've already converged
+          if (test_convergence(l, current_residual, norm_delta))
+            break;
+
           while (current_residual > last_residual)
             {
               // Reduce step size to 1/2, 1/4, etc.
@@ -171,7 +178,7 @@ const Real relative_tolerance = 1.e-3;
         }
 
       // Compute the l2 norm of the whole solution
-      const Real norm_total = newton_iterate.l2_norm();
+      norm_total = newton_iterate.l2_norm();
 
       max_solution_norm = std::max(max_solution_norm, norm_total);
 
@@ -183,91 +190,9 @@ const Real relative_tolerance = 1.e-3;
                   << ", |du| = " << norm_delta
                   << std::endl;
 
-      // We haven't converged unless we pass a convergence test
-      bool has_converged = false;
-
-      // Is our absolute residual low enough?
-      if (current_residual < absolute_residual_tolerance)
-        {
-          if (!quiet)
-	    std::cout << "  Nonlinear solver converged, step " << l
-                      << ", residual " << current_residual
-                      << std::endl;
-          has_converged = true;
-        }
-      else if (absolute_residual_tolerance)
-        {
-          if (!quiet)
-            std::cout << "  Nonlinear solver current_residual "
-                      << current_residual << " > "
-		      << (absolute_residual_tolerance) << std::endl;
-        }
-
-      // Is our relative residual low enough?
-      if ((current_residual / max_residual_norm) <
-          relative_residual_tolerance)
-        {
-          if (!quiet)
-            std::cout << "  Nonlinear solver converged, step " << l
-                      << ", residual reduction "
-                      << current_residual / max_residual_norm
-                      << " < " << relative_residual_tolerance
-                      << std::endl;
-          has_converged = true;
-        }
-      else if (relative_residual_tolerance)
-        {
-          if (!quiet)
-            std::cout << "  Nonlinear solver relative residual "
-                      << (current_residual / max_residual_norm)
-                      << " > " << relative_residual_tolerance
-                      << std::endl;
-        }
-
-      // Is our absolute Newton step size small enough?
-      if (norm_delta / steplength < absolute_step_tolerance)
-        {
-          if (!quiet)
-            std::cout << "  Nonlinear solver converged, step " << l
-                      << ", absolute step size "
-                      << norm_delta / steplength
-                      << " < " << absolute_step_tolerance
-                      << std::endl;
-          has_converged = true;
-        }
-      else if (absolute_step_tolerance)
-        {
-          if (!quiet)
-            std::cout << "  Nonlinear solver absolute step size "
-                      << (norm_delta / steplength)
-                      << " > " << absolute_step_tolerance
-                      << std::endl;
-        }
-
-      // Is our relative Newton step size small enough?
-      if (norm_delta / steplength / max_solution_norm <
-          relative_step_tolerance)
-        {
-          if (!quiet)
-            std::cout << "  Nonlinear solver converged, step " << l
-                      << ", relative step size "
-                      << (norm_delta / steplength / max_solution_norm)
-                      << " < " << relative_step_tolerance
-                      << std::endl;
-          has_converged = true;
-        }
-      else if (relative_step_tolerance)
-        {
-          if (!quiet)
-            std::cout << "  Nonlinear solver relative step size "
-                      << (norm_delta / steplength / max_solution_norm)
-                      << " > " << relative_step_tolerance
-                      << std::endl;
-        }
-
       // Terminate the solution iteration if the difference between
       // this iteration and the last is sufficiently small.
-      if (has_converged)
+      if (test_convergence(l, current_residual, norm_delta / steplength))
         {
           break;
         }
@@ -291,4 +216,95 @@ const Real relative_tolerance = 1.e-3;
   _system.update ();
 
   STOP_LOG("solve()", "NewtonSolver");
+}
+
+
+
+bool NewtonSolver::test_convergence(unsigned int step_num,
+                                    Real current_residual,
+                                    Real step_norm)
+{
+  // We haven't converged unless we pass a convergence test
+  bool has_converged = false;
+
+  // Is our absolute residual low enough?
+  if (current_residual < absolute_residual_tolerance)
+    {
+      if (!quiet)
+        std::cout << "  Nonlinear solver converged, step " << step_num
+                  << ", residual " << current_residual
+                  << std::endl;
+      has_converged = true;
+    }
+  else if (absolute_residual_tolerance)
+    {
+      if (!quiet)
+        std::cout << "  Nonlinear solver current_residual "
+                  << current_residual << " > "
+                  << (absolute_residual_tolerance) << std::endl;
+    }
+
+  // Is our relative residual low enough?
+  if ((current_residual / max_residual_norm) <
+      relative_residual_tolerance)
+    {
+      if (!quiet)
+        std::cout << "  Nonlinear solver converged, step " << step_num
+                  << ", residual reduction "
+                  << current_residual / max_residual_norm
+                  << " < " << relative_residual_tolerance
+                  << std::endl;
+      has_converged = true;
+    }
+  else if (relative_residual_tolerance)
+    {
+      if (!quiet)
+        std::cout << "  Nonlinear solver relative residual "
+                  << (current_residual / max_residual_norm)
+                  << " > " << relative_residual_tolerance
+                  << std::endl;
+    }
+
+  // Is our absolute Newton step size small enough?
+  if (step_norm < absolute_step_tolerance)
+    {
+      if (!quiet)
+        std::cout << "  Nonlinear solver converged, step " << step_num
+                  << ", absolute step size "
+                  << step_norm
+                  << " < " << absolute_step_tolerance
+                  << std::endl;
+      has_converged = true;
+    }
+  else if (absolute_step_tolerance)
+    {
+      if (!quiet)
+        std::cout << "  Nonlinear solver absolute step size "
+                  << step_norm
+                  << " > " << absolute_step_tolerance
+                  << std::endl;
+    }
+
+  // Is our relative Newton step size small enough?
+  if (step_norm / max_solution_norm <
+      relative_step_tolerance)
+    {
+      if (!quiet)
+        std::cout << "  Nonlinear solver converged, step " << step_num
+                  << ", relative step size "
+                  << (step_norm / max_solution_norm)
+                  << " < " << relative_step_tolerance
+                  << std::endl;
+      has_converged = true;
+    }
+  else if (relative_step_tolerance)
+    {
+      if (!quiet)
+        std::cout << "  Nonlinear solver relative step size "
+                  << (step_norm / max_solution_norm)
+                  << " > " << relative_step_tolerance
+                  << std::endl;
+    }
+
+  return has_converged;
 }

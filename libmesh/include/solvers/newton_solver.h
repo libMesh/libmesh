@@ -1,4 +1,4 @@
-// $Id: newton_solver.h,v 1.2 2006-06-13 22:22:00 roystgnr Exp $
+// $Id: newton_solver.h,v 1.3 2006-06-21 01:12:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -69,6 +69,20 @@ public:
    */
   virtual void solve ();
 
+  /**
+   * If this is set to true, the solver is forced to test the residual
+   * after each Newton step, and to reduce the length of its steps
+   * whenever necessary to avoid a residual increase.
+   */
+  bool require_residual_reduction;
+
+  /**
+   * If the quasi-Newton step length must be reduced to below this
+   * factor to give a residual reduction, then the Newton solver
+   * dies with an error()
+   */
+  Real minsteplength;
+
 protected:
 
   /**
@@ -79,6 +93,13 @@ protected:
    */
   AutoPtr<LinearSolver<Number> > linear_solver;
 
+  /**
+   * This returns true if a convergence criterion has been passed
+   * by the given residual and step size; false otherwise.
+   */
+  bool test_convergence(unsigned int step_num,
+			Real current_residual,
+			Real step_norm);
 };
 
 
