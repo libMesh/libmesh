@@ -224,6 +224,25 @@ some eigenvalues for a standard symmetric eigenvalue problem
 A*x=lambda*x are computed, where the matrix A is assembled according
 to a mass matrix.
 
+<h2><a href="ex17.php">Example 17></a> - Solving a generalized Eigen Problem</h2>
+This example shows how the previous EigenSolver example
+can be adapted to solve generailzed eigenvalue problems.
+For solving eigen problems, libMesh interfaces
+SLEPc
+(<a href="http://www.grycap.upv.es/slepc/">www.grycap.upv.es/slepc/</a>)
+which again is based on PETSc.
+Hence, this example will only work if the library is compiled
+with SLEPc support enabled.
+
+In this example some eigenvalues for a generalized symmetric
+eigenvalue problem A*x=lambda*B*x are computed, where the
+matrices A and B are assembled according to stiffness and
+mass matrix, respectively.
+
+<h2><a href="ex18.php">Example 18</a> - Unsteady Navier-Stokes Equations with DiffSystem</h2>
+This example shows how the transient nonlinear problem from
+example 13 can be solved using the DiffSystem class framework to
+simplify the user-implemented equations.
 
 </div>
 

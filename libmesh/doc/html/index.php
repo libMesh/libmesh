@@ -4,6 +4,9 @@
 <HTML>
 <head>
   <title>libMesh - A C++ Finite Element Library</title>
+  <META name="description" content="A parallel adaptive C++ framework for the simulation of partial differential equations.">
+  <META name="keywords" content="science math numerical analysis, science math numerical analysis software, numerical analysis research group, partial differential equations, applied partial differential equations, elliptic parabolic hyperbolic partial differential equations, finite element analysis modeling software, system of linear equation solver, simultaneous linear equation solver, computational fluid dynamics software">
+  <META name="robots" content="index, follow">
   <?php load_style($root); ?>
 </head>
 

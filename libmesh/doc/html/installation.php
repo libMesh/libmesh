@@ -63,14 +63,14 @@ The library is known to work with the following compilers:
     </ul>
   <li>Intel ICC/ECC</li>
     <ul>
-      <li><code>icc/ifort</code> 8.x <code></li>
+      <li><code>icc/ifort</code> 9.x, 8.x <code></li>
       <li><code>icc/ifc</code> 7.x</li>
       <li><code>icc/ifc</code> 6.0</li>
       <li>Earlier versions (&lt;= 5.0) not supported</li>
     </ul>
   <li>SGI Altix</li>
     <ul>
-      <li><code>icc/ifort</code> 9.0, 8.x</li>
+      <li><code>icc/ifort</code> 9.x, 8.x</li>
       <li><code>ecc/efc</code> 7.1</li>
       <li><code>MPT MPI</code> 1.9.1</li>
     </ul>

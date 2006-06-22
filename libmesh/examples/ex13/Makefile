@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2005-05-06 17:44:07 roystgnr Exp $
+# $Id: Makefile,v 1.3 2006-06-22 21:36:52 benkirk Exp $
 
 
 # The location of the mesh library
@@ -33,15 +33,16 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   := ./ex13
+target 	   :=  ex13 ex13_nonlinear
 
 
 all:: $(target)
 
 # Production rules:  how to make the target - depends on library configuration
-$(target): $(objects)
+%: $(patsubst %.C, %.$(obj-suffix), %.C)
 	@echo "Linking "$@"..."
-	@$(CXX) $(CXXFLAGS) $(objects) -o $@ $(LIBS) $(LDFLAGS) $(EXTERNAL_FLAGS)
+	$(CXX) $(CXXFLAGS) $< -o $@ $(LIBS) $(LDFLAGS) $(EXTERNAL_FLAGS)
+
 
 
 # Useful rules.
@@ -61,7 +62,8 @@ run: $(target)
 	@echo "* Running Example " $(target)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target)
+	@./ex13
+	@./ex13_nonlinear -snes_ls cubic -snes_max_it 10 -ksp_rtol 1.e-3 -ksp_max_it 50 -ksp_xmonitor -ksp_gmres_restart 25 -snes_mf_operator -snes_view 
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)

@@ -153,13 +153,13 @@
     - \p gcc 2.96 (RedHat's compiler in the 7.x series)
  
   - Intel ICC/ECC
-    - \p icc/ifort 8.x
+    - \p icc/ifort 9.x, 8.x
     - \p icc/ifc 7.x
     - \p icc/ifc 6.0
     - Earlier versions (<= 5.0) not supported.
     
   - SGI Altix
-    - \p icc/ifort 9.0, 8.x
+    - \p icc/ifort 9.x, 8.x
     - \p ecc/efc 7.1
     - \p MPT \p MPI 1.9.1
  
