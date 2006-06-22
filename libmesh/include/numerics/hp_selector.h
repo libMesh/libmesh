@@ -1,4 +1,4 @@
-// $Id: hp_selector.h,v 1.4 2006-05-27 14:49:35 roystgnr Exp $
+// $Id: hp_selector.h,v 1.5 2006-06-22 21:43:19 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -29,13 +29,15 @@
 #include "auto_ptr.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
+#include "fe.h"         // MipsPro requires fe.h and quadrature.h in order to
+#include "quadrature.h" //  delete AutoPtrs<> upon destruction
 #include "libmesh_common.h"
 
 // Forward Declarations
 class Elem;
-class FEBase;
+//class FEBase;
 class Point;
-class QBase;
+//class QBase;
 class System;
 template <typename T> class TensorValue;
 template <typename T> class VectorValue;

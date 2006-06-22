@@ -1,4 +1,4 @@
-// $Id: fe_hermite.C,v 1.4 2006-04-27 17:57:29 roystgnr Exp $
+// $Id: fe_hermite.C,v 1.5 2006-06-22 21:43:19 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -264,6 +264,10 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
         error();	    
       }
     }
+ 
+  // Will never get here...
+  error();
+  return 0;
 }
 
 
