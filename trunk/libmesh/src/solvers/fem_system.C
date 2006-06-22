@@ -290,6 +290,16 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
   if (get_residual)
     rhs->zero();
 
+  // Stupid C++ lets you set *Real* verify_analytic_jacobians = true!
+  if (verify_analytic_jacobians > 0.5)
+    {
+      std::cerr << "WARNING!  verify_analytic_jacobians was set "
+                << "to absurdly large value of "
+                << verify_analytic_jacobians << std::endl;
+      std::cerr << "Resetting to 1e-6!" << std::endl;
+      verify_analytic_jacobians = 1e-6;
+    }
+
   // In time-dependent problems, the nonlinear function we're trying
   // to solve at each timestep may depend on the particular solver
   // we're using
