@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.39 2006-06-07 19:23:46 roystgnr Exp $
+// $Id: fe_map.C,v 1.40 2006-06-22 14:46:08 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1353,36 +1353,44 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       cnt++;
       
       //  Watch for divergence of Newton's
-      //  method.
+      //  method.  Here's how it goes:
+      //  (1) For good elements, we expect convergence in 10 iterations.
+      //      - If called with (secure == true) and we have not yet converged
+      //        print out a warning message.
+      //      - If called with (secure == true) and we have not converged in
+      //        20 iterations abort
+      //  (2) This method may be called in cases when the target point is not
+      //      inside the element and we have no business expecting convergence.
+      //      For these cases if we have not converged in 10 iterations forget
+      //      about it.
       if (cnt > 10)
 	{
-	  //  Do not bother about devergence when secure is false.
+	  //  Do not bother about divergence when secure is false.
 	  if (secure)
 	    {
 	      here();
-	      {
-		std::cerr << "WARNING: Newton scheme has not converged in "
-			  << cnt << " iterations:" << std::endl
-			  << "   physical_point="
-			  << physical_point
-			  << "   physical_guess="
-			  << physical_guess
-			  << "   dp="
-			  << dp
-			  << "   p="
-			  << p;
+	      std::cerr << "WARNING: Newton scheme has not converged in "
+			<< cnt << " iterations:" << std::endl
+			<< "   physical_point="
+			<< physical_point
+			<< "   physical_guess="
+			<< physical_guess
+			<< "   dp="
+			<< dp
+			<< "   p="
+			<< p
+			<< "   error=" << error
+			<< std::endl;
 
-		std::cerr << "   error=" << error
-			  << std::endl;
-	      }
-	    }
-	  if (cnt > 20 && secure)
-	    {
-	     
-	      std::cerr << "ERROR: Newton scheme FAILED to converge in "
-			<< cnt << " iterations!" << std::endl;
+	      if (cnt > 20)
+		{
+		  std::cerr << "ERROR: Newton scheme FAILED to converge in "
+			    << cnt
+			    << " iterations!"
+			    << std::endl;
 
-	      error();
+		  error();
+		}
 	    }
 	  else
 	    {
