@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.14 2006-01-14 15:56:08 roystgnr Exp $ */
+/* $Id: ex13.C,v 1.15 2006-06-22 21:36:52 benkirk Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -153,14 +153,14 @@ int main (int argc, char** argv)
     equation_systems.parameters.set<Real> ("dt")   = dt;
 
     // Get a reference to the Stokes system to use later.
-    TransientLinearImplicitSystem&  stokes_system =
+    TransientLinearImplicitSystem&  navier_stokes_system =
 	  equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
 
     // The first thing to do is to get a copy of the solution at
     // the current nonlinear iteration.  This value will be used to
     // determine if we can exit the nonlinear loop.
     AutoPtr<NumericVector<Number> >
-      last_nonlinear_soln (stokes_system.solution->clone());
+      last_nonlinear_soln (navier_stokes_system.solution->clone());
 
     for (unsigned int t_step=0; t_step<n_timesteps; ++t_step)
       {
@@ -179,14 +179,14 @@ int main (int argc, char** argv)
 	// Now we need to update the solution vector from the
 	// previous time step.  This is done directly through
 	// the reference to the Stokes system.
-	*stokes_system.old_local_solution = *stokes_system.current_local_solution;
+	*navier_stokes_system.old_local_solution = *navier_stokes_system.current_local_solution;
 
 	// Now we begin the nonlinear loop
 	for (unsigned int l=0; l<n_nonlinear_steps; ++l)
 	  {
 	    // Update the nonlinear solution.
 	    last_nonlinear_soln->zero();
-	    last_nonlinear_soln->add(*stokes_system.solution);
+	    last_nonlinear_soln->add(*navier_stokes_system.solution);
 	    
 	    // Assemble & solve the linear system.
 	    perf_log.start_event("linear solve");
@@ -195,7 +195,7 @@ int main (int argc, char** argv)
 
 	    // Compute the difference between this solution and the last
 	    // nonlinear iterate.
-	    last_nonlinear_soln->add (-1., *stokes_system.solution);
+	    last_nonlinear_soln->add (-1., *navier_stokes_system.solution);
 
 	    // Close the vector before computing its norm
 	    last_nonlinear_soln->close();
@@ -206,9 +206,9 @@ int main (int argc, char** argv)
 	    // Print out convergence information for the linear and
 	    // nonlinear iterations.
 	    std::cout << "Linear solver converged at step: "
-		      << stokes_system.n_linear_iterations()
+		      << navier_stokes_system.n_linear_iterations()
 		      << ", final residual: "
-		      << stokes_system.final_linear_residual()
+		      << navier_stokes_system.final_linear_residual()
 		      << "  Nonlinear convergence: ||u - u_old|| = "
 		      << norm_delta
 		      << std::endl;
@@ -267,20 +267,20 @@ void assemble_stokes (EquationSystems& es,
   const unsigned int dim = mesh.mesh_dimension();
   
   // Get a reference to the Stokes system object.
-  TransientLinearImplicitSystem & stokes_system =
+  TransientLinearImplicitSystem & navier_stokes_system =
     es.get_system<TransientLinearImplicitSystem> ("Navier-Stokes");
 
   // Numeric ids corresponding to each variable in the system
-  const unsigned int u_var = stokes_system.variable_number ("u");
-  const unsigned int v_var = stokes_system.variable_number ("v");
-  const unsigned int p_var = stokes_system.variable_number ("p");
+  const unsigned int u_var = navier_stokes_system.variable_number ("u");
+  const unsigned int v_var = navier_stokes_system.variable_number ("v");
+  const unsigned int p_var = navier_stokes_system.variable_number ("p");
   
   // Get the Finite Element type for "u".  Note this will be
   // the same as the type for "v".
-  FEType fe_vel_type = stokes_system.variable_type(u_var);
+  FEType fe_vel_type = navier_stokes_system.variable_type(u_var);
   
   // Get the Finite Element type for "p".
-  FEType fe_pres_type = stokes_system.variable_type(p_var);
+  FEType fe_pres_type = navier_stokes_system.variable_type(p_var);
 
   // Build a Finite Element object of the specified type for
   // the velocity variables.
@@ -322,7 +322,7 @@ void assemble_stokes (EquationSystems& es,
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
   // in future examples.
-  const DofMap & dof_map = stokes_system.get_dof_map();
+  const DofMap & dof_map = navier_stokes_system.get_dof_map();
 
   // Define data structures to contain the element matrix
   // and right-hand-side vector contribution.  Following
@@ -459,22 +459,22 @@ void assemble_stokes (EquationSystems& es,
 	  for (unsigned int l=0; l<n_u_dofs; l++)
 	    {
 	      // From the old timestep:
-	      u_old += phi[l][qp]*stokes_system.old_solution (dof_indices_u[l]);
-	      v_old += phi[l][qp]*stokes_system.old_solution (dof_indices_v[l]);
-	      grad_u_old.add_scaled (dphi[l][qp],stokes_system.old_solution (dof_indices_u[l]));
-	      grad_v_old.add_scaled (dphi[l][qp],stokes_system.old_solution (dof_indices_v[l]));
+	      u_old += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_u[l]);
+	      v_old += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_v[l]);
+	      grad_u_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_u[l]));
+	      grad_v_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_v[l]));
 
 	      // From the previous Newton iterate:
-	      u += phi[l][qp]*stokes_system.current_solution (dof_indices_u[l]); 
-	      v += phi[l][qp]*stokes_system.current_solution (dof_indices_v[l]);
-	      grad_u.add_scaled (dphi[l][qp],stokes_system.current_solution (dof_indices_u[l]));
-	      grad_v.add_scaled (dphi[l][qp],stokes_system.current_solution (dof_indices_v[l]));
+	      u += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_u[l]); 
+	      v += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_v[l]);
+	      grad_u.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_u[l]));
+	      grad_v.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_v[l]));
 	    }
 
 	  // Compute the old pressure value at this quadrature point.
 	  for (unsigned int l=0; l<n_p_dofs; l++)
 	    {
-	      p_old += psi[l][qp]*stokes_system.old_solution (dof_indices_p[l]);
+	      p_old += psi[l][qp]*navier_stokes_system.old_solution (dof_indices_p[l]);
 	    }
 
 	  // Definitions for convenience.  It is sometimes simpler to do a
@@ -581,7 +581,7 @@ void assemble_stokes (EquationSystems& es,
 		  // The boundary values.
 		   
 		  // Set u = 1 on the top boundary, 0 everywhere else
-		  const Real u_value = (yf > .99) ? 1. : 0.;
+		  const Real u_value = (yf > .999) ? 1. : 0.;
 		  
 		  // Set v = 0 everywhere
 		  const Real v_value = 0.;
@@ -608,8 +608,8 @@ void assemble_stokes (EquationSystems& es,
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The \p PetscMatrix::add_matrix()
       // and \p PetscVector::add_vector() members do this for us.
-      stokes_system.matrix->add_matrix (Ke, dof_indices);
-      stokes_system.rhs->add_vector    (Fe, dof_indices);
+      navier_stokes_system.matrix->add_matrix (Ke, dof_indices);
+      navier_stokes_system.rhs->add_vector    (Fe, dof_indices);
     } // end of element loop
   
   // That's it.
