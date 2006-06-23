@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.h,v 1.4 2005-10-13 16:36:31 roystgnr Exp $
+// $Id: mesh_triangle_support.h,v 1.5 2006-06-23 16:49:48 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -41,6 +41,11 @@ extern "C" {
 #include "triangle.h"
 }
 
+  enum IO_Type {
+    INPUT  = 0,
+    OUTPUT = 1,
+    BOTH   = 2};
+  
   /**
    * Initializes the fields of t to NULL/0 as necessary.
    * This is helpful for preventing the access of uninitialized
@@ -51,11 +56,16 @@ extern "C" {
     
   /**
    * Frees any memory which has been dynamically allocated by
-   * Triangle.  This is safe due to the fact that 1) Triangle does
-   * not free any memory itself, and 2) it is safe to call free
-   * on the NULL pointer.
+   * Triangle.  Note the following facts:
+   * 1) Triangle does not free any memory itself
+   * 2) It is always safe to call free on a NULL pointer.
+   *
+   * However, triangle *does* shallow-copy (for example)
+   * the holelist pointer from the input to output struct **without**
+   * performing a deep copy of the holelist itself.  Therefore, double-free
+   * will occur without additional care!
    */
-  void destroy(triangulateio& t);
+  void destroy(triangulateio& t, IO_Type);
 }
 
 
