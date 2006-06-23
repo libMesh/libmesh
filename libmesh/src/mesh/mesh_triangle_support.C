@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.C,v 1.7 2005-09-30 19:55:23 benkirk Exp $
+// $Id: mesh_triangle_support.C,v 1.8 2006-06-23 16:49:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -129,9 +129,9 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
     }
 
   // Clean up triangle data structures
-  Triangle::destroy(input);
-  Triangle::destroy(intermediate);
-  Triangle::destroy(final);
+  Triangle::destroy(input,        Triangle::INPUT );
+  Triangle::destroy(intermediate, Triangle::BOTH  );
+  Triangle::destroy(final,        Triangle::OUTPUT);
   
   // Prepare mesh for usage.
   mesh.prepare_for_use();
@@ -185,7 +185,7 @@ void Triangle::init(Triangle::triangulateio& t)
 
 
 // Destroy helper routine defined in the Triangle namespace
-void Triangle::destroy(Triangle::triangulateio& t)
+void Triangle::destroy(Triangle::triangulateio& t, Triangle::IO_Type io_type)
 {
   std::free (t.pointlist                    );
   std::free (t.pointattributelist           );
@@ -196,11 +196,20 @@ void Triangle::destroy(Triangle::triangulateio& t)
   std::free (t.neighborlist                 );
   std::free (t.segmentlist                  );
   std::free (t.segmentmarkerlist            );
-  std::free (t.holelist                     );
-  std::free (t.regionlist                   );
+
+  // Only attempt to free these when t was used as an input struct!
+  if (io_type==INPUT)
+    {
+      std::free (t.holelist                     );
+      std::free (t.regionlist                   );
+    }
+  
   std::free (t.edgelist                     );
   std::free (t.edgemarkerlist               );
   std::free (t.normlist                     );
+
+  // Reset
+  // Triangle::init(t);
 }
 #endif // HAVE_TRIANGLE
 
