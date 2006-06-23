@@ -83,7 +83,7 @@ const Real relative_tolerance = 1.e-3;
         }
 
       // But don't let it be zero
-      if (current_linear_tolerance < TOLERANCE * TOLERANCE)
+      if (current_linear_tolerance == 0.)
         {
           current_linear_tolerance = TOLERANCE * TOLERANCE;
         }
