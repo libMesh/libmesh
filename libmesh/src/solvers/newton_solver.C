@@ -198,9 +198,9 @@ const Real relative_tolerance = 1.e-3;
         }
       if (l >= max_nonlinear_iterations - 1)
         {
-          if (!quiet)
-            std::cout << "  Nonlinear solver DIVERGED at step " << l
-                      << std::endl;
+          std::cout << "  Nonlinear solver DIVERGED at step " << l
+                    << " with norm " << norm_total
+                    << std::endl;
           error();
           continue;
         }
