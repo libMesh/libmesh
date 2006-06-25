@@ -125,7 +125,7 @@ a.L3 {
   border-style         : outset;
   /*border               : 1px solid black;*/
   color                : black;
-  /*background           : white url(./bg_muted.png);*/
+  /*background           : white url(./images/bg_muted.png);*/
   padding              : 10px;
   z-index              : 3; /* This allows the content to overlap the right menu in narrow windows in good browsers. */
 }
