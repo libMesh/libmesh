@@ -224,7 +224,7 @@ some eigenvalues for a standard symmetric eigenvalue problem
 A*x=lambda*x are computed, where the matrix A is assembled according
 to a mass matrix.
 
-<h2><a href="ex17.php">Example 17></a> - Solving a generalized Eigen Problem</h2>
+<h2><a href="ex17.php">Example 17</a> - Solving a generalized Eigen Problem</h2>
 This example shows how the previous EigenSolver example
 can be adapted to solve generailzed eigenvalue problems.
 For solving eigen problems, libMesh interfaces
