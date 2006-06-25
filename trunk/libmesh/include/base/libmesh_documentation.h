@@ -117,7 +117,7 @@
   CVS repository via:
   
   \verbatim
-     cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libmesh co libmesh \endverbatim
+     cvs -d:pserver:anonymous@libmesh.cvs.sourceforge.net:/cvsroot/libmesh co libmesh \endverbatim
      
   If you would like to contribute to the project you will need a
   SourceForge developer account, or you can contribute patches.  To create a
