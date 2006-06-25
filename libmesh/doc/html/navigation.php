@@ -33,7 +33,7 @@ function load_style($root)
     
     <?php echo "<a class=\"L1\" href = \"", $root, "examples.php\">Examples</a><BR>"; ?>
 
-    <?php if (ereg("^ex[1-9]+|examples",$mode))
+    <?php if (ereg("^ex[0-9]+|examples",$mode))
             {
               for ($i=0; $i<19; $i++)
                 {

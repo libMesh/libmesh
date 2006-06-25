@@ -1,39 +1,21 @@
-// $Id: ex16.C,v 1.8 2005-12-22 18:06:07 spetersen Exp $
+/* $Id: ex16.C,v 1.9 2006-06-25 00:21:16 benkirk Exp $ */
 
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
-  
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-  
-// This library is distributd in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-  
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+/* The Next Great Finite Element Library. */
+/* Copyright (C) 2003  Benjamin S. Kirk */
 
+/* This library is free software; you can redistribute it and/or */
+/* modify it under the terms of the GNU Lesser General Public */
+/* License as published by the Free Software Foundation; either */
+/* version 2.1 of the License, or (at your option) any later version. */
 
-// C++ include files that we need
+/* This library is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
+/* Lesser General Public License for more details. */
 
-
-// libMesh include files.
-#include "libmesh.h"
-#include "mesh.h"
-#include "mesh_generation.h"
-#include "gmv_io.h"
-#include "eigen_system.h"
-#include "equation_systems.h"
-#include "fe.h"
-#include "quadrature_gauss.h"
-#include "dense_matrix.h"
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dof_map.h"
+/* You should have received a copy of the GNU Lesser General Public */
+/* License along with this library; if not, write to the Free Software */
+/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 
 
@@ -50,6 +32,21 @@
 // In this example some eigenvalues for a standard symmetric eigenvalue
 // problem A*x=lambda*x are computed, where the matrix A
 // is assembled according to a mass matrix.
+
+
+// libMesh include files.
+#include "libmesh.h"
+#include "mesh.h"
+#include "mesh_generation.h"
+#include "gmv_io.h"
+#include "eigen_system.h"
+#include "equation_systems.h"
+#include "fe.h"
+#include "quadrature_gauss.h"
+#include "dense_matrix.h"
+#include "sparse_matrix.h"
+#include "numeric_vector.h"
+#include "dof_map.h"
 
 
 // Function prototype.  This is the function that will assemble

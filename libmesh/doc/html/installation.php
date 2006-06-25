@@ -24,7 +24,7 @@ to the CVS repository via:
 <br>
 
 <div class="fragment">
-  <pre>cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libmesh co libmesh </pre>
+  <pre>cvs -d:pserver:anonymous@libmesh.cvs.sourceforge.net:/cvsroot/libmesh co libmesh </pre>
 </div>
 
 <br>
