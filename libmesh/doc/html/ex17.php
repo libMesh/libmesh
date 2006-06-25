@@ -61,7 +61,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 </pre>
 </div>
 <div class = "comment">
-<h1>Example 16 - Solving a generalized Eigen Problem</h1>
+<h1>Example 17 - Solving a generalized Eigen Problem</h1>
 
 <br><br>This example shows how the previous EigenSolver example 
 can be adapted to solve generailzed eigenvalue problems.
