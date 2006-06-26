@@ -1,4 +1,4 @@
-/* $Id: ex15.C,v 1.11 2006-04-17 16:03:20 roystgnr Exp $ */
+/* $Id: ex15.C,v 1.12 2006-06-26 13:52:37 spetersen Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -54,6 +54,7 @@
 #include "dof_map.h"
 #include "numeric_vector.h"
 #include "elem.h"
+#include "tensor_value.h"
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our Biharmonic problem.  Note that the

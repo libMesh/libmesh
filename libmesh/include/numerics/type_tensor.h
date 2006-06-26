@@ -1,4 +1,4 @@
-// $Id: type_tensor.h,v 1.7 2005-10-14 19:44:09 roystgnr Exp $
+// $Id: type_tensor.h,v 1.8 2006-06-26 13:52:37 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -89,7 +89,7 @@ public:
    * tensor.
    */
   T & operator () (const unsigned int i, const unsigned int j);
-  
+
   /**
    * Add two tensors. 
    */
@@ -111,7 +111,7 @@ public:
    */
   template <typename T2>
   void add_scaled (const TypeTensor<T2> &, const T); 
-  
+
   /**
    * Subtract two tensors.
    */
@@ -239,7 +239,7 @@ public:
    */ 
   void write_unformatted (std::ostream &out, const bool newline = true) const;
     
- protected:
+  // protected:
 
   /**
    * The coordinates of the \p TypeTensor
@@ -420,6 +420,7 @@ void TypeTensor<T>::add_scaled (const TypeTensor<T2> &p, const T factor)
 {
   for (unsigned int i=0; i<DIM*DIM; i++)
     _coords[i] += factor*p._coords[i];
+
 }
 
 
@@ -484,7 +485,7 @@ inline
 void TypeTensor<T>::subtract_scaled (const TypeTensor<T2> &p, const T factor)
 {
   for (unsigned int i=0; i<DIM*DIM; i++)
-    _coords[i] -= factor*p(i);
+    _coords[i] -= factor*p._coords[i];
 }
 
 

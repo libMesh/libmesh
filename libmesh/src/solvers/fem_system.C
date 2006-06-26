@@ -67,7 +67,7 @@ Gradient FEMSystem::interior_gradient(unsigned int var, unsigned int qp)
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<Gradient> > &dphi =
+  const std::vector<std::vector<RealGradient> > &dphi =
     element_fe[this->variable_type(var)]->get_dphi();
 
   // Accumulate solution derivatives
@@ -147,7 +147,7 @@ Gradient FEMSystem::side_gradient(unsigned int var, unsigned int qp)
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<Gradient> > &dphi =
+  const std::vector<std::vector<RealGradient> > &dphi =
     side_fe[this->variable_type(var)]->get_dphi();
 
   // Accumulate solution derivatives

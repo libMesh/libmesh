@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.3 2006-06-14 20:44:21 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.4 2006-06-26 13:52:37 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -258,8 +258,10 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
 
 #ifdef USE_COMPLEX_NUMBERS
               Gradient grad_u_fine (grad_u_fine_re, grad_u_fine_im);
+              Gradient grad_u_coarse (grad_u_coarse_re, grad_u_coarse_im);
   #ifdef ENABLE_SECOND_DERIVATIVES
               Tensor grad2_u_fine (grad2_u_fine_re, grad2_u_fine_im);
+              Tensor grad2_u_coarse (grad2_u_coarse_re, grad2_u_coarse_im);
   #endif
 #endif
 
