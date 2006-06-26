@@ -2507,7 +2507,9 @@ src/geom/elem.$(obj-suffix):\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
     include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
+    include/fe/fe_base.h\
     include/fe/fe_interface.h\
     include/fe/fe_type.h\
     include/geom/cell_hex.h\
@@ -2548,7 +2550,12 @@ src/geom/elem.$(obj-suffix):\
     include/geom/face_tri3.h\
     include/geom/face_tri6.h\
     include/geom/point.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/quadrature/quadrature.h\
+    include/quadrature/quadrature_gauss.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/elem_quality.$(obj-suffix):\
@@ -3422,6 +3429,8 @@ src/mesh/mesh_generation.$(obj-suffix):\
     include/geom/cell_prism15.h\
     include/geom/cell_prism18.h\
     include/geom/cell_prism6.h\
+    include/geom/cell_tet.h\
+    include/geom/cell_tet4.h\
     include/geom/edge.h\
     include/geom/edge_edge2.h\
     include/geom/edge_edge3.h\
@@ -4215,6 +4224,7 @@ src/numerics/hp_selector.$(obj-suffix):\
     include/enums/enum_order.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
+    include/fe/fe.h\
     include/fe/fe_base.h\
     include/fe/fe_interface.h\
     include/fe/fe_type.h\
