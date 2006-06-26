@@ -1,4 +1,4 @@
-// $Id: hp_selector.C,v 1.8 2006-05-27 14:49:35 roystgnr Exp $
+// $Id: hp_selector.C,v 1.9 2006-06-26 13:52:37 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -95,11 +95,13 @@ void HPSelector::add_projection(const System &system,
           val += (*phi)[i][qp] *
             system.current_solution(dof_num);
           if (cont == C_ZERO || cont == C_ONE)
-            grad += (*dphi)[i][qp] *
-              system.current_solution(dof_num);
+	    grad.add_scaled((*dphi)[i][qp],system.current_solution(dof_num));
+           // grad += (*dphi)[i][qp] *
+            //  system.current_solution(dof_num);
           if (cont == C_ONE)
-            hess += (*d2phi)[i][qp] *
-              system.current_solution(dof_num);
+	    hess.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
+	    // hess += (*d2phi)[i][qp] *
+            //  system.current_solution(dof_num);
         }
 
       // The projection matrix and vector
@@ -109,10 +111,12 @@ void HPSelector::add_projection(const System &system,
             (*phi_coarse)[i][qp]*val;
           if (cont == C_ZERO || cont == C_ONE)
             Fe(i) += (*JxW)[qp] *
-              (*dphi_coarse)[i][qp]*grad;
+              (grad*(*dphi_coarse)[i][qp]);
           if (cont == C_ONE)
-            Fe(i) += (*JxW)[qp] *
-              (*d2phi_coarse)[i][qp].contract(hess);
+	    Fe(i) += (*JxW)[qp] *
+              hess.contract((*d2phi_coarse)[i][qp]);
+	    // Fe(i) += (*JxW)[qp] *
+            //  (*d2phi_coarse)[i][qp].contract(hess);
 
           for (unsigned int j=0; j != Fe.size(); ++j)
             {
@@ -288,7 +292,8 @@ void HPSelector::select_refinement (System &system)
 
 	  // The average element value (used as an ugly hack
           // when we have nothing p-coarsened to compare to)
-          Real average_val = 0.;
+          // Real average_val = 0.;
+          Number average_val = 0.;
 
 	  // Calculate this variable's contribution to the p
 	  // refinement error
@@ -334,11 +339,13 @@ void HPSelector::select_refinement (System &system)
                       val += (*phi)[i][qp] *
                         system.current_solution(dof_num);
                       if (cont == C_ZERO || cont == C_ONE)
-                        grad += (*dphi)[i][qp] *
-                          system.current_solution(dof_num);
+			grad.add_scaled((*dphi)[i][qp], system.current_solution(dof_num));
+			// grad += (*dphi)[i][qp] *
+                        //  system.current_solution(dof_num);
                       if (cont == C_ONE)
-                        hess += (*d2phi)[i][qp] *
-                          system.current_solution(dof_num);
+			hess.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
+			// hess += (*d2phi)[i][qp] *
+                        //  system.current_solution(dof_num);
                     }
 
                   // The projection matrix and vector
@@ -348,10 +355,10 @@ void HPSelector::select_refinement (System &system)
                         (*phi_coarse)[i][qp]*val;
                       if (cont == C_ZERO || cont == C_ONE)
                         Fe(i) += (*JxW)[qp] *
-                          (*dphi_coarse)[i][qp]*grad;
+                          grad * (*dphi_coarse)[i][qp];
                       if (cont == C_ONE)
                         Fe(i) += (*JxW)[qp] *
-                          (*d2phi_coarse)[i][qp].contract(hess);
+                          hess.contract((*d2phi_coarse)[i][qp]);
 
                       for (unsigned int j=0; j != Fe.size(); ++j)
                         {
@@ -383,11 +390,13 @@ void HPSelector::select_refinement (System &system)
                   value_error += (*phi)[i][qp] *
                     system.current_solution(dof_num);
                   if (cont == C_ZERO || cont == C_ONE)
-                    grad_error += (*dphi)[i][qp] *
-                      system.current_solution(dof_num);
+		    grad_error.add_scaled((*dphi)[i][qp], system.current_solution(dof_num));
+		    // grad_error += (*dphi)[i][qp] *
+                    //  system.current_solution(dof_num);
                   if (cont == C_ONE)
-                    hessian_error += (*d2phi)[i][qp] *
-                      system.current_solution(dof_num);
+                    hessian_error.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
+		  // hessian_error += (*d2phi)[i][qp] *
+                  //    system.current_solution(dof_num);
                 }
 	      if (elem->p_level() == 0)
 	        {
@@ -399,12 +408,15 @@ void HPSelector::select_refinement (System &system)
                     {
                       value_error -= (*phi_coarse)[i][qp] * Up(i);
                       if (cont == C_ZERO || cont == C_ONE)
-                        grad_error -= (*dphi_coarse)[i][qp] * Up(i);
+			grad_error.subtract_scaled((*dphi_coarse)[i][qp], Up(i));
+                        // grad_error -= (*dphi_coarse)[i][qp] * Up(i);
                       if (cont == C_ONE)
-                        hessian_error -= (*d2phi_coarse)[i][qp] * Up(i);
+			hessian_error.subtract_scaled((*d2phi_coarse)[i][qp], Up(i));
+                        // hessian_error -= (*d2phi_coarse)[i][qp] * Up(i);
                     }
                 }
 
+#ifndef USE_COMPLEX_NUMBERS
 	      p_error_per_cell[e_id] += component_scale[var] * 
 		(*JxW)[qp] * value_error * value_error;
               if (cont == C_ZERO || cont == C_ONE)
@@ -413,6 +425,18 @@ void HPSelector::select_refinement (System &system)
               if (cont == C_ONE)
 	        p_error_per_cell[e_id] += component_scale[var] *
 		  (*JxW)[qp] * hessian_error.contract(hessian_error);
+#else
+	      p_error_per_cell[e_id] += component_scale[var] * 
+		(*JxW)[qp] * std::norm(value_error);
+              if (cont == C_ZERO || cont == C_ONE)
+	        p_error_per_cell[e_id] += component_scale[var] *
+		  (*JxW)[qp] * std::abs(grad_error*grad_error);
+              if (cont == C_ONE)
+	        p_error_per_cell[e_id] += component_scale[var] *
+		  (*JxW)[qp] * std::abs(hessian_error.contract(hessian_error));
+#endif
+
+
             }
 
 	  // Calculate this variable's contribution to the h
@@ -452,22 +476,27 @@ void HPSelector::select_refinement (System &system)
                       value_error += (*phi)[i][qp] *
                         system.current_solution(dof_num);
                       if (cont == C_ZERO || cont == C_ONE)
-                        grad_error += (*dphi)[i][qp] *
-                          system.current_solution(dof_num);
+			grad_error.add_scaled((*dphi)[i][qp], system.current_solution(dof_num));
+                        // grad_error += (*dphi)[i][qp] *
+                        //  system.current_solution(dof_num);
                       if (cont == C_ONE)
-                        hessian_error += (*d2phi)[i][qp] *
-                          system.current_solution(dof_num);
+			hessian_error.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
+			// hessian_error += (*d2phi)[i][qp] *
+                        //  system.current_solution(dof_num);
                     }
 
                   for (unsigned int i=0; i != n_coarse_dofs; ++i)
                     {
                       value_error -= (*phi_coarse)[i][qp] * Uc(i);
                       if (cont == C_ZERO || cont == C_ONE)
-                        grad_error -= (*dphi_coarse)[i][qp] * Uc(i);
+			// grad_error -= (*dphi_coarse)[i][qp] * Uc(i);
+			grad_error.subtract_scaled((*dphi_coarse)[i][qp], Uc(i));
                       if (cont == C_ONE)
-                        hessian_error -= (*d2phi_coarse)[i][qp] * Uc(i);
+			hessian_error.subtract_scaled((*d2phi_coarse)[i][qp], Uc(i));
+			// hessian_error -= (*d2phi_coarse)[i][qp] * Uc(i);
                     }
 
+#ifndef USE_COMPLEX_NUMBERS
 	          h_error_per_cell[e_id] += component_scale[var] * 
 		    (*JxW)[qp] * value_error * value_error;
                   if (cont == C_ZERO || cont == C_ONE)
@@ -476,6 +505,16 @@ void HPSelector::select_refinement (System &system)
                   if (cont == C_ONE)
 	            h_error_per_cell[e_id] += component_scale[var] * 
 		      (*JxW)[qp] * hessian_error.contract(hessian_error);
+#else
+		  h_error_per_cell[e_id] += component_scale[var] * 
+		    (*JxW)[qp] * std::norm(value_error);
+		  if (cont == C_ZERO || cont == C_ONE)
+		    h_error_per_cell[e_id] += component_scale[var] *
+		      (*JxW)[qp] * std::abs(grad_error*grad_error);
+		  if (cont == C_ONE)
+		    h_error_per_cell[e_id] += component_scale[var] *
+		      (*JxW)[qp] * std::abs(hessian_error.contract(hessian_error));
+#endif
                 }
 
             }
