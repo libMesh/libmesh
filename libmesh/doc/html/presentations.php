@@ -39,11 +39,12 @@
   <li> <h2>Finite Element Rodeo</h2> </li>
   <ul>
     <li> <a href="http://www.cfdlab.ae.utexas.edu/~peterson/Rodeo_2006.pdf">A Stabilized h-Adaptive Continuation Method for Double-Diffusive Convection in Porous Media</a> </li>
+    <li> <a href="http://www.cfdlab.ae.utexas.edu/~roystgnr/2006rodeoslides.pdf">Adaptive C1 Macroelements for Fourth-Order and Divergence-Free Problems</a> </li>
   </ul>
 
   
   <!--   add some blank space -->
-  <h2> </h2> q
+  <h2> </h2>
   <li> <a href="http://www.cfdlab.ae.utexas.edu/~peterson/scraper.pdf">Scraper Flow</a> Presentation with I. Schoegl.</li>
   <li> <a href="http://www.challenge.nm.org/FinalReports/08.pdf">Albuquerque Academy</a> Presentation on Stress Analysis in a Torus.</li>
   <li> <a href="http://www.saviac.org/74th_Symposium/abstracts/U040.htm">SAVIAC</a> conference abstract.</li>
