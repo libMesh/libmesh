@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.68 2006-06-15 16:26:57 roystgnr Exp $
+// $Id: mesh.C,v 1.69 2006-06-27 22:55:08 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -93,10 +93,17 @@ Mesh::Mesh (const Mesh& other_mesh):MeshBase(other_mesh)
       for(uint i=0;i<elem->n_nodes();i++)
         elem->set_node(i) = _nodes[(*it)->node(i)];
       
+      // Copy the refinement flags
+      elem->set_refinement_flag((*it)->refinement_flag());
+      elem->set_p_refinement_flag((*it)->p_refinement_flag());
+      
       //Hold onto it
       _elements.push_back(elem);
     }
   }
+  
+  //Finally prepare the Mesh for use
+  this->prepare_for_use();
 }
  
  
