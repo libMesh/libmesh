@@ -10,3 +10,4 @@ so_locations
 *.md5
 *.dot
 .nfs*
+*.php
