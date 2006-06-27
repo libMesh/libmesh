@@ -42,6 +42,10 @@ press release</a> commemorating the launch of the Lonestar cluster. </li>";
 System class by Ondrej Certik.</li>";
 ?>
 
+<?php echo
+"<li><a href=\"http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf\">libMesh: A C++ Library for Parallel Adaptive Mesh Refinement/Coarsening Simulations</a> - Engineering with Computers preprint.</li>";
+?>
+
 </ul>
 </div>
 
