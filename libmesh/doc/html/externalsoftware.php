@@ -1,7 +1,7 @@
 <?php $root=""; ?>
 <?php require($root."navigation.php"); ?>
 
-<!-- $Id: externalsoftware.php,v 1.4 2006-06-28 16:35:35 benkirk Exp $ -->
+<!-- $Id: externalsoftware.php,v 1.5 2006-06-28 16:49:37 benkirk Exp $ -->
 
 <html>
 <head>
@@ -39,7 +39,7 @@
 <hr>
 <h2>Visualization & Post-Processing</h2>
 
-<h3>Tecplot</h3> <a href="http://www.tecplot.com">Tecplot</a> is a high-quality engineering and scientific visualization package.  <code>libMesh<>/code> can write simulation data in either ASCII or binary formatted Tecplot files.
+<h3>Tecplot</h3> <a href="http://www.tecplot.com">Tecplot</a> is a high-quality engineering and scientific visualization package.  <code>libMesh</code> can write simulation data in either ASCII or binary formatted Tecplot files.
 
 <h3>GMV</h3> The <a href="http://laws.lanl.gov/XCM/gmv/GMVHome.html"> General Mesh Viewer</a> is "an easy to use, 3D scientific visualization tool designed to view simulation data from any type of structured or unstructured mesh."  GMV is developed at <a href="http://www.lanl.gov">Los Alamos National Laboratory</a> and is freely available for a wide range of platforms.  <code>libMesh</code> can write simulation data directly in the GMV file format.
 
