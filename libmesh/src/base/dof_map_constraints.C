@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.22 2006-05-27 10:55:08 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.23 2006-06-28 21:32:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,9 @@
 #include "dense_matrix.h"
 #include "dense_vector.h"
 #include "libmesh_logging.h"
+#include "system.h" // needed by enforce_constraints_exactly()
+#include "mesh.h"   // as is this
+#include "numeric_vector.h" // likewise
 
 
 
@@ -446,6 +449,79 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
     } // end if the RHS is constrained.
   
   STOP_LOG("constrain_elem_vector()", "DofMap");  
+}
+
+
+
+void DofMap::enforce_constraints_exactly (System &system)
+{
+  // FIXME - we should support any NumericVector, not just
+  // system.solution
+  NumericVector<Number> &vec = *(system.solution);
+
+  Mesh &mesh = system.get_mesh();
+
+  assert (this == &(system.get_dof_map()));
+
+  // indices on each element
+  std::vector<unsigned int> local_dof_indices;
+
+  MeshBase::const_element_iterator       elem_it  =
+    mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator elem_end =
+    mesh.active_local_elements_end(); 
+      
+  for ( ; elem_it != elem_end; ++elem_it)
+    {
+      const Elem* elem = *elem_it;
+
+      this->dof_indices(elem, local_dof_indices);
+      std::vector<unsigned int> raw_dof_indices = local_dof_indices;
+
+      // Constraint matrix for each element
+      DenseMatrix<Number> C;
+
+      this->build_constraint_matrix (C, local_dof_indices);
+
+      // Continue if the element is unconstrained
+      if (!C.m())
+        continue;
+
+      assert(C.m() == raw_dof_indices.size());
+      assert(C.n() == local_dof_indices.size());
+
+      for (unsigned int i=0; i!=C.m(); ++i)
+        {
+          // Recalculate any constrained dof owned by this processor
+          unsigned int global_dof = raw_dof_indices[i];
+          if (this->is_constrained_dof(global_dof) &&
+              global_dof >= vec.first_local_index() &&
+              global_dof < vec.last_local_index())
+          {
+            Number exact_value = 0;
+            for (unsigned int j=0; j!=C.n(); ++j)
+              {
+                if (j != i)
+                  exact_value += C(i,j) * 
+                    system.current_solution(local_dof_indices[j]);
+              }
+
+            Number old_value = vec(global_dof);
+            std::cerr << "old_value = " << old_value;
+            if (std::abs(exact_value - old_value) > TOLERANCE)
+              std::cerr << ", exact_value = " << exact_value << std::endl;
+            else
+              std::cerr << ", exact_value good." << std::endl;
+            // FIXME - should use insert outside this loop to cut down
+            // on the virtual function calls
+            vec.set(global_dof, exact_value);
+          }
+        }
+    }
+
+  // Synchronize the parallel vector
+  vec.close();
+  system.update();
 }
 
 

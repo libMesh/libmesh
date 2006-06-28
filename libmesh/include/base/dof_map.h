@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.16 2006-03-29 18:47:21 roystgnr Exp $
+// $Id: dof_map.h,v 1.17 2006-06-28 21:32:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,6 +41,7 @@ class Elem;
 class MeshBase;
 class FEType;
 class CouplingMatrix;
+class System;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
@@ -322,6 +323,13 @@ public:
 					    DenseVector<Number>& rhs,
 					    std::vector<unsigned int>& elem_dofs) const;
   
+  /**
+   * Constrains the numeric vector, which represents a solution defined on the
+   * mesh.  This may need to be used after a linear solve, if your linear
+   * solver's solutions do not satisfy your DoF constraints to a high enough
+   * tolerance.
+   */
+  void enforce_constraints_exactly (System &system);
 #endif
 
 
