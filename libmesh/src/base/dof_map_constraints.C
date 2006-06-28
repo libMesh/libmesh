@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.23 2006-06-28 21:32:22 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.24 2006-06-28 23:55:08 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -501,17 +501,19 @@ void DofMap::enforce_constraints_exactly (System &system)
             Number exact_value = 0;
             for (unsigned int j=0; j!=C.n(); ++j)
               {
-                if (j != i)
+                if (local_dof_indices[j] != global_dof)
                   exact_value += C(i,j) * 
                     system.current_solution(local_dof_indices[j]);
+// This isn't true?? RHS
+//                else
+//                  assert(C(i,j) == 1.0);
               }
 
-            Number old_value = vec(global_dof);
-            std::cerr << "old_value = " << old_value;
-            if (std::abs(exact_value - old_value) > TOLERANCE)
-              std::cerr << ", exact_value = " << exact_value << std::endl;
-            else
-              std::cerr << ", exact_value good." << std::endl;
+// For debugging purposes:
+//            Number old_value = vec(global_dof);
+//            if (std::abs(exact_value - old_value) > TOLERANCE)
+//              std::cerr << "old_value = " << old_value << ", exact_value = " << exact_value << std::endl;
+
             // FIXME - should use insert outside this loop to cut down
             // on the virtual function calls
             vec.set(global_dof, exact_value);
