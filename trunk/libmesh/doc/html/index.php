@@ -1,3 +1,4 @@
+<!-- $Id: index.php,v 1.15 2006-06-28 18:08:02 benkirk Exp $ -->
 <?php $root=""; ?>
 <?php require($root."navigation.php"); ?>
 
@@ -81,7 +82,7 @@ Logs</a> online.
 A major goal of the library is to provide support for adaptive mesh
 refinement (AMR) computations in parallel while allowing a research
 scientist to focus on the physics they are modeling.
-The library makes use of high-quality, exsiting software whenever possible.
+The library makes use of high-quality, existing software whenever possible.
 A complete list of external applications used in the library may be found <a href="externalsoftware.php">here</a>.
 
 <br>
