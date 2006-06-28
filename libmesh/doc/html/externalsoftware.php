@@ -1,6 +1,8 @@
 <?php $root=""; ?>
 <?php require($root."navigation.php"); ?>
 
+<!-- $Id: externalsoftware.php,v 1.4 2006-06-28 16:35:35 benkirk Exp $ -->
+
 <html>
 <head>
   <title>Packages used by libMesh</title>
@@ -14,16 +16,19 @@
 <h1>External Packages</h1>
 <code>libMesh</code> interfaces to a number of high-quality software packages to provide certain functionality.  This page provides a list of packages and a description of their use in the library.
 
+<hr>
 <h2>PETSc - Parallel Linear & Nonlinear Solvers</h2> <a href="http://www-unix.mcs.anl.gov/petsc/petsc-2">PETSc</a>
 <h3>MPI</h3>
 <h3>SLEPc</h3> <a href="http://www.grycap.upv.es/slepc">SLEPc</a>
 <h3>BLAS</h3>
 <h3>LAPACK</h3>
 
+<hr>
 <h2>LASPACK - Serial Linear Solvers</h2>
 
 
 
+<hr>
 <h2>Mesh Generation</h2>
 <h3>Triangle</h3> <a href="http://www.cs.cmu.edu/~quake/triangle.html">Triangle</a>
 <h3>Tetgen</h3> <a href="http://tetgen.berlios.de">Tetgen</a>
@@ -31,6 +36,7 @@
 
 
 
+<hr>
 <h2>Visualization & Post-Processing</h2>
 
 <h3>Tecplot</h3> <a href="http://www.tecplot.com">Tecplot</a> is a high-quality engineering and scientific visualization package.  <code>libMesh<>/code> can write simulation data in either ASCII or binary formatted Tecplot files.
@@ -39,6 +45,7 @@
 
 
 
+<hr>
 <h2>Utilities</h2>
 <h3>XDR</h3>
 <h3>GetPot</h3> <a href="http://getpot.sourceforge.net">GetPot</a>
