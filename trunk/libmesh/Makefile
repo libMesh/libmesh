@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.54 2006-06-27 02:35:13 benkirk Exp $
+# $Id: Makefile,v 1.55 2006-06-28 23:53:05 roystgnr Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -118,9 +118,11 @@ echo:
 	@echo -e "Examples Source Files:\n$(examplesrcfiles)\n"
 	@echo -e "CFLAGS:\n$(CFLAGS)\n"
 	@echo -e "CXXFLAGS:\n$(CXXFLAGS)\n"
+	@echo -e "CXXSHAREDFLAG:\n$(CXXSHAREDFLAG)\n"
 	@echo -e "INCLUDE:\n$(INCLUDE)\n"
 	@echo -e "LIBS:\n$(LIBS)\n"
 	@echo -e "LDFLAGS:\n$(LDFLAGS)\n"
+	@echo -e "EXTERNAL_FLAGS:\n$(EXTERNAL_FLAGS)\n"
 	@echo -e "DLFLAGS:\n$(DLFLAGS)\n"
 	@echo -e "EXAMPLES:\n$(examplesrcfiles)\n"
 
