@@ -1,7 +1,7 @@
 <?php $root=""; ?>
 <?php require($root."navigation.php"); ?>
 
-<!-- $Id: externalsoftware.php,v 1.5 2006-06-28 16:49:37 benkirk Exp $ -->
+<!-- $Id: externalsoftware.php,v 1.6 2006-06-28 17:25:47 benkirk Exp $ -->
 
 <html>
 <head>
@@ -17,11 +17,17 @@
 <code>libMesh</code> interfaces to a number of high-quality software packages to provide certain functionality.  This page provides a list of packages and a description of their use in the library.
 
 <hr>
-<h2>PETSc - Parallel Linear & Nonlinear Solvers</h2> <a href="http://www-unix.mcs.anl.gov/petsc/petsc-2">PETSc</a>
-<h3>MPI</h3>
-<h3>SLEPc</h3> <a href="http://www.grycap.upv.es/slepc">SLEPc</a>
-<h3>BLAS</h3>
+<h2>PETSc - Parallel Linear & Nonlinear Solvers</h2> The Portable, Extensible Toolkit for Scientific Computation <a href="http://www-unix.mcs.anl.gov/petsc/petsc-2">(PETSc)</a> is a suite of data structures and routines for the scalable (parallel) solution of scientific applications modeled by partial differential equations.
+
+<h3>SLEPc</h3> The Scalable Library for Eigenvalue Computations <a href="http://www.grycap.upv.es/slepc">(SLEPc)</a> is a library for the solution of large scale sparse eigenvalue problems on parallel computers. It is an extension of PETSc and can be used for either standard or generalized eigenproblems, with real or complex arithmetic.
+
+<h3>MPI</h3> The <a href="http://www-unix.mcs.anl.gov/mpi">Message Passing Interface</a> is a standard for parallel programming using the message passing model.  PETSc requires MPI for its functionality.  <code>libMesh</code> makes use of MPI to when running in parallel for certain operations. 
+
+
+<h3>BLAS</h3> The <a href="http://www.netlib.org/blas">Basic Linear Algebra Subprograms</a> are routines that provide standard building blocks for performing basic vector and matrix operations. The Level 1 BLAS perform scalar, vector and vector-vector operations, the Level 2 BLAS perform matrix-vector operations, and the Level 3 BLAS perform matrix-matrix operations. High-performance implementations of the BLAS are generally provided by computer hardware manufacturers for a particular architecture.  PETSc makes extensive use of the BLAS hence a high-performance BLAS implementation is key to achieving high performance from the PETSc linear solvers.
+
 <h3>LAPACK</h3>
+<a href="http://www.netlib.org/lapack">LAPACK</a> s written in Fortran77 and provides routines for solving systems of simultaneous linear equations, least-squares solutions of linear systems of equations, eigenvalue problems, and singular value problems. The associated matrix factorizations (LU, Cholesky, QR, SVD, Schur, generalized Schur) are also provided, as are related computations such as reordering of the Schur factorizations and estimating condition numbers. Dense and banded matrices are handled, but not general sparse matrices.  PETSc makes use of LAPACK in several computational kernels within its linear solver framework.
 
 <hr>
 <h2>LASPACK - Serial Linear Solvers</h2>
