@@ -52,16 +52,21 @@ body {
 }
 
 h1 {
-  margin               : 0px 0px 15px 0px;
+  margin               : 0px 0px 12px 0px;
   padding              : 0px;
-  font-size            : 28px;
+  font-size            : 18px;
   font-weight          : 900;
   color                : #000;
 }
 
 h2 {
-  font                 : bold 12px/14px verdana, arial, helvetica, sans-serif;
+  font                 : bold 14px/18px verdana, arial, helvetica, sans-serif;
   margin               : 3em 1em 5px 0px;
+  padding              : 0px;
+}
+
+h3 {
+  font                 : bold 12px/14px verdana, arial, helvetica, sans-serif;
   padding              : 0px;
 }
 
