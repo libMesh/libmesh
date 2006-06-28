@@ -5,6 +5,7 @@
 #include "newton_solver.h"
 #include "numeric_vector.h"
 #include "sparse_matrix.h"
+#include "dof_map.h"
 
 
 NewtonSolver::NewtonSolver (sys_type& s)
@@ -44,6 +45,8 @@ const Real relative_tolerance = 1.e-3;
   NumericVector<Number> &solution = *(_system.solution);
   NumericVector<Number> &newton_iterate =
     _system.get_vector("_nonlinear_solution");
+  newton_iterate.close();
+
   NumericVector<Number> &rhs = *(_system.rhs);
 
   SparseMatrix<Number> &matrix = *(_system.matrix);
@@ -113,6 +116,8 @@ const Real relative_tolerance = 1.e-3;
       // We may need to localize a parallel solution
       _system.update ();
       RESTART_LOG("solve()", "NewtonSolver");
+      // The linear solver may not have fit our constraints exactly
+      _system.get_dof_map().enforce_constraints_exactly(_system);
 
       if (!quiet)
         std::cout << "Linear solve finished, step " << rval.first
