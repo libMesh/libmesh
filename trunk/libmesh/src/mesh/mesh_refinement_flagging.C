@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.19 2006-06-12 23:26:04 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.20 2006-06-29 05:49:44 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -137,6 +137,12 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
 						       const Real refine_fraction,
 						       const Real coarsen_fraction)
 {
+  // Check for valid fractions..
+  // The fraction values must be in [0,1]
+  assert (coarsen_threshold  >= 0.);  assert (refine_fraction  <= 1.);
+  assert (refine_fraction  >= 0.);  assert (refine_fraction  <= 1.);
+  assert (coarsen_fraction >= 0.);  assert (coarsen_fraction <= 1.);
+
   // How much error per cell will we tolerate?
   const Real local_refinement_tolerance =
     global_tolerance / _mesh.n_active_elem();
@@ -179,6 +185,109 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
   this->flag_elements_by_elem_fraction (error_per_cell_in,
                                         final_refine_fraction,
                                         final_coarsen_fraction);
+}
+
+
+
+void MeshRefinement::flag_elements_to_nelem_target (const ErrorVector& error_per_cell_in,
+                                                    const unsigned int nelem_target,
+                                                    const Real coarsen_threshold,
+                                                    const Real refine_fraction,
+                                                    const Real coarsen_fraction)
+{
+  // Check for valid fractions..
+  // The fraction values must be in [0,1]
+  assert (refine_fraction  >= 0.);  assert (refine_fraction  <= 1.);
+  assert (coarsen_fraction >= 0.);  assert (coarsen_fraction <= 1.);
+  
+  // The number of active elements in the mesh - hopefully less than
+  // 2 billion on 32 bit machines
+  const unsigned int n_active_elem  = _mesh.n_active_elem();
+
+  // The maximum number of elements to flag for coarsening
+  const unsigned int n_elem_coarsen =
+    static_cast<unsigned int>(coarsen_fraction * n_active_elem);
+
+  // The maximum number of elements to flag for refinement
+  const unsigned int n_elem_refine  =
+    static_cast<unsigned int>(refine_fraction  * n_active_elem);
+
+  // Clean up the refinement flags.  These could be left
+  // over from previous refinement steps.
+  this->clean_refinement_flags();
+
+  // The target number of elements to add or remove
+  const int n_elem_new = nelem_target - n_active_elem;
+
+  // Create a sorted error vector with active elements only
+  std::vector<float> sorted_error;
+
+  sorted_error.reserve (n_active_elem);
+
+  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
+
+  for (; elem_it != elem_end; ++elem_it)
+    {
+      const Elem* elem = *elem_it;
+      const unsigned int elem_number = elem->id();
+      const float        elem_error  = error_per_cell_in[elem_number];
+
+      sorted_error.push_back (elem_error);
+    }
+
+  std::sort (sorted_error.begin(), sorted_error.end());
+  
+  unsigned int bottom = 0;
+  unsigned int top = sorted_error.size() - 1;
+
+  const unsigned int dim = _mesh.mesh_dimension();
+  unsigned int twotodim = 1;
+  for (unsigned int i=0; i!=dim; ++i)
+    twotodim *= 2;
+
+  // First, let's try to get our element count to target_nelem
+  if (n_elem_new >= 0)
+    {
+      // Every element refinement creates at least 
+      // 2^dim-1 new elements
+      top -=
+        std::min(static_cast<unsigned int>(n_elem_new / (twotodim-1)),
+                 n_elem_refine);
+    }
+  else
+    {
+      // Let's guess that the average element coarsening removes
+      // half an element 
+      bottom += std::min(static_cast<unsigned int>(-n_elem_new / 2),
+                         n_elem_coarsen);
+    }
+
+  // Next, let's see if we can trade any refinement for coarsening -
+  // For every element we flag for refinement, we'll need to flag
+  // (2^dim-1)*2 for coarsening to match it!
+  unsigned int coarsens_per_refine = (twotodim-1)*2;
+
+  while (bottom + coarsens_per_refine <= n_elem_coarsen &&
+         sorted_error.size() - top <= n_elem_refine &&
+         top < bottom + coarsens_per_refine + 1 &&
+         sorted_error[bottom + coarsens_per_refine] < 
+           sorted_error[top] * coarsen_threshold)
+    {
+      top--;
+      bottom += coarsens_per_refine;
+    }
+
+  float bottom_error = sorted_error[bottom],
+        top_error = sorted_error[top],
+        min_error = sorted_error[0],
+        max_error = sorted_error[sorted_error.size()-1];
+  const Real top_frac = (max_error - top_error)/max_error,
+             bottom_frac = (bottom_error - min_error) /
+                           (max_error - min_error);
+
+  this->flag_elements_by_error_fraction (error_per_cell_in, top_frac,
+					 bottom_frac);
 }
 
 

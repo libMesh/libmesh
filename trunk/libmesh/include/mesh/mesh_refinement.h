@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.18 2006-06-12 23:26:04 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.19 2006-06-29 05:49:44 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -120,6 +120,21 @@ public:
 					 const Real coarsen_threshold = 0.1,
 					 const Real refine_fraction  = 0.3,
 					 const Real coarsen_fraction = 0.3);
+
+  /**
+   * Flags elements for coarsening and refinement based on
+   * the computed error passed in \p error_per_cell.  This method attempts to
+   * produce a mesh with approximately \p nelem_target active elements,
+   * trading element refinement for element coarsening when their error
+   * ratios exceed \p coarsen_threshold.  It flags no more than
+   * \p refine_fraction * n_elem elements for refinement and flags no
+   * more than \p coarsen_fraction * n_elem elements for coarsening.
+   */
+  void flag_elements_to_nelem_target (const ErrorVector& error_per_cell,
+				      const unsigned int nelem_target,
+				      const Real coarsen_threshold = 0.1,
+				      const Real refine_fraction  = 0.3,
+				      const Real coarsen_fraction = 0.3);
 
   /**
    * Flags elements for coarsening and refinement based on
