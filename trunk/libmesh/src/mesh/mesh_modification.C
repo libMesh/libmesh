@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.19 2006-06-13 18:33:14 jwpeterson Exp $
+// $Id: mesh_modification.C,v 1.20 2006-06-29 21:20:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -499,6 +499,9 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
     for (; el!=end; ++el)
       {
 	const ElemType etype = (*el)->type();
+
+	// all_tri currently only works on coarse meshes
+	assert ((*el)->parent() == NULL);
 
 	switch (etype)
 	  {
