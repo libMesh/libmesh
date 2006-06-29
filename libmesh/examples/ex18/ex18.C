@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.4 2006-06-29 19:02:06 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.5 2006-06-29 19:38:43 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -269,7 +269,7 @@ int main (int argc, char** argv)
             equation_systems.reinit();
           }
         // Do one last solve if necessary
-        if (a_step == n_adaptive_steps)
+        if (a_step == n_adaptivesteps)
           {
             stokes_system.solve();
           }
