@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.3 2006-06-12 17:26:52 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.4 2006-06-29 19:02:06 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -30,12 +30,16 @@
 
 // Basic include files
 #include "equation_systems.h"
+#include "error_vector.h"
 #include "fe_base.h"
 #include "gmv_io.h"
+#include "kelly_error_estimator.h"
 #include "libmesh.h"
 #include "mesh.h"
 #include "mesh_generation.h"
+#include "mesh_refinement.h"
 #include "quadrature.h"
+#include "uniform_refinement_estimator.h"
 
 // Some (older) compilers do not offer full stream 
 // functionality, OStringStream works around this.
@@ -45,17 +49,39 @@
 #include "diff_solver.h"
 #include "fem_system.h"
 #include "euler_solver.h"
+#include "steady_solver.h"
 
-// The Navier-Stokes system class.
-// FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
-// but we must specify element residuals
+// The global FEM error tolerance at each timestep
+// Make this nonzero to solve to a specified tolerance
+// This will probably break with KellyErrorIndicator
+// const Real global_tolerance = 1.e-3;
+const Real global_tolerance = 0.;
+
+// The desired number of active mesh elements
+// Make this nonzero to solve to a specified mesh size
+const unsigned int nelem_target = 1000;
+
+// Solve a transient instead of a steady problem?
+const bool transient = true;
 
 // The interval between our timesteps
 const Real deltat = 0.005;
 
 // And the number of timesteps to take
-const unsigned int n_timesteps = 15;
+unsigned int n_timesteps = 15;
 
+// Write out every nth timestep to file.
+const unsigned int write_interval = 1;
+
+// The coarse grid size from which to start adaptivity
+const unsigned int coarsegridsize = 1;
+
+// The maximum number of adaptive steps per timestep
+const unsigned int n_adaptivesteps = 10;
+
+// The Navier-Stokes system class.
+// FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
+// but we must specify element residuals
 class NavierSystem : public FEMSystem
 {
 public:
@@ -63,7 +89,7 @@ public:
   NavierSystem(EquationSystems& es,
                const std::string& name,
                const unsigned int number)
-  : FEMSystem(es, name, number), Reynolds(1.) {}
+  : FEMSystem(es, name, number), Reynolds(0.) {}
 
   // System initialization
   virtual void init_data ();
@@ -102,7 +128,8 @@ int main (int argc, char** argv)
     // elements in 3D.  Building these higher-order elements allows
     // us to use higher-order approximation, as in example 3.
     MeshTools::Generation::build_square (mesh,
-                                         20, 20,
+                                         coarsegridsize,
+                                         coarsegridsize,
                                          0., 1.,
                                          0., 1.,
                                          QUAD9);
@@ -117,9 +144,16 @@ int main (int argc, char** argv)
     NavierSystem & stokes_system = 
       equation_systems.add_system<NavierSystem> ("Navier-Stokes");
 
-    // Solve this as a time-dependent system
-    stokes_system.time_solver =
-       AutoPtr<TimeSolver>(new EulerSolver(stokes_system));
+    // Solve this as a time-dependent or steady system
+    if (transient)
+      stokes_system.time_solver =
+        AutoPtr<TimeSolver>(new EulerSolver(stokes_system));
+    else
+      {
+        stokes_system.time_solver =
+          AutoPtr<TimeSolver>(new SteadySolver(stokes_system));
+        assert(n_timesteps == 1);
+      }
 
     // Initialize the system
     equation_systems.init ();
@@ -129,15 +163,19 @@ int main (int argc, char** argv)
 
     // And the nonlinear solver options
     DiffSolver &solver = *stokes_system.time_solver->diff_solver;
+    // solver.quiet = false;
     solver.max_nonlinear_iterations = 15;
-    solver.relative_step_tolerance = 0.02;
+    solver.relative_step_tolerance = 1.e-7;
+    solver.relative_residual_tolerance = 1.e-8;
 
     // And the linear solver options
-    solver.max_linear_iterations = 250;
-    solver.initial_linear_tolerance = std::sqrt(TOLERANCE);
+    solver.max_linear_iterations = 1000;
+    solver.initial_linear_tolerance = 1.e-3;
 
     // Print information about the system to the screen.
     equation_systems.print_info();
+
+    MeshRefinement mesh_refinement(mesh);
 
     // Now we begin the timestep loop to compute the time-accurate
     // solution of the equations.
@@ -147,13 +185,99 @@ int main (int argc, char** argv)
         std::cout << " Solving time step " << t_step << ", time = "
                   << stokes_system.time << std::endl;
 
-        stokes_system.solve();
+        // Adaptively solve the timestep
+        unsigned int a_step = 0;
+        for (; a_step != n_adaptivesteps; ++a_step)
+          {
+            stokes_system.solve();
 
+            ErrorVector error;
+
+            AutoPtr<ErrorEstimator> error_estimator;
+
+            // To solve to a tolerance in this problem we
+            // need a better estimator than Kelly
+            if (global_tolerance != 0.)
+              {
+                // We can't adapt to both a tolerance and a mesh
+                // size at once
+                assert (nelem_target == 0);
+
+                UniformRefinementEstimator *u =
+                  new UniformRefinementEstimator;
+
+                // The lid-driven cavity problem isn't in H1, so
+                // lets estimate H0 (i.e. L2) error
+                u->sobolev_order() = 0;
+
+                error_estimator.reset(u);
+              }
+            else
+              {
+		// If we aren't adapting to a tolerance we need a
+                // target mesh size
+                assert (nelem_target > 0);
+
+                error_estimator.reset(new KellyErrorEstimator);
+              }
+
+            // Calculate error based on u and v but not p
+            error_estimator->component_scale.push_back(1.0); // u
+            error_estimator->component_scale.push_back(1.0); // v
+            error_estimator->component_scale.push_back(0.0); // p
+
+            error_estimator->estimate_error(stokes_system, error);
+
+            // Print out status at each adaptive step.
+            Real global_error = error.l2_norm();
+            std::cerr << "adaptive step " << a_step << ": ";
+            if (global_tolerance != 0.)
+              std::cerr << "global_error = " << global_error
+                        << " with ";
+            std::cerr << mesh.n_active_elem()
+                      << " active elements and "
+                      << equation_systems.n_active_dofs()
+                      << " active dofs." << std::endl;
+            if (global_tolerance != 0.)
+              std::cerr << "worst element error = " << error.maximum()
+                        << ", mean = " << error.mean() << std::endl;
+
+            if (global_tolerance != 0.)
+              {
+                // If we've reached our desired tolerance, we
+                // don't need any more adaptive steps
+                if (global_error < global_tolerance)
+                  break;
+                mesh_refinement.flag_elements_by_error_tolerance
+                  (error, global_tolerance);
+              }
+            else
+              {
+		// If flag_elements_to_nelem_target returns true, this
+                // should be our last adaptive step.
+                if (mesh_refinement.flag_elements_to_nelem_target
+                      (error, nelem_target))
+                  {
+                    mesh_refinement.refine_and_coarsen_elements();
+                    equation_systems.reinit();
+                    break;
+                  }
+              }
+
+            // Carry out the adaptive mesh refinement/coarsening
+            mesh_refinement.refine_and_coarsen_elements();
+            equation_systems.reinit();
+          }
+        // Do one last solve if necessary
+        if (a_step == n_adaptive_steps)
+          {
+            stokes_system.solve();
+          }
+
+        // Advance to the next timestep in a transient problem
         stokes_system.time_solver->advance_timestep();
 
-        // Write out every nth timestep to file.
-        const unsigned int write_interval = 1;
-
+        // Write out this timestep if we're requested to
         if ((t_step+1)%write_interval == 0)
           {
             OStringStream file_name;
@@ -199,8 +323,8 @@ void NavierSystem::init_data ()
   fe_pressure = element_fe[this->variable_type(2)];
   fe_side_vel = side_fe[this->variable_type(0)];
 
-  // Now make sure we have requested all the data
-  // we need to build the linear system.
+  // To enable FE optimizations, we should prerequest all the data
+  // we will need to build the linear system.
   fe_velocity->get_JxW();
   fe_velocity->get_phi();
   fe_velocity->get_dphi();
@@ -210,6 +334,10 @@ void NavierSystem::init_data ()
   fe_side_vel->get_JxW();
   fe_side_vel->get_phi();
   fe_side_vel->get_xyz();
+
+  // Useful debugging options
+  // this->verify_analytic_jacobians = 1e-6;
+  // this->print_jacobians = true;
 }
 
 
@@ -409,11 +537,8 @@ bool NavierSystem::side_constraint (bool request_jacobian)
   DenseSubVector<Number> &Fu = *elem_subresiduals[0];
   DenseSubVector<Number> &Fv = *elem_subresiduals[1];
 
-  // At this point the interior element integration has
-  // been completed.  However, we have not yet addressed
-  // boundary conditions.  For this example we will only
-  // consider simple Dirichlet boundary conditions imposed
-  // at each timestep via the penalty method.
+  // For this example we will use Dirichlet velocity boundary
+  // conditions imposed at each timestep via the penalty method.
 
   // The penalty value.  \f$ \frac{1}{\epsilon} \f$
   const Real penalty = 1.e10;
@@ -430,7 +555,7 @@ bool NavierSystem::side_constraint (bool request_jacobian)
       const Real yf = qside_point[qp](1);
 
       // Set u = 1 on the top boundary, 0 everywhere else
-      const Real u_value = (yf > .99) ? 1. : 0.;
+      const Real u_value = (yf > 1.0 - TOLERANCE) ? 1. : 0.;
               
       // Set v = 0 everywhere
       const Real v_value = 0.;
