@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.21 2006-06-29 06:41:31 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.22 2006-06-29 20:48:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -258,8 +258,10 @@ bool MeshRefinement::flag_elements_to_nelem_target (const ErrorVector& error_per
   else
     {
       // Let's guess that the average element coarsening removes
-      // half an element 
-      bottom += std::min(static_cast<unsigned int>(-n_elem_new / 2),
+      // half of an element 
+      // In reality, each element coarsening may remove anywhere
+      // between zero and (2^dim-1)/(2^dim) elements on average
+      bottom += std::min(static_cast<unsigned int>(-n_elem_new * 2),
                          n_elem_coarsen);
     }
 
