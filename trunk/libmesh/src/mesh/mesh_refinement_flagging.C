@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.20 2006-06-29 05:49:44 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.21 2006-06-29 06:41:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -189,7 +189,7 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
 
 
 
-void MeshRefinement::flag_elements_to_nelem_target (const ErrorVector& error_per_cell_in,
+bool MeshRefinement::flag_elements_to_nelem_target (const ErrorVector& error_per_cell_in,
                                                     const unsigned int nelem_target,
                                                     const Real coarsen_threshold,
                                                     const Real refine_fraction,
@@ -286,8 +286,22 @@ void MeshRefinement::flag_elements_to_nelem_target (const ErrorVector& error_per
              bottom_frac = (bottom_error - min_error) /
                            (max_error - min_error);
 
-  this->flag_elements_by_error_fraction (error_per_cell_in, top_frac,
-					 bottom_frac);
+  // Call the other refinement scheme
+  // If all elements have the same error value, refine them all
+  if (max_error <= min_error)
+    this->flag_elements_by_error_fraction  (error_per_cell_in, 1.,
+					    0.);
+  // Otherwise, refine the calculated fractions
+  else
+    this->flag_elements_by_error_fraction  (error_per_cell_in,
+					    top_frac, bottom_frac);
+
+  // Return true if we've done all the AMR/C we can
+  if (bottom + coarsens_per_refine <= n_elem_coarsen && 
+      sorted_error.size() - top <= n_elem_refine)
+    return true;
+  // And false if there may still be more to do.
+  return false;
 }
 
 
