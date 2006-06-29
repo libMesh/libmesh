@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.5 2006-06-09 05:59:12 roystgnr Exp $
+// $Id: fem_system.h,v 1.6 2006-06-29 20:48:26 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,11 @@
 
 // Local Includes
 #include "diff_system.h"
+#include "elem.h"
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+#include "tensor_value.h"
+#endif
 
 // Forward Declarations
 
