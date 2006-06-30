@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.7 2006-06-30 03:58:50 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.8 2006-06-30 21:34:40 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -34,7 +34,7 @@
 #include "mesh_refinement.h"
 #include "uniform_refinement_estimator.h"
 
-// Some (older) compilers do not offer full stream 
+// Some (older) compilers do not offer full stream
 // functionality, OStringStream works around this.
 #include "o_string_stream.h"
 
@@ -61,11 +61,15 @@ int main (int argc, char** argv)
     unsigned int n_timesteps             = infile("n_timesteps", 20);
     const unsigned int write_interval    = infile("write_interval", 5);
     const unsigned int coarsegridsize    = infile("coarsegridsize", 1);
+    const unsigned int coarserefinements = infile("coarserefinements", 0);
     const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
 
     // Create a two-dimensional mesh.
     Mesh mesh (2);
     
+    // And an object to refine it
+    MeshRefinement mesh_refinement(mesh);
+
     // Use the MeshTools::Generation mesh generator to create a uniform
     // grid on the square [-1,1]^D.  We instruct the mesh generator
     // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
@@ -77,25 +81,27 @@ int main (int argc, char** argv)
                                          0., 1.,
                                          0., 1.,
                                          QUAD9);
-    
+
+    mesh_refinement.uniformly_refine(coarserefinements);
+
     // Print information about the mesh to the screen.
     mesh.print_info();
-    
+
     // Create an equation systems object.
     EquationSystems equation_systems (mesh);
-    
+
     // Declare the system "Navier-Stokes" and its variables.
-    NavierSystem & stokes_system = 
+    NavierSystem & system = 
       equation_systems.add_system<NavierSystem> ("Navier-Stokes");
 
     // Solve this as a time-dependent or steady system
     if (transient)
-      stokes_system.time_solver =
-        AutoPtr<TimeSolver>(new EulerSolver(stokes_system));
+      system.time_solver =
+        AutoPtr<TimeSolver>(new EulerSolver(system));
     else
       {
-        stokes_system.time_solver =
-          AutoPtr<TimeSolver>(new SteadySolver(stokes_system));
+        system.time_solver =
+          AutoPtr<TimeSolver>(new SteadySolver(system));
         assert(n_timesteps == 1);
       }
 
@@ -103,23 +109,26 @@ int main (int argc, char** argv)
     equation_systems.init ();
 
     // Set the time stepping options
-    stokes_system.deltat = deltat;
+    system.deltat = deltat;
 
     // And the nonlinear solver options
-    DiffSolver &solver = *stokes_system.time_solver->diff_solver;
-    // solver.quiet = false;
-    solver.max_nonlinear_iterations = 15;
-    solver.relative_step_tolerance = 1.e-7;
-    solver.relative_residual_tolerance = 1.e-8;
+    DiffSolver &solver = *system.time_solver->diff_solver;
+    solver.quiet = infile("solver_quiet", true);
+    solver.max_nonlinear_iterations =
+      infile("max_nonlinear_iterations", 15);
+    solver.relative_step_tolerance =
+      infile("relative_step_tolerance", 1.e-8);
+    solver.relative_residual_tolerance =
+      infile("relative_residual_tolerance", 1.e-9);
 
     // And the linear solver options
-    solver.max_linear_iterations = 1000;
-    solver.initial_linear_tolerance = 1.e-3;
+    solver.max_linear_iterations =
+      infile("max_linear_iterations", 50000);
+    solver.initial_linear_tolerance =
+      infile("initial_linear_tolerance", 1.e-3);
 
     // Print information about the system to the screen.
     equation_systems.print_info();
-
-    MeshRefinement mesh_refinement(mesh);
 
     // Now we begin the timestep loop to compute the time-accurate
     // solution of the equations.
@@ -127,13 +136,13 @@ int main (int argc, char** argv)
       {
         // A pretty update message
         std::cout << " Solving time step " << t_step << ", time = "
-                  << stokes_system.time << std::endl;
+                  << system.time << std::endl;
 
         // Adaptively solve the timestep
         unsigned int a_step = 0;
         for (; a_step != max_adaptivesteps; ++a_step)
           {
-            stokes_system.solve();
+            system.solve();
 
             ErrorVector error;
 
@@ -158,7 +167,7 @@ int main (int argc, char** argv)
               }
             else
               {
-		// If we aren't adapting to a tolerance we need a
+                // If we aren't adapting to a tolerance we need a
                 // target mesh size
                 assert (nelem_target > 0);
 
@@ -174,7 +183,7 @@ int main (int argc, char** argv)
             error_estimator->component_scale.push_back(1.0); // v
             error_estimator->component_scale.push_back(0.0); // p
 
-            error_estimator->estimate_error(stokes_system, error);
+            error_estimator->estimate_error(system, error);
 
             // Print out status at each adaptive step.
             Real global_error = error.l2_norm();
@@ -201,7 +210,7 @@ int main (int argc, char** argv)
               }
             else
               {
-		// If flag_elements_to_nelem_target returns true, this
+                // If flag_elements_to_nelem_target returns true, this
                 // should be our last adaptive step.
                 if (mesh_refinement.flag_elements_to_nelem_target
                       (error, nelem_target))
@@ -219,11 +228,11 @@ int main (int argc, char** argv)
         // Do one last solve if necessary
         if (a_step == max_adaptivesteps)
           {
-            stokes_system.solve();
+            system.solve();
           }
 
         // Advance to the next timestep in a transient problem
-        stokes_system.time_solver->advance_timestep();
+        system.time_solver->advance_timestep();
 
         // Write out this timestep if we're requested to
         if ((t_step+1)%write_interval == 0)
