@@ -1,4 +1,4 @@
-// $Id: mesh_generation.h,v 1.9 2006-06-13 18:33:14 jwpeterson Exp $
+// $Id: mesh_generation.h,v 1.10 2006-06-30 15:33:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,11 +25,13 @@
 
 
 // C++ Includes   -----------------------------------
+#include <vector>
 
 // Local Includes -----------------------------------
 // #include "libmesh_common.h" // needed for Real
 #include "enum_elem_type.h" // needed for ElemType enum
 #include "libmesh.h"        // needed for libMesh::invalid_uint
+#include "point.h"
 
 // forward declarations
 class Mesh;
@@ -45,7 +47,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.9 $
+   * \version $Revision: 1.10 $
    */
   namespace Generation
   {
@@ -107,6 +109,55 @@ namespace MeshTools
 			       const unsigned int ny, // num. of nodes in y-dir
 			       const Real xmin=0., const Real xmax=1.,
 			       const Real ymin=0., const Real ymax=1.);
+
+    
+    // A helper class for describing a "circular" hole.
+    class Hole
+    {
+    public:
+      Hole(Point c, Real r, unsigned int n) :
+	center(c),
+	radius(r),
+	n_points(n) {}
+
+      /**
+       * Constructor, does not set any values
+       */
+      Hole() {}
+
+      /**
+       * (x,y) location of the circular hole
+       */
+      Point center;
+
+      /**
+       * circular hole radius
+       */
+      Real radius;
+
+      /**
+       * number of points used to describe the hole.  The actual
+       * points can be generated knowing the center and radius.
+       * For example, n_points=3 would generate a triangular hole.
+       */
+      unsigned int n_points;
+    };
+
+
+
+
+
+
+
+    // Function which calls triangle to create a mesh on a square domain with
+    // one or more circular holes cut out.
+    void build_delaunay_square_with_hole(Mesh& mesh,
+					 const std::vector<Hole>& holes,
+					 const unsigned int nx=10, // num. of nodes in x-dir (approximate)
+					 const unsigned int ny=10, // num. of nodes in y-dir (approximate)
+					 const Real xmin=-1., const Real xmax=1.,
+					 const Real ymin=-1., const Real ymax=1.);
+
 
 #endif // HAVE_TRIANGLE
     
