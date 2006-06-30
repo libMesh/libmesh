@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.6 2006-06-29 20:49:42 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.7 2006-06-30 03:58:50 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -23,22 +23,15 @@
  // example 13 can be solved using the DiffSystem class framework to
  // simplify the user-implemented equations.
 
-// C++ include files that we need
-#include <iostream>
-#include <algorithm>
-#include <math.h>
-
 // Basic include files
 #include "equation_systems.h"
 #include "error_vector.h"
-#include "fe_base.h"
+#include "getpot.h"
 #include "gmv_io.h"
 #include "kelly_error_estimator.h"
-#include "libmesh.h"
 #include "mesh.h"
 #include "mesh_generation.h"
 #include "mesh_refinement.h"
-#include "quadrature.h"
 #include "uniform_refinement_estimator.h"
 
 // Some (older) compilers do not offer full stream 
@@ -51,42 +44,25 @@
 #include "euler_solver.h"
 #include "steady_solver.h"
 
-// The global FEM error tolerance at each timestep
-// Make this nonzero to solve to a specified tolerance
-// This will probably break with KellyErrorIndicator
-// const Real global_tolerance = 1.e-3;
-const Real global_tolerance = 0.;
-
-// The desired number of active mesh elements
-// Make this nonzero to solve to a specified mesh size
-const unsigned int nelem_target = 1000;
-
-// Solve a transient instead of a steady problem?
-const bool transient = true;
-
-// The interval between our timesteps
-const Real deltat = 0.005;
-
-// And the number of timesteps to take
-unsigned int n_timesteps = 100;
-
-// Write out every nth timestep to file.
-const unsigned int write_interval = 10;
-
-// The coarse grid size from which to start adaptivity
-const unsigned int coarsegridsize = 1;
-
-// The maximum number of adaptive steps per timestep
-const unsigned int n_adaptivesteps = 10;
-
-
-
 // The main program.
 int main (int argc, char** argv)
 {
   // Initialize libMesh.
   libMesh::init (argc, argv);
   {    
+    // Parse the input file
+    GetPot infile("ex18.in");
+
+    // Read in parameters from the input file
+    const Real global_tolerance          = infile("global_tolerance", 0.);
+    const unsigned int nelem_target      = infile("n_elements", 400);
+    const bool transient                 = infile("transient", true);
+    const Real deltat                    = infile("deltat", 0.005);
+    unsigned int n_timesteps             = infile("n_timesteps", 20);
+    const unsigned int write_interval    = infile("write_interval", 5);
+    const unsigned int coarsegridsize    = infile("coarsegridsize", 1);
+    const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
+
     // Create a two-dimensional mesh.
     Mesh mesh (2);
     
@@ -155,7 +131,7 @@ int main (int argc, char** argv)
 
         // Adaptively solve the timestep
         unsigned int a_step = 0;
-        for (; a_step != n_adaptivesteps; ++a_step)
+        for (; a_step != max_adaptivesteps; ++a_step)
           {
             stokes_system.solve();
 
@@ -241,7 +217,7 @@ int main (int argc, char** argv)
             equation_systems.reinit();
           }
         // Do one last solve if necessary
-        if (a_step == n_adaptivesteps)
+        if (a_step == max_adaptivesteps)
           {
             stokes_system.solve();
           }
