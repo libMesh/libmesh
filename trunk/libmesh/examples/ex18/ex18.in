@@ -1,0 +1,27 @@
+# The global FEM error tolerance at each timestep
+# Make this nonzero to solve to a specified tolerance
+# This will probably break with KellyErrorIndicator
+# const Real global_tolerance = 1.e-3;
+global_tolerance = 0.0
+
+# The desired number of active mesh elements
+# Make this nonzero to solve to a specified mesh size
+n_elements = 400
+
+# Solve a transient instead of a steady problem?
+transient = true
+
+# The interval between our timesteps
+deltat = 0.005
+
+# And the number of timesteps to take
+n_timesteps = 20
+
+# Write out every nth timestep to file.
+write_interval = 10
+
+# The coarse grid size from which to start adaptivity
+coarsegridsize = 1
+
+# The maximum number of adaptive steps per timestep
+max_adaptivesteps = 10
