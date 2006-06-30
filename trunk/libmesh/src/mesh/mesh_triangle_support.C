@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.C,v 1.8 2006-06-23 16:49:48 jwpeterson Exp $
+// $Id: mesh_triangle_support.C,v 1.9 2006-06-30 15:33:13 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -141,6 +141,168 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
   s.smooth(2);
 
 }
+
+
+
+
+void MeshTools::Generation::build_delaunay_square_with_hole(Mesh& mesh,
+							    const std::vector<Hole>& holes,
+							    const unsigned int nx, // num. of nodes in x-dir (approximate)
+							    const unsigned int ny, // num. of nodes in y-dir (approximate)
+							    const Real xmin, const Real xmax,
+							    const Real ymin, const Real ymax)
+{
+    // Triangle data structure for the mesh
+    Triangle::triangulateio
+      final_input,
+      final_output;
+
+    // Pseudo-Constructor for the triangle io structs
+    Triangle::init(final_input);
+    Triangle::init(final_output);
+
+    
+    const unsigned int n_holes = holes.size();
+
+    // Pre-allocate space for the points and segments (one segment per point).
+    unsigned int n_hole_points=0;
+    for (unsigned int i=0; i<n_holes; ++i)
+      n_hole_points += holes[i].n_points;
+
+    final_input.numberofpoints = n_hole_points + 4;     // 4 additional points make up the corners of the square
+    final_input.pointlist      = static_cast<REAL*>(std::malloc(final_input.numberofpoints * 2 * sizeof(REAL)));
+
+    final_input.numberofsegments = n_hole_points;
+    final_input.segmentlist      = static_cast<int*>(std::malloc(final_input.numberofsegments * 2 * sizeof(int))); // 2 int per segment
+
+
+    // Constant offset into the vector for each successive hole after the first.
+    unsigned int offset=0;
+    
+    // For each hole, compute points and determine the segments, add them to the input struct
+    for (unsigned int i=0; i<n_holes; ++i)
+      {
+	// The change in angle between each point.
+	const Real dtheta = 2.0*libMesh::pi / static_cast<Real>(holes[i].n_points);
+	// std::cout << "dtheta=" << dtheta << std::endl;
+	
+	// Generate the points for the holes
+	for (unsigned int ctr=0, h=0; h<holes[i].n_points; ctr+=2, ++h)
+	  {
+	    const Real theta = static_cast<Real>(h)*dtheta;
+
+	    const unsigned int index0 = 2*offset+ctr;
+	    const unsigned int index1 = 2*offset+ctr+1;
+
+	    // The points
+	    final_input.pointlist[index0] = holes[i].center(0) + holes[i].radius*cos(theta); // x=r*cos(theta)
+	    final_input.pointlist[index1] = holes[i].center(1) + holes[i].radius*sin(theta); // y=r*sin(theta)
+	  }
+
+	// Generate all the segments for this hole
+	for (unsigned int ctr=0, h=0; h<holes[i].n_points; ctr+=2, ++h)
+	  {
+
+	    const unsigned int index0 = 2*offset+ctr;
+	    const unsigned int index1 = 2*offset+ctr+1;
+
+	    // The points
+	    final_input.segmentlist[index0] = offset+h;
+	    final_input.segmentlist[index1] = (h==holes[i].n_points-1) ? offset : offset+h+1; // wrap around
+	  }
+
+	// for (unsigned int h=0; h<2*final_input.numberofsegments; ++h)
+	// std::cout << final_input.segmentlist[h] << std::endl;
+
+	// Update the offset
+	offset += holes[i].n_points;
+      }
+
+    
+    // Add the corner points
+    unsigned int idx = 2*n_hole_points;
+
+    final_input.pointlist[idx++] = xmin;
+    final_input.pointlist[idx++] = ymin;
+    
+    final_input.pointlist[idx++] = xmax;
+    final_input.pointlist[idx++] = ymin;
+    
+    final_input.pointlist[idx++] = xmax;
+    final_input.pointlist[idx++] = ymax;
+    
+    final_input.pointlist[idx++] = xmin;
+    final_input.pointlist[idx++] = ymax;
+
+    // Tell the input structure about the hole(s)
+    final_input.numberofholes = n_holes;
+    final_input.holelist      = static_cast<REAL*>(std::malloc(final_input.numberofholes * 2 * sizeof(REAL)));
+    for (unsigned int i=0, ctr=0; i<n_holes; ++i, ctr+=2)
+      {
+	final_input.holelist[ctr]   = holes[i].center(0);
+	final_input.holelist[ctr+1] = holes[i].center(1);
+      }
+    
+    // Perform the triangulation.
+    // c ~ enclose convex hull with segments
+    // z ~ use zero indexing
+    // B ~ Suppresses boundary markers in the output
+    // Q ~ run in "quiet" mode
+    // p ~ Triangulates a Planar Straight Line Graph
+    //     If the `p' switch is used, `segmentlist' must point to a list of     
+    //     segments, `numberofsegments' must be properly set, and               
+    //     `segmentmarkerlist' must either be set to NULL (in which case all    
+    //     markers default to zero), or must point to a list of markers.
+    // D ~ Conforming Delaunay: use this switch if you want all triangles in the mesh to be Delaunay, and not just constrained Delaunay
+    // q ~  Quality mesh generation with no angles smaller than 20 degrees. An alternate minimum angle may be specified after the q
+    // a ~ Imposes a maximum triangle area constraint.
+    std::ostringstream flags;
+    flags << "pczBQDqa" << std::fixed << 0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>((nx-1)*(ny-1));
+    Triangle::triangulate(const_cast<char*>(flags.str().c_str()),
+			  &final_input,
+			  &final_output,
+			  NULL); // voronoi ouput -- not used
+
+    
+    // Transfer the information into the LibMesh mesh.
+    // Note: this should be its own function!!
+    mesh.clear();
+  
+    // Node information
+    for (int i=0, c=0; c<final_output.numberofpoints; i+=2, ++c)
+      mesh.add_point( Point(final_output.pointlist[i],
+			    final_output.pointlist[i+1]) );
+  
+    // Element information
+    for (int i=0; i<final_output.numberoftriangles; ++i)
+      {
+	Elem* elem = mesh.add_elem (new Tri3);
+	
+	for (unsigned int n=0; n<3; ++n)
+	  elem->set_node(n) = mesh.node_ptr(final_output.trianglelist[i*3 + n]);
+      }
+
+
+    // here();
+    
+    // Prepare mesh for usage.
+    mesh.prepare_for_use();
+
+    // To the naked eye, a few smoothing iterations usually looks better.
+    LaplaceMeshSmoother(mesh).smooth(2);
+
+    
+    // here();
+    
+    Triangle::destroy(final_input, Triangle::INPUT);
+
+    // here();
+    
+    Triangle::destroy(final_output, Triangle::OUTPUT);
+
+    // here();
+}
+
 
 
 
