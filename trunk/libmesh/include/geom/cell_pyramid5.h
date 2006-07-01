@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.h,v 1.14 2006-06-20 20:18:48 jwpeterson Exp $
+// $Id: cell_pyramid5.h,v 1.15 2006-07-01 23:06:52 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -140,7 +140,7 @@ public:
   /**
    * Specialization for computing the volume of a pyramid.
    */
-  // virtual Real volume () const;
+  virtual Real volume () const;
 
   
 protected:
