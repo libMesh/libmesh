@@ -1,4 +1,4 @@
-// $Id: cell_hex8.C,v 1.26 2006-06-20 20:18:48 jwpeterson Exp $
+// $Id: cell_hex8.C,v 1.27 2006-07-01 23:06:52 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -365,26 +365,51 @@ const float Hex8::_embedding_matrix[8][8][8] =
 
 
 
-// Real Hex8::volume () const
-// {
-//   // Method is based on the long diagonal (LD) decomposition
-//   // of the Hex into tetrahedra.  See J. Grandy, "Efficient
-//   // Computation of Volume of Hexahedral Cells"  LLNL, (1997)
+Real Hex8::volume () const
+{
+  // Compute the volume of the tri-linear hex by splitting it
+  // into 6 sub-pyramids and applying the formula in:
+  // "Calculation of the Volume of a General Hexahedron
+  // for Flow Predictions", AIAA Journal v.23, no.6, 1984, p.954-
+  
+  static const unsigned char sub_pyr[6][4] =
+    {
+      {0, 3, 2, 1},
+      {6, 7, 4, 5},
+      {0, 1, 5, 4},
+      {3, 7, 6, 2},
+      {0, 4, 7, 3},
+      {1, 2, 6, 5}
+    };
 
-//   // Get the various diagonal and edge vectors
-//   Point v60 ( *(this->get_node(6)) - *(this->get_node(0)) );
-//   Point v10 ( *(this->get_node(1)) - *(this->get_node(0)) );
-//   Point v25 ( *(this->get_node(2)) - *(this->get_node(5)) );
-//   Point v40 ( *(this->get_node(4)) - *(this->get_node(0)) );
-//   Point v57 ( *(this->get_node(5)) - *(this->get_node(7)) );
-//   Point v30 ( *(this->get_node(3)) - *(this->get_node(0)) );
-//   Point v72 ( *(this->get_node(7)) - *(this->get_node(2)) );
+  // The centroid is a convenient point to use
+  // for the apex of all the pyramids.
+  const Point R = this->centroid();
+  Node* pyr_base[4];
+  
+  Real vol=0.;
 
-//   // Compute 3 box products
-//   const Real bp0 = v60 * (v10.cross(v25));
-//   const Real bp1 = v60 * (v40.cross(v57));
-//   const Real bp2 = v60 * (v30.cross(v72));
+  // Compute the volume using 6 sub-pyramids
+  for (unsigned int n=0; n<6; ++n)
+    {
+      // Set the nodes of the pyramid base
+      for (unsigned int i=0; i<4; ++i)
+	pyr_base[i] = this->_nodes[sub_pyr[n][i]];
+      
+      // Compute diff vectors
+      Point a ( *pyr_base[0] - R );
+      Point b ( *pyr_base[1] - *pyr_base[3] );
+      Point c ( *pyr_base[2] - *pyr_base[0] );
+      Point d ( *pyr_base[3] - *pyr_base[0] );
+      Point e ( *pyr_base[1] - *pyr_base[0] );
 
-//   // Add up, scale, and return value
-//   return (1./6.)*(bp0+bp1+bp2);
-// }
+      // Compute pyramid volume
+      Real sub_vol = (1./6.)*(a*(b.cross(c))) + (1./12.)*(c*(d.cross(e)));
+
+      assert (sub_vol>0.);
+
+      vol += sub_vol;
+    }
+  
+  return vol;
+}
