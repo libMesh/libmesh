@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.C,v 1.9 2006-06-30 15:33:13 jwpeterson Exp $
+// $Id: mesh_triangle_support.C,v 1.10 2006-07-02 18:25:53 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,7 @@
 #include "mesh_triangle_support.h"
 #include "mesh.h"
 #include "face_tri3.h"
+#include "face_tri6.h"
 #include "mesh_generation.h"
 #include "mesh_smoother_laplace.h"
 
@@ -35,7 +36,8 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
 						   const unsigned int nx,
 						   const unsigned int ny,
 						   const Real xmin, const Real xmax,
-						   const Real ymin, const Real ymax)
+						   const Real ymin, const Real ymax,
+						   const ElemType type)
 {
   // Check for existing nodes and compatible dimension.
   assert (mesh.mesh_dimension() == 2);
@@ -49,10 +51,39 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
   Triangle::init(input);
   Triangle::init(intermediate);
   Triangle::init(final);
+
   
   // Compute the desired final area of the triangles, based on the
   // area of the domain and the requested number of nodes.
   const Real desired_area = 0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>((nx-1)*(ny-1));
+
+
+  // Create the flag strings, depends on element type
+  std::ostringstream flags_initial, flags_final;
+
+  switch (type)
+    {
+      case TRI3:
+        {
+          flags_initial << "czBQ";
+          flags_final << "przBPQa" << std::fixed << desired_area;
+          break;
+        }
+
+      case TRI6:
+        {
+          flags_initial << "czBQo2";
+          flags_final << "przBPQo2a" << std::fixed << desired_area;
+          break;
+        }
+
+      default:
+        {
+          std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
+          error();
+        }
+    }
+
 
   // Allocate memory for the initial points.  Stick to malloc here
   // so that all the accompanying 'destroy's work as well.
@@ -94,7 +125,7 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
   // all similar triangles.
 
   // Perform initial triangulation.
-  Triangle::triangulate(const_cast<char*>("czBQ"), // gives the desired char* 
+  Triangle::triangulate(const_cast<char*>(flags_initial.str().c_str()), // gives the desired char* 
 			&input,
 			&intermediate,
 			NULL);
@@ -104,9 +135,7 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
   final.trianglelist = static_cast<int* >(NULL);
 
   // Perform final triangulation with area constraint
-  std::ostringstream flags;
-  flags << "przBPQa" << std::fixed << desired_area;
-  Triangle::triangulate(const_cast<char*>(flags.str().c_str()),
+  Triangle::triangulate(const_cast<char*>(flags_final.str().c_str()),
 			&intermediate,
 			&final,
 			static_cast<Triangle::triangulateio*>(NULL));
@@ -116,16 +145,47 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
   
   // Node information
   for (int i=0, c=0; c<final.numberofpoints; i+=2, ++c)
+  {
     mesh.add_point( Point(final.pointlist[i],
 			  final.pointlist[i+1]) );
-  
+  }
+
   // Element information
   for (int i=0; i<final.numberoftriangles; ++i)
     {
-      Elem* elem = mesh.add_elem (new Tri3);
+      switch (type)
+      {
+        case TRI3:
+        {
+          Elem* elem = mesh.add_elem (new Tri3);
 
-      for (unsigned int n=0; n<3; ++n)
-	elem->set_node(n) = mesh.node_ptr(final.trianglelist[i*3 + n]);
+          for (unsigned int n=0; n<3; ++n)
+            elem->set_node(n) = mesh.node_ptr(final.trianglelist[i*3 + n]);
+
+          break;
+        }
+
+        case TRI6:
+        {
+          Elem* elem = mesh.add_elem (new Tri6);
+
+          // Triangle number TRI6 nodes in a different way to libMesh
+          elem->set_node(0) = mesh.node_ptr(final.trianglelist[i*6 + 0]);
+          elem->set_node(1) = mesh.node_ptr(final.trianglelist[i*6 + 1]);
+          elem->set_node(2) = mesh.node_ptr(final.trianglelist[i*6 + 2]);
+          elem->set_node(3) = mesh.node_ptr(final.trianglelist[i*6 + 5]);
+          elem->set_node(4) = mesh.node_ptr(final.trianglelist[i*6 + 3]);
+          elem->set_node(5) = mesh.node_ptr(final.trianglelist[i*6 + 4]);
+
+          break;
+        }
+
+        default:
+	{
+          std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
+          error();
+	}
+      }
     }
 
   // Clean up triangle data structures
@@ -150,7 +210,8 @@ void MeshTools::Generation::build_delaunay_square_with_hole(Mesh& mesh,
 							    const unsigned int nx, // num. of nodes in x-dir (approximate)
 							    const unsigned int ny, // num. of nodes in y-dir (approximate)
 							    const Real xmin, const Real xmax,
-							    const Real ymin, const Real ymax)
+							    const Real ymin, const Real ymax,
+							    const ElemType type)
 {
     // Triangle data structure for the mesh
     Triangle::triangulateio
@@ -257,7 +318,30 @@ void MeshTools::Generation::build_delaunay_square_with_hole(Mesh& mesh,
     // q ~  Quality mesh generation with no angles smaller than 20 degrees. An alternate minimum angle may be specified after the q
     // a ~ Imposes a maximum triangle area constraint.
     std::ostringstream flags;
-    flags << "pczBQDqa" << std::fixed << 0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>((nx-1)*(ny-1));
+    const Real desired_area = 0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>((nx-1)*(ny-1));
+    //flags << "pczBQDqa" << std::fixed << 0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>((nx-1)*(ny-1));
+
+    switch (type)
+    {
+      case TRI3:
+        {
+          flags << "pczBQDqa" << std::fixed << desired_area;
+          break;
+        }
+
+      case TRI6:
+        {
+          flags << "pczBQDqo2a" << std::fixed << desired_area;
+          break;
+        }
+
+      default:
+        {
+          std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
+          error();
+        }
+    }
+
     Triangle::triangulate(const_cast<char*>(flags.str().c_str()),
 			  &final_input,
 			  &final_output,
@@ -274,13 +358,52 @@ void MeshTools::Generation::build_delaunay_square_with_hole(Mesh& mesh,
 			    final_output.pointlist[i+1]) );
   
     // Element information
-    for (int i=0; i<final_output.numberoftriangles; ++i)
+//     for (int i=0; i<final_output.numberoftriangles; ++i)
+//       {
+// 	Elem* elem = mesh.add_elem (new Tri3);
+// 	
+// 	for (unsigned int n=0; n<3; ++n)
+// 	  elem->set_node(n) = mesh.node_ptr(final_output.trianglelist[i*3 + n]);
+//       }
+
+
+  // Element information
+  for (int i=0; i<final_output.numberoftriangles; ++i)
+    {
+      switch (type)
       {
-	Elem* elem = mesh.add_elem (new Tri3);
-	
-	for (unsigned int n=0; n<3; ++n)
-	  elem->set_node(n) = mesh.node_ptr(final_output.trianglelist[i*3 + n]);
+        case TRI3:
+        {
+          Elem* elem = mesh.add_elem (new Tri3);
+
+          for (unsigned int n=0; n<3; ++n)
+            elem->set_node(n) = mesh.node_ptr(final_output.trianglelist[i*3 + n]);
+
+          break;
+        }
+
+        case TRI6:
+        {
+          Elem* elem = mesh.add_elem (new Tri6);
+
+          // Triangle number TRI6 nodes in a different way to libMesh
+          elem->set_node(0) = mesh.node_ptr(final_output.trianglelist[i*6 + 0]);
+          elem->set_node(1) = mesh.node_ptr(final_output.trianglelist[i*6 + 1]);
+          elem->set_node(2) = mesh.node_ptr(final_output.trianglelist[i*6 + 2]);
+          elem->set_node(3) = mesh.node_ptr(final_output.trianglelist[i*6 + 5]);
+          elem->set_node(4) = mesh.node_ptr(final_output.trianglelist[i*6 + 3]);
+          elem->set_node(5) = mesh.node_ptr(final_output.trianglelist[i*6 + 4]);
+
+          break;
+        }
+
+        default:
+	{
+          std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
+          error();
+	}
       }
+    }
 
 
     // here();
