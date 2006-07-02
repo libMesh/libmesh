@@ -1,4 +1,4 @@
-/* $Id: ex1.C,v 1.9 2005-09-30 19:55:20 benkirk Exp $ */
+/* $Id: ex1.C,v 1.10 2006-07-02 18:25:53 knezed01 Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -24,6 +24,7 @@
  // information is printed to the screen, and the mesh is then
  // written.
 
+#undef SEEK_SET
  // C++ include files that we need
 #include <iostream>
 // Functions to initialize the library.

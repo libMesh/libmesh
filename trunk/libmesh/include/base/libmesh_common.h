@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.16 2005-12-15 19:12:18 roystgnr Exp $
+// $Id: libmesh_common.h,v 1.17 2006-07-02 18:25:53 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -36,6 +36,9 @@
 
 // Include the MPI definition
 #ifdef HAVE_MPI
+#undef SEEK_SET
+#undef SEEK_CUR
+#undef SEEK_END
 # include <mpi.h>
 #endif
 

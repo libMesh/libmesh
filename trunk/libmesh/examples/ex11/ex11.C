@@ -1,4 +1,4 @@
-/* $Id: ex11.C,v 1.14 2006-01-14 15:56:11 roystgnr Exp $ */
+/* $Id: ex11.C,v 1.15 2006-07-02 18:25:53 knezed01 Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -358,7 +358,7 @@ void assemble_stokes (EquationSystems& es,
 		  // The location on the boundary of the current
 		  // node.
 		   
-		  //const Real xf = side->point(ns)(0);
+		  const Real xf = side->point(ns)(0);
 		  const Real yf = side->point(ns)(1);
 		  
 		  // The penalty value.  \f$ \frac{1}{\epsilon \f$

@@ -1,4 +1,4 @@
-// $Id: mesh_generation.h,v 1.10 2006-06-30 15:33:12 jwpeterson Exp $
+// $Id: mesh_generation.h,v 1.11 2006-07-02 18:25:53 knezed01 Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.10 $
+   * \version $Revision: 1.11 $
    */
   namespace Generation
   {
@@ -108,7 +108,8 @@ namespace MeshTools
 			       const unsigned int nx, // num. of nodes in x-dir
 			       const unsigned int ny, // num. of nodes in y-dir
 			       const Real xmin=0., const Real xmax=1.,
-			       const Real ymin=0., const Real ymax=1.);
+			       const Real ymin=0., const Real ymax=1.,
+			       const ElemType type=INVALID_ELEM);
 
     
     // A helper class for describing a "circular" hole.
@@ -156,7 +157,8 @@ namespace MeshTools
 					 const unsigned int nx=10, // num. of nodes in x-dir (approximate)
 					 const unsigned int ny=10, // num. of nodes in y-dir (approximate)
 					 const Real xmin=-1., const Real xmax=1.,
-					 const Real ymin=-1., const Real ymax=1.);
+					 const Real ymin=-1., const Real ymax=1.,
+					 const ElemType type=INVALID_ELEM);
 
 
 #endif // HAVE_TRIANGLE
