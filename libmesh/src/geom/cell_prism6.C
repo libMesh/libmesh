@@ -1,4 +1,4 @@
-// $Id: cell_prism6.C,v 1.25 2006-06-20 20:18:48 jwpeterson Exp $
+// $Id: cell_prism6.C,v 1.26 2006-07-05 02:25:23 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -330,26 +330,85 @@ const float Prism6::_embedding_matrix[8][6][6] =
 
 
 
-// Real Prism6::volume () const
-// {
-//   // The volume of the prism is computed by splitting
-//   // it into 3 tetrahedra and summing their constitutive
-//   // volumes.
+Real Prism6::volume () const
+{
+  // The volume of the prism is computed by splitting
+  // it into 2 tetrahedra and 3 pyramids with bilinear bases.
+  // Then the volume formulae for the tetrahedron and pyramid
+  // are applied and summed to obtain the prism's volume.
 
-//   // Get the various diagonal and edge vectors
-//   Point v40 ( *(this->get_node(4)) - *(this->get_node(0)) );
-//   Point v10 ( *(this->get_node(1)) - *(this->get_node(0)) );
-//   Point v20 ( *(this->get_node(2)) - *(this->get_node(0)) );
-//   Point v23 ( *(this->get_node(2)) - *(this->get_node(3)) );
-//   Point v53 ( *(this->get_node(5)) - *(this->get_node(3)) );
-//   Point v43 ( *(this->get_node(4)) - *(this->get_node(3)) );
-//   Point v30 ( *(this->get_node(3)) - *(this->get_node(0)) );
+  static const unsigned char sub_pyr[3][4] =
+    {
+      {0, 1, 4, 3},
+      {1, 2, 5, 4},
+      {0, 3, 5, 2}
+    };
 
-//   // Compute box products
-//   const Real bp0 = v40 * (v10.cross(v20));  assert(bp0 > 0.);
-//   const Real bp1 = v23 * (v53.cross(v43));  assert(bp1 > 0.);
-//   const Real bp2 = v20 * (v30.cross(v40));  assert(bp2 > 0.);
+  static const unsigned char sub_tet[2][3] =
+    {
+      {0, 1, 2},
+      {5, 4, 3}
+    };
 
-//   // Add up results, scale and return
-//   return (1./6.)*(bp0+bp1+bp2);
-// }
+  // The centroid is a convenient point to use
+  // for the apex of all the pyramids.
+  const Point R = this->centroid();
+
+  // temporary storage for Nodes which form the base of the
+  // subelements
+  Node* base[4];
+
+  // volume accumulation variable
+  Real vol=0.;
+
+  // Add up the sub-pyramid volumes
+  for (unsigned int n=0; n<3; ++n)
+    {
+      // Set the nodes of the pyramid base
+      for (unsigned int i=0; i<4; ++i)
+	base[i] = this->_nodes[sub_pyr[n][i]];
+      
+      // Compute diff vectors
+      Point a ( *base[0] - R );
+      Point b ( *base[1] - *base[3] );
+      Point c ( *base[2] - *base[0] );
+      Point d ( *base[3] - *base[0] );
+      Point e ( *base[1] - *base[0] );
+
+      // Compute pyramid volume
+      Real sub_vol = (1./6.)*(a*(b.cross(c))) + (1./12.)*(c*(d.cross(e)));
+
+      assert (sub_vol>0.);
+
+      vol += sub_vol;
+    }
+
+
+  // Add up the sub-tet volumes
+  for (unsigned int n=0; n<2; ++n)
+    {
+      // Set the nodes of the pyramid base
+      for (unsigned int i=0; i<3; ++i)
+	base[i] = this->_nodes[sub_tet[n][i]];
+
+      // The volume of a tetrahedron is 1/6 the box product formed
+      // by its base and apex vectors
+      Point a ( R - *base[0] );
+      
+      // b is the vector pointing from 0 to 1
+      Point b ( *base[1] - *base[0] );
+      
+      // c is the vector pointing from 0 to 2
+      Point c ( *base[2] - *base[0] );
+      
+      Real sub_vol =  (1.0 / 6.0) * (a * (b.cross(c)));
+
+      assert (sub_vol>0.);
+
+      vol += sub_vol;
+    }  
+
+
+  // Done with all sub-volumes, so return
+  return vol;
+ }
