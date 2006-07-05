@@ -1,4 +1,4 @@
-// $Id: cell_prism6.h,v 1.13 2006-06-20 20:18:48 jwpeterson Exp $
+// $Id: cell_prism6.h,v 1.14 2006-07-05 02:25:23 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -140,7 +140,7 @@ public:
   /**
    * Specialized function for computing the element volume.
    */
-  // virtual Real volume () const;
+  virtual Real volume () const;
   
 protected:
 
