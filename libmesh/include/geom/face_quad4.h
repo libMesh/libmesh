@@ -1,4 +1,4 @@
-// $Id: face_quad4.h,v 1.13 2006-06-20 20:18:48 jwpeterson Exp $
+// $Id: face_quad4.h,v 1.14 2006-07-06 21:21:49 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -141,7 +141,7 @@ public:
    * 4-node quad with straight sides, but not necessarily a
    * parallelogram.
    */
-  // virtual Real volume () const;
+  virtual Real volume () const;
   
 protected:
 
