@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.26 2006-03-29 18:47:37 roystgnr Exp $
+// $Id: system.C,v 1.27 2006-07-11 21:21:04 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -233,11 +233,11 @@ void System::restrict_vectors ()
 
 	      v->close();
 	    }
-          }
-        else
-          {
-            v->init (this->n_dofs(), this->n_local_dofs());
-          }
+        }
+      else
+        {
+          v->init (this->n_dofs(), this->n_local_dofs());
+        }
     }
 
   // Restrict the current local solution on the coarsened cells
