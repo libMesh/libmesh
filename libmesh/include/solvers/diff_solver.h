@@ -1,4 +1,4 @@
-// $Id: diff_solver.h,v 1.6 2006-06-14 06:39:34 roystgnr Exp $
+// $Id: diff_solver.h,v 1.7 2006-07-13 05:18:30 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -38,6 +38,10 @@ class TimeSolver;
  * This is a generic class that defines a solver to handle
  * DifferentiableSystems  A user can define a solver by 
  * deriving from this class and implementing certain functions.
+ *
+ * This class is part of the new DifferentiableSystem framework,
+ * which is still experimental.  Users of this framework should
+ * beware of bugs and future API changes.
  *
  * @author Roy H. Stogner 2006
  */

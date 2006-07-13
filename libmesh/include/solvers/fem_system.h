@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.6 2006-06-29 20:48:26 roystgnr Exp $
+// $Id: fem_system.h,v 1.7 2006-07-13 05:18:30 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,6 +43,12 @@ template <typename T> class NumericVector;
  * cell residual calculation from the user.  Note
  * that still additional vectors/matrices may be added,
  * as offered in the class \p ExplicitSystem.
+ *
+ * This class is part of the new DifferentiableSystem framework,
+ * which is still experimental.  Users of this framework should
+ * beware of bugs and future API changes.
+ *
+ * @author Roy H. Stogner 2006
  */
 
 // ------------------------------------------------------------

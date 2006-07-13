@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.7 2006-06-13 22:22:00 roystgnr Exp $
+// $Id: diff_system.h,v 1.8 2006-07-13 05:18:30 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,6 +44,12 @@ template <typename T> class NumericVector;
  * This class provides a specific system class.  It aims
  * to generalize any system, linear or nonlinear, which
  * provides both a residual and a Jacobian.
+ *
+ * This class is part of the new DifferentiableSystem framework,
+ * which is still experimental.  Users of this framework should
+ * beware of bugs and future API changes.
+ *
+ * @author Roy H. Stogner 2006
  */
 
 // ------------------------------------------------------------

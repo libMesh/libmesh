@@ -1,4 +1,4 @@
-// $Id: hp_selector.h,v 1.5 2006-06-22 21:43:19 benkirk Exp $
+// $Id: hp_selector.h,v 1.6 2006-07-13 05:18:30 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -55,6 +55,9 @@ typedef RealTensorValue RealTensor;
  * for h refinement, and we may want to change some of those elements
  * to be flagged for p refinement.
  *
+ * This code is currently experimental and will not produce optimal
+ * hp meshes without significant improvement.
+ *
  * @author Roy H. Stogner, 2006.
  */
 class HPSelector
@@ -64,7 +67,10 @@ public:
   /**
    * Constructor.
    */
-  HPSelector() : p_weight(1.0) {}
+  HPSelector() : p_weight(1.0) 
+  {
+    untested();
+  }
   
   /**
    * Destructor.  
