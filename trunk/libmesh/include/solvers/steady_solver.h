@@ -1,5 +1,5 @@
 
-// $Id: steady_solver.h,v 1.2 2006-06-06 21:41:59 roystgnr Exp $
+// $Id: steady_solver.h,v 1.3 2006-07-13 05:18:30 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,10 @@ class DifferentiableSystem;
 /**
  * This class implements a TimeSolver which does a single
  * solve of the steady state problem.
+ *
+ * This class is part of the new DifferentiableSystem framework,
+ * which is still experimental.  Users of this framework should
+ * beware of bugs and future API changes.
  *
  * @author Roy H. Stogner 2006
  */

@@ -17,6 +17,7 @@ DifferentiableSystem::DifferentiableSystem
   print_jacobian_norms(false),
   print_jacobians(false)
 {
+  untested();
 }
 
 

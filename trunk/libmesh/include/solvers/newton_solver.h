@@ -1,4 +1,4 @@
-// $Id: newton_solver.h,v 1.3 2006-06-21 01:12:28 roystgnr Exp $
+// $Id: newton_solver.h,v 1.4 2006-07-13 05:18:30 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,8 +32,12 @@
 
 /**
  * This class defines a solver which uses the default
- * libMesh linear solver in a quasiNewtonto handle a 
+ * libMesh linear solver in a quasiNewton method to handle a 
  * DifferentiableSystem
+ *
+ * This class is part of the new DifferentiableSystem framework,
+ * which is still experimental.  Users of this framework should
+ * beware of bugs and future API changes.
  *
  * @author Roy H. Stogner 2006
  */

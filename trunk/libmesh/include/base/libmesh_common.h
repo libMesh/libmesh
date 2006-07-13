@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.17 2006-07-02 18:25:53 knezed01 Exp $
+// $Id: libmesh_common.h,v 1.18 2006-07-13 05:18:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -169,7 +169,7 @@ namespace libMesh
 
 // The untested macro warns that you are using untested code
 #undef untested
-#define untested() { std::cout << "*** Using untested code: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }
+#define untested() { std::cout << "*** Warning, This code is untested, experimental, or likely to see future API changes: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }
 
 
 // The deprecated macro warns that you are using deprecated code
