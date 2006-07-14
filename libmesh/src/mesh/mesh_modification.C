@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.20 2006-06-29 21:20:18 roystgnr Exp $
+// $Id: mesh_modification.C,v 1.21 2006-07-14 16:19:14 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -680,6 +680,11 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                                       const unsigned int n_iterations,
                                       const Real power)
 {
+  /**
+   * This implementation assumes every element "side" has only 2 nodes.
+   */
+  assert (mesh.mesh_dimension() == 2);
+  
   /*
    * find the boundary nodes
    */
