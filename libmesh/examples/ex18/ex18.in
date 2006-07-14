@@ -25,3 +25,6 @@ coarsegridsize = 1
 
 # The maximum number of adaptive steps per timestep
 max_adaptivesteps = 10
+
+# Turn this off to see the NewtonSolver chatter
+solver_quiet = false

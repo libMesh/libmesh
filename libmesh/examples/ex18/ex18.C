@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.8 2006-06-30 21:34:40 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.9 2006-07-14 01:21:38 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -20,8 +20,8 @@
  // <h1>Example 18 - Unsteady Navier-Stokes Equations with DiffSystem</h1>
  //
  // This example shows how the transient nonlinear problem from
- // example 13 can be solved using the DiffSystem class framework to
- // simplify the user-implemented equations.
+ // example 13 can be solved using the new (and experimental)
+ // DiffSystem class framework
 
 // Basic include files
 #include "equation_systems.h"
