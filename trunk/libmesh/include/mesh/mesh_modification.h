@@ -1,4 +1,4 @@
-// $Id: mesh_modification.h,v 1.7 2005-09-02 13:40:06 benkirk Exp $
+// $Id: mesh_modification.h,v 1.8 2006-07-14 16:19:14 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.7 $
+   * \version $Revision: 1.8 $
    */  
   namespace Modification
   {
@@ -107,9 +107,9 @@ namespace MeshTools
      * nodes. If \p power > 0, the node positions are weighted by their
      * distance.  The positions of higher order nodes, and nodes living in
      * refined elements, are calculated from the vertex positions of their
-     * parent nodes.
+     * parent nodes.  Only works in 2D.
      *
-     * \author Martin Lüthi
+     * \author Martin Lüthi (luthi@gi.alaska.edu)
      * \date 2005
      */ 
     void smooth(MeshBase&, unsigned int, Real);
