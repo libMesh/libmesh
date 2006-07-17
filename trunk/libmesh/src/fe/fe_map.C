@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.40 2006-06-22 14:46:08 benkirk Exp $
+// $Id: fe_map.C,v 1.41 2006-07-17 23:37:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1196,13 +1196,17 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    const Real G = dxi*dxi;
 	    
 	    if (secure)
-	      assert (G > 1.e-20);
+	      assert (G > 0.);
 	    
 	    const Real Ginv = 1./G;
 	    
 	    const Real  dxidelta = dxi*delta;
 	    
 	    dp(0) = Ginv*dxidelta;
+
+            // Assume that no master elements have radius > 4
+	    if (secure)
+	      assert (dp.size() < 4);
 
 	    break;
 	  }
@@ -1244,7 +1248,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    const Real det = (G11*G22 - G12*G21);
 	    
 	    if (secure)
-	      assert (det > 1.e-20);
+	      assert (det != 0.);
 
 	    const Real inv_det = 1./det;
 	    
@@ -1261,6 +1265,10 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    
 	    dp(0) = (Ginv11*dxidelta + Ginv12*detadelta);
 	    dp(1) = (Ginv21*dxidelta + Ginv22*detadelta);
+
+            // Assume that no master elements have radius > 4
+	    if (secure)
+	      assert (dp.size() < 4);
 
 	    break;
 	  }
@@ -1303,7 +1311,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			      J13*(J21*J32 - J22*J31));
 	    
 	    if (secure)
-	      assert (std::abs(det) > 1.e-20);
+	      assert (det != 0.);
 
 	    const Real inv_det = 1./det;
 	    
@@ -1331,6 +1339,10 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    dp(2) = (Jinv31*delta(0) +
 		     Jinv32*delta(1) +
 		     Jinv33*delta(2));
+
+            // Assume that no master elements have radius > 4
+	    if (secure)
+	      assert (dp.size() < 4);
 
 	    break;
 	  }
