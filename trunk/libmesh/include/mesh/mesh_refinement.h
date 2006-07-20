@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.20 2006-06-29 06:41:31 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.21 2006-07-20 22:48:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -97,6 +97,11 @@ public:
    * the computed error passed in \p error_per_cell.  The two
    * fractions \p refine_fraction and \p coarsen_fraction must be in
    * \f$ [0,1] \f$.
+   *
+   * All the function arguments except error_per_cell
+   * have been deprecated, and will be removed in
+   * future libMesh releases - to control these parameters,
+   * set the corresponding member variables.
    */
   void flag_elements_by_error_fraction (const ErrorVector& error_per_cell,
 					const Real refine_fraction  = 0.3,
@@ -107,19 +112,17 @@ public:
    * Flags elements for coarsening and refinement based on
    * the computed error passed in \p error_per_cell.  This method refines
    * the worst elements with errors greater than
-   * \p global_tolerance / n_elem, flagging at most
-   * \p refine_fraction * n_elem.  It coarsens elements with errors less than
-   * \p coarsen_threshold * \p global_tolerance / n_elem, flagging at most
-   * \p coarsen_fraction * n_elem.
+   * \p absolute_global_tolerance / n_active_elem, flagging at most
+   * \p refine_fraction * n_active_elem
+   * It coarsens elements with errors less than
+   * \p coarsen_threshold * \p global_tolerance / n_active_elem,
+   * flagging at most
+   * \p coarsen_fraction * n_active_elem
    *
    * The three fractions \p refine_fraction \p coarsen_fraction and
    * \p coarsen_threshold should be in \f$ [0,1] \f$.
    */
-  void flag_elements_by_error_tolerance (const ErrorVector& error_per_cell,
-					 const Real global_tolerance,
-					 const Real coarsen_threshold = 0.1,
-					 const Real refine_fraction  = 0.3,
-					 const Real coarsen_fraction = 0.3);
+  void flag_elements_by_error_tolerance (const ErrorVector& error_per_cell);
 
   /**
    * Flags elements for coarsening and refinement based on
@@ -134,11 +137,7 @@ public:
    * to produce a mesh with a narrow error distribution and the right
    * number of elements.
    */
-  bool flag_elements_to_nelem_target (const ErrorVector& error_per_cell,
-				      const unsigned int nelem_target,
-				      const Real coarsen_threshold = 0.1,
-				      const Real refine_fraction  = 0.3,
-				      const Real coarsen_fraction = 0.3);
+  bool flag_elements_by_nelem_target (const ErrorVector& error_per_cell);
 
   /**
    * Flags elements for coarsening and refinement based on
@@ -147,6 +146,11 @@ public:
    * the bottom \p coarsen_fraction * \p n_elem elements for coarsening.
    * The two fractions \p refine_fraction and \p coarsen_fraction must be
    * in \f$ [0,1] \f$.
+   *
+   * All the function arguments except error_per_cell
+   * have been deprecated, and will be removed in
+   * future libMesh releases - to control these parameters,
+   * set the corresponding member variables.
    */
   void flag_elements_by_elem_fraction (const ErrorVector& error_per_cell,
 				       const Real refine_fraction  = 0.3,
@@ -160,6 +164,11 @@ public:
    * and the bottom \p mean - \p coarsen_fraction * \p stddev elements for
    * coarsening. The two fractions \p refine_fraction and \p coarsen_fraction
    * must be in \f$ [0,1] \f$.
+   *
+   * All the function arguments except error_per_cell
+   * have been deprecated, and will be removed in
+   * future libMesh releases - to control these parameters,
+   * set the corresponding member variables.
    */
   void flag_elements_by_mean_stddev (const ErrorVector& error_per_cell,
 				     const Real refine_fraction  = 1.0,
@@ -267,7 +276,70 @@ public:
    */
   MeshBase&       get_mesh ()       { return _mesh; }
 
+  /**
+   * If \p coarsen_by_parents is true, complete groups of sibling elements
+   * (elements with the same parent) will be flagged for coarsening.
+   * This should make the coarsening more likely to occur as requested.
+   *
+   * \p coarsen_by_parents is true by default.
+   */
+  bool& coarsen_by_parents();
 
+  /**
+   * The \p refine_fraction sets either a desired target or a desired
+   * maximum number of elements to flag for refinement, depending on which
+   * flag_elements_by method is called.
+   *
+   * \p refine_fraction must be in \f$ [0,1] \f$, and is 0.3 by default.
+   */
+  Real& refine_fraction();
+
+  /**
+   * The \p coarsen_fraction sets either a desired target or a desired
+   * maximum number of elements to flag for coarsening, depending on which
+   * flag_elements_by method is called.
+   *
+   * \p coarsen_fraction must be in \f$ [0,1] \f$, and is 0 by default.
+   */
+  Real& coarsen_fraction();
+
+  /**
+   * The \p max_h_level is the greatest refinement level an element should
+   * reach.
+   *
+   * \p max_h_level is unlimited (libMesh::invalid_uint) by default
+   */
+  unsigned int& max_h_level();
+
+  /**
+   * The \p coarsen_threshold provides hysteresis in AMR/C strategies.
+   * Refinement of elements with error estimate E will be done even
+   * at the expense of coarsening elements whose children's accumulated
+   * error does not exceed \p coarsen_threshold * E.
+   *
+   * \p coarsen_threshold must be in \f$ [0,1] \f$, and is 0.1 by default.
+   */
+  Real& coarsen_threshold();
+
+  /**
+   * If \p nelem_target is set to a nonzero value, methods like
+   * flag_elements_by_nelem_target() will attempt to keep the number
+   * of active elements in the mesh close to nelem_target.
+   *
+   * \p nelem_target is 0 by default.
+   */
+  unsigned int& nelem_target();
+
+  /**
+   * If \p absolute_global_tolerance is set to a nonzero value, methods
+   * like flag_elements_by_global_tolerance() will attempt to reduce
+   * the global error of the mesh (defined as the square root of the
+   * sum of the squares of the errors on active elements) to below
+   * this tolerance.
+   *
+   * \p absolute_global_tolerance is 0 by default.
+   */
+  Real& absolute_global_tolerance();
 
 private:
 
@@ -427,6 +499,14 @@ private:
   // Utility algorithms
 
   /**
+   * Calculates the error on all coarsenable parents
+   */
+  void create_parent_error_vector (const ErrorVector& error_per_cell,
+				   ErrorVector& error_per_parent,
+				   Real &parent_error_min,
+				   Real &parent_error_max);
+
+  /**
    * Updates the \p _new_nodes_map
    */
   void update_nodes_map ();
@@ -477,7 +557,78 @@ private:
    */
   MeshBase& _mesh;
 
+  /**
+   * For backwards compatibility, we initialize this
+   * as false and then set it to true if the user uses
+   * any of the refinement parameter accessor functions
+   */
+  bool _use_member_parameters;
+
+  /**
+   * Refinement parameter values
+   */
+
+  bool _coarsen_by_parents;
+
+  Real _refine_fraction;
+
+  Real _coarsen_fraction;
+
+  unsigned int _max_h_level;
+
+  Real _coarsen_threshold;
+
+  unsigned int _nelem_target;
+
+  Real _absolute_global_tolerance;
 };
+
+
+
+// ------------------------------------------------------------
+// MeshRefinement class inline members
+
+inline bool& MeshRefinement::coarsen_by_parents()
+{
+  _use_member_parameters = true;
+  return _coarsen_by_parents;
+}
+
+inline Real& MeshRefinement::refine_fraction()
+{
+  _use_member_parameters = true;
+  return _refine_fraction;
+}
+
+inline Real& MeshRefinement::coarsen_fraction()
+{
+  _use_member_parameters = true;
+  return _coarsen_fraction;
+}
+
+inline unsigned int& MeshRefinement::max_h_level()
+{
+  _use_member_parameters = true;
+  return _max_h_level;
+}
+
+inline Real& MeshRefinement::coarsen_threshold()
+{
+  _use_member_parameters = true;
+  return _coarsen_threshold;
+}
+
+inline unsigned int& MeshRefinement::nelem_target()
+{
+  _use_member_parameters = true;
+  return _nelem_target;
+}
+
+inline Real& MeshRefinement::absolute_global_tolerance()
+{
+  _use_member_parameters = true;
+  return _absolute_global_tolerance;
+}
 
 #endif // end #ifdef ENABLE_AMR
 #endif // end #ifndef __mesh_refinement_h__ 
