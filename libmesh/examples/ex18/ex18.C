@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.9 2006-07-14 01:21:38 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.10 2006-07-20 22:48:46 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -69,6 +69,9 @@ int main (int argc, char** argv)
     
     // And an object to refine it
     MeshRefinement mesh_refinement(mesh);
+    mesh_refinement.coarsen_by_parents() = true;
+    mesh_refinement.absolute_global_tolerance() = global_tolerance;
+    mesh_refinement.nelem_target() = nelem_target;
 
     // Use the MeshTools::Generation mesh generator to create a uniform
     // grid on the square [-1,1]^D.  We instruct the mesh generator
@@ -205,15 +208,13 @@ int main (int argc, char** argv)
                 // don't need any more adaptive steps
                 if (global_error < global_tolerance)
                   break;
-                mesh_refinement.flag_elements_by_error_tolerance
-                  (error, global_tolerance);
+                mesh_refinement.flag_elements_by_error_tolerance(error);
               }
             else
               {
-                // If flag_elements_to_nelem_target returns true, this
+                // If flag_elements_by_nelem_target returns true, this
                 // should be our last adaptive step.
-                if (mesh_refinement.flag_elements_to_nelem_target
-                      (error, nelem_target))
+                if (mesh_refinement.flag_elements_by_nelem_target(error))
                   {
                     mesh_refinement.refine_and_coarsen_elements();
                     equation_systems.reinit();

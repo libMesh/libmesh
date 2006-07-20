@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.50 2006-06-12 22:50:41 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.51 2006-07-20 22:48:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 // only compile these functions if the user requests AMR support
 #ifdef ENABLE_AMR
 
+#include "error_vector.h"
 #include "mesh_base.h"
 #include "mesh_refinement.h"
 #include "elem.h"
@@ -36,7 +37,15 @@
 //-----------------------------------------------------------------
 // Mesh refinement methods
 MeshRefinement::MeshRefinement (MeshBase& m) :
-  _mesh(m)
+  _mesh(m),
+  _use_member_parameters(false),
+  _coarsen_by_parents(false),
+  _refine_fraction(0.3),
+  _coarsen_fraction(0.0),
+  _max_h_level(libMesh::invalid_uint),
+  _coarsen_threshold(0.1),
+  _nelem_target(0),
+  _absolute_global_tolerance(0.0)
 {
 }
 
@@ -125,6 +134,67 @@ Elem* MeshRefinement::add_elem (Elem* elem)
   _mesh.add_elem (elem);
   
   return elem;
+}
+
+
+
+void MeshRefinement::create_parent_error_vector
+  (const ErrorVector& error_per_cell,
+   ErrorVector& error_per_parent,
+   Real& parent_error_min,
+   Real& parent_error_max)
+{
+  error_per_parent.resize(error_per_cell.size(), 0.);
+
+  parent_error_min = std::numeric_limits<double>::max();
+  parent_error_max = 0.;
+
+  // We need to loop over all active elements to find minimum error
+  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+
+  for (; elem_it != elem_end; ++elem_it)
+    {
+      Elem* elem   = *elem_it;
+      Elem* parent = elem->parent();
+
+      // Calculate summed errors on parent cells
+      if (parent)
+        {
+          const unsigned int parentid  = parent->id();
+          assert (parentid < error_per_parent.size());
+
+          // If we haven't already calculate the parent's total
+          // error, do so now
+          if (!error_per_parent[parentid])
+            {
+              float parent_error = 0.;
+              for (unsigned int n = 0; n != parent->n_children(); ++n)
+                {
+                  Elem* child = parent->child(n);
+                  const unsigned int childid = child->id();
+
+                  // If the parent has grandchildren we won't be able
+                  // to coarsen it, so forget it
+                  if (!child->active())
+                    break;
+
+                  // We take the square root of the sum of the
+                  // squares, so errors that are Hilbert norms
+                  // remain Hilbert norms
+                  parent_error += (error_per_cell[childid] *
+                                   error_per_cell[childid]);
+                }
+              parent_error = sqrt(parent_error);
+              error_per_parent[parentid] = parent_error;
+
+              parent_error_min = std::min (parent_error_min,
+                                           parent_error);
+              parent_error_max = std::max (parent_error_max,
+                                           parent_error);
+            }
+        }
+    }
 }
 
 
