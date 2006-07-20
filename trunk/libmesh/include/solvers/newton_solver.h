@@ -1,4 +1,4 @@
-// $Id: newton_solver.h,v 1.4 2006-07-13 05:18:30 roystgnr Exp $
+// $Id: newton_solver.h,v 1.5 2006-07-20 21:05:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -98,11 +98,18 @@ protected:
   AutoPtr<LinearSolver<Number> > linear_solver;
 
   /**
+   * This prints output for the convergence criteria based on
+   * by the given residual and step size.
+   */
+  void print_convergence(unsigned int step_num,
+			 Real current_residual,
+			 Real step_norm);
+
+  /**
    * This returns true if a convergence criterion has been passed
    * by the given residual and step size; false otherwise.
    */
-  bool test_convergence(unsigned int step_num,
-			Real current_residual,
+  bool test_convergence(Real current_residual,
 			Real step_norm);
 };
 
