@@ -1,4 +1,4 @@
-/* $Id: naviersystem.C,v 1.1 2006-06-29 20:49:42 roystgnr Exp $ */
+/* $Id: naviersystem.C,v 1.2 2006-07-20 21:37:19 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -75,16 +75,16 @@ bool NavierSystem::element_time_derivative (bool request_jacobian)
   const std::vector<Real> &JxW = fe_velocity->get_JxW();
 
   // The velocity shape functions at interior quadrature points.
-  const std::vector<std::vector<Real> > &phi = fe_velocity->get_phi();
+  const std::vector<std::vector<Real> >& phi = fe_velocity->get_phi();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> > &dphi =
+  const std::vector<std::vector<RealGradient> >& dphi =
     fe_velocity->get_dphi();
 
   // The pressure shape functions at interior
   // quadrature points.
-  const std::vector<std::vector<Real> > &psi = fe_pressure->get_phi();
+  const std::vector<std::vector<Real> >& psi = fe_pressure->get_phi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_u_dofs = dof_indices_var[0].size(); 
@@ -190,12 +190,12 @@ bool NavierSystem::element_constraint (bool request_jacobian)
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> > &dphi =
+  const std::vector<std::vector<RealGradient> >& dphi =
     fe_velocity->get_dphi();
 
   // The pressure shape functions at interior
   // quadrature points.
-  const std::vector<std::vector<Real> > &psi = fe_pressure->get_phi();
+  const std::vector<std::vector<Real> >& psi = fe_pressure->get_phi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_u_dofs = dof_indices_var[0].size();
@@ -244,7 +244,7 @@ bool NavierSystem::side_constraint (bool request_jacobian)
   const std::vector<Real> &JxW_side = fe_side_vel->get_JxW();
 
   // The velocity shape functions at side quadrature points.
-  const std::vector<std::vector<Real> > &phi_side =
+  const std::vector<std::vector<Real> >& phi_side =
     fe_side_vel->get_phi();
 
   // The XYZ locations (in physical space) of the
