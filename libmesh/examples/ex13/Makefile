@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2006-06-22 21:36:52 benkirk Exp $
+# $Id: Makefile,v 1.4 2006-07-21 01:03:46 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -33,7 +33,8 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   :=  ex13 ex13_nonlinear
+target 	   :=  ex13
+#target 	   :=  ex13 ex13_nonlinear
 
 
 all:: $(target)
