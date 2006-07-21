@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2006-07-21 01:03:46 roystgnr Exp $
+# $Id: Makefile,v 1.5 2006-07-21 01:52:58 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -64,7 +64,7 @@ run: $(target)
 	@echo "***************************************************************"
 	@echo " "
 	@./ex13
-	@./ex13_nonlinear -snes_ls cubic -snes_max_it 10 -ksp_rtol 1.e-3 -ksp_max_it 50 -ksp_xmonitor -ksp_gmres_restart 25 -snes_mf_operator -snes_view 
+	@#./ex13_nonlinear -snes_ls cubic -snes_max_it 10 -ksp_rtol 1.e-3 -ksp_max_it 50 -ksp_xmonitor -ksp_gmres_restart 25 -snes_mf_operator -snes_view 
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)
