@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.28 2006-03-29 21:02:56 roystgnr Exp $ */
+/* $Id: ex10.C,v 1.29 2006-07-21 01:47:05 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -371,14 +371,14 @@ int main (int argc, char** argv)
 		// This takes the error in \p error and decides which elements
 		// will be coarsened or refined.  Any element within 20% of the
 		// maximum error on any element will be refined, and any
-		// element within 10% of the minimum error on any element might
+		// element within 7% of the minimum error on any element might
 		// be coarsened. Note that the elements flagged for refinement
 		// will be refined, but those flagged for coarsening _might_ be
 		// coarsened.
-		mesh_refinement.flag_elements_by_error_fraction (error,
-								 0.80,
-								 0.07,
-								 5);
+		mesh_refinement.refine_fraction() = 0.80;
+		mesh_refinement.coarsen_fraction() = 0.07;
+		mesh_refinement.max_h_level() = 5;
+		mesh_refinement.flag_elements_by_error_fraction (error);
 		
 		// This call actually refines and coarsens the flagged
 		// elements.
