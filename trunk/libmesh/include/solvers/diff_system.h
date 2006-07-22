@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.8 2006-07-13 05:18:30 roystgnr Exp $
+// $Id: diff_system.h,v 1.9 2006-07-22 07:51:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -252,7 +252,7 @@ public:
   bool print_jacobians;
 
   /**
-   * Local components of nonlinear_solution
+   * Element by element components of nonlinear_solution
    */
   DenseVector<Number> elem_solution;
   std::vector<DenseSubVector<Number> *> elem_subsolutions;
@@ -262,6 +262,12 @@ public:
    */
   DenseVector<Number> elem_residual;
   DenseMatrix<Number> elem_jacobian;
+
+  /**
+   * @returns the current nonlinear solution for the specified global
+   * DOF.
+   */
+  Number current_nonlinear_solution (const unsigned int global_dof_number) const;
 
   /**
    * Element residual subvectors and Jacobian submatrices
@@ -287,6 +293,11 @@ protected:
    * in time and which are just constraints
    */
   std::vector<bool> _time_evolving;
+
+  /**
+   * Serial vector of nonlinear_solution
+   */
+  AutoPtr<NumericVector<Number> > current_local_nonlinear_solution;
 };
 
 

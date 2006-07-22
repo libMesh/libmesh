@@ -20,10 +20,6 @@ EulerSolver::~EulerSolver ()
 
 bool EulerSolver::element_residual (bool request_jacobian)
 {
-  // Global nonlinear solution at old timestep
-  NumericVector<Number> &old_nonlinear_solution =
-    _system.get_vector("_old_nonlinear_solution");
-
   unsigned int n_dofs = _system.elem_solution.size();
 
   // Local nonlinear solution at old timestep
@@ -99,10 +95,6 @@ bool EulerSolver::element_residual (bool request_jacobian)
 
 bool EulerSolver::side_residual (bool request_jacobian)
 {
-  // Global nonlinear solution at old timestep
-  NumericVector<Number> &old_nonlinear_solution =
-    _system.get_vector("_old_nonlinear_solution");
-
   unsigned int n_dofs = _system.elem_solution.size();
 
   // Local nonlinear solution at old timestep

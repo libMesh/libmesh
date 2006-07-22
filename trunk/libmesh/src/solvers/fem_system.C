@@ -280,9 +280,9 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
   const DofMap& dof_map = this->get_dof_map();
 
-  // Global nonlinear solution
-  NumericVector<Number> &nonlinear_solution =
-    this->get_vector("_nonlinear_solution");
+  this->get_vector("_nonlinear_solution").localize
+    (*current_local_nonlinear_solution,
+     dof_map.get_send_list());
 
   // Is this definitely necessary? [RHS]
   if (get_jacobian)
@@ -322,7 +322,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
       elem_solution.resize(n_dofs);
       for (unsigned int i=0; i != n_dofs; ++i)
-        elem_solution(i) = nonlinear_solution(dof_indices[i]);
+        elem_solution(i) = current_nonlinear_solution(dof_indices[i]);
 
       // These resize calls also zero out the residual and jacobian
       elem_residual.resize(n_dofs);
