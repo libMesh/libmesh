@@ -1,4 +1,4 @@
-// $Id: time_solver.h,v 1.7 2006-07-13 05:18:30 roystgnr Exp $
+// $Id: time_solver.h,v 1.8 2006-07-22 07:51:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -123,6 +123,12 @@ public:
   virtual void before_timestep () {}
 
   /**
+   * @returns the old nonlinear solution for the specified global
+   * DOF.
+   */
+  Number old_nonlinear_solution (const unsigned int global_dof_number) const;
+
+  /**
    * @returns a constant reference to the system we are solving.
    */
   const sys_type & system () const { return _system; }
@@ -149,6 +155,11 @@ protected:
    * and false thereafter
    */
   bool first_solve;
+
+  /**
+   * Serial vector of _system.get_vector("_old_nonlinear_solution")
+   */
+  AutoPtr<NumericVector<Number> > old_local_nonlinear_solution;
 };
 
 

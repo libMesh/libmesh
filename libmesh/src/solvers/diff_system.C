@@ -1,4 +1,6 @@
 #include "diff_system.h"
+#include "dof_map.h"
+#include "numeric_vector.h"
 #include "time_solver.h"
 
 
@@ -15,7 +17,8 @@ DifferentiableSystem::DifferentiableSystem
   print_residual_norms(false),
   print_residuals(false),
   print_jacobian_norms(false),
-  print_jacobians(false)
+  print_jacobians(false),
+  current_local_nonlinear_solution(NumericVector<Number>::build())
 {
   untested();
 }
@@ -31,6 +34,9 @@ DifferentiableSystem::~DifferentiableSystem ()
 void DifferentiableSystem::reinit ()
 {
   Parent::reinit();
+
+  // Resize the serial nonlinear solution for the current mesh
+  current_local_nonlinear_solution->init (this->n_dofs());
 
   time_solver->reinit();
 }
@@ -85,6 +91,9 @@ void DifferentiableSystem::init_data ()
             (new DenseSubMatrix<Number>(elem_jacobian));
         }
     }
+
+  // Resize the serial nonlinear solution for the current mesh
+  current_local_nonlinear_solution->init (this->n_dofs());
 }
 
 
@@ -99,4 +108,14 @@ void DifferentiableSystem::assemble ()
 void DifferentiableSystem::solve ()
 {
   time_solver->solve();
+}
+
+
+Number DifferentiableSystem::current_nonlinear_solution (const unsigned int global_dof_number) const
+{
+  // Check the sizes
+  assert (global_dof_number < this->get_dof_map().n_dofs());
+  assert (global_dof_number < current_local_nonlinear_solution->size());
+
+  return (*current_local_nonlinear_solution)(global_dof_number);
 }
