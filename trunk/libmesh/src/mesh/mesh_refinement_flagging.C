@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.23 2006-07-20 22:48:46 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.24 2006-07-23 05:10:51 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -239,11 +239,11 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   // The maximum number of active elements to flag for coarsening
   const unsigned int max_elem_coarsen =
-    static_cast<unsigned int>(_coarsen_fraction * n_active_elem);
+    static_cast<unsigned int>(_coarsen_fraction * n_active_elem) + 1;
 
   // The maximum number of elements to flag for refinement
   const unsigned int max_elem_refine  =
-    static_cast<unsigned int>(_refine_fraction  * n_active_elem);
+    static_cast<unsigned int>(_refine_fraction  * n_active_elem) + 1;
 
   // Clean up the refinement flags.  These could be left
   // over from previous refinement steps.
