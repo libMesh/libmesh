@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.10 2006-07-20 22:48:46 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.11 2006-07-23 05:22:15 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -72,6 +72,9 @@ int main (int argc, char** argv)
     mesh_refinement.coarsen_by_parents() = true;
     mesh_refinement.absolute_global_tolerance() = global_tolerance;
     mesh_refinement.nelem_target() = nelem_target;
+    mesh_refinement.refine_fraction() = 0.3;
+    mesh_refinement.coarsen_fraction() = 0.3;
+    mesh_refinement.coarsen_threshold() = 0.1;
 
     // Use the MeshTools::Generation mesh generator to create a uniform
     // grid on the square [-1,1]^D.  We instruct the mesh generator
