@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.4 2006-06-26 13:52:37 spetersen Exp $
+// $Id: uniform_refinement_estimator.C,v 1.5 2006-07-25 17:59:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -64,6 +64,9 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
   // the number of elements, initialize it to 0.
   error_per_cell.resize (mesh.n_elem());
   std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
+
+  // Check for the use of component_mask
+  this->convert_component_mask_to_scale();
 
   // Check for a valid component_scale
   if (!component_scale.empty())

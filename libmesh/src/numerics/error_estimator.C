@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.19 2005-05-11 23:11:59 benkirk Exp $
+// $Id: error_estimator.C,v 1.20 2006-07-25 17:59:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,4 +44,23 @@ void ErrorEstimator::reduce_error (std::vector<float>& error_per_cell) const
 		     MPI_FLOAT, MPI_SUM, libMesh::COMM_WORLD);
     }  
 #endif
+}
+
+
+
+void ErrorEstimator::convert_component_mask_to_scale()
+{
+  if (!component_mask.empty())
+    {
+      // component_mask has been replaced by component_scale,
+      // and will be removed in future libMesh versions
+      deprecated();
+
+      component_scale.resize(component_mask.size(),0.0);
+      for (unsigned int i=0; i != component_mask.size(); ++i)
+        {
+          if (component_mask[i])
+            component_scale[i] = 1.0;
+        }
+    }
 }
