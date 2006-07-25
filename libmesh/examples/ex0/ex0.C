@@ -1,4 +1,4 @@
-/* $Id: ex0.C,v 1.3 2005-07-20 20:17:03 knezed01 Exp $ */
+/* $Id: ex0.C,v 1.4 2006-07-25 20:04:06 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -61,18 +61,6 @@ int main(int argc, char** argv)
     const unsigned int dim = 1;
     Mesh mesh(dim);
 
-
-    // Refinement parameters
-    const unsigned int max_r_steps = 5; // Refine the mesh 5 times
-    const unsigned int max_r_level = 5; // Maximum refinement level
-
-    // These parameters determine the proportion of elements that will
-    // be refined and coarsened. Any element within 30% of the maximum 
-    // error on any element will be refined, and any element within 30% 
-    // of the minimum error on any element might be coarsened
-    const Real refine_percentage   = 0.7;
-    const Real coarsen_percentage  = 0.3;
-
     // Build a 1D mesh with 4 elements from x=0 to x=1, using 
     // EDGE3 (i.e. quadratic) 1D elements. They are called EDGE3 elements
     // because a quadratic element contains 3 nodes.
@@ -95,8 +83,20 @@ int main(int argc, char** argv)
     // refining the mesh.
     MeshRefinement mesh_refinement(mesh);
 
+    // These parameters determine the proportion of elements that will
+    // be refined and coarsened. Any element within 30% of the maximum 
+    // error on any element will be refined, and any element within 30% 
+    // of the minimum error on any element might be coarsened
+    mesh_refinement.refine_fraction()  = 0.7;
+    mesh_refinement.coarsen_fraction() = 0.3;
+    // We won't refine any element more than 5 times in total
+    mesh_refinement.max_h_level()      = 5;
+
     // Initialize the data structures for the equation system.
     equation_systems.init();
+
+    // Refinement parameters
+    const unsigned int max_r_steps = 5; // Refine the mesh 5 times
 
     // Define the refinement loop
     for(unsigned int r_step=0; r_step<=max_r_steps; r_step++)
@@ -117,11 +117,7 @@ int main(int argc, char** argv)
         error_estimator.estimate_error(system, error);
 
         // Flag elements to be refined and coarsened
-        mesh_refinement.flag_elements_by_error_fraction
-          (error,
-           refine_percentage,
-           coarsen_percentage,
-           max_r_level);
+        mesh_refinement.flag_elements_by_error_fraction (error);
 
         // Perform refinement and coarsening
         mesh_refinement.refine_and_coarsen_elements();
