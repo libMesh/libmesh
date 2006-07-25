@@ -1,4 +1,4 @@
-// $Id: hp_selector.C,v 1.9 2006-06-26 13:52:37 spetersen Exp $
+// $Id: hp_selector.C,v 1.10 2006-07-25 17:59:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -152,7 +152,7 @@ void HPSelector::select_refinement (System &system)
   // The system number (for doing bad hackery)
   const unsigned int sys_num = system.number();
 
-  // Check for a valid component_mask
+  // Check for a valid component_scale
   if (!component_scale.empty())
     {
       if (component_scale.size() != n_vars)

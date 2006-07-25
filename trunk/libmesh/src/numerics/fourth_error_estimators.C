@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.C,v 1.9 2006-03-10 22:42:54 roystgnr Exp $
+// $Id: fourth_error_estimators.C,v 1.10 2006-07-25 17:59:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -106,8 +106,10 @@ void LaplacianErrorEstimator::estimate_error (const System& system,
   error_per_cell.resize (mesh.n_elem());
   std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
 
+  // Check for the use of component_mask
+  this->convert_component_mask_to_scale();
 
-  // Check for a valid component_mask
+  // Check for a valid component_scale
   if (!component_scale.empty())
     {
       if (component_scale.size() != n_vars)

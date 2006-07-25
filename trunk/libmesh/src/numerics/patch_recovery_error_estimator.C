@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.14 2005-10-03 18:55:53 spetersen Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.15 2006-07-25 17:59:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -117,6 +117,8 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
   error_per_cell.resize (mesh.n_elem());
   std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
 
+  // Check for the use of component_mask
+  this->convert_component_mask_to_scale();
 
   // Check for a valid component_scale
   if (!component_scale.empty())

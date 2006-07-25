@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.17 2005-06-28 18:52:23 jwpeterson Exp $
+// $Id: kelly_error_estimator.C,v 1.18 2006-07-25 17:59:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -110,6 +110,9 @@ void KellyErrorEstimator::estimate_error (const System& system,
   // neighbors
   std::vector<float> n_flux_faces (error_per_cell.size());
   
+  // Check for the use of component_mask
+  this->convert_component_mask_to_scale();
+
   // Check for a valid component_scale
   if (!component_scale.empty())
     {
