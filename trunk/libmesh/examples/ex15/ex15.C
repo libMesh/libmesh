@@ -1,4 +1,4 @@
-/* $Id: ex15.C,v 1.12 2006-06-26 13:52:37 spetersen Exp $ */
+/* $Id: ex15.C,v 1.13 2006-07-25 20:24:58 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -227,6 +227,9 @@ int main(int argc, char** argv)
 
     // Mesh Refinement object
     MeshRefinement mesh_refinement(mesh);
+    mesh_refinement.refine_fraction() = refine_percentage;
+    mesh_refinement.coarsen_fraction() = coarsen_percentage;
+    mesh_refinement.max_h_level() = max_r_level;
 
     // Create an equation systems object.
     EquationSystems equation_systems (mesh);
@@ -348,9 +351,7 @@ int main(int argc, char** argv)
 		LaplacianErrorEstimator error_estimator;
 
 		error_estimator.estimate_error(system, error);
-                mesh_refinement.flag_elements_by_elem_fraction
-				(error, refine_percentage,
-				 coarsen_percentage, max_r_level);
+                mesh_refinement.flag_elements_by_elem_fraction (error);
 
 		std::cerr << "Mean Error: " << error.mean() <<
 				std::endl;
