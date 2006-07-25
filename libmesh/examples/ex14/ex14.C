@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.28 2006-05-19 22:13:32 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.29 2006-07-25 20:26:32 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -173,6 +173,9 @@ int main(int argc, char** argv)
 
     // Mesh Refinement object
     MeshRefinement mesh_refinement(mesh);
+    mesh_refinement.refine_fraction() = refine_percentage;
+    mesh_refinement.coarsen_fraction() = coarsen_percentage;
+    mesh_refinement.max_h_level() = max_r_level;
 
     // Create an equation systems object.
     EquationSystems equation_systems (mesh);
@@ -306,10 +309,7 @@ int main(int argc, char** argv)
 		// be coarsened. Note that the elements flagged for refinement
 		// will be refined, but those flagged for coarsening _might_ be
 		// coarsened.
-		mesh_refinement.flag_elements_by_error_fraction (error,
-								 refine_percentage,
-								 coarsen_percentage,
-								 max_r_level);
+		mesh_refinement.flag_elements_by_error_fraction (error);
 
                 // If we are doing adaptive p refinement, we want
                 // elements flagged for that instead.
