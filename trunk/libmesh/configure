@@ -1463,7 +1463,6 @@ test -n "$target_alias" &&
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
 
-
 ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3144,16 +3143,16 @@ echo "${ECHO_T}proper compiler flags" >&6
                 case "$GXX_VERSION" in
                     intel_icc_v8.1 | intel_icc_v9.0 | intel_icc_v9.1)
 
-                            INTEL_AX_FLAG="-axK"
+                            INTEL_AX_FLAG="-tpp6 -axK"
               if test $target_cpu = "x86_64" ; then
                 INTEL_AX_FLAG="-xP"
               fi
 
               CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
-              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 -tpp6 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
               CXXFLAGS_DVL="$CXXFLAGS_DBG"
               CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
-              CFLAGS_OPT="-O2 -Ob2 -tpp6 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CFLAGS_OPT="-O2 -Ob2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
               CFLAGS_DVL="$CFLAGS_DBG"
               ;;
 
@@ -8233,7 +8232,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:8236:" \
+echo "$as_me:8235:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8427,7 +8426,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:8430: \"$ac_link\") >&5
+(eval echo $as_me:8429: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -8505,7 +8504,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:8508: \"$ac_link\") >&5
+(eval echo $as_me:8507: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS

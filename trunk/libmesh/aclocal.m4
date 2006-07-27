@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.100 2006-07-26 21:25:29 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.101 2006-07-27 18:15:50 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -427,16 +427,16 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
               dnl       option causes a segmentation fault in libmesh.C, probably others...
 
               dnl CPU-specific flags: -axK is for ia32, -xP is for x86_64
-              INTEL_AX_FLAG="-axK"
+              INTEL_AX_FLAG="-tpp6 -axK"
               if test $target_cpu = "x86_64" ; then
                 INTEL_AX_FLAG="-xP"
               fi
 
               CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
-              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 -tpp6 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
               CXXFLAGS_DVL="$CXXFLAGS_DBG"
               CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
-              CFLAGS_OPT="-O2 -Ob2 -tpp6 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CFLAGS_OPT="-O2 -Ob2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
               CFLAGS_DVL="$CFLAGS_DBG"
               ;;
           
