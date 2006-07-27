@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.24 2005-08-18 19:12:31 knezed01 Exp $
+// $Id: mesh_communication.C,v 1.25 2006-07-27 23:10:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -344,8 +344,21 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 		
 		elem->set_node(n) = mesh.node_ptr (conn[cnt++]);
 	      }
-	  }
-      }
+	  } // end while cnt < conn.size
+
+	// All the elements at each level have been added, and their node pointers
+	// have been set.  Now compute the node keys to put the mesh into a state consistent
+	// with the state after being constructed through normal refinements. 
+	// The new nodes were added through Mesh::add_point(), which
+	// allocates brand new memory for the point, and does not copy
+	// over any key.
+	MeshBase::element_iterator it = mesh.elements_begin();
+	const MeshBase::element_iterator end = mesh.elements_end();
+	for (; it!=end; ++it)
+	  (*it)->compute_children_node_keys();
+	
+      } // end if iam != cpu 0
+    
     
     assert (mesh.n_elem() == n_elem);
   } // Done distributing the elements

@@ -1,4 +1,4 @@
-// $Id: petsc_linear_solver.C,v 1.8 2006-06-08 00:05:08 roystgnr Exp $
+// $Id: petsc_linear_solver.C,v 1.9 2006-07-27 23:10:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -135,6 +135,10 @@ void PetscLinearSolver<T>::init ()
       //  routines.
       
       ierr = KSPSetFromOptions (_ksp);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      // Not sure if this is necessary, or if it is already handled by KSPSetFromOptions?
+      ierr = PCSetFromOptions (_pc);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 	       
