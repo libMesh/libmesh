@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.29 2006-04-27 17:57:29 roystgnr Exp $
+// $Id: system_projection.C,v 1.30 2006-07-27 17:54:39 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1068,7 +1068,119 @@ void System::project_vector (Number fptr(const Point& p,
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                 }
-              // Assume that C_ONE elements have a single nodal
+              // The hermite element vertex shape functions are weird
+              else if (fe_type.family == HERMITE)
+                {
+                  Ue(current_dof) = fptr(elem->point(n),
+                                         parameters,
+                                         this->name(),
+                                         this->variable_name(var));
+                  dof_is_fixed[current_dof] = true;
+                  current_dof++;
+                  Gradient g = gptr(elem->point(n),
+                                    parameters,
+                                    this->name(),
+                                    this->variable_name(var));
+                  // x derivative
+                  Ue(current_dof) = g(0);
+                  dof_is_fixed[current_dof] = true;
+                  current_dof++;
+                  if (dim > 1)
+                    {
+                      // We'll finite difference mixed derivatives
+                      Point nxminus = elem->point(n),
+                            nxplus = elem->point(n);
+                      nxminus(0) -= TOLERANCE;
+                      nxplus(0) += TOLERANCE;
+                      Gradient gxminus = gptr(nxminus,
+                                              parameters,
+                                              this->name(),
+                                              this->variable_name(var));
+                      Gradient gxplus = gptr(nxminus,
+                                             parameters,
+                                             this->name(),
+                                             this->variable_name(var));
+                      // y derivative
+                      Ue(current_dof) = g(1);
+                      dof_is_fixed[current_dof] = true;
+                      current_dof++;
+                      // xy derivative
+                      Ue(current_dof) = (gxplus(1) - gxminus(1))
+                                        / 2. / TOLERANCE;
+                      dof_is_fixed[current_dof] = true;
+                      current_dof++;
+
+                      if (dim > 2)
+                        {
+                          // z derivative
+                          Ue(current_dof) = g(2);
+                          dof_is_fixed[current_dof] = true;
+                          current_dof++;
+                          // xz derivative
+                          Ue(current_dof) = (gxplus(2) - gxminus(2))
+                                            / 2. / TOLERANCE;
+                          dof_is_fixed[current_dof] = true;
+                          current_dof++;
+                          // We need new points for yz
+                          Point nyminus = elem->point(n),
+                                nyplus = elem->point(n);
+                          nyminus(1) -= TOLERANCE;
+                          nyplus(1) += TOLERANCE;
+                          Gradient gyminus = gptr(nyminus,
+                                                  parameters,
+                                                  this->name(),
+                                                  this->variable_name(var));
+                          Gradient gyplus = gptr(nyminus,
+                                                 parameters,
+                                                 this->name(),
+                                                 this->variable_name(var));
+                          // xz derivative
+                          Ue(current_dof) = (gyplus(2) - gyminus(2))
+                                            / 2. / TOLERANCE;
+                          dof_is_fixed[current_dof] = true;
+                          current_dof++;
+                          // Getting a 2nd order xyz is more tedious
+                          Point nxmym = elem->point(n),
+                                nxmyp = elem->point(n),
+                                nxpym = elem->point(n),
+                                nxpyp = elem->point(n);
+                          nxmym(0) -= TOLERANCE;
+                          nxmym(1) -= TOLERANCE;
+                          nxmyp(0) -= TOLERANCE;
+                          nxmyp(1) += TOLERANCE;
+                          nxpym(0) += TOLERANCE;
+                          nxpym(1) -= TOLERANCE;
+                          nxpyp(0) += TOLERANCE;
+                          nxpyp(1) += TOLERANCE;
+                          Gradient gxmym = gptr(nxmym,
+                                                parameters,
+                                                this->name(),
+                                                this->variable_name(var));
+                          Gradient gxmyp = gptr(nxmyp,
+                                                parameters,
+                                                this->name(),
+                                                this->variable_name(var));
+                          Gradient gxpym = gptr(nxpym,
+                                                parameters,
+                                                this->name(),
+                                                this->variable_name(var));
+                          Gradient gxpyp = gptr(nxpyp,
+                                                parameters,
+                                                this->name(),
+                                                this->variable_name(var));
+                          Real gxzplus = (gxpyp(2) - gxmyp(2))
+                                         / 2. / TOLERANCE;
+                          Real gxzminus = (gxpym(2) - gxmym(2))
+                                          / 2. / TOLERANCE;
+                          // xyz derivative
+                          Ue(current_dof) = (gxzplus - gxzminus)
+                                            / 2. / TOLERANCE;
+                          dof_is_fixed[current_dof] = true;
+                          current_dof++;
+                        }
+                    }
+                }
+              // Assume that other C_ONE elements have a single nodal
               // value shape function and nodal gradient component
               // shape functions
               else if (cont == C_ONE)
