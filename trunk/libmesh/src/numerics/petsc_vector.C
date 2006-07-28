@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.41 2005-12-28 13:47:10 spetersen Exp $
+// $Id: petsc_vector.C,v 1.42 2006-07-28 20:07:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -134,6 +134,8 @@ void PetscVector<T>::set (const unsigned int i, const T value)
 
   ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, INSERT_VALUES);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  this->_is_closed = false;
 }
 
 
@@ -149,6 +151,8 @@ void PetscVector<T>::add (const unsigned int i, const T value)
 
   ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, ADD_VALUES);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  this->_is_closed = false;
 }
 
 
@@ -235,6 +239,8 @@ void PetscVector<T>::add (const T v_in)
       ierr = VecSetValues (_vec, 1, &ig, &value, INSERT_VALUES);
  	     CHKERRABORT(libMesh::COMM_WORLD,ierr); 
     }
+
+  this->_is_closed = false;
 }
 
 
@@ -362,6 +368,8 @@ template <typename T>
 NumericVector<T>& 
 PetscVector<T>::operator = (const T s_in)
 {
+  assert(this->closed());
+
   int ierr = 0;
   PetscScalar s = static_cast<PetscScalar>(s_in);
 
