@@ -1,4 +1,4 @@
-// $Id: type_vector.C,v 1.11 2005-07-13 21:43:49 benkirk Exp $
+// $Id: type_vector.C,v 1.12 2006-07-28 23:28:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -122,14 +122,29 @@ void TypeVector<T>::write_unformatted (std::ostream &out,
 
 
 
-template <>
-bool TypeVector<Real>::operator < (const TypeVector<Real>& rhs) const
+template <typename T>
+bool TypeVector<T>::operator < (const TypeVector<T>& rhs) const
 {
   for (unsigned int i=0; i<DIM; i++)
     {
       if ((*this)(i) < rhs(i))
         return true;
       if ((*this)(i) > rhs(i))
+        return false;
+    }
+  return false;
+}
+
+
+
+template <typename T>
+bool TypeVector<T>::operator > (const TypeVector<T>& rhs) const
+{
+  for (unsigned int i=0; i<DIM; i++)
+    {
+      if ((*this)(i) > rhs(i))
+        return true;
+      if ((*this)(i) < rhs(i))
         return false;
     }
   return false;
@@ -157,6 +172,22 @@ bool TypeVector<Complex>::operator < (const TypeVector<Complex>& rhs) const
 
 
 
+template <>
+bool TypeVector<Complex>::operator > (const TypeVector<Complex>& rhs) const
+{
+  for (unsigned int i=0; i<DIM; i++)
+    {
+      if ((*this)(i).real() > rhs(i).real())
+        return true;
+      if ((*this)(i).real() < rhs(i).real())
+        return false;
+      if ((*this)(i).imag() > rhs(i).imag())
+        return true;
+      if ((*this)(i).imag() < rhs(i).imag())
+        return false;
+    }
+  return false;
+}
 #endif
 
 

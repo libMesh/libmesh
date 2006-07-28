@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.16 2005-11-07 20:30:45 roystgnr Exp $
+// $Id: type_vector.h,v 1.17 2006-07-28 23:28:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -248,9 +248,19 @@ public:
   /**
    * @returns \p true if this vector is "less"
    * than another.  Useful for sorting.
+   * Also used for choosing some arbitrary basis function
+   * orientations
    */
   bool operator < (const TypeVector<T>& rhs) const;
   
+  /**
+   * @returns \p true if this vector is "greater"
+   * than another.  Useful for sorting.
+   * Also used for choosing some arbitrary basis function
+   * orientations
+   */
+  bool operator > (const TypeVector<T>& rhs) const;
+
   /**
    * Formatted print to \p std::cout.
    */
