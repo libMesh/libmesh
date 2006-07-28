@@ -61,6 +61,9 @@ const Real relative_tolerance = 1.e-3;
   // Now we begin the nonlinear loop
   for (unsigned int l=0; l<max_nonlinear_iterations; ++l)
     {
+      if (!quiet)
+        std::cout << "Assembling System" << std::endl;
+
       PAUSE_LOG("solve()", "NewtonSolver");
       _system.assembly(true, true);
       RESTART_LOG("solve()", "NewtonSolver");
