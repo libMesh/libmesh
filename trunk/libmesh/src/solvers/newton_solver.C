@@ -46,7 +46,7 @@ const Real relative_tolerance = 1.e-3;
   NumericVector<Number> &newton_iterate =
     _system.get_vector("_nonlinear_solution");
   newton_iterate.close();
-  solution.close();
+//  solution.close();
 
   NumericVector<Number> &rhs = *(_system.rhs);
 
@@ -136,7 +136,7 @@ const Real relative_tolerance = 1.e-3;
         std::cout << "Trying full Newton step" << std::endl;
       // Take a full Newton step
       newton_iterate.add (-1., solution);
-      newton_iterate.close();
+//      newton_iterate.close();
 
       // Check residual with full Newton step
       Real steplength = 1.;
@@ -167,12 +167,14 @@ const Real relative_tolerance = 1.e-3;
                 std::cout << "Shrinking Newton step to "
                           << steplength << std::endl;
               newton_iterate.add (steplength, solution);
-              newton_iterate.close();
+//              newton_iterate.close();
 
               // Check residual with fractional Newton step
               PAUSE_LOG("solve()", "NewtonSolver");
               _system.assembly (true, false);
               RESTART_LOG("solve()", "NewtonSolver");
+
+              rhs.close();
               current_residual = rhs.l2_norm();
               if (!quiet)
                 std::cout << "Current Residual: "
@@ -226,7 +228,7 @@ const Real relative_tolerance = 1.e-3;
   // for other libMesh functions that expect it
 
   solution = newton_iterate;
-  solution.close();
+//  solution.close();
 
   // We may need to localize a parallel solution
   _system.update ();
