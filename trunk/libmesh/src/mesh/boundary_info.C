@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.45 2006-06-15 16:38:05 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.46 2006-07-31 15:51:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -299,20 +299,22 @@ short int BoundaryInfo::boundary_id(const Node* node) const
 
 
 
-short int BoundaryInfo::boundary_id(const Elem* elem,
+short int BoundaryInfo::boundary_id(const Elem* const elem,
 				    const unsigned short int side) const
 {
   assert (elem != NULL);
 
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
-  if (elem->level() != 0) elem = elem->top_parent ();
+  const Elem*  searched_elem = elem;
+  if (elem->level() != 0)
+    searched_elem = elem->top_parent ();
   
   std::pair<std::multimap<const Elem*,
                           std::pair<unsigned short int, short int> >::const_iterator,
             std::multimap<const Elem*,
                           std::pair<unsigned short int, short int> >::const_iterator > 
-    e = _boundary_side_id.equal_range(elem);
+    e = _boundary_side_id.equal_range(searched_elem);
 
   // elem not in the data structure
   if (e.first == e.second)
