@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.14 2005-06-11 03:59:17 jwpeterson Exp $
+// $Id: boundary_info.h,v 1.15 2006-07-31 15:50:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -156,7 +156,7 @@ public:
    * if the \p side does not have an associated boundary id, hence
    * \p invalid_id can be used as the default boundary id.
    */
-  short int boundary_id (const Elem* elem,
+  short int boundary_id (const Elem* const elem,
 			 const unsigned short int side) const;
 
   /**
