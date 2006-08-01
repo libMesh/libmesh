@@ -1,4 +1,4 @@
-// $Id: fe_clough_shape_2D.C,v 1.7 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_clough_shape_2D.C,v 1.8 2006-08-01 15:10:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -185,7 +185,7 @@ void clough_compute_coefs(const Elem* elem)
 
   // give normal vectors a globally unique orientation
 
-  if (elem->node(2) < elem->node(1))
+  if (elem->point(2) < elem->point(1))
     {
 //      std::cerr << "Flipping nodes " << elem->node(2);
 //      std::cerr << " and " << elem->node(1);
@@ -202,7 +202,7 @@ void clough_compute_coefs(const Elem* elem)
 //      std::cerr << " around node " << elem->node(4);
 //      std::cerr << std::endl;
     }
-  if (elem->node(0) < elem->node(2))
+  if (elem->point(0) < elem->point(2))
     {
 //      std::cerr << "Flipping nodes " << elem->node(0);
 //      std::cerr << " and " << elem->node(2);
@@ -221,7 +221,7 @@ void clough_compute_coefs(const Elem* elem)
 //      std::cerr << " around node " << elem->node(5);
 //      std::cerr << std::endl;
     }
-  if (elem->node(1) < elem->node(0))
+  if (elem->point(1) < elem->point(0))
     {
 //      std::cerr << "Flipping nodes " << elem->node(1);
 //      std::cerr << " and " << elem->node(0);

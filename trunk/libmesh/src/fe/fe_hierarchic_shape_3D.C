@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_3D.C,v 1.21 2006-06-20 20:53:27 benkirk Exp $
+// $Id: fe_hierarchic_shape_3D.C,v 1.22 2006-08-01 15:10:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,14 +29,14 @@
 namespace
 {
 
-  unsigned int get_min_node(const Elem *elem,
-			    unsigned int a,
-			    unsigned int b,
-			    unsigned int c,
-			    unsigned int d)
+  Point get_min_point(const Elem *elem,
+		      unsigned int a,
+		      unsigned int b,
+		      unsigned int c,
+		      unsigned int d)
   {
-    return std::min(std::min(elem->node(a),elem->node(b)),
-		    std::min(elem->node(c),elem->node(d)));
+    return std::min(std::min(elem->point(a),elem->point(b)),
+		    std::min(elem->point(c),elem->point(d)));
   }
   
   void cube_indices(const Elem *elem,
@@ -121,7 +121,7 @@ namespace
 	i0 = i - 6;
 	i1 = 0;
 	i2 = 0;
-	if (elem->node(0) > elem->node(1))
+	if (elem->point(0) > elem->point(1))
 	  xi = -xi_saved;
       }
     // Edge 1
@@ -130,7 +130,7 @@ namespace
 	i0 = 1;
 	i1 = i - e - 6;
 	i2 = 0;
-	if (elem->node(1) > elem->node(2))
+	if (elem->point(1) > elem->point(2))
 	  eta = -eta_saved;
       }
     // Edge 2
@@ -139,7 +139,7 @@ namespace
 	i0 = i - 2*e - 6;
 	i1 = 1;
 	i2 = 0;
-	if (elem->node(3) > elem->node(2))
+	if (elem->point(3) > elem->point(2))
 	  xi = -xi_saved;
       }
     // Edge 3
@@ -148,7 +148,7 @@ namespace
 	i0 = 0;
 	i1 = i - 3*e - 6;
 	i2 = 0;
-	if (elem->node(0) > elem->node(3))
+	if (elem->point(0) > elem->point(3))
 	  eta = -eta_saved;
       }
     // Edge 4
@@ -157,7 +157,7 @@ namespace
 	i0 = 0;
 	i1 = 0;
 	i2 = i - 4*e - 6;
-	if (elem->node(0) > elem->node(4))
+	if (elem->point(0) > elem->point(4))
 	  zeta = -zeta_saved;
       }                
     // Edge 5
@@ -166,7 +166,7 @@ namespace
 	i0 = 1;
 	i1 = 0;
 	i2 = i - 5*e - 6;
-	if (elem->node(1) > elem->node(5))
+	if (elem->point(1) > elem->point(5))
 	  zeta = -zeta_saved;
       }                
     // Edge 6
@@ -175,7 +175,7 @@ namespace
 	i0 = 1;
 	i1 = 1;
 	i2 = i - 6*e - 6;
-	if (elem->node(2) > elem->node(6))
+	if (elem->point(2) > elem->point(6))
 	  zeta = -zeta_saved;
       }
     // Edge 7
@@ -184,7 +184,7 @@ namespace
 	i0 = 0;
 	i1 = 1;
 	i2 = i - 7*e - 6;
-	if (elem->node(3) > elem->node(7))
+	if (elem->point(3) > elem->point(7))
 	  zeta = -zeta_saved;
       }                
     // Edge 8
@@ -193,7 +193,7 @@ namespace
 	i0 = i - 8*e - 6;
 	i1 = 0;
 	i2 = 1;
-	if (elem->node(4) > elem->node(5))
+	if (elem->point(4) > elem->point(5))
 	  xi = -xi_saved;
       }
     // Edge 9
@@ -202,7 +202,7 @@ namespace
 	i0 = 1;
 	i1 = i - 9*e - 6;
 	i2 = 1;
-	if (elem->node(5) > elem->node(6))
+	if (elem->point(5) > elem->point(6))
 	  eta = -eta_saved;
       }                
     // Edge 10
@@ -211,7 +211,7 @@ namespace
 	i0 = i - 10*e - 6;
 	i1 = 1;
 	i2 = 1;
-	if (elem->node(7) > elem->node(6))
+	if (elem->point(7) > elem->point(6))
 	  xi = -xi_saved;
       }
     // Edge 11
@@ -220,7 +220,7 @@ namespace
 	i0 = 0;
 	i1 = i - 11*e - 6;
 	i2 = 1;
-	if (elem->node(4) > elem->node(7))
+	if (elem->point(4) > elem->point(7))
 	  eta = -eta_saved;
       }
     // Face 0
@@ -230,10 +230,10 @@ namespace
 	i0 = square_number_row[basisnum] + 2;
 	i1 = square_number_column[basisnum] + 2;
 	i2 = 0;
-	const unsigned int min_node = get_min_node(elem, 1, 2, 0, 3);
+	const Point min_point = get_min_point(elem, 1, 2, 0, 3);
 
-	if (elem->node(0) == min_node)
-	  if (elem->node(1) == std::min(elem->node(1), elem->node(3)))
+	if (elem->point(0) == min_point)
+	  if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
 	    {
 	      // Case 1
 	      xi  = xi_saved;
@@ -246,8 +246,8 @@ namespace
 	      eta = xi_saved;
 	    }
 
-	else if (elem->node(3) == min_node)
-	  if (elem->node(0) == std::min(elem->node(0), elem->node(2)))
+	else if (elem->point(3) == min_point)
+	  if (elem->point(0) == std::min(elem->point(0), elem->point(2)))
 	    {
 	      // Case 3
 	      xi  = -eta_saved;
@@ -260,8 +260,8 @@ namespace
 	      eta = -eta_saved;
 	    }
 
-	else if (elem->node(2) == min_node)
-	  if (elem->node(3) == std::min(elem->node(3), elem->node(1)))
+	else if (elem->point(2) == min_point)
+	  if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
 	    {
 	      // Case 5
 	      xi  = -xi_saved;
@@ -274,8 +274,8 @@ namespace
 	      eta = -xi_saved;
 	    }
 
-	else if (elem->node(1) == min_node)
-	  if (elem->node(2) == std::min(elem->node(2), elem->node(0)))
+	else if (elem->point(1) == min_point)
+	  if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
 	    {
 	      // Case 7
 	      xi  = eta_saved;
@@ -295,10 +295,10 @@ namespace
 	i0 = square_number_row[basisnum] + 2;
 	i1 = 0;
 	i2 = square_number_column[basisnum] + 2;
-	const unsigned int min_node = get_min_node(elem, 0, 1, 5, 4);
+	const Point min_point = get_min_point(elem, 0, 1, 5, 4);
 
-	if (elem->node(0) == min_node)
-	  if (elem->node(1) == std::min(elem->node(1), elem->node(4)))
+	if (elem->point(0) == min_point)
+	  if (elem->point(1) == std::min(elem->point(1), elem->point(4)))
 	    {
 	      // Case 1
 	      xi   = xi_saved;
@@ -311,8 +311,8 @@ namespace
 	      zeta = xi_saved;
 	    }
 
-	else if (elem->node(1) == min_node)
-	  if (elem->node(5) == std::min(elem->node(5), elem->node(0)))
+	else if (elem->point(1) == min_point)
+	  if (elem->point(5) == std::min(elem->point(5), elem->point(0)))
 	    {
 	      // Case 3
 	      xi   = zeta_saved;
@@ -325,8 +325,8 @@ namespace
 	      zeta = zeta_saved;
 	    }
 
-	else if (elem->node(5) == min_node)
-	  if (elem->node(4) == std::min(elem->node(4), elem->node(1)))
+	else if (elem->point(5) == min_point)
+	  if (elem->point(4) == std::min(elem->point(4), elem->point(1)))
 	    {
 	      // Case 5
 	      xi   = -xi_saved;
@@ -339,8 +339,8 @@ namespace
 	      zeta = -xi_saved;
 	    }
 
-	else if (elem->node(4) == min_node)
-	  if (elem->node(0) == std::min(elem->node(0), elem->node(5)))
+	else if (elem->point(4) == min_point)
+	  if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
 	    {
 	      // Case 7
 	      xi   = -xi_saved;
@@ -360,10 +360,10 @@ namespace
 	i0 = 1;
 	i1 = square_number_row[basisnum] + 2;
 	i2 = square_number_column[basisnum] + 2;
-	const unsigned int min_node = get_min_node(elem, 1, 2, 6, 5);
+	const Point min_point = get_min_point(elem, 1, 2, 6, 5);
 
-	if (elem->node(1) == min_node)
-	  if (elem->node(2) == std::min(elem->node(2), elem->node(5)))
+	if (elem->point(1) == min_point)
+	  if (elem->point(2) == std::min(elem->point(2), elem->point(5)))
 	    {
 	      // Case 1
 	      eta  = eta_saved;
@@ -376,8 +376,8 @@ namespace
 	      zeta = eta_saved;
 	    }
 
-	else if (elem->node(2) == min_node)
-	  if (elem->node(6) == std::min(elem->node(6), elem->node(1)))
+	else if (elem->point(2) == min_point)
+	  if (elem->point(6) == std::min(elem->point(6), elem->point(1)))
 	    {
 	      // Case 3
 	      eta  = zeta_saved;
@@ -390,8 +390,8 @@ namespace
 	      zeta = zeta_saved;
 	    }
 
-	else if (elem->node(6) == min_node)
-	  if (elem->node(5) == std::min(elem->node(5), elem->node(2)))
+	else if (elem->point(6) == min_point)
+	  if (elem->point(5) == std::min(elem->point(5), elem->point(2)))
 	    {
 	      // Case 5
 	      eta  = -eta_saved;
@@ -404,8 +404,8 @@ namespace
 	      zeta = -eta_saved;
 	    }
 
-	else if (elem->node(5) == min_node)
-	  if (elem->node(1) == std::min(elem->node(1), elem->node(6)))
+	else if (elem->point(5) == min_point)
+	  if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
 	    {
 	      // Case 7
 	      eta  = -zeta_saved;
@@ -425,10 +425,10 @@ namespace
 	i0 = square_number_row[basisnum] + 2;
 	i1 = 1;
 	i2 = square_number_column[basisnum] + 2;
-	const unsigned int min_node = get_min_node(elem, 2, 3, 7, 6);
+	const Point min_point = get_min_point(elem, 2, 3, 7, 6);
 
-	if (elem->node(3) == min_node)
-	  if (elem->node(2) == std::min(elem->node(2), elem->node(7)))
+	if (elem->point(3) == min_point)
+	  if (elem->point(2) == std::min(elem->point(2), elem->point(7)))
 	    {
 	      // Case 1
 	      xi   = xi_saved;
@@ -441,8 +441,8 @@ namespace
 	      zeta = xi_saved;
 	    }
 
-	else if (elem->node(7) == min_node)
-	  if (elem->node(3) == std::min(elem->node(3), elem->node(6)))
+	else if (elem->point(7) == min_point)
+	  if (elem->point(3) == std::min(elem->point(3), elem->point(6)))
 	    {
 	      // Case 3
 	      xi   = -zeta_saved;
@@ -455,8 +455,8 @@ namespace
 	      zeta = -zeta_saved;
 	    }
 
-	else if (elem->node(6) == min_node)
-	  if (elem->node(7) == std::min(elem->node(7), elem->node(2)))
+	else if (elem->point(6) == min_point)
+	  if (elem->point(7) == std::min(elem->point(7), elem->point(2)))
 	    {
 	      // Case 5
 	      xi   = -xi_saved;
@@ -469,8 +469,8 @@ namespace
 	      zeta = -xi_saved;
 	    }
 
-	else if (elem->node(2) == min_node)
-	  if (elem->node(6) == std::min(elem->node(3), elem->node(6)))
+	else if (elem->point(2) == min_point)
+	  if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
 	    {
 	      // Case 7
 	      xi   = zeta_saved;
@@ -490,10 +490,10 @@ namespace
 	i0 = 0;
 	i1 = square_number_row[basisnum] + 2;
 	i2 = square_number_column[basisnum] + 2;
-	const unsigned int min_node = get_min_node(elem, 3, 0, 4, 7);
+	const Point min_point = get_min_point(elem, 3, 0, 4, 7);
 
-	if (elem->node(0) == min_node)
-	  if (elem->node(3) == std::min(elem->node(3), elem->node(4)))
+	if (elem->point(0) == min_point)
+	  if (elem->point(3) == std::min(elem->point(3), elem->point(4)))
 	    {
 	      // Case 1
 	      eta  = eta_saved;
@@ -506,8 +506,8 @@ namespace
 	      zeta = eta_saved;
 	    }
 
-	else if (elem->node(4) == min_node)
-	  if (elem->node(0) == std::min(elem->node(0), elem->node(7)))
+	else if (elem->point(4) == min_point)
+	  if (elem->point(0) == std::min(elem->point(0), elem->point(7)))
 	    {
 	      // Case 3
 	      eta  = -zeta_saved;
@@ -520,8 +520,8 @@ namespace
 	      zeta = -zeta_saved;
 	    }
 
-	else if (elem->node(7) == min_node)
-	  if (elem->node(4) == std::min(elem->node(4), elem->node(3)))
+	else if (elem->point(7) == min_point)
+	  if (elem->point(4) == std::min(elem->point(4), elem->point(3)))
 	    {
 	      // Case 5
 	      eta  = -eta_saved;
@@ -534,8 +534,8 @@ namespace
 	      zeta = -eta_saved;
 	    }
 
-	else if (elem->node(3) == min_node)
-	  if (elem->node(7) == std::min(elem->node(7), elem->node(0)))
+	else if (elem->point(3) == min_point)
+	  if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
 	    {
 	      // Case 7
 	      eta   = zeta_saved;
@@ -555,10 +555,10 @@ namespace
 	i0 = square_number_row[basisnum] + 2;
 	i1 = square_number_column[basisnum] + 2;
 	i2 = 1;
-	const unsigned int min_node = get_min_node(elem, 4, 5, 6, 7);
+	const Point min_point = get_min_point(elem, 4, 5, 6, 7);
 
-	if (elem->node(4) == min_node)
-	  if (elem->node(5) == std::min(elem->node(5), elem->node(7)))
+	if (elem->point(4) == min_point)
+	  if (elem->point(5) == std::min(elem->point(5), elem->point(7)))
 	    {
 	      // Case 1
 	      xi  = xi_saved;
@@ -571,8 +571,8 @@ namespace
 	      eta = xi_saved;
 	    }
 
-	else if (elem->node(5) == min_node)
-	  if (elem->node(6) == std::min(elem->node(6), elem->node(4)))
+	else if (elem->point(5) == min_point)
+	  if (elem->point(6) == std::min(elem->point(6), elem->point(4)))
 	    {
 	      // Case 3
 	      xi  = eta_saved;
@@ -585,8 +585,8 @@ namespace
 	      eta = eta_saved;
 	    }
 
-	else if (elem->node(6) == min_node)
-	  if (elem->node(7) == std::min(elem->node(7), elem->node(5)))
+	else if (elem->point(6) == min_point)
+	  if (elem->point(7) == std::min(elem->point(7), elem->point(5)))
 	    {
 	      // Case 5
 	      xi  = -xi_saved;
@@ -599,8 +599,8 @@ namespace
 	      eta = -xi_saved;
 	    }
 
-	else if (elem->node(7) == min_node)
-	  if (elem->node(4) == std::min(elem->node(4), elem->node(6)))
+	else if (elem->point(7) == min_point)
+	  if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
 	    {
 	      // Case 7
 	      xi  = -eta_saved;
