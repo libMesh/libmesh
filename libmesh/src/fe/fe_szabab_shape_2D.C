@@ -1,4 +1,4 @@
-// $Id: fe_szabab_shape_2D.C,v 1.13 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_szabab_shape_2D.C,v 1.14 2006-08-01 15:10:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -155,9 +155,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      assert (i<10);
 
 
-	      if (i==4 && (elem->node(0) > elem->node(1)))f=-1;
-	      if (i==6 && (elem->node(1) > elem->node(2)))f=-1;     
-	      if (i==8 && (elem->node(2) > elem->node(0)))f=-1;
+	      if (i==4 && (elem->point(0) > elem->point(1)))f=-1;
+	      if (i==6 && (elem->point(1) > elem->point(2)))f=-1;     
+	      if (i==8 && (elem->point(2) > elem->point(0)))f=-1;
 
 
 	      switch (i)
@@ -208,17 +208,17 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      	     
 	      switch(i)
 		{
-		case  5: // edge 0 nodes    			
-		  if (elem->node(0) > elem->node(1))f = -1.;
+		case  5: // edge 0 points    			
+		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
-	      	case  7: // edge 1 nodes
-		  if (elem->node(1) > elem->node(2))f = -1.;
+	      	case  7: // edge 1 points
+		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
-	        case  9: // edge 2 nodes
-		  if (elem->node(3) > elem->node(2))f = -1.;
+	        case  9: // edge 2 points
+		  if (elem->point(3) > elem->point(2))f = -1.;
 		  break;
-	        case 11: // edge 3 nodes
-		  if (elem->node(0) > elem->node(3))f = -1.;
+	        case 11: // edge 3 points
+		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
 		}	      
 	      
@@ -251,9 +251,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      assert (i<15);
 	      
 	      
-	      if (i== 4 && (elem->node(0) > elem->node(1)))f=-1;
-	      if (i== 7 && (elem->node(1) > elem->node(2)))f=-1;     
-	      if (i==10 && (elem->node(2) > elem->node(0)))f=-1;
+	      if (i== 4 && (elem->point(0) > elem->point(1)))f=-1;
+	      if (i== 7 && (elem->point(1) > elem->point(2)))f=-1;     
+	      if (i==10 && (elem->point(2) > elem->point(0)))f=-1;
 	      
 
 	      switch (i)
@@ -306,17 +306,17 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      
 	      switch(i)
 		{
-		case  5: // edge 0 nodes    			
-		  if (elem->node(0) > elem->node(1))f = -1.;
+		case  5: // edge 0 points    			
+		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
-	      	case  8: // edge 1 nodes
-		  if (elem->node(1) > elem->node(2))f = -1.;
+	      	case  8: // edge 1 points
+		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
-	        case 11: // edge 2 nodes
-		  if (elem->node(3) > elem->node(2))f = -1.;
+	        case 11: // edge 2 points
+		  if (elem->point(3) > elem->point(2))f = -1.;
 		  break;
-	        case 14: // edge 3 nodes
-		  if (elem->node(0) > elem->node(3))f = -1.;
+	        case 14: // edge 3 points
+		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
 		}	      
    	      
@@ -352,9 +352,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      assert (i<21);      	      
 	      
 
-	      if ((i== 4||i== 6) && (elem->node(0) > elem->node(1)))f=-1;
-	      if ((i== 8||i==10) && (elem->node(1) > elem->node(2)))f=-1;     
-	      if ((i==12||i==14) && (elem->node(2) > elem->node(0)))f=-1;
+	      if ((i== 4||i== 6) && (elem->point(0) > elem->point(1)))f=-1;
+	      if ((i== 8||i==10) && (elem->point(1) > elem->point(2)))f=-1;     
+	      if ((i==12||i==14) && (elem->point(2) > elem->point(0)))f=-1;
 	      
 
 	      switch (i)
@@ -413,21 +413,21 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      
 	      switch(i)
 		{
-		case  5: // edge 0 nodes
+		case  5: // edge 0 points
 		case  7:    			
-		  if (elem->node(0) > elem->node(1))f = -1.;
+		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
-		case  9: // edge 1 nodes
+		case  9: // edge 1 points
 	      	case 11:	      	
-		  if (elem->node(1) > elem->node(2))f = -1.;
+		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
-	        case 13: // edge 2 nodes
+	        case 13: // edge 2 points
 	        case 15:
-		  if (elem->node(3) > elem->node(2))f = -1.;
+		  if (elem->point(3) > elem->point(2))f = -1.;
 		  break;
-	        case 14: // edge 3 nodes
+	        case 14: // edge 3 points
 	        case 19:
-		  if (elem->node(0) > elem->node(3))f = -1.;
+		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
 		}	     
 	      
@@ -463,9 +463,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      assert (i<28);
 	      
 	      
-	      if ((i== 4||i== 6) && (elem->node(0) > elem->node(1)))f=-1;
-	      if ((i== 9||i==11) && (elem->node(1) > elem->node(2)))f=-1;     
-	      if ((i==14||i==16) && (elem->node(2) > elem->node(0)))f=-1;
+	      if ((i== 4||i== 6) && (elem->point(0) > elem->point(1)))f=-1;
+	      if ((i== 9||i==11) && (elem->point(1) > elem->point(2)))f=-1;     
+	      if ((i==14||i==16) && (elem->point(2) > elem->point(0)))f=-1;
 
 	      
 	      switch (i)
@@ -534,21 +534,21 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      
 	      switch(i)
 		{
-		case  5: // edge 0 nodes
+		case  5: // edge 0 points
 		case  7:    			
-		  if (elem->node(0) > elem->node(1))f = -1.;
+		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
-	      	case 10: // edge 1 nodes
+	      	case 10: // edge 1 points
 	      	case 12:	      	
-		  if (elem->node(1) > elem->node(2))f = -1.;
+		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
-	        case 15: // edge 2 nodes
+	        case 15: // edge 2 points
 	        case 17:
-		  if (elem->node(3) > elem->node(2))f = -1.;
+		  if (elem->point(3) > elem->point(2))f = -1.;
 		  break;
-	        case 20: // edge 3 nodes
+	        case 20: // edge 3 points
 	        case 22:
-		  if (elem->node(0) > elem->node(3))f = -1.;
+		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
 		}	     
 	      
@@ -586,9 +586,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      assert (i<36);
 	      
 	      
-	      if ((i>= 4&&i<= 8) && (elem->node(0) > elem->node(1)))f=-1;
-	      if ((i>=10&&i<=14) && (elem->node(1) > elem->node(2)))f=-1;     
-	      if ((i>=16&&i<=20) && (elem->node(2) > elem->node(0)))f=-1;
+	      if ((i>= 4&&i<= 8) && (elem->point(0) > elem->point(1)))f=-1;
+	      if ((i>=10&&i<=14) && (elem->point(1) > elem->point(2)))f=-1;     
+	      if ((i>=16&&i<=20) && (elem->point(2) > elem->point(0)))f=-1;
 
 	      
 	      switch (i)
@@ -667,25 +667,25 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      
 	      switch(i)
 		{
-		case  5: // edge 0 nodes
+		case  5: // edge 0 points
 		case  7:
 		case  9:    			
-		  if (elem->node(0) > elem->node(1))f = -1.;
+		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
-	      	case 11: // edge 1 nodes
+	      	case 11: // edge 1 points
 	      	case 13:	      	
 		case 15:
-		  if (elem->node(1) > elem->node(2))f = -1.;
+		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
-	        case 17: // edge 2 nodes
+	        case 17: // edge 2 points
 	        case 19:
 		case 21:
-		  if (elem->node(3) > elem->node(2))f = -1.;
+		  if (elem->point(3) > elem->point(2))f = -1.;
 		  break;
-	        case 23: // edge 3 nodes
+	        case 23: // edge 3 points
 	        case 25:
 		case 27:
-		  if (elem->node(0) > elem->node(3))f = -1.;
+		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
 		}	     
 	      
@@ -895,17 +895,17 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 
 	      switch(i)
 		{
-	      	case  5: // edge 0 nodes    			
-		  if (elem->node(0) > elem->node(1))f = -1.;
+	      	case  5: // edge 0 points    			
+		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
-	      	case  7: // edge 1 nodes
-		  if (elem->node(1) > elem->node(2))f = -1.;
+	      	case  7: // edge 1 points
+		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
-	        case  9: // edge 2 nodes
-		  if (elem->node(3) > elem->node(2))f = -1.;
+	        case  9: // edge 2 points
+		  if (elem->point(3) > elem->point(2))f = -1.;
 		  break;
-	        case 11: // edge 3 nodes
-		  if (elem->node(0) > elem->node(3))f = -1.;
+	        case 11: // edge 3 points
+		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
 		}	      
 
@@ -998,17 +998,17 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 
 	      switch(i)
 		{
-	      	case  5: // edge 0 nodes    			
-		  if (elem->node(0) > elem->node(1))f = -1.;
+	      	case  5: // edge 0 points    			
+		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
-	      	case  8: // edge 1 nodes
-		  if (elem->node(1) > elem->node(2))f = -1.;
+	      	case  8: // edge 1 points
+		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
-	        case 11: // edge 2 nodes
-		  if (elem->node(3) > elem->node(2))f = -1.;
+	        case 11: // edge 2 points
+		  if (elem->point(3) > elem->point(2))f = -1.;
 		  break;
-	        case 14: // edge 3 nodes
-		  if (elem->node(0) > elem->node(3))f = -1.;
+	        case 14: // edge 3 points
+		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
 		}	      
 
@@ -1101,21 +1101,21 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	     
 	      switch(i)
 		{
-		case  5: // edge 0 nodes
+		case  5: // edge 0 points
 	      	case  7:    			
-		  if (elem->node(0) > elem->node(1))f = -1.;
+		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
-	      	case  9: // edge 1 nodes
+	      	case  9: // edge 1 points
 	      	case 11:	      	
-		  if (elem->node(1) > elem->node(2))f = -1.;
+		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
-	        case 13: // edge 2 nodes
+	        case 13: // edge 2 points
 	        case 15:
-		  if (elem->node(3) > elem->node(2))f = -1.;
+		  if (elem->point(3) > elem->point(2))f = -1.;
 		  break;
-	        case 14: // edge 3 nodes
+	        case 14: // edge 3 points
 	        case 19:
-		  if (elem->node(0) > elem->node(3))f = -1.;
+		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
 		}	     
 	      
@@ -1206,21 +1206,21 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	     
 	      switch(i)
 		{
-	      	case  5: // edge 0 nodes
+	      	case  5: // edge 0 points
 	      	case  7:    			
-		  if (elem->node(0) > elem->node(1))f = -1.;
+		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
-	      	case 10: // edge 1 nodes
+	      	case 10: // edge 1 points
 	      	case 12:	      	
-		  if (elem->node(1) > elem->node(2))f = -1.;
+		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
-	        case 15: // edge 2 nodes
+	        case 15: // edge 2 points
 	        case 17:
-		  if (elem->node(3) > elem->node(2))f = -1.;
+		  if (elem->point(3) > elem->point(2))f = -1.;
 		  break;
-	        case 20: // edge 3 nodes
+	        case 20: // edge 3 points
 	        case 22:
-		  if (elem->node(0) > elem->node(3))f = -1.;
+		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
 		}	       
 
@@ -1311,25 +1311,25 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	     
 	      switch(i)
 		{
-	      	case  5: // edge 0 nodes
+	      	case  5: // edge 0 points
 	      	case  7:
 		case  9:    			
-		  if (elem->node(0) > elem->node(1))f = -1.;
+		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
-	      	case 11: // edge 1 nodes
+	      	case 11: // edge 1 points
 	      	case 13:	      	
 		case 15:
-		  if (elem->node(1) > elem->node(2))f = -1.;
+		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
-	        case 17: // edge 2 nodes
+	        case 17: // edge 2 points
 	        case 19:
 		case 21:
-		  if (elem->node(3) > elem->node(2))f = -1.;
+		  if (elem->point(3) > elem->point(2))f = -1.;
 		  break;
-	        case 23: // edge 3 nodes
+	        case 23: // edge 3 points
 	        case 25:
 		case 27:
-		  if (elem->node(0) > elem->node(3))f = -1.;
+		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
 		}	     	       
 	      

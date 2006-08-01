@@ -1,4 +1,4 @@
-// $Id: fe_bernstein_shape_2D.C,v 1.4 2006-05-02 17:36:30 spetersen Exp $
+// $Id: fe_bernstein_shape_2D.C,v 1.5 2006-08-01 15:10:43 roystgnr Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -111,10 +111,10 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	
 	// Flip odd degree of freedom values if necessary
 	// to keep continuity on sides.
-	if     ((i>= 4                 && i<= 4+  totalorder-2u) && elem->node(0) > elem->node(1)) i0=totalorder+2-i0;	//
-	else if((i>= 4+  totalorder-1u && i<= 4+2*totalorder-3u) && elem->node(1) > elem->node(2)) i1=totalorder+2-i1;    
-	else if((i>= 4+2*totalorder-2u && i<= 4+3*totalorder-4u) && elem->node(3) > elem->node(2)) i0=totalorder+2-i0;
-	else if((i>= 4+3*totalorder-3u && i<= 4+4*totalorder-5u) && elem->node(0) > elem->node(3)) i1=totalorder+2-i1;
+	if     ((i>= 4                 && i<= 4+  totalorder-2u) && elem->point(0) > elem->point(1)) i0=totalorder+2-i0;	//
+	else if((i>= 4+  totalorder-1u && i<= 4+2*totalorder-3u) && elem->point(1) > elem->point(2)) i1=totalorder+2-i1;    
+	else if((i>= 4+2*totalorder-2u && i<= 4+3*totalorder-4u) && elem->point(3) > elem->point(2)) i0=totalorder+2-i0;
+	else if((i>= 4+3*totalorder-3u && i<= 4+4*totalorder-5u) && elem->point(0) > elem->point(3)) i1=totalorder+2-i1;
 	
 	      
         return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0, xi)*
@@ -197,9 +197,9 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    unsigned int shape=i;
 	    
 	    
-	    if((i==3||i==4) && elem->node(0) > elem->node(1)) shape=7-i;			
-	    if((i==5||i==6) && elem->node(1) > elem->node(2)) shape=11-i;
-	    if((i==7||i==8) && elem->node(0) > elem->node(2)) shape=15-i;    
+	    if((i==3||i==4) && elem->point(0) > elem->point(1)) shape=7-i;			
+	    if((i==5||i==6) && elem->point(1) > elem->point(2)) shape=11-i;
+	    if((i==7||i==8) && elem->point(0) > elem->point(2)) shape=15-i;    
 	    	    
 	    switch(shape)
 	      {
@@ -230,9 +230,9 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    
 	    assert(i<15);
 	    
-	    if((i==3||i== 5) && elem->node(0) > elem->node(1))shape=8-i;			
-	    if((i==6||i== 8) && elem->node(1) > elem->node(2))shape=14-i;
-	    if((i==9||i==11) && elem->node(0) > elem->node(2))shape=20-i;		  
+	    if((i==3||i== 5) && elem->point(0) > elem->point(1))shape=8-i;			
+	    if((i==6||i== 8) && elem->point(1) > elem->point(2))shape=14-i;
+	    if((i==9||i==11) && elem->point(0) > elem->point(2))shape=20-i;		  
 	    
 	    
 	    switch(shape)
@@ -272,9 +272,9 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    
 	    assert(i<21);   
 	    
-	    if((i>= 3&&i<= 6) && elem->node(0) > elem->node(1))shape=9-i;			
-	    if((i>= 7&&i<=10) && elem->node(1) > elem->node(2))shape=17-i;
-	    if((i>=11&&i<=14) && elem->node(0) > elem->node(2))shape=25-i;	         			
+	    if((i>= 3&&i<= 6) && elem->point(0) > elem->point(1))shape=9-i;			
+	    if((i>= 7&&i<=10) && elem->point(1) > elem->point(2))shape=17-i;
+	    if((i>=11&&i<=14) && elem->point(0) > elem->point(2))shape=25-i;	         			
 	    
 	    switch(shape)
 	      {
@@ -319,9 +319,9 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    
 	    assert(i<28);
 	    
-	    if((i>= 3&&i<= 7) && elem->node(0) > elem->node(1))shape=10-i;			
-	    if((i>= 8&&i<=12) && elem->node(1) > elem->node(2))shape=20-i;
-	    if((i>=13&&i<=17) && elem->node(0) > elem->node(2))shape=30-i;		  
+	    if((i>= 3&&i<= 7) && elem->point(0) > elem->point(1))shape=10-i;			
+	    if((i>= 8&&i<=12) && elem->point(1) > elem->point(2))shape=20-i;
+	    if((i>=13&&i<=17) && elem->point(0) > elem->point(2))shape=30-i;		  
             
 	    switch(shape)
 	      {
@@ -1023,10 +1023,10 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 	
 	// Flip odd degree of freedom values if necessary
 	// to keep continuity on sides
-	if     ((i>= 4                 && i<= 4+  totalorder-2u) && elem->node(0) > elem->node(1)) i0=totalorder+2-i0;	//
-	else if((i>= 4+  totalorder-1u && i<= 4+2*totalorder-3u) && elem->node(1) > elem->node(2)) i1=totalorder+2-i1;    
-	else if((i>= 4+2*totalorder-2u && i<= 4+3*totalorder-4u) && elem->node(3) > elem->node(2)) i0=totalorder+2-i0;
-	else if((i>= 4+3*totalorder-3u && i<= 4+4*totalorder-5u) && elem->node(0) > elem->node(3)) i1=totalorder+2-i1;
+	if     ((i>= 4                 && i<= 4+  totalorder-2u) && elem->point(0) > elem->point(1)) i0=totalorder+2-i0;	//
+	else if((i>= 4+  totalorder-1u && i<= 4+2*totalorder-3u) && elem->point(1) > elem->point(2)) i1=totalorder+2-i1;    
+	else if((i>= 4+2*totalorder-2u && i<= 4+3*totalorder-4u) && elem->point(3) > elem->point(2)) i0=totalorder+2-i0;
+	else if((i>= 4+3*totalorder-3u && i<= 4+4*totalorder-5u) && elem->point(0) > elem->point(3)) i1=totalorder+2-i1;
 	
 	switch (j)
 	  {

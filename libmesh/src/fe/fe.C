@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.49 2006-06-05 21:04:35 roystgnr Exp $
+// $Id: fe.C,v 1.50 2006-08-01 15:10:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -119,6 +119,12 @@ void FE<Dim,T>::reinit(const Elem* elem,
 {
   assert (elem != NULL);
 
+  // Try to avoid calling init_shape_functions
+  // even when shapes_need_reinit
+  static std::vector<Point> cached_nodes;
+
+  bool cached_nodes_still_fit = false;
+
   // Initialize the shape functions at the user-specified
   // points
   if (pts != NULL)
@@ -140,7 +146,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // update the type in accordance to the current cell
   // and reinit if the cell type has changed or (as in
   // the case of the hierarchics) the shape functions need
-  // reinit, since they depend on the particular element
+  // reinit, since they depend on the particular element shape
   else 
     {
       assert (qrule   != NULL);
@@ -148,20 +154,49 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
       if (elem_type != elem->type() ||
           _p_level != elem->p_level() ||
-          !shapes_on_quadrature ||
-	  this->shapes_need_reinit())
+          !shapes_on_quadrature)
         {
           // Set the type and p level for this element
           elem_type = elem->type();
           _p_level = elem->p_level();
           // Initialize the shape functions
           this->init_shape_functions (qrule->get_points(), elem);
+
+          if (this->shapes_need_reinit())
+            {
+              cached_nodes.resize(elem->n_nodes());
+              for (unsigned int n = 0; n != elem->n_nodes(); ++n)
+                {
+                  cached_nodes[n] = elem->point(n);
+                }
+            }
         }
       else
         {
-          // Set the type and p level for this element
-          elem_type = elem->type();
-          _p_level = elem->p_level();
+          assert(elem_type == elem->type());
+          assert(_p_level == elem->p_level());
+
+          cached_nodes_still_fit = true;
+          if (cached_nodes.size() != elem->n_nodes())
+            cached_nodes_still_fit = false;
+          else
+            for (unsigned int n = 1; n < elem->n_nodes(); ++n)
+              {
+                if ((elem->point(n) - elem->point(0)) !=
+                    (cached_nodes[n] - cached_nodes[0]))
+                  {
+                    cached_nodes_still_fit = false;
+                    break;
+                  }
+              }
+
+          if (this->shapes_need_reinit() && !cached_nodes_still_fit)
+            {
+              this->init_shape_functions (qrule->get_points(), elem);
+              cached_nodes.resize(elem->n_nodes());
+              for (unsigned int n = 0; n != elem->n_nodes(); ++n)
+                cached_nodes[n] = elem->point(n);
+            }
         }
       
       // The shape functions correspond to the qrule
@@ -183,7 +218,8 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
   // Compute the shape functions and the derivatives at all of the
   // quadrature points.
-  this->compute_shape_functions (elem);
+  if (!cached_nodes_still_fit)
+    this->compute_shape_functions (elem);
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.25 2006-05-12 17:36:18 roystgnr Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.26 2006-08-01 15:10:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -83,7 +83,7 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
             const unsigned int basisorder = i - 1;
 	    // Get factors to account for edge-flipping
 	    Real f0 = 1;
-	    if (basisorder%2 && (elem->node(0) > elem->node(1)))
+	    if (basisorder%2 && (elem->point(0) > elem->point(1)))
 	      f0 = -1.;
 	      
             Real edgeval = (zeta1 - zeta0) / (zeta1 + zeta0);
@@ -100,7 +100,7 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
             const unsigned int basisorder = i - totalorder;
 	    // Get factors to account for edge-flipping
 	    Real f1 = 1;
-	    if (basisorder%2 && (elem->node(1) > elem->node(2)))
+	    if (basisorder%2 && (elem->point(1) > elem->point(2)))
 	      f1 = -1.;
 	      
             Real edgeval = (zeta2 - zeta1) / (zeta2 + zeta1);
@@ -117,7 +117,7 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
             const unsigned int basisorder = i - (2u*totalorder) + 1;
 	    // Get factors to account for edge-flipping
 	    Real f2 = 1;
-	    if (basisorder%2 && (elem->node(2) > elem->node(0)))
+	    if (basisorder%2 && (elem->point(2) > elem->point(0)))
 	      f2 = -1.;
 
             Real edgeval = (zeta0 - zeta2) / (zeta0 + zeta2);
@@ -197,13 +197,13 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
         Real f = 1.;
 
         if ((i0%2) && (i0 > 2) && (i1 == 0))
-	  f = (elem->node(0) > elem->node(1))?-1.:1.;
+	  f = (elem->point(0) > elem->point(1))?-1.:1.;
         else if ((i0%2) && (i0>2) && (i1 == 1))
-	  f = (elem->node(3) > elem->node(2))?-1.:1.;
+	  f = (elem->point(3) > elem->point(2))?-1.:1.;
         else if ((i0 == 0) && (i1%2) && (i1>2))
-	  f = (elem->node(0) > elem->node(3))?-1.:1.;
+	  f = (elem->point(0) > elem->point(3))?-1.:1.;
         else if ((i0 == 1) && (i1%2) && (i1>2))
-	  f = (elem->node(1) > elem->node(2))?-1.:1.;
+	  f = (elem->point(1) > elem->point(2))?-1.:1.;
 	      
         return f*(FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0, xi)*
 		  FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1, eta));	      
@@ -338,13 +338,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
         Real f = 1.;
 
         if ((i0%2) && (i0 > 2) && (i1 == 0))
-	  f = (elem->node(0) > elem->node(1))?-1.:1.;
+	  f = (elem->point(0) > elem->point(1))?-1.:1.;
         else if ((i0%2) && (i0>2) && (i1 == 1))
-	  f = (elem->node(3) > elem->node(2))?-1.:1.;
+	  f = (elem->point(3) > elem->point(2))?-1.:1.;
         else if ((i0 == 0) && (i1%2) && (i1>2))
-	  f = (elem->node(0) > elem->node(3))?-1.:1.;
+	  f = (elem->point(0) > elem->point(3))?-1.:1.;
         else if ((i0 == 1) && (i1%2) && (i1>2))
-	  f = (elem->node(1) > elem->node(2))?-1.:1.;
+	  f = (elem->point(1) > elem->point(2))?-1.:1.;
 	      
 	switch (j)
 	  {
