@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.7 2006-07-13 05:18:30 roystgnr Exp $
+// $Id: fem_system.h,v 1.8 2006-08-01 23:44:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -214,6 +214,13 @@ protected:
    */
   std::map<FEType, FEBase *> element_fe;
   std::map<FEType, FEBase *> side_fe;
+
+  /**
+   * Pointers to the same finite element objects, but indexed
+   * by variable number
+   */
+  std::vector<FEBase *> element_fe_var;
+  std::vector<FEBase *> side_fe_var;
 
   /**
    * Quadrature rules for element interior and sides.

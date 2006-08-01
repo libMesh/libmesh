@@ -42,7 +42,7 @@ Number FEMSystem::interior_value(unsigned int var, unsigned int qp)
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<Real> > &phi =
-    element_fe[this->variable_type(var)]->get_phi();
+    element_fe_var[var]->get_phi();
 
   // Accumulate solution value
   Number u = 0.;
@@ -68,7 +68,7 @@ Gradient FEMSystem::interior_gradient(unsigned int var, unsigned int qp)
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<RealGradient> > &dphi =
-    element_fe[this->variable_type(var)]->get_dphi();
+    element_fe_var[var]->get_dphi();
 
   // Accumulate solution derivatives
   Gradient du;
@@ -95,7 +95,7 @@ Tensor FEMSystem::interior_hessian(unsigned int var, unsigned int qp)
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<Tensor> > &d2phi =
-    element_fe[this->variable_type(var)]->get_d2phi();
+    element_fe_var[var]->get_d2phi();
 
   // Accumulate solution second derivatives
   Tensor d2u;
@@ -122,7 +122,7 @@ Number FEMSystem::side_value(unsigned int var, unsigned int qp)
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<Real> > &phi =
-    side_fe[this->variable_type(var)]->get_phi();
+    side_fe_var[var]->get_phi();
 
   // Accumulate solution value
   Number u = 0.;
@@ -148,7 +148,7 @@ Gradient FEMSystem::side_gradient(unsigned int var, unsigned int qp)
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<RealGradient> > &dphi =
-    side_fe[this->variable_type(var)]->get_dphi();
+    side_fe_var[var]->get_dphi();
 
   // Accumulate solution derivatives
   Gradient du;
@@ -175,7 +175,7 @@ Tensor FEMSystem::side_hessian(unsigned int var, unsigned int qp)
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<Tensor> > &d2phi =
-    side_fe[this->variable_type(var)]->get_d2phi();
+    side_fe_var[var]->get_d2phi();
 
   // Accumulate solution second derivatives
   Tensor d2u;
@@ -248,6 +248,8 @@ void FEMSystem::init_data ()
     hardest_fe_type.default_quadrature_rule(dim-1).release();
 
   // Next, create finite element objects
+  element_fe_var.resize(n_vars);
+  side_fe_var.resize(n_vars);
   for (unsigned int i=0; i != n_vars; ++i)
     {
       FEType fe_type = this->variable_type(i);
@@ -258,6 +260,8 @@ void FEMSystem::init_data ()
           side_fe[fe_type] = FEBase::build(dim, fe_type).release();
           side_fe[fe_type]->attach_quadrature_rule(side_qrule);
         }
+      element_fe_var[i] = element_fe[fe_type];
+      side_fe_var[i] = side_fe[fe_type];
     }
 }
 
@@ -648,8 +652,8 @@ void FEMSystem::time_evolving (unsigned int var)
   Parent::time_evolving(var);
 
   // Then make sure we're prepared to do mass integration
-  element_fe[this->variable_type(var)]->get_JxW();
-  element_fe[this->variable_type(var)]->get_phi();
+  element_fe_var[var]->get_JxW();
+  element_fe_var[var]->get_phi();
 }
 
 
@@ -664,10 +668,10 @@ bool FEMSystem::mass_residual (bool request_jacobian)
         continue;
 
       const std::vector<Real> &JxW = 
-        element_fe[this->variable_type(var)]->get_JxW();
+        element_fe_var[var]->get_JxW();
 
       const std::vector<std::vector<Real> > &phi =
-        element_fe[this->variable_type(var)]->get_phi();
+        element_fe_var[var]->get_phi();
 
       const unsigned int n_dofs = dof_indices_var[var].size();
 
