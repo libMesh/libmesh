@@ -71,6 +71,15 @@ const Real relative_tolerance = 1.e-3;
       Real current_residual = rhs.l2_norm();
       last_residual = current_residual;
 
+      if (isnan(current_residual))
+        {
+          std::cout << "  Nonlinear solver DIVERGED at step " << l
+                    << " with norm Not-a-Number"
+                    << std::endl;
+          error();
+          continue;
+        }
+
       max_residual_norm = std::max (current_residual,
                                     max_residual_norm);
  
@@ -183,9 +192,8 @@ const Real relative_tolerance = 1.e-3;
               if (steplength/2. < minsteplength && 
                   current_residual > last_residual)
                 {
-                  if (!quiet)
-                    std::cout << "Inexact Newton step FAILED at step "
-                              << l << std::endl;
+                  std::cout << "Inexact Newton step FAILED at step "
+                            << l << std::endl;
 
                   error();
                 }
@@ -216,7 +224,7 @@ const Real relative_tolerance = 1.e-3;
         }
       if (l >= max_nonlinear_iterations - 1)
         {
-          std::cout << "  Nonlinear solver DIVERGED at step " << l
+          std::cout << "  Nonlinear solver FAILED TO CONVERGE by step " << l
                     << " with norm " << norm_total
                     << std::endl;
           error();
