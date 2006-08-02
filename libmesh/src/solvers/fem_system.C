@@ -680,19 +680,22 @@ bool FEMSystem::mass_residual (bool request_jacobian)
 
       for (unsigned int qp = 0; qp != n_qpoints; ++qp)
         {
-          Number u = 0.;
-          for (unsigned int l = 0; l != n_dofs; ++l)
-            {
-              u += phi[l][qp] * (*elem_subsolutions[var])(l);
-            }
+          Number u = interior_value(var, qp);
+          Number JxWxU = JxW[qp] * u;
           for (unsigned int i = 0; i != n_dofs; ++i)
             {
-              Fu(i) += JxW[qp] * u * phi[i][qp];
+              Fu(i) += JxWxU * phi[i][qp];
               if (request_jacobian)
-                for (unsigned int j = 0; j != n_dofs; ++j)
-                  {
-                    Kuu(i,j) += JxW[qp] * phi[i][qp] * phi[j][qp];
-                  }
+                {
+                  Number JxWxPhiI = JxW[qp] * phi[i][qp];
+                  Kuu(i,i) += JxWxPhiI * phi[i][qp];
+                  for (unsigned int j = i+1; j != n_dofs; ++j)
+                    {
+                      Number Kij = JxWxPhiI * phi[j][qp];
+                      Kuu(i,j) += Kij;
+                      Kuu(j,i) += Kij;
+                    }
+                }
             }
         }
     }
