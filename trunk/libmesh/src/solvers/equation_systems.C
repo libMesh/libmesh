@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.31 2006-06-05 02:31:23 roystgnr Exp $
+// $Id: equation_systems.C,v 1.32 2006-08-03 15:10:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -210,6 +210,10 @@ System & EquationSystems::add_system (const std::string& sys_type,
   // Build a Newmark system
   if      (sys_type == "Newmark")
     this->add_system<NewmarkSystem> (name);
+
+  // Build an Explicit system
+  else if ((sys_type == "Explicit"))
+    this->add_system<ExplicitSystem> (name);
 
   // Build an Implicit system
   else if ((sys_type == "Implicit") ||
