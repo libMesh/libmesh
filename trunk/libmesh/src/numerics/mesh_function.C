@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.10 2006-03-29 19:41:01 roystgnr Exp $
+// $Id: mesh_function.C,v 1.11 2006-08-03 15:09:39 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,7 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
   _eqn_systems   (eqn_systems),
   _vector        (vec),
   _dof_map       (dof_map),
-  _system_vars   (var),
+  _system_vars   (1,var),
   _point_locator (NULL)
 {
 //   std::vector<unsigned int> buf (1);
@@ -134,14 +134,28 @@ void MeshFunction::init ()
       AutoPtr<PointLocatorBase> ap (PointLocatorBase::build (TREE, mesh));
       this->_point_locator = ap.release();
 
-      // initialize the point locator, so that it is ready for use
-      this->_point_locator->init();
+      // Point locator no longer needs to be initialized.
+      //      this->_point_locator->init();
     }
 
 
   // ready for use
   this->_initialized = true;
 }
+
+
+void
+MeshFunction::clear ()
+{
+  // only delete the point locator when we are the master
+  if ((this->_point_locator != NULL) && (this->_master == NULL))
+    {
+      delete this->_point_locator;
+      this->_point_locator = NULL;
+    }
+  this->_initialized = false;
+}
+
 
 
 

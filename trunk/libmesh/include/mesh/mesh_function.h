@@ -1,4 +1,4 @@
-// $Id: mesh_function.h,v 1.4 2006-03-29 19:41:01 roystgnr Exp $
+// $Id: mesh_function.h,v 1.5 2006-08-03 15:09:39 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -84,6 +84,11 @@ public:
    * The actual initialization process.
    */
   void init ();
+
+  /**
+   * Clears the function.
+   */
+  void clear ();
 
   /**
    * @returns the \f$ 0^{th} \f$ entry of the \p std::vector<Number> at point
