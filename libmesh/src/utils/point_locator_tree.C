@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.C,v 1.12 2005-05-24 13:35:41 jwpeterson Exp $
+// $Id: point_locator_tree.C,v 1.13 2006-08-04 21:35:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -164,14 +164,15 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 	// ask the tree
 	this->_element = this->_tree->find_element (p);
 
-	// Note that in some cases the tree may not find a point
-	// e.g. when a point is located in an element that is not
-	// entirely bounded by the tree node's bounding box.
+	// Note that in a few cases the tree may not find a point
+	// e.g. when all a curved element's nodes are outside a
+	// tree node's bounding box, but some of its interior is
+	// inside.
 	// In those cases we take a safe but slow way.
 	if (this->_element == NULL)
 	  {
-	    MeshBase::const_element_iterator       pos     = this->_mesh.elements_begin();
-	    const MeshBase::const_element_iterator end_pos = this->_mesh.elements_end();
+	    MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
+	    const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
 
 	    for ( ; pos != end_pos; ++pos)
 	      if ((*pos)->contains_point(p))
