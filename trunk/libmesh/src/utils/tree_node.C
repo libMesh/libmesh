@@ -1,4 +1,4 @@
-// $Id: tree_node.C,v 1.19 2005-06-11 05:11:31 jwpeterson Exp $
+// $Id: tree_node.C,v 1.20 2006-08-04 21:38:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -68,14 +68,39 @@ void TreeNode<N>::insert (const Elem* elem)
 {
   assert (elem != NULL);
 
-  // Get the element centroid.  This will be used to test
-  // if the element is in our bounding box.
-  const Point p = elem->centroid();
-  
-  // Return if we don't bound any of the element's nodes
-  if (!this->bounds_point(p))
-    return;
-  
+  /* We first want to find the corners of the cuboid surrounding the
+     cell.  */
+  Point minCoord = elem->point(0);
+  Point maxCoord = minCoord;
+  unsigned int dim = elem->dim();
+  for(unsigned int i=elem->n_nodes()-1; i>0; i--)
+    {
+      Point p = elem->point(i);
+      for(unsigned int d=0; d<dim; d++)
+	{
+	  if(minCoord(d)>p(d)) minCoord(d) = p(d);
+	  if(maxCoord(d)<p(d)) maxCoord(d) = p(d);
+	}
+    }
+
+  /* Next, find out whether this cuboid has got non-empty intersection
+     with the bounding box of the current tree node.  */
+  bool intersects = true;
+  for(unsigned int d=0; d<dim; d++)
+    {
+      if(maxCoord(d)<this->bounding_box.first(d) ||
+	 minCoord(d)>this->bounding_box.second(d))
+	{
+	  intersects = false;
+	}
+    }
+
+  /* If not, we should not care about this element.  */
+  if(!intersects)
+    {
+      return;
+    }
+
   // Only add the element if we are active
   if (this->active())
     {
