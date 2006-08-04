@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.11 2006-08-03 15:09:39 roystgnr Exp $
+// $Id: mesh_function.C,v 1.12 2006-08-04 21:34:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -246,6 +246,11 @@ void MeshFunction::operator() (const Point& p,
   return;
 }
 
+const PointLocatorBase& MeshFunction::get_point_locator (void) const
+{
+  assert (this->initialized());
+  return *_point_locator;
+}
 
 
 
