@@ -1,4 +1,4 @@
-// $Id: tree.C,v 1.12 2005-09-30 15:03:06 benkirk Exp $
+// $Id: tree.C,v 1.13 2006-08-04 21:37:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,10 +66,10 @@ Tree<N>::Tree (const MeshBase& m,
 
   else if (build_type == ELEMENTS)
     {
-      // Add all the elements to the root node.  It will
-      // automagically build the tree for us.
-      MeshBase::const_element_iterator       it  = mesh.elements_begin();
-      const MeshBase::const_element_iterator end = mesh.elements_end();
+      // Add all active elements to the root node.  It will
+      // automatically build the tree for us.
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
       
       for (; it != end; ++it)
