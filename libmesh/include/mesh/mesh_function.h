@@ -1,4 +1,4 @@
-// $Id: mesh_function.h,v 1.5 2006-08-03 15:09:39 roystgnr Exp $
+// $Id: mesh_function.h,v 1.6 2006-08-04 21:34:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -108,6 +108,13 @@ public:
   void operator() (const Point& p,
 		   const Real time,
 		   DenseVector<Number>& output);
+
+  /**
+   * Returns the current \p PointLocator object, for you might want to
+   * use it elsewhere.  The \p MeshFunction object must be initialized
+   * before.
+   */
+  const PointLocatorBase& get_point_locator (void) const;
 
 protected:
 
