@@ -1,4 +1,6 @@
 
+#include "math.h"
+
 #include "diff_system.h"
 #include "libmesh_logging.h"
 #include "linear_solver.h"
