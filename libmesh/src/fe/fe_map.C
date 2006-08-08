@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.41 2006-07-17 23:37:17 roystgnr Exp $
+// $Id: fe_map.C,v 1.42 2006-08-08 17:34:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1377,7 +1377,8 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       //      about it.
       if (cnt > 10)
 	{
-	  //  Do not bother about divergence when secure is false.
+	  //  Warn about divergence when secure is true - this
+	  //  shouldn't happen
 	  if (secure)
 	    {
 	      here();
@@ -1404,9 +1405,14 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 		  error();
 		}
 	    }
+	  //  Return a far off point when secure is false - this
+	  //  should only happen when we're trying to map a point
+	  //  that's outside the element
 	  else
 	    {
-	      break;
+	      for (unsigned int i=0; i != Dim; ++i)
+		p(i) = 1e6;
+	      return p;
 	    }
 	}
     }
