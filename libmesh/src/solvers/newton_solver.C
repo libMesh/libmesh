@@ -1,5 +1,5 @@
 
-#include "math.h"
+#include "cmath" // For isnan(), when it's defined
 
 #include "diff_system.h"
 #include "libmesh_logging.h"
@@ -73,6 +73,8 @@ const Real relative_tolerance = 1.e-3;
       Real current_residual = rhs.l2_norm();
       last_residual = current_residual;
 
+// isnan() isn't standard C++ yet
+#ifdef isnan
       if (isnan(current_residual))
         {
           std::cout << "  Nonlinear solver DIVERGED at step " << l
@@ -81,6 +83,7 @@ const Real relative_tolerance = 1.e-3;
           error();
           continue;
         }
+#endif // isnan
 
       max_residual_norm = std::max (current_residual,
                                     max_residual_norm);
