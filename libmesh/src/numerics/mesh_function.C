@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.12 2006-08-04 21:34:35 roystgnr Exp $
+// $Id: mesh_function.C,v 1.13 2006-08-09 13:51:49 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,9 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
   _vector        (vec),
   _dof_map       (dof_map),
   _system_vars   (vars),
-  _point_locator (NULL)
+  _point_locator (NULL),
+  _out_of_mesh_mode(false),
+  _out_of_mesh_value()
 {
 }
 
@@ -63,7 +65,9 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
   _vector        (vec),
   _dof_map       (dof_map),
   _system_vars   (1,var),
-  _point_locator (NULL)
+  _point_locator (NULL),
+  _out_of_mesh_mode(false),
+  _out_of_mesh_value()
 {
 //   std::vector<unsigned int> buf (1);
 //   buf[0] = var;
@@ -181,67 +185,92 @@ void MeshFunction::operator() (const Point& p,
 {
   assert (this->initialized());
 
+  /* Ensure that in the case of a master mesh function, the
+     out-of-mesh mode is enabled either for both or for none.  This is
+     important because the out-of-mesh mode is also communicated to
+     the point locator.  Since this is time consuming, enable it only
+     in debug mode.  */
+#ifdef DEBUG
+  if (this->_master != NULL)
+    {
+      const MeshFunction* master =
+	dynamic_cast<const MeshFunction*>(this->_master);
+      if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
+	{
+	  std::cerr << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
+	  error();
+	}
+    }
+#endif
+  
   // locate the point in the other mesh
   const Elem* element = this->_point_locator->operator()(p);
 
-  // resize the output vector to the number of output values
-  // that the user told us
-  output.resize (this->_system_vars.size());
-
-
-  {
-    const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
-
-
-    /*
-     * Get local coordinates to feed these into compute_data().  
-     * Note that the fe_type can safely be used from the 0-variable,
-     * since the inverse mapping is the same for all FEFamilies
-     */
-    const Point mapped_point (FEInterface::inverse_map (dim, 
-							this->_dof_map.variable_type(0),
-							element, 
-							p));
-
-
-    // loop over all vars
-    for (unsigned int index=0; index < this->_system_vars.size(); index++)
+  if(element==NULL)
+    {
+      output = _out_of_mesh_value;      
+    }
+  else
+    {
+      // resize the output vector to the number of output values
+      // that the user told us
+      output.resize (this->_system_vars.size());
+      
+      
       {
-	/*
-	 * the data for this variable
-	 */
-	const unsigned int var = _system_vars[index];
-	const FEType& fe_type = this->_dof_map.variable_type(var);
-
-	/**
-	 * Build an FEComputeData that contains both input and output data
-	 * for the specific compute_data method.
-	 */
-	{
-	  FEComputeData data (this->_eqn_systems, mapped_point);
-    
-	  FEInterface::compute_data (dim, fe_type, element, data);
-
-	  // where the solution values for the var-th variable are stored
-	  std::vector<unsigned int> dof_indices;
-	  this->_dof_map.dof_indices (element, dof_indices, var);
+	const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
 	
-	  // interpolate the solution
+	
+	/*
+	 * Get local coordinates to feed these into compute_data().  
+	 * Note that the fe_type can safely be used from the 0-variable,
+	 * since the inverse mapping is the same for all FEFamilies
+	 */
+	const Point mapped_point (FEInterface::inverse_map (dim, 
+							    this->_dof_map.variable_type(0),
+							    element, 
+							    p));
+	
+	
+	// loop over all vars
+	for (unsigned int index=0; index < this->_system_vars.size(); index++)
 	  {
-	    Number value = 0.;
-
-	    for (unsigned int i=0; i<dof_indices.size(); i++)
-	      value += this->_vector(dof_indices[i]) * data.shape[i];
-
-	    output(index) = value;
+	    /*
+	     * the data for this variable
+	     */
+	    const unsigned int var = _system_vars[index];
+	    const FEType& fe_type = this->_dof_map.variable_type(var);
+	    
+	    /**
+	     * Build an FEComputeData that contains both input and output data
+	     * for the specific compute_data method.
+	     */
+	    {
+	      FEComputeData data (this->_eqn_systems, mapped_point);
+	      
+	      FEInterface::compute_data (dim, fe_type, element, data);
+	      
+	      // where the solution values for the var-th variable are stored
+	      std::vector<unsigned int> dof_indices;
+	      this->_dof_map.dof_indices (element, dof_indices, var);
+	      
+	      // interpolate the solution
+	      {
+		Number value = 0.;
+		
+		for (unsigned int i=0; i<dof_indices.size(); i++)
+		  value += this->_vector(dof_indices[i]) * data.shape[i];
+		
+		output(index) = value;
+	      }
+	      
+	    }
+	    
+	    // next variable
 	  }
-
-	}
-
-	// next variable
       }
-  }
-
+    }
+      
   // all done
   return;
 }
@@ -252,5 +281,25 @@ const PointLocatorBase& MeshFunction::get_point_locator (void) const
   return *_point_locator;
 }
 
+void MeshFunction::enable_out_of_mesh_mode(const DenseVector<Number>& value)
+{
+  assert (this->initialized());
+  _point_locator->enable_out_of_mesh_mode();
+  _out_of_mesh_mode = true;
+  _out_of_mesh_value = value;
+}
 
+void MeshFunction::enable_out_of_mesh_mode(const Number& value)
+{
+  DenseVector<Number> v(1);
+  v(0) = value;
+  this->enable_out_of_mesh_mode(v);
+}
+
+void MeshFunction::disable_out_of_mesh_mode(void)
+{
+  assert (this->initialized());
+  _point_locator->disable_out_of_mesh_mode();
+  _out_of_mesh_mode = false;
+}
 
