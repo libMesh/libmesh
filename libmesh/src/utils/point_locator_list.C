@@ -1,4 +1,4 @@
-// $Id: point_locator_list.C,v 1.12 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: point_locator_list.C,v 1.13 2006-08-09 13:51:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -192,5 +192,17 @@ const Elem* PointLocatorList::operator() (const Point& p) const
     return (this->_mesh.elem(last_index));
   }
 
+}
+
+void PointLocatorList::enable_out_of_mesh_mode (void)
+{
+  /* This functionality is not yet implemented for PointLocatorList.  */
+  error();
+}
+
+void PointLocatorList::disable_out_of_mesh_mode (void)
+{
+  /* This functionality is not yet implemented for PointLocatorList.  */
+  error();
 }
 

@@ -1,4 +1,4 @@
-// $Id: point_locator_list.h,v 1.5 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: point_locator_list.h,v 1.6 2006-08-09 13:51:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -106,6 +106,20 @@ public:
    */
   virtual const Elem* operator() (const Point& p) const;
 
+  /**
+   * Enables out-of-mesh mode.  In this mode, if asked to find a point
+   * that is contained in no mesh at all, the point locator will
+   * return a NULL pointer instead of crashing.  Per default, this
+   * mode is off.
+   */
+  virtual void enable_out_of_mesh_mode (void);
+
+  /**
+   * Disables out-of-mesh mode (default).  If asked to find a point
+   * that is contained in no mesh at all, the point locator will now
+   * crash.
+   */
+  virtual void disable_out_of_mesh_mode (void);
 
 protected:
 
