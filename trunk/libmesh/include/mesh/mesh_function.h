@@ -1,4 +1,4 @@
-// $Id: mesh_function.h,v 1.6 2006-08-04 21:34:35 roystgnr Exp $
+// $Id: mesh_function.h,v 1.7 2006-08-09 13:51:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 
 // Local Includes
 #include "function_base.h"
+#include "dense_vector.h"
 
 
 
@@ -116,6 +117,35 @@ public:
    */
   const PointLocatorBase& get_point_locator (void) const;
 
+  /**
+   * Enables out-of-mesh mode.  In this mode, if asked for a point
+   * that is not contained in any element, the \p MeshFunction will
+   * return the given \p value instead of crashing.  This mode is off
+   * per default.  If you use a master mesh function and you want to
+   * enable this mode, you will have to enable it for the master mesh
+   * function as well and for all mesh functions that have the same
+   * master mesh function.  You may, however, specify different
+   * values.
+   */
+  void enable_out_of_mesh_mode(const DenseVector<Number>& value);
+
+  /**
+   * Enables out-of-mesh mode.  In this mode, if asked for a point
+   * that is not contained in any element, the \p MeshFunction will
+   * return the given \p value instead of crashing.  This mode is off
+   * per default.  If you use a master mesh function and you want to
+   * enable this mode, you will have to enable it for the master mesh
+   * function as well and for all mesh functions that have the same
+   * master mesh function.  You may, however, specify different
+   * values.
+   */
+  void enable_out_of_mesh_mode(const Number& value);
+
+  /**
+   * Disables out-of-mesh mode.  This is also the default.
+   */
+  void disable_out_of_mesh_mode(void);
+
 protected:
 
 
@@ -148,6 +178,17 @@ protected:
    */
   PointLocatorBase* _point_locator;
 
+  /**
+   * \p true if out-of-mesh mode is enabled.  See \p
+   * enable_out_of_mesh_mode() for more details.  Default is \p false.
+   */
+  bool _out_of_mesh_mode;
+
+  /**
+   * Value to return outside the mesh if out-of-mesh mode is enabled.
+   * See \p enable_out_of_mesh_mode() for more details.
+   */
+  DenseVector<Number> _out_of_mesh_value;
 };
 
 
