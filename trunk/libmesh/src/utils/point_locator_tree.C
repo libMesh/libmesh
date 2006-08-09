@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.C,v 1.13 2006-08-04 21:35:25 roystgnr Exp $
+// $Id: point_locator_tree.C,v 1.14 2006-08-09 13:51:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -36,7 +36,8 @@ PointLocatorTree::PointLocatorTree (const Mesh& mesh,
 				    const PointLocatorBase* master) :
   PointLocatorBase (mesh,master),
   _tree            (NULL),
-  _element         (NULL)
+  _element         (NULL),
+  _out_of_mesh_mode(false)
 {
   this->init();
 }
@@ -159,39 +160,73 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
   assert (this->_initialized);
   
   // First check the element from last time before asking the tree
-  if (!(this->_element->contains_point(p)))
+  if (this->_element==NULL || !(this->_element->contains_point(p)))
     {
 	// ask the tree
 	this->_element = this->_tree->find_element (p);
 
-	// Note that in a few cases the tree may not find a point
-	// e.g. when all a curved element's nodes are outside a
-	// tree node's bounding box, but some of its interior is
-	// inside.
-	// In those cases we take a safe but slow way.
 	if (this->_element == NULL)
 	  {
-	    MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
-	    const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
+	    /* No element seems to contain this point.  If out-of-mesh
+	       mode is enabled, just return NULL.  If not, however, we
+	       have to perform a linear search before we call \p
+	       error() since in the case of curved elements, the
+	       bounding box computed in \p TreeNode::insert(const
+	       Elem*) might be slightly inaccurate.  */
+	    if(!_out_of_mesh_mode)
+	      {
+		MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
+		const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
+		
+		for ( ; pos != end_pos; ++pos)
+		  if ((*pos)->contains_point(p))
+		    return this->_element = (*pos);
 
-	    for ( ; pos != end_pos; ++pos)
-	      if ((*pos)->contains_point(p))
-		return this->_element = (*pos);
-	  }
-
-	if (this->_element == NULL)
-	  {
-	    std::cerr << std::endl
-		      << " ******** Serious Problem.  Could not find an Element "
-		      << "in the Mesh" 
-		      << std:: endl
-		      << " ******** that contains the Point "
-		      << p;
-	    error();
+		if (this->_element == NULL)
+		  {
+		    std::cerr << std::endl
+			      << " ******** Serious Problem.  Could not find an Element "
+			      << "in the Mesh" 
+			      << std:: endl
+			      << " ******** that contains the Point "
+			      << p;
+		    error();
+		  }
+	      }
 	  }
     }
-
+  
   // return the element
   return this->_element;
+}
+
+void PointLocatorTree::enable_out_of_mesh_mode (void)
+{
+  /* Out-of-mesh mode is currently only supported if all of the
+     elements have affine mappings.  The reason is that for quadratic
+     mappings, it is not easy to construct a relyable bounding box of
+     the element, and thus, the fallback linear search in \p
+     operator() is required.  Hence, out-of-mesh mode would be
+     extremely slow.  */
+  if(!_out_of_mesh_mode)
+    {
+#ifdef DEBUG
+      MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
+      for ( ; pos != end_pos; ++pos)
+	if (!(*pos)->has_affine_map())
+	  {
+	    std::cerr << "ERROR: Out-of-mesh mode is currently only supported if all elements have affine mappings." << std::endl;
+	    error();
+	  }
+#endif
+      
+      _out_of_mesh_mode = true;
+    }
+}
+
+void PointLocatorTree::disable_out_of_mesh_mode (void)
+{
+  _out_of_mesh_mode = false;
 }
 
