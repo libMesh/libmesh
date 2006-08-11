@@ -1,4 +1,4 @@
-// $Id: metis_partitioner.C,v 1.22 2005-09-30 20:14:12 benkirk Exp $
+// $Id: metis_partitioner.C,v 1.23 2006-08-11 21:47:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -221,6 +221,9 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
     
   } // done building the graph
 
+
+if (adjncy.empty())
+  adjncy.push_back(0);
 
   // Select which type of partitioning to create
 
