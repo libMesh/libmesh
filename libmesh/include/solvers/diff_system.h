@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.9 2006-07-22 07:51:10 roystgnr Exp $
+// $Id: diff_system.h,v 1.10 2006-08-11 19:56:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -168,6 +168,29 @@ public:
   virtual bool side_constraint (bool request_jacobian) {
     return request_jacobian;
   }
+
+  /**
+   * Executes a postprocessing loop over all elements, and if
+   * \p postprocess_sides is true over all sides.
+   */
+  virtual void postprocess () = 0;
+
+  /**
+   * If \p postprocess_sides is true (it is false by default), the postprocessing
+   * loop will loop over all sides as well as all elements.
+   */
+  bool postprocess_sides;
+
+  /**
+   * Does any work that needs to be done on \p elem in a postprocessing loop.
+   */
+  virtual void element_postprocess () {}
+ 
+  /**
+   * Does any work that needs to be done on \p side of \p elem in a
+   * postprocessing loop.
+   */
+  virtual void side_postprocess () {}
  
   /**
    * Tells the DiffSystem that variable var is evolving with

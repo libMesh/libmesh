@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.8 2006-08-01 23:44:07 roystgnr Exp $
+// $Id: fem_system.h,v 1.9 2006-08-11 19:56:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -120,6 +120,20 @@ public:
    * requires reimplementing mass_residual().
    */
   virtual bool mass_residual (bool request_jacobian);
+
+  /**
+   * Runs a postprocessing loop over all elements, and if
+   * \p postprocess_sides is true over all sides.
+   */
+  virtual void postprocess ();
+
+  /**
+   * If fe_reinit_during_postprocess is true (it is true by default), FE
+   * objects will be reinit()ed with their default quadrature rules.  If false,
+   * FE objects will need to be reinit()ed by the user or will be in an
+   * undefined state.
+   */
+  bool fe_reinit_during_postprocess;
 
   /**
    * Returns the value of the solution variable \p at the quadrature

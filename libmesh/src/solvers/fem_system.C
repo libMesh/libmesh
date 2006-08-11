@@ -16,6 +16,7 @@ FEMSystem::FEMSystem (EquationSystems& es,
                       const std::string& name,
                       const unsigned int number)
   : Parent(es, name, number),
+    fe_reinit_during_postprocess(true),
     numerical_jacobian_h(1.e-6),
     verify_analytic_jacobians(0.0)
 {
@@ -570,6 +571,97 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
       std::cout.precision(old_precision);
     }
   STOP_LOG(log_name, "FEMSystem");
+}
+
+
+
+void FEMSystem::postprocess ()
+{
+  START_LOG("postprocess()", "FEMSystem");
+
+  const Mesh& mesh = this->get_mesh();
+
+  const DofMap& dof_map = this->get_dof_map();
+
+  this->get_vector("_nonlinear_solution").localize
+    (*current_local_nonlinear_solution,
+     dof_map.get_send_list());
+
+  // Loop over every active mesh element on this processor
+  MeshBase::const_element_iterator el =
+    mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el =
+    mesh.active_local_elements_end();
+
+  for ( ; el != end_el; ++el)
+    {
+      elem = *el;
+
+      // Initialize the per-element data for elem.
+      dof_map.dof_indices (elem, dof_indices);
+      unsigned int n_dofs = dof_indices.size();
+
+      elem_solution.resize(n_dofs);
+      for (unsigned int i=0; i != n_dofs; ++i)
+        elem_solution(i) = current_nonlinear_solution(dof_indices[i]);
+
+      // Initialize the per-variable data for elem.
+      unsigned int sub_dofs = 0;
+      for (unsigned int i=0; i != this->n_vars(); ++i)
+        {
+          dof_map.dof_indices (elem, dof_indices_var[i], i);
+
+          elem_subsolutions[i]->reposition
+            (sub_dofs, dof_indices_var[i].size());
+
+          sub_dofs += dof_indices_var[i].size();
+        }
+      assert(sub_dofs == n_dofs);
+
+      // Optionally initialize all the interior FE objects on elem.
+      // Logging of FE::reinit is done in the FE functions
+      if (fe_reinit_during_postprocess)
+        {
+          PAUSE_LOG("postprocess()", "FEMSystem");
+          std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
+          for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
+               i != fe_end; ++i)
+            {
+              i->second->reinit(elem);
+            }
+          RESTART_LOG("postprocess()", "FEMSystem");
+        }
+      
+      this->element_postprocess();
+
+      for (side = 0; side != elem->n_sides(); ++side)
+        {
+          // Don't compute on non-boundary sides unless requested
+          if (!postprocess_sides ||
+              (!compute_internal_sides &&
+               elem->neighbor(side) != NULL))
+            continue;
+
+          // Optionally initialize all the interior FE objects on elem/side.
+          // Logging of FE::reinit is done in the FE functions
+          if (fe_reinit_during_postprocess)
+            {
+              PAUSE_LOG("postprocess()", "FEMSystem");
+              std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
+              fe_end = side_fe.end();
+              for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
+                   i != fe_end; ++i)
+                {
+                  i->second->reinit(elem, side);
+                }
+              RESTART_LOG("postprocess()", "FEMSystem");
+            }
+
+          this->side_postprocess();
+        }
+    }
+
+  STOP_LOG("postprocess()", "FEMSystem");
 }
 
 

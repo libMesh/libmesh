@@ -11,6 +11,7 @@ DifferentiableSystem::DifferentiableSystem
                        const unsigned int number) :
   Parent      (es, name, number),
   compute_internal_sides(false),
+  postprocess_sides(false),
   time_solver (NULL),
   time(0.),
   deltat(1.),
