@@ -1,4 +1,4 @@
-// $Id: exodusII_io.C,v 1.11 2006-05-28 16:13:12 benkirk Exp $
+// $Id: exodusII_io.C,v 1.12 2006-08-14 15:45:12 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -909,7 +909,7 @@ namespace
     else if (type == "HEX27")
       return assign_conversion(HEX27);
 
-    else if (type == "TETRA4")
+    else if ((type == "TETRA4") || (type == "TETRA"))
       return assign_conversion(TET4);
 
     else if (type == "TETRA10")
