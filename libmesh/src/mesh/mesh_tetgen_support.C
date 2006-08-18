@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.22 2006-06-13 18:29:26 jwpeterson Exp $
+// $Id: mesh_tetgen_support.C,v 1.23 2006-08-18 16:44:29 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -167,6 +167,13 @@ void TetGenWrapper::set_numberofholes(const int i)
 
 
 
+void TetGenWrapper::set_numberofregions(const int i)
+{
+  this->tetgen_data.numberofregions = i;
+}
+
+
+
 void TetGenWrapper::set_facetlist(const int numoffacets, const int numofholes)
 {
   set_numberoffacets(numoffacets);
@@ -175,6 +182,14 @@ void TetGenWrapper::set_facetlist(const int numoffacets, const int numofholes)
   for (int i=0; i<numoffacets; i++)
     this->tetgen_data.init(&(this->tetgen_data.facetlist[i]));
   this->tetgen_data.holelist = new REAL[this->tetgen_data.numberofholes * 3];
+}
+
+
+
+void TetGenWrapper::set_regionlist(const int numofregions)
+{
+  set_numberofregions(numofregions);
+  this->tetgen_data.regionlist = new REAL[this->tetgen_data.numberofregions * 5];
 }
 
 
@@ -225,6 +240,20 @@ void TetGenWrapper::set_vertex(const int i, const int j, const int k, const int 
 {
   this->tetgen_data.facetlist[i].polygonlist[j].vertexlist[k] = nodeindex;
 }
+
+
+
+void TetGenWrapper::set_region(const int i, const REAL x, const REAL y, const REAL z,
+			       const REAL attribute, const REAL vol_constraint)
+{
+  int index = i*5;
+  tetgen_data.regionlist[index++] = x;
+  tetgen_data.regionlist[index++] = y;
+  tetgen_data.regionlist[index++] = z;
+  tetgen_data.regionlist[index++] = attribute;
+  tetgen_data.regionlist[index++] = vol_constraint;
+}
+
 
 // class type TetGen_access is cast to TetGenWrapper.
 typedef TetGenWrapper TetGen_access;

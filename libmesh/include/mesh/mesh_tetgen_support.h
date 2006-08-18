@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.h,v 1.17 2005-06-11 03:59:17 jwpeterson Exp $
+// $Id: mesh_tetgen_support.h,v 1.18 2006-08-18 16:44:30 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -99,6 +99,11 @@ class TetGenWrapper
   void set_numberofholes(const int i);
 
   /**
+   * Method sets number of regions in TetGen input.
+   */
+  void set_numberofregions(const int i);
+
+  /**
    * Method allocates memory, sets number of nodes in TetGen input.
    */
   void set_pointlist(const int numofpoints);
@@ -107,6 +112,11 @@ class TetGenWrapper
    * Method allocates memory, sets number of facets, holes in TetGen input.
    */
   void set_facetlist(const int numoffacets, const int numofholes);
+
+  /**
+   * Method allocates memory, sets number of regions in TetGen input.
+   */
+  void set_regionlist(const int numofregions);
 
   /**
    * Method sets coordinates of point i in TetGen input.
@@ -165,6 +175,15 @@ class TetGenWrapper
    * TetGen input.
    */
   void set_vertex(const int i, const int j, const int k, const int nodeindex);
+
+  /**
+   * Method sets coordinates, attribute and volume constraint for
+   * region i in TetGen input.  Note that coordinates and attributes
+   * will only be considered if the corresponding switches are
+   * enabled.  See TetGen documentation for more details.
+   */
+  void set_region(const int i, const REAL x, const REAL y, const REAL z,
+		  const REAL attribute, const REAL vol_constraint);
 
   /**
    * TetGen input structure.
