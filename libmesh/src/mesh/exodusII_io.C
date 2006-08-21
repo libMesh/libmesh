@@ -1,4 +1,4 @@
-// $Id: exodusII_io.C,v 1.12 2006-08-14 15:45:12 benkirk Exp $
+// $Id: exodusII_io.C,v 1.13 2006-08-21 16:56:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -900,7 +900,7 @@ namespace
     else if (type == "TRI6")
       return assign_conversion(TRI6);
 
-    else if ((type == "HEX8") || (type == "HEX")) 
+    else if ((type == "HEX8") || (type == "HEX") || (type=="hex8")) 
       return assign_conversion(HEX8);
 
     else if (type == "HEX20")
