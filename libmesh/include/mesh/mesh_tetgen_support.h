@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.h,v 1.18 2006-08-18 16:44:30 jwpeterson Exp $
+// $Id: mesh_tetgen_support.h,v 1.19 2006-08-22 15:07:15 roystgnr Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -138,6 +138,11 @@ class TetGenWrapper
    */
   int  get_triface_node(const int i, const int j);
 
+  /**
+   * Method returns attribute of element i in TetGen output.
+   */
+  REAL get_element_attribute(const int i);
+       
   /**
    * Method sets coordinates of hole i in TetGen input.
    */
