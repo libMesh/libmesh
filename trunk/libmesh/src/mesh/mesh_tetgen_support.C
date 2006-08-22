@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.23 2006-08-18 16:44:29 jwpeterson Exp $
+// $Id: mesh_tetgen_support.C,v 1.24 2006-08-22 15:07:15 roystgnr Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -120,6 +120,14 @@ int TetGenWrapper::get_element_node(const int i, const int j)
 int TetGenWrapper::get_triface_node(const int i, const int j)
 {
   return tetgen_output->trifacelist[i*3+j];
+}
+
+
+
+REAL TetGenWrapper::get_element_attribute(const int i)
+{
+  assert(numberoftetrahedronattributes>0);
+  return tetgen_output->tetrahedronattributelist[tetgen_output->numberoftetrahedronattributes*i];
 }
 
 
