@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.C,v 1.14 2006-08-09 13:51:07 roystgnr Exp $
+// $Id: point_locator_tree.C,v 1.15 2006-08-23 14:05:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -101,7 +101,7 @@ void PointLocatorTree::init ()
 
 	    case 3:
 	      {
-		_tree = new Trees::OctTree (this->_mesh, 100,
+		_tree = new Trees::OctTree (this->_mesh, 200,
 					    Trees::OctTree::ELEMENTS);
 		break;
 	      }
