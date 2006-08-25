@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.24 2006-07-23 05:10:51 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.25 2006-08-25 05:01:45 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -315,6 +315,8 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   // Next, let's see if we can trade any refinement for coarsening
   while (coarsen_count < max_elem_coarsen &&
          refine_count < max_elem_refine &&
+         coarsen_count < sorted_parent_error.size() &&
+         refine_count < sorted_error.size() &&
          sorted_error[refine_count] < 
 	   sorted_parent_error[coarsen_count] * _coarsen_threshold)
     {
@@ -330,6 +332,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
       Elem* parent = elem->parent();
 
       if (parent && coarsen_count &&
+          error_per_parent[parent->id()] &&
           error_per_parent[parent->id()] <=
             sorted_parent_error[coarsen_count-1])
         elem->set_refinement_flag(Elem::COARSEN);
@@ -474,6 +477,7 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
         elem->set_refinement_flag(Elem::COARSEN);
 
       if (n_elem_refine &&
+          elem->level() < _max_h_level &&
           error_per_cell[elem->id()] >= top_error)
         elem->set_refinement_flag(Elem::REFINE);
     }
