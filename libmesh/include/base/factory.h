@@ -1,4 +1,4 @@
-// $Id: factory.h,v 1.7 2005-02-22 22:17:30 jwpeterson Exp $
+// $Id: factory.h,v 1.8 2006-08-28 15:35:27 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -134,6 +134,8 @@ AutoPtr<Base> Factory<Base>::build (const std::string& name)
 	     it = factory_map().begin(); it != factory_map().end(); ++it)
         std::cerr << "  " << it->first << std::endl;
 
+      error();
+      
       // Do this the stoopid way for IBM xlC
       AutoPtr<Base> ret_val (NULL);
       
