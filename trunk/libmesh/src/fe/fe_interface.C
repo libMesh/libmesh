@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.45 2006-05-02 17:36:30 spetersen Exp $
+// $Id: fe_interface.C,v 1.46 2006-08-28 21:33:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -166,7 +166,7 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 #endif
 	    
 	  case XYZ:
-	    return FEXYZ<1>::n_shape_functions(t, o);
+	    return FEXYZ<3>::n_shape_functions(t, o);
 
 	  default:
 	    error();
