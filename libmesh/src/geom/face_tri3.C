@@ -1,4 +1,4 @@
-// $Id: face_tri3.C,v 1.21 2006-06-19 22:55:41 jwpeterson Exp $
+// $Id: face_tri3.C,v 1.22 2006-08-28 16:02:08 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -198,4 +198,32 @@ Real Tri3::volume () const
   Point v20 ( *(this->get_node(2)) - *(this->get_node(0)) );
 
   return 0.5 * (v10.cross(v20)).size() ;
+}
+
+
+
+std::pair<Real, Real> Tri3::min_and_max_angle() const
+{
+  Point v10 ( this->point(1) - this->point(0) );
+  Point v20 ( this->point(2) - this->point(0) );
+  Point v21 ( this->point(2) - this->point(1) );
+
+  const Real
+    len_10=v10.size(),
+    len_20=v20.size(),
+    len_21=v21.size()
+    ;
+
+  const Real
+    theta0=std::acos(( v10*v20)/len_10/len_20),
+    theta1=std::acos((-v10*v21)/len_10/len_21),
+    theta2=libMesh::pi - theta0 - theta1
+    ;
+
+  assert(theta0 > 0.);
+  assert(theta1 > 0.);
+  assert(theta2 > 0.);
+  
+  return std::make_pair(std::min(theta0, std::min(theta1,theta2)),
+			std::max(theta0, std::max(theta1,theta2)));
 }
