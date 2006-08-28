@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.25 2006-07-27 23:10:39 jwpeterson Exp $
+// $Id: mesh_communication.C,v 1.26 2006-08-28 16:08:22 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -419,11 +419,11 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
     // Only continue if we have element BCs
     if (n_bcs > 0)
       {
-	// Allocate space.
+	// Allocate space. On CPU 0, these vectors should already have size n_bcs.
 	el_id.resize   (n_bcs);
 	side_id.resize (n_bcs);
 	bc_id.resize   (n_bcs);
-
+	
 	// Broadcast the element identities
 	MPI_Bcast (&el_id[0],   n_bcs, MPI_UNSIGNED,       0, libMesh::COMM_WORLD);
 
@@ -442,6 +442,10 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
 	      const Elem* elem = mesh.elem(el_id[e]);
 
 	      assert (elem != NULL);
+
+	      // sanity: be sure that the element returned by mesh.elem() really has id()==el_id[e]
+	      assert(elem->id() == el_id[e]);
+
 	      assert (side_id[e] < elem->n_sides());
 	    
 	      boundary_info.add_side (elem, side_id[e], bc_id[e]);
@@ -469,7 +473,7 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
     // Only continue if we have nodal BCs
     if (n_bcs > 0)
       {      
-	// Allocate space.
+	// Allocate space, again on CPU 0 this should be a no-op.
 	node_id.resize (n_bcs);
 	bc_id.resize   (n_bcs);
 	
@@ -486,8 +490,11 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
 	      assert (node_id[n] < mesh.n_nodes());
 	      
 	      const Node* node = mesh.node_ptr (node_id[n]);
-	      
+
 	      assert (node != NULL);
+	      
+	      // sanity: be sure that the node returned by mesh.node_ptr() really has id()==node_id[n]
+	      assert(node->id() == node_id[n]);
 	    
 	      boundary_info.add_node (node, bc_id[n]);
 	    }
