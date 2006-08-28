@@ -1,4 +1,4 @@
-// $Id: face_tri3.h,v 1.12 2006-06-19 22:55:41 jwpeterson Exp $
+// $Id: face_tri3.h,v 1.13 2006-08-28 16:02:08 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -139,6 +139,12 @@ public:
    */
   virtual Real volume () const;
 
+  /**
+   * Returns the minimum and maximum angles for the triangle
+   * (in radians) in a std::pair.  The first entry in the pair
+   * is the minimum angle, the second entry is the max angle.
+   */
+  std::pair<Real, Real> min_and_max_angle() const;
   
 protected:
 
