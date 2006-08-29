@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.43 2006-06-13 18:33:14 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.44 2006-08-29 22:28:51 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1084,6 +1084,9 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 	 
 		  for (unsigned int s=0; s<base_hex->n_sides(); ++s)
 		    {
+		      // Get the boundary ID for this side
+		      short int b_id = mesh.boundary_info->boundary_id(*el, s);
+		      
 		      // Need to build the full-ordered side!
 		      AutoPtr<Elem> side = base_hex->build_side(s);
 	     
@@ -1095,19 +1098,28 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 			  sub_elem->set_node(1) = side->get_node(8);                           // centroid of the face
 			  sub_elem->set_node(2) = side->get_node(sub_tet==3 ? 0 : sub_tet+1 ); // wrap-around
 			  sub_elem->set_node(3) = apex_node;                                   // apex node always used!
+
+			  // If the original hex was a boundary hex, add the new sub_tet's side
+			  // 0 with the same b_id.  Note: the tets are all aligned so that their
+			  // side 0 is on the boundary.
+			  if (b_id != BoundaryInfo::invalid_id)
+			    mesh.boundary_info->add_side(sub_elem, 0, b_id);
 			}
 		    }
 		}
 	    }
 	    
 
-	    // Delete the original HEX27 elements
+	    // Delete the original HEX27 elements from the mesh, and the boundary info structure.
 	    {
 	      MeshBase::element_iterator       el     = mesh.elements_begin();
 	      const MeshBase::element_iterator end_el = mesh.elements_end();
        
 	      for ( ; el != end_el;  ++el)
-		mesh.delete_elem(*el);
+		{
+		  mesh.boundary_info->remove(*el); // Safe even if *el has no boundary info.
+		  mesh.delete_elem(*el);
+		}
 	    }
 
 	    // Add the new elements
