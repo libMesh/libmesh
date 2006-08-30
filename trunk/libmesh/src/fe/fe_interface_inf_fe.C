@@ -1,4 +1,4 @@
-// $Id: fe_interface_inf_fe.C,v 1.12 2005-08-26 13:21:32 spetersen Exp $
+// $Id: fe_interface_inf_fe.C,v 1.13 2006-08-30 18:42:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -583,7 +583,9 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
 				    const FEType& fe_t,
 				    const Elem* elem,
 				    const std::vector<Point>& physical_points,
-				    std::vector<Point>&       reference_points)
+				    std::vector<Point>&       reference_points,
+				    const Real tolerance,
+				    const bool secure)
 {
   switch (dim)
     {
@@ -593,7 +595,7 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
 	switch (fe_t.inf_map)
 	  {
 	  case CARTESIAN:
-	    InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points);
+	    InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
 	  default:
@@ -608,7 +610,7 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
 	switch (fe_t.inf_map)
 	  {
 	  case CARTESIAN:
-	   InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points);
+	   InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	   return;
 
 	  default:
@@ -624,7 +626,7 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
 	switch (fe_t.inf_map)
 	  {
 	  case CARTESIAN:
-	   InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points);
+	   InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	   return;
 
 	  default:

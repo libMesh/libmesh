@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.9 2006-04-27 17:57:28 roystgnr Exp $
+// $Id: inf_fe.h,v 1.10 2006-08-30 18:42:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.9 $
+   * \version $Revision: 1.10 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.9 $
+   * \version $Revision: 1.10 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -388,7 +388,9 @@ public:
    */
   static void inverse_map (const Elem* elem,
 			   const std::vector<Point>& physical_points,
-			   std::vector<Point>&       reference_points);
+			   std::vector<Point>&       reference_points,
+			   const Real tolerance = TOLERANCE,
+			   const bool secure = true);
 
 
   //-------------------------------------------------------------
