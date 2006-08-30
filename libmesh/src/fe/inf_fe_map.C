@@ -1,4 +1,4 @@
-// $Id: inf_fe_map.C,v 1.15 2005-07-01 16:36:12 spetersen Exp $
+// $Id: inf_fe_map.C,v 1.16 2006-08-30 18:42:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -637,7 +637,9 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* elem,
 					     const std::vector<Point>& physical_points,
-					     std::vector<Point>&       reference_points)
+					     std::vector<Point>&       reference_points,
+					     const Real tolerance,
+					     const bool secure)
 {
   // The number of points to find the
   // inverse map of
@@ -651,7 +653,7 @@ void InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* elem,
   // element of each point in physical space
   for (unsigned int p=0; p<n_points; p++)
     reference_points[p] =
-      InfFE<Dim,T_radial,T_map>::inverse_map (elem, physical_points[p], TOLERANCE, true, false);
+      InfFE<Dim,T_radial,T_map>::inverse_map (elem, physical_points[p], tolerance, secure, false);
 }
 
 
@@ -669,9 +671,9 @@ INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,Point,inverse_map(const Elem*,const Point&,c
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,Point,inverse_map(const Elem*,const Point&,const Real,const bool,const bool));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,Point,inverse_map(const Elem*,const Point&,const Real,const bool,const bool));
 
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,const Real, const bool));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,const Real, const bool));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,const Real, const bool));
 
 
 
