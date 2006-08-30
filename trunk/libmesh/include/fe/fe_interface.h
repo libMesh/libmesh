@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.13 2006-03-29 19:16:39 roystgnr Exp $
+// $Id: fe_interface.h,v 1.14 2006-08-30 18:06:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -169,22 +169,27 @@ public:
 			    const FEType& fe_t,
 			    const Elem* elem,
 			    const Point& p,
-			    const Real tolerance = 1.e-4,
+			    const Real tolerance = TOLERANCE,
 			    const bool secure = true);
 
   /**
-   * @returns the location (on the reference element) of the
-   * points \p physical_points located in physical space.
-   * This function requires
-   * inverting the (probably nonlinear) transformation map, so
-   * it is not trivial. The location of each point on the reference
-   * element is returned in the vector \p reference_points.
+   * @returns the location (on the reference element) of the points \p
+   * physical_points located in physical space.  This function
+   * requires inverting the (probably nonlinear) transformation map,
+   * so it is not trivial. The location of each point on the reference
+   * element is returned in the vector \p reference_points. The
+   * optional parameter \p tolerance defines how close is "good
+   * enough."  The map inversion iteration computes the sequence \f$
+   * \{ p_n \} \f$, and the iteration is terminated when \f$ \|p -
+   * p_n\| < \mbox{\texttt{tolerance}} \f$
    */
   static void  inverse_map (const unsigned int dim,
 			    const FEType& fe_t,
 			    const Elem* elem,
 			    const std::vector<Point>& physical_points,
-			    std::vector<Point>&       reference_points);
+			    std::vector<Point>&       reference_points,
+			    const Real tolerance = TOLERANCE,
+			    const bool secure = true);
 
   /**
    * @returns true if the point p is located on the reference element

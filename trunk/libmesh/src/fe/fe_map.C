@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.42 2006-08-08 17:34:27 roystgnr Exp $
+// $Id: fe_map.C,v 1.43 2006-08-30 18:06:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1458,7 +1458,9 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::inverse_map (const Elem* elem,
 			     const std::vector<Point>& physical_points,
-			     std::vector<Point>&       reference_points)
+			     std::vector<Point>&       reference_points,
+			     const Real tolerance,
+			     const bool secure)
 {
   // The number of points to find the
   // inverse map of
@@ -1472,7 +1474,7 @@ void FE<Dim,T>::inverse_map (const Elem* elem,
   // element of each point in physical space
   for (unsigned int p=0; p<n_points; p++)
     reference_points[p] =
-      FE<Dim,T>::inverse_map (elem, physical_points[p]);
+      FE<Dim,T>::inverse_map (elem, physical_points[p], tolerance, secure);
 }
 
 

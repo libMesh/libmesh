@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.46 2006-08-28 21:33:09 roystgnr Exp $
+// $Id: fe_interface.C,v 1.47 2006-08-30 18:06:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1258,7 +1258,9 @@ void FEInterface::inverse_map (const unsigned int dim,
 			       const FEType& fe_t,
 			       const Elem* elem,
 			       const std::vector<Point>& physical_points,
-			       std::vector<Point>&       reference_points)
+			       std::vector<Point>&       reference_points,
+			       const Real tolerance,
+			       const bool secure)
 {
   const unsigned int n_pts = physical_points.size();
 
@@ -1281,7 +1283,7 @@ void FEInterface::inverse_map (const unsigned int dim,
 
   if ( is_InfFE_elem(elem->type()) )
     {
-      ifem_inverse_map(dim, fe_t, elem, physical_points, reference_points);
+      ifem_inverse_map(dim, fe_t, elem, physical_points, reference_points, tolerance, secure);
       return;
 
 //       std::cerr << "ERROR: Not implemented!"
@@ -1299,39 +1301,39 @@ void FEInterface::inverse_map (const unsigned int dim,
 	switch (fe_t.family)
 	  {
 	  case CLOUGH:
-	    FE<1,CLOUGH>::inverse_map(elem, physical_points, reference_points);
+	    FE<1,CLOUGH>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case HERMITE:
-	    FE<1,HERMITE>::inverse_map(elem, physical_points, reference_points);
+	    FE<1,HERMITE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case HIERARCHIC:
-	    FE<1,HIERARCHIC>::inverse_map(elem, physical_points, reference_points);
+	    FE<1,HIERARCHIC>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case LAGRANGE:
-	    FE<1,LAGRANGE>::inverse_map(elem, physical_points, reference_points);
+	    FE<1,LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case MONOMIAL:
-	    FE<1,MONOMIAL>::inverse_map(elem, physical_points, reference_points);
+	    FE<1,MONOMIAL>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
-	    FE<1,BERNSTEIN>::inverse_map(elem, physical_points, reference_points);
+	    FE<1,BERNSTEIN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
 	  case SZABAB:
-	    FE<1,SZABAB>::inverse_map(elem, physical_points, reference_points);
+	    FE<1,SZABAB>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
 #endif
 	    
 	  case XYZ:
-	    FEXYZ<1>::inverse_map(elem, physical_points, reference_points);
+	    FEXYZ<1>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
 	  default:
@@ -1346,39 +1348,39 @@ void FEInterface::inverse_map (const unsigned int dim,
 	switch (fe_t.family)
 	  {
 	  case CLOUGH:
-	    FE<2,CLOUGH>::inverse_map(elem, physical_points, reference_points);
+	    FE<2,CLOUGH>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case HERMITE:
-	    FE<2,HERMITE>::inverse_map(elem, physical_points, reference_points);
+	    FE<2,HERMITE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case HIERARCHIC:
-	    FE<2,HIERARCHIC>::inverse_map(elem, physical_points, reference_points);
+	    FE<2,HIERARCHIC>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case LAGRANGE:
-	    FE<2,LAGRANGE>::inverse_map(elem, physical_points, reference_points);
+	    FE<2,LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case MONOMIAL:
-	    FE<2,MONOMIAL>::inverse_map(elem, physical_points, reference_points);
+	    FE<2,MONOMIAL>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
-	    FE<2,BERNSTEIN>::inverse_map(elem, physical_points, reference_points);
+	    FE<2,BERNSTEIN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
 	  case SZABAB:
-	    FE<2,SZABAB>::inverse_map(elem, physical_points, reference_points);
+	    FE<2,SZABAB>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
 #endif
 	    
 	  case XYZ:
-	    FEXYZ<2>::inverse_map(elem, physical_points, reference_points);
+	    FEXYZ<2>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
 	  default:
@@ -1393,35 +1395,35 @@ void FEInterface::inverse_map (const unsigned int dim,
 	switch (fe_t.family)
 	  {
 	  case HERMITE:
-	    FE<3,HERMITE>::inverse_map(elem, physical_points, reference_points);
+	    FE<3,HERMITE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case HIERARCHIC:
-	    FE<3,HIERARCHIC>::inverse_map(elem, physical_points, reference_points);
+	    FE<3,HIERARCHIC>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case LAGRANGE:
-	    FE<3,LAGRANGE>::inverse_map(elem, physical_points, reference_points);
+	    FE<3,LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case MONOMIAL:
-	    FE<3,MONOMIAL>::inverse_map(elem, physical_points, reference_points);
+	    FE<3,MONOMIAL>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
-	    FE<3,BERNSTEIN>::inverse_map(elem, physical_points, reference_points);
+	    FE<3,BERNSTEIN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
 	  case SZABAB:
-	    FE<3,SZABAB>::inverse_map(elem, physical_points, reference_points);
+	    FE<3,SZABAB>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
 #endif
 	    
 	  case XYZ:
-	    FEXYZ<3>::inverse_map(elem, physical_points, reference_points);
+	    FEXYZ<3>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  default:

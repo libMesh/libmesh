@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.21 2006-04-27 17:57:28 roystgnr Exp $
+// $Id: fe.h,v 1.22 2006-08-30 18:06:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.21 $
+ * \version $Revision: 1.22 $
  */
 
 //-------------------------------------------------------------
@@ -269,14 +269,20 @@ public:
 			    const bool secure = true);
 
   /**
-   * Takes a number points in physical space (in the \p physical_points
-   * vector) and finds their location on the reference element for the
-   * input element \p elem.  The values on the reference element are
-   * returned in the vector \p reference_points
+   * Takes a number points in physical space (in the \p
+   * physical_points vector) and finds their location on the reference
+   * element for the input element \p elem.  The values on the
+   * reference element are returned in the vector \p
+   * reference_points. The optional parameter \p tolerance defines how
+   * close is "good enough."  The map inversion iteration computes the
+   * sequence \f$ \{ p_n \} \f$, and the iteration is terminated when
+   * \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
    */
   static void inverse_map (const Elem* elem,
 			   const std::vector<Point>& physical_points,
-			   std::vector<Point>&       reference_points);
+			   std::vector<Point>&       reference_points,
+			   const Real tolerance = TOLERANCE,
+			   const bool secure = true);
   
   /**
    * This is at the core of this class. Use this for each
@@ -342,8 +348,6 @@ public:
 				        const Elem* elem);
   
 #ifdef ENABLE_INFINITE_ELEMENTS
-
-protected:
 
   /**
    * Initialize the data fields for the base of an
@@ -433,7 +437,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.21 $
+ * \version $Revision: 1.22 $
  */
 
 //-------------------------------------------------------------
@@ -458,7 +462,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2005
- * \version $Revision: 1.21 $
+ * \version $Revision: 1.22 $
  */
 
 //-------------------------------------------------------------
@@ -493,7 +497,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.21 $
+ * \version $Revision: 1.22 $
  */
 
 //-------------------------------------------------------------
@@ -518,7 +522,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.21 $
+ * \version $Revision: 1.22 $
  */
 
 //-------------------------------------------------------------
@@ -543,7 +547,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.21 $
+ * \version $Revision: 1.22 $
  */
 
 //-------------------------------------------------------------
@@ -569,7 +573,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.21 $
+ * \version $Revision: 1.22 $
  */
 
 //-------------------------------------------------------------
