@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.30 2006-07-27 17:54:39 roystgnr Exp $
+// $Id: system_projection.C,v 1.31 2006-09-02 19:38:41 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1168,9 +1168,9 @@ void System::project_vector (Number fptr(const Point& p,
                                                 parameters,
                                                 this->name(),
                                                 this->variable_name(var));
-                          Real gxzplus = (gxpyp(2) - gxmyp(2))
+                          Number gxzplus = (gxpyp(2) - gxmyp(2))
                                          / 2. / TOLERANCE;
-                          Real gxzminus = (gxpym(2) - gxmym(2))
+                          Number gxzminus = (gxpym(2) - gxmym(2))
                                           / 2. / TOLERANCE;
                           // xyz derivative
                           Ue(current_dof) = (gxzplus - gxzminus)
