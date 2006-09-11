@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.20 2006-04-27 17:57:28 roystgnr Exp $
+// $Id: fe_base.h,v 1.21 2006-09-11 16:49:38 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -136,17 +136,21 @@ public:
     
   /**
    * Reinitializes all the physical element-dependent data based on
-   * the \p side of the element \p elem.
+   * the \p side of the element \p elem.  The \p tolerance paremeter
+   * is passed to the involved call to \p inverse_map().
    */
   virtual void reinit (const Elem* elem,
-		       const unsigned int side) = 0;
+		       const unsigned int side,
+		       const Real tolerance = TOLERANCE) = 0;
   
   /**
    * Reinitializes all the physical element-dependent data based on
-   * the \p edge of the element \p elem.
+   * the \p edge of the element \p elem.  The \p tolerance paremeter
+   * is passed to the involved call to \p inverse_map().
    */
   virtual void edge_reinit (const Elem* elem,
-		            const unsigned int edge) = 0;
+		            const unsigned int edge,
+			    const Real tolerance = TOLERANCE) = 0;
   
   /**
    * @returns true if the point p is located on the reference element
