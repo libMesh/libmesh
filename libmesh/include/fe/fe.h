@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.22 2006-08-30 18:06:29 roystgnr Exp $
+// $Id: fe.h,v 1.23 2006-09-11 16:49:38 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.22 $
+ * \version $Revision: 1.23 $
  */
 
 //-------------------------------------------------------------
@@ -299,17 +299,21 @@ public:
     
   /**
    * Reinitializes all the physical element-dependent data based on
-   * the \p side of \p face.
+   * the \p side of \p face.  The \p tolerance paremeter is passed to
+   * the involved call to \p inverse_map().
    */
   virtual void reinit (const Elem* elem,
-		       const unsigned int side);
+		       const unsigned int side,
+		       const Real tolerance = TOLERANCE);
 
   /**
    * Reinitializes all the physical element-dependent data based on
-   * the \p edge
+   * the \p edge.  The \p tolerance paremeter is passed to the
+   * involved call to \p inverse_map().
    */
   virtual void edge_reinit (const Elem* elem,
-		            const unsigned int edge);
+		            const unsigned int edge,
+			    const Real tolerance = TOLERANCE);
 
   /**
    * Provides the class with the quadrature rule, which provides the
@@ -437,7 +441,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.22 $
+ * \version $Revision: 1.23 $
  */
 
 //-------------------------------------------------------------
@@ -462,7 +466,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2005
- * \version $Revision: 1.22 $
+ * \version $Revision: 1.23 $
  */
 
 //-------------------------------------------------------------
@@ -497,7 +501,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.22 $
+ * \version $Revision: 1.23 $
  */
 
 //-------------------------------------------------------------
@@ -522,7 +526,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.22 $
+ * \version $Revision: 1.23 $
  */
 
 //-------------------------------------------------------------
@@ -547,7 +551,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.22 $
+ * \version $Revision: 1.23 $
  */
 
 //-------------------------------------------------------------
@@ -573,7 +577,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.22 $
+ * \version $Revision: 1.23 $
  */
 
 //-------------------------------------------------------------
