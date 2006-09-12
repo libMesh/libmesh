@@ -1,4 +1,4 @@
-// $Id: fe_xyz_boundary.C,v 1.5 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_xyz_boundary.C,v 1.6 2006-09-12 07:14:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,8 @@
 // Full specialization for 1D when this is a useless method
 template <>
 void FEXYZ<1>::reinit(const Elem*,
-		      const unsigned int)
+		      const unsigned int,
+		      const Real)
 {
   std::cerr << "ERROR: This method only makes sense for 2D elements!"
 	    << std::endl;
@@ -50,7 +51,8 @@ void FEXYZ<1>::reinit(const Elem*,
 // Method for 2D, 3D
 template <unsigned int Dim>
 void FEXYZ<Dim>::reinit(const Elem* elem,
-			const unsigned int s)
+			const unsigned int s,
+			const Real)
 {
   assert (elem  != NULL);
   assert (this->qrule != NULL);

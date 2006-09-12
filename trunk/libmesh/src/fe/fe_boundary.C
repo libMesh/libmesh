@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.41 2006-09-11 17:17:42 roystgnr Exp $
+// $Id: fe_boundary.C,v 1.42 2006-09-12 07:14:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -36,7 +36,8 @@
 #define REINIT_1D_ERROR(_type, _func)       \
 template <>                                 \
 void FE<1,_type>::_func(const Elem*,        \
-			const unsigned int) \
+			const unsigned int, \
+                        const Real) \
 {                                           \
   std::cerr << "ERROR: This method makes no sense for 1D elements!" \
 	    << std::endl;                   \
@@ -67,7 +68,8 @@ REINIT_1D_ERROR(SZABAB, edge_reinit)
 // Methods for 2D, 3D
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit(const Elem* elem,
-		       const unsigned int s)
+		       const unsigned int s,
+		       const Real tolerance)
 {
   assert (elem  != NULL);
   assert (qrule != NULL);
@@ -108,7 +110,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
   // Find where the integration points are located on the
   // full element.
-  std::vector<Point> qp; this->inverse_map (elem, xyz, qp);
+  std::vector<Point> qp; this->inverse_map (elem, xyz, qp, tolerance);
   
   
   // compute the shape function and derivative values
@@ -123,7 +125,8 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::edge_reinit(const Elem* elem,
-		            const unsigned int e)
+		            const unsigned int e,
+			    const Real tolerance)
 {
   assert (elem  != NULL);
   assert (qrule != NULL);
@@ -162,7 +165,7 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
 
   // Find where the integration points are located on the
   // full element.
-  std::vector<Point> qp; this->inverse_map (elem, xyz, qp);
+  std::vector<Point> qp; this->inverse_map (elem, xyz, qp, tolerance);
   
   // compute the shape function and derivative values
   // at the points qp
@@ -605,39 +608,39 @@ void FEBase::compute_edge_map(const std::vector<Real>& qw,
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template void FE<2,LAGRANGE>::reinit(Elem const*, unsigned int);
-template void FE<2,LAGRANGE>::edge_reinit(Elem const*, unsigned int);
-template void FE<2,HIERARCHIC>::reinit(Elem const*, unsigned int);
-template void FE<2,HIERARCHIC>::edge_reinit(Elem const*, unsigned int);
-template void FE<2,CLOUGH>::reinit(Elem const*, unsigned int);
-template void FE<2,CLOUGH>::edge_reinit(Elem const*, unsigned int);
-template void FE<2,HERMITE>::reinit(Elem const*, unsigned int);
-template void FE<2,HERMITE>::edge_reinit(Elem const*, unsigned int);
-template void FE<2,MONOMIAL>::reinit(Elem const*, unsigned int);
-template void FE<2,MONOMIAL>::edge_reinit(Elem const*, unsigned int);
+template void FE<2,LAGRANGE>::reinit(Elem const*, unsigned int, Real);
+template void FE<2,LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<2,HIERARCHIC>::reinit(Elem const*, unsigned int, Real);
+template void FE<2,HIERARCHIC>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<2,CLOUGH>::reinit(Elem const*, unsigned int, Real);
+template void FE<2,CLOUGH>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<2,HERMITE>::reinit(Elem const*, unsigned int, Real);
+template void FE<2,HERMITE>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<2,MONOMIAL>::reinit(Elem const*, unsigned int, Real);
+template void FE<2,MONOMIAL>::edge_reinit(Elem const*, unsigned int, Real);
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
-template void FE<2,BERNSTEIN>::reinit(Elem const*, unsigned int);
-template void FE<2,BERNSTEIN>::edge_reinit(Elem const*, unsigned int);
-template void FE<2,SZABAB>::reinit(Elem const*, unsigned int);
-template void FE<2,SZABAB>::edge_reinit(Elem const*, unsigned int);
+template void FE<2,BERNSTEIN>::reinit(Elem const*, unsigned int, Real);
+template void FE<2,BERNSTEIN>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<2,SZABAB>::reinit(Elem const*, unsigned int, Real);
+template void FE<2,SZABAB>::edge_reinit(Elem const*, unsigned int, Real);
 #endif
-template void FE<2,XYZ>::reinit(Elem const*, unsigned int);
-template void FE<2,XYZ>::edge_reinit(Elem const*, unsigned int);
-template void FE<3,LAGRANGE>::reinit(Elem const*, unsigned int);
-template void FE<3,LAGRANGE>::edge_reinit(Elem const*, unsigned int);
-template void FE<3,HIERARCHIC>::reinit(Elem const*, unsigned int);
-template void FE<3,HIERARCHIC>::edge_reinit(Elem const*, unsigned int);
-template void FE<3,CLOUGH>::reinit(Elem const*, unsigned int);
-template void FE<3,CLOUGH>::edge_reinit(Elem const*, unsigned int);
-template void FE<3,HERMITE>::reinit(Elem const*, unsigned int);
-template void FE<3,HERMITE>::edge_reinit(Elem const*, unsigned int);
-template void FE<3,MONOMIAL>::reinit(Elem const*, unsigned int);
-template void FE<3,MONOMIAL>::edge_reinit(Elem const*, unsigned int);
+template void FE<2,XYZ>::reinit(Elem const*, unsigned int, Real);
+template void FE<2,XYZ>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<3,LAGRANGE>::reinit(Elem const*, unsigned int, Real);
+template void FE<3,LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<3,HIERARCHIC>::reinit(Elem const*, unsigned int, Real);
+template void FE<3,HIERARCHIC>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<3,CLOUGH>::reinit(Elem const*, unsigned int, Real);
+template void FE<3,CLOUGH>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<3,HERMITE>::reinit(Elem const*, unsigned int, Real);
+template void FE<3,HERMITE>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<3,MONOMIAL>::reinit(Elem const*, unsigned int, Real);
+template void FE<3,MONOMIAL>::edge_reinit(Elem const*, unsigned int, Real);
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
-template void FE<3,BERNSTEIN>::reinit(Elem const*, unsigned int);
-template void FE<3,BERNSTEIN>::edge_reinit(Elem const*, unsigned int);
-template void FE<3,SZABAB>::reinit(Elem const*, unsigned int);
-template void FE<3,SZABAB>::edge_reinit(Elem const*, unsigned int);
+template void FE<3,BERNSTEIN>::reinit(Elem const*, unsigned int, Real);
+template void FE<3,BERNSTEIN>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<3,SZABAB>::reinit(Elem const*, unsigned int, Real);
+template void FE<3,SZABAB>::edge_reinit(Elem const*, unsigned int, Real);
 #endif
-template void FE<3,XYZ>::reinit(Elem const*, unsigned int);
-template void FE<3,XYZ>::edge_reinit(Elem const*, unsigned int);
+template void FE<3,XYZ>::reinit(Elem const*, unsigned int, Real);
+template void FE<3,XYZ>::edge_reinit(Elem const*, unsigned int, Real);
