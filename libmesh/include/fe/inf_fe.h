@@ -1,4 +1,4 @@
-// $Id: inf_fe.h,v 1.10 2006-08-30 18:42:06 roystgnr Exp $
+// $Id: inf_fe.h,v 1.11 2006-09-12 07:14:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.11 $
  */
 
 //-------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.10 $
+   * \version $Revision: 1.11 $
    */
   //-------------------------------------------------------------
   // InfFE::Radial class definition
@@ -181,7 +181,7 @@ protected:
    *
    * \author Daniel Dreyer
    * \date 2003
-   * \version $Revision: 1.10 $
+   * \version $Revision: 1.11 $
    */
   //-------------------------------------------------------------
   // InfFE::Base class definition
@@ -410,7 +410,8 @@ public:
    * element.
    */
   virtual void reinit (const Elem* elem,
-		       const unsigned int side);
+		       const unsigned int side,
+		       const Real tolerance = TOLERANCE);
 
   /**
    * Not implemented yet.  Reinitializes all the physical 
@@ -418,7 +419,8 @@ public:
    * element.
    */
   virtual void edge_reinit (const Elem* elem,
-		            const unsigned int edge);
+		            const unsigned int edge,
+			    const Real tolerance = TOLERANCE);
 
   /**
    * The use of quadrature rules with the \p InfFE class is somewhat

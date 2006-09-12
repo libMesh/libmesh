@@ -1,4 +1,4 @@
-// $Id: inf_fe_boundary.C,v 1.13 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: inf_fe_boundary.C,v 1.14 2006-09-12 07:14:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,8 @@
 // Method for 2D, 3D -- see inf_fe_1D.C for a 1D version of this
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
-					const unsigned int s)
+					const unsigned int s,
+					const Real tolerance)
 {
   // We don't do this for 1D elements!
   assert (Dim != 1);
@@ -79,7 +80,7 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
 
   // Find where the integration points are located on the
   // full element.
-  std::vector<Point> qp; this->inverse_map (inf_elem, xyz, qp);
+  std::vector<Point> qp; this->inverse_map (inf_elem, xyz, qp, tolerance);
   
   // compute the shape function and derivative values
   // at the points qp
@@ -96,7 +97,8 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
 // Method for 2D, 3D -- see inf_fe_1D.C for a 1D version of this
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem*,
-					     const unsigned int)
+					     const unsigned int,
+					     const Real)
 {
   // We don't do this for 1D elements!
   //assert (Dim != 1);
@@ -270,12 +272,12 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 //#include "inf_fe_instantiate_1D.h"
 //#include "inf_fe_instantiate_2D.h"
 //#include "inf_fe_instantiate_3D.h"
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,reinit(const Elem*,const unsigned int));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,reinit(const Elem*,const unsigned int));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,reinit(const Elem*,const unsigned int));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,reinit(const Elem*,const unsigned int, const Real));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,reinit(const Elem*,const unsigned int, const Real));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,reinit(const Elem*,const unsigned int, const Real));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int, const Real));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int, const Real));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int, const Real));
 INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
