@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.31 2006-09-02 19:38:41 spetersen Exp $
+// $Id: system_projection.C,v 1.32 2006-09-13 15:09:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -343,9 +343,9 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                         continue;
                       }
 
+                    temp_fe_type = base_fe_type;
                     if (elem->child(n)->p_level() < elem->p_level())
                       {
-                        temp_fe_type = base_fe_type;
                         temp_fe_type.order = 
                           static_cast<Order>(temp_fe_type.order +
                                              elem->child(n)->p_level());
