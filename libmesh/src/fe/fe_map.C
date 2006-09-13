@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.43 2006-08-30 18:06:29 roystgnr Exp $
+// $Id: fe_map.C,v 1.44 2006-09-13 22:23:35 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1412,6 +1412,8 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    {
 	      for (unsigned int i=0; i != Dim; ++i)
 		p(i) = 1e6;
+	      
+	      STOP_LOG("inverse_map()", "FE");
 	      return p;
 	    }
 	}
