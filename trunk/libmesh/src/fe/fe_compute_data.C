@@ -1,4 +1,4 @@
-// $Id: fe_compute_data.C,v 1.1 2005-06-06 14:53:18 jwpeterson Exp $
+// $Id: fe_compute_data.C,v 1.2 2006-09-13 22:22:25 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,14 +43,20 @@ void FEComputeData::init ()
 { 
   if (!(this->shape.empty()))
     std::fill (this->shape.begin(),   this->shape.end(),   0.);
+  
 #if defined(ENABLE_INFINITE_ELEMENTS) && !defined(USE_COMPLEX_NUMBERS)
   this->phase = 0.;
-  this->speed = this->equation_systems.parameters.get<Real>("speed");
+
+  if (equation_systems.parameters.have_parameter<Real>("speed"))
+    this->speed = this->equation_systems.parameters.get<Real>("speed");
 #endif
 
 #if defined (ENABLE_INFINITE_ELEMENTS) && defined(USE_COMPLEX_NUMBERS)
-  this->speed = this->equation_systems.parameters.get<Real>("speed");
-  this->frequency = this->equation_systems.parameters.get<Real>("current frequency");
+  if (equation_systems.parameters.have_parameter<Real>("speed"))
+    this->speed = this->equation_systems.parameters.get<Real>("speed");
+
+  if (equation_systems.parameters.have_parameter<Real>("current frequency"))  
+    this->frequency = this->equation_systems.parameters.get<Real>("current frequency");
 
 #endif
 }
