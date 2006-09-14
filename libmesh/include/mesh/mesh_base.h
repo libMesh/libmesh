@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.49 2005-08-15 21:30:38 knezed01 Exp $
+// $Id: mesh_base.h,v 1.50 2006-09-14 14:32:53 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,8 +56,8 @@ class BoundaryInfo;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2005-08-15 21:30:38 $
- * \version $Revision: 1.49 $
+ * \date    $Date: 2006-09-14 14:32:53 $
+ * \version $Revision: 1.50 $
  */
 
 
@@ -639,7 +639,7 @@ variant_filter_iterator<MeshBase::Predicate,
 			    Node* const &,
 			    Node* const *>(rhs)
   {
-    std::cout << "Called node_iterator conversion-to-const ctor." << std::endl;
+    // std::cout << "Called node_iterator conversion-to-const ctor." << std::endl;
   }
 };
 
