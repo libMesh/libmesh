@@ -1,4 +1,4 @@
-// $Id: quadrature_gauss_2D.C,v 1.21 2006-03-28 00:39:55 roystgnr Exp $
+// $Id: quadrature_gauss_2D.C,v 1.22 2006-09-14 19:46:33 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -169,8 +169,8 @@ void QGauss::init_2D(const ElemType _type,
 	  case SIXTH:
 	    {
 	      // Exact for sixth degree polynomials
-	      // Taken from http://www.rpi.edu/~gilade/fem6.ps by
-	      // Flaherty
+	      // Taken from http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps
+	      // by Flaherty
 	      _points.resize(12);
 	      _weights.resize(12);
 	      const Real w1 = 0.050844906370207 / 2.0;
