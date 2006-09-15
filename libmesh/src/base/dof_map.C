@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.94 2006-06-12 22:51:29 roystgnr Exp $
+// $Id: dof_map.C,v 1.95 2006-09-15 15:58:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1554,3 +1554,10 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 #endif // #ifdef ENABLE_AMR
 
 }
+
+#if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
+void DofMap::_dummy_function(void)
+{
+}
+#endif
+
