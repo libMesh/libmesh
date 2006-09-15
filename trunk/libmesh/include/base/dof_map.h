@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.17 2006-06-28 21:32:21 roystgnr Exp $
+// $Id: dof_map.h,v 1.18 2006-09-15 15:58:26 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -504,6 +504,15 @@ private:
   DofConstraints _dof_constraints;
 
 #endif
+
+#if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
+  /**
+   * Dummy function that does nothing but can be used to prohibit
+   * compiler optimization in some situations where some compilers
+   * have optimization bugs.
+   */
+  static void _dummy_function(void);
+#endif
 };
 
 
@@ -567,6 +576,12 @@ void DofMap::sort_sparsity_row (const BidirectionalIterator begin,
       while (!(*a < *b)) // *a & *b are less-than comparable, so use <
 	{
 	  std::swap (*a, *b);
+
+#if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
+	  /* Prohibit optimization at this point since gcc 3.3.5 seems
+	     to have a bug.  */
+	  this->_dummy_function();
+#endif
 
 	  if (a == begin) break;
 	  
