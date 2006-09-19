@@ -1,4 +1,4 @@
-// $Id: error_estimator.h,v 1.11 2006-09-19 15:46:34 roystgnr Exp $
+// $Id: error_estimator.h,v 1.12 2006-09-19 17:50:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,8 @@ public:
    * cell and place it in the "error_per_cell" vector.
    */
   virtual void estimate_error (const System& system,
-			       ErrorVector& error_per_cell) = 0;
+			       ErrorVector& error_per_cell,
+			       bool estimate_parent_error = false) = 0;
 
   /**
    * When passed an EquationSystems reference, this function

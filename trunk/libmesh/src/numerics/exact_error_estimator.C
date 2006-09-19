@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.C,v 1.6 2006-09-19 15:46:35 roystgnr Exp $
+// $Id: exact_error_estimator.C,v 1.7 2006-09-19 17:50:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -70,7 +70,8 @@ void ExactErrorEstimator::attach_exact_hessian (Tensor fptr(const Point& p,
 
 
 void ExactErrorEstimator::estimate_error (const System& system,
-					  ErrorVector& error_per_cell)
+					  ErrorVector& error_per_cell,
+					  bool)
 {
   // The current mesh
   const Mesh& mesh = system.get_mesh();

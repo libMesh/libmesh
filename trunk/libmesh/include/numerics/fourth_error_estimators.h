@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.h,v 1.2 2006-09-19 15:46:34 roystgnr Exp $
+// $Id: fourth_error_estimators.h,v 1.3 2006-09-19 17:50:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -62,7 +62,8 @@ public:
    * The output is in the vector \p error_per_cell
    */
   virtual void estimate_error (const System& system,
-			       ErrorVector& error_per_cell);
+			       ErrorVector& error_per_cell,
+			       bool estimate_parent_error = false);
 
 
 };
