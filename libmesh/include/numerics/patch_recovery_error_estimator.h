@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.h,v 1.8 2006-09-19 15:46:34 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.h,v 1.9 2006-09-19 17:50:52 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,8 @@ public:
    * \p error_per_cell
    */
   virtual void estimate_error (const System& system,
-			       ErrorVector& error_per_cell);
+			       ErrorVector& error_per_cell,
+			       bool estimate_parent_error = false);
 
 
   // Bring the base class functionality into the name lookup
