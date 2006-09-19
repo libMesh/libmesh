@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.40 2006-06-19 22:55:41 jwpeterson Exp $
+// $Id: elem.h,v 1.41 2006-09-19 02:28:51 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -453,8 +453,8 @@ class Elem : public ReferenceCountedObject<Elem>,
   
   /**
    * @returns \p true if the element is subactive (i.e. has no active
-   * ancestors), \p false otherwise. Always returns \p false if AMR is
-   * disabled. 
+   * descendants), \p false otherwise. Always returns \p false if AMR
+   * is disabled. 
    */
   bool subactive () const;
   
@@ -463,6 +463,13 @@ class Elem : public ReferenceCountedObject<Elem>,
    * \p false  otherwise. Always returns \p false if AMR is disabled. 
    */
   bool has_children () const;
+
+  /**
+   * @returns \p true if the element has any descendants other than
+   * its immediate children, \p false otherwise. Always returns \p
+   * false if AMR is disabled. 
+   */
+  bool has_ancestor_children () const;
 
   /**
    * @returns a const pointer to the element's parent.  Returns \p NULL if
@@ -613,9 +620,16 @@ class Elem : public ReferenceCountedObject<Elem>,
 
   /**
    * Returns the value of the p refinement level of an active
-   * element
+   * element, or the minimum value of the p refinement levels
+   * of an ancestor element's descendants
    */
   unsigned int p_level () const;
+
+  /**
+   * Returns the maximum value of the p refinement levels of
+   * an ancestor element's descendants
+   */
+  unsigned int max_descendant_p_level () const;
 
   /**
    * Returns the minimum p refinement level of elements which 
@@ -1177,6 +1191,22 @@ bool Elem::has_children() const
 }
 
 
+inline
+bool Elem::has_ancestor_children() const
+{
+#ifdef ENABLE_AMR
+  if (_children == NULL)
+    return false;
+  else
+    for (unsigned int c=0; c != this->n_children(); c++)
+      if (this->child(c)->has_children())
+	return true;
+#else
+  return false;
+#endif
+}
+
+
 
 inline
 const Elem* Elem::parent () const
@@ -1309,6 +1339,24 @@ inline
 unsigned int Elem::p_level() const
 {
   return _p_level;
+}
+
+
+
+inline
+unsigned int Elem::max_descendant_p_level () const
+{
+  // This is undefined for subactive elements,
+  // which have no active descendants
+  assert (!this->subactive());
+  if (this->active())
+    return this->p_level();
+  
+  unsigned int max_p_level = _p_level;
+  for (unsigned int c=0; c != this->n_children(); c++)
+    max_p_level = std::max(max_p_level,
+			   this->child(c)->max_descendant_p_level());
+  return max_p_level;
 }
 
 
