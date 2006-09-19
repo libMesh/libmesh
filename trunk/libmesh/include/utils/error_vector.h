@@ -1,4 +1,4 @@
-// $Id: error_vector.h,v 1.5 2006-09-19 15:43:55 roystgnr Exp $
+// $Id: error_vector.h,v 1.6 2006-09-19 17:31:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 // typedef float ErrorVectorReal;
 
 // Forward Declarations
+class MeshBase;
 
 /**
  * The \p ErrorVector is a specialization of the
@@ -51,12 +52,22 @@ class ErrorVector : public StatisticsVector<ErrorVectorReal>
 public:
   
   /**
-   * Call the StatisticsVector constructor.
+   * ErrorVector constructor; sets initial length to \p i.
+   *
+   * If mesh is not null, MeshBase::elem() and Elem::is_active() will
+   * be used to distinguish active and inactive elements.  If mesh is null,
+   * ErrorVector will assume that all 0.0 error values correspond to inactive
+   * elements and all non-zero error values correspond to active elements.
    */
-  ErrorVector(unsigned int i=0) : StatisticsVector<ErrorVectorReal> (i) {}
+  ErrorVector(unsigned int i=0, MeshBase *mesh = NULL) : StatisticsVector<ErrorVectorReal> (i), _mesh(mesh) {}
   
   /**
-   * Call the StatisticsVector constructor, fill each entry with \p val
+   * ErrorVector constructor; sets initial length to \p i and initial values to \p val.
+   *
+   * If mesh is not null, MeshBase::elem() and Elem::is_active() will
+   * be used to distinguish active and inactive elements.  If mesh is null,
+   * ErrorVector will assume that all 0.0 error values correspond to inactive
+   * elements and all non-zero error values correspond to active elements.
    */
   ErrorVector(unsigned int i, ErrorVectorReal val) :
       StatisticsVector<ErrorVectorReal> (i,val) {}
@@ -74,7 +85,7 @@ public:
   
   /**
    * Returns the median (e.g. the middle)
-   * value of the data set, ignoring zero values.
+   * value of the data set, ignoring inactive elements.
    * This function modifies the
    * original data by sorting, so it
    * can't be called on const objects.
@@ -91,7 +102,7 @@ public:
 
   /**
    * Computes the variance of the data set
-   * ignoring zero values.
+   * ignoring inactive elements.
    * Uses a recurrence relation to prevent
    * data overflow for large sums.
    * Note: The variance is equal to the
@@ -104,7 +115,7 @@ public:
 
   /**   
    * Computes the variance of the data set
-   * (and ignoring zero values)
+   * ignoring inactive elements.
    * where the \p mean is provided. This is useful
    * for efficiency when you have already calculated
    * the mean. Uses a recurrence relation to prevent
@@ -118,18 +129,28 @@ public:
   /**
    * Returns a vector of unsigned ints which correspond
    * to the indices of every member of the data set
-   * below the cutoff value cut ignoring zero values.
+   * below the cutoff value cut ignoring inactive elements.
    */
   virtual std::vector<unsigned int> cut_below(Real cut) const;
 
   /**
    * Returns a vector of unsigned ints which correspond
    * to the indices of every member of the data set
-   * above the cutoff value cut ignoring zero values.
+   * above the cutoff value cut ignoring inactive elements.
    */
   virtual std::vector<unsigned int> cut_above(Real cut) const;
 
-  
+protected:
+  /**
+   * Utility function to decide whether element i is active
+   */
+  bool is_active_elem (unsigned int i) const;
+
+  /**
+   * Pointer to the mesh, which may be used to decide which
+   * elements are active
+   */
+  MeshBase *_mesh;
 };
 
 
