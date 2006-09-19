@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.5 2006-07-25 17:59:42 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.6 2006-09-19 15:46:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 #include "dof_map.h"
 #include "elem.h"
 #include "equation_systems.h"
+#include "error_vector.h"
 #include "fe.h"
 #include "fe_interface.h"
 #include "libmesh_common.h"
@@ -41,7 +42,7 @@
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
 void UniformRefinementEstimator::estimate_error (const System& _system,
-					  std::vector<float>& error_per_cell)
+					         ErrorVector& error_per_cell)
 {
   START_LOG("estimate_error()", "UniformRefinementEstimator");
 

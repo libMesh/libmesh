@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.15 2006-07-25 17:59:42 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.16 2006-09-19 15:46:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 #include "fe.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
+#include "error_vector.h"
 #include "quadrature_gauss.h"
 #include "libmesh_logging.h"
 #include "elem.h"
@@ -96,7 +97,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
   
 
 void PatchRecoveryErrorEstimator::estimate_error (const System& system,
-						  std::vector<float>& error_per_cell)
+						  ErrorVector& error_per_cell)
 {
   START_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
 

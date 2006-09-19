@@ -1,4 +1,4 @@
-// $Id: discontinuity_measure.C,v 1.2 2006-07-25 17:59:42 roystgnr Exp $
+// $Id: discontinuity_measure.C,v 1.3 2006-09-19 15:46:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 #include "libmesh_common.h"
 #include "discontinuity_measure.h"
 #include "dof_map.h"
+#include "error_vector.h"
 #include "fe.h"
 #include "fe_interface.h"
 #include "quadrature_gauss.h"
@@ -38,7 +39,7 @@
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
 void DiscontinuityMeasure::estimate_error (const System& system,
-					   std::vector<float>& error_per_cell)
+					   ErrorVector& error_per_cell)
 {
   //  START_LOG("jumps()", "DiscontinuityMeasure");
   

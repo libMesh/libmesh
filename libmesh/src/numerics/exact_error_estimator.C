@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.C,v 1.5 2006-07-25 17:59:42 roystgnr Exp $
+// $Id: exact_error_estimator.C,v 1.6 2006-09-19 15:46:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "exact_error_estimator.h"
 #include "dof_map.h"
 #include "equation_systems.h"
+#include "error_vector.h"
 #include "fe.h"
 #include "fe_interface.h"
 #include "libmesh_logging.h"
@@ -69,7 +70,7 @@ void ExactErrorEstimator::attach_exact_hessian (Tensor fptr(const Point& p,
 
 
 void ExactErrorEstimator::estimate_error (const System& system,
-					  std::vector<float>& error_per_cell)
+					  ErrorVector& error_per_cell)
 {
   // The current mesh
   const Mesh& mesh = system.get_mesh();
