@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.18 2006-07-13 05:18:29 roystgnr Exp $
+// $Id: libmesh_common.h,v 1.19 2006-09-19 15:43:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -87,43 +87,55 @@
 // considered "good enough" when doing floating point comparisons.
 // For example, v == 0 is changed to std::abs(v) < TOLERANCE.
 
-
 #ifndef SINGLE_PRECISION
   #ifdef TRIPLE_PRECISION
     typedef long double Real;
-//    typedef long double REAL;
-    namespace std {
-      inline long double max(long double a, double b)
-      { return (a>b?a:b); }
-      inline long double min(long double a, double b)
-      { return (a<b?a:b); }
-    }
   # define TOLERANCE 1.e-8
   # define MPI_REAL MPI_LONG_DOUBLE
   #else
     typedef double Real;
-//    typedef double REAL;
-  namespace std {
-    inline double max(float a, double b)
-    { return (a>b?a:b); }
-    inline double min(float a, double b)
-    { return (a<b?a:b); }
-  }
   # define TOLERANCE 1.e-6
   # define MPI_REAL MPI_DOUBLE
   #endif
 #else
   typedef float Real;
-//  typedef float REAL;
-  namespace std {
-    inline long double max(long double a, double b)
-    { return (a>b?a:b); }
-    inline long double min(long double a, double b)
-    { return (a<b?a:b); }
-  }
   # define TOLERANCE 1.e-3
-# define MPI_REAL MPI_FLOAT
+  # define MPI_REAL MPI_FLOAT
 #endif
+
+// For some reason the real std::max, std::min
+// don't handle mixed compatible types
+namespace std {
+  inline long double max(long double a, double b)
+  { return (a>b?a:b); }
+  inline long double min(long double a, double b)
+  { return (a<b?a:b); }
+
+  inline long double max(double a, long double b)
+  { return (a>b?a:b); }
+  inline long double min(double a, long double b)
+  { return (a<b?a:b); }
+
+  inline double max(double a, float b)
+  { return (a>b?a:b); }
+  inline double min(double a, float b)
+  { return (a<b?a:b); }
+
+  inline double max(float a, double b)
+  { return (a>b?a:b); }
+  inline double min(float a, double b)
+  { return (a<b?a:b); }
+
+  inline long double max(long double a, float b)
+  { return (a>b?a:b); }
+  inline long double min(long double a, float b)
+  { return (a<b?a:b); }
+
+  inline long double max(float a, long double b)
+  { return (a>b?a:b); }
+  inline long double min(float a, long double b)
+  { return (a<b?a:b); }
+}
 
 // Define the type to use for complex numbers
 // Always use std::complex<double>, as required by Petsc
@@ -141,6 +153,13 @@ typedef std::complex<double> COMPLEX;
 #else
   DIE A HORRIBLE DEATH HERE...
 #endif
+
+
+// Define the value type for error estimates.
+// Since AMR/C decisions don't have to be precise,
+// we default to float for memory efficiency.
+typedef float ErrorVectorReal;
+#define MPI_ERRORVECTORREAL MPI_FLOAT
 
 
 #ifdef HAVE_MPI

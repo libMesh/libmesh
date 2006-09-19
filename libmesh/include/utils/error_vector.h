@@ -1,4 +1,4 @@
-// $Id: error_vector.h,v 1.4 2006-01-11 20:56:51 roystgnr Exp $
+// $Id: error_vector.h,v 1.5 2006-09-19 15:43:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,8 @@
 // Local Includes
 #include "statistics.h"
 
-typedef float ErrorVectorReal;
+// Now defined in libmesh_common.h:
+// typedef float ErrorVectorReal;
 
 // Forward Declarations
 
@@ -63,7 +64,7 @@ public:
   /**
    * Returns the minimum nonzero value in the data set.
    */
-  virtual float minimum() const;
+  virtual ErrorVectorReal minimum() const;
 
   /**
    * Returns the mean value of the data set. Ignores
