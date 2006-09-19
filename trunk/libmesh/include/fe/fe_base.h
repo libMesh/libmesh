@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.23 2006-09-12 07:14:40 roystgnr Exp $
+// $Id: fe_base.h,v 1.24 2006-09-19 02:37:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,9 +39,13 @@
 
 
 // forward declarations
-class QBase;
-class MeshBase;
+template <typename T> class DenseMatrix;
+template <typename T> class DenseVector;
+class DofMap;
 class Elem;
+class MeshBase;
+template <typename T> class NumericVector;
+class QBase;
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
@@ -162,7 +166,19 @@ public:
   static bool on_reference_element(const Point& p,
 				   const ElemType t,
 				   const Real eps = TOLERANCE);
-  
+
+  /**
+   * Creates a local projection on \p coarse_elem, based on the
+   * DoF values in \p global_vector for it's children.
+   */
+
+  static void coarsened_dof_values(const NumericVector<Number> &global_vector,
+			           const DofMap &dof_map,
+                                   const Elem *coarse_elem,
+			           DenseVector<Number> &coarse_dofs,
+			           const unsigned int var,
+			           const bool use_old_dof_indices = false);
+
   /**
    * @returns the \p xyz spatial locations of the quadrature
    * points on the element.
