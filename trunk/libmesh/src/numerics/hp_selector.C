@@ -1,4 +1,4 @@
-// $Id: hp_selector.C,v 1.10 2006-07-25 17:59:42 roystgnr Exp $
+// $Id: hp_selector.C,v 1.11 2006-09-19 15:46:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,7 @@
 #include "fe_interface.h"
 #include "libmesh_logging.h"
 #include "elem.h"
+#include "error_vector.h"
 #include "mesh.h"
 #include "quadrature.h"
 #include "system.h"
@@ -174,8 +175,8 @@ void HPSelector::select_refinement (System &system)
 
   // Resize the error_per_cell vectors to handle
   // the number of elements, initialize them to 0.
-  std::vector<float> h_error_per_cell(mesh.n_elem(), 0.);
-  std::vector<float> p_error_per_cell(mesh.n_elem(), 0.);
+  std::vector<ErrorVectorReal> h_error_per_cell(mesh.n_elem(), 0.);
+  std::vector<ErrorVectorReal> p_error_per_cell(mesh.n_elem(), 0.);
   
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_vars; var++)
@@ -445,7 +446,8 @@ void HPSelector::select_refinement (System &system)
           if (!elem->parent())
             {
               // For now, we'll always start with an h refinement
-              h_error_per_cell[e_id] = std::numeric_limits<float>::max() / 2;
+              h_error_per_cell[e_id] =
+                std::numeric_limits<ErrorVectorReal>::max() / 2;
             }
           else
             {

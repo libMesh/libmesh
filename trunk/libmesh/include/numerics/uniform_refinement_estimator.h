@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.h,v 1.1 2006-06-12 19:25:38 roystgnr Exp $
+// $Id: uniform_refinement_estimator.h,v 1.2 2006-09-19 15:46:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -70,7 +70,7 @@ public:
    * \p error_per_cell
    */
   virtual void estimate_error (const System& system,
-			       std::vector<float>& error_per_cell);
+			       ErrorVector& error_per_cell);
 
   /**
    * Returns or allows you to set the Sobolev order for error computations

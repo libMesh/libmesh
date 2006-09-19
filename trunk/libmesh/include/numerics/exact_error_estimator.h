@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.h,v 1.2 2006-04-18 03:34:33 roystgnr Exp $
+// $Id: exact_error_estimator.h,v 1.3 2006-09-19 15:46:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -137,7 +137,7 @@ public:
    * \p error_per_cell
    */
   virtual void estimate_error (const System& system,
-			       std::vector<float>& error_per_cell);
+			       ErrorVector& error_per_cell);
 
 private:
 

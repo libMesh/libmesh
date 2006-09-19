@@ -1,4 +1,4 @@
-// $Id: discontinuity_measure.h,v 1.1 2006-05-26 12:00:41 roystgnr Exp $
+// $Id: discontinuity_measure.h,v 1.2 2006-09-19 15:46:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ public:
    * \p error_per_cell
    */
   virtual void estimate_error (const System& system,
-			       std::vector<float>& error_per_cell);
+			       ErrorVector& error_per_cell);
 
   /**
    * Register a user function to use in computing external boundary 

@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.51 2006-07-20 22:48:46 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.52 2006-09-19 15:46:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -168,7 +168,7 @@ void MeshRefinement::create_parent_error_vector
           // error, do so now
           if (!error_per_parent[parentid])
             {
-              float parent_error = 0.;
+              ErrorVectorReal parent_error = 0.;
               for (unsigned int n = 0; n != parent->n_children(); ++n)
                 {
                   Elem* child = parent->child(n);

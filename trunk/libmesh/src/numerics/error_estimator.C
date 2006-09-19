@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.20 2006-07-25 17:59:42 roystgnr Exp $
+// $Id: error_estimator.C,v 1.21 2006-09-19 15:46:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,12 +21,13 @@
 // Local include files
 #include "libmesh_common.h"
 #include "error_estimator.h"
+#include "error_vector.h"
 
 
 
 
 // ErrorEstimator functions
-void ErrorEstimator::reduce_error (std::vector<float>& error_per_cell) const
+void ErrorEstimator::reduce_error (std::vector<ErrorVectorReal>& error_per_cell) const
 {
   // Each processor has now computed the error contribuions
   // for its local elements.  We need to sum the vector to
@@ -37,11 +38,11 @@ void ErrorEstimator::reduce_error (std::vector<float>& error_per_cell) const
     {
       // Allreduce requires 2 buffers.  Copy the
       // error_per_cell vector into the epc vector
-      std::vector<float> epc (error_per_cell);
+      std::vector<ErrorVectorReal> epc (error_per_cell);
       
       MPI_Allreduce (&epc[0], &error_per_cell[0],
 		     error_per_cell.size(),
-		     MPI_FLOAT, MPI_SUM, libMesh::COMM_WORLD);
+		     MPI_ERRORVECTORREAL, MPI_SUM, libMesh::COMM_WORLD);
     }  
 #endif
 }
