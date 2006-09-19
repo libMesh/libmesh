@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.33 2006-09-19 02:37:42 roystgnr Exp $
+// $Id: system_projection.C,v 1.34 2006-09-19 15:28:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -338,7 +338,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                     temp_fe_type.order =
                       static_cast<Order>(temp_fe_type.order - 1);
                     unsigned int old_index = 0, new_index = 0;
-                    for (unsigned int n=0; n != elem->n_nodes(); ++n)
+                    for (unsigned int n=0; n != n_nodes; ++n)
                       {
 		        const unsigned int nc =
 		          FEInterface::n_dofs_at_node (dim, temp_fe_type,
@@ -363,7 +363,7 @@ void System::project_vector (const NumericVector<Number>& old_vector,
                     temp_fe_type.order =
                       static_cast<Order>(temp_fe_type.order + 1);
                     unsigned int old_index = 0, new_index = 0;
-                    for (unsigned int n=0; n != elem->n_nodes(); ++n)
+                    for (unsigned int n=0; n != n_nodes; ++n)
                       {
 		        const unsigned int nc =
 		          FEInterface::n_dofs_at_node (dim, fe_type,
