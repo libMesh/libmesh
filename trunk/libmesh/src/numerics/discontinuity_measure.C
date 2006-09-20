@@ -1,4 +1,4 @@
-// $Id: discontinuity_measure.C,v 1.4 2006-09-19 17:50:52 roystgnr Exp $
+// $Id: discontinuity_measure.C,v 1.5 2006-09-20 18:47:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@
 // ErrorEstimator implementations
 void DiscontinuityMeasure::estimate_error (const System& system,
 					   ErrorVector& error_per_cell,
-					   bool estimate_parent_error)
+					   bool)
 {
   //  START_LOG("jumps()", "DiscontinuityMeasure");
   
