@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.h,v 1.5 2006-06-23 16:49:48 jwpeterson Exp $
+// $Id: mesh_triangle_support.h,v 1.6 2006-09-24 05:22:29 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,12 @@
 #ifndef __mesh_triangle_support_h__
 #define __mesh_triangle_support_h__
 
+// Local Includes
 #include "libmesh_config.h"
+#include "elem_type.h" // For ElemType declaration below
+
+// Forward Declarations
+class Mesh;
 
 #ifdef HAVE_TRIANGLE
 
@@ -66,6 +71,18 @@ extern "C" {
    * will occur without additional care!
    */
   void destroy(triangulateio& t, IO_Type);
+
+  /**
+   * Copies triangulation data computed by triange from a triangulateio object
+   * to a LibMesh mesh.   This routine is used internally by the
+   * MeshTools::Generation::build_delaunay_square(...) and
+   * MeshTools::Generation::build_delaunay_square_with_hole(...) routines.
+   */
+  void copy_tri_to_mesh(const triangulateio& triangle_data_input,
+			Mesh& mesh_output,
+			const ElemType type);
+    
+  
 }
 
 

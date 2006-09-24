@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.C,v 1.10 2006-07-02 18:25:53 knezed01 Exp $
+// $Id: mesh_triangle_support.C,v 1.11 2006-09-24 05:22:29 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -140,73 +140,26 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
 			&final,
 			static_cast<Triangle::triangulateio*>(NULL));
 
-  // Transfer the information into the LibMesh mesh.
-  mesh.clear();
-  
-  // Node information
-  for (int i=0, c=0; c<final.numberofpoints; i+=2, ++c)
-  {
-    mesh.add_point( Point(final.pointlist[i],
-			  final.pointlist[i+1]) );
-  }
+  // Send the information computed by Triangle to the Mesh.
+  Triangle::copy_tri_to_mesh(final,
+			     mesh,
+			     type);
 
-  // Element information
-  for (int i=0; i<final.numberoftriangles; ++i)
-    {
-      switch (type)
-      {
-        case TRI3:
-        {
-          Elem* elem = mesh.add_elem (new Tri3);
-
-          for (unsigned int n=0; n<3; ++n)
-            elem->set_node(n) = mesh.node_ptr(final.trianglelist[i*3 + n]);
-
-          break;
-        }
-
-        case TRI6:
-        {
-          Elem* elem = mesh.add_elem (new Tri6);
-
-          // Triangle number TRI6 nodes in a different way to libMesh
-          elem->set_node(0) = mesh.node_ptr(final.trianglelist[i*6 + 0]);
-          elem->set_node(1) = mesh.node_ptr(final.trianglelist[i*6 + 1]);
-          elem->set_node(2) = mesh.node_ptr(final.trianglelist[i*6 + 2]);
-          elem->set_node(3) = mesh.node_ptr(final.trianglelist[i*6 + 5]);
-          elem->set_node(4) = mesh.node_ptr(final.trianglelist[i*6 + 3]);
-          elem->set_node(5) = mesh.node_ptr(final.trianglelist[i*6 + 4]);
-
-          break;
-        }
-
-        default:
-	{
-          std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
-          error();
-	}
-      }
-    }
-
-  // Clean up triangle data structures
-  Triangle::destroy(input,        Triangle::INPUT );
-  Triangle::destroy(intermediate, Triangle::BOTH  );
-  Triangle::destroy(final,        Triangle::OUTPUT);
-  
-  // Prepare mesh for usage.
-  mesh.prepare_for_use();
-  
   // Run mesh through a few Laplace smoothing steps.
   LaplaceMeshSmoother s (mesh);
   s.smooth(2);
 
+  
+  // Clean up triangle data structures
+  Triangle::destroy(input,        Triangle::INPUT );
+  Triangle::destroy(intermediate, Triangle::BOTH  );
+  Triangle::destroy(final,        Triangle::OUTPUT);
 }
 
 
 
-
 void MeshTools::Generation::build_delaunay_square_with_hole(Mesh& mesh,
-							    const std::vector<Hole>& holes,
+							    const std::vector<Hole*>& holes,
 							    const unsigned int nx, // num. of nodes in x-dir (approximate)
 							    const unsigned int ny, // num. of nodes in y-dir (approximate)
 							    const Real xmin, const Real xmax,
@@ -221,14 +174,21 @@ void MeshTools::Generation::build_delaunay_square_with_hole(Mesh& mesh,
     // Pseudo-Constructor for the triangle io structs
     Triangle::init(final_input);
     Triangle::init(final_output);
-
     
     const unsigned int n_holes = holes.size();
+    assert (n_holes > 0);
 
+    // Sanity checks for the holes
+    for (unsigned int i=0; i<n_holes; ++i)
+      {
+	assert (holes[i] != NULL);
+	assert (holes[i]->n_points() > 1);
+      }
+    
     // Pre-allocate space for the points and segments (one segment per point).
     unsigned int n_hole_points=0;
     for (unsigned int i=0; i<n_holes; ++i)
-      n_hole_points += holes[i].n_points;
+      n_hole_points += holes[i]->n_points();
 
     final_input.numberofpoints = n_hole_points + 4;     // 4 additional points make up the corners of the square
     final_input.pointlist      = static_cast<REAL*>(std::malloc(final_input.numberofpoints * 2 * sizeof(REAL)));
@@ -243,25 +203,20 @@ void MeshTools::Generation::build_delaunay_square_with_hole(Mesh& mesh,
     // For each hole, compute points and determine the segments, add them to the input struct
     for (unsigned int i=0; i<n_holes; ++i)
       {
-	// The change in angle between each point.
-	const Real dtheta = 2.0*libMesh::pi / static_cast<Real>(holes[i].n_points);
-	// std::cout << "dtheta=" << dtheta << std::endl;
-	
-	// Generate the points for the holes
-	for (unsigned int ctr=0, h=0; h<holes[i].n_points; ctr+=2, ++h)
+	for (unsigned int ctr=0, h=0; h<holes[i]->n_points(); ctr+=2, ++h)
 	  {
-	    const Real theta = static_cast<Real>(h)*dtheta;
+	    Point p = holes[i]->point(h);
 
 	    const unsigned int index0 = 2*offset+ctr;
 	    const unsigned int index1 = 2*offset+ctr+1;
 
-	    // The points
-	    final_input.pointlist[index0] = holes[i].center(0) + holes[i].radius*cos(theta); // x=r*cos(theta)
-	    final_input.pointlist[index1] = holes[i].center(1) + holes[i].radius*sin(theta); // y=r*sin(theta)
+	    // Save the x,y locations in the triangle struct.
+	    final_input.pointlist[index0] = p(0);
+	    final_input.pointlist[index1] = p(1);
 	  }
 
 	// Generate all the segments for this hole
-	for (unsigned int ctr=0, h=0; h<holes[i].n_points; ctr+=2, ++h)
+	for (unsigned int ctr=0, h=0; h<holes[i]->n_points(); ctr+=2, ++h)
 	  {
 
 	    const unsigned int index0 = 2*offset+ctr;
@@ -269,14 +224,14 @@ void MeshTools::Generation::build_delaunay_square_with_hole(Mesh& mesh,
 
 	    // The points
 	    final_input.segmentlist[index0] = offset+h;
-	    final_input.segmentlist[index1] = (h==holes[i].n_points-1) ? offset : offset+h+1; // wrap around
+	    final_input.segmentlist[index1] = (h==holes[i]->n_points()-1) ? offset : offset+h+1; // wrap around
 	  }
 
 	// for (unsigned int h=0; h<2*final_input.numberofsegments; ++h)
 	// std::cout << final_input.segmentlist[h] << std::endl;
 
 	// Update the offset
-	offset += holes[i].n_points;
+	offset += holes[i]->n_points();
       }
 
     
@@ -295,13 +250,15 @@ void MeshTools::Generation::build_delaunay_square_with_hole(Mesh& mesh,
     final_input.pointlist[idx++] = xmin;
     final_input.pointlist[idx++] = ymax;
 
-    // Tell the input structure about the hole(s)
+    // Tell the input structure about the hole(s) by giving it any point
+    // which lies "inside" the hole (not necessarily the center).
     final_input.numberofholes = n_holes;
     final_input.holelist      = static_cast<REAL*>(std::malloc(final_input.numberofholes * 2 * sizeof(REAL)));
     for (unsigned int i=0, ctr=0; i<n_holes; ++i, ctr+=2)
       {
-	final_input.holelist[ctr]   = holes[i].center(0);
-	final_input.holelist[ctr+1] = holes[i].center(1);
+	Point inside_point = holes[i]->inside();
+	final_input.holelist[ctr]   = inside_point(0);
+	final_input.holelist[ctr+1] = inside_point(1);
       }
     
     // Perform the triangulation.
@@ -348,69 +305,11 @@ void MeshTools::Generation::build_delaunay_square_with_hole(Mesh& mesh,
 			  NULL); // voronoi ouput -- not used
 
     
-    // Transfer the information into the LibMesh mesh.
-    // Note: this should be its own function!!
-    mesh.clear();
-  
-    // Node information
-    for (int i=0, c=0; c<final_output.numberofpoints; i+=2, ++c)
-      mesh.add_point( Point(final_output.pointlist[i],
-			    final_output.pointlist[i+1]) );
-  
-    // Element information
-//     for (int i=0; i<final_output.numberoftriangles; ++i)
-//       {
-// 	Elem* elem = mesh.add_elem (new Tri3);
-// 	
-// 	for (unsigned int n=0; n<3; ++n)
-// 	  elem->set_node(n) = mesh.node_ptr(final_output.trianglelist[i*3 + n]);
-//       }
-
-
-  // Element information
-  for (int i=0; i<final_output.numberoftriangles; ++i)
-    {
-      switch (type)
-      {
-        case TRI3:
-        {
-          Elem* elem = mesh.add_elem (new Tri3);
-
-          for (unsigned int n=0; n<3; ++n)
-            elem->set_node(n) = mesh.node_ptr(final_output.trianglelist[i*3 + n]);
-
-          break;
-        }
-
-        case TRI6:
-        {
-          Elem* elem = mesh.add_elem (new Tri6);
-
-          // Triangle number TRI6 nodes in a different way to libMesh
-          elem->set_node(0) = mesh.node_ptr(final_output.trianglelist[i*6 + 0]);
-          elem->set_node(1) = mesh.node_ptr(final_output.trianglelist[i*6 + 1]);
-          elem->set_node(2) = mesh.node_ptr(final_output.trianglelist[i*6 + 2]);
-          elem->set_node(3) = mesh.node_ptr(final_output.trianglelist[i*6 + 5]);
-          elem->set_node(4) = mesh.node_ptr(final_output.trianglelist[i*6 + 3]);
-          elem->set_node(5) = mesh.node_ptr(final_output.trianglelist[i*6 + 4]);
-
-          break;
-        }
-
-        default:
-	{
-          std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
-          error();
-	}
-      }
-    }
-
-
-    // here();
-    
-    // Prepare mesh for usage.
-    mesh.prepare_for_use();
-
+    // Send the information computed by Triangle to the Mesh.
+    Triangle::copy_tri_to_mesh(final_output,
+			       mesh,
+			       type);
+      
     // To the naked eye, a few smoothing iterations usually looks better.
     LaplaceMeshSmoother(mesh).smooth(2);
 
@@ -496,6 +395,70 @@ void Triangle::destroy(Triangle::triangulateio& t, Triangle::IO_Type io_type)
   // Reset
   // Triangle::init(t);
 }
+
+
+
+
+
+
+void Triangle::copy_tri_to_mesh(const triangulateio& triangle_data_input,
+				Mesh& mesh_output,
+				const ElemType type)
+{
+  // Transfer the information into the LibMesh mesh.
+  mesh_output.clear();
+  
+  // Node information
+  for (int i=0, c=0; c<triangle_data_input.numberofpoints; i+=2, ++c)
+    {
+      mesh_output.add_point( Point(triangle_data_input.pointlist[i],
+				   triangle_data_input.pointlist[i+1]) );
+    }
+
+  // Element information
+  for (int i=0; i<triangle_data_input.numberoftriangles; ++i)
+    {
+      switch (type)
+	{
+        case TRI3:
+	  {
+	    Elem* elem = mesh_output.add_elem (new Tri3);
+
+	    for (unsigned int n=0; n<3; ++n)
+	      elem->set_node(n) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*3 + n]);
+
+	    break;
+	  }
+
+        case TRI6:
+	  {
+	    Elem* elem = mesh_output.add_elem (new Tri6);
+
+	    // Triangle number TRI6 nodes in a different way to libMesh
+	    elem->set_node(0) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 0]);
+	    elem->set_node(1) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 1]);
+	    elem->set_node(2) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 2]);
+	    elem->set_node(3) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 5]);
+	    elem->set_node(4) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 3]);
+	    elem->set_node(5) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 4]);
+
+	    break;
+	  }
+
+        default:
+	  {
+	    std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
+	    error();
+	  }
+	}
+    }
+
+  // Prepare mesh for usage.
+  mesh_output.prepare_for_use();
+}
+
+
+
 #endif // HAVE_TRIANGLE
 
 
@@ -504,96 +467,4 @@ void Triangle::destroy(Triangle::triangulateio& t, Triangle::IO_Type io_type)
 
 
 
-// // Constructor
-// TriangleMeshInterface::TriangleMeshInterface (Mesh& mesh) :
-//   _mesh (mesh)
-// {}
-
-// void TriangleMeshInterface::triangulate()
-// {
-//   // Check for existing nodes and compatible dimension.
-//   assert (_mesh.n_nodes() != 0);
-//   assert (_mesh.mesh_dimension() == 2);
-  
-//   // Construct the triangle interface struct for the input.
-//   // You have to be really careful with the memory management
-//   // of these things.  That might be a good thing to abstract
-//   // away in the future.  AFAIK, triangle will only allocate
-//   // memory (through malloc) if it finds a NULL pointer for
-//   // one of its variables.
-//   // Otherwise, it assumes there is enough space.
-//   Triangle::triangulateio input;
-  
-//   // Set the number of nodes and set x,y values in Triangle's
-//   // data structure.
-//   input.numberofpoints = _mesh.n_nodes();
-//   input.numberofpointattributes = 0;
-  
-//   // Allocate memory using a local vector, and
-//   // let the input node list point to the beginning of the xy vector.
-//   std::vector<Real> xy(2*_mesh.n_nodes());
-//   for (unsigned int i=0, c=0; c<_mesh.n_nodes(); i+=2, ++c)
-//     {
-//       const Point& p = _mesh.point(c);
-//       xy[i]   = p(0);
-//       xy[i+1] = p(1);
-//     }
-//   input.pointlist = &xy[0];
-
-
-//   // Intermediate triangulation step.
-//   Triangle::triangulateio intermediate;
-//   intermediate.pointlist       = static_cast<Real*>(NULL);
-//   intermediate.trianglelist    = static_cast<int* >(NULL);
-//   intermediate.segmentlist     = static_cast<int* >(NULL);
-//   intermediate.pointmarkerlist = static_cast<int* >(NULL);
-  
-//   // Perform initial triangulation.
-//   Triangle::triangulate("czBQ",
-// 			&input,
-// 			&intermediate,
-// 			static_cast<Triangle::triangulateio*>(NULL));
-
-
-
-//   // Refinement triangulation step.
-//   Triangle::triangulateio final;
-//   final.pointlist    = static_cast<Real*>(NULL);
-//   final.trianglelist = static_cast<int* >(NULL);
-
-//   // Perform final triangulation with area constraint
-//   Triangle::triangulate("przBPQa0.002",
-// 			&intermediate,
-// 			&final,
-// 			static_cast<Triangle::triangulateio*>(NULL));
-
-//   // Transfer the information into the LibMesh mesh.
-//   _mesh.clear();
-  
-//   // Node information
-//   for (int i=0, c=0; c<final.numberofpoints; i+=2, ++c)
-//     _mesh.add_point( Point(final.pointlist[i],
-// 			   final.pointlist[i+1]) );
-  
-//   // Element information
-//   for (int i=0; i<final.numberoftriangles; ++i)
-//     {
-//       Elem* elem = _mesh.add_elem (new Tri3);
-
-//       for (unsigned int n=0; n<3; ++n)
-// 	elem->set_node(n) = _mesh.node_ptr(final.trianglelist[i*3 + n]);
-//     }
-
-//   // Free vectors in the ouput struct
-//   free (intermediate.pointlist             );
-//   free (intermediate.trianglelist          );
-//   free (intermediate.segmentlist           );
-//   free (intermediate.pointmarkerlist       );
-//   free (final.pointlist               );
-//   free (final.trianglelist            );
-  
-//   // Prepare mesh for usage.
-//   _mesh.prepare_for_use();
-  
-// }
 
