@@ -1,4 +1,4 @@
-// $Id: mesh_generation.h,v 1.11 2006-07-02 18:25:53 knezed01 Exp $
+// $Id: mesh_generation.h,v 1.12 2006-09-24 05:22:29 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.11 $
+   * \version $Revision: 1.12 $
    */
   namespace Generation
   {
@@ -111,49 +111,161 @@ namespace MeshTools
 			       const Real ymin=0., const Real ymax=1.,
 			       const ElemType type=INVALID_ELEM);
 
-    
-    // A helper class for describing a "circular" hole.
+
+    // An abstract class for defining a 2-dimensional hole.  We assume that
+    // the connectivity of the hole is implicit in the numbering of the points,
+    // i.e. node 0 is connected to node 1, node 1 is connected to node 2, etc,
+    // and the last node "wraps around" to connect back to node 0.
     class Hole
     {
     public:
-      Hole(Point c, Real r, unsigned int n) :
-	center(c),
-	radius(r),
-	n_points(n) {}
-
       /**
-       * Constructor, does not set any values
+       * Constructor
        */
       Hole() {}
 
       /**
-       * (x,y) location of the circular hole
+       * Destructor
        */
-      Point center;
+      virtual ~Hole() {}
+
+      /**
+       * The number of geometric points which define the hole.
+       */
+      virtual unsigned int n_points() const = 0;
+
+      /**
+       * Return the nth point defining the hole.
+       */
+      virtual Point point(const unsigned int n) const = 0;
+
+      /**
+       * Return an (arbitrary) point which lies inside the hole.
+       */
+      virtual Point inside() const = 0;
+    };
+
+
+    
+    /**
+     * A concrete instantiation of the Hole class that describes polygonal
+     * (triangular, square, pentagonal, ...) holes.
+     */
+    class PolygonHole : public Hole
+    {
+    public:
+      /**
+       * Constructor specifying the center, radius, and number of
+       * points which comprise the hole.  The points will all lie
+       * on a circle of radius r.
+       */
+      PolygonHole(Point center, Real radius, unsigned int n_points) :
+	_center(center),
+	_radius(radius),
+	_n_points(n_points) {}
+
+      /**
+       * Default Constructor, does not set any values
+       */
+      // PolygonHole() {}
+
+      virtual unsigned int n_points() const { return _n_points; }
+
+      virtual Point point(const unsigned int n) const
+      {
+	// The nth point lies at the angle theta = 2 * pi * n / _n_points
+	const Real theta = static_cast<Real>(n) * 2.0 * libMesh::pi / static_cast<Real>(_n_points);
+	
+	return Point(_center(0) + _radius*cos(theta), // x=r*cos(theta)
+		     _center(1) + _radius*sin(theta), // y=r*sin(theta)
+		     0.);
+      }
+
+      /**
+       * The center of the hole is definitely inside.
+       */
+      virtual Point inside() const { return _center;  }
+      
+    private:
+      /**
+       * (x,y) location of the center of the hole
+       */
+      Point _center;
 
       /**
        * circular hole radius
        */
-      Real radius;
+      Real _radius;
 
       /**
        * number of points used to describe the hole.  The actual
        * points can be generated knowing the center and radius.
        * For example, n_points=3 would generate a triangular hole.
        */
-      unsigned int n_points;
+      unsigned int _n_points;
     };
 
 
+    
 
+    /**
+     * Another concrete instantiation of the hole, this one should
+     * be sufficiently general for most non-polygonal purposes.  The user
+     * supplies, at the time of construction, a reference to a vector
+     * of Points which defines the hole (in order of connectivity) and
+     * an arbitrary Point which lies inside the hole. 
+     */
+    class ArbitraryHole : public Hole
+    {
+    public:
+      ArbitraryHole(const Point center,
+		    const std::vector<Point>& points)
+	: 	_center(center),
+		_points(points)
+      {}
 
+      /**
+       * Required public Hole interface:
+       */
+      
+      /**
+       * The number of geometric points which define the hole.
+       */
+      virtual unsigned int n_points() const { return _points.size(); }
 
+      /**
+       * Return the nth point defining the hole.
+       */
+      virtual Point point(const unsigned int n) const
+      {
+	assert (n < _points.size());
+	return _points[n];
+      }
 
+      /**
+       * Return an (arbitrary) point which lies inside the hole.
+       */
+      virtual Point inside() const { return _center;  }
+
+    private:
+      /**
+       * arbitrary (x,y) location inside the hole
+       */
+      Point _center;
+
+      /**
+       * Reference to the vector of points which makes up
+       * the hole.
+       */
+      const std::vector<Point>& _points;
+    };
+
+    
 
     // Function which calls triangle to create a mesh on a square domain with
     // one or more circular holes cut out.
     void build_delaunay_square_with_hole(Mesh& mesh,
-					 const std::vector<Hole>& holes,
+					 const std::vector<Hole*>& holes,
 					 const unsigned int nx=10, // num. of nodes in x-dir (approximate)
 					 const unsigned int ny=10, // num. of nodes in y-dir (approximate)
 					 const Real xmin=-1., const Real xmax=1.,
