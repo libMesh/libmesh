@@ -35,6 +35,7 @@ exact_indicator = false
 refinement_type = h
 
 # Mesh dimensionality
+# We generate 1D meshes on [-1, 0].
 # We load lshaped.xda for 2 dimensional problems, lshaped3D.xda for 3
 dimension = 2
 

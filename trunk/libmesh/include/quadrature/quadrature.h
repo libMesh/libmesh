@@ -1,4 +1,4 @@
-// $Id: quadrature.h,v 1.10 2006-03-28 01:22:02 roystgnr Exp $
+// $Id: quadrature.h,v 1.11 2006-10-04 22:26:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -165,6 +165,14 @@ public:
 protected:
 
   
+  /**
+   * Initializes the 0D quadrature rule by filling the points and
+   * weights vectors with the appropriate values.  Generally this
+   * is just one point with weight 1.
+   */
+  virtual void init_0D (const ElemType _type=INVALID_ELEM,
+			unsigned int p_level=0);
+
   /**
    * Initializes the 1D quadrature rule by filling the points and
    * weights vectors with the appropriate values.  The order of

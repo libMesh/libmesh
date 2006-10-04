@@ -1,4 +1,4 @@
-/* $Id: ex0.C,v 1.4 2006-07-25 20:04:06 roystgnr Exp $ */
+/* $Id: ex0.C,v 1.5 2006-10-04 22:26:53 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -277,22 +277,8 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
       // method.
       if(elem->neighbor(s) == NULL)
       {
-        // Build a copy of the side of this element which is on the edge
-        // of the mesh. Again we use an AutoPtr because this function call
-        // dynamically allocates memory.
-        AutoPtr<DofObject> node(elem->side(s));
-
-        // Loop over the local node numbers in order to find the correct entry
-        // in Ke and Fe to impose the BC
-        for(unsigned int n=0; n<elem->n_nodes(); n++)
-        {
-          // Look for nodes with matching global id's.
-          if(elem->node(n) == node->id())
-          {
-            Ke(n,n) += penalty;
-            Fe(n)   += 0*penalty;
-          }
-        }
+        Ke(s,s) += penalty;
+        Fe(s)   += 0*penalty;
       }
     }
 

@@ -1,4 +1,4 @@
-// $Id: quadrature.C,v 1.22 2006-03-28 00:39:55 roystgnr Exp $
+// $Id: quadrature.C,v 1.23 2006-10-04 22:26:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -40,6 +40,11 @@ void QBase::init(const ElemType t,
   
   switch(_dim)
     {
+    case 0:
+      this->init_0D(_type,_p_level);
+
+      return;
+      
     case 1:
       this->init_1D(_type,_p_level);
 
@@ -60,6 +65,16 @@ void QBase::init(const ElemType t,
     }
 }
 
+
+
+void QBase::init_0D(const ElemType t,
+                    unsigned int p)
+{
+  _points.resize(1);
+  _weights.resize(1);
+  _points[0] = Point(0.);
+  _weights[0] = 1.0;
+}
 
 
 

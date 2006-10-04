@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.42 2006-09-12 07:14:40 roystgnr Exp $
+// $Id: fe_boundary.C,v 1.43 2006-10-04 22:26:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,22 +44,26 @@ void FE<1,_type>::_func(const Elem*,        \
   error();                                  \
 }
 
+/*
 REINIT_1D_ERROR(CLOUGH, reinit)
-REINIT_1D_ERROR(CLOUGH, edge_reinit)
 REINIT_1D_ERROR(HERMITE, reinit)
-REINIT_1D_ERROR(HERMITE, edge_reinit)
 REINIT_1D_ERROR(HIERARCHIC, reinit)
-REINIT_1D_ERROR(HIERARCHIC, edge_reinit)
 REINIT_1D_ERROR(LAGRANGE, reinit)
-REINIT_1D_ERROR(LAGRANGE, edge_reinit)
-REINIT_1D_ERROR(XYZ, reinit)
-REINIT_1D_ERROR(XYZ, edge_reinit)
 REINIT_1D_ERROR(MONOMIAL, reinit)
-REINIT_1D_ERROR(MONOMIAL, edge_reinit)
+REINIT_1D_ERROR(XYZ, reinit)
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
 REINIT_1D_ERROR(BERNSTEIN, reinit)
-REINIT_1D_ERROR(BERNSTEIN, edge_reinit)
 REINIT_1D_ERROR(SZABAB, reinit)
+#endif
+*/
+REINIT_1D_ERROR(CLOUGH, edge_reinit)
+REINIT_1D_ERROR(HERMITE, edge_reinit)
+REINIT_1D_ERROR(HIERARCHIC, edge_reinit)
+REINIT_1D_ERROR(LAGRANGE, edge_reinit)
+REINIT_1D_ERROR(XYZ, edge_reinit)
+REINIT_1D_ERROR(MONOMIAL, edge_reinit)
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+REINIT_1D_ERROR(BERNSTEIN, edge_reinit)
 REINIT_1D_ERROR(SZABAB, edge_reinit)
 #endif
 
@@ -73,8 +77,8 @@ void FE<Dim,T>::reinit(const Elem* elem,
 {
   assert (elem  != NULL);
   assert (qrule != NULL);
-  // We don't do this for 1D elements!
-  assert (Dim != 1);
+  // We now do this for 1D elements!
+  // assert (Dim != 1);
 
   // Build the side of interest 
   const AutoPtr<Elem> side(elem->build_side(s));
@@ -203,8 +207,12 @@ void FE<Dim,T>::init_face_shape_functions(const std::vector<Point>& qp,
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping
   psi_map.resize        (n_mapping_shape_functions);
-  dpsidxi_map.resize    (n_mapping_shape_functions);
-  d2psidxi2_map.resize  (n_mapping_shape_functions);
+
+  if (Dim > 1)
+    {
+      dpsidxi_map.resize    (n_mapping_shape_functions);
+      d2psidxi2_map.resize  (n_mapping_shape_functions);
+    }
   
   if (Dim == 3)
     {
@@ -218,8 +226,11 @@ void FE<Dim,T>::init_face_shape_functions(const std::vector<Point>& qp,
       // Allocate space to store the values of the shape functions
       // and their first and second derivatives at the quadrature points.
       psi_map[i].resize        (n_qp);
-      dpsidxi_map[i].resize    (n_qp);
-      d2psidxi2_map[i].resize  (n_qp);
+      if (Dim > 1)
+        {
+          dpsidxi_map[i].resize    (n_qp);
+          d2psidxi2_map[i].resize  (n_qp);
+        }
       if (Dim == 3)
 	{
 	  dpsideta_map[i].resize     (n_qp);
@@ -233,8 +244,11 @@ void FE<Dim,T>::init_face_shape_functions(const std::vector<Point>& qp,
       for (unsigned int p=0; p<n_qp; p++)
 	{
 	  psi_map[i][p]        = FE<Dim-1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
-	  dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
-	  d2psidxi2_map[i][p]  = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
+          if (Dim > 1)
+	    {
+	      dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
+	      d2psidxi2_map[i][p]  = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
+	    }
 	  // std::cout << "d2psidxi2_map["<<i<<"][p]=" << d2psidxi2_map[i][p] << std::endl;
 
 	  // If we are in 3D, then our sides are 2D faces.
@@ -327,6 +341,51 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
   
   switch (dim)
     {
+    case 1:
+      {
+	// A 1D finite element, possibly in 2D or 3D space.
+	// This means the boundary is a "0D finite element", a
+        // NODEELEM.
+
+	// Resize the vectors to hold data at the quadrature points
+	{  
+	  xyz.resize(n_qp);
+	  normals.resize(n_qp);
+
+	  JxW.resize(n_qp);
+        }
+
+        // If we have no quadrature points, there's nothing else to do
+        if (!n_qp)
+          break;
+
+        // We need to look back at the full edge to figure out the normal
+        // vector
+        const Elem *elem = side->parent();
+        assert (elem);
+        if (side->node(0) == elem->node(0))
+          normals[0] == Point(-1.);
+        else
+          {
+            assert (side->node(0) == elem->node(1));
+            normals[0] == Point(1.);
+          }
+
+        // Calculate x at the point
+	assert (psi_map.size() == 1);
+        // In the unlikely event we have multiple quadrature
+        // points, they'll be in the same place
+	for (unsigned int p=0; p<n_qp; p++)
+	  {
+	    xyz[p].zero();
+	    xyz[p].add_scaled          (side->point(0), psi_map[0][p]);
+            normals[p] = normals[0];
+	    JxW[p] = 1.0*qw[p];
+          }
+
+	// done computing the map
+	break;
+      }
       
     case 2:
       {
@@ -608,6 +667,17 @@ void FEBase::compute_edge_map(const std::vector<Real>& qw,
 
 //--------------------------------------------------------------
 // Explicit instantiations
+template void FE<1,LAGRANGE>::reinit(Elem const*, unsigned int, Real);
+template void FE<1,HIERARCHIC>::reinit(Elem const*, unsigned int, Real);
+template void FE<1,CLOUGH>::reinit(Elem const*, unsigned int, Real);
+template void FE<1,HERMITE>::reinit(Elem const*, unsigned int, Real);
+template void FE<1,MONOMIAL>::reinit(Elem const*, unsigned int, Real);
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+template void FE<1,BERNSTEIN>::reinit(Elem const*, unsigned int, Real);
+template void FE<1,SZABAB>::reinit(Elem const*, unsigned int, Real);
+#endif
+template void FE<1,XYZ>::reinit(Elem const*, unsigned int, Real);
+
 template void FE<2,LAGRANGE>::reinit(Elem const*, unsigned int, Real);
 template void FE<2,LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real);
 template void FE<2,HIERARCHIC>::reinit(Elem const*, unsigned int, Real);
@@ -626,6 +696,7 @@ template void FE<2,SZABAB>::edge_reinit(Elem const*, unsigned int, Real);
 #endif
 template void FE<2,XYZ>::reinit(Elem const*, unsigned int, Real);
 template void FE<2,XYZ>::edge_reinit(Elem const*, unsigned int, Real);
+
 template void FE<3,LAGRANGE>::reinit(Elem const*, unsigned int, Real);
 template void FE<3,LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real);
 template void FE<3,HIERARCHIC>::reinit(Elem const*, unsigned int, Real);

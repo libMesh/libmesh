@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.29 2006-04-27 17:57:29 roystgnr Exp $
+// $Id: fe_lagrange.C,v 1.30 2006-10-04 22:26:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -298,6 +298,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
           case EDGE4:
@@ -347,6 +350,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE3:
 	    return 3;
 
@@ -390,6 +396,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
         switch (t)
         {
+	  case NODEELEM:
+	    return 1;
+
           case EDGE4:
             return 4;
 
@@ -428,6 +437,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
           case EDGE4:
@@ -566,6 +578,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	switch (t)
 	  {
 	  // quadratic lagrange has one dof at each node
+	  case NODEELEM:
 	  case EDGE3:
 	  case TRI6:
 	  case QUAD8:
@@ -593,6 +606,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
       {
         switch (t)
           {
+	    case NODEELEM:
             case EDGE4:
               return 1;
 
