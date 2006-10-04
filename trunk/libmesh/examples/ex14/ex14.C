@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.30 2006-10-04 22:26:53 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.31 2006-10-04 23:08:29 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -336,9 +336,11 @@ int main(int argc, char** argv)
 
 	    else if (uniform_refine == 1)
               {
-                if (refine_type == "h" || refine_type == "hp")
+                if (refine_type == "h" || refine_type == "hp" ||
+                    refine_type == "matchedhp")
                   mesh_refinement.uniformly_refine(1);
-                if (refine_type == "p" || refine_type == "hp")
+                if (refine_type == "p" || refine_type == "hp" ||
+                    refine_type == "matchedhp")
                   mesh_refinement.uniformly_p_refine(1);
               }
 	    
@@ -646,7 +648,8 @@ void assemble_laplace(EquationSystems& es,
         for (unsigned int qp=0; qp<qrule->n_points(); qp++)
           {
             Real x = q_point[qp](0);
-            Real f = sqrt(3.)/9.*pow(-x, -4./3.);
+            Real f = singularity ? sqrt(3.)/9.*pow(-x, -4./3.) :
+                                   cos(x);
             for (unsigned int i=0; i<dphi.size(); ++i)
               Fe(i) += JxW[qp]*phi[i][qp]*f;
           }
