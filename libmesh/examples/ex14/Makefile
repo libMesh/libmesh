@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2006-04-17 02:35:19 roystgnr Exp $
+# $Id: Makefile,v 1.7 2006-10-04 23:08:29 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -37,7 +37,7 @@ target  := ./ex14
 
 ifeq ($(petsc-version), 2.3.0)
 #args := -pc_type jacobi #ILU detects 0 pivot in petsc 2.3.0
-args := -pc_type ilu -pc_ilu_levels 4 -pc_factor_zeropivot 0
+args := -pc_type ilu -pc_ilu_levels 4
 endif
 
 all:: $(target)
@@ -65,7 +65,7 @@ run: $(target)
 	@echo "* Running Example " $(target) $(args)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) $(args)
+	@$(target) $(args) -pc_factor_zeropivot 0
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target) $(args)

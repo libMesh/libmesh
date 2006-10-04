@@ -13,31 +13,32 @@ coarsen_percentage = 0.0
 # Option to uniformly or adaptively refine.
 # If uniform_refine == 1, uniform refinement is done.
 # If uniform_refine == 0, adaptive refinement is done.
-uniform_refine = 0
+uniform_refine = 1
 
 # Basis function type (as named in enum_fe_family.h)
-approx_type = LAGRANGE
+approx_type = HIERARCHIC
 
 # minimum approximation order
 # Use approx_order = 1 or 2 for LAGRANGE elements
 # Use approx_order = 2 or 3 for CLOUGH elements
 # Use approx_order = 3 or higher for HERMITE elements
-approx_order = 2
+# Use approx_order = 1 or higher for other elements
+approx_order = 1
 
 # Use exact error estimator instead of gradient jumps?
-exact_indicator = false
+exact_indicator = true
 
 # Mesh refinement type: h, p, matchedhp, or hp
-# Use HIERARCHIC functions with p/matchedhp/hp,
+# Use HIERARCHIC or HERMITE functions with p/matchedhp/hp,
 # Use an exact indicator with matchedhp/hp.
 # matchedhp refinement stupidly does both h and p or neither
 # on every element; hp refinement tries to do one or the other
-refinement_type = h
+refinement_type = p
 
 # Mesh dimensionality
 # We generate 1D meshes on [-1, 0].
 # We load lshaped.xda for 2 dimensional problems, lshaped3D.xda for 3
-dimension = 2
+dimension = 1
 
 # Element type - tensor or simplex
 # simplex is currently only supported in 2D
