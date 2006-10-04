@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.44 2006-08-29 22:28:51 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.45 2006-10-04 22:26:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -83,6 +83,7 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
         // Reserve elements
         switch (type)
           {
+          case INVALID_ELEM:
           case EDGE2:
           case EDGE3:
           case EDGE4:
@@ -101,6 +102,7 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
         // Reserve nodes
         switch (type)
           {
+          case INVALID_ELEM:
           case EDGE2:
             {
               mesh.reserve_nodes(nx+1);
@@ -131,6 +133,7 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
         // quadratics or cubics and whether using uniform grid or Gauss-Lobatto
         switch(type)
         {
+          case INVALID_ELEM:
           case EDGE2:
             {
               for (unsigned int i=0; i<=nx; i++)
@@ -256,6 +259,7 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
         // Build the elements of the mesh
         switch(type)
           {
+            case INVALID_ELEM:
             case EDGE2:
               {
                 for (unsigned int i=0; i<nx; i++)

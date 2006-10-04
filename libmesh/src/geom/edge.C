@@ -1,4 +1,4 @@
-// $Id: edge.C,v 1.8 2005-02-22 22:17:39 jwpeterson Exp $
+// $Id: edge.C,v 1.9 2006-10-04 22:26:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,25 @@
 
 
 // Local includes
+#include "edge.h"
+#include "node_elem.h"
 
-// The Edge class implements no functions
-// which are not inline.
+
+AutoPtr<DofObject> Edge::side (const unsigned int i) const
+{
+  assert(i < 2);
+  const Elem* parent = this;
+  Elem *nodeelem = new NodeElem(const_cast<Elem*>(parent));
+  nodeelem->set_node(0) = this->get_node(i);
+  return AutoPtr<DofObject>(nodeelem);
+}
+
+
+AutoPtr<Elem> Edge::build_side (const unsigned int i) const
+{
+  assert(i < 2);
+  const Elem* parent = this;
+  Elem *nodeelem = new NodeElem(const_cast<Elem*>(parent));
+  nodeelem->set_node(0) = this->get_node(i);
+  return AutoPtr<Elem>(nodeelem);
+}

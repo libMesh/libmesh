@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.29 2006-07-25 20:26:32 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.30 2006-10-04 22:26:53 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -156,7 +156,9 @@ int main(int argc, char** argv)
     Mesh mesh (dim);
     
     // Read in the mesh
-    if (dim == 2)
+    if (dim == 1)
+      MeshTools::Generation::build_line(mesh,1,-1.,0.);
+    else if (dim == 2)
       mesh.read("lshaped.xda");
     else
       mesh.read("lshaped3D.xda");
@@ -391,7 +393,7 @@ Number exact_solution(const Point& p,
 		      const std::string&) // unk_name, not needed
 {
   const Real x = p(0);
-  const Real y = p(1);
+  const Real y = (dim > 1) ? p(1) : 0.;
   
   if (singularity)
     {
@@ -435,7 +437,7 @@ Gradient exact_derivative(const Point& p,
   
   // x and y coordinates in space
   const Real x = p(0);
-  const Real y = p(1);
+  const Real y = dim > 1 ? p(1) : 0.;
 
   if (singularity)
     {
@@ -461,7 +463,8 @@ Gradient exact_derivative(const Point& p,
       gradu(0) = tt*x*pow(r2,-tt)*sin(tt*theta) - pow(r2,ot)*cos(tt*theta)*tt/(1.+y*y/x/x)*y/x/x;
 
       // du/dy
-      gradu(1) = tt*y*pow(r2,-tt)*sin(tt*theta) + pow(r2,ot)*cos(tt*theta)*tt/(1.+y*y/x/x)*1./x;
+      if (dim > 1)
+        gradu(1) = tt*y*pow(r2,-tt)*sin(tt*theta) + pow(r2,ot)*cos(tt*theta)*tt/(1.+y*y/x/x)*1./x;
 
       if (dim > 2)
         gradu(2) = 1.;
@@ -471,7 +474,8 @@ Gradient exact_derivative(const Point& p,
       const Real z = (dim > 2) ? p(2) : 0;
 
       gradu(0) = -sin(x) * exp(y) * (1. - z);
-      gradu(1) = cos(x) * exp(y) * (1. - z);
+      if (dim > 1)
+        gradu(1) = cos(x) * exp(y) * (1. - z);
       if (dim > 2)
         gradu(2) = -cos(x) * exp(y);
     }
@@ -546,12 +550,13 @@ void assemble_laplace(EquationSystems& es,
 
   // The physical XY locations of the quadrature points on the element.
   // These might be useful for evaluating spatially varying material
-  // properties at the quadrature points.
-  // const std::vector<Point>& q_point = fe->get_xyz();
+  // properties or forcing functions at the quadrature points.
+  const std::vector<Point>& q_point = fe->get_xyz();
 
   // The element shape functions evaluated at the quadrature points.
-  // For this simple problem we only need them on element boundaries.
-  // const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  // For this simple problem we usually only need them on element
+  // boundaries.
+  const std::vector<std::vector<Real> >& phi = fe->get_phi();
   const std::vector<std::vector<Real> >& psi = fe_face->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
@@ -635,6 +640,16 @@ void assemble_laplace(EquationSystems& es,
 	for (unsigned int i=0; i<dphi.size(); i++)
 	  for (unsigned int j=0; j<dphi.size(); j++)
 	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+
+      // We need a forcing function to make the 1D case interesting
+      if (dim == 1)
+        for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+          {
+            Real x = q_point[qp](0);
+            Real f = sqrt(3.)/9.*pow(-x, -4./3.);
+            for (unsigned int i=0; i<dphi.size(); ++i)
+              Fe(i) += JxW[qp]*phi[i][qp]*f;
+          }
 
       // Stop logging the matrix computation
       perf_log.stop_event ("Ke");

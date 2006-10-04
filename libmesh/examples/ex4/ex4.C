@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.48 2005-10-18 15:59:23 jwpeterson Exp $ */
+/* $Id: ex4.C,v 1.49 2006-10-04 22:26:53 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -503,78 +503,45 @@ void assemble_poisson(EquationSystems& es,
 	      // in the discussion above.
 	      const Real penalty = 1.e10;
 
-              // face integration doesn't make sense for 1D, so define
-              // BC's separately
-              if(dim == 1)
+              // The value of the shape functions at the quadrature
+              // points.
+              const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+
+              // The Jacobian * Quadrature Weight at the quadrature
+              // points on the face.
+              const std::vector<Real>& JxW_face = fe_face->get_JxW();
+
+              // The XYZ locations (in physical space) of the
+              // quadrature points on the face.  This is where
+              // we will interpolate the boundary value function.
+              const std::vector<Point >& qface_point = fe_face->get_xyz();
+
+              // Compute the shape function values on the element
+              // face.
+              fe_face->reinit(elem, side);
+
+              // Loop over the face quadrature points for integration.
+              for (unsigned int qp=0; qp<qface.n_points(); qp++)
               {
-                // construct the node
-                AutoPtr<DofObject> element_side(elem->side(side));
-
-                // get the location of node so we can calculate value
-                Node* node = dynamic_cast<Node*>(element_side.get());
-                assert(node != NULL); // assert that cast was successful
-                const Real xf = (*node)(0); 
-
-                // Set Dirichlet BC's according to the exact solution along
-                // the line x=0
-                const Real value = exact_solution(0,xf,0);
-
-                for(unsigned int n=0; n<elem->n_nodes(); n++)
-                {
-                  // find nodes with matching global id's
-                  if(elem->node(n) == node->id())
-                  {
-                    Ke(n,n) += penalty;
-                    Fe(n)   += value*penalty;
-                  }
-                }
-              }
-              else
-              {
-
-                // 2D or 3D
+                // The location on the boundary of the current
+                // face quadrature point.
+                const Real xf = qface_point[qp](0);
+                const Real yf = qface_point[qp](1);
+                const Real zf = qface_point[qp](2);
 
 
-                // The value of the shape functions at the quadrature
-                // points.
-                const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+                // The boundary value.
+                const Real value = exact_solution(xf, yf, zf);
 
-                // The Jacobian * Quadrature Weight at the quadrature
-                // points on the face.
-                const std::vector<Real>& JxW_face = fe_face->get_JxW();
+                // Matrix contribution of the L2 projection. 
+                for (unsigned int i=0; i<phi_face.size(); i++)
+                  for (unsigned int j=0; j<phi_face.size(); j++)
+                    Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
 
-                // The XYZ locations (in physical space) of the
-                // quadrature points on the face.  This is where
-                // we will interpolate the boundary value function.
-                const std::vector<Point >& qface_point = fe_face->get_xyz();
-
-                // Compute the shape function values on the element
-                // face.
-                fe_face->reinit(elem, side);
-
-                // Loop over the face quadrature points for integration.
-                for (unsigned int qp=0; qp<qface.n_points(); qp++)
-                {
-                  // The location on the boundary of the current
-                  // face quadrature point.
-                  const Real xf = qface_point[qp](0);
-                  const Real yf = qface_point[qp](1);
-                  const Real zf = qface_point[qp](2);
-
-
-                  // The boundary value.
-                  const Real value = exact_solution(xf, yf, zf);
-
-                  // Matrix contribution of the L2 projection. 
-                  for (unsigned int i=0; i<phi_face.size(); i++)
-                    for (unsigned int j=0; j<phi_face.size(); j++)
-                      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-
-                  // Right-hand-side contribution of the L2
-                  // projection.
-                  for (unsigned int i=0; i<phi_face.size(); i++)
-                    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-                } 
+                // Right-hand-side contribution of the L2
+                // projection.
+                for (unsigned int i=0; i<phi_face.size(); i++)
+                  Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
               } 
             }
             
