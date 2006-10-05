@@ -1,4 +1,4 @@
-// $Id: hp_selector.h,v 1.7 2006-10-05 20:50:15 roystgnr Exp $
+// $Id: hp_singular.h,v 1.1 2006-10-05 20:50:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -19,41 +19,50 @@
 
 
 
-#ifndef __hp_selector_h__
-#define __hp_selector_h__
+#ifndef __hp_singular_h__
+#define __hp_singular_h__
 
 // C++ includes
 #include <vector>
 
 // Local Includes
+#include "auto_ptr.h"
+#include "dense_matrix.h"
+#include "dense_vector.h"
+#include "fe.h"         // MipsPro requires fe.h and quadrature.h in order to
+#include "quadrature.h" //  delete AutoPtrs<> upon destruction
 #include "libmesh_common.h"
 
 // Forward Declarations
+class Point;
 class System;
 
 
 /**
- * Subclasses of this abstract base class choose between h
- * refining and p elevation.
+ * This class uses a user-provided list of singularity locations
+ * to choose between h refining and p elevation.
  * Currently we assume that a set of elements has already been flagged
- * for h refinement, and we may want to change some of those elements
- * to be flagged for p refinement.
+ * for h refinement - any elements which are not adjacent to a
+ * user-provided singularity are instead flagged for p refinement.
  *
  * @author Roy H. Stogner, 2006.
  */
-class HPSelector
+class HPSingularity
 {
 public:
 
   /**
    * Constructor.
    */
-  HPSelector() {}
+  HPSingularity()
+  {
+    untested();
+  }
   
   /**
    * Destructor.  
    */
-  virtual ~HPSelector() {}
+  virtual ~HPSingularity () {}
 
 
   /**
@@ -62,16 +71,8 @@ public:
    * refinement and potentially change the desired
    * refinement type.
    */
-  virtual void select_refinement (System& system) = 0;
+  virtual void select_refinement (System& system);
 
-  /**
-   * This vector can be used to "scale" certain
-   * variables in a system.
-   * If the mask is not empty, the consideration given to each
-   * component's h and p error estimates will be scaled by
-   * component_scale[c].
-   */
-  std::vector<float> component_scale;
 };
 
 

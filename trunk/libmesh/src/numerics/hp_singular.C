@@ -1,4 +1,4 @@
-// $Id: hp_selector.C,v 1.12 2006-10-05 20:50:15 roystgnr Exp $
+// $Id: hp_singular.C,v 1.1 2006-10-05 20:50:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -21,8 +21,37 @@
 // C++ includes
 
 // Local Includes
-#include "hp_selector.h"
+#include "elem.h"
+#include "hp_singular.h"
+#include "libmesh_logging.h"
+#include "mesh.h"
+#include "system.h"
 
 //-----------------------------------------------------------------
-// No implementations necessary for abstract class HPSelector
+// HPSingularity implementations
 
+
+void HPSingularity::select_refinement (System &system)
+{
+  START_LOG("select_refinement()", "HPSingularity");
+
+  // The current mesh
+  const MeshBase& mesh = system.get_mesh();
+
+  MeshBase::const_element_iterator       elem_it  =
+    mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator elem_end =
+    mesh.active_local_elements_end(); 
+
+  for (; elem_it != elem_end; ++elem_it)
+    {
+      const Elem* elem = *elem_it;
+
+      // We're only checking elements that are already flagged for h
+      // refinement
+      if (elem->refinement_flag() != Elem::REFINE)
+        continue;
+    }
+
+  STOP_LOG("select_refinement()", "HPCoarsenTest");
+}

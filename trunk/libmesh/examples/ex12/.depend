@@ -25,4 +25,5 @@ ex12.$(obj-suffix):\
     ../../include/mesh/mesh_tools.h\
     ../../include/mesh/unv_io.h\
     ../../include/numerics/type_vector.h\
+    ../../include/utils/o_string_stream.h\
     ../../include/utils/perf_log.h

@@ -3,6 +3,7 @@ ex10.$(obj-suffix):\
     ../../include/base/auto_ptr.h\
     ../../include/base/dof_map.h\
     ../../include/base/dof_object.h\
+    ../../include/base/getpot.h\
     ../../include/base/libmesh.h\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
@@ -19,10 +20,8 @@ ex10.$(obj-suffix):\
     ../../include/enums/enum_inf_map_type.h\
     ../../include/enums/enum_io_package.h\
     ../../include/enums/enum_order.h\
-    ../../include/enums/enum_preconditioner_type.h\
     ../../include/enums/enum_quadrature_type.h\
     ../../include/enums/enum_solver_package.h\
-    ../../include/enums/enum_solver_type.h\
     ../../include/enums/enum_xdr_mode.h\
     ../../include/fe/fe.h\
     ../../include/fe/fe_base.h\
@@ -40,8 +39,6 @@ ex10.$(obj-suffix):\
     ../../include/numerics/dense_vector_base.h\
     ../../include/numerics/error_estimator.h\
     ../../include/numerics/kelly_error_estimator.h\
-    ../../include/numerics/linear_solver.h\
-    ../../include/numerics/nonlinear_solver.h\
     ../../include/numerics/numeric_vector.h\
     ../../include/numerics/sparse_matrix.h\
     ../../include/numerics/tensor_value.h\
@@ -56,7 +53,6 @@ ex10.$(obj-suffix):\
     ../../include/solvers/implicit_system.h\
     ../../include/solvers/linear_implicit_system.h\
     ../../include/solvers/newmark_system.h\
-    ../../include/solvers/nonlinear_implicit_system.h\
     ../../include/solvers/steady_system.h\
     ../../include/solvers/system.h\
     ../../include/solvers/transient_system.h\

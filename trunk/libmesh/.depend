@@ -4313,8 +4313,8 @@ src/numerics/function_base.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/numerics/function_base.h
-src/numerics/hp_selector.$(obj-suffix):\
-    src/numerics/hp_selector.C\
+src/numerics/hp_coarsentest.$(obj-suffix):\
+    src/numerics/hp_coarsentest.C\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
@@ -4349,6 +4349,7 @@ src/numerics/hp_selector.$(obj-suffix):\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
+    include/numerics/hp_coarsentest.h\
     include/numerics/hp_selector.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
@@ -4360,6 +4361,55 @@ src/numerics/hp_selector.$(obj-suffix):\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/statistics.h
+src/numerics/hp_selector.$(obj-suffix):\
+    src/numerics/hp_selector.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/numerics/hp_selector.h
+src/numerics/hp_singular.$(obj-suffix):\
+    src/numerics/hp_singular.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
+    include/numerics/hp_singular.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/quadrature/quadrature.h\
+    include/solvers/system.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/numerics/kelly_error_estimator.$(obj-suffix):\
     src/numerics/kelly_error_estimator.C\
     include/base/auto_ptr.h\

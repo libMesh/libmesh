@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2006-06-27 20:40:11 roystgnr Exp $
+# $Id: Makefile,v 1.3 2006-10-05 20:50:14 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -84,6 +84,17 @@ ilu4: $(target)
 	@echo "***************************************************************"
 	@echo " "
 	@$(target) -pc_ilu_levels 4 -pc_factor_zeropivot 0
+	@echo " "
+	@echo "***************************************************************"
+	@echo "* Done Running Example " $(target)
+	@echo "***************************************************************"
+
+jacobi: $(target)
+	@echo "***************************************************************"
+	@echo "* Running Example " $(target) -pc_type jacobi
+	@echo "***************************************************************"
+	@echo " "
+	@$(target) -pc_type jacobi
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)
