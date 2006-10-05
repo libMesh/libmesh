@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.32 2006-10-05 20:50:14 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.33 2006-10-05 21:34:22 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -59,6 +59,7 @@
 #include "exact_error_estimator.h"
 #include "kelly_error_estimator.h"
 #include "hp_coarsentest.h"
+#include "hp_singular.h"
 #include "mesh_generation.h"
 #include "mesh_modification.h"
 #include "getpot.h"
@@ -326,6 +327,18 @@ int main(int argc, char** argv)
                 if (refine_type == "hp")
 	          {
 		    HPCoarsenTest hpselector;
+                    hpselector.select_refinement(system);
+	          }
+                // If we are doing "singular hp" refinement, we 
+                // try switching most elements from h to p
+                if (refine_type == "singularhp")
+	          {
+                    // This only differs from p refinement for
+                    // the singular problem
+                    assert (singularity);
+		    HPSingularity hpselector;
+                    // Our only singular point is at the origin
+                    hpselector.singular_points.push_back(Point());
                     hpselector.select_refinement(system);
 	          }
 		
