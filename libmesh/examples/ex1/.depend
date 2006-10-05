@@ -12,4 +12,5 @@ ex1.$(obj-suffix):\
     ../../include/enums/enum_solver_package.h\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
+    ../../include/utils/o_string_stream.h\
     ../../include/utils/perf_log.h

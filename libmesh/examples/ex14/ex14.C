@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.31 2006-10-04 23:08:29 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.32 2006-10-05 20:50:14 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -58,7 +58,7 @@
 #include "error_vector.h"
 #include "exact_error_estimator.h"
 #include "kelly_error_estimator.h"
-#include "hp_selector.h"
+#include "hp_coarsentest.h"
 #include "mesh_generation.h"
 #include "mesh_modification.h"
 #include "getpot.h"
@@ -325,7 +325,7 @@ int main(int argc, char** argv)
                 // try switching some elements from h to p
                 if (refine_type == "hp")
 	          {
-		    HPSelector hpselector;
+		    HPCoarsenTest hpselector;
                     hpselector.select_refinement(system);
 	          }
 		

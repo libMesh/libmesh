@@ -14,27 +14,23 @@ ex2.$(obj-suffix):\
     ../../include/enums/enum_fe_family.h\
     ../../include/enums/enum_inf_map_type.h\
     ../../include/enums/enum_order.h\
-    ../../include/enums/enum_preconditioner_type.h\
     ../../include/enums/enum_solver_package.h\
-    ../../include/enums/enum_solver_type.h\
     ../../include/enums/enum_xdr_mode.h\
     ../../include/fe/fe_type.h\
+    ../../include/geom/point.h\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
     ../../include/mesh/mesh_generation.h\
-    ../../include/numerics/linear_solver.h\
-    ../../include/numerics/nonlinear_solver.h\
     ../../include/numerics/type_vector.h\
-    ../../include/numerics/vector_value.h\
     ../../include/solvers/equation_systems.h\
     ../../include/solvers/explicit_system.h\
     ../../include/solvers/frequency_system.h\
     ../../include/solvers/implicit_system.h\
     ../../include/solvers/linear_implicit_system.h\
     ../../include/solvers/newmark_system.h\
-    ../../include/solvers/nonlinear_implicit_system.h\
     ../../include/solvers/steady_system.h\
     ../../include/solvers/system.h\
     ../../include/solvers/transient_system.h\
+    ../../include/utils/o_string_stream.h\
     ../../include/utils/parameters.h\
     ../../include/utils/perf_log.h
