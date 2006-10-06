@@ -48,7 +48,7 @@ const Real relative_tolerance = 1.e-3;
   NumericVector<Number> &newton_iterate =
     _system.get_vector("_nonlinear_solution");
   newton_iterate.close();
-//  solution.close();
+  solution.close();
 
   NumericVector<Number> &rhs = *(_system.rhs);
 
