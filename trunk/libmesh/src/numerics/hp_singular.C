@@ -1,4 +1,4 @@
-// $Id: hp_singular.C,v 1.1 2006-10-05 20:50:15 roystgnr Exp $
+// $Id: hp_singular.C,v 1.2 2006-10-06 16:03:45 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -36,22 +36,37 @@ void HPSingularity::select_refinement (System &system)
   START_LOG("select_refinement()", "HPSingularity");
 
   // The current mesh
-  const MeshBase& mesh = system.get_mesh();
+  MeshBase& mesh = system.get_mesh();
 
-  MeshBase::const_element_iterator       elem_it  =
+  MeshBase::element_iterator       elem_it  =
     mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end =
+  const MeshBase::element_iterator elem_end =
     mesh.active_local_elements_end(); 
 
   for (; elem_it != elem_end; ++elem_it)
     {
-      const Elem* elem = *elem_it;
+      Elem* elem = *elem_it;
 
       // We're only checking elements that are already flagged for h
       // refinement
       if (elem->refinement_flag() != Elem::REFINE)
         continue;
+
+      elem->set_p_refinement_flag(Elem::REFINE);
+      elem->set_refinement_flag(Elem::DO_NOTHING);
+
+      for (std::list<Point>::iterator ppoint =
+             singular_points.begin();
+           ppoint != singular_points.end(); ++ppoint)
+        {
+          if (elem->contains_point(*ppoint))
+            {
+              elem->set_p_refinement_flag(Elem::DO_NOTHING);
+              elem->set_refinement_flag(Elem::REFINE);
+              break;
+            }
+        }
     }
 
-  STOP_LOG("select_refinement()", "HPCoarsenTest");
+  STOP_LOG("select_refinement()", "HPSingularity");
 }
