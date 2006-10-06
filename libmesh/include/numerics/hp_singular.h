@@ -1,4 +1,4 @@
-// $Id: hp_singular.h,v 1.1 2006-10-05 20:50:15 roystgnr Exp $
+// $Id: hp_singular.h,v 1.2 2006-10-06 16:03:44 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -23,7 +23,7 @@
 #define __hp_singular_h__
 
 // C++ includes
-#include <vector>
+#include <list>
 
 // Local Includes
 #include "auto_ptr.h"
@@ -42,8 +42,8 @@ class System;
  * This class uses a user-provided list of singularity locations
  * to choose between h refining and p elevation.
  * Currently we assume that a set of elements has already been flagged
- * for h refinement - any elements which are not adjacent to a
- * user-provided singularity are instead flagged for p refinement.
+ * for h refinement - any elements which do not contain a
+ * user-provided singular point are instead flagged for p refinement.
  *
  * @author Roy H. Stogner, 2006.
  */
@@ -73,6 +73,11 @@ public:
    */
   virtual void select_refinement (System& system);
 
+  /**
+   * This list, to be filled by the user, should include
+   * all singular points in the solution.
+   */
+  std::list<Point> singular_points;
 };
 
 
