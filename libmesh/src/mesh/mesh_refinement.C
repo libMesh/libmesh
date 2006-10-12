@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.52 2006-09-19 15:46:34 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.53 2006-10-12 22:09:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,9 @@ void MeshRefinement::clear ()
 
 
 
-Node* MeshRefinement::add_point (const Point& p, const unsigned int key)
+Node* MeshRefinement::add_point (const Point& p,
+                                 const unsigned int key,
+                                 const Real tol)
 {
   START_LOG("add_point()", "MeshRefinement");
 
@@ -75,7 +77,7 @@ Node* MeshRefinement::add_point (const Point& p, const unsigned int key)
   
       
   while (pos.first != pos.second) 
-    if (p == *(pos.first->second)) // call Point::operator==
+    if (p.absolute_fuzzy_equals(*(pos.first->second), tol))
     {
       STOP_LOG("add_point()", "MeshRefinement");
       return pos.first->second;      
