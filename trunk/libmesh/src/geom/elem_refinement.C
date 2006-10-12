@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.20 2006-04-14 22:31:50 roystgnr Exp $
+// $Id: elem_refinement.C,v 1.21 2006-10-12 22:09:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -68,11 +68,12 @@ void Elem::refine (MeshRefinement& mesh_refinement)
       // compute new nodal locations
       for (unsigned int c=0; c<this->n_children(); c++)
         {	
-	  p[c].resize    (this->child(c)->n_nodes());
-	  keys[c].resize (this->child(c)->n_nodes());
-	  nodes[c].resize(this->child(c)->n_nodes());
+          Elem *child = this->child(c);
+	  p[c].resize    (child->n_nodes());
+	  keys[c].resize (child->n_nodes());
+	  nodes[c].resize(child->n_nodes());
 
-	  for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
+	  for (unsigned int nc=0; nc<child->n_nodes(); nc++)
 	    {
 	      // zero entries
 	      p[c][nc].zero();
@@ -110,24 +111,26 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 	    }
       
 	// assign nodes to children & add them to the mesh
-	  for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
+          const Real pointtol = this->hmin() * TOLERANCE;
+	  for (unsigned int nc=0; nc<child->n_nodes(); nc++)
 	    {
 	      if (nodes[c][nc] != NULL)
 	        {
-		  this->child(c)->set_node(nc) = nodes[c][nc];
+		  child->set_node(nc) = nodes[c][nc];
 	        }
 	      else
 	        {
-		  this->child(c)->set_node(nc) =
+		  child->set_node(nc) =
 		    mesh_refinement.add_point(p[c][nc],
-					      keys[c][nc]);
-		  this->child(c)->get_node(nc)->set_n_systems
+					      keys[c][nc],
+                                              pointtol);
+		  child->get_node(nc)->set_n_systems
                     (this->n_systems());
 	        }
 	    }
       
-	  mesh_refinement.add_elem (this->child(c));
-          this->child(c)->set_n_systems(this->n_systems());
+	  mesh_refinement.add_elem (child);
+          child->set_n_systems(this->n_systems());
         }
     }
   else
@@ -135,10 +138,11 @@ void Elem::refine (MeshRefinement& mesh_refinement)
       unsigned int parent_p_level = this->p_level();
       for (unsigned int c=0; c<this->n_children(); c++)
         {	
-          assert(this->child(c)->subactive());
-          this->child(c)->set_refinement_flag(Elem::JUST_REFINED);
-          this->child(c)->set_p_level(parent_p_level);
-          this->child(c)->set_p_refinement_flag(this->p_refinement_flag());
+          Elem *child = this->child(c);
+          assert(child->subactive());
+          child->set_refinement_flag(Elem::JUST_REFINED);
+          child->set_p_level(parent_p_level);
+          child->set_p_refinement_flag(this->p_refinement_flag());
         }
     }
 

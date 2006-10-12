@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.17 2006-07-28 23:28:58 roystgnr Exp $
+// $Id: type_vector.h,v 1.18 2006-10-12 22:09:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -234,13 +234,25 @@ public:
   void zero();
 
   /**
-   * @returns \p true iff two vectors occupy the same
-   * physical location in space.
+   * @returns \p true iff two vectors occupy approximately the same
+   * physical location in space, to within a relative tolerance of \p tol.
+   */
+  bool relative_fuzzy_equals(const TypeVector<T>& rhs, Real tol = TOLERANCE) const;
+  
+  /**
+   * @returns \p true iff two vectors occupy approximately the same
+   * physical location in space, to within an absolute tolerance of \p tol.
+   */
+  bool absolute_fuzzy_equals(const TypeVector<T>& rhs, Real tol = TOLERANCE) const;
+  
+  /**
+   * @returns \p true iff two vectors occupy approximately the same
+   * physical location in space, to within an absolute tolerance of \p TOLERANCE.
    */
   bool operator == (const TypeVector<T>& rhs) const;
   
   /**
-   * @returns \p true iff two vectors do not occupy the same
+   * @returns \p true iff two vectors do not occupy approximately the same
    * physical location in space.
    */
   bool operator != (const TypeVector<T>& rhs) const;
@@ -732,28 +744,74 @@ Real TypeVector<Complex>::size_sq() const
 
 
 
-template <>
+template <typename T>
 inline
-bool TypeVector<Real>::operator == (const TypeVector<Real>& rhs) const
+bool TypeVector<T>::absolute_fuzzy_equals(const TypeVector<T>& rhs, Real tol) const
 {
 #if DIM == 1
   return (std::abs(_coords[0] - rhs._coords[0])
-	  < TOLERANCE);
+	  < tol);
 #endif
-  
+
 #if DIM == 2
-  return ((std::abs(_coords[0] - rhs._coords[0]) +
-	   std::abs(_coords[1] - rhs._coords[1]))
-	  < 2.*TOLERANCE);
+  return (std::abs(_coords[0] - rhs._coords[0]) +
+	  std::abs(_coords[1] - rhs._coords[1])
+	  < tol);
 #endif
-  
+
 #if DIM == 3
-  return ((std::abs(_coords[0] - rhs._coords[0]) +
-	   std::abs(_coords[1] - rhs._coords[1]) +
-	   std::abs(_coords[2] - rhs._coords[2]))
-	  < 3.*TOLERANCE);
+  return (std::abs(_coords[0] - rhs._coords[0]) +
+	  std::abs(_coords[1] - rhs._coords[1]) +
+	  std::abs(_coords[2] - rhs._coords[2])
+	  < tol);
 #endif
-  
+}
+
+
+
+template <typename T>
+inline
+bool TypeVector<T>::relative_fuzzy_equals(const TypeVector<T>& rhs, Real tol) const
+{
+#if DIM == 1
+  return this->absolute_fuzzy_equals(rhs, tol *
+				     (std::abs(_coords[0]) + std::abs(rhs._coords[0])));
+#endif
+
+#if DIM == 2
+  return this->absolute_fuzzy_equals(rhs, tol * 
+				     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
+				      std::abs(_coords[1]) + std::abs(rhs._coords[1])));
+#endif
+
+#if DIM == 3
+  return this->absolute_fuzzy_equals(rhs, tol *
+				     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
+				      std::abs(_coords[1]) + std::abs(rhs._coords[1]) +
+				      std::abs(_coords[2]) + std::abs(rhs._coords[2])));
+#endif
+}
+
+
+
+template <typename T>
+inline
+bool TypeVector<T>::operator == (const TypeVector<T>& rhs) const
+{
+#if DIM == 1
+  return (_coords[0] == rhs._coords[0]);
+#endif
+
+#if DIM == 2
+  return (_coords[0] == rhs._coords[0] &&
+	  _coords[1] == rhs._coords[1]);
+#endif
+
+#if DIM == 3
+  return (_coords[0] == rhs._coords[0] &&
+	  _coords[1] == rhs._coords[1] &&
+	  _coords[2] == rhs._coords[2]);
+#endif
 }
 
 
@@ -767,6 +825,7 @@ bool TypeVector<Real>::operator != (const TypeVector<Real>& rhs) const
 
 
 
+/*
 #ifdef USE_COMPLEX_NUMBERS
 
 template <>
@@ -774,21 +833,18 @@ inline
 bool TypeVector<Complex>::operator == (const TypeVector<Complex>& rhs) const
 {
 #if DIM == 1
-  return (std::abs(_coords[0] - rhs._coords[0])
-	  < TOLERANCE);
+  return (_coords[0] == rhs._coords[0]);
 #endif
   
 #if DIM == 2
-  return ((std::abs(_coords[0] - rhs._coords[0]) +
-	   std::abs(_coords[1] - rhs._coords[1]))
-	  < 2.*TOLERANCE);
+  return (_coords[0] == rhs._coords[0] &&
+	  _coords[1] == rhs._coords[1]);
 #endif
   
 #if DIM == 3
-  return ((std::abs(_coords[0] - rhs._coords[0]) +
-	   std::abs(_coords[1] - rhs._coords[1]) +
-	   std::abs(_coords[2] - rhs._coords[2]))
-	  < 3.*TOLERANCE);
+  return (_coords[0] == rhs._coords[0] &&
+	  _coords[1] == rhs._coords[1] &&
+	  _coords[2] == rhs._coords[2]);
 #endif  
 }
 
@@ -802,6 +858,7 @@ bool TypeVector<Complex>::operator != (const TypeVector<Complex>& rhs) const
 
 
 #endif
+*/
 
 
 #endif // #define __type_vector_h__

@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.21 2006-07-20 22:48:46 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.22 2006-10-12 22:09:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -255,9 +255,11 @@ public:
   
   /**
    * Add point \p p to the mesh. The function returns a pointer to
-   * the new node.  The \p key tells the method where to look.
+   * the new node.  The \p key tells the method where to look.  The
+   * tolerance \p tol tells the method how far away from p to search
+   * for existing nodes.
    */
-  Node* add_point (const Point& p, const unsigned int key);
+  Node* add_point (const Point& p, const unsigned int key, const Real tol);
 
   /**
    * Adds the element \p elem to the mesh.
