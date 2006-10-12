@@ -95,7 +95,7 @@ Tensor FEMSystem::interior_hessian(unsigned int var, unsigned int qp)
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<Tensor> > &d2phi =
+  const std::vector<std::vector<RealTensor> > &d2phi =
     element_fe_var[var]->get_d2phi();
 
   // Accumulate solution second derivatives
@@ -175,7 +175,7 @@ Tensor FEMSystem::side_hessian(unsigned int var, unsigned int qp)
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<Tensor> > &d2phi =
+  const std::vector<std::vector<RealTensor> > &d2phi =
     side_fe_var[var]->get_d2phi();
 
   // Accumulate solution second derivatives
