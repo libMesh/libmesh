@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.7 2006-09-19 17:50:52 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.8 2006-10-12 19:20:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -301,7 +301,7 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
                 {
                   Tensor grad2_error = grad2_u_fine - grad2_u_coarse;
 
-                  H2seminormsq += JxW[qp]*(grad2_error.contract(grad2_error));
+                  H2seminormsq += JxW[qp]*std::abs(grad2_error.contract(grad2_error));
                 }
 #endif
 
