@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.23 2005-06-16 23:03:52 roystgnr Exp $
+// $Id: cell_tet10.C,v 1.24 2006-10-13 03:05:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -97,17 +97,23 @@ bool Tet10::is_node_on_edge(const unsigned int n,
 bool Tet10::has_affine_map() const
 {
   // Make sure edges are straight
-  if ((this->point(0) + this->point(1))/2 != this->point(4))
+  if (!this->point(4).relative_fuzzy_equals
+      (this->point(0) + this->point(1)/2))
     return false;
-  if ((this->point(1) + this->point(2))/2 != this->point(5))
+  if (!this->point(5).relative_fuzzy_equals
+      (this->point(1) + this->point(2)/2))
     return false;
-  if ((this->point(2) + this->point(0))/2 != this->point(6))
+  if (!this->point(6).relative_fuzzy_equals
+      (this->point(2) + this->point(0)/2))
     return false;
-  if ((this->point(3) + this->point(0))/2 != this->point(7))
+  if (!this->point(7).relative_fuzzy_equals
+      (this->point(3) + this->point(0)/2))
     return false;
-  if ((this->point(3) + this->point(1))/2 != this->point(8))
+  if (!this->point(8).relative_fuzzy_equals
+      (this->point(3) + this->point(1)/2))
     return false;
-  if ((this->point(3) + this->point(2))/2 != this->point(9))
+  if (!this->point(9).relative_fuzzy_equals
+      (this->point(3) + this->point(2)/2))
     return false;
   return true;
 }

@@ -1,4 +1,4 @@
-// $Id: face_quad9.C,v 1.27 2006-06-07 18:49:35 roystgnr Exp $
+// $Id: face_quad9.C,v 1.28 2006-10-13 03:05:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -145,19 +145,19 @@ bool Quad9::has_affine_map() const
 {
   // make sure corners form a parallelogram
   Point v = this->point(1) - this->point(0);
-  if (this->point(2) - this->point(3) != v)
+  if (!v.relative_fuzzy_equals(this->point(2) - this->point(3)))
     return false;
   // make sure "horizontal" sides are straight
   v /= 2;
-  if ((this->point(4) - this->point(0) != v)
-      || (this->point(6) - this->point(3) != v))
+  if (!v.relative_fuzzy_equals(this->point(4) - this->point(0)) ||
+      !v.relative_fuzzy_equals(this->point(6) - this->point(3)))
     return false;
   // make sure "vertical" sides are straight
   // and the center node is centered
   v = (this->point(3) - this->point(0))/2;
-  if ((this->point(7) - this->point(0) != v)
-     || (this->point(5) - this->point(1) != v)
-     || (this->point(8) - this->point(4) != v))
+  if (!v.relative_fuzzy_equals(this->point(7) - this->point(0)) ||
+      !v.relative_fuzzy_equals(this->point(5) - this->point(1)) ||
+      !v.relative_fuzzy_equals(this->point(8) - this->point(4)))
     return false;
   return true;
 }

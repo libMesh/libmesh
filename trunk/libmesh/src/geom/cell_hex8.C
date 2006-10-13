@@ -1,4 +1,4 @@
-// $Id: cell_hex8.C,v 1.27 2006-07-01 23:06:52 jwpeterson Exp $
+// $Id: cell_hex8.C,v 1.28 2006-10-13 03:05:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -102,13 +102,13 @@ bool Hex8::has_affine_map() const
 {
   // Make sure x-edge endpoints are affine
   Point v = this->point(1) - this->point(0);
-  if ((this->point(2) - this->point(3) != v)
-      || (this->point(5) - this->point(4) != v)
-      || (this->point(6) - this->point(7) != v))
+  if (!v.relative_fuzzy_equals(this->point(2) - this->point(3)) ||
+      !v.relative_fuzzy_equals(this->point(5) - this->point(4)) ||
+      !v.relative_fuzzy_equals(this->point(6) - this->point(7)))
     return false;
   // Make sure xz-faces are identical parallelograms
   v = this->point(4) - this->point(0);
-  if (this->point(7) - this->point(3) != v)
+  if (!v.relative_fuzzy_equals(this->point(7) - this->point(3)))
     return false;
   // If all the above checks out, the map is affine
   return true;

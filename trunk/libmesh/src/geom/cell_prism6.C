@@ -1,4 +1,4 @@
-// $Id: cell_prism6.C,v 1.26 2006-07-05 02:25:23 jwpeterson Exp $
+// $Id: cell_prism6.C,v 1.27 2006-10-13 03:05:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -98,8 +98,8 @@ bool Prism6::has_affine_map() const
 {
   // Make sure z edges are affine
   Point v = this->point(3) - this->point(0);
-  if ((this->point(4) - this->point(1) != v)
-      || (this->point(5) - this->point(2) != v))
+  if (!v.relative_fuzzy_equals(this->point(4) - this->point(1)) ||
+      !v.relative_fuzzy_equals(this->point(5) - this->point(2)))
     return false;
   return true;
 }

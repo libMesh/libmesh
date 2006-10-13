@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.C,v 1.23 2006-07-01 23:06:52 jwpeterson Exp $
+// $Id: cell_pyramid5.C,v 1.24 2006-10-13 03:05:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -97,8 +97,8 @@ bool Pyramid5::is_node_on_edge(const unsigned int n,
 
 bool Pyramid5::has_affine_map() const
 {
-//   return (this->point(3) - this->point(0) ==
-//       this->point(2) - this->point(1));
+//  Point v = this->point(3) - this->point(0);
+//  return (v.relative_fuzzy_equals(this->point(2) - this->point(1)));
   return false;
 }
 
