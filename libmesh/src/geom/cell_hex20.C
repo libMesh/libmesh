@@ -1,4 +1,4 @@
-// $Id: cell_hex20.C,v 1.26 2005-06-16 23:03:52 roystgnr Exp $
+// $Id: cell_hex20.C,v 1.27 2006-10-13 03:05:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -107,33 +107,33 @@ bool Hex20::has_affine_map() const
 {
   // Make sure x-edge endpoints are affine
   Point v = this->point(1) - this->point(0);
-  if ((this->point(2) - this->point(3) != v)
-      || (this->point(5) - this->point(4) != v)
-      || (this->point(6) - this->point(7) != v))
+  if (!v.relative_fuzzy_equals(this->point(2) - this->point(3)) ||
+      !v.relative_fuzzy_equals(this->point(5) - this->point(4)) ||
+      !v.relative_fuzzy_equals(this->point(6) - this->point(7)))
     return false;
   // Make sure x-edges are straight
   v /= 2;
-  if ((this->point(8) - this->point(0) != v)
-      || (this->point(10) - this->point(3) != v)
-      || (this->point(16) - this->point(4) != v)
-      || (this->point(18) - this->point(7) != v))
+  if (!v.relative_fuzzy_equals(this->point(8) - this->point(0)) ||
+      !v.relative_fuzzy_equals(this->point(10) - this->point(3)) ||
+      !v.relative_fuzzy_equals(this->point(16) - this->point(4)) ||
+      !v.relative_fuzzy_equals(this->point(18) - this->point(7)))
     return false;
   // Make sure xz-faces are identical parallelograms
   v = this->point(4) - this->point(0);
-  if (this->point(7) - this->point(3) != v)
+  if (!v.relative_fuzzy_equals(this->point(7) - this->point(3)))
     return false;
   v /= 2;
-  if ((this->point(12) - this->point(0) != v)
-      || (this->point(13) - this->point(1) != v)
-      || (this->point(14) - this->point(2) != v)
-      || (this->point(15) - this->point(3) != v))
+  if (!v.relative_fuzzy_equals(this->point(12) - this->point(0)) ||
+      !v.relative_fuzzy_equals(this->point(13) - this->point(1)) ||
+      !v.relative_fuzzy_equals(this->point(14) - this->point(2)) ||
+      !v.relative_fuzzy_equals(this->point(15) - this->point(3)))
     return false;
   // Make sure y-edges are straight
   v = (this->point(3) - this->point(0))/2;
-  if ((this->point(11) - this->point(0) != v)
-      || (this->point(9) - this->point(1) != v)
-      || (this->point(17) - this->point(5) != v)
-      || (this->point(19) - this->point(4) != v))
+  if (!v.relative_fuzzy_equals(this->point(11) - this->point(0)) ||
+      !v.relative_fuzzy_equals(this->point(9) - this->point(1)) ||
+      !v.relative_fuzzy_equals(this->point(17) - this->point(5)) ||
+      !v.relative_fuzzy_equals(this->point(19) - this->point(4)))
     return false;
   // If all the above checks out, the map is affine
   return true;

@@ -1,4 +1,4 @@
-// $Id: edge_edge3.C,v 1.17 2005-06-16 23:03:52 roystgnr Exp $
+// $Id: edge_edge3.C,v 1.18 2006-10-13 03:05:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -83,7 +83,8 @@ bool Edge3::is_node_on_edge(const unsigned int,
 
 bool Edge3::has_affine_map() const
 {
-  return ((this->point(0) + this->point(1))/2 == this->point(2));
+  return (this->point(2).relative_fuzzy_equals
+          ((this->point(0) + this->point(1))/2));
 }
 
 

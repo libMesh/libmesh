@@ -1,4 +1,4 @@
-// $Id: face_quad4.C,v 1.25 2006-07-06 21:21:49 jwpeterson Exp $
+// $Id: face_quad4.C,v 1.26 2006-10-13 03:05:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -117,8 +117,8 @@ bool Quad4::is_node_on_side(const unsigned int n,
 
 bool Quad4::has_affine_map() const
 {
-  return (this->point(3) - this->point(0) ==
-          this->point(2) - this->point(1));
+  Point v = this->point(3) - this->point(0);
+  return (!v.relative_fuzzy_equals(this->point(2) - this->point(1)));
 }
 
 
