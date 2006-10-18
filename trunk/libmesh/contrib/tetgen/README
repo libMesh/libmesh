@@ -1,3 +1,12 @@
+
+Upgraded the TetGen version from 1.3 to 1.4.1 (released on July 28, 2006).
+
+Steffen Petersen
+Wed Oct 18 09:11:25 CEST 2006
+------------------------------------------------------------------------------
+
+
+
 Fixed tetgen.C so that no warnings are issued under debug mode in libMesh.
 This allows us to use the libMesh CXXFLAGS for compilation, which is important
 for proper shared library generation.
@@ -20,61 +29,19 @@ Do Mai 12 19:41:19 CEST 2005
 
 
 
-
 TetGen
 A Quality Tetrahedral Mesh Generator and 3D Delaunay Triangulator
-Version 1.3 (Released on June 13, 2004).
+Version 1.4.1 (Released on July 28, 2006).
 
-Copyright 2002, 2004  Hang Si
+Copyright 2002, 2004, 2005, 2006 
+Hang Si
 Rathausstr. 9, 10178 Berlin, Germany
 si@wias-berlin.de
 
-TetGen generates exact Delaunay tetrahedralizations, exact constrained
-Delaunay tetrahedralizations, and quality tetrahedral meshes. The
-latter are quality conforming Delaunay and nicely graded if no input
-angle is smaller than 60 degree.
-
-------------------------------------------------------------------------------
-The distributed version of TetGen includes the following files:
-
-  README               This file.
-  LICENSE              Copyright notices.
-  tetgen.h             Header file of the TetGen library.
-  tetgen.cxx           C++ source code of the TetGen library.
-  predicates.cxx       C++ source code of the geometric predicates.
-  makefile             Makefile for compiling TetGen.
-  manual.pdf           User's manual.
-  example.poly         A sample data file.
-
-TetGen should run on all 32-bit and 64-bit computers.  Use an ANSI C++
-compiler to compile the program.  
-
-The easiest way to compile it is to edit and use the included
-makefile.  Before compiling, read the makefile, which describes the
-options, and edit it accordingly.  You should specify:
-
-  - the C++ compiler, and
-  - the level of optimization.
-
-Once you've done this, type "make" to compile the program.
-
-After compiling, type "tetgen -h" for a brief introduction into
-TetGen.  The included user's manual contains documentation and
-examples. Alternatively, the online manual includes a comprehensive
-documentation for using TetGen and more examples, please see:
+Please see the user's manul (available at the following link) for compiling
+and using TetGen.
 
             http://tetgen.berlios.de/index.html
-
-------------------------------------------------------------------------------
-
-The development of TetGen is supported by the pdelib project of
-Weierstrass Institute for Applied Analysis and Stochastics.  Pdelib is
-a collection of software components for solving non-linear partial
-differential equations including 2D and 3D mesh generators, sparse
-matrix solvers, and scientific visualization tools, etc. For further
-informations, see the following link:
-
-            http://www.wias-berlin.de/software/pdelib 
 
 ------------------------------------------------------------------------------
 
@@ -84,10 +51,9 @@ following copyright notices stated in the file LICENSE.
 Please send bugs/comments to Hang Si <si@wias-berlin.de>
 
 Hang Si
-June, 2004
+July 28, 2006
 
-------------------------------------------------------------------------------
-
+--------------
 TetGen License
 --------------
 
@@ -117,9 +83,10 @@ For details, see http://tetgen.berlios.de
 
 TetGen
 A Quality Tetrahedral Mesh Generator and 3D Delaunay Triangulator
-Version 1.3 (Released on June 13, 2004).
+Version 1.4 (Released on January 14, 2006).
 
-Copyright 2002, 2004  Hang Si
+Copyright 2002, 2004, 2005, 2006 
+Hang Si
 Rathausstr. 9, 10178 Berlin, Germany
 si@wias-berlin.de
 
