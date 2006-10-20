@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.9 2006-08-11 19:56:21 roystgnr Exp $
+// $Id: fem_system.h,v 1.10 2006-10-20 21:30:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -89,9 +89,10 @@ public:
 
   /**
    * Prepares \p matrix or \p rhs for matrix assembly.
-   * Users should not need to reimplement this
+   * Users may reimplement this to add pre- or post-assembly
+   * code before or after calling FEMSystem::assembly()
    */
-  void assembly (bool get_residual, bool get_jacobian);
+  virtual void assembly (bool get_residual, bool get_jacobian);
 
   /**
    * Tells the FEMSystem that variable var is evolving with
