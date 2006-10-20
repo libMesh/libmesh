@@ -139,12 +139,9 @@ const Real relative_tolerance = 1.e-3;
       _system.get_dof_map().enforce_constraints_exactly(_system);
 
       const unsigned int linear_steps = rval.first;
-      const unsigned int max_linear_steps =
-        _system.get_equation_systems().parameters.get<unsigned int>
-          ("linear solver maximum iterations");
-      assert(linear_steps <= max_linear_steps);
+      assert(linear_steps <= max_linear_iterations);
       const bool linear_solve_finished = 
-        !(linear_steps == max_linear_steps);
+        !(linear_steps == max_linear_iterations);
 
       if (!quiet)
         std::cout << "Linear solve finished, step " << linear_steps
