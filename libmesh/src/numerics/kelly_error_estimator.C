@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.20 2006-09-19 17:50:52 roystgnr Exp $
+// $Id: kelly_error_estimator.C,v 1.21 2006-10-20 20:25:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -137,8 +137,8 @@ void KellyErrorEstimator::estimate_error (const System& system,
     }
   
 
-
-  // Implement 1D Kelly estimator separately
+/*
+  // We no longer need a separate 1D estimator
   if(dim == 1)
   {
     // Declare temporary vectors which represent the locations
@@ -278,6 +278,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
 
     return;
   } // end dim == 1
+*/
 
       
   //--------- 2D and 3D code ---------//
@@ -372,7 +373,14 @@ void KellyErrorEstimator::estimate_error (const System& system,
 
                       // Get the maximum h for this side
                       START_LOG("side->hmax()", "KellyErrorEstimator");
-                      const Real h = side->hmax();
+                      Real h_e, h_f;
+                      if (dim == 1)
+                        {
+                          h_e = e->hmax();
+                          h_f = f->hmax();
+                        }
+                      else
+                        h_e = h_f = side->hmax();
                       STOP_LOG("side->hmax()", "KellyErrorEstimator");
                       
 		      // Get the DOF indices for the two elements
@@ -437,7 +445,7 @@ void KellyErrorEstimator::estimate_error (const System& system,
 			  // scaled by an additional power of h, where h is
 			  // the maximum side length for the element.  This
 			  // arises in the definition of the indicator.
-			  error += JxW_face[qp]*h*jump2;			
+			  error += JxW_face[qp]*jump2;			
 			
 			} // End quadrature point loop
 		      STOP_LOG("jump integral", "KellyErrorEstimator");
@@ -445,8 +453,8 @@ void KellyErrorEstimator::estimate_error (const System& system,
 		      // Add the error contribution to elements e & f
                       assert(e_id < error_per_cell.size());
                       assert(f_id < error_per_cell.size());
-		      error_per_cell[e_id] += error*component_scale[var];
-		      error_per_cell[f_id] += error*component_scale[var];
+		      error_per_cell[e_id] += error*h_e*component_scale[var];
+		      error_per_cell[f_id] += error*h_f*component_scale[var];
 
 		      // Increment the number of flux faces for e
 		      n_flux_faces[e_id]++;
