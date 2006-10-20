@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2006-10-04 23:08:29 roystgnr Exp $
+# $Id: Makefile,v 1.8 2006-10-20 17:55:05 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -66,6 +66,17 @@ run: $(target)
 	@echo "***************************************************************"
 	@echo " "
 	@$(target) $(args) -pc_factor_zeropivot 0
+	@echo " "
+	@echo "***************************************************************"
+	@echo "* Done Running Example " $(target) $(args)
+	@echo "***************************************************************"
+
+jacobi: $(target)
+	@echo "***************************************************************"
+	@echo "* Running Example " $(target) $(args)
+	@echo "***************************************************************"
+	@echo " "
+	@$(target) $(args) -pc_type jacobi
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target) $(args)
