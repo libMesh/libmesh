@@ -1,4 +1,4 @@
-// $Id: newton_solver.h,v 1.5 2006-07-20 21:05:22 roystgnr Exp $
+// $Id: newton_solver.h,v 1.6 2006-10-20 18:38:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -103,14 +103,16 @@ protected:
    */
   void print_convergence(unsigned int step_num,
 			 Real current_residual,
-			 Real step_norm);
+			 Real step_norm,
+			 bool linear_solve_finished);
 
   /**
    * This returns true if a convergence criterion has been passed
    * by the given residual and step size; false otherwise.
    */
   bool test_convergence(Real current_residual,
-			Real step_norm);
+			Real step_norm,
+			bool linear_solve_finished);
 };
 
 

@@ -5784,6 +5784,7 @@ src/solvers/newton_solver.$(obj-suffix):\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_solver_type.h\
+    include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
@@ -5796,13 +5797,18 @@ src/solvers/newton_solver.$(obj-suffix):\
     include/numerics/sparse_matrix.h\
     include/solvers/diff_solver.h\
     include/solvers/diff_system.h\
+    include/solvers/equation_systems.h\
     include/solvers/explicit_system.h\
+    include/solvers/frequency_system.h\
     include/solvers/implicit_system.h\
     include/solvers/linear_implicit_system.h\
+    include/solvers/newmark_system.h\
     include/solvers/newton_solver.h\
+    include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
     include/utils/o_string_stream.h\
+    include/utils/parameters.h\
     include/utils/perf_log.h
 src/solvers/nonlinear_implicit_system.$(obj-suffix):\
     src/solvers/nonlinear_implicit_system.C\

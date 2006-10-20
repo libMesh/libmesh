@@ -2,6 +2,7 @@
 #include "cmath" // For isnan(), when it's defined
 
 #include "diff_system.h"
+#include "equation_systems.h"
 #include "libmesh_logging.h"
 #include "linear_solver.h"
 #include "newton_solver.h"
@@ -137,8 +138,16 @@ const Real relative_tolerance = 1.e-3;
       // The linear solver may not have fit our constraints exactly
       _system.get_dof_map().enforce_constraints_exactly(_system);
 
+      const unsigned int linear_steps = rval.first;
+      const unsigned int max_linear_steps =
+        _system.get_equation_systems().parameters.get<unsigned int>
+          ("linear solver maximum iterations");
+      assert(linear_steps <= max_linear_steps);
+      const bool linear_solve_finished = 
+        !(linear_steps == max_linear_steps);
+
       if (!quiet)
-        std::cout << "Linear solve finished, step " << rval.first
+        std::cout << "Linear solve finished, step " << linear_steps
                   << ", residual " << rval.second
                   << ", tolerance " << current_linear_tolerance
                   << std::endl;
@@ -165,10 +174,12 @@ const Real relative_tolerance = 1.e-3;
       if (require_residual_reduction)
         {
           // but don't fiddle around if we've already converged
-          if (test_convergence(current_residual, norm_delta))
+          if (test_convergence(current_residual, norm_delta,
+                               linear_solve_finished))
             {
               if (!quiet)
-		print_convergence(l, current_residual, norm_delta);
+		print_convergence(l, current_residual, norm_delta,
+                                  linear_solve_finished);
               break;
             }
 
@@ -222,8 +233,10 @@ const Real relative_tolerance = 1.e-3;
       // this iteration and the last is sufficiently small.
       if (!quiet)
         print_convergence(l, current_residual,
-                          norm_delta / steplength);
-      if (test_convergence(current_residual, norm_delta / steplength))
+                          norm_delta / steplength,
+                          linear_solve_finished);
+      if (test_convergence(current_residual, norm_delta / steplength,
+                           linear_solve_finished))
         {
           break;
         }
@@ -252,7 +265,8 @@ const Real relative_tolerance = 1.e-3;
 
 
 bool NewtonSolver::test_convergence(Real current_residual,
-                                    Real step_norm)
+                                    Real step_norm,
+                                    bool linear_solve_finished)
 {
   // We haven't converged unless we pass a convergence test
   bool has_converged = false;
@@ -265,6 +279,10 @@ bool NewtonSolver::test_convergence(Real current_residual,
   if ((current_residual / max_residual_norm) <
       relative_residual_tolerance)
     has_converged = true;
+
+  // For incomplete linear solves, it's not safe to test step sizes
+  if (!linear_solve_finished)
+    return has_converged;
 
   // Is our absolute Newton step size small enough?
   if (step_norm < absolute_step_tolerance)
@@ -281,7 +299,8 @@ bool NewtonSolver::test_convergence(Real current_residual,
 
 void NewtonSolver::print_convergence(unsigned int step_num,
                                      Real current_residual,
-                                     Real step_norm)
+                                     Real step_norm,
+                                     bool linear_solve_finished)
 {
   // Is our absolute residual low enough?
   if (current_residual < absolute_residual_tolerance)
@@ -315,6 +334,10 @@ void NewtonSolver::print_convergence(unsigned int step_num,
                   << " > " << relative_residual_tolerance
                   << std::endl;
     }
+
+  // For incomplete linear solves, it's not safe to test step sizes
+  if (!linear_solve_finished)
+    return;
 
   // Is our absolute Newton step size small enough?
   if (step_norm < absolute_step_tolerance)
