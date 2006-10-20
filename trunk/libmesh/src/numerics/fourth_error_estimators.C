@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.C,v 1.12 2006-09-19 17:50:52 roystgnr Exp $
+// $Id: fourth_error_estimators.C,v 1.13 2006-10-20 20:31:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -217,8 +217,16 @@ void LaplacianErrorEstimator::estimate_error (const System& system,
 		    AutoPtr<Elem> side (e->build_side(n_e));
 
 		    // Get the maximum h for this side
-		    const Real h = side->hmax();
-		    
+		    Real h_e, h_f;
+
+                    if (dim == 1)
+                      {
+                        h_e = e->hmax();
+                        h_f = f->hmax();
+                      }
+                    else
+                      h_e = h_f = side->hmax();
+
 		    // Get the DOF indices for the two elements
 		    dof_map.dof_indices (e, dof_indices_e, var);
 		    dof_map.dof_indices (f, dof_indices_f, var);
@@ -296,13 +304,13 @@ void LaplacianErrorEstimator::estimate_error (const System& system,
 #endif
 
 			// Integrate the error on the face
-			error += JxW_face[qp]*h*jump2;
+			error += JxW_face[qp]*jump2;
 			
 		      } // End quadrature point loop
 
 		    // Add the error contribution to elements e & f
-		    error_per_cell[e_id] += error;
-		    error_per_cell[f_id] += error;
+		    error_per_cell[e_id] += error*h_e*component_scale[var];
+		    error_per_cell[f_id] += error*h_f*component_scale[var];
 		    
 		    
 		  }
