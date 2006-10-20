@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.43 2006-10-04 22:26:53 roystgnr Exp $
+// $Id: fe_boundary.C,v 1.44 2006-10-20 20:23:36 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -343,7 +343,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
     {
     case 1:
       {
-	// A 1D finite element, possibly in 2D or 3D space.
+	// A 1D finite element, currently assumed to be in 1D space
 	// This means the boundary is a "0D finite element", a
         // NODEELEM.
 
@@ -364,11 +364,11 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
         const Elem *elem = side->parent();
         assert (elem);
         if (side->node(0) == elem->node(0))
-          normals[0] == Point(-1.);
+          normals[0] = Point(-1.);
         else
           {
             assert (side->node(0) == elem->node(1));
-            normals[0] == Point(1.);
+            normals[0] = Point(1.);
           }
 
         // Calculate x at the point
