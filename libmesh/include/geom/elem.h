@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.41 2006-09-19 02:28:51 roystgnr Exp $
+// $Id: elem.h,v 1.42 2006-10-21 18:28:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -598,6 +598,22 @@ class Elem : public ReferenceCountedObject<Elem>,
   void active_family_tree (std::vector<const Elem*>& active_family,
 			   const bool reset=true) const;
   
+  /**
+   * Same as the \p family_tree() member, but only adds elements
+   * which are next to \p neighbor.
+   */
+  void family_tree_by_neighbor (std::vector<const Elem*>& family,
+		                const Elem *neighbor,
+		                const bool reset=true) const;
+
+  /**
+   * Same as the \p active_family_tree() member, but only adds elements
+   * which are next to \p neighbor.
+   */
+  void active_family_tree_by_neighbor (std::vector<const Elem*>& family,
+		                       const Elem *neighbor,
+		                       const bool reset=true) const;
+
   /**
    * Returns the value of the refinement flag for the element.
    */

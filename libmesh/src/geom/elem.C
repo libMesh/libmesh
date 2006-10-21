@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.59 2006-06-19 22:55:41 jwpeterson Exp $
+// $Id: elem.C,v 1.60 2006-10-21 18:28:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -612,6 +612,56 @@ void Elem::active_family_tree (std::vector<const Elem*>& active_family,
       this->child(c)->active_family_tree (active_family, false);
 
 }
+
+
+
+void Elem::family_tree_by_neighbor (std::vector<const Elem*>& family,
+                                    const Elem* neighbor,
+			            const bool reset) const
+{
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    family.clear();
+
+  // This only makes sense if we're already a neighbor
+  assert (this->is_neighbor(neighbor));
+
+  // Add this element to the family tree.
+  family.push_back(this);
+
+  // Recurse into the elements children, if it has them.
+  // Do not clear the vector any more.
+  if (!this->active())
+    for (unsigned int c=0; c<this->n_children(); c++)
+      if (this->child(c)->is_neighbor(neighbor))
+        this->child(c)->family_tree_by_neighbor (family, false);
+}
+
+
+
+void Elem::active_family_tree_by_neighbor (std::vector<const Elem*>& family,
+                                           const Elem* neighbor,
+			                   const bool reset) const
+{
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    family.clear();
+
+  // This only makes sense if we're already a neighbor
+  assert (this->is_neighbor(neighbor));
+
+  // Add an active element to the family tree.
+  if (this->active())
+    family.push_back(this);
+
+  // Or recurse into an ancestor element's children.
+  // Do not clear the vector any more.
+  else
+    for (unsigned int c=0; c<this->n_children(); c++)
+      if (this->child(c)->is_neighbor(neighbor))
+        this->child(c)->active_family_tree_by_neighbor (family, false);
+}
+
 
 #endif // #ifdef ENABLE_AMR
 
