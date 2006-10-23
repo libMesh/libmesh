@@ -1,4 +1,4 @@
-/* $Id: naviersystem.C,v 1.2 2006-07-20 21:37:19 roystgnr Exp $ */
+/* $Id: naviersystem.C,v 1.3 2006-10-23 22:07:30 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -19,7 +19,9 @@
 
 #include "naviersystem.h"
 
+#include "boundary_info.h"
 #include "fe_base.h"
+#include "mesh.h"
 #include "quadrature.h"
 
 
@@ -58,7 +60,6 @@ void NavierSystem::init_data ()
 
   fe_side_vel->get_JxW();
   fe_side_vel->get_phi();
-  fe_side_vel->get_xyz();
 
   // Useful debugging options
   // this->verify_analytic_jacobians = 1e-6;
@@ -247,11 +248,6 @@ bool NavierSystem::side_constraint (bool request_jacobian)
   const std::vector<std::vector<Real> >& phi_side =
     fe_side_vel->get_phi();
 
-  // The XYZ locations (in physical space) of the
-  // quadrature points on the side.  This is where
-  // we will interpolate the boundary value function.
-  const std::vector<Point > &qside_point = fe_side_vel->get_xyz();
-
   // The number of local degrees of freedom in u and v
   const unsigned int n_u_dofs = dof_indices_var[0].size(); 
 
@@ -275,12 +271,13 @@ bool NavierSystem::side_constraint (bool request_jacobian)
       Number u = side_value(0, qp),
              v = side_value(1, qp);
 
-      // The location of the current boundary quadrature point
-      // const Real xf = qside_point[qp](0);
-      const Real yf = qside_point[qp](1);
+      // Set u = 1 on the top boundary, (which build_square() has
+      // given boundary id 2), u = 0 everywhere else
+      short int boundary_id =
+        this->get_mesh().boundary_info->boundary_id(elem, side);
+      assert (boundary_id != BoundaryInfo::invalid_id);
 
-      // Set u = 1 on the top boundary, 0 everywhere else
-      const Real u_value = (yf > 1.0 - TOLERANCE) ? 1. : 0.;
+      const Real u_value = (boundary_id == 2) ? 1. : 0.;
               
       // Set v = 0 everywhere
       const Real v_value = 0.;
