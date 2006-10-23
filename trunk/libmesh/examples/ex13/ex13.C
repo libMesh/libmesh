@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.15 2006-06-22 21:36:52 benkirk Exp $ */
+/* $Id: ex13.C,v 1.16 2006-10-23 18:46:06 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -54,6 +54,7 @@
 #include "linear_implicit_system.h"
 #include "transient_system.h"
 #include "perf_log.h"
+#include "boundary_info.h"
 
 // Some (older) compilers do not offer full stream 
 // functionality, OStringStream works around this.
@@ -564,24 +565,29 @@ void assemble_stokes (EquationSystems& es,
 	for (unsigned int s=0; s<elem->n_sides(); s++)
 	  if (elem->neighbor(s) == NULL)
 	    {
+	      // Get the boundary ID for side 's'.
+	      // These are set internally by build_square().
+	      // 0=bottom
+	      // 1=right
+	      // 2=top
+	      // 3=left
+	      short int bc_id = mesh.boundary_info->boundary_id (elem,s);
+	      if (bc_id==BoundaryInfo::invalid_id)
+		  error();
+
+	      
 	      AutoPtr<Elem> side (elem->build_side(s));
 	      	      
 	      // Loop over the nodes on the side.
 	      for (unsigned int ns=0; ns<side->n_nodes(); ns++)
 		{
-		  // The location on the boundary of the current
-		  // node.
-		   
-		  //const Real xf = side->point(ns)(0);
-		  const Real yf = side->point(ns)(1);
-		  
 		  // The penalty value.  \f$ \frac{1}{\epsilon \f$
 		  const Real penalty = 1.e10;
 		  
-		  // The boundary values.
+		  // Get the boundary values.
 		   
 		  // Set u = 1 on the top boundary, 0 everywhere else
-		  const Real u_value = (yf > .999) ? 1. : 0.;
+		  const Real u_value = (bc_id==2) ? 1. : 0.;
 		  
 		  // Set v = 0 everywhere
 		  const Real v_value = 0.;
