@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.11 2006-07-23 05:22:15 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.12 2006-10-23 22:07:30 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -123,9 +123,9 @@ int main (int argc, char** argv)
     solver.max_nonlinear_iterations =
       infile("max_nonlinear_iterations", 15);
     solver.relative_step_tolerance =
-      infile("relative_step_tolerance", 1.e-8);
+      infile("relative_step_tolerance", 1.e-3);
     solver.relative_residual_tolerance =
-      infile("relative_residual_tolerance", 1.e-9);
+      infile("relative_residual_tolerance", 1.e-3);
 
     // And the linear solver options
     solver.max_linear_iterations =
