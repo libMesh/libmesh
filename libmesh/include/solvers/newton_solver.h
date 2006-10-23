@@ -1,4 +1,4 @@
-// $Id: newton_solver.h,v 1.6 2006-10-20 18:38:17 roystgnr Exp $
+// $Id: newton_solver.h,v 1.7 2006-10-23 23:26:39 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -77,6 +77,8 @@ public:
    * If this is set to true, the solver is forced to test the residual
    * after each Newton step, and to reduce the length of its steps
    * whenever necessary to avoid a residual increase.
+   * It is currently set to true by default; set it to false to
+   * avoid unnecessary residual assembly on well-behaved systems.
    */
   bool require_residual_reduction;
 
@@ -84,6 +86,7 @@ public:
    * If the quasi-Newton step length must be reduced to below this
    * factor to give a residual reduction, then the Newton solver
    * dies with an error()
+   * It is currently set to 1e-5 by default.
    */
   Real minsteplength;
 

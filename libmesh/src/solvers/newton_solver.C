@@ -13,8 +13,8 @@
 
 NewtonSolver::NewtonSolver (sys_type& s)
   : Parent(s),
-    require_residual_reduction(false),
-    minsteplength(0.0),
+    require_residual_reduction(true),
+    minsteplength(1e-5),
     linear_solver(LinearSolver<Number>::build())
 {
 }
