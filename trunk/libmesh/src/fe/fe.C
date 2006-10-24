@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.50 2006-08-01 15:10:43 roystgnr Exp $
+// $Id: fe.C,v 1.51 2006-10-24 18:21:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -739,9 +739,6 @@ void FE<Dim,T>::compute_proj_constraints (DofConstraints &constraints,
         // than this element.
         if (neigh->level() < elem->level()) 
           {
-            const Elem *ancestor = elem;
-            while (neigh->level() < ancestor->level())
-              ancestor = ancestor->parent();
 	    unsigned int s_neigh = neigh->which_neighbor_am_i(ancestor);
 
             // Find the minimum p level; we build the h constraint
