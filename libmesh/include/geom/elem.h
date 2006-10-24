@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.42 2006-10-21 18:28:17 roystgnr Exp $
+// $Id: elem.h,v 1.43 2006-10-24 18:21:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1143,9 +1143,14 @@ inline
 unsigned int Elem::which_neighbor_am_i (const Elem* e) const
 {
   assert (e != NULL);
+
+  const Elem* eparent = e;
+
+  while (eparent->level() > this->level())
+    eparent = eparent->parent();
   
   for (unsigned int s=0; s<this->n_neighbors(); s++)
-    if (this->neighbor(s) == e)
+    if (this->neighbor(s) == eparent)
       return s;
     
 
