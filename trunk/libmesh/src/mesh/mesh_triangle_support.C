@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.C,v 1.12 2006-10-24 17:52:58 jwpeterson Exp $
+// $Id: mesh_triangle_support.C,v 1.13 2006-10-24 19:43:34 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 #include "face_tri6.h"
 #include "mesh_generation.h"
 #include "mesh_smoother_laplace.h"
-
+#include "boundary_info.h"
 
 
 #ifdef HAVE_TRIANGLE
@@ -257,6 +257,57 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
 				     GENERATE_CONVEX_HULL, // type of triangulation to perform
 				     false                 // do not insert any extra points
 				     );
+
+  // The mesh is now generated, but we still need to mark the boundaries
+  // to be consistent with the other build_square routines.
+  MeshBase::element_iterator       el     = mesh.elements_begin();
+  const MeshBase::element_iterator end_el = mesh.elements_end();
+  for ( ; el != end_el; ++el)
+    {
+      const Elem* elem = *el;
+      
+      for (unsigned int s=0; s<elem->n_sides(); s++)
+	if (elem->neighbor(s) == NULL)
+	  {
+	    AutoPtr<Elem> side (elem->build_side(s));
+
+	    // Check the location of the side's midpoint.  Since
+	    // the square has straight sides, the midpoint is not
+	    // on the corner and thus it is uniquely on one of the
+	    // sides.
+	    Point side_midpoint= 0.5*( (*side->get_node(0)) + (*side->get_node(1)) );
+
+	    // The boundary ids are set following the same convention as Quad4 sides
+	    // bottom = 0
+	    // right  = 1
+	    // top = 2
+	    // left = 3
+	    // airfoil = 4
+	    short int bc_id=99;
+
+	    // bottom
+	    if      (fabs(side_midpoint(1) - ymin) < TOLERANCE)
+	      bc_id=0;
+
+	    // right
+	    else if (fabs(side_midpoint(0) - xmax) < TOLERANCE)
+	      bc_id=1;
+
+	    // top
+	    else if (fabs(side_midpoint(1) - ymax) < TOLERANCE)
+	      bc_id=2;
+
+	    // left
+	    else if (fabs(side_midpoint(0) - xmin) < TOLERANCE)
+	      bc_id=3;
+
+	    assert (bc_id != 99);
+
+	    // Finally, add this element's information to the boundary info object.
+	    mesh.boundary_info->add_side(elem->id(), s, bc_id);
+	  }
+    }
+  
 }
 
 
