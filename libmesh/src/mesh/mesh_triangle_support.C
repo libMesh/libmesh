@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.C,v 1.11 2006-09-24 05:22:29 jwpeterson Exp $
+// $Id: mesh_triangle_support.C,v 1.12 2006-10-24 17:52:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,131 +30,241 @@
 
 #ifdef HAVE_TRIANGLE
 
+void MeshTools::Generation::triangulate(Mesh& mesh,
+					const std::vector<Point>& points,
+					const Real desired_area,
+					const ElemType type,
+					const MeshTools::Generation::TriangulationType tt,
+					const bool insert_points)
+{
+  // If the initial PSLG is really simple, e.g. an L-shaped domain or
+  // a square/rectangle, the resulting triangulation will be very
+  // "structured" looking.  Sometimes this is a problem if your
+  // intention is to work with an unstructured grid.  We can attempt
+  // to work around this limitation by inserting midpoints into the
+  // original PSLG.
+  std::vector<Point> new_points = points;
+
+  if ((tt==PSLG) && (insert_points))
+    {
+      new_points.resize  (2*points.size());
+      
+      // Insert a new point on each PSLG at some random location
+      // np=index into new points vector
+      // n =index into original points vector
+      for (unsigned int np=0, n=0; np<new_points.size(); ++np)
+	{
+	  // the even entries are the original points
+	  if (np%2==0)
+	    {
+	      new_points[np] = points[n];
+	      n++;
+	    }
+
+	  else // the odd entries are the midpoints of the original PSLG segments
+	    {
+	      new_points[np] = 0.5*(points[n] + points[n-1]);
+	    }
+	}
+    }
+
+  
+  // Triangle data structure for the mesh
+  Triangle::triangulateio initial;
+  Triangle::triangulateio final;
+
+  // Pseudo-Constructor for the triangle io structs
+  Triangle::init(initial);
+  Triangle::init(final);
+    
+  initial.numberofpoints = new_points.size();
+  initial.pointlist      = static_cast<REAL*>(std::malloc(initial.numberofpoints * 2 * sizeof(REAL)));
+
+  if (tt==PSLG)
+    {
+      initial.numberofsegments = initial.numberofpoints; // n. of segments = n. of points
+      initial.segmentlist      = static_cast<int*>(std::malloc(initial.numberofsegments * 2 * sizeof(int))); // 2 int per segment
+    }
+  
+  // Copy all the point information into the triangle initial struct.
+  for (unsigned int n=0, index=0; n<new_points.size(); ++n, index+=2)
+    {
+      initial.pointlist[index]   = new_points[n](0);
+      initial.pointlist[index+1] = new_points[n](1);
+    }
+
+  // Generate the PSLG segments
+  if (tt==PSLG)
+    for (unsigned int n=0, index=0; n<new_points.size(); ++n, index+=2)
+      {
+	initial.segmentlist[index]   = n;
+	initial.segmentlist[index+1] = (n==new_points.size()-1) ? 0 : n+1;
+      }
+  
+    
+  // Set the triangulation flags.
+  // c ~ enclose convex hull with segments
+  // z ~ use zero indexing
+  // B ~ Suppresses boundary markers in the output
+  // Q ~ run in "quiet" mode
+  // p ~ Triangulates a Planar Straight Line Graph
+  //     If the `p' switch is used, `segmentlist' must point to a list of     
+  //     segments, `numberofsegments' must be properly set, and               
+  //     `segmentmarkerlist' must either be set to NULL (in which case all    
+  //     markers default to zero), or must point to a list of markers.
+  // D ~ Conforming Delaunay: use this switch if you want all triangles in the mesh to be Delaunay, and not just constrained Delaunay
+  // q ~  Quality mesh generation with no angles smaller than 20 degrees. An alternate minimum angle may be specified after the q
+  // a ~ Imposes a maximum triangle area constraint.
+  // -P  Suppresses the output .poly file. Saves disk space, but you lose the ability to maintain
+  //     constraining segments  on later refinements of the mesh.
+  // Create the flag strings, depends on element type
+  std::ostringstream flags;
+
+  // Default flags always used
+  flags << "zBPQq";
+
+  // Flags which are specific to the type of triangulation
+  switch (tt)
+    {
+    case GENERATE_CONVEX_HULL:
+      {
+	flags << "c";
+	break;
+      }
+
+    case PSLG:
+      {
+	flags << "p";
+	break;
+      }
+      
+    case INVALID_TRIANGULATION_TYPE:
+      {
+	error();
+	break;
+      }
+      
+    default:
+      {
+	error();
+      }
+    }
+
+
+  // Flags specific to the type of element
+  switch (type)
+    {
+    case TRI3:
+      {
+	// do nothing.
+	break;
+      }
+
+    case TRI6:
+      {
+	flags << "o2";
+	break;
+      }
+      
+    default:
+      {
+	std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
+	error();
+      }
+    }
+
+
+  // Finally, add the area constraint
+  flags << "a" << std::fixed << desired_area;
+
+  // Refine the initial output to conform to the area constraint
+  Triangle::triangulate(const_cast<char*>(flags.str().c_str()),
+			&initial,
+			&final,
+			NULL); // voronoi ouput -- not used
+  
+  
+  // Send the information computed by Triangle to the Mesh.
+  Triangle::copy_tri_to_mesh(final,
+			     mesh,
+			     type);
+      
+  // To the naked eye, a few smoothing iterations usually looks better.
+  LaplaceMeshSmoother(mesh).smooth(2);
+
+    
+  // Clean up.    
+  Triangle::destroy(initial,      Triangle::INPUT);
+  Triangle::destroy(final,        Triangle::OUTPUT);
+}
+
+
+
+
+
+
+
+
 
 // Definition of the function from the MeshTools::Generation namespace
 void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
-						   const unsigned int nx,
-						   const unsigned int ny,
+						   const unsigned int nx, // n elem, x-direction
+						   const unsigned int ny, // n elem, y-direction
 						   const Real xmin, const Real xmax,
 						   const Real ymin, const Real ymax,
 						   const ElemType type)
 {
   // Check for existing nodes and compatible dimension.
   assert (mesh.mesh_dimension() == 2);
-  assert (nx >= 2);
-  assert (ny >= 2);
+  assert (nx >= 1); // need at least 1 element in x-direction
+  assert (ny >= 1); // need at least 1 element in y-direction
   assert (xmin < xmax);
   assert (ymin < ymax);
 
-  // Declare and initialize the Triangle interface structs
-  Triangle::triangulateio input, intermediate, final;
-  Triangle::init(input);
-  Triangle::init(intermediate);
-  Triangle::init(final);
-
-  
-  // Compute the desired final area of the triangles, based on the
-  // area of the domain and the requested number of nodes.
-  const Real desired_area = 0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>((nx-1)*(ny-1));
-
-
-  // Create the flag strings, depends on element type
-  std::ostringstream flags_initial, flags_final;
-
-  switch (type)
-    {
-      case TRI3:
-        {
-          flags_initial << "czBQ";
-          flags_final << "przBPQa" << std::fixed << desired_area;
-          break;
-        }
-
-      case TRI6:
-        {
-          flags_initial << "czBQo2";
-          flags_final << "przBPQo2a" << std::fixed << desired_area;
-          break;
-        }
-
-      default:
-        {
-          std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
-          error();
-        }
-    }
-
-
-  // Allocate memory for the initial points.  Stick to malloc here
-  // so that all the accompanying 'destroy's work as well.
-  input.numberofpoints = 2*(nx+ny-2);
-  input.pointlist      = static_cast<REAL*>(std::malloc(input.numberofpoints * 2 * sizeof(REAL)));
+  // Generate vector of points to be passed to MeshTools::Generation::triangulate
+  std::vector<Point> points((nx+1)*(ny+1));
 
   // The x and y spacing between boundary points
-  const Real delta_x = (xmax-xmin) / static_cast<Real>(nx-1);
-  const Real delta_y = (ymax-ymin) / static_cast<Real>(ny-1);  
+  const Real delta_x = (xmax-xmin) / static_cast<Real>(nx);
+  const Real delta_y = (ymax-ymin) / static_cast<Real>(ny);  
 
-  // Top and Bottom Sides
-  for (unsigned int i=0, n=0; n<nx; i+=4, ++n)
+  // Top and Bottom
+  unsigned int ctr=0;
+  for (unsigned int p=0; p<=nx; ++p)
     {
-      // Bottom
-      input.pointlist[i]   = xmin + n*delta_x; // x
-      input.pointlist[i+1] = ymin;             // y
+      const Real x=xmin + p*delta_x;
 
-      // Top
-      input.pointlist[i+2] = input.pointlist[i]; // x
-      input.pointlist[i+3] = ymax;  // y
+      points[ctr++] = Point(x, ymin); // Bottom
+      points[ctr++] = Point(x, ymax); // Top
     }
 
   // Left and Right Sides
-  for (unsigned int i=4*nx, n=1; n<ny-1; i+=4, ++n)
+  for (unsigned int p=1; p<ny; ++p)
     {
-      // Left
-      input.pointlist[i]   = xmin;             // x
-      input.pointlist[i+1] = ymin + n*delta_y; // y
+      const Real y = ymin + p*delta_y;
 
-      // Right
-      input.pointlist[i+2] = xmax;     // x
-      input.pointlist[i+3] = input.pointlist[i+1];  // y
+      points[ctr++] = Point(xmin, y); // Left
+      points[ctr++] = Point(xmax, y); // Right
     }
+ 
 
 
-  // Note, if instead of putting a bunch of nodes on the boundary, you
-  // start with just 4 at the corners, this always results in a
-  // perfectly symmetric (boring) triangulation of the square, with
-  // all similar triangles.
-
-  // Perform initial triangulation.
-  Triangle::triangulate(const_cast<char*>(flags_initial.str().c_str()), // gives the desired char* 
-			&input,
-			&intermediate,
-			NULL);
-
-  // Final refined Triangle object.
-  final.pointlist    = static_cast<Real*>(NULL);
-  final.trianglelist = static_cast<int* >(NULL);
-
-  // Perform final triangulation with area constraint
-  Triangle::triangulate(const_cast<char*>(flags_final.str().c_str()),
-			&intermediate,
-			&final,
-			static_cast<Triangle::triangulateio*>(NULL));
-
-  // Send the information computed by Triangle to the Mesh.
-  Triangle::copy_tri_to_mesh(final,
-			     mesh,
-			     type);
-
-  // Run mesh through a few Laplace smoothing steps.
-  LaplaceMeshSmoother s (mesh);
-  s.smooth(2);
-
-  
-  // Clean up triangle data structures
-  Triangle::destroy(input,        Triangle::INPUT );
-  Triangle::destroy(intermediate, Triangle::BOTH  );
-  Triangle::destroy(final,        Triangle::OUTPUT);
+  // Call MeshTools::Generation::triangulate
+  MeshTools::Generation::triangulate(mesh,
+				     points,
+				     0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>(nx*ny), // desired area
+				     type,
+				     GENERATE_CONVEX_HULL, // type of triangulation to perform
+				     false                 // do not insert any extra points
+				     );
 }
+
+
+
+
+
+
+
 
 
 
