@@ -1,4 +1,4 @@
-// $Id: error_vector.h,v 1.6 2006-09-19 17:31:21 roystgnr Exp $
+// $Id: error_vector.h,v 1.7 2006-10-26 21:05:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,7 @@
 
 // Forward Declarations
 class MeshBase;
+class Mesh;
 
 /**
  * The \p ErrorVector is a specialization of the
@@ -139,6 +140,13 @@ public:
    * above the cutoff value cut ignoring inactive elements.
    */
   virtual std::vector<unsigned int> cut_above(Real cut) const;
+
+  /**
+   * Plots a data file, of a type determined by looking at
+   * the file extension in \p filename, of the error values on
+   * the active elements of \p mesh.
+   */
+  void plot_error(std::string filename, Mesh& mesh) const;
 
 protected:
   /**
