@@ -1,4 +1,4 @@
-// $Id: error_vector.C,v 1.10 2006-09-19 17:31:21 roystgnr Exp $
+// $Id: error_vector.C,v 1.11 2006-10-26 21:05:13 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,14 @@
 #include "error_vector.h"
 #include "libmesh_logging.h"
 #include "mesh_base.h"
+
+#include "dof_map.h"
+#include "equation_systems.h"
+#include "explicit_system.h"
+#include "mesh.h"
+#include "numeric_vector.h"
+#include "gmv_io.h"
+#include "tecplot_io.h"
 
 
 
@@ -203,3 +211,56 @@ bool ErrorVector::is_active_elem (unsigned int i) const
   else
     return ((*this)[i] != 0.);
 }
+
+
+void ErrorVector::plot_error(std::string filename, Mesh& mesh) const
+{
+  EquationSystems temp_es (mesh);
+  ExplicitSystem& error_system
+    = temp_es.add_system<ExplicitSystem> ("Error");
+  error_system.add_variable("e", CONSTANT, MONOMIAL);
+  temp_es.init();
+
+  const DofMap& error_dof_map = error_system.get_dof_map();
+
+  MeshBase::const_element_iterator       el     =
+    mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el =
+    mesh.active_local_elements_end();
+  std::vector<unsigned int> dof_indices;
+
+  for ( ; el != end_el; ++el)
+  {
+    Elem* elem = *el;
+
+    error_dof_map.dof_indices(elem, dof_indices);
+
+    const unsigned int elem_id = elem->id();
+
+    //0 for the monomial basis
+    const unsigned int solution_index = dof_indices[0];
+    // std::cout << "elem_number=" << elem_number << std::endl;
+    assert ((*this)[elem_id] > 0.);
+    error_system.solution->set(solution_index, (*this)[elem_id]);
+  }
+
+  if (filename.rfind(".gmv") < filename.size())
+    {
+      GMVIO(mesh).write_discontinuous_gmv(filename,
+                                          temp_es, false);
+    }
+  else if (filename.rfind(".plt") < filename.size())
+    {
+      TecplotIO (mesh).write_equation_systems
+        (filename, temp_es);
+    }
+  else
+    {
+      here();
+      std::cerr << "Warning: ErrorVector::plot_error currently only"
+                << " supports .gmv and .plt output;" << std::endl;
+      std::cerr << "Could not recognize filename: " << filename
+                << std::endl;
+    }
+}
+
