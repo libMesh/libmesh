@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.53 2006-10-12 22:09:32 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.54 2006-10-26 22:18:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -170,6 +170,14 @@ void MeshRefinement::create_parent_error_vector
           // error, do so now
           if (!error_per_parent[parentid])
             {
+              // The error estimator might have already given us an
+              // estimate on the coarsenable parent elements
+              if (error_per_cell[parentid])
+                {
+                  error_per_parent[parentid] = error_per_cell[parentid];
+                  break;
+                }
+ 
               ErrorVectorReal parent_error = 0.;
               for (unsigned int n = 0; n != parent->n_children(); ++n)
                 {
