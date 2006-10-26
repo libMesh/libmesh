@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.69 2006-06-27 22:55:08 roystgnr Exp $
+// $Id: mesh.C,v 1.70 2006-10-26 22:43:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -500,7 +500,7 @@ void Mesh::find_neighbors()
             if ((!neigh->active()) && (!elem->subactive()))
             {
               std::cerr << "Bad element ID = " << elem->id() 
-                << ", Bad neighbor ID = " << neigh->id();
+                << ", Bad neighbor ID = " << neigh->id() << std::endl;
               std::cerr << "ERROR: " 
                 << (elem->active()?"Active":"Ancestor")
                 << " Element at level "
