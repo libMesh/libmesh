@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.h,v 1.3 2006-09-19 17:50:52 roystgnr Exp $
+// $Id: fourth_error_estimators.h,v 1.4 2006-10-26 17:15:59 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 #include <string>
 
 // Local Includes
-#include "error_estimator.h"
+#include "jump_error_estimator.h"
 
 
 
@@ -38,10 +38,11 @@
 /**
  * This class is an error indicator based on laplacian jumps between
  * elements.
+ * See the JumpErrorEstimator class for most user APIs
  *
  * @author Roy H. Stogner, 2005
  */
-class LaplacianErrorEstimator : public ErrorEstimator
+class LaplacianErrorEstimator : public JumpErrorEstimator
 {
 public:
 
@@ -55,17 +56,21 @@ public:
    */
   ~LaplacianErrorEstimator() {}
 
+protected:
 
   /**
-   * This function uses the Laplacian jump error
-   * indicator to estimate the error on each cell.
-   * The output is in the vector \p error_per_cell
+   * An initialization function, for requesting specific data from the FE
+   * objects
    */
-  virtual void estimate_error (const System& system,
-			       ErrorVector& error_per_cell,
-			       bool estimate_parent_error = false);
+  virtual void initialize(const System& system,
+                          ErrorVector& error_per_cell,
+                          bool estimate_parent_error);
 
-
+  /**
+   * The function which calculates a laplacian jump based error
+   * term on an internal side
+   */
+  virtual void internal_side_integration();
 };
 
 

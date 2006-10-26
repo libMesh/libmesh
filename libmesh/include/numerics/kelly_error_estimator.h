@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.h,v 1.10 2006-09-19 17:50:52 roystgnr Exp $
+// $Id: kelly_error_estimator.h,v 1.11 2006-10-26 17:15:59 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 #include <string>
 
 // Local Includes
-#include "error_estimator.h"
+#include "jump_error_estimator.h"
 
 // Forward Declarations
 class Point;
@@ -39,6 +39,7 @@ class Point;
 /**
  * This class implements the Kelly error indicator
  * which is based on the flux jumps between elements.
+ * See the JumpErrorEstimator class for most user APIs
  *
  * Full BibteX reference:
  * 
@@ -54,7 +55,7 @@ class Point;
  *
  * @author Benjamin S. Kirk, 2003.
  */
-class KellyErrorEstimator : public ErrorEstimator
+class KellyErrorEstimator : public JumpErrorEstimator
 {
 public:
 
@@ -62,31 +63,12 @@ public:
    * Constructor.  Responsible for initializing the _bc_function function
    * pointer to NULL.
    */
-  KellyErrorEstimator() : scale_by_n_flux_faces(false),
-			  _bc_function(NULL) {}
+  KellyErrorEstimator() : _bc_function(NULL) {}
   
   /**
    * Destructor.  
    */
   ~KellyErrorEstimator() {}
-
-
-  // Bring the base class functionality into the name lookup
-  // procedure.  This allows for alternative calling formats
-  // defined in the base class.  Thanks Wolfgang.
-  // GCC 2.95.3 cannot compile such code.  Since it was not really
-  // essential to the functioning of this class, it's been removed.
-  // using ErrorEstimator::estimate_error;
-
-  /**
-   * This function uses the Kelly Flux Jump error
-   * estimate to estimate the error on each cell.
-   * The estimated error is output in the vector
-   * \p error_per_cell
-   */
-  virtual void estimate_error (const System& system,
-			       ErrorVector& error_per_cell,
-			       bool estimate_parent_error = false);
 
   /**
    * Register a user function to use in computing the flux BCs.
@@ -95,17 +77,35 @@ public:
   void attach_flux_bc_function (std::pair<bool,Real> fptr(const System& system,
 							  const Point& p,
 							  const std::string& var_name));
-  /**
-   * This boolean flag allows you to scale the error indicator
-   * result for each element by the number of "flux faces" the element
-   * actually has.  This tends to weight more evenly cells which are
-   * on the boundaries and thus have fewer contributions to their flux.
-   * The value is initialized to false, simply set it to true if you
-   * want to use the feature.
-   */
-  bool scale_by_n_flux_faces;
   
-private:
+protected:
+
+  /**
+   * An initialization function, for requesting specific data from the FE
+   * objects
+   */
+  virtual void initialize(const System& system,
+                          ErrorVector& error_per_cell,
+                          bool estimate_parent_error);
+
+  /**
+   * The function which calculates a normal derivative jump based error
+   * term on an internal side
+   */
+  virtual void internal_side_integration();
+
+  /**
+   * The function which calculates a normal derivative jump based error
+   * term on a boundary side.
+   * Returns true if the flux bc function is in fact defined on the current side.
+   */
+  virtual bool boundary_side_integration();
+
+  /**
+   * A pointer to the current System
+   */
+  const System *my_system;
+
   /**
    * Pointer to function that returns BC information.
    */

@@ -1,4 +1,4 @@
-// $Id: jump_error_estimator.C,v 1.1 2006-10-26 04:07:17 roystgnr Exp $
+// $Id: jump_error_estimator.C,v 1.2 2006-10-26 17:15:59 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -219,32 +219,58 @@ void JumpErrorEstimator::estimate_error (const System& system,
 
 	      // Loop over the neighbors of the parent
 	      for (unsigned int n_p=0; n_p<parent->n_neighbors(); n_p++)
-	        if (parent->neighbor(n_p) != NULL) // parent has a neighbor here
-		  {
-                    // Find the active neighbors in this direction
-                    std::vector<const Elem*> active_neighbors;
-                    parent->active_family_tree_by_neighbor(active_neighbors,
-                                                           parent);
-                    // Compute the flux to each active neighbor
-                    for (unsigned int a=0; 
-                         a != active_neighbors.size(); ++a)
-                      {
-                        const Elem *f = active_neighbors[a];
-                        if (f->level() >= parent->level())
-                          {
-                            fine_elem = f;
-                            coarse_elem = parent;
-		            dof_map.dof_indices (fine_elem, dof_indices_fine, var);
-		            const unsigned int n_dofs_fine = dof_indices_fine.size();
-                            Ufine.resize(n_dofs_fine);
-			
-			    for (unsigned int i=0; i<n_dofs_fine; i++)
-			      Ufine(i) = system.current_solution(dof_indices_fine[i]);
-			
+                {
+	          if (parent->neighbor(n_p) != NULL) // parent has a neighbor here
+		    {
+                      // Find the active neighbors in this direction
+                      std::vector<const Elem*> active_neighbors;
+                      parent->active_family_tree_by_neighbor(active_neighbors,
+                                                             parent);
+                      // Compute the flux to each active neighbor
+                      for (unsigned int a=0; 
+                           a != active_neighbors.size(); ++a)
+                        {
+                          const Elem *f = active_neighbors[a];
+                          if (f->level() >= parent->level())
+                            {
+                              fine_elem = f;
+                              coarse_elem = parent;
+                              Ucoarse = Uparent;
 
-                          }
-                      }
-		  }
+		              dof_map.dof_indices (fine_elem, dof_indices_fine, var);
+		              const unsigned int n_dofs_fine = dof_indices_fine.size();
+                              Ufine.resize(n_dofs_fine);
+			
+			      for (unsigned int i=0; i<n_dofs_fine; i++)
+			        Ufine(i) = system.current_solution(dof_indices_fine[i]);
+                              this->reinit_sides();
+                              this->internal_side_integration();
+
+                              error_per_cell[fine_elem->id()] += fine_error;
+                              error_per_cell[coarse_elem->id()] += coarse_error;
+
+                              // Keep track of the number of internal flux
+                              // sides found on each element
+                              n_flux_faces[fine_elem->id()]++;
+                              n_flux_faces[coarse_elem->id()] += this->coarse_n_flux_faces_increment();
+                            }
+                        }
+		    }
+		  else if (integrate_boundary_sides)
+		    {
+                      fine_elem = parent;
+                      Ufine = Uparent;
+
+                      // Reinitialize shape functions on the fine element side
+                      fe_fine->reinit (fine_elem, fine_side);
+
+                      if (this->boundary_side_integration())
+                        {
+                          error_per_cell[fine_elem->id()] += fine_error;
+                          n_flux_faces[fine_elem->id()]++;
+                        }
+                    } 
+		}
 	    }
 
           // If we do any more flux integration, e will be the fine element
