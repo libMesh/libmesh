@@ -1,4 +1,4 @@
-// $Id: error_vector.C,v 1.11 2006-10-26 21:05:13 roystgnr Exp $
+// $Id: error_vector.C,v 1.12 2006-10-26 22:19:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -213,8 +213,9 @@ bool ErrorVector::is_active_elem (unsigned int i) const
 }
 
 
-void ErrorVector::plot_error(std::string filename, Mesh& mesh) const
+void ErrorVector::plot_error(std::string filename, Mesh& oldmesh) const
 {
+  Mesh mesh(oldmesh);
   EquationSystems temp_es (mesh);
   ExplicitSystem& error_system
     = temp_es.add_system<ExplicitSystem> ("Error");
@@ -240,6 +241,7 @@ void ErrorVector::plot_error(std::string filename, Mesh& mesh) const
     //0 for the monomial basis
     const unsigned int solution_index = dof_indices[0];
     // std::cout << "elem_number=" << elem_number << std::endl;
+    assert (elem_id < (*this).size());
     assert ((*this)[elem_id] > 0.);
     error_system.solution->set(solution_index, (*this)[elem_id]);
   }
