@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.26 2006-08-28 16:08:22 jwpeterson Exp $
+// $Id: mesh_communication.C,v 1.27 2006-10-26 04:22:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -42,14 +42,14 @@ void MeshCommunication::clear ()
 }
 
 
+#ifdef HAVE_MPI
+  
 void MeshCommunication::find_neighboring_processors (const MeshBase& mesh)
 {
   // Don't need to do anything if there is
   // only one processor.
   if (libMesh::n_processors() == 1)
     return;
-  
-#ifdef HAVE_MPI
   
   _neighboring_processors.clear();
 
@@ -97,9 +97,15 @@ void MeshCommunication::find_neighboring_processors (const MeshBase& mesh)
     for (unsigned int p=0; p<_neighboring_processors.size(); p++)
       std::cout << " " << _neighboring_processors[p] << std::endl;
   }
-  
-#endif
 }
+
+#else
+
+void MeshCommunication::find_neighboring_processors (const MeshBase&)
+{
+}
+
+#endif
 
 
 void MeshCommunication::broadcast (MeshBase& mesh) const
