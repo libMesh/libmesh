@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.24 2006-09-19 02:37:42 roystgnr Exp $
+// $Id: fe_base.h,v 1.25 2006-10-26 04:13:56 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -506,6 +506,11 @@ public:
    * functions must be recomputed.
    */
   ElemType get_type()  const { return elem_type; }
+
+  /**
+   * @returns the FE Type (approximation order and family) of the finite element.
+   */
+  FEType get_fe_type()  const { return fe_type; }
 
   /**
    * @returns the approximation order of the finite element.
