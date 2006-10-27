@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.43 2006-10-24 18:21:11 roystgnr Exp $
+// $Id: elem.h,v 1.44 2006-10-27 18:49:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -206,10 +206,17 @@ class Elem : public ReferenceCountedObject<Elem>,
   
   /**
    * This function tells you which neighbor you \p (e) are.
-   * What is returned is the index of the side _in_the_neighbor_
-   * which you share. 
+   * I.e. if s = a->which_neighbor_am_i(e); then
+   * a->neighbor(s) will be an ancestor of e;
    */
   unsigned int which_neighbor_am_i(const Elem *e) const; 
+
+  /**
+   * This function tells you which child you \p (e) are.
+   * I.e. if c = a->which_child_am_i(e); then
+   * a->child(c) will be e;
+   */
+  unsigned int which_child_am_i(const Elem *e) const; 
 
   /**
    * Returns the connectivity for this element in a specific
@@ -1155,6 +1162,26 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
     
 
   std::cerr << "ERROR:  Elements are not neighbors!" 
+	    << std::endl;
+
+  error();
+
+  return libMesh::invalid_uint;
+}
+
+
+
+inline
+unsigned int Elem::which_child_am_i (const Elem* e) const
+{
+  assert (e != NULL);
+  assert (this->has_children());
+
+  for (unsigned int c=0; c<this->n_children(); c++)
+    if (this->child(c) == e)
+      return c;
+
+  std::cerr << "ERROR:  which_child_am_i() was called with a non-child!" 
 	    << std::endl;
 
   error();
