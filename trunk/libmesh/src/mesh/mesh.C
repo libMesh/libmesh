@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.70 2006-10-26 22:43:33 roystgnr Exp $
+// $Id: mesh.C,v 1.71 2006-10-27 18:52:03 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -83,19 +83,32 @@ Mesh::Mesh (const Mesh& other_mesh):MeshBase(other_mesh)
   
     for (; it != end; ++it)
     {
-      //Build an element
-      Elem *newparent = (*it)->parent() ?
-          _elements[(*it)->parent()->id()] : NULL;
-      AutoPtr<Elem> ap = Elem::build((*it)->type(), newparent);
+      //Look at the old element
+      Elem *old = *it;
+      //Build a new element
+      Elem *newparent = old->parent() ?
+          _elements[old->parent()->id()] : NULL;
+      AutoPtr<Elem> ap = Elem::build(old->type(), newparent);
       Elem * elem = ap.release();
+
+      //Create the parent's child pointers if necessary
+      if (newparent)
+        {
+          // Make sure we have space for those child pointers
+          newparent->add_child(elem);
+
+          // We'd better be adding these in the correct order
+          assert (newparent->which_child_am_i(elem) ==
+                  old->parent()->which_child_am_i(old));
+        }
       
       //Assign all the nodes
       for(uint i=0;i<elem->n_nodes();i++)
-        elem->set_node(i) = _nodes[(*it)->node(i)];
+        elem->set_node(i) = _nodes[old->node(i)];
       
       // Copy the refinement flags
-      elem->set_refinement_flag((*it)->refinement_flag());
-      elem->set_p_refinement_flag((*it)->p_refinement_flag());
+      elem->set_refinement_flag(old->refinement_flag());
+      elem->set_p_refinement_flag(old->p_refinement_flag());
       
       //Hold onto it
       _elements.push_back(elem);
@@ -504,7 +517,11 @@ void Mesh::find_neighbors()
               std::cerr << "ERROR: " 
                 << (elem->active()?"Active":"Ancestor")
                 << " Element at level "
-                << elem->level() << " found "
+                << elem->level() << std::endl;
+              std::cerr << "with "
+                << (elem->parent()->active()?"active":
+                    (elem->parent()->subactive()?"subactive":"ancestor"))
+                << " parent share "
                 << (neigh->subactive()?"subactive":"ancestor")
                 << " neighbor at level " << neigh->level()
                 << std::endl;
