@@ -1,4 +1,4 @@
-// $Id: error_vector.C,v 1.12 2006-10-26 22:19:16 roystgnr Exp $
+// $Id: error_vector.C,v 1.13 2006-10-27 20:02:57 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -248,8 +248,12 @@ void ErrorVector::plot_error(std::string filename, Mesh& oldmesh) const
 
   if (filename.rfind(".gmv") < filename.size())
     {
-      GMVIO(mesh).write_discontinuous_gmv(filename,
-                                          temp_es, false);
+      GMVIO(mesh).write_equation_systems(filename,
+                                         temp_es);
+// write_discontinuous_gmv doesn't work on second order meshes??
+// [RHS]
+//      GMVIO(mesh).write_discontinuous_gmv(filename,
+//                                          temp_es, false);
     }
   else if (filename.rfind(".plt") < filename.size())
     {
