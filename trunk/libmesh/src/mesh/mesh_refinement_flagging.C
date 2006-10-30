@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.25 2006-08-25 05:01:45 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.26 2006-10-30 22:11:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -317,12 +317,33 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
          refine_count < max_elem_refine &&
          coarsen_count < sorted_parent_error.size() &&
          refine_count < sorted_error.size() &&
-         sorted_error[refine_count] < 
+         sorted_error[refine_count] > 
 	   sorted_parent_error[coarsen_count] * _coarsen_threshold)
     {
       coarsen_count++;
       refine_count++;
     }
+
+  // Find out what our coarsening and refinement error limits are
+  Real max_coarsenable_error = sorted_parent_error.back();
+  if (coarsen_count)
+    {
+      if (coarsen_count < sorted_parent_error.size())
+        max_coarsenable_error = sorted_parent_error[coarsen_count-1];
+    }
+  else
+    if (max_elem_coarsen && max_elem_coarsen < sorted_parent_error.size())
+      max_coarsenable_error = sorted_parent_error[max_elem_coarsen-1];
+
+  Real max_refinable_error = sorted_error.back();
+  if (refine_count)
+    {
+      if (refine_count < sorted_error.size())
+        max_refinable_error = sorted_error[refine_count-1];
+    }
+  else
+    if (max_elem_refine && max_elem_refine < sorted_parent_error.size())
+      max_refinable_error = sorted_error[max_elem_refine-1];
 
   // Finally, let's do the element flagging
   elem_it  = _mesh.active_elements_begin();
@@ -331,14 +352,14 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
       Elem* elem = *elem_it;
       Elem* parent = elem->parent();
 
-      if (parent && coarsen_count &&
+      if (parent && max_elem_coarsen && coarsen_count &&
           error_per_parent[parent->id()] &&
           error_per_parent[parent->id()] <=
-            sorted_parent_error[coarsen_count-1])
+            max_coarsenable_error)
         elem->set_refinement_flag(Elem::COARSEN);
 
-      if (refine_count &&
-          error_per_cell[elem->id()] >= sorted_error[refine_count-1])
+      if (max_elem_refine && refine_count &&
+          error_per_cell[elem->id()] >= max_refinable_error)
         elem->set_refinement_flag(Elem::REFINE);
     }
 
