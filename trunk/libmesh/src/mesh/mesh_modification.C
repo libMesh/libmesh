@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.22 2006-08-28 21:01:24 jwpeterson Exp $
+// $Id: mesh_modification.C,v 1.23 2006-10-30 23:04:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -811,7 +811,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
   if (mesh_has_boundary_data)
     {
       // By this time, we should have removed all of the original boundary sides
-      assert (mesh.boundary_info->n_boundary_ids()==0);
+      assert (mesh.boundary_info->n_boundary_conds()==0);
 
       // Clear the boundary info, to be sure and start from a blank slate.
       mesh.boundary_info->clear();
