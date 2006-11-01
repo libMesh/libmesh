@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.54 2006-10-26 22:18:23 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.55 2006-11-01 23:21:38 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ MeshRefinement::MeshRefinement (MeshBase& m) :
   _refine_fraction(0.3),
   _coarsen_fraction(0.0),
   _max_h_level(libMesh::invalid_uint),
-  _coarsen_threshold(0.1),
+  _coarsen_threshold(10),
   _nelem_target(0),
   _absolute_global_tolerance(0.0)
 {
