@@ -1,4 +1,4 @@
-// $Id: cell_tet4.h,v 1.13 2006-06-19 22:55:41 jwpeterson Exp $
+// $Id: cell_tet4.h,v 1.14 2006-11-02 13:50:36 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -148,8 +148,17 @@ public:
    * 4-node tetrahedron.
    */
   virtual Real volume () const;
-  
- 
+
+  /**
+   * Returns the min and max *dihedral* angles for the tetrahedron.
+   * Note there are 6 dihedral angles (angles between the planar
+   * faces) for the Tet4.  Dihedral angles near 180 deg. are generally
+   * bad for interplation.  Small dihedral angles are not necessarily
+   * bad for interplation, but they can effect the stiffness matrix
+   * condition number.
+   */
+   std::pair<Real, Real> min_and_max_angle() const;
+
 protected:
 
   
@@ -160,14 +169,29 @@ protected:
    */
   float embedding_matrix (const unsigned int i,
 			  const unsigned int j,
-			  const unsigned int k) const
-  { return _embedding_matrix[i][j][k]; }
+			  const unsigned int k) const;
+  //  { return _embedding_matrix[i][j][k]; }
 
   /**
    * Matrix that computes new nodal locations/solution values
-   * from current nodes/solution.
+   * from current nodes/solution.  
    */
   static const float _embedding_matrix[8][4][4];
+
+  /**
+   * This enumeration keeps track of which diagonal is selected during
+   * refinement.  In general there are three possible diagonals to
+   * choose when splitting the octahedron, and by choosing the shortest
+   * one we obtain the best element shape.
+   */
+  enum Diagonal
+    {DIAG_02_13=0,    // diagonal between edges (0,2) and (1,3)
+     DIAG_03_12=1,    // diagonal between edges (0,3) and (1,2)
+     DIAG_01_23=2,    // diagonal between edges (0,1) and (2,3)
+     INVALID_DIAG=99  // diagonal not yet selected
+    };
+
+  mutable Diagonal _diagonal_selection;
   
 #endif
   
@@ -179,7 +203,8 @@ protected:
 // Tet4 class member functions
 inline
 Tet4::Tet4(Elem* p) :
-  Tet(Tet4::n_nodes(), p) 
+  Tet(Tet4::n_nodes(), p),
+  _diagonal_selection(INVALID_DIAG)
 {
 }
 
