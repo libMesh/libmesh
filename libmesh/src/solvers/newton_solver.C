@@ -15,6 +15,7 @@ NewtonSolver::NewtonSolver (sys_type& s)
   : Parent(s),
     require_residual_reduction(true),
     minsteplength(1e-5),
+    linear_tolerance_multiplier(1e-3),
     linear_solver(LinearSolver<Number>::build())
 {
 }
@@ -39,11 +40,6 @@ void NewtonSolver::reinit()
 void NewtonSolver::solve()
 {
   START_LOG("solve()", "NewtonSolver");
-
-// Amount by which nonlinear residual should exceed linear solver
-// tolerance
-const Real relative_tolerance = 1.e-3;
-
 
   NumericVector<Number> &solution = *(_system.solution);
   NumericVector<Number> &newton_iterate =
@@ -99,10 +95,8 @@ const Real relative_tolerance = 1.e-3;
                   << current_residual << std::endl;
 
       // Make sure our linear tolerance is low enough
-      if (current_linear_tolerance > current_residual * relative_tolerance)
-        {
-          current_linear_tolerance = current_residual * relative_tolerance;
-        }
+      current_linear_tolerance = std::min (current_linear_tolerance,
+        current_residual * linear_tolerance_multiplier);
 
       // But don't let it be zero
       if (current_linear_tolerance == 0.)
