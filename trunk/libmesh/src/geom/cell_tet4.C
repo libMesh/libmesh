@@ -1,4 +1,4 @@
-// $Id: cell_tet4.C,v 1.24 2006-06-19 22:55:41 jwpeterson Exp $
+// $Id: cell_tet4.C,v 1.25 2006-11-02 13:50:36 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -197,79 +197,79 @@ void Tet4::connectivity(const unsigned int sc,
 #ifdef ENABLE_AMR
 
 const float Tet4::_embedding_matrix[8][4][4] =
-{
-  // embedding matrix for child 0
   {
-    // 0    1    2    3  
-    {1.0, 0.0, 0.0, 0.0}, // 0
-    {0.5, 0.5, 0.0, 0.0}, // 1
-    {0.5, 0.0, 0.5, 0.0}, // 2
-    {0.5, 0.0, 0.0, 0.5}  // 3
-  },
+    // embedding matrix for child 0
+    {
+      // 0    1    2    3  
+      {1.0, 0.0, 0.0, 0.0}, // 0
+      {0.5, 0.5, 0.0, 0.0}, // 1
+      {0.5, 0.0, 0.5, 0.0}, // 2
+      {0.5, 0.0, 0.0, 0.5}  // 3
+    },
   
-  // embedding matrix for child 1
-  {
-    // 0    1    2    3  
-    {0.5, 0.5, 0.0, 0.0}, // 0
-    {0.0, 1.0, 0.0, 0.0}, // 1
-    {0.0, 0.5, 0.5, 0.0}, // 2
-    {0.0, 0.5, 0.0, 0.5}  // 3
-  },
+    // embedding matrix for child 1
+    {
+      // 0    1    2    3  
+      {0.5, 0.5, 0.0, 0.0}, // 0
+      {0.0, 1.0, 0.0, 0.0}, // 1
+      {0.0, 0.5, 0.5, 0.0}, // 2
+      {0.0, 0.5, 0.0, 0.5}  // 3
+    },
   
-  // embedding matrix for child 2
-  {
-    // 0    1    2    3  
-    {0.5, 0.0, 0.5, 0.0}, // 0
-    {0.0, 0.5, 0.5, 0.0}, // 1
-    {0.0, 0.0, 1.0, 0.0}, // 2
-    {0.0, 0.0, 0.5, 0.5}  // 3
-  },
+    // embedding matrix for child 2
+    {
+      // 0    1    2    3  
+      {0.5, 0.0, 0.5, 0.0}, // 0
+      {0.0, 0.5, 0.5, 0.0}, // 1
+      {0.0, 0.0, 1.0, 0.0}, // 2
+      {0.0, 0.0, 0.5, 0.5}  // 3
+    },
   
-  // embedding matrix for child 3
-  {
-    // 0    1    2    3  
-    {0.5, 0.0, 0.0, 0.5}, // 0
-    {0.0, 0.5, 0.0, 0.5}, // 1
-    {0.0, 0.0, 0.5, 0.5}, // 2
-    {0.0, 0.0, 0.0, 1.0}  // 3
-  },
+    // embedding matrix for child 3
+    {
+      // 0    1    2    3  
+      {0.5, 0.0, 0.0, 0.5}, // 0
+      {0.0, 0.5, 0.0, 0.5}, // 1
+      {0.0, 0.0, 0.5, 0.5}, // 2
+      {0.0, 0.0, 0.0, 1.0}  // 3
+    },
   
-  // embedding matrix for child 4
-  {
-    // 0    1    2    3  
-    {0.5, 0.5, 0.0, 0.0}, // 0
-    {0.0, 0.5, 0.0, 0.5}, // 1
-    {0.5, 0.0, 0.5, 0.0}, // 2
-    {0.5, 0.0, 0.0, 0.5}  // 3
-  },
+    // embedding matrix for child 4
+    {
+      // 0    1    2    3  
+      {0.5, 0.5, 0.0, 0.0}, // 0
+      {0.0, 0.5, 0.0, 0.5}, // 1
+      {0.5, 0.0, 0.5, 0.0}, // 2
+      {0.5, 0.0, 0.0, 0.5}  // 3
+    },
   
-  // embedding matrix for child 5
-  {
-    // 0    1    2    3  
-    {0.5, 0.5, 0.0, 0.0}, // 0
-    {0.0, 0.5, 0.5, 0.0}, // 1
-    {0.5, 0.0, 0.5, 0.0}, // 2
-    {0.0, 0.5, 0.0, 0.5}  // 3
-  },
+    // embedding matrix for child 5
+    {
+      // 0    1    2    3  
+      {0.5, 0.5, 0.0, 0.0}, // 0
+      {0.0, 0.5, 0.5, 0.0}, // 1
+      {0.5, 0.0, 0.5, 0.0}, // 2
+      {0.0, 0.5, 0.0, 0.5}  // 3
+    },
   
-  // embedding matrix for child 6
-  {
-    // 0    1    2    3  
-    {0.5, 0.0, 0.5, 0.0}, // 0
-    {0.0, 0.5, 0.5, 0.0}, // 1
-    {0.0, 0.0, 0.5, 0.5}, // 2
-    {0.0, 0.5, 0.0, 0.5}  // 3
-  },
+    // embedding matrix for child 6
+    {
+      // 0    1    2    3  
+      {0.5, 0.0, 0.5, 0.0}, // 0
+      {0.0, 0.5, 0.5, 0.0}, // 1
+      {0.0, 0.0, 0.5, 0.5}, // 2
+      {0.0, 0.5, 0.0, 0.5}  // 3
+    },
   
-  // embedding matrix for child 7
-  {
-    // 0    1    2    3  
-    {0.5, 0.0, 0.5, 0.0}, // 0
-    {0.0, 0.5, 0.0, 0.5}, // 1
-    {0.0, 0.0, 0.5, 0.5}, // 2
-    {0.5, 0.0, 0.0, 0.5}  // 3
-  }  
-};
+    // embedding matrix for child 7
+    {
+      // 0    1    2    3  
+      {0.5, 0.0, 0.5, 0.0}, // 0
+      {0.0, 0.5, 0.0, 0.5}, // 1
+      {0.0, 0.0, 0.5, 0.5}, // 2
+      {0.5, 0.0, 0.0, 0.5}  // 3
+    }
+  };
 
 #endif // #ifdef ENABLE_AMR
 
@@ -290,4 +290,71 @@ Real Tet4::volume () const
   Point c ( *this->get_node(2) - *this->get_node(0) );
 
   return (1.0 / 6.0) * (a * (b.cross(c)));
+}
+
+
+
+
+std::pair<Real, Real> Tet4::min_and_max_angle() const
+{
+  Point n[4];
+  
+  // Compute the outward normal vectors on each face
+  n[0] = (this->point(2) - this->point(0)).cross(this->point(1) - this->point(0));
+  n[1] = (this->point(1) - this->point(0)).cross(this->point(3) - this->point(0));
+  n[2] = (this->point(2) - this->point(1)).cross(this->point(3) - this->point(1));
+  n[3] = (this->point(0) - this->point(2)).cross(this->point(3) - this->point(2));
+
+  Real dihedral_angles[6]; // 01, 02, 03, 12, 13, 23
+
+  // Compute dihedral angles
+  for (unsigned int k=0,i=0; i<4; ++i)
+    for (unsigned int j=i+1; j<4; ++j,k+=1)
+      dihedral_angles[k] = std::acos(n[i]*n[j] / n[i].size() / n[j].size()); // return value is between 0 and PI
+
+  // Return max/min dihedral angles
+  return std::make_pair(*std::min_element(dihedral_angles, dihedral_angles+6),
+ 			*std::max_element(dihedral_angles, dihedral_angles+6));
+
+}
+
+
+
+float Tet4::embedding_matrix (const unsigned int i,
+			      const unsigned int j,
+			      const unsigned int k) const
+{
+  // Check for uninitialized diagonal selection
+  if (this->_diagonal_selection==INVALID_DIAG)
+    {
+      Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
+      Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
+      Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
+
+      this->_diagonal_selection=DIAG_02_13;
+      
+      if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
+	{
+	  if (diag_01_23 < diag_03_12)
+	    this->_diagonal_selection=DIAG_01_23;
+
+	  else
+	    this->_diagonal_selection=DIAG_03_12;
+	}
+    }
+
+  // Permuted j and k indices
+  unsigned int
+    jp=j,
+    kp=k;
+
+  if ((i>3) && (this->_diagonal_selection!=DIAG_02_13))
+    {
+      // Permute j, k
+      if (jp!=3) jp=(jp+static_cast<unsigned int>(this->_diagonal_selection))%3;
+      if (kp!=3) kp=(kp+static_cast<unsigned int>(this->_diagonal_selection))%3;
+    }
+
+  // Call embedding matrx with permuted indices
+  return this->_embedding_matrix[i][jp][kp]; 
 }
