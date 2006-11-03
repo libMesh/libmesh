@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.24 2006-06-28 23:55:08 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.25 2006-11-03 20:34:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -189,7 +189,8 @@ void DofMap::print_dof_constraints() const
 
 
 void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
-				       std::vector<unsigned int>& elem_dofs) const
+				       std::vector<unsigned int>& elem_dofs,
+				       bool asymmetric_constraint_rows) const
 {
   assert (elem_dofs.size() == matrix.m());
   assert (elem_dofs.size() == matrix.n());
@@ -217,29 +218,32 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
       
       
       for (unsigned int i=0; i<elem_dofs.size(); i++)
+	// If the DOF is constrained
 	if (this->is_constrained_dof(elem_dofs[i]))
 	  {
 	    for (unsigned int j=0; j<matrix.n(); j++)
 	      matrix(i,j) = 0.;
 	    
-	    // If the DOF is constrained
 	    matrix(i,i) = 1.;
 	    
-	    DofConstraints::const_iterator
-	      pos = _dof_constraints.find(elem_dofs[i]);
+            if (asymmetric_constraint_rows)
+              {
+	        DofConstraints::const_iterator
+	          pos = _dof_constraints.find(elem_dofs[i]);
 	    
-	    assert (pos != _dof_constraints.end());
+	        assert (pos != _dof_constraints.end());
 	    
-	    const DofConstraintRow& constraint_row = pos->second;
+	        const DofConstraintRow& constraint_row = pos->second;
 	    
-	    assert (!constraint_row.empty());
+	        assert (!constraint_row.empty());
 	    
-	    for (DofConstraintRow::const_iterator
-		   it=constraint_row.begin(); it != constraint_row.end();
-		 ++it)
-	      for (unsigned int j=0; j<elem_dofs.size(); j++)
-		if (elem_dofs[j] == it->first)
-		  matrix(i,j) = -it->second;	
+	        for (DofConstraintRow::const_iterator
+		       it=constraint_row.begin(); it != constraint_row.end();
+		     ++it)
+	          for (unsigned int j=0; j<elem_dofs.size(); j++)
+		    if (elem_dofs[j] == it->first)
+		      matrix(i,j) = -it->second;	
+	      }
 	  }
     } // end if is constrained...
   
@@ -250,7 +254,8 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 
 void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 						  DenseVector<Number>& rhs,
-						  std::vector<unsigned int>& elem_dofs) const
+						  std::vector<unsigned int>& elem_dofs,
+						  bool asymmetric_constraint_rows) const
 {
   assert (elem_dofs.size() == matrix.m());
   assert (elem_dofs.size() == matrix.n());
@@ -278,9 +283,6 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
       assert (matrix.n() == elem_dofs.size());
       
 
-      // This will put a nonsymmetric entry in the constraint
-      // row to ensure that the linear system produces the
-      // correct value for the constrained DOF.
       for (unsigned int i=0; i<elem_dofs.size(); i++)
 	if (this->is_constrained_dof(elem_dofs[i]))
 	  {
@@ -290,22 +292,28 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 	    // If the DOF is constrained
 	    matrix(i,i) = 1.;
 	    
-	    DofConstraints::const_iterator
-	      pos = _dof_constraints.find(elem_dofs[i]);
+            // This will put a nonsymmetric entry in the constraint
+            // row to ensure that the linear system produces the
+            // correct value for the constrained DOF.
+            if (asymmetric_constraint_rows)
+              {
+	        DofConstraints::const_iterator
+	          pos = _dof_constraints.find(elem_dofs[i]);
 	    
-	    assert (pos != _dof_constraints.end());
+	        assert (pos != _dof_constraints.end());
 	    
-	    const DofConstraintRow& constraint_row = pos->second;
+	        const DofConstraintRow& constraint_row = pos->second;
 	    
 // p refinement creates empty constraint rows
 //	    assert (!constraint_row.empty());
 	    
-	    for (DofConstraintRow::const_iterator
-		   it=constraint_row.begin(); it != constraint_row.end();
-		 ++it)
-	      for (unsigned int j=0; j<elem_dofs.size(); j++)
-		if (elem_dofs[j] == it->first)
-		  matrix(i,j) = -it->second;	
+	        for (DofConstraintRow::const_iterator
+		       it=constraint_row.begin(); it != constraint_row.end();
+		     ++it)
+	          for (unsigned int j=0; j<elem_dofs.size(); j++)
+		    if (elem_dofs[j] == it->first)
+		      matrix(i,j) = -it->second;	
+              }
 	  }
 
       
@@ -339,7 +347,8 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 
 void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 				       std::vector<unsigned int>& row_dofs,
-				       std::vector<unsigned int>& col_dofs) const
+				       std::vector<unsigned int>& col_dofs,
+				       bool asymmetric_constraint_rows) const
 {
   assert (row_dofs.size() == matrix.m());
   assert (col_dofs.size() == matrix.n());
@@ -383,25 +392,28 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 	  {
 	    for (unsigned int j=0; j<matrix.n(); j++)
 	      matrix(i,j) = 0.;
-	    
+	  
 	    // If the DOF is constrained
 	    matrix(i,i) = 1.;
 	    
-	    DofConstraints::const_iterator
-	      pos = _dof_constraints.find(row_dofs[i]);
+            if (asymmetric_constraint_rows)
+              {
+	        DofConstraints::const_iterator
+	          pos = _dof_constraints.find(row_dofs[i]);
 	    
-	    assert (pos != _dof_constraints.end());
+	        assert (pos != _dof_constraints.end());
 	    
-	    const DofConstraintRow& constraint_row = pos->second;
+	        const DofConstraintRow& constraint_row = pos->second;
 	    
-	    assert (!constraint_row.empty());
+	        assert (!constraint_row.empty());
 	    
-	    for (DofConstraintRow::const_iterator
-		   it=constraint_row.begin(); it != constraint_row.end();
-		 ++it)
-	      for (unsigned int j=0; j<col_dofs.size(); j++)
-		if (col_dofs[j] == it->first)
-		  matrix(i,j) = -it->second;	
+	        for (DofConstraintRow::const_iterator
+		       it=constraint_row.begin(); it != constraint_row.end();
+		     ++it)
+	          for (unsigned int j=0; j<col_dofs.size(); j++)
+		    if (col_dofs[j] == it->first)
+		      matrix(i,j) = -it->second;	
+              }
 	  }
     } // end if is constrained...
   
@@ -411,7 +423,8 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 
 
 void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
-				       std::vector<unsigned int>& row_dofs) const
+				       std::vector<unsigned int>& row_dofs,
+				       bool asymmetric_constraint_rows) const
 {
   assert (rhs.size() == row_dofs.size());
   
