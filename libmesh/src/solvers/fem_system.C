@@ -527,15 +527,17 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 #endif // ifdef DEBUG
         }
 
+      // We turn off the asymmetric constraint application;
+      // enforce_constraints_exactly() should be called in the solver
       if (get_residual && get_jacobian)
         this->get_dof_map().constrain_element_matrix_and_vector
-          (elem_jacobian, elem_residual, dof_indices);
+          (elem_jacobian, elem_residual, dof_indices, false);
       else if (get_residual)
         this->get_dof_map().constrain_element_vector
-          (elem_residual, dof_indices);
+          (elem_residual, dof_indices, false);
       else if (get_jacobian)
         this->get_dof_map().constrain_element_matrix
-          (elem_jacobian, dof_indices);
+          (elem_jacobian, dof_indices, false);
 
       if (get_jacobian)
         this->matrix->add_matrix (elem_jacobian, dof_indices);
