@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.26 2006-11-03 21:46:27 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.27 2006-11-03 22:50:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -470,8 +470,9 @@ void DofMap::enforce_constraints_exactly (System &system)
 {
   // FIXME - we should support any NumericVector, not just
   // system.solution
-  system.update();
   NumericVector<Number> &vec = *(system.solution);
+  vec.close();
+  system.update();
 
   Mesh &mesh = system.get_mesh();
 
