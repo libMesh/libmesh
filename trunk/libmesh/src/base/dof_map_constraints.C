@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.25 2006-11-03 20:34:15 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.26 2006-11-03 21:46:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -424,7 +424,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 
 void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
 				       std::vector<unsigned int>& row_dofs,
-				       bool asymmetric_constraint_rows) const
+				       bool) const
 {
   assert (rhs.size() == row_dofs.size());
   
@@ -470,6 +470,7 @@ void DofMap::enforce_constraints_exactly (System &system)
 {
   // FIXME - we should support any NumericVector, not just
   // system.solution
+  system.update();
   NumericVector<Number> &vec = *(system.solution);
 
   Mesh &mesh = system.get_mesh();
