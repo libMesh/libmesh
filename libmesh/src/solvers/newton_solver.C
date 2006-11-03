@@ -247,6 +247,10 @@ void NewtonSolver::solve()
   solution = newton_iterate;
 //  solution.close();
 
+  // The linear solver may not have fit our constraints exactly
+  _system.get_dof_map().enforce_constraints_exactly(_system);
+  newton_iterate = solution;
+
   // We may need to localize a parallel solution
   _system.update ();
 
