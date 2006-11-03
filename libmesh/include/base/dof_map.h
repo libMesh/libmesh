@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.18 2006-09-15 15:58:26 roystgnr Exp $
+// $Id: dof_map.h,v 1.19 2006-11-03 20:34:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -291,9 +291,15 @@ public:
    * columns of the element matrix.  For this case the rows
    * and columns of the matrix necessarily correspond to variables
    * of the same approximation order.
+   *
+   * If \p asymmetric_constraint_rows is set to true (as it is by
+   * default), constraint row equations will be reinforced in a way
+   * which breaks matrix symmetry but makes inexact linear solver
+   * solutions more likely to satisfy hanging node constraints.
    */
   void constrain_element_matrix (DenseMatrix<Number>& matrix,
-				 std::vector<unsigned int>& elem_dofs) const;
+				 std::vector<unsigned int>& elem_dofs,
+				 bool asymmetric_constraint_rows = true) const;
   
   /**
    * Constrains the element matrix.  This method allows the
@@ -303,13 +309,15 @@ public:
    */
   void constrain_element_matrix (DenseMatrix<Number>& matrix,
 				 std::vector<unsigned int>& row_dofs,
-				 std::vector<unsigned int>& col_dofs) const;
+				 std::vector<unsigned int>& col_dofs,
+				 bool asymmetric_constraint_rows = true) const;
   
   /**
    * Constrains the element vector.
    */
   void constrain_element_vector (DenseVector<Number>&       rhs,
-				 std::vector<unsigned int>& dofs) const;
+				 std::vector<unsigned int>& dofs,
+				 bool asymmetric_constraint_rows = true) const;
   
   /**
    * Constrains the element matrix and vector.  This method requires
@@ -321,12 +329,13 @@ public:
    */
   void constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 					    DenseVector<Number>& rhs,
-					    std::vector<unsigned int>& elem_dofs) const;
+					    std::vector<unsigned int>& elem_dofs,
+					    bool asymmetric_constraint_rows = true) const;
   
   /**
-   * Constrains the numeric vector, which represents a solution defined on the
+   * Constrains the numeric vector which represents a solution defined on the
    * mesh.  This may need to be used after a linear solve, if your linear
-   * solver's solutions do not satisfy your DoF constraints to a high enough
+   * solver's solutions do not satisfy your DoF constraints to a tight enough
    * tolerance.
    */
   void enforce_constraints_exactly (System &system);
