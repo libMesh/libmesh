@@ -289,6 +289,14 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
     (*current_local_nonlinear_solution,
      dof_map.get_send_list());
 
+  if (print_solution_norms)
+    {
+      this->get_vector("_nonlinear_solution").close();
+      std::cout << "|U| = "
+                << this->get_vector("_nonlinear_solution").l1_norm()
+                << std::endl;
+    }
+
   // Is this definitely necessary? [RHS]
   if (get_jacobian)
     matrix->zero();
