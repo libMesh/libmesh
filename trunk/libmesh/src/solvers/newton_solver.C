@@ -47,6 +47,10 @@ void NewtonSolver::solve()
   newton_iterate.close();
   solution.close();
 
+  solution = newton_iterate;
+  _system.get_dof_map().enforce_constraints_exactly(_system);
+  newton_iterate = solution;
+
   NumericVector<Number> &rhs = *(_system.rhs);
 
   SparseMatrix<Number> &matrix = *(_system.matrix);
@@ -150,7 +154,7 @@ void NewtonSolver::solve()
         std::cout << "Trying full Newton step" << std::endl;
       // Take a full Newton step
       newton_iterate.add (-1., solution);
-//      newton_iterate.close();
+      newton_iterate.close();
 
       // Check residual with full Newton step
       Real steplength = 1.;
@@ -183,7 +187,7 @@ void NewtonSolver::solve()
                 std::cout << "Shrinking Newton step to "
                           << steplength << std::endl;
               newton_iterate.add (steplength, solution);
-//              newton_iterate.close();
+              newton_iterate.close();
 
               // Check residual with fractional Newton step
               PAUSE_LOG("solve()", "NewtonSolver");
