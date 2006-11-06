@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.10 2006-08-11 19:56:21 roystgnr Exp $
+// $Id: diff_system.h,v 1.11 2006-11-06 01:41:03 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -255,22 +255,28 @@ public:
   Real deltat;
 
   /**
-   * Set print_residual_norm to true to print |F| whenever it is assembled.
+   * Set print_residual_norms to true to print |U| whenever it is
+   * used in an assembly() call
+   */
+  bool print_solution_norms;
+
+  /**
+   * Set print_residual_norms to true to print |F| whenever it is assembled.
    */
   bool print_residual_norms;
 
   /**
-   * Set print_residual_norm to true to print |F| whenever it is assembled.
+   * Set print_residuals to true to print F whenever it is assembled.
    */
   bool print_residuals;
 
   /**
-   * Set print_residual_norm to true to print |F| whenever it is assembled.
+   * Set print_jacobian_norms to true to print |J| whenever it is assembled.
    */
   bool print_jacobian_norms;
 
   /**
-   * Set print_residual_norm to true to print |F| whenever it is assembled.
+   * Set print_jacobians to true to print J whenever it is assembled.
    */
   bool print_jacobians;
 
