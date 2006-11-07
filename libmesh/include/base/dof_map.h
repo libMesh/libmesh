@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.19 2006-11-03 20:34:14 roystgnr Exp $
+// $Id: dof_map.h,v 1.20 2006-11-07 15:47:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -338,7 +338,7 @@ public:
    * solver's solutions do not satisfy your DoF constraints to a tight enough
    * tolerance.
    */
-  void enforce_constraints_exactly (System &system);
+  void enforce_constraints_exactly (System &system) const;
 #endif
 
 
