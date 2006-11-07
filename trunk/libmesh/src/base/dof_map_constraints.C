@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.27 2006-11-03 22:50:46 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.28 2006-11-07 15:47:08 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -466,7 +466,7 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
 
 
 
-void DofMap::enforce_constraints_exactly (System &system)
+void DofMap::enforce_constraints_exactly (System &system) const
 {
   // FIXME - we should support any NumericVector, not just
   // system.solution
