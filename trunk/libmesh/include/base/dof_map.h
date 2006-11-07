@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.20 2006-11-07 15:47:07 roystgnr Exp $
+// $Id: dof_map.h,v 1.21 2006-11-07 19:41:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -339,6 +339,14 @@ public:
    * tolerance.
    */
   void enforce_constraints_exactly (System &system) const;
+  
+  /**
+   * Tests the constrained degrees of freedom on the numeric vector which
+   * represents a solution defined on the mesh, returning a pair whose first
+   * entry is the maximum absolute error on a constrained DoF and whose second
+   * entry is the maximum relative error.  Useful for debugging purposes.
+   */
+  std::pair<Real, Real> max_constraint_error(System &system) const;
 #endif
 
 
