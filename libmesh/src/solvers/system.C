@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.27 2006-07-11 21:21:04 roystgnr Exp $
+// $Id: system.C,v 1.28 2006-11-09 08:11:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -200,54 +200,30 @@ void System::init_data ()
 void System::restrict_vectors ()
 {
 #ifdef ENABLE_AMR
-  _dof_map->distribute_dofs (this->get_mesh());
-  
   // Restrict the _vectors on the coarsened cells
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
     {
       NumericVector<Number>* v = pos->second;
       
       if (_vector_projections[pos->first])
-        {
-          //this->project_vector (*(pos->second));
-
-          //TODO:[BSK] Make projection work properly for distributed vectors 
-          // Right now we must localize distributed
-          // vectors before projection will work.
-          if (v->size() == v->local_size())
-	    this->project_vector (*v);
-      
-          else
-	    {
-	      AutoPtr<NumericVector<Number> > v_local (NumericVector<Number>::build());
-	      v_local->init (v->size(), v->size());
-	      v->localize(*v_local);
-	      v_local->close();
-	      this->project_vector(*v_local);
-	  
-	      v->init(this->n_dofs(), this->n_local_dofs());
-
-	      for (unsigned int i=v->first_local_index();
-	           i<v->last_local_index(); i++)
-	        v->set(i, (*v_local)(i));
-
-	      v->close();
-	    }
-        }
+	this->project_vector (*v);
       else
-        {
-          v->init (this->n_dofs(), this->n_local_dofs());
-        }
+        v->init (this->n_dofs(), this->n_local_dofs());
     }
 
-  // Restrict the current local solution on the coarsened cells
+  // Restrict the solution on the coarsened cells
   if (_solution_projection)
-    this->project_vector (*current_local_solution);
+    {
+      this->project_vector (*solution);
+      current_local_solution->clear();
+      current_local_solution->init(this->n_dofs());
+      const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
+      solution->localize (*current_local_solution, send_list); 
+    }
   else
     {
       current_local_solution->clear();
-      current_local_solution->init(this->n_dofs(),
-                                   this->n_local_dofs());
+      current_local_solution->init(this->n_dofs());
     }
 #endif
 }
@@ -268,7 +244,7 @@ void System::reinit ()
 {
 #ifdef ENABLE_AMR
   // Recreate any hanging node constraints
-  _dof_map->create_dof_constraints(this->get_mesh());
+//  _dof_map->create_dof_constraints(this->get_mesh());
 
   // Apply any user-defined constraints
   this->user_constrain();
