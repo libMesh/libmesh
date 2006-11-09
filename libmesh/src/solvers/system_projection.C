@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.35 2006-11-09 08:11:22 roystgnr Exp $
+// $Id: system_projection.C,v 1.36 2006-11-09 08:17:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -73,7 +73,9 @@ void System::project_vector (const NumericVector<Number>& old_v,
   // Resize the new vector and get a serial version.
 
   NumericVector<Number> *new_vector_ptr;
+  AutoPtr<NumericVector<Number> > new_vector_built;
   NumericVector<Number> *local_old_vector;
+  AutoPtr<NumericVector<Number> > local_old_vector_built;
   const NumericVector<Number> *old_vector_ptr;
 
   // If the old vector was uniprocessor, make the new
@@ -92,8 +94,10 @@ void System::project_vector (const NumericVector<Number>& old_v,
     {
       new_v.init (this->n_dofs(),
 		  this->n_local_dofs());
-      new_vector_ptr = NumericVector<Number>::build().release();
-      local_old_vector = NumericVector<Number>::build().release();
+      new_vector_built = NumericVector<Number>::build();
+      local_old_vector_built = NumericVector<Number>::build();
+      new_vector_ptr = new_vector_built.get();
+      local_old_vector = local_old_vector_built.get();
       new_vector_ptr->init(this->n_dofs(), this->n_dofs());
       local_old_vector->init(old_v.size(), old_v.size());
       old_v.localize(*local_old_vector);
@@ -487,8 +491,6 @@ void System::project_vector (const NumericVector<Number>& old_v,
         if (new_vector(i) != 0.0)
           new_v.set(i, new_vector(i));
       new_v.close();
-      free(local_old_vector);
-      free(new_vector_ptr);
     }
 
   dof_map.enforce_constraints_exactly(*this, &new_v);
