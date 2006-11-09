@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.30 2006-11-09 08:05:53 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.31 2006-11-09 18:39:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -469,6 +469,9 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
 void DofMap::enforce_constraints_exactly (const System &system,
                                           NumericVector<Number> *v) const
 {
+  if (!this->n_constrained_dofs())
+    return;
+
   if (!v)
     v = system.solution.get();
 
@@ -541,7 +544,23 @@ void DofMap::enforce_constraints_exactly (const System &system,
         }
     }
 
-  if (v->size() != v->local_size())
+  // If the old vector was serial, we probably need to send our values
+  // to other processors
+  if (v->size() == v->local_size())
+    {
+      AutoPtr<NumericVector<Number> > dist_v = NumericVector<Number>::build();
+      dist_v->init(this->n_dofs(), this->n_local_dofs());
+      dist_v->close();
+
+      for (unsigned int i=v->first_local_index();
+           i<v->last_local_index(); i++)
+        dist_v->set(i, (*v_local)(i));
+
+      dist_v->localize (*v);
+    }
+  // If the old vector was parallel, we need to update it
+  // and free the localized copies
+  else
     {
       for (unsigned int i=v->first_local_index();
            i<v->last_local_index(); i++)
