@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.32 2006-08-03 15:10:22 roystgnr Exp $
+// $Id: equation_systems.C,v 1.33 2006-11-09 08:07:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -145,6 +145,7 @@ void EquationSystems::reinit ()
 #endif
 
   bool mesh_changed = false;
+  bool dof_constraints_created = false;
   system_iterator       pos = _systems.begin();
   const system_iterator end = _systems.end();
   
@@ -156,10 +157,14 @@ void EquationSystems::reinit ()
   // refine_and_coarsen_elements or refine_uniformly have already
   // been called
   {
-    pos = _systems.begin();
-    for (; pos != end; ++pos)
-      pos->second->prolong_vectors();
+    for (pos = _systems.begin(); pos != end; ++pos)
+      {
+        pos->second->get_dof_map().distribute_dofs(_mesh);
+        pos->second->get_dof_map().create_dof_constraints(_mesh);
+        pos->second->prolong_vectors();
+      }
     mesh_changed = true;
+    dof_constraints_created = true;
   }
   
   // FIXME: Where should the user set maintain_level_one now??
@@ -171,10 +176,17 @@ void EquationSystems::reinit ()
   // if necessary
   if (mesh_refine.coarsen_elements(false))
     {
-      pos = _systems.begin();
-      for (; pos != end; ++pos)
-        pos->second->restrict_vectors();
+      for (pos = _systems.begin(); pos != end; ++pos)
+        {
+          if (!dof_constraints_created)
+            {
+              pos->second->get_dof_map().distribute_dofs(_mesh);
+              pos->second->get_dof_map().create_dof_constraints(_mesh);
+            }
+          pos->second->restrict_vectors();
+        }
       mesh_changed = true;
+      dof_constraints_created = true;
     }
 
   // Once vectors are all restricted, we can delete
@@ -186,18 +198,24 @@ void EquationSystems::reinit ()
   // if necessary
   if (mesh_refine.refine_elements(false))
     {
-      pos = _systems.begin();
-      for (; pos != end; ++pos)
-        pos->second->prolong_vectors();
+      for (pos = _systems.begin(); pos != end; ++pos)
+        {
+          if (!dof_constraints_created)
+            {
+              pos->second->get_dof_map().distribute_dofs(_mesh);
+              pos->second->get_dof_map().create_dof_constraints(_mesh);
+            }
+          pos->second->prolong_vectors();
+        }
       mesh_changed = true;
+      dof_constraints_created = true;
     }
 
   // If the mesh has changed, systems will need to create new dof
   // constraints and update their global solution vectors
   if (mesh_changed)
     {
-      pos = _systems.begin();
-      for (; pos != end; ++pos)
+      for (pos = _systems.begin(); pos != end; ++pos)
         pos->second->reinit();
     }
 }
