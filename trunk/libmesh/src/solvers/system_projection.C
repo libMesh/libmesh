@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.34 2006-09-19 15:28:54 roystgnr Exp $
+// $Id: system_projection.C,v 1.35 2006-11-09 08:11:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -57,32 +57,53 @@ void System::project_vector (NumericVector<Number>& vector) const
  * via L2 projections or nodal
  * interpolations on each element.
  */
-void System::project_vector (const NumericVector<Number>& old_vector,
-			     NumericVector<Number>& new_vector) const
+void System::project_vector (const NumericVector<Number>& old_v,
+			     NumericVector<Number>& new_v) const
 {
   START_LOG ("project_vector()", "System");
 
   /**
    * This method projects a solution from an old mesh to a current, refined
-   * mesh.  The input vector \p old_vector gives the solution on the
-   * old mesh, while the \p new_vector gives the solution (to be computed)
+   * mesh.  The input vector \p old_v gives the solution on the
+   * old mesh, while the \p new_v gives the solution (to be computed)
    * on the new mesh.
    */
-  new_vector.clear();
+  new_v.clear();
 
-  // Resize the new vector.
+  // Resize the new vector and get a serial version.
+
+  NumericVector<Number> *new_vector_ptr;
+  NumericVector<Number> *local_old_vector;
+  const NumericVector<Number> *old_vector_ptr;
 
   // If the old vector was uniprocessor, make the new
   // vector uniprocessor
-  if (old_vector.size() == old_vector.local_size())
-    new_vector.init (this->n_dofs(),
-		     this->n_dofs());
+  if (old_v.size() == old_v.local_size())
+    {
+      new_v.init (this->n_dofs(),
+		  this->n_dofs());
+      new_vector_ptr = &new_v;
+      old_vector_ptr = &old_v;
+    }
 
-  // Otherwise it is a parallel, distributed vector.
+  // Otherwise it is a parallel, distributed vector, which
+  // we need to localize.
   else
-    new_vector.init (this->n_dofs(),
-		     this->n_local_dofs());
+    {
+      new_v.init (this->n_dofs(),
+		  this->n_local_dofs());
+      new_vector_ptr = NumericVector<Number>::build().release();
+      local_old_vector = NumericVector<Number>::build().release();
+      new_vector_ptr->init(this->n_dofs(), this->n_dofs());
+      local_old_vector->init(old_v.size(), old_v.size());
+      old_v.localize(*local_old_vector);
+      local_old_vector->close();
+      old_vector_ptr = local_old_vector;
+    }
   // Note that the above will have zeroed the new_vector
+
+  NumericVector<Number> &new_vector = *new_vector_ptr;
+  const NumericVector<Number> &old_vector = *old_vector_ptr;
    
 #ifdef ENABLE_AMR
 
@@ -454,6 +475,23 @@ void System::project_vector (const NumericVector<Number>& old_vector,
     } // end variables loop
 
   new_vector.close();
+
+  // If the old vector was parallel, we need to update it
+  // and free the localized copies
+  if (old_v.size() != old_v.local_size())
+    {
+      // We may have to set dof values that this processor doesn't
+      // own in certain special cases, like LAGRANGE FIRST or
+      // HERMITE THIRD elements on second-order meshes
+      for (unsigned int i=0; i!=new_v.size(); i++)
+        if (new_vector(i) != 0.0)
+          new_v.set(i, new_vector(i));
+      new_v.close();
+      free(local_old_vector);
+      free(new_vector_ptr);
+    }
+
+  dof_map.enforce_constraints_exactly(*this, &new_v);
 
 #else
 
@@ -1062,6 +1100,8 @@ void System::project_vector (Number fptr(const Point& p,
     } // end variables loop
 
   new_vector.close();
+
+  dof_map.enforce_constraints_exactly(*this, &new_vector);
 
   STOP_LOG("project_vector()", "System");
 }
