@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C,v 1.30 2006-10-04 22:26:53 roystgnr Exp $
+// $Id: fe_lagrange.C,v 1.31 2006-11-09 15:12:49 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -670,6 +670,10 @@ void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 {
   // Only constrain elements in 2,3D.
   if (Dim == 1)
+    return;
+
+  // Only constrain active elements
+  if (!elem->active())
     return;
 
   assert (elem != NULL);
