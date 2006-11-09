@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.29 2006-11-07 19:41:09 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.30 2006-11-09 08:05:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -466,15 +466,31 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
 
 
 
-void DofMap::enforce_constraints_exactly (System &system) const
+void DofMap::enforce_constraints_exactly (const System &system,
+                                          NumericVector<Number> *v) const
 {
-  // FIXME - we should support any NumericVector, not just
-  // system.solution
-  NumericVector<Number> &vec = *(system.solution);
-  vec.close();
-  system.update();
+  if (!v)
+    v = system.solution.get();
 
-  Mesh &mesh = system.get_mesh();
+  NumericVector<Number> *v_local;
+  AutoPtr<NumericVector<Number> > v_built;
+  if (v->size() == v->local_size())
+    {
+      v_local = v;
+      assert (v_local->closed());
+    }
+  else
+    {
+      v_built = NumericVector<Number>::build();
+      v_local = v_built.get();
+      v_local->init (v->size(), v->size());
+      v->localize(*v_local);
+      v_local->close();
+    }
+
+  NumericVector<Number> &vec = *v_local;
+
+  const Mesh &mesh = system.get_mesh();
 
   assert (this == &(system.get_dof_map()));
 
@@ -518,35 +534,38 @@ void DofMap::enforce_constraints_exactly (System &system) const
               {
                 if (local_dof_indices[j] != global_dof)
                   exact_value += C(i,j) * 
-                    system.current_solution(local_dof_indices[j]);
+                    vec(local_dof_indices[j]);
               }
-
-            // FIXME - should use insert outside this loop to cut down
-            // on the virtual function calls
             vec.set(global_dof, exact_value);
           }
         }
     }
 
-  // Synchronize the parallel vector
-  vec.close();
-  system.update();
+  if (v->size() != v->local_size())
+    {
+      for (unsigned int i=v->first_local_index();
+           i<v->last_local_index(); i++)
+        v->set(i, (*v_local)(i));
+      v->close();
+    }
 }
 
 
 
-std::pair<Real, Real> DofMap::max_constraint_error (System &system) const
+std::pair<Real, Real>
+DofMap::max_constraint_error (const System &system,
+                              NumericVector<Number> *v) const
 {
-  // FIXME - we should support any NumericVector, not just
-  // system.solution
-  NumericVector<Number> &vec = *(system.solution);
+  if (!v)
+    v = system.solution.get();
+  NumericVector<Number> &vec = *v;
 
   // We'll assume the vector is closed
   assert (vec.closed());
 
   Real max_absolute_error = 0., max_relative_error = 0.;
 
-  Mesh &mesh = system.get_mesh();
+  const Mesh &mesh = system.get_mesh();
 
   assert (this == &(system.get_dof_map()));
 
@@ -588,16 +607,15 @@ std::pair<Real, Real> DofMap::max_constraint_error (System &system) const
             Number exact_value = 0;
             for (unsigned int j=0; j!=C.n(); ++j)
               {
-// We're assuming that current_solution is up to date
                 if (local_dof_indices[j] != global_dof)
                   exact_value += C(i,j) * 
-                    system.current_solution(local_dof_indices[j]);
+                    vec(local_dof_indices[j]);
               }
 
             max_absolute_error = std::max(max_absolute_error,
-              std::abs(system.current_solution(global_dof) - exact_value));
+              std::abs(vec(global_dof) - exact_value));
             max_relative_error = std::max(max_relative_error,
-              std::abs(system.current_solution(global_dof) - exact_value)
+              std::abs(vec(global_dof) - exact_value)
               / std::abs(exact_value));
           }
         }

@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.21 2006-11-07 19:41:09 roystgnr Exp $
+// $Id: dof_map.h,v 1.22 2006-11-09 08:05:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -333,20 +333,26 @@ public:
 					    bool asymmetric_constraint_rows = true) const;
   
   /**
-   * Constrains the numeric vector which represents a solution defined on the
-   * mesh.  This may need to be used after a linear solve, if your linear
+   * Constrains the numeric vector \p v, which represents a solution defined on
+   * the mesh.  This may need to be used after a linear solve, if your linear
    * solver's solutions do not satisfy your DoF constraints to a tight enough
    * tolerance.
+   *
+   * If \p v == NULL, the system solution vector is constrained
    */
-  void enforce_constraints_exactly (System &system) const;
+  void enforce_constraints_exactly (const System &system,
+				    NumericVector<Number> *v = NULL) const;
   
   /**
-   * Tests the constrained degrees of freedom on the numeric vector which
+   * Tests the constrained degrees of freedom on the numeric vector \p v, which
    * represents a solution defined on the mesh, returning a pair whose first
    * entry is the maximum absolute error on a constrained DoF and whose second
    * entry is the maximum relative error.  Useful for debugging purposes.
+   *
+   * If \p v == NULL, the system solution vector is tested.
    */
-  std::pair<Real, Real> max_constraint_error(System &system) const;
+  std::pair<Real, Real> max_constraint_error(const System &system,
+				    NumericVector<Number> *v = NULL) const;
 #endif
 
 
