@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.31 2006-11-09 18:39:54 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.32 2006-11-09 20:25:41 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -557,6 +557,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
         dist_v->set(i, (*v_local)(i));
 
       dist_v->localize (*v);
+      v->close();
     }
   // If the old vector was parallel, we need to update it
   // and free the localized copies
