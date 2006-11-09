@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.36 2006-11-09 08:17:31 roystgnr Exp $
+// $Id: system_projection.C,v 1.37 2006-11-09 18:40:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -480,9 +480,26 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
   new_vector.close();
 
+  // If the old vector was serial, we probably need to send our values
+  // to other processors
+  if (old_v.size() == old_v.local_size())
+    {
+      AutoPtr<NumericVector<Number> > dist_v = NumericVector<Number>::build();
+      dist_v->init(this->n_dofs(), this->n_local_dofs());
+      dist_v->close();
+    
+      for (unsigned int i=0; i!=dist_v->size(); i++)
+        if (new_vector(i) != 0.0)
+          dist_v->set(i, new_vector(i));
+
+      dist_v->close();
+
+      dist_v->localize (new_v);
+      new_v.close();
+    }
   // If the old vector was parallel, we need to update it
   // and free the localized copies
-  if (old_v.size() != old_v.local_size())
+  else
     {
       // We may have to set dof values that this processor doesn't
       // own in certain special cases, like LAGRANGE FIRST or
