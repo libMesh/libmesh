@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.32 2006-11-09 20:25:41 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.33 2006-11-10 20:21:39 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -476,22 +476,33 @@ void DofMap::enforce_constraints_exactly (const System &system,
     v = system.solution.get();
 
   NumericVector<Number> *v_local;
+  NumericVector<Number> *v_global;
   AutoPtr<NumericVector<Number> > v_built;
   if (v->size() == v->local_size())
     {
+      v_built = NumericVector<Number>::build();
+      v_built->init(this->n_dofs(), this->n_local_dofs());
+      v_built->close();
+
+      for (unsigned int i=v_built->first_local_index();
+           i<v_built->last_local_index(); i++)
+        v_built->set(i, (*v)(i));
+      v_built->close();
+      v_global = v_built.get();
+
       v_local = v;
       assert (v_local->closed());
     }
   else
     {
       v_built = NumericVector<Number>::build();
+      v_built->init (v->size(), v->size());
+      v->localize(*v_built);
+      v_built->close();
       v_local = v_built.get();
-      v_local->init (v->size(), v->size());
-      v->localize(*v_local);
-      v_local->close();
-    }
 
-  NumericVector<Number> &vec = *v_local;
+      v_global = v;
+    }
 
   const Mesh &mesh = system.get_mesh();
 
@@ -528,18 +539,16 @@ void DofMap::enforce_constraints_exactly (const System &system,
         {
           // Recalculate any constrained dof owned by this processor
           unsigned int global_dof = raw_dof_indices[i];
-          if (this->is_constrained_dof(global_dof) &&
-              global_dof >= vec.first_local_index() &&
-              global_dof < vec.last_local_index())
+          if (this->is_constrained_dof(global_dof))
           {
             Number exact_value = 0;
             for (unsigned int j=0; j!=C.n(); ++j)
               {
                 if (local_dof_indices[j] != global_dof)
                   exact_value += C(i,j) * 
-                    vec(local_dof_indices[j]);
+                    (*v_local)(local_dof_indices[j]);
               }
-            vec.set(global_dof, exact_value);
+            v_global->set(global_dof, exact_value);
           }
         }
     }
@@ -548,26 +557,9 @@ void DofMap::enforce_constraints_exactly (const System &system,
   // to other processors
   if (v->size() == v->local_size())
     {
-      AutoPtr<NumericVector<Number> > dist_v = NumericVector<Number>::build();
-      dist_v->init(this->n_dofs(), this->n_local_dofs());
-      dist_v->close();
-
-      for (unsigned int i=v->first_local_index();
-           i<v->last_local_index(); i++)
-        dist_v->set(i, (*v_local)(i));
-
-      dist_v->localize (*v);
-      v->close();
+      v_global->localize (*v);
     }
-  // If the old vector was parallel, we need to update it
-  // and free the localized copies
-  else
-    {
-      for (unsigned int i=v->first_local_index();
-           i<v->last_local_index(); i++)
-        v->set(i, (*v_local)(i));
-      v->close();
-    }
+  v->close();
 }
 
 
