@@ -249,11 +249,12 @@ void NewtonSolver::solve()
   // for other libMesh functions that expect it
 
   solution = newton_iterate;
-//  solution.close();
+  solution.close();
 
   // The linear solver may not have fit our constraints exactly
   _system.get_dof_map().enforce_constraints_exactly(_system);
   newton_iterate = solution;
+  solution.close();
 
   // We may need to localize a parallel solution
   _system.update ();
