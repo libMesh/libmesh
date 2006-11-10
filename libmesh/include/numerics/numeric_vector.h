@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.13 2005-12-28 13:47:10 spetersen Exp $
+// $Id: numeric_vector.h,v 1.14 2006-11-10 20:20:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -397,16 +397,21 @@ public:
 		       const Real threshold = TOLERANCE) const;
 
   /**
-   * Prints the contents of the vector to the screen.
+   * Prints the local contents of the vector to the screen.
    */
   virtual void print(std::ostream& os=std::cout) const;
+
+  /**
+   * Prints the global contents of the vector to the screen.
+   */
+  virtual void print_global(std::ostream& os=std::cout) const;
 
   /**
    * Same as above but allows you to use stream syntax.
    */
   friend std::ostream& operator << (std::ostream& os, const NumericVector<T>& v)
   {
-    v.print(os);
+    v.print_global(os);
     return os;
   }
   
@@ -573,6 +578,50 @@ void NumericVector<T>::print(std::ostream& os) const
   for (unsigned int i=this->first_local_index(); i<this->last_local_index(); i++)
     os << i << "\t" << (*this)(i) << std::endl;
 }
+
+
+
+template <>
+inline
+void NumericVector<Complex>::print_global(std::ostream& os) const
+{
+  assert (this->initialized());
+
+  std::vector<Complex> v(this->size());
+  this->localize(v);
+
+  // Right now we only want one copy of the output
+  if (libMesh::processor_id())
+    return;
+  
+  os << "Size\tglobal =  " << this->size() << std::endl;
+  os << "#\tReal part\t\tImaginary part" << std::endl;
+  for (unsigned int i=0; i!=v.size(); i++)
+    os << i << "\t" 
+       << v[i].real() << "\t\t" 
+       << v[i].imag() << std::endl;
+}
+
+
+template <typename T>
+inline
+void NumericVector<T>::print_global(std::ostream& os) const
+{
+  assert (this->initialized());
+
+  std::vector<T> v(this->size());
+  this->localize(v);
+
+  // Right now we only want one copy of the output
+  if (libMesh::processor_id())
+    return;
+
+  os << "Size\tglobal =  " << this->size() << std::endl;
+  os << "#\tValue" << std::endl;
+  for (unsigned int i=0; i!=v.size(); i++)
+    os << i << "\t" << v[i] << std::endl;
+}
+
 
 
 #endif  // #ifdef __numeric_vector_h__
