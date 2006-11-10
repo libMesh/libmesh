@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.11 2006-11-06 01:41:03 roystgnr Exp $
+// $Id: diff_system.h,v 1.12 2006-11-10 20:20:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -259,6 +259,12 @@ public:
    * used in an assembly() call
    */
   bool print_solution_norms;
+
+  /**
+   * Set print_solutions to true to print U whenever it is used in an
+   * assembly() call
+   */
+  bool print_solutions;
 
   /**
    * Set print_residual_norms to true to print |F| whenever it is assembled.
