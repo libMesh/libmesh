@@ -296,6 +296,14 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                 << this->get_vector("_nonlinear_solution").l1_norm()
                 << std::endl;
     }
+  if (print_solutions)
+    {
+      unsigned int old_precision = std::cout.precision();
+      std::cout.precision(16);
+      std::cout << "U = [" << this->get_vector("_nonlinear_solution")
+                << "];" << std::endl;
+      std::cout.precision(old_precision);
+    }
 
   // Is this definitely necessary? [RHS]
   if (get_jacobian)
