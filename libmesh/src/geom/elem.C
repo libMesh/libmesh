@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.60 2006-10-21 18:28:18 roystgnr Exp $
+// $Id: elem.C,v 1.61 2006-11-10 22:52:59 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -634,7 +634,7 @@ void Elem::family_tree_by_neighbor (std::vector<const Elem*>& family,
   if (!this->active())
     for (unsigned int c=0; c<this->n_children(); c++)
       if (this->child(c)->is_neighbor(neighbor))
-        this->child(c)->family_tree_by_neighbor (family, false);
+        this->child(c)->family_tree_by_neighbor (family, neighbor, false);
 }
 
 
@@ -659,7 +659,7 @@ void Elem::active_family_tree_by_neighbor (std::vector<const Elem*>& family,
   else
     for (unsigned int c=0; c<this->n_children(); c++)
       if (this->child(c)->is_neighbor(neighbor))
-        this->child(c)->active_family_tree_by_neighbor (family, false);
+        this->child(c)->active_family_tree_by_neighbor (family, neighbor, false);
 }
 
 
