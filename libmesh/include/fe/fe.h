@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.25 2006-09-12 07:14:40 roystgnr Exp $
+// $Id: fe.h,v 1.26 2006-11-10 20:19:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.25 $
+ * \version $Revision: 1.26 $
  */
 
 //-------------------------------------------------------------
@@ -431,6 +431,12 @@ public:
   friend class InfFE;
 #endif
 
+protected:
+  /**
+   * An array of the node locations on the last
+   * element we computed on
+   */
+  std::vector<Point> cached_nodes;
 };
 
 
@@ -441,7 +447,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.25 $
+ * \version $Revision: 1.26 $
  */
 
 //-------------------------------------------------------------
@@ -466,7 +472,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2005
- * \version $Revision: 1.25 $
+ * \version $Revision: 1.26 $
  */
 
 //-------------------------------------------------------------
@@ -501,7 +507,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.25 $
+ * \version $Revision: 1.26 $
  */
 
 //-------------------------------------------------------------
@@ -526,7 +532,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.25 $
+ * \version $Revision: 1.26 $
  */
 
 //-------------------------------------------------------------
@@ -551,7 +557,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.25 $
+ * \version $Revision: 1.26 $
  */
 
 //-------------------------------------------------------------
@@ -577,7 +583,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.25 $
+ * \version $Revision: 1.26 $
  */
 
 //-------------------------------------------------------------
