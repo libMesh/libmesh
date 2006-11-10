@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.95 2006-09-15 15:58:27 roystgnr Exp $
+// $Id: dof_map.C,v 1.96 2006-11-10 23:24:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -528,46 +528,11 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
   _n_dfs = next_free_dof;
   //-------------------------------------------------------------------------
 
+  this->add_neighbors_to_send_list(mesh);
   
-
-  //-------------------------------------------------------------------------
-  // The _send_list now only contains entries from the local processor.
-  // We need to add the DOFs from elements that live on neighboring processors
-  // that are neighbors of the elements on the local processor
-  // (for discontinuous elements)
-  {
-    MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
-
-    std::vector<unsigned int> di;
-
-    // Loop over the active local elements
-    for ( ; elem_it != elem_end; ++elem_it)
-      {
-	const Elem* elem = *elem_it;
-
-	// Loop over the neighbors of those elements
-	for (unsigned int s=0; s<elem->n_neighbors(); s++)
-	  if (elem->neighbor(s) != NULL)
-	    
-	    // If the neighbor lives on a different processor
-	    if (elem->neighbor(s)->processor_id() != libMesh::processor_id())
-	      {
-		// Get the DOF indices for this neighboring element
-		this->dof_indices (elem->neighbor(s), di);
-
-		// Insert the DOF indices into the send list
-		_send_list.insert (_send_list.end(),
-				   di.begin(), di.end());
-	      }
-      }
-  }
-  //-------------------------------------------------------------------------
-
-
-  
-  // Note that in the code above nodes on processor boundaries
-  // that are shared by multiple elements are added for each element.
+  // Note that in the add_neighbors_to_send_list nodes on processor
+  // boundaries that are shared by multiple elements are added for
+  // each element.
   // Here we need to clean up that data structure
   this->sort_send_list ();
 
@@ -683,51 +648,99 @@ void DofMap::distribute_dofs_node_major (MeshBase& mesh)
   _n_dfs = next_free_dof;
   //-------------------------------------------------------------------------
 
+  this->add_neighbors_to_send_list(mesh);
   
-
-  //-------------------------------------------------------------------------
-  // The _send_list now only contains entries from the local processor.
-  // We need to add the DOFs from elements that live on neighboring processors
-  // that are neighbors of the elements on the local processor
-  // (for discontinuous elements)
-  {
-    MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
-
-    std::vector<unsigned int> di;
-
-    // Loop over the active local elements
-    for ( ; elem_it != elem_end; ++elem_it)
-      {
-	const Elem* elem = *elem_it;
-
-	// Loop over the neighbors of those elements
-	for (unsigned int s=0; s<elem->n_neighbors(); s++)
-	  if (elem->neighbor(s) != NULL)
-	    
-	    // If the neighbor lives on a different processor
-	    if (elem->neighbor(s)->processor_id() != libMesh::processor_id())
-	      {
-		// Get the DOF indices for this neighboring element
-		this->dof_indices (elem->neighbor(s), di);
-
-		// Insert the DOF indices into the send list
-		_send_list.insert (_send_list.end(),
-				   di.begin(), di.end());
-	      }
-      }
-  }
-  //-------------------------------------------------------------------------
-
-
-  
-  // Note that in the code above nodes on processor boundaries
-  // that are shared by multiple elements are added for each element.
+  // Note that in the add_neighbors_to_send_list nodes on processor
+  // boundaries that are shared by multiple elements are added for
+  // each element.
   // Here we need to clean up that data structure
   this->sort_send_list ();
 
   // All done. Stop logging.
   STOP_LOG("distribute_dofs()", "DofMap");    
+}
+
+
+
+void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
+{
+  //-------------------------------------------------------------------------
+  // The _send_list now only contains entries from the local processor.
+  // We need to add the DOFs from elements that live on neighboring processors
+  // that are neighbors of the elements on the local processor
+  // (for discontinuous elements)
+  //-------------------------------------------------------------------------
+
+  MeshBase::const_element_iterator       local_elem_it
+    = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator local_elem_end
+    = mesh.active_local_elements_end(); 
+
+  std::vector<bool> node_on_processor(mesh.n_nodes(), false);
+  std::vector<unsigned int> di;
+
+  // Loop over the active local elements, adding all active elements
+  // that neighbor an active local element to the send list.
+  for ( ; local_elem_it != local_elem_end; ++local_elem_it)
+    {
+      const Elem* elem = *local_elem_it;
+
+      // Flag all the nodes of active local elements as seen
+      for (unsigned int n=0; n!=elem->n_nodes(); n++)
+        node_on_processor[elem->node(n)] = true;
+
+      // Loop over the neighbors of those elements
+      for (unsigned int s=0; s<elem->n_neighbors(); s++)
+	if (elem->neighbor(s) != NULL)
+	  {
+            // Find all the active elements that neighbor elem
+            std::vector<const Elem *> family;
+            if (elem->neighbor(s)->active())
+              family.push_back(elem->neighbor(s));
+            else
+              elem->neighbor(s)->active_family_tree_by_neighbor(family, elem);
+
+            for (unsigned int i=0; i!=family.size(); ++i)
+	    // If the neighbor lives on a different processor
+	    if (family[i]->processor_id() != libMesh::processor_id())
+	      {
+	        // Get the DOF indices for this neighboring element
+	        this->dof_indices (family[i], di);
+
+	        // Insert the DOF indices into the send list
+	        _send_list.insert (_send_list.end(),
+				   di.begin(), di.end());
+	      }
+	  }
+    }
+
+  // Now loop over all non_local active elements and add any missing
+  // nodal-only neighbors
+  MeshBase::const_element_iterator       elem_it
+    = mesh.active_elements_begin();
+  const MeshBase::const_element_iterator elem_end
+    = mesh.active_elements_end(); 
+  for ( ; elem_it != elem_end; ++elem_it)
+    {
+      const Elem* elem = *elem_it;
+
+      // If this is one of our elements, we've already added it
+      if (elem->processor_id() != libMesh::processor_id())
+        continue;
+
+      // Check all the nodes of those elements to see if they
+      // share a node with us
+      for (unsigned int n=0; n!=elem->n_nodes(); n++)
+        if (node_on_processor[elem->node(n)])
+          {
+	    // Get the DOF indices for this neighboring element
+	    this->dof_indices (elem, di);
+
+	    // Insert the DOF indices into the send list
+	    _send_list.insert (_send_list.end(),
+			       di.begin(), di.end());
+          }
+    }
 }
 
 

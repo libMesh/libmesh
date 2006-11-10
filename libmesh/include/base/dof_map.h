@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.22 2006-11-09 08:05:53 roystgnr Exp $
+// $Id: dof_map.h,v 1.23 2006-11-10 23:24:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -434,6 +434,12 @@ private:
 			  BidirectionalIterator       middle,
 			  const BidirectionalIterator end);
     
+  /**
+   * Adds entries to the \p _send_list vector corresponding to DoFs
+   * on elements neighboring the current processor.
+   */
+  void add_neighbors_to_send_list(MeshBase& mesh);
+
   /**
    * Takes the \p _send_list vector (which may have duplicate entries)
    * and sorts it.  The duplicate entries are then removed, resulting in
