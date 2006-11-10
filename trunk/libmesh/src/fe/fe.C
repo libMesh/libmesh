@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.52 2006-10-24 18:53:45 roystgnr Exp $
+// $Id: fe.C,v 1.53 2006-11-10 20:19:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -121,8 +121,6 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
   // Try to avoid calling init_shape_functions
   // even when shapes_need_reinit
-  static std::vector<Point> cached_nodes;
-
   bool cached_nodes_still_fit = false;
 
   // Initialize the shape functions at the user-specified
@@ -173,8 +171,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
         }
       else
         {
-          assert(elem_type == elem->type());
-          assert(_p_level == elem->p_level());
+          assert(elem->n_nodes() > 1);
 
           cached_nodes_still_fit = true;
           if (cached_nodes.size() != elem->n_nodes())
