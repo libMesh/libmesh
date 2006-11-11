@@ -742,7 +742,7 @@ void FEMSystem::numerical_side_jacobian ()
 
       for (unsigned int i = 0; i != dof_indices.size(); ++i)
         {
-          numerical_jacobian(i,j) =
+          numerical_jacobian(i,j) +=
             (elem_residual(i) - backwards_residual(i))
             / 2. / numerical_jacobian_h;
         }
