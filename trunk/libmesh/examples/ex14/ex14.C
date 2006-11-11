@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.33 2006-10-05 21:34:22 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.34 2006-11-11 01:42:08 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -123,6 +123,7 @@ int main(int argc, char** argv)
     const unsigned int approx_order   = input_file("approx_order", 1);
     const std::string element_type    = input_file("element_type", "tensor");
     const int extra_error_quadrature  = input_file("extra_error_quadrature", 0);
+    const int max_linear_iterations   = input_file("max_linear_iterations", 5000);
     dim = input_file("dimension", 2);
     const bool exact_indicator = input_file("exact_indicator", false);
     singularity = input_file("singularity", true);
@@ -203,7 +204,8 @@ int main(int argc, char** argv)
       equation_systems.init();
 
       // Set linear solver max iterations
-      equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 5000;
+      equation_systems.parameters.set<unsigned int>("linear solver maximum iterations")
+        = max_linear_iterations;
 
       // Linear solver tolerance.
       equation_systems.parameters.set<Real>("linear solver tolerance") =
