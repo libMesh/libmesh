@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.17 2005-10-18 15:59:24 jwpeterson Exp $
+# $Id: Makefile,v 1.18 2006-11-11 16:35:35 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -8,9 +8,6 @@ meshdir := ../..
 # set the variables INCLUDE and LIBS that we will need to build and
 # link with the library.
 include $(meshdir)/Make.common
-
-# include the dependency list
-include .depend
 
 
 ###############################################################################
@@ -69,6 +66,12 @@ run: $(target)
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)
 	@echo "***************************************************************"
+
+
+# include the dependency list
+include .depend
+
+
 #
 # Dependencies
 #
