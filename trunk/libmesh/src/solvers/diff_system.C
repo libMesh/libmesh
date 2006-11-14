@@ -16,6 +16,7 @@ DifferentiableSystem::DifferentiableSystem
   time(0.),
   deltat(1.),
   print_solution_norms(false),
+  print_solutions(false),
   print_residual_norms(false),
   print_residuals(false),
   print_jacobian_norms(false),
