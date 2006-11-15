@@ -1,4 +1,4 @@
-// $Id: partitioner.h,v 1.4 2005-02-22 22:17:34 jwpeterson Exp $
+// $Id: partitioner.h,v 1.5 2006-11-15 22:44:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -103,6 +103,13 @@ protected:
    */
   virtual void _do_repartition (MeshBase& mesh,
 				const unsigned int n) { this->_do_partition (mesh, n); }
+
+  /**
+   * This function is called after partitioning to set the processor IDs
+   * for the nodes.  By definition, a Node's processor ID is the minimum
+   * processor ID for all of the elements which share the node.
+   */
+  void _set_node_processor_ids(MeshBase& mesh);
 };
 
 
