@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.16 2005-08-05 20:49:31 jwpeterson Exp $
+// $Id: mesh.h,v 1.17 2006-11-15 23:50:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -310,8 +310,13 @@ public:
   
   node_iterator active_nodes_begin();
   node_iterator active_nodes_end();
+
+  node_iterator local_nodes_begin  ();
+  node_iterator local_nodes_end    ();
   
-  
+  node_iterator pid_nodes_begin (const unsigned int proc_id);
+  node_iterator pid_nodes_end   (const unsigned int proc_id);
+
   /**
    * const Node iterator accessor functions.
    */
@@ -320,6 +325,12 @@ public:
 
   const_node_iterator active_nodes_begin() const;
   const_node_iterator active_nodes_end()   const;
+
+  const_node_iterator local_nodes_begin  () const;
+  const_node_iterator local_nodes_end    () const;
+
+  const_node_iterator pid_nodes_begin (const unsigned int proc_id) const;
+  const_node_iterator pid_nodes_end   (const unsigned int proc_id) const;
 
   
 };
