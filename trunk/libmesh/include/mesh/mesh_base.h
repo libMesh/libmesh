@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.50 2006-09-14 14:32:53 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.51 2006-11-15 23:50:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,8 +56,8 @@ class BoundaryInfo;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2006-09-14 14:32:53 $
- * \version $Revision: 1.50 $
+ * \date    $Date: 2006-11-15 23:50:59 $
+ * \version $Revision: 1.51 $
  */
 
 
@@ -437,6 +437,10 @@ public:
   virtual node_iterator nodes_end          () = 0;
   virtual node_iterator active_nodes_begin () = 0;
   virtual node_iterator active_nodes_end   () = 0;
+  virtual node_iterator local_nodes_begin  () = 0;
+  virtual node_iterator local_nodes_end    () = 0;
+  virtual node_iterator pid_nodes_begin    (const unsigned int proc_id) = 0;
+  virtual node_iterator pid_nodes_end      (const unsigned int proc_id) = 0;
 
 
   /**
@@ -446,6 +450,10 @@ public:
   virtual const_node_iterator nodes_end          () const = 0;
   virtual const_node_iterator active_nodes_begin () const = 0;
   virtual const_node_iterator active_nodes_end   () const = 0;
+  virtual const_node_iterator local_nodes_begin  () const = 0;
+  virtual const_node_iterator local_nodes_end    () const = 0;
+  virtual const_node_iterator pid_nodes_begin    (const unsigned int proc_id) const = 0;
+  virtual const_node_iterator pid_nodes_end      (const unsigned int proc_id) const = 0;
 
 
   

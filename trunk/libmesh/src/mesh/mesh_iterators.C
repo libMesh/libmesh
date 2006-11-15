@@ -1,4 +1,4 @@
-// $Id: mesh_iterators.C,v 1.7 2005-08-05 20:49:31 jwpeterson Exp $
+// $Id: mesh_iterators.C,v 1.8 2006-11-15 23:51:00 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -591,6 +591,26 @@ Mesh::active_nodes_begin ()
 
 
 
+// local nodes begin() accessor
+Mesh::node_iterator
+Mesh::local_nodes_begin ()
+{
+  Predicates::Local<node_iterator_imp> p;
+  return node_iterator(_nodes.begin(), _nodes.end(), p);
+}
+
+
+
+// pid nodes begin() accessor
+Mesh::node_iterator
+Mesh::pid_nodes_begin (const unsigned int proc_id)
+{
+  Predicates::PID<node_iterator_imp> p(proc_id);
+  return node_iterator(_nodes.begin(), _nodes.end(), p);
+}
+
+
+
 // default const nodes begin() accessor
 Mesh::const_node_iterator
 Mesh::nodes_begin () const
@@ -611,6 +631,22 @@ Mesh::active_nodes_begin () const
 
 
 
+// local const nodes begin() accessor
+Mesh::const_node_iterator
+Mesh::local_nodes_begin () const
+{
+  Predicates::Local<const_node_iterator_imp> p;
+  return const_node_iterator(_nodes.begin(), _nodes.end(), p);
+}
+
+
+// pid const nodes begin() accessor
+Mesh::const_node_iterator
+Mesh::pid_nodes_begin (const unsigned int proc_id) const
+{
+  Predicates::PID<const_node_iterator_imp> p(proc_id);
+  return const_node_iterator(_nodes.begin(), _nodes.end(), p);
+}
 
 
 
@@ -637,6 +673,25 @@ Mesh::active_nodes_end ()
 
 
 
+// local nodes end() accessor
+Mesh::node_iterator
+Mesh::local_nodes_end ()
+{
+  Predicates::Local<node_iterator_imp> p;
+  return node_iterator(_nodes.end(), _nodes.end(), p);
+}
+
+
+// pid nodes end() accessor
+Mesh::node_iterator
+Mesh::pid_nodes_end (const unsigned int proc_id)
+{
+  Predicates::PID<node_iterator_imp> p(proc_id);
+  return node_iterator(_nodes.end(), _nodes.end(), p);
+}
+
+
+
 // default const nodes end() accessor
 Mesh::const_node_iterator
 Mesh::nodes_end () const
@@ -651,5 +706,23 @@ Mesh::const_node_iterator
 Mesh::active_nodes_end () const
 {
   Predicates::Active<const_node_iterator_imp> p;
+  return const_node_iterator(_nodes.end(), _nodes.end(), p);
+}
+
+
+// local const nodes end() accessor
+Mesh::const_node_iterator
+Mesh::local_nodes_end () const
+{
+  Predicates::Local<const_node_iterator_imp> p;
+  return const_node_iterator(_nodes.end(), _nodes.end(), p);
+}
+
+
+// pid const nodes end() accessor
+Mesh::const_node_iterator
+Mesh::pid_nodes_end (const unsigned int proc_id) const
+{
+  Predicates::PID<const_node_iterator_imp> p(proc_id);
   return const_node_iterator(_nodes.end(), _nodes.end(), p);
 }
