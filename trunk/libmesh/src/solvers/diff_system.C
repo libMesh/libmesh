@@ -21,6 +21,7 @@ DifferentiableSystem::DifferentiableSystem
   print_residuals(false),
   print_jacobian_norms(false),
   print_jacobians(false),
+  print_element_jacobians(false),
   current_local_nonlinear_solution(NumericVector<Number>::build())
 {
   untested();

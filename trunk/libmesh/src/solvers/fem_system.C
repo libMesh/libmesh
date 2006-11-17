@@ -555,6 +555,15 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
         this->get_dof_map().constrain_element_matrix
           (elem_jacobian, dof_indices, false);
 
+      if (get_jacobian && print_element_jacobians)
+        {
+          unsigned int old_precision = std::cout.precision();
+          std::cout.precision(16);
+	  std::cout << "J_elem " << elem->id() << " = "
+                    << elem_jacobian << std::endl;
+          std::cout.precision(old_precision);
+        }
+
       if (get_jacobian)
         this->matrix->add_matrix (elem_jacobian, dof_indices);
       if (get_residual)
