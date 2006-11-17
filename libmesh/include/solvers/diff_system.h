@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.12 2006-11-10 20:20:48 roystgnr Exp $
+// $Id: diff_system.h,v 1.13 2006-11-17 05:44:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -285,6 +285,11 @@ public:
    * Set print_jacobians to true to print J whenever it is assembled.
    */
   bool print_jacobians;
+
+  /**
+   * Set print_element_jacobians to true to print each J_elem contribution.
+   */
+  bool print_element_jacobians;
 
   /**
    * Element by element components of nonlinear_solution
