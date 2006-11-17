@@ -1,4 +1,4 @@
-// $Id: sfc_partitioner.C,v 1.16 2005-02-22 22:17:42 jwpeterson Exp $
+// $Id: sfc_partitioner.C,v 1.17 2006-11-17 05:45:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -170,7 +170,7 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 //  	    << z[i] << std::endl;
 //      }      
     
-    const unsigned int blksize = n_active_elem/n; 
+    const unsigned int blksize = (n_active_elem+n-1)/n; 
 
     for (unsigned int i=0; i<n_active_elem; i++)
       {
