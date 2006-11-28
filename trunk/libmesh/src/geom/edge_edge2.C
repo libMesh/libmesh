@@ -1,4 +1,4 @@
-// $Id: edge_edge2.C,v 1.16 2005-06-06 16:24:13 knezed01 Exp $
+// $Id: edge_edge2.C,v 1.17 2006-11-28 00:04:49 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -107,4 +107,12 @@ void Edge2::connectivity(const unsigned int sc,
     }
 
   error();
+}
+
+
+Real Edge2::volume () const
+{
+  // OK, so this is probably overkill, since it is equivalent to
+  // Elem::hmax() for the Edge2, but here it is nonetheless...
+  return (this->point(1) - this->point(0)).size();
 }

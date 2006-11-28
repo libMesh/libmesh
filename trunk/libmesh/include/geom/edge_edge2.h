@@ -1,4 +1,4 @@
-// $Id: edge_edge2.h,v 1.12 2006-03-23 20:24:36 roystgnr Exp $
+// $Id: edge_edge2.h,v 1.13 2006-11-28 00:04:48 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -115,6 +115,10 @@ class Edge2 : public Edge
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const;
 
+  /**
+   * An optimized method for computing the length of a 2-node edge.
+   */
+  virtual Real volume () const;
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
