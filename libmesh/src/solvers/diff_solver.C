@@ -7,6 +7,7 @@ DiffSolver::DiffSolver (sys_type& s)
     : quiet(true),
       max_linear_iterations(1000),
       max_nonlinear_iterations(100),
+      continue_after_max_iterations(true),
       absolute_residual_tolerance(0.),
       relative_residual_tolerance(0.),
       absolute_step_tolerance(0.),

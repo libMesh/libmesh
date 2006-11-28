@@ -1,4 +1,4 @@
-// $Id: diff_solver.h,v 1.7 2006-07-13 05:18:30 roystgnr Exp $
+// $Id: diff_solver.h,v 1.8 2006-11-28 17:04:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -104,16 +104,24 @@ public:
   bool quiet;
 
   /**
-   * Each linear solver step should exit after max_linear_iterations
+   * Each linear solver step should exit after \p max_linear_iterations
    * is exceeded.
    */
   unsigned int max_linear_iterations;
 
   /**
-   * The DiffSolver should exit in failure if max_nonlinear_iterations
-   * is exceeded.
+   * The DiffSolver should exit in failure if \p max_nonlinear_iterations
+   * is exceeded and \p continue_after_max_iterations is false, or should
+   * end the nonlinear solve if \p max_nonlinear_iterations is exceeded and \p
+   * continue_after_max_iterations is true.
    */
   unsigned int max_nonlinear_iterations;
+
+  /**
+   * Defaults to true, telling the DiffSolver to continue rather than exit when
+   * a solve has reached its maximum number of nonlinear iterations.
+   */
+  bool continue_after_max_iterations;
 
   /**
    * The DiffSolver should exit after the residual is
