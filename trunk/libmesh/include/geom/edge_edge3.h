@@ -1,4 +1,4 @@
-// $Id: edge_edge3.h,v 1.12 2006-03-23 20:24:36 roystgnr Exp $
+// $Id: edge_edge3.h,v 1.13 2006-11-28 20:33:16 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -134,6 +134,10 @@ class Edge3 : public Edge
 						   const unsigned int v) const
       { return static_cast<unsigned short int>(v); }
 
+  /**
+   * An optimized method for computing the length of a 3-node edge.
+   */
+  virtual Real volume () const;
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
