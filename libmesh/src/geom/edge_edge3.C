@@ -1,4 +1,4 @@
-// $Id: edge_edge3.C,v 1.18 2006-10-13 03:05:32 roystgnr Exp $
+// $Id: edge_edge3.C,v 1.19 2006-11-28 20:33:15 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -148,4 +148,36 @@ void Edge3::connectivity(const unsigned int sc,
 	error();
       }
     }
+}
+
+
+
+
+Real Edge3::volume () const
+{
+  // Finding the (exact) length of a general quadratic element
+  // is a surprisingly complicated formula.
+  Point A = this->point(0) + this->point(1) - 2.*this->point(2);
+  Point B = 0.5*(this->point(1) - this->point(0));
+
+  const Real a = A.size_sq(); 
+  const Real b = 2.*(A*B);    
+  const Real c = B.size_sq(); 
+
+  // Degenerate straight line case
+  if (a < TOLERANCE*TOLERANCE*TOLERANCE)
+    return (this->point(1) - this->point(0)).size();
+
+  const Real ba=b/a; 
+  const Real ca=c/a; 
+
+  assert (1.-ba+ca>0.);
+  
+  const Real s1 = std::sqrt(1. - ba + ca);
+  const Real s2 = std::sqrt(1. + ba + ca);
+
+  return 0.5*std::sqrt(a)*((1.-0.5*ba)*s1 +
+			   (1.+0.5*ba)*s2 +
+			   (ca - 0.25*ba*ba)*std::log( (1.-0.5*ba+s1)/(-1.-0.5*ba+s2) )
+			   );
 }
