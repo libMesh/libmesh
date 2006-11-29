@@ -240,7 +240,10 @@ void NewtonSolver::solve()
           std::cout << "  Nonlinear solver FAILED TO CONVERGE by step " << l
                     << " with norm " << norm_total
                     << std::endl;
-          error();
+          if (continue_after_max_iterations)
+            std::cout << "  Continuing anyway..." << std::endl;
+          else
+            error();
           continue;
         }
     } // end nonlinear loop
