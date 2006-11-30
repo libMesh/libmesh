@@ -1,4 +1,4 @@
-// $Id: cell_tet10.h,v 1.12 2006-03-23 20:24:36 roystgnr Exp $
+// $Id: cell_tet10.h,v 1.13 2006-11-30 23:14:54 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -164,6 +164,15 @@ public:
    */
   static const unsigned int edge_nodes_map[6][3];
   
+  /**
+   * Returns the min and max *dihedral* angles for the tetrahedron.
+   * Note there are 6 dihedral angles (angles between the planar
+   * faces) for the Tet4.  Dihedral angles near 180 deg. are generally
+   * bad for interplation.  Small dihedral angles are not necessarily
+   * bad for interplation, but they can effect the stiffness matrix
+   * condition number.
+   */
+   std::pair<Real, Real> min_and_max_angle() const;
 
 protected:
 
@@ -175,8 +184,8 @@ protected:
    */
   float embedding_matrix (const unsigned int i,
 			  const unsigned int j,
-			  const unsigned int k) const
-  { return _embedding_matrix[i][j][k]; }
+			  const unsigned int k) const;
+  //  { return _embedding_matrix[i][j][k]; }
 
   /**
    * Matrix that computes new nodal locations/solution values
@@ -184,6 +193,21 @@ protected:
    */
   static const float _embedding_matrix[8][10][10];
   
+  /**
+   * This enumeration keeps track of which diagonal is selected during
+   * refinement.  In general there are three possible diagonals to
+   * choose when splitting the octahedron, and by choosing the shortest
+   * one we obtain the best element shape.
+   */
+  enum Diagonal
+    {DIAG_02_13=0,    // diagonal between edges (0,2) and (1,3)
+     DIAG_03_12=1,    // diagonal between edges (0,3) and (1,2)
+     DIAG_01_23=2,    // diagonal between edges (0,1) and (2,3)
+     INVALID_DIAG=99  // diagonal not yet selected
+    };
+
+  mutable Diagonal _diagonal_selection;
+
 #endif
 
 
@@ -203,7 +227,8 @@ private:
 // Tet10 class member functions
 inline
 Tet10::Tet10(Elem* p) :
-  Tet(Tet10::n_nodes(), p) 
+  Tet(Tet10::n_nodes(), p),
+  _diagonal_selection(INVALID_DIAG)
 {
 }
 
