@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.26 2006-10-30 22:11:32 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.27 2006-11-30 04:13:08 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -325,7 +325,9 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
     }
 
   // Find out what our coarsening and refinement error limits are
-  Real max_coarsenable_error = sorted_parent_error.back();
+  Real max_coarsenable_error = 0.;
+  if (!sorted_parent_error.empty())
+    max_coarsenable_error = sorted_parent_error.back();
   if (coarsen_count)
     {
       if (coarsen_count < sorted_parent_error.size())
