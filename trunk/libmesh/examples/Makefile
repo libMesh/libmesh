@@ -103,7 +103,7 @@ distclean:
 
 #
 # Link the example programs
-link: $(wildcard examples/ex*/ex*.C)
+link: $(wildcard examples/ex*/*.C)
 	@$(MAKE) -C ex0  ex0  
 	@$(MAKE) -C ex1  ex1  
 	@$(MAKE) -C ex2  ex2  
@@ -126,7 +126,7 @@ link: $(wildcard examples/ex*/ex*.C)
 
 #
 # Run the example programs to see if shared lib's get properly loaded
-run: $(wildcard examples/ex*/ex*.C)
+run: $(wildcard examples/ex*/*.C)
 	@$(MAKE) -C ex0  $(MAKECMDGOALS)
 	@$(MAKE) -C ex1  $(MAKECMDGOALS)
 	@$(MAKE) -C ex2  $(MAKECMDGOALS)
@@ -149,7 +149,7 @@ run: $(wildcard examples/ex*/ex*.C)
 
 #
 # Rebuild the dependencies for the examples
-.depend: $(wildcard examples/ex*/ex*.C)
+.depend: $(wildcard examples/ex*/*.C)
 	@$(MAKE) -C ex0  $(MAKECMDGOALS)
 	@$(MAKE) -C ex1  $(MAKECMDGOALS)
 	@$(MAKE) -C ex2  $(MAKECMDGOALS)
