@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.24 2006-10-13 03:05:32 roystgnr Exp $
+// $Id: cell_tet10.C,v 1.25 2006-11-30 23:14:54 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -584,5 +584,73 @@ const float Tet10::_embedding_matrix[8][10][10] =
     {-0.125,    0.,-0.125,    0.,    0.,    0.,  0.25,   0.5,    0.,   0.5}  // 9
   }
 };
+
+
+
+std::pair<Real, Real> Tet10::min_and_max_angle() const
+{
+  Point n[4];
+  
+  // Compute the outward normal vectors on each face
+  n[0] = (this->point(2) - this->point(0)).cross(this->point(1) - this->point(0));
+  n[1] = (this->point(1) - this->point(0)).cross(this->point(3) - this->point(0));
+  n[2] = (this->point(2) - this->point(1)).cross(this->point(3) - this->point(1));
+  n[3] = (this->point(0) - this->point(2)).cross(this->point(3) - this->point(2));
+
+  Real dihedral_angles[6]; // 01, 02, 03, 12, 13, 23
+
+  // Compute dihedral angles
+  for (unsigned int k=0,i=0; i<4; ++i)
+    for (unsigned int j=i+1; j<4; ++j,k+=1)
+      dihedral_angles[k] = std::acos(n[i]*n[j] / n[i].size() / n[j].size()); // return value is between 0 and PI
+
+  // Return max/min dihedral angles
+  return std::make_pair(*std::min_element(dihedral_angles, dihedral_angles+6),
+ 			*std::max_element(dihedral_angles, dihedral_angles+6));
+
+}
+
+
+
+float Tet10::embedding_matrix (const unsigned int i,
+			      const unsigned int j,
+			      const unsigned int k) const
+{
+  // Check for uninitialized diagonal selection
+  if (this->_diagonal_selection==INVALID_DIAG)
+    {
+      Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
+      Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
+      Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
+
+      this->_diagonal_selection=DIAG_02_13;
+
+      if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
+      {
+        if (diag_01_23 < diag_03_12)
+          this->_diagonal_selection=DIAG_01_23;
+
+        else
+          this->_diagonal_selection=DIAG_03_12;
+      }
+    }
+
+  // Permuted j and k indices
+  unsigned int
+    jp=j,
+    kp=k;
+
+  if ((i>3) && (this->_diagonal_selection!=DIAG_02_13))
+    {
+      // Permute j, k
+      if (jp<3) jp=(jp+static_cast<unsigned int>(this->_diagonal_selection))%3;
+      else if (jp>3) jp=(jp-1+static_cast<unsigned int>(this->_diagonal_selection))%3+1+3*((jp-1)/3);
+      if (kp<3) kp=(kp+static_cast<unsigned int>(this->_diagonal_selection))%3;
+      else if (kp>3) kp=(kp-1+static_cast<unsigned int>(this->_diagonal_selection))%3+1+3*((kp-1)/3);
+    }
+
+  // Call embedding matrx with permuted indices
+  return this->_embedding_matrix[i][jp][kp];
+}
 
 #endif // #ifdef ENABLE_AMR
