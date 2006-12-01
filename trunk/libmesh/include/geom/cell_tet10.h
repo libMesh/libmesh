@@ -1,4 +1,4 @@
-// $Id: cell_tet10.h,v 1.13 2006-11-30 23:14:54 jwpeterson Exp $
+// $Id: cell_tet10.h,v 1.14 2006-12-01 16:48:29 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -164,16 +164,6 @@ public:
    */
   static const unsigned int edge_nodes_map[6][3];
   
-  /**
-   * Returns the min and max *dihedral* angles for the tetrahedron.
-   * Note there are 6 dihedral angles (angles between the planar
-   * faces) for the Tet4.  Dihedral angles near 180 deg. are generally
-   * bad for interplation.  Small dihedral angles are not necessarily
-   * bad for interplation, but they can effect the stiffness matrix
-   * condition number.
-   */
-   std::pair<Real, Real> min_and_max_angle() const;
-
 protected:
 
   

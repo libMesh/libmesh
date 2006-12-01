@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.25 2006-11-30 23:14:54 jwpeterson Exp $
+// $Id: cell_tet10.C,v 1.26 2006-12-01 16:48:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -587,28 +587,6 @@ const float Tet10::_embedding_matrix[8][10][10] =
 
 
 
-std::pair<Real, Real> Tet10::min_and_max_angle() const
-{
-  Point n[4];
-  
-  // Compute the outward normal vectors on each face
-  n[0] = (this->point(2) - this->point(0)).cross(this->point(1) - this->point(0));
-  n[1] = (this->point(1) - this->point(0)).cross(this->point(3) - this->point(0));
-  n[2] = (this->point(2) - this->point(1)).cross(this->point(3) - this->point(1));
-  n[3] = (this->point(0) - this->point(2)).cross(this->point(3) - this->point(2));
-
-  Real dihedral_angles[6]; // 01, 02, 03, 12, 13, 23
-
-  // Compute dihedral angles
-  for (unsigned int k=0,i=0; i<4; ++i)
-    for (unsigned int j=i+1; j<4; ++j,k+=1)
-      dihedral_angles[k] = std::acos(n[i]*n[j] / n[i].size() / n[j].size()); // return value is between 0 and PI
-
-  // Return max/min dihedral angles
-  return std::make_pair(*std::min_element(dihedral_angles, dihedral_angles+6),
- 			*std::max_element(dihedral_angles, dihedral_angles+6));
-
-}
 
 
 
