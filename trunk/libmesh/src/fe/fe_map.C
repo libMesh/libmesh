@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.44 2006-09-13 22:23:35 friedmud Exp $
+// $Id: fe_map.C,v 1.45 2006-12-05 19:07:54 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -57,6 +57,8 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
 	  xyz.resize(n_qp);
 	  dxyzdxi_map.resize(n_qp);
 	  dxidx_map.resize(n_qp);
+	  dxidy_map.resize(n_qp); // 1D element may live in 2D ...
+	  dxidz_map.resize(n_qp); // ... or 3D
 #ifdef ENABLE_SECOND_DERIVATIVES
 	  d2xyzdxi2_map.resize(n_qp);
 #endif
@@ -110,16 +112,24 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
 	}
 	*/
 
-	// compute the jacobian once
-
-	// Symbolically, the matrix determinant is
+	// Compute the jacobian once
 	//
-	// jac = | dx/dxi | = dx/dxi
-	//         
-	
-	// Compute the Jacobian.  This assumes the
-	// 1D edge lives in 1D space.
-	const Real jac = dxdxi_map(0);
+	// 1D elements can live in 2D or 3D space.
+	// The transformation matrix from local->global
+	// coordinates is
+	//
+	// T = | dx/dxi | 
+	//     | dy/dxi |
+	//     | dz/dxi |
+	//
+	// The generalized determinant of T (from the
+	// so-called "normal" eqns.) is
+	// jac = "det(T)" = sqrt(det(T'T))
+	//
+	// where T'= transpose of T, so
+	//
+	// jac = sqrt( (dx/dxi)^2 + (dy/dxi)^2 + (dz/dxi)^2 )
+	const Real jac = dxyzdxi_map[0].size();
 	    
 	if (jac <= 0.)
 	  {
@@ -128,16 +138,24 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
 		      << std::endl;
 	    error();
 	  }
+
+	// The inverse Jacobian entries also come from the
+	// generalized inverse of T (see also the 2D element
+	// living in 3D code).
+	const Real jacm2 = 1./jac/jac;
+	dxidx_map[0] = jacm2*dxdxi_map(0);
+	dxidy_map[0] = jacm2*dydxi_map(0);
+	dxidz_map[0] = jacm2*dzdxi_map(0);
 	    
-	assert (dxdxi_map(0) != 0.);
-	    
-	dxidx_map[0] = 1./dxdxi_map(0);
 	JxW[0] = jac*qw[0];
- 
+
+	// copy computed values into the rest of the vector
 	for (unsigned int p=1; p<n_qp; p++)
           {
 	    dxidx_map[p] = dxidx_map[0];
-	    JxW[p] = jac*qw[p];
+	    dxidy_map[p] = dxidy_map[0];
+	    dxidz_map[p] = dxidz_map[0];
+	    JxW[p] = jac*qw[p]; // quadrature weights still vary with p
           }
 
 	// done computing the map
@@ -570,6 +588,8 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	  xyz.resize(n_qp);
 	  dxyzdxi_map.resize(n_qp);
 	  dxidx_map.resize(n_qp);
+	  dxidy_map.resize(n_qp); // 1D element may live in 2D ...
+	  dxidz_map.resize(n_qp); // ... or 3D
 #ifdef ENABLE_SECOND_DERIVATIVES
 	  d2xyzdxi2_map.resize(n_qp);
 #endif
@@ -622,14 +642,23 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 	// compute the jacobian at the quadrature points
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    // Symbolically, the matrix determinant is
+
+	    // 1D elements can live in 2D or 3D space.
+	    // The transformation matrix from local->global
+	    // coordinates is
 	    //
-	    // jac = | dx/dxi | = dx/dxi
-	    //         
-	    
-	    // Compute the Jacobian.  This assumes the
-	    // 1D edge lives in 1D space.
-	    const Real jac = dxdxi_map(p);
+	    // T = | dx/dxi | 
+	    //     | dy/dxi |
+	    //     | dz/dxi |
+	    //
+	    // The generalized determinant of T (from the
+	    // so-called "normal" eqns.) is
+	    // jac = "det(T)" = sqrt(det(T'T))
+	    //
+	    // where T'= transpose of T, so
+	    //
+	    // jac = sqrt( (dx/dxi)^2 + (dy/dxi)^2 + (dz/dxi)^2 )
+	    const Real jac = dxyzdxi_map[p].size();
 	    
 	    if (jac <= 0.)
 	      {
@@ -638,10 +667,14 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 			  << std::endl;
 		error();
 	      }
-	    
-	    assert (dxdxi_map(p) != 0.);
-	    
-	    dxidx_map[p] = 1./dxdxi_map(p);
+
+	    // The inverse Jacobian entries also come from the
+	    // generalized inverse of T (see also the 2D element
+	    // living in 3D code).
+	    const Real jacm2 = 1./jac/jac;
+	    dxidx_map[p] = jacm2*dxdxi_map(p);
+	    dxidy_map[p] = jacm2*dydxi_map(p);
+	    dxidz_map[p] = jacm2*dzdxi_map(p);
 	    
 	    JxW[p] = jac*qw[p];
 	  }
