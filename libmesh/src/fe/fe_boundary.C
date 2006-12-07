@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.44 2006-10-20 20:23:36 roystgnr Exp $
+// $Id: fe_boundary.C,v 1.45 2006-12-07 21:46:31 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -430,13 +430,37 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	// Compute the tangent & normal at the quadrature point
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    const Point n(dxyzdxi_map[p](1), -dxyzdxi_map[p](0), 0.);
-	    
-	    normals[p]     = n.unit();
+	    // The first tangent comes from just the edge's Jacobian
 	    tangents[p][0] = dxyzdxi_map[p].unit();
-#if DIM == 3  // Only good in 3D space
-	    tangents[p][1] = dxyzdxi_map[p].cross(n).unit();
-#endif
+	    
+#if DIM == 2
+	    // For a 2D element living in 2D, the normal is given directly
+	    // from the entries in the edge Jacobian.
+	    normals[p] = (Point(dxyzdxi_map[p](1), -dxyzdxi_map[p](0), 0.)).unit();
+	    
+#elif DIM == 3
+	    // For a 2D element living in 3D, there is a second tangent.
+	    // For the second tangent, we need to refer to the full
+	    // element's (not just the edge's) Jacobian.
+	    const Elem *elem = side->parent();
+	    assert (elem != NULL);
+
+	    // Inverse map xyz[p] to a reference point on the parent...
+	    Point reference_point = FE<2,LAGRANGE>::inverse_map(elem, xyz[p]);
+	    
+	    // Get dxyz/dxi and dxyz/deta from the parent map.
+	    Point dx_dxi  = FE<2,LAGRANGE>::map_xi (elem, reference_point);
+	    Point dx_deta = FE<2,LAGRANGE>::map_eta(elem, reference_point);
+
+	    // The second tangent vector is formed by crossing these vectors.
+	    tangents[p][1] = dx_dxi.cross(dx_deta).unit();
+
+	    // Finally, the normal in this case is given by crossing these
+	    // two tangents.
+	    normals[p] = tangents[p][0].cross(tangents[p][1]).unit();
+#endif 
+	    
+
 	    // The curvature is computed via the familiar Frenet formula:
 	    // curvature = [d^2(x) / d (xi)^2] dot [normal]
 	    // For a reference, see:
@@ -455,8 +479,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	// compute the jacobian at the quadrature points
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    const Real jac = std::sqrt(dxdxi_map(p)*dxdxi_map(p) +
-				       dydxi_map(p)*dydxi_map(p));
+	    const Real jac = dxyzdxi_map[p].size();
 	    
 	    assert (jac > 0.);
 	    
