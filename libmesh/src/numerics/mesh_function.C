@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.13 2006-08-09 13:51:49 roystgnr Exp $
+// $Id: mesh_function.C,v 1.14 2006-12-08 19:41:19 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,7 @@
 #include "numeric_vector.h"
 #include "dof_map.h"
 #include "point_locator_base.h"
+#include "fe_base.h"
 #include "fe_interface.h"
 #include "fe_compute_data.h"
 #include "mesh.h"
@@ -178,6 +179,20 @@ Number MeshFunction::operator() (const Point& p,
 
 
 
+Gradient MeshFunction::gradient (const Point& p, 
+				 const Real time)
+{
+  assert (this->initialized());
+  // At the moment the function we call ignores the time
+  assert (time == 0.);
+  
+  std::vector<Gradient> buf (1);
+  this->gradient(p, time, buf);
+  return buf[0];
+}
+
+
+
 
 void MeshFunction::operator() (const Point& p,
 			       const Real,
@@ -267,6 +282,94 @@ void MeshFunction::operator() (const Point& p,
 	    }
 	    
 	    // next variable
+	  }
+      }
+    }
+      
+  // all done
+  return;
+}
+
+
+
+void MeshFunction::gradient (const Point& p,
+			     const Real,
+			     std::vector<Gradient>& output)
+{
+  assert (this->initialized());
+
+  /* Ensure that in the case of a master mesh function, the
+     out-of-mesh mode is enabled either for both or for none.  This is
+     important because the out-of-mesh mode is also communicated to
+     the point locator.  Since this is time consuming, enable it only
+     in debug mode.  */
+#ifdef DEBUG
+  if (this->_master != NULL)
+    {
+      const MeshFunction* master =
+	dynamic_cast<const MeshFunction*>(this->_master);
+      if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
+	{
+	  std::cerr << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
+	  error();
+	}
+    }
+#endif
+  
+  // locate the point in the other mesh
+  const Elem* element = this->_point_locator->operator()(p);
+
+  if(element==NULL)
+    {
+      output.resize(0);
+    }
+  else
+    {
+      // resize the output vector to the number of output values
+      // that the user told us
+      output.resize (this->_system_vars.size());
+      
+      
+      {
+	const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
+	
+	
+	/*
+	 * Get local coordinates to feed these into compute_data().  
+	 * Note that the fe_type can safely be used from the 0-variable,
+	 * since the inverse mapping is the same for all FEFamilies
+	 */
+	const Point mapped_point (FEInterface::inverse_map (dim, 
+							    this->_dof_map.variable_type(0),
+							    element, 
+							    p));
+	
+        std::vector<Point> point_list (1, mapped_point);
+	
+	// loop over all vars
+	for (unsigned int index=0; index < this->_system_vars.size(); index++)
+	  {
+	    /*
+	     * the data for this variable
+	     */
+	    const unsigned int var = _system_vars[index];
+	    const FEType& fe_type = this->_dof_map.variable_type(var);
+
+            AutoPtr<FEBase> point_fe (FEBase::build(dim, fe_type));
+            const std::vector<std::vector<RealGradient> >& dphi = point_fe->get_dphi();
+            point_fe->reinit(element, &point_list);
+	    
+	    // where the solution values for the var-th variable are stored
+	    std::vector<unsigned int> dof_indices;
+	    this->_dof_map.dof_indices (element, dof_indices, var);
+	      
+	    // interpolate the solution
+	    Gradient grad(0.);
+		
+	    for (unsigned int i=0; i<dof_indices.size(); i++)
+	      grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
+		
+	    output[index] = grad;
 	  }
       }
     }
