@@ -3,7 +3,8 @@
 *.o
 *.pgo
 *.syo
-ex12
+ex14
+ex14-*
 *.gmv
 ii_files
 so_locations
@@ -12,8 +13,7 @@ gmon.out
 *.unv
 *.gz
 *.gmv.*
-ex13
-ex14
 *.m
 *.fig
 .nfs*
+.*.swp

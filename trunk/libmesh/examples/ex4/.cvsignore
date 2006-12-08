@@ -4,6 +4,7 @@
 *.pgo
 *.syo
 ex4
+ex4-*
 out_*.gmv
 ii_files
 so_locations
@@ -12,3 +13,4 @@ gmon.out
 out_1
 out_1_data
 .nfs*
+.*.swp

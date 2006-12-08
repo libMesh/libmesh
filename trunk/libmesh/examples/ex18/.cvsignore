@@ -12,4 +12,6 @@ gmon.out
 *.gz
 *.gmv.*
 ex18
+ex18-*
 .nfs*
+.*.swp
