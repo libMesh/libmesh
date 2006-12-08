@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2006-11-11 16:35:33 roystgnr Exp $
+# $Id: Makefile,v 1.7 2006-12-08 03:19:07 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -30,14 +30,14 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   :=  ex13
+target 	   :=  ./ex13-$(METHOD)
 #target 	   :=  ex13 ex13_nonlinear
 
 
 all:: $(target)
 
 # Production rules:  how to make the target - depends on library configuration
-%: $(patsubst %.C, %.$(obj-suffix), %.C)
+%-$(METHOD): $(patsubst %.C, %.$(obj-suffix), %.C)
 	@echo "Linking "$@"..."
 	$(CXX) $(CXXFLAGS) $< -o $@ $(LIBS) $(LDFLAGS) $(EXTERNAL_FLAGS)
 
@@ -60,7 +60,7 @@ run: $(target)
 	@echo "* Running Example " $(target)
 	@echo "***************************************************************"
 	@echo " "
-	@./ex13
+	@$(target)
 	@#./ex13_nonlinear -snes_ls cubic -snes_max_it 10 -ksp_rtol 1.e-3 -ksp_max_it 50 -ksp_xmonitor -ksp_gmres_restart 25 -snes_mf_operator -snes_view 
 	@echo " "
 	@echo "***************************************************************"
@@ -76,7 +76,7 @@ include .depend
 # Dependencies
 #
 .depend:
-	@$(perl) $(meshdir)/contrib/bin/make_dependencies.pl $(foreach i, $(wildcard ../../include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
+	@$(perl) $(meshdir)/contrib/bin/make_dependencies.pl -I. $(foreach i, $(wildcard ../../include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
 	@echo "Updated .depend"
 
 ###############################################################################
