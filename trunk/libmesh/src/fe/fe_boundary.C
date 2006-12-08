@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.45 2006-12-07 21:46:31 jwpeterson Exp $
+// $Id: fe_boundary.C,v 1.46 2006-12-08 00:50:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -86,21 +86,18 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // initialize quadrature rule
   qrule->init(side->type(), elem->p_level());
 
-  // The last side we computed the shape functions for
-  static unsigned int last_s = libMesh::invalid_uint;
-
   // FIXME - could this break if the same FE object was used
   // for both volume and face integrals? - RHS
   // We might not need to reinitialize the shape functions
   if ((this->get_type() != elem->type()) ||
-      (s != last_s) ||
+      (s != last_side) ||
       this->shapes_need_reinit())
     {
       // Set the element type
       elem_type = elem->type();
 
-      // Set the last_s
-      last_s = s;
+      // Set the last_side
+      last_side = s;
       
       // Initialize the face shape functions
       this->init_face_shape_functions (qrule->get_points(),  side.get());
@@ -143,19 +140,16 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
   // initialize quadrature rule
   qrule->init(edge->type(), elem->p_level());
 
-  // The last edge we computed the shape functions for
-  static unsigned int last_e = libMesh::invalid_uint;
-
   // We might not need to reinitialize the shape functions
   if ((this->get_type() != elem->type()) ||
-      (e != last_e) ||
+      (e != last_edge) ||
       this->shapes_need_reinit())
     {
       // Set the element type
       elem_type = elem->type();
 
-      // Set the last_e
-      last_e = e;
+      // Set the last_edge
+      last_edge = e;
       
       // Initialize the edge shape functions
       this->init_edge_shape_functions (qrule->get_points(), edge.get());

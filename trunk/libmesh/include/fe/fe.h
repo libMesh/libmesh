@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.26 2006-11-10 20:19:10 roystgnr Exp $
+// $Id: fe.h,v 1.27 2006-12-08 00:50:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,7 @@
 
 // Local includes
 #include "fe_base.h"
+#include "libmesh.h"
 
 // forward declarations
 class DofConstraints;
@@ -54,7 +55,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.26 $
+ * \version $Revision: 1.27 $
  */
 
 //-------------------------------------------------------------
@@ -437,6 +438,11 @@ protected:
    * element we computed on
    */
   std::vector<Point> cached_nodes;
+
+  /**
+   * The last side and last edge we did a reinit on
+   */
+  unsigned int last_side, last_edge;
 };
 
 
@@ -447,7 +453,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.26 $
+ * \version $Revision: 1.27 $
  */
 
 //-------------------------------------------------------------
@@ -472,7 +478,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2005
- * \version $Revision: 1.26 $
+ * \version $Revision: 1.27 $
  */
 
 //-------------------------------------------------------------
@@ -507,7 +513,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.26 $
+ * \version $Revision: 1.27 $
  */
 
 //-------------------------------------------------------------
@@ -532,7 +538,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.26 $
+ * \version $Revision: 1.27 $
  */
 
 //-------------------------------------------------------------
@@ -557,7 +563,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.26 $
+ * \version $Revision: 1.27 $
  */
 
 //-------------------------------------------------------------
@@ -583,7 +589,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.26 $
+ * \version $Revision: 1.27 $
  */
 
 //-------------------------------------------------------------
@@ -727,7 +733,9 @@ namespace FiniteElements
 template <unsigned int Dim, FEFamily T>
 inline
 FE<Dim,T>::FE (const FEType& fet) :
-  FEBase (Dim,fet)
+  FEBase (Dim,fet),
+  last_side(libMesh::invalid_uint),
+  last_edge(libMesh::invalid_uint)
 {
   // Sanity check.  Make sure the
   // Family specified in the template instantiation
