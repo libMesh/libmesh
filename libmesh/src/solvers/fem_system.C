@@ -1,6 +1,7 @@
 #include "dof_map.h"
 #include "elem.h"
 #include "fe_base.h"
+#include "fe_interface.h"
 #include "equation_systems.h"
 #include "fem_system.h"
 #include "libmesh_logging.h"
@@ -187,6 +188,33 @@ Tensor FEMSystem::side_hessian(unsigned int var, unsigned int qp)
   return d2u;
 }
 #endif // ifdef ENABLE_SECOND_DERIVATIVES
+
+
+
+Number FEMSystem::point_value(unsigned int var, Point &p)
+{
+  // Get local-to-global dof index lookup
+  assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  
+  // Get current local coefficients
+  assert (elem_subsolutions.size() > var);
+  assert (elem_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+
+  Number u = 0.;
+
+  unsigned int dim = get_mesh().mesh_dimension();
+  FEType fe_type = element_fe_var[var]->get_fe_type();
+  Point p_master = FEInterface::inverse_map(dim, fe_type, elem, p);
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    u += FEInterface::shape(dim, fe_type, elem, l, p_master)
+         * coef(l);
+
+  return u;
+}
 
 
 
