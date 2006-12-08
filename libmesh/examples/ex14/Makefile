@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.9 2006-11-11 16:35:33 roystgnr Exp $
+# $Id: Makefile,v 1.10 2006-12-08 03:19:07 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -30,7 +30,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target  := ./ex14
+target  := ./ex14-$(METHOD)
 
 ifeq ($(petsc-version), 2.3.0)
 #args := -pc_type jacobi #ILU detects 0 pivot in petsc 2.3.0
@@ -88,7 +88,7 @@ include .depend
 # Dependencies
 #
 .depend:
-	@$(perl) $(meshdir)/contrib/bin/make_dependencies.pl $(foreach i, $(wildcard ../../include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
+	@$(perl) $(meshdir)/contrib/bin/make_dependencies.pl -I. $(foreach i, $(wildcard ../../include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
 	@echo "Updated .depend"
 
 ###############################################################################

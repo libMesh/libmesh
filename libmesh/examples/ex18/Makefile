@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2006-11-11 16:35:34 roystgnr Exp $
+# $Id: Makefile,v 1.5 2006-12-08 03:19:07 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -30,7 +30,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   := ./ex18
+target 	   := ./ex18-$(METHOD)
 
 
 all:: $(target)
@@ -66,10 +66,10 @@ run: $(target)
 
 ilu2: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(target) -pc_ilu_levels 2 -pc_factor_zeropivot 0
+	@echo "* Running Example " $(target) -pc_factor_levels 2 -pc_factor_zeropivot 0
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) -pc_ilu_levels 2 -pc_factor_zeropivot 0
+	@$(target) -pc_factor_levels 2 -pc_factor_zeropivot 0
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)
@@ -77,10 +77,10 @@ ilu2: $(target)
 
 ilu4: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(target) -pc_ilu_levels 4 -pc_factor_zeropivot 0
+	@echo "* Running Example " $(target) -pc_factor_levels 4 -pc_factor_zeropivot 0
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) -pc_ilu_levels 4 -pc_factor_zeropivot 0
+	@$(target) -pc_factor_levels 4 -pc_factor_zeropivot 0
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)
@@ -106,7 +106,7 @@ include .depend
 # Dependencies
 #
 .depend:
-	@$(perl) $(meshdir)/contrib/bin/make_dependencies.pl $(foreach i, $(wildcard ../../include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
+	@$(perl) $(meshdir)/contrib/bin/make_dependencies.pl -I. $(foreach i, $(wildcard ../../include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
 	@echo "Updated .depend"
 
 ###############################################################################
