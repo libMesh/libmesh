@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.C,v 1.14 2006-10-26 17:15:59 roystgnr Exp $
+// $Id: fourth_error_estimators.C,v 1.15 2006-12-08 01:45:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,6 @@
 #include "error_vector.h"
 #include "fe.h"
 #include "fe_interface.h"
-#include "quadrature_gauss.h"
 #include "libmesh_logging.h"
 #include "elem.h"
 #include "mesh.h"
