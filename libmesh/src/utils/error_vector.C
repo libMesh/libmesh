@@ -1,4 +1,4 @@
-// $Id: error_vector.C,v 1.13 2006-10-27 20:02:57 roystgnr Exp $
+// $Id: error_vector.C,v 1.14 2006-12-08 16:50:04 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -242,7 +242,8 @@ void ErrorVector::plot_error(std::string filename, Mesh& oldmesh) const
     const unsigned int solution_index = dof_indices[0];
     // std::cout << "elem_number=" << elem_number << std::endl;
     assert (elem_id < (*this).size());
-    assert ((*this)[elem_id] > 0.);
+//  We may have zero error values in special circumstances
+//    assert ((*this)[elem_id] > 0.);
     error_system.solution->set(solution_index, (*this)[elem_id]);
   }
 
