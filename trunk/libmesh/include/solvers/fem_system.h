@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.10 2006-10-20 21:30:22 roystgnr Exp $
+// $Id: fem_system.h,v 1.11 2006-12-08 00:48:41 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -137,39 +137,45 @@ public:
   bool fe_reinit_during_postprocess;
 
   /**
-   * Returns the value of the solution variable \p at the quadrature
-   * point \qp on the current element interior
+   * Returns the value of the solution variable \p var at the quadrature
+   * point \p qp on the current element interior
    */
   Number interior_value(unsigned int var, unsigned int qp);
 
   /**
-   * Returns the value of the solution variable \p at the quadrature
-   * point \qp on the current element side
+   * Returns the value of the solution variable \p var at the quadrature
+   * point \p qp on the current element side
    */
   Number side_value(unsigned int var, unsigned int qp);
 
   /**
-   * Returns the gradient of the solution variable \p at the quadrature
-   * point \qp on the current element interior
+   * Returns the value of the solution variable \p var at the physical
+   * point \p p on the current element
+   */
+  Number point_value(unsigned int var, Point &p);
+
+  /**
+   * Returns the gradient of the solution variable \p var at the quadrature
+   * point \p qp on the current element interior
    */
   Gradient interior_gradient(unsigned int var, unsigned int qp);
 
   /**
-   * Returns the gradient of the solution variable \p at the quadrature
-   * point \qp on the current element side
+   * Returns the gradient of the solution variable \p var at the quadrature
+   * point \p qp on the current element side
    */
   Gradient side_gradient(unsigned int var, unsigned int qp);
 
 #ifdef ENABLE_SECOND_DERIVATIVES
   /**
-   * Returns the hessian of the solution variable \p at the quadrature
-   * point \qp on the current element interior
+   * Returns the hessian of the solution variable \p var at the quadrature
+   * point \p qp on the current element interior
    */
   Tensor interior_hessian(unsigned int var, unsigned int qp);
 
   /**
-   * Returns the hessian of the solution variable \p at the quadrature
-   * point \qp on the current element side
+   * Returns the hessian of the solution variable \p var at the quadrature
+   * point \p qp on the current element side
    */
   Tensor side_hessian(unsigned int var, unsigned int qp);
 #endif // ENABLE_SECOND_DERIVATIVES
