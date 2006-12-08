@@ -45,6 +45,7 @@ ex14.$(obj-suffix):\
     ../../include/numerics/hp_coarsentest.h\
     ../../include/numerics/hp_selector.h\
     ../../include/numerics/hp_singular.h\
+    ../../include/numerics/jump_error_estimator.h\
     ../../include/numerics/kelly_error_estimator.h\
     ../../include/numerics/numeric_vector.h\
     ../../include/numerics/sparse_matrix.h\

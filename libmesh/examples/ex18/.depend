@@ -1,23 +1,29 @@
 ex18.$(obj-suffix):\
     ex18.C\
     ../../include/base/auto_ptr.h\
+    ../../include/base/dof_object.h\
     ../../include/base/getpot.h\
     ../../include/base/libmesh.h\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
     ../../include/base/libmesh_config.h\
     ../../include/base/multi_predicates.h\
+    ../../include/base/node.h\
     ../../include/base/reference_counted_object.h\
     ../../include/base/reference_counter.h\
     ../../include/base/single_predicates.h\
     ../../include/base/variant_filter_iterator.h\
+    ../../include/enums/enum_elem_quality.h\
     ../../include/enums/enum_elem_type.h\
     ../../include/enums/enum_fe_family.h\
     ../../include/enums/enum_inf_map_type.h\
+    ../../include/enums/enum_io_package.h\
     ../../include/enums/enum_order.h\
     ../../include/enums/enum_solver_package.h\
     ../../include/enums/enum_xdr_mode.h\
+    ../../include/fe/fe_base.h\
     ../../include/fe/fe_type.h\
+    ../../include/geom/elem.h\
     ../../include/geom/point.h\
     ../../include/mesh/gmv_io.h\
     ../../include/mesh/mesh.h\
@@ -25,14 +31,26 @@ ex18.$(obj-suffix):\
     ../../include/mesh/mesh_generation.h\
     ../../include/mesh/mesh_output.h\
     ../../include/mesh/mesh_refinement.h\
+    ../../include/numerics/dense_matrix.h\
+    ../../include/numerics/dense_matrix_base.h\
+    ../../include/numerics/dense_submatrix.h\
+    ../../include/numerics/dense_subvector.h\
+    ../../include/numerics/dense_vector.h\
+    ../../include/numerics/dense_vector_base.h\
     ../../include/numerics/error_estimator.h\
+    ../../include/numerics/jump_error_estimator.h\
     ../../include/numerics/kelly_error_estimator.h\
+    ../../include/numerics/tensor_value.h\
+    ../../include/numerics/type_tensor.h\
     ../../include/numerics/type_vector.h\
     ../../include/numerics/uniform_refinement_estimator.h\
+    ../../include/numerics/vector_value.h\
     ../../include/solvers/diff_solver.h\
+    ../../include/solvers/diff_system.h\
     ../../include/solvers/equation_systems.h\
     ../../include/solvers/euler_solver.h\
     ../../include/solvers/explicit_system.h\
+    ../../include/solvers/fem_system.h\
     ../../include/solvers/frequency_system.h\
     ../../include/solvers/implicit_system.h\
     ../../include/solvers/linear_implicit_system.h\
@@ -46,25 +64,56 @@ ex18.$(obj-suffix):\
     ../../include/utils/o_string_stream.h\
     ../../include/utils/parameters.h\
     ../../include/utils/perf_log.h\
-    ../../include/utils/statistics.h
+    ../../include/utils/statistics.h\
+    naviersystem.h
 naviersystem.$(obj-suffix):\
     naviersystem.C\
     ../../include/base/auto_ptr.h\
+    ../../include/base/dof_object.h\
+    ../../include/base/libmesh.h\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
     ../../include/base/libmesh_config.h\
+    ../../include/base/multi_predicates.h\
+    ../../include/base/node.h\
     ../../include/base/reference_counted_object.h\
     ../../include/base/reference_counter.h\
+    ../../include/base/single_predicates.h\
+    ../../include/base/variant_filter_iterator.h\
+    ../../include/enums/enum_elem_quality.h\
     ../../include/enums/enum_elem_type.h\
     ../../include/enums/enum_fe_family.h\
     ../../include/enums/enum_inf_map_type.h\
+    ../../include/enums/enum_io_package.h\
     ../../include/enums/enum_order.h\
     ../../include/enums/enum_quadrature_type.h\
+    ../../include/enums/enum_solver_package.h\
     ../../include/fe/fe_base.h\
+    ../../include/fe/fe_interface.h\
     ../../include/fe/fe_type.h\
+    ../../include/geom/elem.h\
     ../../include/geom/point.h\
+    ../../include/mesh/boundary_info.h\
+    ../../include/mesh/mesh.h\
+    ../../include/mesh/mesh_base.h\
+    ../../include/numerics/dense_matrix.h\
+    ../../include/numerics/dense_matrix_base.h\
+    ../../include/numerics/dense_submatrix.h\
+    ../../include/numerics/dense_subvector.h\
+    ../../include/numerics/dense_vector.h\
+    ../../include/numerics/dense_vector_base.h\
     ../../include/numerics/tensor_value.h\
     ../../include/numerics/type_tensor.h\
     ../../include/numerics/type_vector.h\
     ../../include/numerics/vector_value.h\
-    ../../include/quadrature/quadrature.h
+    ../../include/quadrature/quadrature.h\
+    ../../include/solvers/diff_system.h\
+    ../../include/solvers/explicit_system.h\
+    ../../include/solvers/fem_system.h\
+    ../../include/solvers/implicit_system.h\
+    ../../include/solvers/linear_implicit_system.h\
+    ../../include/solvers/system.h\
+    ../../include/solvers/transient_system.h\
+    ../../include/utils/o_string_stream.h\
+    ../../include/utils/perf_log.h\
+    naviersystem.h

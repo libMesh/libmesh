@@ -41,6 +41,7 @@ ex15.$(obj-suffix):\
     ../../include/numerics/dense_vector_base.h\
     ../../include/numerics/error_estimator.h\
     ../../include/numerics/fourth_error_estimators.h\
+    ../../include/numerics/jump_error_estimator.h\
     ../../include/numerics/numeric_vector.h\
     ../../include/numerics/sparse_matrix.h\
     ../../include/numerics/tensor_value.h\
