@@ -15,16 +15,22 @@ transient = true
 deltat = 0.005
 
 # And the number of timesteps to take
-n_timesteps = 20
+n_timesteps = 15
 
 # Write out every nth timestep to file.
-write_interval = 10
+write_interval = 1
 
 # The coarse grid size from which to start adaptivity
-coarsegridsize = 10
+coarsegridsize = 20
 
 # The maximum number of adaptive steps per timestep
-max_adaptivesteps = 10
+max_adaptivesteps = 0
 
 # Turn this off to see the NewtonSolver chatter
-solver_quiet = false
+solver_quiet = true
+
+# Solve the 2D or 3D problem
+dimension = 2
+
+# Nonlinear solver tolerance
+relative_step_tolerance = 1e-3

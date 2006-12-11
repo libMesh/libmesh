@@ -1,4 +1,4 @@
-/* $Id: naviersystem.h,v 1.1 2006-06-29 20:49:42 roystgnr Exp $ */
+/* $Id: naviersystem.h,v 1.2 2006-12-11 23:17:54 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -30,7 +30,7 @@ public:
   NavierSystem(EquationSystems& es,
                const std::string& name,
                const unsigned int number)
-  : FEMSystem(es, name, number), Reynolds(10.) {}
+  : FEMSystem(es, name, number), Reynolds(1.) {}
 
   // System initialization
   virtual void init_data ();
@@ -42,6 +42,9 @@ public:
   // Constraint parts
   virtual bool element_constraint (bool request_jacobian);
   virtual bool side_constraint (bool request_jacobian);
+
+  // Indices for each variable;
+  unsigned int p_var, u_var, v_var, w_var;
 
   // Finite elements for the velocity and pressure on element interiors
   FEBase *fe_velocity, *fe_pressure;

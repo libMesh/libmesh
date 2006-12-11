@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.12 2006-10-23 22:07:30 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.13 2006-12-11 23:17:54 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -63,9 +63,11 @@ int main (int argc, char** argv)
     const unsigned int coarsegridsize    = infile("coarsegridsize", 1);
     const unsigned int coarserefinements = infile("coarserefinements", 0);
     const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
+    const unsigned int dim               = infile("dimension", 2);
 
-    // Create a two-dimensional mesh.
-    Mesh mesh (2);
+    assert (dim == 2 || dim == 3);
+    // Create a n-dimensional mesh.
+    Mesh mesh (dim);
     
     // And an object to refine it
     MeshRefinement mesh_refinement(mesh);
@@ -81,12 +83,22 @@ int main (int argc, char** argv)
     // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
     // elements in 3D.  Building these higher-order elements allows
     // us to use higher-order approximation, as in example 3.
-    MeshTools::Generation::build_square (mesh,
+    if (dim == 2)
+      MeshTools::Generation::build_square (mesh,
+                                           coarsegridsize,
+                                           coarsegridsize,
+                                           0., 1.,
+                                           0., 1.,
+                                           QUAD9);
+    else if (dim == 3)
+      MeshTools::Generation::build_cube (mesh,
+                                         coarsegridsize,
                                          coarsegridsize,
                                          coarsegridsize,
                                          0., 1.,
                                          0., 1.,
-                                         QUAD9);
+                                         0., 1.,
+                                         HEX27);
 
     mesh_refinement.uniformly_refine(coarserefinements);
 
@@ -125,7 +137,7 @@ int main (int argc, char** argv)
     solver.relative_step_tolerance =
       infile("relative_step_tolerance", 1.e-3);
     solver.relative_residual_tolerance =
-      infile("relative_residual_tolerance", 1.e-3);
+      infile("relative_residual_tolerance", 0);
 
     // And the linear solver options
     solver.max_linear_iterations =
@@ -187,22 +199,24 @@ int main (int argc, char** argv)
             // Calculate error based on u and v but not p
             error_estimator->component_scale.push_back(1.0); // u
             error_estimator->component_scale.push_back(1.0); // v
+            if (dim == 3)
+              error_estimator->component_scale.push_back(1.0); // w
             error_estimator->component_scale.push_back(0.0); // p
 
             error_estimator->estimate_error(system, error);
 
             // Print out status at each adaptive step.
             Real global_error = error.l2_norm();
-            std::cerr << "adaptive step " << a_step << ": ";
+            std::cout << "adaptive step " << a_step << ": ";
             if (global_tolerance != 0.)
-              std::cerr << "global_error = " << global_error
+              std::cout << "global_error = " << global_error
                         << " with ";
-            std::cerr << mesh.n_active_elem()
+            std::cout << mesh.n_active_elem()
                       << " active elements and "
                       << equation_systems.n_active_dofs()
                       << " active dofs." << std::endl;
             if (global_tolerance != 0.)
-              std::cerr << "worst element error = " << error.maximum()
+              std::cout << "worst element error = " << error.maximum()
                         << ", mean = " << error.mean() << std::endl;
 
             if (global_tolerance != 0.)
