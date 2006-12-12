@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.23 2006-10-30 23:04:37 roystgnr Exp $
+// $Id: mesh_modification.C,v 1.24 2006-12-12 23:28:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -220,6 +220,130 @@ void MeshTools::Modification::scale (MeshBase& mesh,
 
 // ------------------------------------------------------------
 // Mesh class member functions for mesh modification
+void Mesh::all_first_order ()
+{
+  /*
+   * when the mesh is not prepared,
+   * at least renumber the nodes and 
+   * elements, so that the node ids
+   * are correct
+   */
+  if (!this->_is_prepared)
+    this->renumber_nodes_and_elements ();
+
+  START_LOG("all_first_order()", "Mesh");
+
+  /*
+   * Store some parent ID data to make it possible
+   * to reconstruct the adaptivity tree
+   */
+  std::vector<unsigned int> parent_ids(_elements.size());
+  for (unsigned int e=0; e<_elements.size(); e++)
+    {
+      Elem* parent = _elements[e]->parent();
+      if (parent)
+        {
+          assert(parent == _elements[parent->id()]);
+          parent_ids[e] = parent->id();
+        }
+    }
+
+  /**
+   * Loop over the high-ordered elements in the _elements vector.
+   * First make sure they _are_ indeed high-order, and then replace
+   * them with an equivalent first-order element.
+   */
+  for (unsigned int e=0; e<_elements.size(); e++)
+    {
+      // the second-order element
+      Elem* so_elem = _elements[e];
+
+      assert (so_elem != NULL);
+
+      // make sure it is linear order
+      if (so_elem->default_order() != SECOND)
+        {	  
+	  std::cerr << "ERROR: This is not a second order element: type=" 
+		    << so_elem->type() << std::endl;
+	  error();
+	}
+
+      /*
+       * build the first-order equivalent, add to
+       * the new_elements list.
+       */
+      Elem *newparent = so_elem->parent() ?
+        _elements[parent_ids[e]] : NULL;
+      Elem* lo_elem = Elem::build
+        (Elem::first_order_equivalent_type
+          (so_elem->type()), newparent).release();
+
+      /*
+       * Add this element to it's parent if it has one
+       */
+      if (newparent)
+        newparent->add_child(lo_elem);
+
+      assert (lo_elem->n_vertices() == so_elem->n_vertices());
+
+      /*
+       * By definition the vertices of the linear and
+       * second order element are identically numbered.
+       * transfer these.
+       */
+      for (unsigned int v=0; v < so_elem->n_vertices(); v++)
+	lo_elem->set_node(v) = so_elem->get_node(v);
+
+      /*
+       * Copy as much data to the new element as makes sense
+       */
+      lo_elem->set_p_level(so_elem->p_level());
+      lo_elem->set_refinement_flag(so_elem->refinement_flag());
+      lo_elem->set_p_refinement_flag(so_elem->p_refinement_flag());
+
+      /**
+       * If the second order element had any boundary conditions they
+       * should be transfered to the first-order element, and then
+       * removed from the BoundaryInfo data structure.
+       */
+      {
+	assert (lo_elem->n_sides() == so_elem->n_sides());
+	
+	for (unsigned int s=0; s<so_elem->n_sides(); s++)
+	  {
+	    const short int boundary_id =
+	      this->boundary_info->boundary_id (so_elem, s);
+	    
+	    if (boundary_id != this->boundary_info->invalid_id)
+	      this->boundary_info->add_side (lo_elem, s, boundary_id);
+	  }
+	
+	/**
+	 * We have taken any boundary conditions the second-order
+	 * element may have had.  Since we are about to delete
+	 * the second-order element, we should first un-associate
+	 * any boundary conditions it has.
+	 */
+	this->boundary_info->remove (so_elem);
+      }
+
+      /*
+       * The new first-order element is ready.
+       * Delete the second-order element and replace it with
+       * the first-order element.
+       */
+      delete so_elem;
+      _elements[e] = lo_elem;
+    }
+
+  STOP_LOG("all_first_order()", "Mesh");
+
+  // delete or renumber nodes, etc
+  this->prepare_for_use();
+}
+
+
+
 void Mesh::all_second_order (const bool full_ordered)
 {
   /*
@@ -249,7 +373,6 @@ void Mesh::all_second_order (const bool full_ordered)
    * make sure that these are correctly numbered.
    */
   std::map<std::vector<unsigned int>, Node*> adj_vertices_to_so_nodes;
-
 
   /*
    * for speed-up of the \p add_point() method, we

@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.17 2006-11-15 23:50:59 jwpeterson Exp $
+// $Id: mesh.h,v 1.18 2006-12-12 23:28:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -101,6 +101,14 @@ class Mesh : public MeshBase
    * Clear all internal data.
    */
   void clear();
+
+  /**
+   * Converts a mesh with higher-order
+   * elements into a mesh with linear elements.  For 
+   * example, a mesh consisting of \p Tet10 will be converted
+   * to a mesh with \p Tet4 etc.
+   */
+  void all_first_order ();
 
   /**
    * Converts a (conforming, non-refined) mesh with linear 
