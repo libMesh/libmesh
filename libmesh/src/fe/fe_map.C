@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.45 2006-12-05 19:07:54 jwpeterson Exp $
+// $Id: fe_map.C,v 1.46 2006-12-12 19:32:23 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -197,7 +197,7 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
 
 	dxyzdxi_map[0].zero();
 	dxyzdeta_map[0].zero();
-#ifdef ENABLE_SECOND_D0RIVATIVES
+#ifdef ENABLE_SECOND_DERIVATIVES
 	d2xyzdxi2_map[0].zero();
 	d2xyzdxideta_map[0].zero();
 	d2xyzdeta2_map[0].zero();
