@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.46 2006-12-12 19:32:23 jwpeterson Exp $
+// $Id: fe_map.C,v 1.47 2006-12-13 20:36:39 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -86,16 +86,14 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
 	      xyz[p].add_scaled        (elem_point, phi_map[i][p]    );
 	      
 	    dxyzdxi_map[0].add_scaled(elem_point, dphidxi_map[i][0]);
-#ifdef ENABLE_SECOND_DERIVATIVES
-	    d2xyzdxi2_map[0].add_scaled(elem_point, d2phidxi2_map[i][0]);
-#endif
 	  }
 
 	for (unsigned int p=1; p<n_qp; p++) // for each extra quadrature point
           {
 	    dxyzdxi_map[p] = dxyzdxi_map[0];
 #ifdef ENABLE_SECOND_DERIVATIVES
-	    d2xyzdxi2_map[p] = d2xyzdxi2_map[0];
+            // The map should be affine, so second derivatives are zero
+	    d2xyzdxi2_map[p] = 0.;
 #endif
           }
 
@@ -216,14 +214,6 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
 
 	    dxyzdxi_map[0].add_scaled  (elem_point, dphidxi_map[i][0] );
 	    dxyzdeta_map[0].add_scaled (elem_point, dphideta_map[i][0]);
-#ifdef ENABLE_SECOND_DERIVATIVES
-	    d2xyzdxi2_map[0].add_scaled    (elem_point,
-					    d2phidxi2_map[i][0]);
-	    d2xyzdxideta_map[0].add_scaled (elem_point,
-					    d2phidxideta_map[i][0]);
-	    d2xyzdeta2_map[0].add_scaled   (elem_point,
-					    d2phideta2_map[i][0]);
-#endif
 	  }
 
 	for (unsigned int p=1; p<n_qp; p++) // for each extra quadrature point
@@ -231,9 +221,10 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
 	    dxyzdxi_map[p] = dxyzdxi_map[0];
 	    dxyzdeta_map[p] = dxyzdeta_map[0];
 #ifdef ENABLE_SECOND_DERIVATIVES
-	    d2xyzdxi2_map[p] = d2xyzdxi2_map[0];
-	    d2xyzdxideta_map[p] = d2xyzdxideta_map[0];
-	    d2xyzdeta2_map[p] = d2xyzdeta2_map[0];
+            // The map should be affine, so second derivatives are zero
+	    d2xyzdxi2_map[p] = 0.;
+	    d2xyzdxideta_map[p] = 0.;
+	    d2xyzdeta2_map[p] = 0.;
 #endif
           }
 	
@@ -437,32 +428,19 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
 	    dxyzdxi_map[0].add_scaled   (elem_point, dphidxi_map[i][0]  );
 	    dxyzdeta_map[0].add_scaled  (elem_point, dphideta_map[i][0] );
 	    dxyzdzeta_map[0].add_scaled (elem_point, dphidzeta_map[i][0]);
-#ifdef ENABLE_SECOND_DERIVATIVES
-	    d2xyzdxi2_map[0].add_scaled      (elem_point,
-					      d2phidxi2_map[i][0]);
-	    d2xyzdxideta_map[0].add_scaled   (elem_point,
-					      d2phidxideta_map[i][0]);
-	    d2xyzdxidzeta_map[0].add_scaled  (elem_point,
-					      d2phidxidzeta_map[i][0]);
-	    d2xyzdeta2_map[0].add_scaled     (elem_point,
-					      d2phideta2_map[i][0]);
-	    d2xyzdetadzeta_map[0].add_scaled (elem_point,
-					      d2phidetadzeta_map[i][0]);
-	    d2xyzdzeta2_map[0].add_scaled    (elem_point,
-					      d2phidzeta2_map[i][0]);
-#endif
 	    for (unsigned int p=0; p<n_qp; p++) // for each extra quadrature point
               {
 	        dxyzdxi_map[p] = dxyzdxi_map[0];
 	        dxyzdeta_map[p] = dxyzdeta_map[0];
 	        dxyzdzeta_map[p] = dxyzdzeta_map[0];
 #ifdef ENABLE_SECOND_DERIVATIVES
-	        d2xyzdxi2_map[p] = d2xyzdxi2_map[0];
-	        d2xyzdxideta_map[p] = d2xyzdxideta_map[0];
-	        d2xyzdxidzeta_map[p] = d2xyzdxidzeta_map[0];
-	        d2xyzdeta2_map[p] = d2xyzdeta2_map[0];
-	        d2xyzdetadzeta_map[p] = d2xyzdetadzeta_map[0];
-	        d2xyzdzeta2_map[p] = d2xyzdzeta2_map[0];
+                // The map should be affine, so second derivatives are zero
+	        d2xyzdxi2_map[p] = 0.;
+	        d2xyzdxideta_map[p] = 0.;
+	        d2xyzdxidzeta_map[p] = 0.;
+	        d2xyzdeta2_map[p] = 0.;
+	        d2xyzdetadzeta_map[p] = 0.;
+	        d2xyzdzeta2_map[p] = 0.;
 #endif
 	      }
 	  }
