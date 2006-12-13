@@ -1,4 +1,4 @@
-// $Id: fe_lagrange_shape_3D.C,v 1.16 2006-03-29 18:47:23 roystgnr Exp $
+// $Id: fe_lagrange_shape_3D.C,v 1.17 2006-12-13 15:37:23 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1335,13 +1335,72 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
 	    // quadratic tetrahedral shape functions	    
 	  case TET10:
 	    {
-              static bool warning_given_TET10 = false;
+	      // The area coordinates are the same as used for the
+	      // shape() and shape_deriv() functions.
+	      // const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+	      // const Real zeta1 = p(0);
+	      // const Real zeta2 = p(1);
+	      // const Real zeta3 = p(2);
+	      static const Real dzetadxi[4][3] =
+		{
+		  {-1., -1., -1.},
+		  {1.,   0.,  0.},
+		  {0.,   1.,  0.},
+		  {0.,   0.,  1.}
+		};
 
-              if (!warning_given_TET10)
-              std::cerr << "Second derivatives for 2D Lagrangian TET10"
-                        << " elements are not yet implemented!"
-                        << std::endl;
-              warning_given_TET10 = true;
+	      // Convert from j -> (j,k) indices for independent variable
+	      // (0=xi, 1=eta, 2=zeta)
+	      static const unsigned short int independent_var_indices[6][2] =
+		{
+		  {0, 0}, // d^2 phi / dxi^2
+		  {0, 1}, // d^2 phi / dxi deta
+		  {1, 1}, // d^2 phi / deta^2
+		  {0, 2}, // d^2 phi / dxi dzeta
+		  {1, 2}, // d^2 phi / deta dzeta
+		  {2, 2}  // d^2 phi / dzeta^2
+		};
+
+	      // Convert from i -> zeta indices.  Each quadratic shape
+	      // function for the Tet10 depends on up to two of the zeta
+	      // area coordinate functions (see the shape() function above).
+	      // This table just tells which two area coords it uses.
+	      static const unsigned short int zeta_indices[10][2] =
+		{
+		  {0, 0}, 
+		  {1, 1}, 
+		  {2, 2}, 
+		  {3, 3},
+		  {0, 1}, 		  
+		  {1, 2}, 
+		  {2, 0},
+		  {0, 3},
+		  {1, 3},
+		  {2, 3},  		  		  
+		};
+
+	      // Look up the independent variable indices for this value of j.
+	      const unsigned int my_j = independent_var_indices[j][0];
+	      const unsigned int my_k = independent_var_indices[j][1];
+	      
+	      if (i<4)
+		{
+		  return 4.*dzetadxi[i][my_j]*dzetadxi[i][my_k];
+		}
+	      
+	      else if (i<10)
+		{
+		  const unsigned short int my_m = zeta_indices[i][0];
+		  const unsigned short int my_n = zeta_indices[i][1];
+
+		  return 4.*(dzetadxi[my_n][my_j]*dzetadxi[my_m][my_k] +
+			     dzetadxi[my_m][my_j]*dzetadxi[my_n][my_k] );
+		}
+	      else
+		{
+		  std::cerr<< "Invalid shape function index " << i << std::endl;
+		  error();
+		}
 	    }
 
 	    
