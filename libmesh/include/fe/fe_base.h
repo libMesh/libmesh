@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.25 2006-10-26 04:13:56 roystgnr Exp $
+// $Id: fe_base.h,v 1.26 2006-12-13 23:45:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -608,9 +608,22 @@ protected:
    */
   virtual void compute_affine_map(const std::vector<Real>& qw,
 		   const Elem* e);
+
+  /**
+   * Compute the jacobian and some other additional
+   * data fields at the single point with index p.
+   */
+  void compute_single_point_map(const std::vector<Real>& qw,
+		                const Elem* e,
+				unsigned int p);
   
+  /**
+   * A utility function for use by compute_*_map
+   */
+  void resize_map_vectors(unsigned int n_qp);
+
   /** 
-   * Same as before, but for a side.  Useful for boundary integration.
+   * Same as compute_map, but for a side.  Useful for boundary integration.
    */  
   void compute_face_map(const std::vector<Real>& qw,
 			const Elem* side);
