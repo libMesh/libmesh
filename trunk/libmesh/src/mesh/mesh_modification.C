@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.24 2006-12-12 23:28:21 roystgnr Exp $
+// $Id: mesh_modification.C,v 1.25 2006-12-14 20:43:49 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -259,14 +259,6 @@ void Mesh::all_first_order ()
       Elem* so_elem = _elements[e];
 
       assert (so_elem != NULL);
-
-      // make sure it is linear order
-      if (so_elem->default_order() != SECOND)
-        {	  
-	  std::cerr << "ERROR: This is not a second order element: type=" 
-		    << so_elem->type() << std::endl;
-	  error();
-	}
 
       /*
        * build the first-order equivalent, add to
