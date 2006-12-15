@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.C,v 1.13 2006-10-24 19:43:34 jwpeterson Exp $
+// $Id: mesh_triangle_support.C,v 1.14 2006-12-15 21:25:53 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,189 +30,14 @@
 
 #ifdef HAVE_TRIANGLE
 
-void MeshTools::Generation::triangulate(Mesh& mesh,
-					const std::vector<Point>& points,
-					const Real desired_area,
-					const ElemType type,
-					const MeshTools::Generation::TriangulationType tt,
-					const bool insert_points)
-{
-  // If the initial PSLG is really simple, e.g. an L-shaped domain or
-  // a square/rectangle, the resulting triangulation will be very
-  // "structured" looking.  Sometimes this is a problem if your
-  // intention is to work with an unstructured grid.  We can attempt
-  // to work around this limitation by inserting midpoints into the
-  // original PSLG.
-  std::vector<Point> new_points = points;
-
-  if ((tt==PSLG) && (insert_points))
-    {
-      new_points.resize  (2*points.size());
-      
-      // Insert a new point on each PSLG at some random location
-      // np=index into new points vector
-      // n =index into original points vector
-      for (unsigned int np=0, n=0; np<new_points.size(); ++np)
-	{
-	  // the even entries are the original points
-	  if (np%2==0)
-	    {
-	      new_points[np] = points[n];
-	      n++;
-	    }
-
-	  else // the odd entries are the midpoints of the original PSLG segments
-	    {
-	      new_points[np] = 0.5*(points[n] + points[n-1]);
-	    }
-	}
-    }
-
-  
-  // Triangle data structure for the mesh
-  Triangle::triangulateio initial;
-  Triangle::triangulateio final;
-
-  // Pseudo-Constructor for the triangle io structs
-  Triangle::init(initial);
-  Triangle::init(final);
-    
-  initial.numberofpoints = new_points.size();
-  initial.pointlist      = static_cast<REAL*>(std::malloc(initial.numberofpoints * 2 * sizeof(REAL)));
-
-  if (tt==PSLG)
-    {
-      initial.numberofsegments = initial.numberofpoints; // n. of segments = n. of points
-      initial.segmentlist      = static_cast<int*>(std::malloc(initial.numberofsegments * 2 * sizeof(int))); // 2 int per segment
-    }
-  
-  // Copy all the point information into the triangle initial struct.
-  for (unsigned int n=0, index=0; n<new_points.size(); ++n, index+=2)
-    {
-      initial.pointlist[index]   = new_points[n](0);
-      initial.pointlist[index+1] = new_points[n](1);
-    }
-
-  // Generate the PSLG segments
-  if (tt==PSLG)
-    for (unsigned int n=0, index=0; n<new_points.size(); ++n, index+=2)
-      {
-	initial.segmentlist[index]   = n;
-	initial.segmentlist[index+1] = (n==new_points.size()-1) ? 0 : n+1;
-      }
-  
-    
-  // Set the triangulation flags.
-  // c ~ enclose convex hull with segments
-  // z ~ use zero indexing
-  // B ~ Suppresses boundary markers in the output
-  // Q ~ run in "quiet" mode
-  // p ~ Triangulates a Planar Straight Line Graph
-  //     If the `p' switch is used, `segmentlist' must point to a list of     
-  //     segments, `numberofsegments' must be properly set, and               
-  //     `segmentmarkerlist' must either be set to NULL (in which case all    
-  //     markers default to zero), or must point to a list of markers.
-  // D ~ Conforming Delaunay: use this switch if you want all triangles in the mesh to be Delaunay, and not just constrained Delaunay
-  // q ~  Quality mesh generation with no angles smaller than 20 degrees. An alternate minimum angle may be specified after the q
-  // a ~ Imposes a maximum triangle area constraint.
-  // -P  Suppresses the output .poly file. Saves disk space, but you lose the ability to maintain
-  //     constraining segments  on later refinements of the mesh.
-  // Create the flag strings, depends on element type
-  std::ostringstream flags;
-
-  // Default flags always used
-  flags << "zBPQq";
-
-  // Flags which are specific to the type of triangulation
-  switch (tt)
-    {
-    case GENERATE_CONVEX_HULL:
-      {
-	flags << "c";
-	break;
-      }
-
-    case PSLG:
-      {
-	flags << "p";
-	break;
-      }
-      
-    case INVALID_TRIANGULATION_TYPE:
-      {
-	error();
-	break;
-      }
-      
-    default:
-      {
-	error();
-      }
-    }
-
-
-  // Flags specific to the type of element
-  switch (type)
-    {
-    case TRI3:
-      {
-	// do nothing.
-	break;
-      }
-
-    case TRI6:
-      {
-	flags << "o2";
-	break;
-      }
-      
-    default:
-      {
-	std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
-	error();
-      }
-    }
-
-
-  // Finally, add the area constraint
-  flags << "a" << std::fixed << desired_area;
-
-  // Refine the initial output to conform to the area constraint
-  Triangle::triangulate(const_cast<char*>(flags.str().c_str()),
-			&initial,
-			&final,
-			NULL); // voronoi ouput -- not used
-  
-  
-  // Send the information computed by Triangle to the Mesh.
-  Triangle::copy_tri_to_mesh(final,
-			     mesh,
-			     type);
-      
-  // To the naked eye, a few smoothing iterations usually looks better.
-  LaplaceMeshSmoother(mesh).smooth(2);
-
-    
-  // Clean up.    
-  Triangle::destroy(initial,      Triangle::INPUT);
-  Triangle::destroy(final,        Triangle::OUTPUT);
-}
-
-
-
-
-
-
-
-
-
-// Definition of the function from the MeshTools::Generation namespace
-void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
-						   const unsigned int nx, // n elem, x-direction
-						   const unsigned int ny, // n elem, y-direction
-						   const Real xmin, const Real xmax,
-						   const Real ymin, const Real ymax,
-						   const ElemType type)
+// Triangulates a 2D rectangular region with or without holes
+void MeshTools::Generation::build_delaunay_square(Mesh& mesh,
+						  const unsigned int nx, // num. of elements in x-dir
+						  const unsigned int ny, // num. of elements in y-dir
+						  const Real xmin, const Real xmax,
+						  const Real ymin, const Real ymax,
+						  const ElemType type,
+						  const std::vector<TriangleInterface::Hole*>* holes)
 {
   // Check for existing nodes and compatible dimension.
   assert (mesh.mesh_dimension() == 2);
@@ -221,45 +46,50 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
   assert (xmin < xmax);
   assert (ymin < ymax);
 
-  // Generate vector of points to be passed to MeshTools::Generation::triangulate
-  std::vector<Point> points((nx+1)*(ny+1));
-
+  // Clear out any data which may have been in the Mesh
+  mesh.clear();
+  
   // The x and y spacing between boundary points
   const Real delta_x = (xmax-xmin) / static_cast<Real>(nx);
   const Real delta_y = (ymax-ymin) / static_cast<Real>(ny);  
 
-  // Top and Bottom
-  unsigned int ctr=0;
+  // Bottom
   for (unsigned int p=0; p<=nx; ++p)
-    {
-      const Real x=xmin + p*delta_x;
-
-      points[ctr++] = Point(x, ymin); // Bottom
-      points[ctr++] = Point(x, ymax); // Top
-    }
-
-  // Left and Right Sides
+    mesh.add_point(Point(xmin + p*delta_x, ymin));
+  
+  // Right side
   for (unsigned int p=1; p<ny; ++p)
-    {
-      const Real y = ymin + p*delta_y;
+    mesh.add_point(Point(xmax, ymin + p*delta_y)); 
 
-      points[ctr++] = Point(xmin, y); // Left
-      points[ctr++] = Point(xmax, y); // Right
-    }
- 
+  // Top
+  for (unsigned int p=0; p<=nx; ++p)
+    mesh.add_point(Point(xmax - p*delta_x, ymax));
 
+  // Left side
+  for (unsigned int p=1; p<ny; ++p)
+    mesh.add_point(Point(xmin,  ymax - p*delta_y)); 
+		   
+  // Be sure we added as many points as we thought we did
+  assert (mesh.n_nodes() == 2*(nx+ny));
 
-  // Call MeshTools::Generation::triangulate
-  MeshTools::Generation::triangulate(mesh,
-				     points,
-				     0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>(nx*ny), // desired area
-				     type,
-				     GENERATE_CONVEX_HULL, // type of triangulation to perform
-				     false                 // do not insert any extra points
-				     );
+  // Construct the Triangle Interface object
+  TriangleInterface t(mesh);
+
+  // Set custom variables for the triangulation
+  t.desired_area()       = 0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>(nx*ny);
+  t.triangulation_type() = TriangleInterface::PSLG;
+  t.elem_type()          = type;
+
+  if (holes != NULL)
+    t.attach_hole_list(holes);
+
+  // Triangulate!
+  t.triangulate();
 
   // The mesh is now generated, but we still need to mark the boundaries
-  // to be consistent with the other build_square routines.
+  // to be consistent with the other build_square routines.  Note that only
+  // the external boundaries of the square are given boundary ids, the holes
+  // are not numbered.
   MeshBase::element_iterator       el     = mesh.elements_begin();
   const MeshBase::element_iterator end_el = mesh.elements_end();
   for ( ; el != end_el; ++el)
@@ -282,8 +112,8 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
 	    // right  = 1
 	    // top = 2
 	    // left = 3
-	    // airfoil = 4
-	    short int bc_id=99;
+	    // hole = 4
+	    short int bc_id=4;
 
 	    // bottom
 	    if      (fabs(side_midpoint(1) - ymin) < TOLERANCE)
@@ -301,189 +131,14 @@ void MeshTools::Generation::build_delaunay_square (Mesh& mesh,
 	    else if (fabs(side_midpoint(0) - xmin) < TOLERANCE)
 	      bc_id=3;
 
-	    assert (bc_id != 99);
-
+	    // If the point is not on any of the external boundaries, it
+	    // is on one of the holes....
+	    
 	    // Finally, add this element's information to the boundary info object.
 	    mesh.boundary_info->add_side(elem->id(), s, bc_id);
 	  }
     }
   
-}
-
-
-
-
-
-
-
-
-
-
-void MeshTools::Generation::build_delaunay_square_with_hole(Mesh& mesh,
-							    const std::vector<Hole*>& holes,
-							    const unsigned int nx, // num. of nodes in x-dir (approximate)
-							    const unsigned int ny, // num. of nodes in y-dir (approximate)
-							    const Real xmin, const Real xmax,
-							    const Real ymin, const Real ymax,
-							    const ElemType type)
-{
-    // Triangle data structure for the mesh
-    Triangle::triangulateio
-      final_input,
-      final_output;
-
-    // Pseudo-Constructor for the triangle io structs
-    Triangle::init(final_input);
-    Triangle::init(final_output);
-    
-    const unsigned int n_holes = holes.size();
-    assert (n_holes > 0);
-
-    // Sanity checks for the holes
-    for (unsigned int i=0; i<n_holes; ++i)
-      {
-	assert (holes[i] != NULL);
-	assert (holes[i]->n_points() > 1);
-      }
-    
-    // Pre-allocate space for the points and segments (one segment per point).
-    unsigned int n_hole_points=0;
-    for (unsigned int i=0; i<n_holes; ++i)
-      n_hole_points += holes[i]->n_points();
-
-    final_input.numberofpoints = n_hole_points + 4;     // 4 additional points make up the corners of the square
-    final_input.pointlist      = static_cast<REAL*>(std::malloc(final_input.numberofpoints * 2 * sizeof(REAL)));
-
-    final_input.numberofsegments = n_hole_points;
-    final_input.segmentlist      = static_cast<int*>(std::malloc(final_input.numberofsegments * 2 * sizeof(int))); // 2 int per segment
-
-
-    // Constant offset into the vector for each successive hole after the first.
-    unsigned int offset=0;
-    
-    // For each hole, compute points and determine the segments, add them to the input struct
-    for (unsigned int i=0; i<n_holes; ++i)
-      {
-	for (unsigned int ctr=0, h=0; h<holes[i]->n_points(); ctr+=2, ++h)
-	  {
-	    Point p = holes[i]->point(h);
-
-	    const unsigned int index0 = 2*offset+ctr;
-	    const unsigned int index1 = 2*offset+ctr+1;
-
-	    // Save the x,y locations in the triangle struct.
-	    final_input.pointlist[index0] = p(0);
-	    final_input.pointlist[index1] = p(1);
-	  }
-
-	// Generate all the segments for this hole
-	for (unsigned int ctr=0, h=0; h<holes[i]->n_points(); ctr+=2, ++h)
-	  {
-
-	    const unsigned int index0 = 2*offset+ctr;
-	    const unsigned int index1 = 2*offset+ctr+1;
-
-	    // The points
-	    final_input.segmentlist[index0] = offset+h;
-	    final_input.segmentlist[index1] = (h==holes[i]->n_points()-1) ? offset : offset+h+1; // wrap around
-	  }
-
-	// for (unsigned int h=0; h<2*final_input.numberofsegments; ++h)
-	// std::cout << final_input.segmentlist[h] << std::endl;
-
-	// Update the offset
-	offset += holes[i]->n_points();
-      }
-
-    
-    // Add the corner points
-    unsigned int idx = 2*n_hole_points;
-
-    final_input.pointlist[idx++] = xmin;
-    final_input.pointlist[idx++] = ymin;
-    
-    final_input.pointlist[idx++] = xmax;
-    final_input.pointlist[idx++] = ymin;
-    
-    final_input.pointlist[idx++] = xmax;
-    final_input.pointlist[idx++] = ymax;
-    
-    final_input.pointlist[idx++] = xmin;
-    final_input.pointlist[idx++] = ymax;
-
-    // Tell the input structure about the hole(s) by giving it any point
-    // which lies "inside" the hole (not necessarily the center).
-    final_input.numberofholes = n_holes;
-    final_input.holelist      = static_cast<REAL*>(std::malloc(final_input.numberofholes * 2 * sizeof(REAL)));
-    for (unsigned int i=0, ctr=0; i<n_holes; ++i, ctr+=2)
-      {
-	Point inside_point = holes[i]->inside();
-	final_input.holelist[ctr]   = inside_point(0);
-	final_input.holelist[ctr+1] = inside_point(1);
-      }
-    
-    // Perform the triangulation.
-    // c ~ enclose convex hull with segments
-    // z ~ use zero indexing
-    // B ~ Suppresses boundary markers in the output
-    // Q ~ run in "quiet" mode
-    // p ~ Triangulates a Planar Straight Line Graph
-    //     If the `p' switch is used, `segmentlist' must point to a list of     
-    //     segments, `numberofsegments' must be properly set, and               
-    //     `segmentmarkerlist' must either be set to NULL (in which case all    
-    //     markers default to zero), or must point to a list of markers.
-    // D ~ Conforming Delaunay: use this switch if you want all triangles in the mesh to be Delaunay, and not just constrained Delaunay
-    // q ~  Quality mesh generation with no angles smaller than 20 degrees. An alternate minimum angle may be specified after the q
-    // a ~ Imposes a maximum triangle area constraint.
-    std::ostringstream flags;
-    const Real desired_area = 0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>((nx-1)*(ny-1));
-    //flags << "pczBQDqa" << std::fixed << 0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>((nx-1)*(ny-1));
-
-    switch (type)
-    {
-      case TRI3:
-        {
-          flags << "pczBQDqa" << std::fixed << desired_area;
-          break;
-        }
-
-      case TRI6:
-        {
-          flags << "pczBQDqo2a" << std::fixed << desired_area;
-          break;
-        }
-
-      default:
-        {
-          std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
-          error();
-        }
-    }
-
-    Triangle::triangulate(const_cast<char*>(flags.str().c_str()),
-			  &final_input,
-			  &final_output,
-			  NULL); // voronoi ouput -- not used
-
-    
-    // Send the information computed by Triangle to the Mesh.
-    Triangle::copy_tri_to_mesh(final_output,
-			       mesh,
-			       type);
-      
-    // To the naked eye, a few smoothing iterations usually looks better.
-    LaplaceMeshSmoother(mesh).smooth(2);
-
-    
-    // here();
-    
-    Triangle::destroy(final_input, Triangle::INPUT);
-
-    // here();
-    
-    Triangle::destroy(final_output, Triangle::OUTPUT);
-
-    // here();
 }
 
 
@@ -617,6 +272,254 @@ void Triangle::copy_tri_to_mesh(const triangulateio& triangle_data_input,
   // Prepare mesh for usage.
   mesh_output.prepare_for_use();
 }
+
+
+
+
+
+
+// Function definitions for the TriangleInterface class
+void TriangleInterface::triangulate()
+{
+  // If the initial PSLG is really simple, e.g. an L-shaped domain or
+  // a square/rectangle, the resulting triangulation may be very
+  // "structured" looking.  Sometimes this is a problem if your
+  // intention is to work with an "unstructured" looking grid.  We can
+  // attempt to work around this limitation by inserting midpoints
+  // into the original PSLG.  Inserting additional points into a
+  // set of points meant to be a convex hull usually makes less sense.
+
+  // May or may not need to insert new points ...
+  if ((_triangulation_type==PSLG) && (_insert_extra_points))
+    {
+      // Make a copy of the original points from the Mesh
+      std::vector<Point> original_points (_mesh.n_nodes());
+
+      MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
+      const MeshBase::node_iterator node_end = _mesh.nodes_end();
+
+      for (unsigned int ctr=0; node_it != node_end; ++node_it)
+	original_points[ctr++] = **node_it;
+      
+      // Clear out the mesh
+      _mesh.clear();
+      
+      // Insert a new point on each PSLG at some random location
+      // np=index into new points vector
+      // n =index into original points vector
+      for (unsigned int np=0, n=0; np<2*original_points.size(); ++np)
+	{
+	  // the even entries are the original points
+	  if (np%2==0)
+	    _mesh.add_point(original_points[n++]);
+
+	  else // the odd entries are the midpoints of the original PSLG segments
+	    _mesh.add_point (0.5*(original_points[n] + original_points[n-1]));
+	}
+    }
+  
+  // Regardless of whether we added additional points, the set of points to
+  // triangulate is now sitting in the mesh.
+
+  // If the holes vector is non-NULL (and non-empty) we need to determine
+  // the number of additional points which the holes will add to the
+  // triangulation.
+  unsigned int n_hole_points = 0;
+  const bool have_holes = ((_holes != NULL) && (!_holes->empty()));
+
+  if (have_holes)
+    {
+      for (unsigned int i=0; i<_holes->size(); ++i)
+	n_hole_points += (*_holes)[i]->n_points();
+    }
+  
+  // Triangle data structure for the mesh
+  Triangle::triangulateio initial;
+  Triangle::triangulateio final;
+
+  // Pseudo-Constructor for the triangle io structs
+  Triangle::init(initial);
+  Triangle::init(final);
+    
+  initial.numberofpoints = _mesh.n_nodes() + n_hole_points;
+  initial.pointlist      = static_cast<REAL*>(std::malloc(initial.numberofpoints * 2 * sizeof(REAL)));
+
+  if (_triangulation_type==PSLG) 
+    initial.numberofsegments = initial.numberofpoints; // One segment per point, including hole points
+
+  else if (_triangulation_type==GENERATE_CONVEX_HULL)
+    initial.numberofsegments = n_hole_points; // One segment for each hole point
+  
+  // Allocate space for the segments
+  if (initial.numberofsegments > 0)
+    initial.segmentlist      = static_cast<int*>(std::malloc(initial.numberofsegments * 2 * sizeof(int))); // 2 int per segment
+
+
+  // Copy all the holes' points and segments into the triangle struct.
+  unsigned int offset=0;
+  
+  if (have_holes)
+    for (unsigned int i=0; i<_holes->size(); ++i)
+      {
+	for (unsigned int ctr=0, h=0; h<(*_holes)[i]->n_points(); ctr+=2, ++h)
+	  {
+	    Point p = (*_holes)[i]->point(h);
+
+	    const unsigned int index0 = 2*offset+ctr;
+	    const unsigned int index1 = 2*offset+ctr+1;
+
+	    // Save the x,y locations in the triangle struct.
+	    initial.pointlist[index0] = p(0);
+	    initial.pointlist[index1] = p(1);
+
+	    // Set the points which define the segments
+	    initial.segmentlist[index0] = offset+h;
+	    initial.segmentlist[index1] = (h==(*_holes)[i]->n_points()-1) ? offset : offset+h+1; // wrap around
+	  }
+	
+	// Update the offset for the next hole
+	offset += (*_holes)[i]->n_points();
+      }
+
+  
+  // Copy all the non-hole points and segments into the triangle struct.
+  for (unsigned int ctr=0, h=0; h<_mesh.n_nodes(); ctr+=2, ++h)
+    {
+      const unsigned int index0 = 2*offset+ctr;
+      const unsigned int index1 = 2*offset+ctr+1;
+      
+      initial.pointlist[index0] = _mesh.point(h)(0);
+      initial.pointlist[index1] = _mesh.point(h)(1);
+
+      // If the user requested a PSLG, the non-hole points are also segments
+      if (_triangulation_type==PSLG)
+	{
+	  initial.segmentlist[index0] = offset+h;
+	  initial.segmentlist[index1] = (h==_mesh.n_nodes()-1) ? offset : offset+h+1; // wrap around
+	}
+    }
+
+
+  // Tell the input struct about the holes
+  if (have_holes)
+    {
+      initial.numberofholes = _holes->size();
+      initial.holelist      = static_cast<REAL*>(std::malloc(initial.numberofholes * 2 * sizeof(REAL)));
+      for (unsigned int i=0, ctr=0; i<_holes->size(); ++i, ctr+=2)
+	{
+	  Point inside_point = (*_holes)[i]->inside();
+	  initial.holelist[ctr]   = inside_point(0);
+	  initial.holelist[ctr+1] = inside_point(1);
+	}
+    }
+  
+  // Set the triangulation flags.
+  // c ~ enclose convex hull with segments
+  // z ~ use zero indexing
+  // B ~ Suppresses boundary markers in the output
+  // Q ~ run in "quiet" mode
+  // p ~ Triangulates a Planar Straight Line Graph
+  //     If the `p' switch is used, `segmentlist' must point to a list of     
+  //     segments, `numberofsegments' must be properly set, and               
+  //     `segmentmarkerlist' must either be set to NULL (in which case all    
+  //     markers default to zero), or must point to a list of markers.
+  // D ~ Conforming Delaunay: use this switch if you want all triangles
+  //     in the mesh to be Delaunay, and not just constrained Delaunay
+  // q ~  Quality mesh generation with no angles smaller than 20 degrees.
+  //      An alternate minimum angle may be specified after the q
+  // a ~ Imposes a maximum triangle area constraint.
+  // -P  Suppresses the output .poly file. Saves disk space, but you lose the ability to maintain
+  //     constraining segments on later refinements of the mesh.
+  // Create the flag strings, depends on element type
+  std::ostringstream flags;
+
+  // Default flags always used
+  flags << "zBPQq";
+
+  // Flags which are specific to the type of triangulation
+  switch (_triangulation_type)
+    {
+    case GENERATE_CONVEX_HULL:
+      {
+	flags << "c";
+	break;
+      }
+
+    case PSLG:
+      {
+	flags << "p";
+	break;
+      }
+      
+    case INVALID_TRIANGULATION_TYPE:
+      {
+	error();
+	break;
+      }
+      
+    default:
+      {
+	error();
+      }
+    }
+
+
+  // Flags specific to the type of element
+  switch (_elem_type)
+    {
+    case TRI3:
+      {
+	// do nothing.
+	break;
+      }
+
+    case TRI6:
+      {
+	flags << "o2";
+	break;
+      }
+      
+    default:
+      {
+	std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
+	error();
+      }
+    }
+
+
+  // If we do have holes and the user asked to GENERATE_CONVEX_HULL,
+  // need to add the p flag so the triangulation respects those segments.
+  if ((_triangulation_type==GENERATE_CONVEX_HULL) && (have_holes))
+    flags << "p";
+  
+  // Finally, add the area constraint
+  flags << "a" << std::fixed << _desired_area;
+
+  // Refine the initial output to conform to the area constraint
+  Triangle::triangulate(const_cast<char*>(flags.str().c_str()),
+			&initial,
+			&final,
+			NULL); // voronoi ouput -- not used
+  
+  
+  // Send the information computed by Triangle to the Mesh.
+  Triangle::copy_tri_to_mesh(final,
+			     _mesh,
+			     _elem_type);
+      
+  // To the naked eye, a few smoothing iterations usually looks better.
+  LaplaceMeshSmoother(_mesh).smooth(2);
+
+    
+  // Clean up.    
+  Triangle::destroy(initial,      Triangle::INPUT);
+  Triangle::destroy(final,        Triangle::OUTPUT);
+  
+}
+
+
+
+
 
 
 
