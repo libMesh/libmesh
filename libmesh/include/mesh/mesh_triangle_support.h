@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.h,v 1.7 2006-10-24 17:52:58 jwpeterson Exp $
+// $Id: mesh_triangle_support.h,v 1.8 2006-12-15 21:25:52 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -95,6 +95,316 @@ extern "C" {
 
 
 
+
+
+
+
+/**
+ * A C++ interface between LibMesh and the Triangle library written by
+ * J.R. Shewchuk.
+ *
+ * @author John W. Peterson
+ */
+class TriangleInterface
+{
+public:
+  /**
+   * The constructor.  A reference to the mesh containing the points
+   * which are to be triangulated must be provided.  Unless otherwise
+   * specified, a convex hull will be computed for set of input points
+   * and the convex hull will be meshed.
+   */
+  TriangleInterface(Mesh& mesh)
+    : _mesh(mesh),
+      _holes(NULL),
+      _elem_type(TRI3),
+      _desired_area(0.1),
+      _triangulation_type(GENERATE_CONVEX_HULL),
+      _insert_extra_points(false)
+  {}
+
+  /**
+   * Empty destructor.
+   */
+  ~TriangleInterface() {}
+      
+  /**
+   * The TriangulationType is used with the general triangulate function
+   * defind below.
+   */
+  enum TriangulationType
+    {
+      GENERATE_CONVEX_HULL = 0,
+      /**
+       * Uses the triangle library to first generate a convex hull from the set
+       * of points passed in, and then triangulate this set of points.  This
+       * is probably the most common type of usage.
+       */
+
+       
+      PSLG = 1,
+      /**
+       * Use the triangle library to triangulate a Planar Straight Line
+       * Graph which is defined implicitly by the order of the "points" vector:
+       * a straight line is assumed to lie between each successive pair of
+       * points, with an additional line joining the final and first points.
+       * In case your triangulation is a little too "structured" looking
+       * (which can happen when the initial PSLG is really simple) you can try to
+       * make the resulting triangulation a little more "unstructured" looking
+       * by setting insert_points to true in the triangulate() function.
+       */
+       
+      INVALID_TRIANGULATION_TYPE
+      /**
+       * Does nothing, used as a default value.
+       */
+    };
+
+  /**
+   * The hole class and its several subclasses define the interface
+   * and functionality of a "hole" which appears in a 2D mesh.  The
+   * definitions of these classes appear below.
+   */
+  class Hole;
+  class PolygonHole;
+  class ArbitraryHole;
+      
+  /**
+   * This is the main public interface for this function.
+   * Internally, it calls Triangle's triangulate routine.
+   */
+  void triangulate();
+
+  /**
+   * Sets and/or gets the desired element type.
+   */
+  ElemType& elem_type() {return _elem_type;}
+
+  /**
+   * Sets and/or gets the desired triangle area.
+   */
+  Real& desired_area() {return _desired_area;}
+
+  /**
+   * Sets and/or gets the desired triangulation type.
+   */
+  TriangulationType& triangulation_type() {return _triangulation_type;}
+
+  /**
+   * Sets and/or gets the flag for inserting add'l points.
+   */
+  bool& insert_extra_points() {return _insert_extra_points;}
+      
+  /**
+   * Attaches a vector of Hole* pointers which will be
+   * meshed around.
+   */
+  void attach_hole_list(const std::vector<Hole*>* holes) {_holes = holes;}
+      
+private:
+  /**
+   * Reference to the mesh which is to be created by triangle.
+   */
+  Mesh& _mesh;
+
+  /**
+   * A pointer to a vector of Hole*s.  If this is NULL, there
+   * are no holes!
+   */
+  const std::vector<Hole*>* _holes;
+
+  /**
+   * The type of elements to generate.  (Defaults to
+   * TRI3).
+   */
+  ElemType _elem_type;
+
+  /**
+   * The desired area for the elements in the resulting mesh.
+   */
+  Real _desired_area;
+
+  /**
+   * The type of triangulation to perform: choices are:
+   * convex hull
+   * PSLG
+   */
+  TriangulationType _triangulation_type;
+
+  /**
+   * Flag which tells whether or not to insert additional nodes
+   * before triangulation.  This can sometimes be used to "de-regularize"
+   * the resulting triangulation.
+   */
+  bool _insert_extra_points;
+};
+
+
+
+
+
+
+
+/**
+ * An abstract class for defining a 2-dimensional hole.  We assume that
+ * the connectivity of the hole is implicit in the numbering of the points,
+ * i.e. node 0 is connected to node 1, node 1 is connected to node 2, etc,
+ * and the last node "wraps around" to connect back to node 0.
+ */
+class TriangleInterface::Hole
+{
+public:
+  /**
+   * Constructor
+   */
+  Hole() {}
+
+  /**
+   * Destructor
+   */
+  virtual ~Hole() {}
+
+  /**
+   * The number of geometric points which define the hole.
+   */
+  virtual unsigned int n_points() const = 0;
+
+  /**
+   * Return the nth point defining the hole.
+   */
+  virtual Point point(const unsigned int n) const = 0;
+
+  /**
+   * Return an (arbitrary) point which lies inside the hole.
+   */
+  virtual Point inside() const = 0;
+};
+
+
+
+
+
+    
+/**
+ * A concrete instantiation of the Hole class that describes polygonal
+ * (triangular, square, pentagonal, ...) holes.
+ */
+class TriangleInterface::PolygonHole : public TriangleInterface::Hole
+{
+public:
+  /**
+   * Constructor specifying the center, radius, and number of
+   * points which comprise the hole.  The points will all lie
+   * on a circle of radius r.
+   */
+  PolygonHole(Point center, Real radius, unsigned int n_points) :
+    _center(center),
+    _radius(radius),
+    _n_points(n_points) {}
+
+  /**
+   * Default Constructor, does not set any values
+   */
+  // PolygonHole() {}
+
+  virtual unsigned int n_points() const { return _n_points; }
+
+  virtual Point point(const unsigned int n) const
+  {
+    // The nth point lies at the angle theta = 2 * pi * n / _n_points
+    const Real theta = static_cast<Real>(n) * 2.0 * libMesh::pi / static_cast<Real>(_n_points);
+	
+    return Point(_center(0) + _radius*cos(theta), // x=r*cos(theta)
+		 _center(1) + _radius*sin(theta), // y=r*sin(theta)
+		 0.);
+  }
+
+  /**
+   * The center of the hole is definitely inside.
+   */
+  virtual Point inside() const { return _center;  }
+      
+private:
+  /**
+   * (x,y) location of the center of the hole
+   */
+  Point _center;
+
+  /**
+   * circular hole radius
+   */
+  Real _radius;
+
+  /**
+   * number of points used to describe the hole.  The actual
+   * points can be generated knowing the center and radius.
+   * For example, n_points=3 would generate a triangular hole.
+   */
+  unsigned int _n_points;
+};
+
+
+
+
+
+    
+
+/**
+ * Another concrete instantiation of the hole, this one should
+ * be sufficiently general for most non-polygonal purposes.  The user
+ * supplies, at the time of construction, a reference to a vector
+ * of Points which defines the hole (in order of connectivity) and
+ * an arbitrary Point which lies inside the hole. 
+ */
+class TriangleInterface::ArbitraryHole : public TriangleInterface::Hole
+{
+public:
+  ArbitraryHole(const Point center,
+		const std::vector<Point>& points)
+    : 	_center(center),
+	_points(points)
+  {}
+
+  /**
+   * Required public Hole interface:
+   */
+      
+  /**
+   * The number of geometric points which define the hole.
+   */
+  virtual unsigned int n_points() const { return _points.size(); }
+
+  /**
+   * Return the nth point defining the hole.
+   */
+  virtual Point point(const unsigned int n) const
+  {
+    assert (n < _points.size());
+    return _points[n];
+  }
+
+  /**
+   * Return an (arbitrary) point which lies inside the hole.
+   */
+  virtual Point inside() const { return _center;  }
+
+private:
+  /**
+   * arbitrary (x,y) location inside the hole
+   */
+  Point _center;
+
+  /**
+   * Reference to the vector of points which makes up
+   * the hole.
+   */
+  const std::vector<Point>& _points;
+};
+
+
+
+
+
 /**
  * Add the triangulation routines to the MeshTools::Generation namespace.
  */
@@ -102,238 +412,19 @@ namespace MeshTools
 {
   namespace Generation
   {
+
     /**
-     * Meshes a square (2D) with a Delaunay triangulation.
-     * This function internally calls the triangle library
-     * written by J.R. Shewchuk.  
+     * Meshes a rectangular (2D) region (with or without holes) with a
+     * Delaunay triangulation.  This function internally calls the
+     * triangle library written by J.R. Shewchuk.
      */
     void build_delaunay_square(Mesh& mesh,
 			       const unsigned int nx, // num. of elements in x-dir
 			       const unsigned int ny, // num. of elements in y-dir
-			       const Real xmin=0., const Real xmax=1.,
-			       const Real ymin=0., const Real ymax=1.,
-			       const ElemType type=INVALID_ELEM);
-    
-    /**
-     * The TriangulationType is used with the general triangulate function
-     * defind below.
-     */
-    enum TriangulationType
-      {
-	GENERATE_CONVEX_HULL = 0,
-	/**
-	 * Uses the triangle library to first generate a convex hull from the set
-	 * of points passed in, and then triangulate this set of points.  This
-	 * is probably the most common type of usage.
-	 */
-
-       
-	PSLG = 1,
-	/**
-	 * Use the triangle library to triangulate a Planar Straight Line
-	 * Graph which is defined implicitly by the order of the "points" vector:
-	 * a straight line is assumed to lie between each successive pair of
-	 * points, with an additional line joining the final and first points.
-	 * In case your triangulation is a little too "structured" looking
-	 * (which can happen when the initial PSLG is really simple) you can try to
-	 * make the resulting triangulation a little more "unstructured" looking
-	 * by setting insert_points to true in the triangulate() function.
-	 */
-       
-	INVALID_TRIANGULATION_TYPE
-	/**
-	 * Does nothing, used as a default value.
-	 */
-      };
-
-
-
-    /**
-     * Meshes an arbitrary 2D domain with a Delaunay triangulation.  This
-     * function internally calls the triangle library written by
-     * J.R. Shewchuk.
-     *
-     * The different TriangulationType enums are described above.
-     *
-     * Setting the insert_points boolean to true only has an effect when
-     * triangulating a PSLG.  See decription above.
-     * 
-     * If you just want to triangulate a rectangular
-     * domain, you might want to try build_delaunay_square() instead.
-     */
-    void triangulate(Mesh& mesh,
-		     const std::vector<Point>& points,
-		     const Real desired_area,
-		     const ElemType type=INVALID_ELEM,
-		     const TriangulationType tt=INVALID_TRIANGULATION_TYPE,
-		     const bool insert_points=false);
-
-
-    
-
-
-    // An abstract class for defining a 2-dimensional hole.  We assume that
-    // the connectivity of the hole is implicit in the numbering of the points,
-    // i.e. node 0 is connected to node 1, node 1 is connected to node 2, etc,
-    // and the last node "wraps around" to connect back to node 0.
-    class Hole
-    {
-    public:
-      /**
-       * Constructor
-       */
-      Hole() {}
-
-      /**
-       * Destructor
-       */
-      virtual ~Hole() {}
-
-      /**
-       * The number of geometric points which define the hole.
-       */
-      virtual unsigned int n_points() const = 0;
-
-      /**
-       * Return the nth point defining the hole.
-       */
-      virtual Point point(const unsigned int n) const = 0;
-
-      /**
-       * Return an (arbitrary) point which lies inside the hole.
-       */
-      virtual Point inside() const = 0;
-    };
-
-
-    
-    /**
-     * A concrete instantiation of the Hole class that describes polygonal
-     * (triangular, square, pentagonal, ...) holes.
-     */
-    class PolygonHole : public Hole
-    {
-    public:
-      /**
-       * Constructor specifying the center, radius, and number of
-       * points which comprise the hole.  The points will all lie
-       * on a circle of radius r.
-       */
-      PolygonHole(Point center, Real radius, unsigned int n_points) :
-	_center(center),
-	_radius(radius),
-	_n_points(n_points) {}
-
-      /**
-       * Default Constructor, does not set any values
-       */
-      // PolygonHole() {}
-
-      virtual unsigned int n_points() const { return _n_points; }
-
-      virtual Point point(const unsigned int n) const
-      {
-	// The nth point lies at the angle theta = 2 * pi * n / _n_points
-	const Real theta = static_cast<Real>(n) * 2.0 * libMesh::pi / static_cast<Real>(_n_points);
-	
-	return Point(_center(0) + _radius*cos(theta), // x=r*cos(theta)
-		     _center(1) + _radius*sin(theta), // y=r*sin(theta)
-		     0.);
-      }
-
-      /**
-       * The center of the hole is definitely inside.
-       */
-      virtual Point inside() const { return _center;  }
-      
-    private:
-      /**
-       * (x,y) location of the center of the hole
-       */
-      Point _center;
-
-      /**
-       * circular hole radius
-       */
-      Real _radius;
-
-      /**
-       * number of points used to describe the hole.  The actual
-       * points can be generated knowing the center and radius.
-       * For example, n_points=3 would generate a triangular hole.
-       */
-      unsigned int _n_points;
-    };
-
-
-    
-
-    /**
-     * Another concrete instantiation of the hole, this one should
-     * be sufficiently general for most non-polygonal purposes.  The user
-     * supplies, at the time of construction, a reference to a vector
-     * of Points which defines the hole (in order of connectivity) and
-     * an arbitrary Point which lies inside the hole. 
-     */
-    class ArbitraryHole : public Hole
-    {
-    public:
-      ArbitraryHole(const Point center,
-		    const std::vector<Point>& points)
-	: 	_center(center),
-		_points(points)
-      {}
-
-      /**
-       * Required public Hole interface:
-       */
-      
-      /**
-       * The number of geometric points which define the hole.
-       */
-      virtual unsigned int n_points() const { return _points.size(); }
-
-      /**
-       * Return the nth point defining the hole.
-       */
-      virtual Point point(const unsigned int n) const
-      {
-	assert (n < _points.size());
-	return _points[n];
-      }
-
-      /**
-       * Return an (arbitrary) point which lies inside the hole.
-       */
-      virtual Point inside() const { return _center;  }
-
-    private:
-      /**
-       * arbitrary (x,y) location inside the hole
-       */
-      Point _center;
-
-      /**
-       * Reference to the vector of points which makes up
-       * the hole.
-       */
-      const std::vector<Point>& _points;
-    };
-
-    
-
-    // Function which calls triangle to create a mesh on a square domain with
-    // one or more circular holes cut out.
-    void build_delaunay_square_with_hole(Mesh& mesh,
-					 const std::vector<Hole*>& holes,
-					 const unsigned int nx=10, // num. of nodes in x-dir (approximate)
-					 const unsigned int ny=10, // num. of nodes in y-dir (approximate)
-					 const Real xmin=-1., const Real xmax=1.,
-					 const Real ymin=-1., const Real ymax=1.,
-					 const ElemType type=INVALID_ELEM);
-
-
-
+			       const Real xmin, const Real xmax,
+			       const Real ymin, const Real ymax,
+			       const ElemType type,
+			       const std::vector<TriangleInterface::Hole*>* holes=NULL);
   }
 }
 
