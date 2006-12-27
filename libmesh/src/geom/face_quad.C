@@ -1,4 +1,4 @@
-// $Id: face_quad.C,v 1.21 2005-06-06 16:24:14 knezed01 Exp $
+// $Id: face_quad.C,v 1.22 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -242,4 +242,22 @@ const unsigned short int Quad::_second_order_adjacent_vertices[4][2] =
   {1, 2}, // vertices adjacent to node 5 
   {2, 3}, // vertices adjacent to node 6 
   {0, 3}  // vertices adjacent to node 7 
+};
+
+
+
+const unsigned short int Quad::_second_order_vertex_child_number[9] =
+{
+  99,99,99,99, // Vertices
+  0,1,2,0,     // Edges
+  0            // Interior
+};
+
+
+
+const unsigned short int Quad::_second_order_vertex_child_index[9] =
+{
+  99,99,99,99, // Vertices
+  1,2,3,3,     // Edges
+  2            // Interior
 };

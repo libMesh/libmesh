@@ -1,4 +1,4 @@
-// $Id: edge_edge3.C,v 1.19 2006-11-28 20:33:15 jwpeterson Exp $
+// $Id: edge_edge3.C,v 1.20 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -150,6 +150,13 @@ void Edge3::connectivity(const unsigned int sc,
     }
 }
 
+
+
+std::pair<unsigned short int, unsigned short int>
+Edge3::second_order_child_vertex (const unsigned int n) const
+{
+  return std::pair<unsigned short int, unsigned short int>(0,0);
+}
 
 
 

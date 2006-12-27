@@ -1,4 +1,4 @@
-// $Id: cell_prism18.C,v 1.20 2006-10-13 03:05:32 roystgnr Exp $
+// $Id: cell_prism18.C,v 1.21 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -571,6 +571,19 @@ const unsigned short int Prism18::_remaining_second_order_adjacent_vertices[3][4
   { 1,  2,  4,  5}, // vertices adjacent to node 16
   { 0,  2,  3,  5}  // vertices adjacent to node 17
 };
+
+
+
+std::pair<unsigned short int, unsigned short int>
+Prism18::second_order_child_vertex (const unsigned int n) const
+{
+  assert (n >= this->n_vertices());
+  assert (n < this->n_nodes());
+
+  return std::pair<unsigned short int, unsigned short int>
+    (_second_order_vertex_child_number[n],
+     _second_order_vertex_child_index[n]);
+}
 
 
 

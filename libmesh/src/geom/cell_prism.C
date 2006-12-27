@@ -1,4 +1,4 @@
-// $Id: cell_prism.C,v 1.16 2005-06-06 16:24:13 knezed01 Exp $
+// $Id: cell_prism.C,v 1.17 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -160,6 +160,22 @@ AutoPtr<DofObject> Prism::side (const unsigned int i) const
 }
 
 
+
+const unsigned short int Prism::_second_order_vertex_child_number[18] =
+{
+  99,99,99,99,99,99, // Vertices
+  0,1,0,0,1,2,3,4,3, // Edges
+  0,1,0              // Faces
+};
+
+
+
+const unsigned short int Prism::_second_order_vertex_child_index[18] =
+{
+  99,99,99,99,99,99, // Vertices
+  1,2,2,3,4,5,4,5,5, // Edges
+  4,5,5              // Faces
+};
 
 
 const unsigned short int Prism::_second_order_adjacent_vertices[9][2] = 

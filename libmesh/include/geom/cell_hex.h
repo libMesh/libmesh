@@ -1,4 +1,4 @@
-// $Id: cell_hex.h,v 1.6 2006-03-23 20:24:36 roystgnr Exp $
+// $Id: cell_hex.h,v 1.7 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -112,6 +112,15 @@ protected:
    */
   static const unsigned short int _second_order_adjacent_vertices[12][2];
 
+  /**
+   * Vector that names a child sharing each second order node. 
+   */
+  static const unsigned short int _second_order_vertex_child_number[27];
+
+  /**
+   * Vector that names the child vertex index for each second order node.
+   */
+  static const unsigned short int _second_order_vertex_child_index[27];
 };
 
 

@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.26 2006-12-01 16:48:30 jwpeterson Exp $
+// $Id: cell_tet10.C,v 1.27 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -432,6 +432,33 @@ void Tet10::connectivity(const unsigned int sc,
   error();
 }
 
+
+
+const unsigned short int Tet10::_second_order_vertex_child_number[10] =
+{
+  99,99,99,99, // Vertices
+  0,1,0,0,1,2  // Edges
+};
+
+
+
+const unsigned short int Tet10::_second_order_vertex_child_index[10] =
+{
+  99,99,99,99, // Vertices
+  1,2,2,3,3,3  // Edges
+};
+
+
+
+std::pair<unsigned short int, unsigned short int>
+Tet10::second_order_child_vertex (const unsigned int n) const
+{
+  assert (n >= this->n_vertices());
+  assert (n < this->n_nodes());
+  return std::pair<unsigned short int, unsigned short int>
+    (_second_order_vertex_child_number[n],
+     _second_order_vertex_child_index[n]);
+}
 
 
 

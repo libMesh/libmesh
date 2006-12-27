@@ -1,4 +1,4 @@
-// $Id: cell_hex.C,v 1.18 2005-06-06 16:23:58 knezed01 Exp $
+// $Id: cell_hex.C,v 1.19 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -395,6 +395,25 @@ std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
   return bounds;
 }
 
+
+
+const unsigned short int Hex::_second_order_vertex_child_number[27] =
+{
+  99,99,99,99,99,99,99,99, // Vertices
+  0,1,2,0,0,1,2,3,4,5,6,5, // Edges
+  0,0,1,2,0,4,             // Faces
+  0                        // Interior
+};
+
+
+
+const unsigned short int Hex::_second_order_vertex_child_index[27] =
+{
+  99,99,99,99,99,99,99,99, // Vertices
+  1,2,3,3,4,5,6,7,5,6,7,7, // Edges
+  2,5,6,7,7,6,             // Faces
+  6                        // Interior
+};
 
 
 const unsigned short int Hex::_second_order_adjacent_vertices[12][2] = 

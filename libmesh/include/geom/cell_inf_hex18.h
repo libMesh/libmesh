@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.h,v 1.9 2006-03-23 20:24:36 roystgnr Exp $
+// $Id: cell_inf_hex18.h,v 1.10 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -178,6 +178,18 @@ public:
    */
   unsigned short int second_order_adjacent_vertex (const unsigned int n,
 						   const unsigned int v) const;
+
+  /**
+   * @returns the child number \p c and element-local index \p v of the
+   * \f$ n^{th} \f$ second-order node on the parent element.  Note that
+   * the return values are always less \p this->n_children() and 
+   * \p this->child(c)->n_vertices(), while \p n has to be greater or equal
+   * to \p * this->n_vertices().  For linear elements this returns 0,0.
+   * On refined second order elements, the return value will satisfy
+   * \p this->get_node(n)==this->child(c)->get_node(v)
+   */
+  virtual std::pair<unsigned short int, unsigned short int> 
+	  second_order_child_vertex (const unsigned int n) const;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
