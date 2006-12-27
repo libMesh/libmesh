@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.62 2006-12-27 07:21:27 roystgnr Exp $
+// $Id: elem.C,v 1.63 2006-12-27 07:25:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -727,7 +727,7 @@ unsigned short int Elem::second_order_adjacent_vertex (const unsigned int,
 
 
 std::pair<unsigned short int, unsigned short int>
-Elem::second_order_child_vertex (const unsigned int n) const
+Elem::second_order_child_vertex (const unsigned int) const
 {
   // for linear elements, always return 0
   return std::pair<unsigned short int, unsigned short int>(0,0);
