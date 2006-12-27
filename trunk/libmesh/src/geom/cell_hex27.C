@@ -1,4 +1,4 @@
-// $Id: cell_hex27.C,v 1.33 2006-10-13 03:05:32 roystgnr Exp $
+// $Id: cell_hex27.C,v 1.34 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -667,6 +667,23 @@ const unsigned short int Hex27::_remaining_second_order_adjacent_vertices[6][4] 
   { 0,  3,  4,  7}, // vertices adjacent to node 24
   { 4,  5,  6,  7}, // vertices adjacent to node 25
 };
+
+
+
+std::pair<unsigned short int, unsigned short int>
+Hex27::second_order_child_vertex (const unsigned int n) const
+{
+  assert (n >= this->n_vertices());
+  assert (n < this->n_nodes());
+  /*
+   * the _second_order_vertex_child_* vectors are
+   * stored in cell_hex.C, since they are identical
+   * for Hex20 and Hex27 (for the first 12 higher-order nodes)
+   */
+  return std::pair<unsigned short int, unsigned short int>
+    (_second_order_vertex_child_number[n],
+     _second_order_vertex_child_index[n]);
+}
 
 
 

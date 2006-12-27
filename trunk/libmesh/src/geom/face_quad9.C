@@ -1,4 +1,4 @@
-// $Id: face_quad9.C,v 1.28 2006-10-13 03:05:32 roystgnr Exp $
+// $Id: face_quad9.C,v 1.29 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -414,6 +414,23 @@ unsigned short int Quad9::second_order_adjacent_vertex (const unsigned int n,
 	return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
       }
     }
+}
+
+
+
+std::pair<unsigned short int, unsigned short int>
+Quad9::second_order_child_vertex (const unsigned int n) const
+{
+  assert (n >= this->n_vertices());
+  assert (n < this->n_nodes());
+  /*
+   * the _second_order_vertex_child_* vectors are
+   * stored in face_quad.C, since they are identical
+   * for Quad8 and Quad9 (for the first 4 higher-order nodes)
+   */
+  return std::pair<unsigned short int, unsigned short int>
+    (_second_order_vertex_child_number[n],
+     _second_order_vertex_child_index[n]);
 }
 
 

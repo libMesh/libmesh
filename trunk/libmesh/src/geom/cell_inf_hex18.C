@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex18.C,v 1.32 2005-06-08 08:13:28 spetersen Exp $
+// $Id: cell_inf_hex18.C,v 1.33 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -424,6 +424,23 @@ unsigned short int InfHex18::second_order_adjacent_vertex (const unsigned int n,
        * code-reuse
        */
       return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+}
+
+
+
+std::pair<unsigned short int, unsigned short int>
+InfHex18::second_order_child_vertex (const unsigned int n) const
+{
+  assert (n >= this->n_vertices());
+  assert (n < this->n_nodes());
+  /*
+   * the _second_order_vertex_child_* vectors are
+   * stored in cell_inf_hex.C, since they are identical
+   * for InfHex16 and InfHex18
+   */
+  return std::pair<unsigned short int, unsigned short int>
+    (_second_order_vertex_child_number[n],
+     _second_order_vertex_child_index[n]);
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.C,v 1.31 2005-06-08 08:13:28 spetersen Exp $
+// $Id: cell_inf_prism12.C,v 1.32 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -317,6 +317,35 @@ const unsigned short int InfPrism12::_second_order_adjacent_vertices[6][2] =
 };
 
 
+
+std::pair<unsigned short int, unsigned short int>
+InfPrism12::second_order_child_vertex (const unsigned int n) const
+{
+  assert (n >= this->n_vertices());
+  assert (n < this->n_nodes());
+
+  return std::pair<unsigned short int, unsigned short int>
+    (_second_order_vertex_child_number[n],
+     _second_order_vertex_child_index[n]);
+}
+
+
+
+const unsigned short int InfPrism12::_second_order_vertex_child_number[12] =
+{
+  99,99,99,99,99,99, // Vertices
+  0,1,0,             // Edges
+  0,1,0              // Faces
+};
+
+
+
+const unsigned short int InfPrism12::_second_order_vertex_child_index[12] =
+{
+  99,99,99,99,99,99, // Vertices
+  1,2,2,             // Edges
+  4,5,5              // Faces
+};
 
 
 

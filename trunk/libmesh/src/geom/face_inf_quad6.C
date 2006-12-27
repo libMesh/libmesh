@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.C,v 1.29 2005-07-01 16:36:22 spetersen Exp $
+// $Id: face_inf_quad6.C,v 1.30 2006-12-27 07:21:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -242,6 +242,19 @@ const unsigned short int InfQuad6::_second_order_adjacent_vertices[2][2] =
   {0, 1}, // vertices adjacent to node 4
   {2, 3}  // vertices adjacent to node 5  
 };
+
+
+
+std::pair<unsigned short int, unsigned short int>
+InfQuad6::second_order_child_vertex (const unsigned int n) const
+{
+  assert (n >= this->n_vertices());
+  assert (n < this->n_nodes());
+
+  return std::pair<unsigned short int, unsigned short int>
+    (0, 2*n-7);
+}
+
 
 
 
