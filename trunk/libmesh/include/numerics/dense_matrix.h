@@ -1,4 +1,4 @@
-// $Id: dense_matrix.h,v 1.15 2006-06-06 08:58:28 roystgnr Exp $
+// $Id: dense_matrix.h,v 1.16 2007-01-05 23:15:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -403,8 +403,7 @@ inline
 void DenseMatrix<T>::resize(const unsigned int m,
 			    const unsigned int n)
 {
-  if (m*n > _val.size())
-    _val.resize(m*n);
+  _val.resize(m*n);
 
   this->_m = m;
   this->_n = n;
