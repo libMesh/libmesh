@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.31 2006-06-07 19:52:35 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.32 2007-01-15 03:16:20 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1484,7 +1484,30 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
       {
       case 1:
 	{
-	  error();
+	  for ( ; it != end; ++it)
+	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	      {
+		if (((*it)->type() == EDGE2) ||
+		    ((*it)->type() == EDGE3) ||
+		    ((*it)->type() == EDGE4)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		    || ((*it)->type() == INFEDGE2)
+#endif
+		    )
+		  {
+		    out << "line 2" << std::endl;
+		    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+		      out << nn++ << " ";
+		    
+		  }
+		else
+		  {
+		    error();
+		  }
+		
+		out << std::endl;
+	      }
+	  
 	  break;
 	}
 	
@@ -1529,7 +1552,51 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	
       case 3:
 	{
-	  error();
+	  for ( ; it != end; ++it)
+	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	      {
+		if (((*it)->type() == HEX8) ||
+		    ((*it)->type() == HEX20) ||
+		    ((*it)->type() == HEX27)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		    || ((*it)->type() == INFHEX8)
+		    || ((*it)->type() == INFHEX16)
+		    || ((*it)->type() == INFHEX18)
+#endif
+		    )
+		  {
+		    out << "phex8 8" << std::endl;
+		    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+		      out << nn++ << " ";
+		  }
+                else if (((*it)->type() == PRISM6) ||
+                         ((*it)->type() == PRISM15) ||
+                         ((*it)->type() == PRISM18)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		         || ((*it)->type() == INFPRISM6)
+		         || ((*it)->type() == INFPRISM12)
+#endif
+			 )
+                  {
+                    out << "pprism6 6" << std::endl;
+		    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+		      out << nn++ << " ";
+                  }
+                else if (((*it)->type() == TET4) ||
+                         ((*it)->type() == TET10))
+                  {
+                    out << "tet 4" << std::endl;
+		    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+		      out << nn++ << " ";
+                  }
+		else
+		  {
+		    error();
+		  }
+		
+		out << std::endl;
+	      }
+	  
 	  break;
 	}
 	
