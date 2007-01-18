@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.h,v 1.9 2006-09-19 17:50:52 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.h,v 1.10 2007-01-18 22:24:47 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,8 +24,6 @@
 
 // C++ includes
 #include <vector>
-#include <string>
-#include <set>
 
 // Local Includes
 #include "error_estimator.h"
@@ -76,15 +74,6 @@ public:
   // using ErrorEstimator::estimate_error;
 
 private:
-
-  /**
-   * Builds a patch containing element \p elem by repeated addition
-   * of neighbors.  This procedure is repeated until the \p target_patch_size
-   * is met or exceeded.  
-   */
-  void build_patch_from_local_neighbors (const Elem* elem,
-					 std::set<const Elem*> patch,
-					 const unsigned int target_patch_size = 10);
 
   /**
    * Computes the factorial of n-used for determining matrix size
