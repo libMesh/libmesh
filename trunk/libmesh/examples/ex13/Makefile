@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2006-12-08 03:19:07 roystgnr Exp $
+# $Id: Makefile,v 1.8 2007-01-18 19:57:20 jwpeterson Exp $
 
 
 # The location of the mesh library
@@ -55,7 +55,7 @@ distclean:
 	@$(MAKE) clobber
 	@rm -f *.o *.g.o *.pg.o
 
-run: $(target)
+run: $(target) -ksp_type tfqmr
 	@echo "***************************************************************"
 	@echo "* Running Example " $(target)
 	@echo "***************************************************************"

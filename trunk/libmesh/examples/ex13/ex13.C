@@ -1,4 +1,4 @@
-/* $Id: ex13.C,v 1.16 2006-10-23 18:46:06 jwpeterson Exp $ */
+/* $Id: ex13.C,v 1.17 2007-01-18 19:57:20 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -55,6 +55,7 @@
 #include "transient_system.h"
 #include "perf_log.h"
 #include "boundary_info.h"
+#include "utility.h"
 
 // Some (older) compilers do not offer full stream 
 // functionality, OStringStream works around this.
@@ -127,9 +128,6 @@ int main (int argc, char** argv)
       // Initialize the data structures for the equation system.
       equation_systems.init ();
 
-      equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
-      equation_systems.parameters.set<Real>        ("linear solver tolerance") = std::sqrt(TOLERANCE);
-      
       // Prints information about the system to the screen.
       equation_systems.print_info();
     }
@@ -139,14 +137,18 @@ int main (int argc, char** argv)
     
     // Now we begin the timestep loop to compute the time-accurate
     // solution of the equations.
-    const Real dt = 0.005;
+    const Real dt = 0.01;
     Real time     = 0.0;
     const unsigned int n_timesteps = 15;
 
     // The number of steps and the stopping criterion are also required
     // for the nonlinear iterations.
     const unsigned int n_nonlinear_steps = 15;
-    const Real nonlinear_tolerance       = 1.e-2;
+    const Real nonlinear_tolerance       = 1.e-3;
+
+    // We also set a standard linear solver flag in the EquationSystems object
+    // which controls the maxiumum number of linear solver iterations allowed.
+    equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
     
     // Tell the system of equations what the timestep is by using
     // the set_parameter function.  The matrix assembly routine can
@@ -175,12 +177,17 @@ int main (int argc, char** argv)
 	equation_systems.parameters.set<Real> ("time") = time;
 
 	// A pretty update message
-	std::cout << " Solving time step " << t_step << ", time = " << time << std::endl;
+	std::cout << "\n\n*** Solving time step " << t_step << ", time = " << time << " ***" << std::endl;
 
 	// Now we need to update the solution vector from the
 	// previous time step.  This is done directly through
 	// the reference to the Stokes system.
 	*navier_stokes_system.old_local_solution = *navier_stokes_system.current_local_solution;
+
+	// At the beginning of each solve, reset the linear solver tolerance
+	// to a "reasonable" starting value.
+	const Real initial_linear_solver_tol = 1.e-6;
+	equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
 
 	// Now we begin the nonlinear loop
 	for (unsigned int l=0; l<n_nonlinear_steps; ++l)
@@ -204,19 +211,27 @@ int main (int argc, char** argv)
 	    // Compute the l2 norm of the difference
 	    const Real norm_delta = last_nonlinear_soln->l2_norm();
 
+	    // How many iterations were required to solve the linear system?
+	    const unsigned int n_linear_iterations = navier_stokes_system.n_linear_iterations();
+	    
+	    // What was the final residual of the linear system?
+	    const Real final_linear_residual = navier_stokes_system.final_linear_residual();
+	    
 	    // Print out convergence information for the linear and
 	    // nonlinear iterations.
 	    std::cout << "Linear solver converged at step: "
-		      << navier_stokes_system.n_linear_iterations()
+		      << n_linear_iterations
 		      << ", final residual: "
-		      << navier_stokes_system.final_linear_residual()
+		      << final_linear_residual
 		      << "  Nonlinear convergence: ||u - u_old|| = "
 		      << norm_delta
 		      << std::endl;
 
 	    // Terminate the solution iteration if the difference between
-	    // this iteration and the last is sufficiently small.
-	    if (norm_delta < nonlinear_tolerance)
+	    // this nonlinear iterate and the last is sufficiently small, AND
+	    // if the most recent linear system was solved to a sufficient tolerance.
+	    if ((norm_delta < nonlinear_tolerance) &&
+		(navier_stokes_system.final_linear_residual() < nonlinear_tolerance))
 	      {
 		std::cout << " Nonlinear solver converged at step "
 			  << l
@@ -224,6 +239,14 @@ int main (int argc, char** argv)
 		break;
 	      }
 	    
+	    // Otherwise, decrease the linear system tolerance.  For the inexact Newton
+	    // method, the linear solver tolerance needs to decrease as we get closer to
+	    // the solution to ensure quadratic convergence.  The new linear solver tolerance
+	    // is chosen (heuristically) as the square of the previous linear system residual norm.
+	    //Real flr2 = final_linear_residual*final_linear_residual;
+	    equation_systems.parameters.set<Real> ("linear solver tolerance") =
+	      Utility::pow<2>(final_linear_residual);
+
 	  } // end nonlinear loop
 	
 	// Write out every nth timestep to file.
@@ -369,9 +392,6 @@ void assemble_stokes (EquationSystems& es,
   // matrix and right-hand-side contribution.  Since the mesh
   // will be refined we want to only consider the ACTIVE elements,
   // hence we use a variant of the \p active_elem_iterator.
-//   const_active_local_elem_iterator           el (mesh.elements_begin());
-//   const const_active_local_elem_iterator end_el (mesh.elements_end());
-
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
   
@@ -559,6 +579,9 @@ void assemble_stokes (EquationSystems& es,
       // the matrix resulting from the L2 projection penalty
       // approach introduced in example 3.
       {
+	// The penalty value.  \f$ \frac{1}{\epsilon \f$
+	const Real penalty = 1.e10;
+		  
 	// The following loops over the sides of the element.
 	// If the element has no neighbor on a side then that
 	// side MUST live on a boundary of the domain.
@@ -581,9 +604,6 @@ void assemble_stokes (EquationSystems& es,
 	      // Loop over the nodes on the side.
 	      for (unsigned int ns=0; ns<side->n_nodes(); ns++)
 		{
-		  // The penalty value.  \f$ \frac{1}{\epsilon \f$
-		  const Real penalty = 1.e10;
-		  
 		  // Get the boundary values.
 		   
 		  // Set u = 1 on the top boundary, 0 everywhere else
@@ -608,6 +628,22 @@ void assemble_stokes (EquationSystems& es,
 		      }
 		} // end face node loop	  
 	    } // end if (elem->neighbor(side) == NULL)
+	
+	// Pin the pressure to zero at global node number "pressure_node".
+	// This effectively removes the non-trivial null space of constant
+	// pressure solutions.
+	const bool pin_pressure = true;
+	if (pin_pressure)
+	  {
+	    const unsigned int pressure_node = 0;
+	    const Real p_value               = 0.0;
+	    for (unsigned int c=0; c<elem->n_nodes(); c++)
+	      if (elem->node(c) == pressure_node)
+		{
+		  Kpp(c,c) += penalty;
+		  Fp(c)    += penalty*p_value;
+		}
+	  }
       } // end boundary condition section	  
       
       // The element matrix and right-hand-side are now built
