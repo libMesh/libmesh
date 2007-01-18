@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.18 2007-01-18 22:24:48 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.19 2007-01-18 22:39:56 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,13 +45,12 @@
 // PatchRecoveryErrorEstimator implementations
 std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 							const Order order,
-							const Real x,
-							const Real y,
-							const Real z,
+							const Point p,
 							const unsigned int matsize)
 {
   std::vector<Real> psi;
   psi.reserve(matsize);
+  Real x = p(0), y = p(1), z = p(2);
     
   // builds psi vector of form 1 x y z x^2 xy xz y^2 yz z^2 etc..
   // I haven't added 1D support here
@@ -229,12 +228,6 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	      // \int_{Omega_e} \psi_i \psi_j = \int_{Omega_e} du_h/dx_k \psi_i
 	      for (unsigned int qp=0; qp<n_qp; qp++)
 		{
-		  // The x,y,z location of the current quadrature point
-		  const Real
-		    x = q_point[qp](0),
-		    y = q_point[qp](1),
-		    z = q_point[qp](2);
-		    
 		  // Compute the gradient on the current patch element
 		  // at the quadrature point
 		  Gradient grad_u_h;
@@ -245,7 +238,7 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 					 system.current_solution(dof_indices[i]));
 
 		  // Construct the shape function values for the patch projection
-		  std::vector<Real> psi(specpoly(dim, element_order, x, y, z, matsize));
+		  std::vector<Real> psi(specpoly(dim, element_order, q_point[qp], matsize));
 		  
 		  // Patch matrix contribution
 		  for (unsigned int i=0; i<Kp.m(); i++)
@@ -300,13 +293,9 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 		{
 		  // Real temperrx=0,temperry=0,temperrz=0;
 		  Number temperrx=0,temperry=0,temperrz=0;
-		  const Point nodpt=elem->point(n);
-		  const Real
-		    x = nodpt(0),
-		    y = nodpt(1),
-		    z = nodpt(2);
 		  
-		  std::vector<Real> psi(specpoly(dim, element_order,x,y,z,matsize));
+		  std::vector<Real> psi( specpoly
+		    (dim, element_order, elem->point(n), matsize));
 		  // get psi-basis values at vertex
 		  
 		  for (unsigned int i=0; i<matsize; i++)
@@ -352,10 +341,6 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 		{
 		  // Real temperrx=0,temperry=0,temperrz=0;
 		  Number temperrx=0,temperry=0,temperrz=0;
-		  const Real
-		    x = samppt[sp](0),
-		    y = samppt[sp](1),
-		    z = samppt[sp](2);
 		  
 		  // Comput the gradient at the current sample point
 		  Gradient grad_u_h;
@@ -364,7 +349,7 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 		    grad_u_h.add_scaled (dphi2[i][sp],
 				       system.current_solution(dof_indices[i]));
 		  // Compute the phi values at the current sample point
-		  std::vector<Real> psi(specpoly(dim,element_order, x,y,z, matsize));
+		  std::vector<Real> psi(specpoly(dim,element_order, samppt[sp], matsize));
 		  for (unsigned int i=0; i<matsize; i++)
 		    {
 		      temperrx += psi[i]*Pu_x_h(i);
