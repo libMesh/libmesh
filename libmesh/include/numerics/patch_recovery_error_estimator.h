@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.h,v 1.10 2007-01-18 22:24:47 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.h,v 1.11 2007-01-18 22:39:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 // Local Includes
 #include "error_estimator.h"
 #include "enum_order.h"
+#include "point.h"
 
 // Forward Declarations
 class Elem;
@@ -86,9 +87,7 @@ private:
   
   std::vector<Real> specpoly(const unsigned int dim,
 			     const Order order,
-			     const Real x,
-			     const Real y,
-			     const Real z,
+			     const Point p,
 			     const unsigned int matsize);
 };
 
