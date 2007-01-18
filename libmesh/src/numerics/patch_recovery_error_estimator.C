@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.17 2006-09-19 17:50:52 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.18 2007-01-18 22:24:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,7 @@
 #include "quadrature_gauss.h"
 #include "libmesh_logging.h"
 #include "elem.h"
+#include "patch.h"
 #include "quadrature_grid.h"
 #include "system.h"
 #include "mesh.h"
@@ -151,11 +152,10 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
       
       // Build a patch containing the current element
       // and its neighbors on the local processor
-      std::set<const Elem*> patch;
+      Patch patch;
 
-
-      this->build_patch_from_local_neighbors (elem, patch);
-
+      // Use default patch size and growth strategy
+      patch.build_around_element (elem);
 
       //------------------------------------------------------------
       // Process each variable in the system using the current patch
@@ -204,8 +204,8 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	  //------------------------------------------------------
 	  // Loop over each element in the patch and compute their
 	  // contribution to the patch gradient projection.
-	  std::set<const Elem*>::const_iterator        patch_it  = patch.begin();
-	  const std::set<const Elem*>::const_iterator  patch_end = patch.end();
+	  Patch::const_iterator        patch_it  = patch.begin();
+	  const Patch::const_iterator  patch_end = patch.end();
 
 	  for (; patch_it != patch_end; ++patch_it)
 	    {
@@ -399,99 +399,4 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
   this->reduce_error(error_per_cell);
   
   STOP_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
-}
-
-
-
-void PatchRecoveryErrorEstimator::build_patch_from_local_neighbors (const Elem* e0,
-								    std::set<const Elem*> patch,
-								    const unsigned int target_patch_size)
-{
-  START_LOG("build_patch_from_local_neighbors()", "PatchRecoveryErrorEstimator");
-  
-  // Make sure we are building a patch for an active, local element.
-  // (Are these restrictions necessary?)
-  assert (e0 != NULL);
-  assert (e0->processor_id() == libMesh::processor_id());
-  assert (e0->active());
-  
-  // First add the element of interest.
-  patch.insert (e0);
-
-  // Repeatedly add the neighbors of the elements in the patch until
-  // the target patch size is met
-  while (patch.size() < target_patch_size)
-    {
-      // It is possible that the target patch size is larger than the number
-      // of active elements in the mesh.  Since we don't have access to the
-      // Mesh object here the only way we can detect this case is by detecting
-      // a "stagnant patch," i.e. a patch whose size does not increase after adding
-      // face neighbors
-      const unsigned int old_patch_size = patch.size();
-      
-      // Loop over all the elements in the patch
-      std::set<const Elem*>::const_iterator       it  = patch.begin();
-      const std::set<const Elem*>::const_iterator end = patch.end();
-
-      for (; (it != end) && (patch.size() < target_patch_size); ++it)
-	{
-	  // Convenience.  Keep the syntax simple.
-	  const Elem* elem = *it;
-
-	  for (unsigned int s=0; s<elem->n_sides(); s++)
-	    if (elem->neighbor(s) != NULL)        // we have a neighbor on this side
-	      {
-		const Elem* neighbor = elem->neighbor(s);
-		
-		if (neighbor->active())           // ... and that neighbor is active
-		  if (neighbor->processor_id() ==
-		      libMesh::processor_id())    // ... and belongs to this processor
-		    patch.insert (neighbor);      // ... then add it to the patch
-		  
-		else                              // ... the neighbor is *not* active,
-		  {                               // ... so add *all* its active, local children to the patch
-		    std::vector<const Elem*> active_children;
-
-		    neighbor->active_family_tree (active_children);
-
-		    for (unsigned int c=0; c<active_children.size(); c++)
-		      if (active_children[c]->processor_id() == libMesh::processor_id())
-			patch.insert (active_children[c]);
-		  }
-	      }
-	}
-      
-      // Check for a "stagnant" patch
-      if (patch.size() == old_patch_size)
-	{
-	  std::cerr << "ERROR: stagnant patch of "
-		    << patch.size() << " elements."
-		    << std::endl
-		    << "Does your target patch size exceed the number of elements in the mesh?"
-		    << std::endl;
-	  here();
-	  break;
-	}
-    } // end while loop
-
-  
-  // make sure all the elements in the patch are active and local
-  // if we are in debug mode
-#ifdef DEBUG
-  {
-    std::set<const Elem*>::const_iterator       it  = patch.begin();
-    const std::set<const Elem*>::const_iterator end = patch.end();
-    
-    for (; it != end; ++it)
-      {
-	// Convenience.  Keep the syntax simple.
-	const Elem* elem = *it;
-
-	assert (elem->active());
-	assert (elem->processor_id() == libMesh::processor_id());
-      }
-  }
-#endif
-
-  STOP_LOG("build_patch_from_local_neighbors()", "PatchRecoveryErrorEstimator");
 }
