@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.48 2006-12-13 23:45:07 roystgnr Exp $
+// $Id: fe_map.C,v 1.49 2007-01-18 18:59:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -99,7 +99,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	dxidx_map[p] = jacm2*dxdxi_map(p);
 	dxidy_map[p] = jacm2*dydxi_map(p);
 	dxidz_map[p] = jacm2*dzdxi_map(p);
-	    
+
 	JxW[p] = jac*qw[p];
 
 	// done computing the map
@@ -473,6 +473,16 @@ void FEBase::compute_map(const std::vector<Real>& qw,
       compute_affine_map(qw, elem);
       return;
     }
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+  static bool curvy_second_derivative_warning = false;
+  if (calculate_dphi && !curvy_second_derivative_warning)
+    {
+      std::cerr << "WARNING: Second derivatives are not currently "
+                << "correctly calculated on non-affine elements!"
+                << std::endl;
+    }
+#endif
   
    // Start logging the map computation.
   START_LOG("compute_map()", "FE");
