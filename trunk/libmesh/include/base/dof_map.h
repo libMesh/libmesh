@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.23 2006-11-10 23:24:37 roystgnr Exp $
+// $Id: dof_map.h,v 1.24 2007-01-19 23:28:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -174,6 +174,12 @@ public:
    * @returns the total number of degrees of freedom in the problem.
    */
   unsigned int n_dofs() const { return _n_dfs; }
+
+  /**
+   * @returns the total number of degrees of freedom on old_dof_objects
+   * 
+   */
+  unsigned int n_old_dofs() const { return _n_old_dfs; }
 
   /**
    * @returns the number of degrees of freedom on this processor.
@@ -494,6 +500,11 @@ private:
    * Total number of degrees of freedom.
    */
   unsigned int _n_dfs;
+
+  /**
+   * Total number of degrees of freedom on old dof objects
+   */
+  unsigned int _n_old_dfs;
 
   /**
    * First DOF index on processor \p p.

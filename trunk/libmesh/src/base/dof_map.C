@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.96 2006-11-10 23:24:37 roystgnr Exp $
+// $Id: dof_map.C,v 1.97 2007-01-19 23:28:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -403,6 +403,7 @@ void DofMap::clear()
 
   _matrices.clear();
 
+  _n_old_dfs = 0;
   _n_dfs = 0;
 }
 
@@ -525,6 +526,7 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
     }
 
   // Set the total number of degrees of freedom
+  _n_old_dfs = _n_dfs;
   _n_dfs = next_free_dof;
   //-------------------------------------------------------------------------
 
@@ -645,6 +647,7 @@ void DofMap::distribute_dofs_node_major (MeshBase& mesh)
     }
   
   // Set the total number of degrees of freedom
+  _n_old_dfs = _n_dfs;
   _n_dfs = next_free_dof;
   //-------------------------------------------------------------------------
 
