@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.22 2006-10-26 04:22:48 roystgnr Exp $
+// $Id: error_estimator.C,v 1.23 2007-01-19 23:28:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,6 +22,7 @@
 #include "libmesh_common.h"
 #include "error_estimator.h"
 #include "error_vector.h"
+#include "equation_systems.h"
 
 
 
@@ -70,3 +71,43 @@ void ErrorEstimator::convert_component_mask_to_scale()
         }
     }
 }
+
+
+
+void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
+                                     ErrorVector& error_per_cell,
+                                     std::map<const System*, std::vector<float> >& component_scales,
+                                     bool estimate_parent_error)
+{
+  // This is a brand-new function; if you're using it you should
+  // already have stopped using component_mask
+  assert(component_mask.empty());
+
+  std::vector<float> old_component_scale = this->component_scale;
+
+  // Sum the error values from each system
+  for (unsigned int s = 0; s != equation_systems.n_systems(); ++s)
+    {
+      ErrorVector system_error_per_cell;
+      const System &sys = equation_systems.get_system(s);
+      if (component_scales.find(&sys) == component_scales.end())
+        this->component_scale = old_component_scale;
+      else
+        this->component_scale = component_scales[&sys];
+
+      this->estimate_error(sys, system_error_per_cell, estimate_parent_error);
+
+      if (s)
+        {
+          assert(error_per_cell.size() == system_error_per_cell.size());
+          for (unsigned int i=0; i != error_per_cell.size(); ++i)
+            error_per_cell[i] += system_error_per_cell[i];
+        }
+      else
+        error_per_cell = system_error_per_cell;
+    }
+
+  // Restore our old state before returning
+  this->component_scale = old_component_scale;
+}
+

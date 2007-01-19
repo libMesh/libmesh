@@ -1,4 +1,4 @@
-// $Id: error_estimator.h,v 1.12 2006-09-19 17:50:52 roystgnr Exp $
+// $Id: error_estimator.h,v 1.13 2007-01-19 23:28:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,8 +23,9 @@
 #define __error_estimator_h__
 
 // C++ includes
-#include <vector>
+#include <map>
 #include <string>
+#include <vector>
 
 // Local Includes
 #include "libmesh_common.h"
@@ -67,6 +68,22 @@ public:
   virtual void estimate_error (const System& system,
 			       ErrorVector& error_per_cell,
 			       bool estimate_parent_error = false) = 0;
+
+  /**
+   * This pure virtual function can be redefined
+   * in derived classes, but by default computes the sum of
+   * the error_per_cell for each system in the equation_systems.
+   *
+   * Currently this function ignores the component_scale member variable,
+   * and uses the function argument component_scales instead.
+   *
+   * This function is named estimate_errors instead of estimate_error
+   * because otherwise C++ can get confused.
+   */
+  virtual void estimate_errors (const EquationSystems& equation_systems,
+			        ErrorVector& error_per_cell,
+			        std::map<const System*, std::vector<float> >& component_scales,
+			        bool estimate_parent_error = false);
 
   /**
    * When passed an EquationSystems reference, this function
