@@ -1,5 +1,5 @@
 
-// $Id: patch.h,v 1.1 2007-01-18 22:24:47 roystgnr Exp $
+// $Id: patch.h,v 1.2 2007-01-19 23:39:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -68,15 +68,15 @@ public:
 
   /**
    * This function finds all elements which touch the current patch at
-   * a vertex, and adds them to the patch.
+   * any point, and adds them to the patch.
    */
-  void add_vertex_neighbors();
+  void add_point_neighbors();
 
   /**
    * This function finds all elements on the current processor which
-   * touch the current patch at a vertex, and adds them to the patch.
+   * touch the current patch at any point, and adds them to the patch.
    */
-  void add_local_vertex_neighbors();
+  void add_local_point_neighbors();
 
   /**
    * Pointer to Member Function typedef
@@ -92,7 +92,21 @@ public:
    */
   void build_around_element(const Elem* elem,
 			    const unsigned int target_patch_size = 10,
-			    PMF patchtype = &Patch::add_local_vertex_neighbors);
+			    PMF patchtype = &Patch::add_local_point_neighbors);
+
+protected:
+
+  /**
+   * This function finds all elements which
+   * touch the current patch at a face
+   */
+  void find_face_neighbors(std::set<const Elem *> &neighbor_set);
+
+  /**
+   * This function finds all elements which
+   * touch the current patch at any point
+   */
+  void find_point_neighbors(std::set<const Elem *> &neighbor_set);
 };
 
 
