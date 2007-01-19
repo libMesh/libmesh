@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.71 2006-10-27 18:52:03 roystgnr Exp $
+// $Id: mesh.C,v 1.72 2007-01-19 23:09:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -927,10 +927,16 @@ void Mesh::create_submesh (Mesh& new_mesh,
 			   const_element_iterator& it,
 			   const const_element_iterator& it_end) const
 {
- 
   // Just in case the subdomain_mesh already has some information
   // in it, get rid of it.
   new_mesh.clear();
+
+  // Fail if (*this == new_mesh), we cannot create a submesh inside ourself!
+  // This may happen if the user accidently passes the original mesh into
+  // this function!  We will check this by making sure we did not just
+  // clear ourself.
+  assert (this->n_nodes() != 0);
+  assert (this->n_elem()  != 0); 
 
   // How the nodes on this mesh will be renumbered to nodes
   // on the new_mesh.  
