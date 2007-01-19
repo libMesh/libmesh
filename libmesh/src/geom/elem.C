@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.64 2007-01-19 23:39:33 roystgnr Exp $
+// $Id: elem.C,v 1.65 2007-01-19 23:52:04 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -427,10 +427,6 @@ bool Elem::contains_vertex_of(const Elem *e) const
 
 void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
 {
-  std::cerr << "Error: Elem::find_point_neighbors not yet implemented"
-            << std::endl;
-  error();
-
   neighbor_set.clear();
   neighbor_set.insert(this);
 
