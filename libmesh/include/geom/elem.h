@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.45 2006-12-27 07:21:27 roystgnr Exp $
+// $Id: elem.h,v 1.46 2007-01-19 23:39:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 
 // C++ includes
 #include <algorithm>
+#include <set>
 #include <vector>
 
 // Local includes
@@ -217,6 +218,18 @@ class Elem : public ReferenceCountedObject<Elem>,
    * a->child(c) will be e;
    */
   unsigned int which_child_am_i(const Elem *e) const; 
+
+  /**
+   * This function returns true iff a vertex of e is contained
+   * in this element
+   */
+  bool contains_vertex_of(const Elem *e) const;
+
+  /**
+   * This function finds all elements which
+   * touch the current element at any point
+   */
+  void find_point_neighbors(std::set<const Elem *> &neighbor_set) const;
 
   /**
    * Returns the connectivity for this element in a specific

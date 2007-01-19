@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.63 2006-12-27 07:25:53 roystgnr Exp $
+// $Id: elem.C,v 1.64 2007-01-19 23:39:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -413,6 +413,72 @@ bool Elem::operator == (const DofObject& rhs) const
 }
 
 
+
+bool Elem::contains_vertex_of(const Elem *e) const
+{
+  // Our vertices are the first numbered nodes
+  for (unsigned int n = 0; n != e->n_vertices(); ++n)
+    if (this->contains_point(e->point(n)))
+      return true;
+  return false;
+}
+
+
+
+void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
+{
+  std::cerr << "Error: Elem::find_point_neighbors not yet implemented"
+            << std::endl;
+  error();
+
+  neighbor_set.clear();
+  neighbor_set.insert(this);
+
+  unsigned int old_size;
+  do
+    {
+      old_size = neighbor_set.size();
+
+      // Loop over all the elements in the patch
+      std::set<const Elem*>::const_iterator       it  = neighbor_set.begin();
+      const std::set<const Elem*>::const_iterator end = neighbor_set.end();
+
+      for (; it != end; ++it)
+        {
+          const Elem* elem = *it;
+
+          for (unsigned int s=0; s<elem->n_sides(); s++)
+            if (elem->neighbor(s) != NULL)           // we have a neighbor on this side
+              {
+                const Elem* neighbor = elem->neighbor(s);
+
+                if (neighbor->active() &&                // ... if it is active
+                  (this->contains_vertex_of(neighbor) || // ... and it touches us
+                   neighbor->contains_vertex_of(this)))  
+                  neighbor_set.insert (neighbor);        // ... then add it
+
+                else                                 // ... the neighbor is *not* active,
+                  {                                  // ... so add *all* neighboring
+                                                     // active children
+                    std::vector<const Elem*> active_neighbor_children;
+  
+                    neighbor->active_family_tree_by_neighbor
+                      (active_neighbor_children, elem);
+
+                    std::vector<const Elem*>::const_iterator
+                      child_it = active_neighbor_children.begin();
+                    const std::vector<const Elem*>::const_iterator
+                      child_end = active_neighbor_children.end();
+                    for (; child_it != child_end; ++child_it)
+                      if (this->contains_vertex_of(*child_it) ||
+                          (*child_it)->contains_vertex_of(this))
+                        neighbor_set.insert (*child_it);
+                  }
+              }
+        }
+    }
+  while (old_size != neighbor_set.size());
+}
 
 
 
