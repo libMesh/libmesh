@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.65 2007-01-19 23:52:04 roystgnr Exp $
+// $Id: elem.C,v 1.66 2007-01-20 21:03:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -448,11 +448,12 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
               {
                 const Elem* neighbor = elem->neighbor(s);
 
-                if (neighbor->active() &&                // ... if it is active
-                  (this->contains_vertex_of(neighbor) || // ... and it touches us
-                   neighbor->contains_vertex_of(this)))  
-                  neighbor_set.insert (neighbor);        // ... then add it
-
+                if (neighbor->active())                // ... if it is active
+                  {
+                    if (this->contains_vertex_of(neighbor) // ... and touches us
+                        || neighbor->contains_vertex_of(this))  
+                      neighbor_set.insert (neighbor);  // ... then add it
+                  }
                 else                                 // ... the neighbor is *not* active,
                   {                                  // ... so add *all* neighboring
                                                      // active children
