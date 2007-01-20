@@ -28,6 +28,9 @@ approx_order = 2
 # Use exact error estimator instead of gradient jumps?
 exact_indicator = false
 
+# Use patch recovery error estimator instead of gradient jumps?
+patch_indicator = false
+
 # Mesh refinement type: h, p, matchedhp, or hp
 # Use HIERARCHIC or HERMITE functions with p/matchedhp/hp,
 # Use an exact indicator with matchedhp/hp.

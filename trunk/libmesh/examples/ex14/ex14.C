@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.34 2006-11-11 01:42:08 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.35 2007-01-20 21:17:35 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -58,6 +58,7 @@
 #include "error_vector.h"
 #include "exact_error_estimator.h"
 #include "kelly_error_estimator.h"
+#include "patch_recovery_error_estimator.h"
 #include "hp_coarsentest.h"
 #include "hp_singular.h"
 #include "mesh_generation.h"
@@ -126,6 +127,7 @@ int main(int argc, char** argv)
     const int max_linear_iterations   = input_file("max_linear_iterations", 5000);
     dim = input_file("dimension", 2);
     const bool exact_indicator = input_file("exact_indicator", false);
+    const bool patch_indicator = input_file("patch_indicator", false);
     singularity = input_file("singularity", true);
     
     // Output file for plotting the error as a function of
@@ -295,6 +297,15 @@ int main(int argc, char** argv)
 		    // the provided indicator.  Note in general you
 		    // will need to provide an error estimator
                     // specifically designed for your application.
+		    error_estimator.estimate_error (system, error);
+                  }
+                else if (patch_indicator)
+                  {
+                    // For real problems, we would need an error
+                    // indicator which only relies on the approximate
+                    // solution.
+		    PatchRecoveryErrorEstimator error_estimator;
+
 		    error_estimator.estimate_error (system, error);
                   }
                 else
