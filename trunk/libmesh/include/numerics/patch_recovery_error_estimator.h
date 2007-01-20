@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.h,v 1.11 2007-01-18 22:39:55 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.h,v 1.12 2007-01-20 20:54:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -77,11 +77,6 @@ public:
 private:
 
   /**
-   * Computes the factorial of n-used for determining matrix size
-   */  
-  unsigned int factorial(const unsigned int n);
-
-  /**
    * Returns the spectral polynomial basis function values at a point x,y,z
    */
   
@@ -90,18 +85,6 @@ private:
 			     const Point p,
 			     const unsigned int matsize);
 };
-
-
-
-//-----------------------------------------------------------------
-// PatchRecoveryErrorEstimator implementations
-inline
-unsigned int PatchRecoveryErrorEstimator::factorial (const unsigned int n)
-{
-  unsigned int fac=1;
-  for (int i=n; i>0; i--) fac *= i;
-  return fac;
-}
 
 
 
