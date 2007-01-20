@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.19 2007-01-18 22:39:56 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.20 2007-01-20 20:54:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -50,7 +50,11 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 {
   std::vector<Real> psi;
   psi.reserve(matsize);
-  Real x = p(0), y = p(1), z = p(2);
+  Real x = p(0), y, z;
+  if (dim > 1)
+    y = p(1);
+  if (dim > 2)
+    z = p(2);
     
   // builds psi vector of form 1 x y z x^2 xy xz y^2 yz z^2 etc..
   // I haven't added 1D support here
@@ -63,9 +67,11 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	case 3:
 	  {	
 	    for (int xexp=poly_deg; xexp >= 0; xexp--) // use an int for xexp since we -- it
-	      for (int yexp=poly_deg-xexp; yexp >= 0; yexp--) // use an int for yexp since we -- it
-		for (int zexp=poly_deg-xexp-yexp; zexp >=0; zexp--) // use an int for zexp since we -- it
+	      for (int yexp=poly_deg-xexp; yexp >= 0; yexp--)
+                {
+                  int zexp = poly_deg - xexp - yexp;
 		  psi.push_back(std::pow(x,xexp)*std::pow(y,yexp)*std::pow(z,zexp));
+                }
 	    break;
 	  }
 
@@ -73,16 +79,18 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	case 2:
 	  {
 	    for (int xexp=poly_deg; xexp >= 0; xexp--) // use an int for xexp since we -- it
-	      for (int yexp=poly_deg-xexp; yexp >= 0; yexp--) // use an int for yexp since we -- it
+              {
+                int yexp = poly_deg - xexp;
 		psi.push_back(std::pow(x,xexp)*std::pow(y,yexp));
+              }
 	    break;
 	  }
 
 	  // 1D spectral polynomial basis functions
 	case 1:
 	  {
-	    for (int xexp=poly_deg; xexp >= 0; xexp--) // use an int for xexp since we -- it
-	      psi.push_back(std::pow(x,xexp));
+            int xexp = poly_deg;
+	    psi.push_back(std::pow(x,xexp));
 	    break;
 	  }
 	  
@@ -147,8 +155,6 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
       // elem is necessarily an active element on the local processor
       const Elem* elem = *elem_it;
 
-      const Order element_order (elem->default_order());
-      
       // Build a patch containing the current element
       // and its neighbors on the local processor
       Patch patch;
@@ -167,14 +173,17 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	  // The type of finite element to use for this variable
 	  const FEType& fe_type = dof_map.variable_type (var);
 
+          const Order element_order  = static_cast<Order>
+            (fe_type.order + elem->p_level());
+      
 	  // Finite element object for use in this patch
 	  AutoPtr<FEBase> fe (FEBase::build (dim, fe_type));
 	  
 	  // Build an appropriate Gaussian quadrature rule
-	  QGauss qrule (dim, fe_type.default_quadrature_order());
+	  AutoPtr<QBase> qrule (fe_type.default_quadrature_rule(dim));
 
 	  // Tell the finite element about the quadrature rule.
-	  fe->attach_quadrature_rule (&qrule);
+	  fe->attach_quadrature_rule (qrule.get());
       
 	  // Get Jacobian values, etc..
 	  const std::vector<Real>&                       JxW     = fe->get_JxW();
@@ -185,14 +194,33 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	  // global DOF indices
 	  std::vector<unsigned int> dof_indices;
 
-	  unsigned int matsize=1;
-
-	  // Computes the approprite size for the patch projection matrices
+	  // Compute the approprite size for the patch projection matrices
 	  // and vectors; 
-	  for (unsigned int pascal_level=1;
-	       pascal_level<static_cast<unsigned int>(element_order)+1;
-	       pascal_level++)
-	    matsize += this->factorial(pascal_level+dim-1)/this->factorial(pascal_level);
+	  unsigned int matsize;
+
+          switch (dim)
+	    {
+	    case 3:
+	      {	
+                matsize = (element_order + 1)*
+                          (element_order + 2)*
+                          (element_order + 3)/6;
+	        break;
+              }
+	    case 2:
+	      {	
+                matsize = (element_order + 1)*
+                          (element_order + 2)/2;
+	        break;
+              }
+	    case 1:
+	      {	
+                matsize = element_order + 1;
+	        break;
+              }
+	    default:
+	      error();
+	    }
 	  	  
 	  DenseMatrix<Number> Kp(matsize,matsize);
 	  DenseVector<Number>
@@ -217,12 +245,10 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	      // Get the global DOF indices for the current variable
 	      // in the current element
 	      dof_map.dof_indices (e_p, dof_indices, var);
-
-	      // Huh? Something is horribly WRONG!
 	      assert (dof_indices.size() == phi.size());
 
 	      const unsigned int n_dofs = dof_indices.size();
-	      const unsigned int n_qp   = qrule.n_points();
+	      const unsigned int n_qp   = qrule->n_points();
 
 	      // Compute the projection components from this cell.
 	      // \int_{Omega_e} \psi_i \psi_j = \int_{Omega_e} du_h/dx_k \psi_i
@@ -281,97 +307,54 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	  // grad u_h once on the element.  Also as G_H u_h - gradu_h is linear
 	  // on an element, it assumes its maximum at a vertex of the element
 	  Real error = 0;
-	  if (element_order == FIRST)
-	    {
-	      // compute the gradient once at any quadrature point(as its constant)
-	      Gradient grad_u_h;
-	      for (unsigned int j=0; j<n_dofs; j++)
-		grad_u_h.add_scaled (dphi[j][0],
-				     system.current_solution(dof_indices[j]));
-	      // loop over element vertices
-	      for (unsigned int n=0; n<elem->n_nodes(); n++)
-		{
-		  // Real temperrx=0,temperry=0,temperrz=0;
-		  Number temperrx=0,temperry=0,temperrz=0;
-		  
-		  std::vector<Real> psi( specpoly
-		    (dim, element_order, elem->point(n), matsize));
-		  // get psi-basis values at vertex
-		  
-		  for (unsigned int i=0; i<matsize; i++)
-		    {
-		      temperrx += psi[i]*Pu_x_h(i);
-		      temperry += psi[i]*Pu_y_h(i);
-		      temperrz += psi[i]*Pu_z_h(i);
-		    }
-		  temperrx -= grad_u_h(0);
-		  temperry -= grad_u_h(1);
-		  temperrz -= grad_u_h(2);
-		  
-		  // temperrx = std::abs(temperrx);
-		  // temperry = std::abs(temperry);
-		  // temperrz = std::abs(temperrz);
-		  
-		  // error = std::max(temperrz,std::max(temperry,temperrx));
+	  // we approximate the max norm by sampling over a set of points
+	  // in future we may add specialized routines for specific cases
+	  // or use some optimization package
+	  const Order qorder = element_order;
 
-		  error = std::max(std::abs(temperrz),
-				   std::max(std::abs(temperry),
-					    std::abs(temperrx)));
-
-		} // end vertex loop
-	    } // end piecewise linear case
-	  else
-	    {
-	      // we approximate the max norm by sampling over a set of points
-	      // in future we may add specialized routines for specific cases
-	      // or use some optimization package
-	      const Order qorder = TENTH;
-	      // build a "fake" quadrature rule for the element
-	      QGrid samprule (dim, qorder);
-	      fe->attach_quadrature_rule (&samprule);
-	      fe->reinit(elem);
+	  // build a "fake" quadrature rule for the element
+	  QGrid samprule (dim, qorder);
+	  fe->attach_quadrature_rule (&samprule);
+	  fe->reinit(elem);
 	      
-	      //const std::vector<Real>&                       JxW2     = fe->get_JxW();
-	      const std::vector<Point>&                      samppt   = fe->get_xyz();
-	      //const std::vector<std::vector<Real> >&         phi2     = fe->get_phi();
-	      const std::vector<std::vector<RealGradient> >& dphi2    = fe->get_dphi();
+	  const std::vector<Point>&                      samppt   = fe->get_xyz();
+	  const std::vector<std::vector<RealGradient> >& dphi2    = fe->get_dphi();
 
-	      const unsigned int n_sp = samprule.n_points();
-	      for (unsigned int sp=0; sp< n_sp; sp++)
-		{
-		  // Real temperrx=0,temperry=0,temperrz=0;
-		  Number temperrx=0,temperry=0,temperrz=0;
-		  
-		  // Comput the gradient at the current sample point
-		  Gradient grad_u_h;
-		  
-		  for (unsigned int i=0; i<n_dofs; i++)
-		    grad_u_h.add_scaled (dphi2[i][sp],
-				       system.current_solution(dof_indices[i]));
-		  // Compute the phi values at the current sample point
-		  std::vector<Real> psi(specpoly(dim,element_order, samppt[sp], matsize));
-		  for (unsigned int i=0; i<matsize; i++)
-		    {
-		      temperrx += psi[i]*Pu_x_h(i);
-		      temperry += psi[i]*Pu_y_h(i);
-		      temperrz += psi[i]*Pu_z_h(i);
-		    }
-		  temperrx -= grad_u_h(0);
-		  temperry -= grad_u_h(1);
-		  temperrz -= grad_u_h(2);
+	  const unsigned int n_sp = samprule.n_points();
+	  for (unsigned int sp=0; sp< n_sp; sp++)
+	    {
+	      // Real temperrx=0,temperry=0,temperrz=0;
+	      Number temperrx=0,temperry=0,temperrz=0;
+	  
+	      // Comput the gradient at the current sample point
+	      Gradient grad_u_h;
+	  
+	      for (unsigned int i=0; i<n_dofs; i++)
+	        grad_u_h.add_scaled (dphi2[i][sp],
+			             system.current_solution(dof_indices[i]));
+	      // Compute the phi values at the current sample point
+	      std::vector<Real> psi(specpoly(dim,element_order, samppt[sp], matsize));
+	      for (unsigned int i=0; i<matsize; i++)
+	        {
+	          temperrx += psi[i]*Pu_x_h(i);
+	          temperry += psi[i]*Pu_y_h(i);
+	          temperrz += psi[i]*Pu_z_h(i);
+	        }
+	      temperrx -= grad_u_h(0);
+	      temperry -= grad_u_h(1);
+	      temperrz -= grad_u_h(2);
 
-		  // temperrx = std::abs(temperrx);
-		  // temperry = std::abs(temperry);
-		  // temperrz = std::abs(temperrz);
-		  
-		  // error = std::max(temperrz,std::max(temperry,temperrx));		  
+	      // temperrx = std::abs(temperrx);
+	      // temperry = std::abs(temperry);
+	      // temperrz = std::abs(temperrz);
+	  
+	      // error = std::max(temperrz,std::max(temperry,temperrx));		  
 
-		  error = std::max(std::abs(temperrz),
-				   std::max(std::abs(temperry),
-					    std::abs(temperrx)));
+	      error = std::max(std::abs(temperrz),
+			       std::max(std::abs(temperry),
+				        std::abs(temperrx)));
 
-		} // end sample_point_loop
-	    } // end P>1 Error loop
+	    } // end sample_point_loop
 	  const int e_id=elem->id();
 	  error_per_cell[e_id] += error;	  
 	} // end variable loop  
