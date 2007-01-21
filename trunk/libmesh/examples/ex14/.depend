@@ -48,6 +48,7 @@ ex14.$(obj-suffix):\
     ../../include/numerics/jump_error_estimator.h\
     ../../include/numerics/kelly_error_estimator.h\
     ../../include/numerics/numeric_vector.h\
+    ../../include/numerics/patch_recovery_error_estimator.h\
     ../../include/numerics/sparse_matrix.h\
     ../../include/numerics/tensor_value.h\
     ../../include/numerics/type_tensor.h\
