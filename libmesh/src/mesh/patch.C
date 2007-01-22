@@ -1,5 +1,5 @@
 
-// $Id: patch.C,v 1.2 2007-01-19 23:39:33 roystgnr Exp $
+// $Id: patch.C,v 1.3 2007-01-22 23:36:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -76,17 +76,20 @@ void Patch::find_face_neighbors(std::set<const Elem *> &new_neighbors)
 
 void Patch::add_face_neighbors()
 {
+  START_LOG("add_face_neighbors()", "Patch");
   std::set<const Elem *> new_neighbors;
 
   this->find_face_neighbors(new_neighbors);
     
   this->insert(new_neighbors.begin(), new_neighbors.end());
+  STOP_LOG("add_face_neighbors()", "Patch");
 }
 
 
 
 void Patch::add_local_face_neighbors()
 {
+  START_LOG("add_local_face_neighbors()", "Patch");
   std::set<const Elem *> new_neighbors;
 
   this->find_face_neighbors(new_neighbors);
@@ -103,6 +106,7 @@ void Patch::add_local_face_neighbors()
     }
 
   this->insert(new_neighbors.begin(), new_neighbors.end());
+  STOP_LOG("add_local_face_neighbors()", "Patch");
 }
     
 
@@ -129,17 +133,20 @@ void Patch::find_point_neighbors(std::set<const Elem *> &new_neighbors)
 
 void Patch::add_point_neighbors()
 {
+  START_LOG("add_point_neighbors()", "Patch");
   std::set<const Elem *> new_neighbors;
 
   this->find_point_neighbors(new_neighbors);
     
   this->insert(new_neighbors.begin(), new_neighbors.end());
+  STOP_LOG("add_point_neighbors()", "Patch");
 }
 
 
   
 void Patch::add_local_point_neighbors()
 {
+  START_LOG("add_local_point_neighbors()", "Patch");
   std::set<const Elem *> new_neighbors;
 
   this->find_point_neighbors(new_neighbors);
@@ -154,6 +161,7 @@ void Patch::add_local_point_neighbors()
 	  libMesh::processor_id()) // ... if the neighbor belongs to this processor
 	this->insert (neighbor);   // ... then add it to the patch
     }
+  STOP_LOG("add_local_point_neighbors()", "Patch");
 }
   
 
@@ -188,7 +196,10 @@ void Patch::build_around_element (const Elem* e0,
       // patch whose size does not increase after adding face neighbors
       const unsigned int old_patch_size = this->size();
       
+      // We profile the patch-extending functions separately
+      PAUSE_LOG("build_around_element()", "Patch");
       (this->*patchtype)();
+      RESTART_LOG("build_around_element()", "Patch");
       
       // Check for a "stagnant" patch
       if (this->size() == old_patch_size)
