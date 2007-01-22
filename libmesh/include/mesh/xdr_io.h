@@ -1,4 +1,4 @@
-// $Id: xdr_io.h,v 1.6 2005-08-18 14:58:56 knezed01 Exp $
+// $Id: xdr_io.h,v 1.7 2007-01-22 17:40:45 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 
 // Forward declarations
 class MeshBase;
-
+class MeshData;
 
 /**
  *
@@ -215,47 +215,6 @@ class XdrIO : public MeshInput<MeshBase>,
 
 
 
-// ------------------------------------------------------------
-// MeshIO inline members
-inline
-XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase>(mesh),
-  _binary (binary)
-{
-}
-
-
-
-inline
-XdrIO::XdrIO (const MeshBase& mesh, const bool binary) :
-  MeshOutput<MeshBase>(mesh),
-  _binary (binary)
-{
-}
-
-
-
-inline
-XdrIO::~XdrIO ()
-{
-}
-
-
-
-inline
-bool & XdrIO::binary ()
-{
-  return _binary;
-}
-
-
-
-inline
-bool XdrIO::binary () const
-{
-  return _binary;
-}
 
 
 

@@ -4061,6 +4061,17 @@ src/mesh/unv_io.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/mesh/xdr_head.$(obj-suffix):\
+    src/mesh/xdr_head.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/mesh/mesh_input.h\
+    include/mesh/mesh_output.h\
+    include/mesh/xdr_head.h\
+    include/mesh/xdr_io.h\
+    include/mesh/xdr_mgf.h\
+    include/utils/o_f_stream.h
 src/mesh/xdr_io.$(obj-suffix):\
     src/mesh/xdr_io.C\
     include/base/auto_ptr.h\
@@ -4084,12 +4095,55 @@ src/mesh/xdr_io.$(obj-suffix):\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
     include/mesh/mesh_tools.h\
+    include/mesh/xdr_head.h\
     include/mesh/xdr_io.h\
+    include/mesh/xdr_mesh.h\
+    include/mesh/xdr_mgf.h\
+    include/mesh/xdr_mhead.h\
+    include/mesh/xdr_shead.h\
+    include/mesh/xdr_soln.h\
     include/numerics/type_vector.h\
     include/utils/o_f_stream.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/utility.h
+src/mesh/xdr_mesh.$(obj-suffix):\
+    src/mesh/xdr_mesh.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/enums/enum_elem_type.h\
+    include/mesh/mesh_input.h\
+    include/mesh/mesh_output.h\
+    include/mesh/xdr_head.h\
+    include/mesh/xdr_io.h\
+    include/mesh/xdr_mesh.h\
+    include/mesh/xdr_mgf.h\
+    include/mesh/xdr_mhead.h\
+    include/utils/o_f_stream.h
+src/mesh/xdr_mgf.$(obj-suffix):\
+    src/mesh/xdr_mgf.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/mesh/mesh_input.h\
+    include/mesh/mesh_output.h\
+    include/mesh/xdr_io.h\
+    include/mesh/xdr_mgf.h\
+    include/utils/o_f_stream.h
+src/mesh/xdr_soln.$(obj-suffix):\
+    src/mesh/xdr_soln.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/mesh/mesh_input.h\
+    include/mesh/mesh_output.h\
+    include/mesh/xdr_head.h\
+    include/mesh/xdr_io.h\
+    include/mesh/xdr_mgf.h\
+    include/mesh/xdr_shead.h\
+    include/mesh/xdr_soln.h\
+    include/utils/o_f_stream.h
 src/numerics/analytic_function.$(obj-suffix):\
     src/numerics/analytic_function.C\
     include/base/libmesh_base.h\
