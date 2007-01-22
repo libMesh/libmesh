@@ -1,5 +1,5 @@
 
-// $Id: patch.h,v 1.2 2007-01-19 23:39:32 roystgnr Exp $
+// $Id: patch.h,v 1.3 2007-01-22 23:36:49 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -92,7 +92,7 @@ public:
    */
   void build_around_element(const Elem* elem,
 			    const unsigned int target_patch_size = 10,
-			    PMF patchtype = &Patch::add_local_point_neighbors);
+			    PMF patchtype = &Patch::add_local_face_neighbors);
 
 protected:
 
