@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.8 2007-01-18 19:57:20 jwpeterson Exp $
+# $Id: Makefile,v 1.9 2007-01-22 23:34:25 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -55,12 +55,12 @@ distclean:
 	@$(MAKE) clobber
 	@rm -f *.o *.g.o *.pg.o
 
-run: $(target) -ksp_type tfqmr
+run: $(target)
 	@echo "***************************************************************"
 	@echo "* Running Example " $(target)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target)
+	@$(target) -ksp_type tfqmr
 	@#./ex13_nonlinear -snes_ls cubic -snes_max_it 10 -ksp_rtol 1.e-3 -ksp_max_it 50 -ksp_xmonitor -ksp_gmres_restart 25 -snes_mf_operator -snes_view 
 	@echo " "
 	@echo "***************************************************************"
