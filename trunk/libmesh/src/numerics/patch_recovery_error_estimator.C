@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.20 2007-01-20 20:54:58 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.21 2007-01-22 23:36:07 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -159,8 +159,13 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
       // and its neighbors on the local processor
       Patch patch;
 
+      // We log the time spent building patches separately
+      PAUSE_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
+
       // Use default patch size and growth strategy
       patch.build_around_element (elem);
+
+      RESTART_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
 
       //------------------------------------------------------------
       // Process each variable in the system using the current patch
