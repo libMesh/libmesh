@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.h,v 1.3 2006-09-19 17:50:52 roystgnr Exp $
+// $Id: uniform_refinement_estimator.h,v 1.4 2007-01-23 20:21:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,12 +66,33 @@ public:
    * system.solve() must be called, and so should
    * have no side effects.
    *
+   * Only the provided system is solved on the refined mesh;
+   * for problems decoupled into multiple systems, use of
+   * estimate_errors() should be more reliable.
+   *
    * The estimated error is output in the vector
    * \p error_per_cell
    */
   virtual void estimate_error (const System& system,
 			       ErrorVector& error_per_cell,
 			       bool estimate_parent_error = false);
+
+  /**
+   * This pure virtual function can be redefined
+   * in derived classes, but by default computes the sum of
+   * the error_per_cell for each system in the equation_systems.
+   *
+   * Currently this function ignores the component_scale member variable,
+   * and uses the function argument component_scales instead.
+   *
+   * This function is named estimate_errors instead of estimate_error
+   * because otherwise C++ can get confused.
+   */
+  virtual void estimate_errors (const EquationSystems& equation_systems,
+				ErrorVector& error_per_cell,
+				std::map<const System*, std::vector<float> >& component_scales,
+				bool estimate_parent_error = false);
+
 
   /**
    * Returns or allows you to set the Sobolev order for error computations
@@ -89,6 +110,17 @@ public:
    * How many p refinements to perform to get the fine grid
    */
   unsigned char number_p_refinements;
+
+protected:
+  /**
+   * The code for estimate_error and estimate_errors is very similar,
+   * so we use the same function for both
+   */
+  virtual void _estimate_error (const EquationSystems *equation_systems,
+                                const System* system,
+				ErrorVector& error_per_cell,
+				std::map<const System*, std::vector<float> >* component_scales,
+				bool estimate_parent_error = false);
 
 private:
   /**
