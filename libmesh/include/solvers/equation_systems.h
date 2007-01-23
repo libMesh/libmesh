@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.19 2007-01-23 05:14:24 roystgnr Exp $
+// $Id: equation_systems.h,v 1.20 2007-01-23 05:15:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -202,6 +202,8 @@ public:
   
   /**
    * Remove the system named \p name from the systems array.
+   * This function is now deprecated - write the
+   * libmesh-devel mailing list if you need it reimplemented.
    */
   void delete_system (const std::string& name);
 
