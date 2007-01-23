@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.50 2007-01-23 00:18:12 roystgnr Exp $
+// $Id: fe_map.C,v 1.51 2007-01-23 01:29:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -476,7 +476,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
 
 #ifdef ENABLE_SECOND_DERIVATIVES
   static bool curvy_second_derivative_warning = false;
-  if (calculate_dphi && !curvy_second_derivative_warning)
+  if (calculate_d2phi && !curvy_second_derivative_warning)
     {
       std::cerr << "WARNING: Second derivatives are not currently "
                 << "correctly calculated on non-affine elements!"
