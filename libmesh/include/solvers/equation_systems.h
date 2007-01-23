@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.18 2005-08-17 19:26:07 knezed01 Exp $
+// $Id: equation_systems.h,v 1.19 2007-01-23 05:14:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -86,9 +86,10 @@ public:
   EquationSystems (Mesh& mesh, MeshData* mesh_data=NULL);
 
   /**
-   * Destructor.
+   * Destructor.  Should be virtual, since the user may want to derive
+   * subclasses of EquationSystems.
    */
-  ~EquationSystems ();
+  virtual ~EquationSystems ();
  
   /**
    * Returns tha data structure to a pristine state.
@@ -224,8 +225,13 @@ public:
   
   /**
    * Call \p solve on all the individual equation systems.
+   *
+   * By default this function solves each equation system once,
+   * in the order they were added.  For more sophisticated decoupled
+   * problems the user may with to override this behavior in a derived
+   * class.
    */
-  void solve ();
+  virtual void solve ();
   
   /**
    * Fill the input vector \p var_names with the names

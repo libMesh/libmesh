@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.33 2006-11-09 08:07:55 roystgnr Exp $
+// $Id: equation_systems.C,v 1.34 2007-01-23 05:14:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -282,6 +282,8 @@ System & EquationSystems::add_system (const std::string& sys_type,
 
 void EquationSystems::delete_system (const std::string& name)
 {
+  deprecated();
+
   if (!_systems.count(name))
     {
       std::cerr << "ERROR: no system named "
@@ -300,12 +302,9 @@ void EquationSystems::delete_system (const std::string& name)
 void EquationSystems::solve ()
 {
   assert (this->n_systems());
-  
-  system_iterator       pos = _systems.begin();
-  const system_iterator end = _systems.end();
-  
-  for (; pos != end; ++pos)
-    pos->second->solve ();
+
+  for (unsigned int i=0; i != this->n_systems(); ++i)
+    this->get_system(i).solve();
 }
  
  
