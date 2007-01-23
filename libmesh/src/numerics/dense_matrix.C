@@ -1,4 +1,4 @@
-// $Id: dense_matrix.C,v 1.26 2005-06-12 18:36:41 jwpeterson Exp $
+// $Id: dense_matrix.C,v 1.27 2007-01-23 00:50:11 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -55,27 +55,58 @@ void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
 template<typename T>
 void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
 {
+  //Check to see if we are doing (A^T)*A
+  if (this == &A)
+    {
+      //here();
+      DenseMatrix<T> B(*this);
+      
+      // Simple but inefficient way
+      // return this->left_multiply_transpose(B);
 
-  DenseMatrix<T> B(*this);
+      // More efficient, but more code way
+      // If A is mxn, the result will be a square matrix of Size n x n.
+      const unsigned int m = A.m();
+      const unsigned int n = A.n();
+
+      // resize() *this and also zero out all entries.
+      this->resize(n,n);
+
+      // Compute the lower-triangular part
+      for (unsigned int i=0; i<n; ++i)
+	for (unsigned int j=0; j<=i; ++j)
+	  for (unsigned int k=0; k<m; ++k) // inner products are over m
+	    (*this)(i,j) += B(k,i)*B(k,j);
+
+      // Copy lower-triangular part into upper-triangular part
+      for (unsigned int i=0; i<n; ++i)
+	for (unsigned int j=i+1; j<n; ++j)
+	  (*this)(i,j) = (*this)(j,i);
+    }
+
+  else
+    {
+      DenseMatrix<T> B(*this);
   
-  this->resize (A.n(), B.n());
+      this->resize (A.n(), B.n());
       
-  assert (A.m() == B.m());
-  assert (this->m() == A.n());
-  assert (this->n() == B.n());
+      assert (A.m() == B.m());
+      assert (this->m() == A.n());
+      assert (this->n() == B.n());
       
-  const unsigned int m_s = A.n();
-  const unsigned int p_s = A.m(); 
-  const unsigned int n_s = this->n();
+      const unsigned int m_s = A.n();
+      const unsigned int p_s = A.m(); 
+      const unsigned int n_s = this->n();
   
-  // Do it this way because there is a
-  // decent chance (at least for constraint matrices)
-  // that A.transpose(i,k) = 0.
-  for (unsigned int i=0; i<m_s; i++)
-    for (unsigned int k=0; k<p_s; k++)
-      if (A.transpose(i,k) != 0.)
-	for (unsigned int j=0; j<n_s; j++)
-	  (*this)(i,j) += A.transpose(i,k)*B(k,j);  
+      // Do it this way because there is a
+      // decent chance (at least for constraint matrices)
+      // that A.transpose(i,k) = 0.
+      for (unsigned int i=0; i<m_s; i++)
+	for (unsigned int k=0; k<p_s; k++)
+	  if (A.transpose(i,k) != 0.)
+	    for (unsigned int j=0; j<n_s; j++)
+	      (*this)(i,j) += A.transpose(i,k)*B(k,j);
+    }
 
 }
 
@@ -108,26 +139,58 @@ void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
 template<typename T>
 void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
 {
-  DenseMatrix<T> A(*this);
-  
-  this->resize (A.m(), B.m());
+  //Check to see if we are doing B*(B^T)
+  if (this == &B)
+    {
+      //here();
+      DenseMatrix<T> A(*this);
       
-  assert (A.n() == B.n());
-  assert (this->m() == A.m());
-  assert (this->n() == B.m());
-      
-  const unsigned int m_s = A.m();
-  const unsigned int p_s = A.n(); 
-  const unsigned int n_s = this->n();
+      // Simple but inefficient way
+      // return this->right_multiply_transpose(A);
 
-  // Do it this way because there is a
-  // decent chance (at least for constraint matrices)
-  // that B.transpose(k,j) = 0.
-  for (unsigned int j=0; j<n_s; j++)
-    for (unsigned int k=0; k<p_s; k++)
-      if (B.transpose(k,j) != 0.)
-	for (unsigned int i=0; i<m_s; i++)
-	  (*this)(i,j) += A(i,k)*B.transpose(k,j);	            
+      // More efficient, more code
+      // If B is mxn, the result will be a square matrix of Size m x m.
+      const unsigned int m = B.m();
+      const unsigned int n = B.n();
+
+      // resize() *this and also zero out all entries.
+      this->resize(m,m);
+
+      // Compute the lower-triangular part
+      for (unsigned int i=0; i<m; ++i)
+	for (unsigned int j=0; j<=i; ++j)
+	  for (unsigned int k=0; k<n; ++k) // inner products are over n
+	    (*this)(i,j) += A(i,k)*A(j,k);
+
+      // Copy lower-triangular part into upper-triangular part
+      for (unsigned int i=0; i<m; ++i)
+	for (unsigned int j=i+1; j<m; ++j)
+	  (*this)(i,j) = (*this)(j,i);
+    }
+
+  else
+    {
+      DenseMatrix<T> A(*this);
+  
+      this->resize (A.m(), B.m());
+      
+      assert (A.n() == B.n());
+      assert (this->m() == A.m());
+      assert (this->n() == B.m());
+      
+      const unsigned int m_s = A.m();
+      const unsigned int p_s = A.n(); 
+      const unsigned int n_s = this->n();
+
+      // Do it this way because there is a
+      // decent chance (at least for constraint matrices)
+      // that B.transpose(k,j) = 0.
+      for (unsigned int j=0; j<n_s; j++)
+	for (unsigned int k=0; k<p_s; k++)
+	  if (B.transpose(k,j) != 0.)
+	    for (unsigned int i=0; i<m_s; i++)
+	      (*this)(i,j) += A(i,k)*B.transpose(k,j);
+    }
 }
 
 
