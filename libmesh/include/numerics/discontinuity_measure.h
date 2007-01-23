@@ -1,7 +1,7 @@
-// $Id: discontinuity_measure.h,v 1.3 2006-09-19 17:50:52 roystgnr Exp $
+// $Id: discontinuity_measure.h,v 1.4 2007-01-23 21:03:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@
 
 
 
-#ifndef __discontinuity_measure_h__
+#ifndef __discontinuity_measure_h___
 #define __discontinuity_measure_h__
 
 // C++ includes
@@ -27,7 +27,7 @@
 #include <string>
 
 // Local Includes
-#include "error_estimator.h"
+#include "jump_error_estimator.h"
 
 // Forward Declarations
 class Point;
@@ -41,9 +41,9 @@ class Point;
  * for debugging purposes.  It derives from ErrorEstimator
  * just in case someone finds it useful in a DG framework.
  *
- * @author Roy H. Stogner, 2006
+ * @author Roy H. Stogner, 2006.
  */
-class DiscontinuityMeasure : public ErrorEstimator
+class DiscontinuityMeasure : public JumpErrorEstimator
 {
 public:
 
@@ -51,8 +51,7 @@ public:
    * Constructor.  Responsible for initializing the _bc_function function
    * pointer to NULL.
    */
-  DiscontinuityMeasure() : scale_by_n_internal_sides(false),
-			  _bc_function(NULL) {}
+  DiscontinuityMeasure() : _bc_function(NULL) {}
   
   /**
    * Destructor.  
@@ -60,34 +59,41 @@ public:
   ~DiscontinuityMeasure() {}
 
   /**
-   * This function uses numerical quadrature to sum up the
-   * discontinuities between each cell and its neighbors.
-   * The integrated error is output in the vector
-   * \p error_per_cell
-   */
-  virtual void estimate_error (const System& system,
-			       ErrorVector& error_per_cell,
-			       bool estimate_parent_error = false);
-
-  /**
-   * Register a user function to use in computing external boundary 
-   * jumps.
+   * Register a user function to use in computing the essential BCs.
    * The return value is std::pair<bool, Real>
    */
-  void attach_flux_bc_function (std::pair<bool,Real> fptr(const System& system,
-							  const Point& p,
-							  const std::string& var_name));
-  /**
-   * This boolean flag allows you to scale the error indicator
-   * result for each element by the number of internal sides the element
-   * actually has.  This tends to weight more evenly cells which are
-   * on the boundaries and thus have fewer contributions to jump terms
-   * The value is initialized to false, simply set it to true if you
-   * want to use the feature.
-   */
-  bool scale_by_n_internal_sides;
+  void attach_essential_bc_function (std::pair<bool,Real> fptr(const System& system,
+							       const Point& p,
+							       const std::string& var_name));
   
-private:
+protected:
+
+  /**
+   * An initialization function, for requesting specific data from the FE
+   * objects
+   */
+  virtual void initialize(const System& system,
+                          ErrorVector& error_per_cell,
+                          bool estimate_parent_error);
+
+  /**
+   * The function which calculates a normal derivative jump based error
+   * term on an internal side
+   */
+  virtual void internal_side_integration();
+
+  /**
+   * The function which calculates a normal derivative jump based error
+   * term on a boundary side.
+   * Returns true if the flux bc function is in fact defined on the current side.
+   */
+  virtual bool boundary_side_integration();
+
+  /**
+   * A pointer to the current System
+   */
+  const System *my_system;
+
   /**
    * Pointer to function that returns BC information.
    */
