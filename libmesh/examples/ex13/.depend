@@ -58,4 +58,5 @@ ex13.$(obj-suffix):\
     ../../include/solvers/transient_system.h\
     ../../include/utils/o_string_stream.h\
     ../../include/utils/parameters.h\
-    ../../include/utils/perf_log.h
+    ../../include/utils/perf_log.h\
+    ../../include/utils/utility.h
