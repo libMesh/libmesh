@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic_shape_2D.C,v 1.26 2006-08-01 15:10:43 roystgnr Exp $
+// $Id: fe_hierarchic_shape_2D.C,v 1.27 2007-01-24 22:16:45 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -80,6 +80,10 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
         // Edge DoFs
         else if (i < totalorder + 2u)
           {
+            // Avoid returning NaN on vertices!
+            if (zeta0 + zeta1 == 0.)
+              return 0.;
+
             const unsigned int basisorder = i - 1;
 	    // Get factors to account for edge-flipping
 	    Real f0 = 1;
@@ -97,6 +101,10 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
           }
         else if (i < 2u*totalorder + 1)
           {
+            // Avoid returning NaN on vertices!
+            if (zeta1 + zeta2 == 0.)
+              return 0.;
+
             const unsigned int basisorder = i - totalorder;
 	    // Get factors to account for edge-flipping
 	    Real f1 = 1;
@@ -114,6 +122,10 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
           }
         else if (i < 3u*totalorder)
           {
+            // Avoid returning NaN on vertices!
+            if (zeta0 + zeta2 == 0.)
+              return 0.;
+
             const unsigned int basisorder = i - (2u*totalorder) + 1;
 	    // Get factors to account for edge-flipping
 	    Real f2 = 1;
