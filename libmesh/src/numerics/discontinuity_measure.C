@@ -1,4 +1,4 @@
-// $Id: discontinuity_measure.C,v 1.6 2007-01-23 21:03:15 roystgnr Exp $
+// $Id: discontinuity_measure.C,v 1.7 2007-01-24 22:20:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -70,7 +70,7 @@ DiscontinuityMeasure::internal_side_integration ()
     {
       // Calculate solution values on fine and coarse elements
       // at this quadrature point
-      Number u_fine, u_coarse;
+      Number u_fine = 0., u_coarse = 0.;
       for (unsigned int i=0; i != n_coarse_dofs; ++i)
         u_coarse += phi_coarse[i][qp] * Ucoarse(i);
 
@@ -134,7 +134,7 @@ DiscontinuityMeasure::boundary_side_integration ()
           assert (essential_bc.first == true);
 
           // The solution gradient from each element
-          Number u_fine;
+          Number u_fine = 0.;
 
           // Compute the solution gradient on element e
           for (unsigned int i=0; i != Ufine.size(); i++)
