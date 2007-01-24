@@ -53,6 +53,7 @@ ex14.$(obj-suffix):\
     ../../include/numerics/tensor_value.h\
     ../../include/numerics/type_tensor.h\
     ../../include/numerics/type_vector.h\
+    ../../include/numerics/uniform_refinement_estimator.h\
     ../../include/numerics/vector_value.h\
     ../../include/quadrature/quadrature.h\
     ../../include/quadrature/quadrature_gauss.h\
