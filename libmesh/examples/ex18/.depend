@@ -70,6 +70,7 @@ naviersystem.$(obj-suffix):\
     naviersystem.C\
     ../../include/base/auto_ptr.h\
     ../../include/base/dof_object.h\
+    ../../include/base/getpot.h\
     ../../include/base/libmesh.h\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
