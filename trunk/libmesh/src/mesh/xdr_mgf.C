@@ -1,4 +1,4 @@
-// $Id: xdr_mgf.C,v 1.1 2007-01-22 17:40:46 jwpeterson Exp $
+// $Id: xdr_mgf.C,v 1.2 2007-01-29 14:03:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -382,7 +382,7 @@ int XdrMGF::dataBlk(Real* array, int numvar, int size)
 	for (int i=0; i<size; i++)
 	  {
 	    for (int j=0; j<numvar; j++)
-	      OFSRealscientific(mp_out,12,array[i*numvar + j]) << " \t";
+	      OFSRealscientific(mp_out,16,array[i*numvar + j]) << " \t";
 	    
 	    mp_out << '\n';
 	  }
