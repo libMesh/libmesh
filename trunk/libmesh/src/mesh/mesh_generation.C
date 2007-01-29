@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.45 2006-10-04 22:26:54 roystgnr Exp $
+// $Id: mesh_generation.C,v 1.46 2007-01-29 17:52:17 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -522,18 +522,32 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 		for (unsigned int i=0; i<nx; i++)
 		  {
 		    Elem* elem = NULL;
-		  
+
+		    // Add first Tri3
 		    elem = mesh.add_elem(new Tri3);
 
 		    elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
 		    elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+1,j)  );
 		    elem->set_node(2) = mesh.node_ptr(idx(type,nx,i+1,j+1));
-		  
+
+		    if (j == 0)
+		      mesh.boundary_info->add_side(elem, 0, 0);
+
+		    if (i == (nx-1))
+		      mesh.boundary_info->add_side(elem, 1, 1);
+
+		    // Add second Tri3
 		    elem = mesh.add_elem(new Tri3);
 
 		    elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
 		    elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+1,j+1));
 		    elem->set_node(2) = mesh.node_ptr(idx(type,nx,i,j+1)  );
+
+		    if (j == (ny-1))
+		      mesh.boundary_info->add_side(elem, 1, 2);
+
+		    if (i == 0)
+		      mesh.boundary_info->add_side(elem, 2, 3);
 		  }
 	      break;
 	    }
@@ -585,7 +599,8 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 		for (unsigned int i=0; i<(2*nx); i += 2)
 		  {
 		    Elem* elem = NULL;
-		  
+
+		    // Add first Tri6
 		    elem = mesh.add_elem(new Tri6);
 
 		    elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
@@ -595,7 +610,13 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 		    elem->set_node(4) = mesh.node_ptr(idx(type,nx,i+2,j+1));
 		    elem->set_node(5) = mesh.node_ptr(idx(type,nx,i+1,j+1));
 
-		  
+		    if (j == 0)
+		      mesh.boundary_info->add_side(elem, 0, 0);
+
+		    if (i == 2*(nx-1))
+		      mesh.boundary_info->add_side(elem, 1, 1);
+
+		    // Add second Tri6
 		    elem = mesh.add_elem(new Tri6);
 
 		    elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
@@ -604,6 +625,13 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 		    elem->set_node(3) = mesh.node_ptr(idx(type,nx,i+1,j+1));
 		    elem->set_node(4) = mesh.node_ptr(idx(type,nx,i+1,j+2));
 		    elem->set_node(5) = mesh.node_ptr(idx(type,nx,i,j+1)  );
+
+		    if (j == 2*(ny-1))
+		      mesh.boundary_info->add_side(elem, 1, 2);
+
+		    if (i == 0)
+		      mesh.boundary_info->add_side(elem, 2, 3);
+
 		  }
 	      break;
 	    };
