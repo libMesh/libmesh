@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.46 2006-07-31 15:51:00 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.47 2007-01-29 16:36:49 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -345,10 +345,10 @@ void BoundaryInfo::build_node_list (std::vector<unsigned int>& nl,
   nl.reserve (_boundary_node_id.size());
   il.reserve (_boundary_node_id.size());
   
-  std::map<const Node*, short int>::const_iterator pos;
+  std::map<const Node*, short int>::const_iterator pos
+    = _boundary_node_id.begin();
 
-  for (pos=_boundary_node_id.begin(); pos != _boundary_node_id.end();
-       ++pos)
+  for (; pos != _boundary_node_id.end(); ++pos)
     {
       nl.push_back (pos->first->id());
       il.push_back (pos->second);
