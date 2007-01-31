@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.25 2006-04-05 16:14:27 roystgnr Exp $
+// $Id: exact_solution.C,v 1.26 2007-01-31 21:35:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -100,7 +100,10 @@ void ExactSolution::attach_exact_hessian (Tensor fptr(const Point& p,
 std::vector<Number>& ExactSolution::_check_inputs(const std::string& sys_name,
 						  const std::string& unknown_name)
 {
-  // Be sure that an exact_value function has been attached
+  // If no exact solution function has been attached, we now
+  // just compute the solution norm (i.e. the difference from an
+  // "exact solution" of zero
+/*
   if (_exact_value == NULL)
     {
       std::cerr << "Cannot compute error, you must provide a "
@@ -108,6 +111,7 @@ std::vector<Number>& ExactSolution::_check_inputs(const std::string& sys_name,
 		<< std::endl;
       error();
     }
+*/
   
   // Make sure the requested sys_name exists.
   std::map<std::string, SystemErrorMap>::iterator sys_iter =
@@ -180,7 +184,10 @@ Number ExactSolution::l2_error(const std::string& sys_name,
 Number ExactSolution::h1_error(const std::string& sys_name,
 			       const std::string& unknown_name)
 {
-  // Check to be sure the user has supplied the exact derivative function
+  // If the user has supplied no exact derivative function, we
+  // just integrate the H1 norm of the solution; i.e. its
+  // difference from an "exact solution" of zero.
+/*
   if (_exact_deriv == NULL)
     {
       std::cerr << "Cannot compute H1 error, you must provide a "
@@ -188,6 +195,7 @@ Number ExactSolution::h1_error(const std::string& sys_name,
 		<< std::endl;
       error();
     }
+*/
   
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
@@ -207,7 +215,10 @@ Number ExactSolution::h1_error(const std::string& sys_name,
 Number ExactSolution::h2_error(const std::string& sys_name,
 			       const std::string& unknown_name)
 {
-  // Check to be sure the user has supplied the exact derivative function
+  // If the user has supplied no exact derivative functions, we
+  // just integrate the H1 norm of the solution; i.e. its
+  // difference from an "exact solution" of zero.
+/*
   if (_exact_deriv == NULL || _exact_hessian == NULL)
     {
       std::cerr << "Cannot compute H2 error, you must provide functions "
@@ -216,6 +227,7 @@ Number ExactSolution::h2_error(const std::string& sys_name,
 		<< std::endl;
       error();
     }
+*/
   
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
@@ -378,39 +390,34 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 #endif
 
 	  // Compute the value of the error at this quadrature point
-	  // const Real val_error = (u_h - _exact_value(q_point[qp],
-	  const Number val_error = (u_h - _exact_value(q_point[qp],
-						       parameters,
-						       sys_name,
-						       unknown_name));
+          const Number exact_val = _exact_value ?
+            _exact_value(q_point[qp], parameters, sys_name, unknown_name) :
+            0.;
+
+	  const Number val_error = u_h - exact_val;
 
 	  // Add the squares of the error to each contribution
 	  error_vals[0] += JxW[qp]*(val_error*val_error);
 
 	  // Compute the value of the error in the gradient at this quadrature point
-	  if (_exact_deriv != NULL)
-	    {
-	      Gradient grad_error = (grad_u_h - _exact_deriv(q_point[qp],
-						             parameters,
-						             sys_name,
-						             unknown_name));
+          const Gradient exact_grad = _exact_deriv ?
+            _exact_deriv(q_point[qp], parameters, sys_name, unknown_name) :
+            Gradient(0.);
 
-	      error_vals[1] += JxW[qp]*(grad_error*grad_error);
-	    }
+	  const Gradient grad_error = grad_u_h - exact_grad;
+
+	  error_vals[1] += JxW[qp]*(grad_error*grad_error);
 
 
 #ifdef ENABLE_SECOND_DERIVATIVES
 	  // Compute the value of the error in the hessian at this quadrature point
-	  if (_exact_hessian != NULL)
-	    {
-	      Tensor grad2_error = (grad2_u_h - _exact_hessian(q_point[qp],
-						               parameters,
-						               sys_name,
-						               unknown_name));
+          const Tensor exact_hess = _exact_hessian ?
+	    _exact_hessian(q_point[qp], parameters, sys_name, unknown_name) :
+            Tensor(0.);
 
-	      error_vals[2] += JxW[qp]*(grad2_error.contract(grad2_error));
-	    }
+	  const Tensor grad2_error = grad2_u_h - exact_hess;
 
+	  error_vals[2] += JxW[qp]*(grad2_error.contract(grad2_error));
 #endif
 	  
 	} // end qp loop
