@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.35 2007-01-20 21:17:35 roystgnr Exp $ */
+/* $Id: ex14.C,v 1.36 2007-02-01 19:19:47 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -59,6 +59,7 @@
 #include "exact_error_estimator.h"
 #include "kelly_error_estimator.h"
 #include "patch_recovery_error_estimator.h"
+#include "uniform_refinement_estimator.h"
 #include "hp_coarsentest.h"
 #include "hp_singular.h"
 #include "mesh_generation.h"
@@ -126,8 +127,7 @@ int main(int argc, char** argv)
     const int extra_error_quadrature  = input_file("extra_error_quadrature", 0);
     const int max_linear_iterations   = input_file("max_linear_iterations", 5000);
     dim = input_file("dimension", 2);
-    const bool exact_indicator = input_file("exact_indicator", false);
-    const bool patch_indicator = input_file("patch_indicator", false);
+    const std::string indicator_type = input_file("indicator_type", "kelly");
     singularity = input_file("singularity", true);
     
     // Output file for plotting the error as a function of
@@ -275,7 +275,7 @@ int main(int argc, char** argv)
 		// for computing error information on a finite element mesh.
 		ErrorVector error;
 		
-                if (exact_indicator)
+                if (indicator_type == "exact")
                   {
 		    // The \p ErrorEstimator class interrogates a
                     // finite element solution and assigns to each
@@ -285,6 +285,9 @@ int main(int argc, char** argv)
                     // For these simple test problems, we can use
                     // numerical quadrature of the exact error between
                     // the approximate and analytic solutions.
+                    // However, for real problems, we would need an error
+                    // indicator which only relies on the approximate
+                    // solution.
                     ExactErrorEstimator error_estimator;
 
                     error_estimator.attach_exact_value(exact_solution);
@@ -299,20 +302,31 @@ int main(int argc, char** argv)
                     // specifically designed for your application.
 		    error_estimator.estimate_error (system, error);
                   }
-                else if (patch_indicator)
+                else if (indicator_type == "patch")
                   {
-                    // For real problems, we would need an error
-                    // indicator which only relies on the approximate
-                    // solution.
+                    // The patch recovery estimator should give a
+                    // good estimate of the solution interpolation
+                    // error.
 		    PatchRecoveryErrorEstimator error_estimator;
+
+		    error_estimator.estimate_error (system, error);
+                  }
+                else if (indicator_type == "uniform")
+                  {
+                    // Error indication based on uniform refinement
+                    // is reliable, but very expensive.
+                    UniformRefinementEstimator error_estimator;
 
 		    error_estimator.estimate_error (system, error);
                   }
                 else
                   {
-                    // For real problems, we would need an error
-                    // indicator which only relies on the approximate
-                    // solution.
+                    assert (indicator_type == "kelly");
+
+                    // The Kelly error estimator is based on 
+                    // an error bound for the Poisson problem
+                    // on linear elements, but is useful for
+                    // driving adaptive refinement in many problems
 		    KellyErrorEstimator error_estimator;
 
 		    error_estimator.estimate_error (system, error);

@@ -25,11 +25,12 @@ approx_type = LAGRANGE
 # Use approx_order = 1 or higher for other elements
 approx_order = 2
 
-# Use exact error estimator instead of gradient jumps?
-exact_indicator = false
-
-# Use patch recovery error estimator instead of gradient jumps?
-patch_indicator = false
+# Use what type of error indicator?
+# exact => comparison with analytic solution
+# kelly => inter-element normal derivative jumps
+# patch => patch gradient recovery
+# uniform => uniform refinement
+indicator_type = kelly
 
 # Mesh refinement type: h, p, matchedhp, or hp
 # Use HIERARCHIC or HERMITE functions with p/matchedhp/hp,
