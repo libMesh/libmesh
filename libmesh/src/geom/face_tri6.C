@@ -1,4 +1,4 @@
-// $Id: face_tri6.C,v 1.28 2007-02-06 23:48:00 roystgnr Exp $
+// $Id: face_tri6.C,v 1.29 2007-02-06 23:54:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -137,7 +137,6 @@ bool Tri6::has_affine_map() const
       ((this->point(2) + this->point(0))/2.))
     return false;
 
-  error();
   return false;
 }
 
