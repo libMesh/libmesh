@@ -1,4 +1,4 @@
-// $Id: face_tri6.C,v 1.27 2006-12-27 07:21:27 roystgnr Exp $
+// $Id: face_tri6.C,v 1.28 2007-02-06 23:48:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -127,13 +127,13 @@ bool Tri6::is_node_on_side(const unsigned int n,
 bool Tri6::has_affine_map() const
 {
   // Make sure edges are straight
-  if (!this->point(4).relative_fuzzy_equals
+  if (!this->point(3).relative_fuzzy_equals
       ((this->point(0) + this->point(1))/2.))
     return false;
-  if (!this->point(5).relative_fuzzy_equals
+  if (!this->point(4).relative_fuzzy_equals
       ((this->point(1) + this->point(2))/2.))
     return false;
-  if (!this->point(6).relative_fuzzy_equals
+  if (!this->point(5).relative_fuzzy_equals
       ((this->point(2) + this->point(0))/2.))
     return false;
 
