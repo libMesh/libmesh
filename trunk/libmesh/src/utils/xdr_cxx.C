@@ -1,4 +1,4 @@
-// "$Id: xdr_cxx.C,v 1.24 2005-09-30 19:55:24 benkirk Exp $\n"
+// "$Id: xdr_cxx.C,v 1.25 2007-02-07 18:56:16 roystgnr Exp $\n"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1136,7 +1136,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
 	    assert (out.good());
-	    OFSRealscientific(out,12,v[i]) << " ";
+	    OFSRealscientific(out,17,v[i]) << " ";
  	  }
 
 	out << "\t " << comment << '\n';
@@ -1256,7 +1256,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
 	    assert (out.good());
-	    OFSRealscientific(out,12,v[i]) << " ";
+	    OFSRealscientific(out,17,v[i]) << " ";
  	  }
 
 
@@ -1456,7 +1456,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
  	for (unsigned int i=0; i<v.size(); i++)
  	  {
  	    assert (out.good());
-	    OFSNumberscientific(out,12,v[i]) << " ";
+	    OFSNumberscientific(out,17,v[i]) << " ";
  	  }
 
 	out << "\t " << comment << '\n';

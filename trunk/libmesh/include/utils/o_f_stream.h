@@ -1,4 +1,4 @@
-// $Id: o_f_stream.h,v 1.4 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: o_f_stream.h,v 1.5 2007-02-07 18:56:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -51,7 +51,7 @@
   * Outputs \p Real \p d  with width
   * \p v in scientific format to stream \p o.
   */
-# define OFSRealscientific(o,v,d)       (o) << std::setw(v) << std::scientific << (d)
+# define OFSRealscientific(o,v,d)       (o) << std::setprecision(v) << std::scientific << (d)
 
  /*
   * Outputs \p Number \p d, (note that \p Number
@@ -59,10 +59,10 @@
   * \p v in scientific format to stream \p o.
   */
 # if defined(USE_COMPLEX_NUMBERS) 
-#  define OFSNumberscientific(o,v,d)    (o) << std::setw(v) << std::scientific << (d).real() << " " \
-                                            << std::setw(v) << std::scientific << (d).imag()
+#  define OFSNumberscientific(o,v,d)    (o) << std::setprecision(v) << std::scientific << (d).real() << " " \
+                                            << std::setprecision(v) << std::scientific << (d).imag()
 # else
-#  define OFSNumberscientific(o,v,d)    (o) << std::setw(v) << std::scientific << (d)
+#  define OFSNumberscientific(o,v,d)    (o) << std::setprecision(v) << std::scientific << (d)
 # endif
 
  /*
