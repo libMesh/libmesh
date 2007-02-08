@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.22 2007-01-22 17:40:46 jwpeterson Exp $
+// $Id: xdr_io.C,v 1.23 2007-02-08 13:49:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -435,6 +435,10 @@ void XdrIO::read_mesh (const std::string& name,
       // to avoid O(n) lookup times for parent pointers.
       std::map<unsigned int, Elem*> parents;
 
+      std::vector<Elem *> unsorted_elements;
+      if (m.get_orig_flag() == XdrIO::LIBM)
+        unsorted_elements.resize(numElem,NULL);
+
       for (unsigned int level=0; level<=n_levels; level++)
       {
         for (unsigned int idx=0; idx<n_blocks; idx++)  
@@ -451,8 +455,8 @@ void XdrIO::read_mesh (const std::string& name,
             // New-style libMesh mesh
             if (m.get_orig_flag() == XdrIO::LIBM)
             {
-              int self_ID   = conn[lastConnIndex + temp_elem->n_nodes()];
-              int parent_ID = conn[lastConnIndex + temp_elem->n_nodes()+1];
+              unsigned int self_ID   = conn[lastConnIndex + temp_elem->n_nodes()];
+              unsigned int parent_ID = conn[lastConnIndex + temp_elem->n_nodes()+1];
 
 
               if (level > 0)
@@ -480,7 +484,10 @@ void XdrIO::read_mesh (const std::string& name,
                 my_parent->set_refinement_flag(Elem::INACTIVE);
                
                 // Now that we know the parent, build the child and add it to the mesh 
-                elem = mesh.add_elem(Elem::build(etypes[idx],my_parent).release());
+                elem = Elem::build(etypes[idx],my_parent).release();
+                if (self_ID >= unsorted_elements.size())
+                  unsorted_elements.resize(self_ID+1, NULL);
+                unsorted_elements[self_ID] = elem;
 
                 // The new child is marked as JUST_REFINED
                 elem->set_refinement_flag(Elem::JUST_REFINED); 
@@ -495,7 +502,10 @@ void XdrIO::read_mesh (const std::string& name,
               // Add level-0 elements to the mesh 
               else
               {
-                elem = mesh.add_elem(Elem::build(etypes[idx]).release());
+                elem = Elem::build(etypes[idx]).release();
+                if (self_ID >= unsorted_elements.size())
+                  unsorted_elements.resize(self_ID+1, NULL);
+                unsorted_elements[self_ID] = elem;
               }
 
               // Assign the newly-added element's ID so that future 
@@ -535,6 +545,19 @@ void XdrIO::read_mesh (const std::string& name,
         }
         
       }
+
+      if (m.get_orig_flag() == XdrIO::LIBM)
+        for (std::vector<Elem *>::iterator i =
+             unsorted_elements.begin();
+             i != unsorted_elements.end(); ++i)
+          {
+            Elem *elem = *i;
+            if (elem)
+              mesh.add_elem(elem);
+            else
+              // We can probably handle this, but we don't expect it
+              error();
+          }
 
       // All the elements at each level have been added, and their node pointers
       // have been set.  Now compute the node keys to put the mesh into a state consistent
