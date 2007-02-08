@@ -1,4 +1,4 @@
-/* $Id: ex15.C,v 1.13 2006-07-25 20:24:58 roystgnr Exp $ */
+/* $Id: ex15.C,v 1.14 2007-02-08 23:17:05 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -65,24 +65,6 @@
 void assemble_biharmonic(EquationSystems& es,
                       const std::string& system_name);
 
-
-Number zero_solution(const Point&,
-		     const Parameters&,   // parameters, not needed
-		     const std::string&,  // sys_name, not needed
-		     const std::string&)  // unk_name, not needed);
-{ return 0; }
-
-Gradient zero_derivative(const Point&,
-		         const Parameters&,   // parameters, not needed
-		         const std::string&,  // sys_name, not needed
-		         const std::string&)  // unk_name, not needed);
-{ return Gradient(); }
-
-Tensor zero_hessian(const Point&,
-		    const Parameters&,   // parameters, not needed
-		    const std::string&,  // sys_name, not needed
-		    const std::string&)  // unk_name, not needed);
-{ return Tensor(); }
 
 // Prototypes for calculation of the exact solution.  Necessary
 // for setting boundary conditions.
@@ -281,10 +263,8 @@ int main(int argc, char** argv)
     exact_sol.attach_exact_hessian(exact_hessian);
 
     // Construct zero solution object, useful for computing solution norms
+    // Attaching "zero_solution" functions is unnecessary
     ExactSolution zero_sol(equation_systems);
-    zero_sol.attach_exact_value(zero_solution);
-    zero_sol.attach_exact_deriv(zero_derivative);
-    zero_sol.attach_exact_hessian(zero_hessian);
 
     // Convenient reference to the system
     LinearImplicitSystem& system = 
