@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.20 2007-01-23 05:15:23 roystgnr Exp $
+// $Id: equation_systems.h,v 1.21 2007-02-08 22:43:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -105,6 +105,11 @@ public:
    * Reinitialize all the systems
    */
   void reinit ();
+
+  /**
+   * Updates local values for all the systems
+   */
+  void update ();
 
   /**
    * @returns the number of equation systems.

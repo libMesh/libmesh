@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.34 2007-01-23 05:14:24 roystgnr Exp $
+// $Id: equation_systems.C,v 1.35 2007-02-08 22:43:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -218,6 +218,18 @@ void EquationSystems::reinit ()
       for (pos = _systems.begin(); pos != end; ++pos)
         pos->second->reinit();
     }
+}
+
+
+
+void EquationSystems::update ()
+{
+  system_iterator       pos = _systems.begin();
+  const system_iterator end = _systems.end();
+  
+  // Localize each system's vectors
+  for (; pos != end; ++pos)
+      pos->second->update();
 }
 
 
