@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.72 2007-01-19 23:09:50 jwpeterson Exp $
+// $Id: mesh.C,v 1.73 2007-02-08 14:56:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -305,7 +305,6 @@ void Mesh::delete_elem(Elem* e)
   delete e;
   
   // explicitly NULL the pointer
-  e    = NULL;
   *pos = NULL;
 }
 
@@ -314,19 +313,34 @@ void Mesh::delete_elem(Elem* e)
 void Mesh::delete_node(Node* n)
 {
   assert (n != NULL);
-  
-  std::vector<Node*>::iterator pos = std::find (_nodes.begin(),
-						_nodes.end(),
-						n);
+  assert (n->id() < _nodes.size());
+
+  // Initialize an iterator to eventually point to the element we want
+  // to delete
+  std::vector<Node*>::iterator pos;
+
+  // In many cases, e->id() gives us a clue as to where e
+  // is located in the _elements vector.  Try that first
+  // before trying the O(n_elem) search.
+  if (_nodes[n->id()] == n)
+    {
+      pos = _nodes.begin();
+      std::advance(pos, n->id());
+    }
+  else
+    {
+      pos = std::find (_nodes.begin(),
+		       _nodes.end(),
+		       n);
+    }
   
   // Huh? Node not in the vector?
   assert (pos != _nodes.end());
   
-  // delete the element
+  // delete the node
   delete n;
   
   // explicitly NULL the pointer
-  n    = NULL;
   *pos = NULL;
 }
 
