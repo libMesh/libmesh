@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.21 2007-01-22 23:36:07 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.22 2007-02-09 22:27:20 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -50,7 +50,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 {
   std::vector<Real> psi;
   psi.reserve(matsize);
-  Real x = p(0), y, z;
+  Real x = p(0), y=0., z=0.;
   if (dim > 1)
     y = p(1);
   if (dim > 2)
