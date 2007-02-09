@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.28 2006-11-09 08:11:22 roystgnr Exp $
+// $Id: system.C,v 1.29 2007-02-09 23:49:45 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -473,7 +473,13 @@ void System::update_global_solution (std::vector<Number>& global_soln,
 NumericVector<Number> & System::add_vector (const std::string& vec_name,
                                             const bool projections)
 {
-  // only add vectors before initializing...
+  // Return the vector if it is already there.
+  if (this->have_vector(vec_name))
+    {
+      return *(_vectors[vec_name]);
+    }
+
+  // We can only add new vectors before initializing...
   if (!_can_add_vectors)
     {
       std::cerr << "ERROR: Too late.  Cannot add vectors to the system after initialization"
@@ -481,12 +487,6 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
 		<< " any more.  You should have done this earlier."
 		<< std::endl;
       error();
-    }
-
-  // Return the vector if it is already there.
-  if (this->have_vector(vec_name))
-    {
-      return *(_vectors[vec_name]);
     }
 
   // Otherwise build the vector and return it.
@@ -541,9 +541,13 @@ void System::add_variable (const std::string& var,
 			   const FEType& type)
 {  
   // Make sure the variable isn't there already
+  // or if it is, that it's the type we want
   if (_var_num.count(var))
     {
-      std::cerr << "ERROR: variable "
+      if (_var_type[var] == type)
+        return;
+
+      std::cerr << "ERROR: incompatible variable "
 		<< var
 		<< " has already been added for this system!"
 		<< std::endl;
