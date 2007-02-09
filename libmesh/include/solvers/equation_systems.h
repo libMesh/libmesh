@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.21 2007-02-08 22:43:18 roystgnr Exp $
+// $Id: equation_systems.h,v 1.22 2007-02-09 23:48:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -451,23 +451,26 @@ T_sys & EquationSystems::add_system (const std::string& name)
       ptr = new T_sys(*this, name, this->n_systems());
 
       _systems.insert (std::make_pair(name, ptr));   
+
+      // Tell all the \p DofObject entities to add a system.
+      this->_add_system_to_nodes_and_elems();
     }
   else
     {
-      std::cerr << "ERROR: There was already a system"
-		<< " named " << name
-		<< std::endl;
+      // We now allow redundant add_system calls, to make it
+      // easier to load data from files for user-derived system
+      // subclasses
+//      std::cerr << "ERROR: There was already a system"
+//		<< " named " << name
+//		<< std::endl;
 
-      error();
+//      error();
+
+      ptr = &(this->get_system<T_sys>(name));
     }
 
-  assert (ptr != NULL);
-  
-  // Tell all the \p DofObject entities to add a system.
-  this->_add_system_to_nodes_and_elems();
-
   // Return a dynamically casted reference to the newly added System.
-  return *(dynamic_cast<T_sys*>(ptr));
+  return *ptr;
 }
 
 
