@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.27 2006-10-26 04:22:48 roystgnr Exp $
+// $Id: mesh_communication.C,v 1.28 2007-02-09 19:52:50 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -323,7 +323,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 		
 		my_parent->set_refinement_flag(Elem::INACTIVE);
 		
-		elem = mesh.add_elem(Elem::build(elem_type,my_parent).release());
+		elem = Elem::build(elem_type,my_parent).release();
 		elem->set_refinement_flag(Elem::JUST_REFINED); 
 		my_parent->add_child(elem);
 		assert (my_parent->type() == elem->type());
@@ -332,7 +332,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
             else // level 0 element has no parent
 	      {
 		// should be able to just use the integer elem_type
-		elem = mesh.add_elem (Elem::build(elem_type).release());
+		elem = Elem::build(elem_type).release();
 	      }
 
 	    // Assign the IDs
@@ -351,6 +351,19 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 		elem->set_node(n) = mesh.node_ptr (conn[cnt++]);
 	      }
 	  } // end while cnt < conn.size
+
+        // Iterate in ascending elem ID order
+        for (std::map<unsigned int, Elem *>::iterator i =
+             parents.begin();
+             i != parents.end(); ++i)
+          {
+            Elem *elem = i->second;
+            if (elem)
+              mesh.add_elem(elem);
+            else
+              // We can probably handle this, but we don't expect it
+              error();
+          }
 
 	// All the elements at each level have been added, and their node pointers
 	// have been set.  Now compute the node keys to put the mesh into a state consistent
