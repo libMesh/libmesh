@@ -1,4 +1,4 @@
-// $Id: point_locator_list.C,v 1.13 2006-08-09 13:51:07 roystgnr Exp $
+// $Id: point_locator_list.C,v 1.14 2007-02-09 22:46:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -187,6 +187,9 @@ const Elem* PointLocatorList::operator() (const Point& p) const
 
 //    std::cout << "Found element No. "<< last_index << std::endl;
 //	      << std::endl << "with key: " << this->_mesh.elem(last_index).key() << std::endl;
+
+    // the element should be active
+    assert (this->_mesh.elem(last_index)->active());
 
     // return the element
     return (this->_mesh.elem(last_index));
