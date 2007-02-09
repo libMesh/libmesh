@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.C,v 1.16 2007-02-09 22:46:46 roystgnr Exp $
+// $Id: point_locator_tree.C,v 1.17 2007-02-09 22:50:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -143,7 +143,7 @@ void PointLocatorTree::init ()
       // Suppose the interpolators are used concurrently
       // at different locations in the mesh, then it makes quite
       // sense to have unique start elements.
-      this->_element = this->_mesh.elem(0);
+      this->_element = NULL;
     }
 
 
