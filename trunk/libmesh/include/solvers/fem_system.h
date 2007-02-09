@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.11 2006-12-08 00:48:41 roystgnr Exp $
+// $Id: fem_system.h,v 1.12 2007-02-09 21:35:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -184,7 +184,7 @@ public:
    * @returns \p "General".  Helps in identifying
    * the system type in an equation system file.
    */
-  virtual std::string system_type () const { return "PDE"; }
+//  virtual std::string system_type () const { return "PDE"; }
 
   /**
    * If calculating numeric jacobians is required, the FEMSystem
