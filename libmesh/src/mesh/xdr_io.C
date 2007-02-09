@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.23 2007-02-08 13:49:02 roystgnr Exp $
+// $Id: xdr_io.C,v 1.24 2007-02-09 19:51:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -431,13 +431,10 @@ void XdrIO::read_mesh (const std::string& name,
       unsigned int lastConnIndex = 0;
       unsigned int lastFaceIndex = 0;
 
-      // This map keeps track of elements we've previously added to the mesh 
-      // to avoid O(n) lookup times for parent pointers.
+      // This map keeps track of elements we've previously
+      // constructed, to avoid O(n) lookup times for parent pointers
+      // and to enable elements to be added in ascending ID order
       std::map<unsigned int, Elem*> parents;
-
-      std::vector<Elem *> unsorted_elements;
-      if (m.get_orig_flag() == XdrIO::LIBM)
-        unsorted_elements.resize(numElem,NULL);
 
       for (unsigned int level=0; level<=n_levels; level++)
       {
@@ -483,11 +480,8 @@ void XdrIO::read_mesh (const std::string& name,
                 // my_parent is now INACTIVE, since he has children
                 my_parent->set_refinement_flag(Elem::INACTIVE);
                
-                // Now that we know the parent, build the child and add it to the mesh 
+                // Now that we know the parent, build the child
                 elem = Elem::build(etypes[idx],my_parent).release();
-                if (self_ID >= unsorted_elements.size())
-                  unsorted_elements.resize(self_ID+1, NULL);
-                unsorted_elements[self_ID] = elem;
 
                 // The new child is marked as JUST_REFINED
                 elem->set_refinement_flag(Elem::JUST_REFINED); 
@@ -503,9 +497,6 @@ void XdrIO::read_mesh (const std::string& name,
               else
               {
                 elem = Elem::build(etypes[idx]).release();
-                if (self_ID >= unsorted_elements.size())
-                  unsorted_elements.resize(self_ID+1, NULL);
-                unsorted_elements[self_ID] = elem;
               }
 
               // Assign the newly-added element's ID so that future 
@@ -547,11 +538,12 @@ void XdrIO::read_mesh (const std::string& name,
       }
 
       if (m.get_orig_flag() == XdrIO::LIBM)
-        for (std::vector<Elem *>::iterator i =
-             unsorted_elements.begin();
-             i != unsorted_elements.end(); ++i)
+        // Iterate in ascending elem ID order
+        for (std::map<unsigned int, Elem *>::iterator i =
+             parents.begin();
+             i != parents.end(); ++i)
           {
-            Elem *elem = *i;
+            Elem *elem = i->second;
             if (elem)
               mesh.add_elem(elem);
             else
