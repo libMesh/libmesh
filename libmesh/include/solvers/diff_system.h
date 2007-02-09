@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.13 2006-11-17 05:44:12 roystgnr Exp $
+// $Id: diff_system.h,v 1.14 2007-02-09 21:35:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -234,7 +234,7 @@ public:
    * @returns \p "Differentiable".  Helps in identifying
    * the system type in an equation system file.
    */
-  virtual std::string system_type () const { return "Differentiable"; }
+//  virtual std::string system_type () const { return "Differentiable"; }
 
   /**
    * A pointer to the solver object we're going to use.
