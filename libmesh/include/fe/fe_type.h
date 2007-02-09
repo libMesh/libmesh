@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.7 2006-06-01 18:32:44 roystgnr Exp $
+// $Id: fe_type.h,v 1.8 2007-02-09 21:35:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -124,6 +124,20 @@ public:
   InfMapType inf_map;
   
 #endif // ifndef ENABLE_INFINITE_ELEMENTS
+
+  /**
+   * @tests equality
+   */
+  bool operator== (const FEType &f2) const
+  {
+    return (order == f2.order
+	    && family == f2.family
+#ifdef ENABLE_INFINITE_ELEMENTS
+	    && radial_order == f2.radial_order
+	    && inf_map == f2.inf_map
+#endif // ifdef ENABLE_INFINITE_ELEMENTS
+	    );
+  }
 
   /**
    * @an ordering to make FEType useful as a std::map key
