@@ -31,6 +31,25 @@ DifferentiableSystem::DifferentiableSystem
 
 DifferentiableSystem::~DifferentiableSystem ()
 {
+  this->clear();
+}
+
+
+
+void DifferentiableSystem::clear ()
+{
+  for (unsigned int i=0; i != elem_subsolutions.size(); ++i)
+    {
+      delete elem_subsolutions[i];
+      delete elem_subresiduals[i];
+
+      for (unsigned int j=0; j != elem_subjacobians[i].size(); ++j)
+        delete elem_subjacobians[i][j];
+    }
+  _time_evolving.resize(0);
+  elem_subsolutions.resize(0);
+  elem_subresiduals.resize(0);
+  elem_subjacobians.resize(0);
 }
 
 

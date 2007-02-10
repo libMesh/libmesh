@@ -220,30 +220,34 @@ Number FEMSystem::point_value(unsigned int var, Point &p)
 
 void FEMSystem::clear()
 {
+  Parent::clear();
+
   // We don't want to store AutoPtrs in STL containers, but we don't
   // want to leak memory either
   for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
        i != element_fe.end(); ++i)
     delete i->second;
+  element_fe.clear();
+
   for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
        i != side_fe.end(); ++i)
     delete i->second;
-  delete element_qrule;
-  delete side_qrule;
-  for (unsigned int i=0; i != elem_subsolutions.size(); ++i)
-    {
-      delete elem_subsolutions[i];
-      delete elem_subresiduals[i];
+  side_fe.clear();
 
-      for (unsigned int j=0; j != elem_subjacobians[i].size(); ++j)
-        delete elem_subjacobians[i][j];
-    }
+  delete element_qrule;
+  element_qrule = NULL;
+
+  delete side_qrule;
+  side_qrule = NULL;
 }
 
 
 
 void FEMSystem::init_data ()
 {
+  // We may have already been initialized once
+  this->clear();
+
   // First initialize LinearImplicitSystem data
   Parent::init_data();
 
