@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.26 2007-01-31 21:35:21 roystgnr Exp $
+// $Id: exact_solution.C,v 1.27 2007-02-12 19:46:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 #include "fe.h"
 #include "fe_interface.h"
 #include "mesh.h"
+#include "mesh_function.h"
 #include "quadrature.h"
 #include "tensor_value.h"
 #include "vector_value.h"
@@ -37,7 +38,7 @@ ExactSolution::ExactSolution(EquationSystems& es) :
   _exact_deriv (NULL),
   _exact_hessian (NULL),
   _equation_systems(es),
-  _mesh(es.get_mesh()),
+  _equation_systems_fine(NULL),
   _extra_order(0)
 {
   // Initialize the _errors data structure which holds all
@@ -65,6 +66,18 @@ ExactSolution::ExactSolution(EquationSystems& es) :
 }
 
 
+void ExactSolution::attach_reference_solution (EquationSystems* es_fine)
+{
+  assert (es_fine != NULL);
+  _equation_systems_fine = es_fine;
+
+  // If we're using a fine grid solution, we're not using exact values
+  _exact_value = NULL;
+  _exact_deriv = NULL;
+  _exact_hessian = NULL;
+}
+
+
 void ExactSolution::attach_exact_value (Number fptr(const Point& p,
 						    const Parameters& parameters,
 						    const std::string& sys_name,
@@ -72,6 +85,9 @@ void ExactSolution::attach_exact_value (Number fptr(const Point& p,
 {
   assert (fptr != NULL);
   _exact_value = fptr;
+
+  // If we're using exact values, we're not using a fine grid solution
+  _equation_systems_fine = NULL;
 }
 
 
@@ -82,6 +98,9 @@ void ExactSolution::attach_exact_deriv (Gradient fptr(const Point& p,
 {
   assert (fptr != NULL);
   _exact_deriv = fptr;
+
+  // If we're using exact values, we're not using a fine grid solution
+  _equation_systems_fine = NULL;
 }
 
 
@@ -92,6 +111,9 @@ void ExactSolution::attach_exact_hessian (Tensor fptr(const Point& p,
 {
   assert (fptr != NULL);
   _exact_hessian = fptr;
+
+  // If we're using exact values, we're not using a fine grid solution
+  _equation_systems_fine = NULL;
 }
 
 
@@ -100,9 +122,9 @@ void ExactSolution::attach_exact_hessian (Tensor fptr(const Point& p,
 std::vector<Number>& ExactSolution::_check_inputs(const std::string& sys_name,
 						  const std::string& unknown_name)
 {
-  // If no exact solution function has been attached, we now
-  // just compute the solution norm (i.e. the difference from an
-  // "exact solution" of zero
+  // If no exact solution function or fine grid solution has been
+  // attached, we now just compute the solution norm (i.e. the
+  // difference from an "exact solution" of zero
 /*
   if (_exact_value == NULL)
     {
@@ -249,17 +271,39 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 				   const std::string& unknown_name,
 				   std::vector<Number>& error_vals)
 {
-  // Get a reference to the system whose error is being computed.
-  const System& computed_system
-    = _equation_systems.get_system (sys_name);
+  // Make sure we're set up as expected
+  assert ((_exact_value && !_equation_systems_fine) ||
+          (!_exact_value && _equation_systems_fine));
 
-  // Get a reference to the dofmap for that system
+  // Get a reference to the system whose error is being computed.
+  // If we have a fine grid, however, we'll integrate on that instead
+  // for more accuracy.
+  const System& computed_system = _equation_systems_fine ?
+    _equation_systems_fine->get_system(sys_name) :
+    _equation_systems.get_system (sys_name);
+
+  // Prepare a MeshFunction of the coarse system if we need one
+  AutoPtr<MeshFunction> coarse_values;
+  if (_equation_systems_fine)
+    {
+      const System& comparison_system
+	= _equation_systems.get_system(sys_name);
+      coarse_values = AutoPtr<MeshFunction>
+	(new MeshFunction(_equation_systems,
+			  *(comparison_system.current_local_solution),
+			  comparison_system.get_dof_map(),
+			  comparison_system.variable_number(unknown_name)));
+    }
+
+  // Get a reference to the dofmap and mesh for that system
   const DofMap& computed_dof_map = computed_system.get_dof_map();
+
+  const MeshBase& _mesh = computed_system.get_mesh();
 
   // Zero the error before summation
   error_vals = std::vector<Number>(3, 0.);
 
-  // get the EquationSystems parameters
+  // get the EquationSystems parameters for use with _exact_value
   const Parameters& parameters = this->_equation_systems.parameters;
 
   // Get the current time, in case the exact solution depends on it.
@@ -390,19 +434,27 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 #endif
 
 	  // Compute the value of the error at this quadrature point
-          const Number exact_val = _exact_value ?
-            _exact_value(q_point[qp], parameters, sys_name, unknown_name) :
-            0.;
+	  Number exact_val = 0.0;
+          if (_exact_value)
+	    exact_val = _exact_value(q_point[qp], parameters,
+				     sys_name, unknown_name);
+	  else if (_equation_systems_fine)
+	    exact_val = (*coarse_values)(q_point[qp]);
 
 	  const Number val_error = u_h - exact_val;
 
 	  // Add the squares of the error to each contribution
 	  error_vals[0] += JxW[qp]*(val_error*val_error);
 
-	  // Compute the value of the error in the gradient at this quadrature point
-          const Gradient exact_grad = _exact_deriv ?
-            _exact_deriv(q_point[qp], parameters, sys_name, unknown_name) :
-            Gradient(0.);
+
+	  // Compute the value of the error in the gradient at this
+	  // quadrature point
+          Gradient exact_grad;
+	  if (_exact_deriv)
+	    exact_grad = _exact_deriv(q_point[qp], parameters,
+				      sys_name, unknown_name);
+	  else if (_equation_systems_fine)
+	    exact_grad = coarse_values->gradient(q_point[qp]);
 
 	  const Gradient grad_error = grad_u_h - exact_grad;
 
@@ -410,10 +462,14 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
 
 #ifdef ENABLE_SECOND_DERIVATIVES
-	  // Compute the value of the error in the hessian at this quadrature point
-          const Tensor exact_hess = _exact_hessian ?
-	    _exact_hessian(q_point[qp], parameters, sys_name, unknown_name) :
-            Tensor(0.);
+	  // Compute the value of the error in the hessian at this
+	  // quadrature point
+          Tensor exact_hess;
+	  if (_exact_hessian)
+	    exact_hess = _exact_hessian(q_point[qp], parameters,
+					sys_name, unknown_name);
+	  else if (_equation_systems_fine)
+	    exact_hess = coarse_values->hessian(q_point[qp]);
 
 	  const Tensor grad2_error = grad2_u_h - exact_hess;
 

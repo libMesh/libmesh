@@ -1,4 +1,4 @@
-// $Id: exact_solution.h,v 1.11 2006-04-05 16:14:26 roystgnr Exp $
+// $Id: exact_solution.h,v 1.12 2007-02-12 19:46:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -75,6 +75,13 @@ public:
   ~ExactSolution() {}
 
   
+  /**
+   * Attach function similar to system.h which
+   * allows the user to attach a second EquationSystems
+   * object with a reference fine grid solution.
+   */
+  void attach_reference_solution (EquationSystems* es_fine);
+
   /**
    * Attach function similar to system.h which
    * allows the user to attach an arbitrary function
@@ -221,9 +228,10 @@ private:
   EquationSystems& _equation_systems;
 
   /**
-   * Constant reference to the mesh in the EquationSystems object.
+   * Constant pointer to the \p EquationSystems object
+   * containing the fine grid solution.
    */
-  const Mesh& _mesh;
+  EquationSystems* _equation_systems_fine;
 
   /**
    * Extra order to use for quadrature rule
