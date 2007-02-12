@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.32 2007-01-15 03:16:20 roystgnr Exp $
+// $Id: gmv_io.C,v 1.33 2007-02-12 13:44:18 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -88,7 +88,7 @@ namespace
   
 	// LINE3
 	{
-	  eledef.label = "line 3";
+	  eledef.label = "3line 3";
 	  const unsigned int nodes[] = {0,1,2};
 	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
 	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
