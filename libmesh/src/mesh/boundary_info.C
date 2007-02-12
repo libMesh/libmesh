@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.47 2007-01-29 16:36:49 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.48 2007-02-12 20:29:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -113,7 +113,7 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
     for(; it != end; ++it)
       {
 	const Node* node = *it;
-	boundary_mesh.add_point(*node);
+	boundary_mesh.add_point(*node); // calls Node::build(Point, id)
       }
   }
 
@@ -128,9 +128,11 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
       for (unsigned int s=0; s<elem->n_sides(); s++)
 	if (elem->neighbor(s) == NULL) // on the boundary
 	  {
-	    
-	    // Build the side
-	    AutoPtr<Elem> side (elem->build_side(s));
+
+	    // Build the side - do not use a "proxy" element here:
+	    // This will be going into the BoundaryMesh and needs to
+	    // stand on its own.
+	    AutoPtr<Elem> side (elem->build_side(s, false));
 	    
 	    // Get the top-level parent for this element
 	    const Elem* top_parent = elem->top_parent();
@@ -191,6 +193,9 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
   // to the boundary_mesh
   if ((boundary_mesh_data != NULL) && (this_mesh_data != NULL))
     boundary_mesh_data->assign(*this_mesh_data);
+
+  // Trim any un-used nodes from the Mesh
+  // boundary_mesh.prepare_for_use();
 }
 
 

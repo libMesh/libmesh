@@ -1,4 +1,4 @@
-// $Id: face_tri3.C,v 1.22 2006-08-28 16:02:08 jwpeterson Exp $
+// $Id: face_tri3.C,v 1.23 2007-02-12 20:29:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -105,48 +105,54 @@ bool Tri3::is_node_on_side(const unsigned int n,
   return false;
 }
 
-AutoPtr<Elem> Tri3::build_side (const unsigned int i) const
+AutoPtr<Elem> Tri3::build_side (const unsigned int i,
+				bool proxy) const
 {
   assert (i < this->n_sides());
 
-  AutoPtr<Elem> ap(new Side<Edge2,Tri3>(this,i));
-  return ap;
-  
-//   Edge2* edge = new Edge2;
+  if (proxy)
+    {
+      AutoPtr<Elem> ap(new Side<Edge2,Tri3>(this,i));
+      return ap;
+    }
 
-//   switch (i)
-//     {
-//     case 0:
-//       {
-// 	edge->set_node(0) = this->get_node(0);
-// 	edge->set_node(1) = this->get_node(1);
-	
-// 	AutoPtr<Elem> ap(edge);  return ap;
-//       }
-//     case 1:
-//       {
-// 	edge->set_node(0) = this->get_node(1);
-// 	edge->set_node(1) = this->get_node(2);
-	
-// 	AutoPtr<Elem> ap(edge);  return ap;
-//       }
-//     case 2:
-//       {
-// 	edge->set_node(0) = this->get_node(2);
-// 	edge->set_node(1) = this->get_node(0);
-	
-// 	AutoPtr<Elem> ap(edge);  return ap;
-//       }
-//     default:
-//       {
-// 	error();
-//       }
-//     }
+  else
+    {
+      Edge2* edge = new Edge2;
 
+      switch (i)
+	{
+	case 0:
+	  {
+	    edge->set_node(0) = this->get_node(0);
+	    edge->set_node(1) = this->get_node(1);
+	
+	    AutoPtr<Elem> ap(edge);  return ap;
+	  }
+	case 1:
+	  {
+	    edge->set_node(0) = this->get_node(1);
+	    edge->set_node(1) = this->get_node(2);
+	
+	    AutoPtr<Elem> ap(edge);  return ap;
+	  }
+	case 2:
+	  {
+	    edge->set_node(0) = this->get_node(2);
+	    edge->set_node(1) = this->get_node(0);
+	
+	    AutoPtr<Elem> ap(edge);  return ap;
+	  }
+	default:
+	  {
+	    error();
+	  }
+	}
+    }
   
-//   // We will never get here...  Look at the code above.
-//   error();
-//   AutoPtr<Elem> ap(NULL);  return ap;
+  // We will never get here...  Look at the code above.
+  error();
+  AutoPtr<Elem> ap(NULL);  return ap;
 }
 
 

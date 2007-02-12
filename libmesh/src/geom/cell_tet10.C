@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.27 2006-12-27 07:21:27 roystgnr Exp $
+// $Id: cell_tet10.C,v 1.28 2007-02-12 20:29:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -120,70 +120,78 @@ bool Tet10::has_affine_map() const
 
 
 
-AutoPtr<Elem> Tet10::build_side (const unsigned int i) const
+AutoPtr<Elem> Tet10::build_side (const unsigned int i,
+				 bool proxy) const
 {
   assert (i < this->n_sides());
 
-  AutoPtr<Elem> ap(new Side<Tri6,Tet10>(this,i));
-  return ap;
+  if (proxy)
+    {
+      AutoPtr<Elem> ap(new Side<Tri6,Tet10>(this,i));
+      return ap;
+    }
+
+  else
+    {
+      AutoPtr<Elem> face(new Tri6);
   
-//   AutoPtr<Elem> face(new Tri6);
+      switch (i)
+	{
+	case 0:
+	  {
+	    face->set_node(0) = this->get_node(0);
+	    face->set_node(1) = this->get_node(2);
+	    face->set_node(2) = this->get_node(1);
+	    face->set_node(3) = this->get_node(6);
+	    face->set_node(4) = this->get_node(5);
+	    face->set_node(5) = this->get_node(4);
+
+	    return face;
+	  }
+	case 1:
+	  {
+	    face->set_node(0) = this->get_node(0);
+	    face->set_node(1) = this->get_node(1);
+	    face->set_node(2) = this->get_node(3);
+	    face->set_node(3) = this->get_node(4);
+	    face->set_node(4) = this->get_node(8);
+	    face->set_node(5) = this->get_node(7);
+
+	    return face;
+	  }
+	case 2:
+	  {
+	    face->set_node(0) = this->get_node(1);
+	    face->set_node(1) = this->get_node(2);
+	    face->set_node(2) = this->get_node(3);
+	    face->set_node(3) = this->get_node(5);
+	    face->set_node(4) = this->get_node(9);
+	    face->set_node(5) = this->get_node(8);
+
+	    return face;
+	  }
+	case 3:
+	  {
+	    face->set_node(0) = this->get_node(2);
+	    face->set_node(1) = this->get_node(0);
+	    face->set_node(2) = this->get_node(3);
+	    face->set_node(3) = this->get_node(6);
+	    face->set_node(4) = this->get_node(7);
+	    face->set_node(5) = this->get_node(9);
+
+	    return face;
+	  }
+	default:
+	  {
+	    error();
+	  }
+	}
+    }
+
   
-//   switch (i)
-//     {
-//     case 0:
-//       {
-// 	face->set_node(0) = this->get_node(0);
-// 	face->set_node(1) = this->get_node(2);
-// 	face->set_node(2) = this->get_node(1);
-// 	face->set_node(3) = this->get_node(6);
-// 	face->set_node(4) = this->get_node(5);
-// 	face->set_node(5) = this->get_node(4);
-
-// 	return face;
-//       }
-//     case 1:
-//       {
-// 	face->set_node(0) = this->get_node(0);
-// 	face->set_node(1) = this->get_node(1);
-// 	face->set_node(2) = this->get_node(3);
-// 	face->set_node(3) = this->get_node(4);
-// 	face->set_node(4) = this->get_node(8);
-// 	face->set_node(5) = this->get_node(7);
-
-// 	return face;
-//       }
-//     case 2:
-//       {
-// 	face->set_node(0) = this->get_node(1);
-// 	face->set_node(1) = this->get_node(2);
-// 	face->set_node(2) = this->get_node(3);
-// 	face->set_node(3) = this->get_node(5);
-// 	face->set_node(4) = this->get_node(9);
-// 	face->set_node(5) = this->get_node(8);
-
-// 	return face;
-//       }
-//     case 3:
-//       {
-// 	face->set_node(0) = this->get_node(2);
-// 	face->set_node(1) = this->get_node(0);
-// 	face->set_node(2) = this->get_node(3);
-// 	face->set_node(3) = this->get_node(6);
-// 	face->set_node(4) = this->get_node(7);
-// 	face->set_node(5) = this->get_node(9);
-
-// 	return face;
-//       }
-//     default:
-//       {
-// 	error();
-//       }
-//     }
-
-//   // We'll never get here.
-//   error();
-//   return face;
+  // We'll never get here.
+  error();
+  AutoPtr<Elem> ap(NULL);  return ap;
 }
 
 

@@ -1,4 +1,4 @@
-// $Id: face_inf_quad6.C,v 1.30 2006-12-27 07:21:27 roystgnr Exp $
+// $Id: face_inf_quad6.C,v 1.31 2007-02-12 20:29:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -107,70 +107,76 @@ const float InfQuad6::_embedding_matrix[2][6][6] =
 
 
 
-AutoPtr<Elem> InfQuad6::build_side (const unsigned int i) const
+AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
+				    bool proxy) const
 {
   // assert (i < this->n_sides());
 
-  switch (i)
+  if (proxy)
     {
-    case 0:
-      {
-	AutoPtr<Elem> ap(new Side<Edge3,InfQuad6>(this,i));
-	return ap;
-      }
-    case 1:
-    case 2:
-      {
-	AutoPtr<Elem> ap(new Side<InfEdge2,InfQuad6>(this,i));
-	return ap;
-      }
-    default:
-      error();
+      switch (i)
+	{
+	case 0:
+	  {
+	    AutoPtr<Elem> ap(new Side<Edge3,InfQuad6>(this,i));
+	    return ap;
+	  }
+	case 1:
+	case 2:
+	  {
+	    AutoPtr<Elem> ap(new Side<InfEdge2,InfQuad6>(this,i));
+	    return ap;
+	  }
+	default:
+	  error();
+	}
     }
-  
-//   switch (i)
-//     {
-//     case 0:
-//       {
-// 	Edge3* edge = new Edge3;
 
-// 	edge->set_node(0) = this->get_node(0);
-// 	edge->set_node(1) = this->get_node(1);
-// 	edge->set_node(2) = this->get_node(4);
+  else
+    {
+      switch (i)
+	{
+	case 0:
+	  {
+	    Edge3* edge = new Edge3;
+
+	    edge->set_node(0) = this->get_node(0);
+	    edge->set_node(1) = this->get_node(1);
+	    edge->set_node(2) = this->get_node(4);
 	
-// 	AutoPtr<Elem> ap(edge);  return ap;
-//       }
+	    AutoPtr<Elem> ap(edge);  return ap;
+	  }
 
-//     case 1:
-//       {
-// 	// adjacent to another infinite element	
-// 	InfEdge2* edge = new InfEdge2;
+	case 1:
+	  {
+	    // adjacent to another infinite element	
+	    InfEdge2* edge = new InfEdge2;
 
-// 	edge->set_node(0) = this->get_node(1);
-// 	edge->set_node(1) = this->get_node(3);
+	    edge->set_node(0) = this->get_node(1);
+	    edge->set_node(1) = this->get_node(3);
 
-// 	AutoPtr<Elem> ap(edge);  return ap;
-//       }
+	    AutoPtr<Elem> ap(edge);  return ap;
+	  }
 
-//     case 2:
-//       {
-// 	// adjacent to another infinite element	
-// 	InfEdge2* edge = new InfEdge2;
+	case 2:
+	  {
+	    // adjacent to another infinite element	
+	    InfEdge2* edge = new InfEdge2;
 
-// 	edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
-// 	edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
+	    edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
+	    edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
 
-// 	AutoPtr<Elem> ap(edge);  return ap;
-//       }
-//     default:
-//       {
-// 	error();
-// 	AutoPtr<Elem> ap(NULL);  return ap;
-//       }
-//     }
+	    AutoPtr<Elem> ap(edge);  return ap;
+	  }
+	default:
+	  {
+	    error();
+	    AutoPtr<Elem> ap(NULL);  return ap;
+	  }
+	}
+    }
 
-
-  // We will never get here...  Look at the code above.
+  // We will never get here...  
   error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }

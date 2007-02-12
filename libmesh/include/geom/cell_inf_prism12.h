@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.h,v 1.11 2006-12-27 07:21:27 roystgnr Exp $
+// $Id: cell_inf_prism12.h,v 1.12 2007-02-12 20:29:38 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -123,7 +123,8 @@ public:
    * built coincident with faces 1 to 3.  Note that the \p AutoPtr<Elem>
    * takes care of freeing memory.
    */
-  AutoPtr<Elem> build_side (const unsigned int i) const;
+  AutoPtr<Elem> build_side (const unsigned int i,
+			    bool proxy) const;
 
   /**
    * Returns a \p EDGE3 built coincident with edges 0 to 2, an \p INFEDGE2

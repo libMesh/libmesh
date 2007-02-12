@@ -1,4 +1,4 @@
-// $Id: cell_prism6.C,v 1.27 2006-10-13 03:05:32 roystgnr Exp $
+// $Id: cell_prism6.C,v 1.28 2007-02-12 20:29:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -106,74 +106,103 @@ bool Prism6::has_affine_map() const
 
 
 
-AutoPtr<Elem> Prism6::build_side (const unsigned int i) const
+AutoPtr<Elem> Prism6::build_side (const unsigned int i,
+				  bool proxy) const
 {
   assert (i < this->n_sides());
 
-  switch (i)
+  if (proxy)
     {
-    case 0:  // the triangular face at z=-1
-      {
-	AutoPtr<Elem> face(new Side<Tri3,Prism6>(this,i));
+      switch(i)
+	{
+	case 0:
+	case 4:
+	  {
+	    AutoPtr<Elem> face(new Side<Tri3,Prism6>(this,i));
+	    return face;
+	  }
 
-// 	face->set_node(0) = this->get_node(0);
-// 	face->set_node(1) = this->get_node(2);
-// 	face->set_node(2) = this->get_node(1);
+	case 1:
+	case 2:
+	case 3:
+	  {
+	    AutoPtr<Elem> face(new Side<Quad4,Prism6>(this,i));
+	    return face;
+	  }
 
-	return face;
-      }
-    case 1:  // the quad face at y=0
-      {
-	AutoPtr<Elem> face(new Side<Quad4,Prism6>(this,i));
-	
-// 	face->set_node(0) = this->get_node(0);
-// 	face->set_node(1) = this->get_node(1);
-// 	face->set_node(2) = this->get_node(4);
-// 	face->set_node(3) = this->get_node(3);
-	
-	return face;
-      }
-    case 2:  // the other quad face
-      {
-	AutoPtr<Elem> face(new Side<Quad4,Prism6>(this,i));
-
-// 	face->set_node(0) = this->get_node(1);
-// 	face->set_node(1) = this->get_node(2);
-// 	face->set_node(2) = this->get_node(5);
-// 	face->set_node(3) = this->get_node(4);
-
-	return face;
-      }
-    case 3: // the quad face at x=0
-      {
-	AutoPtr<Elem> face(new Side<Quad4,Prism6>(this,i));
-
-// 	face->set_node(0) = this->get_node(2);
-// 	face->set_node(1) = this->get_node(0);
-// 	face->set_node(2) = this->get_node(3);
-// 	face->set_node(3) = this->get_node(5);
-	
-	return face;
-      }
-    case 4: // the triangular face at z=1
-      {
-	AutoPtr<Elem> face(new Side<Tri3,Prism6>(this,i));
-
-// 	face->set_node(0) = this->get_node(3);
-// 	face->set_node(1) = this->get_node(4);
-// 	face->set_node(2) = this->get_node(5);
-
-	return face;
-      }
-    default:
-      {
-	error();
-      }
+	default:
+	  {
+	    error();
+	  }
+	}
     }
 
+  else
+    {
+      switch (i)
+	{
+	case 0:  // the triangular face at z=-1
+	  {
+	    AutoPtr<Elem> face(new Tri3);
+
+	    face->set_node(0) = this->get_node(0);
+	    face->set_node(1) = this->get_node(2);
+	    face->set_node(2) = this->get_node(1);
+
+	    return face;
+	  }
+	case 1:  // the quad face at y=0
+	  {
+	    AutoPtr<Elem> face(new Quad4);
+	
+	    face->set_node(0) = this->get_node(0);
+	    face->set_node(1) = this->get_node(1);
+	    face->set_node(2) = this->get_node(4);
+	    face->set_node(3) = this->get_node(3);
+	
+	    return face;
+	  }
+	case 2:  // the other quad face
+	  {
+	    AutoPtr<Elem> face(new Quad4);
+
+	    face->set_node(0) = this->get_node(1);
+	    face->set_node(1) = this->get_node(2);
+	    face->set_node(2) = this->get_node(5);
+	    face->set_node(3) = this->get_node(4);
+
+	    return face;
+	  }
+	case 3: // the quad face at x=0
+	  {
+	    AutoPtr<Elem> face(new Quad4);
+
+	    face->set_node(0) = this->get_node(2);
+	    face->set_node(1) = this->get_node(0);
+	    face->set_node(2) = this->get_node(3);
+	    face->set_node(3) = this->get_node(5);
+	
+	    return face;
+	  }
+	case 4: // the triangular face at z=1
+	  {
+	    AutoPtr<Elem> face(new Tri3);
+
+	    face->set_node(0) = this->get_node(3);
+	    face->set_node(1) = this->get_node(4);
+	    face->set_node(2) = this->get_node(5);
+
+	    return face;
+	  }
+	default:
+	  {
+	    error();
+	  }
+	}
+    }
+  
   // We'll never get here.
   error();
-
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 

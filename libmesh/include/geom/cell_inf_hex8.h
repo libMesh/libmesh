@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.h,v 1.11 2006-03-23 20:24:36 roystgnr Exp $
+// $Id: cell_inf_hex8.h,v 1.12 2007-02-12 20:29:38 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -118,7 +118,8 @@ public:
    * built coincident with faces 1 to 4. Note that the \p AutoPtr<Elem>
    * takes care of freeing memory.
    */
-  AutoPtr<Elem> build_side (const unsigned int i) const;
+  AutoPtr<Elem> build_side (const unsigned int i,
+			    bool proxy) const;
 /*   {  */
 /*     // side() returns an AutoPtr to a DofObject, hence need to cast to Elem* */
 /*     AutoPtr<DofObject> ap_dof_object(this->side(i)); */

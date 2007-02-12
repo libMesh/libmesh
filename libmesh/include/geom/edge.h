@@ -1,4 +1,4 @@
-// $Id: edge.h,v 1.8 2006-10-04 22:26:53 roystgnr Exp $
+// $Id: edge.h,v 1.9 2007-02-12 20:29:38 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -119,7 +119,8 @@ class Edge : public Elem
    * The \p Elem::side() member returns 
    * an auto pointer to a NodeElem for the specified node.
    */
-  AutoPtr<Elem> build_side (const unsigned int i) const;
+  AutoPtr<Elem> build_side (const unsigned int i,
+			    bool proxy) const;
 
   /**
    * The \p Elem::build_edge() member makes no sense for edges.
