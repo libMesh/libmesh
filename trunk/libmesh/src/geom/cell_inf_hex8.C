@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex8.C,v 1.31 2005-06-08 08:13:28 spetersen Exp $
+// $Id: cell_inf_hex8.C,v 1.32 2007-02-12 20:29:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -101,31 +101,42 @@ bool InfHex8::is_node_on_edge(const unsigned int n,
   return false;
 }
 
-AutoPtr<Elem> InfHex8::build_side (const unsigned int i) const
+AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
+				   bool proxy) const
 {
   assert (i < this->n_sides());
 
-  switch (i)
+  if (proxy)
     {
-      // base
-    case 0:
-      {
-	AutoPtr<Elem> ap(new Side<Quad4,InfHex8>(this,i));
-	return ap;
-      }
-      // ifem sides
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-      {
-	AutoPtr<Elem> ap(new Side<InfQuad4,InfHex8>(this,i));
-	return ap;
-      }
-    default:
+      switch (i)
+	{
+	  // base
+	case 0:
+	  {
+	    AutoPtr<Elem> ap(new Side<Quad4,InfHex8>(this,i));
+	    return ap;
+	  }
+	  // ifem sides
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+	  {
+	    AutoPtr<Elem> ap(new Side<InfQuad4,InfHex8>(this,i));
+	    return ap;
+	  }
+	default:
+	  error();
+	}
+    }
+
+  else
+    {
+      // FIXME: Find out how to return non-proxy side
       error();
     }
 
+  
   // We'll never get here.
   error();
   AutoPtr<Elem> ap(NULL);  return ap;

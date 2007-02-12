@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.46 2007-01-19 23:39:32 roystgnr Exp $
+// $Id: elem.h,v 1.47 2007-02-12 20:29:38 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -369,7 +369,7 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual unsigned int n_sub_elem () const = 0;
 
   /**
-   * @returns an element coincident with side \p i.  This method returns
+   * @returns a proxy element coincident with side \p i.  This method returns
    * the _minimum_ element necessary to uniquely identify the side.  So, 
    * for example, the side of a hexahedral is always returned as a 4-noded
    * quadrilateral, regardless of what type of hex you are dealing with.  If
@@ -386,8 +386,16 @@ class Elem : public ReferenceCountedObject<Elem>,
    *
    * A \p AutoPtr<Elem> is returned to prevent a memory leak.
    * This way the user need not remember to delete the object.
+   *
+   * The second argument, which is true by default, specifies that a
+   * "proxy" element (of type Side) will be returned.  This type of
+   * return value is useful because it does not allocate additional
+   * memory, and is usually sufficient for FE calculation purposes.
+   * If you really need a full-ordered, non-proxy side object, call
+   * this function with proxy=false.
    */
-  virtual AutoPtr<Elem> build_side (const unsigned int i) const = 0;
+  virtual AutoPtr<Elem> build_side (const unsigned int i,
+				    bool proxy=true) const = 0;
 
   /**
    * Creates an element coincident with edge \p i. The element returned is

@@ -1,4 +1,4 @@
-// $Id: edge.C,v 1.9 2006-10-04 22:26:54 roystgnr Exp $
+// $Id: edge.C,v 1.10 2007-02-12 20:29:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@ AutoPtr<DofObject> Edge::side (const unsigned int i) const
 }
 
 
-AutoPtr<Elem> Edge::build_side (const unsigned int i) const
+AutoPtr<Elem> Edge::build_side (const unsigned int i, bool) const
 {
   assert(i < 2);
   const Elem* parent = this;

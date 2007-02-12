@@ -1,4 +1,4 @@
-// $Id: cell_tet4.h,v 1.14 2006-11-02 13:50:36 jwpeterson Exp $
+// $Id: cell_tet4.h,v 1.15 2007-02-12 20:29:38 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -119,7 +119,8 @@ public:
    * Builds a \p TRI3 built coincident with face i.  
    * The \p AutoPtr<Elem> handles the memory aspect.
    */
-  AutoPtr<Elem> build_side (const unsigned int i) const;
+  AutoPtr<Elem> build_side (const unsigned int i,
+			    bool proxy) const;
 
   /**
    * Builds a \p EDGE2 built coincident with face i.  

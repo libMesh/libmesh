@@ -1,4 +1,4 @@
-// $Id: cell_tet4.C,v 1.25 2006-11-02 13:50:36 jwpeterson Exp $
+// $Id: cell_tet4.C,v 1.26 2007-02-12 20:29:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -87,58 +87,65 @@ bool Tet4::is_node_on_side(const unsigned int n,
   return false;
 }
 
-AutoPtr<Elem> Tet4::build_side (const unsigned int i) const
+AutoPtr<Elem> Tet4::build_side (const unsigned int i,
+				bool proxy) const
 {
   assert (i < this->n_sides());
 
-  AutoPtr<Elem> ap(new Side<Tri3,Tet4>(this,i));
-  return ap;
-  
-//   AutoPtr<Elem> face(new Tri3);
+  if (proxy)
+    {
+      AutoPtr<Elem> ap(new Side<Tri3,Tet4>(this,i));
+      return ap;
+    }
 
-//   switch (i)
-//     {
-//     case 0:
-//       {
-// 	face->set_node(0) = this->get_node(0);
-// 	face->set_node(1) = this->get_node(2);
-// 	face->set_node(2) = this->get_node(1);
+  else
+    {
+      AutoPtr<Elem> face(new Tri3);
 
-// 	return face;
-//       }
-//     case 1:
-//       {
-// 	face->set_node(0) = this->get_node(0);
-// 	face->set_node(1) = this->get_node(1);
-// 	face->set_node(2) = this->get_node(3);
+      switch (i)
+	{
+	case 0:
+	  {
+	    face->set_node(0) = this->get_node(0);
+	    face->set_node(1) = this->get_node(2);
+	    face->set_node(2) = this->get_node(1);
 
-// 	return face;
-//       }
-//     case 2:
-//       {
-// 	face->set_node(0) = this->get_node(1);
-// 	face->set_node(1) = this->get_node(2);
-// 	face->set_node(2) = this->get_node(3);
+	    return face;
+	  }
+	case 1:
+	  {
+	    face->set_node(0) = this->get_node(0);
+	    face->set_node(1) = this->get_node(1);
+	    face->set_node(2) = this->get_node(3);
 
-// 	return face;
-//       }
-//     case 3:
-//       {
-// 	face->set_node(0) = this->get_node(2);
-// 	face->set_node(1) = this->get_node(0);
-// 	face->set_node(2) = this->get_node(3);
+	    return face;
+	  }
+	case 2:
+	  {
+	    face->set_node(0) = this->get_node(1);
+	    face->set_node(1) = this->get_node(2);
+	    face->set_node(2) = this->get_node(3);
+
+	    return face;
+	  }
+	case 3:
+	  {
+	    face->set_node(0) = this->get_node(2);
+	    face->set_node(1) = this->get_node(0);
+	    face->set_node(2) = this->get_node(3);
 	
-// 	return face;
-//       }
-//     default:
-//       {
-// 	error();
-//       }
-//     }
-
-//   // We'll never get here.
-//   error();  
-//   return face;
+	    return face;
+	  }
+	default:
+	  {
+	    error();
+	  }
+	}
+    }
+  
+  // We'll never get here.
+  error();  
+  AutoPtr<Elem> ap(NULL);  return ap;
 }
 
 

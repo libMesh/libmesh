@@ -1,4 +1,4 @@
-// $Id: face_tri3.h,v 1.13 2006-08-28 16:02:08 jwpeterson Exp $
+// $Id: face_tri3.h,v 1.14 2007-02-12 20:29:38 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -121,7 +121,8 @@ public:
    */
   Order default_order() const { return FIRST; }
 
-  AutoPtr<Elem> build_side (const unsigned int i) const;
+  AutoPtr<Elem> build_side (const unsigned int i,
+			    bool proxy) const;
 
   virtual void connectivity(const unsigned int sf,
 			    const IOPackage iop,

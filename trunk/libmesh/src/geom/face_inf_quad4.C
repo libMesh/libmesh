@@ -1,4 +1,4 @@
-// $Id: face_inf_quad4.C,v 1.29 2005-07-01 16:36:22 spetersen Exp $
+// $Id: face_inf_quad4.C,v 1.30 2007-02-12 20:29:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -162,29 +162,40 @@ bool InfQuad4::contains_point (const Point& p) const
 
 
 
-AutoPtr<Elem> InfQuad4::build_side (const unsigned int i) const
+AutoPtr<Elem> InfQuad4::build_side (const unsigned int i,
+				    bool proxy) const
 {
   // assert (i < this->n_sides());
 
-  switch (i)
+  if (proxy)
     {
-      // base
-    case 0:
-      {
-	AutoPtr<Elem> ap(new Side<Edge2,InfQuad4>(this,i));
-	return ap;
-      }
-      // ifem edges
-    case 1:
-    case 2:
-      {
-	AutoPtr<Elem> ap(new Side<InfEdge2,InfQuad4>(this,i));
-	return ap;
-      }
+      switch (i)
+	{
+	  // base
+	case 0:
+	  {
+	    AutoPtr<Elem> ap(new Side<Edge2,InfQuad4>(this,i));
+	    return ap;
+	  }
+	  // ifem edges
+	case 1:
+	case 2:
+	  {
+	    AutoPtr<Elem> ap(new Side<InfEdge2,InfQuad4>(this,i));
+	    return ap;
+	  }
 
-    default:
+	default:
+	  error();
+	}
+    }
+
+  else
+    {
+      // FIXME: Find out how to return non-proxy side
       error();
     }
+    
   // How did we get here
   error();
   AutoPtr<Elem> ap(NULL);  return ap;

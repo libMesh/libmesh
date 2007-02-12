@@ -1,4 +1,4 @@
-// $Id: cell_inf_prism12.C,v 1.32 2006-12-27 07:21:27 roystgnr Exp $
+// $Id: cell_inf_prism12.C,v 1.33 2007-02-12 20:29:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -100,97 +100,104 @@ bool InfPrism12::is_node_on_edge(const unsigned int n,
   return false;
 }
 
-AutoPtr<Elem> InfPrism12::build_side (const unsigned int i) const
+AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
+				      bool proxy) const
 {
   assert (i < this->n_sides());
 
-  switch (i)
+  if (proxy)
     {
-      // base
-    case 0:
-      {
-	AutoPtr<Elem> ap(new Side<Tri6,InfPrism12>(this,i));
-	return ap;
-      }
-      // ifem sides
-    case 1:
-    case 2:
-    case 3:
-      {
-	AutoPtr<Elem> ap(new Side<InfQuad6,InfPrism12>(this,i));
-	return ap;
-      }
-    default:
-      error();
+      switch (i)
+	{
+	  // base
+	case 0:
+	  {
+	    AutoPtr<Elem> ap(new Side<Tri6,InfPrism12>(this,i));
+	    return ap;
+	  }
+	  // ifem sides
+	case 1:
+	case 2:
+	case 3:
+	  {
+	    AutoPtr<Elem> ap(new Side<InfQuad6,InfPrism12>(this,i));
+	    return ap;
+	  }
+	default:
+	  error();
+	}
     }
+
+  else
+    {
+      switch (i)
+	{
+	case 0:  // the triangular face at z=-1, base face
+	  {
+	    AutoPtr<Elem> face(new Tri6);
+
+	    // Note that for this face element, the normal points inward
+	    face->set_node(0) = this->get_node(0);
+	    face->set_node(1) = this->get_node(1);
+	    face->set_node(2) = this->get_node(2);
+	    face->set_node(3) = this->get_node(6);
+	    face->set_node(4) = this->get_node(7);
+	    face->set_node(5) = this->get_node(8);
+
+	    return face;
+	  }
+
+	case 1:  // the quad face at y=0
+	  {
+	    AutoPtr<Elem> face(new InfQuad6);
+	
+	    face->set_node(0) = this->get_node(0);
+	    face->set_node(1) = this->get_node(1);
+	    face->set_node(2) = this->get_node(3);
+	    face->set_node(3) = this->get_node(4);
+	    face->set_node(4) = this->get_node(6);
+	    face->set_node(5) = this->get_node(9);
+	
+	    return face;
+	  }
+
+	case 2:  // the other quad face
+	  {
+	    AutoPtr<Elem> face(new InfQuad6);
+
+	    face->set_node(0) = this->get_node(1);
+	    face->set_node(1) = this->get_node(2);
+	    face->set_node(2) = this->get_node(4);
+	    face->set_node(3) = this->get_node(5);
+	    face->set_node(4) = this->get_node(7);
+	    face->set_node(5) = this->get_node(10);
+
+	    return face;
+	  }
+
+	case 3: // the quad face at x=0
+	  {
+	    AutoPtr<Elem> face(new InfQuad6);
+
+	    face->set_node(0) = this->get_node(2);
+	    face->set_node(1) = this->get_node(0);
+	    face->set_node(2) = this->get_node(5);
+	    face->set_node(3) = this->get_node(3);
+	    face->set_node(4) = this->get_node(8);
+	    face->set_node(5) = this->get_node(11);
+	
+	    return face;
+	  }
+
+	default:
+	  {
+	    error();
+	    AutoPtr<Elem> ap(NULL);  return ap;
+	  }
+	}
+    }
+
   
-  
-//   switch (i)
-//     {
-//     case 0:  // the triangular face at z=-1, base face
-//       {
-// 	AutoPtr<Elem> face(new Tri6);
-
-// 	// Note that for this face element, the normal points inward
-// 	face->set_node(0) = this->get_node(0);
-// 	face->set_node(1) = this->get_node(1);
-// 	face->set_node(2) = this->get_node(2);
-// 	face->set_node(3) = this->get_node(6);
-// 	face->set_node(4) = this->get_node(7);
-// 	face->set_node(5) = this->get_node(8);
-
-// 	return face;
-//       }
-
-//     case 1:  // the quad face at y=0
-//       {
-// 	AutoPtr<Elem> face(new InfQuad6);
-	
-// 	face->set_node(0) = this->get_node(0);
-// 	face->set_node(1) = this->get_node(1);
-// 	face->set_node(2) = this->get_node(3);
-// 	face->set_node(3) = this->get_node(4);
-// 	face->set_node(4) = this->get_node(6);
-// 	face->set_node(5) = this->get_node(9);
-	
-// 	return face;
-//       }
-
-//     case 2:  // the other quad face
-//       {
-// 	AutoPtr<Elem> face(new InfQuad6);
-
-// 	face->set_node(0) = this->get_node(1);
-// 	face->set_node(1) = this->get_node(2);
-// 	face->set_node(2) = this->get_node(4);
-// 	face->set_node(3) = this->get_node(5);
-// 	face->set_node(4) = this->get_node(7);
-// 	face->set_node(5) = this->get_node(10);
-
-// 	return face;
-//       }
-
-//     case 3: // the quad face at x=0
-//       {
-// 	AutoPtr<Elem> face(new InfQuad6);
-
-// 	face->set_node(0) = this->get_node(2);
-// 	face->set_node(1) = this->get_node(0);
-// 	face->set_node(2) = this->get_node(5);
-// 	face->set_node(3) = this->get_node(3);
-// 	face->set_node(4) = this->get_node(8);
-// 	face->set_node(5) = this->get_node(11);
-	
-// 	return face;
-//       }
-
-//     default:
-//       {
-// 	error();
-// 	AutoPtr<Elem> ap(NULL);  return ap;
-//       }
-//     }
-
   // We'll never get here.
   error();
   AutoPtr<Elem> ap(NULL);  return ap;
