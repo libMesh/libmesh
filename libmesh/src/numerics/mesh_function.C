@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.14 2006-12-08 19:41:19 roystgnr Exp $
+// $Id: mesh_function.C,v 1.15 2007-02-12 18:50:50 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -193,6 +193,21 @@ Gradient MeshFunction::gradient (const Point& p,
 
 
 
+#ifdef ENABLE_SECOND_DERIVATIVES
+Tensor MeshFunction::hessian (const Point& p, 
+			      const Real time)
+{
+  assert (this->initialized());
+  // At the moment the function we call ignores the time
+  assert (time == 0.);
+  
+  std::vector<Tensor> buf (1);
+  this->hessian(p, time, buf);
+  return buf[0];
+}
+#endif
+
+
 
 void MeshFunction::operator() (const Point& p,
 			       const Real,
@@ -377,6 +392,99 @@ void MeshFunction::gradient (const Point& p,
   // all done
   return;
 }
+
+
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+void MeshFunction::hessian (const Point& p,
+			    const Real,
+			    std::vector<Tensor>& output)
+{
+  assert (this->initialized());
+
+  /* Ensure that in the case of a master mesh function, the
+     out-of-mesh mode is enabled either for both or for none.  This is
+     important because the out-of-mesh mode is also communicated to
+     the point locator.  Since this is time consuming, enable it only
+     in debug mode.  */
+#ifdef DEBUG
+  if (this->_master != NULL)
+    {
+      const MeshFunction* master =
+	dynamic_cast<const MeshFunction*>(this->_master);
+      if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
+	{
+	  std::cerr << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
+	  error();
+	}
+    }
+#endif
+  
+  // locate the point in the other mesh
+  const Elem* element = this->_point_locator->operator()(p);
+
+  if(element==NULL)
+    {
+      output.resize(0);
+    }
+  else
+    {
+      // resize the output vector to the number of output values
+      // that the user told us
+      output.resize (this->_system_vars.size());
+      
+      
+      {
+	const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
+	
+	
+	/*
+	 * Get local coordinates to feed these into compute_data().  
+	 * Note that the fe_type can safely be used from the 0-variable,
+	 * since the inverse mapping is the same for all FEFamilies
+	 */
+	const Point mapped_point (FEInterface::inverse_map (dim, 
+							    this->_dof_map.variable_type(0),
+							    element, 
+							    p));
+	
+        std::vector<Point> point_list (1, mapped_point);
+	
+	// loop over all vars
+	for (unsigned int index=0; index < this->_system_vars.size(); index++)
+	  {
+	    /*
+	     * the data for this variable
+	     */
+	    const unsigned int var = _system_vars[index];
+	    const FEType& fe_type = this->_dof_map.variable_type(var);
+
+            AutoPtr<FEBase> point_fe (FEBase::build(dim, fe_type));
+            const std::vector<std::vector<RealTensor> >& d2phi =
+			    point_fe->get_d2phi();
+            point_fe->reinit(element, &point_list);
+	    
+	    // where the solution values for the var-th variable are stored
+	    std::vector<unsigned int> dof_indices;
+	    this->_dof_map.dof_indices (element, dof_indices, var);
+	      
+	    // interpolate the solution
+	    Tensor hess;
+		
+	    for (unsigned int i=0; i<dof_indices.size(); i++)
+	      hess.add_scaled(d2phi[i][0], this->_vector(dof_indices[i]));
+		
+	    output[index] = hess;
+	  }
+      }
+    }
+      
+  // all done
+  return;
+}
+#endif
+
+
 
 const PointLocatorBase& MeshFunction::get_point_locator (void) const
 {
