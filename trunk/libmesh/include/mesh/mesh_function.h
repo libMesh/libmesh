@@ -1,4 +1,4 @@
-// $Id: mesh_function.h,v 1.8 2006-12-08 19:41:18 roystgnr Exp $
+// $Id: mesh_function.h,v 1.9 2007-02-12 18:50:49 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 #include "function_base.h"
 #include "dense_vector.h"
 #include "vector_value.h"
+#include "tensor_value.h"
 
 
 
@@ -93,42 +94,51 @@ public:
   void clear ();
 
   /**
-   * @returns the \f$ 0^{th} \f$ entry of the \p std::vector<Number> at point
-   * \p p and for \p time, which defaults to zero.  Creates a
-   * \p DenseVector<Number> as input to the user-provided method, 
-   * so it may be worth thinking about using \p evaluate().
+   * @returns the value of variable 0 at point
+   * \p p and for \p time, which defaults to zero.
    */
   Number operator() (const Point& p, 
 		     const Real time=0.);
 
   /**
-   * @returns the \f$ 0^{th} \f$ entry of the \p std::vector<Number> at point
-   * \p p and for \p time, which defaults to zero.  Creates a
-   * \p DenseVector<Number> as input to the user-provided method, 
-   * so it may be worth thinking about using \p evaluate().
+   * @returns the first derivatives of variable 0 at point
+   * \p p and for \p time, which defaults to zero.
    */
   Gradient gradient (const Point& p, 
 		     const Real time=0.);
 
+#ifdef ENABLE_SECOND_DERIVATIVES
   /**
-   * Computes values at coordinate \p p and for time \p time, defaults
-   * to zero.  It is up to the user-provided method \p _analytical_fptr
-   * whether \p output has to have the correct length or should be
-   * resized.
+   * @returns the second derivatives of variable 0 at point
+   * \p p and for \p time, which defaults to zero.
+   */
+  Tensor hessian (const Point& p, 
+		  const Real time=0.);
+#endif
+
+  /**
+   * Computes values at coordinate \p p and for time \p time, which
+   * defaults to zero.
    */
   void operator() (const Point& p,
 		   const Real time,
 		   DenseVector<Number>& output);
 
   /**
-   * Computes gradients at coordinate \p p and for time \p time, defaults
-   * to zero.  It is up to the user-provided method \p _analytical_fptr
-   * whether \p output has to have the correct length or should be
-   * resized.
+   * Computes gradients at coordinate \p p and for time \p time, which
+   * defaults to zero.
    */
   void gradient (const Point& p,
 		 const Real time,
 		 std::vector<Gradient>& output);
+
+  /**
+   * Computes gradients at coordinate \p p and for time \p time, which
+   * defaults to zero.
+   */
+  void hessian (const Point& p,
+		const Real time,
+		std::vector<Tensor>& output);
 
   /**
    * Returns the current \p PointLocator object, for you might want to
