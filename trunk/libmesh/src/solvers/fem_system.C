@@ -19,7 +19,8 @@ FEMSystem::FEMSystem (EquationSystems& es,
   : Parent(es, name, number),
     fe_reinit_during_postprocess(true),
     numerical_jacobian_h(1.e-6),
-    verify_analytic_jacobians(0.0)
+    verify_analytic_jacobians(0.0),
+    element_qrule(NULL), side_qrule(NULL), elem(NULL)
 {
 }
 
