@@ -1,5 +1,5 @@
 
-// $Id: patch.C,v 1.3 2007-01-22 23:36:07 roystgnr Exp $
+// $Id: patch.C,v 1.4 2007-02-13 17:10:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -48,12 +48,11 @@ void Patch::find_face_neighbors(std::set<const Elem *> &new_neighbors)
           {
 	    const Elem* neighbor = elem->neighbor(s);
 	
-	    if (neighbor->active() &&                // ... and it is active
-                this->find(neighbor) == this->end()) // ... and not in the patch
-	      new_neighbors.insert (neighbor);       // ... then add it
+	    if (neighbor->active())
+	      new_neighbors.insert (neighbor); // add active neighbors
 	  
-	    else                              // ... the neighbor is *not* active,
-	      {                               // ... so add *all* neighboring
+	    else                              // the neighbor is *not* active,
+	      {                               // so add *all* neighboring
                                               // active children to the patch
 	        std::vector<const Elem*> active_neighbor_children;
 
@@ -65,8 +64,7 @@ void Patch::find_face_neighbors(std::set<const Elem *> &new_neighbors)
                 const std::vector<const Elem*>::const_iterator
                   child_end = active_neighbor_children.end();
                 for (; child_it != child_end; ++child_it)
-                  if (this->find(*child_it) == this->end())
-		    new_neighbors.insert(*child_it);
+		  new_neighbors.insert(*child_it);
 	      }
           }
     }
