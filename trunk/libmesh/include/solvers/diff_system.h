@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.15 2007-02-10 04:48:21 roystgnr Exp $
+// $Id: diff_system.h,v 1.16 2007-02-13 21:29:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -113,8 +113,8 @@ public:
    * return false.
    *
    * Users need to reimplement this for their particular PDE.
-   * Given the physics model du/dt = F(u), the user should
-   * examine u = _nonlinear_solution and add (F(u), phi_i) to 
+   * To implement the physics model du/dt = F(u), the user should
+   * examine u = elem_solution and add (F(u), phi_i) to 
    * elem_residual.
    */
   virtual bool element_time_derivative (bool request_jacobian) {
@@ -129,8 +129,8 @@ public:
    * return false.
    *
    * Users may need to reimplement this for their particular PDE.
-   * Given the constraint 0 = G(u), the user should
-   * examine u = _nonlinear_solution and add (G(u), phi_i) to 
+   * To implement the constraint 0 = G(u), the user should
+   * examine u = elem_solution and add (G(u), phi_i) to 
    * elem_residual.
    */
   virtual bool element_constraint (bool request_jacobian) {
@@ -310,12 +310,6 @@ public:
   DenseMatrix<Number> elem_jacobian;
 
   /**
-   * @returns the current nonlinear solution for the specified global
-   * DOF.
-   */
-  Number current_nonlinear_solution (const unsigned int global_dof_number) const;
-
-  /**
    * Element residual subvectors and Jacobian submatrices
    */
   std::vector<DenseSubVector<Number> *> elem_subresiduals;
@@ -339,11 +333,6 @@ protected:
    * in time and which are just constraints
    */
   std::vector<bool> _time_evolving;
-
-  /**
-   * Serial vector of nonlinear_solution
-   */
-  AutoPtr<NumericVector<Number> > current_local_nonlinear_solution;
 };
 
 

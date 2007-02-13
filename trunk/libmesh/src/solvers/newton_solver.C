@@ -41,15 +41,21 @@ void NewtonSolver::solve()
 {
   START_LOG("solve()", "NewtonSolver");
 
-  NumericVector<Number> &solution = *(_system.solution);
-  NumericVector<Number> &newton_iterate =
-    _system.get_vector("_nonlinear_solution");
-  newton_iterate.close();
-  solution.close();
+//  NumericVector<Number> &newton_iterate =
+//    _system.get_vector("_nonlinear_solution");
+  NumericVector<Number> &newton_iterate = *(_system.solution);
 
-  solution = newton_iterate;
+//  NumericVector<Number> &linear_solution = *(_system.solution);
+  AutoPtr<NumericVector<Number> > linear_solution_ptr = newton_iterate.clone();
+  NumericVector<Number> &linear_solution = *linear_solution_ptr;
+
+  newton_iterate.close();
+  linear_solution.close();
+
+//  solution = newton_iterate;
+//  _system.get_dof_map().enforce_constraints_exactly(_system);
+//  newton_iterate = solution;
   _system.get_dof_map().enforce_constraints_exactly(_system);
-  newton_iterate = solution;
 
   NumericVector<Number> &rhs = *(_system.rhs);
 
@@ -109,11 +115,11 @@ void NewtonSolver::solve()
         }
 
       // At this point newton_iterate is the current guess, and
-      // solution is now about to become the NEGATIVE of the next
+      // linear_solution is now about to become the NEGATIVE of the next
       // Newton step.
 
-      // Our best initial guess for the solution is zero!
-      solution.zero();
+      // Our best initial guess for the linear_solution is zero!
+      linear_solution.zero();
 
       if (!quiet)
         std::cout << "Linear solve starting" << std::endl;
@@ -124,10 +130,10 @@ void NewtonSolver::solve()
         (_system.have_matrix("Preconditioner")) ?
       // 1.) User-supplied preconditioner
         linear_solver->solve (matrix, _system.get_matrix("Preconditioner"),
-                              solution, rhs, current_linear_tolerance,
+                              linear_solution, rhs, current_linear_tolerance,
                               max_linear_iterations) :
       // 2.) Use system matrix for the preconditioner
-        linear_solver->solve (matrix, solution, rhs,
+        linear_solver->solve (matrix, linear_solution, rhs,
                               current_linear_tolerance, 
                               max_linear_iterations);
       // We may need to localize a parallel solution
@@ -148,12 +154,12 @@ void NewtonSolver::solve()
                   << std::endl;
 
       // Compute the l2 norm of the nonlinear update
-      Real norm_delta = solution.l2_norm();
+      Real norm_delta = linear_solution.l2_norm();
 
       if (!quiet)
         std::cout << "Trying full Newton step" << std::endl;
       // Take a full Newton step
-      newton_iterate.add (-1., solution);
+      newton_iterate.add (-1., linear_solution);
       newton_iterate.close();
 
       // Check residual with full Newton step
@@ -164,6 +170,21 @@ void NewtonSolver::solve()
 
       rhs.close();
       current_residual = rhs.l2_norm();
+
+// A potential method for avoiding oversolving?
+/*
+      Real predicted_absolute_error =
+        current_residual * norm_delta / last_residual;
+
+      Real predicted_relative_error =
+        predicted_absolute_error / max_solution_norm;
+
+      std::cout << "Predicted absolute error = " <<
+        predicted_absolute_error << std::endl;
+
+      std::cout << "Predicted relative error = " <<
+        predicted_relative_error << std::endl;
+*/
 
       // backtrack if necessary
       if (require_residual_reduction)
@@ -186,7 +207,7 @@ void NewtonSolver::solve()
               if (!quiet)
                 std::cout << "Shrinking Newton step to "
                           << steplength << std::endl;
-              newton_iterate.add (steplength, solution);
+              newton_iterate.add (steplength, linear_solution);
               newton_iterate.close();
 
               // Check residual with fractional Newton step
@@ -251,13 +272,13 @@ void NewtonSolver::solve()
   // Copy the final nonlinear iterate into the current_solution,
   // for other libMesh functions that expect it
 
-  solution = newton_iterate;
-  solution.close();
+//  solution = newton_iterate;
+//  solution.close();
 
   // The linear solver may not have fit our constraints exactly
   _system.get_dof_map().enforce_constraints_exactly(_system);
-  newton_iterate = solution;
-  solution.close();
+//  newton_iterate = solution;
+//  solution.close();
 
   // We may need to localize a parallel solution
   _system.update ();

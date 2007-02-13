@@ -67,7 +67,8 @@ void TimeSolver::advance_timestep ()
   NumericVector<Number> &old_nonlinear_solution =
   _system.get_vector("_old_nonlinear_solution");
   NumericVector<Number> &nonlinear_solution =
-    _system.get_vector("_nonlinear_solution");
+    *(_system.solution);
+//    _system.get_vector("_nonlinear_solution");
 
   old_nonlinear_solution = nonlinear_solution;
 
