@@ -1,4 +1,4 @@
-// $Id: error_estimator.h,v 1.13 2007-01-19 23:28:42 roystgnr Exp $
+// $Id: error_estimator.h,v 1.14 2007-02-13 21:21:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -52,7 +52,7 @@ public:
   /**
    * Constructor. Empty.
    */
-  ErrorEstimator() {}
+  ErrorEstimator() : _sobolev_order(1) {}
   
   /**
    * Destructor.  
@@ -114,6 +114,15 @@ public:
    */
   std::vector<bool> component_mask;
 
+    /**
+     * Returns or allows you to set the Sobolev order for error computations
+     * e.g. 0 for H^0/L_2 error, 1 for H^1, 2 for H^2
+     * This value defaults to 1, and its exact effects depend on the particular
+     * ErrorEstimator subclass being used.
+     */
+    unsigned int & sobolev_order (void)
+      { return _sobolev_order; }
+
 protected:
 
   /**
@@ -129,6 +138,11 @@ protected:
    * fill the newer component_scale vector.
    */
   void convert_component_mask_to_scale();
+
+  /**
+   * Sobolev order - e.g. 0 for H^0/L_2 error, 1 for H^1, 2 for H^2
+   */
+  unsigned int _sobolev_order;
 };
 
 

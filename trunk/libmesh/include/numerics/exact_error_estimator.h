@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.h,v 1.4 2006-09-19 17:50:52 roystgnr Exp $
+// $Id: exact_error_estimator.h,v 1.5 2007-02-13 21:21:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -65,7 +65,6 @@ public:
   ExactErrorEstimator() : _exact_value(NULL), 
                           _exact_deriv(NULL),
                           _exact_hessian(NULL),
-			  _sobolev_order(1),
 			  _extra_order(0)
   {}
   
@@ -107,13 +106,6 @@ public:
                                           const Parameters& parameters,
                                           const std::string& sys_name,
                                           const std::string& unknown_name));
-
-  /**
-   * Returns or allows you to set the Sobolev order for error computations
-   * e.g. 0 for H^0/L_2 error, 1 for H^1, 2 for H^2
-   */
-  unsigned int & sobolev_order (void)
-    { return _sobolev_order; }
 
   /**
    * Increases or decreases the order of the quadrature rule used for numerical
@@ -168,11 +160,6 @@ private:
 			     const Parameters& parameters,
 			     const std::string& sys_name,
 			     const std::string& unknown_name);
-
-  /**
-   * Sobolev order - e.g. 0 for H^0/L_2 error, 1 for H^1, 2 for H^2
-   */
-  unsigned int _sobolev_order;
 
   /**
    * Extra order to use for quadrature rule

@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.23 2007-02-13 17:13:01 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.24 2007-02-13 21:21:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -110,6 +110,12 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 {
   START_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
 
+#ifdef ENABLE_SECOND_DERIVATIVES
+  assert (_sobolev_order == 1 || _sobolev_order == 2);
+#else
+  assert (_sobolev_order == 1);
+#endif
+
   // The current mesh
   const Mesh& mesh = system.get_mesh();
 
@@ -195,7 +201,14 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	  const std::vector<Real>&                       JxW     = fe->get_JxW();
 	  const std::vector<Point>&                      q_point = fe->get_xyz();
 	  const std::vector<std::vector<Real> >&         phi     = fe->get_phi();
-	  const std::vector<std::vector<RealGradient> >& dphi    = fe->get_dphi();
+	  const std::vector<std::vector<RealGradient> > *dphi;
+          if (_sobolev_order == 1)
+            dphi = &(fe->get_dphi());
+#ifdef ENABLE_SECOND_DERIVATIVES
+	  const std::vector<std::vector<RealTensor> >  *d2phi;
+          if (_sobolev_order == 2)
+            d2phi = &(fe->get_d2phi());
+#endif
       
 	  // global DOF indices
 	  std::vector<unsigned int> dof_indices;
@@ -216,9 +229,16 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	  	  
 	  DenseMatrix<Number> Kp(matsize,matsize);
 	  DenseVector<Number>
-	    Fx(matsize), Pu_x_h(matsize),
-	    Fy(matsize), Pu_y_h(matsize),
-	    Fz(matsize), Pu_z_h(matsize);
+	    Fx(matsize), Pu_x_h(matsize), // Also xx
+	    Fy(matsize), Pu_y_h(matsize), // Also yy
+	    Fz(matsize), Pu_z_h(matsize); // Also zz
+          DenseVector<Number> Fxy, Pu_xy_h, Fxz, Pu_xz_h, Fyz, Pu_yz_h;
+          if (_sobolev_order == 2)
+            {
+              Fxy.resize(matsize); Pu_xy_h.resize(matsize);
+              Fxz.resize(matsize); Pu_xz_h.resize(matsize);
+              Fyz.resize(matsize); Pu_yz_h.resize(matsize);
+            }
 
 	  //------------------------------------------------------
 	  // Loop over each element in the patch and compute their
@@ -246,15 +266,6 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	      // \int_{Omega_e} \psi_i \psi_j = \int_{Omega_e} du_h/dx_k \psi_i
 	      for (unsigned int qp=0; qp<n_qp; qp++)
 		{
-		  // Compute the gradient on the current patch element
-		  // at the quadrature point
-		  Gradient grad_u_h;
-
-		  for (unsigned int i=0; i<n_dofs; i++)
-		    // grad_u_h += dphi[i][qp]*system.current_solution(dof_indices[i]);
-		    grad_u_h.add_scaled (dphi[i][qp],
-					 system.current_solution(dof_indices[i]));
-
 		  // Construct the shape function values for the patch projection
 		  std::vector<Real> psi(specpoly(dim, element_order, q_point[qp], matsize));
 		  
@@ -262,14 +273,46 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 		  for (unsigned int i=0; i<Kp.m(); i++)
 		    for (unsigned int j=0; j<Kp.n(); j++)
 		      Kp(i,j) += JxW[qp]*psi[i]*psi[j];
+
+                  if (_sobolev_order == 1)
+                    {
+		      // Compute the gradient on the current patch element
+		      // at the quadrature point
+		      Gradient grad_u_h;
+
+		      for (unsigned int i=0; i<n_dofs; i++)
+		        grad_u_h.add_scaled ((*dphi)[i][qp],
+					     system.current_solution(dof_indices[i]));
 		  
-		  // Patch RHS contributions
-		  for (unsigned int i=0; i<psi.size(); i++)
-		    {
-		      Fx(i) += JxW[qp]*grad_u_h(0)*psi[i];
-		      Fy(i) += JxW[qp]*grad_u_h(1)*psi[i];
-		      Fz(i) += JxW[qp]*grad_u_h(2)*psi[i];
-		    }
+		      // Patch RHS contributions
+		      for (unsigned int i=0; i<psi.size(); i++)
+		        {
+		          Fx(i) += JxW[qp]*grad_u_h(0)*psi[i];
+		          Fy(i) += JxW[qp]*grad_u_h(1)*psi[i];
+		          Fz(i) += JxW[qp]*grad_u_h(2)*psi[i];
+		        }
+                    }
+                  else if (_sobolev_order == 2)
+                    {
+		      // Compute the hessian on the current patch element
+		      // at the quadrature point
+                      Tensor hess_u_h;
+
+		      for (unsigned int i=0; i<n_dofs; i++)
+		        hess_u_h.add_scaled ((*d2phi)[i][qp],
+					     system.current_solution(dof_indices[i]));
+
+		      // Patch RHS contributions
+		      for (unsigned int i=0; i<psi.size(); i++)
+		        {
+		          Fx(i)  += JxW[qp]*hess_u_h(0,0)*psi[i];
+		          Fy(i)  += JxW[qp]*hess_u_h(1,1)*psi[i];
+		          Fz(i)  += JxW[qp]*hess_u_h(2,2)*psi[i];
+		          Fxy(i) += JxW[qp]*hess_u_h(0,1)*psi[i];
+		          Fxz(i) += JxW[qp]*hess_u_h(0,2)*psi[i];
+		          Fyz(i) += JxW[qp]*hess_u_h(1,2)*psi[i];
+		        }
+                    }
 		} // end quadrature loop
 	    } // end patch loop
 	  
@@ -282,12 +325,17 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	  Kp.lu_solve (Fx, Pu_x_h);
 	  Kp.lu_solve (Fy, Pu_y_h);
 	  Kp.lu_solve (Fz, Pu_z_h);
-	  
-
+          if (_sobolev_order == 2)
+            {
+              Kp.lu_solve(Fxy, Pu_xy_h);
+              Kp.lu_solve(Fxz, Pu_xz_h);
+              Kp.lu_solve(Fyz, Pu_yz_h);
+            }
 	  
 	  //--------------------------------------------------
 	  // Finally, estimate the error in the current variable
-	  // for the current element by computing ||Pgrad_u_h - grad_u_h||
+	  // for the current element by computing ||P grad_u_h - grad_u_h||
+          // or ||P hess_u_h - hess_u_h|| in the infinity (max) norm
 
 	  fe->reinit(elem);
 	  //reinitialize element
@@ -309,42 +357,59 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	  fe->attach_quadrature_rule (&samprule);
 	  fe->reinit(elem);
 	      
-	  const std::vector<Point>&                      samppt   = fe->get_xyz();
-	  const std::vector<std::vector<RealGradient> >& dphi2    = fe->get_dphi();
-
 	  const unsigned int n_sp = samprule.n_points();
 	  for (unsigned int sp=0; sp< n_sp; sp++)
 	    {
-	      // Real temperrx=0,temperry=0,temperrz=0;
-	      Number temperrx=0,temperry=0,temperrz=0;
+	      std::vector<Number> temperr(6,0.0); // x,y,z or xx,yy,zz,xy,xz,yz
 	  
-	      // Comput the gradient at the current sample point
-	      Gradient grad_u_h;
+              if (_sobolev_order == 1)
+                {
+	          // Compute the gradient at the current sample point
+	          Gradient grad_u_h;
 	  
-	      for (unsigned int i=0; i<n_dofs; i++)
-	        grad_u_h.add_scaled (dphi2[i][sp],
-			             system.current_solution(dof_indices[i]));
-	      // Compute the phi values at the current sample point
-	      std::vector<Real> psi(specpoly(dim,element_order, samppt[sp], matsize));
-	      for (unsigned int i=0; i<matsize; i++)
-	        {
-	          temperrx += psi[i]*Pu_x_h(i);
-	          temperry += psi[i]*Pu_y_h(i);
-	          temperrz += psi[i]*Pu_z_h(i);
-	        }
-	      temperrx -= grad_u_h(0);
-	      temperry -= grad_u_h(1);
-	      temperrz -= grad_u_h(2);
-
-	      // temperrx = std::abs(temperrx);
-	      // temperry = std::abs(temperry);
-	      // temperrz = std::abs(temperrz);
+	          for (unsigned int i=0; i<n_dofs; i++)
+	            grad_u_h.add_scaled ((*dphi)[i][sp],
+			                 system.current_solution(dof_indices[i]));
+	          // Compute the phi values at the current sample point
+	          std::vector<Real> psi(specpoly(dim, element_order, q_point[sp], matsize));
+	          for (unsigned int i=0; i<matsize; i++)
+	            {
+	              temperr[0] += psi[i]*Pu_x_h(i);
+	              temperr[1] += psi[i]*Pu_y_h(i);
+	              temperr[2] += psi[i]*Pu_z_h(i);
+	            }
+	          temperr[0] -= grad_u_h(0);
+	          temperr[1] -= grad_u_h(1);
+	          temperr[2] -= grad_u_h(2);
+                }
+              else if (_sobolev_order == 2)
+                {
+	          // Compute the Hessian at the current sample point
+	          Tensor hess_u_h;
 	  
-	      // error = std::max(temperrz,std::max(temperry,temperrx));		  
-
-	      error = std::max(std::abs(temperrz),
-			       std::max(std::abs(temperry),
-				        std::abs(temperrx)));
+	          for (unsigned int i=0; i<n_dofs; i++)
+	            hess_u_h.add_scaled ((*d2phi)[i][sp],
+			                 system.current_solution(dof_indices[i]));
+	          // Compute the phi values at the current sample point
+	          std::vector<Real> psi(specpoly(dim, element_order, q_point[sp], matsize));
+	          for (unsigned int i=0; i<matsize; i++)
+	            {
+	              temperr[0] += psi[i]*Pu_x_h(i);
+	              temperr[1] += psi[i]*Pu_y_h(i);
+	              temperr[2] += psi[i]*Pu_z_h(i);
+	              temperr[3] += psi[i]*Pu_xy_h(i);
+	              temperr[4] += psi[i]*Pu_xz_h(i);
+	              temperr[5] += psi[i]*Pu_yz_h(i);
+	            }
+	          temperr[0] -= hess_u_h(0,0);
+	          temperr[1] -= hess_u_h(1,1);
+	          temperr[2] -= hess_u_h(2,2);
+	          temperr[3] -= hess_u_h(0,1);
+	          temperr[4] -= hess_u_h(0,2);
+	          temperr[5] -= hess_u_h(1,2);
+                }
+              for (unsigned int i=0; i != 6; ++i)
+                error = std::max(error, std::abs(temperr[i]));
 
 	    } // end sample_point_loop
 	  const int e_id=elem->id();
