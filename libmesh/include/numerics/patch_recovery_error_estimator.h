@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.h,v 1.13 2007-02-13 17:13:01 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.h,v 1.14 2007-02-13 21:21:16 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -50,7 +50,7 @@ public:
    * Constructor.
    */
   PatchRecoveryErrorEstimator() :
-    target_patch_size(10),
+    target_patch_size(20),
     patch_growth_strategy(&Patch::add_local_face_neighbors) {}
   
   /**
