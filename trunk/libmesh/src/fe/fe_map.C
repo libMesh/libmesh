@@ -1,4 +1,4 @@
-// $Id: fe_map.C,v 1.51 2007-01-23 01:29:58 roystgnr Exp $
+// $Id: fe_map.C,v 1.52 2007-02-13 14:00:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -88,6 +88,8 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	  {
 	    std::cerr << "ERROR: negative Jacobian: "
 		      << jac
+                      << " in element " 
+                      << elem->id()
 		      << std::endl;
 	    error();
 	  }
@@ -165,6 +167,8 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	  {
 	    std::cerr << "ERROR: negative Jacobian: "
 		      << jac
+                      << " in element " 
+                      << elem->id()
 		      << std::endl;
 	    error();
 	  }
@@ -223,6 +227,8 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	if (det <= 0.)
 	  {
 	    std::cerr << "ERROR: negative Jacobian! "
+                      << " in element " 
+                      << elem->id()
 		      << std::endl;
 	    error();
 	  }
@@ -329,6 +335,8 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	  {
 	    std::cerr << "ERROR: negative Jacobian: "
 		      << jac
+                      << " in element " 
+                      << elem->id()
 		      << std::endl;
 	    error();
 	  }
@@ -890,6 +898,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			<< "   p="
 			<< p
 			<< "   error=" << error
+                        << "   in element " << elem->id()
 			<< std::endl;
 
 	      if (cnt > 20)
@@ -897,6 +906,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 		  std::cerr << "ERROR: Newton scheme FAILED to converge in "
 			    << cnt
 			    << " iterations!"
+                            << " in element " << elem->id()
 			    << std::endl;
 
 		  error();
