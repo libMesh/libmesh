@@ -1,5 +1,5 @@
 
-// $Id: patch.C,v 1.4 2007-02-13 17:10:48 roystgnr Exp $
+// $Id: patch.C,v 1.5 2007-02-13 21:16:41 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -202,12 +202,12 @@ void Patch::build_around_element (const Elem* e0,
       // Check for a "stagnant" patch
       if (this->size() == old_patch_size)
 	{
-	  std::cerr << "WARNING: stagnant patch of "
-		    << this->size() << " elements."
-		    << std::endl
-		    << "Does your target patch size exceed the number of elements in the mesh?"
-		    << std::endl;
-	  here();
+//	  std::cerr << "WARNING: stagnant patch of "
+//		    << this->size() << " elements."
+//		    << std::endl
+//		    << "Does your target patch size exceed the number of elements in the mesh?"
+//		    << std::endl;
+//	  here();
 	  break;
 	}
     } // end while loop
