@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.27 2007-02-12 19:46:02 roystgnr Exp $
+// $Id: exact_solution.C,v 1.28 2007-02-13 01:51:13 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -293,6 +293,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 			  *(comparison_system.current_local_solution),
 			  comparison_system.get_dof_map(),
 			  comparison_system.variable_number(unknown_name)));
+      coarse_values->init();
     }
 
   // Get a reference to the dofmap and mesh for that system
