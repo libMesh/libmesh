@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.28 2007-02-13 01:51:13 roystgnr Exp $
+// $Id: exact_solution.C,v 1.29 2007-02-13 17:36:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -271,9 +271,8 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 				   const std::string& unknown_name,
 				   std::vector<Number>& error_vals)
 {
-  // Make sure we're set up as expected
-  assert ((_exact_value && !_equation_systems_fine) ||
-          (!_exact_value && _equation_systems_fine));
+  // Make sure we aren't "overconfigured"
+  assert (!(_exact_value && _equation_systems_fine));
 
   // Get a reference to the system whose error is being computed.
   // If we have a fine grid, however, we'll integrate on that instead
