@@ -1,4 +1,4 @@
-// $Id: tetgen_io.C,v 1.15 2006-03-13 17:13:30 benkirk Exp $
+// $Id: tetgen_io.C,v 1.16 2007-02-13 03:56:11 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,11 +34,8 @@ void TetGenIO::read (const std::string& name)
 {
   std::string name_node, name_ele, dummy;
 
-  // get a reference to the mesh
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
-  
   // tetgen only works in 3D
-  assert (mesh.mesh_dimension() == 3);
+  assert (MeshInput<MeshBase>::mesh().mesh_dimension() == 3);
 
   // Check name for *.node or *.ele extension.
   // Set std::istream for node_stream and ele_stream.
