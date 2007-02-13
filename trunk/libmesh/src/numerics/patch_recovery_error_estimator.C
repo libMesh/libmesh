@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.22 2007-02-09 22:27:20 jwpeterson Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.23 2007-02-13 17:13:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -162,8 +162,9 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
       // We log the time spent building patches separately
       PAUSE_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
 
-      // Use default patch size and growth strategy
-      patch.build_around_element (elem);
+      // Use user specified patch size and growth strategy
+      patch.build_around_element (elem, target_patch_size,
+				  patch_growth_strategy);
 
       RESTART_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
 
@@ -201,30 +202,16 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 
 	  // Compute the approprite size for the patch projection matrices
 	  // and vectors; 
-	  unsigned int matsize;
-
-          switch (dim)
+	  unsigned int matsize = element_order + 1;
+	  if (dim > 1)
 	    {
-	    case 3:
-	      {	
-                matsize = (element_order + 1)*
-                          (element_order + 2)*
-                          (element_order + 3)/6;
-	        break;
-              }
-	    case 2:
-	      {	
-                matsize = (element_order + 1)*
-                          (element_order + 2)/2;
-	        break;
-              }
-	    case 1:
-	      {	
-                matsize = element_order + 1;
-	        break;
-              }
-	    default:
-	      error();
+	      matsize *= (element_order + 2);
+	      matsize /= 2;
+	    }
+	  if (dim > 2)
+	    {
+	      matsize *= (element_order + 3);
+	      matsize /= 3;
 	    }
 	  	  
 	  DenseMatrix<Number> Kp(matsize,matsize);
