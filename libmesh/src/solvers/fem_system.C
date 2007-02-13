@@ -318,22 +318,26 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
   const DofMap& dof_map = this->get_dof_map();
 
-  this->get_vector("_nonlinear_solution").localize
-    (*current_local_nonlinear_solution,
-     dof_map.get_send_list());
+//  this->get_vector("_nonlinear_solution").localize
+//    (*current_local_nonlinear_solution,
+//     dof_map.get_send_list());
+  this->update();
 
   if (print_solution_norms)
     {
-      this->get_vector("_nonlinear_solution").close();
+//      this->get_vector("_nonlinear_solution").close();
+      this->solution->close();
       std::cout << "|U| = "
-                << this->get_vector("_nonlinear_solution").l1_norm()
+//                << this->get_vector("_nonlinear_solution").l1_norm()
+                << this->solution->l1_norm()
                 << std::endl;
     }
   if (print_solutions)
     {
       unsigned int old_precision = std::cout.precision();
       std::cout.precision(16);
-      std::cout << "U = [" << this->get_vector("_nonlinear_solution")
+//      std::cout << "U = [" << this->get_vector("_nonlinear_solution")
+      std::cout << "U = [" << *(this->solution)
                 << "];" << std::endl;
       std::cout.precision(old_precision);
     }
@@ -376,7 +380,8 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
       elem_solution.resize(n_dofs);
       for (unsigned int i=0; i != n_dofs; ++i)
-        elem_solution(i) = current_nonlinear_solution(dof_indices[i]);
+//        elem_solution(i) = current_nonlinear_solution(dof_indices[i]);
+        elem_solution(i) = current_solution(dof_indices[i]);
 
       // These resize calls also zero out the residual and jacobian
       elem_residual.resize(n_dofs);
@@ -643,9 +648,10 @@ void FEMSystem::postprocess ()
 
   const DofMap& dof_map = this->get_dof_map();
 
-  this->get_vector("_nonlinear_solution").localize
-    (*current_local_nonlinear_solution,
-     dof_map.get_send_list());
+//  this->get_vector("_nonlinear_solution").localize
+//    (*current_local_nonlinear_solution,
+//     dof_map.get_send_list());
+  this->update();
 
   // Loop over every active mesh element on this processor
   MeshBase::const_element_iterator el =
@@ -663,7 +669,8 @@ void FEMSystem::postprocess ()
 
       elem_solution.resize(n_dofs);
       for (unsigned int i=0; i != n_dofs; ++i)
-        elem_solution(i) = current_nonlinear_solution(dof_indices[i]);
+//        elem_solution(i) = current_nonlinear_solution(dof_indices[i]);
+        elem_solution(i) = current_solution(dof_indices[i]);
 
       // Initialize the per-variable data for elem.
       unsigned int sub_dofs = 0;

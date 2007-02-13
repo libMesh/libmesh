@@ -21,8 +21,7 @@ DifferentiableSystem::DifferentiableSystem
   print_residuals(false),
   print_jacobian_norms(false),
   print_jacobians(false),
-  print_element_jacobians(false),
-  current_local_nonlinear_solution(NumericVector<Number>::build())
+  print_element_jacobians(false)
 {
   untested();
 }
@@ -58,9 +57,6 @@ void DifferentiableSystem::reinit ()
 {
   Parent::reinit();
 
-  // Resize the serial nonlinear solution for the current mesh
-  current_local_nonlinear_solution->init (this->n_dofs());
-
   time_solver->reinit();
 }
 
@@ -71,12 +67,12 @@ void DifferentiableSystem::init_data ()
   // First, allocate a vector for the iterate in our quasi_Newton
   // solver
 
-  // FIXME - there really ought to be a way to just use the System
-  // solution vector if the solver doesn't need an extra vector!
+  // Update - we now just use the System
+  // solution vector if the solver doesn't need an extra vector
 
   // We don't want to project more solutions than we have to
 //  this->add_vector("_nonlinear_solution", false);
-  this->add_vector("_nonlinear_solution");
+//  this->add_vector("_nonlinear_solution");
 //  this->project_solution_on_reinit() = false;
 
   // Next, give us flags for every variable that might be time
@@ -116,7 +112,7 @@ void DifferentiableSystem::init_data ()
     }
 
   // Resize the serial nonlinear solution for the current mesh
-  current_local_nonlinear_solution->init (this->n_dofs());
+  // current_local_nonlinear_solution->init (this->n_dofs());
 }
 
 
@@ -131,14 +127,4 @@ void DifferentiableSystem::assemble ()
 void DifferentiableSystem::solve ()
 {
   time_solver->solve();
-}
-
-
-Number DifferentiableSystem::current_nonlinear_solution (const unsigned int global_dof_number) const
-{
-  // Check the sizes
-  assert (global_dof_number < this->get_dof_map().n_dofs());
-  assert (global_dof_number < current_local_nonlinear_solution->size());
-
-  return (*current_local_nonlinear_solution)(global_dof_number);
 }
