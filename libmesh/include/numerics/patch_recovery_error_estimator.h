@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.h,v 1.12 2007-01-20 20:54:58 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.h,v 1.13 2007-02-13 17:13:01 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,6 +28,7 @@
 // Local Includes
 #include "error_estimator.h"
 #include "enum_order.h"
+#include "patch.h"
 #include "point.h"
 
 // Forward Declarations
@@ -48,7 +49,9 @@ public:
   /**
    * Constructor.
    */
-  PatchRecoveryErrorEstimator() {}
+  PatchRecoveryErrorEstimator() :
+    target_patch_size(10),
+    patch_growth_strategy(&Patch::add_local_face_neighbors) {}
   
   /**
    * Destructor.  
@@ -66,13 +69,19 @@ public:
 			       ErrorVector& error_per_cell,
 			       bool estimate_parent_error = false);
 
+  /**
+   * The PatchErrorEstimator will build patches of at least this many
+   * elements to perform estimates
+   */
+  unsigned int target_patch_size;
 
-  // Bring the base class functionality into the name lookup
-  // procedure.  This allows for alternative calling formats
-  // defined in the base class.  Thanks Wolfgang.
-  // GCC 2.95.3 cannot compile such code.  Since it was not really
-  // essential to the functioning of this class, it's been removed.
-  // using ErrorEstimator::estimate_error;
+  /**
+   * The PatchErrorEstimator will use this pointer to a Patch member
+   * function when growing patches.  The default strategy used is
+   * Patch::add_local_face_neighbors.
+   * Patch::add_local_point_neighbors may be more reliable but slower.
+   */
+  Patch::PMF patch_growth_strategy;
 
 private:
 
