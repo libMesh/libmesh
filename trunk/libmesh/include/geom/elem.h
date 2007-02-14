@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.47 2007-02-12 20:29:38 jwpeterson Exp $
+// $Id: elem.h,v 1.48 2007-02-14 21:11:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1282,9 +1282,8 @@ bool Elem::has_ancestor_children() const
     for (unsigned int c=0; c != this->n_children(); c++)
       if (this->child(c)->has_children())
 	return true;
-#else
-  return false;
 #endif
+  return false;
 }
 
 
