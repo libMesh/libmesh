@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.24 2007-02-13 21:21:16 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.25 2007-02-14 02:30:32 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -201,11 +201,11 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	  const std::vector<Real>&                       JxW     = fe->get_JxW();
 	  const std::vector<Point>&                      q_point = fe->get_xyz();
 	  const std::vector<std::vector<Real> >&         phi     = fe->get_phi();
-	  const std::vector<std::vector<RealGradient> > *dphi;
+	  const std::vector<std::vector<RealGradient> > *dphi = NULL;
           if (_sobolev_order == 1)
             dphi = &(fe->get_dphi());
 #ifdef ENABLE_SECOND_DERIVATIVES
-	  const std::vector<std::vector<RealTensor> >  *d2phi;
+	  const std::vector<std::vector<RealTensor> >  *d2phi = NULL;
           if (_sobolev_order == 2)
             d2phi = &(fe->get_d2phi());
 #endif
