@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.25 2007-02-14 02:30:32 jwpeterson Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.26 2007-02-14 19:17:18 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -38,7 +38,7 @@
 #include "quadrature_grid.h"
 #include "system.h"
 #include "mesh.h"
-
+#include "tensor_value.h"
 
 
 //-----------------------------------------------------------------
@@ -294,6 +294,7 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
                     }
                   else if (_sobolev_order == 2)
                     {
+#ifdef ENABLE_SECOND_DERIVATIVES
 		      // Compute the hessian on the current patch element
 		      // at the quadrature point
                       Tensor hess_u_h;
@@ -312,6 +313,11 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 		          Fxz(i) += JxW[qp]*hess_u_h(0,2)*psi[i];
 		          Fyz(i) += JxW[qp]*hess_u_h(1,2)*psi[i];
 		        }
+#else
+		      std::cerr << "ERROR:  --enable-second-derivatives is required\n"
+				<< "        for _sobolev_order == 2!\n";
+		      error();
+#endif
                     }
 		} // end quadrature loop
 	    } // end patch loop
@@ -384,6 +390,7 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
                 }
               else if (_sobolev_order == 2)
                 {
+#ifdef ENABLE_SECOND_DERIVATIVES
 	          // Compute the Hessian at the current sample point
 	          Tensor hess_u_h;
 	  
@@ -407,6 +414,11 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	          temperr[3] -= hess_u_h(0,1);
 	          temperr[4] -= hess_u_h(0,2);
 	          temperr[5] -= hess_u_h(1,2);
+#else
+		      std::cerr << "ERROR:  --enable-second-derivatives is required\n"
+				<< "        for _sobolev_order == 2!\n";
+		      error();
+#endif
                 }
               for (unsigned int i=0; i != 6; ++i)
                 error = std::max(error, std::abs(temperr[i]));
