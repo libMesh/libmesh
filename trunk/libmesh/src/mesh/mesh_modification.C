@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.25 2006-12-14 20:43:49 roystgnr Exp $
+// $Id: mesh_modification.C,v 1.26 2007-02-15 17:07:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,6 @@
 #include "face_tri6.h"
 #include "libmesh_logging.h"
 #include "boundary_info.h"
-
 
 
 // ------------------------------------------------------------
@@ -1119,4 +1118,107 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
         } // refinement_level loop
 
     } // end iteration
+}
+
+
+
+
+
+
+void MeshTools::Modification::flatten(MeshBase& mesh)
+{
+  // Algorithm:
+  // .) For each active element in the mesh: construct a 
+  //    copy which is the same in every way *except* it is
+  //    a level 0 element.  Store the pointers to these in
+  //    a separate vector. Save any boundary information as well.
+  //    Delete the active element from the mesh.
+  // .) Loop over all (remaining) elements in the mesh, delete them.
+  // .) Add the level-0 copies back to the mesh
+  
+  // Temporary storage for new element pointers
+  std::vector<Elem*> new_elements;
+
+  // BoundaryInfo Storage for element ids, sides, and BC ids
+  std::vector<Elem*>              saved_boundary_elements;
+  std::vector<short int>          saved_bc_ids;
+  std::vector<unsigned short int> saved_bc_sides;
+
+  // Reserve a reasonable amt. of space for each
+  new_elements.reserve(mesh.n_active_elem());
+  saved_boundary_elements.reserve(mesh.boundary_info->n_boundary_conds());
+  saved_bc_ids.reserve(mesh.boundary_info->n_boundary_conds());
+  saved_bc_sides.reserve(mesh.boundary_info->n_boundary_conds());
+  {
+    MeshBase::element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::element_iterator end = mesh.active_elements_end(); 
+
+    for (; it != end; ++it)
+      {
+	Elem* elem = *it;
+
+	// Make a new element of the same type
+	Elem* copy = Elem::build(elem->type()).release();
+
+	// Set node pointers (they point to nodes in the original mesh)
+	// The copy's element ID will be set upon adding it to the mesh
+	for(unsigned int n=0; n<elem->n_nodes(); n++)
+	  copy->set_node(n) = elem->get_node(n);
+
+	// This element could have boundary info as well.  We need
+	// to save the (elem, side, bc_id) triples
+	for (unsigned int s=0; s<elem->n_sides(); s++)
+	    if (elem->neighbor(s) == NULL)
+	      {
+		short int bc_id = mesh.boundary_info->boundary_id (elem,s);
+
+		if (bc_id != BoundaryInfo::invalid_id)
+		  {
+		    saved_boundary_elements.push_back(copy);
+		    saved_bc_ids.push_back(bc_id);
+		    saved_bc_sides.push_back(s);
+		  }
+	      }
+
+	
+	// We're done with this element
+	mesh.delete_elem(elem);
+
+	// But save the copy
+	new_elements.push_back(copy);
+      }
+    
+    // Make sure we saved the same number of boundary conditions
+    // in each vector.
+    assert (saved_boundary_elements.size() == saved_bc_ids.size());
+    assert (saved_bc_ids.size()            == saved_bc_sides.size());
+  }
+
+  
+  // Loop again, delete any remaining elements
+  {
+    MeshBase::element_iterator       it  = mesh.elements_begin();
+    const MeshBase::element_iterator end = mesh.elements_end(); 
+
+    for (; it != end; ++it)
+      mesh.delete_elem( *it );
+  }
+
+  
+  // Add the copied (now level-0) elements back to the mesh
+  {
+    for (std::vector<Elem*>::iterator it = new_elements.begin();
+	 it != new_elements.end();
+	 ++it)
+      mesh.add_elem(*it);
+  }
+
+  // Finally, also add back the saved boundary information
+  for (unsigned int e=0; e<saved_boundary_elements.size(); ++e)
+    mesh.boundary_info->add_side(saved_boundary_elements[e],
+				 saved_bc_sides[e],
+				 saved_bc_ids[e]);
+
+  // Trim unused and renumber nodes and elements
+  mesh.prepare_for_use();
 }

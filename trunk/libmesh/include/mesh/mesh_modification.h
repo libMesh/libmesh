@@ -1,4 +1,4 @@
-// $Id: mesh_modification.h,v 1.8 2006-07-14 16:19:14 jwpeterson Exp $
+// $Id: mesh_modification.h,v 1.9 2007-02-15 17:07:59 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.8 $
+   * \version $Revision: 1.9 $
    */  
   namespace Modification
   {
@@ -113,6 +113,17 @@ namespace MeshTools
      * \date 2005
      */ 
     void smooth(MeshBase&, unsigned int, Real);
+
+    /**
+     * Removes all the refinement tree structure of Mesh, leaving
+     * only the highest-level (most-refined) elements.  This is useful
+     * when you want to write out a uniformly-refined grid to be treated later
+     * as an initial mesh.  Note that many functions in LibMesh assume a
+     * conforming (with no hanging nodes) grid exists at some level, so
+     * you probably only want to do this on meshes which have been uniformly
+     * refined.
+     */
+    void flatten(MeshBase& mesh);
     
   } // end namespace Meshtools::Modification
 } // end namespace MeshTools
