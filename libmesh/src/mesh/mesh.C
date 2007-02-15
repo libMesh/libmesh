@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.73 2007-02-08 14:56:55 roystgnr Exp $
+// $Id: mesh.C,v 1.74 2007-02-15 17:09:15 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -78,9 +78,14 @@ Mesh::Mesh (const Mesh& other_mesh):MeshBase(other_mesh)
     //Preallocate Memory if necessary
     _elements.reserve(other_mesh._elements.size());
     
-    std::vector<Elem*>::const_iterator it = other_mesh._elements.begin();
-    const std::vector<Elem*>::const_iterator end = other_mesh._elements.end();
-  
+    //std::vector<Elem*>::const_iterator it = other_mesh._elements.begin();
+    //const std::vector<Elem*>::const_iterator end = other_mesh._elements.end();
+
+    // Loop over the elements
+    MeshBase::const_element_iterator it = other_mesh.elements_begin();
+    const MeshBase::const_element_iterator end = other_mesh.elements_end();
+
+    // FIXME: Where do we set element IDs??
     for (; it != end; ++it)
     {
       //Look at the old element
@@ -301,6 +306,9 @@ void Mesh::delete_elem(Elem* e)
   // Huh? Element not in the vector?
   assert (pos != _elements.end());
 
+  // Remove the element from the BoundaryInfo object
+  this->boundary_info->remove(e);
+  
   // delete the element
   delete e;
   
@@ -336,6 +344,9 @@ void Mesh::delete_node(Node* n)
   
   // Huh? Node not in the vector?
   assert (pos != _nodes.end());
+
+  // Delete the node from the BoundaryInfo object
+  this->boundary_info->remove(n);
   
   // delete the node
   delete n;
