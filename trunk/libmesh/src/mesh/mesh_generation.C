@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.46 2007-01-29 17:52:17 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.47 2007-02-15 17:13:57 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 #include "mesh_generation.h"
 #include "mesh.h"
 // #include "elem.h"
-// #include "mesh_refinement.h"
+#include "mesh_refinement.h"
 #include "edge_edge2.h"
 #include "edge_edge3.h"
 #include "edge_edge4.h"
@@ -45,7 +45,9 @@
 #include "cell_tet4.h"
 #include "libmesh_logging.h"
 #include "boundary_info.h"
-
+#include "sphere.h"
+#include "mesh_modification.h"
+#include "mesh_smoother_laplace.h"
 
 // ------------------------------------------------------------
 // MeshTools::Generation function for mesh generation
@@ -1236,545 +1238,343 @@ void MeshTools::Generation::build_square (Mesh& mesh,
 
 
 
-void MeshTools::Generation::build_sphere (Mesh& /*mesh*/,
-					  const Real /*rad*/,
-					  const unsigned int /*nr*/,
-					  const ElemType /*type*/)
+void MeshTools::Generation::build_sphere (Mesh& mesh,
+					  const Real rad,
+					  const unsigned int nr,
+					  const ElemType type)
 {
-  error();
-//   assert (mesh.mesh_dimension() != 1);
+#ifndef ENABLE_AMR
 
-//   assert (rad > 0.);
+ 	std::cout << "Building a circle/sphere only works with AMR." << std::endl;
+ 	error();
 
-//   START_LOG("build_sphere()", "MeshTools::Generation");
-
-//   // Clear the mesh and start from scratch
-//   mesh.clear();
+#endif
+	
+  assert (mesh.mesh_dimension() != 1);
+  assert (rad > 0.);
+  //assert (nr > 0); // must refine at least once otherwise will end up with a square/cube
   
-//   // Sphere is centered at origin by default
-//   const Point cent;
+  START_LOG("build_sphere()", "MeshTools::Generation");
 
-//   const Sphere sphere (cent, rad);
-
-
+  // Clear the mesh and start from scratch
+  mesh.clear();
   
-//   switch (mesh_dimension())
-//     {
+  // Sphere is centered at origin by default
+  const Point cent;
 
-//       //-----------------------------------------------------------------
-//       // Build a circle in two dimensions
-//     case 2:
-//       {
-
-// #ifdef ENABLE_AMR
-
-// 	const Real sqrt_2     = sqrt(2.);
-//         const Real rad_2      = .25*rad;
-//         const Real rad_sqrt_2 = rad/sqrt_2;
+  const Sphere sphere (cent, rad);
   
+  switch (mesh.mesh_dimension())
+    {
+      //-----------------------------------------------------------------
+      // Build a circle in two dimensions
+    case 2:
+      {
+	const Real sqrt_2     = sqrt(2.);
+        const Real rad_2      = .25*rad;
+        const Real rad_sqrt_2 = rad/sqrt_2;
 
-// 	// Linear elements
-// 	if ((type == INVALID_ELEM) ||
-// 	    (type == TRI3) ||
-// 	    (type == QUAD4))
-// 	  {
-
-// 	    mesh.reserve_nodes(8);
+	// (Temporary) convenient storage for node pointers
+	std::vector<Node*> nodes(8);
 	    
-// 	    // Point 0
-// 	    node_ptr(0) = Node::build(-rad_2,-rad_2, 0, 0).release();
+	// Point 0
+	nodes[0] = mesh.add_point (Point(-rad_2,-rad_2, 0.));
 	    
-// 	    // Point 1
-// 	    node_ptr(1) = Node::build( rad_2,-rad_2, 0, 1).release();
+	// Point 1
+	nodes[1] = mesh.add_point (Point( rad_2,-rad_2, 0.));
 	    
-// 	    // Point 2
-// 	    node_ptr(2) = Node::build( rad_2, rad_2, 0, 2).release();
+	// Point 2
+	nodes[2] = mesh.add_point (Point( rad_2, rad_2, 0.));
 
-// 	    // Point 3
-// 	    node_ptr(3) = Node::build(-rad_2, rad_2, 0, 3).release();
+	// Point 3
+	nodes[3] = mesh.add_point (Point(-rad_2, rad_2, 0.));
 	    
-// 	    // Point 4
-// 	    node_ptr(4) = Node::build(-rad_sqrt_2,-rad_sqrt_2, 0, 4).release();
+	// Point 4
+	nodes[4] = mesh.add_point (Point(-rad_sqrt_2,-rad_sqrt_2, 0.));
 	    
-// 	    // Point 5
-// 	    node_ptr(5) = Node::build( rad_sqrt_2,-rad_sqrt_2, 0, 5).release();
+	// Point 5
+	nodes[5] = mesh.add_point (Point( rad_sqrt_2,-rad_sqrt_2, 0.));
 	    
-// 	    // Point 6
-// 	    node_ptr(6) = Node::build( rad_sqrt_2, rad_sqrt_2, 0, 6).release();
+	// Point 6
+	nodes[6] = mesh.add_point (Point( rad_sqrt_2, rad_sqrt_2, 0.));
 	    
-// 	    // Point 7
-// 	    node_ptr(7) = Node::build(-rad_sqrt_2, rad_sqrt_2, 0, 7).release();
+	// Point 7
+	nodes[7] = mesh.add_point (Point(-rad_sqrt_2, rad_sqrt_2, 0.));
 
-// 	    // Build the elements
-// 	    mesh.reserve_elem(5);
+	// Build the elements & set node pointers
 	    
-// 	    for (unsigned int e=0; e<n_elem(); e++)
-// 	      _elements[e] = new Quad4;
+	// Element 0
+	Elem* elem0 = mesh.add_elem (new Quad4);
+	elem0->set_node(0) = nodes[0];
+	elem0->set_node(1) = nodes[1];
+	elem0->set_node(2) = nodes[2];
+	elem0->set_node(3) = nodes[3];
 	    
-// 	    // Element 0
-// 	    elem(0)->set_node(0) = mesh.node_ptr(0);
-// 	    elem(0)->set_node(1) = mesh.node_ptr(1);
-// 	    elem(0)->set_node(2) = mesh.node_ptr(2);
-// 	    elem(0)->set_node(3) = mesh.node_ptr(3);
+	// Element 1
+	Elem* elem1 = mesh.add_elem (new Quad4);
+	elem1->set_node(0) = nodes[4];
+	elem1->set_node(1) = nodes[0];
+	elem1->set_node(2) = nodes[3];
+	elem1->set_node(3) = nodes[7];
 	    
-// 	    // Element 1
-// 	    elem(1)->set_node(0) = mesh.node_ptr(4);
-// 	    elem(1)->set_node(1) = mesh.node_ptr(0);
-// 	    elem(1)->set_node(2) = mesh.node_ptr(3);
-// 	    elem(1)->set_node(3) = mesh.node_ptr(7);
+	// Element 2
+	Elem* elem2 = mesh.add_elem (new Quad4);
+	elem2->set_node(0) = nodes[4];
+	elem2->set_node(1) = nodes[5];
+	elem2->set_node(2) = nodes[1];
+	elem2->set_node(3) = nodes[0];
 	    
-// 	    // Element 2
-// 	    elem(2)->set_node(0) = mesh.node_ptr(4);
-// 	    elem(2)->set_node(1) = mesh.node_ptr(5);
-// 	    elem(2)->set_node(2) = mesh.node_ptr(1);
-// 	    elem(2)->set_node(3) = mesh.node_ptr(0);
+	// Element 3
+	Elem* elem3 = mesh.add_elem (new Quad4);
+	elem3->set_node(0) = nodes[1];
+	elem3->set_node(1) = nodes[5];
+	elem3->set_node(2) = nodes[6];
+	elem3->set_node(3) = nodes[2];
 	    
-// 	    // Element 3
-// 	    elem(3)->set_node(0) = mesh.node_ptr(1);
-// 	    elem(3)->set_node(1) = mesh.node_ptr(5);
-// 	    elem(3)->set_node(2) = mesh.node_ptr(6);
-// 	    elem(3)->set_node(3) = mesh.node_ptr(2);
-	    
-// 	    // Element 4
-// 	    elem(4)->set_node(0) = mesh.node_ptr(3);
-// 	    elem(4)->set_node(1) = mesh.node_ptr(2);
-// 	    elem(4)->set_node(2) = mesh.node_ptr(6);
-// 	    elem(4)->set_node(3) = mesh.node_ptr(7);
-// 	  }
+	// Element 4
+	Elem* elem4 = mesh.add_elem (new Quad4);
+	elem4->set_node(0) = nodes[3];
+	elem4->set_node(1) = nodes[2];
+	elem4->set_node(2) = nodes[6];
+	elem4->set_node(3) = nodes[7];
 
-
-// 	// Quadratic elements
-// 	else if ((type == QUAD8) ||
-// 		 (type == QUAD9) ||
-// 		 (type == TRI6))
-// 	  {
-	    
-// 	    mesh.reserve_nodes(25);
-
-// 	    // Point 0
-// 	    node_ptr(0)  = Node::build(-rad_2,-rad_2, 0, 0).release();
-	    
-// 	    // Point 1
-// 	    node_ptr(1)  = Node::build( rad_2,-rad_2, 0, 1).release();
-	    
-// 	    // Point 2
-// 	    node_ptr(2)  = Node::build( rad_2, rad_2, 0, 2).release();
-
-// 	    // Point 3
-// 	    node_ptr(3)  = Node::build(-rad_2, rad_2, 0, 3).release();
-	    
-// 	    // Point 4
-// 	    node_ptr(4)  = Node::build(-rad_sqrt_2,-rad_sqrt_2, 0, 4).release();
-	     
-// 	    // Point 5
-// 	    node_ptr(5)  = Node::build( rad_sqrt_2,-rad_sqrt_2, 0, 5).release();
-	    
-// 	    // Point 6
-// 	    node_ptr(6)  = Node::build( rad_sqrt_2, rad_sqrt_2, 0, 6).release();
-	    
-// 	    // Point 7
-// 	    node_ptr(7)  = Node::build(-rad_sqrt_2, rad_sqrt_2, 0, 7).release();
-
-// 	    // Point 8
-// 	    node_ptr(8)  = Node::build((point(0) + point(1))/2., 8).release();
-
-// 	    // Point 9
-// 	    node_ptr(9)  = Node::build((point(1) + point(2))/2., 9).release();
-	    
-// 	    // Point 10
-// 	    node_ptr(10) = Node::build((point(2) + point(3))/2., 10).release();
-	    
-// 	    // Point 11
-// 	    node_ptr(11) = Node::build((point(0) + point(3))/2., 11).release();
-	    
-// 	    // Point 12
-// 	    node_ptr(12) = Node::build((point(0) + point(2))/2., 12).release();
-
-// 	    // Point 13
-// 	    node_ptr(13) = Node::build( 0,-rad, 0, 13).release();
-
-// 	    // Point 14
-// 	    node_ptr(14) = Node::build( rad, 0, 0, 14).release();
-
-// 	    // Point 15
-// 	    node_ptr(15) = Node::build( 0, rad, 0, 15).release();
-
-// 	    // Point 16
-// 	    node_ptr(16) = Node::build(-rad, 0, 0, 16).release();
-
-// 	    // Point 17
-// 	    node_ptr(17) = Node::build((point(8) + point(13))/2., 17).release();
-
-// 	    // Point 18
-// 	    node_ptr(18) = Node::build((point(9) + point(14))/2., 18).release();
-
-// 	    // Point 19
-// 	    node_ptr(19) = Node::build((point(10) + point(15))/2., 19).release();
-	    
-// 	    // Point 20
-// 	    node_ptr(20) = Node::build((point(11) + point(16))/2., 20).release();
-	      
-// 	    // Point 21
-// 	    node_ptr(21) = Node::build((point(0) + point(4))/2., 21).release();
-
-// 	    // Point 22
-// 	    node_ptr(22) = Node::build((point(1) + point(5))/2., 22).release();
-
-// 	    // Point 23
-// 	    node_ptr(23) = Node::build((point(2) + point(6))/2., 23).release();
-
-// 	    // Point 24
-// 	    node_ptr(24) = Node::build((point(3) + point(7))/2., 24).release();
-
-	    
-// 	    // Build the elements
-// 	    mesh.reserve_elem(5);
-	    
-// 	    if ((type == QUAD9) ||
-// 		(type == TRI6))
-// 	      for (unsigned int e=0; e<n_elem(); e++)
-// 		_elements[e] = new Quad9;
-// 	    else
-// 	      for (unsigned int e=0; e<n_elem(); e++)
-// 		_elements[e] = new Quad8;
-		
-// 	    // Element 0
-// 	    elem(0)->set_node(0) = mesh.node_ptr(0);
-// 	    elem(0)->set_node(1) = mesh.node_ptr(1);
-// 	    elem(0)->set_node(2) = mesh.node_ptr(2);
-// 	    elem(0)->set_node(3) = mesh.node_ptr(3);
-// 	    elem(0)->set_node(4) = mesh.node_ptr(8);
-// 	    elem(0)->set_node(5) = mesh.node_ptr(9);
-// 	    elem(0)->set_node(6) = mesh.node_ptr(10);
-// 	    elem(0)->set_node(7) = mesh.node_ptr(11);
-// 	    if (type != QUAD8) elem(0)->set_node(8) = mesh.node_ptr(12);
-
-// 	    // Element 1
-// 	    elem(1)->set_node(0) = mesh.node_ptr(4);
-// 	    elem(1)->set_node(1) = mesh.node_ptr(0);
-// 	    elem(1)->set_node(2) = mesh.node_ptr(3);
-// 	    elem(1)->set_node(3) = mesh.node_ptr(7);
-// 	    elem(1)->set_node(4) = mesh.node_ptr(21);
-// 	    elem(1)->set_node(5) = mesh.node_ptr(11);
-// 	    elem(1)->set_node(6) = mesh.node_ptr(24);
-// 	    elem(1)->set_node(7) = mesh.node_ptr(16);
-// 	    if (type != QUAD8) elem(1)->set_node(8) = mesh.node_ptr(20);
-
-// 	    // Element 2
-// 	    elem(2)->set_node(0) = mesh.node_ptr(4);
-// 	    elem(2)->set_node(1) = mesh.node_ptr(5);
-// 	    elem(2)->set_node(2) = mesh.node_ptr(1);
-// 	    elem(2)->set_node(3) = mesh.node_ptr(0);
-// 	    elem(2)->set_node(4) = mesh.node_ptr(13);
-// 	    elem(2)->set_node(5) = mesh.node_ptr(22);
-// 	    elem(2)->set_node(6) = mesh.node_ptr(8);
-// 	    elem(2)->set_node(7) = mesh.node_ptr(21);
-// 	    if (type != QUAD8) elem(2)->set_node(8) = mesh.node_ptr(17);
-
-// 	    // Element 3
-// 	    elem(3)->set_node(0) = mesh.node_ptr(1);
-// 	    elem(3)->set_node(1) = mesh.node_ptr(5);
-// 	    elem(3)->set_node(2) = mesh.node_ptr(6);
-// 	    elem(3)->set_node(3) = mesh.node_ptr(2);
-// 	    elem(3)->set_node(4) = mesh.node_ptr(22);
-// 	    elem(3)->set_node(5) = mesh.node_ptr(14);
-// 	    elem(3)->set_node(6) = mesh.node_ptr(23);
-// 	    elem(3)->set_node(7) = mesh.node_ptr(9);
-// 	    if (type != QUAD8) elem(3)->set_node(8) = mesh.node_ptr(18);
-
-// 	    // Element 4
-// 	    elem(4)->set_node(0) = mesh.node_ptr(3);
-// 	    elem(4)->set_node(1) = mesh.node_ptr(2);
-// 	    elem(4)->set_node(2) = mesh.node_ptr(6);
-// 	    elem(4)->set_node(3) = mesh.node_ptr(7);
-// 	    elem(4)->set_node(4) = mesh.node_ptr(10);
-// 	    elem(4)->set_node(5) = mesh.node_ptr(23);
-// 	    elem(4)->set_node(6) = mesh.node_ptr(15);
-// 	    elem(4)->set_node(7) = mesh.node_ptr(24);
-// 	    if (type != QUAD8) elem(4)->set_node(8) = mesh.node_ptr(19);
-
-// 	  }
-	
-
-// 	else
-// 	  error();
-
-
-// 	// Now we have the beginnings of a sphere.
-// 	// Add some more elements
-// 	for (unsigned int r=0; r<nr; r++)
-// 	  {
-// 	    MeshRefinement mesh_refinement (*this);
-	    
-// 	    mesh_refinement.uniformly_refine(1);
-	    
-// 	    for (unsigned int e=0; e<n_elem(); e++)
-// 	      if (elem(e)->active())
-// 		for (unsigned int s=0; s<elem(e)->n_sides(); s++)
-// 		  if (elem(e)->neighbor(s) == NULL)
-// 		    {
-// 		      AutoPtr<Elem> side(elem(e)->build_side(s));
-		      
-// 		      for (unsigned int n=0; n<side->n_nodes(); n++)
-// 			side->point(n) =
-// 			  sphere.closest_point(side->point(n));
-// 		    }
-// 	  }
-
-	
-// 	// Copy only the active elements to the current mesh
-// 	{
-//  	  std::vector<Elem*> new_elements;
-
-// 	  new_elements.reserve (n_active_elem());
-	  
-// 	  for (unsigned int e=0; e<n_elem(); e++)
-// 	    {
-// 	      // Add only the active elements.   We can't just copy
-// 	      // the pointers, because that would break the tree.
-// 	      // We'll allocate new elements instead.
-// 	      if (elem(e)->active())
-// 		{
-// 		  new_elements.push_back(Elem::build(elem(e)->type()).release());
-
-// 		  for (unsigned int n=0; n<elem(e)->n_nodes(); n++)
-// 		    new_elements.back()->set_node(n) =
-// 		      elem(e)->get_node(n);
-// 		}
-	      
-// 	      delete _elements[e);
-// 	      _elements[e] = NULL;
-// 	    }
-	  
-// 	  // Copy the new elements
-// 	  _elements = new_elements;
-// 	}
-	
-// 	// Possibly convert all the elements to triangles
-// 	if ((type == TRI6) ||
-// 	    (type == TRI3))
-// 	  all_tri();
-
-// #else
-
-// 	std::cout << "Building a circle in 2D only works with AMR." << std::endl;
-// 	error();
-
-// #endif
-
-	
-// 	break;
-//       }
+	break;
+      } // end case 2
 
 
       
-//       //-----------------------------------------------------------------
-//       // Build a sphere in three dimensions
-//     case 3:
-//       {
-// 	const unsigned int nx=nr, ny=nr, nz=nr;
-
-// 	build_cube(nx,ny,nz,
-// 		   -rad/sqrt(3.), rad/sqrt(3.),
-// 		   -rad/sqrt(3.), rad/sqrt(3.),
-// 		   -rad/sqrt(3.), rad/sqrt(3.),
-// 		   type);
-	
-// 	if ((type == INVALID_ELEM) ||
-// 	    (type == HEX8))
-// 	  {
-	    
-// #define G(i,j,k) ( (i) + (nx+1)*((j) + (k)*(ny+1)) )
-
-// 	    // Pop IJ boundary to the sphere
-// 	    for (unsigned int i=0; i<=nx; i++)
-// 	      for (unsigned int j=0; j<=ny; j++)
-// 		{
-// 		  unsigned int k = 0;
-		
-// 		  node(G(i,j,k)) =
-// 		    sphere.closest_point( point(G(i,j,k)) );
-		  
-// 		  k = nz;
-		
-// 		  node(G(i,j,k)) =
-// 		    sphere.closest_point( point(G(i,j,k)) );
-// 		}
-	    
-// 	    // Pop JK boundary to the sphere
-// 	    for (unsigned int j=0; j<=ny; j++)
-// 	      for (unsigned int k=0; k<=nz; k++)
-// 		{
-// 		  unsigned int i = 0;
-		
-// 		  node(G(i,j,k)) =
-// 		    sphere.closest_point( point(G(i,j,k)) );
-		
-// 		  i = nx;
-		
-// 		  node(G(i,j,k)) =
-// 		    sphere.closest_point( point(G(i,j,k)) );
-// 		}
-	    
-// 	    // Pop IK boundary to the sphere
-// 	    for (unsigned int i=0; i<=nx; i++)
-// 	      for (unsigned int k=0; k<=nz; k++)
-// 		{
-// 		  unsigned int j = 0;
-		
-// 		  node(G(i,j,k)) =
-// 		    sphere.closest_point( point(G(i,j,k)) );
-		
-// 		  j = ny;
-		
-// 		  node(G(i,j,k)) =
-// 		    sphere.closest_point( point(G(i,j,k)) );
-// 		}
-	    
-// 	    // Handle internal nodes
-// 	    for (unsigned int k=1; k<nz; k++)
-// 	      for (unsigned int j=1; j<ny; j++)
-// 		for (unsigned int i=1; i<nx; i++)
-// 		  {
-// 		    const Real xmin = point(G(0 ,j, k))(0);
-// 		    const Real xmax = point(G(nx,j, k))(0);
-// 		    const Real ymin = point(G(i, 0, k))(1);
-// 		    const Real ymax = point(G(i,ny, k))(1);
-// 		    const Real zmin = point(G(i, j, 0))(2);
-// 		    const Real zmax = point(G(i, j,nz))(2);
-
-// 		    node(G(i,j,k))(0) = xmin +
-// 		      (xmax - xmin)*static_cast<Real>(i)/static_cast<Real>(nx);
-		  
-// 		    node(G(i,j,k))(1) = ymin +
-// 		      (ymax - ymin)*static_cast<Real>(j)/static_cast<Real>(ny);
-		  
-// 		    node(G(i,j,k))(2) = zmin +
-// 		      (zmax - zmin)*static_cast<Real>(k)/static_cast<Real>(nz);
-// 		  }
-
-// 	    // Do some smoothing steps.
-// 	    for (unsigned int l=0; l<10; l++)
-// 	      for (unsigned int k=1; k<nz; k++)
-// 		for (unsigned int j=1; j<ny; j++)
-// 		  for (unsigned int i=1; i<nx; i++)
-// 		    node(G(i,j,k)) = (point(G(i-1,j,  k  )) +
-// 				      point(G(i+1,j,  k  )) +
-// 				      point(G(i,  j-1,k  )) +
-// 				      point(G(i,  j+1,k  )) +
-// 				      point(G(i,  j,  k-1)) +
-// 				      point(G(i,  j,  k+1)))/6.;
-
-// #undef G
-// 	  }
-	
-// 	else if ((type == HEX20) ||
-// 		 (type == HEX27))
-// 	  {
-	    
-// #define G(i,j,k) ( (i) + (2*nx+1)*((j) + (k)*(2*ny+1)) )
-
-// 	    // Pop IJ boundary to the sphere
-// 	    for (unsigned int i=0; i<=2*nx; i++)
-// 	      for (unsigned int j=0; j<=2*ny; j++)
-// 		{
-// 		  unsigned int k = 0;
-		
-// 		  node(G(i,j,k)) =
-// 		    sphere.closest_point( point(G(i,j,k)) );
-		  
-// 		  k = 2*nz;
-		
-// 		  node(G(i,j,k)) =
-// 		    sphere.closest_point( point(G(i,j,k)) );
-// 		}
-	    
-// 	    // Pop JK boundary to the sphere
-// 	    for (unsigned int j=0; j<=2*ny; j++)
-// 	      for (unsigned int k=0; k<=2*nz; k++)
-// 		{
-// 		  unsigned int i = 0;
-		
-// 		  node(G(i,j,k)) =
-// 		    sphere.closest_point( point(G(i,j,k)) );
-		
-// 		  i = 2*nx;
-		
-// 		  node(G(i,j,k)) =
-// 		    sphere.closest_point( point(G(i,j,k)) );
-// 		}
-	    
-// 	    // Pop IK boundary to the sphere
-// 	    for (unsigned int i=0; i<=2*nx; i++)
-// 	      for (unsigned int k=0; k<=2*nz; k++)
-// 		{
-// 		  unsigned int j = 0;
-		
-// 		  node(G(i,j,k)) =
-// 		    sphere.closest_point( point(G(i,j,k)) );
-		
-// 		  j = 2*ny;
-		
-// 		  node(G(i,j,k)) =
-// 		    sphere.closest_point( point(G(i,j,k)) );
-// 		}
-	    
-// 	    // Handle internal nodes
-// 	    for (unsigned int k=1; k<2*nz; k++)
-// 	      for (unsigned int j=1; j<2*ny; j++)
-// 		for (unsigned int i=1; i<2*nx; i++)
-// 		  {
-// 		    const Real xmin = point(G(0,   j, k))(0);
-// 		    const Real xmax = point(G(2*nx,j, k))(0);
-// 		    const Real ymin = point(G(i,   0, k))(1);
-// 		    const Real ymax = point(G(i,2*ny, k))(1);
-// 		    const Real zmin = point(G(i, j,   0))(2);
-// 		    const Real zmax = point(G(i, j,2*nz))(2);
-
-// 		    node(G(i,j,k))(0) = xmin +
-// 		      (xmax - xmin)*static_cast<Real>(i)/static_cast<Real>(2*nx);
-		  
-// 		    node(G(i,j,k))(1) = ymin +
-// 		      (ymax - ymin)*static_cast<Real>(j)/static_cast<Real>(2*ny);
-		  
-// 		    node(G(i,j,k))(2) = zmin +
-// 		      (zmax - zmin)*static_cast<Real>(k)/static_cast<Real>(2*nz);
-// 		  }
-
-// 	    // Do some smoothing steps.
-// 	    for (unsigned int l=0; l<10; l++)
-// 	      for (unsigned int k=1; k<2*nz; k++)
-// 		for (unsigned int j=1; j<2*ny; j++)
-// 		  for (unsigned int i=1; i<2*nx; i++)
-// 		    node(G(i,j,k)) = (point(G(i-1,j,  k  )) +
-// 				      point(G(i+1,j,  k  )) +
-// 				      point(G(i,  j-1,k  )) +
-// 				      point(G(i,  j+1,k  )) +
-// 				      point(G(i,  j,  k-1)) +
-// 				      point(G(i,  j,  k+1)))/6.;
-
-// #undef G
-// 	  }
-	
-// 	else
-// 	  error();
-
-
-
-// 	break;
-//       }
-
 
       
-//     default:
-//       error();
-//     }
+      //-----------------------------------------------------------------
+      // Build a sphere in three dimensions
+    case 3:
+      {
+	// (Currently) supported types
+	if (!((type == HEX8) || (type == HEX27)))
+	  {
+	    // FIXME: We'd need an all_tet() routine (which could also be used by
+	    // build_square()) to do Tets, or Prisms for that matter.
+	    std::cerr << "Error: Only HEX8/27 currently supported."
+		      << std::endl;
+	    error();
+	  }
+
+	
+	// 3D analog of 2D initial grid:
+	const Real
+	  r_small = 0.25*rad,                      //  0.25 *radius
+	  r_med   = (0.125*std::sqrt(2.)+0.5)*rad; // .67677*radius 
+	
+	// (Temporary) convenient storage for node pointers
+	std::vector<Node*> nodes(16);
+	
+	// Points 0-7 are the initial HEX8
+	nodes[0] = mesh.add_point (Point(-r_small,-r_small, -r_small));
+	nodes[1] = mesh.add_point (Point( r_small,-r_small, -r_small));
+	nodes[2] = mesh.add_point (Point( r_small, r_small, -r_small));
+	nodes[3] = mesh.add_point (Point(-r_small, r_small, -r_small));
+	nodes[4] = mesh.add_point (Point(-r_small,-r_small,  r_small));
+	nodes[5] = mesh.add_point (Point( r_small,-r_small,  r_small));
+	nodes[6] = mesh.add_point (Point( r_small, r_small,  r_small));
+	nodes[7] = mesh.add_point (Point(-r_small, r_small,  r_small));
+
+	//  Points 8-15 are for the outer hexes, we number them in the same way
+	nodes[8]  = mesh.add_point (Point(-r_med,-r_med, -r_med));
+	nodes[9]  = mesh.add_point (Point( r_med,-r_med, -r_med));
+	nodes[10] = mesh.add_point (Point( r_med, r_med, -r_med));
+	nodes[11] = mesh.add_point (Point(-r_med, r_med, -r_med));
+	nodes[12] = mesh.add_point (Point(-r_med,-r_med,  r_med));
+	nodes[13] = mesh.add_point (Point( r_med,-r_med,  r_med));
+	nodes[14] = mesh.add_point (Point( r_med, r_med,  r_med));
+	nodes[15] = mesh.add_point (Point(-r_med, r_med,  r_med));
+
+	// Now create the elements and add them to the mesh
+	// Element 0 - center element
+	{
+	  Elem* elem0 = mesh.add_elem (new Hex8);
+	  elem0->set_node(0) = nodes[0];
+	  elem0->set_node(1) = nodes[1];
+	  elem0->set_node(2) = nodes[2];
+	  elem0->set_node(3) = nodes[3];
+	  elem0->set_node(4) = nodes[4];
+	  elem0->set_node(5) = nodes[5];
+	  elem0->set_node(6) = nodes[6];
+	  elem0->set_node(7) = nodes[7];
+	}
+	
+	// Element 1 - "bottom"
+	{
+	  Elem* elem1 = mesh.add_elem (new Hex8);
+	  elem1->set_node(0) = nodes[8];
+	  elem1->set_node(1) = nodes[9];
+	  elem1->set_node(2) = nodes[10];
+	  elem1->set_node(3) = nodes[11];
+	  elem1->set_node(4) = nodes[0];
+	  elem1->set_node(5) = nodes[1];
+	  elem1->set_node(6) = nodes[2];
+	  elem1->set_node(7) = nodes[3];
+	}
+	
+	// Element 2 - "front"
+	{
+	  Elem* elem2 = mesh.add_elem (new Hex8);
+	  elem2->set_node(0) = nodes[8];
+	  elem2->set_node(1) = nodes[9];
+	  elem2->set_node(2) = nodes[1];
+	  elem2->set_node(3) = nodes[0];
+	  elem2->set_node(4) = nodes[12];
+	  elem2->set_node(5) = nodes[13];
+	  elem2->set_node(6) = nodes[5];
+	  elem2->set_node(7) = nodes[4];
+	}
+
+	// Element 3 - "right"
+	{
+	  Elem* elem3 = mesh.add_elem (new Hex8);
+	  elem3->set_node(0) = nodes[1];
+	  elem3->set_node(1) = nodes[9];
+	  elem3->set_node(2) = nodes[10];
+	  elem3->set_node(3) = nodes[2];
+	  elem3->set_node(4) = nodes[5];
+	  elem3->set_node(5) = nodes[13];
+	  elem3->set_node(6) = nodes[14];
+	  elem3->set_node(7) = nodes[6];
+	}
+
+	// Element 4 - "back"
+	{
+	  Elem* elem4 = mesh.add_elem (new Hex8);
+	  elem4->set_node(0) = nodes[3];
+	  elem4->set_node(1) = nodes[2];
+	  elem4->set_node(2) = nodes[10];
+	  elem4->set_node(3) = nodes[11];
+	  elem4->set_node(4) = nodes[7];
+	  elem4->set_node(5) = nodes[6];
+	  elem4->set_node(6) = nodes[14];
+	  elem4->set_node(7) = nodes[15];
+	}
+
+	// Element 5 - "left"
+	{
+	  Elem* elem5 = mesh.add_elem (new Hex8);
+	  elem5->set_node(0) = nodes[8];
+	  elem5->set_node(1) = nodes[0];
+	  elem5->set_node(2) = nodes[3];
+	  elem5->set_node(3) = nodes[11];
+	  elem5->set_node(4) = nodes[12];
+	  elem5->set_node(5) = nodes[4];
+	  elem5->set_node(6) = nodes[7];
+	  elem5->set_node(7) = nodes[15];
+	}
+
+	// Element 6 - "top"
+	{
+	  Elem* elem6 = mesh.add_elem (new Hex8);
+	  elem6->set_node(0) = nodes[4];
+	  elem6->set_node(1) = nodes[5];
+	  elem6->set_node(2) = nodes[6];
+	  elem6->set_node(3) = nodes[7];
+	  elem6->set_node(4) = nodes[12];
+	  elem6->set_node(5) = nodes[13];
+	  elem6->set_node(6) = nodes[14];
+	  elem6->set_node(7) = nodes[15];
+	}
+	
+	break;
+      } // end case 3
+      
+    default:
+      error();
+      
+    } // end switch (dim)
 
   
-//   STOP_LOG("build_sphere()", "MeshTools::Generation");
+	
+  // Now we have the beginnings of a sphere.
+  // Add some more elements by doing uniform refinements and
+  // popping nodes to the boundary.
+  MeshRefinement mesh_refinement (mesh);
 
+  // Loop over the elements, refine, pop nodes to boundary.
+  for (unsigned int r=0; r<nr; r++)
+    {
+      mesh_refinement.uniformly_refine(1);
+
+      MeshBase::element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::element_iterator end = mesh.active_elements_end(); 
+
+      for (; it != end; ++it)
+	{
+	  Elem* elem = *it;
+		
+	  for (unsigned int s=0; s<elem->n_sides(); s++)
+	    if (elem->neighbor(s) == NULL)
+	      {
+		AutoPtr<Elem> side(elem->build_side(s));
+
+		// Pop each point to the sphere boundary
+		for (unsigned int n=0; n<side->n_nodes(); n++)
+		  side->point(n) =
+		    sphere.closest_point(side->point(n));
+	      }
+	}
+      }
+
+  // The mesh now contains a refinement hierarchy due to the refinements
+  // used to generate the grid.  In order to call other support functions
+  // like all_tri() and all_second_order, you need a "flat" mesh file (with no
+  // refinement trees) so
+  MeshTools::Modification::flatten(mesh);
+
+  // In 2D, convert all the quads to triangles if requested
+  if (mesh.mesh_dimension()==2)
+    {
+      if ((type == TRI6) || (type == TRI3))
+	{
+	  MeshTools::Modification::all_tri(mesh);
+	}
+    }
 
   
-//   // Done building the mesh.  Now prepare it for use.
-//   mesh.prepare_for_use();
+  // Convert to second-order elements if the user requested it.
+  if (Elem::second_order_equivalent_type(type) == INVALID_ELEM)
+    {
+      // type is already a second-order, determine if it is the
+      // "full-ordered" second-order element, or the "serendipity"
+      // second order element.  Note also that all_second_order
+      // can't be called once the mesh has been refined.
+      bool full_ordered = !((type==QUAD8) || (type==HEX20));
+      mesh.all_second_order(full_ordered);
+
+      // And pop to the boundary again...
+      MeshBase::element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::element_iterator end = mesh.active_elements_end(); 
+
+      for (; it != end; ++it)
+	{
+	  Elem* elem = *it;
+		
+	  for (unsigned int s=0; s<elem->n_sides(); s++)
+	    if (elem->neighbor(s) == NULL)
+	      {
+		AutoPtr<Elem> side(elem->build_side(s));
+
+		// Pop each point to the sphere boundary
+		for (unsigned int n=0; n<side->n_nodes(); n++)
+		  side->point(n) =
+		    sphere.closest_point(side->point(n));
+	      }
+	}
+    }
+  
+
+  // The meshes could probably use some smoothing...
+  LaplaceMeshSmoother smoother(mesh);
+  smoother.smooth(2);
+  
+  STOP_LOG("build_sphere()", "MeshTools::Generation");
+
+  
+  // Done building the mesh.  Now prepare it for use.
+  mesh.prepare_for_use();
 }
