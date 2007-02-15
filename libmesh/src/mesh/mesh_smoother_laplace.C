@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.C,v 1.16 2005-06-11 03:59:18 jwpeterson Exp $
+// $Id: mesh_smoother_laplace.C,v 1.17 2007-02-15 17:04:49 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -48,24 +48,38 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
   for (unsigned int n=0; n<n_iterations; n++)
     {
       new_positions.resize(_mesh.n_nodes());
-      for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
+      
+      for (MeshBase::node_iterator it  = _mesh.nodes_begin();
+	   it != _mesh.nodes_end();
+	   ++it) 
 	{
+	  Node* node = *it;
           // leave the boundary intact
           // Only relocate the nodes which are vertices of an element
           // All other entries of _graph (the secondary nodes) are empty
-	  if (!on_boundary[i] && (_graph[i].size() > 0) )
+	  if (!on_boundary[node->id()] && (_graph[node->id()].size() > 0) )
 	    {
               Point avg_position(0.,0.,0.);
-	      for (unsigned int j=0; j<_graph[i].size(); ++j)
-                avg_position.add(_mesh.node(_graph[i][j]));
-              new_positions[i] = avg_position /
-                static_cast<Real>(_graph[i].size());
+	      for (unsigned int j=0; j<_graph[node->id()].size(); ++j)
+                avg_position.add(_mesh.node(_graph[node->id()][j]));
+              new_positions[node->id()] = avg_position /
+                static_cast<Real>(_graph[node->id()].size());
 	    }
 	}
+      
       // now update the node positions
-      for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
-        if (!on_boundary[i] && (_graph[i].size() > 0) )
-          _mesh.node(i) = new_positions[i];
+      for (MeshBase::node_iterator it  = _mesh.nodes_begin();
+	   it != _mesh.nodes_end();
+	   ++it)
+	{
+	  Node* node = *it;
+	  
+	  if (!on_boundary[node->id()] && (_graph[node->id()].size() > 0) )
+	    {
+	      // Should call Point::op=
+	      _mesh.node(node->id()) = new_positions[node->id()];
+	    }
+	}
     }
   
   // finally adjust the second order nodes (those located between vertices)
@@ -87,18 +101,21 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
       // loop over all second order nodes (son)
       for (unsigned int son=son_begin; son<son_end; son++)
         {
-	  const unsigned int n_adjacent_vertices =
-	    elem->n_second_order_adjacent_vertices(son);
+	  // Don't smooth second-order nodes which are on the boundary
+	  if (!on_boundary[elem->node(son)])
+	    {
+	      const unsigned int n_adjacent_vertices =
+		elem->n_second_order_adjacent_vertices(son);
 
-          // calculate the new position which is the average of the
-          // position of the adjacent vertices
-          Point avg_position(0,0,0);
-          for (unsigned int v=0; v<n_adjacent_vertices; v++)
-              avg_position +=
-                _mesh.point( elem->node( elem->second_order_adjacent_vertex(son,v) ) );
+	      // calculate the new position which is the average of the
+	      // position of the adjacent vertices
+	      Point avg_position(0,0,0);
+	      for (unsigned int v=0; v<n_adjacent_vertices; v++)
+		avg_position +=
+		  _mesh.point( elem->node( elem->second_order_adjacent_vertex(son,v) ) );
 
-          _mesh.node(elem->node(son)) = avg_position / n_adjacent_vertices;
-
+	      _mesh.node(elem->node(son)) = avg_position / n_adjacent_vertices;
+	    }
         }
     }
 }
