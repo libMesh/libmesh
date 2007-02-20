@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.22 2007-02-09 23:48:25 roystgnr Exp $
+// $Id: equation_systems.h,v 1.23 2007-02-20 17:07:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -115,6 +115,12 @@ public:
    * @returns the number of equation systems.
    */
   unsigned int n_systems() const;
+
+  /**
+   * @returns true if the system named \p name exists within
+   * this EquationSystems object.
+   */
+  bool has_system (const std::string& name) const;
 
   /**
    * @returns a constant reference to the system named \p name.
@@ -471,6 +477,16 @@ T_sys & EquationSystems::add_system (const std::string& name)
 
   // Return a dynamically casted reference to the newly added System.
   return *ptr;
+}
+
+
+
+inline
+bool EquationSystems::has_system (const std::string& name) const
+{
+  if (_systems.find(name) == _systems.end())
+    return false;
+  return true;
 }
 
 
