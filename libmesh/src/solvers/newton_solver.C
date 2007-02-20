@@ -16,6 +16,7 @@ NewtonSolver::NewtonSolver (sys_type& s)
     require_residual_reduction(true),
     minsteplength(1e-5),
     linear_tolerance_multiplier(1e-3),
+    minimum_linear_tolerance(TOLERANCE*TOLERANCE),
     linear_solver(LinearSolver<Number>::build())
 {
 }
@@ -108,10 +109,10 @@ void NewtonSolver::solve()
       current_linear_tolerance = std::min (current_linear_tolerance,
         current_residual * linear_tolerance_multiplier);
 
-      // But don't let it be zero
-      if (current_linear_tolerance == 0.)
+      // But don't let it be too small
+      if (current_linear_tolerance < minimum_linear_tolerance)
         {
-          current_linear_tolerance = TOLERANCE * TOLERANCE;
+          current_linear_tolerance = minimum_linear_tolerance;
         }
 
       // At this point newton_iterate is the current guess, and
@@ -122,7 +123,8 @@ void NewtonSolver::solve()
       linear_solution.zero();
 
       if (!quiet)
-        std::cout << "Linear solve starting" << std::endl;
+        std::cout << "Linear solve starting, tolerance " 
+                  << current_linear_tolerance << std::endl;
 
       PAUSE_LOG("solve()", "NewtonSolver");
       // Solve the linear system.  Two cases:
@@ -150,7 +152,6 @@ void NewtonSolver::solve()
       if (!quiet)
         std::cout << "Linear solve finished, step " << linear_steps
                   << ", residual " << rval.second
-                  << ", tolerance " << current_linear_tolerance
                   << std::endl;
 
       // Compute the l2 norm of the nonlinear update

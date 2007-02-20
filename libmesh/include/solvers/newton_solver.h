@@ -1,4 +1,4 @@
-// $Id: newton_solver.h,v 1.8 2006-11-02 22:31:33 roystgnr Exp $
+// $Id: newton_solver.h,v 1.9 2007-02-20 21:39:08 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -95,6 +95,11 @@ public:
    * defaults to 1e-3) times the norm of the current nonlinear residual
    */
   Real linear_tolerance_multiplier;
+
+  /**
+   * The tolerance for linear solves is kept above this minimum
+   */
+  Real minimum_linear_tolerance;
 
 protected:
 
