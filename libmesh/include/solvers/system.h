@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.22 2006-06-12 19:25:38 roystgnr Exp $
+// $Id: system.h,v 1.23 2007-02-20 17:08:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -362,6 +362,11 @@ public:
 		     const Order order = FIRST,
 		     const FEFamily = LAGRANGE);
 
+  /**
+   * @returns true if a variable named \p var exists in this System
+   */
+  bool has_variable(const std::string& var) const;
+  
   /**
    * @returns the name of variable \p i.
    */

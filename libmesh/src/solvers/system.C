@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.29 2007-02-09 23:49:45 roystgnr Exp $
+// $Id: system.C,v 1.30 2007-02-20 17:08:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -572,6 +572,15 @@ void System::add_variable (const std::string& var,
   FEType fe_type(order, family);
   
   this->add_variable(var, fe_type);
+}
+
+
+
+bool System::has_variable (const std::string& var) const
+{
+  if (_var_num.find(var) == _var_num.end())
+    return false;
+  return true;
 }
 
 
