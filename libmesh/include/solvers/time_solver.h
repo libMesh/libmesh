@@ -1,4 +1,4 @@
-// $Id: time_solver.h,v 1.8 2006-07-22 07:51:11 roystgnr Exp $
+// $Id: time_solver.h,v 1.9 2007-02-21 19:18:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 // Local includes
 #include "auto_ptr.h"
 #include "libmesh_common.h"
+#include "numeric_vector.h"
 #include "reference_counted_object.h"
 
 // Forward Declarations
