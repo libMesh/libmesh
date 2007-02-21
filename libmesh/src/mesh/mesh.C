@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.74 2007-02-15 17:09:15 jwpeterson Exp $
+// $Id: mesh.C,v 1.75 2007-02-21 04:08:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -708,31 +708,43 @@ void Mesh::read (const std::string& name,
   // the other processors will pick it up
   if (libMesh::processor_id() == 0)
     {
-      if (name.rfind(".mat") < name.size())
-	MatlabIO(*this).read(name);
+      // Nasty hack for reading/writing zipped files
+      std::string new_name = name;
+      if (name.size() - name.rfind(".bz2") == 4)
+        {
+          new_name.erase(new_name.end() - 4, new_name.end());
+          std::string system_string = "bunzip2 -k ";
+          system_string += name;
+          START_LOG("system(bunzip2)", "Mesh");
+          system(system_string.c_str());
+          STOP_LOG("system(bunzip2)", "Mesh");
+        }
+
+      if (new_name.rfind(".mat") < new_name.size())
+	MatlabIO(*this).read(new_name);
       
-      else if (name.rfind(".ucd") < name.size())
-	UCDIO(*this).read (name);
+      else if (new_name.rfind(".ucd") < new_name.size())
+	UCDIO(*this).read (new_name);
       
-      else if (name.rfind(".exd") < name.size())
-	ExodusII_IO(*this).read (name);
+      else if (new_name.rfind(".exd") < new_name.size())
+	ExodusII_IO(*this).read (new_name);
       
-      else if ((name.rfind(".off")  < name.size()) ||
-	       (name.rfind(".ogl")  < name.size()) ||
-	       (name.rfind(".oogl") < name.size()))
-	OFFIO(*this).read (name);
+      else if ((new_name.rfind(".off")  < new_name.size()) ||
+	       (new_name.rfind(".ogl")  < new_name.size()) ||
+	       (new_name.rfind(".oogl") < new_name.size()))
+	OFFIO(*this).read (new_name);
      
-      else if (name.rfind(".xda") < name.size())
-	XdrIO(*this).read (name);
+      else if (new_name.rfind(".xda") < new_name.size())
+	XdrIO(*this).read (new_name);
       
-      else if (name.rfind(".xdr")  < name.size())
-	XdrIO(*this,true).read (name);
+      else if (new_name.rfind(".xdr")  < new_name.size())
+	XdrIO(*this,true).read (new_name);
       
-      else if ((name.rfind(".mgf")  < name.size()) ||
-	       (name.rfind(".0000") < name.size()))
-	XdrIO(*this,true).read_mgf (name);
+      else if ((new_name.rfind(".mgf")  < new_name.size()) ||
+	       (new_name.rfind(".0000") < new_name.size()))
+	XdrIO(*this,true).read_mgf (new_name);
       
-      else if (name.rfind(".unv") < name.size())
+      else if (new_name.rfind(".unv") < new_name.size())
 	{
 	  if (mesh_data == NULL)
 	    {
@@ -741,15 +753,15 @@ void Mesh::read (const std::string& name,
 			<< "read UNV files!" << std::endl;
 	      error();
 	    }
-	  UNVIO(*this, *mesh_data).read (name);
+	  UNVIO(*this, *mesh_data).read (new_name);
 	}
       
-      else if ((name.rfind(".node")  < name.size()) ||
-	       (name.rfind(".ele")   < name.size()))
-	TetGenIO(*this,mesh_data).read (name);
+      else if ((new_name.rfind(".node")  < new_name.size()) ||
+	       (new_name.rfind(".ele")   < new_name.size()))
+	TetGenIO(*this,mesh_data).read (new_name);
 
-      else if (name.rfind(".msh") < name.size())
-	GmshIO(*this).read (name);
+      else if (new_name.rfind(".msh") < new_name.size())
+	GmshIO(*this).read (new_name);
       
       else
 	{
@@ -766,6 +778,11 @@ void Mesh::read (const std::string& name,
 		    << std::endl;
 	  error();	  
 	}    
+
+      // If we temporarily decompressed a .bz2 file, remove the
+      // uncompressed version
+      if (name.size() - name.rfind(".bz2") == 4)
+        unlink(new_name.c_str());
     }
   
   STOP_LOG("read()", "Mesh");
@@ -789,40 +806,45 @@ void Mesh::write (const std::string& name,
 		  MeshData* mesh_data)
 {
   START_LOG("write()", "Mesh");
+
+  // Nasty hack for reading/writing zipped files
+  std::string new_name = name;
+  if (name.size() - name.rfind(".bz2") == 4)
+    new_name.erase(new_name.end() - 4, new_name.end());
   
   // Write the file based on extension
-  if (name.rfind(".dat") < name.size())
-    TecplotIO(*this).write (name);
+  if (new_name.rfind(".dat") < new_name.size())
+    TecplotIO(*this).write (new_name);
     
-  else if (name.rfind(".plt") < name.size())
-    TecplotIO(*this,true).write (name);
+  else if (new_name.rfind(".plt") < new_name.size())
+    TecplotIO(*this,true).write (new_name);
     
-  else if (name.rfind(".ucd") < name.size())
-    UCDIO (*this).write (name);
+  else if (new_name.rfind(".ucd") < new_name.size())
+    UCDIO (*this).write (new_name);
     
-  else if (name.rfind(".gmv") < name.size())
+  else if (new_name.rfind(".gmv") < new_name.size())
     if (this->n_partitions() > 1)
-      GMVIO(*this).write (name);
+      GMVIO(*this).write (new_name);
     else
       {
 	GMVIO io(*this);
 	io.partitioning() = false;
-	io.write (name);
+	io.write (new_name);
       }
     
-  else if (name.rfind(".ugrid") < name.size())
-    DivaIO(*this).write(name);
+  else if (new_name.rfind(".ugrid") < new_name.size())
+    DivaIO(*this).write(new_name);
     
-  else if (name.rfind(".xda") < name.size())
-    XdrIO(*this).write(name);
+  else if (new_name.rfind(".xda") < new_name.size())
+    XdrIO(*this).write(new_name);
     
-  else if (name.rfind(".xdr") < name.size())
-    XdrIO(*this,true).write(name);
+  else if (new_name.rfind(".xdr") < new_name.size())
+    XdrIO(*this,true).write(new_name);
     
-  else if (name.rfind(".mgf")  < name.size())
-    XdrIO(*this,true).write_mgf(name);
+  else if (new_name.rfind(".mgf")  < new_name.size())
+    XdrIO(*this,true).write_mgf(new_name);
     
-  else if (name.rfind(".unv") < name.size())
+  else if (new_name.rfind(".unv") < new_name.size())
     {
       if (mesh_data == NULL)
 	{
@@ -831,17 +853,17 @@ void Mesh::write (const std::string& name,
 		    << "write UNV files!" << std::endl;
 	  error();
 	}
-      UNVIO(*this, *mesh_data).write (name);
+      UNVIO(*this, *mesh_data).write (new_name);
     }
 
-  else if (name.rfind(".mesh") < name.size())
-    MEDITIO(*this).write (name);
+  else if (new_name.rfind(".mesh") < new_name.size())
+    MEDITIO(*this).write (new_name);
 
-  else if (name.rfind(".poly") < name.size())
-    TetGenIO(*this).write (name);
+  else if (new_name.rfind(".poly") < new_name.size())
+    TetGenIO(*this).write (new_name);
 
-  else if (name.rfind(".msh") < name.size())
-    GmshIO(*this).write (name);
+  else if (new_name.rfind(".msh") < new_name.size())
+    GmshIO(*this).write (new_name);
     
   else
     {
@@ -861,6 +883,17 @@ void Mesh::write (const std::string& name,
 		<< std::endl
 		<< "\n Exiting without writing output\n";
     }    
+  
+  // Nasty hack for reading/writing zipped files
+  if (name.size() - name.rfind(".bz2") == 4)
+    {
+      std::string system_string = "bzip2 ";
+      system_string += new_name;
+      START_LOG("system(bzip2)", "Mesh");
+      if (libMesh::processor_id() == 0)
+        system(system_string.c_str());
+      STOP_LOG("system(bzip2)", "Mesh");
+    }
   
   STOP_LOG("write()", "Mesh");
 }

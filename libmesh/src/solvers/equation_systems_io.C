@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.13 2007-02-13 21:29:03 roystgnr Exp $
+// $Id: equation_systems_io.C,v 1.14 2007-02-21 04:08:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -19,6 +19,7 @@
 
 
 #include "libmesh_common.h"
+#include "libmesh_logging.h"
 
 
 // C++ Includes
@@ -124,8 +125,24 @@ void EquationSystems::read (const std::string& name,
    const bool read_additional_data 
                           = read_flags & EquationSystems::READ_ADDITIONAL_DATA;
 
+  // Nasty hack for reading/writing zipped files
+  std::string new_name = name;
+  if (name.size() - name.rfind(".bz2") == 4)
+    {
+      new_name.erase(new_name.end() - 4, new_name.end());
+      std::string system_string = "bunzip2 -k ";
+      system_string += name;
+      START_LOG("system(bunzip2)", "EquationSystems");
+      if (libMesh::processor_id() == 0)
+        system(system_string.c_str());
+#ifdef HAVE_MPI
+      MPI_Barrier(libMesh::COMM_WORLD);
+#endif // HAVE_MPI
+      STOP_LOG("system(bunzip2)", "EquationSystems");
+    }
+
   
-  Xdr io (name, mode);
+  Xdr io (new_name, mode);
 
   assert (io.reading());
 
@@ -274,6 +291,11 @@ void EquationSystems::read (const std::string& name,
 				read_additional_data);       
     }  
 
+  // If we temporarily decompressed a .bz2 file, remove the
+  // uncompressed version
+  if (name.size() - name.rfind(".bz2") == 4)
+    unlink(new_name.c_str());
+
   // Localize each system's data
   this->update();
 }
@@ -380,7 +402,12 @@ void EquationSystems::write(const std::string& name,
    const bool write_additional_data 
                          = write_flags & EquationSystems::WRITE_ADDITIONAL_DATA;
 
-  Xdr io(name, mode);
+  // Nasty hack for reading/writing zipped files
+  std::string new_name = name;
+  if (name.size() - name.rfind(".bz2") == 4)
+    new_name.erase(new_name.end() - 4, new_name.end());
+
+  Xdr io(new_name, mode);
 
   assert (io.writing());
 
@@ -550,4 +577,15 @@ void EquationSystems::write(const std::string& name,
 	pos->second->write_data (io,
 				 write_additional_data);
       }
+
+  // Nasty hack for reading/writing zipped files
+  if (name.size() - name.rfind(".bz2") == 4)
+    {
+      std::string system_string = "bzip2 ";
+      system_string += new_name;
+      START_LOG("system(bzip2)", "EquationSystems");
+      if (libMesh::processor_id() == 0)
+        system(system_string.c_str());
+      STOP_LOG("system(bzip2)", "EquationSystems");
+    }
 }
