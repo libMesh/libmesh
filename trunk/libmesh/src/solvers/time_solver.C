@@ -8,7 +8,7 @@
 
 
 TimeSolver::TimeSolver (sys_type& s)
-  : diff_solver                  (NULL),
+  : _diff_solver                  (NULL),
     _system                      (s),
     first_solve                  (true),
     old_local_nonlinear_solution (NumericVector<Number>::build())
@@ -25,7 +25,7 @@ TimeSolver::~TimeSolver ()
 
 void TimeSolver::reinit ()
 {
-  diff_solver->reinit();
+  _diff_solver->reinit();
 }
 
 
@@ -34,9 +34,9 @@ void TimeSolver::init ()
 {
   // If the user hasn't given us a solver to use,
   // just build a default solver
-  if (diff_solver.get() == NULL)
-    diff_solver = DiffSolver::build(_system);
-  diff_solver->init();
+  if (_diff_solver.get() == NULL)
+    _diff_solver = DiffSolver::build(_system);
+  _diff_solver->init();
 
   _system.add_vector("_old_nonlinear_solution");
 }
@@ -57,7 +57,7 @@ void TimeSolver::solve ()
     (*old_local_nonlinear_solution,
      _system.get_dof_map().get_send_list());
 
-  diff_solver->solve();
+  _diff_solver->solve();
 }
 
 
@@ -85,4 +85,11 @@ const
   assert (global_dof_number < old_local_nonlinear_solution->size());
 
   return (*old_local_nonlinear_solution)(global_dof_number);
+}
+
+
+
+AutoPtr<DiffSolver> & TimeSolver::diff_solver()
+{
+  return _diff_solver;
 }

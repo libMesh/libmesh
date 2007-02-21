@@ -1,4 +1,4 @@
-// $Id: time_solver.h,v 1.9 2007-02-21 19:18:12 roystgnr Exp $
+// $Id: time_solver.h,v 1.10 2007-02-21 21:13:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -137,9 +137,14 @@ public:
   /**
    * An implicit linear or nonlinear solver to use at each timestep.
    */
-  AutoPtr<DiffSolver> diff_solver;
+  virtual AutoPtr<DiffSolver> &diff_solver();
 
 protected:
+
+  /**
+   * An implicit linear or nonlinear solver to use at each timestep.
+   */
+  AutoPtr<DiffSolver> _diff_solver;
 
   /**
    * @returns a writeable reference to the system we are solving.
