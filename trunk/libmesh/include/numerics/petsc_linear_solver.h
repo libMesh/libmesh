@@ -1,4 +1,4 @@
-// $Id: petsc_linear_solver.h,v 1.3 2006-03-14 17:09:47 jwpeterson Exp $
+// $Id: petsc_linear_solver.h,v 1.4 2007-02-22 00:35:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -87,6 +87,10 @@ public:
    */
   void init ();
   
+  /**
+   * Initialize data structures if not done so already plus much more
+   */
+  void init (PetscMatrix<T>* matrix);
   /**
    * Call the Petsc solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.

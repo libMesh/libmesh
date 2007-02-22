@@ -1,4 +1,4 @@
-// $Id: petsc_linear_solver.C,v 1.9 2006-07-27 23:10:39 jwpeterson Exp $
+// $Id: petsc_linear_solver.C,v 1.10 2007-02-22 00:35:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -118,7 +118,7 @@ void PetscLinearSolver<T>::init ()
       // Create the preconditioner context
       ierr = KSPGetPC        (_ksp, &_pc);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
+
       // Have the Krylov subspace method use our good initial guess rather than 0
       ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -138,8 +138,109 @@ void PetscLinearSolver<T>::init ()
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
       // Not sure if this is necessary, or if it is already handled by KSPSetFromOptions?
-      ierr = PCSetFromOptions (_pc);
+      // NOT NECESSARY!!!!
+      //ierr = PCSetFromOptions (_pc);
+      //CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	       
+#endif
+	     
+      // Notify PETSc of location to store residual history.
+      // This needs to be called before any solves, since
+      // it sets the residual history length to zero.  The default
+      // behavior is for PETSc to allocate (internally) an array
+      // of size 1000 to hold the residual norm history.
+      ierr = KSPSetResidualHistory(_ksp,
+				   PETSC_NULL,   // pointer to the array which holds the history
+				   PETSC_DECIDE, // size of the array holding the history
+				   PETSC_TRUE);  // Whether or not to reset the history for each solve. 
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+}
+
+
+template <typename T>
+void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
+{
+  // Initialize the data structures if not done so already.
+  if (!this->initialized())
+    {
+      this->_is_initialized = true;
+      
+      int ierr=0;
+
+// 2.1.x & earlier style      
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+      
+      // Create the linear solver context
+      ierr = SLESCreate (libMesh::COMM_WORLD, &_sles);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      
+      // Create the Krylov subspace & preconditioner contexts
+      ierr = SLESGetKSP       (_sles, &_ksp);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = SLESGetPC        (_sles, &_pc);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      
+      // Have the Krylov subspace method use our good initial guess rather than 0
+      ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      
+      // Set user-specified  solver and preconditioner types
+      this->set_petsc_solver_type();
+      this->set_petsc_preconditioner_type();
+      
+      // Set the options from user-input
+      // Set runtime options, e.g.,
+      //      -ksp_type <type> -pc_type <type> -ksp_monitor -ksp_rtol <rtol>
+      //  These options will override those specified above as long as
+      //  SLESSetFromOptions() is called _after_ any other customization
+      //  routines.
+      
+      ierr = SLESSetFromOptions (_sles);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+// 2.2.0 & newer style
+#else
+      
+      // Create the linear solver context
+      ierr = KSPCreate (libMesh::COMM_WORLD, &_ksp);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      
+    
+      //ierr = PCCreate (libMesh::COMM_WORLD, &_pc);
+      //     CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      
+      // Create the preconditioner context
+      ierr = KSPGetPC        (_ksp, &_pc);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      
+      // Set operators. The input matrix works as the preconditioning matrix
+      ierr = KSPSetOperators(_ksp, matrix->mat(), matrix->mat(),SAME_NONZERO_PATTERN);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      // Have the Krylov subspace method use our good initial guess rather than 0
+      ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      
+      // Set user-specified  solver and preconditioner types
+      this->set_petsc_solver_type();
+      this->set_petsc_preconditioner_type();
+      
+      // Set the options from user-input
+      // Set runtime options, e.g.,
+      //      -ksp_type <type> -pc_type <type> -ksp_monitor -ksp_rtol <rtol>
+      //  These options will override those specified above as long as
+      //  KSPSetFromOptions() is called _after_ any other customization
+      //  routines.
+      
+      ierr = KSPSetFromOptions (_ksp);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      // Not sure if this is necessary, or if it is already handled by KSPSetFromOptions?
+      // NOT NECESSARY!!!!
+      //ierr = PCSetFromOptions (_pc);
+      //CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 	       
 #endif
@@ -162,8 +263,6 @@ void PetscLinearSolver<T>::init ()
 
 
 
-
-
 template <typename T>
 std::pair<unsigned int, Real> 
 PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
@@ -174,7 +273,6 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 			     const unsigned int m_its)
 {
   START_LOG("solve()", "PetscLinearSolver");
-  this->init ();
   
   PetscMatrix<T>* matrix   = dynamic_cast<PetscMatrix<T>*>(&matrix_in);
   PetscMatrix<T>* precond  = dynamic_cast<PetscMatrix<T>*>(&precond_in);
@@ -188,6 +286,8 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
   assert(solution != NULL);
   assert(rhs      != NULL);
   
+  this->init (matrix);
+
   int ierr=0;
   int its=0, max_its = static_cast<int>(m_its);
   PetscReal final_resid=0.;
@@ -235,9 +335,9 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 #elif (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)
       
   // Set operators. The input matrix works as the preconditioning matrix
-  ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
-			 SAME_NONZERO_PATTERN);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  //ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
+	 //			 SAME_NONZERO_PATTERN);
+	 //       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
