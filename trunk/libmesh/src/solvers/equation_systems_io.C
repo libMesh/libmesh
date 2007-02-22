@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.14 2007-02-21 04:08:54 roystgnr Exp $
+// $Id: equation_systems_io.C,v 1.15 2007-02-22 21:40:03 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -130,11 +130,13 @@ void EquationSystems::read (const std::string& name,
   if (name.size() - name.rfind(".bz2") == 4)
     {
       new_name.erase(new_name.end() - 4, new_name.end());
-      std::string system_string = "bunzip2 -k ";
-      system_string += name;
       START_LOG("system(bunzip2)", "EquationSystems");
       if (libMesh::processor_id() == 0)
-        system(system_string.c_str());
+        {
+          std::string system_string = "bunzip2 -f -k ";
+          system_string += name;
+          system(system_string.c_str());
+        }
 #ifdef HAVE_MPI
       MPI_Barrier(libMesh::COMM_WORLD);
 #endif // HAVE_MPI
@@ -581,11 +583,16 @@ void EquationSystems::write(const std::string& name,
   // Nasty hack for reading/writing zipped files
   if (name.size() - name.rfind(".bz2") == 4)
     {
-      std::string system_string = "bzip2 ";
-      system_string += new_name;
       START_LOG("system(bzip2)", "EquationSystems");
       if (libMesh::processor_id() == 0)
-        system(system_string.c_str());
+        {
+          std::string system_string = "bzip2 -f ";
+          system_string += new_name;
+          system(system_string.c_str());
+        }
+#ifdef HAVE_MPI
+      MPI_Barrier(libMesh::COMM_WORLD);
+#endif
       STOP_LOG("system(bzip2)", "EquationSystems");
     }
 }
