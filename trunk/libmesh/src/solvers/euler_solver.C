@@ -18,6 +18,16 @@ EulerSolver::~EulerSolver ()
 
 
 
+Real EulerSolver::error_order() const
+{
+  if (theta == 0.5)
+    return 2.;
+  return 1.;
+}
+
+
+
+
 bool EulerSolver::element_residual (bool request_jacobian)
 {
   unsigned int n_dofs = _system.elem_solution.size();

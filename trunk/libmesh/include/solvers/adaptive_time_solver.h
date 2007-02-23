@@ -1,4 +1,4 @@
-// $Id: adaptive_time_solver.h,v 1.1 2007-02-21 21:13:37 roystgnr Exp $
+// $Id: adaptive_time_solver.h,v 1.2 2007-02-23 23:31:30 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -73,6 +73,13 @@ public:
 
   virtual void solve();
 
+  virtual void advance_timestep();
+
+  /**
+   * This method is passed on to the core_time_solver
+   */
+  virtual Real error_order () const;
+
   /**
    * This method is passed on to the core_time_solver
    */
@@ -95,9 +102,26 @@ public:
 
   /**
    * This tolerance is the target error between double-deltat
-   * and single-deltat timesteps
+   * and single-deltat timesteps, scaled by deltat
    */
-  Real tolerance;
+  Real target_tolerance;
+
+  /**
+   * This tolerance is the maximum error between double-deltat
+   * and single-deltat timesteps, scaled by deltat
+   *
+   * FIXME - this value is currently ignored!
+   */
+  Real upper_tolerance;
+
+protected:
+
+  /**
+   * We need to store the value of the last deltat used, so
+   * that advance_timestep() will increment the system time
+   * correctly.
+   */
+  Real last_deltat;
 };
 
 
