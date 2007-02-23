@@ -1,4 +1,4 @@
-// $Id: time_solver.h,v 1.10 2007-02-21 21:13:37 roystgnr Exp $
+// $Id: time_solver.h,v 1.11 2007-02-23 23:31:30 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -98,6 +98,15 @@ public:
    * to be repeated.
    */
   virtual void advance_timestep ();
+
+  /**
+   * This method should return the expected convergence order of the
+   * (non-local) error of the time discretization scheme - e.g. 2 for the
+   * O(deltat^2) Crank-Nicholson, or 1 for the O(deltat) Backward Euler.
+   *
+   * Useful for adaptive timestepping schemes.
+   */
+  virtual Real error_order () const = 0;
 
   /**
    * This method uses the DifferentiableSystem's

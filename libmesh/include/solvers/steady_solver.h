@@ -1,5 +1,5 @@
 
-// $Id: steady_solver.h,v 1.3 2006-07-13 05:18:30 roystgnr Exp $
+// $Id: steady_solver.h,v 1.4 2007-02-23 23:31:30 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -68,6 +68,12 @@ public:
    * Destructor.
    */
   virtual ~SteadySolver ();
+
+  /**
+   * error convergence order against deltat is
+   * not applicable to a steady problem.
+   */
+  virtual Real error_order() const { return 0.; }
 
   /**
    * This method uses the DifferentiableSystem's
