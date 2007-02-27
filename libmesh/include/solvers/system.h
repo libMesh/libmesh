@@ -1,4 +1,4 @@
-// $Id: system.h,v 1.23 2007-02-20 17:08:06 roystgnr Exp $
+// $Id: system.h,v 1.24 2007-02-27 00:02:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -387,6 +387,23 @@ public:
    * @returns the finite element type for variable \p var.
    */
   const FEType & variable_type (const std::string& var) const;
+
+  /**
+   * @returns a norm of variable \p var in the vector \p v, in the L2 norm if
+   * \p component_norm == 0, the H1 norm if \p component_norm == 1, or the H2
+   * norm if \p component_norm == 2.
+   */
+  Real calculate_norm(NumericVector<Number>& v,
+		      unsigned int var = 0,
+		      unsigned char norm_type = 0) const;
+
+  /**
+   * @returns a norm of the vector \p v, using \p component_norm and \p
+   * component_scale to choose and weight the norms of each variable.
+   */
+  Real calculate_norm(NumericVector<Number>& v,
+		      std::vector<unsigned char> &component_norm,
+		      std::vector<float> &component_scale) const;
 
   /**
    * Reads the basic data for this System.

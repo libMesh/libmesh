@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.30 2007-02-20 17:08:06 roystgnr Exp $
+// $Id: system.C,v 1.31 2007-02-27 00:02:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,12 @@
 #include "dof_map.h"
 #include "numeric_vector.h"
 #include "mesh.h"
+
+// includes for calculate_norm
+#include "fe_base.h"
+#include "quadrature.h"
+#include "tensor_value.h"
+#include "vector_value.h"
 
 
 // ------------------------------------------------------------
@@ -601,6 +607,136 @@ unsigned short int System::variable_number (const std::string& var) const
     }
   
   return pos->second;
+}
+
+
+
+Real System::calculate_norm(NumericVector<Number>& v,
+                            unsigned int var,
+                            unsigned char norm_type) const
+{
+  std::vector<unsigned char> component_norm(this->n_vars(), 0);
+  std::vector<float> component_scale(this->n_vars(), 0.0);
+  component_norm[var] = norm_type;
+  component_scale[var] = 1.0;
+  return this->calculate_norm(v, component_norm, component_scale);
+}
+
+
+
+Real System::calculate_norm(NumericVector<Number>& v,
+                            std::vector<unsigned char> &component_norm,
+                            std::vector<float> &component_scale) const
+{
+  if (component_norm.empty())
+    {
+      assert (component_scale.empty());
+      return v.l2_norm();
+    }
+
+  assert (component_norm.size() == this->n_vars());
+
+  if (component_scale.size() != this->n_vars())
+    {
+      component_scale.resize(this->n_vars(), 1.0);
+    }
+
+  // Zero the norm before summation
+  Real v_norm = 0.;
+
+  unsigned int dim = this->get_mesh().mesh_dimension();
+
+  // Loop over all variables
+  for (unsigned int var=0; var != this->n_vars(); ++var)
+    {
+      // Skip any variables we don't need to integrate
+      if (component_scale[var] == 0.0)
+        continue;
+
+      const FEType& fe_type = this->get_dof_map().variable_type(var);
+      AutoPtr<QBase> qrule =
+        fe_type.default_quadrature_rule (dim);
+      AutoPtr<FEBase> fe
+        (FEBase::build(dim, fe_type));
+      fe->attach_quadrature_rule (qrule.get());
+
+      const std::vector<Real>&               JxW = fe->get_JxW();
+      const std::vector<std::vector<Real> >& phi = fe->get_phi();
+
+      const std::vector<std::vector<RealGradient> >* dphi;
+      if (component_norm[var] > 0)
+        dphi = &(fe->get_dphi());
+#ifdef ENABLE_SECOND_DERIVATIVES
+      const std::vector<std::vector<RealTensor> >*   d2phi;
+      if (component_norm[var] > 1)
+        d2phi = &(fe->get_d2phi());
+#endif
+
+      std::vector<unsigned int> dof_indices;
+
+      // Begin the loop over the elements
+      MeshBase::const_element_iterator       el     =
+        this->get_mesh().active_local_elements_begin();
+      const MeshBase::const_element_iterator end_el =
+        this->get_mesh().active_local_elements_end();
+
+      for ( ; el != end_el; ++el)
+        {
+          const Elem* elem = *el;
+
+          fe->reinit (elem);
+
+          this->get_dof_map().dof_indices (elem, dof_indices, var);
+
+          const unsigned int n_qp = qrule->n_points();
+
+          const unsigned int n_sf = dof_indices.size();
+
+          // Begin the loop over the Quadrature points.
+          for (unsigned int qp=0; qp<n_qp; qp++)
+            {
+              Number u_h = 0.;
+              for (unsigned int i=0; i != n_sf; ++i)
+                u_h += phi[i][qp] * v(dof_indices[i]);
+              v_norm += component_scale[var] * JxW[qp] * u_h * u_h;
+
+              if (component_norm[var] > 0)
+                {
+                  Gradient grad_u_h;
+                  for (unsigned int i=0; i != n_sf; ++i)
+                    grad_u_h.add_scaled((*dphi)[i][qp], v(dof_indices[i]));
+                  v_norm += component_scale[var] * JxW[qp] *
+                            (grad_u_h * grad_u_h);
+                }
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+              if (component_norm[var] > 1)
+                {
+                  Tensor hess_u_h;
+                  for (unsigned int i=0; i != n_sf; ++i)
+                    hess_u_h.add_scaled((*d2phi)[i][qp], v(dof_indices[i]));
+                  v_norm += component_scale[var] * JxW[qp] *
+                            hess_u_h.contract(hess_u_h);
+                }
+#endif
+            }
+        }
+    }
+
+#ifdef HAVE_MPI
+  if (libMesh::n_processors() > 1)
+    {
+      Real local_v_norm = v_norm;
+      MPI_Allreduce (&local_v_norm,
+                     &v_norm,
+                     1,
+                     MPI_REAL,
+                     MPI_SUM,
+                     libMesh::COMM_WORLD);
+    }
+#endif
+
+  return std::sqrt(v_norm);
 }
 
 
