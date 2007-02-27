@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.13 2006-12-11 23:17:54 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.14 2007-02-27 16:02:58 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -130,7 +130,7 @@ int main (int argc, char** argv)
     system.deltat = deltat;
 
     // And the nonlinear solver options
-    DiffSolver &solver = *system.time_solver->diff_solver;
+    DiffSolver &solver = *(system.time_solver->diff_solver().get());
     solver.quiet = infile("solver_quiet", true);
     solver.max_nonlinear_iterations =
       infile("max_nonlinear_iterations", 15);
