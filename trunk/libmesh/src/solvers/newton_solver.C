@@ -142,7 +142,7 @@ void NewtonSolver::solve()
       _system.update ();
       RESTART_LOG("solve()", "NewtonSolver");
       // The linear solver may not have fit our constraints exactly
-      _system.get_dof_map().enforce_constraints_exactly(_system);
+      _system.get_dof_map().enforce_constraints_exactly(_system, &linear_solution);
 
       const unsigned int linear_steps = rval.first;
       assert(linear_steps <= max_linear_iterations);
