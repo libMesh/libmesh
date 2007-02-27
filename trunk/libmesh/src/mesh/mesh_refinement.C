@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.55 2006-11-01 23:21:38 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.56 2007-02-27 19:33:41 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -146,6 +146,7 @@ void MeshRefinement::create_parent_error_vector
    Real& parent_error_min,
    Real& parent_error_max)
 {
+  error_per_parent.clear();
   error_per_parent.resize(error_per_cell.size(), 0.);
 
   parent_error_min = std::numeric_limits<double>::max();
@@ -175,7 +176,7 @@ void MeshRefinement::create_parent_error_vector
               if (error_per_cell[parentid])
                 {
                   error_per_parent[parentid] = error_per_cell[parentid];
-                  break;
+                  continue;
                 }
  
               ErrorVectorReal parent_error = 0.;
@@ -187,7 +188,10 @@ void MeshRefinement::create_parent_error_vector
                   // If the parent has grandchildren we won't be able
                   // to coarsen it, so forget it
                   if (!child->active())
-                    break;
+                    {
+                      parent_error = 0.;
+                      break;
+                    }
 
                   // We take the square root of the sum of the
                   // squares, so errors that are Hilbert norms
