@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.14 2007-02-27 16:02:58 jwpeterson Exp $ */
+/* $Id: ex18.C,v 1.15 2007-02-27 19:51:43 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -137,7 +137,7 @@ int main (int argc, char** argv)
     solver.relative_step_tolerance =
       infile("relative_step_tolerance", 1.e-3);
     solver.relative_residual_tolerance =
-      infile("relative_residual_tolerance", 0);
+      infile("relative_residual_tolerance", 0.0);
 
     // And the linear solver options
     solver.max_linear_iterations =
@@ -235,6 +235,7 @@ int main (int argc, char** argv)
                   {
                     mesh_refinement.refine_and_coarsen_elements();
                     equation_systems.reinit();
+                    a_step = max_adaptivesteps;
                     break;
                   }
               }
