@@ -79,10 +79,10 @@ void AdaptiveTimeSolver::solve()
   _system.deltat = old_deltat;
 
   // Find the relative error
-  const Real double_norm = double_solution->l2_norm();
-  const Real single_norm = _system.solution->l2_norm();
+  const Real double_norm = calculate_norm(_system, *double_solution);
+  const Real single_norm = calculate_norm(_system, *_system.solution);
   *double_solution -= *(_system.solution);
-  const Real error_norm = double_solution->l2_norm();
+  const Real error_norm  = calculate_norm(_system, *double_solution);
   Real relative_error = error_norm / _system.deltat /
 			std::max(double_norm, single_norm);
 /*
@@ -163,4 +163,12 @@ bool AdaptiveTimeSolver::side_residual (bool request_jacobian)
 AutoPtr<DiffSolver> & AdaptiveTimeSolver::diff_solver()
 {
   return core_time_solver->diff_solver();
+}
+
+
+
+Real AdaptiveTimeSolver::calculate_norm(System &s,
+                                        NumericVector<Number> &v)
+{
+  return s.calculate_norm(v, component_norm, component_scale);
 }

@@ -1,4 +1,4 @@
-// $Id: adaptive_time_solver.h,v 1.2 2007-02-23 23:31:30 roystgnr Exp $
+// $Id: adaptive_time_solver.h,v 1.3 2007-02-27 00:03:19 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,6 +26,9 @@
 
 // Local includes
 #include "time_solver.h"
+
+// Forward declarations
+class System;
 
 /**
  * This class wraps another TimeSolver derived class, and compares the results
@@ -96,9 +99,26 @@ public:
   virtual AutoPtr<DiffSolver> &diff_solver();
 
   /**
-   * This method is used to take timesteps
+   * This object is used to take timesteps
    */
   AutoPtr<TimeSolver> core_time_solver;
+
+  /**
+   * The error calculations can be done in
+   * H0 (L2) norm with component_norm[var] = 0,
+   * H1 norm with component_norm[var] = 1, 
+   * H2 norm with component_norm[var] = 2, 
+   * or most cheaply in l2 norm by just leaving component_norm empty
+   */
+  std::vector<unsigned char> component_norm;
+
+  /**
+   * If component_norms is non-empty, each variable's contribution to the error
+   * of a system will also be scaled by component_scale[var], unless
+   * component_scale is empty in which case all variables will be weighted
+   * equally.
+   */
+  std::vector<float> component_scale;
 
   /**
    * This tolerance is the target error between double-deltat
@@ -122,6 +142,11 @@ protected:
    * correctly.
    */
   Real last_deltat;
+
+  /**
+   * A helper function to calculate error norms
+   */
+  Real calculate_norm(System &, NumericVector<Number> &);
 };
 
 
