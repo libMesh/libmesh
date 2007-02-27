@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.66 2007-01-20 21:03:06 roystgnr Exp $
+// $Id: elem.C,v 1.67 2007-02-27 16:27:41 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -802,37 +802,46 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
 { 
   switch (et)
     {
-    case EDGE4:
+    case EDGE2:
     case EDGE3:
+    case EDGE4:
       return EDGE2;
+    case TRI3:
     case TRI6:
       return TRI3;
+    case QUAD4:
     case QUAD8:
     case QUAD9:
       return QUAD4;
+    case TET4:
     case TET10:
       return TET4;
+    case HEX8:
     case HEX27:
     case HEX20:
       return HEX8;
+    case PRISM6:
     case PRISM15:
     case PRISM18:
       return PRISM6;
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 
+    case INFQUAD4:
     case INFQUAD6:
       return INFQUAD4;
+    case INFHEX8:
     case INFHEX16:
     case INFHEX18:
       return INFHEX8;
+    case INFPRISM6:
     case INFPRISM12:
       return INFPRISM6;
 
 #endif
 
     default:
-      // first-order or unknown element
+      // unknown element
       return INVALID_ELEM;
     }
 }
