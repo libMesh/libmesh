@@ -61,6 +61,7 @@ void usage(char *progName)
     "    -r <count>                    Globally refine <count> times\n"
 #endif
     "    -p <count>                    Partition into <count> subdomains\n"
+    "    -t (-d 2 only)                Convert to triangles first\n"
     "    -b                            Write the boundary conditions\n"
     "    -B                            Like -b, but with activated MeshData\n"
     "                                  (allows to write .unv file of the\n"
@@ -135,6 +136,7 @@ void usage(char *progName)
     "     .xdr   -- Internal binary mesh format\n"
     "     .xda   -- Same format, but ASCII and human-readable\n"
     "     .mgf   -- MGF binary mesh format\n"
+    "     .fro   -- ACDL's .fro format\n"
     "\n"
     " Direct questions to:\n"
     " benkirk@cfdlab.ae.utexas.edu\n";
@@ -163,6 +165,7 @@ void process_cmd_line(int argc, char **argv,
 		      bool& verbose,
 		      BoundaryMeshWriteMode& write_bndry,
 		      unsigned int& convert_second_order,
+		      bool& triangulate,
 		      bool& addinfelems,
 
 #ifdef ENABLE_INFINITE_ELEMENTS
@@ -183,16 +186,17 @@ void process_cmd_line(int argc, char **argv,
    * initialize these to some values,
    * so that the compiler does not complain
    */
+  triangulate     = false;
   addinfelems     = false;
   x_sym           = y_sym           = z_sym           = false;
 
   char optionStr[] =
-    "i:o:s:d:D:r:p:bB23vlLm?h";
+    "i:o:s:d:D:r:p:tbB23vlLm?h";
 
 #else
 
   char optionStr[] =
-    "i:o:s:d:D:r:p:bB23a::x:y:z:XYZvlLm?h";
+    "i:o:s:d:D:r:p:tbB23a::x:y:z:XYZvlLm?h";
 
 #endif
 
@@ -292,6 +296,15 @@ void process_cmd_line(int argc, char **argv,
 	case 'p':
 	  {
 	    n_subdomains = atoi(optarg);
+	    break;
+	  }
+	  
+	  /**
+	   * Triangulate in 2D
+	   */
+	case 't':
+	  {
+	    triangulate = true;
 	    break;
 	  }
 	  
@@ -462,7 +475,8 @@ int main (int argc, char** argv)
     BoundaryMeshWriteMode write_bndry = BM_DISABLED;
     unsigned int convert_second_order = 0;
     bool addinfelems = false;
-
+    bool triangulate = false;
+    
 #ifdef ENABLE_INFINITE_ELEMENTS
     InfElemBuilder::InfElemOriginValue origin_x(false, 0.);
     InfElemBuilder::InfElemOriginValue origin_y(false, 0.);
@@ -483,7 +497,9 @@ int main (int argc, char** argv)
 		     dim, dist_fact, verbose, write_bndry, 
 		     convert_second_order,
 
-		     addinfelems, 
+		     triangulate,
+
+		     addinfelems,
 
 #ifdef ENABLE_INFINITE_ELEMENTS
 		     origin_x, origin_y, origin_z, 
@@ -601,6 +617,17 @@ int main (int argc, char** argv)
 				     var_names);
 
 
+
+    /**
+     * Maybe Triangulate
+     */
+    if (dim == 2 && triangulate)
+      {
+	if (verbose) std::cout << "...Converting to all triangles...\n";
+		       
+	MeshTools::Modification::all_tri(mesh);
+      }
+    
     /**
      * Compute Shape quality metrics
      */

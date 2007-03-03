@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.76 2007-02-22 21:40:03 roystgnr Exp $
+// $Id: mesh.C,v 1.77 2007-03-03 12:26:19 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -40,6 +40,7 @@
 #include "off_io.h"
 #include "medit_io.h"
 #include "gmsh_io.h"
+#include "fro_io.h"
 #include "xdr_io.h"
 
 #if   defined(HAVE_HASH_MAP)
@@ -865,6 +866,9 @@ void Mesh::write (const std::string& name,
   else if (new_name.rfind(".msh") < new_name.size())
     GmshIO(*this).write (new_name);
     
+  else if (new_name.rfind(".fro") < new_name.size())
+    FroIO(*this).write (new_name);
+    
   else
     {
       std::cerr << " ERROR: Unrecognized file extension: " << name
@@ -880,6 +884,8 @@ void Mesh::write (const std::string& name,
 		<< "     *.unv   -- I-deas Universal format\n"
 		<< "     *.mesh  -- MEdit mesh format\n"
 		<< "     *.poly  -- TetGen ASCII file\n"
+		<< "     *.msh   -- GMSH ASCII file\n"
+		<< "     *.fro   -- ACDL's surface triangulation file\n"
 		<< std::endl
 		<< "\n Exiting without writing output\n";
     }    
