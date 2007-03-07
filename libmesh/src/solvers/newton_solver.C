@@ -16,7 +16,6 @@ NewtonSolver::NewtonSolver (sys_type& s)
     require_residual_reduction(true),
     minsteplength(1e-5),
     linear_tolerance_multiplier(1e-3),
-    minimum_linear_tolerance(TOLERANCE*TOLERANCE),
     linear_solver(LinearSolver<Number>::build())
 {
 }

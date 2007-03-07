@@ -13,6 +13,7 @@ DiffSolver::DiffSolver (sys_type& s)
       absolute_step_tolerance(0.),
       relative_step_tolerance(0.),
       initial_linear_tolerance(1e-12),
+      minimum_linear_tolerance(TOLERANCE*TOLERANCE),
       max_solution_norm(0.),
       max_residual_norm(0.),
       _system (s)
