@@ -1,4 +1,4 @@
-// $Id: diff_solver.h,v 1.8 2006-11-28 17:04:48 roystgnr Exp $
+// $Id: diff_solver.h,v 1.9 2007-03-07 22:55:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -152,6 +152,11 @@ public:
    * the DiffSolver may tighten the tolerance for later solves.
    */
   Real initial_linear_tolerance;
+
+  /**
+   * The tolerance for linear solves is kept above this minimum
+   */
+  Real minimum_linear_tolerance;
 
 protected:
 
