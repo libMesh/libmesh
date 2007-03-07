@@ -170,6 +170,9 @@ void NewtonSolver::solve()
 
       rhs.close();
       current_residual = rhs.l2_norm();
+      if (!quiet)
+        std::cout << "  Current Residual: "
+                  << current_residual << std::endl;
 
 // A potential method for avoiding oversolving?
 /*
@@ -205,7 +208,7 @@ void NewtonSolver::solve()
               steplength /= 2.;
               norm_delta /= 2.;
               if (!quiet)
-                std::cout << "Shrinking Newton step to "
+                std::cout << "  Shrinking Newton step to "
                           << steplength << std::endl;
               newton_iterate.add (steplength, linear_solution);
               newton_iterate.close();
@@ -218,7 +221,7 @@ void NewtonSolver::solve()
               rhs.close();
               current_residual = rhs.l2_norm();
               if (!quiet)
-                std::cout << "Current Residual: "
+                std::cout << "  Current Residual: "
                           << current_residual << std::endl;
 
               if (steplength/2. < minsteplength && 
