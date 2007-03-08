@@ -1,4 +1,4 @@
-// $Id: fe_type.h,v 1.8 2007-02-09 21:35:00 roystgnr Exp $
+// $Id: fe_type.h,v 1.9 2007-03-08 23:32:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -134,6 +134,7 @@ public:
 	    && family == f2.family
 #ifdef ENABLE_INFINITE_ELEMENTS
 	    && radial_order == f2.radial_order
+	    && radial_family == f2.radial_family
 	    && inf_map == f2.inf_map
 #endif // ifdef ENABLE_INFINITE_ELEMENTS
 	    );
@@ -144,18 +145,18 @@ public:
    */
   bool operator< (const FEType &f2) const
   {
-    if (order < f2.order)
-      return true;
-    if (family < f2.family)
-      return true;
+    if (order != f2.order)
+      return (order < f2.order);
+    if (family != f2.family)
+      return (family < f2.family);
 
 #ifdef ENABLE_INFINITE_ELEMENTS
-    if (radial_order < f2.radial_order)
-      return true;
-    if (radial_family < f2.radial_family)
-      return true;
-    if (inf_map < f2.inf_map)
-      return true;
+    if (radial_order != f2.radial_order)
+      return (radial_order < f2.radial_order);
+    if (radial_family != f2.radial_family)
+      return (radial_family < f2.radial_family);
+    if (inf_map != f2.inf_map)
+      return (inf_map < f2.inf_map);
 #endif // ifdef ENABLE_INFINITE_ELEMENTS
     return false;
   }
