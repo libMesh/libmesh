@@ -473,6 +473,17 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               std::cerr << "Relative error " << relative_error
                         << " detected in analytic jacobian on element "
                         << elem->id() << '!' << std::endl;
+
+              unsigned int old_precision = std::cout.precision();
+              std::cout.precision(16);
+	      std::cout << "J_analytic " << elem->id() << " = "
+                        << elem_jacobian << std::endl;
+              analytic_jacobian.add(1.0, elem_jacobian);
+	      std::cout << "J_numeric " << elem->id() << " = "
+                        << analytic_jacobian << std::endl;
+
+              std::cout.precision(old_precision);
+
               error();
             }
         }
@@ -564,6 +575,15 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                             << " detected in analytic jacobian on element "
                             << elem->id()
 			    << ", side " << side << '!' << std::endl;
+
+                  unsigned int old_precision = std::cout.precision();
+                  std::cout.precision(16);
+	          std::cout << "J_analytic " << elem->id() << " = "
+                            << elem_jacobian << std::endl;
+                  analytic_jacobian.add(1.0, elem_jacobian);
+	          std::cout << "J_numeric " << elem->id() << " = "
+                            << analytic_jacobian << std::endl;
+
                   error();
                 }
               // Once we've verified a side, we'll want to add back the
