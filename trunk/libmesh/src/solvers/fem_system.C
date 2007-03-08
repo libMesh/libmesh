@@ -269,8 +269,9 @@ void FEMSystem::init_data ()
       FEType fe_type = this->variable_type(i);
 
       // FIXME - we don't yet handle mixed finite elements from
-      // different families 
-      assert (fe_type.family == hardest_fe_type.family);
+      // different families which require different quadrature rules
+      // assert (fe_type.family == hardest_fe_type.family);
+
       if (fe_type.order > hardest_fe_type.order)
         hardest_fe_type = fe_type;
     }
@@ -583,6 +584,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                   analytic_jacobian.add(1.0, elem_jacobian);
 	          std::cout << "J_numeric " << elem->id() << " = "
                             << analytic_jacobian << std::endl;
+                  std::cout.precision(old_precision);
 
                   error();
                 }
