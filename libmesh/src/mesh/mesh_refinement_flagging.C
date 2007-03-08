@@ -1,4 +1,5 @@
-// $Id: mesh_refinement_flagging.C,v 1.28 2007-03-08 19:36:12 roystgnr Exp $
+
+// $Id: mesh_refinement_flagging.C,v 1.29 2007-03-08 20:21:19 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -325,45 +326,73 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
       refine_count++;
     }
 
-  // Find out what our coarsening and refinement error limits are
-  Real max_coarsenable_error = 0.;
-  if (!sorted_parent_error.empty())
-    max_coarsenable_error = sorted_parent_error.back();
-  if (coarsen_count)
-    {
-      if (coarsen_count < sorted_parent_error.size())
-        max_coarsenable_error = sorted_parent_error[coarsen_count-1];
-    }
-  else
-    if (max_elem_coarsen && max_elem_coarsen < sorted_parent_error.size())
-      max_coarsenable_error = sorted_parent_error[max_elem_coarsen-1];
-
-  Real max_refinable_error = sorted_error.back();
+  unsigned int successful_refine_count = 0;
+  if (refine_count > max_elem_refine)
+    refine_count = max_elem_refine;
   if (refine_count)
     {
+      // Find out what our refinement error limit is
+      Real max_refinable_error = sorted_error.back();
+
       if (refine_count < sorted_error.size())
         max_refinable_error = sorted_error[refine_count-1];
+
+      // Flag elements for refinement
+      elem_it  = _mesh.active_elements_begin();
+      for (; elem_it != elem_end; ++elem_it)
+        {
+          Elem* elem = *elem_it;
+
+          if (max_elem_refine && refine_count &&
+              error_per_cell[elem->id()] >= max_refinable_error &&
+              elem->level() < _max_h_level)
+            {
+              elem->set_refinement_flag(Elem::REFINE);
+              successful_refine_count++;
+              if (successful_refine_count >= refine_count)
+                break;
+            }
+        }
     }
+
+  // If we couldn't refine enough elements, don't coarsen too many
+  // either
+  if (coarsen_count < (refine_count - successful_refine_count))
+    coarsen_count = 0;
   else
-    if (max_elem_refine && max_elem_refine < sorted_parent_error.size())
-      max_refinable_error = sorted_error[max_elem_refine-1];
+    coarsen_count -= (refine_count - successful_refine_count);
 
-  // Finally, let's do the element flagging
-  elem_it  = _mesh.active_elements_begin();
-  for (; elem_it != elem_end; ++elem_it)
+  unsigned int successful_coarsen_count = 0;
+  if (coarsen_count > max_elem_coarsen)
+    coarsen_count = max_elem_coarsen;
+  if (coarsen_count)
     {
-      Elem* elem = *elem_it;
-      Elem* parent = elem->parent();
+      // Find out what our coarsening error limit is
+      Real max_coarsenable_error = 0.;
+      if (!sorted_parent_error.empty())
+        max_coarsenable_error = sorted_parent_error.back();
 
-      if (parent && max_elem_coarsen && coarsen_count &&
-          error_per_parent[parent->id()] &&
-          error_per_parent[parent->id()] <=
-            max_coarsenable_error)
-        elem->set_refinement_flag(Elem::COARSEN);
+      if (coarsen_count < sorted_parent_error.size())
+        max_coarsenable_error = sorted_parent_error[coarsen_count-1];
 
-      if (max_elem_refine && refine_count &&
-          error_per_cell[elem->id()] >= max_refinable_error)
-        elem->set_refinement_flag(Elem::REFINE);
+      // Flag elements for coarsening
+      elem_it  = _mesh.active_elements_begin();
+      for (; elem_it != elem_end; ++elem_it)
+        {
+          Elem* elem = *elem_it;
+          Elem* parent = elem->parent();
+
+          if (parent && max_elem_coarsen && coarsen_count &&
+              error_per_parent[parent->id()] &&
+              error_per_parent[parent->id()] <=
+                max_coarsenable_error)
+            {
+              elem->set_refinement_flag(Elem::COARSEN);
+              successful_coarsen_count++;
+              if (successful_coarsen_count >= coarsen_count * twotodim)
+                break;
+            }
+        }
     }
 
   // Return true if we've done all the AMR/C we can
