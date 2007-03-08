@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_flagging.C,v 1.27 2006-11-30 04:13:08 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.28 2007-03-08 19:36:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -196,7 +196,8 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
       const unsigned int elem_number = elem->id();
       const float        elem_error  = error_per_cell_in[elem_number];
 
-      if (elem_error > local_refinement_tolerance)
+      if (elem_error > local_refinement_tolerance &&
+          elem->level() < _max_h_level)
         elem->set_refinement_flag(Elem::REFINE);
 
       if (!_coarsen_by_parents && elem_error <
