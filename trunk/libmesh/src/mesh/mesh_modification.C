@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.26 2007-02-15 17:07:59 jwpeterson Exp $
+// $Id: mesh_modification.C,v 1.27 2007-03-09 16:08:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,7 @@
 #include "face_tri6.h"
 #include "libmesh_logging.h"
 #include "boundary_info.h"
+#include "string_to_enum.h"
 
 
 // ------------------------------------------------------------
@@ -640,6 +641,10 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	
 	switch (etype)
 	  {
+          // No need to split elements that are already triangles
+          case TRI3:
+          case TRI6:
+            continue;
 	  case QUAD4:
 	    {
 	      split_elem = true;
@@ -782,8 +787,9 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	  
 	  default:
 	    {
-	      std::cerr << "Warning, encountered 3D element in "
-			<< "MeshTools::Modification::all_tri(), hope that's OK..."
+	      std::cerr << "Warning, encountered non-2D element "
+                        << Utility::enum_to_string<ElemType>(etype)
+			<< " in MeshTools::Modification::all_tri(), hope that's OK..."
 			<< std::endl;
 	      
 	      // If not one of the QUAD* types, the Elem must
