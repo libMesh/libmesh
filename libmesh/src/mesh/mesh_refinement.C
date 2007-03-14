@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.56 2007-02-27 19:33:41 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.57 2007-03-14 22:02:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -147,7 +147,7 @@ void MeshRefinement::create_parent_error_vector
    Real& parent_error_max)
 {
   error_per_parent.clear();
-  error_per_parent.resize(error_per_cell.size(), 0.);
+  error_per_parent.resize(error_per_cell.size(), -1.);
 
   parent_error_min = std::numeric_limits<double>::max();
   parent_error_max = 0.;
@@ -167,9 +167,9 @@ void MeshRefinement::create_parent_error_vector
           const unsigned int parentid  = parent->id();
           assert (parentid < error_per_parent.size());
 
-          // If we haven't already calculate the parent's total
+          // If we haven't already calculated the parent's total
           // error, do so now
-          if (!error_per_parent[parentid])
+          if (error_per_parent[parentid] == -1.)
             {
               // The error estimator might have already given us an
               // estimate on the coarsenable parent elements
@@ -189,7 +189,7 @@ void MeshRefinement::create_parent_error_vector
                   // to coarsen it, so forget it
                   if (!child->active())
                     {
-                      parent_error = 0.;
+                      parent_error = -1.;
                       break;
                     }
 
@@ -199,6 +199,11 @@ void MeshRefinement::create_parent_error_vector
                   parent_error += (error_per_cell[childid] *
                                    error_per_cell[childid]);
                 }
+
+              // If this element is uncoarsenable, just skip it
+              if (parent_error < 0)
+                continue;
+
               parent_error = sqrt(parent_error);
               error_per_parent[parentid] = parent_error;
 
