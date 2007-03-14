@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.37 2006-11-09 18:40:58 roystgnr Exp $
+// $Id: system_projection.C,v 1.38 2007-03-14 20:45:49 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -855,6 +855,11 @@ void System::project_vector (Number fptr(const Point& p,
                 for (unsigned int i=0; i != side_dofs.size(); ++i)
                   if (!dof_is_fixed[side_dofs[i]])
                     free_dof[free_dofs++] = i;
+
+                // There may be nothing to project
+                if (!free_dofs)
+                  continue;
+
 	        Ke.resize (free_dofs, free_dofs); Ke.zero();
 	        Fe.resize (free_dofs); Fe.zero();
                 // The new edge coefficients
@@ -946,6 +951,11 @@ void System::project_vector (Number fptr(const Point& p,
                 for (unsigned int i=0; i != side_dofs.size(); ++i)
                   if (!dof_is_fixed[side_dofs[i]])
                     free_dof[free_dofs++] = i;
+
+                // There may be nothing to project
+                if (!free_dofs)
+                  continue;
+             
 	        Ke.resize (free_dofs, free_dofs); Ke.zero();
 	        Fe.resize (free_dofs); Fe.zero();
                 // The new side coefficients
@@ -1032,6 +1042,11 @@ void System::project_vector (Number fptr(const Point& p,
           for (unsigned int i=0; i != n_dofs; ++i)
             if (!dof_is_fixed[i])
               free_dof[free_dofs++] = i;
+
+          // There may be nothing to project
+          if (free_dofs)
+            {
+             
 	  Ke.resize (free_dofs, free_dofs); Ke.zero();
 	  Fe.resize (free_dofs); Fe.zero();
           // The new interior coefficients
@@ -1103,6 +1118,8 @@ void System::project_vector (Number fptr(const Point& p,
               dof_is_fixed[free_dof[i]] = true;
             }
 
+            } // if there are free interior dofs
+
           // Make sure every DoF got reached!
 	  for (unsigned int i=0; i != n_dofs; ++i)
             assert(dof_is_fixed[i]);
@@ -1112,9 +1129,14 @@ void System::project_vector (Number fptr(const Point& p,
 	    last  = new_vector.last_local_index();
 	  
           for (unsigned int i = 0; i < n_dofs; i++) 
-	    if (Ue(i) != 0.)
+// We may be projecting a new zero value onto
+// an old nonzero approximation - RHS
+//	    if (Ue(i) != 0.)
 	      if ((dof_indices[i] >= first) &&
-		  (dof_indices[i] <  last)) new_vector.set(dof_indices[i], Ue(i));
+		  (dof_indices[i] <  last))
+                {
+                  new_vector.set(dof_indices[i], Ue(i));
+                }
         }  // end elem loop
     } // end variables loop
 
