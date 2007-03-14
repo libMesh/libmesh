@@ -1,5 +1,5 @@
 
-// $Id: mesh_refinement_flagging.C,v 1.29 2007-03-08 20:21:19 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.30 2007-03-14 22:02:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -140,7 +140,8 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
           if (parent)
             {
               const unsigned int parentid  = parent->id();
-              if (error_per_parent[parentid] <= parent_cutoff)
+              if (error_per_parent[parentid] >= 0. &&
+                  error_per_parent[parentid] <= parent_cutoff)
 	        elem->set_refinement_flag(Elem::COARSEN);
             }
         }
@@ -208,7 +209,7 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
       if (_coarsen_by_parents && parent)
         {
           float parent_error = error_per_parent[parent->id()];
-          if (parent_error)
+          if (parent_error >= 0.)
             {
               const Real parent_coarsening_tolerance =
                 std::sqrt(parent->n_children() *
@@ -282,9 +283,10 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   sorted_parent_error = error_per_parent;
   std::sort (sorted_parent_error.begin(), sorted_parent_error.end());
 
-  // All the other error values will be 0., so get rid of them.
+  // create_parent_error_vector sets values for non-parents and
+  // non-coarsenable parents to -1.  Get rid of them.
   sorted_parent_error.erase (remove(sorted_parent_error.begin(),
-				    sorted_parent_error.end(), 0.),
+				    sorted_parent_error.end(), -1.),
                              sorted_parent_error.end());
   
   // Keep track of how many elements we plan to coarsen & refine
@@ -383,7 +385,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
           Elem* parent = elem->parent();
 
           if (parent && max_elem_coarsen && coarsen_count &&
-              error_per_parent[parent->id()] &&
+              error_per_parent[parent->id()] >= 0. &&
               error_per_parent[parent->id()] <=
                 max_coarsenable_error)
             {
@@ -396,8 +398,8 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
     }
 
   // Return true if we've done all the AMR/C we can
-  if (coarsen_count < max_elem_coarsen && 
-      refine_count < max_elem_refine)
+  if (!successful_coarsen_count && 
+      !successful_refine_count)
     return true;
   // And false if there may still be more to do.
   return false;

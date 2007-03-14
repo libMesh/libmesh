@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.22 2006-10-12 22:09:32 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.23 2007-03-14 22:02:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -501,7 +501,9 @@ private:
   // Utility algorithms
 
   /**
-   * Calculates the error on all coarsenable parents
+   * Calculates the error on all coarsenable parents.
+   * error_per_parent[parent_id] stores this error if parent_id corresponds
+   * to a coarsenable parent, and stores -1 otherwise.
    */
   void create_parent_error_vector (const ErrorVector& error_per_cell,
 				   ErrorVector& error_per_parent,
