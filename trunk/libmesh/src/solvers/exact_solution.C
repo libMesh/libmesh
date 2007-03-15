@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.29 2007-02-13 17:36:10 roystgnr Exp $
+// $Id: exact_solution.C,v 1.30 2007-03-15 20:22:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,7 @@
 #include "fe_interface.h"
 #include "mesh.h"
 #include "mesh_function.h"
+#include "numeric_vector.h"
 #include "quadrature.h"
 #include "tensor_value.h"
 #include "vector_value.h"
@@ -281,15 +282,23 @@ void ExactSolution::_compute_error(const std::string& sys_name,
     _equation_systems_fine->get_system(sys_name) :
     _equation_systems.get_system (sys_name);
 
-  // Prepare a MeshFunction of the coarse system if we need one
+  // Prepare a global solution and a MeshFunction of the coarse system if we need one
   AutoPtr<MeshFunction> coarse_values;
+  AutoPtr<NumericVector<Number> > comparison_soln = NumericVector<Number>::build();
   if (_equation_systems_fine)
     {
       const System& comparison_system
 	= _equation_systems.get_system(sys_name);
+
+      std::vector<Number> global_soln;
+      comparison_system.update_global_solution(global_soln);
+      comparison_soln->init(comparison_system.solution->size(),
+                            comparison_system.solution->size());
+      (*comparison_soln) = global_soln;
+
       coarse_values = AutoPtr<MeshFunction>
 	(new MeshFunction(_equation_systems,
-			  *(comparison_system.current_local_solution),
+			  *comparison_soln,
 			  comparison_system.get_dof_map(),
 			  comparison_system.variable_number(unknown_name)));
       coarse_values->init();
