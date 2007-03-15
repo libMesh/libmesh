@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.9 2007-01-23 20:21:09 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.10 2007-03-15 20:38:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -211,7 +211,11 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       
       // Copy the projected coarse grid solutions, which will be
       // overwritten by solve()
-      projected_solutions[i] = system.solution->clone().release();
+//      projected_solutions[i] = system.solution->clone().release();
+      projected_solutions[i] = NumericVector<Number>::build().release();
+      projected_solutions[i]->init(system.solution->size(), system.solution->size());
+      system.solution->localize(*projected_solutions[i],
+                                system.get_dof_map().get_send_list());
     }
 
   // Get the uniformly refined solution.
