@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.31 2007-02-27 00:02:46 roystgnr Exp $
+// $Id: system.C,v 1.32 2007-03-15 20:22:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -644,6 +644,11 @@ Real System::calculate_norm(NumericVector<Number>& v,
   // Zero the norm before summation
   Real v_norm = 0.;
 
+  // Localize the potentially parallel vector
+  AutoPtr<NumericVector<Number> > local_v = NumericVector<Number>::build();
+  local_v->init(v.size(), v.size());
+  v.localize (*local_v, _dof_map->get_send_list()); 
+
   unsigned int dim = this->get_mesh().mesh_dimension();
 
   // Loop over all variables
@@ -697,14 +702,14 @@ Real System::calculate_norm(NumericVector<Number>& v,
             {
               Number u_h = 0.;
               for (unsigned int i=0; i != n_sf; ++i)
-                u_h += phi[i][qp] * v(dof_indices[i]);
+                u_h += phi[i][qp] * (*local_v)(dof_indices[i]);
               v_norm += component_scale[var] * JxW[qp] * u_h * u_h;
 
               if (component_norm[var] > 0)
                 {
                   Gradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
-                    grad_u_h.add_scaled((*dphi)[i][qp], v(dof_indices[i]));
+                    grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
                   v_norm += component_scale[var] * JxW[qp] *
                             (grad_u_h * grad_u_h);
                 }
@@ -714,7 +719,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
                 {
                   Tensor hess_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
-                    hess_u_h.add_scaled((*d2phi)[i][qp], v(dof_indices[i]));
+                    hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
                   v_norm += component_scale[var] * JxW[qp] *
                             hess_u_h.contract(hess_u_h);
                 }
@@ -726,8 +731,8 @@ Real System::calculate_norm(NumericVector<Number>& v,
 #ifdef HAVE_MPI
   if (libMesh::n_processors() > 1)
     {
-      Real local_v_norm = v_norm;
-      MPI_Allreduce (&local_v_norm,
+      Real my_v_norm = v_norm;
+      MPI_Allreduce (&my_v_norm,
                      &v_norm,
                      1,
                      MPI_REAL,
