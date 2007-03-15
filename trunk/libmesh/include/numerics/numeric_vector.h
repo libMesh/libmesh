@@ -1,4 +1,4 @@
-// $Id: numeric_vector.h,v 1.14 2006-11-10 20:20:14 roystgnr Exp $
+// $Id: numeric_vector.h,v 1.15 2007-03-15 20:04:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -156,17 +156,17 @@ public:
   /**
    * \f$U(0-N) = s\f$: fill all components.
    */
-  virtual NumericVector<T> & operator= (const T s);
+  virtual NumericVector<T> & operator= (const T s) = 0;
   
   /**
    *  \f$U = V\f$: copy all components.
    */
-  virtual NumericVector<T> & operator= (const NumericVector<T> &V);
+  virtual NumericVector<T> & operator= (const NumericVector<T> &V) = 0;
 
   /**
    *  \f$U = V\f$: copy all components.
    */
-  virtual NumericVector<T> & operator= (const std::vector<T> &v);
+  virtual NumericVector<T> & operator= (const std::vector<T> &v) = 0;
 
   /**
    * @returns the minimum element in the vector.
@@ -502,6 +502,8 @@ NumericVector<T>::~NumericVector ()
 
 
 
+// These should be pure virtual, not bugs waiting to happen - RHS
+/*
 template <typename T>
 inline
 NumericVector<T> & NumericVector<T>::operator= (const T) 
@@ -532,6 +534,7 @@ NumericVector<T> & NumericVector<T>::operator= (const std::vector<T>&)
 
   return *this;
 }
+*/
 
 
 
