@@ -1,4 +1,4 @@
-// $Id: inf_elem_builder.C,v 1.8 2005-06-11 03:59:18 jwpeterson Exp $
+// $Id: inf_elem_builder.C,v 1.9 2007-03-19 20:12:41 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,8 +43,8 @@ const Point InfElemBuilder::build_inf_elem(bool be_verbose)
   // works only if the mesh has no symmetry planes.
   const MeshTools::BoundingBox b_box = MeshTools::bounding_box(_mesh);
   Point origin = (b_box.first + b_box.second) / 2.;
-    
-  if (be_verbose)
+
+  if (be_verbose && libMesh::processor_id() == 0)
     {
 #ifdef DEBUG
       std::cout << " Determined origin for Infinite Elements:" 
