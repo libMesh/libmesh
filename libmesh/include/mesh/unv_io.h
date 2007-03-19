@@ -1,4 +1,4 @@
-// $Id: unv_io.h,v 1.8 2005-09-30 19:55:22 benkirk Exp $
+// $Id: unv_io.h,v 1.9 2007-03-19 16:58:19 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -324,7 +324,7 @@ Real UNVIO::D_to_e (std::string& number) const
   // otherwise HP aCC may crash!
   const int position = number.find("D",6);
 #else
-  const unsigned int position = number.find("D",6);
+  const std::string::size_type position = number.find("D",6);
 #endif
 
   assert (position != std::string::npos);
