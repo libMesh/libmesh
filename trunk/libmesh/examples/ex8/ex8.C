@@ -1,4 +1,4 @@
-/* $Id: ex8.C,v 1.18 2005-06-11 03:59:17 jwpeterson Exp $ */
+/* $Id: ex8.C,v 1.19 2007-03-19 19:05:08 roystgnr Exp $ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
@@ -309,11 +309,18 @@ int main (int argc, char** argv)
 	// Update the p, v and a.
 	t_system.update_u_v_a();
 
+	// dof_no may not be local in parallel runs, so we may need a
+        // global displacement vector
+        NumericVector<Number> &displacement
+          = t_system.get_vector("displacement");
+        std::vector<Number> global_displacement(displacement.size());
+        displacement.localize(global_displacement);
+
 	// Write nodal results to file.  The results can then
 	// be viewed with e.g. gnuplot (run gnuplot and type
 	// 'plot "pressure_node.res" with lines' in the command line)
-	res_out << t_time << "\t"
-		<< t_system.get_vector("displacement")(dof_no)
+        res_out << t_time << "\t"
+		<< global_displacement[dof_no]
 		<< std::endl;
       }
   }
