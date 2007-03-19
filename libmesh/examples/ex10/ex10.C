@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.29 2006-07-21 01:47:05 roystgnr Exp $ */
+/* $Id: ex10.C,v 1.30 2007-03-19 20:30:24 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -118,34 +118,23 @@ int main (int argc, char** argv)
 
   {    
 
-    // Check for proper calling arguments.
-    if (argc > 6)
-    {
-      // Use commandline parameter to specify if we are to
-      // read in an initial solution or generate it ourself
-      std::cerr << "Usage:\n"
-        <<"\t " << argv[0] << " -init_timestep 0\n"
-        << "OR\n"
-        <<"\t " << argv[0] << " -read_solution -init_timestep 26\n"
-        << std::endl;
-
-      // This handy function will print the file name, line number,
-      // and then abort.  Currrently the library does not use C++
-      // exception handling.
-      error();
-    }
-
     // Brief message to the user regarding the program name
     // and command line arguments.
-    else 
-    {
-      std::cout << "Running " << argv[0];
 
-      for (int i=1; i<argc; i++)
-        std::cout << " " << argv[i];
+    // Use commandline parameter to specify if we are to
+    // read in an initial solution or generate it ourself
+    std::cout << "Usage:\n"
+      <<"\t " << argv[0] << " -init_timestep 0\n"
+      << "OR\n"
+      <<"\t " << argv[0] << " -read_solution -init_timestep 26\n"
+      << std::endl;
 
-      std::cout << std::endl << std::endl;
-    }
+    std::cout << "Running: " << argv[0];
+
+    for (int i=1; i<argc; i++)
+      std::cout << " " << argv[i];
+
+    std::cout << std::endl << std::endl;
 
     // Create a GetPot object to parse the command line
     GetPot command_line (argc, argv);
@@ -173,6 +162,10 @@ int main (int argc, char** argv)
     else
     {
       std::cerr << "ERROR: Initial timestep not specified\n" << std::endl;
+
+      // This handy function will print the file name, line number,
+      // and then abort.  Currrently the library does not use C++
+      // exception handling.
       error();
     }
 
