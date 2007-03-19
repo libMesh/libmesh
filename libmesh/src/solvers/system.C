@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.32 2007-03-15 20:22:53 roystgnr Exp $
+// $Id: system.C,v 1.33 2007-03-19 13:08:24 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -668,11 +668,11 @@ Real System::calculate_norm(NumericVector<Number>& v,
       const std::vector<Real>&               JxW = fe->get_JxW();
       const std::vector<std::vector<Real> >& phi = fe->get_phi();
 
-      const std::vector<std::vector<RealGradient> >* dphi;
+      const std::vector<std::vector<RealGradient> >* dphi = NULL;
       if (component_norm[var] > 0)
         dphi = &(fe->get_dphi());
 #ifdef ENABLE_SECOND_DERIVATIVES
-      const std::vector<std::vector<RealTensor> >*   d2phi;
+      const std::vector<std::vector<RealTensor> >*   d2phi = NULL;
       if (component_norm[var] > 1)
         d2phi = &(fe->get_d2phi());
 #endif
