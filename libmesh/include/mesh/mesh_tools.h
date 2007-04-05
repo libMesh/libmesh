@@ -1,4 +1,4 @@
-// $Id: mesh_tools.h,v 1.5 2005-09-30 19:55:22 benkirk Exp $
+// $Id: mesh_tools.h,v 1.6 2007-04-05 18:49:00 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -46,7 +46,7 @@ class Elem;
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 
@@ -199,6 +199,22 @@ namespace MeshTools
    */
    unsigned int n_elem (MeshBase::element_iterator& begin,
                         MeshBase::element_iterator& end);
+
+/**
+    * Given a mesh and a node in the mesh, the vector will be filled with
+    * every node directly attached to the given one.
+    */
+   void find_nodal_neighbors(const MeshBase& mesh, const Node& n, 
+                             std::vector<std::vector<const Elem*> >& nodes_to_elem_map, 
+                             std::vector<const Node*>& neighbors);
+   
+   /**
+    * Given a mesh hanging_nodes will be filled with an associative array keyed off the
+    * global id of all the hanging nodes in the mesh.  It will hold an array of the 
+    * parents of the node (meaning the two nodes to either side of it that make up
+    * the side the hanging node is on.
+    */
+   void find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<unsigned int, std::vector<unsigned int> >& hanging_nodes);
 
 } // end namespace MeshTools
 

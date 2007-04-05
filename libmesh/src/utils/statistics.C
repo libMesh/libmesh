@@ -1,4 +1,4 @@
-// $Id: statistics.C,v 1.17 2006-06-13 20:39:32 roystgnr Exp $
+// $Id: statistics.C,v 1.18 2007-04-05 18:49:01 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -165,6 +165,17 @@ Real StatisticsVector<T>::variance(const Real mean) const
 }
 
 
+template <typename T>
+    void StatisticsVector<T>::normalize()
+{
+  const unsigned int n   = this->size();
+  const Real max = this->maximum();
+  
+  for (unsigned int i=0; i<n; i++)
+  {
+    (*this)[i] = (*this)[i] / max;
+  }
+}
 
 
 template <typename T>
