@@ -1,4 +1,4 @@
-// $Id: statistics.h,v 1.6 2006-06-13 20:39:32 roystgnr Exp $
+// $Id: statistics.h,v 1.7 2007-04-05 18:49:00 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -170,6 +170,12 @@ class StatisticsVector : public std::vector<T>
   virtual Real stddev(const Real mean) const
   { return std::sqrt(this->variance(mean)); }
 
+  /**
+   * Divides all entries by the largest entry and
+   * stores the result
+   */
+  void normalize();
+  
   /**
    * Computes and returns a histogram with n_bins bins for the data
    * set.  For simplicity, the bins are assumed to be of uniform size.

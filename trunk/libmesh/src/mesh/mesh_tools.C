@@ -1,4 +1,4 @@
-// $Id: mesh_tools.C,v 1.4 2005-08-15 21:30:38 knezed01 Exp $
+// $Id: mesh_tools.C,v 1.5 2007-04-05 18:49:00 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -338,3 +338,183 @@ unsigned int MeshTools::n_elem (MeshBase::element_iterator& begin,
   return std::distance(begin, end);
 }
 
+void MeshTools::find_nodal_neighbors(const MeshBase& mesh, const Node& n, 
+                                     std::vector<std::vector<const Elem*> >& nodes_to_elem_map, 
+                                     std::vector<const Node*>& neighbors)
+{
+  unsigned int global_id = n.id();
+  
+  //Iterators to iterate through the elements that include this node
+  std::vector<const Elem*>::const_iterator el     = nodes_to_elem_map[global_id].begin();
+  std::vector<const Elem*>::const_iterator end_el = nodes_to_elem_map[global_id].end();
+  
+  unsigned int n_ed=0; //Number of edges on the element
+  unsigned int ed=0; //Current edge
+  unsigned int l_n=0; //Local node number
+  unsigned int o_n=0; //Other node on this edge
+  
+  //Assume we find a edge... then prove ourselves wrong...
+  bool found_edge=true;
+  
+  Node * node_to_save = NULL;
+  
+  //Look through the elements that contain this node
+  //find the local node id... then find the side that
+  //node lives on in the element
+  //next, look for the _other_ node on that side
+  //That other node is a "nodal_neighbor"... save it
+  for(;el != end_el;el++)
+  {
+    //We only care about active elements...
+    if((*el)->active())
+    {
+      n_ed=(*el)->n_edges();
+      
+      //Find the local node id
+      while(global_id != (*el)->node(l_n++)) { }
+      l_n--; //Hmmm... take the last one back off
+      
+      while(ed<n_ed)
+      {
+        
+        //Find the edge the node is on
+        while(found_edge && !(*el)->is_node_on_edge(l_n,ed++))
+        {
+          //This only happens if all the edges have already been found
+          if(ed>=n_ed)
+            found_edge=false;
+        }
+        
+        //Did we find one?
+        if(found_edge)
+        {
+          ed--; //Take the last one back off again
+          
+          //Now find the other node on that edge
+          while(!(*el)->is_node_on_edge(o_n++,ed) || global_id==(*el)->node(o_n-1)) { }
+          o_n--;
+          
+          //We've found one!  Save it..
+          node_to_save=(*el)->get_node(o_n);
+          
+          //Search to see if we've already found this one
+          std::vector<const Node*>::const_iterator result = std::find(neighbors.begin(),neighbors.end(),node_to_save);
+          
+          //If we didn't find it and add it to the vector
+          if(result == neighbors.end())
+            neighbors.push_back(node_to_save);
+        }
+        
+        //Reset to look for another
+        o_n=0;
+        
+        //Keep looking for edges, node may be on more than one edge
+        ed++;
+      }
+      
+      //Reset to get ready for the next element
+      l_n=ed=0;
+      found_edge=true;
+    }
+  }
+}
+
+void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<unsigned int, std::vector<unsigned int> >& hanging_nodes)
+{
+  MeshBase::const_element_iterator it  = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
+  
+  //Loop through all the elements
+  for (; it != end; ++it)
+  {
+    //Save it off for easier access
+    const Elem* elem = (*it);
+    
+    //Right now this only works for quad4's
+    //assert(elem->type() == libMeshEnums::QUAD4);
+    if(elem->type() == libMeshEnums::QUAD4)
+    {
+      //Loop over the sides looking for sides that have hanging nodes
+      //This code is inspired by compute_proj_constraints()
+      for (unsigned int s=0; s<elem->n_sides(); s++)
+      {
+        //If not a boundary node
+        if (elem->neighbor(s) != NULL)
+        {
+          // Get pointers to the element's neighbor.
+          const Elem* neigh = elem->neighbor(s);
+          
+          //Is there a coarser element next to this one?
+          if (neigh->level() < elem->level()) 
+          {
+            const Elem *ancestor = elem;
+            while (neigh->level() < ancestor->level())
+              ancestor = ancestor->parent();
+            unsigned int s_neigh = neigh->which_neighbor_am_i(ancestor);
+            
+            //Couple of helper uints...
+            unsigned int node1=0;
+            unsigned int node2=0;
+            unsigned int hanging_node=0;
+                
+            bool found_in_neighbor = false;
+                
+            //Find the two vertices that make up this side
+            while(!elem->is_node_on_side(node1++,s)) { }
+            node1--;
+                
+                //Start looking for the second one with the next node
+            node2=node1+1;
+            
+            //Find the other one
+            while(!elem->is_node_on_side(node2++,s)) { }
+            node2--;
+  
+                //Pull out their global ids:
+            node1 = elem->node(node1);
+            node2 = elem->node(node2);
+            
+            //Now find which node is present in the neighbor
+            //FIXME This assumes a level one rule!
+            //The _other_ one is the hanging node
+            
+            //First look for the first one
+            //FIXME could be streamlined a bit
+            for(int n=0;n<neigh->n_sides();n++)
+            {
+              if(neigh->node(n) == node1)
+                found_in_neighbor=true;
+            }
+                
+                
+            if(!found_in_neighbor)
+              hanging_node=node1;
+            else //If it wasn't node1 then it must be node2!
+              hanging_node=node2;
+            
+            //Reset these for reuse
+            node1=0;
+            node2=0;
+            
+            //Find the first node that makes up the side in the neighbor (these should be the parent nodes)
+            while(!neigh->is_node_on_side(node1++,s_neigh)) { }
+            node1--;
+                
+            node2=node1+1;
+            
+            //Find the second node...
+            while(!neigh->is_node_on_side(node2++,s_neigh)) { }
+            node2--;
+            
+            //Save them if we haven't already found the parents for this one
+            if(hanging_nodes[hanging_node].size()<2)
+            {
+              hanging_nodes[hanging_node].push_back(neigh->node(node1));
+              hanging_nodes[hanging_node].push_back(neigh->node(node2));
+            }
+          }
+        }
+      }
+    }
+  }
+}
