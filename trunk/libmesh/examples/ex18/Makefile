@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2007-01-24 20:26:45 roystgnr Exp $
+# $Id: Makefile,v 1.7 2007-04-05 19:22:12 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -55,48 +55,14 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(target)
+	@echo "* Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) -pc_factor_zeropivot 0
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target)
-	@echo "***************************************************************"
-
-ilu2: $(target)
-	@echo "***************************************************************"
-	@echo "* Running Example " $(target) -pc_factor_levels 2 -pc_factor_zeropivot 0
-	@echo "***************************************************************"
-	@echo " "
-	@$(target) -pc_factor_levels 2 -pc_factor_zeropivot 0
+	@$(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)
 	@echo "***************************************************************"
-
-ilu4: $(target)
-	@echo "***************************************************************"
-	@echo "* Running Example " $(target) -pc_factor_levels 4 -pc_factor_zeropivot 0
-	@echo "***************************************************************"
-	@echo " "
-	@$(target) -pc_factor_levels 4 -pc_factor_zeropivot 0
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target)
-	@echo "***************************************************************"
-
-jacobi: $(target)
-	@echo "***************************************************************"
-	@echo "* Running Example " $(target) -pc_type jacobi
-	@echo "***************************************************************"
-	@echo " "
-	@$(target) -pc_type jacobi
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target)
-	@echo "***************************************************************"
-
 
 # include the dependency list
 include .depend

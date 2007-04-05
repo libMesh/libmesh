@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2007-01-24 20:26:45 roystgnr Exp $
+# $Id: Makefile,v 1.8 2007-04-05 19:22:11 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -55,48 +55,14 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(target) -ksp_type bcgs -pc_type jacobi
+	@echo "* Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) -ksp_type bcgs -pc_type jacobi
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target)
-	@echo "***************************************************************"
-
-tfqmr: $(target)
-	@echo "***************************************************************"
-	@echo "* Running Example " $(target) -ksp_type tfqmr
-	@echo "***************************************************************"
-	@echo " "
-	@$(target) -ksp_type tfqmr -pc_factor_zeropivot 0
+	@$(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(target)
 	@echo "***************************************************************"
-
-plain: $(target)
-	@echo "***************************************************************"
-	@echo "* Running Example " $(target)
-	@echo "***************************************************************"
-	@echo " "
-	@$(target)
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target)
-	@echo "***************************************************************"
-
-lu: $(target)
-	@echo "***************************************************************"
-	@echo "* Running Example " $(target)
-	@echo "***************************************************************"
-	@echo " "
-	@$(target) -pc_type lu -pc_factor_zeropivot 0
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target)
-	@echo "***************************************************************"
-
 
 # include the dependency list
 include .depend

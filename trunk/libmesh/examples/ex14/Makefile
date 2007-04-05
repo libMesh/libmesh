@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.11 2007-01-24 20:26:45 roystgnr Exp $
+# $Id: Makefile,v 1.12 2007-04-05 19:22:11 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -32,10 +32,10 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 #
 target  := ./ex14-$(METHOD)
 
-ifeq ($(petsc-version), 2.3.0)
+#ifeq ($(petsc-version), 2.3.0)
 #args := -pc_type jacobi #ILU detects 0 pivot in petsc 2.3.0
-args := -pc_type ilu -pc_ilu_levels 4
-endif
+#args := -pc_type ilu -pc_ilu_levels 4
+#endif
 
 all:: $(target)
 
@@ -59,26 +59,14 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(target) $(args)
+	@echo "* Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) $(args) -pc_factor_zeropivot 0
+	@$(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target) $(args)
+	@echo "* Done Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
-
-jacobi: $(target)
-	@echo "***************************************************************"
-	@echo "* Running Example " $(target) $(args)
-	@echo "***************************************************************"
-	@echo " "
-	@$(target) $(args) -pc_type jacobi
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target) $(args)
-	@echo "***************************************************************"
-
 
 # include the dependency list
 include .depend

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.16 2007-01-24 20:26:46 roystgnr Exp $
+# $Id: Makefile,v 1.17 2007-04-05 19:22:12 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -54,13 +54,13 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(target)
+	@echo "* Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target)
+	@$(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target)
+	@echo "* Done Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 
 

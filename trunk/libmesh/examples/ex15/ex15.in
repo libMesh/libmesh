@@ -1,5 +1,5 @@
 # Maximum number of refinement steps
-max_r_steps = 5
+max_r_steps = 4
 
 # Maximum refinement level for an element.
 max_r_level = 8
