@@ -1,4 +1,4 @@
-/* $Id: ex15.C,v 1.14 2007-02-08 23:17:05 roystgnr Exp $ */
+/* $Id: ex15.C,v 1.15 2007-04-05 19:22:11 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -181,9 +181,11 @@ int main(int argc, char** argv)
 	<< "e = [\n";
     
     // Set up the dimension-dependent coarse mesh and solution
+    // We build more than one cell so as to avoid bugs on fewer than 
+    // 4 processors in 2D or 8 in 3D.
     if (dim == 2)
       {
-        MeshTools::Generation::build_square(mesh, 1, 1);
+        MeshTools::Generation::build_square(mesh, 2, 2);
         exact_solution = &exact_2D_solution;
         exact_derivative = &exact_2D_derivative;
         exact_hessian = &exact_2D_hessian;
@@ -191,7 +193,7 @@ int main(int argc, char** argv)
       }
     else if (dim == 3)
       {
-        MeshTools::Generation::build_cube(mesh, 1, 1, 1);
+        MeshTools::Generation::build_cube(mesh, 2, 2, 2);
         exact_solution = &exact_3D_solution;
         exact_derivative = &exact_3D_derivative;
         exact_hessian = &exact_3D_hessian;
@@ -748,7 +750,7 @@ void assemble_biharmonic(EquationSystems& es,
               // The XYZ locations (in physical space) of the
               // quadrature points on the face.  This is where
               // we will interpolate the boundary value function.
-              const std::vector<Point >& qface_point = fe_face->get_xyz();
+              const std::vector<Point>& qface_point = fe_face->get_xyz();
 
 	      const std::vector<Point>& face_normals =
 			      fe_face->get_normals();

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.10 2007-01-24 20:26:45 roystgnr Exp $
+# $Id: Makefile,v 1.11 2007-04-05 19:22:11 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -57,14 +57,14 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(target)
+	@echo "* Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) -ksp_type tfqmr
+	@$(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@#./ex13_nonlinear -snes_ls cubic -snes_max_it 10 -ksp_rtol 1.e-3 -ksp_max_it 50 -ksp_xmonitor -ksp_gmres_restart 25 -snes_mf_operator -snes_view 
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target)
+	@echo "* Done Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 
 

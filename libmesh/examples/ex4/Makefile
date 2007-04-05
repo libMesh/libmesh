@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.20 2007-01-24 20:26:46 roystgnr Exp $
+# $Id: Makefile,v 1.21 2007-04-05 19:22:12 roystgnr Exp $
 
 
 # The location of the mesh library
@@ -56,15 +56,15 @@ distclean:
 # Warning, the 3D problem may be extremely slow if you are running in debug mode.
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(target)
+	@echo "* Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(target) -d 1 -n 20
-	@$(target) -d 2 -n 15
-	@$(target) -d 3 -n 6
+	@$(LIBMESHRUN) $(target) -d 1 -n 20 $(LIBMESHOPTIONS)
+	@$(LIBMESHRUN) $(target) -d 2 -n 15 $(LIBMESHOPTIONS)
+	@$(LIBMESHRUN) $(target) -d 3 -n 6 $(LIBMESHOPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target)
+	@echo "* Done Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 
 
