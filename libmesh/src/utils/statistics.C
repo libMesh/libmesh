@@ -1,4 +1,4 @@
-// $Id: statistics.C,v 1.18 2007-04-05 18:49:01 friedmud Exp $
+// $Id: statistics.C,v 1.19 2007-04-09 17:08:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -173,7 +173,7 @@ template <typename T>
   
   for (unsigned int i=0; i<n; i++)
   {
-    (*this)[i] = (*this)[i] / max;
+    (*this)[i] = static_cast<T>((*this)[i] / max);
   }
 }
 
