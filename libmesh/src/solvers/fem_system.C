@@ -18,6 +18,7 @@ FEMSystem::FEMSystem (EquationSystems& es,
                       const unsigned int number)
   : Parent(es, name, number),
     fe_reinit_during_postprocess(true),
+    extra_quadrature_order(0),
     numerical_jacobian_h(1.e-6),
     verify_analytic_jacobians(0.0),
     element_qrule(NULL), side_qrule(NULL), elem(NULL)
@@ -277,10 +278,10 @@ void FEMSystem::init_data ()
     }
 
   // Create an adequate quadrature rule
-  element_qrule =
-    hardest_fe_type.default_quadrature_rule(dim).release();
-  side_qrule =
-    hardest_fe_type.default_quadrature_rule(dim-1).release();
+  element_qrule = hardest_fe_type.default_quadrature_rule
+    (dim, extra_quadrature_order).release();
+  side_qrule = hardest_fe_type.default_quadrature_rule
+    (dim-1, extra_quadrature_order).release();
 
   // Next, create finite element objects
   element_fe_var.resize(n_vars);

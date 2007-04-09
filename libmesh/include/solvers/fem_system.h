@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.12 2007-02-09 21:35:37 roystgnr Exp $
+// $Id: fem_system.h,v 1.13 2007-04-09 19:00:03 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -135,6 +135,17 @@ public:
    * undefined state.
    */
   bool fe_reinit_during_postprocess;
+
+  /**
+   * By default, when calling the user-defined residual functions, the
+   * FEMSystem will first set up an appropriate
+   * FEType::default_quadrature_rule() object for performing the integration.
+   * This rule will integrate elements of order up to 2*p+1 exactly (where p is
+   * the sum of the base FEType and local p refinement levels), but if
+   * additional (or reduced) quadrature accuracy is desired then this
+   * extra_quadrature_order (default 0) will be added.
+   */
+  int extra_quadrature_order;
 
   /**
    * Returns the value of the solution variable \p var at the quadrature
