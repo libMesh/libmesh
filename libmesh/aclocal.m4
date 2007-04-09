@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.101 2006-07-27 18:15:50 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.102 2007-04-09 20:39:28 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -264,8 +264,8 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
     CXXFLAGS_OPT="-fno-common"
     CXXFLAGS_DVL="-fno-common"
     CXXFLAGS_DBG="-fno-common"
-    CXXSHAREDFLAG="-dynamiclib"
-    CSHAREDFLAG="-dynamiclib"
+    CXXSHAREDFLAG="-dynamiclib -undefined dynamic_lookup"
+    CSHAREDFLAG="-dynamiclib -undefined dynamic_lookup"
     RPATHFLAG="-L"
   else
     CXXSHAREDFLAG="-shared"

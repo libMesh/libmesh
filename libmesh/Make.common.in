@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.54 2006-03-10 13:45:25 benkirk Exp $
+# $Id: Make.common.in,v 1.55 2007-04-09 20:39:28 benkirk Exp $
 
 
 ###############################################################################
@@ -442,15 +442,6 @@ ifeq ($(enable-optional),yes)
   EXTERNAL_FLAGS += $(libs_EXTERNAL)
 
 endif # End of disable-optional test
-
-# Finally, Append the linker flags to the libraries
-ifeq ($(findstring darwin,$(hostos)),darwin)
-  LIBS = $(mesh_library)
-else
-  LIBS += $(DLFLAGS) $(LDFLAGS)
-  EXTERNAL_FLAGS =
-endif
-
 
 # if Exodus is used, link against libexoIIv2c.a
 LIBS    += @EXODUS_LIB@
