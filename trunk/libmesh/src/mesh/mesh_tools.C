@@ -1,4 +1,4 @@
-// $Id: mesh_tools.C,v 1.5 2007-04-05 18:49:00 friedmud Exp $
+// $Id: mesh_tools.C,v 1.6 2007-04-09 17:11:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -338,7 +338,7 @@ unsigned int MeshTools::n_elem (MeshBase::element_iterator& begin,
   return std::distance(begin, end);
 }
 
-void MeshTools::find_nodal_neighbors(const MeshBase& mesh, const Node& n, 
+void MeshTools::find_nodal_neighbors(const MeshBase&, const Node& n, 
                                      std::vector<std::vector<const Elem*> >& nodes_to_elem_map, 
                                      std::vector<const Node*>& neighbors)
 {
@@ -480,7 +480,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<un
             
             //First look for the first one
             //FIXME could be streamlined a bit
-            for(int n=0;n<neigh->n_sides();n++)
+            for(unsigned int n=0;n<neigh->n_sides();n++)
             {
               if(neigh->node(n) == node1)
                 found_in_neighbor=true;
