@@ -3022,8 +3022,8 @@ echo "${ECHO_T}proper compiler flags" >&6
     CXXFLAGS_OPT="-fno-common"
     CXXFLAGS_DVL="-fno-common"
     CXXFLAGS_DBG="-fno-common"
-    CXXSHAREDFLAG="-dynamiclib"
-    CSHAREDFLAG="-dynamiclib"
+    CXXSHAREDFLAG="-dynamiclib -undefined dynamic_lookup"
+    CSHAREDFLAG="-dynamiclib -undefined dynamic_lookup"
     RPATHFLAG="-L"
   else
     CXXSHAREDFLAG="-shared"
