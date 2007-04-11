@@ -1,4 +1,4 @@
-// $Id: error_estimator.C,v 1.23 2007-01-19 23:28:42 roystgnr Exp $
+// $Id: error_estimator.C,v 1.24 2007-04-11 21:46:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -111,3 +111,50 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
   this->component_scale = old_component_scale;
 }
 
+
+
+/**
+ * FIXME: This is a default implementation - derived classes should
+ * reimplement it for efficiency.
+ */
+void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
+  std::map<std::pair<const System*, unsigned int>, ErrorVector*>& errors_per_cell,
+  bool estimate_parent_error)
+{
+  // This is a brand-new function; if you're using it you should
+  // already have stopped using component_mask
+  assert(component_mask.empty());
+
+  std::vector<float> old_component_scale = this->component_scale;
+
+  // Find the requested error values from each system
+  for (unsigned int s = 0; s != equation_systems.n_systems(); ++s)
+    {
+      const System &sys = equation_systems.get_system(s);
+
+      unsigned int n_vars = sys.n_vars();
+
+      // Calculate error in only one variable
+      this->component_scale.clear();
+      this->component_scale.resize(n_vars, 0.0);
+
+      for (unsigned int v = 0; v != n_vars; ++v)
+        {
+          // Only fill in ErrorVectors the user asks for
+          if (errors_per_cell.find(std::make_pair(&sys, v)) ==
+              errors_per_cell.end())
+            continue;
+
+          this->component_scale[v] = 1.0;
+
+          this->estimate_error
+            (sys, *errors_per_cell[std::make_pair(&sys, v)],
+             estimate_parent_error);
+
+          this->component_scale[v] = 0.0;
+        }
+    }
+
+  // Restore our old state before returning
+  this->component_scale = old_component_scale;
+}
