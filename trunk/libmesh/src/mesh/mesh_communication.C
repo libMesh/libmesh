@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.28 2007-02-09 19:52:50 roystgnr Exp $
+// $Id: mesh_communication.C,v 1.29 2007-04-11 02:52:15 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -144,9 +144,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
   unsigned int n_nodes      = mesh.n_nodes();
   unsigned int n_elem       = mesh.n_elem();
   unsigned int n_levels     = MeshTools::n_levels(mesh);
-
-  // For adaptive meshes, need to store parent and self IDs as well
-  unsigned int total_weight = MeshTools::total_weight(mesh) + 2*n_elem;
+  unsigned int total_weight = MeshTools::total_weight(mesh);
 
   // Broadcast the sizes
   {
@@ -232,7 +230,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     // broadcast it to the other processors.
     if (libMesh::processor_id() == 0)
       {
-	conn.reserve (2*n_elem + total_weight);
+	conn.reserve (4*n_elem + total_weight);
 	
 	// We start from level 0. This is a bit simpler than in xdr_io.C
 	// because we do not have to worry about economizing by group elements
@@ -241,7 +239,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	// By filling conn in order of levels, parents should exist before children
 	// are built when we reconstruct the elements on the other processors.
 	
-	for(unsigned int level=0; level<=n_levels; ++level)
+	for (unsigned int level=0; level<=n_levels; ++level)
 	  {
 	    MeshBase::element_iterator it = mesh.level_elements_begin(level);
 	    const MeshBase::element_iterator it_end = mesh.level_elements_end(level);
@@ -268,10 +266,10 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	  }
       }
     else
-      conn.resize (2*n_elem + total_weight);
+      conn.resize (4*n_elem + total_weight);
     
     // Sanity check for all processors
-    assert (conn.size() == (2*n_elem + total_weight));
+    assert (conn.size() == (4*n_elem + total_weight));
     
     // Broadcast the element connectivity
     MPI_Bcast (&conn[0], conn.size(), MPI_INT, 0, libMesh::COMM_WORLD);
@@ -295,8 +293,6 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
             
             const ElemType elem_type = static_cast<ElemType>(conn[cnt++]);
               
-	    // Get the subdomain id
-
             // get ID info
 	    const int subdomain_id = conn[cnt++];
             const int self_ID      = conn[cnt++];
@@ -312,11 +308,11 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
                 
                 // If the parent was not previously added, we cannot continue.
                 if (it == parents.end())
-                {
-                  std::cerr << "Parent element with ID " << parent_ID 
-                            << " not found." << std::endl; 
-                  error();
-                }
+		  {
+		    std::cerr << "Parent element with ID " << parent_ID 
+			      << " not found." << std::endl; 
+		    error();
+		  }
 
                 // Set the my_parent pointer
                 my_parent = (*it).second;
@@ -328,7 +324,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 		my_parent->add_child(elem);
 		assert (my_parent->type() == elem->type());
 	      }
-
+	    
             else // level 0 element has no parent
 	      {
 		// should be able to just use the integer elem_type
@@ -338,10 +334,10 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	    // Assign the IDs
             elem->subdomain_id() = subdomain_id;
             elem->set_id() = self_ID;
-
+	    
             // Add elem to the map of parents, since it may have
             // children to be added later
-            parents[self_ID] = elem;
+            parents.insert(std::make_pair(self_ID,elem));
 	    
 	    // Assign the connectivity
 	    for (unsigned int n=0; n<elem->n_nodes(); n++)
