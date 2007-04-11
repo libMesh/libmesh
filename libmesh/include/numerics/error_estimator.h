@@ -1,4 +1,4 @@
-// $Id: error_estimator.h,v 1.15 2007-04-11 21:46:10 roystgnr Exp $
+// $Id: error_estimator.h,v 1.16 2007-04-11 23:06:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -84,6 +84,11 @@ public:
 			        ErrorVector& error_per_cell,
 			        std::map<const System*, std::vector<float> >& component_scales,
 			        bool estimate_parent_error = false);
+  /**
+   * When calculating many error vectors at once, we need a data structure to
+   * hold them all
+   */
+  typedef std::map<std::pair<const System*, unsigned int>, ErrorVector*> ErrorMap;
 
   /**
    * This virtual function can be redefined
@@ -98,7 +103,7 @@ public:
    * error values in variable \p v of \p system
    */
   virtual void estimate_errors (const EquationSystems& equation_systems,
-			        std::map<std::pair<const System*, unsigned int>, ErrorVector*>& errors_per_cell,
+			        ErrorMap& errors_per_cell,
 			        bool estimate_parent_error = false);
 
   /**
