@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.10 2007-03-15 20:38:17 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.11 2007-04-11 23:06:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -47,7 +47,7 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
 {
   START_LOG("estimate_error()", "UniformRefinementEstimator");
   this->_estimate_error
-    (NULL, &_system, error_per_cell, NULL, estimate_parent_error);
+    (NULL, &_system, &error_per_cell, NULL, NULL, estimate_parent_error);
   STOP_LOG("estimate_error()", "UniformRefinementEstimator");
 }
 
@@ -58,13 +58,24 @@ void UniformRefinementEstimator::estimate_errors (const EquationSystems& _es,
 {
   START_LOG("estimate_errors()", "UniformRefinementEstimator");
   this->_estimate_error
-    (&_es, NULL, error_per_cell, &component_scales, estimate_parent_error);
+    (&_es, NULL, &error_per_cell, NULL, &component_scales, estimate_parent_error);
+  STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
+}
+
+void UniformRefinementEstimator::estimate_errors (const EquationSystems& _es,
+                                                  ErrorMap& errors_per_cell,
+                                                  bool estimate_parent_error)
+{
+  START_LOG("estimate_errors()", "UniformRefinementEstimator");
+  this->_estimate_error
+    (&_es, NULL, NULL, &errors_per_cell, NULL, estimate_parent_error);
   STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
 }
 
 void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                                                  const System* _system,
-					         ErrorVector& error_per_cell,
+					         ErrorVector* error_per_cell,
+                                                 ErrorMap* errors_per_cell,
                                                  std::map<const System*, std::vector<float> > *_component_scales,
 					         bool)
 {
@@ -85,8 +96,37 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       // We have to break the rules here, because we can't refine a const System
         system_list.push_back(const_cast<System *>(&(_es->get_system(i))));
 
-      assert(_component_scales);
-      component_scales = _component_scales;
+      // If we're computing one vector, we need to know how to scale
+      // each variable's contributions to it.
+      if (_component_scales)
+        {
+          assert(!errors_per_cell);
+          component_scales = _component_scales;
+        }
+      else
+      // If we're computing many vectors, we just need to know which
+      // variables to skip
+        {
+          assert (errors_per_cell);
+
+          component_scales = new std::map<const System*, std::vector<float> >;
+          for (unsigned int i=0; i!= _es->n_systems(); ++i)
+            {
+              const System &sys = _es->get_system(i);
+              unsigned int n_vars = sys.n_vars();
+
+              std::vector<float> cs(sys.n_vars(), 0.0);
+              for (unsigned int v = 0; v != n_vars; ++v)
+                {
+                  if (errors_per_cell->find(std::make_pair(&sys, v)) ==
+                      errors_per_cell->end())
+                    continue;
+
+                  cs[v] = 1.0;
+                }
+              (*component_scales)[_system] = cs;
+            }
+        }
     }
   else
     {
@@ -110,10 +150,24 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   // The dimensionality of the mesh
   const unsigned int dim = mesh.mesh_dimension();
   
-  // Resize the error_per_cell vector to be
-  // the number of elements, initialize it to 0.
-  error_per_cell.resize (mesh.n_elem());
-  std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
+  // Resize the error_per_cell vectors to be
+  // the number of elements, initialize them to 0.
+  if (error_per_cell)
+    {
+      error_per_cell->clear();
+      error_per_cell->resize (mesh.n_elem(), 0.);
+    }
+  else
+    {
+      assert(errors_per_cell);
+      for (ErrorMap::iterator i = errors_per_cell->begin();
+           i != errors_per_cell->end(); ++i)
+        {
+          ErrorVector *e = i->second;
+          e->clear();
+          e->resize(mesh.n_elem(), 0.);
+        }
+    }
 
   // component_mask has long since been deprecated
   if (!component_mask.empty())
@@ -406,12 +460,26 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
               assert (L2normsq     >= 0.);
               assert (H1seminormsq >= 0.);
 
-              error_per_cell[e_id] += L2normsq;
-              if (_sobolev_order > 0)
-                error_per_cell[e_id] += H1seminormsq;
-              if (_sobolev_order > 1)
-                error_per_cell[e_id] += H2seminormsq;
+              if (error_per_cell)
+                {
+                  (*error_per_cell)[e_id] += L2normsq;
+                  if (_sobolev_order > 0)
+                    (*error_per_cell)[e_id] += H1seminormsq;
+                  if (_sobolev_order > 1)
+                    (*error_per_cell)[e_id] += H2seminormsq;
+                }
+              else
+                {
+                  assert(errors_per_cell);
+                  ErrorVector &e =
+                    *((*errors_per_cell)[std::make_pair(&system,var)]);
 
+                  e[e_id] += L2normsq;
+                  if (_sobolev_order > 0)
+                    e[e_id] += H1seminormsq;
+                  if (_sobolev_order > 1)
+                    e[e_id] += H2seminormsq;
+                }
             } // End loop over active local elements
         } // End loop over variables
 
@@ -449,15 +517,16 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   // zeros for the inactive elements.
 
   // First sum the vector of estimated error values
-  this->reduce_error(error_per_cell);
+  this->reduce_error(*error_per_cell);
 
   // Compute the square-root of each component.
   START_LOG("std::sqrt()", "UniformRefinementEstimator");
-  for (unsigned int i=0; i<error_per_cell.size(); i++)
-    if (error_per_cell[i] != 0.)
-      error_per_cell[i] = std::sqrt(error_per_cell[i]);
+  for (unsigned int i=0; i<error_per_cell->size(); i++)
+    if ((*error_per_cell)[i] != 0.)
+      (*error_per_cell)[i] = std::sqrt((*error_per_cell)[i]);
   STOP_LOG("std::sqrt()", "UniformRefinementEstimator");
 
+  // Restore old solutions and clean up the heap
   for (unsigned int i=0; i != system_list.size(); ++i)
     {
       System &system = *system_list[i];
@@ -484,4 +553,6 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
         }
     }
 
+  if (!_component_scales)
+    delete component_scales;
 }

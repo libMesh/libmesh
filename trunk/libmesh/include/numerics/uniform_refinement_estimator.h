@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.h,v 1.4 2007-01-23 20:21:09 roystgnr Exp $
+// $Id: uniform_refinement_estimator.h,v 1.5 2007-04-11 23:06:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -78,10 +78,6 @@ public:
 			       bool estimate_parent_error = false);
 
   /**
-   * This pure virtual function can be redefined
-   * in derived classes, but by default computes the sum of
-   * the error_per_cell for each system in the equation_systems.
-   *
    * Currently this function ignores the component_scale member variable,
    * and uses the function argument component_scales instead.
    *
@@ -93,6 +89,17 @@ public:
 				std::map<const System*, std::vector<float> >& component_scales,
 				bool estimate_parent_error = false);
 
+  /**
+   * Currently this function ignores the component_scale member variable,
+   * because it calculates each error individually, unscaled.
+   * 
+   * The user selects which errors get confused by filling a map with error
+   * vectors: If errors_per_cell[&system][v] exists, it will be filled with the
+   * error values in variable \p v of \p system
+   */
+  virtual void estimate_errors (const EquationSystems& equation_systems,
+			        ErrorMap& errors_per_cell,
+			        bool estimate_parent_error = false);
 
   /**
    * Returns or allows you to set the Sobolev order for error computations
@@ -113,12 +120,13 @@ public:
 
 protected:
   /**
-   * The code for estimate_error and estimate_errors is very similar,
-   * so we use the same function for both
+   * The code for estimate_error and both estimate_errors versions is very
+   * similar, so we use the same function for all three
    */
   virtual void _estimate_error (const EquationSystems *equation_systems,
                                 const System* system,
-				ErrorVector& error_per_cell,
+				ErrorVector* error_per_cell,
+			        std::map<std::pair<const System*, unsigned int>, ErrorVector*>* errors_per_cell,
 				std::map<const System*, std::vector<float> >* component_scales,
 				bool estimate_parent_error = false);
 
