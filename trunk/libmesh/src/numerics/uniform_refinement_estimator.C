@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.11 2007-04-11 23:06:42 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.12 2007-04-12 22:58:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -124,7 +124,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
                   cs[v] = 1.0;
                 }
-              (*component_scales)[_system] = cs;
+              (*component_scales)[&sys] = cs;
             }
         }
     }
