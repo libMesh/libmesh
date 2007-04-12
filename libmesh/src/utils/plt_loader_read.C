@@ -1,4 +1,4 @@
-// $Id: plt_loader_read.C,v 1.7 2005-09-30 19:55:24 benkirk Exp $
+// $Id: plt_loader_read.C,v 1.8 2007-04-12 19:08:18 benkirk Exp $
 
 // Copyright (C) 2002-2005  Benjamin S. Kirk
   
@@ -39,7 +39,7 @@ void PltLoader::read (const std::string& name)
       std::cerr << "Error reading input file " << name
 		<< std::endl;
 
-      std::abort();
+      error(); // std::abort();
     }
     
 
@@ -199,7 +199,7 @@ void PltLoader::read_header (std::istream& in)
 	      {
 		std::cerr << "ERROR: Unexpected end-of-file!"
 			  << std::endl;
-		std::abort();
+		error(); // std::abort();
 	      }    
 	  
 	    // Found a Zone marker
@@ -380,7 +380,7 @@ void PltLoader::read_header (std::istream& in)
       // marker (357.) is found.
       int nz=0;
       std::vector<std::string> zname;
-      std::vector<int>         zpack, ztype, zimax, zjmax, zkmax;
+      std::vector<int>         zpack, ztype, zimax, zjmax, zkmax, znelem, znnodes;
       
       {
 	float f=0.;
@@ -405,7 +405,7 @@ void PltLoader::read_header (std::istream& in)
 	      {
 		std::cerr << "ERROR: Unexpected end-of-file!"
 			  << std::endl;
-		std::abort();
+		error(); // std::abort();
 	      }    
 	  
 	    // Found a Zone marker
@@ -503,8 +503,11 @@ void PltLoader::read_header (std::istream& in)
 		      in.read (buf, SIZEOF_INT);
 		      std::memcpy  (&ne, buf, SIZEOF_INT);
 		      rb(ne);
-		    }
 
+		      zimax.push_back (np);
+		      zjmax.push_back (ne);
+		      zjmax.push_back (0);
+		    }
 		  
 		  int
 		    imax=0,
@@ -522,10 +525,15 @@ void PltLoader::read_header (std::istream& in)
 		  in.read (buf, SIZEOF_INT);
 		  std::memcpy  (&kmax, buf, SIZEOF_INT);
 		  rb(kmax);
-		  
-		  zimax.push_back (imax);
-		  zjmax.push_back (jmax);
-		  zkmax.push_back (kmax);
+
+		  // These are only useful for orderd data.  Otherwise
+		  // we grabbed the relevant values above.
+		  if (ztype.back() != ORDERED)
+		    {
+		      zimax.push_back (imax);
+		      zjmax.push_back (jmax);
+		      zkmax.push_back (kmax);
+		    }
 		}
 	      } // else if (f == 299.)
 	  }
@@ -556,7 +564,7 @@ void PltLoader::read_header (std::istream& in)
 		<< std::endl
 		<< this->version()
 		<< std::endl;
-      std::abort();
+      error(); // std::abort();
     }
   
 
@@ -589,7 +597,12 @@ void PltLoader::read_header (std::istream& in)
 
       std::cout << "Zone Types: ";
       for (unsigned int z=0; z<this->n_zones(); z++)
-	std::cout << this->zone_type (z) << " ";
+	{
+	  std::cout << this->zone_type (z) << " ";
+
+	  if (this->zone_type (z) != ORDERED)
+	    std::cout << "(" << this->n_nodes(z) << "," << this->n_elem(z) << ") ";
+	}
       std::cout << std::endl;
 
       std::cout << "Zone Dimensions: " << std::endl;
@@ -650,7 +663,7 @@ void PltLoader::read_data (std::istream& in)
 	    {
 	      std::cerr << "ERROR: Unexpected end-of-file!"
 			<< std::endl;
-	      std::abort();
+	      error(); // std::abort();
 	    }
 
 	  // Get the number of repeated vars.
@@ -669,7 +682,7 @@ void PltLoader::read_data (std::istream& in)
 	      {
 		std::cerr << "ERROR:  I don't understand repeated variables yet!"
 			  << std::endl;
-		std::abort();
+		error(); // std::abort();
 	    
 		in.read (buf, SIZEOF_INT);
 		std::memcpy  (&rep_vars[v], buf, SIZEOF_INT);
@@ -735,7 +748,7 @@ void PltLoader::read_data (std::istream& in)
 		std::cerr << "ERROR: Unsupported Zone type: "
 			  << this->zone_type(zone)
 			  << std::endl;
-		std::abort();
+		error(); // std::abort();
 	      }
 	    } // end switch on zone type
 	}
@@ -762,7 +775,7 @@ void PltLoader::read_data (std::istream& in)
 	    {
 	      std::cerr << "ERROR: Unexpected end-of-file!"
 			<< std::endl;
-	      std::abort();
+	      error(); // std::abort();
 	    }
 
 	  // Get the variable data type
@@ -796,7 +809,7 @@ void PltLoader::read_data (std::istream& in)
 		      {
 			std::cerr << "ERROR:  I don't understand variable sharing!"
 				  << std::endl;
-			std::abort();
+			error(); // std::abort();
 		      }
 		  }
 	      }
@@ -825,7 +838,7 @@ void PltLoader::read_data (std::istream& in)
 		this->read_point_data (in, zone);
 
 	      else
-		std::abort();
+		error(); // std::abort();
 	    }
 	  else
 	    {
@@ -838,7 +851,7 @@ void PltLoader::read_data (std::istream& in)
 		this->read_fepoint_data (in, zone);
 
 	      else
-		std::abort();
+		error(); // std::abort();
 	    }
 	}
 
@@ -852,7 +865,7 @@ void PltLoader::read_data (std::istream& in)
 		    << std::endl
 		    << this->version()
 		    << std::endl;
-	  std::abort();
+	  error(); // std::abort();
 	}
       
     } // end loop on zones
@@ -921,7 +934,7 @@ void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
 	    std::cerr << "ERROR: Unsupported data type: "
 		      << this->var_type(var)
 		      << std::endl;
-	    std::abort();
+	    error(); // std::abort();
 	  }
 	}
     }
@@ -981,7 +994,7 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
 	      std::cerr << "ERROR: unsupported data type: "
 			<< this->var_type(var)
 			<< std::endl;
-	      std::abort();
+	      error(); // std::abort();
 	    }
 }
 
@@ -1039,7 +1052,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
 	    std::cerr << "ERROR: Unsupported data type: "
 		      << this->var_type(var)
 		      << std::endl;
-	    std::abort();
+	    error(); // std::abort();
 	  }
 	}
     }
@@ -1051,11 +1064,11 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
     in.read ((char*) &rep, SIZEOF_INT);
     rb(rep);
 
-    if (rep == 1)
+    if (rep == 1 && this->n_zones() > 1)
       {
 	std::cerr << "ERROR:  Repeated connectivity not supported!"
 		  << std::endl;
-	std::abort();
+	error(); // std::abort();
       }
 
     // Read the connectivity
@@ -1124,7 +1137,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
 	  std::cerr << "ERROR: unsupported data type: "
 		    << this->var_type(var)
 		    << std::endl;
-	  std::abort();
+	  error(); // std::abort();
 	}
 
   // Read the connectivity
@@ -1139,7 +1152,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
       {
 	std::cerr << "ERROR:  Repeated connectivity not supported!"
 		  << std::endl;
-	std::abort();
+	error(); // std::abort();
       }
 
     // Read the connectivity
