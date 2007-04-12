@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.12 2007-04-12 22:58:37 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.13 2007-04-12 23:05:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -516,15 +516,35 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   // if the value is nonzero.  There will in general be many
   // zeros for the inactive elements.
 
-  // First sum the vector of estimated error values
-  this->reduce_error(*error_per_cell);
+  if (error_per_cell)
+    {
+      // First sum the vector of estimated error values
+      this->reduce_error(*error_per_cell);
 
-  // Compute the square-root of each component.
-  START_LOG("std::sqrt()", "UniformRefinementEstimator");
-  for (unsigned int i=0; i<error_per_cell->size(); i++)
-    if ((*error_per_cell)[i] != 0.)
-      (*error_per_cell)[i] = std::sqrt((*error_per_cell)[i]);
-  STOP_LOG("std::sqrt()", "UniformRefinementEstimator");
+      // Compute the square-root of each component.
+      START_LOG("std::sqrt()", "UniformRefinementEstimator");
+      for (unsigned int i=0; i<error_per_cell->size(); i++)
+        if ((*error_per_cell)[i] != 0.)
+          (*error_per_cell)[i] = std::sqrt((*error_per_cell)[i]);
+      STOP_LOG("std::sqrt()", "UniformRefinementEstimator");
+    }
+  else
+    {
+      for (ErrorMap::iterator i = errors_per_cell->begin();
+           i != errors_per_cell->end(); ++i)
+        {
+          ErrorVector *e = i->second;
+          // First sum the vector of estimated error values
+          this->reduce_error(*e);
+
+          // Compute the square-root of each component.
+          START_LOG("std::sqrt()", "UniformRefinementEstimator");
+          for (unsigned int i=0; i<e->size(); i++)
+            if ((*e)[i] != 0.)
+              (*e)[i] = std::sqrt((*e)[i]);
+          STOP_LOG("std::sqrt()", "UniformRefinementEstimator");
+        }
+    }
 
   // Restore old solutions and clean up the heap
   for (unsigned int i=0; i != system_list.size(); ++i)
