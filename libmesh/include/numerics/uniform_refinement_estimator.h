@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.h,v 1.5 2007-04-11 23:06:42 roystgnr Exp $
+// $Id: uniform_refinement_estimator.h,v 1.6 2007-04-12 17:21:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -93,7 +93,7 @@ public:
    * Currently this function ignores the component_scale member variable,
    * because it calculates each error individually, unscaled.
    * 
-   * The user selects which errors get confused by filling a map with error
+   * The user selects which errors get computed by filling a map with error
    * vectors: If errors_per_cell[&system][v] exists, it will be filled with the
    * error values in variable \p v of \p system
    */
