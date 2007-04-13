@@ -1,4 +1,4 @@
-// $Id: mesh_data_unv_support.C,v 1.28 2005-10-13 16:36:31 roystgnr Exp $
+// $Id: mesh_data_unv_support.C,v 1.29 2007-04-13 20:16:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -756,7 +756,7 @@ void MeshDataUnvHeader::write (std::ostream& out_file)
 {
   
   
-  char buf[81];
+  char buf[82];
 
   std::sprintf(buf, "%6i\n",this->dataset_label);
   
