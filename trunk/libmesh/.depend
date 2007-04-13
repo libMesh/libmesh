@@ -3651,7 +3651,8 @@ src/mesh/mesh_modification.$(obj-suffix):\
     include/mesh/mesh_tools.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
-    include/utils/perf_log.h
+    include/utils/perf_log.h\
+    include/utils/string_to_enum.h
 src/mesh/mesh_output.$(obj-suffix):\
     src/mesh/mesh_output.C\
     include/base/auto_ptr.h\
@@ -3797,6 +3798,36 @@ src/mesh/mesh_smoother_laplace.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/mesh/mesh_smoother_vsmoother.$(obj-suffix):\
+    src/mesh/mesh_smoother_vsmoother.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_smoother.h\
+    include/mesh/mesh_smoother_vsmoother.h\
+    include/mesh/mesh_tools.h\
+    include/numerics/type_vector.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h\
+    include/utils/utility.h
 src/mesh/mesh_tetgen_support.$(obj-suffix):\
     src/mesh/mesh_tetgen_support.C\
     include/base/auto_ptr.h\
@@ -5789,6 +5820,7 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/function_base.h\
+    include/numerics/numeric_vector.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
