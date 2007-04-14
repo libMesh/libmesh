@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_vsmoother.h,v 1.1 2007-04-05 18:49:00 friedmud Exp $
+// $Id: mesh_smoother_vsmoother.h,v 1.2 2007-04-14 19:05:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -64,7 +64,7 @@ enum adapt_type
  *
  * \author Derek R. Gaston
  * \date 2006
- * \version $Revision: 1.1 $
+ * \version $Revision: 1.2 $
  */
 
 
@@ -80,19 +80,19 @@ public:
   VariationalMeshSmoother(Mesh& mesh, const double& theta=0.5, const uint& miniter=2,
 			  const uint& maxiter=5, const uint& miniterBC=5)
     :MeshSmoother(mesh),
+     _percent_to_move(1),
+     _adapt_data(NULL),
      _dim(mesh.mesh_dimension()),
-     _theta(theta),
      _miniter(miniter),
      _maxiter(maxiter),
      _miniterBC(miniterBC),
      
      _metric(uniform),
-     _generate_data(false),
      _adaptive_func(none),
+     _theta(theta),
+     _generate_data(false),
 
-     _area_of_interest(NULL),
-     _adapt_data(NULL),
-     _percent_to_move(1)
+     _area_of_interest(NULL)
   {}
 
   /**
@@ -102,17 +102,17 @@ public:
 			  const uint& miniter=2, const uint& maxiter=5, const uint& miniterBC=5,
 			  const double& percent_to_move=1)
     :MeshSmoother(mesh),
-     _dim(mesh.mesh_dimension()),
+     _percent_to_move(percent_to_move),
      _adapt_data(adapt_data),
-     _theta(theta),
+     _dim(mesh.mesh_dimension()),
      _miniter(miniter),
      _maxiter(maxiter),
      _miniterBC(miniterBC),
-     _percent_to_move(percent_to_move),
      
      _metric(uniform),
-     _generate_data(false),
      _adaptive_func(cell),
+     _theta(theta),
+     _generate_data(false),
 
      _area_of_interest(NULL)
   {}
@@ -125,18 +125,19 @@ public:
 			  const double& theta=0.5, const uint& miniter=2, const uint& maxiter=5,
 			  const uint& miniterBC=5, const double& percent_to_move=1)
     :MeshSmoother(mesh),
-     _dim(mesh.mesh_dimension()),
-     _area_of_interest(area_of_interest),
+     _percent_to_move(percent_to_move),
      _adapt_data(adapt_data),
-     _theta(theta),
+     _dim(mesh.mesh_dimension()),
      _miniter(miniter),
      _maxiter(maxiter),
      _miniterBC(miniterBC),
-     _percent_to_move(percent_to_move),
 
      _metric(uniform),
+     _adaptive_func(cell),
+     _theta(theta),
      _generate_data(false),
-     _adaptive_func(cell)
+
+     _area_of_interest(area_of_interest)
   {}
 
 /* Old constructors... will eventually be removed.
@@ -261,9 +262,9 @@ private:
   /*-- allocate memory --*/
   LPDOUBLE alloc_d_n1(int m1)              { return((LPDOUBLE)malloc(m1*sizeof(double))); }
   LPINT alloc_i_n1(int m1)                 { return((LPINT)malloc(m1*sizeof(int))); }
-  LPLPINT alloc_i_n1_n2(int m1, int m2)    { return((LPLPINT)malloc(m1*sizeof(LPINT))); }
-  LPLPDOUBLE alloc_d_n1_n2(int m1, int m2) { return((LPLPDOUBLE)malloc(m1*sizeof(LPDOUBLE))); }
-  LPLPLPDOUBLE alloc_d_n1_n2_n3(int m1, int m2, int m3) { return((LPLPLPDOUBLE)malloc(m1*sizeof(LPLPDOUBLE))); }
+  LPLPINT alloc_i_n1_n2(int m1, int)    { return((LPLPINT)malloc(m1*sizeof(LPINT))); }
+  LPLPDOUBLE alloc_d_n1_n2(int m1, int) { return((LPLPDOUBLE)malloc(m1*sizeof(LPDOUBLE))); }
+  LPLPLPDOUBLE alloc_d_n1_n2_n3(int m1, int, int) { return((LPLPLPDOUBLE)malloc(m1*sizeof(LPLPDOUBLE))); }
 
   int writegr(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells,
               LPINT mcells, int nedges, LPINT edges, LPINT hnodes, char grid[],
