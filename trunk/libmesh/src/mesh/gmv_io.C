@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.33 2007-02-12 13:44:18 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.34 2007-05-03 20:26:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -699,83 +699,135 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
               mesh_max_p_level = std::max(mesh_max_p_level,
                                           (*it)->p_level());
 
-	      for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-	        {
+              if (this->subdivide_second_order())
+	        for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	          {
 
 #ifndef  ENABLE_INFINITE_ELEMENTS
-		  if (((*it)->type() == HEX8)   ||    
-		      ((*it)->type() == HEX27))
-		    {
-		      out << "phex8 8\n";
-		      (*it)->connectivity(se, TECPLOT, conn);
-		      for (unsigned int i=0; i<conn.size(); i++)
-		        out << conn[i] << " ";
-		    }
+		    if (((*it)->type() == HEX8)   ||    
+		        ((*it)->type() == HEX27))
+		      {
+		        out << "phex8 8\n";
+		        (*it)->connectivity(se, TECPLOT, conn);
+		        for (unsigned int i=0; i<conn.size(); i++)
+		          out << conn[i] << " ";
+		      }
 		
-		  else if ((*it)->type() == HEX20)
-		    {
-		      out << "phex20 20\n";
-		      out << (*it)->node(0)+1  << " "
-			  << (*it)->node(1)+1  << " "
-			  << (*it)->node(2)+1  << " "
-			  << (*it)->node(3)+1  << " "
-			  << (*it)->node(4)+1  << " "
-			  << (*it)->node(5)+1  << " "
-			  << (*it)->node(6)+1  << " "
-			  << (*it)->node(7)+1  << " "
-			  << (*it)->node(8)+1  << " "
-			  << (*it)->node(9)+1  << " "
-			  << (*it)->node(10)+1 << " "
-			  << (*it)->node(11)+1 << " "
-			  << (*it)->node(16)+1 << " "
-			  << (*it)->node(17)+1 << " "
-			  << (*it)->node(18)+1 << " "
-			  << (*it)->node(19)+1 << " "
-			  << (*it)->node(12)+1 << " "
-			  << (*it)->node(13)+1 << " "
-			  << (*it)->node(14)+1 << " "
-			  << (*it)->node(15)+1 << " ";
-		    }
+		    else if ((*it)->type() == HEX20)
+		      {
+		        out << "phex20 20\n";
+		        out << (*it)->node(0)+1  << " "
+			    << (*it)->node(1)+1  << " "
+			    << (*it)->node(2)+1  << " "
+			    << (*it)->node(3)+1  << " "
+			    << (*it)->node(4)+1  << " "
+			    << (*it)->node(5)+1  << " "
+			    << (*it)->node(6)+1  << " "
+			    << (*it)->node(7)+1  << " "
+			    << (*it)->node(8)+1  << " "
+			    << (*it)->node(9)+1  << " "
+			    << (*it)->node(10)+1 << " "
+			    << (*it)->node(11)+1 << " "
+			    << (*it)->node(16)+1 << " "
+			    << (*it)->node(17)+1 << " "
+			    << (*it)->node(18)+1 << " "
+			    << (*it)->node(19)+1 << " "
+			    << (*it)->node(12)+1 << " "
+			    << (*it)->node(13)+1 << " "
+			    << (*it)->node(14)+1 << " "
+			    << (*it)->node(15)+1 << " ";
+		      }
 #else
-		  /*
-		   * In case of infinite elements, HEX20
-		   * should be handled just like the
-		   * INFHEX16, since these connect to each other
-		   */
-		  if (((*it)->type() == HEX8)     ||
-		      ((*it)->type() == HEX27)    ||
-		      ((*it)->type() == INFHEX8)  ||
-		      ((*it)->type() == INFHEX16) ||
-		      ((*it)->type() == INFHEX18) ||
-		      ((*it)->type() == HEX20))
-		    {
-		      out << "phex8 8\n";
-		      (*it)->connectivity(se, TECPLOT, conn);
-		      for (unsigned int i=0; i<conn.size(); i++)
-		        out << conn[i] << " ";
-		    }
+		    /*
+		     * In case of infinite elements, HEX20
+		     * should be handled just like the
+		     * INFHEX16, since these connect to each other
+		     */
+		    if (((*it)->type() == HEX8)     ||
+		        ((*it)->type() == HEX27)    ||
+		        ((*it)->type() == INFHEX8)  ||
+		        ((*it)->type() == INFHEX16) ||
+		        ((*it)->type() == INFHEX18) ||
+		        ((*it)->type() == HEX20))
+		      {
+		        out << "phex8 8\n";
+		        (*it)->connectivity(se, TECPLOT, conn);
+		        for (unsigned int i=0; i<conn.size(); i++)
+		          out << conn[i] << " ";
+		      }
 #endif
 		
-		  else if (((*it)->type() == TET4)  ||
-			   ((*it)->type() == TET10))
+		    else if (((*it)->type() == TET4)  ||
+			     ((*it)->type() == TET10))
+		      {
+		        out << "tet 4\n";
+		        (*it)->connectivity(se, TECPLOT, conn);
+		        out << conn[0] << " "
+			    << conn[2] << " "
+			    << conn[1] << " "
+			    << conn[4] << " ";
+		      }
+#ifndef  ENABLE_INFINITE_ELEMENTS
+		    else if (((*it)->type() == PRISM6)  ||
+			     ((*it)->type() == PRISM15) ||
+			     ((*it)->type() == PRISM18))
+#else
+		    else if (((*it)->type() == PRISM6)     ||
+			     ((*it)->type() == PRISM15)    ||
+			     ((*it)->type() == PRISM18)    ||
+			     ((*it)->type() == INFPRISM6)  ||
+			     ((*it)->type() == INFPRISM12))
+#endif
+		      {
+		        /**
+		         * Note that the prisms are treated as
+		         * degenerated phex8's.
+		         */
+		        out << "phex8 8\n";
+		        (*it)->connectivity(se, TECPLOT, conn);
+		        for (unsigned int i=0; i<conn.size(); i++)
+		          out << conn[i] << " ";
+		      }
+		
+		    else
+		      {
+		        std::cout << "Encountered an unrecognized element "
+			          << "type.  Possibly a dim-1 dimensional "
+			          << "element?  Aborting..."
+			          << std::endl;
+		        error();
+		      }
+		
+		    out << '\n';
+	          }
+              else // !this->subdivide_second_order()
+                {
+                  AutoPtr<Elem> lo_elem = Elem::build(
+                    Elem::first_order_equivalent_type((*it)->type()));
+		  if ((lo_elem->type() == HEX8)
+#ifdef  ENABLE_INFINITE_ELEMENTS
+                      || (lo_elem->type() == HEX27)
+#endif
+                     )
+		    {
+		      out << "phex8 8\n";
+		      lo_elem->connectivity(0, TECPLOT, conn);
+		      for (unsigned int i=0; i<conn.size(); i++)
+		        out << conn[i] << " ";
+		    }
+		
+		  else if (lo_elem->type() == TET4)
 		    {
 		      out << "tet 4\n";
-		      (*it)->connectivity(se, TECPLOT, conn);
+		      lo_elem->connectivity(0, TECPLOT, conn);
 		      out << conn[0] << " "
 			  << conn[2] << " "
 			  << conn[1] << " "
 			  << conn[4] << " ";
-		      }
-#ifndef  ENABLE_INFINITE_ELEMENTS
-		  else if (((*it)->type() == PRISM6)  ||
-			   ((*it)->type() == PRISM15) ||
-			   ((*it)->type() == PRISM18))
-#else
-		  else if (((*it)->type() == PRISM6)     ||
-			   ((*it)->type() == PRISM15)    ||
-			   ((*it)->type() == PRISM18)    ||
-			   ((*it)->type() == INFPRISM6)  ||
-			   ((*it)->type() == INFPRISM12))
+		    }
+		  else if ((lo_elem->type() == PRISM6)
+#ifdef  ENABLE_INFINITE_ELEMENTS
+                           || (lo_elem->type() == INFPRISM6))
 #endif
 		    {
 		      /**
@@ -783,7 +835,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 		       * degenerated phex8's.
 		       */
 		      out << "phex8 8\n";
-		      (*it)->connectivity(se, TECPLOT, conn);
+		      lo_elem->connectivity(0, TECPLOT, conn);
 		      for (unsigned int i=0; i<conn.size(); i++)
 		        out << conn[i] << " ";
 		    }
