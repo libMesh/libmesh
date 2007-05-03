@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.34 2007-05-03 20:26:48 roystgnr Exp $
+// $Id: gmv_io.C,v 1.35 2007-05-03 21:15:56 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -804,6 +804,8 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
                 {
                   AutoPtr<Elem> lo_elem = Elem::build(
                     Elem::first_order_equivalent_type((*it)->type()));
+                  for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
+                    lo_elem->set_node(i) = (*it)->get_node(i);
 		  if ((lo_elem->type() == HEX8)
 #ifdef  ENABLE_INFINITE_ELEMENTS
                       || (lo_elem->type() == HEX27)
