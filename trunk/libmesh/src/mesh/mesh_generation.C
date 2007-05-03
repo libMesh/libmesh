@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.47 2007-02-15 17:13:57 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.48 2007-05-03 22:47:58 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -897,13 +897,13 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 
 
 
-	    
 	  case PRISM6:
 	    {
 	      for (unsigned int k=0; k<nz; k++)
 		for (unsigned int j=0; j<ny; j++)
 		  for (unsigned int i=0; i<nx; i++)
 		    {
+		      // First Prism
 		      Elem* elem = NULL;
 		      elem = mesh.add_elem(new Prism6);
 
@@ -914,6 +914,20 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 		      elem->set_node(4) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k+1)  );
 		      elem->set_node(5) = mesh.node_ptr(idx(type,nx,ny,i,j+1,k+1)  );
 
+		      // Add sides for first prism to boundary info object
+		      if (i==0)
+			mesh.boundary_info->add_side(elem, 3, 4);
+
+		      if (j==0)
+			mesh.boundary_info->add_side(elem, 1, 1);
+
+		      if (k==0)
+			mesh.boundary_info->add_side(elem, 0, 0);
+
+		      if (k == (nz-1))
+			mesh.boundary_info->add_side(elem, 4, 5);
+
+		      // Second Prism
 		      elem = mesh.add_elem(new Prism6);
 
 		      elem->set_node(0) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k)    );
@@ -923,6 +937,18 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 		      elem->set_node(4) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1));
 		      elem->set_node(5) = mesh.node_ptr(idx(type,nx,ny,i,j+1,k+1)  );
 
+		      // Add sides for second prism to boundary info object
+		      if (i == (nx-1))
+			mesh.boundary_info->add_side(elem, 1, 2);
+
+		      if (j == (ny-1))
+			mesh.boundary_info->add_side(elem, 2, 3);
+
+		      if (k==0)
+			mesh.boundary_info->add_side(elem, 0, 0);
+
+		      if (k == (nz-1))
+			mesh.boundary_info->add_side(elem, 4, 5);
 		    }
 	      break;
 	    }
@@ -1001,7 +1027,6 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 
 
 	    
-	    // TODO: Add the proper sides to the boundary_info object.
 	  case PRISM15:
 	  case PRISM18:
 	    {
@@ -1009,6 +1034,7 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 		for (unsigned int j=0; j<(2*ny); j += 2)
 		  for (unsigned int i=0; i<(2*nx); i += 2)
 		    {
+		      // First Prism
 		      Elem* elem = NULL;
 		      elem = ((type == PRISM15) ?
 			      mesh.add_elem(new Prism15) :
@@ -1036,7 +1062,21 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 			  elem->set_node(17) = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k+1));
 			}
 
-			
+		      // Add sides for first prism to boundary info object
+		      if (i==0)
+			mesh.boundary_info->add_side(elem, 3, 4);
+
+		      if (j==0)
+			mesh.boundary_info->add_side(elem, 1, 1);
+
+		      if (k==0)
+			mesh.boundary_info->add_side(elem, 0, 0);
+
+		      if (k == 2*(nz-1))
+			mesh.boundary_info->add_side(elem, 4, 5);
+
+		      
+		      // Second Prism
 		      elem = ((type == PRISM15) ?
 			      mesh.add_elem(new Prism15) :
 			      mesh.add_elem(new Prism18));
@@ -1062,6 +1102,20 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 			  elem->set_node(16)  = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k+1));
 			  elem->set_node(17)  = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1));
 			}
+		      
+		      // Add sides for second prism to boundary info object
+		      if (i == 2*(nx-1))
+			mesh.boundary_info->add_side(elem, 1, 2);
+
+		      if (j == 2*(ny-1))
+			mesh.boundary_info->add_side(elem, 2, 3);
+
+		      if (k==0)
+			mesh.boundary_info->add_side(elem, 0, 0);
+
+		      if (k == 2*(nz-1))
+			mesh.boundary_info->add_side(elem, 4, 5);
+
 		    }
 	      break;
 	    }
