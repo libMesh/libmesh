@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.24 2007-01-19 23:28:09 roystgnr Exp $
+// $Id: dof_map.h,v 1.25 2007-05-04 22:58:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -191,7 +191,7 @@ public:
    * Returns the number of degrees of freedom on subdomain \p proc.
    */
   unsigned int n_dofs_on_processor(const unsigned int proc) const
-  { assert(proc < _first_df.size()); return (_last_df[proc] - _first_df[proc]+1); }
+  { assert(proc < _first_df.size()); return (_end_df[proc] - _first_df[proc]); }
 
   /**
    * Returns the first dof index that is local to subdomain \p proc.
@@ -201,10 +201,18 @@ public:
   
   /**
    * Returns the last dof index that is local to subdomain \p proc.
+   * This function is now deprecated, because it returns nonsense in the rare
+   * case where \p proc has no local dof indices.  Use end_dof() instead.
    */
   unsigned int last_dof(const unsigned int proc = libMesh::processor_id()) const
-  { assert(proc < _last_df.size()); return _last_df[proc]; }  
+  { assert(proc < _end_df.size()); return (_end_df[proc] - 1); }  
 
+  /**
+   * Returns the first dof index that is after all indices local to subdomain \p proc.
+   * Analogous to the end() member function of STL containers.
+   */
+  unsigned int end_dof(const unsigned int proc = libMesh::processor_id()) const
+  { assert(proc < _end_df.size()); return _end_df[proc]; }  
   
   /**
    * Fills the vector \p di with the global degree of freedom indices
@@ -514,7 +522,7 @@ private:
   /**
    * Last DOF index (plus 1) on processor \p p.
    */
-  std::vector<unsigned int> _last_df;
+  std::vector<unsigned int> _end_df;
 
   /**
    * A list containing all the global DOF indicies that affect the

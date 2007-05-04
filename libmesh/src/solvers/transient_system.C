@@ -1,4 +1,4 @@
-// $Id: transient_system.C,v 1.10 2006-03-29 20:56:45 roystgnr Exp $
+// $Id: transient_system.C,v 1.11 2007-05-04 22:58:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -131,22 +131,26 @@ void TransientSystem<Base>::re_update ()
   Utility::iota (send_list.begin(), send_list.end(), 0);
   
   const unsigned int first_local_dof = Base::get_dof_map().first_dof();
-  const unsigned int last_local_dof  = Base::get_dof_map().last_dof();
+  const unsigned int end_local_dof  = Base::get_dof_map().end_dof();
 
   // Check sizes
-  assert (last_local_dof > first_local_dof);
-  assert (send_list.size() >= (last_local_dof - first_local_dof + 1));
+  assert (end_local_dof >= first_local_dof);
+  assert (send_list.size() >= end_local_dof - first_local_dof);
   assert (older_local_solution->size() >= send_list.size());
   assert (old_local_solution->size()   >= send_list.size());
+
+  // Make sure we have something to do
+  if (first_local_dof == end_local_dof)
+    return;
   
   // Update the old & older solutions with the send_list,
   // which may have changed since their last update.
   older_local_solution->localize (first_local_dof,
-				  last_local_dof,
+				  end_local_dof-1,
 				  send_list);
   
   old_local_solution->localize (first_local_dof,
-				last_local_dof,
+				end_local_dof-1,
 				send_list);  
 }
 
