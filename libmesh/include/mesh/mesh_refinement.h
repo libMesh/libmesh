@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.23 2007-03-14 22:02:10 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.24 2007-05-04 21:18:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -194,6 +194,9 @@ public:
    * is actually no change upon calling this member function.  Consequently,
    * this function returns \p true if the mesh actually changed (hence
    * data needs to be projected) and \p false otherwise.
+   *
+   * The argument \p maintain_level_one is now deprecated; use the option
+   * face_level_mismatch_limit() instead.
    */
   bool refine_and_coarsen_elements (const bool maintain_level_one=true);
 
@@ -204,6 +207,9 @@ public:
    * is actually no change upon calling this member function.  Consequently,
    * this function returns \p true if the mesh actually changed (hence
    * data needs to be projected) and \p false otherwise.
+   *
+   * The argument \p maintain_level_one is now deprecated; use the option
+   * face_level_mismatch_limit() instead.
    */
   bool coarsen_elements (const bool maintain_level_one=true);
 
@@ -213,6 +219,9 @@ public:
    * is actually no change upon calling this member function.  Consequently,
    * this function returns \p true if the mesh actually changed (hence
    * data needs to be projected) and \p false otherwise.
+   *
+   * The argument \p maintain_level_one is now deprecated; use the option
+   * face_level_mismatch_limit() instead.
    */
   bool refine_elements (const bool maintain_level_one=true);
   
@@ -343,6 +352,40 @@ public:
    */
   Real& absolute_global_tolerance();
 
+  /**
+   * If \p face_level_mismatch_limit is set to a nonzero value, then
+   * refinement and coarsening will produce meshes in which the
+   * refinement level of two face neighbors will not differ by more than
+   * that limit.  If \p face_level_mismatch_limit is 0, then level
+   * differences will be unlimited.
+   *
+   * \p face_level_mismatch_limit is 1 by default.  Currently the only
+   * supported options are 0 and 1.
+   */
+  unsigned char& face_level_mismatch_limit();
+
+  /**
+   * If \p edge_level_mismatch_limit is set to a nonzero value, then
+   * refinement and coarsening will produce meshes in which the
+   * refinement level of two edge neighbors will not differ by more than
+   * that limit.  If \p edge_level_mismatch_limit is 0, then level
+   * differences will be unlimited.
+   *
+   * \p edge_level_mismatch_limit is 0 by default.
+   */
+  unsigned char& edge_level_mismatch_limit();
+
+  /**
+   * If \p node_level_mismatch_limit is set to a nonzero value, then
+   * refinement and coarsening will produce meshes in which the
+   * refinement level of two nodal neighbors will not differ by more than
+   * that limit.  If \p node_level_mismatch_limit is 0, then level
+   * differences will be unlimited.
+   *
+   * \p node_level_mismatch_limit is 0 by default.
+   */
+  unsigned char& node_level_mismatch_limit();
+
 private:
 
   /**
@@ -377,7 +420,7 @@ private:
   // "Smoothing" algorthms for refined meshes
   
   /**
-   * This algorithm restricts the maximim level mismatch
+   * This algorithm restricts the maximum level mismatch
    * at any node in the mesh.  Calling this with \p max_mismatch
    * equal to 1 would transform this mesh:
    \verbatim
@@ -441,6 +484,13 @@ private:
    
    */
   bool limit_level_mismatch_at_node (const unsigned int max_mismatch);
+
+  /*
+   * This algorithm restricts the maximum level mismatch
+   * at any edge in the mesh.  See the ASCII art in the comment of
+   * limit_level_mismatch_at_node, and pretend they're hexes.
+   */
+  bool limit_level_mismatch_at_edge (const unsigned int max_mismatch);
 
   /**
    * This algorithm selects an element for refinement
@@ -585,6 +635,9 @@ private:
   unsigned int _nelem_target;
 
   Real _absolute_global_tolerance;
+
+  unsigned char _face_level_mismatch_limit, _edge_level_mismatch_limit,
+	        _node_level_mismatch_limit;
 };
 
 

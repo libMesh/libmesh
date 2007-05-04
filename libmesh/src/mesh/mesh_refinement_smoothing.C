@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_smoothing.C,v 1.14 2006-05-24 20:34:45 roystgnr Exp $
+// $Id: mesh_refinement_smoothing.C,v 1.15 2007-05-04 21:18:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,9 +45,6 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 
   // Loop over all the active elements & fill the vector
   {
-//     const_active_elem_iterator       elem_it (_mesh.const_elements_begin());
-//     const const_active_elem_iterator elem_end(_mesh.const_elements_end());
-
     MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
     
@@ -78,9 +75,6 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
   // Now loop over the active elements and flag the elements
   // who violate the requested level mismatch
   {
-//     active_elem_iterator       elem_it (_mesh.elements_begin());
-//     const active_elem_iterator elem_end(_mesh.elements_end());
-
     MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
     
@@ -123,13 +117,118 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 
 
 
+//-----------------------------------------------------------------
+// Mesh refinement methods
+bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismatch)
+{
+  bool flags_changed = false;
+
+
+  // Maps holding the maximum element level that touches an edge
+  std::map<std::pair<unsigned int, unsigned int>, unsigned char>
+    max_level_at_edge;
+  std::map<std::pair<unsigned int, unsigned int>, unsigned char>
+    max_p_level_at_edge;
+
+  // Loop over all the active elements & fill the maps
+  {
+    MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
+    const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
+    
+    for (; elem_it != elem_end; ++elem_it)
+      {
+	const Elem* elem = *elem_it;	
+	const unsigned char elem_level =
+	  elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
+	const unsigned char elem_p_level =
+	  elem->p_level() + ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0);
+
+	// Set the max_level at each edge
+	for (unsigned int n=0; n<elem->n_edges(); n++)
+	  {
+            AutoPtr<Elem> edge = elem->build_edge(n);
+            unsigned int node0 = edge->node(0);
+            unsigned int node1 = edge->node(1);
+            if (node1 < node0)
+              std::swap(node0, node1);
+
+            std::pair<unsigned int, unsigned int> edge_key =
+              std::make_pair(node0, node1);
+
+            if (max_level_at_edge.find(edge_key) ==
+                max_level_at_edge.end())
+              {
+                max_level_at_edge[edge_key] = elem_level;
+	        max_p_level_at_edge[edge_key] = elem_p_level;
+              }
+            else
+              {
+	        max_level_at_edge[edge_key] =
+	          std::max (max_level_at_edge[edge_key], elem_level);
+	        max_p_level_at_edge[edge_key] =
+	          std::max (max_p_level_at_edge[edge_key], elem_p_level);
+              }
+	  }
+      }     
+  }
+
+
+  // Now loop over the active elements and flag the elements
+  // who violate the requested level mismatch
+  {
+    MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
+    const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
+    
+    for (; elem_it != elem_end; ++elem_it)
+      {
+	Elem* elem = *elem_it;	
+	const unsigned int elem_level = elem->level();
+	const unsigned int elem_p_level = elem->p_level();
+	
+	// Skip the element if it is already fully flagged
+	if (elem->refinement_flag() == Elem::REFINE &&
+            elem->p_refinement_flag() == Elem::REFINE)
+	  continue;
+
+	// Loop over the nodes, check for possible mismatch
+	for (unsigned int n=0; n<elem->n_edges(); n++)
+	  {
+            AutoPtr<Elem> edge = elem->build_edge(n);
+            unsigned int node0 = edge->node(0);
+            unsigned int node1 = edge->node(1);
+            if (node1 < node0)
+              std::swap(node0, node1);
+
+            std::pair<unsigned int, unsigned int> edge_key =
+              std::make_pair(node0, node1);
+
+	    // Flag the element for refinement if it violates
+	    // the requested level mismatch
+	    if ( (elem_level + max_mismatch) < max_level_at_edge[edge_key]
+                 && elem->refinement_flag() != Elem::REFINE)
+	      {
+		elem->set_refinement_flag (Elem::REFINE);
+		flags_changed = true;
+	      }
+	    if ( (elem_p_level + max_mismatch) < max_p_level_at_edge[edge_key]
+                 && elem->p_refinement_flag() != Elem::REFINE)
+	      {
+		elem->set_p_refinement_flag (Elem::REFINE);
+		flags_changed = true;
+	      }
+	  }
+      }     
+  }
+  
+  return flags_changed;
+}
+
+
+
 
 bool MeshRefinement::eliminate_unrefined_patches ()
 {
   bool flags_changed = false;
-
-//   active_elem_iterator       elem_it (_mesh.elements_begin());
-//   const active_elem_iterator elem_end(_mesh.elements_end());
 
   MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
