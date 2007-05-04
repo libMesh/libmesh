@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.35 2007-02-08 22:43:18 roystgnr Exp $
+// $Id: equation_systems.C,v 1.36 2007-05-04 22:11:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -172,9 +172,11 @@ void EquationSystems::reinit ()
 
   MeshRefinement mesh_refine(_mesh);
 
+  mesh_refine.face_level_mismatch_limit() = false;
+
   // Try to coarsen the mesh, then restrict each system's vectors
   // if necessary
-  if (mesh_refine.coarsen_elements(false))
+  if (mesh_refine.coarsen_elements())
     {
       for (pos = _systems.begin(); pos != end; ++pos)
         {
@@ -196,7 +198,7 @@ void EquationSystems::reinit ()
   
   // Try to refine the mesh, then prolong each system's vectors
   // if necessary
-  if (mesh_refine.refine_elements(false))
+  if (mesh_refine.refine_elements())
     {
       for (pos = _systems.begin(); pos != end; ++pos)
         {
