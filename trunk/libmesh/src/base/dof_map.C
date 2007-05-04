@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.97 2007-01-19 23:28:09 roystgnr Exp $
+// $Id: dof_map.C,v 1.98 2007-05-04 22:58:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -389,7 +389,7 @@ void DofMap::clear()
   
   _variable_types.clear();  
   _first_df.clear();
-  _last_df.clear();
+  _end_df.clear();
   _send_list.clear();
   _n_nz.clear();
   _n_oz.clear();
@@ -445,9 +445,9 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
   // new degrees of freedom
   unsigned int next_free_dof = 0;
 
-  // Resize the _first_df and _last_df arrays, fill with 0.
+  // Resize the _first_df and _end_df arrays, fill with 0.
   _first_df.resize(n_proc); std::fill(_first_df.begin(), _first_df.end(), 0);
-  _last_df.resize (n_proc); std::fill(_last_df.begin(),  _last_df.end(),  0);
+  _end_df.resize (n_proc); std::fill(_end_df.begin(),  _end_df.end(),  0);
 
   _send_list.clear();
   
@@ -522,7 +522,7 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
 	    }
 	}
       
-      _last_df[processor] = (next_free_dof-1);
+      _end_df[processor] = next_free_dof;
     }
 
   // Set the total number of degrees of freedom
@@ -567,9 +567,9 @@ void DofMap::distribute_dofs_node_major (MeshBase& mesh)
   // new degrees of freedom
   unsigned int next_free_dof = 0;
 
-  // Resize the _first_df and _last_df arrays, fill with 0.
+  // Resize the _first_df and _end_df arrays, fill with 0.
   _first_df.resize(n_proc); std::fill(_first_df.begin(), _first_df.end(), 0);
-  _last_df.resize (n_proc); std::fill(_last_df.begin(),  _last_df.end(),  0);
+  _end_df.resize (n_proc); std::fill(_end_df.begin(),  _end_df.end(),  0);
 
   _send_list.clear();
   
@@ -643,7 +643,7 @@ void DofMap::distribute_dofs_node_major (MeshBase& mesh)
                }
 	}
       
-      _last_df[processor] = (next_free_dof-1);
+      _end_df[processor] = next_free_dof;
     }
   
   // Set the total number of degrees of freedom
@@ -781,8 +781,8 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   const unsigned int proc_id           = mesh.processor_id();
   const unsigned int n_dofs_on_proc    = this->n_dofs_on_processor(proc_id);
   const unsigned int first_dof_on_proc = this->first_dof(proc_id);
-  const unsigned int last_dof_on_proc  = this->last_dof(proc_id);
-  
+  const unsigned int end_dof_on_proc   = this->end_dof(proc_id);
+
   std::vector<std::vector<unsigned int> > sparsity_pattern (n_dofs_on_proc);
 
   static const bool implicit_neighbor_dofs = 
@@ -823,7 +823,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 	      // Only bother if this matrix row will be stored
 	      // on this processor.
 	      if ((ig >= first_dof_on_proc) &&
-		  (ig <= last_dof_on_proc))
+		  (ig < end_dof_on_proc))
 		{
 		  // This is what I mean
 		  // assert ((ig - first_dof_on_proc) >= 0);
@@ -977,7 +977,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 		      // Only bother if this matrix row will be stored
 		      // on this processor.
 		      if ((ig >= first_dof_on_proc) &&
-			  (ig <= last_dof_on_proc))
+			  (ig < end_dof_on_proc))
 			{
 			  // This is what I mean
 			  // assert ((ig - first_dof_on_proc) >= 0);
@@ -1062,7 +1062,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
       const std::vector<unsigned int>& row = sparsity_pattern[i];
 
       for (unsigned int j=0; j<row.size(); j++)
-	if ((row[j] < first_dof_on_proc) || (row[j] > last_dof_on_proc))
+	if ((row[j] < first_dof_on_proc) || (row[j] >= end_dof_on_proc))
 	  _n_oz[i]++;
 	else
 	  _n_nz[i]++;
