@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.24 2007-05-04 21:18:34 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.25 2007-05-04 22:20:32 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -685,6 +685,21 @@ inline Real& MeshRefinement::absolute_global_tolerance()
 {
   _use_member_parameters = true;
   return _absolute_global_tolerance;
+}
+
+inline unsigned char& MeshRefinement::face_level_mismatch_limit()
+{
+  return _face_level_mismatch_limit;
+}
+
+inline unsigned char& MeshRefinement::edge_level_mismatch_limit()
+{
+  return _edge_level_mismatch_limit;
+}
+
+inline unsigned char& MeshRefinement::node_level_mismatch_limit()
+{
+  return _node_level_mismatch_limit;
 }
 
 #endif // end #ifdef ENABLE_AMR
