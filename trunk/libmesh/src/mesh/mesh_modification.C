@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.27 2007-03-09 16:08:37 roystgnr Exp $
+// $Id: mesh_modification.C,v 1.28 2007-05-04 20:23:41 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -347,6 +347,14 @@ void Mesh::all_second_order (const bool full_ordered)
   if (!this->_is_prepared)
     this->renumber_nodes_and_elements ();
 
+  /*
+   * If the mesh is already second order
+   * then we have nothing to do
+   */
+  assert(_elements[0] != NULL);
+  if (_elements[0]->default_order() != FIRST)
+    return;
+
   // does this work also in parallel?
   // assert (this->n_processors() == 1);
 
@@ -641,10 +649,6 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	
 	switch (etype)
 	  {
-          // No need to split elements that are already triangles
-          case TRI3:
-          case TRI6:
-            continue;
 	  case QUAD4:
 	    {
 	      split_elem = true;
@@ -784,16 +788,17 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	    
 	      break;
 	    }
-	  
+          // No need to split elements that are already triangles
+          case TRI3:
+          case TRI6:
+            continue;
+          // Try to ignore non-2D elements for now
 	  default:
 	    {
 	      std::cerr << "Warning, encountered non-2D element "
                         << Utility::enum_to_string<ElemType>(etype)
 			<< " in MeshTools::Modification::all_tri(), hope that's OK..."
 			<< std::endl;
-	      
-	      // If not one of the QUAD* types, the Elem must
-	      // be a TRI* type already, or a 3D element, so just leave it.
 	    }
 	  } // end switch (etype)
 
@@ -931,10 +936,11 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
   if (mesh_has_boundary_data)
     {
       // By this time, we should have removed all of the original boundary sides
-      assert (mesh.boundary_info->n_boundary_conds()==0);
+      // - except on a hybrid mesh, where we can't "start from a blank slate"! - RHS
+      // assert (mesh.boundary_info->n_boundary_conds()==0);
 
       // Clear the boundary info, to be sure and start from a blank slate.
-      mesh.boundary_info->clear();
+      // mesh.boundary_info->clear();
 
       // If the old mesh had boundary data, the new mesh better have some.
       assert (new_bndry_elements.size() > 0);
