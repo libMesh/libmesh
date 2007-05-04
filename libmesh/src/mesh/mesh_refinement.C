@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.59 2007-05-04 22:20:32 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.60 2007-05-04 22:27:50 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -350,10 +350,10 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   do
     {
       const bool coarsening_satisfied =
-	this->make_coarsening_compatible(_maintain_level_one);
+	this->make_coarsening_compatible(maintain_level_one);
       
       const bool refinement_satisfied =
-	this->make_refinement_compatible(_maintain_level_one);
+	this->make_refinement_compatible(maintain_level_one);
 
       bool smoothing_satisfied = 
  	!this->eliminate_unrefined_patches();
@@ -378,8 +378,8 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 
   if (_maintain_level_one)
     assert(test_level_one(true));
-  assert(this->make_coarsening_compatible(_maintain_level_one));
-  assert(this->make_refinement_compatible(_maintain_level_one));
+  assert(this->make_coarsening_compatible(maintain_level_one));
+  assert(this->make_refinement_compatible(maintain_level_one));
 // FIXME: This won't pass unless we add a redundant find_neighbors()
 // call or replace find_neighbors() with on-the-fly neighbor updating
 // assert(!this->eliminate_unrefined_patches());
@@ -396,8 +396,8 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   if (_maintain_level_one)
     assert(test_level_one(true));
   assert(test_unflagged(true));
-  assert(this->make_coarsening_compatible(_maintain_level_one));
-  assert(this->make_refinement_compatible(_maintain_level_one));
+  assert(this->make_coarsening_compatible(maintain_level_one));
+  assert(this->make_refinement_compatible(maintain_level_one));
 // FIXME: This won't pass unless we add a redundant find_neighbors()
 // call or replace find_neighbors() with on-the-fly neighbor updating
 // assert(!this->eliminate_unrefined_patches());
@@ -470,7 +470,7 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
   while (!satisfied)
     {
       const bool coarsening_satisfied =
-	this->make_coarsening_compatible(_maintain_level_one);
+	this->make_coarsening_compatible(maintain_level_one);
 
       bool smoothing_satisfied = 
  	!this->eliminate_unrefined_patches();// &&
@@ -493,7 +493,7 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 
   if (_maintain_level_one)
     assert(test_level_one(true));
-  assert(this->make_coarsening_compatible(_maintain_level_one));
+  assert(this->make_coarsening_compatible(maintain_level_one));
 // FIXME: This won't pass unless we add a redundant find_neighbors()
 // call or replace find_neighbors() with on-the-fly neighbor updating
 // assert(!this->eliminate_unrefined_patches());
@@ -562,7 +562,7 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
   while (!satisfied)
     {
       const bool refinement_satisfied =
-	this->make_refinement_compatible(_maintain_level_one);
+	this->make_refinement_compatible(maintain_level_one);
 
       bool smoothing_satisfied = 
  	!this->eliminate_unrefined_patches();// &&
@@ -586,7 +586,7 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
 
   if (_maintain_level_one)
     assert(test_level_one(true));
-  assert(this->make_refinement_compatible(_maintain_level_one));
+  assert(this->make_refinement_compatible(maintain_level_one));
 // FIXME: This won't pass unless we add a redundant find_neighbors()
 // call or replace find_neighbors() with on-the-fly neighbor updating
 // assert(!this->eliminate_unrefined_patches());
