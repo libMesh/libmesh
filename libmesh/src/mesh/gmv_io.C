@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.35 2007-05-03 21:15:56 roystgnr Exp $
+// $Id: gmv_io.C,v 1.36 2007-05-08 14:56:09 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -829,8 +829,9 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 		    }
 		  else if ((lo_elem->type() == PRISM6)
 #ifdef  ENABLE_INFINITE_ELEMENTS
-                           || (lo_elem->type() == INFPRISM6))
+                           || (lo_elem->type() == INFPRISM6)
 #endif
+			   )
 		    {
 		      /**
 		       * Note that the prisms are treated as
