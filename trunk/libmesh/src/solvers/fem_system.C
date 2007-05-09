@@ -529,7 +529,9 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 	      // In DEBUG mode, we've already set elem_jacobian == 0,
 	      // so we can make sure side_residual didn't compute a
               // jacobian and lie about it
+#ifdef DEBUG
               assert(elem_jacobian.l1_norm() == 0.0);
+#endif
               // Logging of numerical jacobians is done separately
               PAUSE_LOG(log_name, "FEMSystem");
               this->numerical_side_jacobian();
