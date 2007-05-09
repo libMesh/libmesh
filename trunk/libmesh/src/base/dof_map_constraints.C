@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.33 2006-11-10 20:21:39 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.34 2007-05-09 18:12:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -754,6 +754,70 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
     }
   
   if (!called_recursively) STOP_LOG("build_constraint_matrix()", "DofMap");  
+}
+
+
+
+void DofMap::process_recursive_constraints ()
+{
+  // Create a set containing the DOFs we already depend on
+  typedef std::set<unsigned int> RCSet;
+  RCSet unexpanded_set;
+
+  for (DofConstraints::iterator i = _dof_constraints.begin();
+	 i != _dof_constraints.end(); ++i)
+    unexpanded_set.insert(i->first);
+
+  while (!unexpanded_set.empty())
+    for (RCSet::iterator i = unexpanded_set.begin();
+	 i != unexpanded_set.end(); /* nothing */)
+      {
+	// If the DOF is constrained
+	DofConstraints::iterator
+	  pos = _dof_constraints.find(*i);
+	
+	assert (pos != _dof_constraints.end());
+	
+	DofConstraintRow& constraint_row = pos->second;
+
+	std::vector<unsigned int> constraints_to_expand;
+
+	for (DofConstraintRow::const_iterator
+	       it=constraint_row.begin(); it != constraint_row.end();
+	     ++it)
+	  if (this->is_constrained_dof(it->first))
+            {
+              unexpanded_set.insert(it->first);
+	      constraints_to_expand.push_back(it->first);
+	    }
+
+	for (unsigned int j = 0; j != constraints_to_expand.size();
+	     ++j)
+	  {
+            unsigned int expandable = constraints_to_expand[j];
+
+	    DofConstraints::const_iterator
+	      subpos = _dof_constraints.find(expandable);
+	
+	    assert (subpos != _dof_constraints.end());
+	
+	    const DofConstraintRow& subconstraint_row = subpos->second;
+            
+	    for (DofConstraintRow::const_iterator
+	           it=subconstraint_row.begin();
+		   it != subconstraint_row.end(); ++it)
+              {
+		constraint_row[it->first] += it->second *
+				constraint_row[expandable];
+	      }
+	    constraint_row.erase(expandable);
+          }
+
+	if (constraints_to_expand.empty())
+	  unexpanded_set.erase(i++);
+	else
+	  i++;
+      }
 }
 
 #endif // #ifdef ENABLE_AMR

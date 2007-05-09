@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.25 2007-05-04 22:58:10 roystgnr Exp $
+// $Id: dof_map.h,v 1.26 2007-05-09 18:12:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -270,9 +270,16 @@ public:
 			const unsigned int vn = libMesh::invalid_uint) const;
 
   /**
-   * Rebuilds the degree of freedom constraints.
+   * Rebuilds the raw degree of freedom constraints.
    */ 
   void create_dof_constraints (const MeshBase& mesh);
+
+  /**
+   * Postprocesses any constrained degrees of freedom in elem_dofs
+   * to be constrained only in terms of unconstrained dofs.
+   */
+  void process_recursive_constraints ();
+
 
   /**
    * Adds the user-defined row to the constraint matrix.
