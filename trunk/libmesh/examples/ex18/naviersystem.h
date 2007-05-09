@@ -1,4 +1,4 @@
-/* $Id: naviersystem.h,v 1.2 2006-12-11 23:17:54 roystgnr Exp $ */
+/* $Id: naviersystem.h,v 1.3 2007-05-09 19:31:47 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -30,7 +30,7 @@ public:
   NavierSystem(EquationSystems& es,
                const std::string& name,
                const unsigned int number)
-  : FEMSystem(es, name, number), Reynolds(1.) {}
+    : FEMSystem(es, name, number), Reynolds(1.), application(0) {}
 
   // System initialization
   virtual void init_data ();
@@ -54,4 +54,14 @@ public:
 
   // The Reynolds number to solve for
   Real Reynolds;
+
+  // The application number controls what boundary conditions and/or
+  // forcing functions are applied.  Current options are:
+  // 0 - discontinuous lid velociy driven cavity
+  // 1 - homogeneous Dirichlet BC with smooth forcing
+  unsigned int application;
+
+  // Returns the value of a forcing function at point p.  This value
+  // depends on which application is being used.
+  Point forcing(const Point& p);
 };

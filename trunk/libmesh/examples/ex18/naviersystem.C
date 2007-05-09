@@ -1,4 +1,4 @@
-/* $Id: naviersystem.C,v 1.4 2006-12-11 23:17:54 roystgnr Exp $ */
+/* $Id: naviersystem.C,v 1.5 2007-05-09 19:31:47 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -76,7 +76,8 @@ void NavierSystem::init_data ()
   fe_velocity->get_JxW();
   fe_velocity->get_phi();
   fe_velocity->get_dphi();
-
+  fe_velocity->get_xyz();
+  
   fe_pressure->get_phi();
 
   fe_side_vel->get_JxW();
@@ -85,6 +86,7 @@ void NavierSystem::init_data ()
   // Check the input file for Reynolds number
   GetPot infile("navier.in");
   Reynolds = infile("Reynolds", 1.);
+  application = infile("application", 0);
 
   // Useful debugging options
   // Set verify_analytic_jacobians to 1e-6 to use
@@ -114,6 +116,9 @@ bool NavierSystem::element_time_derivative (bool request_jacobian)
   // quadrature points.
   const std::vector<std::vector<Real> >& psi = fe_pressure->get_phi();
 
+  // Physical location of the quadrature points
+  const std::vector<Point>& qpoint = fe_velocity->get_xyz();
+ 
   // The number of local degrees of freedom in each variable
   const unsigned int n_p_dofs = dof_indices_var[p_var].size();
   const unsigned int n_u_dofs = dof_indices_var[u_var].size(); 
@@ -170,7 +175,10 @@ bool NavierSystem::element_time_derivative (bool request_jacobian)
       const Number  w_x = (dim == 3)?grad_w(0):0;
       const Number  w_y = (dim == 3)?grad_w(1):0;
       const Number  w_z = (dim == 3)?grad_w(2):0;
-          
+
+      // Value of the forcing function at this quadrature point
+      Point f = this->forcing(qpoint[qp]);
+
       // First, an i-loop over the velocity degrees of freedom.
       // We know that n_u_dofs == n_v_dofs so we can compute contributions
       // for both at the same time.
@@ -179,18 +187,27 @@ bool NavierSystem::element_time_derivative (bool request_jacobian)
           Fu(i) += JxW[qp] *
                    (-Reynolds*(U*grad_u)*phi[i][qp] + // convection term
                     p*dphi[i][qp](0) -                // pressure term
-                    (grad_u*dphi[i][qp]));            // diffusion term
+		    (grad_u*dphi[i][qp]) +            // diffusion term
+		    f(0)*phi[i][qp]                   // forcing function
+		    );
+
             
           Fv(i) += JxW[qp] *
                    (-Reynolds*(U*grad_v)*phi[i][qp] + // convection term
                     p*dphi[i][qp](1) -                // pressure term
-                    (grad_v*dphi[i][qp]));            // diffusion term
+		    (grad_v*dphi[i][qp]) +            // diffusion term
+		    f(1)*phi[i][qp]                   // forcing function
+		    );
+
 
           if (dim == 3)
           Fw(i) += JxW[qp] *
                    (-Reynolds*(U*grad_w)*phi[i][qp] + // convection term
                     p*dphi[i][qp](2) -                // pressure term
-                    (grad_w*dphi[i][qp]));            // diffusion term
+		    (grad_w*dphi[i][qp]) +            // diffusion term
+		    f(2)*phi[i][qp]                   // forcing function
+		    );
+
 
           // Note that the Fp block is identically zero unless we are using
           // some kind of artificial compressibility scheme...
@@ -358,7 +375,11 @@ bool NavierSystem::side_constraint (bool request_jacobian)
       assert (boundary_id != BoundaryInfo::invalid_id);
       const short int top_id = (dim==3) ? 5 : 2;
 
-      const Real u_value = (boundary_id == top_id) ? 1. : 0.;
+      Real u_value = 0.;
+
+      // For lid-driven cavity, set u=1 on the lid.
+      if ((application == 0) && (boundary_id == top_id))
+	u_value = 1.;
               
       // Set v, w = 0 everywhere
       const Real v_value = 0.;
@@ -424,4 +445,50 @@ bool NavierSystem::side_constraint (bool request_jacobian)
     }
 
   return request_jacobian;
+}
+
+
+
+Point NavierSystem::forcing(const Point& p)
+{
+  switch (application)
+    {
+      // lid driven cavity
+    case 0:
+      {
+	// No forcing
+	return Point(0.,0.,0.);
+      }
+
+      // Homogeneous Dirichlet BCs + sinusoidal forcing
+    case 1:
+      {
+	const unsigned int dim = this->get_mesh().mesh_dimension();
+
+	// This assumes your domain is defined on [0,1]^dim.
+	Point f;
+
+	// Counter-Clockwise vortex in x-y plane
+	if (dim==2)
+	  {
+	    f(0) =  std::sin(2.*libMesh::pi*p(1));
+	    f(1) = -std::sin(2.*libMesh::pi*p(0));
+	  }
+
+	// Counter-Clockwise vortex in x-z plane
+	else if (dim==3)
+	  {
+	    f(0) =  std::sin(2.*libMesh::pi*p(1));
+	    f(1) = 0.;
+	    f(2) = -std::sin(2.*libMesh::pi*p(0));
+	  }
+
+	return f;
+      }
+
+    default:
+      {
+	error();
+      }
+    }
 }
