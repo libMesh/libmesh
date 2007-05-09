@@ -4,3 +4,10 @@ Reynolds = 0.
 verify_analytic_jacobians = false
 print_jacobians = false
 print_element_jacobians = false
+
+
+# The application number controls what boundary conditions and/or
+# forcing functions are applied.  Current options are:
+# 0 - discontinuous lid velociy driven cavity
+# 1 - homogeneous Dirichlet BC with smooth forcing
+application = 0
