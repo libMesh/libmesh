@@ -12,6 +12,14 @@ SteadySolver::~SteadySolver ()
 
 bool SteadySolver::element_residual(bool request_jacobian)
 {
+  // If a fixed solution is requested, it will just be the current
+  // solution
+  if (_system.use_fixed_solution)
+    {
+      _system.elem_fixed_solution = _system.elem_solution;
+      _system.fixed_solution_derivative = 1.0;
+    }
+
   bool jacobian_computed =
     _system.element_time_derivative(request_jacobian);
 
@@ -31,6 +39,14 @@ bool SteadySolver::element_residual(bool request_jacobian)
 
 bool SteadySolver::side_residual(bool request_jacobian)
 {
+  // If a fixed solution is requested, it will just be the current
+  // solution
+  if (_system.use_fixed_solution)
+    {
+      _system.elem_fixed_solution = _system.elem_solution;
+      _system.fixed_solution_derivative = 1.0;
+    }
+
   bool jacobian_computed =
     _system.side_time_derivative(request_jacobian);
 
