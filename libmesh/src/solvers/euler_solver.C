@@ -74,9 +74,20 @@ bool EulerSolver::element_residual (bool request_jacobian)
 
   // Add the mass term for the old solution
   _system.elem_solution.swap(old_elem_solution);
-  // FIXME - we should detect if mass_residual() edits
-  // elem_jacobian and lies about it!
-  _system.mass_residual(false);
+
+  if (_system.use_fixed_solution)
+    {
+      _system.elem_solution_derivative = 0.0;
+      jacobian_computed = _system.mass_residual(jacobian_computed) &&
+        jacobian_computed;
+      _system.elem_solution_derivative = 1.0;
+    }
+  else
+    {
+      // FIXME - we should detect if mass_residual() edits
+      // elem_jacobian and lies about it!
+      _system.mass_residual(false);
+    }
 
   // Restore the elem_solution
   _system.elem_solution.swap(theta_solution);

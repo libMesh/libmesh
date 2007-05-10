@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.17 2007-05-10 22:14:14 roystgnr Exp $
+// $Id: diff_system.h,v 1.18 2007-05-10 22:38:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -299,6 +299,7 @@ public:
 
   /**
    * Element by element components of nonlinear_solution
+   * as adjusted by a time_solver
    */
   DenseVector<Number> elem_solution;
   std::vector<DenseSubVector<Number> *> elem_subsolutions;
@@ -318,9 +319,16 @@ public:
   bool use_fixed_solution;
 
   /**
-   * The derivative of elem_fixed_solution with respect to elem_solution,
+   * The derivative of elem_solution with respect to the nonlinear solution,
    * for use by systems constructing jacobians with elem_fixed_solution
    * based methods
+   */
+  Real elem_solution_derivative;
+
+  /**
+   * The derivative of elem_fixed_solution with respect to the nonlinear
+   * solution, for use by systems constructing jacobians with
+   * elem_fixed_solution based methods
    */
   Real fixed_solution_derivative;
 

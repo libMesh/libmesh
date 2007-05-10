@@ -869,8 +869,10 @@ bool FEMSystem::mass_residual (bool request_jacobian)
           for (unsigned int i = 0; i != n_dofs; ++i)
             {
               Fu(i) += JxWxU * phi[i][qp];
-              if (request_jacobian)
+              if (request_jacobian && elem_solution_derivative)
                 {
+                  assert (elem_solution_derivative == 1.0);
+
                   Number JxWxPhiI = JxW[qp] * phi[i][qp];
                   Kuu(i,i) += JxWxPhiI * phi[i][qp];
                   for (unsigned int j = i+1; j != n_dofs; ++j)
