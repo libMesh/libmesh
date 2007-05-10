@@ -1,4 +1,4 @@
-// $Id: mesh_refinement_smoothing.C,v 1.15 2007-05-04 21:18:35 roystgnr Exp $
+// $Id: mesh_refinement_smoothing.C,v 1.16 2007-05-10 22:13:05 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -147,26 +147,40 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 	for (unsigned int n=0; n<elem->n_edges(); n++)
 	  {
             AutoPtr<Elem> edge = elem->build_edge(n);
-            unsigned int node0 = edge->node(0);
-            unsigned int node1 = edge->node(1);
-            if (node1 < node0)
-              std::swap(node0, node1);
+            unsigned int childnode0 = edge->node(0);
+            unsigned int childnode1 = edge->node(1);
+            if (childnode1 < childnode0)
+              std::swap(childnode0, childnode1);
 
-            std::pair<unsigned int, unsigned int> edge_key =
-              std::make_pair(node0, node1);
+	    for (const Elem *p = elem; p != NULL; p = elem->parent())
+	      {
+                AutoPtr<Elem> pedge = p->build_edge(n);
+		unsigned int node0 = pedge->node(0);
+		unsigned int node1 = pedge->node(1);
 
-            if (max_level_at_edge.find(edge_key) ==
-                max_level_at_edge.end())
-              {
-                max_level_at_edge[edge_key] = elem_level;
-	        max_p_level_at_edge[edge_key] = elem_p_level;
-              }
-            else
-              {
-	        max_level_at_edge[edge_key] =
-	          std::max (max_level_at_edge[edge_key], elem_level);
-	        max_p_level_at_edge[edge_key] =
-	          std::max (max_p_level_at_edge[edge_key], elem_p_level);
+		if (node0 != childnode0 && node0 != childnode1
+		    && node1 != childnode0 && node1 != childnode1)
+		  break;
+
+                if (node1 < node0)
+                  std::swap(node0, node1);
+		
+                std::pair<unsigned int, unsigned int> edge_key =
+                  std::make_pair(node0, node1);
+
+                if (max_level_at_edge.find(edge_key) ==
+                    max_level_at_edge.end())
+                  {
+                    max_level_at_edge[edge_key] = elem_level;
+	            max_p_level_at_edge[edge_key] = elem_p_level;
+                  }
+                else
+                  {
+	            max_level_at_edge[edge_key] =
+	              std::max (max_level_at_edge[edge_key], elem_level);
+	            max_p_level_at_edge[edge_key] =
+	              std::max (max_p_level_at_edge[edge_key], elem_p_level);
+                  }
               }
 	  }
       }     
