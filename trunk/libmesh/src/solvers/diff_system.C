@@ -23,6 +23,7 @@ DifferentiableSystem::DifferentiableSystem
   print_jacobians(false),
   print_element_jacobians(false),
   use_fixed_solution(false),
+  elem_solution_derivative(1.),
   fixed_solution_derivative(0.)
 {
   untested();
