@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.16 2007-02-13 21:29:02 roystgnr Exp $
+// $Id: diff_system.h,v 1.17 2007-05-10 22:14:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -304,9 +304,35 @@ public:
   std::vector<DenseSubVector<Number> *> elem_subsolutions;
 
   /**
-   * Element residual vector and Jacobian matrix
+   * Element by element components of nonlinear_solution
+   * at a fixed point in a timestep, for optional use by e.g.
+   * stabilized methods
+   */
+  DenseVector<Number> elem_fixed_solution;
+  std::vector<DenseSubVector<Number> *> elem_fixed_subsolutions;
+
+  /**
+   * A boolean to be set to true by systems using elem_fixed_solution,
+   * so that the library code will create it.
+   */
+  bool use_fixed_solution;
+
+  /**
+   * The derivative of elem_fixed_solution with respect to elem_solution,
+   * for use by systems constructing jacobians with elem_fixed_solution
+   * based methods
+   */
+  Real fixed_solution_derivative;
+
+  /**
+   * Element residual vector
    */
   DenseVector<Number> elem_residual;
+
+  /**
+   * Element jacobian: derivatives of elem_residual with respect to
+   * elem_solution
+   */
   DenseMatrix<Number> elem_jacobian;
 
   /**

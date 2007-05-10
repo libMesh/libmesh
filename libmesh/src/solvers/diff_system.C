@@ -21,7 +21,9 @@ DifferentiableSystem::DifferentiableSystem
   print_residuals(false),
   print_jacobian_norms(false),
   print_jacobians(false),
-  print_element_jacobians(false)
+  print_element_jacobians(false),
+  use_fixed_solution(false),
+  fixed_solution_derivative(0.)
 {
   untested();
 }
