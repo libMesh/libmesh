@@ -220,6 +220,193 @@ Number FEMSystem::point_value(unsigned int var, Point &p)
 
 
 
+Number FEMSystem::fixed_interior_value(unsigned int var, unsigned int qp)
+{
+  // Get local-to-global dof index lookup
+  assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  // Get current local coefficients
+  assert (elem_fixed_subsolutions.size() > var);
+  assert (elem_fixed_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<Real> > &phi =
+    element_fe_var[var]->get_phi();
+
+  // Accumulate solution value
+  Number u = 0.;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    u += phi[l][qp] * coef(l);
+
+  return u;
+}
+
+
+
+Gradient FEMSystem::fixed_interior_gradient(unsigned int var, unsigned int qp)
+{
+  // Get local-to-global dof index lookup
+  assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  // Get current local coefficients
+  assert (elem_fixed_subsolutions.size() > var);
+  assert (elem_fixed_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<RealGradient> > &dphi =
+    element_fe_var[var]->get_dphi();
+
+  // Accumulate solution derivatives
+  Gradient du;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    du.add_scaled(dphi[l][qp], coef(l));
+
+  return du;
+}
+
+
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+Tensor FEMSystem::fixed_interior_hessian(unsigned int var, unsigned int qp)
+{
+  // Get local-to-global dof index lookup
+  assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  // Get current local coefficients
+  assert (elem_fixed_subsolutions.size() > var);
+  assert (elem_fixed_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<RealTensor> > &d2phi =
+    element_fe_var[var]->get_d2phi();
+
+  // Accumulate solution second derivatives
+  Tensor d2u;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    d2u.add_scaled(d2phi[l][qp], coef(l));
+
+  return d2u;
+}
+#endif // ifdef ENABLE_SECOND_DERIVATIVES
+
+
+
+Number FEMSystem::fixed_side_value(unsigned int var, unsigned int qp)
+{
+  // Get local-to-global dof index lookup
+  assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  // Get current local coefficients
+  assert (elem_fixed_subsolutions.size() > var);
+  assert (elem_fixed_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<Real> > &phi =
+    side_fe_var[var]->get_phi();
+
+  // Accumulate solution value
+  Number u = 0.;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    u += phi[l][qp] * coef(l);
+
+  return u;
+}
+
+
+
+Gradient FEMSystem::fixed_side_gradient(unsigned int var, unsigned int qp)
+{
+  // Get local-to-global dof index lookup
+  assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  // Get current local coefficients
+  assert (elem_fixed_subsolutions.size() > var);
+  assert (elem_fixed_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<RealGradient> > &dphi =
+    side_fe_var[var]->get_dphi();
+
+  // Accumulate solution derivatives
+  Gradient du;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    du.add_scaled(dphi[l][qp], coef(l));
+
+  return du;
+}
+
+
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+Tensor FEMSystem::fixed_side_hessian(unsigned int var, unsigned int qp)
+{
+  // Get local-to-global dof index lookup
+  assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  // Get current local coefficients
+  assert (elem_fixed_subsolutions.size() > var);
+  assert (elem_fixed_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<RealTensor> > &d2phi =
+    side_fe_var[var]->get_d2phi();
+
+  // Accumulate solution second derivatives
+  Tensor d2u;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    d2u.add_scaled(d2phi[l][qp], coef(l));
+
+  return d2u;
+}
+#endif // ifdef ENABLE_SECOND_DERIVATIVES
+
+
+
+Number FEMSystem::fixed_point_value(unsigned int var, Point &p)
+{
+  // Get local-to-global dof index lookup
+  assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  
+  // Get current local coefficients
+  assert (elem_fixed_subsolutions.size() > var);
+  assert (elem_fixed_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+
+  Number u = 0.;
+
+  unsigned int dim = get_mesh().mesh_dimension();
+  FEType fe_type = element_fe_var[var]->get_fe_type();
+  Point p_master = FEInterface::inverse_map(dim, fe_type, elem, p);
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    u += FEInterface::shape(dim, fe_type, elem, l, p_master)
+         * coef(l);
+
+  return u;
+}
+
+
+
 void FEMSystem::clear()
 {
   Parent::clear();
