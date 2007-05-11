@@ -47,7 +47,11 @@ bool EulerSolver::element_residual (bool request_jacobian)
   if (_system.use_fixed_solution)
     {
       _system.elem_fixed_solution = theta_solution;
-      _system.fixed_solution_derivative = theta;
+
+// Technically the fixed_solution_derivative is always theta,
+// but we're scaling a whole jacobian by theta later
+//      _system.fixed_solution_derivative = theta;
+      _system.fixed_solution_derivative = 1.0;
     }
 
   // Temporarily replace elem_solution with theta_solution
@@ -71,6 +75,14 @@ bool EulerSolver::element_residual (bool request_jacobian)
   _system.elem_residual *= _system.deltat;
   if (jacobian_computed)
     _system.elem_jacobian *= (theta * _system.deltat);
+
+  // If a fixed solution is requested, we'll use theta_solution
+  if (_system.use_fixed_solution)
+    {
+// The fixed_solution_derivative is always theta,
+// and now we're done scaling jacobians
+      _system.fixed_solution_derivative = theta;
+    }
 
   // Add the mass term for the old solution
   _system.elem_solution.swap(old_elem_solution);
@@ -143,7 +155,11 @@ bool EulerSolver::side_residual (bool request_jacobian)
   if (_system.use_fixed_solution)
     {
       _system.elem_fixed_solution = theta_solution;
-      _system.fixed_solution_derivative = theta;
+
+// Technically the fixed_solution_derivative is always theta,
+// but we're scaling a whole jacobian by theta later
+//      _system.fixed_solution_derivative = theta;
+      _system.fixed_solution_derivative = 1.0;
     }
 
   // We're going to compute just the change in elem_residual,
