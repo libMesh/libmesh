@@ -1,4 +1,4 @@
-// $Id: adaptive_time_solver.h,v 1.3 2007-02-27 00:03:19 roystgnr Exp $
+// $Id: adaptive_time_solver.h,v 1.4 2007-05-11 21:53:32 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -134,6 +134,28 @@ public:
    */
   Real upper_tolerance;
 
+  /**
+   * Do not allow the adaptive time solver to select deltat > max_deltat.
+   * If you set max_deltat=0.0, then max_deltat=infty.
+   */
+  Real max_deltat;
+
+  /**
+   * This flag, which is true by default, grows (shrinks) the timestep
+   * based on the expected global accuracy of the timestepping scheme.
+   * Global in this sense means the cumulative final-time accuracy of
+   * the scheme.  For example, the backward Euler scheme's truncation
+   * error is locally of order 2, so that after N timesteps of size
+   * deltat, the result is first-order accurate.  If you set this to
+   * false, you can grow (shrink) your timestep based on the local
+   * accuracy rather than the global accuracy of the core TimeSolver.
+   * Note that by setting this value to false you may fail to achieve
+   * the predicted convergence in time of the underlying method, however
+   * it may be possible to get more fine-grained control over step sizes
+   * as well.
+   */
+  bool global_tolerance;
+  
 protected:
 
   /**

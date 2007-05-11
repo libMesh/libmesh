@@ -1,4 +1,4 @@
-// $Id: time_solver.h,v 1.11 2007-02-23 23:31:30 roystgnr Exp $
+// $Id: time_solver.h,v 1.12 2007-05-11 21:53:32 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -148,6 +148,25 @@ public:
    */
   virtual AutoPtr<DiffSolver> &diff_solver();
 
+  /**
+   * Print extra debugging information if quiet ==  false.
+   */
+  bool quiet;
+
+  /**
+   * Computes the size of ||u^{n+1} - u^{n}|| in some norm.
+   * Supported norms are
+   * l2: norm_type=0
+   * l1: norm_type=1
+   * 
+   * Note that, while you can always call this function, its
+   * result may or may not be very meaningful.  For example, if
+   * you call this function right after calling advance_timestep()
+   * then you'll get a result of zero since old_nonlinear_solution
+   * is set equal to nonlinear_solution in this function.
+   */
+  Real du(unsigned char norm_type=0);
+  
 protected:
 
   /**

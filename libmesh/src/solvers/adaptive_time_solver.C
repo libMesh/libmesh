@@ -9,7 +9,9 @@
 AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type& s)
  : TimeSolver(s),
    core_time_solver(new EulerSolver(s)),
-   target_tolerance(1.e-3), upper_tolerance(1.e-2)
+   target_tolerance(1.e-3), upper_tolerance(1.e-2),
+   max_deltat(0.),
+   global_tolerance(true)
 {
   // We start with a reasonable time solver: implicit Euler
 }
@@ -67,7 +69,7 @@ void AdaptiveTimeSolver::solve()
 
   // Call two single-length timesteps
   Real old_deltat = _system.deltat;
-  _system.deltat /= 2;
+  _system.deltat *= 0.5;
   core_time_solver->solve();
   core_time_solver->advance_timestep();
   core_time_solver->solve();
@@ -84,35 +86,86 @@ void AdaptiveTimeSolver::solve()
   *double_solution -= *(_system.solution);
   const Real error_norm  = calculate_norm(_system, *double_solution);
   Real relative_error = error_norm / _system.deltat /
-			std::max(double_norm, single_norm);
-/*
-std::cerr << "Double norm = " << double_norm << std::endl;
-std::cerr << "Single norm = " << single_norm << std::endl;
-std::cerr << "Error norm = " << error_norm << std::endl;
-std::cerr << "Local relative error = " << (error_norm / std::max(double_norm, single_norm)) << std::endl;
-std::cerr << "Global relative error = " << (error_norm / _system.deltat / std::max(double_norm, single_norm)) << std::endl;
-std::cerr << "old delta t = " << _system.deltat << std::endl;
-*/
+    std::max(double_norm, single_norm);
 
   // If the relative error makes no sense, we're done
   if (!double_norm && !single_norm)
     return;
+
+  if (!quiet)
+    {
+      std::cout << "\n === Computing adaptive timestep === " << std::endl;
+      std::cout << "Double norm = " << double_norm << std::endl;
+      std::cout << "Single norm = " << single_norm << std::endl;
+      std::cout << "Error norm = " << error_norm << std::endl;
+      std::cout << "Local relative error = "
+		<< (error_norm / std::max(double_norm, single_norm)) << std::endl;
+      std::cout << "Global relative error = "
+		<< (error_norm / _system.deltat / std::max(double_norm, single_norm)) << std::endl;
+      std::cout << "old delta t = " << _system.deltat << std::endl;
+    }
+
   
   // Otherwise, compare the relative error to the tolerance
   // and adjust deltat
   last_deltat = _system.deltat;
 
-  if (relative_error > target_tolerance)
-    _system.deltat *= std::pow(target_tolerance / relative_error,
-                               1. / core_time_solver->error_order());
-  // Use a little hysteresis when enlarging deltat
-  else if (relative_error < target_tolerance)
-    _system.deltat *= std::pow(target_tolerance / relative_error,
-                               1. / core_time_solver->error_order());
+  const Real global_shrink_or_growth_factor =
+    std::pow(target_tolerance / relative_error,
+	     1. / core_time_solver->error_order());
 
-/*
-std::cerr << "new delta t = " << _system.deltat << std::endl;
-*/
+  const Real local_shrink_or_growth_factor =
+    std::pow(target_tolerance / (error_norm/std::max(double_norm, single_norm)),
+	     1. / (core_time_solver->error_order()+1.));
+
+  if (!quiet)
+    {
+      std::cout << "The global growth/shrink factor is: "
+		<< global_shrink_or_growth_factor << std::endl;
+      std::cout << "The local growth/shrink factor is: "
+		<< local_shrink_or_growth_factor << std::endl;
+    }
+
+  // The local s.o.g. factor is based on the expected **local**
+  // truncation error for the timestepping method, the global
+  // s.o.g. factor is based on the method's **global** truncation
+  // error.  You can shrink/grow the timestep to attempt to satisfy
+  // either a global or local time-discretization error tolerance.
+  //bool use_global_shrink_or_growth_factor=false;
+  
+  if (relative_error > target_tolerance)
+    {
+      if (global_tolerance)
+	_system.deltat *= global_shrink_or_growth_factor;
+      else
+	_system.deltat *= local_shrink_or_growth_factor;
+    }
+  
+  // We might eventually want to use a little hysteresis when growing deltat
+  // One way to achieve hysteresis is to use a different power when computing the
+  // growth factor.
+  else if (relative_error < target_tolerance)
+    {
+      if (global_tolerance)
+	_system.deltat *= global_shrink_or_growth_factor;
+      else
+	_system.deltat *= local_shrink_or_growth_factor;
+    }
+
+  if ((this->max_deltat != 0.0) && (_system.deltat > this->max_deltat))
+    {
+      if (!quiet)
+	{
+	  std::cout << "delta t is constrained by maximum-allowable delta t." << std::endl;
+	}
+      _system.deltat = this->max_deltat;
+    }
+  
+  if (!quiet)
+    {
+      std::cout << "new delta t = " << _system.deltat << std::endl;
+    }
+
 }
 
 

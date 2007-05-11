@@ -8,7 +8,8 @@
 
 
 TimeSolver::TimeSolver (sys_type& s)
-  : _diff_solver                  (NULL),
+  : quiet(true),
+    _diff_solver                  (NULL),
     _system                      (s),
     first_solve                  (true),
     old_local_nonlinear_solution (NumericVector<Number>::build())
@@ -92,4 +93,34 @@ const
 AutoPtr<DiffSolver> & TimeSolver::diff_solver()
 {
   return _diff_solver;
+}
+
+
+
+Real TimeSolver::du(unsigned char norm_type)
+{
+
+  AutoPtr<NumericVector<Number> > solution_copy =
+    _system.solution->clone();
+
+  solution_copy->add(-1., _system.get_vector("_old_nonlinear_solution"));
+
+  solution_copy->close();
+
+  if (norm_type==0)
+    return solution_copy->l2_norm();
+
+  else if (norm_type==1)
+    return solution_copy->l1_norm();
+
+  else
+    {
+      std::cout << "Unrecognized norm "
+		<< norm_type
+		<< " requested.";
+      error();
+    }
+
+  return 0.;
+    
 }

@@ -1,5 +1,5 @@
 
-// $Id: steady_solver.h,v 1.4 2007-02-23 23:31:30 roystgnr Exp $
+// $Id: steady_solver.h,v 1.5 2007-05-11 21:53:32 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -88,6 +88,13 @@ public:
    * to build a full residual/jacobian on an element's side.
    */
   virtual bool side_residual (bool get_jacobian);
+
+  /**
+   * Nominally computes the size of the difference between
+   * successive solution iterates ||u^{n+1} - u^{n}|| in some norm,
+   * but for this class just returns 0.
+   */
+  Real du(unsigned char norm_type=0) { return 0.; }
 };
 
 
