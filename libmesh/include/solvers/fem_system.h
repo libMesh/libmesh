@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.13 2007-04-09 19:00:03 roystgnr Exp $
+// $Id: fem_system.h,v 1.14 2007-05-11 23:05:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -189,6 +189,52 @@ public:
    * point \p qp on the current element side
    */
   Tensor side_hessian(unsigned int var, unsigned int qp);
+
+#endif // ENABLE_SECOND_DERIVATIVES
+
+  /**
+   * Returns the value of the fixed_solution variable \p var at the quadrature
+   * point \p qp on the current element interior
+   */
+  Number fixed_interior_value(unsigned int var, unsigned int qp);
+
+  /**
+   * Returns the value of the fixed_solution variable \p var at the quadrature
+   * point \p qp on the current element side
+   */
+  Number fixed_side_value(unsigned int var, unsigned int qp);
+
+  /**
+   * Returns the value of the fixed_solution variable \p var at the physical
+   * point \p p on the current element
+   */
+  Number fixed_point_value(unsigned int var, Point &p);
+
+  /**
+   * Returns the gradient of the fixed_solution variable \p var at the quadrature
+   * point \p qp on the current element interior
+   */
+  Gradient fixed_interior_gradient(unsigned int var, unsigned int qp);
+
+  /**
+   * Returns the gradient of the fixed_solution variable \p var at the quadrature
+   * point \p qp on the current element side
+   */
+  Gradient fixed_side_gradient(unsigned int var, unsigned int qp);
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+  /**
+   * Returns the hessian of the fixed_solution variable \p var at the quadrature
+   * point \p qp on the current element interior
+   */
+  Tensor fixed_interior_hessian(unsigned int var, unsigned int qp);
+
+  /**
+   * Returns the hessian of the fixed_solution variable \p var at the quadrature
+   * point \p qp on the current element side
+   */
+  Tensor fixed_side_hessian(unsigned int var, unsigned int qp);
+
 #endif // ENABLE_SECOND_DERIVATIVES
 
   /**
