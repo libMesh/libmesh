@@ -585,6 +585,10 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
           elem_subsolutions[i]->reposition
             (sub_dofs, dof_indices_var[i].size());
 
+          if (use_fixed_solution)
+            elem_fixed_subsolutions[i]->reposition
+              (sub_dofs, dof_indices_var[i].size());
+
           elem_subresiduals[i]->reposition
             (sub_dofs, dof_indices_var[i].size());
 
@@ -892,6 +896,10 @@ void FEMSystem::postprocess ()
 
           elem_subsolutions[i]->reposition
             (sub_dofs, dof_indices_var[i].size());
+
+          if (use_fixed_solution)
+            elem_fixed_subsolutions[i]->reposition
+              (sub_dofs, dof_indices_var[i].size());
 
           sub_dofs += dof_indices_var[i].size();
         }

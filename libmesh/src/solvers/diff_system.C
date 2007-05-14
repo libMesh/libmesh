@@ -45,6 +45,11 @@ void DifferentiableSystem::clear ()
       delete elem_subsolutions[i];
       delete elem_subresiduals[i];
 
+      if (use_fixed_solution)
+        {
+          delete elem_fixed_subsolutions[i];
+        }
+
       for (unsigned int j=0; j != elem_subjacobians[i].size(); ++j)
         delete elem_subjacobians[i][j];
     }
@@ -52,6 +57,10 @@ void DifferentiableSystem::clear ()
   elem_subsolutions.resize(0);
   elem_subresiduals.resize(0);
   elem_subjacobians.resize(0);
+
+  if (use_fixed_solution)
+    elem_fixed_subsolutions.resize(0);
+  use_fixed_solution = false;
 }
 
 
@@ -100,6 +109,12 @@ void DifferentiableSystem::init_data ()
   elem_subresiduals.reserve(n_vars);
   elem_subjacobians.clear();
   elem_subjacobians.resize(n_vars);
+
+  if (use_fixed_solution)
+    {
+      elem_fixed_subsolutions.clear();
+      elem_fixed_subsolutions.reserve(n_vars);
+    }
   for (unsigned int i=0; i != n_vars; ++i)
     {
       elem_subsolutions.push_back(new DenseSubVector<Number>(elem_solution));
@@ -107,6 +122,11 @@ void DifferentiableSystem::init_data ()
       elem_subjacobians[i].clear();
       elem_subjacobians[i].reserve(n_vars);
 
+      if (use_fixed_solution)
+        {
+          elem_fixed_subsolutions.push_back
+	    (new DenseSubVector<Number>(elem_fixed_solution));
+        }
       for (unsigned int j=0; j != n_vars; ++j)
         {
           elem_subjacobians[i].push_back
