@@ -1,5 +1,5 @@
 
-// $Id: steady_solver.h,v 1.5 2007-05-11 21:53:32 jwpeterson Exp $
+// $Id: steady_solver.h,v 1.6 2007-05-14 20:33:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -94,7 +94,7 @@ public:
    * successive solution iterates ||u^{n+1} - u^{n}|| in some norm,
    * but for this class just returns 0.
    */
-  Real du(unsigned char norm_type=0) { return 0.; }
+  Real du(unsigned char) { return 0.; }
 };
 
 
