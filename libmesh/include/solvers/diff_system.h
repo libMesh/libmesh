@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h,v 1.18 2007-05-10 22:38:31 roystgnr Exp $
+// $Id: diff_system.h,v 1.19 2007-05-15 21:46:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -367,6 +367,11 @@ protected:
    * in time and which are just constraints
    */
   std::vector<bool> _time_evolving;
+
+  /**
+   * Clear data pointers associated with this system.
+   */
+  void clear_diff_ptrs ();
 };
 
 

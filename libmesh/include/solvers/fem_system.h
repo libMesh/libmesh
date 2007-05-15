@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h,v 1.14 2007-05-11 23:05:22 roystgnr Exp $
+// $Id: fem_system.h,v 1.15 2007-05-15 21:46:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -272,6 +272,11 @@ protected:
    * the system, so that, e.g., \p assemble() may be used.
    */
   virtual void init_data ();
+
+  /**
+   * Clear data pointers associated with this system.
+   */
+  void clear_fem_ptrs ();
 
   /**
    * Uses the results of multiple element_residual() calls

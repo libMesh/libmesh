@@ -409,8 +409,15 @@ Number FEMSystem::fixed_point_value(unsigned int var, Point &p)
 
 void FEMSystem::clear()
 {
-  Parent::clear();
+  this->clear_fem_ptrs();
 
+  Parent::clear();
+}
+
+
+
+void FEMSystem::clear_fem_ptrs()
+{
   // We don't want to store AutoPtrs in STL containers, but we don't
   // want to leak memory either
   for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
@@ -435,7 +442,7 @@ void FEMSystem::clear()
 void FEMSystem::init_data ()
 {
   // We may have already been initialized once
-  this->clear();
+  this->clear_fem_ptrs();
 
   // First initialize LinearImplicitSystem data
   Parent::init_data();
@@ -568,6 +575,9 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
       unsigned int n_dofs = dof_indices.size();
 
       elem_solution.resize(n_dofs);
+      if (use_fixed_solution)
+        elem_fixed_solution.resize(n_dofs);
+
       for (unsigned int i=0; i != n_dofs; ++i)
 //        elem_solution(i) = current_nonlinear_solution(dof_indices[i]);
         elem_solution(i) = current_solution(dof_indices[i]);

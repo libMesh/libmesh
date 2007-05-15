@@ -40,6 +40,17 @@ DifferentiableSystem::~DifferentiableSystem ()
 
 void DifferentiableSystem::clear ()
 {
+  this->clear_diff_ptrs();
+
+  _time_evolving.resize(0);
+
+  use_fixed_solution = false;
+}
+
+
+
+void DifferentiableSystem::clear_diff_ptrs ()
+{
   for (unsigned int i=0; i != elem_subsolutions.size(); ++i)
     {
       delete elem_subsolutions[i];
@@ -53,14 +64,12 @@ void DifferentiableSystem::clear ()
       for (unsigned int j=0; j != elem_subjacobians[i].size(); ++j)
         delete elem_subjacobians[i][j];
     }
-  _time_evolving.resize(0);
   elem_subsolutions.resize(0);
   elem_subresiduals.resize(0);
   elem_subjacobians.resize(0);
 
   if (use_fixed_solution)
     elem_fixed_subsolutions.resize(0);
-  use_fixed_solution = false;
 }
 
 
@@ -103,18 +112,16 @@ void DifferentiableSystem::init_data ()
 
   dof_indices_var.resize(n_vars);
 
-  elem_subsolutions.clear();
+  // We may have already been initialized
+  this->clear_diff_ptrs();
+
   elem_subsolutions.reserve(n_vars);
-  elem_subresiduals.clear();
   elem_subresiduals.reserve(n_vars);
-  elem_subjacobians.clear();
   elem_subjacobians.resize(n_vars);
 
   if (use_fixed_solution)
-    {
-      elem_fixed_subsolutions.clear();
-      elem_fixed_subsolutions.reserve(n_vars);
-    }
+    elem_fixed_subsolutions.reserve(n_vars);
+
   for (unsigned int i=0; i != n_vars; ++i)
     {
       elem_subsolutions.push_back(new DenseSubVector<Number>(elem_solution));
