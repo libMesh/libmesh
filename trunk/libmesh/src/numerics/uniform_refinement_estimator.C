@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.13 2007-04-12 23:05:24 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.14 2007-05-17 16:36:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -297,9 +297,16 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       // Loop over all the variables in the system
       for (unsigned int var=0; var<n_vars; var++)
         {
+          Real var_scale = 1.0;
+
           // Possibly skip this variable
           if (!_component_scale.empty())
-	    if (_component_scale[var] == 0.0) continue;
+            {
+	      if (_component_scale[var] == 0.0)
+                continue;
+              else
+                var_scale = _component_scale[var];
+            }
 
           // The type of finite element to use for this variable
           const FEType& fe_type = dof_map.variable_type (var);
@@ -424,10 +431,11 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                   const Number val_error = u_fine - u_coarse;
 
                   // Add the squares of the error to each contribution
+		  L2normsq += JxW[qp] * var_scale *
 #ifndef USE_COMPLEX_NUMBERS
-                  L2normsq += JxW[qp]*(val_error*val_error);
+                    (val_error*val_error);
 #else
-                  L2normsq += JxW[qp]*std::norm(val_error);
+                    std::norm(val_error);
 #endif
 
                   // Compute the value of the error in the gradient at this
@@ -436,10 +444,11 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                     {
                       Gradient grad_error = grad_u_fine - grad_u_coarse;
 
+                      H1seminormsq += JxW[qp] * var_scale *
 #ifndef USE_COMPLEX_NUMBERS
-                      H1seminormsq += JxW[qp]*(grad_error*grad_error);
+                        (grad_error*grad_error);
 #else
-                      H1seminormsq += JxW[qp]*std::abs(grad_error*grad_error);
+                        std::abs(grad_error*grad_error);
 #endif
                     }
 
@@ -451,7 +460,12 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                     {
                       Tensor grad2_error = grad2_u_fine - grad2_u_coarse;
 
-                      H2seminormsq += JxW[qp]*std::abs(grad2_error.contract(grad2_error));
+		      H2seminormsq += JxW[qp] * var_scale *
+#  ifndef USE_COMPLEX_NUMBERS
+                        grad2_error.contract(grad2_error);
+#  else
+                        std::abs(grad2_error.contract(grad2_error));
+#  endif
                     }
 #endif
 
