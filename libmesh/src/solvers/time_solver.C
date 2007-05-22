@@ -9,7 +9,8 @@
 
 TimeSolver::TimeSolver (sys_type& s)
   : quiet(true),
-    _diff_solver                  (NULL),
+    reduce_deltat_on_diffsolver_failure(0),
+    _diff_solver                 (NULL),
     _system                      (s),
     first_solve                  (true),
     old_local_nonlinear_solution (NumericVector<Number>::build())
@@ -58,7 +59,64 @@ void TimeSolver::solve ()
     (*old_local_nonlinear_solution,
      _system.get_dof_map().get_send_list());
 
-  _diff_solver->solve();
+  unsigned int solve_result = _diff_solver->solve();
+
+  // If we requested the TimeSolver to attempt reducing dt after a
+  // failed DiffSolver solve, check the results of the solve now.
+  if (reduce_deltat_on_diffsolver_failure)
+    {
+      bool backtracking_failed =
+	solve_result & DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
+
+      bool max_iterations =
+	solve_result & DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
+	
+      if (backtracking_failed || max_iterations)
+	{
+	  // If the solve failed for one of the reasons above and this is
+	  // a SteadySolver, then we can't try to make it succeed by
+	  // decreasing deltat.  We can test to see if we are a
+	  // SteadySolver by checking our error_order().
+	  if  (this->error_order() == 0.0)
+	    {
+	      std::cout << "DiffSolver::solve() failed, but we cannot reduce deltat "
+			<< " because this is a SteadySolver!" << std::endl;
+	      error();
+	    }
+
+	  // Otherwise, cut timestep in half
+	  for (unsigned int nr=0; nr<reduce_deltat_on_diffsolver_failure; ++nr)
+	    {
+	      _system.deltat *= 0.5;
+	      std::cout << "Newton backtracking failed.  Trying with smaller timestep, dt="
+			<< _system.deltat << std::endl;
+
+	      solve_result = _diff_solver->solve();
+
+	      // Check solve results with reduced timestep
+	      bool backtracking_failed =
+		solve_result & DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
+	      
+	      bool max_iterations =
+		solve_result & DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
+
+	      if (!backtracking_failed && !max_iterations)
+		{
+		  if (!quiet)
+		    std::cout << "Reduced dt solve succeeded." << std::endl;
+		  return;
+		}
+	    }
+
+	  // If we made it here, we still couldn't converge the solve after
+	  // reducing deltat
+	  std::cout << "DiffSolver::solve() did not succeed after "
+		    << reduce_deltat_on_diffsolver_failure
+		    << " attempts." << std::endl;
+	  error();
+	  
+  	} // end if (backtracking_failed || max_iterations)
+    } // end if (reduce_deltat_on_diffsolver_failure)
 }
 
 

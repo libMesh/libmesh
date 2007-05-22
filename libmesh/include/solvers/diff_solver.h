@@ -1,4 +1,4 @@
-// $Id: diff_solver.h,v 1.9 2007-03-07 22:55:48 roystgnr Exp $
+// $Id: diff_solver.h,v 1.10 2007-05-22 20:31:54 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -85,12 +85,13 @@ public:
    */
   virtual void reinit ();
 
+
   /**
    * This method performs a solve.  What occurs in
    * this method will depend on the type of solver.  See
-   * the subclasses for more details.
+   * the subclasses for more details.  
    */
-  virtual void solve () = 0;
+  virtual unsigned int solve () = 0;
 
   /**
    * @returns a constant reference to the system we are solving.
@@ -122,6 +123,12 @@ public:
    * a solve has reached its maximum number of nonlinear iterations.
    */
   bool continue_after_max_iterations;
+
+  /**
+   * Defaults to false, telling the DiffSolver to throw an error() when
+   * the backtracking scheme fails to find a descent direction.
+   */
+  bool continue_after_backtrack_failure;
 
   /**
    * The DiffSolver should exit after the residual is
@@ -157,6 +164,68 @@ public:
    * The tolerance for linear solves is kept above this minimum
    */
   Real minimum_linear_tolerance;
+  
+  /**
+   * Enumeration return type for the solve() function.  Multiple SolveResults
+   * may be combined (OR'd) in the single return.  To test which ones are present,
+   * just AND the return value with any of the SolveResult flags defined below.
+   */
+  enum SolveResult {
+    /**
+     * A default or invalid solve result.  This usually means
+     * no solve has occurred yet.
+     */
+    INVALID_SOLVE_RESULT = 0,
+    
+    /**
+     * The solver converged but no
+     * particular reason is specified.
+     */
+    CONVERGED_NO_REASON = 1,
+
+    /**
+     * The DiffSolver achieved the desired
+     * absolute residual tolerance.
+     */
+    CONVERGED_ABSOLUTE_RESIDUAL = 2,
+
+    /**
+     * The DiffSolver achieved the desired
+     * relative residual tolerance.
+     */
+    CONVERGED_RELATIVE_RESIDUAL = 4,
+
+    /**
+     * The DiffSolver achieved the desired
+     * absolute step size tolerance.
+     */
+    CONVERGED_ABSOLUTE_STEP = 8,
+
+    /**
+     * The DiffSolver achieved the desired
+     * relative step size tolerance.
+     */
+    CONVERGED_RELATIVE_STEP = 16,
+
+    /**
+     * The DiffSolver diverged but no
+     * particular reason is specified.
+     */
+    DIVERGED_NO_REASON = 32,
+
+    /**
+     * The DiffSolver reached the maximum allowed
+     * number of nonlinear iterations before satisfying
+     * any convergence tests.
+     */
+    DIVERGED_MAX_NONLINEAR_ITERATIONS = 64,
+
+    /**
+     * The DiffSolver failed to find a descent direction
+     * by backtracking (See newton_solver.C)
+     */
+    DIVERGED_BACKTRACKING_FAILURE = 128
+  };
 
 protected:
 
@@ -183,6 +252,13 @@ protected:
    */
   sys_type& _system;
 
+  /**
+   * Initialized to zero.  solve_result is typically set internally in
+   * the solve() function before it returns.  When non-zero,
+   * solve_result tells the result of the latest solve.  See enum
+   * definition for description.
+   */
+  unsigned int _solve_result;
 };
 
 

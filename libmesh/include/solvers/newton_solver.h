@@ -1,4 +1,4 @@
-// $Id: newton_solver.h,v 1.10 2007-03-07 22:55:48 roystgnr Exp $
+// $Id: newton_solver.h,v 1.11 2007-05-22 20:31:54 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -71,7 +71,7 @@ public:
    * this method will depend on the type of solver.  See
    * the subclasses for more details.
    */
-  virtual void solve ();
+  virtual unsigned int solve ();
 
   /**
    * If this is set to true, the solver is forced to test the residual

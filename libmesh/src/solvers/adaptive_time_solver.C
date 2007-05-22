@@ -11,6 +11,7 @@ AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type& s)
    core_time_solver(new EulerSolver(s)),
    target_tolerance(1.e-3), upper_tolerance(1.e-2),
    max_deltat(0.),
+   min_deltat(0.),
    global_tolerance(true)
 {
   // We start with a reasonable time solver: implicit Euler
@@ -68,12 +69,23 @@ void AdaptiveTimeSolver::solve()
   *(_system.solution) = _system.get_vector("_old_nonlinear_solution");
 
   // Call two single-length timesteps
+  // Be sure that the core_time_solver does not change the timestep here.
+  // (This is unlikely because it just succeeded with a timestep twice
+  // as large!)
+  const unsigned int old_reduce_deltat_on_diffsolver_failure =
+    core_time_solver->reduce_deltat_on_diffsolver_failure;
+  core_time_solver->reduce_deltat_on_diffsolver_failure = 0;
+  
   Real old_deltat = _system.deltat;
   _system.deltat *= 0.5;
   core_time_solver->solve();
   core_time_solver->advance_timestep();
   core_time_solver->solve();
 
+  // Reset the core_time_solver's original reduce_deltat... value.
+  core_time_solver->reduce_deltat_on_diffsolver_failure =
+    old_reduce_deltat_on_diffsolver_failure;
+  
   // But then back off just in case our advance_timestep() isn't
   // called - this probably doesn't work with multistep methods
   _system.get_vector("_old_nonlinear_solution") = *old_solution;
@@ -131,7 +143,6 @@ void AdaptiveTimeSolver::solve()
   // s.o.g. factor is based on the method's **global** truncation
   // error.  You can shrink/grow the timestep to attempt to satisfy
   // either a global or local time-discretization error tolerance.
-  //bool use_global_shrink_or_growth_factor=false;
   
   if (relative_error > target_tolerance)
     {
@@ -152,6 +163,7 @@ void AdaptiveTimeSolver::solve()
 	_system.deltat *= local_shrink_or_growth_factor;
     }
 
+  // Restrict deltat to max-allowable value if necessary
   if ((this->max_deltat != 0.0) && (_system.deltat > this->max_deltat))
     {
       if (!quiet)
@@ -159,6 +171,16 @@ void AdaptiveTimeSolver::solve()
 	  std::cout << "delta t is constrained by maximum-allowable delta t." << std::endl;
 	}
       _system.deltat = this->max_deltat;
+    }
+
+  // Restrict deltat to min-allowable value if necessary
+  if ((this->min_deltat != 0.0) && (_system.deltat < this->min_deltat))
+    {
+      if (!quiet)
+	{
+	  std::cout << "delta t is constrained by minimum-allowable delta t." << std::endl;
+	}
+      _system.deltat = this->min_deltat;
     }
   
   if (!quiet)
