@@ -37,7 +37,7 @@ void NewtonSolver::reinit()
 
 
 
-void NewtonSolver::solve()
+unsigned int NewtonSolver::solve()
 {
   START_LOG("solve()", "NewtonSolver");
 
@@ -199,7 +199,7 @@ void NewtonSolver::solve()
               if (!quiet)
 		print_convergence(l, current_residual, norm_delta,
                                   linear_solve_finished);
-              break;
+              break; // out of for (unsigned int l=0; l<max_nonlinear_iterations; ++l)
             }
 
           while (current_residual > last_residual)
@@ -229,11 +229,28 @@ void NewtonSolver::solve()
                 {
                   std::cout << "Inexact Newton step FAILED at step "
                             << l << std::endl;
+		  
+		  if (!continue_after_backtrack_failure)
+		    {
+		      error();
+		    }
 
-                  error();
+		  else
+		    {
+		      std::cout << "Continuing anyway ..." << std::endl;
+		      _solve_result = DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
+		      break; // out of while (current_residual > last_residual)
+		    }
                 }
-            }
-        }
+            } // end while (current_residual > last_residual)
+
+	  // Check to see if backtracking failed,
+	  // and break out of the nonlinear loop if so...
+	  if (_solve_result == DiffSolver::DIVERGED_BACKTRACKING_FAILURE)
+	    break; // out of for (unsigned int l=0; l<max_nonlinear_iterations; ++l)
+	  
+        } // end if (require_residual_reduction)
+
 
       // Compute the l2 norm of the whole solution
       norm_total = newton_iterate.l2_norm();
@@ -259,15 +276,21 @@ void NewtonSolver::solve()
         {
           break;
         }
+
       if (l >= max_nonlinear_iterations - 1)
         {
           std::cout << "  Nonlinear solver FAILED TO CONVERGE by step " << l
                     << " with norm " << norm_total
                     << std::endl;
           if (continue_after_max_iterations)
-            std::cout << "  Continuing anyway..." << std::endl;
+	    {
+	      _solve_result = DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
+	      std::cout << "  Continuing anyway..." << std::endl;
+	    }
           else
-            error();
+	    {
+	      error();
+	    }
           continue;
         }
     } // end nonlinear loop
@@ -287,6 +310,12 @@ void NewtonSolver::solve()
   _system.update ();
 
   STOP_LOG("solve()", "NewtonSolver");
+
+  // Make sure we are returning something sensible as the
+  // _solve_result.
+  assert (_solve_result != DiffSolver::INVALID_SOLVE_RESULT);
+  
+  return _solve_result;
 }
 
 
@@ -298,28 +327,45 @@ bool NewtonSolver::test_convergence(Real current_residual,
   // We haven't converged unless we pass a convergence test
   bool has_converged = false;
 
+  // Also, reset any prior solve result
+  _solve_result = INVALID_SOLVE_RESULT;
+  
   // Is our absolute residual low enough?
   if (current_residual < absolute_residual_tolerance)
-    has_converged = true;
-
+    {
+      _solve_result |= CONVERGED_ABSOLUTE_RESIDUAL;
+      has_converged = true;
+    }
+  
   // Is our relative residual low enough?
   if ((current_residual / max_residual_norm) <
       relative_residual_tolerance)
-    has_converged = true;
-
+    {
+      _solve_result |= CONVERGED_RELATIVE_RESIDUAL;
+      has_converged = true;
+    }
+  
   // For incomplete linear solves, it's not safe to test step sizes
   if (!linear_solve_finished)
-    return has_converged;
-
+    {
+      return has_converged;
+    }
+  
   // Is our absolute Newton step size small enough?
   if (step_norm < absolute_step_tolerance)
-    has_converged = true;
-
+    {
+      _solve_result |= CONVERGED_ABSOLUTE_STEP;
+      has_converged = true;
+    }
+  
   // Is our relative Newton step size small enough?
   if (step_norm / max_solution_norm <
       relative_step_tolerance)
-    has_converged = true;
-
+    {
+      _solve_result |= CONVERGED_RELATIVE_STEP;
+      has_converged = true;
+    }
+  
   return has_converged;
 }
 

@@ -8,6 +8,7 @@ DiffSolver::DiffSolver (sys_type& s)
       max_linear_iterations(1000),
       max_nonlinear_iterations(100),
       continue_after_max_iterations(true),
+      continue_after_backtrack_failure(false),
       absolute_residual_tolerance(0.),
       relative_residual_tolerance(0.),
       absolute_step_tolerance(0.),
@@ -16,7 +17,8 @@ DiffSolver::DiffSolver (sys_type& s)
       minimum_linear_tolerance(TOLERANCE*TOLERANCE),
       max_solution_norm(0.),
       max_residual_norm(0.),
-      _system (s)
+      _system (s),
+      _solve_result(INVALID_SOLVE_RESULT)
 {
 }
 

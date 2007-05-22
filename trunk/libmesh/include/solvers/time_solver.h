@@ -1,4 +1,4 @@
-// $Id: time_solver.h,v 1.12 2007-05-11 21:53:32 jwpeterson Exp $
+// $Id: time_solver.h,v 1.13 2007-05-22 20:31:54 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -166,6 +166,18 @@ public:
    * is set equal to nonlinear_solution in this function.
    */
   Real du(unsigned char norm_type=0);
+
+  /**
+   * This value (which defaults to zero) is the number of times the
+   * TimeSolver is allowed to halve deltat and let the DiffSolver
+   * repeat the latest failed solve with a reduced timestep.  Note
+   * that this has no effect for SteadySolvers.  Note that you must
+   * set at least one of the DiffSolver flags
+   * "continue_after_max_iterations" or
+   * "continue_after_backtrack_failure" to allow the TimeSolver to
+   * retry the solve.
+   */
+  unsigned int reduce_deltat_on_diffsolver_failure;
   
 protected:
 
