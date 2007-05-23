@@ -807,6 +807,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 #endif // ifdef DEBUG
         }
 
+#ifdef ENABLE_AMR
       // We turn off the asymmetric constraint application;
       // enforce_constraints_exactly() should be called in the solver
       if (get_residual && get_jacobian)
@@ -818,6 +819,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
       else if (get_jacobian)
         this->get_dof_map().constrain_element_matrix
           (elem_jacobian, dof_indices, false);
+#endif // #ifdef ENABLE_AMR
 
       if (get_jacobian && print_element_jacobians)
         {

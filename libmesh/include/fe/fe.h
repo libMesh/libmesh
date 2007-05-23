@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.27 2006-12-08 00:50:43 roystgnr Exp $
+// $Id: fe.h,v 1.28 2007-05-23 23:36:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -55,7 +55,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.27 $
+ * \version $Revision: 1.28 $
  */
 
 //-------------------------------------------------------------
@@ -330,6 +330,7 @@ public:
    */
   virtual unsigned int n_quadrature_points () const;
 
+#ifdef ENABLE_AMR
   /**
    * Computes the constraint matrix contributions (for
    * non-conforming adapted meshes) corresponding to 
@@ -351,6 +352,7 @@ public:
 				        DofMap &dof_map,
 				        const unsigned int variable_number,
 				        const Elem* elem);
+#endif // #ifdef ENABLE_AMR
   
 #ifdef ENABLE_INFINITE_ELEMENTS
 
@@ -453,7 +455,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.27 $
+ * \version $Revision: 1.28 $
  */
 
 //-------------------------------------------------------------
@@ -478,7 +480,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2005
- * \version $Revision: 1.27 $
+ * \version $Revision: 1.28 $
  */
 
 //-------------------------------------------------------------
@@ -513,7 +515,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.27 $
+ * \version $Revision: 1.28 $
  */
 
 //-------------------------------------------------------------
@@ -538,7 +540,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.27 $
+ * \version $Revision: 1.28 $
  */
 
 //-------------------------------------------------------------
@@ -563,7 +565,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.27 $
+ * \version $Revision: 1.28 $
  */
 
 //-------------------------------------------------------------
@@ -589,7 +591,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.27 $
+ * \version $Revision: 1.28 $
  */
 
 //-------------------------------------------------------------

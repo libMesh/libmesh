@@ -1,4 +1,4 @@
-// $Id: hp_singular.C,v 1.2 2006-10-06 16:03:45 roystgnr Exp $
+// $Id: hp_singular.C,v 1.3 2007-05-23 23:36:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -17,7 +17,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 // C++ includes
 
 // Local Includes
@@ -26,6 +25,8 @@
 #include "libmesh_logging.h"
 #include "mesh.h"
 #include "system.h"
+
+#ifdef ENABLE_AMR
 
 //-----------------------------------------------------------------
 // HPSingularity implementations
@@ -70,3 +71,5 @@ void HPSingularity::select_refinement (System &system)
 
   STOP_LOG("select_refinement()", "HPSingularity");
 }
+
+#endif // #ifdef ENABLE_AMR

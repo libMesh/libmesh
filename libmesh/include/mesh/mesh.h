@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.18 2006-12-12 23:28:21 roystgnr Exp $
+// $Id: mesh.h,v 1.19 2007-05-23 23:36:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -177,12 +177,14 @@ class Mesh : public MeshBase
   virtual void find_neighbors ();
   virtual void renumber_nodes_and_elements ();
 
+#ifdef ENABLE_AMR
   /**
    * Delete subactive (i.e. children of coarsened) elements.
    * This removes all elements descended from currently active
    * elements in the mesh.
    */
   virtual bool contract ();
+#endif // #ifdef ENABLE_AMR
 
 
 protected:

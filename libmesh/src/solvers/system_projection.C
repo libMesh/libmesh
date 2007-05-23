@@ -1,4 +1,4 @@
-// $Id: system_projection.C,v 1.38 2007-03-14 20:45:49 roystgnr Exp $
+// $Id: system_projection.C,v 1.39 2007-05-23 23:36:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1142,7 +1142,9 @@ void System::project_vector (Number fptr(const Point& p,
 
   new_vector.close();
 
+#ifdef ENABLE_AMR
   dof_map.enforce_constraints_exactly(*this, &new_vector);
+#endif
 
   STOP_LOG("project_vector()", "System");
 }

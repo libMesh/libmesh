@@ -1,4 +1,4 @@
-// $Id: hp_selector.h,v 1.7 2006-10-05 20:50:15 roystgnr Exp $
+// $Id: hp_selector.h,v 1.8 2007-05-23 23:36:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,8 @@
 
 // Local Includes
 #include "libmesh_common.h"
+
+#ifdef ENABLE_AMR
 
 // Forward Declarations
 class System;
@@ -74,6 +76,7 @@ public:
   std::vector<float> component_scale;
 };
 
+#endif // #ifdef ENABLE_AMR
 
 #endif
 

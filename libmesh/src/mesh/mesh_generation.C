@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.48 2007-05-03 22:47:58 jwpeterson Exp $
+// $Id: mesh_generation.C,v 1.49 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1292,18 +1292,23 @@ void MeshTools::Generation::build_square (Mesh& mesh,
 
 
 
+#ifndef ENABLE_AMR
+void MeshTools::Generation::build_sphere (Mesh&,
+					  const Real,
+					  const unsigned int,
+					  const ElemType)
+{
+ 	std::cout << "Building a circle/sphere only works with AMR." << std::endl;
+ 	error();
+}
+
+#else
+	
 void MeshTools::Generation::build_sphere (Mesh& mesh,
 					  const Real rad,
 					  const unsigned int nr,
 					  const ElemType type)
 {
-#ifndef ENABLE_AMR
-
- 	std::cout << "Building a circle/sphere only works with AMR." << std::endl;
- 	error();
-
-#endif
-	
   assert (mesh.mesh_dimension() != 1);
   assert (rad > 0.);
   //assert (nr > 0); // must refine at least once otherwise will end up with a square/cube
@@ -1632,3 +1637,6 @@ void MeshTools::Generation::build_sphere (Mesh& mesh,
   // Done building the mesh.  Now prepare it for use.
   mesh.prepare_for_use();
 }
+
+#endif // #ifndef ENABLE_AMR
+

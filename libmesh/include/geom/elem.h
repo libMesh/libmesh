@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.48 2007-02-14 21:11:31 roystgnr Exp $
+// $Id: elem.h,v 1.49 2007-05-23 23:36:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -213,13 +213,6 @@ class Elem : public ReferenceCountedObject<Elem>,
   unsigned int which_neighbor_am_i(const Elem *e) const; 
 
   /**
-   * This function tells you which child you \p (e) are.
-   * I.e. if c = a->which_child_am_i(e); then
-   * a->child(c) will be e;
-   */
-  unsigned int which_child_am_i(const Elem *e) const; 
-
-  /**
    * This function returns true iff a vertex of e is contained
    * in this element
    */
@@ -340,20 +333,6 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   virtual bool is_node_on_edge(const unsigned int n,
 			       const unsigned int e) const = 0;
-
-  /*
-   * @returns true iff the specified child is on the
-   * specified side
-   */
-  virtual bool is_child_on_side(const unsigned int c,
-			        const unsigned int s) const;
-  
-  /*
-   * @returns true iff the specified child is on the
-   * specified edge
-   */
-  virtual bool is_child_on_edge(const unsigned int c,
-			        const unsigned int e) const;
 
 //   /**
 //    * @returns the number of children this element has that
@@ -589,6 +568,13 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   unsigned int level () const;
   
+  /**
+   * Returns the value of the p refinement level of an active
+   * element, or the minimum value of the p refinement levels
+   * of an ancestor element's descendants
+   */
+  unsigned int p_level () const;
+
 #ifdef ENABLE_AMR
 
   /**
@@ -609,6 +595,26 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   Elem* child (const unsigned int i) const;
 
+  /**
+   * This function tells you which child you \p (e) are.
+   * I.e. if c = a->which_child_am_i(e); then
+   * a->child(c) will be e;
+   */
+  unsigned int which_child_am_i(const Elem *e) const; 
+
+  /*
+   * @returns true iff the specified child is on the
+   * specified side
+   */
+  virtual bool is_child_on_side(const unsigned int c,
+			        const unsigned int s) const;
+  
+  /*
+   * @returns true iff the specified child is on the
+   * specified edge
+   */
+  virtual bool is_child_on_edge(const unsigned int c,
+			        const unsigned int e) const;
 
   /**
    * Adds a child pointer to the array of children of this element.
@@ -673,13 +679,6 @@ class Elem : public ReferenceCountedObject<Elem>,
    * Sets the value of the p refinement flag for the element.
    */     
   void set_p_refinement_flag (const RefinementState pflag);
-
-  /**
-   * Returns the value of the p refinement level of an active
-   * element, or the minimum value of the p refinement levels
-   * of an ancestor element's descendants
-   */
-  unsigned int p_level () const;
 
   /**
    * Returns the maximum value of the p refinement levels of
@@ -898,11 +897,6 @@ public:
   Elem** _children;
 
   /**
-   * The subdomain to which this element belongs.
-   */
-  unsigned char _sbd_id;
-
-  /**
    * h refinement flag. This is stored as an unsigned char
    * to save space.
    */
@@ -927,6 +921,11 @@ public:
   unsigned char _p_level;
 
 #endif
+
+  /**
+   * The subdomain to which this element belongs.
+   */
+  unsigned char _sbd_id;
 
   /**
    * Make the classes that need to access our build
@@ -1205,26 +1204,6 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
 
 
 inline
-unsigned int Elem::which_child_am_i (const Elem* e) const
-{
-  assert (e != NULL);
-  assert (this->has_children());
-
-  for (unsigned int c=0; c<this->n_children(); c++)
-    if (this->child(c) == e)
-      return c;
-
-  std::cerr << "ERROR:  which_child_am_i() was called with a non-child!" 
-	    << std::endl;
-
-  error();
-
-  return libMesh::invalid_uint;
-}
-
-
-
-inline
 bool Elem::active() const
 {
 #ifdef ENABLE_AMR
@@ -1348,6 +1327,19 @@ unsigned int Elem::level() const
 }
 
 
+
+inline
+unsigned int Elem::p_level() const
+{
+#ifdef ENABLE_AMR
+  return _p_level;
+#else
+  return 0;
+#endif
+}
+
+
+
 #ifdef ENABLE_AMR
 
 inline
@@ -1357,6 +1349,26 @@ Elem* Elem::child (const unsigned int i) const
   assert (_children[i] != NULL);
   
   return _children[i];
+}
+
+
+
+inline
+unsigned int Elem::which_child_am_i (const Elem* e) const
+{
+  assert (e != NULL);
+  assert (this->has_children());
+
+  for (unsigned int c=0; c<this->n_children(); c++)
+    if (this->child(c) == e)
+      return c;
+
+  std::cerr << "ERROR:  which_child_am_i() was called with a non-child!" 
+	    << std::endl;
+
+  error();
+
+  return libMesh::invalid_uint;
 }
 
 
@@ -1411,14 +1423,6 @@ void Elem::set_p_refinement_flag(RefinementState pflag)
 #endif
 
   _pflag = pflag;
-}
-
-
-
-inline
-unsigned int Elem::p_level() const
-{
-  return _p_level;
 }
 
 

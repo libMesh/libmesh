@@ -1,4 +1,4 @@
-// $Id: mesh_modification.h,v 1.9 2007-02-15 17:07:59 jwpeterson Exp $
+// $Id: mesh_modification.h,v 1.10 2007-05-23 23:36:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,7 +43,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.9 $
+   * \version $Revision: 1.10 $
    */  
   namespace Modification
   {
@@ -114,6 +114,7 @@ namespace MeshTools
      */ 
     void smooth(MeshBase&, unsigned int, Real);
 
+#ifdef ENABLE_AMR
     /**
      * Removes all the refinement tree structure of Mesh, leaving
      * only the highest-level (most-refined) elements.  This is useful
@@ -124,6 +125,7 @@ namespace MeshTools
      * refined.
      */
     void flatten(MeshBase& mesh);
+#endif // #ifdef ENABLE_AMR
     
   } // end namespace Meshtools::Modification
 } // end namespace MeshTools

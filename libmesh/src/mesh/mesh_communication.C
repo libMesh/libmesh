@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.29 2007-04-11 02:52:15 benkirk Exp $
+// $Id: mesh_communication.C,v 1.30 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -298,7 +298,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
             const int self_ID      = conn[cnt++];
             const int parent_ID    = conn[cnt++];
 	    
-	    
+#ifdef ENABLE_AMR
             if (parent_ID != -1) // Do a log(n) search for the parent
 	      {
 		Elem* my_parent;
@@ -326,6 +326,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	      }
 	    
             else // level 0 element has no parent
+#endif // #ifdef ENABLE_AMR
 	      {
 		// should be able to just use the integer elem_type
 		elem = Elem::build(elem_type).release();
@@ -361,6 +362,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
               error();
           }
 
+#ifdef ENABLE_AMR
 	// All the elements at each level have been added, and their node pointers
 	// have been set.  Now compute the node keys to put the mesh into a state consistent
 	// with the state after being constructed through normal refinements. 
@@ -371,6 +373,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	const MeshBase::element_iterator end = mesh.elements_end();
 	for (; it!=end; ++it)
 	  (*it)->compute_children_node_keys();
+#endif // #ifdef ENABLE_AMR
 	
       } // end if iam != cpu 0
     

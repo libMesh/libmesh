@@ -1,4 +1,4 @@
-// $Id: hp_coarsentest.C,v 1.1 2006-10-05 20:50:15 roystgnr Exp $
+// $Id: hp_coarsentest.C,v 1.2 2007-05-23 23:36:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -16,7 +16,6 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
 
 // C++ includes
 #include <limits> // for std::numeric_limits::max
@@ -37,6 +36,8 @@
 #include "quadrature.h"
 #include "system.h"
 #include "tensor_value.h"
+
+#ifdef ENABLE_AMR
 
 //-----------------------------------------------------------------
 // HPCoarsenTest implementations
@@ -595,3 +596,5 @@ std::cerr << "Cell " << e_id << ": h = " << elem->hmax()
 
   STOP_LOG("select_refinement()", "HPCoarsenTest");
 }
+
+#endif // #ifdef ENABLE_AMR

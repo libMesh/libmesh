@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.36 2007-05-04 22:11:37 roystgnr Exp $
+// $Id: equation_systems.C,v 1.37 2007-05-23 23:36:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -144,14 +144,17 @@ void EquationSystems::reinit ()
   }
 #endif
 
-  bool mesh_changed = false;
-  bool dof_constraints_created = false;
   system_iterator       pos = _systems.begin();
   const system_iterator end = _systems.end();
   
   // Localize each system's vectors
   for (; pos != end; ++pos)
       pos->second->re_update();
+
+#ifdef ENABLE_AMR
+
+  bool dof_constraints_created = false;
+  bool mesh_changed = false;
 
   // FIXME: For backwards compatibility, assume
   // refine_and_coarsen_elements or refine_uniformly have already
@@ -220,6 +223,7 @@ void EquationSystems::reinit ()
       for (pos = _systems.begin(); pos != end; ++pos)
         pos->second->reinit();
     }
+#endif // #ifdef ENABLE_AMR
 }
 
 

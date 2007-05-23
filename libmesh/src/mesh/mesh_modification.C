@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.28 2007-05-04 20:23:41 roystgnr Exp $
+// $Id: mesh_modification.C,v 1.29 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -270,11 +270,20 @@ void Mesh::all_first_order ()
         (Elem::first_order_equivalent_type
           (so_elem->type()), newparent).release();
 
+#ifdef ENABLE_AMR
       /*
        * Add this element to it's parent if it has one
        */
       if (newparent)
         newparent->add_child(lo_elem);
+
+      /*
+       * Copy as much data to the new element as makes sense
+       */
+      lo_elem->set_p_level(so_elem->p_level());
+      lo_elem->set_refinement_flag(so_elem->refinement_flag());
+      lo_elem->set_p_refinement_flag(so_elem->p_refinement_flag());
+#endif
 
       assert (lo_elem->n_vertices() == so_elem->n_vertices());
 
@@ -285,13 +294,6 @@ void Mesh::all_first_order ()
        */
       for (unsigned int v=0; v < so_elem->n_vertices(); v++)
 	lo_elem->set_node(v) = so_elem->get_node(v);
-
-      /*
-       * Copy as much data to the new element as makes sense
-       */
-      lo_elem->set_p_level(so_elem->p_level());
-      lo_elem->set_refinement_flag(so_elem->refinement_flag());
-      lo_elem->set_p_refinement_flag(so_elem->p_refinement_flag());
 
       /**
        * If the second order element had any boundary conditions they
@@ -1048,6 +1050,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                         }
                     } // element neighbor loop
                 } 
+#ifdef ENABLE_AMR
               else   // refinement_level > 0
                 {
                   /*
@@ -1093,7 +1096,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                         } // if parent->child == elem
                     } // for parent->n_children
                 } // if element refinement_level
-
+#endif // #ifdef ENABLE_AMR
 
               /*
                * Now handle the additional second_order nodes by calculating
@@ -1134,9 +1137,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
 
 
 
-
-
-
+#ifdef ENABLE_AMR
 void MeshTools::Modification::flatten(MeshBase& mesh)
 {
   // Algorithm:
@@ -1234,3 +1235,4 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
   // Trim unused and renumber nodes and elements
   mesh.prepare_for_use();
 }
+#endif // #ifdef ENABLE_AMR

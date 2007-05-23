@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.51 2006-11-15 23:50:59 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.52 2007-05-23 23:36:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,8 +56,8 @@ class BoundaryInfo;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2006-11-15 23:50:59 $
- * \version $Revision: 1.51 $
+ * \date    $Date: 2007-05-23 23:36:10 $
+ * \version $Revision: 1.52 $
  */
 
 
@@ -260,12 +260,14 @@ public:
    */
   virtual void renumber_nodes_and_elements () = 0;    
 
+#ifdef ENABLE_AMR
   /**
    * Delete subactive (i.e. children of coarsened) elements.
    * This removes all elements descended from currently active
    * elements in the mesh.
    */
   virtual bool contract () = 0;
+#endif
 
   /**
    * Prepare a newly created (or read) mesh for use.
