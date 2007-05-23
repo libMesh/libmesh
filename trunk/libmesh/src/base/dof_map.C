@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.98 2007-05-04 22:58:10 roystgnr Exp $
+// $Id: dof_map.C,v 1.99 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -187,12 +187,13 @@ void DofMap::reinit(MeshBase& mesh)
 
           FEType fe_type = base_fe_type;
 
+#ifdef ENABLE_AMR
           // Make sure we haven't done more p refinement than we can
           // handle
           if (elem->p_level() + base_fe_type.order >
               FEInterface::max_order(base_fe_type, type))
             {
-#ifdef DEBUG
+#  ifdef DEBUG
               if (FEInterface::max_order(base_fe_type,type) <
                   static_cast<unsigned int>(base_fe_type.order))
                 {
@@ -213,11 +214,11 @@ void DofMap::reinit(MeshBase& mesh)
                     << "could not be p refined past FEInterface::max_order = " 
                     << FEInterface::max_order(base_fe_type,type)
                     << std::endl;
-#endif
+#  endif
               elem->set_p_level(FEInterface::max_order(base_fe_type,type)
                                 - base_fe_type.order);
             }
-            
+#endif
 
 	  fe_type.order = static_cast<Order>(fe_type.order +
                                              elem->p_level());
@@ -698,10 +699,12 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 	  {
             // Find all the active elements that neighbor elem
             std::vector<const Elem *> family;
-            if (elem->neighbor(s)->active())
-              family.push_back(elem->neighbor(s));
-            else
+#ifdef ENABLE_AMR
+            if (!elem->neighbor(s)->active())
               elem->neighbor(s)->active_family_tree_by_neighbor(family, elem);
+            else
+#endif
+              family.push_back(elem->neighbor(s));
 
             for (unsigned int i=0; i!=family.size(); ++i)
 	    // If the neighbor lives on a different processor
@@ -1490,21 +1493,10 @@ void DofMap::augment_send_list_for_projection(const MeshBase& mesh)
   if (needs_sorting) this->sort_send_list ();
 }
 
-#endif // #ifdef ENABLE_AMR
-
-
-
-
-
-
-
-
 
 
 void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 {
-  
-#ifdef ENABLE_AMR
 
   typedef std::set<unsigned int> RCSet;
 
@@ -1565,11 +1557,17 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
       this->find_connected_dofs (elem_dofs);
       
     } // end if (!done)
+}
 
+#else // #ifdef ENABLE_AMR
+
+void DofMap::find_connected_dofs (std::vector<unsigned int>&) const
+{
+}
 
 #endif // #ifdef ENABLE_AMR
 
-}
+
 
 #if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
 void DofMap::_dummy_function(void)

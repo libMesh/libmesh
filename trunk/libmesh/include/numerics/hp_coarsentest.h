@@ -1,4 +1,4 @@
-// $Id: hp_coarsentest.h,v 1.1 2006-10-05 20:50:15 roystgnr Exp $
+// $Id: hp_coarsentest.h,v 1.2 2007-05-23 23:36:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,8 @@
 
 #include "fe.h"         // MipsPro requires fe.h and quadrature.h in order to
 #include "quadrature.h" //  delete AutoPtrs<> upon destruction
+
+#ifdef ENABLE_AMR
 
 // Forward Declarations
 class Elem;
@@ -150,6 +152,7 @@ protected:
   DenseVector<Number> Up;
 };
 
+#endif // #ifdef ENABLE_AMR
 
 #endif
 

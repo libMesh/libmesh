@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.77 2007-03-03 12:26:19 benkirk Exp $
+// $Id: mesh.C,v 1.78 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -97,6 +97,7 @@ Mesh::Mesh (const Mesh& other_mesh):MeshBase(other_mesh)
       AutoPtr<Elem> ap = Elem::build(old->type(), newparent);
       Elem * elem = ap.release();
 
+#ifdef ENABLE_AMR
       //Create the parent's child pointers if necessary
       if (newparent)
         {
@@ -108,13 +109,14 @@ Mesh::Mesh (const Mesh& other_mesh):MeshBase(other_mesh)
                   old->parent()->which_child_am_i(old));
         }
       
-      //Assign all the nodes
-      for(uint i=0;i<elem->n_nodes();i++)
-        elem->set_node(i) = _nodes[old->node(i)];
-      
       // Copy the refinement flags
       elem->set_refinement_flag(old->refinement_flag());
       elem->set_p_refinement_flag(old->p_refinement_flag());
+#endif // #ifdef ENABLE_AMR
+
+      //Assign all the nodes
+      for(uint i=0;i<elem->n_nodes();i++)
+        elem->set_node(i) = _nodes[old->node(i)];
       
       //Hold onto it
       _elements.push_back(elem);
@@ -1074,7 +1076,7 @@ void Mesh::create_submesh (Mesh& new_mesh,
 
 
 
-
+#ifdef ENABLE_AMR
 bool Mesh::contract ()
 {
   START_LOG ("contract()", "Mesh");
@@ -1148,7 +1150,7 @@ bool Mesh::contract ()
   
   return mesh_changed;
 }
-
+#endif // #ifdef ENABLE_AMR
 
 
 

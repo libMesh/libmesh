@@ -1,4 +1,4 @@
-// $Id: fe_hermite.C,v 1.5 2006-06-22 21:43:19 benkirk Exp $
+// $Id: fe_hermite.C,v 1.6 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -288,6 +288,7 @@ bool FE<Dim,T>::is_hierarchic() const
 
 
 
+#ifdef ENABLE_AMR
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 				     DofMap &dof_map,
@@ -296,6 +297,7 @@ void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 {
   compute_proj_constraints(constraints, dof_map, variable_number, elem);
 }
+#endif // #ifdef ENABLE_AMR
 
 
 
@@ -311,10 +313,12 @@ bool FE<Dim,T>::shapes_need_reinit() const
 INSTANTIATE_MBRF(1,HERMITE);
 INSTANTIATE_MBRF(2,HERMITE);
 INSTANTIATE_MBRF(3,HERMITE);
+
+#ifdef ENABLE_AMR
 template void FE<2,HERMITE>::compute_constraints(DofConstraints&, DofMap&,
                                                  const unsigned int,
                                                  const Elem*);
 template void FE<3,HERMITE>::compute_constraints(DofConstraints&, DofMap&,
                                                  const unsigned int,
                                                  const Elem*);
-
+#endif // #ifdef ENABLE_AMR

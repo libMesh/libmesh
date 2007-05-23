@@ -1,4 +1,4 @@
-// $Id: cell_tet4.C,v 1.26 2007-02-12 20:29:39 jwpeterson Exp $
+// $Id: cell_tet4.C,v 1.27 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -327,6 +327,7 @@ std::pair<Real, Real> Tet4::min_and_max_angle() const
 
 
 
+#ifdef ENABLE_AMR
 float Tet4::embedding_matrix (const unsigned int i,
 			      const unsigned int j,
 			      const unsigned int k) const
@@ -365,3 +366,4 @@ float Tet4::embedding_matrix (const unsigned int i,
   // Call embedding matrx with permuted indices
   return this->_embedding_matrix[i][jp][kp]; 
 }
+#endif // #ifdef ENABLE_AMR

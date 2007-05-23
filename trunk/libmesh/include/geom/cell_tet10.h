@@ -1,4 +1,4 @@
-// $Id: cell_tet10.h,v 1.16 2007-02-12 20:29:38 jwpeterson Exp $
+// $Id: cell_tet10.h,v 1.17 2007-05-23 23:36:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -239,8 +239,10 @@ private:
 // Tet10 class member functions
 inline
 Tet10::Tet10(Elem* p) :
-  Tet(Tet10::n_nodes(), p),
-  _diagonal_selection(INVALID_DIAG)
+  Tet(Tet10::n_nodes(), p)
+#ifdef ENABLE_AMR
+  , _diagonal_selection(INVALID_DIAG)
+#endif
 {
 }
 

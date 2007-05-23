@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.47 2006-08-30 18:06:29 roystgnr Exp $
+// $Id: fe_interface.C,v 1.48 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1773,7 +1773,7 @@ void FEInterface::compute_data(const unsigned int dim,
 
 
 
-
+#ifdef ENABLE_AMR
 void FEInterface::compute_constraints (DofConstraints &constraints,
 				       DofMap &dof_map,
 				       const unsigned int variable_number,
@@ -1857,6 +1857,7 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
       error();
     }
 }
+#endif // #ifdef ENABLE_AMR
   
 
 

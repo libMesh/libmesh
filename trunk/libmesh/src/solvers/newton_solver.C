@@ -41,21 +41,17 @@ unsigned int NewtonSolver::solve()
 {
   START_LOG("solve()", "NewtonSolver");
 
-//  NumericVector<Number> &newton_iterate =
-//    _system.get_vector("_nonlinear_solution");
   NumericVector<Number> &newton_iterate = *(_system.solution);
 
-//  NumericVector<Number> &linear_solution = *(_system.solution);
   AutoPtr<NumericVector<Number> > linear_solution_ptr = newton_iterate.clone();
   NumericVector<Number> &linear_solution = *linear_solution_ptr;
 
   newton_iterate.close();
   linear_solution.close();
 
-//  solution = newton_iterate;
-//  _system.get_dof_map().enforce_constraints_exactly(_system);
-//  newton_iterate = solution;
+#ifdef ENABLE_AMR
   _system.get_dof_map().enforce_constraints_exactly(_system);
+#endif
 
   NumericVector<Number> &rhs = *(_system.rhs);
 
@@ -141,7 +137,9 @@ unsigned int NewtonSolver::solve()
       _system.update ();
       RESTART_LOG("solve()", "NewtonSolver");
       // The linear solver may not have fit our constraints exactly
+#ifdef ENABLE_AMR
       _system.get_dof_map().enforce_constraints_exactly(_system, &linear_solution);
+#endif
 
       const unsigned int linear_steps = rval.first;
       assert(linear_steps <= max_linear_iterations);
@@ -295,16 +293,10 @@ unsigned int NewtonSolver::solve()
         }
     } // end nonlinear loop
 
-  // Copy the final nonlinear iterate into the current_solution,
-  // for other libMesh functions that expect it
-
-//  solution = newton_iterate;
-//  solution.close();
-
   // The linear solver may not have fit our constraints exactly
+#ifdef ENABLE_AMR
   _system.get_dof_map().enforce_constraints_exactly(_system);
-//  newton_iterate = solution;
-//  solution.close();
+#endif
 
   // We may need to localize a parallel solution
   _system.update ();

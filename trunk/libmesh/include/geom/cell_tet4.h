@@ -1,4 +1,4 @@
-// $Id: cell_tet4.h,v 1.15 2007-02-12 20:29:38 jwpeterson Exp $
+// $Id: cell_tet4.h,v 1.16 2007-05-23 23:36:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -204,8 +204,10 @@ protected:
 // Tet4 class member functions
 inline
 Tet4::Tet4(Elem* p) :
-  Tet(Tet4::n_nodes(), p),
-  _diagonal_selection(INVALID_DIAG)
+  Tet(Tet4::n_nodes(), p)
+#ifdef ENABLE_AMR
+  , _diagonal_selection(INVALID_DIAG)
+#endif
 {
 }
 

@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.h,v 1.6 2007-04-12 17:21:32 roystgnr Exp $
+// $Id: uniform_refinement_estimator.h,v 1.7 2007-05-23 23:36:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,10 +27,9 @@
 
 // Local Includes
 #include "error_estimator.h"
+#include "libmesh.h"
 
-
-
-
+#ifdef ENABLE_AMR
 
 /**
  * This class implements a ``brute force'' error estimator
@@ -138,6 +137,7 @@ private:
 
 };
 
+#endif // #ifdef ENABLE_AMR
 
 #endif
 

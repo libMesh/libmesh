@@ -1,4 +1,4 @@
-// $Id: jump_error_estimator.C,v 1.2 2006-10-26 17:15:59 roystgnr Exp $
+// $Id: jump_error_estimator.C,v 1.3 2007-05-23 23:36:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -194,6 +194,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 	  const Elem* e = *elem_it;
 	  const unsigned int e_id = e->id();
 
+#ifdef ENABLE_AMR
           // See if the parent of element e has been examined yet;
           // if not, we may want to compute the estimator on it
           const Elem* parent = e->parent();
@@ -272,6 +273,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
                     } 
 		}
 	    }
+#endif // #ifdef ENABLE_AMR
 
           // If we do any more flux integration, e will be the fine element
           fine_elem = e;

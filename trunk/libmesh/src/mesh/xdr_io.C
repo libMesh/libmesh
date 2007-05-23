@@ -1,4 +1,4 @@
-// $Id: xdr_io.C,v 1.24 2007-02-09 19:51:43 roystgnr Exp $
+// $Id: xdr_io.C,v 1.25 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -453,8 +453,9 @@ void XdrIO::read_mesh (const std::string& name,
             if (m.get_orig_flag() == XdrIO::LIBM)
             {
               unsigned int self_ID   = conn[lastConnIndex + temp_elem->n_nodes()];
-              unsigned int parent_ID = conn[lastConnIndex + temp_elem->n_nodes()+1];
 
+#ifdef ENABLE_AMR
+              unsigned int parent_ID = conn[lastConnIndex + temp_elem->n_nodes()+1];
 
               if (level > 0)
               {
@@ -495,6 +496,7 @@ void XdrIO::read_mesh (const std::string& name,
 
               // Add level-0 elements to the mesh 
               else
+#endif // #ifdef ENABLE_AMR
               {
                 elem = Elem::build(etypes[idx]).release();
               }
@@ -551,6 +553,7 @@ void XdrIO::read_mesh (const std::string& name,
               error();
           }
 
+#ifdef ENABLE_AMR
       // All the elements at each level have been added, and their node pointers
       // have been set.  Now compute the node keys to put the mesh into a state consistent
       // with the state after being constructed through normal refinements. 
@@ -558,6 +561,7 @@ void XdrIO::read_mesh (const std::string& name,
       const MeshBase::element_iterator end = mesh.elements_end();
       for (; it!=end; ++it)
         (*it)->compute_children_node_keys();
+#endif // #ifdef ENABLE_AMR
     }
  
   // MGF-style (1) Hex27 mesh

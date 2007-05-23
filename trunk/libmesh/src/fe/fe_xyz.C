@@ -1,4 +1,4 @@
-// $Id: fe_xyz.C,v 1.12 2006-04-27 17:57:29 roystgnr Exp $
+// $Id: fe_xyz.C,v 1.13 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -773,6 +773,7 @@ bool FE<Dim,T>::is_hierarchic() const
 
 
 
+#ifdef ENABLE_AMR
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::compute_constraints (DofConstraints &,
 				     DofMap &,
@@ -782,6 +783,7 @@ void FE<Dim,T>::compute_constraints (DofConstraints &,
   // Monomials are discontinuous...  No constraints.
   return;
 }
+#endif // #ifdef ENABLE_AMR
 
 
 
@@ -807,10 +809,10 @@ template void  FEXYZ<3>::init_shape_functions(const std::vector<Point>&,
 template void  FEXYZ<1>::compute_shape_functions(const Elem*);
 template void  FEXYZ<2>::compute_shape_functions(const Elem*);
 template void  FEXYZ<3>::compute_shape_functions(const Elem*);
+
+#ifdef ENABLE_AMR
 template void FE<2,XYZ>::compute_constraints(DofConstraints&, DofMap&, 
 					     const unsigned int, const Elem*);
 template void FE<3,XYZ>::compute_constraints(DofConstraints&, DofMap&, 
 					     const unsigned int, const Elem*);
-
-
-
+#endif // #ifdef ENABLE_AMR

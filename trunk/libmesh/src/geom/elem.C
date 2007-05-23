@@ -1,4 +1,4 @@
-// $Id: elem.C,v 1.67 2007-02-27 16:27:41 roystgnr Exp $
+// $Id: elem.C,v 1.68 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -454,6 +454,7 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
                         || neighbor->contains_vertex_of(this))  
                       neighbor_set.insert (neighbor);  // ... then add it
                   }
+#ifdef ENABLE_AMR
                 else                                 // ... the neighbor is *not* active,
                   {                                  // ... so add *all* neighboring
                                                      // active children
@@ -471,6 +472,7 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
                           (*child_it)->contains_vertex_of(this))
                         neighbor_set.insert (*child_it);
                   }
+#endif // #ifdef ENABLE_AMR
               }
         }
     }
@@ -636,6 +638,33 @@ void Elem::add_child (Elem* elem)
 
 
 
+bool Elem::is_child_on_edge(const unsigned int c,
+                            const unsigned int e) const
+{
+  assert (c < this->n_children());
+  assert (e < this->n_edges());
+
+  AutoPtr<Elem> my_edge = this->build_edge(e);
+  AutoPtr<Elem> child_edge = this->build_edge(e);
+
+  // We're assuming that an overlapping child edge has the same
+  // number and orientation as its parent
+  return (child_edge->node(0) == my_edge->node(0) ||
+      child_edge->node(1) == my_edge->node(1));
+}
+
+
+bool Elem::is_child_on_side(const unsigned int c,
+                            const unsigned int s) const
+{
+  assert (c < this->n_children());
+  assert (s < this->n_sides());
+
+  Elem *child = this->child(c);
+  return ((child->neighbor(s) == NULL) // on boundary
+      || (child->neighbor(s)->parent() != this));
+}
+
 
 
 void Elem::family_tree (std::vector<const Elem*>& family,
@@ -725,6 +754,76 @@ void Elem::active_family_tree_by_neighbor (std::vector<const Elem*>& family,
         this->child(c)->active_family_tree_by_neighbor (family, neighbor, false);
 }
 
+
+
+unsigned int Elem::min_p_level_by_neighbor(const Elem* neighbor,
+                                           unsigned int current_min) const
+{
+  assert(!this->subactive());
+  assert(neighbor->active());
+
+  // If we're an active element this is simple
+  if (this->active())
+    return std::min(current_min, this->p_level());
+
+  assert(is_neighbor(neighbor));
+
+  // The p_level() of an ancestor element is already the minimum
+  // p_level() of its children - so if that's high enough, we don't
+  // need to examine any children.
+  if (current_min <= this->p_level())
+    return current_min;
+
+  unsigned int min_p_level = current_min;
+
+  for (unsigned int c=0; c<this->n_children(); c++)
+    {
+      const Elem* const child = this->child(c);
+      if (child->is_neighbor(neighbor))
+        min_p_level =
+	  child->min_p_level_by_neighbor(neighbor,
+                                         min_p_level);
+    }
+
+  return min_p_level;
+}
+
+
+unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
+                                               unsigned int current_min) const
+{
+  assert(!this->subactive());
+  assert(neighbor->active());
+
+  // If we're an active element this is simple
+  if (this->active())
+    {
+      unsigned int new_p_level = this->p_level();
+      if (this->p_refinement_flag() == Elem::REFINE)
+        new_p_level += 1;
+      if (this->p_refinement_flag() == Elem::COARSEN)
+        {
+          assert (new_p_level > 0);
+          new_p_level -= 1;
+        }
+      return std::min(current_min, new_p_level);
+    }
+
+  assert(is_neighbor(neighbor));
+
+  unsigned int min_p_level = current_min;
+
+  for (unsigned int c=0; c<this->n_children(); c++)
+    {
+      const Elem* const child = this->child(c);
+      if (child->is_neighbor(neighbor))
+        min_p_level =
+	  child->min_new_p_level_by_neighbor(neighbor,
+                                             min_p_level);
+    }
+
+  return min_p_level;
+}
 
 #endif // #ifdef ENABLE_AMR
 
@@ -970,104 +1069,6 @@ Elem::side_iterator Elem::boundary_sides_end()
 {
   Predicates::BoundarySide<SideIter> bsp;
   return side_iterator(this->_last_side(), this->_last_side(), bsp);
-}
-
-
-bool Elem::is_child_on_edge(const unsigned int c,
-                            const unsigned int e) const
-{
-  assert (c < this->n_children());
-  assert (e < this->n_edges());
-
-  AutoPtr<Elem> my_edge = this->build_edge(e);
-  AutoPtr<Elem> child_edge = this->build_edge(e);
-
-  // We're assuming that an overlapping child edge has the same
-  // number and orientation as its parent
-  return (child_edge->node(0) == my_edge->node(0) ||
-      child_edge->node(1) == my_edge->node(1));
-}
-
-
-bool Elem::is_child_on_side(const unsigned int c,
-                            const unsigned int s) const
-{
-  assert (c < this->n_children());
-  assert (s < this->n_sides());
-
-  Elem *child = this->child(c);
-  return ((child->neighbor(s) == NULL) // on boundary
-      || (child->neighbor(s)->parent() != this));
-}
-
-
-unsigned int Elem::min_p_level_by_neighbor(const Elem* neighbor,
-                                           unsigned int current_min) const
-{
-  assert(!this->subactive());
-  assert(neighbor->active());
-
-  // If we're an active element this is simple
-  if (this->active())
-    return std::min(current_min, this->p_level());
-
-  assert(is_neighbor(neighbor));
-
-  // The p_level() of an ancestor element is already the minimum
-  // p_level() of its children - so if that's high enough, we don't
-  // need to examine any children.
-  if (current_min <= this->p_level())
-    return current_min;
-
-  unsigned int min_p_level = current_min;
-
-  for (unsigned int c=0; c<this->n_children(); c++)
-    {
-      const Elem* const child = this->child(c);
-      if (child->is_neighbor(neighbor))
-        min_p_level =
-	  child->min_p_level_by_neighbor(neighbor,
-                                         min_p_level);
-    }
-
-  return min_p_level;
-}
-
-
-unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
-                                               unsigned int current_min) const
-{
-  assert(!this->subactive());
-  assert(neighbor->active());
-
-  // If we're an active element this is simple
-  if (this->active())
-    {
-      unsigned int new_p_level = this->p_level();
-      if (this->p_refinement_flag() == Elem::REFINE)
-        new_p_level += 1;
-      if (this->p_refinement_flag() == Elem::COARSEN)
-        {
-          assert (new_p_level > 0);
-          new_p_level -= 1;
-        }
-      return std::min(current_min, new_p_level);
-    }
-
-  assert(is_neighbor(neighbor));
-
-  unsigned int min_p_level = current_min;
-
-  for (unsigned int c=0; c<this->n_children(); c++)
-    {
-      const Elem* const child = this->child(c);
-      if (child->is_neighbor(neighbor))
-        min_p_level =
-	  child->min_new_p_level_by_neighbor(neighbor,
-                                             min_p_level);
-    }
-
-  return min_p_level;
 }
 
 

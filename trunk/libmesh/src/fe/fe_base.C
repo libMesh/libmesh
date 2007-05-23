@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.36 2006-09-19 02:37:42 roystgnr Exp $
+// $Id: fe_base.C,v 1.37 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1025,6 +1025,8 @@ std::ostream& operator << (std::ostream& os, const FEBase& fe)
 
 
 
+#ifdef ENABLE_AMR
+
 void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
                                   const DofMap &dof_map,
                                   const Elem *elem,
@@ -1539,3 +1541,5 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
   for (unsigned int i=0; i != new_n_dofs; ++i)
     assert(dof_is_fixed[i]);
 }
+
+#endif // #ifdef ENABLE_AMR

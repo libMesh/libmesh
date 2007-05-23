@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.15 2006-08-30 18:42:06 roystgnr Exp $
+// $Id: fe_interface.h,v 1.16 2007-05-23 23:36:09 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -243,7 +243,7 @@ public:
 			   const Elem* elem,
 			   FEComputeData& data);
 
-
+#ifdef ENABLE_AMR
   /**
    * Computes the constraint matrix contributions (for
    * non-conforming adapted meshes) corresponding to 
@@ -253,6 +253,7 @@ public:
 				   DofMap &dof_map,
 				   const unsigned int variable_number,
 				   const Elem* elem);
+#endif // #ifdef ENABLE_AMR
 
   /**
    * Returns the maximum polynomial degree that the given finite

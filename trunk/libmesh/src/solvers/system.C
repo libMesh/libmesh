@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.34 2007-05-09 18:12:35 roystgnr Exp $
+// $Id: system.C,v 1.35 2007-05-23 23:36:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -182,14 +182,14 @@ void System::init_data ()
   // Recreate any hanging node constraints
   _dof_map->create_dof_constraints(this->get_mesh());
 
-#endif
-  
   // Apply any user-defined constraints
   this->user_constrain();
 
   // Expand any recursive constraints
   _dof_map->process_recursive_constraints();
 
+#endif
+  
   // Resize the solution conformal to the current mesh
   solution->init (this->n_dofs(), this->n_local_dofs());
 

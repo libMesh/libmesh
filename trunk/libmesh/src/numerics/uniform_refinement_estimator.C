@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.14 2007-05-17 16:36:35 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.15 2007-05-23 23:36:12 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -16,7 +16,6 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
 
 // C++ includes
 #include <algorithm> // for std::fill
@@ -38,6 +37,8 @@
 #include "quadrature.h"
 #include "system.h"
 #include "uniform_refinement_estimator.h"
+
+#ifdef ENABLE_AMR
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
@@ -308,6 +309,15 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                 var_scale = _component_scale[var];
             }
 
+          // Get the error vector to fill for this system and variable
+          ErrorVector *err_vec = error_per_cell;
+          if (!err_vec)
+            {
+              assert(errors_per_cell);
+	      err_vec =
+		(*errors_per_cell)[std::make_pair(&system,var)];
+            }
+
           // The type of finite element to use for this variable
           const FEType& fe_type = dof_map.variable_type (var);
       
@@ -437,6 +447,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 #else
                     std::norm(val_error);
 #endif
+                  assert (L2normsq     >= 0.);
+
 
                   // Compute the value of the error in the gradient at this
                   // quadrature point
@@ -450,8 +462,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 #else
                         std::abs(grad_error*grad_error);
 #endif
+                      assert (H1seminormsq >= 0.);
                     }
-
 
 #ifdef ENABLE_SECOND_DERIVATIVES
                   // Compute the value of the error in the hessian at this
@@ -466,34 +478,16 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 #  else
                         std::abs(grad2_error.contract(grad2_error));
 #  endif
+                      assert (H2seminormsq >= 0.);
                     }
 #endif
-
                 } // end qp loop
 
-              assert (L2normsq     >= 0.);
-              assert (H1seminormsq >= 0.);
-
-              if (error_per_cell)
-                {
-                  (*error_per_cell)[e_id] += L2normsq;
-                  if (_sobolev_order > 0)
-                    (*error_per_cell)[e_id] += H1seminormsq;
-                  if (_sobolev_order > 1)
-                    (*error_per_cell)[e_id] += H2seminormsq;
-                }
-              else
-                {
-                  assert(errors_per_cell);
-                  ErrorVector &e =
-                    *((*errors_per_cell)[std::make_pair(&system,var)]);
-
-                  e[e_id] += L2normsq;
-                  if (_sobolev_order > 0)
-                    e[e_id] += H1seminormsq;
-                  if (_sobolev_order > 1)
-                    e[e_id] += H2seminormsq;
-                }
+              (*err_vec)[e_id] += L2normsq;
+              if (_sobolev_order > 0)
+                (*err_vec)[e_id] += H1seminormsq;
+              if (_sobolev_order > 1)
+                (*err_vec)[e_id] += H2seminormsq;
             } // End loop over active local elements
         } // End loop over variables
 
@@ -590,3 +584,5 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   if (!_component_scales)
     delete component_scales;
 }
+
+#endif // #ifdef ENABLE_AMR

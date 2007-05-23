@@ -1,4 +1,4 @@
-// $Id: fe.C,v 1.53 2006-11-10 20:19:10 roystgnr Exp $
+// $Id: fe.C,v 1.54 2007-05-23 23:36:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -661,14 +661,13 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 
 
 
-
+#ifdef ENABLE_AMR
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::compute_proj_constraints (DofConstraints &constraints,
 				          DofMap &dof_map,
 				          const unsigned int variable_number,
 				          const Elem* elem)
 {
-#ifdef ENABLE_AMR
   // Only constrain elements in 2,3D.
   if (Dim == 1)
     return;
@@ -684,6 +683,8 @@ void FE<Dim,T>::compute_proj_constraints (DofConstraints &constraints,
   // Construct FE objects for this element and its neighbors.
   AutoPtr<FEBase> my_fe (FEBase::build(Dim, base_fe_type));
   const FEContinuity cont = my_fe->get_continuity();
+
+  // We don't need to constrain discontinuous elements
   if (cont == DISCONTINUOUS)
     return;
   assert (cont == C_ZERO || cont == C_ONE);
@@ -875,8 +876,8 @@ void FE<Dim,T>::compute_proj_constraints (DofConstraints &constraints,
                                      s, min_p_level);
           }
       }
-#endif
 }
+#endif // #ifdef ENABLE_AMR
 
 
     

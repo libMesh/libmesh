@@ -1,4 +1,4 @@
-// $Id: hp_singular.h,v 1.2 2006-10-06 16:03:44 roystgnr Exp $
+// $Id: hp_singular.h,v 1.3 2007-05-23 23:36:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,8 @@
 #include "fe.h"         // MipsPro requires fe.h and quadrature.h in order to
 #include "quadrature.h" //  delete AutoPtrs<> upon destruction
 #include "libmesh_common.h"
+
+#ifdef ENABLE_AMR
 
 // Forward Declarations
 class Point;
@@ -80,6 +82,7 @@ public:
   std::list<Point> singular_points;
 };
 
+#endif // #ifdef ENABLE_AMR
 
 #endif
 
