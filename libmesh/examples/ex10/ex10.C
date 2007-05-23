@@ -1,4 +1,4 @@
-/* $Id: ex10.C,v 1.30 2007-03-19 20:30:24 roystgnr Exp $ */
+/* $Id: ex10.C,v 1.31 2007-05-23 23:29:15 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -115,6 +115,13 @@ int main (int argc, char** argv)
 {
   // Initialize libMesh.
   libMesh::init (argc, argv);
+
+#ifndef ENABLE_AMR
+  std::cerr << "ERROR: This example requires libMesh to be\n"
+            << "compiled with AMR support!"
+            << std::endl;
+  return 0;
+#else
 
   {    
 
@@ -405,6 +412,7 @@ int main (int argc, char** argv)
         equation_systems.write("saved_solution.xda", libMeshEnums::WRITE);
       }
   }
+#endif // #ifndef ENABLE_AMR
   
   // All done.  
   return libMesh::close ();
@@ -440,6 +448,7 @@ void init_cd (EquationSystems& es,
 void assemble_cd (EquationSystems& es,
 		  const std::string& system_name)
 {
+#ifdef ENABLE_AMR
   // It is a good idea to make sure we are assembling
   // the proper system.
   assert (system_name == "Convection-Diffusion");
@@ -669,4 +678,5 @@ void assemble_cd (EquationSystems& es,
       
     }
   // Finished computing the sytem matrix and right-hand side.
+#endif // #ifdef ENABLE_AMR
 }
