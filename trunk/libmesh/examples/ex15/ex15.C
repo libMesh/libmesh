@@ -1,4 +1,4 @@
-/* $Id: ex15.C,v 1.15 2007-04-05 19:22:11 roystgnr Exp $ */
+/* $Id: ex15.C,v 1.16 2007-05-23 23:29:15 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */
@@ -111,15 +111,19 @@ int main(int argc, char** argv)
   // Initialize libMesh.
   libMesh::init (argc, argv);
 
-#ifndef ENABLE_SECOND_DERIVATIVES
 
+#ifndef ENABLE_AMR
+  std::cerr << "ERROR: This example requires libMesh to be\n"
+            << "compiled with AMR support!"
+            << std::endl;
+  return 0;
+#else
+
+#ifndef ENABLE_SECOND_DERIVATIVES
   std::cerr << "ERROR: This example requires the library to be "
 	    << "compiled with second derivatives support!"
 	    << std::endl;
-  here();
-
   return 0;
-
 #else
 
   {
@@ -375,7 +379,8 @@ int main(int argc, char** argv)
   
   // All done.  
   return libMesh::close ();
-#endif
+#endif // #ifndef ENABLE_SECOND_DERIVATIVES
+#endif // #ifndef ENABLE_AMR
 }
 
 
@@ -544,11 +549,12 @@ Number forcing_function_3D(const Point& p)
 void assemble_biharmonic(EquationSystems& es,
                       const std::string& system_name)
 {
+#ifdef ENABLE_AMR
+#ifdef ENABLE_SECOND_DERIVATIVES
+
   // It is a good idea to make sure we are assembling
   // the proper system.
   assert (system_name == "Biharmonic");
-
-#ifdef ENABLE_SECOND_DERIVATIVES
 
   // Declare a performance log.  Give it a descriptive
   // string to identify what part of the code we are
@@ -829,6 +835,6 @@ void assemble_biharmonic(EquationSystems& es,
 
 #else
 
-#endif
-
+#endif // #ifdef ENABLE_SECOND_DERIVATIVES
+#endif // #ifdef ENABLE_AMR
 }

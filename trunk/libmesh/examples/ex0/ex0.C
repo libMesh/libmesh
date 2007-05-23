@@ -1,4 +1,4 @@
-/* $Id: ex0.C,v 1.5 2006-10-04 22:26:53 roystgnr Exp $ */
+/* $Id: ex0.C,v 1.6 2007-05-23 23:29:14 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -56,6 +56,14 @@ int main(int argc, char** argv)
   // may depend on a number of other libraries (i.e. MPI  and Petsc)
   // that require initialization before use. 
   libMesh::init(argc, argv);
+
+#ifndef ENABLE_AMR
+  std::cerr << "ERROR: This example requires libMesh to be\n"
+            << "compiled with AMR support!"
+            << std::endl;
+  return 0;
+#else
+
   {
     // Create a new 1 dimensional mesh
     const unsigned int dim = 1;
@@ -140,6 +148,7 @@ int main(int argc, char** argv)
     // Load gnuplot, then type "call 'gnuplot_script'" from gnuplot prompt
     plot.write_equation_systems("gnuplot_script",equation_systems);
   }  
+#endif // #ifndef ENABLE_AMR
   
   // All done.  Call the libMesh::close() function to close any
   // external libraries and check for leaked memory.  To be absolutey
@@ -155,6 +164,9 @@ int main(int argc, char** argv)
 // Define the matrix assembly function for the 1D PDE we are solving
 void assemble_1D(EquationSystems& es, const std::string& system_name)
 {
+
+#ifdef ENABLE_AMR
+
   // It is a good idea to check we are solving the correct system
   assert(system_name == "1D");
 
@@ -290,4 +302,5 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
     system.matrix->add_matrix(Ke, dof_indices);
     system.rhs->add_vector(Fe, dof_indices);
   }
+#endif // #ifdef ENABLE_AMR
 }

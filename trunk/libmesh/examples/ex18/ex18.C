@@ -1,4 +1,4 @@
-/* $Id: ex18.C,v 1.15 2007-02-27 19:51:43 roystgnr Exp $ */
+/* $Id: ex18.C,v 1.16 2007-05-23 23:29:15 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -49,6 +49,14 @@ int main (int argc, char** argv)
 {
   // Initialize libMesh.
   libMesh::init (argc, argv);
+
+#ifndef ENABLE_AMR
+  std::cerr << "ERROR: This example requires libMesh to be\n"
+            << "compiled with AMR support!"
+            << std::endl;
+  return 0;
+#else
+
   {    
     // Parse the input file
     GetPot infile("ex18.in");
@@ -267,6 +275,7 @@ int main (int argc, char** argv)
           }
       }
   }
+#endif // #ifndef ENABLE_AMR
   
   // All done.  
   return libMesh::close ();
