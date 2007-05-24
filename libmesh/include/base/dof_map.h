@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.26 2007-05-09 18:12:35 roystgnr Exp $
+// $Id: dof_map.h,v 1.27 2007-05-24 23:10:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,7 @@
 #include "enum_order.h"
 #include "reference_counted_object.h"
 #include "libmesh.h" // libMesh::invalid_uint
+#include "vector_value.h" // RealVectorValue
 
 // Forward Declarations
 class DofMap;
@@ -64,6 +65,7 @@ template <typename T> class NumericVector;
 // ------------------------------------------------------------
 // AMR constraint matrix types
 
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
 /**
  * A row of the Dof constraint matrix.
  */
@@ -79,6 +81,42 @@ typedef std::map<unsigned int, Real> DofConstraintRow;
 class DofConstraints : public std::map<unsigned int, DofConstraintRow>
 {
 };
+#endif // ENABLE_AMR || ENABLE_PERIODIC
+
+  
+// ------------------------------------------------------------
+// Periodic boundary conditions information
+
+#ifdef ENABLE_PERIODIC
+/**
+ * A row of the Dof constraint matrix.
+ */
+class PeriodicBoundary
+{
+  // The boundary ID of this boundary and it's counterpart
+  unsigned int myboundary,
+	       pairedboundary;
+
+  // One of these days we'll support rotated boundaries
+  // RealTensor rotation_matrix;
+
+  // The vector which is added to points in myboundary
+  // to produce corresponding points in pairedboundary
+  RealVectorValue translation_vector;
+};
+
+
+/** 
+ * The constraint matrix storage format. 
+ * We're using a class instead of a typedef to allow forward
+ * declarations and future flexibility.  Is there some issue with
+ * deriving from standard containers, i.e. don't do it because they
+ * don't have virtual destructors?
+ */
+class PeriodicBoundaries : public std::map<unsigned int, PeriodicBoundary>
+{
+};
+#endif // ENABLE_PERIODIC
 
   
 // ------------------------------------------------------------
@@ -176,12 +214,6 @@ public:
   unsigned int n_dofs() const { return _n_dfs; }
 
   /**
-   * @returns the total number of degrees of freedom on old_dof_objects
-   * 
-   */
-  unsigned int n_old_dofs() const { return _n_old_dfs; }
-
-  /**
    * @returns the number of degrees of freedom on this processor.
    */
   unsigned int n_local_dofs () const
@@ -237,37 +269,16 @@ public:
 			     const std::vector<unsigned int>& dof_indices,
 			     DenseVectorBase<Number>& Ue) const;
 
-  
-#ifdef ENABLE_AMR
+
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
 
   //--------------------------------------------------------------------
-  // AMR-specific methods
-
-  /**
-   * After a mesh is refined and repartitioned it is possible that the
-   * \p _send_list will need to be augmented.  This is the case when an
-   * element is refined and its children end up on different processors
-   * than the parent.  These children will need values from the parent
-   * when projecting the solution onto the refined mesh, hence the parent's
-   * DOF indices need to be included in the \p _send_list.
-   */
-  void augment_send_list_for_projection(const MeshBase &);
-
+  // Constraint-specific methods
   /**
    * @returns the total number of constrained degrees of freedom
    * in the problem.
    */
   unsigned int n_constrained_dofs() const { return _dof_constraints.size(); }
-
-  /**
-   * Fills the vector di with the global degree of freedom indices
-   * for the element using the \p DofMap::old_dof_object.
-   * If no variable number is specified then all
-   * variables are returned.
-   */
-  void old_dof_indices (const Elem* const elem,
-			std::vector<unsigned int>& di,
-			const unsigned int vn = libMesh::invalid_uint) const;
 
   /**
    * Rebuilds the raw degree of freedom constraints.
@@ -280,24 +291,13 @@ public:
    */
   void process_recursive_constraints ();
 
-
   /**
-   * Adds the user-defined row to the constraint matrix.
+   * Adds a copy of the user-defined row to the constraint matrix.
    * By default, produces an error if the DOF was already constrained.
    */
   void add_constraint_row (const unsigned int dof_number,
 			   const DofConstraintRow& constraint_row,
 			   const bool forbid_constraint_overwrite = true);
-  
-  /**
-   * Constrains degrees of freedom on side \p s of element \p elem which
-   * correspond to variable number \p var and to p refinement levels 
-   * above \p p.
-   */
-  void constrain_p_dofs (unsigned int var,
-			 const Elem *elem,
-			 unsigned int s,
-			 unsigned int p);
   
   /**
    * @returns true if the degree of freedom dof is constrained,
@@ -365,6 +365,11 @@ public:
 				    NumericVector<Number> *v = NULL) const;
   
   /**
+   * Prints the \p _dof_constraints data structure.
+   */
+  void print_dof_constraints() const;
+
+  /**
    * Tests the constrained degrees of freedom on the numeric vector \p v, which
    * represents a solution defined on the mesh, returning a pair whose first
    * entry is the maximum absolute error on a constrained DoF and whose second
@@ -374,9 +379,70 @@ public:
    */
   std::pair<Real, Real> max_constraint_error(const System &system,
 				    NumericVector<Number> *v = NULL) const;
-#endif
+
+#endif // ENABLE_AMR || ENABLE_PERIODIC
 
 
+#ifdef ENABLE_PERIODIC
+
+  //--------------------------------------------------------------------
+  // PeriodicBoundary-specific methods
+
+  /**
+   * Adds a copy of the specified periodic boundary to the system.
+   */
+  void add_periodic_boundary (const PeriodicBoundary& periodic_boundary);
+
+  /**
+   * @returns true if the boundary given by \p boundaryid is periodic,
+   * false otherwise
+   */
+  void is_periodic_boundary (const unsigned int boundaryid) const;
+
+#endif // ENABLE_PERIODIC
+
+
+#ifdef ENABLE_AMR
+
+  //--------------------------------------------------------------------
+  // AMR-specific methods
+
+  /**
+   * After a mesh is refined and repartitioned it is possible that the
+   * \p _send_list will need to be augmented.  This is the case when an
+   * element is refined and its children end up on different processors
+   * than the parent.  These children will need values from the parent
+   * when projecting the solution onto the refined mesh, hence the parent's
+   * DOF indices need to be included in the \p _send_list.
+   */
+  void augment_send_list_for_projection(const MeshBase &);
+
+  /**
+   * Fills the vector di with the global degree of freedom indices
+   * for the element using the \p DofMap::old_dof_object.
+   * If no variable number is specified then all
+   * variables are returned.
+   */
+  void old_dof_indices (const Elem* const elem,
+			std::vector<unsigned int>& di,
+			const unsigned int vn = libMesh::invalid_uint) const;
+  /**
+   * @returns the total number of degrees of freedom on old_dof_objects
+   * 
+   */
+  unsigned int n_old_dofs() const { return _n_old_dfs; }
+
+  /**
+   * Constrains degrees of freedom on side \p s of element \p elem which
+   * correspond to variable number \p var and to p refinement levels 
+   * above \p p.
+   */
+  void constrain_p_dofs (unsigned int var,
+			 const Elem *elem,
+			 unsigned int s,
+			 unsigned int p);
+  
+#endif // ENABLE_AMR
 
   /**
    * Reinitialize the underlying data strucures conformal to the current mesh.
@@ -387,17 +453,6 @@ public:
    * Free all memory associated with the object, but keep the mesh pointer.
    */
   void clear ();
-  
-
-
-#ifdef ENABLE_AMR
-
-  /**
-   * Prints the \p _dof_constraints data structure.
-   */
-  void print_dof_constraints() const;
-
-#endif
   
   /**
    * Degree of freedom coupling.  If left empty each DOF
@@ -416,7 +471,6 @@ public:
 
   
 private:
-
   
   /**
    * @returns the number of the system we are responsible for.
@@ -469,7 +523,7 @@ private:
   void sort_send_list ();
 
   
-#ifdef ENABLE_AMR
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
 
   /**
    * Build the constraint matrix C associated with the element
@@ -485,15 +539,15 @@ private:
 				std::vector<unsigned int>& elem_dofs,
 				const bool called_recursively=false) const;
 
-#endif
-
-
   /**
    * Finds all the DOFS associated with the element DOFs elem_dofs.
    * This will account for off-element couplings via hanging nodes.
    */
   void find_connected_dofs (std::vector<unsigned int>& elem_dofs) const;
   
+#endif
+
+
   /**
    * The finite element type for each variable.
    */
@@ -511,16 +565,6 @@ private:
    */
   std::vector<SparseMatrix<Number>* > _matrices;
   
-  /**
-   * Total number of degrees of freedom.
-   */
-  unsigned int _n_dfs;
-
-  /**
-   * Total number of degrees of freedom on old dof objects
-   */
-  unsigned int _n_old_dfs;
-
   /**
    * First DOF index on processor \p p.
    */
@@ -549,8 +593,17 @@ private:
    */
   std::vector<unsigned int> _n_oz;
 
+  /**
+   * Total number of degrees of freedom.
+   */
+  unsigned int _n_dfs;
 
 #ifdef ENABLE_AMR
+
+  /**
+   * Total number of degrees of freedom on old dof objects
+   */
+  unsigned int _n_old_dfs;
 
   /**
    * Data structure containing DOF constraints.  The ith
@@ -559,6 +612,16 @@ private:
   DofConstraints _dof_constraints;
 
 #endif
+
+
+#ifdef ENABLE_PERIODIC
+  /**
+   * Data structure containing periodic boundaries.  The ith
+   * entry is the constraint matrix row for boundaryid i.
+   */
+  PeriodicBoundaries _periodic_boundaries;
+#endif
+
 
 #if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
   /**
@@ -585,13 +648,26 @@ DofMap::DofMap(const unsigned int number) :
 }
 
 
-
-#ifdef ENABLE_AMR
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
 
 inline
 bool DofMap::is_constrained_dof (const unsigned int dof) const
 {
   if (_dof_constraints.count(dof) != 0)
+    return true;
+
+  return false;
+}
+
+#endif
+
+
+#ifdef ENABLE_PERIODIC
+
+inline
+bool DofMap::is_periodic_boundary (const unsigned int boundaryid) const
+{
+  if (_periodic_boundaries.count(boundaryid) != 0)
     return true;
 
   return false;

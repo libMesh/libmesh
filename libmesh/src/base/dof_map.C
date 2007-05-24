@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.99 2007-05-23 23:36:11 roystgnr Exp $
+// $Id: dof_map.C,v 1.100 2007-05-24 23:10:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -399,12 +399,12 @@ void DofMap::clear()
 #ifdef ENABLE_AMR
 
   _dof_constraints.clear();
+  _n_old_dfs = 0;
 
 #endif
 
   _matrices.clear();
 
-  _n_old_dfs = 0;
   _n_dfs = 0;
 }
 
@@ -527,7 +527,9 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
     }
 
   // Set the total number of degrees of freedom
+#ifdef ENABLE_AMR
   _n_old_dfs = _n_dfs;
+#endif
   _n_dfs = next_free_dof;
   //-------------------------------------------------------------------------
 
@@ -648,7 +650,9 @@ void DofMap::distribute_dofs_node_major (MeshBase& mesh)
     }
   
   // Set the total number of degrees of freedom
+#ifdef ENABLE_AMR
   _n_old_dfs = _n_dfs;
+#endif
   _n_dfs = next_free_dof;
   //-------------------------------------------------------------------------
 
@@ -811,7 +815,9 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 
 	  // Get the global indices of the DOFs with support on this element
 	  this->dof_indices (elem, element_dofs);
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
 	  this->find_connected_dofs (element_dofs);
+#endif
 
 	  // We can be more efficient if we sort the element DOFs
 	  // into increasing order
@@ -898,7 +904,9 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 			  const Elem* const neighbor = elem->neighbor(s);
 			  
 			  this->dof_indices (neighbor, neighbor_dofs);
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
 			  this->find_connected_dofs (neighbor_dofs);
+#endif
 			  
 			  const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
 			  
@@ -946,7 +954,9 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 	    
 	    // Find element dofs for variable vi
 	    this->dof_indices (elem, element_dofs_i, vi);
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
 	    this->find_connected_dofs (element_dofs_i);
+#endif
 
 	    // We can be more efficient if we sort the element DOFs
 	    // into increasing order
@@ -961,7 +971,9 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 		  if (vi != vj)
 		    {
 		      this->dof_indices (elem, element_dofs_j, vj);
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
 		      this->find_connected_dofs (element_dofs_j);
+#endif
 
 		      // We can be more efficient if we sort the element DOFs
 		      // into increasing order
@@ -1493,7 +1505,10 @@ void DofMap::augment_send_list_for_projection(const MeshBase& mesh)
   if (needs_sorting) this->sort_send_list ();
 }
 
+#endif // ENABLE_AMR
 
+
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
 
 void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 {
@@ -1559,13 +1574,7 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
     } // end if (!done)
 }
 
-#else // #ifdef ENABLE_AMR
-
-void DofMap::find_connected_dofs (std::vector<unsigned int>&) const
-{
-}
-
-#endif // #ifdef ENABLE_AMR
+#endif // ENABLE_AMR || ENABLE_PERIODIC
 
 
 
