@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.35 2007-05-23 23:36:12 roystgnr Exp $
+// $Id: system.C,v 1.36 2007-05-24 18:16:54 spetersen Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -709,15 +709,23 @@ Real System::calculate_norm(NumericVector<Number>& v,
               Number u_h = 0.;
               for (unsigned int i=0; i != n_sf; ++i)
                 u_h += phi[i][qp] * (*local_v)(dof_indices[i]);
+#if   defined (USE_REAL_NUMBERS)
               v_norm += component_scale[var] * JxW[qp] * u_h * u_h;
-
+#elif defined (USE_COMPLEX_NUMBERS)
+	      v_norm += component_scale[var] * JxW[qp] * norm(u_h);
+#endif
               if (component_norm[var] > 0)
                 {
                   Gradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
+#if   defined (USE_REAL_NUMBERS)
                   v_norm += component_scale[var] * JxW[qp] *
                             (grad_u_h * grad_u_h);
+#elif defined (USE_COMPLEX_NUMBERS)
+                  v_norm += component_scale[var] * JxW[qp] *
+                            norm(grad_u_h * grad_u_h);
+#endif
                 }
 
 #ifdef ENABLE_SECOND_DERIVATIVES
