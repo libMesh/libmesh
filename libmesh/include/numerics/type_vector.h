@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.18 2006-10-12 22:09:32 roystgnr Exp $
+// $Id: type_vector.h,v 1.19 2007-05-24 19:17:03 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,26 +44,26 @@ namespace boostcopy {
 // Complete list of scalar classes, needed for disambiguation
 template <typename T>
 struct ScalarTraits {
-  const static bool value = false;
+  static const bool value = false;
 };
 
 template<>
-struct ScalarTraits<float> { const static bool value = true; };
+struct ScalarTraits<float> { static const bool value = true; };
 
 template<>
-struct ScalarTraits<double> { const static bool value = true; };
+struct ScalarTraits<double> { static const bool value = true; };
 
 template<>
-struct ScalarTraits<long double> { const static bool value = true; };
+struct ScalarTraits<long double> { static const bool value = true; };
 
 template<>
-struct ScalarTraits<std::complex<float> > { const static bool value = true; };
+struct ScalarTraits<std::complex<float> > { static const bool value = true; };
 
 template<>
-struct ScalarTraits<std::complex<double> > { const static bool value = true; };
+struct ScalarTraits<std::complex<double> > { static const bool value = true; };
 
 template<>
-struct ScalarTraits<std::complex<long double> > { const static bool value = true; };
+struct ScalarTraits<std::complex<long double> > { static const bool value = true; };
 
 
 // Forward declaration for friend class
