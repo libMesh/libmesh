@@ -864,6 +864,7 @@ Optional Features:
   --enable-shared         build shared libraries
   --enable-everything     treat all applicable options as enabled
   --enable-amr            build with adaptive mesh refinement (AMR) suppport
+  --enable-periodic       build with periodic boundary condition suppport
   --enable-2D-only        build with support for 1D and 2D meshes only
   --enable-pfem           build with support for higher order p-FEM shapes
   --enable-ifem           build with infinite elements
@@ -7504,6 +7505,26 @@ fi
 
 
 
+# Check whether --enable-periodic or --disable-periodic was given.
+if test "${enable_periodic+set}" = set; then
+  enableval="$enable_periodic"
+  enableperiodic=$enableval
+else
+  enableperiodic=yes
+fi;
+
+if test "$enableperiodic" != no ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_PERIODIC 1
+_ACEOF
+
+  echo "$as_me:$LINENO: result: <<< Configuring library with periodic BC support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with periodic BC support >>>" >&6
+fi
+
+
+
 # Check whether --enable-2D-only or --disable-2D-only was given.
 if test "${enable_2D_only+set}" = set; then
   enableval="$enable_2D_only"
@@ -8232,7 +8253,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:8235:" \
+echo "$as_me:8256:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8426,7 +8447,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:8429: \"$ac_link\") >&5
+(eval echo $as_me:8450: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -8504,7 +8525,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:8507: \"$ac_link\") >&5
+(eval echo $as_me:8528: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS

@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.100 2007-05-24 23:10:35 roystgnr Exp $
+// $Id: dof_map.C,v 1.101 2007-05-29 23:25:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -36,6 +36,7 @@
 #include "dense_vector_base.h"
 #include "dense_matrix.h"
 #include "string_to_enum.h"
+#include "point_locator_base.h"
 
 
 
@@ -1579,8 +1580,43 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 
 
 #if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
+
 void DofMap::_dummy_function(void)
 {
 }
+
 #endif
 
+
+
+#ifdef ENABLE_PERIODIC
+
+// ------------------------------------------------------------
+// PeriodicBoundaries member functions
+
+void PeriodicBoundaries::reinit(MeshBase &mesh)
+{
+  _point_locator = PointLocatorBase::build(TREE, mesh);
+}
+
+const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
+                                         const Elem *e,
+                                         unsigned int side)
+{
+  // Find a point on that side
+  unsigned int n = 0;
+  for (; n != e->n_nodes(); n++)
+    if (e->is_node_on_side(n, side))
+      break;
+  assert (n != e->n_nodes());
+
+  Point p = e->node(n);
+
+  PeriodicBoundary *b = this->boundary(boundary_id);
+  assert (b);
+  p += b->translation_vector;
+
+  return _point_locator->operator()(p);
+}
+
+#endif

@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.27 2007-05-24 23:10:35 roystgnr Exp $
+// $Id: dof_map.h,v 1.28 2007-05-29 23:25:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,11 +35,15 @@
 #include "reference_counted_object.h"
 #include "libmesh.h" // libMesh::invalid_uint
 #include "vector_value.h" // RealVectorValue
+#include "auto_ptr.h"
+#include "point_locator_base.h"
 
 // Forward Declarations
 class DofMap;
 class Elem;
 class MeshBase;
+class Mesh;
+class PointLocatorBase;
 class FEType;
 class CouplingMatrix;
 class System;
@@ -93,6 +97,7 @@ class DofConstraints : public std::map<unsigned int, DofConstraintRow>
  */
 class PeriodicBoundary
 {
+public:
   // The boundary ID of this boundary and it's counterpart
   unsigned int myboundary,
 	       pairedboundary;
@@ -115,6 +120,20 @@ class PeriodicBoundary
  */
 class PeriodicBoundaries : public std::map<unsigned int, PeriodicBoundary>
 {
+public:
+  PeriodicBoundary *boundary(unsigned int id);
+
+  // The periodic neighbor of \p e in direction \p side, if it
+  // exists.  NULL otherwise
+  const Elem *neighbor(unsigned int boundary_id, const Elem *e, unsigned int side);
+
+  /**
+   * Reinitialize the underlying data strucures conformal to the current mesh.
+   */
+  void reinit (MeshBase& mesh);
+
+private:
+  AutoPtr<PointLocatorBase> _point_locator;
 };
 #endif // ENABLE_PERIODIC
 
@@ -397,7 +416,7 @@ public:
    * @returns true if the boundary given by \p boundaryid is periodic,
    * false otherwise
    */
-  void is_periodic_boundary (const unsigned int boundaryid) const;
+  bool is_periodic_boundary (const unsigned int boundaryid) const;
 
 #endif // ENABLE_PERIODIC
 
@@ -642,7 +661,10 @@ DofMap::DofMap(const unsigned int number) :
   _dof_coupling(NULL),
   _sys_number(number),
 //  _matrix(NULL),
-  _n_dfs(0)  
+  _n_dfs(0) 
+#ifdef ENABLE_AMR
+  , _n_old_dfs(0)
+#endif
 {
   _matrices.clear();
 }
@@ -744,4 +766,21 @@ void DofMap::sort_sparsity_row (const BidirectionalIterator begin,
 }
 
 
-#endif
+// ------------------------------------------------------------
+// PeriodicBoundary inline member functions
+
+#ifdef ENABLE_PERIODIC
+
+inline
+PeriodicBoundary *PeriodicBoundaries::boundary(unsigned int id)
+{
+  iterator i = this->find(id);
+  if (i == this->end())
+    return NULL;
+  return &i->second;
+}
+
+#endif // ENABLE_PERIODIC
+
+
+#endif // __dof_map_h__
