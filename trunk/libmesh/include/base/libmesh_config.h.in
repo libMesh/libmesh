@@ -9,6 +9,9 @@
 /* Flag indicating if the library should be built with AMR support */
 #undef ENABLE_AMR
 
+/* Flag indicating if the library should be built with periodic BC support */
+#undef ENABLE_PERIODIC
+
 /* Flag indicating if the library should offer higher order p-FEM shapes */
 #undef ENABLE_HIGHER_ORDER_SHAPES
 
