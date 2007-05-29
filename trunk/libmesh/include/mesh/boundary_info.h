@@ -1,4 +1,4 @@
-// $Id: boundary_info.h,v 1.15 2006-07-31 15:50:59 jwpeterson Exp $
+// $Id: boundary_info.h,v 1.16 2007-05-29 23:22:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -158,6 +158,17 @@ public:
    */
   short int boundary_id (const Elem* const elem,
 			 const unsigned short int side) const;
+
+  /**
+   * Returns a side of element \p elem whose associated boundary id is 
+   * \p boundary_id if such a side exists.
+   * If multiple sides of \p elem have the same id, only the lowest numbered
+   * such side is returned.
+   *
+   * Returns \p invalid_uint if no side has the requested boundary id.
+   */
+  unsigned int side_with_boundary_id(const Elem* const elem,
+				     const unsigned short int boundary_id) const;
 
   /**
    * @returns the number of element-based boundary conditions.
