@@ -1,4 +1,4 @@
-// $Id: point_locator_list.C,v 1.14 2007-02-09 22:46:46 roystgnr Exp $
+// $Id: point_locator_list.C,v 1.15 2007-05-29 23:20:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -33,11 +33,17 @@ typedef std::vector<Point>::const_iterator   const_list_iterator;
 
 //------------------------------------------------------------------
 // PointLocator methods
-PointLocatorList::PointLocatorList (const Mesh& mesh,
+PointLocatorList::PointLocatorList (const MeshBase& mesh,
 				    const PointLocatorBase* master) :
   PointLocatorBase (mesh,master),
   _list            (NULL)
 {
+  // This code will only work if your mesh is the Voroni mesh of it's
+  // own elements' centroids.  If your mesh is that regular you might
+  // as well hand-code an O(1) algorithm for locating points within
+  // it. - RHS
+  untested();
+
   this->init();
 }
 
@@ -92,8 +98,8 @@ void PointLocatorList::init ()
 	  // We are the master, so we have to build the list.
 	  // First create it, then get a handy reference, and
 	  // then try to speed up by reserving space...
-	  this->_list = new std::vector<Point>;
-	  std::vector<Point>& my_list = *(this->_list);
+	  this->_list = new std::vector<std::pair<Point, const Elem *> >;
+	  std::vector<std::pair<Point, const Elem *> >& my_list = *(this->_list);
 
 	  my_list.clear();
 	  my_list.reserve(this->_mesh.n_active_elem());
@@ -108,7 +114,7 @@ void PointLocatorList::init ()
 	  const MeshBase::const_element_iterator end = _mesh.active_elements_end(); 
 
 	  for (; el!=end; ++el)
-	    my_list.push_back((*el)->centroid());
+	    my_list.push_back(std::make_pair((*el)->centroid(), *el));
 	}
 
       else
@@ -166,33 +172,29 @@ const Elem* PointLocatorList::operator() (const Point& p) const
   // here to avoid repeated calls to std::sqrt(), which is
   // pretty expensive.
   {
-    std::vector<Point>& my_list = *(this->_list);
+    std::vector<std::pair<Point, const Elem *> >& my_list = *(this->_list);
 
-    Real               last_distance_sq = Point(my_list[0] -p).size_sq();
-    unsigned int       last_index       = 0;
+    Real               last_distance_sq = Point(my_list[0].first -p).size_sq();
+    const Elem *       last_elem        = NULL;
     const unsigned int max_index        = my_list.size();
 
 
     for (unsigned int n=1; n<max_index; n++)
       {
-	const Real current_distance_sq = Point(my_list[n] -p).size_sq();
+	const Real current_distance_sq = Point(my_list[n].first -p).size_sq();
 
 	if (current_distance_sq < last_distance_sq)
 	  {
 	    last_distance_sq = current_distance_sq;
-	    last_index       = n;
+	    last_elem        = my_list[n].second;
 	  }
       }
 
-
-//    std::cout << "Found element No. "<< last_index << std::endl;
-//	      << std::endl << "with key: " << this->_mesh.elem(last_index).key() << std::endl;
-
     // the element should be active
-    assert (this->_mesh.elem(last_index)->active());
+    assert (last_elem->active());
 
     // return the element
-    return (this->_mesh.elem(last_index));
+    return (last_elem);
   }
 
 }

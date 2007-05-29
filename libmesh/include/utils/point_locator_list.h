@@ -1,4 +1,4 @@
-// $Id: point_locator_list.h,v 1.6 2006-08-09 13:51:07 roystgnr Exp $
+// $Id: point_locator_list.h,v 1.7 2007-05-29 23:20:26 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 #define __point_locator_list_h__
 
 // C++ includes
+#include <utility> // pair
 #include <vector>
 
 
@@ -32,7 +33,7 @@
 
 
 // Forward Declarations
-class Mesh;
+class MeshBase;
 class Point;
 class Elem;
 
@@ -76,7 +77,7 @@ public:
    * locator holds a list, the others simply  use the 
    * master's list.
    */
-  PointLocatorList (const Mesh& mesh,
+  PointLocatorList (const MeshBase& mesh,
 		    const PointLocatorBase* master = NULL);
 
 
@@ -129,7 +130,7 @@ protected:
    * pointer points to the list of the master.   Note that
    * it's not a std::list as the name might suggest, but a std::vector.
    */
-  std::vector<Point>* _list;
+  std::vector<std::pair<Point, const Elem *> >* _list;
 
 };
 
