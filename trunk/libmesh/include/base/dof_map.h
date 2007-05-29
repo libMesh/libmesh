@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.29 2007-05-29 23:30:09 roystgnr Exp $
+// $Id: dof_map.h,v 1.30 2007-05-29 23:36:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -36,6 +36,7 @@
 #include "reference_counted_object.h"
 #include "libmesh.h" // libMesh::invalid_uint
 #include "vector_value.h" // RealVectorValue
+#include "point_locator_base.h" // Needed by AutoPtr?
 
 // Forward Declarations
 class DofMap;
