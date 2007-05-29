@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.48 2007-02-12 20:29:39 jwpeterson Exp $
+// $Id: boundary_info.C,v 1.49 2007-05-29 23:22:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -339,6 +339,40 @@ short int BoundaryInfo::boundary_id(const Elem* const elem,
   // if we get here, we found elem in the data structure but not
   // the requested side, so return the default value
   return invalid_id;  
+}
+
+
+unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
+                                                 const unsigned short int boundary_id) const
+{
+  const Elem* searched_elem = elem;
+  if (elem->level() != 0)
+    searched_elem = elem->top_parent();
+
+  std::pair<std::multimap<const Elem*,
+                          std::pair<unsigned short int, short int> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, short int> >::const_iterator > 
+    e = _boundary_side_id.equal_range(searched_elem);
+
+  // elem not in the data structure
+  if (e.first == e.second)
+    return libMesh::invalid_uint;
+
+  // elem is there, maybe multiple occurances
+  while (e.first != e.second)
+    {
+      // if this is true we found the requested boundary_id
+      // of the element and want to return the side
+      if (e.first->second.second == boundary_id)
+	return e.first->second.first;
+
+      ++e.first;
+    }
+
+  // if we get here, we found elem in the data structure but not
+  // the requested boundary id, so return the default value
+  return libMesh::invalid_uint;  
 }
 
 
