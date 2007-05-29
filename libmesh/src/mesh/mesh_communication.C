@@ -1,4 +1,4 @@
-// $Id: mesh_communication.C,v 1.30 2007-05-23 23:36:11 roystgnr Exp $
+// $Id: mesh_communication.C,v 1.31 2007-05-29 23:24:50 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -296,9 +296,11 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
             // get ID info
 	    const int subdomain_id = conn[cnt++];
             const int self_ID      = conn[cnt++];
-            const int parent_ID    = conn[cnt++];
 	    
 #ifdef ENABLE_AMR
+
+            const int parent_ID    = conn[cnt++];
+
             if (parent_ID != -1) // Do a log(n) search for the parent
 	      {
 		Elem* my_parent;
