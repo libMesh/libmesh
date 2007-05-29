@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.h,v 1.7 2006-08-09 13:51:07 roystgnr Exp $
+// $Id: point_locator_tree.h,v 1.8 2007-05-29 23:20:26 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 
 
 // Forward Declarations
-class Mesh;
+class MeshBase;
 class Point;
 class TreeBase;
 class Elem;
@@ -62,7 +62,7 @@ public:
    * master locator holds a  tree, the others simply 
    * use the master's tree.
    */
-  PointLocatorTree (const Mesh& mesh,
+  PointLocatorTree (const MeshBase& mesh,
 		    const PointLocatorBase* master = NULL);
 
 

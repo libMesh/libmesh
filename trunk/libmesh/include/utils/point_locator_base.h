@@ -1,4 +1,4 @@
-// $Id: point_locator_base.h,v 1.6 2006-08-09 13:51:07 roystgnr Exp $
+// $Id: point_locator_base.h,v 1.7 2007-05-29 23:20:26 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,7 @@
 
 // Forward Declarations
 class PointLocatorBase;
-class Mesh;
+class MeshBase;
 class Point;
 class TreeBase;
 class Elem;
@@ -63,7 +63,7 @@ protected:
    * cannot be explicitly instantiated.  Takes a master
    * PointLocator that helps in saving memory.
    */
-  PointLocatorBase (const Mesh& mesh,
+  PointLocatorBase (const MeshBase& mesh,
 		    const PointLocatorBase* master);
 
 
@@ -81,7 +81,7 @@ public:
    * This way the user need not remember to delete the object.
    */
   static AutoPtr<PointLocatorBase> build (const PointLocatorType t,
-					  const Mesh& mesh,
+					  const MeshBase& mesh,
 					  const PointLocatorBase* master = NULL);
 
   /**
@@ -134,7 +134,7 @@ protected:
   /**
    * constant reference to the mesh in which the point is looked for.
    */
-  const Mesh& _mesh;
+  const MeshBase& _mesh;
 
   /**
    * \p true when properly initialized, \p false otherwise.

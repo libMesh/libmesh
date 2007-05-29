@@ -1,4 +1,4 @@
-// $Id: point_locator_base.C,v 1.8 2005-06-12 18:36:43 jwpeterson Exp $
+// $Id: point_locator_base.C,v 1.9 2007-05-29 23:20:27 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 
 //------------------------------------------------------------------
 // PointLocatorBase methods
-PointLocatorBase::PointLocatorBase (const Mesh& mesh,
+PointLocatorBase::PointLocatorBase (const MeshBase& mesh,
 				    const PointLocatorBase* master) :
   _master                  (master),
   _mesh                    (mesh),
@@ -53,7 +53,7 @@ PointLocatorBase::~PointLocatorBase ()
 
 
 AutoPtr<PointLocatorBase> PointLocatorBase::build (const PointLocatorType t,
-						   const Mesh& mesh,
+						   const MeshBase& mesh,
 						   const PointLocatorBase* master)
 {
   switch (t)
