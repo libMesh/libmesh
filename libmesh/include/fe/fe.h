@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.28 2007-05-23 23:36:09 roystgnr Exp $
+// $Id: fe.h,v 1.29 2007-05-30 21:34:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,6 +31,7 @@
 // forward declarations
 class DofConstraints;
 class DofMap;
+
 #ifdef ENABLE_INFINITE_ELEMENTS
 
 template <unsigned int friend_Dim, FEFamily friend_T_radial, InfMapType friend_T_map>
@@ -55,7 +56,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.28 $
+ * \version $Revision: 1.29 $
  */
 
 //-------------------------------------------------------------
@@ -341,17 +342,6 @@ public:
 				   DofMap &dof_map,
 				   const unsigned int variable_number,
 				   const Elem* elem);
-  
-  /**
-   * Computes the constraint matrix contributions (for
-   * non-conforming adapted meshes) corresponding to 
-   * variable number \p var_number, using generic
-   * projections.
-   */
-  static void compute_proj_constraints (DofConstraints &constraints,
-				        DofMap &dof_map,
-				        const unsigned int variable_number,
-				        const Elem* elem);
 #endif // #ifdef ENABLE_AMR
   
 #ifdef ENABLE_INFINITE_ELEMENTS
@@ -455,7 +445,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.28 $
+ * \version $Revision: 1.29 $
  */
 
 //-------------------------------------------------------------
@@ -480,7 +470,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2005
- * \version $Revision: 1.28 $
+ * \version $Revision: 1.29 $
  */
 
 //-------------------------------------------------------------
@@ -515,7 +505,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.28 $
+ * \version $Revision: 1.29 $
  */
 
 //-------------------------------------------------------------
@@ -540,7 +530,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.28 $
+ * \version $Revision: 1.29 $
  */
 
 //-------------------------------------------------------------
@@ -565,7 +555,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.28 $
+ * \version $Revision: 1.29 $
  */
 
 //-------------------------------------------------------------
@@ -591,7 +581,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2003
- * \version $Revision: 1.28 $
+ * \version $Revision: 1.29 $
  */
 
 //-------------------------------------------------------------
