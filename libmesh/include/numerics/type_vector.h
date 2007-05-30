@@ -1,4 +1,4 @@
-// $Id: type_vector.h,v 1.19 2007-05-24 19:17:03 roystgnr Exp $
+// $Id: type_vector.h,v 1.20 2007-05-30 19:15:49 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -750,20 +750,20 @@ bool TypeVector<T>::absolute_fuzzy_equals(const TypeVector<T>& rhs, Real tol) co
 {
 #if DIM == 1
   return (std::abs(_coords[0] - rhs._coords[0])
-	  < tol);
+	  <= tol);
 #endif
 
 #if DIM == 2
   return (std::abs(_coords[0] - rhs._coords[0]) +
 	  std::abs(_coords[1] - rhs._coords[1])
-	  < tol);
+	  <= tol);
 #endif
 
 #if DIM == 3
   return (std::abs(_coords[0] - rhs._coords[0]) +
 	  std::abs(_coords[1] - rhs._coords[1]) +
 	  std::abs(_coords[2] - rhs._coords[2])
-	  < tol);
+	  <= tol);
 #endif
 }
 
