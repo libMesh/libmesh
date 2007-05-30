@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.16 2007-05-23 23:36:09 roystgnr Exp $
+// $Id: fe_interface.h,v 1.17 2007-05-30 21:34:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,11 +32,13 @@
 
 
 // forward declarations
+class BoundaryInfo;
 class DofConstraints;
 class DofMap;
 class Elem;
 class FEType;
 class FEComputeData;
+class PeriodicBoundaries;
 class Point;
 
 
@@ -254,6 +256,20 @@ public:
 				   const unsigned int variable_number,
 				   const Elem* elem);
 #endif // #ifdef ENABLE_AMR
+
+#ifdef ENABLE_PERIODIC
+  /**
+   * Computes the constraint matrix contributions (for
+   * periodic boundary conditions) corresponding to 
+   * variable number \p var_number.
+   */
+  static void compute_periodic_constraints (DofConstraints &constraints,
+				            DofMap &dof_map,
+				            PeriodicBoundaries &boundaries,
+				            BoundaryInfo &boundaryinfo,
+				            const unsigned int variable_number,
+				            const Elem* elem);
+#endif // #ifdef ENABLE_PERIODIC
 
   /**
    * Returns the maximum polynomial degree that the given finite

@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.27 2007-05-23 23:36:09 roystgnr Exp $
+// $Id: fe_base.h,v 1.28 2007-05-30 21:34:54 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,9 +41,12 @@
 // forward declarations
 template <typename T> class DenseMatrix;
 template <typename T> class DenseVector;
+class BoundaryInfo;
+class DofConstraints;
 class DofMap;
 class Elem;
 class MeshBase;
+class PeriodicBoundaries;
 template <typename T> class NumericVector;
 class QBase;
 
@@ -168,6 +171,18 @@ public:
 				   const Real eps = TOLERANCE);
 
 #ifdef ENABLE_AMR
+
+  /**
+   * Computes the constraint matrix contributions (for
+   * non-conforming adapted meshes) corresponding to
+   * variable number \p var_number, using generic
+   * projections.
+   */
+  static void compute_proj_constraints (DofConstraints &constraints,
+                                        DofMap &dof_map,
+                                        const unsigned int variable_number,
+                                        const Elem* elem);
+
   /**
    * Creates a local projection on \p coarse_elem, based on the
    * DoF values in \p global_vector for it's children.
@@ -179,7 +194,24 @@ public:
 			           DenseVector<Number> &coarse_dofs,
 			           const unsigned int var,
 			           const bool use_old_dof_indices = false);
+
 #endif // #ifdef ENABLE_AMR
+
+#ifdef ENABLE_PERIODIC
+
+  /**
+   * Computes the constraint matrix contributions (for
+   * meshes with periodic boundary conditions) corresponding to
+   * variable number \p var_number, using generic projections.
+   */
+  static void compute_periodic_constraints (DofConstraints &constraints,
+                                            DofMap &dof_map,
+                                            PeriodicBoundaries &boundaries,
+                                            BoundaryInfo &boundary_info,
+                                            const unsigned int variable_number,
+                                            const Elem* elem);
+
+#endif // ENABLE_PERIODIC
 
   /**
    * @returns the \p xyz spatial locations of the quadrature

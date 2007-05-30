@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.48 2007-05-23 23:36:11 roystgnr Exp $
+// $Id: fe_interface.C,v 1.49 2007-05-30 21:34:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1774,6 +1774,7 @@ void FEInterface::compute_data(const unsigned int dim,
 
 
 #ifdef ENABLE_AMR
+
 void FEInterface::compute_constraints (DofConstraints &constraints,
 				       DofMap &dof_map,
 				       const unsigned int variable_number,
@@ -1857,7 +1858,30 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
       error();
     }
 }
+
 #endif // #ifdef ENABLE_AMR
+
+
+
+#ifdef ENABLE_PERIODIC
+
+void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
+				                DofMap &dof_map,
+                                                PeriodicBoundaries &boundaries,
+                                                BoundaryInfo &boundaryinfo,
+				                const unsigned int variable_number,
+				                const Elem* elem)
+{
+  // No element-specific optimizations currently exist
+  FEBase::compute_periodic_constraints (constraints,
+                                        dof_map,
+                                        boundaries,
+                                        boundaryinfo,
+				        variable_number,
+				        elem);
+}
+
+#endif // #ifdef ENABLE_PERIODIC
   
 
 
