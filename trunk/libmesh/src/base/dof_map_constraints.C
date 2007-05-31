@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.36 2007-05-31 20:01:11 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.37 2007-05-31 21:46:13 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,7 @@
 #include "system.h" // needed by enforce_constraints_exactly()
 #include "mesh.h"   // as is this
 #include "numeric_vector.h" // likewise
+#include "point_locator_base.h"
 
 
 
@@ -782,28 +783,6 @@ void DofMap::process_recursive_constraints ()
 #endif // ENABLE_AMR || ENABLE_PERIODIC
 
 
-#ifdef ENABLE_PERIODIC
-
-void DofMap::add_periodic_boundary (const PeriodicBoundary& periodic_boundary)
-{
-  PeriodicBoundary boundary = periodic_boundary;
-  PeriodicBoundary inverse_boundary;
-  inverse_boundary.myboundary = boundary.pairedboundary;
-  inverse_boundary.pairedboundary = boundary.myboundary;
-  inverse_boundary.translation_vector = -boundary.translation_vector;
-
-  std::pair<unsigned int, PeriodicBoundary> bp
-    (boundary.myboundary, boundary);
-  std::pair<unsigned int, PeriodicBoundary> ibp
-    (boundary.pairedboundary, inverse_boundary);
-
-  _periodic_boundaries.insert(bp);
-  _periodic_boundaries.insert(ibp);
-}
-
-#endif // ENABLE_PERIODIC
-
-
 #ifdef ENABLE_AMR
 
 void DofMap::constrain_p_dofs (unsigned int var,
@@ -858,3 +837,59 @@ void DofMap::constrain_p_dofs (unsigned int var,
 }
 
 #endif // ENABLE_AMR
+
+
+#ifdef ENABLE_PERIODIC
+
+void DofMap::add_periodic_boundary (const PeriodicBoundary& periodic_boundary)
+{
+  PeriodicBoundary boundary = periodic_boundary;
+  PeriodicBoundary inverse_boundary;
+  inverse_boundary.myboundary = boundary.pairedboundary;
+  inverse_boundary.pairedboundary = boundary.myboundary;
+  inverse_boundary.translation_vector = -boundary.translation_vector;
+
+  std::pair<unsigned int, PeriodicBoundary> bp
+    (boundary.myboundary, boundary);
+  std::pair<unsigned int, PeriodicBoundary> ibp
+    (boundary.pairedboundary, inverse_boundary);
+
+  _periodic_boundaries.insert(bp);
+  _periodic_boundaries.insert(ibp);
+}
+
+
+// ------------------------------------------------------------
+// PeriodicBoundaries member functions
+
+PeriodicBoundaries::~PeriodicBoundaries()
+{
+  delete _point_locator;
+}
+
+void PeriodicBoundaries::reinit(MeshBase &mesh)
+{
+  delete _point_locator;
+
+  _point_locator = PointLocatorBase::build(TREE, mesh).release();
+}
+
+const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
+                                         const Elem *e,
+                                         unsigned int side)
+{
+  // We'd better already be initialized
+  assert(_point_locator);
+
+  // Find a point on that side (and only that side)
+
+  Point p = e->build_side(side)->centroid();
+
+  PeriodicBoundary *b = this->boundary(boundary_id);
+  assert (b);
+  p += b->translation_vector;
+
+  return _point_locator->operator()(p);
+}
+
+#endif
