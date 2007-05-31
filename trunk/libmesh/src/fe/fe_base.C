@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.38 2007-05-30 21:34:55 roystgnr Exp $
+// $Id: fe_base.C,v 1.39 2007-05-31 23:48:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1995,6 +1995,10 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 	              const unsigned int j = my_side_dofs[js];
 	              const unsigned int my_dof_g = my_dof_indices[j];
                       assert(my_dof_g != DofObject::invalid_id);
+
+                      if (dof_map.is_constrained_dof(my_dof_g))
+                        continue;
+
 		      const Real their_dof_value = Ue[is](js);
 		      if (their_dof_g == my_dof_g)
 		        {
