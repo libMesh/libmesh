@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.101 2007-05-29 23:25:15 roystgnr Exp $
+// $Id: dof_map.C,v 1.102 2007-05-31 20:01:10 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -88,6 +88,9 @@ void DofMap::reinit(MeshBase& mesh)
   const unsigned int n_var = this->n_variables();
   const unsigned int dim   = mesh.mesh_dimension();
 
+#ifdef ENABLE_PERIODIC
+  _periodic_boundaries.reinit(mesh);
+#endif
 
 #ifdef ENABLE_AMR
   
@@ -1594,15 +1597,25 @@ void DofMap::_dummy_function(void)
 // ------------------------------------------------------------
 // PeriodicBoundaries member functions
 
+PeriodicBoundaries::~PeriodicBoundaries()
+{
+  delete _point_locator;
+}
+
 void PeriodicBoundaries::reinit(MeshBase &mesh)
 {
-  _point_locator = PointLocatorBase::build(TREE, mesh);
+  delete _point_locator;
+
+  _point_locator = PointLocatorBase::build(TREE, mesh).release();
 }
 
 const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
                                          const Elem *e,
                                          unsigned int side)
 {
+  // We'd better already be initialized
+  assert(_point_locator);
+
   // Find a point on that side
   unsigned int n = 0;
   for (; n != e->n_nodes(); n++)
@@ -1610,7 +1623,7 @@ const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
       break;
   assert (n != e->n_nodes());
 
-  Point p = e->node(n);
+  Point p = *(e->get_node(n));
 
   PeriodicBoundary *b = this->boundary(boundary_id);
   assert (b);

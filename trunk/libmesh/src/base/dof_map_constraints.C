@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.35 2007-05-24 23:10:35 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.36 2007-05-31 20:01:11 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -79,10 +79,22 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
       const MeshBase::const_element_iterator elem_end = mesh.elements_end(); 
       
       for ( ; elem_it != elem_end; ++elem_it)
-	FEInterface::compute_constraints (_dof_constraints,
-					  *this,
-					  variable_number,
-					  *elem_it);
+        {
+#ifdef ENABLE_AMR
+	  FEInterface::compute_constraints (_dof_constraints,
+					    *this,
+					    variable_number,
+					    *elem_it);
+#endif
+#ifdef ENABLE_PERIODIC
+	  FEInterface::compute_periodic_constraints (_dof_constraints,
+					             *this,
+                                                     _periodic_boundaries,
+                                                     *mesh.boundary_info,
+					             variable_number,
+					             *elem_it);
+#endif
+        }
     }
   
   STOP_LOG("create_dof_constraints()", "DofMap");
@@ -783,7 +795,7 @@ void DofMap::add_periodic_boundary (const PeriodicBoundary& periodic_boundary)
   std::pair<unsigned int, PeriodicBoundary> bp
     (boundary.myboundary, boundary);
   std::pair<unsigned int, PeriodicBoundary> ibp
-    (boundary.pairedboundary, boundary);
+    (boundary.pairedboundary, inverse_boundary);
 
   _periodic_boundaries.insert(bp);
   _periodic_boundaries.insert(ibp);
