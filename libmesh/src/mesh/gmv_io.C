@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.36 2007-05-08 14:56:09 benkirk Exp $
+// $Id: gmv_io.C,v 1.37 2007-06-01 19:24:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -36,6 +36,18 @@
 #include "mesh_base.h"
 #include "elem.h"
 #include "equation_systems.h"
+
+// Wrap everything in a GMV namespace and
+// use extern "C" to avoid name mangling.
+#ifdef HAVE_GMV
+namespace GMV
+{
+  extern "C"
+  {
+#include "gmvread.h"
+  }
+}
+#endif
 
 // anonymous namespace to hold local data
 namespace
@@ -1782,6 +1794,186 @@ void GMVIO::add_cell_centered_data (const std::string&       cell_centered_data_
 				    const std::vector<Real>* cell_centered_data_vals)
 {
   assert (cell_centered_data_vals != NULL);
-  assert (cell_centered_data_vals->size() == this->mesh().n_active_elem());
+  assert (cell_centered_data_vals->size() ==
+	  MeshOutput<MeshBase>::mesh().n_active_elem());
   this->_cell_centered_data[cell_centered_data_name] = cell_centered_data_vals;
+}
+
+
+
+void GMVIO::read (const std::string& name)
+{
+  //std::cout << "Reading mesh " << name << std::endl;
+  //error();
+
+  
+#ifndef HAVE_GMV
+
+  std::cerr << "Cannot read a GMV file without the GMV API." << std::endl;
+  error();
+
+#else
+  // Clear the mesh so we are sure to start from a pristeen state.
+  MeshInput<MeshBase>::mesh().clear();
+  
+  // It is apparently possible for gmv files to contain
+  // a "fromfile" directive (?) But we currently don't make
+  // any use of this feature in LibMesh.  Nonzero return val
+  // from any function usually means an error has occurred.
+  int ierr = GMV::gmvread_open_fromfileskip(const_cast<char*>(name.c_str()));
+  if (ierr != 0)
+    {
+      std::cerr << "GMV::gmvread_open_fromfileskip failed!" << std::endl;
+      error();
+    }
+
+  
+  // Loop through file until GMVEND.  
+  int iend = 0;
+  while (iend == 0)
+    {
+      GMV::gmvread_data();
+
+      /*  Check for GMVEND.  */
+      if (GMV::gmv_data.keyword == GMVEND)
+        {
+	  iend = 1;
+	  GMV::gmvread_close();
+	  break;
+        }
+
+      /*  Check for GMVERROR.  */
+      if (GMV::gmv_data.keyword == GMVERROR)
+        {
+	  std::cerr << "Encountered GMVERROR while reading!" << std::endl;
+	  error();
+        }
+
+      /*  Process the data.  */
+      switch (GMV::gmv_data.keyword)
+        {
+	case NODES:
+	  {
+	    //std::cout << "Reading nodes." << std::endl;
+
+	    if (GMV::gmv_data.num2 == NODES)
+	      this->_read_nodes();
+	    
+	    else if (GMV::gmv_data.num2 == NODE_V)
+	      {
+		std::cerr << "Unsupported GMV data type NODE_V!" << std::endl;
+		error();
+	      }
+	    break;
+	  }
+	  
+	case CELLS:
+	  {
+	    // Read 1 cell at a time
+	    // std::cout << "\nReading one cell." << std::endl;
+	    this->_read_one_cell();
+	    break;
+	  }
+	  
+	default:
+	  {
+	    std::cout << "Encountered unknown GMV keyword "
+		      << GMV::gmv_data.keyword
+		      << std::endl;
+	    error();
+	  }
+        } // end switch
+    } // end while
+#endif
+}
+
+
+
+void GMVIO::_read_nodes()
+{
+  // error();
+  
+  // Debug Info 
+  std::cout << "gmv_data.datatype="
+	    <<  GMV::gmv_data.datatype
+	    << std::endl;
+
+  // LibMesh writes UNSTRUCT=100 node data 
+  assert (GMV::gmv_data.datatype == UNSTRUCT);
+
+  // The nodal data is stored in gmv_data.doubledata{1,2,3}
+  // and is nnodes long
+  for (int i = 0; i < GMV::gmv_data.num; i++)
+    {
+      //       std::cout << "(x,y,z)="
+      // 		<< "("
+      // 		<< GMV::gmv_data.doubledata1[i]
+      // 		<< ","
+      // 		<< GMV::gmv_data.doubledata2[i]
+      // 		<< ","
+      // 		<< GMV::gmv_data.doubledata3[i]
+      // 		<< ")"
+      // 		<< std::endl;
+      
+      // Add the point to the Mesh
+      MeshInput<MeshBase>::mesh().add_point( Point(GMV::gmv_data.doubledata1[i],
+						   GMV::gmv_data.doubledata2[i],
+						   GMV::gmv_data.doubledata3[i]) );
+    }
+  
+}
+
+
+void GMVIO::_read_one_cell()
+{
+  // error();
+
+  // Debug Info 
+  std::cout << "gmv_data.datatype="
+	    <<  GMV::gmv_data.datatype
+	    << std::endl;
+
+  // This is either a REGULAR=111 cell or
+  // the ENDKEYWORD=207 of the cells
+  {
+    bool recognized =
+      (GMV::gmv_data.datatype==REGULAR) ||
+      (GMV::gmv_data.datatype==ENDKEYWORD);
+    
+    assert (recognized);
+  }
+
+  if (GMV::gmv_data.datatype == REGULAR)
+    {
+      // FIXME: In a real problem, we would need to figure out
+      // what type of LibMesh cell this is, create it,
+      // and add it to the mesh...
+      
+      std::cout << "Name of the cell is: "
+		<< GMV::gmv_data.name1
+		<< std::endl;
+
+      std::cout << "Cell has "
+		<< GMV::gmv_data.num2
+		<< " vertices."
+		<< std::endl;
+
+      // Print out the connectivity information for
+      // this cell.
+      for (int i = 0; i < GMV::gmv_data.num2; i++)
+	{
+	  // Note: Node numbers are 1-based
+	  std::cout << "Vertex " << i << " is node "
+		    << GMV::gmv_data.longdata1[i]
+		    << std::endl;
+	}
+    }
+
+
+  if (GMV::gmv_data.datatype == ENDKEYWORD)
+    {
+      // There isn't a cell to read, so we just return
+      return;
+    }
+  
 }

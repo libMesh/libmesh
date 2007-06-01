@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.56 2007-04-16 16:40:39 roystgnr Exp $
+# $Id: Make.common.in,v 1.57 2007-06-01 19:24:39 jwpeterson Exp $
 
 
 ###############################################################################
@@ -76,6 +76,7 @@ enable-sfcurves	     = @enablesfc@
 enable-gzstream      = @enablegz@
 enable-tetgen        = @enabletetgen@
 enable-triangle      = @enabletriangle@
+enable-gmv           = @enablegmv@
 
 #
 # Set the current directory.
@@ -272,6 +273,10 @@ ifeq ($(enable-optional),yes)
   LIBS    += @TECPLOT_LIBRARY@
   INCLUDE += @TECPLOT_INCLUDE@
 
+  # Link against the GMV APIs to read GMV files
+  LIBS    += @GMV_LIBRARY@
+  INCLUDE += @GMV_INCLUDE@
+
   # if TetGen is used:
   ifeq ($(enable-tetgen),yes)
     LIBS     += @TETGEN_LIBRARY@
@@ -437,6 +442,9 @@ ifeq ($(enable-optional),yes)
   endif
   ifeq ($(enable-triangle),yes)
     libs_EXTERNAL += -ltriangle
+  endif
+  ifeq ($(enable-gmv),yes)
+    libs_EXTERNAL += -lgmv
   endif
 
   EXTERNAL_FLAGS += $(libs_EXTERNAL)

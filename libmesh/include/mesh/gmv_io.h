@@ -1,4 +1,4 @@
-// $Id: gmv_io.h,v 1.11 2006-06-05 16:46:53 jwpeterson Exp $
+// $Id: gmv_io.h,v 1.12 2007-06-01 19:24:39 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,7 @@
 // Local includes
 #include "libmesh_common.h"
 #include "mesh_output.h"
+#include "mesh_input.h"
 
 // Forward declarations
 class MeshBase;
@@ -46,7 +47,8 @@ class MeshBase;
 
 // ------------------------------------------------------------
 // GMVIO class definition
-class GMVIO : public MeshOutput<MeshBase>
+class GMVIO : public MeshInput<MeshBase>,
+	      public MeshOutput<MeshBase>
 {
  public:
 
@@ -55,12 +57,23 @@ class GMVIO : public MeshOutput<MeshBase>
    * This constructor will only allow us to write the mesh.
    */
   GMVIO (const MeshBase&);
+
+  /**
+   * Constructor.  Takes a writeable reference to a mesh object.
+   * This constructor is required to let us read in a mesh.
+   */
+  GMVIO (MeshBase&);
   
   /**
    * This method implements writing a mesh to a specified file.
    */
   virtual void write (const std::string& );
-  
+
+  /**
+   * This method implements reading a mesh from a specified file.
+   */
+  virtual void read (const std::string&);
+
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
@@ -198,6 +211,12 @@ private:
    * to a vector containing the data.
    */
   std::map<std::string, const std::vector<Real>* > _cell_centered_data;
+
+  /**
+   * Helper functions for reading nodes/cells from a GMV file
+   */
+  void _read_nodes();
+  void _read_one_cell();
 };
 
 
@@ -208,6 +227,18 @@ inline
 GMVIO::GMVIO (const MeshBase& mesh) :
   MeshOutput<MeshBase>    (mesh),
   _binary                 (false),
+  _discontinuous          (false),  
+  _partitioning           (true),
+  _subdivide_second_order (true),
+  _p_levels               (true)
+{
+}
+
+inline
+GMVIO::GMVIO (MeshBase& mesh) :
+  MeshInput<MeshBase> (mesh),
+  MeshOutput<MeshBase>(mesh),
+  _binary (false),
   _discontinuous          (false),  
   _partitioning           (true),
   _subdivide_second_order (true),

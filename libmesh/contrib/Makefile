@@ -22,10 +22,13 @@ all:
 	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
 	@echo ""
 	@echo "--- Building TetGen ---------------------"
-	@$(MAKE) -C tetgen     $(MAKECMDGOALS)
+	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
 	@echo ""
 	@echo "--- Building triangle ---------------------"
 	@$(MAKE) -C triangle     $(MAKECMDGOALS)
+	@echo ""
+	@echo "--- Building gmv ---------------------"
+	@$(MAKE) -C gmv          $(MAKECMDGOALS)
 	@echo ""
 	@echo "----------------------------------------------"
 	@echo "----- Done Building Contributed Packages -----"
@@ -45,6 +48,8 @@ clean:
 	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
 	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
 	@$(MAKE) -C triangle     $(MAKECMDGOALS)
+	@$(MAKE) -C gmv          $(MAKECMDGOALS)
+
 #
 # How to clobber the packages
 #
@@ -57,6 +62,7 @@ clobber:
 	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
 	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
 	@$(MAKE) -C triangle     $(MAKECMDGOALS)
+	@$(MAKE) -C gmv          $(MAKECMDGOALS)
 
 #
 # How to distclean the packages
@@ -70,4 +76,5 @@ distclean:
 	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
 	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
 	@$(MAKE) -C triangle     $(MAKECMDGOALS)
+	@$(MAKE) -C gmv          $(MAKECMDGOALS)
 	@rm -rf lib/*_dbg lib/*_opt lib/*_pro lib/*_devel
