@@ -1,4 +1,4 @@
-// $Id: gmv_io.h,v 1.12 2007-06-01 19:24:39 jwpeterson Exp $
+// $Id: gmv_io.h,v 1.13 2007-06-01 22:18:19 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 #include "libmesh_common.h"
 #include "mesh_output.h"
 #include "mesh_input.h"
+#include "elem_type.h"
 
 // Forward declarations
 class MeshBase;
@@ -217,6 +218,8 @@ private:
    */
   void _read_nodes();
   void _read_one_cell();
+  ElemType _gmv_elem_to_libmesh_elem(const char* elemname);
+  void _read_materials();
 };
 
 

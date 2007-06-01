@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.37 2007-06-01 19:24:39 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.38 2007-06-01 22:18:19 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1803,9 +1803,6 @@ void GMVIO::add_cell_centered_data (const std::string&       cell_centered_data_
 
 void GMVIO::read (const std::string& name)
 {
-  //std::cout << "Reading mesh " << name << std::endl;
-  //error();
-
   
 #ifndef HAVE_GMV
 
@@ -1874,29 +1871,79 @@ void GMVIO::read (const std::string& name)
 	    this->_read_one_cell();
 	    break;
 	  }
+
+	case MATERIAL:
+	  {
+	    // keyword == 6
+	    // These are the materials, which we use to specify the mesh
+	    // partitioning.
+	    this->_read_materials();
+	    break;
+	  }
 	  
 	default:
 	  {
-	    std::cout << "Encountered unknown GMV keyword "
+	    std::cerr << "Encountered unknown GMV keyword "
 		      << GMV::gmv_data.keyword
 		      << std::endl;
 	    error();
 	  }
         } // end switch
     } // end while
+
+  // Done reading in the mesh, now call find_neighbors, etc.
+  MeshInput<MeshBase>::mesh().find_neighbors();
+  
+  // Careful, this also renumbers the nodes & elements
+  //MeshInput<MeshBase>::mesh().prepare_for_use();
 #endif
 }
+
+void GMVIO::_read_materials()
+{
+  // LibMesh assigns materials on a per-cell basis
+  assert (GMV::gmv_data.datatype == CELL);
+
+  //   // Material names: LibMesh has no use for these currently...
+  //   std::cout << "Number of material names="
+  // 	    << GMV::gmv_data.num
+  // 	    << std::endl;
+  
+  //   for (int i = 0; i < GMV::gmv_data.num; i++)
+  //     {
+  //       // Build a 32-char string from the appropriate entries
+  //       std::string mat_string(&GMV::gmv_data.chardata1[i*33], 32);
+
+  //       std::cout << "Material name " << i << ": " << mat_string << std::endl;
+  //     }
+
+  //   // Material labels: These correspond to (1-based) CPU IDs, and
+  //   // there should be 1 of these for each element.
+  //   std::cout << "Number of material labels = "
+  // 	    << GMV::gmv_data.nlongdata1
+  // 	    << std::endl;
+  
+  for (int i = 0; i < GMV::gmv_data.nlongdata1; i++)
+    {
+      // Debugging Info
+      // std::cout << "Material ID " << i << ": "
+      // << GMV::gmv_data.longdata1[i]
+      // << std::endl;
+      
+      MeshInput<MeshBase>::mesh().elem(i)->processor_id() =
+	GMV::gmv_data.longdata1[i]-1;
+    }
+}
+
 
 
 
 void GMVIO::_read_nodes()
 {
-  // error();
-  
-  // Debug Info 
-  std::cout << "gmv_data.datatype="
-	    <<  GMV::gmv_data.datatype
-	    << std::endl;
+  //   // Debug Info 
+  //   std::cout << "gmv_data.datatype="
+  // 	    <<  GMV::gmv_data.datatype
+  // 	    << std::endl;
 
   // LibMesh writes UNSTRUCT=100 node data 
   assert (GMV::gmv_data.datatype == UNSTRUCT);
@@ -1926,12 +1973,10 @@ void GMVIO::_read_nodes()
 
 void GMVIO::_read_one_cell()
 {
-  // error();
-
-  // Debug Info 
-  std::cout << "gmv_data.datatype="
-	    <<  GMV::gmv_data.datatype
-	    << std::endl;
+  //   // Debug Info 
+  //   std::cout << "gmv_data.datatype="
+  // 	    <<  GMV::gmv_data.datatype
+  // 	    << std::endl;
 
   // This is either a REGULAR=111 cell or
   // the ENDKEYWORD=207 of the cells
@@ -1945,28 +1990,41 @@ void GMVIO::_read_one_cell()
 
   if (GMV::gmv_data.datatype == REGULAR)
     {
-      // FIXME: In a real problem, we would need to figure out
-      // what type of LibMesh cell this is, create it,
-      // and add it to the mesh...
-      
-      std::cout << "Name of the cell is: "
-		<< GMV::gmv_data.name1
-		<< std::endl;
+      //       std::cout << "Name of the cell is: "
+      // 		<< GMV::gmv_data.name1
+      // 		<< std::endl;
 
-      std::cout << "Cell has "
-		<< GMV::gmv_data.num2
-		<< " vertices."
-		<< std::endl;
+      //       std::cout << "Cell has "
+      // 		<< GMV::gmv_data.num2
+      // 		<< " vertices."
+      // 		<< std::endl;
+
+      // We need a mapping from GMV element types to LibMesh
+      // ElemTypes.  Basically the reverse of the eletypes
+      // std::map above.
+      //
+      // FIXME: Since Quad9's apparently don't exist for GMV, and since
+      // In general we write linear sub-elements to GMV files, we need
+      // to be careful to read back in exactly what we wrote out...
+      ElemType type = this->_gmv_elem_to_libmesh_elem(GMV::gmv_data.name1);
+      
+      Elem* elem = Elem::build(type).release();
 
       // Print out the connectivity information for
       // this cell.
       for (int i = 0; i < GMV::gmv_data.num2; i++)
 	{
+	  // 	  // Debugging info
+	  // 	  std::cout << "Vertex " << i << " is node "
+	  // 		    << GMV::gmv_data.longdata1[i]
+	  // 		    << std::endl;
+	  
 	  // Note: Node numbers are 1-based
-	  std::cout << "Vertex " << i << " is node "
-		    << GMV::gmv_data.longdata1[i]
-		    << std::endl;
+	  elem->set_node(i) = MeshInput<MeshBase>::mesh().node_ptr(GMV::gmv_data.longdata1[i]-1);
 	}
+
+      // Add the newly-created element to the mesh
+      MeshInput<MeshBase>::mesh().add_elem(elem);
     }
 
 
@@ -1976,4 +2034,73 @@ void GMVIO::_read_one_cell()
       return;
     }
   
+}
+
+
+ElemType GMVIO::_gmv_elem_to_libmesh_elem(const char* elemname)
+{
+  //
+  // Linear Elements
+  //
+  if (!strncmp(elemname,"line",4))
+    return EDGE2;
+  
+  if (!strncmp(elemname,"tri",3))
+    return TRI3;
+
+  if (!strncmp(elemname,"quad",4))
+    return QUAD4;
+  
+  // FIXME: tet or ptet4?
+  if ((!strncmp(elemname,"tet",3)) ||
+      (!strncmp(elemname,"ptet4",5)))
+    return TET4;
+
+  // FIXME: hex or phex8?
+  if ((!strncmp(elemname,"hex",3)) ||
+      (!strncmp(elemname,"phex8",5)))
+    return HEX8;
+
+  // FIXME: prism or pprism6?
+  if ((!strncmp(elemname,"prism",5)) ||
+      (!strncmp(elemname,"pprism6",7)))
+    return PRISM6;
+
+  //
+  // Quadratic Elements
+  //
+  if (!strncmp(elemname,"phex20",6))
+    return HEX20;
+
+  if (!strncmp(elemname,"phex27",6))
+    return HEX27;
+
+  if (!strncmp(elemname,"pprism15",8))
+    return PRISM15;
+
+  if (!strncmp(elemname,"ptet10",6))
+    return TET10;
+
+  if (!strncmp(elemname,"6tri",4))
+    return TRI6;
+
+  if (!strncmp(elemname,"8quad",5))
+    return QUAD8;
+
+  if (!strncmp(elemname,"3line",5))
+    return EDGE3;
+  
+  // Unsupported/Unused types
+  // if (!strncmp(elemname,"vface2d",7))
+  // if (!strncmp(elemname,"vface3d",7))
+  // if (!strncmp(elemname,"pyramid",7))
+  // if (!strncmp(elemname,"ppyrmd5",7))
+  // if (!strncmp(elemname,"ppyrmd13",8))
+
+  // If we didn't return yet, then we didn't find the right cell!
+  std::cerr << "Uknown/unsupported element: "
+	    << elemname
+	    << " was read."
+	    << std::endl;
+  error();
 }
