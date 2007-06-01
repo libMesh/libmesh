@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.102 2007-04-09 20:39:28 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.103 2007-06-01 19:24:39 jwpeterson Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1039,6 +1039,36 @@ dnl where it might be installed...
   AC_SUBST(TRIANGLE_INCLUDE)
   AC_SUBST(TRIANGLE_LIBRARY)	
   AC_SUBST(enabletriangle)
+])
+dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
+dnl GMV file I/O API for reading GMV files, by Frank Ortega
+dnl -------------------------------------------------------------
+AC_DEFUN(CONFIGURE_GMV, 
+[
+dnl The GMV API is distributed with libmesh, so we don't have to guess
+dnl where it might be installed...
+
+  if (test $enablegmv = yes); then
+     GMV_INCLUDE="-I$PWD/contrib/gmv"
+     GMV_LIBRARY="\$(EXTERNAL_LIBDIR)/libgmv\$(libext)"
+     AC_DEFINE(HAVE_GMV, 1, [Flag indicating whether the library will be compiled with GMV support])
+     AC_MSG_RESULT(<<< Configuring library with GMV support >>>)
+     CONTRIB_HAVE_GMV="#define HAVE_GMV 1"
+  else
+     GMV_INCLUDE=""
+     GMV_LIBRARY=""
+     enablegmv=no
+     CONTRIB_HAVE_GMV="/* #undef HAVE_GMV */"
+  fi
+
+  AC_SUBST(CONTRIB_HAVE_GMV)	
+  AC_SUBST(GMV_INCLUDE)
+  AC_SUBST(GMV_LIBRARY)	
+  AC_SUBST(enablegmv)
 ])
 dnl -------------------------------------------------------------
 
