@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.40 2007-06-04 19:08:59 benkirk Exp $
+// $Id: gmv_io.C,v 1.41 2007-06-04 19:29:41 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1803,6 +1803,8 @@ void GMVIO::add_cell_centered_data (const std::string&       cell_centered_data_
 
 void GMVIO::read (const std::string& name)
 {
+
+  untested();
   
 #ifndef HAVE_GMV
 
