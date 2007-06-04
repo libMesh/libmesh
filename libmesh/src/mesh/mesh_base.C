@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.98 2005-08-18 14:58:56 knezed01 Exp $
+// $Id: mesh_base.C,v 1.99 2007-06-04 16:31:40 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -73,14 +73,19 @@ MeshBase::~MeshBase()
 
 
 
-void MeshBase::prepare_for_use (const bool read_xd_file)
+void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 {
-  // Renumber the nodes and elements so that they in
-  // contiguous blocks.  Note that we skip this step if prepare_for_use()
-  // has just been called from Mesh::read while reading an xda or xdr file. In
+
+  // Renumber the nodes and elements so that they in contiguous
+  // blocks.  By default, skip_renumber_nodes_and_elements is false,
+  // however we may skip this step by passing
+  // skip_renumber_nodes_and_elements==true to this function.
+  //
+  // Instances where you if prepare_for_use() should not renumber the nodes
+  // and elements include reading in e.g. an xda/r or gmv file. In
   // this case, the ordering of the nodes may depend on an accompanying
   // solution, and the node ordering cannot be changed.
-  if(!read_xd_file)
+  if(!skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
   
   // Let all the elements find their neighbors
