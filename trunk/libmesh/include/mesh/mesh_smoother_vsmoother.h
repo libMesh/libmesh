@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_vsmoother.h,v 1.2 2007-04-14 19:05:46 roystgnr Exp $
+// $Id: mesh_smoother_vsmoother.h,v 1.3 2007-06-04 17:44:38 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -43,28 +43,25 @@ typedef LPINT  * LPLPINT;
 #include "mesh_smoother.h"
 #include "mesh.h"
 
-enum metric_type
-{
-  uniform=1,
-  volumetric=2,
-  directional=3
-};
-
-enum adapt_type
-{
-  cell=-1,
-  none=0,
-  node=1
-};
-
 /**
  * This is an implementation of Larisa Branets smoothing
  * algorithms.  The initial implementation was done by her,
  * the adaptation to libmesh was completed by Derek Gaston.
  *
+ * Here are the relevant publications:
+ * 1) L. Branets, G. Carey, "Extension of a mesh quality metric for
+ * elements with a curved boundary edge or surface",
+ * Journal of Computing and Information Science in Engineering, vol. 5(4), pp.302-308, 2005.
+ *
+ * 2) L. Branets, G. Carey, ¡ÈA local cell quality metric and variational grid
+ * smoothing algorithm¡É, Engineering with Computers, vol. 21, pp.19-28, 2005.
+ *
+ * 3) L.V. Branets, "A variational grid optimization algorithm based on a local
+ * cell quality metric", Ph.D. thesis, The University of Texas at Austin, 2005.
+ *
  * \author Derek R. Gaston
  * \date 2006
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  */
 
 
@@ -140,50 +137,20 @@ public:
      _area_of_interest(area_of_interest)
   {}
 
-/* Old constructors... will eventually be removed.
-  VariationalMeshSmoother(Mesh& mesh, uint metric, bool generate_data, int adaptive_func, double theta,
-                          uint miniter, uint maxiter, uint miniterBC, std::vector<float> &adapt_data, const double percent_to_move)
-  :MeshSmoother(mesh),
-  _dim(mesh.mesh_dimension()),
-  _metric(metric),
-  _generate_data(generate_data),
-  _adaptive_func(adaptive_func),
-  _theta(theta),
-  _miniter(miniter),
-  _maxiter(maxiter),
-  _miniterBC(miniterBC),
-  _adapt_data(adapt_data),
-  _area_of_interest(NULL),
-  _percent_to_move(percent_to_move),
-  _dist_norm(0){}
-  
-  VariationalMeshSmoother(Mesh& mesh, uint metric, bool generate_data, int adaptive_func, double theta,
-                          uint miniter, uint maxiter, uint miniterBC, std::vector<float> &adapt_data, Mesh& area_of_interest)
-  :MeshSmoother(mesh),
-  _dim(mesh.mesh_dimension()),
-  _metric(metric),
-  _generate_data(generate_data),
-  _adaptive_func(adaptive_func),
-  _theta(theta),
-  _miniter(miniter),
-  _maxiter(maxiter),
-  _miniterBC(miniterBC),
-  _adapt_data(adapt_data),
-  _area_of_interest(&area_of_interest){}
-    
-  VariationalMeshSmoother(Mesh& mesh,
-                          uint metric,
-                          bool generate_data,
-                          int adaptive_func,
-                          double theta,
-                          uint miniter,
-                          uint maxiter,
-                          uint miniterBC)
-                          :MeshSmoother(mesh),_dim(mesh.mesh_dimension()),_metric(metric),_generate_data(generate_data),
-                          _adaptive_func(adaptive_func),_theta(theta),_miniter(miniter),_maxiter(maxiter),
-                          _miniterBC(miniterBC),_adapt_data(*(new std::vector<float>())),
-                          _area_of_interest(NULL){}
-*/
+  enum metric_type
+  {
+    uniform=1,
+    volumetric=2,
+    directional=3
+  };
+
+  enum adapt_type
+  {
+    cell=-1,
+    none=0,
+    node=1
+  };
+
   /**
    * Destructor.
    */
