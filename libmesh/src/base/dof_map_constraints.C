@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.37 2007-05-31 21:46:13 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.38 2007-06-04 19:17:49 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -843,6 +843,8 @@ void DofMap::constrain_p_dofs (unsigned int var,
 
 void DofMap::add_periodic_boundary (const PeriodicBoundary& periodic_boundary)
 {
+  untested();
+
   PeriodicBoundary boundary = periodic_boundary;
   PeriodicBoundary inverse_boundary;
   inverse_boundary.myboundary = boundary.pairedboundary;
