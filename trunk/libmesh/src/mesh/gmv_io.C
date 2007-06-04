@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.39 2007-06-04 16:33:51 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.40 2007-06-04 19:08:59 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1927,6 +1927,8 @@ void GMVIO::read (const std::string& name)
 
 void GMVIO::_read_materials()
 {
+#ifdef HAVE_GMV
+  
   // LibMesh assigns materials on a per-cell basis
   assert (GMV::gmv_data.datatype == CELL);
 
@@ -1993,12 +1995,13 @@ void GMVIO::_read_nodes()
 						   GMV::gmv_data.doubledata2[i],
 						   GMV::gmv_data.doubledata3[i]) );
     }
-  
+#endif  
 }
 
 
 void GMVIO::_read_one_cell()
 {
+#ifdef HAVE_GMV
   //   // Debug Info 
   //   std::cout << "gmv_data.datatype="
   // 	    <<  GMV::gmv_data.datatype
@@ -2059,7 +2062,8 @@ void GMVIO::_read_one_cell()
       // There isn't a cell to read, so we just return
       return;
     }
-  
+
+#endif
 }
 
 
