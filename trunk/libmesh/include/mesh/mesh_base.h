@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.52 2007-05-23 23:36:10 roystgnr Exp $
+// $Id: mesh_base.h,v 1.53 2007-06-04 16:32:44 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,8 +56,8 @@ class BoundaryInfo;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2007-05-23 23:36:10 $
- * \version $Revision: 1.52 $
+ * \date    $Date: 2007-06-04 16:32:44 $
+ * \version $Revision: 1.53 $
  */
 
 
@@ -281,7 +281,7 @@ public:
    * the renumbering of nodes and elements.  In general, leave this at
    * the default value of false.
    */
-  void prepare_for_use (const bool read_xda_file=false);
+  void prepare_for_use (const bool skip_renumber_nodes_and_elements=false);
   
   /**
    * Call the default partitioner (currently \p metis_partition()).
