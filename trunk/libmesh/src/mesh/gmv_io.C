@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.38 2007-06-01 22:18:19 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.39 2007-06-04 16:33:51 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1878,6 +1878,32 @@ void GMVIO::read (const std::string& name)
 	    // These are the materials, which we use to specify the mesh
 	    // partitioning.
 	    this->_read_materials();
+	    break;
+	  }
+	  
+	case VARIABLE:
+	  {
+	    // keyword == 8
+	    // This is a field variable.  We don't really have a
+	    // way to process this while reading in the mesh...
+	    if (GMV::gmv_data.datatype == NODE)
+	      {
+		std::cout << "Skipping node field variable "
+		      << GMV::gmv_data.name1 << std::endl;
+	      }
+	    
+	    else if (GMV::gmv_data.datatype == ENDKEYWORD)
+	      {
+		std::cout << "Done reading GMV variables." << std::endl;
+	      }
+
+	    else
+	      {
+		std::cerr << "Unrecognized GMV datatype: "
+			  << GMV::gmv_data.datatype
+			  << std::endl;
+		error();
+	      }
 	    break;
 	  }
 	  
