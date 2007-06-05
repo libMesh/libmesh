@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.h,v 1.5 2007-02-13 21:21:16 roystgnr Exp $
+// $Id: exact_error_estimator.h,v 1.6 2007-06-05 15:16:33 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -108,6 +108,14 @@ public:
                                           const std::string& unknown_name));
 
   /**
+   * Attach function similar to system.h which
+   * allows the user to attach a second EquationSystems
+   * object with a reference fine grid solution.
+   */
+  void attach_reference_solution (EquationSystems* es_fine);
+  
+
+  /**
    * Increases or decreases the order of the quadrature rule used for numerical
    * integration.
    */
@@ -160,6 +168,12 @@ private:
 			     const Parameters& parameters,
 			     const std::string& sys_name,
 			     const std::string& unknown_name);
+
+  /**
+   * Constant pointer to the \p EquationSystems object
+   * containing the fine grid solution.
+   */
+  EquationSystems* _equation_systems_fine;
 
   /**
    * Extra order to use for quadrature rule
