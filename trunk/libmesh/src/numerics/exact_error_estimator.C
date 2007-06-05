@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.C,v 1.8 2006-10-12 19:20:22 roystgnr Exp $
+// $Id: exact_error_estimator.C,v 1.9 2007-06-05 15:16:33 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,6 +34,8 @@
 #include "libmesh_logging.h"
 #include "elem.h"
 #include "mesh.h"
+#include "mesh_function.h"
+#include "numeric_vector.h"
 #include "quadrature.h"
 #include "system.h"
 
@@ -46,6 +48,10 @@ void ExactErrorEstimator::attach_exact_value (Number fptr(const Point& p,
 {
   assert (fptr != NULL);
   _exact_value = fptr;
+
+  // If we're not using a fine grid solution
+  _equation_systems_fine = NULL;
+
 }
 
 
@@ -56,6 +62,10 @@ void ExactErrorEstimator::attach_exact_deriv (Gradient fptr(const Point& p,
 {
   assert (fptr != NULL);
   _exact_deriv = fptr;
+
+  // If we're not using a fine grid solution
+  _equation_systems_fine = NULL;
+
 }
 
 
@@ -66,8 +76,21 @@ void ExactErrorEstimator::attach_exact_hessian (Tensor fptr(const Point& p,
 {
   assert (fptr != NULL);
   _exact_hessian = fptr;
+
+  // If we're not using a fine grid solution
+  _equation_systems_fine = NULL;
 }
 
+void ExactErrorEstimator::attach_reference_solution (EquationSystems* es_fine)
+{
+  assert (es_fine != NULL);
+  _equation_systems_fine = es_fine;
+
+  // If we're using a fine grid solution, we're not using exact values
+  _exact_value = NULL;
+  _exact_deriv = NULL;
+  _exact_hessian = NULL;
+}
 
 void ExactErrorEstimator::estimate_error (const System& system,
 					  ErrorVector& error_per_cell,
@@ -115,8 +138,6 @@ void ExactErrorEstimator::estimate_error (const System& system,
       component_scale.resize (n_vars);
       std::fill (component_scale.begin(), component_scale.end(), 1.0);
     }
-  
-
 
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_vars; var++)
@@ -142,6 +163,26 @@ void ExactErrorEstimator::estimate_error (const System& system,
                                          _extra_order);
 
       fe->attach_quadrature_rule (qrule.get());
+
+      // Prepare a global solution and a MeshFunction of the fine system if we need one
+      AutoPtr<MeshFunction> fine_values;
+      AutoPtr<NumericVector<Number> > fine_soln = NumericVector<Number>::build();
+      if (_equation_systems_fine)
+      {
+	const System& fine_system = _equation_systems_fine->get_system(system.name());
+
+	std::vector<Number> global_soln;
+	fine_system.update_global_solution(global_soln);
+	fine_soln->init(fine_system.solution->size(),fine_system.solution->size());
+	(*fine_soln) = global_soln;
+
+	fine_values = AutoPtr<MeshFunction>
+	  (new MeshFunction(*_equation_systems_fine,
+			    *fine_soln,
+			    fine_system.get_dof_map(),
+			    fine_system.variable_number(var_name)));
+	fine_values->init();
+      }
       
       const std::vector<Real> &
         JxW          = fe->get_JxW();
@@ -243,10 +284,11 @@ void ExactErrorEstimator::estimate_error (const System& system,
 #endif
 
               // Compute the value of the error at this quadrature point
-              const Number val_error = (u_h - _exact_value(q_point[qp],
-                                                           parameters,
-                                                           sys_name,
-                                                           var_name));
+              Number val_error = 0;
+	      if(_exact_value)
+		val_error = u_h - _exact_value(q_point[qp],parameters,sys_name,var_name);
+	      else if(_equation_systems_fine)
+		val_error = u_h - (*fine_values)(q_point[qp]);
 
               // Add the squares of the error to each contribution
 #ifndef USE_COMPLEX_NUMBERS
@@ -257,13 +299,13 @@ void ExactErrorEstimator::estimate_error (const System& system,
 
 	      // Compute the value of the error in the gradient at this
               // quadrature point
-              if (_exact_deriv != NULL && _sobolev_order > 0)
+              if ((_exact_deriv || _equation_systems_fine) && _sobolev_order > 0)
                 {
-                  Gradient grad_error = (grad_u_h - _exact_deriv(q_point[qp],
-                                                                 parameters,
-                                                                 sys_name,
-                                                                 var_name));
-
+                  Gradient grad_error;
+		  if(_exact_deriv)
+		    grad_error = grad_u_h - _exact_deriv(q_point[qp],parameters,sys_name,var_name);
+		  else if(_equation_systems_fine)
+		    grad_error = grad_u_h - fine_values->gradient(q_point[qp]);
 
 #ifndef USE_COMPLEX_NUMBERS
                   H1seminormsq += JxW[qp]*(grad_error*grad_error);
@@ -276,12 +318,13 @@ void ExactErrorEstimator::estimate_error (const System& system,
 #ifdef ENABLE_SECOND_DERIVATIVES
 	      // Compute the value of the error in the hessian at this
               // quadrature point
-              if (_exact_hessian != NULL && _sobolev_order > 1)
+              if ((_exact_hessian || _equation_systems_fine) && _sobolev_order > 1)
                 {
-                  Tensor grad2_error = (grad2_u_h - _exact_hessian(q_point[qp],
-                                                                   parameters,
-                                                                   sys_name,
-                                                                   var_name));
+		  Tensor grad2_error;
+		  if(_exact_hessian)
+		    grad2_error = grad2_u_h - _exact_hessian(q_point[qp],parameters,sys_name,var_name);
+		  else if (_equation_systems_fine)
+		    grad2_error = grad2_u_h - fine_values->hessian(q_point[qp]);
 
                   H2seminormsq += JxW[qp]*std::abs(grad2_error.contract(grad2_error));
                 }
