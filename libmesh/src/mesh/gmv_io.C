@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.42 2007-06-05 16:04:13 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.43 2007-06-05 16:09:30 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1943,10 +1943,12 @@ void GMVIO::read (const std::string& name)
 
 void GMVIO::_read_var()
 {
+#ifdef HAVE_GMV
+  
   // Copy all the variable's values into a local storage vector.
   _nodal_data.insert ( std::make_pair(std::string(GMV::gmv_data.name1),
 				      std::vector<Number>(GMV::gmv_data.doubledata1, GMV::gmv_data.doubledata1+GMV::gmv_data.num) ) );
-							 
+#endif							 
 }
 
 
@@ -1987,6 +1989,8 @@ void GMVIO::_read_materials()
       MeshInput<MeshBase>::mesh().elem(i)->processor_id() =
 	GMV::gmv_data.longdata1[i]-1;
     }
+  
+#endif
 }
 
 
@@ -1994,6 +1998,7 @@ void GMVIO::_read_materials()
 
 void GMVIO::_read_nodes()
 {
+#ifdef HAVE_GMV
   //   // Debug Info 
   //   std::cout << "gmv_data.datatype="
   // 	    <<  GMV::gmv_data.datatype
