@@ -1,4 +1,4 @@
-// $Id: gmv_io.h,v 1.13 2007-06-01 22:18:19 jwpeterson Exp $
+// $Id: gmv_io.h,v 1.14 2007-06-05 16:04:12 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -70,11 +70,26 @@ class GMVIO : public MeshInput<MeshBase>,
    */
   virtual void write (const std::string& );
 
-  /**
-   * This method implements reading a mesh from a specified file.
-   */
-  virtual void read (const std::string&);
+   /**
+    * This method implements reading a mesh from a specified file.
+    */
+  virtual void read (const std::string& mesh_file);
+  
+//   /**
+//    * This method implements reading a mesh from a specified file.
+//    */
+//   virtual void read (const std::string& mesh_file)
+//   { this->read_mesh_and_nodal_data(mesh_file, NULL); }
 
+//   /**
+//    * Extension of the MeshInput::read() routine which
+//    * also takes an optional EquationSystems pointer and
+//    * tries to read field variables from the GMV file
+//    * into the EquationSystems object.
+//    */
+//   virtual void read_mesh_and_nodal_data (const std::string& ,
+// 					 EquationSystems* es=NULL);
+  
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
@@ -150,6 +165,12 @@ class GMVIO : public MeshInput<MeshBase>,
    */
   void add_cell_centered_data (const std::string&       cell_centered_data_name,
 			       const std::vector<Real>* cell_centered_data_vals);
+
+  /**
+   * If we read in a nodal solution while reading in a mesh, we can attempt
+   * to copy that nodal solution into an EquationSystems object.
+   */
+  void copy_nodal_solution(EquationSystems& es);
   
 private:
 
@@ -220,6 +241,8 @@ private:
   void _read_one_cell();
   ElemType _gmv_elem_to_libmesh_elem(const char* elemname);
   void _read_materials();
+  void _read_var();
+  std::map<std::string, std::vector<Number> > _nodal_data;
 };
 
 

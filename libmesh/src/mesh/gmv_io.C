@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.41 2007-06-04 19:29:41 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.42 2007-06-05 16:04:13 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -36,6 +36,7 @@
 #include "mesh_base.h"
 #include "elem.h"
 #include "equation_systems.h"
+#include "numeric_vector.h"
 
 // Wrap everything in a GMV namespace and
 // use extern "C" to avoid name mangling.
@@ -1801,6 +1802,9 @@ void GMVIO::add_cell_centered_data (const std::string&       cell_centered_data_
 
 
 
+
+
+
 void GMVIO::read (const std::string& name)
 {
 
@@ -1886,27 +1890,34 @@ void GMVIO::read (const std::string& name)
 	case VARIABLE:
 	  {
 	    // keyword == 8
-	    // This is a field variable.  We don't really have a
-	    // way to process this while reading in the mesh...
-	    if (GMV::gmv_data.datatype == NODE)
+	    // This is a field variable.  
+
+	    // Check to see if we're done reading variables and break out.
+	    if (GMV::gmv_data.datatype == ENDKEYWORD)
 	      {
-		std::cout << "Skipping node field variable "
-		      << GMV::gmv_data.name1 << std::endl;
-	      }
-	    
-	    else if (GMV::gmv_data.datatype == ENDKEYWORD)
-	      {
-		std::cout << "Done reading GMV variables." << std::endl;
+		// std::cout << "Done reading GMV variables." << std::endl;
+		break;
 	      }
 
+	    if (GMV::gmv_data.datatype == NODE)
+	      {
+		// std::cout << "Reading node field data for variable "
+		// 	  << GMV::gmv_data.name1 << std::endl;
+		this->_read_var();
+		break;
+	      }
+	    
 	    else
 	      {
-		std::cerr << "Unrecognized GMV datatype: "
+		std::cerr << "Warning: Skipping variable: "
+			  << GMV::gmv_data.name1
+			  << " which is of unsupported GMV datatype "
 			  << GMV::gmv_data.datatype
+			  << ".  Nodal field data is currently the only type currently supported."
 			  << std::endl;
-		error();
+		break;
 	      }
-	    break;
+
 	  }
 	  
 	default:
@@ -1920,12 +1931,25 @@ void GMVIO::read (const std::string& name)
     } // end while
 
   // Done reading in the mesh, now call find_neighbors, etc.
-  MeshInput<MeshBase>::mesh().find_neighbors();
+  // MeshInput<MeshBase>::mesh().find_neighbors();
   
-  // Careful, this also renumbers the nodes & elements
-  //MeshInput<MeshBase>::mesh().prepare_for_use();
+  // Pass true flag to skip renumbering nodes and elements
+  MeshInput<MeshBase>::mesh().prepare_for_use(true);
 #endif
 }
+
+
+
+
+void GMVIO::_read_var()
+{
+  // Copy all the variable's values into a local storage vector.
+  _nodal_data.insert ( std::make_pair(std::string(GMV::gmv_data.name1),
+				      std::vector<Number>(GMV::gmv_data.doubledata1, GMV::gmv_data.doubledata1+GMV::gmv_data.num) ) );
+							 
+}
+
+
 
 void GMVIO::_read_materials()
 {
@@ -2135,4 +2159,126 @@ ElemType GMVIO::_gmv_elem_to_libmesh_elem(const char* elemname)
 	    << " was read."
 	    << std::endl;
   error();
+}
+
+
+
+
+void GMVIO::copy_nodal_solution(EquationSystems& es)
+{
+  // Check for easy return if there isn't any nodal data
+  if (_nodal_data.empty())
+    {
+      std::cerr << "Unable to copy nodal solution: No nodal "
+		<< "solution has been read in from file." << std::endl;
+      return;
+    }
+
+  // Be sure there is at least one system
+  assert (es.n_systems());
+
+  // Keep track of variable names which have been found and
+  // copied already.  This could be used to prevent us from
+  // e.g. copying the same var into 2 different systems ...
+  // but this seems unlikely.  Also, it is used to tell if
+  // any variables which were read in were not successfully
+  // copied to the EquationSystems.
+  std::set<std::string> vars_copied;
+  
+  // For each entry in the nodal data map, try to find a system
+  // that has the same variable key name.
+  for (unsigned int sys=0; sys<es.n_systems(); ++sys)
+    {
+      // Get a generic refernence to the current System
+      System& system = es.get_system(sys);
+
+      // And a reference to that system's dof_map
+      // const DofMap & dof_map = system.get_dof_map();
+	
+      // For each var entry in the _nodal_data map, try to find
+      // that var in the system
+      std::map<std::string, std::vector<Number> >::iterator it = _nodal_data.begin();
+      const std::map<std::string, std::vector<Number> >::iterator end = _nodal_data.end();
+      for (; it != end; ++it)
+	{
+	  std::string var_name = (*it).first;
+	  // std::cout << "Searching for var " << var_name << " in system " << sys << std::endl;
+
+	  if (system.has_variable(var_name))
+	    {
+	      // Check if there are as many nodes in the mesh as there are entries
+	      // in the stored nodal data vector
+	      assert ( (*it).second.size() == MeshInput<MeshBase>::mesh().n_nodes() );
+	      
+	      const unsigned int var_num = system.variable_number(var_name);
+	      
+	      // std::cout << "Variable "
+	      // 			<< var_name
+	      // 			<< " is variable "
+	      // 			<< var_num 
+	      // 			<< " in system " << sys << std::endl;
+
+	      // The only type of nodal data we can read in from GMV is for
+	      // linear LAGRANGE type elements.
+	      const FEType& fe_type = system.variable_type(var_num);
+	      if ((fe_type.order != FIRST) || (fe_type.family != LAGRANGE))
+		{
+		  std::cerr << "Only FIRST-order LAGRANGE variables can be read from GMV files. "
+			    << "Skipping variable " << var_name << std::endl;
+		  //error();
+		  break;
+		}
+
+	      
+	      // Loop over the stored vector's entries, inserting them into
+	      // the System's solution if appropriate.
+	      for (unsigned int i=0; i<(*it).second.size(); ++i)
+		{
+		  // Since this var came from a GMV file, the index i corresponds to
+		  // the (single) DOF value of the current variable for node i.
+		  const unsigned int dof_index =
+		    MeshInput<MeshBase>::mesh().node_ptr(i)->dof_number(sys,      /*system #*/
+									var_num,  /*var # */
+									0);       /*component #, always zero for LAGRANGE */
+
+		  // std::cout << "Value " << i << ": "
+		  // 			    << (*it).second [i]
+		  // 			    << ", dof index="
+		  // 			    << dof_index << std::endl;
+
+		  // If the dof_index is local to this processor, set the value
+		  if ((dof_index >= system.solution->first_local_index()) &&
+		      (dof_index <  system.solution->last_local_index()))
+		    system.solution->set (dof_index, (*it).second [i]);
+		} // end loop over my GMVIO's copy of the solution
+
+	      // Add the most recently copied var to the set of copied vars
+	      vars_copied.insert (var_name);
+	    } // end if (system.has_variable)
+	} // end for loop over _nodal_data
+
+      // Communicate parallel values before going to the next system.
+      system.update();
+
+    } // end loop over all systems
+
+
+  
+  // Warn the user if any GMV variables were not successfully copied over to the EquationSystems object
+  {
+    std::map<std::string, std::vector<Number> >::iterator it = _nodal_data.begin();
+    const std::map<std::string, std::vector<Number> >::iterator end = _nodal_data.end();
+
+    for (; it != end; ++it)
+      {
+	if (vars_copied.find( (*it).first ) == vars_copied.end())
+	  {
+	    std::cerr << "Warning: Variable "
+		      << (*it).first
+		      << " was not copied to the EquationSystems object."
+		      << std::endl;
+	  }
+      }
+  }
+  
 }
