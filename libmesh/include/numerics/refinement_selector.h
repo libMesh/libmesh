@@ -1,4 +1,4 @@
-// $Id: refinement_selector.h,v 1.1 2006-05-19 22:13:00 roystgnr Exp $
+// $Id: refinement_selector.h,v 1.2 2007-06-06 16:52:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -23,6 +23,7 @@
 #define __refinement_selector_h__
 
 // C++ includes
+#include <vector>
 
 // Local Includes
 #include "libmesh_common.h"

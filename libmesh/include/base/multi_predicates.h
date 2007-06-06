@@ -1,4 +1,4 @@
-// $Id: multi_predicates.h,v 1.7 2005-08-05 20:49:30 jwpeterson Exp $
+// $Id: multi_predicates.h,v 1.8 2007-06-06 16:52:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,7 @@
 #define __multi_predicates_h__
 
 #include <vector>
+#include "libmesh_base.h" // for libMesh::processor_id()
 #include "single_predicates.h"
 
 /**

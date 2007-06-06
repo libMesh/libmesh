@@ -1,4 +1,4 @@
-// $Id: exact_solution.h,v 1.12 2007-02-12 19:46:02 roystgnr Exp $
+// $Id: exact_solution.h,v 1.13 2007-06-06 16:52:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 #include <vector>
 
 // Local Includes
-
+#include "libmesh_common.h" // for Number
 
 
 // Forward Declarations
