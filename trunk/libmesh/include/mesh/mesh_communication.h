@@ -1,4 +1,4 @@
-// $Id: mesh_communication.h,v 1.5 2005-05-17 15:26:20 benkirk Exp $
+// $Id: mesh_communication.h,v 1.6 2007-06-06 16:52:05 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 
 
 // C++ Includes   -----------------------------------
+#include <vector>
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
