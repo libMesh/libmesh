@@ -40,7 +40,7 @@ echo "<br><br><br> <h1> The program without comments: </h1> " >> $output_file;
 # Now bust out the magic.  We are going to use
 # two perl scripts and enscript to get sweet looking
 # C code into our html.
-perl stripcomments.pl $input_file | enscript -q --header="" --pretty-print=cpp --color --title="" -W html --output=- | perl stripenscript.pl >> $output_file;
+perl stripcomments.pl $input_file | enscript -q --header="" --pretty-print=cpp --color --title="" --language=html --output=- | perl stripenscript.pl >> $output_file;
 
 # Now run the example and redirect stdout into the file
 if test $# -gt 1; then
