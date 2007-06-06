@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.h,v 1.25 2007-05-04 22:20:32 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.26 2007-06-06 15:38:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -597,7 +597,9 @@ private:
 # elif (__GNUC__ >= 3)                          // gcc 3.1 & newer
     typedef __gnu_cxx::hash_multimap<unsigned int, Node*> map_type;
 # else
-    DIE A HORRIBLE DEATH
+// XLC and who knows what other compilers get here.
+// Try the most standard thing we can:
+    typedef std::multimap<unsigned int, Node*> map_type;
 # endif
 #else
     typedef std::multimap<unsigned int, Node*> map_type;

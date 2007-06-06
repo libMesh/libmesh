@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.79 2007-06-04 16:33:51 jwpeterson Exp $
+// $Id: mesh.C,v 1.80 2007-06-06 15:38:04 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -395,7 +395,9 @@ void Mesh::find_neighbors()
 # elif (__GNUC__ >= 3)                          // gcc 3.1 & newer
     typedef __gnu_cxx::hash_multimap<key_type, val_type> map_type;
 # else
-# error     DIE A HORRIBLE DEATH
+// XLC and who knows what other compilers get here.
+// Try the most standard thing we can:
+    typedef std::multimap<key_type, val_type>  map_type;
 # endif
 #else
     typedef std::multimap<key_type, val_type>  map_type;
