@@ -7,7 +7,7 @@
 # How many examples are there?
 n_examples=`ls -l ../../examples/ | grep ex | wc -l`
 
-for i in $(seq 1 $n_examples); do
+for i in $(seq 0 $n_examples); do
     echo "Processing example $i";
     ./ex2html.sh ../../examples/ex$i/ex$i.C "make --no-print-directory -C ../../examples/ex$i run"
 done
