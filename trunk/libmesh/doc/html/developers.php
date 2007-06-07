@@ -30,9 +30,9 @@
 
 <?php
 dev_table_entry("images/benkirk.jpg",
-                "Benjamin S. Kirk",
+                "Dr. Benjamin S. Kirk",
                 "http://www.cfdlab.ae.utexas.edu/~benkirk",
-                "PhD Student, libMesh Project Manager",
+                "libMesh Project Manager",
 	        "<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>");
 ?>
 
@@ -104,6 +104,14 @@ dev_table_entry("images/spetersen.jpg",
 // 		"http://www.tu-harburg.de",
 // 		"Student, libMesh Developer",
 // 		"<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
+?>
+
+<?php
+// dev_table_entry("images/friedmud.jpg",
+// 		"Derek Gaston",
+// 		"http://www.cfdlab.ae.utexas.edu/~drgasto",
+// 		"libMesh Developer",
+// 		"<a href=\"http://www.tu-harburg.de\">UT-Austin, Sandia Nat'l Lab</a>");
 ?>
 
 
