@@ -54,6 +54,7 @@ refinement after the solve.  In the input file "ex15.in", the variable
         #include "dof_map.h"
         #include "numeric_vector.h"
         #include "elem.h"
+        #include "tensor_value.h"
         
 </pre>
 </div>
@@ -71,24 +72,6 @@ other objects we might need.
         void assemble_biharmonic(EquationSystems& es,
                               const std::string& system_name);
         
-        
-        Number zero_solution(const Point&,
-        		     const Parameters&,   // parameters, not needed
-        		     const std::string&,  // sys_name, not needed
-        		     const std::string&)  // unk_name, not needed);
-        { return 0; }
-        
-        Gradient zero_derivative(const Point&,
-        		         const Parameters&,   // parameters, not needed
-        		         const std::string&,  // sys_name, not needed
-        		         const std::string&)  // unk_name, not needed);
-        { return Gradient(); }
-        
-        Tensor zero_hessian(const Point&,
-        		    const Parameters&,   // parameters, not needed
-        		    const std::string&,  // sys_name, not needed
-        		    const std::string&)  // unk_name, not needed);
-        { return Tensor(); }
         
 </pre>
 </div>
@@ -163,15 +146,19 @@ Initialize libMesh.
 <pre>
           libMesh::init (argc, argv);
         
-        #ifndef ENABLE_SECOND_DERIVATIVES
         
+        #ifndef ENABLE_AMR
+          std::cerr &lt;&lt; "ERROR: This example requires libMesh to be\n"
+                    &lt;&lt; "compiled with AMR support!"
+                    &lt;&lt; std::endl;
+          return 0;
+        #else
+        
+        #ifndef ENABLE_SECOND_DERIVATIVES
           std::cerr &lt;&lt; "ERROR: This example requires the library to be "
         	    &lt;&lt; "compiled with second derivatives support!"
         	    &lt;&lt; std::endl;
-          here();
-        
           return 0;
-        
         #else
         
           {
@@ -271,20 +258,22 @@ Output file for plotting the error
             output_file += ".m";
         
             std::ofstream out (output_file.c_str());
-            out &lt;&lt; "% dofs     L2-error     H1-error\n"
+            out &lt;&lt; "% dofs     L2-error     H1-error      H2-error\n"
         	&lt;&lt; "e = [\n";
             
 </pre>
 </div>
 <div class = "comment">
 Set up the dimension-dependent coarse mesh and solution
+We build more than one cell so as to avoid bugs on fewer than 
+4 processors in 2D or 8 in 3D.
 </div>
 
 <div class ="fragment">
 <pre>
             if (dim == 2)
               {
-                MeshTools::Generation::build_square(mesh, 1, 1);
+                MeshTools::Generation::build_square(mesh, 2, 2);
                 exact_solution = &exact_2D_solution;
                 exact_derivative = &exact_2D_derivative;
                 exact_hessian = &exact_2D_hessian;
@@ -292,7 +281,7 @@ Set up the dimension-dependent coarse mesh and solution
               }
             else if (dim == 3)
               {
-                MeshTools::Generation::build_cube(mesh, 1, 1, 1);
+                MeshTools::Generation::build_cube(mesh, 2, 2, 2);
                 exact_solution = &exact_3D_solution;
                 exact_derivative = &exact_3D_derivative;
                 exact_hessian = &exact_3D_hessian;
@@ -331,6 +320,9 @@ Mesh Refinement object
 <div class ="fragment">
 <pre>
             MeshRefinement mesh_refinement(mesh);
+            mesh_refinement.refine_fraction() = refine_percentage;
+            mesh_refinement.coarsen_fraction() = coarsen_percentage;
+            mesh_refinement.max_h_level() = max_r_level;
         
 </pre>
 </div>
@@ -455,14 +447,12 @@ Construct ExactSolution object and attach function to compute exact solution
 </div>
 <div class = "comment">
 Construct zero solution object, useful for computing solution norms
+Attaching "zero_solution" functions is unnecessary
 </div>
 
 <div class ="fragment">
 <pre>
             ExactSolution zero_sol(equation_systems);
-            zero_sol.attach_exact_value(zero_solution);
-            zero_sol.attach_exact_deriv(zero_derivative);
-            zero_sol.attach_exact_hessian(zero_hessian);
         
 </pre>
 </div>
@@ -585,9 +575,7 @@ Possibly refine the mesh
         		LaplacianErrorEstimator error_estimator;
         
         		error_estimator.estimate_error(system, error);
-                        mesh_refinement.flag_elements_by_elem_fraction
-        				(error, refine_percentage,
-        				 coarsen_percentage, max_r_level);
+                        mesh_refinement.flag_elements_by_elem_fraction (error);
         
         		std::cerr &lt;&lt; "Mean Error: " &lt;&lt; error.mean() &lt;&lt;
         				std::endl;
@@ -657,7 +645,8 @@ All done.
 <div class ="fragment">
 <pre>
           return libMesh::close ();
-        #endif
+        #endif // #ifndef ENABLE_SECOND_DERIVATIVES
+        #endif // #ifndef ENABLE_AMR
         }
         
         
@@ -980,6 +969,9 @@ via a penalty method.
         void assemble_biharmonic(EquationSystems& es,
                               const std::string& system_name)
         {
+        #ifdef ENABLE_AMR
+        #ifdef ENABLE_SECOND_DERIVATIVES
+        
 </pre>
 </div>
 <div class = "comment">
@@ -990,8 +982,6 @@ the proper system.
 <div class ="fragment">
 <pre>
           assert (system_name == "Biharmonic");
-        
-        #ifdef ENABLE_SECOND_DERIVATIVES
         
 </pre>
 </div>
@@ -1453,7 +1443,7 @@ we will interpolate the boundary value function.
 
 <div class ="fragment">
 <pre>
-                      const std::vector&lt;Point &gt;& qface_point = fe_face-&gt;get_xyz();
+                      const std::vector&lt;Point&gt;& qface_point = fe_face-&gt;get_xyz();
         
         	      const std::vector&lt;Point&gt;& face_normals =
         			      fe_face-&gt;get_normals();
@@ -1596,8 +1586,8 @@ it will print its log to the screen. Pretty easy, huh?
 <pre>
         #else
         
-        #endif
-        
+        #endif // #ifdef ENABLE_SECOND_DERIVATIVES
+        #endif // #ifdef ENABLE_AMR
         }
 </pre>
 </div>
@@ -1606,152 +1596,139 @@ it will print its log to the screen. Pretty easy, huh?
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;linear_implicit_system.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;sparse_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh_generation.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh_modification.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh_refinement.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;error_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;fourth_error_estimators.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;getpot.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;exact_solution.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dof_map.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;numeric_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;elem.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;quadrature.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_modification.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_refinement.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;error_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;fourth_error_estimators.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;getpot.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;exact_solution.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;tensor_value.h&quot;</FONT></B>
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_biharmonic(EquationSystems&amp; es,
-                        <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_biharmonic(EquationSystems&amp; es,
+                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
   
-  Number zero_solution(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp;,
-  		     <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;,   <I><FONT COLOR="#B22222">// parameters, not needed
-</FONT></I>  		     <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;,  <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  		     <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;)  <I><FONT COLOR="#B22222">// unk_name, not needed);
-</FONT></I>  { <B><FONT COLOR="#A020F0">return</FONT></B> 0; }
-  
-  Gradient zero_derivative(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp;,
-  		         <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;,   <I><FONT COLOR="#B22222">// parameters, not needed
-</FONT></I>  		         <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;,  <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  		         <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;)  <I><FONT COLOR="#B22222">// unk_name, not needed);
-</FONT></I>  { <B><FONT COLOR="#A020F0">return</FONT></B> Gradient(); }
-  
-  Tensor zero_hessian(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp;,
-  		    <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;,   <I><FONT COLOR="#B22222">// parameters, not needed
-</FONT></I>  		    <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;,  <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  		    <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;)  <I><FONT COLOR="#B22222">// unk_name, not needed);
-</FONT></I>  { <B><FONT COLOR="#A020F0">return</FONT></B> Tensor(); }
-  
-  Number exact_2D_solution(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-  		         <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;,   <I><FONT COLOR="#B22222">// parameters, not needed
-</FONT></I>  		         <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;,  <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  		         <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;); <I><FONT COLOR="#B22222">// unk_name, not needed);
+  Number exact_2D_solution(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+  		         <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,   <I><FONT COLOR="#B22222">// parameters, not needed
+</FONT></I>  		         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;,  <I><FONT COLOR="#B22222">// sys_name, not needed
+</FONT></I>  		         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;); <I><FONT COLOR="#B22222">// unk_name, not needed);
 </FONT></I>  
-  Number exact_3D_solution(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-    <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;);
+  Number exact_3D_solution(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+    <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;);
   
-  Gradient exact_2D_derivative(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-    <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;);
+  Gradient exact_2D_derivative(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+    <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;);
   
-  Gradient exact_3D_derivative(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-    <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;);
+  Gradient exact_3D_derivative(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+    <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;);
   
-  Tensor exact_2D_hessian(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-    <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;);
+  Tensor exact_2D_hessian(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+    <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;);
   
-  Tensor exact_3D_hessian(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-    <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;);
+  Tensor exact_3D_hessian(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+    <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;);
   
-  Number forcing_function_2D(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p);
+  Number forcing_function_2D(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p);
   
-  Number forcing_function_3D(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p);
+  Number forcing_function_3D(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p);
   
-  Number (*exact_solution)(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-    <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;);
-  Gradient (*exact_derivative)(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-    <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;);
-  Tensor (*exact_hessian)(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-    <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;);
-  Number (*forcing_function)(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p);
+  Number (*exact_solution)(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+    <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;);
+  Gradient (*exact_derivative)(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+    <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;);
+  Tensor (*exact_hessian)(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+    <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;);
+  Number (*forcing_function)(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p);
   
   
   
-  <FONT COLOR="#228B22"><B>int</FONT></B> main(<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
+  <B><FONT COLOR="#228B22">int</FONT></B> main(<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    libMesh::init (argc, argv);
+    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
+  
+  
+  #ifndef ENABLE_AMR
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example requires libMesh to be\n&quot;</FONT></B>
+              &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;compiled with AMR support!&quot;</FONT></B>
+              &lt;&lt; std::endl;
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  #<B><FONT COLOR="#A020F0">else</FONT></B>
   
   #ifndef ENABLE_SECOND_DERIVATIVES
-  
-    std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;ERROR: This example requires the library to be &quot;</FONT></B>
-  	    &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;compiled with second derivatives support!&quot;</FONT></B>
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example requires the library to be &quot;</FONT></B>
+  	    &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;compiled with second derivatives support!&quot;</FONT></B>
   	    &lt;&lt; std::endl;
-    here();
-  
     <B><FONT COLOR="#A020F0">return</FONT></B> 0;
-  
   #<B><FONT COLOR="#A020F0">else</FONT></B>
   
     {
       
-      GetPot input_file(<FONT COLOR="#BC8F8F"><B>&quot;ex15.in&quot;</FONT></B>);
+      GetPot input_file(<B><FONT COLOR="#BC8F8F">&quot;ex15.in&quot;</FONT></B>);
   
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> max_r_level = input_file(<FONT COLOR="#BC8F8F"><B>&quot;max_r_level&quot;</FONT></B>, 10);
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> max_r_steps = input_file(<FONT COLOR="#BC8F8F"><B>&quot;max_r_steps&quot;</FONT></B>, 4);
-      <FONT COLOR="#228B22"><B>const</FONT></B> std::string approx_type  = input_file(<FONT COLOR="#BC8F8F"><B>&quot;approx_type&quot;</FONT></B>,
-  						<FONT COLOR="#BC8F8F"><B>&quot;HERMITE&quot;</FONT></B>);
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> uniform_refine =
-  		    input_file(<FONT COLOR="#BC8F8F"><B>&quot;uniform_refine&quot;</FONT></B>, 0);
-      <FONT COLOR="#228B22"><B>const</FONT></B> Real refine_percentage =
-  		    input_file(<FONT COLOR="#BC8F8F"><B>&quot;refine_percentage&quot;</FONT></B>, 0.5);
-      <FONT COLOR="#228B22"><B>const</FONT></B> Real coarsen_percentage =
-  		    input_file(<FONT COLOR="#BC8F8F"><B>&quot;coarsen_percentage&quot;</FONT></B>, 0.5);
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim =
-  		    input_file(<FONT COLOR="#BC8F8F"><B>&quot;dimension&quot;</FONT></B>, 2);
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> max_linear_iterations =
-  		    input_file(<FONT COLOR="#BC8F8F"><B>&quot;max_linear_iterations&quot;</FONT></B>, 10000);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_r_level = input_file(<B><FONT COLOR="#BC8F8F">&quot;max_r_level&quot;</FONT></B>, 10);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_r_steps = input_file(<B><FONT COLOR="#BC8F8F">&quot;max_r_steps&quot;</FONT></B>, 4);
+      <B><FONT COLOR="#228B22">const</FONT></B> std::string approx_type  = input_file(<B><FONT COLOR="#BC8F8F">&quot;approx_type&quot;</FONT></B>,
+  						<B><FONT COLOR="#BC8F8F">&quot;HERMITE&quot;</FONT></B>);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> uniform_refine =
+  		    input_file(<B><FONT COLOR="#BC8F8F">&quot;uniform_refine&quot;</FONT></B>, 0);
+      <B><FONT COLOR="#228B22">const</FONT></B> Real refine_percentage =
+  		    input_file(<B><FONT COLOR="#BC8F8F">&quot;refine_percentage&quot;</FONT></B>, 0.5);
+      <B><FONT COLOR="#228B22">const</FONT></B> Real coarsen_percentage =
+  		    input_file(<B><FONT COLOR="#BC8F8F">&quot;coarsen_percentage&quot;</FONT></B>, 0.5);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim =
+  		    input_file(<B><FONT COLOR="#BC8F8F">&quot;dimension&quot;</FONT></B>, 2);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_linear_iterations =
+  		    input_file(<B><FONT COLOR="#BC8F8F">&quot;max_linear_iterations&quot;</FONT></B>, 10000);
   
       assert (dim == 2 || dim == 3);
   
-      assert (dim == 2 || approx_type == <FONT COLOR="#BC8F8F"><B>&quot;HERMITE&quot;</FONT></B>);
+      assert (dim == 2 || approx_type == <B><FONT COLOR="#BC8F8F">&quot;HERMITE&quot;</FONT></B>);
   
       Mesh mesh (dim);
       
-      std::string output_file = <FONT COLOR="#BC8F8F"><B>&quot;&quot;</FONT></B>;
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::string output_file = <B><FONT COLOR="#BC8F8F">&quot;&quot;</FONT></B>;
   
       <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 2)
-        output_file += <FONT COLOR="#BC8F8F"><B>&quot;2D_&quot;</FONT></B>;
+        output_file += <B><FONT COLOR="#BC8F8F">&quot;2D_&quot;</FONT></B>;
       <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
-        output_file += <FONT COLOR="#BC8F8F"><B>&quot;3D_&quot;</FONT></B>;
+        output_file += <B><FONT COLOR="#BC8F8F">&quot;3D_&quot;</FONT></B>;
   
-      <B><FONT COLOR="#A020F0">if</FONT></B> (approx_type == <FONT COLOR="#BC8F8F"><B>&quot;HERMITE&quot;</FONT></B>)
-        output_file += <FONT COLOR="#BC8F8F"><B>&quot;hermite_&quot;</FONT></B>;
-      <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (approx_type == <FONT COLOR="#BC8F8F"><B>&quot;SECOND&quot;</FONT></B>)
-        output_file += <FONT COLOR="#BC8F8F"><B>&quot;reducedclough_&quot;</FONT></B>;
+      <B><FONT COLOR="#A020F0">if</FONT></B> (approx_type == <B><FONT COLOR="#BC8F8F">&quot;HERMITE&quot;</FONT></B>)
+        output_file += <B><FONT COLOR="#BC8F8F">&quot;hermite_&quot;</FONT></B>;
+      <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (approx_type == <B><FONT COLOR="#BC8F8F">&quot;SECOND&quot;</FONT></B>)
+        output_file += <B><FONT COLOR="#BC8F8F">&quot;reducedclough_&quot;</FONT></B>;
       <B><FONT COLOR="#A020F0">else</FONT></B>
-        output_file += <FONT COLOR="#BC8F8F"><B>&quot;clough_&quot;</FONT></B>;
+        output_file += <B><FONT COLOR="#BC8F8F">&quot;clough_&quot;</FONT></B>;
   
       <B><FONT COLOR="#A020F0">if</FONT></B> (uniform_refine == 0)
-        output_file += <FONT COLOR="#BC8F8F"><B>&quot;adaptive&quot;</FONT></B>;
+        output_file += <B><FONT COLOR="#BC8F8F">&quot;adaptive&quot;</FONT></B>;
       <B><FONT COLOR="#A020F0">else</FONT></B>
-        output_file += <FONT COLOR="#BC8F8F"><B>&quot;uniform&quot;</FONT></B>;
+        output_file += <B><FONT COLOR="#BC8F8F">&quot;uniform&quot;</FONT></B>;
   
-      std::string gmv_file = output_file;
-      gmv_file += <FONT COLOR="#BC8F8F"><B>&quot;.gmv&quot;</FONT></B>;
-      output_file += <FONT COLOR="#BC8F8F"><B>&quot;.m&quot;</FONT></B>;
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::string gmv_file = output_file;
+      gmv_file += <B><FONT COLOR="#BC8F8F">&quot;.gmv&quot;</FONT></B>;
+      output_file += <B><FONT COLOR="#BC8F8F">&quot;.m&quot;</FONT></B>;
   
-      std::ofstream out (output_file.c_str());
-      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;% dofs     L2-error     H1-error\n&quot;</FONT></B>
-  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;e = [\n&quot;</FONT></B>;
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::ofstream out (output_file.c_str());
+      out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;% dofs     L2-error     H1-error      H2-error\n&quot;</FONT></B>
+  	&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;e = [\n&quot;</FONT></B>;
       
       <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 2)
         {
-          MeshTools::Generation::build_square(mesh, 1, 1);
+          <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square(mesh, 2, 2);
           exact_solution = &amp;exact_2D_solution;
           exact_derivative = &amp;exact_2D_derivative;
           exact_hessian = &amp;exact_2D_hessian;
@@ -1759,7 +1736,7 @@ it will print its log to the screen. Pretty easy, huh?
         }
       <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
         {
-          MeshTools::Generation::build_cube(mesh, 1, 1, 1);
+          <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube(mesh, 2, 2, 2);
           exact_solution = &amp;exact_3D_solution;
           exact_derivative = &amp;exact_3D_derivative;
           exact_hessian = &amp;exact_3D_hessian;
@@ -1768,23 +1745,26 @@ it will print its log to the screen. Pretty easy, huh?
   
       mesh.all_second_order();
   
-      <B><FONT COLOR="#A020F0">if</FONT></B> (approx_type != <FONT COLOR="#BC8F8F"><B>&quot;HERMITE&quot;</FONT></B>)
-        MeshTools::Modification::all_tri(mesh);
+      <B><FONT COLOR="#A020F0">if</FONT></B> (approx_type != <B><FONT COLOR="#BC8F8F">&quot;HERMITE&quot;</FONT></B>)
+        <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Modification::all_tri(mesh);
   
       MeshRefinement mesh_refinement(mesh);
+      mesh_refinement.refine_fraction() = refine_percentage;
+      mesh_refinement.coarsen_fraction() = coarsen_percentage;
+      mesh_refinement.max_h_level() = max_r_level;
   
       EquationSystems equation_systems (mesh);
   
       {
         LinearImplicitSystem&amp; system =
-  	equation_systems.add_system&lt;LinearImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>);
+  	equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>);
   
-        <B><FONT COLOR="#A020F0">if</FONT></B> (approx_type == <FONT COLOR="#BC8F8F"><B>&quot;HERMITE&quot;</FONT></B>)
-          system.add_variable(<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, THIRD, HERMITE);
-        <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (approx_type == <FONT COLOR="#BC8F8F"><B>&quot;SECOND&quot;</FONT></B>)
-          system.add_variable(<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, SECOND, CLOUGH);
-        <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (approx_type == <FONT COLOR="#BC8F8F"><B>&quot;CLOUGH&quot;</FONT></B>)
-          system.add_variable(<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, THIRD, CLOUGH);
+        <B><FONT COLOR="#A020F0">if</FONT></B> (approx_type == <B><FONT COLOR="#BC8F8F">&quot;HERMITE&quot;</FONT></B>)
+          system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, THIRD, HERMITE);
+        <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (approx_type == <B><FONT COLOR="#BC8F8F">&quot;SECOND&quot;</FONT></B>)
+          system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, SECOND, CLOUGH);
+        <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (approx_type == <B><FONT COLOR="#BC8F8F">&quot;CLOUGH&quot;</FONT></B>)
+          system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, THIRD, CLOUGH);
         <B><FONT COLOR="#A020F0">else</FONT></B>
           error();
   
@@ -1793,12 +1773,12 @@ it will print its log to the screen. Pretty easy, huh?
         
         equation_systems.init();
   
-        equation_systems.parameters.set&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt;
-  		      (<FONT COLOR="#BC8F8F"><B>&quot;linear solver maximum iterations&quot;</FONT></B>) =
+        equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;
+  		      (<B><FONT COLOR="#BC8F8F">&quot;linear solver maximum iterations&quot;</FONT></B>) =
                         max_linear_iterations;
   
         equation_systems.parameters.set&lt;Real&gt;
-  		      (<FONT COLOR="#BC8F8F"><B>&quot;linear solver tolerance&quot;</FONT></B>) = TOLERANCE *
+  		      (<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) = TOLERANCE *
                                                       TOLERANCE * TOLERANCE;
         
         equation_systems.print_info();
@@ -1810,60 +1790,57 @@ it will print its log to the screen. Pretty easy, huh?
       exact_sol.attach_exact_hessian(exact_hessian);
   
       ExactSolution zero_sol(equation_systems);
-      zero_sol.attach_exact_value(zero_solution);
-      zero_sol.attach_exact_deriv(zero_derivative);
-      zero_sol.attach_exact_hessian(zero_hessian);
   
       LinearImplicitSystem&amp; system = 
-        equation_systems.get_system&lt;LinearImplicitSystem&gt;(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>);
+        equation_systems.get_system&lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>);
   
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> r_step=0; r_step&lt;max_r_steps; r_step++)
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> r_step=0; r_step&lt;max_r_steps; r_step++)
         {
           mesh.print_info();
           equation_systems.print_info();
   
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Beginning Solve &quot;</FONT></B> &lt;&lt; r_step &lt;&lt; std::endl;
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Beginning Solve &quot;</FONT></B> &lt;&lt; r_step &lt;&lt; std::endl;
   	
   	system.solve();
   
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Linear solver converged at step: &quot;</FONT></B>
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Linear solver converged at step: &quot;</FONT></B>
   		  &lt;&lt; system.n_linear_iterations()
-  		  &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;, final residual: &quot;</FONT></B>
+  		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, final residual: &quot;</FONT></B>
   		  &lt;&lt; system.final_linear_residual()
   		  &lt;&lt; std::endl;
   
-  	exact_sol.compute_error(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>);
-  	zero_sol.compute_error(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>);
+  	exact_sol.compute_error(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+  	zero_sol.compute_error(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
   
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;L2-Norm is: &quot;</FONT></B>
-  		  &lt;&lt; zero_sol.l2_error(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>)
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;L2-Norm is: &quot;</FONT></B>
+  		  &lt;&lt; zero_sol.l2_error(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
   		  &lt;&lt; std::endl;
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;H1-Norm is: &quot;</FONT></B>
-  		  &lt;&lt; zero_sol.h1_error(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>)
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;H1-Norm is: &quot;</FONT></B>
+  		  &lt;&lt; zero_sol.h1_error(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
   		  &lt;&lt; std::endl;
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;H2-Norm is: &quot;</FONT></B>
-  		  &lt;&lt; zero_sol.h2_error(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>)
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;H2-Norm is: &quot;</FONT></B>
+  		  &lt;&lt; zero_sol.h2_error(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
   		  &lt;&lt; std::endl
   		  &lt;&lt; std::endl;
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;L2-Error is: &quot;</FONT></B>
-  		  &lt;&lt; exact_sol.l2_error(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>)
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;L2-Error is: &quot;</FONT></B>
+  		  &lt;&lt; exact_sol.l2_error(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
   		  &lt;&lt; std::endl;
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;H1-Error is: &quot;</FONT></B>
-  		  &lt;&lt; exact_sol.h1_error(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>)
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;H1-Error is: &quot;</FONT></B>
+  		  &lt;&lt; exact_sol.h1_error(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
   		  &lt;&lt; std::endl;
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;H2-Error is: &quot;</FONT></B>
-  		  &lt;&lt; exact_sol.h2_error(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>)
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;H2-Error is: &quot;</FONT></B>
+  		  &lt;&lt; exact_sol.h2_error(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
   		  &lt;&lt; std::endl
   		  &lt;&lt; std::endl;
   
-  	out &lt;&lt; equation_systems.n_active_dofs() &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
-  	    &lt;&lt; exact_sol.l2_error(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
-  	    &lt;&lt; exact_sol.h1_error(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
-  	    &lt;&lt; exact_sol.h2_error(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>) &lt;&lt; std::endl;
+  	out &lt;&lt; equation_systems.n_active_dofs() &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B>
+  	    &lt;&lt; exact_sol.l2_error(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>) &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B>
+  	    &lt;&lt; exact_sol.h1_error(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>) &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B>
+  	    &lt;&lt; exact_sol.h2_error(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>) &lt;&lt; std::endl;
   
   	<B><FONT COLOR="#A020F0">if</FONT></B> (r_step+1 != max_r_steps)
   	  {
-  	    std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;  Refining the mesh...&quot;</FONT></B> &lt;&lt; std::endl;
+  	    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;  Refining the mesh...&quot;</FONT></B> &lt;&lt; std::endl;
   
   	    <B><FONT COLOR="#A020F0">if</FONT></B> (uniform_refine == 0)
   	      {
@@ -1871,14 +1848,12 @@ it will print its log to the screen. Pretty easy, huh?
   		LaplacianErrorEstimator error_estimator;
   
   		error_estimator.estimate_error(system, error);
-                  mesh_refinement.flag_elements_by_elem_fraction
-  				(error, refine_percentage,
-  				 coarsen_percentage, max_r_level);
+                  mesh_refinement.flag_elements_by_elem_fraction (error);
   
-  		std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Mean Error: &quot;</FONT></B> &lt;&lt; error.mean() &lt;&lt;
-  				std::endl;
-  		std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Error Variance: &quot;</FONT></B> &lt;&lt; error.variance() &lt;&lt;
-  				std::endl;
+  		<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Mean Error: &quot;</FONT></B> &lt;&lt; error.mean() &lt;&lt;
+  				<B><FONT COLOR="#5F9EA0">std</FONT></B>::endl;
+  		<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Error Variance: &quot;</FONT></B> &lt;&lt; error.variance() &lt;&lt;
+  				<B><FONT COLOR="#5F9EA0">std</FONT></B>::endl;
   
   		mesh_refinement.refine_and_coarsen_elements();
                 }
@@ -1893,42 +1868,43 @@ it will print its log to the screen. Pretty easy, huh?
       
       GMVIO (mesh).write_equation_systems (gmv_file,
       					 equation_systems);
-      out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;];\n&quot;</FONT></B>
-  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;hold on\n&quot;</FONT></B>
-  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;loglog(e(:,1), e(:,2), 'bo-');\n&quot;</FONT></B>
-  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;loglog(e(:,1), e(:,3), 'ro-');\n&quot;</FONT></B>
-  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;loglog(e(:,1), e(:,4), 'go-');\n&quot;</FONT></B>
-  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;xlabel('log(dofs)');\n&quot;</FONT></B>
-  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;ylabel('log(error)');\n&quot;</FONT></B>
-  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;title('C1 &quot;</FONT></B> &lt;&lt; approx_type &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; elements');\n&quot;</FONT></B>
-  	&lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;legend('L2-error', 'H1-error', 'H2-error');\n&quot;</FONT></B>;
+      out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;];\n&quot;</FONT></B>
+  	&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;hold on\n&quot;</FONT></B>
+  	&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;loglog(e(:,1), e(:,2), 'bo-');\n&quot;</FONT></B>
+  	&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;loglog(e(:,1), e(:,3), 'ro-');\n&quot;</FONT></B>
+  	&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;loglog(e(:,1), e(:,4), 'go-');\n&quot;</FONT></B>
+  	&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;xlabel('log(dofs)');\n&quot;</FONT></B>
+  	&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ylabel('log(error)');\n&quot;</FONT></B>
+  	&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;title('C1 &quot;</FONT></B> &lt;&lt; approx_type &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; elements');\n&quot;</FONT></B>
+  	&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;legend('L2-error', 'H1-error', 'H2-error');\n&quot;</FONT></B>;
     }
     
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
-  #endif
-  }
+  #endif <I><FONT COLOR="#B22222">// #ifndef ENABLE_SECOND_DERIVATIVES
+</FONT></I>  #endif <I><FONT COLOR="#B22222">// #ifndef ENABLE_AMR
+</FONT></I>  }
   
   
   
-  Number exact_2D_solution(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-  		         <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
-</FONT></I>  		         <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  		         <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
+  Number exact_2D_solution(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+  		         <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
+</FONT></I>  		         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
+</FONT></I>  		         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
 </FONT></I>  {
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real x = p(0);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real y = p(1);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real x = p(0);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real y = p(1);
   
     <B><FONT COLOR="#A020F0">return</FONT></B> 256.*(x-x*x)*(x-x*x)*(y-y*y)*(y-y*y);
   }
   
   
-  Gradient exact_2D_derivative(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-  			     <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
-</FONT></I>  			     <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  			     <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
+  Gradient exact_2D_derivative(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+  			     <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
+</FONT></I>  			     <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
+</FONT></I>  			     <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
 </FONT></I>  {
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real x = p(0);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real y = p(1);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real x = p(0);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real y = p(1);
   
     Gradient gradu;
   
@@ -1939,15 +1915,15 @@ it will print its log to the screen. Pretty easy, huh?
   }
   
   
-  Tensor exact_2D_hessian(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-  			<FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
-</FONT></I>  			<FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  			<FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
+  Tensor exact_2D_hessian(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+  			<B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
+</FONT></I>  			<B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
+</FONT></I>  			<B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
 </FONT></I>  {
     Tensor hessu;
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real x = p(0);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real y = p(1);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real x = p(0);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real y = p(1);
   
     hessu(0,0) = 256.*2.*(1-6.*x+6.*x*x)*(y-y*y)*(y-y*y);
     hessu(0,1) = 256.*4.*(x-x*x)*(1.-2.*x)*(y-y*y)*(1.-2.*y);
@@ -1959,10 +1935,10 @@ it will print its log to the screen. Pretty easy, huh?
   
   
   
-  Number forcing_function_2D(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p)
+  Number forcing_function_2D(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p)
   {
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real x = p(0);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real y = p(1);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real x = p(0);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real y = p(1);
   
     <B><FONT COLOR="#A020F0">return</FONT></B> 256. * 8. * (3.*((y-y*y)*(y-y*y)+(x-x*x)*(x-x*x))
            + (1.-6.*x+6.*x*x)*(1.-6.*y+6.*y*y));
@@ -1970,29 +1946,29 @@ it will print its log to the screen. Pretty easy, huh?
   
   
   
-  Number exact_3D_solution(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-  		         <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
-</FONT></I>  		         <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  		         <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
+  Number exact_3D_solution(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+  		         <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
+</FONT></I>  		         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
+</FONT></I>  		         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
 </FONT></I>  {
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real x = p(0);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real y = p(1);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real z = p(2);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real x = p(0);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real y = p(1);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real z = p(2);
     
     <B><FONT COLOR="#A020F0">return</FONT></B> 4096.*(x-x*x)*(x-x*x)*(y-y*y)*(y-y*y)*(z-z*z)*(z-z*z);
   }
   
   
-  Gradient exact_3D_derivative(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-  			     <FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
-</FONT></I>  			     <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  			     <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
+  Gradient exact_3D_derivative(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+  			     <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
+</FONT></I>  			     <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
+</FONT></I>  			     <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
 </FONT></I>  {
     Gradient gradu;
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real x = p(0);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real y = p(1);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real z = p(2);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real x = p(0);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real y = p(1);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real z = p(2);
   
     gradu(0) = 4096.*2.*(x-x*x)*(1.-2.*x)*(y-y*y)*(y-y*y)*(z-z*z)*(z-z*z);
     gradu(1) = 4096.*2.*(x-x*x)*(x-x*x)*(y-y*y)*(1.-2.*y)*(z-z*z)*(z-z*z);
@@ -2002,16 +1978,16 @@ it will print its log to the screen. Pretty easy, huh?
   }
   
   
-  Tensor exact_3D_hessian(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p,
-  			<FONT COLOR="#228B22"><B>const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
-</FONT></I>  			<FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  			<FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
+  Tensor exact_3D_hessian(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+  			<B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
+</FONT></I>  			<B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
+</FONT></I>  			<B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
 </FONT></I>  {
     Tensor hessu;
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real x = p(0);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real y = p(1);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real z = p(2);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real x = p(0);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real y = p(1);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real z = p(2);
   
     hessu(0,0) = 4096.*(2.-12.*x+12.*x*x)*(y-y*y)*(y-y*y)*(z-z*z)*(z-z*z);
     hessu(0,1) = 4096.*4.*(x-x*x)*(1.-2.*x)*(y-y*y)*(1.-2.*y)*(z-z*z)*(z-z*z);
@@ -2029,11 +2005,11 @@ it will print its log to the screen. Pretty easy, huh?
   
   
   
-  Number forcing_function_3D(<FONT COLOR="#228B22"><B>const</FONT></B> Point&amp; p)
+  Number forcing_function_3D(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p)
   {
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real x = p(0);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real y = p(1);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real z = p(2);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real x = p(0);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real y = p(1);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real z = p(2);
   
     <B><FONT COLOR="#A020F0">return</FONT></B> 4096. * 8. * (3.*((y-y*y)*(y-y*y)*(x-x*x)*(x-x*x) +
                              (z-z*z)*(z-z*z)*(x-x*x)*(x-x*x) +
@@ -2045,22 +2021,23 @@ it will print its log to the screen. Pretty easy, huh?
   
   
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_biharmonic(EquationSystems&amp; es,
-                        <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_biharmonic(EquationSystems&amp; es,
+                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    assert (system_name == <FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>);
-  
+  #ifdef ENABLE_AMR
   #ifdef ENABLE_SECOND_DERIVATIVES
   
-    PerfLog perf_log (<FONT COLOR="#BC8F8F"><B>&quot;Matrix Assembly&quot;</FONT></B>,false);
-    
-    <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>);
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
-  
-    LinearImplicitSystem&amp; system = es.get_system&lt;LinearImplicitSystem&gt;(<FONT COLOR="#BC8F8F"><B>&quot;Biharmonic&quot;</FONT></B>);
+    PerfLog perf_log (<B><FONT COLOR="#BC8F8F">&quot;Matrix Assembly&quot;</FONT></B>,false);
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
+    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
+  
+    LinearImplicitSystem&amp; system = es.get_system&lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;Biharmonic&quot;</FONT></B>);
+    
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
   
     FEType fe_type = dof_map.variable_type(0);
   
@@ -2076,30 +2053,30 @@ it will print its log to the screen. Pretty easy, huh?
   
     fe_face-&gt;attach_quadrature_rule (qface.get());
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Point&gt;&amp; q_point = fe-&gt;get_xyz();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; q_point = fe-&gt;get_xyz();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealTensor&gt; &gt;&amp; d2phi = fe-&gt;get_d2phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealTensor&gt; &gt;&amp; d2phi = fe-&gt;get_d2phi();
   
-    std::vector&lt;Real&gt; shape_laplacian;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Real&gt; shape_laplacian;
   
     DenseMatrix&lt;Number&gt; Ke;
     DenseVector&lt;Number&gt; Fe;
   
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
   
   
-    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
-        perf_log.start_event(<FONT COLOR="#BC8F8F"><B>&quot;elem init&quot;</FONT></B>);      
+        perf_log.start_event(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
   
-        <FONT COLOR="#228B22"><B>const</FONT></B> Elem* elem = *el;
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
   
         dof_map.dof_indices (elem, dof_indices);
   
@@ -2112,62 +2089,62 @@ it will print its log to the screen. Pretty easy, huh?
   
         shape_laplacian.resize(dof_indices.size());
   
-        perf_log.stop_event(<FONT COLOR="#BC8F8F"><B>&quot;elem init&quot;</FONT></B>);      
+        perf_log.stop_event(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
   
-        perf_log.start_event (<FONT COLOR="#BC8F8F"><B>&quot;Ke&quot;</FONT></B>);
+        perf_log.start_event (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
   
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qrule-&gt;n_points(); qp++)
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule-&gt;n_points(); qp++)
           {
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
               {
                 shape_laplacian[i] = d2phi[i][qp](0,0)+d2phi[i][qp](1,1);
                 <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
                    shape_laplacian[i] += d2phi[i][qp](2,2);
               }
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;phi.size(); j++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
   	      Ke(i,j) += JxW[qp]*
                            shape_laplacian[i]*shape_laplacian[j];
           }
   
-        perf_log.stop_event (<FONT COLOR="#BC8F8F"><B>&quot;Ke&quot;</FONT></B>);
+        perf_log.stop_event (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
   
   
         {
-  	perf_log.start_event (<FONT COLOR="#BC8F8F"><B>&quot;BCs&quot;</FONT></B>);
+  	perf_log.start_event (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
   
-  	<FONT COLOR="#228B22"><B>const</FONT></B> Real penalty = 1e10;
-  	<FONT COLOR="#228B22"><B>const</FONT></B> Real penalty2 = 1e10;
+  	<B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1e10;
+  	<B><FONT COLOR="#228B22">const</FONT></B> Real penalty2 = 1e10;
   
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
+  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
   	  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
   	    {
-  	      <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face =
+  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face =
   			      fe_face-&gt;get_phi();
   
-                <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi_face =
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi_face =
   			      fe_face-&gt;get_dphi();
   
-                <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
                                                                                  
-                <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Point &gt;&amp; qface_point = fe_face-&gt;get_xyz();
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; qface_point = fe_face-&gt;get_xyz();
   
-  	      <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Point&gt;&amp; face_normals =
+  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; face_normals =
   			      fe_face-&gt;get_normals();
   
                 fe_face-&gt;reinit(elem, s);
                                                                                   
-                <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qface-&gt;n_points(); qp++)
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface-&gt;n_points(); qp++)
                   {
   		  Number value = exact_solution(qface_point[qp],
-  					        es.parameters, <FONT COLOR="#BC8F8F"><B>&quot;null&quot;</FONT></B>,
-  					        <FONT COLOR="#BC8F8F"><B>&quot;void&quot;</FONT></B>);
+  					        es.parameters, <B><FONT COLOR="#BC8F8F">&quot;null&quot;</FONT></B>,
+  					        <B><FONT COLOR="#BC8F8F">&quot;void&quot;</FONT></B>);
   		  Gradient flux = exact_2D_derivative(qface_point[qp],
                                                         es.parameters,
-  						      <FONT COLOR="#BC8F8F"><B>&quot;null&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;void&quot;</FONT></B>);
+  						      <B><FONT COLOR="#BC8F8F">&quot;null&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;void&quot;</FONT></B>);
   
-                    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-                      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;phi_face.size(); j++)
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+                      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi_face.size(); j++)
   		      Ke(i,j) += JxW_face[qp] *
   				 (penalty * phi_face[i][qp] *
   				  phi_face[j][qp] + penalty2
@@ -2176,7 +2153,7 @@ it will print its log to the screen. Pretty easy, huh?
   				  (dphi_face[j][qp] *
   				   face_normals[qp]));
   
-                    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
                       Fe(i) += JxW_face[qp] *
   				    (penalty * value * phi_face[i][qp]
   				     + penalty2 * 
@@ -2187,38 +2164,34 @@ it will print its log to the screen. Pretty easy, huh?
                   }
   	    } 
   	
-  	perf_log.stop_event (<FONT COLOR="#BC8F8F"><B>&quot;BCs&quot;</FONT></B>);
+  	perf_log.stop_event (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
         } 
   
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qrule-&gt;n_points(); qp++)
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule-&gt;n_points(); qp++)
+  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
   	  Fe(i) += JxW[qp]*phi[i][qp]*forcing_function(q_point[qp]);
   
-        perf_log.start_event (<FONT COLOR="#BC8F8F"><B>&quot;matrix insertion&quot;</FONT></B>);
+        perf_log.start_event (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
   
         dof_map.constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
         system.matrix-&gt;add_matrix (Ke, dof_indices);
         system.rhs-&gt;add_vector    (Fe, dof_indices);
   
-        perf_log.stop_event (<FONT COLOR="#BC8F8F"><B>&quot;matrix insertion&quot;</FONT></B>);
+        perf_log.stop_event (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
       }
   
   
   #<B><FONT COLOR="#A020F0">else</FONT></B>
   
-  #endif
-  
-  }
+  #endif <I><FONT COLOR="#B22222">// #ifdef ENABLE_SECOND_DERIVATIVES
+</FONT></I>  #endif <I><FONT COLOR="#B22222">// #ifdef ENABLE_AMR
+</FONT></I>  }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex15.C...
-Linking ex15...
-/local/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: warning: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
-* Running Example  ./ex15 -ksp_type bcgs -pc_type jacobi
+* Running Example  ./ex15-devel
 ***************************************************************
  
  EquationSystems
@@ -2226,55 +2199,19 @@ Linking ex15...
    System "Biharmonic"
     Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="HERMITE", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" 
-    Approximation Orders="THIRD", "THIRD" 
-    n_dofs()=16
-    n_local_dofs()=16
+    Finite Element Types="HERMITE" 
+    Approximation Orders="THIRD" 
+    n_dofs()=36
+    n_local_dofs()=36
     n_constrained_dofs()=0
     n_vectors()=1
 
- Mesh Information:
-  mesh_dimension()=2
-  spatial_dimension()=3
-  n_nodes()=9
-  n_elem()=1
-   n_local_elem()=1
-   n_active_elem()=1
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
- EquationSystems
-  n_systems()=1
-   System "Biharmonic"
-    Type "LinearImplicit"
-    Variables="u" 
-    Finite Element Types="HERMITE", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" 
-    Approximation Orders="THIRD", "THIRD" 
-    n_dofs()=16
-    n_local_dofs()=16
-    n_constrained_dofs()=0
-    n_vectors()=1
-
-Beginning Solve 0
-Linear solver converged at step: 11, final residual: 1.26966e-24
-L2-Norm is: 1.06079e-08
-H1-Norm is: 1.07761e-08
-H2-Norm is: 1.35257e-08
-
-L2-Error is: 0.400544
-H1-Error is: 2.0166
-H2-Error is: 14.6862
-
-  Refining the mesh...
  Mesh Information:
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=25
-  n_elem()=5
-   n_local_elem()=5
+  n_elem()=4
+   n_local_elem()=4
    n_active_elem()=4
   n_subdomains()=1
   n_processors()=1
@@ -2285,16 +2222,15 @@ H2-Error is: 14.6862
    System "Biharmonic"
     Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="HERMITE", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" 
-    Approximation Orders="THIRD", "THIRD" 
+    Finite Element Types="HERMITE" 
+    Approximation Orders="THIRD" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
     n_vectors()=1
 
-Beginning Solve 1
-Linear solver converged at step: 7, final residual: 5.94714e-19
+Beginning Solve 0
+Linear solver converged at step: 31, final residual: 6.00383e-19
 L2-Norm is: 0.384025
 H1-Norm is: 1.98976
 H2-Norm is: 14.3417
@@ -2308,8 +2244,8 @@ H2-Error is: 3.51162
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=81
-  n_elem()=21
-   n_local_elem()=21
+  n_elem()=20
+   n_local_elem()=20
    n_active_elem()=16
   n_subdomains()=1
   n_processors()=1
@@ -2320,16 +2256,15 @@ H2-Error is: 3.51162
    System "Biharmonic"
     Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="HERMITE", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" 
-    Approximation Orders="THIRD", "THIRD" 
+    Finite Element Types="HERMITE" 
+    Approximation Orders="THIRD" 
     n_dofs()=100
     n_local_dofs()=100
     n_constrained_dofs()=0
     n_vectors()=1
 
-Beginning Solve 2
-Linear solver converged at step: 24, final residual: 2.36986e-19
+Beginning Solve 1
+Linear solver converged at step: 21, final residual: 1.78941e-17
 L2-Norm is: 0.404988
 H1-Norm is: 2.02995
 H2-Norm is: 14.7459
@@ -2343,8 +2278,8 @@ H2-Error is: 0.822125
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=289
-  n_elem()=85
-   n_local_elem()=85
+  n_elem()=84
+   n_local_elem()=84
    n_active_elem()=64
   n_subdomains()=1
   n_processors()=1
@@ -2355,16 +2290,15 @@ H2-Error is: 0.822125
    System "Biharmonic"
     Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="HERMITE", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" 
-    Approximation Orders="THIRD", "THIRD" 
+    Finite Element Types="HERMITE" 
+    Approximation Orders="THIRD" 
     n_dofs()=324
     n_local_dofs()=324
     n_constrained_dofs()=0
     n_vectors()=1
 
-Beginning Solve 3
-Linear solver converged at step: 51, final residual: 2.93363e-19
+Beginning Solve 2
+Linear solver converged at step: 22, final residual: 4.7073e-17
 L2-Norm is: 0.406264
 H1-Norm is: 2.03164
 H2-Norm is: 14.7676
@@ -2378,8 +2312,8 @@ H2-Error is: 0.202531
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=1089
-  n_elem()=341
-   n_local_elem()=341
+  n_elem()=340
+   n_local_elem()=340
    n_active_elem()=256
   n_subdomains()=1
   n_processors()=1
@@ -2390,16 +2324,15 @@ H2-Error is: 0.202531
    System "Biharmonic"
     Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="HERMITE", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" 
-    Approximation Orders="THIRD", "THIRD" 
+    Finite Element Types="HERMITE" 
+    Approximation Orders="THIRD" 
     n_dofs()=1156
     n_local_dofs()=1156
     n_constrained_dofs()=0
     n_vectors()=1
 
-Beginning Solve 4
-Linear solver converged at step: 170, final residual: 1.4037e-20
+Beginning Solve 3
+Linear solver converged at step: 48, final residual: 1.86903e-16
 L2-Norm is: 0.406344
 H1-Norm is: 2.03174
 H2-Norm is: 14.7689
@@ -2408,47 +2341,9 @@ L2-Error is: 8.07721e-06
 H1-Error is: 0.000486566
 H2-Error is: 0.050454
 
-
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| 12LinearSolverIdE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 12SparseMatrixIdE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 13NumericVectorIdE reference count information:
-|  Creations:    7
-|  Destructions: 7
-| 4Elem reference count information:
-|  Creations:    2058
-|  Destructions: 2058
-| 4Node reference count information:
-|  Creations:    1089
-|  Destructions: 1089
-| 5QBase reference count information:
-|  Creations:    392
-|  Destructions: 392
-| 6DofMap reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 6FEBase reference count information:
-|  Creations:    710
-|  Destructions: 710
-| 6System reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 9DofObject reference count information:
-|  Creations:    3673
-|  Destructions: 3673
-| N10Parameters5ValueE reference count information:
-|  Creations:    2
-|  Destructions: 2
- ---------------------------------------------------------------------------- 
  
 ***************************************************************
-* Done Running Example  ./ex15
+* Done Running Example  ./ex15-devel
 ***************************************************************
 </pre>
 </div>

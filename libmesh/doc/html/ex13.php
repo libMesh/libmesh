@@ -48,6 +48,7 @@ Basic include file needed for the mesh functionality.
 <pre>
         #include "libmesh.h"
         #include "mesh.h"
+        #include "mesh_generation.h"
         #include "gmv_io.h"
         #include "equation_systems.h"
         #include "fe.h"
@@ -57,11 +58,11 @@ Basic include file needed for the mesh functionality.
         #include "numeric_vector.h"
         #include "dense_matrix.h"
         #include "dense_vector.h"
-        #include "implicit_system.h"
-        #include "error_vector.h"
-        #include "error_estimator.h"
+        #include "linear_implicit_system.h"
         #include "transient_system.h"
         #include "perf_log.h"
+        #include "boundary_info.h"
+        #include "utility.h"
         
 </pre>
 </div>
@@ -87,6 +88,16 @@ component-by-component basis.
 <pre>
         #include "dense_submatrix.h"
         #include "dense_subvector.h"
+        
+</pre>
+</div>
+<div class = "comment">
+The definition of a geometric element
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "elem.h"
         
 </pre>
 </div>
@@ -143,7 +154,7 @@ Create a two-dimensional mesh.
 </pre>
 </div>
 <div class = "comment">
-Use the internal mesh generator to create a uniform
+Use the MeshTools::Generation mesh generator to create a uniform
 grid on the square [-1,1]^D.  We instruct the mesh generator
 to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
 elements in 3D.  Building these higher-order elements allows
@@ -152,10 +163,11 @@ us to use higher-order approximation, as in example 3.
 
 <div class ="fragment">
 <pre>
-            mesh.build_square (20, 20,
-        		       0., 1.,
-        		       0., 1.,
-        		       QUAD9);
+            MeshTools::Generation::build_square (mesh,
+        					 20, 20,
+        					 0., 1.,
+        					 0., 1.,
+        					 QUAD9);
             
 </pre>
 </div>
@@ -194,8 +206,8 @@ Creates a transient system named "Navier-Stokes"
 
 <div class ="fragment">
 <pre>
-              TransientImplicitSystem & system = 
-        	equation_systems.add_system&lt;TransientImplicitSystem&gt; ("Navier-Stokes");
+              TransientLinearImplicitSystem & system = 
+        	equation_systems.add_system&lt;TransientLinearImplicitSystem&gt; ("Navier-Stokes");
               
 </pre>
 </div>
@@ -242,9 +254,6 @@ Initialize the data structures for the equation system.
 <pre>
               equation_systems.init ();
         
-              equation_systems.set_parameter("linear solver maximum iterations") = 250;
-              equation_systems.set_parameter("linear solver tolerance") = 1.e-3;
-              
 </pre>
 </div>
 <div class = "comment">
@@ -275,7 +284,7 @@ solution of the equations.
 
 <div class ="fragment">
 <pre>
-            const Real dt = 0.005;
+            const Real dt = 0.01;
             Real time     = 0.0;
             const unsigned int n_timesteps = 15;
         
@@ -289,7 +298,18 @@ for the nonlinear iterations.
 <div class ="fragment">
 <pre>
             const unsigned int n_nonlinear_steps = 15;
-            const Real nonlinear_tolerance       = 1.e-2;
+            const Real nonlinear_tolerance       = 1.e-3;
+        
+</pre>
+</div>
+<div class = "comment">
+We also set a standard linear solver flag in the EquationSystems object
+which controls the maxiumum number of linear solver iterations allowed.
+</div>
+
+<div class ="fragment">
+<pre>
+            equation_systems.parameters.set&lt;unsigned int&gt;("linear solver maximum iterations") = 250;
             
 </pre>
 </div>
@@ -301,7 +321,7 @@ then reference this parameter.
 
 <div class ="fragment">
 <pre>
-            equation_systems.set_parameter ("dt")   = dt;
+            equation_systems.parameters.set&lt;Real&gt; ("dt")   = dt;
         
 </pre>
 </div>
@@ -311,8 +331,8 @@ Get a reference to the Stokes system to use later.
 
 <div class ="fragment">
 <pre>
-            TransientImplicitSystem&  stokes_system =
-        	  equation_systems.get_system&lt;TransientImplicitSystem&gt;("Navier-Stokes");
+            TransientLinearImplicitSystem&  navier_stokes_system =
+        	  equation_systems.get_system&lt;TransientLinearImplicitSystem&gt;("Navier-Stokes");
         
 </pre>
 </div>
@@ -325,7 +345,7 @@ determine if we can exit the nonlinear loop.
 <div class ="fragment">
 <pre>
             AutoPtr&lt;NumericVector&lt;Number&gt; &gt;
-              last_nonlinear_soln (stokes_system.solution-&gt;clone());
+              last_nonlinear_soln (navier_stokes_system.solution-&gt;clone());
         
             for (unsigned int t_step=0; t_step&lt;n_timesteps; ++t_step)
               {
@@ -350,7 +370,7 @@ function for example.
 
 <div class ="fragment">
 <pre>
-                equation_systems.set_parameter ("time") = time;
+                equation_systems.parameters.set&lt;Real&gt; ("time") = time;
         
 </pre>
 </div>
@@ -360,7 +380,7 @@ A pretty update message
 
 <div class ="fragment">
 <pre>
-                std::cout &lt;&lt; " Solving time step " &lt;&lt; t_step &lt;&lt; ", time = " &lt;&lt; time &lt;&lt; std::endl;
+                std::cout &lt;&lt; "\n\n*** Solving time step " &lt;&lt; t_step &lt;&lt; ", time = " &lt;&lt; time &lt;&lt; " ***" &lt;&lt; std::endl;
         
 </pre>
 </div>
@@ -372,7 +392,19 @@ the reference to the Stokes system.
 
 <div class ="fragment">
 <pre>
-                *stokes_system.old_local_solution = *stokes_system.current_local_solution;
+                *navier_stokes_system.old_local_solution = *navier_stokes_system.current_local_solution;
+        
+</pre>
+</div>
+<div class = "comment">
+At the beginning of each solve, reset the linear solver tolerance
+to a "reasonable" starting value.
+</div>
+
+<div class ="fragment">
+<pre>
+                const Real initial_linear_solver_tol = 1.e-6;
+        	equation_systems.parameters.set&lt;Real&gt; ("linear solver tolerance") = initial_linear_solver_tol;
         
 </pre>
 </div>
@@ -393,7 +425,7 @@ Update the nonlinear solution.
 <div class ="fragment">
 <pre>
                     last_nonlinear_soln-&gt;zero();
-        	    last_nonlinear_soln-&gt;add(*stokes_system.solution);
+        	    last_nonlinear_soln-&gt;add(*navier_stokes_system.solution);
         	    
 </pre>
 </div>
@@ -404,7 +436,7 @@ Assemble & solve the linear system.
 <div class ="fragment">
 <pre>
                     perf_log.start_event("linear solve");
-        	    equation_systems("Navier-Stokes").solve();
+        	    equation_systems.get_system("Navier-Stokes").solve();
         	    perf_log.stop_event("linear solve");
         
 </pre>
@@ -416,7 +448,7 @@ nonlinear iterate.
 
 <div class ="fragment">
 <pre>
-                    last_nonlinear_soln-&gt;add (-1., *stokes_system.solution);
+                    last_nonlinear_soln-&gt;add (-1., *navier_stokes_system.solution);
         
 </pre>
 </div>
@@ -441,6 +473,26 @@ Compute the l2 norm of the difference
 </pre>
 </div>
 <div class = "comment">
+How many iterations were required to solve the linear system?
+</div>
+
+<div class ="fragment">
+<pre>
+                    const unsigned int n_linear_iterations = navier_stokes_system.n_linear_iterations();
+        	    
+</pre>
+</div>
+<div class = "comment">
+What was the final residual of the linear system?
+</div>
+
+<div class ="fragment">
+<pre>
+                    const Real final_linear_residual = navier_stokes_system.final_linear_residual();
+        	    
+</pre>
+</div>
+<div class = "comment">
 Print out convergence information for the linear and
 nonlinear iterations.
 </div>
@@ -448,9 +500,9 @@ nonlinear iterations.
 <div class ="fragment">
 <pre>
                     std::cout &lt;&lt; "Linear solver converged at step: "
-        		      &lt;&lt; stokes_system.n_linear_iterations()
+        		      &lt;&lt; n_linear_iterations
         		      &lt;&lt; ", final residual: "
-        		      &lt;&lt; stokes_system.final_linear_residual()
+        		      &lt;&lt; final_linear_residual
         		      &lt;&lt; "  Nonlinear convergence: ||u - u_old|| = "
         		      &lt;&lt; norm_delta
         		      &lt;&lt; std::endl;
@@ -459,12 +511,14 @@ nonlinear iterations.
 </div>
 <div class = "comment">
 Terminate the solution iteration if the difference between
-this iteration and the last is sufficiently small.
+this nonlinear iterate and the last is sufficiently small, AND
+if the most recent linear system was solved to a sufficient tolerance.
 </div>
 
 <div class ="fragment">
 <pre>
-                    if (norm_delta &lt; nonlinear_tolerance)
+                    if ((norm_delta &lt; nonlinear_tolerance) &&
+        		(navier_stokes_system.final_linear_residual() &lt; nonlinear_tolerance))
         	      {
         		std::cout &lt;&lt; " Nonlinear solver converged at step "
         			  &lt;&lt; l
@@ -472,6 +526,21 @@ this iteration and the last is sufficiently small.
         		break;
         	      }
         	    
+</pre>
+</div>
+<div class = "comment">
+Otherwise, decrease the linear system tolerance.  For the inexact Newton
+method, the linear solver tolerance needs to decrease as we get closer to
+the solution to ensure quadratic convergence.  The new linear solver tolerance
+is chosen (heuristically) as the square of the previous linear system residual norm.
+Real flr2 = final_linear_residual*final_linear_residual;
+</div>
+
+<div class ="fragment">
+<pre>
+                    equation_systems.parameters.set&lt;Real&gt; ("linear solver tolerance") =
+        	      Utility::pow&lt;2&gt;(final_linear_residual);
+        
         	  } // end nonlinear loop
         	
 </pre>
@@ -572,8 +641,8 @@ Get a reference to the Stokes system object.
 
 <div class ="fragment">
 <pre>
-          TransientImplicitSystem & stokes_system =
-            es.get_system&lt;TransientImplicitSystem&gt; ("Navier-Stokes");
+          TransientLinearImplicitSystem & navier_stokes_system =
+            es.get_system&lt;TransientLinearImplicitSystem&gt; ("Navier-Stokes");
         
 </pre>
 </div>
@@ -583,9 +652,9 @@ Numeric ids corresponding to each variable in the system
 
 <div class ="fragment">
 <pre>
-          const unsigned int u_var = stokes_system.variable_number ("u");
-          const unsigned int v_var = stokes_system.variable_number ("v");
-          const unsigned int p_var = stokes_system.variable_number ("p");
+          const unsigned int u_var = navier_stokes_system.variable_number ("u");
+          const unsigned int v_var = navier_stokes_system.variable_number ("v");
+          const unsigned int p_var = navier_stokes_system.variable_number ("p");
           
 </pre>
 </div>
@@ -596,7 +665,7 @@ the same as the type for "v".
 
 <div class ="fragment">
 <pre>
-          FEType fe_vel_type = stokes_system.variable_type(u_var);
+          FEType fe_vel_type = navier_stokes_system.variable_type(u_var);
           
 </pre>
 </div>
@@ -606,7 +675,7 @@ Get the Finite Element type for "p".
 
 <div class ="fragment">
 <pre>
-          FEType fe_pres_type = stokes_system.variable_type(p_var);
+          FEType fe_pres_type = navier_stokes_system.variable_type(p_var);
         
 </pre>
 </div>
@@ -712,7 +781,7 @@ in future examples.
 
 <div class ="fragment">
 <pre>
-          const DofMap & dof_map = stokes_system.get_dof_map();
+          const DofMap & dof_map = navier_stokes_system.get_dof_map();
         
 </pre>
 </div>
@@ -770,11 +839,11 @@ simulation, you should see that it is monotonically decreasing in time.
 
 <div class ="fragment">
 <pre>
-          const Real dt    = es.parameter("dt");
+          const Real dt    = es.parameters.get&lt;Real&gt;("dt");
 </pre>
 </div>
 <div class = "comment">
-const Real time  = es.parameter("time");
+const Real time  = es.parameters.get<Real>("time");
 </div>
 
 <div class ="fragment">
@@ -789,11 +858,7 @@ live on the local processor. We will compute the element
 matrix and right-hand-side contribution.  Since the mesh
 will be refined we want to only consider the ACTIVE elements,
 hence we use a variant of the \p active_elem_iterator.
-const_active_local_elem_iterator           el (mesh.elements_begin());
-const const_active_local_elem_iterator end_el (mesh.elements_end());
-
-
-<br><br></div>
+</div>
 
 <div class ="fragment">
 <pre>
@@ -872,7 +937,7 @@ Reposition the submatrices...  The idea is this:
 <br><br>-           -          -  -
 | Kuu Kuv Kup |        | Fu |
 Ke = | Kvu Kvv Kvp |;  Fe = | Fv |
-| Kpu Kpv Kpp |        | Fv |
+| Kpu Kpv Kpp |        | Fp |
 -           -          -  -
 
 <br><br>The \p DenseSubMatrix.repostition () member takes the
@@ -948,10 +1013,10 @@ From the old timestep:
 
 <div class ="fragment">
 <pre>
-                      u_old += phi[l][qp]*stokes_system.old_solution (dof_indices_u[l]);
-        	      v_old += phi[l][qp]*stokes_system.old_solution (dof_indices_v[l]);
-        	      grad_u_old.add_scaled (dphi[l][qp],stokes_system.old_solution (dof_indices_u[l]));
-        	      grad_v_old.add_scaled (dphi[l][qp],stokes_system.old_solution (dof_indices_v[l]));
+                      u_old += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_u[l]);
+        	      v_old += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_v[l]);
+        	      grad_u_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_u[l]));
+        	      grad_v_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_v[l]));
         
 </pre>
 </div>
@@ -961,10 +1026,10 @@ From the previous Newton iterate:
 
 <div class ="fragment">
 <pre>
-                      u += phi[l][qp]*stokes_system.current_solution (dof_indices_u[l]); 
-        	      v += phi[l][qp]*stokes_system.current_solution (dof_indices_v[l]);
-        	      grad_u.add_scaled (dphi[l][qp],stokes_system.current_solution (dof_indices_u[l]));
-        	      grad_v.add_scaled (dphi[l][qp],stokes_system.current_solution (dof_indices_v[l]));
+                      u += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_u[l]); 
+        	      v += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_v[l]);
+        	      grad_u.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_u[l]));
+        	      grad_v.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_v[l]));
         	    }
         
 </pre>
@@ -977,7 +1042,7 @@ Compute the old pressure value at this quadrature point.
 <pre>
                   for (unsigned int l=0; l&lt;n_p_dofs; l++)
         	    {
-        	      p_old += psi[l][qp]*stokes_system.old_solution (dof_indices_p[l]);
+        	      p_old += psi[l][qp]*navier_stokes_system.old_solution (dof_indices_p[l]);
         	    }
         
 </pre>
@@ -1107,6 +1172,16 @@ approach introduced in example 3.
 </pre>
 </div>
 <div class = "comment">
+The penalty value.  \f$ \frac{1}{\epsilon \f$
+</div>
+
+<div class ="fragment">
+<pre>
+                const Real penalty = 1.e10;
+        		  
+</pre>
+</div>
+<div class = "comment">
 The following loops over the sides of the element.
 If the element has no neighbor on a side then that
 side MUST live on a boundary of the domain.
@@ -1117,6 +1192,24 @@ side MUST live on a boundary of the domain.
                 for (unsigned int s=0; s&lt;elem-&gt;n_sides(); s++)
         	  if (elem-&gt;neighbor(s) == NULL)
         	    {
+</pre>
+</div>
+<div class = "comment">
+Get the boundary ID for side 's'.
+These are set internally by build_square().
+0=bottom
+1=right
+2=top
+3=left
+</div>
+
+<div class ="fragment">
+<pre>
+                      short int bc_id = mesh.boundary_info-&gt;boundary_id (elem,s);
+        	      if (bc_id==BoundaryInfo::invalid_id)
+        		  error();
+        
+        	      
         	      AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
         	      	      
 </pre>
@@ -1132,31 +1225,7 @@ Loop over the nodes on the side.
 </pre>
 </div>
 <div class = "comment">
-The location on the boundary of the current
-node.
-		   
-
-<br><br>const Real xf = side->point(ns)(0);
-</div>
-
-<div class ="fragment">
-<pre>
-                          const Real yf = side-&gt;point(ns)(1);
-        		  
-</pre>
-</div>
-<div class = "comment">
-The penalty value.  \f$ \frac{1}{\epsilon \f$
-</div>
-
-<div class ="fragment">
-<pre>
-                          const Real penalty = 1.e10;
-        		  
-</pre>
-</div>
-<div class = "comment">
-The boundary values.
+Get the boundary values.
 		   
 
 <br><br>Set u = 1 on the top boundary, 0 everywhere else
@@ -1164,7 +1233,7 @@ The boundary values.
 
 <div class ="fragment">
 <pre>
-                          const Real u_value = (yf &gt; .99) ? 1. : 0.;
+                          const Real u_value = (bc_id==2) ? 1. : 0.;
         		  
 </pre>
 </div>
@@ -1213,24 +1282,30 @@ Right-hand-side contribution.
         		      }
         		} // end face node loop	  
         	    } // end if (elem-&gt;neighbor(side) == NULL)
-              } // end boundary condition section	  
-              
+        	
 </pre>
 </div>
 <div class = "comment">
-We have now built the element matrix and RHS vector in terms
-of the element degrees of freedom.  However, it is possible
-that some of the element DOFs are constrained to enforce
-solution continuity, i.e. they are not really "free".  We need
-to constrain those DOFs in terms of non-constrained DOFs to
-ensure a continuous solution.  The
-\p DofMap::constrain_element_matrix_and_vector() method does
-just that.
+Pin the pressure to zero at global node number "pressure_node".
+This effectively removes the non-trivial null space of constant
+pressure solutions.
 </div>
 
 <div class ="fragment">
 <pre>
-              dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+                const bool pin_pressure = true;
+        	if (pin_pressure)
+        	  {
+        	    const unsigned int pressure_node = 0;
+        	    const Real p_value               = 0.0;
+        	    for (unsigned int c=0; c&lt;elem-&gt;n_nodes(); c++)
+        	      if (elem-&gt;node(c) == pressure_node)
+        		{
+        		  Kpp(c,c) += penalty;
+        		  Fp(c)    += penalty*p_value;
+        		}
+        	  }
+              } // end boundary condition section	  
               
 </pre>
 </div>
@@ -1243,8 +1318,8 @@ and \p PetscVector::add_vector() members do this for us.
 
 <div class ="fragment">
 <pre>
-              stokes_system.matrix-&gt;add_matrix (Ke, dof_indices);
-              stokes_system.rhs-&gt;add_vector    (Fe, dof_indices);
+              navier_stokes_system.matrix-&gt;add_matrix (Ke, dof_indices);
+              navier_stokes_system.rhs-&gt;add_vector    (Fe, dof_indices);
             } // end of element loop
           
 </pre>
@@ -1268,134 +1343,148 @@ That's it.
   #include &lt;algorithm&gt;
   #include &lt;math.h&gt;
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature_gauss.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dof_map.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;sparse_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;numeric_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;implicit_system.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;error_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;error_estimator.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;transient_system.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;perf_log.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;transient_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;perf_log.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;boundary_info.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;utility.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;o_string_stream.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;o_string_stream.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_submatrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_subvector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_submatrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_subvector.h&quot;</FONT></B>
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_stokes (EquationSystems&amp; es,
-  		      <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
+  #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
   
-  <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_stokes (EquationSystems&amp; es,
+  		      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    libMesh::init (argc, argv);
+    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
     {    
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = 2;     
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 2;     
       
       Mesh mesh (dim);
       
-      mesh.build_square (20, 20,
-  		       0., 1.,
-  		       0., 1.,
-  		       QUAD9);
+      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh,
+  					 20, 20,
+  					 0., 1.,
+  					 0., 1.,
+  					 QUAD9);
       
       mesh.print_info();
       
       EquationSystems equation_systems (mesh);
       
       {
-        TransientImplicitSystem &amp; system = 
-  	equation_systems.add_system&lt;TransientImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Navier-Stokes&quot;</FONT></B>);
+        TransientLinearImplicitSystem &amp; system = 
+  	equation_systems.add_system&lt;TransientLinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Navier-Stokes&quot;</FONT></B>);
         
-        system.add_variable (<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, SECOND);
-        system.add_variable (<FONT COLOR="#BC8F8F"><B>&quot;v&quot;</FONT></B>, SECOND);
+        system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, SECOND);
+        system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>, SECOND);
   
-        system.add_variable (<FONT COLOR="#BC8F8F"><B>&quot;p&quot;</FONT></B>, FIRST);
+        system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, FIRST);
   
         system.attach_assemble_function (assemble_stokes);
         
         equation_systems.init ();
   
-        equation_systems.set_parameter(<FONT COLOR="#BC8F8F"><B>&quot;linear solver maximum iterations&quot;</FONT></B>) = 250;
-        equation_systems.set_parameter(<FONT COLOR="#BC8F8F"><B>&quot;linear solver tolerance&quot;</FONT></B>) = 1.e-3;
-        
         equation_systems.print_info();
       }
   
-      PerfLog perf_log(<FONT COLOR="#BC8F8F"><B>&quot;Example 13&quot;</FONT></B>);
+      PerfLog perf_log(<B><FONT COLOR="#BC8F8F">&quot;Example 13&quot;</FONT></B>);
       
-      <FONT COLOR="#228B22"><B>const</FONT></B> Real dt = 0.005;
+      <B><FONT COLOR="#228B22">const</FONT></B> Real dt = 0.01;
       Real time     = 0.0;
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_timesteps = 15;
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_timesteps = 15;
   
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_nonlinear_steps = 15;
-      <FONT COLOR="#228B22"><B>const</FONT></B> Real nonlinear_tolerance       = 1.e-2;
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_nonlinear_steps = 15;
+      <B><FONT COLOR="#228B22">const</FONT></B> Real nonlinear_tolerance       = 1.e-3;
+  
+      equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;linear solver maximum iterations&quot;</FONT></B>) = 250;
       
-      equation_systems.set_parameter (<FONT COLOR="#BC8F8F"><B>&quot;dt&quot;</FONT></B>)   = dt;
+      equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;dt&quot;</FONT></B>)   = dt;
   
-      TransientImplicitSystem&amp;  stokes_system =
-  	  equation_systems.get_system&lt;TransientImplicitSystem&gt;(<FONT COLOR="#BC8F8F"><B>&quot;Navier-Stokes&quot;</FONT></B>);
+      TransientLinearImplicitSystem&amp;  navier_stokes_system =
+  	  equation_systems.get_system&lt;TransientLinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;Navier-Stokes&quot;</FONT></B>);
   
       AutoPtr&lt;NumericVector&lt;Number&gt; &gt;
-        last_nonlinear_soln (stokes_system.solution-&gt;clone());
+        last_nonlinear_soln (navier_stokes_system.solution-&gt;clone());
   
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> t_step=0; t_step&lt;n_timesteps; ++t_step)
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> t_step=0; t_step&lt;n_timesteps; ++t_step)
         {
   	time += dt;
   
-  	equation_systems.set_parameter (<FONT COLOR="#BC8F8F"><B>&quot;time&quot;</FONT></B>) = time;
+  	equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;time&quot;</FONT></B>) = time;
   
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; Solving time step &quot;</FONT></B> &lt;&lt; t_step &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;, time = &quot;</FONT></B> &lt;&lt; time &lt;&lt; std::endl;
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\n\n*** Solving time step &quot;</FONT></B> &lt;&lt; t_step &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, time = &quot;</FONT></B> &lt;&lt; time &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; ***&quot;</FONT></B> &lt;&lt; std::endl;
   
-  	*stokes_system.old_local_solution = *stokes_system.current_local_solution;
+  	*navier_stokes_system.old_local_solution = *navier_stokes_system.current_local_solution;
   
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> l=0; l&lt;n_nonlinear_steps; ++l)
+  	<B><FONT COLOR="#228B22">const</FONT></B> Real initial_linear_solver_tol = 1.e-6;
+  	equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) = initial_linear_solver_tol;
+  
+  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> l=0; l&lt;n_nonlinear_steps; ++l)
   	  {
   	    last_nonlinear_soln-&gt;zero();
-  	    last_nonlinear_soln-&gt;add(*stokes_system.solution);
+  	    last_nonlinear_soln-&gt;add(*navier_stokes_system.solution);
   	    
-  	    perf_log.start_event(<FONT COLOR="#BC8F8F"><B>&quot;linear solve&quot;</FONT></B>);
-  	    equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Navier-Stokes&quot;</FONT></B>).solve();
-  	    perf_log.stop_event(<FONT COLOR="#BC8F8F"><B>&quot;linear solve&quot;</FONT></B>);
+  	    perf_log.start_event(<B><FONT COLOR="#BC8F8F">&quot;linear solve&quot;</FONT></B>);
+  	    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Navier-Stokes&quot;</FONT></B>).solve();
+  	    perf_log.stop_event(<B><FONT COLOR="#BC8F8F">&quot;linear solve&quot;</FONT></B>);
   
-  	    last_nonlinear_soln-&gt;add (-1., *stokes_system.solution);
+  	    last_nonlinear_soln-&gt;add (-1., *navier_stokes_system.solution);
   
   	    last_nonlinear_soln-&gt;close();
   
-  	    <FONT COLOR="#228B22"><B>const</FONT></B> Real norm_delta = last_nonlinear_soln-&gt;l2_norm();
+  	    <B><FONT COLOR="#228B22">const</FONT></B> Real norm_delta = last_nonlinear_soln-&gt;l2_norm();
   
-  	    std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Linear solver converged at step: &quot;</FONT></B>
-  		      &lt;&lt; stokes_system.n_linear_iterations()
-  		      &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;, final residual: &quot;</FONT></B>
-  		      &lt;&lt; stokes_system.final_linear_residual()
-  		      &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;  Nonlinear convergence: ||u - u_old|| = &quot;</FONT></B>
+  	    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_linear_iterations = navier_stokes_system.n_linear_iterations();
+  	    
+  	    <B><FONT COLOR="#228B22">const</FONT></B> Real final_linear_residual = navier_stokes_system.final_linear_residual();
+  	    
+  	    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Linear solver converged at step: &quot;</FONT></B>
+  		      &lt;&lt; n_linear_iterations
+  		      &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, final residual: &quot;</FONT></B>
+  		      &lt;&lt; final_linear_residual
+  		      &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;  Nonlinear convergence: ||u - u_old|| = &quot;</FONT></B>
   		      &lt;&lt; norm_delta
   		      &lt;&lt; std::endl;
   
-  	    <B><FONT COLOR="#A020F0">if</FONT></B> (norm_delta &lt; nonlinear_tolerance)
+  	    <B><FONT COLOR="#A020F0">if</FONT></B> ((norm_delta &lt; nonlinear_tolerance) &amp;&amp;
+  		(navier_stokes_system.final_linear_residual() &lt; nonlinear_tolerance))
   	      {
-  		std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; Nonlinear solver converged at step &quot;</FONT></B>
+  		<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; Nonlinear solver converged at step &quot;</FONT></B>
   			  &lt;&lt; l
   			  &lt;&lt; std::endl;
   		<B><FONT COLOR="#A020F0">break</FONT></B>;
   	      }
   	    
+  	    equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) =
+  	      <B><FONT COLOR="#5F9EA0">Utility</FONT></B>::pow&lt;2&gt;(final_linear_residual);
+  
   	  } <I><FONT COLOR="#B22222">// end nonlinear loop
 </FONT></I>  	
-  	<FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> write_interval = 1;
+  	<B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> write_interval = 1;
   	
   	<B><FONT COLOR="#A020F0">if</FONT></B> ((t_step+1)%write_interval == 0)
   	  {
   	    OStringStream file_name;
   
-  	    file_name &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;out.gmv.&quot;</FONT></B>;
+  	    file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out.gmv.&quot;</FONT></B>;
   	    OSSRealzeroright(file_name,3,0, t_step + 1);
   	    
   	    GMVIO(mesh).write_equation_systems (file_name.str(),
@@ -1412,25 +1501,25 @@ That's it.
   
   
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_stokes (EquationSystems&amp; es,
-  		      <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_stokes (EquationSystems&amp; es,
+  		      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    assert (system_name == <FONT COLOR="#BC8F8F"><B>&quot;Navier-Stokes&quot;</FONT></B>);
+    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Navier-Stokes&quot;</FONT></B>);
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
     
-    TransientImplicitSystem &amp; stokes_system =
-      es.get_system&lt;TransientImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Navier-Stokes&quot;</FONT></B>);
+    TransientLinearImplicitSystem &amp; navier_stokes_system =
+      es.get_system&lt;TransientLinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Navier-Stokes&quot;</FONT></B>);
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> u_var = stokes_system.variable_number (<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>);
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> v_var = stokes_system.variable_number (<FONT COLOR="#BC8F8F"><B>&quot;v&quot;</FONT></B>);
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> p_var = stokes_system.variable_number (<FONT COLOR="#BC8F8F"><B>&quot;p&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = navier_stokes_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var = navier_stokes_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> p_var = navier_stokes_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>);
     
-    FEType fe_vel_type = stokes_system.variable_type(u_var);
+    FEType fe_vel_type = navier_stokes_system.variable_type(u_var);
     
-    FEType fe_pres_type = stokes_system.variable_type(p_var);
+    FEType fe_pres_type = navier_stokes_system.variable_type(p_var);
   
     AutoPtr&lt;FEBase&gt; fe_vel  (FEBase::build(dim, fe_vel_type));
       
@@ -1441,16 +1530,16 @@ That's it.
     fe_vel-&gt;attach_quadrature_rule (&amp;qrule);
     fe_pres-&gt;attach_quadrature_rule (&amp;qrule);
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe_vel-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe_vel-&gt;get_JxW();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe_vel-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe_vel-&gt;get_phi();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe_vel-&gt;get_dphi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe_vel-&gt;get_dphi();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; psi = fe_pres-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; psi = fe_pres-&gt;get_phi();
   
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap &amp; dof_map = stokes_system.get_dof_map();
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap &amp; dof_map = navier_stokes_system.get_dof_map();
   
     DenseMatrix&lt;Number&gt; Ke;
     DenseVector&lt;Number&gt; Fe;
@@ -1465,31 +1554,30 @@ That's it.
       Fv(Fe),
       Fp(Fe);
   
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices_u;
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices_v;
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices_p;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_u;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_v;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_p;
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real dt    = es.parameter(<FONT COLOR="#BC8F8F"><B>&quot;dt&quot;</FONT></B>);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real theta = 1.;
+    <B><FONT COLOR="#228B22">const</FONT></B> Real dt    = es.parameters.get&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;dt&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real theta = 1.;
       
-  
-    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {    
-        <FONT COLOR="#228B22"><B>const</FONT></B> Elem* elem = *el;
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
         
         dof_map.dof_indices (elem, dof_indices);
         dof_map.dof_indices (elem, dof_indices_u, u_var);
         dof_map.dof_indices (elem, dof_indices_v, v_var);
         dof_map.dof_indices (elem, dof_indices_p, p_var);
   
-        <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_dofs   = dof_indices.size();
-        <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_u_dofs = dof_indices_u.size(); 
-        <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_v_dofs = dof_indices_v.size(); 
-        <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_p_dofs = dof_indices_p.size();
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_dofs   = dof_indices.size();
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = dof_indices_u.size(); 
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_v_dofs = dof_indices_v.size(); 
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_p_dofs = dof_indices_p.size();
         
         fe_vel-&gt;reinit  (elem);
         fe_pres-&gt;reinit (elem);
@@ -1513,7 +1601,7 @@ That's it.
         Fv.reposition (v_var*n_u_dofs, n_v_dofs);
         Fp.reposition (p_var*n_u_dofs, n_p_dofs);
   
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
   	{
   	  Number   u = 0., u_old = 0.;
   	  Number   v = 0., v_old = 0.;
@@ -1521,32 +1609,32 @@ That's it.
   	  Gradient grad_u, grad_u_old;
   	  Gradient grad_v, grad_v_old;
   	  
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> l=0; l&lt;n_u_dofs; l++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> l=0; l&lt;n_u_dofs; l++)
   	    {
-  	      u_old += phi[l][qp]*stokes_system.old_solution (dof_indices_u[l]);
-  	      v_old += phi[l][qp]*stokes_system.old_solution (dof_indices_v[l]);
-  	      grad_u_old.add_scaled (dphi[l][qp],stokes_system.old_solution (dof_indices_u[l]));
-  	      grad_v_old.add_scaled (dphi[l][qp],stokes_system.old_solution (dof_indices_v[l]));
+  	      u_old += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_u[l]);
+  	      v_old += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_v[l]);
+  	      grad_u_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_u[l]));
+  	      grad_v_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_v[l]));
   
-  	      u += phi[l][qp]*stokes_system.current_solution (dof_indices_u[l]); 
-  	      v += phi[l][qp]*stokes_system.current_solution (dof_indices_v[l]);
-  	      grad_u.add_scaled (dphi[l][qp],stokes_system.current_solution (dof_indices_u[l]));
-  	      grad_v.add_scaled (dphi[l][qp],stokes_system.current_solution (dof_indices_v[l]));
+  	      u += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_u[l]); 
+  	      v += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_v[l]);
+  	      grad_u.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_u[l]));
+  	      grad_v.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_v[l]));
   	    }
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> l=0; l&lt;n_p_dofs; l++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> l=0; l&lt;n_p_dofs; l++)
   	    {
-  	      p_old += psi[l][qp]*stokes_system.old_solution (dof_indices_p[l]);
+  	      p_old += psi[l][qp]*navier_stokes_system.old_solution (dof_indices_p[l]);
   	    }
   
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> NumberVectorValue U_old (u_old, v_old);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> NumberVectorValue U     (u,     v);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Number  u_x = grad_u(0);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Number  u_y = grad_u(1);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Number  v_x = grad_v(0);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Number  v_y = grad_v(1);
+  	  <B><FONT COLOR="#228B22">const</FONT></B> NumberVectorValue U_old (u_old, v_old);
+  	  <B><FONT COLOR="#228B22">const</FONT></B> NumberVectorValue U     (u,     v);
+  	  <B><FONT COLOR="#228B22">const</FONT></B> Number  u_x = grad_u(0);
+  	  <B><FONT COLOR="#228B22">const</FONT></B> Number  u_y = grad_u(1);
+  	  <B><FONT COLOR="#228B22">const</FONT></B> Number  v_x = grad_v(0);
+  	  <B><FONT COLOR="#228B22">const</FONT></B> Number  v_y = grad_v(1);
   	  
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;n_u_dofs; i++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_u_dofs; i++)
   	    {
   	      Fu(i) += JxW[qp]*(u_old*phi[i][qp] -                            <I><FONT COLOR="#B22222">// mass-matrix term 
 </FONT></I>  				(1.-theta)*dt*(U_old*grad_u_old)*phi[i][qp] + <I><FONT COLOR="#B22222">// convection term
@@ -1563,7 +1651,7 @@ That's it.
 </FONT></I>  	    
   
   
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;n_u_dofs; j++)
+  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; j++)
   		{
   		  Kuu(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                <I><FONT COLOR="#B22222">// mass matrix term
 </FONT></I>  				       theta*dt*(dphi[i][qp]*dphi[j][qp]) +   <I><FONT COLOR="#B22222">// diffusion term
@@ -1580,16 +1668,16 @@ That's it.
   		  Kvu(i,j) += JxW[qp]*theta*dt*v_x*phi[i][qp]*phi[j][qp];     <I><FONT COLOR="#B22222">// Newton term
 </FONT></I>  		}
   
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;n_p_dofs; j++)
+  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_p_dofs; j++)
   		{
   		  Kup(i,j) += JxW[qp]*(-theta*dt*psi[j][qp]*dphi[i][qp](0));
   		  Kvp(i,j) += JxW[qp]*(-theta*dt*psi[j][qp]*dphi[i][qp](1));
   		}
   	    }
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;n_p_dofs; i++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_p_dofs; i++)
   	    {
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;n_u_dofs; j++)
+  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; j++)
   		{
   		  Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
   		  Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
@@ -1599,24 +1687,26 @@ That's it.
 </FONT></I>  
         
         {
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
+  	<B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
+  		  
+  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
   	  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
   	    {
+  	      <B><FONT COLOR="#228B22">short</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> bc_id = mesh.boundary_info-&gt;boundary_id (elem,s);
+  	      <B><FONT COLOR="#A020F0">if</FONT></B> (bc_id==BoundaryInfo::invalid_id)
+  		  error();
+  
+  	      
   	      AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
   	      	      
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> ns=0; ns&lt;side-&gt;n_nodes(); ns++)
+  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> ns=0; ns&lt;side-&gt;n_nodes(); ns++)
   		{
   		   
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real yf = side-&gt;point(ns)(1);
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real u_value = (bc_id==2) ? 1. : 0.;
   		  
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real penalty = 1.e10;
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real v_value = 0.;
   		  
-  		   
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real u_value = (yf &gt; .99) ? 1. : 0.;
-  		  
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real v_value = 0.;
-  		  
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n=0; n&lt;elem-&gt;n_nodes(); n++)
+  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n=0; n&lt;elem-&gt;n_nodes(); n++)
   		    <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;node(n) == side-&gt;node(ns))
   		      {
   			Kuu(n,n) += penalty;
@@ -1627,12 +1717,23 @@ That's it.
   		      }
   		} <I><FONT COLOR="#B22222">// end face node loop	  
 </FONT></I>  	    } <I><FONT COLOR="#B22222">// end if (elem-&gt;neighbor(side) == NULL)
-</FONT></I>        } <I><FONT COLOR="#B22222">// end boundary condition section	  
+</FONT></I>  	
+  	<B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> pin_pressure = true;
+  	<B><FONT COLOR="#A020F0">if</FONT></B> (pin_pressure)
+  	  {
+  	    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> pressure_node = 0;
+  	    <B><FONT COLOR="#228B22">const</FONT></B> Real p_value               = 0.0;
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> c=0; c&lt;elem-&gt;n_nodes(); c++)
+  	      <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;node(c) == pressure_node)
+  		{
+  		  Kpp(c,c) += penalty;
+  		  Fp(c)    += penalty*p_value;
+  		}
+  	  }
+        } <I><FONT COLOR="#B22222">// end boundary condition section	  
 </FONT></I>        
-        dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-        
-        stokes_system.matrix-&gt;add_matrix (Ke, dof_indices);
-        stokes_system.rhs-&gt;add_vector    (Fe, dof_indices);
+        navier_stokes_system.matrix-&gt;add_matrix (Ke, dof_indices);
+        navier_stokes_system.rhs-&gt;add_vector    (Fe, dof_indices);
       } <I><FONT COLOR="#B22222">// end of element loop
 </FONT></I>    
     <B><FONT COLOR="#A020F0">return</FONT></B>;
@@ -1641,13 +1742,8 @@ That's it.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex13.C...
-Linking ex13...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
-
 ***************************************************************
-* Running Example  ./ex13
+* Running Example  ./ex13-devel
 ***************************************************************
  
  Mesh Information:
@@ -1664,140 +1760,161 @@ Linking ex13...
  EquationSystems
   n_systems()=1
    System "Navier-Stokes"
-    Type "TransientImplicit"
+    Type "TransientLinearImplicit"
     Variables="u" "v" "p" 
-    Finite Element Types="0", "12" "0", "12" "0", "12" 
-    Infinite Element Mapping="0" "0" "0" 
-    Approximation Orders="2", "3" "2", "3" "1", "3" 
+    Finite Element Types="LAGRANGE" "LAGRANGE" "LAGRANGE" 
+    Approximation Orders="SECOND" "SECOND" "FIRST" 
     n_dofs()=3803
     n_local_dofs()=3803
     n_constrained_dofs()=0
-    n_vectors()=1
-  n_parameters()=2
-   Parameters:
-    "linear solver maximum iterations"=250
-    "linear solver tolerance"=0.001
-
- Solving time step 0, time = 0.005
-Linear solver converged at step: 16, final residual: 0.121329  Nonlinear convergence: ||u - u_old|| = 223.471
-Linear solver converged at step: 24, final residual: 0.000317615  Nonlinear convergence: ||u - u_old|| = 6.5317
-Linear solver converged at step: 28, final residual: 2.58051e-07  Nonlinear convergence: ||u - u_old|| = 0.0072933
- Nonlinear solver converged at step 2
- Solving time step 1, time = 0.01
-Linear solver converged at step: 23, final residual: 0.0025053  Nonlinear convergence: ||u - u_old|| = 35.4701
-Linear solver converged at step: 24, final residual: 1.47282e-05  Nonlinear convergence: ||u - u_old|| = 0.0466908
-Linear solver converged at step: 24, final residual: 1.27369e-08  Nonlinear convergence: ||u - u_old|| = 0.00027294
- Nonlinear solver converged at step 2
- Solving time step 2, time = 0.015
-Linear solver converged at step: 24, final residual: 0.000790085  Nonlinear convergence: ||u - u_old|| = 9.79414
-Linear solver converged at step: 24, final residual: 3.41055e-06  Nonlinear convergence: ||u - u_old|| = 0.0208939
-Linear solver converged at step: 28, final residual: 2.96023e-09  Nonlinear convergence: ||u - u_old|| = 0.000135564
- Nonlinear solver converged at step 2
- Solving time step 3, time = 0.02
-Linear solver converged at step: 24, final residual: 0.000382917  Nonlinear convergence: ||u - u_old|| = 4.07167
-Linear solver converged at step: 25, final residual: 1.42401e-06  Nonlinear convergence: ||u - u_old|| = 0.00672638
- Nonlinear solver converged at step 1
- Solving time step 4, time = 0.025
-Linear solver converged at step: 23, final residual: 0.000247016  Nonlinear convergence: ||u - u_old|| = 2.13266
-Linear solver converged at step: 25, final residual: 8.20034e-07  Nonlinear convergence: ||u - u_old|| = 0.00772513
- Nonlinear solver converged at step 1
- Solving time step 5, time = 0.03
-Linear solver converged at step: 23, final residual: 0.000126994  Nonlinear convergence: ||u - u_old|| = 1.26206
-Linear solver converged at step: 27, final residual: 4.97111e-07  Nonlinear convergence: ||u - u_old|| = 0.0057915
- Nonlinear solver converged at step 1
- Solving time step 6, time = 0.035
-Linear solver converged at step: 24, final residual: 8.03056e-05  Nonlinear convergence: ||u - u_old|| = 0.805059
-Linear solver converged at step: 24, final residual: 2.93058e-07  Nonlinear convergence: ||u - u_old|| = 0.00147397
- Nonlinear solver converged at step 1
- Solving time step 7, time = 0.04
-Linear solver converged at step: 24, final residual: 7.94782e-05  Nonlinear convergence: ||u - u_old|| = 0.53619
-Linear solver converged at step: 23, final residual: 1.75705e-07  Nonlinear convergence: ||u - u_old|| = 0.000919154
- Nonlinear solver converged at step 1
- Solving time step 8, time = 0.045
-Linear solver converged at step: 23, final residual: 6.92094e-05  Nonlinear convergence: ||u - u_old|| = 0.368994
-Linear solver converged at step: 27, final residual: 9.13022e-08  Nonlinear convergence: ||u - u_old|| = 0.00104694
- Nonlinear solver converged at step 1
- Solving time step 9, time = 0.05
-Linear solver converged at step: 23, final residual: 4.73186e-05  Nonlinear convergence: ||u - u_old|| = 0.260159
-Linear solver converged at step: 27, final residual: 6.18452e-08  Nonlinear convergence: ||u - u_old|| = 0.000762091
- Nonlinear solver converged at step 1
- Solving time step 10, time = 0.055
-Linear solver converged at step: 22, final residual: 4.01872e-05  Nonlinear convergence: ||u - u_old|| = 0.187318
-Linear solver converged at step: 27, final residual: 3.72042e-08  Nonlinear convergence: ||u - u_old|| = 0.000711503
- Nonlinear solver converged at step 1
- Solving time step 11, time = 0.06
-Linear solver converged at step: 22, final residual: 2.7971e-05  Nonlinear convergence: ||u - u_old|| = 0.137235
-Linear solver converged at step: 28, final residual: 2.40094e-08  Nonlinear convergence: ||u - u_old|| = 0.000617341
- Nonlinear solver converged at step 1
- Solving time step 12, time = 0.065
-Linear solver converged at step: 21, final residual: 2.51357e-05  Nonlinear convergence: ||u - u_old|| = 0.102129
-Linear solver converged at step: 28, final residual: 2.11058e-08  Nonlinear convergence: ||u - u_old|| = 0.00086522
- Nonlinear solver converged at step 1
- Solving time step 13, time = 0.07
-Linear solver converged at step: 21, final residual: 1.78319e-05  Nonlinear convergence: ||u - u_old|| = 0.07677
-Linear solver converged at step: 28, final residual: 1.60542e-08  Nonlinear convergence: ||u - u_old|| = 0.000734319
- Nonlinear solver converged at step 1
- Solving time step 14, time = 0.075
-Linear solver converged at step: 21, final residual: 1.27677e-05  Nonlinear convergence: ||u - u_old|| = 0.0582848
-Linear solver converged at step: 28, final residual: 1.17971e-08  Nonlinear convergence: ||u - u_old|| = 0.000574086
- Nonlinear solver converged at step 1
-
- ----------------------------------------------------------------------------
-| Time:           Fri Nov 12 12:16:40 2004
-| OS:             Linux
-| HostName:       zaniwoop
-| OS Release      2.4.20-19.9smp
-| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
-| Machine:        i686
-| Username:       peterson
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| Example 13 Performance: Alive time=22.0944, Active time=21.2389
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-| linear solve                  33      21.2389     0.643604    100.00       |
- ----------------------------------------------------------------------------
-| Totals:                       33      21.2389                 100.00       |
- ----------------------------------------------------------------------------
+    n_vectors()=3
 
 
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| 12SparseMatrixISt7complexIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 13NumericVectorISt7complexIdEE reference count information:
-|  Creations:    6
-|  Destructions: 6
-| 21LinearSolverInterfaceISt7complexIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 4Elem reference count information:
-|  Creations:    4640
-|  Destructions: 4640
-| 4Node reference count information:
-|  Creations:    1681
-|  Destructions: 1681
-| 5QBase reference count information:
-|  Creations:    66
-|  Destructions: 66
-| 6DofMap reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 6FEBase reference count information:
-|  Creations:    66
-|  Destructions: 66
-| 6System reference count information:
-|  Creations:    1
-|  Destructions: 1
- ---------------------------------------------------------------------------- 
+
+*** Solving time step 0, time = 0.01 ***
+Linear solver converged at step: 236, final residual: 0.000214866  Nonlinear convergence: ||u - u_old|| = 282.453
+Linear solver converged at step: 90, final residual: 9.99752e-06  Nonlinear convergence: ||u - u_old|| = 0.743588
+Linear solver converged at step: 250, final residual: 1.04334e-07  Nonlinear convergence: ||u - u_old|| = 0.0151695
+Linear solver converged at step: 250, final residual: 4.20802e-10  Nonlinear convergence: ||u - u_old|| = 0.000178465
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 1, time = 0.02 ***
+Linear solver converged at step: 148, final residual: 0.000196443  Nonlinear convergence: ||u - u_old|| = 30.6968
+Linear solver converged at step: 74, final residual: 8.13638e-06  Nonlinear convergence: ||u - u_old|| = 0.194999
+Linear solver converged at step: 250, final residual: 3.57667e-08  Nonlinear convergence: ||u - u_old|| = 0.0088697
+Linear solver converged at step: 250, final residual: 8.44767e-13  Nonlinear convergence: ||u - u_old|| = 5.9269e-05
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 2, time = 0.03 ***
+Linear solver converged at step: 77, final residual: 0.000223335  Nonlinear convergence: ||u - u_old|| = 6.00665
+Linear solver converged at step: 118, final residual: 9.30581e-06  Nonlinear convergence: ||u - u_old|| = 0.268524
+Linear solver converged at step: 250, final residual: 3.29197e-08  Nonlinear convergence: ||u - u_old|| = 0.00316201
+Linear solver converged at step: 250, final residual: 2.45713e-09  Nonlinear convergence: ||u - u_old|| = 5.82116e-05
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 3, time = 0.04 ***
+Linear solver converged at step: 72, final residual: 0.000210495  Nonlinear convergence: ||u - u_old|| = 2.18249
+Linear solver converged at step: 159, final residual: 9.538e-06  Nonlinear convergence: ||u - u_old|| = 0.260483
+Linear solver converged at step: 250, final residual: 2.18784e-07  Nonlinear convergence: ||u - u_old|| = 0.0103119
+Linear solver converged at step: 250, final residual: 3.4177e-09  Nonlinear convergence: ||u - u_old|| = 0.000386804
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 4, time = 0.05 ***
+Linear solver converged at step: 58, final residual: 0.000192962  Nonlinear convergence: ||u - u_old|| = 1.02052
+Linear solver converged at step: 119, final residual: 7.33031e-06  Nonlinear convergence: ||u - u_old|| = 0.103956
+Linear solver converged at step: 225, final residual: 1.16591e-08  Nonlinear convergence: ||u - u_old|| = 0.00534628
+Linear solver converged at step: 250, final residual: 1.41694e-12  Nonlinear convergence: ||u - u_old|| = 3.60742e-06
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 5, time = 0.06 ***
+Linear solver converged at step: 52, final residual: 0.000214167  Nonlinear convergence: ||u - u_old|| = 0.476324
+Linear solver converged at step: 172, final residual: 1.00119e-05  Nonlinear convergence: ||u - u_old|| = 0.202403
+Linear solver converged at step: 158, final residual: 2.16565e-08  Nonlinear convergence: ||u - u_old|| = 0.0173926
+Linear solver converged at step: 250, final residual: 2.6449e-11  Nonlinear convergence: ||u - u_old|| = 2.11892e-05
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 6, time = 0.07 ***
+Linear solver converged at step: 21, final residual: 0.000225026  Nonlinear convergence: ||u - u_old|| = 0.256854
+Linear solver converged at step: 117, final residual: 1.12946e-05  Nonlinear convergence: ||u - u_old|| = 0.147309
+Linear solver converged at step: 250, final residual: 1.54091e-06  Nonlinear convergence: ||u - u_old|| = 0.0128016
+Linear solver converged at step: 250, final residual: 2.11486e-09  Nonlinear convergence: ||u - u_old|| = 0.00239393
+Linear solver converged at step: 250, final residual: 8.06203e-12  Nonlinear convergence: ||u - u_old|| = 2.67758e-06
+ Nonlinear solver converged at step 4
+
+
+*** Solving time step 7, time = 0.08 ***
+Linear solver converged at step: 19, final residual: 0.000192228  Nonlinear convergence: ||u - u_old|| = 0.152223
+Linear solver converged at step: 67, final residual: 7.02725e-06  Nonlinear convergence: ||u - u_old|| = 0.0850415
+Linear solver converged at step: 194, final residual: 1.08592e-08  Nonlinear convergence: ||u - u_old|| = 0.00357155
+Linear solver converged at step: 250, final residual: 6.3798e-12  Nonlinear convergence: ||u - u_old|| = 1.67316e-05
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 8, time = 0.09 ***
+Linear solver converged at step: 15, final residual: 0.000204876  Nonlinear convergence: ||u - u_old|| = 0.086678
+Linear solver converged at step: 97, final residual: 8.76745e-06  Nonlinear convergence: ||u - u_old|| = 0.0454467
+Linear solver converged at step: 137, final residual: 1.72036e-08  Nonlinear convergence: ||u - u_old|| = 0.00314358
+Linear solver converged at step: 250, final residual: 3.37166e-12  Nonlinear convergence: ||u - u_old|| = 1.96889e-05
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 9, time = 0.1 ***
+Linear solver converged at step: 11, final residual: 0.00022001  Nonlinear convergence: ||u - u_old|| = 0.0505868
+Linear solver converged at step: 69, final residual: 1.08054e-05  Nonlinear convergence: ||u - u_old|| = 0.0182682
+Linear solver converged at step: 250, final residual: 3.49658e-08  Nonlinear convergence: ||u - u_old|| = 0.0127024
+Linear solver converged at step: 250, final residual: 2.95441e-10  Nonlinear convergence: ||u - u_old|| = 5.53751e-05
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 10, time = 0.11 ***
+Linear solver converged at step: 11, final residual: 0.000139574  Nonlinear convergence: ||u - u_old|| = 0.0322373
+Linear solver converged at step: 104, final residual: 4.33263e-06  Nonlinear convergence: ||u - u_old|| = 0.0126853
+Linear solver converged at step: 250, final residual: 4.09989e-08  Nonlinear convergence: ||u - u_old|| = 0.00565014
+Linear solver converged at step: 250, final residual: 1.93796e-10  Nonlinear convergence: ||u - u_old|| = 5.64589e-05
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 11, time = 0.12 ***
+Linear solver converged at step: 10, final residual: 0.000145884  Nonlinear convergence: ||u - u_old|| = 0.0205125
+Linear solver converged at step: 48, final residual: 4.75062e-06  Nonlinear convergence: ||u - u_old|| = 0.00781029
+Linear solver converged at step: 250, final residual: 1.24408e-08  Nonlinear convergence: ||u - u_old|| = 0.00689828
+Linear solver converged at step: 250, final residual: 1.17963e-10  Nonlinear convergence: ||u - u_old|| = 2.01527e-05
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 12, time = 0.13 ***
+Linear solver converged at step: 10, final residual: 9.34716e-05  Nonlinear convergence: ||u - u_old|| = 0.0136016
+Linear solver converged at step: 68, final residual: 1.95668e-06  Nonlinear convergence: ||u - u_old|| = 0.00578812
+Linear solver converged at step: 250, final residual: 4.84151e-09  Nonlinear convergence: ||u - u_old|| = 0.00253899
+Linear solver converged at step: 250, final residual: 3.95845e-11  Nonlinear convergence: ||u - u_old|| = 9.45948e-06
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 13, time = 0.14 ***
+Linear solver converged at step: 9, final residual: 0.000149994  Nonlinear convergence: ||u - u_old|| = 0.00910172
+Linear solver converged at step: 19, final residual: 3.88794e-06  Nonlinear convergence: ||u - u_old|| = 0.00478718
+Linear solver converged at step: 250, final residual: 1.09364e-08  Nonlinear convergence: ||u - u_old|| = 0.00216678
+Linear solver converged at step: 250, final residual: 5.72984e-10  Nonlinear convergence: ||u - u_old|| = 1.61723e-05
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 14, time = 0.15 ***
+Linear solver converged at step: 8, final residual: 0.000159547  Nonlinear convergence: ||u - u_old|| = 0.00594451
+Linear solver converged at step: 17, final residual: 5.39693e-06  Nonlinear convergence: ||u - u_old|| = 0.00369967
+Linear solver converged at step: 250, final residual: 4.58011e-08  Nonlinear convergence: ||u - u_old|| = 0.00112625
+Linear solver converged at step: 250, final residual: 7.19345e-10  Nonlinear convergence: ||u - u_old|| = 7.43234e-05
+ Nonlinear solver converged at step 3
+
+-------------------------------------------------------
+| Time:           Wed Jun  6 12:19:06 2007             |
+| OS:             Linux                                |
+| HostName:       orville                              |
+| OS Release:     2.6.21-1.3194.fc7PAE                 |
+| OS Version:     #1 SMP Wed May 23 22:27:31 EDT 2007  |
+| Machine:        i686                                 |
+| Username:       peterson                             |
+-------------------------------------------------------
+ ------------------------------------------------------------------------------
+| Example 13 Performance: Alive time=30.8237, Active time=30.4748              |
+ ------------------------------------------------------------------------------
+| Event                         nCalls    Total       Avg         Percent of   |
+|                                         Time        Time        Active Time  |
+|------------------------------------------------------------------------------|
+|                                                                              |
+| linear solve                  61        30.4748     0.499587    100.00       |
+ ------------------------------------------------------------------------------
+| Totals:                       61        30.4748                 100.00       |
+ ------------------------------------------------------------------------------
+
  
 ***************************************************************
-* Done Running Example  ./ex13
+* Done Running Example  ./ex13-devel
 ***************************************************************
 </pre>
 </div>

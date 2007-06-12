@@ -63,6 +63,14 @@ that require initialization before use.
 <div class ="fragment">
 <pre>
           libMesh::init(argc, argv);
+        
+        #ifndef ENABLE_AMR
+          std::cerr &lt;&lt; "ERROR: This example requires libMesh to be\n"
+                    &lt;&lt; "compiled with AMR support!"
+                    &lt;&lt; std::endl;
+          return 0;
+        #else
+        
           {
 </pre>
 </div>
@@ -74,32 +82,6 @@ Create a new 1 dimensional mesh
 <pre>
             const unsigned int dim = 1;
             Mesh mesh(dim);
-        
-        
-</pre>
-</div>
-<div class = "comment">
-Refinement parameters
-</div>
-
-<div class ="fragment">
-<pre>
-            const unsigned int max_r_steps = 5; // Refine the mesh 5 times
-            const unsigned int max_r_level = 5; // Maximum refinement level
-        
-</pre>
-</div>
-<div class = "comment">
-These parameters determine the proportion of elements that will
-be refined and coarsened. Any element within 30% of the maximum 
-error on any element will be refined, and any element within 30% 
-of the minimum error on any element might be coarsened
-</div>
-
-<div class ="fragment">
-<pre>
-            const Real refine_percentage   = 0.7;
-            const Real coarsen_percentage  = 0.3;
         
 </pre>
 </div>
@@ -161,12 +143,45 @@ refining the mesh.
 </pre>
 </div>
 <div class = "comment">
+These parameters determine the proportion of elements that will
+be refined and coarsened. Any element within 30% of the maximum 
+error on any element will be refined, and any element within 30% 
+of the minimum error on any element might be coarsened
+</div>
+
+<div class ="fragment">
+<pre>
+            mesh_refinement.refine_fraction()  = 0.7;
+            mesh_refinement.coarsen_fraction() = 0.3;
+</pre>
+</div>
+<div class = "comment">
+We won't refine any element more than 5 times in total
+</div>
+
+<div class ="fragment">
+<pre>
+            mesh_refinement.max_h_level()      = 5;
+        
+</pre>
+</div>
+<div class = "comment">
 Initialize the data structures for the equation system.
 </div>
 
 <div class ="fragment">
 <pre>
             equation_systems.init();
+        
+</pre>
+</div>
+<div class = "comment">
+Refinement parameters
+</div>
+
+<div class ="fragment">
+<pre>
+            const unsigned int max_r_steps = 5; // Refine the mesh 5 times
         
 </pre>
 </div>
@@ -229,11 +244,7 @@ Flag elements to be refined and coarsened
 
 <div class ="fragment">
 <pre>
-                mesh_refinement.flag_elements_by_error_fraction
-                  (error,
-                   refine_percentage,
-                   coarsen_percentage,
-                   max_r_level);
+                mesh_refinement.flag_elements_by_error_fraction (error);
         
 </pre>
 </div>
@@ -271,7 +282,7 @@ show the edges of each element in the mesh.
 
 <div class ="fragment">
 <pre>
-            GnuPlotIO plot(mesh,"Example 0",true);
+            GnuPlotIO plot(mesh,"Example 0", GnuPlotIO::GRID_ON);
         
 </pre>
 </div>
@@ -284,6 +295,7 @@ Load gnuplot, then type "call 'gnuplot_script'" from gnuplot prompt
 <pre>
             plot.write_equation_systems("gnuplot_script",equation_systems);
           }  
+        #endif // #ifndef ENABLE_AMR
           
 </pre>
 </div>
@@ -313,6 +325,9 @@ Define the matrix assembly function for the 1D PDE we are solving
 <pre>
         void assemble_1D(EquationSystems& es, const std::string& system_name)
         {
+        
+        #ifdef ENABLE_AMR
+        
 </pre>
 </div>
 <div class = "comment">
@@ -612,43 +627,8 @@ method.
 <pre>
               if(elem-&gt;neighbor(s) == NULL)
               {
-</pre>
-</div>
-<div class = "comment">
-Build a copy of the side of this element which is on the edge
-of the mesh. Again we use an AutoPtr because this function call
-dynamically allocates memory.
-</div>
-
-<div class ="fragment">
-<pre>
-                AutoPtr&lt;DofObject&gt; node(elem-&gt;side(s));
-        
-</pre>
-</div>
-<div class = "comment">
-Loop over the local node numbers in order to find the correct entry
-in Ke and Fe to impose the BC
-</div>
-
-<div class ="fragment">
-<pre>
-                for(unsigned int n=0; n&lt;elem-&gt;n_nodes(); n++)
-                {
-</pre>
-</div>
-<div class = "comment">
-Look for nodes with matching global id's.
-</div>
-
-<div class ="fragment">
-<pre>
-                  if(elem-&gt;node(n) == node-&gt;id())
-                  {
-                    Ke(n,n) += penalty;
-                    Fe(n)   += 0*penalty;
-                  }
-                }
+                Ke(s,s) += penalty;
+                Fe(s)   += 0*penalty;
               }
             }
         
@@ -674,6 +654,7 @@ Add Ke and Fe to the global matrix and right-hand-side.
             system.matrix-&gt;add_matrix(Ke, dof_indices);
             system.rhs-&gt;add_vector(Fe, dof_indices);
           }
+        #endif // #ifdef ENABLE_AMR
         }
 </pre>
 </div>
@@ -682,57 +663,64 @@ Add Ke and Fe to the global matrix and right-hand-side.
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh_generation.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;edge_edge3.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;gnuplot_io.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;linear_implicit_system.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature_gauss.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;sparse_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dof_map.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;numeric_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;error_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;kelly_error_estimator.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh_refinement.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;edge_edge3.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;gnuplot_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;error_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;kelly_error_estimator.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_refinement.h&quot;</FONT></B>
   
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_1D(EquationSystems&amp; es, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_1D(EquationSystems&amp; es, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
-  <FONT COLOR="#228B22"><B>int</FONT></B> main(<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
+  <B><FONT COLOR="#228B22">int</FONT></B> main(<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {   
-    libMesh::init(argc, argv);
+    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init(argc, argv);
+  
+  #ifndef ENABLE_AMR
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example requires libMesh to be\n&quot;</FONT></B>
+              &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;compiled with AMR support!&quot;</FONT></B>
+              &lt;&lt; std::endl;
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  #<B><FONT COLOR="#A020F0">else</FONT></B>
+  
     {
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = 1;
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 1;
       Mesh mesh(dim);
   
-  
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> max_r_steps = 5; <I><FONT COLOR="#B22222">// Refine the mesh 5 times
-</FONT></I>      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> max_r_level = 5; <I><FONT COLOR="#B22222">// Maximum refinement level
-</FONT></I>  
-      <FONT COLOR="#228B22"><B>const</FONT></B> Real refine_percentage   = 0.7;
-      <FONT COLOR="#228B22"><B>const</FONT></B> Real coarsen_percentage  = 0.3;
-  
-      MeshTools::Generation::build_line(mesh,4,0.,1.,EDGE3);
+      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_line(mesh,4,0.,1.,EDGE3);
   
       EquationSystems equation_systems(mesh);
       LinearImplicitSystem&amp; system = equation_systems.add_system
-        &lt;LinearImplicitSystem&gt;(<FONT COLOR="#BC8F8F"><B>&quot;1D&quot;</FONT></B>);
+        &lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;1D&quot;</FONT></B>);
   
-      system.add_variable(<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>,SECOND);
+      system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>,SECOND);
   
       system.attach_assemble_function(assemble_1D);
   
       MeshRefinement mesh_refinement(mesh);
   
+      mesh_refinement.refine_fraction()  = 0.7;
+      mesh_refinement.coarsen_fraction() = 0.3;
+      mesh_refinement.max_h_level()      = 5;
+  
       equation_systems.init();
   
-      <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> r_step=0; r_step&lt;=max_r_steps; r_step++)
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_r_steps = 5; <I><FONT COLOR="#B22222">// Refine the mesh 5 times
+</FONT></I>  
+      <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> r_step=0; r_step&lt;=max_r_steps; r_step++)
       {
-        equation_systems.get_system(<FONT COLOR="#BC8F8F"><B>&quot;1D&quot;</FONT></B>).solve();
+        equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;1D&quot;</FONT></B>).solve();
   
         <B><FONT COLOR="#A020F0">if</FONT></B>(r_step != max_r_steps)
         {
@@ -741,11 +729,7 @@ Add Ke and Fe to the global matrix and right-hand-side.
   
           error_estimator.estimate_error(system, error);
   
-          mesh_refinement.flag_elements_by_error_fraction
-            (error,
-             refine_percentage,
-             coarsen_percentage,
-             max_r_level);
+          mesh_refinement.flag_elements_by_error_fraction (error);
   
           mesh_refinement.refine_and_coarsen_elements();
   
@@ -755,28 +739,32 @@ Add Ke and Fe to the global matrix and right-hand-side.
   
       }
   
-      GnuPlotIO plot(mesh,<FONT COLOR="#BC8F8F"><B>&quot;Example 0&quot;</FONT></B>,true);
+      GnuPlotIO plot(mesh,<B><FONT COLOR="#BC8F8F">&quot;Example 0&quot;</FONT></B>, GnuPlotIO::GRID_ON);
   
-      plot.write_equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;gnuplot_script&quot;</FONT></B>,equation_systems);
+      plot.write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;gnuplot_script&quot;</FONT></B>,equation_systems);
     }  
-    
+  #endif <I><FONT COLOR="#B22222">// #ifndef ENABLE_AMR
+</FONT></I>    
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close();
   }
   
   
   
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_1D(EquationSystems&amp; es, <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_1D(EquationSystems&amp; es, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    assert(system_name == <FONT COLOR="#BC8F8F"><B>&quot;1D&quot;</FONT></B>);
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+  #ifdef ENABLE_AMR
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
+    assert(system_name == <B><FONT COLOR="#BC8F8F">&quot;1D&quot;</FONT></B>);
   
-    LinearImplicitSystem&amp; system = es.get_system&lt;LinearImplicitSystem&gt;(<FONT COLOR="#BC8F8F"><B>&quot;1D&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
+  
+    LinearImplicitSystem&amp; system = es.get_system&lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;1D&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
   
     FEType fe_type = dof_map.variable_type(0);
   
@@ -786,41 +774,41 @@ Add Ke and Fe to the global matrix and right-hand-side.
     fe-&gt;attach_quadrature_rule(&amp;qrule);
   
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
   
     DenseMatrix&lt;Number&gt; Ke;
     DenseVector&lt;Number&gt; Fe;
   
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
   
-    MeshBase::const_element_iterator el     = mesh.active_elements_begin();
-    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator el_end = mesh.active_elements_end();
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator el     = mesh.active_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator el_end = mesh.active_elements_end();
   
     <B><FONT COLOR="#A020F0">for</FONT></B>( ; el != el_end; ++el)
     {
-      <FONT COLOR="#228B22"><B>const</FONT></B> Elem* elem = *el;
+      <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
   
       dof_map.dof_indices(elem, dof_indices);
   
       fe-&gt;reinit(elem);
   
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_dofs = dof_indices.size();
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_dofs = dof_indices.size();
   
       Ke.resize(n_dofs, n_dofs);
       Fe.resize(n_dofs);
   
   
-      <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+      <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
       {
-        <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
+        <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
         {
           Fe(i) += JxW[qp]*phi[i][qp];
   
-          <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;phi.size(); j++)
+          <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
           {
             Ke(i,j) += JxW[qp]*(1.e-3*dphi[i][qp]*dphi[j][qp] + 
                                        phi[i][qp]*phi[j][qp]);
@@ -830,22 +818,14 @@ Add Ke and Fe to the global matrix and right-hand-side.
   
   
   
-      <FONT COLOR="#228B22"><B>double</FONT></B> penalty = 1.e10;
+      <B><FONT COLOR="#228B22">double</FONT></B> penalty = 1.e10;
   
-      <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
+      <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
       {
         <B><FONT COLOR="#A020F0">if</FONT></B>(elem-&gt;neighbor(s) == NULL)
         {
-          AutoPtr&lt;DofObject&gt; node(elem-&gt;side(s));
-  
-          <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n=0; n&lt;elem-&gt;n_nodes(); n++)
-          {
-            <B><FONT COLOR="#A020F0">if</FONT></B>(elem-&gt;node(n) == node-&gt;id())
-            {
-              Ke(n,n) += penalty;
-              Fe(n)   += 0*penalty;
-            }
-          }
+          Ke(s,s) += penalty;
+          Fe(s)   += 0*penalty;
         }
       }
   
@@ -854,60 +834,23 @@ Add Ke and Fe to the global matrix and right-hand-side.
       system.matrix-&gt;add_matrix(Ke, dof_indices);
       system.rhs-&gt;add_vector(Fe, dof_indices);
     }
-  }
+  #endif <I><FONT COLOR="#B22222">// #ifdef ENABLE_AMR
+</FONT></I>  }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex0.C...
-Linking ex0...
-/home/benkirk/phd/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: warning: the use of `mktemp' is dangerous, better use `mkstemp'
+Compiling C++ (in development mode) ex0.C...
+Linking ex0-devel...
+/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o): In function `tecini':
+tecxxx.c:(.text+0x1a7): warning: the use of `mktemp' is dangerous, better use `mkstemp'
 ***************************************************************
-* Running  ./ex0
+* Running Example  ./ex0-devel
 ***************************************************************
  
-
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| 12LinearSolverIdE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 12SparseMatrixIdE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 13NumericVectorIdE reference count information:
-|  Creations:    13
-|  Destructions: 13
-| 4Elem reference count information:
-|  Creations:    80
-|  Destructions: 80
-| 4Node reference count information:
-|  Creations:    503
-|  Destructions: 503
-| 5QBase reference count information:
-|  Creations:    41
-|  Destructions: 41
-| 6DofMap reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 6FEBase reference count information:
-|  Creations:    36
-|  Destructions: 36
-| 6System reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 9DofObject reference count information:
-|  Creations:    829
-|  Destructions: 829
-| N10Parameters5ValueE reference count information:
-|  Creations:    2
-|  Destructions: 2
- ---------------------------------------------------------------------------- 
  
 ***************************************************************
-* Done Running  ./ex0
+* Done Running Example  ./ex0-devel
 ***************************************************************
 </pre>
 </div>

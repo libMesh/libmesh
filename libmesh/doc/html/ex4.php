@@ -12,13 +12,13 @@
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-<h1>Example 4 - Solving a 2D or 3D Poisson Problem in Parallel</h1>
+<h1>Example 4 - Solving a 1D, 2D or 3D Poisson Problem in Parallel</h1>
 
 <br><br>This is the fourth example program.  It builds on
 the third example program by showing how to formulate
 the code in a dimension-independent way.  Very minor
 changes to the example will allow the problem to be
-solved in two or three dimensions.
+solved in one, two or three dimensions.
 
 <br><br>This example will also introduce the PerfLog class
 as a way to monitor your code's performance.  We will
@@ -51,8 +51,10 @@ Basic include file needed for the mesh functionality.
 <pre>
         #include "libmesh.h"
         #include "mesh.h"
+        #include "mesh_generation.h"
         #include "gmv_io.h"
-        #include "implicit_system.h"
+        #include "gnuplot_io.h"
+        #include "linear_implicit_system.h"
         #include "equation_systems.h"
         
 </pre>
@@ -112,6 +114,20 @@ you an idea where bottlenecks lie.
 <pre>
         #include "perf_log.h"
         
+</pre>
+</div>
+<div class = "comment">
+The definition of a geometric element
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "elem.h"
+        
+        #include "string_to_enum.h"
+        #include "getpot.h"
+        
+        
         
 </pre>
 </div>
@@ -138,7 +154,7 @@ Exact solution function prototype.
 <div class ="fragment">
 <pre>
         Real exact_solution (const Real x,
-        		     const Real y,
+        		     const Real y = 0.,
         		     const Real z = 0.);
         
 </pre>
@@ -177,6 +193,16 @@ PerfLog perf_main("Main Program");
 </pre>
 </div>
 <div class = "comment">
+Create a GetPot object to parse the command line
+</div>
+
+<div class ="fragment">
+<pre>
+            GetPot command_line (argc, argv);
+            
+</pre>
+</div>
+<div class = "comment">
 Check for proper calling arguments.
 </div>
 
@@ -184,7 +210,8 @@ Check for proper calling arguments.
 <pre>
             if (argc &lt; 3)
               {
-        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -d 2(3)" &lt;&lt; " -n 15"
+        	std::cerr &lt;&lt; "Usage:\n"
+        		  &lt;&lt;"\t " &lt;&lt; argv[0] &lt;&lt; " -d 2(3)" &lt;&lt; " -n 15"
         		  &lt;&lt; std::endl;
         
 </pre>
@@ -219,32 +246,75 @@ and command line arguments.
         	std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
               }
             
+        
 </pre>
 </div>
 <div class = "comment">
-Get the dimensionality of the mesh from argv[2]
+Read problem dimension from command line.  Use int
+instead of unsigned since the GetPot overload is ambiguous
+otherwise.
 </div>
 
 <div class ="fragment">
 <pre>
-            const unsigned int dim = atoi(argv[2]);     
+            int dim = 2;
+            if ( command_line.search(1, "-d") )
+              dim = command_line.next(dim);
             
 </pre>
 </div>
 <div class = "comment">
-Get the problem size from argv[4]
+Read number of elements from command line
 </div>
 
 <div class ="fragment">
 <pre>
-            const unsigned int ps = atoi(argv[4]);
+            int ps = 15;
+            if ( command_line.search(1, "-n") )
+              ps = command_line.next(ps);
+            
 </pre>
 </div>
 <div class = "comment">
-std::cout << "problem_size=" << ps << std::endl;
-    
+Read FE order from command line
+</div>
 
-<br><br>Create a mesh with user-defined dimension.
+<div class ="fragment">
+<pre>
+            std::string order = "SECOND"; 
+            if ( command_line.search(2, "-Order", "-o") )
+              order = command_line.next(order);
+        
+</pre>
+</div>
+<div class = "comment">
+Read FE Family from command line
+</div>
+
+<div class ="fragment">
+<pre>
+            std::string family = "LAGRANGE"; 
+            if ( command_line.search(2, "-FEFamily", "-f") )
+              family = command_line.next(family);
+            
+</pre>
+</div>
+<div class = "comment">
+Cannot use dicontinuous basis.
+</div>
+
+<div class ="fragment">
+<pre>
+            if ((family == "MONOMIAL") || (family == "XYZ"))
+              {
+        	std::cerr &lt;&lt; "ex4 currently requires a C^0 (or higher) FE basis." &lt;&lt; std::endl;
+        	error();
+              }
+              
+</pre>
+</div>
+<div class = "comment">
+Create a mesh with user-defined dimension.
 </div>
 
 <div class ="fragment">
@@ -255,7 +325,7 @@ std::cout << "problem_size=" << ps << std::endl;
 </pre>
 </div>
 <div class = "comment">
-Use the internal mesh generator to create a uniform
+Use the MeshTools::Generation mesh generator to create a uniform
 grid on the square [-1,1]^D.  We instruct the mesh generator
 to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
 elements in 3D.  Building these higher-order elements allows
@@ -264,12 +334,38 @@ us to use higher-order approximation, as in example 3.
 
 <div class ="fragment">
 <pre>
-            mesh.build_cube (ps, ps, ps,
-        		     -1., 1.,
-        		     -1., 1.,
-        		     -1., 1.,
-        		     (dim == 2) ? QUAD9 : HEX27);
+            if ((family == "LAGRANGE") && (order == "FIRST"))
+              {
+</pre>
+</div>
+<div class = "comment">
+No reason to use high-order geometric elements if we are
+solving with low-order finite elements.
+</div>
+
+<div class ="fragment">
+<pre>
+                MeshTools::Generation::build_cube (mesh,
+        					   ps, ps, ps,
+        					   -1., 1.,
+        					   -1., 1.,
+        					   -1., 1.,
+        					   (dim==1)    ? EDGE2 : 
+        					   ((dim == 2) ? QUAD4 : HEX8));
+              }
+            
+            else
+              {
+        	MeshTools::Generation::build_cube (mesh,
+        					   ps, ps, ps,
+        					   -1., 1.,
+        					   -1., 1.,
+        					   -1., 1.,
+        					   (dim==1)    ? EDGE3 : 
+        					   ((dim == 2) ? QUAD9 : HEX27));
+              }
         
+            
 </pre>
 </div>
 <div class = "comment">
@@ -308,9 +404,10 @@ Creates a system named "Poisson"
 
 <div class ="fragment">
 <pre>
-              equation_systems.add_system&lt;ImplicitSystem&gt; ("Poisson");
-              
+              LinearImplicitSystem& system =
+        	equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Poisson");
         
+              
 </pre>
 </div>
 <div class = "comment">
@@ -320,7 +417,9 @@ will be approximated using second-order approximation.
 
 <div class ="fragment">
 <pre>
-              equation_systems("Poisson").add_variable("u", SECOND);
+              system.add_variable("u",
+        			  Utility::string_to_enum&lt;Order&gt;   (order),
+        			  Utility::string_to_enum&lt;FEFamily&gt;(family));
         
 </pre>
 </div>
@@ -331,7 +430,7 @@ function.
 
 <div class ="fragment">
 <pre>
-              equation_systems("Poisson").attach_assemble_function (assemble_poisson);
+              system.attach_assemble_function (assemble_poisson);
               
 </pre>
 </div>
@@ -362,7 +461,7 @@ Solve the system "Poisson", just like example 2.
 
 <div class ="fragment">
 <pre>
-            equation_systems("Poisson").solve();
+            equation_systems.get_system("Poisson").solve();
         
 </pre>
 </div>
@@ -373,8 +472,16 @@ to a GMV-formatted plot file.
 
 <div class ="fragment">
 <pre>
-            GMVIO (mesh).write_equation_systems ((dim == 3) ? "out_3.gmv" : "out_2.gmv",
-        					 equation_systems);
+            if(dim == 1)
+            {        
+              GnuPlotIO plot(mesh,"Example 4, 1D",GnuPlotIO::GRID_ON);
+              plot.write_equation_systems("out_1",equation_systems);
+            }
+            else
+            {
+              GMVIO (mesh).write_equation_systems ((dim == 3) ? 
+                "out_3.gmv" : "out_2.gmv",equation_systems);
+            }
           }
           
 </pre>
@@ -457,12 +564,12 @@ The dimension that we are running
 </pre>
 </div>
 <div class = "comment">
-Get a reference to the ImplicitSystem we are solving
+Get a reference to the LinearImplicitSystem we are solving
 </div>
 
 <div class ="fragment">
 <pre>
-          ImplicitSystem& system = es.get_system&lt;ImplicitSystem&gt;("Poisson");
+          LinearImplicitSystem& system = es.get_system&lt;LinearImplicitSystem&gt;("Poisson");
           
 </pre>
 </div>
@@ -639,11 +746,7 @@ to the local processor.  This allows each processor to compute
 its components of the global matrix.
 
 <br><br>"PARALLEL CHANGE"
-const_local_elem_iterator           el (mesh.elements_begin());
-const const_local_elem_iterator end_el (mesh.elements_end());
-
-
-<br><br></div>
+</div>
 
 <div class ="fragment">
 <pre>
@@ -819,7 +922,25 @@ we will compute it here, outside of the i-loop
         			    exact_solution(x,y,z+eps) +
         			    -2.*exact_solution(x,y,z))/eps/eps;
         
-        	  const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+                  Real fxy;
+                  if(dim==1)
+                  {
+</pre>
+</div>
+<div class = "comment">
+In 1D, compute the rhs by differentiating the
+exact solution twice.
+</div>
+
+<div class ="fragment">
+<pre>
+                    const Real pi = libMesh::pi;
+                    fxy = (0.25*pi*pi)*sin(.5*pi*x);
+                  }
+                  else
+                  {
+        	    fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+                  } 
         
 </pre>
 </div>
@@ -881,6 +1002,18 @@ side MUST live on a boundary of the domain.
                 for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
         	  if (elem-&gt;neighbor(side) == NULL)
         	    {
+                    
+</pre>
+</div>
+<div class = "comment">
+The penalty value.  \frac{1}{\epsilon}
+in the discussion above.
+</div>
+
+<div class ="fragment">
+<pre>
+                      const Real penalty = 1.e10;
+        
 </pre>
 </div>
 <div class = "comment">
@@ -902,7 +1035,7 @@ points on the face.
 <div class ="fragment">
 <pre>
                       const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
-        	      
+        
 </pre>
 </div>
 <div class = "comment">
@@ -925,17 +1058,17 @@ face.
 <div class ="fragment">
 <pre>
                       fe_face-&gt;reinit(elem, side);
-        	      
+        
 </pre>
 </div>
 <div class = "comment">
-Loop over the face quagrature points for integration.
+Loop over the face quadrature points for integration.
 </div>
 
 <div class ="fragment">
 <pre>
                       for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
-        		{
+                      {
 </pre>
 </div>
 <div class = "comment">
@@ -945,21 +1078,11 @@ face quadrature point.
 
 <div class ="fragment">
 <pre>
-                          const Real xf = qface_point[qp](0);
-        		  const Real yf = qface_point[qp](1);
-        		  const Real zf = qface_point[qp](2);
+                        const Real xf = qface_point[qp](0);
+                        const Real yf = qface_point[qp](1);
+                        const Real zf = qface_point[qp](2);
         
-</pre>
-</div>
-<div class = "comment">
-The penalty value.  \frac{1}{\epsilon}
-in the discussion above.
-</div>
-
-<div class ="fragment">
-<pre>
-                          const Real penalty = 1.e10;
-        		  
+        
 </pre>
 </div>
 <div class = "comment">
@@ -968,8 +1091,8 @@ The boundary value.
 
 <div class ="fragment">
 <pre>
-                          const Real value = exact_solution(xf, yf, zf);
-        		  
+                        const Real value = exact_solution(xf, yf, zf);
+        
 </pre>
 </div>
 <div class = "comment">
@@ -978,10 +1101,10 @@ Matrix contribution of the L2 projection.
 
 <div class ="fragment">
 <pre>
-                          for (unsigned int i=0; i&lt;phi_face.size(); i++)
-        		    for (unsigned int j=0; j&lt;phi_face.size(); j++)
-        		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-        		  
+                        for (unsigned int i=0; i&lt;phi_face.size(); i++)
+                          for (unsigned int j=0; j&lt;phi_face.size(); j++)
+                            Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+        
 </pre>
 </div>
 <div class = "comment">
@@ -991,10 +1114,11 @@ projection.
 
 <div class ="fragment">
 <pre>
-                          for (unsigned int i=0; i&lt;phi_face.size(); i++)
-        		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-        		} 
-        	    } 
+                        for (unsigned int i=0; i&lt;phi_face.size(); i++)
+                          Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+                      } 
+                    }
+                    
         	
 </pre>
 </div>
@@ -1061,42 +1185,53 @@ it will print its log to the screen. Pretty easy, huh?
   #include &lt;algorithm&gt;
   #include &lt;math.h&gt;
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;implicit_system.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;gnuplot_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;quadrature_gauss.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;sparse_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;numeric_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_vector.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;perf_log.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;perf_log.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;string_to_enum.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;getpot.h&quot;</FONT></B>
   
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_poisson(EquationSystems&amp; es,
-                        <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
   
-  Real exact_solution (<FONT COLOR="#228B22"><B>const</FONT></B> Real x,
-  		     <FONT COLOR="#228B22"><B>const</FONT></B> Real y,
-  		     <FONT COLOR="#228B22"><B>const</FONT></B> Real z = 0.);
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_poisson(EquationSystems&amp; es,
+                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
-  <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
+  Real exact_solution (<B><FONT COLOR="#228B22">const</FONT></B> Real x,
+  		     <B><FONT COLOR="#228B22">const</FONT></B> Real y = 0.,
+  		     <B><FONT COLOR="#228B22">const</FONT></B> Real z = 0.);
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    libMesh::init (argc, argv);
+    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
   
     
     {
+      GetPot command_line (argc, argv);
+      
       <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 3)
         {
-  	std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; -d 2(3)&quot;</FONT></B> &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; -n 15&quot;</FONT></B>
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Usage:\n&quot;</FONT></B>
+  		  &lt;&lt;<B><FONT COLOR="#BC8F8F">&quot;\t &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -d 2(3)&quot;</FONT></B> &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -n 15&quot;</FONT></B>
   		  &lt;&lt; std::endl;
   
   	error();
@@ -1104,49 +1239,96 @@ it will print its log to the screen. Pretty easy, huh?
       
       <B><FONT COLOR="#A020F0">else</FONT></B> 
         {
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
   	
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i=1; i&lt;argc; i++)
-  	  std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; argv[i];
+  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
+  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
   	
-  	std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
         }
       
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = atoi(argv[2]);     
+  
+      <B><FONT COLOR="#228B22">int</FONT></B> dim = 2;
+      <B><FONT COLOR="#A020F0">if</FONT></B> ( command_line.search(1, <B><FONT COLOR="#BC8F8F">&quot;-d&quot;</FONT></B>) )
+        dim = command_line.next(dim);
       
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> ps = atoi(argv[4]);
+      <B><FONT COLOR="#228B22">int</FONT></B> ps = 15;
+      <B><FONT COLOR="#A020F0">if</FONT></B> ( command_line.search(1, <B><FONT COLOR="#BC8F8F">&quot;-n&quot;</FONT></B>) )
+        ps = command_line.next(ps);
       
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::string order = <B><FONT COLOR="#BC8F8F">&quot;SECOND&quot;</FONT></B>; 
+      <B><FONT COLOR="#A020F0">if</FONT></B> ( command_line.search(2, <B><FONT COLOR="#BC8F8F">&quot;-Order&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;-o&quot;</FONT></B>) )
+        order = command_line.next(order);
+  
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::string family = <B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>; 
+      <B><FONT COLOR="#A020F0">if</FONT></B> ( command_line.search(2, <B><FONT COLOR="#BC8F8F">&quot;-FEFamily&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;-f&quot;</FONT></B>) )
+        family = command_line.next(family);
+      
+      <B><FONT COLOR="#A020F0">if</FONT></B> ((family == <B><FONT COLOR="#BC8F8F">&quot;MONOMIAL&quot;</FONT></B>) || (family == <B><FONT COLOR="#BC8F8F">&quot;XYZ&quot;</FONT></B>))
+        {
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ex4 currently requires a C^0 (or higher) FE basis.&quot;</FONT></B> &lt;&lt; std::endl;
+  	error();
+        }
+        
       Mesh mesh (dim);
       
   
-      mesh.build_cube (ps, ps, ps,
-  		     -1., 1.,
-  		     -1., 1.,
-  		     -1., 1.,
-  		     (dim == 2) ? QUAD9 : HEX27);
+      <B><FONT COLOR="#A020F0">if</FONT></B> ((family == <B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>) &amp;&amp; (order == <B><FONT COLOR="#BC8F8F">&quot;FIRST&quot;</FONT></B>))
+        {
+  	<B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh,
+  					   ps, ps, ps,
+  					   -1., 1.,
+  					   -1., 1.,
+  					   -1., 1.,
+  					   (dim==1)    ? EDGE2 : 
+  					   ((dim == 2) ? QUAD4 : HEX8));
+        }
+      
+      <B><FONT COLOR="#A020F0">else</FONT></B>
+        {
+  	<B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh,
+  					   ps, ps, ps,
+  					   -1., 1.,
+  					   -1., 1.,
+  					   -1., 1.,
+  					   (dim==1)    ? EDGE3 : 
+  					   ((dim == 2) ? QUAD9 : HEX27));
+        }
   
+      
       mesh.print_info();
       
       
       EquationSystems equation_systems (mesh);
       
       {
-        equation_systems.add_system&lt;ImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>);
+        LinearImplicitSystem&amp; system =
+  	equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
+  
         
+        system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>,
+  			  <B><FONT COLOR="#5F9EA0">Utility</FONT></B>::string_to_enum&lt;Order&gt;   (order),
+  			  <B><FONT COLOR="#5F9EA0">Utility</FONT></B>::string_to_enum&lt;FEFamily&gt;(family));
   
-        equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).add_variable(<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, SECOND);
-  
-        equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).attach_assemble_function (assemble_poisson);
+        system.attach_assemble_function (assemble_poisson);
         
         equation_systems.init();
   
         equation_systems.print_info();
       }
   
-      equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).solve();
+      equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).solve();
   
-      GMVIO (mesh).write_equation_systems ((dim == 3) ? <FONT COLOR="#BC8F8F"><B>&quot;out_3.gmv&quot;</FONT></B> : <FONT COLOR="#BC8F8F"><B>&quot;out_2.gmv&quot;</FONT></B>,
-  					 equation_systems);
+      <B><FONT COLOR="#A020F0">if</FONT></B>(dim == 1)
+      {        
+        GnuPlotIO plot(mesh,<B><FONT COLOR="#BC8F8F">&quot;Example 4, 1D&quot;</FONT></B>,GnuPlotIO::GRID_ON);
+        plot.write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;out_1&quot;</FONT></B>,equation_systems);
+      }
+      <B><FONT COLOR="#A020F0">else</FONT></B>
+      {
+        GMVIO (mesh).write_equation_systems ((dim == 3) ? 
+          <B><FONT COLOR="#BC8F8F">&quot;out_3.gmv&quot;</FONT></B> : <B><FONT COLOR="#BC8F8F">&quot;out_2.gmv&quot;</FONT></B>,equation_systems);
+      }
     }
     
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
@@ -1155,21 +1337,21 @@ it will print its log to the screen. Pretty easy, huh?
   
   
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_poisson(EquationSystems&amp; es,
-                        <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_poisson(EquationSystems&amp; es,
+                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    assert (system_name == <FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>);
+    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
   
   
-    PerfLog perf_log (<FONT COLOR="#BC8F8F"><B>&quot;Matrix Assembly&quot;</FONT></B>);
+    PerfLog perf_log (<B><FONT COLOR="#BC8F8F">&quot;Matrix Assembly&quot;</FONT></B>);
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
   
-    ImplicitSystem&amp; system = es.get_system&lt;ImplicitSystem&gt;(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>);
+    LinearImplicitSystem&amp; system = es.get_system&lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
   
     FEType fe_type = dof_map.variable_type(0);
   
@@ -1185,28 +1367,27 @@ it will print its log to the screen. Pretty easy, huh?
     
     fe_face-&gt;attach_quadrature_rule (&amp;qface);
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Point&gt;&amp; q_point = fe-&gt;get_xyz();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; q_point = fe-&gt;get_xyz();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
   
     DenseMatrix&lt;Number&gt; Ke;
     DenseVector&lt;Number&gt; Fe;
   
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
   
-  
-    MeshBase::const_element_iterator       el     = mesh.local_elements_begin();
-    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.local_elements_end();
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.local_elements_end();
   
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
-        perf_log.start_event(<FONT COLOR="#BC8F8F"><B>&quot;elem init&quot;</FONT></B>);      
+        perf_log.start_event(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
   
-        <FONT COLOR="#228B22"><B>const</FONT></B> Elem* elem = *el;
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
   
         dof_map.dof_indices (elem, dof_indices);
   
@@ -1217,91 +1398,103 @@ it will print its log to the screen. Pretty easy, huh?
   
         Fe.resize (dof_indices.size());
   
-        perf_log.stop_event(<FONT COLOR="#BC8F8F"><B>&quot;elem init&quot;</FONT></B>);      
+        perf_log.stop_event(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
   
-        perf_log.start_event (<FONT COLOR="#BC8F8F"><B>&quot;Ke&quot;</FONT></B>);
+        perf_log.start_event (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
   
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;phi.size(); j++)
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
   	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
   	    
   
-        perf_log.stop_event (<FONT COLOR="#BC8F8F"><B>&quot;Ke&quot;</FONT></B>);
+        perf_log.stop_event (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
   
-        perf_log.start_event (<FONT COLOR="#BC8F8F"><B>&quot;Fe&quot;</FONT></B>);
+        perf_log.start_event (<B><FONT COLOR="#BC8F8F">&quot;Fe&quot;</FONT></B>);
         
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
   	{
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real x = q_point[qp](0);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real y = q_point[qp](1);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real z = q_point[qp](2);
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real eps = 1.e-3;
+  	  <B><FONT COLOR="#228B22">const</FONT></B> Real x = q_point[qp](0);
+  	  <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
+  	  <B><FONT COLOR="#228B22">const</FONT></B> Real z = q_point[qp](2);
+  	  <B><FONT COLOR="#228B22">const</FONT></B> Real eps = 1.e-3;
   
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real uxx = (exact_solution(x-eps,y,z) +
+  	  <B><FONT COLOR="#228B22">const</FONT></B> Real uxx = (exact_solution(x-eps,y,z) +
   			    exact_solution(x+eps,y,z) +
   			    -2.*exact_solution(x,y,z))/eps/eps;
   	      
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real uyy = (exact_solution(x,y-eps,z) +
+  	  <B><FONT COLOR="#228B22">const</FONT></B> Real uyy = (exact_solution(x,y-eps,z) +
   			    exact_solution(x,y+eps,z) +
   			    -2.*exact_solution(x,y,z))/eps/eps;
   	  
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real uzz = (exact_solution(x,y,z-eps) +
+  	  <B><FONT COLOR="#228B22">const</FONT></B> Real uzz = (exact_solution(x,y,z-eps) +
   			    exact_solution(x,y,z+eps) +
   			    -2.*exact_solution(x,y,z))/eps/eps;
   
-  	  <FONT COLOR="#228B22"><B>const</FONT></B> Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+            Real fxy;
+            <B><FONT COLOR="#A020F0">if</FONT></B>(dim==1)
+            {
+              <B><FONT COLOR="#228B22">const</FONT></B> Real pi = libMesh::pi;
+              fxy = (0.25*pi*pi)*sin(.5*pi*x);
+            }
+            <B><FONT COLOR="#A020F0">else</FONT></B>
+            {
+  	    fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+            } 
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
   	    Fe(i) += JxW[qp]*fxy*phi[i][qp];	  
   	}
         
-        perf_log.stop_event (<FONT COLOR="#BC8F8F"><B>&quot;Fe&quot;</FONT></B>);
+        perf_log.stop_event (<B><FONT COLOR="#BC8F8F">&quot;Fe&quot;</FONT></B>);
   
         {
   	
-  	perf_log.start_event (<FONT COLOR="#BC8F8F"><B>&quot;BCs&quot;</FONT></B>);
+  	perf_log.start_event (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
   
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
+  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
   	  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
   	    {
-  	      <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
+              
+  	      <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
   
-  	      <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
-  	      
-  	      <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Point &gt;&amp; qface_point = fe_face-&gt;get_xyz();
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
   
-  	      fe_face-&gt;reinit(elem, side);
-  	      
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
-  		{
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real xf = qface_point[qp](0);
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real yf = qface_point[qp](1);
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real zf = qface_point[qp](2);
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
   
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real penalty = 1.e10;
-  		  
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real value = exact_solution(xf, yf, zf);
-  		  
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-  		    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;phi_face.size(); j++)
-  		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-  		  
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-  		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-  		} 
-  	    } 
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt;&amp; qface_point = fe_face-&gt;get_xyz();
+  
+                fe_face-&gt;reinit(elem, side);
+  
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+                {
+                  <B><FONT COLOR="#228B22">const</FONT></B> Real xf = qface_point[qp](0);
+                  <B><FONT COLOR="#228B22">const</FONT></B> Real yf = qface_point[qp](1);
+                  <B><FONT COLOR="#228B22">const</FONT></B> Real zf = qface_point[qp](2);
+  
+  
+                  <B><FONT COLOR="#228B22">const</FONT></B> Real value = exact_solution(xf, yf, zf);
+  
+                  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi_face.size(); j++)
+                      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+  
+                  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+                    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+                } 
+              }
+              
   	
-  	perf_log.stop_event (<FONT COLOR="#BC8F8F"><B>&quot;BCs&quot;</FONT></B>);
+  	perf_log.stop_event (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
         } 
         
   
-        perf_log.start_event (<FONT COLOR="#BC8F8F"><B>&quot;matrix insertion&quot;</FONT></B>);
+        perf_log.start_event (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
         
         system.matrix-&gt;add_matrix (Ke, dof_indices);
         system.rhs-&gt;add_vector    (Fe, dof_indices);
   
-        perf_log.stop_event (<FONT COLOR="#BC8F8F"><B>&quot;matrix insertion&quot;</FONT></B>);
+        perf_log.stop_event (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
       }
   
   }
@@ -1309,16 +1502,62 @@ it will print its log to the screen. Pretty easy, huh?
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex4.C...
-Linking ex4...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
-
 ***************************************************************
-* Running Example  ./ex4
+* Running Example  ./ex4-devel
 ***************************************************************
  
-Running ./ex4 -d 2 -n 15
+Running ./ex4-devel -d 1 -n 20
+
+ Mesh Information:
+  mesh_dimension()=1
+  spatial_dimension()=3
+  n_nodes()=41
+  n_elem()=20
+   n_local_elem()=20
+   n_active_elem()=20
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Poisson"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="SECOND" 
+    n_dofs()=41
+    n_local_dofs()=41
+    n_constrained_dofs()=0
+    n_vectors()=1
+
+
+-------------------------------------------------------
+| Time:           Wed Jun  6 12:18:07 2007             |
+| OS:             Linux                                |
+| HostName:       orville                              |
+| OS Release:     2.6.21-1.3194.fc7PAE                 |
+| OS Version:     #1 SMP Wed May 23 22:27:31 EDT 2007  |
+| Machine:        i686                                 |
+| Username:       peterson                             |
+-------------------------------------------------------
+ ------------------------------------------------------------------------------
+| Matrix Assembly Performance: Alive time=0.001533, Active time=0.000777       |
+ ------------------------------------------------------------------------------
+| Event                         nCalls    Total       Avg         Percent of   |
+|                                         Time        Time        Active Time  |
+|------------------------------------------------------------------------------|
+|                                                                              |
+| BCs                           20        0.0001      0.000005    13.26        |
+| Fe                            20        0.0002      0.000010    26.25        |
+| Ke                            20        0.0000      0.000002    5.53         |
+| elem init                     20        0.0002      0.000011    28.44        |
+| matrix insertion              20        0.0002      0.000010    26.51        |
+ ------------------------------------------------------------------------------
+| Totals:                       100       0.0008                  100.00       |
+ ------------------------------------------------------------------------------
+
+Running ./ex4-devel -d 2 -n 15
 
  Mesh Information:
   mesh_dimension()=2
@@ -1334,79 +1573,42 @@ Running ./ex4 -d 2 -n 15
  EquationSystems
   n_systems()=1
    System "Poisson"
-    Type "Implicit"
+    Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="2", "3" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="SECOND" 
     n_dofs()=961
     n_local_dofs()=961
     n_constrained_dofs()=0
     n_vectors()=1
-  n_parameters()=2
-   Parameters:
-    "linear solver maximum iterations"=5000
-    "linear solver tolerance"=1e-12
 
 
- ----------------------------------------------------------------------------
-| Time:           Fri Nov 12 12:11:37 2004
-| OS:             Linux
-| HostName:       zaniwoop
-| OS Release      2.4.20-19.9smp
-| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
-| Machine:        i686
-| Username:       peterson
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=0.055975, Active time=0.052056
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-| BCs                           225     0.0102      0.000045    19.66        |
-| Fe                            225     0.0080      0.000035    15.28        |
-| Ke                            225     0.0150      0.000067    28.91        |
-| elem init                     225     0.0165      0.000073    31.67        |
-| matrix insertion              225     0.0023      0.000010    4.48         |
- ----------------------------------------------------------------------------
-| Totals:                       1125    0.0521                  100.00       |
- ----------------------------------------------------------------------------
+-------------------------------------------------------
+| Time:           Wed Jun  6 12:18:07 2007             |
+| OS:             Linux                                |
+| HostName:       orville                              |
+| OS Release:     2.6.21-1.3194.fc7PAE                 |
+| OS Version:     #1 SMP Wed May 23 22:27:31 EDT 2007  |
+| Machine:        i686                                 |
+| Username:       peterson                             |
+-------------------------------------------------------
+ ------------------------------------------------------------------------------
+| Matrix Assembly Performance: Alive time=0.02087, Active time=0.018112        |
+ ------------------------------------------------------------------------------
+| Event                         nCalls    Total       Avg         Percent of   |
+|                                         Time        Time        Active Time  |
+|------------------------------------------------------------------------------|
+|                                                                              |
+| BCs                           225       0.0042      0.000019    23.18        |
+| Fe                            225       0.0046      0.000021    25.52        |
+| Ke                            225       0.0038      0.000017    21.18        |
+| elem init                     225       0.0037      0.000016    20.30        |
+| matrix insertion              225       0.0018      0.000008    9.82         |
+ ------------------------------------------------------------------------------
+| Totals:                       1125      0.0181                  100.00       |
+ ------------------------------------------------------------------------------
 
-
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| 12SparseMatrixISt7complexIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 13NumericVectorISt7complexIdEE reference count information:
-|  Creations:    3
-|  Destructions: 3
-| 21LinearSolverInterfaceISt7complexIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 4Elem reference count information:
-|  Creations:    1185
-|  Destructions: 1185
-| 4Node reference count information:
-|  Creations:    961
-|  Destructions: 961
-| 5QBase reference count information:
-|  Creations:    3
-|  Destructions: 3
-| 6DofMap reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 6FEBase reference count information:
-|  Creations:    2
-|  Destructions: 2
-| 6System reference count information:
-|  Creations:    1
-|  Destructions: 1
- ---------------------------------------------------------------------------- 
-Running ./ex4 -d 3 -n 6
+Running ./ex4-devel -d 3 -n 6
 
  Mesh Information:
   mesh_dimension()=3
@@ -1422,81 +1624,44 @@ Running ./ex4 -d 3 -n 6
  EquationSystems
   n_systems()=1
    System "Poisson"
-    Type "Implicit"
+    Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="2", "3" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="SECOND" 
     n_dofs()=2197
     n_local_dofs()=2197
     n_constrained_dofs()=0
     n_vectors()=1
-  n_parameters()=2
-   Parameters:
-    "linear solver maximum iterations"=5000
-    "linear solver tolerance"=1e-12
 
 
- ----------------------------------------------------------------------------
-| Time:           Fri Nov 12 12:11:42 2004
-| OS:             Linux
-| HostName:       zaniwoop
-| OS Release      2.4.20-19.9smp
-| OS Version:     #1 SMP Tue Jul 15 17:04:18 EDT 2003
-| Machine:        i686
-| Username:       peterson
- ----------------------------------------------------------------------------
- ----------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=0.842618, Active time=0.83894
- ----------------------------------------------------------------------------
-| Event                         nCalls  Total       Avg         Percent of   |
-|                                       Time        Time        Active Time  |
-|----------------------------------------------------------------------------|
-|                                                                            |
-| BCs                           216     0.2950      0.001366    35.16        |
-| Fe                            216     0.0247      0.000115    2.95         |
-| Ke                            216     0.3649      0.001689    43.50        |
-| elem init                     216     0.1383      0.000640    16.49        |
-| matrix insertion              216     0.0159      0.000074    1.90         |
- ----------------------------------------------------------------------------
-| Totals:                       1080    0.8389                  100.00       |
- ----------------------------------------------------------------------------
+-------------------------------------------------------
+| Time:           Wed Jun  6 12:18:07 2007             |
+| OS:             Linux                                |
+| HostName:       orville                              |
+| OS Release:     2.6.21-1.3194.fc7PAE                 |
+| OS Version:     #1 SMP Wed May 23 22:27:31 EDT 2007  |
+| Machine:        i686                                 |
+| Username:       peterson                             |
+-------------------------------------------------------
+ ------------------------------------------------------------------------------
+| Matrix Assembly Performance: Alive time=0.240115, Active time=0.237185       |
+ ------------------------------------------------------------------------------
+| Event                         nCalls    Total       Avg         Percent of   |
+|                                         Time        Time        Active Time  |
+|------------------------------------------------------------------------------|
+|                                                                              |
+| BCs                           216       0.1129      0.000523    47.59        |
+| Fe                            216       0.0128      0.000059    5.41         |
+| Ke                            216       0.0812      0.000376    34.22        |
+| elem init                     216       0.0169      0.000078    7.12         |
+| matrix insertion              216       0.0134      0.000062    5.66         |
+ ------------------------------------------------------------------------------
+| Totals:                       1080      0.2372                  100.00       |
+ ------------------------------------------------------------------------------
 
-
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| 12SparseMatrixISt7complexIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 13NumericVectorISt7complexIdEE reference count information:
-|  Creations:    3
-|  Destructions: 3
-| 21LinearSolverInterfaceISt7complexIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 4Elem reference count information:
-|  Creations:    1728
-|  Destructions: 1728
-| 4Node reference count information:
-|  Creations:    2197
-|  Destructions: 2197
-| 5QBase reference count information:
-|  Creations:    4
-|  Destructions: 4
-| 6DofMap reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 6FEBase reference count information:
-|  Creations:    2
-|  Destructions: 2
-| 6System reference count information:
-|  Creations:    1
-|  Destructions: 1
- ---------------------------------------------------------------------------- 
  
 ***************************************************************
-* Done Running Example  ./ex4
+* Done Running Example  ./ex4-devel
 ***************************************************************
 </pre>
 </div>

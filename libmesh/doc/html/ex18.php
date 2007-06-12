@@ -15,39 +15,29 @@
 <h1>Example 18 - Unsteady Navier-Stokes Equations with DiffSystem</h1>
 
 <br><br>This example shows how the transient nonlinear problem from
-example 13 can be solved using the DiffSystem class framework to
-simplify the user-implemented equations.
+example 13 can be solved using the new (and experimental)
+DiffSystem class framework
 
 
-<br><br>C++ include files that we need
-</div>
-
-<div class ="fragment">
-<pre>
-        #include &lt;iostream&gt;
-        #include &lt;algorithm&gt;
-        #include &lt;math.h&gt;
-        
-</pre>
-</div>
-<div class = "comment">
-Basic include files
+<br><br>Basic include files
 </div>
 
 <div class ="fragment">
 <pre>
         #include "equation_systems.h"
-        #include "fe_base.h"
+        #include "error_vector.h"
+        #include "getpot.h"
         #include "gmv_io.h"
-        #include "libmesh.h"
+        #include "kelly_error_estimator.h"
         #include "mesh.h"
         #include "mesh_generation.h"
-        #include "quadrature.h"
+        #include "mesh_refinement.h"
+        #include "uniform_refinement_estimator.h"
         
 </pre>
 </div>
 <div class = "comment">
-Some (older) compilers do not offer full stream 
+Some (older) compilers do not offer full stream
 functionality, OStringStream works around this.
 </div>
 
@@ -58,119 +48,15 @@ functionality, OStringStream works around this.
 </pre>
 </div>
 <div class = "comment">
-DiffSystem framework files
+The systems and solvers we may use
 </div>
 
 <div class ="fragment">
 <pre>
+        #include "naviersystem.h"
         #include "diff_solver.h"
-        #include "fem_system.h"
         #include "euler_solver.h"
-        
-</pre>
-</div>
-<div class = "comment">
-The Navier-Stokes system class.
-FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
-but we must specify element residuals
-
-
-<br><br>The interval between our timesteps
-</div>
-
-<div class ="fragment">
-<pre>
-        const Real deltat = 0.005;
-        
-</pre>
-</div>
-<div class = "comment">
-And the number of timesteps to take
-</div>
-
-<div class ="fragment">
-<pre>
-        const unsigned int n_timesteps = 15;
-        
-        class NavierSystem : public FEMSystem
-        {
-        public:
-</pre>
-</div>
-<div class = "comment">
-Constructor
-</div>
-
-<div class ="fragment">
-<pre>
-          NavierSystem(EquationSystems& es,
-                       const std::string& name,
-                       const unsigned int number)
-          : FEMSystem(es, name, number), Reynolds(1.) {}
-        
-</pre>
-</div>
-<div class = "comment">
-System initialization
-</div>
-
-<div class ="fragment">
-<pre>
-          virtual void init_data ();
-        
-</pre>
-</div>
-<div class = "comment">
-Element residual and jacobian calculations
-Time dependent parts
-</div>
-
-<div class ="fragment">
-<pre>
-          virtual bool element_time_derivative (bool request_jacobian);
-        
-</pre>
-</div>
-<div class = "comment">
-Constraint parts
-</div>
-
-<div class ="fragment">
-<pre>
-          virtual bool element_constraint (bool request_jacobian);
-          virtual bool side_constraint (bool request_jacobian);
-        
-</pre>
-</div>
-<div class = "comment">
-Finite elements for the velocity and pressure on element interiors
-</div>
-
-<div class ="fragment">
-<pre>
-          FEBase *fe_velocity, *fe_pressure;
-        
-</pre>
-</div>
-<div class = "comment">
-Finite element for the velocity on element sides
-</div>
-
-<div class ="fragment">
-<pre>
-          FEBase *fe_side_vel;
-        
-</pre>
-</div>
-<div class = "comment">
-The Reynolds number to solve for
-</div>
-
-<div class ="fragment">
-<pre>
-          Real Reynolds;
-        };
-        
+        #include "steady_solver.h"
         
 </pre>
 </div>
@@ -191,17 +77,71 @@ Initialize libMesh.
 <div class ="fragment">
 <pre>
           libMesh::init (argc, argv);
+        
+        #ifndef ENABLE_AMR
+          std::cerr &lt;&lt; "ERROR: This example requires libMesh to be\n"
+                    &lt;&lt; "compiled with AMR support!"
+                    &lt;&lt; std::endl;
+          return 0;
+        #else
+        
           {    
 </pre>
 </div>
 <div class = "comment">
-Create a two-dimensional mesh.
+Parse the input file
 </div>
 
 <div class ="fragment">
 <pre>
-            Mesh mesh (2);
+            GetPot infile("ex18.in");
+        
+</pre>
+</div>
+<div class = "comment">
+Read in parameters from the input file
+</div>
+
+<div class ="fragment">
+<pre>
+            const Real global_tolerance          = infile("global_tolerance", 0.);
+            const unsigned int nelem_target      = infile("n_elements", 400);
+            const bool transient                 = infile("transient", true);
+            const Real deltat                    = infile("deltat", 0.005);
+            unsigned int n_timesteps             = infile("n_timesteps", 20);
+            const unsigned int write_interval    = infile("write_interval", 5);
+            const unsigned int coarsegridsize    = infile("coarsegridsize", 1);
+            const unsigned int coarserefinements = infile("coarserefinements", 0);
+            const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
+            const unsigned int dim               = infile("dimension", 2);
+        
+            assert (dim == 2 || dim == 3);
+</pre>
+</div>
+<div class = "comment">
+Create a n-dimensional mesh.
+</div>
+
+<div class ="fragment">
+<pre>
+            Mesh mesh (dim);
             
+</pre>
+</div>
+<div class = "comment">
+And an object to refine it
+</div>
+
+<div class ="fragment">
+<pre>
+            MeshRefinement mesh_refinement(mesh);
+            mesh_refinement.coarsen_by_parents() = true;
+            mesh_refinement.absolute_global_tolerance() = global_tolerance;
+            mesh_refinement.nelem_target() = nelem_target;
+            mesh_refinement.refine_fraction() = 0.3;
+            mesh_refinement.coarsen_fraction() = 0.3;
+            mesh_refinement.coarsen_threshold() = 0.1;
+        
 </pre>
 </div>
 <div class = "comment">
@@ -214,12 +154,25 @@ us to use higher-order approximation, as in example 3.
 
 <div class ="fragment">
 <pre>
-            MeshTools::Generation::build_square (mesh,
-                                                 20, 20,
+            if (dim == 2)
+              MeshTools::Generation::build_square (mesh,
+                                                   coarsegridsize,
+                                                   coarsegridsize,
+                                                   0., 1.,
+                                                   0., 1.,
+                                                   QUAD9);
+            else if (dim == 3)
+              MeshTools::Generation::build_cube (mesh,
+                                                 coarsegridsize,
+                                                 coarsegridsize,
+                                                 coarsegridsize,
                                                  0., 1.,
                                                  0., 1.,
-                                                 QUAD9);
-            
+                                                 0., 1.,
+                                                 HEX27);
+        
+            mesh_refinement.uniformly_refine(coarserefinements);
+        
 </pre>
 </div>
 <div class = "comment">
@@ -229,7 +182,7 @@ Print information about the mesh to the screen.
 <div class ="fragment">
 <pre>
             mesh.print_info();
-            
+        
 </pre>
 </div>
 <div class = "comment">
@@ -239,7 +192,7 @@ Create an equation systems object.
 <div class ="fragment">
 <pre>
             EquationSystems equation_systems (mesh);
-            
+        
 </pre>
 </div>
 <div class = "comment">
@@ -248,19 +201,26 @@ Declare the system "Navier-Stokes" and its variables.
 
 <div class ="fragment">
 <pre>
-            NavierSystem & stokes_system = 
+            NavierSystem & system = 
               equation_systems.add_system&lt;NavierSystem&gt; ("Navier-Stokes");
         
 </pre>
 </div>
 <div class = "comment">
-Solve this as a time-dependent system
+Solve this as a time-dependent or steady system
 </div>
 
 <div class ="fragment">
 <pre>
-            stokes_system.time_solver =
-               AutoPtr&lt;TimeSolver&gt;(new EulerSolver(stokes_system));
+            if (transient)
+              system.time_solver =
+                AutoPtr&lt;TimeSolver&gt;(new EulerSolver(system));
+            else
+              {
+                system.time_solver =
+                  AutoPtr&lt;TimeSolver&gt;(new SteadySolver(system));
+                assert(n_timesteps == 1);
+              }
         
 </pre>
 </div>
@@ -280,7 +240,7 @@ Set the time stepping options
 
 <div class ="fragment">
 <pre>
-            stokes_system.deltat = deltat;
+            system.deltat = deltat;
         
 </pre>
 </div>
@@ -290,9 +250,14 @@ And the nonlinear solver options
 
 <div class ="fragment">
 <pre>
-            DiffSolver &solver = *stokes_system.time_solver-&gt;diff_solver;
-            solver.max_nonlinear_iterations = 15;
-            solver.relative_step_tolerance = 0.02;
+            DiffSolver &solver = *(system.time_solver-&gt;diff_solver().get());
+            solver.quiet = infile("solver_quiet", true);
+            solver.max_nonlinear_iterations =
+              infile("max_nonlinear_iterations", 15);
+            solver.relative_step_tolerance =
+              infile("relative_step_tolerance", 1.e-3);
+            solver.relative_residual_tolerance =
+              infile("relative_residual_tolerance", 0.0);
         
 </pre>
 </div>
@@ -302,8 +267,10 @@ And the linear solver options
 
 <div class ="fragment">
 <pre>
-            solver.max_linear_iterations = 250;
-            solver.initial_linear_tolerance = std::sqrt(TOLERANCE);
+            solver.max_linear_iterations =
+              infile("max_linear_iterations", 50000);
+            solver.initial_linear_tolerance =
+              infile("initial_linear_tolerance", 1.e-3);
         
 </pre>
 </div>
@@ -335,22 +302,204 @@ A pretty update message
 <div class ="fragment">
 <pre>
                 std::cout &lt;&lt; " Solving time step " &lt;&lt; t_step &lt;&lt; ", time = "
-                          &lt;&lt; stokes_system.time &lt;&lt; std::endl;
-        
-                stokes_system.solve();
-        
-                stokes_system.time_solver-&gt;advance_timestep();
+                          &lt;&lt; system.time &lt;&lt; std::endl;
         
 </pre>
 </div>
 <div class = "comment">
-Write out every nth timestep to file.
+Adaptively solve the timestep
 </div>
 
 <div class ="fragment">
 <pre>
-                const unsigned int write_interval = 1;
+                unsigned int a_step = 0;
+                for (; a_step != max_adaptivesteps; ++a_step)
+                  {
+                    system.solve();
         
+                    ErrorVector error;
+        
+                    AutoPtr&lt;ErrorEstimator&gt; error_estimator;
+        
+</pre>
+</div>
+<div class = "comment">
+To solve to a tolerance in this problem we
+need a better estimator than Kelly
+</div>
+
+<div class ="fragment">
+<pre>
+                    if (global_tolerance != 0.)
+                      {
+</pre>
+</div>
+<div class = "comment">
+We can't adapt to both a tolerance and a mesh
+size at once
+</div>
+
+<div class ="fragment">
+<pre>
+                        assert (nelem_target == 0);
+        
+                        UniformRefinementEstimator *u =
+                          new UniformRefinementEstimator;
+        
+</pre>
+</div>
+<div class = "comment">
+The lid-driven cavity problem isn't in H1, so
+lets estimate H0 (i.e. L2) error
+</div>
+
+<div class ="fragment">
+<pre>
+                        u-&gt;sobolev_order() = 0;
+        
+                        error_estimator.reset(u);
+                      }
+                    else
+                      {
+</pre>
+</div>
+<div class = "comment">
+If we aren't adapting to a tolerance we need a
+target mesh size
+</div>
+
+<div class ="fragment">
+<pre>
+                        assert (nelem_target &gt; 0);
+        
+</pre>
+</div>
+<div class = "comment">
+Kelly is a lousy estimator to use for a problem
+not in H1 - if we were doing more than a few
+timesteps we'd need to turn off or limit the
+maximum level of our adaptivity eventually
+</div>
+
+<div class ="fragment">
+<pre>
+                        error_estimator.reset(new KellyErrorEstimator);
+                      }
+        
+</pre>
+</div>
+<div class = "comment">
+Calculate error based on u and v but not p
+</div>
+
+<div class ="fragment">
+<pre>
+                    error_estimator-&gt;component_scale.push_back(1.0); // u
+                    error_estimator-&gt;component_scale.push_back(1.0); // v
+                    if (dim == 3)
+                      error_estimator-&gt;component_scale.push_back(1.0); // w
+                    error_estimator-&gt;component_scale.push_back(0.0); // p
+        
+                    error_estimator-&gt;estimate_error(system, error);
+        
+</pre>
+</div>
+<div class = "comment">
+Print out status at each adaptive step.
+</div>
+
+<div class ="fragment">
+<pre>
+                    Real global_error = error.l2_norm();
+                    std::cout &lt;&lt; "adaptive step " &lt;&lt; a_step &lt;&lt; ": ";
+                    if (global_tolerance != 0.)
+                      std::cout &lt;&lt; "global_error = " &lt;&lt; global_error
+                                &lt;&lt; " with ";
+                    std::cout &lt;&lt; mesh.n_active_elem()
+                              &lt;&lt; " active elements and "
+                              &lt;&lt; equation_systems.n_active_dofs()
+                              &lt;&lt; " active dofs." &lt;&lt; std::endl;
+                    if (global_tolerance != 0.)
+                      std::cout &lt;&lt; "worst element error = " &lt;&lt; error.maximum()
+                                &lt;&lt; ", mean = " &lt;&lt; error.mean() &lt;&lt; std::endl;
+        
+                    if (global_tolerance != 0.)
+                      {
+</pre>
+</div>
+<div class = "comment">
+If we've reached our desired tolerance, we
+don't need any more adaptive steps
+</div>
+
+<div class ="fragment">
+<pre>
+                        if (global_error &lt; global_tolerance)
+                          break;
+                        mesh_refinement.flag_elements_by_error_tolerance(error);
+                      }
+                    else
+                      {
+</pre>
+</div>
+<div class = "comment">
+If flag_elements_by_nelem_target returns true, this
+should be our last adaptive step.
+</div>
+
+<div class ="fragment">
+<pre>
+                        if (mesh_refinement.flag_elements_by_nelem_target(error))
+                          {
+                            mesh_refinement.refine_and_coarsen_elements();
+                            equation_systems.reinit();
+                            a_step = max_adaptivesteps;
+                            break;
+                          }
+                      }
+        
+</pre>
+</div>
+<div class = "comment">
+Carry out the adaptive mesh refinement/coarsening
+</div>
+
+<div class ="fragment">
+<pre>
+                    mesh_refinement.refine_and_coarsen_elements();
+                    equation_systems.reinit();
+                  }
+</pre>
+</div>
+<div class = "comment">
+Do one last solve if necessary
+</div>
+
+<div class ="fragment">
+<pre>
+                if (a_step == max_adaptivesteps)
+                  {
+                    system.solve();
+                  }
+        
+</pre>
+</div>
+<div class = "comment">
+Advance to the next timestep in a transient problem
+</div>
+
+<div class ="fragment">
+<pre>
+                system.time_solver-&gt;advance_timestep();
+        
+</pre>
+</div>
+<div class = "comment">
+Write out this timestep if we're requested to
+</div>
+
+<div class ="fragment">
+<pre>
                 if ((t_step+1)%write_interval == 0)
                   {
                     OStringStream file_name;
@@ -371,6 +520,7 @@ We write the file name in the gmv auto-read format.
                   }
               }
           }
+        #endif // #ifndef ENABLE_AMR
           
 </pre>
 </div>
@@ -382,547 +532,6 @@ All done.
 <pre>
           return libMesh::close ();
         }
-        
-        
-        
-        void NavierSystem::init_data ()
-        {
-</pre>
-</div>
-<div class = "comment">
-Add the velocity components "u" & "v".  They
-will be approximated using second-order approximation.
-</div>
-
-<div class ="fragment">
-<pre>
-          this-&gt;add_variable ("u", SECOND);
-          this-&gt;add_variable ("v", SECOND);
-        
-</pre>
-</div>
-<div class = "comment">
-Add the pressure variable "p". This will
-be approximated with a first-order basis,
-providing an LBB-stable pressure-velocity pair.
-</div>
-
-<div class ="fragment">
-<pre>
-          this-&gt;add_variable ("p", FIRST);
-        
-</pre>
-</div>
-<div class = "comment">
-Do the parent's initialization after variables are defined
-</div>
-
-<div class ="fragment">
-<pre>
-          FEMSystem::init_data();
-        
-</pre>
-</div>
-<div class = "comment">
-Tell the system to march u and v forward in time, but 
-leave p as a constraint only
-</div>
-
-<div class ="fragment">
-<pre>
-          this-&gt;time_evolving(0);
-          this-&gt;time_evolving(1);
-        
-</pre>
-</div>
-<div class = "comment">
-Get references to the finite elements we need
-</div>
-
-<div class ="fragment">
-<pre>
-          fe_velocity = element_fe[this-&gt;variable_type(0)];
-          fe_pressure = element_fe[this-&gt;variable_type(2)];
-          fe_side_vel = side_fe[this-&gt;variable_type(0)];
-        
-</pre>
-</div>
-<div class = "comment">
-Now make sure we have requested all the data
-we need to build the linear system.
-</div>
-
-<div class ="fragment">
-<pre>
-          fe_velocity-&gt;get_JxW();
-          fe_velocity-&gt;get_phi();
-          fe_velocity-&gt;get_dphi();
-        
-          fe_pressure-&gt;get_phi();
-        
-          fe_side_vel-&gt;get_JxW();
-          fe_side_vel-&gt;get_phi();
-          fe_side_vel-&gt;get_xyz();
-        }
-        
-        
-        bool NavierSystem::element_time_derivative (bool request_jacobian)
-        {
-</pre>
-</div>
-<div class = "comment">
-First we get some references to cell-specific data that
-will be used to assemble the linear system.
-
-
-<br><br>Element Jacobian * quadrature weights for interior integration
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;Real&gt; &JxW = fe_velocity-&gt;get_JxW();
-        
-</pre>
-</div>
-<div class = "comment">
-The velocity shape functions at interior quadrature points.
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt; &phi = fe_velocity-&gt;get_phi();
-        
-</pre>
-</div>
-<div class = "comment">
-The velocity shape function gradients at interior
-quadrature points.
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt; &dphi =
-            fe_velocity-&gt;get_dphi();
-        
-</pre>
-</div>
-<div class = "comment">
-The pressure shape functions at interior
-quadrature points.
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt; &psi = fe_pressure-&gt;get_phi();
-        
-</pre>
-</div>
-<div class = "comment">
-The number of local degrees of freedom in each variable
-</div>
-
-<div class ="fragment">
-<pre>
-          const unsigned int n_u_dofs = dof_indices_var[0].size(); 
-          assert (n_u_dofs == dof_indices_var[1].size()); 
-          const unsigned int n_p_dofs = dof_indices_var[2].size();
-        
-</pre>
-</div>
-<div class = "comment">
-The subvectors and submatrices we need to fill:
-</div>
-
-<div class ="fragment">
-<pre>
-          DenseSubMatrix&lt;Number&gt; &Kuu = *elem_subjacobians[0][0];
-          DenseSubMatrix&lt;Number&gt; &Kvv = *elem_subjacobians[1][1];
-          DenseSubMatrix&lt;Number&gt; &Kuv = *elem_subjacobians[0][1];
-          DenseSubMatrix&lt;Number&gt; &Kvu = *elem_subjacobians[1][0];
-          DenseSubMatrix&lt;Number&gt; &Kup = *elem_subjacobians[0][2];
-          DenseSubMatrix&lt;Number&gt; &Kvp = *elem_subjacobians[1][2];
-          DenseSubVector&lt;Number&gt; &Fu = *elem_subresiduals[0];
-          DenseSubVector&lt;Number&gt; &Fv = *elem_subresiduals[1];
-              
-</pre>
-</div>
-<div class = "comment">
-Now we will build the element Jacobian and residual.
-Constructing the residual requires the solution and its
-gradient from the previous timestep.  This must be
-calculated at each quadrature point by summing the
-solution degree-of-freedom values by the appropriate
-weight functions.
-</div>
-
-<div class ="fragment">
-<pre>
-          unsigned int n_qpoints = element_qrule-&gt;n_points();
-        
-          for (unsigned int qp=0; qp != n_qpoints; qp++)
-            {
-</pre>
-</div>
-<div class = "comment">
-Compute the solution & its gradient at the old Newton iterate
-</div>
-
-<div class ="fragment">
-<pre>
-              Number u = interior_value(0, qp),
-                     v = interior_value(1, qp),
-                     p = interior_value(2, qp);
-              Gradient grad_u = interior_gradient(0, qp),
-                       grad_v = interior_gradient(1, qp);
-        
-</pre>
-</div>
-<div class = "comment">
-Definitions for convenience.  It is sometimes simpler to do a
-dot product if you have the full vector at your disposal.
-</div>
-
-<div class ="fragment">
-<pre>
-              const NumberVectorValue U     (u,     v);
-              const Number  u_x = grad_u(0);
-              const Number  u_y = grad_u(1);
-              const Number  v_x = grad_v(0);
-              const Number  v_y = grad_v(1);
-                  
-</pre>
-</div>
-<div class = "comment">
-First, an i-loop over the velocity degrees of freedom.
-We know that n_u_dofs == n_v_dofs so we can compute contributions
-for both at the same time.
-</div>
-
-<div class ="fragment">
-<pre>
-              for (unsigned int i=0; i != n_u_dofs; i++)
-                {
-                  Fu(i) += JxW[qp] *
-                           (-Reynolds*(U*grad_u)*phi[i][qp] + // convection term
-                            p*dphi[i][qp](0) -                // pressure term
-                            (grad_u*dphi[i][qp]));            // diffusion term
-                    
-                  Fv(i) += JxW[qp] *
-                           (-Reynolds*(U*grad_v)*phi[i][qp] + // convection term
-                            p*dphi[i][qp](1) -                // pressure term
-                            (grad_v*dphi[i][qp]));            // diffusion term
-        
-</pre>
-</div>
-<div class = "comment">
-Note that the Fp block is identically zero unless we are using
-some kind of artificial compressibility scheme...
-
-
-<br><br>Matrix contributions for the uu and vv couplings.
-</div>
-
-<div class ="fragment">
-<pre>
-                  if (request_jacobian)
-                    for (unsigned int j=0; j != n_u_dofs; j++)
-                      {
-                        Kuu(i,j) += JxW[qp] *
-         /* convection term */      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
-         /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
-         /* Newton term     */       Reynolds*u_x*phi[i][qp]*phi[j][qp]);
-        
-                        Kuv(i,j) += JxW[qp] *
-         /* Newton term     */      -Reynolds*u_y*phi[i][qp]*phi[j][qp];
-        
-                        Kvv(i,j) += JxW[qp] *
-         /* convection term */      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
-         /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
-         /* Newton term     */       Reynolds*v_y*phi[i][qp]*phi[j][qp]);
-        
-                        Kvu(i,j) += JxW[qp] * 
-         /* Newton term     */      -Reynolds*v_x*phi[i][qp]*phi[j][qp];
-                    }
-        
-</pre>
-</div>
-<div class = "comment">
-Matrix contributions for the up and vp couplings.
-</div>
-
-<div class ="fragment">
-<pre>
-                  if (request_jacobian)
-                    for (unsigned int j=0; j != n_p_dofs; j++)
-                      {
-                        Kup(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](0);
-                        Kvp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](1);
-                      }
-                }
-            } // end of the quadrature point qp-loop
-          
-          return request_jacobian;
-        }
-        
-        
-        
-        bool NavierSystem::element_constraint (bool request_jacobian)
-        {
-</pre>
-</div>
-<div class = "comment">
-Here we define some references to cell-specific data that
-will be used to assemble the linear system.
-
-
-<br><br>Element Jacobian * quadrature weight for interior integration
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;Real&gt; &JxW = fe_velocity-&gt;get_JxW();
-        
-</pre>
-</div>
-<div class = "comment">
-The velocity shape function gradients at interior
-quadrature points.
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt; &dphi =
-            fe_velocity-&gt;get_dphi();
-        
-</pre>
-</div>
-<div class = "comment">
-The pressure shape functions at interior
-quadrature points.
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt; &psi = fe_pressure-&gt;get_phi();
-        
-</pre>
-</div>
-<div class = "comment">
-The number of local degrees of freedom in each variable
-</div>
-
-<div class ="fragment">
-<pre>
-          const unsigned int n_u_dofs = dof_indices_var[0].size();
-          const unsigned int n_p_dofs = dof_indices_var[2].size();
-        
-</pre>
-</div>
-<div class = "comment">
-The subvectors and submatrices we need to fill:
-</div>
-
-<div class ="fragment">
-<pre>
-          DenseSubMatrix&lt;Number&gt; &Kpu = *elem_subjacobians[2][0];
-          DenseSubMatrix&lt;Number&gt; &Kpv = *elem_subjacobians[2][1];
-          DenseSubVector&lt;Number&gt; &Fp = *elem_subresiduals[2];
-        
-</pre>
-</div>
-<div class = "comment">
-Add the constraint given by the continuity equation
-</div>
-
-<div class ="fragment">
-<pre>
-          unsigned int n_qpoints = element_qrule-&gt;n_points();
-          for (unsigned int qp=0; qp != n_qpoints; qp++)
-            {
-</pre>
-</div>
-<div class = "comment">
-Compute the velocity gradient at the old Newton iterate
-</div>
-
-<div class ="fragment">
-<pre>
-              Gradient grad_u = interior_gradient(0, qp),
-                       grad_v = interior_gradient(1, qp);
-        
-</pre>
-</div>
-<div class = "comment">
-Now a loop over the pressure degrees of freedom.  This
-computes the contributions of the continuity equation.
-</div>
-
-<div class ="fragment">
-<pre>
-              for (unsigned int i=0; i != n_p_dofs; i++)
-                {
-                  Fp(i) += JxW[qp] * psi[i][qp] *
-                           (grad_u(0) + grad_v(1));
-        
-                  if (request_jacobian)
-                    for (unsigned int j=0; j != n_u_dofs; j++)
-                      {
-                        Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
-                        Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
-                      }
-                }
-            } // end of the quadrature point qp-loop
-        
-          return request_jacobian;
-        }
-        
-              
-        
-        bool NavierSystem::side_constraint (bool request_jacobian)
-        {
-</pre>
-</div>
-<div class = "comment">
-Here we define some references to cell-specific data that
-will be used to assemble the linear system.
-
-
-<br><br>Element Jacobian * quadrature weight for side integration
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;Real&gt; &JxW_side = fe_side_vel-&gt;get_JxW();
-        
-</pre>
-</div>
-<div class = "comment">
-The velocity shape functions at side quadrature points.
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt; &phi_side =
-            fe_side_vel-&gt;get_phi();
-        
-</pre>
-</div>
-<div class = "comment">
-The XYZ locations (in physical space) of the
-quadrature points on the side.  This is where
-we will interpolate the boundary value function.
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;Point &gt; &qside_point = fe_side_vel-&gt;get_xyz();
-        
-</pre>
-</div>
-<div class = "comment">
-The number of local degrees of freedom in u and v
-</div>
-
-<div class ="fragment">
-<pre>
-          const unsigned int n_u_dofs = dof_indices_var[0].size(); 
-        
-</pre>
-</div>
-<div class = "comment">
-The subvectors and submatrices we need to fill:
-</div>
-
-<div class ="fragment">
-<pre>
-          DenseSubMatrix&lt;Number&gt; &Kuu = *elem_subjacobians[0][0];
-          DenseSubMatrix&lt;Number&gt; &Kvv = *elem_subjacobians[1][1];
-        
-          DenseSubVector&lt;Number&gt; &Fu = *elem_subresiduals[0];
-          DenseSubVector&lt;Number&gt; &Fv = *elem_subresiduals[1];
-        
-</pre>
-</div>
-<div class = "comment">
-At this point the interior element integration has
-been completed.  However, we have not yet addressed
-boundary conditions.  For this example we will only
-consider simple Dirichlet boundary conditions imposed
-at each timestep via the penalty method.
-
-
-<br><br>The penalty value.  \f$ \frac{1}{\epsilon} \f$
-</div>
-
-<div class ="fragment">
-<pre>
-          const Real penalty = 1.e10;
-        
-          unsigned int n_sidepoints = side_qrule-&gt;n_points();
-          for (unsigned int qp=0; qp != n_sidepoints; qp++)
-            {
-</pre>
-</div>
-<div class = "comment">
-Compute the solution at the old Newton iterate
-</div>
-
-<div class ="fragment">
-<pre>
-              Number u = side_value(0, qp),
-                     v = side_value(1, qp);
-        
-</pre>
-</div>
-<div class = "comment">
-The location of the current boundary quadrature point
-const Real xf = qside_point[qp](0);
-</div>
-
-<div class ="fragment">
-<pre>
-              const Real yf = qside_point[qp](1);
-        
-</pre>
-</div>
-<div class = "comment">
-Set u = 1 on the top boundary, 0 everywhere else
-</div>
-
-<div class ="fragment">
-<pre>
-              const Real u_value = (yf &gt; .99) ? 1. : 0.;
-                      
-</pre>
-</div>
-<div class = "comment">
-Set v = 0 everywhere
-</div>
-
-<div class ="fragment">
-<pre>
-              const Real v_value = 0.;
-        
-              for (unsigned int i=0; i != n_u_dofs; i++)
-                {
-                  Fu(i) += JxW_side[qp] * penalty *
-                           (u - u_value) * phi_side[i][qp];
-                  Fv(i) += JxW_side[qp] * penalty *
-                           (v - v_value) * phi_side[i][qp];
-        
-                  if (request_jacobian)
-                    for (unsigned int j=0; j != n_u_dofs; j++)
-                      {
-                        Kuu(i,j) += JxW_side[qp] * penalty *
-                                    phi_side[i][qp] * phi_side[j][qp];
-                        Kvv(i,j) += JxW_side[qp] * penalty *
-                                    phi_side[i][qp] * phi_side[j][qp];
-                      }
-                }
-            }
-        
-          return request_jacobian;
-        }
 </pre>
 </div>
 
@@ -930,103 +539,200 @@ Set v = 0 everywhere
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
   
-  #include &lt;iostream&gt;
-  #include &lt;algorithm&gt;
-  #include &lt;math.h&gt;
+  #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;error_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;getpot.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;kelly_error_estimator.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_refinement.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;uniform_refinement_estimator.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;fe_base.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh_generation.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;o_string_stream.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;o_string_stream.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;naviersystem.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;diff_solver.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;euler_solver.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;steady_solver.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;diff_solver.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;fem_system.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;euler_solver.h&quot;</FONT></B>
-  
-  
-  <FONT COLOR="#228B22"><B>const</FONT></B> Real deltat = 0.005;
-  
-  <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_timesteps = 15;
-  
-  <FONT COLOR="#228B22"><B>class</FONT></B> NavierSystem : <FONT COLOR="#228B22"><B>public</FONT></B> FEMSystem
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-  <FONT COLOR="#228B22"><B>public</FONT></B>:
-    NavierSystem(EquationSystems&amp; es,
-                 <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; name,
-                 <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> number)
-    : FEMSystem(es, name, number), Reynolds(1.) {}
+    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
   
-    <FONT COLOR="#228B22"><B>virtual</FONT></B> <FONT COLOR="#228B22"><B>void</FONT></B> init_data ();
+  #ifndef ENABLE_AMR
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example requires libMesh to be\n&quot;</FONT></B>
+              &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;compiled with AMR support!&quot;</FONT></B>
+              &lt;&lt; std::endl;
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  #<B><FONT COLOR="#A020F0">else</FONT></B>
   
-    <FONT COLOR="#228B22"><B>virtual</FONT></B> <FONT COLOR="#228B22"><B>bool</FONT></B> element_time_derivative (<FONT COLOR="#228B22"><B>bool</FONT></B> request_jacobian);
-  
-    <FONT COLOR="#228B22"><B>virtual</FONT></B> <FONT COLOR="#228B22"><B>bool</FONT></B> element_constraint (<FONT COLOR="#228B22"><B>bool</FONT></B> request_jacobian);
-    <FONT COLOR="#228B22"><B>virtual</FONT></B> <FONT COLOR="#228B22"><B>bool</FONT></B> side_constraint (<FONT COLOR="#228B22"><B>bool</FONT></B> request_jacobian);
-  
-    FEBase *fe_velocity, *fe_pressure;
-  
-    FEBase *fe_side_vel;
-  
-    Real Reynolds;
-  };
-  
-  
-  <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
-  {
-    libMesh::init (argc, argv);
     {    
-      Mesh mesh (2);
-      
-      MeshTools::Generation::build_square (mesh,
-                                           20, 20,
-                                           0., 1.,
-                                           0., 1.,
-                                           QUAD9);
-      
-      mesh.print_info();
-      
-      EquationSystems equation_systems (mesh);
-      
-      NavierSystem &amp; stokes_system = 
-        equation_systems.add_system&lt;NavierSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Navier-Stokes&quot;</FONT></B>);
+      GetPot infile(<B><FONT COLOR="#BC8F8F">&quot;ex18.in&quot;</FONT></B>);
   
-      stokes_system.time_solver =
-         AutoPtr&lt;TimeSolver&gt;(<B><FONT COLOR="#A020F0">new</FONT></B> EulerSolver(stokes_system));
+      <B><FONT COLOR="#228B22">const</FONT></B> Real global_tolerance          = infile(<B><FONT COLOR="#BC8F8F">&quot;global_tolerance&quot;</FONT></B>, 0.);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nelem_target      = infile(<B><FONT COLOR="#BC8F8F">&quot;n_elements&quot;</FONT></B>, 400);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> transient                 = infile(<B><FONT COLOR="#BC8F8F">&quot;transient&quot;</FONT></B>, true);
+      <B><FONT COLOR="#228B22">const</FONT></B> Real deltat                    = infile(<B><FONT COLOR="#BC8F8F">&quot;deltat&quot;</FONT></B>, 0.005);
+      <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_timesteps             = infile(<B><FONT COLOR="#BC8F8F">&quot;n_timesteps&quot;</FONT></B>, 20);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> write_interval    = infile(<B><FONT COLOR="#BC8F8F">&quot;write_interval&quot;</FONT></B>, 5);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> coarsegridsize    = infile(<B><FONT COLOR="#BC8F8F">&quot;coarsegridsize&quot;</FONT></B>, 1);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> coarserefinements = infile(<B><FONT COLOR="#BC8F8F">&quot;coarserefinements&quot;</FONT></B>, 0);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_adaptivesteps = infile(<B><FONT COLOR="#BC8F8F">&quot;max_adaptivesteps&quot;</FONT></B>, 10);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim               = infile(<B><FONT COLOR="#BC8F8F">&quot;dimension&quot;</FONT></B>, 2);
+  
+      assert (dim == 2 || dim == 3);
+      Mesh mesh (dim);
+      
+      MeshRefinement mesh_refinement(mesh);
+      mesh_refinement.coarsen_by_parents() = true;
+      mesh_refinement.absolute_global_tolerance() = global_tolerance;
+      mesh_refinement.nelem_target() = nelem_target;
+      mesh_refinement.refine_fraction() = 0.3;
+      mesh_refinement.coarsen_fraction() = 0.3;
+      mesh_refinement.coarsen_threshold() = 0.1;
+  
+      <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 2)
+        <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh,
+                                             coarsegridsize,
+                                             coarsegridsize,
+                                             0., 1.,
+                                             0., 1.,
+                                             QUAD9);
+      <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+        <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh,
+                                           coarsegridsize,
+                                           coarsegridsize,
+                                           coarsegridsize,
+                                           0., 1.,
+                                           0., 1.,
+                                           0., 1.,
+                                           HEX27);
+  
+      mesh_refinement.uniformly_refine(coarserefinements);
+  
+      mesh.print_info();
+  
+      EquationSystems equation_systems (mesh);
+  
+      NavierSystem &amp; system = 
+        equation_systems.add_system&lt;NavierSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Navier-Stokes&quot;</FONT></B>);
+  
+      <B><FONT COLOR="#A020F0">if</FONT></B> (transient)
+        system.time_solver =
+          AutoPtr&lt;TimeSolver&gt;(<B><FONT COLOR="#A020F0">new</FONT></B> EulerSolver(system));
+      <B><FONT COLOR="#A020F0">else</FONT></B>
+        {
+          system.time_solver =
+            AutoPtr&lt;TimeSolver&gt;(<B><FONT COLOR="#A020F0">new</FONT></B> SteadySolver(system));
+          assert(n_timesteps == 1);
+        }
   
       equation_systems.init ();
   
-      stokes_system.deltat = deltat;
+      system.deltat = deltat;
   
-      DiffSolver &amp;solver = *stokes_system.time_solver-&gt;diff_solver;
-      solver.max_nonlinear_iterations = 15;
-      solver.relative_step_tolerance = 0.02;
+      DiffSolver &amp;solver = *(system.time_solver-&gt;diff_solver().get());
+      solver.quiet = infile(<B><FONT COLOR="#BC8F8F">&quot;solver_quiet&quot;</FONT></B>, true);
+      solver.max_nonlinear_iterations =
+        infile(<B><FONT COLOR="#BC8F8F">&quot;max_nonlinear_iterations&quot;</FONT></B>, 15);
+      solver.relative_step_tolerance =
+        infile(<B><FONT COLOR="#BC8F8F">&quot;relative_step_tolerance&quot;</FONT></B>, 1.e-3);
+      solver.relative_residual_tolerance =
+        infile(<B><FONT COLOR="#BC8F8F">&quot;relative_residual_tolerance&quot;</FONT></B>, 0.0);
   
-      solver.max_linear_iterations = 250;
-      solver.initial_linear_tolerance = std::sqrt(TOLERANCE);
+      solver.max_linear_iterations =
+        infile(<B><FONT COLOR="#BC8F8F">&quot;max_linear_iterations&quot;</FONT></B>, 50000);
+      solver.initial_linear_tolerance =
+        infile(<B><FONT COLOR="#BC8F8F">&quot;initial_linear_tolerance&quot;</FONT></B>, 1.e-3);
   
       equation_systems.print_info();
   
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> t_step=0; t_step != n_timesteps; ++t_step)
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> t_step=0; t_step != n_timesteps; ++t_step)
         {
-          std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; Solving time step &quot;</FONT></B> &lt;&lt; t_step &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;, time = &quot;</FONT></B>
-                    &lt;&lt; stokes_system.time &lt;&lt; std::endl;
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; Solving time step &quot;</FONT></B> &lt;&lt; t_step &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, time = &quot;</FONT></B>
+                    &lt;&lt; system.time &lt;&lt; std::endl;
   
-          stokes_system.solve();
+          <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> a_step = 0;
+          <B><FONT COLOR="#A020F0">for</FONT></B> (; a_step != max_adaptivesteps; ++a_step)
+            {
+              system.solve();
   
-          stokes_system.time_solver-&gt;advance_timestep();
+              ErrorVector error;
   
-          <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> write_interval = 1;
+              AutoPtr&lt;ErrorEstimator&gt; error_estimator;
+  
+              <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
+                {
+                  assert (nelem_target == 0);
+  
+                  UniformRefinementEstimator *u =
+                    <B><FONT COLOR="#A020F0">new</FONT></B> UniformRefinementEstimator;
+  
+                  u-&gt;sobolev_order() = 0;
+  
+                  error_estimator.reset(u);
+                }
+              <B><FONT COLOR="#A020F0">else</FONT></B>
+                {
+                  assert (nelem_target &gt; 0);
+  
+                  error_estimator.reset(<B><FONT COLOR="#A020F0">new</FONT></B> KellyErrorEstimator);
+                }
+  
+              error_estimator-&gt;component_scale.push_back(1.0); <I><FONT COLOR="#B22222">// u
+</FONT></I>              error_estimator-&gt;component_scale.push_back(1.0); <I><FONT COLOR="#B22222">// v
+</FONT></I>              <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+                error_estimator-&gt;component_scale.push_back(1.0); <I><FONT COLOR="#B22222">// w
+</FONT></I>              error_estimator-&gt;component_scale.push_back(0.0); <I><FONT COLOR="#B22222">// p
+</FONT></I>  
+              error_estimator-&gt;estimate_error(system, error);
+  
+              Real global_error = error.l2_norm();
+              <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;adaptive step &quot;</FONT></B> &lt;&lt; a_step &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;: &quot;</FONT></B>;
+              <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
+                <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;global_error = &quot;</FONT></B> &lt;&lt; global_error
+                          &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; with &quot;</FONT></B>;
+              <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; mesh.n_active_elem()
+                        &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; active elements and &quot;</FONT></B>
+                        &lt;&lt; equation_systems.n_active_dofs()
+                        &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; active dofs.&quot;</FONT></B> &lt;&lt; std::endl;
+              <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
+                <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;worst element error = &quot;</FONT></B> &lt;&lt; error.maximum()
+                          &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, mean = &quot;</FONT></B> &lt;&lt; error.mean() &lt;&lt; std::endl;
+  
+              <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
+                {
+                  <B><FONT COLOR="#A020F0">if</FONT></B> (global_error &lt; global_tolerance)
+                    <B><FONT COLOR="#A020F0">break</FONT></B>;
+                  mesh_refinement.flag_elements_by_error_tolerance(error);
+                }
+              <B><FONT COLOR="#A020F0">else</FONT></B>
+                {
+                  <B><FONT COLOR="#A020F0">if</FONT></B> (mesh_refinement.flag_elements_by_nelem_target(error))
+                    {
+                      mesh_refinement.refine_and_coarsen_elements();
+                      equation_systems.reinit();
+                      a_step = max_adaptivesteps;
+                      <B><FONT COLOR="#A020F0">break</FONT></B>;
+                    }
+                }
+  
+              mesh_refinement.refine_and_coarsen_elements();
+              equation_systems.reinit();
+            }
+          <B><FONT COLOR="#A020F0">if</FONT></B> (a_step == max_adaptivesteps)
+            {
+              system.solve();
+            }
+  
+          system.time_solver-&gt;advance_timestep();
   
           <B><FONT COLOR="#A020F0">if</FONT></B> ((t_step+1)%write_interval == 0)
             {
               OStringStream file_name;
   
-              file_name &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;out.gmv.&quot;</FONT></B>;
+              file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out.gmv.&quot;</FONT></B>;
               OSSRealzeroright(file_name,3,0, t_step + 1);
   
               GMVIO(mesh).write_equation_systems (file_name.str(),
@@ -1034,229 +740,16 @@ Set v = 0 everywhere
             }
         }
     }
-    
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
-  }
-  
-  
-  
-  <FONT COLOR="#228B22"><B>void</FONT></B> NavierSystem::init_data ()
-  {
-    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, SECOND);
-    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<FONT COLOR="#BC8F8F"><B>&quot;v&quot;</FONT></B>, SECOND);
-  
-    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<FONT COLOR="#BC8F8F"><B>&quot;p&quot;</FONT></B>, FIRST);
-  
-    FEMSystem::init_data();
-  
-    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;time_evolving(0);
-    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;time_evolving(1);
-  
-    fe_velocity = element_fe[<B><FONT COLOR="#A020F0">this</FONT></B>-&gt;variable_type(0)];
-    fe_pressure = element_fe[<B><FONT COLOR="#A020F0">this</FONT></B>-&gt;variable_type(2)];
-    fe_side_vel = side_fe[<B><FONT COLOR="#A020F0">this</FONT></B>-&gt;variable_type(0)];
-  
-    fe_velocity-&gt;get_JxW();
-    fe_velocity-&gt;get_phi();
-    fe_velocity-&gt;get_dphi();
-  
-    fe_pressure-&gt;get_phi();
-  
-    fe_side_vel-&gt;get_JxW();
-    fe_side_vel-&gt;get_phi();
-    fe_side_vel-&gt;get_xyz();
-  }
-  
-  
-  <FONT COLOR="#228B22"><B>bool</FONT></B> NavierSystem::element_time_derivative (<FONT COLOR="#228B22"><B>bool</FONT></B> request_jacobian)
-  {
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = fe_velocity-&gt;get_JxW();
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt; &amp;phi = fe_velocity-&gt;get_phi();
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt; &amp;dphi =
-      fe_velocity-&gt;get_dphi();
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt; &amp;psi = fe_pressure-&gt;get_phi();
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_u_dofs = dof_indices_var[0].size(); 
-    assert (n_u_dofs == dof_indices_var[1].size()); 
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_p_dofs = dof_indices_var[2].size();
-  
-    DenseSubMatrix&lt;Number&gt; &amp;Kuu = *elem_subjacobians[0][0];
-    DenseSubMatrix&lt;Number&gt; &amp;Kvv = *elem_subjacobians[1][1];
-    DenseSubMatrix&lt;Number&gt; &amp;Kuv = *elem_subjacobians[0][1];
-    DenseSubMatrix&lt;Number&gt; &amp;Kvu = *elem_subjacobians[1][0];
-    DenseSubMatrix&lt;Number&gt; &amp;Kup = *elem_subjacobians[0][2];
-    DenseSubMatrix&lt;Number&gt; &amp;Kvp = *elem_subjacobians[1][2];
-    DenseSubVector&lt;Number&gt; &amp;Fu = *elem_subresiduals[0];
-    DenseSubVector&lt;Number&gt; &amp;Fv = *elem_subresiduals[1];
-        
-    <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_qpoints = element_qrule-&gt;n_points();
-  
-    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp != n_qpoints; qp++)
-      {
-        Number u = interior_value(0, qp),
-               v = interior_value(1, qp),
-               p = interior_value(2, qp);
-        Gradient grad_u = interior_gradient(0, qp),
-                 grad_v = interior_gradient(1, qp);
-  
-        <FONT COLOR="#228B22"><B>const</FONT></B> NumberVectorValue U     (u,     v);
-        <FONT COLOR="#228B22"><B>const</FONT></B> Number  u_x = grad_u(0);
-        <FONT COLOR="#228B22"><B>const</FONT></B> Number  u_y = grad_u(1);
-        <FONT COLOR="#228B22"><B>const</FONT></B> Number  v_x = grad_v(0);
-        <FONT COLOR="#228B22"><B>const</FONT></B> Number  v_y = grad_v(1);
-            
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i != n_u_dofs; i++)
-          {
-            Fu(i) += JxW[qp] *
-                     (-Reynolds*(U*grad_u)*phi[i][qp] + <I><FONT COLOR="#B22222">// convection term
-</FONT></I>                      p*dphi[i][qp](0) -                <I><FONT COLOR="#B22222">// pressure term
-</FONT></I>                      (grad_u*dphi[i][qp]));            <I><FONT COLOR="#B22222">// diffusion term
-</FONT></I>              
-            Fv(i) += JxW[qp] *
-                     (-Reynolds*(U*grad_v)*phi[i][qp] + <I><FONT COLOR="#B22222">// convection term
-</FONT></I>                      p*dphi[i][qp](1) -                <I><FONT COLOR="#B22222">// pressure term
-</FONT></I>                      (grad_v*dphi[i][qp]));            <I><FONT COLOR="#B22222">// diffusion term
-</FONT></I>  
-  
-            <B><FONT COLOR="#A020F0">if</FONT></B> (request_jacobian)
-              <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j != n_u_dofs; j++)
-                {
-                  Kuu(i,j) += JxW[qp] *
-   <I><FONT COLOR="#B22222">/* convection term */</FONT></I>      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
-   <I><FONT COLOR="#B22222">/* diffusion term  */</FONT></I>       (dphi[i][qp]*dphi[j][qp]) -
-   <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>       Reynolds*u_x*phi[i][qp]*phi[j][qp]);
-  
-                  Kuv(i,j) += JxW[qp] *
-   <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>      -Reynolds*u_y*phi[i][qp]*phi[j][qp];
-  
-                  Kvv(i,j) += JxW[qp] *
-   <I><FONT COLOR="#B22222">/* convection term */</FONT></I>      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
-   <I><FONT COLOR="#B22222">/* diffusion term  */</FONT></I>       (dphi[i][qp]*dphi[j][qp]) -
-   <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>       Reynolds*v_y*phi[i][qp]*phi[j][qp]);
-  
-                  Kvu(i,j) += JxW[qp] * 
-   <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>      -Reynolds*v_x*phi[i][qp]*phi[j][qp];
-              }
-  
-            <B><FONT COLOR="#A020F0">if</FONT></B> (request_jacobian)
-              <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j != n_p_dofs; j++)
-                {
-                  Kup(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](0);
-                  Kvp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](1);
-                }
-          }
-      } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
+  #endif <I><FONT COLOR="#B22222">// #ifndef ENABLE_AMR
 </FONT></I>    
-    <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;
-  }
-  
-  
-  
-  <FONT COLOR="#228B22"><B>bool</FONT></B> NavierSystem::element_constraint (<FONT COLOR="#228B22"><B>bool</FONT></B> request_jacobian)
-  {
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = fe_velocity-&gt;get_JxW();
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt; &amp;dphi =
-      fe_velocity-&gt;get_dphi();
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt; &amp;psi = fe_pressure-&gt;get_phi();
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_u_dofs = dof_indices_var[0].size();
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_p_dofs = dof_indices_var[2].size();
-  
-    DenseSubMatrix&lt;Number&gt; &amp;Kpu = *elem_subjacobians[2][0];
-    DenseSubMatrix&lt;Number&gt; &amp;Kpv = *elem_subjacobians[2][1];
-    DenseSubVector&lt;Number&gt; &amp;Fp = *elem_subresiduals[2];
-  
-    <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_qpoints = element_qrule-&gt;n_points();
-    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp != n_qpoints; qp++)
-      {
-        Gradient grad_u = interior_gradient(0, qp),
-                 grad_v = interior_gradient(1, qp);
-  
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i != n_p_dofs; i++)
-          {
-            Fp(i) += JxW[qp] * psi[i][qp] *
-                     (grad_u(0) + grad_v(1));
-  
-            <B><FONT COLOR="#A020F0">if</FONT></B> (request_jacobian)
-              <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j != n_u_dofs; j++)
-                {
-                  Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
-                  Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
-                }
-          }
-      } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
-</FONT></I>  
-    <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;
-  }
-  
-        
-  
-  <FONT COLOR="#228B22"><B>bool</FONT></B> NavierSystem::side_constraint (<FONT COLOR="#228B22"><B>bool</FONT></B> request_jacobian)
-  {
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt; &amp;JxW_side = fe_side_vel-&gt;get_JxW();
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt; &amp;phi_side =
-      fe_side_vel-&gt;get_phi();
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Point &gt; &amp;qside_point = fe_side_vel-&gt;get_xyz();
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_u_dofs = dof_indices_var[0].size(); 
-  
-    DenseSubMatrix&lt;Number&gt; &amp;Kuu = *elem_subjacobians[0][0];
-    DenseSubMatrix&lt;Number&gt; &amp;Kvv = *elem_subjacobians[1][1];
-  
-    DenseSubVector&lt;Number&gt; &amp;Fu = *elem_subresiduals[0];
-    DenseSubVector&lt;Number&gt; &amp;Fv = *elem_subresiduals[1];
-  
-  
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real penalty = 1.e10;
-  
-    <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_sidepoints = side_qrule-&gt;n_points();
-    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp != n_sidepoints; qp++)
-      {
-        Number u = side_value(0, qp),
-               v = side_value(1, qp);
-  
-        <FONT COLOR="#228B22"><B>const</FONT></B> Real yf = qside_point[qp](1);
-  
-        <FONT COLOR="#228B22"><B>const</FONT></B> Real u_value = (yf &gt; .99) ? 1. : 0.;
-                
-        <FONT COLOR="#228B22"><B>const</FONT></B> Real v_value = 0.;
-  
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i != n_u_dofs; i++)
-          {
-            Fu(i) += JxW_side[qp] * penalty *
-                     (u - u_value) * phi_side[i][qp];
-            Fv(i) += JxW_side[qp] * penalty *
-                     (v - v_value) * phi_side[i][qp];
-  
-            <B><FONT COLOR="#A020F0">if</FONT></B> (request_jacobian)
-              <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j != n_u_dofs; j++)
-                {
-                  Kuu(i,j) += JxW_side[qp] * penalty *
-                              phi_side[i][qp] * phi_side[j][qp];
-                  Kvv(i,j) += JxW_side[qp] * penalty *
-                              phi_side[i][qp] * phi_side[j][qp];
-                }
-          }
-      }
-  
-    <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;
+    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
   }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
 ***************************************************************
-* Running Example  ./ex18
+* Running Example  ./ex18-devel
 ***************************************************************
  
  Mesh Information:
@@ -1270,17 +763,18 @@ Set v = 0 everywhere
   n_processors()=1
   processor_id()=0
 
+*** Warning, This code is untested, experimental, or likely to see future API changes: src/solvers/diff_system.C, line 29, compiled Jun  1 2007 at 14:30:46 ***
  EquationSystems
   n_systems()=1
    System "Navier-Stokes"
-    Type "PDE"
+    Type "Implicit"
     Variables="u" "v" "p" 
     Finite Element Types="LAGRANGE" "LAGRANGE" "LAGRANGE" 
     Approximation Orders="SECOND" "SECOND" "FIRST" 
     n_dofs()=3803
     n_local_dofs()=3803
     n_constrained_dofs()=0
-    n_vectors()=3
+    n_vectors()=2
 
  Solving time step 0, time = 0
  Solving time step 1, time = 0.005
@@ -1299,7 +793,7 @@ Set v = 0 everywhere
  Solving time step 14, time = 0.07
  
 ***************************************************************
-* Done Running Example  ./ex18
+* Done Running Example  ./ex18-devel
 ***************************************************************
 </pre>
 </div>
