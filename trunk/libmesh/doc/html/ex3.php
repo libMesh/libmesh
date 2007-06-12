@@ -42,8 +42,9 @@ Basic include files needed for the mesh functionality.
 <pre>
         #include "libmesh.h"
         #include "mesh.h"
+        #include "mesh_generation.h"
         #include "gmv_io.h"
-        #include "implicit_system.h"
+        #include "linear_implicit_system.h"
         #include "equation_systems.h"
         
 </pre>
@@ -79,6 +80,7 @@ matrix and vector components.
         #include "numeric_vector.h"
         #include "dense_matrix.h"
         #include "dense_vector.h"
+        #include "elem.h"
         
 </pre>
 </div>
@@ -90,6 +92,8 @@ indexing.
 <div class ="fragment">
 <pre>
         #include "dof_map.h"
+        #include "boundary_mesh.h"
+        #include "boundary_info.h"
         
 </pre>
 </div>
@@ -173,7 +177,7 @@ Create a 2D mesh.
 </pre>
 </div>
 <div class = "comment">
-Use the internal mesh generator to create a uniform
+Use the MeshTools::Generation mesh generator to create a uniform
 grid on the square [-1,1]^2.  We instruct the mesh generator
 to build a mesh of 15x15 QUAD9 elements.  Building QUAD9
 elements instead of the default QUAD4's we used in example 2
@@ -182,10 +186,11 @@ allow us to use higher-order approximation.
 
 <div class ="fragment">
 <pre>
-            mesh.build_square (15, 15,
-        		       -1., 1.,
-        		       -1., 1.,
-        		       QUAD9);
+            MeshTools::Generation::build_square (mesh, 
+        					 15, 15,
+        					 -1., 1.,
+        					 -1., 1.,
+        					 QUAD9);
         
 </pre>
 </div>
@@ -218,7 +223,7 @@ The Poisson system is another example of a steady system.
 
 <div class ="fragment">
 <pre>
-            equation_systems.add_system&lt;ImplicitSystem&gt; ("Poisson");
+            equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Poisson");
         
 </pre>
 </div>
@@ -229,7 +234,7 @@ will be approximated using second-order approximation.
 
 <div class ="fragment">
 <pre>
-            equation_systems("Poisson").add_variable("u", SECOND);
+            equation_systems.get_system("Poisson").add_variable("u", SECOND);
         
 </pre>
 </div>
@@ -241,7 +246,7 @@ library.
 
 <div class ="fragment">
 <pre>
-            equation_systems("Poisson").attach_assemble_function (assemble_poisson);
+            equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
             
 </pre>
 </div>
@@ -285,7 +290,7 @@ built PETSc.
 
 <div class ="fragment">
 <pre>
-            equation_systems("Poisson").solve();
+            equation_systems.get_system("Poisson").solve();
         
 </pre>
 </div>
@@ -297,6 +302,23 @@ to a GMV-formatted plot file.
 <div class ="fragment">
 <pre>
             GMVIO (mesh).write_equation_systems ("out.gmv", equation_systems);
+        
+            for (unsigned int i=0; i&lt;3; i++)
+              {
+        	here();
+        	equation_systems.get_system("Poisson").solve();
+                BoundaryMesh boundary_mesh (mesh.mesh_dimension()-1);
+                mesh.boundary_info-&gt;sync(boundary_mesh, false);
+</pre>
+</div>
+<div class = "comment">
+GMVIO(boundary_mesh).write("boundary.gmv");
+</div>
+
+<div class ="fragment">
+<pre>
+              }
+        
           }
         
 </pre>
@@ -363,12 +385,12 @@ The dimension that we are running
 </pre>
 </div>
 <div class = "comment">
-Get a reference to the ImplicitSystem we are solving
+Get a reference to the LinearImplicitSystem we are solving
 </div>
 
 <div class ="fragment">
 <pre>
-          ImplicitSystem& system = es.get_system&lt;ImplicitSystem&gt; ("Poisson");
+          LinearImplicitSystem& system = es.get_system&lt;LinearImplicitSystem&gt; ("Poisson");
         
 </pre>
 </div>
@@ -919,70 +941,84 @@ All done!
   #include &lt;algorithm&gt;
   #include &lt;math.h&gt;
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;implicit_system.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;quadrature_gauss.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;sparse_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;numeric_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;boundary_mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;boundary_info.h&quot;</FONT></B>
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_poisson(EquationSystems&amp; es,
-                        <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_poisson(EquationSystems&amp; es,
+                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
-  Real exact_solution (<FONT COLOR="#228B22"><B>const</FONT></B> Real x,
-  		     <FONT COLOR="#228B22"><B>const</FONT></B> Real y,
-  		     <FONT COLOR="#228B22"><B>const</FONT></B> Real z = 0.);
+  Real exact_solution (<B><FONT COLOR="#228B22">const</FONT></B> Real x,
+  		     <B><FONT COLOR="#228B22">const</FONT></B> Real y,
+  		     <B><FONT COLOR="#228B22">const</FONT></B> Real z = 0.);
   
-  <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
     
-    libMesh::init (argc, argv);
+    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
   
     
     {
       
-      std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
       
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i=1; i&lt;argc; i++)
-        std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; argv[i];
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
       
-      std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
       
       Mesh mesh (2);
       
       
-      mesh.build_square (15, 15,
-  		       -1., 1.,
-  		       -1., 1.,
-  		       QUAD9);
+      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh, 
+  					 15, 15,
+  					 -1., 1.,
+  					 -1., 1.,
+  					 QUAD9);
   
       mesh.print_info();
       
       EquationSystems equation_systems (mesh);
       
-      equation_systems.add_system&lt;ImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>);
+      equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
   
-      equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).add_variable(<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, SECOND);
+      equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, SECOND);
   
-      equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).attach_assemble_function (assemble_poisson);
+      equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).attach_assemble_function (assemble_poisson);
       
       equation_systems.init();
       
       equation_systems.print_info();
   
-      equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>).solve();
+      equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).solve();
   
-      GMVIO (mesh).write_equation_systems (<FONT COLOR="#BC8F8F"><B>&quot;out.gmv&quot;</FONT></B>, equation_systems);
+      GMVIO (mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;out.gmv&quot;</FONT></B>, equation_systems);
+  
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;3; i++)
+        {
+  	here();
+  	equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).solve();
+          BoundaryMesh boundary_mesh (mesh.mesh_dimension()-1);
+          mesh.boundary_info-&gt;sync(boundary_mesh, false);
+        }
+  
     }
   
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close();
@@ -990,20 +1026,20 @@ All done!
   
   
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_poisson(EquationSystems&amp; es,
-                        <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_poisson(EquationSystems&amp; es,
+                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
     
-    assert (system_name == <FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>);
+    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
   
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
   
-    ImplicitSystem&amp; system = es.get_system&lt;ImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Poisson&quot;</FONT></B>);
+    LinearImplicitSystem&amp; system = es.get_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
     
     FEType fe_type = dof_map.variable_type(0);
     
@@ -1019,28 +1055,28 @@ All done!
     
     fe_face-&gt;attach_quadrature_rule (&amp;qface);
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Point&gt;&amp; q_point = fe-&gt;get_xyz();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; q_point = fe-&gt;get_xyz();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
   
     DenseMatrix&lt;Number&gt; Ke;
     DenseVector&lt;Number&gt; Fe;
   
   
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
   
   
-    MeshBase::const_element_iterator       el     = mesh.elements_begin();
-    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.elements_end();
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.elements_end();
   
   
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el ; ++el)
       {
-        <FONT COLOR="#228B22"><B>const</FONT></B> Elem* elem = *el;
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
   
         dof_map.dof_indices (elem, dof_indices);
   
@@ -1053,60 +1089,60 @@ All done!
   
         Fe.resize (dof_indices.size());
   
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
   	{
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;phi.size(); j++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
   	      {
   		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
   	      }
   	  
   	  {
-  	    <FONT COLOR="#228B22"><B>const</FONT></B> Real x = q_point[qp](0);
-  	    <FONT COLOR="#228B22"><B>const</FONT></B> Real y = q_point[qp](1);
-  	    <FONT COLOR="#228B22"><B>const</FONT></B> Real eps = 1.e-3;
+  	    <B><FONT COLOR="#228B22">const</FONT></B> Real x = q_point[qp](0);
+  	    <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
+  	    <B><FONT COLOR="#228B22">const</FONT></B> Real eps = 1.e-3;
   	    
   
-  	    <FONT COLOR="#228B22"><B>const</FONT></B> Real fxy = -(exact_solution(x,y-eps) +
+  	    <B><FONT COLOR="#228B22">const</FONT></B> Real fxy = -(exact_solution(x,y-eps) +
   			       exact_solution(x,y+eps) +
   			       exact_solution(x-eps,y) +
   			       exact_solution(x+eps,y) -
   			       4.*exact_solution(x,y))/eps/eps;
   	    
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
   	      Fe(i) += JxW[qp]*fxy*phi[i][qp];
   	  } 
   	} 
         
         {
   
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
+  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
   	  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
   	    {
-  	      <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
+  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
   	      
-  	      <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
+  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
   	      
-  	      <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Point &gt;&amp; qface_point = fe_face-&gt;get_xyz();
+  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt;&amp; qface_point = fe_face-&gt;get_xyz();
   	      
   	      fe_face-&gt;reinit(elem, side);
   	      
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
   		{
   
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real xf = qface_point[qp](0);
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real yf = qface_point[qp](1);
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real xf = qface_point[qp](0);
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real yf = qface_point[qp](1);
   
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real penalty = 1.e10;
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
   
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real value = exact_solution(xf, yf);
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real value = exact_solution(xf, yf);
   		  
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-  		    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;phi_face.size(); j++)
+  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+  		    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi_face.size(); j++)
   		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
   
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
   		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
   		} 
   	    }
@@ -1121,16 +1157,11 @@ All done!
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex3.C...
-Linking ex3...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
-
 ***************************************************************
-* Running Example  ./ex3
+* Running Example  ./ex3-devel
 ***************************************************************
  
-Running ./ex3
+Running ./ex3-devel
 
  Mesh Information:
   mesh_dimension()=2
@@ -1146,55 +1177,21 @@ Running ./ex3
  EquationSystems
   n_systems()=1
    System "Poisson"
-    Type "Implicit"
+    Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="2", "3" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="SECOND" 
     n_dofs()=961
     n_local_dofs()=961
     n_constrained_dofs()=0
     n_vectors()=1
-  n_parameters()=2
-   Parameters:
-    "linear solver maximum iterations"=5000
-    "linear solver tolerance"=1e-12
 
-
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| 12SparseMatrixISt7complexIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 13NumericVectorISt7complexIdEE reference count information:
-|  Creations:    3
-|  Destructions: 3
-| 21LinearSolverInterfaceISt7complexIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 4Elem reference count information:
-|  Creations:    1185
-|  Destructions: 1185
-| 4Node reference count information:
-|  Creations:    961
-|  Destructions: 961
-| 5QBase reference count information:
-|  Creations:    3
-|  Destructions: 3
-| 6DofMap reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 6FEBase reference count information:
-|  Creations:    2
-|  Destructions: 2
-| 6System reference count information:
-|  Creations:    1
-|  Destructions: 1
- ---------------------------------------------------------------------------- 
+[0] ex3.C, line 162, compiled Jun  6 2007 at 11:54:25
+[0] ex3.C, line 162, compiled Jun  6 2007 at 11:54:25
+[0] ex3.C, line 162, compiled Jun  6 2007 at 11:54:25
  
 ***************************************************************
-* Done Running Example  ./ex3
+* Done Running Example  ./ex3-devel
 ***************************************************************
 </pre>
 </div>

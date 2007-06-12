@@ -12,33 +12,6 @@
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-  
-
-<br><br>This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-  
-
-<br><br>This library is distributd in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-  
-
-<br><br>You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-<br><br>
-
-<br><br>C++ include files that we need
-
-
-<br><br>
-
-<br><br>libMesh include files.
 </div>
 
 <div class ="fragment">
@@ -57,29 +30,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
         #include "dof_map.h"
         
         
-        
 </pre>
 </div>
 <div class = "comment">
-<h1>Example 17 - Solving a generalized Eigen Problem</h1>
-
-<br><br>This example shows how the previous EigenSolver example 
-can be adapted to solve generailzed eigenvalue problems.
-
-<br><br>For solving eigen problems, libMesh interfaces
-SLEPc (www.grycap.upv.es/slepc/) which again is based on PETSc.
-Hence, this example will only work if the library is compiled
-with SLEPc support enabled.
-
-<br><br>In this example some eigenvalues for a generalized symmetric
-eigenvalue problem A*x=lambda*B*x are computed, where the
-matrices A and B are assembled according to stiffness and
-mass matrix, respectively.
-
-
-<br><br>
-
-<br><br>Function prototype.  This is the function that will assemble
+Function prototype.  This is the function that will assemble
 the eigen system. Here, we will simply assemble a mass matrix.
 </div>
 
@@ -729,43 +683,33 @@ overall matrices A and B.
 <a name="nocomments"></a> 
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
-    
-    
-    
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;eigen_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
+  
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_mass(EquationSystems&amp; es,
+  		   <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
   
   
-  
-  #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh_generation.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;eigen_system.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature_gauss.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;sparse_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;numeric_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dof_map.h&quot;</FONT></B>
-  
-  
-  
-  
-  
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_mass(EquationSystems&amp; es,
-  		   <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
-  
-  
-  
-  <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    libMesh::init (argc, argv);
+    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
   
   #ifndef HAVE_SLEPC
   
-    std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;ERROR: This example requires libMesh to be\n&quot;</FONT></B>
-  	    &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;compiled with SLEPc eigen solvers support!&quot;</FONT></B>
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example requires libMesh to be\n&quot;</FONT></B>
+  	    &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;compiled with SLEPc eigen solvers support!&quot;</FONT></B>
   	    &lt;&lt; std::endl;
   
     <B><FONT COLOR="#A020F0">return</FONT></B> 0;
@@ -775,29 +719,29 @@ overall matrices A and B.
     {
       <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 3)
         {
-  	std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;\nUsage: &quot;</FONT></B> &lt;&lt; argv[0]
-  		  &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; -n &lt;number of eigen values&gt;&quot;</FONT></B>
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\nUsage: &quot;</FONT></B> &lt;&lt; argv[0]
+  		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -n &lt;number of eigen values&gt;&quot;</FONT></B>
   		  &lt;&lt; std::endl;
   	error();
         }
       
       <B><FONT COLOR="#A020F0">else</FONT></B> 
         {
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
   	
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i=1; i&lt;argc; i++)
-  	  std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; argv[i];
+  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
+  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
   	
-  	std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
         }
   
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = 2;
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 2;
   
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> nev = std::atoi(argv[2]);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nev = std::atoi(argv[2]);
   
       Mesh mesh (dim);
   
-      MeshTools::Generation::build_square (mesh, 
+      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh, 
   					 20, 20,
   					 -1., 1.,
   					 -1., 1.,
@@ -808,21 +752,21 @@ overall matrices A and B.
       EquationSystems equation_systems (mesh);
   
       EigenSystem &amp; eigen_system =
-        equation_systems.add_system&lt;EigenSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Eigensystem&quot;</FONT></B>);
+        equation_systems.add_system&lt;EigenSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Eigensystem&quot;</FONT></B>);
   
       {
-        eigen_system.add_variable(<FONT COLOR="#BC8F8F"><B>&quot;p&quot;</FONT></B>, FIRST);
+        eigen_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, FIRST);
   
         eigen_system.attach_assemble_function (assemble_mass);
   
-        equation_systems.parameters.set&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt;(<FONT COLOR="#BC8F8F"><B>&quot;eigenpairs&quot;</FONT></B>)    = nev;
-        equation_systems.parameters.set&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt;(<FONT COLOR="#BC8F8F"><B>&quot;basis vectors&quot;</FONT></B>) = nev*3;
+        equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;eigenpairs&quot;</FONT></B>)    = nev;
+        equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;basis vectors&quot;</FONT></B>) = nev*3;
   
         eigen_system.eigen_solver-&gt;set_eigensolver_type(ARNOLDI);
   
-        equation_systems.parameters.set&lt;Real&gt;(<FONT COLOR="#BC8F8F"><B>&quot;linear solver tolerance&quot;</FONT></B>) = pow(TOLERANCE, 5./3.);
-        equation_systems.parameters.set&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt;
-  	(<FONT COLOR="#BC8F8F"><B>&quot;linear solver maximum iterations&quot;</FONT></B>) = 1000;
+        equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) = pow(TOLERANCE, 5./3.);
+        equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;
+  	(<B><FONT COLOR="#BC8F8F">&quot;linear solver maximum iterations&quot;</FONT></B>) = 1000;
   
         eigen_system.set_eigenproblem_type(GHEP);
   
@@ -835,22 +779,22 @@ overall matrices A and B.
          
       eigen_system.solve();
   
-      <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> nconv = eigen_system.get_n_converged();
+      <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nconv = eigen_system.get_n_converged();
   
-      std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Number of converged eigenpairs: &quot;</FONT></B> &lt;&lt; nconv
-  	      &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;\n&quot;</FONT></B> &lt;&lt; std::endl;
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Number of converged eigenpairs: &quot;</FONT></B> &lt;&lt; nconv
+  	      &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\n&quot;</FONT></B> &lt;&lt; std::endl;
   
       <B><FONT COLOR="#A020F0">if</FONT></B> (nconv != 0)
         {
   	eigen_system.get_eigenpair(nconv-1);
   	
-  	<FONT COLOR="#228B22"><B>char</FONT></B> buf[14];
-  	sprintf (buf, <FONT COLOR="#BC8F8F"><B>&quot;out.gmv&quot;</FONT></B>);
+  	<B><FONT COLOR="#228B22">char</FONT></B> buf[14];
+  	sprintf (buf, <B><FONT COLOR="#BC8F8F">&quot;out.gmv&quot;</FONT></B>);
   	GMVIO (mesh).write_equation_systems (buf, equation_systems);
         }
       <B><FONT COLOR="#A020F0">else</FONT></B>
         {
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;WARNING: Solver did not converge!\n&quot;</FONT></B> &lt;&lt; nconv &lt;&lt; std::endl;
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;WARNING: Solver did not converge!\n&quot;</FONT></B> &lt;&lt; nconv &lt;&lt; std::endl;
         }
     }
   
@@ -862,17 +806,17 @@ overall matrices A and B.
   
   
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_mass(EquationSystems&amp; es,
-  		   <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_mass(EquationSystems&amp; es,
+  		   <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
     
-    assert (system_name == <FONT COLOR="#BC8F8F"><B>&quot;Eigensystem&quot;</FONT></B>);
+    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Eigensystem&quot;</FONT></B>);
   
   #ifdef HAVE_SLEPC
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
   
     EigenSystem &amp; eigen_system = es.get_system&lt;EigenSystem&gt; (system_name);
   
@@ -887,27 +831,27 @@ overall matrices A and B.
   
     fe-&gt;attach_quadrature_rule (&amp;qrule);
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = eigen_system.get_dof_map();
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap&amp; dof_map = eigen_system.get_dof_map();
   
     DenseMatrix&lt;Number&gt;   Me;
     DenseMatrix&lt;Number&gt;   Ke;
   
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
   
   
   
-    MeshBase::const_element_iterator       el     = mesh.elements_begin();
-    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.elements_end();
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.elements_end();
    
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
-        <FONT COLOR="#228B22"><B>const</FONT></B> Elem* elem = *el;
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
   
         dof_map.dof_indices (elem, dof_indices);
   
@@ -916,9 +860,9 @@ overall matrices A and B.
         Ke.resize (dof_indices.size(), dof_indices.size());
         Me.resize (dof_indices.size(), dof_indices.size());
   
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;phi.size(); j++)
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
   	    {
   	      Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
   	      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
@@ -966,18 +910,41 @@ overall matrices A and B.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-make: Entering directory `/aerolab/benkirk/libmesh/examples/ex17'
 ***************************************************************
-* Running Example  ./ex17
+* Running Example  ./ex17-devel -n 5
 ***************************************************************
- 
-ERROR: This example requires libMesh to be
-compiled with SLEPc eigen solvers support!
- 
+
+Running ./ex17-devel -n 5
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=441
+  n_elem()=400
+   n_local_elem()=400
+   n_active_elem()=400
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "Eigensystem"
+    Type "Eigen"
+    Variables="p"
+    Finite Element Types="LAGRANGE"
+    Approximation Orders="FIRST"
+    n_dofs()=441
+    n_local_dofs()=441
+    n_constrained_dofs()=0
+    n_vectors()=0
+
+Number of converged eigenpairs: 5
+
+
 ***************************************************************
-* Done Running Example  ./ex17
+* Done Running Example  ./ex17-devel -n 5
 ***************************************************************
-make: Leaving directory `/aerolab/benkirk/libmesh/examples/ex17'
 </pre>
 </div>
 <?php make_footer() ?>

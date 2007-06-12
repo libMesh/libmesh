@@ -38,6 +38,7 @@ Basic include file needed for the mesh functionality.
 <pre>
         #include "libmesh.h"
         #include "mesh.h"
+        #include "mesh_generation.h"
         #include "gmv_io.h"
         #include "equation_systems.h"
         #include "fe.h"
@@ -47,9 +48,7 @@ Basic include file needed for the mesh functionality.
         #include "numeric_vector.h"
         #include "dense_matrix.h"
         #include "dense_vector.h"
-        #include "implicit_system.h"
-        #include "error_vector.h"
-        #include "error_estimator.h"
+        #include "linear_implicit_system.h"
         
 </pre>
 </div>
@@ -64,6 +63,16 @@ component-by-component basis.
 <pre>
         #include "dense_submatrix.h"
         #include "dense_subvector.h"
+        
+</pre>
+</div>
+<div class = "comment">
+The definition of a geometric element
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "elem.h"
         
 </pre>
 </div>
@@ -120,7 +129,7 @@ Create a two-dimensional mesh.
 </pre>
 </div>
 <div class = "comment">
-Use the internal mesh generator to create a uniform
+Use the MeshTools::Generation mesh generator to create a uniform
 grid on the square [-1,1]^D.  We instruct the mesh generator
 to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
 elements in 3D.  Building these higher-order elements allows
@@ -129,10 +138,11 @@ us to use higher-order approximation, as in example 3.
 
 <div class ="fragment">
 <pre>
-            mesh.build_square (15, 15,
-        		       0., 1.,
-        		       0., 1.,
-        		       QUAD9);
+            MeshTools::Generation::build_square (mesh,
+        					 15, 15,
+        					 0., 1.,
+        					 0., 1.,
+        					 QUAD9);
             
 </pre>
 </div>
@@ -171,8 +181,8 @@ Creates a transient system named "Convection-Diffusion"
 
 <div class ="fragment">
 <pre>
-              ImplicitSystem & system = 
-        	equation_systems.add_system&lt;ImplicitSystem&gt; ("Stokes");
+              LinearImplicitSystem & system = 
+        	equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Stokes");
               
 </pre>
 </div>
@@ -219,8 +229,8 @@ Initialize the data structures for the equation system.
 <pre>
               equation_systems.init ();
         
-              equation_systems.set_parameter("linear solver maximum iterations") = 250;
-              equation_systems.set_parameter("linear solver tolerance") = 1.e-6;
+              equation_systems.parameters.set&lt;unsigned int&gt;("linear solver maximum iterations") = 250;
+              equation_systems.parameters.set&lt;Real&gt;        ("linear solver tolerance") = TOLERANCE;
               
 </pre>
 </div>
@@ -242,7 +252,7 @@ then write the solution.
 
 <div class ="fragment">
 <pre>
-            equation_systems("Stokes").solve();
+            equation_systems.get_system("Stokes").solve();
         
             GMVIO(mesh).write_equation_systems ("out.gmv",
         					equation_systems);
@@ -301,8 +311,8 @@ Get a reference to the Convection-Diffusion system object.
 
 <div class ="fragment">
 <pre>
-          ImplicitSystem & system =
-            es.get_system&lt;ImplicitSystem&gt; ("Stokes");
+          LinearImplicitSystem & system =
+            es.get_system&lt;LinearImplicitSystem&gt; ("Stokes");
         
 </pre>
 </div>
@@ -559,7 +569,7 @@ Reposition the submatrices...  The idea is this:
 <br><br>-           -          -  -
 | Kuu Kuv Kup |        | Fu |
 Ke = | Kvu Kvv Kvp |;  Fe = | Fv |
-| Kpu Kpv Kpp |        | Fv |
+| Kpu Kpv Kpp |        | Fp |
 -           -          -  -
 
 <br><br>The \p DenseSubMatrix.repostition () member takes the
@@ -724,12 +734,12 @@ The location on the boundary of the current
 node.
 		   
 
-<br><br>const Real xf = side->point(ns)(0);
-</div>
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-                          const Real yf = side-&gt;point(ns)(1);
+                          const Real xf = side-&gt;point(ns)(0);
+        		  const Real yf = side-&gt;point(ns)(1);
         		  
 </pre>
 </div>
@@ -806,23 +816,6 @@ Right-hand-side contribution.
 </pre>
 </div>
 <div class = "comment">
-We have now built the element matrix and RHS vector in terms
-of the element degrees of freedom.  However, it is possible
-that some of the element DOFs are constrained to enforce
-solution continuity, i.e. they are not really "free".  We need
-to constrain those DOFs in terms of non-constrained DOFs to
-ensure a continuous solution.  The
-\p DofMap::constrain_element_matrix_and_vector() method does
-just that.
-</div>
-
-<div class ="fragment">
-<pre>
-              dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-              
-</pre>
-</div>
-<div class = "comment">
 The element matrix and right-hand-side are now built
 for this element.  Add them to the global matrix and
 right-hand-side vector.  The \p PetscMatrix::add_matrix()
@@ -856,87 +849,89 @@ That's it.
   #include &lt;algorithm&gt;
   #include &lt;math.h&gt;
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature_gauss.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dof_map.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;sparse_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;numeric_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;implicit_system.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;error_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;error_estimator.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_submatrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_subvector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_submatrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_subvector.h&quot;</FONT></B>
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_stokes (EquationSystems&amp; es,
-  		      <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
+  #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
   
-  <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_stokes (EquationSystems&amp; es,
+  		      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    libMesh::init (argc, argv);
+    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
     {    
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = 2;     
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 2;     
       
       Mesh mesh (dim);
       
-      mesh.build_square (15, 15,
-  		       0., 1.,
-  		       0., 1.,
-  		       QUAD9);
+      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh,
+  					 15, 15,
+  					 0., 1.,
+  					 0., 1.,
+  					 QUAD9);
       
       mesh.print_info();
       
       EquationSystems equation_systems (mesh);
       
       {
-        ImplicitSystem &amp; system = 
-  	equation_systems.add_system&lt;ImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Stokes&quot;</FONT></B>);
+        LinearImplicitSystem &amp; system = 
+  	equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Stokes&quot;</FONT></B>);
         
-        system.add_variable (<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, SECOND);
-        system.add_variable (<FONT COLOR="#BC8F8F"><B>&quot;v&quot;</FONT></B>, SECOND);
+        system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, SECOND);
+        system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>, SECOND);
   
-        system.add_variable (<FONT COLOR="#BC8F8F"><B>&quot;p&quot;</FONT></B>, FIRST);
+        system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, FIRST);
   
         system.attach_assemble_function (assemble_stokes);
         
         equation_systems.init ();
   
-        equation_systems.set_parameter(<FONT COLOR="#BC8F8F"><B>&quot;linear solver maximum iterations&quot;</FONT></B>) = 250;
-        equation_systems.set_parameter(<FONT COLOR="#BC8F8F"><B>&quot;linear solver tolerance&quot;</FONT></B>) = 1.e-6;
+        equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;linear solver maximum iterations&quot;</FONT></B>) = 250;
+        equation_systems.parameters.set&lt;Real&gt;        (<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) = TOLERANCE;
         
         equation_systems.print_info();
       }
       
-      equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Stokes&quot;</FONT></B>).solve();
+      equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Stokes&quot;</FONT></B>).solve();
   
-      GMVIO(mesh).write_equation_systems (<FONT COLOR="#BC8F8F"><B>&quot;out.gmv&quot;</FONT></B>,
+      GMVIO(mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;out.gmv&quot;</FONT></B>,
   					equation_systems);
     }
     
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
   }
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_stokes (EquationSystems&amp; es,
-  		      <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_stokes (EquationSystems&amp; es,
+  		      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    assert (system_name == <FONT COLOR="#BC8F8F"><B>&quot;Stokes&quot;</FONT></B>);
+    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Stokes&quot;</FONT></B>);
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
     
-    ImplicitSystem &amp; system =
-      es.get_system&lt;ImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Stokes&quot;</FONT></B>);
+    LinearImplicitSystem &amp; system =
+      es.get_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Stokes&quot;</FONT></B>);
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> u_var = system.variable_number (<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>);
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> v_var = system.variable_number (<FONT COLOR="#BC8F8F"><B>&quot;v&quot;</FONT></B>);
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> p_var = system.variable_number (<FONT COLOR="#BC8F8F"><B>&quot;p&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> p_var = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>);
     
     FEType fe_vel_type = system.variable_type(u_var);
     
@@ -951,13 +946,13 @@ That's it.
     fe_vel-&gt;attach_quadrature_rule (&amp;qrule);
     fe_pres-&gt;attach_quadrature_rule (&amp;qrule);
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe_vel-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe_vel-&gt;get_JxW();
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe_vel-&gt;get_dphi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe_vel-&gt;get_dphi();
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; psi = fe_pres-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; psi = fe_pres-&gt;get_phi();
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap &amp; dof_map = system.get_dof_map();
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap &amp; dof_map = system.get_dof_map();
   
     DenseMatrix&lt;Number&gt; Ke;
     DenseVector&lt;Number&gt; Fe;
@@ -972,28 +967,28 @@ That's it.
       Fv(Fe),
       Fp(Fe);
   
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices_u;
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices_v;
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices_p;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_u;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_v;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_p;
     
   
-    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {    
-        <FONT COLOR="#228B22"><B>const</FONT></B> Elem* elem = *el;
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
         
         dof_map.dof_indices (elem, dof_indices);
         dof_map.dof_indices (elem, dof_indices_u, u_var);
         dof_map.dof_indices (elem, dof_indices_v, v_var);
         dof_map.dof_indices (elem, dof_indices_p, p_var);
   
-        <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_dofs   = dof_indices.size();
-        <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_u_dofs = dof_indices_u.size(); 
-        <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_v_dofs = dof_indices_v.size(); 
-        <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n_p_dofs = dof_indices_p.size();
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_dofs   = dof_indices.size();
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = dof_indices_u.size(); 
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_v_dofs = dof_indices_v.size(); 
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_p_dofs = dof_indices_p.size();
         
         fe_vel-&gt;reinit  (elem);
         fe_pres-&gt;reinit (elem);
@@ -1017,55 +1012,56 @@ That's it.
         Fv.reposition (v_var*n_u_dofs, n_v_dofs);
         Fp.reposition (p_var*n_u_dofs, n_p_dofs);
         
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
   	{
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;n_u_dofs; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;n_u_dofs; j++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_u_dofs; i++)
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; j++)
   	      Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;n_u_dofs; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;n_p_dofs; j++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_u_dofs; i++)
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_p_dofs; j++)
   	      Kup(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](0);
   
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;n_v_dofs; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;n_v_dofs; j++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_v_dofs; j++)
   	      Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;n_v_dofs; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;n_p_dofs; j++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_p_dofs; j++)
   	      Kvp(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](1);
   
   	  
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;n_p_dofs; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;n_u_dofs; j++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_p_dofs; i++)
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; j++)
   	      Kpu(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](0);
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;n_p_dofs; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;n_v_dofs; j++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_p_dofs; i++)
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_v_dofs; j++)
   	      Kpv(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](1);
   	  
   	} <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
 </FONT></I>  
         {
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
+  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
   	  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
   	    {
   	      AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
   	      	      
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> ns=0; ns&lt;side-&gt;n_nodes(); ns++)
+  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> ns=0; ns&lt;side-&gt;n_nodes(); ns++)
   		{
   		   
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real yf = side-&gt;point(ns)(1);
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real xf = side-&gt;point(ns)(0);
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real yf = side-&gt;point(ns)(1);
   		  
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real penalty = 1.e10;
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
   		  
   		   
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real u_value = (yf &gt; .99) ? 1. : 0.;
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real u_value = (yf &gt; .99) ? 1. : 0.;
   		  
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> Real v_value = 0.;
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real v_value = 0.;
   		  
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n=0; n&lt;elem-&gt;n_nodes(); n++)
+  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n=0; n&lt;elem-&gt;n_nodes(); n++)
   		    <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;node(n) == side-&gt;node(ns))
   		      {
   			Kuu(n,n) += penalty;
@@ -1078,8 +1074,6 @@ That's it.
 </FONT></I>  	    } <I><FONT COLOR="#B22222">// end if (elem-&gt;neighbor(side) == NULL)
 </FONT></I>        } <I><FONT COLOR="#B22222">// end boundary condition section	  
 </FONT></I>        
-        dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-        
         system.matrix-&gt;add_matrix (Ke, dof_indices);
         system.rhs-&gt;add_vector    (Fe, dof_indices);
       } <I><FONT COLOR="#B22222">// end of element loop
@@ -1090,13 +1084,8 @@ That's it.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex11.C...
-Linking ex11...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
-
 ***************************************************************
-* Running Example  ./ex11
+* Running Example  ./ex11-devel
 ***************************************************************
  
  Mesh Information:
@@ -1113,55 +1102,18 @@ Linking ex11...
  EquationSystems
   n_systems()=1
    System "Stokes"
-    Type "Implicit"
+    Type "LinearImplicit"
     Variables="u" "v" "p" 
-    Finite Element Types="0", "12" "0", "12" "0", "12" 
-    Infinite Element Mapping="0" "0" "0" 
-    Approximation Orders="2", "3" "2", "3" "1", "3" 
+    Finite Element Types="LAGRANGE" "LAGRANGE" "LAGRANGE" 
+    Approximation Orders="SECOND" "SECOND" "FIRST" 
     n_dofs()=2178
     n_local_dofs()=2178
     n_constrained_dofs()=0
     n_vectors()=1
-  n_parameters()=2
-   Parameters:
-    "linear solver maximum iterations"=250
-    "linear solver tolerance"=1e-06
 
-
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| 12SparseMatrixISt7complexIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 13NumericVectorISt7complexIdEE reference count information:
-|  Creations:    3
-|  Destructions: 3
-| 21LinearSolverInterfaceISt7complexIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 4Elem reference count information:
-|  Creations:    1185
-|  Destructions: 1185
-| 4Node reference count information:
-|  Creations:    961
-|  Destructions: 961
-| 5QBase reference count information:
-|  Creations:    2
-|  Destructions: 2
-| 6DofMap reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 6FEBase reference count information:
-|  Creations:    2
-|  Destructions: 2
-| 6System reference count information:
-|  Creations:    1
-|  Destructions: 1
- ---------------------------------------------------------------------------- 
  
 ***************************************************************
-* Done Running Example  ./ex11
+* Done Running Example  ./ex11-devel
 ***************************************************************
 </pre>
 </div>

@@ -20,7 +20,15 @@ information is printed to the screen, and the mesh is then
 written.
 
 
-<br><br>C++ include files that we need
+<br><br></div>
+
+<div class ="fragment">
+<pre>
+        #undef SEEK_SET
+</pre>
+</div>
+<div class = "comment">
+C++ include files that we need
 </div>
 
 <div class ="fragment">
@@ -109,7 +117,7 @@ Get the dimensionality of the mesh from argv[2]
 
 <div class ="fragment">
 <pre>
-            const unsigned int dim = atoi(argv[2]);
+            const unsigned int dim = std::atoi(argv[2]);
             
 </pre>
 </div>
@@ -131,6 +139,8 @@ Read the input mesh.
 <pre>
             mesh.read (argv[3]);
             
+            mesh.find_neighbors();
+        
 </pre>
 </div>
 <div class = "comment">
@@ -183,28 +193,31 @@ can be useful for testing purposes.
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
   
+  #undef SEEK_SET
   #include &lt;iostream&gt;
-  #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   
-  <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    libMesh::init (argc, argv);
+    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
     {    
       <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 4)
         {
-  	std::cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; -d 2 in.mesh [out.mesh]&quot;</FONT></B>
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -d 2 in.mesh [out.mesh]&quot;</FONT></B>
   		  &lt;&lt; std::endl;
   	
   	error();
         }
       
-      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = atoi(argv[2]);
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = std::atoi(argv[2]);
       
       Mesh mesh(dim);
       
       mesh.read (argv[3]);
       
+      mesh.find_neighbors();
+  
       mesh.print_info();
       
       <B><FONT COLOR="#A020F0">if</FONT></B> (argc == 5)
@@ -216,13 +229,8 @@ can be useful for testing purposes.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex1.C...
-Linking ex1...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
-
 ***************************************************************
-* Running Example  ./ex1
+* Running Example  ./ex1-devel -d 3 ../../reference_elements/3D/one_hex27.xda
 ***************************************************************
  
  Mesh Information:
@@ -236,20 +244,9 @@ Linking ex1...
   n_processors()=1
   processor_id()=0
 
-
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| 4Elem reference count information:
-|  Creations:    7
-|  Destructions: 7
-| 4Node reference count information:
-|  Creations:    27
-|  Destructions: 27
- ---------------------------------------------------------------------------- 
  
 ***************************************************************
-* Done Running Example  ./ex1
+* Done Running Example  ./ex1-devel -d 3 ../../reference_elements/3D/one_hex27.xda
 ***************************************************************
 </pre>
 </div>

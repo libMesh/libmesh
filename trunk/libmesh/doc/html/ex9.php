@@ -67,13 +67,24 @@ functionality, OStringStream works around this.
 </div>
 <div class = "comment">
 This example will solve a linear transient system,
-so we need to include the \p TransientImplicitSystem definition.
+so we need to include the \p TransientLinearImplicitSystem definition.
 </div>
 
 <div class ="fragment">
 <pre>
+        #include "linear_implicit_system.h"
         #include "transient_system.h"
         #include "vector_value.h"
+        
+</pre>
+</div>
+<div class = "comment">
+The definition of a geometric element
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "elem.h"
         
 </pre>
 </div>
@@ -122,6 +133,16 @@ as will the Dirichlet boundary conditions at time t.
         		     const Real y,
         		     const Real t);
         
+        Number exact_value (const Point& p,
+        		    const Parameters& parameters,
+        		    const std::string&,
+        		    const std::string&)
+        {
+          return exact_solution(p(0), p(1), parameters.get&lt;Real&gt; ("time"));
+        }
+        
+        
+        
 </pre>
 </div>
 <div class = "comment">
@@ -143,6 +164,13 @@ Initialize libMesh.
 <div class ="fragment">
 <pre>
           libMesh::init (argc, argv);
+        
+        #ifndef ENABLE_AMR
+          std::cerr &lt;&lt; "ERROR: This example requires libMesh to be\n"
+                    &lt;&lt; "compiled with AMR support!"
+                    &lt;&lt; std::endl;
+          return 0;
+        #else
         
           {    
 </pre>
@@ -220,8 +248,8 @@ object named "Convection-Diffusion".
 
 <div class ="fragment">
 <pre>
-            TransientImplicitSystem & system = 
-              equation_systems.add_system&lt;TransientImplicitSystem&gt; ("Convection-Diffusion");
+            TransientLinearImplicitSystem & system = 
+              equation_systems.add_system&lt;TransientLinearImplicitSystem&gt; ("Convection-Diffusion");
               
 </pre>
 </div>
@@ -282,16 +310,14 @@ Write out the initial conditions.
 <div class = "comment">
 The Convection-Diffusion system requires that we specify
 the flow velocity.  We will specify it as a RealVectorValue
-data type and then use the DataMap object to pass it to
-the assemble function.  The DataMap is a convenient way
-to encapsulate various data types.
+data type and then use the Parameters object to pass it to
+the assemble function.
 </div>
 
 <div class ="fragment">
 <pre>
-            RealVectorValue velocity (0.8, 0.8);
-        
-            equation_systems.data_map.add_data ("velocity", velocity);
+            equation_systems.parameters.set&lt;RealVectorValue&gt;("velocity") = 
+              RealVectorValue (0.8, 0.8);
             
 </pre>
 </div>
@@ -320,8 +346,8 @@ time step size as parameters in the EquationSystem.
 <pre>
                 time += dt;
         
-        	equation_systems.set_parameter ("time") = time;
-        	equation_systems.set_parameter ("dt")   = dt;
+        	equation_systems.parameters.set&lt;Real&gt; ("time") = time;
+        	equation_systems.parameters.set&lt;Real&gt; ("dt")   = dt;
         
 </pre>
 </div>
@@ -372,8 +398,8 @@ we need to specify the system type when we ask for it.
 
 <div class ="fragment">
 <pre>
-                TransientImplicitSystem&  system =
-        	  equation_systems.get_system&lt;TransientImplicitSystem&gt;("Convection-Diffusion");
+                TransientLinearImplicitSystem&  system =
+        	  equation_systems.get_system&lt;TransientLinearImplicitSystem&gt;("Convection-Diffusion");
         
         	*system.old_local_solution = *system.current_local_solution;
         	
@@ -385,7 +411,7 @@ Assemble & solve the linear system
 
 <div class ="fragment">
 <pre>
-                equation_systems("Convection-Diffusion").solve();
+                equation_systems.get_system("Convection-Diffusion").solve();
         	
 </pre>
 </div>
@@ -408,6 +434,7 @@ Output evey 10 timesteps to file.
         	  }
               }
           }
+        #endif // #ifdef ENABLE_AMR
         
 </pre>
 </div>
@@ -444,17 +471,7 @@ the proper system.
 <div class ="fragment">
 <pre>
           assert (system_name == "Convection-Diffusion");
-            
-</pre>
-</div>
-<div class = "comment">
-Get a constant reference to the mesh object.
-</div>
-
-<div class ="fragment">
-<pre>
-          const Mesh& mesh = es.get_mesh();
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -463,114 +480,20 @@ Get a reference to the Convection-Diffusion system object.
 
 <div class ="fragment">
 <pre>
-          TransientImplicitSystem & system =
-            es.get_system&lt;TransientImplicitSystem&gt; ("Convection-Diffusion");
-          
-</pre>
-</div>
-<div class = "comment">
-Get a reference to the \p DofMap for this system.
-</div>
-
-<div class ="fragment">
-<pre>
-          const DofMap& dof_map = system.get_dof_map();
-          
-</pre>
-</div>
-<div class = "comment">
-Get a reference to the solution vector.
-</div>
-
-<div class ="fragment">
-<pre>
-          NumericVector&lt;Number&gt;& solution = *system.solution;
-          
-</pre>
-</div>
-<div class = "comment">
-A vector to hold the global DOF indices for this element.
-</div>
-
-<div class ="fragment">
-<pre>
-          std::vector&lt;unsigned int&gt; dof_indices;
+          TransientLinearImplicitSystem & system =
+            es.get_system&lt;TransientLinearImplicitSystem&gt;("Convection-Diffusion");
         
 </pre>
 </div>
 <div class = "comment">
-Loop over the active local elements and compute the initial value
-of the solution at the element degrees of freedom.  Assign
-these initial values to the solution vector.  There is a small
-catch, however...  We only want to assign the components that
-live on the local processor, hence there will be an if-test
-in the loop.
-const_active_local_elem_iterator       elem_it (mesh.elements_begin());
-const const_active_local_elem_iterator elem_end(mesh.elements_end());
-
-
-<br><br></div>
-
-<div class ="fragment">
-<pre>
-          MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-          const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
-        
-          for ( ; elem_it != elem_end; ++elem_it)
-            {
-              const Elem* elem = *elem_it;
-        
-              dof_map.dof_indices (elem, dof_indices);
-              
-</pre>
-</div>
-<div class = "comment">
-For these Lagrange-elements the number
-of degrees of freedom should be <= the number
-of nodes.
+Project initial conditions at time 0
 </div>
 
 <div class ="fragment">
 <pre>
-              assert (dof_indices.size() &lt;= elem-&gt;n_nodes());
-        
-</pre>
-</div>
-<div class = "comment">
-Loop over the element DOFs, compute the initial
-value if the DOF is local to the processor.
-</div>
-
-<div class ="fragment">
-<pre>
-              for (unsigned int i=0; i&lt;dof_indices.size(); i++)
-        	if ((dof_indices[i] &gt;= solution.first_local_index()) &&
-        	    (dof_indices[i] &lt;  solution.last_local_index()))
-        	  {
-        	    const Point&  p = elem-&gt;point (i);
-        	    const Real    x = p(0);
-        	    const Real    y = p(1);
-        	    const Real time = 0.;
-        	    
-        	    solution.set (dof_indices[i],
-        			  exact_solution (x,y,time));	    
-        	  }	 
-            }
+          es.parameters.set&lt;Real&gt; ("time") = 0;
           
-</pre>
-</div>
-<div class = "comment">
-The initial solution has now been set for the local
-solution components.  However, the local matrix assembly
-will likely depend on solution components that live on
-other processors.  We need to get those components, and
-the TransientSystem::update() member will do that
-for us.
-</div>
-
-<div class ="fragment">
-<pre>
-          system.update ();
+          system.project_solution(exact_value, NULL, es.parameters);
         }
         
         
@@ -588,6 +511,7 @@ the linear system for solution.
         void assemble_cd (EquationSystems& es,
         		  const std::string& system_name)
         {
+        #ifdef ENABLE_AMR
 </pre>
 </div>
 <div class = "comment">
@@ -627,8 +551,8 @@ Get a reference to the Convection-Diffusion system object.
 
 <div class ="fragment">
 <pre>
-          TransientImplicitSystem & system =
-            es.get_system&lt;TransientImplicitSystem&gt; ("Convection-Diffusion");
+          TransientLinearImplicitSystem & system =
+            es.get_system&lt;TransientLinearImplicitSystem&gt; ("Convection-Diffusion");
           
 </pre>
 </div>
@@ -652,7 +576,8 @@ of as a pointer that will clean up after itself.
 
 <div class ="fragment">
 <pre>
-          AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
+          AutoPtr&lt;FEBase&gt; fe      (FEBase::build(dim, fe_type));
+          AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
           
 </pre>
 </div>
@@ -663,7 +588,8 @@ Let the \p FEType object decide what order rule is appropriate.
 
 <div class ="fragment">
 <pre>
-          QGauss qrule (dim, fe_type.default_quadrature_order());
+          QGauss qrule (dim,   fe_type.default_quadrature_order());
+          QGauss qface (dim-1, fe_type.default_quadrature_order());
         
 </pre>
 </div>
@@ -673,8 +599,9 @@ Tell the finite element object to use our quadrature rule.
 
 <div class ="fragment">
 <pre>
-          fe-&gt;attach_quadrature_rule (&qrule);
-          
+          fe-&gt;attach_quadrature_rule      (&qrule);
+          fe_face-&gt;attach_quadrature_rule (&qface);
+        
 </pre>
 </div>
 <div class = "comment">
@@ -685,7 +612,8 @@ with the element Jacobian * quadrature weight at each integration point.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;Real&gt;& JxW = fe-&gt;get_JxW();
+          const std::vector&lt;Real&gt;& JxW      = fe-&gt;get_JxW();
+          const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
           
 </pre>
 </div>
@@ -696,7 +624,8 @@ The element shape functions evaluated at the quadrature points.
 <div class ="fragment">
 <pre>
           const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = fe-&gt;get_phi();
-          
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& psi = fe_face-&gt;get_phi();
+        
 </pre>
 </div>
 <div class = "comment">
@@ -707,6 +636,16 @@ points.
 <div class ="fragment">
 <pre>
           const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
+        
+</pre>
+</div>
+<div class = "comment">
+The XY locations of the quadrature points used for face integration
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Point&gt;& qface_points = fe_face-&gt;get_xyz();
           
 </pre>
 </div>
@@ -757,10 +696,10 @@ EquationSystems object.
 <div class ="fragment">
 <pre>
           const RealVectorValue velocity =
-            es.data_map.get_data&lt;RealVectorValue&gt; ("velocity");
+            es.parameters.get&lt;RealVectorValue&gt; ("velocity");
         
-          const Real dt = es.parameter   ("dt");
-          const Real time = es.parameter ("time");
+          const Real dt = es.parameters.get&lt;Real&gt;   ("dt");
+          const Real time = es.parameters.get&lt;Real&gt; ("time");
         
 </pre>
 </div>
@@ -994,10 +933,7 @@ At this point the interior element integration has
 been completed.  However, we have not yet addressed
 boundary conditions.  For this example we will only
 consider simple Dirichlet boundary conditions imposed
-via the penalty method. The penalty method used here
-is equivalent (for Lagrange basis functions) to lumping
-the matrix resulting from the L2 projection penalty
-approach introduced in example 3.
+via the penalty method. 
 
 <br><br>The following loops over the sides of the element.
 If the element has no neighbor on a side then that
@@ -1006,89 +942,63 @@ side MUST live on a boundary of the domain.
 
 <div class ="fragment">
 <pre>
-              for (unsigned int s=0; s&lt;elem-&gt;n_sides(); s++)
-        	if (elem-&gt;neighbor(s) == NULL)
-        	  {
-        	    AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
-        	    
-        	    
+              {
 </pre>
 </div>
 <div class = "comment">
-Loop over the nodes on the side.
+The penalty value.  
 </div>
 
 <div class ="fragment">
 <pre>
-                    for (unsigned int ns=0; ns&lt;side-&gt;n_nodes(); ns++)
-        	      {
-</pre>
-</div>
-<div class = "comment">
-The location on the boundary of the current
-node.
-</div>
-
-<div class ="fragment">
-<pre>
-                        const Real xf = side-&gt;point(ns)(0);
-        		const Real yf = side-&gt;point(ns)(1);
-        		  
-</pre>
-</div>
-<div class = "comment">
-The penalty value.  \f$ \frac{1}{\epsilon} \f$
-</div>
-
-<div class ="fragment">
-<pre>
-                        const Real penalty = 1.e10;
-        		  
-</pre>
-</div>
-<div class = "comment">
-The boundary value.
-</div>
-
-<div class ="fragment">
-<pre>
-                        const Real value = exact_solution(xf, yf, time);
+                const Real penalty = 1.e10;
         
 </pre>
 </div>
 <div class = "comment">
-Find the node on the element matching this node on
-the side.  That defined where in the element matrix
-the boundary condition will be applied.
+The following loops over the sides of the element.
+If the element has no neighbor on a side then that
+side MUST live on a boundary of the domain.
 </div>
 
 <div class ="fragment">
 <pre>
-                        for (unsigned int n=0; n&lt;elem-&gt;n_nodes(); n++)
-        		  if (elem-&gt;node(n) == side-&gt;node(ns))
-        		    {
+                for (unsigned int s=0; s&lt;elem-&gt;n_sides(); s++)
+        	  if (elem-&gt;neighbor(s) == NULL)
+        	    {
+        	      fe_face-&gt;reinit(elem,s);
+        	      
+        	      for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
+        		{
+        		  const Number value = exact_solution (qface_points[qp](0),
+        						       qface_points[qp](1),
+        						       time);
+        						       
 </pre>
 </div>
 <div class = "comment">
-Matrix contribution.
+RHS contribution
 </div>
 
 <div class ="fragment">
 <pre>
-                              Ke(n,n) += penalty;
-        		  		  
+                          for (unsigned int i=0; i&lt;psi.size(); i++)
+        		    Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
+        
 </pre>
 </div>
 <div class = "comment">
-Right-hand-side contribution.
+Matrix contribution
 </div>
 
 <div class ="fragment">
 <pre>
-                              Fe(n) += penalty*value;
-        		    }
-        	      } 
-        	  }
+                          for (unsigned int i=0; i&lt;psi.size(); i++)
+        		    for (unsigned int j=0; j&lt;psi.size(); j++)
+        		      Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
+        		}
+        	    } 
+              } 
         
 </pre>
 </div>
@@ -1113,6 +1023,7 @@ That concludes the system matrix assembly routine.
 
 <div class ="fragment">
 <pre>
+        #endif // #ifdef ENABLE_AMR
         }
 </pre>
 </div>
@@ -1125,42 +1036,62 @@ That concludes the system matrix assembly routine.
   #include &lt;algorithm&gt;
   #include &lt;math.h&gt;
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;libmesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;mesh_refinement.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;gmv_io.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;equation_systems.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;fe.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;quadrature_gauss.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dof_map.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;sparse_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;numeric_vector.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_matrix.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_refinement.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;dense_vector.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;o_string_stream.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;o_string_stream.h&quot;</FONT></B>
   
-  #include <FONT COLOR="#BC8F8F"><B>&quot;transient_system.h&quot;</FONT></B>
-  #include <FONT COLOR="#BC8F8F"><B>&quot;vector_value.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;transient_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;vector_value.h&quot;</FONT></B>
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_cd (EquationSystems&amp; es,
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
+  #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> init_cd (EquationSystems&amp; es,
-  	      <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name);
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_cd (EquationSystems&amp; es,
+  		  <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
-  Real exact_solution (<FONT COLOR="#228B22"><B>const</FONT></B> Real x,
-  		     <FONT COLOR="#228B22"><B>const</FONT></B> Real y,
-  		     <FONT COLOR="#228B22"><B>const</FONT></B> Real t);
+  <B><FONT COLOR="#228B22">void</FONT></B> init_cd (EquationSystems&amp; es,
+  	      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
-  <FONT COLOR="#228B22"><B>int</FONT></B> main (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B>** argv)
+  Real exact_solution (<B><FONT COLOR="#228B22">const</FONT></B> Real x,
+  		     <B><FONT COLOR="#228B22">const</FONT></B> Real y,
+  		     <B><FONT COLOR="#228B22">const</FONT></B> Real t);
+  
+  Number exact_value (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+  		    <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp; parameters,
+  		    <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;,
+  		    <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;)
   {
-    libMesh::init (argc, argv);
+    <B><FONT COLOR="#A020F0">return</FONT></B> exact_solution(p(0), p(1), parameters.get&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;time&quot;</FONT></B>));
+  }
+  
+  
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
+  {
+    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
+  
+  #ifndef ENABLE_AMR
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example requires libMesh to be\n&quot;</FONT></B>
+              &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;compiled with AMR support!&quot;</FONT></B>
+              &lt;&lt; std::endl;
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  #<B><FONT COLOR="#A020F0">else</FONT></B>
   
     {    
       Mesh mesh (2);
           
-      mesh.read (<FONT COLOR="#BC8F8F"><B>&quot;../ex10/mesh.xda&quot;</FONT></B>);
+      mesh.read (<B><FONT COLOR="#BC8F8F">&quot;../ex10/mesh.xda&quot;</FONT></B>);
       
       MeshRefinement mesh_refinement (mesh);
       
@@ -1170,10 +1101,10 @@ That concludes the system matrix assembly routine.
       
       EquationSystems equation_systems (mesh);
       
-      TransientImplicitSystem &amp; system = 
-        equation_systems.add_system&lt;TransientImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
+      TransientLinearImplicitSystem &amp; system = 
+        equation_systems.add_system&lt;TransientLinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Convection-Diffusion&quot;</FONT></B>);
         
-      system.add_variable (<FONT COLOR="#BC8F8F"><B>&quot;u&quot;</FONT></B>, FIRST);
+      system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, FIRST);
         
       system.attach_assemble_function (assemble_cd);
       system.attach_init_function (init_cd);
@@ -1182,152 +1113,128 @@ That concludes the system matrix assembly routine.
         
       equation_systems.print_info();
         
-      GMVIO(mesh).write_equation_systems (<FONT COLOR="#BC8F8F"><B>&quot;out_000.gmv&quot;</FONT></B>,
+      GMVIO(mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;out_000.gmv&quot;</FONT></B>,
   					equation_systems);
       
-      RealVectorValue velocity (0.8, 0.8);
-  
-      equation_systems.data_map.add_data (<FONT COLOR="#BC8F8F"><B>&quot;velocity&quot;</FONT></B>, velocity);
+      equation_systems.parameters.set&lt;RealVectorValue&gt;(<B><FONT COLOR="#BC8F8F">&quot;velocity&quot;</FONT></B>) = 
+        RealVectorValue (0.8, 0.8);
       
-      <FONT COLOR="#228B22"><B>const</FONT></B> Real dt = 0.025;
+      <B><FONT COLOR="#228B22">const</FONT></B> Real dt = 0.025;
       Real time     = 0.;
       
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> t_step = 0; t_step &lt; 50; t_step++)
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> t_step = 0; t_step &lt; 50; t_step++)
         {
   	time += dt;
   
-  	equation_systems.set_parameter (<FONT COLOR="#BC8F8F"><B>&quot;time&quot;</FONT></B>) = time;
-  	equation_systems.set_parameter (<FONT COLOR="#BC8F8F"><B>&quot;dt&quot;</FONT></B>)   = dt;
+  	equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;time&quot;</FONT></B>) = time;
+  	equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;dt&quot;</FONT></B>)   = dt;
   
-  	std::cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; Solving time step &quot;</FONT></B>;
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; Solving time step &quot;</FONT></B>;
   	
   	{
   	  OStringStream out;
   
   	  OSSInt(out,2,t_step);
-  	  out &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;, time=&quot;</FONT></B>;
+  	  out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, time=&quot;</FONT></B>;
   	  OSSRealzeroleft(out,6,3,time);
-  	  out &lt;&lt;  <FONT COLOR="#BC8F8F"><B>&quot;...&quot;</FONT></B>;
-  	  std::cout &lt;&lt; out.str() &lt;&lt; std::endl;
+  	  out &lt;&lt;  <B><FONT COLOR="#BC8F8F">&quot;...&quot;</FONT></B>;
+  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; out.str() &lt;&lt; std::endl;
   	}
   	
-  	TransientImplicitSystem&amp;  system =
-  	  equation_systems.get_system&lt;TransientImplicitSystem&gt;(<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
+  	TransientLinearImplicitSystem&amp;  system =
+  	  equation_systems.get_system&lt;TransientLinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;Convection-Diffusion&quot;</FONT></B>);
   
   	*system.old_local_solution = *system.current_local_solution;
   	
-  	equation_systems(<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>).solve();
+  	equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Convection-Diffusion&quot;</FONT></B>).solve();
   	
   	<B><FONT COLOR="#A020F0">if</FONT></B> ( (t_step+1)%10 == 0)
   	  {
   	    OStringStream file_name;
   
-  	    file_name &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;out_&quot;</FONT></B>;
+  	    file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out_&quot;</FONT></B>;
   	    OSSRealzeroright(file_name,3,0,t_step+1);
-  	    file_name &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;.gmv&quot;</FONT></B>;
+  	    file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;.gmv&quot;</FONT></B>;
   
   	    GMVIO(mesh).write_equation_systems (file_name.str(),
   						equation_systems);
   	  }
         }
     }
-  
+  #endif <I><FONT COLOR="#B22222">// #ifdef ENABLE_AMR
+</FONT></I>  
     <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
   }
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> init_cd (EquationSystems&amp; es,
-  	      <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
+  <B><FONT COLOR="#228B22">void</FONT></B> init_cd (EquationSystems&amp; es,
+  	      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    assert (system_name == <FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
-      
-    <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
-    
-    TransientImplicitSystem &amp; system =
-      es.get_system&lt;TransientImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
-    
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
-    
-    NumericVector&lt;Number&gt;&amp; solution = *system.solution;
-    
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
+    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Convection-Diffusion&quot;</FONT></B>);
   
+    TransientLinearImplicitSystem &amp; system =
+      es.get_system&lt;TransientLinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;Convection-Diffusion&quot;</FONT></B>);
   
-    MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
-  
-    <B><FONT COLOR="#A020F0">for</FONT></B> ( ; elem_it != elem_end; ++elem_it)
-      {
-        <FONT COLOR="#228B22"><B>const</FONT></B> Elem* elem = *elem_it;
-  
-        dof_map.dof_indices (elem, dof_indices);
-        
-        assert (dof_indices.size() &lt;= elem-&gt;n_nodes());
-  
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;dof_indices.size(); i++)
-  	<B><FONT COLOR="#A020F0">if</FONT></B> ((dof_indices[i] &gt;= solution.first_local_index()) &amp;&amp;
-  	    (dof_indices[i] &lt;  solution.last_local_index()))
-  	  {
-  	    <FONT COLOR="#228B22"><B>const</FONT></B> Point&amp;  p = elem-&gt;point (i);
-  	    <FONT COLOR="#228B22"><B>const</FONT></B> Real    x = p(0);
-  	    <FONT COLOR="#228B22"><B>const</FONT></B> Real    y = p(1);
-  	    <FONT COLOR="#228B22"><B>const</FONT></B> Real time = 0.;
-  	    
-  	    solution.set (dof_indices[i],
-  			  exact_solution (x,y,time));	    
-  	  }	 
-      }
+    es.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;time&quot;</FONT></B>) = 0;
     
-    system.update ();
+    system.project_solution(exact_value, NULL, es.parameters);
   }
   
   
   
-  <FONT COLOR="#228B22"><B>void</FONT></B> assemble_cd (EquationSystems&amp; es,
-  		  <FONT COLOR="#228B22"><B>const</FONT></B> std::string&amp; system_name)
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_cd (EquationSystems&amp; es,
+  		  <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    assert (system_name == <FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
+  #ifdef ENABLE_AMR
+    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Convection-Diffusion&quot;</FONT></B>);
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> dim = mesh.mesh_dimension();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
     
-    TransientImplicitSystem &amp; system =
-      es.get_system&lt;TransientImplicitSystem&gt; (<FONT COLOR="#BC8F8F"><B>&quot;Convection-Diffusion&quot;</FONT></B>);
+    TransientLinearImplicitSystem &amp; system =
+      es.get_system&lt;TransientLinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Convection-Diffusion&quot;</FONT></B>);
     
     FEType fe_type = system.variable_type(0);
     
-    AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
+    AutoPtr&lt;FEBase&gt; fe      (FEBase::build(dim, fe_type));
+    AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
     
-    QGauss qrule (dim, fe_type.default_quadrature_order());
+    QGauss qrule (dim,   fe_type.default_quadrature_order());
+    QGauss qface (dim-1, fe_type.default_quadrature_order());
   
-    fe-&gt;attach_quadrature_rule (&amp;qrule);
+    fe-&gt;attach_quadrature_rule      (&amp;qrule);
+    fe_face-&gt;attach_quadrature_rule (&amp;qface);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW      = fe-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; psi = fe_face-&gt;get_phi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; qface_points = fe_face-&gt;get_xyz();
     
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
-    
-    <FONT COLOR="#228B22"><B>const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
-    
-    <FONT COLOR="#228B22"><B>const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
   
     DenseMatrix&lt;Number&gt; Ke;
     DenseVector&lt;Number&gt; Fe;
     
-    std::vector&lt;<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B>&gt; dof_indices;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> RealVectorValue velocity =
-      es.data_map.get_data&lt;RealVectorValue&gt; (<FONT COLOR="#BC8F8F"><B>&quot;velocity&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue velocity =
+      es.parameters.get&lt;RealVectorValue&gt; (<B><FONT COLOR="#BC8F8F">&quot;velocity&quot;</FONT></B>);
   
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real dt = es.parameter   (<FONT COLOR="#BC8F8F"><B>&quot;dt&quot;</FONT></B>);
-    <FONT COLOR="#228B22"><B>const</FONT></B> Real time = es.parameter (<FONT COLOR="#BC8F8F"><B>&quot;time&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real dt = es.parameters.get&lt;Real&gt;   (<B><FONT COLOR="#BC8F8F">&quot;dt&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real time = es.parameters.get&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;time&quot;</FONT></B>);
   
   
-    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-    <FONT COLOR="#228B22"><B>const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
   
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {    
-        <FONT COLOR="#228B22"><B>const</FONT></B> Elem* elem = *el;
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
         
         dof_map.dof_indices (elem, dof_indices);
         
@@ -1338,19 +1245,19 @@ That concludes the system matrix assembly routine.
   
         Fe.resize (dof_indices.size());
         
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
   	{
   	  Number   u_old = 0.;
   	  Gradient grad_u_old;
   	  
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> l=0; l&lt;phi.size(); l++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> l=0; l&lt;phi.size(); l++)
   	    {
   	      u_old      += phi[l][qp]*system.old_solution  (dof_indices[l]);
   	      
   	      grad_u_old.add_scaled (dphi[l][qp],system.old_solution (dof_indices[l]));
   	    }
   	  
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i=0; i&lt;phi.size(); i++)
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
   	    {
   	      Fe(i) += JxW[qp]*(
   				u_old*phi[i][qp] +
@@ -1360,7 +1267,7 @@ That concludes the system matrix assembly routine.
   					0.01*(grad_u_old*dphi[i][qp]))     
   				);
   	      
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> j=0; j&lt;phi.size(); j++)
+  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
   		{
   		  Ke(i,j) += JxW[qp]*(
   				      phi[i][qp]*phi[j][qp] + 
@@ -1374,47 +1281,42 @@ That concludes the system matrix assembly routine.
   	    } 
   	} 
   
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
-  	<B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
-  	  {
-  	    AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
-  	    
-  	    
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> ns=0; ns&lt;side-&gt;n_nodes(); ns++)
-  	      {
-  		<FONT COLOR="#228B22"><B>const</FONT></B> Real xf = side-&gt;point(ns)(0);
-  		<FONT COLOR="#228B22"><B>const</FONT></B> Real yf = side-&gt;point(ns)(1);
-  		  
-  		<FONT COLOR="#228B22"><B>const</FONT></B> Real penalty = 1.e10;
-  		  
-  		<FONT COLOR="#228B22"><B>const</FONT></B> Real value = exact_solution(xf, yf, time);
+        {
+  	<B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
   
-  		<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n=0; n&lt;elem-&gt;n_nodes(); n++)
-  		  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;node(n) == side-&gt;node(ns))
-  		    {
-  		      Ke(n,n) += penalty;
-  		  		  
-  		      Fe(n) += penalty*value;
-  		    }
-  	      } 
-  	  }
+  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
+  	  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
+  	    {
+  	      fe_face-&gt;reinit(elem,s);
+  	      
+  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+  		{
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Number value = exact_solution (qface_points[qp](0),
+  						       qface_points[qp](1),
+  						       time);
+  						       
+  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;psi.size(); i++)
+  		    Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
+  
+  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;psi.size(); i++)
+  		    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;psi.size(); j++)
+  		      Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
+  		}
+  	    } 
+        } 
   
         system.matrix-&gt;add_matrix (Ke, dof_indices);
         system.rhs-&gt;add_vector    (Fe, dof_indices);
       }
     
-  }
+  #endif <I><FONT COLOR="#B22222">// #ifdef ENABLE_AMR
+</FONT></I>  }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in debug mode) ex9.C...
-Linking ex9...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o)(.text+0x1a7): In function `tecini':
-: the use of `mktemp' is dangerous, better use `mkstemp'
-
 ***************************************************************
-* Running Example  ./ex9
+* Running Example  ./ex9-devel
 ***************************************************************
  
  Mesh Information:
@@ -1431,19 +1333,14 @@ Linking ex9...
  EquationSystems
   n_systems()=1
    System "Convection-Diffusion"
-    Type "TransientImplicit"
+    Type "TransientLinearImplicit"
     Variables="u" 
-    Finite Element Types="0", "12" 
-    Infinite Element Mapping="0" 
-    Approximation Orders="1", "3" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
     n_dofs()=6273
     n_local_dofs()=6273
     n_constrained_dofs()=0
-    n_vectors()=1
-  n_parameters()=2
-   Parameters:
-    "linear solver maximum iterations"=5000
-    "linear solver tolerance"=1e-12
+    n_vectors()=3
 
  Solving time step  0, time=0.0250...
  Solving time step  1, time=0.0500...
@@ -1495,41 +1392,9 @@ Linking ex9...
  Solving time step 47, time=1.2000...
  Solving time step 48, time=1.2200...
  Solving time step 49, time=1.2500...
-
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| 12SparseMatrixISt7complexIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 13NumericVectorISt7complexIdEE reference count information:
-|  Creations:    5
-|  Destructions: 5
-| 21LinearSolverInterfaceISt7complexIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 4Elem reference count information:
-|  Creations:    70112
-|  Destructions: 70112
-| 4Node reference count information:
-|  Creations:    6273
-|  Destructions: 6273
-| 5QBase reference count information:
-|  Creations:    100
-|  Destructions: 100
-| 6DofMap reference count information:
-|  Creations:    1
-|  Destructions: 1
-| 6FEBase reference count information:
-|  Creations:    50
-|  Destructions: 50
-| 6System reference count information:
-|  Creations:    1
-|  Destructions: 1
- ---------------------------------------------------------------------------- 
  
 ***************************************************************
-* Done Running Example  ./ex9
+* Done Running Example  ./ex9-devel
 ***************************************************************
 </pre>
 </div>
