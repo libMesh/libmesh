@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.36 2007-05-24 18:16:54 spetersen Exp $
+// $Id: system.C,v 1.37 2007-06-15 22:34:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,7 @@
 
 // includes for calculate_norm
 #include "fe_base.h"
+#include "parallel.h"
 #include "quadrature.h"
 #include "tensor_value.h"
 #include "vector_value.h"
@@ -742,18 +743,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
         }
     }
 
-#ifdef HAVE_MPI
-  if (libMesh::n_processors() > 1)
-    {
-      Real my_v_norm = v_norm;
-      MPI_Allreduce (&my_v_norm,
-                     &v_norm,
-                     1,
-                     MPI_REAL,
-                     MPI_SUM,
-                     libMesh::COMM_WORLD);
-    }
-#endif
+  Parallel::sum(v_norm);
 
   return std::sqrt(v_norm);
 }

@@ -1,4 +1,4 @@
-// $Id: parmetis_partitioner.C,v 1.19 2005-05-17 15:26:20 benkirk Exp $
+// $Id: parmetis_partitioner.C,v 1.20 2007-06-15 22:34:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 // Local Includes -----------------------------------
 #include "libmesh_config.h"
 #include "mesh_base.h"
+#include "parallel.h"
 #include "parmetis_partitioner.h"
 #include "libmesh_logging.h"
 #include "elem.h"
@@ -87,20 +88,17 @@ void ParmetisPartitioner::_do_partition (MeshBase& mesh,
   
 
   // Partition the graph
-  std::vector<int>  local_part(_part);
   MPI_Comm mpi_comm = libMesh::COMM_WORLD;
   
   // Call the ParMETIS k-way partitioning algorithm.
   Parmetis::ParMETIS_V3_PartKway(&_vtxdist[0], &_xadj[0], &_adjncy[0], &_vwgt[0], NULL,
 				 &_wgtflag, &_numflag, &_ncon, &_nparts, &_tpwgts[0],
 				 &_ubvec[0], &_options[0], &_edgecut,
-				 &local_part[_first_local_elem],
+				 &_part[_first_local_elem],
 				 &mpi_comm);
 
   // Collect the partioning information from all the processors.
-  assert (_part.size() == local_part.size());
-  MPI_Allreduce (&local_part[0], &_part[0], _part.size(), MPI_INT, MPI_SUM,
-		 libMesh::COMM_WORLD);
+  Parallel::sum(_part);
   
   // Assign the returned processor ids
   this->assign_partitioning (mesh);
@@ -158,7 +156,6 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
   
 
   // Partition the graph
-  std::vector<int> local_part(_part);
   std::vector<int> vsize(_vwgt.size(), 1);
   float itr = 1000.0;
   MPI_Comm mpi_comm = libMesh::COMM_WORLD;
@@ -171,13 +168,11 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
 				       &_wgtflag, &_numflag, &_ncon,
 				       &_nparts, &_tpwgts[0],
 				       &_ubvec[0], & itr, &_options[0],
-				       &_edgecut, &local_part[_first_local_elem],
+				       &_edgecut, &_part[_first_local_elem],
 				       &mpi_comm);
 
   // Collect the partioning information from all the processors.
-  assert (_part.size() == local_part.size());
-  MPI_Allreduce (&local_part[0], &_part[0], _part.size(), MPI_INT, MPI_SUM,
-		 libMesh::COMM_WORLD);
+  Parallel::sum(_part);
   
   // Assign the returned processor ids
   this->assign_partitioning (mesh);

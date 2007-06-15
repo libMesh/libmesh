@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.42 2006-07-28 20:07:02 roystgnr Exp $
+// $Id: petsc_vector.C,v 1.43 2007-06-15 22:34:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,7 @@
 
 #ifdef HAVE_PETSC
 
+#include "parallel.h"
 #include "utility.h"
 #include "dense_vector.h"
 
@@ -647,11 +648,8 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
 
 
 
-// Full specialization for Real datatypes
-#ifdef USE_REAL_NUMBERS
-
-template <>
-void PetscVector<Real>::localize (std::vector<Real>& v_local) const
+template <typename T>
+void PetscVector<T>::localize (std::vector<T>& v_local) const
 {
   int ierr=0;
   const int n  = this->size();
@@ -665,124 +663,17 @@ void PetscVector<Real>::localize (std::vector<Real>& v_local) const
   for (int i=0; i<n; i++)
     v_local[i] = 0.;
   
-  // only one processor
-  if (n == nl)
-    {      
-      ierr = VecGetArray (_vec, &values);
-	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = VecGetArray (_vec, &values);
+	 CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-      for (int i=0; i<n; i++)
-	v_local[i] = static_cast<Real>(values[i]);
-
-      ierr = VecRestoreArray (_vec, &values);
-	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
-
-  // otherwise multiple processors
-  else
-    {
-      unsigned int ioff = first_local_index();
-      std::vector<Real> local_values(n, 0.);
-
-      {
-	ierr = VecGetArray (_vec, &values);
-	       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	
-	for (int i=0; i<nl; i++)
-	  local_values[i+ioff] = static_cast<Real>(values[i]);
-	
-	ierr = VecRestoreArray (_vec, &values);
-	       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      }
-
-      MPI_Allreduce (&local_values[0], &v_local[0], n, MPI_REAL, MPI_SUM,
-		     libMesh::COMM_WORLD);
-    }  
-}
-
-#endif
-
-
-
-// Full specialization for Complex datatypes
-#ifdef USE_COMPLEX_NUMBERS
-
-template <>
-void PetscVector<Complex>::localize (std::vector<Complex>& v_local) const
-{
-  int ierr=0;
-  const int n  = size();
-  const int nl = local_size();
-  PetscScalar *values;
-
-  v_local.resize(n);
-
-  
   for (int i=0; i<n; i++)
-    v_local[i] = 0.;
-  
-  // only one processor
-  if (n == nl)
-    {      
-      ierr = VecGetArray (_vec, &values);
-	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    v_local[i] = static_cast<T>(values[i]);
 
-      for (int i=0; i<n; i++)
-	v_local[i] = static_cast<Complex>(values[i]);
+  ierr = VecRestoreArray (_vec, &values);
+	 CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-      ierr = VecRestoreArray (_vec, &values);
-	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
-
-  // otherwise multiple processors
-  else
-    {
-      unsigned int ioff = first_local_index();
-
-      /* in here the local values are stored, acting as send buffer for MPI
-       * initialize to zero, since we collect using MPI_SUM
-       */
-      std::vector<Real> real_local_values(n, 0.);
-      std::vector<Real> imag_local_values(n, 0.);
-
-      {
-	ierr = VecGetArray (_vec, &values);
-	       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	
-	// provide my local share to the real and imag buffers
-	for (int i=0; i<nl; i++)
-	  {
-	    real_local_values[i+ioff] = static_cast<Complex>(values[i]).real();
-	    imag_local_values[i+ioff] = static_cast<Complex>(values[i]).imag();
-	  }
-
-	ierr = VecRestoreArray (_vec, &values);
-	       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      }
-   
-      /* have buffers of the real and imaginary part of v_local.
-       * Once MPI_Reduce() collected all the real and imaginary
-       * parts in these std::vector<double>, the values can be 
-       * copied to v_local
-       */
-      std::vector<Real> real_v_local(n);
-      std::vector<Real> imag_v_local(n);
-
-      // collect entries from other proc's in real_v_local, imag_v_local
-      MPI_Allreduce (&real_local_values[0], &real_v_local[0], n, 
-		     MPI_DOUBLE, MPI_SUM, libMesh::COMM_WORLD);	
-
-      MPI_Allreduce (&imag_local_values[0], &imag_v_local[0], n, 
-		     MPI_DOUBLE, MPI_SUM, libMesh::COMM_WORLD);	
-
-      // copy real_v_local and imag_v_local to v_local
-      for (int i=0; i<n; i++)
-	v_local[i] = Complex(real_v_local[i], imag_v_local[i]);
-
-    }
+  Parallel::sum(v_local);
 }
-
-#endif
 
 
 
