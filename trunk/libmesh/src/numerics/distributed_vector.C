@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.28 2005-12-28 13:47:10 spetersen Exp $
+// $Id: distributed_vector.C,v 1.29 2007-06-15 22:34:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 // Local Includes
 #include "distributed_vector.h"
 #include "dense_vector.h"
-
+#include "parallel.h"
 
 
 
@@ -45,17 +45,9 @@ Real DistributedVector<T>::l1_norm () const
   for (unsigned int i=0; i<local_size(); i++)
     local_l1 += std::abs(_values[i]);
   
-  double global_l1 = local_l1;
+  Parallel::sum(local_l1);
 
-
-#ifdef HAVE_MPI
-
-  MPI_Allreduce (&local_l1, &global_l1, 1,
-		 MPI_DOUBLE, MPI_SUM, libMesh::COMM_WORLD);
-  
-#endif
-
-  return global_l1;
+  return local_l1;
 }
 
 
@@ -72,17 +64,9 @@ Real DistributedVector<T>::l2_norm () const
   for (unsigned int i=0; i<local_size(); i++)
     local_l2 += _values[i]*_values[i];
   
-  double global_l2 = local_l2;
+  Parallel::sum(local_l2);
 
-
-#ifdef HAVE_MPI
-
-  MPI_Allreduce (&local_l2, &global_l2, 1,
-		 MPI_DOUBLE, MPI_SUM, libMesh::COMM_WORLD);
-  
-#endif
-
-  return global_l2;
+  return local_l2;
 }
 
 
@@ -103,17 +87,9 @@ Real DistributedVector<T>::linfty_norm () const
                                 // types are the same, as required
                                 // by std::max
   
-  double global_linfty = local_linfty;
+  Parallel::max(local_linfty);
 
-
-#ifdef HAVE_MPI
-
-  MPI_Allreduce (&local_linfty, &global_linfty, 1,
-		 MPI_DOUBLE, MPI_MAX, libMesh::COMM_WORLD);
-  
-#endif
-
-  return global_linfty;
+  return local_linfty;
 }
 
 
@@ -308,18 +284,9 @@ Number DistributedVector<T>::dot (const NumericVector<T>& V) const
     local_dot += this->_values[i] * v->_values[i];
 
   // The local dot products are now summed via MPI
-  Real global_dot = local_dot;
+  Parallel::sum(local_dot);
 
-#ifdef HAVE_MPI
-  MPI_Allreduce(&local_dot,       // sendbuf 
-		&global_dot,      // recvbuf
-		1,                // count
-		MPI_DOUBLE,       // MPI_Datatype
-		MPI_SUM,          // MPI_Op
-		libMesh::COMM_WORLD);
-#endif
-
-  return global_dot;
+  return local_dot;
 } 
 
 
@@ -508,16 +475,7 @@ void DistributedVector<float>::localize (std::vector<float>& v_local) const
   for (unsigned int i=0; i<local_size(); i++)
     v_local[i+first_local_index()] = _values[i];
 
-#ifdef HAVE_MPI
-
-  MPI_Allreduce (&v_local[0], &v_local[0], v_local.size(),
-		 MPI_FLOAT, MPI_SUM, libMesh::COMM_WORLD);
-  
-#else
-
-  assert (local_size() == size());
-  
-#endif  
+  Parallel::sum(v_local);
 }
 
 
@@ -539,15 +497,10 @@ void DistributedVector<double>::localize (std::vector<double>& v_local) const
   for (unsigned int i=0; i<local_size(); i++)
     v_local[i+first_local_index()] = _values[i];
 
-#ifdef HAVE_MPI
+  Parallel::sum(v_local);
 
-  MPI_Allreduce (&v_local[0], &v_local[0], v_local.size(),
-		 MPI_DOUBLE, MPI_SUM, libMesh::COMM_WORLD);
-  
-#else
-
+#ifndef HAVE_MPI
   assert (local_size() == size());
-  
 #endif  
 }
 

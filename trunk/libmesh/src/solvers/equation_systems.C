@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.37 2007-05-23 23:36:12 roystgnr Exp $
+// $Id: equation_systems.C,v 1.38 2007-06-15 22:34:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,6 +29,7 @@
 #include "mesh_refinement.h"
 #include "newmark_system.h"
 #include "nonlinear_implicit_system.h"
+#include "parallel.h"
 #include "transient_system.h"
 #include "dof_map.h"
 #include "mesh.h"
@@ -443,49 +444,33 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   // (number_of_nodes)*(number_of_variables) entries.
   soln.resize(nn*nv);
 
-  std::vector<Number>             soln_local (soln.size());
   std::vector<Number>             sys_soln;
+
+  // (Note that we use an unsigned short int here even though an
+  // unsigned char would be more that sufficient.  The MPI 1.1
+  // standard does not require that MPI_SUM, MPI_PROD etc... be
+  // implemented for char data types. 12/23/2003 - BSK)  
   std::vector<unsigned short int> node_conn(nn);
 
   
-  // Zero out the soln and soln_local vectors
+  // Zero out the soln vector
   std::fill (soln.begin(),       soln.end(),       libMesh::zero);
-  std::fill (soln_local.begin(), soln_local.end(), libMesh::zero);
 
   
   // Get the number of elements that share each node.  We will
   // compute the average value at each node.  This is particularly
   // useful for plotting discontinuous data.
-  {
-    std::vector<unsigned short int> node_conn_local (node_conn.size());
-    
-    MeshBase::element_iterator       it  = _mesh.active_local_elements_begin();
-    const MeshBase::element_iterator end = _mesh.active_local_elements_end(); 
+  MeshBase::element_iterator       e_it  = _mesh.active_local_elements_begin();
+  const MeshBase::element_iterator e_end = _mesh.active_local_elements_end(); 
 
-    for ( ; it != end; ++it)
-      for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-	node_conn_local[(*it)->node(n)]++;
+  for ( ; e_it != e_end; ++e_it)
+    for (unsigned int n=0; n<(*e_it)->n_nodes(); n++)
+      node_conn[(*e_it)->node(n)]++;
 
-#ifdef HAVE_MPI
-    // Gather the distributed node_conn arrays in the case of
-    // multiple processors
-    //
-    // (Note that we use an unsigned short int here even though an
-    // unsigned char would be more that sufficient.  The MPI 1.1
-    // standard does not require that MPI_SUM, MPI_PROD etc... be
-    // implemented for char data types. 12/23/2003 - BSK)  
-    MPI_Allreduce (&node_conn_local[0], &node_conn[0], node_conn.size(),
-		   MPI_UNSIGNED_SHORT, MPI_SUM, libMesh::COMM_WORLD);
-    
-#else
-    // Without MPI the node_conn_local and the node_conn arrays
-    // are necessarily identical
-    node_conn = node_conn_local;
-    
-#endif
-  }
+  // Gather the distributed node_conn arrays in the case of
+  // multiple processors
+  Parallel::sum(node_conn);
 
-  
   unsigned int var_num=0;
 
   // For each system in this EquationSystems object,
@@ -540,7 +525,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 		  for (unsigned int n=0; n<elem->n_nodes(); n++)
 		    {
 		      assert (node_conn[elem->node(n)] != 0);
-		      soln_local[nv*(elem->node(n)) + (var + var_num)] +=
+		      soln[nv*(elem->node(n)) + (var + var_num)] +=
 			nodal_soln[n]/static_cast<Real>(node_conn[elem->node(n)]);
 		    }
 		}
@@ -550,49 +535,9 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
       var_num += nv_sys;
     }
 
-#ifdef HAVE_MPI
-# ifdef USE_REAL_NUMBERS
-  
-  // For real numbers simply reduce the vector
-  
   // Now each processor has computed contriburions to the
   // soln vector.  Gather them all up.
-  MPI_Allreduce (&soln_local[0], &soln[0], soln.size(),
-		 MPI_REAL, MPI_SUM, libMesh::COMM_WORLD);
-# else
-  
-  // In the case of complex numbers we must reduce the
-  // real and imaginary parts separately since MPI does
-  // not support our C++ complex type.
-  std::vector<Real>
-    real_part_local(soln.size()), real_part(soln.size()),
-    imag_part_local(soln.size()), imag_part(soln.size());
-
-  for (unsigned int i=0; i<soln_local.size(); i++)
-    {
-      real_part_local[i] = soln_local[i].real();
-      imag_part_local[i] = soln_local[i].imag();
-    }
-
-  // Now reduce the two vectors
-  MPI_Allreduce (&real_part_local[0], &real_part[0], real_part.size(),
-		 MPI_REAL, MPI_SUM, libMesh::COMM_WORLD);
-  
-  MPI_Allreduce (&imag_part_local[0], &imag_part[0], imag_part.size(),
-		 MPI_REAL, MPI_SUM, libMesh::COMM_WORLD);
-
-  // Now construct the soln vector from the two pieces
-  for (unsigned int i=0; i<soln.size(); i++)
-    soln[i] = Complex (real_part[i], imag_part[i]);  
-  
-# endif  
-#else
-  
-  // If there is no MPI the soln and the soln_local vectors are
-  // necessarily identical
-  soln = soln_local;
-  
-#endif
+  Parallel::sum(soln);
 }
 
 

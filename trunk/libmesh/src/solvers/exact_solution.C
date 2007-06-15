@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.30 2007-03-15 20:22:17 roystgnr Exp $
+// $Id: exact_solution.C,v 1.31 2007-06-15 22:34:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,6 +30,7 @@
 #include "mesh.h"
 #include "mesh_function.h"
 #include "numeric_vector.h"
+#include "parallel.h"
 #include "quadrature.h"
 #include "tensor_value.h"
 #include "vector_value.h"
@@ -488,41 +489,6 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	} // end qp loop
     } // end element loop
 
-#ifdef HAVE_MPI
-  if (libMesh::n_processors() > 1)
-    {
-      
-#ifndef USE_COMPLEX_NUMBERS
-      std::vector<Real> local_errors(3);
-
-      // Set local error entries.
-      local_errors[0] = error_vals[0];
-      local_errors[1] = error_vals[1];
-      local_errors[2] = error_vals[2];
-      
-      std::vector<Real> global_errors(3);
-      
-      
-      MPI_Allreduce (&local_errors[0],
-		     &global_errors[0],
-		     local_errors.size(),
-		     MPI_REAL,
-		     MPI_SUM,
-		     libMesh::COMM_WORLD);
-
-      // Store result back in the pair
-      error_vals[0] = global_errors[0];
-      error_vals[1] = global_errors[1];
-      error_vals[2] = global_errors[2];
-
-      // Sanity check
-      assert (global_errors[0] >= local_errors[0]);
-      assert (global_errors[1] >= local_errors[1]);
-      assert (global_errors[2] >= local_errors[2]);
-
-#endif
-      
-    }
-#endif  
-  
+  // Add up the error values on all processors
+  Parallel::sum(error_vals);
 }

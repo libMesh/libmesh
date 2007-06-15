@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.11 2005-12-28 13:47:10 spetersen Exp $
+// $Id: distributed_vector.h,v 1.12 2007-06-15 22:34:33 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -39,6 +39,7 @@
 
 // Local includes
 #include "numeric_vector.h"
+#include "parallel.h"
 
 
 
@@ -461,13 +462,11 @@ void DistributedVector<T>::init (const unsigned int n,
   MPI_Comm_size (libMesh::COMM_WORLD, &n_proc);
   
   std::vector<int> local_sizes     (n_proc, 0);
-  std::vector<int> local_sizes_send(n_proc, 0);
   
-  local_sizes_send[proc_id] = n_local;
+  local_sizes[proc_id] = n_local;
 
-  MPI_Allreduce (&local_sizes_send[0], &local_sizes[0], local_sizes.size(),
-		 MPI_INT, MPI_SUM, libMesh::COMM_WORLD);
-  
+  Parallel::sum(local_sizes);
+
   // _first_local_index is the sum of _local_size
   // for all processor ids less than ours
   for (int p=0; p<proc_id; p++)
@@ -684,17 +683,9 @@ Real DistributedVector<T>::min () const
   double local_min = static_cast<double>(*std::min(_values.begin(),
 						   _values.end()));
   
-  double global_min = local_min;
+  Parallel::min(local_min);
 
-
-#ifdef HAVE_MPI
-
-  MPI_Allreduce (&local_min, &global_min, 1,
-		 MPI_DOUBLE, MPI_MIN, libMesh::COMM_WORLD);
-
-#endif
-
-  return global_min;
+  return local_min;
 }
 
 
@@ -710,17 +701,9 @@ Real DistributedVector<T>::max() const
   double local_max = static_cast<double>(*std::max(_values.begin(),
 						   _values.end()));
 
-  double global_max = local_max;
+  Parallel::max(local_max);
 
-
-#ifdef HAVE_MPI
-
-  MPI_Allreduce (&local_max, &global_max, 1,
-		 MPI_DOUBLE, MPI_MAX, libMesh::COMM_WORLD);
-  
-#endif
-
-  return global_max;
+  return local_max;
 }
 
 
