@@ -1,6 +1,6 @@
 all:: examples
 
-dirlist := $(filter-out CVS/, $(wildcard */) )
+dirlist := $(wildcard ex?/ ex??/)
 
 #
 # Build the example programs
