@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.43 2007-06-15 22:34:33 roystgnr Exp $
+// $Id: petsc_vector.C,v 1.44 2007-06-17 19:25:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -653,7 +653,6 @@ void PetscVector<T>::localize (std::vector<T>& v_local) const
 {
   int ierr=0;
   const int n  = this->size();
-  const int nl = this->local_size();
   PetscScalar *values;
 
   
