@@ -21,6 +21,11 @@ Masters Report</a>. </li>";
 ?>
 
 <?php echo
+"<li> Ben's <a href=\"http://www.cfdlab.ae.utexas.edu/~peterson/ben_dissertation.pdf\">
+PhD Dissertation</a>. </li>";
+?>
+
+<?php echo
 "<li>  A general <a href=\"howto/howto.pdf\">HOWTO</a>
 document by M. Luthi containing some hints
 and programming tips for writing effective LibMesh programs. </li>";
@@ -44,7 +49,7 @@ System class by Ondrej Certik.</li>";
 
 <?php echo
 "<li>libMesh: A C++ Library for Parallel Adaptive
- Mesh Refinement/Coarsening Simulations - Engineering with Computers (Preprint).
+ Mesh Refinement/Coarsening Simulations - Engineering with Computers.
       <ul>
 	<li>
 	  <a href=\"http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf\">Preprint</a>
