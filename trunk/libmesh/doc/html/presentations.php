@@ -14,6 +14,14 @@
 <h1>Presentations</h1>
 <ul>
 
+  <li> <h2>libMesh Overviews</h2> </li>
+  <ul>
+    <li> <a href="http://cfdlab.ae.utexas.edu/~peterson/ERDC_talk.pdf">LibMesh Experience and Usage</a> (January 2007 ERDC course)</li>
+    <li> <a href="http://cfdlab.ae.utexas.edu/~roystgnr/vicksburg.pdf">AMR Infrastructure Expansion, Adding Complexity</a> (January 2007 ERDC course)</li>
+    <li> <a href="http://cfdlab.ae.utexas.edu/~roystgnr/libmesh_intro.pdf">LibMesh Introduction</a> (June 2007 lecture, Num. Meth. for Transport in Semiconductors)</li>
+  </ul>
+
+
   <li> <h2>Ben's Presentations</h2> </li>
   <ul>
     <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/adv_flows_project.pdf">Adavnced Flows Class Project</a> (natural convection, 2002)</li>
