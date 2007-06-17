@@ -1,5 +1,5 @@
 
-// $Id: parallel.h,v 1.2 2007-06-15 22:34:33 roystgnr Exp $
+// $Id: parallel.h,v 1.3 2007-06-17 19:24:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -35,13 +35,15 @@
 
 namespace Parallel
 {
+#ifdef HAVE_MPI
   //-------------------------------------------------------------------
   /**
-   * Take a local variable and replace it with the sum of it's value
-   * on all processors
+   * Templated function to return the appropriate MPI datatype
+   * for use with built-in C types
    */
   template <typename T>
   inline MPI_Datatype datatype();
+#endif // HAVE_MPI
 
   //-------------------------------------------------------------------
   /**
@@ -80,6 +82,7 @@ namespace Parallel
 //-----------------------------------------------------------------------
 // Parallel members
 
+#ifdef HAVE_MPI
 template<>
 inline MPI_Datatype datatype<short int>() { return MPI_SHORT; }
 
@@ -111,7 +114,6 @@ inline MPI_Datatype datatype<long double>() { return MPI_LONG_DOUBLE; }
 template <typename T>
 inline void min(T &r)
 {
-#ifdef HAVE_MPI
   if (libMesh::n_processors() > 1)
     {
       T temp;
@@ -123,14 +125,12 @@ inline void min(T &r)
                      libMesh::COMM_WORLD);
       r = temp;
     }
-#endif // #ifdef HAVE_MPI
 }
 
 
 template <typename T>
 inline void max(T &r)
 {
-#ifdef HAVE_MPI
   if (libMesh::n_processors() > 1)
     {
       T temp;
@@ -142,14 +142,12 @@ inline void max(T &r)
                      libMesh::COMM_WORLD);
       r = temp;
     }
-#endif // #ifdef HAVE_MPI
 }
 
 
 template <typename T>
 inline void sum(T &r)
 {
-#ifdef HAVE_MPI
   if (libMesh::n_processors() > 1)
     {
       T temp;
@@ -161,14 +159,12 @@ inline void sum(T &r)
                      libMesh::COMM_WORLD);
       r = temp;
     }
-#endif // #ifdef HAVE_MPI
 }
 
 
 template <typename T>
 inline void sum(std::vector<T> &r)
 {
-#ifdef HAVE_MPI
   if (libMesh::n_processors() > 1)
     {
       std::vector<T> temp(r.size());
@@ -180,14 +176,12 @@ inline void sum(std::vector<T> &r)
                      libMesh::COMM_WORLD);
       r = temp;
     }
-#endif // #ifdef HAVE_MPI
 }
 
 
 template <typename T>
 inline void sum(std::complex<T> &r)
 {
-#ifdef HAVE_MPI
   if (libMesh::n_processors() > 1)
     {
       T tempinput[2], tempoutput[2];
@@ -202,14 +196,12 @@ inline void sum(std::complex<T> &r)
       r.real = tempoutput[0];
       r.imag = tempoutput[1];
     }
-#endif // #ifdef HAVE_MPI
 }
 
 
 template <typename T>
 inline void sum(std::vector<std::complex<T> > &r)
 {
-#ifdef HAVE_MPI
   if (libMesh::n_processors() > 1)
     {
       std::vector<T> temprealinput(r.size()),
@@ -239,8 +231,24 @@ inline void sum(std::vector<std::complex<T> > &r)
 	  r[i].imag = tempimagoutput[i];
 	}
     }
-#endif // #ifdef HAVE_MPI
 }
+
+
+#else // HAVE_MPI
+
+template <typename T>
+inline void min(T &) {}
+
+template <typename T>
+inline void max(T &) {}
+
+template <typename T>
+inline void sum(T &) {}
+
+template <typename T>
+inline void sum(std::vector<T> &) {}
+
+#endif // HAVE_MPI
 
 
 }
