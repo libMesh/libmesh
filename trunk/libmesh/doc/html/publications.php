@@ -16,13 +16,27 @@
 <ul>
 
 <?php echo
-"<li> John's <a href=\"http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf\">
-Masters Report</a>. </li>";
+"<li>libMesh: A C++ Library for Parallel Adaptive
+ Mesh Refinement/Coarsening Simulations - Engineering with Computers.
+      <ul>
+	<li>
+	  <a href=\"http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf\">Preprint</a>
+	</li>
+	<li>
+	  <a href=\"http://cfdlab.ae.utexas.edu/~peterson/ewc_journal_version.pdf\">Journal Version</a>
+	</li>
+      </ul>
+</li>";
 ?>
 
 <?php echo
-"<li> Ben's <a href=\"http://www.cfdlab.ae.utexas.edu/~peterson/ben_dissertation.pdf\">
+"<li> Ben Kirk's <a href=\"http://www.cfdlab.ae.utexas.edu/~peterson/ben_dissertation.pdf\">
 PhD Dissertation</a>. </li>";
+?>
+
+<?php echo
+"<li> John Peterson's <a href=\"http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf\">
+Masters Report</a>. </li>";
 ?>
 
 <?php echo
@@ -45,20 +59,6 @@ press release</a> commemorating the launch of the Lonestar cluster. </li>";
 <?php echo
 "<li>A <a href=\"http://ondrej.certik.cz/libmesh/fem.ps\">description</a> of the Newmark
 System class by Ondrej Certik.</li>";
-?>
-
-<?php echo
-"<li>libMesh: A C++ Library for Parallel Adaptive
- Mesh Refinement/Coarsening Simulations - Engineering with Computers.
-      <ul>
-	<li>
-	  <a href=\"http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf\">Preprint</a>
-	</li>
-	<li>
-	  <a href=\"http://cfdlab.ae.utexas.edu/~peterson/ewc_journal_version.pdf\">Journal Version</a>
-	</li>
-      </ul>
-</li>";
 ?>
 
 
