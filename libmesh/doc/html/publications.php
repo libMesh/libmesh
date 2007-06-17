@@ -43,8 +43,19 @@ System class by Ondrej Certik.</li>";
 ?>
 
 <?php echo
-"<li><a href=\"http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf\">libMesh: A C++ Library for Parallel Adaptive Mesh Refinement/Coarsening Simulations</a> - Engineering with Computers preprint.</li>";
+"<li>libMesh: A C++ Library for Parallel Adaptive
+ Mesh Refinement/Coarsening Simulations - Engineering with Computers (Preprint).
+      <ul>
+	<li>
+	  <a href=\"http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf\">Preprint</a>
+	</li>
+	<li>
+	  <a href=\"http://cfdlab.ae.utexas.edu/~peterson/ewc_journal_version.pdf\">Journal Version</a>
+	</li>
+      </ul>
+</li>";
 ?>
+
 
 </ul>
 </div>
