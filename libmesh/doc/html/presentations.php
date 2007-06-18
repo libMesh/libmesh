@@ -57,6 +57,15 @@
   <li> <a href="http://www.challenge.nm.org/FinalReports/08.pdf">Albuquerque Academy</a> Presentation on Stress Analysis in a Torus.</li>
   <li> <a href="http://www.saviac.org/74th_Symposium/abstracts/U040.htm">SAVIAC</a> conference abstract.</li>
 
+<li>
+Marc Buffat, Anne Cadiou, Lionel Le Penven, and Catherine Le Ribault,
+<i> Comparison of implicit, explicit, center and upwind
+ schemes for the simulation of internal vortex flow at
+                 low Mach number.</i>
+<a href="http://www.ufrmeca.univ-lyon1.fr/~buffat/PUBLI_HTML/LowMach04.pdf">
+Low Mach Conference</a>, June 2004.
+</li>
+  
 </ul>
 </div>
 
