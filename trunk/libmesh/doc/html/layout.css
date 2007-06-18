@@ -130,11 +130,11 @@ a.L3 {
   border-style         : outset;
   /*border               : 1px solid black;*/
   color                : black;
-  background           : white url(./images/bg_roy_muted.png);
+  background           : white url(./images/bg_roy_muted_50pct.png) top right; 
   background-repeat    : no-repeat;
   padding              : 10px 10px 10px 10px;  /* top, right, left, bottom */
   z-index              : 3; /* This allows the content to overlap the right menu in narrow windows in good browsers. */
-  min-height           : 500; /* Make the div box at least big enough to show the background image */
+  /* min-height           : 500; */ /* Make the div box at least big enough to show the background image */
   /* vertical-align       : text-bottom; */
   /* top-margin           : 20px;*/
 }
