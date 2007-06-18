@@ -65,7 +65,7 @@ dev_table_entry("images/roystgnr.jpg",
  		"Derek Gaston",
  		"http://www.cfdlab.ae.utexas.edu/~drgasto",
  		"libMesh Developer",
- 		"<a href=\"http://www.tu-harburg.de\">UT-Austin, Sandia Nat'l Lab</a>");
+ 		"<a href=\"http://www.sandia.gov\">UT-Austin, Sandia Nat'l Lab</a>");
 ?>
 
 <p>
