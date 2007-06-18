@@ -48,30 +48,30 @@ body {
   background           : #eeeeee;
   margin               : 20px;
   padding              : 0px;
-  font                 : 11px verdana, arial, helvetica, sans-serif;
+  font                 : 13px verdana, arial, helvetica, sans-serif;
 }
 
 h1 {
   margin               : 0px 0px 12px 0px;
   padding              : 0px;
-  font-size            : 18px;
+  font-size            : 20px;
   font-weight          : 900;
   color                : #000;
 }
 
 h2 {
-  font                 : bold 14px/18px verdana, arial, helvetica, sans-serif;
+  font                 : bold 16px/20px verdana, arial, helvetica, sans-serif;
   margin               : 3em 1em 5px 0px;
   padding              : 0px;
 }
 
 h3 {
-  font                 : bold 12px/14px verdana, arial, helvetica, sans-serif;
+  font                 : bold 14px/16px verdana, arial, helvetica, sans-serif;
   padding              : 0px;
 }
 
 p {
-  font                 : 11px/20px verdana, arial, helvetica, sans-serif;
+  font                 : 13px/22px verdana, arial, helvetica, sans-serif;
   margin               : 0px 0px 16px 0px;
   padding              : 0px;
 }
@@ -80,7 +80,7 @@ p {
 
 a {
   color                : navy;
-  font-size            : 11px;
+  font-size            : 13px;
   font-family          : verdana, arial, helvetica, sans-serif;
   font-weight          : 600;
   text-decoration      : none;
@@ -94,7 +94,7 @@ background-color:#eee;}
   
 a.L1 {
   color                : black;
-  font-size            : 15px;
+  font-size            : 17px;
   font-family          : verdana, arial, helvetica, sans-serif;
   font-weight          : 200;
   text-decoration      : none;
@@ -103,7 +103,7 @@ a.L1 {
 
 a.L2 {
   color                : black;
-  font-size            : 11px;
+  font-size            : 13px;
   font-family          : verdana, arial, helvetica, sans-serif;
   font-weight          : 200;
   text-decoration      : none;
@@ -113,7 +113,7 @@ a.L2 {
 
 a.L3 {
   color                : black;
-  font-size            : 9px;
+  font-size            : 11px;
   font-family          : verdana, arial, helvetica, sans-serif;
   font-weight          : 100;
   text-decoration      : none;
@@ -130,7 +130,8 @@ a.L3 {
   border-style         : outset;
   /*border               : 1px solid black;*/
   color                : black;
-  /*background           : white url(./images/bg_muted.png);*/
+  background           : white url(./images/bg_roy_muted.png);
+  background-repeat    : no-repeat;
   padding              : 10px;
   z-index              : 3; /* This allows the content to overlap the right menu in narrow windows in good browsers. */
 }
