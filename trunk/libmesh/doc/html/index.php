@@ -1,4 +1,4 @@
-<!-- $Id: index.php,v 1.15 2006-06-28 18:08:02 benkirk Exp $ -->
+<!-- $Id: index.php,v 1.16 2007-06-18 00:31:36 roystgnr Exp $ -->
 <?php $root=""; ?>
 <?php require($root."navigation.php"); ?>
 
@@ -66,10 +66,14 @@ provided for solving both standard and generalized eigenvalue problems.
 
 <br>
 <br>
-The <code>libMesh</code> library is actively developed at The
-University of Texas at Austin in the <a href="http://www.cfdlab.ae.utexas.edu">CFDLab</a> and at
-Technische Universit&auml;t Hamburg-Harburg,
-<a href="http://www.mub.tu-harburg.de/index_e.html">Modelling and Computation</a> in Germany.
+The <code>libMesh</code> library is primarily developed at The
+University of Texas at Austin in the 
+<a href="http://www.cfdlab.ae.utexas.edu">CFDLab</a>.  Major 
+contributions have come from developers at the Technische 
+Universit&auml;t Hamburg-Harburg
+<a href="http://www.mub.tu-harburg.de/index_e.html">Institute of Modelling and Computation</a>, 
+and recent contributions have been made by CFDLab graduates at
+<a href="http://www.sandia.gov/">Sandia National Laboratories</a> and <a href="http://www.nasa.gov/">NASA</a>.
 Many thanks to <a href="http://sourceforge.net">SourceForge</a> for
 <a href="http://sourceforge.net/projects/libmesh">hosting the
 project</a>.  You can find out what is currently happening in the
