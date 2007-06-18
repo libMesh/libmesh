@@ -68,7 +68,8 @@ dev_table_entry("images/roystgnr.jpg",
  		"<a href=\"http://www.sandia.gov\">UT-Austin, Sandia Nat'l Lab</a>");
 ?>
 
-<p>
+<br>
+<br>
 
 <h1>Past LibMesh Developers</h1>
 
