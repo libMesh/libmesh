@@ -11,7 +11,7 @@
 <?php make_navigation("publications",$root)?>
 
 <div class="content">
-<h1>Publications</h1>
+<h1>Publications by LibMesh Developers</h1>
 
 <ul>
 
@@ -38,7 +38,43 @@ PhD Dissertation</a>. </li>";
 "<li> John Peterson's <a href=\"http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf\">
 Masters Report</a>. </li>";
 ?>
+</ul>
 
+<h1>Publications and Preprints Using LibMesh</h1>
+
+<ul>
+<li>
+Graham F. Carey, William Barth, Juliette A. Woods, Benjamin S. Kirk, Michael L. Anderson,
+Sum Chow, and Wolfgang Bangerth, 
+<i>Modelling error and constitutive relations in simulation of flow and transport.</i>
+<a href="http://www3.interscience.wiley.com/cgi-bin/abstract/109747121/ABSTRACT?CRETRY=1&SRETRY=0">
+IJNMF</a> Volume 46, Issue 12, Pages 1211 - 1236, 2004.
+</li>
+
+<li>
+Michael Schindler, Peter Talkner, and Peter Hanggi,					     
+<i>Computing stationary free-surface shapes in microfluidics.</i>
+<a href="http://arxiv.org/pdf/physics/0511217">Physics Preprint arXiv</a>
+</li>
+
+<li>
+Paul Simedrea, Luca Antiga, and David A. Steinman,
+<i>Towards a New Framework for Simulating Magnetic Resonance Imaging.</i>
+<a href="http://cscbc2006.cs.queensu.ca/assets/documents/Papers/paper108.pdf">
+First Canadian Student Conference on Biomedical Computing (CSCBC)</a>, 2005
+</li>
+
+<li>
+Jose Camata, Alvaro Coutinho, and Graham Carey,
+<i>Numerical Evaluation of the LCD Method Implemented in the LibMesh Library.</i>
+<a href="http://www.inf.ufes.br/~avalli/papers/2005/CIL-0692.pdf.gz">CILAMCE</a> 2005.
+</li>
+</ul>
+
+
+<h1>Misc. Publications</h1>
+
+<ul>
 <?php echo
 "<li>  A general <a href=\"howto/howto.pdf\">HOWTO</a>
 document by M. Luthi containing some hints
@@ -60,7 +96,6 @@ press release</a> commemorating the launch of the Lonestar cluster. </li>";
 "<li>A <a href=\"http://ondrej.certik.cz/libmesh/fem.ps\">description</a> of the Newmark
 System class by Ondrej Certik.</li>";
 ?>
-
 
 </ul>
 </div>
