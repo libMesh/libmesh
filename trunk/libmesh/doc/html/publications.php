@@ -54,6 +54,47 @@ B. Kirk, J. W. Peterson, R. H. Stogner, and G. F. Carey,
 vol. 22, no. 3--4, pp. 237--254, 2006.
 </li>
 
+<li>
+G. F. Carey, W. Barth, B. Kirk, and J. W. Peterson,
+<i>Parallel CFD for Flow and Transport Applications Including Unstructured and Adaptive Grids.</i>
+  In <a href="http://ceani.ulpgc.es/pcfd04/">
+  Proceedings of Parallel CFD 2004: Multidisciplinary Applications</a>,
+  G. Winter, A. Ecer, J. Periaux, N. Satofuka and P. Fox (Eds), (Amsterdam,
+  The Netherlands), Elsevier Science B.V., Oct 2005. ISBN: 0444520244.
+</li>
+
+<li>
+R. H. Stogner and G. F. Carey,
+<i>C<sup>1</sup> macroelements in adaptive finite element methods.</i>
+<a href="doi.wiley.com/10.1002/nme.1912">IJNME</a> vol 70, issue 9, Pages 1076 - 1095, 2006.
+</li>
+
+<li>
+Carey GF, Anderson M, Carnes B, and Kirk B, <i>Some aspects of adaptive grid
+  technology related to boundary and interior layers.</i>
+  <a href="http://dx.doi.org/10.1016/j.cam.2003.09.036"> J. Comput. Appl. Math.</a>
+    166(1):55--86, ISSN 0377-0427, 2004.
+</li>
+
+<li>
+Dreyer D, Petersen S, and O. von Estorff,
+<i> Effectiveness and robustness of
+improved infinite elements for exterior acoustics.</i>
+<a href="http://dx.doi.org/10.1016/j.cma.2005.01.019">
+CMAME</a>
+ 195(29-32):3591--3607, 2006.
+</li>
+
+<li>
+Petersen S, Dreyer D, and O. von Estorff,
+<i>Assessment of finite and spectral
+element shape functions for efficient iterative simulations of interior
+acoustics.</i>
+<a href="http://dx.doi.org/10.1016/j.cma.2006.01.008">
+CMAME</a>
+Volume 195, Issues 44-47, Pages 6463-6478, 2006.
+</li>
+        
 </ul>
 
 <h1>Publications and Preprints Using LibMesh</h1>
