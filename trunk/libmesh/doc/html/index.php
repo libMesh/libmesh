@@ -1,4 +1,4 @@
-<!-- $Id: index.php,v 1.17 2007-06-18 21:58:55 jwpeterson Exp $ -->
+<!-- $Id: index.php,v 1.18 2007-06-19 17:39:03 jwpeterson Exp $ -->
 <?php $root=""; ?>
 <?php require($root."navigation.php"); ?>
 
@@ -21,15 +21,11 @@
 <!-- <img class="title_image" src="images/libmesh_mesh_small.png"> -->
 <!-- <br><br><br> -->
 <?php
-// This php script makes the words wrap nicely around the image which
-// we have split up into several sections.  Unfortunately, it doesnt
-// work for internet explorer!
-if (NW_IS_IE)
-{
-  echo "<img class=\"title_image\" src=\"images/libmesh_mesh_small.png\">";
-}
 
-else
+// This php script makes the words wrap nicely around the image which
+// we have split up into several sections.  This apparently only works
+// for Gecko-enabled browsers, e.g. Firefox.
+if (NW_IS_GECKO)
 {
   // You can get these numbers using the 'file' command on most linux systems.
   $pic_widths  = array( 417, 417, 417, 417, 417, 400, 345, 270, 205, 145, 80 );
@@ -47,6 +43,11 @@ else
 	  echo "<img class=\"slant\" width=$pic_widths[$i] height=$pic_heights[$i] src=\"images/libmesh_mesh_layer_10.png\">";
 	}
     }
+}
+
+else
+{
+  echo "<img class=\"title_image\" src=\"images/libmesh_mesh_small.png\">";
 }
 ?>
 The <code>libMesh</code> library is a C++ framework for the numerical
