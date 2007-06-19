@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.44 2007-06-17 19:25:21 roystgnr Exp $
+// $Id: petsc_vector.C,v 1.45 2007-06-19 17:52:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -652,21 +652,20 @@ template <typename T>
 void PetscVector<T>::localize (std::vector<T>& v_local) const
 {
   int ierr=0;
-  const int n  = this->size();
+  const int n = this->size();
+  const int nl = this->local_size();
   PetscScalar *values;
 
-  
-  v_local.resize(n);
+  v_local.clear();
+  v_local.resize(n, 0.);
 
-  
-  for (int i=0; i<n; i++)
-    v_local[i] = 0.;
-  
   ierr = VecGetArray (_vec, &values);
 	 CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  for (int i=0; i<n; i++)
-    v_local[i] = static_cast<T>(values[i]);
+  unsigned int ioff = first_local_index();
+
+  for (int i=0; i<nl; i++)
+    v_local[i+ioff] = static_cast<T>(values[i]);
 
   ierr = VecRestoreArray (_vec, &values);
 	 CHKERRABORT(libMesh::COMM_WORLD,ierr);
