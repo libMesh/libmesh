@@ -1,4 +1,4 @@
-// $Id: node.h,v 1.8 2005-08-22 18:57:31 knezed01 Exp $
+// $Id: node.h,v 1.9 2007-06-19 14:20:38 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,7 +45,7 @@ class MeshRefinement;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.8 $
+ * \version $Revision: 1.9 $
  */
 
 class Node : public Point,
@@ -72,8 +72,8 @@ public:
   /**
    * Copy-constructor from a \p Point.  Optionally assigned the \p id.
    */
-  Node (const Point& p,
-	const unsigned int id = invalid_id);
+  explicit Node (const Point& p,
+	         const unsigned int id = invalid_id);
 
   /**
    * Destructor.
@@ -215,7 +215,7 @@ Node & Node::operator= (const Point& p)
   (*this)(1) = p(1);
   (*this)(2) = p(2);
 
-  _key = 0;
+//  _key = 0;
   
   return *this;
 }
