@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.80 2007-06-06 15:38:04 roystgnr Exp $
+// $Id: mesh.C,v 1.81 2007-06-19 19:17:50 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -824,6 +824,8 @@ void Mesh::write (const std::string& name,
   if (name.size() - name.rfind(".bz2") == 4)
     new_name.erase(new_name.end() - 4, new_name.end());
   
+  // New scope so that io will close before we try to zip the file
+  {
   // Write the file based on extension
   if (new_name.rfind(".dat") < new_name.size())
     TecplotIO(*this).write (new_name);
@@ -900,11 +902,15 @@ void Mesh::write (const std::string& name,
 		<< std::endl
 		<< "\n Exiting without writing output\n";
     }    
+  }
   
   // Nasty hack for reading/writing zipped files
   if (name.size() - name.rfind(".bz2") == 4)
     {
       START_LOG("system(bzip2)", "Mesh");
+#ifdef HAVE_MPI
+      MPI_Barrier(libMesh::COMM_WORLD);
+#endif
       if (libMesh::processor_id() == 0)
         {
           std::string system_string = "bzip2 -f ";
