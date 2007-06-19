@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.h,v 1.8 2006-12-15 21:25:52 jwpeterson Exp $
+// $Id: mesh_triangle_support.h,v 1.9 2007-06-19 23:16:01 jwpeterson Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -120,7 +120,8 @@ public:
       _elem_type(TRI3),
       _desired_area(0.1),
       _triangulation_type(GENERATE_CONVEX_HULL),
-      _insert_extra_points(false)
+      _insert_extra_points(false),
+      _smooth_after_generating(true)
   {}
 
   /**
@@ -194,13 +195,32 @@ public:
    * Sets and/or gets the flag for inserting add'l points.
    */
   bool& insert_extra_points() {return _insert_extra_points;}
-      
+
+  /**
+   * Sets/gets flag which tells whether to do Delaunay mesh
+   * smoothing after generating the grid.
+   */
+  bool& smooth_after_generating() {return _smooth_after_generating;}
+  
   /**
    * Attaches a vector of Hole* pointers which will be
    * meshed around.
    */
   void attach_hole_list(const std::vector<Hole*>* holes) {_holes = holes;}
-      
+
+  /**
+   * When constructing a PSLG, it is often not possible to do
+   * so implicitly through the ordering of the points.  You
+   * can use the segments vector to specify the segments explicitly,
+   * Ex: unit square numbered counter-clockwise starting from origin
+   * segments[0] = (0,1)
+   * segments[1] = (1,2)
+   * segments[2] = (2,3)
+   * segments[3] = (3,0)
+   * Note: for this case, you could use the implicit ordering!
+   */
+  std::vector<std::pair<unsigned int, unsigned int> > segments;
+  
 private:
   /**
    * Reference to the mesh which is to be created by triangle.
@@ -237,6 +257,12 @@ private:
    * the resulting triangulation.
    */
   bool _insert_extra_points;
+
+  /**
+   * Flag which tells whether we should smooth the mesh after
+   * it is generated.  True by default.
+   */
+  bool _smooth_after_generating;
 };
 
 

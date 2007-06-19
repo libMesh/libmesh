@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.C,v 1.14 2006-12-15 21:25:53 jwpeterson Exp $
+// $Id: mesh_triangle_support.C,v 1.15 2007-06-19 23:16:01 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -281,6 +281,14 @@ void Triangle::copy_tri_to_mesh(const triangulateio& triangle_data_input,
 // Function definitions for the TriangleInterface class
 void TriangleInterface::triangulate()
 {
+  // Will the triangulation have holes?
+  const bool have_holes = ((_holes != NULL) && (!_holes->empty()));
+  
+  // Currently, we don't support specifying user-defined segments
+  // *and* having holes
+  if (have_holes)
+    assert (this->segments.empty());
+  
   // If the initial PSLG is really simple, e.g. an L-shaped domain or
   // a square/rectangle, the resulting triangulation may be very
   // "structured" looking.  Sometimes this is a problem if your
@@ -294,10 +302,10 @@ void TriangleInterface::triangulate()
     {
       // Make a copy of the original points from the Mesh
       std::vector<Point> original_points (_mesh.n_nodes());
-
+      
       MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
       const MeshBase::node_iterator node_end = _mesh.nodes_end();
-
+      
       for (unsigned int ctr=0; node_it != node_end; ++node_it)
 	original_points[ctr++] = **node_it;
       
@@ -325,7 +333,6 @@ void TriangleInterface::triangulate()
   // the number of additional points which the holes will add to the
   // triangulation.
   unsigned int n_hole_points = 0;
-  const bool have_holes = ((_holes != NULL) && (!_holes->empty()));
 
   if (have_holes)
     {
@@ -344,19 +351,35 @@ void TriangleInterface::triangulate()
   initial.numberofpoints = _mesh.n_nodes() + n_hole_points;
   initial.pointlist      = static_cast<REAL*>(std::malloc(initial.numberofpoints * 2 * sizeof(REAL)));
 
-  if (_triangulation_type==PSLG) 
-    initial.numberofsegments = initial.numberofpoints; // One segment per point, including hole points
+  if (_triangulation_type==PSLG)
+    {
+      // Implicit segment ordering: One segment per point, including hole points
+      if (this->segments.empty())
+	initial.numberofsegments = initial.numberofpoints; 
 
+      // User-defined segment ordering: One segment per entry in the segments vector
+      else
+	initial.numberofsegments = this->segments.size();
+    }
+  
   else if (_triangulation_type==GENERATE_CONVEX_HULL)
     initial.numberofsegments = n_hole_points; // One segment for each hole point
+
+  // Debugging
+  // std::cout << "Number of segments set to: " << initial.numberofsegments << std::endl;
   
-  // Allocate space for the segments
+  // Allocate space for the segments (2 int per segment)
   if (initial.numberofsegments > 0)
-    initial.segmentlist      = static_cast<int*>(std::malloc(initial.numberofsegments * 2 * sizeof(int))); // 2 int per segment
+    {
+      initial.segmentlist = static_cast<int*> (std::malloc(initial.numberofsegments * 2 * sizeof(int)));
+    }  
 
 
   // Copy all the holes' points and segments into the triangle struct.
-  unsigned int offset=0;
+
+  // The hole_offset is a constant offset into the points vector which points
+  // past the end of the last hole point added.
+  unsigned int hole_offset=0;
   
   if (have_holes)
     for (unsigned int i=0; i<_holes->size(); ++i)
@@ -365,39 +388,55 @@ void TriangleInterface::triangulate()
 	  {
 	    Point p = (*_holes)[i]->point(h);
 
-	    const unsigned int index0 = 2*offset+ctr;
-	    const unsigned int index1 = 2*offset+ctr+1;
+	    const unsigned int index0 = 2*hole_offset+ctr;
+	    const unsigned int index1 = 2*hole_offset+ctr+1;
 
 	    // Save the x,y locations in the triangle struct.
 	    initial.pointlist[index0] = p(0);
 	    initial.pointlist[index1] = p(1);
 
 	    // Set the points which define the segments
-	    initial.segmentlist[index0] = offset+h;
-	    initial.segmentlist[index1] = (h==(*_holes)[i]->n_points()-1) ? offset : offset+h+1; // wrap around
+	    initial.segmentlist[index0] = hole_offset+h;
+	    initial.segmentlist[index1] = (h==(*_holes)[i]->n_points()-1) ? hole_offset : hole_offset+h+1; // wrap around
 	  }
 	
-	// Update the offset for the next hole
-	offset += (*_holes)[i]->n_points();
+	// Update the hole_offset for the next hole
+	hole_offset += (*_holes)[i]->n_points();
       }
 
   
   // Copy all the non-hole points and segments into the triangle struct.
-  for (unsigned int ctr=0, h=0; h<_mesh.n_nodes(); ctr+=2, ++h)
+  for (unsigned int ctr=0, n=0; n<_mesh.n_nodes(); ctr+=2, ++n)
     {
-      const unsigned int index0 = 2*offset+ctr;
-      const unsigned int index1 = 2*offset+ctr+1;
+      const unsigned int index0 = 2*hole_offset+ctr;
+      const unsigned int index1 = 2*hole_offset+ctr+1;
       
-      initial.pointlist[index0] = _mesh.point(h)(0);
-      initial.pointlist[index1] = _mesh.point(h)(1);
+      initial.pointlist[index0] = _mesh.point(n)(0);
+      initial.pointlist[index1] = _mesh.point(n)(1);
 
       // If the user requested a PSLG, the non-hole points are also segments
       if (_triangulation_type==PSLG)
 	{
-	  initial.segmentlist[index0] = offset+h;
-	  initial.segmentlist[index1] = (h==_mesh.n_nodes()-1) ? offset : offset+h+1; // wrap around
+	  // Use implicit ordering to define segments
+	  if (this->segments.empty())
+	    {
+	      initial.segmentlist[index0] = hole_offset+n;
+	      initial.segmentlist[index1] = (n==_mesh.n_nodes()-1) ? hole_offset : hole_offset+n+1; // wrap around
+	    }
 	}
     }
+
+  
+  // If the user provided it, use his ordering to define the segments
+  for (unsigned int ctr=0, s=0; s<this->segments.size(); ctr+=2, ++s)
+    {
+      const unsigned int index0 = 2*hole_offset+ctr;
+      const unsigned int index1 = 2*hole_offset+ctr+1;
+      
+      initial.segmentlist[index0] = hole_offset + this->segments[s].first;
+      initial.segmentlist[index1] = hole_offset + this->segments[s].second;
+    }
+
 
 
   // Tell the input struct about the holes
@@ -431,10 +470,10 @@ void TriangleInterface::triangulate()
   // -P  Suppresses the output .poly file. Saves disk space, but you lose the ability to maintain
   //     constraining segments on later refinements of the mesh.
   // Create the flag strings, depends on element type
-  std::ostringstream flags;
+std::ostringstream flags;
 
-  // Default flags always used
-  flags << "zBPQq";
+// Default flags always used
+flags << "zBPQq";
 
   // Flags which are specific to the type of triangulation
   switch (_triangulation_type)
@@ -507,8 +546,10 @@ void TriangleInterface::triangulate()
 			     _mesh,
 			     _elem_type);
       
-  // To the naked eye, a few smoothing iterations usually looks better.
-  LaplaceMeshSmoother(_mesh).smooth(2);
+  // To the naked eye, a few smoothing iterations usually looks better,
+  // so we do this by default unless the user says not to.
+  if (this->_smooth_after_generating)
+    LaplaceMeshSmoother(_mesh).smooth(2);
 
     
   // Clean up.    
