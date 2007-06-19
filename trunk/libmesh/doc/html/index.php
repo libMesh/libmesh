@@ -1,4 +1,4 @@
-<!-- $Id: index.php,v 1.18 2007-06-19 17:39:03 jwpeterson Exp $ -->
+<!-- $Id: index.php,v 1.19 2007-06-19 18:29:33 jwpeterson Exp $ -->
 <?php $root=""; ?>
 <?php require($root."navigation.php"); ?>
 
@@ -45,9 +45,18 @@ if (NW_IS_GECKO)
     }
 }
 
+// Do not do slanting text
 else
 {
+  // Use a slightly different CSS module for IE.
+  if (NW_IS_IE > 5)
+    {
+  echo "<img class=\"title_image_ie\" src=\"images/libmesh_mesh_small.png\">";
+    }
+  else
+    {
   echo "<img class=\"title_image\" src=\"images/libmesh_mesh_small.png\">";
+    }
 }
 ?>
 The <code>libMesh</code> library is a C++ framework for the numerical

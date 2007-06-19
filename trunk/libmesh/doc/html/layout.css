@@ -7,7 +7,17 @@ img.slant
 }
 
 img.title_image {
-  float                : left;
+  float                : left; /*IE does not render float :left correctly*/
+  margin-left          : 0;
+  padding-right        : 1em;
+  margin-top           : 0em;
+  margin-bottom        : 0em;
+  padding-top          : 0em;
+
+}
+
+img.title_image_ie {
+  /*float                : left;*/ /*IE does not render float :left correctly*/
   margin-left          : 0;
   padding-right        : 1em;
   margin-top           : 0em;
