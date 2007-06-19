@@ -3,7 +3,7 @@ img.slant
 {
   float: left;
   clear: left;
-  margin: 0 1em 0 0;
+  margin: 0 1em 0 0; /* top, right, left, bottom */
 }
 
 img.title_image {
