@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.15 2007-02-22 21:40:03 roystgnr Exp $
+// $Id: equation_systems_io.C,v 1.16 2007-06-19 18:27:59 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -409,6 +409,8 @@ void EquationSystems::write(const std::string& name,
   if (name.size() - name.rfind(".bz2") == 4)
     new_name.erase(new_name.end() - 4, new_name.end());
 
+  // New scope so that io will close before we try to zip the file
+  {
   Xdr io(new_name, mode);
 
   assert (io.writing());
@@ -579,11 +581,15 @@ void EquationSystems::write(const std::string& name,
 	pos->second->write_data (io,
 				 write_additional_data);
       }
+  }
 
   // Nasty hack for reading/writing zipped files
   if (name.size() - name.rfind(".bz2") == 4)
     {
       START_LOG("system(bzip2)", "EquationSystems");
+#ifdef HAVE_MPI
+      MPI_Barrier(libMesh::COMM_WORLD);
+#endif
       if (libMesh::processor_id() == 0)
         {
           std::string system_string = "bzip2 -f ";
