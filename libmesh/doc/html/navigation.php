@@ -8,7 +8,7 @@ function load_style($root)
   detect();
   
   // Now check for CSS compatibility
-  if (NW_IS_GECKO)
+  if (NW_IS_GECKO || NW_IS_KONQ || NW_IS_OPERA)
     {
       echo "<link href='gecko.css' type='text/css' rel='stylesheet' media='screen'>\n";
     }
