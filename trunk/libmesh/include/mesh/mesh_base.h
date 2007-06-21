@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.53 2007-06-04 16:32:44 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.54 2007-06-21 21:24:35 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -56,8 +56,8 @@ class BoundaryInfo;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2007-06-04 16:32:44 $
- * \version $Revision: 1.53 $
+ * \date    $Date: 2007-06-21 21:24:35 $
+ * \version $Revision: 1.54 $
  */
 
 
@@ -361,8 +361,16 @@ public:
   struct node_iterator;
   struct const_node_iterator;
 
-
-
+  /**
+   * In a few (very rare) cases, the user may have manually tagged the
+   * elements with specific processor IDs by hand, without using a
+   * partitioner.  In this case, the Mesh will not know that the total
+   * number of partitions, _n_parts, has changed, unless you call this
+   * function.  This is an O(N active elements) calculation.  The return
+   * value is the number of partitions, and _n_parts is also set by
+   * this function.  
+   */
+  unsigned int recalculate_n_partitions();
 
 public:
 
