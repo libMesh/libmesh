@@ -1,5 +1,5 @@
 
-// $Id: parallel.h,v 1.3 2007-06-17 19:24:53 roystgnr Exp $
+// $Id: parallel.h,v 1.4 2007-06-21 20:57:41 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -55,11 +55,27 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Take a vector of local variables and replace each entry with the minimum
+   * of it's values on all processors
+   */
+  template <typename T>
+  inline void min(std::vector<T> &r);
+
+  //-------------------------------------------------------------------
+  /**
    * Take a local variable and replace it with the maximum of it's values
    * on all processors
    */
   template <typename T>
   inline void max(T &r);
+
+  //-------------------------------------------------------------------
+  /**
+   * Take a vector of local variables and replace each entry with the maximum
+   * of it's values on all processors
+   */
+  template <typename T>
+  inline void max(std::vector<T> &r);
 
   //-------------------------------------------------------------------
   /**
@@ -129,6 +145,23 @@ inline void min(T &r)
 
 
 template <typename T>
+inline void min(std::vector<T> &r)
+{
+  if (libMesh::n_processors() > 1)
+    {
+      std::vector<T> temp(r.size());
+      MPI_Allreduce (&r[0],
+                     &temp[0],
+                     r.size(),
+                     datatype<T>(),
+                     MPI_MIN,
+                     libMesh::COMM_WORLD);
+      r = temp;
+    }
+}
+
+
+template <typename T>
 inline void max(T &r)
 {
   if (libMesh::n_processors() > 1)
@@ -137,6 +170,23 @@ inline void max(T &r)
       MPI_Allreduce (&r,
                      &temp,
                      1,
+                     datatype<T>(),
+                     MPI_MAX,
+                     libMesh::COMM_WORLD);
+      r = temp;
+    }
+}
+
+
+template <typename T>
+inline void max(std::vector<T> &r)
+{
+  if (libMesh::n_processors() > 1)
+    {
+      std::vector<T> temp(r.size());
+      MPI_Allreduce (&r[0],
+                     &temp[0],
+                     r.size(),
                      datatype<T>(),
                      MPI_MAX,
                      libMesh::COMM_WORLD);
@@ -240,7 +290,13 @@ template <typename T>
 inline void min(T &) {}
 
 template <typename T>
+inline void min(std::vector<T> &) {}
+
+template <typename T>
 inline void max(T &) {}
+
+template <typename T>
+inline void max(std::vector<T> &) {}
 
 template <typename T>
 inline void sum(T &) {}
