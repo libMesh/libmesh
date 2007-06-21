@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.43 2007-06-05 16:09:30 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.44 2007-06-21 21:24:35 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -326,7 +326,17 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
   if (this->partitioning())
     {
       out << "material "
-          << mesh.n_partitions()
+	  << mesh.n_partitions()
+	// Note: GMV may give you errors like
+	// Error, material for cell 1 is greater than 1
+        // Error, material for cell 2 is greater than 1
+        // Error, material for cell 3 is greater than 1
+	// ... because you put the wrong number of partitions here.
+	// To ensure you write the correct number of materials, call
+	// mesh.recalculate_n_partitions() before writing out the
+	// mesh.
+	// Note: we can't call it now because the Mesh is const here and
+	// it is a non-const function.
           << " 0\n";
 
       for (unsigned int proc=0; proc<mesh.n_partitions(); proc++)

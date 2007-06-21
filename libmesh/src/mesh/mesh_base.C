@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.99 2007-06-04 16:31:40 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.100 2007-06-21 21:24:35 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -251,6 +251,21 @@ void MeshBase::partition (const unsigned int n_parts)
 
 
 
+unsigned int MeshBase::recalculate_n_partitions()
+{
+  const_element_iterator       el  = this->active_elements_begin();
+  const const_element_iterator end = this->active_elements_end(); 
+
+  unsigned int max_proc_id=0;
+  
+  for (; el!=end; ++el)
+    max_proc_id = std::max(max_proc_id, static_cast<unsigned int>((*el)->processor_id()));
+
+  // The number of partitions is one more than the max processor ID.
+  _n_parts = max_proc_id+1;
+
+  return _n_parts;
+}
 
 
 
