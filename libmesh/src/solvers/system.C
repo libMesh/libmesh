@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.37 2007-06-15 22:34:34 roystgnr Exp $
+// $Id: system.C,v 1.38 2007-06-22 18:39:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -736,7 +736,11 @@ Real System::calculate_norm(NumericVector<Number>& v,
                   for (unsigned int i=0; i != n_sf; ++i)
                     hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
                   v_norm += component_scale[var] * JxW[qp] *
+#if   defined (USE_REAL_NUMBERS)
                             hess_u_h.contract(hess_u_h);
+#elif defined (USE_COMPLEX_NUMBERS)
+                            std::abs(hess_u_h.contract(hess_u_h));
+#endif
                 }
 #endif
             }
