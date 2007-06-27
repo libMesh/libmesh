@@ -1,4 +1,4 @@
-// $Id: cell_tet4.h,v 1.16 2007-05-23 23:36:09 roystgnr Exp $
+// $Id: cell_tet4.h,v 1.17 2007-06-27 20:41:27 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -179,6 +179,8 @@ protected:
    */
   static const float _embedding_matrix[8][4][4];
 
+ public:
+
   /**
    * This enumeration keeps track of which diagonal is selected during
    * refinement.  In general there are three possible diagonals to
@@ -191,6 +193,38 @@ protected:
      DIAG_01_23=2,    // diagonal between edges (0,1) and (2,3)
      INVALID_DIAG=99  // diagonal not yet selected
     };
+
+  /**
+   * Returns the diagonal that has been selected during refinement.
+   */
+  Diagonal diagonal_selection (void) const { return _diagonal_selection; }
+
+  /**
+   * Allows the user to select the diagonal for the refinement.  This
+   * function may only be called before the element is ever refined.
+   */
+  void select_diagonal (const Diagonal diag) const;
+
+  /**
+   * Allows the user to reselect the diagonal after refinement.  This
+   * function may only be called directly after the element is refined
+   * for the first time (and before the \p EquationSystems::reinit()
+   * is called).  It will destroy and re-create the children if
+   * necessary.
+   */
+  void reselect_diagonal (const Diagonal diag);
+
+  /**
+   * Reselects the diagonal after refinement to be the optimal one.
+   * This makes sense if the user has moved some grid points, so that
+   * the former optimal choice is no longer optimal.  Also, the user
+   * may exclude one diagonal from this selection by giving it as
+   * argument.  In this case, the more optimal one of the remaining
+   * two diagonals is chosen.
+   */
+  void reselect_optimal_diagonal (const Diagonal exclude_this=INVALID_DIAG);
+
+ protected:
 
   mutable Diagonal _diagonal_selection;
   
