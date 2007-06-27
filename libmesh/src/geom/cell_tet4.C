@@ -1,4 +1,4 @@
-// $Id: cell_tet4.C,v 1.27 2007-05-23 23:36:11 roystgnr Exp $
+// $Id: cell_tet4.C,v 1.28 2007-06-27 20:41:27 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -366,4 +366,140 @@ float Tet4::embedding_matrix (const unsigned int i,
   // Call embedding matrx with permuted indices
   return this->_embedding_matrix[i][jp][kp]; 
 }
+
+
+
+void Tet4::select_diagonal (const Diagonal diag) const
+{
+  assert (_diagonal_selection==INVALID_DIAG);
+  _diagonal_selection = diag;
+}
+
+
+
+void Tet4::reselect_diagonal (const Diagonal diag)
+{
+  /* Make sure that the element has just been refined.  */
+  assert (_children!=NULL);
+  assert (n_children()==8);
+  assert (_children[0]->refinement_flag()==JUST_REFINED);
+  assert (_children[1]->refinement_flag()==JUST_REFINED);
+  assert (_children[2]->refinement_flag()==JUST_REFINED);
+  assert (_children[3]->refinement_flag()==JUST_REFINED);
+  assert (_children[4]->refinement_flag()==JUST_REFINED);
+  assert (_children[5]->refinement_flag()==JUST_REFINED);
+  assert (_children[6]->refinement_flag()==JUST_REFINED);
+  assert (_children[7]->refinement_flag()==JUST_REFINED);
+
+  /* Check whether anything has to be changed.  */
+  if (_diagonal_selection!=diag)
+    {
+      /* Set new diagonal selection.  */
+      _diagonal_selection = diag;
+
+      /* The first four children do not have to be changed.  For the
+	 others, only the nodes have to be changed.  Note that we have
+	 to keep track of the nodes ourselves since there is no \p
+	 MeshRefinement object with a valid \p _new_nodes_map
+	 available.  */
+      for (unsigned int c=4; c<this->n_children(); c++)
+	{
+	  Elem *child = this->child(c);
+	  for (unsigned int nc=0; nc<child->n_nodes(); nc++)
+	    {
+	      /* Unassign the current node.  */
+	      child->set_node(nc) = NULL;
+
+	      /* We have to find the correct new node now.  We know
+		 that it exists somewhere.  We make use of the fact
+		 that the embedding matrix for these children consists
+		 of entries 0.0 and 0.5 only.  Also, we make use of
+		 the properties of the embedding matrix for the first
+		 (unchanged) four children, which allow us to use a
+		 simple mechanism to find the required node.  */
+	      
+	      
+	      unsigned int first_05_in_embedding_matrix = libMesh::invalid_uint;
+	      for (unsigned int n=0; n<this->n_nodes(); n++)
+		{
+		  if (this->embedding_matrix(c,nc,n) != 0.0)
+		    {
+		      /* It must be 0.5 then.  Check whether it's the
+			 first or second time that we get a 0.5
+			 value.  */
+		      if (first_05_in_embedding_matrix==libMesh::invalid_uint)
+			{
+			  /* First time, so just remeber this position.  */
+			  first_05_in_embedding_matrix = n;
+			}
+		      else
+			{
+			  /* Second time, so we know now which node to
+			     use.  */
+			  child->set_node(nc) = this->child(n)->get_node(first_05_in_embedding_matrix);
+			}
+
+		    }
+		}
+
+	      /* Make sure that a node has been found.  */
+	      assert (child->get_node(nc)!=NULL);
+	    }
+	}
+    }
+}
+
+
+
+void Tet4::reselect_optimal_diagonal (const Diagonal exclude_this)
+{
+  Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
+  Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
+  Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
+  
+  Diagonal use_this = INVALID_DIAG;
+  switch (exclude_this)
+    {
+    case DIAG_01_23:
+      use_this = DIAG_02_13;
+      if (diag_03_12 < diag_02_13)
+	{
+	  use_this = DIAG_03_12;
+	}
+      break;
+
+    case DIAG_02_13:
+      use_this = DIAG_03_12;
+      if (diag_01_23 < diag_03_12)
+	{
+	  use_this = DIAG_01_23;
+	}
+      break;
+
+    case DIAG_03_12:
+      use_this = DIAG_02_13;
+      if (diag_01_23 < diag_02_13)
+	{
+	  use_this = DIAG_01_23;
+	}
+      break;
+
+    default:
+      use_this = DIAG_02_13;
+      if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
+	{
+	  if (diag_01_23 < diag_03_12)
+	    {
+	      use_this = DIAG_01_23;
+	    }
+	  else
+	    {
+	      use_this = DIAG_03_12;
+	    }
+	}
+      break;
+    }
+
+  reselect_diagonal (use_this);  
+} 
 #endif // #ifdef ENABLE_AMR
