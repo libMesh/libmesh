@@ -1,4 +1,4 @@
-// $Id: jump_error_estimator.C,v 1.3 2007-05-23 23:36:12 roystgnr Exp $
+// $Id: jump_error_estimator.C,v 1.4 2007-06-28 19:51:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -225,8 +225,9 @@ void JumpErrorEstimator::estimate_error (const System& system,
 		    {
                       // Find the active neighbors in this direction
                       std::vector<const Elem*> active_neighbors;
-                      parent->active_family_tree_by_neighbor(active_neighbors,
-                                                             parent);
+                      parent->neighbor(n_p)->
+		        active_family_tree_by_neighbor(active_neighbors,
+                                                       parent);
                       // Compute the flux to each active neighbor
                       for (unsigned int a=0; 
                            a != active_neighbors.size(); ++a)
