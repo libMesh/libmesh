@@ -1,4 +1,4 @@
-<!-- $Id: index.php,v 1.19 2007-06-19 18:29:33 jwpeterson Exp $ -->
+<!-- $Id: index.php,v 1.20 2007-07-01 00:43:38 benkirk Exp $ -->
 <?php $root=""; ?>
 <?php require($root."navigation.php"); ?>
 
@@ -83,7 +83,7 @@ contributions have come from developers at the Technische
 Universit&auml;t Hamburg-Harburg
 <a href="http://www.mub.tu-harburg.de/index_e.html">Institute of Modelling and Computation</a>, 
 and recent contributions have been made by CFDLab graduates at
-<a href="http://www.sandia.gov/">Sandia National Laboratories</a> and <a href="http://www.nasa.gov/">NASA</a>.
+<a href="http://www.sandia.gov/">Sandia National Laboratories</a> and <a href="http://www.nasa.gov/">NASA</a> <a href="http://www.nasa.gov/centers/johnson/home/index.html">Lyndon B. Johnson Space Center</a>.
 The <code>libMesh</code> <a href="http://libmesh.sf.net/developers.php">developers</a> welcome contributions
 in the form of patches and bug reports (preferably with a minimal test case that reliably reproduces the error)
 to the official <a href="http://sourceforge.net/mail/?group_id=71130">mailing lists</a>.
