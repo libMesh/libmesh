@@ -29,6 +29,7 @@
     <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/libmesh_uwa03.pdf">libMesh Presentation</a> (from the June 2003 UWA Shortcourse)</li>
     <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/applications_uwa03.pdf">AMR Applications</a> (from the June 2003 UWA Shortcourse)</li>
     <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/seminar/talk.pdf">Finite Elements - Introduction and Applications</a> (April 2004 NASA/JSC technical seminar)</li>
+    <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/defense.pdf">PhD Dissertation Defense</a>, March 2007</li>
   </ul>
   
   <li> <h2>USNCCM VII</h2> </li>
