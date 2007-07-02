@@ -1,4 +1,4 @@
-// $Id: node_elem.h,v 1.2 2007-02-12 20:29:38 jwpeterson Exp $
+// $Id: node_elem.h,v 1.3 2007-07-02 16:10:51 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -150,14 +150,14 @@ class NodeElem : public Elem
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int,
-			       const unsigned int) const { error(); }
+			       const unsigned int) const { error(); return false; }
   
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge (i.e. "returns true" in 1D)
    */
   virtual bool is_node_on_edge(const unsigned int,
-			       const unsigned int) const { error(); }
+			       const unsigned int) const { error(); return false; }
   
   /*
    * @returns true iff the element map is definitely affine within

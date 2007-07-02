@@ -1,4 +1,4 @@
-// $Id: xdr_mgf.h,v 1.2 2007-02-13 22:47:56 roystgnr Exp $
+// $Id: xdr_mgf.h,v 1.3 2007-07-02 16:10:51 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,7 @@
 #include <cstdio>  // for std::FILE
 #include <string>
 #include <fstream> // for std::ifstream
+#include <sstream>
 
 // Local includes
 #include "xdr_io.h"          // for XdrIO::FileFormat

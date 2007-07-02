@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.60 2007-05-04 22:27:50 roystgnr Exp $
+// $Id: mesh_refinement.C,v 1.61 2007-07-02 16:10:52 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,7 @@
 #include "libmesh_logging.h"
 #include "boundary_info.h"
 
+#include <limits>
 
 
 //-----------------------------------------------------------------
@@ -207,7 +208,7 @@ void MeshRefinement::create_parent_error_vector
               if (parent_error < 0)
                 continue;
 
-              parent_error = sqrt(parent_error);
+              parent_error = std::sqrt(parent_error);
               error_per_parent[parentid] = parent_error;
 
               parent_error_min = std::min (parent_error_min,

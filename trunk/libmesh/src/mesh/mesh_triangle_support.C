@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.C,v 1.15 2007-06-19 23:16:01 jwpeterson Exp $
+// $Id: mesh_triangle_support.C,v 1.16 2007-07-02 16:10:52 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -116,19 +116,19 @@ void MeshTools::Generation::build_delaunay_square(Mesh& mesh,
 	    short int bc_id=4;
 
 	    // bottom
-	    if      (fabs(side_midpoint(1) - ymin) < TOLERANCE)
+	    if      (std::fabs(side_midpoint(1) - ymin) < TOLERANCE)
 	      bc_id=0;
 
 	    // right
-	    else if (fabs(side_midpoint(0) - xmax) < TOLERANCE)
+	    else if (std::fabs(side_midpoint(0) - xmax) < TOLERANCE)
 	      bc_id=1;
 
 	    // top
-	    else if (fabs(side_midpoint(1) - ymax) < TOLERANCE)
+	    else if (std::fabs(side_midpoint(1) - ymax) < TOLERANCE)
 	      bc_id=2;
 
 	    // left
-	    else if (fabs(side_midpoint(0) - xmin) < TOLERANCE)
+	    else if (std::fabs(side_midpoint(0) - xmin) < TOLERANCE)
 	      bc_id=3;
 
 	    // If the point is not on any of the external boundaries, it
