@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.15 2007-07-02 16:42:52 roystgnr Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.16 2007-07-02 17:04:57 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -176,7 +176,7 @@ void PetscNonlinearSolver<T>::init ()
 
 #endif	     
 
-#if ((PETSC_VERSION_MAJOR == 2) && ((PETSC_VERSION_MINOR <= 3) || ((PETSC_VERSION_MINOR == 3) && (PETSC_VERSION_SUBMINOR <= 2))))
+#if ((PETSC_VERSION_MAJOR == 2) && ((PETSC_VERSION_MINOR < 3) || ((PETSC_VERSION_MINOR == 3) && (PETSC_VERSION_SUBMINOR <= 2))))
       // API name change in PETSc 2.3.3
       ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
 			     this, PETSC_NULL);
