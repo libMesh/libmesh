@@ -1,4 +1,4 @@
-// $Id: equation_systems_io.C,v 1.16 2007-06-19 18:27:59 roystgnr Exp $
+// $Id: equation_systems_io.C,v 1.17 2007-07-02 16:10:52 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -135,7 +135,7 @@ void EquationSystems::read (const std::string& name,
         {
           std::string system_string = "bunzip2 -f -k ";
           system_string += name;
-          system(system_string.c_str());
+          std::system(system_string.c_str());
         }
 #ifdef HAVE_MPI
       MPI_Barrier(libMesh::COMM_WORLD);
@@ -296,7 +296,7 @@ void EquationSystems::read (const std::string& name,
   // If we temporarily decompressed a .bz2 file, remove the
   // uncompressed version
   if (name.size() - name.rfind(".bz2") == 4)
-    unlink(new_name.c_str());
+    std::remove(new_name.c_str());
 
   // Localize each system's data
   this->update();
@@ -594,7 +594,7 @@ void EquationSystems::write(const std::string& name,
         {
           std::string system_string = "bzip2 -f ";
           system_string += new_name;
-          system(system_string.c_str());
+          std::system(system_string.c_str());
         }
 #ifdef HAVE_MPI
       MPI_Barrier(libMesh::COMM_WORLD);

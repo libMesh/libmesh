@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.49 2007-05-23 23:36:11 roystgnr Exp $
+// $Id: mesh_generation.C,v 1.50 2007-07-02 16:10:52 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1329,7 +1329,7 @@ void MeshTools::Generation::build_sphere (Mesh& mesh,
       // Build a circle in two dimensions
     case 2:
       {
-	const Real sqrt_2     = sqrt(2.);
+	const Real sqrt_2     = std::sqrt(2.);
         const Real rad_2      = .25*rad;
         const Real rad_sqrt_2 = rad/sqrt_2;
 

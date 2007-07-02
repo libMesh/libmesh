@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.h,v 1.9 2007-06-19 23:16:01 jwpeterson Exp $
+// $Id: mesh_triangle_support.h,v 1.10 2007-07-02 16:10:51 friedmud Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -340,8 +340,8 @@ public:
     // The nth point lies at the angle theta = 2 * pi * n / _n_points
     const Real theta = static_cast<Real>(n) * 2.0 * libMesh::pi / static_cast<Real>(_n_points);
 	
-    return Point(_center(0) + _radius*cos(theta), // x=r*cos(theta)
-		 _center(1) + _radius*sin(theta), // y=r*sin(theta)
+    return Point(_center(0) + _radius*std::cos(theta), // x=r*cos(theta)
+		 _center(1) + _radius*std::sin(theta), // y=r*sin(theta)
 		 0.);
   }
 

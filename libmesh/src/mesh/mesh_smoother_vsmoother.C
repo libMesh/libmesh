@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_vsmoother.C,v 1.3 2007-06-04 17:44:38 friedmud Exp $
+// $Id: mesh_smoother_vsmoother.C,v 1.4 2007-07-02 16:10:52 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -646,10 +646,10 @@ int VariationalMeshSmoother::basisA(int n, LPLPDOUBLE Q, int nvert, LPDOUBLE K, 
      }
      if(nvert==4){//linear tetr
       /*---for regular reference tetrahedron--------*/
-      U[0][0]=-1; U[1][0]=-1.0/sqrt(3); U[2][0]=-1.0/sqrt(6);
-      U[0][1]=1;  U[1][1]=-1.0/sqrt(3); U[2][1]=-1.0/sqrt(6);
-      U[0][2]=0;  U[1][2]=2.0/sqrt(3);  U[2][2]=-1.0/sqrt(6);
-      U[0][3]=0;  U[1][3]=0;            U[2][3]=3.0/sqrt(6);
+      U[0][0]=-1; U[1][0]=-1.0/sqrt(3.0); U[2][0]=-1.0/sqrt(6.0);
+      U[0][1]=1;  U[1][1]=-1.0/sqrt(3.0); U[2][1]=-1.0/sqrt(6.0);
+      U[0][2]=0;  U[1][2]=2.0/sqrt(3.0);  U[2][2]=-1.0/sqrt(6.0);
+      U[0][3]=0;  U[1][3]=0;            U[2][3]=3.0/sqrt(6.0);
       /*---for right corner reference tetrahedron----
       U[0][0]=-1; U[1][0]=-1; U[2][0]=-1;
       U[0][1]=1;  U[1][1]=0;  U[2][1]=0;
@@ -1501,7 +1501,7 @@ if(msglev>=3) fprintf(sout, "dJ=%e J0=%e \n",sqrt(nonzero),Jpr);
 J=1e32; j=1;
 while((Jpr<=J)&&(j>-30)){
    j=j-1;
-   tau=pow(2,j); //search through finite # of values for tau
+   tau=pow(2.0,j); //search through finite # of values for tau
    for(i=0;i<N;i++)
    {
        for(k=0;k<n;k++)
@@ -1811,7 +1811,7 @@ for(nz=0;nz<5;nz++){
    L=1e32; j=1;
    while((Jpr<=L)&&(j>-30)){
       j=j-1;
-      tau=pow(2,j);
+      tau=pow(2.0,j);
       for(i=0;i<N;i++){
 	  for(k=0;k<2;k++) Rpr[i][k]=R[i][k]+tau*P[i][k];}
       J=0; gVmin=1e32; gemax=-1e32; gqmin=1e32;

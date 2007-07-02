@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.44 2007-06-21 21:24:35 jwpeterson Exp $
+// $Id: gmv_io.C,v 1.45 2007-07-02 16:10:52 friedmud Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -2113,60 +2113,60 @@ ElemType GMVIO::_gmv_elem_to_libmesh_elem(const char* elemname)
   //
   // Linear Elements
   //
-  if (!strncmp(elemname,"line",4))
+  if (!std::strncmp(elemname,"line",4))
     return EDGE2;
   
-  if (!strncmp(elemname,"tri",3))
+  if (!std::strncmp(elemname,"tri",3))
     return TRI3;
 
-  if (!strncmp(elemname,"quad",4))
+  if (!std::strncmp(elemname,"quad",4))
     return QUAD4;
   
   // FIXME: tet or ptet4?
-  if ((!strncmp(elemname,"tet",3)) ||
-      (!strncmp(elemname,"ptet4",5)))
+  if ((!std::strncmp(elemname,"tet",3)) ||
+      (!std::strncmp(elemname,"ptet4",5)))
     return TET4;
 
   // FIXME: hex or phex8?
-  if ((!strncmp(elemname,"hex",3)) ||
-      (!strncmp(elemname,"phex8",5)))
+  if ((!std::strncmp(elemname,"hex",3)) ||
+      (!std::strncmp(elemname,"phex8",5)))
     return HEX8;
 
   // FIXME: prism or pprism6?
-  if ((!strncmp(elemname,"prism",5)) ||
-      (!strncmp(elemname,"pprism6",7)))
+  if ((!std::strncmp(elemname,"prism",5)) ||
+      (!std::strncmp(elemname,"pprism6",7)))
     return PRISM6;
 
   //
   // Quadratic Elements
   //
-  if (!strncmp(elemname,"phex20",6))
+  if (!std::strncmp(elemname,"phex20",6))
     return HEX20;
 
-  if (!strncmp(elemname,"phex27",6))
+  if (!std::strncmp(elemname,"phex27",6))
     return HEX27;
 
-  if (!strncmp(elemname,"pprism15",8))
+  if (!std::strncmp(elemname,"pprism15",8))
     return PRISM15;
 
-  if (!strncmp(elemname,"ptet10",6))
+  if (!std::strncmp(elemname,"ptet10",6))
     return TET10;
 
-  if (!strncmp(elemname,"6tri",4))
+  if (!std::strncmp(elemname,"6tri",4))
     return TRI6;
 
-  if (!strncmp(elemname,"8quad",5))
+  if (!std::strncmp(elemname,"8quad",5))
     return QUAD8;
 
-  if (!strncmp(elemname,"3line",5))
+  if (!std::strncmp(elemname,"3line",5))
     return EDGE3;
   
   // Unsupported/Unused types
-  // if (!strncmp(elemname,"vface2d",7))
-  // if (!strncmp(elemname,"vface3d",7))
-  // if (!strncmp(elemname,"pyramid",7))
-  // if (!strncmp(elemname,"ppyrmd5",7))
-  // if (!strncmp(elemname,"ppyrmd13",8))
+  // if (!std::strncmp(elemname,"vface2d",7))
+  // if (!std::strncmp(elemname,"vface3d",7))
+  // if (!std::strncmp(elemname,"pyramid",7))
+  // if (!std::strncmp(elemname,"ppyrmd5",7))
+  // if (!std::strncmp(elemname,"ppyrmd13",8))
 
   // If we didn't return yet, then we didn't find the right cell!
   std::cerr << "Uknown/unsupported element: "
