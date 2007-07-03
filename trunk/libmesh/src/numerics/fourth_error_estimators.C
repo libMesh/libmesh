@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.C,v 1.15 2006-12-08 01:45:01 roystgnr Exp $
+// $Id: fourth_error_estimators.C,v 1.16 2007-07-03 03:46:53 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
@@ -115,7 +115,7 @@ LaplacianErrorEstimator::internal_side_integration ()
 #else // defined (ENABLE_SECOND_DERIVATIVES)
 
 void
-LaplacianErrorEstimator::initialize(const System& system,
+LaplacianErrorEstimator::initialize(const System&,
                                     ErrorVector&,
                                     bool)
 {
