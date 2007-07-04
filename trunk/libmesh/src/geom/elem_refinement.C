@@ -1,4 +1,4 @@
-// $Id: elem_refinement.C,v 1.21 2006-10-12 22:09:32 roystgnr Exp $
+// $Id: elem_refinement.C,v 1.22 2007-07-04 19:03:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -259,6 +259,40 @@ void Elem::coarsen()
   // _children = NULL;
 
   unsigned int parent_p_level = 0;
+
+  // re-compute hanging node nodal locations
+  for (unsigned int c=0; c<this->n_children(); c++)
+  {	
+    for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
+    {
+      Point new_pos;
+      bool calculated_new_pos = false;
+
+      for (unsigned int n=0; n<this->n_nodes(); n++)
+      {
+        // The value from the embedding matrix
+        const float em_val = this->embedding_matrix(c,nc,n);
+         
+        // The node location is somewhere between existing vertices
+        if ((em_val != 0.) && (em_val != 1.)) 
+        {
+	  new_pos.add_scaled (this->point(n), em_val);
+	  calculated_new_pos = true;
+        }
+      }
+
+      if(calculated_new_pos)
+      {	
+	//Move the existing node back into it's original location
+	for(unsigned int i=0; i<DIM; i++)
+	{
+	  Point & child_node = *(this->child(c)->get_node(nc));
+	  child_node(i)=new_pos(i);
+	}
+      }
+    }
+  }
+
   for (unsigned int c=0; c<this->n_children(); c++)
     {	
       assert (this->child(c)->refinement_flag() == Elem::COARSEN);
