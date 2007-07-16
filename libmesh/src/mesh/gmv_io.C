@@ -1,4 +1,4 @@
-// $Id: gmv_io.C,v 1.45 2007-07-02 16:10:52 friedmud Exp $
+// $Id: gmv_io.C,v 1.46 2007-07-16 15:56:50 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -420,11 +420,12 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 	  MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
 	  const MeshBase::const_element_iterator elem_end = mesh.active_elements_end(); 
 	  
-	  for ( ; elem_it != elem_end; ++elem_it)
+	  for (; elem_it != elem_end; ++elem_it)
 	    {
 	      const Elem* e = *elem_it;
 	      
-	      // If there's a seg-fault, it will probably be here!
+	      // Use the element's ID to find the value.
+	      assert (e->id() < the_array->size());
 	      const Real the_value = the_array->operator[](e->id());
 	      
 	      if (this->subdivide_second_order())
@@ -629,7 +630,9 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 	          {
 		    // Quad elements
 		    if (((*it)->type() == QUAD4) ||
-		        ((*it)->type() == QUAD8) ||
+		        ((*it)->type() == QUAD8) || // Note: QUAD8 will be output as one central quad and
+			                            // four surrounding triangles (though they will be written
+			                            // to GMV as QUAD4s).  
 		        ((*it)->type() == QUAD9)
 #ifdef ENABLE_INFINITE_ELEMENTS
 		        || ((*it)->type() == INFQUAD4)
@@ -976,11 +979,12 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 	  MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
 	  const MeshBase::const_element_iterator elem_end = mesh.active_elements_end(); 
 	  
-	  for ( ; elem_it != elem_end; ++elem_it)
+	  for (; elem_it != elem_end; ++elem_it)
 	    {
 	      const Elem* e = *elem_it;
 	      
-	      // If there's a seg-fault, it will probably be here!
+	      // Use the element's ID to find the value...
+	      assert (e->id() < the_array->size());
 	      const Real the_value = the_array->operator[](e->id());
 	      
 	      if (this->subdivide_second_order())
@@ -1595,7 +1599,9 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 	      {
 		if (((*it)->type() == QUAD4) ||
-		    ((*it)->type() == QUAD8) ||
+		    ((*it)->type() == QUAD8) || // Note: QUAD8 will be output as one central quad and
+			                        // four surrounding triangles (though they will be written
+			                        // to GMV as QUAD4s).  
 		    ((*it)->type() == QUAD9)
 #ifdef ENABLE_INFINITE_ELEMENTS
 		    || ((*it)->type() == INFQUAD4)
@@ -1805,7 +1811,10 @@ void GMVIO::add_cell_centered_data (const std::string&       cell_centered_data_
 				    const std::vector<Real>* cell_centered_data_vals)
 {
   assert (cell_centered_data_vals != NULL);
-  assert (cell_centered_data_vals->size() ==
+
+  // Make sure there are *at least* enough entries for all the active elements.
+  // There can also be entries for inactive elements, they will be ignored.
+  assert (cell_centered_data_vals->size() >=
 	  MeshOutput<MeshBase>::mesh().n_active_elem());
   this->_cell_centered_data[cell_centered_data_name] = cell_centered_data_vals;
 }
