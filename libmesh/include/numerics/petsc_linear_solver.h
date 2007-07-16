@@ -1,4 +1,4 @@
-// $Id: petsc_linear_solver.h,v 1.4 2007-02-22 00:35:18 roystgnr Exp $
+// $Id: petsc_linear_solver.h,v 1.5 2007-07-16 15:12:36 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 #include "linear_solver.h"
 #include "petsc_vector.h"
 #include "petsc_matrix.h"
-
+#include "petsc_macro.h"
 
 /**
  * Petsc include files.
@@ -37,16 +37,14 @@
 
 #ifndef USE_COMPLEX_NUMBERS
 extern "C" {
-# include <petscversion.h>
-# if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+# if PETSC_VERSION_LESS_THAN(2,2,0)
 #   include <petscsles.h>
 # else
 #   include <petscksp.h>
 # endif
 }
 #else
-# include <petscversion.h>
-# if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+# if PETSC_VERSION_LESS_THAN(2,2,0)
 #   include <petscsles.h>
 # else
 #   include <petscksp.h>
@@ -171,7 +169,7 @@ private:
   void set_petsc_preconditioner_type ();
 
   // SLES removed from >= PETSc 2.2.0
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+#if PETSC_VERSION_LESS_THAN(2,2,0)
   
   /**
    * Linear solver context

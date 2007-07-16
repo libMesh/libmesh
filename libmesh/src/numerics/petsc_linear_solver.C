@@ -1,4 +1,4 @@
-// $Id: petsc_linear_solver.C,v 1.10 2007-02-22 00:35:18 roystgnr Exp $
+// $Id: petsc_linear_solver.C,v 1.11 2007-07-16 15:12:36 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -42,18 +42,20 @@ void PetscLinearSolver<T>::clear ()
 
       int ierr=0;
 
-// 2.1.x & earlier style      
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
-      
-      ierr = SLESDestroy(_sles);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#if PETSC_VERSION_LESS_THAN(2,2,0)
 
-// 2.2.0 & newer style
+  // 2.1.x & earlier style      
+  ierr = SLESDestroy(_sles);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
 #else
-      
-      ierr = KSPDestroy(_ksp);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // 2.2.0 & newer style
+  ierr = KSPDestroy(_ksp);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
 #endif
+
 	     
       // Mimic PETSc default solver and preconditioner
       this->_solver_type           = GMRES;
@@ -78,7 +80,7 @@ void PetscLinearSolver<T>::init ()
       int ierr=0;
   
 // 2.1.x & earlier style      
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+#if PETSC_VERSION_LESS_THAN(2,2,0)
       
       // Create the linear solver context
       ierr = SLESCreate (libMesh::COMM_WORLD, &_sles);
@@ -170,7 +172,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       int ierr=0;
 
 // 2.1.x & earlier style      
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+#if PETSC_VERSION_LESS_THAN(2,2,0)
       
       // Create the linear solver context
       ierr = SLESCreate (libMesh::COMM_WORLD, &_sles);
@@ -307,7 +309,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 //     }
   
 // 2.1.x & earlier style      
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+#if PETSC_VERSION_LESS_THAN(2,2,0)
       
   // Set operators. The input matrix works as the preconditioning matrix
   ierr = SLESSetOperators(_sles, matrix->mat(), precond->mat(),
@@ -332,7 +334,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 // 2.2.0
-#elif (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)
+#elif PETSC_VERSION_LESS_THAN(2,2,1)
       
   // Set operators. The input matrix works as the preconditioning matrix
   //ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
@@ -568,7 +570,8 @@ void PetscLinearSolver<T>::set_petsc_preconditioner_type()
     case EISENSTAT_PRECOND:
       ierr = PCSetType (_pc, (char*) PCEISENSTAT); CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
-#if !((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1) && (PETSC_VERSION_SUBMINOR <= 1))
+#if !(PETSC_VERSION_LESS_THAN(2,1,2))
+    // Only available for PETSC >= 2.1.2      
     case USER_PRECOND:
       ierr = PCSetType (_pc, (char*) PCMAT);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 #endif

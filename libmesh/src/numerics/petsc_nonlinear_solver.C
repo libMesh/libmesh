@@ -1,4 +1,4 @@
-// $Id: petsc_nonlinear_solver.C,v 1.16 2007-07-02 17:04:57 roystgnr Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.17 2007-07-16 15:12:36 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,8 +44,7 @@ extern "C"
   // Older versions of PETSc do not have the different int typedefs.
   // On 64-bit machines, PetscInt may actually be a long long int.
   // This change occurred in Petsc-2.2.1.
-# if (((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)) || \
-      ((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)))
+#if PETSC_VERSION_LESS_THAN(2,2,1)
   typedef int PetscErrorCode;
   typedef int PetscInt;
 #endif
@@ -161,8 +160,7 @@ void PetscNonlinearSolver<T>::init ()
       
       int ierr=0;
 
-# if ((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1) && (PETSC_VERSION_SUBMINOR <= 1))
-
+#if PETSC_VERSION_LESS_THAN(2,1,2)
       // At least until Petsc 2.1.1, the SNESCreate had a different calling syntax.
       // The second argument was of type SNESProblemType, and could have a value of
       // either SNES_NONLINEAR_EQUATIONS or SNES_UNCONSTRAINED_MINIMIZATION.
@@ -176,11 +174,11 @@ void PetscNonlinearSolver<T>::init ()
 
 #endif	     
 
-#if ((PETSC_VERSION_MAJOR == 2) && ((PETSC_VERSION_MINOR < 3) || ((PETSC_VERSION_MINOR == 3) && (PETSC_VERSION_SUBMINOR <= 2))))
-      // API name change in PETSc 2.3.3
+#if PETSC_VERSION_LESS_THAN(2,3,3)
       ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
 			     this, PETSC_NULL);
 #else
+      // API name change in PETSc 2.3.3
       ierr = SNESMonitorSet (_snes, __libmesh_petsc_snes_monitor,
 			     this, PETSC_NULL);
 #endif
@@ -224,13 +222,13 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 	 
 // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
 // the last one being a pointer to an int to hold the number of iterations required.
-# if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 1)
+# if PETSC_VERSION_LESS_THAN(2,2,0)
 
  ierr = SNESSolve (_snes, x->vec(), &n_iterations);
         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 // 2.2.x style	
-#elif (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
+#elif PETSC_VERSION_LESS_THAN(2,3,0)
 	
  ierr = SNESSolve (_snes, x->vec());
         CHKERRABORT(libMesh::COMM_WORLD,ierr);

@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.h,v 1.16 2005-06-12 18:36:40 jwpeterson Exp $
+// $Id: petsc_matrix.h,v 1.17 2007-07-16 15:12:36 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,7 @@
 
 // Local includes
 #include "sparse_matrix.h"
+#include "petsc_macro.h"
 
 // Forward Declarations
 template <typename T> class DenseMatrix;
@@ -515,7 +516,7 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   X->close ();
 
 // 2.2.x & earlier style
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
+#if PETSC_VERSION_LESS_THAN(2,3,0)  
   
   ierr = MatAXPY(&a,  X->_mat, _mat, SAME_NONZERO_PATTERN);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -538,19 +539,21 @@ T PetscMatrix<T>::operator () (const unsigned int i,
 			       const unsigned int j) const
 {
   assert (this->initialized());
-  
-#if (((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR >= 2) && (PETSC_VERSION_SUBMINOR >= 1)) || \
-     ((PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR >= 3)))
-  // PETSc 2.2.1 & newer
-  const PetscScalar *petsc_row;
-  const PetscInt    *petsc_cols;
-  
-#else
+
+#if PETSC_VERSION_LESS_THAN(2,2,1)
+
   // PETSc 2.2.0 & older
   PetscScalar *petsc_row;
   int* petsc_cols;
   
+#else
+  
+  // PETSc 2.2.1 & newer
+  const PetscScalar *petsc_row;
+  const PetscInt    *petsc_cols;
+
 #endif
+  
   
   T value=0.;  
   
