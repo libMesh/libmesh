@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.47 2007-07-02 17:04:57 roystgnr Exp $
+// $Id: petsc_vector.C,v 1.48 2007-07-16 15:12:36 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 #include "parallel.h"
 #include "utility.h"
 #include "dense_vector.h"
-
+#include "petsc_macro.h"
 
 
 
@@ -265,15 +265,16 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
   assert (v != NULL);
   assert(this->size() == v->size());
   
-// 2.2.x & earlier style
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
-  
+
+#if PETSC_VERSION_LESS_THAN(2,3,0)
+	 
+  // 2.2.x & earlier style
   ierr = VecAXPY(&a, v->_vec, _vec);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
-// 2.3.x & later style
+
 #else
-  
+	 
+  // 2.3.x & later style
   ierr = VecAXPY(_vec, a, v->_vec);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
@@ -324,15 +325,15 @@ void PetscVector<T>::scale (const T factor_in)
   int ierr = 0;
   PetscScalar factor = static_cast<PetscScalar>(factor_in);
   
-// 2.2.x & earlier style
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
-  
+#if PETSC_VERSION_LESS_THAN(2,3,0)
+
+  // 2.2.x & earlier style
   ierr = VecScale(&factor, _vec);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-// 2.3.x & later style	 
 #else
   
+  // 2.3.x & later style	 
   ierr = VecScale(_vec, factor);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -376,17 +377,17 @@ PetscVector<T>::operator = (const T s_in)
 
   if (this->size() != 0)
     {
-// 2.2.x & earlier style
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR <= 2)
-  
-      ierr = VecSet(&s, _vec);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#if PETSC_VERSION_LESS_THAN(2,3,0)
+      
+  // 2.2.x & earlier style
+  ierr = VecSet(&s, _vec);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	     
-// 2.3.x & later style	 
 #else
 
-      ierr = VecSet(_vec, s);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  // 2.3.x & later style	 
+  ierr = VecSet(_vec, s);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	     
 #endif
     }
@@ -510,8 +511,8 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Perform the scatter
-#if ((PETSC_VERSION_MAJOR == 2) && ((PETSC_VERSION_MINOR < 3) || ((PETSC_VERSION_MINOR == 3) && (PETSC_VERSION_SUBMINOR <= 2))))
-      // API argument order change in PETSc 2.3.3
+#if PETSC_VERSION_LESS_THAN(2,3,3)
+	 
   ierr = VecScatterBegin(_vec, v_local->_vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -520,6 +521,7 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
+  // API argument order change in PETSc 2.3.3
   ierr = VecScatterBegin(scatter, _vec, v_local->_vec,
 			 INSERT_VALUES, SCATTER_FORWARD);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -571,8 +573,8 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
 
   
   // Perform the scatter
-#if ((PETSC_VERSION_MAJOR == 2) && ((PETSC_VERSION_MINOR < 3) || ((PETSC_VERSION_MINOR == 3) && (PETSC_VERSION_SUBMINOR <= 2))))
-      // API argument order change in PETSc 2.3.3
+#if PETSC_VERSION_LESS_THAN(2,3,3)
+	 
   ierr = VecScatterBegin(_vec, v_local->_vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -580,7 +582,10 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   ierr = VecScatterEnd  (_vec, v_local->_vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
 #else
+	 
+  // API argument order change in PETSc 2.3.3
   ierr = VecScatterBegin(scatter, _vec, v_local->_vec,
                          INSERT_VALUES, SCATTER_FORWARD);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -588,7 +593,9 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   ierr = VecScatterEnd  (scatter, _vec, v_local->_vec,
                          INSERT_VALUES, SCATTER_FORWARD);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
 #endif
+	 
 
   // Clean up
   ierr = ISDestroy (is);
@@ -646,8 +653,8 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
     // Perform the scatter
-#if ((PETSC_VERSION_MAJOR == 2) && ((PETSC_VERSION_MINOR < 3) || ((PETSC_VERSION_MINOR == 3) && (PETSC_VERSION_SUBMINOR <= 2))))
-      // API argument order change in PETSc 2.3.3
+#if PETSC_VERSION_LESS_THAN(2,3,3)
+
     ierr = VecScatterBegin(_vec, parallel_vec._vec, INSERT_VALUES,
 			   SCATTER_FORWARD, scatter);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -655,7 +662,10 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
     ierr = VecScatterEnd  (_vec, parallel_vec._vec, INSERT_VALUES,
 			   SCATTER_FORWARD, scatter);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
 #else
+	   
+      // API argument order change in PETSc 2.3.3
     ierr = VecScatterBegin(scatter, _vec, parallel_vec._vec,
 			   INSERT_VALUES, SCATTER_FORWARD);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -663,6 +673,7 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
     ierr = VecScatterEnd  (scatter, _vec, parallel_vec._vec,
 			   INSERT_VALUES, SCATTER_FORWARD);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	   
 #endif
 
     // Clean up
@@ -964,8 +975,7 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
 			  &scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Actually perform the scatter
-#if ((PETSC_VERSION_MAJOR == 2) && ((PETSC_VERSION_MINOR < 3) || ((PETSC_VERSION_MINOR == 3) && (PETSC_VERSION_SUBMINOR <= 2))))
-      // API argument order change in PETSc 2.3.3
+#if PETSC_VERSION_LESS_THAN(2,3,3)
   ierr = VecScatterBegin(this->_vec,
 			 petsc_subvector->_vec,
 			 INSERT_VALUES,
@@ -978,6 +988,7 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
 		       SCATTER_FORWARD,
 		       scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
+  // API argument order change in PETSc 2.3.3
   ierr = VecScatterBegin(scatter,
 			 this->_vec,
 			 petsc_subvector->_vec,
