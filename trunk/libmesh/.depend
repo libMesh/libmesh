@@ -4349,6 +4349,7 @@ src/numerics/eigen_solver.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/numerics/eigen_solver.h\
     include/numerics/numeric_vector.h\
+    include/numerics/petsc_macro.h\
     include/numerics/petsc_matrix.h\
     include/numerics/petsc_vector.h\
     include/numerics/slepc_eigen_solver.h\
@@ -4752,6 +4753,7 @@ src/numerics/laspack_vector.$(obj-suffix):\
 src/numerics/linear_solver.$(obj-suffix):\
     src/numerics/linear_solver.C\
     include/base/auto_ptr.h\
+    include/base/auto_ptr.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4771,6 +4773,7 @@ src/numerics/linear_solver.$(obj-suffix):\
     include/numerics/linear_solver.h\
     include/numerics/numeric_vector.h\
     include/numerics/petsc_linear_solver.h\
+    include/numerics/petsc_macro.h\
     include/numerics/petsc_matrix.h\
     include/numerics/petsc_vector.h\
     include/numerics/sparse_matrix.h\
@@ -4853,6 +4856,7 @@ src/numerics/numeric_vector.$(obj-suffix):\
     include/numerics/dense_vector_base.h\
     include/numerics/laspack_vector.h\
     include/numerics/numeric_vector.h\
+    include/numerics/petsc_macro.h\
     include/numerics/petsc_vector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -4922,6 +4926,7 @@ src/numerics/petsc_linear_solver.$(obj-suffix):\
     include/numerics/linear_solver.h\
     include/numerics/numeric_vector.h\
     include/numerics/petsc_linear_solver.h\
+    include/numerics/petsc_macro.h\
     include/numerics/petsc_matrix.h\
     include/numerics/petsc_vector.h\
     include/numerics/sparse_matrix.h\
@@ -4941,6 +4946,7 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
+    include/numerics/petsc_macro.h\
     include/numerics/petsc_matrix.h\
     include/numerics/sparse_matrix.h\
     include/numerics/type_vector.h\
@@ -4959,6 +4965,7 @@ src/numerics/petsc_nonlinear_solver.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/numerics/nonlinear_solver.h\
     include/numerics/numeric_vector.h\
+    include/numerics/petsc_macro.h\
     include/numerics/petsc_matrix.h\
     include/numerics/petsc_nonlinear_solver.h\
     include/numerics/petsc_vector.h\
@@ -4978,6 +4985,7 @@ src/numerics/petsc_vector.$(obj-suffix):\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/petsc_macro.h\
     include/numerics/petsc_matrix.h\
     include/numerics/petsc_vector.h\
     include/numerics/sparse_matrix.h\
@@ -4999,6 +5007,7 @@ src/numerics/slepc_eigen_solver.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/numerics/eigen_solver.h\
     include/numerics/numeric_vector.h\
+    include/numerics/petsc_macro.h\
     include/numerics/petsc_matrix.h\
     include/numerics/petsc_vector.h\
     include/numerics/slepc_eigen_solver.h\
@@ -5018,6 +5027,7 @@ src/numerics/sparse_matrix.$(obj-suffix):\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/laspack_matrix.h\
+    include/numerics/petsc_macro.h\
     include/numerics/petsc_matrix.h\
     include/numerics/sparse_matrix.h\
     include/utils/o_string_stream.h\
