@@ -1,4 +1,4 @@
-// $Id: tree_node.C,v 1.20 2006-08-04 21:38:17 roystgnr Exp $
+// $Id: tree_node.C,v 1.21 2007-08-01 18:56:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -160,8 +160,14 @@ void TreeNode<N>::refine ()
 
   // We don't need to store nodes or elements any more,
   // they have been added to the children.
-  nodes.clear();
-  elements.clear();
+  // Note that we cannot use std::vector<>::clear() here
+  // since that in general does not reduce capacity!!
+  // That would be a bad, bad thing.
+  std::vector<const Node*>().swap(nodes);
+  std::vector<const Elem*>().swap(elements);
+
+  assert (nodes.capacity()    == 0);
+  assert (elements.capacity() == 0);
 }
 
 
