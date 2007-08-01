@@ -1,4 +1,4 @@
-// $Id: equation_systems.C,v 1.38 2007-06-15 22:34:34 roystgnr Exp $
+// $Id: equation_systems.C,v 1.39 2007-08-01 22:02:34 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -107,14 +107,8 @@ void EquationSystems::init ()
       (*elem_it)->set_n_systems(n_sys);
   }
 
-  system_iterator       pos = _systems.begin();
-  const system_iterator end = _systems.end();
-  
-  for (; pos != end; ++pos)
-    {
-      // Initialize the system.
-      pos->second->init();
-    }
+  for (unsigned int i=0; i != this->n_systems(); ++i)
+    this->get_system(i).init();
 }
 
 
@@ -145,12 +139,9 @@ void EquationSystems::reinit ()
   }
 #endif
 
-  system_iterator       pos = _systems.begin();
-  const system_iterator end = _systems.end();
-  
   // Localize each system's vectors
-  for (; pos != end; ++pos)
-      pos->second->re_update();
+  for (unsigned int i=0; i != this->n_systems(); ++i)
+    this->get_system(i).re_update();
 
 #ifdef ENABLE_AMR
 
@@ -161,11 +152,12 @@ void EquationSystems::reinit ()
   // refine_and_coarsen_elements or refine_uniformly have already
   // been called
   {
-    for (pos = _systems.begin(); pos != end; ++pos)
+    for (unsigned int i=0; i != this->n_systems(); ++i)
       {
-        pos->second->get_dof_map().distribute_dofs(_mesh);
-        pos->second->get_dof_map().create_dof_constraints(_mesh);
-        pos->second->prolong_vectors();
+	System &sys = this->get_system(i);
+        sys.get_dof_map().distribute_dofs(_mesh);
+        sys.get_dof_map().create_dof_constraints(_mesh);
+        sys.prolong_vectors();
       }
     mesh_changed = true;
     dof_constraints_created = true;
@@ -182,14 +174,15 @@ void EquationSystems::reinit ()
   // if necessary
   if (mesh_refine.coarsen_elements())
     {
-      for (pos = _systems.begin(); pos != end; ++pos)
+      for (unsigned int i=0; i != this->n_systems(); ++i)
         {
+	  System &sys = this->get_system(i);
           if (!dof_constraints_created)
             {
-              pos->second->get_dof_map().distribute_dofs(_mesh);
-              pos->second->get_dof_map().create_dof_constraints(_mesh);
+              sys.get_dof_map().distribute_dofs(_mesh);
+              sys.get_dof_map().create_dof_constraints(_mesh);
             }
-          pos->second->restrict_vectors();
+          sys.restrict_vectors();
         }
       mesh_changed = true;
       dof_constraints_created = true;
@@ -204,14 +197,15 @@ void EquationSystems::reinit ()
   // if necessary
   if (mesh_refine.refine_elements())
     {
-      for (pos = _systems.begin(); pos != end; ++pos)
+      for (unsigned int i=0; i != this->n_systems(); ++i)
         {
+	  System &sys = this->get_system(i);
           if (!dof_constraints_created)
             {
-              pos->second->get_dof_map().distribute_dofs(_mesh);
-              pos->second->get_dof_map().create_dof_constraints(_mesh);
+              sys.get_dof_map().distribute_dofs(_mesh);
+              sys.get_dof_map().create_dof_constraints(_mesh);
             }
-          pos->second->prolong_vectors();
+          sys.prolong_vectors();
         }
       mesh_changed = true;
       dof_constraints_created = true;
@@ -221,8 +215,8 @@ void EquationSystems::reinit ()
   // constraints and update their global solution vectors
   if (mesh_changed)
     {
-      for (pos = _systems.begin(); pos != end; ++pos)
-        pos->second->reinit();
+      for (unsigned int i=0; i != this->n_systems(); ++i)
+        this->get_system(i).reinit();
     }
 #endif // #ifdef ENABLE_AMR
 }
@@ -231,12 +225,9 @@ void EquationSystems::reinit ()
 
 void EquationSystems::update ()
 {
-  system_iterator       pos = _systems.begin();
-  const system_iterator end = _systems.end();
-  
   // Localize each system's vectors
-  for (; pos != end; ++pos)
-      pos->second->update();
+  for (unsigned int i=0; i != this->n_systems(); ++i)
+    this->get_system(i).update();
 }
 
 
