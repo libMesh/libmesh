@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.C,v 1.18 2007-05-29 23:20:27 roystgnr Exp $
+// $Id: point_locator_tree.C,v 1.19 2007-08-02 20:02:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 #include "elem.h"
 #include "tree.h"
 #include "point_locator_tree.h"
-
+#include "mesh_tools.h"
 
 
 
@@ -87,33 +87,37 @@ void PointLocatorTree::init ()
 
       if (this->_master == NULL)
         {
-	  // We are the master, so we have to build the tree
-	  switch (this->_mesh.spatial_dimension())
-	    { 
-	    case 2:
+	  if (this->_mesh.mesh_dimension() == 3)
+	    _tree = new Trees::OctTree (this->_mesh, 200,
+					Trees::OctTree::ELEMENTS);		
+	  else
+	    {
+	      // A 1D/2D mesh in 3D space needs special consideration.
+	      // If the mesh is planar XY, we want to build a QuadTree
+	      // to search efficiently.  If the mesh is truly a manifold,
+	      // then we need an octree
+	      bool is_planar_xy = false;
+	      
+	      // Build the bounding box for the mesh.  If the delta-z bound is
+	      // negligibly small then we can use a quadtree.
 	      {
-//TODO: What to do with the level of the tree?
+		MeshTools::BoundingBox bbox = MeshTools::bounding_box(this->_mesh);
 		
-		_tree = new Trees::QuadTree (this->_mesh, 100,
+		const Real
+		  Dx = bbox.second(0) - bbox.first(0),
+		  Dz = bbox.second(2) - bbox.first(2);
+		
+		if (std::abs(Dz/(Dx + 1.e-20)) < 1e-10)
+		  is_planar_xy = true;
+	      }
+	      		    
+	      if (is_planar_xy)
+		_tree = new Trees::QuadTree (this->_mesh, 200,
 					     Trees::QuadTree::ELEMENTS);
-		break;
-	      }
-
-	    case 3:
-	      {
+	      else
 		_tree = new Trees::OctTree (this->_mesh, 200,
-					    Trees::OctTree::ELEMENTS);
-		break;
-	      }
-
-	    default:
-	      {
-		std::cerr << "ERROR: Bad dimension = " 
-			  << this->_mesh.spatial_dimension() 
-			  << std::endl;
-		error();
-	      }
-	    }	
+					    Trees::OctTree::ELEMENTS);		      
+	    }
 	}
 
       else
