@@ -1,4 +1,4 @@
-// $Id: libmesh_common.h,v 1.19 2006-09-19 15:43:55 roystgnr Exp $
+// $Id: libmesh_common.h,v 1.20 2007-08-02 20:12:59 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -177,6 +177,18 @@ namespace libMesh
 // stick a here(); in it, for example
 #undef here
 #define here()     { std::cout << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; }
+
+// the stop() macro will stop the code until a SIGCONT signal is recieved.  This is useful, for example, when
+// determining the memory used by a given operation.  A stop() could be instered before and after a questionable
+// operation and the delta memory can be obtained from a ps or top.  This macro only works for serial cases.
+#undef stop
+#ifdef HAVE_CSIGNAL
+#  include <csignal>
+#  define stop()     { if (libMesh::n_processors() == 1) { here(); std::cout << "Stopping process " << getpid() << "..." << std::endl; std::raise(SIGSTOP); std::cout << "Continuing process " << getpid() << "..." << std::endl; } }
+#else
+#  define stop()     { if (libMesh::n_processors() == 1) { here(); std::cerr << "WARNING:  stop() does not work without the <csignal> header file!" << std::endl; } }
+#endif
+
 
 // The error() macro prints a message and aborts the code
 #undef error

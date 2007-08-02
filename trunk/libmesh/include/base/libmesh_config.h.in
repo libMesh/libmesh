@@ -30,6 +30,9 @@
 /* Flag indicating if the library should be built with second derivatives */
 #undef ENABLE_SECOND_DERIVATIVES
 
+/* Define to 1 if you have the <csignal> header file. */
+#undef HAVE_CSIGNAL
+
 /* Flag indicating whether the library shall be compiled to use the Exodus
    interface */
 #undef HAVE_EXODUS_API
