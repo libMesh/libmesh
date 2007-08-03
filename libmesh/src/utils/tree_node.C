@@ -1,4 +1,4 @@
-// $Id: tree_node.C,v 1.21 2007-08-01 18:56:51 benkirk Exp $
+// $Id: tree_node.C,v 1.22 2007-08-03 20:42:45 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -442,7 +442,7 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
 	}
 
       // Done with the nodes.
-      nodes.clear();
+      std::vector<const Node*>().swap(nodes);
 
       // Now the set is built.  We can copy this to the
       // vector.  Note that the resulting vector will 
