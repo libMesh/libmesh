@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.106 2007-08-03 20:12:33 benkirk Exp $
+// $Id: dof_map.C,v 1.107 2007-08-03 20:39:10 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -80,16 +80,16 @@ void DofMap::reinit(MeshBase& mesh)
 {
   assert (mesh.is_prepared());
   
+#ifdef ENABLE_PERIODIC
+  _periodic_boundaries.reinit(mesh);
+#endif
+  
   START_LOG("reinit()", "DofMap");
   
   //this->clear();
 
   const unsigned int n_var = this->n_variables();
   const unsigned int dim   = mesh.mesh_dimension();
-
-#ifdef ENABLE_PERIODIC
-  _periodic_boundaries.reinit(mesh);
-#endif
 
 #ifdef ENABLE_AMR
   
