@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.C,v 1.19 2007-08-02 20:02:52 benkirk Exp $
+// $Id: point_locator_tree.C,v 1.20 2007-08-03 20:40:23 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -89,7 +89,7 @@ void PointLocatorTree::init ()
         {
 	  if (this->_mesh.mesh_dimension() == 3)
 	    _tree = new Trees::OctTree (this->_mesh, 200,
-					Trees::OctTree::ELEMENTS);		
+					Trees::OctTree::NODES);		
 	  else
 	    {
 	      // A 1D/2D mesh in 3D space needs special consideration.
@@ -113,10 +113,10 @@ void PointLocatorTree::init ()
 	      		    
 	      if (is_planar_xy)
 		_tree = new Trees::QuadTree (this->_mesh, 200,
-					     Trees::QuadTree::ELEMENTS);
+					     Trees::QuadTree::NODES);
 	      else
 		_tree = new Trees::OctTree (this->_mesh, 200,
-					    Trees::OctTree::ELEMENTS);		      
+					    Trees::OctTree::NODES);		      
 	    }
 	}
 
