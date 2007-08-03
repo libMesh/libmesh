@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.104 2007-08-03 19:31:11 benkirk Exp $
+// $Id: dof_map.C,v 1.105 2007-08-03 20:10:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -538,7 +538,11 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
   //-------------------------------------------------------------------------  
   STOP_LOG("distribute_dofs_var_major()", "DofMap");    
 
+  here();
+  
   this->add_neighbors_to_send_list(mesh);
+
+  here();
   
   // Note that in the add_neighbors_to_send_list nodes on processor
   // boundaries that are shared by multiple elements are added for
@@ -546,6 +550,7 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
   // Here we need to clean up that data structure
   this->sort_send_list ();
 
+  here();
   // All done.
 }
 
@@ -707,6 +712,8 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
       for (unsigned int s=0; s<elem->n_neighbors(); s++)
 	if (elem->neighbor(s) != NULL)
 	  {
+	    family.clear();
+	    
             // Find all the active elements that neighbor elem
 #ifdef ENABLE_AMR
             if (!elem->neighbor(s)->active())
@@ -757,6 +764,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
       // least one node.
       if (add_elem_dofs)
 	{
+	  here();
 	  // Get the DOF indices for this neighboring element
 	  this->dof_indices (elem, di);
 
