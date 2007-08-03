@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.38 2007-06-04 19:17:49 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.39 2007-08-03 19:31:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -873,7 +873,7 @@ void PeriodicBoundaries::reinit(MeshBase &mesh)
 {
   delete _point_locator;
 
-  _point_locator = PointLocatorBase::build(TREE, mesh).release();
+  //_point_locator = PointLocatorBase::build(TREE, mesh).release();
 }
 
 const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,

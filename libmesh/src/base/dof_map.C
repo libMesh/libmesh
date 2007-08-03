@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.103 2007-05-31 21:46:13 roystgnr Exp $
+// $Id: dof_map.C,v 1.104 2007-08-03 19:31:11 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -441,9 +441,9 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
   
   // re-init in case the mesh has changed
   this->reinit(mesh);
-
+  
   // Log how long it takes to distribute the degrees of freedom
-  START_LOG("distribute_dofs()", "DofMap");
+  START_LOG("distribute_dofs_var_major()", "DofMap");
 
   // The DOF counter, will be incremented as we encounter
   // new degrees of freedom
@@ -534,7 +534,9 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
   _n_old_dfs = _n_dfs;
 #endif
   _n_dfs = next_free_dof;
-  //-------------------------------------------------------------------------
+
+  //-------------------------------------------------------------------------  
+  STOP_LOG("distribute_dofs_var_major()", "DofMap");    
 
   this->add_neighbors_to_send_list(mesh);
   
@@ -544,8 +546,7 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
   // Here we need to clean up that data structure
   this->sort_send_list ();
 
-  // All done. Stop logging.
-  STOP_LOG("distribute_dofs()", "DofMap");    
+  // All done.
 }
 
 
@@ -567,7 +568,7 @@ void DofMap::distribute_dofs_node_major (MeshBase& mesh)
   this->reinit(mesh);
 
   // Log how long it takes to distribute the degrees of freedom
-  START_LOG("distribute_dofs()", "DofMap");
+  START_LOG("distribute_dofs_node_major()", "DofMap");
 
   // The DOF counter, will be incremented as we encounter
   // new degrees of freedom
@@ -658,6 +659,7 @@ void DofMap::distribute_dofs_node_major (MeshBase& mesh)
 #endif
   _n_dfs = next_free_dof;
   //-------------------------------------------------------------------------
+  STOP_LOG("distribute_dofs_node_major()", "DofMap");    
 
   this->add_neighbors_to_send_list(mesh);
   
@@ -667,19 +669,19 @@ void DofMap::distribute_dofs_node_major (MeshBase& mesh)
   // Here we need to clean up that data structure
   this->sort_send_list ();
 
-  // All done. Stop logging.
-  STOP_LOG("distribute_dofs()", "DofMap");    
+  // All done.
 }
 
 
 
 void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 {
+  START_LOG("add_neighbors_to_send_list()", "DofMap");
+  
   //-------------------------------------------------------------------------
   // The _send_list now only contains entries from the local processor.
   // We need to add the DOFs from elements that live on neighboring processors
   // that are neighbors of the elements on the local processor
-  // (for discontinuous elements)
   //-------------------------------------------------------------------------
 
   MeshBase::const_element_iterator       local_elem_it
@@ -689,6 +691,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 
   std::vector<bool> node_on_processor(mesh.n_nodes(), false);
   std::vector<unsigned int> di;
+  std::vector<const Elem *> family;
 
   // Loop over the active local elements, adding all active elements
   // that neighbor an active local element to the send list.
@@ -705,7 +708,6 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 	if (elem->neighbor(s) != NULL)
 	  {
             // Find all the active elements that neighbor elem
-            std::vector<const Elem *> family;
 #ifdef ENABLE_AMR
             if (!elem->neighbor(s)->active())
               elem->neighbor(s)->active_family_tree_by_neighbor(family, elem);
@@ -732,34 +734,47 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
   MeshBase::const_element_iterator       elem_it
     = mesh.active_elements_begin();
   const MeshBase::const_element_iterator elem_end
-    = mesh.active_elements_end(); 
+    = mesh.active_elements_end();
+  
   for ( ; elem_it != elem_end; ++elem_it)
     {
       const Elem* elem = *elem_it;
 
       // If this is one of our elements, we've already added it
-      if (elem->processor_id() != libMesh::processor_id())
+      if (elem->processor_id() == libMesh::processor_id())
         continue;
 
-      // Check all the nodes of those elements to see if they
-      // share a node with us
+      // Do we need to add the element DOFs?
+      bool add_elem_dofs = false;
+      
+      // Check all the nodes of the element to see if it
+      // shares a node with us
       for (unsigned int n=0; n!=elem->n_nodes(); n++)
         if (node_on_processor[elem->node(n)])
-          {
-	    // Get the DOF indices for this neighboring element
-	    this->dof_indices (elem, di);
+	  add_elem_dofs = true;
 
-	    // Insert the DOF indices into the send list
-	    _send_list.insert (_send_list.end(),
+      // Add the element degrees of freedom if it shares at
+      // least one node.
+      if (add_elem_dofs)
+	{
+	  // Get the DOF indices for this neighboring element
+	  this->dof_indices (elem, di);
+
+	  // Insert the DOF indices into the send list
+	  _send_list.insert (_send_list.end(),
 			       di.begin(), di.end());
-          }
+	}
     }
+  
+  STOP_LOG("add_neighbors_to_send_list()", "DofMap");
 }
 
 
 
 void DofMap::sort_send_list ()
 {
+  START_LOG("sort_send_list()", "DofMap");
+  
   // First sort the send list.  After this
   // duplicated elements will be adjacent in the
   // vector
@@ -772,6 +787,8 @@ void DofMap::sort_send_list ()
   // Remove the end of the send_list.  Use the "swap trick"
   // from Effective STL
   std::vector<unsigned int> (_send_list.begin(), new_end).swap (_send_list);
+  
+  STOP_LOG("sort_send_list()", "DofMap");
 }
 
 
