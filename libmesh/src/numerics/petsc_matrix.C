@@ -1,4 +1,4 @@
-// $Id: petsc_matrix.C,v 1.29 2007-08-03 19:31:11 benkirk Exp $
+// $Id: petsc_matrix.C,v 1.30 2007-08-03 19:34:18 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -92,7 +92,7 @@ template <typename T>
 void PetscMatrix<T>::init ()
 {
   assert (this->_dof_map != NULL);
-  here();
+  
   {
     // Clear initialized matrices
     if (this->initialized())
