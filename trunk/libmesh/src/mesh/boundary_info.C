@@ -1,4 +1,4 @@
-// $Id: boundary_info.C,v 1.49 2007-05-29 23:22:06 roystgnr Exp $
+// $Id: boundary_info.C,v 1.50 2007-08-10 14:53:54 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -195,7 +195,7 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
     boundary_mesh_data->assign(*this_mesh_data);
 
   // Trim any un-used nodes from the Mesh
-  // boundary_mesh.prepare_for_use();
+  boundary_mesh.prepare_for_use();
 }
 
 
