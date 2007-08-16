@@ -5835,6 +5835,37 @@ src/solvers/equation_systems_io.$(obj-suffix):\
     include/utils/parameters.h\
     include/utils/perf_log.h\
     include/utils/xdr_cxx.h
+src/solvers/euler2_solver.$(obj-suffix):\
+    src/solvers/euler2_solver.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe_type.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_submatrix.h\
+    include/numerics/dense_subvector.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
+    include/numerics/numeric_vector.h\
+    include/solvers/diff_system.h\
+    include/solvers/euler2_solver.h\
+    include/solvers/explicit_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/linear_implicit_system.h\
+    include/solvers/system.h\
+    include/solvers/time_solver.h\
+    include/solvers/transient_system.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/solvers/euler_solver.$(obj-suffix):\
     src/solvers/euler_solver.C\
     include/base/auto_ptr.h\
