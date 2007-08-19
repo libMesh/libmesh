@@ -1,4 +1,4 @@
-// $Id: fe_interface.h,v 1.17 2007-05-30 21:34:54 roystgnr Exp $
+// $Id: fe_interface.h,v 1.18 2007-08-19 20:00:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -40,7 +40,7 @@ class FEType;
 class FEComputeData;
 class PeriodicBoundaries;
 class Point;
-
+class MeshBase;
 
 /**
  * This class provides an encapsulated access to all @e static
@@ -266,7 +266,7 @@ public:
   static void compute_periodic_constraints (DofConstraints &constraints,
 				            DofMap &dof_map,
 				            PeriodicBoundaries &boundaries,
-				            BoundaryInfo &boundaryinfo,
+					    const MeshBase &mesh,
 				            const unsigned int variable_number,
 				            const Elem* elem);
 #endif // #ifdef ENABLE_PERIODIC

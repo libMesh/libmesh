@@ -1,4 +1,4 @@
-// $Id: fe_base.h,v 1.28 2007-05-30 21:34:54 roystgnr Exp $
+// $Id: fe_base.h,v 1.29 2007-08-19 20:00:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -207,7 +207,7 @@ public:
   static void compute_periodic_constraints (DofConstraints &constraints,
                                             DofMap &dof_map,
                                             PeriodicBoundaries &boundaries,
-                                            BoundaryInfo &boundary_info,
+                                            const MeshBase& mesh,
                                             const unsigned int variable_number,
                                             const Elem* elem);
 

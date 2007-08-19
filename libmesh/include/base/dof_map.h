@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.31 2007-05-31 20:01:07 roystgnr Exp $
+// $Id: dof_map.h,v 1.32 2007-08-19 20:00:45 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,6 @@ class DofMap;
 class Elem;
 class MeshBase;
 class Mesh;
-class PointLocatorBase;
 class FEType;
 class CouplingMatrix;
 class System;
@@ -121,21 +120,15 @@ class PeriodicBoundaries : public std::map<unsigned int, PeriodicBoundary>
 public:
   PeriodicBoundary *boundary(unsigned int id);
 
-  PeriodicBoundaries() : _point_locator(NULL) {}
+  PeriodicBoundaries() {}
 
   ~PeriodicBoundaries();
 
   // The periodic neighbor of \p e in direction \p side, if it
   // exists.  NULL otherwise
-  const Elem *neighbor(unsigned int boundary_id, const Elem *e, unsigned int side);
-
-  /**
-   * Reinitialize the underlying data strucures conformal to the current mesh.
-   */
-  void reinit (MeshBase& mesh);
+  const Elem *neighbor(unsigned int boundary_id, const MeshBase &mesh, const Elem *e, unsigned int side);
 
 private:
-  PointLocatorBase *_point_locator;
 };
 #endif // ENABLE_PERIODIC
 

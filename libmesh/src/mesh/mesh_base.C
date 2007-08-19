@@ -1,4 +1,4 @@
-// $Id: mesh_base.C,v 1.100 2007-06-21 21:24:35 jwpeterson Exp $
+// $Id: mesh_base.C,v 1.101 2007-08-19 20:00:48 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -33,17 +33,18 @@
 #include "metis_partitioner.h" // for default partitioning
 #include "elem.h"
 #include "boundary_info.h"
-
+#include "point_locator_base.h"
 
 
 // ------------------------------------------------------------
 // MeshBase class member functions
 MeshBase::MeshBase (unsigned int d) :
-  boundary_info (new BoundaryInfo(*this)),
-  _n_sbd        (1),
-  _n_parts      (1),
-  _dim          (d),
-  _is_prepared  (false)
+  boundary_info  (new BoundaryInfo(*this)),
+  _n_sbd         (1),
+  _n_parts       (1),
+  _dim           (d),
+  _is_prepared   (false),
+  _point_locator (NULL)
 {
   assert (DIM <= 3);
   assert (DIM >= _dim);
@@ -53,11 +54,12 @@ MeshBase::MeshBase (unsigned int d) :
 
 
 MeshBase::MeshBase (const MeshBase& other_mesh) :
-  boundary_info      (new BoundaryInfo(*this)), // no copy constructor defined for BoundaryInfo?
-  _n_sbd             (other_mesh._n_sbd),
-  _n_parts           (other_mesh._n_parts),
-  _dim               (other_mesh._dim),
-  _is_prepared       (other_mesh._is_prepared)
+  boundary_info  (new BoundaryInfo(*this)), // no copy constructor defined for BoundaryInfo?
+  _n_sbd         (other_mesh._n_sbd),
+  _n_parts       (other_mesh._n_parts),
+  _dim           (other_mesh._dim),
+  _is_prepared   (other_mesh._is_prepared),
+  _point_locator (NULL)
 
 {
 }
@@ -74,8 +76,7 @@ MeshBase::~MeshBase()
 
 
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
-{
-
+{  
   // Renumber the nodes and elements so that they in contiguous
   // blocks.  By default, skip_renumber_nodes_and_elements is false,
   // however we may skip this step by passing
@@ -94,6 +95,10 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
   // Partition the mesh.
   this->partition();
   
+  // Reset our PointLocator.  This needs to happen any time the elements
+  // in the underlying elements in the mesh have changed, so we do it here.
+  this->clear_point_locator();
+
   // The mesh is now prepared for use.
   _is_prepared = true;
 }
@@ -131,6 +136,9 @@ void MeshBase::clear ()
 
   // Clear boundary information
   this->boundary_info->clear();
+
+  // Clear our point locator.
+  this->clear_point_locator();
 }
 
 
@@ -268,6 +276,21 @@ unsigned int MeshBase::recalculate_n_partitions()
 }
 
 
+
+const PointLocatorBase & MeshBase::point_locator () const
+{
+  if (_point_locator.get() == NULL)
+    _point_locator.reset (PointLocatorBase::build(TREE, *this).release());
+
+  return *_point_locator;
+}
+
+
+
+void MeshBase::clear_point_locator ()
+{
+  _point_locator.reset(NULL);
+}
 
 
 

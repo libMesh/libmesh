@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.41 2007-08-03 20:39:11 benkirk Exp $
+// $Id: dof_map_constraints.C,v 1.42 2007-08-19 20:00:47 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -91,7 +91,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
 	  FEInterface::compute_periodic_constraints (_dof_constraints,
 					             *this,
                                                      _periodic_boundaries,
-                                                     *mesh.boundary_info,
+						     mesh,
 					             variable_number,
 					             *elem_it);
 #endif
@@ -866,27 +866,13 @@ void DofMap::add_periodic_boundary (const PeriodicBoundary& periodic_boundary)
 
 PeriodicBoundaries::~PeriodicBoundaries()
 {
-  delete _point_locator;
-}
-
-void PeriodicBoundaries::reinit(MeshBase &mesh)
-{
-  START_LOG("reinit()", "PeriodicBoundaries");
-  
-  delete _point_locator;
-
-  _point_locator = PointLocatorBase::build(TREE, mesh).release();
-  
-  STOP_LOG("reinit()", "PeriodicBoundaries");
 }
 
 const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
+					 const MeshBase &mesh,
                                          const Elem *e,
                                          unsigned int side)
 {
-  // We'd better already be initialized
-  assert(_point_locator);
-
   // Find a point on that side (and only that side)
 
   Point p = e->build_side(side)->centroid();
@@ -895,7 +881,7 @@ const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
   assert (b);
   p += b->translation_vector;
 
-  return _point_locator->operator()(p);
+  return mesh.point_locator().operator()(p);
 }
 
 #endif

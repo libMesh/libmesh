@@ -1,4 +1,4 @@
-// $Id: fe_interface.C,v 1.49 2007-05-30 21:34:55 roystgnr Exp $
+// $Id: fe_interface.C,v 1.50 2007-08-19 20:00:47 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1868,7 +1868,7 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
 				                DofMap &dof_map,
                                                 PeriodicBoundaries &boundaries,
-                                                BoundaryInfo &boundaryinfo,
+						const MeshBase &mesh,
 				                const unsigned int variable_number,
 				                const Elem* elem)
 {
@@ -1876,7 +1876,7 @@ void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
   FEBase::compute_periodic_constraints (constraints,
                                         dof_map,
                                         boundaries,
-                                        boundaryinfo,
+                                        mesh,
 				        variable_number,
 				        elem);
 }
