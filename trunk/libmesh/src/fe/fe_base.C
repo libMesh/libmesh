@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.39 2007-05-31 23:48:33 roystgnr Exp $
+// $Id: fe_base.C,v 1.40 2007-08-19 20:00:47 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,7 @@
 #include "libmesh_logging.h"
 // For projection code:
 #include "boundary_info.h"
+#include "mesh_base.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
 #include "dof_map.h"
@@ -1772,7 +1773,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 				           DofMap &dof_map,
                                            PeriodicBoundaries &boundaries,
-                                           BoundaryInfo &boundaryinfo,
+                                           const MeshBase &mesh,
 				           const unsigned int variable_number,
 				           const Elem* elem)
 {
@@ -1836,12 +1837,12 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
       if (elem->neighbor(s))
         continue;
 
-      unsigned int boundary_id = boundaryinfo.boundary_id(elem, s);
+      unsigned int boundary_id = mesh.boundary_info->boundary_id(elem, s);
       PeriodicBoundary *periodic = boundaries.boundary(boundary_id);
       if (periodic)
         {
           // Get pointers to the element's neighbor.
-          const Elem* neigh = boundaries.neighbor(boundary_id, elem, s);
+          const Elem* neigh = boundaries.neighbor(boundary_id, mesh, elem, s);
 
           // h refinement constraints:
           // constrain dofs shared between
@@ -1850,8 +1851,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
           if (neigh->level() <= elem->level()) 
             {
 	      unsigned int s_neigh = 
-                boundaryinfo.side_with_boundary_id
-                  (neigh, periodic->pairedboundary);
+                mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
               assert(s_neigh != libMesh::invalid_uint);
 
               // Find the minimum p level; we build the h constraint

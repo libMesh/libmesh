@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.107 2007-08-03 20:39:10 benkirk Exp $
+// $Id: dof_map.C,v 1.108 2007-08-19 20:00:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -79,10 +79,6 @@ void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
 void DofMap::reinit(MeshBase& mesh)
 {
   assert (mesh.is_prepared());
-  
-#ifdef ENABLE_PERIODIC
-  _periodic_boundaries.reinit(mesh);
-#endif
   
   START_LOG("reinit()", "DofMap");
   

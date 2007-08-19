@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.54 2007-06-21 21:24:35 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.55 2007-08-19 20:00:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,7 @@ class Node;
 class Point;
 class Partitioner;
 class BoundaryInfo;
+class PointLocatorBase;
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
@@ -56,8 +57,8 @@ class BoundaryInfo;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2007-06-21 21:24:35 $
- * \version $Revision: 1.54 $
+ * \date    $Date: 2007-08-19 20:00:46 $
+ * \version $Revision: 1.55 $
  */
 
 
@@ -372,6 +373,19 @@ public:
    */
   unsigned int recalculate_n_partitions();
 
+  /**
+   * \p returns a reference to a \p PointLocatorBase object for this mesh.
+   * 
+   */
+  const PointLocatorBase & point_locator () const;
+
+  /**
+   * Releases the current \p PointLocator object.
+   */
+  void clear_point_locator ();
+
+
+
 public:
 
 
@@ -522,6 +536,14 @@ protected:
    */
   bool _is_prepared;
   
+  /**
+   * A \p PointLocator class for this mesh. 
+   * This will not actually be built unless needed. Further, since we want 
+   * our \p point_locator() method to be \p const (yet do the dynamic allocating)
+   * this needs to be mutable.  Since the PointLocatorBase::build() member is used, 
+   * and it operates on a constant reference to the mesh, this is OK.
+   */
+  mutable AutoPtr<PointLocatorBase> _point_locator;
 
   /**
    * The partitioner class is a friend so that it can set
