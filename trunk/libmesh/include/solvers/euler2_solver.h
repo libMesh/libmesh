@@ -1,4 +1,4 @@
-// $Id: euler2_solver.h,v 1.1 2007-08-16 17:56:44 roystgnr Exp $
+// $Id: euler2_solver.h,v 1.2 2007-08-22 16:17:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -93,7 +93,7 @@ public:
   /**
    * The value for the theta method to employ: 1.0 corresponds
    * to backwards Euler, 0.0 corresponds to forwards Euler,
-   * 0.5 corresponds to a Crank-Nicholson-like scheme.
+   * 0.5 corresponds to a Crank-Nicolson-like scheme.
    */
   Real theta;
 };
