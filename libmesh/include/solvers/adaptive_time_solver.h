@@ -1,4 +1,4 @@
-// $Id: adaptive_time_solver.h,v 1.5 2007-05-22 20:31:54 jwpeterson Exp $
+// $Id: adaptive_time_solver.h,v 1.6 2007-08-23 22:11:08 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -136,7 +136,7 @@ public:
 
   /**
    * Do not allow the adaptive time solver to select deltat > max_deltat.
-   * If you set max_deltat=0.0, then max_deltat=infty.
+   * If you use the default max_deltat=0.0, then deltat is unlimited.
    */
   Real max_deltat;
 
@@ -146,6 +146,14 @@ public:
    */
   Real min_deltat;
   
+  /**
+   * Do not allow the adaptive time solver to select
+   * a new deltat greater than max_growth times the old deltat.
+   * If you use the default max_growth=0.0, then the deltat growth is
+   * unlimited.
+   */
+  Real max_growth;
+
   /**
    * This flag, which is true by default, grows (shrinks) the timestep
    * based on the expected global accuracy of the timestepping scheme.
