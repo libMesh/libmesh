@@ -1,4 +1,4 @@
-// $Id: euler_solver.h,v 1.4 2007-02-23 23:31:30 roystgnr Exp $
+// $Id: euler_solver.h,v 1.5 2007-08-23 18:07:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -66,7 +66,7 @@ public:
   virtual ~EulerSolver ();
 
   /**
-   * Error convergence order: 2 for Crank-Nicholson, 1 otherwise
+   * Error convergence order: 2 for Crank-Nicolson, 1 otherwise
    */
   virtual Real error_order() const;
 
@@ -89,7 +89,7 @@ public:
   /**
    * The value for the theta method to employ: 1.0 corresponds
    * to backwards Euler, 0.0 corresponds to forwards Euler,
-   * 0.5 corresponds to Crank-Nicholson.
+   * 0.5 corresponds to Crank-Nicolson.
    */
   Real theta;
 };

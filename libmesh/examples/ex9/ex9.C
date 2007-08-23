@@ -1,4 +1,4 @@
-/* $Id: ex9.C,v 1.22 2007-05-23 23:29:16 roystgnr Exp $ */
+/* $Id: ex9.C,v 1.23 2007-08-23 18:07:46 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -25,7 +25,7 @@
  // system can be solved in parallel.  The system is simple
  // scalar convection-diffusion with a specified external
  // velocity.  The initial condition is given, and the
- // solution is advanced in time with a standard Crank-Nicholson
+ // solution is advanced in time with a standard Crank-Nicolson
  // time-stepping strategy.
 
 // C++ include files that we need

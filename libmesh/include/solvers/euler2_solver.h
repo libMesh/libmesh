@@ -1,4 +1,4 @@
-// $Id: euler2_solver.h,v 1.2 2007-08-22 16:17:49 benkirk Exp $
+// $Id: euler2_solver.h,v 1.3 2007-08-23 18:07:46 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -70,7 +70,7 @@ public:
   virtual ~Euler2Solver ();
 
   /**
-   * Error convergence order: 2 for Crank-Nicholson, 1 otherwise
+   * Error convergence order: 2 for Crank-Nicolson, 1 otherwise
    */
   virtual Real error_order() const;
 
