@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.32 2007-08-19 20:00:45 benkirk Exp $
+// $Id: dof_map.h,v 1.33 2007-08-23 18:03:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -381,7 +381,7 @@ public:
   /**
    * Prints the \p _dof_constraints data structure.
    */
-  void print_dof_constraints() const;
+  void print_dof_constraints(std::ostream& os=std::cout) const;
 
   /**
    * Tests the constrained degrees of freedom on the numeric vector \p v, which
