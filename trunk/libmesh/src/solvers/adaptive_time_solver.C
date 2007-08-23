@@ -12,6 +12,7 @@ AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type& s)
    target_tolerance(1.e-3), upper_tolerance(1.e-2),
    max_deltat(0.),
    min_deltat(0.),
+   max_growth(0.),
    global_tolerance(true)
 {
   // We start with a reasonable time solver: implicit Euler
@@ -53,6 +54,11 @@ void AdaptiveTimeSolver::solve()
 
   // The core_time_solver will handle any first_solve actions
   first_solve = false;
+ 
+  // If we've been asked to reduce deltat if necessary, make
+  // sure the core timesolver does so
+  core_time_solver->reduce_deltat_on_diffsolver_failure =
+    this->reduce_deltat_on_diffsolver_failure;
 
   // Use the double-length timestep first (so the old_nonlinear_solution
   // won't have to change)
@@ -72,8 +78,6 @@ void AdaptiveTimeSolver::solve()
   // Be sure that the core_time_solver does not change the timestep here.
   // (This is unlikely because it just succeeded with a timestep twice
   // as large!)
-  const unsigned int old_reduce_deltat_on_diffsolver_failure =
-    core_time_solver->reduce_deltat_on_diffsolver_failure;
   core_time_solver->reduce_deltat_on_diffsolver_failure = 0;
   
   Real old_deltat = _system.deltat;
@@ -82,9 +86,9 @@ void AdaptiveTimeSolver::solve()
   core_time_solver->advance_timestep();
   core_time_solver->solve();
 
-  // Reset the core_time_solver's original reduce_deltat... value.
+  // Reset the core_time_solver's reduce_deltat... value.
   core_time_solver->reduce_deltat_on_diffsolver_failure =
-    old_reduce_deltat_on_diffsolver_failure;
+    this->reduce_deltat_on_diffsolver_failure;
   
   // But then back off just in case our advance_timestep() isn't
   // called - this probably doesn't work with multistep methods
@@ -143,26 +147,22 @@ void AdaptiveTimeSolver::solve()
   // s.o.g. factor is based on the method's **global** truncation
   // error.  You can shrink/grow the timestep to attempt to satisfy
   // either a global or local time-discretization error tolerance.
-  
-  if (relative_error > target_tolerance)
+ 
+  Real shrink_or_growth_factor =
+    global_tolerance ? global_shrink_or_growth_factor :
+                       local_shrink_or_growth_factor;
+
+  if (this->max_growth && this->max_growth < shrink_or_growth_factor)
     {
-      if (global_tolerance)
-	_system.deltat *= global_shrink_or_growth_factor;
-      else
-	_system.deltat *= local_shrink_or_growth_factor;
-    }
-  
-  // We might eventually want to use a little hysteresis when growing deltat
-  // One way to achieve hysteresis is to use a different power when computing the
-  // growth factor.
-  else if (relative_error < target_tolerance)
-    {
-      if (global_tolerance)
-	_system.deltat *= global_shrink_or_growth_factor;
-      else
-	_system.deltat *= local_shrink_or_growth_factor;
+      if (!quiet && global_tolerance)
+        {
+	  std::cout << "delta t is constrained by max_growth" << std::endl;
+	}
+        shrink_or_growth_factor = this->max_growth;
     }
 
+  _system.deltat *= shrink_or_growth_factor;
+  
   // Restrict deltat to max-allowable value if necessary
   if ((this->max_deltat != 0.0) && (_system.deltat > this->max_deltat))
     {
