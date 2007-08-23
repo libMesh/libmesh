@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.42 2007-08-19 20:00:47 benkirk Exp $
+// $Id: dof_map_constraints.C,v 1.43 2007-08-23 18:03:44 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -123,10 +123,10 @@ void DofMap::add_constraint_row (const unsigned int dof_number,
 
 
 
-void DofMap::print_dof_constraints() const
+void DofMap::print_dof_constraints(std::ostream& os) const
 {
-  std::cout << "DOF CONSTRAINTS OUTPUT:"
-	    << std::endl;
+  os << "DOF CONSTRAINTS OUTPUT:"
+     << std::endl;
   
   for (DofConstraints::const_iterator it=_dof_constraints.begin();
        it != _dof_constraints.end(); ++it)
@@ -134,15 +134,15 @@ void DofMap::print_dof_constraints() const
       const unsigned int i = it->first;
       const DofConstraintRow& row = it->second;
 
-      std::cout << "Constraints for DOF " << i
-		<< ": \t";
+      os << "Constraints for DOF " << i
+	 << ": \t";
 
       for (DofConstraintRow::const_iterator pos=row.begin();
 	   pos != row.end(); ++pos)
-	std::cout << " (" << pos->first << ","
-		  << pos->second << ")\t";
+	os << " (" << pos->first << ","
+	   << pos->second << ")\t";
 
-      std::cout << std::endl;
+      os << std::endl;
     }
 }
 
