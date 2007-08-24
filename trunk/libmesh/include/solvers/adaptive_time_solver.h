@@ -1,4 +1,4 @@
-// $Id: adaptive_time_solver.h,v 1.6 2007-08-23 22:11:08 roystgnr Exp $
+// $Id: adaptive_time_solver.h,v 1.7 2007-08-24 18:23:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -121,16 +121,22 @@ public:
   std::vector<float> component_scale;
 
   /**
-   * This tolerance is the target error between double-deltat
-   * and single-deltat timesteps, scaled by deltat
+   * This tolerance is the target relative error between double-deltat
+   * and single-deltat timesteps, scaled by deltat.  If this error tolerance
+   * is exceeded or not met, future timesteps will be run with deltat shrunk
+   * or grown to compensate.
+   *
+   * The default value is 1.0e-2; obviously users should select their
+   * own tolerance.
    */
   Real target_tolerance;
 
   /**
-   * This tolerance is the maximum error between double-deltat
-   * and single-deltat timesteps, scaled by deltat
+   * This tolerance is the maximum relative error between double-deltat and
+   * single-deltat timesteps, scaled by deltat.  If this error tolerance is 
+   * exceeded, the current timestep will be repeated with a smaller deltat.
    *
-   * FIXME - this value is currently ignored!
+   * If you use the default upper_tolerance=0.0, 
    */
   Real upper_tolerance;
 
