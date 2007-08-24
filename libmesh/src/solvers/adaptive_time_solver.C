@@ -9,7 +9,7 @@
 AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type& s)
  : TimeSolver(s),
    core_time_solver(new EulerSolver(s)),
-   target_tolerance(1.e-3), upper_tolerance(1.e-2),
+   target_tolerance(1.e-3), upper_tolerance(0.0),
    max_deltat(0.),
    min_deltat(0.),
    max_growth(0.),
@@ -54,71 +54,113 @@ void AdaptiveTimeSolver::solve()
 
   // The core_time_solver will handle any first_solve actions
   first_solve = false;
+
+  // We may have to repeat timesteps entirely if our error is bad
+  // enough
+  bool max_tolerance_met = false;
+
+  // Calcualting error values each time
+  Real single_norm(0.), double_norm(0.), error_norm(0.),
+       relative_error(0.);
  
-  // If we've been asked to reduce deltat if necessary, make
-  // sure the core timesolver does so
-  core_time_solver->reduce_deltat_on_diffsolver_failure =
-    this->reduce_deltat_on_diffsolver_failure;
-
-  // Use the double-length timestep first (so the old_nonlinear_solution
-  // won't have to change)
-  core_time_solver->solve();
-
-  // Save a copy of the double-length nonlinear solution
-  // and the old nonlinear solution
-  AutoPtr<NumericVector<Number> > double_solution =
-    _system.solution->clone();
-  AutoPtr<NumericVector<Number> > old_solution =
-    _system.get_vector("_old_nonlinear_solution").clone();
-
-  // Then reset the solution for our single-length calcs
-  *(_system.solution) = _system.get_vector("_old_nonlinear_solution");
-
-  // Call two single-length timesteps
-  // Be sure that the core_time_solver does not change the timestep here.
-  // (This is unlikely because it just succeeded with a timestep twice
-  // as large!)
-  core_time_solver->reduce_deltat_on_diffsolver_failure = 0;
-  
-  Real old_deltat = _system.deltat;
-  _system.deltat *= 0.5;
-  core_time_solver->solve();
-  core_time_solver->advance_timestep();
-  core_time_solver->solve();
-
-  // Reset the core_time_solver's reduce_deltat... value.
-  core_time_solver->reduce_deltat_on_diffsolver_failure =
-    this->reduce_deltat_on_diffsolver_failure;
-  
-  // But then back off just in case our advance_timestep() isn't
-  // called - this probably doesn't work with multistep methods
-  _system.get_vector("_old_nonlinear_solution") = *old_solution;
-  _system.time -= _system.deltat;
-  _system.deltat = old_deltat;
-
-  // Find the relative error
-  const Real double_norm = calculate_norm(_system, *double_solution);
-  const Real single_norm = calculate_norm(_system, *_system.solution);
-  *double_solution -= *(_system.solution);
-  const Real error_norm  = calculate_norm(_system, *double_solution);
-  Real relative_error = error_norm / _system.deltat /
-    std::max(double_norm, single_norm);
-
-  // If the relative error makes no sense, we're done
-  if (!double_norm && !single_norm)
-    return;
-
-  if (!quiet)
+  while (!max_tolerance_met)
     {
-      std::cout << "\n === Computing adaptive timestep === " << std::endl;
-      std::cout << "Double norm = " << double_norm << std::endl;
-      std::cout << "Single norm = " << single_norm << std::endl;
-      std::cout << "Error norm = " << error_norm << std::endl;
-      std::cout << "Local relative error = "
-		<< (error_norm / std::max(double_norm, single_norm)) << std::endl;
-      std::cout << "Global relative error = "
-		<< (error_norm / _system.deltat / std::max(double_norm, single_norm)) << std::endl;
-      std::cout << "old delta t = " << _system.deltat << std::endl;
+      // If we've been asked to reduce deltat if necessary, make sure
+      // the core timesolver does so
+      core_time_solver->reduce_deltat_on_diffsolver_failure =
+        this->reduce_deltat_on_diffsolver_failure;
+
+      // Use the double-length timestep first (so the
+      // old_nonlinear_solution won't have to change)
+      core_time_solver->solve();
+
+      // Save a copy of the double-length nonlinear solution
+      // and the old nonlinear solution
+      AutoPtr<NumericVector<Number> > double_solution =
+        _system.solution->clone();
+      AutoPtr<NumericVector<Number> > old_solution =
+        _system.get_vector("_old_nonlinear_solution").clone();
+
+      // Then reset the initial guess for our single-length calcs
+      *(_system.solution) = _system.get_vector("_old_nonlinear_solution");
+
+      // Call two single-length timesteps
+      // Be sure that the core_time_solver does not change the
+      // timestep here.  (This is unlikely because it just succeeded
+      // with a timestep twice as large!)
+      // FIXME: even if diffsolver failure is unlikely, we ought to
+      // do *something* if it happens
+      core_time_solver->reduce_deltat_on_diffsolver_failure = 0;
+  
+      Real old_time = _system.time;
+      Real old_deltat = _system.deltat;
+      _system.deltat *= 0.5;
+      core_time_solver->solve();
+      core_time_solver->advance_timestep();
+      core_time_solver->solve();
+
+      // Reset the core_time_solver's reduce_deltat... value.
+      core_time_solver->reduce_deltat_on_diffsolver_failure =
+        this->reduce_deltat_on_diffsolver_failure;
+  
+      // But then back off just in case our advance_timestep() isn't
+      // called.
+      // FIXME: this probably doesn't work with multistep methods
+      _system.get_vector("_old_nonlinear_solution") = *old_solution;
+      _system.time = old_time;
+      _system.deltat = old_deltat;
+
+      // Find the relative error
+      double_norm = calculate_norm(_system, *double_solution);
+      single_norm = calculate_norm(_system, *_system.solution);
+      *double_solution -= *(_system.solution);
+      error_norm  = calculate_norm(_system, *double_solution);
+      relative_error = error_norm / _system.deltat /
+        std::max(double_norm, single_norm);
+
+      // If the relative error makes no sense, we're done
+      if (!double_norm && !single_norm)
+        return;
+
+      if (!quiet)
+        {
+          std::cout << "\n === Computing adaptive timestep === " 
+                    << std::endl;
+	  std::cout << "Double norm = " << double_norm << std::endl;
+          std::cout << "Single norm = " << single_norm << std::endl;
+          std::cout << "Error norm = " << error_norm << std::endl;
+          std::cout << "Local relative error = "
+		    << (error_norm /
+                        std::max(double_norm, single_norm))
+                    << std::endl;
+          std::cout << "Global relative error = "
+		    << (error_norm / _system.deltat / 
+                        std::max(double_norm, single_norm)) 
+                    << std::endl;
+          std::cout << "old delta t = " << _system.deltat << std::endl;
+        }
+
+      // If we haven't met our upper error tolerance, we'll have to
+      // repeat this timestep entirely
+      if (this->upper_tolerance && relative_error > this->upper_tolerance)
+        {
+	  // Reset the initial guess for our next try
+	  *(_system.solution) =
+            _system.get_vector("_old_nonlinear_solution");
+
+          // Chop delta t in half
+          _system.deltat /= 2.;
+
+          if (!quiet)
+            {
+              std::cout << "Failed to meet upper error tolerance" 
+                        << std::endl;
+              std::cout << "Retrying with delta t = "
+                        << _system.deltat << std::endl;
+            }
+        }
+      else
+        max_tolerance_met = true;
     }
 
   
@@ -127,11 +169,12 @@ void AdaptiveTimeSolver::solve()
   last_deltat = _system.deltat;
 
   const Real global_shrink_or_growth_factor =
-    std::pow(target_tolerance / relative_error,
+    std::pow(this->target_tolerance / relative_error,
 	     1. / core_time_solver->error_order());
 
   const Real local_shrink_or_growth_factor =
-    std::pow(target_tolerance / (error_norm/std::max(double_norm, single_norm)),
+    std::pow(this->target_tolerance /
+	     (error_norm/std::max(double_norm, single_norm)),
 	     1. / (core_time_solver->error_order()+1.));
 
   if (!quiet)
@@ -149,12 +192,12 @@ void AdaptiveTimeSolver::solve()
   // either a global or local time-discretization error tolerance.
  
   Real shrink_or_growth_factor =
-    global_tolerance ? global_shrink_or_growth_factor :
-                       local_shrink_or_growth_factor;
+    this->global_tolerance ? global_shrink_or_growth_factor :
+                             local_shrink_or_growth_factor;
 
   if (this->max_growth && this->max_growth < shrink_or_growth_factor)
     {
-      if (!quiet && global_tolerance)
+      if (!quiet && this->global_tolerance)
         {
 	  std::cout << "delta t is constrained by max_growth" << std::endl;
 	}
@@ -168,7 +211,8 @@ void AdaptiveTimeSolver::solve()
     {
       if (!quiet)
 	{
-	  std::cout << "delta t is constrained by maximum-allowable delta t." << std::endl;
+	  std::cout << "delta t is constrained by maximum-allowable delta t."
+                    << std::endl;
 	}
       _system.deltat = this->max_deltat;
     }
@@ -178,7 +222,8 @@ void AdaptiveTimeSolver::solve()
     {
       if (!quiet)
 	{
-	  std::cout << "delta t is constrained by minimum-allowable delta t." << std::endl;
+	  std::cout << "delta t is constrained by minimum-allowable delta t."
+                    << std::endl;
 	}
       _system.deltat = this->min_deltat;
     }
