@@ -70,6 +70,12 @@ void AdaptiveTimeSolver::solve()
       core_time_solver->reduce_deltat_on_diffsolver_failure =
         this->reduce_deltat_on_diffsolver_failure;
 
+      if (!quiet)
+        {
+          std::cout << "\n === Computing adaptive timestep === " 
+                    << std::endl;
+        }
+
       // Use the double-length timestep first (so the
       // old_nonlinear_solution won't have to change)
       core_time_solver->solve();
@@ -80,6 +86,12 @@ void AdaptiveTimeSolver::solve()
         _system.solution->clone();
       AutoPtr<NumericVector<Number> > old_solution =
         _system.get_vector("_old_nonlinear_solution").clone();
+
+      double_norm = calculate_norm(_system, *double_solution);
+      if (!quiet)
+        {
+	  std::cout << "Double norm = " << double_norm << std::endl;
+        }
 
       // Then reset the initial guess for our single-length calcs
       *(_system.solution) = _system.get_vector("_old_nonlinear_solution");
@@ -99,6 +111,12 @@ void AdaptiveTimeSolver::solve()
       core_time_solver->advance_timestep();
       core_time_solver->solve();
 
+      single_norm = calculate_norm(_system, *_system.solution);
+      if (!quiet)
+        {
+          std::cout << "Single norm = " << single_norm << std::endl;
+        }
+
       // Reset the core_time_solver's reduce_deltat... value.
       core_time_solver->reduce_deltat_on_diffsolver_failure =
         this->reduce_deltat_on_diffsolver_failure;
@@ -111,8 +129,6 @@ void AdaptiveTimeSolver::solve()
       _system.deltat = old_deltat;
 
       // Find the relative error
-      double_norm = calculate_norm(_system, *double_solution);
-      single_norm = calculate_norm(_system, *_system.solution);
       *double_solution -= *(_system.solution);
       error_norm  = calculate_norm(_system, *double_solution);
       relative_error = error_norm / _system.deltat /
@@ -124,10 +140,6 @@ void AdaptiveTimeSolver::solve()
 
       if (!quiet)
         {
-          std::cout << "\n === Computing adaptive timestep === " 
-                    << std::endl;
-	  std::cout << "Double norm = " << double_norm << std::endl;
-          std::cout << "Single norm = " << single_norm << std::endl;
           std::cout << "Error norm = " << error_norm << std::endl;
           std::cout << "Local relative error = "
 		    << (error_norm /
