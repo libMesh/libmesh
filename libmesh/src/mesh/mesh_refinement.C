@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.61 2007-07-02 16:10:52 friedmud Exp $
+// $Id: mesh_refinement.C,v 1.62 2007-09-05 19:02:15 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -18,6 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+// C++ includes
+#include <limits>
 
 // Local includes
 #include "libmesh_config.h"
