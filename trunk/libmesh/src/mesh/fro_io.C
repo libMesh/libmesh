@@ -1,4 +1,4 @@
-// $Id: fro_io.C,v 1.1 2007-03-03 12:26:19 benkirk Exp $
+// $Id: fro_io.C,v 1.2 2007-09-05 18:32:56 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -103,7 +103,7 @@ void FroIO::write (const std::string& fname)
 	// Map the boundary ids into [1,n_bc_ids],
 	// treat them one at a time.
 	short int bc_id=0;
-	for (std::set<short int>::iterator id = bc_ids.begin();
+	for (std::set<short int>::const_iterator id = bc_ids.begin();
 	     id != bc_ids.end(); ++id)
 	  {
 	    std::deque<unsigned int> node_list;
