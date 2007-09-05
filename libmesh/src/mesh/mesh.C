@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.82 2007-07-02 16:10:52 friedmud Exp $
+// $Id: mesh.C,v 1.83 2007-09-05 19:10:43 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,9 @@
 
 // C++ includes
 #include <fstream>
+
+// C includes
+#include <unistd.h>  // for unlink()
 
 // Local includes
 #include "mesh.h"
