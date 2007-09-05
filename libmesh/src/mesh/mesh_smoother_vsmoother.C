@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_vsmoother.C,v 1.4 2007-07-02 16:10:52 friedmud Exp $
+// $Id: mesh_smoother_vsmoother.C,v 1.5 2007-09-05 21:08:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -915,7 +915,7 @@ double VariationalMeshSmoother::maxE(int n, int, LPLPDOUBLE R, int ncells, LPLPI
 			double *qmin, FILE *)
 {
   LPLPDOUBLE Q;
-  double K[8], a1[3], a2[3], a3[3];
+  double K[9], a1[3], a2[3], a3[3];
   double  gemax, det, tr, E=0.0, sigma=0.0, chi, vmin;
   int  ii, i, j, k, l, m, nn, kk, ll;
 
@@ -1109,7 +1109,7 @@ double VariationalMeshSmoother::minq(int n, int, LPLPDOUBLE R, int ncells, LPLPI
 				     int me, LPLPLPDOUBLE H, double *vol, double *Vmin, FILE *)
 {
   LPLPDOUBLE Q;
-  double K[8], a1[3], a2[3], a3[3];
+  double K[9], a1[3], a2[3], a3[3];
   double  v, vmin, gqmin, det, vcell, sigma=0.0;
   int  ii, i, j, k, l, m, nn, kk, ll;
 
@@ -1911,7 +1911,7 @@ double VariationalMeshSmoother::localP(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLP
 
   int  ii, jj, kk, i, j, k, l, m, nn;
   double  sigma=0.0, fun, lqmin, gqmin, g;
-  double K[8];
+  double K[9];
   /*f - flag, f=0 for determination of Hessian and gradient of the functional,
     f=1 for determination of the functional value only;
     K - determines approximation rule for local integral over the cell*/
@@ -2581,7 +2581,7 @@ void VariationalMeshSmoother::metr_data_gen(char grid[], char metr[], int n, int
   LPLPINT cells;
   LPINT mask, mcells;
   LPLPDOUBLE Q;
-  double K[8], a1[3], a2[3], a3[3];
+  double K[9], a1[3], a2[3], a3[3];
   double det, g1, g2, g3, det_o, g1_o, g2_o, g3_o, eps=1e-3;
   int  i, j, k, l, N, ncells, Ncells, nvert;
   FILE *stream;
