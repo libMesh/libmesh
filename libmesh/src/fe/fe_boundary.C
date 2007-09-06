@@ -1,4 +1,4 @@
-// $Id: fe_boundary.C,v 1.46 2006-12-08 00:50:43 roystgnr Exp $
+// $Id: fe_boundary.C,v 1.47 2007-09-06 15:50:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,39 +32,38 @@
 #include "libmesh_logging.h"
 
 //-------------------------------------------------------
-// Full specializations for 1D when these are useless methods
-#define REINIT_1D_ERROR(_type, _func)       \
-template <>                                 \
-void FE<1,_type>::_func(const Elem*,        \
-			const unsigned int, \
-                        const Real) \
-{                                           \
-  std::cerr << "ERROR: This method makes no sense for 1D elements!" \
-	    << std::endl;                   \
-  error();                                  \
+// Full specializations for useless methods in 0D, 1D
+#define REINIT_ERROR(_dim, _type, _func)       \
+template <>                                    \
+void FE<_dim,_type>::_func(const Elem*,        \
+			   const unsigned int, \
+                           const Real)         \
+{                                              \
+  std::cerr << "ERROR: This method makes no sense for low-D elements!" \
+	    << std::endl;                      \
+  error();                                     \
 }
 
-/*
-REINIT_1D_ERROR(CLOUGH, reinit)
-REINIT_1D_ERROR(HERMITE, reinit)
-REINIT_1D_ERROR(HIERARCHIC, reinit)
-REINIT_1D_ERROR(LAGRANGE, reinit)
-REINIT_1D_ERROR(MONOMIAL, reinit)
-REINIT_1D_ERROR(XYZ, reinit)
+REINIT_ERROR(0, CLOUGH, reinit)
+REINIT_ERROR(0, HERMITE, reinit)
+REINIT_ERROR(0, HIERARCHIC, reinit)
+REINIT_ERROR(0, LAGRANGE, reinit)
+REINIT_ERROR(0, MONOMIAL, reinit)
+REINIT_ERROR(0, XYZ, reinit)
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
-REINIT_1D_ERROR(BERNSTEIN, reinit)
-REINIT_1D_ERROR(SZABAB, reinit)
+REINIT_ERROR(0, BERNSTEIN, reinit)
+REINIT_ERROR(0, SZABAB, reinit)
 #endif
-*/
-REINIT_1D_ERROR(CLOUGH, edge_reinit)
-REINIT_1D_ERROR(HERMITE, edge_reinit)
-REINIT_1D_ERROR(HIERARCHIC, edge_reinit)
-REINIT_1D_ERROR(LAGRANGE, edge_reinit)
-REINIT_1D_ERROR(XYZ, edge_reinit)
-REINIT_1D_ERROR(MONOMIAL, edge_reinit)
+
+REINIT_ERROR(1, CLOUGH, edge_reinit)
+REINIT_ERROR(1, HERMITE, edge_reinit)
+REINIT_ERROR(1, HIERARCHIC, edge_reinit)
+REINIT_ERROR(1, LAGRANGE, edge_reinit)
+REINIT_ERROR(1, XYZ, edge_reinit)
+REINIT_ERROR(1, MONOMIAL, edge_reinit)
 #ifdef ENABLE_HIGHER_ORDER_SHAPES
-REINIT_1D_ERROR(BERNSTEIN, edge_reinit)
-REINIT_1D_ERROR(SZABAB, edge_reinit)
+REINIT_ERROR(1, BERNSTEIN, edge_reinit)
+REINIT_ERROR(1, SZABAB, edge_reinit)
 #endif
 
 
