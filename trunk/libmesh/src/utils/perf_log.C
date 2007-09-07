@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.25 2005-06-28 16:24:54 jwpeterson Exp $
+// $Id: perf_log.C,v 1.26 2007-09-07 16:16:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -126,9 +126,11 @@ std::string PerfLog::get_info_header() const
       OStringStream osver_stream;
       OStringStream machine_stream;
       OStringStream user_stream;
+      OStringStream config_stream;
+      
 
       // Put pointers to these streams in a vector
-      std::vector<OStringStream*> v(9);
+      std::vector<OStringStream*> v(10);
       v[0] = &pid_stream;
       v[1] = &nprocs_stream;
       v[2] = &time_stream;
@@ -138,6 +140,7 @@ std::string PerfLog::get_info_header() const
       v[6] = &osver_stream;
       v[7] = &machine_stream;
       v[8] = &user_stream;
+      v[9] = &config_stream;
 
       // Fill string stream objects
       if (libMesh::n_processors() > 1)
@@ -155,7 +158,8 @@ std::string PerfLog::get_info_header() const
       osrel_stream   << "| OS Release:     " << sysInfo.release        ; 
       osver_stream   << "| OS Version:     " << sysInfo.version        ; 
       machine_stream << "| Machine:        " << sysInfo.machine        ; 
-      user_stream    << "| Username:       " << p->pw_name             ; 
+      user_stream    << "| Username:       " << p->pw_name             ;
+      config_stream << " | Configuration:  " << LIBMESH_CONFIGURE_INFO;
       
       // Find the longest string, use that to set the line length for formatting.
       unsigned int max_length = 0;

@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.105 2007-07-05 18:58:47 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.106 2007-09-07 16:16:53 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -690,6 +690,11 @@ AC_DEFUN(CONFIGURE_PETSC,
 
   else
     if (test -r $PETSC_DIR/include/petsc.h) ; then
+      AC_ARG_WITH([f77],
+		  AC_HELP_STRING([--with-f77=F77],
+                                 [Fortran compiler to use]),
+	          [F77="$withval"],
+	          [])	
       AC_PROG_F77            dnl Petsc requires linking with FORTRAN libraries 
       AC_F77_LIBRARY_LDFLAGS
       AC_SUBST(PETSC_ARCH)
