@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.57 2007-06-01 19:24:39 jwpeterson Exp $
+# $Id: Make.common.in,v 1.58 2007-09-07 21:55:46 benkirk Exp $
 
 
 ###############################################################################
@@ -22,25 +22,25 @@
 ###############################################################################
 # the following lines will be replaced by the output 
 # of ./configure
-hosttype             = @host@
-hostos               = @host_os@
+hosttype              = @host@
+hostos                = @host_os@
 
-CXX                  = @CXX@
-CC		     = @CC@
-LDFLAGS              = @LDFLAGS@
-DLFLAGS              =
-LIBS                 = @LIBS@
-FLIBS		     = @FLIBS@
-GXX-VERSION          = @GXX_VERSION@
-CXXSHAREDFLAG        = @CXXSHAREDFLAG@
-CSHAREDFLAG          = @CXXSHAREDFLAG@
-RPATHFLAG            = @RPATHFLAG@
+libmesh_CXX           = @CXX@
+libmesh_CC            = @CC@
+libmesh_LDFLAGS       = @LDFLAGS@
+libmesh_DLFLAGS       =
+libmesh_LIBS          = @LIBS@
+libmesh_FLIBS	      = @FLIBS@
+GXX-VERSION           = @GXX_VERSION@
+libmesh_CXXSHAREDFLAG = @CXXSHAREDFLAG@
+libmesh_CSHAREDFLAG   = @CXXSHAREDFLAG@
+libmesh_RPATHFLAG     = @RPATHFLAG@
 
 # Complex variable support
 enable-complex       = @enablecomplex@
 ifeq ($(enable-complex),yes)
-  CXXFLAGS     += -DUSE_COMPLEX_NUMBERS
-  CFLAGS       += -DUSE_REAL_NUMBERS
+  libmesh_CXXFLAGS     += -DUSE_COMPLEX_NUMBERS
+  libmesh_CFLAGS       += -DUSE_REAL_NUMBERS
 endif
 
 # Petsc iterative solvers for parallel and uniprocessor
@@ -158,30 +158,30 @@ endif
 ###############################################################################
 # Compiler flags, different for optimized, debug, and profiler modes.
 ifeq ($(opt-mode),on)
-  CXXFLAGS += -DNDEBUG @CXXFLAGS_OPT@
-  CFLAGS   += -DNDEBUG @CFLAGS_OPT@
+  libmesh_CXXFLAGS += -DNDEBUG @CXXFLAGS_OPT@
+  libmesh_CFLAGS   += -DNDEBUG @CFLAGS_OPT@
 endif
 
 
 ifeq ($(devel-mode),on)
-  CXXFLAGS += @CXXFLAGS_DVL@
-  CFLAGS   += @CFLAGS_DVL@
+  libmesh_CXXFLAGS += @CXXFLAGS_DVL@
+  libmesh_CFLAGS   += @CFLAGS_DVL@
 endif
 
 
 ifeq ($(debug-mode),on)
-  CXXFLAGS += -DDEBUG @CXXFLAGS_DBG@
-  CFLAGS   += -DDEBUG @CFLAGS_DBG@
+  libmesh_CXXFLAGS += -DDEBUG @CXXFLAGS_DBG@
+  libmesh_CFLAGS   += -DDEBUG @CFLAGS_DBG@
 endif
 
 
 ifeq ($(prof-mode),on)
-  CXXFLAGS += -DNDEBUG @CXXFLAGS_OPT@ @PROFILING_FLAGS@
-  CFLAGS   += -DNDEBUG @CFLAGS_OPT@ @PROFILING_FLAGS@ 
+  libmesh_CXXFLAGS += -DNDEBUG @CXXFLAGS_OPT@ @PROFILING_FLAGS@
+  libmesh_CFLAGS   += -DNDEBUG @CFLAGS_OPT@ @PROFILING_FLAGS@ 
 endif
 
 ifeq ($(prof-mode),on)
-  LIBS += @PROFILING_FLAGS@
+  libmesh_LIBS += @PROFILING_FLAGS@
 endif
 ###############################################################################
 
@@ -195,10 +195,10 @@ mesh_library_dir := $(libmesh_dir)/lib/$(hosttype)_$(METHOD)
 mesh_library     := $(mesh_library_dir)/libmesh$(static_libext)
 ifeq ($(enable-shared),yes) 
   mesh_library   := $(mesh_library_dir)/libmesh$(shared_libext)
-  DLFLAGS += $(RPATHFLAG)$(mesh_library_dir)
+  libmesh_DLFLAGS += $(libmesh_RPATHFLAG)$(mesh_library_dir)
 endif
 
-LIBS += $(mesh_library)
+libmesh_LIBS += $(mesh_library)
 ###############################################################################
 
 
@@ -208,7 +208,7 @@ LIBS += $(mesh_library)
 
 #
 # The include directories for libMesh
-LIBMESH_INCLUDES = -I$(libmesh_dir)/include/base \
+libmesh_INCLUDE += -I$(libmesh_dir)/include/base \
                    -I$(libmesh_dir)/include/enums \
                    -I$(libmesh_dir)/include/fe \
                    -I$(libmesh_dir)/include/geom \
@@ -219,8 +219,6 @@ LIBMESH_INCLUDES = -I$(libmesh_dir)/include/base \
                    -I$(libmesh_dir)/include/solvers \
                    -I$(libmesh_dir)/include/utils
 
-INCLUDE += $(LIBMESH_INCLUDES)
-
 
 
 #
@@ -230,14 +228,14 @@ INCLUDE += $(LIBMESH_INCLUDES)
 # Contributed source & libraries
 EXTERNAL_LIBDIR := $(libmesh_dir)/contrib/lib/$(hosttype)_$(METHOD)
 ifeq ($(enable-shared),yes) 
-  DLFLAGS += $(RPATHFLAG)$(EXTERNAL_LIBDIR)
+  libmesh_DLFLAGS += $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR)
 endif
 
 
 # Include path for local boost header files.  Note, this
 # will probably not be an "optional" package if we really
 # do end up using it.
-INCLUDE += -I$(libmesh_dir)/contrib/boost
+libmesh_INCLUDE += -I$(libmesh_dir)/contrib/boost
 
 #
 # Optional packages
@@ -245,48 +243,48 @@ ifeq ($(enable-optional),yes)
 
   # if Laspack is used we need the header path
   # and the lib
-  LIBS    += @LASPACK_LIB@
-  INCLUDE += @LASPACK_INCLUDE@
+  libmesh_LIBS    += @LASPACK_LIB@
+  libmesh_INCLUDE += @LASPACK_INCLUDE@
 
   # if Paretis is used we need the header path
   # and the lib
   # (Parmetis must precede Metis for static linking)
-  LIBS    += @PARMETIS_LIB@
-  INCLUDE += @PARMETIS_INCLUDE@
+  libmesh_LIBS    += @PARMETIS_LIB@
+  libmesh_INCLUDE += @PARMETIS_INCLUDE@
 
   # if Metis is used we need the header path
   # and the lib
-  LIBS    += @METIS_LIB@
-  INCLUDE += @METIS_INCLUDE@
+  libmesh_LIBS    += @METIS_LIB@
+  libmesh_INCLUDE += @METIS_INCLUDE@
 
   # if Space filling curves are used we need the
   # header path and the lib
-  LIBS    += @SFC_LIB@
-  INCLUDE += @SFC_INCLUDE@
+  libmesh_LIBS    += @SFC_LIB@
+  libmesh_INCLUDE += @SFC_INCLUDE@
 
   # if gzstreams are used, we need the 
   # header path and the lib
-  LIBS    += @GZSTREAM_LIB@
-  INCLUDE += @GZSTREAM_INCLUDE@
+  libmesh_LIBS    += @GZSTREAM_LIB@
+  libmesh_INCLUDE += @GZSTREAM_INCLUDE@
 
   # if Tecplot is used, link against tecio.a
-  LIBS    += @TECPLOT_LIBRARY@
-  INCLUDE += @TECPLOT_INCLUDE@
+  libmesh_LIBS    += @TECPLOT_LIBRARY@
+  libmesh_INCLUDE += @TECPLOT_INCLUDE@
 
   # Link against the GMV APIs to read GMV files
-  LIBS    += @GMV_LIBRARY@
-  INCLUDE += @GMV_INCLUDE@
+  libmesh_LIBS    += @GMV_LIBRARY@
+  libmesh_INCLUDE += @GMV_INCLUDE@
 
   # if TetGen is used:
   ifeq ($(enable-tetgen),yes)
-    LIBS     += @TETGEN_LIBRARY@
-    INCLUDE  += @TETGEN_INCLUDE@
+    libmesh_LIBS     += @TETGEN_LIBRARY@
+    libmesh_INCLUDE  += @TETGEN_INCLUDE@
   endif
 
   # if Triangle is used:
   ifeq ($(enable-triangle),yes)
-    LIBS     += @TRIANGLE_LIBRARY@
-    INCLUDE  += @TRIANGLE_INCLUDE@
+    libmesh_LIBS     += @TRIANGLE_LIBRARY@
+    libmesh_INCLUDE  += @TRIANGLE_INCLUDE@
   endif
 
   #############################################################################
@@ -301,7 +299,7 @@ ifeq ($(enable-optional),yes)
       include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/packages
     endif
 
-    INCLUDE += -I$(SLEPC_DIR)/include
+    libmesh_INCLUDE += -I$(SLEPC_DIR)/include
 
     # Depending on petsc version, libs live in different locations
     ifneq (,$(findstring 2.3.x, $(petsc-major-minor))) # 2.3.x & newer does not use BOPT
@@ -313,9 +311,9 @@ ifeq ($(enable-optional),yes)
     libs-SLEPC = -L$(SLEPC_LIB) \
                  -lslepc
 
-    LIBS += $(libs-SLEPC) $(ARPACK_LIB)
+    libmesh_LIBS += $(libs-SLEPC) $(ARPACK_LIB)
 
-    DLFLAGS += $(RPATHFLAG)$(SLEPC_LIB)
+    libmesh_DLFLAGS += $(libmesh_RPATHFLAG)$(SLEPC_LIB)
 
   endif #end ifeq ($(enable-slepc),yes)
 
@@ -326,8 +324,8 @@ ifeq ($(enable-optional),yes)
 
     # define BOPT first since it may be used in the packages file
     ifeq ($(enable-complex),yes)
-      CXXFLAGS     += -DPETSC_USE_COMPLEX
-      CFLAGS       += -DPETSC_USE_COMPLEX
+      libmesh_CXXFLAGS     += -DPETSC_USE_COMPLEX
+      libmesh_CFLAGS       += -DPETSC_USE_COMPLEX
       PETSC_BOPT.g = g_complex
       PETSC_BOPT.o = O_complex
     else
@@ -345,7 +343,7 @@ ifeq ($(enable-optional),yes)
     ifeq ($(petsc-version),2.1.0)
       include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
     else
-      C_CLINKER_SLFLAG = $(RPATHFLAG)# necessary for PETSc >= 2.1.6
+      C_CLINKER_SLFLAG = $(libmesh_RPATHFLAG)# necessary for PETSc >= 2.1.6
       ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x & newer style
         include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/petscconf # 2.3.0 or later style
       else
@@ -355,11 +353,11 @@ ifeq ($(enable-optional),yes)
 
 #     # As of PETSc 2.1.x we can extract the libraries and include paths
 #     # from the PETSc make file
-#     LIBS    += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getlinklibs`
-#     INCLUDE += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getincludedirs`
+#     libmesh_LIBS    += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getlinklibs`
+#     libmesh_INCLUDE += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getincludedirs`
 
 
-    INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) \
+    libmesh_INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) \
                 $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE)
 
     # Depending on petsc version, libs live in different locations
@@ -370,9 +368,9 @@ ifeq ($(enable-optional),yes)
     endif
 
     ifeq ($(enable-shared),yes)
-      CXXFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
-      CFLAGS       += -DPETSC_USE_DYNAMIC_LIBRARIES 
-      DLFLAGS      += $(RPATHFLAG)$(PETSC_LIB)
+      libmesh_CXXFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
+      libmesh_CFLAGS       += -DPETSC_USE_DYNAMIC_LIBRARIES 
+      libmesh_DLFLAGS      += $(libmesh_RPATHFLAG)$(PETSC_LIB)
     endif
 
     # Depending on petsc version, we link with different libs :-(
@@ -396,12 +394,12 @@ ifeq ($(enable-optional),yes)
 		   -lpetsc
     endif
 
-    LIBS += $(libs-PETSC) \
+    libmesh_LIBS += $(libs-PETSC) \
             $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) $(HYPRE_LIB) \
             $(SUPERLU_DIST_LIB) $(UMFPACK_LIB) $(SUPERLU_LIB) \
             $(BLOPEX_LIB) \
             $(BLASLAPACK_LIB) $(X11_LIB) $(MATLAB_LIB) \
-            $(FLIBS)
+            $(libmesh_FLIBS)
 
     EXTERNAL_FLAGS += $(libs-PETSC) $(MPI_LIB) $(BLASLAPACK_LIB) \
                       $(X11_LIB) $(MATLAB_LIB) -lz
@@ -418,8 +416,8 @@ ifeq ($(enable-optional),yes)
   endif
 
   # MPI configuration when Petsc is absent
-  LIBS    += $(MPI_LIB)
-  INCLUDE += $(MPI_INCLUDE)
+  libmesh_LIBS    += $(MPI_LIB)
+  libmesh_INCLUDE += $(MPI_INCLUDE)
 
   libs_EXTERNAL = -L$(EXTERNAL_LIBDIR)
   ifeq ($(enable-gzstream),yes)
@@ -453,21 +451,21 @@ endif # End of disable-optional test
 
 # Finally, Append the linker flags to the libraries
 ifeq ($(findstring darwin,$(hostos)),darwin)
-  LIBS = $(mesh_library)
+  libmesh_LIBS = $(mesh_library)
 else
-  LIBS += $(DLFLAGS) $(LDFLAGS)
+  libmesh_LIBS += $(libmesh_DLFLAGS) $(libmesh_LDFLAGS)
   EXTERNAL_FLAGS =
 endif
 
 # if Exodus is used, link against libexoIIv2c.a
-LIBS    += @EXODUS_LIB@
-INCLUDE += @EXODUS_INCLUDE@
+libmesh_LIBS    += @EXODUS_LIB@
+libmesh_INCLUDE += @EXODUS_INCLUDE@
 
 # if netCDF is used, link against libnetcdf.a
 # (note that netCDF is required by exodus if available,
 # so we need to link to this _after_ exodus.
-LIBS    += @NETCDF_LIB@
-INCLUDE += @NETCDF_INCLUDE@
+libmesh_LIBS    += @NETCDF_LIB@
+libmesh_INCLUDE += @NETCDF_INCLUDE@
 
 
 ###############################################################################
@@ -486,7 +484,7 @@ INCLUDE += @NETCDF_INCLUDE@
 #
 %.$(obj-suffix) : %.C
 	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
-	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 ##################################
 # C rules                        #
@@ -499,7 +497,7 @@ ifeq (x$(included-from-laspack),x)
   #
 %.$(obj-suffix) : %.c
 	@echo "Compiling C (in "$(mode)" mode) "$<"..."
-	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+	@$(libmesh_CC) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 else
 
@@ -509,14 +507,14 @@ else
     # complex: C++ rules for .c Laspack code
 %.$(obj-suffix) : %.c
 	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
-	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
   else
 
     # real: C rules for .c Laspack code
 %.$(obj-suffix) : %.c
 	@echo "Compiling C (in "$(mode)" mode) "$<"..."
-	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+	@$(libmesh_CC) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
   endif
 endif

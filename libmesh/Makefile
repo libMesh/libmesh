@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.56 2006-11-30 04:33:44 roystgnr Exp $
+# $Id: Makefile,v 1.57 2007-09-07 21:55:46 benkirk Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -80,7 +80,7 @@ $(mesh_library_dir)/libmesh$(shared_libext): $(objects)
 	@$(MAKE) -C contrib
 	@$(shell mkdir -p $(mesh_library_dir))
 	@echo "Linking "$@
-	@$(CXX) $(CXXSHAREDFLAG) -o $(mesh_library) $(objects) $(LDFLAGS) $(EXTERNAL_FLAGS)
+	@$(libmesh_CXX) $(libmesh_CXXSHAREDFLAG) -o $(mesh_library) $(objects) $(libmesh_LDFLAGS) $(EXTERNAL_FLAGS)
 
 #
 # Build just object files
@@ -112,43 +112,44 @@ run_examples: $(mesh_library)
 # Useful for checking make rules
 #
 echo:
+	@echo -e "C++ compiler:\n$(libmesh_CXX)\n"
 	@echo -e "Source Files:\n$(srcfiles)\n"
 	@echo -e "Object Files:\n$(objects)\n"
 	@echo -e "Target:\n$(target)\n"
 	@echo -e "Examples Source Files:\n$(examplesrcfiles)\n"
-	@echo -e "CFLAGS:\n$(CFLAGS)\n"
-	@echo -e "CXXFLAGS:\n$(CXXFLAGS)\n"
-	@echo -e "CXXSHAREDFLAG:\n$(CXXSHAREDFLAG)\n"
-	@echo -e "INCLUDE:\n$(INCLUDE)\n"
-	@echo -e "LIBS:\n$(LIBS)\n"
-	@echo -e "LDFLAGS:\n$(LDFLAGS)\n"
+	@echo -e "libmesh_CFLAGS:\n$(libmesh_CFLAGS)\n"
+	@echo -e "libmesh_CXXFLAGS:\n$(libmesh_CXXFLAGS)\n"
+	@echo -e "libmesh_CXXSHAREDFLAG:\n$(libmesh_CXXSHAREDFLAG)\n"
+	@echo -e "libmesh_INCLUDE:\n$(libmesh_INCLUDE)\n"
+	@echo -e "libmesh_LIBS:\n$(libmesh_LIBS)\n"
+	@echo -e "libmesh_LDFLAGS:\n$(libmesh_LDFLAGS)\n"
 	@echo -e "EXTERNAL_FLAGS:\n$(EXTERNAL_FLAGS)\n"
-	@echo -e "DLFLAGS:\n$(DLFLAGS)\n"
+	@echo -e "libmesh_DLFLAGS:\n$(libmesh_DLFLAGS)\n"
 	@echo -e "EXAMPLES:\n$(examplesrcfiles)\n"
 
 #
 # Print the name of the C++ compiler, padded with whitespace
 #
 echo_cxx:
-	@echo -n " " $(CXX) " "
+	@echo -n " " $(libmesh_CXX) " "
 
 #
 # Print the flags used for C++ compilation, padded with whitespace
 #
 echo_cxxflags:
-	@echo -n " " $(CXXFLAGS) " "
+	@echo -n " " $(libmesh_CXXFLAGS) " "
 
 #
 # Print C++ compiler include path, padded with whitespace
 #
 echo_include:
-	@echo -n " " $(INCLUDE) " "
+	@echo -n " " $(libmesh_INCLUDE) " "
 
 #
 # Print the flags used to link, padded with whitespace
 #
 echo_ldflags:
-	@echo -n " " $(LIBS) $(LDFLAGS) $(DLFLAGS) " "
+	@echo -n " " $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS) " "
 
 #	
 # Remove object files for the current mode
@@ -235,14 +236,14 @@ cvsweb:
 # and is a standalone program, then make bin/foo will work.
 #
 bin/% : src/apps/%.cc $(mesh_library)
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $< -o $@ $(LIBS) $(LDFLAGS) $(DLFLAGS)
+	$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) $< -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS)
 
 #
 # In the contrib/bin directory, we run the test_headers.sh shell
 # script.  This is a make rule for those tests.
 #
 contrib/bin/%.o : contrib/bin/%.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+	$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 #
 # Make a TODO list

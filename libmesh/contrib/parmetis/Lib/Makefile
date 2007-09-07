@@ -1,6 +1,6 @@
 include ../../../Make.common
 
-INCLUDE = $(MPI_INCLUDE) -I.
+libmesh_INCLUDE = $(MPI_INCLUDE) -I.
 
 
 SRC     := $(wildcard *.c)
@@ -45,7 +45,7 @@ endif
 $(EXTERNAL_LIBDIR)/libparmetis$(shared_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
-	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
+	@$(libmesh_CC) $(libmesh_CSHAREDFLAG) -o $@ $(OBJS) $(libmesh_LDFLAGS)
 
 clean:
 	@rm -f $(OBJS) *~
@@ -60,4 +60,4 @@ distclean:
 	@rm -f ../../lib/*/libparmetis.*
 
 echo:
-	@echo $(INCLUDE)
+	@echo $(libmesh_INCLUDE)

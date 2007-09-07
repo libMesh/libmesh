@@ -36,7 +36,7 @@ endif
 $(EXTERNAL_LIBDIR)/libsfcurves$(shared_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
-	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
+	@$(libmesh_CC) $(libmesh_CSHAREDFLAG) -o $@ $(OBJS) $(libmesh_LDFLAGS)
 
 
 .PHONY: clean clobber distclean
