@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.65 2007-08-02 20:12:59 benkirk Exp $
+dnl $Id: configure.in,v 1.66 2007-09-07 16:16:53 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.65 $)
+AC_REVISION($Revision: 1.66 $)
 
 
 AC_INIT
@@ -26,6 +26,10 @@ AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(----------- Configuring libMesh -------------)
 AC_MSG_RESULT(---------------------------------------------)
 
+
+dnl Print configuration info to the header file
+AC_DEFINE_UNQUOTED(LIBMESH_CONFIGURE_INFO, ["\"$0 $@\" run on `date`"], [Configuration information.])	
+
 dnl Compute the canonical target system type variable "target", and its
 dnl three individual parts: "target_cpu", "target_vendor", and "target_os"
 AC_CANONICAL_TARGET
@@ -36,10 +40,20 @@ AC_LANG_CPLUSPLUS
 
 dnl Determines a C++ compiler to use.  First checks if the variable CXX is
 dnl already set.  If not, then searches under g++, c++, and other names.
+AC_ARG_WITH([cxx],
+	    AC_HELP_STRING([--with-cxx=CXX],
+                           [C++ compiler to use]),
+	    [CXX="$withval"],
+	    [])
 AC_PROG_CXX
 
 dnl Determine a C compiler to use.  If CC is not already set, checks for
 dnl gcc, cc, and other C compilers.  Then sets the CC variable to the result.
+AC_ARG_WITH([cc],
+	    AC_HELP_STRING([--with-cc=CC],
+                           [C compiler to use]),
+	    [CC="$withval"],
+	    [])
 AC_PROG_CC
 
 
