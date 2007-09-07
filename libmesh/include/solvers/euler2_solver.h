@@ -1,4 +1,4 @@
-// $Id: euler2_solver.h,v 1.3 2007-08-23 18:07:46 roystgnr Exp $
+// $Id: euler2_solver.h,v 1.4 2007-09-07 23:11:50 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,7 @@
  * residuals at intermediate theta values:
  * Euler solves u' = f(theta*u_new + (1-theta)*u_old),
  * Euler2 solves u' = theta*f(u_new) + (1-theta)*f(u_old)
+ * i.e. the trapezoidal rule for theta = 0.5
  *
  * This class is part of the new DifferentiableSystem framework,
  * which is still experimental.  Users of this framework should
