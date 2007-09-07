@@ -1,4 +1,4 @@
-// $Id: parallel_mesh.C,v 1.1 2007-09-07 21:48:17 roystgnr Exp $
+// $Id: parallel_mesh.C,v 1.2 2007-09-07 22:03:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,4 +32,17 @@ ParallelMesh::ParallelMesh (unsigned int d) :
 
 ParallelMesh::~ParallelMesh ()
 {
+}
+
+
+void ParallelMesh::delete_nonlocal_elements()
+{
+  // Someday...
+  error();
+}
+
+void ParallelMesh::restore_nonlocal_elements()
+{
+  // Someday...
+  error();
 }

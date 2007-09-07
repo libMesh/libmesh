@@ -1,4 +1,4 @@
-// $Id: parallel_mesh.h,v 1.1 2007-09-07 21:48:17 roystgnr Exp $
+// $Id: parallel_mesh.h,v 1.2 2007-09-07 22:03:57 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -63,6 +63,18 @@ class ParallelMesh : public Mesh
    * Destructor.
    */
   ~ParallelMesh();
+
+  /**
+   * Deletes any elements which are neither local to this processor
+   * nor "ghosts" neighboring local elements
+   */
+  void delete_nonlocal_elements();
+
+  /**
+   * Called on all processors at once, rebuilds any elements which
+   * are local to other processors.
+   */
+  void restore_nonlocal_elements();
 
   /**
    * Reads the file specified by \p name.  Attempts to figure out the
