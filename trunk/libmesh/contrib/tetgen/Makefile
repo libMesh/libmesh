@@ -6,8 +6,8 @@ INCLUDE = -I.
 
 # Package name and additional flags required for library compilation
 pkgname  := tetgen
-#CXXFLAGS += -DTRILIBRARY
-CXXFLAGS := -DNDEBUG -DTRILIBRARY -fPIC
+#libmesh_CXXFLAGS += -DTRILIBRARY
+libmesh_CXXFLAGS := -DNDEBUG -DTRILIBRARY -fPIC
 
 # (Relative) Path to location of shared libs
 libpath := ../lib
@@ -49,7 +49,7 @@ endif
 $(EXTERNAL_LIBDIR)/lib$(pkgname)$(shared_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
-	@$(CXX) $(CXXSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
+	@$(libmesh_CXX) $(libmesh_CXXSHAREDFLAG) -o $@ $(OBJS) $(libmesh_LDFLAGS)
 
 
 clean:

@@ -7,7 +7,7 @@ included-from-laspack := yes
 
 include ../../Make.common
 
-INCLUDES = -I.
+libmesh_INCLUDES = -I.
 
 SRC     := $(wildcard *.c)
 OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
@@ -47,7 +47,7 @@ ifeq ($(enable-complex),yes)
 $(EXTERNAL_LIBDIR)/liblaspack$(shared_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
-	@$(CXX) $(CXXSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
+	@$(libmesh_CXX) $(libmesh_CXXSHAREDFLAG) -o $@ $(OBJS) $(libmesh_LDFLAGS)
 
 else
 #
@@ -56,7 +56,7 @@ else
 $(EXTERNAL_LIBDIR)/liblaspack$(shared_libext): $(OBJS)
 	@echo "Linking "$@
 	@$(shell mkdir -p $(EXTERNAL_LIBDIR))
-	@$(CC) $(CSHAREDFLAG) -o $@ $(OBJS) $(LDFLAGS)
+	@$(libmesh_CC) $(libmesh_CSHAREDFLAG) -o $@ $(OBJS) $(libmesh_LDFLAGS)
 
 endif
 
