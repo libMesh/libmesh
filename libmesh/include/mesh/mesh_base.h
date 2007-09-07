@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.55 2007-08-19 20:00:46 benkirk Exp $
+// $Id: mesh_base.h,v 1.56 2007-09-07 23:14:49 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -57,8 +57,8 @@ class PointLocatorBase;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2007-08-19 20:00:46 $
- * \version $Revision: 1.55 $
+ * \date    $Date: 2007-09-07 23:14:49 $
+ * \version $Revision: 1.56 $
  */
 
 
@@ -394,20 +394,24 @@ public:
    * Elem iterator accessor functions.  These must be defined in
    * Concrete base classes.
    */
-  virtual element_iterator elements_begin               () = 0;
-  virtual element_iterator elements_end                 () = 0;
-  virtual element_iterator active_elements_begin        () = 0;
-  virtual element_iterator active_elements_end          () = 0;
-  virtual element_iterator subactive_elements_begin     () = 0;
-  virtual element_iterator subactive_elements_end       () = 0;
-  virtual element_iterator not_active_elements_begin    () = 0;
-  virtual element_iterator not_active_elements_end      () = 0;
-  virtual element_iterator not_subactive_elements_begin () = 0;
-  virtual element_iterator not_subactive_elements_end   () = 0;
-  virtual element_iterator local_elements_begin         () = 0;
-  virtual element_iterator local_elements_end           () = 0;
-  virtual element_iterator active_local_elements_begin  () = 0;
-  virtual element_iterator active_local_elements_end    () = 0;
+  virtual element_iterator elements_begin                   () = 0;
+  virtual element_iterator elements_end                     () = 0;
+  virtual element_iterator active_elements_begin            () = 0;
+  virtual element_iterator active_elements_end              () = 0;
+  virtual element_iterator subactive_elements_begin         () = 0;
+  virtual element_iterator subactive_elements_end           () = 0;
+  virtual element_iterator not_active_elements_begin        () = 0;
+  virtual element_iterator not_active_elements_end          () = 0;
+  virtual element_iterator not_subactive_elements_begin     () = 0;
+  virtual element_iterator not_subactive_elements_end       () = 0;
+  virtual element_iterator local_elements_begin             () = 0;
+  virtual element_iterator local_elements_end               () = 0;
+  virtual element_iterator not_local_elements_begin         () = 0;
+  virtual element_iterator not_local_elements_end           () = 0;
+  virtual element_iterator active_local_elements_begin      () = 0;
+  virtual element_iterator active_local_elements_end        () = 0;
+  virtual element_iterator active_not_local_elements_begin  () = 0;
+  virtual element_iterator active_not_local_elements_end    () = 0;
   virtual element_iterator level_elements_begin         (const unsigned int level  ) = 0;
   virtual element_iterator level_elements_end           (const unsigned int level  ) = 0;
   virtual element_iterator not_level_elements_begin     (const unsigned int level  ) = 0;
@@ -426,20 +430,24 @@ public:
   /**
    * const Elem iterator accessor functions.
    */
-  virtual const_element_iterator elements_begin               () const = 0;
-  virtual const_element_iterator elements_end                 () const = 0;
-  virtual const_element_iterator active_elements_begin        () const = 0;
-  virtual const_element_iterator active_elements_end          () const = 0;
-  virtual const_element_iterator subactive_elements_begin     () const = 0;
-  virtual const_element_iterator subactive_elements_end       () const = 0;
-  virtual const_element_iterator not_active_elements_begin    () const = 0;
-  virtual const_element_iterator not_active_elements_end      () const = 0;
-  virtual const_element_iterator not_subactive_elements_begin () const = 0;
-  virtual const_element_iterator not_subactive_elements_end   () const = 0;
-  virtual const_element_iterator local_elements_begin         () const = 0;
-  virtual const_element_iterator local_elements_end           () const = 0;
-  virtual const_element_iterator active_local_elements_begin  () const = 0;
-  virtual const_element_iterator active_local_elements_end    () const = 0;
+  virtual const_element_iterator elements_begin                   () const = 0;
+  virtual const_element_iterator elements_end                     () const = 0;
+  virtual const_element_iterator active_elements_begin            () const = 0;
+  virtual const_element_iterator active_elements_end              () const = 0;
+  virtual const_element_iterator subactive_elements_begin         () const = 0;
+  virtual const_element_iterator subactive_elements_end           () const = 0;
+  virtual const_element_iterator not_active_elements_begin        () const = 0;
+  virtual const_element_iterator not_active_elements_end          () const = 0;
+  virtual const_element_iterator not_subactive_elements_begin     () const = 0;
+  virtual const_element_iterator not_subactive_elements_end       () const = 0;
+  virtual const_element_iterator local_elements_begin             () const = 0;
+  virtual const_element_iterator local_elements_end               () const = 0;
+  virtual const_element_iterator not_local_elements_begin         () const = 0;
+  virtual const_element_iterator not_local_elements_end           () const = 0;
+  virtual const_element_iterator active_local_elements_begin      () const = 0;
+  virtual const_element_iterator active_local_elements_end        () const = 0;
+  virtual const_element_iterator active_not_local_elements_begin  () const = 0;
+  virtual const_element_iterator active_not_local_elements_end    () const = 0;
   virtual const_element_iterator level_elements_begin         (const unsigned int level)   const = 0;
   virtual const_element_iterator level_elements_end           (const unsigned int level)   const = 0;
   virtual const_element_iterator not_level_elements_begin     (const unsigned int level)   const = 0;

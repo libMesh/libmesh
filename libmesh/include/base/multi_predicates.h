@@ -1,4 +1,4 @@
-// $Id: multi_predicates.h,v 1.8 2007-06-06 16:52:05 jwpeterson Exp $
+// $Id: multi_predicates.h,v 1.9 2007-09-07 23:14:49 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -209,6 +209,35 @@ namespace Predicates
   };
 
 
+  // Instantiation for the NotLocal abstract_multi_predicate
+  template <typename T>
+  struct NotLocal : abstract_multi_predicate<T>
+  {
+    // Constructor, pushes back two single predicates
+    NotLocal()
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new not_pid<T>(libMesh::processor_id()));
+    }
+
+  };
+
+
+  // Instantiation for the ActiveNotLocal abstract_multi_predicate
+  template <typename T>
+  struct ActiveNotLocal : abstract_multi_predicate<T>
+  {
+    // Constructor, pushes back two single predicates
+    ActiveNotLocal()
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new active<T>);
+      this->_predicates.push_back(new not_pid<T>(libMesh::processor_id()));
+    }
+
+  };
+  
+
   // Instantiation for the Type abstract_multi_predicate
   template <typename T>
   struct Type : abstract_multi_predicate<T>
@@ -276,6 +305,19 @@ namespace Predicates
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new pid<T>(proc_id));
+    }
+  };
+
+
+  
+  // Instantiation for the NotPID abstract_multi_predicate
+  template <typename T>
+  struct NotPID : abstract_multi_predicate<T>
+  {
+    NotPID(const unsigned int proc_id)
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new not_pid<T>(proc_id));
     }
   };
 

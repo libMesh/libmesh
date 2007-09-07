@@ -1,4 +1,4 @@
-// $Id: mesh.h,v 1.19 2007-05-23 23:36:10 roystgnr Exp $
+// $Id: mesh.h,v 1.20 2007-09-07 23:14:49 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -241,8 +241,14 @@ public:
   element_iterator local_elements_begin ();
   element_iterator local_elements_end   ();
 
+  element_iterator not_local_elements_begin ();
+  element_iterator not_local_elements_end   ();
+
   element_iterator active_local_elements_begin ();
   element_iterator active_local_elements_end   ();
+
+  element_iterator active_not_local_elements_begin ();
+  element_iterator active_not_local_elements_end   ();
 
   element_iterator level_elements_begin (const unsigned int level);
   element_iterator level_elements_end   (const unsigned int level);
@@ -285,8 +291,14 @@ public:
   const_element_iterator local_elements_begin () const;
   const_element_iterator local_elements_end   () const;
 
+  const_element_iterator not_local_elements_begin () const;
+  const_element_iterator not_local_elements_end   () const;
+
   const_element_iterator active_local_elements_begin () const;
   const_element_iterator active_local_elements_end   () const;
+
+  const_element_iterator active_not_local_elements_begin () const;
+  const_element_iterator active_not_local_elements_end   () const;
 
   const_element_iterator level_elements_begin (const unsigned int level) const;
   const_element_iterator level_elements_end   (const unsigned int level) const;
