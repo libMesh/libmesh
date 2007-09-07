@@ -1,4 +1,4 @@
-// $Id: mesh_iterators.C,v 1.8 2006-11-15 23:51:00 jwpeterson Exp $
+// $Id: mesh_iterators.C,v 1.9 2007-09-07 23:14:49 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -85,11 +85,29 @@ Mesh::local_elements_begin ()
 }
 
 
+// not_local elements begin() accessor
+Mesh::element_iterator
+Mesh::not_local_elements_begin ()
+{
+  Predicates::NotLocal<elem_iterator_imp> p;
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
 // active local elements begin() accessor
 Mesh::element_iterator
 Mesh::active_local_elements_begin ()
 {
   Predicates::ActiveLocal<elem_iterator_imp> p;
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+// active_not_local elements begin() accessor
+Mesh::element_iterator
+Mesh::active_not_local_elements_begin ()
+{
+  Predicates::ActiveNotLocal<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -206,11 +224,19 @@ Mesh::not_subactive_elements_begin () const
 
 
 // const local begin() accessor
-
 Mesh::const_element_iterator
 Mesh::local_elements_begin () const
 {
   Predicates::Local<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+// const not_local begin() accessor
+Mesh::const_element_iterator
+Mesh::not_local_elements_begin () const
+{
+  Predicates::NotLocal<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -220,6 +246,14 @@ Mesh::const_element_iterator
 Mesh::active_local_elements_begin () const
 {
   Predicates::ActiveLocal<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+// const active not_local begin() accessor
+Mesh::const_element_iterator
+Mesh::active_not_local_elements_begin () const
+{
+  Predicates::ActiveNotLocal<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -351,6 +385,15 @@ Mesh::local_elements_end ()
 }
 
 
+// not_local end() accessor
+Mesh::element_iterator
+Mesh::not_local_elements_end ()
+{
+  Predicates::NotLocal<elem_iterator_imp> p;
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
 // active local end() accessor
 Mesh::element_iterator
 Mesh::active_local_elements_end ()
@@ -359,6 +402,14 @@ Mesh::active_local_elements_end ()
   return element_iterator(_elements.end(), _elements.end(), p);
 }
 
+
+// not_local end() accessor
+Mesh::element_iterator
+Mesh::active_not_local_elements_end ()
+{
+  Predicates::ActiveNotLocal<elem_iterator_imp> p;
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
 
 
 // level end() accessor
@@ -491,6 +542,15 @@ Mesh::local_elements_end () const
 }
 
 
+// not_local const end() accessor
+Mesh::const_element_iterator
+Mesh::not_local_elements_end () const
+{
+  Predicates::NotLocal<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
 // local active const end() accessor
 Mesh::const_element_iterator
 Mesh::active_local_elements_end () const
@@ -500,6 +560,13 @@ Mesh::active_local_elements_end () const
 }
 
 
+// const local active const end() accessor
+Mesh::const_element_iterator
+Mesh::active_not_local_elements_end () const
+{
+  Predicates::ActiveNotLocal<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
 
 
 // level const end() accessor
