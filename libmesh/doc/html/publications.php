@@ -15,29 +15,30 @@
 
 <ul>
 
-<?php echo
-"<li>libMesh: A C++ Library for Parallel Adaptive
+<li>libMesh: A C++ Library for Parallel Adaptive
  Mesh Refinement/Coarsening Simulations - Engineering with Computers.
       <ul>
 	<li>
-	  <a href=\"http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf\">Preprint</a>
+	  <a href="http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf">Preprint</a>
 	</li>
 	<li>
-	  <a href=\"http://cfdlab.ae.utexas.edu/~peterson/ewc_journal_version.pdf\">Journal Version</a>
+	  <a href="http://cfdlab.ae.utexas.edu/~peterson/ewc_journal_version.pdf">Journal Version</a>
 	</li>
       </ul>
-</li>";
-?>
+</li>
 
-<?php echo
-"<li> Ben Kirk's <a href=\"http://www.cfdlab.ae.utexas.edu/~peterson/ben_dissertation.pdf\">
-PhD Dissertation</a>. </li>";
-?>
+<li> Benjamin S. Kirk's <a href="http://www.cfdlab.ae.utexas.edu/~peterson/ben_dissertation.pdf">
+PhD Dissertation</a>. 
+</li>
 
-<?php echo
-"<li> John Peterson's <a href=\"http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf\">
-Masters Report</a>. </li>";
-?>
+<li> John Peterson's <a href="http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf">
+Masters Report</a>. 
+</li>
+
+<li>
+  Benjamin S. Kirk, Graham F. Carey, 
+  <i>Development and Validation of a SUPG Finite Element Scheme for the Compressible Navier-Stokes Equations using a Modified Inviscid Flux Discretization.</i> accepted, IJNMF, 2007. (<a href="http://cfdlab.ae.utexas.edu/~benkirk/2007_fins_IJNMF.pdf">Preprint</a>)
+</li>
 
 <li>
 J.W. Peterson, G.F. Carey, D.J. Knezevic, and B.T. Murray, <i>Adaptive
@@ -66,7 +67,7 @@ G. F. Carey, W. Barth, B. Kirk, and J. W. Peterson,
 <li>
 R. H. Stogner and G. F. Carey,
 <i>C<sup>1</sup> macroelements in adaptive finite element methods.</i>
-<a href="doi.wiley.com/10.1002/nme.1912">IJNME</a> vol 70, issue 9, Pages 1076 - 1095, 2006.
+<a href="http://doi.wiley.com/10.1002/nme.1912">IJNME</a> vol 70, issue 9, Pages 1076 - 1095, 2006.
 </li>
 
 <li>
