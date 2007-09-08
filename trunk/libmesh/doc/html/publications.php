@@ -105,7 +105,7 @@ Volume 195, Issues 44-47, Pages 6463-6478, 2006.
 Graham F. Carey, William Barth, Juliette A. Woods, Benjamin S. Kirk, Michael L. Anderson,
 Sum Chow, and Wolfgang Bangerth, 
 <i>Modelling error and constitutive relations in simulation of flow and transport.</i>
-<a href="http://www3.interscience.wiley.com/cgi-bin/abstract/109747121/ABSTRACT?CRETRY=1&SRETRY=0">
+<a href="http://dx.doi.org/10.1002/fld.797">
 IJNMF</a> Volume 46, Issue 12, Pages 1211 - 1236, 2004.
 </li>
 
