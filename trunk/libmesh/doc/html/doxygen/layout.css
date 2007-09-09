@@ -89,7 +89,7 @@ background-color:#eee;}
   
 a.L1 {
   color                : black;
-  font-size            : 15px;
+  font-size            : 17px;
   font-family          : verdana, arial, helvetica, sans-serif;
   font-weight          : 200;
   text-decoration      : none;
@@ -98,7 +98,7 @@ a.L1 {
 
 a.L2 {
   color                : black;
-  font-size            : 11px;
+  font-size            : 13px;
   font-family          : verdana, arial, helvetica, sans-serif;
   font-weight          : 200;
   text-decoration      : none;
@@ -108,7 +108,7 @@ a.L2 {
 
 a.L3 {
   color                : black;
-  font-size            : 9px;
+  font-size            : 11px;
   font-family          : verdana, arial, helvetica, sans-serif;
   font-weight          : 100;
   text-decoration      : none;
@@ -125,8 +125,9 @@ a.L3 {
   border-style         : outset;
   /*border               : 1px solid black;*/
   color                : black;
-  /*background           : white url(./images/bg_muted.png);*/
-  padding              : 10px;
+  background           : white url(../images/bg_roy_muted_50pct.png) top right; 
+  background-repeat    : no-repeat;
+  padding              : 10px 10px 10px 10px;
   z-index              : 3; /* This allows the content to overlap the right menu in narrow windows in good browsers. */
 }
 

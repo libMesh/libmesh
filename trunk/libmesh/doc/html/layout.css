@@ -6,6 +6,13 @@ img.slant
   margin: 0 1em 0 0; /* top, right, left, bottom */
 }
 
+img.slant_right
+{
+  float: right;
+  clear: right;
+  margin: 0 0 0 1em; /* top, right, left, bottom */
+}
+
 img.title_image {
   float                : left; /*IE does not render float :left correctly*/
   margin-left          : 0;
