@@ -8,7 +8,7 @@ function load_style($root)
   detect();
   
   // Now check for CSS compatibility
-  if (NW_IS_GECKO || NW_IS_KONQ || NW_IS_OPERA)
+  if (NW_IS_GECKO || NW_IS_KONQ || NW_IS_OPERA || NW_IS_MAC)
     {
       echo "<link href='gecko.css' type='text/css' rel='stylesheet' media='screen'>\n";
     }
@@ -30,7 +30,6 @@ function load_style($root)
 <?php function make_navigation($mode,$root) { ?>
  <div id="navAlpha">
     <?php echo "<a class=\"L1\" href = \"", $root, "index.php\" title=\"Main Page\">Home</a><BR>"; ?>    
-    <?php echo "<a class=\"L1\" href = \"", $root, "wiki/index.php/Gallery\" title=\"Results From Applications Which Use libMesh\">Gallery</a><BR>"; ?>
     <?php echo "<a class=\"L1\" href = \"", $root, "publications.php\">Publications</a><BR>"; ?>
     <?php echo "<a class=\"L1\" href = \"", $root, "presentations.php\">Presentations</a><BR>"; ?>
 	
@@ -59,7 +58,14 @@ function load_style($root)
 
     <?php echo "<a class=\"L1\" href = \"", $root, "developers.php\">Developers</a><BR>"; ?>
     <?php echo "<a class=\"L1\" href = \"", $root, "doxygen/index.php\" title=\"C++ Class Documentation\">Class Docs</a><BR>"; ?>
+	<?php if ($mode=="documentation") {?>
+              <?php echo "<a class=\"L2\" href = \"", $root, "doxygen/namespaces.php\" title=\"Namespaces\">Namespaces</a><BR>"; ?>
+              <?php echo "<a class=\"L2\" href = \"", $root, "doxygen/classes.php\" title=\"Classes\">Classes</a><BR>"; ?>
+              <?php echo "<a class=\"L2\" href = \"", $root, "doxygen/files.php\" title=\"Files\">Files</a><BR>"; ?>
+	<?php } ?>
+ 
     <?php echo "<a class=\"L1\" href = \"", $root, "http://sourceforge.net/mail/?group_id=71130\" title=\"Sourceforge's Mailing List Page\">Mailing Lists</a><BR>" ?>
+    <?php echo "<a class=\"L1\" href = \"", $root, "wiki/index.php/Gallery\" title=\"Results From Applications Which Use libMesh\">Gallery</a><BR>"; ?>
     <?php echo "<a class=\"L1\" href = \"", $root, "wiki\" title=\"External Wiki Page\">Wiki</a><BR>"; ?>
 </div>
 <?php } ?>
