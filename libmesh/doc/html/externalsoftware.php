@@ -1,7 +1,7 @@
 <?php $root=""; ?>
 <?php require($root."navigation.php"); ?>
 
-<!-- $Id: externalsoftware.php,v 1.6 2006-06-28 17:25:47 benkirk Exp $ -->
+<!-- $Id: externalsoftware.php,v 1.7 2007-09-09 20:02:19 benkirk Exp $ -->
 
 <html>
 <head>
@@ -10,7 +10,7 @@
 </head>
 
 <body>
-<?php make_navigation("download",$root)?>
+<?php make_navigation("externalsoftware",$root)?>
 
 <div class="content">
 <h1>External Packages</h1>

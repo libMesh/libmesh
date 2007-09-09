@@ -63,7 +63,7 @@ The library is known to work with the following compilers:
     </ul>
   <li>Intel ICC/ECC</li>
     <ul>
-      <li><code>icc/ifort</code> 9.x, 8.x <code></li>
+      <li><code>icc/ifort</code> 9.x, 8.x</li>
       <li><code>icc/ifc</code> 7.x</li>
       <li><code>icc/ifc</code> 6.0</li>
       <li>Earlier versions (&lt;= 5.0) not supported</li>
@@ -170,9 +170,10 @@ function call with whatever you like.
 Since <code>libMesh</code> can be configured with many additional packages we recommend
 including the <code>Make.common</code> file created in the top-level directory in the
 <code>Makefile</code> of any application you want to use with the library. This will
-properly set the <code>INCLUDE</code> and <code>LIBS</code> variables, which you can
+properly set the <code>libmesh_INCLUDE</code> and <code>libmesh_LIBS</code> variables, which you can
 append to with your own stuff.
 
+<br>
 For testing simple programs you may want to use the <code>libmesh-config</code> script
 included in the <code>contrib/bin</code> directory instead of creating a <code>Makefile</code>.
 This script may be used to determine the relevant compilation and linking flags
