@@ -16,13 +16,17 @@
 <ul>
 
 <br>
-<li> Benjamin S. Kirk's <a href="http://www.cfdlab.ae.utexas.edu/~peterson/ben_dissertation.pdf">
-PhD Dissertation</a>. 
+<li> Benjamin S. Kirk, 
+<i>Adaptive Finite Element Simulation of Flow and Transport Applications on Parallel Computers.</i>
+<a href="http://www.cfdlab.ae.utexas.edu/~benkirk/dissertation.pdf">PhD Dissertation</a>, 
+The University of Texas at Austin, May 2007. 
 </li>
 
 <br>
-<li> John Peterson's <a href="http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf">
-Masters Report</a>. 
+<li> John W. Peterson,
+<i>A Numerical Investigation of Benard Convection in Small Aspect Ratio Containers.</i>
+<a href="http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf">Masters Report</a>, 
+The University of Texas at Austin, August 2004. 
 </li>
 
 <br>
@@ -106,6 +110,16 @@ Sum Chow, and Wolfgang Bangerth,
 <a href="http://dx.doi.org/10.1002/fld.797">
 IJNMF</a> Volume 46, Issue 12, Pages 1211 - 1236, 2004.
 </li>
+
+
+<br>
+<li>
+Jeremiah J. Marichalar, William C. Rochelle, Benjamin S. Kirk, and Charles H. Campbell, 
+<i>Boundary Layer/Streamline Surface Catalytic Heating Predictions on Space Shuttle Orbiter.</i>
+<a href="http://www.aiaa.org/content.cfm?pageid=322&lupubid=25&sItem=6">Journal of Spacecraft and Rockets</a>, 
+Volume 43,  Number 6, Pages 1202--1215, 2006.
+</li>
+
 
 <br>
 <li>
