@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.66 2007-09-07 16:16:53 benkirk Exp $
+dnl $Id: configure.in,v 1.67 2007-09-10 23:09:19 benkirk Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.66 $)
+AC_REVISION($Revision: 1.67 $)
 
 
 AC_INIT
@@ -28,7 +28,7 @@ AC_MSG_RESULT(---------------------------------------------)
 
 
 dnl Print configuration info to the header file
-AC_DEFINE_UNQUOTED(LIBMESH_CONFIGURE_INFO, ["\"$0 $@\" run on `date`"], [Configuration information.])	
+AC_DEFINE_UNQUOTED(LIBMESH_CONFIGURE_INFO, ["$0 $@ run on `date`"], [Configuration information.])	
 
 dnl Compute the canonical target system type variable "target", and its
 dnl three individual parts: "target_cpu", "target_vendor", and "target_os"
