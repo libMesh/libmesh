@@ -15,31 +15,23 @@
 
 <ul>
 
-<li>libMesh: A C++ Library for Parallel Adaptive
- Mesh Refinement/Coarsening Simulations - Engineering with Computers.
-      <ul>
-	<li>
-	  <a href="http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf">Preprint</a>
-	</li>
-	<li>
-	  <a href="http://cfdlab.ae.utexas.edu/~peterson/ewc_journal_version.pdf">Journal Version</a>
-	</li>
-      </ul>
-</li>
-
+<br>
 <li> Benjamin S. Kirk's <a href="http://www.cfdlab.ae.utexas.edu/~peterson/ben_dissertation.pdf">
 PhD Dissertation</a>. 
 </li>
 
+<br>
 <li> John Peterson's <a href="http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf">
 Masters Report</a>. 
 </li>
 
+<br>
 <li>
   Benjamin S. Kirk, Graham F. Carey, 
-  <i>Development and Validation of a SUPG Finite Element Scheme for the Compressible Navier-Stokes Equations using a Modified Inviscid Flux Discretization.</i> accepted, IJNMF, 2007. (<a href="http://cfdlab.ae.utexas.edu/~benkirk/2007_fins_IJNMF.pdf">Preprint</a>)
+  <i>Development and Validation of a SUPG Finite Element Scheme for the Compressible Navier-Stokes Equations using a Modified Inviscid Flux Discretization.</i> accepted, IJNMF, 2007. (<a href="http://cfdlab.ae.utexas.edu/~benkirk/2007_fins_IJNMF.pdf">preprint</a>)
 </li>
 
+<br>
 <li>
 J.W. Peterson, G.F. Carey, D.J. Knezevic, and B.T. Murray, <i>Adaptive
   finite element methodology for tumor angiogenesis modeling.</i>
@@ -47,14 +39,16 @@ J.W. Peterson, G.F. Carey, D.J. Knezevic, and B.T. Murray, <i>Adaptive
   IJNME</a>, vol. 69, no. 6, pp. 1212--1238, 2007.
 </li>
 
+<br>
 <li>
 B. Kirk, J. W. Peterson, R. H. Stogner, and G. F. Carey,
 <code>libMesh</code><i>: A
   C++ Library for Parallel Adaptive Mesh Refinement/Coarsening Simulations.</i>
 <a href="http://dx.doi.org/10.1007/s00366-006-0049-3">Engineering with Computers</a>,
-vol. 22, no. 3--4, pp. 237--254, 2006.
+vol. 22, no. 3--4, pp. 237--254, 2006. 	 (<a href="http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf">preprint</a>)
 </li>
 
+<br>
 <li>
 G. F. Carey, W. Barth, B. Kirk, and J. W. Peterson,
 <i>Parallel CFD for Flow and Transport Applications Including Unstructured and Adaptive Grids.</i>
@@ -64,12 +58,14 @@ G. F. Carey, W. Barth, B. Kirk, and J. W. Peterson,
   The Netherlands), Elsevier Science B.V., Oct 2005. ISBN: 0444520244.
 </li>
 
+<br>
 <li>
 R. H. Stogner and G. F. Carey,
 <i>C<sup>1</sup> macroelements in adaptive finite element methods.</i>
 <a href="http://doi.wiley.com/10.1002/nme.1912">IJNME</a> vol 70, issue 9, Pages 1076 - 1095, 2006.
 </li>
 
+<br>
 <li>
 Carey GF, Anderson M, Carnes B, and Kirk B, <i>Some aspects of adaptive grid
   technology related to boundary and interior layers.</i>
@@ -77,6 +73,7 @@ Carey GF, Anderson M, Carnes B, and Kirk B, <i>Some aspects of adaptive grid
     166(1):55--86, ISSN 0377-0427, 2004.
 </li>
 
+<br>
 <li>
 Dreyer D, Petersen S, and O. von Estorff,
 <i> Effectiveness and robustness of
@@ -86,6 +83,7 @@ CMAME</a>
  195(29-32):3591--3607, 2006.
 </li>
 
+<br>
 <li>
 Petersen S, Dreyer D, and O. von Estorff,
 <i>Assessment of finite and spectral
@@ -109,6 +107,7 @@ Sum Chow, and Wolfgang Bangerth,
 IJNMF</a> Volume 46, Issue 12, Pages 1211 - 1236, 2004.
 </li>
 
+<br>
 <li>
 Michael Schindler, Peter Talkner, and Peter Hanggi,					     
 <i>Computing stationary free-surface shapes in microfluidics.</i>
@@ -116,6 +115,7 @@ Michael Schindler, Peter Talkner, and Peter Hanggi,
 <a href="http://scitation.aip.org/getabs/servlet/GetabsServlet?prog=normal&id=PHFLE6000018000010103303000001&idtype=cvips&gifs=yes">Physics of Fluids</a> 2006.
 </li>
 
+<br>
 <li>
 Paul Simedrea, Luca Antiga, and David A. Steinman,
 <i>Towards a New Framework for Simulating Magnetic Resonance Imaging.</i>
@@ -123,6 +123,7 @@ Paul Simedrea, Luca Antiga, and David A. Steinman,
 First Canadian Student Conference on Biomedical Computing (CSCBC)</a>, 2005
 </li>
 
+<br>
 <li>
 Jose Camata, Alvaro Coutinho, and Graham Carey,
 <i>Numerical Evaluation of the LCD Method Implemented in the LibMesh Library.</i>
@@ -130,6 +131,7 @@ Jose Camata, Alvaro Coutinho, and Graham Carey,
 </li>
 
 
+<br>
 <li>
 Matthew Anderson and Jung-Han Kimn,
 <i>A Numerical Approach to Space-Time Finite Elements for the Wave Equation.</i>
@@ -137,6 +139,15 @@ Matthew Anderson and Jung-Han Kimn,
 </li>
 
 
+<br>
+<li>
+Stefano Berrone and Endre Suliz,
+<i>Two-sided a posteriori error bounds for incompressible quasi-Newtonian flows.</i>
+Dipartimento di Matematica Politecnico di Torino, <a href="http://calvino.polito.it/ricerca/2006/2006.html">calvino.polito.it/ricerca</a>, 2006. 
+</li>
+
+
+<br>
 <li>
 M.P. Luthi,
 <i>A Full Ice Stream Model for Jakobshavn Isbrae.</i>
@@ -153,35 +164,18 @@ M.P. Luthi,
 <h1>Misc. Publications</h1>
 
 <ul>
-<?php echo
-"<li>  A general <a href=\"howto/howto.pdf\">HOWTO</a>
-document by M. Luthi containing some hints
-and programming tips for writing effective LibMesh programs. </li>";
-?>
+<li>  A general <a href="howto/howto.pdf">HOWTO</a> document by M. Luthi containing some hints
+and programming tips for writing effective LibMesh programs. </li>
 
-<?php echo
-"<li>  A <a href=\"xda_format/xda_format.pdf\">description</a>
-of the XDA file format used by LibMesh. </li>";
-?>
+<li>  A <a href="xda_format/xda_format.pdf">description</a> of the XDA file format used by LibMesh. </li>
 
-<?php echo
-"<li> Texas Advanced Computing Center
-<a href=\"http://www.tacc.utexas.edu/general/press/announcements/20040112_01.php\">
-press release</a> commemorating the launch of the Lonestar cluster. </li>";
-?>
+<li> Texas Advanced Computing Center <a href="http://www.tacc.utexas.edu/general/news/archive/20040112_01.php">press release</a> commemorating the launch of the Lonestar cluster. </li>
 
-<?php echo
-"<li>A <a href=\"http://ondrej.certik.cz/libmesh/fem.ps\">description</a> of the Newmark
-System class by Ondrej Certik.</li>";
-?>
+<li>A <a href="http://ondrej.certik.cz/libmesh/fem.ps">description</a> of the Newmark System class by Ondrej Certik.</li>
 
 </ul>
 </div>
 
-<br>
-<br>
-<br>
-<br>
 <br>
 <br>
 <!--
