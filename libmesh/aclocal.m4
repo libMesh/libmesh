@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.107 2007-09-11 21:11:26 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.108 2007-09-11 21:26:55 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -717,6 +717,12 @@ AC_DEFUN(CONFIGURE_PETSC,
       petscversion=$petscmajor.$petscminor.$petscsubminor
       petscmajorminor=$petscmajor.$petscminor.x
       AC_MSG_RESULT(<<< Configuring library with PETSc version $petscversion support >>>)
+
+      PETSCLINKLIBS=`cd $PETSC_DIR ; make getlinklibs`
+      PETSCINCLUDEDIRS=`cd $PETSC_DIR ; make getincludedirs`
+
+      AC_SUBST(PETSCLINKLIBS)
+      AC_SUBST(PETSCINCLUDEDIRS)
 
       AC_SUBST(petscversion)
       AC_SUBST(petscmajorminor)
