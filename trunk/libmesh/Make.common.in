@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.59 2007-09-11 21:11:26 benkirk Exp $
+# $Id: Make.common.in,v 1.60 2007-09-11 21:26:55 benkirk Exp $
 
 
 ###############################################################################
@@ -340,8 +340,8 @@ ifeq ($(enable-optional),yes)
 
      # As of PETSc 2.1.x we can extract the libraries and include paths
      # from the PETSc make file
-     libmesh_LIBS    += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getlinklibs`
-     libmesh_INCLUDE += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getincludedirs`
+     libmesh_LIBS    += @PETSCLINKLIBS@
+     libmesh_INCLUDE += @PETSCINCLUDEDIRS@
 
   endif #end ifeq ($(enable-petsc),yes)
 
