@@ -1,6 +1,6 @@
 include ../../../Make.common
 
-libmesh_INCLUDE = $(MPI_INCLUDE) -I.
+libmesh_INCLUDE += -I.
 
 
 SRC     := $(wildcard *.c)
