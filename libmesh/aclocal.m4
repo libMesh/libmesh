@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.106 2007-09-07 16:16:53 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.107 2007-09-11 21:11:26 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -22,6 +22,10 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
+      *4.3*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.3 >>>)
+  	GXX_VERSION=gcc4.3
+  	;;
       *4.2*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-4.2 >>>)
   	GXX_VERSION=gcc4.2
@@ -96,7 +100,7 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
     dnl variables, moon position, and other reasons unknown to me, the
     dnl compiler displays different names in the first line of output, so
     dnl check various possibilities
-    is_ibm_xlc="`($CXX 2>&1) | egrep 'xlC'`"
+    is_ibm_xlc="`($CXX 2>&1) | egrep 'xlc'`"
     if test "x$is_ibm_xlc" != "x"  ; then
       dnl IBM's C++ compiler.
       AC_MSG_RESULT(<<< C++ compiler is IBM xlC >>>)
@@ -690,13 +694,13 @@ AC_DEFUN(CONFIGURE_PETSC,
 
   else
     if (test -r $PETSC_DIR/include/petsc.h) ; then
-      AC_ARG_WITH([f77],
-		  AC_HELP_STRING([--with-f77=F77],
-                                 [Fortran compiler to use]),
-	          [F77="$withval"],
-	          [])	
-      AC_PROG_F77            dnl Petsc requires linking with FORTRAN libraries 
-      AC_F77_LIBRARY_LDFLAGS
+      dnl AC_ARG_WITH([f77],
+      dnl 		  AC_HELP_STRING([--with-f77=F77],
+      dnl                            [Fortran compiler to use]),
+      dnl 	          [F77="$withval"],
+      dnl 	          [])	
+      dnl AC_PROG_F77            dnl Petsc requires linking with FORTRAN libraries 
+      dnl AC_F77_LIBRARY_LDFLAGS
       AC_SUBST(PETSC_ARCH)
       AC_SUBST(PETSC_DIR)
       AC_DEFINE(HAVE_PETSC, 1,
