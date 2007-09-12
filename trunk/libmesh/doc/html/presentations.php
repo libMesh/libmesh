@@ -52,6 +52,7 @@
   <li>USNCCM IX</li>
   <ul>
     <li> <a href="http://www.cfdlab.ae.utexas.edu/~benkirk/gaston_USNCCM_2007.pdf">On Combining Mesh Redistribution with H-Adaptivity</a> </li>
+    <li> <a href="http://www.cfdlab.ae.utexas.edu/~roystgnr/usnccm9.pdf">Cahn-Hilliard Phase Decomposition and Directed Pattern Assembly</a> </li>
   </ul>
 </ul>
 
