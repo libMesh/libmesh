@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.110 2007-09-13 21:17:35 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.111 2007-09-13 21:59:04 jwpeterson Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1142,7 +1142,9 @@ AC_DEFUN(CONFIGURE_VTK,
      if (test $enablevtk = yes); then
        dnl Since VTK headers use deprecated C++ header files and we don't want to see this
        dnl warning everytime, we can add the -Wno-derecated flag (GCC only?) to disable it.
-       VTK_INCLUDE="-I$VTK_INC -Wno-deprecated"
+       dnl Unfortunately, using -Wno-deprecated in the general CFLAGS generates *another*
+       dnl warning when you are compiling C files.
+       VTK_INCLUDE="-I$VTK_INC"
        VTK_LIBRARY="\$(libmesh_RPATHFLAG)$VTK_LIB -L$VTK_LIB -lvtkIO -lvtkCommon"
        AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
        AC_MSG_RESULT(<<< Configuring library with VTK support >>>)
