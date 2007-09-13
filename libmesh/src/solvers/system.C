@@ -1,4 +1,4 @@
-// $Id: system.C,v 1.39 2007-09-04 17:10:02 roystgnr Exp $
+// $Id: system.C,v 1.40 2007-09-13 22:51:51 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -640,6 +640,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
   if (component_norm.empty())
     {
       assert (component_scale.empty());
+      STOP_LOG ("calculate_norm()", "System");
       return v.l2_norm();
     }
 
