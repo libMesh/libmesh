@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.108 2007-09-11 21:26:55 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.109 2007-09-13 21:02:18 jwpeterson Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1084,6 +1084,75 @@ dnl where it might be installed...
   AC_SUBST(GMV_INCLUDE)
   AC_SUBST(GMV_LIBRARY)	
   AC_SUBST(enablegmv)
+])
+dnl -------------------------------------------------------------
+
+
+
+dnl ----------------------------------------------------------------
+dnl VTK Mesh I/O API (by Wout Ruijter) requires VTK headers and lib
+dnl ----------------------------------------------------------------
+AC_DEFUN(CONFIGURE_VTK, 
+[
+  dnl Default path to VTK's include and lib files
+  VTK_INC="/usr/include/vtk"
+  VTK_LIB="/usr/lib"
+  
+  dnl User-specific include path
+  AC_ARG_WITH(vtk-include,
+              AC_HELP_STRING([--with-vtk-include=PATH],[Specify the path for VTK header files]),
+              withvtkinc=$withval,
+              withvtkinc=no)
+	      
+  dnl User-specific library path
+  AC_ARG_WITH(vtk-lib,
+              AC_HELP_STRING([--with-vtk-lib=PATH],[Specify the path for VTK libs]),
+              withvtklib=$withval,
+              withvtklib=no)
+
+  if (test $withvtkinc != no); then
+    VTK_INC="$withvtkinc"
+  fi
+
+  if (test $withvtklib != no); then
+    VTK_LIB="$withvtklib"
+  fi
+
+  dnl Initialize Makefile/config.h substitution variables
+  VTK_INCLUDE=""
+  VTK_LIBRARY=""
+
+  dnl Properly let the substitution variables
+  if (test $enablevtk = yes); then
+  
+     dnl Check for existence of a header file in the specified location
+     dnl AC_CHECK_FILE([$VTK_INC/vtkCommonInstantiator.h], [vtkincFound="OK"], [vtkincFound="FAIL"])
+     AC_CHECK_HEADERS($VTK_INC/vtkCommonInstantiator.h, vtkincFound=yes)
+
+     if (test $vtkincFound != yes); then
+       AC_MSG_RESULT(VTK header files not found!)
+       enablevtk = no;
+     fi
+
+     dnl Check for existence of required libraries
+     AC_CHECK_FILE($VTK_LIB/libvtkIO.so, [enablevtk=yes], [enablevtk=no])
+     AC_CHECK_FILE($VTK_LIB/libvtkCommon.so, [enablevtk=yes], [enablevtk=no])
+
+     dnl If both the header file and the required libs were found, continue.
+     if (test $enablevtk = yes); then
+       dnl Since VTK headers use deprecated C++ header files and we don't want to see this
+       dnl warning everytime, we can add the -Wno-derecated flag (GCC only?) to disable it.
+       VTK_INCLUDE="-I$VTK_INC -Wno-deprecated"
+       VTK_LIBRARY="\$(libmesh_RPATHFLAG)$VTK_LIB -L$VTK_LIB -lvtkIO -lvtkCommon"
+       AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
+       AC_MSG_RESULT(<<< Configuring library with VTK support >>>)
+     fi
+  fi
+
+  dnl Substitute the substitution variables
+  AC_SUBST(VTK_INCLUDE)
+  AC_SUBST(VTK_LIBRARY)	
+  AC_SUBST(enablevtk)
 ])
 dnl -------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-// $Id: mesh.C,v 1.83 2007-09-05 19:10:43 roystgnr Exp $
+// $Id: mesh.C,v 1.84 2007-09-13 21:02:19 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -45,6 +45,7 @@
 #include "gmsh_io.h"
 #include "fro_io.h"
 #include "xdr_io.h"
+#include "vtk_io.h"
 
 #if   defined(HAVE_HASH_MAP)
 # include <hash_map>
@@ -776,6 +777,9 @@ void Mesh::read (const std::string& name,
 
       else if (new_name.rfind(".gmv") < new_name.size())
 	GMVIO(*this).read (new_name);
+
+      else if (new_name.rfind(".vtu") < new_name.size())
+	VTKIO(*this).read(new_name);
       
       else
 	{
@@ -884,7 +888,10 @@ void Mesh::write (const std::string& name,
     
   else if (new_name.rfind(".fro") < new_name.size())
     FroIO(*this).write (new_name);
-    
+
+  else if (new_name.rfind(".vtu") < new_name.size())
+    VTKIO(*this).write (new_name);
+  
   else
     {
       std::cerr << " ERROR: Unrecognized file extension: " << name
