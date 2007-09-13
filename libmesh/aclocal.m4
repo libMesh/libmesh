@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.109 2007-09-13 21:02:18 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.110 2007-09-13 21:17:35 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -694,13 +694,13 @@ AC_DEFUN(CONFIGURE_PETSC,
 
   else
     if (test -r $PETSC_DIR/include/petsc.h) ; then
-      dnl AC_ARG_WITH([f77],
-      dnl 		  AC_HELP_STRING([--with-f77=F77],
-      dnl                            [Fortran compiler to use]),
-      dnl 	          [F77="$withval"],
-      dnl 	          [])	
-      dnl AC_PROG_F77            dnl Petsc requires linking with FORTRAN libraries 
-      dnl AC_F77_LIBRARY_LDFLAGS
+      AC_ARG_WITH([f77],
+      		  AC_HELP_STRING([--with-f77=F77],
+                                 [Fortran compiler to use]),
+      	          [F77="$withval"],
+      	          [])	
+      AC_PROG_F77            dnl Petsc requires linking with FORTRAN libraries 
+      AC_F77_LIBRARY_LDFLAGS
       AC_SUBST(PETSC_ARCH)
       AC_SUBST(PETSC_DIR)
       AC_DEFINE(HAVE_PETSC, 1,
@@ -718,11 +718,11 @@ AC_DEFUN(CONFIGURE_PETSC,
       petscmajorminor=$petscmajor.$petscminor.x
       AC_MSG_RESULT(<<< Configuring library with PETSc version $petscversion support >>>)
 
-      PETSCLINKLIBS=`cd $PETSC_DIR ; make getlinklibs`
-      PETSCINCLUDEDIRS=`cd $PETSC_DIR ; make getincludedirs`
-
-      AC_SUBST(PETSCLINKLIBS)
-      AC_SUBST(PETSCINCLUDEDIRS)
+dnl      PETSCLINKLIBS=`cd $PETSC_DIR ; make getlinklibs`
+dnl      PETSCINCLUDEDIRS=`cd $PETSC_DIR ; make getincludedirs`
+dnl
+dnl      AC_SUBST(PETSCLINKLIBS)
+dnl      AC_SUBST(PETSCINCLUDEDIRS)
 
       AC_SUBST(petscversion)
       AC_SUBST(petscmajorminor)
