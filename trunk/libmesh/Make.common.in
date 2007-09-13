@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.61 2007-09-13 21:02:18 jwpeterson Exp $
+# $Id: Make.common.in,v 1.62 2007-09-13 21:17:35 benkirk Exp $
 
 
 ###############################################################################
@@ -30,6 +30,7 @@ libmesh_CC            = @CC@
 libmesh_LDFLAGS       = @LDFLAGS@
 libmesh_DLFLAGS       =
 libmesh_LIBS          = @LIBS@
+libmesh_FLIBS         = @FLIBS@
 GXX-VERSION           = @GXX_VERSION@
 libmesh_CXXSHAREDFLAG = @CXXSHAREDFLAG@
 libmesh_CSHAREDFLAG   = @CXXSHAREDFLAG@
@@ -344,11 +345,69 @@ ifeq ($(enable-optional),yes)
     else
       BOPT = $(PETSC_BOPT.o)
     endif
+    # Depending on petsc version, we include different files
+    ifeq ($(petsc-version),2.1.0)
+      include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
+    else
+      C_CLINKER_SLFLAG = $(RPATHFLAG)# necessary for PETSc >= 2.1.6
+      ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x & newer style
+        include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/petscconf # 2.3.0 or later style
 
-     # As of PETSc 2.1.x we can extract the libraries and include paths
-     # from the PETSc make file
-     libmesh_LIBS    += @PETSCLINKLIBS@
-     libmesh_INCLUDE += @PETSCINCLUDEDIRS@
+      else
+        include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/packages  # 2.1.1 or later style
+
+      endif      
+    endif
+
+#     # As of PETSc 2.1.x we can extract the libraries and include paths
+#     # from the PETSc make file
+#     LIBS    += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getlinklibs`
+#     INCLUDE += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getincludedirs`
+
+
+    libmesh_INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) \
+                         $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE)
+
+    # Depending on petsc version, libs live in different locations
+    ifneq (,$(findstring 2.3.x, $(petsc-major-minor))) # 2.3.x & newer does not use BOPT
+      PETSC_LIB = $(PETSC_DIR)/lib/$(PETSC_ARCH)
+    else
+      PETSC_LIB = $(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
+    endif
+
+    ifeq ($(enable-shared),yes)
+      CXXFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
+      CFLAGS       += -DPETSC_USE_DYNAMIC_LIBRARIES 
+      DLFLAGS      += $(RPATHFLAG)$(PETSC_LIB)
+    endif
+
+    # Depending on petsc version, we link with different libs :-(
+    ifeq ($(petsc-major-minor),2.1.x)  # 2.1.x & older style
+      libs-PETSC = -L$(PETSC_LIB) \
+                   -lpetscsnes \
+                   -lpetscsles \
+                   -lpetscdm \
+                   -lpetscmat \
+                   -lpetscvec \
+                   -lpetscsnes \
+                   -lpetsc
+    else                               # 2.2.x & newer style
+      libs-PETSC = -L$(PETSC_LIB) \
+                   -lpetscsnes \
+                   -lpetscksp \
+                   -lpetscdm \
+                   -lpetscmat \
+                   -lpetscvec \
+                   -lpetscsnes \
+                   -lpetsc
+    endif
+
+    libmesh_LIBS += $(libs-PETSC) \
+                    $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) $(HYPRE_LIB) \
+                    $(SUPERLU_DIST_LIB) $(UMFPACK_LIB) $(SUPERLU_LIB) \
+                    $(BLOPEX_LIB) \
+                    $(BLASLAPACK_LIB) $(X11_LIB) $(MATLAB_LIB) \
+                    $(FLIBS)
 
   endif #end ifeq ($(enable-petsc),yes)
 
