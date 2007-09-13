@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.58 2007-09-11 21:11:26 benkirk Exp $
+# $Id: Makefile,v 1.59 2007-09-13 21:02:18 jwpeterson Exp $
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -210,6 +210,19 @@ upload:
 	rsync -rltzve ssh ./doc/latex/howto $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
 	rsync -rltzve ssh ./doc/latex/xda_format $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
 	chmod -R g-w ./doc/html/* ./doc/latex/*/*
+
+
+#
+# Test Uploading (rsync -n) the web page to sourceforge.  Try this
+# if you want to see what *would be* uploaded with a real rsync.
+#
+upload_test:
+	chmod -R g+w ./doc/html/* ./doc/latex/*/*
+	rsync -nrltzve ssh ./doc/html/ $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
+	rsync -nrltzve ssh ./doc/latex/howto $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+	rsync -nrltzve ssh ./doc/latex/xda_format $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+	chmod -R g-w ./doc/html/* ./doc/latex/*/*
+
 #
 # Build and upload the documentation to sourceforge
 #

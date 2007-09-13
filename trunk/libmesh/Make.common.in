@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.60 2007-09-11 21:26:55 benkirk Exp $
+# $Id: Make.common.in,v 1.61 2007-09-13 21:02:18 jwpeterson Exp $
 
 
 ###############################################################################
@@ -76,6 +76,7 @@ enable-gzstream      = @enablegz@
 enable-tetgen        = @enabletetgen@
 enable-triangle      = @enabletriangle@
 enable-gmv           = @enablegmv@
+enable-vtk           = @enablevtk@
 
 #
 # Set the current directory.
@@ -273,6 +274,12 @@ ifeq ($(enable-optional),yes)
   # Link against the GMV APIs to read GMV files
   libmesh_LIBS    += @GMV_LIBRARY@
   libmesh_INCLUDE += @GMV_INCLUDE@
+
+  # Link against the GMV APIs to read GMV files
+  ifeq ($(enable-vtk),yes)
+    libmesh_LIBS    += @VTK_LIBRARY@
+    libmesh_INCLUDE += @VTK_INCLUDE@
+  endif
 
   # if TetGen is used:
   ifeq ($(enable-tetgen),yes)
