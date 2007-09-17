@@ -1,4 +1,4 @@
-// $Id: vtk_io.C,v 1.2 2007-09-13 21:05:52 jwpeterson Exp $
+// $Id: vtk_io.C,v 1.3 2007-09-17 19:27:47 woutruijter Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -85,6 +85,7 @@
 
 // ------------------------------------------------------------
 // vtkIO class members
+//
 void VTKIO::read (const std::string& name)
 {
 #ifndef HAVE_VTK
@@ -223,8 +224,9 @@ void VTKIO::read (const std::string& name)
 
 
 /**
- * This method implements writing a mesh to a specified ".poly" file.
- * ".poly" files defines so called Piecewise Linear Complex (PLC).
+ * This method implements writing to a .vtu (VTK Unstructured Grid) file. 
+ * This is one of the new style XML dataformats, binary output is used to keep
+ * the file size down. 
  */
 void VTKIO::write (const std::string& name)
 {	
@@ -238,7 +240,6 @@ void VTKIO::write (const std::string& name)
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
   vtkPoints* points = vtkPoints::New();
-  //vtkCellArray* cells = vtkCellArray::New();
   vtkUnstructuredGrid* grid = vtkUnstructuredGrid::New();
   vtkXMLUnstructuredGridWriter* writer = vtkXMLUnstructuredGridWriter::New();
   MeshBase::const_node_iterator nd = mesh.active_nodes_begin();
@@ -259,7 +260,6 @@ void VTKIO::write (const std::string& name)
   // write out element data 
   MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
-
   for ( ; it != end; ++it)
     {
       Elem *elem  = (*it);
@@ -323,21 +323,23 @@ void VTKIO::write (const std::string& name)
 	case INVALID_ELEM:
 	default:
 	  {
-	    std::cerr<<"element type "<<elem->type()<<" not implemented"<<std::endl;
-	    error();
+		  std::cerr<<"element type "<<elem->type()<<" not implemented"<<std::endl;
+		  error();
 	  }
 	}
 
-      vtkIdList *pts = vtkIdList::New();
-      pts->SetNumberOfIds(elem->n_nodes());
+	  vtkIdList *pts = vtkIdList::New();
+	  pts->SetNumberOfIds(elem->n_nodes());
+	  // get the connectivity for this element
+	  std::vector<unsigned int> conn;
+	  elem->connectivity(0,VTK,conn);
+	  for(unsigned int i=0;i<elem->n_nodes();++i)
+	  {
+		  pts->SetId(i,conn[i]);
+	  } 
+	  grid->InsertNextCell(celltype,pts);
+	} // end loop over active elements
 
-      for(unsigned int i=0;i<elem->n_nodes();++i)
-	{
-	  pts->SetId(i,elem->node(i));
-	} 
-      grid->InsertNextCell(celltype,pts);
-    } // end loop over active elements
-	
   grid->SetPoints(points);
   writer->SetInput(grid);
   writer->SetFileName(name.c_str());

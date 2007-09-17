@@ -1,4 +1,4 @@
-// $Id: cell_hex20.C,v 1.29 2007-02-12 20:29:38 jwpeterson Exp $
+// $Id: cell_hex20.C,v 1.30 2007-09-17 19:27:47 woutruijter Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -270,7 +270,6 @@ void Hex20::connectivity(const unsigned int sc,
   assert (sc < this->n_sub_elem());
   assert (iop != INVALID_IO_PACKAGE);
 
-  conn.resize(8);
   
   switch (iop)
     {
@@ -279,7 +278,7 @@ void Hex20::connectivity(const unsigned int sc,
 	switch (sc)
 	  {
 	  case 0:
-
+	    conn.resize(8);
 	    conn[0] = this->node(0)+1;
 	    conn[1] = this->node(1)+1;
 	    conn[2] = this->node(2)+1;
@@ -298,6 +297,7 @@ void Hex20::connectivity(const unsigned int sc,
 
     case VTK:
       {
+    conn.resize(20);
 	conn[0] = this->node(0);
 	conn[1] = this->node(1);
 	conn[2] = this->node(2);
@@ -306,6 +306,18 @@ void Hex20::connectivity(const unsigned int sc,
 	conn[5] = this->node(5);
 	conn[6] = this->node(6);
 	conn[7] = this->node(7);
+	conn[8] = this->node(8);
+	conn[9] = this->node(9);
+	conn[10] = this->node(10);
+	conn[11] = this->node(11);
+	conn[12] = this->node(16);
+	conn[13] = this->node(17);
+	conn[14] = this->node(18);
+	conn[15] = this->node(19);
+	conn[16] = this->node(12);
+	conn[17] = this->node(13);
+	conn[18] = this->node(14);
+	conn[19] = this->node(15);
 
 	return;
       }
