@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.h,v 1.6 2007-06-05 15:16:33 friedmud Exp $
+// $Id: exact_error_estimator.h,v 1.7 2007-09-18 22:13:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,8 +30,13 @@
 #include "error_estimator.h"
 
 // Forward Declarations
+class Elem;
+class FEBase;
+class MeshFunction;
 class Point;
 class Parameters;
+
+template <typename T> class DenseVector;
 
 // Is there any way to simplify this?
 // All we need are Tensor and Gradient. - RHS
@@ -174,6 +179,16 @@ private:
    * containing the fine grid solution.
    */
   EquationSystems* _equation_systems_fine;
+
+  /**
+   * Helper method for calculating on each element
+   */
+  Real find_squared_element_error (const System& system,
+				   const std::string& var_name,
+				   const Elem *elem,
+                                   const DenseVector<Number> &Uelem,
+                                   FEBase *fe,
+				   MeshFunction *fine_values) const;
 
   /**
    * Extra order to use for quadrature rule

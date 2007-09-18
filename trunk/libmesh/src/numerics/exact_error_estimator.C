@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.C,v 1.9 2007-06-05 15:16:33 friedmud Exp $
+// $Id: exact_error_estimator.C,v 1.10 2007-09-18 22:13:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -94,7 +94,7 @@ void ExactErrorEstimator::attach_reference_solution (EquationSystems* es_fine)
 
 void ExactErrorEstimator::estimate_error (const System& system,
 					  ErrorVector& error_per_cell,
-					  bool)
+					  bool estimate_parent_error)
 {
   // The current mesh
   const Mesh& mesh = system.get_mesh();
@@ -107,8 +107,6 @@ void ExactErrorEstimator::estimate_error (const System& system,
   
   // The DofMap for this system
   const DofMap& dof_map = system.get_dof_map();
-
-  const Parameters& parameters = system.get_equation_systems().parameters;
 
   // Resize the error_per_cell vector to be
   // the number of elements, initialize it to 0.
@@ -146,9 +144,6 @@ void ExactErrorEstimator::estimate_error (const System& system,
       if (!component_scale.empty())
 	if (component_scale[var] == 0.0) continue;
 
-      // The (string) name of this system
-      const std::string& sys_name = system.name();
-      
       // The (string) name of this variable
       const std::string& var_name = system.variable_name(var);
       
@@ -184,17 +179,14 @@ void ExactErrorEstimator::estimate_error (const System& system,
 	fine_values->init();
       }
       
-      const std::vector<Real> &
-        JxW          = fe->get_JxW();
-      const std::vector<std::vector<Real> >&
-        phi_values   = fe->get_phi();
-      const std::vector<std::vector<RealGradient> >&
-        dphi_values  = fe->get_dphi();
+      // Request the data we'll need to compute with
+      fe->get_JxW();
+      fe->get_phi();
+      fe->get_dphi();
 #ifdef ENABLE_SECOND_DERIVATIVES
-      const std::vector<std::vector<RealTensor> >&
-        d2phi_values = fe->get_d2phi();
+      fe->get_d2phi();
 #endif
-      const std::vector<Point>& q_point = fe->get_xyz();
+      fe->get_xyz();
 
       // The global DOF indices for elements e & f
       std::vector<unsigned int> dof_indices;
@@ -206,140 +198,50 @@ void ExactErrorEstimator::estimate_error (const System& system,
       const MeshBase::const_element_iterator
         elem_end = mesh.active_local_elements_end(); 
 
-      for (; elem_it != elem_end; ++elem_it)
 	{
 	  // e is necessarily an active element on the local processor
 	  const Elem* elem = *elem_it;
 	  const unsigned int e_id = elem->id();
-          double L2normsq = 0., H1seminormsq = 0., H2seminormsq = 0.;
 
-          // reinitialize the element-specific data
-          // for the current element
-          fe->reinit (elem);
+#ifdef ENABLE_AMR
+          // See if the parent of element e has been examined yet;
+          // if not, we may want to compute the estimator on it
+          const Elem* parent = elem->parent();
+
+          // We only can compute and only need to compute on
+          // parents with all active children
+          bool compute_on_parent = true;
+          if (!parent || !estimate_parent_error)
+            compute_on_parent = false;
+          else
+            for (unsigned int c=0; c != parent->n_children(); ++c)
+              if (!parent->child(c)->active())
+                compute_on_parent = false;
+
+          if (compute_on_parent &&
+              !error_per_cell[parent->id()])
+            {
+              // Compute a projection onto the parent
+              DenseVector<Number> Uparent;
+              FEBase::coarsened_dof_values(*(system.solution),
+                                           dof_map, parent, Uparent,
+                                           var, false);
+
+              error_per_cell[parent->id()] =
+		find_squared_element_error(system, var_name, parent, Uparent,
+                                           fe.get(), fine_values.get());
+            }
+#endif
 
           // Get the local to global degree of freedom maps
           dof_map.dof_indices (elem, dof_indices, var);
+          DenseVector<Number> Uelem(dof_indices.size());
+          for (unsigned int i=0; i != dof_indices.size(); ++i)
+            Uelem(i) = system.current_solution(dof_indices[i]);
 
-          // The number of quadrature points
-          const unsigned int n_qp = qrule->n_points();
-
-          // The number of shape functions
-          const unsigned int n_sf = dof_indices.size();
-
-          //
-          // Begin the loop over the Quadrature points.
-          //
-          for (unsigned int qp=0; qp<n_qp; qp++)
-            {
-              // Real u_h = 0.;
-              // RealGradient grad_u_h;
-
-              Number u_h = 0.;
-
-#ifndef USE_COMPLEX_NUMBERS
-              RealGradient grad_u_h;
-#else
-              // Gradient     grad_u_h;
-              RealGradient grad_u_h_re;
-              RealGradient grad_u_h_im;
-#endif
-#ifdef ENABLE_SECOND_DERIVATIVES
-  #ifndef USE_COMPLEX_NUMBERS
-              RealTensor grad2_u_h;
-  #else
-              RealTensor grad2_u_h_re;
-              RealTensor grad2_u_h_im;
-  #endif
-#endif
-
-              // Compute solution values at the current
-              // quadrature point.  This reqiures a sum
-              // over all the shape functions evaluated
-              // at the quadrature point.
-              for (unsigned int i=0; i<n_sf; i++)
-                {
-                  // Values from current solution.
-                  u_h      += phi_values[i][qp]*system.current_solution (dof_indices[i]);
-#ifndef USE_COMPLEX_NUMBERS
-                  grad_u_h += dphi_values[i][qp]*system.current_solution (dof_indices[i]);
-#else
-                  grad_u_h_re += dphi_values[i][qp]*system.current_solution (dof_indices[i]).real();
-                  grad_u_h_im += dphi_values[i][qp]*system.current_solution (dof_indices[i]).imag();
-#endif
-#ifdef ENABLE_SECOND_DERIVATIVES
-  #ifndef USE_COMPLEX_NUMBERS
-                  grad2_u_h += d2phi_values[i][qp]*system.current_solution (dof_indices[i]);
-  #else
-                  grad2_u_h_re += d2phi_values[i][qp]*system.current_solution (dof_indices[i]).real();
-                  grad2_u_h_im += d2phi_values[i][qp]*system.current_solution (dof_indices[i]).imag();
-  #endif
-#endif
-                }
-
-#ifdef USE_COMPLEX_NUMBERS
-              Gradient grad_u_h (grad_u_h_re, grad_u_h_im);
-  #ifdef ENABLE_SECOND_DERIVATIVES
-              Tensor grad2_u_h (grad2_u_h_re, grad2_u_h_im);
-  #endif
-#endif
-
-              // Compute the value of the error at this quadrature point
-              Number val_error = 0;
-	      if(_exact_value)
-		val_error = u_h - _exact_value(q_point[qp],parameters,sys_name,var_name);
-	      else if(_equation_systems_fine)
-		val_error = u_h - (*fine_values)(q_point[qp]);
-
-              // Add the squares of the error to each contribution
-#ifndef USE_COMPLEX_NUMBERS
-              L2normsq += JxW[qp]*(val_error*val_error);
-#else
-	      L2normsq += JxW[qp]*std::norm(val_error);
-#endif
-
-	      // Compute the value of the error in the gradient at this
-              // quadrature point
-              if ((_exact_deriv || _equation_systems_fine) && _sobolev_order > 0)
-                {
-                  Gradient grad_error;
-		  if(_exact_deriv)
-		    grad_error = grad_u_h - _exact_deriv(q_point[qp],parameters,sys_name,var_name);
-		  else if(_equation_systems_fine)
-		    grad_error = grad_u_h - fine_values->gradient(q_point[qp]);
-
-#ifndef USE_COMPLEX_NUMBERS
-                  H1seminormsq += JxW[qp]*(grad_error*grad_error);
-#else
-                  H1seminormsq += JxW[qp]*std::abs(grad_error*grad_error);
-#endif
-                }
-
-
-#ifdef ENABLE_SECOND_DERIVATIVES
-	      // Compute the value of the error in the hessian at this
-              // quadrature point
-              if ((_exact_hessian || _equation_systems_fine) && _sobolev_order > 1)
-                {
-		  Tensor grad2_error;
-		  if(_exact_hessian)
-		    grad2_error = grad2_u_h - _exact_hessian(q_point[qp],parameters,sys_name,var_name);
-		  else if (_equation_systems_fine)
-		    grad2_error = grad2_u_h - fine_values->hessian(q_point[qp]);
-
-                  H2seminormsq += JxW[qp]*std::abs(grad2_error.contract(grad2_error));
-                }
-#endif
-
-            } // end qp loop
-
-	  assert (L2normsq     >= 0.);
-	  assert (H1seminormsq >= 0.);
-	  
-          error_per_cell[e_id] = L2normsq;
-          if (_sobolev_order > 0)
-            error_per_cell[e_id] += H1seminormsq;
-          if (_sobolev_order > 1)
-            error_per_cell[e_id] += H2seminormsq;
+          error_per_cell[e_id] =
+            find_squared_element_error(system, var_name, elem, Uelem,
+                                       fe.get(), fine_values.get());
 
 	} // End loop over active local elements
     } // End loop over variables
@@ -373,4 +275,154 @@ void ExactErrorEstimator::estimate_error (const System& system,
   STOP_LOG("std::sqrt()", "ExactErrorEstimator");
 
   //  STOP_LOG("flux_jumps()", "KellyErrorEstimator");
+}
+
+
+
+Real ExactErrorEstimator::find_squared_element_error(const System& system,
+                                                     const std::string& var_name,
+                                                     const Elem *elem,
+                                                     const DenseVector<Number> &Uelem,
+                                                     FEBase *fe,
+                                                     MeshFunction *fine_values) const
+{
+  // The (string) name of this system
+  const std::string& sys_name = system.name();
+  
+  const Parameters& parameters = system.get_equation_systems().parameters;
+
+  // reinitialize the element-specific data
+  // for the current element
+  fe->reinit (elem);
+
+  // Get the data we need to compute with
+  const std::vector<Real> &                      JxW          = fe->get_JxW();
+  const std::vector<std::vector<Real> >&         phi_values   = fe->get_phi();
+  const std::vector<std::vector<RealGradient> >& dphi_values  = fe->get_dphi();
+  const std::vector<Point>&                      q_point      = fe->get_xyz();
+#ifdef ENABLE_SECOND_DERIVATIVES
+  const std::vector<std::vector<RealTensor> >&   d2phi_values = fe->get_d2phi();
+#endif
+
+  // The number of shape functions
+  const unsigned int n_sf = Uelem.size();
+
+  // The number of quadrature points
+  const unsigned int n_qp = JxW.size();
+
+  double L2normsq = 0., H1seminormsq = 0., H2seminormsq = 0.;
+  
+  // Begin the loop over the Quadrature points.
+  //
+  for (unsigned int qp=0; qp<n_qp; qp++)
+    {
+      // Real u_h = 0.;
+      // RealGradient grad_u_h;
+
+      Number u_h = 0.;
+
+#ifndef USE_COMPLEX_NUMBERS
+      RealGradient grad_u_h;
+#else
+      // Gradient     grad_u_h;
+      RealGradient grad_u_h_re;
+      RealGradient grad_u_h_im;
+#endif
+#ifdef ENABLE_SECOND_DERIVATIVES
+  #ifndef USE_COMPLEX_NUMBERS
+      RealTensor grad2_u_h;
+  #else
+      RealTensor grad2_u_h_re;
+      RealTensor grad2_u_h_im;
+  #endif
+#endif
+
+      // Compute solution values at the current
+      // quadrature point.  This reqiures a sum
+      // over all the shape functions evaluated
+      // at the quadrature point.
+      for (unsigned int i=0; i<n_sf; i++)
+        {
+          // Values from current solution.
+          u_h      += phi_values[i][qp]*Uelem(i);
+#ifndef USE_COMPLEX_NUMBERS
+          grad_u_h += dphi_values[i][qp]*Uelem(i);
+#else
+          grad_u_h_re += dphi_values[i][qp]*Uelem(i).real();
+          grad_u_h_im += dphi_values[i][qp]*Uelem(i).imag();
+#endif
+#ifdef ENABLE_SECOND_DERIVATIVES
+  #ifndef USE_COMPLEX_NUMBERS
+          grad2_u_h += d2phi_values[i][qp]*Uelem(i);
+  #else
+          grad2_u_h_re += d2phi_values[i][qp]*Uelem(i).real();
+          grad2_u_h_im += d2phi_values[i][qp]*Uelem(i).imag();
+  #endif
+#endif
+        }
+
+#ifdef USE_COMPLEX_NUMBERS
+      Gradient grad_u_h (grad_u_h_re, grad_u_h_im);
+  #ifdef ENABLE_SECOND_DERIVATIVES
+      Tensor grad2_u_h (grad2_u_h_re, grad2_u_h_im);
+  #endif
+#endif
+
+      // Compute the value of the error at this quadrature point
+      Number val_error = 0;
+      if(_exact_value)
+	val_error = u_h - _exact_value(q_point[qp],parameters,sys_name,var_name);
+      else if(_equation_systems_fine)
+	val_error = u_h - (*fine_values)(q_point[qp]);
+
+      // Add the squares of the error to each contribution
+#ifndef USE_COMPLEX_NUMBERS
+      L2normsq += JxW[qp]*(val_error*val_error);
+#else
+      L2normsq += JxW[qp]*std::norm(val_error);
+#endif
+
+      // Compute the value of the error in the gradient at this
+      // quadrature point
+      if ((_exact_deriv || _equation_systems_fine) && _sobolev_order > 0)
+        {
+          Gradient grad_error;
+	  if(_exact_deriv)
+	    grad_error = grad_u_h - _exact_deriv(q_point[qp],parameters,sys_name,var_name);
+	  else if(_equation_systems_fine)
+	    grad_error = grad_u_h - fine_values->gradient(q_point[qp]);
+
+#ifndef USE_COMPLEX_NUMBERS
+          H1seminormsq += JxW[qp]*(grad_error*grad_error);
+#else
+          H1seminormsq += JxW[qp]*std::abs(grad_error*grad_error);
+#endif
+        }
+
+
+#ifdef ENABLE_SECOND_DERIVATIVES
+      // Compute the value of the error in the hessian at this
+      // quadrature point
+      if ((_exact_hessian || _equation_systems_fine) && _sobolev_order > 1)
+        {
+	  Tensor grad2_error;
+	  if(_exact_hessian)
+	    grad2_error = grad2_u_h - _exact_hessian(q_point[qp],parameters,sys_name,var_name);
+	  else if (_equation_systems_fine)
+	    grad2_error = grad2_u_h - fine_values->hessian(q_point[qp]);
+
+          H2seminormsq += JxW[qp]*std::abs(grad2_error.contract(grad2_error));
+        }
+#endif
+
+    } // end qp loop
+
+  assert (L2normsq     >= 0.);
+  assert (H1seminormsq >= 0.);
+	  
+  Real error_val = L2normsq;
+  if (_sobolev_order > 0)
+    error_val += H1seminormsq;
+  if (_sobolev_order > 1)
+    error_val += H2seminormsq;
 }
