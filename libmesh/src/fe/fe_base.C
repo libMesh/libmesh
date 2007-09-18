@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.40 2007-08-19 20:00:47 benkirk Exp $
+// $Id: fe_base.C,v 1.41 2007-09-18 22:12:51 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1037,13 +1037,6 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
                                   const unsigned int var,
                                   const bool use_old_dof_indices)
 {
-  // The global DOF indices
-  std::vector<unsigned int> old_dof_indices;
-  if (use_old_dof_indices)
-    dof_map.old_dof_indices (elem, old_dof_indices, var);
-  else
-    dof_map.dof_indices (elem, old_dof_indices, var);
-
   // Side/edge DOF indices
   std::vector<unsigned int> new_side_dofs, old_side_dofs;
 
@@ -1127,6 +1120,13 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
   // hold those fixed and project interiors
 
   // Copy node values first
+  {
+  std::vector<unsigned int> node_dof_indices;
+  if (use_old_dof_indices)
+    dof_map.old_dof_indices (elem, node_dof_indices, var);
+  else
+    dof_map.dof_indices (elem, node_dof_indices, var);
+
   unsigned int current_dof = 0;
   for (unsigned int n=0; n!= n_nodes; ++n)
     {
@@ -1156,11 +1156,12 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
       for (unsigned int i=0; i!= nc; ++i)
         {
           Ue(current_dof) =
-            old_vector(old_dof_indices[current_dof]);
+            old_vector(node_dof_indices[current_dof]);
           dof_is_fixed[current_dof] = true;
           current_dof++;
         }
     }
+  }
 
   // In 3D, project any edge values next
   if (dim > 2 && cont != DISCONTINUOUS)
@@ -1189,9 +1190,15 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
             if (!elem->is_child_on_edge(c,e))
               continue;
             Elem *child = elem->child(c);
-            dof_map.old_dof_indices (child,
-              old_dof_indices, var);
-            const unsigned int old_n_dofs = old_dof_indices.size();
+
+            std::vector<unsigned int> child_dof_indices;
+            if (use_old_dof_indices)
+              dof_map.old_dof_indices (child,
+                child_dof_indices, var);
+            else
+              dof_map.dof_indices (child,
+                child_dof_indices, var);
+            const unsigned int child_n_dofs = child_dof_indices.size();
 
             temp_fe_type = base_fe_type;
             temp_fe_type.order = 
@@ -1223,15 +1230,15 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
                 // Sum the solution values * the DOF
                 // values at the quadrature point to
                 // get the solution value and gradient.
-                for (unsigned int i=0; i<old_n_dofs;
+                for (unsigned int i=0; i<child_n_dofs;
                      i++)
                   {
                     fineval +=
-                      (old_vector(old_dof_indices[i])*
+                      (old_vector(child_dof_indices[i])*
                       phi_values[i][qp]);
                     if (cont == C_ONE)
                       finegrad.add_scaled((*dphi_values)[i][qp],
-                                          old_vector(old_dof_indices[i]));
+                                          old_vector(child_dof_indices[i]));
                   }
 
                 // Form edge projection matrix
@@ -1325,9 +1332,15 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
             if (!elem->is_child_on_side(c,s))
               continue;
             Elem *child = elem->child(c);
-            dof_map.old_dof_indices (child,
-              old_dof_indices, var);
-            const unsigned int old_n_dofs = old_dof_indices.size();
+
+            std::vector<unsigned int> child_dof_indices;
+            if (use_old_dof_indices)
+              dof_map.old_dof_indices (child,
+                child_dof_indices, var);
+            else
+              dof_map.dof_indices (child,
+                child_dof_indices, var);
+            const unsigned int child_n_dofs = child_dof_indices.size();
 
             temp_fe_type = base_fe_type;
             temp_fe_type.order = 
@@ -1359,15 +1372,15 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
                 // Sum the solution values * the DOF
                 // values at the quadrature point to
                 // get the solution value and gradient.
-                for (unsigned int i=0; i<old_n_dofs;
+                for (unsigned int i=0; i<child_n_dofs;
                      i++)
                   {
                     fineval +=
-                      (old_vector(old_dof_indices[i])*
+                      (old_vector(child_dof_indices[i])*
                       phi_values[i][qp]);
                     if (cont == C_ONE)
                       finegrad.add_scaled((*dphi_values)[i][qp],
-                                          old_vector(old_dof_indices[i]));
+                                          old_vector(child_dof_indices[i]));
                   }
 
                 // Form side projection matrix
@@ -1450,9 +1463,15 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
   for (unsigned int c=0; c != elem->n_children(); ++c)
     {
       Elem *child = elem->child(c);
-      dof_map.old_dof_indices (child, old_dof_indices,
-                               var);
-      const unsigned int old_n_dofs = old_dof_indices.size();
+
+      std::vector<unsigned int> child_dof_indices;
+      if (use_old_dof_indices)
+        dof_map.old_dof_indices (child,
+          child_dof_indices, var);
+      else
+        dof_map.dof_indices (child,
+          child_dof_indices, var);
+      const unsigned int child_n_dofs = child_dof_indices.size();
 
       // Initialize both child and parent FE data
       // on the child's quadrature points
@@ -1476,14 +1495,14 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
           // Sum the solution values * the DOF
           // values at the quadrature point to
           // get the solution value and gradient.
-          for (unsigned int i=0; i<old_n_dofs; i++)
+          for (unsigned int i=0; i<child_n_dofs; i++)
             {
               fineval +=
-                (old_vector(old_dof_indices[i])*
+                (old_vector(child_dof_indices[i])*
                  phi_values[i][qp]);
               if (cont == C_ONE)
                 finegrad.add_scaled((*dphi_values)[i][qp],
-                                    old_vector(old_dof_indices[i]));
+                                    old_vector(child_dof_indices[i]));
             }
 
           // Form interior projection matrix
