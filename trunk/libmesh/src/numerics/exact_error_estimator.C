@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.C,v 1.10 2007-09-18 22:13:40 roystgnr Exp $
+// $Id: exact_error_estimator.C,v 1.11 2007-09-18 23:08:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -188,9 +188,6 @@ void ExactErrorEstimator::estimate_error (const System& system,
 #endif
       fe->get_xyz();
 
-      // The global DOF indices for elements e & f
-      std::vector<unsigned int> dof_indices;
-
       // Iterate over all the active elements in the mesh
       // that live on this processor.
       MeshBase::const_element_iterator
@@ -198,6 +195,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
       const MeshBase::const_element_iterator
         elem_end = mesh.active_local_elements_end(); 
 
+      for (;elem_it != elem_end; ++elem_it)
 	{
 	  // e is necessarily an active element on the local processor
 	  const Elem* elem = *elem_it;
@@ -234,6 +232,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 #endif
 
           // Get the local to global degree of freedom maps
+          std::vector<unsigned int> dof_indices;
           dof_map.dof_indices (elem, dof_indices, var);
           DenseVector<Number> Uelem(dof_indices.size());
           for (unsigned int i=0; i != dof_indices.size(); ++i)
@@ -425,4 +424,5 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
     error_val += H1seminormsq;
   if (_sobolev_order > 1)
     error_val += H2seminormsq;
+  return error_val;
 }
