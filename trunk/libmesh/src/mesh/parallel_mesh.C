@@ -1,4 +1,4 @@
-// $Id: parallel_mesh.C,v 1.2 2007-09-07 22:03:58 roystgnr Exp $
+// $Id: parallel_mesh.C,v 1.3 2007-09-19 21:03:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -20,6 +20,7 @@
 
 
 // Local includes
+#include "elem.h"
 #include "parallel_mesh.h"
 
 // ------------------------------------------------------------
@@ -37,8 +38,37 @@ ParallelMesh::~ParallelMesh ()
 
 void ParallelMesh::delete_nonlocal_elements()
 {
-  // Someday...
-  error();
+  std::vector<bool> local_nodes(_nodes.size(), false);
+  std::vector<bool> semilocal_elems(_elements.size(), false);
+
+  const_element_iterator l_elem_it = this->local_elements_begin(),
+                         l_end     = this->local_elements_end();
+  for (; l_elem_it != l_end; ++l_elem_it)
+    {
+      const Elem *elem = *l_elem_it;
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        local_nodes[elem->node(n)] = true;
+    }
+
+  element_iterator nl_elem_it = this->not_local_elements_begin(),
+                   nl_end     = this->not_local_elements_end();
+  for (; nl_elem_it != nl_end; ++nl_elem_it)
+    {
+      Elem *elem = *nl_elem_it;
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        if (local_nodes[elem->node(n)])
+          {
+            semilocal_elems[elem->id()] = true;
+            break;
+          }
+      if (!semilocal_elems[elem->id()])
+        {
+          // delete_elem doesn't currently invalidate element
+          // iterators... that had better not change
+          this->delete_elem(elem);
+        }
+    }
+  this->prepare_for_use();
 }
 
 void ParallelMesh::restore_nonlocal_elements()
