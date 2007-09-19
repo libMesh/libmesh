@@ -1,5 +1,5 @@
 
-// $Id: mesh_refinement_flagging.C,v 1.31 2007-07-02 16:10:52 friedmud Exp $
+// $Id: mesh_refinement_flagging.C,v 1.32 2007-09-19 19:47:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -172,7 +172,7 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
 
   // How much error per cell will we tolerate?
   const Real local_refinement_tolerance =
-    _absolute_global_tolerance / _mesh.n_active_elem();
+    _absolute_global_tolerance / std::sqrt(_mesh.n_active_elem());
   const Real local_coarsening_tolerance =
     local_refinement_tolerance * _coarsen_threshold;
 
@@ -255,9 +255,9 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   // The target number of elements to add or remove
   const int n_elem_new = _nelem_target - n_active_elem;
 
-  // Create an error vector with active elements only,
+  // Create an vector with active element errors and ids,
   // sorted by highest errors first
-  std::vector<float> sorted_error;
+  std::vector<std::pair<float, unsigned int> > sorted_error;
 
   sorted_error.reserve (n_active_elem);
 
@@ -265,8 +265,13 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
 
   for (; elem_it != elem_end; ++elem_it)
-    sorted_error.push_back (error_per_cell[(*elem_it)->id()]);
+    {
+      unsigned int eid = (*elem_it)->id();
+      sorted_error.push_back
+        (std::make_pair(error_per_cell[eid], eid));
+    }
 
+  // Default sort works since pairs are sorted lexicographically
   std::sort (sorted_error.begin(), sorted_error.end());
   std::reverse (sorted_error.begin(), sorted_error.end());
 
@@ -321,41 +326,29 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
          refine_count < max_elem_refine &&
          coarsen_count < sorted_parent_error.size() &&
          refine_count < sorted_error.size() &&
-         sorted_error[refine_count] > 
+         sorted_error[refine_count].first > 
 	 sorted_parent_error[coarsen_count] * _coarsen_threshold)
   {
     coarsen_count++;
     refine_count++;
   }
 
-  unsigned int successful_refine_count = 0;
   if (refine_count > max_elem_refine)
     refine_count = max_elem_refine;
-  if (refine_count)
-  {
-    // Find out what our refinement error limit is
-    Real max_refinable_error = sorted_error.back();
-
-    if (refine_count < sorted_error.size())
-      max_refinable_error = sorted_error[refine_count-1];
-
-    // Flag elements for refinement
-    elem_it  = _mesh.active_elements_begin();
-    for (; elem_it != elem_end; ++elem_it)
+  unsigned int successful_refine_count = 0;
+  for (unsigned int i=0; i != sorted_error.size(); ++i)
     {
-      Elem* elem = *elem_it;
+      if (successful_refine_count >= refine_count)
+        break;
 
-      if (max_elem_refine && refine_count &&
-	  error_per_cell[elem->id()] >= max_refinable_error &&
-	  elem->level() < _max_h_level)
-      {
-	elem->set_refinement_flag(Elem::REFINE);
-	successful_refine_count++;
-	if (successful_refine_count >= refine_count)
-	  break;
-      }
+      unsigned int eid = sorted_error[i].second;
+      Elem *elem = _mesh.elem(eid);
+      if (elem->level() < _max_h_level)
+        {
+	  elem->set_refinement_flag(Elem::REFINE);
+	  successful_refine_count++;
+        }
     }
-  }
 
   // If we couldn't refine enough elements, don't coarsen too many
   // either
