@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.62 2007-09-13 21:17:35 benkirk Exp $
+# $Id: Make.common.in,v 1.63 2007-09-20 15:53:39 benkirk Exp $
 
 
 ###############################################################################
@@ -407,7 +407,7 @@ ifeq ($(enable-optional),yes)
                     $(SUPERLU_DIST_LIB) $(UMFPACK_LIB) $(SUPERLU_LIB) \
                     $(BLOPEX_LIB) \
                     $(BLASLAPACK_LIB) $(X11_LIB) $(MATLAB_LIB) \
-                    $(FLIBS)
+                    $(libmesh_FLIBS)
 
   endif #end ifeq ($(enable-petsc),yes)
 
