@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_vsmoother.C,v 1.5 2007-09-05 21:08:35 roystgnr Exp $
+// $Id: mesh_smoother_vsmoother.C,v 1.6 2007-09-20 16:11:38 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -139,7 +139,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
 //int VariationalMeshSmoother::writegr(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells,
 //            LPINT mcells, int nedges, LPINT edges, LPINT hnodes, char grid[], int me, char grid_old[], FILE *sout)
 int VariationalMeshSmoother::writegr(int, int, LPLPDOUBLE R, LPINT, int, LPLPINT,
-	    LPINT, int, LPINT, LPINT, char [], int, char [], FILE*)
+	    LPINT, int, LPINT, LPINT, const char [], int, const char [], FILE*)
 {
   std::cout<<"Starting writegr"<<std::endl;
   int i;

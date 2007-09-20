@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_vsmoother.h,v 1.3 2007-06-04 17:44:38 friedmud Exp $
+// $Id: mesh_smoother_vsmoother.h,v 1.4 2007-09-20 16:11:38 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -61,7 +61,7 @@ typedef LPINT  * LPLPINT;
  *
  * \author Derek R. Gaston
  * \date 2006
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  */
 
 
@@ -234,8 +234,8 @@ private:
   LPLPLPDOUBLE alloc_d_n1_n2_n3(int m1, int, int) { return((LPLPLPDOUBLE)malloc(m1*sizeof(LPLPDOUBLE))); }
 
   int writegr(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells,
-              LPINT mcells, int nedges, LPINT edges, LPINT hnodes, char grid[],
-              int me, char grid_old[], FILE *sout);
+              LPINT mcells, int nedges, LPINT edges, LPINT hnodes, const char grid[],
+              int me, const char grid_old[], FILE *sout);
 
   int readgr(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells,
              LPLPINT cells, LPINT mcells, int nedges, LPINT edges, LPINT hnodes, FILE *sout);
