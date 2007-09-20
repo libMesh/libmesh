@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.29 2007-05-23 23:36:11 roystgnr Exp $
+// $Id: mesh_modification.C,v 1.30 2007-09-20 16:28:27 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -998,137 +998,148 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
           new_positions.resize(mesh.n_nodes());
           weight.resize(mesh.n_nodes());
 
-          /*
-           * Loop over the elements to calculate new node positions
-           */
-          MeshBase::element_iterator       el  = mesh.level_elements_begin(refinement_level);
-          const MeshBase::element_iterator end = mesh.level_elements_end(refinement_level); 
+          {
+            /*
+             * Loop over the elements to calculate new node positions
+             */
+            MeshBase::element_iterator       el  = mesh.level_elements_begin(refinement_level);
+            const MeshBase::element_iterator end = mesh.level_elements_end(refinement_level); 
 	
-          for (; el != end; ++el)
-            {
-              /*
-               * Constant handle for the element
-               */
-              const Elem* elem = *el;
+            for (; el != end; ++el)
+              {
+                /*
+                 * Constant handle for the element
+                 */
+                const Elem* elem = *el;
           
-              /*
-               * We relax all nodes on level 0 first 
-               * If the element is refined (level > 0), we interpolate the
-               * parents nodes with help of the embedding matrix
-               */
-              if (refinement_level == 0)
-                {
-                  for (unsigned int s=0; s<elem->n_neighbors(); s++)
-                    {
-                      /*
-                       * Only operate on sides which are on the
-                       * boundary or for which the current element's
-                       * id is greater than its neighbor's.
-                       * Sides get only built once.
-                       */
-                      if ((elem->neighbor(s) != NULL) &&
-                          (elem->id() > elem->neighbor(s)->id()) ) 
-                        {
-                          AutoPtr<Elem> side(elem->build_side(s));
+                /*
+                 * We relax all nodes on level 0 first 
+                 * If the element is refined (level > 0), we interpolate the
+                 * parents nodes with help of the embedding matrix
+                 */
+                if (refinement_level == 0)
+                  {
+                    for (unsigned int s=0; s<elem->n_neighbors(); s++)
+                      {
+                        /*
+                         * Only operate on sides which are on the
+                         * boundary or for which the current element's
+                         * id is greater than its neighbor's.
+                         * Sides get only built once.
+                         */
+                        if ((elem->neighbor(s) != NULL) &&
+                            (elem->id() > elem->neighbor(s)->id()) ) 
+                          {
+                            AutoPtr<Elem> side(elem->build_side(s));
 
-                          Node* node0 = side->get_node(0);
-                          Node* node1 = side->get_node(1);
+                            Node* node0 = side->get_node(0);
+                            Node* node1 = side->get_node(1);
 
-                          Real node_weight = 1.;
-                          // calculate the weight of the nodes
-                          if (power > 0)
-                            {
-                              Point diff = (*node0)-(*node1);
-                              node_weight = std::pow( diff.size(), power );
-                            }
+                            Real node_weight = 1.;
+                            // calculate the weight of the nodes
+                            if (power > 0)
+                              {
+                                Point diff = (*node0)-(*node1);
+                                node_weight = std::pow( diff.size(), power );
+                              }
 
-                          const unsigned int id0 = node0->id(), id1 = node1->id();
-                          new_positions[id0].add_scaled( *node1, node_weight );
-                          new_positions[id1].add_scaled( *node0, node_weight );
-                          weight[id0] += node_weight;
-                          weight[id1] += node_weight;
-                        }
-                    } // element neighbor loop
-                } 
+                            const unsigned int id0 = node0->id(), id1 = node1->id();
+                            new_positions[id0].add_scaled( *node1, node_weight );
+                            new_positions[id1].add_scaled( *node0, node_weight );
+                            weight[id0] += node_weight;
+                            weight[id1] += node_weight;
+                          }
+                      } // element neighbor loop
+                  } 
 #ifdef ENABLE_AMR
-              else   // refinement_level > 0
-                {
-                  /*
-                   * Find the positions of the hanging nodes of refined elements.
-                   * We do this by calculating their position based on the parent
-                   * (one level less refined) element, and the embedding matrix
-                   */
+                else   // refinement_level > 0
+                  {
+                    /*
+                     * Find the positions of the hanging nodes of refined elements.
+                     * We do this by calculating their position based on the parent
+                     * (one level less refined) element, and the embedding matrix
+                     */
 
-                  const Elem* parent = elem->parent();
+                    const Elem* parent = elem->parent();
 
-                  /*
-                   * find out which child I am
-                   */
-                  for (unsigned int c=0; c < parent->n_children(); c++)
-                    {
-                      if (parent->child(c) == elem)
-                        {
-                          /*
-                           *loop over the childs (that is, the current elements) nodes
-                           */
-                          for (unsigned int nc=0; nc < elem->n_nodes(); nc++)
-                            {
-                              /*
-                               * the new position of the node
-                               */
-                              Point point;
-                              for (unsigned int n=0; n<parent->n_nodes(); n++)
-                                {
-                                  /*
-                                   * The value from the embedding matrix
-                                   */
-                                  const float em_val = parent->embedding_matrix(c,nc,n);
+                    /*
+                     * find out which child I am
+                     */
+                    for (unsigned int c=0; c < parent->n_children(); c++)
+                      {
+                        if (parent->child(c) == elem)
+                          {
+                            /*
+                             *loop over the childs (that is, the current elements) nodes
+                             */
+                            for (unsigned int nc=0; nc < elem->n_nodes(); nc++)
+                              {
+                                /*
+                                 * the new position of the node
+                                 */
+                                Point point;
+                                for (unsigned int n=0; n<parent->n_nodes(); n++)
+                                  {
+                                    /*
+                                     * The value from the embedding matrix
+                                     */
+                                    const float em_val = parent->embedding_matrix(c,nc,n);
 	      
-                                  if (em_val != 0.)
-                                    point.add_scaled (parent->point(n), em_val);
-                                }
+                                    if (em_val != 0.)
+                                      point.add_scaled (parent->point(n), em_val);
+                                  }
 
-                              const unsigned int id = elem->get_node(nc)->id();
-                              new_positions[id] = point;
-                              weight[id] = 1.;
-                            }
+                                const unsigned int id = elem->get_node(nc)->id();
+                                new_positions[id] = point;
+                                weight[id] = 1.;
+                              }
                     
-                        } // if parent->child == elem
-                    } // for parent->n_children
-                } // if element refinement_level
+                          } // if parent->child == elem
+                      } // for parent->n_children
+                  } // if element refinement_level
 #endif // #ifdef ENABLE_AMR
 
-              /*
-               * Now handle the additional second_order nodes by calculating
-               * their position based on the vertex postitions
-               */
-              std::vector<unsigned int> adjacent_vertices_ids;
+              } // element loop
+          
+            /*
+             * finally reposition the vertex nodes
+             */
+            for (unsigned int nid=0; nid<mesh.n_nodes(); ++nid)
+              if (!on_boundary[nid] && weight[nid] > 0.)
+                mesh.node(nid) = new_positions[nid]/weight[nid];
+          }
 
-              const unsigned int son_begin = elem->n_vertices();
-              const unsigned int son_end   = elem->n_nodes();
+          {
+            /*
+             * Now handle the additional second_order nodes by calculating
+             * their position based on the vertex postitions
+             * we do a second loop over the level elements
+             */
+            MeshBase::element_iterator       el  = mesh.level_elements_begin(refinement_level);
+            const MeshBase::element_iterator end = mesh.level_elements_end(refinement_level); 
 
-              for (unsigned int n=son_begin; n<son_end; n++)
-                {
-                  const unsigned int n_adjacent_vertices =
-                    elem->n_second_order_adjacent_vertices(n);
+            for (; el != end; ++el)
+              {
+                /*
+                 * Constant handle for the element
+                 */
+                const Elem* elem = *el;
+                const unsigned int son_begin = elem->n_vertices();
+                const unsigned int son_end   = elem->n_nodes();
+                for (unsigned int n=son_begin; n<son_end; n++)
+                  {
+                    const unsigned int n_adjacent_vertices =
+                      elem->n_second_order_adjacent_vertices(n);
 
-                  Point point; 
-                  for (unsigned int v=0; v<n_adjacent_vertices; v++)
-                    point.add(elem->point( elem->second_order_adjacent_vertex(n,v) ));
+                    Point point; 
+                    for (unsigned int v=0; v<n_adjacent_vertices; v++)
+                      point.add(elem->point( elem->second_order_adjacent_vertex(n,v) ));
 
-                  const unsigned int id = elem->get_node(n)->id();
-                  new_positions[id] = point;
-                  weight[id] = 1.*n_adjacent_vertices;
-                }
-
-            } // element loop
-
-          /*
-           * finally reposition the nodes
-           */
-          for (unsigned int nid=0; nid<mesh.n_nodes(); ++nid)
-            if (!on_boundary[nid] && weight[nid] > 0.)
-              mesh.node(nid) = new_positions[nid]/weight[nid];
+                    const unsigned int id = elem->get_node(n)->id();
+                    mesh.node(id) = point/n_adjacent_vertices;
+                  }
+              }
+          }
       
         } // refinement_level loop
 
