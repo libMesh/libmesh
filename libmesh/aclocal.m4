@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.111 2007-09-13 21:59:04 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.112 2007-09-20 00:09:30 jwpeterson Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1127,17 +1127,20 @@ AC_DEFUN(CONFIGURE_VTK,
   
      dnl Check for existence of a header file in the specified location
      dnl AC_CHECK_FILE([$VTK_INC/vtkCommonInstantiator.h], [vtkincFound="OK"], [vtkincFound="FAIL"])
+     vtkincFound=no;
      AC_CHECK_HEADERS($VTK_INC/vtkCommonInstantiator.h, vtkincFound=yes)
 
-     if (test $vtkincFound != yes); then
+     if (test $vtkincFound = no); then
        AC_MSG_RESULT(VTK header files not found!)
-       enablevtk = no;
+       enablevtk=no;
      fi
 
-     dnl Check for existence of required libraries
-     AC_CHECK_FILE($VTK_LIB/libvtkIO.so, [enablevtk=yes], [enablevtk=no])
-     AC_CHECK_FILE($VTK_LIB/libvtkCommon.so, [enablevtk=yes], [enablevtk=no])
-
+     if (test $enablevtk = yes); then
+       dnl Also Check for existence of required libraries
+       AC_CHECK_FILE($VTK_LIB/libvtkIO.so, [enablevtk=yes], [enablevtk=no])
+       AC_CHECK_FILE($VTK_LIB/libvtkCommon.so, [enablevtk=yes], [enablevtk=no])
+     fi
+     
      dnl If both the header file and the required libs were found, continue.
      if (test $enablevtk = yes); then
        dnl Since VTK headers use deprecated C++ header files and we don't want to see this

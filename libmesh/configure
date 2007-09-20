@@ -11874,6 +11874,7 @@ fi
 
     if (test $enablevtk = yes); then
 
+               vtkincFound=no;
 
 for ac_header in $VTK_INC/vtkCommonInstantiator.h
 do
@@ -12015,13 +12016,14 @@ fi
 done
 
 
-     if (test $vtkincFound != yes); then
+     if (test $vtkincFound = no); then
        { echo "$as_me:$LINENO: result: VTK header files not found!" >&5
 echo "${ECHO_T}VTK header files not found!" >&6; }
-       enablevtk = no;
+       enablevtk=no;
      fi
 
-          as_ac_File=`echo "ac_cv_file_$VTK_LIB/libvtkIO.so" | $as_tr_sh`
+     if (test $enablevtk = yes); then
+              as_ac_File=`echo "ac_cv_file_$VTK_LIB/libvtkIO.so" | $as_tr_sh`
 { echo "$as_me:$LINENO: checking for $VTK_LIB/libvtkIO.so" >&5
 echo $ECHO_N "checking for $VTK_LIB/libvtkIO.so... $ECHO_C" >&6; }
 if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
@@ -12046,7 +12048,7 @@ else
   enablevtk=no
 fi
 
-     as_ac_File=`echo "ac_cv_file_$VTK_LIB/libvtkCommon.so" | $as_tr_sh`
+       as_ac_File=`echo "ac_cv_file_$VTK_LIB/libvtkCommon.so" | $as_tr_sh`
 { echo "$as_me:$LINENO: checking for $VTK_LIB/libvtkCommon.so" >&5
 echo $ECHO_N "checking for $VTK_LIB/libvtkCommon.so... $ECHO_C" >&6; }
 if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
@@ -12071,6 +12073,7 @@ else
   enablevtk=no
 fi
 
+     fi
 
           if (test $enablevtk = yes); then
                                    VTK_INCLUDE="-I$VTK_INC"
