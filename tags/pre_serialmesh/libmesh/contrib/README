@@ -1,0 +1,16 @@
+./metis:
+Contains th METIS graph partitioning software.  METIS is Copyright
+(C) 1997, Regents of the University of Minnesota. The source is
+redistributed with permission.  See ./metis/README.
+
+
+./tecplot:
+Contains the Tecplot binary output API implementation libraries.
+Redistributed with permission.  Tecplot is Copyright (C) 1988-98 Amtec
+Engineering, Inc.  See ./tecplot/README
+
+
+./laspack:
+Contains the LASPACK iterative solver library.  LASPACK is Copyright
+(C) 1992-1996 Tomas Skalicky. See ./laspack/copyright.h
+
