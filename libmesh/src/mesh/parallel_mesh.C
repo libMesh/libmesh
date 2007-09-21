@@ -1,4 +1,4 @@
-// $Id: parallel_mesh.C,v 1.3 2007-09-19 21:03:21 roystgnr Exp $
+// $Id: parallel_mesh.C,v 1.4 2007-09-21 19:55:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -68,7 +68,9 @@ void ParallelMesh::delete_nonlocal_elements()
           this->delete_elem(elem);
         }
     }
-  this->prepare_for_use();
+//  We eventually want to compact the _nodes and _elems vectors
+//  But not do a repartition or anything
+//  do not this->prepare_for_use();
 }
 
 void ParallelMesh::restore_nonlocal_elements()
