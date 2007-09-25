@@ -1,4 +1,4 @@
-// $Id: mesh_output.C,v 1.1 2005-06-11 03:59:18 jwpeterson Exp $
+// $Id: mesh_output.C,v 1.2 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -38,4 +38,4 @@ _build_variable_names_and_solution_vector (const EquationSystems& es,
 // Instantiate for our Mesh types.  If this becomes too cumbersome later,
 // move any functions in this file to the header file instead.
 template class MeshOutput<MeshBase>;
-template class MeshOutput<Mesh>;
+template class MeshOutput<UnstructuredMesh>;

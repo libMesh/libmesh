@@ -1,4 +1,4 @@
-// $Id: mesh_generation.h,v 1.13 2006-10-24 17:52:58 jwpeterson Exp $
+// $Id: mesh_generation.h,v 1.14 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 #include "point.h"
 
 // forward declarations
-class Mesh;
+class UnstructuredMesh;
 
 
 
@@ -47,7 +47,7 @@ namespace MeshTools
    *
    * \author Benjamin S. Kirk
    * \date 2004
-   * \version $Revision: 1.13 $
+   * \version $Revision: 1.14 $
    */
   namespace Generation
   {
@@ -57,7 +57,7 @@ namespace MeshTools
      * but the dimensions can be specified through the optional
      * arguments.
      */  
-    void build_cube (Mesh& mesh,
+    void build_cube (UnstructuredMesh& mesh,
 		     const unsigned int nx=0,
 		     const unsigned int ny=0,
 		     const unsigned int nz=0,
@@ -70,7 +70,7 @@ namespace MeshTools
     /**
      * A specialized \p build_cube() for 1D meshes
      */
-    void build_line (Mesh& mesh,
+    void build_line (UnstructuredMesh& mesh,
                      const unsigned int nx,
                      const Real xmin=0., const Real xmax=1.,
                      const ElemType type=INVALID_ELEM,
@@ -79,7 +79,7 @@ namespace MeshTools
     /**
      * A specialized \p build_cube() for 2D meshes.
      */
-    void build_square (Mesh& mesh,
+    void build_square (UnstructuredMesh& mesh,
 		       const unsigned int nx,
 		       const unsigned int ny,
 		       const Real xmin=0., const Real xmax=1.,
@@ -90,7 +90,7 @@ namespace MeshTools
     /**
      * Meshes a spherical or mapped-spherical domain.
      */
-    void build_sphere (Mesh& mesh,
+    void build_sphere (UnstructuredMesh& mesh,
 		       const Real rad=1,
 		       const unsigned int nr=2,
 		       const ElemType type=INVALID_ELEM);

@@ -1,5 +1,5 @@
 
-// $Id: mesh_refinement_flagging.C,v 1.32 2007-09-19 19:47:37 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.33 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -277,7 +277,8 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   // Create a sorted error vector with coarsenable parent elements
   // only, sorted by lowest errors first
-  ErrorVector error_per_parent, sorted_parent_error;
+  ErrorVector error_per_parent;
+  std::vector<std::pair<float, unsigned int> > sorted_parent_error;
   Real parent_error_min, parent_error_max;
 
   create_parent_error_vector(error_per_cell,
@@ -285,15 +286,14 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
                              parent_error_min,
                              parent_error_max);
 
-  sorted_parent_error = error_per_parent;
-  std::sort (sorted_parent_error.begin(), sorted_parent_error.end());
-
   // create_parent_error_vector sets values for non-parents and
   // non-coarsenable parents to -1.  Get rid of them.
-  sorted_parent_error.erase (std::remove(sorted_parent_error.begin(),
-					 sorted_parent_error.end(), -1.),
-                             sorted_parent_error.end());
-  
+  for (unsigned int i=0; i != error_per_parent.size(); ++i)
+    if (error_per_parent[i] != -1)
+      sorted_parent_error.push_back(std::make_pair(error_per_parent[i], i));
+
+  std::sort (sorted_parent_error.begin(), sorted_parent_error.end());
+
   // Keep track of how many elements we plan to coarsen & refine
   unsigned int coarsen_count = 0;
   unsigned int refine_count = 0;
@@ -327,7 +327,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
          coarsen_count < sorted_parent_error.size() &&
          refine_count < sorted_error.size() &&
          sorted_error[refine_count].first > 
-	 sorted_parent_error[coarsen_count] * _coarsen_threshold)
+	 sorted_parent_error[coarsen_count].first * _coarsen_threshold)
   {
     coarsen_count++;
     refine_count++;
@@ -357,38 +357,26 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   else
     coarsen_count -= (refine_count - successful_refine_count);
 
-  unsigned int successful_coarsen_count = 0;
   if (coarsen_count > max_elem_coarsen)
     coarsen_count = max_elem_coarsen;
-  if (coarsen_count)
-  {
-    // Find out what our coarsening error limit is
-    Real max_coarsenable_error = 0.;
-    if (!sorted_parent_error.empty())
-      max_coarsenable_error = sorted_parent_error.back();
-
-    if (coarsen_count < sorted_parent_error.size())
-      max_coarsenable_error = sorted_parent_error[coarsen_count-1];
-
-    // Flag elements for coarsening
-    elem_it  = _mesh.active_elements_begin();
-    for (; elem_it != elem_end; ++elem_it)
+  unsigned int successful_coarsen_count = 0;
+  for (unsigned int i=0; i != sorted_parent_error.size(); ++i)
     {
-      Elem* elem = *elem_it;
-      Elem* parent = elem->parent();
+      if (successful_coarsen_count >= coarsen_count * twotodim)
+        break;
 
-      if (parent && max_elem_coarsen && coarsen_count &&
-	  error_per_parent[parent->id()] >= 0. &&
-	  error_per_parent[parent->id()] <=
-	  max_coarsenable_error)
-      {
-	elem->set_refinement_flag(Elem::COARSEN);
-	successful_coarsen_count++;
-	if (successful_coarsen_count >= coarsen_count * twotodim)
-	  break;
-      }
+      unsigned int parent_id = sorted_parent_error[i].second;
+      Elem *parent = _mesh.elem(parent_id);
+      for (unsigned int c=0; c != parent->n_children(); ++c)
+        {
+          Elem *elem = parent->child(c);
+          if (elem->active())
+            {
+              elem->set_refinement_flag(Elem::COARSEN);
+              successful_coarsen_count++;
+            }
+        }
     }
-  }
 
   // Return true if we've done all the AMR/C we can
   if (!successful_coarsen_count && 

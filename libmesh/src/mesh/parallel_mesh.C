@@ -1,4 +1,4 @@
-// $Id: parallel_mesh.C,v 1.4 2007-09-21 19:55:55 roystgnr Exp $
+// $Id: parallel_mesh.C,v 1.5 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,7 +26,7 @@
 // ------------------------------------------------------------
 // ParallelMesh class member functions
 ParallelMesh::ParallelMesh (unsigned int d) :
-  Mesh (d)
+  UnstructuredMesh (d)
 {
 }
 

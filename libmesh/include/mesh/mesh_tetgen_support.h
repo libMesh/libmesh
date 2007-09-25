@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.h,v 1.19 2006-08-22 15:07:15 roystgnr Exp $
+// $Id: mesh_tetgen_support.h,v 1.20 2007-09-25 19:54:42 roystgnr Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -37,7 +37,7 @@
 
 
 // Forward Declarations
-class Mesh;
+class UnstructuredMesh;
 class Node;
 
 /**
@@ -227,7 +227,7 @@ public:
   /**
    * Constructor. Takes a reference to the mesh.
    */
-  TetGenMeshInterface (Mesh& mesh);
+  TetGenMeshInterface (UnstructuredMesh& mesh);
 
   /**
    * Empty destructor.
@@ -274,7 +274,7 @@ protected:
   /**
    * Local reference to the mesh we are working with.
    */
-  Mesh& _mesh;
+  UnstructuredMesh& _mesh;
 
 };
 

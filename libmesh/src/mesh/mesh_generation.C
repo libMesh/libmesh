@@ -1,4 +1,4 @@
-// $Id: mesh_generation.C,v 1.50 2007-07-02 16:10:52 friedmud Exp $
+// $Id: mesh_generation.C,v 1.51 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 
 // Local includes
 #include "mesh_generation.h"
-#include "mesh.h"
+#include "unstructured_mesh.h"
 // #include "elem.h"
 #include "mesh_refinement.h"
 #include "edge_edge2.h"
@@ -51,7 +51,7 @@
 
 // ------------------------------------------------------------
 // MeshTools::Generation function for mesh generation
-void MeshTools::Generation::build_cube(Mesh& mesh,
+void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 				       const unsigned int nx,
 				       const unsigned int ny,
 				       const unsigned int nz,
@@ -1243,7 +1243,7 @@ void MeshTools::Generation::build_cube(Mesh& mesh,
 
 
 
-void MeshTools::Generation::build_line (Mesh& mesh,
+void MeshTools::Generation::build_line (UnstructuredMesh& mesh,
                                         const unsigned int nx,
                                         const Real xmin, const Real xmax,
                                         const ElemType type,
@@ -1263,7 +1263,7 @@ void MeshTools::Generation::build_line (Mesh& mesh,
                                         
 
 
-void MeshTools::Generation::build_square (Mesh& mesh,
+void MeshTools::Generation::build_square (UnstructuredMesh& mesh,
 					  const unsigned int nx,
 					  const unsigned int ny,
 					  const Real xmin, const Real xmax,
@@ -1293,7 +1293,7 @@ void MeshTools::Generation::build_square (Mesh& mesh,
 
 
 #ifndef ENABLE_AMR
-void MeshTools::Generation::build_sphere (Mesh&,
+void MeshTools::Generation::build_sphere (UnstructuredMesh&,
 					  const Real,
 					  const unsigned int,
 					  const ElemType)
@@ -1304,7 +1304,7 @@ void MeshTools::Generation::build_sphere (Mesh&,
 
 #else
 	
-void MeshTools::Generation::build_sphere (Mesh& mesh,
+void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 					  const Real rad,
 					  const unsigned int nr,
 					  const ElemType type)

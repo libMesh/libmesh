@@ -1,4 +1,4 @@
-// $Id: parallel_mesh.h,v 1.2 2007-09-07 22:03:57 roystgnr Exp $
+// $Id: parallel_mesh.h,v 1.3 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,15 +34,15 @@
  * By "is intended" I mean that it doesn't work that way yet.  Don't
  * use this class unless you're developing or debugging it.
  *
- * Most methods are currently commented out, and will thus not
- * redefine the Mesh:: versions of those functions.  Methods for
- * which the Mesh:: version is obviously wrong for ParallelMesh
- * have been tagged by "error();"
+ * Most methods are currently commented out, and will thus not redefine the
+ * UnstructuredMesh:: versions of those functions.  Methods for which the
+ * UnstructuredMesh:: version is obviously wrong for ParallelMesh have been
+ * tagged by "error();"
 */
 
 // ------------------------------------------------------------
-// Mesh class definition
-class ParallelMesh : public Mesh
+// UnstructuredMesh class definition
+class ParallelMesh : public UnstructuredMesh
 {
  public:
 
@@ -57,7 +57,8 @@ class ParallelMesh : public Mesh
    * Copy-constructor.  This should be able to take a
    * serial or parallel mesh.
    */
-  ParallelMesh (const Mesh& other_mesh);  
+  ParallelMesh (const UnstructuredMesh& other_mesh) :
+    UnstructuredMesh(other_mesh) {}
 
   /**
    * Destructor.

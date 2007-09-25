@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_vsmoother.h,v 1.4 2007-09-20 16:11:38 benkirk Exp $
+// $Id: mesh_smoother_vsmoother.h,v 1.5 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@ typedef LPINT  * LPLPINT;
 
 // Local Includes -----------------------------------
 #include "mesh_smoother.h"
-#include "mesh.h"
+#include "unstructured_mesh.h"
 
 /**
  * This is an implementation of Larisa Branets smoothing
@@ -61,7 +61,7 @@ typedef LPINT  * LPLPINT;
  *
  * \author Derek R. Gaston
  * \date 2006
- * \version $Revision: 1.4 $
+ * \version $Revision: 1.5 $
  */
 
 
@@ -74,7 +74,7 @@ public:
   /**
    * Simple constructor to use for smoothing purposes
    */
-  VariationalMeshSmoother(Mesh& mesh, const double& theta=0.5, const uint& miniter=2,
+  VariationalMeshSmoother(UnstructuredMesh& mesh, const double& theta=0.5, const uint& miniter=2,
 			  const uint& maxiter=5, const uint& miniterBC=5)
     :MeshSmoother(mesh),
      _percent_to_move(1),
@@ -95,7 +95,7 @@ public:
   /**
    * Slightly more complicated constructor for mesh redistribution based on adapt_data
    */
-  VariationalMeshSmoother(Mesh& mesh, std::vector<float>* adapt_data, const double& theta=0.5,
+  VariationalMeshSmoother(UnstructuredMesh& mesh, std::vector<float>* adapt_data, const double& theta=0.5,
 			  const uint& miniter=2, const uint& maxiter=5, const uint& miniterBC=5,
 			  const double& percent_to_move=1)
     :MeshSmoother(mesh),
@@ -118,7 +118,7 @@ public:
    * Even more complicated constructor for mesh redistribution based on adapt_data with an
    * area of interest
    */
-  VariationalMeshSmoother(Mesh& mesh, const Mesh* area_of_interest, std::vector<float>* adapt_data,
+  VariationalMeshSmoother(UnstructuredMesh& mesh, const UnstructuredMesh* area_of_interest, std::vector<float>* adapt_data,
 			  const double& theta=0.5, const uint& miniter=2, const uint& maxiter=5,
 			  const uint& miniterBC=5, const double& percent_to_move=1)
     :MeshSmoother(mesh),
@@ -217,7 +217,7 @@ private:
   /**
    * Area of Interest Mesh
    */
-  const Mesh * _area_of_interest;
+  const UnstructuredMesh * _area_of_interest;
   
   void adjust_adapt_data();
   float adapt_minimum() const;
