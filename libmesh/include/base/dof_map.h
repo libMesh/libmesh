@@ -1,4 +1,4 @@
-// $Id: dof_map.h,v 1.33 2007-08-23 18:03:43 roystgnr Exp $
+// $Id: dof_map.h,v 1.34 2007-09-25 20:15:45 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -618,6 +618,10 @@ private:
    * Total number of degrees of freedom on old dof objects
    */
   unsigned int _n_old_dfs;
+
+#endif
+
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
 
   /**
    * Data structure containing DOF constraints.  The ith
