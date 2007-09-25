@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.50 2007-08-02 20:12:59 benkirk Exp $
+// $Id: elem.h,v 1.51 2007-09-25 20:19:45 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -962,8 +962,10 @@ inline
 Elem::Elem(const unsigned int nn,
 	   const unsigned int ns,
 	   Elem* p) :
-  _parent(p),
-  _p_level(0)
+  _parent(p)
+#ifdef ENABLE_AMR
+  , _p_level(0)
+#endif
 {
   this->subdomain_id() = 0;
   this->processor_id() = 0;
