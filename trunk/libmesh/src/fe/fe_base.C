@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.42 2007-09-25 20:26:00 roystgnr Exp $
+// $Id: fe_base.C,v 1.43 2007-09-25 20:31:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1873,6 +1873,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
                 mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
               assert(s_neigh != libMesh::invalid_uint);
 
+#ifdef ENABLE_AMR
               // Find the minimum p level; we build the h constraint
               // matrix with this and then constrain away all higher p
               // DoFs.
@@ -1885,7 +1886,6 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
               // FIXME - I hate using const_cast<> and avoiding
               // accessor functions; there's got to be a
               // better way to do this!
-#ifdef ENABLE_AMR
               const unsigned int old_elem_level = elem->p_level();
               if (old_elem_level != min_p_level)
                 (const_cast<Elem *>(elem))->hack_p_level(min_p_level);
@@ -2055,8 +2055,8 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
               assert(my_fe->is_hierarchic());
               dof_map.constrain_p_dofs(variable_number, elem,
                                        s, min_p_level);
-#endif // #ifdef ENABLE_AMR
             }
+#endif // #ifdef ENABLE_AMR
         }
     }
 }
