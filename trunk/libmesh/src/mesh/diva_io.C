@@ -1,4 +1,4 @@
-// $Id: diva_io.C,v 1.9 2005-06-11 05:11:31 jwpeterson Exp $
+// $Id: diva_io.C,v 1.10 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -74,7 +74,8 @@ void DivaIO::write_stream (std::ostream& out)
   here();
   std::cerr << "WARNING...  Sure you want to do this?"
 	    << std::endl;
-  Mesh& mesh = const_cast<Mesh&>(MeshOutput<Mesh>::mesh());
+  UnstructuredMesh& mesh = const_cast<UnstructuredMesh&>
+    (MeshOutput<UnstructuredMesh>::mesh());
 
   if (mesh.mesh_dimension() < 3)
     {

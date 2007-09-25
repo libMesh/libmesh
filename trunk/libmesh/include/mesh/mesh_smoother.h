@@ -1,4 +1,4 @@
-// $Id: mesh_smoother.h,v 1.5 2005-06-11 03:59:17 jwpeterson Exp $
+// $Id: mesh_smoother.h,v 1.6 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,7 +29,7 @@
 // Local Includes -----------------------------------
 
 // forward declarations
-class Mesh;
+class UnstructuredMesh;
 
 
 /**
@@ -39,7 +39,7 @@ class Mesh;
  *
  * \author John W. Peterson
  * \date 2002-2003
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 
@@ -52,7 +52,7 @@ public:
    * Constructor.  Sets the mesh reference
    * in the protected data section of the class.
    */
-  MeshSmoother(Mesh& mesh) : _mesh(mesh) {}
+  MeshSmoother(UnstructuredMesh& mesh) : _mesh(mesh) {}
 
   /**
    * Destructor.
@@ -67,7 +67,7 @@ public:
   
 protected:
 
-  Mesh& _mesh;
+  UnstructuredMesh& _mesh;
   
 };
 

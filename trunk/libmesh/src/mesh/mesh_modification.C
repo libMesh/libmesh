@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.30 2007-09-20 16:28:27 benkirk Exp $
+// $Id: mesh_modification.C,v 1.31 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -219,8 +219,8 @@ void MeshTools::Modification::scale (MeshBase& mesh,
 
 
 // ------------------------------------------------------------
-// Mesh class member functions for mesh modification
-void Mesh::all_first_order ()
+// UnstructuredMesh class member functions for mesh modification
+void UnstructuredMesh::all_first_order ()
 {
   /*
    * when the mesh is not prepared,
@@ -338,7 +338,7 @@ void Mesh::all_first_order ()
 
 
 
-void Mesh::all_second_order (const bool full_ordered)
+void UnstructuredMesh::all_second_order (const bool full_ordered)
 {
   /*
    * when the mesh is not prepared,

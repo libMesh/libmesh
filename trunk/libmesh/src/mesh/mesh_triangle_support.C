@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.C,v 1.16 2007-07-02 16:10:52 friedmud Exp $
+// $Id: mesh_triangle_support.C,v 1.17 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 #ifdef HAVE_TRIANGLE
 
 // Triangulates a 2D rectangular region with or without holes
-void MeshTools::Generation::build_delaunay_square(Mesh& mesh,
+void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 						  const unsigned int nx, // num. of elements in x-dir
 						  const unsigned int ny, // num. of elements in y-dir
 						  const Real xmin, const Real xmax,
@@ -218,7 +218,7 @@ void Triangle::destroy(Triangle::triangulateio& t, Triangle::IO_Type io_type)
 
 
 void Triangle::copy_tri_to_mesh(const triangulateio& triangle_data_input,
-				Mesh& mesh_output,
+				UnstructuredMesh& mesh_output,
 				const ElemType type)
 {
   // Transfer the information into the LibMesh mesh.

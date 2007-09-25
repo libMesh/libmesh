@@ -1,4 +1,4 @@
-// $Id: mesh_triangle_support.h,v 1.10 2007-07-02 16:10:51 friedmud Exp $
+// $Id: mesh_triangle_support.h,v 1.11 2007-09-25 19:54:42 roystgnr Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 #include "libmesh.h"
 
 // Forward Declarations
-class Mesh;
+class UnstructuredMesh;
 
 #ifdef HAVE_TRIANGLE
 
@@ -84,7 +84,7 @@ extern "C" {
    * MeshTools::Generation::build_delaunay_square_with_hole(...) routines.
    */
   void copy_tri_to_mesh(const triangulateio& triangle_data_input,
-			Mesh& mesh_output,
+			UnstructuredMesh& mesh_output,
 			const ElemType type);
     
   
@@ -114,7 +114,7 @@ public:
    * specified, a convex hull will be computed for set of input points
    * and the convex hull will be meshed.
    */
-  TriangleInterface(Mesh& mesh)
+  TriangleInterface(UnstructuredMesh& mesh)
     : _mesh(mesh),
       _holes(NULL),
       _elem_type(TRI3),
@@ -225,7 +225,7 @@ private:
   /**
    * Reference to the mesh which is to be created by triangle.
    */
-  Mesh& _mesh;
+  UnstructuredMesh& _mesh;
 
   /**
    * A pointer to a vector of Hole*s.  If this is NULL, there
@@ -444,7 +444,7 @@ namespace MeshTools
      * Delaunay triangulation.  This function internally calls the
      * triangle library written by J.R. Shewchuk.
      */
-    void build_delaunay_square(Mesh& mesh,
+    void build_delaunay_square(UnstructuredMesh& mesh,
 			       const unsigned int nx, // num. of elements in x-dir
 			       const unsigned int ny, // num. of elements in y-dir
 			       const Real xmin, const Real xmax,

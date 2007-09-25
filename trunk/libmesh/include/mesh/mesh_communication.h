@@ -1,4 +1,4 @@
-// $Id: mesh_communication.h,v 1.6 2007-06-06 16:52:05 jwpeterson Exp $
+// $Id: mesh_communication.h,v 1.7 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -33,7 +33,6 @@
 
 // Forward declarations
 class MeshBase;
-class Mesh;
 class BoundaryInfo;
 
 

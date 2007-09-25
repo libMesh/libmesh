@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_laplace.h,v 1.6 2005-06-11 03:59:17 jwpeterson Exp $
+// $Id: mesh_smoother_laplace.h,v 1.7 2007-09-25 19:54:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -44,7 +44,7 @@
  *
  * \author John W. Peterson
  * \date 2002-2003
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 
@@ -57,7 +57,7 @@ public:
    * Constructor.  Sets the constant mesh reference
    * in the protected data section of the class.
    */
-  LaplaceMeshSmoother(Mesh& mesh)
+  LaplaceMeshSmoother(UnstructuredMesh& mesh)
     : MeshSmoother(mesh),
       _initialized(false) {}
 

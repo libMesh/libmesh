@@ -1,4 +1,4 @@
-// $Id: mesh_tetgen_support.C,v 1.26 2007-02-13 03:56:11 spetersen Exp $
+// $Id: mesh_tetgen_support.C,v 1.27 2007-09-25 19:54:42 roystgnr Exp $
  
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 // Local includes
 #include "cell_tet4.h"
 #include "face_tri3.h"
-#include "mesh.h"
+#include "unstructured_mesh.h"
 #include "mesh_tetgen_support.h"
 
 
@@ -272,7 +272,7 @@ typedef TetGenWrapper TetGen_access;
 
 //----------------------------------------------------------------------
 // TetGenMeshInterface class members
-TetGenMeshInterface::TetGenMeshInterface (Mesh& mesh) :
+TetGenMeshInterface::TetGenMeshInterface (UnstructuredMesh& mesh) :
   _mesh         (mesh)
 {
 }
