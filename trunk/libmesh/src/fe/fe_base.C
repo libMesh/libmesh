@@ -1,4 +1,4 @@
-// $Id: fe_base.C,v 1.41 2007-09-18 22:12:51 roystgnr Exp $
+// $Id: fe_base.C,v 1.42 2007-09-25 20:26:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1885,12 +1885,14 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
               // FIXME - I hate using const_cast<> and avoiding
               // accessor functions; there's got to be a
               // better way to do this!
+#ifdef ENABLE_AMR
               const unsigned int old_elem_level = elem->p_level();
               if (old_elem_level != min_p_level)
                 (const_cast<Elem *>(elem))->hack_p_level(min_p_level);
               const unsigned int old_neigh_level = neigh->p_level();
               if (old_neigh_level != min_p_level)
                 (const_cast<Elem *>(neigh))->hack_p_level(min_p_level);
+#endif // #ifdef ENABLE_AMR
 
 	      my_fe->reinit(elem, s);
 
@@ -1919,10 +1921,12 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 
               // We're done with functions that examine Elem::p_level(),
               // so let's unhack those levels
+#ifdef ENABLE_AMR
               if (elem->p_level() != old_elem_level)
                 (const_cast<Elem *>(elem))->hack_p_level(old_elem_level);
               if (neigh->p_level() != old_neigh_level)
                 (const_cast<Elem *>(neigh))->hack_p_level(old_neigh_level);
+#endif // #ifdef ENABLE_AMR
 
 	      const unsigned int n_side_dofs = my_side_dofs.size();
 	      assert(n_side_dofs == neigh_side_dofs.size());
@@ -2041,6 +2045,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
           // constrain dofs shared between
           // active elements and neighbors with
           // lower polynomial degrees
+#ifdef ENABLE_AMR
           const unsigned int min_p_level =
             neigh->min_p_level_by_neighbor(elem, elem->p_level());
           if (min_p_level < elem->p_level())
@@ -2050,6 +2055,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
               assert(my_fe->is_hierarchic());
               dof_map.constrain_p_dofs(variable_number, elem,
                                        s, min_p_level);
+#endif // #ifdef ENABLE_AMR
             }
         }
     }
