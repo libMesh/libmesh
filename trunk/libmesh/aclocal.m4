@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.112 2007-09-20 00:09:30 jwpeterson Exp $
+dnl $Id: aclocal.m4,v 1.113 2007-09-28 20:53:34 roystgnr Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1706,7 +1706,7 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
 		       MPI_LIBS="-lmpich $MPI_LIBS"
 		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
 	               MPI_IMPL="mpich"
-                       AC_MSG_RESULT([Found valid MPICH installlaion...])
+                       AC_MSG_RESULT([Found valid MPICH installation...])
                      ],
 		     [AC_MSG_RESULT([Could not link in the MPI library...]); enablempi=no] )
 
@@ -1758,7 +1758,44 @@ AC_SUBST(MPI_INCLUDES_PATHS)
 ])dnl ACX_MPI
 
 
+dnl ----------------------------------------------------------------------------
+dnl check for gcc name demangling function
+dnl Copyright © 2004 Neil Ferguson <nferguso@eso.org>
+dnl
+dnl Copying and distribution of this file, with or without
+dnl modification, are permitted in any medium without royalty
+dnl provided the copyright notice and this notice are preserved.
+dnl ----------------------------------------------------------------------------
+AC_DEFUN([AX_CXX_GCC_ABI_DEMANGLE],
+[AC_CACHE_CHECK(whether the compiler supports GCC C++ ABI name demangling,
+ac_cv_cxx_gcc_abi_demangle,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([#include <typeinfo>
+#include <cxxabi.h>
+#include <string>
 
+template<typename TYPE>
+class A {};
+],[A<int> instance;
+int status = 0;
+char* c_name = 0;
+
+c_name = abi::__cxa_demangle(typeid(instance).name(), 0, 0, &status);
+
+std::string name(c_name);
+free(c_name);
+
+return name == "A<int>";
+],
+ ac_cv_cxx_gcc_abi_demangle=yes, ac_cv_cxx_gcc_abi_demangle=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_gcc_abi_demangle" = yes; then
+  AC_DEFINE(HAVE_GCC_ABI_DEMANGLE,1,
+            [define if the compiler supports GCC C++ ABI name demangling])
+fi
+])
 
 
 dnl ----------------------------------------------------------------------------

@@ -8092,6 +8092,94 @@ fi
 done
 
 
+{ echo "$as_me:$LINENO: checking whether the compiler supports GCC C++ ABI name demangling" >&5
+echo $ECHO_N "checking whether the compiler supports GCC C++ ABI name demangling... $ECHO_C" >&6; }
+if test "${ac_cv_cxx_gcc_abi_demangle+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <typeinfo>
+#include <cxxabi.h>
+#include <string>
+
+template<typename TYPE>
+class A {};
+
+int
+main ()
+{
+A<int> instance;
+int status = 0;
+char* c_name = 0;
+
+c_name = abi::__cxa_demangle(typeid(instance).name(), 0, 0, &status);
+
+std::string name(c_name);
+free(c_name);
+
+return name == "A<int>";
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_cv_cxx_gcc_abi_demangle=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_cxx_gcc_abi_demangle=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_cxx_gcc_abi_demangle" >&5
+echo "${ECHO_T}$ac_cv_cxx_gcc_abi_demangle" >&6; }
+if test "$ac_cv_cxx_gcc_abi_demangle" = yes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_GCC_ABI_DEMANGLE 1
+_ACEOF
+
+fi
+
+
 
 if test "$CXX" = xlC_r; then
     # Extract the first word of "mpCC_r", so it can be a program name with args.
@@ -9937,8 +10025,8 @@ if test $ac_cv_lib_mpich_MPI_Init = yes; then
 		       MPI_LIBS="-lmpich $MPI_LIBS"
 		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
 	               MPI_IMPL="mpich"
-                       { echo "$as_me:$LINENO: result: Found valid MPICH installlaion..." >&5
-echo "${ECHO_T}Found valid MPICH installlaion..." >&6; }
+                       { echo "$as_me:$LINENO: result: Found valid MPICH installation..." >&5
+echo "${ECHO_T}Found valid MPICH installation..." >&6; }
 
 else
   { echo "$as_me:$LINENO: result: Could not link in the MPI library..." >&5
@@ -10648,8 +10736,8 @@ if test $ac_cv_lib_mpich_MPI_Init = yes; then
 		       MPI_LIBS="-lmpich $MPI_LIBS"
 		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
 	               MPI_IMPL="mpich"
-                       { echo "$as_me:$LINENO: result: Found valid MPICH installlaion..." >&5
-echo "${ECHO_T}Found valid MPICH installlaion..." >&6; }
+                       { echo "$as_me:$LINENO: result: Found valid MPICH installation..." >&5
+echo "${ECHO_T}Found valid MPICH installation..." >&6; }
 
 else
   { echo "$as_me:$LINENO: result: Could not link in the MPI library..." >&5
