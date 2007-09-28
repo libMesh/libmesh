@@ -1,5 +1,5 @@
 
-// $Id: mesh_refinement_flagging.C,v 1.33 2007-09-25 19:54:42 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.34 2007-09-28 15:45:51 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -267,6 +267,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   for (; elem_it != elem_end; ++elem_it)
     {
       unsigned int eid = (*elem_it)->id();
+      assert(eid < error_per_cell.size());
       sorted_error.push_back
         (std::make_pair(error_per_cell[eid], eid));
     }
