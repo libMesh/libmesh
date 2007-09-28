@@ -1,4 +1,4 @@
-// $Id: error_vector.C,v 1.15 2006-12-12 23:29:12 roystgnr Exp $
+// $Id: error_vector.C,v 1.16 2007-09-28 16:27:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -213,7 +213,8 @@ bool ErrorVector::is_active_elem (unsigned int i) const
 }
 
 
-void ErrorVector::plot_error(std::string filename, Mesh& oldmesh) const
+void ErrorVector::plot_error(const std::string& filename,
+                             const Mesh& oldmesh) const
 {
   Mesh mesh(oldmesh);
   mesh.all_first_order();

@@ -1,4 +1,4 @@
-// $Id: error_vector.h,v 1.7 2006-10-26 21:05:12 roystgnr Exp $
+// $Id: error_vector.h,v 1.8 2007-09-28 16:27:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -146,7 +146,8 @@ public:
    * the file extension in \p filename, of the error values on
    * the active elements of \p mesh.
    */
-  void plot_error(std::string filename, Mesh& mesh) const;
+  void plot_error(const std::string &filename,
+		  const Mesh& mesh) const;
 
 protected:
   /**
