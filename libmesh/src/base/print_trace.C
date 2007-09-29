@@ -26,17 +26,17 @@
 // DEALINGS IN THE SOFTWARE.
 
 
+#include "libmesh_config.h"
+#include "print_trace.h"
+
+#if defined(HAVE_GCC_ABI_DEMANGLE) && defined(HAVE_DLADDR)
+
 #include <dlfcn.h>
 #include <cxxabi.h>
 #include <iostream>
 #include <string>
 #include <cstdlib>
 #include <cstring>
-
-#include "libmesh_config.h"
-#include "print_trace.h"
-
-#ifdef HAVE_GCC_ABI_DEMANGLE
 
 std::string abi_demangle(const char *name)
 {
@@ -51,6 +51,7 @@ std::string abi_demangle(const char *name)
 
 void print_trace()
 {
+std::cerr << "Trying print_trace()" << std::endl;
     Dl_info info;
     void **frame = static_cast<void **>(__builtin_frame_address(0));
     void **bp = static_cast<void **>(*frame);
