@@ -29,7 +29,7 @@
 #include "libmesh_config.h"
 #include "print_trace.h"
 
-#if defined(HAVE_GCC_ABI_DEMANGLE) && defined(HAVE_DLADDR)
+#if defined(HAVE_GCC_ABI_DEMANGLE) && defined(HAVE_DLADDR) && defined(__USE_GNU)
 
 #include <dlfcn.h>
 #include <cxxabi.h>
