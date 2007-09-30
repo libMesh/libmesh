@@ -119,6 +119,9 @@
 /* define if the compiler has the strstream header */
 #undef HAVE_STRSTREAM
 
+/* define if the compiler has the dladdr function */
+#undef HAVE_DLADDR
+
 /* define if the compiler has abi::__cxa_demangle */
 #undef HAVE_GCC_ABI_DEMANGLE
 
