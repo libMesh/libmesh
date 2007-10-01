@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.51 2007-09-25 20:19:45 roystgnr Exp $
+// $Id: elem.h,v 1.52 2007-10-01 18:34:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -489,6 +489,12 @@ class Elem : public ReferenceCountedObject<Elem>,
    * the element was not created via refinement, i.e. was read from file.
    */
   Elem* parent ();
+
+  /**
+   * @Sets the stored pointer to the element's parent.
+   * Dangerous to use in high-level code.
+   */
+  void set_parent (Elem* p);
 
   /**
    * @returns a pointer to the element's top-most (i.e. level-0) parent.
@@ -1282,6 +1288,13 @@ inline
 Elem* Elem::parent ()
 {
   return _parent;
+}
+
+
+inline
+void set_parent (Elem* p)
+{
+  _parent = p;
 }
 
 
