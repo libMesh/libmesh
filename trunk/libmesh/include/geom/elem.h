@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.52 2007-10-01 18:34:22 roystgnr Exp $
+// $Id: elem.h,v 1.53 2007-10-01 18:44:02 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -1292,7 +1292,7 @@ Elem* Elem::parent ()
 
 
 inline
-void set_parent (Elem* p)
+void Elem::set_parent (Elem* p)
 {
   _parent = p;
 }
