@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.56 2007-09-07 23:14:49 jwpeterson Exp $
+// $Id: mesh_base.h,v 1.57 2007-10-01 23:13:21 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -57,8 +57,8 @@ class PointLocatorBase;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2007-09-07 23:14:49 $
- * \version $Revision: 1.56 $
+ * \date    $Date: 2007-10-01 23:13:21 $
+ * \version $Revision: 1.57 $
  */
 
 
@@ -123,6 +123,12 @@ public:
   virtual unsigned int n_nodes () const = 0; 
 
   /**
+   * Returns a number greater than or equal to the maximum node id in the
+   * mesh.
+   */
+  virtual unsigned int max_node_id () const = 0;
+
+  /**
    * Reserves space for a known number of nodes.
    * Note that this method may or may not do anything, depending
    * on the actual \p Mesh implementation.  If you know the number
@@ -135,6 +141,12 @@ public:
    * Returns the number of elements in the mesh.
    */
   virtual unsigned int n_elem () const = 0; 
+
+  /**
+   * Returns a number greater than or equal to the maximum element id in the
+   * mesh.
+   */
+  virtual unsigned int max_elem_id () const = 0;
 
   /**
    * Reserves space for a known number of elements.
@@ -234,6 +246,12 @@ public:
    * Add elem \p e to the end of the element array.
    */
   virtual Elem* add_elem (Elem* e) = 0;
+
+  /**
+   * Insert elem \p e to the element array, preserving its id
+   * and replacing/deleting any existing element with the same id.
+   */
+  virtual Elem* insert_elem (Elem* e) = 0;
 
   /**
    * Removes element \p e from the mesh. Note that calling this

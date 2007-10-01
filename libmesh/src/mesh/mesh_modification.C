@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.31 2007-09-25 19:54:42 roystgnr Exp $
+// $Id: mesh_modification.C,v 1.32 2007-10-01 23:13:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -233,30 +233,16 @@ void UnstructuredMesh::all_first_order ()
 
   START_LOG("all_first_order()", "Mesh");
 
-  /*
-   * Store some parent ID data to make it possible
-   * to reconstruct the adaptivity tree
-   */
-  std::vector<unsigned int> parent_ids(_elements.size());
-  for (unsigned int e=0; e<_elements.size(); e++)
-    {
-      Elem* parent = _elements[e]->parent();
-      if (parent)
-        {
-          assert(parent == _elements[parent->id()]);
-          parent_ids[e] = parent->id();
-        }
-    }
-
   /**
-   * Loop over the high-ordered elements in the _elements vector.
+   * Loop over the high-ordered elements.
    * First make sure they _are_ indeed high-order, and then replace
    * them with an equivalent first-order element.
    */
-  for (unsigned int e=0; e<_elements.size(); e++)
+  const_element_iterator endit = elements_end();
+  for (const_element_iterator it = elements_begin();
+       it != endit; ++it)
     {
-      // the second-order element
-      Elem* so_elem = _elements[e];
+      Elem* so_elem = *it;
 
       assert (so_elem != NULL);
 
@@ -264,8 +250,7 @@ void UnstructuredMesh::all_first_order ()
        * build the first-order equivalent, add to
        * the new_elements list.
        */
-      Elem *newparent = so_elem->parent() ?
-        _elements[parent_ids[e]] : NULL;
+      Elem *newparent = so_elem->parent();
       Elem* lo_elem = Elem::build
         (Elem::first_order_equivalent_type
           (so_elem->type()), newparent).release();
@@ -276,6 +261,15 @@ void UnstructuredMesh::all_first_order ()
        */
       if (newparent)
         newparent->add_child(lo_elem);
+
+      /*
+       * Reset the parent links of any child elements
+       */
+      if (so_elem->has_children())
+        {
+          for (unsigned int c=0; c != so_elem->n_children(); ++c)
+            so_elem->child(c)->set_parent(lo_elem);
+        }
 
       /*
        * Copy as much data to the new element as makes sense
@@ -297,37 +291,28 @@ void UnstructuredMesh::all_first_order ()
 
       /**
        * If the second order element had any boundary conditions they
-       * should be transfered to the first-order element, and then
-       * removed from the BoundaryInfo data structure.
+       * should be transfered to the first-order element.  The old
+       * boundary conditions will be removed from the BoundaryInfo
+       * data structure by insert_elem.
        */
-      {
-	assert (lo_elem->n_sides() == so_elem->n_sides());
+      assert (lo_elem->n_sides() == so_elem->n_sides());
 	
-	for (unsigned int s=0; s<so_elem->n_sides(); s++)
-	  {
-	    const short int boundary_id =
-	      this->boundary_info->boundary_id (so_elem, s);
+      for (unsigned int s=0; s<so_elem->n_sides(); s++)
+	{
+	  const short int boundary_id =
+	    this->boundary_info->boundary_id (so_elem, s);
 	    
-	    if (boundary_id != this->boundary_info->invalid_id)
-	      this->boundary_info->add_side (lo_elem, s, boundary_id);
-	  }
-	
-	/**
-	 * We have taken any boundary conditions the second-order
-	 * element may have had.  Since we are about to delete
-	 * the second-order element, we should first un-associate
-	 * any boundary conditions it has.
-	 */
-	this->boundary_info->remove (so_elem);
-      }
+	  if (boundary_id != this->boundary_info->invalid_id)
+	    this->boundary_info->add_side (lo_elem, s, boundary_id);
+	}
 
       /*
        * The new first-order element is ready.
-       * Delete the second-order element and replace it with
-       * the first-order element.
+       * Inserting it into the mesh will replace and delete
+       * the second-order element.
        */
-      delete so_elem;
-      _elements[e] = lo_elem;
+      lo_elem->set_id(so_elem->id());
+      this->insert_elem(lo_elem);
     }
 
   STOP_LOG("all_first_order()", "Mesh");
@@ -350,11 +335,11 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
     this->renumber_nodes_and_elements ();
 
   /*
-   * If the mesh is already second order
+   * If the mesh is empty or already second order
    * then we have nothing to do
    */
-  assert(_elements[0] != NULL);
-  if (_elements[0]->default_order() != FIRST)
+  if (!this->n_elem() ||
+      (*(this->elements_begin()))->default_order() != FIRST)
     return;
 
   // does this work also in parallel?
@@ -389,7 +374,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * to Edge3.  Something like 1/2 of n_nodes() have
        * to be added
        */
-      this->_nodes.reserve(static_cast<unsigned int>(1.5*this->_nodes.size()));
+      this->reserve_nodes(static_cast<unsigned int>(1.5*this->n_nodes()));
       break;
 
     case 2:
@@ -397,7 +382,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * in 2D, either refine from Tri3 to Tri6 (double the nodes)
        * or from Quad4 to Quad8 (again, double) or Quad9 (2.25 that much)
        */
-      this->_nodes.reserve(static_cast<unsigned int>(2*this->_nodes.size()));
+      this->reserve_nodes(static_cast<unsigned int>(2*this->n_nodes()));
       break;
 
 
@@ -408,7 +393,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * quite some nodes, and since we do not want to overburden the memory by
        * a too conservative guess, use the lower bound
        */
-      this->_nodes.reserve(static_cast<unsigned int>(2.5*this->_nodes.size()));
+      this->reserve_nodes(static_cast<unsigned int>(2.5*this->n_nodes()));
       break;
 	
     default:
@@ -434,10 +419,12 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    * them with an equivalent second-order element.  Don't
    * forget to delete the low-order element, or else it will leak!
    */
-  for (unsigned int e=0; e<_elements.size(); e++)
+  const_element_iterator endit = elements_end();
+  for (const_element_iterator it = elements_begin();
+       it != endit; ++it)
     {
       // the linear-order element
-      Elem* lo_elem = _elements[e];
+      Elem* lo_elem = *it;
 
       assert (lo_elem != NULL);
 
@@ -556,38 +543,28 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
       /**
        * If the linear element had any boundary conditions they
-       * should be transfered to the second-order element, and then
-       * removed from the BoundaryInfo data structure.
+       * should be transfered to the second-order element.  The old
+       * boundary conditions will be removed from the BoundaryInfo
+       * data structure by insert_elem.
        */
-      {
-	assert (lo_elem->n_sides() == so_elem->n_sides());
+      assert (lo_elem->n_sides() == so_elem->n_sides());
 	
-	for (unsigned int s=0; s<lo_elem->n_sides(); s++)
-	  {
-	    const short int boundary_id =
-	      this->boundary_info->boundary_id (lo_elem, s);
+      for (unsigned int s=0; s<lo_elem->n_sides(); s++)
+	{
+	  const short int boundary_id =
+	    this->boundary_info->boundary_id (lo_elem, s);
 	    
-	    if (boundary_id != this->boundary_info->invalid_id)
-	      this->boundary_info->add_side (so_elem, s, boundary_id);
-	  }
-	
-	/**
-	 * We have taken any boundary conditions the low-ordered
-	 * element may have had.  Since we are about to delete
-	 * the low-ordered element, we should first un-associate
-	 * any boundary conditions it has.
-	 */
-	this->boundary_info->remove (lo_elem);
-      }
+	  if (boundary_id != this->boundary_info->invalid_id)
+	    this->boundary_info->add_side (so_elem, s, boundary_id);
+	}
 
-      
       /*
        * The new second-order element is ready.
-       * Delete the linear element and replace it with
-       * the second-order element.
+       * Inserting it into the mesh will replace and delete
+       * the first-order element.
        */
-      delete lo_elem;
-      _elements[e] = so_elem;
+      so_elem->set_id(lo_elem->id());
+      this->insert_elem(so_elem);
     }
 
 

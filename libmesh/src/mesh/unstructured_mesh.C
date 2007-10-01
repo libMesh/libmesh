@@ -1,4 +1,4 @@
-// $Id: unstructured_mesh.C,v 1.1 2007-09-25 19:59:23 roystgnr Exp $
+// $Id: unstructured_mesh.C,v 1.2 2007-10-01 23:13:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,11 +26,11 @@
 #include <unistd.h>  // for unlink()
 
 // Local includes
+#include "boundary_info.h"
 #include "unstructured_mesh.h"
 #include "mesh_communication.h"
 #include "libmesh_logging.h"
 #include "elem.h"
-#include "boundary_info.h"
 
 #include "diva_io.h"
 #include "exodusII_io.h"
@@ -64,29 +64,32 @@ UnstructuredMesh::UnstructuredMesh (unsigned int d) :
 
 
 
-UnstructuredMesh::UnstructuredMesh (const UnstructuredMesh& other_mesh)
-  :  MeshBase(other_mesh)
+void UnstructuredMesh::copy_nodes_and_elements 
+  (const UnstructuredMesh& other_mesh)
 {
+  // We're assuming our subclass data needs no copy
+  assert(_n_sbd == other_mesh._n_sbd);
+  assert(_n_parts == other_mesh._n_parts);
+  assert(_dim == other_mesh._dim);
+  assert(_is_prepared == other_mesh._is_prepared);
+
   //Copy in Nodes
   {
     //Preallocate Memory if necessary
-    _nodes.reserve(other_mesh._nodes.size());
+    this->reserve_nodes(other_mesh.n_nodes());
     
-    std::vector<Node*>::const_iterator it = other_mesh._nodes.begin();
-    const std::vector<Node*>::const_iterator end = other_mesh._nodes.end();
+    const_node_iterator it = other_mesh.nodes_begin();
+    const_node_iterator end = other_mesh.nodes_end();
 
     for (; it != end; ++it)
-      _nodes.push_back(new Node(*(*it))); //Create new nodes using the Node copy constructor.
+      this->add_point(*(*it)); //Add new nodes in old node Point locations
   }
   
   //Copy in Elements
   {
     //Preallocate Memory if necessary
-    _elements.reserve(other_mesh._elements.size());
+    this->reserve_elem(other_mesh.n_elem());
     
-    //std::vector<Elem*>::const_iterator it = other_mesh._elements.begin();
-    //const std::vector<Elem*>::const_iterator end = other_mesh._elements.end();
-
     // Loop over the elements
     MeshBase::const_element_iterator it = other_mesh.elements_begin();
     const MeshBase::const_element_iterator end = other_mesh.elements_end();
@@ -98,7 +101,7 @@ UnstructuredMesh::UnstructuredMesh (const UnstructuredMesh& other_mesh)
       Elem *old = *it;
       //Build a new element
       Elem *newparent = old->parent() ?
-          _elements[old->parent()->id()] : NULL;
+          this->elem(old->parent()->id()) : NULL;
       AutoPtr<Elem> ap = Elem::build(old->type(), newparent);
       Elem * elem = ap.release();
 
@@ -121,10 +124,10 @@ UnstructuredMesh::UnstructuredMesh (const UnstructuredMesh& other_mesh)
 
       //Assign all the nodes
       for(uint i=0;i<elem->n_nodes();i++)
-        elem->set_node(i) = _nodes[old->node(i)];
+        elem->set_node(i) = &this->node(old->node(i));
       
       //Hold onto it
-      _elements.push_back(elem);
+      this->add_elem(elem);
     }
   }
   
@@ -136,235 +139,10 @@ UnstructuredMesh::UnstructuredMesh (const UnstructuredMesh& other_mesh)
 
 UnstructuredMesh::~UnstructuredMesh ()
 {
-  this->clear ();
+//  this->clear ();  // Nothing to clear at this level
   
   assert (!libMesh::closed());
 }
-
-
-
-
-
-const Point& UnstructuredMesh::point (const unsigned int i) const
-{
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);  
-
-  return (*_nodes[i]);
-}
-
-
-
-
-
-const Node& UnstructuredMesh::node (const unsigned int i) const
-{
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);  
-  
-  return (*_nodes[i]);
-}
-
-
-
-
-
-Node& UnstructuredMesh::node (const unsigned int i)
-{
-  if (i >= this->n_nodes())
-    {
-      std::cout << " i=" << i
-		<< ", n_nodes()=" << this->n_nodes()
-		<< std::endl;
-      error();
-    }
-  
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-
-  return (*_nodes[i]);
-}
-
-
-
-const Node* UnstructuredMesh::node_ptr (const unsigned int i) const
-{
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);  
-  
-  return _nodes[i];
-}
-
-
-
-
-Node* & UnstructuredMesh::node_ptr (const unsigned int i)
-{
-  assert (i < this->n_nodes());
-
-  return _nodes[i];
-}
-
-
-
-
-Elem* UnstructuredMesh::elem (const unsigned int i) const
-{
-  assert (i < this->n_elem());
-  assert (_elements[i] != NULL);
-  
-  return _elements[i];
-}
-
-
-
-
-
-
-void UnstructuredMesh::clear ()
-{
-  // Call parent clear function
-  MeshBase::clear();
-
-  
-  // Clear our elements and nodes
-  {
-    std::vector<Elem*>::iterator       it  = _elements.begin();
-    const std::vector<Elem*>::iterator end = _elements.end();
-
-    // There is no need to remove the elements from
-    // the BoundaryInfo data structure since we
-    // already cleared it.
-    for (; it != end; ++it)
-      delete *it;
-
-    _elements.clear();
-  }
-
-  // clear the nodes data structure
-  {
-    std::vector<Node*>::iterator       it  = _nodes.begin();
-    const std::vector<Node*>::iterator end = _nodes.end();
-
-    // There is no need to remove the nodes from
-    // the BoundaryInfo data structure since we
-    // already cleared it.
-    for (; it != end; ++it)
-      delete *it;
-    
-    _nodes.clear();
-  }
-}
-
-
-
-
-
-Node* UnstructuredMesh::add_point (const Point& p)
-{  
-  _nodes.push_back (Node::build(p, this->n_nodes()).release());
-  
-  return _nodes.back();
-}
-
-
-
-Elem* UnstructuredMesh::add_elem (Elem* e)
-{
-  if (e != NULL)
-    e->set_id (_elements.size());
-  
-  _elements.push_back(e);
-
-  return e;
-}
-
-
-
-void UnstructuredMesh::delete_elem(Elem* e)
-{
-  assert (e != NULL);
-
-  // Initialize an iterator to eventually point to the element we want to delete
-  std::vector<Elem*>::iterator pos = _elements.end();
-  
-  // In many cases, e->id() gives us a clue as to where e
-  // is located in the _elements vector.  Try that first
-  // before trying the O(n_elem) search.
-  assert (e->id() < _elements.size());
-
-  if (_elements[e->id()] == e)
-    {
-      // We found it!
-      pos = _elements.begin();
-      std::advance(pos, e->id());
-    }
-
-  else
-    {
-      // This search is O(n_elem)
-      pos = std::find (_elements.begin(),
-		       _elements.end(),
-		       e);
-    }
-
-  // Huh? Element not in the vector?
-  assert (pos != _elements.end());
-
-  // Remove the element from the BoundaryInfo object
-  this->boundary_info->remove(e);
-  
-  // delete the element
-  delete e;
-  
-  // explicitly NULL the pointer
-  *pos = NULL;
-}
-
-
-
-void UnstructuredMesh::delete_node(Node* n)
-{
-  assert (n != NULL);
-  assert (n->id() < _nodes.size());
-
-  // Initialize an iterator to eventually point to the element we want
-  // to delete
-  std::vector<Node*>::iterator pos;
-
-  // In many cases, e->id() gives us a clue as to where e
-  // is located in the _elements vector.  Try that first
-  // before trying the O(n_elem) search.
-  if (_nodes[n->id()] == n)
-    {
-      pos = _nodes.begin();
-      std::advance(pos, n->id());
-    }
-  else
-    {
-      pos = std::find (_nodes.begin(),
-		       _nodes.end(),
-		       n);
-    }
-  
-  // Huh? Node not in the vector?
-  assert (pos != _nodes.end());
-
-  // Delete the node from the BoundaryInfo object
-  this->boundary_info->remove(n);
-  
-  // delete the node
-  delete n;
-  
-  // explicitly NULL the pointer
-  *pos = NULL;
-}
-
-
-
 
 
 
@@ -571,116 +349,6 @@ void UnstructuredMesh::find_neighbors()
 
   STOP_LOG("find_neighbors()", "Mesh");
 }
-
-
-
-
-
-
-void UnstructuredMesh::renumber_nodes_and_elements ()
-{
-  
-  START_LOG("renumber_nodes_and_elem()", "Mesh");
-  
-  // node and element id counters
-  unsigned int next_free_elem = 0;
-  unsigned int next_free_node = 0;
-
-  // Loop over the elements.  Note that there may
-  // be NULLs in the _elements vector from the coarsening
-  // process.  Pack the elements in to a contiguous array
-  // and then trim any excess.
-  {      
-    std::vector<Elem*>::iterator in        = _elements.begin();
-    std::vector<Elem*>::iterator out       = _elements.begin();
-    const std::vector<Elem*>::iterator end = _elements.end();
-
-    for (; in != end; ++in)
-      if (*in != NULL)
-	{
-	  Elem* elem = *in;
-	  
-	  *out = *in;
-	  ++out;
-	  
-	  // Increment the element counter
-	  elem->set_id (next_free_elem++);
-	  
-	  // Loop over this element's nodes.  Number them,
-	  // if they have not been numbered already.  Also,
-	  // position them in the _nodes vector so that they
-	  // are packed contiguously from the beginning.
-	  for (unsigned int n=0; n<elem->n_nodes(); n++)
-	    if (elem->node(n) == next_free_node)     // don't need to process
-	      next_free_node++;                      // [(src == dst) below]
-
-	    else if (elem->node(n) > next_free_node) // need to process
-	      {
-		// The source and destination indices
-		// for this node
-		const unsigned int src_idx = elem->node(n);
-		const unsigned int dst_idx = next_free_node++;
-
-		// ensure we want to swap valid nodes
-		assert (_nodes[src_idx] != NULL);
-		assert (_nodes[dst_idx] != NULL);
-		
-		// Swap the source and destination nodes
-		std::swap (_nodes[src_idx],
-			   _nodes[dst_idx] );
-
-		// Set proper indices
-		_nodes[src_idx]->set_id (src_idx);
-		_nodes[dst_idx]->set_id (dst_idx);
-	      }
-	}
-
-    // Erase any additional storage. These elements have been
-    // copied into NULL voids by the procedure above, and are
-    // thus repeated and unnecessary.
-    _elements.erase (out, end);
-  }
-
-  // Any nodes in the vector >= _nodes[next_free_node]
-  // are not connected to any elements and may be deleted
-  // if desired.
-
-  // (This code block will erase the unused nodes)
-  // Now, delete the unused nodes
-  {
-    std::vector<Node*>::iterator nd        = _nodes.begin();
-    const std::vector<Node*>::iterator end = _nodes.end();
-
-    std::advance (nd, next_free_node);
-    
-    for (std::vector<Node*>::iterator it=nd;
-	 it != end; ++it)
-      {
-	assert (*it != NULL);
-
-	// remove any boundary information associated with
-	// this node
-	this->boundary_info->remove (*it);
-	
-	// delete the node
-	delete *it;
-	*it = NULL;
-      }
-
-    _nodes.erase (nd, end);
-  }
-  
-
-  assert (next_free_elem == _elements.size());
-  assert (next_free_node == _nodes.size());
-  
-  STOP_LOG("renumber_nodes_and_elem()", "Mesh");
-}
-
-
-
-
-
 
 
 
@@ -1110,9 +778,9 @@ bool UnstructuredMesh::contract ()
   // Flag indicating if this call actually changes the mesh
   bool mesh_changed = false;
 
-  std::vector<Elem*>::iterator in        = _elements.begin();
-  std::vector<Elem*>::iterator out       = _elements.begin();
-  const std::vector<Elem*>::iterator end = _elements.end();
+  element_iterator in        = elements_begin();
+  element_iterator out       = elements_begin();
+  const element_iterator end = elements_end();
 
 #ifdef DEBUG
   for ( ; in != end; ++in)
@@ -1121,10 +789,8 @@ bool UnstructuredMesh::contract ()
 	Elem* elem = *in;
 	assert(elem->active() || elem->subactive() || elem->ancestor());
       }
-  in = _elements.begin();
+  in = elements_begin();
 #endif
-  
-  unsigned int next_free_elem = 0;
   
   // Loop over the elements.   
   for ( ; in != end; ++in)
@@ -1145,8 +811,9 @@ bool UnstructuredMesh::contract ()
 	      }
 
 	    // Delete the element
-	    delete elem;
-	    *in = NULL;
+	    // This just sets a pointer to NULL, and doesn't
+	    // invalidate any iterators
+	    this->delete_elem(elem);
 	    
 	    // the mesh has certainly changed
 	    mesh_changed = true;
@@ -1158,19 +825,11 @@ bool UnstructuredMesh::contract ()
 	      elem->contract();
 	    else
 	      assert (elem->ancestor());
-
-	    // These elements are kept, pack them
-	    // contiguously in the _elements vector
-	    elem->set_id(next_free_elem++);
-	    *out = elem;
-	    ++out;
 	  }
       }
 
-  // Erase any additional storage. These elements have been
-  // copied into NULL voids by the procedure above, and are
-  // thus repeated and unnecessary.
-  _elements.erase (out, end);
+  // Strip any newly-created NULL voids out of the element array
+  this->renumber_nodes_and_elements();
 
   STOP_LOG ("contract()", "Mesh");
   
