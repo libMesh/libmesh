@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.C,v 1.11 2007-09-18 23:08:17 roystgnr Exp $
+// $Id: exact_error_estimator.C,v 1.12 2007-10-01 23:04:38 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -221,7 +221,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
             {
               // Compute a projection onto the parent
               DenseVector<Number> Uparent;
-              FEBase::coarsened_dof_values(*(system.solution),
+              FEBase::coarsened_dof_values(*(system.current_local_solution),
                                            dof_map, parent, Uparent,
                                            var, false);
 
