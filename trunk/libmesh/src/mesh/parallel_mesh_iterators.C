@@ -1,6 +1,6 @@
-// $Id: mesh_iterators.C,v 1.10 2007-09-25 19:54:42 roystgnr Exp $
+// $Id: parallel_mesh_iterators.C,v 1.1 2007-10-01 23:13:22 roystgnr Exp $
 
-// The libUnstructuredMesh Finite Element Library.
+// The libParallelMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 
 // Local includes
 // #include "mesh_base.h"
-#include "unstructured_mesh.h"
+#include "parallel_mesh.h"
 #include "elem.h"
 
 // This file contains the implementation of all the different iterator
@@ -32,8 +32,8 @@
 
 
 // default begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::elements_begin ()
+ParallelMesh::element_iterator
+ParallelMesh::elements_begin ()
 {
   Predicates::NotNull<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -41,8 +41,8 @@ UnstructuredMesh::elements_begin ()
 
 
 // active elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::active_elements_begin ()
+ParallelMesh::element_iterator
+ParallelMesh::active_elements_begin ()
 {
   Predicates::Active<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -50,8 +50,8 @@ UnstructuredMesh::active_elements_begin ()
 
 
 // not active elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::not_active_elements_begin ()
+ParallelMesh::element_iterator
+ParallelMesh::not_active_elements_begin ()
 {
   Predicates::NotActive<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -59,8 +59,8 @@ UnstructuredMesh::not_active_elements_begin ()
 
 
 // subactive elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::subactive_elements_begin ()
+ParallelMesh::element_iterator
+ParallelMesh::subactive_elements_begin ()
 {
   Predicates::SubActive<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -68,8 +68,8 @@ UnstructuredMesh::subactive_elements_begin ()
 
 
 // not subactive elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::not_subactive_elements_begin ()
+ParallelMesh::element_iterator
+ParallelMesh::not_subactive_elements_begin ()
 {
   Predicates::NotSubActive<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -77,8 +77,8 @@ UnstructuredMesh::not_subactive_elements_begin ()
 
 
 // local elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::local_elements_begin ()
+ParallelMesh::element_iterator
+ParallelMesh::local_elements_begin ()
 {
   Predicates::Local<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -86,8 +86,8 @@ UnstructuredMesh::local_elements_begin ()
 
 
 // not_local elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::not_local_elements_begin ()
+ParallelMesh::element_iterator
+ParallelMesh::not_local_elements_begin ()
 {
   Predicates::NotLocal<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -95,8 +95,8 @@ UnstructuredMesh::not_local_elements_begin ()
 
 
 // active local elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::active_local_elements_begin ()
+ParallelMesh::element_iterator
+ParallelMesh::active_local_elements_begin ()
 {
   Predicates::ActiveLocal<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -104,8 +104,8 @@ UnstructuredMesh::active_local_elements_begin ()
 
 
 // active_not_local elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::active_not_local_elements_begin ()
+ParallelMesh::element_iterator
+ParallelMesh::active_not_local_elements_begin ()
 {
   Predicates::ActiveNotLocal<elem_iterator_imp> p;
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -113,8 +113,8 @@ UnstructuredMesh::active_not_local_elements_begin ()
 
 
 // level elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::level_elements_begin (const unsigned int level)
+ParallelMesh::element_iterator
+ParallelMesh::level_elements_begin (const unsigned int level)
 {
   Predicates::Level<elem_iterator_imp> p(level);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -122,8 +122,8 @@ UnstructuredMesh::level_elements_begin (const unsigned int level)
 
 
 // not level elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::not_level_elements_begin (const unsigned int level)
+ParallelMesh::element_iterator
+ParallelMesh::not_level_elements_begin (const unsigned int level)
 {
   Predicates::NotLevel<elem_iterator_imp> p(level);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -132,8 +132,8 @@ UnstructuredMesh::not_level_elements_begin (const unsigned int level)
 
 
 // pid elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::pid_elements_begin (const unsigned int proc_id)
+ParallelMesh::element_iterator
+ParallelMesh::pid_elements_begin (const unsigned int proc_id)
 {
   Predicates::PID<elem_iterator_imp> p(proc_id);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -141,8 +141,8 @@ UnstructuredMesh::pid_elements_begin (const unsigned int proc_id)
 
 
 // type elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::type_elements_begin (const ElemType type)
+ParallelMesh::element_iterator
+ParallelMesh::type_elements_begin (const ElemType type)
 {
   Predicates::Type<elem_iterator_imp> p(type);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -151,8 +151,8 @@ UnstructuredMesh::type_elements_begin (const ElemType type)
 
 
 // active type elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::active_type_elements_begin (const ElemType type)
+ParallelMesh::element_iterator
+ParallelMesh::active_type_elements_begin (const ElemType type)
 {
   Predicates::ActiveType<elem_iterator_imp> p(type);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -161,8 +161,8 @@ UnstructuredMesh::active_type_elements_begin (const ElemType type)
 
 
 // active pid elements begin() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::active_pid_elements_begin (const unsigned int proc_id)
+ParallelMesh::element_iterator
+ParallelMesh::active_pid_elements_begin (const unsigned int proc_id)
 {
   Predicates::ActivePID<elem_iterator_imp> p(proc_id);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -178,8 +178,8 @@ UnstructuredMesh::active_pid_elements_begin (const unsigned int proc_id)
 
 
 // default const begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::elements_begin () const
+ParallelMesh::const_element_iterator
+ParallelMesh::elements_begin () const
 {
   Predicates::NotNull<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -188,8 +188,8 @@ UnstructuredMesh::elements_begin () const
 
 
 // const active begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::active_elements_begin () const
+ParallelMesh::const_element_iterator
+ParallelMesh::active_elements_begin () const
 {
   Predicates::Active<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -197,8 +197,8 @@ UnstructuredMesh::active_elements_begin () const
 
 
 // const not active begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::not_active_elements_begin () const
+ParallelMesh::const_element_iterator
+ParallelMesh::not_active_elements_begin () const
 {
   Predicates::NotActive<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -206,8 +206,8 @@ UnstructuredMesh::not_active_elements_begin () const
 
 
 // const subactive begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::subactive_elements_begin () const
+ParallelMesh::const_element_iterator
+ParallelMesh::subactive_elements_begin () const
 {
   Predicates::SubActive<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -215,8 +215,8 @@ UnstructuredMesh::subactive_elements_begin () const
 
 
 // const not subactive begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::not_subactive_elements_begin () const
+ParallelMesh::const_element_iterator
+ParallelMesh::not_subactive_elements_begin () const
 {
   Predicates::NotSubActive<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -224,8 +224,8 @@ UnstructuredMesh::not_subactive_elements_begin () const
 
 
 // const local begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::local_elements_begin () const
+ParallelMesh::const_element_iterator
+ParallelMesh::local_elements_begin () const
 {
   Predicates::Local<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -233,8 +233,8 @@ UnstructuredMesh::local_elements_begin () const
 
 
 // const not_local begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::not_local_elements_begin () const
+ParallelMesh::const_element_iterator
+ParallelMesh::not_local_elements_begin () const
 {
   Predicates::NotLocal<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -242,16 +242,16 @@ UnstructuredMesh::not_local_elements_begin () const
 
 
 // const active local begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::active_local_elements_begin () const
+ParallelMesh::const_element_iterator
+ParallelMesh::active_local_elements_begin () const
 {
   Predicates::ActiveLocal<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
 // const active not_local begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::active_not_local_elements_begin () const
+ParallelMesh::const_element_iterator
+ParallelMesh::active_not_local_elements_begin () const
 {
   Predicates::ActiveNotLocal<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -260,8 +260,8 @@ UnstructuredMesh::active_not_local_elements_begin () const
 
 
 // const level begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::level_elements_begin (const unsigned int level) const
+ParallelMesh::const_element_iterator
+ParallelMesh::level_elements_begin (const unsigned int level) const
 {
   Predicates::Level<const_elem_iterator_imp> p(level);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -270,8 +270,8 @@ UnstructuredMesh::level_elements_begin (const unsigned int level) const
 
 
 // const not level begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::not_level_elements_begin (const unsigned int level) const
+ParallelMesh::const_element_iterator
+ParallelMesh::not_level_elements_begin (const unsigned int level) const
 {
   Predicates::NotLevel<const_elem_iterator_imp> p(level);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -280,8 +280,8 @@ UnstructuredMesh::not_level_elements_begin (const unsigned int level) const
 
 
 // const pid begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::pid_elements_begin (const unsigned int proc_id) const
+ParallelMesh::const_element_iterator
+ParallelMesh::pid_elements_begin (const unsigned int proc_id) const
 {
   Predicates::PID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -289,8 +289,8 @@ UnstructuredMesh::pid_elements_begin (const unsigned int proc_id) const
 
 
 // const type begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::type_elements_begin (const ElemType type) const
+ParallelMesh::const_element_iterator
+ParallelMesh::type_elements_begin (const ElemType type) const
 {
   Predicates::Type<const_elem_iterator_imp> p(type);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -300,8 +300,8 @@ UnstructuredMesh::type_elements_begin (const ElemType type) const
 
 // const active type begin() accessor
 
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::active_type_elements_begin (const ElemType type) const
+ParallelMesh::const_element_iterator
+ParallelMesh::active_type_elements_begin (const ElemType type) const
 {
   Predicates::ActiveType<const_elem_iterator_imp> p(type);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -311,8 +311,8 @@ UnstructuredMesh::active_type_elements_begin (const ElemType type) const
 
 
 // const active pid elements begin() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::active_pid_elements_begin (const unsigned int proc_id) const
+ParallelMesh::const_element_iterator
+ParallelMesh::active_pid_elements_begin (const unsigned int proc_id) const
 {
   Predicates::ActivePID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -327,8 +327,8 @@ UnstructuredMesh::active_pid_elements_begin (const unsigned int proc_id) const
 
 
 // default end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::elements_end ()
+ParallelMesh::element_iterator
+ParallelMesh::elements_end ()
 {
   Predicates::NotNull<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -337,8 +337,8 @@ UnstructuredMesh::elements_end ()
 
 
 // active end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::active_elements_end ()
+ParallelMesh::element_iterator
+ParallelMesh::active_elements_end ()
 {
   Predicates::Active<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -347,8 +347,8 @@ UnstructuredMesh::active_elements_end ()
 
 
 // active end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::not_active_elements_end ()
+ParallelMesh::element_iterator
+ParallelMesh::not_active_elements_end ()
 {
   Predicates::NotActive<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -357,8 +357,8 @@ UnstructuredMesh::not_active_elements_end ()
 
 
 // subactive end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::subactive_elements_end ()
+ParallelMesh::element_iterator
+ParallelMesh::subactive_elements_end ()
 {
   Predicates::SubActive<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -367,8 +367,8 @@ UnstructuredMesh::subactive_elements_end ()
 
 
 // subactive end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::not_subactive_elements_end ()
+ParallelMesh::element_iterator
+ParallelMesh::not_subactive_elements_end ()
 {
   Predicates::NotSubActive<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -377,8 +377,8 @@ UnstructuredMesh::not_subactive_elements_end ()
 
 
 // local end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::local_elements_end ()
+ParallelMesh::element_iterator
+ParallelMesh::local_elements_end ()
 {
   Predicates::Local<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -386,8 +386,8 @@ UnstructuredMesh::local_elements_end ()
 
 
 // not_local end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::not_local_elements_end ()
+ParallelMesh::element_iterator
+ParallelMesh::not_local_elements_end ()
 {
   Predicates::NotLocal<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -395,8 +395,8 @@ UnstructuredMesh::not_local_elements_end ()
 
 
 // active local end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::active_local_elements_end ()
+ParallelMesh::element_iterator
+ParallelMesh::active_local_elements_end ()
 {
   Predicates::ActiveLocal<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -404,8 +404,8 @@ UnstructuredMesh::active_local_elements_end ()
 
 
 // not_local end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::active_not_local_elements_end ()
+ParallelMesh::element_iterator
+ParallelMesh::active_not_local_elements_end ()
 {
   Predicates::ActiveNotLocal<elem_iterator_imp> p;
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -413,8 +413,8 @@ UnstructuredMesh::active_not_local_elements_end ()
 
 
 // level end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::level_elements_end (const unsigned int level)
+ParallelMesh::element_iterator
+ParallelMesh::level_elements_end (const unsigned int level)
 {
   Predicates::Level<elem_iterator_imp> p(level);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -423,8 +423,8 @@ UnstructuredMesh::level_elements_end (const unsigned int level)
 
 
 // not level end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::not_level_elements_end (const unsigned int level)
+ParallelMesh::element_iterator
+ParallelMesh::not_level_elements_end (const unsigned int level)
 {
   Predicates::NotLevel<elem_iterator_imp> p(level);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -434,8 +434,8 @@ UnstructuredMesh::not_level_elements_end (const unsigned int level)
 
 
 // pid end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::pid_elements_end (const unsigned int proc_id)
+ParallelMesh::element_iterator
+ParallelMesh::pid_elements_end (const unsigned int proc_id)
 {
   Predicates::PID<elem_iterator_imp> p(proc_id);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -444,8 +444,8 @@ UnstructuredMesh::pid_elements_end (const unsigned int proc_id)
 
 
 // type end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::type_elements_end (const ElemType type)
+ParallelMesh::element_iterator
+ParallelMesh::type_elements_end (const ElemType type)
 {
   Predicates::Type<elem_iterator_imp> p(type);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -454,8 +454,8 @@ UnstructuredMesh::type_elements_end (const ElemType type)
 
 
 // active type end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::active_type_elements_end (const ElemType type)
+ParallelMesh::element_iterator
+ParallelMesh::active_type_elements_end (const ElemType type)
 {
   Predicates::ActiveType<elem_iterator_imp> p(type);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -463,8 +463,8 @@ UnstructuredMesh::active_type_elements_end (const ElemType type)
 
 
 // active PID end() accessor
-UnstructuredMesh::element_iterator
-UnstructuredMesh::active_pid_elements_end (const unsigned int proc_id)
+ParallelMesh::element_iterator
+ParallelMesh::active_pid_elements_end (const unsigned int proc_id)
 {
   Predicates::ActivePID<elem_iterator_imp> p(proc_id);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -482,8 +482,8 @@ UnstructuredMesh::active_pid_elements_end (const unsigned int proc_id)
 
 
 // default const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::elements_end () const
+ParallelMesh::const_element_iterator
+ParallelMesh::elements_end () const
 {
   Predicates::NotNull<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -493,8 +493,8 @@ UnstructuredMesh::elements_end () const
 
 
 // active const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::active_elements_end () const
+ParallelMesh::const_element_iterator
+ParallelMesh::active_elements_end () const
 {
   Predicates::Active<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -503,8 +503,8 @@ UnstructuredMesh::active_elements_end () const
 
 
 // not active const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::not_active_elements_end () const
+ParallelMesh::const_element_iterator
+ParallelMesh::not_active_elements_end () const
 {
   Predicates::NotActive<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -513,8 +513,8 @@ UnstructuredMesh::not_active_elements_end () const
 
 
 // subactive const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::subactive_elements_end () const
+ParallelMesh::const_element_iterator
+ParallelMesh::subactive_elements_end () const
 {
   Predicates::SubActive<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -523,8 +523,8 @@ UnstructuredMesh::subactive_elements_end () const
 
 
 // not subactive const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::not_subactive_elements_end () const
+ParallelMesh::const_element_iterator
+ParallelMesh::not_subactive_elements_end () const
 {
   Predicates::NotSubActive<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -534,8 +534,8 @@ UnstructuredMesh::not_subactive_elements_end () const
 
 
 // local const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::local_elements_end () const
+ParallelMesh::const_element_iterator
+ParallelMesh::local_elements_end () const
 {
   Predicates::Local<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -543,8 +543,8 @@ UnstructuredMesh::local_elements_end () const
 
 
 // not_local const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::not_local_elements_end () const
+ParallelMesh::const_element_iterator
+ParallelMesh::not_local_elements_end () const
 {
   Predicates::NotLocal<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -552,8 +552,8 @@ UnstructuredMesh::not_local_elements_end () const
 
 
 // local active const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::active_local_elements_end () const
+ParallelMesh::const_element_iterator
+ParallelMesh::active_local_elements_end () const
 {
   Predicates::ActiveLocal<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -561,8 +561,8 @@ UnstructuredMesh::active_local_elements_end () const
 
 
 // const local active const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::active_not_local_elements_end () const
+ParallelMesh::const_element_iterator
+ParallelMesh::active_not_local_elements_end () const
 {
   Predicates::ActiveNotLocal<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -570,8 +570,8 @@ UnstructuredMesh::active_not_local_elements_end () const
 
 
 // level const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::level_elements_end (const unsigned int level) const
+ParallelMesh::const_element_iterator
+ParallelMesh::level_elements_end (const unsigned int level) const
 {
   Predicates::Level<const_elem_iterator_imp> p(level);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -581,8 +581,8 @@ UnstructuredMesh::level_elements_end (const unsigned int level) const
 
 
 // not level const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::not_level_elements_end (const unsigned int level) const
+ParallelMesh::const_element_iterator
+ParallelMesh::not_level_elements_end (const unsigned int level) const
 {
   Predicates::NotLevel<const_elem_iterator_imp> p(level);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -593,8 +593,8 @@ UnstructuredMesh::not_level_elements_end (const unsigned int level) const
 
 
 // pid const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::pid_elements_end (const unsigned int proc_id) const
+ParallelMesh::const_element_iterator
+ParallelMesh::pid_elements_end (const unsigned int proc_id) const
 {
   Predicates::PID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -603,8 +603,8 @@ UnstructuredMesh::pid_elements_end (const unsigned int proc_id) const
 
 
 // type const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::type_elements_end (const ElemType type) const
+ParallelMesh::const_element_iterator
+ParallelMesh::type_elements_end (const ElemType type) const
 {
   Predicates::Type<const_elem_iterator_imp> p(type);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -613,8 +613,8 @@ UnstructuredMesh::type_elements_end (const ElemType type) const
 
 
 // active type const end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::active_type_elements_end (const ElemType type) const
+ParallelMesh::const_element_iterator
+ParallelMesh::active_type_elements_end (const ElemType type) const
 {
   Predicates::ActiveType<const_elem_iterator_imp> p(type);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -622,8 +622,8 @@ UnstructuredMesh::active_type_elements_end (const ElemType type) const
 
 
 // active PID end() accessor
-UnstructuredMesh::const_element_iterator
-UnstructuredMesh::active_pid_elements_end (const unsigned int proc_id) const
+ParallelMesh::const_element_iterator
+ParallelMesh::active_pid_elements_end (const unsigned int proc_id) const
 {
   Predicates::ActivePID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -638,8 +638,8 @@ UnstructuredMesh::active_pid_elements_end (const unsigned int proc_id) const
 
 
 // default nodes begin() accessor
-UnstructuredMesh::node_iterator
-UnstructuredMesh::nodes_begin ()
+ParallelMesh::node_iterator
+ParallelMesh::nodes_begin ()
 {
   Predicates::NotNull<node_iterator_imp> p;
   return node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -649,8 +649,8 @@ UnstructuredMesh::nodes_begin ()
 
 
 // active nodes begin() accessor
-UnstructuredMesh::node_iterator
-UnstructuredMesh::active_nodes_begin ()
+ParallelMesh::node_iterator
+ParallelMesh::active_nodes_begin ()
 {
   Predicates::Active<node_iterator_imp> p;
   return node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -659,8 +659,8 @@ UnstructuredMesh::active_nodes_begin ()
 
 
 // local nodes begin() accessor
-UnstructuredMesh::node_iterator
-UnstructuredMesh::local_nodes_begin ()
+ParallelMesh::node_iterator
+ParallelMesh::local_nodes_begin ()
 {
   Predicates::Local<node_iterator_imp> p;
   return node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -669,8 +669,8 @@ UnstructuredMesh::local_nodes_begin ()
 
 
 // pid nodes begin() accessor
-UnstructuredMesh::node_iterator
-UnstructuredMesh::pid_nodes_begin (const unsigned int proc_id)
+ParallelMesh::node_iterator
+ParallelMesh::pid_nodes_begin (const unsigned int proc_id)
 {
   Predicates::PID<node_iterator_imp> p(proc_id);
   return node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -679,8 +679,8 @@ UnstructuredMesh::pid_nodes_begin (const unsigned int proc_id)
 
 
 // default const nodes begin() accessor
-UnstructuredMesh::const_node_iterator
-UnstructuredMesh::nodes_begin () const
+ParallelMesh::const_node_iterator
+ParallelMesh::nodes_begin () const
 {
   Predicates::NotNull<const_node_iterator_imp> p;
   return const_node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -689,8 +689,8 @@ UnstructuredMesh::nodes_begin () const
 
 
 // active const nodes begin() accessor
-UnstructuredMesh::const_node_iterator
-UnstructuredMesh::active_nodes_begin () const
+ParallelMesh::const_node_iterator
+ParallelMesh::active_nodes_begin () const
 {
   Predicates::Active<const_node_iterator_imp> p;
   return const_node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -699,8 +699,8 @@ UnstructuredMesh::active_nodes_begin () const
 
 
 // local const nodes begin() accessor
-UnstructuredMesh::const_node_iterator
-UnstructuredMesh::local_nodes_begin () const
+ParallelMesh::const_node_iterator
+ParallelMesh::local_nodes_begin () const
 {
   Predicates::Local<const_node_iterator_imp> p;
   return const_node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -708,8 +708,8 @@ UnstructuredMesh::local_nodes_begin () const
 
 
 // pid const nodes begin() accessor
-UnstructuredMesh::const_node_iterator
-UnstructuredMesh::pid_nodes_begin (const unsigned int proc_id) const
+ParallelMesh::const_node_iterator
+ParallelMesh::pid_nodes_begin (const unsigned int proc_id) const
 {
   Predicates::PID<const_node_iterator_imp> p(proc_id);
   return const_node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -720,8 +720,8 @@ UnstructuredMesh::pid_nodes_begin (const unsigned int proc_id) const
 
 
 // default nodes end() accessor
-UnstructuredMesh::node_iterator
-UnstructuredMesh::nodes_end ()
+ParallelMesh::node_iterator
+ParallelMesh::nodes_end ()
 {
   Predicates::NotNull<node_iterator_imp> p;
   return node_iterator(_nodes.end(), _nodes.end(), p);
@@ -731,8 +731,8 @@ UnstructuredMesh::nodes_end ()
 
 
 // active nodes end() accessor
-UnstructuredMesh::node_iterator
-UnstructuredMesh::active_nodes_end ()
+ParallelMesh::node_iterator
+ParallelMesh::active_nodes_end ()
 {
   Predicates::Active<node_iterator_imp> p;
   return node_iterator(_nodes.end(), _nodes.end(), p);
@@ -741,8 +741,8 @@ UnstructuredMesh::active_nodes_end ()
 
 
 // local nodes end() accessor
-UnstructuredMesh::node_iterator
-UnstructuredMesh::local_nodes_end ()
+ParallelMesh::node_iterator
+ParallelMesh::local_nodes_end ()
 {
   Predicates::Local<node_iterator_imp> p;
   return node_iterator(_nodes.end(), _nodes.end(), p);
@@ -750,8 +750,8 @@ UnstructuredMesh::local_nodes_end ()
 
 
 // pid nodes end() accessor
-UnstructuredMesh::node_iterator
-UnstructuredMesh::pid_nodes_end (const unsigned int proc_id)
+ParallelMesh::node_iterator
+ParallelMesh::pid_nodes_end (const unsigned int proc_id)
 {
   Predicates::PID<node_iterator_imp> p(proc_id);
   return node_iterator(_nodes.end(), _nodes.end(), p);
@@ -760,8 +760,8 @@ UnstructuredMesh::pid_nodes_end (const unsigned int proc_id)
 
 
 // default const nodes end() accessor
-UnstructuredMesh::const_node_iterator
-UnstructuredMesh::nodes_end () const
+ParallelMesh::const_node_iterator
+ParallelMesh::nodes_end () const
 {
   Predicates::NotNull<const_node_iterator_imp> p;
   return const_node_iterator(_nodes.end(), _nodes.end(), p);
@@ -769,8 +769,8 @@ UnstructuredMesh::nodes_end () const
 
 
 // const active nodes end() accessor
-UnstructuredMesh::const_node_iterator
-UnstructuredMesh::active_nodes_end () const
+ParallelMesh::const_node_iterator
+ParallelMesh::active_nodes_end () const
 {
   Predicates::Active<const_node_iterator_imp> p;
   return const_node_iterator(_nodes.end(), _nodes.end(), p);
@@ -778,8 +778,8 @@ UnstructuredMesh::active_nodes_end () const
 
 
 // local const nodes end() accessor
-UnstructuredMesh::const_node_iterator
-UnstructuredMesh::local_nodes_end () const
+ParallelMesh::const_node_iterator
+ParallelMesh::local_nodes_end () const
 {
   Predicates::Local<const_node_iterator_imp> p;
   return const_node_iterator(_nodes.end(), _nodes.end(), p);
@@ -787,8 +787,8 @@ UnstructuredMesh::local_nodes_end () const
 
 
 // pid const nodes end() accessor
-UnstructuredMesh::const_node_iterator
-UnstructuredMesh::pid_nodes_end (const unsigned int proc_id) const
+ParallelMesh::const_node_iterator
+ParallelMesh::pid_nodes_end (const unsigned int proc_id) const
 {
   Predicates::PID<const_node_iterator_imp> p(proc_id);
   return const_node_iterator(_nodes.end(), _nodes.end(), p);
