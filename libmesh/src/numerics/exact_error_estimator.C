@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.C,v 1.12 2007-10-01 23:04:38 roystgnr Exp $
+// $Id: exact_error_estimator.C,v 1.13 2007-10-01 23:17:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -110,7 +110,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 
   // Resize the error_per_cell vector to be
   // the number of elements, initialize it to 0.
-  error_per_cell.resize (mesh.n_elem());
+  error_per_cell.resize (mesh.max_elem_id());
   std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
 
   // Check for the use of component_mask

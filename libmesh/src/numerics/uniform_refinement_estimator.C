@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.15 2007-05-23 23:36:12 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.16 2007-10-01 23:17:06 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -156,7 +156,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   if (error_per_cell)
     {
       error_per_cell->clear();
-      error_per_cell->resize (mesh.n_elem(), 0.);
+      error_per_cell->resize (mesh.max_elem_id(), 0.);
     }
   else
     {
@@ -166,7 +166,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
         {
           ErrorVector *e = i->second;
           e->clear();
-          e->resize(mesh.n_elem(), 0.);
+          e->resize(mesh.max_elem_id(), 0.);
         }
     }
 
@@ -238,6 +238,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
   // Find the number of coarse mesh elements, to make it possible
   // to find correct coarse elem ids later
+  const unsigned int max_coarse_elem_id = mesh.max_elem_id();
   const unsigned int n_coarse_elem = mesh.n_elem();
 
   // Uniformly refine the mesh
@@ -353,7 +354,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
               // Find the element id for the corresponding coarse grid element
               const Elem* coarse = elem;
               unsigned int e_id = coarse->id();
-              while (e_id >= n_coarse_elem)
+              while (e_id >= max_coarse_elem_id)
                 {
                   assert (coarse->parent());
                   coarse = coarse->parent();
