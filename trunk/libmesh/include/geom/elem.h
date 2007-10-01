@@ -1,4 +1,4 @@
-// $Id: elem.h,v 1.54 2007-10-01 18:45:37 roystgnr Exp $
+// $Id: elem.h,v 1.55 2007-10-01 18:55:18 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -491,6 +491,12 @@ class Elem : public ReferenceCountedObject<Elem>,
   Elem* parent ();
 
   /**
+   * @sets the pointer to the element's parent.
+   * Dangerous to use in high-level code.
+   */
+  void set_parent (Elem *p);
+
+  /**
    * @returns a pointer to the element's top-most (i.e. level-0) parent.
    * Returns \p this if this is a level-0 element, this element's parent
    * if this is a level-1 element, this element's grandparent if this is
@@ -887,7 +893,7 @@ public:
   /**
    * A pointer to this element's parent.
    */
-  Elem* const _parent;
+  Elem* _parent;
 
 #ifdef ENABLE_AMR
   
@@ -1283,6 +1289,15 @@ Elem* Elem::parent ()
 {
   return _parent;
 }
+
+
+
+inline
+void Elem::set_parent (Elem *p)
+{
+  _parent = p;
+}
+
 
 
 inline
