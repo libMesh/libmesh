@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.64 2007-10-03 19:27:54 roystgnr Exp $
+# $Id: Make.common.in,v 1.65 2007-10-03 21:09:43 roystgnr Exp $
 
 
 ###############################################################################
@@ -349,7 +349,7 @@ ifeq ($(enable-optional),yes)
     ifeq ($(petsc-version),2.1.0)
       include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
     else
-      C_CLINKER_SLFLAG = $(RPATHFLAG)# necessary for PETSc >= 2.1.6
+      C_CLINKER_SLFLAG = $(libmesh_RPATHFLAG)# necessary for PETSc >= 2.1.6
       ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x & newer style
         include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/petscconf # 2.3.0 or later style
 
@@ -378,7 +378,7 @@ ifeq ($(enable-optional),yes)
     ifeq ($(enable-shared),yes)
       libmesh_CXXFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
       libmesh_CFLAGS       += -DPETSC_USE_DYNAMIC_LIBRARIES 
-      libmesh_DLFLAGS      += $(RPATHFLAG)$(PETSC_LIB)
+      libmesh_DLFLAGS      += $(libmesh_RPATHFLAG)$(PETSC_LIB)
     endif
 
     # Depending on petsc version, we link with different libs :-(
