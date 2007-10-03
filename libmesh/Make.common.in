@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.63 2007-09-20 15:53:39 benkirk Exp $
+# $Id: Make.common.in,v 1.64 2007-10-03 19:27:54 roystgnr Exp $
 
 
 ###############################################################################
@@ -376,9 +376,9 @@ ifeq ($(enable-optional),yes)
     endif
 
     ifeq ($(enable-shared),yes)
-      CXXFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
-      CFLAGS       += -DPETSC_USE_DYNAMIC_LIBRARIES 
-      DLFLAGS      += $(RPATHFLAG)$(PETSC_LIB)
+      libmesh_CXXFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
+      libmesh_CFLAGS       += -DPETSC_USE_DYNAMIC_LIBRARIES 
+      libmesh_DLFLAGS      += $(RPATHFLAG)$(PETSC_LIB)
     endif
 
     # Depending on petsc version, we link with different libs :-(
