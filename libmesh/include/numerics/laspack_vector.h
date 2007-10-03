@@ -1,4 +1,4 @@
-// $Id: laspack_vector.h,v 1.11 2005-12-28 13:47:10 spetersen Exp $
+// $Id: laspack_vector.h,v 1.12 2007-10-03 20:18:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -164,6 +164,8 @@ class LaspackVector : public NumericVector<T>
    */
   Real max () const;
   
+
+  Real sum () const; 
   /**
    * @returns the \f$l_1\f$-norm of the vector, i.e.
    * the sum of the absolute values.
