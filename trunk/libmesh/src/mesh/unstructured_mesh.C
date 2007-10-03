@@ -1,4 +1,4 @@
-// $Id: unstructured_mesh.C,v 1.2 2007-10-01 23:13:22 roystgnr Exp $
+// $Id: unstructured_mesh.C,v 1.3 2007-10-03 19:41:59 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -617,7 +617,7 @@ void UnstructuredMesh::write (const std::string& name,
   if (name.rfind(".dat") < name.size())
     TecplotIO(*this).write_nodal_data (name, v, vn);
   
-  if (name.rfind(".plt") < name.size())
+  else if (name.rfind(".plt") < name.size())
     TecplotIO(*this,true).write_nodal_data (name, v, vn);
   
   else if (name.rfind(".gmv") < name.size())
