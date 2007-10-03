@@ -1,4 +1,4 @@
-// $Id: unstructured_mesh.C,v 1.3 2007-10-03 19:41:59 roystgnr Exp $
+// $Id: unstructured_mesh.C,v 1.4 2007-10-03 19:47:35 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -631,12 +631,17 @@ void UnstructuredMesh::write (const std::string& name,
 	  io.write_nodal_data (name, v, vn);
 	}
     }    
+  else if (name.rfind(".pvtu") < name.size())
+    {
+      VTKIO(*this).write_nodal_data (name, v, vn);
+    }
   else
     {
       std::cerr << " ERROR: Unrecognized file extension: " << name
 		<< "\n   I understand the following:\n\n"
 		<< "     *.dat  -- Tecplot ASCII file\n"
 		<< "     *.plt  -- Tecplot binary file\n"
+		<< "     *.pvtu -- Paraview VTK file\n"
 		<< "     *.gmv  -- LANL's GMV (General Mesh Viewer) format\n"
 		<< "\n Exiting without writing output\n";
     }
