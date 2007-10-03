@@ -1,5 +1,5 @@
 
-// Code copyright Edd Dawson 2007
+// Code partially copyright Edd Dawson 2007
 //
 // Boost Software License - Version 1.0 - August 17th, 2003
 //
@@ -29,7 +29,66 @@
 #include "libmesh_config.h"
 #include "print_trace.h"
 
-#if defined(HAVE_GCC_ABI_DEMANGLE) && defined(HAVE_DLADDR) && defined(__USE_GNU)
+#if defined(HAVE_GCC_ABI_DEMANGLE) && defined(HAVE_GLIBC_BACKTRACE)
+
+#include <iostream>
+#include <string>
+#include <execinfo.h> 
+#include <cxxabi.h>
+
+std::string abi_demangle(const char *name)
+{
+  int status = 0;
+  char *d = 0;
+  std::string fullname = name;
+  size_t namestart = fullname.find('(');
+  if (namestart == std::string::npos)
+    return fullname;
+  else
+    namestart++;
+  size_t nameend = fullname.find('+');
+  if (nameend == std::string::npos ||
+      nameend <= namestart)
+    return fullname;
+  std::string funcname = fullname.substr(namestart, nameend - namestart);
+  std::string goodname = funcname;
+  try { if ( (d = abi::__cxa_demangle(funcname.c_str(), 0, 0, &status)) ) goodname = d; }
+  catch(...) {  }
+  std::free(d);
+/*
+  std::string ret = fullname.substr(0, namestart);
+  ret.append(goodname);
+  ret.append(fullname.substr(nameend, fullname.length() - nameend));
+  return ret;
+*/
+  return goodname;
+}
+
+void print_trace(void)
+{
+  void *addresses[10];
+  char **strings;
+
+  int size = backtrace(addresses, 10);
+  strings = backtrace_symbols(addresses, size);
+  std::cerr << "Stack frames: " << size << std::endl;
+  for(int i = 0; i < size; i++)
+    {
+//      std::cerr << i << ": " << (int)addresses[i] << std::endl;
+//      std::cerr << abi_demangle(strings[i]) << std::endl;
+      std::cerr << i << ": "
+                << abi_demangle(strings[i]) << std::endl;
+    }
+  free(strings);
+}
+
+#else
+
+void print_trace(void) {}
+
+#endif
+
+#if 0 // MAC OS X code??
 
 #include <dlfcn.h>
 #include <cxxabi.h>
@@ -49,7 +108,7 @@ std::string abi_demangle(const char *name)
     return ret;
 }
 
-void print_trace()
+void print_trace(void)
 {
 std::cerr << "Trying print_trace()" << std::endl;
     Dl_info info;
@@ -67,10 +126,9 @@ info.dli_fname << '\n';
         ip = bp[1];
         bp = static_cast<void**>(bp[0]);
     }
+    char *dlerr = dlerror();
+    if (dlerr)
+      std::cout << "dlerror() = " << dlerr << std::endl;
 }
-
-#else
-
-void print_trace() {}
 
 #endif
