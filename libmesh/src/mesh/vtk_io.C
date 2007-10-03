@@ -1,4 +1,4 @@
-// $Id: vtk_io.C,v 1.3 2007-09-17 19:27:47 woutruijter Exp $
+// $Id: vtk_io.C,v 1.4 2007-10-03 22:09:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -24,18 +24,20 @@
 // Local includes
 #include "vtk_io.h"
 #include "mesh_base.h"
+#include "mesh.h"
+#include "equation_systems.h"
 #include "cell_tet4.h"
 #include "cell_tet10.h"
 #include "cell_prism6.h"
 #include "cell_pyramid5.h"
 #include "cell_hex8.h"
-
+#include "cell_hex20.h"
+#include "petsc_vector.h"
 //#include "cell_inf.h"
 //#include "cell_inf_prism12.h"
 //#include "cell_prism6.h"
 //#include "cell_tet4.h"
 
-//#include "cell_hex20.h"
 //#include "cell_inf_hex16.h"
 //#include "cell_inf_prism6.h"
 //#include "cell_prism.h"
@@ -64,9 +66,12 @@
 
 #include "vtkXMLUnstructuredGridReader.h"
 #include "vtkXMLUnstructuredGridWriter.h"
+#include "vtkXMLPUnstructuredGridWriter.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkGenericGeometryFilter.h"
 #include "vtkCellArray.h"
+#include "vtkConfigure.h"
+/*
 #include "vtkTetra.h"
 #include "vtkTriangle.h"
 #include "vtkWedge.h"
@@ -78,9 +83,213 @@
 #include "vtkQuadraticHexahedron.h"
 #include "vtkQuadraticWedge.h"
 #include "vtkQuadraticTetra.h"
-
+#include "vtkBiQuadraticQuad.h"
+*/
+#include "vtkFloatArray.h"
+#include "vtkPointData.h"
 #endif //HAVE_VTK
 
+//static unsigned int vtk_tet4_mapping[4]= {0,1,2,3};
+//static unsigned int vtk_pyramid5_mapping[5]= {0,3,2,1,4};
+//static unsigned int vtk_wedge6_mapping[6]= {0,2,1,3,5,4};
+//static unsigned int vtk_hex8_mapping[8]= {0,1,2,3,4,5,6,7};
+
+#ifdef HAVE_VTK // private functions
+void VTKIO::nodes_to_vtk(const MeshBase& mesh, vtkUnstructuredGrid*& grid){
+  vtkPoints* points = vtkPoints::New();
+// FIXME change to local iterators when I've figured out how to write in parallel
+//  MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
+//  MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
+  MeshBase::const_node_iterator nd = mesh.active_nodes_begin();
+  MeshBase::const_node_iterator nd_end = mesh.active_nodes_end();
+  // write out nodal data
+  for (;nd!=nd_end;++nd)
+  {
+	  float tuple[3]; //, dsp[3];
+	  Node* node = (*nd);
+
+	  for(unsigned int i=0;i<3;++i)
+	  {
+		  tuple[i] = (*node)(i);
+	  }
+	  points->InsertPoint(node->id(),tuple);
+  }
+  grid->SetPoints(points);
+}
+
+void VTKIO::cells_to_vtk(const MeshBase& mesh, vtkUnstructuredGrid*& grid){
+//  MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
+//  const MeshBase::const_element_iterator end = mesh.active_local_elements_end(); 
+  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+  for ( ; it != end; ++it)
+  {
+    Elem *elem  = (*it);
+    vtkIdType celltype = VTK_EMPTY_CELL; // initialize to something to avoid compiler warning
+
+    switch(elem->type())
+    {
+	case EDGE2:				
+	  celltype = VTK_LINE;
+	  break;
+	case EDGE3:      
+	  celltype = VTK_QUADRATIC_EDGE;
+	  break;// 1
+	case TRI3:       
+	  celltype = VTK_TRIANGLE;
+	  break;// 3
+	case TRI6:       
+	  celltype = VTK_QUADRATIC_TRIANGLE;
+	  break;// 4
+	case QUAD4:      
+	  celltype = VTK_QUAD;
+	  break;// 5
+	case QUAD8:      
+	  celltype = VTK_QUADRATIC_QUAD;
+	  break;// 6
+	case TET4:      
+	  celltype = VTK_TETRA;
+	  break;// 8
+	case TET10:      
+	  celltype = VTK_QUADRATIC_TETRA;
+	  break;// 9
+	case HEX8:    
+	  celltype = VTK_HEXAHEDRON;
+	  break;// 10
+	case HEX20:      
+	  celltype = VTK_QUADRATIC_HEXAHEDRON;
+	  break;// 12
+	case PRISM6:     
+	  celltype = VTK_WEDGE;
+	  break;// 13
+	case PRISM15:   
+	  celltype = VTK_HIGHER_ORDER_WEDGE;
+	  break;// 14
+	case PRISM18:    
+	  break;// 15
+	case PYRAMID5:
+	  celltype = VTK_PYRAMID;
+	  break;// 16
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+	case QUAD9:      
+	  celltype = VTK_BIQUADRATIC_QUAD;
+	  break;
+#else
+	case QUAD9:
+#endif 
+	case EDGE4:      
+	case HEX27:      
+	case INFEDGE2:   
+	case INFQUAD4:   
+	case INFQUAD6:   
+	case INFHEX8:    
+	case INFHEX16:   
+	case INFHEX18:   
+	case INFPRISM6:  
+	case INFPRISM12: 
+	case NODEELEM:   
+	case INVALID_ELEM:
+	default:
+	  {
+		  std::cerr<<"element type "<<elem->type()<<" not implemented"<<std::endl;
+		  error();
+	  }
+	}
+
+	  vtkIdList *pts = vtkIdList::New();
+	  pts->SetNumberOfIds(elem->n_nodes());
+	  // get the connectivity for this element
+	  std::vector<unsigned int> conn;
+	  elem->connectivity(0,VTK,conn);
+	  for(unsigned int i=0;i<conn.size();++i)
+	  {
+		  pts->SetId(i,conn[i]);
+	  } 
+	  grid->InsertNextCell(celltype,pts);
+	} // end loop over active elements
+}
+
+/*
+ * single processor implementation, this can be done in parallel, but requires a
+ * bit more thinking on how to deal with overlapping local solution vectors
+ */
+void VTKIO::solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid* grid){
+	const MeshBase& mesh = (MeshBase&)es.get_mesh();
+	const unsigned int n_nodes = es.get_mesh().n_nodes();
+	const unsigned int n_vars = es.n_vars();
+	std::vector<Real> soln;
+	es.build_solution_vector(soln);
+
+//   if(libMesh::processor_id()==0){
+		// write the solutions belonging to the system
+		for(unsigned int i=0;i<es.n_systems();++i){ // for all systems, regardless of whether they are active or not
+			for(unsigned int j=0;j<n_vars;++j){
+				const System& sys = es.get_system(i);
+				const std::string& varname = sys.variable_name(j); 
+				vtkFloatArray *data = vtkFloatArray::New(); 
+				data->SetName(varname.c_str());
+				data->SetNumberOfValues(n_nodes);
+				MeshBase::const_node_iterator it = mesh.nodes_begin();
+				const MeshBase::const_node_iterator n_end = mesh.nodes_end();
+				for(;it!=n_end;++it){
+					if((*it)->n_comp(i,j)>0){
+						const unsigned int nd_id = (*it)->id();
+//                  const unsigned int dof_nr = (*it)->dof_number(i,j,0);
+//                  data->InsertValue((*it)->id(),sys.current_solution(count++));
+						data->InsertValue(nd_id,soln[nd_id*n_vars+j]);
+//               data->InsertValue((*it)->id(),sys.current_solution(dof_nr));
+					}else{
+						data->InsertValue((*it)->id(),0);
+					}
+				} 
+				grid->GetPointData()->AddArray(data);
+			} 
+		} 
+//   }
+}
+/*
+ * FIXME now this is known to write nonsense on AMR meshes
+ */
+void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid* grid){
+	// write out the vectors added to the systems
+	const MeshBase& mesh = (MeshBase&)es.get_mesh();
+	const unsigned int n_nodes = mesh.n_nodes();
+	for(unsigned int i=0;i<es.n_systems();++i){ // for all systems, regardless of whether they are active or not
+		const System& sys = es.get_system(i);
+		System::const_vectors_iterator v_end = sys.vectors_end();
+		System::const_vectors_iterator it = sys.vectors_begin();
+		for(;it!= v_end;++it){ // for all vectors on this system
+			vtkFloatArray *data = vtkFloatArray::New(); 
+			data->SetName(it->first.c_str());
+			std::vector<Real> values; 	
+			it->second->localize(values);
+			data->SetNumberOfValues(n_nodes);
+//         MeshBase::const_node_iterator it = mesh.active_nodes_begin();
+//         const MeshBase::const_node_iterator n_end = mesh.nodes_end();
+//         for(unsigned int count=0;it!=n_end;++it,++count){			
+			for(unsigned int j=0;j<values.size();++j){
+				data->InsertValue(j,values[j]);
+//            it++;
+			} 
+			grid->GetPointData()->AddArray(data);		
+		} 
+	} 
+}
+
+/*
+// write out mesh data to the VTK file, this might come in handy to display
+// boundary conditions and material data
+inline void meshdata_to_vtk(const MeshData& meshdata,
+										vtkUnstructuredGrid* grid){
+	vtkPointData* pointdata = vtkPointData::New();
+	
+	const unsigned int n_vn = meshdata.n_val_per_node();
+	const unsigned int n_dat = meshdata.n_node_data();
+
+	pointdata->SetNumberOfTuples(n_dat);
+}*/
+
+#endif
 
 
 // ------------------------------------------------------------
@@ -134,94 +343,86 @@ void VTKIO::read (const std::string& name)
     {
       vtkCell* cell = grid->GetCell(i);
       Elem* elem = NULL;  // Initialize to avoid compiler warning
-	    
       switch(cell->GetCellType())
 	{
 	case VTK_TETRA:
 	  elem = new Tet4();
 	  break;
-		
 	case VTK_WEDGE:
 	  elem = new Prism6();
 	  break;
-		
 	case VTK_HEXAHEDRON:
 	  elem = new Hex8();
 	  break;
-		
 	case VTK_PYRAMID:	
 	  elem = new Pyramid5();					
 	  break;
-		
+	case VTK_QUADRATIC_HEXAHEDRON:
+  	  elem = new Hex20();
+	  break;
+	case VTK_QUADRATIC_TETRA:
+	  elem = new Tet10();
+	  break;
 	default:
 	  std::cerr << "element type not implemented in vtkinterface " << cell->GetCellType() << std::endl;
 	  error();
-
 	}
-	    
-      for(unsigned int j=0;j<elem->n_nodes();++j)
-	{
+  // get the straightforward numbering from the VTK cells
+  for(unsigned int j=0;j<elem->n_nodes();++j){
 	  elem->set_node(j) = mesh.node_ptr(cell->GetPointId(j));
-	} 
-      mesh.add_elem(elem);
-    } // end loop over VTK cells
+  } 
+  // then get the connectivity 
+  std::vector<unsigned int> conn;
+  elem->connectivity(0,VTK,conn);
+  // then reshuffle the nodes according to the connectivity, this
+  // two-time-assign would evade the definition of the vtk_mapping
+  for(unsigned int j=0;j<conn.size();++j){
+	  elem->set_node(j) = mesh.node_ptr(conn[j]);
+  } 
+  mesh.add_elem(elem);
+  } // end loop over VTK cells
   
 #endif // HAVE_VTK
 }
 
+/*
+ * FIXME this operates on the mesh it "gets" from the ES only, this would
+ * prevent passing in a mesh that doesn't belong to the ES
+ */
+void VTKIO::write_equation_systems(const std::string& fname, const EquationSystems& es){
+#ifndef HAVE_VTK
+	std::cerr << "Cannot write VTK file: " << name
+	    << "\nYou must have VTK installed and correctly configured to read VTK meshes."
+	    << std::endl;
+	error();
+#else
+	/*
+	 * we only use Unstructured grids
+	 */
+	vtkUnstructuredGrid* grid = vtkUnstructuredGrid::New();
+	vtkXMLPUnstructuredGridWriter* writer= vtkXMLPUnstructuredGridWriter::New();
+	nodes_to_vtk((const MeshBase&)es.get_mesh(), grid);
+	cells_to_vtk((const MeshBase&)es.get_mesh(), grid);
 
+	// I'd like to write out meshdata, but this requires some coding, in
+	// particular, non_const meshdata iterators
+//   const MeshData& md = es.get_mesh_data();
+//   if(es.has_mesh_data())
+//      meshdata_to_vtk(md,grid);
+//   assert (soln.size() ==mesh.n_nodes()*names.size());
+	solution_to_vtk(es,grid);
 
-// // a copy from the VTK docs
-//    VTKCellType {
-//  VTK_EMPTY_CELL = 0,
-//  VTK_VERTEX = 1,
-//  VTK_POLY_VERTEX = 2,
-//  VTK_LINE = 3,
-//  VTK_POLY_LINE = 4,
-//  VTK_TRIANGLE = 5,
-//  VTK_TRIANGLE_STRIP = 6,
-//  VTK_POLYGON =7,
-//  VTK_PIXEL = 8,
-//  VTK_QUAD = 9,
-//  VTK_TETRA = 10,
-//  VTK_VOXEL = 11,
-//  VTK_HEXAHEDRON = 12,
-//  VTK_WEDGE = 13,
-//  VTK_PYRAMID = 14,
-//  VTK_PENTAGONAL_PRISM= 15,
-//  VTK_HEXAGONAL_PRISM = 16,
-//  VTK_QUADRATIC_EDGE = 21,
-//  VTK_QUADRATIC_TRIANGLE =22,
-//  VTK_QUADRATIC_QUAD = 23,
-//  VTK_QUADRATIC_TETRA = 24,
-//  VTK_QUADRATIC_HEXAHEDRON = 25,
-//  VTK_QUADRATIC_WEDGE= 26,
-//  VTK_QUADRATIC_PYRAMID = 27,
-//  VTK_BIQUADRATIC_QUAD = 28,
-//  VTK_TRIQUADRATIC_HEXAHEDRON = 29,
-//  VTK_QUADRATIC_LINEAR_QUAD = 30,
-//  VTK_QUADRATIC_LINEAR_WEDGE = 31,
-//  VTK_BIQUADRATIC_QUADRATIC_WEDGE = 32,
-//  VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON =33,
-//  VTK_CONVEX_POINT_SET = 41,
-//  VTK_PARAMETRIC_CURVE = 51,
-//  VTK_PARAMETRIC_SURFACE = 52,
-//  VTK_PARAMETRIC_TRI_SURFACE = 53,
-//  VTK_PARAMETRIC_QUAD_SURFACE = 54,
-//  VTK_PARAMETRIC_TETRA_REGION = 55,
-//  VTK_PARAMETRIC_HEX_REGION = 56,
-//  VTK_HIGHER_ORDER_EDGE = 60,
-//  VTK_HIGHER_ORDER_TRIANGLE = 61,
-//  VTK_HIGHER_ORDER_QUAD = 62,
-//  VTK_HIGHER_ORDER_POLYGON = 63,
-//  VTK_HIGHER_ORDER_TETRAHEDRON = 64,
-//  VTK_HIGHER_ORDER_WEDGE = 65,
-//  VTK_HIGHER_ORDER_PYRAMID = 66,
-//  VTK_HIGHER_ORDER_HEXAHEDRON = 67,
-//  VTK_NUMBER_OF_CELL_TYPES
-// }
-
-
+#ifdef DEBUG
+	if(true) // add some condition here, although maybe it is more sensible to give each vector a flag on whether it is to be written out or not
+		system_vectors_to_vtk(es,grid);
+#endif
+//   writer->SetNumberOfPieces(libMesh::n_processors());
+//   writer->SetInput(libMesh::processor_id(),grid);
+	writer->SetInput(grid);
+	writer->SetFileName(fname.c_str());
+	writer->Write();
+#endif
+}
 
 /**
  * This method implements writing to a .vtu (VTK Unstructured Grid) file. 
@@ -238,111 +439,14 @@ void VTKIO::write (const std::string& name)
 
 #else
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
-
-  vtkPoints* points = vtkPoints::New();
   vtkUnstructuredGrid* grid = vtkUnstructuredGrid::New();
   vtkXMLUnstructuredGridWriter* writer = vtkXMLUnstructuredGridWriter::New();
-  MeshBase::const_node_iterator nd = mesh.active_nodes_begin();
-  MeshBase::const_node_iterator nd_end = mesh.active_nodes_end();
-  // write out nodal data
-  for (;nd!=nd_end;++nd)
-    {
-      float tuple[3]; //, dsp[3];
-      Node* node = (*nd);
-
-      for(unsigned int i=0;i<3;++i)
-	{
-	  tuple[i] = (*node)(i);
-	}
-      points->InsertPoint(node->id(),tuple);
-    }
-	
-  // write out element data 
-  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
-  for ( ; it != end; ++it)
-    {
-      Elem *elem  = (*it);
-      vtkIdType celltype = VTK_EMPTY_CELL; // initialize to something to avoid compiler warning
-		
-      switch(elem->type())
-	{
-	case EDGE2:				
-	  celltype = VTK_LINE;
-	  break;
-	case EDGE3:      
-	  celltype = VTK_QUADRATIC_EDGE;
-	  break;// 1
-	case TRI3:       
-	  celltype = VTK_TRIANGLE;
-	  break;// 3
-	case TRI6:       
-	  celltype = VTK_QUADRATIC_TRIANGLE;
-	  break;// 4
-	case QUAD4:      
-	  celltype = VTK_QUAD;
-	  break;// 5
-	case QUAD8:      
-	  celltype = VTK_QUADRATIC_QUAD;
-	  break;// 6
-	case TET4:      
-	  celltype = VTK_TETRA;
-	  break;// 8
-	case TET10:      
-	  celltype = VTK_QUADRATIC_TETRA;
-	  break;// 9
-	case HEX8:    
-	  celltype = VTK_HEXAHEDRON;
-	  break;// 10
-	case HEX20:      
-	  celltype = VTK_QUADRATIC_HEXAHEDRON;
-	  break;// 12
-	case PRISM6:     
-	  celltype = VTK_WEDGE;
-	  break;// 13
-	case PRISM15:   
-	  celltype = VTK_HIGHER_ORDER_WEDGE;
-	  break;// 14
-	case PRISM18:    
-	  break;// 15
-	case PYRAMID5:
-	  celltype = VTK_PYRAMID;
-	  break;// 16
-	case EDGE4:      
-	case QUAD9:      
-	case HEX27:      
-	case INFEDGE2:   
-	case INFQUAD4:   
-	case INFQUAD6:   
-	case INFHEX8:    
-	case INFHEX16:   
-	case INFHEX18:   
-	case INFPRISM6:  
-	case INFPRISM12: 
-	case NODEELEM:   
-	case INVALID_ELEM:
-	default:
-	  {
-		  std::cerr<<"element type "<<elem->type()<<" not implemented"<<std::endl;
-		  error();
-	  }
-	}
-
-	  vtkIdList *pts = vtkIdList::New();
-	  pts->SetNumberOfIds(elem->n_nodes());
-	  // get the connectivity for this element
-	  std::vector<unsigned int> conn;
-	  elem->connectivity(0,VTK,conn);
-	  for(unsigned int i=0;i<elem->n_nodes();++i)
-	  {
-		  pts->SetId(i,conn[i]);
-	  } 
-	  grid->InsertNextCell(celltype,pts);
-	} // end loop over active elements
-
-  grid->SetPoints(points);
+  nodes_to_vtk(mesh, grid);
+  cells_to_vtk(mesh, grid);
   writer->SetInput(grid);
   writer->SetFileName(name.c_str());
   writer->Write();
 #endif // HAVE_VTK
 }
+
+//  vim: sw=3 ts=3  
