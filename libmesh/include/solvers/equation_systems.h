@@ -1,4 +1,4 @@
-// $Id: equation_systems.h,v 1.23 2007-02-20 17:07:00 roystgnr Exp $
+// $Id: equation_systems.h,v 1.24 2007-10-03 20:31:42 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -346,6 +346,12 @@ public:
   Mesh & get_mesh();
 
   /**
+   * @returns true when the _mesh_data pointer is not NULL.
+   * This is needed because get_mesh_data will fail if it is NULL
+   */
+  const bool has_mesh_data() const;
+
+  /**
    * @returns a constant reference to the mesh_data
    */
   const MeshData & get_mesh_data() const;
@@ -435,6 +441,11 @@ MeshData & EquationSystems::get_mesh_data ()
   return *_mesh_data;
 }
 
+inline
+const bool EquationSystems::has_mesh_data () const 
+{
+  return (_mesh_data!=NULL);
+}
 
 
 inline
