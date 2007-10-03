@@ -1,4 +1,4 @@
-// $Id: face_quad9.C,v 1.30 2007-02-12 20:29:39 jwpeterson Exp $
+// $Id: face_quad9.C,v 1.31 2007-10-03 22:09:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -319,6 +319,19 @@ void Quad9::connectivity(const unsigned int sf,
 
     case VTK:
       {
+        conn.resize(9);
+        conn[0] = this->node(0);
+        conn[1] = this->node(1);
+        conn[2] = this->node(2);
+        conn[3] = this->node(3);
+        conn[4] = this->node(4);
+        conn[5] = this->node(5);
+        conn[6] = this->node(6);
+        conn[7] = this->node(7);
+        conn[8] = this->node(8);
+	return;
+
+	  /*
 	switch(sf)
 	  {
 	  case 0:
@@ -359,7 +372,7 @@ void Quad9::connectivity(const unsigned int sf,
 
 	  default:
 	    error();
-	  }
+	  }*/
       }
 
     default:

@@ -1,4 +1,4 @@
-// $Id: cell_pyramid5.C,v 1.25 2007-02-12 20:29:39 jwpeterson Exp $
+// $Id: cell_pyramid5.C,v 1.26 2007-10-03 22:09:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -241,10 +241,10 @@ void Pyramid5::connectivity(const unsigned int sc,
     case VTK:
       {
 	conn.resize(5);
-	conn[0] = this->node(0);
-	conn[1] = this->node(1);
-	conn[2] = this->node(2);
-	conn[3] = this->node(3);
+	conn[0] = this->node(3);
+	conn[1] = this->node(2);
+	conn[2] = this->node(1);
+	conn[3] = this->node(0);
 	conn[4] = this->node(4);
 	return;
       }

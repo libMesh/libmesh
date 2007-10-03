@@ -1,4 +1,4 @@
-// $Id: cell_tet10.C,v 1.28 2007-02-12 20:29:39 jwpeterson Exp $
+// $Id: cell_tet10.C,v 1.29 2007-10-03 22:09:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -213,18 +213,18 @@ void Tet10::connectivity(const unsigned int sc,
   assert (sc < this->n_sub_elem());
   assert (iop != INVALID_IO_PACKAGE);
 
-    switch (iop)
+  switch (iop)
     {
     case TECPLOT:
       {
 	conn.resize(8);
 	switch (sc)
 	  {
-      
-      
+
+
 	    // Linear sub-tet 0
 	  case 0:
-      
+
 	    conn[0] = this->node(0)+1;
 	    conn[1] = this->node(4)+1;
 	    conn[2] = this->node(6)+1;
@@ -233,12 +233,12 @@ void Tet10::connectivity(const unsigned int sc,
 	    conn[5] = this->node(7)+1;
 	    conn[6] = this->node(7)+1;
 	    conn[7] = this->node(7)+1;
-
+ 
 	    return;
-
+  
 	    // Linear sub-tet 1
 	  case 1:
-      
+
 	    conn[0] = this->node(4)+1;
 	    conn[1] = this->node(1)+1;
 	    conn[2] = this->node(5)+1;
@@ -252,7 +252,7 @@ void Tet10::connectivity(const unsigned int sc,
 
 	    // Linear sub-tet 2
 	  case 2:
-      
+
 	    conn[0] = this->node(5)+1;
 	    conn[1] = this->node(2)+1;
 	    conn[2] = this->node(6)+1;
@@ -266,7 +266,7 @@ void Tet10::connectivity(const unsigned int sc,
 
 	    // Linear sub-tet 3
 	  case 3:
-      
+
 	    conn[0] = this->node(7)+1;
 	    conn[1] = this->node(8)+1;
 	    conn[2] = this->node(9)+1;
@@ -280,7 +280,7 @@ void Tet10::connectivity(const unsigned int sc,
 
 	    // Linear sub-tet 4
 	  case 4:
-      
+
 	    conn[0] = this->node(4)+1;
 	    conn[1] = this->node(8)+1;
 	    conn[2] = this->node(6)+1;
@@ -294,7 +294,7 @@ void Tet10::connectivity(const unsigned int sc,
 
 	    // Linear sub-tet 5
 	  case 5:
-      
+
 	    conn[0] = this->node(4)+1;
 	    conn[1] = this->node(5)+1;
 	    conn[2] = this->node(6)+1;
@@ -308,7 +308,7 @@ void Tet10::connectivity(const unsigned int sc,
 
 	    // Linear sub-tet 6
 	  case 6:
-      
+
 	    conn[0] = this->node(5)+1;
 	    conn[1] = this->node(9)+1;
 	    conn[2] = this->node(6)+1;
@@ -322,7 +322,7 @@ void Tet10::connectivity(const unsigned int sc,
 
 	    // Linear sub-tet 7
 	  case 7:
-      
+
 	    conn[0] = this->node(7)+1;
 	    conn[1] = this->node(6)+1;
 	    conn[2] = this->node(9)+1;
@@ -338,104 +338,118 @@ void Tet10::connectivity(const unsigned int sc,
 	  default:
 
 	    error();
-	  }
+	}
       }
 
     case VTK:
       {
-	conn.resize(4);
-	switch (sc)
-	  {            
-	    // Linear sub-tet 0
-	  case 0:
-      
-	    conn[0] = this->node(0);
-	    conn[1] = this->node(4);
-	    conn[2] = this->node(6);
-	    conn[3] = this->node(7);
+        conn.resize(10);
+        conn[0] = this->node(0);
+        conn[1] = this->node(1);
+        conn[2] = this->node(2);
+        conn[3] = this->node(3);
+        conn[4] = this->node(4);
+        conn[5] = this->node(5);
+        conn[6] = this->node(6);
+        conn[7] = this->node(7);
+        conn[8] = this->node(8);
+        conn[9] = this->node(9);
+        return;
+        /*
+           conn.resize(4);
+           switch (sc)
+           {            
+        // Linear sub-tet 0
+        case 0:
 
-	    return;
+        conn[0] = this->node(0);
+        conn[1] = this->node(4);
+        conn[2] = this->node(6);
+        conn[3] = this->node(7);
 
-	    // Linear sub-tet 1
-	  case 1:
-      
-	    conn[0] = this->node(4);
-	    conn[1] = this->node(1);
-	    conn[2] = this->node(5);
-	    conn[3] = this->node(8);
+        return;
 
-	    return;
+        // Linear sub-tet 1
+        case 1:
 
-	    // Linear sub-tet 2
-	  case 2:
-      
-	    conn[0] = this->node(5);
-	    conn[1] = this->node(2);
-	    conn[2] = this->node(6);
-	    conn[3] = this->node(9);
+        conn[0] = this->node(4);
+        conn[1] = this->node(1);
+        conn[2] = this->node(5);
+        conn[3] = this->node(8);
 
-	    return;
+        return;
 
-	    // Linear sub-tet 3
-	  case 3:
-      
-	    conn[0] = this->node(7);
-	    conn[1] = this->node(8);
-	    conn[2] = this->node(9);
-	    conn[3] = this->node(3);
+        // Linear sub-tet 2
+        case 2:
 
-	    return;
+        conn[0] = this->node(5);
+        conn[1] = this->node(2);
+        conn[2] = this->node(6);
+        conn[3] = this->node(9);
 
-	    // Linear sub-tet 4
-	  case 4:
-      
-	    conn[0] = this->node(4);
-	    conn[1] = this->node(8);
-	    conn[2] = this->node(6);
-	    conn[3] = this->node(7);
+        return;
 
-	    return;
+        // Linear sub-tet 3
+        case 3:
 
-	    // Linear sub-tet 5
-	  case 5:
-      
-	    conn[0] = this->node(4);
-	    conn[1] = this->node(5);
-	    conn[2] = this->node(6);
-	    conn[3] = this->node(8);
+        conn[0] = this->node(7);
+        conn[1] = this->node(8);
+        conn[2] = this->node(9);
+        conn[3] = this->node(3);
 
-	    return;
+        return;
 
-	    // Linear sub-tet 6
-	  case 6:
-      
-	    conn[0] = this->node(5);
-	    conn[1] = this->node(9);
-	    conn[2] = this->node(6);
-	    conn[3] = this->node(8);
+        // Linear sub-tet 4
+        case 4:
 
-	    return;
+        conn[0] = this->node(4);
+        conn[1] = this->node(8);
+        conn[2] = this->node(6);
+        conn[3] = this->node(7);
 
-	    // Linear sub-tet 7
-	  case 7:
-      
-	    conn[0] = this->node(7);
-	    conn[1] = this->node(6);
-	    conn[2] = this->node(9);
-	    conn[3] = this->node(8);
+        return;
 
-	    return;
+        // Linear sub-tet 5
+        case 5:
+
+        conn[0] = this->node(4);
+        conn[1] = this->node(5);
+        conn[2] = this->node(6);
+        conn[3] = this->node(8);
+
+        return;
+
+        // Linear sub-tet 6
+        case 6:
+
+        conn[0] = this->node(5);
+        conn[1] = this->node(9);
+        conn[2] = this->node(6);
+        conn[3] = this->node(8);
+
+        return;
+
+        // Linear sub-tet 7
+        case 7:
+
+        conn[0] = this->node(7);
+        conn[1] = this->node(6);
+        conn[2] = this->node(9);
+        conn[3] = this->node(8);
+
+        return;
 
 
-	  default:
+        default:
 
-	    error();
-	  }
+        error();
+      }
+      */
       }
 
     default:
       error();
-    }
+  }
 
   error();
 }

@@ -1,4 +1,4 @@
-// $Id: vtk_io.h,v 1.2 2007-09-13 21:05:53 jwpeterson Exp $
+// $Id: vtk_io.h,v 1.3 2007-10-03 22:09:24 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -29,9 +29,14 @@
 #include "mesh_input.h"
 #include "mesh_output.h"
 
+
 // Forward declarations
 class MeshBase;
 class MeshData;
+
+#ifdef HAVE_VTK
+class vtkUnstructuredGrid;
+#endif //HAVE_VTK
 
 
 /**
@@ -64,6 +69,21 @@ public:
    */
   VTKIO (const MeshBase& mesh, MeshData* mesh_data=NULL);
 
+ /**
+   * This method implements writing a mesh with nodal data to a
+   * specified file where the nodal data and variable names are provided.
+   */
+//  virtual void write_nodal_data (const std::string&,
+//             const std::vector<Number>&,
+//             const std::vector<std::string>&);
+
+  /**
+   * Overloads writing equation systems, this is done because when overloading
+   * write_nodal_data there would be no way to export cell centered data
+   */
+
+  virtual void write_equation_systems(const std::string& fname, const EquationSystems& es); 
+
   /**
    * This method implements reading a mesh from a specified file
    * in VTK format.
@@ -77,6 +97,25 @@ public:
   virtual void write (const std::string& );  
 
 private:
+#ifdef HAVE_VTK
+  /**
+   * write the nodes from the mesh into a vtkUnstructuredGrid
+   */
+  void nodes_to_vtk(const MeshBase& mesh, vtkUnstructuredGrid*& grid);
+  /** 
+   * write the cells from the mesh into a vtkUnstructuredGrid
+   */
+  void cells_to_vtk(const MeshBase& mesh, vtkUnstructuredGrid*& grid);
+  /**
+   * write the solution to a vtkUnstructuredGrid
+   */
+  void solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid* grid);
+  /**
+   * write the system vectors to vtk 
+   */
+  void system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid* grid);
+#endif 
+
   /**
    * A pointer to the MeshData object you would like to use.
    * with this VTKIO object.  Can be NULL.
