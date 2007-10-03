@@ -1,4 +1,4 @@
-// $Id: cell_hex8.C,v 1.29 2007-02-12 20:29:38 jwpeterson Exp $
+// $Id: cell_hex8.C,v 1.30 2007-10-03 19:31:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -248,6 +248,7 @@ void Hex8::connectivity(const unsigned int sc,
 	conn[5] = this->node(5);
 	conn[6] = this->node(6);
 	conn[7] = this->node(7);
+        return;
       }
 
     default:
