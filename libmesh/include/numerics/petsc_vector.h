@@ -1,4 +1,4 @@
-// $Id: petsc_vector.h,v 1.16 2007-10-03 20:18:23 roystgnr Exp $
+// $Id: petsc_vector.h,v 1.17 2007-10-03 20:21:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -195,7 +195,8 @@ public:
   /**
    * @returns the sum of values in a vector
    */
-  Real sum () const;
+  T sum () const;
+
   /**
    * @returns the \f$l_1\f$-norm of the vector, i.e.
    * the sum of the absolute values.

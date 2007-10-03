@@ -1,4 +1,4 @@
-// $Id: petsc_vector.C,v 1.49 2007-10-03 20:18:23 roystgnr Exp $
+// $Id: petsc_vector.C,v 1.50 2007-10-03 20:21:17 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -47,17 +47,17 @@
 // }
 
 template <typename T>
-Real PetscVector<T>::sum () const
+T PetscVector<T>::sum () const
 {
   assert(this->closed());
   
   int ierr=0;
-  PetscReal value=0.;
+  PetscScalar value=0.;
   
   ierr = VecSum (_vec, &value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
-  return static_cast<Real>(value);
+  return static_cast<T>(value);
 }
 
 
