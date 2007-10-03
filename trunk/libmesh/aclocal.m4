@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.113 2007-09-28 20:53:34 roystgnr Exp $
+dnl $Id: aclocal.m4,v 1.114 2007-10-03 21:02:05 roystgnr Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -1794,6 +1794,29 @@ return name == "A<int>";
 if test "$ac_cv_cxx_gcc_abi_demangle" = yes; then
   AC_DEFINE(HAVE_GCC_ABI_DEMANGLE,1,
             [define if the compiler supports GCC C++ ABI name demangling])
+fi
+])
+
+
+dnl ----------------------------------------------------------------------------
+dnl check for gcc backtrace functions
+dnl ----------------------------------------------------------------------------
+AC_DEFUN([AX_CXX_GLIBC_BACKTRACE],
+[AC_CACHE_CHECK(whether the c++ compiler supports glibc backtrace,
+ac_cv_cxx_glibc_backtrace,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([#include <execinfo.h>],
+[void *addresses[10];
+int size = backtrace(addresses, 10);
+char** strings = backtrace_symbols(addresses, size);
+],
+ ac_cv_cxx_glibc_backtrace=yes, ac_cv_cxx_glibc_backtrace=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_glibc_backtrace" = yes; then
+  AC_DEFINE(HAVE_GLIBC_BACKTRACE,1,
+            [define if the compiler supports glibc backtrace])
 fi
 ])
 

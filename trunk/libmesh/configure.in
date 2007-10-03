@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------
-dnl $Id: configure.in,v 1.70 2007-09-30 04:09:57 roystgnr Exp $
+dnl $Id: configure.in,v 1.71 2007-10-03 21:02:06 roystgnr Exp $
 dnl --------------------------------------------------------------
 dnl Process this file with autoconf to produce a configure script.
 
@@ -9,7 +9,7 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision: 1.70 $)
+AC_REVISION($Revision: 1.71 $)
 
 
 AC_INIT
@@ -121,6 +121,7 @@ AC_CHECK_HEADERS(hash_set,[],[AC_CHECK_HEADERS(ext/hash_set)])
 
 AC_CHECK_HEADERS(dlfcn.h, AC_DEFINE(HAVE_DLADDR))
 AX_CXX_GCC_ABI_DEMANGLE
+AX_CXX_GLIBC_BACKTRACE
 
 
 dnl --------------------------------------------------------------

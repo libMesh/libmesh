@@ -125,6 +125,9 @@
 /* define if the compiler has abi::__cxa_demangle */
 #undef HAVE_GCC_ABI_DEMANGLE
 
+/* define if the C library has glibc style backtrace() */
+#undef HAVE_GLIBC_BACKTRACE
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
