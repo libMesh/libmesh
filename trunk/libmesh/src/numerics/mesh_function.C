@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.15 2007-02-12 18:50:50 roystgnr Exp $
+// $Id: mesh_function.C,v 1.16 2007-10-05 20:53:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -133,7 +133,7 @@ void MeshFunction::init ()
       // we are the master: build the point locator
 
       // constant reference to the other mesh
-      const Mesh& mesh = this->_eqn_systems.get_mesh();
+      const MeshBase& mesh = this->_eqn_systems.get_mesh();
 
       // build the point locator.  Only \p TREE version available
       AutoPtr<PointLocatorBase> ap (PointLocatorBase::build (TREE, mesh));
