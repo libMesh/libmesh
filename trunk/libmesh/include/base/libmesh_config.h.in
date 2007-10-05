@@ -23,6 +23,10 @@
    condition support */
 #undef ENABLE_PERIODIC
 
+/* Flag indicating if the library should use ParallelMesh as its
+   default Mesh type */
+#undef ENABLE_PARMESH
+
 /* Flag indicating if the library should be built with reference counting
    support */
 #undef ENABLE_REFERENCE_COUNTING
