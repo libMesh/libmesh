@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_vsmoother.C,v 1.6 2007-09-20 16:11:38 benkirk Exp $
+// $Id: mesh_smoother_vsmoother.C,v 1.7 2007-10-05 20:38:26 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 #include "mesh_smoother_vsmoother.h"
 #include "mesh_tools.h"
 #include "elem.h"
-#include "mesh.h"
+#include "unstructured_mesh.h"
 #include "utility.h"
 
 // Member functions for the Variational Smoother
