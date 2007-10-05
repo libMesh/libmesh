@@ -1,4 +1,4 @@
-// $Id: mesh_output.C,v 1.2 2007-09-25 19:54:42 roystgnr Exp $
+// $Id: mesh_output.C,v 1.3 2007-10-05 20:34:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,7 +21,7 @@
 // Local includes
 #include "mesh_output.h"
 #include "equation_systems.h"
-#include "mesh.h"
+#include "unstructured_mesh.h"
 
 template <class MT>
 void MeshOutput<MT>::
