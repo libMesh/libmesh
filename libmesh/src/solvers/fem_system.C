@@ -447,7 +447,7 @@ void FEMSystem::init_data ()
   // First initialize LinearImplicitSystem data
   Parent::init_data();
 
-  const Mesh &mesh = this->get_mesh();
+  const MeshBase &mesh = this->get_mesh();
 
   unsigned int dim = mesh.mesh_dimension();
 
@@ -510,7 +510,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
   START_LOG(log_name, "FEMSystem");
 
-  const Mesh& mesh = this->get_mesh();
+  const MeshBase& mesh = this->get_mesh();
 
   const DofMap& dof_map = this->get_dof_map();
 
@@ -872,7 +872,7 @@ void FEMSystem::postprocess ()
 {
   START_LOG("postprocess()", "FEMSystem");
 
-  const Mesh& mesh = this->get_mesh();
+  const MeshBase& mesh = this->get_mesh();
 
   const DofMap& dof_map = this->get_dof_map();
 
