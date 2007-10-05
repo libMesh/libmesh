@@ -1,4 +1,4 @@
-// $Id: perf_log.C,v 1.26 2007-09-07 16:16:53 benkirk Exp $
+// $Id: perf_log.C,v 1.27 2007-10-05 20:39:13 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -159,7 +159,7 @@ std::string PerfLog::get_info_header() const
       osver_stream   << "| OS Version:     " << sysInfo.version        ; 
       machine_stream << "| Machine:        " << sysInfo.machine        ; 
       user_stream    << "| Username:       " << p->pw_name             ;
-      config_stream << " | Configuration:  " << LIBMESH_CONFIGURE_INFO;
+      config_stream  << "| Configuration:  " << LIBMESH_CONFIGURE_INFO;
       
       // Find the longest string, use that to set the line length for formatting.
       unsigned int max_length = 0;
