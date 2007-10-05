@@ -1,4 +1,4 @@
-// $Id: uniform_refinement_estimator.C,v 1.16 2007-10-01 23:17:06 roystgnr Exp $
+// $Id: uniform_refinement_estimator.C,v 1.17 2007-10-05 21:02:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -146,7 +146,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
     const_cast<EquationSystems &>(_system->get_equation_systems());
 
   // The current mesh
-  Mesh& mesh = es.get_mesh();
+  MeshBase& mesh = es.get_mesh();
 
   // The dimensionality of the mesh
   const unsigned int dim = mesh.mesh_dimension();
