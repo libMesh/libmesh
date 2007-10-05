@@ -1,4 +1,4 @@
-// $Id: hp_coarsentest.C,v 1.2 2007-05-23 23:36:12 roystgnr Exp $
+// $Id: hp_coarsentest.C,v 1.3 2007-10-05 20:49:14 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
@@ -140,7 +140,7 @@ void HPCoarsenTest::select_refinement (System &system)
   START_LOG("select_refinement()", "HPCoarsenTest");
 
   // The current mesh
-  const Mesh& mesh = system.get_mesh();
+  const MeshBase& mesh = system.get_mesh();
 
   // The dimensionality of the mesh
   const unsigned int dim = mesh.mesh_dimension();
