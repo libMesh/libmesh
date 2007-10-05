@@ -67,6 +67,7 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/dense_matrix.h\
@@ -3062,6 +3063,7 @@ src/mesh/boundary_info.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
@@ -3080,6 +3082,7 @@ src/mesh/boundary_mesh.$(obj-suffix):\
     include/mesh/boundary_mesh.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h
 src/mesh/diva_io.$(obj-suffix):\
@@ -3110,6 +3113,7 @@ src/mesh/diva_io.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_output.h\
     include/mesh/mesh_tools.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
@@ -3361,11 +3365,8 @@ src/mesh/medit_io.$(obj-suffix):\
     include/geom/elem.h\
     include/geom/point.h\
     include/mesh/medit_io.h\
-    include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_output.h\
-    include/mesh/serial_mesh.h\
-    include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -3594,11 +3595,9 @@ src/mesh/mesh_modification.$(obj-suffix):\
     include/geom/face_tri6.h\
     include/geom/point.h\
     include/mesh/boundary_info.h\
-    include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_modification.h\
     include/mesh/mesh_tools.h\
-    include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
@@ -3621,10 +3620,8 @@ src/mesh/mesh_output.$(obj-suffix):\
     include/enums/enum_order.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
-    include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_output.h\
-    include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/solvers/equation_systems.h\
     include/solvers/explicit_system.h\
@@ -3743,12 +3740,10 @@ src/mesh/mesh_smoother_laplace.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/geom/elem.h\
     include/geom/point.h\
-    include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_smoother.h\
     include/mesh/mesh_smoother_laplace.h\
     include/mesh/mesh_tools.h\
-    include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
@@ -3774,12 +3769,10 @@ src/mesh/mesh_smoother_vsmoother.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/geom/elem.h\
     include/geom/point.h\
-    include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_smoother.h\
     include/mesh/mesh_smoother_vsmoother.h\
     include/mesh/mesh_tools.h\
-    include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
@@ -3873,13 +3866,11 @@ src/mesh/mesh_triangle_support.$(obj-suffix):\
     include/geom/face_tri6.h\
     include/geom/point.h\
     include/mesh/boundary_info.h\
-    include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_generation.h\
     include/mesh/mesh_smoother.h\
     include/mesh/mesh_smoother_laplace.h\
     include/mesh/mesh_triangle_support.h\
-    include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
@@ -3937,10 +3928,8 @@ src/mesh/parallel_mesh.$(obj-suffix):\
     include/geom/elem.h\
     include/geom/point.h\
     include/mesh/boundary_info.h\
-    include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/parallel_mesh.h\
-    include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
@@ -3966,10 +3955,8 @@ src/mesh/parallel_mesh_iterators.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/geom/elem.h\
     include/geom/point.h\
-    include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/parallel_mesh.h\
-    include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
@@ -4264,11 +4251,15 @@ src/mesh/vtk_io.$(obj-suffix):\
     include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
     include/geom/cell_hex.h\
+    include/geom/cell_hex20.h\
     include/geom/cell_hex8.h\
     include/geom/cell_prism.h\
     include/geom/cell_prism6.h\
@@ -4279,13 +4270,30 @@ src/mesh/vtk_io.$(obj-suffix):\
     include/geom/cell_tet4.h\
     include/geom/elem.h\
     include/geom/point.h\
+    include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
+    include/mesh/parallel_mesh.h\
+    include/mesh/serial_mesh.h\
+    include/mesh/unstructured_mesh.h\
     include/mesh/vtk_io.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/petsc_macro.h\
+    include/numerics/petsc_vector.h\
     include/numerics/type_vector.h\
+    include/solvers/equation_systems.h\
+    include/solvers/explicit_system.h\
+    include/solvers/frequency_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/linear_implicit_system.h\
+    include/solvers/newmark_system.h\
+    include/solvers/steady_system.h\
+    include/solvers/system.h\
+    include/solvers/transient_system.h\
     include/utils/o_string_stream.h\
+    include/utils/parameters.h\
     include/utils/perf_log.h
 src/mesh/xdr_head.$(obj-suffix):\
     src/mesh/xdr_head.C\
@@ -4434,7 +4442,6 @@ src/numerics/dense_vector.$(obj-suffix):\
 src/numerics/discontinuity_measure.$(obj-suffix):\
     src/numerics/discontinuity_measure.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -4460,10 +4467,6 @@ src/numerics/discontinuity_measure.$(obj-suffix):\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
-    include/mesh/mesh.h\
-    include/mesh/mesh_base.h\
-    include/mesh/serial_mesh.h\
-    include/mesh/unstructured_mesh.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/discontinuity_measure.h\
@@ -4576,6 +4579,7 @@ src/numerics/exact_error_estimator.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_function.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/dense_vector.h\
@@ -4606,7 +4610,6 @@ src/numerics/exact_error_estimator.$(obj-suffix):\
 src/numerics/fourth_error_estimators.$(obj-suffix):\
     src/numerics/fourth_error_estimators.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -4632,10 +4635,6 @@ src/numerics/fourth_error_estimators.$(obj-suffix):\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
-    include/mesh/mesh.h\
-    include/mesh/mesh_base.h\
-    include/mesh/serial_mesh.h\
-    include/mesh/unstructured_mesh.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/error_estimator.h\
@@ -4688,6 +4687,7 @@ src/numerics/hp_coarsentest.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/dense_matrix.h\
@@ -4742,6 +4742,7 @@ src/numerics/hp_singular.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/dense_matrix.h\
@@ -4789,6 +4790,7 @@ src/numerics/jump_error_estimator.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/dense_vector.h\
@@ -4809,7 +4811,6 @@ src/numerics/jump_error_estimator.$(obj-suffix):\
 src/numerics/kelly_error_estimator.$(obj-suffix):\
     src/numerics/kelly_error_estimator.C\
     include/base/auto_ptr.h\
-    include/base/dof_map.h\
     include/base/dof_object.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
@@ -4836,10 +4837,6 @@ src/numerics/kelly_error_estimator.$(obj-suffix):\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/point.h\
-    include/mesh/mesh.h\
-    include/mesh/mesh_base.h\
-    include/mesh/serial_mesh.h\
-    include/mesh/unstructured_mesh.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/error_estimator.h\
@@ -4978,6 +4975,7 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_function.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/dense_vector.h\
@@ -5064,6 +5062,7 @@ src/numerics/patch_recovery_error_estimator.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/patch.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
@@ -5254,6 +5253,7 @@ src/numerics/uniform_refinement_estimator.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_refinement.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/error_estimator.h\
@@ -5919,6 +5919,7 @@ src/solvers/eigen_system.$(obj-suffix):\
     include/fe/fe_type.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/eigen_solver.h\
@@ -5968,6 +5969,7 @@ src/solvers/equation_systems.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_refinement.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
@@ -6111,6 +6113,7 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_function.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/dense_vector.h\
@@ -6182,6 +6185,7 @@ src/solvers/fem_system.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/dense_matrix.h\
@@ -6265,6 +6269,7 @@ src/solvers/implicit_system.$(obj-suffix):\
     include/fe/fe_type.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/numeric_vector.h\
@@ -6472,6 +6477,7 @@ src/solvers/system.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/numeric_vector.h\
@@ -6523,6 +6529,7 @@ src/solvers/system_io.$(obj-suffix):\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_tools.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/numeric_vector.h\
@@ -6563,6 +6570,7 @@ src/solvers/system_projection.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/mesh.h\
     include/mesh/mesh_base.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/dense_matrix.h\
@@ -6673,6 +6681,7 @@ src/utils/error_vector.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
+    include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/tecplot_io.h\
     include/mesh/unstructured_mesh.h\
@@ -6762,10 +6771,7 @@ src/utils/point_locator_list.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/geom/elem.h\
     include/geom/point.h\
-    include/mesh/mesh.h\
     include/mesh/mesh_base.h\
-    include/mesh/serial_mesh.h\
-    include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -6793,11 +6799,8 @@ src/utils/point_locator_tree.$(obj-suffix):\
     include/enums/enum_solver_package.h\
     include/geom/elem.h\
     include/geom/point.h\
-    include/mesh/mesh.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_tools.h\
-    include/mesh/serial_mesh.h\
-    include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
