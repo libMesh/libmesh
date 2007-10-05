@@ -23,7 +23,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "medit_io.h"
 #include "elem.h"
 
