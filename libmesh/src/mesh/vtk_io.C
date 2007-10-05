@@ -1,4 +1,4 @@
-// $Id: vtk_io.C,v 1.4 2007-10-03 22:09:24 roystgnr Exp $
+// $Id: vtk_io.C,v 1.5 2007-10-05 20:38:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -391,7 +391,7 @@ void VTKIO::read (const std::string& name)
  */
 void VTKIO::write_equation_systems(const std::string& fname, const EquationSystems& es){
 #ifndef HAVE_VTK
-	std::cerr << "Cannot write VTK file: " << name
+	std::cerr << "Cannot write VTK file: " << fname
 	    << "\nYou must have VTK installed and correctly configured to read VTK meshes."
 	    << std::endl;
 	error();
