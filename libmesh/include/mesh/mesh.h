@@ -1,8 +1,15 @@
 #ifndef __mesh_h__
 #define __mesh_h__
 
+#include "libmesh_config.h"
+
+#ifdef ENABLE_PARMESH
+#include "parallel_mesh.h"
+  typedef ParallelMesh DefaultMesh;
+#else
 #include "serial_mesh.h"
-typedef SerialMesh DefaultMesh;
+  typedef SerialMesh DefaultMesh;
+#endif
 
 // Forward declarations don't like typedefs...
 // typedef SerialMesh Mesh;
