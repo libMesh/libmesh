@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_vsmoother.C,v 1.7 2007-10-05 20:38:26 roystgnr Exp $
+// $Id: mesh_smoother_vsmoother.C,v 1.8 2007-10-05 20:41:05 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -494,7 +494,7 @@ float VariationalMeshSmoother::adapt_minimum() const
 void VariationalMeshSmoother::adjust_adapt_data()
 {
   //For convenience
-  const Mesh & aoe_mesh=*_area_of_interest;
+  const UnstructuredMesh & aoe_mesh=*_area_of_interest;
   std::vector<float>& adapt_data = *_adapt_data;
 
   float min=adapt_minimum();
