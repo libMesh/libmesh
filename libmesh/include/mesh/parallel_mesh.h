@@ -1,4 +1,4 @@
-// $Id: parallel_mesh.h,v 1.4 2007-10-01 23:13:21 roystgnr Exp $
+// $Id: parallel_mesh.h,v 1.5 2007-10-05 20:43:08 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -25,7 +25,7 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-#include "mesh.h"
+#include "unstructured_mesh.h"
 
 /**
  * The \p ParallelMesh class is derived from the \p MeshBase class,
