@@ -1,4 +1,4 @@
-// $Id: mesh_modification.C,v 1.32 2007-10-01 23:13:22 roystgnr Exp $
+// $Id: mesh_modification.C,v 1.33 2007-10-05 20:33:22 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -27,7 +27,7 @@
 // Local includes
 #include "mesh_tools.h"
 #include "mesh_modification.h"
-#include "mesh.h"
+#include "unstructured_mesh.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
 #include "libmesh_logging.h"
