@@ -1,4 +1,4 @@
-// $Id: kelly_error_estimator.C,v 1.22 2006-10-26 17:15:59 roystgnr Exp $
+// $Id: kelly_error_estimator.C,v 1.23 2007-10-05 20:51:40 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -26,14 +26,12 @@
 // Local Includes
 #include "libmesh_common.h"
 #include "kelly_error_estimator.h"
-#include "dof_map.h"
 #include "error_vector.h"
 #include "fe.h"
 #include "fe_interface.h"
 #include "quadrature_gauss.h"
 #include "libmesh_logging.h"
 #include "elem.h"
-#include "mesh.h"
 #include "system.h"
 
 #include "dense_vector.h"
