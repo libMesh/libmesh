@@ -1,4 +1,4 @@
-// $Id: dof_map_constraints.C,v 1.43 2007-08-23 18:03:44 roystgnr Exp $
+// $Id: dof_map_constraints.C,v 1.44 2007-10-05 21:18:57 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -464,7 +464,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
       v_global = v;
     }
 
-  const Mesh &mesh = system.get_mesh();
+  const MeshBase &mesh = system.get_mesh();
 
   assert (this == &(system.get_dof_map()));
 
@@ -537,7 +537,7 @@ DofMap::max_constraint_error (const System &system,
 
   Real max_absolute_error = 0., max_relative_error = 0.;
 
-  const Mesh &mesh = system.get_mesh();
+  const MeshBase &mesh = system.get_mesh();
 
   assert (this == &(system.get_dof_map()));
 
