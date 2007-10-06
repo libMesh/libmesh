@@ -1,4 +1,4 @@
-// $Id: exact_error_estimator.C,v 1.13 2007-10-01 23:17:06 roystgnr Exp $
+// $Id: exact_error_estimator.C,v 1.14 2007-10-06 18:56:00 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -97,7 +97,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 					  bool estimate_parent_error)
 {
   // The current mesh
-  const Mesh& mesh = system.get_mesh();
+  const MeshBase& mesh = system.get_mesh();
 
   // The dimensionality of the mesh
   const unsigned int dim = mesh.mesh_dimension();
