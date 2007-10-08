@@ -1,4 +1,4 @@
-// $Id: vtk_io.C,v 1.5 2007-10-05 20:38:51 benkirk Exp $
+// $Id: vtk_io.C,v 1.6 2007-10-08 21:26:06 woutruijter Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -213,7 +213,7 @@ void VTKIO::cells_to_vtk(const MeshBase& mesh, vtkUnstructuredGrid*& grid){
  * single processor implementation, this can be done in parallel, but requires a
  * bit more thinking on how to deal with overlapping local solution vectors
  */
-void VTKIO::solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid* grid){
+void VTKIO::solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid){
 	const MeshBase& mesh = (MeshBase&)es.get_mesh();
 	const unsigned int n_nodes = es.get_mesh().n_nodes();
 	const unsigned int n_vars = es.n_vars();
@@ -250,7 +250,7 @@ void VTKIO::solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid* grid)
 /*
  * FIXME now this is known to write nonsense on AMR meshes
  */
-void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid* grid){
+void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid){
 	// write out the vectors added to the systems
 	const MeshBase& mesh = (MeshBase&)es.get_mesh();
 	const unsigned int n_nodes = mesh.n_nodes();
@@ -312,8 +312,9 @@ void VTKIO::read (const std::string& name)
   reader->Update();
 
   // read in the grid   
-  vtkUnstructuredGrid *grid = reader->GetOutput();
-  grid->Update();
+//  vtkUnstructuredGrid *grid = reader->GetOutput();
+  _vtk_grid = reader->GetOutput();
+  _vtk_grid->Update();
 
   // Get a reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -322,7 +323,7 @@ void VTKIO::read (const std::string& name)
   mesh.clear();
   
   // read in the nodes
-  vtkPoints *points = grid->GetPoints();
+  vtkPoints *points = _vtk_grid->GetPoints();
 	
   // always numbered nicely??, so we can loop like this
   for (unsigned int i=0; i < static_cast<unsigned int>(points->GetNumberOfPoints()); ++i)
@@ -339,9 +340,9 @@ void VTKIO::read (const std::string& name)
 	this->_mesh_data->add_foreign_node_id (newnode, i);
     }
 	
-  for (unsigned int i=0; i < static_cast<unsigned int>(grid->GetNumberOfCells()); ++i)
+  for (unsigned int i=0; i < static_cast<unsigned int>(_vtk_grid->GetNumberOfCells()); ++i)
     {
-      vtkCell* cell = grid->GetCell(i);
+      vtkCell* cell = _vtk_grid->GetCell(i);
       Elem* elem = NULL;  // Initialize to avoid compiler warning
       switch(cell->GetCellType())
 	{
@@ -399,26 +400,26 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 	/*
 	 * we only use Unstructured grids
 	 */
-	vtkUnstructuredGrid* grid = vtkUnstructuredGrid::New();
+	_vtk_grid = vtkUnstructuredGrid::New();
 	vtkXMLPUnstructuredGridWriter* writer= vtkXMLPUnstructuredGridWriter::New();
-	nodes_to_vtk((const MeshBase&)es.get_mesh(), grid);
-	cells_to_vtk((const MeshBase&)es.get_mesh(), grid);
+	nodes_to_vtk((const MeshBase&)es.get_mesh(), _vtk_grid);
+	cells_to_vtk((const MeshBase&)es.get_mesh(), _vtk_grid);
 
 	// I'd like to write out meshdata, but this requires some coding, in
 	// particular, non_const meshdata iterators
 //   const MeshData& md = es.get_mesh_data();
 //   if(es.has_mesh_data())
-//      meshdata_to_vtk(md,grid);
+//      meshdata_to_vtk(md,_vtk_grid);
 //   assert (soln.size() ==mesh.n_nodes()*names.size());
-	solution_to_vtk(es,grid);
+	solution_to_vtk(es,_vtk_grid);
 
 #ifdef DEBUG
 	if(true) // add some condition here, although maybe it is more sensible to give each vector a flag on whether it is to be written out or not
-		system_vectors_to_vtk(es,grid);
+		system_vectors_to_vtk(es,_vtk_grid);
 #endif
 //   writer->SetNumberOfPieces(libMesh::n_processors());
-//   writer->SetInput(libMesh::processor_id(),grid);
-	writer->SetInput(grid);
+//   writer->SetInput(libMesh::processor_id(),_vtk_grid);
+	writer->SetInput(_vtk_grid);
 	writer->SetFileName(fname.c_str());
 	writer->Write();
 #endif
@@ -439,11 +440,11 @@ void VTKIO::write (const std::string& name)
 
 #else
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
-  vtkUnstructuredGrid* grid = vtkUnstructuredGrid::New();
+  _vtk_grid = vtkUnstructuredGrid::New();
   vtkXMLUnstructuredGridWriter* writer = vtkXMLUnstructuredGridWriter::New();
-  nodes_to_vtk(mesh, grid);
-  cells_to_vtk(mesh, grid);
-  writer->SetInput(grid);
+  nodes_to_vtk(mesh, _vtk_grid);
+  cells_to_vtk(mesh, _vtk_grid);
+  writer->SetInput(_vtk_grid);
   writer->SetFileName(name.c_str());
   writer->Write();
 #endif // HAVE_VTK
