@@ -1,5 +1,5 @@
 
-// $Id: mesh_refinement_flagging.C,v 1.34 2007-09-28 15:45:51 roystgnr Exp $
+// $Id: mesh_refinement_flagging.C,v 1.35 2007-10-09 19:40:06 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -172,7 +172,7 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
 
   // How much error per cell will we tolerate?
   const Real local_refinement_tolerance =
-    _absolute_global_tolerance / std::sqrt(_mesh.n_active_elem());
+    _absolute_global_tolerance / std::sqrt(static_cast<Real>(_mesh.n_active_elem()));
   const Real local_coarsening_tolerance =
     local_refinement_tolerance * _coarsen_threshold;
 
