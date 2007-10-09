@@ -1,4 +1,4 @@
-/* $Id: ex17.C,v 1.3 2006-06-25 00:21:16 benkirk Exp $ */
+/* $Id: ex17.C,v 1.4 2007-10-09 21:41:21 jwpeterson Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -180,9 +180,7 @@ int main (int argc, char** argv)
 	eigen_system.get_eigenpair(nconv-1);
 	
 	// Write the eigen vector to file.
-	char buf[14];
-	sprintf (buf, "out.gmv");
-	GMVIO (mesh).write_equation_systems (buf, equation_systems);
+	GMVIO (mesh).write_equation_systems ("out.gmv", equation_systems);
       }
     else
       {
