@@ -1,4 +1,4 @@
-// $Id: vtk_io.h,v 1.4 2007-10-08 21:26:06 woutruijter Exp $
+// $Id: vtk_io.h,v 1.5 2007-10-09 13:43:59 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,9 +34,8 @@
 class MeshBase;
 class MeshData;
 
-#ifdef HAVE_VTK
 class vtkUnstructuredGrid;
-#endif //HAVE_VTK
+
 
 
 /**
@@ -99,34 +98,35 @@ public:
   /** 
    * Get a pointer to the VTK datastructure
    */
-#ifdef HAVE_VTK
-   inline vtkUnstructuredGrid* get_vtk_grid(){return _vtk_grid;}
-#endif
+   vtkUnstructuredGrid* get_vtk_grid(){return _vtk_grid;}
 	
 private:
-#ifdef HAVE_VTK
+
   /**
    * write the nodes from the mesh into a vtkUnstructuredGrid
    */
   void nodes_to_vtk(const MeshBase& mesh, vtkUnstructuredGrid*& grid);
+
   /** 
    * write the cells from the mesh into a vtkUnstructuredGrid
    */
   void cells_to_vtk(const MeshBase& mesh, vtkUnstructuredGrid*& grid);
+
   /**
    * write the solution to a vtkUnstructuredGrid
    */
   void solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid);
+
   /**
    * write the system vectors to vtk 
    */
   void system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid);
+
    /**
     * pointer to the VTK grid
     */
    vtkUnstructuredGrid* _vtk_grid;
   
-#endif 
   /**
    * A pointer to the MeshData object you would like to use.
    * with this VTKIO object.  Can be NULL.
