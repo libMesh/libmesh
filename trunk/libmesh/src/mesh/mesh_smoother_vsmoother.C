@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_vsmoother.C,v 1.8 2007-10-05 20:41:05 roystgnr Exp $
+// $Id: mesh_smoother_vsmoother.C,v 1.9 2007-10-09 13:44:43 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -105,7 +105,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
   full_smooth(n,N,R,mask,ncells,cells,mcells,nedges,edges,hnodes,theta,iter,me,H,adp,adap,gr,sout);
   ticks2=clock();
   fprintf(sout,"full_smooth took (%d-%d)/%ld = %ld seconds \n",
-	  (int)ticks2,(int)ticks1,CLOCKS_PER_SEC,(ticks2-ticks1)/CLOCKS_PER_SEC);
+	  (int)ticks2,(int)ticks1,(long int)CLOCKS_PER_SEC,(long int)(ticks2-ticks1)/CLOCKS_PER_SEC);
 
   /*---------save result---------*/
   fprintf(sout,"Saving Result \n");
