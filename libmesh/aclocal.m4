@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.114 2007-10-03 21:02:05 roystgnr Exp $
+dnl $Id: aclocal.m4,v 1.115 2007-10-09 19:39:11 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -614,14 +614,34 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           ;;
   
       portland_group)
-	  CXXFLAGS_DBG="-g --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects"
-          CXXFLAGS_OPT="-O2 --no_using_std --instantiate=none --one_instantiation_per_object --prelink_objects"
+	  CXXFLAGS_DBG="-g --no_using_std"
+          CXXFLAGS_OPT="-O2 --no_using_std -fast --no_exceptions -Minform=severe"
 	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
 	  CFLAGS_DBG="-g"
           CFLAGS_OPT="-O2"
           CFLAGS_DVL="$CFLAGS_DBG"
 
-	  LDFLAGS="$LDFLAGS -fpic"
+          dnl Position-independent code for shared libraries
+          if test "$enableshared" = yes ; then
+            CXXFLAGS_OPT="$CXXFLAGS_OPT -fpic"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG -fpic"
+            CXXFLAGS_DVL="$CXXFLAGS_DVL -fpic"
+          
+            CFLAGS_OPT="$CFLAGS_OPT -fpic"
+            CFLAGS_DBG="$CFLAGS_DBG -fpic"
+            CFLAGS_DVL="$CFLAGS_DVL -fpic"
+          
+            LDFLAGS="$LDFLAGS -fpic"
+          fi
+
+	  if test $target_cpu = "x86_64" ; then
+	    CXXFLAGS_DBG="$CXXFLAGS_DBG -tp amd64"
+	    CXXFLAGS_OPT="$CXXFLAGS_OPT -tp amd64"
+	    CXXFLAGS_DVL="$CXXFLAGS_DVL -tp amd64"
+	    CFLAGS_DBG="$CFLAGS_DBG -tp amd64"
+	    CFLAGS_OPT="$CFLAGS_OPT -tp amd64"
+	    CFLAGS_DVL="$CFLAGS_DVL -tp amd64"
+          fi
           ;;
 
       hpux_acc)
