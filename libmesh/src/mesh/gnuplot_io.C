@@ -1,4 +1,4 @@
-// $Id: gnuplot_io.C,v 1.10 2005-07-21 21:14:06 benkirk Exp $
+// $Id: gnuplot_io.C,v 1.11 2007-10-11 18:49:21 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -142,7 +142,9 @@ void GnuPlotIO::write_solution(const std::string& fname,
     out << "set output \"" << fname << ".png\"\n";
   }
 
-  out << "plot \"" << data_file_name << "\" using 1:2 title \"" << (*names)[0]
+  out << "plot "
+      << axes_limits
+      << " \"" << data_file_name << "\" using 1:2 title \"" << (*names)[0]
       << "\" with lines";
   if(n_vars > 1)
   {
