@@ -1,4 +1,4 @@
-// $Id: gnuplot_io.h,v 1.5 2005-07-21 21:13:58 benkirk Exp $
+// $Id: gnuplot_io.h,v 1.6 2007-10-11 18:49:20 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -82,10 +82,20 @@ class GnuPlotIO : public MeshOutput<MeshBase>
 
 
   /**
-   * Write output to a .png file useing gnuplot
+   * Write output to a .png file using gnuplot
    */
   void set_png_output(bool png_output) { _png_output = png_output; }
 
+  /**
+   * GNUplot automatically adjusts the x and y-axes of 2D plots
+   * to "zoom in" on the data.  You can set this string to force
+   * GNUplot to maintain a fixed set of axes.
+   * Example: axes_limits = "[0:1] [0:1]" would force x and y
+   * to be plotted on the range 0<=x<=1 and 0<=y<=1 regardless
+   * of where the data lie. 
+   */
+  std::string axes_limits;
+  
  private:
   /**
    * This method implements writing a mesh with nodal data to a
