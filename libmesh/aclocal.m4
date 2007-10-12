@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.115 2007-10-09 19:39:11 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.116 2007-10-12 20:29:06 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -119,6 +119,10 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
         if test "x$is_intel_ecc" != "x" ; then
           GXX_VERSION_STRING="`($CXX -V -help 2>&1) | grep 'Version '`"
           case "$GXX_VERSION_STRING" in
+            *10.0*)
+              AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 10.0 >>>)
+  	      GXX_VERSION=intel_itanium_icc_v10.0
+              ;;
             *9.1*)
               AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 9.1 >>>)
   	      GXX_VERSION=intel_itanium_icc_v9.1
@@ -151,6 +155,10 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
           if test "x$is_intel_icc" != "x" ; then
             GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
             case "$GXX_VERSION_STRING" in
+              *10.0*)
+                AC_MSG_RESULT(<<< C++ compiler is Intel ICC 10.0 >>>)
+  	        GXX_VERSION=intel_icc_v10.0
+                ;;
               *9.1*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel ICC 9.1 >>>)
   	        GXX_VERSION=intel_icc_v9.1
@@ -418,8 +426,35 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 
         dnl Specific flags for specific versions
         case "$GXX_VERSION" in
+
+          dnl Intel ICC >= 10.0	
+          intel_icc_v10.0)	
+              dnl Disable some warning messages:
+              dnl #266: 'function declared implicitly'
+              dnl       Metis function "GKfree" caused this error
+              dnl       in almost every file.
+              dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
+              dnl        Well, duh, when the tested value is computed...  OK when it
+              dnl        was from an assignment.
+              dnl Note: In Version 8.1 (and possibly newer?) the -inline_debug_info
+              dnl       option causes a segmentation fault in libmesh.C, probably others...
+
+              dnl CPU-specific flags: -axK is for ia32, -xP is for x86_64
+              INTEL_AX_FLAG="-tpp6 -axK"
+              if test $target_cpu = "x86_64" ; then
+                INTEL_AX_FLAG="-xP"
+              fi
+
+              CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
+              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
+              CFLAGS_OPT="-O2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CFLAGS_DVL="$CFLAGS_DBG"
+              ;;
+          
           dnl Intel ICC >= 8.1	
-          intel_icc_v8.1 | intel_icc_v9.0 | intel_icc_v9.1)	
+          intel_icc_v8.1 | intel_icc_v9.0 | intel_icc_v9.1 | intel_icc_v10.0)	
               dnl Disable some warning messages:
               dnl #266: 'function declared implicitly'
               dnl       Metis function "GKfree" caused this error
@@ -459,7 +494,27 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
               ;;
           
           dnl Intel Itanium ICC >= v8.1
-          intel_itanium_icc_v8.1 | intel_itanium_icc_v9.0 | intel_itanium_icc_v9.1)
+          intel_itanium_icc_v8.1 | intel_itanium_icc_v9.0 | intel_itanium_icc_v9.1 | intel_itanium_icc_v10.0)
+              dnl Disable some warning messages:
+              dnl #266: 'function declared implicitly'
+              dnl       Metis function "GKfree" caused this error
+              dnl       in almost every file.
+              dnl #1476: 'field uses tail padding of a base class'
+          	  dnl #1505: 'size of class is affected by tail padding'
+              dnl        simply warns of a possible incompatibility with
+              dnl        the g++ ABI for this case
+              dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
+              dnl        Well, duh, when the tested value is computed...  OK when it
+              dnl        was from an assignment.
+              CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
+              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
+              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
+              CFLAGS_OPT="-O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
+              CFLAGS_DVL="$CFLAGS_DBG"
+              ;;
+          
+          intel_itanium_icc_v8.1 | intel_itanium_icc_v9.0 | intel_itanium_icc_v9.1 | intel_itanium_icc_v10.0)
               dnl Disable some warning messages:
               dnl #266: 'function declared implicitly'
               dnl       Metis function "GKfree" caused this error
@@ -500,15 +555,34 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 
         dnl Position-independent code for shared libraries
         if test "$enableshared" = yes ; then
-          CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
-          CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-          CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
+	        
+          dnl Specific flags for specific versions
+          case "$GXX_VERSION" in
+
+            dnl Intel ICC >= 10.0	
+            intel_*_v10.0)	
+              CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
+              CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
+              CXXFLAGS_DVL="$CXXFLAGS_DVL -fPIC"
         
-          CFLAGS_OPT="$CFLAGS_OPT -KPIC"
-          CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-          CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+              CFLAGS_OPT="$CFLAGS_OPT -fPIC"
+              CFLAGS_DBG="$CFLAGS_DBG -fPIC"
+              CFLAGS_DVL="$CFLAGS_DVL -fPIC"
+
+              LDFLAGS="$LDFLAGS -fPIC"
+	      ;;
+	    *)
+              CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+              CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+              CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
         
-          LDFLAGS="$LDFLAGS -KPIC"
+              CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+              CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+              CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+
+              LDFLAGS="$LDFLAGS -KPIC"
+	      ;;
+          esac
         fi
       ;;
   
