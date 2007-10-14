@@ -1,4 +1,4 @@
-# $Id: Make.common.in,v 1.65 2007-10-03 21:09:43 roystgnr Exp $
+# $Id: Make.common.in,v 1.66 2007-10-14 16:00:26 benkirk Exp $
 
 
 ###############################################################################
@@ -405,7 +405,7 @@ ifeq ($(enable-optional),yes)
     libmesh_LIBS += $(libs-PETSC) \
                     $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) $(HYPRE_LIB) \
                     $(SUPERLU_DIST_LIB) $(UMFPACK_LIB) $(SUPERLU_LIB) \
-                    $(BLOPEX_LIB) \
+                    $(BLOPEX_LIB)  $(SPAI_LIB) \
                     $(BLASLAPACK_LIB) $(X11_LIB) $(MATLAB_LIB) \
                     $(libmesh_FLIBS)
 
