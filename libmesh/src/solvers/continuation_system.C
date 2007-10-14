@@ -1,4 +1,4 @@
-// $Id: continuation_system.C,v 1.1 2007-08-02 17:27:19 jwpeterson Exp $
+// $Id: continuation_system.C,v 1.2 2007-10-14 21:47:03 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -22,7 +22,7 @@
 #include "linear_solver.h"
 #include "time_solver.h"
 #include "newton_solver.h"
-
+#include "sparse_matrix.h"
 
 ContinuationSystem::ContinuationSystem (EquationSystems& es,
 					const std::string& name,
@@ -30,15 +30,29 @@ ContinuationSystem::ContinuationSystem (EquationSystems& es,
   : Parent(es, name, number),
     continuation_parameter(NULL),
     quiet(true),
-    ds(0.1),
     continuation_parameter_tolerance(1.e-6),
     solution_tolerance(1.e-6),
+    old_continuation_parameter(0.),
+    min_continuation_parameter(0.),
+    max_continuation_parameter(0.),
+    Theta(1.),
+    Theta_LOCA(1.),
+    //tau(1.),
+    n_backtrack_steps(5),
+    n_arclength_reductions(5),
+    ds_min(1.e-8),
+    predictor(Euler),
+    newton_stepgrowth_aggressiveness(1.),
     rhs_mode(Residual),
     linear_solver(LinearSolver<Number>::build()),
     tangent_initialized(false),
     newton_solver(NULL),
-    old_continuation_parameter(0.),
-    dlambda_ds(1.0)
+    dlambda_ds(0.707),
+    ds(0.1),
+    ds_current(0.1),
+    previous_dlambda_ds(0.),
+    previous_ds(0.),
+    newton_step(0)
 {
   // Warn about using untested code
   untested();
@@ -57,6 +71,9 @@ ContinuationSystem::~ContinuationSystem ()
 
 void ContinuationSystem::clear()
 {
+  // FIXME: Do anything here, e.g. zero vectors, etc?
+
+  // Call the Parent's clear function
   Parent::clear();
 }
 
@@ -67,12 +84,18 @@ void ContinuationSystem::init_data ()
   // Add a vector which stores the tangent "du/ds" to the system and save its pointer.
   du_ds = &(add_vector("du_ds"));
 
+  // Add a vector which stores the tangent "du/ds" to the system and save its pointer.
+  previous_du_ds = &(add_vector("previous_du_ds"));
+
   // Add a vector to keep track of the previous nonlinear solution
   // at the old value of lambda.
   previous_u = &(add_vector("previous_u"));
 
   // Add a vector to keep track of the temporary solution "y" of Ay=G_{\lambda}.
   y = &(add_vector("y"));
+
+  // Add a vector to keep track of the "old value" of "y" which is the solution of Ay=G_{\lambda}.
+  y_old = &(add_vector("y_old"));
 
   // Add a vector to keep track of the temporary solution "z" of Az=-G.
   z = &(add_vector("z"));
@@ -96,6 +119,232 @@ void ContinuationSystem::solve()
 
 
 
+
+void ContinuationSystem::initialize_tangent()
+{
+  // Be sure the tangent was not already initialized.
+  assert (!tangent_initialized);
+  
+  // Compute delta_s_zero, the initial arclength travelled during the
+  // first step.  Here we assume that previous_u and lambda_old store
+  // the previous solution and control parameter.  You may need to
+  // read in an old solution (or solve the non-continuation system)
+  // first and call save_current_solution() before getting here.
+  
+  // 1.) Compute delta_s_zero as ||u|| - ||u_old|| + ...
+  // Compute norms of the current and previous solutions
+//   Real norm_u          = solution->l2_norm();
+//   Real norm_previous_u = previous_u->l2_norm();
+  
+//   if (!quiet)
+//     {
+//       std::cout << "norm_u=" << norm_u << std::endl;
+//       std::cout << "norm_previous_u=" << norm_previous_u << std::endl;
+//     }
+  
+//   if (norm_u == norm_previous_u)
+//     {
+//       std::cerr << "Warning, it appears u and previous_u are the "
+//   		<< "same, are you sure this is correct?"
+//   		<< "It's possible you forgot to set one or the other..."
+//   		<< std::endl;
+//     }
+  
+//   Real delta_s_zero = std::sqrt(
+//   				(norm_u - norm_previous_u)*(norm_u - norm_previous_u) +
+//   				(*continuation_parameter-old_continuation_parameter)*
+//   				(*continuation_parameter-old_continuation_parameter)
+//   				);
+
+//   // 2.) Compute delta_s_zero as ||u -u_old|| + ...
+//   *delta_u = *solution;
+//   delta_u->add(-1., *previous_u);
+//   delta_u->close();
+//   Real norm_delta_u = delta_u->l2_norm();
+//   Real norm_u          = solution->l2_norm();
+//   Real norm_previous_u = previous_u->l2_norm();
+
+//   // Scale norm_delta_u by the bigger of either norm_u or norm_previous_u
+//   norm_delta_u /= std::max(norm_u, norm_previous_u);
+  
+//   if (!quiet)
+//     {
+//       std::cout << "norm_u=" << norm_u << std::endl;
+//       std::cout << "norm_previous_u=" << norm_previous_u << std::endl;
+//       //std::cout << "norm_delta_u=" << norm_delta_u << std::endl;
+//       std::cout << "norm_delta_u/max(|u|,|u_old|)=" << norm_delta_u << std::endl;
+//       std::cout << "|norm_u-norm_previous_u|=" << fabs(norm_u - norm_previous_u) << std::endl;
+//     }
+  
+//   const Real dlambda = *continuation_parameter-old_continuation_parameter;
+
+//   if (!quiet)
+//     std::cout << "dlambda=" << dlambda << std::endl;
+  
+//   Real delta_s_zero = std::sqrt(
+//   				(norm_delta_u*norm_delta_u) +
+//   				(dlambda*dlambda)
+//   				);
+  
+//   if (!quiet)
+//     std::cout << "delta_s_zero=" << delta_s_zero << std::endl;
+
+  // 1.) + 2.)
+//   // Now approximate the initial tangent d(lambda)/ds
+//   this->dlambda_ds = (*continuation_parameter-old_continuation_parameter) / delta_s_zero;
+
+
+//   // We can also approximate the deriv. wrt s by finite differences:
+//   // du/ds = (u1 - u0) / delta_s_zero.
+//   // FIXME: Use delta_u from above if we decide to keep that method.
+//   *du_ds = *solution;
+//   du_ds->add(-1., *previous_u);
+//   du_ds->scale(1./delta_s_zero);
+//   du_ds->close();
+
+
+  // 3.) Treating (u-previous_u)/(lambda - lambda_old) as an approximation to du/d(lambda),
+  // we follow the same technique as Carnes and Shadid.
+//   const Real dlambda = *continuation_parameter-old_continuation_parameter;
+//   assert (dlambda > 0.);
+  
+//   // Use delta_u for temporary calculation of du/d(lambda)
+//   *delta_u = *solution;
+//   delta_u->add(-1., *previous_u);
+//   delta_u->scale(1. / dlambda);
+//   delta_u->close();
+
+//   // Determine initial normalization parameter
+//   const Real solution_size = std::max(solution->l2_norm(), previous_u->l2_norm());
+//   if (solution_size > 1.)
+//     {
+//       Theta = 1./solution_size;
+      
+//       if (!quiet)
+// 	std::cout << "Setting Normalization Parameter Theta=" << Theta << std::endl;
+//     }
+  
+//   // Compute d(lambda)/ds
+//   // The correct sign of d(lambda)/ds should be positive, since we assume that (lambda > lambda_old)
+//   // but we could always double-check that as well.
+//   Real norm_delta_u = delta_u->l2_norm();
+//   this->dlambda_ds = 1. / std::sqrt(1. + Theta*Theta*norm_delta_u*norm_delta_u);
+
+//   // Finally, compute du/ds = d(lambda)/ds * du/d(lambda)
+//   *du_ds = *delta_u;
+//   du_ds->scale(dlambda_ds);
+//   du_ds->close();
+
+
+  // 4.) Use normalized arclength formula to estimate delta_s_zero
+//   // Determine initial normalization parameter
+//   set_Theta();
+
+//   // Compute (normalized) delta_s_zero
+//   *delta_u = *solution;
+//   delta_u->add(-1., *previous_u);
+//   delta_u->close();
+//   Real norm_delta_u = delta_u->l2_norm();
+  
+//   const Real dlambda = *continuation_parameter-old_continuation_parameter;
+
+//   if (!quiet)
+//     std::cout << "dlambda=" << dlambda << std::endl;
+  
+//   Real delta_s_zero = std::sqrt(
+//   				(Theta_LOCA*Theta_LOCA*Theta*norm_delta_u*norm_delta_u) +
+//   				(dlambda*dlambda)
+//   				);
+//   *du_ds = *delta_u;
+//   du_ds->scale(1./delta_s_zero);
+//   dlambda_ds = dlambda / delta_s_zero;
+  
+//   if (!quiet)
+//     {
+//       std::cout << "delta_s_zero=" << delta_s_zero << std::endl;
+//       std::cout << "initial d(lambda)/ds|_0 = " << dlambda_ds << std::endl;
+//       std::cout << "initial ||du_ds||_0 = " << du_ds->l2_norm() << std::endl;
+//     }
+
+//   // FIXME: Also store the initial finite-differenced approximation to -du/dlambda as y.
+//   // We stick to the convention of storing negative y, since that is what we typically
+//   // solve for anyway.
+//   *y = *delta_u;
+//   y->scale(-1./dlambda);
+//   y->close();
+
+  
+
+  // 5.) Assume dlambda/ds_0 ~ 1/sqrt(2) and determine the value of Theta_LOCA which
+  // will satisfy this criterion
+
+  // Initial change in parameter
+  const Real dlambda = *continuation_parameter-old_continuation_parameter;
+  assert (dlambda != 0.0);
+  
+  // Ideal initial value of dlambda_ds
+  dlambda_ds = 1. / std::sqrt(2.);
+  if (dlambda < 0.)
+    dlambda_ds *= -1.;
+  
+  // This also implies the initial value of ds
+  ds_current = dlambda / dlambda_ds;
+
+  if (!quiet)
+    std::cout << "Setting ds_current|_0=" << ds_current << std::endl;
+  
+  // Set y = -du/dlambda using finite difference approximation
+  *y = *solution;
+  y->add(-1., *previous_u);
+  y->scale(-1./dlambda);
+  y->close();
+  const Real ynorm=y->l2_norm();
+  
+  // Finally, set the value of du_ds to be used in the upcoming
+  // tangent calculation. du/ds = du/dlambda * dlambda/ds
+  *du_ds = *y;
+  du_ds->scale(-dlambda_ds);
+  du_ds->close();
+
+  // Determine additional solution normalization parameter
+  // (Since we just set du/ds, it will be:  ||du||*||du/ds||)
+  set_Theta();
+
+  // The value of Theta_LOCA which makes dlambda_ds = 1/sqrt(2),
+  // assuming our Theta = ||du||^2.
+  // Theta_LOCA = fabs(dlambda);
+
+  // Assuming general Theta
+  Theta_LOCA = std::sqrt(1./Theta/ynorm/ynorm);
+  
+  
+  if (!quiet)
+    {
+      std::cout << "Setting initial Theta_LOCA = " << Theta_LOCA << std::endl;
+      std::cout << "Theta_LOCA^2*Theta         = " << Theta_LOCA*Theta_LOCA*Theta << std::endl;
+      std::cout << "initial d(lambda)/ds|_0    = " << dlambda_ds << std::endl;
+      std::cout << "initial ||du_ds||_0        = " << du_ds->l2_norm() << std::endl;
+    }
+
+
+  
+  // OK, we estimated the tangent at point u0.
+  // Now, to estimate the tangent at point u1, we call the solve_tangent routine.
+
+  // Set the flag which tells us the method has been initialized.
+  tangent_initialized = true;
+
+  solve_tangent();
+  
+  // Advance the solution and the parameter to the next value.
+  update_solution();
+}
+
+
+
+
+
+
 // This is most of the "guts" of this class.  This is where we implement
 // our custom Newton iterations and perform most of the solves.
 void ContinuationSystem::continuation_solve()
@@ -112,13 +361,25 @@ void ContinuationSystem::continuation_solve()
       error();
     }
 
+  // Use extra precision for all the numbers printed in this function.
+  unsigned int old_precision = std::cout.precision();
+  std::cout.precision(16);
+  std::cout.setf(std::ios_base::scientific);
   
   // We can't start solving the augmented PDE system unless the tangent
   // vectors have been initialized.  This only needs to occur once.
   if (!tangent_initialized)
     initialize_tangent();
 
-
+  // Save the old value of -du/dlambda.  This will be used after the Newton iterations
+  // to compute the angle between previous tangent vectors.  This cosine of this angle is
+  //
+  // tau := abs( (du/d(lambda)_i , du/d(lambda)_{i-1}) / (||du/d(lambda)_i|| * ||du/d(lambda)_{i-1}||) )
+  //
+  // The scaling factor tau (which should vary between 0 and 1) is used to shrink the step-size ds
+  // when we are approaching a turning point.  Note that it can only shrink the step size.  
+  *y_old = *y;
+  
   // Set pointer to underlying Newton solver
   if (!newton_solver)
     newton_solver =
@@ -128,153 +389,504 @@ void ContinuationSystem::continuation_solve()
   // A pair for catching return values from linear system solves.
   std::pair<unsigned int, Real> rval;
 
-  // The nonlinear loop
-  unsigned int l=0;
-  for (; l<newton_solver->max_nonlinear_iterations; ++l)
+  // Convergence flag for the entire arcstep
+  bool arcstep_converged = false;
+
+  // Begin loop over arcstep reductions.
+  for (unsigned int ns=0; ns<n_arclength_reductions; ++ns)
     {
-      std::cout << "Starting Newton step " << l << std::endl;
-      
-      // Assemble the system matrix AND rhs, with rhs = G_{\lambda}
-      rhs_mode = G_Lambda;
-
-      // Assemble both rhs and Jacobian
-      assembly(true, true);
-
-      // Not sure if this is really necessary
-      rhs->close();
-      
-      //std::cout << "||y||=" << y->l2_norm() << std::endl;
-      
-      // Solve G_u*y = G_{\lambda}
-      // Initial guess?
-      y->zero();
-      y->close();
-      rval =
-	linear_solver->solve(*matrix,
-			     *y,
-			     *rhs,
-			     1.e-12, // linear tolerance
-			     newton_solver->max_linear_iterations);   // max linear iterations
-      //here();
-
       if (!quiet)
-	std::cout << "G_u*y = G_{lambda} solver converged at step "
-		  << rval.first
-		  << ", linear tolerance = "
-		  << rval.second
-		  << "."
-		  << std::endl;
-
-      //std::cout << "||y||=" << y->l2_norm() << std::endl;
-      
-      
-      // Now, reassemble the system (skipping the Jacobian) with rhs = the normal residual.
-      rhs_mode = Residual;
-      assembly(true, false);
-      rhs->close();
-      
-      // Solve the linear system G_u*z = G
-      // Initial guess?
-      z->zero(); // It seems to be extremely important to zero z here, otherwise the solver quits early.
-      z->close();
-      rval =
-	linear_solver->solve(*matrix,
-			     *z,
-			     *rhs,
-			     1.e-12, // linear tolerance
-			     newton_solver->max_linear_iterations);   // max linear iterations
-      //here();
-
-      if (!quiet)
-	std::cout << "G_u*z = G solver converged at step "
-		  << rval.first
-		  << " linear tolerance = "
-		  << rval.second
-		  << "."
-		  << std::endl;
-      
-      // Note: need to scale z by -1 since our code always solves Jx=R
-      // instead of Jx=-R.
-      z->scale(-1.);
-      z->close();
-      //std::cout << "||z||=" << z->l2_norm() << std::endl;
-      
-      
-      // Compute N, the residual of the arclength constraint eqn.
-      // Note 1: N(u,lambda,s) := (u-u_{old}, du_ds) + (lambda-lambda_{old}, dlambda_ds) - _ds 
-      // We temporarily use the delta_u vector as a temporary vector for this calculation.
-      *delta_u = *solution;
-      delta_u->add(-1., *previous_u);
-
-      Real N =
-	delta_u->dot(*du_ds) +
-	((*continuation_parameter) - old_continuation_parameter)*dlambda_ds -
-	ds;
-
-      //std::cout << "N=" << N << std::endl;
-
-      const Real duds_dot_z = du_ds->dot(*z);
-      const Real duds_dot_y = du_ds->dot(*y);
-
-      //std::cout << "duds_dot_z=" << duds_dot_z << std::endl;
-      //std::cout << "duds_dot_y=" << duds_dot_y << std::endl;
-      //std::cout << "dlambda_ds=" << dlambda_ds << std::endl;
-
-      const Real delta_lambda_numerator   = -N -duds_dot_z;
-      const Real delta_lambda_denominator = dlambda_ds  - duds_dot_y;
-
-      assert (delta_lambda_denominator != 0.0);
-      //std::cout << "delta_lambda_numerator=" << delta_lambda_numerator << std::endl;
-      //std::cout << "delta_lambda_denominator=" << delta_lambda_denominator << std::endl;
-
-      // Now, we are ready to compute the step delta_lambda
-      // delta_lambda = (-N - dot(N_u,z)) / (N_{\lambda} - dot(N_u,y))
-      Real delta_lambda = delta_lambda_numerator / delta_lambda_denominator;
-      //	(-N          - duds_dot_z)  /  (dlambda_ds  - duds_dot_y);
-
-      // Knowing delta_lambda, we are ready to update delta_u
-      // delta_u = z - delta_lambda*y
-      delta_u->zero();
-      delta_u->add(1., *z);
-      delta_u->add(-delta_lambda, *y);
-      delta_u->close();
-
-
-      // Update the system solution and the system parameter.
-      //std::cout << "||solution||=" << solution->l2_norm() << std::endl;
-      solution->add(1., *delta_u);
-      solution->close();
-      //std::cout << "||solution||=" << solution->l2_norm() << std::endl;
-      *continuation_parameter += delta_lambda;
-      
-      // Check the convergence of the parameter and the solution.  If they are small
-      // enough, we can break out of the Newton iteration loop.  
-      const Real norm_delta_u = delta_u->l2_norm();
-      std::cout << "  delta_lambda = " << delta_lambda << std::endl;
-      std::cout << "  ||delta_u|| = " << norm_delta_u << std::endl;
-
-      if ((fabs(delta_lambda) < continuation_parameter_tolerance) &&
-	  (norm_delta_u       < solution_tolerance))
 	{
-	  if (!quiet)
-	    std::cout << "Newton iterations converged!" << std::endl;
-	  
-	  break;
+	  std::cout << "Current arclength stepsize, ds_current=" << ds_current << std::endl;
+	  std::cout << "Current parameter value, lambda=" << *continuation_parameter << std::endl;
 	}
-    }
+      
+      // Upon exit from the nonlinear loop, the newton_converged flag
+      // will tell us the convergence status of Newton's method.
+      bool newton_converged = false;
 
-  //std::cout << "l=" << l << std::endl;
-  if (l == newton_solver->max_nonlinear_iterations)
+      // The nonlinear residual at the end of the previous "k-1" Newton step
+      //Real old_nonlinear_residual = 0.;
+
+      // The nonlinear residual from the current "k" Newton step, before the Newton step
+      Real nonlinear_residual_beforestep = 0.;
+
+      // The nonlinear residual from the current "k" Newton step, after the Newton step
+      Real nonlinear_residual_afterstep = 0.;
+
+      // The linear solver tolerance, can be updated dynamically at each Newton step.
+      Real current_linear_tolerance = 0.;
+      
+      // The nonlinear loop
+      for (newton_step=0; newton_step<newton_solver->max_nonlinear_iterations; ++newton_step)
+	{
+	  std::cout << "\n === Starting Newton step " << newton_step << " ===" << std::endl;
+	  
+	  // Set the linear system solver tolerance
+// 	  // 1.) Set the current linear tolerance based as a multiple of the current residual of the system.
+// 	  const Real residual_multiple = 1.e-4;
+// 	  Real current_linear_tolerance = residual_multiple*nonlinear_residual_beforestep;
+
+// 	  // But if the current residual isn't small, don't let the solver exit with zero iterations!
+// 	  if (current_linear_tolerance > 1.)
+// 	    current_linear_tolerance = residual_multiple;
+
+	  // 2.) Set the current linear tolerance based on the method based on technique of Eisenstat & Walker.
+	  if (newton_step==0)
+	    {
+	      // At first step, only try reducing the residual by a small amount
+	      current_linear_tolerance = 0.01;
+	    }
+
+	  else
+	    {
+	      // The new tolerance is based on the ratio of the most recent tolerances
+	      const Real alp=0.5*(1.+std::sqrt(5.));
+	      const Real gam=0.9;
+
+	      assert (nonlinear_residual_beforestep != 0.0);
+	      assert (nonlinear_residual_afterstep != 0.0);
+
+	      current_linear_tolerance = std::min(gam*std::pow(nonlinear_residual_afterstep/nonlinear_residual_beforestep, alp),
+						  current_linear_tolerance*current_linear_tolerance
+						  );
+
+	      // Don't let it get ridiculously small!!
+	      if (current_linear_tolerance < 1.e-12)
+		current_linear_tolerance = 1.e-12;
+	    }
+
+	  if (!quiet)
+	    std::cout << "Using current_linear_tolerance=" << current_linear_tolerance << std::endl;
+
+	  
+	  // Assemble the residual (and Jacobian).
+	  rhs_mode = Residual;
+	  assembly(true,   // Residual
+		   true); // Jacobian
+	  rhs->close();
+
+	  // Save the current nonlinear residual.  We don't need to recompute the residual unless
+	  // this is the first step, since it was already computed as part of the convergence check
+	  // at the end of the last loop iteration.
+	  if (newton_step==0)
+	    {
+	      nonlinear_residual_beforestep = rhs->l2_norm();
+	      const Real old_norm_u = solution->l2_norm();
+	      std::cout << "  (before step) ||R||_{L2} = " << nonlinear_residual_beforestep << std::endl;
+	      std::cout << "  (before step) ||R||_{L2}/||u|| = " << nonlinear_residual_beforestep / old_norm_u << std::endl;
+
+	      // In rare cases (very small arcsteps), it's possible that the residual is
+	      // already below our absolute linear tolerance.
+	      if (nonlinear_residual_beforestep  < solution_tolerance)
+		{
+		  if (!quiet)
+		    std::cout << "Initial guess satisfied linear tolerance, exiting with zero Newton iterations!" << std::endl;
+
+		  // Since we go straight from here to the solve of the next tangent, we
+		  // have to close the matrix before it can be assembled again.
+		  matrix->close();
+		  newton_converged=true;
+		  break; // out of Newton iterations, with newton_converged=true
+		}
+	    }
+
+	  else
+	    {
+	      nonlinear_residual_beforestep = nonlinear_residual_afterstep;
+	    }
+
+	  
+	  // Solve the linear system G_u*z = G
+	  // Initial guess?
+	  z->zero(); // It seems to be extremely important to zero z here, otherwise the solver quits early.
+	  z->close();
+	  
+	  rval =
+	    linear_solver->solve(*matrix,
+				 *z,
+				 *rhs,
+				 //1.e-12,
+				 current_linear_tolerance,
+				 newton_solver->max_linear_iterations);   // max linear iterations
+
+	  if (!quiet)
+	    std::cout << "  G_u*z = G solver converged at step "
+		      << rval.first
+		      << " linear tolerance = "
+		      << rval.second
+		      << "."
+		      << std::endl;
+
+	  // Sometimes (I am not sure why) the linear solver exits after zero iterations.
+	  // Perhaps it is hitting PETSc's divergence tolerance dtol???  If this occurs,
+	  // we should break out of the Newton iteration loop because nothing further is
+	  // going to happen...  Of course if the tolerance is already small enough after
+	  // zero iterations (how can this happen?!) we should not quit.
+	  if ((rval.first == 0) && (rval.second > current_linear_tolerance))
+	    {
+	      if (!quiet)
+		std::cout << "Linear solver exited in zero iterations!" << std::endl;
+
+	      break; // out of Newton iterations
+	    }
+	  
+	  // Note: need to scale z by -1 since our code always solves Jx=R
+	  // instead of Jx=-R.
+	  z->scale(-1.);
+	  z->close();
+
+
+
+
+
+	  
+	  // Assemble the G_Lambda vector, skip residual.
+	  rhs_mode = G_Lambda;
+
+	  // Assemble both rhs and Jacobian
+	  assembly(true,  // Residual
+		   false); // Jacobian
+
+	  // Not sure if this is really necessary
+	  rhs->close();
+	  const Real yrhsnorm=rhs->l2_norm();
+	  if (yrhsnorm == 0.0)
+	    {
+	      std::cout << "||G_Lambda|| = 0" << std::endl;
+	      error();
+	    }
+
+	  // We select a tolerance for the y-system which is based on the inexact Newton
+	  // tolerance but scaled by an extra term proportional to the RHS (which is not -> 0 in this case)
+	  const Real ysystemtol=current_linear_tolerance*(nonlinear_residual_beforestep/yrhsnorm);
+	  if (!quiet)
+	    std::cout << "ysystemtol=" << ysystemtol << std::endl;
+	  
+	  // Solve G_u*y = G_{\lambda}
+	  // FIXME: Initial guess?  This is really a solve for -du/dlambda so we could try
+	  // initializing it with the latest approximation to that... du/dlambda ~ du/ds * ds/dlambda
+	  //*y = *solution;
+	  //y->add(-1., *previous_u);
+	  //y->scale(-1. / (*continuation_parameter - old_continuation_parameter)); // Be careful of divide by zero...
+	  //y->close();
+	  
+	  //	  const unsigned int max_attempts=1;
+	  // unsigned int attempt=0;
+	  // 	  do
+	  // 	    {
+	  // 	      if (!quiet)
+	  // 		std::cout << "Trying to solve tangent system, attempt " << attempt << std::endl;
+	      
+	      rval =
+		linear_solver->solve(*matrix,
+				     *y,
+				     *rhs,
+				     //1.e-12, 
+				     ysystemtol,
+				     newton_solver->max_linear_iterations);   // max linear iterations
+
+	      if (!quiet)
+		std::cout << "  G_u*y = G_{lambda} solver converged at step "
+			  << rval.first
+			  << ", linear tolerance = "
+			  << rval.second
+			  << "."
+			  << std::endl;
+
+	      // Sometimes (I am not sure why) the linear solver exits after zero iterations.
+	      // Perhaps it is hitting PETSc's divergence tolerance dtol???  If this occurs,
+	      // we should break out of the Newton iteration loop because nothing further is
+	      // going to happen...
+	      if ((rval.first == 0) && (rval.second > ysystemtol))
+		{
+		  if (!quiet)
+		    std::cout << "Linear solver exited in zero iterations!" << std::endl;
+
+		  break; // out of Newton iterations
+		}
+	      
+// 	      ++attempt;
+// 	    } while ((attempt<max_attempts) && (rval.first==newton_solver->max_linear_iterations));
+	    
+      
+      
+      
+      
+	  // Compute N, the residual of the arclength constraint eqn.
+	  // Note 1: N(u,lambda,s) := (u-u_{old}, du_ds) + (lambda-lambda_{old}, dlambda_ds) - _ds 
+	  // We temporarily use the delta_u vector as a temporary vector for this calculation.
+	  *delta_u = *solution;
+	  delta_u->add(-1., *previous_u);
+
+	  // First part of the arclength constraint
+	  const Real N1 = Theta_LOCA*Theta_LOCA*Theta*delta_u->dot(*du_ds);
+	  const Real N2 = ((*continuation_parameter) - old_continuation_parameter)*dlambda_ds;
+	  const Real N3 = ds_current;
+
+	  if (!quiet)
+	    {
+	      std::cout << "  N1=" << N1 << std::endl;
+	      std::cout << "  N2=" << N2 << std::endl;
+	      std::cout << "  N3=" << N3 << std::endl;
+	    }
+      
+	  // The arclength constraint value 
+	  const Real N = N1+N2-N3;
+      
+	  if (!quiet)
+	    std::cout << "  N=" << N << std::endl;
+
+	  const Real duds_dot_z = du_ds->dot(*z);
+	  const Real duds_dot_y = du_ds->dot(*y);
+
+	  //std::cout << "duds_dot_z=" << duds_dot_z << std::endl;
+	  //std::cout << "duds_dot_y=" << duds_dot_y << std::endl;
+	  //std::cout << "dlambda_ds=" << dlambda_ds << std::endl;
+
+	  const Real delta_lambda_numerator   = -(N          + Theta_LOCA*Theta_LOCA*Theta*duds_dot_z);
+	  const Real delta_lambda_denominator =  (dlambda_ds - Theta_LOCA*Theta_LOCA*Theta*duds_dot_y);
+
+	  assert (delta_lambda_denominator != 0.0);
+
+	  // Now, we are ready to compute the step delta_lambda
+	  Real delta_lambda = delta_lambda_numerator / delta_lambda_denominator;
+
+	  // Knowing delta_lambda, we are ready to update delta_u
+	  // delta_u = z - delta_lambda*y
+	  delta_u->zero();
+	  delta_u->add(1., *z);
+	  delta_u->add(-delta_lambda, *y);
+	  delta_u->close();
+
+	  // Update the system solution and the continuation parameter.
+	  solution->add(1., *delta_u);
+	  solution->close();
+	  *continuation_parameter += delta_lambda;
+
+	  // Did the Newton step actually reduce the residual?
+	  rhs_mode = Residual;
+	  assembly(true,   // Residual
+		   false); // Jacobian
+	  rhs->close();
+	  nonlinear_residual_afterstep = rhs->l2_norm();
+
+	  
+	  // In a "normal" Newton step, ||du||/||R|| > 1 since the most recent
+	  // step is where you "just were" and the current residual is where
+	  // you are now.  It can occur that ||du||/||R|| < 1, but these are
+	  // likely not good cases to attempt backtracking (?).
+	  const Real norm_du_norm_R = delta_u->l2_norm() / nonlinear_residual_afterstep;
+	  if (!quiet)
+	    std::cout << "  norm_du_norm_R=" << norm_du_norm_R << std::endl;
+      
+      
+	  // Factor to decrease the stepsize by for backtracking
+	  Real newton_stepfactor = 1.;
+
+	  const bool attempt_backtracking =
+	    (nonlinear_residual_afterstep > solution_tolerance)
+	    && (nonlinear_residual_afterstep > nonlinear_residual_beforestep)
+	    && (n_backtrack_steps>0)
+	    && (norm_du_norm_R > 1.)
+	    ;
+    
+	  // If residual is not reduced, do Newton back tracking.  
+	  if (attempt_backtracking)
+	    {
+	      if (!quiet)
+		std::cout << "Newton step did not reduce residual." << std::endl;
+
+	      // back off the previous step.
+	      solution->add(-1., *delta_u);
+	      solution->close();
+	      *continuation_parameter -= delta_lambda;
+
+	      // Backtracking: start cutting the Newton stepsize by halves until
+	      // the new residual is actually smaller...
+	      for (unsigned int backtrack_step=0; backtrack_step<n_backtrack_steps; ++backtrack_step)
+		{
+		  newton_stepfactor *= 0.5;
+
+		  if (!quiet)
+		    std::cout << "Shrinking step size by " << newton_stepfactor << std::endl;
+	      
+		  // Take fractional step
+		  solution->add(newton_stepfactor, *delta_u);
+		  solution->close();
+		  *continuation_parameter += newton_stepfactor*delta_lambda;
+	      
+		  rhs_mode = Residual;
+		  assembly(true,   // Residual
+			   false); // Jacobian
+		  rhs->close();
+		  nonlinear_residual_afterstep = rhs->l2_norm();
+
+		  if (!quiet)
+		    std::cout << "At shrink step "
+			      << backtrack_step
+			      << ", nonlinear_residual_afterstep="
+			      << nonlinear_residual_afterstep
+			      << std::endl;
+
+		  if (nonlinear_residual_afterstep < nonlinear_residual_beforestep)
+		    {
+		      if (!quiet)
+			std::cout << "Backtracking succeeded!" << std::endl;
+		      
+		      break; // out of backtracking loop
+		    }
+		  
+		  else
+		    {
+		      // Back off that step
+		      solution->add(-newton_stepfactor, *delta_u);
+		      solution->close();
+		      *continuation_parameter -= newton_stepfactor*delta_lambda;
+		    }
+	      
+		  // Save a copy of the solution from before the Newton step.
+		  //AutoPtr<NumericVector<Number> > prior_iterate = solution->clone();
+		}
+	    } // end if (attempte_backtracking)
+
+
+	  // If we tried backtracking but the residual is still not reduced, print message.
+	  if ((attempt_backtracking) && (nonlinear_residual_afterstep > nonlinear_residual_beforestep))
+	    {
+	      //std::cerr << "Backtracking failed." << std::endl;
+	      std::cout << "Backtracking failed." << std::endl;
+	  
+	      // 1.) Quit, exit program.
+	      //error();
+
+	      // 2.) Continue with last newton_stepfactor
+	      if (newton_step<3)
+		{
+		  solution->add(newton_stepfactor, *delta_u);
+		  solution->close();
+		  *continuation_parameter += newton_stepfactor*delta_lambda;
+		  if (!quiet)
+		    std::cout << "Backtracking could not reduce residual ... continuing anyway!" << std::endl;
+		}
+	      
+	      // 3.) Break out of Newton iteration loop with newton_converged = false,
+	      //     reduce the arclength stepsize, and try again.
+	      else
+		{
+		  break; // out of Newton iteration loop, with newton_converged=false
+		}
+	    }
+
+
+	  // Safety check: Check the current continuation parameter against user-provided min-allowable parameter value
+	  if (*continuation_parameter < min_continuation_parameter)
+	    {
+	      std::cout << "Continuation parameter fell below min-allowable value." << std::endl;
+	      // error();
+	      break; // out of Newton iteration loop, newton_converged = false
+	    }
+	  
+	  // Safety check: Check the current continuation parameter against user-provided max-allowable parameter value
+	  if ( (max_continuation_parameter != 0.0) &&
+	       (*continuation_parameter > max_continuation_parameter) )
+	    {
+	      std::cout << "Current continuation parameter value: "
+			<< *continuation_parameter
+			<< " exceeded max-allowable value."
+			<< std::endl;
+	      // error();
+	      break; // out of Newton iteration loop, newton_converged = false
+	    }
+	  
+      
+	  // Check the convergence of the parameter and the solution.  If they are small
+	  // enough, we can break out of the Newton iteration loop.  
+	  const Real norm_delta_u = delta_u->l2_norm();
+	  const Real norm_u = solution->l2_norm();
+	  std::cout << "  delta_lambda                   = " << delta_lambda << std::endl;
+	  std::cout << "  newton_stepfactor*delta_lambda = " << newton_stepfactor*delta_lambda << std::endl;
+	  std::cout << "  lambda_current                 = " << *continuation_parameter << std::endl;
+	  std::cout << "  ||delta_u||                    = " << norm_delta_u << std::endl;
+	  std::cout << "  ||delta_u||/||u||              = " << norm_delta_u / norm_u << std::endl;
+      
+
+	  // Evaluate the residual at the current Newton iterate.  We don't want to detect
+	  // convergence due to a small Newton step when the residual is still not small.
+	  rhs_mode = Residual;
+	  assembly(true,   // Residual
+		   false); // Jacobian
+	  rhs->close();
+	  const Real norm_residual = rhs->l2_norm();
+	  std::cout << "  ||R||_{L2} = " << norm_residual << std::endl;
+	  std::cout << "  ||R||_{L2}/||u|| = " << norm_residual / norm_u << std::endl;
+      
+      
+	  // FIXME: The norm_delta_u tolerance (at least) should be relative.
+	  // It doesn't make sense to converge a solution whose size is ~ 10^5 to
+	  // a tolerance of 1.e-6.  Oh, and we should also probably check the
+	  // (relative) size of the residual as well, instead of just the step.
+	  if ((fabs(delta_lambda) < continuation_parameter_tolerance) &&
+	      //(norm_delta_u       < solution_tolerance)               && // This is a *very* strict criterion we can probably skip
+	      (norm_residual      < solution_tolerance))
+	    {
+	      if (!quiet)
+		std::cout << "Newton iterations converged!" << std::endl;
+
+	      newton_converged = true;
+	      break; // out of Newton iterations
+	    }
+	} // end nonlinear loop
+
+      if (!newton_converged)
+	{
+	  std::cout << "Newton iterations of augmented system did not converge!" << std::endl;
+	  
+	  // Reduce ds_current, recompute the solution and parameter, and continue to next
+	  // arcstep, if there is one.
+	  ds_current *= 0.5;
+
+	  // Go back to previous solution and parameter value.
+	  *solution = *previous_u;
+	  *continuation_parameter = old_continuation_parameter;
+
+	  // Compute new predictor with smaller ds
+	  apply_predictor();
+	}
+      else
+	{
+	  // Set step convergence and break out
+	  arcstep_converged=true;
+	  break; // out of arclength reduction loop
+	}
+      
+    } // end loop over arclength reductions
+
+  // Check for convergence of the whole arcstep.  If not converged at this
+  // point, we have no choice but to quit.
+  if (!arcstep_converged)
     {
-      std::cout << "Newton iterations of augmented system did not converge!" << std::endl;
+      std::cout << "Arcstep failed to converge after max number of reductions! Exiting..." << std::endl;
       error();
     }
-
+  
   // Print converged solution control parameter and max value.
   std::cout << "lambda_current=" << *continuation_parameter << std::endl;
-  std::cout << "u_max=" << solution->max() << std::endl;
-  
-  
+  //std::cout << "u_max=" << solution->max() << std::endl;
+
+  // Reset old stream precision and flags.
+  std::cout.precision(old_precision);
+  std::cout.unsetf(std::ios_base::scientific);
+
+  // Note: we don't want to go on to the next guess yet, since the user may
+  // want to post-process this data.  It's up to the user to call advance_arcstep()
+  // when they are ready to go on.
+}
+
+
+
+void ContinuationSystem::advance_arcstep()
+{
   // Solve for the updated tangent du1/ds, d(lambda1)/ds
   solve_tangent();
 
@@ -285,12 +897,14 @@ void ContinuationSystem::continuation_solve()
 
 
 // This function solves the tangent system:
-// [ G_u          G_{lambda}        ][(du/ds)_new      ] = [  0 ]
-// [ (du/ds)_old  (dlambda/ds)_old  ][(dlambda/ds)_new ]   [-N_s]
+// [ G_u                G_{lambda}        ][(du/ds)_new      ] = [  0 ]
+// [ Theta*(du/ds)_old  (dlambda/ds)_old  ][(dlambda/ds)_new ]   [-N_s]
 // The solution is given by:
-// 1. Let G_u y = G_lambda
-// 2. (du_ds)_new = -(dlambda/ds)_new * y
-// 3. (dlambda/ds)_new = 1.0 / ( (dlambda/ds)_old - (du/ds)_old*y )
+// .) Let G_u y = G_lambda, then 
+// .) 2nd row yields:
+//    (dlambda/ds)_new = 1.0 / ( (dlambda/ds)_old - Theta*(du/ds)_old*y )
+// .) 1st row yields
+//    (du_ds)_new = -(dlambda/ds)_new * y
 void ContinuationSystem::solve_tangent()
 {
   // We shouldn't call this unless the current tangent already makes sense.
@@ -301,12 +915,13 @@ void ContinuationSystem::solve_tangent()
     newton_solver =
       dynamic_cast<NewtonSolver*> (this->time_solver->diff_solver().get());
   assert (newton_solver != NULL);
-  
+
   // Assemble the system matrix AND rhs, with rhs = G_{\lambda}
   this->rhs_mode = G_Lambda;
   
-  // Assemble both rhs and Jacobian
-  this->assembly(true, true);
+  // Assemble Residual and Jacobian
+  this->assembly(true,   // Residual
+		 true); // Jacobian
 
   // Not sure if this is really necessary
   rhs->close();
@@ -316,8 +931,11 @@ void ContinuationSystem::solve_tangent()
     linear_solver->solve(*matrix,
 			 *y,
 			 *rhs,
-			 1.e-12, // linear tolerance
-			 newton_solver->max_linear_iterations);   // max linear iterations
+			 1.e-12, // relative linear tolerance
+			 2*newton_solver->max_linear_iterations);   // max linear iterations
+
+  // FIXME: If this doesn't converge at all, the new tangent vector is
+  // going to be really bad...
   
   if (!quiet)
     std::cout << "G_u*y = G_{lambda} solver converged at step "
@@ -327,105 +945,361 @@ void ContinuationSystem::solve_tangent()
 	      << "."
 	      << std::endl;
 
+  // Save old solution and parameter tangents for possible use in higher-order
+  // predictor schemes.
+  previous_dlambda_ds = dlambda_ds;
+  *previous_du_ds     = *du_ds;
+
   
-  // Solve for the updated d(lambda)/ds
-  // denom = N_{lambda}   - (du_ds)^t y
-  //       = d(lambda)/ds - (du_ds)^t y
-  Real denom = dlambda_ds - du_ds->dot(*y);
+  // 1.) Previous, probably wrong, technique!
+//   // Solve for the updated d(lambda)/ds
+//   // denom = N_{lambda}   - (du_ds)^t y
+//   //       = d(lambda)/ds - (du_ds)^t y
+//   Real denom = dlambda_ds - du_ds->dot(*y);
 
-  //std::cout << "denom=" << denom << std::endl;
-  assert (denom != 0.0);
+//   //std::cout << "denom=" << denom << std::endl;
+//   assert (denom != 0.0);
   
-  dlambda_ds = 1.0 / denom;
- 
-  // Compute the updated value of du/ds = -_dlambda_ds * y
-  du_ds->zero();
-  du_ds->add(-dlambda_ds, *y);
-  du_ds->close();
+//   dlambda_ds = 1.0 / denom;
 
-  //std::cout << "||du_ds||=" << this->du_ds->l2_norm() << std::endl;
+
+//   if (!quiet)
+//     std::cout << "dlambda_ds=" << dlambda_ds << std::endl;
   
-  //error();
-}
+//   // Compute the updated value of du/ds = -_dlambda_ds * y
+//   du_ds->zero();
+//   du_ds->add(-dlambda_ds, *y);
+//   du_ds->close();
 
-
-
-void ContinuationSystem::initialize_tangent()
-{
-  // Be sure the tangent was not already initialized.
-  assert (!tangent_initialized);
   
-  // Compute delta_s_zero, the initial arclength travelled during the
-  // first step.  Here we assume that previous_u and lambda_old store
-  // the previous solution and control parameter.  You may need to
-  // read in an old solution (or solve the non-continuation system)
-  // first and call save_current_solution() before getting here.
-  
-  // Compute norms of the current and previous solutions
-  Real norm_u          = solution->l2_norm();
-  Real norm_previous_u = previous_u->l2_norm();
+  // 2.) From Brian Carnes' paper...
+  // According to Carnes, y comes from solving G_u * y = -G_{\lambda}
+  y->scale(-1.);
+  const Real ynorm = y->l2_norm();
+  dlambda_ds = 1. / std::sqrt(1. + Theta_LOCA*Theta_LOCA*Theta*ynorm*ynorm);
 
-  if (norm_u == norm_previous_u)
+  // Determine the correct sign for dlambda_ds.
+  
+  // We will use delta_u to temporarily compute this sign.
+  *delta_u = *solution;
+  delta_u->add(-1., *previous_u);
+  delta_u->close();
+
+  const Real sgn_dlambda_ds =
+    Theta_LOCA*Theta_LOCA*Theta*y->dot(*delta_u) +
+    (*continuation_parameter-old_continuation_parameter);
+
+  if (sgn_dlambda_ds < 0.)
     {
-      std::cerr << "Warning, it appears u and previous_u are the "
-		<< "same, are you sure this is correct?"
-		<< "It's possible you forgot to set one or the other..."
-		<< std::endl;
+      if (!quiet)
+	std::cout << "dlambda_ds is negative." << std::endl;
+      
+      dlambda_ds *= -1.;
     }
-  //std::cout << "||u_old||=" << this->solution->l2_norm() << std::endl;
-  
-  Real delta_s_zero = std::sqrt(
-				(norm_u - norm_previous_u)*(norm_u - norm_previous_u) +
-				(*continuation_parameter-old_continuation_parameter)*
-				(*continuation_parameter-old_continuation_parameter)
-				);
 
-  if (!quiet)
-    std::cout << "delta_s_zero=" << delta_s_zero << std::endl;
-
-  // Now approximate the initial tangent d(lambda)/ds
-  this->dlambda_ds = (*continuation_parameter-old_continuation_parameter) / delta_s_zero;
-
-  if (!quiet)
-    std::cout << "d(lambda_0)/ds=" << this->dlambda_ds << std::endl;
-
-  // We can also approximate the deriv. wrt s by finite differences:
-  // du/ds = (u1 - u0) / delta_s_zero.
-  *du_ds = *solution;
-  du_ds->add(-1., *previous_u);
-  du_ds->scale(1./delta_s_zero);
+  // Finally, set the new tangent vector, du/ds = dlambda/ds * y.
+  du_ds->zero();
+  du_ds->add(dlambda_ds, *y);
   du_ds->close();
-  
-  // Set the flag which tells us the method has been initialized.
-  tangent_initialized = true;
-  
-  // Advance the solution and the parameter to the next value.
-  update_solution();
+
+  if (!quiet)
+    {
+      std::cout << "d(lambda)/ds = " << dlambda_ds << std::endl;
+      std::cout << "||du_ds||    = " << du_ds->l2_norm() << std::endl;
+    }
+
+  // Our next solve expects y ~ -du/dlambda, so scale it back by -1 again now.
+  y->scale(-1.);
+  y->close();
 }
 
+
+
+void ContinuationSystem::set_Theta()
+{
+  // // Use the norm of the latest solution, squared.
+  //const Real normu = solution->l2_norm();
+  //assert (normu != 0.0);
+  //Theta = 1./normu/normu;
+  
+  // // 1.) Use the norm of du, squared
+//   *delta_u = *solution;
+//   delta_u->add(-1, *previous_u);
+//   delta_u->close();
+//   const Real normdu = delta_u->l2_norm();
+  
+//   if (normdu < 1.) // don't divide by zero or make a huge scaling parameter.
+//     Theta = 1.;
+//   else
+//     Theta = 1./normdu/normdu;
+
+  // 2.) Use 1.0, i.e. don't scale
+  Theta=1.;
+
+  // 3.) Use a formula which attempts to make the "solution triangle" isosceles.
+//   assert (fabs(dlambda_ds) < 1.);
+
+//   *delta_u = *solution;
+//   delta_u->add(-1, *previous_u);
+//   delta_u->close();
+//   const Real normdu = delta_u->l2_norm();
+
+//   Theta = std::sqrt(1. - dlambda_ds*dlambda_ds) / normdu * tau * ds;
+
+
+//   // 4.) Use the norm of du and the norm of du/ds
+//   *delta_u = *solution;
+//   delta_u->add(-1, *previous_u);
+//   delta_u->close();
+//   const Real normdu   = delta_u->l2_norm();
+//   du_ds->close();
+//   const Real normduds = du_ds->l2_norm();
+
+//   if (normduds < 1.e-12)
+//     {
+//       std::cout << "Setting initial Theta= 1./normdu/normdu" << std::endl;
+//       std::cout << "normdu=" << normdu << std::endl;
+
+//       // Don't use this scaling if the solution delta is already O(1)
+//       if (normdu > 1.)
+// 	Theta = 1./normdu/normdu;
+//       else
+// 	Theta = 1.;
+//     }
+//   else
+//     {
+//       std::cout << "Setting Theta= 1./normdu/normduds" << std::endl;
+//       std::cout << "normdu=" << normdu << std::endl;
+//       std::cout << "normduds=" << normduds << std::endl;
+
+//       // Don't use this scaling if the solution delta is already O(1)
+//       if ((normdu>1.) || (normduds>1.))
+// 	Theta = 1./normdu/normduds;
+//       else
+// 	Theta = 1.;
+//     }
+  
+ if (!quiet)
+   std::cout << "Setting Normalization Parameter Theta=" << Theta << std::endl;
+}
+
+
+
+void ContinuationSystem::set_Theta_LOCA()
+{
+  // We also recompute the LOCA normalization parameter based on the
+  // most recently computed value of dlambda_ds
+  // if (!quiet)
+  //   std::cout << "(Theta_LOCA) dlambda_ds=" << dlambda_ds << std::endl;
+
+  // Formula makes no sense if |dlambda_ds| > 1
+  assert (fabs(dlambda_ds) < 1.);
+  
+  // 1.) Attempt to implement the method in LOCA paper
+//   const Real g = 1./std::sqrt(2.); // "desired" dlambda_ds
+
+//   // According to the LOCA people, we only renormalize for
+//   // when |dlambda_ds| exceeds some pre-selected maximum (which they take to be zero, btw).
+//   if (fabs(dlambda_ds) > .9)
+//     {
+//       // Note the *= ... This is updating the previous value of Theta_LOCA
+//       // Note: The LOCA people actually use Theta_LOCA^2 to normalize their arclength constraint.
+//       Theta_LOCA *= fabs( (dlambda_ds/g)*std::sqrt( (1.-g*g) / (1.-dlambda_ds*dlambda_ds) ) );
+  
+//       // Suggested max-allowable value for Theta_LOCA
+//       if (Theta_LOCA > 1.e8)
+// 	{
+// 	  Theta_LOCA = 1.e8;
+
+// 	  if (!quiet)
+// 	    std::cout << "max Theta_LOCA=" << Theta_LOCA << " has been selected." << std::endl;
+// 	}
+//     }
+//   else
+//     Theta_LOCA=1.0;
+
+  // 2.) FIXME: Should we do *= or just =?  This function is of dlambda_ds is
+  //  < 1,  |dlambda_ds| < 1/sqrt(2) ~~ .7071
+  //  > 1,  |dlambda_ds| > 1/sqrt(2) ~~ .7071
+  Theta_LOCA *= fabs( dlambda_ds / std::sqrt( (1.-dlambda_ds*dlambda_ds) ) );
+
+  // Suggested max-allowable value for Theta_LOCA.  I've never come close
+  // to this value in my code.
+  if (Theta_LOCA > 1.e8)
+    {
+      Theta_LOCA = 1.e8;
+      
+      if (!quiet)
+	std::cout << "max Theta_LOCA=" << Theta_LOCA << " has been selected." << std::endl;
+    }
+    
+  // 3.) Use 1.0, i.e. don't scale
+  //Theta_LOCA=1.0;
+
+  if (!quiet)
+    std::cout << "Setting Theta_LOCA=" << Theta_LOCA << std::endl;
+}
 
 
 
 void ContinuationSystem::update_solution()
 {
+  // Set some stream formatting flags
+  unsigned int old_precision = std::cout.precision();
+  std::cout.precision(16);
+  std::cout.setf(std::ios_base::scientific);
+  
   // We must have a tangent that makes sense before we can update the solution.
   assert (tangent_initialized);
 
+  // Compute tau, the stepsize scaling parameter which attempts to
+  // reduce ds when the angle between the most recent two tangent
+  // vectors becomes large.  tau is actually the (absolute value of
+  // the) cosine of the angle between these two vectors... so if tau ~
+  // 0 the angle is ~ 90 degrees, while if tau ~ 1 the angle is ~ 0
+  // degrees.
+  y_old->close();
+  y->close();
+  const Real yoldnorm = y_old->l2_norm();
+  const Real ynorm = y->l2_norm();
+  const Real yoldy = y_old->dot(*y);
+  const Real yold_over_y = yoldnorm/ynorm;
+  
+  if (!quiet)
+    {
+      std::cout << "yoldnorm=" << yoldnorm << std::endl;
+      std::cout << "ynorm="    << ynorm << std::endl;
+      std::cout << "yoldy="    << yoldy << std::endl;
+      std::cout << "yoldnorm/ynorm=" << yoldnorm/ynorm << std::endl;
+    }      
+
+  // Save the current value of ds before updating it
+  previous_ds = ds_current;
+  
+  // // 1.) Cosine method (for some reason this always predicts the angle is ~0)
+  // // Don't try divinding by zero
+  // if ((yoldnorm > 1.e-12) && (ynorm > 1.e-12))
+  //   tau = fabs(yoldy) / yoldnorm  / ynorm;
+  // else
+  //   tau = 1.;
+
+  // // 2.) Relative size of old and new du/dlambda method with cutoff of 0.9
+  // if ((yold_over_y < 0.9) && (yold_over_y > 1.e-6))
+  //   tau = yold_over_y;
+  // else
+  //   tau = 1.;
+
+  // 3.) Grow (or shrink) the arclength stepsize by the ratio of du/dlambda, but do not
+  // exceed the user-specified value of ds.
+  if (yold_over_y > 1.e-6)
+    {
+      // // 1.) Scale current ds by the ratio of successive tangents.
+      //       ds_current *= yold_over_y;
+      //       if (ds_current > ds)
+      // 	ds_current = ds;
+
+      // 2.) Technique 1 tends to shrink the step fairly well (and even if it doesn't
+      // get very small, we still have step reduction) but it seems to grow the step
+      // very slowly.  Another possible technique is step-doubling:
+      // if (yold_over_y > 1.)
+      // 	ds_current *= 2.;
+      //       else
+      // 	ds_current *= yold_over_y;
+
+      // 3.) Technique 2 may over-zealous when we are also using the Newton stepgrowth
+      // factor.  For technique 3 we multiply by yold_over_y unless yold_over_y > 2
+      // in which case we use 2.
+      if (yold_over_y > 2.)
+	ds_current *= 2.;
+      else
+	ds_current *= yold_over_y;
+	
+      
+      // Also use the number of Newton iterations required to compute the previous
+      // step (relative to the maximum-allowed number of Newton iterations) to possibly
+      // grow the step.
+      {
+	assert (newton_solver != NULL);
+	const unsigned int Nmax = newton_solver->max_nonlinear_iterations;
+
+	// // The LOCA Newton step growth technique (note: only grows step length)
+	// const Real stepratio = static_cast<Real>(Nmax-(newton_step+1))/static_cast<Real>(Nmax-1.);
+	// const Real newtonstep_growthfactor = 1. + newton_stepgrowth_aggressiveness*stepratio*stepratio;
+
+	// The "Nopt/N" method, may grow or shrink the step.  Assume Nopt=Nmax/2.
+	const Real newtonstep_growthfactor =
+	  newton_stepgrowth_aggressiveness * 0.5 *
+	  static_cast<Real>(Nmax) / static_cast<Real>(newton_step+1);
+
+	if (!quiet)
+	  std::cout << "newtonstep_growthfactor=" << newtonstep_growthfactor << std::endl;
+	
+	ds_current *= newtonstep_growthfactor;
+      }
+    }
+
+  
+  // Don't let the stepsize get above the user's maximum-allowed stepsize.
+  if (ds_current > ds)
+    ds_current = ds;
+  
+  // Check also for a minimum allowed stepsize.
+  if (ds_current < ds_min)
+    {
+      std::cout << "Enforcing minimum-allowed arclength stepsize of " << ds_min << std::endl;
+      ds_current = ds_min;
+    }
+  
+  if (!quiet)
+    {
+      std::cout << "Current step size: ds_current=" << ds_current << std::endl;
+    }
+  
+  // Recompute scaling factor Theta for
+  // the current solution before updating.
+  set_Theta();
+
+  // Also, recompute the LOCA scaling factor, which attempts to
+  // maintain a reasonable value of dlambda/ds
+  set_Theta_LOCA();
+    
+  std::cout << "Theta*Theta_LOCA^2=" << Theta*Theta_LOCA*Theta_LOCA << std::endl;
+
+  // Based on the asymptotic singular behavior of du/dlambda near simple turning points,
+  // we can compute a single parameter which may suggest that we are close to a singularity.
+  *delta_u = *solution;
+  delta_u->add(-1, *previous_u);
+  delta_u->close();
+  const Real normdu   = delta_u->l2_norm();
+  const Real C = (std::log (Theta_LOCA*normdu) /
+		  std::log (std::abs(*continuation_parameter-old_continuation_parameter))) - 1.0;
+  if (!quiet)
+    std::cout << "C=" << C << std::endl;
+  
   // Save the current value of u and lambda before updating.
   save_current_solution();
 
-  // Since we solved for the tangent vector, now we can compute
-  // an initial guess for the new solution, and an initial guess for the new value of lambda.
-  solution->add(ds, *du_ds);
-  solution->close();
+  if (!quiet)
+    {
+      std::cout << "Updating the solution with the tangent guess." << std::endl;
+      std::cout << "||u_old||=" << this->solution->l2_norm() << std::endl;
+      std::cout << "lambda_old=" << *continuation_parameter << std::endl;
+    }
 
-  //std::cout << "||u_new||=" << this->solution->l2_norm() << std::endl;
-  //here();
-
-  *continuation_parameter += ds*dlambda_ds;
+  // Since we solved for the tangent vector, now we can compute an
+  // initial guess for the new solution, and an initial guess for the
+  // new value of lambda.
+  apply_predictor();
 
   if (!quiet)
-    std::cout << "lambda_new=" << *continuation_parameter << std::endl;
+    {
+      std::cout << "||u_new||=" << this->solution->l2_norm() << std::endl;
+      std::cout << "lambda_new=" << *continuation_parameter << std::endl;
+    }
+  
+  // Unset previous stream flags
+  std::cout.precision(old_precision);
+  std::cout.unsetf(std::ios_base::scientific);
 }
 
 
@@ -438,4 +1312,45 @@ void ContinuationSystem::save_current_solution()
 
   // Save the old value of lambda
   old_continuation_parameter = *continuation_parameter;
+}
+
+
+
+void ContinuationSystem::apply_predictor()
+{
+  if (predictor == Euler)
+    {
+      // 1.) Euler Predictor
+      // Predict next the solution
+      solution->add(ds_current, *du_ds);
+      solution->close();
+  
+      // Predict next parameter value
+      *continuation_parameter += ds_current*dlambda_ds;
+    }
+
+
+  else if (predictor == AB2)
+    {
+      // 2.) 2nd-order explicit AB predictor
+      assert(previous_ds != 0.0);
+      const Real stepratio = ds_current/previous_ds;
+      
+      // Build up next solution value.
+      solution->add( 0.5*ds_current*(2.+stepratio), *du_ds);
+      solution->add(-0.5*ds_current*stepratio     , *previous_du_ds);
+      solution->close();
+      
+      // Next parameter value
+      *continuation_parameter +=
+	0.5*ds_current*((2.+stepratio)*dlambda_ds -
+			stepratio*previous_dlambda_ds);
+    }
+
+  else
+    {
+      // Unknown predictor
+      error();
+    }
+  
 }
