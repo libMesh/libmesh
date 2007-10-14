@@ -1,4 +1,4 @@
-// $Id: continuation_system.h,v 1.1 2007-08-02 17:27:18 jwpeterson Exp $
+// $Id: continuation_system.h,v 1.2 2007-10-14 21:47:03 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -96,6 +96,12 @@ public:
    * required for starting up the continuation method.
    */
   void continuation_solve();
+
+  /**
+   * Call this function after a continuation solve to compute the tangent and
+   * get the next initial guess.
+   */
+  void advance_arcstep();
   
   /**
    * The continuation parameter must be a member variable of the
@@ -115,10 +121,12 @@ public:
   bool quiet;
 
   /**
-   * The arclength step size.
+   * Sets (initializes) the max-allowable ds value and the current ds value.
+   * Call this before beginning arclength continuation.  The default max stepsize
+   * is 0.1
    */
-  Real ds;
-
+  void set_max_arclength_stepsize(Real maxds) { ds=maxds; ds_current=maxds; }
+  
   /**
    * How tightly should the Newton iterations attempt to converge delta_lambda.
    * Defaults to 1.e-6.
@@ -139,6 +147,95 @@ public:
    * beginning arclength continuation.
    */
   void save_current_solution();
+
+  /**
+   * The system also keeps track of the old value of the continuation parameter.
+   */
+  Real old_continuation_parameter;
+
+  /**
+   * The minimum-allowable value of the continuation parameter.  The Newton iterations
+   * will quit if the continuation parameter falls below this value.
+   */
+  Real min_continuation_parameter;
+
+  /**
+   * The maximum-allowable value of the continuation parameter.  The Newton iterations
+   * will quit if the continuation parameter goes above this value.  If this value is zero,
+   * there is no maximum value for the continuation parameter.
+   */
+  Real max_continuation_parameter;
+
+  /**
+   * Arclength normalization parameter.  Defaults to 1.0 (no normalization).  Used to
+   * ensure that one term in the arclength contstraint equation does not wash out all
+   * the others.
+   */
+  Real Theta;
+  
+  /**
+   * Another normalization parameter, which is described in the LOCA manual.
+   * This one is designed to maintain a relatively "fixed" value of d(lambda)/ds.
+   * It is initially 1.0 and is updated after each solve.
+   */
+  Real Theta_LOCA;
+
+  /**
+   * Another scaling parameter suggested by the LOCA people.  This one attempts
+   * to shrink the stepsize ds whenever the angle between the previous two
+   * tangent vectors gets large.
+   */
+  //Real tau;
+
+  /**
+   * Number of (Newton) backtracking steps to attempt if a Newton step does not
+   * reduce the residual.  This is backtracking within a *single* Newton step,
+   * if you want to try a smaller arcstep, set n_arclength_reductions > 0.
+   */
+  unsigned int n_backtrack_steps;
+
+  /**
+   * Number of arclength reductions to try when Newton fails to reduce
+   * the residual.  For each arclength reduction, the arcstep size is
+   * cut in half.
+   */
+  unsigned int n_arclength_reductions;
+
+  /**
+   * The minimum-allowed steplength, defaults to 1.e-8.
+   */
+  Real ds_min;
+
+  /**
+   * The code provides the ability to select from different predictor
+   * schemes for getting the initial guess for the solution at the next
+   * point on the solution arc.
+   */
+  enum Predictor {
+    /**
+     * First-order Euler predictor
+     */
+    Euler,
+
+    /**
+     * Second-order explicit Adams-Bashforth predictor
+     */
+    AB2,
+
+    /**
+     * Invalid predictor
+     */
+    Invalid_Predictor
+  };
+
+  Predictor predictor;
+
+  /**
+   * A measure of how rapidly one should attempt to grow the arclength
+   * stepsize based on the number of Newton iterations required to solve
+   * the problem. Default value is 1.0
+   */
+  Real newton_stepgrowth_aggressiveness;
   
 protected:
   /**
@@ -197,6 +294,23 @@ private:
   void update_solution();
 
   /**
+   * A centralized function for setting the normalization parameter theta
+   */
+  void set_Theta();
+
+  /**
+   * A centralized function for setting the other normalization parameter, i.e.
+   * the one suggested by the LOCA developers.
+   */
+  void set_Theta_LOCA();
+
+  /**
+   * Applies the predictor to the current solution to get a guess for the
+   * next solution.
+   */
+  void apply_predictor();
+  
+  /**
    * Extra work vectors used by the continuation algorithm.
    * These are added to the system by the init_data() routine.
    *
@@ -206,14 +320,25 @@ private:
   NumericVector<Number>* du_ds;
 
   /**
+   * The value of du_ds from the previous solution
+   */
+  NumericVector<Number>* previous_du_ds;
+
+  /**
    * The solution at the previous value of the continuation variable.
    */ 
   NumericVector<Number>* previous_u;
 
   /**
-   * Temporary vector "y" ... the solution of Ay=G_{\lambda}.
+   * Temporary vector "y" ... stores -du/dlambda, the solution of Ay=G_{\lambda}.
    */
   NumericVector<Number>* y;
+
+  /**
+   * Temporary vector "y_old" ... stores the previous value of -du/dlambda,
+   * which is the solution of Ay=G_{\lambda}.
+   */
+  NumericVector<Number>* y_old;
 
   /**
    * Temporary vector "z" ... the solution of Az = -G
@@ -246,16 +371,39 @@ private:
   NewtonSolver* newton_solver;
   
   /**
-   * The system also keeps track of the old value of the continuation parameter.
-   */
-  Real old_continuation_parameter;
-
-  /**
    * The most recent value of the derivative of the continuation parameter
    * with respect to s.  We use "lambda" here for shortness of notation, lambda
    * always refers to the continuation parameter.
    */ 
   Real dlambda_ds;
+
+  /**
+   * The initial arclength stepsize, selected by the user.  This is
+   * the max-allowable arclength stepsize, but the algorithm may frequently
+   * reduce ds near turning points.  
+   */
+  Real ds;
+  
+  /**
+   * Value of stepsize currently in use.  Will not exceed user-provided maximum
+   * arclength stepize ds.
+   */
+  Real ds_current;
+
+  /**
+   * The old parameter tangent value.
+   */
+  Real previous_dlambda_ds;
+
+  /**
+   * The previous arcstep length used.
+   */
+  Real previous_ds;
+
+  /**
+   * Loop counter for nonlinear (Newton) iteration loop.
+   */
+  unsigned int newton_step;
 };
 
 #endif
