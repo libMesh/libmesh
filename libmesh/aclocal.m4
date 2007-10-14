@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.116 2007-10-12 20:29:06 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.117 2007-10-14 19:06:14 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -116,6 +116,9 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
 
         dnl Intel's ICC C++ compiler for Itanium?
         is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Itanium(R)' | grep 'Compiler'`"
+        if test "x$is_intel_ecc" = "x" ; then
+          is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'IA-64' | grep 'Compiler'`"
+        fi
         if test "x$is_intel_ecc" != "x" ; then
           GXX_VERSION_STRING="`($CXX -V -help 2>&1) | grep 'Version '`"
           case "$GXX_VERSION_STRING" in
