@@ -11,11 +11,36 @@
 <?php make_navigation("publications",$root)?>
 
 <div class="content">
+<h1>Please use the following citation to reference LibMesh</h1>
+<ul>
+<li>
+  B. Kirk, J. W. Peterson, R. H. Stogner, and G. F. Carey,
+<code>libMesh</code><i>: A
+  C++ Library for Parallel Adaptive Mesh Refinement/Coarsening Simulations.</i>
+<a href="http://dx.doi.org/10.1007/s00366-006-0049-3">Engineering with Computers</a>,
+vol. 22, no. 3--4, pp. 237--254, 2006. 	 (<a href="http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf">preprint</a>)
+<pre>
+@Article{LibMeshPaper,
+  author = {B.~Kirk and J.~W.~Peterson and R.~H.~Stogner and G.~F.~Carey},
+  title = {{\texttt{libMesh}: A C++ Library for Parallel Adaptive Mesh
+           Refinement/Coarsening Simulations}},
+  journal = {Engineering with Computers},
+  volume = {22},
+  number = {3--4},
+  pages = {237--254},
+  year = {2006},
+  note = {\url{http://dx.doi.org/10.1007/s00366-006-0049-3}}
+}
+</pre>  
+</li>
+</ul>
+
+<br>
 <h1>Publications by LibMesh Developers</h1>
 
 <ul>
 
-<br>
+
 <li> Benjamin S. Kirk, 
 <i>Adaptive Finite Element Simulation of Flow and Transport Applications on Parallel Computers.</i>
 <a href="http://www.cfdlab.ae.utexas.edu/~benkirk/dissertation.pdf">PhD Dissertation</a>, 
@@ -41,18 +66,24 @@ J.W. Peterson, G.F. Carey, D.J. Knezevic, and B.T. Murray, <i>Adaptive
   finite element methodology for tumor angiogenesis modeling.</i>
   <a href="http://dx.doi.org/10.1002/nme.1802">
   IJNME</a>, vol. 69, no. 6, pp. 1212--1238, 2007.
+<pre>
+@Article{Tumor,
+  author = {J.~W.~Peterson and G.~F.~Carey and D.~J.~Knezevic and B.~T.~Murray},
+  title = {{Adaptive finite element methodology for tumor angiogenesis modeling}},
+  journal = {Int.~J.~Numer.~Meth.~Eng.},
+  volume = {69},
+  number  = {6},
+  pages = {1212--1238},
+  year = {2007},
+  note = {\url{http://dx.doi.org/10.1002/nme.1802}}
+}
+</pre>
 </li>
 
 <br>
-<li>
-B. Kirk, J. W. Peterson, R. H. Stogner, and G. F. Carey,
-<code>libMesh</code><i>: A
-  C++ Library for Parallel Adaptive Mesh Refinement/Coarsening Simulations.</i>
-<a href="http://dx.doi.org/10.1007/s00366-006-0049-3">Engineering with Computers</a>,
-vol. 22, no. 3--4, pp. 237--254, 2006. 	 (<a href="http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf">preprint</a>)
-</li>
 
-<br>
+
+
 <li>
 G. F. Carey, W. Barth, B. Kirk, and J. W. Peterson,
 <i>Parallel CFD for Flow and Transport Applications Including Unstructured and Adaptive Grids.</i>
@@ -175,7 +206,7 @@ M.P. Luthi,
 
 
 
-<h1>Misc. Publications</h1>
+<h1>Miscellaneous</h1>
 
 <ul>
 <li>  A general <a href="howto/howto.pdf">HOWTO</a> document by M. Luthi containing some hints
