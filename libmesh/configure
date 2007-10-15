@@ -3006,8 +3006,8 @@ echo "${ECHO_T}<<< C++ compiler is Compaq cxx >>>" >&6
 
   	                    is_sun_cc="`($CXX -V 2>&1) | grep 'Sun C++'`"
               if test "x$is_sun_cc" != "x" ; then
-                echo "$as_me:$LINENO: result: <<< C++ compiler is Sun ONE Studio compiler >>>" >&5
-echo "${ECHO_T}<<< C++ compiler is Sun ONE Studio compiler >>>" >&6
+                echo "$as_me:$LINENO: result: <<< C++ compiler is Sun Studio compiler >>>" >&5
+echo "${ECHO_T}<<< C++ compiler is Sun Studio compiler >>>" >&6
                 GXX_VERSION=sun_studio
               else
 
@@ -3325,7 +3325,7 @@ echo "${ECHO_T}Unknown Intel complier" >&6
 
       sun_studio | sun_forte)
           CXXFLAGS_DBG="-library=stlport4 -g"
-          CXXFLAGS_OPT="-library=stlport4 -xO4"
+          CXXFLAGS_OPT="-library=stlport4 -fast -xO4"
 	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
           CFLAGS_DBG="-g"
           CFLAGS_OPT="-xO4"
