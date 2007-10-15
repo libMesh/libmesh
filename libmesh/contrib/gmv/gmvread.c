@@ -25,7 +25,7 @@
 
 #define RDATA_INIT
 #include "gmvread.h"
-//#include "gmvrayread.h"
+/* #include "gmvrayread.h" */
 
 #include <sys/types.h>
 /* #include <malloc.h> */
