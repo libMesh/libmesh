@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------
-dnl $Id: aclocal.m4,v 1.117 2007-10-14 19:06:14 benkirk Exp $
+dnl $Id: aclocal.m4,v 1.118 2007-10-15 20:48:46 benkirk Exp $
 dnl -------------------------------------------------------------
 dnl
 
@@ -196,10 +196,10 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
               GXX_VERSION=compaq_cxx
             else
   	
-  	      dnl Sun ONE Studio?
+  	      dnl Sun Studio?
               is_sun_cc="`($CXX -V 2>&1) | grep 'Sun C++'`"
               if test "x$is_sun_cc" != "x" ; then
-                AC_MSG_RESULT(<<< C++ compiler is Sun ONE Studio compiler >>>)
+                AC_MSG_RESULT(<<< C++ compiler is Sun Studio compiler >>>)
                 GXX_VERSION=sun_studio
               else
   	
@@ -663,7 +663,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   
       sun_studio | sun_forte)
           CXXFLAGS_DBG="-library=stlport4 -g"
-          CXXFLAGS_OPT="-library=stlport4 -xO4"
+          CXXFLAGS_OPT="-library=stlport4 -fast -xO4"
 	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
           CFLAGS_DBG="-g"
           CFLAGS_OPT="-xO4"
