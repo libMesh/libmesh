@@ -1,4 +1,4 @@
-// $Id: distributed_vector.C,v 1.30 2007-10-03 20:18:23 roystgnr Exp $
+// $Id: distributed_vector.C,v 1.31 2007-10-15 07:37:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -34,7 +34,7 @@
 //--------------------------------------------------------------------------
 // DistributedVector methods
 template <typename T>
-Real DistributedVector<T>::sum () const
+T DistributedVector<T>::sum () const
 {
   assert (this->initialized());
   assert (_values.size() == _local_size);

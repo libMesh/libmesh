@@ -1,4 +1,4 @@
-// $Id: distributed_vector.h,v 1.13 2007-10-03 20:18:23 roystgnr Exp $
+// $Id: distributed_vector.h,v 1.14 2007-10-15 07:37:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -161,7 +161,7 @@ public:
   /**
    * @returns the sum of all values in the vector 
    */
-  Real sum() const;
+  T sum() const;
 
   /**
    * @returns the \f$l_1\f$-norm of the vector, i.e.

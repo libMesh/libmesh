@@ -1,4 +1,4 @@
-// $Id: laspack_vector.C,v 1.33 2007-10-03 20:18:23 roystgnr Exp $
+// $Id: laspack_vector.C,v 1.34 2007-10-15 07:37:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -30,7 +30,7 @@
 #ifdef HAVE_LASPACK
 
 template <typename T>
-Real LaspackVector<T>::sum () const
+T LaspackVector<T>::sum () const
 {
   assert (this->closed());
 
