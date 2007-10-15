@@ -1,5 +1,5 @@
 
-// $Id: parallel.h,v 1.4 2007-06-21 20:57:41 roystgnr Exp $
+// $Id: parallel.h,v 1.5 2007-10-15 07:37:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -235,16 +235,16 @@ inline void sum(std::complex<T> &r)
   if (libMesh::n_processors() > 1)
     {
       T tempinput[2], tempoutput[2];
-      tempinput[0] = r.real;
-      tempinput[1] = r.imag;
+      tempinput[0] = r.real();
+      tempinput[1] = r.imag();
       MPI_Allreduce (&tempinput,
                      &tempoutput,
                      2,
                      datatype<T>(),
                      MPI_SUM,
                      libMesh::COMM_WORLD);
-      r.real = tempoutput[0];
-      r.imag = tempoutput[1];
+      r.real() = tempoutput[0];
+      r.imag() = tempoutput[1];
     }
 }
 
@@ -260,8 +260,8 @@ inline void sum(std::vector<std::complex<T> > &r)
 	             tempimagoutput(r.size());
       for (unsigned int i=0; i != r.size(); ++i)
 	{
-	  temprealinput[i] = r[i].real;
-	  tempimaginput[i] = r[i].real;
+	  temprealinput[i] = r[i].real();
+	  tempimaginput[i] = r[i].imag();
 	}
       MPI_Allreduce (&temprealinput[0],
                      &temprealoutput[0],
@@ -277,8 +277,8 @@ inline void sum(std::vector<std::complex<T> > &r)
                      libMesh::COMM_WORLD);
       for (unsigned int i=0; i != r.size(); ++i)
 	{
-	  r[i].real = temprealoutput[i];
-	  r[i].imag = tempimagoutput[i];
+	  r[i].real() = temprealoutput[i];
+	  r[i].imag() = tempimagoutput[i];
 	}
     }
 }
