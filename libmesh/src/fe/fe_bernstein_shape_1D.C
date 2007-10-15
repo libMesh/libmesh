@@ -1,4 +1,4 @@
-// $Id: fe_bernstein_shape_1D.C,v 1.3 2006-05-02 17:36:30 spetersen Exp $
+// $Id: fe_bernstein_shape_1D.C,v 1.4 2007-10-15 20:48:31 benkirk Exp $
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -171,13 +171,13 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
 	switch(i)
 	  {
 	  case 0:
-	    return binomial_p_i * std::pow((1.-xi)/2.,p_order);
+	    return binomial_p_i * std::pow((1.-xi)/2.,static_cast<double>(p_order));
 	  case 1:
-	    return binomial_p_i * std::pow((1.+xi)/2.,p_order);
+	    return binomial_p_i * std::pow((1.+xi)/2.,static_cast<double>(p_order));
 	  default:
 	    {
-	      return binomial_p_i * std::pow((1.+xi)/2.,n)
-		                  * std::pow((1.-xi)/2.,m);
+	      return binomial_p_i * std::pow((1.+xi)/2.,static_cast<double>(n))
+		                  * std::pow((1.-xi)/2.,static_cast<double>(m));
 	    }
 	  }
 
@@ -352,14 +352,14 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
 	switch(i)
 	  {
 	  case 0:
-	    return binomial_p_i * (-1./2.) * p_order * std::pow((1.-xi)/2.,p_order-1);
+	    return binomial_p_i * (-1./2.) * p_order * std::pow((1.-xi)/2.,static_cast<double>(p_order-1));
 	  case 1:
-	    return binomial_p_i * ( 1./2.) * p_order * std::pow((1.+xi)/2.,p_order-1);
+	    return binomial_p_i * ( 1./2.) * p_order * std::pow((1.+xi)/2.,static_cast<double>(p_order-1));
 	    
 	  default:
 	    {
-	      return binomial_p_i * (1./2. * n * std::pow((1.+xi)/2.,n-1) * std::pow((1.-xi)/2.,m)
-				   - 1./2. * m * std::pow((1.+xi)/2.,n)   * std::pow((1.-xi)/2.,m-1));
+	      return binomial_p_i * (1./2. * n * std::pow((1.+xi)/2.,static_cast<double>(n-1)) * std::pow((1.-xi)/2.,static_cast<double>(m))
+				   - 1./2. * m * std::pow((1.+xi)/2.,static_cast<double>(n))   * std::pow((1.-xi)/2.,static_cast<double>(m-1)));
 	    }
 	  }
 	
