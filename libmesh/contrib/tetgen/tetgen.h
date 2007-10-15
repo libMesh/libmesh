@@ -1008,7 +1008,7 @@ class tetgenmesh {
 
     // The function used to determine the size of primitive data types and
     //   set the corresponding predefined linear order functions for them.
-    static void set_compfunc(char* str, int* itembytes, compfunc* pcomp);
+    static void set_compfunc(const char* str, int* itembytes, compfunc* pcomp);
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           //
@@ -1049,7 +1049,7 @@ class tetgenmesh {
         list(int itbytes, compfunc pcomp, int mitems = 256, int exsize = 128) {
           listinit(itbytes, pcomp, mitems, exsize);
         }
-        list(char* str, int mitems = 256, int exsize = 128) {
+        list(const char* str, int mitems = 256, int exsize = 128) {
           set_compfunc(str, &itembytes, &comp);
           listinit(itembytes, comp, mitems, exsize);
         }
