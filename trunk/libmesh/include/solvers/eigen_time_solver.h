@@ -1,4 +1,4 @@
-// $Id: eigen_time_solver.h,v 1.1 2007-10-15 20:33:01 jwpeterson Exp $
+// $Id: eigen_time_solver.h,v 1.2 2007-10-15 21:08:25 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -21,6 +21,9 @@
 
 #ifndef __eigen_time_solver_h__
 #define __eigen_time_solver_h__
+
+#include "libmesh_config.h"
+#ifdef HAVE_SLEPC
 
 // C++ includes
 
@@ -203,5 +206,5 @@ private:
 };
 
 
-
+#endif // HAVE_SLEPC
 #endif // #define __eigen_time_solver_h__
