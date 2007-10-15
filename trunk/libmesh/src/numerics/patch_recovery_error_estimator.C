@@ -1,4 +1,4 @@
-// $Id: patch_recovery_error_estimator.C,v 1.28 2007-10-05 20:55:13 roystgnr Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.29 2007-10-15 20:48:31 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -70,7 +70,9 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	      for (int yexp=poly_deg-xexp; yexp >= 0; yexp--)
                 {
                   int zexp = poly_deg - xexp - yexp;
-		  psi.push_back(std::pow(x,xexp)*std::pow(y,yexp)*std::pow(z,zexp));
+		  psi.push_back(std::pow(x,static_cast<double>(xexp))*
+				std::pow(y,static_cast<double>(yexp))*
+				std::pow(z,static_cast<double>(zexp)));
                 }
 	    break;
 	  }
@@ -81,7 +83,8 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	    for (int xexp=poly_deg; xexp >= 0; xexp--) // use an int for xexp since we -- it
               {
                 int yexp = poly_deg - xexp;
-		psi.push_back(std::pow(x,xexp)*std::pow(y,yexp));
+		psi.push_back(std::pow(x,static_cast<double>(xexp))*
+			      std::pow(y,static_cast<double>(yexp)));
               }
 	    break;
 	  }
@@ -90,7 +93,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	case 1:
 	  {
             int xexp = poly_deg;
-	    psi.push_back(std::pow(x,xexp));
+	    psi.push_back(std::pow(x,static_cast<double>(xexp)));
 	    break;
 	  }
 	  
