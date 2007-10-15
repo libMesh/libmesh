@@ -1,4 +1,4 @@
-// $Id: vtk_io.C,v 1.6 2007-10-08 21:26:06 woutruijter Exp $
+// $Id: vtk_io.C,v 1.7 2007-10-15 07:37:55 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -217,7 +217,7 @@ void VTKIO::solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid
 	const MeshBase& mesh = (MeshBase&)es.get_mesh();
 	const unsigned int n_nodes = es.get_mesh().n_nodes();
 	const unsigned int n_vars = es.n_vars();
-	std::vector<Real> soln;
+	std::vector<Number> soln;
 	es.build_solution_vector(soln);
 
 //   if(libMesh::processor_id()==0){
@@ -236,7 +236,11 @@ void VTKIO::solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid
 						const unsigned int nd_id = (*it)->id();
 //                  const unsigned int dof_nr = (*it)->dof_number(i,j,0);
 //                  data->InsertValue((*it)->id(),sys.current_solution(count++));
+#ifdef USE_COMPLEX_NUMBERS
+						data->InsertValue(nd_id,soln[nd_id*n_vars+j].real());
+#else
 						data->InsertValue(nd_id,soln[nd_id*n_vars+j]);
+#endif
 //               data->InsertValue((*it)->id(),sys.current_solution(dof_nr));
 					}else{
 						data->InsertValue((*it)->id(),0);
@@ -249,6 +253,7 @@ void VTKIO::solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid
 }
 /*
  * FIXME now this is known to write nonsense on AMR meshes
+ * and it strips the imaginary parts of complex Numbers
  */
 void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid){
 	// write out the vectors added to the systems
@@ -261,14 +266,18 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*
 		for(;it!= v_end;++it){ // for all vectors on this system
 			vtkFloatArray *data = vtkFloatArray::New(); 
 			data->SetName(it->first.c_str());
-			std::vector<Real> values; 	
+			std::vector<Number> values; 	
 			it->second->localize(values);
 			data->SetNumberOfValues(n_nodes);
 //         MeshBase::const_node_iterator it = mesh.active_nodes_begin();
 //         const MeshBase::const_node_iterator n_end = mesh.nodes_end();
 //         for(unsigned int count=0;it!=n_end;++it,++count){			
 			for(unsigned int j=0;j<values.size();++j){
+#ifdef USE_COMPLEX_NUMBERS
+				data->InsertValue(j,values[j].real());
+#else
 				data->InsertValue(j,values[j]);
+#endif
 //            it++;
 			} 
 			grid->GetPointData()->AddArray(data);		
