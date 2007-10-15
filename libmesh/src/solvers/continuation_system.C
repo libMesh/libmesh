@@ -1,4 +1,4 @@
-// $Id: continuation_system.C,v 1.2 2007-10-14 21:47:03 jwpeterson Exp $
+// $Id: continuation_system.C,v 1.3 2007-10-15 23:06:37 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -620,9 +620,9 @@ void ContinuationSystem::continuation_solve()
 	  delta_u->add(-1., *previous_u);
 
 	  // First part of the arclength constraint
-	  const Real N1 = Theta_LOCA*Theta_LOCA*Theta*delta_u->dot(*du_ds);
-	  const Real N2 = ((*continuation_parameter) - old_continuation_parameter)*dlambda_ds;
-	  const Real N3 = ds_current;
+	  const Number N1 = Theta_LOCA*Theta_LOCA*Theta*delta_u->dot(*du_ds);
+	  const Number N2 = ((*continuation_parameter) - old_continuation_parameter)*dlambda_ds;
+	  const Number N3 = ds_current;
 
 	  if (!quiet)
 	    {
@@ -632,25 +632,32 @@ void ContinuationSystem::continuation_solve()
 	    }
       
 	  // The arclength constraint value 
-	  const Real N = N1+N2-N3;
+	  const Number N = N1+N2-N3;
       
 	  if (!quiet)
 	    std::cout << "  N=" << N << std::endl;
 
-	  const Real duds_dot_z = du_ds->dot(*z);
-	  const Real duds_dot_y = du_ds->dot(*y);
+	  const Number duds_dot_z = du_ds->dot(*z);
+	  const Number duds_dot_y = du_ds->dot(*y);
 
 	  //std::cout << "duds_dot_z=" << duds_dot_z << std::endl;
 	  //std::cout << "duds_dot_y=" << duds_dot_y << std::endl;
 	  //std::cout << "dlambda_ds=" << dlambda_ds << std::endl;
 
-	  const Real delta_lambda_numerator   = -(N          + Theta_LOCA*Theta_LOCA*Theta*duds_dot_z);
-	  const Real delta_lambda_denominator =  (dlambda_ds - Theta_LOCA*Theta_LOCA*Theta*duds_dot_y);
+	  const Number delta_lambda_numerator   = -(N          + Theta_LOCA*Theta_LOCA*Theta*duds_dot_z);
+	  const Number delta_lambda_denominator =  (dlambda_ds - Theta_LOCA*Theta_LOCA*Theta*duds_dot_y);
 
 	  assert (delta_lambda_denominator != 0.0);
 
 	  // Now, we are ready to compute the step delta_lambda
-	  Real delta_lambda = delta_lambda_numerator / delta_lambda_denominator;
+	  const Number delta_lambda_comp = delta_lambda_numerator /
+                                           delta_lambda_denominator;
+#ifdef USE_COMPLEX_NUMBERS
+          // Lambda is real-valued
+          const Real delta_lambda = delta_lambda_comp.real();
+#else
+          const Real delta_lambda = delta_lambda_comp;
+#endif
 
 	  // Knowing delta_lambda, we are ready to update delta_u
 	  // delta_u = z - delta_lambda*y
@@ -985,9 +992,15 @@ void ContinuationSystem::solve_tangent()
   delta_u->add(-1., *previous_u);
   delta_u->close();
 
+#ifdef USE_COMPLEX_NUMBERS
+  const Real sgn_dlambda_ds =
+    (Theta_LOCA*Theta_LOCA*Theta*y->dot(*delta_u) +
+    (*continuation_parameter-old_continuation_parameter)).real();
+#else
   const Real sgn_dlambda_ds =
     Theta_LOCA*Theta_LOCA*Theta*y->dot(*delta_u) +
     (*continuation_parameter-old_continuation_parameter);
+#endif
 
   if (sgn_dlambda_ds < 0.)
     {
@@ -1162,7 +1175,7 @@ void ContinuationSystem::update_solution()
   y->close();
   const Real yoldnorm = y_old->l2_norm();
   const Real ynorm = y->l2_norm();
-  const Real yoldy = y_old->dot(*y);
+  const Number yoldy = y_old->dot(*y);
   const Real yold_over_y = yoldnorm/ynorm;
   
   if (!quiet)
