@@ -1,4 +1,4 @@
-// $Id: unstructured_mesh.C,v 1.4 2007-10-03 19:47:35 roystgnr Exp $
+// $Id: unstructured_mesh.C,v 1.5 2007-10-15 20:14:04 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -123,7 +123,7 @@ void UnstructuredMesh::copy_nodes_and_elements
 #endif // #ifdef ENABLE_AMR
 
       //Assign all the nodes
-      for(uint i=0;i<elem->n_nodes();i++)
+      for(unsigned int i=0;i<elem->n_nodes();i++)
         elem->set_node(i) = &this->node(old->node(i));
       
       //Hold onto it

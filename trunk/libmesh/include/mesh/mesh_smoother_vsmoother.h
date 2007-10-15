@@ -1,4 +1,4 @@
-// $Id: mesh_smoother_vsmoother.h,v 1.5 2007-09-25 19:54:42 roystgnr Exp $
+// $Id: mesh_smoother_vsmoother.h,v 1.6 2007-10-15 20:14:03 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -38,6 +38,7 @@ typedef void     * LPVOID;
 typedef LPVOID   * LPLPVOID;
 typedef int  * LPINT;
 typedef LPINT  * LPLPINT;
+typedef unsigned int uint;
 
 // Local Includes -----------------------------------
 #include "mesh_smoother.h"
@@ -61,7 +62,7 @@ typedef LPINT  * LPLPINT;
  *
  * \author Derek R. Gaston
  * \date 2006
- * \version $Revision: 1.5 $
+ * \version $Revision: 1.6 $
  */
 
 
