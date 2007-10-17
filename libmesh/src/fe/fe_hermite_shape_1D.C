@@ -1,4 +1,4 @@
-// $Id: fe_hermite_shape_1D.C,v 1.7 2006-04-25 22:31:34 roystgnr Exp $
+// $Id: fe_hermite_shape_1D.C,v 1.8 2007-10-17 23:34:29 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -54,7 +54,7 @@ void hermite_compute_coefs(const Elem* elem)
 
   // Degrees of freedom are at vertices and edge midpoints
   std::vector<Point> dofpt;
-  dofpt.push_back(Point(0));
+  dofpt.push_back(Point(-1));
   dofpt.push_back(Point(1));
 
   // Mapping functions - first derivatives at each dofpt
