@@ -1,4 +1,4 @@
-// $Id: vtk_io.C,v 1.7 2007-10-15 07:37:55 roystgnr Exp $
+// $Id: vtk_io.C,v 1.8 2007-10-18 22:40:47 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -32,7 +32,7 @@
 #include "cell_pyramid5.h"
 #include "cell_hex8.h"
 #include "cell_hex20.h"
-#include "petsc_vector.h"
+#include "numeric_vector.h"
 //#include "cell_inf.h"
 //#include "cell_inf_prism12.h"
 //#include "cell_prism6.h"
