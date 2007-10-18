@@ -1,4 +1,4 @@
-// $Id: fe_hermite.C,v 1.6 2007-05-23 23:36:11 roystgnr Exp $
+// $Id: fe_hermite.C,v 1.7 2007-10-18 20:31:28 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
@@ -125,7 +125,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  case 0:
 	  case 1:
 	    return 2;
-	  case 3:
+	  case 2:
 //          Interior DoFs are carried on Elems
 //	    return (o-3);
             return 0;
