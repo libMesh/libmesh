@@ -1,7 +1,7 @@
-// $Id: quadrature_trap.C,v 1.7 2005-02-22 22:17:43 jwpeterson Exp $
+// $Id: quadrature_trap.C,v 1.8 2007-10-21 20:48:53 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

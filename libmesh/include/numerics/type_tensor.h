@@ -1,7 +1,7 @@
-// $Id: type_tensor.h,v 1.8 2006-06-26 13:52:37 spetersen Exp $
+// $Id: type_tensor.h,v 1.9 2007-10-21 20:48:43 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

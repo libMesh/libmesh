@@ -1,7 +1,7 @@
-// $Id: mesh_refinement.h,v 1.26 2007-06-06 15:38:02 roystgnr Exp $
+// $Id: mesh_refinement.h,v 1.27 2007-10-21 20:48:42 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -58,7 +58,7 @@ class ErrorVector;
  * This is the \p MeshRefinement class.  This class implements
  * adaptive mesh refinement algorithms for a \p MeshBase.
  *
- * @author Benjamin S. Kirk, 2002-2003.
+ * @author Benjamin S. Kirk, 2002-2007.
  */
 
 

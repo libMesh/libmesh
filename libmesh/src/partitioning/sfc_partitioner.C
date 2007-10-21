@@ -1,7 +1,7 @@
-// $Id: sfc_partitioner.C,v 1.17 2006-11-17 05:45:27 roystgnr Exp $
+// $Id: sfc_partitioner.C,v 1.18 2007-10-21 20:48:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

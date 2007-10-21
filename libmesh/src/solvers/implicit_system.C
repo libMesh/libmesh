@@ -1,7 +1,7 @@
-// $Id: implicit_system.C,v 1.12 2005-06-12 18:36:42 jwpeterson Exp $
+// $Id: implicit_system.C,v 1.13 2007-10-21 20:48:54 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

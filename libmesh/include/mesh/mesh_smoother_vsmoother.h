@@ -1,7 +1,7 @@
-// $Id: mesh_smoother_vsmoother.h,v 1.6 2007-10-15 20:14:03 benkirk Exp $
+// $Id: mesh_smoother_vsmoother.h,v 1.7 2007-10-21 20:48:42 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -62,7 +62,7 @@ typedef unsigned int uint;
  *
  * \author Derek R. Gaston
  * \date 2006
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 

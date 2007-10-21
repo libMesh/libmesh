@@ -1,7 +1,7 @@
-// $Id: steady_system.h,v 1.2 2005-01-06 21:55:03 benkirk Exp $
+// $Id: steady_system.h,v 1.3 2007-10-21 20:48:44 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2003  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

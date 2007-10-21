@@ -1,7 +1,7 @@
-// $Id: mesh_smoother_laplace.h,v 1.7 2007-09-25 19:54:42 roystgnr Exp $
+// $Id: mesh_smoother_laplace.h,v 1.8 2007-10-21 20:48:42 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -43,8 +43,8 @@
  * use work.
  *
  * \author John W. Peterson
- * \date 2002-2003
- * \version $Revision: 1.7 $
+ * \date 2002-2007
+ * \version $Revision: 1.8 $
  */
 
 

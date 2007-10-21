@@ -1,7 +1,7 @@
-// $Id: metis_partitioner.C,v 1.23 2006-08-11 21:47:22 roystgnr Exp $
+// $Id: metis_partitioner.C,v 1.24 2007-10-21 20:48:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

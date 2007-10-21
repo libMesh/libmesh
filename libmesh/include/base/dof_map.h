@@ -1,7 +1,7 @@
-// $Id: dof_map.h,v 1.34 2007-09-25 20:15:45 roystgnr Exp $
+// $Id: dof_map.h,v 1.35 2007-10-21 20:48:40 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -60,7 +60,7 @@ template <typename T> class NumericVector;
  * correspond to distinct subdomains.  This is so that the resulting data
  * structures will work well with parallel linear algebra packages.
  *
- * @author Benjamin S. Kirk, 2002-2003
+ * @author Benjamin S. Kirk, 2002-2007
  */
 
 // ------------------------------------------------------------

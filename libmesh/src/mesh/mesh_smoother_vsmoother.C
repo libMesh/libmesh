@@ -1,7 +1,7 @@
-// $Id: mesh_smoother_vsmoother.C,v 1.9 2007-10-09 13:44:43 benkirk Exp $
+// $Id: mesh_smoother_vsmoother.C,v 1.10 2007-10-21 20:48:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

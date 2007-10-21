@@ -1,7 +1,7 @@
-// $Id: time_solver.h,v 1.13 2007-05-22 20:31:54 jwpeterson Exp $
+// $Id: time_solver.h,v 1.14 2007-10-21 20:48:44 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

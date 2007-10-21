@@ -1,7 +1,7 @@
-// $Id: petsc_nonlinear_solver.C,v 1.17 2007-07-16 15:12:36 jwpeterson Exp $
+// $Id: petsc_nonlinear_solver.C,v 1.18 2007-10-21 20:48:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

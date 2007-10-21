@@ -1,7 +1,7 @@
-// $Id: enum_eigen_solver_type.h,v 1.4 2006-01-17 13:36:56 spetersen Exp $
+// $Id: enum_eigen_solver_type.h,v 1.5 2007-10-21 20:48:40 benkirk Exp $
 
 // The Next Great Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
