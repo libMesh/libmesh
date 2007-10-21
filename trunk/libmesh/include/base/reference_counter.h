@@ -1,7 +1,7 @@
- // $Id: reference_counter.h,v 1.6 2005-06-06 19:10:50 benkirk Exp $
+ // $Id: reference_counter.h,v 1.7 2007-10-21 20:48:40 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,7 @@
  * This is the base class for enabling reference counting.  It
  * should not be used by the user, thus it has a private constructor.
  *
- * \author Benjamin S. Kirk, 2002-2003
+ * \author Benjamin S. Kirk, 2002-2007
  */
 
 // ------------------------------------------------------------

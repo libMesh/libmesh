@@ -1,7 +1,7 @@
-// $Id: adaptive_time_solver.h,v 1.7 2007-08-24 18:23:42 roystgnr Exp $
+// $Id: adaptive_time_solver.h,v 1.8 2007-10-21 20:48:44 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

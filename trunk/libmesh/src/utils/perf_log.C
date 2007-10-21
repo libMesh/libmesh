@@ -1,7 +1,7 @@
-// $Id: perf_log.C,v 1.27 2007-10-05 20:39:13 benkirk Exp $
+// $Id: perf_log.C,v 1.28 2007-10-21 20:48:54 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

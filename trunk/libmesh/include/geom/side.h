@@ -1,7 +1,7 @@
-// $Id: side.h,v 1.7 2006-03-23 20:24:36 roystgnr Exp $
+// $Id: side.h,v 1.8 2007-10-21 20:48:42 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -43,8 +43,8 @@ class Node;
  * does not store any.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2006-03-23 20:24:36 $
- * \version $Revision: 1.7 $
+ * \date    $Date: 2007-10-21 20:48:42 $
+ * \version $Revision: 1.8 $
  */
 
 // ------------------------------------------------------------
@@ -141,8 +141,8 @@ class Side : public SideType
  * cannot access the neighbors of a side since it does not store any.
  *
  * \author  Roy H. Stogner
- * \date    $Date: 2006-03-23 20:24:36 $
- * \version $Revision: 1.7 $
+ * \date    $Date: 2007-10-21 20:48:42 $
+ * \version $Revision: 1.8 $
  */
 
 // ------------------------------------------------------------

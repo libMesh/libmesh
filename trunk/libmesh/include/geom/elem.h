@@ -1,7 +1,7 @@
-// $Id: elem.h,v 1.55 2007-10-01 18:55:18 roystgnr Exp $
+// $Id: elem.h,v 1.56 2007-10-21 20:48:41 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -76,7 +76,7 @@ class Elem;
  * In all that follows, nodes that live either on edges, faces or the 
  * interior are named @e second-order nodes.
  *
- * \author Benjamin S. Kirk, 2002-2003
+ * \author Benjamin S. Kirk, 2002-2007
  */
 
 // ------------------------------------------------------------

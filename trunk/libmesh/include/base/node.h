@@ -1,7 +1,7 @@
-// $Id: node.h,v 1.9 2007-06-19 14:20:38 roystgnr Exp $
+// $Id: node.h,v 1.10 2007-10-21 20:48:40 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ class MeshRefinement;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.9 $
+ * \version $Revision: 1.10 $
  */
 
 class Node : public Point,

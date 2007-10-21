@@ -1,7 +1,7 @@
-// $Id: laspack_vector.C,v 1.34 2007-10-15 07:37:23 roystgnr Exp $
+// $Id: laspack_vector.C,v 1.35 2007-10-21 20:48:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

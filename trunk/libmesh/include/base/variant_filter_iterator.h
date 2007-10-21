@@ -1,7 +1,7 @@
-// $Id: variant_filter_iterator.h,v 1.11 2005-09-30 19:55:22 benkirk Exp $
+// $Id: variant_filter_iterator.h,v 1.12 2007-10-21 20:48:40 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2004  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

@@ -1,7 +1,7 @@
-// $Id: equation_systems.h,v 1.25 2007-10-09 19:43:07 benkirk Exp $
+// $Id: equation_systems.h,v 1.26 2007-10-21 20:48:44 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -58,7 +58,7 @@ class Mesh;
  * may be handled.  Also other features, like flags, 
  * parameters, I/O etc are provided.
  *
- * @author Benjamin S. Kirk, 2002-2003
+ * @author Benjamin S. Kirk, 2002-2007
  */
 
 // ------------------------------------------------------------

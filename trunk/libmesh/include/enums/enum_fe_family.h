@@ -1,7 +1,7 @@
-// $Id: enum_fe_family.h,v 1.10 2005-08-24 15:12:28 roystgnr Exp $
+// $Id: enum_fe_family.h,v 1.11 2007-10-21 20:48:40 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

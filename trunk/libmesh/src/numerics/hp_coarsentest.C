@@ -1,7 +1,7 @@
-// $Id: hp_coarsentest.C,v 1.3 2007-10-05 20:49:14 roystgnr Exp $
+// $Id: hp_coarsentest.C,v 1.4 2007-10-21 20:48:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2006  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

@@ -1,7 +1,7 @@
-// $Id: mesh_refinement_smoothing.C,v 1.16 2007-05-10 22:13:05 roystgnr Exp $
+// $Id: mesh_refinement_smoothing.C,v 1.17 2007-10-21 20:48:50 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

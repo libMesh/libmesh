@@ -1,7 +1,7 @@
-// $Id: fe_lagrange_shape_3D.C,v 1.17 2006-12-13 15:37:23 jwpeterson Exp $
+// $Id: fe_lagrange_shape_3D.C,v 1.18 2007-10-21 20:48:46 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

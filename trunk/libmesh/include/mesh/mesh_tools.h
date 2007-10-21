@@ -1,7 +1,7 @@
-// $Id: mesh_tools.h,v 1.6 2007-04-05 18:49:00 friedmud Exp $
+// $Id: mesh_tools.h,v 1.7 2007-10-21 20:48:42 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -46,7 +46,7 @@ class Elem;
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.6 $
+ * \version $Revision: 1.7 $
  */
 
 

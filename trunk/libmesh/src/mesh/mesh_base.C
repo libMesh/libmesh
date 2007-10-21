@@ -1,7 +1,7 @@
-// $Id: mesh_base.C,v 1.101 2007-08-19 20:00:48 benkirk Exp $
+// $Id: mesh_base.C,v 1.102 2007-10-21 20:48:49 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute and/or
 // modify it under the terms of the GNU Lesser General Public

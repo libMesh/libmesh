@@ -1,7 +1,7 @@
-// $Id: petsc_linear_solver.h,v 1.5 2007-07-16 15:12:36 jwpeterson Exp $
+// $Id: petsc_linear_solver.h,v 1.6 2007-10-21 20:48:43 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -58,7 +58,7 @@ extern "C" {
  * iterative solvers that is compatible with the \p libMesh
  * \p LinearSolver<>
  *
- * @author Benjamin Kirk, 2002-2005
+ * @author Benjamin Kirk, 2002-2007
  */
 
 template <typename T>

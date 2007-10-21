@@ -1,7 +1,7 @@
-// $Id: patch_recovery_error_estimator.C,v 1.29 2007-10-15 20:48:31 benkirk Exp $
+// $Id: patch_recovery_error_estimator.C,v 1.30 2007-10-21 20:48:52 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

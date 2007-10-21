@@ -1,7 +1,7 @@
-// $Id: solver.h,v 1.3 2005-02-22 22:17:35 jwpeterson Exp $
+// $Id: solver.h,v 1.4 2007-10-21 20:48:44 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -158,7 +158,7 @@ Solver::~Solver ()
 inline
 void Solver::init ()
 {
-  std::cout << "Initializing $Id: solver.h,v 1.3 2005-02-22 22:17:35 jwpeterson Exp $"
+  std::cout << "Initializing $Id: solver.h,v 1.4 2007-10-21 20:48:44 benkirk Exp $"
 	    << std::endl;
   
   // Initialize the system.
@@ -182,7 +182,7 @@ void Solver::solve ()
   // Perform any necessary pre-processing
   Solver::pre_process ();
   
-//  std::cout << "Solving $Id: solver.h,v 1.3 2005-02-22 22:17:35 jwpeterson Exp $"
+//  std::cout << "Solving $Id: solver.h,v 1.4 2007-10-21 20:48:44 benkirk Exp $"
 //	    << std::endl;
 
   // Solve the system

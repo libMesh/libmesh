@@ -1,7 +1,7 @@
-// $Id: dense_matrix_base.h,v 1.13 2005-05-24 13:35:41 jwpeterson Exp $
+// $Id: dense_matrix_base.h,v 1.14 2007-10-21 20:48:43 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

@@ -1,7 +1,7 @@
-// $Id: enum_order.h,v 1.6 2006-03-22 19:08:26 roystgnr Exp $
+// $Id: enum_order.h,v 1.7 2007-10-21 20:48:40 benkirk Exp $
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
