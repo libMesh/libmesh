@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.63 2007-10-21 20:48:50 benkirk Exp $
+// $Id: mesh_refinement.C,v 1.64 2007-10-22 23:23:25 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -788,33 +788,37 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   // all want to be unrefined then ALL of them need to have their
   // unrefinement flags cleared.    
   for (int level=(max_level); level >= 0; level--)
-    for (unsigned int e=0; e<_mesh.n_elem(); e++)
     {
-      if (_mesh.elem(e)->ancestor() &&
-	  (_mesh.elem(e)->level() == static_cast<unsigned int>(level)))
-	{
-	  
-	  // right now the element hasn't been disqualified
-	  // as a candidate for unrefinement	   
-	  bool is_a_candidate = true;
-	      
-	  for (unsigned int c=0; c<_mesh.elem(e)->n_children(); c++)
-	    if ((_mesh.elem(e)->child(c)->refinement_flag() != Elem::COARSEN) ||
-		!_mesh.elem(e)->child(c)->active() )
-	      is_a_candidate = false;
-	      
-	  if (!is_a_candidate)
+      MeshBase::element_iterator       el     = _mesh.level_elements_begin(level);
+      const MeshBase::element_iterator end_el = _mesh.level_elements_end(level); 
+      for (; el != end_el; ++el)
+        {
+          Elem *elem = *el;
+          if (elem->ancestor())
 	    {
-	      _mesh.elem(e)->set_refinement_flag(Elem::INACTIVE);
+	  
+	      // right now the element hasn't been disqualified
+	      // as a candidate for unrefinement	   
+	      bool is_a_candidate = true;
+	      
+	      for (unsigned int c=0; c<elem->n_children(); c++)
+	        if ((elem->child(c)->refinement_flag() != Elem::COARSEN) ||
+		    !elem->child(c)->active() )
+	          is_a_candidate = false;
+	      
+	      if (!is_a_candidate)
+	        {
+	          elem->set_refinement_flag(Elem::INACTIVE);
 		  
-	      for (unsigned int c=0; c<_mesh.elem(e)->n_children(); c++)
-		if (_mesh.elem(e)->child(c)->refinement_flag() == Elem::COARSEN)
-		  {
-		    level_one_satisfied = false;
-		    _mesh.elem(e)->child(c)->set_refinement_flag(Elem::DO_NOTHING);
-		  }
+	          for (unsigned int c=0; c<elem->n_children(); c++)
+		    if (elem->child(c)->refinement_flag() == Elem::COARSEN)
+		      {
+		        level_one_satisfied = false;
+		        elem->child(c)->set_refinement_flag(Elem::DO_NOTHING);
+		      }
+	        }
 	    }
-	}
+         }
      }
      
   if (!level_one_satisfied && _maintain_level_one) goto repeat;
@@ -822,23 +826,28 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   
   // If all the children of a parent are set to be coarsened
   // then flag the parent so that they can kill thier kids...   
-  for (unsigned int e=0; e<_mesh.n_elem(); e++)
-    if (_mesh.elem(e)->ancestor())
-      {
+  MeshBase::element_iterator       all_el     = _mesh.elements_begin();
+  const MeshBase::element_iterator all_el_end = _mesh.elements_end(); 
+  for (; all_el != all_el_end; ++all_el)
+    {
+      Elem *elem = *all_el;
+        if (elem->ancestor())
+          {
 	
-	// Presume all the children are flagged for coarsening
-	// and then look for a contradiction	 
-	bool all_children_flagged_for_coarsening = true;
+	    // Presume all the children are flagged for coarsening
+	    // and then look for a contradiction	 
+	    bool all_children_flagged_for_coarsening = true;
 	
-	for (unsigned int c=0; c<_mesh.elem(e)->n_children(); c++)
-	  if (_mesh.elem(e)->child(c)->refinement_flag() != Elem::COARSEN)
-	    all_children_flagged_for_coarsening = false;
+	    for (unsigned int c=0; c<elem->n_children(); c++)
+	      if (elem->child(c)->refinement_flag() != Elem::COARSEN)
+	        all_children_flagged_for_coarsening = false;
 	
-	if (all_children_flagged_for_coarsening)
-	  _mesh.elem(e)->set_refinement_flag(Elem::COARSEN_INACTIVE);
-        else
-	  _mesh.elem(e)->set_refinement_flag(Elem::INACTIVE);
-      }
+	    if (all_children_flagged_for_coarsening)
+	      elem->set_refinement_flag(Elem::COARSEN_INACTIVE);
+            else
+	      elem->set_refinement_flag(Elem::INACTIVE);
+          }
+    }
 	
   STOP_LOG ("make_coarsening_compatible()", "MeshRefinement");
   
