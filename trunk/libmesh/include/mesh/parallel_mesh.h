@@ -1,4 +1,4 @@
-// $Id: parallel_mesh.h,v 1.7 2007-10-22 19:57:58 roystgnr Exp $
+// $Id: parallel_mesh.h,v 1.8 2007-10-22 23:06:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -96,10 +96,14 @@ class ParallelMesh : public UnstructuredMesh
   void restore_nonlocal_elements();
 
   virtual unsigned int n_nodes () const { return _nodes.size(); }
-  virtual unsigned int max_node_id () const { return _nodes.size(); }
+  virtual unsigned int max_node_id () const {
+    return _nodes.empty() ? 0 : _nodes.rbegin()->first + 1;
+  }
   virtual void reserve_nodes (const unsigned int) { }
   virtual unsigned int n_elem ()  const { return _elements.size(); }
-  virtual unsigned int max_elem_id ()  const { return _elements.size(); }
+  virtual unsigned int max_elem_id ()  const {
+    return _elements.empty() ? 0 : _elements.rbegin()->first + 1;
+  }
   virtual void reserve_elem (const unsigned int) { }
 
   /**

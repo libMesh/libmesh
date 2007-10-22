@@ -1,4 +1,4 @@
-// $Id: parallel_mesh.C,v 1.8 2007-10-22 19:57:58 roystgnr Exp $
+// $Id: parallel_mesh.C,v 1.9 2007-10-22 23:06:31 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -60,7 +60,7 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
 
 const Point& ParallelMesh::point (const unsigned int i) const
 {
-  assert (i < this->n_nodes());
+  assert (i < this->max_node_id());
   assert (_nodes[i] != NULL);
   assert (_nodes[i]->id() != Node::invalid_id);  
 
@@ -73,7 +73,7 @@ const Point& ParallelMesh::point (const unsigned int i) const
 
 const Node& ParallelMesh::node (const unsigned int i) const
 {
-  assert (i < this->n_nodes());
+  assert (i < this->max_node_id());
   assert (_nodes[i] != NULL);
   assert (_nodes[i]->id() != Node::invalid_id);  
   
@@ -86,16 +86,9 @@ const Node& ParallelMesh::node (const unsigned int i) const
 
 Node& ParallelMesh::node (const unsigned int i)
 {
-  if (i >= this->n_nodes())
-    {
-      std::cout << " i=" << i
-		<< ", n_nodes()=" << this->n_nodes()
-		<< std::endl;
-      error();
-    }
-  
-  assert (i < this->n_nodes());
+  assert (i < this->max_node_id());
   assert (_nodes[i] != NULL);
+  assert (_nodes[i]->id() != Node::invalid_id);  
 
   return (*_nodes[i]);
 }
@@ -104,7 +97,7 @@ Node& ParallelMesh::node (const unsigned int i)
 
 const Node* ParallelMesh::node_ptr (const unsigned int i) const
 {
-  assert (i < this->n_nodes());
+  assert (i < this->max_node_id());
   assert (_nodes[i] != NULL);
   assert (_nodes[i]->id() != Node::invalid_id);  
   
@@ -116,7 +109,7 @@ const Node* ParallelMesh::node_ptr (const unsigned int i) const
 
 Node* & ParallelMesh::node_ptr (const unsigned int i)
 {
-  assert (i < this->n_nodes());
+  assert (i < this->max_node_id());
 
   return _nodes[i];
 }
@@ -126,7 +119,7 @@ Node* & ParallelMesh::node_ptr (const unsigned int i)
 
 Elem* ParallelMesh::elem (const unsigned int i) const
 {
-  assert (i < this->n_elem());
+  assert (i < this->max_elem_id());
   assert (_elements[i] != NULL);
   
   return _elements[i];
@@ -138,9 +131,9 @@ Elem* ParallelMesh::elem (const unsigned int i) const
 Elem* ParallelMesh::add_elem (Elem* e)
 {
   if (e != NULL)
-    e->set_id (_elements.size());
+    e->set_id (this->max_elem_id());
   
-  _elements[_elements.size()] = e;
+  _elements[this->max_elem_id()] = e;
 
   return e;
 }
@@ -166,8 +159,14 @@ void ParallelMesh::delete_elem(Elem* e)
   // Delete the element from the BoundaryInfo object
   this->boundary_info->remove(e);
 
-  // And from the container
-  _elements.erase(e->id());
+  // But not yet from the container; we might invalidate
+  // an iterator that way!
+
+  //_elements.erase(e->id());
+
+  // Instead, we set it to NULL for now
+
+  _elements[e->id()] = NULL;
   
   // delete the element
   delete e;
@@ -177,8 +176,8 @@ void ParallelMesh::delete_elem(Elem* e)
 
 Node* ParallelMesh::add_point (const Point& p)
 {  
-  Node* n = Node::build(p, this->n_nodes()).release();
-  _nodes[this->n_nodes()] = n;
+  Node* n = Node::build(p, this->max_node_id()).release();
+  _nodes[this->max_node_id()] = n;
   
   return n;
 }
@@ -188,7 +187,7 @@ Node* ParallelMesh::add_point (const Point& p)
 void ParallelMesh::delete_node(Node* n)
 {
   assert (n != NULL);
-  assert (n->id() < _nodes.size());
+  assert (n->id() < this->max_node_id());
 
   // Delete the node from the BoundaryInfo object
   this->boundary_info->remove(n);
@@ -245,7 +244,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
   START_LOG("renumber_nodes_and_elem()", "Mesh");
   
   // In Parallel we do *not* want to renumber anything, just to delete
-  // any unused nodes
+  // any unused nodes or NULL elements
 
   // Loop over the elements.  Remember any node ids we see.
   std::map<unsigned int, bool> used_nodes;
@@ -254,13 +253,22 @@ void ParallelMesh::renumber_nodes_and_elements ()
     elem_iterator_imp  in = _elements.begin();
     elem_iterator_imp end = _elements.end();
 
-    for (; in != end; ++in)
+    for (; in != end;)
       {
         Elem* elem = *in;
-        
-        // Notice this element's nodes.
-        for (unsigned int n=0; n<elem->n_nodes(); n++)
-          used_nodes[elem->node(n)] = true;
+
+        if (elem)
+          {
+            // Notice this element's nodes.
+            for (unsigned int n=0; n<elem->n_nodes(); n++)
+              used_nodes[elem->node(n)] = true;
+            ++in;
+          }
+        else
+          {
+            // Remove this non-element
+            _elements.erase(in++);
+          }
       }
   }
 
@@ -295,8 +303,8 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
 void ParallelMesh::delete_nonlocal_elements()
 {
-  std::vector<bool> local_nodes(_nodes.size(), false);
-  std::vector<bool> semilocal_elems(_elements.size(), false);
+  std::vector<bool> local_nodes(this->max_node_id(), false);
+  std::vector<bool> semilocal_elems(this->max_elem_id(), false);
 
   const_element_iterator l_elem_it = this->local_elements_begin(),
                          l_end     = this->local_elements_end();
