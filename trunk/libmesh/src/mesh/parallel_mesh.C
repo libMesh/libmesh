@@ -1,4 +1,4 @@
-// $Id: parallel_mesh.C,v 1.7 2007-10-21 20:48:51 benkirk Exp $
+// $Id: parallel_mesh.C,v 1.8 2007-10-22 19:57:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -140,7 +140,7 @@ Elem* ParallelMesh::add_elem (Elem* e)
   if (e != NULL)
     e->set_id (_elements.size());
   
-  _elements.push_back(e);
+  _elements[_elements.size()] = e;
 
   return e;
 }
@@ -163,49 +163,24 @@ void ParallelMesh::delete_elem(Elem* e)
 {
   assert (e != NULL);
 
-  // Initialize an iterator to eventually point to the element we want to delete
-  std::vector<Elem*>::iterator pos = _elements.end();
-  
-  // In many cases, e->id() gives us a clue as to where e
-  // is located in the _elements vector.  Try that first
-  // before trying the O(n_elem) search.
-  assert (e->id() < _elements.size());
-
-  if (_elements[e->id()] == e)
-    {
-      // We found it!
-      pos = _elements.begin();
-      std::advance(pos, e->id());
-    }
-
-  else
-    {
-      // This search is O(n_elem)
-      pos = std::find (_elements.begin(),
-		       _elements.end(),
-		       e);
-    }
-
-  // Huh? Element not in the vector?
-  assert (pos != _elements.end());
-
-  // Remove the element from the BoundaryInfo object
+  // Delete the element from the BoundaryInfo object
   this->boundary_info->remove(e);
+
+  // And from the container
+  _elements.erase(e->id());
   
   // delete the element
   delete e;
-  
-  // explicitly NULL the pointer
-  *pos = NULL;
 }
 
 
 
 Node* ParallelMesh::add_point (const Point& p)
 {  
-  _nodes.push_back (Node::build(p, this->n_nodes()).release());
+  Node* n = Node::build(p, this->n_nodes()).release();
+  _nodes[this->n_nodes()] = n;
   
-  return _nodes.back();
+  return n;
 }
 
 
@@ -215,36 +190,14 @@ void ParallelMesh::delete_node(Node* n)
   assert (n != NULL);
   assert (n->id() < _nodes.size());
 
-  // Initialize an iterator to eventually point to the element we want
-  // to delete
-  std::vector<Node*>::iterator pos;
-
-  // In many cases, e->id() gives us a clue as to where e
-  // is located in the _elements vector.  Try that first
-  // before trying the O(n_elem) search.
-  if (_nodes[n->id()] == n)
-    {
-      pos = _nodes.begin();
-      std::advance(pos, n->id());
-    }
-  else
-    {
-      pos = std::find (_nodes.begin(),
-		       _nodes.end(),
-		       n);
-    }
-  
-  // Huh? Node not in the vector?
-  assert (pos != _nodes.end());
-
   // Delete the node from the BoundaryInfo object
   this->boundary_info->remove(n);
+
+  // And from the container
+  _nodes.erase(n->id());
   
   // delete the node
   delete n;
-  
-  // explicitly NULL the pointer
-  *pos = NULL;
 }
 
 
@@ -257,8 +210,8 @@ void ParallelMesh::clear ()
   
   // Clear our elements and nodes
   {
-    std::vector<Elem*>::iterator       it  = _elements.begin();
-    const std::vector<Elem*>::iterator end = _elements.end();
+    elem_iterator_imp        it = _elements.begin();
+    const elem_iterator_imp end = _elements.end();
 
     // There is no need to remove the elements from
     // the BoundaryInfo data structure since we
@@ -271,8 +224,8 @@ void ParallelMesh::clear ()
 
   // clear the nodes data structure
   {
-    std::vector<Node*>::iterator       it  = _nodes.begin();
-    const std::vector<Node*>::iterator end = _nodes.end();
+    node_iterator_imp it  = _nodes.begin();
+    node_iterator_imp end = _nodes.end();
 
     // There is no need to remove the nodes from
     // the BoundaryInfo data structure since we
@@ -291,97 +244,49 @@ void ParallelMesh::renumber_nodes_and_elements ()
   
   START_LOG("renumber_nodes_and_elem()", "Mesh");
   
-  // node and element id counters
-  unsigned int next_free_elem = 0;
-  unsigned int next_free_node = 0;
+  // In Parallel we do *not* want to renumber anything, just to delete
+  // any unused nodes
 
-  // Loop over the elements.  Note that there may
-  // be NULLs in the _elements vector from the coarsening
-  // process.  Pack the elements in to a contiguous array
-  // and then trim any excess.
+  // Loop over the elements.  Remember any node ids we see.
+  std::map<unsigned int, bool> used_nodes;
+
   {      
-    std::vector<Elem*>::iterator in        = _elements.begin();
-    std::vector<Elem*>::iterator out       = _elements.begin();
-    const std::vector<Elem*>::iterator end = _elements.end();
+    elem_iterator_imp  in = _elements.begin();
+    elem_iterator_imp end = _elements.end();
 
     for (; in != end; ++in)
-      if (*in != NULL)
-	{
-	  Elem* elem = *in;
-	  
-	  *out = *in;
-	  ++out;
-	  
-	  // Increment the element counter
-	  elem->set_id (next_free_elem++);
-	  
-	  // Loop over this element's nodes.  Number them,
-	  // if they have not been numbered already.  Also,
-	  // position them in the _nodes vector so that they
-	  // are packed contiguously from the beginning.
-	  for (unsigned int n=0; n<elem->n_nodes(); n++)
-	    if (elem->node(n) == next_free_node)     // don't need to process
-	      next_free_node++;                      // [(src == dst) below]
-
-	    else if (elem->node(n) > next_free_node) // need to process
-	      {
-		// The source and destination indices
-		// for this node
-		const unsigned int src_idx = elem->node(n);
-		const unsigned int dst_idx = next_free_node++;
-
-		// ensure we want to swap valid nodes
-		assert (_nodes[src_idx] != NULL);
-		assert (_nodes[dst_idx] != NULL);
-		
-		// Swap the source and destination nodes
-                std::swap(_nodes[src_idx],
-                          _nodes[dst_idx] );
-
-		// Set proper indices
-		_nodes[src_idx]->set_id (src_idx);
-		_nodes[dst_idx]->set_id (dst_idx);
-	      }
-	}
-
-    // Erase any additional storage. These elements have been
-    // copied into NULL voids by the procedure above, and are
-    // thus repeated and unnecessary.
-    _elements.erase (out, end);
-  }
-
-  // Any nodes in the vector >= _nodes[next_free_node]
-  // are not connected to any elements and may be deleted
-  // if desired.
-
-  // (This code block will erase the unused nodes)
-  // Now, delete the unused nodes
-  {
-    std::vector<Node*>::iterator nd        = _nodes.begin();
-    const std::vector<Node*>::iterator end = _nodes.end();
-
-    std::advance (nd, next_free_node);
-    
-    for (std::vector<Node*>::iterator it=nd;
-	 it != end; ++it)
       {
-	assert (*it != NULL);
-
-	// remove any boundary information associated with
-	// this node
-	this->boundary_info->remove (*it);
-	
-	// delete the node
-	delete *it;
-	*it = NULL;
+        Elem* elem = *in;
+        
+        // Notice this element's nodes.
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
+          used_nodes[elem->node(n)] = true;
       }
-
-    _nodes.erase (nd, end);
   }
-  
 
-  assert (next_free_elem == _elements.size());
-  assert (next_free_node == _nodes.size());
+  // Nodes not connected to any elements are deleted
+  {
+    node_iterator_imp  it = _nodes.begin();
+    node_iterator_imp end = _nodes.end();
+
+    for (; it != end;)
+      {
+	Node *node = *it;
+        if (!used_nodes[node->id()])
+          {
+	    // remove any boundary information associated with
+	    // this node
+	    this->boundary_info->remove (node);
+
+	    // delete the node
+	    delete node;
+
+            _nodes.erase(it++);
+	  }
+        else
+          ++it;
+      }
+  }
   
   STOP_LOG("renumber_nodes_and_elem()", "Mesh");
 }
