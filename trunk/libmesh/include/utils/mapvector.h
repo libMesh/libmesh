@@ -1,4 +1,4 @@
-// $Id: mapvector.h,v 1.1 2007-10-22 19:57:57 roystgnr Exp $
+// $Id: mapvector.h,v 1.2 2007-10-22 23:43:48 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -24,6 +24,16 @@
 
 // C++ Includes   -----------------------------------
 #include <map>
+
+/**
+ * This \p mapvector templated class is intended to provide the
+ * performance characteristics of a std::map with an interface more
+ * closely resembling that of a std::vector, for use with ParallelMesh.
+ *
+ * \author  Roy H. Stogner
+ * \date    $Date: 2007-10-22 23:43:48 $
+ * \version $Revision: 1.2 $
+ */
 
 template <typename Val>
 class mapvector : public std::map<unsigned int, Val>
