@@ -1,4 +1,4 @@
-// $Id: dof_map.C,v 1.109 2007-10-21 20:48:45 benkirk Exp $
+// $Id: dof_map.C,v 1.110 2007-10-22 23:57:56 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -684,7 +684,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
   const MeshBase::const_element_iterator local_elem_end
     = mesh.active_local_elements_end(); 
 
-  std::vector<bool> node_on_processor(mesh.n_nodes(), false);
+  std::vector<bool> node_on_processor(mesh.max_node_id(), false);
   std::vector<unsigned int> di;
   std::vector<const Elem *> family;
 
