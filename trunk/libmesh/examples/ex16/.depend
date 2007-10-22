@@ -2,19 +2,23 @@ ex16.$(obj-suffix):\
     ex16.C\
     ../../include/base/auto_ptr.h\
     ../../include/base/dof_map.h\
+    ../../include/base/dof_object.h\
     ../../include/base/libmesh.h\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
     ../../include/base/libmesh_config.h\
     ../../include/base/multi_predicates.h\
+    ../../include/base/node.h\
     ../../include/base/reference_counted_object.h\
     ../../include/base/reference_counter.h\
     ../../include/base/single_predicates.h\
     ../../include/base/variant_filter_iterator.h\
     ../../include/enums/enum_eigen_solver_type.h\
+    ../../include/enums/enum_elem_quality.h\
     ../../include/enums/enum_elem_type.h\
     ../../include/enums/enum_fe_family.h\
     ../../include/enums/enum_inf_map_type.h\
+    ../../include/enums/enum_io_package.h\
     ../../include/enums/enum_order.h\
     ../../include/enums/enum_quadrature_type.h\
     ../../include/enums/enum_solver_package.h\
@@ -22,12 +26,18 @@ ex16.$(obj-suffix):\
     ../../include/fe/fe.h\
     ../../include/fe/fe_base.h\
     ../../include/fe/fe_type.h\
+    ../../include/geom/elem.h\
+    ../../include/geom/elem_type.h\
     ../../include/geom/point.h\
     ../../include/mesh/gmv_io.h\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
     ../../include/mesh/mesh_generation.h\
+    ../../include/mesh/mesh_input.h\
     ../../include/mesh/mesh_output.h\
+    ../../include/mesh/parallel_mesh.h\
+    ../../include/mesh/serial_mesh.h\
+    ../../include/mesh/unstructured_mesh.h\
     ../../include/numerics/dense_matrix.h\
     ../../include/numerics/dense_matrix_base.h\
     ../../include/numerics/eigen_solver.h\
@@ -49,6 +59,7 @@ ex16.$(obj-suffix):\
     ../../include/solvers/steady_system.h\
     ../../include/solvers/system.h\
     ../../include/solvers/transient_system.h\
+    ../../include/utils/mapvector.h\
     ../../include/utils/o_string_stream.h\
     ../../include/utils/parameters.h\
     ../../include/utils/perf_log.h
