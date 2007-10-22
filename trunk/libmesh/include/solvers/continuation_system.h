@@ -1,4 +1,4 @@
-// $Id: continuation_system.h,v 1.3 2007-10-21 20:48:44 benkirk Exp $
+// $Id: continuation_system.h,v 1.4 2007-10-22 23:12:10 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -140,6 +140,13 @@ public:
   Real solution_tolerance;
 
   /**
+   * How much to try to reduce the residual by at the first (inexact) Newton step.
+   * This is frequently something large like 1/2 in an inexact Newton method, to
+   * prevent oversolving.
+   */
+  Real initial_newton_tolerance;
+  
+  /**
    * Stores the current solution and continuation parameter
    * (as "previous_u" and "old_continuation_paramter") for later referral.
    * You may need to call this e.g. after the first regular solve, in order
@@ -233,7 +240,9 @@ public:
   /**
    * A measure of how rapidly one should attempt to grow the arclength
    * stepsize based on the number of Newton iterations required to solve
-   * the problem. Default value is 1.0
+   * the problem. Default value is 1.0, if set to zero, will not try to
+   * grow or shrink the arclength stepsize based on the number of Newton
+   * iterations required.
    */
   Real newton_stepgrowth_aggressiveness;
   
