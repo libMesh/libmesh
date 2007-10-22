@@ -1,4 +1,4 @@
-// $Id: continuation_system.C,v 1.4 2007-10-21 20:48:54 benkirk Exp $
+// $Id: continuation_system.C,v 1.5 2007-10-22 23:12:11 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -32,6 +32,7 @@ ContinuationSystem::ContinuationSystem (EquationSystems& es,
     quiet(true),
     continuation_parameter_tolerance(1.e-6),
     solution_tolerance(1.e-6),
+    initial_newton_tolerance(0.01),
     old_continuation_parameter(0.),
     min_continuation_parameter(0.),
     max_continuation_parameter(0.),
@@ -435,7 +436,7 @@ void ContinuationSystem::continuation_solve()
 	  if (newton_step==0)
 	    {
 	      // At first step, only try reducing the residual by a small amount
-	      current_linear_tolerance = 0.01;
+	      current_linear_tolerance = initial_newton_tolerance;//0.01;
 	    }
 
 	  else
@@ -1214,41 +1215,49 @@ void ContinuationSystem::update_solution()
       // 2.) Technique 1 tends to shrink the step fairly well (and even if it doesn't
       // get very small, we still have step reduction) but it seems to grow the step
       // very slowly.  Another possible technique is step-doubling:
-      // if (yold_over_y > 1.)
-      // 	ds_current *= 2.;
-      //       else
-      // 	ds_current *= yold_over_y;
+//       if (yold_over_y > 1.)
+//       	ds_current *= 2.;
+//       else
+// 	ds_current *= yold_over_y;
 
       // 3.) Technique 2 may over-zealous when we are also using the Newton stepgrowth
       // factor.  For technique 3 we multiply by yold_over_y unless yold_over_y > 2
       // in which case we use 2.
-      if (yold_over_y > 2.)
-	ds_current *= 2.;
-      else
-	ds_current *= yold_over_y;
+      //       if (yold_over_y > 2.)
+      // 	ds_current *= 2.;
+      //       else
+      // 	ds_current *= yold_over_y;
+
+      // 4.) Double-or-halve.  We double the arc-step if the ratio of successive tangents
+      // is larger than some pre-determined value, halve it if it is less than some other
+      // pre-determined value.
+      if (yold_over_y > 1.0)
+      	ds_current *= 2.;
+      else if (yold_over_y < 0.9)
+      	ds_current *= 0.5;
 	
       
-      // Also use the number of Newton iterations required to compute the previous
-      // step (relative to the maximum-allowed number of Newton iterations) to possibly
-      // grow the step.
-      {
-	assert (newton_solver != NULL);
-	const unsigned int Nmax = newton_solver->max_nonlinear_iterations;
+      // Also possibly use the number of Newton iterations required to compute the previous
+      // step (relative to the maximum-allowed number of Newton iterations) to grow the step.
+      if (newton_stepgrowth_aggressiveness > 0.)
+	{
+	  assert (newton_solver != NULL);
+	  const unsigned int Nmax = newton_solver->max_nonlinear_iterations;
 
-	// // The LOCA Newton step growth technique (note: only grows step length)
-	// const Real stepratio = static_cast<Real>(Nmax-(newton_step+1))/static_cast<Real>(Nmax-1.);
-	// const Real newtonstep_growthfactor = 1. + newton_stepgrowth_aggressiveness*stepratio*stepratio;
+	  // // The LOCA Newton step growth technique (note: only grows step length)
+	  // const Real stepratio = static_cast<Real>(Nmax-(newton_step+1))/static_cast<Real>(Nmax-1.);
+	  // const Real newtonstep_growthfactor = 1. + newton_stepgrowth_aggressiveness*stepratio*stepratio;
 
-	// The "Nopt/N" method, may grow or shrink the step.  Assume Nopt=Nmax/2.
-	const Real newtonstep_growthfactor =
-	  newton_stepgrowth_aggressiveness * 0.5 *
-	  static_cast<Real>(Nmax) / static_cast<Real>(newton_step+1);
+	  // The "Nopt/N" method, may grow or shrink the step.  Assume Nopt=Nmax/2.
+	  const Real newtonstep_growthfactor =
+	    newton_stepgrowth_aggressiveness * 0.5 *
+	    static_cast<Real>(Nmax) / static_cast<Real>(newton_step+1);
 
-	if (!quiet)
-	  std::cout << "newtonstep_growthfactor=" << newtonstep_growthfactor << std::endl;
+	  if (!quiet)
+	    std::cout << "newtonstep_growthfactor=" << newtonstep_growthfactor << std::endl;
 	
-	ds_current *= newtonstep_growthfactor;
-      }
+	  ds_current *= newtonstep_growthfactor;
+	}
     }
 
   
