@@ -1,4 +1,4 @@
-// $Id: tree.h,v 1.11 2007-10-21 20:48:45 benkirk Exp $
+// $Id: tree.h,v 1.12 2007-10-22 15:58:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -46,19 +46,9 @@ class Tree : public TreeBase
 public:
   
   /**
-   * \p enum defining how to build the tree.  \p NODES will populate
-   * the tree with nodes and then replace the nodes with element
-   * connectivity, \p ELEMENTS will populate the tree with the elements
-   * directly.
-   */
-  enum BuildType {NODES=0,
-		  ELEMENTS,
-		  INVALID_BUILD_TYPE };
-  
-  /**
    * Constructor.
    */
-  Tree (const MeshBase& m, const unsigned int level, BuildType bt=NODES);
+  Tree (const MeshBase& m, const unsigned int level, Trees::BuildType bt=Trees::NODES);
 
   /**
    * Copy-constructor.
@@ -109,7 +99,7 @@ private:
   /**
    * How the tree is built.
    */
-  const BuildType build_type;
+  const Trees::BuildType build_type;
   
 };
 

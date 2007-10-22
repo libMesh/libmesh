@@ -1,4 +1,4 @@
-// $Id: tree.C,v 1.14 2007-10-21 20:48:54 benkirk Exp $
+// $Id: tree.C,v 1.15 2007-10-22 15:58:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -35,7 +35,7 @@
 template <unsigned int N>
 Tree<N>::Tree (const MeshBase& m,
 	       const unsigned int level,
-	       const BuildType bt) :
+	       const Trees::BuildType bt) :
   TreeBase(m),
   root(m,level),
   build_type(bt)
@@ -45,7 +45,7 @@ Tree<N>::Tree (const MeshBase& m,
   root.set_bounding_box (MeshTools::bounding_box(mesh));
 
 
-  if (build_type == NODES)
+  if (build_type == Trees::NODES)
     {
       // Add all the nodes to the root node.  It will 
       // automagically build the tree for us.
@@ -64,7 +64,7 @@ Tree<N>::Tree (const MeshBase& m,
       root.transform_nodes_to_elements (nodes_to_elem);
     }
 
-  else if (build_type == ELEMENTS)
+  else if (build_type == Trees::ELEMENTS)
     {
       // Add all active elements to the root node.  It will
       // automatically build the tree for us.

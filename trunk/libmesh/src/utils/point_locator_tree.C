@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.C,v 1.22 2007-10-21 20:48:54 benkirk Exp $
+// $Id: point_locator_tree.C,v 1.23 2007-10-22 15:58:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -39,7 +39,21 @@ PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
   _element         (NULL),
   _out_of_mesh_mode(false)
 {
-  this->init();
+  this->init(Trees::NODES);
+}
+
+
+
+
+PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
+				    const Trees::BuildType build_type,
+				    const PointLocatorBase* master) :
+  PointLocatorBase (mesh,master),
+  _tree            (NULL),
+  _element         (NULL),
+  _out_of_mesh_mode(false)
+{
+  this->init(build_type);
 }
 
 
@@ -71,7 +85,7 @@ void PointLocatorTree::clear ()
 
 
 
-void PointLocatorTree::init ()
+void PointLocatorTree::init (const Trees::BuildType build_type)
 {
   assert (this->_tree == NULL); 
 
@@ -88,8 +102,7 @@ void PointLocatorTree::init ()
       if (this->_master == NULL)
         {
 	  if (this->_mesh.mesh_dimension() == 3)
-	    _tree = new Trees::OctTree (this->_mesh, 200,
-					Trees::OctTree::NODES);		
+	    _tree = new Trees::OctTree (this->_mesh, 200, build_type);		
 	  else
 	    {
 	      // A 1D/2D mesh in 3D space needs special consideration.
@@ -112,11 +125,9 @@ void PointLocatorTree::init ()
 	      }
 	      		    
 	      if (is_planar_xy)
-		_tree = new Trees::QuadTree (this->_mesh, 200,
-					     Trees::QuadTree::NODES);
+		_tree = new Trees::QuadTree (this->_mesh, 200, build_type);
 	      else
-		_tree = new Trees::OctTree (this->_mesh, 200,
-					    Trees::OctTree::NODES);		      
+		_tree = new Trees::OctTree (this->_mesh, 200, build_type);
 	    }
 	}
 
