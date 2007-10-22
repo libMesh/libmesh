@@ -1,4 +1,4 @@
-// $Id: parallel_mesh.h,v 1.6 2007-10-21 20:48:42 benkirk Exp $
+// $Id: parallel_mesh.h,v 1.7 2007-10-22 19:57:58 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -25,6 +25,9 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
+#include "elem.h"
+#include "mapvector.h"
+#include "node.h"
 #include "unstructured_mesh.h"
 
 /**
@@ -94,10 +97,10 @@ class ParallelMesh : public UnstructuredMesh
 
   virtual unsigned int n_nodes () const { return _nodes.size(); }
   virtual unsigned int max_node_id () const { return _nodes.size(); }
-  virtual void reserve_nodes (const unsigned int nn) { _nodes.reserve (nn); }
+  virtual void reserve_nodes (const unsigned int) { }
   virtual unsigned int n_elem ()  const { return _elements.size(); }
   virtual unsigned int max_elem_id ()  const { return _elements.size(); }
-  virtual void reserve_elem (const unsigned int ne) { _elements.reserve (ne); }
+  virtual void reserve_elem (const unsigned int) { }
 
   /**
    * For meshes that don't store points/elems, these functions may be an issue!
@@ -254,15 +257,16 @@ public:
   const_node_iterator pid_nodes_end   (const unsigned int proc_id) const;
  
 protected:
+
   /**
    * The verices (spatial coordinates) of the mesh.
    */
-  std::vector<Node*> _nodes;
+  mapvector<Node*> _nodes;
   
   /**
    * The elements in the mesh.
    */
-  std::vector<Elem*> _elements;
+  mapvector<Elem*> _elements;
 
 private:
   
@@ -270,15 +274,15 @@ private:
    * Typedefs for the container implementation.  In this case,
    * it's just a std::vector<Elem*>.
    */
-  typedef std::vector<Elem*>::iterator             elem_iterator_imp;
-  typedef std::vector<Elem*>::const_iterator const_elem_iterator_imp;
+  typedef mapvector<Elem*>::veclike_iterator             elem_iterator_imp;
+  typedef mapvector<Elem*>::const_veclike_iterator const_elem_iterator_imp;
 
   /**
    * Typedefs for the container implementation.  In this case,
    * it's just a std::vector<Node*>.
    */
-  typedef std::vector<Node*>::iterator             node_iterator_imp;
-  typedef std::vector<Node*>::const_iterator const_node_iterator_imp;
+  typedef mapvector<Node*>::veclike_iterator             node_iterator_imp;
+  typedef mapvector<Node*>::const_veclike_iterator const_node_iterator_imp;
 };
 
 
