@@ -1,4 +1,4 @@
-// $Id: point_locator_tree.h,v 1.9 2007-10-21 20:48:45 benkirk Exp $
+// $Id: point_locator_tree.h,v 1.10 2007-10-22 15:58:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -28,13 +28,12 @@
 
 // Local Includes
 #include "point_locator_base.h"
-
+#include "tree_base.h"
 
 
 // Forward Declarations
 class MeshBase;
 class Point;
-class TreeBase;
 class Elem;
 
 
@@ -54,6 +53,7 @@ class PointLocatorTree : public PointLocatorBase
 {
 public:
 
+
   /**
    * Constructor.  Needs the \p mesh in which the points
    * should be located.  Optionally takes a master 
@@ -65,6 +65,23 @@ public:
   PointLocatorTree (const MeshBase& mesh,
 		    const PointLocatorBase* master = NULL);
 
+  
+  /**
+   * Constructor.  Needs the \p mesh in which the points
+   * should be located.  Allows the user to specify the
+   * method to use when building the tree.
+   * Optionally takes a master interpolator.
+   * This master helps in saving memory 
+   * by reducing the number of trees in use.  Only the 
+   * master locator holds a  tree, the others simply 
+   * use the master's tree. Allows the user to specify
+   * the build type.
+   */
+  PointLocatorTree (const MeshBase& mesh,
+		    const Trees::BuildType build_type,
+		    const PointLocatorBase* master = NULL);
+
+    
 
 public:
 
@@ -82,7 +99,13 @@ public:
    * Initializes the locator, so that the \p operator() methods can
    * be used.  This function allocates dynamic memory with "new".
    */
-  virtual void init();
+  void init(const Trees::BuildType build_type);
+
+  /**
+   * Initializes the locator, so that the \p operator() methods can
+   * be used.  This function allocates dynamic memory with "new".
+   */
+  virtual void init() { this->init(Trees::NODES); };
 
   /**
    * Locates the element in which the point with global coordinates

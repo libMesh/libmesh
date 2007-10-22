@@ -1,4 +1,4 @@
-// $Id: mesh_function.h,v 1.10 2007-10-21 20:48:42 benkirk Exp $
+// $Id: mesh_function.h,v 1.11 2007-10-22 15:58:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -31,7 +31,7 @@
 #include "dense_vector.h"
 #include "vector_value.h"
 #include "tensor_value.h"
-
+#include "tree_base.h"
 
 
 // Forward Declarations
@@ -85,8 +85,16 @@ public:
 
   /**
    * The actual initialization process.
+   * specifies the method to use when building a \p PointLocator
    */
-  void init ();
+  void init () { this->init(Trees::NODES); };
+
+
+  /**
+   * The actual initialization process.  Takes an optional argument which
+   * specifies the method to use when building a \p PointLocator
+   */
+  void init (const Trees::BuildType point_locator_build_type);
 
   /**
    * Clears the function.

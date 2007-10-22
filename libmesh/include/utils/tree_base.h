@@ -1,4 +1,4 @@
-// $Id: tree_base.h,v 1.5 2007-10-21 20:48:45 benkirk Exp $
+// $Id: tree_base.h,v 1.6 2007-10-22 15:58:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -35,6 +35,19 @@ class Point;
 class Elem;
 
 
+namespace Trees
+{
+  /**
+   * \p enum defining how to build the tree.  \p NODES will populate
+   * the tree with nodes and then replace the nodes with element
+   * connectivity, \p ELEMENTS will populate the tree with the elements
+   * directly.
+   */
+  enum BuildType {NODES=0,
+		  ELEMENTS,
+		  INVALID_BUILD_TYPE };
+}
+
 /**
  * This is the base class for trees, it allows pointer
  * usage of trees.
@@ -53,7 +66,7 @@ protected:
 
 
 public:
-
+  
   /**
    * Destructor.
    */

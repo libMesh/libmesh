@@ -1,4 +1,4 @@
-// $Id: vtk_io.C,v 1.9 2007-10-21 20:48:51 benkirk Exp $
+// $Id: vtk_io.C,v 1.10 2007-10-22 15:58:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -399,38 +399,45 @@ void VTKIO::read (const std::string& name)
  * FIXME this operates on the mesh it "gets" from the ES only, this would
  * prevent passing in a mesh that doesn't belong to the ES
  */
-void VTKIO::write_equation_systems(const std::string& fname, const EquationSystems& es){
+void VTKIO::write_equation_systems(const std::string& fname, const EquationSystems& es)
+{
 #ifndef HAVE_VTK
-	std::cerr << "Cannot write VTK file: " << fname
+
+  // Do something with the es to avoid a compiler warning.
+  es.n_systems();
+  
+  std::cerr << "Cannot write VTK file: " << fname
 	    << "\nYou must have VTK installed and correctly configured to read VTK meshes."
 	    << std::endl;
-	error();
+  error();
+  
 #else
-	/*
-	 * we only use Unstructured grids
-	 */
-	_vtk_grid = vtkUnstructuredGrid::New();
-	vtkXMLPUnstructuredGridWriter* writer= vtkXMLPUnstructuredGridWriter::New();
-	nodes_to_vtk((const MeshBase&)es.get_mesh(), _vtk_grid);
-	cells_to_vtk((const MeshBase&)es.get_mesh(), _vtk_grid);
-
-	// I'd like to write out meshdata, but this requires some coding, in
-	// particular, non_const meshdata iterators
-//   const MeshData& md = es.get_mesh_data();
-//   if(es.has_mesh_data())
-//      meshdata_to_vtk(md,_vtk_grid);
-//   assert (soln.size() ==mesh.n_nodes()*names.size());
-	solution_to_vtk(es,_vtk_grid);
+  
+  /*
+   * we only use Unstructured grids
+   */
+  _vtk_grid = vtkUnstructuredGrid::New();
+  vtkXMLPUnstructuredGridWriter* writer= vtkXMLPUnstructuredGridWriter::New();
+  nodes_to_vtk((const MeshBase&)es.get_mesh(), _vtk_grid);
+  cells_to_vtk((const MeshBase&)es.get_mesh(), _vtk_grid);
+  
+  // I'd like to write out meshdata, but this requires some coding, in
+  // particular, non_const meshdata iterators
+  //   const MeshData& md = es.get_mesh_data();
+  //   if(es.has_mesh_data())
+  //      meshdata_to_vtk(md,_vtk_grid);
+  //   assert (soln.size() ==mesh.n_nodes()*names.size());
+  solution_to_vtk(es,_vtk_grid);
 
 #ifdef DEBUG
-	if(true) // add some condition here, although maybe it is more sensible to give each vector a flag on whether it is to be written out or not
-		system_vectors_to_vtk(es,_vtk_grid);
+  if(true) // add some condition here, although maybe it is more sensible to give each vector a flag on whether it is to be written out or not
+    system_vectors_to_vtk(es,_vtk_grid);
 #endif
-//   writer->SetNumberOfPieces(libMesh::n_processors());
-//   writer->SetInput(libMesh::processor_id(),_vtk_grid);
-	writer->SetInput(_vtk_grid);
-	writer->SetFileName(fname.c_str());
-	writer->Write();
+  //   writer->SetNumberOfPieces(libMesh::n_processors());
+  //   writer->SetInput(libMesh::processor_id(),_vtk_grid);
+  writer->SetInput(_vtk_grid);
+  writer->SetFileName(fname.c_str());
+  writer->Write();
 #endif
 }
 

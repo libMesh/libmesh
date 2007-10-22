@@ -1,4 +1,4 @@
-// $Id: mesh_function.C,v 1.17 2007-10-21 20:48:52 benkirk Exp $
+// $Id: mesh_function.C,v 1.18 2007-10-22 15:58:51 benkirk Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -28,7 +28,7 @@
 #include "equation_systems.h"
 #include "numeric_vector.h"
 #include "dof_map.h"
-#include "point_locator_base.h"
+#include "point_locator_tree.h"
 #include "fe_base.h"
 #include "fe_interface.h"
 #include "fe_compute_data.h"
@@ -91,7 +91,7 @@ MeshFunction::~MeshFunction ()
 
 
 
-void MeshFunction::init ()
+void MeshFunction::init (const Trees::BuildType point_locator_build_type)
 {
   // are indices of the desired variable(s) provided?
   assert (this->_system_vars.size() > 0);
@@ -136,8 +136,10 @@ void MeshFunction::init ()
       const MeshBase& mesh = this->_eqn_systems.get_mesh();
 
       // build the point locator.  Only \p TREE version available
-      AutoPtr<PointLocatorBase> ap (PointLocatorBase::build (TREE, mesh));
-      this->_point_locator = ap.release();
+      //AutoPtr<PointLocatorBase> ap (PointLocatorBase::build (TREE, mesh));
+      //this->_point_locator = ap.release();
+      this->_point_locator = new PointLocatorTree (mesh, point_locator_build_type);
+      
 
       // Point locator no longer needs to be initialized.
       //      this->_point_locator->init();
