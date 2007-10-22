@@ -35,6 +35,9 @@ ex0.$(obj-suffix):\
     ../../include/mesh/mesh_generation.h\
     ../../include/mesh/mesh_output.h\
     ../../include/mesh/mesh_refinement.h\
+    ../../include/mesh/parallel_mesh.h\
+    ../../include/mesh/serial_mesh.h\
+    ../../include/mesh/unstructured_mesh.h\
     ../../include/numerics/dense_matrix.h\
     ../../include/numerics/dense_matrix_base.h\
     ../../include/numerics/dense_vector.h\
@@ -60,6 +63,7 @@ ex0.$(obj-suffix):\
     ../../include/solvers/system.h\
     ../../include/solvers/transient_system.h\
     ../../include/utils/error_vector.h\
+    ../../include/utils/mapvector.h\
     ../../include/utils/o_string_stream.h\
     ../../include/utils/parameters.h\
     ../../include/utils/perf_log.h\
