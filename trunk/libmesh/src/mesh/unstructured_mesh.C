@@ -1,4 +1,4 @@
-// $Id: unstructured_mesh.C,v 1.6 2007-10-21 20:48:51 benkirk Exp $
+// $Id: unstructured_mesh.C,v 1.7 2007-10-22 23:30:38 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -157,9 +157,13 @@ void UnstructuredMesh::find_neighbors()
   
   
   //TODO:[BSK] This should be removed later?!
-  for (unsigned int e=0; e<this->n_elem(); e++)
-    for (unsigned int s=0; s<this->elem(e)->n_neighbors(); s++)
-      this->elem(e)->set_neighbor(s,NULL);
+  const element_iterator el_end = this->elements_end();
+  for (element_iterator el = this->elements_begin(); el != el_end; ++el)
+    {
+      Elem* elem = *el;
+      for (unsigned int s=0; s<elem->n_neighbors(); s++)
+        elem->set_neighbor(s,NULL);
+    }
   
   // Find neighboring elements by first finding elements
   // with identical side keys and then check to see if they
@@ -190,11 +194,8 @@ void UnstructuredMesh::find_neighbors()
     map_type side_to_elem_map;
   
 
-    element_iterator       el  = this->elements_begin();
-    const element_iterator end = this->elements_end();
 
-
-    for (; el != end; ++el)
+    for (element_iterator el = this->elements_begin(); el != el_end; ++el)
       {
 	Elem* element = *el;
 	
@@ -305,10 +306,9 @@ void UnstructuredMesh::find_neighbors()
    * Furthermore, that neighbor better be active,
    * otherwise we missed a child somewhere.
    */
-  element_iterator el  = this->not_level_elements_begin(0);
   element_iterator end = this->not_level_elements_end(0);
-
-  for (; el != end; ++el)
+  for (element_iterator el = this->not_level_elements_begin(0);
+       el != end; ++el)
     {
       Elem* elem = *el;
 
