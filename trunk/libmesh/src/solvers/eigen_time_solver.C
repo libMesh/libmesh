@@ -1,4 +1,4 @@
-// $Id: eigen_time_solver.C,v 1.3 2007-10-21 20:48:54 benkirk Exp $
+// $Id: eigen_time_solver.C,v 1.4 2007-10-22 23:13:42 jwpeterson Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -55,8 +55,14 @@ void EigenTimeSolver::reinit ()
   
 void EigenTimeSolver::init ()
 {
-  // FIXME: Add matrix "B" to _system?
-  _system.add_matrix("B");
+  // Add matrix "B" to _system if not already there.
+  // The user may have already added a matrix "B" before
+  // calling the System initialization.  This would be
+  // necessary if e.g. the System originally started life
+  // with a different type of TimeSolver and only later
+  // had its TimeSolver changed to an EigenTimeSolver.
+  if (!_system.have_matrix("B"))
+    _system.add_matrix("B");
 }
 
 void EigenTimeSolver::solve ()
