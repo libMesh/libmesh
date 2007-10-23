@@ -1,4 +1,4 @@
-/* $Id: ex12.C,v 1.13 2007-10-23 18:08:04 roystgnr Exp $ */
+/* $Id: ex12.C,v 1.14 2007-10-23 18:30:23 roystgnr Exp $ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -239,9 +239,7 @@ int main (int argc, char** argv)
 	// the <code>MeshData</code>.  Note that by default the element-associated
 	// data containers are closed, so that the <code>MeshData</code> is
 	// ready for use.
-std::cerr << "Reached Point A" << std::endl;
 	mesh_data.insert_node_data(artificial_data);
-std::cerr << "Reached Point B" << std::endl;
 
 	// Let <code>artificial_data()</code> go out of scope
       }
@@ -383,9 +381,7 @@ std::cerr << "Reached Point B" << std::endl;
       {
 	std::map<const Node*, std::vector<Number> > artificial_data;
 	create_artificial_data (mesh, artificial_data);
-std::cerr << "Reached Point C" << std::endl;
 	mesh_data.insert_node_data(artificial_data);
-std::cerr << "Reached Point D" << std::endl;
       }
 
       // Note that even with (only) compatibility mode MeshData
