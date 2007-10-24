@@ -477,46 +477,16 @@ void DistributedVector<T>::localize (const unsigned int first_local_idx,
 
 
 
-template <>
-void DistributedVector<float>::localize (std::vector<float>& v_local) const
-
+template <typename T>
+void DistributedVector<T>::localize (std::vector<T>& v_local) const
 {
   assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  v_local.resize(size());
-  
-  std::fill (v_local.begin(),
-	     v_local.end(),
-	     0.);
+  v_local = this->_values;
 
-  for (unsigned int i=0; i<local_size(); i++)
-    v_local[i+first_local_index()] = _values[i];
-
-  Parallel::sum(v_local);
-}
-
-
-
-template <>
-void DistributedVector<double>::localize (std::vector<double>& v_local) const
-
-{
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
-
-  v_local.resize(size());
-  
-  std::fill (v_local.begin(),
-	     v_local.end(),
-	     0.);
-
-  for (unsigned int i=0; i<local_size(); i++)
-    v_local[i+first_local_index()] = _values[i];
-
-  Parallel::sum(v_local);
+  Parallel::vector_union (v_local);
 
 #ifndef HAVE_MPI
   assert (local_size() == size());
