@@ -152,7 +152,7 @@ Once the library is configured you can build it simply by typing
 
 
 <a name="test"></a><h2>Testing the Library</h2>
-
+<h3>Running the Examples</h3>
 <code>libMesh</code> includes a number of examples in the <code>examples</code>
 directory. From the top-level directory you can build and run the example programs 
 by typing
@@ -166,6 +166,15 @@ since you can <a href="http://laws.lanl.gov/XCM/gmv/GMVHome.html">download GMV</
 for free from Los Alamos National Lab. It is a simple matter to change the source
 in the example to write a different format, just replace the <code>write_gmv</code>
 function call with whatever you like.
+
+
+<h3>Unit Tests</h3>
+The SVN repository contains a <code>libmesh_tests</code> entry in the main trunk
+that contains a series of unit tests which can be used to validate a <code>libMesh</code>
+installation.  You may download the tests via
+<div class="fragment">
+  <pre> svn checkout https://libmesh.svn.sourceforge.net/svnroot/libmesh/trunk/libmesh_tests</pre>
+</div>
 
 
 <a name="link"></a><h2>Linking With Your Application</h2>
