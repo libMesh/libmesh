@@ -1,4 +1,3 @@
-
 // $Id$
 
 // The libMesh Finite Element Library.
@@ -113,318 +112,339 @@ namespace Parallel
 
 
 
-//-----------------------------------------------------------------------
-// Parallel members
+  //-----------------------------------------------------------------------
+  // Parallel members
 
 #ifdef HAVE_MPI
-template<>
-inline MPI_Datatype datatype<short int>() { return MPI_SHORT; }
+  template<>
+  inline MPI_Datatype datatype<short int>() { return MPI_SHORT; }
 
-template<>
-inline MPI_Datatype datatype<unsigned short int>() { return MPI_UNSIGNED_SHORT; }
+  template<>
+  inline MPI_Datatype datatype<unsigned short int>() { return MPI_UNSIGNED_SHORT; }
 
-template<>
-inline MPI_Datatype datatype<int>() { return MPI_INT; }
+  template<>
+  inline MPI_Datatype datatype<int>() { return MPI_INT; }
 
-template<>
-inline MPI_Datatype datatype<unsigned int>() { return MPI_UNSIGNED; }
+  template<>
+  inline MPI_Datatype datatype<unsigned int>() { return MPI_UNSIGNED; }
 
-template<>
-inline MPI_Datatype datatype<long>() { return MPI_LONG; }
+  template<>
+  inline MPI_Datatype datatype<long>() { return MPI_LONG; }
 
-template<>
-inline MPI_Datatype datatype<unsigned long>() { return MPI_UNSIGNED_LONG; }
+  template<>
+  inline MPI_Datatype datatype<unsigned long>() { return MPI_UNSIGNED_LONG; }
 
-template<>
-inline MPI_Datatype datatype<float>() { return MPI_FLOAT; }
+  template<>
+  inline MPI_Datatype datatype<float>() { return MPI_FLOAT; }
 
-template<>
-inline MPI_Datatype datatype<double>() { return MPI_DOUBLE; }
+  template<>
+  inline MPI_Datatype datatype<double>() { return MPI_DOUBLE; }
 
-template<>
-inline MPI_Datatype datatype<long double>() { return MPI_LONG_DOUBLE; }
-
-
-template <typename T>
-inline void min(T &r)
-{
-  if (libMesh::n_processors() > 1)
-    {
-      T temp;
-      MPI_Allreduce (&r,
-                     &temp,
-                     1,
-                     datatype<T>(),
-                     MPI_MIN,
-                     libMesh::COMM_WORLD);
-      r = temp;
-    }
-}
+  template<>
+  inline MPI_Datatype datatype<long double>() { return MPI_LONG_DOUBLE; }
 
 
-template <typename T>
-inline void min(std::vector<T> &r)
-{
-  if (libMesh::n_processors() > 1)
-    {
-      std::vector<T> temp(r.size());
-      MPI_Allreduce (&r[0],
-                     &temp[0],
-                     r.size(),
-                     datatype<T>(),
-                     MPI_MIN,
-                     libMesh::COMM_WORLD);
-      r = temp;
-    }
-}
+  template <typename T>
+  inline void min(T &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+	T temp;
+	MPI_Allreduce (&r,
+		       &temp,
+		       1,
+		       datatype<T>(),
+		       MPI_MIN,
+		       libMesh::COMM_WORLD);
+	r = temp;
+      }
+  }
 
 
-template <typename T>
-inline void max(T &r)
-{
-  if (libMesh::n_processors() > 1)
-    {
-      T temp;
-      MPI_Allreduce (&r,
-                     &temp,
-                     1,
-                     datatype<T>(),
-                     MPI_MAX,
-                     libMesh::COMM_WORLD);
-      r = temp;
-    }
-}
+  template <typename T>
+  inline void min(std::vector<T> &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+	std::vector<T> temp(r.size());
+	MPI_Allreduce (&r[0],
+		       &temp[0],
+		       r.size(),
+		       datatype<T>(),
+		       MPI_MIN,
+		       libMesh::COMM_WORLD);
+	r = temp;
+      }
+  }
 
 
-template <typename T>
-inline void max(std::vector<T> &r)
-{
-  if (libMesh::n_processors() > 1)
-    {
-      std::vector<T> temp(r.size());
-      MPI_Allreduce (&r[0],
-                     &temp[0],
-                     r.size(),
-                     datatype<T>(),
-                     MPI_MAX,
-                     libMesh::COMM_WORLD);
-      r = temp;
-    }
-}
+  template <typename T>
+  inline void max(T &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+	T temp;
+	MPI_Allreduce (&r,
+		       &temp,
+		       1,
+		       datatype<T>(),
+		       MPI_MAX,
+		       libMesh::COMM_WORLD);
+	r = temp;
+      }
+  }
 
 
-template <typename T>
-inline void sum(T &r)
-{
-  if (libMesh::n_processors() > 1)
-    {
-      T temp;
-      MPI_Allreduce (&r,
-                     &temp,
-                     1,
-                     datatype<T>(),
-                     MPI_SUM,
-                     libMesh::COMM_WORLD);
-      r = temp;
-    }
-}
+  template <typename T>
+  inline void max(std::vector<T> &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+	std::vector<T> temp(r.size());
+	MPI_Allreduce (&r[0],
+		       &temp[0],
+		       r.size(),
+		       datatype<T>(),
+		       MPI_MAX,
+		       libMesh::COMM_WORLD);
+	r = temp;
+      }
+  }
 
 
-template <typename T>
-inline void sum(std::vector<T> &r)
-{
-  if (libMesh::n_processors() > 1)
-    {
-      std::vector<T> temp(r.size());
-      MPI_Allreduce (&r[0],
-                     &temp[0],
-                     r.size(),
-                     datatype<T>(),
-                     MPI_SUM,
-                     libMesh::COMM_WORLD);
-      r = temp;
-    }
-}
+  template <typename T>
+  inline void sum(T &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+	T temp;
+	MPI_Allreduce (&r,
+		       &temp,
+		       1,
+		       datatype<T>(),
+		       MPI_SUM,
+		       libMesh::COMM_WORLD);
+	r = temp;
+      }
+  }
 
 
-template <typename T>
-inline void sum(std::complex<T> &r)
-{
-  if (libMesh::n_processors() > 1)
-    {
-      T tempinput[2], tempoutput[2];
-      tempinput[0] = r.real();
-      tempinput[1] = r.imag();
-      MPI_Allreduce (&tempinput,
-                     &tempoutput,
-                     2,
-                     datatype<T>(),
-                     MPI_SUM,
-                     libMesh::COMM_WORLD);
-      r.real() = tempoutput[0];
-      r.imag() = tempoutput[1];
-    }
-}
+  template <typename T>
+  inline void sum(std::vector<T> &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+	std::vector<T> temp(r.size());
+	MPI_Allreduce (&r[0],
+		       &temp[0],
+		       r.size(),
+		       datatype<T>(),
+		       MPI_SUM,
+		       libMesh::COMM_WORLD);
+	r = temp;
+      }
+  }
 
 
-template <typename T>
-inline void sum(std::vector<std::complex<T> > &r)
-{
-  if (libMesh::n_processors() > 1)
-    {
-      std::vector<T> temprealinput(r.size()),
-	             tempimaginput(r.size()),
-	             temprealoutput(r.size()),
-	             tempimagoutput(r.size());
-      for (unsigned int i=0; i != r.size(); ++i)
-	{
-	  temprealinput[i] = r[i].real();
-	  tempimaginput[i] = r[i].imag();
-	}
-      MPI_Allreduce (&temprealinput[0],
-                     &temprealoutput[0],
-                     r.size(),
-                     datatype<T>(),
-                     MPI_SUM,
-                     libMesh::COMM_WORLD);
-      MPI_Allreduce (&tempimaginput[0],
-                     &tempimagoutput[0],
-                     r.size(),
-                     datatype<T>(),
-                     MPI_SUM,
-                     libMesh::COMM_WORLD);
-      for (unsigned int i=0; i != r.size(); ++i)
-	{
-	  r[i].real() = temprealoutput[i];
-	  r[i].imag() = tempimagoutput[i];
-	}
-    }
-}
+  template <typename T>
+  inline void sum(std::complex<T> &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+	T tempinput[2], tempoutput[2];
+	tempinput[0] = r.real();
+	tempinput[1] = r.imag();
+	MPI_Allreduce (&tempinput,
+		       &tempoutput,
+		       2,
+		       datatype<T>(),
+		       MPI_SUM,
+		       libMesh::COMM_WORLD);
+	r.real() = tempoutput[0];
+	r.imag() = tempoutput[1];
+      }
+  }
 
 
-
-template <typename T>
-inline void allgather(T send,
-		      std::vector<T> &recv)
-{
-  assert(recv.size() == libMesh::n_processors());
-
-  if (libMesh::n_processors() > 1)
-    {
-      MPI_Allgather (&send,
-                     1,
-                     datatype<T>(),
-		     &recv[0],
-                     1, 
-                     libMesh::COMM_WORLD);
-    }
-  else
-    recv[0] = send;
-}
+  template <typename T>
+  inline void sum(std::vector<std::complex<T> > &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+	std::vector<T> temprealinput(r.size()),
+	  tempimaginput(r.size()),
+	  temprealoutput(r.size()),
+	  tempimagoutput(r.size());
+	for (unsigned int i=0; i != r.size(); ++i)
+	  {
+	    temprealinput[i] = r[i].real();
+	    tempimaginput[i] = r[i].imag();
+	  }
+	MPI_Allreduce (&temprealinput[0],
+		       &temprealoutput[0],
+		       r.size(),
+		       datatype<T>(),
+		       MPI_SUM,
+		       libMesh::COMM_WORLD);
+	MPI_Allreduce (&tempimaginput[0],
+		       &tempimagoutput[0],
+		       r.size(),
+		       datatype<T>(),
+		       MPI_SUM,
+		       libMesh::COMM_WORLD);
+	for (unsigned int i=0; i != r.size(); ++i)
+	  {
+	    r[i].real() = temprealoutput[i];
+	    r[i].imag() = tempimagoutput[i];
+	  }
+      }
+  }
 
 
 
-template <typename T>
-inline void allgather(std::complex<T> send,
-		      std::vector<std::complex<T> > &recv)
-{
-  assert(recv.size() == libMesh::n_processors());
-
-  if (libMesh::n_processors() > 1)
-    {
-      std::vector<T> temprealoutput(recv.size()),
-	             tempimagoutput(recv.size());
-      T realinput = send.real(),
-	imaginput = send.imag();
-
-      MPI_Allgather (&realinput,
-                     1,
-                     datatype<T>(),
-		     &temprealoutput[0],
-                     1, 
-                     libMesh::COMM_WORLD);
-
-      MPI_Allgather (&imaginput,
-                     1,
-                     datatype<T>(),
-		     &tempimagoutput[0],
-                     1, 
-                     libMesh::COMM_WORLD);
-
-      for (unsigned int i=0; i != recv.size(); ++i)
-	{
-	  recv[i].real() = temprealoutput[i];
-	  recv[i].imag() = tempimagoutput[i];
-	}
-    }
-  else
-    recv[0] = send;
-}
+  template <typename T>
+  inline void allgather(T send,
+			std::vector<T> &recv)
+  {
+    //assert(recv.size() == libMesh::n_processors());
+    recv.resize(libMesh::n_processors());
+    
+    if (libMesh::n_processors() > 1)
+      {
+	MPI_Allgather (&send,
+		       1,
+		       datatype<T>(),
+		       &recv[0],
+		       1, 
+		       datatype<T>(),
+		       libMesh::COMM_WORLD);
+      }
+    else
+      recv[0] = send;
+  }
 
 
 
-template <typename T>
-void vector_union(std::vector<T> &r)
-{
-  std::vector<unsigned int> sendlengths(libMesh::n_processors(), 0);
-  unsigned int mysize = r.size();
-  Parallel::allgather(mysize, sendlengths);
-  
-  // Find how long the final vector should be and where our
-  // data will fall in it
-  unsigned int myoffset = 0,
-               totallength = 0;
-  for (unsigned int i=0; i != libMesh::processor_id(); ++i)
-    {
-      myoffset += sendlengths[i];
-      totallength += sendlengths[i];
-    }
-  for (unsigned int i=libMesh::processor_id();
-       i != libMesh::n_processors(); ++i)
-    totallength += sendlengths[i];
+  template <typename T>
+  inline void allgather(std::complex<T> send,
+			std::vector<std::complex<T> > &recv)
+  {
+    assert(recv.size() == libMesh::n_processors());
 
-  // Expand the vector and move our data to the appropriate offset
-  r.resize(totallength);
-  if (myoffset)
-    for (unsigned int i=0; i != mysize; ++i)
-      r[i-1+myoffset] = r[i-1];
+    if (libMesh::n_processors() > 1)
+      {
+	std::vector<T> temprealoutput(recv.size()),
+	  tempimagoutput(recv.size());
+	T realinput = send.real(),
+	  imaginput = send.imag();
 
-  // Scatter data on every processor to the appropriate offset
-  unsigned int currentoffset = 0;
-  for (unsigned int i=0; i != libMesh::processor_id(); ++i)
-    {
-      MPI_Scatter(&r[currentoffset], sendlengths[i], datatype<T>(),
-		  &r[currentoffset], sendlengths[i], datatype<T>(),
-		  i, libMesh::COMM_WORLD);
+	MPI_Allgather (&realinput,
+		       1,
+		       datatype<T>(),
+		       &temprealoutput[0],
+		       1, 
+		       libMesh::COMM_WORLD);
 
-      currentoffset += sendlengths[i];
-    }
-}
+	MPI_Allgather (&imaginput,
+		       1,
+		       datatype<T>(),
+		       &tempimagoutput[0],
+		       1, 
+		       libMesh::COMM_WORLD);
+
+	for (unsigned int i=0; i != recv.size(); ++i)
+	  {
+	    recv[i].real() = temprealoutput[i];
+	    recv[i].imag() = tempimagoutput[i];
+	  }
+      }
+    else
+      recv[0] = send;
+  }
+
+
+
+  /**
+   * This function provides a convenient method
+   * for combining vectors from each processor into one
+   * contiguous chunk.  This handles the case where the
+   * lengths of the vectors may vary.  Specifically, this
+   * function transforms this:
+   \verbatim
+    Processor 0: [ ... N_0 ]
+    Processor 1: [ ....... N_1 ]
+      ...
+    Processor M: [ .. N_M]
+   \endverbatim
+   *
+   * into this:
+   *
+   \verbatim
+   [ [ ... N_0 ] [ ....... N_1 ] ... [ .. N_M] ]
+   \endverbatim
+   *
+   * on each processor. This function is collective and therefore
+   * must be called by all processors.
+   */
+  template <typename T>
+  void vector_union(std::vector<T> &r)
+  {
+    std::vector<int>
+      sendlengths  (libMesh::n_processors(), 0),
+      displacements(libMesh::n_processors(), 0);
+
+    const int mysize = r.size();
+    Parallel::allgather(mysize, sendlengths);
+
+    // Find the total size of the final array and
+    // set up the displacement offsets for each processor.
+    unsigned int globalsize = 0; 
+    for (unsigned int i=0; i != libMesh::n_processors(); ++i)
+      {
+	displacements[i] = globalsize;
+	globalsize += sendlengths[i];
+      }
+
+    // copy the input buffer
+    std::vector<T> r_src(r);
+
+    // now resize it to hold the global data
+    r.resize(globalsize);
+
+    // and get the data from the remote processors
+    const int ierr =
+      MPI_Allgatherv (&r_src[0], mysize, datatype<T>(),
+		      &r[0], &sendlengths[0], &displacements[0], datatype<T>(),
+		      libMesh::COMM_WORLD);
+
+    assert (ierr == MPI_SUCCESS);
+
+  }
 
 
 
 #else // HAVE_MPI
 
-template <typename T>
-inline void min(T &) {}
+  template <typename T>
+  inline void min(T &) {}
 
-template <typename T>
-inline void min(std::vector<T> &) {}
+  template <typename T>
+  inline void min(std::vector<T> &) {}
 
-template <typename T>
-inline void max(T &) {}
+  template <typename T>
+  inline void max(T &) {}
 
-template <typename T>
-inline void max(std::vector<T> &) {}
+  template <typename T>
+  inline void max(std::vector<T> &) {}
 
-template <typename T>
-inline void sum(T &) {}
+  template <typename T>
+  inline void sum(T &) {}
 
-template <typename T>
-inline void sum(std::vector<T> &) {}
+  template <typename T>
+  inline void sum(std::vector<T> &) {}
 
-template <typename T>
-inline void vector_union(std::vector<T> &r) {}
+  template <typename T>
+  inline void vector_union(std::vector<T> &r) {}
 
 #endif // HAVE_MPI
 
