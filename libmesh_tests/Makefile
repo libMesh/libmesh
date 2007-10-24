@@ -1,3 +1,5 @@
+# $Id:$
+
 test_source := $(shell find ./ -name "*.cc")
 tests       := $(patsubst %.cc, %, ${test_source}) 
 
