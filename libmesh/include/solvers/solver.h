@@ -1,4 +1,4 @@
-// $Id: solver.h,v 1.4 2007-10-21 20:48:44 benkirk Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -158,7 +158,7 @@ Solver::~Solver ()
 inline
 void Solver::init ()
 {
-  std::cout << "Initializing $Id: solver.h,v 1.4 2007-10-21 20:48:44 benkirk Exp $"
+  std::cout << "Initializing $Id$"
 	    << std::endl;
   
   // Initialize the system.
@@ -182,7 +182,7 @@ void Solver::solve ()
   // Perform any necessary pre-processing
   Solver::pre_process ();
   
-//  std::cout << "Solving $Id: solver.h,v 1.4 2007-10-21 20:48:44 benkirk Exp $"
+//  std::cout << "Solving $Id$"
 //	    << std::endl;
 
   // Solve the system

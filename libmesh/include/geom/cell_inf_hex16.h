@@ -1,4 +1,4 @@
-// $Id: cell_inf_hex16.h,v 1.12 2007-10-21 20:48:41 benkirk Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson

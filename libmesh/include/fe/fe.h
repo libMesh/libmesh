@@ -1,4 +1,4 @@
-// $Id: fe.h,v 1.30 2007-10-21 20:48:41 benkirk Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -56,7 +56,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
- * \version $Revision: 1.30 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -445,7 +445,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 1.30 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -470,7 +470,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2005
- * \version $Revision: 1.30 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -505,7 +505,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
- * \version $Revision: 1.30 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -530,7 +530,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
- * \version $Revision: 1.30 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -555,7 +555,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
- * \version $Revision: 1.30 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -581,7 +581,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
- * \version $Revision: 1.30 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------

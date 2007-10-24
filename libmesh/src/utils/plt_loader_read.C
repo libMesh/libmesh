@@ -1,4 +1,4 @@
-// $Id: plt_loader_read.C,v 1.9 2007-10-21 20:48:54 benkirk Exp $
+// $Id$
 
 // Copyright (C) 2002-2007  Benjamin S. Kirk
   

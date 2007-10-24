@@ -1,4 +1,4 @@
-// $Id: parallel_mesh.h,v 1.8 2007-10-22 23:06:31 roystgnr Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson

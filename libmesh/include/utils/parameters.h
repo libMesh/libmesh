@@ -1,4 +1,4 @@
-// $Id: parameters.h,v 1.9 2007-10-21 20:48:45 benkirk Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -41,7 +41,7 @@
  *
  * \author Benjamin S. Kirk
  * \date 2004
- * \version $Revision: 1.9 $
+ * \version $Revision$
  */
 
 // ------------------------------------------------------------

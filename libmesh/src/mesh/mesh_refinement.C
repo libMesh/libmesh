@@ -1,4 +1,4 @@
-// $Id: mesh_refinement.C,v 1.64 2007-10-22 23:23:25 roystgnr Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson

@@ -1,4 +1,4 @@
-// $Id: auto_ptr.h,v 1.1 2003-11-05 22:26:42 benkirk Exp $
+// $Id$
 
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //

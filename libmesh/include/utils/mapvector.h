@@ -1,4 +1,4 @@
-// $Id: mapvector.h,v 1.2 2007-10-22 23:43:48 roystgnr Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -31,8 +31,8 @@
  * closely resembling that of a std::vector, for use with ParallelMesh.
  *
  * \author  Roy H. Stogner
- * \date    $Date: 2007-10-22 23:43:48 $
- * \version $Revision: 1.2 $
+ * \date    $Date$
+ * \version $Revision$
  */
 
 template <typename Val>

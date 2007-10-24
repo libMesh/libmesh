@@ -1,4 +1,4 @@
-// $Id: plt_loader.h,v 1.6 2007-10-21 20:48:45 benkirk Exp $
+// $Id$
 
 // Copyright (C) 2002-2007  Benjamin S. Kirk
   
