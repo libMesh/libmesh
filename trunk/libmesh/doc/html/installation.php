@@ -28,6 +28,9 @@ to the SVN repository via:
 </div>
 
 <br>
+More information regarding how the <code>libMesh</code> SVN repository may be found <a href="subversion.php"> here</a>.
+
+<br>
 If you would like to contribute to the project you will need a SourceForge
 developer account, or you can contribute patches. To create a patch from a
 modified SVN tree simply do:
@@ -38,9 +41,6 @@ modified SVN tree simply do:
 
 <br>
 in the top-level directory. You can then submit the file <code>patch</code>.
-
-<br>
-More information regarding how the <code>libMesh</code> SVN repository may be found <a href="subversion.php"> here</a>.
 
 <a name="compilers"></a><h2>Compilers</h2>
 
