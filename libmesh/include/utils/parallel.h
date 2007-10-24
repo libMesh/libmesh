@@ -386,7 +386,7 @@ void vector_union(std::vector<T> &r)
   // Expand the vector and move our data to the appropriate offset
   r.resize(totallength);
   if (myoffset)
-    for (unsigned int i=mysize; i != 0; ++i)
+    for (unsigned int i=0; i != mysize; ++i)
       r[i-1+myoffset] = r[i-1];
 
   // Scatter data on every processor to the appropriate offset
