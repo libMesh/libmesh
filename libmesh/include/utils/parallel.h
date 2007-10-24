@@ -1,5 +1,5 @@
 
-// $Id: parallel.h,v 1.5 2007-10-15 07:37:23 roystgnr Exp $
+// $Id: parallel.h,v 1.5 2007/10/15 07:37:23 roystgnr Exp $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -92,6 +92,24 @@ namespace Parallel
    */
   template <typename T>
   inline void sum(std::vector<T> &r);
+
+  //-------------------------------------------------------------------
+  /**
+   * Take a vector of length n_processors, and fill in recv[processor_id] = the
+   * value of send on that processor
+   */
+  template <typename T>
+  inline void allgather(T send,
+			std::vector<T> &recv);
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Take a vector of local variables and expand it to include 
+   * values from all processors
+   */
+  template <typename T>
+  void vector_union(std::vector<T> &r);
 
 
 
@@ -284,6 +302,107 @@ inline void sum(std::vector<std::complex<T> > &r)
 }
 
 
+
+template <typename T>
+inline void allgather(T send,
+		      std::vector<T> &recv)
+{
+  assert(recv.size() == libMesh::n_processors());
+
+  if (libMesh::n_processors() > 1)
+    {
+      MPI_Allgather (&send,
+                     1,
+                     datatype<T>(),
+		     &recv[0],
+                     1, 
+                     libMesh::COMM_WORLD);
+    }
+  else
+    recv[0] = send;
+}
+
+
+
+template <typename T>
+inline void allgather(std::complex<T> send,
+		      std::vector<std::complex<T> > &recv)
+{
+  assert(recv.size() == libMesh::n_processors());
+
+  if (libMesh::n_processors() > 1)
+    {
+      std::vector<T> temprealoutput(recv.size()),
+	             tempimagoutput(recv.size());
+      T realinput = send.real(),
+	imaginput = send.imag();
+
+      MPI_Allgather (&realinput,
+                     1,
+                     datatype<T>(),
+		     &temprealoutput[0],
+                     1, 
+                     libMesh::COMM_WORLD);
+
+      MPI_Allgather (&imaginput,
+                     1,
+                     datatype<T>(),
+		     &tempimagoutput[0],
+                     1, 
+                     libMesh::COMM_WORLD);
+
+      for (unsigned int i=0; i != recv.size(); ++i)
+	{
+	  recv[i].real() = temprealoutput[i];
+	  recv[i].imag() = tempimagoutput[i];
+	}
+    }
+  else
+    recv[0] = send;
+}
+
+
+
+template <typename T>
+void vector_union(std::vector<T> &r)
+{
+  std::vector<unsigned int> sendlengths(libMesh::n_processors(), 0);
+  unsigned int mysize = r.size();
+  Parallel::allgather(mysize, sendlengths);
+  
+  // Find how long the final vector should be and where our
+  // data will fall in it
+  unsigned int myoffset = 0,
+               totallength = 0;
+  for (unsigned int i=0; i != libMesh::processor_id(); ++i)
+    {
+      myoffset += sendlengths[i];
+      totallength += sendlengths[i];
+    }
+  for (unsigned int i=libMesh::processor_id();
+       i != libMesh::n_processors(); ++i)
+    totallength += sendlengths[i];
+
+  // Expand the vector and move our data to the appropriate offset
+  r.resize(totallength);
+  if (myoffset)
+    for (unsigned int i=mysize; i != 0; ++i)
+      r[i-1+myoffset] = r[i-1];
+
+  // Scatter data on every processor to the appropriate offset
+  unsigned int currentoffset = 0;
+  for (unsigned int i=0; i != libMesh::processor_id(); ++i)
+    {
+      MPI_Scatter(&r[currentoffset], sendlengths[i], datatype<T>(),
+		  &r[currentoffset], sendlengths[i], datatype<T>(),
+		  i, libMesh::COMM_WORLD);
+
+      currentoffset += sendlengths[i];
+    }
+}
+
+
+
 #else // HAVE_MPI
 
 template <typename T>
@@ -303,6 +422,9 @@ inline void sum(T &) {}
 
 template <typename T>
 inline void sum(std::vector<T> &) {}
+
+template <typename T>
+inline void vector_union(std::vector<T> &r) {}
 
 #endif // HAVE_MPI
 
