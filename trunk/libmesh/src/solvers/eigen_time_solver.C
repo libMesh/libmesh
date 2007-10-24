@@ -1,4 +1,4 @@
-// $Id: eigen_time_solver.C,v 1.4 2007-10-22 23:13:42 jwpeterson Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson

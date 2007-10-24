@@ -1,4 +1,4 @@
-// $Id: fourth_error_estimators.C,v 1.18 2007-10-21 20:48:52 benkirk Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson

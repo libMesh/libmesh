@@ -1,4 +1,4 @@
-// $Id: tree_base.h,v 1.6 2007-10-22 15:58:51 benkirk Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson

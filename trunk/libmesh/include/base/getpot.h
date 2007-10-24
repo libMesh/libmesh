@@ -1,4 +1,4 @@
-// $Id: getpot.h,v 1.10 2005-09-30 19:59:35 benkirk Exp $
+// $Id$
 //
 // (with patches from Michael Anderson for more general variable types)
 

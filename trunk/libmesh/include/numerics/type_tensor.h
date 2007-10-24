@@ -1,4 +1,4 @@
-// $Id: type_tensor.h,v 1.9 2007-10-21 20:48:43 benkirk Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson

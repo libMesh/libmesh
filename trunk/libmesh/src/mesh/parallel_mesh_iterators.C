@@ -1,4 +1,4 @@
-// $Id: parallel_mesh_iterators.C,v 1.2 2007-10-21 20:48:51 benkirk Exp $
+// $Id$
 
 // The libParallelMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson

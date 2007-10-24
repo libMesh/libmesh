@@ -1,4 +1,4 @@
-// $Id: mesh_base.h,v 1.58 2007-10-21 20:48:42 benkirk Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -57,8 +57,8 @@ class PointLocatorBase;
  * mesh to disk in various formats.
  *
  * \author  Benjamin S. Kirk
- * \date    $Date: 2007-10-21 20:48:42 $
- * \version $Revision: 1.58 $
+ * \date    $Date$
+ * \version $Revision$
  */
 
 

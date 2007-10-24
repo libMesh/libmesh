@@ -1,4 +1,4 @@
-// $Id: dof_object.h,v 1.14 2007-10-21 20:48:40 benkirk Exp $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -51,7 +51,7 @@ class DofObject;
  *
  * \author Benjamin S. Kirk
  * \date 2003
- * \version $Revision: 1.14 $
+ * \version $Revision$
  */
 
 class DofObject : public ReferenceCountedObject<DofObject>
