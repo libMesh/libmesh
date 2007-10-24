@@ -19,26 +19,28 @@
 The <code>libMesh</code> source can be 
 <a href="http://sourceforge.net/project/showfiles.php?group_id=71130">downloaded from the project's SourceForge homepage</a>.
 Stable releases are located there as compressed tar archives. You may also
-access the CVS source tree for the latest code. You can get read-only access
-to the CVS repository via:
+access the SVN source tree for the latest code. You can get read-only access
+to the SVN repository via:
 <br>
 
 <div class="fragment">
-  <pre>cvs -d:pserver:anonymous@libmesh.cvs.sourceforge.net:/cvsroot/libmesh co libmesh </pre>
+  <pre>svn checkout https://libmesh.svn.sourceforge.net/svnroot/libmesh/trunk/libmesh </pre>
 </div>
 
 <br>
 If you would like to contribute to the project you will need a SourceForge
 developer account, or you can contribute patches. To create a patch from a
-modified CVS tree simply do:
+modified SVN tree simply do:
 <br>
 <div class="fragment">
-  <pre>cvs diff -c &gt; patch </pre>
+  <pre>svn diff &gt; patch </pre>
 </div>
 
 <br>
 in the top-level directory. You can then submit the file <code>patch</code>.
 
+<br>
+More information regarding how the <code>libMesh</code> SVN repository may be found <a href="subversion.php"> here</a>.
 
 <a name="compilers"></a><h2>Compilers</h2>
 

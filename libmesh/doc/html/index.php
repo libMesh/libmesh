@@ -109,7 +109,7 @@ Many thanks to <a href="http://sourceforge.net">SourceForge</a> for
 <a href="http://sourceforge.net/projects/libmesh">hosting the
 project</a>.  You can find out what is currently happening in the
 development branch by checking out the
-<a href="http://libmesh.cvs.sourceforge.net/libmesh/libmesh">CVS
+<a href="http://libmesh.svn.sourceforge.net/viewvc/libmesh/trunk/libmesh">SVN
 Logs</a> online, and you can see many people are downloading the library
 on the <a href="http://sourceforge.net/project/stats/?group_id=71130&ugn=libmesh">statistics</a> page.
 
