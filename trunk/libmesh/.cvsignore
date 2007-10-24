@@ -50,3 +50,4 @@ config.status
 *.lay
 *.swp
 .nfs*
+libmesh_tests
