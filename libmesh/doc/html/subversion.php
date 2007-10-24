@@ -53,15 +53,17 @@ will create a tagged version <code>libmesh-x.y.z</code>.
 It is equally simple to check out a tagged version of the code:
 <div class="fragment">
   <pre>
-  $ svn checkout https://libmesh.svn.sourceforge.net/svnroot/libmesh/tags/libmesh-x.y.z/libmesh libmesh-x.y.z
+  $ svn checkout https://libmesh.svn.sourceforge.net/svnroot/libmesh/tags/libmesh-x.y.z/libmesh \
+                 libmesh-x.y.z
   </pre>
 </div>
 will checkout the tagged version <code>libmesh-x.y.z</code> and place it in the local directory <code>libmesh-x.y.z</code>
-</div>
-<br>
 
 <h2>Reference</h2>
 For a comprehensive discussion of subversion, its features, and examples of its usage read <a href="http://svnbook.red-bean.com"><i>Version Control with</i> Subversion</a>.
+
+</div>
+
 <?php make_footer() ?>
 
 </body>
