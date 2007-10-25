@@ -94,6 +94,17 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Send vector send to one processor while simultaneously receiving
+   * another vector recv from a (potentially different) processor.
+   */
+  template <typename T>
+  inline void send_receive(const unsigned int dest_processor_id,
+                           std::vector<T> &send,
+			   const unsigned int source_processor_id,
+                           std::vector<T> &recv);
+
+  //-------------------------------------------------------------------
+  /**
    * Take a vector of length n_processors, and on processor root_id fill in
    * recv[processor_id] = the value of send on processor processor_id
    */
@@ -319,6 +330,33 @@ namespace Parallel
       }
   }
 
+
+
+  template <typename T>
+  inline void send_receive(const unsigned int source_processor_id,
+                           std::vector<T> &send,
+			   const unsigned int dest_processor_id,
+                           std::vector<T> &recv)
+  {
+    // Trade buffer sizes first
+    unsigned int sendsize = send.size(), recvsize;
+    MPI_Status status;
+    MPI_Sendrecv(&sendsize, 1, datatype<unsigned int>(),
+		 dest_processor_id, MPI_ANY_TAG,
+		 &recvsize, 1, datatype<unsigned int>(),
+		 source_processor_id, MPI_ANY_TAG,
+		 libMesh::COMM_WORLD,
+		 &status);
+
+    recv.resize(recvsize);
+
+    MPI_Sendrecv(&send[0], sendsize, datatype<T>(),
+		 dest_processor_id, MPI_ANY_TAG,
+		 &recv[0], recvsize, datatype<T>(),
+		 source_processor_id, MPI_ANY_TAG,
+		 libMesh::COMM_WORLD,
+		 &status);
+  }
 
 
   template <typename T>
