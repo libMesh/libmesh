@@ -85,7 +85,7 @@ Real DistributedVector<T>::l2_norm () const
   
   Parallel::sum(local_l2);
 
-  return local_l2;
+  return std::sqrt(local_l2);
 }
 
 
@@ -486,7 +486,7 @@ void DistributedVector<T>::localize (std::vector<T>& v_local) const
 
   v_local = this->_values;
 
-  Parallel::vector_union (v_local);
+  Parallel::allgather (v_local);
 
 #ifndef HAVE_MPI
   assert (local_size() == size());
