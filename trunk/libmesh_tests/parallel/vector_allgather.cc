@@ -33,7 +33,7 @@ void unit_test ()
   if (libMesh::processor_id() == 0)
     v.push_back(libMesh::invalid_uint);
 
-  Parallel::vector_union (v);
+  Parallel::allgather (v);
 
   std::cout << "v=[ ";
   for (unsigned int i=0; i<v.size(); i++)
