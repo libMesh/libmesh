@@ -19,11 +19,13 @@
 
 #include <libmesh.h>
 #include <distributed_vector.h>
+#include <laspack_vector.h>
 #include <vector>
 
-
 namespace {
-  template <typename T>  void run_test ()
+
+  template <class VecType>  
+  void run_test ()
   {
     unsigned int block_size  = 10;
     unsigned int local_size  = block_size + libMesh::processor_id();  // a different size on
@@ -33,7 +35,7 @@ namespace {
       global_size += (block_size + p);
     
     {
-      DistributedVector<T> 
+      VecType
 	v (global_size, local_size),
 	l (global_size);
       
@@ -65,9 +67,19 @@ namespace {
 
 void unit_test ()
 {
-  std::cout << "Running with T=Real" << std::endl;
-  run_test<Real>();
+  std::cout << "Running with VecType=DistributedVector<Real>" << std::endl;
+  run_test< DistributedVector<Real> >();
 
-  std::cout << "\n\nRunning with T=float" << std::endl;
-  run_test<float>();
+  std::cout << "\n\nRunning with VecType=DistributedVector<float>" << std::endl;
+  run_test< DistributedVector<float> >();
+
+#ifdef HAVE_LASPACK
+
+  if (libMesh::n_processors() == 1)
+    {
+      std::cout << "\n\nRunning with VecType=LaspackVector<Real>" << std::endl;
+      run_test< LaspackVector<Real> >();
+    }
+
+#endif
 }
