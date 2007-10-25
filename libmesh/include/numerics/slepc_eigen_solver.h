@@ -40,10 +40,22 @@
 extern "C"
 {
 # include <slepceps.h>
+# include <slepcversion.h>
 }
 #else
 # include <slepceps.h>
+# include <slepcversion.h>
 #endif
+
+
+// A convenient macro for comparing SLEPc versions.
+// Returns 1 if the current SLEPc version is < major.minor.subminor
+// and zero otherwise.
+#define SLEPC_VERSION_LESS_THAN(major,minor,subminor)			            \
+  ((SLEPC_VERSION_MAJOR < (major) ||						    \
+    (SLEPC_VERSION_MAJOR == (major) && (SLEPC_VERSION_MINOR < (minor) ||	    \
+				  (SLEPC_VERSION_MINOR == (minor) &&		    \
+				   SLEPC_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
 
 
 
@@ -160,7 +172,18 @@ private:
    * Eigenproblem solver context
    */
   EPS _eps;
-                    
+
+  
+#if !(SLEPC_VERSION_LESS_THAN(2,3,3))
+  
+  /**
+   * For version 2.3.3 and higher SLEPc provided a separate "inner
+   * product" context for certain operations.
+   */
+  IP _ip;
+  
+#endif
+  
 };
 
 
