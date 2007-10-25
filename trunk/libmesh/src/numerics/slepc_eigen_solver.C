@@ -44,6 +44,13 @@ void SlepcEigenSolver<T>::clear ()
       ierr = EPSDestroy(_eps);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
+     // For SLEPC 2.3.3 and later, also be sure to
+     // destroy the IP context
+#if !(SLEPC_VERSION_LESS_THAN(2,3,3))
+      ierr = IPDestroy(_ip);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+	     
       // SLEPc default eigenproblem solver
       this->_eigen_solver_type = ARNOLDI;
  
@@ -67,7 +74,13 @@ void SlepcEigenSolver<T>::init ()
       ierr = EPSCreate (libMesh::COMM_WORLD, &_eps);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-
+#if !(SLEPC_VERSION_LESS_THAN(2,3,3))
+      // For SLEPc 2.3.3 and greater, construct the inner product context
+      ierr = IPCreate (libMesh::COMM_WORLD, &_ip);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+      
+#if SLEPC_VERSION_LESS_THAN(2,3,3)
       // Set modified Gram-Schmidt orthogonalization as default
       // and leave other parameters unchanged
       EPSOrthogonalizationRefinementType refinement;
@@ -75,7 +88,17 @@ void SlepcEigenSolver<T>::init ()
       ierr = EPSGetOrthogonalization (_eps, PETSC_NULL, &refinement, &eta);
       ierr = EPSSetOrthogonalization (_eps, EPS_MGS_ORTH, refinement, eta);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#else
+     // For 2.3.3 and greater, the Orthogonalization type is set
+     // to modified Graham-Schmidt in the IP object.
+     IPOrthogonalizationRefinementType refinement;
+     PetscReal eta;
+     ierr = IPGetOrthogonalization (_ip, PETSC_NULL,  &refinement, &eta);
+     ierr = IPSetOrthogonalization (_ip, IP_MGS_ORTH, refinement, eta);
+            CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
 
+	     
       // Set user-specified  solver
       set_slepc_solver_type();
       
