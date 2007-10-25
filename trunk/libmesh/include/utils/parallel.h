@@ -94,6 +94,16 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Take a vector of length n_processors, and on processor root_id fill in
+   * recv[processor_id] = the value of send on processor processor_id
+   */
+  template <typename T>
+  inline void gather(int root_id,
+		     T send,
+		     std::vector<T> &recv);
+
+  //-------------------------------------------------------------------
+  /**
    * Take a vector of length n_processors, and fill in recv[processor_id] = the
    * value of send on that processor
    */
@@ -303,6 +313,84 @@ namespace Parallel
 
 
   template <typename T>
+  inline void gather(int root_id,
+		     T send,
+		     std::vector<T> &recv)
+  {
+    assert(root_id < libMesh::n_processors());
+
+    if (libMesh::processor_id() == root_id)
+      recv.resize(libMesh::n_processors());
+    
+    if (libMesh::n_processors() > 1)
+      {
+	MPI_Gather(&send,
+		   1,
+		   datatype<T>(),
+		   &recv[0],
+		   1,
+		   datatype<T>(),
+		   root_id,
+		   libMesh::COMM_WORLD);
+      }
+    else
+      recv[0] = send;
+  }
+
+
+
+  template <typename T>
+  inline void gather(int root_id,
+		     std::complex<T> send,
+		     std::vector<std::complex<T> > &recv)
+  {
+    assert(root_id < libMesh::n_processors());
+
+    std::vector<T> temprealoutput, tempimagoutput;
+
+    if (libMesh::processor_id() == root_id)
+      {
+        temprealoutput.resize(libMesh::n_processors());
+        tempimagoutput.resize(libMesh::n_processors());
+        recv.resize(libMesh::n_processors());
+      }
+    
+    if (libMesh::n_processors() > 1)
+      {
+	T realinput = send.real(),
+	  imaginput = send.imag();
+
+	MPI_Gather(&realinput,
+		   1,
+		   datatype<T>(),
+		   &temprealoutput[0],
+		   1,
+		   datatype<T>(),
+		   root_id,
+		   libMesh::COMM_WORLD);
+
+	MPI_Gather(&imaginput,
+		   1,
+		   datatype<T>(),
+		   &tempimagoutput[0],
+		   1,
+		   datatype<T>(),
+		   root_id,
+		   libMesh::COMM_WORLD);
+
+	for (unsigned int i=0; i != recv.size(); ++i)
+	  {
+	    recv[i].real() = temprealoutput[i];
+	    recv[i].imag() = tempimagoutput[i];
+	  }
+      }
+    else
+      recv[0] = send;
+  }
+
+
+
+  template <typename T>
   inline void allgather(T send,
 			std::vector<T> &recv)
   {
@@ -444,7 +532,10 @@ namespace Parallel
   inline void sum(std::vector<T> &) {}
 
   template <typename T>
-  inline void vector_union(std::vector<T> &r) {}
+  inline void allgather(T, std::vector<T> &);
+
+  template <typename T>
+  inline void vector_union(std::vector<T> &) {}
 
 #endif // HAVE_MPI
 
