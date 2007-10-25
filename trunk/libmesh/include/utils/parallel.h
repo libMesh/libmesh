@@ -98,9 +98,18 @@ namespace Parallel
    * recv[processor_id] = the value of send on processor processor_id
    */
   template <typename T>
-  inline void gather(int root_id,
+  inline void gather(const unsigned int root_id,
 		     T send,
 		     std::vector<T> &recv);
+
+  //-------------------------------------------------------------------
+  /**
+   * Take a vector of local variables and expand it on processor root_id 
+   * to include values from all processors
+   */
+  template <typename T>
+  inline void gather(const unsigned int root_id,
+		     std::vector<T> &r);
 
   //-------------------------------------------------------------------
   /**
@@ -118,7 +127,7 @@ namespace Parallel
    * values from all processors
    */
   template <typename T>
-  void vector_union(std::vector<T> &r);
+  inline void allgather(std::vector<T> &r);
 
 
 
@@ -313,7 +322,7 @@ namespace Parallel
 
 
   template <typename T>
-  inline void gather(int root_id,
+  inline void gather(const unsigned int root_id,
 		     T send,
 		     std::vector<T> &recv)
   {
@@ -340,7 +349,7 @@ namespace Parallel
 
 
   template <typename T>
-  inline void gather(int root_id,
+  inline void gather(const unsigned int root_id,
 		     std::complex<T> send,
 		     std::vector<std::complex<T> > &recv)
   {
@@ -388,6 +397,68 @@ namespace Parallel
       recv[0] = send;
   }
 
+
+
+  /**
+   * This function provides a convenient method
+   * for combining vectors from each processor into one
+   * contiguous chunk on one processor.  This handles the 
+   * case where the lengths of the vectors may vary.  
+   * Specifically, this function transforms this:
+   \verbatim
+    Processor 0: [ ... N_0 ]
+    Processor 1: [ ....... N_1 ]
+      ...
+    Processor M: [ .. N_M]
+   \endverbatim
+   *
+   * into this:
+   *
+   \verbatim
+   [ [ ... N_0 ] [ ....... N_1 ] ... [ .. N_M] ]
+   \endverbatim
+   *
+   * on processor root_id. This function is collective and therefore
+   * must be called by all processors.
+   */
+  template <typename T>
+  void gather(const unsigned int root_id,
+	      std::vector<T> &r)
+  {
+    std::vector<int>
+      sendlengths  (libMesh::n_processors(), 0),
+      displacements(libMesh::n_processors(), 0);
+
+    const int mysize = r.size();
+    Parallel::allgather(mysize, sendlengths);
+
+    // Find the total size of the final array and
+    // set up the displacement offsets for each processor.
+    unsigned int globalsize = 0; 
+    for (unsigned int i=0; i != libMesh::n_processors(); ++i)
+      {
+	displacements[i] = globalsize;
+	globalsize += sendlengths[i];
+      }
+
+    // copy the input buffer
+    std::vector<T> r_src(r);
+
+    // now resize it to hold the global data
+    // on the receiving processor
+    if (root_id == libMesh::processor_id())
+      r.resize(globalsize);
+
+    // and get the data from the remote processors
+    const int ierr =
+      MPI_Gatherv (&r_src[0], mysize, datatype<T>(),
+		   &r[0], &sendlengths[0], &displacements[0], datatype<T>(),
+		   root_id,
+		   libMesh::COMM_WORLD);
+
+    assert (ierr == MPI_SUCCESS);
+
+  }
 
 
   template <typename T>
@@ -475,7 +546,7 @@ namespace Parallel
    * must be called by all processors.
    */
   template <typename T>
-  void vector_union(std::vector<T> &r)
+  void allgather(std::vector<T> &r)
   {
     std::vector<int>
       sendlengths  (libMesh::n_processors(), 0),
