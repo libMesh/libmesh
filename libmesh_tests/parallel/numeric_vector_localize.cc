@@ -19,12 +19,13 @@
 
 #include <libmesh.h>
 #include <distributed_vector.h>
+#include <petsc_vector.h>
 #include <laspack_vector.h>
 #include <vector>
 
 namespace {
 
-  template <class VecType>  
+  template <class NumericVectorType>  
   void run_test ()
   {
     unsigned int block_size  = 10;
@@ -35,7 +36,7 @@ namespace {
       global_size += (block_size + p);
     
     {
-      VecType
+      NumericVectorType
 	v (global_size, local_size),
 	l (global_size);
       
@@ -67,17 +68,24 @@ namespace {
 
 void unit_test ()
 {
-  std::cout << "Running with VecType=DistributedVector<Real>" << std::endl;
+  std::cout << "Running with NumericVectorType=DistributedVector<Real>" << std::endl;
   run_test< DistributedVector<Real> >();
 
-  std::cout << "\n\nRunning with VecType=DistributedVector<float>" << std::endl;
+  std::cout << "\n\nRunning with NumericVectorType=DistributedVector<float>" << std::endl;
   run_test< DistributedVector<float> >();
+
+#ifdef HAVE_PETSC
+
+  std::cout << "\n\nRunning with NumericVectorType=PetscVector<Real>" << std::endl;
+  run_test< PetscVector<Real> >();
+
+#endif
 
 #ifdef HAVE_LASPACK
 
   if (libMesh::n_processors() == 1)
     {
-      std::cout << "\n\nRunning with VecType=LaspackVector<Real>" << std::endl;
+      std::cout << "\n\nRunning with NumericVectorType=LaspackVector<Real>" << std::endl;
       run_test< LaspackVector<Real> >();
     }
 
