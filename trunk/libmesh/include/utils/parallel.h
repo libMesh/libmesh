@@ -335,9 +335,9 @@ namespace Parallel
 
 
   template <typename T>
-  inline void send_receive(const unsigned int source_processor_id,
+  inline void send_receive(const unsigned int dest_processor_id,
                            std::vector<T> &send,
-			   const unsigned int dest_processor_id,
+			   const unsigned int source_processor_id,
                            std::vector<T> &recv)
   {
     START_LOG("send_receive()", "Parallel");
@@ -346,18 +346,18 @@ namespace Parallel
     unsigned int sendsize = send.size(), recvsize;
     MPI_Status status;
     MPI_Sendrecv(&sendsize, 1, datatype<unsigned int>(),
-		 dest_processor_id, MPI_ANY_TAG,
+		 dest_processor_id, 0,
 		 &recvsize, 1, datatype<unsigned int>(),
-		 source_processor_id, MPI_ANY_TAG,
+		 source_processor_id, 0,
 		 libMesh::COMM_WORLD,
 		 &status);
 
     recv.resize(recvsize);
 
     MPI_Sendrecv(send.empty() ? NULL : &send[0], sendsize, datatype<T>(),
-		 dest_processor_id, MPI_ANY_TAG,
+		 dest_processor_id, 0,
 		 recv.empty() ? NULL : &recv[0], recvsize, datatype<T>(),
-		 source_processor_id, MPI_ANY_TAG,
+		 source_processor_id, 0,
 		 libMesh::COMM_WORLD,
 		 &status);
     
