@@ -3952,6 +3952,7 @@ src/mesh/parallel_mesh.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
+    include/utils/parallel.h\
     include/utils/perf_log.h
 src/mesh/parallel_mesh_iterators.$(obj-suffix):\
     src/mesh/parallel_mesh_iterators.C\
