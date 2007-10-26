@@ -495,65 +495,20 @@ void DistributedVector<T>::localize (std::vector<T>& v_local) const
 
 
 
-template <>
-void DistributedVector<float>::localize_to_one (std::vector<float>& v_local,
-						const unsigned int pid) const
+template <typename T>
+void DistributedVector<T>::localize_to_one (std::vector<T>& v_local,
+					    const unsigned int pid) const
 {
   assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  v_local.resize(size());
-  
-  std::fill (v_local.begin(),
-	     v_local.end(),
-	     0.);
+  v_local = this->_values;
 
-  for (unsigned int i=0; i<local_size(); i++)
-    v_local[i+first_local_index()] = _values[i];
+  Parallel::gather (pid, v_local);
 
-#ifdef HAVE_MPI
-
-  MPI_Reduce (&v_local[0], &v_local[0], v_local.size(),
-	      MPI_FLOAT, MPI_SUM, pid, libMesh::COMM_WORLD);
-  
-#else
-
-  assert (this->local_size() == this->size());
-  assert (pid == 0);
-  
-#endif  
-}
-
-
-
-template <>
-void DistributedVector<double>::localize_to_one (std::vector<double>& v_local,
-						 const unsigned int pid) const
-{
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
-
-  v_local.resize(size());
-  
-  std::fill (v_local.begin(),
-	     v_local.end(),
-	     0.);
-
-  for (unsigned int i=0; i<local_size(); i++)
-    v_local[i+first_local_index()] = _values[i];
-
-#ifdef HAVE_MPI
-
-  MPI_Reduce (&v_local[0], &v_local[0], v_local.size(),
-	      MPI_DOUBLE, MPI_SUM, pid, libMesh::COMM_WORLD);
-  
-#else
-
-  assert (this->local_size() == this->size());
-  assert (pid == 0);
-  
+#ifndef HAVE_MPI
+  assert (local_size() == size());
 #endif  
 }
 
