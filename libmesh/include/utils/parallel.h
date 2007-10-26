@@ -26,6 +26,8 @@
 
 // Local includes
 #include "libmesh_common.h" // for Real
+#include "libmesh_logging.h"
+
 
 
 // ------------------------------------------------------------
@@ -338,6 +340,8 @@ namespace Parallel
 			   const unsigned int dest_processor_id,
                            std::vector<T> &recv)
   {
+    START_LOG("send_receive()", "Parallel");
+
     // Trade buffer sizes first
     unsigned int sendsize = send.size(), recvsize;
     MPI_Status status;
@@ -356,6 +360,8 @@ namespace Parallel
 		 source_processor_id, MPI_ANY_TAG,
 		 libMesh::COMM_WORLD,
 		 &status);
+    
+    STOP_LOG("send_receive()", "Parallel");
   }
 
 
@@ -463,6 +469,8 @@ namespace Parallel
   void gather(const unsigned int root_id,
 	      std::vector<T> &r)
   {
+    START_LOG("gather()", "Parallel");
+    
     std::vector<int>
       sendlengths  (libMesh::n_processors(), 0),
       displacements(libMesh::n_processors(), 0);
@@ -480,7 +488,11 @@ namespace Parallel
       }
 
     // Check for quick return
-    if (globalsize == 0) return;
+    if (globalsize == 0)
+      {
+	STOP_LOG("gather()", "Parallel");
+	return;
+      }
 
     // copy the input buffer
     std::vector<T> r_src(r);
@@ -499,6 +511,7 @@ namespace Parallel
 
     assert (ierr == MPI_SUCCESS);
 
+    STOP_LOG("gather()", "Parallel");
   }
 
 
@@ -589,6 +602,8 @@ namespace Parallel
   template <typename T>
   void allgather(std::vector<T> &r)
   {
+    START_LOG("allgather()", "Parallel");
+
     std::vector<int>
       sendlengths  (libMesh::n_processors(), 0),
       displacements(libMesh::n_processors(), 0);
@@ -606,7 +621,11 @@ namespace Parallel
       }
 
     // Check for quick return
-    if (globalsize == 0) return;
+    if (globalsize == 0)
+      {
+	STOP_LOG("allgather()", "Parallel");
+	return;
+      }
 
     // copy the input buffer
     std::vector<T> r_src(r);
@@ -621,7 +640,9 @@ namespace Parallel
 		      r.empty()     ? NULL : &r[0],     &sendlengths[0], &displacements[0], datatype<T>(),
 		      libMesh::COMM_WORLD);
 
-    assert (ierr == MPI_SUCCESS);      
+    assert (ierr == MPI_SUCCESS);
+
+    STOP_LOG("allgather()", "Parallel");
   }
 
 
