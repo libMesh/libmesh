@@ -479,6 +479,9 @@ namespace Parallel
 	globalsize += sendlengths[i];
       }
 
+    // Check for quick return
+    if (globalsize == 0) return;
+
     // copy the input buffer
     std::vector<T> r_src(r);
 
@@ -489,7 +492,7 @@ namespace Parallel
 
     // and get the data from the remote processors
     const int ierr =
-      MPI_Gatherv (&r_src[0], mysize, datatype<T>(),
+      MPI_Gatherv (r_src.empty() ? NULL : &r_src[0], mysize, datatype<T>(),
 		   &r[0], &sendlengths[0], &displacements[0], datatype<T>(),
 		   root_id,
 		   libMesh::COMM_WORLD);
@@ -602,20 +605,23 @@ namespace Parallel
 	globalsize += sendlengths[i];
       }
 
+    // Check for quick return
+    if (globalsize == 0) return;
+
     // copy the input buffer
     std::vector<T> r_src(r);
 
     // now resize it to hold the global data
     r.resize(globalsize);
 
-    // and get the data from the remote processors
+    // and get the data from the remote processors.
+    // Pass NULL if our vector is empty.
     const int ierr =
-      MPI_Allgatherv (&r_src[0], mysize, datatype<T>(),
-		      &r[0], &sendlengths[0], &displacements[0], datatype<T>(),
+      MPI_Allgatherv (r_src.empty() ? NULL : &r_src[0], mysize, datatype<T>(),
+		      r.empty()     ? NULL : &r[0],     &sendlengths[0], &displacements[0], datatype<T>(),
 		      libMesh::COMM_WORLD);
 
-    assert (ierr == MPI_SUCCESS);
-
+    assert (ierr == MPI_SUCCESS);      
   }
 
 
@@ -641,10 +647,16 @@ namespace Parallel
   inline void sum(std::vector<T> &) {}
 
   template <typename T>
+  inline void gather(const unsigned int, T, std::vector<T> &);
+
+  template <typename T>
+  inline void gather(const unsigned int, std::vector<T> &) {}
+
+  template <typename T>
   inline void allgather(T, std::vector<T> &);
 
   template <typename T>
-  inline void vector_union(std::vector<T> &) {}
+  inline void allgather(std::vector<T> &) {}
 
 #endif // HAVE_MPI
 
