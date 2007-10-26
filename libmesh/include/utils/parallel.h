@@ -262,7 +262,7 @@ namespace Parallel
   template <typename T>
   inline void sum(std::vector<T> &r)
   {
-    if (libMesh::n_processors() > 1)
+    if (libMesh::n_processors() > 1 && !r.empty())
       {
 	std::vector<T> temp(r.size());
 	MPI_Allreduce (&r[0],
@@ -299,7 +299,7 @@ namespace Parallel
   template <typename T>
   inline void sum(std::vector<std::complex<T> > &r)
   {
-    if (libMesh::n_processors() > 1)
+    if (libMesh::n_processors() > 1 && !r.empty())
       {
 	std::vector<T> temprealinput(r.size()),
 	  tempimaginput(r.size()),
@@ -350,9 +350,9 @@ namespace Parallel
 
     recv.resize(recvsize);
 
-    MPI_Sendrecv(&send[0], sendsize, datatype<T>(),
+    MPI_Sendrecv(send.empty() ? NULL : &send[0], sendsize, datatype<T>(),
 		 dest_processor_id, MPI_ANY_TAG,
-		 &recv[0], recvsize, datatype<T>(),
+		 recv.empty() ? NULL : &recv[0], recvsize, datatype<T>(),
 		 source_processor_id, MPI_ANY_TAG,
 		 libMesh::COMM_WORLD,
 		 &status);
