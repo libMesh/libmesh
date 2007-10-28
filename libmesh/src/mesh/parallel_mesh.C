@@ -24,6 +24,7 @@
 #include "elem.h"
 #include "libmesh_logging.h"
 #include "parallel_mesh.h"
+#include "parallel.h"
 
 // ------------------------------------------------------------
 // ParallelMesh class member functions
@@ -238,41 +239,193 @@ void ParallelMesh::clear ()
 
 
 
+template <typename T>
+void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
+{
+  typedef typename mapvector<T*>::veclike_iterator object_iterator;
+
+  // In parallel we may not know what objects other processors have.
+  // Start by figuring out how many
+  unsigned int objects_on_me = 0;
+  unsigned int unpartitioned_objects = 0;
+
+  object_iterator it  = objects.begin();
+  object_iterator end = objects.end();
+
+  for (; it != end;)
+    {
+      T *obj = *it;
+
+      // Remove any NULL container entries while we're here,
+      // being careful not to invalidate our iterator
+      if (!*it)
+        objects.erase(it++);
+      else
+        {
+          unsigned int obj_procid = obj->processor_id();
+          if (obj_procid == libMesh::processor_id())
+            objects_on_me++;
+          else if (obj_procid == DofObject::invalid_processor_id)
+            unpartitioned_objects++;
+          ++it;
+        }
+    }
+
+  std::vector<unsigned int> objects_on_proc(libMesh::n_processors(), 0);
+  Parallel::allgather(objects_on_me, objects_on_proc);
+
+#ifdef DEBUG
+  unsigned int global_unpartitioned_objects = unpartitioned_objects;
+  Parallel::max(global_unpartitioned_objects);
+  assert(global_unpartitioned_objects == unpartitioned_objects);
+#endif
+
+  // We'll renumber objects in blocks by processor id
+  std::vector<unsigned int> first_object_on_proc(libMesh::n_processors());
+  for (unsigned int i=1; i != libMesh::n_processors(); ++i)
+    first_object_on_proc[i] = first_object_on_proc[i-1] +
+                              objects_on_proc[i-1];
+  unsigned int next_id = first_object_on_proc[libMesh::processor_id()];
+
+  // First set new local object ids and build request sets 
+  // for non-local object ids
+  
+  // Request sets to send to each processor
+  std::vector<std::vector<unsigned int> >
+    requested_ids(libMesh::n_processors());
+
+  end = objects.end();
+  for (it = objects.begin(); it != end; ++it)
+    {
+      T *obj = *it;
+      if (obj->processor_id() == libMesh::processor_id())
+        obj->set_id(next_id++);
+      else if (obj->processor_id() != DofObject::invalid_processor_id)
+        requested_ids[obj->processor_id()].push_back(obj->id());
+    }
+
+  // Next set ghost object ids from other processors
+  if (libMesh::n_processors() > 1)
+    {
+      for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+        {
+          // Trade my requests with processor procup and procdown
+          unsigned int procup = (libMesh::processor_id() + p) %
+                                 libMesh::n_processors();
+          unsigned int procdown = (libMesh::n_processors() +
+                                   libMesh::processor_id() - p) %
+                                   libMesh::n_processors();
+          std::vector<unsigned int> request_to_fill;
+          Parallel::send_receive(procup, requested_ids[procup],
+                                 procdown, request_to_fill);
+
+          // Fill those requests
+          std::vector<unsigned int> new_ids(request_to_fill.size());
+          for (unsigned int i=0; i != request_to_fill.size(); ++i)
+            {
+              assert(objects[request_to_fill[i]]);
+              assert(objects[request_to_fill[i]]->processor_id()
+                     == libMesh::processor_id());
+              new_ids[i] = objects[request_to_fill[i]]->id();
+              assert(new_ids[i] >=
+                     first_object_on_proc[libMesh::processor_id()]);
+              assert(new_ids[i] <
+                     first_object_on_proc[libMesh::processor_id()] +
+                     objects_on_proc[libMesh::processor_id()]);
+            }
+
+          // Trade back the results
+          std::vector<unsigned int> filled_request;
+          Parallel::send_receive(procdown, new_ids,
+                                 procup, filled_request);
+
+          // And copy the id changes we've now been informed of
+          for (unsigned int i=0; i != filled_request.size(); ++i)
+            {
+              assert (objects[requested_ids[procup][i]]->processor_id()
+                      == procup);
+              assert(filled_request[i] >=
+                     first_object_on_proc[procup]);
+              assert(filled_request[i] <
+                     first_object_on_proc[procup] +
+                     objects_on_proc[procup]);
+              objects[requested_ids[procup][i]]->set_id(filled_request[i]);
+            }
+        }
+    }
+
+  // Next set unpartitioned object ids
+  next_id = 0;
+  for (unsigned int i=0; i != libMesh::n_processors(); ++i)
+    next_id += objects_on_proc[i];
+  for (it = objects.begin(); it != end; ++it)
+    {
+      T *obj = *it;
+      if (obj->processor_id() == DofObject::invalid_processor_id)
+        obj->set_id(next_id++);
+    }
+
+  // Finally shuffle around objects so that container indices
+  // match ids
+  end = objects.end();
+  for (it = objects.begin(); it != end;)
+    {
+      T *obj = *it;
+      if (obj) // don't try shuffling already-NULL entries
+        {
+          T *next = objects[obj->id()];
+          // If we have to move this object
+          if (next != obj)
+            {
+              // NULL out its original position for now
+              // (our shuffling may put another object there shortly)
+              *it = NULL;
+
+              // There may already be another object with this id that
+              // needs to be moved itself
+              while (next)
+                {
+                  // We shouldn't be trying to give two objects the
+                  // same id
+                  assert (next->id() != obj->id());
+                  objects[obj->id()] = obj;
+                  obj = next;
+                  next = objects[obj->id()];
+                }
+              objects[obj->id()] = obj;
+            }
+        }
+      // Remove any container entries that were left as NULL,
+      // being careful not to invalidate our iterator
+      if (!*it)
+        objects.erase(it++);
+      else
+        ++it;
+    }
+}
+
+
 void ParallelMesh::renumber_nodes_and_elements ()
 {
-  
   START_LOG("renumber_nodes_and_elem()", "Mesh");
-  
-  // In Parallel we do *not* want to renumber anything, just to delete
-  // any unused nodes or NULL elements
 
-  // Loop over the elements.  Remember any node ids we see.
-  std::map<unsigned int, bool> used_nodes;
+  std::set<unsigned int> used_nodes;
 
+  // flag the nodes we need
   {      
-    elem_iterator_imp  in = _elements.begin();
-    elem_iterator_imp end = _elements.end();
+    element_iterator  it = elements_begin();
+    element_iterator end = elements_end();
 
-    for (; in != end;)
+    for (; it != end; ++it)
       {
-        Elem* elem = *in;
+        Elem *elem = *it;
 
-        if (elem)
-          {
-            // Notice this element's nodes.
-            for (unsigned int n=0; n<elem->n_nodes(); n++)
-              used_nodes[elem->node(n)] = true;
-            ++in;
-          }
-        else
-          {
-            // Remove this non-element
-            _elements.erase(in++);
-          }
+        for (unsigned int n=0; n != elem->n_nodes(); ++n)
+          used_nodes.insert(elem->node(n));
       }
   }
 
-  // Nodes not connected to any elements are deleted
+  // Nodes not connected to any local elements are deleted
   {
     node_iterator_imp  it = _nodes.begin();
     node_iterator_imp end = _nodes.end();
@@ -280,7 +433,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
     for (; it != end;)
       {
 	Node *node = *it;
-        if (!used_nodes[node->id()])
+        if (used_nodes.find(node->id()) == used_nodes.end())
           {
 	    // remove any boundary information associated with
 	    // this node
@@ -295,7 +448,13 @@ void ParallelMesh::renumber_nodes_and_elements ()
           ++it;
       }
   }
-  
+
+  // Finally renumber all the elements
+  this->renumber_dof_objects (_elements);
+
+  // and all the remaining nodes
+  this->renumber_dof_objects (_nodes);
+
   STOP_LOG("renumber_nodes_and_elem()", "Mesh");
 }
 
