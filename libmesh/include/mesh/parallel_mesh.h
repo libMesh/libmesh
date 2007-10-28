@@ -79,6 +79,12 @@ class ParallelMesh : public UnstructuredMesh
   virtual void clear();
 
   /**
+   * Renumber a parallel objects container
+   */
+  template <typename T>
+  void renumber_dof_objects (mapvector<T*>&);
+
+  /**
    * Remove NULL elements from arrays
    */
   virtual void renumber_nodes_and_elements ();
