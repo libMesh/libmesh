@@ -294,6 +294,12 @@ void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
   std::vector<std::vector<unsigned int> >
     requested_ids(libMesh::n_processors());
 
+  // We know how many objects live on each processor, so reseve() space for
+  // each.
+  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+    if (p != libMesh::processor_id())
+      requested_ids[p].reserve(objects_on_proc[p]);
+
   end = objects.end();
   for (it = objects.begin(); it != end; ++it)
     {
