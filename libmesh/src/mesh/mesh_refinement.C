@@ -1083,14 +1083,6 @@ bool MeshRefinement::_coarsen_elements ()
 	  // The _unused_elements optimization is currently off.
 	  // _unused_elements.push_back (it);
 
-          // About to call parent()->active!
-
-	  // Is this element's parent inactive??
-	  if (!elem->parent()->active())
-	    {
-	      std::cerr << "Element being deleted has inactive parent." << std::endl;
-	    }
-
 	  // Don't delete the element until
 	  // MeshRefinement::contract()
 	  // _mesh.delete_elem(elem);
