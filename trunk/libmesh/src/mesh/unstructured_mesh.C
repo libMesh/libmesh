@@ -814,12 +814,6 @@ bool UnstructuredMesh::contract ()
 	    // Huh?  no level-0 element should be subactive
 	    assert (elem->level() != 0);
 
-	    // Make sure we dealt with parents first
-	    if (elem->parent()->has_children())
-	      {
-		std::cerr << "Element being deleted is still a child." << std::endl;
-	      }
-
 	    // Delete the element
 	    // This just sets a pointer to NULL, and doesn't
 	    // invalidate any iterators
