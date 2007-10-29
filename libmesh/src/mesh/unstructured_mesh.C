@@ -31,6 +31,7 @@
 #include "mesh_communication.h"
 #include "libmesh_logging.h"
 #include "elem.h"
+#include "mesh_tools.h" // For n_levels
 
 #include "diva_io.h"
 #include "exodusII_io.h"
@@ -306,42 +307,46 @@ void UnstructuredMesh::find_neighbors()
    * Furthermore, that neighbor better be active,
    * otherwise we missed a child somewhere.
    */
-  element_iterator end = this->not_level_elements_end(0);
-  for (element_iterator el = this->not_level_elements_begin(0);
-       el != end; ++el)
+  const unsigned int n_levels = MeshTools::n_levels(*this);
+  for (unsigned int level = 1; level < n_levels; ++level)
     {
-      Elem* elem = *el;
+      element_iterator end = this->level_elements_end(level);
+      for (element_iterator el = this->level_elements_begin(level);
+           el != end; ++el)
+        {
+          Elem* elem = *el;
 
-      assert (elem->parent() != NULL);
-      for (unsigned int s=0; s < elem->n_neighbors(); s++)
-        if (elem->neighbor(s) == NULL)
-        {	    
-          elem->set_neighbor(s, elem->parent()->neighbor(s));
+          assert (elem->parent() != NULL);
+          for (unsigned int s=0; s < elem->n_neighbors(); s++)
+            if (elem->neighbor(s) == NULL)
+            {	    
+              elem->set_neighbor(s, elem->parent()->neighbor(s));
 
 #ifdef DEBUG	    
-          Elem *neigh = elem->neighbor(s);
-          if (neigh != NULL)
-            // We ignore subactive elements here because
-            // we don't care about neighbors of subactive element.
-            if ((!neigh->active()) && (!elem->subactive()))
-            {
-              std::cerr << "Bad element ID = " << elem->id() 
-                << ", Bad neighbor ID = " << neigh->id() << std::endl;
-              std::cerr << "ERROR: " 
-                << (elem->active()?"Active":"Ancestor")
-                << " Element at level "
-                << elem->level() << std::endl;
-              std::cerr << "with "
-                << (elem->parent()->active()?"active":
-                    (elem->parent()->subactive()?"subactive":"ancestor"))
-                << " parent share "
-                << (neigh->subactive()?"subactive":"ancestor")
-                << " neighbor at level " << neigh->level()
-                << std::endl;
-              GMVIO(*dynamic_cast<UnstructuredMesh*>(this)).write ("bad_mesh.gmv");
-              error();
-            }
+              Elem *neigh = elem->neighbor(s);
+              if (neigh != NULL)
+                // We ignore subactive elements here because
+                // we don't care about neighbors of subactive element.
+                if ((!neigh->active()) && (!elem->subactive()))
+                {
+                  std::cerr << "Bad element ID = " << elem->id() 
+                    << ", Bad neighbor ID = " << neigh->id() << std::endl;
+                  std::cerr << "ERROR: " 
+                    << (elem->active()?"Active":"Ancestor")
+                    << " Element at level "
+                    << elem->level() << std::endl;
+                  std::cerr << "with "
+                    << (elem->parent()->active()?"active":
+                        (elem->parent()->subactive()?"subactive":"ancestor"))
+                    << " parent share "
+                    << (neigh->subactive()?"subactive":"ancestor")
+                    << " neighbor at level " << neigh->level()
+                    << std::endl;
+                  GMVIO(*dynamic_cast<UnstructuredMesh*>(this)).write ("bad_mesh.gmv");
+                  error();
+                }
 #endif // DEBUG
+            }
         }
     }
   
