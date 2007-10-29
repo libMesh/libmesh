@@ -4199,6 +4199,7 @@ src/mesh/unstructured_mesh.$(obj-suffix):\
     include/mesh/mesh_communication.h\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
+    include/mesh/mesh_tools.h\
     include/mesh/off_io.h\
     include/mesh/tecplot_io.h\
     include/mesh/tetgen_io.h\
@@ -4508,6 +4509,7 @@ src/numerics/distributed_vector.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
     include/enums/enum_solver_package.h\
@@ -4541,14 +4543,17 @@ src/numerics/eigen_solver.$(obj-suffix):\
 src/numerics/error_estimator.$(obj-suffix):\
     src/numerics/error_estimator.C\
     include/base/auto_ptr.h\
+    include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/numerics/error_estimator.h\
@@ -4562,8 +4567,10 @@ src/numerics/error_estimator.$(obj-suffix):\
     include/solvers/system.h\
     include/solvers/transient_system.h\
     include/utils/error_vector.h\
+    include/utils/o_string_stream.h\
     include/utils/parallel.h\
     include/utils/parameters.h\
+    include/utils/perf_log.h\
     include/utils/statistics.h
 src/numerics/exact_error_estimator.$(obj-suffix):\
     src/numerics/exact_error_estimator.C\
@@ -5187,6 +5194,7 @@ src/numerics/petsc_vector.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
     include/enums/enum_solver_package.h\
@@ -6026,6 +6034,7 @@ src/solvers/equation_systems.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/node.h\
     include/base/reference_counted_object.h\
@@ -6168,6 +6177,7 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/node.h\
     include/base/reference_counted_object.h\
