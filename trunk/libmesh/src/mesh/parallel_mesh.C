@@ -439,7 +439,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
     for (; it != end;)
       {
 	Node *node = *it;
-        if (used_nodes.find(node->id()) == used_nodes.end())
+        if (!used_nodes.count(node->id()))
           {
 	    // remove any boundary information associated with
 	    // this node
