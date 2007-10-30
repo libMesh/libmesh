@@ -143,6 +143,15 @@ void MeshBase::clear ()
 
 
 
+unsigned int MeshBase::n_nodes_on_proc (const unsigned int proc_id) const
+{
+    assert (proc_id < libMesh::n_processors());
+    return static_cast<unsigned int>(std::distance (this->pid_nodes_begin(proc_id),
+						    this->pid_nodes_end  (proc_id)));
+}
+
+
+
 unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
 {
     assert (proc_id < libMesh::n_processors());
@@ -222,10 +231,11 @@ std::string MeshBase::get_info() const
       << "  mesh_dimension()="    << this->mesh_dimension()    << '\n'
       << "  spatial_dimension()=" << this->spatial_dimension() << '\n'
       << "  n_nodes()="           << this->n_nodes()           << '\n'
+      << "    n_local_nodes()="   << this->n_local_nodes()     << '\n'
       << "  n_elem()="            << this->n_elem()            << '\n'
-      << "   n_local_elem()="     << this->n_local_elem()      << '\n'
+      << "    n_local_elem()="    << this->n_local_elem()      << '\n'
 #ifdef ENABLE_AMR
-      << "   n_active_elem()="    << this->n_active_elem()     << '\n'
+      << "    n_active_elem()="   << this->n_active_elem()     << '\n'
 #endif
       << "  n_subdomains()="      << this->n_subdomains()      << '\n'
       << "  n_processors()="      << this->n_processors()      << '\n'
