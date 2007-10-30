@@ -63,8 +63,12 @@ unsigned int NewtonSolver::solve()
   // Set starting linear tolerance
   Real current_linear_tolerance = initial_linear_tolerance;
 
+  // Start counting our linear solver steps
+  _inner_iterations = 0;
+
   // Now we begin the nonlinear loop
-  for (unsigned int l=0; l<max_nonlinear_iterations; ++l)
+  for (_outer_iterations=0; _outer_iterations<max_nonlinear_iterations;
+       ++_outer_iterations)
     {
       if (!quiet)
         std::cout << "Assembling System" << std::endl;
@@ -143,6 +147,8 @@ unsigned int NewtonSolver::solve()
 
       const unsigned int linear_steps = rval.first;
       assert(linear_steps <= max_linear_iterations);
+      _inner_iterations += linear_steps;
+
       const bool linear_solve_finished = 
         !(linear_steps == max_linear_iterations);
 
@@ -195,8 +201,8 @@ unsigned int NewtonSolver::solve()
                                linear_solve_finished))
             {
               if (!quiet)
-		print_convergence(l, current_residual, norm_delta,
-                                  linear_solve_finished);
+		print_convergence(_outer_iterations, current_residual,
+                                  norm_delta, linear_solve_finished);
               break; // out of for (unsigned int l=0; l<max_nonlinear_iterations; ++l)
             }
 
@@ -226,7 +232,7 @@ unsigned int NewtonSolver::solve()
                   current_residual > last_residual)
                 {
                   std::cout << "Inexact Newton step FAILED at step "
-                            << l << std::endl;
+                            << _outer_iterations << std::endl;
 		  
 		  if (!continue_after_backtrack_failure)
 		    {
@@ -266,7 +272,7 @@ unsigned int NewtonSolver::solve()
       // Terminate the solution iteration if the difference between
       // this iteration and the last is sufficiently small.
       if (!quiet)
-        print_convergence(l, current_residual,
+        print_convergence(_outer_iterations, current_residual,
                           norm_delta / steplength,
                           linear_solve_finished);
       if (test_convergence(current_residual, norm_delta / steplength,
@@ -275,11 +281,11 @@ unsigned int NewtonSolver::solve()
           break;
         }
 
-      if (l >= max_nonlinear_iterations - 1)
+      if (_outer_iterations >= max_nonlinear_iterations - 1)
         {
-          std::cout << "  Nonlinear solver FAILED TO CONVERGE by step " << l
-                    << " with norm " << norm_total
-                    << std::endl;
+          std::cout << "  Nonlinear solver FAILED TO CONVERGE by step "
+                    << _outer_iterations << " with norm "
+                    << norm_total << std::endl;
           if (continue_after_max_iterations)
 	    {
 	      _solve_result = DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
