@@ -26,10 +26,6 @@
 
 #ifdef HAVE_PETSC
 
-// TODO:[BSK} This seems necessary to use petsc on IBM Power3 at NERSC, but only there?  
-//#include <cmath>
-
-
 // C++ includes
 #include <algorithm>
 
