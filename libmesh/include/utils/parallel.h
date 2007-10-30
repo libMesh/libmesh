@@ -144,6 +144,29 @@ namespace Parallel
 
 
 
+  //-------------------------------------------------------------------
+  /**
+   * Take a local value and broadcast it to all processors.
+   * Optionally takes the \p root_id processor, which specifies
+   * the processor intiating the broadcast.
+   */
+  template <typename T>
+  inline void broadcast(T &data, const unsigned int root_id=0);
+
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Take a local vector and broadcast it to all processors.
+   * Optionally takes the \p root_id processor, which specifies
+   * the processor intiating the broadcast.  The user is responsible
+   * for appropriately sizing the input buffer on all processors.
+   */
+  template <typename T>
+  inline void broadcast(std::vector<T> &data, const unsigned int root_id=0);
+
+
+
   //-----------------------------------------------------------------------
   // Parallel members
 
@@ -469,6 +492,9 @@ namespace Parallel
   void gather(const unsigned int root_id,
 	      std::vector<T> &r)
   {
+    if (libMesh::n_processors() == 1)
+      return;
+    
     START_LOG("gather()", "Parallel");
     
     std::vector<int>
@@ -574,7 +600,7 @@ namespace Parallel
     else
       recv[0] = send;
   }
-
+ 
 
 
   /**
@@ -602,6 +628,9 @@ namespace Parallel
   template <typename T>
   void allgather(std::vector<T> &r)
   {
+    if (libMesh::n_processors() == 1)
+      return;
+    
     START_LOG("allgather()", "Parallel");
 
     std::vector<int>
@@ -647,6 +676,45 @@ namespace Parallel
 
 
 
+  template <typename T>
+  void broadcast (T &data, const unsigned int root_id)
+  {
+    if (libMesh::n_processors() == 1)
+      return;
+    
+    START_LOG("broadcast()", "Parallel");
+
+    // Spread data to remote processors.
+    const int ierr =
+      MPI_Bcast (&data, 1, datatype<T>(), root_id, libMesh::COMM_WORLD);
+
+    assert (ierr == MPI_SUCCESS);
+
+    STOP_LOG("broadcast()", "Parallel");
+  }
+
+
+
+  template <typename T>
+  void broadcast (std::vector<T> &data, const unsigned int root_id)
+  {
+    if (libMesh::n_processors() == 1)
+      return;
+    
+    START_LOG("broadcast()", "Parallel");
+
+
+    // and get the data from the remote processors.
+    // Pass NULL if our vector is empty.
+    const int ierr =
+      MPI_Bcast (data.empty() ? NULL : &data[0], data.size(), datatype<T>(), root_id, libMesh::COMM_WORLD);
+
+    assert (ierr == MPI_SUCCESS);
+
+    STOP_LOG("broadcast()", "Parallel");
+  }
+
+
 #else // HAVE_MPI
 
   template <typename T>
@@ -678,6 +746,9 @@ namespace Parallel
 
   template <typename T>
   inline void allgather(std::vector<T> &) {}
+
+  template <typename T>
+    inline void broadcast (std::vector<T> &, const unsigned int =0) {}
 
 #endif // HAVE_MPI
 
