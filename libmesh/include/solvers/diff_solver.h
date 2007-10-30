@@ -94,6 +94,18 @@ public:
   virtual unsigned int solve () = 0;
 
   /**
+   * @returns the number of "outer" (e.g. quasi-Newton) iterations
+   * required by the last solve.
+   */
+  unsigned int total_outer_iterations() { return _outer_iterations; }
+
+  /**
+   * @returns the number of "inner" (e.g. Krylov) iterations
+   * required by the last solve.
+   */
+  unsigned int total_inner_iterations() { return _inner_iterations; }
+
+  /**
    * @returns a constant reference to the system we are solving.
    */
   const sys_type & system () const { return _system; }
@@ -241,6 +253,16 @@ protected:
    * relative_residual_tolerance
    */
   Real max_residual_norm;
+
+  /**
+   * The number of outer iterations used by the last solve
+   */
+  unsigned int _outer_iterations;
+
+  /**
+   * The number of inner iterations used by the last solve
+   */
+  unsigned int _inner_iterations;
 
   /**
    * @returns a writeable reference to the system we are solving.
