@@ -31,10 +31,6 @@
 
 
 
-// TODO:[BSK} This seems necessary to use petsc on IBM Power3 at NERSC, but only there?  This will need to be wrapped in an ifdef with a variable set by configure
-//#include <cmath>
-
-
 // C++ includes
 #include <vector>
 
