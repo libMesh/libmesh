@@ -123,6 +123,17 @@ public:
   virtual unsigned int n_nodes () const = 0; 
 
   /**
+   * Returns the number of elements on processor \p proc.
+   */
+  unsigned int n_nodes_on_proc (const unsigned int proc) const;
+
+  /**
+   * Returns the number of elements on the local processor.
+   */
+  unsigned int n_local_nodes () const
+  { return this->n_nodes_on_proc (libMesh::processor_id()); }
+
+  /**
    * Returns a number greater than or equal to the maximum node id in the
    * mesh.
    */
