@@ -126,6 +126,7 @@ class ParallelMesh : public UnstructuredMesh
    * functions for adding /deleting nodes elements.
    */
   virtual Node* add_point (const Point& n) ;
+  virtual Node* insert_node (Node* n);
   virtual void delete_node (Node* n) ;
   virtual Elem* add_elem (Elem* e) ;
   virtual Elem* insert_elem (Elem* e) ;

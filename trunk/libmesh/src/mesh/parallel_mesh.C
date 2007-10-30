@@ -185,6 +185,18 @@ Node* ParallelMesh::add_point (const Point& p)
 
 
 
+Node* ParallelMesh::insert_node (Node* n)
+{
+  if (_nodes[n->id()])
+    this->delete_node(_nodes[n->id()]);
+
+  _nodes[n->id()] = n;
+
+  return n;
+}
+
+
+
 void ParallelMesh::delete_node(Node* n)
 {
   assert (n != NULL);
@@ -274,7 +286,7 @@ void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
   std::vector<unsigned int> objects_on_proc(libMesh::n_processors(), 0);
   Parallel::allgather(objects_on_me, objects_on_proc);
 
-#ifdef DEBUG
+#ifndef NDEBUG
   unsigned int global_unpartitioned_objects = unpartitioned_objects;
   Parallel::max(global_unpartitioned_objects);
   assert(global_unpartitioned_objects == unpartitioned_objects);
