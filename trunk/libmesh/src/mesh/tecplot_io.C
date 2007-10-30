@@ -184,16 +184,24 @@ void TecplotIO::write_ascii (const std::string& fname,
 
     out << '\n';
     
-    if (mesh.mesh_dimension() != 1)
-      {
-	out << "Zone f=fepoint, n=" << mesh.n_nodes() << ", e=" << mesh.n_active_sub_elem();
+    out << "Zone f=fepoint, n=" << mesh.n_nodes() << ", e=" << mesh.n_active_sub_elem();
 	
-	if (mesh.mesh_dimension() == 2)
-	  out << ", et=quadrilateral\n";
-	else if (mesh.mesh_dimension() == 3)
-	  out << ", et=brick\n";
+    if (mesh.mesh_dimension() == 1)
+      out << ", et=lineseg";
+    else if (mesh.mesh_dimension() == 2)
+      out << ", et=quadrilateral";
+    else if (mesh.mesh_dimension() == 3)
+      out << ", et=brick";
+    else
+      {
+	// Dimension other than 1, 2, or 3?
+	error();
       }
-  }
+    
+    // Use default mesh color = black
+    out << ", c=black\n";
+    
+  } // finished writing header
 
   for (unsigned int i=0; i<mesh.n_nodes(); i++)
     {
