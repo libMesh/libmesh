@@ -26,11 +26,12 @@
 #include "libmesh_common.h"
 #include "libmesh_logging.h"
 #include "mesh_base.h"
+#include "parallel_mesh.h"
 #include "mesh_tools.h"
 #include "boundary_info.h"
 #include "mesh_communication.h"
+#include "parallel.h"
 #include "elem.h"
-#include "sphere.h"
 
 
 
@@ -38,70 +39,70 @@
 // MeshCommunication class members
 void MeshCommunication::clear ()
 {
-  _neighboring_processors.clear();
+  //  _neighboring_processors.clear();
 }
 
 
-#ifdef HAVE_MPI
-void MeshCommunication::find_neighboring_processors (const MeshBase& mesh)
-{
-  // Don't need to do anything if there is
-  // only one processor.
-  if (libMesh::n_processors() == 1)
-    return;
+// #ifdef HAVE_MPI
+// void MeshCommunication::find_neighboring_processors (const MeshBase& mesh)
+// {
+//   // Don't need to do anything if there is
+//   // only one processor.
+//   if (libMesh::n_processors() == 1)
+//     return;
   
-  _neighboring_processors.clear();
+//   _neighboring_processors.clear();
 
-  // Get the bounding sphere for the local processor
-  Sphere bounding_sphere =
-    MeshTools::processor_bounding_sphere (mesh, libMesh::processor_id());
+//   // Get the bounding sphere for the local processor
+//   Sphere bounding_sphere =
+//     MeshTools::processor_bounding_sphere (mesh, libMesh::processor_id());
 
-  // Just to be sure, increase its radius by 10%.  Sure would suck to
-  // miss a neighboring processor!
-  bounding_sphere.radius() *= 1.1;
+//   // Just to be sure, increase its radius by 10%.  Sure would suck to
+//   // miss a neighboring processor!
+//   bounding_sphere.radius() *= 1.1;
 
-  // Collect the bounding spheres from all processors, test for intersection
-  {
-    std::vector<float>
-      send (4,                         0),
-      recv (4*libMesh::n_processors(), 0);
+//   // Collect the bounding spheres from all processors, test for intersection
+//   {
+//     std::vector<float>
+//       send (4,                         0),
+//       recv (4*libMesh::n_processors(), 0);
 
-    send[0] = bounding_sphere.center()(0);
-    send[1] = bounding_sphere.center()(1);
-    send[2] = bounding_sphere.center()(2);
-    send[3] = bounding_sphere.radius();
+//     send[0] = bounding_sphere.center()(0);
+//     send[1] = bounding_sphere.center()(1);
+//     send[2] = bounding_sphere.center()(2);
+//     send[3] = bounding_sphere.radius();
 
-    MPI_Allgather (&send[0], send.size(), MPI_FLOAT,
-		   &recv[0], send.size(), MPI_FLOAT,
-		   libMesh::COMM_WORLD);
+//     MPI_Allgather (&send[0], send.size(), MPI_FLOAT,
+// 		   &recv[0], send.size(), MPI_FLOAT,
+// 		   libMesh::COMM_WORLD);
 
 
-    for (unsigned int proc=0; proc<libMesh::n_processors(); proc++)
-      {
-	const Point center (recv[4*proc+0],
-			    recv[4*proc+1],
-			    recv[4*proc+2]);
+//     for (unsigned int proc=0; proc<libMesh::n_processors(); proc++)
+//       {
+// 	const Point center (recv[4*proc+0],
+// 			    recv[4*proc+1],
+// 			    recv[4*proc+2]);
 	
-	const Real radius = recv[4*proc+3];
+// 	const Real radius = recv[4*proc+3];
 
-	const Sphere proc_sphere (center, radius);
+// 	const Sphere proc_sphere (center, radius);
 
-	if (bounding_sphere.intersects(proc_sphere))
-	  _neighboring_processors.push_back(proc);
-      }
+// 	if (bounding_sphere.intersects(proc_sphere))
+// 	  _neighboring_processors.push_back(proc);
+//       }
 
-    // Print out the _neighboring_processors list
-    std::cout << "Processor " << libMesh::processor_id()
-	      << " intersects:" << std::endl;
-    for (unsigned int p=0; p<_neighboring_processors.size(); p++)
-      std::cout << " " << _neighboring_processors[p] << std::endl;
-  }
-}
-#else
-void MeshCommunication::find_neighboring_processors (const MeshBase&)
-{
-}
-#endif
+//     // Print out the _neighboring_processors list
+//     std::cout << "Processor " << libMesh::processor_id()
+// 	      << " intersects:" << std::endl;
+//     for (unsigned int p=0; p<_neighboring_processors.size(); p++)
+//       std::cout << " " << _neighboring_processors[p] << std::endl;
+//   }
+// }
+// #else
+// void MeshCommunication::find_neighboring_processors (const MeshBase&)
+// {
+// }
+// #endif
 
 
 
@@ -152,7 +153,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     buf[2] = total_weight;
     
     // Broadcast
-    MPI_Bcast (&buf[0], buf.size(), MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
+    Parallel::broadcast (buf);
 
     if (libMesh::processor_id() != 0)
       {
@@ -194,7 +195,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     assert (pts.size() == (3*n_nodes));
     
     // Broadcast the pts vector
-    MPI_Bcast (&pts[0], pts.size(), MPI_REAL, 0, libMesh::COMM_WORLD);
+    Parallel::broadcast (pts);
 
     // Add the nodes we just received if we are not
     // processor 0.
@@ -219,7 +220,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     // The conn array contains the information needed to construct each element.
     // Pack all this information into one communication to avoid two latency hits
     // For each element it is of the form
-    // [ etype subdomain_id self_ID parent_ID node_0 node_1 ... node_n]
+    // [ level etype subdomain_id self_ID parent_ID node_0 node_1 ... node_n]
     // We cannot use unsigned int because parent_ID can be negative
     std::vector<int> conn;
 
@@ -227,7 +228,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     // broadcast it to the other processors.
     if (libMesh::processor_id() == 0)
       {
-	conn.reserve (4*n_elem + total_weight);
+	conn.reserve (5*n_elem + total_weight);
 	
 	// We start from level 0. This is a bit simpler than in xdr_io.C
 	// because we do not have to worry about economizing by group elements
@@ -244,32 +245,18 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	    for (; it != it_end; ++it)
 	      {
 		const Elem* elem = *it;
-		
-		assert (elem != NULL);
-		
-		conn.push_back (static_cast<int>(elem->type()));
-		conn.push_back (static_cast<int>(elem->subdomain_id()));
-		conn.push_back (elem->id());
-		
-		// use parent_ID of -1 to indicate a level 0 element
-		if (level==0)
-		  conn.push_back(-1);
-		else
-		  conn.push_back(elem->parent()->id());
-		
-		for (unsigned int n=0; n<elem->n_nodes(); n++)
-		  conn.push_back (elem->node(n));		
+		pack_element (conn, elem);
 	      }
 	  }
       }
     else
-      conn.resize (4*n_elem + total_weight);
+      conn.resize (5*n_elem + total_weight);
     
     // Sanity check for all processors
-    assert (conn.size() == (4*n_elem + total_weight));
+    assert (conn.size() == (5*n_elem + total_weight));
     
     // Broadcast the element connectivity
-    MPI_Bcast (&conn[0], conn.size(), MPI_INT, 0, libMesh::COMM_WORLD);
+    Parallel::broadcast (conn);
 
     // Build the elements we just received if we are not
     // processor 0.
@@ -287,34 +274,27 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	  {
 	    // Declare the element that we will add
             Elem* elem = NULL;
-            
+
+	    // Unpack the element header
+	    const int level          = conn[cnt++];
             const ElemType elem_type = static_cast<ElemType>(conn[cnt++]);
-              
-            // get ID info
-	    const int subdomain_id = conn[cnt++];
-            const int self_ID      = conn[cnt++];
+	    const int subdomain_ID   = conn[cnt++];
+            const int self_ID        = conn[cnt++];
+            const int parent_ID      = conn[cnt++];
 	    
 #ifdef ENABLE_AMR
 
-            const int parent_ID    = conn[cnt++];
-
             if (parent_ID != -1) // Do a log(n) search for the parent
 	      {
-		Elem* my_parent;
-                
-                // Search for parent in the parents map (log(n))
-                std::map<unsigned int, Elem*>::iterator it = parents.find(parent_ID);
+		Elem* my_parent = parents.count(parent_ID) ? parents[parent_ID] : NULL;
                 
                 // If the parent was not previously added, we cannot continue.
-                if (it == parents.end())
+                if (my_parent == NULL)
 		  {
 		    std::cerr << "Parent element with ID " << parent_ID 
 			      << " not found." << std::endl; 
 		    error();
 		  }
-
-                // Set the my_parent pointer
-                my_parent = (*it).second;
 		
 		my_parent->set_refinement_flag(Elem::INACTIVE);
 		
@@ -325,14 +305,17 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	      }
 	    
             else // level 0 element has no parent
-#endif // #ifdef ENABLE_AMR
+#endif 
 	      {
+		assert (level == 0);
+		
 		// should be able to just use the integer elem_type
 		elem = Elem::build(elem_type).release();
 	      }
 
 	    // Assign the IDs
-            elem->subdomain_id() = subdomain_id;
+	    assert (elem->level() == static_cast<unsigned int>(level));
+            elem->subdomain_id() = subdomain_ID;
             elem->set_id() = self_ID;
 	    
             // Add elem to the map of parents, since it may have
@@ -431,7 +414,7 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
     unsigned int n_bcs = el_id.size();
 
     // Broadcast the number of bcs to expect from processor 0.
-    MPI_Bcast (&n_bcs, 1, MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
+    Parallel::broadcast (n_bcs);
 
     // Only continue if we have element BCs
     if (n_bcs > 0)
@@ -442,13 +425,13 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
 	bc_id.resize   (n_bcs);
 	
 	// Broadcast the element identities
-	MPI_Bcast (&el_id[0],   n_bcs, MPI_UNSIGNED,       0, libMesh::COMM_WORLD);
+	Parallel::broadcast (el_id);
 
 	// Broadcast the side ids for those elements
-	MPI_Bcast (&side_id[0], n_bcs, MPI_UNSIGNED_SHORT, 0, libMesh::COMM_WORLD);
+	Parallel::broadcast (side_id);
 
 	// Broadcast the bc ids for each side
-	MPI_Bcast (&bc_id[0],   n_bcs, MPI_SHORT,          0, libMesh::COMM_WORLD);
+	Parallel::broadcast (bc_id);
 
 	// Build the boundary_info structure if we aren't processor 0
 	if (libMesh::processor_id() != 0)
@@ -485,7 +468,7 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
     unsigned int n_bcs = node_id.size();
 
     // Broadcast the number of bcs to expect from processor 0.
-    MPI_Bcast (&n_bcs, 1, MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
+    Parallel::broadcast (n_bcs);
 
     // Only continue if we have nodal BCs
     if (n_bcs > 0)
@@ -495,10 +478,10 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
 	bc_id.resize   (n_bcs);
 	
 	// Broadcast the node ids
-	MPI_Bcast (&node_id[0], n_bcs, MPI_UNSIGNED, 0, libMesh::COMM_WORLD);
+	Parallel::broadcast (node_id);
 	
 	// Broadcast the bc ids for each side
-	MPI_Bcast (&bc_id[0],   n_bcs, MPI_SHORT,    0, libMesh::COMM_WORLD);
+	Parallel::broadcast (bc_id);
 
 	// Build the boundary_info structure if we aren't processor 0
 	if (libMesh::processor_id() != 0)
@@ -526,4 +509,309 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
   error();
 
 #endif  
+}
+
+
+
+void MeshCommunication::allgather (ParallelMesh& mesh) const
+{
+#ifndef HAVE_MPI
+  
+  // NO MPI == one processor, no need for this method
+  return;
+  
+#else
+
+  // Check for quick return
+  if (libMesh::n_processors() == 1)
+    return;
+
+  START_LOG ("allgather()","MeshCommunication");
+  
+  // Gather the number of nodes and elements on each processor.
+  std::vector<unsigned int>
+    n_nodes(libMesh::n_processors()), n_elem(libMesh::n_processors());
+  
+  {
+    std::vector<unsigned int> n_objects(2);
+    n_objects[0] = mesh.n_local_nodes();
+    n_objects[1] = mesh.n_local_elem();
+
+    Parallel::allgather(n_objects);
+    
+    for (unsigned int p=0, idx=0; p<libMesh::n_processors(); p++)
+      {
+	n_nodes[p] = n_objects[idx++];
+	n_elem[p]  = n_objects[idx++];	
+      }
+
+    assert (mesh.n_local_nodes() == n_nodes[libMesh::processor_id()]);
+    assert (mesh.n_local_elem()  ==  n_elem[libMesh::processor_id()]);
+  }
+
+  std::vector<unsigned int>
+    node_offsets(libMesh::n_processors(), 0),
+    elem_offsets(libMesh::n_processors(), 0);
+
+  for (unsigned int p=1; p<libMesh::n_processors(); p++)
+    {
+      node_offsets[p] = node_offsets[p-1] + n_nodes[p-1];
+      elem_offsets[p] = elem_offsets[p-1] +  n_elem[p-1];
+    }
+
+  
+  
+  //-------------------------------------------------
+  // Gather the nodal coordinates from each processor.
+  {
+    std::vector<Real> xyz; xyz.reserve(n_nodes[libMesh::processor_id()]);
+    
+    ParallelMesh::node_iterator       it  = mesh.local_nodes_begin();
+    const ParallelMesh::node_iterator end = mesh.local_nodes_end();
+
+    for (; it != end; ++it)
+      {
+	assert (*it != NULL);
+	    
+	const Point &p = **it;
+
+	xyz.push_back(p(0));
+	xyz.push_back(p(1));
+	xyz.push_back(p(2));
+      }
+
+    assert (xyz.size() == 3*n_nodes[libMesh::processor_id()]);
+
+    // Get values from other processors
+    Parallel::allgather (xyz);
+
+    // And add them to our mesh.
+    for (unsigned int p=0; p<libMesh::n_processors(); p++)
+      if (p == libMesh::processor_id()) continue; // We've already got our
+                                                  // own local nodes!
+      else
+	{
+	  const unsigned int
+	    first_global_idx = node_offsets[p],
+	    last_global_idx  = first_global_idx + n_nodes[p];
+
+	  // Extract the coordinates for each node belonging to processor p
+	  // and add it to our mesh.
+	  for (unsigned int global_idx = first_global_idx; global_idx<last_global_idx; global_idx++)
+	    {	      
+	      Node *node = Node::build(xyz[3*global_idx + 0],
+				       xyz[3*global_idx + 1],
+				       xyz[3*global_idx + 2],
+				       global_idx).release();
+	      
+	      assert (node != NULL);
+	      assert (node->id() == global_idx);
+	      
+	      node->processor_id() = p;
+
+	      mesh.insert_node(node);
+	    }
+	}
+    
+    // At this point all processors should contain every node in the mesh. Let's
+    // be sure, but only when NDEBUG is not defined.
+#ifndef NDEBUG
+    unsigned int global_n_nodes = mesh.n_nodes();
+    Parallel::max(global_n_nodes);
+    assert (global_n_nodes == mesh.n_nodes());
+#endif
+  }
+  
+  
+  //----------------------------------------------------
+  // Gather the element connectivity from each processor.
+  {
+    // Get the sum of elem->n_nodes() for all local elements.  This
+    // will allow for efficient preallocation.
+    const unsigned int
+      local_weight   = MeshTools::weight(mesh),
+      local_n_levels = MeshTools::n_levels(mesh); // Strictly speaking, this looks at all elements,
+                                                  // not just the local ones.  That is OK, though. 
+
+    unsigned int global_n_levels = local_n_levels;
+    Parallel::max (global_n_levels);
+    
+    // The conn array contains the information needed to construct each element.
+    std::vector<int> conn; conn.reserve (5*n_elem[libMesh::processor_id()] + local_weight);
+						
+    for (unsigned int level=0; level<=local_n_levels; level++)
+      {
+	// TODO:[BSK] implement local_level_elements iterators
+	ParallelMesh::element_iterator
+	  it  = mesh.level_elements_begin(level),
+	  end = mesh.level_elements_end(level);
+
+	for (; it != end; ++it)
+	  {
+	    const Elem* elem = *it;
+
+	    assert (elem != NULL);
+	    assert (elem->level() == level);
+	    
+	    // Only local elements!
+	    if (elem->processor_id() != libMesh::processor_id()) continue;
+
+	    pack_element (conn, elem);	    
+	  }
+      } // ...that was easy.
+
+    // Get the size of the connectivity array on each processor
+    std::vector<unsigned int>
+      conn_size (libMesh::n_processors(), 0),
+      conn_offset (libMesh::n_processors(), 0);
+    
+    Parallel::allgather (static_cast<unsigned int>(conn.size()), conn_size);
+
+    for (unsigned int p=1; p<libMesh::n_processors(); p++)
+      conn_offset[p] = conn_offset[p-1] + conn_size[p-1];    
+    
+    // Get the element connectivity from all the other processors
+    Parallel::allgather (conn);
+
+
+        
+    // And add them to our mesh.
+    // This is a little tricky.  We need to insure that parents are added before children. So we need
+    // to add elements level-wise to handle, for example, the case where a child on
+    // processor [0] has a parent on processor [1].  But we also need to add the elements processor-wise
+    // so that we can set the processor_id() properly.  So, loop on levels/processors
+    for (unsigned int level=0; level<=global_n_levels; level++)
+      for (unsigned int p=0; p<libMesh::n_processors(); p++)
+	if (p == libMesh::processor_id()) continue; // We've already got our
+    // own local elements!
+	else
+	  {
+	    unsigned int cnt = conn_offset[p]; // counter into the conn[] array.
+	    
+	    const unsigned int
+	      first_global_idx = elem_offsets[p],
+	      last_global_idx  = first_global_idx + n_elem[p];
+
+	    // Process each element for processor p.
+	    while (cnt < (conn_offset[p] + conn_size[p]))
+	      {
+		// Unpack the element header
+		const unsigned int elem_level = conn[cnt++];
+		const ElemType elem_type      = static_cast<ElemType>(conn[cnt++]);
+		const int subdomain_ID        = conn[cnt++];
+		const unsigned int self_ID    = conn[cnt++];
+		const int parent_ID           = conn[cnt++];
+
+		// We require contiguous numbering on each processor
+		// for elements.
+		assert (self_ID >= first_global_idx);
+		assert (self_ID  < last_global_idx);
+		  
+		// Ignore elements not matching the current level.  We
+		// have to do this in a somewhat expensive fashion since
+		// there is no good way to determine the number of nodes
+		// in an element type without constructing one.
+		if (elem_level > level) // build an element of elem_type and skip elem->n_nodes()
+		  {                     // entries in the conn array.
+		    AutoPtr<Elem> elem = Elem::build (elem_type);
+
+		    cnt += elem->n_nodes();
+		  }
+
+		else if (elem_level < level) // we should already have this element, so there
+		  {                          // is no need to construct a dummy element of this type
+		    const Elem* elem = mesh.elem(self_ID);
+
+		    assert (elem->subdomain_id() == subdomain_ID);
+		    assert (elem->id()           == self_ID);
+
+		    cnt += elem->n_nodes();
+		  }
+
+		// Those are the easy cases...
+		else // elem_level == level
+		  {
+		    // Declare the element we will add
+		    Elem* elem = NULL;
+
+		    // Maybe find its parent
+		    if (level > 0)
+		      {
+			Elem* my_parent = mesh.elem(parent_ID);
+
+			// If the parent was not previously added, we cannot continue.
+			if (my_parent == NULL)
+			  {
+			    std::cerr << "Parent element with ID " << parent_ID 
+				      << " not found." << std::endl; 
+			    error();
+			  }
+		
+			my_parent->set_refinement_flag(Elem::INACTIVE);
+		    
+			elem = Elem::build(elem_type,my_parent).release();
+		      }
+		    else
+		      elem = Elem::build(elem_type).release();
+		      
+		    // Assign the IDs
+		    assert (elem->level() == static_cast<unsigned int>(level));
+		    elem->subdomain_id() = subdomain_ID;
+		    elem->set_id()       = self_ID;
+	    
+		    // Assign the connectivity
+		    for (unsigned int n=0; n<elem->n_nodes(); n++)
+		      {
+			assert (cnt < conn.size());
+		
+			elem->set_node(n) = mesh.node_ptr (conn[cnt++]);
+		      }
+
+		    // Good to go.  Add to the mesh.
+		    mesh.insert_elem(elem);
+		    
+		  } // end elem_level == level
+	      }
+	    
+	  }
+    
+    
+    // At this point all processors should contain every element in the mesh. Let's
+    // be sure, but only when NDEBUG is not defined.
+#ifndef NDEBUG
+    unsigned int global_n_elem = mesh.n_elem();
+    Parallel::max(global_n_elem);
+    assert (global_n_elem == mesh.n_elem());
+#endif
+  }
+
+  // All done!
+  STOP_LOG ("allgather()","MeshCommunication");
+  
+#endif
+}
+
+
+
+// Pack all this information into one communication to avoid two latency hits
+// For each element it is of the form
+// [ level etype subdomain_id self_ID parent_ID node_0 node_1 ... node_n]
+// We cannot use unsigned int because parent_ID can be negative
+void MeshCommunication::pack_element (std::vector<int> &conn, const Elem* &elem) const
+{
+  assert (elem != NULL);
+  
+  conn.push_back (static_cast<int>(elem->level()));
+  conn.push_back (static_cast<int>(elem->type()));
+  conn.push_back (static_cast<int>(elem->subdomain_id()));
+  conn.push_back (elem->id());
+		
+  // use parent_ID of -1 to indicate a level 0 element
+  if (elem->level() == 0)
+    conn.push_back(-1);
+  else
+    conn.push_back(elem->parent()->id());
+  
+  for (unsigned int n=0; n<elem->n_nodes(); n++)
+    conn.push_back (elem->node(n));		
 }

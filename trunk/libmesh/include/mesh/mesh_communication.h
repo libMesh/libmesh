@@ -25,7 +25,6 @@
 
 
 // C++ Includes   -----------------------------------
-#include <vector>
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
@@ -33,6 +32,7 @@
 
 // Forward declarations
 class MeshBase;
+class ParallelMesh;
 class BoundaryInfo;
 
 
@@ -67,15 +67,15 @@ public:
    */
   void clear ();
 
-  /**
-   * Finds all the processors that may contain
-   * elements that neighbor my elements.  This list
-   * is guaranteed to include all processors that border
-   * any of my elements, but may include additional ones as
-   * well.  This method computes bounding boxes for the
-   * elements on each processor and checks for overlaps.
-   */
-  void find_neighboring_processors(const MeshBase& );
+//   /**
+//    * Finds all the processors that may contain
+//    * elements that neighbor my elements.  This list
+//    * is guaranteed to include all processors that border
+//    * any of my elements, but may include additional ones as
+//    * well.  This method computes bounding boxes for the
+//    * elements on each processor and checks for overlaps.
+//    */
+//   void find_neighboring_processors(const MeshBase& );
 
   /**
    * This method takes a mesh (which is assumed to reside on
@@ -86,10 +86,14 @@ public:
   void broadcast (MeshBase& ) const;
 
   /**
-   * Each processor will broadcasts its elements and nodes
-   * to its neighboring processors.
+   * This method takes an input \p ParallelMesh which may be
+   * distributed among all the processors.  Each processor then
+   * sends its local nodes and elements to the other processors.
+   * The end result is that a previously distributed \p ParallelMesh
+   * will be serialized on each processor.  Since this method is
+   * collective it must be called by all processors.
    */
-  void distribute (MeshBase& ) const {}
+  void allgather (ParallelMesh& ) const;
 
   
 private:
@@ -105,10 +109,17 @@ private:
   void broadcast_bcs (MeshBase&, BoundaryInfo&) const;
 
   /**
-   * The processors who neighbor the current
-   * processor
+   * Packs the element \p elem at the end of vector \p conn.
+   * This includes all the information needed to rebuild the element
+   * on a remote processor, including refinement state.
    */
-  std::vector<unsigned short int> _neighboring_processors;
+  void pack_element (std::vector<int> &conn, const Elem* &elem) const;
+
+//   /**
+//    * The processors who neighbor the current
+//    * processor
+//    */
+//   std::vector<unsigned short int> _neighboring_processors;
 };
 
 
