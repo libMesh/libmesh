@@ -47,6 +47,21 @@ unsigned int MeshTools::total_weight(const MeshBase& mesh)
 
 
 
+unsigned int MeshTools::weight(const MeshBase& mesh, const unsigned int pid)
+{
+  unsigned int weight=0;
+
+  MeshBase::const_element_iterator       el  = mesh.pid_elements_begin(pid);
+  const MeshBase::const_element_iterator end = mesh.pid_elements_end(pid); 
+
+  for ( ; el != end; ++el)
+    weight += (*el)->n_nodes();
+  
+  return weight;
+}
+
+
+
 void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
 					 std::vector<std::vector<unsigned int> >& nodes_to_elem_map)
 {

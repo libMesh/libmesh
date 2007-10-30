@@ -69,6 +69,14 @@ namespace MeshTools
   unsigned int total_weight (const MeshBase& mesh);
   
   /**
+   * This function returns the sum over all the elemenents on processor \p pid
+   * of nodes per element.  This can be useful for partitioning hybrid meshes.
+   * A feasible load balancing scheme is to keep the weight per processor as
+   * uniform as possible.
+   */
+  unsigned int weight (const MeshBase& mesh, const unsigned int pid=libMesh::processor_id());
+  
+  /**
    * After calling this function the input vector \p nodes_to_elem_map
    * will contain the node to element connectivity.  That is to say
    * \p nodes_to_elem_map[i][j] is the global number of \f$ j^{th} \f$
