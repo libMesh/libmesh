@@ -818,7 +818,8 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 		    else
 		      {
 		        std::cout << "Encountered an unrecognized element "
-			          << "type.  Possibly a dim-1 dimensional "
+			          << "type: " << (*it)->type()
+				  << "\nPossibly a dim-1 dimensional "
 			          << "element?  Aborting..."
 			          << std::endl;
 		        error();
