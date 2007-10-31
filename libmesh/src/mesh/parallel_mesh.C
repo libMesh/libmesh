@@ -275,6 +275,9 @@ void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
   unsigned int objects_on_me = 0;
   unsigned int unpartitioned_objects = 0;
 
+  std::vector<unsigned int>
+    ghost_objects_from_proc(libMesh::n_processors(), 0);
+
   object_iterator it  = objects.begin();
   object_iterator end = objects.end();
 
@@ -289,6 +292,7 @@ void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
       else
         {
           unsigned int obj_procid = obj->processor_id();
+          ghost_objects_from_proc[obj_procid]++;
           if (obj_procid == libMesh::processor_id())
             objects_on_me++;
           else if (obj_procid == DofObject::invalid_processor_id)
@@ -304,6 +308,8 @@ void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
   unsigned int global_unpartitioned_objects = unpartitioned_objects;
   Parallel::max(global_unpartitioned_objects);
   assert(global_unpartitioned_objects == unpartitioned_objects);
+  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+    assert(ghost_objects_from_proc[p] <= objects_on_proc[p]);
 #endif
 
   // We'll renumber objects in blocks by processor id
@@ -324,7 +330,7 @@ void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
   // each.
   for (unsigned int p=0; p != libMesh::n_processors(); ++p)
     if (p != libMesh::processor_id())
-      requested_ids[p].reserve(objects_on_proc[p]);
+      requested_ids[p].reserve(ghost_objects_from_proc[p]);
 
   end = objects.end();
   for (it = objects.begin(); it != end; ++it)
