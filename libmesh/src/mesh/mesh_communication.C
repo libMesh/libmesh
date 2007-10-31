@@ -671,6 +671,8 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	  }
       } // ...that was easy.
 
+    assert (conn.size() == 5*n_elem[libMesh::processor_id()] + local_weight);
+
     // Get the size of the connectivity array on each processor
     std::vector<unsigned int>
       conn_size   (libMesh::n_processors(), 0),
@@ -780,7 +782,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 		    for (unsigned int n=0; n<elem->n_nodes(); n++)
 		      {
 			assert (cnt < conn.size());
-		
+			
 			elem->set_node(n) = mesh.node_ptr (conn[cnt++]);
 		      }
 
