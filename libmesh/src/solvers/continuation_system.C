@@ -23,6 +23,7 @@
 #include "time_solver.h"
 #include "newton_solver.h"
 #include "sparse_matrix.h"
+#include "petsc_linear_solver.h" // for access to print_converged_reason
 
 ContinuationSystem::ContinuationSystem (EquationSystems& es,
 					const std::string& name,
@@ -44,6 +45,7 @@ ContinuationSystem::ContinuationSystem (EquationSystems& es,
     ds_min(1.e-8),
     predictor(Euler),
     newton_stepgrowth_aggressiveness(1.),
+    newton_progress_check(true),
     rhs_mode(Residual),
     linear_solver(LinearSolver<Number>::build()),
     tangent_initialized(false),
@@ -406,8 +408,8 @@ void ContinuationSystem::continuation_solve()
       // will tell us the convergence status of Newton's method.
       bool newton_converged = false;
 
-      // The nonlinear residual at the end of the previous "k-1" Newton step
-      //Real old_nonlinear_residual = 0.;
+      // The nonlinear residual before *any* nonlinear steps have been taken.
+      Real nonlinear_residual_firststep = 0.;
 
       // The nonlinear residual from the current "k" Newton step, before the Newton step
       Real nonlinear_residual_beforestep = 0.;
@@ -473,6 +475,12 @@ void ContinuationSystem::continuation_solve()
 	  if (newton_step==0)
 	    {
 	      nonlinear_residual_beforestep = rhs->l2_norm();
+
+	      // Store the residual before any steps have been taken.  This will *not*
+	      // be updated at each step, and can be used to see if any progress has
+	      // been made from the initial residual at later steps.
+	      nonlinear_residual_firststep = nonlinear_residual_beforestep;
+
 	      const Real old_norm_u = solution->l2_norm();
 	      std::cout << "  (before step) ||R||_{L2} = " << nonlinear_residual_beforestep << std::endl;
 	      std::cout << "  (before step) ||R||_{L2}/||u|| = " << nonlinear_residual_beforestep / old_norm_u << std::endl;
@@ -503,14 +511,39 @@ void ContinuationSystem::continuation_solve()
 	  z->zero(); // It seems to be extremely important to zero z here, otherwise the solver quits early.
 	  z->close();
 	  
-	  rval =
-	    linear_solver->solve(*matrix,
-				 *z,
-				 *rhs,
-				 //1.e-12,
-				 current_linear_tolerance,
-				 newton_solver->max_linear_iterations);   // max linear iterations
+	  // It's possible that we have selected the current_linear_tolerance so large that
+	  // a guess of z=zero yields a linear system residual |Az + R| small enough that the
+	  // linear solver exits in zero iterations.  If this happens, we will reduce the
+	  // current_linear_tolerance until the linear solver does at least 1 iteration.
+	  do
+	    {
+	      rval =
+		linear_solver->solve(*matrix,
+				     *z,
+				     *rhs,
+				     //1.e-12,
+				     current_linear_tolerance,
+				     newton_solver->max_linear_iterations);   // max linear iterations
+	      
+	      if (rval.first==0)
+		{
+		  if (newton_step==0)
+		    {
+		      std::cout << "Repeating initial solve with smaller linear tolerance!" << std::endl;
+		      current_linear_tolerance *= initial_newton_tolerance; // reduce the linear tolerance to force the solver to do some work
+		    }
+		  else
+		    {
+		      // We shouldn't get here ... it means the linear solver did no work on a Newton
+		      // step other than the first one.  If this happens, we need to think more about our
+		      // tolerance selection.
+		      error();
+		    }
+		}
+	      
+	    } while (rval.first==0);
 
+	  
 	  if (!quiet)
 	    std::cout << "  G_u*z = G solver converged at step "
 		      << rval.first
@@ -524,11 +557,22 @@ void ContinuationSystem::continuation_solve()
 	  // we should break out of the Newton iteration loop because nothing further is
 	  // going to happen...  Of course if the tolerance is already small enough after
 	  // zero iterations (how can this happen?!) we should not quit.
-	  if ((rval.first == 0) && (rval.second > current_linear_tolerance))
+	  if ((rval.first == 0) && (rval.second > current_linear_tolerance*nonlinear_residual_beforestep))
 	    {
 	      if (!quiet)
 		std::cout << "Linear solver exited in zero iterations!" << std::endl;
 
+	      // Try to find out the reason for convergence/divergence
+	      {
+		PetscLinearSolver<Number>* petsc_linear_solver =
+		  dynamic_cast<PetscLinearSolver<Number>*>(linear_solver.get());
+
+		if (petsc_linear_solver)
+		  {
+		    petsc_linear_solver->print_converged_reason();
+		  }
+	      }
+	      
 	      break; // out of Newton iterations
 	    }
 	  
@@ -786,7 +830,27 @@ void ContinuationSystem::continuation_solve()
 		}
 	    }
 
-
+	  // Another type of convergence check: suppose the residual has not been reduced
+	  // from its initial value after half of the allowed Newton steps have occurred.
+	  // In our experience, this typically means that it isn't going to converge and
+	  // we could probably save time by dropping out of the Newton iteration loop and
+	  // trying a smaller arcstep.
+	  if (this->newton_progress_check)
+	    {
+	      if ((nonlinear_residual_afterstep > nonlinear_residual_firststep) &&
+		  (newton_step+1 > static_cast<unsigned int>(0.5*newton_solver->max_nonlinear_iterations)))
+		{
+		  std::cout << "Progress check failed: the current residual: "
+			    << nonlinear_residual_afterstep
+			    << ", is\n"
+			    << "larger than the initial residual, and half of the allowed\n"
+			    << "number of Newton iterations have elapsed.\n"
+			    << "Exiting Newton iterations with converged==false." << std::endl;
+	      
+		  break; // out of Newton iteration loop, newton_converged = false
+		}
+	    }
+	  
 	  // Safety check: Check the current continuation parameter against user-provided min-allowable parameter value
 	  if (*continuation_parameter < min_continuation_parameter)
 	    {
@@ -1229,11 +1293,12 @@ void ContinuationSystem::update_solution()
       // 	ds_current *= yold_over_y;
 
       // 4.) Double-or-halve.  We double the arc-step if the ratio of successive tangents
-      // is larger than some pre-determined value, halve it if it is less than some other
-      // pre-determined value.
-      if (yold_over_y > 1.0)
+      // is larger than 'double_threshold', halve it if it is less than 'halve_threshold'
+      const Real double_threshold = 0.5;
+      const Real halve_threshold  = 0.5;
+      if (yold_over_y > double_threshold)
       	ds_current *= 2.;
-      else if (yold_over_y < 0.9)
+      else if (yold_over_y < halve_threshold)
       	ds_current *= 0.5;
 	
       
