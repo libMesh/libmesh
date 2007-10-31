@@ -187,10 +187,24 @@ Node* ParallelMesh::add_point (const Point& p)
 
 Node* ParallelMesh::insert_node (Node* n)
 {
-  if (_nodes[n->id()])
-    this->delete_node(_nodes[n->id()]);
+  // If we already have this node we cannot
+  // simply delete it, because we may have elements
+  // which are attached to its address.
+  //
+  // Instead, call the Node copy constructor to
+  // overwrite the current node (but keep its address),
+  // delete the provided node, and return the address of
+  // the one we already had.
+  if (_nodes.count(n->id()))
+    {
+      Node *my_n = _nodes[n->id()];
 
-  _nodes[n->id()] = n;
+      *my_n = *n;
+      delete n;
+      n = my_n;
+    }
+  else
+    _nodes[n->id()] = n;
 
   return n;
 }
@@ -425,7 +439,7 @@ void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
 
 void ParallelMesh::renumber_nodes_and_elements ()
 {
-  START_LOG("renumber_nodes_and_elem()", "Mesh");
+  START_LOG("renumber_nodes_and_elem()", "ParallelMesh");
 
   std::set<unsigned int> used_nodes;
 
@@ -473,13 +487,15 @@ void ParallelMesh::renumber_nodes_and_elements ()
   // and all the remaining nodes
   this->renumber_dof_objects (_nodes);
 
-  STOP_LOG("renumber_nodes_and_elem()", "Mesh");
+  STOP_LOG("renumber_nodes_and_elem()", "ParallelMesh");
 }
 
 
 
 void ParallelMesh::delete_nonlocal_elements()
 {
+  START_LOG("delete_nonlocal_elements()", "ParallelMesh");
+
   std::vector<bool> local_nodes(this->max_node_id(), false);
   std::vector<bool> semilocal_elems(this->max_elem_id(), false);
 
@@ -513,6 +529,8 @@ void ParallelMesh::delete_nonlocal_elements()
 //  We eventually want to compact the _nodes and _elems vectors
 //  But not do a repartition or anything
 //  do not this->prepare_for_use();
+
+  STOP_LOG("delete_nonlocal_elements()", "ParallelMesh");
 }
 
 void ParallelMesh::restore_nonlocal_elements()
