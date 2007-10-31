@@ -32,7 +32,6 @@
 // Forward Declarations
 class DiffSolver;
 class DifferentiableSystem;
-class TimeSolver;
 
 /**
  * This is a generic class that defines a solver to handle
