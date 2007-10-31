@@ -552,11 +552,20 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
   std::vector<unsigned int>
     node_offsets(libMesh::n_processors(), 0),
     elem_offsets(libMesh::n_processors(), 0);
+  
+  // Compute the global sizes to cross-check the results of the
+  // operations that follow.
+  unsigned int
+    global_n_nodes = n_nodes[0], 
+    global_n_elem  = n_elem[0];
 
   for (unsigned int p=1; p<libMesh::n_processors(); p++)
     {
       node_offsets[p] = node_offsets[p-1] + n_nodes[p-1];
       elem_offsets[p] = elem_offsets[p-1] +  n_elem[p-1];
+
+      global_n_nodes += n_nodes[p];
+      global_n_elem  += n_elem[p];
     }
 
   
@@ -564,7 +573,7 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
   //-------------------------------------------------
   // Gather the nodal coordinates from each processor.
   {
-    std::vector<Real> xyz; xyz.reserve(n_nodes[libMesh::processor_id()]);
+    std::vector<Real> xyz; xyz.reserve(3*n_nodes[libMesh::processor_id()]);
     
     ParallelMesh::node_iterator       it  = mesh.local_nodes_begin();
     const ParallelMesh::node_iterator end = mesh.local_nodes_end();
@@ -613,13 +622,8 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
 	    }
 	}
     
-    // At this point all processors should contain every node in the mesh. Let's
-    // be sure, but only when NDEBUG is not defined.
-#ifndef NDEBUG
-    unsigned int global_n_nodes = mesh.n_nodes();
-    Parallel::max(global_n_nodes);
+    // Check the result
     assert (global_n_nodes == mesh.n_nodes());
-#endif
   }
   
   
@@ -662,7 +666,7 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
 
     // Get the size of the connectivity array on each processor
     std::vector<unsigned int>
-      conn_size (libMesh::n_processors(), 0),
+      conn_size   (libMesh::n_processors(), 0),
       conn_offset (libMesh::n_processors(), 0);
     
     Parallel::allgather (static_cast<unsigned int>(conn.size()), conn_size);
@@ -675,15 +679,16 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
 
 
         
-    // And add them to our mesh.
-    // This is a little tricky.  We need to insure that parents are added before children. So we need
-    // to add elements level-wise to handle, for example, the case where a child on
-    // processor [0] has a parent on processor [1].  But we also need to add the elements processor-wise
-    // so that we can set the processor_id() properly.  So, loop on levels/processors
+    // ...and add them to our mesh.
+    // This is a little tricky.  We need to insure that parents are added before children. 
+    // So we need to add elements level-wise to handle, for example, the case where a child on
+    // processor [0] has a parent on processor [1].  But we also need to add the elements 
+    // processor-wise so that we can set the processor_id() properly.  
+    // So, loop on levels/processors
     for (unsigned int level=0; level<=global_n_levels; level++)
       for (unsigned int p=0; p<libMesh::n_processors(); p++)
 	if (p == libMesh::processor_id()) continue; // We've already got our
-    // own local elements!
+                                                    // own local elements!
 	else
 	  {
 	    unsigned int cnt = conn_offset[p]; // counter into the conn[] array.
@@ -693,6 +698,7 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
 	      last_global_idx  = first_global_idx + n_elem[p];
 
 	    // Process each element for processor p.
+	    // Note this must work in the case when conn_size[p] == 0.
 	    while (cnt < (conn_offset[p] + conn_size[p]))
 	      {
 		// Unpack the element header
@@ -701,12 +707,13 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
 		const int subdomain_ID        = conn[cnt++];
 		const unsigned int self_ID    = conn[cnt++];
 		const int parent_ID           = conn[cnt++];
-
+	       
 		// We require contiguous numbering on each processor
 		// for elements.
 		assert (self_ID >= first_global_idx);
 		assert (self_ID  < last_global_idx);
-		  
+		assert ((level == 0) || (parent_ID != -1));
+  
 		// Ignore elements not matching the current level.  We
 		// have to do this in a somewhat expensive fashion since
 		// there is no good way to determine the number of nodes
@@ -757,6 +764,7 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
 		    // Assign the IDs
 		    assert (elem->level() == static_cast<unsigned int>(level));
 		    elem->subdomain_id() = subdomain_ID;
+		    elem->processor_id() = p;
 		    elem->set_id()       = self_ID;
 	    
 		    // Assign the connectivity
@@ -773,16 +781,10 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
 		  } // end elem_level == level
 	      }
 	    
-	  }
+	  }   
     
-    
-    // At this point all processors should contain every element in the mesh. Let's
-    // be sure, but only when NDEBUG is not defined.
-#ifndef NDEBUG
-    unsigned int global_n_elem = mesh.n_elem();
-    Parallel::max(global_n_elem);
+    // Check the result
     assert (global_n_elem == mesh.n_elem());
-#endif
   }
 
   // All done!
