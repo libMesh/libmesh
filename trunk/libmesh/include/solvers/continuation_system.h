@@ -245,6 +245,15 @@ public:
    * iterations required.
    */
   Real newton_stepgrowth_aggressiveness;
+
+  /**
+   * True by default, the Newton progress check allows the Newton loop
+   * to exit if half the allowed iterations have elapsed without a reduction
+   * in the *initial* residual.  In our experience this usually means the
+   * Newton steps are going to fail eventually and we could save some time
+   * by quitting early.
+   */
+  bool newton_progress_check;
   
 protected:
   /**
