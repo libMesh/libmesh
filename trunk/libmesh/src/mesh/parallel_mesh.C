@@ -272,7 +272,6 @@ void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
 
   // In parallel we may not know what objects other processors have.
   // Start by figuring out how many
-  unsigned int objects_on_me = 0;
   unsigned int unpartitioned_objects = 0;
 
   std::vector<unsigned int>
@@ -292,17 +291,17 @@ void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
       else
         {
           unsigned int obj_procid = obj->processor_id();
-          ghost_objects_from_proc[obj_procid]++;
-          if (obj_procid == libMesh::processor_id())
-            objects_on_me++;
-          else if (obj_procid == DofObject::invalid_processor_id)
+          if (obj_procid == DofObject::invalid_processor_id)
             unpartitioned_objects++;
+          else
+            ghost_objects_from_proc[obj_procid]++;
           ++it;
         }
     }
 
   std::vector<unsigned int> objects_on_proc(libMesh::n_processors(), 0);
-  Parallel::allgather(objects_on_me, objects_on_proc);
+  Parallel::allgather(ghost_objects_from_proc[libMesh::processor_id()],
+                      objects_on_proc);
 
 #ifndef NDEBUG
   unsigned int global_unpartitioned_objects = unpartitioned_objects;
