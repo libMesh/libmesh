@@ -64,7 +64,7 @@ function load_style($root)
               <?php echo "<a class=\"L2\" href = \"", $root, "doxygen/files.php\" title=\"Files\">Files</a><BR>"; ?>
 	<?php } ?>
  
-    <?php echo "<a class=\"L1\" href = \"", $root, "http://sourceforge.net/mail/?group_id=71130\" title=\"Sourceforge's Mailing List Page\">Mailing Lists</a><BR>" ?>
+    <?php echo "<a class=\"L1\" href = \"http://sourceforge.net/mail/?group_id=71130\" title=\"Sourceforge's Mailing List Page\">Mailing Lists</a><BR>" ?>
     <?php echo "<a class=\"L1\" href = \"", $root, "wiki/index.php/Gallery\" title=\"Results From Applications Which Use libMesh\">Gallery</a><BR>"; ?>
     <?php echo "<a class=\"L1\" href = \"", $root, "wiki\" title=\"External Wiki Page\">Wiki</a><BR>"; ?>
 </div>
