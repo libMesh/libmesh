@@ -763,10 +763,12 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 			    error();
 			  }
 		
-			my_parent->set_refinement_flag(Elem::INACTIVE);		    
 			elem = Elem::build(elem_type,my_parent).release();
+#ifdef ENABLE_AMR
+			my_parent->set_refinement_flag(Elem::INACTIVE);
 			elem->set_refinement_flag(Elem::JUST_REFINED);
 			my_parent->add_child(elem);
+#endif // ENABLE_AMR
 			assert (my_parent->type() == elem->type());
 		      }
 		    else
@@ -818,15 +820,15 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 #endif
 }
 
-void MeshCommunication::allgather_bcs (ParallelMesh& mesh) const
-{
 #ifndef HAVE_MPI
-  
+void MeshCommunication::allgather_bcs (ParallelMesh&) const
+{
   // NO MPI == one processor, no need for this method
   return;
-  
+}
 #else
-
+void MeshCommunication::allgather_bcs (ParallelMesh& mesh) const
+{
   // Check for quick return
   if (libMesh::n_processors() == 1)
     return;
@@ -838,9 +840,8 @@ void MeshCommunication::allgather_bcs (ParallelMesh& mesh) const
  
 
   STOP_LOG  ("allgather_bcs()","MeshCommunication");
-
-#endif
 }
+#endif
 
 
 
