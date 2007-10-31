@@ -353,8 +353,10 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	// over any key.
 	MeshBase::element_iterator it = mesh.elements_begin();
 	const MeshBase::element_iterator end = mesh.elements_end();
+
 	for (; it!=end; ++it)
 	  (*it)->compute_children_node_keys();
+
 #endif // #ifdef ENABLE_AMR
 	
       } // end if iam != cpu 0
@@ -515,6 +517,12 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
 
 void MeshCommunication::allgather (ParallelMesh& mesh) const
 {
+  this->allgather_mesh (mesh);
+  this->allgather_bcs  (mesh);
+}
+
+void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
+{
 #ifndef HAVE_MPI
   
   // NO MPI == one processor, no need for this method
@@ -526,7 +534,7 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
   if (libMesh::n_processors() == 1)
     return;
 
-  START_LOG ("allgather()","MeshCommunication");
+  START_LOG ("allgather_mesh()","MeshCommunication");
   
   // Gather the number of nodes and elements on each processor.
   std::vector<unsigned int>
@@ -646,9 +654,8 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
     for (unsigned int level=0; level<=local_n_levels; level++)
       {
 	// TODO:[BSK] implement local_level_elements iterators
-	ParallelMesh::element_iterator
-	  it  = mesh.level_elements_begin(level),
-	  end = mesh.level_elements_end(level);
+	ParallelMesh::element_iterator        it  = mesh.level_elements_begin(level);
+	const ParallelMesh::element_iterator  end = mesh.level_elements_end(level);
 
 	for (; it != end; ++it)
 	  {
@@ -754,9 +761,11 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
 			    error();
 			  }
 		
-			my_parent->set_refinement_flag(Elem::INACTIVE);
-		    
+			my_parent->set_refinement_flag(Elem::INACTIVE);		    
 			elem = Elem::build(elem_type,my_parent).release();
+			elem->set_refinement_flag(Elem::JUST_REFINED);
+			my_parent->add_child(elem);
+			assert (my_parent->type() == elem->type());
 		      }
 		    else
 		      elem = Elem::build(elem_type).release();
@@ -782,14 +791,52 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
 	      }
 	    
 	  }   
-    
+#ifdef ENABLE_AMR
+    // All the elements at each level have been added, and their node pointers
+    // have been set.  Now compute the node keys to put the mesh into a state consistent
+    // with the state after being constructed through normal refinements. 
+    // The new nodes were added through Mesh::add_point(), which
+    // allocates brand new memory for the point, and does not copy
+    // over any key.
+    ParallelMesh::element_iterator it = mesh.elements_begin();
+    const ParallelMesh::element_iterator end = mesh.elements_end();
+
+    for (; it!=end; ++it)
+      (*it)->compute_children_node_keys();
+
+#endif // #ifdef ENABLE_AMR
+
     // Check the result
     assert (global_n_elem == mesh.n_elem());
   }
 
   // All done!
-  STOP_LOG ("allgather()","MeshCommunication");
+  STOP_LOG ("allgather_mesh()","MeshCommunication");
   
+#endif
+}
+
+void MeshCommunication::allgather_bcs (ParallelMesh& mesh) const
+{
+#ifndef HAVE_MPI
+  
+  // NO MPI == one processor, no need for this method
+  return;
+  
+#else
+
+  // Check for quick return
+  if (libMesh::n_processors() == 1)
+    return;
+
+  START_LOG ("allgather_bcs()","MeshCommunication");
+  
+  std::cerr << "NOT IMPLEMENTED!!!" << std::endl;
+  here();
+ 
+
+  STOP_LOG  ("allgather_bcs()","MeshCommunication");
+
 #endif
 }
 
