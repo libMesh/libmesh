@@ -109,6 +109,16 @@ private:
   void broadcast_bcs (MeshBase&, BoundaryInfo&) const;
 
   /**
+   *
+   */
+  void allgather_mesh (ParallelMesh& ) const;
+
+  /**
+   *
+   */
+  void allgather_bcs (ParallelMesh& ) const;
+
+  /**
    * Packs the element \p elem at the end of vector \p conn.
    * This includes all the information needed to rebuild the element
    * on a remote processor, including refinement state.
