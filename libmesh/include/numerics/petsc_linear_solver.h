@@ -153,6 +153,12 @@ public:
    * and not the entire history.
    */
   Real get_initial_residual();
+
+  /**
+   * Prints a useful message about why the latest linear solve
+   * con(di)verged.
+   */
+  void print_converged_reason();
   
 private:
 
