@@ -31,7 +31,7 @@
 #include "string_to_enum.h"
 #include "dof_map.h"
 #include "numeric_vector.h"
-#include "mesh.h"
+#include "mesh_base.h"
 
 // includes for calculate_norm
 #include "fe_base.h"

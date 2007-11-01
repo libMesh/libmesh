@@ -32,7 +32,7 @@
 #include "parallel.h"
 #include "transient_system.h"
 #include "dof_map.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "elem.h"
 
 // Include the systems before this one to avoid
@@ -46,7 +46,7 @@
 
 // ------------------------------------------------------------
 // EquationSystems class implementation
-EquationSystems::EquationSystems (Mesh& m, MeshData* mesh_data) :
+EquationSystems::EquationSystems (MeshBase& m, MeshData* mesh_data) :
   _mesh      (m),
   _mesh_data (mesh_data)
 {

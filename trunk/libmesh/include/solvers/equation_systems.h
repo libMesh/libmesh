@@ -46,12 +46,12 @@
 class MeshData;
 //class System;
 class Elem;
-class Mesh;
+class MeshBase;
 
 /**
  * This is the \p EquationSystems class.  It is in charge
  * of handling all the various equation systems defined
- * for a \p Mesh.  It may have multiple systems, which may
+ * for a \p MeshBase.  It may have multiple systems, which may
  * be active or inactive, so that at different solution
  * stages only a sub-set may be solved for.  Also, through
  * the templated access, @e different types of systems
@@ -83,7 +83,7 @@ public:
   /**
    * Constructor.
    */
-  EquationSystems (Mesh& mesh, MeshData* mesh_data=NULL);
+  EquationSystems (MeshBase& mesh, MeshData* mesh_data=NULL);
 
   /**
    * Destructor.  Should be virtual, since the user may want to derive
@@ -338,12 +338,12 @@ public:
   /**
    * @returns a constant reference to the mesh
    */
-  const Mesh & get_mesh() const;
+  const MeshBase & get_mesh() const;
 
   /**
    * @returns a reference to the mesh
    */
-  Mesh & get_mesh();
+  MeshBase & get_mesh();
 
   /**
    * @returns true when the _mesh_data pointer is not NULL.
@@ -374,7 +374,7 @@ protected:
   /**
    * The mesh data structure
    */
-  Mesh& _mesh;
+  MeshBase& _mesh;
 
   /**
    * A pointer to the MeshData object you would like to use.
@@ -412,7 +412,7 @@ private:
 // ------------------------------------------------------------
 // EquationSystems inline methods
 inline
-const Mesh & EquationSystems::get_mesh () const
+const MeshBase & EquationSystems::get_mesh () const
 {
   return _mesh;
 }
@@ -420,7 +420,7 @@ const Mesh & EquationSystems::get_mesh () const
 
 
 inline
-Mesh & EquationSystems::get_mesh ()
+MeshBase & EquationSystems::get_mesh ()
 {
   return _mesh;
 }
