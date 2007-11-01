@@ -34,6 +34,7 @@ class Point;
 class Partitioner;
 class BoundaryInfo;
 class PointLocatorBase;
+class MeshData;
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
@@ -366,6 +367,13 @@ public:
    * std::cout << mesh << std::endl;
    */
   friend std::ostream& operator << (std::ostream& os, const MeshBase& m);
+
+  /**
+   * Interfaces for reading/writing a mesh to/from a file.  Must be
+   * implemented in derived classes.
+   */
+  virtual void read  (const std::string& name, MeshData* mesh_data=NULL) = 0;
+  virtual void write (const std::string& name, MeshData* mesh_data=NULL) = 0;
 
   /**
    * We need an empty, generic class to act as a predicate for this
