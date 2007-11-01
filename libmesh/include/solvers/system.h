@@ -36,7 +36,7 @@
 // Forward Declarations
 class System;
 class EquationSystems;
-class Mesh;
+class MeshBase;
 class Xdr;
 class DofMap;
 class Parameters;
@@ -201,12 +201,12 @@ public:
   /**
    * @returns a constant reference to this systems's \p _mesh.
    */
-  const Mesh & get_mesh() const;
+  const MeshBase & get_mesh() const;
   
   /**
    * @returns a reference to this systems's \p _mesh.
    */
-  Mesh & get_mesh();
+  MeshBase & get_mesh();
   
   /**
    * @returns a constant reference to this system's \p _dof_map.
@@ -603,7 +603,7 @@ private:
    * Constant reference to the \p mesh data structure used
    * for the simulation.   
    */
-  Mesh& _mesh;
+  MeshBase& _mesh;
   
   /**
    * A name associated with this system.
@@ -694,7 +694,7 @@ unsigned int System::number() const
 
 
 inline
-const Mesh & System::get_mesh() const
+const MeshBase & System::get_mesh() const
 {
   return _mesh;
 }
@@ -702,7 +702,7 @@ const Mesh & System::get_mesh() const
 
 
 inline
-Mesh & System::get_mesh()
+MeshBase & System::get_mesh()
 {
   return _mesh;
 }
