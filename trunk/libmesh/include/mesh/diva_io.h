@@ -26,7 +26,7 @@
 #include "mesh_output.h"
 
 // Forward declarations
-class UnstructuredMesh;
+class MeshBase;
 
 
 
@@ -41,7 +41,7 @@ class UnstructuredMesh;
 
 // ------------------------------------------------------------
 // DivaIO class definition
-class DivaIO : public MeshOutput<UnstructuredMesh>
+class DivaIO : public MeshOutput<MeshBase>
 {
 public:
   /**
@@ -49,7 +49,7 @@ public:
    * not a mesh generator.
    */
   //TODO:[JWP] figure out how to implement a const write method!
-  DivaIO (const UnstructuredMesh&);
+  DivaIO (const MeshBase&);
 
   /**
    * This method implements writing a mesh to a specified file.
@@ -72,8 +72,8 @@ private:
 // ------------------------------------------------------------
 // DivaIO inline members
 inline
-DivaIO::DivaIO (const UnstructuredMesh& mesh) :
-  MeshOutput<UnstructuredMesh>  (mesh)
+DivaIO::DivaIO (const MeshBase& mesh) :
+  MeshOutput<MeshBase>  (mesh)
 {}
 
 

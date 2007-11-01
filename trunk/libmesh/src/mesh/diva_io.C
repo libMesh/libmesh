@@ -74,8 +74,8 @@ void DivaIO::write_stream (std::ostream& out)
   here();
   std::cerr << "WARNING...  Sure you want to do this?"
 	    << std::endl;
-  UnstructuredMesh& mesh = const_cast<UnstructuredMesh&>
-    (MeshOutput<UnstructuredMesh>::mesh());
+  MeshBase& mesh = const_cast<MeshBase&>
+    (MeshOutput<MeshBase>::mesh());
 
   if (mesh.mesh_dimension() < 3)
     {
