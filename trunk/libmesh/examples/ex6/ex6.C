@@ -225,7 +225,7 @@ void assemble_wave(EquationSystems& es,
 #ifdef ENABLE_INFINITE_ELEMENTS
   
   // Get a constant reference to the mesh object.
-  const Mesh& mesh = es.get_mesh();
+  const MeshBase& mesh = es.get_mesh();
 
   // Get a reference to the system we are solving.
   LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Wave");
