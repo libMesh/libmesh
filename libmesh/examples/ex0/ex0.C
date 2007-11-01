@@ -171,7 +171,7 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
   assert(system_name == "1D");
 
   // Get a reference to the mesh object
-  const Mesh& mesh = es.get_mesh();
+  const MeshBase& mesh = es.get_mesh();
 
   // The dimension we are using, i.e. dim==1
   const unsigned int dim = mesh.mesh_dimension();

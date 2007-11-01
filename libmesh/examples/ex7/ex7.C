@@ -279,7 +279,7 @@ void assemble_helmholtz(EquationSystems& es,
   assert (system_name == "Helmholtz");
   
   // Get a constant reference to the mesh object.
-  const Mesh& mesh = es.get_mesh();
+  const MeshBase& mesh = es.get_mesh();
   
   // The dimension that we are in
   const unsigned int dim = mesh.mesh_dimension();

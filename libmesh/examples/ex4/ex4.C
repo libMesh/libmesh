@@ -276,7 +276,7 @@ void assemble_poisson(EquationSystems& es,
   PerfLog perf_log ("Matrix Assembly");
   
     // Get a constant reference to the mesh object.
-  const Mesh& mesh = es.get_mesh();
+  const MeshBase& mesh = es.get_mesh();
 
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();

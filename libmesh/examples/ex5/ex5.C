@@ -200,7 +200,7 @@ void assemble_poisson(EquationSystems& es,
 {
   assert (system_name == "Poisson");
 
-  const Mesh& mesh = es.get_mesh();
+  const MeshBase& mesh = es.get_mesh();
 
   const unsigned int dim = mesh.mesh_dimension();
 

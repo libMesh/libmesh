@@ -339,7 +339,7 @@ void assemble_wave(EquationSystems& es,
   assert (system_name == "Wave");
 
   // Get a constant reference to the mesh object.
-  const Mesh& mesh = es.get_mesh();
+  const MeshBase& mesh = es.get_mesh();
 
   // The dimension that we are running.
   const unsigned int dim = mesh.mesh_dimension();
@@ -590,7 +590,7 @@ void fill_dirichlet_bc(EquationSystems& es,
   NumericVector<Number>& rhs    = *t_system.rhs;
 
   // Get a constant reference to the mesh object.
-  const Mesh& mesh = es.get_mesh();
+  const MeshBase& mesh = es.get_mesh();
 
   // Get \p libMesh's  \f$ \pi \f$
   const Real pi = libMesh::pi;
