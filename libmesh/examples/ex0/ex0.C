@@ -224,8 +224,8 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
   // the matrix and right-hand-side contribution from each element. Use a
   // const_element_iterator to loop over the elements. We make
   // el_end const as it is used only for the stopping condition of the loop.
-  MeshBase::const_element_iterator el     = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator el_end = mesh.active_elements_end();
+  MeshBase::const_element_iterator el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator el_end = mesh.active_local_elements_end();
 
   // Note that ++el is preferred to el++ when using loops with iterators
   for( ; el != el_end; ++el)
