@@ -379,11 +379,11 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 
 
 #ifdef HAVE_MPI
-void MeshCommunication::broadcast_bcs (MeshBase& mesh,
-					BoundaryInfo& boundary_info) const
+void MeshCommunication::broadcast_bcs (const MeshBase& mesh,
+				       BoundaryInfo& boundary_info) const
 #else // avoid spurious gcc warnings
-void MeshCommunication::broadcast_bcs (MeshBase&,
-					BoundaryInfo&) const
+void MeshCommunication::broadcast_bcs (const MeshBase&,
+				       BoundaryInfo&) const
 #endif
 {
   // Don't need to do anything if there is
@@ -518,7 +518,7 @@ void MeshCommunication::broadcast_bcs (MeshBase&,
 void MeshCommunication::allgather (ParallelMesh& mesh) const
 {
   this->allgather_mesh (mesh);
-  this->allgather_bcs  (mesh);
+  this->allgather_bcs  (mesh, *(mesh.boundary_info));
 }
 
 void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
@@ -821,23 +821,149 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 }
 
 #ifndef HAVE_MPI
-void MeshCommunication::allgather_bcs (ParallelMesh&) const
+void MeshCommunication::allgather_bcs (ParallelMesh&, BoundaryInfo&) const
 {
   // NO MPI == one processor, no need for this method
   return;
 }
 #else
-void MeshCommunication::allgather_bcs (ParallelMesh& mesh) const
+void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
+				       BoundaryInfo& boundary_info) const
 {
   // Check for quick return
   if (libMesh::n_processors() == 1)
     return;
 
   START_LOG ("allgather_bcs()","MeshCommunication");
+
+  std::vector<int>
+    xfer_elem_bcs,
+    xfer_node_bcs;
   
-  std::cerr << "NOT IMPLEMENTED!!!" << std::endl;
-  here();
+  
+  // Get the element boundary conditions
+  {    
+    std::vector<unsigned int>       el_id;
+    std::vector<unsigned short int> side_id;
+    std::vector<short int>          bc_id;
+    
+    boundary_info.build_side_list (el_id, side_id, bc_id);
+
+    assert (el_id.size() == side_id.size());
+    assert (el_id.size() == bc_id.size());
+    
+    const unsigned int n_bcs = el_id.size();
+
+    // reserve an upper bound for the number of BCs
+    xfer_elem_bcs.reserve(3*n_bcs);
+
+    // populate the xfer_elem_bcs list with *local* elements only.
+    for (unsigned int bc=0; bc<n_bcs; bc++)
+      {
+	const Elem* elem = mesh.elem(el_id[bc]);
+	
+	// sanity: be sure that the element returned by mesh.elem() really has id()==el_id[e]
+	assert(elem != NULL);
+	assert(elem->id() == el_id[bc]);
+	assert(elem->level() == 0);
+	assert(side_id[bc] < elem->n_sides());
+
+	if (elem->processor_id() == libMesh::processor_id())
+	  {
+	    xfer_elem_bcs.push_back(el_id[bc]);
+	    xfer_elem_bcs.push_back(side_id[bc]);
+	    xfer_elem_bcs.push_back(bc_id[bc]);
+	  }
+      }
+  
+  } // done with element boundary conditions
+
+
+  // Get the nodal boundary conditions
+  {
+    std::vector<unsigned int> node_id;
+    std::vector<short int>    bc_id;
+    
+    boundary_info.build_node_list (node_id, bc_id);
+
+    assert (node_id.size() == bc_id.size());
+
+    const unsigned int n_bcs = node_id.size();
+
+    // reserve an upper bound for the number of BCs
+    xfer_node_bcs.reserve(2*n_bcs);
+
+    // populate the xfer_node_bcs witl *local* nodes only
+    for (unsigned int bc=0; bc<n_bcs; bc++)
+      {
+	const Node* node = mesh.node_ptr(node_id[bc]);
+	
+	assert(node != NULL);
+	assert(node->id() == node_id[bc]);
+
+	if (node->processor_id() == libMesh::processor_id())
+	  {
+	    xfer_node_bcs.push_back(node_id[bc]);
+	    xfer_node_bcs.push_back(bc_id[bc]);
+	  }
+      }
+  } // done with nodal boundary conditions
+
+
+  // The xfer arrays now contain all the information for our
+  // local bcs, and we are about to get all the information for
+  // remote bcs.  Go ahead and clear the current boundary_info
+  // information and rebuild it after we get the remote data.
+  boundary_info.clear();
+  
+  // Get the boundary condition information from adacent processors
+  Parallel::allgather (xfer_elem_bcs);
+  Parallel::allgather (xfer_node_bcs);
+
+
+  // Insert the elements
+  {
+    const unsigned int n_bcs = xfer_elem_bcs.size()/3;
+
+    for (unsigned int bc=0, cnt=0; bc<n_bcs; bc++)
+      {
+	const Elem* elem = mesh.elem(xfer_elem_bcs[cnt++]);
+	const unsigned short int side_id = xfer_elem_bcs[cnt++];
+	const short int bc_id = xfer_elem_bcs[cnt++];
+
+	boundary_info.add_side (elem, side_id, bc_id);	
+      }
+
+    // no need for this any more
+    xfer_elem_bcs.resize(0);
+  }
+
+  
+  // Insert the nodes
+  {
+    const unsigned int n_bcs = xfer_node_bcs.size()/2;
+
+    for (unsigned int bc=0, cnt=0; bc<n_bcs; bc++)
+      {
+	const Node* node = mesh.node_ptr (xfer_node_bcs[cnt++]);
+	const short int bc_id = xfer_node_bcs[cnt++];
+
+	boundary_info.add_node (node, bc_id);
+      }
+  }
+
  
+#ifndef NDEBUG
+  
+  // Make sure all processors agree on the number of boundary ids.
+  const unsigned int n_bc_ids = boundary_info.n_boundary_ids();
+  unsigned int global_n_bc_ids = n_bc_ids;
+  
+  Parallel::max (global_n_bc_ids);
+  assert (n_bc_ids == global_n_bc_ids);
+  
+#endif
+  
 
   STOP_LOG  ("allgather_bcs()","MeshCommunication");
 }

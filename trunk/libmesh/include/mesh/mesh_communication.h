@@ -98,25 +98,11 @@ public:
   
 private:
 
-  /**
-   *
-   */
   void broadcast_mesh (MeshBase& ) const;
+  void broadcast_bcs  (const MeshBase&, BoundaryInfo&) const;
 
-  /**
-   *
-   */
-  void broadcast_bcs (MeshBase&, BoundaryInfo&) const;
-
-  /**
-   *
-   */
   void allgather_mesh (ParallelMesh& ) const;
-
-  /**
-   *
-   */
-  void allgather_bcs (ParallelMesh& ) const;
+  void allgather_bcs  (const ParallelMesh&, BoundaryInfo&) const;
 
   /**
    * Packs the element \p elem at the end of vector \p conn.
