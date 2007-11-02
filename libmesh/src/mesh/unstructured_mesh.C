@@ -234,10 +234,14 @@ void UnstructuredMesh::find_neighbors()
 
 			// If found a match wbounds.firsth my side
                         //
-                        // We need a special case here for 1D, since parents
-                        // and children have an equal side (i.e. a node), 
-                        // so need to check ns != ms in 1D as well
+			// We need special tests here for 1D:
+			// since parents and children have an equal
+			// side (i.e. a node), we need to check 
+			// ns != ms, and we also check level() to
+			// avoid setting our neighbor pointer to
+			// any of our neighbor's descendants
 			if( (*my_side == *their_side) && 
+                            (element->level() == neighbor->level()) &&
                             ((_dim != 1) || (ns != ms)) )
 			  {
 			    // So share a side.  Is this a mixed pair
