@@ -94,6 +94,12 @@ class LaspackLinearSolver : public LinearSolver<T>
 	   const double tol,
 	   const unsigned int m_its);
    
+  /**
+   * Prints a useful message about why the latest linear solve
+   * con(di)verged.
+   */
+  virtual void print_converged_reason();
+  
  private:
   
   /**

@@ -312,6 +312,15 @@ void LaspackLinearSolver<T>::set_laspack_preconditioner_type ()
 
 
 
+template <typename T>
+void LaspackLinearSolver<T>::print_converged_reason()
+{
+  std::cout << "print_converged_reason() is currently only supported"
+            << "with Petsc 2.3.1 and later." << std::endl;
+}
+
+
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LaspackLinearSolver<Number>;
