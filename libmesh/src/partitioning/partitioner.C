@@ -97,8 +97,8 @@ void Partitioner::_set_node_processor_ids(MeshBase& mesh)
   
   
   // Loop over all the elements
-  MeshBase::element_iterator       elem_it  = mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = mesh.elements_end(); 
+  MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+  const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
   
   for ( ; elem_it != elem_end; ++elem_it)
     {
