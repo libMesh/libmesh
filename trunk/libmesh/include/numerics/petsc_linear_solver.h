@@ -158,7 +158,7 @@ public:
    * Prints a useful message about why the latest linear solve
    * con(di)verged.
    */
-  void print_converged_reason();
+  virtual void print_converged_reason();
   
 private:
 

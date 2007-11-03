@@ -140,6 +140,12 @@ public:
 					       const double,      // Stopping tolerance
 					       const unsigned int) = 0; // N. Iterations
   
+  /**
+   * Prints a useful message about why the latest linear solve
+   * con(di)verged.
+   */
+  virtual void print_converged_reason() = 0;
+  
 protected:
 
   
