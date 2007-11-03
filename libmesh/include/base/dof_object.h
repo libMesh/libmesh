@@ -344,20 +344,19 @@ DofObject::~DofObject ()
 inline
 void DofObject::invalidate_dofs (const unsigned int sys_num)
 {
-  // FIXME - this should no longer need to loop over c - RHS
-
   // If the user does not specify the system number...
   if (sys_num >= this->n_systems()) 
-    for (unsigned int s=0; s<n_systems(); s++)
-      for (unsigned int v=0; v<n_vars(s); v++)
-	for (unsigned int c=0; c<n_comp(s,v); c++)
-	  this->set_dof_number(s,v,c,invalid_id);
-
+    {
+      for (unsigned int s=0; s<n_systems(); s++)
+        for (unsigned int v=0; v<n_vars(s); v++)
+	  if (this->n_comp(s,v))
+	    this->set_dof_number(s,v,0,invalid_id);
+    }
   // ...otherwise invalidate the dofs for all systems
   else
     for (unsigned int v=0; v<n_vars(sys_num); v++)
-      for (unsigned int c=0; c<n_comp(sys_num,v); c++)
-	this->set_dof_number(sys_num,v,c,invalid_id);
+      if (this->n_comp(sys_num,v))
+        this->set_dof_number(sys_num,v,0,invalid_id);
 }
 
 
