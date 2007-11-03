@@ -115,6 +115,6 @@ void Partitioner::_set_node_processor_ids(MeshBase& mesh)
   node_it  = mesh.nodes_begin();
   // Make sure we hit all the nodes
   for ( ; node_it != node_end; ++node_it)
-    assert((*node_it)->processor_id() != DofObject::invalid_id);
+    assert((*node_it)->processor_id() != DofObject::invalid_processor_id);
 #endif
 }
