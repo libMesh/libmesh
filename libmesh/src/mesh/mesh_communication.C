@@ -521,15 +521,25 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
   this->allgather_bcs  (mesh, *(mesh.boundary_info));
 }
 
-void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
-{
 #ifndef HAVE_MPI
   
+void MeshCommunication::allgather_mesh (ParallelMesh&) const
+{
   // NO MPI == one processor, no need for this method
   return;
+}
   
+void MeshCommunication::allgather_bcs (const ParallelMesh&,
+				       BoundaryInfo&) const
+{
+  // NO MPI == one processor, no need for this method
+  return;
+}
+
 #else
 
+void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
+{
   // Check for quick return
   if (libMesh::n_processors() == 1)
     return;
@@ -816,18 +826,10 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 
   // All done!
   STOP_LOG ("allgather_mesh()","MeshCommunication");
-  
-#endif
 }
 
-#ifndef HAVE_MPI
-void MeshCommunication::allgather_bcs (const ParallelMesh&,
-				       BoundaryInfo&) const
-{
-  // NO MPI == one processor, no need for this method
-  return;
-}
-#else
+
+
 void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
 				       BoundaryInfo& boundary_info) const
 {
@@ -968,7 +970,7 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
 
   STOP_LOG  ("allgather_bcs()","MeshCommunication");
 }
-#endif
+#endif // HAVE_MPI
 
 
 
