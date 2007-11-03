@@ -111,7 +111,8 @@ void Partitioner::_set_node_processor_ids(MeshBase& mesh)
 						     elem->processor_id());
     }
 
-  // And the subactive elements
+  // And loop over the subactive elements, but don't reassign
+  // nodes that are already active on another processor.
   MeshBase::element_iterator       sub_it  = mesh.subactive_elements_begin();
   const MeshBase::element_iterator sub_end = mesh.subactive_elements_end(); 
   
@@ -120,8 +121,9 @@ void Partitioner::_set_node_processor_ids(MeshBase& mesh)
       Elem* elem = *sub_it;
       
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
-	elem->get_node(n)->processor_id() = std::min(elem->get_node(n)->processor_id(),
-						     elem->processor_id());
+        if (elem->get_node(n)->processor_id() == DofObject::invalid_processor_id)
+	  elem->get_node(n)->processor_id() = std::min(elem->get_node(n)->processor_id(),
+						       elem->processor_id());
     }
 
 #ifdef DEBUG
