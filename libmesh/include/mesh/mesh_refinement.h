@@ -264,11 +264,15 @@ public:
   
   /**
    * Add point \p p to the mesh. The function returns a pointer to
-   * the new node.  The \p key tells the method where to look.  The
-   * tolerance \p tol tells the method how far away from p to search
-   * for existing nodes.
+   * the new node.  The \p key tells the method where to look.
+   * The processor_id is assigned to the new node (only if no existing
+   * node is found.  The tolerance \p tol tells the method how far away
+   * from p to search for existing nodes.
    */
-  Node* add_point (const Point& p, const unsigned int key, const Real tol);
+  Node* add_point (const Point& p,
+                   const unsigned int key,
+                   const unsigned int processor_id,
+                   const Real tol);
 
   /**
    * Adds the element \p elem to the mesh.
