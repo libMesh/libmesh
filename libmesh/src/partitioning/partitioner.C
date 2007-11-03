@@ -96,7 +96,7 @@ void Partitioner::_set_node_processor_ids(MeshBase& mesh)
     (*node_it)->invalidate_processor_id();
   
   
-  // Loop over all the elements
+  // Loop over all the active elements
   MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
   const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
   
@@ -106,6 +106,19 @@ void Partitioner::_set_node_processor_ids(MeshBase& mesh)
       
       // For each node, set the processor ID to the min of
       // its current value and this Element's processor id.
+      for (unsigned int n=0; n<elem->n_nodes(); ++n)
+	elem->get_node(n)->processor_id() = std::min(elem->get_node(n)->processor_id(),
+						     elem->processor_id());
+    }
+
+  // And the subactive elements
+  MeshBase::element_iterator       sub_it  = mesh.subactive_elements_begin();
+  const MeshBase::element_iterator sub_end = mesh.subactive_elements_end(); 
+  
+  for ( ; sub_it != sub_end; ++sub_it)
+    {
+      Elem* elem = *sub_it;
+      
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
 	elem->get_node(n)->processor_id() = std::min(elem->get_node(n)->processor_id(),
 						     elem->processor_id());
