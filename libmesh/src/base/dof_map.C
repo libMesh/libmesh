@@ -24,17 +24,18 @@
 #include <algorithm> // for std::fill, std::equal_range, std::max, std::lower_bound, etc.
 
 // Local Includes -----------------------------------
+#include "coupling_matrix.h"
+#include "dense_matrix.h"
+#include "dense_vector_base.h"
 #include "dof_map.h"
 #include "elem.h"
-#include "mesh_base.h"
 #include "fe_interface.h"
-#include "sparse_matrix.h"
-#include "libmesh_logging.h"
 #include "fe_type.h"
-#include "coupling_matrix.h"
+#include "libmesh_logging.h"
+#include "mesh_base.h"
 #include "numeric_vector.h"
-#include "dense_vector_base.h"
-#include "dense_matrix.h"
+#include "parallel.h"
+#include "sparse_matrix.h"
 #include "string_to_enum.h"
 
 
@@ -72,6 +73,164 @@ void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
   _matrices.push_back(&matrix);
   
   matrix.attach_dof_map (*this);
+}
+
+
+
+DofObject* DofMap::node_ptr(MeshBase& mesh, unsigned int i) const
+{
+  return mesh.node_ptr(i);
+}
+
+
+
+DofObject* DofMap::elem_ptr(MeshBase& mesh, unsigned int i) const
+{
+  return mesh.elem(i);
+}
+
+
+
+template <typename iterator_type>
+void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
+                                      iterator_type objects_end,
+                                      MeshBase &mesh,
+                                      dofobject_accessor objects)
+{
+  // First, iterate over local objects to find out how many
+  // are on each processor
+  std::vector<unsigned int>
+    ghost_objects_from_proc(libMesh::n_processors(), 0);
+
+  iterator_type it  = objects_begin;
+
+  for (; it != objects_end; ++it)
+    {
+      DofObject *obj = *it;
+
+      if (obj)
+        {
+          unsigned int obj_procid = obj->processor_id();
+          // We'd better be completely partitioned by now
+          assert(obj_procid != DofObject::invalid_processor_id);
+          ghost_objects_from_proc[obj_procid]++;
+        }
+    }
+
+  std::vector<unsigned int> objects_on_proc(libMesh::n_processors(), 0);
+  Parallel::allgather(ghost_objects_from_proc[libMesh::processor_id()],
+                      objects_on_proc);
+
+#ifdef DEBUG
+  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+    assert(ghost_objects_from_proc[p] <= objects_on_proc[p]);
+#endif
+
+  // Request sets to send to each processor
+  std::vector<std::vector<unsigned int> >
+    requested_ids(libMesh::n_processors());
+
+  // We know how many of our objects live on each processor, so
+  // reserve() space for requests from each.
+  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+    if (p != libMesh::processor_id())
+      requested_ids[p].reserve(ghost_objects_from_proc[p]);
+
+  for (it = objects_begin; it != objects_end; ++it)
+    {
+      DofObject *obj = *it;
+      if (obj->processor_id() != DofObject::invalid_processor_id)
+        requested_ids[obj->processor_id()].push_back(obj->id());
+    }
+#ifdef DEBUG
+  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+    assert(requested_ids[p].size() == ghost_objects_from_proc[p]);
+#endif
+
+  // Next set ghost object n_comps from other processors
+  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+    {
+      // Trade my requests with processor procup and procdown
+      unsigned int procup = (libMesh::processor_id() + p) %
+                             libMesh::n_processors();
+      unsigned int procdown = (libMesh::n_processors() +
+                               libMesh::processor_id() - p) %
+                               libMesh::n_processors();
+      std::vector<unsigned int> request_to_fill;
+      Parallel::send_receive(procup, requested_ids[procup],
+                             procdown, request_to_fill);
+
+      // Fill those requests
+      const unsigned int n_variables = request_to_fill.empty() ?
+        0 : ((this->*objects)(mesh, request_to_fill[0]))->n_vars(this->sys_number());
+
+      std::vector<unsigned int> ghost_data
+        (request_to_fill.size() * 2 * n_variables);
+
+      for (unsigned int i=0; i != request_to_fill.size(); ++i)
+        {
+          DofObject *requested = (this->*objects)(mesh, request_to_fill[i]);
+          assert(requested);
+          assert(requested->processor_id() == libMesh::processor_id());
+          assert(requested->n_vars(this->sys_number()) == n_variables);
+          for (unsigned int v=0; v != n_variables; ++v)
+            {
+              unsigned int n_comp =
+                requested->n_comp(this->sys_number(), v);
+              ghost_data[i*2*n_variables+v] = n_comp;
+              unsigned int first_dof = n_comp ?
+                requested->dof_number(this->sys_number(), v, 0) : 0;
+              assert(first_dof != DofObject::invalid_id);
+              ghost_data[i*2*n_variables+n_variables+v] = first_dof;
+            }
+        }
+
+      // Trade back the results
+      std::vector<unsigned int> filled_request;
+      Parallel::send_receive(procdown, ghost_data,
+                             procup, filled_request);
+
+      // And copy the id changes we've now been informed of
+      assert(filled_request.size() ==
+             requested_ids[procup].size() * 2 * n_variables);
+      for (unsigned int i=0; i != requested_ids[procup].size(); ++i)
+        {
+          DofObject *requested = (this->*objects)(mesh, requested_ids[procup][i]);
+          assert(requested);
+          assert (requested->processor_id() == procup);
+          for (unsigned int v=0; v != n_variables; ++v)
+            {
+              unsigned int n_comp = filled_request[i*2*n_variables+v];
+              requested->set_n_comp(this->sys_number(), v, n_comp);
+              if (n_comp)
+                {
+                  unsigned int first_dof = 
+                    filled_request[i*2*n_variables+n_variables+v];
+                  assert(first_dof != DofObject::invalid_id);
+                  requested->set_dof_number
+                    (this->sys_number(), v, 0, first_dof);
+                }
+            }
+        }
+    }
+
+#ifdef DEBUG
+  // Double check for invalid dofs
+  for (it = objects_begin; it != objects_end; ++it)
+    {
+      DofObject *obj = *it;
+      assert (obj);
+      unsigned int n_variables = obj->n_vars(this->sys_number());
+      for (unsigned int v=0; v != n_variables; ++v)
+        {
+          unsigned int n_comp =
+            obj->n_comp(this->sys_number(), v);
+          unsigned int first_dof = n_comp ?
+            obj->dof_number(this->sys_number(), v, 0) : 0;
+          assert(first_dof != DofObject::invalid_id);
+        }
+    }
+#endif
 }
 
 
@@ -349,27 +508,54 @@ void DofMap::reinit(MeshBase& mesh)
 	}
     }
 
+  // Calling DofMap::reinit() by itself makes little sense,
+  // so we won't bother with nonlocal DofObjects.
+  // Those will be fixed by distribute_dofs
+/*
+  //------------------------------------------------------------
+  // At this point, all n_comp and dof_number values on local
+  // DofObjects should be correct, but a ParallelMesh might have
+  // incorrect values on non-local DofObjects.  Let's request the
+  // correct values from each other processor.
+
+  this->set_nonlocal_n_comps(mesh.nodes_begin(),
+                             mesh.nodes_end(),
+                             mesh,
+                             &DofMap::node_ptr);
+
+  this->set_nonlocal_n_comps(mesh.elements_begin(),
+                             mesh.elements_end(),
+                             mesh,
+                             &DofMap::elem_ptr);
+*/
 
   //------------------------------------------------------------
   // Finally, clear all the current DOF indices
-  {
-    // All the nodes
-    MeshBase::node_iterator       node_it  = mesh.nodes_begin();
-    const MeshBase::node_iterator node_end = mesh.nodes_end();
-
-    for ( ; node_it != node_end; ++node_it)
-      (*node_it)->invalidate_dofs(this->sys_number());
-    
-    // All the elements
-    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
-
-    for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->invalidate_dofs(this->sys_number());
-  }
-
+  // (distribute_dofs expects them cleared!)
+  this->invalidate_dofs(mesh);
   
   STOP_LOG("reinit()", "DofMap");
+}
+
+
+
+void DofMap::invalidate_dofs(MeshBase& mesh) const
+{
+  const unsigned int sys_num = this->sys_number();
+
+  // All the nodes
+  MeshBase::node_iterator       node_it  = mesh.nodes_begin();
+  const MeshBase::node_iterator node_end = mesh.nodes_end();
+
+  for ( ; node_it != node_end; ++node_it)
+    (*node_it)->invalidate_dofs(sys_num);
+  
+  // All the elements
+  MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+  const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
+
+  for ( ; elem_it != elem_end; ++elem_it)
+    (*elem_it)->invalidate_dofs(sys_num);
 }
 
 
@@ -411,260 +597,317 @@ void DofMap::clear()
 
 void DofMap::distribute_dofs (MeshBase& mesh)
 {
+  // Log how long it takes to distribute the degrees of freedom
+  START_LOG("distribute_dofs()", "DofMap");
+
+  assert (mesh.is_prepared());
+  
+  const unsigned int proc_id = libMesh::processor_id();
+  const unsigned int n_proc  = libMesh::n_processors();
+  const unsigned int n_vars  = this->n_variables();
+  
+  assert (n_vars > 0);
+  assert (proc_id < n_proc);
+  
+  // re-init in case the mesh has changed
+  this->reinit(mesh);
+  
   // By default distribute variables in a
   // var-major fashion, but allow run-time
   // specification
-  if (libMesh::on_command_line ("--node_major_dofs"))
-    this->distribute_dofs_node_major (mesh);
-  
+  bool node_major_dofs = libMesh::on_command_line ("--node_major_dofs");
+
+  // The DOF counter, will be incremented as we encounter
+  // new degrees of freedom
+  unsigned int next_free_dof = 0;
+
+  // Set temporary DOF indices on this processor
+  if (node_major_dofs)
+    this->distribute_local_dofs_node_major (next_free_dof, mesh, false);
   else
-    this->distribute_dofs_var_major (mesh);
-}
+    this->distribute_local_dofs_var_major (next_free_dof, mesh, false);
 
+  // Get DOF counts on all processors
+  std::vector<unsigned int> dofs_on_proc(n_proc, 0);
+  Parallel::allgather(next_free_dof, dofs_on_proc);
 
+  // Resize the _first_df and _end_df arrays
+  _first_df.resize(n_proc);
+  _end_df.resize (n_proc);
 
-void DofMap::distribute_dofs_var_major (MeshBase& mesh)
-{
-  assert (mesh.is_prepared());
+  // Get DOF offsets
+  _first_df[0] = 0;
+  for (unsigned int i=1; i < n_proc; ++i)
+    _first_df[i] = _end_df[i-1] = _first_df[i-1] + dofs_on_proc[i-1];
+  _end_df[n_proc-1] = _first_df[n_proc-1] + dofs_on_proc[n_proc-1];
+
+  // Clear all the current DOF indices
+  // (distribute_dofs expects them cleared!)
+  this->invalidate_dofs(mesh);
+
+  next_free_dof = _first_df[proc_id];
+
+  // Set permanent DOF indices on this processor
+  if (node_major_dofs)
+    this->distribute_local_dofs_node_major (next_free_dof, mesh, true);
+  else
+    this->distribute_local_dofs_var_major (next_free_dof, mesh, true);
+
+  assert(next_free_dof == _end_df[proc_id]);
+
+  //------------------------------------------------------------
+  // At this point, all n_comp and dof_number values on local
+  // DofObjects should be correct, but a ParallelMesh might have
+  // incorrect values on non-local DofObjects.  Let's request the
+  // correct values from each other processor.
+
+  this->set_nonlocal_dof_objects(mesh.nodes_begin(),
+                                 mesh.nodes_end(),
+                                 mesh,
+                                 &DofMap::node_ptr);
+
+  this->set_nonlocal_dof_objects(mesh.elements_begin(),
+                                 mesh.elements_end(),
+                                 mesh,
+                                 &DofMap::elem_ptr);
   
-  const unsigned int proc_id = libMesh::processor_id();
-  const unsigned int n_proc  = libMesh::n_processors();
-  const unsigned int sys_num = this->sys_number();
-  const unsigned int n_vars  = this->n_variables();
-  
-  assert (n_vars > 0);
-  assert (proc_id < n_proc);
-  
-  // re-init in case the mesh has changed
-  this->reinit(mesh);
-  
-  // Log how long it takes to distribute the degrees of freedom
-  START_LOG("distribute_dofs_var_major()", "DofMap");
-
-  // The DOF counter, will be incremented as we encounter
-  // new degrees of freedom
-  unsigned int next_free_dof = 0;
-
-  // Resize the _first_df and _end_df arrays, fill with 0.
-  _first_df.resize(n_proc); std::fill(_first_df.begin(), _first_df.end(), 0);
-  _end_df.resize (n_proc); std::fill(_end_df.begin(),  _end_df.end(),  0);
-
-  _send_list.clear();
-  
-  //-------------------------------------------------------------------------
-  // DOF numbering
-  for (unsigned int processor=0; processor<n_proc; processor++)
-    {
-      _first_df[processor] = next_free_dof;
-      
-      for (unsigned var=0; var<n_vars; var++)
-	{
-	  MeshBase::element_iterator       elem_it  = mesh.active_pid_elements_begin(processor);
-	  const MeshBase::element_iterator elem_end = mesh.active_pid_elements_end(processor);
-
-	  for ( ; elem_it != elem_end; ++elem_it)
-	    {
-	      // Only number dofs connected to active
-	      // elements on this processor.
-	      Elem* elem                 = *elem_it;
-	      const unsigned int n_nodes = elem->n_nodes();
-	      
-	      // First number the nodal DOFS
-	      for (unsigned int n=0; n<n_nodes; n++)
-		{
-		  Node* node = elem->get_node(n);
-		  
-		  // assign dof numbers (all at once) if they aren't
-		  // already there
-		  if ((node->n_comp(sys_num,var) > 0) &&
-                      (node->dof_number(sys_num,var,0) ==
-		       DofObject::invalid_id))
-		    {
-		      node->set_dof_number(sys_num,
-					   var,
-					   0,
-					   next_free_dof);
-                      next_free_dof += node->n_comp(sys_num,var);
-
-		      // If these DOFs are on the local processor add 
-		      // them to the _send_list
-		      if (processor == proc_id)
-		        for (unsigned int index=0; index<node->n_comp(sys_num,var);
-		             index++)
-			  _send_list.push_back(node->dof_number(sys_num,
-								var,
-								index));
-		    }
-		}
-		  
-	      // Now number the element DOFS
-              if (elem->n_comp(sys_num,var) > 0)
-                {
-		  assert (elem->dof_number(sys_num,var,0) ==
-			  DofObject::invalid_id);
-
-		  elem->set_dof_number(sys_num,
-				       var,
-				       0,
-				       next_free_dof);
-
-		  next_free_dof += elem->n_comp(sys_num,var);
-		  
-		if (processor == proc_id)
-	          for (unsigned int index=0; index<elem->n_comp(sys_num,var);
-		       index++)
-		  // If these DOFs are on the local processor add them
-		  // to the _send_list
-		    _send_list.push_back(elem->dof_number(sys_num,
-							  var,
-							  index));
-		}
-	    }
-	}
-      
-      _end_df[processor] = next_free_dof;
-    }
-
   // Set the total number of degrees of freedom
 #ifdef ENABLE_AMR
   _n_old_dfs = _n_dfs;
 #endif
-  _n_dfs = next_free_dof;
+  _n_dfs = _end_df[n_proc-1];
 
-  //-------------------------------------------------------------------------  
-  STOP_LOG("distribute_dofs_var_major()", "DofMap");    
+  STOP_LOG("distribute_dofs()", "DofMap");
 
-  this->add_neighbors_to_send_list(mesh);
-  
   // Note that in the add_neighbors_to_send_list nodes on processor
   // boundaries that are shared by multiple elements are added for
   // each element.
+  this->add_neighbors_to_send_list(mesh);
+  
   // Here we need to clean up that data structure
   this->sort_send_list ();
-  // All done.
 }
 
 
-
-
-void DofMap::distribute_dofs_node_major (MeshBase& mesh)
+void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
+                                              MeshBase& mesh,
+                                              bool build_send_list)
 {
-  assert (mesh.is_prepared());
-  
-  const unsigned int proc_id = libMesh::processor_id();
-  const unsigned int n_proc  = libMesh::n_processors();
   const unsigned int sys_num = this->sys_number();
   const unsigned int n_vars  = this->n_variables();
-  
-  assert (n_vars > 0);
-  assert (proc_id < n_proc);
-  
-  // re-init in case the mesh has changed
-  this->reinit(mesh);
 
-  // Log how long it takes to distribute the degrees of freedom
-  START_LOG("distribute_dofs_node_major()", "DofMap");
-
-  // The DOF counter, will be incremented as we encounter
-  // new degrees of freedom
-  unsigned int next_free_dof = 0;
-
-  // Resize the _first_df and _end_df arrays, fill with 0.
-  _first_df.resize(n_proc); std::fill(_first_df.begin(), _first_df.end(), 0);
-  _end_df.resize (n_proc); std::fill(_end_df.begin(),  _end_df.end(),  0);
-
-  _send_list.clear();
+  // Number of elements to add to send_list
+  unsigned int send_list_size = 0;
   
   //-------------------------------------------------------------------------
-  // DOF numbering
-  for (unsigned int processor=0; processor<n_proc; processor++)
+  // First count and assign temporary numbers to local dofs
+  MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
+  const MeshBase::element_iterator elem_end = mesh.active_local_elements_end();
+
+  for ( ; elem_it != elem_end; ++elem_it)
     {
-      _first_df[processor] = next_free_dof;
-      
       // Only number dofs connected to active
-      // elements for the current processor.	      
-      MeshBase::element_iterator       elem_it  = mesh.active_pid_elements_begin(processor);
-      const MeshBase::element_iterator elem_end = mesh.active_pid_elements_end(processor);
-	
-      for ( ; elem_it != elem_end; ++elem_it)
-	{
-	  Elem* elem                 = *elem_it;
-	  const unsigned int n_nodes = elem->n_nodes();
-	  
-	  // First number the nodal DOFS
-	  for (unsigned int n=0; n<n_nodes; n++)
-	    {
-	      Node* node = elem->get_node(n);
-		  
-	      for (unsigned var=0; var<n_vars; var++)
-	      // assign dof numbers (all at once) if they aren't
-	      // already there
-	        if ((node->n_comp(sys_num,var) > 0) &&
-                    (node->dof_number(sys_num,var,0) ==
-	             DofObject::invalid_id))
-	          {
-	            node->set_dof_number(sys_num,
-				         var,
-				         0,
-				         next_free_dof);
-                    next_free_dof += node->n_comp(sys_num,var);
-  
-	            // If these DOFs are on the local processor add 
-	            // them to the _send_list
-	            if (processor == proc_id)
-	              for (unsigned int index=0; index<node->n_comp(sys_num,var);
-	                   index++)
-		        _send_list.push_back(node->dof_number(sys_num,
-							      var,
-							      index));
-	          }
-	    }
-	    
-	  // Now number the element DOFS
-	  for (unsigned var=0; var<n_vars; var++)
-            if (elem->n_comp(sys_num,var) > 0)
-              {
-		assert (elem->dof_number(sys_num,var,0) ==
-			DofObject::invalid_id);
-
-		elem->set_dof_number(sys_num,
-				     var,
-				     0,
-				     next_free_dof);
-
-		next_free_dof += elem->n_comp(sys_num,var);
-		  
-		if (processor == proc_id)
-	          for (unsigned int index=0; index<elem->n_comp(sys_num,var);
-		       index++)
-		      // If these DOFs are on the local processor add them
-		      // to the _send_list
-		      _send_list.push_back(elem->dof_number(sys_num,
-							    var,
-							    index));
-               }
-	}
+      // elements on this processor.
+      Elem* elem                 = *elem_it;
+      const unsigned int n_nodes = elem->n_nodes();
       
-      _end_df[processor] = next_free_dof;
+      // First number the nodal DOFS
+      for (unsigned int n=0; n<n_nodes; n++)
+        {
+          Node* node = elem->get_node(n);
+              
+          for (unsigned var=0; var<n_vars; var++)
+            {
+              // assign dof numbers (all at once) if this is
+              // our node and if they aren't already there
+              if ((node->n_comp(sys_num,var) > 0) &&
+                  (node->processor_id() == libMesh::processor_id()) &&
+                  (node->dof_number(sys_num,var,0) ==
+                   DofObject::invalid_id))
+                {
+                  node->set_dof_number(sys_num,
+                                       var,
+                                       0,
+                                       next_free_dof);
+                  next_free_dof += node->n_comp(sys_num,var);
+
+		  // If we've been requested to, add local dofs to the
+		  // _send_list
+                  if (build_send_list)
+                    for (unsigned int index=0; index<node->n_comp(sys_num,var);
+                         index++)
+                      _send_list.push_back(node->dof_number(sys_num,
+                                                            var,
+                                                            index));
+                  else
+                    send_list_size += node->n_comp(sys_num,var);
+                }
+            }
+        }
+                  
+      // Now number the element DOFS
+      for (unsigned var=0; var<n_vars; var++)
+        if (elem->n_comp(sys_num,var) > 0)
+          {
+            assert (elem->dof_number(sys_num,var,0) ==
+                    DofObject::invalid_id);
+
+            elem->set_dof_number(sys_num,
+                                 var,
+                                 0,
+                                 next_free_dof);
+
+            next_free_dof += elem->n_comp(sys_num,var);
+              
+	    // If we've been requested to, add local dofs to the
+	    // _send_list
+            if (build_send_list)
+              for (unsigned int index=0; index<elem->n_comp(sys_num,var);
+                   index++)
+                _send_list.push_back(elem->dof_number(sys_num,
+                                                      var,
+                                                      index));
+            else
+              send_list_size += elem->n_comp(sys_num,var);
+          }
     }
-  
-  // Set the total number of degrees of freedom
-#ifdef ENABLE_AMR
-  _n_old_dfs = _n_dfs;
+
+// Make sure we didn't miss any nodes
+#ifdef DEBUG
+  MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
+  const MeshBase::node_iterator node_end = mesh.local_nodes_end();
+  for (; node_it != node_end; ++node_it)
+    {
+      DofObject *obj = *node_it;
+      assert(obj);
+      unsigned int n_variables = obj->n_vars(this->sys_number());
+      for (unsigned int v=0; v != n_variables; ++v)
+        {
+          unsigned int n_comp =
+            obj->n_comp(this->sys_number(), v);
+          unsigned int first_dof = n_comp ?
+            obj->dof_number(this->sys_number(), v, 0) : 0;
+          assert(first_dof != DofObject::invalid_id);
+        }
+    }
 #endif
-  _n_dfs = next_free_dof;
-  //-------------------------------------------------------------------------
-  STOP_LOG("distribute_dofs_node_major()", "DofMap");    
 
-  this->add_neighbors_to_send_list(mesh);
+  if (!build_send_list)
+    {
+      _send_list.clear();
+      _send_list.reserve(send_list_size);
+    }
+}
+
+
+
+void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
+                                             MeshBase& mesh,
+                                             bool build_send_list)
+{
+  const unsigned int sys_num = this->sys_number();
+  const unsigned int n_vars  = this->n_variables();
+
+  // Number of elements to add to send_list
+  unsigned int send_list_size = 0;
   
-  // Note that in the add_neighbors_to_send_list nodes on processor
-  // boundaries that are shared by multiple elements are added for
-  // each element.
-  // Here we need to clean up that data structure
-  this->sort_send_list ();
+  //-------------------------------------------------------------------------
+  // First count and assign temporary numbers to local dofs
+  for (unsigned var=0; var<n_vars; var++)
+    {
+      MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
+      const MeshBase::element_iterator elem_end = mesh.active_local_elements_end();
 
-  // All done.
+      for ( ; elem_it != elem_end; ++elem_it)
+        {
+          // Only number dofs connected to active
+          // elements on this processor.
+          Elem* elem                 = *elem_it;
+          const unsigned int n_nodes = elem->n_nodes();
+          
+          // First number the nodal DOFS
+          for (unsigned int n=0; n<n_nodes; n++)
+            {
+              Node* node = elem->get_node(n);
+              
+              // assign dof numbers (all at once) if this is
+              // our node and if they aren't already there
+              if ((node->n_comp(sys_num,var) > 0) &&
+                  (node->processor_id() == libMesh::processor_id()) &&
+                  (node->dof_number(sys_num,var,0) ==
+                   DofObject::invalid_id))
+                {
+                  node->set_dof_number(sys_num,
+                                       var,
+                                       0,
+                                       next_free_dof);
+                  next_free_dof += node->n_comp(sys_num,var);
+
+		  // If we've been requested to, add local dofs to the
+		  // _send_list
+                  if (build_send_list)
+                    for (unsigned int index=0; index<node->n_comp(sys_num,var);
+                         index++)
+                      _send_list.push_back(node->dof_number(sys_num,
+                                                            var,
+                                                            index));
+                  else
+                    send_list_size += node->n_comp(sys_num,var);
+                }
+            }
+                  
+          // Now number the element DOFS
+          if (elem->n_comp(sys_num,var) > 0)
+            {
+              assert (elem->dof_number(sys_num,var,0) ==
+                      DofObject::invalid_id);
+
+              elem->set_dof_number(sys_num,
+                                   var,
+                                   0,
+                                   next_free_dof);
+
+              next_free_dof += elem->n_comp(sys_num,var);
+              
+	      // If we've been requested to, add local dofs to the
+	      // _send_list
+              if (build_send_list)
+                for (unsigned int index=0; index<elem->n_comp(sys_num,var);
+                     index++)
+                  _send_list.push_back(elem->dof_number(sys_num,
+                                                      var,
+                                                      index));
+              else
+                send_list_size += elem->n_comp(sys_num,var);
+            }
+        }
+    }
+
+// Make sure we didn't miss any nodes
+#ifdef DEBUG
+  MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
+  const MeshBase::node_iterator node_end = mesh.local_nodes_end();
+  for (; node_it != node_end; ++node_it)
+    {
+      DofObject *obj = *node_it;
+      assert(obj);
+      unsigned int n_variables = obj->n_vars(this->sys_number());
+      for (unsigned int v=0; v != n_variables; ++v)
+        {
+          unsigned int n_comp =
+            obj->n_comp(this->sys_number(), v);
+          unsigned int first_dof = n_comp ?
+            obj->dof_number(this->sys_number(), v, 0) : 0;
+          assert(first_dof != DofObject::invalid_id);
+        }
+    }
+#endif
+
+  if (!build_send_list)
+    {
+      _send_list.clear();
+      _send_list.reserve(send_list_size);
+    }
 }
 
 

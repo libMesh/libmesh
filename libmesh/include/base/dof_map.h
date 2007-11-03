@@ -38,6 +38,7 @@
 
 // Forward Declarations
 class DofMap;
+class DofObject;
 class Elem;
 class MeshBase;
 class Mesh;
@@ -490,25 +491,67 @@ private:
    * @returns the number of the system we are responsible for.
    */
   unsigned int sys_number() const;
+
+  /**
+   * @invalidates all active DofObject dofs for this system
+   */
+  void invalidate_dofs(MeshBase& mesh) const;
+
+  /**
+   * An adapter function that returns Node pointers by index
+   */
+  DofObject* node_ptr(MeshBase& mesh, unsigned int i) const;
+
+  /**
+   * An adapter function that returns Elem pointers by index
+   */
+  DofObject* elem_ptr(MeshBase& mesh, unsigned int i) const;
+
+  /**
+   * A member function type like node_ptr or elem_ptr
+   */
+  typedef DofObject* (DofMap::*dofobject_accessor)
+    (MeshBase& mesh, unsigned int i) const;
   
   /**
-   * Distributes the global degrees of freedom in a 
-   * variable-major ordering.  In this format the local
+   * Helper function for distributing dofs in parallel
+   */
+  template<typename iterator_type>
+  void set_nonlocal_dof_objects(iterator_type objects_begin,
+			        iterator_type objects_end,
+			        MeshBase &mesh,
+			        dofobject_accessor objects);
+
+  /**
+   * Distributes the global degrees of freedom, for dofs on
+   * this processor.  In this format the local
    * degrees of freedom are in a contiguous block for each
    * variable in the system.
+   * Starts at index next_free_dof, and increments it to
+   * the post-final index.
+   * If build_send_list is true, builds the send list.  If
+   * false, clears and reserves the send list
    */  
-  void distribute_dofs_var_major (MeshBase&);
+  void distribute_local_dofs_var_major (unsigned int& next_free_dof,
+				        MeshBase& mesh,
+				        bool build_send_list);
   
   /**
-   * Distributes the global degrees of freedom in a 
-   * node/element-major ordering.  In this format all the 
+   * Distributes the global degrees of freedom, for dofs on
+   * this processor.  In this format all the 
    * degrees of freedom at a node/element are in contiguous 
    * blocks.  Note in particular that the degrees of freedom
    * for a given variable are not in contiguous blocks, as 
    * in the case of \p distribute_dofs_var_major.
+   * Starts at index next_free_dof, and increments it to
+   * the post-final index.
+   * If build_send_list is true, builds the send list.  If
+   * false, clears and reserves the send list
    */  
-  void distribute_dofs_node_major (MeshBase&);
-
+  void distribute_local_dofs_node_major (unsigned int& next_free_dof,
+				         MeshBase& mesh,
+				         bool build_send_list);
+  
   /**
    * Splices the two sorted ranges [begin,middle) and [middle,end)
    * into one sorted range [begin,end).  This method is much like
