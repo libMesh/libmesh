@@ -821,7 +821,8 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 }
 
 #ifndef HAVE_MPI
-void MeshCommunication::allgather_bcs (ParallelMesh&, BoundaryInfo&) const
+void MeshCommunication::allgather_bcs (const ParallelMesh&,
+				       BoundaryInfo&) const
 {
   // NO MPI == one processor, no need for this method
   return;
