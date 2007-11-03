@@ -23,7 +23,6 @@
 #include "time_solver.h"
 #include "newton_solver.h"
 #include "sparse_matrix.h"
-#include "petsc_linear_solver.h" // for access to print_converged_reason
 
 ContinuationSystem::ContinuationSystem (EquationSystems& es,
 					const std::string& name,
@@ -563,15 +562,7 @@ void ContinuationSystem::continuation_solve()
 		std::cout << "Linear solver exited in zero iterations!" << std::endl;
 
 	      // Try to find out the reason for convergence/divergence
-	      {
-		PetscLinearSolver<Number>* petsc_linear_solver =
-		  dynamic_cast<PetscLinearSolver<Number>*>(linear_solver.get());
-
-		if (petsc_linear_solver)
-		  {
-		    petsc_linear_solver->print_converged_reason();
-		  }
-	      }
+	      linear_solver->print_converged_reason();
 	      
 	      break; // out of Newton iterations
 	    }
