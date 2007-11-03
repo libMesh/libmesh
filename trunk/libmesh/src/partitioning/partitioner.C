@@ -110,4 +110,10 @@ void Partitioner::_set_node_processor_ids(MeshBase& mesh)
 	elem->get_node(n)->processor_id() = std::min(elem->get_node(n)->processor_id(),
 						     elem->processor_id());
     }
+
+#ifdef DEBUG
+  // Make sure we hit all the nodes
+  for ( ; node_it != node_end; ++node_it)
+    assert((*node_it)->processor_id() != DofObject::invalid_id);
+#endif
 }
