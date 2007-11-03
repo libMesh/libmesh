@@ -123,6 +123,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 		  child->set_node(nc) =
 		    mesh_refinement.add_point(p[c][nc],
 					      keys[c][nc],
+					      child->processor_id(),
                                               pointtol);
 		  child->get_node(nc)->set_n_systems
                     (this->n_systems());

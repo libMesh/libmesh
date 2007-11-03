@@ -73,6 +73,7 @@ void MeshRefinement::clear ()
 
 Node* MeshRefinement::add_point (const Point& p,
                                  const unsigned int key,
+                                 const unsigned int processor_id,
                                  const Real tol)
 {
   START_LOG("add_point()", "MeshRefinement");
@@ -106,8 +107,9 @@ Node* MeshRefinement::add_point (const Point& p,
   _new_nodes_map.insert(pos.first, std::make_pair(key, node));
 #endif			    
 
-  // Set the key for this node
+  // Set the key and processor id for this node
   node->set_key() = key;
+  node->processor_id(processor_id);
   
   // Return the address of the new node
   STOP_LOG("add_point()", "MeshRefinement");
