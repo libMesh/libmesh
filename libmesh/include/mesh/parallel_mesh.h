@@ -90,16 +90,18 @@ class ParallelMesh : public UnstructuredMesh
   virtual void renumber_nodes_and_elements ();
 
   /**
-   * Deletes any elements which are neither local to this processor
-   * nor "ghosts" neighboring local elements
+   * Gathers all elements and nodes of the mesh onto
+   * every processor
    */
-  void delete_nonlocal_elements();
+  virtual void allgather();
 
   /**
-   * Called on all processors at once, rebuilds any elements which
-   * are local to other processors.
+   * Deletes all nonlocal elements of the mesh
+   * except for "ghosts" which touch a local element, and deletes
+   * all nodes which are not part of a local or ghost element
+   *
    */
-  void restore_nonlocal_elements();
+  virtual void delete_remote_elements();
 
   virtual unsigned int n_nodes () const { return _nodes.size(); }
   virtual unsigned int max_node_id () const {
