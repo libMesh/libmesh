@@ -30,7 +30,7 @@
 // ------------------------------------------------------------
 // ParallelMesh class member functions
 ParallelMesh::ParallelMesh (unsigned int d) :
-  UnstructuredMesh (d)
+  UnstructuredMesh (d), _is_serial(true)
 {
 }
 
@@ -500,6 +500,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
 void ParallelMesh::delete_remote_elements()
 {
+  _is_serial = false;
   MeshCommunication().delete_remote_elements(*this);
 }
 
@@ -507,5 +508,6 @@ void ParallelMesh::delete_remote_elements()
 
 void ParallelMesh::allgather()
 {
+  _is_serial = true;
   MeshCommunication().allgather(*this);
 }

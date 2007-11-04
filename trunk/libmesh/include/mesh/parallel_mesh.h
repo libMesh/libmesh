@@ -79,6 +79,13 @@ class ParallelMesh : public UnstructuredMesh
   virtual void clear();
 
   /**
+   * @returns \p true if all elements and nodes of the mesh
+   * exist on the current processor, \p false otherwise
+   */
+  virtual bool is_serial () const
+    { return _is_serial; }
+
+  /**
    * Renumber a parallel objects container
    */
   template <typename T>
@@ -280,6 +287,11 @@ protected:
    * The elements in the mesh.
    */
   mapvector<Elem*> _elements;
+
+  /**
+   * A boolean remembering whether we're serialized or not
+   */
+  bool _is_serial;
 
 private:
   

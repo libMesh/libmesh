@@ -517,6 +517,9 @@ void MeshCommunication::broadcast_bcs (const MeshBase&,
 
 void MeshCommunication::allgather (ParallelMesh& mesh) const
 {
+  // The mesh should know it's about to be parallelized
+  assert (!mesh.is_serial());
+
   this->allgather_mesh (mesh);
   this->allgather_bcs  (mesh, *(mesh.boundary_info));
 }
@@ -976,6 +979,9 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
 
 void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
 {
+  // The mesh should know it's about to be parallelized
+  assert (!mesh.is_serial());
+
   START_LOG("delete_remote_elements()", "MeshCommunication");
 
   std::vector<bool> local_nodes(mesh.max_node_id(), false);
