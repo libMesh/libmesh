@@ -71,6 +71,8 @@ namespace libMeshEnums {
 		 INFPRISM12, // 24
 
 		 NODEELEM,   // 25
+
+		 REMOTEELEM,   // 26
 		 
 		 INVALID_ELEM};
 }
