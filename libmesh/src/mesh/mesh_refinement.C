@@ -27,14 +27,14 @@
 // only compile these functions if the user requests AMR support
 #ifdef ENABLE_AMR
 
+#include "boundary_info.h"
+#include "elem.h"
 #include "error_vector.h"
+#include "libmesh_logging.h"
 #include "mesh_base.h"
 #include "mesh_refinement.h"
-#include "elem.h"
-#include "libmesh_logging.h"
-#include "boundary_info.h"
+#include "parallel.h"
 
-#include <limits>
 
 
 //-----------------------------------------------------------------
@@ -250,10 +250,12 @@ void MeshRefinement::update_nodes_map ()
 
 bool MeshRefinement::test_level_one (bool assert_pass)
 {
-  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+  MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
 
-  for ( ; elem_it != elem_end; ++elem_it)
+  unsigned int failure = 0;
+
+  for ( ; elem_it != elem_end && !failure; ++elem_it)
     {
       // Pointer to the element
       Elem *elem = *elem_it;
@@ -269,12 +271,20 @@ bool MeshRefinement::test_level_one (bool assert_pass)
               (neighbor->p_level() + 1 < elem->p_level()) ||
               (neighbor->p_level() > elem->p_level() + 1))
             {
-              // We didn't pass the level one test, so assert that 
-              // we're allowed not to
-              assert(!assert_pass);
-              return false;
+              failure = 1;
+              break;
             }
         }
+    }
+
+  Parallel::max(failure);
+
+  if (failure)
+    {
+      // We didn't pass the level one test, so assert that 
+      // we're allowed not to
+      assert(!assert_pass);
+      return false;
     }
   return true;
 }
