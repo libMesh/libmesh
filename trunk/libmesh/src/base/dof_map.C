@@ -161,8 +161,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
                              procdown, request_to_fill);
 
       // Fill those requests
-      const unsigned int n_variables = request_to_fill.empty() ?
-        0 : ((this->*objects)(mesh, request_to_fill[0]))->n_vars(this->sys_number());
+      const unsigned int n_variables = this->n_variables();
 
       std::vector<unsigned int> ghost_data
         (request_to_fill.size() * 2 * n_variables);
