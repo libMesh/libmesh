@@ -27,6 +27,7 @@
 #include "auto_ptr.h"
 #include "getpot.h"
 #include "reference_counter.h"
+#include "remote_elem.h"
 
 
 
@@ -127,6 +128,11 @@ void libMesh::init (int &argc, char** & argv,
   // Build a command-line parser.
   command_line.reset(new GetPot (argc, argv));
 
+  // Construct singletons who may be at risk of the
+  // "static initialization order fiasco"
+  //
+  // RemoteElem depends on static reference counting data
+  remote_elem = new RemoteElem();
 
 #if defined(HAVE_MPI)
 
@@ -217,6 +223,8 @@ void libMesh::init (int &argc, char** & argv,
 
 int libMesh::close ()
 {
+  // Delete reference counted singleton(s)
+  delete remote_elem;
 
 #if defined(HAVE_MPI)
   // Allow the user to bypass MPI finalization
