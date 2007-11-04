@@ -23,6 +23,7 @@
 #include "boundary_info.h"
 #include "elem.h"
 #include "libmesh_logging.h"
+#include "mesh_communication.h"
 #include "parallel_mesh.h"
 #include "parallel.h"
 
@@ -497,64 +498,14 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
 
 
-void ParallelMesh::delete_nonlocal_elements()
+void ParallelMesh::delete_remote_elements()
 {
-  START_LOG("delete_nonlocal_elements()", "ParallelMesh");
-
-  std::vector<bool> local_nodes(this->max_node_id(), false);
-  std::vector<bool> semilocal_elems(this->max_elem_id(), false);
-
-  // We don't want to delete any element that shares a node
-  // with a local element.
-  const_element_iterator l_elem_it = this->local_elements_begin(),
-                         l_end     = this->local_elements_end();
-  for (; l_elem_it != l_end; ++l_elem_it)
-    {
-      const Elem *elem = *l_elem_it;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        local_nodes[elem->node(n)] = true;
-    }
-
-  // We don't want to delete any element that shares a node
-  // with an unpartitioned element either.
-  const_element_iterator u_elem_it =
-    this->pid_elements_begin(DofObject::invalid_processor_id),
-                         u_end     =
-    this->pid_elements_end(DofObject::invalid_processor_id);
-  for (; u_elem_it != u_end; ++u_elem_it)
-    {
-      const Elem *elem = *u_elem_it;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        local_nodes[elem->node(n)] = true;
-    }
-
-  element_iterator nl_elem_it = this->not_local_elements_begin(),
-                   nl_end     = this->not_local_elements_end();
-  for (; nl_elem_it != nl_end; ++nl_elem_it)
-    {
-      Elem *elem = *nl_elem_it;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        if (local_nodes[elem->node(n)])
-          {
-            semilocal_elems[elem->id()] = true;
-            break;
-          }
-      if (!semilocal_elems[elem->id()])
-        {
-          // delete_elem doesn't currently invalidate element
-          // iterators... that had better not change
-          this->delete_elem(elem);
-        }
-    }
-//  We eventually want to compact the _nodes and _elems vectors
-//  But not do a repartition or anything
-//  do not this->prepare_for_use();
-
-  STOP_LOG("delete_nonlocal_elements()", "ParallelMesh");
+  MeshCommunication().delete_remote_elements(*this);
 }
 
-void ParallelMesh::restore_nonlocal_elements()
+
+
+void ParallelMesh::allgather()
 {
-  // Someday...
-  error();
+  MeshCommunication().allgather(*this);
 }

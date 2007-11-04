@@ -95,6 +95,18 @@ public:
    */
   void allgather (ParallelMesh& ) const;
 
+  /**
+   * This method takes an input \p ParallelMesh which may be
+   * distributed among all the processors.  Each processor 
+   * deletes all elements which are neither local elements nor "ghost"
+   * elements which touch local elements, and deletes all nodes which
+   * are not contained in local or ghost elements.
+   * The end result is that a previously serial \p ParallelMesh
+   * will be distributed between processors.  Since this method is
+   * collective it must be called by all processors.
+   */
+  void delete_remote_elements (ParallelMesh& ) const;
+
   
 private:
 

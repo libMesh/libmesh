@@ -974,6 +974,62 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
 
 
 
+void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
+{
+  START_LOG("delete_remote_elements()", "MeshCommunication");
+
+  std::vector<bool> local_nodes(mesh.max_node_id(), false);
+  std::vector<bool> semilocal_elems(mesh.max_elem_id(), false);
+
+  // We don't want to delete any element that shares a node
+  // with a local element.
+  MeshBase::const_element_iterator l_elem_it = mesh.local_elements_begin(),
+                                   l_end     = mesh.local_elements_end();
+  for (; l_elem_it != l_end; ++l_elem_it)
+    {
+      const Elem *elem = *l_elem_it;
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        local_nodes[elem->node(n)] = true;
+    }
+
+  // We don't want to delete any element that shares a node
+  // with an unpartitioned element either.
+  MeshBase::const_element_iterator u_elem_it =
+    mesh.pid_elements_begin(DofObject::invalid_processor_id),
+                                   u_end     =
+    mesh.pid_elements_end(DofObject::invalid_processor_id);
+  for (; u_elem_it != u_end; ++u_elem_it)
+    {
+      const Elem *elem = *u_elem_it;
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        local_nodes[elem->node(n)] = true;
+    }
+
+  MeshBase::element_iterator nl_elem_it = mesh.not_local_elements_begin(),
+                             nl_end     = mesh.not_local_elements_end();
+  for (; nl_elem_it != nl_end; ++nl_elem_it)
+    {
+      Elem *elem = *nl_elem_it;
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        if (local_nodes[elem->node(n)])
+          {
+            semilocal_elems[elem->id()] = true;
+            break;
+          }
+      if (!semilocal_elems[elem->id()])
+        {
+          // delete_elem doesn't currently invalidate element
+          // iterators... that had better not change
+          mesh.delete_elem(elem);
+        }
+    }
+
+  STOP_LOG("delete_remote_elements()", "MeshCommunication");
+}
+
+
+
+
 // Pack all this information into one communication to avoid two latency hits
 // For each element it is of the form
 // [ level etype subdomain_id self_ID parent_ID node_0 node_1 ... node_n]

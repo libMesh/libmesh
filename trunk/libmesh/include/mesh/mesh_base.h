@@ -104,6 +104,26 @@ public:
   { return _is_prepared; }
   
   /**
+   * @returns \p true if all elements and nodes of the mesh
+   * exist on the current processor, \p false otherwise
+   */
+  virtual bool is_serial () const 
+  { return true; }
+  
+  /**
+   * @gathers all elements and nodes of the mesh onto
+   * every processor
+   */
+  virtual void allgather () {}
+  
+  /**
+   * @when supported, deletes all nonlocal elements of the mesh
+   * except for "ghosts" which touch a local element, and deletes
+   * all nodes which are not part of a local or ghost element
+   */
+  virtual void delete_remote_elements () {}
+  
+  /**
    * Returns the logical dimension of the mesh.
    */
   unsigned int mesh_dimension () const
