@@ -22,9 +22,10 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-#include "partitioner.h"
-#include "mesh_base.h"
 #include "elem.h"
+#include "mesh_base.h"
+#include "parallel.h"
+#include "partitioner.h"
 
 
 // ------------------------------------------------------------
@@ -93,7 +94,11 @@ void Partitioner::_set_node_processor_ids(MeshBase& mesh)
   const MeshBase::node_iterator node_end = mesh.nodes_end();
   
   for ( ; node_it != node_end; ++node_it)
-    (*node_it)->invalidate_processor_id();
+    {
+      Node *node = *node_it;
+      assert(node);
+      node->invalidate_processor_id();
+    }
   
   
   // Loop over all the active elements
@@ -103,6 +108,7 @@ void Partitioner::_set_node_processor_ids(MeshBase& mesh)
   for ( ; elem_it != elem_end; ++elem_it)
     {
       Elem* elem = *elem_it;
+      assert(elem);
       
       // For each node, set the processor ID to the min of
       // its current value and this Element's processor id.
@@ -119,6 +125,7 @@ void Partitioner::_set_node_processor_ids(MeshBase& mesh)
   for ( ; sub_it != sub_end; ++sub_it)
     {
       Elem* elem = *sub_it;
+      assert(elem);
       
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
         if (elem->get_node(n)->processor_id() == DofObject::invalid_processor_id)
@@ -126,10 +133,75 @@ void Partitioner::_set_node_processor_ids(MeshBase& mesh)
 						       elem->processor_id());
     }
 
-#ifdef DEBUG
+  // At this point, if we're in parallel, all our own processor ids
+  // should be correct, but ghost nodes may be incorrect.  However,
+  // our tenative processor ids will let us know who to ask.
+
+  // Loop over all the nodes, count the ones on each processor
+  std::vector<unsigned int>
+    ghost_objects_from_proc(libMesh::n_processors(), 0);
+
   node_it  = mesh.nodes_begin();
-  // Make sure we hit all the nodes
   for ( ; node_it != node_end; ++node_it)
-    assert((*node_it)->processor_id() != DofObject::invalid_processor_id);
-#endif
+    {
+      Node *node = *node_it;
+      assert(node);
+      unsigned int obj_procid = node->processor_id();
+      assert(obj_procid != DofObject::invalid_processor_id);
+      ghost_objects_from_proc[obj_procid]++;
+    }
+
+  // Request sets to send to each processor
+  std::vector<std::vector<unsigned int> >
+    requested_ids(libMesh::n_processors());
+
+  // We know how many objects live on each processor, so reserve()
+  // space for each.
+  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+    if (p != libMesh::processor_id())
+      requested_ids[p].reserve(ghost_objects_from_proc[p]);
+
+  node_it  = mesh.nodes_begin();
+  for ( ; node_it != node_end; ++node_it)
+    {
+      Node *node = *node_it;
+      requested_ids[node->processor_id()].push_back(node->id());
+    }
+
+  // Next set ghost object ids from other processors
+  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+    {
+      // Trade my requests with processor procup and procdown
+      unsigned int procup = (libMesh::processor_id() + p) %
+                             libMesh::n_processors();
+      unsigned int procdown = (libMesh::n_processors() +
+                               libMesh::processor_id() - p) %
+                               libMesh::n_processors();
+      std::vector<unsigned int> request_to_fill;
+      Parallel::send_receive(procup, requested_ids[procup],
+                             procdown, request_to_fill);
+
+      // Fill those requests
+      std::vector<unsigned int> new_ids(request_to_fill.size());
+      for (unsigned int i=0; i != request_to_fill.size(); ++i)
+        {
+          Node *node = mesh.node_ptr(request_to_fill[i]);
+          assert(node);
+          new_ids[i] = node->processor_id();
+        }
+
+      // Trade back the results
+      std::vector<unsigned int> filled_request;
+      Parallel::send_receive(procdown, new_ids,
+                             procup, filled_request);
+      assert(filled_request.size() == requested_ids[procup].size());
+      
+      // And copy the id changes we've now been informed of
+      for (unsigned int i=0; i != filled_request.size(); ++i)
+        {
+          Node *node = mesh.node_ptr(requested_ids[procup][i]);
+          assert(filled_request[i] < libMesh::n_processors());
+          node->processor_id(filled_request[i]);
+        }
+    }
 }
