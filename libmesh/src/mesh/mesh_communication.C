@@ -982,7 +982,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
   std::vector<bool> semilocal_elems(mesh.max_elem_id(), false);
 
   // We don't want to delete any element that shares a node
-  // with a local element.
+  // with or is an ancestor of a local element.
   MeshBase::const_element_iterator l_elem_it = mesh.local_elements_begin(),
                                    l_end     = mesh.local_elements_end();
   for (; l_elem_it != l_end; ++l_elem_it)
@@ -990,10 +990,16 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
       const Elem *elem = *l_elem_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         local_nodes[elem->node(n)] = true;
+      const Elem *parent = elem->parent();
+      while (parent)
+        {
+          semilocal_elems[parent->id()] = true;
+          parent = parent->parent();
+        }
     }
 
   // We don't want to delete any element that shares a node
-  // with an unpartitioned element either.
+  // with or is an ancestor of an unpartitioned element either.
   MeshBase::const_element_iterator u_elem_it =
     mesh.pid_elements_begin(DofObject::invalid_processor_id),
                                    u_end     =
@@ -1003,8 +1009,16 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
       const Elem *elem = *u_elem_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         local_nodes[elem->node(n)] = true;
+      const Elem *parent = elem->parent();
+      while (parent)
+        {
+          semilocal_elems[parent->id()] = true;
+          parent = parent->parent();
+        }
     }
 
+  // Flag all the elements that share nodes with
+  // local and unpartitioned elements, along with their ancestors
   MeshBase::element_iterator nl_elem_it = mesh.not_local_elements_begin(),
                              nl_end     = mesh.not_local_elements_end();
   for (; nl_elem_it != nl_end; ++nl_elem_it)
@@ -1014,8 +1028,21 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
         if (local_nodes[elem->node(n)])
           {
             semilocal_elems[elem->id()] = true;
+            const Elem *parent = elem->parent();
+            while (parent)
+              {
+                semilocal_elems[parent->id()] = true;
+                parent = parent->parent();
+              }
             break;
           }
+    }
+
+  // Delete all the elements we have no reason to save
+  nl_elem_it = mesh.not_local_elements_begin();
+  for (; nl_elem_it != nl_end; ++nl_elem_it)
+    {
+      Elem *elem = *nl_elem_it;
       if (!semilocal_elems[elem->id()])
         {
           // delete_elem doesn't currently invalidate element
