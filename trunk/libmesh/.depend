@@ -35,6 +35,7 @@ src/base/dof_map.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/utils/o_string_stream.h\
+    include/utils/parallel.h\
     include/utils/perf_log.h\
     include/utils/string_to_enum.h
 src/base/dof_map_constraints.$(obj-suffix):\
@@ -97,13 +98,27 @@ src/base/dof_object.$(obj-suffix):\
 src/base/libmesh.$(obj-suffix):\
     src/base/libmesh.C\
     include/base/auto_ptr.h\
+    include/base/dof_object.h\
     include/base/getpot.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/geom/remote_elem.h\
+    include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/base/node.$(obj-suffix):\
@@ -3022,6 +3037,31 @@ src/geom/plane.$(obj-suffix):\
     include/numerics/type_vector.h
 src/geom/point.$(obj-suffix):\
     src/geom/point.C
+src/geom/remote_elem.$(obj-suffix):\
+    src/geom/remote_elem.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/multi_predicates.h\
+    include/base/node.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/geom/elem.h\
+    include/geom/point.h\
+    include/geom/remote_elem.h\
+    include/numerics/type_vector.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/geom/sphere.$(obj-suffix):\
     src/geom/sphere.C\
     include/base/libmesh.h\
@@ -3681,6 +3721,7 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/utils/error_vector.h\
     include/utils/o_string_stream.h\
+    include/utils/parallel.h\
     include/utils/perf_log.h\
     include/utils/statistics.h
 src/mesh/mesh_refinement_flagging.$(obj-suffix):\
@@ -3949,6 +3990,7 @@ src/mesh/parallel_mesh.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/boundary_info.h\
     include/mesh/mesh_base.h\
+    include/mesh/mesh_communication.h\
     include/mesh/parallel_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
@@ -5445,6 +5487,7 @@ src/partitioning/partitioner.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/node.h\
     include/base/reference_counted_object.h\
@@ -5462,6 +5505,7 @@ src/partitioning/partitioner.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/partitioning/partitioner.h\
     include/utils/o_string_stream.h\
+    include/utils/parallel.h\
     include/utils/perf_log.h
 src/partitioning/partitioner_factory.$(obj-suffix):\
     src/partitioning/partitioner_factory.C\
@@ -5875,10 +5919,6 @@ src/solvers/continuation_system.$(obj-suffix):\
     include/numerics/dense_vector_base.h\
     include/numerics/linear_solver.h\
     include/numerics/numeric_vector.h\
-    include/numerics/petsc_linear_solver.h\
-    include/numerics/petsc_macro.h\
-    include/numerics/petsc_matrix.h\
-    include/numerics/petsc_vector.h\
     include/numerics/sparse_matrix.h\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
