@@ -101,9 +101,9 @@ namespace Parallel
    */
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
-                           std::vector<T> &send,
+                           T &send,
 			   const unsigned int source_processor_id,
-                           std::vector<T> &recv);
+                           T &recv);
 
   //-------------------------------------------------------------------
   /**
@@ -353,6 +353,27 @@ namespace Parallel
 	    r[i].imag() = tempimagoutput[i];
 	  }
       }
+  }
+
+
+
+  template <typename T>
+  inline void send_receive(const unsigned int dest_processor_id,
+                           T &send,
+			   const unsigned int source_processor_id,
+                           T &recv)
+  {
+    START_LOG("send_receive()", "Parallel");
+
+    MPI_Status status;
+    MPI_Sendrecv(&send, 1, datatype<T>(),
+		 dest_processor_id, 0,
+		 &recv, 1, datatype<T>(),
+		 source_processor_id, 0,
+		 libMesh::COMM_WORLD,
+		 &status);
+
+    STOP_LOG("send_receive()", "Parallel");
   }
 
 
