@@ -1061,6 +1061,10 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
     }
 
   STOP_LOG("delete_remote_elements()", "MeshCommunication");
+
+  // Now make sure the containers actually shrink - strip
+  // any newly-created NULL voids out of the element array
+  mesh.renumber_nodes_and_elements();
 }
 
 
