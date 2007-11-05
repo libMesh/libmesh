@@ -110,15 +110,11 @@ class ParallelMesh : public UnstructuredMesh
    */
   virtual void delete_remote_elements();
 
-  virtual unsigned int n_nodes () const { return _nodes.size(); }
-  virtual unsigned int max_node_id () const {
-    return _nodes.empty() ? 0 : _nodes.rbegin()->first + 1;
-  }
+  virtual unsigned int n_nodes () const;
+  virtual unsigned int max_node_id () const;
   virtual void reserve_nodes (const unsigned int) { }
-  virtual unsigned int n_elem ()  const { return _elements.size(); }
-  virtual unsigned int max_elem_id ()  const {
-    return _elements.empty() ? 0 : _elements.rbegin()->first + 1;
-  }
+  virtual unsigned int n_elem () const;
+  virtual unsigned int max_elem_id () const;
   virtual void reserve_elem (const unsigned int) { }
 
   /**
