@@ -534,7 +534,7 @@ private:
    */  
   void distribute_local_dofs_var_major (unsigned int& next_free_dof,
 				        MeshBase& mesh,
-				        bool build_send_list);
+				        const bool build_send_list);
   
   /**
    * Distributes the global degrees of freedom, for dofs on
@@ -550,7 +550,7 @@ private:
    */  
   void distribute_local_dofs_node_major (unsigned int& next_free_dof,
 				         MeshBase& mesh,
-				         bool build_send_list);
+				         const bool build_send_list);
   
   /**
    * Splices the two sorted ranges [begin,middle) and [middle,end)
