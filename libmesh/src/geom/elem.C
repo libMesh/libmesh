@@ -54,6 +54,7 @@
 #include "cell_pyramid5.h"
 #include "fe_base.h"
 #include "quadrature_gauss.h"
+#include "remote_elem.h"
 
 // Initialize static member variables
 const unsigned int Elem::_bp1 = 65449;
@@ -477,6 +478,41 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
         }
     }
   while (old_size != neighbor_set.size());
+}
+
+
+
+void Elem::remote_neighbors_links()
+{
+  for (unsigned int s = 0; s != this->n_sides(); ++s)
+    {
+      Elem *neigh = this->neighbor(s);
+      if (neigh && neigh != remote_elem)
+        {
+          unsigned int my_s = neigh->which_neighbor_am_i(this);
+
+          // My neighbor's neighbor may be my ancestor, in which
+          // case it doesn't need to change
+          if (my_s == libMesh::invalid_uint)
+            continue;
+          
+	  // My neighbor may have descendants which also consider me a
+	  // neighbor
+          std::vector<const Elem*> family;
+          neigh->family_tree_by_neighbor (family, this);
+
+          // FIXME - There's a lot of ugly const_casts here; we
+          // may want to make remote_elem non-const and create
+          // non-const versions of the family_tree methods
+          for (unsigned int i=0; i != family.size(); ++i)
+            {
+              Elem *n = const_cast<Elem*>(family[i]);
+              // This assumption
+              assert (n->which_neighbor_am_i(this) == my_s);
+              n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
+            }
+        }
+    }
 }
 
 
