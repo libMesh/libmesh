@@ -522,6 +522,9 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
 
   this->allgather_mesh (mesh);
   this->allgather_bcs  (mesh, *(mesh.boundary_info));
+
+  // Inform new elements of their neighbors
+  mesh.find_neighbors();
 }
 
 #ifndef HAVE_MPI
