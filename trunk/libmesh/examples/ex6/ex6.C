@@ -468,21 +468,22 @@ void assemble_wave(EquationSystems& es,
   // Note that we have not applied any boundary conditions so far.
   // Here we apply a unit load at the node located at (0,0,0).
   {
-    // Number of nodes in the mesh.     
-    const unsigned int n_nodes = mesh.n_nodes();
+    // Iterate over local nodes
+    MeshBase::const_node_iterator           nd = mesh.local_nodes_begin();
+    const MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
     
-    for (unsigned int n_cnt=0; n_cnt<n_nodes; n_cnt++)
+    for (; nd != nd_end; ++nd)
       {	
 	// Get a reference to the current node.
-	const Node& curr_node = mesh.node(n_cnt);
+	const Node& node = **nd;
 	
 	// Check the location of the current node.
-	if (fabs(curr_node(0)) < TOLERANCE &&
-	    fabs(curr_node(1)) < TOLERANCE &&
-	    fabs(curr_node(2)) < TOLERANCE)
+	if (fabs(node(0)) < TOLERANCE &&
+	    fabs(node(1)) < TOLERANCE &&
+	    fabs(node(2)) < TOLERANCE)
 	  {
 	    // The global number of the respective degree of freedom.
-	    unsigned int dn = curr_node.dof_number(0,0,0);
+	    unsigned int dn = node.dof_number(0,0,0);
 
 	    system.rhs->add (dn, 1.);
 	  }
