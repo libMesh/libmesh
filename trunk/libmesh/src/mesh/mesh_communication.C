@@ -517,8 +517,8 @@ void MeshCommunication::broadcast_bcs (const MeshBase&,
 
 void MeshCommunication::allgather (ParallelMesh& mesh) const
 {
-  // The mesh should know it's about to be parallelized
-  assert (!mesh.is_serial());
+  // The mesh should know it's about to be serialized
+  assert (mesh.is_serial());
 
   this->allgather_mesh (mesh);
   this->allgather_bcs  (mesh, *(mesh.boundary_info));
