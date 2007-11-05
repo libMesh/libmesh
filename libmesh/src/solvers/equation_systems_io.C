@@ -29,6 +29,8 @@
 #include "equation_systems.h"
 #include "xdr_cxx.h"
 
+#include "mesh_base.h" // for allgather
+
 // Forward Declarations
 
 
@@ -320,6 +322,12 @@ void EquationSystems::write(const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
                             const unsigned int write_flags) const
 {
+  /**
+   * Currently we only support I/O in serial
+   */
+  if (!_mesh.is_serial())
+    _mesh.allgather();
+
   /**
    * This program implements the output of an 
    * EquationSystems object.  This warrants some 
