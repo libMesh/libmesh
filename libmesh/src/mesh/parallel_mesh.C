@@ -60,6 +60,46 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
 
 
 
+unsigned int ParallelMesh::n_elem() const
+{
+  unsigned int n_local = this->n_local_elem();
+  Parallel::sum(n_local);
+  n_local += this->n_unpartitioned_elem();
+  return n_local;
+}
+
+
+
+unsigned int ParallelMesh::max_elem_id() const
+{
+  unsigned int max_local = _elements.empty() ?
+    0 : _elements.rbegin()->first + 1;
+  Parallel::max(max_local);
+  return max_local;
+}
+
+
+
+unsigned int ParallelMesh::n_nodes() const
+{
+  unsigned int n_local = this->n_local_nodes();
+  Parallel::sum(n_local);
+  n_local += this->n_unpartitioned_nodes();
+  return n_local;
+}
+
+
+
+unsigned int ParallelMesh::max_node_id() const
+{
+  unsigned int max_local = _nodes.empty() ?
+    0 : _nodes.rbegin()->first + 1;
+  Parallel::max(max_local);
+  return max_local;
+}
+
+
+
 const Point& ParallelMesh::point (const unsigned int i) const
 {
   assert (i < this->max_node_id());

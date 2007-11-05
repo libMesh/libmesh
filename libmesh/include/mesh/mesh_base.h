@@ -37,11 +37,12 @@ class PointLocatorBase;
 class MeshData;
 
 // Local Includes -----------------------------------
-#include "libmesh_common.h"
-#include "enum_elem_type.h"
-#include "variant_filter_iterator.h"
-#include "multi_predicates.h"
 #include "auto_ptr.h"
+#include "dof_object.h" // for invalid_processor_id
+#include "enum_elem_type.h"
+#include "libmesh_common.h"
+#include "multi_predicates.h"
+#include "variant_filter_iterator.h"
 
 
 
@@ -144,15 +145,21 @@ public:
   virtual unsigned int n_nodes () const = 0; 
 
   /**
-   * Returns the number of elements on processor \p proc.
+   * Returns the number of nodes on processor \p proc.
    */
   unsigned int n_nodes_on_proc (const unsigned int proc) const;
 
   /**
-   * Returns the number of elements on the local processor.
+   * Returns the number of nodes on the local processor.
    */
   unsigned int n_local_nodes () const
   { return this->n_nodes_on_proc (libMesh::processor_id()); }
+
+  /**
+   * Returns the number of nodes owned by no processor.
+   */
+  unsigned int n_unpartitioned_nodes () const
+  { return this->n_nodes_on_proc (DofObject::invalid_processor_id); }
 
   /**
    * Returns a number greater than or equal to the maximum node id in the
@@ -205,6 +212,12 @@ public:
    */
   unsigned int n_local_elem () const
   { return this->n_elem_on_proc (libMesh::processor_id()); }
+
+  /**
+   * Returns the number of elements owned by no processor.
+   */
+  unsigned int n_unpartitioned_elem () const
+  { return this->n_elem_on_proc (DofObject::invalid_processor_id); }
 
   /**
    * Returns the number of active elements on processor \p proc.
