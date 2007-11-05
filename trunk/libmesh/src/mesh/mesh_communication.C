@@ -1051,6 +1051,9 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
       Elem *elem = *nl_elem_it;
       if (!semilocal_elems[elem->id()])
         {
+          // Make sure we don't leave any invalid neighbor pointers
+          elem->remote_neighbors_links();
+
           // delete_elem doesn't currently invalidate element
           // iterators... that had better not change
           mesh.delete_elem(elem);
