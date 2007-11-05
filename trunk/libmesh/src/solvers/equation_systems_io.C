@@ -29,8 +29,6 @@
 #include "equation_systems.h"
 #include "xdr_cxx.h"
 
-#include "mesh_base.h" // for allgather
-
 // Forward Declarations
 
 
@@ -324,9 +322,10 @@ void EquationSystems::write(const std::string& name,
 {
   /**
    * Currently we only support I/O in serial
+   * So we're going to horribly abuse const_cast and change
+   * that
    */
-  if (!_mesh.is_serial())
-    _mesh.allgather();
+  const_cast<EquationSystems*>(this)->allgather();
 
   /**
    * This program implements the output of an 

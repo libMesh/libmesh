@@ -361,6 +361,12 @@ public:
    */
   MeshData & get_mesh_data();
 
+  /**
+   * @serializes a distributed mesh and its associated
+   * degree of freedom numbering for all systems
+   **/
+  void allgather ();
+
 
   /**
    * Data structure holding arbitrary parameters.
