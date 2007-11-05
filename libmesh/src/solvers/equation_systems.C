@@ -227,6 +227,43 @@ void EquationSystems::reinit ()
 
 
 
+void EquationSystems::allgather ()
+{
+  // A serial mesh means nothing needs to be done
+  if (_mesh.is_serial())
+    return;
+
+  const unsigned int n_sys = this->n_systems();
+
+  assert (n_sys != 0);
+
+  // Gather the mesh
+  _mesh.allgather();
+  
+  // Tell all the \p DofObject entities how many systems
+  // there are.
+  {
+    MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
+    const MeshBase::node_iterator node_end = _mesh.nodes_end();
+
+    for ( ; node_it != node_end; ++node_it)
+      (*node_it)->set_n_systems(n_sys);
+    
+    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
+    const MeshBase::element_iterator elem_end = _mesh.elements_end();
+    
+    for ( ; elem_it != elem_end; ++elem_it)
+      (*elem_it)->set_n_systems(n_sys);
+  }
+
+  // And distribute each system's dofs
+  for (unsigned int i=0; i != this->n_systems(); ++i)
+    this->get_system(i).get_dof_map().distribute_dofs(_mesh);
+}
+
+
+
+
 void EquationSystems::update ()
 {
   // Localize each system's vectors
