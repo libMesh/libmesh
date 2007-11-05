@@ -288,7 +288,8 @@ public:
   /**
    * Removes element \p e from the mesh. Note that calling this
    * method may produce isolated nodes, i.e. nodes not connected
-   * to any element.
+   * to any element.  This method must be implemented in derived classes
+   * in such a way that it does not invalidate element iterators.
    */
   virtual void delete_elem (Elem* e) = 0;
 		      
