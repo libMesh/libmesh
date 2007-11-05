@@ -225,6 +225,14 @@ class Elem : public ReferenceCountedObject<Elem>,
   void find_point_neighbors(std::set<const Elem *> &neighbor_set) const;
 
   /**
+   * Resets this element's neighbors' appropriate neighbor pointers
+   * to point to the global remote_elem instead of this.
+   * Used by the library before a remote element is deleted on the
+   * local processor.
+   */
+  void remote_neighbors_links ();
+
+  /**
    * Returns the connectivity for this element in a specific
    * format, which is specified by the IOPackage tag.  This
    * method supercedes the tecplot_connectivity(...) and vtk_connectivity(...)
