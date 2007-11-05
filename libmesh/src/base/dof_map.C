@@ -690,7 +690,7 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
 void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
                                               MeshBase& mesh,
-                                              bool build_send_list)
+                                              const bool build_send_list)
 {
   const unsigned int sys_num = this->sys_number();
   const unsigned int n_vars  = this->n_variables();
@@ -802,7 +802,7 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
 
 void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
                                              MeshBase& mesh,
-                                             bool build_send_list)
+                                             const bool build_send_list)
 {
   const unsigned int sys_num = this->sys_number();
   const unsigned int n_vars  = this->n_variables();
