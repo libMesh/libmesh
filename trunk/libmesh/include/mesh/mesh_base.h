@@ -277,9 +277,14 @@ public:
   virtual Elem* elem (const unsigned int i) const = 0;
 
   /**
-   * Add a new \p Node at \p Point \p p to the end of the vertex array.
+   * Add a new \p Node at \p Point \p p to the end of the vertex array,
+   * with processor_id \p procid.  Use DofObject::invalid_processor_id
+   * (default) to add a node to all processors, or libMesh::processor_id()
+   * to add a node locally only.
    */
-  virtual Node* add_point (const Point& p) = 0;
+  virtual Node* add_point (const Point& p,
+			   const unsigned int proc_id =
+			     DofObject::invalid_processor_id) = 0;
 
   /**
    * Add \p Node \p n to the end of the vertex array.
