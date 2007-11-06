@@ -982,7 +982,7 @@ Elem::Elem(const unsigned int nn,
 #endif
 {
   this->subdomain_id() = 0;
-  this->processor_id() = 0;
+  this->processor_id() = DofObject::invalid_processor_id;
 
   // Initialize the nodes data structure
   _nodes = NULL;
