@@ -243,21 +243,13 @@ void ParallelMesh::delete_elem(Elem* e)
 
 
 
-Node* ParallelMesh::add_point (const Point& p)
+Node* ParallelMesh::add_point (const Point& p,
+			       const unsigned int proc_id)
 {  
   Node* n = Node::build(p, _next_free_unpartitioned_node_id).release();
-  _nodes[_next_free_unpartitioned_node_id] = n;
+  n->processor_id() = proc_id;
 
-  _next_free_unpartitioned_node_id += libMesh::n_processors() + 1;
-  
-// This method is intended for adding nodes to every processor
-#ifdef DEBUG
-  unsigned int test_id = _next_free_unpartitioned_node_id;
-  Parallel::max(test_id);
-  assert(test_id == _next_free_unpartitioned_node_id);
-#endif
-  
-  return n;
+  return ParallelMesh::add_node(n);
 }
 
 

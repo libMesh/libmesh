@@ -211,11 +211,14 @@ void SerialMesh::delete_elem(Elem* e)
 
 
 
-Node* SerialMesh::add_point (const Point& p)
+Node* SerialMesh::add_point (const Point& p,
+			     const unsigned int proc_id)
 {  
-  _nodes.push_back (Node::build(p, this->n_nodes()).release());
+  Node *n = Node::build(p, _nodes.size()).release();
+  n->processor_id() = proc_id;
+  _nodes.push_back (n);
   
-  return _nodes.back();
+  return n;
 }
 
 
