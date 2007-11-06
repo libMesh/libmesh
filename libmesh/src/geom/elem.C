@@ -496,6 +496,7 @@ void Elem::remote_neighbors_links()
           if (my_s == libMesh::invalid_uint)
             continue;
           
+#ifdef ENABLE_AMR
 	  // My neighbor may have descendants which also consider me a
 	  // neighbor
           std::vector<const Elem*> family;
@@ -511,6 +512,9 @@ void Elem::remote_neighbors_links()
               assert (n->which_neighbor_am_i(this) == my_s);
               n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
             }
+#else
+          neigh->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
+#endif
         }
     }
 }
