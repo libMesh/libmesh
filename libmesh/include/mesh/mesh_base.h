@@ -277,10 +277,14 @@ public:
   virtual Elem* elem (const unsigned int i) const = 0;
 
   /**
-   * Add \p Node \p n to the vertex array.  The node will be appended to the
-   * end of the vertex array. 
+   * Add a new \p Node at \p Point \p p to the end of the vertex array.
    */
-  virtual Node* add_point (const Point& n) = 0;
+  virtual Node* add_point (const Point& p) = 0;
+
+  /**
+   * Add \p Node \p n to the end of the vertex array.
+   */
+  virtual Node* add_node (Node* n) ;
 
   /**
    * Removes the Node n from the mesh.

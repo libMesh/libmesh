@@ -139,8 +139,9 @@ Elem* SerialMesh::elem (const unsigned int i) const
 
 Elem* SerialMesh::add_elem (Elem* e)
 {
-  if (e != NULL)
-    e->set_id (_elements.size());
+  assert(e);
+
+  e->set_id (_elements.size());
   
   _elements.push_back(e);
 
@@ -215,6 +216,19 @@ Node* SerialMesh::add_point (const Point& p)
   _nodes.push_back (Node::build(p, this->n_nodes()).release());
   
   return _nodes.back();
+}
+
+
+
+Node* SerialMesh::add_node (Node* n)
+{  
+  assert(n);
+
+  n->set_id (_nodes.size());
+  
+  _nodes.push_back(n);
+
+  return n;
 }
 
 

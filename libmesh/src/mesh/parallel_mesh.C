@@ -177,28 +177,33 @@ Elem* ParallelMesh::add_elem (Elem* e)
   // Don't try to add NULLs!
   assert(e);
 
-  unsigned int elem_procid = e->processor_id();
+  const unsigned int elem_procid = e->processor_id();
+  unsigned int *elem_id;
   if (elem_procid == DofObject::invalid_processor_id)
     {
-      e->set_id (_next_free_unpartitioned_elem_id);
-      _next_free_unpartitioned_elem_id += libMesh::n_processors() + 1;
-
-// Unpartitioned elements must be added on every processor
-#ifdef DEBUG
-      unsigned int test_id = _next_free_unpartitioned_elem_id;
-      Parallel::max(test_id);
-      assert(test_id == _next_free_unpartitioned_elem_id);
-#endif
+      elem_id = &_next_free_unpartitioned_elem_id;
     }
   else
     {
       assert(e->processor_id() == libMesh::processor_id());
-      e->set_id (_next_free_local_elem_id);
-      _next_free_local_elem_id += libMesh::n_processors() + 1;
+      elem_id = &_next_free_local_elem_id;
     }
 
-  _elements[_next_free_unpartitioned_elem_id] = e;
+  e->set_id (*elem_id);
+  *elem_id += libMesh::n_processors() + 1;
+
+  _elements[*elem_id] = e;
   
+// Unpartitioned elements must be added on every processor
+#ifdef DEBUG
+  if (elem_procid == DofObject::invalid_processor_id)
+    {
+      unsigned int test_id = *elem_id;
+      Parallel::max(test_id);
+      assert(test_id == *elem_id);
+    }
+#endif
+
   return e;
 }
 
@@ -218,7 +223,7 @@ Elem* ParallelMesh::insert_elem (Elem* e)
 
 void ParallelMesh::delete_elem(Elem* e)
 {
-  assert (e != NULL);
+  assert (e);
 
   // Delete the element from the BoundaryInfo object
   this->boundary_info->remove(e);
@@ -252,6 +257,43 @@ Node* ParallelMesh::add_point (const Point& p)
   assert(test_id == _next_free_unpartitioned_node_id);
 #endif
   
+  return n;
+}
+
+
+
+Node* ParallelMesh::add_node (Node *n)
+{
+  // Don't try to add NULLs!
+  assert(n);
+
+  const unsigned int node_procid = n->processor_id();
+  unsigned int *node_id;
+  if (node_procid == DofObject::invalid_processor_id)
+    {
+      node_id = &_next_free_unpartitioned_node_id;
+    }
+  else
+    {
+      assert(n->processor_id() == libMesh::processor_id());
+      node_id = &_next_free_local_node_id;
+    }
+
+  n->set_id (*node_id);
+  *node_id += libMesh::n_processors() + 1;
+
+  _nodes[*node_id] = n;
+  
+// Unpartitioned elements must be added on every processor
+#ifdef DEBUG
+  if (node_procid == DofObject::invalid_processor_id)
+    {
+      unsigned int test_id = *node_id;
+      Parallel::max(test_id);
+      assert(test_id == *node_id);
+    }
+#endif
+
   return n;
 }
 
