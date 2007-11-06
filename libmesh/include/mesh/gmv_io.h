@@ -238,6 +238,7 @@ private:
    * Helper functions for reading nodes/cells from a GMV file
    */
   void _read_nodes();
+  unsigned int _next_elem_id;
   void _read_one_cell();
   ElemType _gmv_elem_to_libmesh_elem(const char* elemname);
   void _read_materials();
@@ -256,7 +257,8 @@ GMVIO::GMVIO (const MeshBase& mesh) :
   _discontinuous          (false),  
   _partitioning           (true),
   _subdivide_second_order (true),
-  _p_levels               (true)
+  _p_levels               (true),
+  _next_elem_id           (0)
 {
 }
 
@@ -268,7 +270,8 @@ GMVIO::GMVIO (MeshBase& mesh) :
   _discontinuous          (false),  
   _partitioning           (true),
   _subdivide_second_order (true),
-  _p_levels               (true)
+  _p_levels               (true),
+  _next_elem_id           (0)
 {
 }
 

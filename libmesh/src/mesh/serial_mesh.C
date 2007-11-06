@@ -141,6 +141,10 @@ Elem* SerialMesh::add_elem (Elem* e)
 {
   assert(e);
 
+  // We only append elements with SerialMesh
+  assert (!e->valid_id() ||
+          e->id() == _elements.size());
+
   e->set_id (_elements.size());
   
   _elements.push_back(e);
@@ -212,8 +216,11 @@ void SerialMesh::delete_elem(Elem* e)
 
 
 Node* SerialMesh::add_point (const Point& p,
+			     const unsigned int id,
 			     const unsigned int proc_id)
 {  
+  // We only append points with SerialMesh
+  assert(id == DofObject::invalid_id || id == _nodes.size());
   Node *n = Node::build(p, _nodes.size()).release();
   n->processor_id() = proc_id;
   _nodes.push_back (n);
@@ -226,6 +233,8 @@ Node* SerialMesh::add_point (const Point& p,
 Node* SerialMesh::add_node (Node* n)
 {  
   assert(n);
+  // We only append points with SerialMesh
+  assert(!n->valid_id() || n->id() == _nodes.size());
 
   n->set_id (_nodes.size());
   

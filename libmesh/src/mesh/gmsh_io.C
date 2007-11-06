@@ -378,7 +378,7 @@ void GmshIO::read_mesh(std::istream& in)
           for (unsigned int i=0; i<numNodes; ++i)      
             {
               in >> id >> x >> y >> z;
-              mesh.add_point (Point(x, y, z), 0);
+              mesh.add_point (Point(x, y, z), i);
               nodetrans[id] = i;
             }
           // read the $ENDNOD delimiter
@@ -445,7 +445,7 @@ void GmshIO::read_mesh(std::istream& in)
                 {
                   // add the elements to the mesh
                   Elem* elem = Elem::build(eletype.type).release();
-                  elem->processor_id() = 0;
+                  elem->set_id(iel);
                   mesh.add_elem(elem);
 
                   // check number of nodes. We cannot do that for version 2.0

@@ -278,11 +278,16 @@ public:
 
   /**
    * Add a new \p Node at \p Point \p p to the end of the vertex array,
-   * with processor_id \p procid.  Use DofObject::invalid_processor_id
-   * (default) to add a node to all processors, or libMesh::processor_id()
-   * to add a node locally only.
+   * with processor_id \p procid.
+   * Use DofObject::invalid_processor_id (default) to add a node to all
+   * processors, or libMesh::processor_id() to add a node to the local
+   * processor only.
+   * If adding a node locally, passing an \p id other than
+   * DofObject::invalid_id will set that specific node id.  Only
+   * do this in parallel if you are manually keeping ids consistent.
    */
   virtual Node* add_point (const Point& p,
+			   const unsigned int id = DofObject::invalid_id,
 			   const unsigned int proc_id =
 			     DofObject::invalid_processor_id) = 0;
 
@@ -298,6 +303,9 @@ public:
   
   /**
    * Add elem \p e to the end of the element array.
+   * To add an element locally, set e->processor_id() before adding it.
+   * To ensure a specific element id, call e->set_id() before adding it;
+   * only do this in parallel if you are manually keeping ids consistent.
    */
   virtual Elem* add_elem (Elem* e) = 0;
 

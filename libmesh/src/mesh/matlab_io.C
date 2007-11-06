@@ -74,7 +74,7 @@ void MatlabIO::read_stream(std::istream& in)
 	in >> x   // x-coordinate value
 	   >> y;  // y-coordinate value
 
-	mesh.add_point ( Point(x,y,z), 0 );
+	mesh.add_point ( Point(x,y,z), i);
       }
   }
 
@@ -85,7 +85,7 @@ void MatlabIO::read_stream(std::istream& in)
     for (unsigned int i=0; i<nElem; i++)
       {
 	Elem* elem = new Tri3; // Always build a triangle
-        elem->processor_id() = 0;
+        elem->set_id(i);
 	mesh.add_elem (elem);
 	
 	for (unsigned int n=0; n<3; n++)  // Always read three 3 nodes

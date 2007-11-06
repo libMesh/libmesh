@@ -528,6 +528,10 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   // Get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
+  // Make sure our nodes are contiguous and serialized
+  assert (mesh.n_nodes() == mesh.max_node_id());
+  assert (mesh.is_serial());
+
   unsigned int mesh_max_p_level = 0;
   
   // Begin interfacing with the GMV data file
@@ -1832,6 +1836,8 @@ void GMVIO::read (const std::string& name)
   // broadcast later
   assert(libMesh::processor_id() == 0);
 
+  _next_elem_id = 0;
+
   untested();
   
 #ifndef HAVE_GMV
@@ -2046,10 +2052,10 @@ void GMVIO::_read_nodes()
       // 		<< std::endl;
       
       // Add the point to the Mesh
-      MeshInput<MeshBase>::mesh().add_point( Point(GMV::gmv_data.doubledata1[i],
-						   GMV::gmv_data.doubledata2[i],
-						   GMV::gmv_data.doubledata3[i]),
-                                                   0 );
+      MeshInput<MeshBase>::mesh().add_point
+                     ( Point(GMV::gmv_data.doubledata1[i],
+			     GMV::gmv_data.doubledata2[i],
+			     GMV::gmv_data.doubledata3[i]), i);
     }
 #endif  
 }
@@ -2094,7 +2100,7 @@ void GMVIO::_read_one_cell()
       ElemType type = this->_gmv_elem_to_libmesh_elem(GMV::gmv_data.name1);
       
       Elem* elem = Elem::build(type).release();
-      elem->processor_id() = 0;
+      elem->set_id(_next_elem_id++);
 
       // Print out the connectivity information for
       // this cell.

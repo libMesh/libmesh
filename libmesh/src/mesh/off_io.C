@@ -86,8 +86,7 @@ void OFFIO::read_stream(std::istream& in)
 	 >> y
 	 >> z;
       
-      // node_ptr(n) = Node::build(x,y,z,n);
-      mesh.add_point ( Point(x,y,z), 0 );
+      mesh.add_point ( Point(x,y,z), n );
     }
 
   unsigned int dummy, n0, n1, n2;
@@ -100,7 +99,7 @@ void OFFIO::read_stream(std::istream& in)
       // _elements[e] = new Tri3;
       // _elements[e]->set_id (e);
       Elem* elem = new Tri3;
-      elem->processor_id() = 0;
+      elem->set_id(e);
       mesh.add_elem (elem);
 
       // The number of nodes in the object
