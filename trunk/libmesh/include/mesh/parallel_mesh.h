@@ -87,9 +87,11 @@ class ParallelMesh : public UnstructuredMesh
 
   /**
    * Renumber a parallel objects container
+   * Returns the smallest globally unused id for that
+   * container.
    */
   template <typename T>
-  void renumber_dof_objects (mapvector<T*>&);
+  unsigned int renumber_dof_objects (mapvector<T*>&);
 
   /**
    * Remove NULL elements from arrays
@@ -110,11 +112,11 @@ class ParallelMesh : public UnstructuredMesh
    */
   virtual void delete_remote_elements();
 
-  virtual unsigned int n_nodes () const;
-  virtual unsigned int max_node_id () const;
+  virtual unsigned int n_nodes () const { return _n_nodes; }
+  virtual unsigned int max_node_id () const { return _max_node_id; }
   virtual void reserve_nodes (const unsigned int) { }
-  virtual unsigned int n_elem () const;
-  virtual unsigned int max_elem_id () const;
+  virtual unsigned int n_elem () const { return _n_nodes; }
+  virtual unsigned int max_elem_id () const { return _max_elem_id; }
   virtual void reserve_elem (const unsigned int) { }
 
   /**
@@ -288,6 +290,20 @@ protected:
    * A boolean remembering whether we're serialized or not
    */
   bool _is_serial;
+
+  /**
+   * Cached data from the last renumber_nodes_and_elements call
+   */
+  unsigned int _n_nodes, _n_elem, _max_node_id, _max_elem_id;
+
+  /**
+   * Guaranteed globally unused IDs for use when adding new
+   * nodes or elements.
+   */
+  unsigned int _next_free_local_node_id,
+	       _next_free_local_elem_id;
+  unsigned int _next_free_unpartitioned_node_id,
+	       _next_free_unpartitioned_elem_id;
 
 private:
   
