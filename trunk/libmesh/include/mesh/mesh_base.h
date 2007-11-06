@@ -284,7 +284,7 @@ public:
   /**
    * Add \p Node \p n to the end of the vertex array.
    */
-  virtual Node* add_node (Node* n) ;
+  virtual Node* add_node (Node* n) = 0;
 
   /**
    * Removes the Node n from the mesh.
