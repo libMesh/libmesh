@@ -380,7 +380,13 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
       assert (_forward_map[elem->id()] != libMesh::invalid_uint);
       assert (_forward_map[elem->id()] < _part.size());
       
-      elem->processor_id() = static_cast<short int>(_part[_forward_map[elem->id()]]);
+      const unsigned int elem_procid =
+        static_cast<short int>(_part[_forward_map[elem->id()]]);
+      while (elem)
+        {
+          elem->processor_id() = elem_procid;
+          elem = elem->parent();
+        }
       
     }
 }

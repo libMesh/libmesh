@@ -255,8 +255,13 @@ if (adjncy.empty())
 	assert (elem->id() < forward_map.size());
 	assert (forward_map[elem->id()] != libMesh::invalid_uint);
 	
-	elem->processor_id() =
+	const unsigned int elem_procid =
 	  static_cast<short int>(part[forward_map[elem->id()]]);	
+        while (elem)
+          {
+            elem->processor_id() = elem_procid;
+            elem = elem->parent();
+          }
       }
   }
 
