@@ -180,6 +180,8 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	for (; it != it_end; ++it)
 	  {
 	    assert (*it != NULL);
+            assert (!(*it)->valid_processor_id());
+            assert ((*it)->id()*3 == pts.size());
 	    
 	    const Point& p = **it;
 	    
@@ -206,8 +208,8 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	for (unsigned int i=0; i<pts.size(); i += 3)
 	  mesh.add_point (Point(pts[i+0],
 				pts[i+1],
-				pts[i+2])
-			  );
+				pts[i+2]),
+			  i/3);
       }
     
     assert (mesh.n_nodes() == n_nodes);
@@ -244,6 +246,8 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	    
 	    for (; it != it_end; ++it)
 	      {
+                assert (*it);
+                assert (!(*it)->valid_processor_id());
 		const Elem* elem = *it;
 		pack_element (conn, elem);
 	      }

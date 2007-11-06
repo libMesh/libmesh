@@ -31,6 +31,7 @@
 // ParallelMesh class member functions
 ParallelMesh::ParallelMesh (unsigned int d) :
   UnstructuredMesh (d), _is_serial(true),
+  _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(libMesh::processor_id()),
   _next_free_local_elem_id(libMesh::processor_id()),
   _next_free_unpartitioned_node_id(libMesh::n_processors()),
@@ -52,6 +53,10 @@ ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
   UnstructuredMesh (other_mesh)
 {
   this->copy_nodes_and_elements(other_mesh);
+  _n_nodes = other_mesh.n_nodes();
+  _n_elem  = other_mesh.n_elem();
+  _max_node_id = other_mesh.max_node_id();
+  _max_elem_id = other_mesh.max_elem_id();
 }
 
 
@@ -60,6 +65,10 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
   UnstructuredMesh (other_mesh)
 {
   this->copy_nodes_and_elements(other_mesh);
+  _n_nodes = other_mesh.n_nodes();
+  _n_elem  = other_mesh.n_elem();
+  _max_node_id = other_mesh.max_node_id();
+  _max_elem_id = other_mesh.max_elem_id();
 }
 
 
@@ -172,36 +181,46 @@ Elem* ParallelMesh::elem (const unsigned int i) const
 
 
 
-Elem* ParallelMesh::add_elem (Elem* e)
+Elem* ParallelMesh::add_elem (Elem *e)
 {
   // Don't try to add NULLs!
   assert(e);
 
   const unsigned int elem_procid = e->processor_id();
-  unsigned int *elem_id;
-  if (elem_procid == DofObject::invalid_processor_id)
+
+  if (!e->valid_id())
     {
-      elem_id = &_next_free_unpartitioned_elem_id;
-    }
-  else
-    {
-      assert(e->processor_id() == libMesh::processor_id());
-      elem_id = &_next_free_local_elem_id;
+      unsigned int *next_id = &_next_free_unpartitioned_elem_id;
+      if (elem_procid != DofObject::invalid_processor_id)
+        {
+          assert(e->processor_id() == libMesh::processor_id());
+          next_id = &_next_free_local_elem_id;
+        }
+      e->set_id (*next_id);
+      *next_id += libMesh::n_processors() + 1;
     }
 
-  e->set_id (*elem_id);
-  *elem_id += libMesh::n_processors() + 1;
+  // Don't try to overwrite existing elems
+  assert (!_elements[e->id()]);
 
-  _elements[*elem_id] = e;
+  _elements[e->id()] = e;
+
+  // Make the cached elem data more accurate
+  _n_elem++;
+  _max_elem_id = std::max(_max_elem_id, e->id()+1);
   
-// Unpartitioned elements must be added on every processor
+// Unpartitioned elems should be added on every processor
+// But we might be just adding on processor 0 to
+// broadcast later
+#if 0
 #ifdef DEBUG
   if (elem_procid == DofObject::invalid_processor_id)
     {
-      unsigned int test_id = *elem_id;
-      Parallel::max(test_id);
-      assert(test_id == *elem_id);
+      unsigned int elem_id = e->id();
+      Parallel::max(elem_id);
+      assert(elem_id == e->id());
     }
+#endif
 #endif
 
   return e;
@@ -244,9 +263,10 @@ void ParallelMesh::delete_elem(Elem* e)
 
 
 Node* ParallelMesh::add_point (const Point& p,
+			       const unsigned int id,
 			       const unsigned int proc_id)
 {  
-  Node* n = Node::build(p, _next_free_unpartitioned_node_id).release();
+  Node* n = Node::build(p, id).release();
   n->processor_id() = proc_id;
 
   return ParallelMesh::add_node(n);
@@ -260,30 +280,40 @@ Node* ParallelMesh::add_node (Node *n)
   assert(n);
 
   const unsigned int node_procid = n->processor_id();
-  unsigned int *node_id;
-  if (node_procid == DofObject::invalid_processor_id)
+
+  if (!n->valid_id())
     {
-      node_id = &_next_free_unpartitioned_node_id;
-    }
-  else
-    {
-      assert(n->processor_id() == libMesh::processor_id());
-      node_id = &_next_free_local_node_id;
+      unsigned int *next_id = &_next_free_unpartitioned_node_id;
+      if (node_procid != DofObject::invalid_processor_id)
+        {
+          assert(n->processor_id() == libMesh::processor_id());
+          next_id = &_next_free_local_node_id;
+        }
+      n->set_id (*next_id);
+      *next_id += libMesh::n_processors() + 1;
     }
 
-  n->set_id (*node_id);
-  *node_id += libMesh::n_processors() + 1;
+  // Don't try to overwrite existing nodes
+  assert (!_nodes[n->id()]);
 
-  _nodes[*node_id] = n;
+  _nodes[n->id()] = n;
   
-// Unpartitioned elements must be added on every processor
+  // Make the cached elem data more accurate
+  _n_nodes++;
+  _max_node_id = std::max(_max_node_id, n->id()+1);
+  
+// Unpartitioned nodes should be added on every processor
+// But we might be just adding on processor 0 to
+// broadcast later
+#if 0
 #ifdef DEBUG
   if (node_procid == DofObject::invalid_processor_id)
     {
-      unsigned int test_id = *node_id;
-      Parallel::max(test_id);
-      assert(test_id == *node_id);
+      unsigned int node_id = n->id();
+      Parallel::max(node_id);
+      assert(node_id == n->id());
     }
+#endif
 #endif
 
   return n;
@@ -305,7 +335,8 @@ Node* ParallelMesh::insert_node (Node* n)
     {
       Node *my_n = _nodes[n->id()];
 
-      *my_n = *n;
+//      *my_n = *n;
+      assert (*my_n == *n);
       delete n;
       n = my_n;
     }

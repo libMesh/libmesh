@@ -1069,7 +1069,7 @@ void ExodusII_IO::read (const std::string& fname)
   for (int i=0; i<ex.get_num_nodes(); i++)
     mesh.add_point (Point(ex.get_x(i),
 			  ex.get_y(i),
-			  ex.get_z(i)), 0);
+			  ex.get_z(i)), i);
 
   assert (static_cast<unsigned int>(ex.get_num_nodes()) == mesh.n_nodes());
 
@@ -1096,7 +1096,7 @@ void ExodusII_IO::read (const std::string& fname)
 	{
 	  Elem* elem = Elem::build (conv.get_canonical_type()).release();
 	  assert (elem);
-          elem->processor_id() = 0;
+          elem->set_id(j);
 	  mesh.add_elem (elem);
 	    
 	  // Set all the nodes for this element

@@ -29,6 +29,9 @@ _build_variable_names_and_solution_vector (const EquationSystems& es,
 					   std::vector<Number>& soln,
 					   std::vector<std::string>& names)
 {
+  // We need a serial mesh for MeshOutput for now
+  const_cast<EquationSystems&>(es).allgather();
+
   es.build_variable_names  (names);
   es.build_solution_vector (soln);
 }

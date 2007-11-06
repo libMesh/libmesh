@@ -133,6 +133,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
         // Build the nodes, depends on whether we're using linears, 
         // quadratics or cubics and whether using uniform grid or Gauss-Lobatto
+        unsigned int node_id = 0;
         switch(type)
         {
           case INVALID_ELEM:
@@ -143,11 +144,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                 if (gauss_lobatto_grid)
                   mesh.add_point (Point(0.5*(std::cos(libMesh::pi*static_cast<Real>(nx-i)/static_cast<Real>(nx))+1.0),
                         0, 
-                        0));
+                        0), node_id++);
                 else
                   mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx), 
                         0, 
-                        0));
+                        0), node_id++);
               }
               break;
             }
@@ -182,12 +183,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                     x = 0.5*(xmin + xmax);
                   }
 
-                  mesh.add_point (Point(x,0.,0.));
+                  mesh.add_point (Point(x,0.,0.), node_id++);
                 }
                 else
                   mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
                         0,
-                        0));
+                        0), node_id++);
               }
               break;
             }
@@ -237,12 +238,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
                   }
 
-                  mesh.add_point (Point(x,0.,0.));
+                  mesh.add_point (Point(x,0.,0.), node_id++);
                 }
                 else
                 mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(3*nx),
                         0,
-                        0));
+                        0), node_id++);
               }
 
 
@@ -391,6 +392,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	// Build the nodes. Depends on whether you are using a linear
 	// or quadratic element, and whether you are using a uniform
 	// grid or the Gauss-Lobatto grid points.
+        unsigned int node_id = 0;
 	switch (type)
 	  {
 	  case INVALID_ELEM:
@@ -407,13 +409,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 			mesh.add_point (Point(0.5*(1.0 - std::cos(pi*static_cast<Real>(i)/static_cast<Real>(nx))),
 					      0.5*(1.0 - std::cos(pi*static_cast<Real>(j)/static_cast<Real>(ny))),
-					      0.));
+					      0.), node_id++);
 		      }
 		  
 		    else
 		      mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx),
 					    static_cast<Real>(j)/static_cast<Real>(ny),
-					    0.));
+					    0.), node_id++);
 		  }
 
 	      break;
@@ -459,14 +461,14 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			  y = 0.5*(1.0 - b*d);
 		      
 
-			mesh.add_point (Point(x,y,0.));
+			mesh.add_point (Point(x,y,0.), node_id++);
 		      } 
 
 		  
 		    else
 		      mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
 					    static_cast<Real>(j)/static_cast<Real>(2*ny),
-					    0));
+					    0), node_id++);
 		}
 
 	      break;
@@ -746,6 +748,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
 	// Build the nodes.
+        unsigned int node_id = 0;
 	switch (type)
 	  {
 	  case INVALID_ELEM:
@@ -763,13 +766,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 			  mesh.add_point (Point(0.5*(1.0 - std::cos(pi*static_cast<Real>(i)/static_cast<Real>(nx))),
 						0.5*(1.0 - std::cos(pi*static_cast<Real>(j)/static_cast<Real>(ny))),
-						0.5*(1.0 - std::cos(pi*static_cast<Real>(k)/static_cast<Real>(nz)))));
+						0.5*(1.0 - std::cos(pi*static_cast<Real>(k)/static_cast<Real>(nz)))), node_id++);
 			}
 		      
 		      else
 			mesh.add_point(Point(static_cast<Real>(i)/static_cast<Real>(nx),
 					     static_cast<Real>(j)/static_cast<Real>(ny),
-					     static_cast<Real>(k)/static_cast<Real>(nz)));
+					     static_cast<Real>(k)/static_cast<Real>(nz)), node_id++);
 		    }
 	      break;
 	    }
@@ -830,13 +833,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			    z = 0.5*(1.0 - e*f);
 		      
 			  
-			  mesh.add_point (Point(x,y,z));
+			  mesh.add_point (Point(x,y,z), node_id++);
 			}
 
 		      else
 			mesh.add_point(Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
 					     static_cast<Real>(j)/static_cast<Real>(2*ny),
-					     static_cast<Real>(k)/static_cast<Real>(2*nz)));
+					     static_cast<Real>(k)/static_cast<Real>(2*nz)), node_id++);
 		    }
 	      break;
 	    }

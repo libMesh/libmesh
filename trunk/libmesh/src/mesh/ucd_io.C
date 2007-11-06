@@ -147,7 +147,7 @@ void UCDIO::read_implementation (std::istream& in)
 	   >> xyz(2); // z-coordinate value
 
 	// Build the node
-	mesh.add_point (xyz, 0);
+	mesh.add_point (xyz, i);
       }
   }
 
@@ -203,7 +203,7 @@ void UCDIO::read_implementation (std::istream& in)
 	  }
 
 	// Add the element to the mesh
-	elem->processor_id() = 0;
+	elem->set_id(i);
 	mesh.add_elem (elem);
       }
   }  

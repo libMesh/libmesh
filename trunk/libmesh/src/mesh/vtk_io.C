@@ -346,8 +346,8 @@ void VTKIO::read (const std::string& name)
       // and add the actual point
       double * pnt = points->GetPoint(i);
       Point xyz(pnt[0],pnt[1],pnt[2]);
-      Node* newnode = mesh.add_point(xyz,0);
-	    
+      Node* newnode = mesh.add_point(xyz,i);
+
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
       if (this->_mesh_data != NULL)
@@ -394,7 +394,7 @@ void VTKIO::read (const std::string& name)
   for(unsigned int j=0;j<conn.size();++j){
 	  elem->set_node(j) = mesh.node_ptr(conn[j]);
   } 
-  elem->processor_id() = 0;
+  elem->set_id(i);
   mesh.add_elem(elem);
   } // end loop over VTK cells
   

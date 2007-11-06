@@ -115,7 +115,7 @@ class ParallelMesh : public UnstructuredMesh
   virtual unsigned int n_nodes () const { return _n_nodes; }
   virtual unsigned int max_node_id () const { return _max_node_id; }
   virtual void reserve_nodes (const unsigned int) { }
-  virtual unsigned int n_elem () const { return _n_nodes; }
+  virtual unsigned int n_elem () const { return _n_elem; }
   virtual unsigned int max_elem_id () const { return _max_elem_id; }
   virtual void reserve_elem (const unsigned int) { }
 
@@ -133,6 +133,8 @@ class ParallelMesh : public UnstructuredMesh
    * functions for adding /deleting nodes elements.
    */
   virtual Node* add_point (const Point& p,
+			   const unsigned int id =
+			     DofObject::invalid_id,
 			   const unsigned int proc_id =
 			     DofObject::invalid_processor_id);
   virtual Node* add_node (Node* n) ;

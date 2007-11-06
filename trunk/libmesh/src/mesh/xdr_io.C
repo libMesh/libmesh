@@ -385,7 +385,6 @@ void XdrIO::read_mesh (const std::string& name,
       error();
     }
 
-
   // read in the nodal coordinates and form points.
   {
     std::vector<Real> coords(numNodes*mesh.spatial_dimension()); // Always use three coords per node
@@ -402,7 +401,7 @@ void XdrIO::read_mesh (const std::string& name,
       {
 	Node* node = mesh.add_point (Point(coords[0+innd*3],  
 					   coords[1+innd*3],
-					   coords[2+innd*3]), 0);
+					   coords[2+innd*3]), innd);
 				       
 	if (mesh_data != NULL)
 	  if (mesh_data->active())
@@ -440,6 +439,9 @@ void XdrIO::read_mesh (const std::string& name,
       // constructed, to avoid O(n) lookup times for parent pointers
       // and to enable elements to be added in ascending ID order
       std::map<unsigned int, Elem*> parents;
+
+      // Keep track of Element ids in MGF-style meshes;
+      unsigned int _next_elem_id = 0;
 
       for (unsigned int level=0; level<=n_levels; level++)
       {
@@ -520,7 +522,7 @@ void XdrIO::read_mesh (const std::string& name,
             else
             {
               elem = Elem::build(etypes[idx]).release();
-              elem->processor_id() = 0;
+              elem->set_id(_next_elem_id++);
               mesh.add_elem(elem);
             }
             
@@ -547,21 +549,24 @@ void XdrIO::read_mesh (const std::string& name,
       }
 
       if (m.get_orig_flag() == XdrIO::LIBM)
-        // Iterate in ascending elem ID order
-        for (std::map<unsigned int, Elem *>::iterator i =
-             parents.begin();
-             i != parents.end(); ++i)
-          {
-            Elem *elem = i->second;
-            if (elem)
-              {
-                elem->processor_id() = 0;
-                mesh.add_elem(elem);
-              }
-            else
-              // We can probably handle this, but we don't expect it
-              error();
-          }
+        {
+          // Iterate in ascending elem ID order
+          unsigned int _next_elem_id = 0;
+          for (std::map<unsigned int, Elem *>::iterator i =
+               parents.begin();
+               i != parents.end(); ++i)
+            {
+              Elem *elem = i->second;
+              if (elem)
+                {
+                  elem->set_id(_next_elem_id++);
+                  mesh.add_elem(elem);
+                }
+              else
+                // We can probably handle this, but we don't expect it
+                error();
+            }
+        }
 
 #ifdef ENABLE_AMR
       // All the elements at each level have been added, and their node pointers
@@ -591,7 +596,7 @@ void XdrIO::read_mesh (const std::string& name,
       for (int ielm=0; ielm < numElem; ++ielm)
 	{
 	  Elem* elem = new Hex27;
-          elem->processor_id() = 0;
+          elem->set_id(ielm);
 	  mesh.add_elem(elem);
 	  
 	  for (int innd=0; innd < 27; ++innd)

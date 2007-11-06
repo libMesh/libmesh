@@ -159,7 +159,7 @@ void TetGenIO::node_in (std::istream& node_stream)
       _assign_nodes[node_lab] = i;
 
       // do this irrespective whether MeshData exists
-      Node* newnode = mesh.add_point(xyz, 0);
+      Node* newnode = mesh.add_point(xyz, i);
 
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
@@ -213,7 +213,7 @@ void TetGenIO::element_in (std::istream& ele_stream)
 		    << " nodes are not supported in the LibMesh tetgen module\n";
 	  error();
 	}
-      elem->processor_id() = 0;
+      elem->set_id(i);
       mesh.add_elem (elem);
 
       assert (elem != NULL);
