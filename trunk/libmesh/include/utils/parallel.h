@@ -757,6 +757,15 @@ namespace Parallel
   inline void sum(std::vector<T> &) {}
 
   template <typename T>
+  inline void send_receive(const unsigned int,
+                           T &send,
+			   const unsigned int,
+                           T &recv)
+  {
+    recv = send;
+  }
+
+  template <typename T>
   inline void gather(const unsigned int root_id,
 		     T send,
 		     std::vector<T> &recv)
