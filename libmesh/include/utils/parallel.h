@@ -757,13 +757,25 @@ namespace Parallel
   inline void sum(std::vector<T> &) {}
 
   template <typename T>
-  inline void gather(const unsigned int, T, std::vector<T> &);
+  inline void gather(const unsigned int root_id,
+		     T send,
+		     std::vector<T> &recv)
+  {
+    assert (!root_id);
+    recv.resize(1);
+    recv[0] = send;
+  }
 
   template <typename T>
   inline void gather(const unsigned int, std::vector<T> &) {}
 
   template <typename T>
-  inline void allgather(T, std::vector<T> &);
+  inline void allgather(T send,
+			std::vector<T> &recv)
+  {
+    recv.resize(1);
+    recv[0] = send;
+  }
 
   template <typename T>
   inline void allgather(std::vector<T> &) {}
