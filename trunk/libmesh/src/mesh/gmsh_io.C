@@ -317,6 +317,10 @@ void GmshIO::read (const std::string& name)
 
 void GmshIO::read_mesh(std::istream& in)
 {
+  // This is a serial-only process for now;
+  // the Mesh should be read on processor 0 and
+  // broadcast later
+  assert(libMesh::processor_id() == 0);
 
   assert(in.good());
 
@@ -374,7 +378,7 @@ void GmshIO::read_mesh(std::istream& in)
           for (unsigned int i=0; i<numNodes; ++i)      
             {
               in >> id >> x >> y >> z;
-              mesh.add_point (Point(x, y, z));
+              mesh.add_point (Point(x, y, z), 0);
               nodetrans[id] = i;
             }
           // read the $ENDNOD delimiter
@@ -440,7 +444,9 @@ void GmshIO::read_mesh(std::istream& in)
               if (eletype.dim == dim)
                 {
                   // add the elements to the mesh
-                  Elem* elem = mesh.add_elem(Elem::build(eletype.type).release());
+                  Elem* elem = Elem::build(eletype.type).release();
+                  elem->processor_id() = 0;
+                  mesh.add_elem(elem);
 
                   // check number of nodes. We cannot do that for version 2.0
                   if (version <= 1.0) 

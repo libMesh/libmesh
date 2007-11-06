@@ -266,6 +266,11 @@ void XdrIO::read_mesh (const std::string& name,
 		       const XdrIO::FileFormat originator,
 		       MeshData* mesh_data)
 {
+  // This is a serial-only process for now;
+  // the Mesh should be read on processor 0 and
+  // broadcast later
+  assert(libMesh::processor_id() == 0);
+
   // get a writeable reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
@@ -397,7 +402,7 @@ void XdrIO::read_mesh (const std::string& name,
       {
 	Node* node = mesh.add_point (Point(coords[0+innd*3],  
 					   coords[1+innd*3],
-					   coords[2+innd*3]));
+					   coords[2+innd*3]), 0);
 				       
 	if (mesh_data != NULL)
 	  if (mesh_data->active())
@@ -514,7 +519,9 @@ void XdrIO::read_mesh (const std::string& name,
             // MGF-style meshes
             else
             {
-              elem = mesh.add_elem(Elem::build(etypes[idx]).release());
+              elem = Elem::build(etypes[idx]).release();
+              elem->processor_id() = 0;
+              mesh.add_elem(elem);
             }
             
             // Add elements with the same id as in libMesh.  
@@ -547,7 +554,10 @@ void XdrIO::read_mesh (const std::string& name,
           {
             Elem *elem = i->second;
             if (elem)
-              mesh.add_elem(elem);
+              {
+                elem->processor_id() = 0;
+                mesh.add_elem(elem);
+              }
             else
               // We can probably handle this, but we don't expect it
               error();
@@ -580,7 +590,9 @@ void XdrIO::read_mesh (const std::string& name,
       
       for (int ielm=0; ielm < numElem; ++ielm)
 	{
-	  Elem* elem = mesh.add_elem(new Hex27);
+	  Elem* elem = new Hex27;
+          elem->processor_id() = 0;
+	  mesh.add_elem(elem);
 	  
 	  for (int innd=0; innd < 27; ++innd)
 	    elem->set_node(innd) = mesh.node_ptr(conn[innd+2+(27+2)*ielm]);	

@@ -32,6 +32,11 @@
 // TetgenIO class members
 void TetGenIO::read (const std::string& name)
 {
+  // This is a serial-only process for now;
+  // the Mesh should be read on processor 0 and
+  // broadcast later
+  assert(libMesh::processor_id() == 0);
+
   std::string name_node, name_ele, dummy;
 
   // tetgen only works in 3D
@@ -154,7 +159,7 @@ void TetGenIO::node_in (std::istream& node_stream)
       _assign_nodes[node_lab] = i;
 
       // do this irrespective whether MeshData exists
-      Node* newnode = mesh.add_point(xyz);
+      Node* newnode = mesh.add_point(xyz, 0);
 
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
@@ -194,13 +199,13 @@ void TetGenIO::element_in (std::istream& ele_stream)
       assert (ele_stream.good());
       
       // TetGen only supports Tet4 and Tet10 elements.
-      Elem* elem = NULL;
+      Elem* elem;
       
       if (n_nodes==4)
-	elem = mesh.add_elem (new Tet4);
+	elem = new Tet4;
       
       else if (n_nodes==10)
-	elem = mesh.add_elem (new Tet10);
+	elem = new Tet10;
       
       else
 	{
@@ -208,6 +213,8 @@ void TetGenIO::element_in (std::istream& ele_stream)
 		    << " nodes are not supported in the LibMesh tetgen module\n";
 	  error();
 	}
+      elem->processor_id() = 0;
+      mesh.add_elem (elem);
 
       assert (elem != NULL);
       assert (elem->n_nodes() == n_nodes);

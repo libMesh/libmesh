@@ -1827,6 +1827,10 @@ void GMVIO::add_cell_centered_data (const std::string&       cell_centered_data_
 
 void GMVIO::read (const std::string& name)
 {
+  // This is a serial-only process for now;
+  // the Mesh should be read on processor 0 and
+  // broadcast later
+  assert(libMesh::processor_id() == 0);
 
   untested();
   
@@ -2044,7 +2048,8 @@ void GMVIO::_read_nodes()
       // Add the point to the Mesh
       MeshInput<MeshBase>::mesh().add_point( Point(GMV::gmv_data.doubledata1[i],
 						   GMV::gmv_data.doubledata2[i],
-						   GMV::gmv_data.doubledata3[i]) );
+						   GMV::gmv_data.doubledata3[i]),
+                                                   0 );
     }
 #endif  
 }
@@ -2089,6 +2094,7 @@ void GMVIO::_read_one_cell()
       ElemType type = this->_gmv_elem_to_libmesh_elem(GMV::gmv_data.name1);
       
       Elem* elem = Elem::build(type).release();
+      elem->processor_id() = 0;
 
       // Print out the connectivity information for
       // this cell.
