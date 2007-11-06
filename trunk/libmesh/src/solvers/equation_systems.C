@@ -472,6 +472,9 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   const unsigned int nn  = _mesh.n_nodes();
   const unsigned int nv  = this->n_vars();
 
+  // We'd better have a contiguous node numbering
+  assert (nn == _mesh.max_node_id());
+
   // allocate storage to hold
   // (number_of_nodes)*(number_of_variables) entries.
   soln.resize(nn*nv);
