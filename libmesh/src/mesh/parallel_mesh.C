@@ -30,7 +30,11 @@
 // ------------------------------------------------------------
 // ParallelMesh class member functions
 ParallelMesh::ParallelMesh (unsigned int d) :
-  UnstructuredMesh (d), _is_serial(true)
+  UnstructuredMesh (d), _is_serial(true),
+  _next_free_local_node_id(libMesh::processor_id()),
+  _next_free_local_elem_id(libMesh::processor_id()),
+  _next_free_unpartitioned_node_id(libMesh::n_processors()),
+  _next_free_unpartitioned_elem_id(libMesh::n_processors())
 {
 }
 
@@ -59,7 +63,9 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
 }
 
 
-
+// We use cached values for these so they can be called
+// from one processor without bothering the rest.
+/*
 unsigned int ParallelMesh::n_elem() const
 {
   unsigned int n_local = this->n_local_elem();
@@ -97,12 +103,12 @@ unsigned int ParallelMesh::max_node_id() const
   Parallel::max(max_local);
   return max_local;
 }
+*/
 
 
 
 const Point& ParallelMesh::point (const unsigned int i) const
 {
-  assert (i < this->max_node_id());
   assert (_nodes[i] != NULL);
   assert (_nodes[i]->id() != Node::invalid_id);  
 
@@ -115,7 +121,6 @@ const Point& ParallelMesh::point (const unsigned int i) const
 
 const Node& ParallelMesh::node (const unsigned int i) const
 {
-  assert (i < this->max_node_id());
   assert (_nodes[i] != NULL);
   assert (_nodes[i]->id() != Node::invalid_id);  
   
@@ -128,7 +133,6 @@ const Node& ParallelMesh::node (const unsigned int i) const
 
 Node& ParallelMesh::node (const unsigned int i)
 {
-  assert (i < this->max_node_id());
   assert (_nodes[i] != NULL);
   assert (_nodes[i]->id() != Node::invalid_id);  
 
@@ -139,7 +143,6 @@ Node& ParallelMesh::node (const unsigned int i)
 
 const Node* ParallelMesh::node_ptr (const unsigned int i) const
 {
-  assert (i < this->max_node_id());
   assert (_nodes[i] != NULL);
   assert (_nodes[i]->id() != Node::invalid_id);  
   
@@ -151,7 +154,7 @@ const Node* ParallelMesh::node_ptr (const unsigned int i) const
 
 Node* & ParallelMesh::node_ptr (const unsigned int i)
 {
-  assert (i < this->max_node_id());
+  assert (_nodes[i] != NULL);
 
   return _nodes[i];
 }
@@ -161,7 +164,6 @@ Node* & ParallelMesh::node_ptr (const unsigned int i)
 
 Elem* ParallelMesh::elem (const unsigned int i) const
 {
-  assert (i < this->max_elem_id());
   assert (_elements[i] != NULL);
   
   return _elements[i];
@@ -172,11 +174,30 @@ Elem* ParallelMesh::elem (const unsigned int i) const
 
 Elem* ParallelMesh::add_elem (Elem* e)
 {
-  if (e != NULL)
-    e->set_id (this->max_elem_id());
-  
-  _elements[this->max_elem_id()] = e;
+  // Don't try to add NULLs!
+  assert(e);
 
+  unsigned int elem_procid = e->processor_id();
+  if (elem_procid == DofObject::invalid_processor_id)
+    {
+      e->set_id (_next_free_unpartitioned_elem_id);
+      _next_free_unpartitioned_elem_id += libMesh::n_processors() + 1;
+
+// Unpartitioned elements must be added on every processor
+#ifdef DEBUG
+      unsigned int test_id = _next_free_unpartitioned_elem_id;
+      Parallel::max(test_id);
+      assert(test_id == _next_free_unpartitioned_elem_id);
+#endif
+    }
+  else
+    {
+      e->set_id (_next_free_local_elem_id);
+      _next_free_local_elem_id += libMesh::n_processors() + 1;
+    }
+
+  _elements[_next_free_unpartitioned_elem_id] = e;
+  
   return e;
 }
 
@@ -218,8 +239,17 @@ void ParallelMesh::delete_elem(Elem* e)
 
 Node* ParallelMesh::add_point (const Point& p)
 {  
-  Node* n = Node::build(p, this->max_node_id()).release();
-  _nodes[this->max_node_id()] = n;
+  Node* n = Node::build(p, _next_free_unpartitioned_node_id).release();
+  _nodes[_next_free_unpartitioned_node_id] = n;
+
+  _next_free_unpartitioned_node_id += libMesh::n_processors() + 1;
+  
+// This method is intended for adding nodes to every processor
+#ifdef DEBUG
+  unsigned int test_id = _next_free_unpartitioned_node_id;
+  Parallel::max(test_id);
+  assert(test_id == _next_free_unpartitioned_node_id);
+#endif
   
   return n;
 }
@@ -255,7 +285,7 @@ Node* ParallelMesh::insert_node (Node* n)
 void ParallelMesh::delete_node(Node* n)
 {
   assert (n != NULL);
-  assert (n->id() < this->max_node_id());
+  assert (_nodes[n->id()] != NULL);
 
   // Delete the node from the BoundaryInfo object
   this->boundary_info->remove(n);
@@ -307,7 +337,7 @@ void ParallelMesh::clear ()
 
 
 template <typename T>
-void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
+unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
 {
   typedef typename mapvector<T*>::veclike_iterator object_iterator;
 
@@ -358,6 +388,9 @@ void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
     first_object_on_proc[i] = first_object_on_proc[i-1] +
                               objects_on_proc[i-1];
   unsigned int next_id = first_object_on_proc[libMesh::processor_id()];
+  unsigned int first_free_id =
+    first_object_on_proc[libMesh::n_processors()-1] +
+    objects_on_proc[libMesh::n_processors()-1] + 1;
 
   // First set new local object ids and build request sets 
   // for non-local object ids
@@ -480,6 +513,8 @@ void ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
       else
         ++it;
     }
+
+  return first_free_id;
 }
 
 
@@ -528,10 +563,29 @@ void ParallelMesh::renumber_nodes_and_elements ()
   }
 
   // Finally renumber all the elements
-  this->renumber_dof_objects (_elements);
+  _next_free_local_elem_id = this->renumber_dof_objects (_elements);
 
   // and all the remaining nodes
-  this->renumber_dof_objects (_nodes);
+  _next_free_local_node_id = this->renumber_dof_objects (_nodes);
+
+  // And figure out what IDs we should use when adding new nodes and
+  // new elements
+  unsigned int cycle = libMesh::n_processors()+1;
+  unsigned int offset = _next_free_local_elem_id % cycle;
+  if (offset)
+    _next_free_local_elem_id += cycle - offset;
+  _next_free_unpartitioned_elem_id = _next_free_local_elem_id +
+                                     libMesh::n_processors();
+  _next_free_local_elem_id += libMesh::processor_id();
+
+  offset = _next_free_local_node_id % cycle;
+  if (offset)
+    _next_free_local_node_id += cycle - offset;
+  _next_free_unpartitioned_node_id = _next_free_local_node_id +
+                                     libMesh::n_processors();
+  _next_free_local_node_id += libMesh::processor_id();
+
+
 
   STOP_LOG("renumber_nodes_and_elem()", "ParallelMesh");
 }
