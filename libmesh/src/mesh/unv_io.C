@@ -586,7 +586,7 @@ void UNVIO::node_in (std::istream& in_file)
 	  // add node to the Mesh & 
 	  // tell the MeshData object the foreign node id
 	  // (note that mesh.add_point() returns a pointer to the new node)
-	  this->_mesh_data.add_foreign_node_id (mesh.add_point(xyz), node_lab);
+	  this->_mesh_data.add_foreign_node_id (mesh.add_point(xyz,0), node_lab);
 	}
     }
 
@@ -922,6 +922,7 @@ void UNVIO::element_in (std::istream& in_file)
       // add elem to the Mesh & 
       // tell the MeshData object the foreign elem id
       // (note that mesh.add_elem() returns a pointer to the new element)
+      elem->processor_id() = 0;
       this->_mesh_data.add_foreign_elem_id (mesh.add_elem(elem), element_lab);
     }
 }

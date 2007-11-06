@@ -41,6 +41,11 @@ void OFFIO::read(const std::string& name)
 
 void OFFIO::read_stream(std::istream& in)
 {
+  // This is a serial-only process for now;
+  // the Mesh should be read on processor 0 and
+  // broadcast later
+  assert(libMesh::processor_id() == 0);
+
   // Get a reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
@@ -82,7 +87,7 @@ void OFFIO::read_stream(std::istream& in)
 	 >> z;
       
       // node_ptr(n) = Node::build(x,y,z,n);
-      mesh.add_point ( Point(x,y,z) );
+      mesh.add_point ( Point(x,y,z), 0 );
     }
 
   unsigned int dummy, n0, n1, n2;
@@ -94,7 +99,9 @@ void OFFIO::read_stream(std::istream& in)
       
       // _elements[e] = new Tri3;
       // _elements[e]->set_id (e);
-      Elem* elem = mesh.add_elem (new Tri3);
+      Elem* elem = new Tri3;
+      elem->processor_id() = 0;
+      mesh.add_elem (elem);
 
       // The number of nodes in the object
       in >> dummy;

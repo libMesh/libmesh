@@ -306,6 +306,11 @@ inline void meshdata_to_vtk(const MeshData& meshdata,
 //
 void VTKIO::read (const std::string& name)
 {
+  // This is a serial-only process for now;
+  // the Mesh should be read on processor 0 and
+  // broadcast later
+  assert(libMesh::processor_id() == 0);
+
 #ifndef HAVE_VTK
   std::cerr << "Cannot read VTK file: " << name
 	    << "\nYou must have VTK installed and correctly configured to read VTK meshes."
@@ -341,7 +346,7 @@ void VTKIO::read (const std::string& name)
       // and add the actual point
       double * pnt = points->GetPoint(i);
       Point xyz(pnt[0],pnt[1],pnt[2]);
-      Node* newnode = mesh.add_point(xyz);
+      Node* newnode = mesh.add_point(xyz,0);
 	    
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
@@ -389,6 +394,7 @@ void VTKIO::read (const std::string& name)
   for(unsigned int j=0;j<conn.size();++j){
 	  elem->set_node(j) = mesh.node_ptr(conn[j]);
   } 
+  elem->processor_id() = 0;
   mesh.add_elem(elem);
   } // end loop over VTK cells
   

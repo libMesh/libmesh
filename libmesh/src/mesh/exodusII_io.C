@@ -1025,6 +1025,11 @@ namespace
 // ExodusII_IO class members
 void ExodusII_IO::read (const std::string& fname)
 {
+  // This is a serial-only process for now;
+  // the Mesh should be read on processor 0 and
+  // broadcast later
+  assert(libMesh::processor_id() == 0);
+
 #ifndef HAVE_EXODUS_API
 
   std::cerr <<  "ERROR, ExodusII API is not defined.\n"
@@ -1060,11 +1065,11 @@ void ExodusII_IO::read (const std::string& fname)
   ex.read_nodes();                        // Read nodes from the exodus file
   mesh.reserve_nodes(ex.get_num_nodes()); // Reserve space for the nodes.
   
-  // Loop over the nodes, create Nodes.
+  // Loop over the nodes, create Nodes with local processor_id 0.
   for (int i=0; i<ex.get_num_nodes(); i++)
     mesh.add_point (Point(ex.get_x(i),
 			  ex.get_y(i),
-			  ex.get_z(i)));
+			  ex.get_z(i)), 0);
 
   assert (static_cast<unsigned int>(ex.get_num_nodes()) == mesh.n_nodes());
 
@@ -1089,8 +1094,10 @@ void ExodusII_IO::read (const std::string& fname)
       int jmax = nelem_last_block+ex.get_num_elem_this_blk();
       for (int j=nelem_last_block; j<jmax; j++)
 	{
-	  Elem* elem = mesh.add_elem (Elem::build (conv.get_canonical_type()).release());
-	  assert (elem != NULL);
+	  Elem* elem = Elem::build (conv.get_canonical_type()).release();
+	  assert (elem);
+          elem->processor_id() = 0;
+	  mesh.add_elem (elem);
 	    
 	  // Set all the nodes for this element
 	  for (int k=0; k<ex.get_num_nodes_per_elem(); k++)

@@ -39,6 +39,11 @@ void MatlabIO::read(const std::string& name)
 
 void MatlabIO::read_stream(std::istream& in)
 {
+  // This is a serial-only process for now;
+  // the Mesh should be read on processor 0 and
+  // broadcast later
+  assert(libMesh::processor_id() == 0);
+
   // Get a reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
@@ -69,7 +74,7 @@ void MatlabIO::read_stream(std::istream& in)
 	in >> x   // x-coordinate value
 	   >> y;  // y-coordinate value
 
-	mesh.add_point ( Point(x,y,z) );
+	mesh.add_point ( Point(x,y,z), 0 );
       }
   }
 
@@ -79,7 +84,9 @@ void MatlabIO::read_stream(std::istream& in)
     
     for (unsigned int i=0; i<nElem; i++)
       {
-	Elem* elem = mesh.add_elem (new Tri3); // Always build a triangle
+	Elem* elem = new Tri3; // Always build a triangle
+        elem->processor_id() = 0;
+	mesh.add_elem (elem);
 	
 	for (unsigned int n=0; n<3; n++)  // Always read three 3 nodes
 	  {

@@ -106,6 +106,11 @@ void UCDIO::write (const std::string& file_name)
 
 void UCDIO::read_implementation (std::istream& in)
 {
+  // This is a serial-only process for now;
+  // the Mesh should be read on processor 0 and
+  // broadcast later
+  assert(libMesh::processor_id() == 0);
+
   // Check input buffer
   assert (in.good());
 
@@ -142,7 +147,7 @@ void UCDIO::read_implementation (std::istream& in)
 	   >> xyz(2); // z-coordinate value
 
 	// Build the node
-	mesh.add_point (xyz);
+	mesh.add_point (xyz, 0);
       }
   }
 
@@ -198,6 +203,7 @@ void UCDIO::read_implementation (std::istream& in)
 	  }
 
 	// Add the element to the mesh
+	elem->processor_id() = 0;
 	mesh.add_elem (elem);
       }
   }  
