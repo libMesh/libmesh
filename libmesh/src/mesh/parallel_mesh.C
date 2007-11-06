@@ -192,6 +192,7 @@ Elem* ParallelMesh::add_elem (Elem* e)
     }
   else
     {
+      assert(e->processor_id() == libMesh::processor_id());
       e->set_id (_next_free_local_elem_id);
       _next_free_local_elem_id += libMesh::n_processors() + 1;
     }
