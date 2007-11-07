@@ -74,11 +74,17 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
   for (unsigned int variable_number=0; variable_number<this->n_variables();
        ++variable_number)
     {
-      //const_elem_iterator       elem_it (mesh.elements_begin());
-      //const const_elem_iterator elem_end(mesh.elements_end());
-
-      MeshBase::const_element_iterator       elem_it  = mesh.elements_begin();
-      const MeshBase::const_element_iterator elem_end = mesh.elements_end(); 
+      // With SerialMesh or a serial ParallelMesh, every processor
+      // computes every constraint
+      MeshBase::const_element_iterator  elem_it = mesh.elements_begin(),
+                                       elem_end = mesh.elements_end();
+      // With a parallel ParallelMesh, processors compute only
+      // their local constraints
+      if (!mesh.is_serial())
+        {
+          elem_it = mesh.local_elements_begin();
+          elem_end = mesh.local_elements_end(); 
+        }
       
       for ( ; elem_it != elem_end; ++elem_it)
         {
@@ -89,6 +95,9 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
 					    *elem_it);
 #endif
 #ifdef ENABLE_PERIODIC
+          // FIXME: periodic constraints won't work on a non-serial
+          // mesh unless it's kept ghost elements from opposing
+          // boundaries!
 	  FEInterface::compute_periodic_constraints (_dof_constraints,
 					             *this,
                                                      _periodic_boundaries,
@@ -98,6 +107,12 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
 #endif
         }
     }
+
+  // With a parallelized Mesh, we've computed our local constraints,
+  // but they may depend on non-local constraints that we'll need to
+  // take into account.
+  if (!mesh.is_serial())
+    this->allgather_recursive_constraints();
   
   STOP_LOG("create_dof_constraints()", "DofMap");
 }
@@ -723,6 +738,13 @@ void DofMap::allgather_recursive_constraints()
 {
   // Return immediately if there's nothing to gather
   if (libMesh::n_processors() == 1)
+    return;
+
+  // We might get to return immediately if none of the processors
+  // found any constraints
+  unsigned int has_constraints = !_dof_constraints.empty();
+  Parallel::max(has_constraints);
+  if (!has_constraints)
     return;
 
   // We might have calculated constraints for constrained dofs
