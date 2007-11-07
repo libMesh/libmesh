@@ -576,8 +576,11 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
     idx[i] = static_cast<int>(send_list[i]);
   
   // Create the index set & scatter object
-  ierr = ISCreateGeneral(libMesh::COMM_WORLD, n_sl, &idx[0], &is);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if (idx.empty())
+    ierr = ISCreateGeneral(libMesh::COMM_WORLD, n_sl, PETSC_NULL, &is);
+  else
+    ierr = ISCreateGeneral(libMesh::COMM_WORLD, n_sl, &idx[0], &is);
+           CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   ierr = VecScatterCreate(_vec,          is,
 			  v_local->_vec, is,

@@ -286,7 +286,8 @@ void System::update ()
 
   // Check sizes
   assert (current_local_solution->local_size() == solution->size());
-  assert (!send_list.empty());
+// More processors than elements => empty send_list
+//  assert (!send_list.empty());
   assert (send_list.size() <= solution->size());
 
   // Create current_local_solution from solution.  This will

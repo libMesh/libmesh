@@ -132,8 +132,12 @@ void PetscMatrix<T>::init ()
   // create a sequential matrix on one processor
   if ((m_l == m) && (n_l == n))
     {
-      ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, n_global, n_global,
-			      PETSC_NULL, (int*) &n_nz[0], &_mat);
+      if (n_nz.empty())
+        ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, n_global, n_global,
+			        PETSC_NULL, (int*) PETSC_NULL, &_mat);
+      else
+        ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, n_global, n_global,
+			        PETSC_NULL, (int*) &n_nz[0], &_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
       ierr = MatSetFromOptions (_mat);
@@ -142,11 +146,18 @@ void PetscMatrix<T>::init ()
 
   else
     {
-      ierr = MatCreateMPIAIJ (libMesh::COMM_WORLD,
-			      m_local, n_local,
-			      m_global, n_global,
-			      PETSC_NULL, (int*) &n_nz[0],
-			      PETSC_NULL, (int*) &n_oz[0], &_mat);
+      if (n_nz.empty())
+        ierr = MatCreateMPIAIJ (libMesh::COMM_WORLD,
+			        m_local, n_local,
+			        m_global, n_global,
+			        PETSC_NULL, (int*) PETSC_NULL,
+			        PETSC_NULL, (int*) PETSC_NULL, &_mat);
+      else
+        ierr = MatCreateMPIAIJ (libMesh::COMM_WORLD,
+			        m_local, n_local,
+			        m_global, n_global,
+			        PETSC_NULL, (int*) &n_nz[0],
+			        PETSC_NULL, (int*) &n_oz[0], &_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
       ierr = MatSetFromOptions (_mat);
