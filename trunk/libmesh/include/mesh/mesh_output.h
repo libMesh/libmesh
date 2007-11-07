@@ -128,6 +128,12 @@ inline
 MeshOutput<MT>::MeshOutput (const MT& obj) :
   _obj (&obj)
 {
+  if (!this->mesh().is_serial())
+    {
+      std::cerr << "ERROR:  This I/O operation is only supported for meshes which have been serialized!"
+		<< std::endl;
+      error();
+    }
 }
 
 
