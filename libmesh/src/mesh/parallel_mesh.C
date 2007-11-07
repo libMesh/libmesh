@@ -199,6 +199,13 @@ Elem* ParallelMesh::add_elem (Elem *e)
       e->set_id (*next_id);
       *next_id += libMesh::n_processors() + 1;
     }
+  else
+    {
+      if (_next_free_unpartitioned_elem_id <= e->id())
+        _next_free_unpartitioned_elem_id += libMesh::n_processors() + 1;
+      if (_next_free_local_elem_id <= e->id())
+        _next_free_local_elem_id += libMesh::n_processors() + 1;
+    }
 
   // Don't try to overwrite existing elems
   assert (!_elements[e->id()]);
@@ -291,6 +298,13 @@ Node* ParallelMesh::add_node (Node *n)
         }
       n->set_id (*next_id);
       *next_id += libMesh::n_processors() + 1;
+    }
+  else
+    {
+      if (_next_free_unpartitioned_node_id <= n->id())
+        _next_free_unpartitioned_node_id += libMesh::n_processors() + 1;
+      if (_next_free_local_node_id <= n->id())
+        _next_free_local_node_id += libMesh::n_processors() + 1;
     }
 
   // Don't try to overwrite existing nodes
@@ -455,7 +469,8 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
   unsigned int next_id = first_object_on_proc[libMesh::processor_id()];
   unsigned int first_free_id =
     first_object_on_proc[libMesh::n_processors()-1] +
-    objects_on_proc[libMesh::n_processors()-1] + 1;
+    objects_on_proc[libMesh::n_processors()-1] + 
+    unpartitioned_objects + 1;
 
   // First set new local object ids and build request sets 
   // for non-local object ids
@@ -585,7 +600,7 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
 
 void ParallelMesh::renumber_nodes_and_elements ()
 {
-  START_LOG("renumber_nodes_and_elem()", "ParallelMesh");
+  START_LOG("renumber_nodes_and_elements()", "ParallelMesh");
 
   std::set<unsigned int> used_nodes;
 
@@ -652,7 +667,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
 
 
-  STOP_LOG("renumber_nodes_and_elem()", "ParallelMesh");
+  STOP_LOG("renumber_nodes_and_elements()", "ParallelMesh");
 }
 
 
