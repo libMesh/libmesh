@@ -327,16 +327,15 @@ Node* ParallelMesh::insert_node (Node* n)
   // simply delete it, because we may have elements
   // which are attached to its address.
   //
-  // Instead, call the Node copy constructor to
-  // overwrite the current node (but keep its address),
-  // delete the provided node, and return the address of
-  // the one we already had.
+  // Instead, call the Node = Point assignment operator
+  // to overwrite the spatial coordinates (but keep its
+  // address), delete the provided node, and return the
+  // address of the one we already had.
   if (_nodes.count(n->id()))
     {
       Node *my_n = _nodes[n->id()];
 
-//      *my_n = *n;
-      assert (*my_n == *n);
+      *my_n = static_cast<Point>(*n);
       delete n;
       n = my_n;
     }
