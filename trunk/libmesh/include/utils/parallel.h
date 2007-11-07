@@ -439,10 +439,10 @@ namespace Parallel
 	sendsizesum += sendsizes[i];
       }
 
-    MPI_Sendrecv(sendsize ? &sendsizes[0] : NULL, sendsize, datatype<T>(),
-		 dest_processor_id, 0,
-		 recvsize ? &recvsizes[0] : NULL, recvsize, datatype<T>(),
-		 source_processor_id, 0,
+    MPI_Sendrecv(sendsize ? &sendsizes[0] : NULL, sendsize, 
+		 datatype<unsigned int>(), dest_processor_id, 0,
+		 recvsize ? &recvsizes[0] : NULL, recvsize, 
+		 datatype<unsigned int>(), source_processor_id, 0,
 		 libMesh::COMM_WORLD,
 		 &status);
 
@@ -454,10 +454,10 @@ namespace Parallel
     // Build temporary buffers third
     // We can't do multiple Sendrecv calls instead because send.size() may
     // differ on different processors
-    std::vector<unsigned int> senddata(sendsizesum), recvdata(recvsizesum);
+    std::vector<T> senddata(sendsizesum), recvdata(recvsizesum);
 
     // Fill the temporary send buffer
-    std::vector<unsigned int>::iterator out = senddata.begin();
+    typename std::vector<T>::iterator out = senddata.begin();
     for (unsigned int i = 0; i != sendsize; ++i)
       {
 	out = std::copy(send[i].begin(), send[i].end(), out);
@@ -472,7 +472,7 @@ namespace Parallel
 		 &status);
 
     // Empty the temporary recv buffer
-    std::vector<unsigned int>::iterator in = recvdata.begin();
+    typename std::vector<T>::iterator in = recvdata.begin();
     for (unsigned int i = 0; i != recvsize; ++i)
       {
 	std::copy(in, in + recvsizes[i], recv[i].begin());
