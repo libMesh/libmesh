@@ -226,11 +226,12 @@ class Elem : public ReferenceCountedObject<Elem>,
 
   /**
    * Resets this element's neighbors' appropriate neighbor pointers
+   * and its parent's and children's appropriate pointers
    * to point to the global remote_elem instead of this.
    * Used by the library before a remote element is deleted on the
    * local processor.
    */
-  void remote_neighbors_links ();
+  void make_links_to_me_remote ();
 
   /**
    * Returns the connectivity for this element in a specific

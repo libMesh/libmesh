@@ -482,8 +482,9 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
 
 
 
-void Elem::remote_neighbors_links()
+void Elem::make_links_to_me_remote()
 {
+  // Remotify neighbor links
   for (unsigned int s = 0; s != this->n_sides(); ++s)
     {
       Elem *neigh = this->neighbor(s);
@@ -516,6 +517,25 @@ void Elem::remote_neighbors_links()
           neigh->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
 #endif
         }
+    }
+
+  // Remotify parent's and childrens' links - if we're going remote
+  // all our children should be too, but let's be careful to handle
+  // cases where we are deleted before our children are and
+  // vice-versa.
+  if (this->has_children())
+    for (unsigned int c=0; c != this->n_children(); ++c)
+      {
+        Elem *child = this->child(c);
+        assert(child);
+        if (child != remote_elem)
+          child->set_parent(const_cast<RemoteElem*>(remote_elem));
+      }
+  Elem *parent = this->parent();
+  if (parent && parent != remote_elem)
+    {
+      unsigned int me = parent->which_child_am_i(this);
+      parent->_children[me] = const_cast<RemoteElem*>(remote_elem);
     }
 }
 
