@@ -35,6 +35,7 @@
 #include "system.h" // needed by enforce_constraints_exactly()
 #include "mesh.h"   // as is this
 #include "numeric_vector.h" // likewise
+#include "parallel.h"
 #include "point_locator_base.h"
 
 
@@ -714,6 +715,239 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
     }
   
   if (!called_recursively) STOP_LOG("build_constraint_matrix()", "DofMap");  
+}
+
+
+
+void DofMap::allgather_recursive_constraints()
+{
+  // Return immediately if there's nothing to gather
+  if (libMesh::n_processors() == 1)
+    return;
+
+  // We might have calculated constraints for constrained dofs
+  // which live on other processors.
+  // Push these out first.
+  {
+  std::vector<std::vector<unsigned int> > pushed_ids(libMesh::n_processors());
+  std::vector<unsigned int> pushed_on_proc(libMesh::n_processors(), 0);
+
+  // Count the constraints to push to each processor
+  unsigned int push_proc_id = 0;
+  for (DofConstraints::iterator i = _dof_constraints.begin();
+	 i != _dof_constraints.end(); ++i)
+    {
+      unsigned int constrained = i->first;
+      while (constrained >= _end_df[push_proc_id])
+        push_proc_id++;
+      pushed_on_proc[push_proc_id]++;
+    }
+  for (unsigned int p = 0; p != libMesh::n_processors(); ++p)
+    pushed_ids[p].reserve(pushed_on_proc[p]);
+
+  // Collect the constraints to push to each processor
+  push_proc_id = 0;
+  for (DofConstraints::iterator i = _dof_constraints.begin();
+	 i != _dof_constraints.end(); ++i)
+    {
+      unsigned int constrained = i->first;
+      while (constrained >= _end_df[push_proc_id])
+        push_proc_id++;
+      pushed_ids[push_proc_id].push_back(constrained);
+    }
+
+  // Now trade constraint rows
+  for (unsigned int p = 0; p != libMesh::n_processors(); ++p)
+    {
+      // Push to processor procup while receiving from procdown
+      unsigned int procup = (libMesh::processor_id() + p) %
+                             libMesh::n_processors();
+      unsigned int procdown = (libMesh::n_processors() +
+                               libMesh::processor_id() - p) %
+                               libMesh::n_processors();
+
+      // Pack the constraint rows to push to procup
+      std::vector<std::vector<unsigned int> > pushed_keys(pushed_ids[procup].size());
+      std::vector<std::vector<Real> > pushed_vals(pushed_ids[procup].size());
+      for (unsigned int i = 0; i != pushed_ids[procup].size(); ++i) 
+        {
+          DofConstraintRow &row = _dof_constraints[pushed_ids[procup][i]];
+          unsigned int row_size = row.size();
+          pushed_keys[i].reserve(row_size);
+          pushed_vals[i].reserve(row_size);
+          for (DofConstraintRow::iterator j = row.begin();
+               j != row.end(); ++j)
+            {
+              pushed_keys[i].push_back(j->first);
+              pushed_vals[i].push_back(j->second);
+            }
+        }
+
+      // Trade pushed constraint rows
+      std::vector<unsigned int> pushed_ids_to_me;
+      std::vector<std::vector<unsigned int> > pushed_keys_to_me;
+      std::vector<std::vector<Real> > pushed_vals_to_me;
+      Parallel::send_receive(procup, pushed_ids[procup],
+                             procdown, pushed_ids_to_me);
+      Parallel::send_receive(procup, pushed_keys,
+                             procdown, pushed_keys_to_me);
+      Parallel::send_receive(procup, pushed_vals,
+                             procdown, pushed_vals_to_me);
+      assert (pushed_ids_to_me.size() == pushed_keys_to_me.size());
+      assert (pushed_ids_to_me.size() == pushed_vals_to_me.size());
+
+      // Add the constraints that I've been sent
+      for (unsigned int i = 0; i != pushed_ids_to_me.size(); ++i)
+        {
+          assert (pushed_keys_to_me[i].size() == pushed_vals_to_me[i].size());
+
+          unsigned int constrained = pushed_ids_to_me[i];
+
+          // If we don't already have a constraint for this dof,
+          // add the one we were sent
+          if (!this->is_constrained_dof(constrained))
+            {
+              DofConstraintRow &row = _dof_constraints[constrained];
+              for (unsigned int j = 0; j != pushed_keys_to_me[i].size(); ++j)
+                {
+                  row[pushed_keys_to_me[i][j]] = pushed_vals_to_me[i][j];
+                }
+            }
+        }
+    }
+  }
+
+  // Now start checking for any other constraints we need
+  // to know about, requesting them recursively.
+
+  // Create a set containing the DOFs we already depend on
+  typedef std::set<unsigned int> RCSet;
+  RCSet unexpanded_set;
+
+  for (DofConstraints::iterator i = _dof_constraints.begin();
+	 i != _dof_constraints.end(); ++i)
+    {
+      unexpanded_set.insert(i->first);
+    }
+
+  // We have to keep recursing while the unexpanded set is
+  // nonempty on *any* processor
+  unsigned int unexpanded_set_nonempty = !unexpanded_set.empty();
+  Parallel::max(unexpanded_set_nonempty);
+
+  while (unexpanded_set_nonempty)
+    {
+      // Request set
+      RCSet request_set;
+
+      // Request sets to send to each processor
+      std::vector<std::vector<unsigned int> >
+        requested_ids(libMesh::n_processors());
+
+      // And the sizes of each
+      std::vector<unsigned int> ids_on_proc(libMesh::n_processors(), 0);
+
+      // Fill (and thereby sort and uniq!) the main request set
+      for (RCSet::iterator i = unexpanded_set.begin();
+           i != unexpanded_set.end(); ++i)
+        {
+          DofConstraintRow &row = _dof_constraints[*i];
+          for (DofConstraintRow::iterator j = row.begin();
+               j != row.end(); ++j)
+            request_set.insert(j->first);
+        }
+
+      // Clear the unexpanded constraint set; we're about to expand it
+      unexpanded_set.clear();
+
+      // Count requests by processor
+      unsigned int proc_id = 0;
+      for (RCSet::iterator i = request_set.begin();
+           i != request_set.end(); ++i)
+        {
+          while (*i >= _end_df[proc_id])
+            proc_id++;
+          ids_on_proc[proc_id]++;
+        }
+      for (unsigned int p = 0; p != libMesh::n_processors(); ++p)
+        requested_ids[p].reserve(ids_on_proc[p]);
+
+      // Prepare each processor's request set
+      proc_id = 0;
+      for (RCSet::iterator i = request_set.begin();
+           i != request_set.end(); ++i)
+        {
+          while (*i >= _end_df[proc_id])
+            proc_id++;
+          requested_ids[proc_id].push_back(*i);
+        }
+
+      // Now request constraint rows from other processors
+      for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+        {
+          // Trade my requests with processor procup and procdown
+          unsigned int procup = (libMesh::processor_id() + p) %
+                                 libMesh::n_processors();
+          unsigned int procdown = (libMesh::n_processors() +
+                                   libMesh::processor_id() - p) %
+                                   libMesh::n_processors();
+          std::vector<unsigned int> request_to_fill;
+          Parallel::send_receive(procup, requested_ids[procup],
+                                 procdown, request_to_fill);
+
+          // Fill those requests
+          std::vector<std::vector<unsigned int> > row_keys(request_to_fill.size());
+          std::vector<std::vector<Real> > row_vals(request_to_fill.size());
+          for (unsigned int i=0; i != request_to_fill.size(); ++i)
+            {
+              unsigned int constrained = request_to_fill[i];
+              if (_dof_constraints.count(constrained))
+                {
+                  DofConstraintRow &row = _dof_constraints[constrained];
+                  unsigned int row_size = row.size();
+                  row_keys[i].reserve(row_size);
+                  row_vals[i].reserve(row_size);
+                  for (DofConstraintRow::iterator j = row.begin();
+                       j != row.end(); ++j)
+                    {
+                      row_keys[i].push_back(j->first);
+                      row_vals[i].push_back(j->second);
+                    }
+                }
+            }
+
+          // Trade back the results
+          std::vector<std::vector<unsigned int> > filled_keys;
+          std::vector<std::vector<Real> > filled_vals;
+          Parallel::send_receive(procdown, row_keys,
+                                 procup, filled_keys);
+          Parallel::send_receive(procdown, row_vals,
+                                 procup, filled_vals);
+          assert (filled_keys.size() == requested_ids[procup].size());
+          assert (filled_vals.size() == requested_ids[procup].size());
+
+          // Add any new constraint rows we've found
+          for (unsigned int i=0; i != requested_ids[procup].size(); ++i)
+            {
+              assert (filled_keys[i].size() == filled_vals[i].size());
+              if (!filled_keys[i].empty())
+                {
+                  unsigned int constrained = requested_ids[procup][i];
+                  DofConstraintRow &row = _dof_constraints[constrained];
+                  for (unsigned int j = 0; j != filled_keys[i].size(); ++j)
+                    row[filled_keys[i][j]] = filled_vals[i][j];
+
+                  // And prepare to check for more recursive constraints
+                  unexpanded_set.insert(constrained);
+                }
+            }
+        }
+
+      // We have to keep recursing while the unexpanded set is
+      // nonempty on *any* processor
+      unexpanded_set_nonempty = !unexpanded_set.empty();
+      Parallel::max(unexpanded_set_nonempty);
+    }
 }
 
 

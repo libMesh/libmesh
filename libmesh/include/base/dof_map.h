@@ -76,9 +76,8 @@ typedef std::map<unsigned int, Real> DofConstraintRow;
 /** 
  * The constraint matrix storage format. 
  * We're using a class instead of a typedef to allow forward
- * declarations and future flexibility.  Is there some issue with
- * deriving from standard containers, i.e. don't do it because they
- * don't have virtual destructors?
+ * declarations and future flexibility.  Don't delete this from
+ * a pointer-to-std::map; the destructor isn't virtual!
  */
 class DofConstraints : public std::map<unsigned int, DofConstraintRow>
 {
@@ -299,6 +298,11 @@ public:
    * Rebuilds the raw degree of freedom constraints.
    */ 
   void create_dof_constraints (const MeshBase& mesh);
+
+  /**
+   * Gathers any relevant constraint equations from other processors
+   */
+  void allgather_recursive_constraints ();
 
   /**
    * Postprocesses any constrained degrees of freedom in elem_dofs
