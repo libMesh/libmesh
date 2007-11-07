@@ -81,6 +81,7 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/solvers/system.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
+    include/utils/parallel.h\
     include/utils/perf_log.h\
     include/utils/point_locator_base.h
 src/base/dof_object.$(obj-suffix):\
