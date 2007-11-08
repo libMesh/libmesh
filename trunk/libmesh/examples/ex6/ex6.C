@@ -85,10 +85,9 @@ int main (int argc, char** argv)
   
   // This example requires Infinite Elements   
 #ifndef ENABLE_INFINITE_ELEMENTS
-
-  std::cerr << "ERROR: This example requires the library to be compiled with Infinite Element support!"
-	    << std::endl;
-  here();
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example requires the library to be" << std::endl
+              << "compiled with Infinite Element support!" << std::endl;
 
   return 0;
 

@@ -95,8 +95,11 @@ int main (int argc, char** argv)
 
   if (libMesh::n_processors() > 1)
     {
-      std::cout << "Skipping example 12: " << std::endl;
-      std::cout << "MeshData objects currently only work in serial." << std::endl;
+      if (libMesh::processor_id() == 0)
+        {
+          std::cerr << "ERROR: Skipping example 12. " << std::endl;
+          std::cerr << "MeshData objects currently only work in serial." << std::endl;
+        }
       return libMesh::close();
     }
 
@@ -110,8 +113,9 @@ int main (int argc, char** argv)
     // where in_mesh.unv should be a Universal file.
     if (argc < 4)
       {
-	std::cerr << "Usage: " << argv[0] << " -d <dim> in_mesh.unv"
-		  << std::endl;
+        if (libMesh::processor_id() == 0)
+	  std::cerr << "Usage: " << argv[0] << " -d <dim> in_mesh.unv"
+		    << std::endl;
 	
 	error();
       }
@@ -126,8 +130,9 @@ int main (int argc, char** argv)
     // only with a Universal file
     if (mesh_file.rfind(".unv") >= mesh_file.size())
       {
-	std::cerr << "ERROR:  This example works only properly with a Universal mesh file!"
-		  << std::endl;
+        if (libMesh::processor_id() == 0)
+	  std::cerr << "ERROR:  This example works only properly with a Universal mesh file!"
+		    << std::endl;
 	
 	error();
       }

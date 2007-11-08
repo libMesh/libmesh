@@ -51,16 +51,18 @@ int main (int argc, char** argv)
   libMesh::init (argc, argv);
 
 #ifdef ENABLE_PARMESH
-  std::cerr << "ERROR: This example uses AMR, which libMesh\n"
-            << "does not yet support on parallel meshes!"
-            << std::endl;
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example uses AMR, which libMesh\n"
+              << "does not yet support on parallel meshes!"
+              << std::endl;
   return 0;
 #endif
 
 #ifndef ENABLE_AMR
-  std::cerr << "ERROR: This example requires libMesh to be\n"
-            << "compiled with AMR support!"
-            << std::endl;
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example requires libMesh to be\n"
+              << "compiled with AMR support!"
+              << std::endl;
   return 0;
 #else
 

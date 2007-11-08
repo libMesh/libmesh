@@ -109,10 +109,9 @@ int main (int argc, char** argv)
   
   // This example is designed for complex numbers.   
 #ifndef USE_COMPLEX_NUMBERS
-
-  std::cerr << "ERROR: This example is intended for " << std::endl
-	    << " use with complex numbers." << std::endl;
-  here();
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example is intended for " << std::endl
+	      << " use with complex numbers." << std::endl;
 
   return 0;
 
@@ -123,8 +122,9 @@ int main (int argc, char** argv)
     // Check for proper usage.
     if (argc < 3)
       {
-	std::cerr << "Usage: " << argv[0] << " -f [frequency]"
-		  << std::endl;
+        if (libMesh::processor_id() == 0)
+	  std::cerr << "Usage: " << argv[0] << " -f [frequency]"
+		    << std::endl;
 	
 	error();
       }
