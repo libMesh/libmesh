@@ -567,16 +567,6 @@ void XdrIO::read_mesh (const std::string& name,
                 error();
             }
         }
-
-#ifdef ENABLE_AMR
-      // All the elements at each level have been added, and their node pointers
-      // have been set.  Now compute the node keys to put the mesh into a state consistent
-      // with the state after being constructed through normal refinements. 
-      MeshBase::element_iterator it = mesh.elements_begin();
-      const MeshBase::element_iterator end = mesh.elements_end();
-      for (; it!=end; ++it)
-        (*it)->compute_children_node_keys();
-#endif // #ifdef ENABLE_AMR
     }
  
   // MGF-style (1) Hex27 mesh
