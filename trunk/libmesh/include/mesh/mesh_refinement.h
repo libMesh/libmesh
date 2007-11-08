@@ -588,6 +588,12 @@ private:
   bool make_refinement_compatible (const bool);
   
   /**
+   * Copy refinement flags on ghost nodes from their
+   * local processors.  Return true if any flags changed.
+   */
+  bool make_flags_parallel_consistent ();
+  
+  /**
    * Data structure that holds the new nodes information.
    * The key is a pointer to the element that created the node.
    * For efficiency we will use a hashed multimap if it is

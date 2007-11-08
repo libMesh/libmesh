@@ -264,7 +264,7 @@ bool MeshRefinement::test_level_one (bool assert_pass)
   MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
 
-  unsigned int failure = 0;
+  bool failure = false;
 
   for ( ; elem_it != elem_end && !failure; ++elem_it)
     {
@@ -282,12 +282,13 @@ bool MeshRefinement::test_level_one (bool assert_pass)
               (neighbor->p_level() + 1 < elem->p_level()) ||
               (neighbor->p_level() > elem->p_level() + 1))
             {
-              failure = 1;
+              failure = true;
               break;
             }
         }
     }
 
+  // If any processor failed, we failed globally
   Parallel::max(failure);
 
   if (failure)
@@ -304,8 +305,11 @@ bool MeshRefinement::test_level_one (bool assert_pass)
 
 bool MeshRefinement::test_unflagged (bool assert_pass)
 {
-  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+  bool found_flag = false;
+
+  // Search for local flags
+  MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
 
   for ( ; elem_it != elem_end; ++elem_it)
     {
@@ -317,11 +321,20 @@ bool MeshRefinement::test_unflagged (bool assert_pass)
           elem->p_refinement_flag() == Elem::REFINE ||
           elem->p_refinement_flag() == Elem::COARSEN)
         {
-          // We didn't pass the "elements are unflagged" test,
-          // so assert that we're allowed not to
-          assert(!assert_pass);
-          return false;
+          found_flag = true;
+          break;
         }
+    }
+
+  // If we found a flag on any processor, it counts
+  Parallel::max(found_flag);
+
+  if (found_flag)
+    {
+      // We didn't pass the "elements are unflagged" test,
+      // so assert that we're allowed not to
+      assert(!assert_pass);
+      return false;
     }
   return true;
 }
@@ -375,6 +388,12 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   bool satisfied = false;
   do
     {
+      // Parallel consistency has to come first, or coarsening
+      // along processor boundaries might occasionally be falsely
+      // prevented
+      const bool parallel_consistent = _mesh.is_serial() ||
+        this->make_flags_parallel_consistent();
+      
       const bool coarsening_satisfied =
 	this->make_coarsening_compatible(maintain_level_one);
       
@@ -391,10 +410,11 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
       if (_node_level_mismatch_limit)
         smoothing_satisfied = smoothing_satisfied &&
           !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
-      
+
       satisfied = (coarsening_satisfied &&
 		   refinement_satisfied &&
-		   smoothing_satisfied);
+		   smoothing_satisfied &&
+                   parallel_consistent);
     }
   while (!satisfied);
 
@@ -626,6 +646,115 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
 
 
 
+
+
+
+bool MeshRefinement::make_flags_parallel_consistent()
+{
+  START_LOG ("make_flags_parallel_consistent()", "MeshRefinement");
+  // We're consistent until we discover otherwise
+  bool parallel_consistent = true;
+
+  // Count the number of ghost elements we'll need to inquire about
+  // from each other processor
+  std::vector<unsigned int>
+    ghost_elems_from_proc(libMesh::n_processors(), 0);
+
+  const MeshBase::element_iterator end = _mesh.elements_end();
+
+  for (MeshBase::element_iterator it = _mesh.elements_begin();
+       it != end; ++it)
+    {
+      Elem *elem = *it;
+      assert (elem);
+      unsigned int elem_procid = elem->processor_id();
+
+      // Assume we're partitioned before we try any AMR
+      assert(elem_procid != DofObject::invalid_processor_id);
+
+      ghost_elems_from_proc[elem_procid]++;
+    }
+
+  // Request sets to send to each processor
+  std::vector<std::vector<unsigned int> >
+    requested_ids(libMesh::n_processors());
+
+  // We know how many ghost elements live on each processor, so reserve()
+  // space for each.
+  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+    if (p != libMesh::processor_id())
+      requested_ids[p].reserve(ghost_elems_from_proc[p]);
+
+  for (MeshBase::element_iterator it = _mesh.elements_begin();
+       it != end; ++it)
+    {
+      Elem *elem = *it;
+      unsigned int elem_procid = elem->processor_id();
+
+      requested_ids[elem_procid].push_back(elem->id());
+    }
+
+  // Set refinement flags from other processors
+  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+    {
+      // Trade my requests with processor procup and procdown
+      unsigned int procup = (libMesh::processor_id() + p) %
+                             libMesh::n_processors();
+      unsigned int procdown = (libMesh::n_processors() +
+                               libMesh::processor_id() - p) %
+                               libMesh::n_processors();
+      std::vector<unsigned int> request_to_fill;
+      Parallel::send_receive(procup, requested_ids[procup],
+                             procdown, request_to_fill);
+
+      // Fill those requests
+      std::vector<unsigned char> rflags(request_to_fill.size()),
+                                 pflags(request_to_fill.size());
+      for (unsigned int i=0; i != request_to_fill.size(); ++i)
+        {
+          Elem *elem = _mesh.elem(i);
+          rflags[i] = elem->refinement_flag();
+          pflags[i] = elem->p_refinement_flag();
+        }
+
+      // Trade back the results
+      std::vector<unsigned char> ghost_rflags, ghost_pflags;
+      Parallel::send_receive(procdown, rflags,
+                             procup, ghost_rflags);
+      Parallel::send_receive(procdown, pflags,
+                             procup, ghost_pflags);
+      assert (ghost_rflags.size() == requested_ids[procup].size());
+      assert (ghost_pflags.size() == requested_ids[procup].size());
+
+      // And see if we need to change any flags
+      for (unsigned int i=0; i != requested_ids[procup].size(); ++i)
+        {
+          Elem *elem = _mesh.elem(i);
+          unsigned char old_r_flag = elem->refinement_flag();
+          unsigned char old_p_flag = elem->p_refinement_flag();
+          if (old_r_flag != ghost_rflags[i])
+            {
+              elem->set_refinement_flag
+                (static_cast<Elem::RefinementState>(ghost_rflags[i]));
+              parallel_consistent = false;
+            }
+          if (old_p_flag != ghost_pflags[i])
+            {
+              elem->set_p_refinement_flag
+                (static_cast<Elem::RefinementState>(ghost_pflags[i]));
+              parallel_consistent = false;
+            }
+        }
+    }
+
+  // If we weren't consistent on any processor then we weren't
+  // globally consistent
+  Parallel::min(parallel_consistent);
+
+  STOP_LOG ("make_flags_parallel_consistent()", "MeshRefinement");
+
+  return parallel_consistent;
+}
 
 
 
