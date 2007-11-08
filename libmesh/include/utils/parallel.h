@@ -33,6 +33,9 @@
 // ------------------------------------------------------------
 // The Parallel namespace is for wrapper functions
 // for common general parallel synchronization tasks
+//
+// For MPI 1.1 compatibility, temporary buffers are used
+// instead of MPI 2's MPI_IN_PLACE
 
 namespace Parallel
 {
@@ -172,6 +175,12 @@ namespace Parallel
 
 #ifdef HAVE_MPI
   template<>
+  inline MPI_Datatype datatype<char>() { return MPI_CHAR; }
+
+  template<>
+  inline MPI_Datatype datatype<unsigned char>() { return MPI_UNSIGNED_CHAR; }
+
+  template<>
   inline MPI_Datatype datatype<short int>() { return MPI_SHORT; }
 
   template<>
@@ -216,6 +225,24 @@ namespace Parallel
   }
 
 
+  template <>
+  inline void min(bool &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+	unsigned char tempsend = r;
+	unsigned char temp;
+	MPI_Allreduce (&tempsend,
+		       &temp,
+		       1,
+		       datatype<unsigned char>(),
+		       MPI_MIN,
+		       libMesh::COMM_WORLD);
+	r = temp;
+      }
+  }
+
+
   template <typename T>
   inline void min(std::vector<T> &r)
   {
@@ -243,6 +270,24 @@ namespace Parallel
 		       &temp,
 		       1,
 		       datatype<T>(),
+		       MPI_MAX,
+		       libMesh::COMM_WORLD);
+	r = temp;
+      }
+  }
+
+
+  template <>
+  inline void max(bool &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+	unsigned char tempsend = r;
+	unsigned char temp;
+	MPI_Allreduce (&tempsend,
+		       &temp,
+		       1,
+		       datatype<unsigned char>(),
 		       MPI_MAX,
 		       libMesh::COMM_WORLD);
 	r = temp;
