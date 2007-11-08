@@ -61,7 +61,6 @@ void Elem::refine (MeshRefinement& mesh_refinement)
       // sizes will change from call to call, so having these
       // static should save on reallocations
       std::vector<std::vector<Point> >        p    (this->n_children());
-      std::vector<std::vector<unsigned int> > keys (this->n_children());
       std::vector<std::vector<Node*> >        nodes(this->n_children());
     
 
@@ -70,14 +69,12 @@ void Elem::refine (MeshRefinement& mesh_refinement)
         {	
           Elem *child = this->child(c);
 	  p[c].resize    (child->n_nodes());
-	  keys[c].resize (child->n_nodes());
 	  nodes[c].resize(child->n_nodes());
 
 	  for (unsigned int nc=0; nc<child->n_nodes(); nc++)
 	    {
 	      // zero entries
 	      p[c][nc].zero();
-	      keys[c][nc]  = 0;
 	      nodes[c][nc] = NULL;
 	  
 	      for (unsigned int n=0; n<this->n_nodes(); n++)
@@ -93,19 +90,6 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 		      // won't need to look it up later.
 		      if (em_val == 1.)
 		        nodes[c][nc] = this->get_node(n);
-		  
-		      // Otherwise build the key to look for the node
-		      else
-		        {
-                          const unsigned int n_id = _cast_node_address_to_unsigned_int(n);
-			  
-                          // Compute the key for this new node nc.  This will
-			  // be used to locate the node if it already exists
-			  // in the mesh.
-			  keys[c][nc] +=
-			  (((static_cast<unsigned int>(em_val*100000.)%_bp1) *
-			    (n_id%_bp1))%_bp1)*_bp2;
-		        }
 		    }
 	        }
 	    }
@@ -122,7 +106,6 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 	        {
 		  child->set_node(nc) =
 		    mesh_refinement.add_point(p[c][nc],
-					      keys[c][nc],
 					      child->processor_id(),
                                               pointtol);
 		  child->get_node(nc)->set_n_systems
@@ -158,59 +141,6 @@ void Elem::refine (MeshRefinement& mesh_refinement)
     }
   assert (this->ancestor());
 }
-
-
-
-
-void Elem::compute_children_node_keys()
-{
-  // No node keys need to be set if I have no children 
-  if (!_children)
-    return;
-
-  // Temporary storage for keys. 
-  std::vector<std::vector<unsigned int> > keys (this->n_children());
-
-
-  // compute new nodal locations
-  for (unsigned int c=0; c<this->n_children(); c++)
-  {	
-    keys[c].resize (this->child(c)->n_nodes());
-
-    for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-    {
-      for (unsigned int n=0; n<this->n_nodes(); n++)
-      {
-        // The value from the embedding matrix
-        const float em_val = this->embedding_matrix(c,nc,n);
-         
-        // The node location is somewhere between existing vertices
-        if ((em_val != 0.) && (em_val != 1.)) 
-        {
-          const unsigned int n_id = _cast_node_address_to_unsigned_int(n);
-
-          // Compute the key for this new node nc.  This will
-          // be used to locate the node if it already exists
-          // in the mesh.
-          keys[c][nc] +=
-            (((static_cast<unsigned int>(em_val*100000.)%_bp1) *
-              (n_id%_bp1))%_bp1)*_bp2;
-        }
-      }
-    }
-  }
-
-  // By now, all the keys for the child nodes have been computed.
-  // keys[c][nc] will have zero entries for nodes that already belonged
-  // to the parent.
-  for (unsigned int c=0; c<this->n_children(); c++)
-    for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
-      if (keys[c][nc] != 0)
-        this->child(c)->get_node(nc)->set_key() = keys[c][nc];
-}
-
-
-
 
 
 

@@ -142,14 +142,6 @@ class Elem : public ReferenceCountedObject<Elem>,
   unsigned char & subdomain_id ();
 
   /**
-   * @returns an id assocated with this element.  The id is not
-   * guaranteed to be unique, but it should be close.  The id
-   * is thus useful, for example, as a key in a hash table
-   * data structure.
-   */
-  unsigned int key () const;
-
-  /**
    * @returns an id associated with the \p s side of this element.
    * The id is not necessariy unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
@@ -734,13 +726,6 @@ class Elem : public ReferenceCountedObject<Elem>,
    * Refine the element.
    */
   virtual void refine (MeshRefinement& mesh_refinement);
- 
-  /**
-   * For an element with children, this function calculates
-   * and sets the key values for the nodes introduced by the
-   * children (e.g. mid-edge/mid-face nodes)
-   */
-  void compute_children_node_keys();
  
   /**
    * Coarsen the element.  This is not

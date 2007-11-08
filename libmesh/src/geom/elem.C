@@ -231,35 +231,6 @@ AutoPtr<Elem> Elem::build(const ElemType type,
 
 
 
-
-
-
-unsigned int Elem::key() const
-{
-  const unsigned int nv = this->n_vertices();
-  
-  assert (nv != 0);
-
-  std::vector<unsigned int> vec (nv, 0);
-
-  for (unsigned int v=0; v<nv; v++)
-    vec[v] = this->node(v);
-
-  
-  std::sort(vec.begin(), vec.end());
-  
-  unsigned int n       = vec[0];
-  const unsigned int m = vec[0];
-  
-  for (unsigned int i=1; i<nv; i++)
-    n = n^vec[i];
-  
-
-  return n + m*m;  
-} 
-
-
-
 Point Elem::centroid() const
 {
   Point cp;
