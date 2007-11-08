@@ -348,21 +348,6 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
               error();
           }
 
-#ifdef ENABLE_AMR
-	// All the elements at each level have been added, and their node pointers
-	// have been set.  Now compute the node keys to put the mesh into a state consistent
-	// with the state after being constructed through normal refinements. 
-	// The new nodes were added through Mesh::add_point(), which
-	// allocates brand new memory for the point, and does not copy
-	// over any key.
-	MeshBase::element_iterator it = mesh.elements_begin();
-	const MeshBase::element_iterator end = mesh.elements_end();
-
-	for (; it!=end; ++it)
-	  (*it)->compute_children_node_keys();
-
-#endif // #ifdef ENABLE_AMR
-	
       } // end if iam != cpu 0
     
     
@@ -815,20 +800,6 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	      }
 	    
 	  }   
-#ifdef ENABLE_AMR
-    // All the elements at each level have been added, and their node pointers
-    // have been set.  Now compute the node keys to put the mesh into a state consistent
-    // with the state after being constructed through normal refinements. 
-    // The new nodes were added through Mesh::add_point(), which
-    // allocates brand new memory for the point, and does not copy
-    // over any key.
-    ParallelMesh::element_iterator it = mesh.elements_begin();
-    const ParallelMesh::element_iterator end = mesh.elements_end();
-
-    for (; it!=end; ++it)
-      (*it)->compute_children_node_keys();
-
-#endif // #ifdef ENABLE_AMR
 
     // Check the result
     assert (global_n_elem == mesh.n_elem());
