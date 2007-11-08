@@ -126,30 +126,6 @@ public:
 private:
 
   /**
-   * Compares two Node pointers.
-   */
-//   static bool _equals(const Node* lhs, const Node* rhs);
-
-  /**
-   * @returns the \p key for this node. The key is an arbitrary,
-   * not necessarily unique value associated with this \p Node.
-   * Don't use it, unless you know what you are doing.
-   */
-  unsigned int key () const;
-
-  /**
-   * @returns a writeable reference to the \p key for
-   * this \p Node.
-   */
-  unsigned int & set_key ();
-
-  /**
-   * The \p key value.
-   */
-  unsigned int _key;
-
-
-  /**
    * This class need access to the node key information,
    * but no one else should be able to mess with it.
    */
@@ -166,8 +142,7 @@ Node::Node (const Real x,
 	    const Real y,
 	    const Real z,
 	    const unsigned int id) :
-  Point(x,y,z),
-  _key (0)
+  Point(x,y,z)
 {
   this->set_id() = id;
 }
@@ -178,8 +153,7 @@ inline
 Node::Node (const Node& n) :
   Point(n),
   DofObject(n),
-  ReferenceCountedObject<Node>(),
-  _key (n._key)
+  ReferenceCountedObject<Node>()
 {
 }
 
@@ -188,8 +162,7 @@ Node::Node (const Node& n) :
 inline
 Node::Node (const Point& p,
 	    const unsigned int id) :
-  Point(p),
-  _key (0)
+  Point(p)
 {
   // optionally assign the id.  We have
   // to do it like this otherwise
@@ -215,8 +188,6 @@ Node & Node::operator= (const Point& p)
   (*this)(1) = p(1);
   (*this)(2) = p(2);
 
-//  _key = 0;
-  
   return *this;
 }
 
@@ -260,21 +231,6 @@ bool Node::active () const
   return (this->id() != Node::invalid_id);
 }
 
-
-
-inline
-unsigned int Node::key () const
-{
-  return _key;
-}
-
-
-
-inline
-unsigned int & Node::set_key ()
-{
-  return _key;
-}
 
 
 #endif

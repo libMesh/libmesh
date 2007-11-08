@@ -72,11 +72,12 @@ void MeshRefinement::clear ()
 
 
 Node* MeshRefinement::add_point (const Point& p,
-                                 const unsigned int key,
                                  const unsigned int processor_id,
                                  const Real tol)
 {
   START_LOG("add_point()", "MeshRefinement");
+
+  const unsigned int key = this->point_key(p);
 
   // Look for the key in the multimap  
   std::pair<map_type::iterator, map_type::iterator>
@@ -95,7 +96,11 @@ Node* MeshRefinement::add_point (const Point& p,
   // If we get here pos.first == pos.second.
   assert (pos.first == pos.second); // still not found
                                     // so we better add it
-  Node* node = _mesh.add_point (p);
+
+  // Add the node, with a default id and the requested
+  // processor_id
+  Node* node = _mesh.add_point (p, DofObject::invalid_id,
+                                processor_id);
 
   assert (node != NULL);
 
@@ -107,10 +112,6 @@ Node* MeshRefinement::add_point (const Point& p,
   _new_nodes_map.insert(pos.first, std::make_pair(key, node));
 #endif			    
 
-  // Set the key and processor id for this node
-  node->set_key() = key;
-  node->processor_id(processor_id);
-  
   // Return the address of the new node
   STOP_LOG("add_point()", "MeshRefinement");
   return node;
@@ -241,7 +242,14 @@ void MeshRefinement::update_nodes_map ()
 {
   START_LOG("update_nodes_map()", "MeshRefinement");
 
+  // Clear the old map
   _new_nodes_map.clear();
+
+  // Cache a bounding box as we populate the new map
+  _lower_bound.clear();
+  _lower_bound.resize(3, std::numeric_limits<Real>::max());
+  _upper_bound.clear();
+  _upper_bound.resize(3, -std::numeric_limits<Real>::max());
 
   MeshBase::node_iterator       it  = _mesh.nodes_begin();
   const MeshBase::node_iterator end = _mesh.nodes_end();
@@ -251,7 +259,28 @@ void MeshRefinement::update_nodes_map ()
       Node* node = *it;
 
       // Add the node to the map.
-      _new_nodes_map.insert(std::make_pair(node->key(), node));
+      _new_nodes_map.insert(std::make_pair(this->point_key(*node), node));
+
+      // Expand the bounding box if necessary
+      _lower_bound[0] = std::min(_lower_bound[0],
+                                 (*node)(0));
+      _lower_bound[1] = std::min(_lower_bound[1],
+                                 (*node)(1));
+      _lower_bound[2] = std::min(_lower_bound[2],
+                                 (*node)(2));
+      _upper_bound[0] = std::max(_upper_bound[0],
+                                 (*node)(0));
+      _upper_bound[1] = std::max(_upper_bound[1],
+                                 (*node)(1));
+      _upper_bound[2] = std::max(_upper_bound[2],
+                                 (*node)(2));
+    }
+
+  // On a parallel mesh we might not yet have a full bounding box
+  if (!_mesh.is_serial())
+    {
+      Parallel::min(_lower_bound);
+      Parallel::max(_upper_bound);
     }
 
   STOP_LOG("update_nodes_map()", "MeshRefinement");
@@ -1333,8 +1362,26 @@ bool MeshRefinement::_refine_elements ()
   // Now iterate over the local copy and refine each one.
   // This may resize the mesh's internal container and invalidate
   // any existing iterators.
+  // To ensure that the new local nodes we add are given correct
+  // processor ids, with ParallelMesh we'd better be adding elements
+  // in increasing processor id order.  The default element sorting
+  // should get that right.
+#ifdef DEBUG
+  unsigned int proc_id = 0;
+#endif
   for (unsigned int e=0; e<local_copy_of_elements.size(); ++e)
-    local_copy_of_elements[e]->refine(*this);
+    {
+#ifdef DEBUG
+      unsigned int next_proc_id =
+        local_copy_of_elements[e]->processor_id();
+      assert (_mesh.is_serial() || next_proc_id >= proc_id);
+      proc_id = next_proc_id;
+#endif
+      local_copy_of_elements[e]->refine(*this);
+    }
+
+  if (!_mesh.is_serial())
+    this->make_nodes_parallel_consistent();
   
   // Clear the _new_nodes_map and _unused_elements data structures.
   this->clear();
@@ -1342,6 +1389,49 @@ bool MeshRefinement::_refine_elements ()
   STOP_LOG ("_refine_elements()", "MeshRefinement");
 
   return mesh_changed;
+}
+
+
+
+void MeshRefinement::make_nodes_parallel_consistent()
+{
+  // Local nodes in the _new_nodes_map have authoritative ids
+  // and correct processor ids, nodes touching local elements
+  // have correct processor ids but need to have their ids
+  // corrected, and ghost nodes not touching local elements
+  // may need to have both ids and processor ids corrected.
+
+  // First correct the processor ids, so we'll ask the 
+  // right processor when correcting ids later
+
+  // Count the nodes to ask each processor about
+}
+
+
+
+unsigned int MeshRefinement::point_key (const Point &p) const
+{
+  Real xscaled = (p(0) - _lower_bound[0])/
+                 (_upper_bound[0] - _lower_bound[0]),
+       yscaled = (p(1) - _lower_bound[1])/
+                 (_upper_bound[1] - _lower_bound[1]),
+       zscaled = (p(2) - _lower_bound[2])/
+                 (_upper_bound[2] - _lower_bound[2]);
+  unsigned int n0 = static_cast<unsigned int> (static_cast<Real>
+                     (std::numeric_limits<unsigned int>::max()) * xscaled),
+               n1 = static_cast<unsigned int> (static_cast<Real>
+                     (std::numeric_limits<unsigned int>::max()) * yscaled),
+               n2 = static_cast<unsigned int> (static_cast<Real>
+                     (std::numeric_limits<unsigned int>::max()) * zscaled);
+
+  // See Elem::compute_key
+  const unsigned int bp = 65449;
+  if (n0 > n1) std::swap (n0, n1);
+  if (n1 > n2) std::swap (n1, n2);
+  if (n0 > n1) std::swap (n0, n1);
+  assert ((n0 <= n1) && (n1 <= n2));
+
+  return (n0%bp + (n1<<5)%bp + (n2<<10)%bp);
 }
 
 

@@ -264,13 +264,12 @@ public:
   
   /**
    * Add point \p p to the mesh. The function returns a pointer to
-   * the new node.  The \p key tells the method where to look.
+   * the new node.
    * The processor_id is assigned to the new node (only if no existing
    * node is found.  The tolerance \p tol tells the method how far away
    * from p to search for existing nodes.
    */
   Node* add_point (const Point& p,
-                   const unsigned int key,
                    const unsigned int processor_id,
                    const Real tol);
 
@@ -588,14 +587,25 @@ private:
   bool make_refinement_compatible (const bool);
   
   /**
-   * Copy refinement flags on ghost nodes from their
+   * Copy refinement flags on ghost elements from their
    * local processors.  Return true if any flags changed.
    */
   bool make_flags_parallel_consistent ();
   
   /**
+   * Copy processor_ids and ids on ghost nodes from their
+   * local processors.
+   */
+  void make_nodes_parallel_consistent ();
+
+  /**
+   * Returns a hash of a point location.
+   */
+  unsigned int point_key (const Point &p) const;
+  
+  /**
    * Data structure that holds the new nodes information.
-   * The key is a pointer to the element that created the node.
+   * The key is a hash of the Node location.
    * For efficiency we will use a hashed multimap if it is
    * available, otherwise a regular multimap.
    */
@@ -617,11 +627,15 @@ private:
   
   map_type _new_nodes_map;
 
-
   /**
    * Reference to the mesh.
    */
   MeshBase& _mesh;
+
+  /**
+   * A cached bounding box for the mesh
+   */
+  std::vector<Real> _lower_bound, _upper_bound;
 
   /**
    * For backwards compatibility, we initialize this
