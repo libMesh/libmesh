@@ -5114,16 +5114,19 @@ src/numerics/numeric_vector.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
     include/enums/enum_solver_package.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
+    include/numerics/distributed_vector.h\
     include/numerics/laspack_vector.h\
     include/numerics/numeric_vector.h\
     include/numerics/petsc_macro.h\
     include/numerics/petsc_vector.h\
     include/utils/o_string_stream.h\
+    include/utils/parallel.h\
     include/utils/perf_log.h
 src/numerics/patch_recovery_error_estimator.$(obj-suffix):\
     src/numerics/patch_recovery_error_estimator.C\
