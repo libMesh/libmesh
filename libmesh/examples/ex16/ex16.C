@@ -63,10 +63,10 @@ int main (int argc, char** argv)
 
   // This example is designed for the SLEPc eigen solver interface.
 #ifndef HAVE_SLEPC
-
-  std::cerr << "ERROR: This example requires libMesh to be\n"
-	    << "compiled with SLEPc eigen solvers support!"
-	    << std::endl;
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example requires libMesh to be\n"
+	      << "compiled with SLEPc eigen solvers support!"
+	      << std::endl;
 
   return 0;
 #else
@@ -77,9 +77,10 @@ int main (int argc, char** argv)
     // Check for proper usage.
     if (argc < 3)
       {
-	std::cerr << "\nUsage: " << argv[0]
-		  << " -n <number of eigen values>"
-		  << std::endl;
+        if (libMesh::processor_id() == 0)
+	  std::cerr << "\nUsage: " << argv[0]
+		    << " -n <number of eigen values>"
+		    << std::endl;
 	error();
       }
     

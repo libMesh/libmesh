@@ -113,23 +113,26 @@ int main(int argc, char** argv)
 
 
 #ifdef ENABLE_PARMESH
-  std::cerr << "ERROR: This example uses AMR, which libMesh\n"
-            << "does not yet support on parallel meshes!"
-            << std::endl;
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example uses AMR, which libMesh\n"
+              << "does not yet support on parallel meshes!"
+              << std::endl;
   return 0;
 #endif
 
 #ifndef ENABLE_AMR
-  std::cerr << "ERROR: This example requires libMesh to be\n"
-            << "compiled with AMR support!"
-            << std::endl;
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example requires libMesh to be\n"
+              << "compiled with AMR support!"
+              << std::endl;
   return 0;
 #else
 
 #ifndef ENABLE_SECOND_DERIVATIVES
-  std::cerr << "ERROR: This example requires the library to be "
-	    << "compiled with second derivatives support!"
-	    << std::endl;
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example requires the library to be "
+	      << "compiled with second derivatives support!"
+	      << std::endl;
   return 0;
 #else
 
@@ -346,9 +349,9 @@ int main(int argc, char** argv)
 		error_estimator.estimate_error(system, error);
                 mesh_refinement.flag_elements_by_elem_fraction (error);
 
-		std::cerr << "Mean Error: " << error.mean() <<
+		std::cout << "Mean Error: " << error.mean() <<
 				std::endl;
-		std::cerr << "Error Variance: " << error.variance() <<
+		std::cout << "Error Variance: " << error.variance() <<
 				std::endl;
 
 		mesh_refinement.refine_and_coarsen_elements();

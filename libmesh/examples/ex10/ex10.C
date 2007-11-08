@@ -117,16 +117,18 @@ int main (int argc, char** argv)
   libMesh::init (argc, argv);
 
 #ifdef ENABLE_PARMESH
-  std::cerr << "ERROR: This example uses AMR, which libMesh\n"
-            << "does not yet support on parallel meshes!"
-            << std::endl;
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example uses AMR, which libMesh\n"
+              << "does not yet support on parallel meshes!"
+              << std::endl;
   return 0;
 #endif
 
 #ifndef ENABLE_AMR
-  std::cerr << "ERROR: This example requires libMesh to be\n"
-            << "compiled with AMR support!"
-            << std::endl;
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example requires libMesh to be\n"
+              << "compiled with AMR support!"
+              << std::endl;
   return 0;
 #else
 
@@ -175,7 +177,8 @@ int main (int argc, char** argv)
       init_timestep = command_line.next(0);
     else
     {
-      std::cerr << "ERROR: Initial timestep not specified\n" << std::endl;
+      if (libMesh::processor_id() == 0)
+        std::cerr << "ERROR: Initial timestep not specified\n" << std::endl;
 
       // This handy function will print the file name, line number,
       // and then abort.  Currrently the library does not use C++
@@ -194,7 +197,7 @@ int main (int argc, char** argv)
       n_timesteps = command_line.next(0);
     else
     {
-      std::cerr << "ERROR: Number of timesteps not specified\n" << std::endl;
+      std::cout << "ERROR: Number of timesteps not specified\n" << std::endl;
       error();
     }
 

@@ -50,8 +50,9 @@ int main (int argc, char** argv)
     // a filename to write the mesh into.
     if (argc < 4)
       {
-	std::cerr << "Usage: " << argv[0] << " -d 2 in.mesh [out.mesh]"
-		  << std::endl;
+        if (libMesh::processor_id() == 0)
+	  std::cerr << "Usage: " << argv[0] << " -d 2 in.mesh [out.mesh]"
+		    << std::endl;
 	
 	// This handy function will print the file name, line number,
 	// and then abort.  Currently the library does not use C++

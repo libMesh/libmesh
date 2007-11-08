@@ -106,8 +106,9 @@ int main (int argc, char** argv)
     // Check for proper usage.
     if (argc < 2)
       {
-	std::cerr << "Usage: " << argv[0] << " [meshfile]"
-		  << std::endl;
+        if (libMesh::processor_id() == 0)
+	  std::cerr << "Usage: " << argv[0] << " [meshfile]"
+		    << std::endl;
 	
 	error();
       }
@@ -132,7 +133,7 @@ int main (int argc, char** argv)
 	(libMesh::on_command_line("--disable-petsc")))
 #endif
       {
-	std::cerr << "WARNING! It appears you are using the\n"
+	std::cout << "WARNING! It appears you are using the\n"
 		  << "LasPack solvers.  ex8 is known not to converge\n"
 		  << "using LasPack, but should work OK with PETSc.\n"
 		  << "If possible, download and install the PETSc\n"

@@ -112,9 +112,10 @@ int main (int argc, char** argv)
     // Check for proper calling arguments.
     if (argc < 3)
       {
-	std::cerr << "Usage:\n"
-		  <<"\t " << argv[0] << " -d 2(3)" << " -n 15"
-		  << std::endl;
+        if (libMesh::processor_id() == 0)
+	  std::cerr << "Usage:\n"
+		    <<"\t " << argv[0] << " -d 2(3)" << " -n 15"
+		    << std::endl;
 
 	// This handy function will print the file name, line number,
 	// and then abort.  Currrently the library does not use C++
@@ -160,7 +161,7 @@ int main (int argc, char** argv)
     // Cannot use dicontinuous basis.
     if ((family == "MONOMIAL") || (family == "XYZ"))
       {
-	std::cerr << "ex4 currently requires a C^0 (or higher) FE basis." << std::endl;
+	std::cout << "ex4 currently requires a C^0 (or higher) FE basis." << std::endl;
 	error();
       }
       

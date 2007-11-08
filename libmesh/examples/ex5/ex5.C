@@ -104,21 +104,24 @@ int main (int argc, char** argv)
     // must be given at run time.
     if (argc < 3)
       {
-	std::cerr << "Usage: " << argv[0] << " -q n"
-		  << std::endl;
-	std::cerr << "  where n stands for:" << std::endl;
+        if (libMesh::processor_id() == 0)
+          {
+	    std::cerr << "Usage: " << argv[0] << " -q n"
+		      << std::endl;
+	    std::cerr << "  where n stands for:" << std::endl;
 
 	
-	// Note that only some of all quadrature rules are
-	// valid choices.  For example, the Jacobi quadrature
-	// is actually a "helper" for higher-order rules,
-	// included in QGauss.
-	for (unsigned int n=0; n<QuadratureRules::num_valid_elem_rules; n++)
-	  std::cerr << "  " << QuadratureRules::valid_elem_rules[n] << "    " 
-		    << QuadratureRules::name(QuadratureRules::valid_elem_rules[n])
-		    << std::endl;
+	    // Note that only some of all quadrature rules are
+	    // valid choices.  For example, the Jacobi quadrature
+	    // is actually a "helper" for higher-order rules,
+	    // included in QGauss.
+	    for (unsigned int n=0; n<QuadratureRules::num_valid_elem_rules; n++)
+	      std::cerr << "  " << QuadratureRules::valid_elem_rules[n] << "    " 
+		        << QuadratureRules::name(QuadratureRules::valid_elem_rules[n])
+		        << std::endl;
 	
-	std::cerr << std::endl;
+	    std::cerr << std::endl;
+          }
 	
 	error();
       }
