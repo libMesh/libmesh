@@ -155,72 +155,83 @@ void MeshRefinement::create_parent_error_vector
    Real& parent_error_max)
 {
   error_per_parent.clear();
-  error_per_parent.resize(error_per_cell.size(), -1.);
+  error_per_parent.resize(error_per_cell.size(), 0);
 
-  parent_error_min = std::numeric_limits<double>::max();
-  parent_error_max = 0.;
-
-  // We need to loop over all active elements to find minimum error
-  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+  // The parent's error is defined as the square root of the
+  // sum of the children's errors squared, so errors that are
+  // Hilbert norms remain Hilbert norms.
+  //
+  // Because the children may be on different processors, we
+  // calculate local contributions to the parents' errors squared
+  // first, then sum across processors and take the square roots
+  // second.
+  MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
 
   for (; elem_it != elem_end; ++elem_it)
     {
       Elem* elem   = *elem_it;
       Elem* parent = elem->parent();
 
-      // Calculate summed errors on parent cells
+      // Calculate each contribution to parent cells
       if (parent)
         {
           const unsigned int parentid  = parent->id();
           assert (parentid < error_per_parent.size());
 
-          // If we haven't already calculated the parent's total
-          // error, do so now
-          if (error_per_parent[parentid] == -1.)
+          // If the parent has grandchildren we won't be able
+          // to coarsen it, so forget it.
+          // On a parallel mesh, all the parent's children will be
+          // local or ghost elements - it's grandchildren may be
+	  // remote elements, but that's fine; we only need to know if
+	  // they exist.
+	  bool parent_has_grandchildren = false;
+          for (unsigned int n = 0; n != parent->n_children(); ++n)
             {
-              // The error estimator might have already given us an
-              // estimate on the coarsenable parent elements
-              if (error_per_cell[parentid])
+              Elem* child = parent->child(n);
+
+              if (!child->active())
                 {
-                  error_per_parent[parentid] = error_per_cell[parentid];
-                  continue;
+                  parent_has_grandchildren = true;
+                  break;
                 }
- 
-              ErrorVectorReal parent_error = 0.;
-              for (unsigned int n = 0; n != parent->n_children(); ++n)
-                {
-                  Elem* child = parent->child(n);
-                  const unsigned int childid = child->id();
-
-                  // If the parent has grandchildren we won't be able
-                  // to coarsen it, so forget it
-                  if (!child->active())
-                    {
-                      parent_error = -1.;
-                      break;
-                    }
-
-                  // We take the square root of the sum of the
-                  // squares, so errors that are Hilbert norms
-                  // remain Hilbert norms
-                  parent_error += (error_per_cell[childid] *
-                                   error_per_cell[childid]);
-                }
-
-              // If this element is uncoarsenable, just skip it
-              if (parent_error < 0)
-                continue;
-
-              parent_error = std::sqrt(parent_error);
-              error_per_parent[parentid] = parent_error;
-
-              parent_error_min = std::min (parent_error_min,
-                                           parent_error);
-              parent_error_max = std::max (parent_error_max,
-                                           parent_error);
             }
+
+          if (!parent_has_grandchildren)
+            error_per_parent[parentid] += (error_per_cell[elem->id()] *
+                                           error_per_cell[elem->id()]);
         }
+    }
+
+  // Sum the vector across all processors
+  Parallel::sum(static_cast<std::vector<ErrorVectorReal>&>(error_per_parent));
+
+  // Calculate the min and max as we loop
+  parent_error_min = std::numeric_limits<double>::max();
+  parent_error_max = 0.;
+
+  for (unsigned int i = 0; i != error_per_parent.size(); ++i)
+    {
+      // The error estimator might have already given us an
+      // estimate on the coarsenable parent elements; if so then
+      // we want to retain that estimate
+      if (error_per_cell[i])
+        {
+          error_per_parent[i] = error_per_cell[i];
+          continue;
+        }
+ 
+      // If this element isn't a coarsenable parent with error, we
+      // have nothing to do.
+      if (!error_per_parent[i])
+        continue;
+
+      error_per_parent[i] = std::sqrt(error_per_parent[i]);
+
+      parent_error_min = std::min (parent_error_min,
+                                   error_per_parent[i]);
+      parent_error_max = std::max (parent_error_max,
+                                   error_per_parent[i]);
     }
 }
 
