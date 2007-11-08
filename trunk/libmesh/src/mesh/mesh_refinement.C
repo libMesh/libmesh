@@ -411,10 +411,10 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
         smoothing_satisfied = smoothing_satisfied &&
           !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
 
-      satisfied = (coarsening_satisfied &&
+      satisfied = (parallel_consistent &&
+                   coarsening_satisfied &&
 		   refinement_satisfied &&
-		   smoothing_satisfied &&
-                   parallel_consistent);
+		   smoothing_satisfied);
     }
   while (!satisfied);
 
@@ -515,6 +515,9 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
   bool satisfied = false;
   while (!satisfied)
     {
+      const bool parallel_consistent = _mesh.is_serial() ||
+        this->make_flags_parallel_consistent();
+      
       const bool coarsening_satisfied =
 	this->make_coarsening_compatible(maintain_level_one);
 
@@ -529,7 +532,8 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
         smoothing_satisfied = smoothing_satisfied &&
           !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
       
-      satisfied = (coarsening_satisfied &&
+      satisfied = (parallel_consistent &&
+                   coarsening_satisfied &&
 		   smoothing_satisfied);
     }
 
@@ -607,6 +611,9 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
   bool satisfied = false;
   while (!satisfied)
     {
+      const bool parallel_consistent = _mesh.is_serial() ||
+        this->make_flags_parallel_consistent();
+      
       const bool refinement_satisfied =
 	this->make_refinement_compatible(maintain_level_one);
 
@@ -621,7 +628,8 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
         smoothing_satisfied = smoothing_satisfied &&
           !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
       
-      satisfied = (refinement_satisfied &&
+      satisfied = (parallel_consistent &&
+                   refinement_satisfied &&
 		   smoothing_satisfied);
     }
   
