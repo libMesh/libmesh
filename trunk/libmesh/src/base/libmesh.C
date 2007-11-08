@@ -326,7 +326,10 @@ SolverPackage libMesh::default_solver_package ()
 	  libMesh::on_command_line ("--disable-petsc"))
 	libMeshPrivateData::_solver_package = LASPACK_SOLVERS;
 #endif
-      
+
+      if (libMesh::on_command_line ("--disable-laspack"  ) &&
+	  libMesh::on_command_line ("--disable-petsc"))
+	libMeshPrivateData::_solver_package = INVALID_SOLVER_PACKAGE;
     }
   
   
