@@ -1084,6 +1084,9 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
 void MeshCommunication::pack_element (std::vector<int> &conn, const Elem* &elem) const
 {
   assert (elem != NULL);
+
+  // We don't support p refined elements yet
+  assert (!elem->p_level());
   
   conn.push_back (static_cast<int>(elem->level()));
   conn.push_back (static_cast<int>(elem->type()));
