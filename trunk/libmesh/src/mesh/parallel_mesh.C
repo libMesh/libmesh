@@ -119,7 +119,7 @@ unsigned int ParallelMesh::max_node_id() const
 const Point& ParallelMesh::point (const unsigned int i) const
 {
   assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);  
+  assert (_nodes[i]->id() == i);  
 
   return (*_nodes[i]);
 }
@@ -131,7 +131,7 @@ const Point& ParallelMesh::point (const unsigned int i) const
 const Node& ParallelMesh::node (const unsigned int i) const
 {
   assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);  
+  assert (_nodes[i]->id() == i);  
   
   return (*_nodes[i]);
 }
@@ -143,7 +143,7 @@ const Node& ParallelMesh::node (const unsigned int i) const
 Node& ParallelMesh::node (const unsigned int i)
 {
   assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);  
+  assert (_nodes[i]->id() == i);  
 
   return (*_nodes[i]);
 }
@@ -153,7 +153,7 @@ Node& ParallelMesh::node (const unsigned int i)
 const Node* ParallelMesh::node_ptr (const unsigned int i) const
 {
   assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);  
+  assert (_nodes[i]->id() == i);  
   
   return _nodes[i];
 }
@@ -164,6 +164,7 @@ const Node* ParallelMesh::node_ptr (const unsigned int i) const
 Node* & ParallelMesh::node_ptr (const unsigned int i)
 {
   assert (_nodes[i] != NULL);
+  assert (_nodes[i]->id() == i);
 
   return _nodes[i];
 }
@@ -174,6 +175,7 @@ Node* & ParallelMesh::node_ptr (const unsigned int i)
 Elem* ParallelMesh::elem (const unsigned int i) const
 {
   assert (_elements[i] != NULL);
+  assert (_elements[i]->id() == i);
   
   return _elements[i];
 }
@@ -274,6 +276,7 @@ void ParallelMesh::renumber_elem(const unsigned int old_id,
 {
   Elem *elem = _elements[old_id];
   assert (elem);
+  assert (elem->id() == old_id);
 
   elem->set_id(new_id);
   assert (!_elements[new_id]);
@@ -397,6 +400,7 @@ void ParallelMesh::renumber_node(const unsigned int old_id,
 {
   Node *node = _nodes[old_id];
   assert (node);
+  assert (node->id() == old_id);
 
   node->set_id(new_id);
   assert (!_nodes[new_id]);
@@ -441,7 +445,7 @@ void ParallelMesh::clear ()
   }
 
   // We're no longer distributed if we were before
-  _is_serial = false;
+  _is_serial = true;
 }
 
 
