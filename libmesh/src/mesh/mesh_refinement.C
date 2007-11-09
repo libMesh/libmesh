@@ -245,7 +245,7 @@ void MeshRefinement::update_nodes_map ()
   // Clear the old map
   _new_nodes_map.clear();
 
-  // Cache a bounding box as we populate the new map
+  // Cache a bounding box
   _lower_bound.clear();
   _lower_bound.resize(3, std::numeric_limits<Real>::max());
   _upper_bound.clear();
@@ -257,9 +257,6 @@ void MeshRefinement::update_nodes_map ()
   for (; it != end; ++it)
     {
       Node* node = *it;
-
-      // Add the node to the map.
-      _new_nodes_map.insert(std::make_pair(this->point_key(*node), node));
 
       // Expand the bounding box if necessary
       _lower_bound[0] = std::min(_lower_bound[0],
@@ -281,6 +278,17 @@ void MeshRefinement::update_nodes_map ()
     {
       Parallel::min(_lower_bound);
       Parallel::max(_upper_bound);
+    }
+
+  // Populate the nodes map
+  it  = _mesh.nodes_begin();
+
+  for (; it != end; ++it)
+    {
+      Node* node = *it;
+
+      // Add the node to the map.
+      _new_nodes_map.insert(std::make_pair(this->point_key(*node), node));
     }
 
   STOP_LOG("update_nodes_map()", "MeshRefinement");
@@ -1499,6 +1507,9 @@ void MeshRefinement::make_nodes_parallel_consistent()
           std::pair<map_type::iterator, map_type::iterator>
             pos = _new_nodes_map.equal_range(key);
 
+          // We'd better find every node we're asked for
+          assert (pos.first != pos.second);
+
           Node *node = NULL;
           // FIXME - what tolerance should we use?
           for (; pos.first != pos.second; ++pos.first)
@@ -1506,6 +1517,12 @@ void MeshRefinement::make_nodes_parallel_consistent()
               {
                 node = pos.first->second;
                 break;
+              }
+            else
+              {
+                // Make sure this map conflict isn't a key bug
+                assert (this->point_key(*(pos.first->second)) == 
+                        this->point_key(p));
               }
 
           // We'd better have found every node we're asked for
@@ -1600,6 +1617,9 @@ void MeshRefinement::make_nodes_parallel_consistent()
           // Look for this point in the multimap
           std::pair<map_type::iterator, map_type::iterator>
             pos = _new_nodes_map.equal_range(key);
+
+          // We'd better find every node we're asked for
+          assert (pos.first != pos.second);
 
           Node *node = NULL;
           // FIXME - what tolerance should we use?
@@ -1755,21 +1775,16 @@ unsigned int MeshRefinement::point_key (const Point &p) const
                  (_upper_bound[1] - _lower_bound[1]),
        zscaled = (p(2) - _lower_bound[2])/
                  (_upper_bound[2] - _lower_bound[2]);
-  unsigned int n0 = static_cast<unsigned int> (static_cast<Real>
-                     (std::numeric_limits<unsigned int>::max()) * xscaled),
-               n1 = static_cast<unsigned int> (static_cast<Real>
-                     (std::numeric_limits<unsigned int>::max()) * yscaled),
-               n2 = static_cast<unsigned int> (static_cast<Real>
-                     (std::numeric_limits<unsigned int>::max()) * zscaled);
 
-  // See Elem::compute_key
-  const unsigned int bp = 65449;
-  if (n0 > n1) std::swap (n0, n1);
-  if (n1 > n2) std::swap (n1, n2);
-  if (n0 > n1) std::swap (n0, n1);
-  assert ((n0 <= n1) && (n1 <= n2));
+  // 10 bits per coordinate, to work with 32+ bit machines
+  unsigned chunkmax = 1024;
+  Real chunkfloat = 1024.0;
 
-  return (n0%bp + (n1<<5)%bp + (n2<<10)%bp);
+  unsigned int n0 = static_cast<unsigned int> (chunkfloat * xscaled),
+               n1 = static_cast<unsigned int> (chunkfloat * yscaled),
+               n2 = static_cast<unsigned int> (chunkfloat * zscaled);
+
+  return chunkmax*chunkmax*n0 + chunkmax*n1 + n2;
 }
 
 
