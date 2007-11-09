@@ -599,6 +599,11 @@ private:
   void make_nodes_parallel_consistent ();
 
   /**
+   * Copy ids on ghost elements from their local processors.
+   */
+  void make_elems_parallel_consistent ();
+
+  /**
    * Returns a hash of a point location.
    */
   unsigned int point_key (const Point &p) const;
