@@ -302,6 +302,13 @@ public:
   virtual void delete_node (Node* n) = 0;
   
   /**
+   * Changes the id of node \p old_id, both by changing node(old_id)->id() and
+   * by moving node(old_id) in the mesh's internal container.  No element with
+   * the id \p new_id should already exist.
+   */
+  virtual void renumber_node (unsigned int old_id, unsigned int new_id) = 0;
+		      
+  /**
    * Add elem \p e to the end of the element array.
    * To add an element locally, set e->processor_id() before adding it.
    * To ensure a specific element id, call e->set_id() before adding it;
@@ -322,7 +329,14 @@ public:
    * in such a way that it does not invalidate element iterators.
    */
   virtual void delete_elem (Elem* e) = 0;
-		      
+
+  /**
+   * Changes the id of element \p old_id, both by changing elem(old_id)->id()
+   * and by moving elem(old_id) in the mesh's internal container.  No element
+   * with the id \p new_id should already exist.
+   */
+  virtual void renumber_elem (unsigned int old_id, unsigned int new_id) = 0;
+
   /**
    * Locate element face (edge in 2D) neighbors.  This is done with the help
    * of a \p std::map that functions like a hash table.  When this function is

@@ -190,12 +190,11 @@ Elem* ParallelMesh::add_elem (Elem *e)
 
   if (!e->valid_id())
     {
+      // Use the unpartitioned ids for unpartitioned elems
+      // and temporarily for ghost elems
       unsigned int *next_id = &_next_free_unpartitioned_elem_id;
-      if (elem_procid != DofObject::invalid_processor_id)
-        {
-          assert(e->processor_id() == libMesh::processor_id());
-          next_id = &_next_free_local_elem_id;
-        }
+      if (elem_procid == libMesh::processor_id())
+        next_id = &_next_free_local_elem_id;
       e->set_id (*next_id);
       *next_id += libMesh::n_processors() + 1;
     }
@@ -217,6 +216,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
   _max_elem_id = std::max(_max_elem_id, e->id()+1);
   
 // Unpartitioned elems should be added on every processor
+// And shouldn't be added in the same batch as ghost elems
 // But we might be just adding on processor 0 to
 // broadcast later
 #if 0
@@ -269,6 +269,20 @@ void ParallelMesh::delete_elem(Elem* e)
 
 
 
+void ParallelMesh::renumber_elem(const unsigned int old_id,
+                                 const unsigned int new_id)
+{
+  Elem *elem = _elements[old_id];
+  assert (elem);
+
+  elem->set_id(new_id);
+  assert (!_elements[new_id]);
+  _elements[new_id] = elem;
+  _elements.erase(old_id);
+}
+
+
+
 Node* ParallelMesh::add_point (const Point& p,
 			       const unsigned int id,
 			       const unsigned int proc_id)
@@ -290,12 +304,11 @@ Node* ParallelMesh::add_node (Node *n)
 
   if (!n->valid_id())
     {
+      // Use the unpartitioned ids for unpartitioned nodes
+      // and temporarily for ghost nodes
       unsigned int *next_id = &_next_free_unpartitioned_node_id;
-      if (node_procid != DofObject::invalid_processor_id)
-        {
-          assert(n->processor_id() == libMesh::processor_id());
-          next_id = &_next_free_local_node_id;
-        }
+      if (node_procid == libMesh::processor_id())
+        next_id = &_next_free_local_node_id;
       n->set_id (*next_id);
       *next_id += libMesh::n_processors() + 1;
     }
@@ -317,6 +330,7 @@ Node* ParallelMesh::add_node (Node *n)
   _max_node_id = std::max(_max_node_id, n->id()+1);
   
 // Unpartitioned nodes should be added on every processor
+// And shouldn't be added in the same batch as ghost nodes
 // But we might be just adding on processor 0 to
 // broadcast later
 #if 0
@@ -374,6 +388,20 @@ void ParallelMesh::delete_node(Node* n)
   
   // delete the node
   delete n;
+}
+
+
+
+void ParallelMesh::renumber_node(const unsigned int old_id,
+                                 const unsigned int new_id)
+{
+  Node *node = _nodes[old_id];
+  assert (node);
+
+  node->set_id(new_id);
+  assert (!_nodes[new_id]);
+  _nodes[new_id] = node;
+  _nodes.erase(old_id);
 }
 
 
