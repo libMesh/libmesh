@@ -439,6 +439,9 @@ void ParallelMesh::clear ()
     
     _nodes.clear();
   }
+
+  // We're no longer distributed if we were before
+  _is_serial = false;
 }
 
 
