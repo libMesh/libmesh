@@ -1501,9 +1501,12 @@ void MeshRefinement::make_nodes_parallel_consistent()
 
           Node *node = NULL;
           // FIXME - what tolerance should we use?
-          while (pos.first != pos.second)
+          for (; pos.first != pos.second; ++pos.first)
             if (p.absolute_fuzzy_equals(*(pos.first->second), TOLERANCE))
-              node = pos.first->second;
+              {
+                node = pos.first->second;
+                break;
+              }
 
           // We'd better have found every node we're asked for
           assert (node);
@@ -1600,9 +1603,12 @@ void MeshRefinement::make_nodes_parallel_consistent()
 
           Node *node = NULL;
           // FIXME - what tolerance should we use?
-          while (pos.first != pos.second)
+          for (; pos.first != pos.second; ++pos.first)
             if (p.absolute_fuzzy_equals(*(pos.first->second), TOLERANCE))
-              node = pos.first->second;
+              {
+                node = pos.first->second;
+                break;
+              }
 
           // We'd better have found every node we're asked for
           assert (node);
