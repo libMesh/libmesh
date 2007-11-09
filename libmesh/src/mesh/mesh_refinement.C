@@ -1535,7 +1535,8 @@ void MeshRefinement::make_nodes_parallel_consistent()
           assert (node->processor_id() == procup);
           if (procup == new_procid)
             {
-              node->set_id(filled_node_ids[i]);
+              _mesh.renumber_node(requested_nodes_id[procup][i],
+                                  filled_node_ids[i]);
             }
 
           // Rerequest ids of nodes where we should have asked another
@@ -1619,8 +1620,8 @@ void MeshRefinement::make_nodes_parallel_consistent()
       // Set the ghost node ids we've now been informed of
       for (unsigned int i=0; i != filled_node_ids.size(); ++i)
         {
-          Node *node = _mesh.node_ptr(rerequested_nodes_id[procup][i]);
-          node->set_id(filled_node_ids[i]);
+          _mesh.renumber_node(rerequested_nodes_id[procup][i],
+                              filled_node_ids[i]);
         }
     }
 }
@@ -1631,6 +1632,111 @@ void MeshRefinement::make_elems_parallel_consistent()
   // Newly added local elements have authoritative ids
   // and correct processor ids, ghost elements have correct
   // processor ids but need to have their ids corrected.
+
+  // Count the elements to ask each processor about
+  std::vector<unsigned int>
+    ghost_objects_from_proc(libMesh::n_processors(), 0);
+
+  const MeshBase::element_iterator end = _mesh.elements_end();
+
+  for (MeshBase::element_iterator it  = _mesh.elements_begin();
+       it != end; ++it)
+    {
+      Elem *elem = *it;
+      assert (elem);
+
+      // We only have to worry about new child elements
+      if (!elem->parent() || !elem->active())
+        continue;
+
+      unsigned int elem_procid = elem->processor_id();
+      assert (elem_procid != DofObject::invalid_processor_id);
+
+      ghost_objects_from_proc[elem_procid]++;
+    }
+
+  // Request sets to send to each processor on the first pass
+  std::vector<std::vector<unsigned int> >
+    requested_parent_ids(libMesh::n_processors()),
+    requested_child_nums(libMesh::n_processors());
+
+  // We know how many objects live on each processor, so reserve()
+  // space for each.
+  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+    if (p != libMesh::processor_id())
+      {
+        requested_parent_ids[p].reserve(ghost_objects_from_proc[p]);
+        requested_child_nums[p].reserve(ghost_objects_from_proc[p]);
+      }
+
+  for (MeshBase::element_iterator it  = _mesh.elements_begin();
+       it != end; ++it)
+    {
+      Elem *elem = *it;
+      unsigned int elem_procid = elem->processor_id();
+      const Elem *parent = elem->parent();
+
+      // We only have to worry about new child elements
+      if (!parent || !elem->active())
+        continue;
+
+      requested_parent_ids[elem_procid].push_back(parent->id());
+      requested_child_nums[elem_procid].push_back
+        (parent->which_child_am_i(elem));
+    }
+
+  // Trade requests with other processors
+  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+    {
+      // Trade my requests with processor procup and procdown
+      unsigned int procup = (libMesh::processor_id() + p) %
+                             libMesh::n_processors();
+      unsigned int procdown = (libMesh::n_processors() +
+                               libMesh::processor_id() - p) %
+                               libMesh::n_processors();
+      std::vector<unsigned int> request_to_fill_parent_ids,
+                                request_to_fill_child_nums;
+      Parallel::send_receive(procup, requested_parent_ids[procup],
+                             procdown, request_to_fill_parent_ids);
+      Parallel::send_receive(procup, requested_child_nums[procup],
+                             procdown, request_to_fill_child_nums);
+      assert (request_to_fill_parent_ids.size() ==
+              request_to_fill_child_nums.size());
+
+      // Find the id of each requested element
+      std::vector<unsigned int> elem_ids(request_to_fill_parent_ids.size());
+      for (unsigned int i=0; i != request_to_fill_parent_ids.size(); ++i)
+        {
+          Elem *parent = _mesh.elem(request_to_fill_parent_ids[i]);
+          assert (parent);
+          assert (parent->has_children());
+          Elem *child = parent->child(request_to_fill_child_nums[i]);
+          assert (child);
+          assert (child->active());
+
+          // Return the child element's correct id
+          elem_ids[i] = child->id();
+        }
+      
+      // Trade back the results
+      std::vector<unsigned int> filled_elem_ids;
+      Parallel::send_receive(procdown, elem_ids,
+                             procup, filled_elem_ids);
+      assert (requested_parent_ids[procup].size() == filled_elem_ids.size());
+
+      // Set those ghost element ids
+      for (unsigned int i=0; i != requested_parent_ids.size(); ++i)
+        {
+          Elem *parent = _mesh.elem(requested_parent_ids[procup][i]);
+          assert (parent);
+          assert (parent->has_children());
+          Elem *child = parent->child(requested_child_nums[procup][i]);
+          assert (child);
+          assert (child->active());
+          const unsigned int old_id = child->id();
+          _mesh.renumber_elem(old_id, filled_elem_ids[i]);
+        }
+    }
 }
 
 
