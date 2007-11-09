@@ -24,9 +24,10 @@
 #include <set>
 
 // Local includes
+#include "elem.h"
 #include "mesh_tools.h"
 #include "mesh_base.h"
-#include "elem.h"
+#include "parallel.h"
 #include "sphere.h"
 
 
