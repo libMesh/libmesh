@@ -749,7 +749,7 @@ bool MeshRefinement::make_flags_parallel_consistent()
                                  pflags(request_to_fill.size());
       for (unsigned int i=0; i != request_to_fill.size(); ++i)
         {
-          Elem *elem = _mesh.elem(i);
+          Elem *elem = _mesh.elem(request_to_fill[i]);
           rflags[i] = elem->refinement_flag();
           pflags[i] = elem->p_refinement_flag();
         }
@@ -766,7 +766,7 @@ bool MeshRefinement::make_flags_parallel_consistent()
       // And see if we need to change any flags
       for (unsigned int i=0; i != requested_ids[procup].size(); ++i)
         {
-          Elem *elem = _mesh.elem(i);
+          Elem *elem = _mesh.elem(requested_ids[procup][i]);
           unsigned char old_r_flag = elem->refinement_flag();
           unsigned char old_p_flag = elem->p_refinement_flag();
           if (old_r_flag != ghost_rflags[i])
