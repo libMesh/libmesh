@@ -1381,7 +1381,10 @@ bool MeshRefinement::_refine_elements ()
     }
 
   if (!_mesh.is_serial())
-    this->make_nodes_parallel_consistent();
+    {
+      this->make_nodes_parallel_consistent();
+      this->make_elems_parallel_consistent();
+    }
   
   // Clear the _new_nodes_map and _unused_elements data structures.
   this->clear();
@@ -1405,6 +1408,229 @@ void MeshRefinement::make_nodes_parallel_consistent()
   // right processor when correcting ids later
 
   // Count the nodes to ask each processor about
+  std::vector<unsigned int>
+    ghost_objects_from_proc(libMesh::n_processors(), 0);
+
+  const MeshBase::node_iterator end = _mesh.nodes_end();
+
+  for (MeshBase::node_iterator it  = _mesh.nodes_begin();
+       it != end; ++it)
+    {
+      Node *node = *it;
+      assert (node);
+      unsigned int node_procid = node->processor_id();
+      assert (node_procid != DofObject::invalid_processor_id);
+
+      ghost_objects_from_proc[node_procid]++;
+    }
+
+  // Request sets to send to each processor on the first pass
+  std::vector<std::vector<Real> >
+    requested_nodes_x(libMesh::n_processors()),
+    requested_nodes_y(libMesh::n_processors()),
+    requested_nodes_z(libMesh::n_processors());
+  // Corresponding temporary ids to keep track of
+  std::vector<std::vector<unsigned int> >
+    requested_nodes_id(libMesh::n_processors());
+  // And (hopefully much smaller) sets for the second pass
+  std::vector<std::vector<Real> >
+    rerequested_nodes_x(libMesh::n_processors()),
+    rerequested_nodes_y(libMesh::n_processors()),
+    rerequested_nodes_z(libMesh::n_processors());
+  std::vector<std::vector<unsigned int> >
+    rerequested_nodes_id(libMesh::n_processors());
+
+  // We know how many objects live on each processor, so reserve()
+  // space for each.
+  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+    if (p != libMesh::processor_id())
+      {
+        requested_nodes_x[p].reserve(ghost_objects_from_proc[p]);
+        requested_nodes_y[p].reserve(ghost_objects_from_proc[p]);
+        requested_nodes_z[p].reserve(ghost_objects_from_proc[p]);
+        requested_nodes_id[p].reserve(ghost_objects_from_proc[p]);
+      }
+
+  for (MeshBase::node_iterator it  = _mesh.nodes_begin();
+       it != end; ++it)
+    {
+      Node *node = *it;
+      unsigned int node_procid = node->processor_id();
+
+      requested_nodes_x[node_procid].push_back((*node)(0));
+      requested_nodes_y[node_procid].push_back((*node)(1));
+      requested_nodes_z[node_procid].push_back((*node)(2));
+      requested_nodes_id[node_procid].push_back(node->id());
+    }
+
+  // Trade requests with other processors
+  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+    {
+      // Trade my requests with processor procup and procdown
+      unsigned int procup = (libMesh::processor_id() + p) %
+                             libMesh::n_processors();
+      unsigned int procdown = (libMesh::n_processors() +
+                               libMesh::processor_id() - p) %
+                               libMesh::n_processors();
+      std::vector<Real> request_to_fill_x,
+                        request_to_fill_y,
+                        request_to_fill_z;
+      Parallel::send_receive(procup, requested_nodes_x[procup],
+                             procdown, request_to_fill_x);
+      Parallel::send_receive(procup, requested_nodes_x[procup],
+                             procdown, request_to_fill_y);
+      Parallel::send_receive(procup, requested_nodes_x[procup],
+                             procdown, request_to_fill_z);
+      assert (request_to_fill_x.size() == request_to_fill_y.size());
+      assert (request_to_fill_x.size() == request_to_fill_z.size());
+
+      // Find the processor id (and if it's local, the id)
+      // of each requested node
+      std::vector<unsigned int> node_proc_ids(request_to_fill_x.size()),
+                                node_ids(request_to_fill_x.size());
+      for (unsigned int i=0; i != request_to_fill_x.size(); ++i)
+        {
+          Point p(request_to_fill_x[i],
+                  request_to_fill_y[i],
+                  request_to_fill_z[i]);
+          unsigned int key = this->point_key(p);
+
+          // Look for this point in the multimap
+          std::pair<map_type::iterator, map_type::iterator>
+            pos = _new_nodes_map.equal_range(key);
+
+          Node *node = NULL;
+          // FIXME - what tolerance should we use?
+          while (pos.first != pos.second)
+            if (p.absolute_fuzzy_equals(*(pos.first->second), TOLERANCE))
+              node = pos.first->second;
+
+          // We'd better have found every node we're asked for
+          assert (node);
+
+          // Return the node's correct processor id,
+          // and our (correct if it's local) id for it.
+          node_proc_ids[i] = node->processor_id();
+          node_ids[i] = node->id();
+        }
+      
+      // Trade back the results
+      std::vector<unsigned int> filled_node_proc_ids, filled_node_ids;
+      Parallel::send_receive(procdown, node_proc_ids,
+                             procup, filled_node_proc_ids);
+      Parallel::send_receive(procdown, node_ids,
+                             procup, filled_node_ids);
+      assert (requested_nodes_x[procup].size() == filled_node_proc_ids.size());
+      assert (requested_nodes_x[procup].size() == filled_node_ids.size());
+
+      // Set the ghost node processor ids and ids we've now been
+      // informed of, and build request sets for ids we need to
+      // request from a different processor
+      for (unsigned int i=0; i != filled_node_ids.size(); ++i)
+        {
+          Node *node = _mesh.node_ptr(requested_nodes_id[procup][i]);
+          const unsigned int new_procid = filled_node_proc_ids[i];
+
+          // Set ids of and move nodes where we asked their local processor
+          assert (node->processor_id() == procup);
+          if (procup == new_procid)
+            {
+              node->set_id(filled_node_ids[i]);
+            }
+
+          // Rerequest ids of nodes where we should have asked another
+          // processor
+          else
+            {
+              node->processor_id() = new_procid;
+              // We need to rerequest this node's id, from the
+              // correct processor this time.
+
+              // There's no obvious way to reserve() this vector,
+              // so let's hope our STL amortizes resize() properly.
+              // O(N) overhead on small vectors shouldn't be bad.
+              rerequested_nodes_x[new_procid].push_back((*node)(0));
+              rerequested_nodes_y[new_procid].push_back((*node)(1));
+              rerequested_nodes_z[new_procid].push_back((*node)(2));
+              rerequested_nodes_id[new_procid].push_back(node->id());
+            }
+        }
+    }
+
+  // We're done with the first set of requests
+  requested_nodes_x.clear();
+  requested_nodes_y.clear();
+  requested_nodes_z.clear();
+  requested_nodes_id.clear();
+
+  // Trade rerequests with other processors
+  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+    {
+      // Trade my rerequests with processor procup and procdown
+      unsigned int procup = (libMesh::processor_id() + p) %
+                             libMesh::n_processors();
+      unsigned int procdown = (libMesh::n_processors() +
+                               libMesh::processor_id() - p) %
+                               libMesh::n_processors();
+      std::vector<Real> rerequest_to_fill_x,
+                        rerequest_to_fill_y,
+                        rerequest_to_fill_z;
+      Parallel::send_receive(procup, rerequested_nodes_x[procup],
+                             procdown, rerequest_to_fill_x);
+      Parallel::send_receive(procup, rerequested_nodes_x[procup],
+                             procdown, rerequest_to_fill_y);
+      Parallel::send_receive(procup, rerequested_nodes_x[procup],
+                             procdown, rerequest_to_fill_z);
+      assert (rerequest_to_fill_x.size() == rerequest_to_fill_y.size());
+      assert (rerequest_to_fill_x.size() == rerequest_to_fill_z.size());
+
+      // Find the id of each rerequested node
+      std::vector<unsigned int> node_ids(rerequest_to_fill_x.size());
+      for (unsigned int i=0; i != rerequest_to_fill_x.size(); ++i)
+        {
+          Point p(rerequest_to_fill_x[i],
+                  rerequest_to_fill_y[i],
+                  rerequest_to_fill_z[i]);
+          unsigned int key = this->point_key(p);
+
+          // Look for this point in the multimap
+          std::pair<map_type::iterator, map_type::iterator>
+            pos = _new_nodes_map.equal_range(key);
+
+          Node *node = NULL;
+          // FIXME - what tolerance should we use?
+          while (pos.first != pos.second)
+            if (p.absolute_fuzzy_equals(*(pos.first->second), TOLERANCE))
+              node = pos.first->second;
+
+          // We'd better have found every node we're asked for
+          assert (node);
+
+          // Return the node's correct id
+          node_ids[i] = node->id();
+        }
+      
+      // Trade back the results
+      std::vector<unsigned int> filled_node_ids;
+      Parallel::send_receive(procdown, node_ids,
+                             procup, filled_node_ids);
+      assert (rerequested_nodes_x[procup].size() == filled_node_ids.size());
+
+      // Set the ghost node ids we've now been informed of
+      for (unsigned int i=0; i != filled_node_ids.size(); ++i)
+        {
+          Node *node = _mesh.node_ptr(rerequested_nodes_id[procup][i]);
+          node->set_id(filled_node_ids[i]);
+        }
+    }
+}
+
+
+void MeshRefinement::make_elems_parallel_consistent()
+{
+  // Newly added local elements have authoritative ids
+  // and correct processor ids, ghost elements have correct
+  // processor ids but need to have their ids corrected.
 }
 
 
