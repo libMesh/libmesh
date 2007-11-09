@@ -1755,7 +1755,7 @@ void MeshRefinement::make_elems_parallel_consistent()
       assert (requested_parent_ids[procup].size() == filled_elem_ids.size());
 
       // Set those ghost element ids
-      for (unsigned int i=0; i != requested_parent_ids.size(); ++i)
+      for (unsigned int i=0; i != filled_elem_ids.size(); ++i)
         {
           Elem *parent = _mesh.elem(requested_parent_ids[procup][i]);
           assert (parent);
