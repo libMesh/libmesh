@@ -215,6 +215,21 @@ void SerialMesh::delete_elem(Elem* e)
 
 
 
+void SerialMesh::renumber_elem(const unsigned int old_id,
+                               const unsigned int new_id)
+{
+  // This doesn't get used in serial yet
+  Elem *elem = _elements[old_id];
+  assert (elem);
+
+  elem->set_id(new_id);
+  assert (!_elements[new_id]);
+  _elements[new_id] = elem;
+  _elements[old_id] = NULL;
+}
+
+
+
 Node* SerialMesh::add_point (const Point& p,
 			     const unsigned int id,
 			     const unsigned int proc_id)
@@ -280,6 +295,21 @@ void SerialMesh::delete_node(Node* n)
   
   // explicitly NULL the pointer
   *pos = NULL;
+}
+
+
+
+void SerialMesh::renumber_node(const unsigned int old_id,
+                               const unsigned int new_id)
+{
+  // This doesn't get used in serial yet
+  Node *node = _nodes[old_id];
+  assert (node);
+
+  node->set_id(new_id);
+  assert (!_nodes[new_id]);
+  _nodes[new_id] = node;
+  _nodes[old_id] = NULL;
 }
 
 

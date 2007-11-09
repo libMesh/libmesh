@@ -101,9 +101,11 @@ class SerialMesh : public UnstructuredMesh
 			     DofObject::invalid_processor_id);
   virtual Node* add_node (Node* n) ;
   virtual void delete_node (Node* n) ;
+  virtual void renumber_node (unsigned int old_id, unsigned int new_id);
   virtual Elem* add_elem (Elem* e) ;
   virtual Elem* insert_elem (Elem* e) ;
   virtual void delete_elem (Elem* e) ;
+  virtual void renumber_elem (unsigned int old_id, unsigned int new_id);
 
 public:
   /**
