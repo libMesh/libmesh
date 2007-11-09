@@ -20,6 +20,7 @@
 
 
 // C++ includes
+#include <limits>
 #include <set>
 
 // Local includes
@@ -157,19 +158,29 @@ MeshTools::processor_bounding_box (const MeshBase& mesh,
 {
   assert (mesh.n_nodes() != 0);
 
-  Point min(1.e30,   1.e30,  1.e30);
-  Point max(-1.e30, -1.e30, -1.e30);
+  std::vector<Real> vmin(3, std::numeric_limits<Real>::max());
+  std::vector<Real> vmax(3, -std::numeric_limits<Real>::max());
 
   // By default no processor is specified and we compute
   // the bounding box for the whole domain.
   if (pid == libMesh::invalid_uint)
     {
-      for (unsigned int n=0; n<mesh.n_nodes(); n++)
-	for (unsigned int i=0; i<mesh.spatial_dimension(); i++)
-	  {
-	    min(i) = std::min(min(i), mesh.point(n)(i));
-	    max(i) = std::max(max(i), mesh.point(n)(i));
-	  }      
+      MeshBase::const_node_iterator       it  = mesh.local_nodes_begin();
+      const MeshBase::const_node_iterator end = mesh.local_nodes_end();
+
+      for (; it != end; ++it)
+        {
+          Node *node = *it;
+	  for (unsigned int i=0; i<mesh.spatial_dimension(); i++)
+	    {
+	      vmin[i] = std::min(vmin[i], (*node)(i));
+	      vmax[i] = std::max(vmax[i], (*node)(i));
+	    }      
+        }
+
+      // Compare the bounding boxes across processors
+      Parallel::min(vmin);
+      Parallel::max(vmax);
     }
   // if a specific processor id is specified then we need
   // to only consider those elements living on that processor
@@ -182,12 +193,15 @@ MeshTools::processor_bounding_box (const MeshBase& mesh,
 	for (unsigned int n=0; n<(*el)->n_nodes(); n++)
 	  for (unsigned int i=0; i<mesh.spatial_dimension(); i++)
 	    {
-	      min(i) = std::min(min(i), mesh.point((*el)->node(n))(i));
-	      max(i) = std::max(max(i), mesh.point((*el)->node(n))(i));
+	      vmin[i] = std::min(vmin[i], mesh.point((*el)->node(n))(i));
+	      vmax[i] = std::max(vmax[i], mesh.point((*el)->node(n))(i));
 	    }      
     }
 
-  const BoundingBox ret_val(min, max);
+  Point pmin(vmin[0], vmin[1], vmin[2]);
+  Point pmax(vmax[0], vmax[2], vmax[2]);
+
+  const BoundingBox ret_val(pmin, pmax);
 
   return ret_val;  
 }
