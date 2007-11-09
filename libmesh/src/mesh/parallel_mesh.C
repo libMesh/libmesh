@@ -717,6 +717,8 @@ void ParallelMesh::delete_remote_elements()
 
 void ParallelMesh::allgather()
 {
+  if (_is_serial)
+    return;
   _is_serial = true;
   MeshCommunication().allgather(*this);
 }
