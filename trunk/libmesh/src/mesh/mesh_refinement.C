@@ -1477,9 +1477,9 @@ void MeshRefinement::make_nodes_parallel_consistent()
                         request_to_fill_z;
       Parallel::send_receive(procup, requested_nodes_x[procup],
                              procdown, request_to_fill_x);
-      Parallel::send_receive(procup, requested_nodes_x[procup],
+      Parallel::send_receive(procup, requested_nodes_y[procup],
                              procdown, request_to_fill_y);
-      Parallel::send_receive(procup, requested_nodes_x[procup],
+      Parallel::send_receive(procup, requested_nodes_z[procup],
                              procdown, request_to_fill_z);
       assert (request_to_fill_x.size() == request_to_fill_y.size());
       assert (request_to_fill_x.size() == request_to_fill_z.size());
@@ -1581,9 +1581,9 @@ void MeshRefinement::make_nodes_parallel_consistent()
                         rerequest_to_fill_z;
       Parallel::send_receive(procup, rerequested_nodes_x[procup],
                              procdown, rerequest_to_fill_x);
-      Parallel::send_receive(procup, rerequested_nodes_x[procup],
+      Parallel::send_receive(procup, rerequested_nodes_y[procup],
                              procdown, rerequest_to_fill_y);
-      Parallel::send_receive(procup, rerequested_nodes_x[procup],
+      Parallel::send_receive(procup, rerequested_nodes_z[procup],
                              procdown, rerequest_to_fill_z);
       assert (rerequest_to_fill_x.size() == rerequest_to_fill_y.size());
       assert (rerequest_to_fill_x.size() == rerequest_to_fill_z.size());
