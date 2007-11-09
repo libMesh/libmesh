@@ -1555,8 +1555,10 @@ void MeshRefinement::make_nodes_parallel_consistent()
           assert (node->processor_id() == procup);
           if (procup == new_procid)
             {
-              _mesh.renumber_node(requested_nodes_id[procup][i],
-                                  filled_node_ids[i]);
+              const unsigned int old_id = requested_nodes_id[procup][i],
+                                 new_id = filled_node_ids[i];
+              if (old_id != new_id)
+                _mesh.renumber_node(old_id, new_id);
             }
 
           // Rerequest ids of nodes where we should have asked another
@@ -1646,8 +1648,10 @@ void MeshRefinement::make_nodes_parallel_consistent()
       // Set the ghost node ids we've now been informed of
       for (unsigned int i=0; i != filled_node_ids.size(); ++i)
         {
-          _mesh.renumber_node(rerequested_nodes_id[procup][i],
-                              filled_node_ids[i]);
+          const unsigned int old_id = rerequested_nodes_id[procup][i],
+                             new_id = filled_node_ids[i];
+          if (old_id != new_id)
+            _mesh.renumber_node(old_id, new_id);
         }
     }
 }
@@ -1759,8 +1763,10 @@ void MeshRefinement::make_elems_parallel_consistent()
           Elem *child = parent->child(requested_child_nums[procup][i]);
           assert (child);
           assert (child->active());
-          const unsigned int old_id = child->id();
-          _mesh.renumber_elem(old_id, filled_elem_ids[i]);
+          const unsigned int old_id = child->id(),
+                             new_id = filled_elem_ids[i];
+          if (old_id != new_id)
+            _mesh.renumber_elem(old_id, new_id);
         }
     }
 }
