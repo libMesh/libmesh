@@ -22,6 +22,7 @@
 #define __parallel_h__
 
 // System includes
+#include <string>
 #include <vector>
 
 // Local includes
@@ -29,6 +30,15 @@
 #include "libmesh_logging.h"
 
 
+// Macro to identify and debug functions which should only be called in
+// parallel on every processor at once
+
+#undef parallel_only
+#ifdef DEBUG
+  #define parallel_only() { assert(Parallel::verify(std::string(__FILE__))); assert(Parallel::verify(__LINE__)); }
+#else
+  #define parallel_only() { }
+#endif
 
 // ------------------------------------------------------------
 // The Parallel namespace is for wrapper functions
@@ -48,6 +58,13 @@ namespace Parallel
   template <typename T>
   inline MPI_Datatype datatype();
 #endif // HAVE_MPI
+
+  //-------------------------------------------------------------------
+  /**
+   * Verify that a local variable has the same value on all processors
+   */
+  template <typename T>
+  inline bool verify(const T &r);
 
   //-------------------------------------------------------------------
   /**
@@ -206,6 +223,36 @@ namespace Parallel
 
   template<>
   inline MPI_Datatype datatype<long double>() { return MPI_LONG_DOUBLE; }
+
+
+  template <typename T>
+  inline bool verify(const T &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+	T tempmin = r, tempmax = r;
+	Parallel::min(tempmin);
+	Parallel::max(tempmax);
+	bool verified = (r == tempmin) &&
+	                (r == tempmax);
+	Parallel::min(verified);
+      }
+    return true;
+  }
+
+
+  template <>
+  inline bool verify(const std::string & r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+	std::vector<char> temp(r.size());
+	for (unsigned int i=0; i != r.size(); ++i)
+	  temp.push_back(r[i]);
+	return Parallel::verify(temp);
+      }
+    return true;
+  }
 
 
   template <typename T>
