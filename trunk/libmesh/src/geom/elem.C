@@ -416,36 +416,38 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
           const Elem* elem = *it;
 
           for (unsigned int s=0; s<elem->n_sides(); s++)
-            if (elem->neighbor(s) != NULL)           // we have a neighbor on this side
-              {
-                const Elem* neighbor = elem->neighbor(s);
-
-                if (neighbor->active())                // ... if it is active
-                  {
-                    if (this->contains_vertex_of(neighbor) // ... and touches us
-                        || neighbor->contains_vertex_of(this))  
-                      neighbor_set.insert (neighbor);  // ... then add it
-                  }
+            {
+              const Elem* neighbor = elem->neighbor(s);
+              if (neighbor &&
+                  neighbor != remote_elem)    // we have a real neighbor on this side
+                {
+                  if (neighbor->active())                // ... if it is active
+                    {
+                      if (this->contains_vertex_of(neighbor) // ... and touches us
+                          || neighbor->contains_vertex_of(this))  
+                        neighbor_set.insert (neighbor);  // ... then add it
+                    }
 #ifdef ENABLE_AMR
-                else                                 // ... the neighbor is *not* active,
-                  {                                  // ... so add *all* neighboring
-                                                     // active children
-                    std::vector<const Elem*> active_neighbor_children;
+                  else                                 // ... the neighbor is *not* active,
+                    {                                  // ... so add *all* neighboring
+                                                       // active children
+                      std::vector<const Elem*> active_neighbor_children;
   
-                    neighbor->active_family_tree_by_neighbor
-                      (active_neighbor_children, elem);
+                      neighbor->active_family_tree_by_neighbor
+                        (active_neighbor_children, elem);
 
-                    std::vector<const Elem*>::const_iterator
-                      child_it = active_neighbor_children.begin();
-                    const std::vector<const Elem*>::const_iterator
-                      child_end = active_neighbor_children.end();
-                    for (; child_it != child_end; ++child_it)
-                      if (this->contains_vertex_of(*child_it) ||
-                          (*child_it)->contains_vertex_of(this))
-                        neighbor_set.insert (*child_it);
-                  }
+                      std::vector<const Elem*>::const_iterator
+                        child_it = active_neighbor_children.begin();
+                      const std::vector<const Elem*>::const_iterator
+                        child_end = active_neighbor_children.end();
+                      for (; child_it != child_end; ++child_it)
+                        if (this->contains_vertex_of(*child_it) ||
+                            (*child_it)->contains_vertex_of(this))
+                          neighbor_set.insert (*child_it);
+                    }
 #endif // #ifdef ENABLE_AMR
-              }
+                }
+            }
         }
     }
   while (old_size != neighbor_set.size());
@@ -760,8 +762,11 @@ void Elem::family_tree_by_neighbor (std::vector<const Elem*>& family,
   // Do not clear the vector any more.
   if (!this->active())
     for (unsigned int c=0; c<this->n_children(); c++)
-      if (this->child(c)->is_neighbor(neighbor))
-        this->child(c)->family_tree_by_neighbor (family, neighbor, false);
+      {
+        Elem *child = this->child(c);
+        if (child != remote_elem && child->is_neighbor(neighbor))
+          child->family_tree_by_neighbor (family, neighbor, false);
+      }
 }
 
 
@@ -785,8 +790,11 @@ void Elem::active_family_tree_by_neighbor (std::vector<const Elem*>& family,
   // Do not clear the vector any more.
   else
     for (unsigned int c=0; c<this->n_children(); c++)
-      if (this->child(c)->is_neighbor(neighbor))
-        this->child(c)->active_family_tree_by_neighbor (family, neighbor, false);
+      {
+        Elem *child = this->child(c);
+        if (child != remote_elem && child->is_neighbor(neighbor))
+          child->active_family_tree_by_neighbor (family, neighbor, false);
+      }
 }
 
 
@@ -814,7 +822,7 @@ unsigned int Elem::min_p_level_by_neighbor(const Elem* neighbor,
   for (unsigned int c=0; c<this->n_children(); c++)
     {
       const Elem* const child = this->child(c);
-      if (child->is_neighbor(neighbor))
+      if (child != remote_elem && child->is_neighbor(neighbor))
         min_p_level =
 	  child->min_p_level_by_neighbor(neighbor,
                                          min_p_level);
