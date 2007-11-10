@@ -77,6 +77,9 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
 // we may want to verify our cache in debug mode
 unsigned int ParallelMesh::parallel_n_elem() const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   unsigned int n_local = this->n_local_elem();
   Parallel::sum(n_local);
   n_local += this->n_unpartitioned_elem();
@@ -87,6 +90,9 @@ unsigned int ParallelMesh::parallel_n_elem() const
 
 unsigned int ParallelMesh::parallel_max_elem_id() const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   unsigned int max_local = _elements.empty() ?
     0 : _elements.rbegin()->first + 1;
   Parallel::max(max_local);
@@ -97,6 +103,9 @@ unsigned int ParallelMesh::parallel_max_elem_id() const
 
 unsigned int ParallelMesh::parallel_n_nodes() const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   unsigned int n_local = this->n_local_nodes();
   Parallel::sum(n_local);
   n_local += this->n_unpartitioned_nodes();
@@ -107,6 +116,9 @@ unsigned int ParallelMesh::parallel_n_nodes() const
 
 unsigned int ParallelMesh::parallel_max_node_id() const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   unsigned int max_local = _nodes.empty() ?
     0 : _nodes.rbegin()->first + 1;
   Parallel::max(max_local);
@@ -462,6 +474,9 @@ void ParallelMesh::clear ()
 template <typename T>
 unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   typedef typename mapvector<T*>::veclike_iterator object_iterator;
 
   // In parallel we may not know what objects other processors have.

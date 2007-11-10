@@ -636,6 +636,9 @@ Real System::calculate_norm(NumericVector<Number>& v,
                             std::vector<unsigned char> &component_norm,
                             std::vector<float> &component_scale) const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   START_LOG ("calculate_norm()", "System");
 
   if (component_norm.empty())

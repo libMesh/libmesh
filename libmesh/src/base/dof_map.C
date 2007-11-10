@@ -97,6 +97,9 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
                                       MeshBase &mesh,
                                       dofobject_accessor objects)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   // First, iterate over local objects to find out how many
   // are on each processor
   std::vector<unsigned int>
@@ -596,6 +599,9 @@ void DofMap::clear()
 
 void DofMap::distribute_dofs (MeshBase& mesh)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   // Log how long it takes to distribute the degrees of freedom
   START_LOG("distribute_dofs()", "DofMap");
 

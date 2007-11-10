@@ -273,6 +273,9 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 				   const std::string& unknown_name,
 				   std::vector<Number>& error_vals)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   // Make sure we aren't "overconfigured"
   assert (!(_exact_value && _equation_systems_fine));
 

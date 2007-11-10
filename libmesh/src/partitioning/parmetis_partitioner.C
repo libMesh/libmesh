@@ -63,6 +63,9 @@ void ParmetisPartitioner::_do_partition (MeshBase& mesh,
       return;
     }
 
+  // This function must be run on all processors at once
+  parallel_only();
+
 // What to do if the Parmetis library IS NOT present
 #ifndef HAVE_PARMETIS
 
@@ -128,6 +131,9 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
       
       return;
     }
+
+  // This function must be run on all processors at once
+  parallel_only();
 
 // What to do if the Parmetis library IS NOT present
 #ifndef HAVE_PARMETIS

@@ -736,6 +736,9 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 
 void DofMap::allgather_recursive_constraints()
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   // Return immediately if there's nothing to gather
   if (libMesh::n_processors() == 1)
     return;

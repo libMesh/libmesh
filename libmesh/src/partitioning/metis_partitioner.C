@@ -50,6 +50,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 				      const unsigned int n_pieces)
 {
   assert (n_pieces > 0);
+  assert (mesh.is_serial());
 
   // Check for an easy return
   if (n_pieces == 1)

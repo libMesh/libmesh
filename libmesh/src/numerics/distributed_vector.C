@@ -36,6 +36,9 @@
 template <typename T>
 T DistributedVector<T>::sum () const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
@@ -55,6 +58,9 @@ T DistributedVector<T>::sum () const
 template <typename T>
 Real DistributedVector<T>::l1_norm () const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
@@ -74,6 +80,9 @@ Real DistributedVector<T>::l1_norm () const
 template <typename T>
 Real DistributedVector<T>::l2_norm () const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
@@ -93,6 +102,9 @@ Real DistributedVector<T>::l2_norm () const
 template <typename T>
 Real DistributedVector<T>::linfty_norm () const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
@@ -288,6 +300,9 @@ void DistributedVector<T>::scale (const T factor)
 template <typename T>
 Number DistributedVector<T>::dot (const NumericVector<T>& V) const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   // Make sure the NumericVector passed in is really a DistributedVector
   const DistributedVector<T>* v = dynamic_cast<const DistributedVector<T>*>(&V);
   assert (v != NULL);
@@ -480,6 +495,9 @@ void DistributedVector<T>::localize (const unsigned int first_local_idx,
 template <typename T>
 void DistributedVector<T>::localize (std::vector<T>& v_local) const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
@@ -499,6 +517,9 @@ template <typename T>
 void DistributedVector<T>::localize_to_one (std::vector<T>& v_local,
 					    const unsigned int pid) const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
