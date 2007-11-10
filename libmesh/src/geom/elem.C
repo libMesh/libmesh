@@ -851,10 +851,11 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
   for (unsigned int c=0; c<this->n_children(); c++)
     {
       const Elem* const child = this->child(c);
-      if (child->is_neighbor(neighbor))
-        min_p_level =
-	  child->min_new_p_level_by_neighbor(neighbor,
-                                             min_p_level);
+      if (child && child != remote_elem)
+        if (child->is_neighbor(neighbor))
+          min_p_level =
+	    child->min_new_p_level_by_neighbor(neighbor,
+                                               min_p_level);
     }
 
   return min_p_level;
@@ -887,20 +888,21 @@ void Elem::nullify_neighbors ()
   // Tell any of my neighbors about my death...
   // Looks strange, huh?
   for (unsigned int n=0; n<this->n_neighbors(); n++)
-    if (this->neighbor(n) != NULL)
-      {
-	Elem* neighbor = this->neighbor(n);
-
-	// Note:  it is possible that I see the neighbor
-	// (which is coarser than me)
-	// but they don't see me, so avoid that case.
-	if (neighbor->level() == this->level())
-	  {	
-	    const unsigned int w_n_a_i = neighbor->which_neighbor_am_i(this);
-	    neighbor->set_neighbor(w_n_a_i, NULL);
-	    this->set_neighbor(n, NULL);
-	  }
-      }
+    {
+      Elem* neighbor = this->neighbor(n);
+      if (neighbor && neighbor != remote_elem)
+        {
+	  // Note:  it is possible that I see the neighbor
+	  // (which is coarser than me)
+	  // but they don't see me, so avoid that case.
+	  if (neighbor->level() == this->level())
+	    {	
+	      const unsigned int w_n_a_i = neighbor->which_neighbor_am_i(this);
+	      neighbor->set_neighbor(w_n_a_i, NULL);
+	      this->set_neighbor(n, NULL);
+	    }
+        }
+    }
 }
 
 
