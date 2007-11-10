@@ -73,9 +73,9 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
 
 
 // We use cached values for these so they can be called
-// from one processor without bothering the rest.
-/*
-unsigned int ParallelMesh::n_elem() const
+// from one processor without bothering the rest, but
+// we may want to verify our cache in debug mode
+unsigned int ParallelMesh::parallel_n_elem() const
 {
   unsigned int n_local = this->n_local_elem();
   Parallel::sum(n_local);
@@ -85,7 +85,7 @@ unsigned int ParallelMesh::n_elem() const
 
 
 
-unsigned int ParallelMesh::max_elem_id() const
+unsigned int ParallelMesh::parallel_max_elem_id() const
 {
   unsigned int max_local = _elements.empty() ?
     0 : _elements.rbegin()->first + 1;
@@ -95,7 +95,7 @@ unsigned int ParallelMesh::max_elem_id() const
 
 
 
-unsigned int ParallelMesh::n_nodes() const
+unsigned int ParallelMesh::parallel_n_nodes() const
 {
   unsigned int n_local = this->n_local_nodes();
   Parallel::sum(n_local);
@@ -105,14 +105,13 @@ unsigned int ParallelMesh::n_nodes() const
 
 
 
-unsigned int ParallelMesh::max_node_id() const
+unsigned int ParallelMesh::parallel_max_node_id() const
 {
   unsigned int max_local = _nodes.empty() ?
     0 : _nodes.rbegin()->first + 1;
   Parallel::max(max_local);
   return max_local;
 }
-*/
 
 
 
@@ -446,6 +445,16 @@ void ParallelMesh::clear ()
 
   // We're no longer distributed if we were before
   _is_serial = true;
+
+  // Correct our caches
+  _n_nodes = 0;
+  _n_elem = 0;
+  _max_node_id = 0;
+  _max_elem_id = 0;
+  _next_free_local_node_id = libMesh::processor_id();
+  _next_free_local_elem_id = libMesh::processor_id();
+  _next_free_unpartitioned_node_id = libMesh::n_processors();
+  _next_free_unpartitioned_elem_id = libMesh::n_processors();
 }
 
 
@@ -505,7 +514,7 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
   unsigned int first_free_id =
     first_object_on_proc[libMesh::n_processors()-1] +
     objects_on_proc[libMesh::n_processors()-1] + 
-    unpartitioned_objects + 1;
+    unpartitioned_objects;
 
   // First set new local object ids and build request sets 
   // for non-local object ids
@@ -678,10 +687,14 @@ void ParallelMesh::renumber_nodes_and_elements ()
   }
 
   // Finally renumber all the elements
-  _next_free_local_elem_id = this->renumber_dof_objects (_elements);
+  _n_elem = this->renumber_dof_objects (_elements);
+  _max_elem_id = _n_elem;
+  _next_free_local_elem_id = _n_elem;
 
   // and all the remaining nodes
-  _next_free_local_node_id = this->renumber_dof_objects (_nodes);
+  _n_nodes = this->renumber_dof_objects (_nodes);
+  _max_node_id = _n_nodes;
+  _next_free_local_node_id = _n_nodes;
 
   // And figure out what IDs we should use when adding new nodes and
   // new elements
@@ -700,7 +713,16 @@ void ParallelMesh::renumber_nodes_and_elements ()
                                      libMesh::n_processors();
   _next_free_local_node_id += libMesh::processor_id();
 
-
+// Make sure our caches are up to date and our
+// DofObjects are well packed
+#ifdef DEBUG
+  assert(this->n_nodes() == this->parallel_n_nodes());
+  assert(this->n_elem() == this->parallel_n_elem());
+  assert(this->max_node_id() == this->parallel_max_node_id());
+  assert(this->max_elem_id() == this->parallel_max_elem_id());
+  assert(this->n_nodes() == this->max_node_id());
+  assert(this->n_elem() == this->max_elem_id());
+#endif
 
   STOP_LOG("renumber_nodes_and_elements()", "ParallelMesh");
 }
@@ -711,6 +733,17 @@ void ParallelMesh::delete_remote_elements()
 {
   _is_serial = false;
   MeshCommunication().delete_remote_elements(*this);
+
+// Make sure our caches are up to date and our
+// DofObjects are well packed
+#ifdef DEBUG
+  assert(this->n_nodes() == this->parallel_n_nodes());
+  assert(this->n_elem() == this->parallel_n_elem());
+  assert(this->max_node_id() == this->parallel_max_node_id());
+  assert(this->max_elem_id() == this->parallel_max_elem_id());
+  assert(this->n_nodes() == this->max_node_id());
+  assert(this->n_elem() == this->max_elem_id());
+#endif
 }
 
 
@@ -721,4 +754,15 @@ void ParallelMesh::allgather()
     return;
   _is_serial = true;
   MeshCommunication().allgather(*this);
+
+// Make sure our caches are up to date and our
+// DofObjects are well packed
+#ifdef DEBUG
+  assert(this->n_nodes() == this->parallel_n_nodes());
+  assert(this->n_elem() == this->parallel_n_elem());
+  assert(this->max_node_id() == this->parallel_max_node_id());
+  assert(this->max_elem_id() == this->parallel_max_elem_id());
+  assert(this->n_nodes() == this->max_node_id());
+  assert(this->n_elem() == this->max_elem_id());
+#endif
 }
