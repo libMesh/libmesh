@@ -735,7 +735,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 		// for elements.
 		assert (self_ID >= first_global_idx);
 		assert (self_ID  < last_global_idx);
-		assert ((level == 0) || (parent_ID != -1));
+		assert ((elem_level == 0) || (parent_ID != -1));
   
 		// Ignore elements not matching the current level.  We
 		// have to do this in a somewhat expensive fashion since
