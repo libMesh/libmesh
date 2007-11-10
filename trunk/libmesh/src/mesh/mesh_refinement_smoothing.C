@@ -29,6 +29,7 @@
 #include "mesh_base.h"
 #include "mesh_refinement.h"
 #include "parallel.h"
+#include "remote_elem.h"
 
 
 
@@ -309,8 +310,8 @@ bool MeshRefinement::eliminate_unrefined_patches ()
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
         {
           const Elem *neighbor = elem->neighbor(n);
-	  // Quit if the element is on the boundary
-	  if (neighbor == NULL)
+	  // Quit if the element is on a local boundary
+	  if (neighbor == NULL || neighbor == remote_elem)
             {
               h_flag_me = false;
               p_flag_me = false;
