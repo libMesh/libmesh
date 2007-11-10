@@ -3767,6 +3767,7 @@ src/mesh/mesh_refinement_smoothing.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/node.h\
     include/base/reference_counted_object.h\
@@ -3784,6 +3785,7 @@ src/mesh/mesh_refinement_smoothing.$(obj-suffix):\
     include/mesh/mesh_refinement.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
+    include/utils/parallel.h\
     include/utils/perf_log.h
 src/mesh/mesh_smoother.$(obj-suffix):\
     src/mesh/mesh_smoother.C
@@ -3887,6 +3889,7 @@ src/mesh/mesh_tools.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/node.h\
     include/base/reference_counted_object.h\
@@ -3906,6 +3909,7 @@ src/mesh/mesh_tools.$(obj-suffix):\
     include/mesh/mesh_tools.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
+    include/utils/parallel.h\
     include/utils/perf_log.h
 src/mesh/mesh_triangle_support.$(obj-suffix):\
     src/mesh/mesh_triangle_support.C\
