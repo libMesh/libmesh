@@ -118,7 +118,7 @@ int main (int argc, char** argv)
 
     // Write the mesh before the infinite elements are added
     GMVIO(mesh).write ("orig_mesh.gmv");
-    
+
     // Normally, when a mesh is imported or created in
     // libMesh, only conventional elements exist.  The infinite
     // elements used here, however, require prescribed
@@ -143,7 +143,7 @@ int main (int argc, char** argv)
     // Write the mesh with the infinite elements added.
     // Compare this to the original mesh.
     GMVIO(mesh).write ("ifems_added.gmv");
-    
+
     // After building infinite elements, we have to let 
     // the elements find their neighbors again.
     mesh.find_neighbors();
@@ -194,6 +194,9 @@ int main (int argc, char** argv)
     // Solve the system "Wave".
     equation_systems.get_system("Wave").solve();
     
+    // We currently have to serialize for I/O.
+    equation_systems.allgather();
+
     // Write the whole EquationSystems object to file.
     // For infinite elements, the concept of nodal_soln()
     // is not applicable. Therefore, writing the mesh in
@@ -203,6 +206,8 @@ int main (int argc, char** argv)
     // determine physically correct results within an
     // infinite element.
     equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
+
+    mesh.delete_remote_elements();
   }
   
   // All done.  

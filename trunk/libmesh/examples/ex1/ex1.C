@@ -77,7 +77,14 @@ int main (int argc, char** argv)
     // Write the output mesh if the user specified an
     // output file name.
     if (argc == 5)
-      mesh.write (argv[4]);
+      {
+        // We currently have to serialize for I/O.
+        mesh.allgather();
+
+        mesh.write (argv[4]);
+
+        mesh.delete_remote_elements();
+      }
     // At this closing brace all of our objects will be forced
     // out of scope and will get deconstructed.
   }

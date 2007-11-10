@@ -249,14 +249,26 @@ int main (int argc, char** argv)
 	// respectively.
 	char buf[14];
 	sprintf (buf, "out%04d.gmv", n);
+
+        // We currently have to serialize for I/O.
+        equation_systems.allgather();
+
 	GMVIO(mesh).write_equation_systems (buf,
 					    equation_systems);
+
+        mesh.delete_remote_elements();
       }
     
     // Alternatively, the whole EquationSystems object can be
     // written to disk.  By default, the additional vectors are also
     // saved.
+
+    // We currently have to serialize for I/O.
+    equation_systems.allgather();
+
     equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
+
+    mesh.delete_remote_elements();
   }
   
   // All done.  

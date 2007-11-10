@@ -116,14 +116,6 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   libMesh::init (argc, argv);
 
-#ifdef ENABLE_PARMESH
-  if (libMesh::processor_id() == 0)
-    std::cerr << "ERROR: This example uses AMR, which libMesh\n"
-              << "does not yet support on parallel meshes!"
-              << std::endl;
-  return 0;
-#endif
-
 #ifndef ENABLE_AMR
   if (libMesh::processor_id() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
@@ -279,6 +271,9 @@ int main (int argc, char** argv)
     equation_systems.parameters.set<Real>
       ("linear solver tolerance") = TOLERANCE;
       
+    // We currently have to serialize for I/O.
+    equation_systems.allgather();
+
     if(!read_solution)
       // Write out the initial condition
       GMVIO(mesh).write_equation_systems ("out.gmv.000",
@@ -288,6 +283,7 @@ int main (int argc, char** argv)
       GMVIO(mesh).write_equation_systems ("solution_read_in.gmv",
 					  equation_systems);
 
+    mesh.delete_remote_elements();
       
     
     // The Convection-Diffusion system requires that we specify
@@ -411,15 +407,25 @@ int main (int argc, char** argv)
 	    file_name << "out.gmv.";
 	    OSSRealzeroright(file_name,3,0,t_step+1);
 
+            // We currently have to serialize for I/O.
+            equation_systems.allgather();
+
 	    GMVIO(mesh).write_equation_systems (file_name.str(),
 						equation_systems);
+
+            mesh.delete_remote_elements();
 	  }
       }
 
       if(!read_solution)
       {
+        // We currently have to serialize for I/O.
+        equation_systems.allgather();
+
         mesh.write("saved_mesh.xda");
         equation_systems.write("saved_solution.xda", libMeshEnums::WRITE);
+
+        mesh.delete_remote_elements();
       }
   }
 #endif // #ifndef ENABLE_AMR

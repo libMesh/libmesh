@@ -151,9 +151,14 @@ int main (int argc, char** argv)
     // built PETSc.
     equation_systems.get_system("Poisson").solve();
 
+    // We currently have to serialize for I/O.
+    equation_systems.allgather();
+
     // After solving the system write the solution
     // to a GMV-formatted plot file.
     GMVIO (mesh).write_equation_systems ("out.gmv", equation_systems);
+
+    mesh.delete_remote_elements();
   }
 
   // All done.  
