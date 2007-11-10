@@ -906,6 +906,9 @@ namespace Parallel
 #else // HAVE_MPI
 
   template <typename T>
+  inline bool verify(const T &) { return true; }
+
+  template <typename T>
   inline void min(T &) {}
 
   template <typename T>
