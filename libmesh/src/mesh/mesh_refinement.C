@@ -857,11 +857,15 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	elem->set_p_refinement_flag(Elem::DO_NOTHING);
     }
   
-  // if there are no refined elements then
+  // if there are no refined elements on this processor then
   // there is no work for us to do   
   if (max_level == 0 && max_p_level == 0)
     {
       STOP_LOG ("make_coarsening_compatible()", "MeshRefinement");
+
+      // But we still have to check with other processors
+      Parallel::min(compatible_with_refinement);
+
       return compatible_with_refinement;
     }
 
@@ -889,6 +893,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	  for (; el != end_el; ++el)
 	    {
 	      Elem* elem = *el;
+              bool my_flag_changed = false;
 	      
 	      if (elem->refinement_flag() == Elem::COARSEN) // If the element is active and 
 		// the coarsen flag is set
@@ -906,7 +911,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	        	                                                     // and wants to be refined
 			    {
 			      elem->set_refinement_flag(Elem::DO_NOTHING);
-			      level_one_satisfied = false;
+                              my_flag_changed = true;
                               break;
 			    }
 			}
@@ -916,7 +921,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 			   // stage.  Forget about it for the moment...  This can be handled in
 			   // two steps.
 			  elem->set_refinement_flag(Elem::DO_NOTHING);
-			  level_one_satisfied = false;
+			  my_flag_changed = true;
                           break;
 			}
 		}
@@ -937,7 +942,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                                neighbor->p_refinement_flag() == Elem::REFINE))
 			    {
 			      elem->set_p_refinement_flag(Elem::DO_NOTHING);
-			      level_one_satisfied = false;
+			      my_flag_changed = true;
                               break;
 			    }
 			}
@@ -962,15 +967,46 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                                      subneighbor->p_refinement_flag() == Elem::REFINE))
 			           {
 			             elem->set_p_refinement_flag(Elem::DO_NOTHING);
-			             level_one_satisfied = false;
+			             my_flag_changed = true;
                                      break;
 			           }
                              }
-                           if (!level_one_satisfied)
+                           if (my_flag_changed)
                              break;
 			}
 		}
 		  
+	      // If the current element's flag changed, we hadn't
+	      // satisfied the level one rule.
+	      if (my_flag_changed)
+                level_one_satisfied = false;
+	      
+	      // Additionally, if it has non-local neighbors, and
+	      // we're not in serial, then we'll eventually have to
+	      // return compatible_with_refinement = false, because
+	      // our change has to propagate to neighboring
+	      // processors.
+	      if (my_flag_changed && !_mesh.is_serial())
+              for (unsigned int n=0; n != elem->n_neighbors(); ++n)
+                {
+                  Elem *neigh = elem->neighbor(n);
+                  if (neigh->processor_id() !=
+                      libMesh::processor_id())
+                    {
+                      compatible_with_refinement = false;
+                      break;
+                    }
+                  // FIXME - for non-level one meshes we should
+                  // test all descendants
+                  if (neigh->has_children())
+                    for (unsigned int c=0; c != neigh->n_children(); ++c)
+                      if (neigh->child(c)->processor_id() !=
+                          libMesh::processor_id())
+                        {
+                          compatible_with_refinement = false;
+                          break;
+                        }
+                }
 	    }      
 	}
       while (!level_one_satisfied);
@@ -1047,6 +1083,10 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
     }
 	
   STOP_LOG ("make_coarsening_compatible()", "MeshRefinement");
+
+  // If one processor finds an incompatibility, we're globally
+  // incompatible
+  Parallel::min(compatible_with_refinement);
   
   return compatible_with_refinement;
 }
@@ -1226,9 +1266,12 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
       while (!level_one_satisfied);
     } // end if (_maintain_level_one)
 
+  // If we're not compatible on one processor, we're globally not
+  // compatible
+  Parallel::min(compatible_with_coarsening);
   
   STOP_LOG ("make_refinement_compatible()", "MeshRefinement");
-  
+
   return compatible_with_coarsening;
 }
 
@@ -1312,6 +1355,9 @@ bool MeshRefinement::_coarsen_elements ()
             }
         }
     }  
+
+  // If the mesh changed on any processor, it changed globally
+  Parallel::max(mesh_changed);
   
   STOP_LOG ("_coarsen_elements()", "MeshRefinement");
 
@@ -1396,6 +1442,9 @@ bool MeshRefinement::_refine_elements ()
   
   // Clear the _new_nodes_map and _unused_elements data structures.
   this->clear();
+  
+  // If the mesh changed on any processor, it changed globally
+  Parallel::max(mesh_changed);
   
   STOP_LOG ("_refine_elements()", "MeshRefinement");
 
