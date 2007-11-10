@@ -490,6 +490,7 @@ void Elem::make_links_to_me_remote()
         }
     }
 
+#ifdef ENABLE_AMR
   // Remotify parent's and childrens' links - if we're going remote
   // all our children should be too, but let's be careful to handle
   // cases where we are deleted before our children are and
@@ -508,6 +509,7 @@ void Elem::make_links_to_me_remote()
       unsigned int me = parent->which_child_am_i(this);
       parent->_children[me] = const_cast<RemoteElem*>(remote_elem);
     }
+#endif
 }
 
 
