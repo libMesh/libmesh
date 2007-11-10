@@ -452,6 +452,14 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
                    coarsening_satisfied &&
 		   refinement_satisfied &&
 		   smoothing_satisfied);
+#ifdef DEBUG
+      bool max_satisfied = satisfied,
+           min_satisfied = satisfied;
+      Parallel::max(max_satisfied);
+      Parallel::min(min_satisfied);
+      assert (satisfied == max_satisfied);
+      assert (satisfied == min_satisfied);
+#endif
     }
   while (!satisfied);
 
@@ -572,6 +580,14 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
       satisfied = (parallel_consistent &&
                    coarsening_satisfied &&
 		   smoothing_satisfied);
+#ifdef DEBUG
+      bool max_satisfied = satisfied,
+           min_satisfied = satisfied;
+      Parallel::max(max_satisfied);
+      Parallel::min(min_satisfied);
+      assert (satisfied == max_satisfied);
+      assert (satisfied == min_satisfied);
+#endif
     }
 
   // Coarsen the flagged elements.
@@ -668,6 +684,14 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
       satisfied = (parallel_consistent &&
                    refinement_satisfied &&
 		   smoothing_satisfied);
+#ifdef DEBUG
+      bool max_satisfied = satisfied,
+           min_satisfied = satisfied;
+      Parallel::max(max_satisfied);
+      Parallel::min(min_satisfied);
+      assert (satisfied == max_satisfied);
+      assert (satisfied == min_satisfied);
+#endif
     }
   
   // Now refine the flagged elements.  This will
@@ -990,6 +1014,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
               for (unsigned int n=0; n != elem->n_neighbors(); ++n)
                 {
                   Elem *neigh = elem->neighbor(n);
+                  if (!neigh)
+                    continue;
                   if (neigh->processor_id() !=
                       libMesh::processor_id())
                     {
