@@ -132,6 +132,9 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
   
 #ifdef HAVE_MPI
 
+  // This function must be run on all processors at once
+  parallel_only();
+
   START_LOG("broadcast_mesh()","MeshCommunication");
 
   // Explicitly clear the mesh on all but processor 0.
@@ -383,6 +386,9 @@ void MeshCommunication::broadcast_bcs (const MeshBase&,
   
 #ifdef HAVE_MPI
 
+  // This function must be run on all processors at once
+  parallel_only();
+
   START_LOG("broadcast_bcs()","MeshCommunication");
 
   // Explicitly clear the boundary conditions on all
@@ -538,6 +544,9 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
   // Check for quick return
   if (libMesh::n_processors() == 1)
     return;
+
+  // This function must be run on all processors at once
+  parallel_only();
 
   START_LOG ("allgather_mesh()","MeshCommunication");
   
@@ -817,6 +826,9 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
   // Check for quick return
   if (libMesh::n_processors() == 1)
     return;
+
+  // This function must be run on all processors at once
+  parallel_only();
 
   START_LOG ("allgather_bcs()","MeshCommunication");
 

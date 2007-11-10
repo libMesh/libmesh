@@ -155,6 +155,9 @@ void MeshRefinement::create_parent_error_vector
    Real& parent_error_min,
    Real& parent_error_max)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   error_per_parent.clear();
   error_per_parent.resize(error_per_cell.size(), 0);
 
@@ -240,6 +243,11 @@ void MeshRefinement::create_parent_error_vector
 
 void MeshRefinement::update_nodes_map ()
 {
+  // This function must be run on all processors at once
+  // for non-serial meshes
+  if (!_mesh.is_serial())
+    parallel_only();
+
   START_LOG("update_nodes_map()", "MeshRefinement");
 
   // Clear the old map
@@ -298,6 +306,9 @@ void MeshRefinement::update_nodes_map ()
 
 bool MeshRefinement::test_level_one (bool assert_pass)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
 
@@ -342,6 +353,9 @@ bool MeshRefinement::test_level_one (bool assert_pass)
 
 bool MeshRefinement::test_unflagged (bool assert_pass)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   bool found_flag = false;
 
   // Search for local flags
@@ -380,7 +394,8 @@ bool MeshRefinement::test_unflagged (bool assert_pass)
 
 bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 {
-  //assert (_mesh.mesh_dimension() != 1);
+  // This function must be run on all processors at once
+  parallel_only();
 
   bool _maintain_level_one = maintain_level_one;
 
@@ -516,8 +531,9 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 
 bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 {
-  //assert (_mesh.mesh_dimension() != 1);
-  
+  // This function must be run on all processors at once
+  parallel_only();
+
   bool _maintain_level_one = maintain_level_one;
 
   // If the user used non-default parameters, let's warn that they're
@@ -620,7 +636,8 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 
 bool MeshRefinement::refine_elements (const bool maintain_level_one)
 {
-  //assert (_mesh.mesh_dimension() != 1);
+  // This function must be run on all processors at once
+  parallel_only();
 
   bool _maintain_level_one = maintain_level_one;
 
@@ -720,6 +737,9 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
 
 bool MeshRefinement::make_flags_parallel_consistent()
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   START_LOG ("make_flags_parallel_consistent()", "MeshRefinement");
   // We're consistent until we discover otherwise
   bool parallel_consistent = true;
@@ -829,6 +849,9 @@ bool MeshRefinement::make_flags_parallel_consistent()
 
 bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   START_LOG ("make_coarsening_compatible()", "MeshRefinement");
   
   bool _maintain_level_one = maintain_level_one;
@@ -1126,6 +1149,9 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
 bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   START_LOG ("make_refinement_compatible()", "MeshRefinement");
   
   bool _maintain_level_one = maintain_level_one;
@@ -1306,6 +1332,9 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
 bool MeshRefinement::_coarsen_elements ()
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   START_LOG ("_coarsen_elements()", "MeshRefinement");
 
   // Flag indicating if this call actually changes the mesh
@@ -1398,6 +1427,9 @@ bool MeshRefinement::_coarsen_elements ()
 
 bool MeshRefinement::_refine_elements ()
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   // Update the _new_nodes_map so that elements can
   // find nodes to connect to.
   this->update_nodes_map ();
@@ -1481,6 +1513,9 @@ bool MeshRefinement::_refine_elements ()
 
 void MeshRefinement::make_nodes_parallel_consistent()
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   // Local nodes in the _new_nodes_map have authoritative ids
   // and correct processor ids, nodes touching local elements
   // have correct processor ids but need to have their ids
@@ -1734,6 +1769,9 @@ void MeshRefinement::make_nodes_parallel_consistent()
 
 void MeshRefinement::make_elems_parallel_consistent()
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   // Newly added local elements have authoritative ids
   // and correct processor ids, ghost elements have correct
   // processor ids but need to have their ids corrected.

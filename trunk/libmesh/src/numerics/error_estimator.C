@@ -31,6 +31,9 @@
 // ErrorEstimator functions
 void ErrorEstimator::reduce_error (std::vector<ErrorVectorReal>& error_per_cell) const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   // Each processor has now computed the error contribuions
   // for its local elements.  We may need to sum the vector to
   // recover the error for each element.

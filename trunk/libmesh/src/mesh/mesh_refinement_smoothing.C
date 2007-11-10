@@ -36,6 +36,9 @@
 // Mesh refinement methods
 bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismatch)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   bool flags_changed = false;
 
 
@@ -125,6 +128,9 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 // Mesh refinement methods
 bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismatch)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   bool flags_changed = false;
 
 
@@ -249,6 +255,9 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 
 bool MeshRefinement::eliminate_unrefined_patches ()
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   bool flags_changed = false;
 
   MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();

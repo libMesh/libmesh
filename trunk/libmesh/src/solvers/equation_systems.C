@@ -466,6 +466,9 @@ void EquationSystems::build_solution_vector (std::vector<Number>&,
 
 void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   assert (this->n_systems());
 
   const unsigned int dim = _mesh.mesh_dimension();

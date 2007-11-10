@@ -166,6 +166,10 @@ MeshTools::processor_bounding_box (const MeshBase& mesh,
   // the bounding box for the whole domain.
   if (pid == libMesh::invalid_uint)
     {
+      // This function must be run on all processors at once
+      // to calculate on the whole domain
+      parallel_only();
+
       MeshBase::const_node_iterator       it  = mesh.local_nodes_begin();
       const MeshBase::const_node_iterator end = mesh.local_nodes_end();
 

@@ -711,6 +711,9 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
 template <typename T>
 void PetscVector<T>::localize (std::vector<T>& v_local) const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   int ierr=0;
   const int n = this->size();
   const int nl = this->local_size();

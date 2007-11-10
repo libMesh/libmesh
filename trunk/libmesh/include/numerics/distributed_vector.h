@@ -446,6 +446,9 @@ void DistributedVector<T>::init (const unsigned int n,
 				 const unsigned int n_local,
 				 const bool fast)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   assert (n_local <= n);
 
   // Clear the data structures if already initialized
@@ -681,6 +684,9 @@ template <typename T>
 inline
 Real DistributedVector<T>::min () const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
@@ -699,6 +705,9 @@ template <typename T>
 inline
 Real DistributedVector<T>::max() const
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   assert (this->initialized());
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
