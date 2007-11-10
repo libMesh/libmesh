@@ -35,6 +35,10 @@
 void Partitioner::partition (MeshBase& mesh,
 			     const unsigned int n)
 {
+  // For now we don't repartition in parallel
+  if (!mesh.is_serial())
+    return;
+
   // Set the number of partitions in the mesh
   mesh.set_n_partitions()=n;
 
@@ -88,6 +92,9 @@ void Partitioner::single_partition (MeshBase& mesh)
 
 void Partitioner::_set_node_processor_ids(MeshBase& mesh)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   // Unset any previously-set node processor ids
   // (maybe from previous partitionings).
   MeshBase::node_iterator       node_it  = mesh.nodes_begin();
