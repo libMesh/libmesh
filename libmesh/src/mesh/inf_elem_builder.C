@@ -280,6 +280,8 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 				    std::set< std::pair<unsigned int,
 				    unsigned int> >* inner_faces)
 {
+  // This isn't parallelized yet
+  assert (_mesh.is_serial());
 
   if (be_verbose)
     {
@@ -493,11 +495,12 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 
   // for each boundary node, add an outer_node with 
   // double distance from origin.
+  unsigned int node_id = _mesh.max_node_id();
   std::set<unsigned int>::iterator on_it = onodes.begin();
   for( ; on_it != onodes.end(); ++on_it)
     {
       Point p = (Point(this->_mesh.point(*on_it)) * 2.) - origin;
-      outer_nodes[*on_it]=this->_mesh.add_point(p);
+      outer_nodes[*on_it]=this->_mesh.add_point(p, node_id++);
     }
 
 
