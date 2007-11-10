@@ -480,7 +480,9 @@ void Elem::make_links_to_me_remote()
           for (unsigned int i=0; i != family.size(); ++i)
             {
               Elem *n = const_cast<Elem*>(family[i]);
-              // This assumption
+              assert (n);
+              if (n == remote_elem)
+                continue;
               assert (n->which_neighbor_am_i(this) == my_s);
               n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
             }
