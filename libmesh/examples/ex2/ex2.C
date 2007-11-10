@@ -137,6 +137,9 @@ int main (int argc, char** argv)
 	  std::cout << "<<< Writing system to file " << argv[1]
 		    << std::endl;
 	  
+          // We currently have to serialize for I/O.
+          equation_systems.allgather();
+
 	  // Write the system.
 	  equation_systems.write (argv[1], libMeshEnums::WRITE);
 	  

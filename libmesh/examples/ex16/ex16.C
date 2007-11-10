@@ -172,8 +172,13 @@ int main (int argc, char** argv)
       {
 	eigen_system.get_eigenpair(nconv-1);
 	
+        // We currently have to serialize for I/O.
+        equation_systems.allgather();
+
 	// Write the eigen vector to file.
 	GMVIO (mesh).write_equation_systems ("out.gmv", equation_systems);
+
+        mesh.delete_remote_elements();
       }
     else
       {
