@@ -119,6 +119,12 @@ class ParallelMesh : public UnstructuredMesh
   virtual unsigned int max_elem_id () const { return _max_elem_id; }
   virtual void reserve_elem (const unsigned int) { }
 
+  // Uncached methods to be called in parallel only
+  virtual unsigned int parallel_n_nodes () const;
+  virtual unsigned int parallel_max_node_id () const;
+  virtual unsigned int parallel_n_elem () const;
+  virtual unsigned int parallel_max_elem_id () const;
+
   /**
    * For meshes that don't store points/elems, these functions may be an issue!
    */
