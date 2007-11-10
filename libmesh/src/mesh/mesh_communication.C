@@ -1039,6 +1039,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
   for (; nl_elem_it != nl_end; ++nl_elem_it)
     {
       Elem *elem = *nl_elem_it;
+      assert (elem);
       if (!semilocal_elems[elem->id()])
         {
           // Make sure we don't leave any invalid pointers
