@@ -25,9 +25,10 @@
 // only compile these functions if the user requests AMR support
 #ifdef ENABLE_AMR
 
-#include "mesh_refinement.h"
-#include "mesh_base.h"
 #include "elem.h"
+#include "mesh_base.h"
+#include "mesh_refinement.h"
+#include "parallel.h"
 
 
 
@@ -112,6 +113,9 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
       }     
   }
   
+  // If flags changed on any processor then they changed globally
+  Parallel::max(flags_changed);
+
   return flags_changed;
 }
 
@@ -234,6 +238,9 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
       }     
   }
   
+  // If flags changed on any processor then they changed globally
+  Parallel::max(flags_changed);
+
   return flags_changed;
 }
 
@@ -377,6 +384,9 @@ bool MeshRefinement::eliminate_unrefined_patches ()
 	  flags_changed = true;
 	}      
     }
+
+  // If flags changed on any processor then they changed globally
+  Parallel::max(flags_changed);
 
   return flags_changed;
 }
