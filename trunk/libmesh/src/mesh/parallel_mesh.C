@@ -573,10 +573,10 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
           std::vector<unsigned int> new_ids(request_to_fill.size());
           for (unsigned int i=0; i != request_to_fill.size(); ++i)
             {
-              assert(objects[request_to_fill[i]]);
-              assert(objects[request_to_fill[i]]->processor_id()
-                     == libMesh::processor_id());
-              new_ids[i] = objects[request_to_fill[i]]->id();
+              T *obj = objects[request_to_fill[i]];
+              assert(obj);
+              assert(obj->processor_id() == libMesh::processor_id());
+              new_ids[i] = obj->id();
               assert(new_ids[i] >=
                      first_object_on_proc[libMesh::processor_id()]);
               assert(new_ids[i] <
@@ -592,14 +592,15 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
           // And copy the id changes we've now been informed of
           for (unsigned int i=0; i != filled_request.size(); ++i)
             {
-              assert (objects[requested_ids[procup][i]]->processor_id()
-                      == procup);
+              T *obj = objects[requested_ids[procup][i]];
+              assert (obj);
+              assert (obj->processor_id() == procup);
               assert(filled_request[i] >=
                      first_object_on_proc[procup]);
               assert(filled_request[i] <
                      first_object_on_proc[procup] +
                      objects_on_proc[procup]);
-              objects[requested_ids[procup][i]]->set_id(filled_request[i]);
+              obj->set_id(filled_request[i]);
             }
         }
     }
