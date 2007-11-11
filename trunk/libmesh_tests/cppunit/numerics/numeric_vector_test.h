@@ -4,19 +4,14 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
-template <class DerivedClass>
-class NumericVectorTest : public CppUnit::TestCase { 
-public: 
-  CPPUNIT_TEST_SUITE( NumericVectorTest );
-
-  CPPUNIT_TEST( testLocalize );
-  CPPUNIT_TEST( testLocalizeBase );
-  CPPUNIT_TEST( testLocalizeToOne );
+#define NUMERICVECTORTEST \
+  CPPUNIT_TEST( testLocalize ); \
+  CPPUNIT_TEST( testLocalizeBase ); \
+  CPPUNIT_TEST( testLocalizeToOne ); \
   CPPUNIT_TEST( testLocalizeToOneBase );
 
-  CPPUNIT_TEST_SUITE_END();
-
-private:
+template <class DerivedClass>
+class NumericVectorTest : public CppUnit::TestCase { 
 
 public:
   void setUp()

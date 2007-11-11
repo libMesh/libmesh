@@ -11,11 +11,8 @@ class PetscVectorTest : public NumericVectorTest<PetscVector<Real> > {
 public: 
   CPPUNIT_TEST_SUITE( PetscVectorTest );
 
-  CPPUNIT_TEST( testLocalize );
-  CPPUNIT_TEST( testLocalizeBase );
-  CPPUNIT_TEST( testLocalizeToOne );
-  CPPUNIT_TEST( testLocalizeToOneBase );
-
+  NUMERICVECTORTEST
+  
   CPPUNIT_TEST_SUITE_END();
 };
 
