@@ -516,6 +516,35 @@ void ParallelMesh::assert_valid_parallel_ids () const
 
 
 
+void ParallelMesh::assert_valid_parallel_flags () const
+{
+  // This function must be run on all processors at once
+  parallel_only();
+
+  unsigned int pmax_elem_id = this->parallel_max_elem_id();
+
+  for (unsigned int i=0; i != pmax_elem_id; ++i)
+    {
+      Elem* elem = _elements[i]; // Returns NULL if there's no map entry
+
+      unsigned int refinement_flag   = elem ?
+        elem->refinement_flag() : libMesh::invalid_uint;
+      unsigned int p_refinement_flag = elem ?
+        elem->p_refinement_flag() : libMesh::invalid_uint;
+
+      unsigned int min_rflag = refinement_flag;
+      Parallel::min(min_rflag);
+      // All processors with this element should agree on flag
+      assert (!elem || min_rflag == refinement_flag);
+
+      unsigned int min_pflag = p_refinement_flag;
+      // All processors with this element should agree on flag
+      assert (!elem || min_pflag == p_refinement_flag);
+    }
+}
+
+
+
 template <typename T>
 unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
 {
@@ -784,8 +813,9 @@ void ParallelMesh::renumber_nodes_and_elements ()
   assert(this->n_nodes() == this->max_node_id());
   assert(this->n_elem() == this->max_elem_id());
 
-// Make sure our ids and processor_ids are consistent
+// Make sure our ids and flags are consistent
   this->assert_valid_parallel_ids();
+  this->assert_valid_parallel_flags();
 #endif
 
   STOP_LOG("renumber_nodes_and_elements()", "ParallelMesh");
@@ -816,8 +846,9 @@ void ParallelMesh::delete_remote_elements()
 // Make sure our neighbor links are all fine
   this->assert_valid_neighbors();
 
-// Make sure our ids and processor_ids are consistent
+// Make sure our ids and flags are consistent
   this->assert_valid_parallel_ids();
+  this->assert_valid_parallel_flags();
 #endif
 }
 
@@ -843,7 +874,8 @@ void ParallelMesh::allgather()
 // Make sure our neighbor links are all fine
   this->assert_valid_neighbors();
 
-// Make sure our ids and processor_ids are consistent
+// Make sure our ids and flags are consistent
   this->assert_valid_parallel_ids();
+  this->assert_valid_parallel_flags();
 #endif
 }

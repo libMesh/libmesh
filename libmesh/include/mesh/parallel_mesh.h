@@ -101,6 +101,13 @@ class ParallelMesh : public UnstructuredMesh
   void assert_valid_parallel_ids() const;
 
   /**
+   * Verify refinement_flag and p_refinement_flag consistency of our
+   * elements containers.
+   * Calls assert() on each possible failure.
+   */
+  void assert_valid_parallel_flags() const;
+
+  /**
    * Renumber a parallel objects container
    * Returns the smallest globally unused id for that
    * container.
