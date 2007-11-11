@@ -86,6 +86,21 @@ class ParallelMesh : public UnstructuredMesh
     { return _is_serial; }
 
   /**
+   * Verify id and processor_id consistency of a parallel
+   * objects container.
+   * Calls assert() on each possible failure in that container.
+   */
+  template <typename T>
+  void assert_valid_parallel_object_ids(const mapvector<T*>&) const;
+
+  /**
+   * Verify id and processor_id consistency of our elements and
+   * nodes containers.
+   * Calls assert() on each possible failure.
+   */
+  void assert_valid_parallel_ids() const;
+
+  /**
    * Renumber a parallel objects container
    * Returns the smallest globally unused id for that
    * container.
