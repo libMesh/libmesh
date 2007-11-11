@@ -1,4 +1,4 @@
-CC=g++
+CC=$(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --cxx)
 CFLAGS=-c -Wall $(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --cxxflags --include$)
 LDFLAGS=-lcppunit $(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --ldflags)
 SOURCES=$(shell find ./ -name "*.C")
