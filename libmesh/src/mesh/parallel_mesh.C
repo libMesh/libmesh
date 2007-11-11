@@ -472,6 +472,51 @@ void ParallelMesh::clear ()
 
 
 template <typename T>
+void ParallelMesh::assert_valid_parallel_object_ids 
+  (const mapvector<T*> &objects) const
+{
+  // This function must be run on all processors at once
+  parallel_only();
+
+  unsigned int pmax_elem_id = this->parallel_max_elem_id();
+
+  for (unsigned int i=0; i != pmax_elem_id; ++i)
+    {
+      T* obj = objects[i]; // Returns NULL if there's no map entry
+
+      unsigned int dofid = obj && obj->valid_id() ?
+        obj->id() : DofObject::invalid_id;
+      // Local lookups by id should return the requested object
+      assert(!obj || obj->id() == i);
+
+      unsigned int min_dofid = dofid;
+      Parallel::min(min_dofid);
+      // All processors with an object should agree on id
+      assert (!obj || dofid == min_dofid);
+
+      unsigned int procid = obj && obj->valid_processor_id() ?
+        obj->processor_id() : DofObject::invalid_processor_id;
+
+      unsigned int min_procid = procid;
+      Parallel::min(min_procid);
+      // All processors with an object should agree on processor id
+      assert (!obj || procid == min_procid);
+      // I should own any object another processor thinks I do
+      assert (min_procid != libMesh::processor_id() || obj);
+    }
+}
+
+
+
+void ParallelMesh::assert_valid_parallel_ids () const
+{
+  this->assert_valid_parallel_object_ids (this->_elements);
+  this->assert_valid_parallel_object_ids (this->_nodes);
+}
+
+
+
+template <typename T>
 unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
 {
   // This function must be run on all processors at once
@@ -703,12 +748,12 @@ void ParallelMesh::renumber_nodes_and_elements ()
   }
 
   // Finally renumber all the elements
-  _n_elem = this->renumber_dof_objects (_elements);
+  _n_elem = this->renumber_dof_objects (this->_elements);
   _max_elem_id = _n_elem;
   _next_free_local_elem_id = _n_elem;
 
   // and all the remaining nodes
-  _n_nodes = this->renumber_dof_objects (_nodes);
+  _n_nodes = this->renumber_dof_objects (this->_nodes);
   _max_node_id = _n_nodes;
   _next_free_local_node_id = _n_nodes;
 
@@ -738,6 +783,9 @@ void ParallelMesh::renumber_nodes_and_elements ()
   assert(this->max_elem_id() == this->parallel_max_elem_id());
   assert(this->n_nodes() == this->max_node_id());
   assert(this->n_elem() == this->max_elem_id());
+
+// Make sure our ids and processor_ids are consistent
+  this->assert_valid_parallel_ids();
 #endif
 
   STOP_LOG("renumber_nodes_and_elements()", "ParallelMesh");
@@ -767,6 +815,9 @@ void ParallelMesh::delete_remote_elements()
 
 // Make sure our neighbor links are all fine
   this->assert_valid_neighbors();
+
+// Make sure our ids and processor_ids are consistent
+  this->assert_valid_parallel_ids();
 #endif
 }
 
@@ -791,5 +842,8 @@ void ParallelMesh::allgather()
 
 // Make sure our neighbor links are all fine
   this->assert_valid_neighbors();
+
+// Make sure our ids and processor_ids are consistent
+  this->assert_valid_parallel_ids();
 #endif
 }
