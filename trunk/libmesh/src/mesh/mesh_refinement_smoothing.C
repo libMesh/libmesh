@@ -354,7 +354,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
                 }
               // If we have inactive neighbors, we need to
               // test all their active descendants which neighbor us
-              else
+              else if (neighbor->ancestor())
                 {
                   if (neighbor->min_new_p_level_by_neighbor(elem,
                       my_new_p_level + 2) <= my_new_p_level)
