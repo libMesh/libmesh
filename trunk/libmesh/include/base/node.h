@@ -62,7 +62,7 @@ public:
   Node  (const Real x,
 	 const Real y,
 	 const Real z,
-	 const unsigned int id);
+	 const unsigned int id = invalid_id);
 
   /**
    * Copy-constructor.
