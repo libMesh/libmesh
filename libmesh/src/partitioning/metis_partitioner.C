@@ -184,6 +184,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 		    // we are connected
 		    const unsigned int ns =
 		      neighbor->which_neighbor_am_i (elem);
+                    assert (ns < neighbor->n_neighbors());
 		    
 		    // Get all the active children (& grandchildren, etc...)
 		    // of the neighbor.
