@@ -485,6 +485,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<un
             while (neigh->level() < ancestor->level())
               ancestor = ancestor->parent();
             unsigned int s_neigh = neigh->which_neighbor_am_i(ancestor);
+            assert (s_neigh < neigh->n_neighbors());
             
             //Couple of helper uints...
             unsigned int node1=0;
