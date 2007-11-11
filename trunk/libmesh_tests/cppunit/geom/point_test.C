@@ -3,13 +3,13 @@
 
 #include <point.h>
 
-#include "../numerics/type_vector_test.h"
+#include "point_test.h"
 
-class PointTest : public TypeVectorTestBase<Point> { 
+class PointTest : public PointTestBase<Point> { 
 public: 
   CPPUNIT_TEST_SUITE( PointTest );
 
-  TYPEVECTORTEST
+  POINTTEST
 
   CPPUNIT_TEST_SUITE_END();
 };
