@@ -1198,12 +1198,6 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
     if (this->neighbor(s) == eparent)
       return s;
     
-
-  std::cerr << "ERROR:  Elements are not neighbors!" 
-	    << std::endl;
-
-  error();
-
   return libMesh::invalid_uint;
 }
 
