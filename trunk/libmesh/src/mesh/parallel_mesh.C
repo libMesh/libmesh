@@ -750,15 +750,18 @@ void ParallelMesh::delete_remote_elements()
   _is_serial = false;
   MeshCommunication().delete_remote_elements(*this);
 
+#ifdef DEBUG
 // Make sure our caches are up to date and our
 // DofObjects are well packed
-#ifdef DEBUG
   assert(this->n_nodes() == this->parallel_n_nodes());
   assert(this->n_elem() == this->parallel_n_elem());
   assert(this->max_node_id() == this->parallel_max_node_id());
   assert(this->max_elem_id() == this->parallel_max_elem_id());
   assert(this->n_nodes() == this->max_node_id());
   assert(this->n_elem() == this->max_elem_id());
+
+// Make sure our neighbor links are all fine
+  this->assert_valid_neighbors();
 #endif
 }
 
