@@ -111,8 +111,8 @@
  /*
   * class alias
   */
-# define OStringStream           std::ostringstream
-
+//# define OStringStream           std::ostringstream
+typedef std::ostringstream OStringStream;
 
 
 
