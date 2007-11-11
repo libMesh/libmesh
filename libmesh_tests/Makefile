@@ -1,4 +1,4 @@
-# $Id:$
+# $Id$
 
 test_source := $(shell find ./ -name "*.cc")
 tests       := $(patsubst %.cc, %, ${test_source}) 
@@ -14,7 +14,7 @@ all: $(tests) $(tests_source) driver.C
 
 %: %.cc driver.C
 	@echo "Building $@ ..."
-	@`${LIBMESH_ROOT}/libmesh/contrib/bin/libmesh-config --cxx` driver.C $< `${LIBMESH_ROOT}/libmesh/contrib/bin/libmesh-config --cxxflags --include` -o $@ `${LIBMESH_ROOT}/libmesh/contrib/bin/libmesh-config --ldflags`
+	@`${LIBMESH_ROOT}/contrib/bin/libmesh-config --cxx` driver.C $< `${LIBMESH_ROOT}/contrib/bin/libmesh-config --cxxflags --include` -o $@ `${LIBMESH_ROOT}/contrib/bin/libmesh-config --ldflags`
 
 
 
