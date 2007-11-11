@@ -32,6 +32,7 @@
 #include "libmesh_logging.h"
 #include "elem.h"
 #include "mesh_tools.h" // For n_levels
+#include "remote_elem.h"
 
 #include "diva_io.h"
 #include "exodusII_io.h"
@@ -147,6 +148,47 @@ UnstructuredMesh::~UnstructuredMesh ()
 
 
 
+void UnstructuredMesh::assert_valid_neighbors() const
+{
+  const const_element_iterator el_end = this->elements_end();
+  for (const_element_iterator el = this->elements_begin(); el != el_end; ++el)
+    {
+      const Elem* elem = *el;
+      assert (elem);
+
+      if (elem->subactive())
+        continue;
+
+      for (unsigned int s=0; s<elem->n_neighbors(); s++)
+        {
+          const Elem *neigh = elem->neighbor(s);
+          if (neigh == remote_elem)
+            continue;
+
+          if (neigh)
+            {
+              assert (!neigh->subactive());
+
+              unsigned int rev = neigh->which_neighbor_am_i(elem);
+              assert (rev < neigh->n_neighbors());
+
+              Elem *nn = neigh->neighbor(rev);
+              assert(nn);
+
+              for (const Elem *eparent = elem; eparent != nn;
+                   eparent = eparent->parent())
+                assert(eparent);
+            }
+          else
+            {
+              const Elem *parent = elem->parent();
+              if (parent)
+                assert (!parent->neighbor(s));
+            }
+        }
+    }
+}
+
 
 
 void UnstructuredMesh::find_neighbors()
@@ -163,7 +205,8 @@ void UnstructuredMesh::find_neighbors()
     {
       Elem* elem = *el;
       for (unsigned int s=0; s<elem->n_neighbors(); s++)
-        elem->set_neighbor(s,NULL);
+        if (elem->neighbor(s) != remote_elem)
+          elem->set_neighbor(s,NULL);
     }
   
   // Find neighboring elements by first finding elements
@@ -312,7 +355,7 @@ void UnstructuredMesh::find_neighbors()
    * otherwise we missed a child somewhere.
    */
   const unsigned int n_levels = MeshTools::n_levels(*this);
-  for (unsigned int level = 1; level < n_levels; ++level)
+  for (unsigned int level = 1; level <= n_levels; ++level)
     {
       element_iterator end = this->level_elements_end(level);
       for (element_iterator el = this->level_elements_begin(level);
@@ -355,6 +398,10 @@ void UnstructuredMesh::find_neighbors()
     }
   
 #endif // AMR
+
+#ifdef DEBUG
+this->assert_valid_neighbors();
+#endif
 
   STOP_LOG("find_neighbors()", "Mesh");
 }

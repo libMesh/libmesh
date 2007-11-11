@@ -145,6 +145,11 @@ class UnstructuredMesh : public MeshBase
    */
   virtual void find_neighbors ();
 
+  /**
+   * A function for testing neighbor connectivity
+   */
+  void assert_valid_neighbors () const;
+
 #ifdef ENABLE_AMR
   /**
    * Delete subactive (i.e. children of coarsened) elements.
