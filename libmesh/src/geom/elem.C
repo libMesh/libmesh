@@ -457,6 +457,8 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
 
 void Elem::make_links_to_me_remote()
 {
+  assert (this != remote_elem);
+
   // We need to handle any children first
 #ifdef ENABLE_AMR
   if (this->has_children())
@@ -477,6 +479,7 @@ void Elem::make_links_to_me_remote()
         if (neigh && neigh != remote_elem &&
             this->level() == neigh->level())
           {
+            assert (neigh->is_neighbor(this));
             unsigned int my_s = neigh->which_neighbor_am_i(this);
             assert (my_s < neigh->n_neighbors());
 
@@ -495,10 +498,11 @@ void Elem::make_links_to_me_remote()
                 assert (n);
                 if (n == remote_elem)
                   continue;
-                assert (n->which_neighbor_am_i(this) == my_s);
+                assert (n->neighbor(my_s) == this);
                 n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
               }
 #else
+            assert (neigh->neighbor(my_s) == this);
             neigh->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
 #endif
           }
@@ -510,6 +514,7 @@ void Elem::make_links_to_me_remote()
   if (parent && parent != remote_elem)
     {
       unsigned int me = parent->which_child_am_i(this);
+      assert (parent->_children[me] == this);
       parent->_children[me] = const_cast<RemoteElem*>(remote_elem);
       this->set_parent(const_cast<RemoteElem*>(remote_elem));
     }
