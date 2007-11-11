@@ -1189,7 +1189,10 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
   const Elem* eparent = e;
 
   while (eparent->level() > this->level())
-    eparent = eparent->parent();
+    {
+      eparent = eparent->parent();
+      assert(eparent);
+    }
   
   for (unsigned int s=0; s<this->n_neighbors(); s++)
     if (this->neighbor(s) == eparent)
