@@ -8,5 +8,15 @@
 #define POINTTEST TYPEVECTORTEST
 
 template <class DerivedClass>
-class PointTestBase : public TypeVectorTestBase<DerivedClass> { 
+class PointTestBase : public TypeVectorTestBase<DerivedClass> {
+public:
+  virtual void setUp()
+  {
+    TypeVectorTestBase<DerivedClass>::setUp();
+  }
+
+  virtual void tearDown()
+  {
+    TypeVectorTestBase<DerivedClass>::tearDown();
+  }
 };

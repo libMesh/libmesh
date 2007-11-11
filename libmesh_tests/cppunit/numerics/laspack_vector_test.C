@@ -11,7 +11,10 @@ class LaspackVectorTest : public NumericVectorTest<LaspackVector<Real> > {
 public: 
   CPPUNIT_TEST_SUITE( LaspackVectorTest );
 
-  NUMERICVECTORTEST
+  if (libMesh::n_processors() == 1)
+  {
+    NUMERICVECTORTEST
+  }
   
   CPPUNIT_TEST_SUITE_END();
 };
