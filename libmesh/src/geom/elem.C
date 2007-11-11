@@ -457,61 +457,61 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
 
 void Elem::make_links_to_me_remote()
 {
-  // Remotify neighbor links
-  for (unsigned int s = 0; s != this->n_sides(); ++s)
-    {
-      Elem *neigh = this->neighbor(s);
-      if (neigh && neigh != remote_elem)
-        {
-          unsigned int my_s = neigh->which_neighbor_am_i(this);
-
-          // My neighbor's neighbor may be my ancestor, in which
-          // case it doesn't need to change
-          if (my_s == libMesh::invalid_uint)
-            continue;
-          
+  // We need to handle any children first
 #ifdef ENABLE_AMR
-	  // My neighbor may have descendants which also consider me a
-	  // neighbor
-          std::vector<const Elem*> family;
-          neigh->family_tree_by_neighbor (family, this);
-
-          // FIXME - There's a lot of ugly const_casts here; we
-          // may want to make remote_elem non-const and create
-          // non-const versions of the family_tree methods
-          for (unsigned int i=0; i != family.size(); ++i)
-            {
-              Elem *n = const_cast<Elem*>(family[i]);
-              assert (n);
-              if (n == remote_elem)
-                continue;
-              assert (n->which_neighbor_am_i(this) == my_s);
-              n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
-            }
-#else
-          neigh->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
-#endif
-        }
-    }
-
-#ifdef ENABLE_AMR
-  // Remotify parent's and childrens' links - if we're going remote
-  // all our children should be too, but let's be careful to handle
-  // cases where we are deleted before our children are and
-  // vice-versa.
   if (this->has_children())
-    for (unsigned int c=0; c != this->n_children(); ++c)
+    for (unsigned int c = 0; c != this->n_children(); ++c)
       {
         Elem *child = this->child(c);
-        assert(child);
+        assert (child);
         if (child != remote_elem)
-          child->set_parent(const_cast<RemoteElem*>(remote_elem));
+          child->make_links_to_me_remote();
       }
+#endif
+
+  // Remotify any neighbor links
+  if (!this->subactive())
+    for (unsigned int s = 0; s != this->n_sides(); ++s)
+      {
+        Elem *neigh = this->neighbor(s);
+        if (neigh && neigh != remote_elem &&
+            this->level() == neigh->level())
+          {
+            unsigned int my_s = neigh->which_neighbor_am_i(this);
+            assert (my_s < neigh->n_neighbors());
+
+#ifdef ENABLE_AMR
+	    // My neighbor may have descendants which also consider me a
+	    // neighbor
+            std::vector<const Elem*> family;
+            neigh->family_tree_by_neighbor (family, this);
+
+            // FIXME - There's a lot of ugly const_casts here; we
+            // may want to make remote_elem non-const and create
+            // non-const versions of the family_tree methods
+            for (unsigned int i=0; i != family.size(); ++i)
+              {
+                Elem *n = const_cast<Elem*>(family[i]);
+                assert (n);
+                if (n == remote_elem)
+                  continue;
+                assert (n->which_neighbor_am_i(this) == my_s);
+                n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
+              }
+#else
+            neigh->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
+#endif
+          }
+      }
+
+#ifdef ENABLE_AMR
+  // Remotify parent's child link
   Elem *parent = this->parent();
   if (parent && parent != remote_elem)
     {
       unsigned int me = parent->which_child_am_i(this);
       parent->_children[me] = const_cast<RemoteElem*>(remote_elem);
+      this->set_parent(const_cast<RemoteElem*>(remote_elem));
     }
 #endif
 }
@@ -906,6 +906,7 @@ void Elem::nullify_neighbors ()
 	  if (neighbor->level() == this->level())
 	    {	
 	      const unsigned int w_n_a_i = neighbor->which_neighbor_am_i(this);
+              assert (w_n_a_i < neighbor->n_neighbors());
 	      neighbor->set_neighbor(w_n_a_i, NULL);
 	      this->set_neighbor(n, NULL);
 	    }
