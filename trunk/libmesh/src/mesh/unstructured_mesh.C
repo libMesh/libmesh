@@ -247,7 +247,8 @@ void UnstructuredMesh::find_neighbors()
 	  {
 	  next_side:
 	    
-	    if (element->neighbor(ms) == NULL)
+	    if (element->neighbor(ms) == NULL ||
+	        element->neighbor(ms) == remote_elem)
 	      {
 		// Get the key for the side of this element
 		const unsigned int key = element->key(ms);
@@ -362,16 +363,31 @@ void UnstructuredMesh::find_neighbors()
            el != end; ++el)
         {
           Elem* elem = *el;
+          assert(elem);
+          Elem* parent = elem->parent();
+          assert(parent);
 
-          assert (elem->parent() != NULL);
           for (unsigned int s=0; s < elem->n_neighbors(); s++)
-            if (elem->neighbor(s) == NULL)
+            if (elem->neighbor(s) == NULL ||
+                elem->neighbor(s) == remote_elem)
             {	    
+              if (elem->neighbor(s) == remote_elem)
+                {
+                  // Our "remote" neighbor might have been
+                  // gathered again, but not found because
+                  // it's coarser than we are.  But if this
+                  // potential neighbor is internal to our
+                  // parent then it's really not there.
+                  unsigned int c = parent->which_child_am_i(elem);
+                  if (!parent->is_child_on_side(c, s))
+                    continue;
+                }
+
               elem->set_neighbor(s, elem->parent()->neighbor(s));
 
 #ifdef DEBUG	    
               Elem *neigh = elem->neighbor(s);
-              if (neigh != NULL)
+              if (neigh != NULL && neigh != remote_elem)
                 // We ignore subactive elements here because
                 // we don't care about neighbors of subactive element.
                 if ((!neigh->active()) && (!elem->subactive()))
