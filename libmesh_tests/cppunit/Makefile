@@ -6,16 +6,16 @@ OBJECTS=$(SOURCES:.C=.o)
 EXECUTABLE=run_tests
 DEPEND= makedepend
 
-all: $(SOURCES) $(EXECUTABLE)
+all: $(EXECUTABLE)
 	
-$(EXECUTABLE): $(OBJECTS) depend
+$(EXECUTABLE): depend $(SOURCES) $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
 .C.o:
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	rm -rf *~* */*~* *.o */*.o run_tests
+	rm -rf *~* */*~* *.o */*.o run_tests .depends
 
 depend: $(SOURCES)
 	@touch .depends
