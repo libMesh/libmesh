@@ -48,6 +48,33 @@ struct ScalarTraits {
 };
 
 template<>
+struct ScalarTraits<signed char> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<char> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<short> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<int> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<long> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<unsigned char> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<unsigned short> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<unsigned int> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<unsigned long> { static const bool value = true; };
+
+template<>
 struct ScalarTraits<float> { static const bool value = true; };
 
 template<>
