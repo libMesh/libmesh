@@ -1643,6 +1643,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
         if (neigh->level() < elem->level()) 
           {
 	    unsigned int s_neigh = neigh->which_neighbor_am_i(elem);
+            assert (s_neigh < neigh->n_neighbors());
 
             // Find the minimum p level; we build the h constraint
             // matrix with this and then constrain away all higher p
