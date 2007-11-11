@@ -21,4 +21,4 @@ approx_type = HERMITE
 # Domain dimension (3D is only supported with HERMITE elements)
 dimension = 2
 
-max_linear_iterations = 100000
+max_linear_iterations = 1000
