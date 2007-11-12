@@ -514,15 +514,13 @@ void Elem::make_links_to_me_remote()
 {
   assert (this != remote_elem);
 
-  // We need to handle any children first
+  // We need to have handled any children first
 #ifdef ENABLE_AMR
   if (this->has_children())
     for (unsigned int c = 0; c != this->n_children(); ++c)
       {
         Elem *child = this->child(c);
-        assert (child);
-        if (child != remote_elem)
-          child->make_links_to_me_remote();
+        assert (child == remote_elem);
       }
 #endif
 
