@@ -808,7 +808,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 			  }
 		
 			elem = Elem::build(elem_type,my_parent).release();
-			my_parent->add_child(elem);
+			my_parent->add_child(elem, which_child);
 			assert (my_parent->type() == elem->type());
                         assert (my_parent->child(which_child) == elem);
 		      }
