@@ -163,8 +163,8 @@ Node& ParallelMesh::node (const unsigned int i)
 
 const Node* ParallelMesh::node_ptr (const unsigned int i) const
 {
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() == i);  
+//  assert (_nodes[i] != NULL);
+  assert (_nodes[i] == NULL || _nodes[i]->id() == i);  
   
   return _nodes[i];
 }
@@ -174,8 +174,8 @@ const Node* ParallelMesh::node_ptr (const unsigned int i) const
 
 Node* & ParallelMesh::node_ptr (const unsigned int i)
 {
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() == i);
+//  assert (_nodes[i] != NULL);
+  assert (_nodes[i] == NULL || _nodes[i]->id() == i);
 
   return _nodes[i];
 }
@@ -185,8 +185,8 @@ Node* & ParallelMesh::node_ptr (const unsigned int i)
 
 Elem* ParallelMesh::elem (const unsigned int i) const
 {
-  assert (_elements[i] != NULL);
-  assert (_elements[i]->id() == i);
+//  assert (_elements[i] != NULL);
+  assert (_elements[i] == NULL || _elements[i]->id() == i);
   
   return _elements[i];
 }
@@ -203,10 +203,11 @@ Elem* ParallelMesh::add_elem (Elem *e)
 
   if (!e->valid_id())
     {
-      // Use the unpartitioned ids for unpartitioned elems
-      // and temporarily for ghost elems
+      // Use the unpartitioned ids for unpartitioned elems,
+      // in serial, and temporarily for ghost elems
       unsigned int *next_id = &_next_free_unpartitioned_elem_id;
-      if (elem_procid == libMesh::processor_id())
+      if (elem_procid == libMesh::processor_id() &&
+          !this->is_serial())
         next_id = &_next_free_local_elem_id;
       e->set_id (*next_id);
       *next_id += libMesh::n_processors() + 1;
@@ -318,10 +319,11 @@ Node* ParallelMesh::add_node (Node *n)
 
   if (!n->valid_id())
     {
-      // Use the unpartitioned ids for unpartitioned nodes
-      // and temporarily for ghost nodes
+      // Use the unpartitioned ids for unpartitioned nodes,
+      // in serial, and temporarily for ghost nodes
       unsigned int *next_id = &_next_free_unpartitioned_node_id;
-      if (node_procid == libMesh::processor_id())
+      if (node_procid == libMesh::processor_id() &&
+          !this->is_serial())
         next_id = &_next_free_local_node_id;
       n->set_id (*next_id);
       *next_id += libMesh::n_processors() + 1;
