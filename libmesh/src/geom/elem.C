@@ -719,7 +719,7 @@ void Elem::add_child (Elem* elem)
 
   for (unsigned int c=0; c<this->n_children(); c++)
   {
-    if(_children[c] == NULL)
+    if(_children[c] == NULL || _children[c] == remote_elem)
     {
       _children[c] = elem;
       return;
