@@ -638,6 +638,14 @@ class Elem : public ReferenceCountedObject<Elem>,
   void add_child (Elem* elem);
 
   /**
+   * Adds a new child pointer to the specified index in the array of
+   * children of this element.  If this is the first child to be added,
+   * this method allocates memory in the parent's _children array,
+   * otherwise, it just sets the pointer.
+   */
+  void add_child (Elem* elem, unsigned int c);
+
+  /**
    * Fills the vector \p family with the children of this element,
    * recursively.  So, calling this method on a twice-refined element
    * will give you the element itself, its direct children, and their
