@@ -345,7 +345,7 @@ unsigned int MeshTools::n_active_local_levels(const MeshBase& mesh)
   for( ; el != end_el; ++el)
     max_level = std::max((*el)->level(), max_level);
 
-  return max_level;
+  return max_level + 1;
 }
 
 
@@ -354,7 +354,7 @@ unsigned int MeshTools::n_active_levels(const MeshBase& mesh)
 {
   parallel_only();
 
-  unsigned int max_level = MeshTools::n_active_local_levels(mesh);
+  unsigned int nl = MeshTools::n_active_local_levels(mesh);
 
   MeshBase::const_element_iterator el =
     mesh.active_pid_elements_begin(DofObject::invalid_processor_id);
@@ -362,10 +362,10 @@ unsigned int MeshTools::n_active_levels(const MeshBase& mesh)
     mesh.active_pid_elements_end(DofObject::invalid_processor_id);
 
   for( ; el != end_el; ++el)
-    max_level = std::max((*el)->level(), max_level);
+    nl = std::max((*el)->level() + 1, nl);
 
-  Parallel::max(max_level);
-  return max_level;
+  Parallel::max(nl);
+  return nl;
 }
 
 
@@ -380,7 +380,7 @@ unsigned int MeshTools::n_local_levels(const MeshBase& mesh)
   for( ; el != end_el; ++el)
     max_level = std::max((*el)->level(), max_level);
 
-  return max_level;
+  return max_level + 1;
 }
    
 
@@ -397,10 +397,10 @@ unsigned int MeshTools::n_levels(const MeshBase& mesh)
     mesh.pid_elements_end(DofObject::invalid_processor_id);
 
   for( ; el != end_el; ++el)
-    max_level = std::max((*el)->level(), max_level);
+    nl = std::max((*el)->level() + 1, nl);
 
-  Parallel::max(max_level);
-  return max_level;
+  Parallel::max(nl);
+  return nl;
 }
 
 
