@@ -1805,13 +1805,13 @@ void MeshRefinement::make_elems_parallel_consistent()
        it != end; ++it)
     {
       Elem *elem = *it;
-      assert (elem);
+      unsigned int elem_procid = elem->processor_id();
 
-      // We only have to worry about new child elements
-      if (!elem->parent() || !elem->active())
+      // We only have to worry about new ghost child elements
+      if (!elem->parent() || !elem->active() ||
+          elem_procid == libMesh::processor_id())
         continue;
 
-      unsigned int elem_procid = elem->processor_id();
       assert (elem_procid != DofObject::invalid_processor_id);
 
       ghost_objects_from_proc[elem_procid]++;
@@ -1838,14 +1838,23 @@ void MeshRefinement::make_elems_parallel_consistent()
       unsigned int elem_procid = elem->processor_id();
       const Elem *parent = elem->parent();
 
-      // We only have to worry about new child elements
-      if (!parent || !elem->active())
+      // We only have to worry about new ghost child elements
+      if (!parent || !elem->active() ||
+          elem_procid == libMesh::processor_id())
         continue;
 
       requested_parent_ids[elem_procid].push_back(parent->id());
       requested_child_nums[elem_procid].push_back
         (parent->which_child_am_i(elem));
     }
+#ifdef DEBUG
+  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+    if (p != libMesh::processor_id())
+      {
+        assert(requested_parent_ids[p].size() == ghost_objects_from_proc[p]);
+        assert(requested_child_nums[p].size() == ghost_objects_from_proc[p]);
+      }
+#endif
 
   // Trade requests with other processors
   for (unsigned int p=1; p != libMesh::n_processors(); ++p)
