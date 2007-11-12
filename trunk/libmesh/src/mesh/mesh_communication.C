@@ -225,7 +225,8 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     // The conn array contains the information needed to construct each element.
     // Pack all this information into one communication to avoid two latency hits
     // For each element it is of the form
-    // [ level etype subdomain_id self_ID parent_ID node_0 node_1 ... node_n]
+    // [ level p_level r_flag p_flag etype subdomain_id 
+    //   self_ID parent_ID which_child node_0 node_1 ... node_n]
     // We cannot use unsigned int because parent_ID can be negative
     std::vector<int> conn;
 
@@ -233,7 +234,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     // broadcast it to the other processors.
     if (libMesh::processor_id() == 0)
       {
-	conn.reserve (8*n_elem + total_weight);
+	conn.reserve (9*n_elem + total_weight);
 	
 	// We start from level 0. This is a bit simpler than in xdr_io.C
 	// because we do not have to worry about economizing by group elements
@@ -257,10 +258,10 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	  }
       }
     else
-      conn.resize (8*n_elem + total_weight);
+      conn.resize (9*n_elem + total_weight);
     
     // Sanity check for all processors
-    assert (conn.size() == (8*n_elem + total_weight));
+    assert (conn.size() == (9*n_elem + total_weight));
     
     // Broadcast the element connectivity
     Parallel::broadcast (conn);
@@ -293,6 +294,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	    const int subdomain_ID   = conn[cnt++];
             const int self_ID        = conn[cnt++];
             const int parent_ID      = conn[cnt++];
+            const int which_child    = conn[cnt++];
 	    
 #ifdef ENABLE_AMR
 
@@ -313,6 +315,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 		elem = Elem::build(elem_type,my_parent).release();
 		my_parent->add_child(elem);
 		assert (my_parent->type() == elem->type());
+                assert (my_parent->child(which_child) == elem);
 	      }
 	    
             else // level 0 element has no parent
@@ -668,7 +671,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
     Parallel::max (global_n_levels);
     
     // The conn array contains the information needed to construct each element.
-    std::vector<int> conn; conn.reserve (8*n_elem[libMesh::processor_id()] + local_weight);
+    std::vector<int> conn; conn.reserve (9*n_elem[libMesh::processor_id()] + local_weight);
 						
     for (unsigned int level=0; level<=local_n_levels; level++)
       {
@@ -693,7 +696,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	  }
       } // ...that was easy.
 
-    assert (conn.size() == 8*n_elem[libMesh::processor_id()] + local_weight);
+    assert (conn.size() == 9*n_elem[libMesh::processor_id()] + local_weight);
 
     // Get the size of the connectivity array on each processor
     std::vector<unsigned int>
@@ -743,6 +746,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	        const int subdomain_ID        = conn[cnt++];
                 const unsigned int self_ID    = conn[cnt++];
                 const int parent_ID           = conn[cnt++];
+                const int which_child         = conn[cnt++];
 
 		// We require contiguous numbering on each processor
 		// for elements.
@@ -761,8 +765,11 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 		    cnt += elem->n_nodes();
 		  }
 
-		else if (elem_level < level) // we should already have this element, so there
-		  {                          // is no need to construct a dummy element of this type
+		else if (elem_level < level ||     // we should already have
+		         (elem_level == level &&   // lower level and some
+                          mesh.elem(self_ID)))     // ghost elements
+		  {
+                    // No need to construct a dummy element of this type
 		    const Elem* elem = mesh.elem(self_ID);
 
                     assert (elem);
@@ -778,19 +785,21 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 
 		    cnt += elem->n_nodes();
 		  }
-
 		// Those are the easy cases...
-		else // elem_level == level
+		// now elem_level == level and we don't have it
+		else
 		  {
 		    // Declare the element we will add
 		    Elem* elem = NULL;
 
+#ifdef ENABLE_AMR
 		    // Maybe find its parent
 		    if (level > 0)
 		      {
 			Elem* my_parent = mesh.elem(parent_ID);
 
-			// If the parent was not previously added, we cannot continue.
+			// If the parent was not previously added, we
+			// cannot continue.
 			if (my_parent == NULL)
 			  {
 			    std::cerr << "Parent element with ID " << parent_ID 
@@ -799,12 +808,12 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 			  }
 		
 			elem = Elem::build(elem_type,my_parent).release();
-#ifdef ENABLE_AMR
 			my_parent->add_child(elem);
-#endif // ENABLE_AMR
 			assert (my_parent->type() == elem->type());
+                        assert (my_parent->child(which_child) == elem);
 		      }
 		    else
+#endif // ENABLE_AMR
                       {
                         assert (parent_ID == -1);
 		        elem = Elem::build(elem_type).release();
@@ -1096,7 +1105,8 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
 
 // Pack all this information into one communication to avoid two latency hits
 // For each element it is of the form
-// [ level etype subdomain_id self_ID parent_ID node_0 node_1 ... node_n]
+// [ level p_level r_flag p_flag etype subdomain_id 
+//   self_ID parent_ID which_child node_0 node_1 ... node_n]
 // We cannot use unsigned int because parent_ID can be negative
 void MeshCommunication::pack_element (std::vector<int> &conn, const Elem* &elem) const
 {
@@ -1115,9 +1125,15 @@ void MeshCommunication::pack_element (std::vector<int> &conn, const Elem* &elem)
 		
   // use parent_ID of -1 to indicate a level 0 element
   if (elem->level() == 0)
-    conn.push_back(-1);
+    {
+      conn.push_back(-1);
+      conn.push_back(-1);
+    }
   else
-    conn.push_back(elem->parent()->id());
+    {
+      conn.push_back(elem->parent()->id());
+      conn.push_back(elem->parent()->which_child_am_i(elem));
+    }
   
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     conn.push_back (elem->node(n));		
