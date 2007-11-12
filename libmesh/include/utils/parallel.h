@@ -541,6 +541,7 @@ namespace Parallel
     for (unsigned int i = 0; i != recvsize; ++i)
       {
 	recvsizesum += recvsizes[i];
+	recv[i].resize(recvsizes[i]);
       }
 
     // Build temporary buffers third
