@@ -389,7 +389,7 @@ unsigned int MeshTools::n_levels(const MeshBase& mesh)
 {
   parallel_only();
 
-  unsigned int max_level = MeshTools::n_local_levels(mesh);
+  unsigned int nl = MeshTools::n_local_levels(mesh);
 
   MeshBase::const_element_iterator el =
     mesh.pid_elements_begin(DofObject::invalid_processor_id);
