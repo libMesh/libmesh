@@ -188,10 +188,31 @@ namespace MeshTools
 
   /**
    * Return the number of levels of refinement in the mesh.
-   * Implemented by looping over all the elements and finding the maximum
-   * level.
+   * Implemented by looping over all the local elements and finding the
+   * maximum level, then summing in parallel.
    */
   unsigned int n_levels(const MeshBase& mesh);
+
+  /**
+   * Return the number of levels of refinement in the local mesh.
+   * Implemented by looping over all the local elements and finding the
+   * maximum level.
+   */
+  unsigned int n_local_levels(const MeshBase& mesh);
+ 
+  /**
+   * Return the number of levels of refinement in the active mesh.
+   * Implemented by looping over all the active local elements and finding
+   * the maximum level, then summing in parallel.
+   */
+  unsigned int n_active_levels(const MeshBase& mesh);
+
+  /**
+   * Return the number of levels of refinement in the active local mesh.
+   * Implemented by looping over all the active local elements and finding
+   * the maximum level.
+   */
+  unsigned int n_active_local_levels(const MeshBase& mesh);
  
   /**
    * Builds a set of node IDs for nodes which belong to non-subactive
