@@ -528,9 +528,9 @@ void ParallelMesh::assert_valid_parallel_flags () const
       Elem* elem = _elements[i]; // Returns NULL if there's no map entry
 
       unsigned int refinement_flag   = elem ?
-        elem->refinement_flag() : libMesh::invalid_uint;
+        static_cast<unsigned int> (elem->refinement_flag()) : libMesh::invalid_uint;
       unsigned int p_refinement_flag = elem ?
-        elem->p_refinement_flag() : libMesh::invalid_uint;
+        static_cast<unsigned int> (elem->p_refinement_flag()) : libMesh::invalid_uint;
 
       unsigned int min_rflag = refinement_flag;
       Parallel::min(min_rflag);
