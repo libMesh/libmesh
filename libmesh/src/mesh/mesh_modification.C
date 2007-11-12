@@ -964,10 +964,10 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
     {
       /*
        * loop over the mesh refinement level
-       * TODO: the maximum should be mesh.max_refinement_level(),
-       *       but this does not exist (yet)
        */
-      for (unsigned int refinement_level=0; refinement_level<10; refinement_level++)
+      unsigned int n_levels = MeshTools::n_levels(mesh);
+      for (unsigned int refinement_level=0; refinement_level != n_levels;
+           refinement_level++)
         {
           // initialize the storage (have to do it on every level to get empty vectors
           std::vector<Point> new_positions;
