@@ -325,7 +325,7 @@ void UnstructuredMesh::find_neighbors()
    * Furthermore, that neighbor better be active,
    * otherwise we missed a child somewhere.
    */
-  const unsigned int n_levels = MeshTools::n_levels(*this);
+  const unsigned int n_levels = MeshTools::n_local_levels(*this);
   for (unsigned int level = 1; level <= n_levels; ++level)
     {
       element_iterator end = this->level_elements_end(level);
