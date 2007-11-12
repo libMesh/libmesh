@@ -363,7 +363,7 @@ void assemble_stokes (EquationSystems& es,
 		  // The location on the boundary of the current
 		  // node.
 		   
-		  const Real xf = side->point(ns)(0);
+		  // const Real xf = side->point(ns)(0);
 		  const Real yf = side->point(ns)(1);
 		  
 		  // The penalty value.  \f$ \frac{1}{\epsilon \f$
