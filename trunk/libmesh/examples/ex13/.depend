@@ -8,7 +8,6 @@ ex13.$(obj-suffix):\
     ../../include/base/libmesh_common.h\
     ../../include/base/libmesh_config.h\
     ../../include/base/multi_predicates.h\
-    ../../include/base/node.h\
     ../../include/base/reference_counted_object.h\
     ../../include/base/reference_counter.h\
     ../../include/base/single_predicates.h\
@@ -27,6 +26,7 @@ ex13.$(obj-suffix):\
     ../../include/fe/fe_type.h\
     ../../include/geom/elem.h\
     ../../include/geom/elem_type.h\
+    ../../include/geom/node.h\
     ../../include/geom/point.h\
     ../../include/mesh/boundary_info.h\
     ../../include/mesh/gmv_io.h\

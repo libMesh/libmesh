@@ -7,7 +7,6 @@ ex1.$(obj-suffix):\
     ../../include/base/libmesh_common.h\
     ../../include/base/libmesh_config.h\
     ../../include/base/multi_predicates.h\
-    ../../include/base/node.h\
     ../../include/base/reference_counted_object.h\
     ../../include/base/reference_counter.h\
     ../../include/base/single_predicates.h\
@@ -18,6 +17,7 @@ ex1.$(obj-suffix):\
     ../../include/enums/enum_order.h\
     ../../include/enums/enum_solver_package.h\
     ../../include/geom/elem.h\
+    ../../include/geom/node.h\
     ../../include/geom/point.h\
     ../../include/mesh/mesh.h\
     ../../include/mesh/mesh_base.h\
