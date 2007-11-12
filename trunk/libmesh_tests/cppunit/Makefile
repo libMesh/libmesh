@@ -1,5 +1,5 @@
 CC=$(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --cxx)
-CFLAGS=-g -c -Wall $(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --cxxflags --include$)
+CFLAGS=-c -Wall $(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --cxxflags --include$)
 LDFLAGS=-lcppunit $(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --ldflags)
 SOURCES=$(shell find ./ -name "*.C")
 OBJECTS=$(SOURCES:.C=.o)
