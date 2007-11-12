@@ -733,6 +733,22 @@ void Elem::add_child (Elem* elem)
 
 
 
+void Elem::add_child (Elem* elem, unsigned int c)
+{
+  if(_children == NULL)
+  {
+    _children = new Elem*[this->n_children()];
+    
+    for (unsigned int i=0; i<this->n_children(); i++)
+      _children[i] = NULL;
+  }
+
+  assert (_children[c] == NULL || _children[c] == remote_elem);
+  _children[c] = elem;
+}
+
+
+
 bool Elem::is_child_on_edge(const unsigned int c,
                             const unsigned int e) const
 {
