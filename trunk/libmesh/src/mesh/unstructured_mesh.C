@@ -32,6 +32,7 @@
 #include "libmesh_logging.h"
 #include "elem.h"
 #include "mesh_tools.h" // For n_levels
+#include "parallel.h"
 #include "remote_elem.h"
 
 #include "diva_io.h"
@@ -165,6 +166,9 @@ void UnstructuredMesh::find_neighbors()
 {
   assert(this->n_nodes() != 0);
   assert(this->n_elem()  != 0);
+
+  // This function must be run on all processors at once
+  parallel_only();
 
   START_LOG("find_neighbors()", "Mesh");
   
@@ -325,8 +329,8 @@ void UnstructuredMesh::find_neighbors()
    * Furthermore, that neighbor better be active,
    * otherwise we missed a child somewhere.
    */
-  const unsigned int n_levels = MeshTools::n_local_levels(*this);
-  for (unsigned int level = 1; level <= n_levels; ++level)
+  const unsigned int n_levels = MeshTools::n_levels(*this);
+  for (unsigned int level = 1; level < n_levels; ++level)
     {
       element_iterator end = this->level_elements_end(level);
       for (element_iterator el = this->level_elements_begin(level);
