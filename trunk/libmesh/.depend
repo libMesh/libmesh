@@ -4267,6 +4267,7 @@ src/mesh/unstructured_mesh.$(obj-suffix):\
     include/mesh/xdr_io.h\
     include/numerics/type_vector.h\
     include/utils/o_string_stream.h\
+    include/utils/parallel.h\
     include/utils/perf_log.h
 src/mesh/unv_io.$(obj-suffix):\
     src/mesh/unv_io.C\
