@@ -435,20 +435,19 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 	elem->set_refinement_flag(Elem::DO_NOTHING);
     }
 
-  
+  // Parallel consistency has to come first, or coarsening
+  // along processor boundaries might occasionally be falsely
+  // prevented
+  if (!_mesh.is_serial())
+    this->make_flags_parallel_consistent();
+
   // Repeat until coarsening & refinement flags jive
   bool satisfied = false;
   do
     {
-      // Parallel consistency has to come first, or coarsening
-      // along processor boundaries might occasionally be falsely
-      // prevented
-      const bool parallel_consistent = _mesh.is_serial() ||
-        this->make_flags_parallel_consistent();
-      
       const bool coarsening_satisfied =
 	this->make_coarsening_compatible(maintain_level_one);
-      
+
       const bool refinement_satisfied =
 	this->make_refinement_compatible(maintain_level_one);
 
@@ -462,6 +461,13 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
       if (_node_level_mismatch_limit)
         smoothing_satisfied = smoothing_satisfied &&
           !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
+
+      // Parallel consistency has to come first, or coarsening
+      // along processor boundaries might occasionally be falsely
+      // prevented
+
+      const bool parallel_consistent = _mesh.is_serial() ||
+        this->make_flags_parallel_consistent();
 
       satisfied = (parallel_consistent &&
                    coarsening_satisfied &&
@@ -498,7 +504,7 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   // take up some space, maybe more than what was freed.
   const bool refining_changed_mesh =
     this->_refine_elements();
-  
+
   if (_maintain_level_one)
     assert(test_level_one(true));
   assert(test_unflagged(true));
@@ -572,13 +578,16 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 	elem->set_refinement_flag(Elem::DO_NOTHING);
     }
 
+  // Parallel consistency has to come first, or coarsening
+  // along processor boundaries might occasionally be falsely
+  // prevented
+  if (!_mesh.is_serial())
+    this->make_flags_parallel_consistent();
+
   // Repeat until the flags form a conforming mesh.
   bool satisfied = false;
   while (!satisfied)
     {
-      const bool parallel_consistent = _mesh.is_serial() ||
-        this->make_flags_parallel_consistent();
-      
       const bool coarsening_satisfied =
 	this->make_coarsening_compatible(maintain_level_one);
 
@@ -592,6 +601,9 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
       if (_node_level_mismatch_limit)
         smoothing_satisfied = smoothing_satisfied &&
           !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
+
+      const bool parallel_consistent = _mesh.is_serial() ||
+        this->make_flags_parallel_consistent();
       
       satisfied = (parallel_consistent &&
                    coarsening_satisfied &&
@@ -676,14 +688,18 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
 	elem->set_refinement_flag(Elem::DO_NOTHING);
     }
 
+
   
+  // Parallel consistency has to come first, or coarsening
+  // along processor boundaries might occasionally be falsely
+  // prevented
+  if (!_mesh.is_serial())
+    this->make_flags_parallel_consistent();
+
   // Repeat until coarsening & refinement flags jive
   bool satisfied = false;
   while (!satisfied)
     {
-      const bool parallel_consistent = _mesh.is_serial() ||
-        this->make_flags_parallel_consistent();
-      
       const bool refinement_satisfied =
 	this->make_refinement_compatible(maintain_level_one);
 
@@ -697,6 +713,9 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
       if (_node_level_mismatch_limit)
         smoothing_satisfied = smoothing_satisfied &&
           !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
+
+      const bool parallel_consistent = _mesh.is_serial() ||
+        this->make_flags_parallel_consistent();
       
       satisfied = (parallel_consistent &&
                    refinement_satisfied &&
