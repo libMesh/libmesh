@@ -335,12 +335,47 @@ unsigned int MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase& me
 }
 
 
-unsigned int MeshTools::n_levels(const MeshBase& mesh)
+unsigned int MeshTools::n_active_local_levels(const MeshBase& mesh)
 {
   unsigned int max_level = 0;
 
-  MeshBase::const_element_iterator el = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_elements_end();
+  MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+  for( ; el != end_el; ++el)
+    max_level = std::max((*el)->level(), max_level);
+
+  return max_level;
+}
+
+
+
+unsigned int MeshTools::n_active_levels(const MeshBase& mesh)
+{
+  parallel_only();
+
+  unsigned int max_level = MeshTools::n_active_local_levels(mesh);
+
+  MeshBase::const_element_iterator el =
+    mesh.active_pid_elements_begin(DofObject::invalid_processor_id);
+  const MeshBase::const_element_iterator end_el =
+    mesh.active_pid_elements_end(DofObject::invalid_processor_id);
+
+  for( ; el != end_el; ++el)
+    max_level = std::max((*el)->level(), max_level);
+
+  Parallel::max(max_level);
+  return max_level;
+}
+
+
+
+unsigned int MeshTools::n_local_levels(const MeshBase& mesh)
+{
+  unsigned int max_level = 0;
+
+  MeshBase::const_element_iterator el = mesh.local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
 
   for( ; el != end_el; ++el)
     max_level = std::max((*el)->level(), max_level);
@@ -348,6 +383,26 @@ unsigned int MeshTools::n_levels(const MeshBase& mesh)
   return max_level;
 }
    
+
+
+unsigned int MeshTools::n_levels(const MeshBase& mesh)
+{
+  parallel_only();
+
+  unsigned int max_level = MeshTools::n_local_levels(mesh);
+
+  MeshBase::const_element_iterator el =
+    mesh.pid_elements_begin(DofObject::invalid_processor_id);
+  const MeshBase::const_element_iterator end_el =
+    mesh.pid_elements_end(DofObject::invalid_processor_id);
+
+  for( ; el != end_el; ++el)
+    max_level = std::max((*el)->level(), max_level);
+
+  Parallel::max(max_level);
+  return max_level;
+}
+
 
 
 void MeshTools::get_not_subactive_node_ids(const MeshBase& mesh,
