@@ -155,37 +155,7 @@ void UnstructuredMesh::assert_valid_neighbors() const
     {
       const Elem* elem = *el;
       assert (elem);
-
-      if (elem->subactive())
-        continue;
-
-      for (unsigned int s=0; s<elem->n_neighbors(); s++)
-        {
-          const Elem *neigh = elem->neighbor(s);
-          if (neigh == remote_elem)
-            continue;
-
-          if (neigh)
-            {
-              assert (!neigh->subactive());
-
-              unsigned int rev = neigh->which_neighbor_am_i(elem);
-              assert (rev < neigh->n_neighbors());
-
-              Elem *nn = neigh->neighbor(rev);
-              assert(nn);
-
-              for (const Elem *eparent = elem; eparent != nn;
-                   eparent = eparent->parent())
-                assert(eparent);
-            }
-          else
-            {
-              const Elem *parent = elem->parent();
-              if (parent)
-                assert (!parent->neighbor(s));
-            }
-        }
+      elem->assert_valid_neighbors();
     }
 }
 
