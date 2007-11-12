@@ -1059,8 +1059,6 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
           }
     }
 
-mesh.assert_valid_neighbors();
-
   // Delete all the elements we have no reason to save,
   // starting with the most refined so that the mesh
   // is valid at all intermediate steps
@@ -1082,7 +1080,6 @@ mesh.assert_valid_neighbors();
               // delete_elem doesn't currently invalidate element
               // iterators... that had better not change
               mesh.delete_elem(elem);
-mesh.assert_valid_neighbors();
             }
         }
     }
