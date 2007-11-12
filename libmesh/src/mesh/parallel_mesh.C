@@ -736,6 +736,12 @@ void ParallelMesh::renumber_nodes_and_elements ()
 {
   START_LOG("renumber_nodes_and_elements()", "ParallelMesh");
 
+#ifdef DEBUG
+// Make sure our ids and flags are consistent
+  this->assert_valid_parallel_ids();
+  this->assert_valid_parallel_flags();
+#endif
+
   std::set<unsigned int> used_nodes;
 
   // flag the nodes we need
