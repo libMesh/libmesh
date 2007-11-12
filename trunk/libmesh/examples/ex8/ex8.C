@@ -101,6 +101,14 @@ int main (int argc, char** argv)
   // Initialize Petsc, like in example 2.
   libMesh::init (argc, argv);
 
+#ifdef ENABLE_PARMESH
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example directly references\n"
+              << "all mesh nodes and is incompatible with"
+              << "ParallelMesh use."
+              << std::endl;
+#else
+
   // Braces are used to force object scope.
   {
     // Check for proper usage.
@@ -331,6 +339,7 @@ int main (int argc, char** argv)
 		<< std::endl;
       }
   }
+#endif
   
   // All done.  
   return libMesh::close ();
