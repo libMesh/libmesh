@@ -455,6 +455,61 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
 
 
 
+void Elem::assert_valid_neighbors() const
+{
+  for (unsigned int s=0; s<this->n_neighbors(); s++)
+    {
+      const Elem *neigh = this->neighbor(s);
+
+      // Any element might have a remote neighbor; checking
+      // to make sure that's not inaccurate is tough.
+      if (neigh == remote_elem)
+        continue;
+
+      if (neigh)
+        {
+          // Only subactive elements have subactive neighbors
+          assert (this->subactive() || !neigh->subactive());
+
+          const Elem *elem = this;
+
+          // If we're subactive but our neighbor isn't, its
+          // return neighbor link will be to our first active
+          // ancestor
+          if (this->subactive() && !neigh->subactive())
+            {
+              for (elem = this; !elem->active();
+                   elem = elem->parent())
+                assert(elem);
+            }
+
+          unsigned int rev = neigh->which_neighbor_am_i(elem);
+          assert (rev < neigh->n_neighbors());
+
+          if (this->subactive() && !neigh->subactive())
+            {
+              assert (neigh->neighbor(rev) == elem);
+            }
+          else
+            {
+              Elem *nn = neigh->neighbor(rev);
+              assert(nn);
+
+              for (; elem != nn; elem = elem->parent())
+                assert(elem);
+            }
+        }
+      else
+        {
+          const Elem *parent = this->parent();
+          if (parent)
+            assert (!parent->neighbor(s));
+        }
+    }
+}
+
+
+
 void Elem::make_links_to_me_remote()
 {
   assert (this != remote_elem);

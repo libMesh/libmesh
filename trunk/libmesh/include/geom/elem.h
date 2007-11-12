@@ -217,6 +217,12 @@ class Elem : public ReferenceCountedObject<Elem>,
   void find_point_neighbors(std::set<const Elem *> &neighbor_set) const;
 
   /**
+   * This function checks for consistent neighbor links at this
+   * element.
+   */
+  void assert_valid_neighbors() const;
+
+  /**
    * Resets this element's neighbors' appropriate neighbor pointers
    * and its parent's and children's appropriate pointers
    * to point to the global remote_elem instead of this.
