@@ -233,7 +233,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     // broadcast it to the other processors.
     if (libMesh::processor_id() == 0)
       {
-	conn.reserve (5*n_elem + total_weight);
+	conn.reserve (8*n_elem + total_weight);
 	
 	// We start from level 0. This is a bit simpler than in xdr_io.C
 	// because we do not have to worry about economizing by group elements
@@ -257,10 +257,10 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	  }
       }
     else
-      conn.resize (5*n_elem + total_weight);
+      conn.resize (8*n_elem + total_weight);
     
     // Sanity check for all processors
-    assert (conn.size() == (5*n_elem + total_weight));
+    assert (conn.size() == (8*n_elem + total_weight));
     
     // Broadcast the element connectivity
     Parallel::broadcast (conn);
@@ -284,6 +284,11 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 
 	    // Unpack the element header
 	    const int level          = conn[cnt++];
+	    const int p_level        = conn[cnt++];
+	    const Elem::RefinementState refinement_flag   =
+              static_cast<Elem::RefinementState>(conn[cnt++]);
+	    const Elem::RefinementState p_refinement_flag =
+              static_cast<Elem::RefinementState>(conn[cnt++]);
             const ElemType elem_type = static_cast<ElemType>(conn[cnt++]);
 	    const int subdomain_ID   = conn[cnt++];
             const int self_ID        = conn[cnt++];
@@ -303,10 +308,9 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 		    error();
 		  }
 		
-		my_parent->set_refinement_flag(Elem::INACTIVE);
+                assert (my_parent->refinement_flag() == Elem::INACTIVE);
 		
 		elem = Elem::build(elem_type,my_parent).release();
-		elem->set_refinement_flag(Elem::JUST_REFINED); 
 		my_parent->add_child(elem);
 		assert (my_parent->type() == elem->type());
 	      }
@@ -322,6 +326,9 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 
 	    // Assign the IDs
 	    assert (elem->level() == static_cast<unsigned int>(level));
+	    elem->set_refinement_flag(refinement_flag); 
+	    elem->set_p_refinement_flag(p_refinement_flag); 
+	    elem->set_p_level(p_level); 
             elem->subdomain_id() = subdomain_ID;
             elem->set_id() = self_ID;
 	    
@@ -648,7 +655,6 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
     assert (global_n_nodes == mesh.n_nodes());
   }
   
-  
   //----------------------------------------------------
   // Gather the element connectivity from each processor.
   {
@@ -656,14 +662,13 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
     // will allow for efficient preallocation.
     const unsigned int
       local_weight   = MeshTools::weight(mesh),
-      local_n_levels = MeshTools::n_levels(mesh); // Strictly speaking, this looks at all elements,
-                                                  // not just the local ones.  That is OK, though. 
+      local_n_levels = MeshTools::n_local_levels(mesh);
 
     unsigned int global_n_levels = local_n_levels;
     Parallel::max (global_n_levels);
     
     // The conn array contains the information needed to construct each element.
-    std::vector<int> conn; conn.reserve (5*n_elem[libMesh::processor_id()] + local_weight);
+    std::vector<int> conn; conn.reserve (8*n_elem[libMesh::processor_id()] + local_weight);
 						
     for (unsigned int level=0; level<=local_n_levels; level++)
       {
@@ -678,6 +683,9 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	    assert (elem != NULL);
 	    assert (elem->level() == level);
 	    
+	    // We're not handling unpartitioned elements!
+	    assert (elem->processor_id() != DofObject::invalid_processor_id);
+
 	    // Only local elements!
 	    if (elem->processor_id() != libMesh::processor_id()) continue;
 
@@ -685,7 +693,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	  }
       } // ...that was easy.
 
-    assert (conn.size() == 5*n_elem[libMesh::processor_id()] + local_weight);
+    assert (conn.size() == 8*n_elem[libMesh::processor_id()] + local_weight);
 
     // Get the size of the connectivity array on each processor
     std::vector<unsigned int>
@@ -725,12 +733,17 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	    while (cnt < (conn_offset[p] + conn_size[p]))
 	      {
 		// Unpack the element header
-		const unsigned int elem_level = conn[cnt++];
-		const ElemType elem_type      = static_cast<ElemType>(conn[cnt++]);
-		const int subdomain_ID        = conn[cnt++];
-		const unsigned int self_ID    = conn[cnt++];
-		const int parent_ID           = conn[cnt++];
-	       
+	        const unsigned int elem_level = conn[cnt++];
+	        const unsigned int p_level    = conn[cnt++];
+	        const Elem::RefinementState refinement_flag   =
+                  static_cast<Elem::RefinementState>(conn[cnt++]);
+	        const Elem::RefinementState p_refinement_flag =
+                  static_cast<Elem::RefinementState>(conn[cnt++]);
+                const ElemType elem_type      = static_cast<ElemType>(conn[cnt++]);
+	        const int subdomain_ID        = conn[cnt++];
+                const unsigned int self_ID    = conn[cnt++];
+                const int parent_ID           = conn[cnt++];
+
 		// We require contiguous numbering on each processor
 		// for elements.
 		assert (self_ID >= first_global_idx);
@@ -752,8 +765,16 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 		  {                          // is no need to construct a dummy element of this type
 		    const Elem* elem = mesh.elem(self_ID);
 
-		    assert (elem->subdomain_id() == subdomain_ID);
-		    assert (elem->id()           == self_ID);
+                    assert (elem);
+		    assert (elem->p_level()           == p_level);
+		    assert (elem->refinement_flag()   == refinement_flag);
+		    assert (elem->p_refinement_flag() == p_refinement_flag);
+		    assert (elem->type()              == elem_type);
+		    assert (elem->subdomain_id()      == subdomain_ID);
+		    assert (elem->id()                == self_ID);
+		    assert (!elem->parent() ||
+                            elem->parent()->id() ==
+                            static_cast<unsigned int>(parent_ID));
 
 		    cnt += elem->n_nodes();
 		  }
@@ -779,17 +800,22 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 		
 			elem = Elem::build(elem_type,my_parent).release();
 #ifdef ENABLE_AMR
-			my_parent->set_refinement_flag(Elem::INACTIVE);
-			elem->set_refinement_flag(Elem::JUST_REFINED);
 			my_parent->add_child(elem);
 #endif // ENABLE_AMR
 			assert (my_parent->type() == elem->type());
 		      }
 		    else
-		      elem = Elem::build(elem_type).release();
+                      {
+                        assert (parent_ID == -1);
+		        elem = Elem::build(elem_type).release();
+                      }
 		      
 		    // Assign the IDs
+		    assert (elem);
 		    assert (elem->level() == static_cast<unsigned int>(level));
+		    elem->set_p_level(p_level);
+		    elem->set_refinement_flag(refinement_flag);
+		    elem->set_p_refinement_flag(p_refinement_flag);
 		    elem->subdomain_id() = subdomain_ID;
 		    elem->processor_id() = p;
 		    elem->set_id()       = self_ID;
@@ -986,11 +1012,11 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
       const Elem *elem = *l_elem_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         local_nodes[elem->node(n)] = true;
-      const Elem *parent = elem->parent();
-      while (parent)
+      const Elem *a = elem;
+      while (a)
         {
-          semilocal_elems[parent->id()] = true;
-          parent = parent->parent();
+          semilocal_elems[a->id()] = true;
+          a = a->parent();
         }
     }
 
@@ -1005,11 +1031,11 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
       const Elem *elem = *u_elem_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         local_nodes[elem->node(n)] = true;
-      const Elem *parent = elem->parent();
-      while (parent)
+      const Elem *a = elem;
+      while (a)
         {
-          semilocal_elems[parent->id()] = true;
-          parent = parent->parent();
+          semilocal_elems[a->id()] = true;
+          a = a->parent();
         }
     }
 
@@ -1023,31 +1049,41 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         if (local_nodes[elem->node(n)])
           {
-            semilocal_elems[elem->id()] = true;
-            const Elem *parent = elem->parent();
-            while (parent)
+            const Elem *a = elem;
+            while (a)
               {
-                semilocal_elems[parent->id()] = true;
-                parent = parent->parent();
+                semilocal_elems[a->id()] = true;
+                a = a->parent();
               }
             break;
           }
     }
 
-  // Delete all the elements we have no reason to save
-  nl_elem_it = mesh.not_local_elements_begin();
-  for (; nl_elem_it != nl_end; ++nl_elem_it)
-    {
-      Elem *elem = *nl_elem_it;
-      assert (elem);
-      if (!semilocal_elems[elem->id()])
-        {
-          // Make sure we don't leave any invalid pointers
-          elem->make_links_to_me_remote();
+mesh.assert_valid_neighbors();
 
-          // delete_elem doesn't currently invalidate element
-          // iterators... that had better not change
-          mesh.delete_elem(elem);
+  // Delete all the elements we have no reason to save,
+  // starting with the most refined so that the mesh
+  // is valid at all intermediate steps
+  unsigned int n_levels = MeshTools::n_levels(mesh);
+
+  for (int l = n_levels - 1; l >= 0; --l)
+    {
+      MeshBase::element_iterator lev_elem_it = mesh.level_elements_begin(l),
+                                 lev_end     = mesh.level_elements_end(l);
+      for (; lev_elem_it != lev_end; ++lev_elem_it)
+        {
+          Elem *elem = *lev_elem_it;
+          assert (elem);
+          if (!semilocal_elems[elem->id()])
+            {
+              // Make sure we don't leave any invalid pointers
+              elem->make_links_to_me_remote();
+
+              // delete_elem doesn't currently invalidate element
+              // iterators... that had better not change
+              mesh.delete_elem(elem);
+mesh.assert_valid_neighbors();
+            }
         }
     }
 
@@ -1073,6 +1109,9 @@ void MeshCommunication::pack_element (std::vector<int> &conn, const Elem* &elem)
   assert (!elem->p_level());
   
   conn.push_back (static_cast<int>(elem->level()));
+  conn.push_back (static_cast<int>(elem->p_level()));
+  conn.push_back (static_cast<int>(elem->refinement_flag()));
+  conn.push_back (static_cast<int>(elem->p_refinement_flag()));
   conn.push_back (static_cast<int>(elem->type()));
   conn.push_back (static_cast<int>(elem->subdomain_id()));
   conn.push_back (elem->id());
