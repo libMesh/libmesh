@@ -1,0 +1,107 @@
+========================================================================
+CONTACT:
+
+Greg Sjaardema,
+Sandia National Laboratories,
+gdsjaar@sandia.gov
+
+========================================================================
+LICENSE:
+The ExodusII library is licensed under the terms of the BSD License. 
+
+Legal stuff (copyright, licensing restrictions, etc.) can be found in
+the file COPYRIGHT which contains:
+
+1. The Sandia Corporation Copyright Notice.
+2. The BSD License.
+
+We appreciate feedback from users of this package.  Please send
+comments, suggestions, and bug reports to Greg Sjaardema <gdsjaar@sandia.gov>.
+Please identify the version of the package.
+
+========================================================================
+BUILDING
+
+There are 3 methods for building exodusII.
+
+1. SEAMS/SEACAS Build system which is based on imake.  If you have a
+SEAMS or SEACAS installation, you can use its build system.  In the
+top-level exodusii directory, do 'accmkmf' followed by 'make
+Makefiles' and then 'make'
+
+2. CMAKE: type 'cmake .' or 'cmake -i' to generate the Makefiles
+followed by 'make'.  There is an issue with finding the required
+netcdf library that I am not good enough at cmake to solve.  The
+easiest method is to symbolically link the netcdf library into the
+cbind directory and the netcdf include into the cbind/include
+directory. 
+
+3. Makefile.standalone.  Edit the top-level Makefile.standalone file
+and specify the compiler and other options as detailed in the
+file. Then, do "make -f Makefile.standalone".
+
+Once you have built the library, you can test it by typing "make
+check"
+
+
+========================================================================
+NETCDF
+
+The exodusII library uses the netcdf library for low-level data
+storage.
+
+ExodusII requires NetCDF version 3.6.0 or later with the "large-model
+modifications". 
+
+The netcdf library must be modified slightly in order to handle the
+exodusII datamodel. The specific changes are:
+
+1. src/libsrc/netcdf.h -- Modify the following defines:
+
+#define NC_MAX_DIMS	65536	 /* max dimensions per file */
+#define NC_MAX_VARS	524288	 /* max variables per file */
+#define NC_MAX_VAR_DIMS	8        /* max per variable dimensions */
+
+2. src/ncdump/ncdump.c -- Due to the increased sizes above, the 'dims'
+and 'vdims' arrays are malloc'd instead of static arrays which fail
+with the increased sizes.
+
+
+347a348,351
+> #if 0
+>     /* The following code was blowing out the stack on some systems.
+>      * Changed code to get the memory off the heap using malloc instead
+>      */
+349a354,357
+> #else
+>     struct ncdim *dims;               /* dimensions */
+>     size_t *vdims;            /* dimension sizes for a single variable */
+> #endif
+359a368,370
+>     dims = NULL;
+>     vdims = NULL;
+>
+388c399
+<     if (ndims > 0)
+---
+>     if (ndims > 0) {
+389a401,403
+>       dims  = malloc(ndims * sizeof(struct ncdim));
+>       vdims = malloc(ndims * sizeof(size_t));
+>     }
+508a523,526
+>                   if (dims)
+>                     free(dims);
+>                   if (vdims)
+>                     free(vdims);
+519a538,541
+>     if (dims)
+>       free(dims);
+>     if (vdims)
+>       free(vdims);
+
+3. When running the netcdf tests, you may have to do "unlimit
+stacksize" to avoid some failures due to the increased define sizes
+above.
+
+========================================================================

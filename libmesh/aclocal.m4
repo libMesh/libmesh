@@ -1258,52 +1258,109 @@ AC_DEFUN(CONFIGURE_VTK,
 ])
 dnl -------------------------------------------------------------
 
-
-
 dnl -------------------------------------------------------------
 dnl netCDF
 dnl -------------------------------------------------------------
-AC_DEFUN(CONFIGURE_NETCDF,
+AC_DEFUN(CONFIGURE_NETCDF, 
 [
-  AC_CHECK_FILE(./contrib/netcdf/lib/$host/libnetcdf.a,
-		NETCDF_LIB=$PWD/contrib/netcdf/lib/$host/libnetcdf.a)
-  AC_CHECK_FILE(./contrib/netcdf/include/netcdf.h,
-		NETCDF_INCLUDE_PATH=$PWD/contrib/netcdf/include)
+dnl Netcdf is distributed with libmesh, so we don't have to guess
+dnl where it might be installed...
 
-  if (test -r $NETCDF_INCLUDE_PATH/netcdf.h -a "x$NETCDF_LIB" != x) ; then
-    NETCDF_INCLUDE=-I$NETCDF_INCLUDE_PATH
-    AC_SUBST(NETCDF_LIB)
-    AC_SUBST(NETCDF_INCLUDE)
-    AC_DEFINE(HAVE_NETCDF, 1,
-              [Flag indicating whether the library shall be compiled to support netcdf files])
-    AC_MSG_RESULT(<<< Configuring library with netCDF support >>>)
-    have_netcdf=yes
+  if (test $enablenetcdf = yes); then
+     NETCDF_INCLUDE="-I$PWD/contrib/netcdf/Lib"
+     NETCDF_LIBRARY="\$(EXTERNAL_LIBDIR)/libnetcdf\$(libext)"
+     AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
+     AC_MSG_RESULT(<<< Configuring library with Netcdf support >>>)
+     CONTRIB_HAVE_NETCDF="#define HAVE_NETCDF 1"
+     have_netcdf=yes
+  else
+     NETCDF_INCLUDE=""
+     NETCDF_LIBRARY=""
+     enablenetcdf=no
+     CONTRIB_HAVE_NETCDF="/* #undef HAVE_NETCDF */"
+     have_netcdf=no
   fi
+
+  AC_SUBST(CONTRIB_HAVE_NETCDF)	
+  AC_SUBST(NETCDF_INCLUDE)
+  AC_SUBST(NETCDF_LIBRARY)	
+  AC_SUBST(enablenetcdf)
+])
+dnl -------------------------------------------------------------
+
+dnl -------------------------------------------------------------
+dnl ExodusII
+dnl -------------------------------------------------------------
+AC_DEFUN(CONFIGURE_EXODUS, 
+[
+dnl Exodus is distributed with libmesh, so we don't have to guess
+dnl where it might be installed...
+
+  if (test $enablenetcdf = yes); then
+     EXODUS_INCLUDE="-I$PWD/contrib/exodusii/Lib/include"
+     EXODUS_LIBRARY="\$(EXTERNAL_LIBDIR)/libexodusii\$(libext)"
+     AC_DEFINE(HAVE_EXODUS_API, 1, [Flag indicating whether the library will be compiled with Exodus support])
+     AC_MSG_RESULT(<<< Configuring library with Exodus API support >>>)
+     CONTRIB_HAVE_EXODUS="#define HAVE_EXODUS 1"
+  else
+     EXODUS_INCLUDE=""
+     EXODUS_LIBRARY=""
+     enableexodus=no
+     CONTRIB_HAVE_EXODUS="/* #undef HAVE_EXODUS */"
+  fi
+
+  AC_SUBST(CONTRIB_HAVE_EXODUS)	
+  AC_SUBST(EXODUS_INCLUDE)
+  AC_SUBST(EXODUS_LIBRARY)	
+  AC_SUBST(enableexodus)
 ])
 dnl -------------------------------------------------------------
 
 
+# dnl -------------------------------------------------------------
+# dnl netCDF
+# dnl -------------------------------------------------------------
+# AC_DEFUN(CONFIGURE_NETCDF,
+# [
+#   AC_CHECK_FILE(./contrib/netcdf/lib/$host/libnetcdf.a,
+# 		NETCDF_LIB=$PWD/contrib/netcdf/lib/$host/libnetcdf.a)
+#   AC_CHECK_FILE(./contrib/netcdf/include/netcdf.h,
+# 		NETCDF_INCLUDE_PATH=$PWD/contrib/netcdf/include)
 
-dnl -------------------------------------------------------------
-dnl ExodusII 
-dnl -------------------------------------------------------------
-AC_DEFUN(CONFIGURE_EXODUS,
-[
-  AC_CHECK_FILE(./contrib/exodus/lib/$host/libexoIIv2c.a,
-		EXODUS_LIB=$PWD/contrib/exodus/lib/$host/libexoIIv2c.a)
-  AC_CHECK_FILE(./contrib/exodus/include/exodusII.h,
-		EXODUS_INCLUDE_PATH=$PWD/contrib/exodus/include)
+#   if (test -r $NETCDF_INCLUDE_PATH/netcdf.h -a "x$NETCDF_LIB" != x) ; then
+#     NETCDF_INCLUDE=-I$NETCDF_INCLUDE_PATH
+#     AC_SUBST(NETCDF_LIB)
+#     AC_SUBST(NETCDF_INCLUDE)
+#     AC_DEFINE(HAVE_NETCDF, 1,
+#               [Flag indicating whether the library shall be compiled to support netcdf files])
+#     AC_MSG_RESULT(<<< Configuring library with netCDF support >>>)
+#     have_netcdf=yes
+#   fi
+# ])
+# dnl -------------------------------------------------------------
 
-  if (test -r $EXODUS_INCLUDE_PATH/exodusII.h -a "x$EXODUS_LIB" != x) ; then
-    EXODUS_INCLUDE=-I$EXODUS_INCLUDE_PATH
-    AC_SUBST(EXODUS_LIB)
-    AC_SUBST(EXODUS_INCLUDE)
-    AC_DEFINE(HAVE_EXODUS_API, 1,
-	      [Flag indicating whether the library shall be compiled to use the Exodus interface])
-    AC_MSG_RESULT(<<< Configuring library with Exodus API support >>>)
-  fi
-])
-dnl -------------------------------------------------------------
+
+
+# dnl -------------------------------------------------------------
+# dnl ExodusII 
+# dnl -------------------------------------------------------------
+# AC_DEFUN(CONFIGURE_EXODUS,
+# [
+#   AC_CHECK_FILE(./contrib/exodus/lib/$host/libexoIIv2c.a,
+# 		EXODUS_LIB=$PWD/contrib/exodus/lib/$host/libexoIIv2c.a)
+#   AC_CHECK_FILE(./contrib/exodus/include/exodusII.h,
+# 		EXODUS_INCLUDE_PATH=$PWD/contrib/exodus/include)
+
+#   if (test -r $EXODUS_INCLUDE_PATH/exodusII.h -a "x$EXODUS_LIB" != x) ; then
+#     EXODUS_INCLUDE=-I$EXODUS_INCLUDE_PATH
+#     AC_SUBST(EXODUS_LIB)
+#     AC_SUBST(EXODUS_INCLUDE)
+#     AC_DEFINE(HAVE_EXODUS_API, 1,
+# 	      [Flag indicating whether the library shall be compiled to use the Exodus interface])
+#     AC_MSG_RESULT(<<< Configuring library with Exodus API support >>>)
+#   fi
+# ])
+# dnl -------------------------------------------------------------
 
 
 
