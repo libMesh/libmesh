@@ -118,6 +118,12 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
 }
 
 
+#ifdef ENABLE_AMR
+const unsigned int packed_elem_header_size = 9;
+#else
+const unsigned int packed_elem_header_size = 3;
+#endif
+
 
 #ifdef HAVE_MPI
 void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
@@ -234,7 +240,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     // broadcast it to the other processors.
     if (libMesh::processor_id() == 0)
       {
-	conn.reserve (9*n_elem + total_weight);
+	conn.reserve (packed_elem_header_size*n_elem + total_weight);
 	
 	// We start from level 0. This is a bit simpler than in xdr_io.C
 	// because we do not have to worry about economizing by group elements
@@ -258,10 +264,10 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	  }
       }
     else
-      conn.resize (9*n_elem + total_weight);
+      conn.resize (packed_elem_header_size*n_elem + total_weight);
     
     // Sanity check for all processors
-    assert (conn.size() == (9*n_elem + total_weight));
+    assert (conn.size() == (packed_elem_header_size*n_elem + total_weight));
     
     // Broadcast the element connectivity
     Parallel::broadcast (conn);
@@ -284,19 +290,20 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
             Elem* elem = NULL;
 
 	    // Unpack the element header
+#ifdef ENABLE_AMR
 	    const int level          = conn[cnt++];
 	    const int p_level        = conn[cnt++];
 	    const Elem::RefinementState refinement_flag   =
               static_cast<Elem::RefinementState>(conn[cnt++]);
 	    const Elem::RefinementState p_refinement_flag =
               static_cast<Elem::RefinementState>(conn[cnt++]);
+#endif
             const ElemType elem_type = static_cast<ElemType>(conn[cnt++]);
 	    const int subdomain_ID   = conn[cnt++];
             const int self_ID        = conn[cnt++];
+#ifdef ENABLE_AMR
             const int parent_ID      = conn[cnt++];
             const int which_child    = conn[cnt++];
-	    
-#ifdef ENABLE_AMR
 
             if (parent_ID != -1) // Do a log(n) search for the parent
 	      {
@@ -319,12 +326,13 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	      }
 	    
             else // level 0 element has no parent
-#endif 
 	      {
 		assert (level == 0);
+#endif 
 		
 		// should be able to just use the integer elem_type
 		elem = Elem::build(elem_type).release();
+#ifdef ENABLE_AMR
 	      }
 
 	    // Assign the IDs
@@ -332,6 +340,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	    elem->set_refinement_flag(refinement_flag); 
 	    elem->set_p_refinement_flag(p_refinement_flag); 
 	    elem->set_p_level(p_level); 
+#endif
             elem->subdomain_id() = subdomain_ID;
             elem->set_id() = self_ID;
 	    
@@ -671,7 +680,8 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
     Parallel::max (global_n_levels);
     
     // The conn array contains the information needed to construct each element.
-    std::vector<int> conn; conn.reserve (9*n_elem[libMesh::processor_id()] + local_weight);
+    std::vector<int> conn; conn.reserve 
+      (packed_elem_header_size*n_elem[libMesh::processor_id()] + local_weight);
 						
     for (unsigned int level=0; level<=local_n_levels; level++)
       {
@@ -696,7 +706,8 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	  }
       } // ...that was easy.
 
-    assert (conn.size() == 9*n_elem[libMesh::processor_id()] + local_weight);
+    assert (conn.size() == 
+      packed_elem_header_size*n_elem[libMesh::processor_id()] + local_weight);
 
     // Get the size of the connectivity array on each processor
     std::vector<unsigned int>
@@ -736,22 +747,27 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	    while (cnt < (conn_offset[p] + conn_size[p]))
 	      {
 		// Unpack the element header
+#ifdef ENABLE_AMR
 	        const unsigned int elem_level = conn[cnt++];
 	        const unsigned int p_level    = conn[cnt++];
 	        const Elem::RefinementState refinement_flag   =
                   static_cast<Elem::RefinementState>(conn[cnt++]);
 	        const Elem::RefinementState p_refinement_flag =
                   static_cast<Elem::RefinementState>(conn[cnt++]);
+#else
+	        const unsigned int elem_level = 0;
+#endif
                 const ElemType elem_type      = static_cast<ElemType>(conn[cnt++]);
 	        const int subdomain_ID        = conn[cnt++];
                 const unsigned int self_ID    = conn[cnt++];
-                const int parent_ID           = conn[cnt++];
-                const int which_child         = conn[cnt++];
-
 		// We require contiguous numbering on each processor
 		// for elements.
 		assert (self_ID >= first_global_idx);
 		assert (self_ID  < last_global_idx);
+#ifdef ENABLE_AMR
+                const int parent_ID           = conn[cnt++];
+                const int which_child         = conn[cnt++];
+
 		assert ((elem_level == 0) || (parent_ID != -1));
   
 		// Ignore elements not matching the current level.  We
@@ -764,24 +780,27 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 
 		    cnt += elem->n_nodes();
 		  }
-
-		else if (elem_level < level ||     // we should already have
-		         (elem_level == level &&   // lower level and some
-                          mesh.elem(self_ID)))     // ghost elements
+                else
+#endif
+		if (elem_level < level ||     // we should already have
+		    (elem_level == level &&   // lower level and some
+                     mesh.elem(self_ID)))     // ghost elements
 		  {
                     // No need to construct a dummy element of this type
 		    const Elem* elem = mesh.elem(self_ID);
 
                     assert (elem);
-		    assert (elem->p_level()           == p_level);
-		    assert (elem->refinement_flag()   == refinement_flag);
-		    assert (elem->p_refinement_flag() == p_refinement_flag);
-		    assert (elem->type()              == elem_type);
-		    assert (elem->subdomain_id()      == subdomain_ID);
-		    assert (elem->id()                == self_ID);
+#ifdef ENABLE_AMR
 		    assert (!elem->parent() ||
                             elem->parent()->id() ==
                             static_cast<unsigned int>(parent_ID));
+		    assert (elem->p_level()           == p_level);
+		    assert (elem->refinement_flag()   == refinement_flag);
+		    assert (elem->p_refinement_flag() == p_refinement_flag);
+#endif
+		    assert (elem->type()              == elem_type);
+		    assert (elem->subdomain_id()      == subdomain_ID);
+		    assert (elem->id()                == self_ID);
 
 		    cnt += elem->n_nodes();
 		  }
@@ -808,23 +827,26 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 			  }
 		
 			elem = Elem::build(elem_type,my_parent).release();
+		        assert (elem);
 			my_parent->add_child(elem, which_child);
 			assert (my_parent->type() == elem->type());
                         assert (my_parent->child(which_child) == elem);
 		      }
 		    else
-#endif // ENABLE_AMR
                       {
                         assert (parent_ID == -1);
+#endif // ENABLE_AMR
 		        elem = Elem::build(elem_type).release();
+		        assert (elem);
+#ifdef ENABLE_AMR
                       }
 		      
 		    // Assign the IDs
-		    assert (elem);
-		    assert (elem->level() == static_cast<unsigned int>(level));
 		    elem->set_p_level(p_level);
 		    elem->set_refinement_flag(refinement_flag);
 		    elem->set_p_refinement_flag(p_refinement_flag);
+		    assert (elem->level() == static_cast<unsigned int>(level));
+#endif
 		    elem->subdomain_id() = subdomain_ID;
 		    elem->processor_id() = p;
 		    elem->set_id()       = self_ID;
@@ -1112,17 +1134,17 @@ void MeshCommunication::pack_element (std::vector<int> &conn, const Elem* &elem)
 {
   assert (elem != NULL);
 
-  // We don't support p refined elements yet
-  assert (!elem->p_level());
-  
+#ifdef ENABLE_AMR
   conn.push_back (static_cast<int>(elem->level()));
   conn.push_back (static_cast<int>(elem->p_level()));
   conn.push_back (static_cast<int>(elem->refinement_flag()));
   conn.push_back (static_cast<int>(elem->p_refinement_flag()));
+#endif
   conn.push_back (static_cast<int>(elem->type()));
   conn.push_back (static_cast<int>(elem->subdomain_id()));
   conn.push_back (elem->id());
 		
+#ifdef ENABLE_AMR
   // use parent_ID of -1 to indicate a level 0 element
   if (elem->level() == 0)
     {
@@ -1134,6 +1156,7 @@ void MeshCommunication::pack_element (std::vector<int> &conn, const Elem* &elem)
       conn.push_back(elem->parent()->id());
       conn.push_back(elem->parent()->which_child_am_i(elem));
     }
+#endif
   
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     conn.push_back (elem->node(n));		
