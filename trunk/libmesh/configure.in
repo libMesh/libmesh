@@ -396,7 +396,6 @@ fi
 dnl -------------------------------------------------------------
 
 
-
 dnl -------------------------------------------------------------
 dnl Performance Logging -- disabled by default
 dnl -------------------------------------------------------------
@@ -412,39 +411,6 @@ if test "$enableperflog" != no ; then
   AC_MSG_RESULT(<<< Configuring library with performance logging support >>>)
 fi
 dnl ------------------------------------------------------------
-
-
-
-
-dnl --------------------------------------------------------------
-dnl netCDF binary IO support - enabled by default
-dnl --------------------------------------------------------------
-AC_ARG_ENABLE(netcdf,
-              AC_HELP_STRING([--enable-netcdf],
-                             [build with netCDF binary I/O]),
-              enablenetcdf=$enableval,
-              enablenetcdf=yes)
-
-if (test "$enablenetcdf" != no) ; then
-   CONFIGURE_NETCDF
-
-   dnl -------------------------------------------------------------
-   dnl ExodusII -- enabled by default - Reads in cubit meshes
-   dnl (note that ExodusII requires netCDF
-   dnl -------------------------------------------------------------
-   AC_ARG_ENABLE(exodus,
-                 AC_HELP_STRING([--enable-exodus],
-                                [build with ExodusII binary support]),
-                 enableexodus=$enableval,
-                 enableexodus=yes)
-   
-   if (test "$enableexodus" != no -a "$have_netcdf" = yes) ; then
-     CONFIGURE_EXODUS
-   fi
-   dnl -------------------------------------------------------------
-fi
-dnl -------------------------------------------------------------
-
 
 dnl --------------------------------------------------------------
 dnl Allow for disable-optional
@@ -687,6 +653,35 @@ AC_ARG_ENABLE(vtk,
 CONFIGURE_VTK
 dnl -------------------------------------------------------------
 
+
+dnl --------------------------------------------------------------
+dnl netCDF -- enabled by default (it is distributed in contrib)
+dnl --------------------------------------------------------------
+AC_ARG_ENABLE(netcdf,
+              AC_HELP_STRING([--enable-netcdf],
+                             [build with netCDF binary I/O]),
+              enablenetcdf=$enableval,
+              enablenetcdf=yes)
+
+if (test "$enablenetcdf" != no) ; then
+   CONFIGURE_NETCDF
+
+   dnl -------------------------------------------------------------
+   dnl ExodusII -- enabled by default (it is distributed in contrib)
+   dnl (note that ExodusII requires netCDF
+   dnl -------------------------------------------------------------
+   AC_ARG_ENABLE(exodus,
+                 AC_HELP_STRING([--enable-exodus],
+                                [build with ExodusII API support]),
+                 enableexodus=$enableval,
+                 enableexodus=yes)
+   
+   if (test "$enableexodus" != no -a "$have_netcdf" = yes) ; then
+     CONFIGURE_EXODUS
+   fi
+   dnl -------------------------------------------------------------
+fi
+dnl -------------------------------------------------------------
 
 dnl end of --disable-optional test
    AC_MSG_RESULT(----------------------------------------------)
