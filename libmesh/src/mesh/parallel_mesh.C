@@ -520,6 +520,7 @@ void ParallelMesh::assert_valid_parallel_ids () const
 
 void ParallelMesh::assert_valid_parallel_flags () const
 {
+#ifdef ENABLE_AMR
   // This function must be run on all processors at once
   parallel_only();
 
@@ -543,6 +544,7 @@ void ParallelMesh::assert_valid_parallel_flags () const
       // All processors with this element should agree on flag
       assert (!elem || min_pflag == p_refinement_flag);
     }
+#endif
 }
 
 
