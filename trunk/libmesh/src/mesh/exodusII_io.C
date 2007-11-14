@@ -27,6 +27,8 @@
 #include "mesh_base.h"
 #include "enum_elem_type.h"
 #include "elem.h"
+#include "system.h"
+#include "numeric_vector.h"
 
 // Wrap all the helper classes in an #ifdef to avoid excessive compilation
 // time in the case of no ExodusII support
@@ -41,8 +43,8 @@ namespace exII {
 
 //-----------------------------------------------------------------------------
 // Exodus class - private helper class defined in an anonymous namespace
-namespace
-{
+//namespace
+//{
   /**
    * This is the \p ExodusII class.
    * This class hides the implementation
@@ -346,7 +348,7 @@ namespace
      * Returns an array containing the nodal variable values
      * at the specified time
      */
-    const std::vector<double>& get_nodal_var_values(int var_index, int time_step);
+    const std::vector<double>& get_nodal_var_values(std::string nodal_var_name, int time_step);
 
     //-------------------------------------------------------------------------
     /**
@@ -960,15 +962,34 @@ namespace
     return nodal_var_names;
   }
 
-  const std::vector<double>& ExodusII::get_nodal_var_values(int var_index, int time_step)
+  const std::vector<double>& ExodusII::get_nodal_var_values(std::string nodal_var_name, int time_step)
   {
     nodal_var_values.resize(num_nodes);
+    
+    get_nodal_var_names();
 
-    exII::ex_get_nodal_var(ex_id, time_step, var_index, num_nodes, &nodal_var_values[0]);
+    //See if we can find the variable we are looking for
+    int var_index = 0;
+    bool found = false;
+
+    found = nodal_var_names[var_index] == nodal_var_name;
+    
+    while(!found && var_index < nodal_var_names.size())
+    {
+      var_index++;
+      found = nodal_var_names[var_index] == nodal_var_name;
+    }
+
+    if(!found)
+    {
+      std::cerr << "Unable to locate variable named: " << nodal_var_name << std::endl;
+      return nodal_var_values;
+    }
+
+    exII::ex_get_nodal_var(ex_id, time_step, var_index+1, num_nodes, &nodal_var_values[0]);
 
     return nodal_var_values;
   }
-
 
   // ------------------------------------------------------------
   // ExodusII::Conversion class members
@@ -1103,7 +1124,7 @@ namespace
   }
   
     
-} // end anonymous namespace
+//} // end anonymous namespace
 
 #endif // #ifdef HAVE_EXODUS_API
 
@@ -1140,7 +1161,9 @@ void ExodusII_IO::read (const std::string& fname)
     this->verbose() = true;
 #endif
   
-  ExodusII ex(this->verbose()); // Instantiate ExodusII interface
+  ex_ptr = new ExodusII(this->verbose()); // Instantiate ExodusII interface
+  ExodusII & ex = *ex_ptr;
+  
   ExodusII::ElementMaps em;     // Instantiate the ElementMaps interface
     
   ex.open(fname.c_str());       // Open the exodus file, if possible
@@ -1231,25 +1254,35 @@ void ExodusII_IO::read (const std::string& fname)
 				      id_list[e]);
       }
   }
-/*
-  std::vector<double> time_steps = ex.get_time_steps();
 
-  std::cerr<<"Time Steps In File:"<<std::endl;
-  for(unsigned int i=0;i<time_steps.size();i++)
-    std::cerr<<time_steps[i]<<std::endl;;
-
-  std::cerr<<"Num nodal vars:"<<ex.get_num_nodal_vars()<<std::endl;
-
-  std::vector<std::string> nodal_var_names = ex.get_nodal_var_names();
-  std::cerr<<"Nodal Var Names:"<<std::endl;
-  for(unsigned int i=0;i<nodal_var_names.size();i++)
-    std::cerr<<nodal_var_names[i]<<std::endl;
-
-  const std::vector<double> & nodal_values = ex.get_nodal_var_values(1,1);
-  std::cerr<<"Nodal Values"<<std::endl;
-  for(unsigned int i=0;i<nodal_values.size();i++)
-    std::cerr<<nodal_values[i]<<std::endl;
-*/
-  ex.close();            // Close the exodus file, if possible
+//  ex.close();            // Close the exodus file, if possible
 #endif
 }
+
+
+
+void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name)
+{
+  ExodusII & ex = *ex_ptr;
+
+
+  std::vector<double> time_steps = ex.get_time_steps();
+  
+  const std::vector<double> & nodal_values = ex.get_nodal_var_values(nodal_var_name,1);
+
+  const DofMap & dof_map = system.get_dof_map();
+
+  const unsigned int var_num = system.variable_number(nodal_var_name);
+
+  for (unsigned int i=0; i<nodal_values.size(); ++i)
+  {
+    const unsigned int dof_index = MeshInput<MeshBase>::mesh().node_ptr(i)->dof_number(system.number(),var_num,0);
+    
+    // If the dof_index is local to this processor, set the value
+    if ((dof_index >= system.solution->first_local_index()) && (dof_index <  system.solution->last_local_index()))
+      system.solution->set (dof_index, nodal_values[i]);
+  }
+
+  system.update();
+}
+
