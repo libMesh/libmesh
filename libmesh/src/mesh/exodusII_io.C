@@ -1173,7 +1173,7 @@ void ExodusII_IO::read (const std::string& fname)
   assert(static_cast<unsigned int>(ex.get_num_dim()) == mesh.mesh_dimension()); // Be sure number of dimensions
                                                                                 // is equal to the number of 
                                                                                 // dimensions in the mesh supplied.
-
+  
   ex.read_nodes();                        // Read nodes from the exodus file
   mesh.reserve_nodes(ex.get_num_nodes()); // Reserve space for the nodes.
   
@@ -1182,7 +1182,7 @@ void ExodusII_IO::read (const std::string& fname)
     mesh.add_point (Point(ex.get_x(i),
 			  ex.get_y(i),
 			  ex.get_z(i)), i);
-
+  
   assert (static_cast<unsigned int>(ex.get_num_nodes()) == mesh.n_nodes());
 
   ex.read_block_info();                 // Get information about all the blocks
@@ -1226,7 +1226,6 @@ void ExodusII_IO::read (const std::string& fname)
       // (should equal total number of elements in the end)
       nelem_last_block += ex.get_num_elem_this_blk();
     }
-
   assert (static_cast<unsigned int>(nelem_last_block) == mesh.n_elem());
   
   // Read in sideset information -- this is useful for applying boundary conditions
@@ -1265,9 +1264,9 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
 {
   ExodusII & ex = *ex_ptr;
 
-
   std::vector<double> time_steps = ex.get_time_steps();
-  
+
+  //For now just read the first timestep (1)
   const std::vector<double> & nodal_values = ex.get_nodal_var_values(nodal_var_name,1);
 
   const DofMap & dof_map = system.get_dof_map();
@@ -1277,7 +1276,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
   for (unsigned int i=0; i<nodal_values.size(); ++i)
   {
     const unsigned int dof_index = MeshInput<MeshBase>::mesh().node_ptr(i)->dof_number(system.number(),var_num,0);
-    
+
     // If the dof_index is local to this processor, set the value
     if ((dof_index >= system.solution->first_local_index()) && (dof_index <  system.solution->last_local_index()))
       system.solution->set (dof_index, nodal_values[i]);
