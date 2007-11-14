@@ -24,6 +24,7 @@
 // Local includes
 #include "elem.h"
 #include "mesh_refinement.h"
+#include "remote_elem.h"
 
 
 //--------------------------------------------------------------------
@@ -194,7 +195,10 @@ void Elem::coarsen()
   // re-compute hanging node nodal locations
   for (unsigned int c=0; c<this->n_children(); c++)
   {	
-    for (unsigned int nc=0; nc<this->child(c)->n_nodes(); nc++)
+    Elem *mychild = this->child(c);
+    if (mychild == remote_elem)
+      continue;
+    for (unsigned int nc=0; nc<mychild->n_nodes(); nc++)
     {
       Point new_pos;
       bool calculated_new_pos = false;
@@ -217,7 +221,7 @@ void Elem::coarsen()
 	//Move the existing node back into it's original location
 	for(unsigned int i=0; i<DIM; i++)
 	{
-	  Point & child_node = *(this->child(c)->get_node(nc));
+	  Point & child_node = *(mychild->get_node(nc));
 	  child_node(i)=new_pos(i);
 	}
       }
@@ -226,10 +230,13 @@ void Elem::coarsen()
 
   for (unsigned int c=0; c<this->n_children(); c++)
     {	
-      assert (this->child(c)->refinement_flag() == Elem::COARSEN);
-      this->child(c)->set_refinement_flag(Elem::INACTIVE);
-      if (this->child(c)->p_level() > parent_p_level)
-        parent_p_level = this->child(c)->p_level();
+      Elem *mychild = this->child(c);
+      if (mychild == remote_elem)
+        continue;
+      assert (mychild->refinement_flag() == Elem::COARSEN);
+      mychild->set_refinement_flag(Elem::INACTIVE);
+      if (mychild->p_level() > parent_p_level)
+        parent_p_level = mychild->p_level();
     }
 
   this->set_refinement_flag(Elem::JUST_COARSENED);
