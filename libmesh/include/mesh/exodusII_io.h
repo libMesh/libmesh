@@ -30,6 +30,8 @@
 
 // Forward declarations
 class MeshBase;
+class System;
+class ExodusII;
 
 /**
  * The \p ExodusII_IO class implements reading meshes in the
@@ -74,11 +76,17 @@ class ExodusII_IO : public MeshInput<MeshBase>
    */
   bool & verbose ();
 
+  /**
+   * If we read in a nodal solution while reading in a mesh, we can attempt
+   * to copy that nodal solution into an EquationSystems object.
+   */
+  void copy_nodal_solution(System& es, std::string nodal_var_name);
+
   
  private:
-  //void read_soln(ExodusII & ex);
+  ExodusII * ex_ptr;
 
-  //-------------------------------------------------------------
+//-------------------------------------------------------------
   // local data
 
   /**
