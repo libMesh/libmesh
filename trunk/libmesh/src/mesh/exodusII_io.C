@@ -83,7 +83,8 @@ namespace
 				   ret_float(0.0),
 				   ret_char(0),
 				   title(new char[MAX_LINE_LENGTH]),
-				   elem_type(new char[MAX_STR_LENGTH])
+				   elem_type(new char[MAX_STR_LENGTH]),
+				   num_time_steps(0)
     {}
 
     /**
@@ -317,8 +318,36 @@ namespace
      */
     void close();
 
+    /**
+     * Generic inquiry, returs the value
+     */
+    int inquire(int req_info, std::string error_msg="");
 
-  
+    
+    // For reading solutions:
+    /*
+     * Returns an array containing the timesteps in the file
+     */
+    const std::vector<double>& get_time_steps();
+
+
+    /*
+     * Number of Nodal variables defined.
+     */
+    int get_num_nodal_vars(){ return num_nodal_vars; }
+    
+
+    /*
+     * Returns an array containing the nodal var names in the file
+     */
+    const std::vector<std::string>& get_nodal_var_names();
+
+    /*
+     * Returns an array containing the nodal variable values
+     * at the specified time
+     */
+    const std::vector<double>& get_nodal_var_values(int var_index, int time_step);
+
     //-------------------------------------------------------------------------
     /**
      * This is the \p ExodusII
@@ -624,7 +653,13 @@ namespace
     char*   title;                       // Problem title
     char*   elem_type;                   // Type of element in a given block
 
-  };
+    //Solution Data
+    int num_time_steps;
+    std::vector<double> time_steps;
+    int num_nodal_vars;
+    std::vector<std::string> nodal_var_names;
+    std::vector<double> nodal_var_values;
+};
 
 
   // ------------------------------------------------------------
@@ -720,6 +755,11 @@ namespace
 			       &num_side_sets);
 
     check_err(ex_err, "Error retrieving header info.");
+
+    num_time_steps = inquire(EX_INQ_TIME, "Error retrieving time steps");
+
+    exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
+
     message("Exodus header info retrieved successfully.");
   }
 
@@ -879,6 +919,55 @@ namespace
     message("Exodus file closed successfully."); 
   }
 
+  int ExodusII::inquire(int req_info, std::string error_msg)
+  {
+    ex_err = exII::ex_inquire(ex_id,
+			      req_info,
+			      &ret_int,
+			      &ret_float,
+			      &ret_char);
+    
+    check_err(ex_err, error_msg);
+
+    return ret_int;
+  }
+
+  const std::vector<double>& ExodusII::get_time_steps()
+  {
+    time_steps.resize(num_time_steps);
+    exII::ex_get_all_times(ex_id, &time_steps[0]);
+    return time_steps;
+  }
+
+  const std::vector<std::string>& ExodusII::get_nodal_var_names()
+  {
+    //Max of 100 variable names
+    char *var_names[100];
+    
+    nodal_var_names.resize(num_nodal_vars);
+    for(int i=0;i<num_nodal_vars;i++)
+    {
+      var_names[i]=new char[MAX_STR_LENGTH+1];
+    }
+
+    exII::ex_get_var_names(ex_id, "n", num_nodal_vars, var_names);
+
+    for(int i=0;i<num_nodal_vars;i++)
+    {
+      nodal_var_names[i]=var_names[i];
+    }
+
+    return nodal_var_names;
+  }
+
+  const std::vector<double>& ExodusII::get_nodal_var_values(int var_index, int time_step)
+  {
+    nodal_var_values.resize(num_nodes);
+
+    exII::ex_get_nodal_var(ex_id, time_step, var_index, num_nodes, &nodal_var_values[0]);
+
+    return nodal_var_values;
+  }
 
 
   // ------------------------------------------------------------
@@ -1142,8 +1231,25 @@ void ExodusII_IO::read (const std::string& fname)
 				      id_list[e]);
       }
   }
-    
-  ex.close();            // Close the exodus file, if possible
+/*
+  std::vector<double> time_steps = ex.get_time_steps();
 
+  std::cerr<<"Time Steps In File:"<<std::endl;
+  for(unsigned int i=0;i<time_steps.size();i++)
+    std::cerr<<time_steps[i]<<std::endl;;
+
+  std::cerr<<"Num nodal vars:"<<ex.get_num_nodal_vars()<<std::endl;
+
+  std::vector<std::string> nodal_var_names = ex.get_nodal_var_names();
+  std::cerr<<"Nodal Var Names:"<<std::endl;
+  for(unsigned int i=0;i<nodal_var_names.size();i++)
+    std::cerr<<nodal_var_names[i]<<std::endl;
+
+  const std::vector<double> & nodal_values = ex.get_nodal_var_values(1,1);
+  std::cerr<<"Nodal Values"<<std::endl;
+  for(unsigned int i=0;i<nodal_values.size();i++)
+    std::cerr<<nodal_values[i]<<std::endl;
+*/
+  ex.close();            // Close the exodus file, if possible
 #endif
 }

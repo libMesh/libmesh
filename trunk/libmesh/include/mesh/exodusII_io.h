@@ -31,7 +31,6 @@
 // Forward declarations
 class MeshBase;
 
-
 /**
  * The \p ExodusII_IO class implements reading meshes in the
  * \p ExodusII file format from Sandia National Labs.  Due to
@@ -77,7 +76,7 @@ class ExodusII_IO : public MeshInput<MeshBase>
 
   
  private:
-  
+  //void read_soln(ExodusII & ex);
 
   //-------------------------------------------------------------
   // local data
