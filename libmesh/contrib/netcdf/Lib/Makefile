@@ -1,6 +1,6 @@
 include ../../../Make.common
 
-INCLUDE = -I.
+libmesh_INCLUDE = -I.
 
 # Package name and additional flags required for library compilation
 pkgname  := netcdf
