@@ -162,7 +162,7 @@ void UnstructuredMesh::assert_valid_neighbors() const
 
 
 
-void UnstructuredMesh::find_neighbors()
+void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
 {
   assert(this->n_nodes() != 0);
   assert(this->n_elem()  != 0);
@@ -179,7 +179,8 @@ void UnstructuredMesh::find_neighbors()
     {
       Elem* elem = *el;
       for (unsigned int s=0; s<elem->n_neighbors(); s++)
-        if (elem->neighbor(s) != remote_elem)
+        if (elem->neighbor(s) != remote_elem ||
+            reset_remote_elements)
           elem->set_neighbor(s,NULL);
     }
   

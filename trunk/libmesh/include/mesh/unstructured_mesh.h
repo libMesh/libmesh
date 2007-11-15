@@ -143,7 +143,7 @@ class UnstructuredMesh : public MeshBase
   /**
    * Other functions from MeshBase requiring re-definition.
    */
-  virtual void find_neighbors ();
+  virtual void find_neighbors (bool reset_remote_elements = false);
 
   /**
    * A function for testing neighbor connectivity

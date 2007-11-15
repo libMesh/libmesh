@@ -339,15 +339,14 @@ public:
 
   /**
    * Locate element face (edge in 2D) neighbors.  This is done with the help
-   * of a \p std::map that functions like a hash table.  When this function is
-   * called only elements with \p NULL neighbor pointers are considered, so
-   * the first call should take the longest.  Subsequent calls will only
-   * consider new elements and the elements that lie on the boundary.
+   * of a \p std::map that functions like a hash table.  
    * After this routine is called all the elements with a \p NULL neighbor
    * pointer are guaranteed to be on the boundary.  Thus this routine is
    * useful for automatically determining the boundaries of the domain.
+   * If reset_remote_elements is left to false, remote neighbor links are not
+   * reset and searched for in the local mesh.
    */
-  virtual void find_neighbors () = 0;
+  virtual void find_neighbors (bool reset_remote_elements = false) = 0;
   
   /**
    * After partitoning a mesh it is useful to renumber the nodes and elements
