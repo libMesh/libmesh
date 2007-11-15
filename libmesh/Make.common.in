@@ -218,6 +218,7 @@ libmesh_INCLUDE += -I$(libmesh_dir)/include/base \
                    -I$(libmesh_dir)/include/geom \
                    -I$(libmesh_dir)/include/mesh \
                    -I$(libmesh_dir)/include/numerics \
+                   -I$(libmesh_dir)/include/parallel \
                    -I$(libmesh_dir)/include/partitioning \
                    -I$(libmesh_dir)/include/quadrature \
                    -I$(libmesh_dir)/include/solvers \
