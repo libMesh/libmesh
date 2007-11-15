@@ -11936,9 +11936,9 @@ echo "${ECHO_T}<<< Configuring library with Exodus API support >>>" >&6
    fi
    fi
 
-# Check whether --enable-libhilbert or --disable-libhilbert was given.
-if test "${enable_libhilbert+set}" = set; then
-  enableval="$enable_libhilbert"
+# Check whether --enable-libHilbert or --disable-libHilbert was given.
+if test "${enable_libHilbert+set}" = set; then
+  enableval="$enable_libHilbert"
   enablelibhilbert=$enableval
 else
   enablelibhilbert=yes
