@@ -34,6 +34,7 @@
 #include "mesh_base.h"
 #include "mesh_refinement.h"
 #include "parallel.h"
+#include "remote_elem.h"
 
 
 
@@ -323,7 +324,8 @@ bool MeshRefinement::test_level_one (bool assert_pass)
         {
           Elem *neighbor = elem->neighbor(n);
 
-          if (!neighbor || !neighbor->active())
+          if (!neighbor || !neighbor->active() ||
+              neighbor == remote_elem)
             continue;
 
           if ((neighbor->level() + 1 < elem->level()) ||
@@ -441,48 +443,45 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   if (!_mesh.is_serial())
     this->make_flags_parallel_consistent();
 
-  // Repeat until coarsening & refinement flags jive
-  bool satisfied = false;
+  // Repeat until flag changes match on every processor
   do
     {
-      const bool coarsening_satisfied =
-	this->make_coarsening_compatible(maintain_level_one);
+      // Repeat until coarsening & refinement flags jive
+      bool satisfied = false;
+      do
+        {
+          const bool coarsening_satisfied =
+	    this->make_coarsening_compatible(maintain_level_one);
 
-      const bool refinement_satisfied =
-	this->make_refinement_compatible(maintain_level_one);
+          const bool refinement_satisfied =
+	    this->make_refinement_compatible(maintain_level_one);
 
-      bool smoothing_satisfied = 
- 	!this->eliminate_unrefined_patches();
+          bool smoothing_satisfied = 
+ 	    !this->eliminate_unrefined_patches();
 
-      if (_edge_level_mismatch_limit)
-        smoothing_satisfied = smoothing_satisfied && 
-          !this->limit_level_mismatch_at_edge (_edge_level_mismatch_limit);
+          if (_edge_level_mismatch_limit)
+            smoothing_satisfied = smoothing_satisfied && 
+              !this->limit_level_mismatch_at_edge (_edge_level_mismatch_limit);
 
-      if (_node_level_mismatch_limit)
-        smoothing_satisfied = smoothing_satisfied &&
-          !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
+          if (_node_level_mismatch_limit)
+            smoothing_satisfied = smoothing_satisfied &&
+              !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
 
-      // Parallel consistency has to come first, or coarsening
-      // along processor boundaries might occasionally be falsely
-      // prevented
-
-      const bool parallel_consistent = _mesh.is_serial() ||
-        this->make_flags_parallel_consistent();
-
-      satisfied = (parallel_consistent &&
-                   coarsening_satisfied &&
-		   refinement_satisfied &&
-		   smoothing_satisfied);
+          satisfied = (coarsening_satisfied &&
+		       refinement_satisfied &&
+		       smoothing_satisfied);
 #ifdef DEBUG
-      bool max_satisfied = satisfied,
-           min_satisfied = satisfied;
-      Parallel::max(max_satisfied);
-      Parallel::min(min_satisfied);
-      assert (satisfied == max_satisfied);
-      assert (satisfied == min_satisfied);
+          bool max_satisfied = satisfied,
+               min_satisfied = satisfied;
+          Parallel::max(max_satisfied);
+          Parallel::min(min_satisfied);
+          assert (satisfied == max_satisfied);
+          assert (satisfied == min_satisfied);
 #endif
+        }
+      while (!satisfied);
     }
-  while (!satisfied);
+  while (!_mesh.is_serial() && !this->make_flags_parallel_consistent());
 
   // First coarsen the flagged elements.
   const bool coarsening_changed_mesh =
@@ -584,39 +583,41 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
   if (!_mesh.is_serial())
     this->make_flags_parallel_consistent();
 
-  // Repeat until the flags form a conforming mesh.
-  bool satisfied = false;
-  while (!satisfied)
+  // Repeat until flag changes match on every processor
+  do
     {
-      const bool coarsening_satisfied =
-	this->make_coarsening_compatible(maintain_level_one);
+      // Repeat until the flags form a conforming mesh.
+      bool satisfied = false;
+      do
+        {
+          const bool coarsening_satisfied =
+	    this->make_coarsening_compatible(maintain_level_one);
 
-      bool smoothing_satisfied = 
- 	!this->eliminate_unrefined_patches();// &&
+          bool smoothing_satisfied = 
+ 	    !this->eliminate_unrefined_patches();// &&
 
-      if (_edge_level_mismatch_limit)
-        smoothing_satisfied = smoothing_satisfied &&
-          !this->limit_level_mismatch_at_edge (_edge_level_mismatch_limit);
+          if (_edge_level_mismatch_limit)
+            smoothing_satisfied = smoothing_satisfied &&
+              !this->limit_level_mismatch_at_edge (_edge_level_mismatch_limit);
 
-      if (_node_level_mismatch_limit)
-        smoothing_satisfied = smoothing_satisfied &&
-          !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
+          if (_node_level_mismatch_limit)
+            smoothing_satisfied = smoothing_satisfied &&
+              !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
 
-      const bool parallel_consistent = _mesh.is_serial() ||
-        this->make_flags_parallel_consistent();
-      
-      satisfied = (parallel_consistent &&
-                   coarsening_satisfied &&
-		   smoothing_satisfied);
+          satisfied = (coarsening_satisfied &&
+		       smoothing_satisfied);
 #ifdef DEBUG
-      bool max_satisfied = satisfied,
-           min_satisfied = satisfied;
-      Parallel::max(max_satisfied);
-      Parallel::min(min_satisfied);
-      assert (satisfied == max_satisfied);
-      assert (satisfied == min_satisfied);
+          bool max_satisfied = satisfied,
+               min_satisfied = satisfied;
+          Parallel::max(max_satisfied);
+          Parallel::min(min_satisfied);
+          assert (satisfied == max_satisfied);
+          assert (satisfied == min_satisfied);
 #endif
+        }
+      while (!satisfied);
     }
+  while (!_mesh.is_serial() && !this->make_flags_parallel_consistent());
 
   // Coarsen the flagged elements.
   const bool mesh_changed = 
@@ -696,39 +697,41 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
   if (!_mesh.is_serial())
     this->make_flags_parallel_consistent();
 
-  // Repeat until coarsening & refinement flags jive
-  bool satisfied = false;
-  while (!satisfied)
+  // Repeat until flag changes match on every processor
+  do
     {
-      const bool refinement_satisfied =
-	this->make_refinement_compatible(maintain_level_one);
+      // Repeat until coarsening & refinement flags jive
+      bool satisfied = false;
+      do
+        {
+          const bool refinement_satisfied =
+	    this->make_refinement_compatible(maintain_level_one);
 
-      bool smoothing_satisfied = 
- 	!this->eliminate_unrefined_patches();// &&
+          bool smoothing_satisfied = 
+ 	    !this->eliminate_unrefined_patches();// &&
 
-      if (_edge_level_mismatch_limit)
-        smoothing_satisfied = smoothing_satisfied &&
-          !this->limit_level_mismatch_at_edge (_edge_level_mismatch_limit);
+          if (_edge_level_mismatch_limit)
+            smoothing_satisfied = smoothing_satisfied &&
+              !this->limit_level_mismatch_at_edge (_edge_level_mismatch_limit);
 
-      if (_node_level_mismatch_limit)
-        smoothing_satisfied = smoothing_satisfied &&
-          !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
+          if (_node_level_mismatch_limit)
+            smoothing_satisfied = smoothing_satisfied &&
+              !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
 
-      const bool parallel_consistent = _mesh.is_serial() ||
-        this->make_flags_parallel_consistent();
-      
-      satisfied = (parallel_consistent &&
-                   refinement_satisfied &&
-		   smoothing_satisfied);
+          satisfied = (refinement_satisfied &&
+		       smoothing_satisfied);
 #ifdef DEBUG
-      bool max_satisfied = satisfied,
-           min_satisfied = satisfied;
-      Parallel::max(max_satisfied);
-      Parallel::min(min_satisfied);
-      assert (satisfied == max_satisfied);
-      assert (satisfied == min_satisfied);
+          bool max_satisfied = satisfied,
+               min_satisfied = satisfied;
+          Parallel::max(max_satisfied);
+          Parallel::min(min_satisfied);
+          assert (satisfied == max_satisfied);
+          assert (satisfied == min_satisfied);
 #endif
+        }
+      while (!satisfied);
     }
+  while (!_mesh.is_serial() && !this->make_flags_parallel_consistent());
   
   // Now refine the flagged elements.  This will
   // take up some space, maybe more than what was freed.
@@ -786,12 +789,25 @@ bool MeshRefinement::make_flags_parallel_consistent()
   // Request sets to send to each processor
   std::vector<std::vector<unsigned int> >
     requested_ids(libMesh::n_processors());
+  // Double check that my flags are sufficiently
+  // conservative
+#ifdef DEBUG
+  std::vector<std::vector<unsigned char> >
+    current_rflags(libMesh::n_processors()),
+    current_pflags(libMesh::n_processors());
+#endif
 
   // We know how many ghost elements live on each processor, so reserve()
   // space for each.
   for (unsigned int p=0; p != libMesh::n_processors(); ++p)
     if (p != libMesh::processor_id())
-      requested_ids[p].reserve(ghost_elems_from_proc[p]);
+      {
+        requested_ids[p].reserve(ghost_elems_from_proc[p]);
+#ifdef DEBUG
+        current_rflags[p].reserve(ghost_elems_from_proc[p]);
+        current_pflags[p].reserve(ghost_elems_from_proc[p]);
+#endif
+      }
 
   for (MeshBase::element_iterator it = _mesh.elements_begin();
        it != end; ++it)
@@ -800,6 +816,10 @@ bool MeshRefinement::make_flags_parallel_consistent()
       unsigned int elem_procid = elem->processor_id();
 
       requested_ids[elem_procid].push_back(elem->id());
+#ifdef DEBUG
+      current_rflags[elem_procid].push_back(elem->refinement_flag());
+      current_pflags[elem_procid].push_back(elem->p_refinement_flag());
+#endif
     }
 
   // Set refinement flags from other processors
@@ -811,9 +831,19 @@ bool MeshRefinement::make_flags_parallel_consistent()
       unsigned int procdown = (libMesh::n_processors() +
                                libMesh::processor_id() - p) %
                                libMesh::n_processors();
-      std::vector<unsigned int> request_to_fill;
+      std::vector<unsigned int>  request_to_fill;
       Parallel::send_receive(procup, requested_ids[procup],
                              procdown, request_to_fill);
+#ifdef DEBUG
+      std::vector<unsigned char> foreign_rflags,
+                                 foreign_pflags;
+      Parallel::send_receive(procup, current_rflags[procup],
+                             procdown, foreign_rflags);
+      Parallel::send_receive(procup, current_pflags[procup],
+                             procdown, foreign_pflags);
+      assert (request_to_fill.size() == foreign_rflags.size());
+      assert (request_to_fill.size() == foreign_pflags.size());
+#endif
 
       // Fill those requests.
       std::vector<unsigned char> rflags(request_to_fill.size()),
@@ -821,8 +851,42 @@ bool MeshRefinement::make_flags_parallel_consistent()
       for (unsigned int i=0; i != request_to_fill.size(); ++i)
         {
           Elem *elem = _mesh.elem(request_to_fill[i]);
+
           rflags[i] = elem->refinement_flag();
           pflags[i] = elem->p_refinement_flag();
+#ifdef DEBUG
+          Elem::RefinementState frflag = 
+            static_cast<Elem::RefinementState>(foreign_rflags[i]),
+                                fpflag = 
+            static_cast<Elem::RefinementState>(foreign_pflags[i]);
+
+          // Make sure all our flags are for new operations
+          assert (frflag != Elem::JUST_REFINED);
+          assert (frflag != Elem::JUST_COARSENED);
+          assert (rflags[i] != Elem::JUST_REFINED);
+          assert (rflags[i] != Elem::JUST_COARSENED);
+          assert (fpflag != Elem::JUST_REFINED);
+          assert (fpflag != Elem::JUST_COARSENED);
+          assert (pflags[i] != Elem::JUST_REFINED);
+          assert (pflags[i] != Elem::JUST_COARSENED);
+
+          // Make sure none of the foreign flags are more
+          // conservative than our own
+          assert (!(rflags[i] != Elem::REFINE &&
+                    frflag == Elem::REFINE));
+          assert (!(pflags[i] != Elem::REFINE &&
+                    fpflag == Elem::REFINE));
+/*
+          assert (!(rflags[i] == Elem::COARSEN &&
+                    frflag != Elem::COARSEN));
+          assert (!(pflags[i] == Elem::COARSEN &&
+                    fpflag != Elem::COARSEN));
+          assert (!(rflags[i] == Elem::COARSEN_INACTIVE &&
+                    frflag != Elem::COARSEN_INACTIVE));
+          assert (!(pflags[i] == Elem::COARSEN_INACTIVE &&
+                    fpflag != Elem::COARSEN_INACTIVE));
+*/
+#endif
         }
 
       // Trade back the results
@@ -842,6 +906,7 @@ bool MeshRefinement::make_flags_parallel_consistent()
           unsigned char old_p_flag = elem->p_refinement_flag();
           if (old_r_flag != ghost_rflags[i])
             {
+
               elem->set_refinement_flag
                 (static_cast<Elem::RefinementState>(ghost_rflags[i]));
               parallel_consistent = false;
@@ -967,7 +1032,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 		  const unsigned int my_level = elem->level();
 		  
 		  for (unsigned int n=0; n<elem->n_neighbors(); n++)
-		    if (elem->neighbor(n) != NULL)     // I have a neighbor
+		    if (elem->neighbor(n) != NULL &&      // I have a
+		        elem->neighbor(n) != remote_elem) // neighbor here
 		      if (elem->neighbor(n)->active()) // and it is active
 			{
 			  const Elem* neighbor = elem->neighbor(n);
@@ -997,7 +1063,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 		  const unsigned int my_p_level = elem->p_level();
 
 		  for (unsigned int n=0; n<elem->n_neighbors(); n++)
-		    if (elem->neighbor(n) != NULL)     // I have a neighbor
+		    if (elem->neighbor(n) != NULL &&      // I have a
+		        elem->neighbor(n) != remote_elem) // neighbor here
 		      if (elem->neighbor(n)->active()) // and it is active
 			{
 			  const Elem* neighbor = elem->neighbor(n);
@@ -1025,7 +1092,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	                   for (unsigned int c=0; c!=neighbor->n_children(); c++)
                              {
                                Elem *subneighbor = neighbor->child(c);
-                               if (subneighbor->active() &&
+                               if (subneighbor != remote_elem &&
+                                   subneighbor->active() &&
                                    subneighbor->is_neighbor(elem))
                                  if ((subneighbor->p_level() > my_p_level &&
                                      subneighbor->p_refinement_flag() != Elem::COARSEN)
@@ -1058,7 +1126,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                   Elem *neigh = elem->neighbor(n);
                   if (!neigh)
                     continue;
-                  if (neigh->processor_id() !=
+                  if (neigh == remote_elem ||
+                      neigh->processor_id() !=
                       libMesh::processor_id())
                     {
                       compatible_with_refinement = false;
@@ -1068,7 +1137,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                   // test all descendants
                   if (neigh->has_children())
                     for (unsigned int c=0; c != neigh->n_children(); ++c)
-                      if (neigh->child(c)->processor_id() !=
+                      if (neigh->child(c) == remote_elem ||
+                          neigh->child(c)->processor_id() !=
                           libMesh::processor_id())
                         {
                           compatible_with_refinement = false;
@@ -1101,22 +1171,33 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	      // right now the element hasn't been disqualified
 	      // as a candidate for unrefinement	   
 	      bool is_a_candidate = true;
+	      bool found_remote_child = false;
 	      
 	      for (unsigned int c=0; c<elem->n_children(); c++)
-	        if ((elem->child(c)->refinement_flag() != Elem::COARSEN) ||
-		    !elem->child(c)->active() )
-	          is_a_candidate = false;
+                {
+                  Elem *child = elem->child(c);
+                  if (child == remote_elem)
+                    found_remote_child = true;
+	          else if ((child->refinement_flag() != Elem::COARSEN) ||
+		           !child->active() )
+	            is_a_candidate = false;
+                }
 	      
-	      if (!is_a_candidate)
+	      if (!is_a_candidate && !found_remote_child)
 	        {
 	          elem->set_refinement_flag(Elem::INACTIVE);
 		  
 	          for (unsigned int c=0; c<elem->n_children(); c++)
-		    if (elem->child(c)->refinement_flag() == Elem::COARSEN)
-		      {
-		        level_one_satisfied = false;
-		        elem->child(c)->set_refinement_flag(Elem::DO_NOTHING);
-		      }
+                    {
+                      Elem *child = elem->child(c);
+                      if (child == remote_elem)
+                        continue;
+		      if (child->refinement_flag() == Elem::COARSEN)
+		        {
+		          level_one_satisfied = false;
+		          child->set_refinement_flag(Elem::DO_NOTHING);
+		        }
+                    }
 	        }
 	    }
          }
@@ -1135,17 +1216,24 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
         if (elem->ancestor())
           {
 	
-	    // Presume all the children are flagged for coarsening
-	    // and then look for a contradiction	 
+	    // Presume all the children are local and flagged for
+	    // coarsening and then look for a contradiction	 
 	    bool all_children_flagged_for_coarsening = true;
+	    bool found_remote_child = false;
 	
 	    for (unsigned int c=0; c<elem->n_children(); c++)
-	      if (elem->child(c)->refinement_flag() != Elem::COARSEN)
-	        all_children_flagged_for_coarsening = false;
+              {
+                Elem *child = elem->child(c);
+	        if (child == remote_elem)
+                  found_remote_child = true;
+	        else if (child->refinement_flag() != Elem::COARSEN)
+	          all_children_flagged_for_coarsening = false;
+              }
 	
-	    if (all_children_flagged_for_coarsening)
+	    if (!found_remote_child &&
+                all_children_flagged_for_coarsening)
 	      elem->set_refinement_flag(Elem::COARSEN_INACTIVE);
-            else
+            else if (!found_remote_child)
 	      elem->set_refinement_flag(Elem::INACTIVE);
           }
     }
@@ -1214,7 +1302,8 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 		for (unsigned int side=0; side != elem->n_sides(); side++)
                   {
 		    Elem* neighbor = elem->neighbor(side);
-		    if (neighbor != NULL &&     // I have a neighbor
+		    if (neighbor != NULL        && // I have a
+		        neighbor != remote_elem && // neighbor here
 		        neighbor->active()) // and it is active
 		      {
 			
@@ -1283,7 +1372,8 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 		for (unsigned int side=0; side != elem->n_sides(); side++)
                   {
                     Elem *neighbor = elem->neighbor(side);
-		    if (neighbor != NULL)     // I have a neighbor
+		    if (neighbor != NULL &&      // I have a
+		        neighbor != remote_elem) // neighbor here
 		      if (neighbor->active()) // and it is active
 		        {
                           if (neighbor->p_level() < my_p_level &&
@@ -1307,6 +1397,8 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 	                   for (unsigned int c=0; c!=neighbor->n_children(); c++)
                              {
                                Elem *subneighbor = neighbor->child(c);
+                               if (subneighbor == remote_elem)
+                                 continue;
                                if (subneighbor->active() &&
                                    subneighbor->is_neighbor(elem))
                                  if (subneighbor->p_level() < my_p_level &&
