@@ -80,6 +80,7 @@ enable-gmv           = @enablegmv@
 enable-vtk           = @enablevtk@
 enable-exodus	     = @enableexodus@
 enable-netcdf	     = @enablenetcdf@
+enable-libhilbert    = @enablelibhilbert@
 
 #
 # Set the current directory.
@@ -311,6 +312,13 @@ ifeq ($(enable-optional),yes)
     libmesh_INCLUDE += @NETCDF_INCLUDE@
   endif
 
+  # if libHilbert is used we need the header path
+  # and the lib
+  ifeq ($(enable-libhilbert),yes)
+    libmesh_LIBS    += @LIBHILBERT_LIBRARY@
+    libmesh_INCLUDE += @LIBHILBERT_INCLUDE@
+  endif
+
   #############################################################################
   # SLEPc
   ifeq ($(enable-slepc),yes)
@@ -442,10 +450,6 @@ ifeq ($(enable-optional),yes)
   libmesh_INCLUDE += $(MPI_INCLUDE)
 
 endif # End of disable-optional test
-
-# if Exodus is used, link against libexoIIv2c.a
-#libmesh_LIBS    += @EXODUS_LIBRARY@
-#libmesh_INCLUDE += @EXODUS_INCLUDE@
 
 
 # Finally, Append the linker flags to the libraries

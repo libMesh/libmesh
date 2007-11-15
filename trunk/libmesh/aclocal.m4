@@ -886,7 +886,6 @@ AC_DEFUN(CONFIGURE_SFC,
   dnl Initialize variables
   SFC_INCLUDE=""
   SFC_LIB=""
-  CONTRIB_HAVE_SFC="/* #undef HAVE_SFCURVES */"
 
   dnl Sanity check: make sure the user really has the contrib directory
   if (test $enablesfc = yes); then
@@ -899,10 +898,8 @@ AC_DEFUN(CONFIGURE_SFC,
      SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfcurves\$(libext)"
      AC_DEFINE(HAVE_SFCURVES, 1, [Flag indicating whether or not Space filling curves are available])
      AC_MSG_RESULT(<<< Configuring library with SFC support >>>)
-     CONTRIB_HAVE_SFC="#define HAVE_SFCURVES 1"
   fi
 
-  AC_SUBST(CONTRIB_HAVE_SFC)	
   AC_SUBST(SFC_INCLUDE)
   AC_SUBST(SFC_LIB)	
   AC_SUBST(enablesfc)
@@ -922,7 +919,6 @@ AC_DEFUN(CONFIGURE_GZ,
 dnl Initialize variables
 GZSTREAM_INCLUDE=""
 GZSTREAM_LIB=""
-CONTRIB_HAVE_GZSTREAM="/* #undef HAVE_GZSTREAM */"
 
 dnl Sanity check: make sure the user really has the contrib directory
 if (test $enablegz = yes); then
@@ -941,7 +937,6 @@ if (test $enablegz = yes); then
     GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
     AC_DEFINE(HAVE_GZSTREAM, 1, [Flag indicating whether or not gzstreams are available])
     AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
-    CONTRIB_HAVE_GZSTREAM="#define HAVE_GZSTREAM 1"
 
   dnl Otherwise do not enable gzstreams
   else
@@ -949,7 +944,6 @@ if (test $enablegz = yes); then
   fi
 fi
 
-AC_SUBST(CONTRIB_HAVE_GZSTREAM)	
 AC_SUBST(GZSTREAM_INCLUDE)
 AC_SUBST(GZSTREAM_LIB)	
 AC_SUBST(enablegz)
@@ -969,7 +963,6 @@ AC_DEFUN(CONFIGURE_LASPACK,
 dnl Initialize variables
 LASPACK_INCLUDE=""
 LASPACK_LIB=""
-CONTRIB_HAVE_LASPACK="/* #undef HAVE_LASPACK */"
 
 dnl Sanity check: make sure the user really has the contrib directory
 if (test $enablelaspack = yes); then
@@ -984,11 +977,9 @@ if (test $enablelaspack = yes); then
   AC_DEFINE(HAVE_LASPACK, 1, [Flag indicating whether or not LASPACK iterative solvers are available])
   laspack_version=`grep "define LASPACK_VERSION " $PWD/contrib/laspack/version.h | sed -e "s/[[^0-9.]]*//g"`
   AC_MSG_RESULT(<<< Configuring library with LASPACK version $laspack_version support >>>)
-  CONTRIB_HAVE_LASPACK="#define HAVE_LASPACK 1"
 
 fi
 
-AC_SUBST(CONTRIB_HAVE_LASPACK)	
 AC_SUBST(LASPACK_INCLUDE)
 AC_SUBST(LASPACK_LIB)	
 AC_SUBST(enablelaspack)
@@ -1108,16 +1099,13 @@ dnl if TetGen is enabled we need the header path and the lib
      TETGEN_LIBRARY="\$(EXTERNAL_LIBDIR)/libtetgen\$(libext)"
      AC_DEFINE(HAVE_TETGEN, 1, [Flag indicating whether the library will be compiled with TetGen support])
      AC_MSG_RESULT(<<< Configuring library with TetGen support >>>)
-     CONTRIB_HAVE_TETGEN="#define HAVE_TETGEN 1"
   else
      TETGEN_INCLUDE=""
      TETGEN_LIBRARY=""
      enabletetgen=no
-     CONTRIB_HAVE_TETGEN="/* #undef HAVE_TETGEN */"
    fi
 
   dnl TetGen
-  AC_SUBST(CONTRIB_HAVE_TETGEN)	
   AC_SUBST(TETGEN_INCLUDE)
   AC_SUBST(TETGEN_LIBRARY)	
   AC_SUBST(enabletetgen)
@@ -1139,15 +1127,12 @@ dnl where it might be installed...
      TRIANGLE_LIBRARY="\$(EXTERNAL_LIBDIR)/libtriangle\$(libext)"
      AC_DEFINE(HAVE_TRIANGLE, 1, [Flag indicating whether the library will be compiled with Triangle support])
      AC_MSG_RESULT(<<< Configuring library with Triangle support >>>)
-     CONTRIB_HAVE_TRIANGLE="#define HAVE_TRIANGLE 1"
   else
      TRIANGLE_INCLUDE=""
      TRIANGLE_LIBRARY=""
      enabletriangle=no
-     CONTRIB_HAVE_TRIANGLE="/* #undef HAVE_TRIANGLE */"
   fi
 
-  AC_SUBST(CONTRIB_HAVE_TRIANGLE)	
   AC_SUBST(TRIANGLE_INCLUDE)
   AC_SUBST(TRIANGLE_LIBRARY)	
   AC_SUBST(enabletriangle)
@@ -1169,15 +1154,12 @@ dnl where it might be installed...
      GMV_LIBRARY="\$(EXTERNAL_LIBDIR)/libgmv\$(libext)"
      AC_DEFINE(HAVE_GMV, 1, [Flag indicating whether the library will be compiled with GMV support])
      AC_MSG_RESULT(<<< Configuring library with GMV support >>>)
-     CONTRIB_HAVE_GMV="#define HAVE_GMV 1"
   else
      GMV_INCLUDE=""
      GMV_LIBRARY=""
      enablegmv=no
-     CONTRIB_HAVE_GMV="/* #undef HAVE_GMV */"
   fi
 
-  AC_SUBST(CONTRIB_HAVE_GMV)	
   AC_SUBST(GMV_INCLUDE)
   AC_SUBST(GMV_LIBRARY)	
   AC_SUBST(enablegmv)
@@ -1271,17 +1253,14 @@ dnl where it might be installed...
      NETCDF_LIBRARY="\$(EXTERNAL_LIBDIR)/libnetcdf\$(libext)"
      AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
      AC_MSG_RESULT(<<< Configuring library with Netcdf support >>>)
-     CONTRIB_HAVE_NETCDF="#define HAVE_NETCDF 1"
      have_netcdf=yes
   else
      NETCDF_INCLUDE=""
      NETCDF_LIBRARY=""
      enablenetcdf=no
-     CONTRIB_HAVE_NETCDF="/* #undef HAVE_NETCDF */"
      have_netcdf=no
   fi
 
-  AC_SUBST(CONTRIB_HAVE_NETCDF)	
   AC_SUBST(NETCDF_INCLUDE)
   AC_SUBST(NETCDF_LIBRARY)	
   AC_SUBST(enablenetcdf)
@@ -1301,18 +1280,40 @@ dnl where it might be installed...
      EXODUS_LIBRARY="\$(EXTERNAL_LIBDIR)/libexodusii\$(libext)"
      AC_DEFINE(HAVE_EXODUS_API, 1, [Flag indicating whether the library will be compiled with Exodus support])
      AC_MSG_RESULT(<<< Configuring library with Exodus API support >>>)
-     CONTRIB_HAVE_EXODUS="#define HAVE_EXODUS 1"
   else
      EXODUS_INCLUDE=""
      EXODUS_LIBRARY=""
      enableexodus=no
-     CONTRIB_HAVE_EXODUS="/* #undef HAVE_EXODUS */"
   fi
 
-  AC_SUBST(CONTRIB_HAVE_EXODUS)	
   AC_SUBST(EXODUS_INCLUDE)
   AC_SUBST(EXODUS_LIBRARY)	
   AC_SUBST(enableexodus)
+])
+dnl -------------------------------------------------------------
+
+dnl -------------------------------------------------------------
+dnl libHilbert
+dnl -------------------------------------------------------------
+AC_DEFUN(CONFIGURE_LIBHILBERT,
+[
+dnl libHilbert is distributed with libmesh, so we don't have to guess
+dnl where it might be installed...
+
+  if (test $enablelibhilbert = yes); then
+     LIBHILBERT_INCLUDE="-I$PWD/contrib/libHilbert/include"
+     LIBHILBERT_LIBRARY="\$(EXTERNAL_LIBDIR)/libHilbert\$(libext)"
+     AC_DEFINE(HAVE_LIBHILBERT, 1, [Flag indicating whether the library will be compiled with libHilbert support])
+     AC_MSG_RESULT(<<< Configuring library with libHilbert support >>>)
+  else
+     LIBHILBERT_INCLUDE=""
+     LIBHILBERT_LIBRARY=""
+     enablelibhilbert=no
+  fi
+
+  AC_SUBST(LIBHILBERT_INCLUDE)
+  AC_SUBST(LIBHILBERT_LIBRARY)	
+  AC_SUBST(enablelibhilbert)
 ])
 dnl -------------------------------------------------------------
 

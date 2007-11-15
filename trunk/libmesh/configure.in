@@ -120,7 +120,7 @@ AC_CXX_HAVE_SSTREAM
 AC_CHECK_HEADERS(hash_map,[],[AC_CHECK_HEADERS(ext/hash_map)])
 AC_CHECK_HEADERS(hash_set,[],[AC_CHECK_HEADERS(ext/hash_set)])
 
-AC_CHECK_HEADERS(dlfcn.h, AC_DEFINE(HAVE_DLADDR))
+AC_CHECK_HEADERS(dlfcn.h)
 AX_CXX_GCC_ABI_DEMANGLE
 AX_CXX_GLIBC_BACKTRACE
 
@@ -681,6 +681,18 @@ if (test "$enablenetcdf" != no) ; then
    fi
    dnl -------------------------------------------------------------
 fi
+dnl -------------------------------------------------------------
+
+dnl -------------------------------------------------------------
+dnl libHilbert -- enabled by default, distributed in ./contrib
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(libhilbert,
+              AC_HELP_STRING([--enable-libHilbert],
+                             [build with Chris Hamilton's libHilbert]),
+              enablelibhilbert=$enableval,
+              enablelibhilbert=yes)
+
+CONFIGURE_LIBHILBERT
 dnl -------------------------------------------------------------
 
 dnl end of --disable-optional test

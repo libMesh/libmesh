@@ -36,6 +36,9 @@ all:
 	@echo "--- Building ExodusII ---------------------"
 	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
 	@echo ""
+	@echo "--- Building libHilbert ---------------------"
+	@$(MAKE) -C libHilbert $(MAKECMDGOALS)
+	@echo ""
 	@echo "----------------------------------------------"
 	@echo "----- Done Building Contributed Packages -----"
 	@echo "----------------------------------------------"
@@ -57,6 +60,7 @@ clean:
 	@$(MAKE) -C gmv          $(MAKECMDGOALS)
 	@$(MAKE) -C netcdf/Lib   $(MAKECMDGOALS)
 	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
+	@$(MAKE) -C libHilbert   $(MAKECMDGOALS)
 
 #
 # How to clobber the packages
@@ -73,6 +77,7 @@ clobber:
 	@$(MAKE) -C gmv          $(MAKECMDGOALS)
 	@$(MAKE) -C netcdf/Lib   $(MAKECMDGOALS)
 	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
+	@$(MAKE) -C libHilbert   $(MAKECMDGOALS)
 
 #
 # How to distclean the packages
@@ -89,4 +94,5 @@ distclean:
 	@$(MAKE) -C gmv          $(MAKECMDGOALS)
 	@$(MAKE) -C netcdf/Lib   $(MAKECMDGOALS)
 	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
+	@$(MAKE) -C libHilbert   $(MAKECMDGOALS)
 	@rm -rf lib/*_dbg lib/*_opt lib/*_pro lib/*_devel
