@@ -815,9 +815,11 @@ bool MeshRefinement::make_flags_parallel_consistent()
       Parallel::send_receive(procup, requested_ids[procup],
                              procdown, request_to_fill);
 
-      // Fill those requests
-      std::vector<unsigned char> rflags(request_to_fill.size()),
-                                 pflags(request_to_fill.size());
+      // Fill those requests. We are using unsigned short ints
+      // where unsigned chars would do, because underlying
+      // operations like MPI_MIN are not portable for chars
+      std::vector<unsigned short int> rflags(request_to_fill.size()),
+                                      pflags(request_to_fill.size());
       for (unsigned int i=0; i != request_to_fill.size(); ++i)
         {
           Elem *elem = _mesh.elem(request_to_fill[i]);
@@ -826,7 +828,7 @@ bool MeshRefinement::make_flags_parallel_consistent()
         }
 
       // Trade back the results
-      std::vector<unsigned char> ghost_rflags, ghost_pflags;
+      std::vector<unsigned short int> ghost_rflags, ghost_pflags;
       Parallel::send_receive(procdown, rflags,
                              procup, ghost_rflags);
       Parallel::send_receive(procdown, pflags,

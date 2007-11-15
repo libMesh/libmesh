@@ -191,11 +191,11 @@ namespace Parallel
   // Parallel members
 
 #ifdef HAVE_MPI
-  template<>
-  inline MPI_Datatype datatype<char>() { return MPI_CHAR; }
-
-  template<>
-  inline MPI_Datatype datatype<unsigned char>() { return MPI_UNSIGNED_CHAR; }
+//  template<>
+//  inline MPI_Datatype datatype<char>() { return MPI_CHAR; }
+//
+//  template<>
+//  inline MPI_Datatype datatype<unsigned char>() { return MPI_UNSIGNED_CHAR; }
 
   template<>
   inline MPI_Datatype datatype<short int>() { return MPI_SHORT; }
@@ -246,7 +246,9 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
-	std::vector<char> temp(r.size());
+	// Cannot use <char> since MPI_MIN is not
+	// strictly defined for chars!
+	std::vector<short int> temp; temp.reserve(r.size());
 	for (unsigned int i=0; i != r.size(); ++i)
 	  temp.push_back(r[i]);
 	return Parallel::verify(temp);
@@ -277,12 +279,12 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
-	unsigned char tempsend = r;
-	unsigned char temp;
+	unsigned int tempsend = r;
+	unsigned int temp;
 	MPI_Allreduce (&tempsend,
 		       &temp,
 		       1,
-		       datatype<unsigned char>(),
+		       datatype<unsigned int>(),
 		       MPI_MIN,
 		       libMesh::COMM_WORLD);
 	r = temp;
@@ -329,12 +331,12 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
-	unsigned char tempsend = r;
-	unsigned char temp;
+	unsigned int tempsend = r;
+	unsigned int temp;
 	MPI_Allreduce (&tempsend,
 		       &temp,
 		       1,
-		       datatype<unsigned char>(),
+		       datatype<unsigned int>(),
 		       MPI_MAX,
 		       libMesh::COMM_WORLD);
 	r = temp;
