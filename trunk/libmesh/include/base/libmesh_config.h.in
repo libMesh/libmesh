@@ -15,6 +15,10 @@
 /* Flag indicating if the library should be built with infinite elements */
 #undef ENABLE_INFINITE_ELEMENTS
 
+/* Flag indicating if the library should use the experimental ParallelMesh as
+   its default Mesh type */
+#undef ENABLE_PARMESH
+
 /* Flag indicating if the library should be built with performance logging
    support */
 #undef ENABLE_PERFORMANCE_LOGGING
@@ -22,10 +26,6 @@
 /* Flag indicating if the library should be built with periodic boundary
    condition support */
 #undef ENABLE_PERIODIC
-
-/* Flag indicating if the library should use ParallelMesh as its
-   default Mesh type */
-#undef ENABLE_PARMESH
 
 /* Flag indicating if the library should be built with reference counting
    support */
@@ -37,8 +37,10 @@
 /* Define to 1 if you have the <csignal> header file. */
 #undef HAVE_CSIGNAL
 
-/* Flag indicating whether the library shall be compiled to use the Exodus
-   interface */
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Flag indicating whether the library will be compiled with Exodus support */
 #undef HAVE_EXODUS_API
 
 /* Define to 1 if you have the <ext/hash_map> header file. */
@@ -47,8 +49,14 @@
 /* Define to 1 if you have the <ext/hash_set> header file. */
 #undef HAVE_EXT_HASH_SET
 
+/* define if the compiler supports GCC C++ ABI name demangling */
+#undef HAVE_GCC_ABI_DEMANGLE
+
 /* Define to 1 if you have the <getopt.h> header file. */
 #undef HAVE_GETOPT_H
+
+/* define if the compiler supports glibc backtrace */
+#undef HAVE_GLIBC_BACKTRACE
 
 /* Flag indicating whether the library will be compiled with GMV support */
 #undef HAVE_GMV
@@ -68,6 +76,10 @@
 /* Flag indicating whether or not LASPACK iterative solvers are available */
 #undef HAVE_LASPACK
 
+/* Flag indicating whether the library will be compiled with libHilbert
+   support */
+#undef HAVE_LIBHILBERT
+
 /* define if the compiler has locale */
 #undef HAVE_LOCALE
 
@@ -83,8 +95,7 @@
 /* define if the compiler implements namespaces */
 #undef HAVE_NAMESPACES
 
-/* Flag indicating whether the library shall be compiled to support netcdf
-   files */
+/* Flag indicating whether the library will be compiled with Netcdf support */
 #undef HAVE_NETCDF
 
 /* Flag indicating whether or not ParMetis is available */
@@ -122,15 +133,6 @@
 
 /* define if the compiler has the strstream header */
 #undef HAVE_STRSTREAM
-
-/* define if the compiler has the dladdr function */
-#undef HAVE_DLADDR
-
-/* define if the compiler has abi::__cxa_demangle */
-#undef HAVE_GCC_ABI_DEMANGLE
-
-/* define if the C library has glibc style backtrace() */
-#undef HAVE_GLIBC_BACKTRACE
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
@@ -179,22 +181,22 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* The size of `double', as computed by sizeof. */
+/* The size of a `double', as computed by sizeof. */
 #undef SIZEOF_DOUBLE
 
-/* The size of `float', as computed by sizeof. */
+/* The size of a `float', as computed by sizeof. */
 #undef SIZEOF_FLOAT
 
-/* The size of `int', as computed by sizeof. */
+/* The size of a `int', as computed by sizeof. */
 #undef SIZEOF_INT
 
-/* The size of `long int', as computed by sizeof. */
+/* The size of a `long int', as computed by sizeof. */
 #undef SIZEOF_LONG_INT
 
-/* The size of `short int', as computed by sizeof. */
+/* The size of a `short int', as computed by sizeof. */
 #undef SIZEOF_SHORT_INT
 
-/* The size of `void *', as computed by sizeof. */
+/* The size of a `void *', as computed by sizeof. */
 #undef SIZEOF_VOID_P
 
 /* Define to 1 if you have the ANSI C header files. */
