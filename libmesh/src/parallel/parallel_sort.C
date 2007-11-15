@@ -319,15 +319,16 @@ void Sort<Hilbert::BitVecType>::communicate_bins()
 
       // Resize the destination buffer
       dest.resize (global_bin_sizes[i]);
-
-      MPI_Gatherv(&sendbuf[0],                   // Points to the beginning of the bin to be sent
-		  _local_bin_sizes[i],           // How much data is in the bin being sent.
-		  hilbert_type,                  // The data type we are sorting
-		  &dest[0],                      // Enough storage to hold all bin contributions
-		  &proc_bin_size[0],             // How much is to be received from each processor
-		  &displacements[0],             // Offsets into the receive buffer
-		  hilbert_type,                  // The data type we are sorting
-		  i,                             // The root process (we do this once for each proc)
+      
+      MPI_Gatherv(sendbuf.empty() ? 
+		    NULL : &sendbuf[0],  // Points to the beginning of the bin to be sent
+		  _local_bin_sizes[i],   // How much data is in the bin being sent.
+		  hilbert_type,          // The data type we are sorting
+		  &dest[0],              // Enough storage to hold all bin contributions
+		  &proc_bin_size[0],     // How much is to be received from each processor
+		  &displacements[0],     // Offsets into the receive buffer
+		  hilbert_type,          // The data type we are sorting
+		  i,                     // The root process (we do this once for each proc)
 		  libMesh::COMM_WORLD);
 
       // Copy the destination buffer if it

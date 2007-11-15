@@ -107,7 +107,18 @@ public:
    */
   void delete_remote_elements (ParallelMesh& ) const;
 
-  
+  /**
+   * This method assigns globally unique, partition-agnostic
+   * indices to the nodes and elements in the mesh.  The approach
+   * is to compute the Hilbert space-filling curve key and use its 
+   * value to assign an index in [0,N_global). Since the Hilbert key
+   * is unique for each spatial location, two objects occupying the 
+   * same location will be assigned the same global id.  Thus, this
+   * method can also be useful for identifying duplicate nodes 
+   * which may occur during parallel refinement.
+   */
+  void find_global_indices (MeshBase& ) const;
+
 private:
 
   void broadcast_mesh (MeshBase& ) const;
