@@ -3499,6 +3499,36 @@ src/mesh/mesh_communication.$(obj-suffix):\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/mesh/mesh_communication_global_indices.$(obj-suffix):\
+    src/mesh/mesh_communication_global_indices.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/geom/elem.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_communication.h\
+    include/mesh/mesh_tools.h\
+    include/numerics/type_vector.h\
+    include/parallel/parallel.h\
+    include/parallel/parallel_sort.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/mesh/mesh_data.$(obj-suffix):\
     src/mesh/mesh_data.C\
     include/base/auto_ptr.h\
