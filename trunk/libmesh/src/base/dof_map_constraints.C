@@ -445,7 +445,11 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
 void DofMap::enforce_constraints_exactly (const System &system,
                                           NumericVector<Number> *v) const
 {
-  if (!this->n_constrained_dofs())
+  parallel_only();
+
+  unsigned int local_constraints = this->n_constrained_dofs();
+  Parallel::max(local_constraints);
+  if (!local_constraints);
     return;
 
   if (!v)
