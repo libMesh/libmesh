@@ -32,7 +32,7 @@
 
 
 namespace Parallel {
-
+  
 // The Constructor sorts the local data using
 // std::sort().  Therefore, the construction of
 // a Parallel::Sort object takes O(nlogn) time,
@@ -99,31 +99,22 @@ void Sort<KeyType>::binsort()
   // we don't have to keep around the BinSorter.
   for (unsigned int i=0; i<_n_procs; ++i)
     _local_bin_sizes[i] = bs.sizeof_bin(i);
-
 }
 
 
 
 #ifdef HAVE_LIBHILBERT
-
+// Full specialization for HilbertIndices, there is a fair amount of
+// code duplication here that could potentially be consolidated with the 
+// above method
 template <>
-void Sort<Hilbert::BitVecType>::binsort()
+void Sort<Hilbert::HilbertIndices>::binsort()
 {
-  const Hilbert::BitVecType 
-    &my_min = _data.front(),
-    &my_max = _data.back();
-
-  Hilbert::BitVecType
-    my_global_min, my_global_max;
-
   // Find the global min and max from all the
   // processors.  Do this using MPI_Allreduce.
   Hilbert::HilbertIndices 
-    local_min, local_max,
+    local_min = _data.front(), local_max = _data.back(),
     global_min, global_max;
-
-  local_min = my_min;
-  local_max = my_max;
 
   MPI_Op hilbert_max, hilbert_min;
   MPI_Datatype hilbert_type;
@@ -141,7 +132,6 @@ void Sort<Hilbert::BitVecType>::binsort()
 		hilbert_type,
 		hilbert_min,
 		libMesh::COMM_WORLD);
-  my_global_min = global_min;
 
   MPI_Allreduce(&local_max,
 		&global_max,
@@ -149,21 +139,19 @@ void Sort<Hilbert::BitVecType>::binsort()
 		hilbert_type,
 		hilbert_max,
 		libMesh::COMM_WORLD);
-  my_global_max = global_max;
 
   MPI_Type_free (&hilbert_type);
   MPI_Op_free   (&hilbert_max);
   MPI_Op_free   (&hilbert_min);
 
   // Bin-Sort based on the global min and max
-  Parallel::BinSorter<Hilbert::BitVecType> bs(_data);
-  bs.binsort(_n_procs, my_global_max, my_global_min);
+  Parallel::BinSorter<Hilbert::HilbertIndices> bs(_data);
+  bs.binsort(_n_procs, global_max, global_min);
 
   // Now save the local bin sizes in a vector so
   // we don't have to keep around the BinSorter.
   for (unsigned int i=0; i<_n_procs; ++i)
     _local_bin_sizes[i] = bs.sizeof_bin(i);
-
 }
 
 #endif // #ifdef HAVE_LIBHILBERT
@@ -226,7 +214,9 @@ void Sort<KeyType>::communicate_bins()
       // Resize the destination buffer
       dest.resize (global_bin_sizes[i]);
 	  
-      MPI_Gatherv(&_data[local_offset],          // Points to the beginning of the bin to be sent
+      MPI_Gatherv((_data.size() > local_offset) ?
+		    &_data[local_offset] :
+		    NULL,                        // Points to the beginning of the bin to be sent
 		  _local_bin_sizes[i],           // How much data is in the bin being sent.
 		  Parallel::datatype<KeyType>(), // The data type we are sorting
 		  &dest[0],                      // Enough storage to hold all bin contributions
@@ -243,16 +233,17 @@ void Sort<KeyType>::communicate_bins()
 	  
       // Increment the local offset counter
       local_offset += _local_bin_sizes[i];
-    }
-  
+    } 
 }
 
 
 
 #ifdef HAVE_LIBHILBERT
-
+// Full specialization for HilbertIndices, there is a fair amount of
+// code duplication here that could potentially be consolidated with the 
+// above method
 template <>
-void Sort<Hilbert::BitVecType>::communicate_bins()
+void Sort<Hilbert::HilbertIndices>::communicate_bins()
 {
   // Create storage for the global bin sizes.  This
   // is the number of keys which will be held in
@@ -310,18 +301,12 @@ void Sort<Hilbert::BitVecType>::communicate_bins()
       for (unsigned int j=1; j<_n_procs; ++j)
 	displacements[j] = proc_bin_size[j-1] + displacements[j-1];
 
-      // Assemble the send buffer.  Note that _data is of type Hilbert::BitVecType,
-      // but we need to convert this to Hilbert::HilbertIndices to actually send them.
-      sendbuf.resize(_local_bin_sizes[i]);
-
-      for (unsigned int j=0; j<sendbuf.size(); j++)
-	sendbuf[j] = _data[j + local_offset];
-
       // Resize the destination buffer
       dest.resize (global_bin_sizes[i]);
       
-      MPI_Gatherv(sendbuf.empty() ? 
-		    NULL : &sendbuf[0],  // Points to the beginning of the bin to be sent
+      MPI_Gatherv((_data.size() > local_offset) ?
+		    &_data[local_offset] :
+		    NULL,                // Points to the beginning of the bin to be sent
 		  _local_bin_sizes[i],   // How much data is in the bin being sent.
 		  hilbert_type,          // The data type we are sorting
 		  &dest[0],              // Enough storage to hold all bin contributions
@@ -334,21 +319,13 @@ void Sort<Hilbert::BitVecType>::communicate_bins()
       // Copy the destination buffer if it
       // corresponds to the bin for this processor
       if (i == _proc_id)
-	{
-	  // Again, _my_bin is of type Hilbert::BitVecType, but
-	  // dest is of type Hilbert::HilbertIndices.
-	  _my_bin.resize(dest.size());
-
-	  for (unsigned int j=0; j<_my_bin.size(); j++)
-	    _my_bin[j] = dest[j];
-	}
+	_my_bin = dest;
 
       // Increment the local offset counter
       local_offset += _local_bin_sizes[i];
     }
 
-  MPI_Type_free (&hilbert_type);
-  
+  MPI_Type_free (&hilbert_type);  
 }
 
 #endif // #ifdef HAVE_LIBHILBERT
@@ -382,5 +359,5 @@ const std::vector<KeyType>& Sort<KeyType>::bin()
 template class Parallel::Sort<int>;
 template class Parallel::Sort<double>;
 #ifdef HAVE_LIBHILBERT
-template class Parallel::Sort<Hilbert::BitVecType>;
+template class Parallel::Sort<Hilbert::HilbertIndices>;
 #endif

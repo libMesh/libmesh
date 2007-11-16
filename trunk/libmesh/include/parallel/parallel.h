@@ -127,6 +127,19 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Send vector send to one processor while simultaneously receiving
+   * another vector recv from a (potentially different) processor using
+   * a user-specified MPI Dataype.
+   */
+  template <typename T>
+  inline void send_receive(const unsigned int dest_processor_id,
+                           T &send,
+			   const unsigned int source_processor_id,
+                           T &recv,
+			   MPI_Datatype &type);
+
+  //-------------------------------------------------------------------
+  /**
    * Take a vector of length n_processors, and on processor root_id fill in
    * recv[processor_id] = the value of send on processor processor_id
    */
@@ -495,6 +508,39 @@ namespace Parallel
     MPI_Sendrecv(sendsize ? &send[0] : NULL, sendsize, datatype<T>(),
 		 dest_processor_id, 0,
 		 recvsize ? &recv[0] : NULL, recvsize, datatype<T>(),
+		 source_processor_id, 0,
+		 libMesh::COMM_WORLD,
+		 &status);
+    
+    STOP_LOG("send_receive()", "Parallel");
+  }
+
+
+
+  template <typename T>
+  inline void send_receive(const unsigned int dest_processor_id,
+                           std::vector<T> &send,
+			   const unsigned int source_processor_id,
+                           std::vector<T> &recv,
+			   MPI_Datatype &type)
+  {
+    START_LOG("send_receive()", "Parallel");
+
+    // Trade buffer sizes first
+    unsigned int sendsize = send.size(), recvsize;
+    MPI_Status status;
+    MPI_Sendrecv(&sendsize, 1, datatype<unsigned int>(),
+		 dest_processor_id, 0,
+		 &recvsize, 1, datatype<unsigned int>(),
+		 source_processor_id, 0,
+		 libMesh::COMM_WORLD,
+		 &status);
+
+    recv.resize(recvsize);
+
+    MPI_Sendrecv(sendsize ? &send[0] : NULL, sendsize, type,
+		 dest_processor_id, 0,
+		 recvsize ? &recv[0] : NULL, recvsize, type,
 		 source_processor_id, 0,
 		 libMesh::COMM_WORLD,
 		 &status);
