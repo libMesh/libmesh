@@ -81,6 +81,11 @@ public:
   MeshBase (const MeshBase& other_mesh);
 
   /**
+   * Virtual "copy constructor"
+   */
+  virtual AutoPtr<MeshBase> clone() const = 0;
+
+  /**
    * Destructor.
    */
   virtual ~MeshBase ();
@@ -438,6 +443,27 @@ public:
    */
   virtual void read  (const std::string& name, MeshData* mesh_data=NULL) = 0;
   virtual void write (const std::string& name, MeshData* mesh_data=NULL) = 0;
+
+  /**
+   * Converts a mesh with higher-order
+   * elements into a mesh with linear elements.  For 
+   * example, a mesh consisting of \p Tet10 will be converted
+   * to a mesh with \p Tet4 etc.
+   */
+  virtual void all_first_order () = 0;
+
+  /**
+   * Converts a (conforming, non-refined) mesh with linear 
+   * elements into a mesh with second-order elements.  For 
+   * example, a mesh consisting of \p Tet4 will be converted
+   * to a mesh with \p Tet10 etc.  Note that for some elements
+   * like \p Hex8 there exist @e two higher order equivalents,
+   * \p Hex20 and \p Hex27.  When \p full_ordered is \p true
+   * (default), then \p Hex27 is built.  Otherwise, \p Hex20
+   * is built.  The same holds obviously for \p Quad4, \p Prism6
+   * ...
+   */
+  virtual void all_second_order (const bool full_ordered=true) = 0;
 
   /**
    * We need an empty, generic class to act as a predicate for this

@@ -69,6 +69,12 @@ class ParallelMesh : public UnstructuredMesh
   ParallelMesh (const ParallelMesh& other_mesh);
 
   /**
+   * Virtual copy-constructor, creates a copy of this mesh
+   */
+  virtual AutoPtr<MeshBase> clone () const
+    { return AutoPtr<MeshBase>(new ParallelMesh(*this)); }
+
+  /**
    * Destructor.
    */
   virtual ~ParallelMesh();
