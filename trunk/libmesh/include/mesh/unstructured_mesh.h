@@ -99,7 +99,7 @@ class UnstructuredMesh : public MeshBase
    * example, a mesh consisting of \p Tet10 will be converted
    * to a mesh with \p Tet4 etc.
    */
-  void all_first_order ();
+  virtual void all_first_order ();
 
   /**
    * Converts a (conforming, non-refined) mesh with linear 
@@ -112,7 +112,7 @@ class UnstructuredMesh : public MeshBase
    * is built.  The same holds obviously for \p Quad4, \p Prism6
    * ...
    */
-  void all_second_order (const bool full_ordered=true);
+  virtual void all_second_order (const bool full_ordered=true);
   
   /**
    * Generates a new mesh containing all the elements which

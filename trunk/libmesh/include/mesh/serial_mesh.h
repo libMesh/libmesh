@@ -60,6 +60,12 @@ class SerialMesh : public UnstructuredMesh
   SerialMesh (const SerialMesh& other_mesh);
 
   /**
+   * Virtual copy-constructor, creates a copy of this mesh
+   */
+  virtual AutoPtr<MeshBase> clone () const
+    { return AutoPtr<MeshBase>(new SerialMesh(*this)); }
+
+  /**
    * Destructor.
    */
   virtual ~SerialMesh();
