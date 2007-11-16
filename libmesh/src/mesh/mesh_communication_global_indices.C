@@ -34,20 +34,52 @@
 #ifdef HAVE_LIBHILBERT
 #  include "hilbert.h"
 #endif
-  
-#ifdef HAVE_LIBHILBERT
-namespace {
-  std::ostream& operator << (std::ostream& os, const Hilbert::BitVecType& t)
+ 
+#ifdef HAVE_LIBHILBERT 
+namespace { // anonymous namespace for helper functions
+
+  // Utility function to map (x,y,z) in [bbox.min, bbox.max]^3 into
+  // [0,max_inttype]^3 for computing Hilbert keys
+  void get_hilbert_coords (const Point &p,
+			   const MeshTools::BoundingBox &bbox,
+			   CFixBitVec icoords[3])
   {
-    int r = t.rackCount()-1;
-    
-    while (r >= 0)
-      os << "_" << t.racks()[r--];
-    
-    return os;
+    static const Hilbert::inttype max_inttype = static_cast<Hilbert::inttype>(-1);
+
+    const double // put (x,y,z) in [0,1]^3 (don't divide by 0)
+      x = ((bbox.first(0) == bbox.second(0)) ? 0. :
+	   (p(0)-bbox.first(0))/(bbox.second(0)-bbox.first(0))),
+	  
+      y = ((bbox.first(1) == bbox.second(1)) ? 0. :
+	   (p(1)-bbox.first(1))/(bbox.second(1)-bbox.first(1))),
+	  
+      z = ((bbox.first(2) == bbox.second(2)) ? 0. :
+	   (p(2)-bbox.first(2))/(bbox.second(2)-bbox.first(2)));
+	
+    // (iccords) in [0,max_inttype]^3
+    icoords[0] = static_cast<Hilbert::inttype>(x*max_inttype);
+    icoords[1] = static_cast<Hilbert::inttype>(y*max_inttype);
+    icoords[2] = static_cast<Hilbert::inttype>(z*max_inttype);
+  }
+
+  // Compute the hilbert index
+  Hilbert::HilbertIndices
+  get_hilbert_index (const Point &p,
+		     const MeshTools::BoundingBox &bbox)
+  {
+    static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
+
+    Hilbert::HilbertIndices index;
+    CFixBitVec icoords[3];
+    Hilbert::BitVecType bv;
+    get_hilbert_coords (p, bbox, icoords);
+    Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, bv);
+    index = bv;
+
+    return index;
   }
 }
-#endif // #ifdef HAVE_LIBHILBERT
+#endif
 
 
 
@@ -65,7 +97,7 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
   // Algorithm:
   // (1) compute the Hilbert key for each local node/element
   // (2) perform a parallel sort of the Hilbert key
-  // (3) get the min/max value on each processor.
+  // (3) get the min/max value on each processor
   // (4) determine the position in the global ranking for
   //     each local object
 
@@ -73,18 +105,18 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
   MeshTools::BoundingBox bbox =
     MeshTools::bounding_box (mesh);
 
-  const Hilbert::inttype max_inttype = static_cast<Hilbert::inttype>(-1);
-  const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
+  // Set up a derived MPI datatype to handle communication of HilbertIndices
+  MPI_Datatype hilbert_type;
+  MPI_Type_contiguous (3, MPI_UNSIGNED, &hilbert_type);
+  MPI_Type_commit     (&hilbert_type);
+
 
   //-------------------------------------------------------------
   // (1) compute Hilbert keys
-  std::vector<Hilbert::BitVecType>
+  std::vector<Hilbert::HilbertIndices>
     node_keys, elem_keys;
   
   {
-    CFixBitVec icoords[3];
-    Hilbert::BitVecType hilbert_index(3*sizeof(double)*sizeof(Hilbert::inttype));
-    //const unsigned int n_racks = hilbert_index.rackCount();
     node_keys.reserve (mesh.n_local_nodes());  
     elem_keys.reserve (mesh.n_local_elem()); 
     
@@ -97,28 +129,8 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
 	{
 	  const Node* node = (*it);
 	  assert (node != NULL);
-
-	  const Point& p = *node;
-
-	  const double // (x,y,z) in [0,1]^3
-	    x = ((bbox.first(0) == bbox.second(0)) ? 0. :
-		 (p(0)-bbox.first(0))/(bbox.second(0)-bbox.first(0))),
 	  
-	    y = ((bbox.first(1) == bbox.second(1)) ? 0. :
-		 (p(1)-bbox.first(1))/(bbox.second(1)-bbox.first(1))),
-	  
-	    z = ((bbox.first(2) == bbox.second(2)) ? 0. :
-		 (p(2)-bbox.first(2))/(bbox.second(2)-bbox.first(2)));
-	
-	  // (iccords) in [0,max_inttype]^3
-	  icoords[0] = static_cast<Hilbert::inttype>(x*max_inttype);
-	  icoords[1] = static_cast<Hilbert::inttype>(y*max_inttype);
-	  icoords[2] = static_cast<Hilbert::inttype>(z*max_inttype);
-
-	  // Compute the Hilbert Index
-	  Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, hilbert_index);
-
-	  node_keys.push_back(hilbert_index);
+	  node_keys.push_back(get_hilbert_index (*node, bbox));
 	}
     }
     
@@ -132,59 +144,308 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
 	  const Elem* elem = (*it);
 	  assert (elem != NULL);
 
-	  const Point p = elem->centroid();
-	
-	  const double // (x,y,z) in [0,1]^3
-	    x = ((bbox.first(0) == bbox.second(0)) ? 0. :
-		 (p(0)-bbox.first(0))/(bbox.second(0)-bbox.first(0))),
-	  
-	    y = ((bbox.first(1) == bbox.second(1)) ? 0. :
-		 (p(1)-bbox.first(1))/(bbox.second(1)-bbox.first(1))),
-	  
-	    z = ((bbox.first(2) == bbox.second(2)) ? 0. :
-		 (p(2)-bbox.first(2))/(bbox.second(2)-bbox.first(2)));
-	
-	  // (iccords) in [0,max_inttype]^3
-	  icoords[0] = static_cast<Hilbert::inttype>(x*max_inttype);
-	  icoords[1] = static_cast<Hilbert::inttype>(y*max_inttype);
-	  icoords[2] = static_cast<Hilbert::inttype>(z*max_inttype);
-
-	  // Compute the Hilbert Index
-	  Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, hilbert_index);
-
-	  elem_keys.push_back(hilbert_index);
+	  elem_keys.push_back(get_hilbert_index (elem->centroid(), bbox));
 	}
     }    
   } // done computing Hilbert keys
+
   
  
   //-------------------------------------------------------------
   // (2) parallel sort the Hilbert keys
-  {
-    Parallel::Sort<Hilbert::BitVecType> elem_sorter (elem_keys);
-    elem_sorter.sort();
+  Parallel::Sort<Hilbert::HilbertIndices> node_sorter (node_keys);
+  node_sorter.sort(); /* done with node_keys */ //node_keys.clear();
+    
+  const std::vector<Hilbert::HilbertIndices> &my_node_bin = 
+    node_sorter.bin();
 
-    for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+  Parallel::Sort<Hilbert::HilbertIndices> elem_sorter (elem_keys);
+  elem_sorter.sort(); /* done with elem_keys */ //elem_keys.clear();
+    
+  const std::vector<Hilbert::HilbertIndices> &my_elem_bin = 
+    elem_sorter.bin();
+
+
+
+  //-------------------------------------------------------------
+  // (3) get the min/max value on each processor
+  std::vector<Hilbert::HilbertIndices>    
+    node_lower_bounds(libMesh::n_processors()),
+    node_upper_bounds(libMesh::n_processors()),
+    elem_lower_bounds(libMesh::n_processors()),
+    elem_upper_bounds(libMesh::n_processors());
+
+  { // limit scope of temporaries
+    std::vector<Hilbert::HilbertIndices> recvbuf(4*libMesh::n_processors());
+
+    Hilbert::HilbertIndices my_min_max[4];
+
+    my_min_max[0] = my_node_bin.front(); /**/ my_min_max[1] = my_node_bin.back();
+    my_min_max[2] = my_elem_bin.front(); /**/ my_min_max[3] = my_elem_bin.back();
+
+    MPI_Allgather (my_min_max,  4, hilbert_type,
+		   &recvbuf[0], 4, hilbert_type,
+		   libMesh::COMM_WORLD);
+
+    node_lower_bounds[0] = recvbuf[4*0+0]; /**/ node_upper_bounds[0] = recvbuf[4*0+1];
+    elem_lower_bounds[0] = recvbuf[4*0+2]; /**/ elem_upper_bounds[0] = recvbuf[4*0+3];
+
+    for (unsigned int p=1; p<libMesh::n_processors(); p++)
       {
-	MPI_Barrier (libMesh::COMM_WORLD);
+	node_lower_bounds[p] = recvbuf[4*p+0]; /**/ node_upper_bounds[p] = recvbuf[4*p+1];
+	elem_lower_bounds[p] = recvbuf[4*p+2]; /**/ elem_upper_bounds[p] = recvbuf[4*p+3];
+      }
+     
+    for (unsigned int p=0; p<libMesh::n_processors(); p++)
+      std::cout << "[" << p << ":node_min]= " << node_lower_bounds[p] << std::endl
+		<< "[" << p << ":node_max]= " << node_upper_bounds[p] << std::endl
+		<< "[" << p << ":elem_min]= " << elem_lower_bounds[p] << std::endl
+		<< "[" << p << ":elem_max]= " << elem_upper_bounds[p] << std::endl << std::endl;    
+  }
 
-	if (libMesh::processor_id() == pid)
-	  {
-	    std::cerr << "PID [" << libMesh::processor_id() << "] size="
-		      << elem_sorter.bin().size() << std::endl;
 
-	    for (unsigned int i=0; i<elem_sorter.bin().size(); i++)
-	      std::cerr << elem_sorter.bin()[i] << '\n';
 
-	    std::cerr << std::endl;
-	  }
-	sleep (2);
-	MPI_Barrier (libMesh::COMM_WORLD);
+  //-------------------------------------------------------------
+  // (4) determine the position in the global ranking for
+  //     each local object
+  {
+    for (unsigned int obj=0; obj<elem_keys.size(); obj++)
+      {
+	const Hilbert::HilbertIndices &hi = elem_keys[obj];
+	
+	const unsigned int pid = 
+	  std::distance (elem_upper_bounds.begin(), 
+			 std::lower_bound(elem_upper_bounds.begin(), 
+					  elem_upper_bounds.end(),
+					  hi));
+
+	std::cout << hi << " on processor " << pid << std::endl;
       }
 
-    Parallel::Sort<Hilbert::BitVecType> node_sorter (node_keys);
-    node_sorter.sort();
+
+    //----------------------------------------------
+    // Nodes first -- all nodes, not just local ones
+    {
+      // Request sets to send to each processor
+      std::vector<std::vector<Hilbert::HilbertIndices> > 
+	requested_ids (libMesh::n_processors());
+      // Results to gather from each processor
+      std::vector<std::vector<unsigned int > >
+	filled_request (libMesh::n_processors());
+
+      MeshBase::const_node_iterator       it  = mesh.nodes_begin();
+      const MeshBase::const_node_iterator end = mesh.nodes_end();
+
+      // build up list of requests
+      for (; it != end; ++it)
+	{
+	  const Node* node = (*it);
+	  assert (node != NULL);
+	  const Hilbert::HilbertIndices hi = 
+	    get_hilbert_index (*node, bbox);
+	  const unsigned int pid = 
+	    std::distance (node_upper_bounds.begin(), 
+			   std::lower_bound(node_upper_bounds.begin(), 
+					    node_upper_bounds.end(),
+					    hi));
+
+	  assert (pid < libMesh::n_processors());
+
+	  requested_ids[pid].push_back(hi);
+	}
+
+      // The number of objects in my_node_bin on each processor
+      std::vector<unsigned int> node_bin_sizes(libMesh::n_processors());
+      Parallel::allgather (static_cast<unsigned int>(my_node_bin.size()), node_bin_sizes);
+
+      // The offset of my first global index
+      unsigned int my_offset = 0;
+      for (unsigned int pid=0; pid<libMesh::processor_id(); pid++)
+	my_offset += node_bin_sizes[pid];
+
+      // start with pid=0, so that we will trade with ourself
+      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	{
+          // Trade my requests with processor procup and procdown
+          const unsigned int procup = (libMesh::processor_id() + pid) %
+                                       libMesh::n_processors();
+          const unsigned int procdown = (libMesh::n_processors() +
+                                         libMesh::processor_id() - pid) %
+                                         libMesh::n_processors();
+
+          std::vector<Hilbert::HilbertIndices> request_to_fill;
+          Parallel::send_receive(procup, requested_ids[procup],
+                                 procdown, request_to_fill,
+				 hilbert_type);	  
+
+	  // Fill the requests
+	  std::vector<unsigned int> global_ids; /**/ global_ids.reserve(request_to_fill.size());
+	  for (unsigned int idx=0; idx<request_to_fill.size(); idx++)
+	    {
+	      const Hilbert::HilbertIndices &hi = request_to_fill[idx];
+	      assert (hi <= node_upper_bounds[libMesh::processor_id()]);
+	      
+	      // find the requested index in my node bin
+	      std::vector<Hilbert::HilbertIndices>::const_iterator pos =
+		 std::lower_bound (my_node_bin.begin(), my_node_bin.end(), hi);
+	      assert (pos != my_node_bin.end());
+	      assert (*pos == hi);
+	      
+	      // Finally, assign the global index based off the position of the index
+	      // in my array, properly offset.
+	      global_ids.push_back (std::distance(my_node_bin.begin(), pos) + my_offset);
+	    }
+
+	  // and trade back
+	  Parallel::send_receive (procdown, global_ids,
+				  procup,   filled_request[procup]);
+	}
+
+      // We now have all the filled requests, so we can loop through our
+      // nodes once and assign the global index to each one.
+      {
+	std::vector<std::vector<unsigned int>::const_iterator>
+	  next_obj_on_proc; next_obj_on_proc.reserve(libMesh::n_processors());
+	for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	  next_obj_on_proc.push_back(filled_request[pid].begin());
+
+	MeshBase::const_node_iterator       it  = mesh.nodes_begin();
+	const MeshBase::const_node_iterator end = mesh.nodes_end();
+
+	for (; it != end; ++it)
+	  {
+	    const Node* node = (*it);
+	    assert (node != NULL);
+	    const Hilbert::HilbertIndices hi = 
+	      get_hilbert_index (*node, bbox);
+	    const unsigned int pid = 
+	      std::distance (node_upper_bounds.begin(), 
+			     std::lower_bound(node_upper_bounds.begin(), 
+					      node_upper_bounds.end(),
+					      hi));
+
+	    assert (pid < libMesh::n_processors());
+	    assert (next_obj_on_proc[pid] != filled_request[pid].end());
+
+	    const unsigned int global_index = *next_obj_on_proc[pid];
+	    ++next_obj_on_proc[pid];
+	  }
+      }
+    }
+
+    //---------------------------------------------------
+    // elements next -- all elements, not just local ones
+    {
+      // Request sets to send to each processor
+      std::vector<std::vector<Hilbert::HilbertIndices> > 
+	requested_ids (libMesh::n_processors());
+      // Results to gather from each processor
+      std::vector<std::vector<unsigned int > >
+	filled_request (libMesh::n_processors());
+      
+      MeshBase::const_element_iterator       it  = mesh.elements_begin();
+      const MeshBase::const_element_iterator end = mesh.elements_end();
+
+      for (; it != end; ++it)
+	{
+	  const Elem* elem = (*it);
+	  assert (elem != NULL);
+	  const Hilbert::HilbertIndices hi = 
+	    get_hilbert_index (elem->centroid(), bbox);
+	  const unsigned int pid = 
+	    std::distance (elem_upper_bounds.begin(), 
+			   std::lower_bound(elem_upper_bounds.begin(), 
+					    elem_upper_bounds.end(),
+					    hi));
+
+	  assert (pid < libMesh::n_processors());
+
+	  requested_ids[pid].push_back(hi);
+	}
+
+      // The number of objects in my_elem_bin on each processor
+      std::vector<unsigned int> elem_bin_sizes(libMesh::n_processors());
+      Parallel::allgather (static_cast<unsigned int>(my_elem_bin.size()), elem_bin_sizes);
+
+      // The offset of my first global index
+      unsigned int my_offset = 0;
+      for (unsigned int pid=0; pid<libMesh::processor_id(); pid++)
+	my_offset += elem_bin_sizes[pid];
+
+      // start with pid=0, so that we will trade with ourself
+      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	{
+          // Trade my requests with processor procup and procdown
+          const unsigned int procup = (libMesh::processor_id() + pid) %
+                                       libMesh::n_processors();
+          const unsigned int procdown = (libMesh::n_processors() +
+                                         libMesh::processor_id() - pid) %
+                                         libMesh::n_processors();
+
+          std::vector<Hilbert::HilbertIndices> request_to_fill;
+          Parallel::send_receive(procup, requested_ids[procup],
+                                 procdown, request_to_fill,
+				 hilbert_type);	  
+
+	  // Fill the requests
+	  std::vector<unsigned int> global_ids; /**/ global_ids.reserve(request_to_fill.size());
+	  for (unsigned int idx=0; idx<request_to_fill.size(); idx++)
+	    {
+	      const Hilbert::HilbertIndices &hi = request_to_fill[idx];
+	      assert (hi <= elem_upper_bounds[libMesh::processor_id()]);
+	      
+	      // find the requested index in my elem bin
+	      std::vector<Hilbert::HilbertIndices>::const_iterator pos =
+		std::lower_bound (my_elem_bin.begin(), my_elem_bin.end(), hi);
+	      assert (pos != my_elem_bin.end());
+	      assert (*pos == hi);
+	      
+	      // Finally, assign the global index based off the position of the index
+	      // in my array, properly offset.
+	      global_ids.push_back (std::distance(my_elem_bin.begin(), pos) + my_offset);
+	    }
+
+	  // and trade back
+	  Parallel::send_receive (procdown, global_ids,
+				  procup,   filled_request[procup]);
+	}
+
+      // We now have all the filled requests, so we can loop through our
+      // elements once and assign the global index to each one.
+      {
+	std::vector<std::vector<unsigned int>::const_iterator>
+	  next_obj_on_proc; next_obj_on_proc.reserve(libMesh::n_processors());
+	for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	  next_obj_on_proc.push_back(filled_request[pid].begin());
+
+	MeshBase::const_element_iterator       it  = mesh.elements_begin();
+	const MeshBase::const_element_iterator end = mesh.elements_end();
+
+	for (; it != end; ++it)
+	  {
+	    const Elem* elem = (*it);
+	    assert (elem != NULL);
+	    const Hilbert::HilbertIndices hi = 
+	      get_hilbert_index (elem->centroid(), bbox);
+	    const unsigned int pid = 
+	      std::distance (elem_upper_bounds.begin(), 
+			     std::lower_bound(elem_upper_bounds.begin(), 
+					      elem_upper_bounds.end(),
+					      hi));
+
+	    assert (pid < libMesh::n_processors());
+	    assert (next_obj_on_proc[pid] != filled_request[pid].end());
+
+	    const unsigned int global_index = *next_obj_on_proc[pid];
+	    ++next_obj_on_proc[pid];
+	  }
+      }
+    }        
   }
+
+
+  // Clean up
+  MPI_Type_free (&hilbert_type);
 
   STOP_LOG ("find_global_indices()", "MeshCommunication");
 
