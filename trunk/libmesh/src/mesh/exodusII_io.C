@@ -350,6 +350,29 @@ namespace exII {
      */
     const std::vector<double>& get_nodal_var_values(std::string nodal_var_name, int time_step);
 
+    // For Writing Solutions
+    /**
+     * Opens an \p ExodusII mesh
+     * file named \p filename
+     * for writing.
+     */
+    void create(std::string filename);
+
+    /**
+     * Initializes the Exodus file
+     */
+    void initialize(std::string title, const MeshBase & mesh);
+
+    /**
+     * Writes the nodal coordinates contained in "mesh"
+     */
+    void write_nodal_coordinates(const MeshBase & mesh);
+
+    /**
+     * Writes the elements contained in "mesh"
+     */
+    void write_elements(const MeshBase & mesh);
+
     //-------------------------------------------------------------------------
     /**
      * This is the \p ExodusII
@@ -369,10 +392,11 @@ namespace exII {
        * Constructor.  Initializes the const private member
        * variables.
        */
-      Conversion(const int* nm, const int* sm, const ElemType ct) 
+      Conversion(const int* nm, const int* sm, const ElemType ct, std::string ex_type) 
 	: node_map(nm),       // Node map for this element
 	  side_map(sm),
-	  canonical_type(ct)    // Element type name in this code
+	  canonical_type(ct),    // Element type name in this code
+	  exodus_type(ex_type)   // Element type in Exodus
       {}
 
       /**
@@ -396,6 +420,10 @@ namespace exII {
        */
       ElemType get_canonical_type()    const { return canonical_type; }
 
+      /**
+       * Returns the string corresponding to the Exodus type for this element
+       */
+      std::string exodus_elem_type() const { return exodus_type; };
     private:
       /**
        * Pointer to the node map for this element.
@@ -412,6 +440,11 @@ namespace exII {
        * element type.
        */
       const ElemType canonical_type;
+
+      /**
+       * The string corresponding to the Exodus type for this element
+       */
+      const std::string exodus_type;
     };
 
 
@@ -991,6 +1024,84 @@ namespace exII {
     return nodal_var_values;
   }
 
+  // For Writing Solutions
+
+  void ExodusII::create(std::string filename)
+  {
+    //Store things as doubles
+    comp_ws = 8;
+    io_ws = 8;
+    
+    ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
+    
+    ex_id = exII::ex_open(filename.c_str(),
+			  EX_WRITE,
+			  &comp_ws,
+			  &io_ws,
+			  &ex_version);
+  
+    check_err(ex_id, "Error creating ExodusII mesh file.");
+    if (verbose) std::cout << "File created successfully." << std::endl;
+  }
+
+  void ExodusII::initialize(std::string title, const MeshBase & mesh)
+  {
+    num_dim = mesh.mesh_dimension();
+    num_nodes = mesh.n_nodes();
+    num_elem = mesh.n_elem();
+    num_elem_blk = 1;
+    num_node_sets = 0;
+    num_side_sets = 0;
+
+    ex_err = exII::ex_put_init(ex_id, title.c_str(), num_dim, num_nodes, num_elem, num_elem_blk, num_node_sets, num_side_sets);
+    
+    check_err(ex_err, "Error initializing new Exodus file.");
+  }
+
+  void ExodusII::write_nodal_coordinates(const MeshBase & mesh)
+  {
+    x.resize(num_nodes);
+    y.resize(num_nodes);
+    z.resize(num_nodes);
+
+    for (unsigned int i=0; i<num_nodes; ++i)
+    {
+      x[i]=(*mesh.node_ptr(i))(0);
+      y[i]=(*mesh.node_ptr(i))(1);
+      z[i]=(*mesh.node_ptr(i))(2);
+    }
+
+    ex_err = exII::ex_put_coord(ex_id, &x[0], &y[0], &z[0]);
+
+    check_err(ex_err, "Error writing coordinates to Exodus file.");
+  }
+
+  void ExodusII::write_elements(const MeshBase & mesh)
+  {
+    ExodusII::ElementMaps em;
+    const ExodusII::Conversion conv = em.assign_conversion(mesh.elem(0)->type());
+
+    num_nodes_per_elem = mesh.elem(0)->n_nodes();
+      
+    ex_err = exII::ex_put_elem_block(ex_id, 1, conv.exodus_elem_type().c_str(), num_elem,num_nodes_per_elem, 0);
+    check_err(ex_err, "Error writing element block.");
+
+    connect.resize(num_elem*num_nodes_per_elem);
+
+    for(int i=0;i<num_elem;i++)
+    {
+      Elem * elem = mesh.elem(i);
+
+      for(int j=0; j<num_nodes_per_elem; j++)
+	connect[(i*num_nodes_per_elem)+j] = elem->node(conv.get_node_map(j))+1;
+    }
+
+    ex_err = exII::ex_put_elem_conn(ex_id, 1, &connect[0]);
+    check_err(ex_err, "Error writing element connectivities");
+  }
+
+
+
   // ------------------------------------------------------------
   // ExodusII::Conversion class members
   const ExodusII::Conversion ExodusII::ElementMaps::assign_conversion(const std::string type)
@@ -1036,7 +1147,7 @@ namespace exII {
 
     error();
   
-    const Conversion conv(tri3_node_map, tri_edge_map, TRI3); // dummy
+    const Conversion conv(tri3_node_map, tri_edge_map, TRI3,"TRI3"); // dummy
     return conv;  
   }
 
@@ -1049,67 +1160,67 @@ namespace exII {
 
       case QUAD4:
 	{
-	  const Conversion conv(quad4_node_map, quad_edge_map, QUAD4);
+	  const Conversion conv(quad4_node_map, quad_edge_map, QUAD4, "QUAD4");
 	  return conv;
 	}
 
       case QUAD8:
 	{
-	  const Conversion conv(quad8_node_map, quad_edge_map, QUAD8);
+	  const Conversion conv(quad8_node_map, quad_edge_map, QUAD8, "QUAD8");
 	  return conv;
 	}
       
       case QUAD9:
 	{
-	  const Conversion conv(quad9_node_map, quad_edge_map, QUAD9);
+	  const Conversion conv(quad9_node_map, quad_edge_map, QUAD9, "QUAD9");
 	  return conv;
 	}
       
       case TRI3:
 	{
-	  const Conversion conv(tri3_node_map, tri_edge_map, TRI3);
+	  const Conversion conv(tri3_node_map, tri_edge_map, TRI3, "TRI3");
 	  return conv;
 	}
       
       case TRI6:
 	{
-	  const Conversion conv(tri6_node_map, tri_edge_map, TRI6);
+	  const Conversion conv(tri6_node_map, tri_edge_map, TRI6, "TRI6");
 	  return conv;
 	}
       
       case HEX8:
 	{
-	  const Conversion conv(hex8_node_map, hex_face_map, HEX8);
+	  const Conversion conv(hex8_node_map, hex_face_map, HEX8, "HEX8");
 	  return conv;
 	}
       
       case HEX20:
 	{
-	  const Conversion conv(hex20_node_map, hex_face_map, HEX20);
+	  const Conversion conv(hex20_node_map, hex_face_map, HEX20, "HEX20");
 	  return conv;
 	}
       
       case HEX27:
 	{
-	  const Conversion conv(hex27_node_map, hex27_face_map, HEX27);
+	  const Conversion conv(hex27_node_map, hex27_face_map, HEX27, "HEX27");
 	  return conv;
 	}
       
       case TET4:
 	{
-	  const Conversion conv(tet4_node_map, tet_face_map, TET4);
+	  const Conversion conv(tet4_node_map, tet_face_map, TET4, "TETRA4");
 	  return conv;
 	}
       
       case TET10:
 	{
-	  const Conversion conv(tet10_node_map, tet_face_map, TET10);
+	  const Conversion conv(tet10_node_map, tet_face_map, TET10, "TETRA10");
 	  return conv;
 	}
 
       case PRISM6:
 	{
-	  const Conversion conv(prism6_node_map, prism_face_map, PRISM6);
+	  const Conversion conv(prism6_node_map, prism_face_map, PRISM6, "WEDGE");
 	  return conv;
 	}
 	
@@ -1119,7 +1230,7 @@ namespace exII {
     
     error();
     
-    const Conversion conv(tri3_node_map, tri_edge_map, TRI3); // dummy
+    const Conversion conv(tri3_node_map, tri_edge_map, TRI3, "TRI3"); // dummy
     return conv;  
   }
   
@@ -1283,5 +1394,17 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
   }
 
   system.update();
+}
+
+void ExodusII_IO::write_nodal_data(std::string filename)
+{
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+  
+  ExodusII out_ex = new ExodusII(this->verbose());
+  out_ex.create(filename);
+  out_ex.initialize(filename,mesh);
+  out_ex.write_nodal_coordinates(mesh);
+  out_ex.write_elements(mesh);
+  out_ex.close();
 }
 

@@ -82,6 +82,10 @@ class ExodusII_IO : public MeshInput<MeshBase>
    */
   void copy_nodal_solution(System& es, std::string nodal_var_name);
 
+  /**
+   * Write out a nodal solution.
+   */
+  void write_nodal_data(std::string filename);
   
  private:
   ExodusII * ex_ptr;
