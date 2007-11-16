@@ -204,7 +204,7 @@ MeshTools::processor_bounding_box (const MeshBase& mesh,
     }
 
   Point pmin(vmin[0], vmin[1], vmin[2]);
-  Point pmax(vmax[0], vmax[2], vmax[2]);
+  Point pmax(vmax[0], vmax[1], vmax[2]);
 
   const BoundingBox ret_val(pmin, pmax);
 
