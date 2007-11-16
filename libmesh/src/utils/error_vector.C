@@ -214,9 +214,10 @@ bool ErrorVector::is_active_elem (unsigned int i) const
 
 
 void ErrorVector::plot_error(const std::string& filename,
-                             const Mesh& oldmesh) const
+                             const MeshBase& oldmesh) const
 {
-  Mesh mesh(oldmesh);
+  AutoPtr<MeshBase> meshptr = oldmesh.clone();
+  MeshBase &mesh = *meshptr;
   mesh.all_first_order();
   EquationSystems temp_es (mesh);
   ExplicitSystem& error_system
