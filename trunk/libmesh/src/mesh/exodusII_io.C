@@ -373,6 +373,17 @@ namespace exII {
      */
     void write_elements(const MeshBase & mesh);
 
+    /**
+     * Sets up the nodal variables
+     */
+    void initialize_nodal_variables(std::vector<std::string> names);
+
+    /**
+     * Writes the vector of values to a nodal variable.
+     */
+    void write_nodal_values(int var_id, const std::vector<double> & values, int timestep);
+
+
     //-------------------------------------------------------------------------
     /**
      * This is the \p ExodusII
@@ -1100,7 +1111,28 @@ namespace exII {
     check_err(ex_err, "Error writing element connectivities");
   }
 
+  void ExodusII::initialize_nodal_variables(std::vector<std::string> names)
+  {
+    num_nodal_vars = names.size();
 
+    ex_err = exII::ex_put_var_param(ex_id, "n", num_nodal_vars);
+    check_err(ex_err, "Error setting number of nodal vars.");
+
+    const char ** var_names = new const char*[num_nodal_vars];
+
+    for(int i=0;i<num_nodal_vars;i++)
+      var_names[i]=names[i].c_str();
+
+    ex_err = exII::ex_put_var_names(ex_id, "n", num_nodal_vars, const_cast <char**>(var_names));
+    check_err(ex_err, "Error setting nodal variable names.");
+  }
+
+  void ExodusII::write_nodal_values(int var_id, const std::vector<double> & values, int timestep)
+  {
+    ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &values[0]);
+    check_err(ex_err, "Error writing nodal values.");
+  }
+  
 
   // ------------------------------------------------------------
   // ExodusII::Conversion class members
@@ -1396,15 +1428,34 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
   system.update();
 }
 
-void ExodusII_IO::write_nodal_data(std::string filename)
+void ExodusII_IO::write_nodal_data (const std::string& fname,
+				    const std::vector<Number>& soln,
+				    const std::vector<std::string>& names)
 {
-  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   
   ExodusII out_ex = new ExodusII(this->verbose());
-  out_ex.create(filename);
-  out_ex.initialize(filename,mesh);
+  out_ex.create(fname);
+  out_ex.initialize(fname,mesh);
   out_ex.write_nodal_coordinates(mesh);
   out_ex.write_elements(mesh);
+
+  int num_vars = names.size();
+  int num_nodes = mesh.n_nodes();
+  
+  out_ex.initialize_nodal_variables(names);
+
+  for(int c=0; c<num_vars; c++)
+  {
+    std::vector<Number> cur_soln(num_nodes);
+
+    //Copy out this variable's solution
+    for(int i=0; i<num_nodes; i++)
+      cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+    
+    out_ex.write_nodal_values(c+1,cur_soln,1);
+  }  
+  
   out_ex.close();
 }
 
