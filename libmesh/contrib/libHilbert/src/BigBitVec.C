@@ -747,7 +747,7 @@ bool
 CBigBitVec::operator--()
 {
 	int i = 0;
-	bool b;
+	bool b=false;
 	while ( i < m_iRacks && (b = --m_pcRacks[i]) ) i++;
 	
 	return b;
