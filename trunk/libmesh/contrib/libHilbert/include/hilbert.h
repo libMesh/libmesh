@@ -20,6 +20,7 @@
 #define __hilbert_h__
 
 #include <Hilbert.hpp>
+#include <iostream>
 
 // Specific extensions to libHilbert-0.2.
 namespace Hilbert 
