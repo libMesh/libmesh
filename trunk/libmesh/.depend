@@ -5428,12 +5428,14 @@ src/parallel/parallel_bin_sorter.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/parallel/parallel_bin_sorter.h\
+    include/parallel/parallel_conversion_utils.h\
     include/parallel/parallel_histogram.h
 src/parallel/parallel_histogram.$(obj-suffix):\
     src/parallel/parallel_histogram.C\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/parallel/parallel_conversion_utils.h\
     include/parallel/parallel_histogram.h
 src/parallel/parallel_sort.$(obj-suffix):\
     src/parallel/parallel_sort.C\

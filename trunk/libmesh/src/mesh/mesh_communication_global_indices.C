@@ -196,11 +196,11 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
 	elem_lower_bounds[p] = recvbuf[4*p+2]; /**/ elem_upper_bounds[p] = recvbuf[4*p+3];
       }
      
-    for (unsigned int p=0; p<libMesh::n_processors(); p++)
-      std::cout << "[" << p << ":node_min]= " << node_lower_bounds[p] << std::endl
-		<< "[" << p << ":node_max]= " << node_upper_bounds[p] << std::endl
-		<< "[" << p << ":elem_min]= " << elem_lower_bounds[p] << std::endl
-		<< "[" << p << ":elem_max]= " << elem_upper_bounds[p] << std::endl << std::endl;    
+//     for (unsigned int p=0; p<libMesh::n_processors(); p++)
+//       std::cout << "[" << p << ":node_min]= " << node_lower_bounds[p] << std::endl
+// 		<< "[" << p << ":node_max]= " << node_upper_bounds[p] << std::endl
+// 		<< "[" << p << ":elem_min]= " << elem_lower_bounds[p] << std::endl
+// 		<< "[" << p << ":elem_max]= " << elem_upper_bounds[p] << std::endl << std::endl;    
   }
 
 
@@ -209,18 +209,18 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
   // (4) determine the position in the global ranking for
   //     each local object
   {
-    for (unsigned int obj=0; obj<elem_keys.size(); obj++)
-      {
-	const Hilbert::HilbertIndices &hi = elem_keys[obj];
-	
-	const unsigned int pid = 
-	  std::distance (elem_upper_bounds.begin(), 
-			 std::lower_bound(elem_upper_bounds.begin(), 
-					  elem_upper_bounds.end(),
-					  hi));
-
-	std::cout << hi << " on processor " << pid << std::endl;
-      }
+//    for (unsigned int obj=0; obj<elem_keys.size(); obj++)
+//      {
+//	const Hilbert::HilbertIndices &hi = elem_keys[obj];
+//	
+//	const unsigned int pid = 
+//	  std::distance (elem_upper_bounds.begin(), 
+//			 std::lower_bound(elem_upper_bounds.begin(), 
+//					  elem_upper_bounds.end(),
+//					  hi));
+//
+//	std::cout << hi << " on processor " << pid << std::endl;
+//      }
 
 
     //----------------------------------------------
@@ -230,7 +230,7 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
       std::vector<std::vector<Hilbert::HilbertIndices> > 
 	requested_ids (libMesh::n_processors());
       // Results to gather from each processor
-      std::vector<std::vector<unsigned int > >
+      std::vector<std::vector<unsigned int> >
 	filled_request (libMesh::n_processors());
 
       MeshBase::const_node_iterator       it  = mesh.nodes_begin();
@@ -309,12 +309,12 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
 	for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 	  next_obj_on_proc.push_back(filled_request[pid].begin());
 
-	MeshBase::const_node_iterator       it  = mesh.nodes_begin();
-	const MeshBase::const_node_iterator end = mesh.nodes_end();
+	MeshBase::node_iterator       it  = mesh.nodes_begin();
+	const MeshBase::node_iterator end = mesh.nodes_end();
 
 	for (; it != end; ++it)
 	  {
-	    const Node* node = (*it);
+	    Node* node = (*it);
 	    assert (node != NULL);
 	    const Hilbert::HilbertIndices hi = 
 	      get_hilbert_index (*node, bbox);
@@ -328,6 +328,9 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
 	    assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
 	    const unsigned int global_index = *next_obj_on_proc[pid];
+
+	    node->set_id() = global_index;
+	    
 	    ++next_obj_on_proc[pid];
 	  }
       }
@@ -340,7 +343,7 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
       std::vector<std::vector<Hilbert::HilbertIndices> > 
 	requested_ids (libMesh::n_processors());
       // Results to gather from each processor
-      std::vector<std::vector<unsigned int > >
+      std::vector<std::vector<unsigned int> >
 	filled_request (libMesh::n_processors());
       
       MeshBase::const_element_iterator       it  = mesh.elements_begin();
@@ -418,12 +421,12 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
 	for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 	  next_obj_on_proc.push_back(filled_request[pid].begin());
 
-	MeshBase::const_element_iterator       it  = mesh.elements_begin();
-	const MeshBase::const_element_iterator end = mesh.elements_end();
+	MeshBase::element_iterator       it  = mesh.elements_begin();
+	const MeshBase::element_iterator end = mesh.elements_end();
 
 	for (; it != end; ++it)
 	  {
-	    const Elem* elem = (*it);
+	    Elem* elem = (*it);
 	    assert (elem != NULL);
 	    const Hilbert::HilbertIndices hi = 
 	      get_hilbert_index (elem->centroid(), bbox);
@@ -437,6 +440,9 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
 	    assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
 	    const unsigned int global_index = *next_obj_on_proc[pid];
+
+	    elem->set_id() = global_index;
+	    
 	    ++next_obj_on_proc[pid];
 	  }
       }

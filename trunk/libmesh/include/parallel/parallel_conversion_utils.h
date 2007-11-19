@@ -93,7 +93,7 @@ namespace Parallel {
 
 	bvt.rack0 = 0;
 	bvt.rack1 = 0;
-	bvt.rack2 = f;
+	bvt.rack2 = static_cast<Hilbert::inttype>(f);
 
 	return bvt;
       }

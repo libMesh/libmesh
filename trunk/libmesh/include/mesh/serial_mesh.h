@@ -27,6 +27,20 @@
 // Local Includes -----------------------------------
 #include "unstructured_mesh.h"
 
+
+
+
+
+
+// Prototype this function so we can delcare it a friend.
+class SerialMesh;
+namespace MeshTools {
+  namespace Private {
+    void fix_broken_node_and_element_numbering (SerialMesh &);
+  }
+}
+
+
 /**
  * The \p SerialMesh class is derived from the \p MeshBase class,
  * and currently represents the default Mesh implementation.
@@ -113,6 +127,8 @@ class SerialMesh : public UnstructuredMesh
   virtual void delete_elem (Elem* e) ;
   virtual void renumber_elem (unsigned int old_id, unsigned int new_id);
 
+  friend void MeshTools::Private::fix_broken_node_and_element_numbering (SerialMesh &);
+  
 public:
   /**
    * Elem iterator accessor functions.
