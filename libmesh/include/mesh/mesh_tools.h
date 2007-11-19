@@ -35,6 +35,8 @@
 #include "point.h" // some compilers want the full definition - I think so they can do 
                    // return-value-optimization for BoundingBox'es - BSK
 // forward declarations
+class SerialMesh;
+class ParallelMesh;
 class Sphere;
 class Elem;
 
@@ -229,7 +231,7 @@ namespace MeshTools
    unsigned int n_elem (MeshBase::element_iterator& begin,
                         MeshBase::element_iterator& end);
 
-/**
+  /**
     * Given a mesh and a node in the mesh, the vector will be filled with
     * every node directly attached to the given one.
     */
@@ -245,6 +247,40 @@ namespace MeshTools
     */
    void find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<unsigned int, std::vector<unsigned int> >& hanging_nodes);
 
+  // There is no reason for users to call functions in the MeshTools::Private namespace.
+  namespace Private {
+    /**
+     * There is no reason for a user to ever call this function.
+     *
+     * This function determines partition-agnostic global indices for all nodes and elements 
+     * in the mesh.  Note that after this function is called the mesh will likely be in an
+     * inconsistent state, i.e. \p mesh.nodes(i)->id() != i in the nodes container.
+     * Direct node/element access via the \p mesh.node(n) or \p mesh.elem(e) functions will
+     * likely fail. The original numbering can (and should) be restored with a subsequent call to
+     * \p fix_node_and_element_numbering().
+     *
+     */
+    void globally_renumber_nodes_and_elements (MeshBase &);
+
+  
+    /**
+     * There is no reason for a user to ever call this function.
+     *
+     * This function restores a previously broken element/node numbering such that
+     * \p mesh.node(n)->id() == n. 
+     */
+    void fix_broken_node_and_element_numbering (SerialMesh &);
+    
+
+    /**
+     * There is no reason for a user to ever call this function.
+     *
+     * This function restores a previously broken element/node numbering such that
+     * \p mesh.node(n)->id() == n. 
+     */
+    void fix_broken_node_and_element_numbering (ParallelMesh &);
+  } // end namespace Private
+  
 } // end namespace MeshTools
 
 

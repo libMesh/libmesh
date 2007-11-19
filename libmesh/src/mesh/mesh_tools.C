@@ -29,6 +29,10 @@
 #include "mesh_base.h"
 #include "parallel.h"
 #include "sphere.h"
+#include "serial_mesh.h"
+#include "parallel_mesh.h"
+#include "mesh_communication.h"
+
 
 
 
@@ -606,5 +610,59 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<un
         }
       }
     }
+  }
+}
+
+
+
+void MeshTools::Private::globally_renumber_nodes_and_elements (MeshBase& mesh)
+{
+  MeshCommunication().find_global_indices(mesh);
+}
+
+
+
+void MeshTools::Private::fix_broken_node_and_element_numbering (SerialMesh &mesh)
+{
+   // Nodes first
+  for (unsigned int n=0; n<mesh._nodes.size(); n++)
+    if (mesh._nodes[n] != NULL)
+      mesh._nodes[n]->set_id() = n;
+
+  // Elements next
+  for (unsigned int e=0; e<mesh._elements.size(); e++)
+    if (mesh._elements[e] != NULL)
+      mesh._elements[e]->set_id() = e; 
+}
+
+
+
+void MeshTools::Private::fix_broken_node_and_element_numbering (ParallelMesh &mesh)
+{
+  // We need access to iterators for the underlying containers,
+  // not the mapvector<> reimplementations.
+  mapvector<Node*>::maptype &nodes = mesh._nodes;
+  mapvector<Elem*>::maptype &elem  = mesh._elements;
+  
+  // Nodes first
+  {
+    mapvector<Node*>::maptype::iterator
+      it  = nodes.begin(),
+      end = nodes.end();
+
+    for (; it != end; ++it)
+      if (it->second != NULL)
+	it->second->set_id() = it->first;
+  }
+
+  // Elements next
+  {
+    mapvector<Elem*>::maptype::iterator
+      it  = elem.begin(),
+      end = elem.end();
+
+    for (; it != end; ++it)
+      if (it->second != NULL)
+	it->second->set_id() = it->first;
   }
 }

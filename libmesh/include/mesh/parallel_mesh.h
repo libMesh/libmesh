@@ -30,6 +30,17 @@
 #include "node.h"
 #include "unstructured_mesh.h"
 
+
+
+// Prototype this function so we can delcare it a friend.
+class ParallelMesh;
+namespace MeshTools {
+  namespace Private {
+    void fix_broken_node_and_element_numbering (ParallelMesh &);
+  }
+}
+
+
 /**
  * The \p ParallelMesh class is derived from the \p MeshBase class,
  * and is intended to provide identical functionality to the user
@@ -180,6 +191,8 @@ class ParallelMesh : public UnstructuredMesh
   virtual void delete_elem (Elem* e) ;
   virtual void renumber_elem (unsigned int old_id, unsigned int new_id);
 
+  friend void MeshTools::Private::fix_broken_node_and_element_numbering (ParallelMesh &);
+  
 public:
   /**
    * Elem iterator accessor functions.
