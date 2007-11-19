@@ -40,11 +40,11 @@ typedef uint32_t FBV_UINT;
 #define FBVMOD(i,m)	if((i)>=(m))(i)-=(m)*((i)/(m));
 
 
-typedef enum EBitVecType
+typedef enum 
 {
 	eFix,
 	eBig
-};
+} EBitVecType;
 
 
 class CFixBitVec
