@@ -55,7 +55,7 @@
 * revision history - 
 *   20061002 - David Thompson - Adapted from ex_get_elem_var
 *
-*  $Id: exgvar.c,v 1.3 2007/10/08 15:01:43 gdsjaar Exp $
+*  $Id$
 *
 *****************************************************************************/
 

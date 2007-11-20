@@ -46,7 +46,7 @@
 *                                       side or face
 * revision history - 
 *
-*  $Id: exgssc.c,v 1.5 2007/10/08 15:01:42 gdsjaar Exp $
+*  $Id$
 *****************************************************************************/
 
 #include <ctype.h>

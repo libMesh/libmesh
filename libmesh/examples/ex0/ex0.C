@@ -1,4 +1,4 @@
-/* $Id: ex0.C,v 1.6 2007-05-23 23:29:14 roystgnr Exp $ */
+/* $Id$ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */

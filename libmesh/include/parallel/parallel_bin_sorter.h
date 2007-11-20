@@ -1,4 +1,4 @@
-// $Id: mesh_base.h 2378 2007-11-09 07:19:22Z roystgnr $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -33,6 +33,9 @@
 namespace Parallel {
 
 template <typename KeyType>
+  /**
+   * Perform a parallel sort using a bin-sort method.
+   */
 class BinSorter
 {
   // The type of iterator we will be using is inferred from KeyType

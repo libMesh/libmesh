@@ -10,7 +10,7 @@
  * Started 9/2/94
  * George
  *
- * $Id: pqueue.c,v 1.5 2004-03-08 04:58:28 benkirk Exp $
+ * $Id$
  *
  */
 

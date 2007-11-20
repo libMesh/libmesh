@@ -44,73 +44,56 @@ void EquationSystems::read (const std::string& name,
    * This program implements the output of an 
    * EquationSystems object.  This warrants some 
    * documentation.  The output file essentially
-   * consists of 13 sections:
-   *
-   * 1.) The number of flags that are set (unsigned int),
-   *
-   * for each flag in the equation system object
-   *
-   *   2.) the name (string)
-   *
-   * end flag loop
-   *
-   * 3.) The number of parameters that are set (unsigned int),
-   *
-   * for each parameter in the equation system object
-   *
-   *   4.) the name of the parameter  (string)
-   *   5.) the value of the parameter (real)
-   *
-   * end parameter loop
-   * 
-   * 6.) The number of individual equation systems (unsigned int)
-   * 
-   *   for each system
-   *                                                      
-   *    7.)  The name of the system (string)
-   *    8.)  The type of the system (string)
-   *
-   *    handled through System::read():
-   *
-   * +-------------------------------------------------------------+
-   * |  9.) The number of variables in the system (unsigned int)   |
-   * |                                                             |
-   * |   for each variable in the system                           |
-   * |                                                             |
-   * |    10.) The name of the variable (string)                   |
-   * |                                                             |
-   * |    11.) Combined in an FEType:                              |
-   * |         - The approximation order(s) of the variable (Order |
-   * |           Enum, cast to int/s)                              |
-   * |         - The finite element family/ies of the variable     |
-   * |           (FEFamily Enum, cast to int/s)                    |
-   * |                                                             |
-   * |   end variable loop                                         |
-   * |                                                             |
-   * | 12.) The number of additional vectors (unsigned int),       |
-   * |                                                             |
-   * |    for each additional vector in the equation system object |
-   * |                                                             |
-   * |    13.) the name of the additional vector  (string)         |
-   * +-------------------------------------------------------------+
-   *
-   * end system loop
-   *
-   *
-   *   for each system, handled through System::read_data():
-   *   
-   * +-------------------------------------------------------------+
-   * | 14.) The global solution vector, re-ordered to be node-major|
-   * |     (More on this later.)                                   |
-   * |                                                             |
-   * |    for each additional vector in the equation system object |
-   * |                                                             |
-   * |    15.) The global additional vector, re-ordered to be      |
-   * |         node-major (More on this later.)                    |
-   * +-------------------------------------------------------------+
-   *
-   * end system loop
-   *
+   * consists of 10 sections:
+     \verbatim
+     1.) The number of individual equation systems (unsigned int)
+     
+       for each system
+                                                          
+        2.)  The name of the system (string)
+        3.)  The type of the system (string)
+    
+        handled through System::read():
+    
+     +-------------------------------------------------------------+
+     |  4.) The number of variables in the system (unsigned int)   |
+     |                                                             |
+     |   for each variable in the system                           |
+     |                                                             |
+     |    5.) The name of the variable (string)                   |
+     |                                                             |
+     |    6.) Combined in an FEType:                              |
+     |         - The approximation order(s) of the variable (Order |
+     |           Enum, cast to int/s)                              |
+     |         - The finite element family/ies of the variable     |
+     |           (FEFamily Enum, cast to int/s)                    |
+     |                                                             |
+     |   end variable loop                                         |
+     |                                                             |
+     | 7.) The number of additional vectors (unsigned int),       |
+     |                                                             |
+     |    for each additional vector in the equation system object |
+     |                                                             |
+     |    8.) the name of the additional vector  (string)         |
+     +-------------------------------------------------------------+
+    
+     end system loop
+    
+    
+       for each system, handled through System::read_data():
+       
+     +-------------------------------------------------------------+
+     | 9.) The global solution vector, re-ordered to be node-major|
+     |     (More on this later.)                                   |
+     |                                                             |
+     |    for each additional vector in the equation system object |
+     |                                                             |
+     |    10.) The global additional vector, re-ordered to be      |
+     |         node-major (More on this later.)                    |
+     +-------------------------------------------------------------+
+    
+     end system loop
+   \endverbatim
    *
    * Note that the actual IO is handled through the Xdr class 
    * (to be renamed later?) which provides a uniform interface to 
@@ -147,84 +130,10 @@ void EquationSystems::read (const std::string& name,
   Xdr io (new_name, mode);
 
   assert (io.reading());
-
-
-  /**
-   * Possibly clear data structures and start from scratch.
-   */
-//  if (read_header)
-//    this->clear ();
-
-
-//   /**
-//    * 1.)  
-//    *
-//    * Read the number of flags that are set
-//    */
-//   {
-//     unsigned int n_flags=0;
-  
-//     io.data (n_flags);
-  
-//     for (unsigned int flags=0; flags<n_flags; flags++)
-//       {
-// 	/**
-// 	 * 2.)
-// 	 *
-// 	 * Read the name of the ith flag
-// 	 */
-// 	std::string flag_name;
-     
-// 	io.data (flag_name);
-       
-// 	if (read_header)
-// 	  this->parameters.set<bool> (flag_name) = true;
-//       }
-//   }
-
-
-//   /**
-//    * 3.)  
-//    *
-//    * Read the number of params that are set
-//    */
-//   {
-//     unsigned int n_params=0;
-  
-//     io.data (n_params);
-  
-//     for (unsigned int params=0; params<n_params; params++)
-//       {
-//         /**
-// 	 * 4.)
-// 	 *
-// 	 * Read the name of the ith param
-// 	 */
-// 	std::string param_name;
-     
-// 	io.data (param_name);
- 
-// 	/**
-// 	 * 5.)
-// 	 *
-// 	 * Read the value of the ith param
-// 	 */
-// 	Real param_value;
-     
-// 	io.data (param_value);
-
-// 	if (read_header)
-// 	  this->parameters.set<Real> (param_name) = param_value;
-//       }
-//   }
-
-
 	  
-  /**
-   * 6.)  
-   *
-   * Read the number of equation systems
-   */
+  // 1.)  
+  //
+  // Read the number of equation systems
   {
     unsigned int n_sys=0;
   
@@ -232,20 +141,14 @@ void EquationSystems::read (const std::string& name,
 
     for (unsigned int sys=0; sys<n_sys; sys++)
       {
-	/**
-	 * 7.)
-	 *
-	 * Read the name of the sys-th equation system
-	 */
+	// 2.)
+	// Read the name of the sys-th equation system
 	std::string sys_name;
       
 	io.data (sys_name);
       
-	/**
-	 * 8.)
-	 *
-	 * Read the type of the sys-th equation system
-	 */
+	// 3.)
+	// Read the type of the sys-th equation system
 	std::string sys_type;
 	
 	io.data (sys_type);
@@ -253,11 +156,8 @@ void EquationSystems::read (const std::string& name,
 	if (read_header)
 	  this->add_system (sys_type, sys_name);
 
-	/**
-	 * 9.) - 11.)
-	 *
-	 * Let System::read() do the job
-	 */
+	// 4.) - 8.)
+	// Let System::read() do the job
 	System& new_system = this->get_system(sys_name);
 	  
 	new_system.read (io,
@@ -268,21 +168,16 @@ void EquationSystems::read (const std::string& name,
       
 
 
-  /**
-   * Now we are ready to initialize the underlying data
-   * structures. This will initialize the vectors for 
-   * storage, the dof_map, etc...
-   */ 
+  // Now we are ready to initialize the underlying data
+  // structures. This will initialize the vectors for 
+  // storage, the dof_map, etc...
   if (read_header) 
     this->init();
 
 
 
-  /**
-   * 12.)
-   *
-   * Read and set the numeric vector values
-   */
+  // 9.) & 10.)
+  // Read and set the numeric vector values
   if (read_data)
     {
       std::map<std::string, System*>::iterator
@@ -320,84 +215,65 @@ void EquationSystems::write(const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
                             const unsigned int write_flags) const
 {
-  /**
-   * Currently we only support I/O in serial
-   * So we're going to horribly abuse const_cast and change
-   * that
-   */
+  // Currently we only support I/O in serial
+  // So we're going to horribly abuse const_cast and change
+  // that
   const_cast<EquationSystems*>(this)->allgather();
 
   /**
    * This program implements the output of an 
    * EquationSystems object.  This warrants some 
    * documentation.  The output file essentially
-   * consists of 13 sections:
-   *
-   * 1.) The number of flags that are set (unsigned int),
-   *
-   * for each flag in the equation system object
-   *
-   *   2.) the name (string)
-   *
-   * end flag loop
-   *
-   * 3.) The number of parameters that are set (unsigned int),
-   *
-   * for each parameter in the equation system object
-   *
-   *   4.) the name of the parameter  (string)
-   *   5.) the value of the parameter (real)
-   *
-   * end parameter loop
-   * 
-   * 6.) The number of individual equation systems (unsigned int)
-   * 
-   *   for each system
-   *                                                      
-   *    7.)  The name of the system (string)            
-   *    8.)  The type of the system (string)            
-   *
-   *    handled through System::read():
-   *
-   * +-------------------------------------------------------------+
-   * |  9.) The number of variables in the system (unsigned int)   |
-   * |                                                             |
-   * |   for each variable in the system                           |
-   * |                                                             |
-   * |    10.) The name of the variable (string)                   |
-   * |                                                             |
-   * |    11.) Combined in an FEType:                              |
-   * |         - The approximation order(s) of the variable (Order |
-   * |           Enum, cast to int/s)                              |
-   * |         - The finite element family/ies of the variable     |
-   * |           (FEFamily Enum, cast to int/s)                    |
-   * |                                                             |
-   * |   end variable loop                                         |
-   * |                                                             |
-   * | 12.) The number of additional vectors (unsigned int),       |
-   * |                                                             |
-   * |    for each additional vector in the equation system object |
-   * |                                                             |
-   * |    13.) the name of the additional vector  (string)         |
-   * +-------------------------------------------------------------+
-   *
-   * end system loop
-   *
-   *
-   *   for each system, handled through System::read_data():
-   *   
-   * +-------------------------------------------------------------+
-   * | 14.) The global solution vector, re-ordered to be node-major|
-   * |     (More on this later.)                                   |
-   * |                                                             |
-   * |    for each additional vector in the equation system object |
-   * |                                                             |
-   * |    15.) The global additional vector, re-ordered to be      |
-   * |         node-major (More on this later.)                    |
-   * +-------------------------------------------------------------+
-   *
-   * end system loop
-   *
+   * consists of 10 sections:
+   \verbatim
+     1.) The number of individual equation systems (unsigned int)
+     
+       for each system
+                                                          
+        2.)  The name of the system (string)            
+        3.)  The type of the system (string)            
+   
+        handled through System::read():
+   
+     +-------------------------------------------------------------+
+     |  4.) The number of variables in the system (unsigned int)   |
+     |                                                             |
+     |   for each variable in the system                           |
+     |                                                             |
+     |    5.) The name of the variable (string)                   |
+     |                                                             |
+     |    6.) Combined in an FEType:                              |
+     |         - The approximation order(s) of the variable (Order |
+     |           Enum, cast to int/s)                              |
+     |         - The finite element family/ies of the variable     |
+     |           (FEFamily Enum, cast to int/s)                    |
+     |                                                             |
+     |   end variable loop                                         |
+     |                                                             |
+     | 7.) The number of additional vectors (unsigned int),       |
+     |                                                             |
+     |    for each additional vector in the equation system object |
+     |                                                             |
+     |    8.) the name of the additional vector  (string)         |
+     +-------------------------------------------------------------+
+   
+    end system loop
+   
+   
+    for each system, handled through System::read_data():
+       
+     +-------------------------------------------------------------+
+     | 9.) The global solution vector, re-ordered to be node-major|
+     |     (More on this later.)                                   |
+     |                                                             |
+     |    for each additional vector in the equation system object |
+     |                                                             |
+     |    10.) The global additional vector, re-ordered to be      |
+     |         node-major (More on this later.)                    |
+     +-------------------------------------------------------------+
+
+    end system loop
+   \endverbatim
    *
    * Note that the actual IO is handled through the Xdr class 
    * (to be renamed later?) which provides a uniform interface to 
@@ -431,101 +307,19 @@ void EquationSystems::write(const std::string& name,
   std::string comment;
   char buf[80];
 
-
-
-  /**
-   * Only write the header information
-   * if we are processor 0.
-   */
+  // Only write the header information
+  // if we are processor 0.
   if (proc_id == 0) 
     {
-//       /**
-//        * 1.)  
-//        *
-//        * Write the number of flags
-//        */
-//       {
-//         unsigned int n_flags = this->_flags.size();
-// 	io.data (n_flags, "# No. of Flags");
-//       }
-
-
-
-//       /**
-//        * 2.)  
-//        *
-//        * Write the flags
-//        */
-//       {
-//         std::set<std::string>::const_iterator flag_pos = _flags.begin();
-// 	std::set<std::string>::const_iterator flag_end = _flags.end();
-// 	unsigned int cnt=0;
-// 	for (; flag_pos!= flag_end; ++flag_pos)
-//           {
-// 	    comment =  "# Name, Flag ";
-// 	    std::sprintf(buf, "%d", cnt++);
-// 	    comment += buf;
-// 	    std::string flag_name = *flag_pos;
-// 	    io.data (flag_name, comment.c_str());
-// 	  }
-//       }
-
-
-
-//       /**
-//        * 3.)  
-//        *
-//        * Write the number of parameters
-//        */
-//       {
-//         unsigned int n_params = this->_parameters.size();
-// 	io.data (n_params, "# No. of Parameters");
-//       }
-
-
-
-//       /**
-//        * 4.) + 5.)
-//        *
-//        * Write the parameter names and values
-//        */
-//       {
-//         std::map<std::string, Real>::const_iterator param_pos = _parameters.begin();
-// 	std::map<std::string, Real>::const_iterator param_end = _parameters.end();
-// 	unsigned int cnt=0;
-// 	for (; param_pos!= param_end; ++param_pos)
-//           {
-// 	    comment =  "# Name,  Parameter No. ";
-// 	    std::sprintf(buf, "%d", cnt);
-// 	    comment += buf;
-// 	    std::string param_name = param_pos->first;
-// 	    io.data (param_name, comment.c_str());
-
-// 	    comment = "# Value, Parameter No. ";
-// 	    std::sprintf(buf, "%d", cnt++);
-// 	    comment += buf;
-// 	    Real param_value = param_pos->second;
-// 	    io.data (param_value, comment.c_str());
-// 	  }
-//       }
-
-
-
-      /**
-       * 6.)  
-       *
-       * Write the number of equation systems
-       */
+      // 1.)  
+      // Write the number of equation systems
       io.data (n_sys, "# No. of Equation Systems");
         
 
       while (pos != _systems.end())
 	{
-	  /**
-	   * 7.)
-	   *
-	   * Write the name of the sys_num-th system
-	   */
+	  // 2.)
+	  // Write the name of the sys_num-th system
 	  {
 	    const unsigned int sys_num = pos->second->number();
 	    std::string sys_name       = pos->first;
@@ -538,12 +332,9 @@ void EquationSystems::write(const std::string& name,
 	  }
 
 
-
-	  /**
-	   * 8.)
-	   *
-	   * Write the type of system handled
-	   */
+	  
+	  // 3.)
+	  // Write the type of system handled
 	  {
 	    const unsigned int sys_num = pos->second->number();
 	    std::string sys_type       = pos->second->system_type();
@@ -557,11 +348,9 @@ void EquationSystems::write(const std::string& name,
 
 
 	
-	  /**
-	   * 9.) - 13.)
-	   *
-	   * Let System::write() do the job
-	   */
+	  // 4.) - 8.)
+	  //
+	  // Let System::write() do the job
 	  pos->second->write (io, write_additional_data);
 
 	  ++pos;
@@ -572,19 +361,16 @@ void EquationSystems::write(const std::string& name,
 
 
   /**
-   * Start from the first system, again,
-   * to write vectors to disk, if wanted
+   // Start from the first system, again,
+   // to write vectors to disk, if wanted
    */
   pos = _systems.begin();
 
   if (write_data)
     for (; pos != _systems.end(); ++pos) 
       {
-	/**
-	 * 14.) + 15.)
-	 *
-	 * Let System::write_data() do the job
-	 */
+	// 9.) + 10.)
+	// Let System::write_data() do the job
 	pos->second->write_data (io,
 				 write_additional_data);
       }

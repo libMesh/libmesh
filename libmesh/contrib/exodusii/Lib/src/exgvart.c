@@ -53,7 +53,7 @@
 * revision history - 
 *   20061002 - David Thompson - Adapted from ex_get_var_time
 *
-* $Id: exgvart.c,v 1.3 2007/10/08 15:01:43 gdsjaar Exp $
+* $Id$
 *
 *****************************************************************************/
 

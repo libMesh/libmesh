@@ -8,7 +8,7 @@
  * Started 8/11/97
  * George
  *
- * $Id: ccgraph.c,v 1.5 2004-03-08 04:58:28 benkirk Exp $
+ * $Id$
  *
  */
 

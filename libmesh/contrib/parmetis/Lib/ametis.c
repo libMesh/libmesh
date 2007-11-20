@@ -8,7 +8,7 @@
  * Started 10/19/96
  * George
  *
- * $Id: ametis.c,v 1.2 2004-03-08 04:58:30 benkirk Exp $
+ * $Id$
  *
  */
 

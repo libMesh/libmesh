@@ -1,4 +1,4 @@
-// $Id: exact_solution.C,v 1.4 2003-09-25 21:46:54 benkirk Exp $
+// $Id$
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2003  Benjamin S. Kirk

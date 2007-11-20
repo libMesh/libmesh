@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: dot.in,v 1.1 2005-09-30 16:53:56 benkirk Exp $
+# $Id$
 # This is a wrapper for dot to create pretty class diagrams
 # corresponding to the libMesh web page style
 

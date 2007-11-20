@@ -8,7 +8,7 @@
  * Started 7/23/97
  * George
  *
- * $Id: redomylink.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
+ * $Id$
  */
 
 #include <parmetislib.h>

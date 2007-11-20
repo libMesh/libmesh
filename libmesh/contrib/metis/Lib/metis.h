@@ -8,7 +8,7 @@
  * Started 8/27/94
  * George
  *
- * $Id: metis.h,v 1.6 2004-03-08 04:58:28 benkirk Exp $
+ * $Id$
  */
 
 /*

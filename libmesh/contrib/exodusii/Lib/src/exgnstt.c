@@ -45,7 +45,7 @@
 * exit conditions - 
 *       int*    nset_var_tab            nodeset variable truth table array
 *
-*  $Id: exgnstt.c,v 1.4 2007/10/08 15:01:41 gdsjaar Exp $
+*  $Id$
 *
 *****************************************************************************/
 

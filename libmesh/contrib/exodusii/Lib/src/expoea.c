@@ -48,7 +48,7 @@
 * revision history - 
 *   20061003 - David Thompson - moved to ex_put_one_attr
 *
-*  $Id: expoea.c,v 1.4 2007/10/08 15:01:47 gdsjaar Exp $
+*  $Id$
 *
 *****************************************************************************/
 

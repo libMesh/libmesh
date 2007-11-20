@@ -428,6 +428,8 @@ INPUT                  = ./src/base \
                          ./src/geom \
                          ./src/mesh \
                          ./src/numerics \
+                         ./src/parallel \
+                         ./src/partitioning \
                          ./src/quadrature \
                          ./src/utils \
                          ./src/solvers \
@@ -437,6 +439,7 @@ INPUT                  = ./src/base \
                          ./include/geom \
                          ./include/mesh \
                          ./include/numerics \
+                         ./include/parallel \
                          ./include/partitioning \
                          ./include/quadrature \
                          ./include/utils \

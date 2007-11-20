@@ -8,7 +8,7 @@
  * Started 9/26/95
  * George
  *
- * $Id: struct.h,v 1.5 2004-03-08 04:58:28 benkirk Exp $
+ * $Id$
  */
 
 #ifndef __parmetis_h__
