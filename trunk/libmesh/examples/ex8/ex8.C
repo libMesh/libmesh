@@ -1,4 +1,4 @@
-/* $Id: ex8.C,v 1.19 2007-03-19 19:05:08 roystgnr Exp $ */
+/* $Id$ */
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 

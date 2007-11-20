@@ -7,7 +7,7 @@
  * Started 6/1/98
  * George
  *
- * $Id: frename.c,v 1.2 2004-03-08 04:58:30 benkirk Exp $
+ * $Id$
  *
  */
 

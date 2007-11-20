@@ -2,7 +2,7 @@
  * 	Copyright 1988 University Corporation for Atmospheric Research
  *      See netcdf/COPYRIGHT file for copying and redistribution conditions.
  */
-/* $Id: t_nc.c,v 1.82 2005/05/20 14:48:14 russ Exp $ */
+/* $Id$ */
 
 /*
  *	 Program to create a cdf, exercise all cdf functions.

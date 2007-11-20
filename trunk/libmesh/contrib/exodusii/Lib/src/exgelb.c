@@ -49,7 +49,7 @@
 *
 * revision history -
 *
-*  $Id: exgelb.c,v 1.5 2007/10/08 15:01:40 gdsjaar Exp $
+*  $Id$
 *
 */
 

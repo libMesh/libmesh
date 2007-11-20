@@ -8,7 +8,7 @@
  * Started 8/27/94
  * George
  *
- * $Id: stdheaders.h,v 1.3 2005-05-06 17:43:43 roystgnr Exp $
+ * $Id$
  */
 
 

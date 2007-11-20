@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.59 2007-09-13 21:02:18 jwpeterson Exp $
+# $Id$
 #
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
@@ -206,9 +206,9 @@ doc:
 #
 upload:
 	chmod -R g+w ./doc/html/* ./doc/latex/*/*
-	rsync -rltzve ssh ./doc/html/ $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
-	rsync -rltzve ssh ./doc/latex/howto $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
-	rsync -rltzve ssh ./doc/latex/xda_format $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+	rsync -rltzve ssh ./doc/html/ libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
+	rsync -rltzve ssh ./doc/latex/howto libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+	rsync -rltzve ssh ./doc/latex/xda_format libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
 	chmod -R g-w ./doc/html/* ./doc/latex/*/*
 
 

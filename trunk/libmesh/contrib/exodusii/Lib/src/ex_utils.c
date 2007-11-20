@@ -36,7 +36,7 @@
 *
 * exutils - utility routines
 *
-*  $Id: ex_utils.c,v 1.5 2007/10/08 15:01:38 gdsjaar Exp $
+*  $Id$
 *****************************************************************************/
 
 #if defined(DEBUG_QSORT)

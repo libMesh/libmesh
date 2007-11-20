@@ -40,13 +40,13 @@
   #define parallel_only() { }
 #endif
 
-// ------------------------------------------------------------
-// The Parallel namespace is for wrapper functions
-// for common general parallel synchronization tasks
-//
-// For MPI 1.1 compatibility, temporary buffers are used
-// instead of MPI 2's MPI_IN_PLACE
-
+/**
+ * The Parallel namespace is for wrapper functions
+ * for common general parallel synchronization tasks.
+ *
+ * For MPI 1.1 compatibility, temporary buffers are used
+ * instead of MPI 2's MPI_IN_PLACE
+ */
 namespace Parallel
 {
 #ifdef HAVE_MPI

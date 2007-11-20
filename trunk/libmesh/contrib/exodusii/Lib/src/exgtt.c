@@ -45,7 +45,7 @@
 * exit conditions - 
 *       int*    var_tab            element variable truth table array
 *
-*  $Id: exgtt.c,v 1.4 2007/10/08 15:01:43 gdsjaar Exp $
+*  $Id$
 *
 *****************************************************************************/
 

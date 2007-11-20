@@ -8,7 +8,7 @@
  * Started 8/1/97
  * George
  *
- * $Id: mincover.c,v 1.5 2004-03-08 04:58:28 benkirk Exp $
+ * $Id$
  */
 
 #include <metis.h>

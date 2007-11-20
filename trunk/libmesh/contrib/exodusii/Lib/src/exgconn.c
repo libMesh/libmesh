@@ -50,7 +50,7 @@
 *
 * revision history - 
 *
-* $Id: exgconn.c,v 1.3 2007/10/08 15:01:39 gdsjaar Exp $
+* $Id$
 */
 #include <stdlib.h>
 #include "exodusII.h"

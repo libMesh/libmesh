@@ -1,4 +1,4 @@
-/* $Id: ex4.C,v 1.49 2006-10-04 22:26:53 roystgnr Exp $ */
+/* $Id$ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
@@ -229,9 +229,11 @@ int main (int argc, char** argv)
       // Prints information about the system to the screen.
       equation_systems.print_info();
     }
+    mesh.print_info();
 
     // Solve the system "Poisson", just like example 2.
     equation_systems.get_system("Poisson").solve();
+    equation_systems.allgather();
 
     // We currently have to serialize for I/O.
     equation_systems.allgather();

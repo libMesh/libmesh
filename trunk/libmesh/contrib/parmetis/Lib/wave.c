@@ -7,7 +7,7 @@
  *
  * Started 5/19/97, Kirk, George
  *
- * $Id: wave.c,v 1.2 2004-03-08 04:58:31 benkirk Exp $
+ * $Id$
  *
  */
 

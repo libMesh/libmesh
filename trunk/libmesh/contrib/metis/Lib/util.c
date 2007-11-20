@@ -8,7 +8,7 @@
  * Started 9/28/95
  * George
  *
- * $Id: util.c,v 1.5 2004-03-08 04:58:28 benkirk Exp $
+ * $Id$
  */
 
 #include <metis.h>

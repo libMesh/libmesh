@@ -8,7 +8,7 @@
  * Started 2/22/96
  * George
  *
- * $Id: coarsen.c,v 1.2 2004-03-08 04:58:30 benkirk Exp $
+ * $Id$
  *
  */
 

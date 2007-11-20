@@ -8,7 +8,7 @@
  * Started 8/28/94
  * George
  *
- * $Id: checkgraph.c,v 1.1 2004-03-08 04:58:28 benkirk Exp $
+ * $Id$
  *
  */
 

@@ -1,4 +1,4 @@
-// $Id: mesh_base.h 2378 2007-11-09 07:19:22Z roystgnr $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -31,15 +31,17 @@
 
 namespace Parallel
 {
-// The parallel sorting method is templated on the
-// type of data which is to be sorted.  It may later
-// be templated on other things if we are ambitious.
-// This class knows about MPI, and knows how many
-// processors there are.  It is responsible for
-// transmitting data between the processors and
-// ensuring that the data is properly sorted between
-// all the processors.  We assume that a Sort
-// is instantiated on all processors.
+  /**
+   * The parallel sorting method is templated on the
+   * type of data which is to be sorted.  It may later
+   * be templated on other things if we are ambitious.
+   * This class knows about MPI, and knows how many
+   * processors there are.  It is responsible for
+   * transmitting data between the processors and
+   * ensuring that the data is properly sorted between
+   * all the processors.  We assume that a Sort
+   * is instantiated on all processors.
+   */
 template <typename KeyType>
 class Sort
 {

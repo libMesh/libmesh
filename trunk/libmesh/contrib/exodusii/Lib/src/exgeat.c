@@ -44,7 +44,7 @@
 * exit conditions - 
 *       float*  attrib                  array of attributes
 *
-*  $Id: exgeat.c,v 1.5 2007/10/08 15:01:39 gdsjaar Exp $
+*  $Id$
 *
 *****************************************************************************/
 

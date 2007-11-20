@@ -8,7 +8,7 @@
  * Started 3/1/96
  * George
  *
- * $Id: akwayfm.c,v 1.2 2004-03-08 04:58:30 benkirk Exp $
+ * $Id$
  */
 
 #include <parmetislib.h>

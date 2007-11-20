@@ -46,7 +46,7 @@
 * revision history - 
 *          David Thompson  - Added edge/face blocks/sets
 *
-*  $Id: expinix.c,v 1.3 2007/10/08 15:01:46 gdsjaar Exp $
+*  $Id$
 *
 *****************************************************************************/
 

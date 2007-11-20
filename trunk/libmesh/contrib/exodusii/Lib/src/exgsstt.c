@@ -45,7 +45,7 @@
 * exit conditions - 
 *       int*    sset_var_tab            sideset variable truth table array
 *
-*  $Id: exgsstt.c,v 1.4 2007/10/08 15:01:43 gdsjaar Exp $
+*  $Id$
 *
 *****************************************************************************/
 

@@ -1,4 +1,4 @@
-/* $Id: ex14.C,v 1.37 2007-05-23 23:29:15 roystgnr Exp $ */
+/* $Id$ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2004  Benjamin S. Kirk, John W. Peterson */

@@ -2,7 +2,7 @@
  *	Copyright 1997, University Corporation for Atmospheric Research
  *	See netcdf/COPYRIGHT file for copying and redistribution conditions.
  */
-/* $Id: onstack.h,v 2.7 2006/09/15 20:40:39 ed Exp $ */
+/* $Id$ */
 
 #ifndef _ONSTACK_H_
 #define _ONSTACK_H_

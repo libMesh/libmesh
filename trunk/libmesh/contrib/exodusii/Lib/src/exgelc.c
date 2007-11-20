@@ -46,7 +46,7 @@
 *       int*    connect         connectivity array
 *
 *
-* $Id: exgelc.c,v 1.5 2007/10/08 15:01:40 gdsjaar Exp $
+* $Id$
 */
 #include <stdlib.h>
 #include "exodusII.h"

@@ -44,7 +44,7 @@
 * exit conditions - 
 *       char*   names[]                 ptr array of attribute names
 *
-*  $Id: exgean.c,v 1.4 2007/10/08 15:01:39 gdsjaar Exp $
+*  $Id$
 *
 *****************************************************************************/
 
