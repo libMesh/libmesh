@@ -1013,7 +1013,7 @@ namespace exII {
     get_nodal_var_names();
 
     //See if we can find the variable we are looking for
-    int var_index = 0;
+    unsigned int var_index = 0;
     bool found = false;
 
     found = nodal_var_names[var_index] == nodal_var_name;
@@ -1075,7 +1075,7 @@ namespace exII {
     y.resize(num_nodes);
     z.resize(num_nodes);
 
-    for (unsigned int i=0; i<num_nodes; ++i)
+    for (/* unsigned */ int i=0; i<num_nodes; ++i)
     {
       x[i]=(*mesh.node_ptr(i))(0);
       y[i]=(*mesh.node_ptr(i))(1);
@@ -1420,7 +1420,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
   //For now just read the first timestep (1)
   const std::vector<double> & nodal_values = ex.get_nodal_var_values(nodal_var_name,1);
 
-  const DofMap & dof_map = system.get_dof_map();
+  //const DofMap & dof_map = system.get_dof_map();
 
   const unsigned int var_num = system.variable_number(nodal_var_name);
 
