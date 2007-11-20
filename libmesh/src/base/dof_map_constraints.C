@@ -449,7 +449,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
 
   unsigned int local_constraints = this->n_constrained_dofs();
   Parallel::max(local_constraints);
-  if (!local_constraints);
+  if (!local_constraints)
     return;
 
   if (!v)
