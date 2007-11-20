@@ -1405,6 +1405,14 @@ void ExodusII_IO::read (const std::string& fname)
 
 void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name)
 {
+  #ifndef HAVE_EXODUS_API
+
+  std::cerr <<  "ERROR, ExodusII API is not defined.\n"
+	    << std::endl;
+  error();
+    
+  #else
+
   ExodusII & ex = *ex_ptr;
 
   std::vector<double> time_steps = ex.get_time_steps();
@@ -1426,12 +1434,22 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
   }
 
   system.update();
+  
+  #endif
 }
 
 void ExodusII_IO::write_nodal_data (const std::string& fname,
 				    const std::vector<Number>& soln,
 				    const std::vector<std::string>& names)
 {
+  #ifndef HAVE_EXODUS_API
+
+  std::cerr <<  "ERROR, ExodusII API is not defined.\n"
+	    << std::endl;
+  error();
+    
+  #else
+
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   
   ExodusII out_ex = new ExodusII(this->verbose());
@@ -1457,5 +1475,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   }  
   
   out_ex.close();
+  
+  #endif
 }
 
