@@ -211,6 +211,10 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
                   assert(first_dof != DofObject::invalid_id);
                   requested->set_dof_number
                     (this->sys_number(), v, 0, first_dof);
+
+		  // don't forget to add these remore dofs to the _send_list
+		  for (unsigned int comp=0; comp!=n_comp; ++comp)
+		    _send_list.push_back(first_dof+comp);
                 }
             }
         }
