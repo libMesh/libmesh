@@ -1,0 +1,269 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> OPERATS(3LAS)</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" OPERATS(3LAS)">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html421 HREF="node24.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html419 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html413 HREF="node22.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html423 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html422 HREF="node24.html"> PRECOND(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html420 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html414 HREF="node22.html"> MLSOLV(3LAS)</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00088000000000000000>&#160;</A><A NAME=OPERATS> OPERATS(3LAS)</A></H2>
+<P>
+<P>
+
+<H3><A NAME=SECTION00088100000000000000> NAME</A></H3>
+<P>
+
+<P>
+<tt> Asgn_VV</tt>, <tt> AddAsgn_VV</tt>, <tt> SubAsgn_VV</tt>, <tt> MulAsgn_VS</tt>,
+<tt> Add_VV</tt>, <tt> Add_MM</tt>, <tt> Sub_VV</tt>, <tt> Sub_MM</tt>,
+<tt> Mul_SV</tt>, <tt> Mul_SM</tt>, <tt> Mul_SO</tt>, 
+<tt> Mul_VV</tt>, <tt> Mul_MV</tt>, <tt> Mul_OV</tt>, <tt> MulInv_MV</tt>, 
+<tt> Transp_M</tt>, <tt> Transp_O</tt>, 
+<tt> Diag_M</tt>, <tt> Upper_M</tt>, <tt> Lower_M</tt>, 
+<tt> l1Norm_V</tt>, <tt> l2Norm_V</tt>, <tt> MaxNorm_V</tt>,
+<tt> OrthoRightKer_VQ</tt>, <tt> OrthoLeftKer_VQ</tt>
+-- basic operations of linear algebra
+<P>
+<H3><A NAME=SECTION00088200000000000000> SYNOPSIS</A></H3>
+<P>
+
+<PRE>#include &lt;laspack/operats.h&gt;
+ 
+Vector *Asgn_VV(Vector *V1, Vector *V2); 
+Vector *AddAsgn_VV(Vector *V1, Vector *V2); 
+Vector *SubAsgn_VV(Vector *V1, Vector *V2); 
+Vector *MulAsgn_VS(Vector *V, double S); 
+Vector *Add_VV(Vector *V1, Vector *V2); 
+QMatrix *Add_QQ(QMatrix *Q1, QMatrix *Q2); 
+Vector *Sub_VV(Vector *V1, Vector *V2); 
+QMatrix *Sub_QQ(QMatrix *Q1, QMatrix *Q2); 
+Vector *Mul_SV(double S, Vector *V); 
+Matrix *Mul_SM(double S, Matrix *M); 
+QMatrix *Mul_SQ(double S, QMatrix *Q); 
+double Mul_VV(Vector *V1, Vector *V2); 
+Vector *Mul_MV(Matrix *M, Vector *V); 
+Vector *Mul_QV(QMatrix *Q, Vector *V); 
+Vector *MulInv_QV(QMatrix *Q, Vector *V); 
+Matrix *Transp_M(Matrix *M); 
+QMatrix *Transp_Q(QMatrix *Q); 
+QMatrix *Diag_Q(QMatrix *Q); 
+QMatrix *Upper_Q(QMatrix *Q); 
+QMatrix *Lower_Q(QMatrix *Q); 
+double l1Norm_V(Vector *V); 
+double l2Norm_V(Vector *V); 
+double MaxNorm_V(Vector *V); 
+Vector *OrthoRightKer_VQ(Vector *V, QMatrix *Q);
+Vector *OrthoLeftKer_VQ(Vector *V, QMatrix *Q);
+</PRE>
+<H3><A NAME=SECTION00088300000000000000> DESCRIPTION</A></H3>
+<P>
+<H6><A NAME=Asgn_VV>&#160;</A><A NAME=AddAsgn_VV>&#160;</A><A NAME=SubAsgn_VV>&#160;</A><A NAME=MulAsgn_VS>&#160;</A><A NAME=Add_VV>&#160;</A><A NAME=Add_MM>&#160;</A><A NAME=Sub_VV>&#160;</A><A NAME=Sub_MM>&#160;</A><A NAME=Mul_SV>&#160;</A><A NAME=Mul_SM>&#160;</A><A NAME=Mul_SO>&#160;</A><A NAME=Mul_VV>&#160;</A><A NAME=Mul_MV>&#160;</A><A NAME=Mul_OV>&#160;</A><A NAME=MulInv_MV>&#160;</A><A NAME=Transp_M>&#160;</A><A NAME=Transp_O>&#160;</A><A NAME=l1Norm_V>&#160;</A><A NAME=l2Norm_V>&#160;</A><A NAME=MaxNorm_V>&#160;</A></H6>
+Functions defined in this module perform the following basic operations
+of linear algebra:
+
+
+<PRE>    Asgn_VV(Vector a, Vector b)     --&gt; Vector   :  a = b
+    AddAsgn_VV(Vector a, Vector b)  --&gt; Vector   :  a = a + b
+    SubAsgn_VV(Vector a, Vector b)  --&gt; Vector   :  a = a - b
+    MulAsgn_VS(Vector a, double s)  --&gt; Vector   :  a = s a
+    Add_VV(Vector a, Vector b)      --&gt; Vector   :  a + b
+    Add_QQ(QMatrix A, QMatrix B)    --&gt; QMatrix  :  A + B
+    Sub_VV(Vector a, Vector b)      --&gt; Vector   :  a - b
+    Sub_QQ(QMatrix A, QMatrix B)    --&gt; QMatrix  :  A - B
+    Mul_SV(double s, Vector a)      --&gt; Vector   :  s a
+    Mul_SM(double s, Matrix P)      --&gt; Matrix   :  s P
+    Mul_SQ(double s, QMatrix A)     --&gt; QMatrix  :  s A
+    Mul_VV(Vector a, Vector b)      --&gt; double   :  a . b
+    Mul_MV(Matrix P, Vector a)      --&gt; Vector   :  P a
+    Mul_QV(QMatrix A, Vector a)     --&gt; Vector   :  A a
+    MulInv_QV(QMatrix A, Vector a)  --&gt; Vector   :  A^{-1} a
+    Transp_M(Matrix P)              --&gt; Matrix   :  P^T
+    Transp_Q(QMatrix A)             --&gt; QMatrix  :  A^T
+    l1Norm_V(Vector a)              --&gt; double   :  || a ||_1
+    l2Norm_V(Vector a)              --&gt; double   :  || a ||_2
+    MaxNorm_V(Vector a)             --&gt; double   :  || a ||_max
+</PRE>
+<P>
+
+Here <tt> a</tt>,
+ <tt> b</tt>,
+ 
+<tt> c</tt>
+ are vectors,
+<tt> s</tt>
+ is a scalar,
+<tt> A</tt>,
+ <tt> B</tt>
+ are quadratic matrices,
+and <tt> P</tt>
+ is a rectangular matrix.
+<P>
+<H6><A NAME=Diag_M>&#160;</A><A NAME=Upper_M>&#160;</A><A NAME=Lower_M>&#160;</A></H6>
+The procedures <tt> Diag_Q</tt>, <tt> Upper_Q</tt> and <tt> Lower_Q</tt>
+return the diagonal, the strictly upper and the strictly lower triangular part
+of the matrix <tt> Q</tt>, respectively.
+<P>
+As usual in C, all the above operations produce temporary results
+which can be processed further.
+For example by the following statements
+
+<PRE>  Asgn_VV(&amp;a, Add_VV(&amp;b, Mul_SV(s,&amp;c)));
+  Asgn_VV(&amp;a, Mul_QV(Transp(&amp;B), &amp;c));
+</PRE>
+
+the compound operation 
+<tt> a = b + s c</tt>
+ and
+the matrix-vector product
+<tt> a = B c</tt>
+,
+respectively, 
+could be performed.
+Some sophisticated techniques have been developed
+in order that this flexible approach may not have an essential influence
+on the memory requirement as well as the CPU time.
+Operations with only one parameter of the type <tt> Vector</tt>, <tt> Matrix</tt>, or
+<tt> QMatrix</tt> return objects
+which share memory extensive arrays
+of vector components and matrix non-zero elements
+with the original ones.
+The modification has an effect only on internal auxiliary variables
+such as scaling factors for products by scalars, combinations or restrictions
+of matrices as well as the element ordering for transposition of matrices.
+This saves memory, 
+avoids unnecessary data transfer between processor and memory,
+and allows us to better exploit some special processor capabilities
+such as e.g. a multiply-add pipe for compound operations.
+<P>
+<H6><A NAME=OrthoRightKer_VQ>&#160;</A><A NAME=OrthoLeftKer_VQ>&#160;</A></H6>
+The procedures <tt> OrthoRightKer_VQ</tt> and <tt> OrthoLeftKer_VQ</tt>
+carry out the orthogonalization
+of the vector <tt> V</tt> on the ``right'' and ``left'' null space
+of the matrix <tt> Q</tt>, respectively.
+The vector <tt> V</tt> will be modified as distinguished from other routines.
+<P>
+<H3><A NAME=SECTION00088400000000000000> FILES</A></H3>
+<P>
+  <tt> operats.h ... </tt> header file <BR> 
+
+  <tt> operats.c ... </tt> source file
+<P>
+
+<H3><A NAME=SECTION00088500000000000000> EXAMPLES</A></H3>
+<P>
+
+<P>
+The following example demonstrates how the CG method
+is by means of the above operations implemented in <tt> LASPack</tt>
+  (simplified
+for preconditioned systems with non-singular matrices).
+<P>
+
+<PRE>Vector *CGIter(QMatrix *A, Vector *x, Vector *b, int MaxIter,
+            PrecondProcType PrecondProc, double OmegaPrecond)
+{
+    int Iter;
+    double Alpha, Beta, Rho, RhoOld = 0.0;
+    double bNorm;
+    size_t Dim;
+    Vector r, p, q, z;
+
+    Q_Lock(A);
+    V_Lock(x);
+    V_Lock(b);
+    
+    Dim = Q_GetDim(A);
+    V_Constr(&amp;r, &quot;r&quot;, Dim, Normal, True);
+    V_Constr(&amp;p, &quot;p&quot;, Dim, Normal, True);
+    V_Constr(&amp;q, &quot;q&quot;, Dim, Normal, True);
+    if (PrecondProc != NULL)
+        V_Constr(&amp;z, &quot;z&quot;, Dim, Normal, True);
+
+    if (LASResult() == LASOK) {
+        bNorm = l2Norm_V(b);
+        
+        Iter = 0;
+        /* r = b - A * x(i) */
+        if (!IsZero(l1Norm_V(x) / Dim))
+            Asgn_VV(&amp;r, Sub_VV(b, Mul_QV(A, x)));
+        else
+            Asgn_VV(&amp;r, b);
+        if (PrecondProc != NULL) {
+            /* preconditioned CG */
+            while (!RTCResult(Iter, l2Norm_V(&amp;r), bNorm, CGIterId)
+                &amp;&amp; Iter &lt; MaxIter) {
+                Iter++;
+                (*PrecondProc)(A, &amp;z, &amp;r, OmegaPrecond);
+                Rho = Mul_VV(&amp;r, &amp;z);
+                if (Iter == 1) {
+                    Asgn_VV(&amp;p, &amp;z);
+           } else {
+                    Beta = Rho / RhoOld;
+                    Asgn_VV(&amp;p, Add_VV(&amp;z, Mul_SV(Beta, &amp;p)));
+           }
+                Asgn_VV(&amp;q, Mul_QV(A, &amp;p));
+                Alpha = Rho / Mul_VV(&amp;p, &amp;q);
+                AddAsgn_VV(x, Mul_SV(Alpha, &amp;p));
+                SubAsgn_VV(&amp;r, Mul_SV(Alpha, &amp;q));
+                RhoOld = Rho;
+       }
+   } else {
+            /* plain CG (z = r) */
+
+            ...
+
+   }
+    }
+    
+    V_Destr(&amp;r);
+    V_Destr(&amp;p);
+    V_Destr(&amp;q);
+    if (PrecondProc != NULL)
+        V_Destr(&amp;z);
+
+    Q_Unlock(A);
+    V_Unlock(x);
+    V_Unlock(b);
+
+    return(x);
+}
+</PRE>
+<P>
+<H3><A NAME=SECTION00088600000000000000> SEE ALSO</A></H3>
+<P>
+<A HREF="node27.html#VECTOR">vector(3LAS)</A>, <A HREF="node21.html#MATRIX">matrix(3LAS)</A>,
+<A HREF="node25.html#QMATRIX">qmatrix(3LAS)</A>, <A HREF="node18.html#ERRHANDL">errhandl(3LAS)</A>
+<P>
+<H3><A NAME=SECTION00088700000000000000> BUGS</A></H3>
+<P>
+Addition and subtraction of matrices are allowed only for matrices
+which are derived from the same one.
+This indeed disables general matrix manipulations but, 
+as a rule, 
+operations of such kind are not applied in solvers
+of systems of linear equations.
+<P>
+For example, triangular matrices with a weighted diagonal used 
+in the SOR method could be built as follows:
+<PRE>  Add_QQ(Mul_SQ(1.0 / Omega, Diag_Q(A)), Lower_Q(A))
+</PRE>
+<P>
+<BR> <HR><A NAME=tex2html421 HREF="node24.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html419 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html413 HREF="node22.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html423 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html422 HREF="node24.html"> PRECOND(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html420 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html414 HREF="node22.html"> MLSOLV(3LAS)</A>
+<BR> <HR> <P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>
