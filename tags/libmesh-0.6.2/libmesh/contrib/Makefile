@@ -30,6 +30,12 @@ all:
 	@echo "--- Building gmv ---------------------"
 	@$(MAKE) -C gmv          $(MAKECMDGOALS)
 	@echo ""
+	@echo "--- Building netCDF ---------------------"
+	@$(MAKE) -C netcdf/Lib   $(MAKECMDGOALS)
+	@echo ""
+	@echo "--- Building ExodusII ---------------------"
+	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
+	@echo ""
 	@echo "----------------------------------------------"
 	@echo "----- Done Building Contributed Packages -----"
 	@echo "----------------------------------------------"
@@ -49,6 +55,8 @@ clean:
 	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
 	@$(MAKE) -C triangle     $(MAKECMDGOALS)
 	@$(MAKE) -C gmv          $(MAKECMDGOALS)
+	@$(MAKE) -C netcdf/Lib   $(MAKECMDGOALS)
+	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
 
 #
 # How to clobber the packages
@@ -63,6 +71,8 @@ clobber:
 	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
 	@$(MAKE) -C triangle     $(MAKECMDGOALS)
 	@$(MAKE) -C gmv          $(MAKECMDGOALS)
+	@$(MAKE) -C netcdf/Lib   $(MAKECMDGOALS)
+	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
 
 #
 # How to distclean the packages
@@ -77,4 +87,6 @@ distclean:
 	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
 	@$(MAKE) -C triangle     $(MAKECMDGOALS)
 	@$(MAKE) -C gmv          $(MAKECMDGOALS)
+	@$(MAKE) -C netcdf/Lib   $(MAKECMDGOALS)
+	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
 	@rm -rf lib/*_dbg lib/*_opt lib/*_pro lib/*_devel
