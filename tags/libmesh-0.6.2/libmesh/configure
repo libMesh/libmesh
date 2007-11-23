@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC enableshared GXX_VERSION CXXFLAGS_OPT CXXFLAGS_DBG CXXFLAGS_DVL CFLAGS_OPT CFLAGS_DBG CFLAGS_DVL CXXDEPFLAG CXXSHAREDFLAG RPATHFLAG PROFILING_FLAGS CXXCPP EGREP MPCXX PWD enablexdr enablecomplex NETCDF_LIB NETCDF_INCLUDE EXODUS_LIB EXODUS_INCLUDE enableoptional F77 FFLAGS ac_ct_F77 FLIBS PETSC_ARCH PETSC_DIR petscversion petscmajorminor MPI_IMPL MPI MPI_LIBS MPI_LIBS_PATH MPI_LIBS_PATHS MPI_INCLUDES_PATH MPI_INCLUDES_PATHS enablepetsc SLEPC_DIR slepcversion enableslepc CONTRIB_HAVE_LASPACK LASPACK_INCLUDE LASPACK_LIB enablelaspack CONTRIB_HAVE_SFC SFC_INCLUDE SFC_LIB enablesfc CONTRIB_HAVE_GZSTREAM GZSTREAM_INCLUDE GZSTREAM_LIB enablegz TECPLOT_LIBRARY TECPLOT_INCLUDE METIS_INCLUDE METIS_LIB PARMETIS_INCLUDE PARMETIS_LIB enablemetis enableparmetis DOXYGEN DOT DOTPATH HAVE_DOT CONTRIB_HAVE_TETGEN TETGEN_INCLUDE TETGEN_LIBRARY enabletetgen CONTRIB_HAVE_TRIANGLE TRIANGLE_INCLUDE TRIANGLE_LIBRARY enabletriangle CONTRIB_HAVE_GMV GMV_INCLUDE GMV_LIBRARY enablegmv VTK_INCLUDE VTK_LIBRARY enablevtk PERL LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC enableshared GXX_VERSION CXXFLAGS_OPT CXXFLAGS_DBG CXXFLAGS_DVL CFLAGS_OPT CFLAGS_DBG CFLAGS_DVL CXXDEPFLAG CXXSHAREDFLAG RPATHFLAG PROFILING_FLAGS CXXCPP EGREP MPCXX PWD enablexdr enablecomplex NETCDF_INCLUDE NETCDF_LIBRARY enablenetcdf EXODUS_INCLUDE EXODUS_LIBRARY enableexodus enableoptional F77 FFLAGS ac_ct_F77 FLIBS PETSC_ARCH PETSC_DIR petscversion petscmajorminor MPI_IMPL MPI MPI_LIBS MPI_LIBS_PATH MPI_LIBS_PATHS MPI_INCLUDES_PATH MPI_INCLUDES_PATHS enablepetsc SLEPC_DIR slepcversion enableslepc CONTRIB_HAVE_LASPACK LASPACK_INCLUDE LASPACK_LIB enablelaspack CONTRIB_HAVE_SFC SFC_INCLUDE SFC_LIB enablesfc CONTRIB_HAVE_GZSTREAM GZSTREAM_INCLUDE GZSTREAM_LIB enablegz TECPLOT_LIBRARY TECPLOT_INCLUDE METIS_INCLUDE METIS_LIB PARMETIS_INCLUDE PARMETIS_LIB enablemetis enableparmetis DOXYGEN DOT DOTPATH HAVE_DOT CONTRIB_HAVE_TETGEN TETGEN_INCLUDE TETGEN_LIBRARY enabletetgen CONTRIB_HAVE_TRIANGLE TRIANGLE_INCLUDE TRIANGLE_LIBRARY enabletriangle CONTRIB_HAVE_GMV GMV_INCLUDE GMV_LIBRARY enablegmv VTK_INCLUDE VTK_LIBRARY enablevtk PERL LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -876,7 +876,7 @@ Optional Features:
                           build with reference counting suppport
   --enable-perflog        build with performance logging turned on
   --enable-netcdf         build with netCDF binary I/O
-  --enable-exodus         build with ExodusII binary support
+  --enable-exodus         build with ExodusII API support
   --enable-optional       en/disable optional external libraries
   --enable-mpi            build with MPI message passing support
   --enable-petsc          build with PETSc iterative solver suppport
@@ -7782,9 +7782,6 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
   cat >>confdefs.h <<_ACEOF
 #define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
- cat >>confdefs.h <<\_ACEOF
-#define HAVE_DLADDR 1
-_ACEOF
 
 fi
 
@@ -8550,8 +8547,6 @@ echo "${ECHO_T}<<< Configuring library with performance logging support >>>" >&6
 fi
 
 
-
-
 # Check whether --enable-netcdf or --disable-netcdf was given.
 if test "${enable_netcdf+set}" = set; then
   enableval="$enable_netcdf"
@@ -8562,63 +8557,28 @@ fi;
 
 if (test "$enablenetcdf" != no) ; then
 
-  as_ac_File=`echo "ac_cv_file_./contrib/netcdf/lib/$host/libnetcdf.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for ./contrib/netcdf/lib/$host/libnetcdf.a" >&5
-echo $ECHO_N "checking for ./contrib/netcdf/lib/$host/libnetcdf.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "./contrib/netcdf/lib/$host/libnetcdf.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  NETCDF_LIB=$PWD/contrib/netcdf/lib/$host/libnetcdf.a
-fi
 
-  echo "$as_me:$LINENO: checking for ./contrib/netcdf/include/netcdf.h" >&5
-echo $ECHO_N "checking for ./contrib/netcdf/include/netcdf.h... $ECHO_C" >&6
-if test "${ac_cv_file___contrib_netcdf_include_netcdf_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "./contrib/netcdf/include/netcdf.h"; then
-  ac_cv_file___contrib_netcdf_include_netcdf_h=yes
-else
-  ac_cv_file___contrib_netcdf_include_netcdf_h=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file___contrib_netcdf_include_netcdf_h" >&5
-echo "${ECHO_T}$ac_cv_file___contrib_netcdf_include_netcdf_h" >&6
-if test $ac_cv_file___contrib_netcdf_include_netcdf_h = yes; then
-  NETCDF_INCLUDE_PATH=$PWD/contrib/netcdf/include
-fi
-
-
-  if (test -r $NETCDF_INCLUDE_PATH/netcdf.h -a "x$NETCDF_LIB" != x) ; then
-    NETCDF_INCLUDE=-I$NETCDF_INCLUDE_PATH
-
-
+  if (test $enablenetcdf = yes); then
+     NETCDF_INCLUDE="-I$PWD/contrib/netcdf/Lib"
+     NETCDF_LIBRARY="\$(EXTERNAL_LIBDIR)/libnetcdf\$(libext)"
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_NETCDF 1
 _ACEOF
 
-    echo "$as_me:$LINENO: result: <<< Configuring library with netCDF support >>>" >&5
-echo "${ECHO_T}<<< Configuring library with netCDF support >>>" >&6
-    have_netcdf=yes
+     echo "$as_me:$LINENO: result: <<< Configuring library with Netcdf support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with Netcdf support >>>" >&6
+     have_netcdf=yes
+  else
+     NETCDF_INCLUDE=""
+     NETCDF_LIBRARY=""
+     enablenetcdf=no
+     have_netcdf=no
   fi
+
+
+
+
 
 
                # Check whether --enable-exodus or --disable-exodus was given.
@@ -8631,62 +8591,26 @@ fi;
 
    if (test "$enableexodus" != no -a "$have_netcdf" = yes) ; then
 
-  as_ac_File=`echo "ac_cv_file_./contrib/exodus/lib/$host/libexoIIv2c.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for ./contrib/exodus/lib/$host/libexoIIv2c.a" >&5
-echo $ECHO_N "checking for ./contrib/exodus/lib/$host/libexoIIv2c.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "./contrib/exodus/lib/$host/libexoIIv2c.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  EXODUS_LIB=$PWD/contrib/exodus/lib/$host/libexoIIv2c.a
-fi
 
-  echo "$as_me:$LINENO: checking for ./contrib/exodus/include/exodusII.h" >&5
-echo $ECHO_N "checking for ./contrib/exodus/include/exodusII.h... $ECHO_C" >&6
-if test "${ac_cv_file___contrib_exodus_include_exodusII_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "./contrib/exodus/include/exodusII.h"; then
-  ac_cv_file___contrib_exodus_include_exodusII_h=yes
-else
-  ac_cv_file___contrib_exodus_include_exodusII_h=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file___contrib_exodus_include_exodusII_h" >&5
-echo "${ECHO_T}$ac_cv_file___contrib_exodus_include_exodusII_h" >&6
-if test $ac_cv_file___contrib_exodus_include_exodusII_h = yes; then
-  EXODUS_INCLUDE_PATH=$PWD/contrib/exodus/include
-fi
-
-
-  if (test -r $EXODUS_INCLUDE_PATH/exodusII.h -a "x$EXODUS_LIB" != x) ; then
-    EXODUS_INCLUDE=-I$EXODUS_INCLUDE_PATH
-
-
+  if (test $enablenetcdf = yes -a $enableexodus = yes); then
+     EXODUS_INCLUDE="-I$PWD/contrib/exodusii/Lib/include"
+     EXODUS_LIBRARY="\$(EXTERNAL_LIBDIR)/libexodusii\$(libext)"
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_EXODUS_API 1
 _ACEOF
 
-    echo "$as_me:$LINENO: result: <<< Configuring library with Exodus API support >>>" >&5
+     echo "$as_me:$LINENO: result: <<< Configuring library with Exodus API support >>>" >&5
 echo "${ECHO_T}<<< Configuring library with Exodus API support >>>" >&6
+  else
+     EXODUS_INCLUDE=""
+     EXODUS_LIBRARY=""
+     enableexodus=no
   fi
+
+
+
+
 
    fi
    fi
@@ -8861,7 +8785,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:8864:" \
+echo "$as_me:8788:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -9055,7 +8979,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:9058: \"$ac_link\") >&5
+(eval echo $as_me:8982: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -9133,7 +9057,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:9136: \"$ac_link\") >&5
+(eval echo $as_me:9060: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -12699,10 +12623,12 @@ s,@MPCXX@,$MPCXX,;t t
 s,@PWD@,$PWD,;t t
 s,@enablexdr@,$enablexdr,;t t
 s,@enablecomplex@,$enablecomplex,;t t
-s,@NETCDF_LIB@,$NETCDF_LIB,;t t
 s,@NETCDF_INCLUDE@,$NETCDF_INCLUDE,;t t
-s,@EXODUS_LIB@,$EXODUS_LIB,;t t
+s,@NETCDF_LIBRARY@,$NETCDF_LIBRARY,;t t
+s,@enablenetcdf@,$enablenetcdf,;t t
 s,@EXODUS_INCLUDE@,$EXODUS_INCLUDE,;t t
+s,@EXODUS_LIBRARY@,$EXODUS_LIBRARY,;t t
+s,@enableexodus@,$enableexodus,;t t
 s,@enableoptional@,$enableoptional,;t t
 s,@F77@,$F77,;t t
 s,@FFLAGS@,$FFLAGS,;t t

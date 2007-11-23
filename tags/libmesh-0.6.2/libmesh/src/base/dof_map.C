@@ -488,7 +488,8 @@ void DofMap::distribute_dofs_var_major (MeshBase& mesh)
 
 		      // If these DOFs are on the local processor add 
 		      // them to the _send_list
-		      if (processor == proc_id)
+		      if (processor == proc_id ||
+			  node->processor_id() == processor)
 		        for (unsigned int index=0; index<node->n_comp(sys_num,var);
 		             index++)
 			  _send_list.push_back(node->dof_number(sys_num,
@@ -611,7 +612,8 @@ void DofMap::distribute_dofs_node_major (MeshBase& mesh)
   
 	            // If these DOFs are on the local processor add 
 	            // them to the _send_list
-	            if (processor == proc_id)
+	            if (processor == proc_id ||
+			node->processor_id() == processor)
 	              for (unsigned int index=0; index<node->n_comp(sys_num,var);
 	                   index++)
 		        _send_list.push_back(node->dof_number(sys_num,

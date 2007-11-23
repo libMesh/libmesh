@@ -515,8 +515,11 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
   std::vector<int> idx(n); Utility::iota (idx.begin(), idx.end(), 0);
 
   // Create the index set & scatter object
-  ierr = ISCreateGeneral(libMesh::COMM_WORLD, n, &idx[0], &is);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if (idx.empty())
+    ierr = ISCreateGeneral(libMesh::COMM_WORLD, n, PETSC_NULL, &is);
+  else
+    ierr = ISCreateGeneral(libMesh::COMM_WORLD, n, &idx[0], &is);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   ierr = VecScatterCreate(_vec,          is,
 			  v_local->_vec, is,
@@ -576,8 +579,11 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
     idx[i] = static_cast<int>(send_list[i]);
   
   // Create the index set & scatter object
-  ierr = ISCreateGeneral(libMesh::COMM_WORLD, n_sl, &idx[0], &is);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if (idx.empty())
+    ierr = ISCreateGeneral(libMesh::COMM_WORLD, n_sl, PETSC_NULL, &is);
+  else
+    ierr = ISCreateGeneral(libMesh::COMM_WORLD, n_sl, &idx[0], &is);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   ierr = VecScatterCreate(_vec,          is,
 			  v_local->_vec, is,
@@ -657,8 +663,11 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
     Utility::iota (idx.begin(), idx.end(), first_local_idx);
 
     // Create the index set & scatter object
-    ierr = ISCreateGeneral(libMesh::COMM_WORLD, local_size, &idx[0], &is); 
-           CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    if (idx.empty())
+      ierr = ISCreateGeneral(libMesh::COMM_WORLD, local_size, PETSC_NULL, &is); 
+    else
+      ierr = ISCreateGeneral(libMesh::COMM_WORLD, local_size, &idx[0], &is); 
+    CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
     ierr = VecScatterCreate(_vec,              is,
 			    parallel_vec._vec, is,

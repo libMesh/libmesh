@@ -1,4 +1,4 @@
-// $Id: exodusII_io.h,v 1.4 2007-10-21 20:48:42 benkirk Exp $
+// $Id: exodusII_io.h 2501 2007-11-20 02:33:29Z benkirk $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -27,10 +27,12 @@
 
 // Local includes
 #include "mesh_input.h"
+#include "mesh_output.h"
 
 // Forward declarations
 class MeshBase;
-
+class System;
+class ExodusII;
 
 /**
  * The \p ExodusII_IO class implements reading meshes in the
@@ -45,7 +47,8 @@ class MeshBase;
 
 // ------------------------------------------------------------
 // ExodusII_IO class definition
-class ExodusII_IO : public MeshInput<MeshBase>
+class ExodusII_IO : public MeshInput<MeshBase>,
+		    public MeshOutput<MeshBase>
 {
 
  public:
@@ -71,15 +74,33 @@ class ExodusII_IO : public MeshInput<MeshBase>
   virtual void read (const std::string& name);
 
   /**
+   * This method implements writing a mesh to a specified file.
+   */
+  virtual void write (const std::string& ){}
+
+
+  /**
    * Set the flag indicationg if we should be verbose.
    */
   bool & verbose ();
 
+  /**
+   * If we read in a nodal solution while reading in a mesh, we can attempt
+   * to copy that nodal solution into an EquationSystems object.
+   */
+  void copy_nodal_solution(System& es, std::string nodal_var_name);
+
+  /**
+   * Write out a nodal solution.
+   */
+  void write_nodal_data (const std::string&,
+			 const std::vector<Number>&,
+			 const std::vector<std::string>&);
   
  private:
-  
+  ExodusII * ex_ptr;
 
-  //-------------------------------------------------------------
+//-------------------------------------------------------------
   // local data
 
   /**
@@ -95,6 +116,7 @@ class ExodusII_IO : public MeshInput<MeshBase>
 inline
 ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
   MeshInput<MeshBase> (mesh),
+  MeshOutput<MeshBase> (mesh),
   _verbose (false)
 {
 }

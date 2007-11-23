@@ -1,4 +1,4 @@
-// $Id: exodusII_io.C,v 1.15 2007-10-21 20:48:49 benkirk Exp $
+// $Id: exodusII_io.C 2502 2007-11-20 16:20:12Z benkirk $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -27,6 +27,8 @@
 #include "mesh_base.h"
 #include "enum_elem_type.h"
 #include "elem.h"
+#include "system.h"
+#include "numeric_vector.h"
 
 // Wrap all the helper classes in an #ifdef to avoid excessive compilation
 // time in the case of no ExodusII support
@@ -41,8 +43,8 @@ namespace exII {
 
 //-----------------------------------------------------------------------------
 // Exodus class - private helper class defined in an anonymous namespace
-namespace
-{
+//namespace
+//{
   /**
    * This is the \p ExodusII class.
    * This class hides the implementation
@@ -83,7 +85,8 @@ namespace
 				   ret_float(0.0),
 				   ret_char(0),
 				   title(new char[MAX_LINE_LENGTH]),
-				   elem_type(new char[MAX_STR_LENGTH])
+				   elem_type(new char[MAX_STR_LENGTH]),
+				   num_time_steps(0)
     {}
 
     /**
@@ -317,8 +320,70 @@ namespace
      */
     void close();
 
+    /**
+     * Generic inquiry, returs the value
+     */
+    int inquire(int req_info, std::string error_msg="");
 
-  
+    
+    // For reading solutions:
+    /*
+     * Returns an array containing the timesteps in the file
+     */
+    const std::vector<double>& get_time_steps();
+
+
+    /*
+     * Number of Nodal variables defined.
+     */
+    int get_num_nodal_vars(){ return num_nodal_vars; }
+    
+
+    /*
+     * Returns an array containing the nodal var names in the file
+     */
+    const std::vector<std::string>& get_nodal_var_names();
+
+    /*
+     * Returns an array containing the nodal variable values
+     * at the specified time
+     */
+    const std::vector<double>& get_nodal_var_values(std::string nodal_var_name, int time_step);
+
+    // For Writing Solutions
+    /**
+     * Opens an \p ExodusII mesh
+     * file named \p filename
+     * for writing.
+     */
+    void create(std::string filename);
+
+    /**
+     * Initializes the Exodus file
+     */
+    void initialize(std::string title, const MeshBase & mesh);
+
+    /**
+     * Writes the nodal coordinates contained in "mesh"
+     */
+    void write_nodal_coordinates(const MeshBase & mesh);
+
+    /**
+     * Writes the elements contained in "mesh"
+     */
+    void write_elements(const MeshBase & mesh);
+
+    /**
+     * Sets up the nodal variables
+     */
+    void initialize_nodal_variables(std::vector<std::string> names);
+
+    /**
+     * Writes the vector of values to a nodal variable.
+     */
+    void write_nodal_values(int var_id, const std::vector<double> & values, int timestep);
+
+
     //-------------------------------------------------------------------------
     /**
      * This is the \p ExodusII
@@ -338,10 +403,11 @@ namespace
        * Constructor.  Initializes the const private member
        * variables.
        */
-      Conversion(const int* nm, const int* sm, const ElemType ct) 
+      Conversion(const int* nm, const int* sm, const ElemType ct, std::string ex_type) 
 	: node_map(nm),       // Node map for this element
 	  side_map(sm),
-	  canonical_type(ct)    // Element type name in this code
+	  canonical_type(ct),    // Element type name in this code
+	  exodus_type(ex_type)   // Element type in Exodus
       {}
 
       /**
@@ -365,6 +431,10 @@ namespace
        */
       ElemType get_canonical_type()    const { return canonical_type; }
 
+      /**
+       * Returns the string corresponding to the Exodus type for this element
+       */
+      std::string exodus_elem_type() const { return exodus_type; };
     private:
       /**
        * Pointer to the node map for this element.
@@ -381,6 +451,11 @@ namespace
        * element type.
        */
       const ElemType canonical_type;
+
+      /**
+       * The string corresponding to the Exodus type for this element
+       */
+      const std::string exodus_type;
     };
 
 
@@ -624,7 +699,13 @@ namespace
     char*   title;                       // Problem title
     char*   elem_type;                   // Type of element in a given block
 
-  };
+    //Solution Data
+    int num_time_steps;
+    std::vector<double> time_steps;
+    int num_nodal_vars;
+    std::vector<std::string> nodal_var_names;
+    std::vector<double> nodal_var_values;
+};
 
 
   // ------------------------------------------------------------
@@ -720,6 +801,11 @@ namespace
 			       &num_side_sets);
 
     check_err(ex_err, "Error retrieving header info.");
+
+    num_time_steps = inquire(EX_INQ_TIME, "Error retrieving time steps");
+
+    exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
+
     message("Exodus header info retrieved successfully.");
   }
 
@@ -879,7 +965,174 @@ namespace
     message("Exodus file closed successfully."); 
   }
 
+  int ExodusII::inquire(int req_info, std::string error_msg)
+  {
+    ex_err = exII::ex_inquire(ex_id,
+			      req_info,
+			      &ret_int,
+			      &ret_float,
+			      &ret_char);
+    
+    check_err(ex_err, error_msg);
 
+    return ret_int;
+  }
+
+  const std::vector<double>& ExodusII::get_time_steps()
+  {
+    time_steps.resize(num_time_steps);
+    exII::ex_get_all_times(ex_id, &time_steps[0]);
+    return time_steps;
+  }
+
+  const std::vector<std::string>& ExodusII::get_nodal_var_names()
+  {
+    //Max of 100 variable names
+    char *var_names[100];
+    
+    nodal_var_names.resize(num_nodal_vars);
+    for(int i=0;i<num_nodal_vars;i++)
+    {
+      var_names[i]=new char[MAX_STR_LENGTH+1];
+    }
+
+    exII::ex_get_var_names(ex_id, "n", num_nodal_vars, var_names);
+
+    for(int i=0;i<num_nodal_vars;i++)
+    {
+      nodal_var_names[i]=var_names[i];
+    }
+
+    return nodal_var_names;
+  }
+
+  const std::vector<double>& ExodusII::get_nodal_var_values(std::string nodal_var_name, int time_step)
+  {
+    nodal_var_values.resize(num_nodes);
+    
+    get_nodal_var_names();
+
+    //See if we can find the variable we are looking for
+    unsigned int var_index = 0;
+    bool found = false;
+
+    found = nodal_var_names[var_index] == nodal_var_name;
+    
+    while(!found && var_index < nodal_var_names.size())
+    {
+      var_index++;
+      found = nodal_var_names[var_index] == nodal_var_name;
+    }
+
+    if(!found)
+    {
+      std::cerr << "Unable to locate variable named: " << nodal_var_name << std::endl;
+      return nodal_var_values;
+    }
+
+    exII::ex_get_nodal_var(ex_id, time_step, var_index+1, num_nodes, &nodal_var_values[0]);
+
+    return nodal_var_values;
+  }
+
+  // For Writing Solutions
+
+  void ExodusII::create(std::string filename)
+  {
+    //Store things as doubles
+    comp_ws = 8;
+    io_ws = 8;
+    
+    ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
+    
+    ex_id = exII::ex_open(filename.c_str(),
+			  EX_WRITE,
+			  &comp_ws,
+			  &io_ws,
+			  &ex_version);
+  
+    check_err(ex_id, "Error creating ExodusII mesh file.");
+    if (verbose) std::cout << "File created successfully." << std::endl;
+  }
+
+  void ExodusII::initialize(std::string title, const MeshBase & mesh)
+  {
+    num_dim = mesh.mesh_dimension();
+    num_nodes = mesh.n_nodes();
+    num_elem = mesh.n_elem();
+    num_elem_blk = 1;
+    num_node_sets = 0;
+    num_side_sets = 0;
+
+    ex_err = exII::ex_put_init(ex_id, title.c_str(), num_dim, num_nodes, num_elem, num_elem_blk, num_node_sets, num_side_sets);
+    
+    check_err(ex_err, "Error initializing new Exodus file.");
+  }
+
+  void ExodusII::write_nodal_coordinates(const MeshBase & mesh)
+  {
+    x.resize(num_nodes);
+    y.resize(num_nodes);
+    z.resize(num_nodes);
+
+    for (/* unsigned */ int i=0; i<num_nodes; ++i)
+    {
+      x[i]=(*mesh.node_ptr(i))(0);
+      y[i]=(*mesh.node_ptr(i))(1);
+      z[i]=(*mesh.node_ptr(i))(2);
+    }
+
+    ex_err = exII::ex_put_coord(ex_id, &x[0], &y[0], &z[0]);
+
+    check_err(ex_err, "Error writing coordinates to Exodus file.");
+  }
+
+  void ExodusII::write_elements(const MeshBase & mesh)
+  {
+    ExodusII::ElementMaps em;
+    const ExodusII::Conversion conv = em.assign_conversion(mesh.elem(0)->type());
+
+    num_nodes_per_elem = mesh.elem(0)->n_nodes();
+      
+    ex_err = exII::ex_put_elem_block(ex_id, 1, conv.exodus_elem_type().c_str(), num_elem,num_nodes_per_elem, 0);
+    check_err(ex_err, "Error writing element block.");
+
+    connect.resize(num_elem*num_nodes_per_elem);
+
+    for(int i=0;i<num_elem;i++)
+    {
+      Elem * elem = mesh.elem(i);
+
+      for(int j=0; j<num_nodes_per_elem; j++)
+	connect[(i*num_nodes_per_elem)+j] = elem->node(conv.get_node_map(j))+1;
+    }
+
+    ex_err = exII::ex_put_elem_conn(ex_id, 1, &connect[0]);
+    check_err(ex_err, "Error writing element connectivities");
+  }
+
+  void ExodusII::initialize_nodal_variables(std::vector<std::string> names)
+  {
+    num_nodal_vars = names.size();
+
+    ex_err = exII::ex_put_var_param(ex_id, "n", num_nodal_vars);
+    check_err(ex_err, "Error setting number of nodal vars.");
+
+    const char ** var_names = new const char*[num_nodal_vars];
+
+    for(int i=0;i<num_nodal_vars;i++)
+      var_names[i]=names[i].c_str();
+
+    ex_err = exII::ex_put_var_names(ex_id, "n", num_nodal_vars, const_cast <char**>(var_names));
+    check_err(ex_err, "Error setting nodal variable names.");
+  }
+
+  void ExodusII::write_nodal_values(int var_id, const std::vector<double> & values, int timestep)
+  {
+    ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &values[0]);
+    check_err(ex_err, "Error writing nodal values.");
+  }
+  
 
   // ------------------------------------------------------------
   // ExodusII::Conversion class members
@@ -926,7 +1179,7 @@ namespace
 
     error();
   
-    const Conversion conv(tri3_node_map, tri_edge_map, TRI3); // dummy
+    const Conversion conv(tri3_node_map, tri_edge_map, TRI3,"TRI3"); // dummy
     return conv;  
   }
 
@@ -939,67 +1192,67 @@ namespace
 
       case QUAD4:
 	{
-	  const Conversion conv(quad4_node_map, quad_edge_map, QUAD4);
+	  const Conversion conv(quad4_node_map, quad_edge_map, QUAD4, "QUAD4");
 	  return conv;
 	}
 
       case QUAD8:
 	{
-	  const Conversion conv(quad8_node_map, quad_edge_map, QUAD8);
+	  const Conversion conv(quad8_node_map, quad_edge_map, QUAD8, "QUAD8");
 	  return conv;
 	}
       
       case QUAD9:
 	{
-	  const Conversion conv(quad9_node_map, quad_edge_map, QUAD9);
+	  const Conversion conv(quad9_node_map, quad_edge_map, QUAD9, "QUAD9");
 	  return conv;
 	}
       
       case TRI3:
 	{
-	  const Conversion conv(tri3_node_map, tri_edge_map, TRI3);
+	  const Conversion conv(tri3_node_map, tri_edge_map, TRI3, "TRI3");
 	  return conv;
 	}
       
       case TRI6:
 	{
-	  const Conversion conv(tri6_node_map, tri_edge_map, TRI6);
+	  const Conversion conv(tri6_node_map, tri_edge_map, TRI6, "TRI6");
 	  return conv;
 	}
       
       case HEX8:
 	{
-	  const Conversion conv(hex8_node_map, hex_face_map, HEX8);
+	  const Conversion conv(hex8_node_map, hex_face_map, HEX8, "HEX8");
 	  return conv;
 	}
       
       case HEX20:
 	{
-	  const Conversion conv(hex20_node_map, hex_face_map, HEX20);
+	  const Conversion conv(hex20_node_map, hex_face_map, HEX20, "HEX20");
 	  return conv;
 	}
       
       case HEX27:
 	{
-	  const Conversion conv(hex27_node_map, hex27_face_map, HEX27);
+	  const Conversion conv(hex27_node_map, hex27_face_map, HEX27, "HEX27");
 	  return conv;
 	}
       
       case TET4:
 	{
-	  const Conversion conv(tet4_node_map, tet_face_map, TET4);
+	  const Conversion conv(tet4_node_map, tet_face_map, TET4, "TETRA4");
 	  return conv;
 	}
       
       case TET10:
 	{
-	  const Conversion conv(tet10_node_map, tet_face_map, TET10);
+	  const Conversion conv(tet10_node_map, tet_face_map, TET10, "TETRA10");
 	  return conv;
 	}
 
       case PRISM6:
 	{
-	  const Conversion conv(prism6_node_map, prism_face_map, PRISM6);
+	  const Conversion conv(prism6_node_map, prism_face_map, PRISM6, "WEDGE");
 	  return conv;
 	}
 	
@@ -1009,12 +1262,12 @@ namespace
     
     error();
     
-    const Conversion conv(tri3_node_map, tri_edge_map, TRI3); // dummy
+    const Conversion conv(tri3_node_map, tri_edge_map, TRI3, "TRI3"); // dummy
     return conv;  
   }
   
     
-} // end anonymous namespace
+//} // end anonymous namespace
 
 #endif // #ifdef HAVE_EXODUS_API
 
@@ -1025,6 +1278,11 @@ namespace
 // ExodusII_IO class members
 void ExodusII_IO::read (const std::string& fname)
 {
+  // This is a serial-only process for now;
+  // the Mesh should be read on processor 0 and
+  // broadcast later
+  assert(libMesh::processor_id() == 0);
+
 #ifndef HAVE_EXODUS_API
 
   std::cerr <<  "ERROR, ExodusII API is not defined.\n"
@@ -1046,7 +1304,9 @@ void ExodusII_IO::read (const std::string& fname)
     this->verbose() = true;
 #endif
   
-  ExodusII ex(this->verbose()); // Instantiate ExodusII interface
+  ex_ptr = new ExodusII(this->verbose()); // Instantiate ExodusII interface
+  ExodusII & ex = *ex_ptr;
+  
   ExodusII::ElementMaps em;     // Instantiate the ElementMaps interface
     
   ex.open(fname.c_str());       // Open the exodus file, if possible
@@ -1056,16 +1316,16 @@ void ExodusII_IO::read (const std::string& fname)
   assert(static_cast<unsigned int>(ex.get_num_dim()) == mesh.mesh_dimension()); // Be sure number of dimensions
                                                                                 // is equal to the number of 
                                                                                 // dimensions in the mesh supplied.
-
+  
   ex.read_nodes();                        // Read nodes from the exodus file
   mesh.reserve_nodes(ex.get_num_nodes()); // Reserve space for the nodes.
   
-  // Loop over the nodes, create Nodes.
+  // Loop over the nodes, create Nodes with local processor_id 0.
   for (int i=0; i<ex.get_num_nodes(); i++)
     mesh.add_point (Point(ex.get_x(i),
 			  ex.get_y(i),
 			  ex.get_z(i)));
-
+  
   assert (static_cast<unsigned int>(ex.get_num_nodes()) == mesh.n_nodes());
 
   ex.read_block_info();                 // Get information about all the blocks
@@ -1089,8 +1349,10 @@ void ExodusII_IO::read (const std::string& fname)
       int jmax = nelem_last_block+ex.get_num_elem_this_blk();
       for (int j=nelem_last_block; j<jmax; j++)
 	{
-	  Elem* elem = mesh.add_elem (Elem::build (conv.get_canonical_type()).release());
-	  assert (elem != NULL);
+	  Elem* elem = Elem::build (conv.get_canonical_type()).release();
+	  assert (elem);
+          elem->set_id(j);
+	  mesh.add_elem (elem);
 	    
 	  // Set all the nodes for this element
 	  for (int k=0; k<ex.get_num_nodes_per_elem(); k++)
@@ -1107,7 +1369,6 @@ void ExodusII_IO::read (const std::string& fname)
       // (should equal total number of elements in the end)
       nelem_last_block += ex.get_num_elem_this_blk();
     }
-
   assert (static_cast<unsigned int>(nelem_last_block) == mesh.n_elem());
   
   // Read in sideset information -- this is useful for applying boundary conditions
@@ -1135,8 +1396,86 @@ void ExodusII_IO::read (const std::string& fname)
 				      id_list[e]);
       }
   }
-    
-  ex.close();            // Close the exodus file, if possible
 
+//  ex.close();            // Close the exodus file, if possible
 #endif
 }
+
+
+
+void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name)
+{
+  #ifndef HAVE_EXODUS_API
+
+  std::cerr <<  "ERROR, ExodusII API is not defined.\n"
+	    << std::endl;
+  error();
+    
+  #else
+
+  ExodusII & ex = *ex_ptr;
+
+  std::vector<double> time_steps = ex.get_time_steps();
+
+  //For now just read the first timestep (1)
+  const std::vector<double> & nodal_values = ex.get_nodal_var_values(nodal_var_name,1);
+
+  //const DofMap & dof_map = system.get_dof_map();
+
+  const unsigned int var_num = system.variable_number(nodal_var_name);
+
+  for (unsigned int i=0; i<nodal_values.size(); ++i)
+  {
+    const unsigned int dof_index = MeshInput<MeshBase>::mesh().node_ptr(i)->dof_number(system.number(),var_num,0);
+
+    // If the dof_index is local to this processor, set the value
+    if ((dof_index >= system.solution->first_local_index()) && (dof_index <  system.solution->last_local_index()))
+      system.solution->set (dof_index, nodal_values[i]);
+  }
+
+  system.update();
+  
+  #endif
+}
+
+void ExodusII_IO::write_nodal_data (const std::string& fname,
+				    const std::vector<Number>& soln,
+				    const std::vector<std::string>& names)
+{
+  #ifndef HAVE_EXODUS_API
+
+  std::cerr <<  "ERROR, ExodusII API is not defined.\n"
+	    << std::endl;
+  error();
+    
+  #else
+
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  
+  ExodusII out_ex = new ExodusII(this->verbose());
+  out_ex.create(fname);
+  out_ex.initialize(fname,mesh);
+  out_ex.write_nodal_coordinates(mesh);
+  out_ex.write_elements(mesh);
+
+  int num_vars = names.size();
+  int num_nodes = mesh.n_nodes();
+  
+  out_ex.initialize_nodal_variables(names);
+
+  for(int c=0; c<num_vars; c++)
+  {
+    std::vector<Number> cur_soln(num_nodes);
+
+    //Copy out this variable's solution
+    for(int i=0; i<num_nodes; i++)
+      cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+    
+    out_ex.write_nodal_values(c+1,cur_soln,1);
+  }  
+  
+  out_ex.close();
+  
+  #endif
+}
+
