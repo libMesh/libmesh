@@ -114,10 +114,11 @@ void XdrIO::read_mgf (const std::string& name)
 
 void XdrIO::write (const std::string& name)
 {
-  if (this->binary())
-    this->write_binary (name);
-  else
-    this->write_ascii  (name);
+  if (libMesh::processor_id() == 0)
+    if (this->binary())
+      this->write_binary (name);
+    else
+      this->write_ascii  (name);
 }
 
 
