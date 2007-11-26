@@ -19,7 +19,7 @@
 
 
 #include "libmesh_common.h"
-
+#include "parallel.h"
 
 // C++ Includes
 #include <cstdio> // for std::sprintf
@@ -33,9 +33,12 @@
 #include "xdr_cxx.h"
 #include "numeric_vector.h"
 
-// Forward Declarations
 
 
+// Anonymous namespace for implementation details.
+namespace {
+  static const unsigned int io_blksize = 1e5;  
+}
 
 
 // ------------------------------------------------------------
@@ -211,8 +214,6 @@ void System::read (Xdr& io,
 
 
 
-
-
 void System::read_data (Xdr& io,
 			const bool read_additional_data)
 {
@@ -272,36 +273,46 @@ void System::read_data (Xdr& io,
 
     const unsigned int sys     = this->number();
     const unsigned int n_vars  = this->n_vars();
-    const unsigned int n_nodes = _mesh.n_nodes();
-    const unsigned int n_elem  = _mesh.n_elem();
 
     for (unsigned int var=0; var<n_vars; var++)
-      {
+      {	
 	// First reorder the nodal DOF values
-	for (unsigned int node=0; node<n_nodes; node++)
-	  for (unsigned int index=0; index<_mesh.node(node).n_comp(sys,var); index++)
-	    {
-	      assert (_mesh.node(node).dof_number(sys, var, index) !=
-		      DofObject::invalid_id);
-
-              assert (cnt < global_vector.size());
-              
-              reordered_vector[_mesh.node(node).dof_number(sys, var, index)] =
-		  global_vector[cnt++]; 
-	    }
-
+	{
+	  MeshBase::node_iterator
+	    it  = this->get_mesh().nodes_begin(),
+	    end = this->get_mesh().nodes_end();
+	
+  	  for (; it != end; ++it)
+	    for (unsigned int index=0; index<(*it)->n_comp(sys,var); index++)
+	      {
+	        assert ((*it)->dof_number(sys, var, index) !=
+			DofObject::invalid_id);
+		
+                assert (cnt < global_vector.size());
+                
+                reordered_vector[(*it)->dof_number(sys, var, index)] =
+	  	  global_vector[cnt++]; 
+	      }
+	}
+	
 	// Then reorder the element DOF values
-	for (unsigned int elem=0; elem<n_elem; elem++)
-	  for (unsigned int index=0; index<_mesh.elem(elem)->n_comp(sys,var); index++)
-	    {  
-	      assert (_mesh.elem(elem)->dof_number(sys, var, index) !=
-		      DofObject::invalid_id);
-		  
-	      assert (cnt < global_vector.size());
-		  
-	      reordered_vector[_mesh.elem(elem)->dof_number(sys, var, index)] =
-		global_vector[cnt++]; 
-	    }
+	{
+	  MeshBase::element_iterator
+	    it  = this->get_mesh().active_elements_begin(),
+	    end = this->get_mesh().active_elements_end();
+
+	  for (; it != end; ++it)
+	    for (unsigned int index=0; index<(*it)->n_comp(sys,var); index++)
+	      {  
+		assert ((*it)->dof_number(sys, var, index) !=
+			DofObject::invalid_id);
+		
+		assert (cnt < global_vector.size());
+		
+		reordered_vector[(*it)->dof_number(sys, var, index)] =
+		  global_vector[cnt++]; 
+	      }
+	}
       }
 	    
     *(this->solution) = reordered_vector;
@@ -360,36 +371,46 @@ void System::read_data (Xdr& io,
 
 	      const unsigned int sys     = this->number();
 	      const unsigned int n_vars  = this->n_vars();
-	      const unsigned int n_nodes = _mesh.n_nodes();
-	      const unsigned int n_elem  = _mesh.n_elem();
 	
 	      for (unsigned int var=0; var<n_vars; var++)
 		{
 		  // First reorder the nodal DOF values
-		  for (unsigned int node=0; node<n_nodes; node++)
-		    for (unsigned int index=0; index<_mesh.node(node).n_comp(sys,var); index++)
-		      {
-			assert (_mesh.node(node).dof_number(sys, var, index) !=
-				DofObject::invalid_id);
+		  {
+		    MeshBase::node_iterator
+		      it  = this->get_mesh().nodes_begin(),
+		      end = this->get_mesh().nodes_end();
 
-			assert (cnt < global_vector.size());
-		  
-			reordered_vector[_mesh.node(node).dof_number(sys, var, index)] =
-			  global_vector[cnt++]; 
-		      }
+		    for (; it!=end; ++it)
+		      for (unsigned int index=0; index<(*it)->n_comp(sys,var); index++)
+			{
+			  assert ((*it)->dof_number(sys, var, index) !=
+				  DofObject::invalid_id);
+			  
+			  assert (cnt < global_vector.size());
+			  
+			  reordered_vector[(*it)->dof_number(sys, var, index)] =
+			    global_vector[cnt++]; 
+			}
+		  }
 
 		  // Then reorder the element DOF values
-		  for (unsigned int elem=0; elem<n_elem; elem++)
-		    for (unsigned int index=0; index<_mesh.elem(elem)->n_comp(sys,var); index++)
-		      {  
-			assert (_mesh.elem(elem)->dof_number(sys, var, index) !=
-				DofObject::invalid_id);
-		  
-			assert (cnt < global_vector.size());
-		  
-			reordered_vector[_mesh.elem(elem)->dof_number(sys, var, index)] =
-			  global_vector[cnt++]; 
-		      }
+		  {
+		    MeshBase::element_iterator
+		      it  = this->get_mesh().active_elements_begin(),
+		      end = this->get_mesh().active_elements_end();
+
+		    for (; it!=end; ++it)
+		      for (unsigned int index=0; index<(*it)->n_comp(sys,var); index++)
+			{  
+			  assert ((*it)->dof_number(sys, var, index) !=
+				  DofObject::invalid_id);
+			  
+			  assert (cnt < global_vector.size());
+			  
+			  reordered_vector[(*it)->dof_number(sys, var, index)] =
+			    global_vector[cnt++]; 
+			}
+		  }
 		}
 	    
 	      // use the overloaded operator=(std::vector) to assign the values
@@ -401,9 +422,12 @@ void System::read_data (Xdr& io,
 
 
 
-
-
-
+void System::read_parallel_data (Xdr& io,
+				 const bool read_additional_data)
+{
+  parallel_only();
+  error();
+}
 
 
 
@@ -456,7 +480,7 @@ void System::write(Xdr& io,
    * Only write the header information
    * if we are processor 0.
    */
-  assert (_mesh.processor_id() == 0);
+  assert (this->get_mesh().processor_id() == 0);
   
   std::string comment;
   char buf[80];
@@ -659,13 +683,6 @@ void System::write(Xdr& io,
 
 
 
-
-
-
-
-
-
-
 void System::write_data (Xdr& io,
 			 const bool write_additional_data) const
 {
@@ -691,7 +708,7 @@ void System::write_data (Xdr& io,
  
   assert (io.writing());
 
-  const unsigned int proc_id = _mesh.processor_id();
+  const unsigned int proc_id = this->get_mesh().processor_id();
  
   std::string comment;
 
@@ -731,11 +748,10 @@ void System::write_data (Xdr& io,
 
       const unsigned int sys_num = this->number();
       const unsigned int n_vars  = this->n_vars();
-      const unsigned int n_elem  = _mesh.n_elem();
 
       // Build a set of non subactive node indices. 
       std::set<unsigned int> not_subactive_node_ids;
-      MeshTools::get_not_subactive_node_ids(_mesh, not_subactive_node_ids);
+      MeshTools::get_not_subactive_node_ids(this->get_mesh(), not_subactive_node_ids);
 
       // Loop over each variable and each node, and write out the value.
       for (unsigned int var=0; var<n_vars; var++)
@@ -749,33 +765,38 @@ void System::write_data (Xdr& io,
             // Get the global index of this node
             const unsigned int node = *it;
             // std::cout << "Setting value for node " << node << std::endl;
-	    for (unsigned int index=0; index<_mesh.node(node).n_comp(sys_num, var); index++)
+	    for (unsigned int index=0; index<this->get_mesh().node(node).n_comp(sys_num, var); index++)
             {
-                assert (_mesh.node(node).id() == node);
+                assert (this->get_mesh().node(node).id() == node);
 
-		assert (_mesh.node(node).dof_number(sys_num, var, index) !=
+		assert (this->get_mesh().node(node).dof_number(sys_num, var, index) !=
 			DofObject::invalid_id);
 		      
 		assert (cnt < reordered_soln.size());
 		    
 		reordered_soln[cnt++] = 
-		    global_vector[_mesh.node(node).dof_number(sys_num, var, index)];
+		    global_vector[this->get_mesh().node(node).dof_number(sys_num, var, index)];
             }
           }
 
 	  // Then write the element DOF values
-	  for (unsigned int elem=0; elem<n_elem; elem++)
-	    if (_mesh.elem(elem)->active())
-	      for (unsigned int index=0; index<_mesh.elem(elem)->n_comp(sys_num, var); index++)
+	  {
+	    MeshBase::const_element_iterator
+	      it  = this->get_mesh().active_elements_begin(),
+	      end = this->get_mesh().active_elements_end();
+
+	    for (; it!=end; ++it)
+	      for (unsigned int index=0; index<(*it)->n_comp(sys_num, var); index++)
 	        {
-		  assert (_mesh.elem(elem)->dof_number(sys_num, var, index) !=
+		  assert ((*it)->dof_number(sys_num, var, index) !=
 			  DofObject::invalid_id);
 			
 		  assert (cnt < reordered_soln.size());
 			
 		  reordered_soln[cnt++] = 
-		      global_vector[_mesh.elem(elem)->dof_number(sys_num, var, index)];
+		      global_vector[(*it)->dof_number(sys_num, var, index)];
 		}
+	  }
 	}
 
       /**
@@ -842,37 +863,46 @@ void System::write_data (Xdr& io,
 
 		const unsigned int sys_num = this->number();
 		const unsigned int n_vars  = this->n_vars();
-		const unsigned int n_nodes = _mesh.n_nodes();
-		const unsigned int n_elem  = _mesh.n_elem();
 
 		for (unsigned int var=0; var<n_vars; var++)
 		  {		
 		    // First write the nodal DOF values
-		    for (unsigned int node=0; node<n_nodes; node++)
-		      for (unsigned int index=0; index<_mesh.node(node).n_comp(sys_num, var); index++)
-		        {
-			  assert (_mesh.node(node).dof_number(sys_num, var, index) !=
-				  DofObject::invalid_id);
-		      
-			  assert (cnt < reordered_soln.size());
-		      
-			  reordered_soln[cnt++] = 
-			      global_vector[_mesh.node(node).dof_number(sys_num, var, index)];
-			}
+		    {
+		      MeshBase::const_node_iterator
+			it  = this->get_mesh().nodes_begin(),
+			end = this->get_mesh().nodes_end();
 
-		    // Then write the element DOF values
-		    for (unsigned int elem=0; elem<n_elem; elem++)
-		      if (_mesh.elem(elem)->active())
-			for (unsigned int index=0; index<_mesh.elem(elem)->n_comp(sys_num, var); index++)
+		      for (; it !=end; ++it)
+			for (unsigned int index=0; index<(*it)->n_comp(sys_num, var); index++)
 			  {
-			    assert (_mesh.elem(elem)->dof_number(sys_num, var, index) !=
+			    assert ((*it)->dof_number(sys_num, var, index) !=
 				    DofObject::invalid_id);
-			
+			    
 			    assert (cnt < reordered_soln.size());
-			
+			    
 			    reordered_soln[cnt++] = 
-				global_vector[_mesh.elem(elem)->dof_number(sys_num, var, index)];
+			      global_vector[(*it)->dof_number(sys_num, var, index)];
 			  }
+		    }
+		    
+		    // Then write the element DOF values
+		    {
+		      MeshBase::const_element_iterator
+			it  = this->get_mesh().active_elements_begin(),
+			end = this->get_mesh().active_elements_end();
+		      
+		      for (; it!=end; ++it)
+			for (unsigned int index=0; index<(*it)->n_comp(sys_num, var); index++)
+			  {
+			    assert ((*it)->dof_number(sys_num, var, index) !=
+				    DofObject::invalid_id);
+			    
+			    assert (cnt < reordered_soln.size());
+			    
+			    reordered_soln[cnt++] = 
+			      global_vector[(*it)->dof_number(sys_num, var, index)];
+			  }
+		    }
 		  }
 
 	    
@@ -896,6 +926,90 @@ void System::write_data (Xdr& io,
 	    }
 	}
     }
+}
+
+
+
+void System::write_parallel_data (Xdr& io,
+				  const bool write_additional_data) const
+{
+  parallel_only();
+
+  
+  /**
+   * This program implements the output of the vectors
+   * contained in this System object, embedded in the 
+   * output of an EquationSystems<T_sys>. 
+   *
+   *   1.) The global solution vector, re-ordered to be node-major 
+   *       (More on this later.)                                    
+   *                                                                
+   *      for each additional vector in the object          
+   *                                                                
+   *      2.) The global additional vector, re-ordered to be       
+   *          node-major (More on this later.)
+   *
+   * Note that the actual IO is handled through the Xdr class 
+   * (to be renamed later?) which provides a uniform interface to 
+   * both the XDR (eXternal Data Representation) interface and standard
+   * ASCII output.  Thus this one section of code will read XDR or ASCII
+   * files with no changes.
+   */
+ 
+  assert (io.writing());
+
+  std::string comment;
+
+  here();
+  
+  const unsigned int sys_num = this->number();
+  const unsigned int n_vars  = this->n_vars();
+
+  std::vector<unsigned int> xfer_ids;
+  std::vector<Number>       xfer_vals;
+  
+  // Loop over each variable in the system, and then each node,element in the mesh.
+  for (unsigned int var=0; var<n_vars; var++)
+    {
+      const unsigned int n_nodes = this->get_mesh().n_nodes();      
+      unsigned int first_node=0, last_node=0;
+      
+      // Collect the values for all nodes
+      for (unsigned int blk=0; last_node<n_nodes; blk++)
+	{
+	  std::cout << "Writing node block " << blk << std::endl;
+	  
+	  first_node = blk*io_blksize;
+	  last_node  = std::min((blk+1)*io_blksize,n_nodes);
+
+	  // Each processor should build up is xfer bufs for the
+	  // nodes in [first_node,last_node).
+	  MeshBase::const_node_iterator
+	    it  = this->get_mesh().local_nodes_begin(),
+	    end = this->get_mesh().local_nodes_end();
+
+	  for (; it!=end; ++it)
+	    if (((*it)->id() >= first_node) && /* node in [first_node,last_node) */
+		((*it)->id() <   last_node) &&
+		 (*it)->n_comp(sys_num,var)    /* variable has components on this node */
+		)
+	      {
+		here();
+		
+		xfer_ids.push_back((*it)->id());
+		xfer_ids.push_back((*it)->n_comp(sys_num, var));
+
+		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+		  {
+		    assert ((*it)->dof_number(sys_num, var, comp) >= this->solution->first_local_index());
+		    assert ((*it)->dof_number(sys_num, var, comp) <  this->solution->last_local_index());
+		    xfer_vals.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));
+		  }
+	      }
+	}            
+    }
+
+  
 }
 
 

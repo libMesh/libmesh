@@ -419,6 +419,13 @@ public:
 		  const bool read_additional_data=true);
 
   /**
+   * Reads additional data, namely vectors, for this System.
+   * This method may safely be called on a distributed-memory mesh.
+   */
+  void read_parallel_data (Xdr& io,
+			   const bool read_additional_data=true);
+
+  /**
    * Writes the basic data for this System.
    */
   void write (Xdr& io,
@@ -429,6 +436,13 @@ public:
    */
   void write_data (Xdr& io,
 		   const bool write_additional_data = true) const;
+
+  /**
+   * Writes additional data, namely vectors, for this System.
+   * This method may safely be called on a distributed-memory mesh.
+   */
+  void write_parallel_data (Xdr& io,
+			    const bool write_additional_data = true) const;
 
   /**
    * @returns a string containing information about the
