@@ -328,7 +328,7 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
 	    assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
 	    const unsigned int global_index = *next_obj_on_proc[pid];
-
+	    assert (global_index < mesh.n_nodes());
 	    node->set_id() = global_index;
 	    
 	    ++next_obj_on_proc[pid];
@@ -440,7 +440,7 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
 	    assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
 	    const unsigned int global_index = *next_obj_on_proc[pid];
-
+	    assert (global_index < mesh.n_elem());
 	    elem->set_id() = global_index;
 	    
 	    ++next_obj_on_proc[pid];
