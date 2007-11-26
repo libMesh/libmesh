@@ -178,26 +178,6 @@ public:
    */
   System & get_system (const unsigned int num);
   
-//   /**
-//    * @returns a reference to the system named \p name.
-//    */
-//   System & operator () (const std::string& name);
- 
-//   /**
-//    * @returns a constant reference to the system name
-//    */
-//   const System & operator () (const std::string& name) const;
- 
-//   /**
-//    * @returns a reference to system number \p num.
-//    */
-//   System & operator () (const unsigned int num);
- 
-//   /**
-//    * @returns a constant reference to system number \p num.
-//    */
-//   const System & operator () (const unsigned int num) const;
-  
   /**
    * Add the system of type \p system_type named \p name to the
    * systems array.
@@ -688,41 +668,6 @@ System & EquationSystems::get_system (const unsigned int num)
 {
   return this->get_system<System>(num);
 }
-
-
-
-// inline
-// System & EquationSystems::operator () (const std::string& name)
-// {
-//   deprecated(); // Use the get_system() interface directly instead.
-//   return this->get_system (name);
-// }
-  
- 
-// inline
-// const System & EquationSystems::operator () (const std::string& name) const
-// {
-//   deprecated(); // Use the get_system() interface directly instead.
-//   return this->get_system (name);
-// }
-  
- 
- 
-// inline
-// System & EquationSystems::operator () (const unsigned int num)
-// {
-//   deprecated(); // Use the get_system() interface directly instead.
-//   return this->get_system (num);
-// }
-
-
-
-// inline
-// const System & EquationSystems::operator () (const unsigned int num) const
-// {
-//   deprecated(); // Use the get_system() interface directly instead.
-//   return this->get_system (num);
-// }
 
 
 
