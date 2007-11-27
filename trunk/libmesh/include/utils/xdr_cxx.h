@@ -408,6 +408,12 @@ public:
   Xdr& operator >> (std::string& v) { assert (reading()); data(v); return *this; }
 
 
+  /**
+   * Inputs or outputs a raw data stream.
+   */
+  template <typename T>
+  void data_stream (T *val, const unsigned int len);
+  
 private:
 
   /**
