@@ -973,6 +973,7 @@ void System::write_parallel_data (Xdr& io,
   std::vector<std::vector<unsigned int> > recv_ids (libMesh::n_processors());
   std::vector<std::vector<Number> >       recv_vals(libMesh::n_processors());
   std::vector<std::vector<Number>::const_iterator>  val_iters; val_iters.reserve(libMesh::n_processors());
+  std::vector<unsigned int> idx_map;
 
   // Loop over each variable in the system, and then each node/element in the mesh.
   for (unsigned int var=0; var<n_vars; var++)
@@ -1067,7 +1068,7 @@ void System::write_parallel_data (Xdr& io,
 	      assert (tot_id_size <= 2*io_blksize);
 
 	      // Create a useful map to avoid searching 
-	      std::vector<unsigned int> idx_map(tot_id_size);
+	      idx_map.resize(tot_id_size);
 	      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 		for (unsigned int idx=0; idx<recv_ids[pid].size(); idx+=2)
 		  {
