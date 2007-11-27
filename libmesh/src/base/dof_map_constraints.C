@@ -170,7 +170,15 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 {
   assert (elem_dofs.size() == matrix.m());
   assert (elem_dofs.size() == matrix.n());
-  
+
+  // check for easy return
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+  if (this->n_constrained_dofs() == 0)
+    return;
+#else
+    return;
+#endif
+    
   // The constrained matrix is built up as C^T K C.    
   DenseMatrix<Number> C;
 
@@ -236,6 +244,14 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
   assert (elem_dofs.size() == matrix.m());
   assert (elem_dofs.size() == matrix.n());
   assert (elem_dofs.size() == rhs.size());
+
+  // check for easy return
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+  if (this->n_constrained_dofs() == 0)
+    return;
+#else
+    return;
+#endif
   
   // The constrained matrix is built up as C^T K C.
   // The constrained RHS is built up as C^T F
@@ -328,6 +344,14 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 {
   assert (row_dofs.size() == matrix.m());
   assert (col_dofs.size() == matrix.n());
+
+  // check for easy return
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+  if (this->n_constrained_dofs() == 0)
+    return;
+#else
+    return;
+#endif
   
   // The constrained matrix is built up as R^T K C.
   DenseMatrix<Number> R;
@@ -403,6 +427,14 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
 				       bool) const
 {
   assert (rhs.size() == row_dofs.size());
+
+  // check for easy return
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+  if (this->n_constrained_dofs() == 0)
+    return;
+#else
+    return;
+#endif
   
   // The constrained RHS is built up as R^T F.  
   DenseMatrix<Number> R;
