@@ -34,7 +34,7 @@
 // parallel on every processor at once
 
 #undef parallel_only
-#ifdef DEBUG
+#ifndef NDEBUG
   #define parallel_only() { assert(Parallel::verify(std::string(__FILE__))); assert(Parallel::verify(__LINE__)); }
 #else
   #define parallel_only() { }
