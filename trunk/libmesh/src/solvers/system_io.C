@@ -37,7 +37,8 @@
 
 // Anonymous namespace for implementation details.
 namespace {
-  static const unsigned int io_blksize = 1e5;  
+#warning "Increase to something usable for final checkin"
+  static const unsigned int io_blksize = 100;
 }
 
 
@@ -934,7 +935,11 @@ void System::write_parallel_data (Xdr& io,
 				  const bool write_additional_data) const
 {
   parallel_only();
-
+  
+#ifndef NDEBUG
+  // If this is not the same on all processors we're in trouble!
+  Parallel::verify(io_blksize);
+#endif
   
   /**
    * This program implements the output of the vectors
@@ -952,38 +957,43 @@ void System::write_parallel_data (Xdr& io,
    * Note that the actual IO is handled through the Xdr class 
    * (to be renamed later?) which provides a uniform interface to 
    * both the XDR (eXternal Data Representation) interface and standard
-   * ASCII output.  Thus this one section of code will read XDR or ASCII
+   * ASCII output.  Thus this one section of code will write XDR or ASCII
    * files with no changes.
-   */
- 
+   */ 
   assert (io.writing());
 
   std::string comment;
 
-  here();
-  
   const unsigned int sys_num = this->number();
   const unsigned int n_vars  = this->n_vars();
 
   std::vector<unsigned int> xfer_ids;
   std::vector<Number>       xfer_vals;
-  
-  // Loop over each variable in the system, and then each node,element in the mesh.
+
+  std::vector<std::vector<unsigned int> > recv_ids (libMesh::n_processors());
+  std::vector<std::vector<Number> >       recv_vals(libMesh::n_processors());
+  std::vector<std::vector<Number>::const_iterator>  val_iters; val_iters.reserve(libMesh::n_processors());
+
+  // Loop over each variable in the system, and then each node/element in the mesh.
   for (unsigned int var=0; var<n_vars; var++)
     {
       const unsigned int n_nodes = this->get_mesh().n_nodes();      
       unsigned int first_node=0, last_node=0;
-      
+
+      //---------------------------------
       // Collect the values for all nodes
       for (unsigned int blk=0; last_node<n_nodes; blk++)
 	{
 	  std::cout << "Writing node block " << blk << std::endl;
 	  
+	  // Each processor should build up its transfer buffers for its
+	  // local nodes in [first_node,last_node).
 	  first_node = blk*io_blksize;
 	  last_node  = std::min((blk+1)*io_blksize,n_nodes);
+	  
+	  // Clear the transfer buffers for this block.
+	  xfer_ids.clear(); xfer_vals.clear();
 
-	  // Each processor should build up is xfer bufs for the
-	  // nodes in [first_node,last_node).
 	  MeshBase::const_node_iterator
 	    it  = this->get_mesh().local_nodes_begin(),
 	    end = this->get_mesh().local_nodes_end();
@@ -991,11 +1001,8 @@ void System::write_parallel_data (Xdr& io,
 	  for (; it!=end; ++it)
 	    if (((*it)->id() >= first_node) && /* node in [first_node,last_node) */
 		((*it)->id() <   last_node) &&
-		 (*it)->n_comp(sys_num,var)    /* variable has components on this node */
-		)
+		(*it)->n_comp(sys_num,var))    /* var has n_comp components on this node */
 	      {
-		here();
-		
 		xfer_ids.push_back((*it)->id());
 		xfer_ids.push_back((*it)->n_comp(sys_num, var));
 
@@ -1006,9 +1013,90 @@ void System::write_parallel_data (Xdr& io,
 		    xfer_vals.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));
 		  }
 	      }
+
+	  //-----------------------------------------
+	  // Send the transfer buffers to processor 0.
+	  
+	  // Get the size of the incoming buffers -- optionally
+	  // we could over-size the recv buffers based on
+	  // some maximum size to avoid these communications
+	  std::vector<unsigned int> ids_size, vals_size;
+	  Parallel::gather (0, static_cast<unsigned int>(xfer_ids.size()),  ids_size);
+	  Parallel::gather (0, static_cast<unsigned int>(xfer_vals.size()), vals_size);
+	  
+	  // Note that we will actually send/receive to ourself if we are
+	  // processor 0, so let's use nonblocking receives.
+	  std::vector<MPI_Request>
+	    id_request_handles(libMesh::n_processors()),
+	    val_request_handles(libMesh::n_processors());
+	    
+	  const unsigned int id_tag=0, val_tag=1;
+	  
+	  // Post the receives -- do this on processor 0 only.
+	  if (libMesh::processor_id() == 0)
+	    for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	      {
+		recv_ids[pid].resize(ids_size[pid]);
+		recv_vals[pid].resize(vals_size[pid]);
+
+		Parallel::irecv (pid, recv_ids[pid],  id_request_handles[pid],  id_tag);
+		Parallel::irecv (pid, recv_vals[pid], val_request_handles[pid], val_tag);
+	      }
+
+	  // Send -- do this on all processors.
+	  Parallel::send(0, xfer_ids,  id_tag);
+	  Parallel::send(0, xfer_vals, val_tag);
+	    
+	  // Wait for all the receives to complete -- do this on processor 0 only.
+	  // We have no need for the statuses since we already know the buffer sizes.
+	  if (libMesh::processor_id() == 0)
+	    {
+	      MPI_Waitall (libMesh::n_processors(), &id_request_handles[0],  MPI_STATUSES_IGNORE);
+	      MPI_Waitall (libMesh::n_processors(), &val_request_handles[0], MPI_STATUSES_IGNORE);
+	      
+	      // Write the values in this block.
+	      unsigned int tot_id_size = 0;
+	      val_iters.clear();
+	      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+		{
+		  tot_id_size += recv_ids[pid].size();
+		  
+		  val_iters.push_back(recv_vals[pid].begin());
+		}
+
+	      assert (tot_id_size <= 2*io_blksize);
+
+	      // Create a useful map to avoid searching 
+	      std::vector<unsigned int> idx_map(tot_id_size);
+	      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+		for (unsigned int idx=0; idx<recv_ids[pid].size(); idx+=2)
+		  {
+		    const unsigned int local_idx = recv_ids[pid][idx]-first_node;
+		    assert (local_idx < std::min(io_blksize,n_nodes));
+		    const unsigned int n_comp    = recv_ids[pid][idx+1];
+
+		    idx_map[2*local_idx+0] = pid;
+		    idx_map[2*local_idx+1] = n_comp;
+		  }
+
+	      for (unsigned int idx=0; idx<idx_map.size(); idx+=2)
+		{
+		  const unsigned int pid    = idx_map[idx+0];
+		  const unsigned int n_comp = idx_map[idx+1];
+
+		  for (unsigned int comp=0; comp<n_comp; comp++)
+		    {
+		      assert (val_iters[pid] != recv_vals[pid].end());
+		      Number value = *val_iters[pid];
+		      io.data_stream (&value, 1);
+		      ++val_iters[pid];
+		    }
+		}
+	    }
+	  
 	}            
     }
-
+  
   
 }
 
