@@ -38,7 +38,7 @@
 // Anonymous namespace for implementation details.
 namespace {
 #warning "Increase to something usable for final checkin"
-  static const unsigned int io_blksize = 100;
+  static const unsigned int io_blksize = 10;
 }
 
 
@@ -978,11 +978,11 @@ void System::write_parallel_data (Xdr& io,
   // Loop over each variable in the system, and then each node/element in the mesh.
   for (unsigned int var=0; var<n_vars; var++)
     {
+      //---------------------------------
+      // Collect the values for all nodes
       const unsigned int n_nodes = this->get_mesh().n_nodes();      
       unsigned int first_node=0, last_node=0;
 
-      //---------------------------------
-      // Collect the values for all nodes
       for (unsigned int blk=0; last_node<n_nodes; blk++)
 	{
 	  std::cout << "Writing node block " << blk << std::endl;
@@ -1047,11 +1047,13 @@ void System::write_parallel_data (Xdr& io,
 	  // Send -- do this on all processors.
 	  Parallel::send(0, xfer_ids,  id_tag);
 	  Parallel::send(0, xfer_vals, val_tag);
-	    
-	  // Wait for all the receives to complete -- do this on processor 0 only.
-	  // We have no need for the statuses since we already know the buffer sizes.
+
+	  // -------------------------------------------------------
+	  // Receive the messages and write the output on processor 0.
 	  if (libMesh::processor_id() == 0)
 	    {
+	      // Wait for all the receives to complete. We have no need for the statuses since
+	      // we already know the buffer sizes.
 	      MPI_Waitall (libMesh::n_processors(), &id_request_handles[0],  MPI_STATUSES_IGNORE);
 	      MPI_Waitall (libMesh::n_processors(), &val_request_handles[0], MPI_STATUSES_IGNORE);
 	      
@@ -1065,9 +1067,10 @@ void System::write_parallel_data (Xdr& io,
 		  val_iters.push_back(recv_vals[pid].begin());
 		}
 
-	      assert (tot_id_size <= 2*io_blksize);
+	      assert (tot_id_size <= 2*std::min(io_blksize,n_nodes));
 
-	      // Create a useful map to avoid searching 
+	      // Create a map to avoid searching.  This will allow us to
+	      // traverse the received values in [first_node,last_node) order.
 	      idx_map.resize(tot_id_size);
 	      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 		for (unsigned int idx=0; idx<recv_ids[pid].size(); idx+=2)
@@ -1095,10 +1098,9 @@ void System::write_parallel_data (Xdr& io,
 		}
 	    }
 	  
-	}            
-    }
-  
-  
+	} // end node block loop            
+    } // end variable loop
+   
 }
 
 
