@@ -116,6 +116,44 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Blocking-send vector to one processor.
+   */
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::vector<T> &buf,
+		    const unsigned int tag=0);
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-send vector to one processor.
+   */
+  template <typename T>
+  inline void isend (const unsigned int dest_processor_id,
+		     std::vector<T> &buf,
+		     MPI_Request &request,
+		     const unsigned int tag=0);
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-receive vector from one processor.
+   */
+  template <typename T>
+  inline void recv (const unsigned int src_processor_id,
+		    std::vector<T> &buf,
+		    const unsigned int tag=MPI_ANY_TAG);
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-receive vector from one processor.
+   */
+  template <typename T>
+  inline void irecv (const unsigned int src_processor_id,
+		     std::vector<T> &buf,
+		     MPI_Request &request,
+		     const unsigned int tag=MPI_ANY_TAG);
+  
+  //-------------------------------------------------------------------
+  /**
    * Send vector send to one processor while simultaneously receiving
    * another vector recv from a (potentially different) processor.
    */
@@ -463,6 +501,95 @@ namespace Parallel
   }
 
 
+
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::vector<T> &buf,
+		    const unsigned int tag)
+  {
+    START_LOG("send()", "Parallel");
+    
+    const int ierr =	  
+      MPI_Send (buf.empty() ? NULL : &buf[0],
+		buf.size(),
+		datatype<T>(),
+		dest_processor_id,
+		tag,
+		libMesh::COMM_WORLD);    
+    assert (ierr == MPI_SUCCESS);
+    
+    STOP_LOG("send()", "Parallel");
+  }
+
+
+
+  template <typename T>
+  inline void isend (const unsigned int dest_processor_id,
+		     std::vector<T> &buf,
+		     MPI_Request &request,
+		     const unsigned int tag)
+  {
+    START_LOG("isend()", "Parallel");
+    
+    const int ierr =	  
+      MPI_Isend (buf.empty() ? NULL : &buf[0],
+		 buf.size(),
+		 datatype<T>(),
+		 dest_processor_id,
+		 tag,
+		 libMesh::COMM_WORLD,
+		 &request);    
+    assert (ierr == MPI_SUCCESS);
+    
+    STOP_LOG("isend()", "Parallel");
+  }
+
+
+
+  template <typename T>
+  inline void recv (const unsigned int src_processor_id,
+		    std::vector<T> &buf,
+		    const unsigned int tag)
+  {
+    START_LOG("recv()", "Parallel");
+    
+    const int ierr =	  
+      MPI_Recv (buf.empty() ? NULL : &buf[0],
+		buf.size(),
+		datatype<T>(),
+		src_processor_id,
+		tag,
+		libMesh::COMM_WORLD,
+		MPI_STATUS_IGNORE);    
+    assert (ierr == MPI_SUCCESS);
+    
+    STOP_LOG("recv()", "Parallel");
+  }
+
+
+
+  template <typename T>
+  inline void irecv (const unsigned int src_processor_id,
+		     std::vector<T> &buf,
+		     MPI_Request &request,
+		     const unsigned int tag)
+  {
+    START_LOG("irecv()", "Parallel");
+    
+    const int ierr =	  
+      MPI_Irecv (buf.empty() ? NULL : &buf[0],
+		 buf.size(),
+		 datatype<T>(),
+		 src_processor_id,
+		 tag,
+		 libMesh::COMM_WORLD,
+		 &request);    
+    assert (ierr == MPI_SUCCESS);
+    
+    STOP_LOG("irecv()", "Parallel");
+  }
+
+  
 
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
