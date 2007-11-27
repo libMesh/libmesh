@@ -1587,4 +1587,187 @@ void Xdr::data (std::string& s, const char* comment)
 
 
 
+template <>
+void Xdr::data_stream (unsigned int *val, const unsigned int len)
+{
+  switch (mode)
+    {
+    case ENCODE:
+      {
+#ifdef HAVE_XDR
+
+	assert (this->is_open());
+
+
+	xdr_vector(xdrs, 
+		   (char*) val,
+		   len,
+		   sizeof(unsigned int),
+		   (xdrproc_t) xdr_u_int);
+
+#else
+	
+	std::cerr << "ERROR: Functionality is not available." << std::endl
+		  << "Make sure HAVE_XDR is defined at build time" 
+		  << std::endl
+		  << "The XDR interface is not available in this installation"
+		  << std::endl;
+
+	error();
+
+#endif	
+	return;
+      }
+
+    case DECODE:
+      {
+#ifdef HAVE_XDR
+
+	assert (this->is_open());
+
+	if (len > 0)
+	  xdr_vector(xdrs, 
+		     (char*) val,
+		     len,
+		     sizeof(unsigned int),
+		     (xdrproc_t) xdr_u_int);
+	
+#else
+	
+	std::cerr << "ERROR: Functionality is not available." << std::endl
+		  << "Make sure HAVE_XDR is defined at build time" 
+		  << std::endl
+		  << "The XDR interface is not available in this installation"
+		  << std::endl;
+
+	error();
+
+#endif
+	return;
+      }
+
+    case READ:
+      {
+	assert (in.good());
+
+	for (unsigned int i=0; i<len; i++)
+	  {
+	    assert (in.good());
+	    in >> val[i];
+	  }
+
+	return;	
+      }
+
+    case WRITE:
+      {
+	assert (out.good());
+
+	for (unsigned int i=0; i<len; i++)
+	  {
+	    assert (out.good());
+	    out << val[i] << " ";
+ 	  }
+
+	return;	
+      }
+
+    default:
+      error();
+    }
+}
+
+
+
+template <>
+void Xdr::data_stream (double *val, const unsigned int len)
+{
+  switch (mode)
+    {
+    case ENCODE:
+      {
+#ifdef HAVE_XDR
+
+	assert (this->is_open());
+
+
+	xdr_vector(xdrs, 
+		   (char*) val,
+		   len,
+		   sizeof(double),
+		   (xdrproc_t) xdr_double);
+
+#else
+	
+	std::cerr << "ERROR: Functionality is not available." << std::endl
+		  << "Make sure HAVE_XDR is defined at build time" 
+		  << std::endl
+		  << "The XDR interface is not available in this installation"
+		  << std::endl;
+
+	error();
+
+#endif	
+	return;
+      }
+
+    case DECODE:
+      {
+#ifdef HAVE_XDR
+
+	assert (this->is_open());
+
+	if (len > 0)
+	  xdr_vector(xdrs, 
+		     (char*) val,
+		     len,
+		     sizeof(double),
+		     (xdrproc_t) xdr_double);
+	
+#else
+	
+	std::cerr << "ERROR: Functionality is not available." << std::endl
+		  << "Make sure HAVE_XDR is defined at build time" 
+		  << std::endl
+		  << "The XDR interface is not available in this installation"
+		  << std::endl;
+
+	error();
+
+#endif
+	return;
+      }
+
+    case READ:
+      {
+	assert (in.good());
+
+	for (unsigned int i=0; i<len; i++)
+	  {
+	    assert (in.good());
+	    in >> val[i];
+	  }
+
+	return;	
+      }
+
+    case WRITE:
+      {
+	assert (out.good());
+
+	for (unsigned int i=0; i<len; i++)
+	  {
+	    assert (out.good());
+	    OFSRealscientific(out,17,val[i]) << " ";
+ 	  }
+
+	return;	
+      }
+
+    default:
+      error();
+    }
+}
+
+
 #undef xdr_REAL
