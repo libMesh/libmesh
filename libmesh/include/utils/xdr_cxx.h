@@ -413,7 +413,13 @@ public:
    */
   template <typename T>
   void data_stream (T *val, const unsigned int len);
+
+  /**
+   * Writes or reads (ignores) a comment line.
+   */   
+  void comment (std::string &);
   
+
 private:
 
   /**

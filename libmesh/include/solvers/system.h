@@ -582,6 +582,14 @@ protected:
 private:
 
   
+
+  /**
+   * Writes vectors for this System.
+   * This method may safely be called on a distributed-memory mesh.
+   */
+  void write_parallel_vector (Xdr& io,
+			      const NumericVector<Number> &vec) const;
+
   /**
    * Function that initializes the system.
    */

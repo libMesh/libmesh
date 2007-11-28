@@ -1770,4 +1770,34 @@ void Xdr::data_stream (double *val, const unsigned int len)
 }
 
 
+void Xdr::comment (std::string &comment)
+{
+  switch (mode)
+    {
+    case ENCODE:
+    case DECODE:
+      {
+	return;
+      }
+
+    case READ:
+      {
+	assert (in.good());
+	in.getline(comm, comm_len);
+	return;	
+      }
+
+    case WRITE:
+      {
+	assert (out.good());
+	out << "\t " << comment << '\n';
+	return;	
+      }
+
+    default:
+      error();
+    }
+}
+
+
 #undef xdr_REAL
