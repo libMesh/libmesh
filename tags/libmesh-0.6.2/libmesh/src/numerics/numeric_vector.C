@@ -24,6 +24,7 @@
 
 // Local Includes
 #include "numeric_vector.h"
+#include "distributed_vector.h"
 #include "laspack_vector.h"
 #include "petsc_vector.h"
 
@@ -60,10 +61,8 @@ NumericVector<T>::build(const SolverPackage solver_package)
 #endif
 
     default:
-      std::cerr << "ERROR:  Unrecognized solver package: "
-		<< solver_package
-		<< std::endl;
-      error();
+      AutoPtr<NumericVector<T> > ap(new DistributedVector<T>);
+      return ap;
     }
     
   AutoPtr<NumericVector<T> > ap(NULL);
