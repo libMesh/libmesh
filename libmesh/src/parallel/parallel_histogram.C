@@ -30,6 +30,7 @@
 #ifdef HAVE_LIBHILBERT
 #  include "hilbert.h"
 #endif
+#include "parallel.h"
 #include "parallel_conversion_utils.h"
 
 
@@ -98,15 +99,9 @@ void Histogram<KeyType>::build_histogram ()
     local_hist[b] = this->local_bin_size(b);
 
   // Add all the local histograms to get the global histogram
-  hist.resize (this->n_bins());
+  hist = local_hist;
+  Parallel::sum(hist);
   
-  MPI_Allreduce (&local_hist[0],
-		 &hist[0],
-		 this->n_bins(),
-		 MPI_UNSIGNED,
-		 MPI_SUM,
-		 libMesh::COMM_WORLD);
-
   // All done!  
 }
 
