@@ -24,6 +24,7 @@
 
 // Local Includes
 #include "libmesh_common.h"
+#include "parallel.h"
 #include "parallel_sort.h"
 #include "parallel_bin_sorter.h"
 #ifdef HAVE_LIBHILBERT
@@ -71,22 +72,16 @@ template <typename KeyType>
 void Sort<KeyType>::binsort()
 {
   // Find the global min and max from all the
-  // processors.  Do this using MPI_Allreduce.
-  KeyType local_min_max[2];
-  KeyType global_min_max[2];
+  // processors.
+  std::vector<KeyType> global_min_max(2);
 
   // Insert the local min and max for this processor
-  local_min_max[0] = -_data.front();
-  local_min_max[1] =  _data.back();
+  global_min_max[0] = -_data.front();
+  global_min_max[1] =  _data.back();
 
   // Communicate to determine the global
   // min and max for all processors.
-  MPI_Allreduce(local_min_max,
-		global_min_max,
-		2,
-		Parallel::datatype<KeyType>(),
-		MPI_MAX,
-		libMesh::COMM_WORLD);
+  Parallel::max(global_min_max);
 
   // Multiply the min by -1 to obtain the true min
   global_min_max[0] *= -1;
@@ -103,7 +98,7 @@ void Sort<KeyType>::binsort()
 
 
 
-#ifdef HAVE_LIBHILBERT
+#if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
 // Full specialization for HilbertIndices, there is a fair amount of
 // code duplication here that could potentially be consolidated with the 
 // above method
@@ -160,22 +155,14 @@ void Sort<Hilbert::HilbertIndices>::binsort()
 template <typename KeyType>
 void Sort<KeyType>::communicate_bins()
 {
+#ifdef HAVE_MPI
   // Create storage for the global bin sizes.  This
   // is the number of keys which will be held in
   // each bin over all processors.
-  std::vector<unsigned int> global_bin_sizes(_n_procs);
+  std::vector<int> global_bin_sizes = _local_bin_sizes;
   
-  assert (_local_bin_sizes.size() == global_bin_sizes.size());
-
   // Sum to find the total number of entries in each bin.
-  // This is stored in global_bin_sizes.  Note, we
-  // explicitly know that we are communicating MPI_INT's here.
-  MPI_Allreduce(&_local_bin_sizes[0],
-		&global_bin_sizes[0],
-		_n_procs,
-		MPI_UNSIGNED,
-		MPI_SUM,
-		libMesh::COMM_WORLD);
+  Parallel::sum(global_bin_sizes);
 
   // Create a vector to temporarily hold the results of MPI_Gatherv
   // calls.  The vector dest  may be saved away to _my_bin depending on which
@@ -189,21 +176,13 @@ void Sort<KeyType>::communicate_bins()
       // Vector to receive the total bin size for each
       // processor.  Processor i's bin size will be
       // held in proc_bin_size[i]
-      std::vector<int> proc_bin_size(_n_procs);
+      std::vector<int> proc_bin_size;
 
       // Find the number of contributions coming from each
-      // processor for this bin.  Note: Allgather combines
+      // processor for this bin.  Note: allgather combines
       // the MPI_Gather and MPI_Bcast operations into one.
-      // Note: Here again we know that we are communicating
-      // MPI_INT's so there is no need to check the MPI_traits.
-      MPI_Allgather(&_local_bin_sizes[i], // Source: # of entries on this proc in bin i
-		    1,                    // Number of items to gather                 
-		    MPI_INT,           
-		    &proc_bin_size[0],    // Destination: Total # of entries in bin i
-		    1,
-		    MPI_INT,
-		    libMesh::COMM_WORLD);
-      
+      Parallel::allgather(_local_bin_sizes[i], proc_bin_size);
+
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
       // of the proc_bin_size vector.
@@ -234,11 +213,12 @@ void Sort<KeyType>::communicate_bins()
       // Increment the local offset counter
       local_offset += _local_bin_sizes[i];
     } 
+#endif // HAVE_MPI
 }
 
 
 
-#ifdef HAVE_LIBHILBERT
+#if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
 // Full specialization for HilbertIndices, there is a fair amount of
 // code duplication here that could potentially be consolidated with the 
 // above method
@@ -328,7 +308,7 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
   MPI_Type_free (&hilbert_type);  
 }
 
-#endif // #ifdef HAVE_LIBHILBERT
+#endif // #if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
 
 
 
@@ -358,6 +338,6 @@ const std::vector<KeyType>& Sort<KeyType>::bin()
 // Explicitly instantiate for int, double
 template class Parallel::Sort<int>;
 template class Parallel::Sort<double>;
-#ifdef HAVE_LIBHILBERT
+#if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
 template class Parallel::Sort<Hilbert::HilbertIndices>;
 #endif
