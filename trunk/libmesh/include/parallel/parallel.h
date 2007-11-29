@@ -52,11 +52,32 @@ namespace Parallel
 #ifdef HAVE_MPI
   //-------------------------------------------------------------------
   /**
+   * Data types for communication
+   */
+  typedef MPI_Datatype data_type;
+ 
+  /**
    * Templated function to return the appropriate MPI datatype
    * for use with built-in C types
    */
   template <typename T>
-  inline MPI_Datatype datatype();
+  inline data_type datatype();
+
+  /**
+   * Request object for non-blocking I/O
+   */
+  typedef MPI_Request request;
+
+  /**
+   * Default message tag id
+   */
+  const unsigned int any_tag=MPI_ANY_TAG;
+#else
+  // These shouldn't be needed
+  typedef unsigned int data_type;
+  typedef unsigned int request;
+
+  const unsigned int any_tag=-1;
 #endif // HAVE_MPI
 
   //-------------------------------------------------------------------
@@ -130,7 +151,7 @@ namespace Parallel
   template <typename T>
   inline void isend (const unsigned int dest_processor_id,
 		     std::vector<T> &buf,
-		     MPI_Request &request,
+		     request &r,
 		     const unsigned int tag=0);
 
   //-------------------------------------------------------------------
@@ -140,7 +161,7 @@ namespace Parallel
   template <typename T>
   inline void recv (const unsigned int src_processor_id,
 		    std::vector<T> &buf,
-		    const unsigned int tag=MPI_ANY_TAG);
+		    const unsigned int tag=any_tag);
 
   //-------------------------------------------------------------------
   /**
@@ -149,8 +170,14 @@ namespace Parallel
   template <typename T>
   inline void irecv (const unsigned int src_processor_id,
 		     std::vector<T> &buf,
-		     MPI_Request &request,
-		     const unsigned int tag=MPI_ANY_TAG);
+		     request &r,
+		     const unsigned int tag=any_tag);
+  
+  //-------------------------------------------------------------------
+  /**
+   * Wait for a non-blocking send or receive to finish
+   */
+  inline void wait (request &r);
   
   //-------------------------------------------------------------------
   /**
@@ -174,7 +201,7 @@ namespace Parallel
                            T &send,
 			   const unsigned int source_processor_id,
                            T &recv,
-			   MPI_Datatype &type);
+			   data_type &type);
 
   //-------------------------------------------------------------------
   /**
@@ -526,7 +553,7 @@ namespace Parallel
   template <typename T>
   inline void isend (const unsigned int dest_processor_id,
 		     std::vector<T> &buf,
-		     MPI_Request &request,
+		     request &r,
 		     const unsigned int tag)
   {
     START_LOG("isend()", "Parallel");
@@ -538,7 +565,7 @@ namespace Parallel
 		 dest_processor_id,
 		 tag,
 		 libMesh::COMM_WORLD,
-		 &request);    
+		 &r);    
     assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("isend()", "Parallel");
@@ -571,7 +598,7 @@ namespace Parallel
   template <typename T>
   inline void irecv (const unsigned int src_processor_id,
 		     std::vector<T> &buf,
-		     MPI_Request &request,
+		     request &r,
 		     const unsigned int tag)
   {
     START_LOG("irecv()", "Parallel");
@@ -583,7 +610,7 @@ namespace Parallel
 		 src_processor_id,
 		 tag,
 		 libMesh::COMM_WORLD,
-		 &request);    
+		 &r);    
     assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("irecv()", "Parallel");
