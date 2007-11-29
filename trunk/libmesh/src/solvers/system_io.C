@@ -423,8 +423,8 @@ void System::read_data (Xdr& io,
 
 
 
-void System::read_parallel_data (Xdr& io,
-				 const bool read_additional_data)
+void System::read_parallel_data (Xdr&,
+				 const bool)
 {
   parallel_only();
   error();
@@ -957,7 +957,7 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
   
 #ifndef NDEBUG
   // If this is not the same on all processors we're in trouble!
-  Parallel::verify(io_blksize);
+  assert(Parallel::verify(io_blksize));
 #endif
   
   assert (io.writing());
@@ -1031,10 +1031,11 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 	  
 	  // Note that we will actually send/receive to ourself if we are
 	  // processor 0, so let's use nonblocking receives.
-	  std::vector<MPI_Request>
+	  std::vector<Parallel::request>
 	    id_request_handles(libMesh::n_processors()),
 	    val_request_handles(libMesh::n_processors());
 	    
+#ifdef HAVE_MPI
 	  const unsigned int id_tag=0, val_tag=1;
 	  
 	  // Post the receives -- do this on processor 0 only.
@@ -1051,15 +1052,27 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 	  // Send -- do this on all processors.
 	  Parallel::send(0, xfer_ids,  id_tag);
 	  Parallel::send(0, xfer_vals, val_tag);
+#else
+          // On one processor there's nothing to send
+          recv_ids[0] = xfer_ids;
+          recv_vals[0] = xfer_vals;
+#endif
 
 	  // -------------------------------------------------------
 	  // Receive the messages and write the output on processor 0.
 	  if (libMesh::processor_id() == 0)
 	    {
-	      // Wait for all the receives to complete. We have no need for the statuses since
-	      // we already know the buffer sizes.
-	      MPI_Waitall (libMesh::n_processors(), &id_request_handles[0],  MPI_STATUSES_IGNORE);
-	      MPI_Waitall (libMesh::n_processors(), &val_request_handles[0], MPI_STATUSES_IGNORE);
+#ifdef HAVE_MPI
+	      // Wait for all the receives to complete. We have no
+	      // need for the statuses since we already know the
+	      // buffer sizes.
+	      MPI_Waitall (libMesh::n_processors(),
+                           &id_request_handles[0],
+                           MPI_STATUSES_IGNORE);
+	      MPI_Waitall (libMesh::n_processors(),
+                           &val_request_handles[0],
+                           MPI_STATUSES_IGNORE);
+#endif
 	      
 	      // Write the values in this block.
 	      unsigned int tot_id_size = 0, tot_val_size=0;
@@ -1156,10 +1169,11 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 	  
 	  // Note that we will actually send/receive to ourself if we are
 	  // processor 0, so let's use nonblocking receives.
-	  std::vector<MPI_Request>
+	  std::vector<Parallel::request>
 	    id_request_handles(libMesh::n_processors()),
 	    val_request_handles(libMesh::n_processors());
 	    
+#ifdef HAVE_MPI
 	  const unsigned int id_tag=0, val_tag=1;
 	  
 	  // Post the receives -- do this on processor 0 only.
@@ -1176,15 +1190,27 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 	  // Send -- do this on all processors.
 	  Parallel::send(0, xfer_ids,  id_tag);
 	  Parallel::send(0, xfer_vals, val_tag);
+#else
+          // On one processor there's nothing to send
+          recv_ids[0] = xfer_ids;
+          recv_vals[0] = xfer_vals;
+#endif
 
 	  // -------------------------------------------------------
 	  // Receive the messages and write the output on processor 0.
 	  if (libMesh::processor_id() == 0)
 	    {
-	      // Wait for all the receives to complete. We have no need for the statuses since
-	      // we already know the buffer sizes.
-	      MPI_Waitall (libMesh::n_processors(), &id_request_handles[0],  MPI_STATUSES_IGNORE);
-	      MPI_Waitall (libMesh::n_processors(), &val_request_handles[0], MPI_STATUSES_IGNORE);
+#ifdef HAVE_MPI
+	      // Wait for all the receives to complete. We have no
+	      // need for the statuses since we already know the
+	      // buffer sizes.
+	      MPI_Waitall (libMesh::n_processors(),
+			   &id_request_handles[0],
+                           MPI_STATUSES_IGNORE);
+	      MPI_Waitall (libMesh::n_processors(),
+			   &val_request_handles[0],
+                           MPI_STATUSES_IGNORE);
+#endif
 	      
 	      // Write the values in this block.
 	      unsigned int tot_id_size = 0, tot_val_size=0;
