@@ -314,6 +314,7 @@ namespace Parallel
 	bool verified = (r == tempmin) &&
 	                (r == tempmax);
 	Parallel::min(verified);
+	return verified;
       }
     return true;
   }
@@ -1129,6 +1130,32 @@ namespace Parallel
   template <typename T>
   inline void sum(std::vector<T> &) {}
 
+  // Blocking sends don't make sense on one processor
+  template <typename T>
+  inline void send (const unsigned int,
+		    std::vector<T> &,
+		    const unsigned int) { error(); }
+
+  template <typename T>
+  inline void isend (const unsigned int,
+		     std::vector<T> &,
+		     request &,
+		     const unsigned int) {}
+
+  // Blocking receives don't make sense on one processor
+  template <typename T>
+  inline void recv (const unsigned int,
+		    std::vector<T> &,
+		    const unsigned int) { error(); }
+
+  template <typename T>
+  inline void irecv (const unsigned int,
+		     std::vector<T> &,
+		     request &,
+		     const unsigned int) {}
+  
+  inline void wait (request &) {}
+  
   template <typename T>
   inline void send_receive(const unsigned int,
                            T &send,
