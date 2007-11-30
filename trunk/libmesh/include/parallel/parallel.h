@@ -82,6 +82,18 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Pause execution until all processors reach a certain point.
+   */
+  inline void barrier ()
+  {
+#ifdef HAVE_MPI
+    MPI_Barrier (libMesh::COMM_WORLD);
+#endif
+    return;
+  }    
+  
+  //-------------------------------------------------------------------
+  /**
    * Verify that a local variable has the same value on all processors
    */
   template <typename T>
@@ -881,11 +893,14 @@ namespace Parallel
    * must be called by all processors.
    */
   template <typename T>
-  void gather(const unsigned int root_id,
-	      std::vector<T> &r)
+  inline void gather(const unsigned int root_id,
+		     std::vector<T> &r)
   {
     if (libMesh::n_processors() == 1)
-      return;
+      {
+	assert (libMesh::processor_id()==root_id);
+	return;
+      }
     
     START_LOG("gather()", "Parallel");
     
@@ -1018,7 +1033,7 @@ namespace Parallel
    * must be called by all processors.
    */
   template <typename T>
-  void allgather(std::vector<T> &r)
+  inline void allgather(std::vector<T> &r)
   {
     if (libMesh::n_processors() == 1)
       return;
@@ -1069,10 +1084,13 @@ namespace Parallel
 
 
   template <typename T>
-  void broadcast (T &data, const unsigned int root_id)
+  inline void broadcast (T &data, const unsigned int root_id)
   {
     if (libMesh::n_processors() == 1)
-      return;
+      {
+	assert (libMesh::processor_id() == root_id);
+	return;
+      }
     
     START_LOG("broadcast()", "Parallel");
 
@@ -1087,15 +1105,46 @@ namespace Parallel
 
 
 
-  template <typename T>
-  void broadcast (std::vector<T> &data, const unsigned int root_id)
+  template <>
+  inline void broadcast (std::string &data, const unsigned int root_id)
   {
     if (libMesh::n_processors() == 1)
-      return;
+      {
+	assert (libMesh::processor_id() == root_id);
+	return;
+      }
 
-    if (data.empty())
-      return;
+    unsigned int data_size = data.size();
+    Parallel::broadcast(data_size, root_id);
     
+    std::vector<char> data_c(data_size);
+    std::string orig(data);
+
+    if (libMesh::processor_id() == root_id)
+      for(unsigned int i=0; i<data.size(); i++)
+	data_c[i] = data[i];
+
+    Parallel::broadcast (data_c,root_id);
+    
+    data.clear(); data.reserve(data_c.size());
+    for(unsigned int i=0; i<data_c.size(); i++)
+      data.push_back(data_c[i]);
+    
+    if (libMesh::processor_id() == root_id)
+      assert(data == orig);
+  }
+
+
+
+  template <typename T>
+  inline void broadcast (std::vector<T> &data, const unsigned int root_id)
+  {
+    if (libMesh::n_processors() == 1)
+      {
+	assert (libMesh::processor_id() == root_id);
+	return;
+      }
+
     START_LOG("broadcast()", "Parallel");
 
     // and get the data from the remote processors.
