@@ -1159,11 +1159,12 @@ namespace Parallel
   inline void wait (request &) {}
   
   template <typename T>
-  inline void send_receive(const unsigned int,
+  inline void send_receive(const unsigned int send_tgt,
                            T &send,
-			   const unsigned int,
+			   const unsigned int recv_source,
                            T &recv)
   {
+    assert (send_tgt == recv_source);
     recv = send;
   }
 
