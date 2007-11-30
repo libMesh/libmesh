@@ -795,7 +795,7 @@ namespace Parallel
 	MPI_Gather(&send,
 		   1,
 		   datatype<T>(),
-		   &recv[0],
+		   recv.empty() ? NULL : &recv[0],
 		   1,
 		   datatype<T>(),
 		   root_id,
@@ -831,7 +831,7 @@ namespace Parallel
 	MPI_Gather(&realinput,
 		   1,
 		   datatype<T>(),
-		   &temprealoutput[0],
+		   temprealoutput.empty() ? NULL : &temprealoutput[0],
 		   1,
 		   datatype<T>(),
 		   root_id,
@@ -840,7 +840,7 @@ namespace Parallel
 	MPI_Gather(&imaginput,
 		   1,
 		   datatype<T>(),
-		   &tempimagoutput[0],
+		   tempimagoutput.empty() ? NULL : &tempimagoutput[0],
 		   1,
 		   datatype<T>(),
 		   root_id,
@@ -923,7 +923,7 @@ namespace Parallel
     // and get the data from the remote processors
     const int ierr =
       MPI_Gatherv (r_src.empty() ? NULL : &r_src[0], mysize, datatype<T>(),
-		   &r[0], &sendlengths[0], &displacements[0], datatype<T>(),
+		   r.empty() ? NULL :  &r[0], &sendlengths[0], &displacements[0], datatype<T>(),
 		   root_id,
 		   libMesh::COMM_WORLD);
 
@@ -1022,7 +1022,7 @@ namespace Parallel
   {
     if (libMesh::n_processors() == 1)
       return;
-    
+
     START_LOG("allgather()", "Parallel");
 
     std::vector<int>
@@ -1092,9 +1092,11 @@ namespace Parallel
   {
     if (libMesh::n_processors() == 1)
       return;
+
+    if (data.empty())
+      return;
     
     START_LOG("broadcast()", "Parallel");
-
 
     // and get the data from the remote processors.
     // Pass NULL if our vector is empty.
