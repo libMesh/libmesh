@@ -1295,46 +1295,6 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 	for (; iter != v.end(); ++iter)
 	    data(*iter, "");
 
-// Alternative code
-// 	/*
-// 	 * save complex values as two std::vectors<double>.
-// 	 * Using just one buffer increases time for copying,
-// 	 * but reduces memory consumption
-// 	 */
-// 	std::vector<double> buf;
-// 	buf.resize(length);
-
-// 	// real part
-// 	std::vector< std::complex<double> >::iterator c_iter   = v.begin();
-// 	std::vector<double>::iterator                 buf_iter = buf.begin();
-// 	for (; c_iter != v.end(); ++c_iter)
-// 	{
-// 	  *buf_iter = c_iter->real();
-// 	  ++buf_iter;
-// 	}
-// 	data(buf, "");
-
-// 	// imaginary part
-// 	c_iter   = v.begin();
-// 	buf_iter = buf.begin();
-// 	for (; c_iter != v.end(); ++c_iter)
-// 	{
-// 	  *buf_iter = c_iter->real();
-// 	  ++buf_iter;
-// 	}
-// 	data(buf, "");
-
-// 	buf.clear();
-
-
-// did not work...
-// 	// with null pointer, let XDR dynamically allocate?
-// 	xdr_vector(xdrs, 
-// 		   (char*) &v[0],
-// 		   length,
-// 		   sizeof(std::complex<double>),
-// 		   (xdrproc_t) 0);
-
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
@@ -1365,46 +1325,6 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 	
 	for (; iter != v.end(); ++iter)
 	    data(*iter, "");
-
-// alternative code
-// 	/*
-// 	 * load complex values as two std::vector<double>
-// 	 * one after the other, store them in two buffers,
-// 	 * since we have @e no chance to get the real and complex
-// 	 * part one after the other into the std::complex
-// 	 * (apart from messing with += or so, which i don't want to)
-// 	 */
-// 	std::vector<double> real_buf, imag_buf;
-// 	real_buf.resize(length);
-// 	imag_buf.resize(length);
-
-// 	// get real & imaginary part
-// 	data(real_buf, "");
-// 	data(imag_buf, "");
-
-// 	// copy into vector
-// 	std::vector< std::complex<double> >::iterator c_iter   = v.begin();
-// 	std::vector<double>::iterator                 real_buf_iter = real_buf.begin();
-// 	std::vector<double>::iterator                 imag_buf_iter = imag_buf.begin();
-
-// 	for (; c_iter != v.end(); ++c_iter)
-// 	{
-// 	  *c_iter = std::complex<double>(*real_buf_iter, *imag_buf_iter);
-// 	  ++real_buf_iter;
-// 	  ++imag_buf_iter;
-// 	}
-
-// 	// clear up
-// 	real_buf.clear();
-// 	imag_buf.clear();
-
-
-// did not work...
-// 	xdr_vector(xdrs, 
-// 		   (char*) &v[0],
-// 		   length,
-// 		   sizeof(std::complex<double>),
-// 		   (xdrproc_t) 0);
 	
 #else
 	
@@ -1690,12 +1610,12 @@ void Xdr::data_stream (double *val, const unsigned int len)
 
 	assert (this->is_open());
 
-
-	xdr_vector(xdrs, 
-		   (char*) val,
-		   len,
-		   sizeof(double),
-		   (xdrproc_t) xdr_double);
+	if (len > 0)
+	  xdr_vector(xdrs, 
+		     (char*) val,
+		     len,
+		     sizeof(double),
+		     (xdrproc_t) xdr_double);
 
 #else
 	
