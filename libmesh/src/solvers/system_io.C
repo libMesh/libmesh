@@ -544,13 +544,16 @@ void System::read_parallel_vector (Xdr& io, NumericVector<Number>& vec)
 	      }
 
 	  // Get the recv_ids for all other processors.
-	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
-	    {
-	      unsigned int curr_vec_size = recv_ids[pid].size();
-	      Parallel::broadcast(curr_vec_size, pid);
-	      recv_ids[pid].resize(curr_vec_size);
-	      Parallel::broadcast(recv_ids[pid], pid);
-	    }
+	  {
+	    const unsigned int curr_vec_size = recv_ids[libMesh::processor_id()].size();
+	    std::vector<unsigned int> recv_id_sizes(libMesh::n_processors());
+	    Parallel::allgather(curr_vec_size, recv_id_sizes);
+	    for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	      {
+		recv_ids[pid].resize(recv_id_sizes[pid]);
+		Parallel::broadcast(recv_ids[pid], pid);
+	      }
+	  }
 
 	  // create the idx map for all processors -- this will match the ordering
 	  // in the input buffer chunk which we are about to read.
@@ -648,13 +651,16 @@ void System::read_parallel_vector (Xdr& io, NumericVector<Number>& vec)
 	      }
 
 	  // Get the recv_ids for all other processors.
-	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
-	    {
-	      unsigned int curr_vec_size = recv_ids[pid].size();
-	      Parallel::broadcast(curr_vec_size, pid);
-	      recv_ids[pid].resize(curr_vec_size);
-	      Parallel::broadcast(recv_ids[pid], pid);
-	    }
+	  {
+	    const unsigned int curr_vec_size = recv_ids[libMesh::processor_id()].size();
+	    std::vector<unsigned int> recv_id_sizes(libMesh::n_processors());
+	    Parallel::allgather(curr_vec_size, recv_id_sizes);
+	    for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	      {
+		recv_ids[pid].resize(recv_id_sizes[pid]);
+		Parallel::broadcast(recv_ids[pid], pid);
+	      }
+	  }
 
 	  // create the idx map for all processors -- this will match the ordering
 	  // in the input buffer chunk which we are about to read.
