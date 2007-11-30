@@ -649,7 +649,9 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	  // Extract the coordinates for each node belonging to processor p
 	  // and add it to our mesh.
 	  for (unsigned int global_idx = first_global_idx; global_idx<last_global_idx; global_idx++)
-	    {	      
+	    {
+	      assert ((3*global_idx + 2) < xyz.size());
+	      
 	      Node *node = Node::build(xyz[3*global_idx + 0],
 				       xyz[3*global_idx + 1],
 				       xyz[3*global_idx + 2],
