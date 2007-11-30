@@ -60,7 +60,7 @@ run: $(target)
 	@echo " "
 	@$(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
 	@echo " "
-	@$(target) eqn_sys.dat
+	@$(LIBMESHRUN) $(target) eqn_sys.dat
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
