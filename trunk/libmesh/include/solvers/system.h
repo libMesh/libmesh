@@ -406,17 +406,17 @@ public:
 		      std::vector<float> &component_scale) const;
 
   /**
-   * Reads the basic data for this System.
+   * Reads the basic data header for this System.
    */
-  void read (Xdr& io, 
-	     const bool read_header=true,
-	     const bool read_additional_data=true);
+  void read_header (Xdr& io, 
+		    const bool read_header=true,
+		    const bool read_additional_data=true);
 
   /**
    * Reads additional data, namely vectors, for this System.
    */
-  void read_data (Xdr& io,
-		  const bool read_additional_data=true);
+  void read_legacy_data (Xdr& io,
+			 const bool read_additional_data=true);
 
   /**
    * Reads additional data, namely vectors, for this System.
@@ -426,16 +426,10 @@ public:
 			   const bool read_additional_data=true);
 
   /**
-   * Writes the basic data for this System.
+   * Writes the basic data header for this System.
    */
-  void write (Xdr& io,
-	      const bool write_additional_data) const;
-
-  /**
-   * Writes additional data, namely vectors, for this System.
-   */
-  void write_data (Xdr& io,
-		   const bool write_additional_data = true) const;
+  void write_header (Xdr& io,
+		     const bool write_additional_data) const;
 
   /**
    * Writes additional data, namely vectors, for this System.
@@ -575,13 +569,23 @@ protected:
   void project_vector (const NumericVector<Number>&,
 		       NumericVector<Number>&) const;
 
-  // -------------------------------------------------
-  // Necessary classes
-  //
   
 private:
 
   
+
+  /**
+   * Reads an input vector from the stream \p io and assigns
+   * the values to a set of \p DofObjects.  This method uses
+   * blocked input and is safe to call on a distributed memory-mesh.
+   */   
+  template <typename iterator_type>
+  unsigned int read_parallel_blocked_dof_objects (const unsigned int var,
+						  const unsigned int n_objects,
+						  const iterator_type begin,
+						  const iterator_type end,
+						  Xdr &io,
+						  NumericVector<Number> &vec) const;
 
   /**
    * Reads a vector for this System.
@@ -589,6 +593,18 @@ private:
    */
   void read_parallel_vector (Xdr& io,
 			     NumericVector<Number> &vec);
+
+  /**
+   * Writes an output vector to the stream \p io for a set of \p DofObjects.
+   * This method uses blocked output and is safe to call on a distributed memory-mesh.
+   */   
+  template <typename iterator_type>
+  unsigned int write_parallel_blocked_dof_objects (const NumericVector<Number> &vec,
+						   const unsigned int var,
+						   const unsigned int n_objects,
+						   const iterator_type begin,
+						   const iterator_type end,
+						   Xdr &io) const;
 
   /**
    * Writes a vector for this System.
