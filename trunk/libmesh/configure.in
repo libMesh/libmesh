@@ -96,6 +96,7 @@ AC_SUBST(CXXDEPFLAG)
 AC_SUBST(CXXSHAREDFLAG)
 AC_SUBST(RPATHFLAG)
 AC_SUBST(PROFILING_FLAGS)
+AC_SUBST(OPROFILE_FLAGS)
 
 
 dnl --------------------------------------------------------------

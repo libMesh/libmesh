@@ -292,6 +292,9 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   dnl Flag for profiling mode; can me modified at a later stage
   PROFILING_FLAGS="-pg"
 
+  dnl The -g flag is all OProfile needs to produce annotations
+  OPROFILE_FLAGS="-g"
+
   dnl First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
@@ -426,6 +429,9 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
 
         dnl Intel compilers use -qp for profiling
         PROFILING_FLAGS="-qp"
+
+	dnl The -g flag is all OProfile needs to produce annotations
+        OPROFILE_FLAGS="-g"
 
         dnl Specific flags for specific versions
         case "$GXX_VERSION" in

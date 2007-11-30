@@ -100,6 +100,7 @@ enable-shared := @enableshared@
 opt-mode   := off
 debug-mode := off
 prof-mode  := off
+oprof-mode := off
 syn-mode   := off
 devel-mode := off
 
@@ -137,6 +138,13 @@ ifeq ($(METHOD),pro)
   prof-mode     := on
   mode          := "profiling"
   enable-shared := no
+endif
+
+#
+# If METHOD=oprof, compile in OProfile mode
+ifeq ($(METHOD),oprof)
+  oprof-mode    := on
+  mode          := "oprofile"
 endif
 
 # The file extension for object files.
@@ -186,6 +194,12 @@ endif
 
 ifeq ($(prof-mode),on)
   libmesh_LIBS += @PROFILING_FLAGS@
+endif
+
+
+ifeq ($(oprof-mode),on)
+  libmesh_CXXFLAGS += -DNDEBUG @CXXFLAGS_OPT@ @OPROFILE_FLAGS@
+  libmesh_CFLAGS   += -DNDEBUG @CFLAGS_OPT@ @OPROFILE_FLAGS@ 
 endif
 ###############################################################################
 
