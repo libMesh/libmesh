@@ -168,39 +168,42 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
 
 
   //-------------------------------------------------------------
-  // (3) get the min/max value on each processor
+  // (3) get the max value on each processor
   std::vector<Hilbert::HilbertIndices>    
-    node_lower_bounds(libMesh::n_processors()),
     node_upper_bounds(libMesh::n_processors()),
-    elem_lower_bounds(libMesh::n_processors()),
     elem_upper_bounds(libMesh::n_processors());
 
   { // limit scope of temporaries
-    std::vector<Hilbert::HilbertIndices> recvbuf(4*libMesh::n_processors());
+    std::vector<Hilbert::HilbertIndices> recvbuf(2*libMesh::n_processors());
+    std::vector<unsigned short int> /* do not use a vector of bools here since it is not always so! */
+      empty_nodes (libMesh::n_processors()),
+      empty_elem  (libMesh::n_processors());
+    Hilbert::HilbertIndices my_max[2];
+    
+    Parallel::allgather (static_cast<unsigned short int>(my_node_bin.empty()), empty_nodes);
+    Parallel::allgather (static_cast<unsigned short int>(my_elem_bin.empty()),  empty_elem);
+     	       
+    if (!my_node_bin.empty()) my_max[0] = my_node_bin.back();
+    if (!my_elem_bin.empty()) my_max[1] = my_elem_bin.back();
 
-    Hilbert::HilbertIndices my_min_max[4];
-
-    my_min_max[0] = my_node_bin.front(); /**/ my_min_max[1] = my_node_bin.back();
-    my_min_max[2] = my_elem_bin.front(); /**/ my_min_max[3] = my_elem_bin.back();
-
-    MPI_Allgather (my_min_max,  4, hilbert_type,
-		   &recvbuf[0], 4, hilbert_type,
+    MPI_Allgather (my_max,      2, hilbert_type,
+		   &recvbuf[0], 2, hilbert_type,
 		   libMesh::COMM_WORLD);
 
-    node_lower_bounds[0] = recvbuf[4*0+0]; /**/ node_upper_bounds[0] = recvbuf[4*0+1];
-    elem_lower_bounds[0] = recvbuf[4*0+2]; /**/ elem_upper_bounds[0] = recvbuf[4*0+3];
-
-    for (unsigned int p=1; p<libMesh::n_processors(); p++)
+    // Be cereful here.  The *_upper_bounds will be used to find the processor
+    // a given object belongs to.  So, if a processor contains no objects (possible!)
+    // then copy the bound from the lower processor id.
+    for (unsigned int p=0; p<libMesh::n_processors(); p++)
       {
-	node_lower_bounds[p] = recvbuf[4*p+0]; /**/ node_upper_bounds[p] = recvbuf[4*p+1];
-	elem_lower_bounds[p] = recvbuf[4*p+2]; /**/ elem_upper_bounds[p] = recvbuf[4*p+3];
+	node_upper_bounds[p] = recvbuf[2*p+0];
+	elem_upper_bounds[p] = recvbuf[2*p+1];
+
+	if (p > 0) // default hilbert index value is the OK upper bound for processor 0.
+	  {
+	    if (empty_nodes[p]) node_upper_bounds[p] = node_upper_bounds[p-1];
+	    if (empty_elem[p])  elem_upper_bounds[p] = elem_upper_bounds[p-1];
+	  }
       }
-     
-//     for (unsigned int p=0; p<libMesh::n_processors(); p++)
-//       std::cout << "[" << p << ":node_min]= " << node_lower_bounds[p] << std::endl
-// 		<< "[" << p << ":node_max]= " << node_upper_bounds[p] << std::endl
-// 		<< "[" << p << ":elem_min]= " << elem_lower_bounds[p] << std::endl
-// 		<< "[" << p << ":elem_max]= " << elem_upper_bounds[p] << std::endl << std::endl;    
   }
 
 
@@ -209,20 +212,6 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
   // (4) determine the position in the global ranking for
   //     each local object
   {
-//    for (unsigned int obj=0; obj<elem_keys.size(); obj++)
-//      {
-//	const Hilbert::HilbertIndices &hi = elem_keys[obj];
-//	
-//	const unsigned int pid = 
-//	  std::distance (elem_upper_bounds.begin(), 
-//			 std::lower_bound(elem_upper_bounds.begin(), 
-//					  elem_upper_bounds.end(),
-//					  hi));
-//
-//	std::cout << hi << " on processor " << pid << std::endl;
-//      }
-
-
     //----------------------------------------------
     // Nodes first -- all nodes, not just local ones
     {
