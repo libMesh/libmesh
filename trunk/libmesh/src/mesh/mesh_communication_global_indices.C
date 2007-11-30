@@ -85,9 +85,9 @@ namespace { // anonymous namespace for helper functions
 
 // ------------------------------------------------------------
 // MeshCommunication class members
+#if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
 void MeshCommunication::find_global_indices (MeshBase& mesh) const
 {
-#if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
 
   START_LOG ("find_global_indices()", "MeshCommunication");
 
@@ -443,6 +443,9 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
   MPI_Type_free (&hilbert_type);
 
   STOP_LOG ("find_global_indices()", "MeshCommunication");
-
-#endif // HAVE_LIBHILBERT, HAVE_MPI
 }
+#else
+void MeshCommunication::find_global_indices (MeshBase&) const
+{
+}
+#endif // HAVE_LIBHILBERT, HAVE_MPI
