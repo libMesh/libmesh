@@ -103,7 +103,7 @@ private:
    * bin on this processor.  It has 
    * size equal to _n_procs.
    */
-  std::vector<int> _local_bin_sizes;
+  std::vector<unsigned int> _local_bin_sizes;
   
   /**
    * The bin which will eventually be held

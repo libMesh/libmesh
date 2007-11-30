@@ -108,9 +108,20 @@ void Sort<Hilbert::HilbertIndices>::binsort()
   // Find the global min and max from all the
   // processors.  Do this using MPI_Allreduce.
   Hilbert::HilbertIndices 
-    local_min = _data.front(), local_max = _data.back(),
+    local_min,  local_max,
     global_min, global_max;
 
+  if (_data.empty())
+    {
+      local_min.rack0 = local_min.rack1 = local_min.rack2 = static_cast<Hilbert::inttype>(-1);
+      local_max.rack0 = local_max.rack1 = local_max.rack2 = 0;
+    }
+  else
+    {
+      local_min = _data.front();
+      local_max = _data.back();
+    }
+  
   MPI_Op hilbert_max, hilbert_min;
   MPI_Datatype hilbert_type;
 
@@ -159,7 +170,7 @@ void Sort<KeyType>::communicate_bins()
   // Create storage for the global bin sizes.  This
   // is the number of keys which will be held in
   // each bin over all processors.
-  std::vector<int> global_bin_sizes = _local_bin_sizes;
+  std::vector<unsigned int> global_bin_sizes = _local_bin_sizes;
   
   // Sum to find the total number of entries in each bin.
   Parallel::sum(global_bin_sizes);
@@ -176,7 +187,7 @@ void Sort<KeyType>::communicate_bins()
       // Vector to receive the total bin size for each
       // processor.  Processor i's bin size will be
       // held in proc_bin_size[i]
-      std::vector<int> proc_bin_size;
+      std::vector<unsigned int> proc_bin_size;
 
       // Find the number of contributions coming from each
       // processor for this bin.  Note: allgather combines
@@ -186,7 +197,7 @@ void Sort<KeyType>::communicate_bins()
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
       // of the proc_bin_size vector.
-      std::vector<int> displacements(_n_procs);
+      std::vector<unsigned int> displacements(_n_procs);
       for (unsigned int j=1; j<_n_procs; ++j)
 	displacements[j] = proc_bin_size[j-1] + displacements[j-1];
 
@@ -198,9 +209,11 @@ void Sort<KeyType>::communicate_bins()
 		    NULL,                        // Points to the beginning of the bin to be sent
 		  _local_bin_sizes[i],           // How much data is in the bin being sent.
 		  Parallel::datatype<KeyType>(), // The data type we are sorting
-		  &dest[0],                      // Enough storage to hold all bin contributions
-		  &proc_bin_size[0],             // How much is to be received from each processor
-		  &displacements[0],             // Offsets into the receive buffer
+		  (dest.empty()) ?
+		    NULL :
+		    &dest[0],                    // Enough storage to hold all bin contributions
+		  (int*) &proc_bin_size[0],      // How much is to be received from each processor
+	          (int*) &displacements[0],      // Offsets into the receive buffer
 		  Parallel::datatype<KeyType>(), // The data type we are sorting
 		  i,                             // The root process (we do this once for each proc)
 		  libMesh::COMM_WORLD);
@@ -234,7 +247,7 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
 
   // Sum to find the total number of entries in each bin.
   // This is stored in global_bin_sizes.  Note, we
-  // explicitly know that we are communicating MPI_INT's here.
+  // explicitly know that we are communicating MPI_UNSIGNED's here.
   MPI_Allreduce(&_local_bin_sizes[0],
 		&global_bin_sizes[0],
 		_n_procs,
@@ -259,25 +272,25 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
       // Vector to receive the total bin size for each
       // processor.  Processor i's bin size will be
       // held in proc_bin_size[i]
-      std::vector<int> proc_bin_size(_n_procs);
+      std::vector<unsigned int> proc_bin_size(_n_procs);
 
       // Find the number of contributions coming from each
       // processor for this bin.  Note: Allgather combines
       // the MPI_Gather and MPI_Bcast operations into one.
       // Note: Here again we know that we are communicating
-      // MPI_INT's so there is no need to check the MPI_traits.
+      // MPI_UNSIGNED's so there is no need to check the MPI_traits.
       MPI_Allgather(&_local_bin_sizes[i], // Source: # of entries on this proc in bin i
 		    1,                    // Number of items to gather                 
-		    MPI_INT,           
+		    MPI_UNSIGNED,           
 		    &proc_bin_size[0],    // Destination: Total # of entries in bin i
 		    1,
-		    MPI_INT,
+		    MPI_UNSIGNED,
 		    libMesh::COMM_WORLD);
       
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
       // of the proc_bin_size vector.
-      std::vector<int> displacements(_n_procs);
+      std::vector<unsigned int> displacements(_n_procs);
       for (unsigned int j=1; j<_n_procs; ++j)
 	displacements[j] = proc_bin_size[j-1] + displacements[j-1];
 
@@ -286,14 +299,16 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
       
       MPI_Gatherv((_data.size() > local_offset) ?
 		    &_data[local_offset] :
-		    NULL,                // Points to the beginning of the bin to be sent
-		  _local_bin_sizes[i],   // How much data is in the bin being sent.
-		  hilbert_type,          // The data type we are sorting
-		  &dest[0],              // Enough storage to hold all bin contributions
-		  &proc_bin_size[0],     // How much is to be received from each processor
-		  &displacements[0],     // Offsets into the receive buffer
-		  hilbert_type,          // The data type we are sorting
-		  i,                     // The root process (we do this once for each proc)
+		    NULL,                   // Points to the beginning of the bin to be sent
+		  _local_bin_sizes[i],      // How much data is in the bin being sent.
+		  hilbert_type,             // The data type we are sorting
+		  (dest.empty()) ?
+		    NULL :
+		    &dest[0],               // Enough storage to hold all bin contributions
+		  (int*) &proc_bin_size[0], // How much is to be received from each processor
+		  (int*) &displacements[0], // Offsets into the receive buffer
+		  hilbert_type,             // The data type we are sorting
+		  i,                        // The root process (we do this once for each proc)
 		  libMesh::COMM_WORLD);
 
       // Copy the destination buffer if it
