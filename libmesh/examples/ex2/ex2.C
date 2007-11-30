@@ -55,6 +55,9 @@
 // Include files that define a simple steady system
 #include "linear_implicit_system.h"
 #include "transient_system.h"
+#include "explicit_system.h"
+
+
 
 int main (int argc, char** argv)
 {
@@ -77,10 +80,7 @@ int main (int argc, char** argv)
     // grid on the unit square.  By default a mesh of QUAD4
     // elements will be created.  We instruct the mesh generator
     // to build a mesh of 5x5 elements.
-    MeshTools::Generation::build_cube (mesh, 5, 5);
-    
-    // Print information about the mesh to the screen.
-    mesh.print_info();
+    MeshTools::Generation::build_square (mesh, 5, 5);
 
     // Create an equation systems object. This object can
     // contain multiple systems of different 
@@ -105,7 +105,7 @@ int main (int argc, char** argv)
     equation_systems.parameters.set<Real> ("nobody") = 0.;
     
     // Now we declare the system and its variables.
-    // We begin by adding a "SteadyStytem" to the
+    // We begin by adding a "TransientLinearImplicitSystem" to the
     // EquationSystems object, and we give it the name
     // "Simple System".
     equation_systems.add_system<TransientLinearImplicitSystem> ("Simple System");
@@ -113,10 +113,25 @@ int main (int argc, char** argv)
     // Adds the variable "u" to "Simple System".  "u"
     // will be approximated using first-order approximation.
     equation_systems.get_system("Simple System").add_variable("u", FIRST);
+
+    // Next we'll by add an "ExplicitSystem" to the
+    // EquationSystems object, and we give it the name
+    // "Complex System".
+    equation_systems.add_system<ExplicitSystem> ("Complex System");
+
+    // Give "Complex System" three variables -- each with a different approximation
+    // order.  Variables "c" and "T" will use first-order Lagrange approximation, 
+    // while variable "dv" will use a second-order discontinuous
+    // approximation space.
+    equation_systems.get_system("Complex System").add_variable("c", FIRST);
+    equation_systems.get_system("Complex System").add_variable("T", FIRST);
+    equation_systems.get_system("Complex System").add_variable("dv", SECOND, MONOMIAL);
       
     // Initialize the data structures for the equation system.
     equation_systems.init();
-      
+          
+    // Print information about the mesh to the screen.
+    mesh.print_info();
     // Prints information about the system to the screen.
     equation_systems.print_info();
 
@@ -131,15 +146,12 @@ int main (int argc, char** argv)
     // Note that you might use this in an application to periodically
     // dump the state of your simulation.  You can then restart from
     // this data later.
-    if (argc == 2)
+    if (argc > 1)
       if (argv[1][0] != '-')
 	{
 	  std::cout << "<<< Writing system to file " << argv[1]
 		    << std::endl;
 	  
-          // We currently have to serialize for I/O.
-          equation_systems.allgather();
-
 	  // Write the system.
 	  equation_systems.write (argv[1], libMeshEnums::WRITE);
 	  
