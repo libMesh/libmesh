@@ -38,7 +38,7 @@
 // Anonymous namespace for implementation details.
 namespace {
 #warning "Increase to something usable for final checkin"
-  static const unsigned int io_blksize = 10;
+  static const unsigned int io_blksize = 10; //100000;
 }
 
 
@@ -49,7 +49,7 @@ void System::read (Xdr& io,
 		   const bool read_additional_data)
 {
   /**
-   * This program implements the output of a
+   * This method implements the output of a
    * System object, embedded in the output of
    * an EquationSystems<T_sys>.  This warrants some 
    * documentation.  The output file essentially
@@ -219,7 +219,7 @@ void System::read_data (Xdr& io,
 			const bool read_additional_data)
 {
   /**
-   * This program implements the output of the vectors
+   * This method implements the output of the vectors
    * contained in this System object, embedded in the 
    * output of an EquationSystems<T_sys>. 
    *
@@ -423,11 +423,302 @@ void System::read_data (Xdr& io,
 
 
 
-void System::read_parallel_data (Xdr&,
-				 const bool)
+void System::read_parallel_data (Xdr& io,
+				  const bool read_additional_data)
+{
+  /**
+   * This method implements the input of the vectors
+   * contained in this System object, embedded in the 
+   * output of an EquationSystems<T_sys>. 
+   *
+   *   9.) The global solution vector, re-ordered to be node-major 
+   *       (More on this later.)                                    
+   *                                                                
+   *      for each additional vector in the object          
+   *                                                                
+   *      10.) The global additional vector, re-ordered to be       
+   *          node-major (More on this later.)
+   *
+   * Note that the actual IO is handled through the Xdr class 
+   * (to be renamed later?) which provides a uniform interface to 
+   * both the XDR (eXternal Data Representation) interface and standard
+   * ASCII output.  Thus this one section of code will read XDR or ASCII
+   * files with no changes.
+   */ 
+  parallel_only();
+  std::string comment;
+
+  this->read_parallel_vector(io, *this->solution); 
+
+  // get the comment
+  if (libMesh::processor_id() == 0)
+    io.comment (comment);  
+
+  // Only read additional vectors if wanted  
+  if (read_additional_data)
+    {	  
+      std::map<std::string, NumericVector<Number>* >::const_iterator
+	pos = _vectors.begin();
+  
+      for(; pos != this->_vectors.end(); ++pos)
+        {
+	  this->read_parallel_vector(io, *pos->second);
+
+	  // get the comment
+	  if (libMesh::processor_id() == 0)
+	    io.comment (comment);	  
+	    
+	}
+    }
+}
+
+
+
+void System::read_parallel_vector (Xdr& io, NumericVector<Number>& vec)
 {
   parallel_only();
-  error();
+
+
+#ifndef NDEBUG
+  // In parallel we better be reading a parallel vector -- if not
+  // we will not set all of its components below!!
+  if (libMesh::n_processors() > 1)
+    {
+      assert (vec.size() != vec.local_size());
+    }
+  
+  // If this is not the same on all processors we're in trouble!
+  Parallel::verify(io_blksize);
+#endif
+  
+  assert (io.reading());
+
+  const unsigned int sys_num = this->number();
+  const unsigned int n_vars  = this->n_vars();
+
+  // vector length
+  unsigned int vector_length=0, n_assigned_vals=0;
+
+  // Get the buffer size
+  if (libMesh::processor_id() == 0)
+    io.data(vector_length, "# vector length");
+  Parallel::broadcast(vector_length,0);
+  
+
+  std::vector<Number> input_buffer;
+  std::vector<std::vector<unsigned int> > recv_ids(libMesh::n_processors());
+  std::vector<unsigned int> idx_map;
+
+
+  // Loop over each variable in the system, and then each node/element in the mesh.
+  for (unsigned int var=0; var<n_vars; var++)
+    {
+      //---------------------------------
+      // Collect the values for all nodes
+      const unsigned int n_nodes = this->get_mesh().n_nodes();      
+      unsigned int first_node=0, last_node=0;
+
+      for (unsigned int blk=0; last_node<n_nodes; blk++)
+	{
+	  std::cout << "Reading node block " << blk << std::endl;
+	  
+	  // Each processor should build up its transfer buffers for its
+	  // local nodes in [first_node,last_node).
+	  first_node = blk*io_blksize;
+	  last_node  = std::min((blk+1)*io_blksize,n_nodes);
+	  
+	  // Clear the transfer buffers for this block.
+	  recv_ids[libMesh::processor_id()].clear();
+
+	  MeshBase::const_node_iterator
+	    it  = this->get_mesh().local_nodes_begin(),
+	    end = this->get_mesh().local_nodes_end();
+
+	  for (; it!=end; ++it)
+	    if (((*it)->id() >= first_node) && /* node in [first_node,last_node) */
+		((*it)->id() <   last_node) &&
+		(*it)->n_comp(sys_num,var))    /* var has n_comp components on this node */
+	      {
+		recv_ids[libMesh::processor_id()].push_back((*it)->id());
+		recv_ids[libMesh::processor_id()].push_back((*it)->n_comp(sys_num, var));
+	      }
+
+	  // Get the recv_ids for all other processors.
+	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	    {
+	      unsigned int curr_vec_size = recv_ids[pid].size();
+	      Parallel::broadcast(curr_vec_size, pid);
+	      recv_ids[pid].resize(curr_vec_size);
+	      Parallel::broadcast(recv_ids[pid], pid);
+	    }
+
+	  // create the idx map for all processors -- this will match the ordering
+	  // in the input buffer chunk which we are about to read.
+	  idx_map.resize(2*io_blksize); std::fill (idx_map.begin(), idx_map.end(), libMesh::invalid_uint);
+	  unsigned int tot_n_comp=0;
+	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	    for (unsigned int idx=0; idx<recv_ids[pid].size(); idx+=2)
+	      {
+		const unsigned int local_idx = recv_ids[pid][idx+0]-first_node;
+		assert (local_idx < std::min(io_blksize,n_nodes));
+		const unsigned int n_comp    = recv_ids[pid][idx+1];
+		
+		idx_map[2*local_idx+0] = pid;
+		idx_map[2*local_idx+1] = n_comp;
+
+		tot_n_comp += n_comp;
+	      }
+	  
+	  // Processor 0 will read the block from the buffer stream and send it to all other processors
+	  input_buffer.resize (tot_n_comp);
+	  if (libMesh::processor_id() == 0)
+	    io.data_stream(input_buffer.empty() ? NULL : &input_buffer[0], tot_n_comp);
+	  Parallel::broadcast(input_buffer,0);
+
+	  // We will traverse the idx_map and step through each of the input components.
+	  // A subset of the components (potentially null set) will match our nodes in
+	  // [first_node,last_node), and we will assign the corresponding values from
+	  // the input buffer.
+	  it = this->get_mesh().local_nodes_begin();
+	  std::vector<Number>::const_iterator next_val = input_buffer.begin();
+	  unsigned int processed_size=0;
+	  
+	  for (unsigned int idx=0; idx<idx_map.size(); idx+=2)
+	    if (idx_map[idx] != libMesh::invalid_uint) // this could happen when a local node
+	      {                                        // has no components for the current variable
+		const unsigned int pid    = idx_map[idx+0];
+		const unsigned int n_comp = idx_map[idx+1];
+		
+		if (pid == libMesh::processor_id()) assert (it != end);
+		
+		for (unsigned int comp=0; comp<n_comp; comp++)
+		  {
+		    assert (next_val != input_buffer.end());
+		    const Number value = *next_val;
+		    ++next_val; // This must occur irrespective of pid
+                                // to keep the idx_map and the input values sync'ed
+		    processed_size++;
+		    
+		    // If this DOF is one of ours then keep the value.
+		    if (pid == libMesh::processor_id())
+		      {
+			const unsigned int dof_index = (*it)->dof_number (sys_num, var, comp);
+			assert (dof_index >= vec.first_local_index());
+			assert (dof_index <  vec.last_local_index());
+			
+			vec.set (dof_index, value);
+			n_assigned_vals++;
+		      }
+		  }	      
+		if (pid == libMesh::processor_id()) ++it;	      
+	      }
+	  assert (processed_size == input_buffer.size());
+	} // end node block loop
+
+      
+      
+      //------------------------------------
+      // Collect the values for all elements
+      const unsigned int n_elem = this->get_mesh().n_elem();      
+      unsigned int first_elem=0, last_elem=0;
+
+      for (unsigned int blk=0; last_elem<n_elem; blk++)
+	{
+	  std::cout << "Reading elem block " << blk << std::endl;
+	  
+	  // Each processor should build up its transfer buffers for its
+	  // local elements in [first_elem,last_elem).
+	  first_elem = blk*io_blksize;
+	  last_elem  = std::min((blk+1)*io_blksize,n_elem);
+	  
+	  // Clear the transfer buffers for this block.
+	  recv_ids[libMesh::processor_id()].clear();
+
+	  MeshBase::const_element_iterator
+	    it  = this->get_mesh().local_elements_begin(),
+	    end = this->get_mesh().local_elements_end();
+
+	  for (; it!=end; ++it)
+	    if (((*it)->id() >= first_elem) && /* elem in [first_elem,last_elem) */
+		((*it)->id() <   last_elem) &&
+		(*it)->n_comp(sys_num,var))    /* var has n_comp components on this elem */
+	      {
+		recv_ids[libMesh::processor_id()].push_back((*it)->id());
+		recv_ids[libMesh::processor_id()].push_back((*it)->n_comp(sys_num, var));
+	      }
+
+	  // Get the recv_ids for all other processors.
+	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	    {
+	      unsigned int curr_vec_size = recv_ids[pid].size();
+	      Parallel::broadcast(curr_vec_size, pid);
+	      recv_ids[pid].resize(curr_vec_size);
+	      Parallel::broadcast(recv_ids[pid], pid);
+	    }
+
+	  // create the idx map for all processors -- this will match the ordering
+	  // in the input buffer chunk which we are about to read.
+	  idx_map.resize(2*io_blksize); std::fill (idx_map.begin(), idx_map.end(), libMesh::invalid_uint);
+	  unsigned int tot_n_comp=0;
+	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	    for (unsigned int idx=0; idx<recv_ids[pid].size(); idx+=2)
+	      {
+		const unsigned int local_idx = recv_ids[pid][idx+0]-first_elem;
+		assert (local_idx < std::min(io_blksize,n_elem));
+		const unsigned int n_comp    = recv_ids[pid][idx+1];
+		
+		idx_map[2*local_idx+0] = pid;
+		idx_map[2*local_idx+1] = n_comp;
+
+		tot_n_comp += n_comp;
+	      }
+	  
+	  // Processor 0 will read the block from the buffer stream and send it to all other processors
+	  input_buffer.resize (tot_n_comp);
+	  if (libMesh::processor_id() == 0)
+	    io.data_stream(input_buffer.empty() ? NULL : &input_buffer[0], tot_n_comp);
+	  Parallel::broadcast(input_buffer,0);
+
+	  // We will traverse the idx_map and step through each of the input components.
+	  // A subset of the components (potentially null set) will match our elem in
+	  // [first_elem,last_elem), and we will assign the corresponding values from
+	  // the input buffer.
+	  it = this->get_mesh().local_elements_begin();
+	  std::vector<Number>::const_iterator next_val = input_buffer.begin();
+	  unsigned int processed_size=0;
+	  
+	  for (unsigned int idx=0; idx<idx_map.size(); idx+=2)
+	    if (idx_map[idx] != libMesh::invalid_uint) // this could happen when a local elem
+	      {                                        // has no components for the current variable
+		const unsigned int pid    = idx_map[idx+0];
+		const unsigned int n_comp = idx_map[idx+1];
+		
+		if (pid == libMesh::processor_id()) assert (it != end);
+		
+		for (unsigned int comp=0; comp<n_comp; comp++)
+		  {
+		    assert (next_val != input_buffer.end());
+		    const Number value = *next_val;
+		    ++next_val; // This must occur irrespective of pid
+                                // to keep the idx_map and the input values sync'ed
+		    processed_size++;
+		    
+		    // If this DOF is one of ours then keep the value.
+		    if (pid == libMesh::processor_id())
+		      {
+			const unsigned int dof_index = (*it)->dof_number (sys_num, var, comp);
+			assert (dof_index >= vec.first_local_index());
+			assert (dof_index <  vec.last_local_index());
+			
+			vec.set (dof_index, value);
+			n_assigned_vals++;
+		      }
+		  }	      
+		if (pid == libMesh::processor_id()) ++it;	      
+	      }
+	  assert (processed_size == input_buffer.size());
+	} // end elem block loop
+    } // end variable loop   
 }
 
 
@@ -436,7 +727,7 @@ void System::write(Xdr& io,
 		   const bool write_additional_data) const
 {
   /**
-   * This program implements the output of a
+   * This method implements the output of a
    * System object, embedded in the output of
    * an EquationSystems<T_sys>.  This warrants some 
    * documentation.  The output of this part 
@@ -517,7 +808,7 @@ void System::write(Xdr& io,
 
 	// set up the comment
       {
-	comment  = "# Name, Variable No. ";
+	comment  = "#   Name, Variable No. ";
 	std::sprintf(buf, "%d", var);
 	comment += buf;
 	comment += ", System \"";
@@ -539,7 +830,7 @@ void System::write(Xdr& io,
 
       // set up the comment
       {
-	comment = "# Approximation Order, Variable \"";
+	comment = "#     Approximation Order, Variable \"";
 	std::sprintf(buf, "%s", var_name.c_str());
 	comment += buf;
 	comment += "\", System \"";
@@ -558,7 +849,7 @@ void System::write(Xdr& io,
        * do the same for radial_order
        */
       {
-	comment = "# Radial Approximation Order, Variable \"";
+	comment = "#     Radial Approximation Order, Variable \"";
 	std::sprintf(buf, "%s", var_name.c_str());
 	comment += buf;
 	comment += "\", System \"";
@@ -581,7 +872,7 @@ void System::write(Xdr& io,
 
       // set up the comment
       {
-	comment = "# FE Family, Variable \"";
+	comment = "#     FE Family, Variable \"";
 	std::sprintf(buf, "%s", var_name.c_str());
 	comment += buf;
 	comment += "\", System \"";
@@ -599,7 +890,7 @@ void System::write(Xdr& io,
 #ifdef ENABLE_INFINITE_ELEMENTS
 
       {
-	comment = "# Radial FE Family, Variable \"";
+	comment = "#     Radial FE Family, Variable \"";
 	std::sprintf(buf, "%s", var_name.c_str());
 	comment += buf;
 	comment += "\", System \"";
@@ -613,7 +904,7 @@ void System::write(Xdr& io,
       io.data (radial_fam, comment.c_str());
 
       {
-	comment = "# Infinite Mapping Type, Variable \"";
+	comment = "#     Infinite Mapping Type, Variable \"";
 	std::sprintf(buf, "%s", var_name.c_str());
 	comment += buf;
 	comment += "\", System \"";
@@ -687,8 +978,12 @@ void System::write(Xdr& io,
 void System::write_data (Xdr& io,
 			 const bool write_additional_data) const
 {
+  // This is deprecated -- use write_parallel_data() instead.  This will be kept for reference
+  // for a little while, then dropped.  There is no need call this method any more.
+  deprecated();
+  
   /**
-   * This program implements the output of the vectors
+   * This method implements the output of the vectors
    * contained in this System object, embedded in the 
    * output of an EquationSystems<T_sys>. 
    *
@@ -892,7 +1187,7 @@ void System::write_parallel_data (Xdr& io,
 				  const bool write_additional_data) const
 {
   /**
-   * This program implements the output of the vectors
+   * This method implements the output of the vectors
    * contained in this System object, embedded in the 
    * output of an EquationSystems<T_sys>. 
    *
@@ -962,8 +1257,6 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
   
   assert (io.writing());
 
-  std::string comment;
-
   const unsigned int sys_num = this->number();
   const unsigned int n_vars  = this->n_vars();
 
@@ -972,16 +1265,18 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 
   std::vector<std::vector<unsigned int> > recv_ids (libMesh::n_processors());
   std::vector<std::vector<Number> >       recv_vals(libMesh::n_processors());
-  std::vector<std::vector<Number>::const_iterator>  val_iters; val_iters.reserve(libMesh::n_processors());
+  std::vector<std::vector<Number>::iterator>  val_iters; val_iters.reserve(libMesh::n_processors());
   std::vector<unsigned int> &idx_map     = xfer_ids;
   std::vector<Number>       &output_vals = xfer_vals;
+  
+  unsigned int vec_length = vec.size();
+  io.data (vec_length, "# vector length");
 
+  unsigned int written_length = 0;
+  
   // Loop over each variable in the system, and then each node/element in the mesh.
   for (unsigned int var=0; var<n_vars; var++)
     {
-      unsigned int vec_length = vec.size();
-      io.data (vec_length, "# vector length");
-
       //---------------------------------
       // Collect the values for all nodes
       const unsigned int n_nodes = this->get_mesh().n_nodes();      
@@ -989,7 +1284,7 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 
       for (unsigned int blk=0; last_node<n_nodes; blk++)
 	{
-	  std::cout << "Writing node block " << blk << std::endl;
+ 	  //std::cout << "Writing node block " << blk << " for var " << var << std::endl;
 	  
 	  // Each processor should build up its transfer buffers for its
 	  // local nodes in [first_node,last_node).
@@ -999,6 +1294,24 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 	  // Clear the transfer buffers for this block.
 	  xfer_ids.clear(); xfer_vals.clear();
 
+// 	  if (blk == 0)
+// 	  {	    
+// 	    for (unsigned int n=0; n<n_nodes; n++)
+// 	      {
+// 		MPI_Barrier(libMesh::COMM_WORLD);
+// 		MeshBase::const_node_iterator
+// 		  it  = this->get_mesh().local_nodes_begin(),
+// 		  end = this->get_mesh().local_nodes_end();
+	    
+// 		for (; it != end; ++it)
+// 		  if ((*it)->id() == n)
+// 		    {
+// 		      std::cerr << "pid=" << libMesh::processor_id() << ", (*it)->id()=" <<  (*it)->id() << " " << **it;
+// 		      std::cerr.flush();
+// 		    }
+// 	      }
+// 	  }
+	  
 	  MeshBase::const_node_iterator
 	    it  = this->get_mesh().local_nodes_begin(),
 	    end = this->get_mesh().local_nodes_end();
@@ -1013,8 +1326,8 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 
 		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
 		  {
-		    assert ((*it)->dof_number(sys_num, var, comp) >= this->solution->first_local_index());
-		    assert ((*it)->dof_number(sys_num, var, comp) <  this->solution->last_local_index());
+		    assert ((*it)->dof_number(sys_num, var, comp) >= vec.first_local_index());
+		    assert ((*it)->dof_number(sys_num, var, comp) <  vec.last_local_index());
 		    xfer_vals.push_back(vec((*it)->dof_number(sys_num, var, comp)));
 		  }
 	      }
@@ -1026,8 +1339,11 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 	  // we could over-size the recv buffers based on
 	  // some maximum size to avoid these communications
 	  std::vector<unsigned int> ids_size, vals_size;
-	  Parallel::gather (0, static_cast<unsigned int>(xfer_ids.size()),  ids_size);
-	  Parallel::gather (0, static_cast<unsigned int>(xfer_vals.size()), vals_size);
+	  const unsigned int my_ids_size  = xfer_ids.size();
+	  const unsigned int my_vals_size = xfer_vals.size();
+	  
+	  Parallel::gather (0, my_ids_size,  ids_size);
+	  Parallel::gather (0, my_vals_size, vals_size);
 	  
 	  // Note that we will actually send/receive to ourself if we are
 	  // processor 0, so let's use nonblocking receives.
@@ -1075,11 +1391,11 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 #endif
 	      
 	      // Write the values in this block.
-	      unsigned int tot_id_size = 0, tot_val_size=0;
+	      unsigned int tot_id_size=0, tot_val_size=0;
 	      val_iters.clear();
 	      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 		{
-		  tot_id_size  += recv_ids[pid].size();
+		  tot_id_size  += recv_ids[pid].size();		    
 		  tot_val_size += recv_vals[pid].size();
 		  val_iters.push_back(recv_vals[pid].begin());
 		}
@@ -1088,46 +1404,52 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 
 	      // Create a map to avoid searching.  This will allow us to
 	      // traverse the received values in [first_node,last_node) order.
-	      idx_map.resize(tot_id_size);
-	      output_vals.clear(); output_vals.reserve (tot_val_size);
+	      idx_map.resize(3*io_blksize); std::fill (idx_map.begin(), idx_map.end(), libMesh::invalid_uint);
 	      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 		for (unsigned int idx=0; idx<recv_ids[pid].size(); idx+=2)
 		  {
-		    const unsigned int local_idx = recv_ids[pid][idx]-first_node;
+		    const unsigned int local_idx = recv_ids[pid][idx+0]-first_node;
 		    assert (local_idx < std::min(io_blksize,n_nodes));
 		    const unsigned int n_comp    = recv_ids[pid][idx+1];
 
-		    idx_map[2*local_idx+0] = pid;
-		    idx_map[2*local_idx+1] = n_comp;
+		    idx_map[3*local_idx+0] = pid;
+		    idx_map[3*local_idx+1] = n_comp;
+		    idx_map[3*local_idx+2] = std::distance(recv_vals[pid].begin(), val_iters[pid]);
+		    val_iters[pid] += n_comp;
 		  }
 
-	      for (unsigned int idx=0; idx<idx_map.size(); idx+=2)
-		{
-		  const unsigned int pid    = idx_map[idx+0];
-		  const unsigned int n_comp = idx_map[idx+1];
-
-		  for (unsigned int comp=0; comp<n_comp; comp++)
-		    {
-		      assert (val_iters[pid] != recv_vals[pid].end());
-		      output_vals.push_back(*val_iters[pid]);
-		      ++val_iters[pid];
-		    }
-		}
+	      output_vals.clear(); output_vals.reserve (tot_val_size);
+	      for (unsigned int idx=0; idx<idx_map.size(); idx+=3)
+		if (idx_map[idx] != libMesh::invalid_uint) // this could happen when a local node
+		  {                                        // has no components for the current variable
+		    const unsigned int pid       = idx_map[idx+0];
+		    const unsigned int n_comp    = idx_map[idx+1];
+		    const unsigned int first_pos = idx_map[idx+2];
+		    
+		    for (unsigned int comp=0; comp<n_comp; comp++)
+		      {
+			assert (first_pos + comp < recv_vals[pid].size());
+			output_vals.push_back(recv_vals[pid][first_pos + comp]);
+		      }
+		  }
+	      assert (output_vals.size() == tot_val_size);
+	      
 	      // write the stream
-	      io.data_stream (&output_vals[0], output_vals.size());
+	      io.data_stream (output_vals.empty() ? NULL : &output_vals[0], output_vals.size());
+	      written_length += output_vals.size();
 	    } // end processor 0 conditional block	  
 	} // end node block loop            
 
 
 
-      //---------------------------------
+      //------------------------------------
       // Collect the values for all elements
       const unsigned int n_elem = this->get_mesh().n_elem();      
       unsigned int first_elem=0, last_elem=0;
 
       for (unsigned int blk=0; last_elem<n_elem; blk++)
 	{
-	  std::cout << "Writing elem block " << blk << std::endl;
+ 	  //std::cout << "Writing elem block " << blk << " for var " << var << std::endl;
 	  
 	  // Each processor should build up its transfer buffers for its
 	  // local elem in [first_elem,last_elem).
@@ -1151,8 +1473,8 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 
 		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
 		  {
-		    assert ((*it)->dof_number(sys_num, var, comp) >= this->solution->first_local_index());
-		    assert ((*it)->dof_number(sys_num, var, comp) <  this->solution->last_local_index());
+		    assert ((*it)->dof_number(sys_num, var, comp) >= vec.first_local_index());
+		    assert ((*it)->dof_number(sys_num, var, comp) <  vec.last_local_index());
 		    xfer_vals.push_back(vec((*it)->dof_number(sys_num, var, comp)));
 		  }
 	      }
@@ -1213,7 +1535,7 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 #endif
 	      
 	      // Write the values in this block.
-	      unsigned int tot_id_size = 0, tot_val_size=0;
+	      unsigned int tot_id_size=0, tot_val_size=0;
 	      val_iters.clear();
 	      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 		{
@@ -1226,34 +1548,43 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
 
 	      // Create a map to avoid searching.  This will allow us to
 	      // traverse the received values in [first_elem,last_elem) order.
-	      idx_map.resize(tot_id_size);
-	      output_vals.clear(); output_vals.reserve (tot_val_size);
+	      idx_map.resize(3*io_blksize); std::fill (idx_map.begin(), idx_map.end(), libMesh::invalid_uint);
 	      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 		for (unsigned int idx=0; idx<recv_ids[pid].size(); idx+=2)
 		  {
-		    const unsigned int local_idx = recv_ids[pid][idx]-first_elem;
-		    assert (local_idx < std::min(io_blksize,n_elem));
+		    const unsigned int local_idx = recv_ids[pid][idx+0]-first_node;
+		    assert (local_idx < std::min(io_blksize,n_nodes));
 		    const unsigned int n_comp    = recv_ids[pid][idx+1];
 
-		    idx_map[2*local_idx+0] = pid;
-		    idx_map[2*local_idx+1] = n_comp;
+		    idx_map[3*local_idx+0] = pid;
+		    idx_map[3*local_idx+1] = n_comp;
+		    idx_map[3*local_idx+2] = std::distance(recv_vals[pid].begin(), val_iters[pid]);
+		    val_iters[pid] += n_comp;
 		  }
 
-	      for (unsigned int idx=0; idx<idx_map.size(); idx+=2)
-		{
-		  const unsigned int pid    = idx_map[idx+0];
-		  const unsigned int n_comp = idx_map[idx+1];
-
-		  for (unsigned int comp=0; comp<n_comp; comp++)
-		    {
-		      assert (val_iters[pid] != recv_vals[pid].end());
-		      output_vals.push_back(*val_iters[pid]);
-		      ++val_iters[pid];
-		    }
-		}
+	      output_vals.clear(); output_vals.reserve (tot_val_size);
+	      for (unsigned int idx=0; idx<idx_map.size(); idx+=3)
+		if (idx_map[idx] != libMesh::invalid_uint) // this could happen when a local node
+		  {                                        // has no components for the current variable
+		    const unsigned int pid       = idx_map[idx+0];
+		    const unsigned int n_comp    = idx_map[idx+1];
+		    const unsigned int first_pos = idx_map[idx+2];
+		    
+		    for (unsigned int comp=0; comp<n_comp; comp++)
+		      {
+			assert (first_pos + comp < recv_vals[pid].size());
+			output_vals.push_back(recv_vals[pid][first_pos + comp]);
+		      }
+		  }
+	      assert (output_vals.size() == tot_val_size);
+	      
 	      // write the stream
-	      io.data_stream (&output_vals[0], output_vals.size());
+	      io.data_stream (output_vals.empty() ? NULL : &output_vals[0], output_vals.size());
+	      written_length += output_vals.size();
 	    } // end processor 0 conditional block	  
 	} // end elem block loop            
-    } // end variable loop   
+    } // end variable loop
+
+  if (libMesh::processor_id() == 0)
+    assert(written_length == vec_length);
 }

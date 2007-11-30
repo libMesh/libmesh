@@ -584,7 +584,14 @@ private:
   
 
   /**
-   * Writes vectors for this System.
+   * Reads a vector for this System.
+   * This method may safely be called on a distributed-memory mesh.
+   */
+  void read_parallel_vector (Xdr& io,
+			     NumericVector<Number> &vec);
+
+  /**
+   * Writes a vector for this System.
    * This method may safely be called on a distributed-memory mesh.
    */
   void write_parallel_vector (Xdr& io,
