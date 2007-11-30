@@ -44,14 +44,13 @@ namespace {
   //   when performing parallel IO.
   // - This parameter only loosely affects the size of the actual IO buffer as this depends
   //   on the number of components a given variable has for the nodes/elements in the block.
-  // - When writing, processor 0 uses an ID map which is 3*io_blksize*sizeof(unsigned int) bytes
+  // - When reading/writing each processor uses an ID map which is 3*io_blksize*sizeof(unsigned int) bytes
   //   long, so if io_blksize=256000 we would expect that buffer alone to be ~3Mb.
   // - In general, an increase in io_blksize should increase the efficiency of the parallel
   //   read/writes by reducing the number of MPI messages at the expense of memory.
   // - If the library exhausts memory during IO you might reduce this parameter.
-
-#warning "Increase to something usable for final checkin"
-  const unsigned int io_blksize = 2; // 256000;
+  
+  const unsigned int io_blksize = 256000;
 }
 
 
