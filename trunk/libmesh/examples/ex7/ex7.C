@@ -83,6 +83,10 @@
 // data about the mesh when reading in files, etc.
 #include "mesh_data.h"
 
+// This problem is only defined on complex-valued fields, for
+// which libMesh must be configured with Number == complex.
+
+#ifdef USE_COMPLEX_NUMBERS
 // Function prototype.  This is the function that will assemble
 // the mass, damping and stiffness matrices.  It will <i>not</i>
 // form an overall system matrix ready for solution.
@@ -94,6 +98,7 @@ void assemble_helmholtz(EquationSystems& es,
 // to the overall matrix, which then renders ready for solution.
 void add_M_C_K_helmholtz(EquationSystems& es,
 			 const std::string& system_name);
+#endif
 
 // Begin the main program.  Note that this example only
 // works correctly if complex numbers have been enabled
@@ -278,13 +283,13 @@ int main (int argc, char** argv)
 }
 
 
+#ifdef USE_COMPLEX_NUMBERS
 // Here we define the matrix assembly routine for
 // the Helmholtz system.  This function will be
 // called to form the stiffness matrix and right-hand side.
 void assemble_helmholtz(EquationSystems& es,
 			const std::string& system_name)
 {
-#ifdef USE_COMPLEX_NUMBERS
     
   // It is a good idea to make sure we are assembling
   // the proper system.
@@ -554,7 +559,6 @@ void assemble_helmholtz(EquationSystems& es,
   }
 
   // All done!
-#endif
 }
 
 
@@ -564,8 +568,6 @@ void assemble_helmholtz(EquationSystems& es,
 void add_M_C_K_helmholtz(EquationSystems& es,
 			 const std::string& system_name)
 {
-#ifdef USE_COMPLEX_NUMBERS
-
   START_LOG("init phase","add_M_C_K_helmholtz");
   
   // It is a good idea to make sure we are assembling
@@ -639,6 +641,6 @@ void add_M_C_K_helmholtz(EquationSystems& es,
   STOP_LOG("global matrix & vector additions","add_M_C_K_helmholtz");
   
   // The "matrix" and "rhs" are now ready for solution   
-#endif
 }
 
+#endif // USE_COMPLEX_NUMBERS
