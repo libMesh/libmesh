@@ -34,6 +34,7 @@
 #include "dof_map.h"
 #include "mesh_base.h"
 #include "elem.h"
+#include "libmesh_logging.h"
 
 // Include the systems before this one to avoid
 // overlapping forward declarations.
@@ -266,9 +267,13 @@ void EquationSystems::allgather ()
 
 void EquationSystems::update ()
 {
+  START_LOG("update()","EquationSystems");
+  
   // Localize each system's vectors
   for (unsigned int i=0; i != this->n_systems(); ++i)
     this->get_system(i).update();
+  
+  STOP_LOG("update()","EquationSystems");
 }
 
 
