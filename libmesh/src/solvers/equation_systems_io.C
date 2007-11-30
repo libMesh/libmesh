@@ -27,6 +27,11 @@
 
 // Local Includes
 #include "equation_systems.h"
+#include "mesh_base.h"
+#include "mesh_tools.h"
+#include "parallel_mesh.h"
+#include "parallel.h"
+#include "serial_mesh.h"
 #include "xdr_cxx.h"
 
 // Forward Declarations
@@ -40,29 +45,32 @@ void EquationSystems::read (const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
                             const unsigned int read_flags)
 {
+  START_LOG("read()","EquationSystems");
+  
   /**
    * This program implements the output of an 
    * EquationSystems object.  This warrants some 
    * documentation.  The output file essentially
-   * consists of 10 sections:
+   * consists of 11 sections:
      \verbatim
-     1.) The number of individual equation systems (unsigned int)
+     1.) A version header (for non-'legacy' formats, libMesh-0.7.0 and greater). 
+     2.) The number of individual equation systems (unsigned int)
      
        for each system
                                                           
-        2.)  The name of the system (string)
-        3.)  The type of the system (string)
+        3.)  The name of the system (string)
+        4.)  The type of the system (string)
     
         handled through System::read():
     
      +-------------------------------------------------------------+
-     |  4.) The number of variables in the system (unsigned int)   |
+     |  5.) The number of variables in the system (unsigned int)   |
      |                                                             |
      |   for each variable in the system                           |
      |                                                             |
-     |    5.) The name of the variable (string)                   |
+     |    6.) The name of the variable (string)                    |
      |                                                             |
-     |    6.) Combined in an FEType:                              |
+     |    7.) Combined in an FEType:                               |
      |         - The approximation order(s) of the variable (Order |
      |           Enum, cast to int/s)                              |
      |         - The finite element family/ies of the variable     |
@@ -70,27 +78,27 @@ void EquationSystems::read (const std::string& name,
      |                                                             |
      |   end variable loop                                         |
      |                                                             |
-     | 7.) The number of additional vectors (unsigned int),       |
+     | 8.) The number of additional vectors (unsigned int),        |
      |                                                             |
      |    for each additional vector in the equation system object |
      |                                                             |
-     |    8.) the name of the additional vector  (string)         |
+     |    9.) the name of the additional vector  (string)          |
      +-------------------------------------------------------------+
     
      end system loop
     
     
-       for each system, handled through System::read_data():
+       for each system, handled through System::read_parallel_data():
        
-     +-------------------------------------------------------------+
-     | 9.) The global solution vector, re-ordered to be node-major|
-     |     (More on this later.)                                   |
-     |                                                             |
-     |    for each additional vector in the equation system object |
-     |                                                             |
-     |    10.) The global additional vector, re-ordered to be      |
-     |         node-major (More on this later.)                    |
-     +-------------------------------------------------------------+
+     +--------------------------------------------------------------+
+     | 10.) The global solution vector, re-ordered to be node-major |
+     |     (More on this later.)                                    |
+     |                                                              |
+     |    for each additional vector in the equation system object  |
+     |                                                              |
+     |    11.) The global additional vector, re-ordered to be       |
+     |         node-major (More on this later.)                     |
+     +--------------------------------------------------------------+
     
      end system loop
    \endverbatim
@@ -108,6 +116,9 @@ void EquationSystems::read (const std::string& name,
    const bool read_additional_data 
                           = read_flags & EquationSystems::READ_ADDITIONAL_DATA;
 
+
+   static const bool read_legacy_restart_format = libMesh::on_command_line ("--read_legacy_restart_format");
+   
   // Nasty hack for reading/writing zipped files
   std::string new_name = name;
   if (name.size() - name.rfind(".bz2") == 4)
@@ -127,42 +138,48 @@ void EquationSystems::read (const std::string& name,
     }
 
   
-  Xdr io (new_name, mode);
-
+  Xdr io ((libMesh::processor_id() == 0) ? name : "", mode);
   assert (io.reading());
 	  
-  // 1.)  
-  //
-  // Read the number of equation systems
   {
+    // 1.)
+    // Read the version header.
+    std::string version = "legacy";
+    if (!read_legacy_restart_format)
+      {
+	if (libMesh::processor_id() == 0) io.data(version);	
+	Parallel::broadcast(version);
+      }
+    
+    // 2.)  
+    // Read the number of equation systems
     unsigned int n_sys=0;
-  
-    io.data (n_sys);
+    if (libMesh::processor_id() == 0) io.data (n_sys);
+    Parallel::broadcast(n_sys);
 
     for (unsigned int sys=0; sys<n_sys; sys++)
       {
-	// 2.)
-	// Read the name of the sys-th equation system
-	std::string sys_name;
-      
-	io.data (sys_name);
-      
 	// 3.)
-	// Read the type of the sys-th equation system
-	std::string sys_type;
+	// Read the name of the sys-th equation system
+	std::string sys_name;      
+	if (libMesh::processor_id() == 0) io.data (sys_name);
+	Parallel::broadcast(sys_name);
 	
-	io.data (sys_type);
+	// 4.)
+	// Read the type of the sys-th equation system
+	std::string sys_type;	
+	if (libMesh::processor_id() == 0) io.data (sys_type);
+	Parallel::broadcast(sys_type);
 	
 	if (read_header)
 	  this->add_system (sys_type, sys_name);
 
-	// 4.) - 8.)
-	// Let System::read() do the job
-	System& new_system = this->get_system(sys_name);
-	  
-	new_system.read (io,
-			 read_header,
-			 read_additional_data);
+	// 5.) - 9.)
+	// Let System::read_header() do the job
+	System& new_system = this->get_system(sys_name);	  
+	new_system.read_header (io,
+				read_header,
+				read_additional_data);
       }
   }
       
@@ -174,18 +191,49 @@ void EquationSystems::read (const std::string& name,
   if (read_header) 
     this->init();
 
-
-
-  // 9.) & 10.)
+  // 10.) & 11.)
   // Read and set the numeric vector values
   if (read_data)
     {
+      // the EquationSystems::read() method should look constant from the mesh
+      // perspective, but we need to assign a temporary numbering to the nodes
+      // and elements in the mesh, which requires that we abuse const_cast
+      if (!read_legacy_restart_format)
+	{
+	  MeshBase &mesh = const_cast<MeshBase&>(this->get_mesh());
+	  MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
+	}
+   
       std::map<std::string, System*>::iterator
 	pos = _systems.begin();
       
       for (; pos != _systems.end(); ++pos)
-	pos->second->read_data (io,
-				read_additional_data);       
+	if (read_legacy_restart_format)
+	  {
+	    deprecated();
+	    pos->second->read_legacy_data (io, read_additional_data);
+	  }
+	else
+	  pos->second->read_parallel_data (io, read_additional_data);
+
+      // Undo the temporary numbering.
+      if (!read_legacy_restart_format)
+	if (dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh)))
+	  {
+	    ParallelMesh *mesh = dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh));    
+	    MeshTools::Private::fix_broken_node_and_element_numbering(*mesh);
+	  }
+	else if (dynamic_cast<SerialMesh*>(const_cast<MeshBase*>(&_mesh)))
+	  {
+	    SerialMesh *mesh = dynamic_cast<SerialMesh*>(const_cast<MeshBase*>(&_mesh));    
+	    MeshTools::Private::fix_broken_node_and_element_numbering(*mesh);
+	  }
+	else
+	  {
+	    std::cerr << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
+		      << std::endl;
+	    error();
+	  }	  
     }  
 
   // If we temporarily decompressed a .bz2 file, remove the
@@ -193,21 +241,11 @@ void EquationSystems::read (const std::string& name,
   if (name.size() - name.rfind(".bz2") == 4)
     std::remove(new_name.c_str());
 
+  STOP_LOG("read()","EquationSystems");
+  
   // Localize each system's data
   this->update();
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -215,34 +253,30 @@ void EquationSystems::write(const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
                             const unsigned int write_flags) const
 {
-  // Currently we only support I/O in serial
-  // So we're going to horribly abuse const_cast and change
-  // that
-  const_cast<EquationSystems*>(this)->allgather();
-
   /**
    * This program implements the output of an 
    * EquationSystems object.  This warrants some 
    * documentation.  The output file essentially
-   * consists of 10 sections:
+   * consists of 11 sections:
    \verbatim
-     1.) The number of individual equation systems (unsigned int)
+     1.) The version header.
+     2.) The number of individual equation systems (unsigned int)
      
        for each system
                                                           
-        2.)  The name of the system (string)            
-        3.)  The type of the system (string)            
+        3.)  The name of the system (string)            
+        4.)  The type of the system (string)            
    
         handled through System::read():
    
      +-------------------------------------------------------------+
-     |  4.) The number of variables in the system (unsigned int)   |
+     |  5.) The number of variables in the system (unsigned int)   |
      |                                                             |
      |   for each variable in the system                           |
      |                                                             |
-     |    5.) The name of the variable (string)                   |
+     |    6.) The name of the variable (string)                    |
      |                                                             |
-     |    6.) Combined in an FEType:                              |
+     |    7.) Combined in an FEType:                               |
      |         - The approximation order(s) of the variable (Order |
      |           Enum, cast to int/s)                              |
      |         - The finite element family/ies of the variable     |
@@ -250,27 +284,27 @@ void EquationSystems::write(const std::string& name,
      |                                                             |
      |   end variable loop                                         |
      |                                                             |
-     | 7.) The number of additional vectors (unsigned int),       |
+     | 8.) The number of additional vectors (unsigned int),        |
      |                                                             |
      |    for each additional vector in the equation system object |
      |                                                             |
-     |    8.) the name of the additional vector  (string)         |
+     |    9.) the name of the additional vector  (string)          |
      +-------------------------------------------------------------+
    
     end system loop
    
    
-    for each system, handled through System::read_data():
+    for each system, handled through System::write_parallel_data():
        
-     +-------------------------------------------------------------+
-     | 9.) The global solution vector, re-ordered to be node-major|
-     |     (More on this later.)                                   |
-     |                                                             |
-     |    for each additional vector in the equation system object |
-     |                                                             |
-     |    10.) The global additional vector, re-ordered to be      |
-     |         node-major (More on this later.)                    |
-     +-------------------------------------------------------------+
+     +--------------------------------------------------------------+
+     | 10.) The global solution vector, re-ordered to be node-major |
+     |     (More on this later.)                                    |
+     |                                                              |
+     |    for each additional vector in the equation system object  |
+     |                                                              |
+     |    11.) The global additional vector, re-ordered to be       |
+     |         node-major (More on this later.)                     |
+     +--------------------------------------------------------------+
 
     end system loop
    \endverbatim
@@ -281,7 +315,15 @@ void EquationSystems::write(const std::string& name,
    * ASCII output.  Thus this one section of code will write XDR or ASCII
    * files with no changes.
    */
-
+  
+  // the EquationSystems::write() method should look constant,
+  // but we need to assign a temporary numbering to the nodes
+  // and elements in the mesh, which requires that we abuse const_cast
+  {
+    MeshBase &mesh = const_cast<MeshBase&>(this->get_mesh());
+    MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
+  }
+  
    // set booleans from write_flags argument
    const bool write_data = write_flags & EquationSystems::WRITE_DATA;
    const bool write_additional_data 
@@ -291,90 +333,85 @@ void EquationSystems::write(const std::string& name,
   std::string new_name = name;
   if (name.size() - name.rfind(".bz2") == 4)
     new_name.erase(new_name.end() - 4, new_name.end());
-
+  
   // New scope so that io will close before we try to zip the file
   {
-  Xdr io(new_name, mode);
+    START_LOG("write()","EquationSystems");
 
-  assert (io.writing());
-
-  const unsigned int proc_id = libMesh::processor_id();
-  unsigned int n_sys         = this->n_systems();
-
-  std::map<std::string, System*>::const_iterator
-    pos = _systems.begin();
-  
-  std::string comment;
-  char buf[80];
-
-  // Only write the header information
-  // if we are processor 0.
-  if (proc_id == 0) 
-    {
-      // 1.)  
-      // Write the number of equation systems
-      io.data (n_sys, "# No. of Equation Systems");
-        
-
-      while (pos != _systems.end())
-	{
-	  // 2.)
-	  // Write the name of the sys_num-th system
-	  {
-	    const unsigned int sys_num = pos->second->number();
-	    std::string sys_name       = pos->first;
-
-	    comment =  "# Name, System No. ";
-	    std::sprintf(buf, "%d", sys_num);
-	    comment += buf;
-	  
-	    io.data (sys_name, comment.c_str());
-	  }
-
-
-	  
-	  // 3.)
-	  // Write the type of system handled
-	  {
-	    const unsigned int sys_num = pos->second->number();
-	    std::string sys_type       = pos->second->system_type();
-
-	    comment =  "# Type, System No. ";
-	    std::sprintf(buf, "%d", sys_num);
-	    comment += buf;
-	  
-	    io.data (sys_type, comment.c_str());
-	  }
-
-
-	
-	  // 4.) - 8.)
-	  //
-	  // Let System::write() do the job
-	  pos->second->write (io, write_additional_data);
-
-	  ++pos;
-	}
-    }
-
-
-
-
-  /**
-   // Start from the first system, again,
-   // to write vectors to disk, if wanted
-   */
-  pos = _systems.begin();
-
-  if (write_data)
-    for (; pos != _systems.end(); ++pos) 
+    Xdr io((libMesh::processor_id()==0) ? new_name : "", mode);    
+    assert (io.writing());
+    
+    const unsigned int proc_id = libMesh::processor_id();
+    unsigned int n_sys         = this->n_systems();
+    
+    std::map<std::string, System*>::const_iterator
+      pos = _systems.begin();
+    
+    std::string comment;
+    char buf[256];
+    
+    // Only write the header information
+    // if we are processor 0.
+    if (proc_id == 0) 
       {
-	// 9.) + 10.)
-	// Let System::write_data() do the job
-	pos->second->write_data (io,
-				 write_additional_data);
+	// 1.)
+	// Write the version header
+	std::string version = "libMesh-0.7.0+";	
+	io.data (version, "# File Format Identifier");
+	
+	// 2.)  
+	// Write the number of equation systems
+	io.data (n_sys, "# No. of Equation Systems");
+        
+	while (pos != _systems.end())
+	  {
+	    // 3.)
+	    // Write the name of the sys_num-th system
+	    {
+	      const unsigned int sys_num = pos->second->number();
+	      std::string sys_name       = pos->first;
+	      
+	      comment =  "# Name, System No. ";
+	      std::sprintf(buf, "%d", sys_num);
+	      comment += buf;
+	  
+	      io.data (sys_name, comment.c_str());
+	    }
+	  
+	    // 4.)
+	    // Write the type of system handled
+	    {
+	      const unsigned int sys_num = pos->second->number();
+	      std::string sys_type       = pos->second->system_type();
+
+	      comment =  "# Type, System No. ";
+	      std::sprintf(buf, "%d", sys_num);
+	      comment += buf;
+	  
+	      io.data (sys_type, comment.c_str());
+	    }
+	
+	    // 5.) - 9.)
+	    // Let System::write_header() do the job
+	    pos->second->write_header (io, write_additional_data);
+	    
+	    ++pos;
+	  }
       }
+
+    // Start from the first system, again,
+    // to write vectors to disk, if wanted
+    if (write_data)
+      for (pos = _systems.begin(); pos != _systems.end(); ++pos) 
+	{
+	  // 10.) + 11.)
+	  // Let System::write_parallel_data() do the job
+	  pos->second->write_parallel_data (io,write_additional_data);
+	}
+
+    STOP_LOG("write()","EquationSystems");
   }
+
 
   // Nasty hack for reading/writing zipped files
   if (name.size() - name.rfind(".bz2") == 4)
@@ -393,5 +430,25 @@ void EquationSystems::write(const std::string& name,
       MPI_Barrier(libMesh::COMM_WORLD);
 #endif
       STOP_LOG("system(bzip2)", "EquationSystems");
+    }
+
+  // the EquationSystems::write() method should look constant,
+  // but we need to undo the temporary numbering of the nodes
+  // and elements in the mesh, which requires that we abuse const_cast
+  if (dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh)))
+    {
+      ParallelMesh *mesh = dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh));    
+      MeshTools::Private::fix_broken_node_and_element_numbering(*mesh);
+    }
+  else if (dynamic_cast<SerialMesh*>(const_cast<MeshBase*>(&_mesh)))
+    {
+      SerialMesh *mesh = dynamic_cast<SerialMesh*>(const_cast<MeshBase*>(&_mesh));    
+      MeshTools::Private::fix_broken_node_and_element_numbering(*mesh);
+    }
+  else
+    {
+      std::cerr << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
+		<< std::endl;
+      error();
     }
 }
