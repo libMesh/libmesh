@@ -22,8 +22,7 @@
   <li> <a href="http://cfdlab.ae.utexas.edu/~roystgnr/sandia_libmesh.pdf">LibMesh Finite Element Library</a> (August 2007 seminar, Sandia National Laboratories)</li>
 </ul>
 
-
-<h2>Applications</h2>
+<h2>User Applications</h2>
 <ul>
 <!--   <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/adv_flows_project.pdf">Advanced Flows Class Project</a> (natural convection, 2002)</li> -->
 <!--   <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/siam_geo.pdf">SIAM Geosciences 2003</a></li> -->
@@ -31,6 +30,19 @@
   <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/seminar/talk.pdf">Finite Elements - Introduction and Applications</a> (April 2004 NASA/JSC technical seminar)</li>
   <li> <a href="http://ntrs.nasa.gov/search.jsp?N=4294668673">SUPG Finite Element Simulations of Compressible Flows for Aerothermodynamic Applications</a>, February 2007</li>
   <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/defense.pdf">Benjamin S. Kirk's PhD Dissertation Defense</a>, March 2007</li>
+</ul>
+
+<h2>Applications which use libMesh</h2>
+<ul>
+  <li> <a href="http://libmultiscale.gforge.inria.fr">libMultiScale</a> - multiscale modeling</li>
+   <ul>
+      <li><a href="http://libmultiscale.gforge.inria.fr/presentation-hpsec.pdf">High Performance Multiscale Simulation for Crack Propagation</a>, Guillaume Anciaux, Olivier Coulaud, and Jean Roman, 2006</li>
+      <li><a href="http://libmultiscale.gforge.inria.fr/talk.pdf">Simulation multi-échelles des solides par une approche couplée dynamique moléculaire/éléments finis. De la modélisation à la simulation haute performance</a>, Guillaume Anciaux's PhD Dissertation Defense, July 2007</li>
+   </ul>
+  <li><a href="http://octmesh.forja.rediris.es">OctMesh</a> - finite elements in Octave</li>
+    <ul>
+      <li> <a href="http://octmesh.forja.rediris.es/octmesh-cedya.pdf">OctMesh: a finite elements tool kit for Octave</a>, J. Rafael Rodríguez Galván, 2007</li>
+    </ul>
 </ul>
 
 
