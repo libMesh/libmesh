@@ -57,7 +57,13 @@ The University of Texas at Austin, August 2004.
 <br>
 <li>
   Benjamin S. Kirk, Graham F. Carey, 
-  <i>Development and Validation of a SUPG Finite Element Scheme for the Compressible Navier-Stokes Equations using a Modified Inviscid Flux Discretization.</i><a href="http://dx.doi.org/10.1002/fld.1635">IJNMF</a>, 2007. (<a href="http://cfdlab.ae.utexas.edu/~benkirk/2007_fins_IJNMF.pdf">preprint</a>)
+  <i>A Parallel, Adaptive Finite Element Scheme for Modeling Chemotactic Biological Systems</i>, submitted. (<a href="http://cfdlab.ae.utexas.edu/~benkirk/2008_chemotaxis_CNME.pdf">preprint</a>)
+</li>
+
+<br>
+<li>
+  Benjamin S. Kirk, Graham F. Carey, 
+  <i>Development and Validation of a SUPG Finite Element Scheme for the Compressible Navier-Stokes Equations using a Modified Inviscid Flux Discretization.</i> <a href="http://dx.doi.org/10.1002/fld.1635">IJNMF</a>, 2007. (<a href="http://cfdlab.ae.utexas.edu/~benkirk/2007_fins_IJNMF.pdf">preprint</a>)
 </li>
 
 <br>
