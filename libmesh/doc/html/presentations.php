@@ -16,10 +16,10 @@
 <h2>libMesh Overviews</h2>
 <ul>
   <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/libmesh_uwa03.pdf">libMesh Presentation</a> (from the June 2003 UWA Shortcourse)</li>
-  <li> <a href="http://cfdlab.ae.utexas.edu/~peterson/ERDC_talk.pdf">LibMesh Experience and Usage</a> (January 2007 ERDC course)</li>
+  <li> <a href="http://cfdlab.ae.utexas.edu/~peterson/ERDC_talk.pdf">libMesh Experience and Usage</a> (January 2007 ERDC course)</li>
   <li> <a href="http://cfdlab.ae.utexas.edu/~roystgnr/vicksburg.pdf">AMR Infrastructure Expansion, Adding Complexity</a> (January 2007 ERDC course)</li>
-  <li> <a href="http://cfdlab.ae.utexas.edu/~roystgnr/libmesh_intro.pdf">LibMesh Introduction</a> (June 2007 lecture, Num. Meth. for Transport in Semiconductors)</li>
-  <li> <a href="http://cfdlab.ae.utexas.edu/~roystgnr/sandia_libmesh.pdf">LibMesh Finite Element Library</a> (August 2007 seminar, Sandia National Laboratories)</li>
+  <li> <a href="http://cfdlab.ae.utexas.edu/~roystgnr/libmesh_intro.pdf">libMesh Introduction</a> (June 2007 lecture, Num. Meth. for Transport in Semiconductors)</li>
+  <li> <a href="http://cfdlab.ae.utexas.edu/~roystgnr/sandia_libmesh.pdf">libMesh Finite Element Library</a> (August 2007 seminar, Sandia National Laboratories)</li>
 </ul>
 
 <h2>User Applications</h2>
