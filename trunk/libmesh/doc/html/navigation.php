@@ -84,7 +84,8 @@ function load_style($root)
 <?php function make_footer() { ?>
 <hr>
 <i>Site Created By:</i>
-<a href="mailto:libmesh-users@lists.sourceforge.net">libMesh Developers</a><br>
+<!-- <a href="mailto:libmesh-users@lists.sourceforge.net">libMesh Developers</a><br> -->
+<a href="developers.php">libMesh Developers</a><br>
 <i><?php echo "Last modified: ".date( "F d Y H:i:s.", getlastmod() ); ?></i>
 
 <br>

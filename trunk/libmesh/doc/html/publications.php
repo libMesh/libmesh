@@ -11,7 +11,7 @@
 <?php make_navigation("publications",$root)?>
 
 <div class="content">
-<h1>Please use the following citation to reference LibMesh</h1>
+<h1>Please use the following citation to reference libMesh</h1>
 <ul>
 <li>
   B. Kirk, J. W. Peterson, R. H. Stogner, and G. F. Carey,
@@ -20,7 +20,7 @@
 <a href="http://dx.doi.org/10.1007/s00366-006-0049-3">Engineering with Computers</a>,
 vol. 22, no. 3--4, pp. 237--254, 2006. 	 (<a href="http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf">preprint</a>)
 <pre>
-@Article{LibMeshPaper,
+@Article{libMeshPaper,
   author = {B.~Kirk and J.~W.~Peterson and R.~H.~Stogner and G.~F.~Carey},
   title = {{\texttt{libMesh}: A C++ Library for Parallel Adaptive Mesh
            Refinement/Coarsening Simulations}},
@@ -36,7 +36,7 @@ vol. 22, no. 3--4, pp. 237--254, 2006. 	 (<a href="http://cfdlab.ae.utexas.edu/~
 </ul>
 
 <br>
-<h1>Publications by LibMesh Developers</h1>
+<h1>Publications by libMesh Developers</h1>
 
 <ul>
 
@@ -131,7 +131,7 @@ Volume 195, Issues 44-47, Pages 6463-6478, 2006.
         
 </ul>
 
-<h1>Publications and Preprints Using LibMesh</h1>
+<h1>Publications and Preprints Using libMesh</h1>
 
 <ul>
 <li>
@@ -171,7 +171,7 @@ First Canadian Student Conference on Biomedical Computing (CSCBC)</a>, 2005
 <br>
 <li>
 Jose Camata, Alvaro Coutinho, and Graham Carey,
-<i>Numerical Evaluation of the LCD Method Implemented in the LibMesh Library.</i>
+<i>Numerical Evaluation of the LCD Method Implemented in the libMesh Library.</i>
 <a href="http://www.inf.ufes.br/~avalli/papers/2005/CIL-0692.pdf.gz">CILAMCE</a> 2005.
 </li>
 
@@ -210,9 +210,9 @@ M.P. Luthi,
 
 <ul>
 <li>  A general <a href="howto/howto.pdf">HOWTO</a> document by M. Luthi containing some hints
-and programming tips for writing effective LibMesh programs. </li>
+and programming tips for writing effective libMesh programs. </li>
 
-<li>  A <a href="xda_format/xda_format.pdf">description</a> of the XDA file format used by LibMesh. </li>
+<li>  A <a href="xda_format/xda_format.pdf">description</a> of the XDA file format used by libMesh. </li>
 
 <li> Texas Advanced Computing Center <a href="http://www.tacc.utexas.edu/general/news/archive/20040112_01.php">press release</a> commemorating the launch of the Lonestar cluster. </li>
 
