@@ -74,14 +74,10 @@ goal of the library is to provide support for adaptive mesh refinement
 (AMR) computations in parallel while allowing a research scientist to
 focus on the physics they are modeling.
 
-<!-- Development began in March 2002 with the intent of providing a -->
-<!-- friendly interface to a number of high-quality software packages that -->
-<!-- are publicly available. -->
-
 <br>
 <br>
 <code>libMesh</code> currently supports 1D, 2D, and 3D steady and transient finite element simulations.
-The library makes use of high-quality, existing software whenever possible.
+The library makes use of high-quality, <a href="externalsoftware.php">existing software</a> whenever possible.
 <a href="http://www-unix.mcs.anl.gov/petsc/petsc-2">PETSc</a> is
 used for the solution of linear systems on both serial and
 parallel platforms, and
@@ -89,7 +85,6 @@ parallel platforms, and
 is included with the library to provide linear solver support on serial machines.
 An optional interface to <a href="http://www.grycap.upv.es/slepc">SLEPc</a> is also
 provided for solving both standard and generalized eigenvalue problems.
-A complete list of external applications used in the library may be found <a href="externalsoftware.php">here</a>.
 
 
 <br>
