@@ -50,8 +50,11 @@ Main features:
 
 <hr>
 <h2>Mesh Generation</h2>
-<h3>Triangle</h3> <a href="http://www.cs.cmu.edu/~quake/triangle.html">Triangle</a>
-<h3>Tetgen</h3> <a href="http://tetgen.berlios.de">Tetgen</a>
+<h3>Triangle</h3> <a href="http://www.cs.cmu.edu/~quake/triangle.html">Triangle</a> is the definitive two-dimensional delaunay triangulator written by Jonathan Richard Shewchuk. <code>libMesh</code> can use Triangle to produce Delaunay triangulizations for hybrid-element (not just triangles) input meshes. 
+
+<h3>Tetgen</h3> <a href="http://tetgen.berlios.de"> Tetgen</a>generates the Delaunay tetrahedralization, Voronoi diagram, constrained Delaunay tetrahedralizations and quality tetrahedral meshes. The main goal of TetGen is to generate suitable meshes for solving partial differential equations by finite element or finite volume methods.
+
+
 <h3>EXODUS II</h3> EXODUS II, available via <a href="http://sourceforge.net/projects/exodusii">sourceforge</a>, is a model developed to store and retrieve data for finite element analyses. It is used for preprocessing (problem definition), postprocessing (results visualization), as well as code to code data transfer. An EXODUS II data file is a random access, machine independent, binary file that is written and read via C, C++, or Fortran library routines which comprise the Application Programming Interface. <code>libMesh</code> contains source code for the EXODUS II library in <code>./contrib/exodusii</code> and can use it to read EXODUS II mesh files.  Additional information may be found on the <a href="http://endo.sandia.gov/SEACAS/Documentation/SEACAS.html">Sandia Engineering Analysis Code Access System</a>
 
 
