@@ -47,7 +47,7 @@
 #include "medit_io.h"
 #include "gmsh_io.h"
 #include "fro_io.h"
-#include "xdr_io.h"
+#include "legacy_xdr_io.h"
 #include "vtk_io.h"
 
 #if   defined(HAVE_HASH_MAP)
@@ -463,14 +463,14 @@ void UnstructuredMesh::read (const std::string& name,
 	OFFIO(*this).read (new_name);
      
       else if (new_name.rfind(".xda") < new_name.size())
-	XdrIO(*this).read (new_name);
+	LegacyXdrIO(*this).read (new_name);
       
       else if (new_name.rfind(".xdr")  < new_name.size())
-	XdrIO(*this,true).read (new_name);
+	LegacyXdrIO(*this,true).read (new_name);
       
       else if ((new_name.rfind(".mgf")  < new_name.size()) ||
 	       (new_name.rfind(".0000") < new_name.size()))
-	XdrIO(*this,true).read_mgf (new_name);
+	LegacyXdrIO(*this,true).read_mgf (new_name);
       
       else if (new_name.rfind(".unv") < new_name.size())
 	{
@@ -573,13 +573,13 @@ void UnstructuredMesh::write (const std::string& name,
     DivaIO(*this).write(new_name);
     
   else if (new_name.rfind(".xda") < new_name.size())
-    XdrIO(*this).write(new_name);
+    LegacyXdrIO(*this).write(new_name);
     
   else if (new_name.rfind(".xdr") < new_name.size())
-    XdrIO(*this,true).write(new_name);
+    LegacyXdrIO(*this,true).write(new_name);
     
   else if (new_name.rfind(".mgf")  < new_name.size())
-    XdrIO(*this,true).write_mgf(new_name);
+    LegacyXdrIO(*this,true).write_mgf(new_name);
     
   else if (new_name.rfind(".unv") < new_name.size())
     {
