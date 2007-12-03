@@ -31,6 +31,7 @@
 #include "mesh_base.h"
 #include "mesh_data.h"
 #include "mesh_tools.h" // MeshTools::n_levels(mesh)
+#include "parallel.h"   // - which makes write parallel-only
 #include "cell_hex27.h" // Needed for MGF-style Hex27 meshes
 #include "boundary_info.h"
 #include "libmesh_logging.h"
@@ -114,7 +115,6 @@ void LegacyXdrIO::read_mgf (const std::string& name)
 
 void LegacyXdrIO::write (const std::string& name)
 {
-  if (libMesh::processor_id() == 0)
     if (this->binary())
       this->write_binary (name);
     else
@@ -635,7 +635,16 @@ void LegacyXdrIO::write_mesh (const std::string& name,
   // get a read-only reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
+  // n_levels is a parallel-only method
+  parallel_only();
+  const unsigned int          n_levels = MeshTools::n_levels(mesh);
 
+  // The Legacy Xdr IO code only works if we have a serialized mesh
+  assert (mesh.is_serial());
+
+  // In which case only processor 0 needs to do any writing
+  if (libMesh::processor_id() != 0)
+    return;
   
   // Create an XdrMESH object.
   XdrMESH m;
@@ -703,7 +712,6 @@ void LegacyXdrIO::write_mesh (const std::string& name,
 
   const int                   numElem  = n_non_subactive;       
   const int                   numBCs   = mesh.boundary_info->n_boundary_conds();
-  const unsigned int          n_levels = MeshTools::n_levels(mesh);
   
   // Fill the etypes vector with all of the element types found in the mesh
   MeshTools::elem_types(mesh, etypes);
