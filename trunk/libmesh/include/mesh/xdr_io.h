@@ -19,8 +19,8 @@
 
 
 
-#ifndef __xdr_io_io_h__
-#define __xdr_io_io_h__
+#ifndef __xdr_io_h__
+#define __xdr_io_h__
 
 
 // C++ inludes
@@ -32,6 +32,9 @@
 // Forward declarations
 class MeshBase;
 class MeshData;
+class Xdr;
+
+
 
 /**
  *
@@ -102,9 +105,24 @@ class XdrIO : public MeshInput<MeshBase>,
 
 
   /**
+   * Write the connectivity for a parallel, distributed mesh
+   */
+  void write_serialized_connectivity (Xdr &io, const unsigned int n_elem);
+
+  /**
+   * Write the nodal locations for a parallel, distributed mesh
+   */
+  void write_serialized_nodes (Xdr &io, const unsigned int n_nodes);
+
+  /**
    * should we read/write binary?
    */
   bool _binary;
+
+  /**
+   * Define the block size to use for chunked IO.
+   */
+  static const unsigned int io_blksize;
 };
 
 
@@ -112,4 +130,4 @@ class XdrIO : public MeshInput<MeshBase>,
 
 
 
-#endif // #define __legacy_xdr_io.h__
+#endif // #define __xdr_io_h__
