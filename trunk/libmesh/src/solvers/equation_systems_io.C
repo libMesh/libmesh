@@ -35,6 +35,16 @@
 #include "xdr_cxx.h"
 
 // Forward Declarations
+// Anonymous namespace for implementation details.
+namespace {
+  std::string local_file_name (const std::string &basename)
+  {
+    char buf[256];
+    std::sprintf(buf, "%s.%04d", basename.c_str(),libMesh::processor_id());
+    std::string filename(buf);
+    return filename;
+  }
+}
 
 
 
@@ -88,7 +98,7 @@ void EquationSystems::read (const std::string& name,
      end system loop
     
     
-       for each system, handled through System::read_parallel_data():
+       for each system, handled through System::read_{serialized,parallel}_data():
        
      +--------------------------------------------------------------+
      | 10.) The global solution vector, re-ordered to be node-major |
@@ -111,10 +121,10 @@ void EquationSystems::read (const std::string& name,
    */
 
    // Set booleans from the read_flags argument
-   const bool read_header = read_flags & EquationSystems::READ_HEADER;
-   const bool read_data   = read_flags & EquationSystems::READ_DATA;
-   const bool read_additional_data 
-                          = read_flags & EquationSystems::READ_ADDITIONAL_DATA;
+   const bool read_header          = read_flags & EquationSystems::READ_HEADER;
+   const bool read_data            = read_flags & EquationSystems::READ_DATA;
+   const bool read_additional_data = read_flags & EquationSystems::READ_ADDITIONAL_DATA;
+         bool read_parallel_files  = false;
 
 
    static const bool read_legacy_restart_format = libMesh::on_command_line ("--read_legacy_restart_format");
@@ -149,6 +159,7 @@ void EquationSystems::read (const std::string& name,
       {
 	if (libMesh::processor_id() == 0) io.data(version);	
 	Parallel::broadcast(version);
+	read_parallel_files = (version.size() - version.rfind(" parallel") == 9);
       }
     
     // 2.)  
@@ -203,6 +214,8 @@ void EquationSystems::read (const std::string& name,
 	  MeshBase &mesh = const_cast<MeshBase&>(this->get_mesh());
 	  MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
 	}
+
+      Xdr local_io (read_parallel_files ? local_file_name(name) : "", mode);
    
       std::map<std::string, System*>::iterator
 	pos = _systems.begin();
@@ -214,8 +227,12 @@ void EquationSystems::read (const std::string& name,
 	    pos->second->read_legacy_data (io, read_additional_data);
 	  }
 	else
-	  pos->second->read_parallel_data (io, read_additional_data);
+	  if (read_parallel_files)
+	    pos->second->read_parallel_data   (local_io, read_additional_data);
+	  else
+	    pos->second->read_serialized_data (io, read_additional_data);
 
+      
       // Undo the temporary numbering.
       if (!read_legacy_restart_format)
 	if (dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh)))
@@ -294,7 +311,7 @@ void EquationSystems::write(const std::string& name,
     end system loop
    
    
-    for each system, handled through System::write_parallel_data():
+    for each system, handled through System::write_{serialized,parallel}_data():
        
      +--------------------------------------------------------------+
      | 10.) The global solution vector, re-ordered to be node-major |
@@ -325,9 +342,9 @@ void EquationSystems::write(const std::string& name,
   }
   
    // set booleans from write_flags argument
-   const bool write_data = write_flags & EquationSystems::WRITE_DATA;
-   const bool write_additional_data 
-                         = write_flags & EquationSystems::WRITE_ADDITIONAL_DATA;
+   const bool write_data            = write_flags & EquationSystems::WRITE_DATA;
+   const bool write_parallel_files  = write_flags & EquationSystems::WRITE_PARALLEL_FILES;
+   const bool write_additional_data = write_flags & EquationSystems::WRITE_ADDITIONAL_DATA;
 
   // Nasty hack for reading/writing zipped files
   std::string new_name = name;
@@ -356,7 +373,8 @@ void EquationSystems::write(const std::string& name,
       {
 	// 1.)
 	// Write the version header
-	std::string version = "libMesh-0.7.0+";	
+	std::string version = "libMesh-0.7.0+";
+	if (write_parallel_files) version += " parallel";
 	io.data (version, "# File Format Identifier");
 	
 	// 2.)  
@@ -402,12 +420,19 @@ void EquationSystems::write(const std::string& name,
     // Start from the first system, again,
     // to write vectors to disk, if wanted
     if (write_data)
-      for (pos = _systems.begin(); pos != _systems.end(); ++pos) 
-	{
-	  // 10.) + 11.)
-	  // Let System::write_parallel_data() do the job
-	  pos->second->write_parallel_data (io,write_additional_data);
-	}
+      {
+	// open a parallel buffer if warranted.
+	Xdr local_io (write_parallel_files ? local_file_name(name) : "", mode);
+	
+	for (pos = _systems.begin(); pos != _systems.end(); ++pos) 
+	  {
+	    // 10.) + 11.)
+	    if (write_parallel_files)
+	      pos->second->write_parallel_data (local_io,write_additional_data);
+	    else
+	      pos->second->write_serialized_data (io,write_additional_data);
+	  }
+      }
 
     STOP_LOG("write()","EquationSystems");
   }
