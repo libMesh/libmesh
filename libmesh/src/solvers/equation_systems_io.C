@@ -159,7 +159,7 @@ void EquationSystems::read (const std::string& name,
       {
 	if (libMesh::processor_id() == 0) io.data(version);	
 	Parallel::broadcast(version);
-	read_parallel_files = (version.size() - version.rfind(" parallel") == 9);
+	read_parallel_files = (version.rfind(" parallel") < version.size());
       }
     
     // 2.)  
