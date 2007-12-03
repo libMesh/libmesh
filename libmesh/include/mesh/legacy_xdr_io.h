@@ -19,8 +19,8 @@
 
 
 
-#ifndef __xdr_io_io_h__
-#define __xdr_io_io_h__
+#ifndef __legacy_xdr_io_io_h__
+#define __legacy_xdr_io_io_h__
 
 
 // C++ inludes
@@ -39,8 +39,8 @@ class MeshData;
  */
 
 // ------------------------------------------------------------
-// XdrIO class definition
-class XdrIO : public MeshInput<MeshBase>,
+// LegacyXdrIO class definition
+class LegacyXdrIO : public MeshInput<MeshBase>,
 	      public MeshOutput<MeshBase>
 {
 
@@ -61,7 +61,7 @@ class XdrIO : public MeshInput<MeshBase>,
    * between ASCII (\p false, the default) or binary (\p true)
    * files.
    */
-  XdrIO (MeshBase&,       const bool=false);
+  LegacyXdrIO (MeshBase&,       const bool=false);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
@@ -70,12 +70,12 @@ class XdrIO : public MeshInput<MeshBase>,
    * between ASCII (\p false, the default) or binary (\p true)
    * files.
    */
-  XdrIO (const MeshBase&, const bool=false);
+  LegacyXdrIO (const MeshBase&, const bool=false);
   
   /**
    * Destructor.
    */
-  virtual ~XdrIO ();
+  virtual ~LegacyXdrIO ();
   
   /**
    * This method implements reading a mesh from a specified file.
@@ -145,7 +145,7 @@ class XdrIO : public MeshInput<MeshBase>,
    * mesh file formats.  This method actually
    * expects an ASCII-file.
    */
-  void read_ascii (const std::string&, const XdrIO::FileFormat = XdrIO::LIBM);
+  void read_ascii (const std::string&, const LegacyXdrIO::FileFormat = LegacyXdrIO::LIBM);
 
   /**
    * Read meshes in \p libMesh XDR format.
@@ -153,7 +153,7 @@ class XdrIO : public MeshInput<MeshBase>,
    * mesh file formats.  This method
    * expects an XDR-encoded binary file.
    */
-  void read_binary (const std::string&, const XdrIO::FileFormat = XdrIO::LIBM);
+  void read_binary (const std::string&, const LegacyXdrIO::FileFormat = LegacyXdrIO::LIBM);
 
   
   
@@ -166,7 +166,7 @@ class XdrIO : public MeshInput<MeshBase>,
    * 1: "MGF " even older style meshes from MGF
    * 2: "LIBM" new type meshes which contain refinement trees.
    */
-  void write_ascii (const std::string&, const XdrIO::FileFormat = XdrIO::LIBM);
+  void write_ascii (const std::string&, const LegacyXdrIO::FileFormat = LegacyXdrIO::LIBM);
 
   /**
    * Write meshes in \p libMesh  XDR format.
@@ -174,21 +174,21 @@ class XdrIO : public MeshInput<MeshBase>,
    * meshes in general since they will be
    * hybrid meshes.
    */
-  void write_binary (const std::string&, const XdrIO::FileFormat = XdrIO::LIBM);
+  void write_binary (const std::string&, const LegacyXdrIO::FileFormat = LegacyXdrIO::LIBM);
 
 
   /**
    * Implements reading either a binary \p XDR or ASCII \p XDA mesh.
    */ 
   void read_mesh (const std::string&,
-		  const XdrIO::FileFormat = XdrIO::LIBM,
+		  const LegacyXdrIO::FileFormat = LegacyXdrIO::LIBM,
 		  MeshData* = NULL);
 
   /**
    * Implements writing either a binary \p XDR or ASCII \p XDA mesh.
    */ 
   void write_mesh (const std::string&,
-		   const XdrIO::FileFormat = XdrIO::LIBM);
+		   const LegacyXdrIO::FileFormat = LegacyXdrIO::LIBM);
 
   /**
    * Implements reading either a binary or ASCII MGF solution.
@@ -218,4 +218,4 @@ class XdrIO : public MeshInput<MeshBase>,
 
 
 
-#endif // #define __xdr_io_h__
+#endif // #define __legacy_xdr_io.h__

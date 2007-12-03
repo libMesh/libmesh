@@ -27,7 +27,7 @@
 #include <sstream>
 
 // Local includes
-#include "xdr_io.h"          // for XdrIO::FileFormat
+#include "legacy_xdr_io.h"          // for LegacyXdrIO::FileFormat
 #include "libmesh_config.h"  // for HAVE_XDR
 #include "o_f_stream.h"      // for OFStream
 
@@ -107,9 +107,9 @@ public:
    * standard C header \p rpc/rpc.h.
    */
 #ifdef HAVE_XDR
-  XdrMGF() : _num_levels(0), m_type(UNKNOWN), mp_xdr_handle(0), orig_flag(XdrIO::LIBM), mp_fp(0) {}
+  XdrMGF() : _num_levels(0), m_type(UNKNOWN), mp_xdr_handle(0), orig_flag(LegacyXdrIO::LIBM), mp_fp(0) {}
 #else
-  XdrMGF() : _num_levels(0), m_type(UNKNOWN), orig_flag(XdrIO::LIBM), mp_fp(0) {}
+  XdrMGF() : _num_levels(0), m_type(UNKNOWN), orig_flag(LegacyXdrIO::LIBM), mp_fp(0) {}
 #endif
     
   /**
@@ -166,12 +166,12 @@ public:
   /**
    * Get the originator flag.
    */
-  XdrIO::FileFormat get_orig_flag() const { return orig_flag; }
+  LegacyXdrIO::FileFormat get_orig_flag() const { return orig_flag; }
 
   /**
    * Set the originator flag.
    */
-  void set_orig_flag(XdrIO::FileFormat in_orig_flag) { orig_flag = in_orig_flag; }
+  void set_orig_flag(LegacyXdrIO::FileFormat in_orig_flag) { orig_flag = in_orig_flag; }
 
 
   /**
@@ -231,7 +231,7 @@ protected:
    * @item 1: It's a MGF style mesh
    * @end{itemize}
    */
-  XdrIO::FileFormat orig_flag;
+  LegacyXdrIO::FileFormat orig_flag;
 
   /**
    * An input file stream object

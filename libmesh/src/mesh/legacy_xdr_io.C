@@ -27,7 +27,7 @@
 #include <string>
 
 // Local includes
-#include "xdr_io.h"
+#include "legacy_xdr_io.h"
 #include "mesh_base.h"
 #include "mesh_data.h"
 #include "mesh_tools.h" // MeshTools::n_levels(mesh)
@@ -51,8 +51,8 @@
 
 
 // ------------------------------------------------------------
-// XdrIO members
-XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
+// LegacyXdrIO members
+LegacyXdrIO::LegacyXdrIO (MeshBase& mesh, const bool binary) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase>(mesh),
   _binary (binary)
@@ -62,7 +62,7 @@ XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
 
 
 
-XdrIO::XdrIO (const MeshBase& mesh, const bool binary) :
+LegacyXdrIO::LegacyXdrIO (const MeshBase& mesh, const bool binary) :
   MeshOutput<MeshBase>(mesh),
   _binary (binary)
 {
@@ -71,28 +71,28 @@ XdrIO::XdrIO (const MeshBase& mesh, const bool binary) :
 
 
 
-XdrIO::~XdrIO ()
+LegacyXdrIO::~LegacyXdrIO ()
 {
 }
 
 
 
 
-bool & XdrIO::binary ()
-{
-  return _binary;
-}
-
-
-
-
-bool XdrIO::binary () const
+bool & LegacyXdrIO::binary ()
 {
   return _binary;
 }
 
 
-void XdrIO::read (const std::string& name)
+
+
+bool LegacyXdrIO::binary () const
+{
+  return _binary;
+}
+
+
+void LegacyXdrIO::read (const std::string& name)
 {
   if (this->binary())
     this->read_binary (name);
@@ -102,17 +102,17 @@ void XdrIO::read (const std::string& name)
 
 
 
-void XdrIO::read_mgf (const std::string& name)
+void LegacyXdrIO::read_mgf (const std::string& name)
 {
   if (this->binary())
-    this->read_binary (name, XdrIO::MGF);
+    this->read_binary (name, LegacyXdrIO::MGF);
   else
-    this->read_ascii  (name, XdrIO::MGF);
+    this->read_ascii  (name, LegacyXdrIO::MGF);
 }
 
 
 
-void XdrIO::write (const std::string& name)
+void LegacyXdrIO::write (const std::string& name)
 {
   if (libMesh::processor_id() == 0)
     if (this->binary())
@@ -123,19 +123,19 @@ void XdrIO::write (const std::string& name)
 
 
 
-void XdrIO::write_mgf (const std::string& name)
+void LegacyXdrIO::write_mgf (const std::string& name)
 {
   if (this->binary())
-    this->write_binary (name, XdrIO::MGF);
+    this->write_binary (name, LegacyXdrIO::MGF);
   else
-    this->write_ascii  (name, XdrIO::MGF);
+    this->write_ascii  (name, LegacyXdrIO::MGF);
 }
 
 
 
-void XdrIO::read_mgf_soln (const std::string& name,
-			   std::vector<Number>& soln,
-			   std::vector<std::string>& var_names) const
+void LegacyXdrIO::read_mgf_soln (const std::string& name,
+				 std::vector<Number>& soln,
+				 std::vector<std::string>& var_names) const
 {
   here();
   std::cerr << "WARNING: this method is deprecated and will disappear soon!"
@@ -166,9 +166,9 @@ void XdrIO::read_mgf_soln (const std::string& name,
 
 
 
-void XdrIO::write_mgf_soln (const std::string& name,
-			    std::vector<Number>& soln,
-			    std::vector<std::string>& var_names) const
+void LegacyXdrIO::write_mgf_soln (const std::string& name,
+				  std::vector<Number>& soln,
+				  std::vector<std::string>& var_names) const
 {
   here();
   std::cerr << "WARNING: this method is deprecated and will disappear soon!"
@@ -199,7 +199,7 @@ void XdrIO::write_mgf_soln (const std::string& name,
 
 
 
-void XdrIO::read_ascii (const std::string& name, const XdrIO::FileFormat originator)
+void LegacyXdrIO::read_ascii (const std::string& name, const LegacyXdrIO::FileFormat originator)
 {
   // get a writeable reference to the underlying mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -213,7 +213,7 @@ void XdrIO::read_ascii (const std::string& name, const XdrIO::FileFormat origina
 
 
 
-void XdrIO::read_binary (const std::string& name, const XdrIO::FileFormat originator)
+void LegacyXdrIO::read_binary (const std::string& name, const LegacyXdrIO::FileFormat originator)
 {
 #ifndef HAVE_XDR
 
@@ -238,14 +238,14 @@ void XdrIO::read_binary (const std::string& name, const XdrIO::FileFormat origin
 
 
 
-void XdrIO::write_ascii (const std::string& name, const XdrIO::FileFormat originator)
+void LegacyXdrIO::write_ascii (const std::string& name, const LegacyXdrIO::FileFormat originator)
 {
   this->write_mesh (name, originator);
 }
 
 
 
-void XdrIO::write_binary (const std::string& name, const XdrIO::FileFormat originator)
+void LegacyXdrIO::write_binary (const std::string& name, const LegacyXdrIO::FileFormat originator)
 {
 #ifndef HAVE_XDR
 
@@ -263,9 +263,9 @@ void XdrIO::write_binary (const std::string& name, const XdrIO::FileFormat origi
 
 
 
-void XdrIO::read_mesh (const std::string& name,
-		       const XdrIO::FileFormat originator,
-		       MeshData* mesh_data)
+void LegacyXdrIO::read_mesh (const std::string& name,
+			     const LegacyXdrIO::FileFormat originator,
+			     MeshData* mesh_data)
 {
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
@@ -303,7 +303,7 @@ void XdrIO::read_mesh (const std::string& name,
   unsigned int              n_blocks = 0;
   unsigned int              n_levels = 0;
   
-  if (m.get_orig_flag() == XdrIO::LIBM)
+  if (m.get_orig_flag() == LegacyXdrIO::LIBM)
     n_levels = m.get_num_levels();
   
   
@@ -324,7 +324,7 @@ void XdrIO::read_mesh (const std::string& name,
   const int numBCs      = mh.getNumBCs();
   
   // If a libMesh-type mesh, read the augmented mesh information
-  if ((m.get_orig_flag() == XdrIO::DEAL) || (m.get_orig_flag() == XdrIO::LIBM))
+  if ((m.get_orig_flag() == LegacyXdrIO::DEAL) || (m.get_orig_flag() == LegacyXdrIO::LIBM))
     {
       // Read augmented header
       n_blocks = mh.get_n_blocks();
@@ -362,19 +362,19 @@ void XdrIO::read_mesh (const std::string& name,
   // Note: This section now depends on
   // whether we are reading an old-style libMesh, 
   // MGF, or a new-style libMesh mesh.  
-  if (m.get_orig_flag() == XdrIO::DEAL) 
+  if (m.get_orig_flag() == LegacyXdrIO::DEAL) 
     {
       conn.resize(totalWeight);
       m.Icon(&conn[0], 1, totalWeight);
     }
   
-  else if (m.get_orig_flag() == XdrIO::MGF) 
+  else if (m.get_orig_flag() == LegacyXdrIO::MGF) 
     {
       conn.resize(totalWeight+(2*numElem));
       m.Icon(&conn[0], 1, totalWeight+(2*numElem));
     }
 
-  else if (m.get_orig_flag() == XdrIO::LIBM)
+  else if (m.get_orig_flag() == LegacyXdrIO::LIBM)
     {
       conn.resize(totalWeight);
       m.Icon(&conn[0], 1, totalWeight);
@@ -431,7 +431,7 @@ void XdrIO::read_mesh (const std::string& name,
   // had to change now that elements store pointers to
   // nodes.  The nodes must exist before we assign them to
   // the elements. BSK, 1/13/2003)
-  if ((m.get_orig_flag() == XdrIO::DEAL) || (m.get_orig_flag() == XdrIO::LIBM)) 
+  if ((m.get_orig_flag() == LegacyXdrIO::DEAL) || (m.get_orig_flag() == LegacyXdrIO::LIBM)) 
     {
       unsigned int lastConnIndex = 0;
       unsigned int lastFaceIndex = 0;
@@ -458,7 +458,7 @@ void XdrIO::read_mesh (const std::string& name,
             Elem* elem;
 
             // New-style libMesh mesh
-            if (m.get_orig_flag() == XdrIO::LIBM)
+            if (m.get_orig_flag() == LegacyXdrIO::LIBM)
             {
               unsigned int self_ID   = conn[lastConnIndex + temp_elem->n_nodes()];
 
@@ -471,9 +471,9 @@ void XdrIO::read_mesh (const std::string& name,
                 Elem* my_parent;
 
                 // Search for parent in the parents map (log(n))
-                START_LOG("log(n) search for parent", "XdrIO::read_mesh");
+                START_LOG("log(n) search for parent", "LegacyXdrIO::read_mesh");
                 std::map<unsigned int, Elem*>::iterator it = parents.find(parent_ID);
-                STOP_LOG("log(n) search for parent", "XdrIO::read_mesh");
+                STOP_LOG("log(n) search for parent", "LegacyXdrIO::read_mesh");
                 
                 // If the parent was not previously added, we cannot continue.
                 if (it == parents.end())
@@ -514,9 +514,9 @@ void XdrIO::read_mesh (const std::string& name,
               elem->set_id() = self_ID;
                 
               // Add this element to the map, it may be a parent for a future element
-              START_LOG("insert elem into map", "XdrIO::read_mesh");
+              START_LOG("insert elem into map", "LegacyXdrIO::read_mesh");
               parents[self_ID] = elem;
-              STOP_LOG("insert elem into map", "XdrIO::read_mesh");
+              STOP_LOG("insert elem into map", "LegacyXdrIO::read_mesh");
             }
 
             // MGF-style meshes
@@ -542,14 +542,14 @@ void XdrIO::read_mesh (const std::string& name,
               elem->set_node(innd) = mesh.node_ptr(conn[innd+lastConnIndex]);
             }
 
-            lastConnIndex += (m.get_orig_flag() == XdrIO::LIBM) ? (elem->n_nodes()+2) : elem->n_nodes();
+            lastConnIndex += (m.get_orig_flag() == LegacyXdrIO::LIBM) ? (elem->n_nodes()+2) : elem->n_nodes();
           }
           lastFaceIndex += neeb[idx];
         }
         
       }
 
-      if (m.get_orig_flag() == XdrIO::LIBM)
+      if (m.get_orig_flag() == LegacyXdrIO::LIBM)
         {
           // Iterate in ascending elem ID order
           unsigned int _next_elem_id = 0;
@@ -571,7 +571,7 @@ void XdrIO::read_mesh (const std::string& name,
     }
  
   // MGF-style (1) Hex27 mesh
-  else if (m.get_orig_flag() == XdrIO::MGF) 
+  else if (m.get_orig_flag() == LegacyXdrIO::MGF) 
     {
       
 #ifdef DEBUG
@@ -629,8 +629,8 @@ void XdrIO::read_mesh (const std::string& name,
 
 
 
-void XdrIO::write_mesh (const std::string& name,
-			const XdrIO::FileFormat originator)
+void LegacyXdrIO::write_mesh (const std::string& name,
+			      const LegacyXdrIO::FileFormat originator)
 {
   // get a read-only reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
@@ -735,7 +735,7 @@ void XdrIO::write_mesh (const std::string& name,
   // allowing us to optimize storage
   // and minimize IO requirements
   // for these meshes.
-  if ((m.get_orig_flag() == XdrIO::DEAL) || (m.get_orig_flag() == XdrIO::LIBM))
+  if ((m.get_orig_flag() == LegacyXdrIO::DEAL) || (m.get_orig_flag() == LegacyXdrIO::LIBM))
     {
       mh.set_n_blocks(etypes.size());
       mh.set_block_elt_types(etypes);
@@ -751,13 +751,13 @@ void XdrIO::write_mesh (const std::string& name,
   // set a local variable for the total weight of the mesh
   int totalWeight =0;
 
-  if (m.get_orig_flag() == XdrIO::DEAL)  // old-style LibMesh
+  if (m.get_orig_flag() == LegacyXdrIO::DEAL)  // old-style LibMesh
     totalWeight=MeshTools::total_weight(mesh);
 
-  else if (m.get_orig_flag() == XdrIO::MGF) // MGF-style
+  else if (m.get_orig_flag() == LegacyXdrIO::MGF) // MGF-style
     totalWeight = MeshTools::total_weight(mesh)+2*numElem;
 
-  else if (m.get_orig_flag() == XdrIO::LIBM) // new-style LibMesh
+  else if (m.get_orig_flag() == LegacyXdrIO::LIBM) // new-style LibMesh
     totalWeight = non_subactive_weight+2*numElem;
 
   else
@@ -778,7 +778,7 @@ void XdrIO::write_mesh (const std::string& name,
   // Write the connectivity  
   {
     std::vector<int> conn;
-    XdrIO::FileFormat orig_type = m.get_orig_flag();
+    LegacyXdrIO::FileFormat orig_type = m.get_orig_flag();
    
     // Resize the connectivity vector to hold all the connectivity for the mesh
     conn.resize(totalWeight);
@@ -799,10 +799,10 @@ void XdrIO::write_mesh (const std::string& name,
           {
             int nstart=0;
             
-            if (orig_type == XdrIO::DEAL)
+            if (orig_type == LegacyXdrIO::DEAL)
               nn = mesh.elem(e)->n_nodes();
 
-            else if (orig_type == XdrIO::MGF)
+            else if (orig_type == LegacyXdrIO::MGF)
             {
               nstart=2; // ignore the 27 and 0 entries
               nn = mesh.elem(e)->n_nodes()+2;
@@ -810,21 +810,21 @@ void XdrIO::write_mesh (const std::string& name,
               conn[lastConnIndex + 1] = 0;
             }
 
-            else if (orig_type == XdrIO::LIBM) // LIBMESH format
+            else if (orig_type == LegacyXdrIO::LIBM) // LIBMESH format
               nn = mesh.elem(e)->n_nodes() + 2;
 
             else
               error();
 
             // Loop over the connectivity entries for this element and write to conn.
-            START_LOG("set connectivity", "XdrIO::write_mesh");
-            const unsigned int loopmax = (orig_type==XdrIO::LIBM) ? nn-2 : nn;
+            START_LOG("set connectivity", "LegacyXdrIO::write_mesh");
+            const unsigned int loopmax = (orig_type==LegacyXdrIO::LIBM) ? nn-2 : nn;
             for (unsigned int n=nstart; n<loopmax; n++)
             {
               unsigned int connectivity_value=0;
 
               // old-style Libmesh and MGF meshes
-              if (orig_type != XdrIO::LIBM)
+              if (orig_type != LegacyXdrIO::LIBM)
                 connectivity_value = mesh.elem(e)->node(n-nstart);
 
               // new-style libMesh meshes: compress the connectivity entries to account for
@@ -840,10 +840,10 @@ void XdrIO::write_mesh (const std::string& name,
               }
               conn[lastConnIndex + n] = connectivity_value;
             }
-            STOP_LOG("set connectivity", "XdrIO::write_mesh");
+            STOP_LOG("set connectivity", "LegacyXdrIO::write_mesh");
 
             // In the case of an adaptive mesh, set last 2 entries to this ID and parent ID
-            if (orig_type == XdrIO::LIBM)
+            if (orig_type == LegacyXdrIO::LIBM)
             {
               int self_ID = mesh.elem(e)->id();
               int parent_ID = -1;
@@ -922,9 +922,9 @@ void XdrIO::write_mesh (const std::string& name,
 
 
 
-void XdrIO::read_soln (const std::string& name,
-		       std::vector<Real>& soln,
-		       std::vector<std::string>& var_names) const
+void LegacyXdrIO::read_soln (const std::string& name,
+			     std::vector<Real>& soln,
+			     std::vector<std::string>& var_names) const
 {
   // Create an XdrSOLN object.
   XdrSOLN s;
@@ -983,9 +983,9 @@ void XdrIO::read_soln (const std::string& name,
 
 
 
-void XdrIO::write_soln (const std::string& name,
-			std::vector<Real>& soln,
-			std::vector<std::string>& var_names) const
+void LegacyXdrIO::write_soln (const std::string& name,
+			      std::vector<Real>& soln,
+			      std::vector<std::string>& var_names) const
 {
   // get a read-only reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();

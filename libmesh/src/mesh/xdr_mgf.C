@@ -160,16 +160,16 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
     case (XdrMGF::ENCODE):
       {
 	char* p = &buf[0];
-	const XdrIO::FileFormat orig = this->get_orig_flag();
+	const LegacyXdrIO::FileFormat orig = this->get_orig_flag();
 
 	std::ostringstream name;
-	if (orig == XdrIO::DEAL)
+	if (orig == LegacyXdrIO::DEAL)
 	  name << "DEAL 003:003";
           
-	else if (orig == XdrIO::MGF)
+	else if (orig == LegacyXdrIO::MGF)
 	  name << "MGF  002:000";
           
-	else if (orig == XdrIO::LIBM)
+	else if (orig == LegacyXdrIO::LIBM)
 	  name << "LIBM " << this->get_num_levels();
 
 	else
@@ -198,15 +198,15 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
       
     case (XdrMGF::W_ASCII):
       {
-	const XdrIO::FileFormat orig = this->get_orig_flag();
+	const LegacyXdrIO::FileFormat orig = this->get_orig_flag();
 
-	if (orig == XdrIO::DEAL)
+	if (orig == LegacyXdrIO::DEAL)
 	  std::sprintf(&buf[0], "%s %03d:%03d", "DEAL", 3, 3);
           
-	else if (orig == XdrIO::MGF)
+	else if (orig == LegacyXdrIO::MGF)
 	  std::sprintf(&buf[0], "%s %03d:%03d", "MGF ", 2, 0);
 
-	else if (orig == XdrIO::LIBM)
+	else if (orig == LegacyXdrIO::LIBM)
 	  std::sprintf(&buf[0], "%s %d", "LIBM", this->get_num_levels());
           
 	mp_out << buf << '\n';
@@ -261,15 +261,15 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 
       if (std::strcmp (name, "DEAL") == 0)
 	{
-	  this->orig_flag = XdrIO::DEAL; // 0 is the DEAL identifier by definition
+	  this->orig_flag = LegacyXdrIO::DEAL; // 0 is the DEAL identifier by definition
 	}
       else if (std::strcmp (name, "MGF ") == 0)
 	{
-	  this->orig_flag = XdrIO::MGF; // 1 is the MGF identifier by definition
+	  this->orig_flag = LegacyXdrIO::MGF; // 1 is the MGF identifier by definition
 	}
       else if (std::strcmp (name, "LIBM") == 0)
 	{
-	  this->orig_flag = XdrIO::LIBM; // the New and Improved XDA
+	  this->orig_flag = LegacyXdrIO::LIBM; // the New and Improved XDA
 	}
 
       else
