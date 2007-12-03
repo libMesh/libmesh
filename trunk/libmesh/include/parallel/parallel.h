@@ -71,13 +71,13 @@ namespace Parallel
   /**
    * Default message tag id
    */
-  const unsigned int any_tag=MPI_ANY_TAG;
+  const int any_tag=MPI_ANY_TAG;
 #else
   // These shouldn't be needed
   typedef unsigned int data_type;
   typedef unsigned int request;
 
-  const unsigned int any_tag=-1;
+  const int any_tag=-1;
 #endif // HAVE_MPI
 
   //-------------------------------------------------------------------
@@ -154,7 +154,7 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
-		    const unsigned int tag=0);
+		    const int tag=0);
 
   //-------------------------------------------------------------------
   /**
@@ -164,7 +164,7 @@ namespace Parallel
   inline void isend (const unsigned int dest_processor_id,
 		     std::vector<T> &buf,
 		     request &r,
-		     const unsigned int tag=0);
+		     const int tag=0);
 
   //-------------------------------------------------------------------
   /**
@@ -173,7 +173,7 @@ namespace Parallel
   template <typename T>
   inline void recv (const unsigned int src_processor_id,
 		    std::vector<T> &buf,
-		    const unsigned int tag=any_tag);
+		    const int tag=any_tag);
 
   //-------------------------------------------------------------------
   /**
@@ -183,7 +183,7 @@ namespace Parallel
   inline void irecv (const unsigned int src_processor_id,
 		     std::vector<T> &buf,
 		     request &r,
-		     const unsigned int tag=any_tag);
+		     const int tag=any_tag);
   
   //-------------------------------------------------------------------
   /**
@@ -545,7 +545,7 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
-		    const unsigned int tag)
+		    const int tag)
   {
     START_LOG("send()", "Parallel");
     
@@ -567,7 +567,7 @@ namespace Parallel
   inline void isend (const unsigned int dest_processor_id,
 		     std::vector<T> &buf,
 		     request &r,
-		     const unsigned int tag)
+		     const int tag)
   {
     START_LOG("isend()", "Parallel");
     
@@ -589,7 +589,7 @@ namespace Parallel
   template <typename T>
   inline void recv (const unsigned int src_processor_id,
 		    std::vector<T> &buf,
-		    const unsigned int tag)
+		    const int tag)
   {
     START_LOG("recv()", "Parallel");
     
@@ -612,7 +612,7 @@ namespace Parallel
   inline void irecv (const unsigned int src_processor_id,
 		     std::vector<T> &buf,
 		     request &r,
-		     const unsigned int tag)
+		     const int tag)
   {
     START_LOG("irecv()", "Parallel");
     
