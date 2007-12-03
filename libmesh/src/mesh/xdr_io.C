@@ -190,16 +190,14 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes)
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
   assert (n_nodes == mesh.n_nodes());
 
-
   std::vector<unsigned int> xfer_ids;
-  std::vector<Real>         xfer_coords;
+  std::vector<Real>         xfer_coords, &coords=xfer_coords;
 
   std::vector<std::vector<unsigned int> > recv_ids   (libMesh::n_processors());;
   std::vector<std::vector<Real> >         recv_coords(libMesh::n_processors());
-  
-  std::vector<Real> coords; coords.reserve(3*io_blksize);
 
-  unsigned int last_node=0;
+
+  unsigned int last_node=0, n_written=0;
 
   for (unsigned int blk=0; last_node<n_nodes; blk++)
     {
@@ -272,5 +270,51 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes)
       recv_coords[0] = xfer_coords;
 #endif
 
+      // -------------------------------------------------------
+      // Receive the messages and write the output on processor 0.
+      if (libMesh::processor_id() == 0)
+        {
+#ifdef HAVE_MPI
+          // Wait for all the receives to complete. We have no
+          // need for the statuses since we already know the
+          // buffer sizes.
+          MPI_Waitall (libMesh::n_processors(),
+                       &id_request_handles[0],
+                       MPI_STATUSES_IGNORE);
+          MPI_Waitall (libMesh::n_processors(),
+                       &coord_request_handles[0],
+                       MPI_STATUSES_IGNORE);
+#endif
+          
+          // Write the coordinates in this block.
+	  unsigned int tot_id_size=0, tot_coord_size=0;
+	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	    {
+	      tot_id_size    += recv_ids[pid].size();
+	      tot_coord_size += recv_coords[pid].size();
+	    }
+
+	  assert (tot_id_size <= std::min(io_blksize, n_nodes));
+	  assert (tot_coord_size == 3*tot_id_size);
+
+	  coords.resize (tot_coord_size);
+	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	    for (unsigned int idx=0; idx<recv_ids[pid].size(); idx++)
+	      {
+		const unsigned int local_idx = recv_ids[pid][idx] - first_node;
+		assert ((3*local_idx+2) < coords.size());
+		assert ((3*idx+2)      < recv_coords[pid].size());
+		
+		coords[3*local_idx+0] = recv_coords[pid][3*idx+0];
+		coords[3*local_idx+1] = recv_coords[pid][3*idx+1];
+		coords[3*local_idx+2] = recv_coords[pid][3*idx+2];
+
+		n_written++;
+	      }
+
+	  io.data_stream (coords.empty() ? NULL : &coords[0], coords.size(), 3);
+	}
     }
+  if (libMesh::processor_id() == 0)
+    assert (n_written == n_nodes);
 }
