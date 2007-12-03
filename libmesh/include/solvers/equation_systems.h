@@ -44,7 +44,6 @@
 
 // Forward Declarations
 class MeshData;
-//class System;
 class Elem;
 class MeshBase;
 
@@ -70,15 +69,16 @@ public:
   /**
    * Define enumeration to set properties in EquationSystems::read()
    */
-  enum ReadFlags { READ_HEADER          = 1,
-                   READ_DATA            = 2,
-                   READ_ADDITIONAL_DATA = 4 };
+  enum ReadFlags { READ_HEADER           = 1,
+                   READ_DATA             = 2,
+                   READ_ADDITIONAL_DATA  = 4 };
 
   /**
    * Define enumeration to set properties in EquationSystems::write()
    */
-  enum WriteFlags { WRITE_DATA            = 1,
-                    WRITE_ADDITIONAL_DATA = 2 };
+  enum WriteFlags { WRITE_DATA             = 1,
+                    WRITE_ADDITIONAL_DATA  = 2,
+                    WRITE_PARALLEL_FILES   = 4};
   
   /**
    * Constructor.
@@ -287,7 +287,7 @@ public:
    */
   void write (const std::string& name,
 	      const libMeshEnums::XdrMODE,
-              const unsigned int write_flags=WRITE_DATA) const;
+              const unsigned int write_flags=(WRITE_DATA)) const;
 
   /**
    * @returns \p true when this equation system contains

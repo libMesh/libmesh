@@ -367,8 +367,140 @@ void System::read_legacy_data (Xdr& io,
 
 
 
-void System::read_parallel_data (Xdr& io,
-				  const bool read_additional_data)
+void System::read_parallel_data (Xdr &io,
+				 const bool read_additional_data)
+{
+  /**
+   * This method implements the output of the vectors
+   * contained in this System object, embedded in the 
+   * output of an EquationSystems<T_sys>. 
+   *
+   *   9.) The global solution vector, re-ordered to be node-major 
+   *       (More on this later.)                                    
+   *                                                                
+   *      for each additional vector in the object          
+   *                                                                
+   *      10.) The global additional vector, re-ordered to be       
+   *           node-major (More on this later.)
+   *
+   * Note that the actual IO is handled through the Xdr class 
+   * (to be renamed later?) which provides a uniform interface to 
+   * both the XDR (eXternal Data Representation) interface and standard
+   * ASCII output.  Thus this one section of code will read XDR or ASCII
+   * files with no changes.
+   */ 
+  assert (io.reading());
+  assert (io.is_open());
+  
+  std::vector<Number> io_buffer;
+  
+  // 9.)
+  //
+  // Actually read the solution components
+  // for the ith system to disk
+  io.data(io_buffer);
+	  
+  const unsigned int sys_num = this->number();
+  const unsigned int n_vars  = this->n_vars();
+
+  unsigned int cnt=0;
+  
+  // Loop over each variable and each node, and read out the value.
+  for (unsigned int var=0; var<n_vars; var++)
+    {
+      // First read the node DOF values
+      {	
+	MeshBase::const_node_iterator
+	  it  = this->get_mesh().local_nodes_begin(),
+	  end = this->get_mesh().local_nodes_end();
+	
+	for (; it != end; ++it)
+	  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+	    {
+	      assert ((*it)->dof_number(sys_num, var, comp) !=
+		      DofObject::invalid_id);
+	      assert (cnt < io_buffer.size());
+	      this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+	    }
+      }
+
+      // Then read the element DOF values
+      {	
+	MeshBase::const_element_iterator
+	  it  = this->get_mesh().local_elements_begin(),
+	  end = this->get_mesh().local_elements_end();
+	
+	for (; it != end; ++it)
+	  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+	    {
+	      assert ((*it)->dof_number(sys_num, var, comp) !=
+		      DofObject::invalid_id);
+	      assert (cnt < io_buffer.size());
+	      this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+	    }
+      }
+    }
+  
+  // Only read additional vectors if wanted  
+  if (read_additional_data)
+    {	  
+      std::map<std::string, NumericVector<Number>* >::const_iterator
+	pos = _vectors.begin();
+  
+      for(; pos != this->_vectors.end(); ++pos)
+        {
+	  cnt=0;
+	  io_buffer.clear();
+	  
+	  // 10.)
+	  //
+	  // Actually read the additional vector components
+	  // for the ith system to disk
+	  io.data(io_buffer);
+	  
+	  // Loop over each variable and each node, and read out the value.
+	  for (unsigned int var=0; var<n_vars; var++)
+	    {
+	      // First read the node DOF values
+	      {	
+		MeshBase::const_node_iterator
+		  it  = this->get_mesh().local_nodes_begin(),
+		  end = this->get_mesh().local_nodes_end();
+		
+		for (; it != end; ++it)
+		  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+		    {
+		      assert ((*it)->dof_number(sys_num, var, comp) !=
+			      DofObject::invalid_id);
+		      assert (cnt < io_buffer.size());
+		      this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+		    }
+	      }
+	      
+	      // Then read the element DOF values
+	      {	
+		MeshBase::const_element_iterator
+		  it  = this->get_mesh().local_elements_begin(),
+		  end = this->get_mesh().local_elements_end();
+		
+		for (; it != end; ++it)
+		  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+		    {
+		      assert ((*it)->dof_number(sys_num, var, comp) !=
+			      DofObject::invalid_id);
+		      assert (cnt < io_buffer.size());
+		      this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+		    }
+	      }
+	    }
+	}
+    }
+}
+
+
+
+void System::read_serialized_data (Xdr& io,
+				   const bool read_additional_data)
 {
   // This method implements the input of the vectors
   // contained in this System object, embedded in the 
@@ -387,7 +519,7 @@ void System::read_parallel_data (Xdr& io,
   // 10.)
   // Read the global solution vector
   {
-    this->read_parallel_vector(io, *this->solution); 
+    this->read_serialized_vector(io, *this->solution); 
 
     // get the comment
     if (libMesh::processor_id() == 0)
@@ -403,7 +535,7 @@ void System::read_parallel_data (Xdr& io,
   
       for(; pos != this->_vectors.end(); ++pos)
         {
-	  this->read_parallel_vector(io, *pos->second);
+	  this->read_serialized_vector(io, *pos->second);
 
 	  // get the comment
 	  if (libMesh::processor_id() == 0)
@@ -416,12 +548,12 @@ void System::read_parallel_data (Xdr& io,
 
 
 template <typename iterator_type>
-unsigned int System::read_parallel_blocked_dof_objects (const unsigned int var,
-							const unsigned int n_objects,
-							const iterator_type begin,
-							const iterator_type end,
-							Xdr &io,
-							NumericVector<Number> &vec) const
+unsigned int System::read_serialized_blocked_dof_objects (const unsigned int var,
+							  const unsigned int n_objects,
+							  const iterator_type begin,
+							  const iterator_type end,
+							  Xdr &io,
+							  NumericVector<Number> &vec) const
 {
   const unsigned int sys_num = this->number();
   
@@ -561,7 +693,7 @@ unsigned int System::read_parallel_blocked_dof_objects (const unsigned int var,
 
 
 
-void System::read_parallel_vector (Xdr& io, NumericVector<Number>& vec)
+void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
 {
   parallel_only();
 
@@ -590,23 +722,23 @@ void System::read_parallel_vector (Xdr& io, NumericVector<Number>& vec)
       //---------------------------------
       // Collect the values for all nodes
       n_assigned_vals +=
-	this->read_parallel_blocked_dof_objects (var,
-						 this->get_mesh().n_nodes(),
-						 this->get_mesh().local_nodes_begin(),
-						 this->get_mesh().local_nodes_end(),
-						 io,
-						 vec);
+	this->read_serialized_blocked_dof_objects (var,
+						   this->get_mesh().n_nodes(),
+						   this->get_mesh().local_nodes_begin(),
+						   this->get_mesh().local_nodes_end(),
+						   io,
+						   vec);
       
       
       //------------------------------------
       // Collect the values for all elements
       n_assigned_vals +=
-	this->read_parallel_blocked_dof_objects (var,
-						 this->get_mesh().n_elem(),
-						 this->get_mesh().local_elements_begin(),
-						 this->get_mesh().local_elements_end(),
-						 io,
-						 vec);
+	this->read_serialized_blocked_dof_objects (var,
+						   this->get_mesh().n_elem(),
+						   this->get_mesh().local_elements_begin(),
+						   this->get_mesh().local_elements_end(),
+						   io,
+						   vec);
     } // end variable loop
   Parallel::sum (n_assigned_vals);
   assert (n_assigned_vals == vector_length);
@@ -806,7 +938,7 @@ void System::write_header (Xdr& io,
 // void System::write_data (Xdr& io,
 // 			 const bool write_additional_data) const
 // {
-//   // This is deprecated -- use write_parallel_data() instead.  This will be kept for reference
+//   // This is deprecated -- use write_serialized_data() instead.  This will be kept for reference
 //   // for a little while, then dropped.  There is no need call this method any more.
 //   deprecated();
   
@@ -1011,8 +1143,154 @@ void System::write_header (Xdr& io,
 
 
 
-void System::write_parallel_data (Xdr& io,
+void System::write_parallel_data (Xdr &io,
 				  const bool write_additional_data) const
+{
+  /**
+   * This method implements the output of the vectors
+   * contained in this System object, embedded in the 
+   * output of an EquationSystems<T_sys>. 
+   *
+   *   9.) The global solution vector, re-ordered to be node-major 
+   *       (More on this later.)                                    
+   *                                                                
+   *      for each additional vector in the object          
+   *                                                                
+   *      10.) The global additional vector, re-ordered to be       
+   *           node-major (More on this later.)
+   *
+   * Note that the actual IO is handled through the Xdr class 
+   * (to be renamed later?) which provides a uniform interface to 
+   * both the XDR (eXternal Data Representation) interface and standard
+   * ASCII output.  Thus this one section of code will read XDR or ASCII
+   * files with no changes.
+   */ 
+  std::string comment;
+  
+  assert (io.writing());
+  
+  std::vector<Number> io_buffer; io_buffer.reserve(this->solution->local_size());
+	  
+  const unsigned int sys_num = this->number();
+  const unsigned int n_vars  = this->n_vars();
+  
+  // Loop over each variable and each node, and write out the value.
+  for (unsigned int var=0; var<n_vars; var++)
+    {
+      // First write the node DOF values
+      {	
+	MeshBase::const_node_iterator
+	  it  = this->get_mesh().local_nodes_begin(),
+	  end = this->get_mesh().local_nodes_end();
+	
+	for (; it != end; ++it)
+	  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+	    {
+	      assert ((*it)->dof_number(sys_num, var, comp) !=
+		      DofObject::invalid_id);
+	      
+	      io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));
+	    }
+      }
+
+      // Then write the element DOF values
+      {	
+	MeshBase::const_element_iterator
+	  it  = this->get_mesh().local_elements_begin(),
+	  end = this->get_mesh().local_elements_end();
+	
+	for (; it != end; ++it)
+	  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+	    {
+	      assert ((*it)->dof_number(sys_num, var, comp) !=
+		      DofObject::invalid_id);
+	      
+	      io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));    
+	    }
+      }
+    }
+  // 9.)
+  //
+  // Actually write the reordered solution vector 
+  // for the ith system to disk
+  
+  // set up the comment
+  {
+    comment = "# System \"";
+    comment += this->name();
+    comment += "\" Solution Vector";
+  }
+  
+  io.data (io_buffer, comment.c_str());	  
+  
+  // Only write additional vectors if wanted  
+  if (write_additional_data)
+    {	  
+      std::map<std::string, NumericVector<Number>* >::const_iterator
+	pos = _vectors.begin();
+  
+      for(; pos != this->_vectors.end(); ++pos)
+        {
+	  io_buffer.clear(); io_buffer.reserve( pos->second->local_size());
+	  
+	  // Loop over each variable and each node, and write out the value.
+	  for (unsigned int var=0; var<n_vars; var++)
+	    {
+	      // First write the node DOF values
+	      {	
+		MeshBase::const_node_iterator
+		  it  = this->get_mesh().local_nodes_begin(),
+		  end = this->get_mesh().local_nodes_end();
+	
+		for (; it != end; ++it)
+		  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+		    {
+		      assert ((*it)->dof_number(sys_num, var, comp) !=
+			      DofObject::invalid_id);
+		      
+		      io_buffer.push_back((*pos->second)((*it)->dof_number(sys_num, var, comp)));   
+		    }
+	      }
+
+	      // Then write the element DOF values
+	      {	
+		MeshBase::const_element_iterator
+		  it  = this->get_mesh().local_elements_begin(),
+		  end = this->get_mesh().local_elements_end();
+	
+		for (; it != end; ++it)
+		  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+		    {
+		      assert ((*it)->dof_number(sys_num, var, comp) !=
+			      DofObject::invalid_id);
+	      
+		      io_buffer.push_back((*pos->second)((*it)->dof_number(sys_num, var, comp)));
+		    }
+	      }
+	    }
+	  // 10.)
+	  //
+	  // Actually write the reordered additional vector 
+	  // for this system to disk
+	  
+	  // set up the comment
+	  {
+	    comment = "# System \"";
+	    comment += this->name(); 
+	    comment += "\" Additional Vector \"";
+	    comment += pos->first;
+	    comment += "\"";
+	  }
+	      
+	  io.data (io_buffer, comment.c_str());	  	
+	}
+    }
+}
+
+
+
+void System::write_serialized_data (Xdr& io,
+				    const bool write_additional_data) const
 {
   /**
    * This method implements the output of the vectors
@@ -1030,7 +1308,7 @@ void System::write_parallel_data (Xdr& io,
   parallel_only();
   std::string comment;
 
-  this->write_parallel_vector(io, *this->solution); 
+  this->write_serialized_vector(io, *this->solution); 
 
   // set up the comment
   if (libMesh::processor_id() == 0)
@@ -1050,7 +1328,7 @@ void System::write_parallel_data (Xdr& io,
   
       for(; pos != this->_vectors.end(); ++pos)
         {
-	  this->write_parallel_vector(io, *pos->second);
+	  this->write_serialized_vector(io, *pos->second);
 
 	  // set up the comment
 	  if (libMesh::processor_id() == 0)
@@ -1069,12 +1347,12 @@ void System::write_parallel_data (Xdr& io,
 
 
 template <typename iterator_type>
-unsigned int System::write_parallel_blocked_dof_objects (const NumericVector<Number> &vec,
-							 const unsigned int var,
-							 const unsigned int n_objects,
-							 const iterator_type begin,
-							 const iterator_type end,
-							 Xdr &io) const
+unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<Number> &vec,
+							   const unsigned int var,
+							   const unsigned int n_objects,
+							   const iterator_type begin,
+							   const iterator_type end,
+							   Xdr &io) const
 {
   
   const unsigned int sys_num = this->number();
@@ -1237,7 +1515,7 @@ unsigned int System::write_parallel_blocked_dof_objects (const NumericVector<Num
 
 
 
-void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) const
+void System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec) const
 {
   parallel_only();
   
@@ -1256,22 +1534,22 @@ void System::write_parallel_vector (Xdr& io, const NumericVector<Number>& vec) c
       //---------------------------------
       // Collect the values for all nodes
       written_length +=
-	this->write_parallel_blocked_dof_objects (vec,
-						  var,
-						  this->get_mesh().n_nodes(),
-						  this->get_mesh().local_nodes_begin(),
-						  this->get_mesh().local_nodes_end(),
-						  io);
+	this->write_serialized_blocked_dof_objects (vec,
+						    var,
+						    this->get_mesh().n_nodes(),
+						    this->get_mesh().local_nodes_begin(),
+						    this->get_mesh().local_nodes_end(),
+						    io);
       
       //------------------------------------
       // Collect the values for all elements
       written_length +=
-	this->write_parallel_blocked_dof_objects (vec,
-						  var,
-						  this->get_mesh().n_elem(),
-						  this->get_mesh().local_elements_begin(),
-						  this->get_mesh().local_elements_end(),
-						  io);
+	this->write_serialized_blocked_dof_objects (vec,
+						    var,
+						    this->get_mesh().n_elem(),
+						    this->get_mesh().local_elements_begin(),
+						    this->get_mesh().local_elements_end(),
+						    io);
     } // end variable loop
 
   if (libMesh::processor_id() == 0)

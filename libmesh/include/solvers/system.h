@@ -30,7 +30,7 @@
 #include "fe_type.h"
 #include "auto_ptr.h"
 #include "reference_counted_object.h"
-
+#include "enum_xdr_mode.h"
 
 
 // Forward Declarations
@@ -422,9 +422,17 @@ public:
    * Reads additional data, namely vectors, for this System.
    * This method may safely be called on a distributed-memory mesh.
    */
-  void read_parallel_data (Xdr& io,
-			   const bool read_additional_data=true);
+  void read_serialized_data (Xdr& io,
+			     const bool read_additional_data=true);
 
+  /**
+   * Reads additional data, namely vectors, for this System.
+   * This method may safely be called on a distributed-memory mesh.
+   * This method will read an individual file for each processor in the simulation
+   * where the local solution components for that processor are stored.
+   */
+  void read_parallel_data (Xdr &io,
+			   const bool read_additional_data);
   /**
    * Writes the basic data header for this System.
    */
@@ -435,9 +443,18 @@ public:
    * Writes additional data, namely vectors, for this System.
    * This method may safely be called on a distributed-memory mesh.
    */
-  void write_parallel_data (Xdr& io,
-			    const bool write_additional_data = true) const;
+  void write_serialized_data (Xdr& io,
+			      const bool write_additional_data = true) const;
 
+  /**
+   * Writes additional data, namely vectors, for this System.
+   * This method may safely be called on a distributed-memory mesh.
+   * This method will create an individual file for each processor in the simulation
+   * where the local solution components for that processor will be stored.
+   */
+  void write_parallel_data (Xdr &io,
+			    const bool write_additional_data) const;
+  
   /**
    * @returns a string containing information about the
    * system.
@@ -580,38 +597,38 @@ private:
    * blocked input and is safe to call on a distributed memory-mesh.
    */   
   template <typename iterator_type>
-  unsigned int read_parallel_blocked_dof_objects (const unsigned int var,
-						  const unsigned int n_objects,
-						  const iterator_type begin,
-						  const iterator_type end,
-						  Xdr &io,
-						  NumericVector<Number> &vec) const;
+  unsigned int read_serialized_blocked_dof_objects (const unsigned int var,
+						    const unsigned int n_objects,
+						    const iterator_type begin,
+						    const iterator_type end,
+						    Xdr &io,
+						    NumericVector<Number> &vec) const;
 
   /**
    * Reads a vector for this System.
    * This method may safely be called on a distributed-memory mesh.
    */
-  void read_parallel_vector (Xdr& io,
-			     NumericVector<Number> &vec);
+  void read_serialized_vector (Xdr& io,
+			       NumericVector<Number> &vec);
 
   /**
    * Writes an output vector to the stream \p io for a set of \p DofObjects.
    * This method uses blocked output and is safe to call on a distributed memory-mesh.
    */   
   template <typename iterator_type>
-  unsigned int write_parallel_blocked_dof_objects (const NumericVector<Number> &vec,
-						   const unsigned int var,
-						   const unsigned int n_objects,
-						   const iterator_type begin,
-						   const iterator_type end,
-						   Xdr &io) const;
+  unsigned int write_serialized_blocked_dof_objects (const NumericVector<Number> &vec,
+						     const unsigned int var,
+						     const unsigned int n_objects,
+						     const iterator_type begin,
+						     const iterator_type end,
+						     Xdr &io) const;
 
   /**
    * Writes a vector for this System.
    * This method may safely be called on a distributed-memory mesh.
    */
-  void write_parallel_vector (Xdr& io,
-			      const NumericVector<Number> &vec) const;
+  void write_serialized_vector (Xdr& io,
+				const NumericVector<Number> &vec) const;
 
   /**
    * Function that initializes the system.
