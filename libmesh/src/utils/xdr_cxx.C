@@ -1508,7 +1508,7 @@ void Xdr::data (std::string& s, const char* comment)
 
 
 template <>
-void Xdr::data_stream (unsigned int *val, const unsigned int len)
+void Xdr::data_stream (unsigned int *val, const unsigned int len, const unsigned int line_break)
 {
   switch (mode)
     {
@@ -1583,11 +1583,26 @@ void Xdr::data_stream (unsigned int *val, const unsigned int len)
       {
 	assert (out.good());
 
-	for (unsigned int i=0; i<len; i++)
+	if (line_break == libMesh::invalid_uint)
+	  for (unsigned int i=0; i<len; i++)
+	    {
+	      assert (out.good());
+	      out << val[i] << " ";
+	    }
+	else
 	  {
-	    assert (out.good());
-	    out << val[i] << " ";
- 	  }
+	    unsigned int cnt=0;
+	    while (cnt < len)
+	      {
+		for (unsigned int i=0; i<std::min(line_break,len); i++)
+		  {
+		    assert (out.good());
+		    out << val[cnt++] << " ";
+		  }
+		assert (out.good());
+		out << '\n';
+	      }
+	  }
 
 	return;	
       }
@@ -1600,7 +1615,7 @@ void Xdr::data_stream (unsigned int *val, const unsigned int len)
 
 
 template <>
-void Xdr::data_stream (double *val, const unsigned int len)
+void Xdr::data_stream (double *val, const unsigned int len, const unsigned int line_break)
 {
   switch (mode)
     {
@@ -1675,11 +1690,26 @@ void Xdr::data_stream (double *val, const unsigned int len)
       {
 	assert (out.good());
 
-	for (unsigned int i=0; i<len; i++)
+	if (line_break == libMesh::invalid_uint)
+	  for (unsigned int i=0; i<len; i++)
+	    {
+	      assert (out.good());
+	      OFSRealscientific(out,17,val[i]) << " ";
+	    }
+	else
 	  {
-	    assert (out.good());
-	    OFSRealscientific(out,17,val[i]) << " ";
- 	  }
+	    unsigned int cnt=0;
+	    while (cnt < len)
+	      {
+		for (unsigned int i=0; i<std::min(line_break,len); i++)
+		  {
+		    assert (out.good());
+		    OFSRealscientific(out,17,val[cnt++]) << " ";
+		  }
+		assert (out.good());
+		out << '\n';
+	      }
+	  }
 
 	return;	
       }

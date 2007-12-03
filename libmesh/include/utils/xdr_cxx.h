@@ -24,6 +24,7 @@
 
 // Local includes
 #include "libmesh_common.h"
+#include "libmesh.h"
 #include "enum_xdr_mode.h"
 #include "o_f_stream.h"
 
@@ -412,7 +413,7 @@ public:
    * Inputs or outputs a raw data stream.
    */
   template <typename T>
-  void data_stream (T *val, const unsigned int len);
+  void data_stream (T *val, const unsigned int len, const unsigned int line_break=libMesh::invalid_uint);
 
   /**
    * Writes or reads (ignores) a comment line.
