@@ -203,7 +203,8 @@ unsigned int NewtonSolver::solve()
               if (!quiet)
 		print_convergence(_outer_iterations, current_residual,
                                   norm_delta, linear_solve_finished);
-              break; // out of for (unsigned int l=0; l<max_nonlinear_iterations; ++l)
+              _outer_iterations++;
+              break; // out of _outer_iterations for loop
             }
 
           while (current_residual > last_residual)
@@ -251,7 +252,10 @@ unsigned int NewtonSolver::solve()
 	  // Check to see if backtracking failed,
 	  // and break out of the nonlinear loop if so...
 	  if (_solve_result == DiffSolver::DIVERGED_BACKTRACKING_FAILURE)
-	    break; // out of for (unsigned int l=0; l<max_nonlinear_iterations; ++l)
+            {
+              _outer_iterations++;
+	      break; // out of _outer_iterations for loop
+            }
 	  
         } // end if (require_residual_reduction)
 
@@ -278,7 +282,8 @@ unsigned int NewtonSolver::solve()
       if (test_convergence(current_residual, norm_delta / steplength,
                            linear_solve_finished))
         {
-          break;
+          _outer_iterations++;
+	  break; // out of _outer_iterations for loop
         }
 
       if (_outer_iterations >= max_nonlinear_iterations - 1)
