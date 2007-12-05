@@ -539,18 +539,22 @@ public:
   virtual element_iterator active_local_elements_end        () = 0;
   virtual element_iterator active_not_local_elements_begin  () = 0;
   virtual element_iterator active_not_local_elements_end    () = 0;
-  virtual element_iterator level_elements_begin         (const unsigned int level  ) = 0;
-  virtual element_iterator level_elements_end           (const unsigned int level  ) = 0;
-  virtual element_iterator not_level_elements_begin     (const unsigned int level  ) = 0;
-  virtual element_iterator not_level_elements_end       (const unsigned int level  ) = 0;
-  virtual element_iterator pid_elements_begin           (const unsigned int proc_id) = 0;
-  virtual element_iterator pid_elements_end             (const unsigned int proc_id) = 0;
-  virtual element_iterator type_elements_begin          (const ElemType type       ) = 0;
-  virtual element_iterator type_elements_end            (const ElemType type       ) = 0;
-  virtual element_iterator active_type_elements_begin   (const ElemType type       ) = 0;
-  virtual element_iterator active_type_elements_end     (const ElemType type       ) = 0;
-  virtual element_iterator active_pid_elements_begin    (const unsigned int proc_id) = 0;
-  virtual element_iterator active_pid_elements_end      (const unsigned int proc_id) = 0;
+  virtual element_iterator level_elements_begin           (const unsigned int level  ) = 0;
+  virtual element_iterator level_elements_end             (const unsigned int level  ) = 0;
+  virtual element_iterator not_level_elements_begin       (const unsigned int level  ) = 0;
+  virtual element_iterator not_level_elements_end         (const unsigned int level  ) = 0;
+  virtual element_iterator local_level_elements_begin     (const unsigned int level  ) = 0;
+  virtual element_iterator local_level_elements_end       (const unsigned int level  ) = 0;
+  virtual element_iterator local_not_level_elements_begin (const unsigned int level  ) = 0;
+  virtual element_iterator local_not_level_elements_end   (const unsigned int level  ) = 0;
+  virtual element_iterator pid_elements_begin             (const unsigned int proc_id) = 0;
+  virtual element_iterator pid_elements_end               (const unsigned int proc_id) = 0;
+  virtual element_iterator type_elements_begin            (const ElemType type       ) = 0;
+  virtual element_iterator type_elements_end              (const ElemType type       ) = 0;
+  virtual element_iterator active_type_elements_begin     (const ElemType type       ) = 0;
+  virtual element_iterator active_type_elements_end       (const ElemType type       ) = 0;
+  virtual element_iterator active_pid_elements_begin      (const unsigned int proc_id) = 0;
+  virtual element_iterator active_pid_elements_end        (const unsigned int proc_id) = 0;
 
   
   
@@ -575,18 +579,22 @@ public:
   virtual const_element_iterator active_local_elements_end        () const = 0;
   virtual const_element_iterator active_not_local_elements_begin  () const = 0;
   virtual const_element_iterator active_not_local_elements_end    () const = 0;
-  virtual const_element_iterator level_elements_begin         (const unsigned int level)   const = 0;
-  virtual const_element_iterator level_elements_end           (const unsigned int level)   const = 0;
-  virtual const_element_iterator not_level_elements_begin     (const unsigned int level)   const = 0;
-  virtual const_element_iterator not_level_elements_end       (const unsigned int level)   const = 0;
-  virtual const_element_iterator pid_elements_begin           (const unsigned int proc_id) const = 0;
-  virtual const_element_iterator pid_elements_end             (const unsigned int proc_id) const = 0;
-  virtual const_element_iterator type_elements_begin          (const ElemType type)        const = 0;
-  virtual const_element_iterator type_elements_end            (const ElemType type)        const = 0;
-  virtual const_element_iterator active_type_elements_begin   (const ElemType type)        const = 0;
-  virtual const_element_iterator active_type_elements_end     (const ElemType type)        const = 0;
-  virtual const_element_iterator active_pid_elements_begin    (const unsigned int proc_id) const = 0;
-  virtual const_element_iterator active_pid_elements_end      (const unsigned int proc_id) const = 0;
+  virtual const_element_iterator level_elements_begin           (const unsigned int level)   const = 0;
+  virtual const_element_iterator level_elements_end             (const unsigned int level)   const = 0;
+  virtual const_element_iterator not_level_elements_begin       (const unsigned int level)   const = 0;
+  virtual const_element_iterator not_level_elements_end         (const unsigned int level)   const = 0;
+  virtual const_element_iterator local_level_elements_begin     (const unsigned int level)   const = 0;
+  virtual const_element_iterator local_level_elements_end       (const unsigned int level)   const = 0;
+  virtual const_element_iterator local_not_level_elements_begin (const unsigned int level)   const = 0;
+  virtual const_element_iterator local_not_level_elements_end   (const unsigned int level)   const = 0;
+  virtual const_element_iterator pid_elements_begin             (const unsigned int proc_id) const = 0;
+  virtual const_element_iterator pid_elements_end               (const unsigned int proc_id) const = 0;
+  virtual const_element_iterator type_elements_begin            (const ElemType type)        const = 0;
+  virtual const_element_iterator type_elements_end              (const ElemType type)        const = 0;
+  virtual const_element_iterator active_type_elements_begin     (const ElemType type)        const = 0;
+  virtual const_element_iterator active_type_elements_end       (const ElemType type)        const = 0;
+  virtual const_element_iterator active_pid_elements_begin      (const unsigned int proc_id) const = 0;
+  virtual const_element_iterator active_pid_elements_end        (const unsigned int proc_id) const = 0;
 
   
   /**

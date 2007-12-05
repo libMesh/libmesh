@@ -351,6 +351,36 @@ namespace Predicates
 
 
 
+
+  // Instantiation for the LocalLevel abstract_multi_predicate
+  template <typename T>
+  struct LocalLevel : abstract_multi_predicate<T>
+  {
+    LocalLevel(const unsigned int l)
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new pid<T>(libMesh::processor_id()));
+      this->_predicates.push_back(new level<T>(l));
+    }
+  };
+
+
+
+
+  // Instantiation for the LocalNotLevel abstract_multi_predicate
+  template <typename T>
+  struct LocalNotLevel : abstract_multi_predicate<T>
+  {
+    LocalNotLevel(const unsigned int l)
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new pid<T>(libMesh::processor_id()));
+      this->_predicates.push_back(new not_level<T>(l));
+    }
+  };
+
+
+
   // Instantiation for the ActiveOnBoundary abstract_multi_predicate
   template <typename T>
   struct ActiveOnBoundary : abstract_multi_predicate<T>
