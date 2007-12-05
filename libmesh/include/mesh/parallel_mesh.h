@@ -230,6 +230,12 @@ public:
   element_iterator not_level_elements_begin (const unsigned int level);
   element_iterator not_level_elements_end   (const unsigned int level);
 
+  element_iterator local_level_elements_begin (const unsigned int level);
+  element_iterator local_level_elements_end   (const unsigned int level);
+
+  element_iterator local_not_level_elements_begin (const unsigned int level);
+  element_iterator local_not_level_elements_end   (const unsigned int level);
+
   element_iterator pid_elements_begin (const unsigned int proc_id);
   element_iterator pid_elements_end   (const unsigned int proc_id);
 
@@ -279,6 +285,12 @@ public:
 
   const_element_iterator not_level_elements_begin (const unsigned int level) const;
   const_element_iterator not_level_elements_end   (const unsigned int level) const;
+
+  const_element_iterator local_level_elements_begin (const unsigned int level) const;
+  const_element_iterator local_level_elements_end   (const unsigned int level) const;
+
+  const_element_iterator local_not_level_elements_begin (const unsigned int level) const;
+  const_element_iterator local_not_level_elements_end   (const unsigned int level) const;
 
   const_element_iterator pid_elements_begin (const unsigned int proc_id) const;
   const_element_iterator pid_elements_end   (const unsigned int proc_id) const;
