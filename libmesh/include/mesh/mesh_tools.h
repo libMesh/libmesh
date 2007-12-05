@@ -228,8 +228,8 @@ namespace MeshTools
   /**
    * Count up the number of elements of a specific type (as defined by an iterator range).
    */
-   unsigned int n_elem (MeshBase::element_iterator& begin,
-                        MeshBase::element_iterator& end);
+   unsigned int n_elem (MeshBase::const_element_iterator& begin,
+                        MeshBase::const_element_iterator& end);
 
   /**
     * Given a mesh and a node in the mesh, the vector will be filled with
