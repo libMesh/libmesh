@@ -30,7 +30,7 @@
 #include "equation_systems.h"
 
 // Forward Declarations
-class Mesh;
+class MeshBase;
 class Solver;
 
 /**
@@ -108,7 +108,7 @@ public:
   /**
    * @returns a reference to the \p Mesh.
    */
-  const Mesh & mesh () const { return _mesh; }
+  const MeshBase & mesh () const { return _mesh; }
 
   
 protected:
@@ -121,7 +121,7 @@ protected:
   /**
    * @returns a reference to the \p Mesh.
    */
-  Mesh & mesh () { return _mesh; }
+  MeshBase & mesh () { return _mesh; }
 
   /**
    * A reference to the system we are solving.
@@ -132,7 +132,7 @@ protected:
    * A reference to the \p Mesh for the system
    * we are solving.
    */
-  Mesh& _mesh;
+  MeshBase& _mesh;
 };
 
 
