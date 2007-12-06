@@ -74,7 +74,7 @@ namespace libMeshEnums {
 
 		 REMOTEELEM,   // 26
 		 
-		 INVALID_ELEM};
+		 INVALID_ELEM};  // 27 - should always be last
 }
 
 using namespace libMeshEnums;

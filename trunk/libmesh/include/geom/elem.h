@@ -266,7 +266,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * This array maps the integer representation of the \p ElemType enum
    * to the number of nodes in the element.
    */
-  static const unsigned int type_to_n_nodes_map[26];
+  static const unsigned int type_to_n_nodes_map[INVALID_ELEM];
   
   /**
    * @returns the dimensionality of the object.
