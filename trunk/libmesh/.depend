@@ -3421,6 +3421,7 @@ src/mesh/legacy_xdr_io.$(obj-suffix):\
     include/mesh/xdr_shead.h\
     include/mesh/xdr_soln.h\
     include/numerics/type_vector.h\
+    include/parallel/parallel.h\
     include/utils/o_f_stream.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -4353,6 +4354,7 @@ src/mesh/unstructured_mesh.$(obj-suffix):\
     include/mesh/unstructured_mesh.h\
     include/mesh/unv_io.h\
     include/mesh/vtk_io.h\
+    include/mesh/xdr_io.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
     include/utils/o_string_stream.h\
@@ -4473,6 +4475,42 @@ src/mesh/xdr_head.$(obj-suffix):\
     include/mesh/xdr_head.h\
     include/mesh/xdr_mgf.h\
     include/utils/o_f_stream.h
+src/mesh/xdr_io.$(obj-suffix):\
+    src/mesh/xdr_io.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/geom/elem.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/mesh/boundary_info.h\
+    include/mesh/legacy_xdr_io.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_input.h\
+    include/mesh/mesh_output.h\
+    include/mesh/mesh_tools.h\
+    include/mesh/xdr_io.h\
+    include/numerics/type_vector.h\
+    include/parallel/parallel.h\
+    include/utils/o_f_stream.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h\
+    include/utils/xdr_cxx.h
 src/mesh/xdr_mesh.$(obj-suffix):\
     src/mesh/xdr_mesh.C\
     include/base/libmesh_base.h\
@@ -7180,9 +7218,13 @@ src/utils/utility.$(obj-suffix):\
     include/utils/utility.h
 src/utils/xdr_cxx.$(obj-suffix):\
     src/utils/xdr_cxx.C\
+    include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/utils/o_f_stream.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h\
     include/utils/xdr_cxx.h
