@@ -143,12 +143,22 @@ class XdrIO : public MeshInput<MeshBase>,
   /**
    * Write the connectivity for a parallel, distributed mesh
    */
-  void write_serialized_connectivity (Xdr &io, const unsigned int n_elem);
+  void write_serialized_connectivity (Xdr &io, const unsigned int n_elem) const;
 
   /**
    * Write the nodal locations for a parallel, distributed mesh
    */
-  void write_serialized_nodes (Xdr &io, const unsigned int n_nodes);
+  void write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const;
+
+  /**
+   * Read the connectivity for a parallel, distributed mesh
+   */
+  void read_serialized_connectivity (Xdr &io, const unsigned int n_elem);
+
+  /**
+   * Read the nodal locations for a parallel, distributed mesh
+   */
+  void read_serialized_nodes (Xdr &io, const unsigned int n_nodes);
 
   /**
    * Pack an element into a transfer buffer for parallel communication.
