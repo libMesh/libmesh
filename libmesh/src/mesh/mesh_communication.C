@@ -773,16 +773,10 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 
 		assert ((elem_level == 0) || (parent_ID != -1));
   
-		// Ignore elements not matching the current level.  We
-		// have to do this in a somewhat expensive fashion since
-		// there is no good way to determine the number of nodes
-		// in an element type without constructing one.
-		if (elem_level > level) // build an element of elem_type and skip elem->n_nodes()
-		  {                     // entries in the conn array.
-		    AutoPtr<Elem> elem = Elem::build (elem_type);
+		// Ignore elements not matching the current level.
+		if (elem_level > level) // skip elem->n_nodes() entries in the conn array.
+		  cnt += Elem::type_to_n_nodes_map[elem_type];
 
-		    cnt += elem->n_nodes();
-		  }
                 else
 #endif
 		if (elem_level < level ||     // we should already have

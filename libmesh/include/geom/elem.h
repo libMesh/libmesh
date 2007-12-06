@@ -261,6 +261,12 @@ class Elem : public ReferenceCountedObject<Elem>,
    * base class.
    */
   virtual ElemType type () const = 0;
+
+  /**
+   * This array maps the integer representation of the \p ElemType enum
+   * to the number of nodes in the element.
+   */
+  static const unsigned int type_to_n_nodes_map[26];
   
   /**
    * @returns the dimensionality of the object.
@@ -983,7 +989,7 @@ Elem::Elem(const unsigned int nn,
 {
   this->subdomain_id() = 0;
   this->processor_id() = DofObject::invalid_processor_id;
-
+  
   // Initialize the nodes data structure
   _nodes = NULL;
   
@@ -1026,7 +1032,7 @@ Elem::Elem(const unsigned int nn,
   else
     this->set_p_level(0);
 
-#endif  
+#endif
 }
 
 
