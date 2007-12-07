@@ -132,9 +132,9 @@ void XdrIO::write (const std::string& name)
 
   // write the nodal locations
   this->write_serialized_nodes (io, n_nodes);
-  
-  if (libMesh::processor_id() == 0)
-    io.data (n_bcs,   "# number of boundary conditions");
+
+  // write the boundary condition information
+  this->write_serialized_bcs (io, n_bcs);
 }
 
 
@@ -445,6 +445,40 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
   if (libMesh::processor_id() == 0)
     assert (n_written == n_nodes);
 }
+
+
+
+void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
+{
+  assert (io.writing());
+  
+  if (!n_bcs) return;
+  
+  // convenient reference to our mesh
+  const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
+  
+  // and our boundary info object
+  const BoundaryInfo &boundary_info = *mesh.boundary_info;
+
+  if (libMesh::processor_id() == 0)
+    {
+      unsigned int n_bcs_out = n_bcs;
+      io.data (n_bcs_out, "# number of boundary conditions");
+    }
+
+  std::vector<unsigned int> xfer_bcs, bcs_size(libMesh::n_processors());;
+  
+  // Boundary conditions are only specified for level-0 elements
+  MeshBase::const_element_iterator
+    it  = mesh.local_level_elements_begin(0),
+    end = mesh.local_level_elements_end(0);
+
+  for (; it!=end; ++it)
+    {
+      const Elem *elem = *it;
+    }
+    
+} 
 
 
 

@@ -140,6 +140,8 @@ class XdrIO : public MeshInput<MeshBase>,
  private:
 
 
+  //---------------------------------------------------------------------------
+  // Write Implementation
   /**
    * Write the connectivity for a parallel, distributed mesh
    */
@@ -150,6 +152,15 @@ class XdrIO : public MeshInput<MeshBase>,
    */
   void write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const;
 
+  /**
+   * Write the boundary conditions for a parallel, distributed mesh
+   */
+  void write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const;
+
+
+  
+  //---------------------------------------------------------------------------
+  // Read Implementation
   /**
    * Read the connectivity for a parallel, distributed mesh
    */
