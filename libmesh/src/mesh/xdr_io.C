@@ -501,7 +501,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
   // convenient reference to our mesh
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
-  std::map<unsigned int, unsigned int> my_nodes;
+  std::map<unsigned int, Node*> my_nodes;
 
   std::vector<unsigned int> conn, input_buffer(100 /* oversized ! */);
 
@@ -527,7 +527,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	    
 	    // get the element type, 
 	    io.data_stream (&input_buffer[0], 1);
-	    // mabe the parent
+	    // maybe the parent
 	    if (level)
 	      io.data_stream (&input_buffer[1], 1);
 	    else
@@ -555,10 +555,31 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	  
 	  Elem *parent = (parent_id == libMesh::invalid_uint) ? NULL : mesh.elem(parent_id);
 
-	  Elem *elem= mesh.add_elem(Elem::build (elem_type, parent).release());
+	  Elem *elem = Elem::build (elem_type, parent).release();
+	  elem->set_id() = e;
 
 	  if (parent)
-	    parent->add_child(elem);
+	    {
+	      parent->add_child(elem);
+	      parent->set_refinement_flag (Elem::INACTIVE);
+	      elem->set_refinement_flag   (Elem::JUST_REFINED);
+	    }
+
+	  for (unsigned int n=0; n<elem->n_nodes(); n++, ++it)
+	    {
+	      const unsigned int global_node_number = *it;
+	      
+	      Node *node = my_nodes[global_node_number];
+
+	      if (!node)
+		{
+		  node = mesh.add_point (Point(), global_node_number);
+		  my_nodes[global_node_number] = node;
+		}
+
+	      elem->set_node(n) = node;
+	    }
+	  mesh.add_elem(elem);
 	}
     }
 }
@@ -625,16 +646,16 @@ void XdrIO::read_serialized_nodes (Xdr &io, const unsigned int n_nodes)
 	  pos = std::equal_range (pos.first, needed_nodes.end(), n);
 
 	  if (pos.first != pos.second) // we need this node.
-	    {	      
-	      Node &node = mesh.node(n);
+	    {
+	      assert (*pos.first == n);
+	      mesh.node(n) = 
+		Point (coords[idx+0],
+		       coords[idx+1],
+		       coords[idx+2]);
 
-	      node(0) = coords[idx+0];
-	      node(1) = coords[idx+1];
-	      node(2) = coords[idx+2];
 	    }
-	}
-    }	  
-    
+	}	  
+    }    
 }
 
 
