@@ -751,21 +751,22 @@ if (!this->has_children())
 void Elem::add_child (Elem* elem)
 {
   if(_children == NULL)
-  {
-    _children = new Elem*[this->n_children()];
-    
-    for (unsigned int c=0; c<this->n_children(); c++)
-      _children[c] = NULL;
-  }
-
-  for (unsigned int c=0; c<this->n_children(); c++)
-  {
-    if(_children[c] == NULL || _children[c] == remote_elem)
     {
-      _children[c] = elem;
-      return;
+      _children = new Elem*[this->n_children()];
+      
+      for (unsigned int c=0; c<this->n_children(); c++)
+	_children[c] = NULL;
     }
-  }
+  
+  for (unsigned int c=0; c<this->n_children(); c++)
+    {
+      if(_children[c] == NULL || _children[c] == remote_elem)
+	{
+	  assert (this == elem->parent());
+	  _children[c] = elem;
+	  return;
+	}
+    }
 
   std::cerr << "Error: Tried to add a child to an element with full children array"
             << std::endl;
@@ -777,14 +778,16 @@ void Elem::add_child (Elem* elem)
 void Elem::add_child (Elem* elem, unsigned int c)
 {
   if(_children == NULL)
-  {
-    _children = new Elem*[this->n_children()];
-    
-    for (unsigned int i=0; i<this->n_children(); i++)
-      _children[i] = NULL;
-  }
-
+    {
+      _children = new Elem*[this->n_children()];
+      
+      for (unsigned int i=0; i<this->n_children(); i++)
+	_children[i] = NULL;
+    }
+  
   assert (_children[c] == NULL || _children[c] == remote_elem);
+  assert (this == elem->parent());
+
   _children[c] = elem;
 }
 
