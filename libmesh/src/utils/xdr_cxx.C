@@ -1507,8 +1507,8 @@ void Xdr::data (std::string& s, const char* comment)
 
 
 
-template <>
-void Xdr::data_stream (unsigned int *val, const unsigned int len, const unsigned int line_break)
+template <typename T>
+void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_break)
 {
   switch (mode)
     {
@@ -1751,3 +1751,8 @@ void Xdr::comment (std::string &comment)
 
 
 #undef xdr_REAL
+
+
+//
+template void Xdr::data_stream<int>           (int *val,         const unsigned int len, const unsigned int line_break);
+template void Xdr::data_stream<unsigned int> (unsigned int *val, const unsigned int len, const unsigned int line_break);
