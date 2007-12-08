@@ -264,28 +264,6 @@ void BoundaryInfo::add_side(const Elem* elem,
   
   _boundary_side_id.insert(kv);
   _boundary_ids.insert(id);
-
-  // Possilby add the nodes of the side,
-  // if they aren't already there.
-  {
-    // MGF meshes seem to cause some trouble here, so don't
-    // do this if the library is initialized with
-    // --enable-mgf-workaround as an argument
-    // command line can't change at run-time, so use a static here.
-    static bool mgf_workaround =
-      libMesh::on_command_line("--enable-mgf-workaround");
-
-    if (!mgf_workaround)
-      {
-	assert (side < elem->n_sides());
-	
-	AutoPtr<Elem> side_elem(elem->build_side(side));
-	
-	for (unsigned int n=0; n<side_elem->n_nodes(); n++)
-	  if (this->boundary_id(side_elem->get_node(n)) == invalid_id)
-	    this->add_node(side_elem->get_node(n), id);
-      }
-  }  
 }
 
 
