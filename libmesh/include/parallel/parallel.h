@@ -1242,6 +1242,9 @@ namespace Parallel
   inline void allgather(std::vector<T> &) {}
 
   template <typename T>
+    inline void broadcast (T &, const unsigned int =0) {}
+
+  template <typename T>
     inline void broadcast (std::vector<T> &, const unsigned int =0) {}
 
 #endif // HAVE_MPI
