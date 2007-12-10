@@ -172,9 +172,18 @@ class XdrIO : public MeshInput<MeshBase>,
   void read_serialized_nodes (Xdr &io, const unsigned int n_nodes);
 
   /**
+   * Read the boundary conditions for a parallel, distributed mesh
+   */
+  void read_serialized_bcs (Xdr &io);
+
+  //-------------------------------------------------------------------------
+  /**
    * Pack an element into a transfer buffer for parallel communication.
    */
-  void pack_element (std::vector<unsigned int> &conn, const Elem *elem, const unsigned int parent_id = libMesh::invalid_uint) const;
+  void pack_element (std::vector<unsigned int> &conn, 
+		     const Elem *elem, 
+		     const unsigned int parent_id  = libMesh::invalid_uint,
+		     const unsigned int parent_pid = libMesh::invalid_uint) const;
 
   bool _binary;
   bool _legacy;
