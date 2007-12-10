@@ -215,6 +215,13 @@ namespace MeshTools
    * the maximum level.
    */
   unsigned int n_active_local_levels(const MeshBase& mesh);
+
+  /**
+   * Return the number of p-levels of refinement in the mesh.
+   * Implemented by looping over all the local elements and finding the
+   * maximum p-level, then summing in parallel.
+   */
+  unsigned int n_p_levels (const MeshBase& mesh);
  
   /**
    * Builds a set of node IDs for nodes which belong to non-subactive
@@ -231,6 +238,13 @@ namespace MeshTools
    unsigned int n_elem (MeshBase::const_element_iterator& begin,
                         MeshBase::const_element_iterator& end);
 
+
+  /**
+   * Find the maxium h-refinement level in a mesh.   
+   */
+  unsigned int max_level (const MeshBase &mesh);
+    
+  
   /**
     * Given a mesh and a node in the mesh, the vector will be filled with
     * every node directly attached to the given one.
