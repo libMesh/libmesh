@@ -37,7 +37,7 @@
 #include "boundary_info.h"
 #include "parallel.h"
 #include "mesh_tools.h"
-
+#include "partitioner.h"
 
 
 //-----------------------------------------------
@@ -80,7 +80,7 @@ namespace {
 
 // ------------------------------------------------------------
 // XdrIO static data
-const unsigned int XdrIO::io_blksize = 2;
+const unsigned int XdrIO::io_blksize = 128000;
 
 
 
@@ -92,7 +92,7 @@ XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
   _binary             (binary),
   _legacy             (true),
   _version            ("libMesh-0.7.0+"),
-  _bc_file_name       ("."),
+  _bc_file_name       ("n/a"),
   _partition_map_file ("n/a"),
   _subdomain_map_file ("n/a"),
   _p_level_file       ("n/a")
@@ -129,24 +129,35 @@ void XdrIO::write (const std::string& name)
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
   
   unsigned int
-    n_elem  = mesh.n_elem(),
-    n_nodes = mesh.n_nodes(),
-    n_bcs   = mesh.boundary_info->n_boundary_conds();
+    n_elem     = mesh.n_elem(),
+    n_nodes    = mesh.n_nodes(),
+    n_bcs      = mesh.boundary_info->n_boundary_conds(),
+    n_p_levels = MeshTools::n_p_levels (mesh); 
 
-  // If there are no bcs, don't write anything
-  if (!n_bcs)
-    this->boundary_condition_file_name() = "n/a";
 
+  //-------------------------------------------------------------
+  // For all the optional files -- the default file name is "n/a".
+  // However, the user may specify an optional external file. 
+  
+  // If there are BCs and the user has not already provided a
+  // file name then write to "."
+  if (n_bcs &&
+      this->boundary_condition_file_name() == "n/a")
+    this->boundary_condition_file_name() = ".";
+  
   // If there are more than one subdomains and the user has not specified an 
   // external file then write the subdomain mapping to the default file "."  
-  // Do not assume that we will not write a sudomain file if there is only 1 
-  // subdomain, since reading such a mesh would break in the case when all the 
-  // elements are on subdomain 100, for example.  In this case, however, the 
-  // user will need to explicitly set the subdomain_map_file_name() before 
-  // calling the write() method.
   if ((mesh.n_subdomains() > 1) && 
       (this->subdomain_map_file_name() == "n/a"))
     this->subdomain_map_file_name() = ".";
+
+  // In general we don't write the partition information.
+  
+  // If we have p levels and the user has not already provided
+  // a file name then write to "."
+  if ((n_p_levels > 1) &&
+      (this->polynomial_level_file_name() == "n/a"))
+    this->polynomial_level_file_name() = ".";
 
   // write the header
   if (libMesh::processor_id() == 0)
@@ -275,17 +286,17 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 	    {
 	      output_buffer.clear();
 	      const unsigned int n_nodes = *it; ++it;
-	      output_buffer.push_back(*it);     /* type          */ ++it;	      
-	      /*output_buffer.push_back(*it);*/ /* id            */ ++it;
+	      output_buffer.push_back(*it);     /* type       */ ++it;	      
+	      /*output_buffer.push_back(*it);*/ /* id         */ ++it;
 	      
 	      if (write_partitioning)
-		output_buffer.push_back(pid); /* processor id */
+		output_buffer.push_back(*it); /* processor id */ ++it;
 
 	      if (write_subdomain_id)
-		output_buffer.push_back(*it); /* subdomain id  */ ++it;
+		output_buffer.push_back(*it); /* subdomain id */ ++it;
 
 	      if (write_p_level)
-		output_buffer.push_back(*it); /* p level       */ ++it;
+		output_buffer.push_back(*it); /* p level      */ ++it;
 	      
 	      for (unsigned int node=0; node<n_nodes; node++, ++it)
 		output_buffer.push_back(*it);
@@ -343,7 +354,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 	  {
 	    char buf[80];
 	    std::sprintf(buf, "# n_elem at level %d", level);
-	    std::string comment(buf), legend  = ", [ type ";
+	    std::string comment(buf), legend  = ", [ type parent ";
 
 	    if (write_partitioning)
 	      legend += "pid ";
@@ -355,7 +366,6 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 	    comment += legend;
 	    io.data (n_global_elem_at_level[level], comment.c_str());
 	  }
-
 	  
 	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 	    {
@@ -378,10 +388,10 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 		  const unsigned int parent_pid      = *it; ++it; 
 	      
 		  if (write_partitioning)
-		    output_buffer.push_back(pid); /* processor id */
+		    output_buffer.push_back(*it); /* processor id */ ++it;
 
 		  if (write_subdomain_id)
-		    output_buffer.push_back(*it); /* subdomain id  */ ++it;
+		    output_buffer.push_back(*it); /* subdomain id */ ++it;
 		  
 		  if (write_p_level)
 		    output_buffer.push_back(*it); /* p level       */ ++it;
@@ -482,8 +492,6 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
 
   for (unsigned int blk=0, last_node=0; last_node<n_nodes; blk++)
     {
-      std::cout << "Writing node block " << blk << std::endl;
-
       const unsigned int first_node = blk*io_blksize;
                           last_node = std::min((blk+1)*io_blksize, n_nodes);
 
@@ -688,14 +696,6 @@ void XdrIO::read (const std::string& name)
   // convenient reference to our mesh
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
-  // get the version string
-//   {
-//     std::string vs;
-//     if (libMesh::processor_id() == 0)
-//       io.data(vs);
-//     Parallel::broadcast (vs);
-//     this->version() = vs;
-//   }
   io.data (this->version());
   
   this->legacy() = !(this->version().find("libMesh") < this->version().size());
@@ -709,19 +709,26 @@ void XdrIO::read (const std::string& name)
     }
   
   unsigned int n_elem, n_nodes;
-  io.data (n_elem);
-  io.data (n_nodes);
-
+  if (libMesh::processor_id() == 0)
+    {
+      io.data (n_elem);
+      io.data (n_nodes);
+      io.data (this->boundary_condition_file_name()); std::cout << "bc_file="  << this->boundary_condition_file_name() << std::endl;
+      io.data (this->subdomain_map_file_name());      std::cout << "sid_file=" << this->subdomain_map_file_name()      << std::endl;
+      io.data (this->partition_map_file_name());      std::cout << "pid_file=" << this->partition_map_file_name()      << std::endl;
+      io.data (this->polynomial_level_file_name());   std::cout << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
+    }
+  Parallel::broadcast (n_elem);
+  Parallel::broadcast (n_nodes);
+  Parallel::broadcast (this->boundary_condition_file_name());
+  Parallel::broadcast (this->subdomain_map_file_name());
+  Parallel::broadcast (this->partition_map_file_name());
+  Parallel::broadcast (this->polynomial_level_file_name());
+  
   // Tell the mesh how many nodes/elements to expect. Depending on the mesh type,
   // this may allow for efficient adding of nodes/elements.
   mesh.reserve_elem(n_elem);
   mesh.reserve_nodes(n_nodes);
-  
-  io.data (this->boundary_condition_file_name()); std::cout << "bc_file="  << this->boundary_condition_file_name() << std::endl;
-  io.data (this->subdomain_map_file_name());      std::cout << "sid_file=" << this->subdomain_map_file_name()      << std::endl;
-  io.data (this->partition_map_file_name());      std::cout << "pid_file=" << this->partition_map_file_name()      << std::endl;
-  io.data (this->polynomial_level_file_name());   std::cout << "pl_file="  << this->polynomial_level_file_name()  << std::endl;
-
 
   // read connectivity
   this->read_serialized_connectivity (io, n_elem);
@@ -731,6 +738,9 @@ void XdrIO::read (const std::string& name)
 
   // read the boundary conditions
   this->read_serialized_bcs (io);
+
+  // set the node processor ids
+  Partitioner::set_node_processor_ids(mesh);
 }
 
 
@@ -1012,12 +1022,15 @@ void XdrIO::pack_element (std::vector<unsigned int> &conn, const Elem *elem,
 
   conn.push_back (elem->type());
   conn.push_back (elem->id());
+  
   if (parent_id != libMesh::invalid_uint)
     {
       conn.push_back (parent_id);
       assert (parent_pid != libMesh::invalid_uint);
       conn.push_back (parent_pid);
     }
+  
+  conn.push_back (elem->processor_id());
   conn.push_back (elem->subdomain_id());
   
 #ifdef ENABLE_AMR
