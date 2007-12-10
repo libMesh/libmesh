@@ -430,6 +430,35 @@ unsigned int MeshTools::n_elem (MeshBase::const_element_iterator& begin,
 {
   return std::distance(begin, end);
 }
+   
+
+
+unsigned int MeshTools::n_p_levels (const MeshBase& mesh)
+{
+  parallel_only();
+  
+  unsigned int max_p_level = 0;
+
+  // first my local elements
+  MeshBase::const_element_iterator
+    el     = mesh.local_elements_begin(),
+    end_el = mesh.local_elements_end();
+
+  for( ; el != end_el; ++el)
+    max_p_level = std::max((*el)->p_level(), max_p_level);
+
+  // then any unpartitioned objects
+  el     = mesh.pid_elements_begin(DofObject::invalid_processor_id);
+  end_el = mesh.pid_elements_end(DofObject::invalid_processor_id);
+
+  for( ; el != end_el; ++el)
+    max_p_level = std::max((*el)->p_level(), max_p_level);
+
+  Parallel::max(max_p_level);
+  return max_p_level + 1;
+}
+
+
 
 void MeshTools::find_nodal_neighbors(const MeshBase&, const Node& n, 
                                      std::vector<std::vector<const Elem*> >& nodes_to_elem_map, 
