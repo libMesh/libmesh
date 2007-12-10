@@ -46,7 +46,7 @@ void Partitioner::partition (MeshBase& mesh,
   this->_do_partition(mesh,n);
 
   // Set the node's processor ids
-  this->_set_node_processor_ids(mesh);
+  Partitioner::set_node_processor_ids(mesh);
 }
 
 
@@ -63,7 +63,7 @@ void Partitioner::repartition (MeshBase& mesh,
   this->_do_repartition(mesh,n);
 
   // Set the node's processor ids
-  this->_set_node_processor_ids(mesh);
+  Partitioner::set_node_processor_ids(mesh);
 }
 
 
@@ -90,7 +90,7 @@ void Partitioner::single_partition (MeshBase& mesh)
 
 
 
-void Partitioner::_set_node_processor_ids(MeshBase& mesh)
+void Partitioner::set_node_processor_ids(MeshBase& mesh)
 {
   // This function must be run on all processors at once
   parallel_only();

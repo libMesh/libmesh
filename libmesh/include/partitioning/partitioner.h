@@ -77,6 +77,12 @@ class Partitioner
   void repartition (MeshBase& mesh,
 		    const unsigned int n=libMesh::n_processors());
 
+  /**
+   * This function is called after partitioning to set the processor IDs
+   * for the nodes.  By definition, a Node's processor ID is the minimum
+   * processor ID for all of the elements which share the node.
+   */
+  static void set_node_processor_ids(MeshBase& mesh);
   
 protected:
 
@@ -103,13 +109,6 @@ protected:
    */
   virtual void _do_repartition (MeshBase& mesh,
 				const unsigned int n) { this->_do_partition (mesh, n); }
-
-  /**
-   * This function is called after partitioning to set the processor IDs
-   * for the nodes.  By definition, a Node's processor ID is the minimum
-   * processor ID for all of the elements which share the node.
-   */
-  void _set_node_processor_ids(MeshBase& mesh);
 };
 
 
