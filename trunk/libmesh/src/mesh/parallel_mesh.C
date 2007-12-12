@@ -302,6 +302,18 @@ Node* ParallelMesh::add_point (const Point& p,
 			       const unsigned int id,
 			       const unsigned int proc_id)
 {  
+  if (_nodes.count(id))
+    {
+      Node *n = _nodes[id];
+      assert (n);
+      assert (n->id() == id);
+      
+      *n = p;
+      n->processor_id() = proc_id;
+
+      return n;
+    }
+
   Node* n = Node::build(p, id).release();
   n->processor_id() = proc_id;
 
