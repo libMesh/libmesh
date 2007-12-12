@@ -305,9 +305,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 	    }       	
 	}
     }
-#ifdef HAVE_MPI
-  MPI_Wait (&request_handle, MPI_STATUS_IGNORE);
-#endif
+  Parallel::wait (request_handle);
 
   //--------------------------------------------------------------------
   // Next write the remaining elements indirectly through their parents.
@@ -404,10 +402,8 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 		  io.data_stream (&output_buffer[0], output_buffer.size(), output_buffer.size());
 		}       		    
 	    }
-	}    
-#ifdef HAVE_MPI
-      MPI_Wait (&request_handle, MPI_STATUS_IGNORE);
-#endif
+	}  
+      Parallel::wait (request_handle);
   
       // update the processor_offsets
       processor_offsets[0] = processor_offsets.back() + n_elem_on_proc.back();	  
@@ -563,17 +559,11 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
       // Receive the messages and write the output on processor 0.
       if (libMesh::processor_id() == 0)
         {
-#ifdef HAVE_MPI
           // Wait for all the receives to complete. We have no
           // need for the statuses since we already know the
           // buffer sizes.
-          MPI_Waitall (libMesh::n_processors(),
-                       &id_request_handles[0],
-                       MPI_STATUSES_IGNORE);
-          MPI_Waitall (libMesh::n_processors(),
-                       &coord_request_handles[0],
-                       MPI_STATUSES_IGNORE);
-#endif
+	  Parallel::wait (id_request_handles);
+	  Parallel::wait (coord_request_handles);
           
           // Write the coordinates in this block.
 	  unsigned int tot_id_size=0, tot_coord_size=0;
@@ -682,9 +672,7 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
 	}    
       assert (n_bcs == n_bcs_out);
     }
-#ifdef HAVE_MPI
-  MPI_Wait (&request_handle, MPI_STATUS_IGNORE);
-#endif
+  Parallel::wait (request_handle);
 } 
 
 

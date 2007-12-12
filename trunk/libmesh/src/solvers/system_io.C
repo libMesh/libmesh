@@ -1448,17 +1448,11 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
       // Receive the messages and write the output on processor 0.
       if (libMesh::processor_id() == 0)
 	{
-#ifdef HAVE_MPI
 	  // Wait for all the receives to complete. We have no
 	  // need for the statuses since we already know the
 	  // buffer sizes.
-	  MPI_Waitall (libMesh::n_processors(),
-		       &id_request_handles[0],
-		       MPI_STATUSES_IGNORE);
-	  MPI_Waitall (libMesh::n_processors(),
-		       &val_request_handles[0],
-		       MPI_STATUSES_IGNORE);
-#endif
+	  Parallel::wait (id_request_handles);
+	  Parallel::wait (val_request_handles);
 	  
 	  // Write the values in this block.
 	  unsigned int tot_id_size=0, tot_val_size=0;
