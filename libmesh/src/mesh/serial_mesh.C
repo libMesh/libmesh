@@ -234,12 +234,44 @@ Node* SerialMesh::add_point (const Point& p,
 			     const unsigned int id,
 			     const unsigned int proc_id)
 {  
-  // We only append points with SerialMesh
-  assert(id == DofObject::invalid_id || id == _nodes.size());
-  Node *n = Node::build(p, _nodes.size()).release();
-  n->processor_id() = proc_id;
-  _nodes.push_back (n);
+//   // We only append points with SerialMesh
+//   assert(id == DofObject::invalid_id || id == _nodes.size());
+//   Node *n = Node::build(p, _nodes.size()).release();
+//   n->processor_id() = proc_id;
+//   _nodes.push_back (n);
+
+  Node *n = NULL;
+
+  // If the user requests a valid id, either
+  // provide the existing node or resize the container
+  // to fit the new node.
+  if (id != DofObject::invalid_id)
+    if (id < _nodes.size())
+      n = _nodes[id];
+    else
+      _nodes.resize(id+1);
+  else
+    _nodes.push_back (NULL);
   
+  // if the node already exists, then assign new (x,y,z) values
+  if (n)
+    *n = p;
+  // otherwise build a new node, put it in the right spot, and return 
+  // a valid pointer.
+  else
+    {
+      n = Node::build(p, (id == DofObject::invalid_id) ? _nodes.size()-1 : id).release();
+      n->processor_id() = proc_id;
+
+      if (id == DofObject::invalid_id)
+	_nodes.back() = n;
+      else
+	_nodes[id] = n;
+    }
+
+  // better not pass back a NULL pointer.
+  assert (n);
+
   return n;
 }
 

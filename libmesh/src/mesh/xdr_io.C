@@ -759,7 +759,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
   // convenient reference to our mesh
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
-  std::map<unsigned int, Node*> my_nodes;
+  //std::map<unsigned int, Node*> my_nodes;
 
   std::vector<unsigned int> conn, input_buffer(100 /* oversized ! */);
 
@@ -854,15 +854,16 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	    {
 	      const unsigned int global_node_number = *it;
 	      
-	      Node *node = my_nodes[global_node_number];
+// 	      Node *node = my_nodes[global_node_number];
 
-	      if (!node)
-		{
-		  node = mesh.add_point (Point(), global_node_number);
-		  my_nodes[global_node_number] = node;
-		}
+// 	      if (!node)
+// 		{
+// 		  node = mesh.add_point (Point(), global_node_number);
+// 		  my_nodes[global_node_number] = node;
+// 		}
 
-	      elem->set_node(n) = node;
+	      elem->set_node(n) = 
+		mesh.add_point (Point(), global_node_number);
 	    }
 	  mesh.add_elem(elem);
 	}
