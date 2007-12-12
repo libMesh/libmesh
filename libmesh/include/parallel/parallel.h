@@ -193,6 +193,12 @@ namespace Parallel
   
   //-------------------------------------------------------------------
   /**
+   * Wait for a non-blocking send or receive to finish
+   */
+  inline void wait (std::vector<request> &r);
+  
+  //-------------------------------------------------------------------
+  /**
    * Send vector send to one processor while simultaneously receiving
    * another vector recv from a (potentially different) processor.
    */
@@ -631,6 +637,28 @@ namespace Parallel
 
   
 
+  inline void wait (request &r)
+  {
+    START_LOG("wait()", "Parallel");
+    
+    MPI_Wait (&r, MPI_STATUS_IGNORE);
+
+    STOP_LOG("wait()", "Parallel");
+  }
+
+  
+
+  inline void wait (std::vector<request> &r)
+  {
+    START_LOG("wait()", "Parallel");
+    
+    MPI_Waitall (r.size(), r.empty() ? NULL : &r[0], MPI_STATUSES_IGNORE);
+
+    STOP_LOG("wait()", "Parallel");
+  }
+  
+
+  
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
                            T &send,
@@ -1206,6 +1234,8 @@ namespace Parallel
 		     const unsigned int) {}
   
   inline void wait (request &) {}
+  
+  inline void wait (std::vector<request> &) {}
   
   template <typename T>
   inline void send_receive(const unsigned int send_tgt,
