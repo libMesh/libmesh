@@ -28,7 +28,7 @@ to the SVN repository via:
 </div>
 
 <br>
-More information regarding how the <code>libMesh</code> SVN repository may be found <a href="subversion.php"> here</a>.
+More information regarding the <code>libMesh</code> SVN repository may be found <a href="subversion.php"> here</a>.
 
 <br>
 <br>

@@ -160,10 +160,10 @@ Volume 43,  Number 6, Pages 1202--1215, 2006.
 
 <br>
 <li>
-Michael Schindler, Peter Talkner, and Peter Hanggi,					     
+Michael Schindler, Peter Talkner, and Peter Hänggi,
 <i>Computing stationary free-surface shapes in microfluidics.</i>
-<a href="http://arxiv.org/pdf/physics/0511217">Physics Preprint arXiv</a> and
-<a href="http://scitation.aip.org/getabs/servlet/GetabsServlet?prog=normal&id=PHFLE6000018000010103303000001&idtype=cvips&gifs=yes">Physics of Fluids</a> 2006.
+<a href="http://link.aip.org/link/?PHFLE6/18/103303/1">Physics of Fluids</a>, 
+Volume 18, 2006.
 </li>
 
 <br>
