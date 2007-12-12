@@ -1,6 +1,6 @@
 CC=$(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --cxx)
-CFLAGS=-c -Wall $(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --cxxflags --include$)
-LDFLAGS=-lcppunit $(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --ldflags)
+CFLAGS=-c -Wall $(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --cxxflags --include$) -I${CPP_UNIT}/include
+LDFLAGS=-L${CPP_UNIT}/lib -lcppunit $(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --ldflags)
 SOURCES=$(shell find ./ -name "*.C")
 OBJECTS=$(SOURCES:.C=.o)
 EXECUTABLE=run_tests
@@ -22,3 +22,4 @@ depend: $(SOURCES)
 	@$(DEPEND) -f.depends -- $(CFLAGS) -- $(SOURCES) &>/dev/null
 
 -include .depends
+# DO NOT DELETE
