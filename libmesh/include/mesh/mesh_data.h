@@ -210,6 +210,12 @@ public:
   const std::vector<Number>& get_data (const Node* node) const;
 
   /**
+   * @Sets all the data values associated with 
+   * the node \p node, overwriting any existing vector
+   */
+  void set_data (const Node* node, const std::vector<Number>& val);
+
+  /**
    * @returns the number of \p Number -type data 
    * (i.e., the size of the \p std::vector<Number>
    * returned through the \p operator() methods)
@@ -280,6 +286,12 @@ public:
    * Check existence through \p has_data() first.
    */
   const std::vector<Number>& get_data (const Elem* elem) const;
+
+  /**
+   * @Sets all the data values associated with 
+   * the element \p elem, overwriting any existing vector
+   */
+  void set_data (const Elem* elem, const std::vector<Number> &val);
 
   /**
    * @returns the number of \p Number -type data 
@@ -877,6 +889,15 @@ const std::vector<Number>& MeshData::get_data (const Node* node) const
 
 
 inline
+void MeshData::set_data (const Node* node,
+			 const std::vector<Number> &val)
+{
+  this->_node_data[node] = val;
+}
+
+
+
+inline
 MeshData::const_node_data_iterator MeshData::node_data_begin () const
 {
   return _node_data.begin();
@@ -946,6 +967,15 @@ const std::vector<Number>& MeshData::get_data (const Elem* elem) const
 #endif
 
   return pos->second;
+}
+
+
+
+inline
+void MeshData::set_data (const Elem* elem,
+			 const std::vector<Number> &val)
+{
+  this->_elem_data[elem] = val;
 }
 
 
