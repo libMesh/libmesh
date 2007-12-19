@@ -913,6 +913,9 @@ void FEMSystem::postprocess ()
             elem_fixed_subsolutions[i]->reposition
               (sub_dofs, dof_indices_var[i].size());
 
+          elem_subresiduals[i]->reposition
+            (sub_dofs, dof_indices_var[i].size());
+
           sub_dofs += dof_indices_var[i].size();
         }
       assert(sub_dofs == n_dofs);
