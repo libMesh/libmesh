@@ -159,8 +159,9 @@ void MeshRefinement::create_parent_error_vector
   // This function must be run on all processors at once
   parallel_only();
 
+  // error values on uncoarsenable elements will be left at -1
   error_per_parent.clear();
-  error_per_parent.resize(error_per_cell.size(), 0);
+  error_per_parent.resize(error_per_cell.size(), -1.0);
 
   // The parent's error is defined as the square root of the
   // sum of the children's errors squared, so errors that are
@@ -217,6 +218,11 @@ void MeshRefinement::create_parent_error_vector
 
   for (unsigned int i = 0; i != error_per_parent.size(); ++i)
     {
+      // If this element isn't a coarsenable parent with error, we
+      // have nothing to do.
+      if (error_per_parent[i] == -1)
+        continue;
+
       // The error estimator might have already given us an
       // estimate on the coarsenable parent elements; if so then
       // we want to retain that estimate
@@ -226,11 +232,6 @@ void MeshRefinement::create_parent_error_vector
           continue;
         }
  
-      // If this element isn't a coarsenable parent with error, we
-      // have nothing to do.
-      if (!error_per_parent[i])
-        continue;
-
       error_per_parent[i] = std::sqrt(error_per_parent[i]);
 
       parent_error_min = std::min (parent_error_min,
