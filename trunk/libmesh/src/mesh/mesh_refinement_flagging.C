@@ -368,6 +368,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
       unsigned int parent_id = sorted_parent_error[i].second;
       Elem *parent = _mesh.elem(parent_id);
+      assert(parent->has_children());
       for (unsigned int c=0; c != parent->n_children(); ++c)
         {
           Elem *elem = parent->child(c);
