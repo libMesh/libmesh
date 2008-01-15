@@ -181,11 +181,23 @@ class StatisticsVector : public std::vector<T>
    * set.  For simplicity, the bins are assumed to be of uniform size.
    * Upon return, the bin_members vector will contain unsigned
    * integers which give the number of members in each bin.
+   * WARNING: This non-const function sorts the vector, changing its
+   * order.  
    * Source: GNU Scientific Library
    */
   virtual void histogram (std::vector<unsigned int>& bin_members,
 			  unsigned int n_bins=10);
 
+  /**
+   * Generates a Matlab/Octave style file which can be used to
+   * make a plot of the histogram having the desired number of bins.
+   * Uses the histogram(...) function in this class
+   * WARNING: The histogram(...) function is non-const, and changes
+   * the order of the vector.  
+   */
+  void plot_histogram(const std::string& filename,
+		      unsigned int n_bins);
+  
   /**
    * A const version of the histogram function.
    */

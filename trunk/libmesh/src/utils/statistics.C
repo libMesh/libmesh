@@ -20,7 +20,8 @@
 
 // C++ includes
 #include <algorithm> // for std::min_element, std::max_element
-
+#include <fstream> // std::ofstream
+#include <numeric> // std::accumulate
 
 // Local includes
 #include "statistics.h"
@@ -178,10 +179,16 @@ template <typename T>
 }
 
 
+
+
+
 template <typename T>
 void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
 				    unsigned int n_bins)
 {
+  // Must have at least 1 bin
+  assert (n_bins>0);
+
   const unsigned int n   = this->size();
   
   std::sort(this->begin(), this->end());
@@ -193,28 +200,98 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
   START_LOG ("histogram()", "StatisticsVector");
   
   std::vector<T> bin_bounds(n_bins+1);
-  for (unsigned int i=0; i<n_bins+1; i++)
+  for (unsigned int i=0; i<bin_bounds.size(); i++)
     bin_bounds[i] = min + i * bin_size;
+
+  // The last bin boundary should be the max value
+  if (max != 0.0)
+    if ( !(fabs(bin_bounds.back()-max)/max < 1.e-6) )
+      {
+	std::cout.precision(16);
+	std::cout.setf(std::ios_base::fixed);
+	std::cout << "bin_bounds.back()=" << bin_bounds.back() << std::endl;
+	std::cout << "max=" << max << std::endl;
+	error();
+      }
   
-  // std::vector<unsigned int> bin_members(n_bins);
-  bin_members.resize(n_bins+1);
+  // This vector will store the number of members each bin has.
+  bin_members.resize(n_bins);
   
   unsigned int data_index = 0;
-  for (unsigned int j=1; j<n_bins+1; j++) 
-    for (unsigned int i=data_index; i<n; i++) 
+  for (unsigned int j=0; j<bin_members.size(); j++) // bin vector indexing
+    for (unsigned int i=data_index; i<n; i++) // data vector indexing
       {
-	if ( (*this)[i] > bin_bounds[j] ) 
+	if ( (*this)[i] > bin_bounds[j+1] ) // if outside the current bin (bin[j] is bounded
+	                                    // by bin_bounds[j] and bin_bounds[j+1])
 	  {
-	    data_index = i+1; 
-	    bin_members[j]++; 
-	    break;
+	    data_index = i; // start searching here for next bin 
+	    break; // go to next bin
 	  }
 	
-	bin_members[j-1]++; 
+	// Otherwise, increment current bin's count
+	bin_members[j]++; 
       }
 
+  // Check the number of binned entries
+  const unsigned int n_binned = std::accumulate(bin_members.begin(),
+						bin_members.end(),
+						static_cast<unsigned int>(0),
+						std::plus<unsigned int>());
+
+  if (n != n_binned)
+    {
+      std::cout << "Warning: The number of binned entries, n_binned="
+		<< n_binned
+		<< ", did not match the total number of entries, n="
+		<< n << "." << std::endl;
+      //error();
+    }
   
   STOP_LOG ("histogram()", "StatisticsVector");
+}
+
+
+
+
+
+template <typename T>
+void StatisticsVector<T>::plot_histogram(const std::string& filename,
+					 unsigned int n_bins)
+{
+  // First generate the histogram with the desired number of bins
+  std::vector<unsigned int> bin_members;
+  this->histogram(bin_members, n_bins);
+
+  // The max, min and bin size are used to generate x-axis values.
+  T min      = this->minimum();
+  T max      = this->maximum();
+  T bin_size = (max - min) / static_cast<T>(n_bins); 
+  
+  // On processor 0: Write histogram to file
+  if (libMesh::processor_id()==0)
+    {
+      std::ofstream out (filename.c_str());
+
+      out << "clear all\n";
+      out << "clf\n";
+      //out << "x=linspace(" << min << "," << max << "," << n_bins+1 << ");\n";
+
+      // abscissa values are located at the center of each bin.
+      out << "x=[";
+      for (unsigned int i=0; i<bin_members.size(); ++i)
+	{
+	  out << min + (i+0.5)*bin_size << " ";
+	}
+      out << "];\n";
+	
+      out << "y=[";
+      for (unsigned int i=0; i<bin_members.size(); ++i)
+	{
+	  out << bin_members[i] << " ";
+	}
+      out << "];\n";
+      out << "bar(x,y);\n";
+    }
 }
 
 
