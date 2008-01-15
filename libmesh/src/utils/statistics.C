@@ -192,46 +192,68 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
   const unsigned int n   = this->size();
   
   std::sort(this->begin(), this->end());
-  
-  T min      = this->minimum();
-  T max      = this->maximum();
-  T bin_size = (max - min) / static_cast<T>(n_bins); 
+
+  // The StatisticsVector can hold both integer and float types.
+  // We will define all the bins, etc. using Reals.
+  Real min      = static_cast<Real>(this->minimum());
+  Real max      = static_cast<Real>(this->maximum());
+  Real bin_size = (max - min) / static_cast<Real>(n_bins); 
 
   START_LOG ("histogram()", "StatisticsVector");
   
-  std::vector<T> bin_bounds(n_bins+1);
+  std::vector<Real> bin_bounds(n_bins+1);
   for (unsigned int i=0; i<bin_bounds.size(); i++)
     bin_bounds[i] = min + i * bin_size;
 
-  // The last bin boundary should be the max value
-  if (max != 0.0)
-    if ( !(fabs(bin_bounds.back()-max)/max < 1.e-6) )
-      {
-	std::cout.precision(16);
-	std::cout.setf(std::ios_base::fixed);
-	std::cout << "bin_bounds.back()=" << bin_bounds.back() << std::endl;
-	std::cout << "max=" << max << std::endl;
-	error();
-      }
+  // Give the last bin boundary a little wiggle room: we don't want
+  // it to be just barely less than the max, otherwise our bin test below
+  // may fail.
+  bin_bounds.back() += 1.e-6 * bin_size;
   
   // This vector will store the number of members each bin has.
   bin_members.resize(n_bins);
   
   unsigned int data_index = 0;
   for (unsigned int j=0; j<bin_members.size(); j++) // bin vector indexing
-    for (unsigned int i=data_index; i<n; i++) // data vector indexing
-      {
-	if ( (*this)[i] > bin_bounds[j+1] ) // if outside the current bin (bin[j] is bounded
-	                                    // by bin_bounds[j] and bin_bounds[j+1])
-	  {
-	    data_index = i; // start searching here for next bin 
-	    break; // go to next bin
-	  }
+    {
+      // std::cout << "(debug) Filling bin " << j << std::endl;
+      
+      for (unsigned int i=data_index; i<n; i++) // data vector indexing
+	{
+	  //	std::cout << "(debug) Processing index=" << i << std::endl;
+	  Real current_val = static_cast<Real>( (*this)[i] );
+	  
+	  // There may be entries in the vector smaller than the value
+	  // reported by this->minimum().  (e.g. inactive elements in an
+	  // ErrorVector.)  We just skip entries like that.
+	  if ( current_val < min )
+	    {
+	      // 	    std::cout << "(debug) Skipping entry v[" << i << "]="
+	      // 		      << (*this)[i]
+	      // 		      << " which is less than the min value: min="
+	      // 		      << min << std::endl;
+	      continue;
+	    }
 	
-	// Otherwise, increment current bin's count
-	bin_members[j]++; 
-      }
-
+	  if ( current_val > bin_bounds[j+1] ) // if outside the current bin (bin[j] is bounded
+	                                       // by bin_bounds[j] and bin_bounds[j+1])
+	    {
+	      // std::cout.precision(16);
+	      // 	    std::cout.setf(std::ios_base::fixed);
+	      // 	    std::cout << "(debug) (*this)[i]= " << (*this)[i]
+	      // 		      << " is greater than bin_bounds[j+1]="
+	      //		      << bin_bounds[j+1]	 << std::endl;
+	      data_index = i; // start searching here for next bin 
+	      break; // go to next bin
+	    }
+	
+	  // Otherwise, increment current bin's count
+	  bin_members[j]++;
+	  // std::cout << "(debug) Binned index=" << i << std::endl;
+	}
+    }
+  
+#ifdef DEBUG
   // Check the number of binned entries
   const unsigned int n_binned = std::accumulate(bin_members.begin(),
 						bin_members.end(),
@@ -246,6 +268,8 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
 		<< n << "." << std::endl;
       //error();
     }
+#endif
+
   
   STOP_LOG ("histogram()", "StatisticsVector");
 }
