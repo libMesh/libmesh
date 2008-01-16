@@ -19,6 +19,7 @@
 
 
 // C++ includes
+#include <cmath> // for isnan(), when it's defined
 #include <limits>
 
 // Local includes
@@ -159,9 +160,50 @@ void MeshRefinement::create_parent_error_vector
   // This function must be run on all processors at once
   parallel_only();
 
+  // Make sure the input error vector is valid
+#ifdef DEBUG
+  for (unsigned int i=0; i != error_per_cell.size(); ++i)
+    {
+  // isnan() isn't standard C++ yet
+  #ifdef isnan
+      assert(!isnan(error_per_cell[i]));
+      assert(error_per_cell[i] >= 0);
+  #endif
+    }
+#endif // #ifdef DEBUG
+
   // error values on uncoarsenable elements will be left at -1
   error_per_parent.clear();
-  error_per_parent.resize(error_per_cell.size(), -1.0);
+  error_per_parent.resize(error_per_cell.size(), 0.0);
+
+  {
+  // Find which elements are uncoarsenable
+  MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
+  for (; elem_it != elem_end; ++elem_it)
+    {
+      Elem* elem   = *elem_it;
+      Elem* parent = elem->parent();
+
+      // Grandparents and up are uncoarsenable
+      while (parent)
+        {
+          parent = parent->parent();
+          if (parent)
+            {
+              const unsigned int parentid  = parent->id();
+              assert (parentid < error_per_parent.size());
+              error_per_parent[parentid] = -1.0;
+            }
+        }
+    }
+
+  // Sync between processors.
+  // Use a reference to std::vector to avoid confusing
+  // Parallel::min
+  std::vector<ErrorVectorReal> &epp = error_per_parent;
+  Parallel::min(epp);
+  }
 
   // The parent's error is defined as the square root of the
   // sum of the children's errors squared, so errors that are
@@ -171,6 +213,7 @@ void MeshRefinement::create_parent_error_vector
   // calculate local contributions to the parents' errors squared
   // first, then sum across processors and take the square roots
   // second.
+  {
   MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
 
@@ -185,29 +228,15 @@ void MeshRefinement::create_parent_error_vector
           const unsigned int parentid  = parent->id();
           assert (parentid < error_per_parent.size());
 
-          // If the parent has grandchildren we won't be able
-          // to coarsen it, so forget it.
-          // On a parallel mesh, all the parent's children will be
-          // local or ghost elements - it's grandchildren may be
-	  // remote elements, but that's fine; we only need to know if
-	  // they exist.
-	  bool parent_has_grandchildren = false;
-          for (unsigned int n = 0; n != parent->n_children(); ++n)
-            {
-              Elem* child = parent->child(n);
-
-              if (!child->active())
-                {
-                  parent_has_grandchildren = true;
-                  break;
-                }
-            }
-
-          if (!parent_has_grandchildren)
+	  // If the parent has grandchildren we won't be able to
+	  // coarsen it, so forget it.  Otherwise, add this child's
+	  // contribution to the sum of the squared child errors
+	  if (error_per_parent[parentid] != -1.0)
             error_per_parent[parentid] += (error_per_cell[elem->id()] *
                                            error_per_cell[elem->id()]);
         }
     }
+  }
 
   // Sum the vector across all processors
   Parallel::sum(static_cast<std::vector<ErrorVectorReal>&>(error_per_parent));
@@ -220,7 +249,7 @@ void MeshRefinement::create_parent_error_vector
     {
       // If this element isn't a coarsenable parent with error, we
       // have nothing to do.
-      if (error_per_parent[i] == -1)
+      if (error_per_parent[i] == -1.0)
         continue;
 
       // The error estimator might have already given us an
@@ -231,8 +260,9 @@ void MeshRefinement::create_parent_error_vector
           error_per_parent[i] = error_per_cell[i];
           continue;
         }
- 
-      error_per_parent[i] = std::sqrt(error_per_parent[i]);
+      // if not, then e_parent = sqrt(sum(e_child^2))
+      else
+        error_per_parent[i] = std::sqrt(error_per_parent[i]);
 
       parent_error_min = std::min (parent_error_min,
                                    error_per_parent[i]);
