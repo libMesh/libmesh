@@ -896,6 +896,9 @@ void FEMSystem::postprocess ()
       unsigned int n_dofs = dof_indices.size();
 
       elem_solution.resize(n_dofs);
+      // This resize call also zeros out the residual
+      elem_residual.resize(n_dofs);
+
       for (unsigned int i=0; i != n_dofs; ++i)
 //        elem_solution(i) = current_nonlinear_solution(dof_indices[i]);
         elem_solution(i) = current_solution(dof_indices[i]);
