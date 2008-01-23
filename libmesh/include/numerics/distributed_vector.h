@@ -692,10 +692,10 @@ Real DistributedVector<T>::min () const
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  Real local_min = v.size() ? 
-    libmesh_real(v[0]) : std::numeric_limits<Real>::max();
-  for (unsigned int i = 1; i < v.size(); ++i)
-    local_min = std::min(libmesh_real(v[i]), local_min);
+  Real local_min = _values.size() ? 
+    libmesh_real(_values[0]) : std::numeric_limits<Real>::max();
+  for (unsigned int i = 1; i < _values.size(); ++i)
+    local_min = std::min(libmesh_real(_values[i]), local_min);
   
   Parallel::min(local_min);
 
@@ -715,10 +715,10 @@ Real DistributedVector<T>::max() const
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  Real local_max = v.size() ? 
-    libmesh_real(v[0]) : -std::numeric_limits<Real>::max();
-  for (unsigned int i = 1; i < v.size(); ++i)
-    local_max = std::max(libmesh_real(v[i]), local_max);
+  Real local_max = _values.size() ? 
+    libmesh_real(_values[0]) : -std::numeric_limits<Real>::max();
+  for (unsigned int i = 1; i < _values.size(); ++i)
+    local_max = std::max(libmesh_real(_values[i]), local_max);
   
   Parallel::max(local_max);
 
