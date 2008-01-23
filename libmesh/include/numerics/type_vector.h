@@ -736,38 +736,25 @@ void TypeVector<T>::zero()
 
 
 
-template <>
+template <typename T>
 inline
-Real TypeVector<Real>::size_sq () const
-{
-  return (*this)*(*this);
-}
-
-
-
-#ifdef USE_COMPLEX_NUMBERS
-
-template <>
-inline
-Real TypeVector<Complex>::size_sq() const
+Real TypeVector<T>::size_sq() const
 {
 #if DIM == 1
-  return (std::norm(_coords[0]));
+  return (libmesh_norm(_coords[0]));
 #endif
   
 #if DIM == 2
-  return (std::norm(_coords[0]) +
-	  std::norm(_coords[1]));
+  return (libmesh_norm(_coords[0]) +
+	  libmesh_norm(_coords[1]));
 #endif
   
 #if DIM == 3
-  return (std::norm(_coords[0]) +
-	  std::norm(_coords[1]) + 
-	  std::norm(_coords[2]));
+  return (libmesh_norm(_coords[0]) +
+	  libmesh_norm(_coords[1]) + 
+	  libmesh_norm(_coords[2]));
 #endif
 }
-
-#endif
 
 
 

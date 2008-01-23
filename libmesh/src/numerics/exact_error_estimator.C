@@ -375,11 +375,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 	val_error = u_h - (*fine_values)(q_point[qp]);
 
       // Add the squares of the error to each contribution
-#ifndef USE_COMPLEX_NUMBERS
-      L2normsq += JxW[qp]*(val_error*val_error);
-#else
-      L2normsq += JxW[qp]*std::norm(val_error);
-#endif
+      L2normsq += JxW[qp]*libmesh_norm(val_error);
 
       // Compute the value of the error in the gradient at this
       // quadrature point

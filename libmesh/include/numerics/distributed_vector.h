@@ -32,6 +32,8 @@
 // C++ includes
 #include <vector>
 #include <algorithm>
+#include <complex>
+#include <limits>
 
 #ifdef HAVE_MPI
 # include <mpi.h>
@@ -328,7 +330,7 @@ public:
   /**
    * Computes the dot product, p = U.V
    */
-  virtual Number dot(const NumericVector<T>& V) const;
+  virtual T dot(const NumericVector<T>& V) const;
   
   /**
    * Creates a copy of the global vector in the
@@ -397,6 +399,24 @@ private:
 };
 
 
+// Helper functions for min, max
+template <typename T>
+inline
+Real min_realpart(const std::vector<T> &v);
+
+template <typename T>
+inline
+Real min_realpart(const std::vector<std::complex<T> > &v);
+
+/*
+template <typename T>
+inline
+Real max_realpart(const std::vector<T> > &v);
+*/
+
+template <typename T>
+inline
+Real max_realpart(const std::vector<std::complex<T> > &v);
 
 //--------------------------------------------------------------------------
 // DistributedVector inline methods
@@ -691,8 +711,7 @@ Real DistributedVector<T>::min () const
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  double local_min = static_cast<double>(*std::min(_values.begin(),
-						   _values.end()));
+  Real local_min = min_realpart(_values);
   
   Parallel::min(local_min);
 
@@ -712,13 +731,69 @@ Real DistributedVector<T>::max() const
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  double local_max = static_cast<double>(*std::max(_values.begin(),
-						   _values.end()));
-
+  Real local_max = max_realpart(_values);
+  
   Parallel::max(local_max);
 
   return local_max;
 }
+
+
+
+/*
+template <typename T>
+inline
+Real min_realpart(const std::vector<T> &v)
+{
+  Real local_min = v.size() ? 
+    v[0] : std::numeric_limits<Real>::max();
+  for (unsigned int i = 1; i < v.size(); ++i)
+    local_min = std::min(v[i], local_min);
+  return local_min;
+}
+*/
+
+
+
+template <typename T>
+inline
+Real min_realpart(const std::vector<std::complex<T> > &v)
+{
+  Real local_min = v.size() ? 
+    v[0].real() : std::numeric_limits<Real>::max();
+  for (unsigned int i = 1; i < v.size(); ++i)
+    local_min = std::min(v[i].real(), local_min);
+  return local_min;
+}
+
+
+
+/*
+template <typename T>
+inline
+Real max_realpart(const std::vector<T> &v)
+{
+  Real local_max = v.size() ? 
+    v[0] : -std::numeric_limits<Real>::max();
+  for (unsigned int i = 1; i < v.size(); ++i)
+    local_max = std::max(v[i], local_max);
+  return local_max;
+}
+*/
+
+
+
+template <typename T>
+inline
+Real max_realpart(const std::vector<std::complex<T> > &v)
+{
+  Real local_max = v.size() ? 
+    v[0].real() : -std::numeric_limits<Real>::max();
+  for (unsigned int i = 1; i < v.size(); ++i)
+    local_max = std::max(v[i].real(), local_max);
+  return local_max;
+}
+
 
 
 #endif  // #ifdef __distributed_vector_h__

@@ -729,31 +729,15 @@ void TypeTensor<T>::zero()
 
 
 
-template <>
+template <typename T>
 inline
-Real TypeTensor<Real>::size_sq () const
+Real TypeTensor<T>::size_sq () const
 {
   Real sum = 0.;
   for (unsigned int i=0; i<DIM*DIM; i++)
-    sum += _coords[i]*_coords[i];
+    sum += libmesh_norm(_coords[i]);
   return sum;
 }
-
-
-
-#ifdef USE_COMPLEX_NUMBERS
-
-template <>
-inline
-Real TypeTensor<Complex>::size_sq() const
-{
-  Real sum = 0.;
-  for (unsigned int i=0; i<DIM*DIM; i++)
-    sum += std::norm(_coords[i]);
-  return sum;
-}
-
-#endif
 
 
 

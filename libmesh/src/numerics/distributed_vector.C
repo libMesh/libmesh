@@ -43,7 +43,7 @@ T DistributedVector<T>::sum () const
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  double local_sum = 0.;
+  T local_sum = 0.;
 
   for (unsigned int i=0; i<local_size(); i++)
     local_sum += _values[i];
@@ -90,7 +90,7 @@ Real DistributedVector<T>::l2_norm () const
   double local_l2 = 0.;
   
   for (unsigned int i=0; i<local_size(); i++)
-    local_l2 += _values[i]*_values[i];
+    local_l2 += libmesh_norm(_values[i]);
   
   Parallel::sum(local_l2);
 
@@ -298,7 +298,7 @@ void DistributedVector<T>::scale (const T factor)
 
 
 template <typename T>
-Number DistributedVector<T>::dot (const NumericVector<T>& V) const
+T DistributedVector<T>::dot (const NumericVector<T>& V) const
 {
   // This function must be run on all processors at once
   parallel_only();
@@ -312,7 +312,7 @@ Number DistributedVector<T>::dot (const NumericVector<T>& V) const
   assert ( this->last_local_index()  == v->last_local_index()  );
   
   // The result of dotting together the local parts of the vector.
-  Real local_dot = 0;
+  T local_dot = 0;
 
   for (unsigned int i=0; i<this->local_size(); i++)
     local_dot += this->_values[i] * v->_values[i];
@@ -536,5 +536,4 @@ void DistributedVector<T>::localize_to_one (std::vector<T>& v_local,
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template class DistributedVector<float>;
-template class DistributedVector<double>;
+template class DistributedVector<Number>;

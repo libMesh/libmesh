@@ -140,6 +140,20 @@ typedef std::complex<double> Complex;
 typedef std::complex<double> COMPLEX;
 
 
+// Helper functions for complex/real numbers
+// to clean up #ifdef USE_COMPLEX_NUMBERS elsewhere
+template<typename T> inline T libmesh_real(T a) { return a; }
+template<typename T> inline T libmesh_norm(T a) { return a*a; }
+
+#ifdef USE_COMPLEX_NUMBERS
+template<typename T>
+inline T libmesh_real(std::complex<T> a) { return std::real(a); }
+
+template<typename T>
+inline T libmesh_norm(std::complex<T> a) { return std::norm(a); }
+#endif // USE_COMPLEX_NUMBERS
+
+
 // Define the value type for unknowns in simulations.
 // This is either Real or Complex, depending on how
 // the library was configures

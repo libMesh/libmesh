@@ -94,11 +94,8 @@ LaplacianErrorEstimator::internal_side_integration ()
       // Find the jump in the Laplacian
       // at this quadrature point
       const Number jump = laplacian_fine - laplacian_coarse;
-#ifndef USE_COMPLEX_NUMBERS
-      const Real jump2 = jump*jump;
-#else
-      const Real jump2 = std::norm(jump);
-#endif
+      const Real jump2 = libmesh_norm(jump);
+
       // Accumulate the jump integral
       error += JxW_face[qp] * jump2;
     }
