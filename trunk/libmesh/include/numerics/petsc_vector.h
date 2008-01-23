@@ -357,7 +357,7 @@ public:
   /**
    * Computes the dot product, p = U.V
    */
-  virtual Number dot(const NumericVector<T>& V) const;
+  virtual T dot(const NumericVector<T>& V) const;
   
   /**
    * Creates a copy of the global vector in the

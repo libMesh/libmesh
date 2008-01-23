@@ -343,17 +343,6 @@ DenseVector<T>& DenseVector<T>::operator+= (const DenseVector<T>& vec)
 
 
 
-template<typename T> inline T libmesh_real(T a) { return a; }
-template<typename T> inline T libmesh_norm(T a) { return a*a; }
-
-#ifdef USE_COMPLEX_NUMBERS
-template<typename T>
-inline T libmesh_real(std::complex<T> a) { return std::real(a); }
-
-template<typename T>
-inline T libmesh_norm(std::complex<T> a) { return std::norm(a); }
-#endif // USE_COMPLEX_NUMBERS
-
 template<typename T>
 inline
 Real DenseVector<T>::min () const

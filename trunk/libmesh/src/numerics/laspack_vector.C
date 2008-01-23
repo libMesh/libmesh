@@ -248,7 +248,7 @@ void LaspackVector<T>::scale (const T factor)
 
 
 template <typename T>
-Number LaspackVector<T>::dot (const NumericVector<T>& V) const
+T LaspackVector<T>::dot (const NumericVector<T>& V) const
 {
   assert (this->initialized());
 

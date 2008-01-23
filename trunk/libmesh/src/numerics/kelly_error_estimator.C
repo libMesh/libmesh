@@ -81,11 +81,8 @@ KellyErrorEstimator::internal_side_integration ()
       // Find the jump in the normal derivative 
       // at this quadrature point
       const Number jump = (grad_fine - grad_coarse)*face_normals[qp];
-#ifndef USE_COMPLEX_NUMBERS
-      const Real jump2 = jump*jump;
-#else
-      const Real jump2 = std::norm(jump);
-#endif
+      const Real jump2 = libmesh_norm(jump);
+
       // Accumulate the jump integral
       error += JxW_face[qp] * jump2;
     }
@@ -146,12 +143,8 @@ KellyErrorEstimator::boundary_side_integration ()
           const Number jump = flux_bc.second - grad_fine*face_normals[qp];
 
           // The flux jump squared.  If using complex numbers,
-          // std::norm(z) returns |z|^2, where |z| is the modulus of z.
-#ifndef USE_COMPLEX_NUMBERS
-          const Real jump2 = jump*jump;
-#else
-          const Real jump2 = std::norm(jump);
-#endif
+          // libmesh_norm(z) returns |z|^2, where |z| is the modulus of z.
+          const Real jump2 = libmesh_norm(jump);
 
           // Integrate the error on the face.  The error is
           // scaled by an additional power of h, where h is

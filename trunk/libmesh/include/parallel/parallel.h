@@ -139,6 +139,9 @@ namespace Parallel
   template <typename T>
   inline void sum(T &r);
 
+  template <typename T>
+  inline void sum(std::complex<T> &r);
+
   //-------------------------------------------------------------------
   /**
    * Take a vector of local variables and replace each entry with the sum of
@@ -146,6 +149,9 @@ namespace Parallel
    */
   template <typename T>
   inline void sum(std::vector<T> &r);
+
+  template <typename T>
+  inline void sum(std::vector<std::complex<T> > &r);
 
   //-------------------------------------------------------------------
   /**

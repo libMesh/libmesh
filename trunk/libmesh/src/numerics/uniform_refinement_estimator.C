@@ -443,11 +443,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
                   // Add the squares of the error to each contribution
 		  L2normsq += JxW[qp] * var_scale *
-#ifndef USE_COMPLEX_NUMBERS
-                    (val_error*val_error);
-#else
-                    std::norm(val_error);
-#endif
+                    libmesh_norm(val_error);
                   assert (L2normsq     >= 0.);
 
 

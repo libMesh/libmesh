@@ -357,7 +357,7 @@ void PetscVector<T>::scale (const T factor_in)
 
 
 template <typename T>
-Number PetscVector<T>::dot (const NumericVector<T>& V) const
+T PetscVector<T>::dot (const NumericVector<T>& V) const
 {
   // Error flag
   int ierr = 0;
@@ -373,7 +373,7 @@ Number PetscVector<T>::dot (const NumericVector<T>& V) const
   ierr = VecDot(this->_vec, v->_vec, &value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  return static_cast<Number>(value);
+  return static_cast<T>(value);
 }
 
 
