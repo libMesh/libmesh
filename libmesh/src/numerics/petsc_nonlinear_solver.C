@@ -87,8 +87,10 @@ extern "C"
 
     X_global.localize (X_local);
   
-    if (solver->residual != NULL) solver->residual (X_local, R);
-    if (solver->matvec   != NULL) solver->matvec   (X_local, &R, NULL);
+    R.zero();
+
+    if      (solver->residual != NULL) solver->residual (X_local, R);
+    else if (solver->matvec   != NULL) solver->matvec   (X_local, &R, NULL);
 
     R.close();
     
@@ -115,9 +117,10 @@ extern "C"
     PetscVector<Number> X_local (X_global.size());
 
     X_global.localize (X_local);
+    PC.zero();
 
-    if (solver->jacobian != NULL) solver->jacobian (X_local, PC);
-    if (solver->matvec   != NULL) solver->matvec   (X_local, NULL, &PC);
+    if      (solver->jacobian != NULL) solver->jacobian (X_local, PC);
+    else if (solver->matvec   != NULL) solver->matvec   (X_local, NULL, &PC);
     
     PC.close();
     Jac.close();
@@ -219,7 +222,15 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
   ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
+
+   // Have the Krylov subspace method use our good initial guess rather than 0
+   KSP ksp;	 
+   ierr = SNESGetKSP (_snes, &ksp);
+          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+		      
+//    ierr = KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
+//           CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      	 
 // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
 // the last one being a pointer to an int to hold the number of iterations required.
 # if PETSC_VERSION_LESS_THAN(2,2,0)
