@@ -213,8 +213,8 @@ public:
   Real size() const;
 
   /**
-   * Reutrns the Frobenius norm of the tensor squared, i.e. the
-   * square-root of the sum of the elements squared.
+   * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
+   * elements squared.
    */
   Real size_sq() const;
 
