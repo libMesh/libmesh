@@ -219,6 +219,12 @@ public:
   bool operator < (const TypeTensor<T>& rhs) const;
   
   /**
+   * @returns \p true if this tensor is "greater"
+   * than another.
+   */
+  bool operator > (const TypeTensor<T>& rhs) const;
+  
+  /**
    * Formatted print to \p std::cout.
    */
   void print(std::ostream& os) const;
@@ -741,9 +747,9 @@ Real TypeTensor<T>::size_sq () const
 
 
 
-template <>
+template <typename T>
 inline
-bool TypeTensor<Real>::operator == (const TypeTensor<Real>& rhs) const
+bool TypeTensor<T>::operator == (const TypeTensor<T>& rhs) const
 {
 #if DIM == 1
   return (std::abs(_coords[0] - rhs._coords[0])
@@ -772,42 +778,5 @@ bool TypeTensor<Real>::operator == (const TypeTensor<Real>& rhs) const
 #endif
   
 }
-
-
-#ifdef USE_COMPLEX_NUMBERS
-
-template <>
-inline
-bool TypeTensor<Complex>::operator == (const TypeTensor<Complex>& rhs) const
-{
-#if DIM == 1
-  return (std::abs(_coords[0] - rhs._coords[0])
-	  < TOLERANCE);
-#endif
-  
-#if DIM == 2
-  return ((std::abs(_coords[0] - rhs._coords[0]) +
-	   std::abs(_coords[1] - rhs._coords[1]) +
-	   std::abs(_coords[2] - rhs._coords[2]) +
-	   std::abs(_coords[3] - rhs._coords[3]))
-	  < 4.*TOLERANCE);
-#endif
-  
-#if DIM == 3
-  return ((std::abs(_coords[0] - rhs._coords[0]) +
-	   std::abs(_coords[1] - rhs._coords[1]) +
-	   std::abs(_coords[2] - rhs._coords[2]) +
-	   std::abs(_coords[3] - rhs._coords[3]) +
-	   std::abs(_coords[4] - rhs._coords[4]) +
-	   std::abs(_coords[5] - rhs._coords[5]) +
-	   std::abs(_coords[6] - rhs._coords[6]) +
-	   std::abs(_coords[7] - rhs._coords[7]) +
-	   std::abs(_coords[8] - rhs._coords[8]))
-	  < 9.*TOLERANCE);
-#endif  
-}
-
-#endif
-
 
 #endif // #define __type_tensor_h__

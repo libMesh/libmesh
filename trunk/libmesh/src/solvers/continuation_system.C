@@ -688,12 +688,8 @@ void ContinuationSystem::continuation_solve()
 	  // Now, we are ready to compute the step delta_lambda
 	  const Number delta_lambda_comp = delta_lambda_numerator /
                                            delta_lambda_denominator;
-#ifdef USE_COMPLEX_NUMBERS
           // Lambda is real-valued
-          const Real delta_lambda = delta_lambda_comp.real();
-#else
-          const Real delta_lambda = delta_lambda_comp;
-#endif
+          const Real delta_lambda = libmesh_real(delta_lambda_comp);
 
 	  // Knowing delta_lambda, we are ready to update delta_u
 	  // delta_u = z - delta_lambda*y
@@ -1048,15 +1044,9 @@ void ContinuationSystem::solve_tangent()
   delta_u->add(-1., *previous_u);
   delta_u->close();
 
-#ifdef USE_COMPLEX_NUMBERS
   const Real sgn_dlambda_ds =
-    (Theta_LOCA*Theta_LOCA*Theta*y->dot(*delta_u) +
-    (*continuation_parameter-old_continuation_parameter)).real();
-#else
-  const Real sgn_dlambda_ds =
-    Theta_LOCA*Theta_LOCA*Theta*y->dot(*delta_u) +
-    (*continuation_parameter-old_continuation_parameter);
-#endif
+    libmesh_real(Theta_LOCA*Theta_LOCA*Theta*y->dot(*delta_u) +
+    (*continuation_parameter-old_continuation_parameter));
 
   if (sgn_dlambda_ds < 0.)
     {

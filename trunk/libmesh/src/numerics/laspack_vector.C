@@ -21,6 +21,7 @@
 
 // C++ includes
 #include <algorithm> // for std::min
+#include <limits>
 
 // Local Includes
 #include "laspack_vector.h"
@@ -73,17 +74,6 @@ Real LaspackVector<T>::linfty_norm () const
   
   return static_cast<Real>(MaxNorm_V(const_cast<QVector*>(&_vec)));
 }
-
-
-
-template <typename T> 
-Real LaspackVector<T>::max() const
-{
-  assert (this->initialized());
-
-  return static_cast<Real>(MaxNorm_V(const_cast<QVector*>(&_vec)));
-}
-
 
 
 
@@ -396,49 +386,42 @@ void LaspackVector<T>::localize_to_one (std::vector<T>& v_local,
 }
 
 
-// Full specialization for Real datatypes
-#ifdef USE_REAL_NUMBERS
 
-template <> 
-Real LaspackVector<Real>::min () const
+template <typename T> 
+Real LaspackVector<T>::max() const
 {
   assert (this->initialized());
+  if (!this->size())
+    return -std::numeric_limits<Real>::max();
 
-  Real min = (*this)(0);
+  Real max = libmesh_real((*this)(0));
 
   const unsigned int n = this->size();
   
   for (unsigned int i=1; i<n; i++)
-    min = std::min (min, (*this)(i));
+    max = std::max (max, libmesh_real((*this)(i)));
 
-  return min;
+  return max;
 }
 
 
-#endif
 
-
-
-// Full specialization for Complex datatypes
-#ifdef USE_COMPLEX_NUMBERS
-
-template <> 
-Real LaspackVector<Complex>::min () const
+template <typename T> 
+Real LaspackVector<T>::min () const
 {
   assert (this->initialized());
+  if (!this->size())
+    return std::numeric_limits<Real>::max();
 
-  Real min = (*this)(0).real();
+  Real min = libmesh_real((*this)(0));
 
   const unsigned int n = this->size();
   
   for (unsigned int i=1; i<n; i++)
-    min = std::min (min, (*this)(i).real() );
+    min = std::min (min, libmesh_real((*this)(i)));
 
   return min;
 }
-
-#endif
-
 
 
 //------------------------------------------------------------------
