@@ -27,6 +27,7 @@
 
 // Local includes
 #include "libmesh_common.h"
+#include "compare_types.h"
 
 // Copy of boost enable_if_c
 
@@ -154,17 +155,21 @@ public:
   /**
    * Add two vectors.
    */
-  TypeVector<T> operator + (const TypeVector<T> &) const;
+  template <typename T2>
+  TypeVector<typename CompareTypes<T, T2>::supertype> 
+  operator + (const TypeVector<T2> &) const;
 
   /**
-   * Add to this vectors.
+   * Add to this vector.
    */
-  const TypeVector<T> & operator += (const TypeVector<T> &);
+  template <typename T2>
+  const TypeVector<T> & operator += (const TypeVector<T2> &);
   
   /**
    * Add to this vector without creating a temporary.
    */
-  void add (const TypeVector<T> &); 
+  template <typename T2>
+  void add (const TypeVector<T2> &); 
   
   /**
    * Add a scaled value to this vector without
@@ -176,17 +181,21 @@ public:
   /**
    * Subtract two vectors.
    */
-  TypeVector<T> operator - (const TypeVector<T> &) const;
+  template <typename T2>
+  TypeVector<typename CompareTypes<T, T2>::supertype> 
+  operator - (const TypeVector<T2> &) const;
 
   /**
    * Subtract from this vector.
    */
-  const TypeVector<T> & operator -= (const TypeVector<T> &);
+  template <typename T2>
+  const TypeVector<T> & operator -= (const TypeVector<T2> &);
 
   /**
    * Subtract from this vector without creating a temporary.
    */
-  void subtract (const TypeVector<T> &); 
+  template <typename T2>
+  void subtract (const TypeVector<T2> &); 
   
   /**
    * Subtract a scaled value from this vector without
@@ -206,7 +215,7 @@ public:
   template <typename Scalar>
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
-    TypeVector<T> >::type
+    TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
   operator * (const Scalar) const;
 
   /**
@@ -218,24 +227,35 @@ public:
   /**
    * Divide a vector by a number, i.e. scale.
    */
-  TypeVector<T> operator / (const T) const;
+  template <typename Scalar>
+  typename boostcopy::enable_if_c<
+    ScalarTraits<Scalar>::value,
+    TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
+  operator / (const Scalar) const;
 
   /**
    * Divide this vector by a number, i.e. scale.
    */
-  const TypeVector<T> & operator /= (const T);
+  template <typename Scalar>
+  typename boostcopy::enable_if_c<
+    ScalarTraits<Scalar>::value,
+    const TypeVector<T> & >::type
+  operator /= (const Scalar);
 
   /**
    * Multiply 2 vectors together, i.e. dot-product.
    * The vectors may be of different types.
    */
   template <typename T2>
-  T operator * (const TypeVector<T2> &) const;
+  typename CompareTypes<T, T2>::supertype
+  operator * (const TypeVector<T2> &) const;
 
   /**
    * Cross 2 vectors together, i.e. cross-product.
    */
-  TypeVector<T> cross(const TypeVector<T> &) const;
+  template <typename T2>
+  TypeVector<typename CompareTypes<T, T2>::supertype>
+  cross(const TypeVector<T2> &) const;
 
   /**
    * Think of a vector as a \p dim dimensional vector.  This
@@ -426,23 +446,25 @@ T & TypeVector<T>::operator () (const unsigned int i)
 
 
 template <typename T>
+template <typename T2>
 inline
-TypeVector<T> TypeVector<T>::operator + (const TypeVector<T> &p) const
+TypeVector<typename CompareTypes<T, T2>::supertype> 
+TypeVector<T>::operator + (const TypeVector<T2> &p) const
 {
- 
+  typedef typename CompareTypes<T, T2>::supertype TS;
 #if DIM == 1
-  return TypeVector(_coords[0] + p._coords[0]);
+  return TypeVector<TS> (_coords[0] + p._coords[0]);
 #endif
 
 #if DIM == 2 
-  return TypeVector(_coords[0] + p._coords[0],
-		    _coords[1] + p._coords[1]);
+  return TypeVector<TS> (_coords[0] + p._coords[0],
+                         _coords[1] + p._coords[1]);
 #endif
 
 #if DIM == 3
-  return TypeVector(_coords[0] + p._coords[0],
-		    _coords[1] + p._coords[1],
-		    _coords[2] + p._coords[2]);
+  return TypeVector<TS> (_coords[0] + p._coords[0],
+                         _coords[1] + p._coords[1],
+                         _coords[2] + p._coords[2]);
 #endif
 	       
 }
@@ -450,8 +472,9 @@ TypeVector<T> TypeVector<T>::operator + (const TypeVector<T> &p) const
 
 
 template <typename T>
+template <typename T2>
 inline
-const TypeVector<T> & TypeVector<T>::operator += (const TypeVector<T> &p)
+const TypeVector<T> & TypeVector<T>::operator += (const TypeVector<T2> &p)
 {
   this->add (p);
 
@@ -461,8 +484,9 @@ const TypeVector<T> & TypeVector<T>::operator += (const TypeVector<T> &p)
 
 
 template <typename T>
+template <typename T2>
 inline
-void TypeVector<T>::add (const TypeVector<T> &p)
+void TypeVector<T>::add (const TypeVector<T2> &p)
 {
 #if DIM == 1
   _coords[0] += p._coords[0];
@@ -508,23 +532,26 @@ void TypeVector<T>::add_scaled (const TypeVector<T2> &p, const T factor)
 
 
 template <typename T>
+template <typename T2>
 inline
-TypeVector<T> TypeVector<T>::operator - (const TypeVector<T> &p) const
+TypeVector<typename CompareTypes<T, T2>::supertype> 
+TypeVector<T>::operator - (const TypeVector<T2> &p) const
 {
+  typedef typename CompareTypes<T, T2>::supertype TS;
 
 #if DIM == 1
-  return TypeVector(_coords[0] - p._coords[0]);
+  return TypeVector<TS>(_coords[0] - p._coords[0]);
 #endif
 
 #if DIM == 2 
-  return TypeVector(_coords[0] - p._coords[0],
-		    _coords[1] - p._coords[1]);
+  return TypeVector<TS>(_coords[0] - p._coords[0],
+		        _coords[1] - p._coords[1]);
 #endif
 
 #if DIM == 3
-  return TypeVector(_coords[0] - p._coords[0],
-		    _coords[1] - p._coords[1],
-		    _coords[2] - p._coords[2]);
+  return TypeVector<TS>(_coords[0] - p._coords[0],
+		        _coords[1] - p._coords[1],
+		        _coords[2] - p._coords[2]);
 #endif
 
 }
@@ -532,8 +559,9 @@ TypeVector<T> TypeVector<T>::operator - (const TypeVector<T> &p) const
 
 
 template <typename T>
+template <typename T2>
 inline
-const TypeVector<T> & TypeVector<T>::operator -= (const TypeVector<T> &p)
+const TypeVector<T> & TypeVector<T>::operator -= (const TypeVector<T2> &p)
 {
   this->subtract (p);
 
@@ -543,8 +571,9 @@ const TypeVector<T> & TypeVector<T>::operator -= (const TypeVector<T> &p)
 
 
 template <typename T>
+template <typename T2>
 inline
-void TypeVector<T>::subtract (const TypeVector<T>& p)
+void TypeVector<T>::subtract (const TypeVector<T2>& p)
 {
   for (unsigned int i=0; i<DIM; i++)
     _coords[i] -= p._coords[i];
@@ -592,23 +621,24 @@ template <typename Scalar>
 inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
-  TypeVector<T> >::type
+  TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
 TypeVector<T>::operator * (const Scalar factor) const
 {
+  typedef typename CompareTypes<T, Scalar>::supertype TS;
 
 #if DIM == 1
-  return TypeVector(_coords[0]*factor);
+  return TypeVector<TS>(_coords[0]*factor);
 #endif
   
 #if DIM == 2 
-  return TypeVector(_coords[0]*factor,
-		    _coords[1]*factor);
+  return TypeVector<TS>(_coords[0]*factor,
+		        _coords[1]*factor);
 #endif
   
 #if DIM == 3
-  return TypeVector(_coords[0]*factor,
-		    _coords[1]*factor, 
-		    _coords[2]*factor);
+  return TypeVector<TS>(_coords[0]*factor,
+		        _coords[1]*factor, 
+		        _coords[2]*factor);
 #endif  
 }
 
@@ -618,7 +648,7 @@ template <typename T, typename Scalar>
 inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
-  TypeVector<T> >::type
+  TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
 operator * (const Scalar factor,
             const TypeVector<T> &v)
 {
@@ -652,26 +682,31 @@ const TypeVector<T> & TypeVector<T>::operator *= (const Scalar factor)
 
 
 
-
 template <typename T>
+template <typename Scalar>
 inline
-TypeVector<T> TypeVector<T>::operator / (const T factor) const
+typename boostcopy::enable_if_c<
+  ScalarTraits<Scalar>::value,
+  TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
+TypeVector<T>::operator / (const Scalar factor) const
 {
   assert (factor != static_cast<T>(0.));
+
+  typedef typename CompareTypes<T, Scalar>::supertype TS;
   
 #if DIM == 1
-  return TypeVector(_coords[0]/factor);
+  return TypeVector<TS>(_coords[0]/factor);
 #endif
   
 #if DIM == 2 
-  return TypeVector(_coords[0]/factor,
-		    _coords[1]/factor);
+  return TypeVector<TS>(_coords[0]/factor,
+		        _coords[1]/factor);
 #endif
   
 #if DIM == 3
-  return TypeVector(_coords[0]/factor,
-		    _coords[1]/factor, 
-		    _coords[2]/factor);
+  return TypeVector<TS>(_coords[0]/factor,
+		        _coords[1]/factor, 
+		        _coords[2]/factor);
 #endif
   
 }
@@ -680,8 +715,12 @@ TypeVector<T> TypeVector<T>::operator / (const T factor) const
 
 
 template <typename T>
+template <typename Scalar>
 inline
-const TypeVector<T> & TypeVector<T>::operator /= (const T factor)
+typename boostcopy::enable_if_c<
+  ScalarTraits<Scalar>::value,
+  const TypeVector<T> & >::type
+TypeVector<T>::operator /= (const Scalar factor)
 {
   assert (factor != static_cast<T>(0.));
   
@@ -697,7 +736,8 @@ const TypeVector<T> & TypeVector<T>::operator /= (const T factor)
 template <typename T>
 template <typename T2>
 inline
-T TypeVector<T>::operator * (const TypeVector<T2> &p) const
+typename CompareTypes<T, T2>::supertype
+TypeVector<T>::operator * (const TypeVector<T2> &p) const
 {
 #if DIM == 1
   return _coords[0]*p._coords[0];
@@ -713,6 +753,25 @@ T TypeVector<T>::operator * (const TypeVector<T2> &p) const
 	  _coords[1]*p(1) +
 	  _coords[2]*p(2));
 #endif
+}
+
+
+
+template <typename T>
+template <typename T2>
+TypeVector<typename CompareTypes<T, T2>::supertype>
+TypeVector<T>::cross(const TypeVector<T2>& p) const
+{
+  typedef typename CompareTypes<T, T2>::supertype TS;
+  assert (DIM == 3);
+
+  // |     i          j          k    |
+  // |(*this)(0) (*this)(1) (*this)(2)|
+  // |   p(0)       p(1)       p(2)   |
+
+  return TypeVector<TS>( _coords[1]*p._coords[2] - _coords[2]*p._coords[1],
+                        -_coords[0]*p._coords[2] + _coords[2]*p._coords[0],
+                         _coords[0]*p._coords[1] - _coords[1]*p._coords[0]);
 }
 
 
