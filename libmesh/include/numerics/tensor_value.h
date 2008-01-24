@@ -59,12 +59,14 @@ public:
   /**
    * Copy-constructor.
    */
-  TensorValue (const TensorValue<T>& p);
+  template <typename T2>
+  TensorValue (const TensorValue<T2>& p);
 
   /**
    * Copy-constructor.
    */
-  TensorValue (const TypeTensor<T>& p);
+  template <typename T2>
+  TensorValue (const TypeTensor<T2>& p);
 
 
 #ifdef USE_COMPLEX_NUMBERS
@@ -116,8 +118,9 @@ TensorValue<T>::TensorValue (const T xx,
 
 
 template <typename T>
+template <typename T2>
 inline
-TensorValue<T>::TensorValue (const TensorValue<T>& p) :
+TensorValue<T>::TensorValue (const TensorValue<T2>& p) :
   TypeTensor<T> (p)
 {
 }
@@ -125,8 +128,9 @@ TensorValue<T>::TensorValue (const TensorValue<T>& p) :
 
 
 template <typename T>
+template <typename T2>
 inline
-TensorValue<T>::TensorValue (const TypeTensor<T>& p) :
+TensorValue<T>::TensorValue (const TypeTensor<T2>& p) :
   TypeTensor<T> (p)
 {
 }

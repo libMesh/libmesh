@@ -158,8 +158,7 @@ public:
   /**
    * Multiply this vector by a number, i.e. scale.
    */
-  template <typename Scalar>
-  const TypeVector<T> & operator *= (const Scalar);
+  const TypeVector<T> & operator *= (const T);
   
   /**
    * Divide a vector by a number, i.e. scale.
@@ -173,11 +172,7 @@ public:
   /**
    * Divide this vector by a number, i.e. scale.
    */
-  template <typename Scalar>
-  typename boostcopy::enable_if_c<
-    ScalarTraits<Scalar>::value,
-    const TypeVector<T> & >::type
-  operator /= (const Scalar);
+  const TypeVector<T> & operator /= (const T);
 
   /**
    * Multiply 2 vectors together, i.e. dot-product.
@@ -597,9 +592,8 @@ operator * (const Scalar factor,
 
 
 template <typename T>
-template <typename Scalar>
 inline
-const TypeVector<T> & TypeVector<T>::operator *= (const Scalar factor)
+const TypeVector<T> & TypeVector<T>::operator *= (const T factor)
 {
 #if DIM == 1
   _coords[0] *= factor;
@@ -654,12 +648,9 @@ TypeVector<T>::operator / (const Scalar factor) const
 
 
 template <typename T>
-template <typename Scalar>
 inline
-typename boostcopy::enable_if_c<
-  ScalarTraits<Scalar>::value,
-  const TypeVector<T> & >::type
-TypeVector<T>::operator /= (const Scalar factor)
+const TypeVector<T> &
+TypeVector<T>::operator /= (const T factor)
 {
   assert (factor != static_cast<T>(0.));
   

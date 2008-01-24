@@ -53,13 +53,15 @@ public:
   
   /**
    * Copy-constructor.
-   */
-  VectorValue (const VectorValue<T>& p);
+   */ 
+  template <typename T2>
+  VectorValue (const VectorValue<T2>& p);
 
   /**
    * Copy-constructor.
    */
-  VectorValue (const TypeVector<T>& p);
+  template <typename T2>
+  VectorValue (const TypeVector<T2>& p);
 
 
 #ifdef USE_COMPLEX_NUMBERS
@@ -105,8 +107,9 @@ VectorValue<T>::VectorValue (const T x,
 
 
 template <typename T>
+template <typename T2>
 inline
-VectorValue<T>::VectorValue (const VectorValue<T>& p) :
+VectorValue<T>::VectorValue (const VectorValue<T2>& p) :
   TypeVector<T> (p)
 {
 }
@@ -114,8 +117,9 @@ VectorValue<T>::VectorValue (const VectorValue<T>& p) :
 
 
 template <typename T>
+template <typename T2>
 inline
-VectorValue<T>::VectorValue (const TypeVector<T>& p) :
+VectorValue<T>::VectorValue (const TypeVector<T2>& p) :
   TypeVector<T> (p)
 {
 }
