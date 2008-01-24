@@ -35,6 +35,7 @@ src/base/dof_map.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/parallel.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/string_to_enum.h
@@ -81,6 +82,7 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/numerics/vector_value.h\
     include/parallel/parallel.h\
     include/solvers/system.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -121,6 +123,7 @@ src/base/libmesh.$(obj-suffix):\
     include/geom/point.h\
     include/geom/remote_elem.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/base/print_trace.$(obj-suffix):\
@@ -177,6 +180,7 @@ src/fe/fe_base.$(obj-suffix):\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_bernstein.$(obj-suffix):\
@@ -210,6 +214,7 @@ src/fe/fe_bernstein.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_bernstein_shape_1D.$(obj-suffix):\
@@ -242,6 +247,7 @@ src/fe/fe_bernstein_shape_1D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/utility.h
@@ -275,6 +281,7 @@ src/fe/fe_bernstein_shape_2D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/number_lookups.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -309,6 +316,7 @@ src/fe/fe_bernstein_shape_3D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_boundary.$(obj-suffix):\
@@ -345,6 +353,7 @@ src/fe/fe_boundary.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe.$(obj-suffix):\
@@ -381,6 +390,7 @@ src/fe/fe.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_clough.$(obj-suffix):\
@@ -414,6 +424,7 @@ src/fe/fe_clough.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_clough_shape_1D.$(obj-suffix):\
@@ -446,6 +457,7 @@ src/fe/fe_clough_shape_1D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_clough_shape_2D.$(obj-suffix):\
@@ -478,6 +490,7 @@ src/fe/fe_clough_shape_2D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_clough_shape_3D.$(obj-suffix):\
@@ -510,6 +523,7 @@ src/fe/fe_clough_shape_3D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_compute_data.$(obj-suffix):\
@@ -571,6 +585,7 @@ src/fe/fe_hermite.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_hermite_shape_1D.$(obj-suffix):\
@@ -603,6 +618,7 @@ src/fe/fe_hermite_shape_1D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/utility.h
@@ -636,6 +652,7 @@ src/fe/fe_hermite_shape_2D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/number_lookups.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -669,6 +686,7 @@ src/fe/fe_hermite_shape_3D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/number_lookups.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -703,6 +721,7 @@ src/fe/fe_hierarchic.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_hierarchic_shape_1D.$(obj-suffix):\
@@ -735,6 +754,7 @@ src/fe/fe_hierarchic_shape_1D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/utility.h
@@ -768,6 +788,7 @@ src/fe/fe_hierarchic_shape_2D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/number_lookups.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -802,6 +823,7 @@ src/fe/fe_hierarchic_shape_3D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/number_lookups.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -838,6 +860,7 @@ src/fe/fe_interface.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_interface_inf_fe.$(obj-suffix):\
@@ -860,7 +883,8 @@ src/fe/fe_interface_inf_fe.$(obj-suffix):\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
-    include/numerics/vector_value.h
+    include/numerics/vector_value.h\
+    include/utils/compare_types.h
 src/fe/fe_lagrange.$(obj-suffix):\
     src/fe/fe_lagrange.C\
     include/base/auto_ptr.h\
@@ -894,6 +918,7 @@ src/fe/fe_lagrange.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_lagrange_shape_0D.$(obj-suffix):\
@@ -926,6 +951,7 @@ src/fe/fe_lagrange_shape_0D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_lagrange_shape_1D.$(obj-suffix):\
@@ -958,6 +984,7 @@ src/fe/fe_lagrange_shape_1D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_lagrange_shape_2D.$(obj-suffix):\
@@ -990,6 +1017,7 @@ src/fe/fe_lagrange_shape_2D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_lagrange_shape_3D.$(obj-suffix):\
@@ -1022,6 +1050,7 @@ src/fe/fe_lagrange_shape_3D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_map.$(obj-suffix):\
@@ -1056,6 +1085,7 @@ src/fe/fe_map.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_monomial.$(obj-suffix):\
@@ -1089,6 +1119,7 @@ src/fe/fe_monomial.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_monomial_shape_1D.$(obj-suffix):\
@@ -1121,6 +1152,7 @@ src/fe/fe_monomial_shape_1D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_monomial_shape_2D.$(obj-suffix):\
@@ -1153,6 +1185,7 @@ src/fe/fe_monomial_shape_2D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_monomial_shape_3D.$(obj-suffix):\
@@ -1185,6 +1218,7 @@ src/fe/fe_monomial_shape_3D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_szabab.$(obj-suffix):\
@@ -1218,6 +1252,7 @@ src/fe/fe_szabab.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_szabab_shape_1D.$(obj-suffix):\
@@ -1250,6 +1285,7 @@ src/fe/fe_szabab_shape_1D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_szabab_shape_2D.$(obj-suffix):\
@@ -1282,6 +1318,7 @@ src/fe/fe_szabab_shape_2D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/utility.h
@@ -1307,6 +1344,7 @@ src/fe/fe_szabab_shape_3D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_type.$(obj-suffix):\
@@ -1327,7 +1365,8 @@ src/fe/fe_type.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_clough.h\
-    include/quadrature/quadrature_gauss.h
+    include/quadrature/quadrature_gauss.h\
+    include/utils/compare_types.h
 src/fe/fe_xyz_boundary.$(obj-suffix):\
     src/fe/fe_xyz_boundary.C\
     include/base/auto_ptr.h\
@@ -1362,6 +1401,7 @@ src/fe/fe_xyz_boundary.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_xyz.$(obj-suffix):\
@@ -1396,6 +1436,7 @@ src/fe/fe_xyz.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_xyz_shape_1D.$(obj-suffix):\
@@ -1428,6 +1469,7 @@ src/fe/fe_xyz_shape_1D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_xyz_shape_2D.$(obj-suffix):\
@@ -1460,6 +1502,7 @@ src/fe/fe_xyz_shape_2D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/fe_xyz_shape_3D.$(obj-suffix):\
@@ -1492,6 +1535,7 @@ src/fe/fe_xyz_shape_3D.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/inf_fe_base_radial.$(obj-suffix):\
@@ -1526,6 +1570,7 @@ src/fe/inf_fe_base_radial.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/inf_fe_boundary.$(obj-suffix):\
@@ -1561,6 +1606,7 @@ src/fe/inf_fe_boundary.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/inf_fe.$(obj-suffix):\
@@ -1601,6 +1647,7 @@ src/fe/inf_fe.$(obj-suffix):\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/inf_fe_jacobi_20_00_eval.$(obj-suffix):\
@@ -1622,7 +1669,8 @@ src/fe/inf_fe_jacobi_20_00_eval.$(obj-suffix):\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
-    include/numerics/vector_value.h
+    include/numerics/vector_value.h\
+    include/utils/compare_types.h
 src/fe/inf_fe_jacobi_30_00_eval.$(obj-suffix):\
     src/fe/inf_fe_jacobi_30_00_eval.C\
     include/base/auto_ptr.h\
@@ -1642,7 +1690,8 @@ src/fe/inf_fe_jacobi_30_00_eval.$(obj-suffix):\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
-    include/numerics/vector_value.h
+    include/numerics/vector_value.h\
+    include/utils/compare_types.h
 src/fe/inf_fe_lagrange_eval.$(obj-suffix):\
     src/fe/inf_fe_lagrange_eval.C\
     include/base/auto_ptr.h\
@@ -1662,7 +1711,8 @@ src/fe/inf_fe_lagrange_eval.$(obj-suffix):\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
-    include/numerics/vector_value.h
+    include/numerics/vector_value.h\
+    include/utils/compare_types.h
 src/fe/inf_fe_legendre_eval.$(obj-suffix):\
     src/fe/inf_fe_legendre_eval.C\
     include/base/auto_ptr.h\
@@ -1683,7 +1733,8 @@ src/fe/inf_fe_legendre_eval.$(obj-suffix):\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
-    include/numerics/vector_value.h
+    include/numerics/vector_value.h\
+    include/utils/compare_types.h
 src/fe/inf_fe_map.$(obj-suffix):\
     src/fe/inf_fe_map.C\
     include/base/auto_ptr.h\
@@ -1717,6 +1768,7 @@ src/fe/inf_fe_map.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/fe/inf_fe_map_eval.$(obj-suffix):\
@@ -1738,7 +1790,8 @@ src/fe/inf_fe_map_eval.$(obj-suffix):\
     include/numerics/tensor_value.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
-    include/numerics/vector_value.h
+    include/numerics/vector_value.h\
+    include/utils/compare_types.h
 src/fe/inf_fe_static.$(obj-suffix):\
     src/fe/inf_fe_static.C\
     include/base/auto_ptr.h\
@@ -1773,6 +1826,7 @@ src/fe/inf_fe_static.$(obj-suffix):\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell.$(obj-suffix):\
@@ -1807,6 +1861,7 @@ src/geom/cell_hex20.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_hex27.$(obj-suffix):\
@@ -1839,6 +1894,7 @@ src/geom/cell_hex27.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_hex8.$(obj-suffix):\
@@ -1871,6 +1927,7 @@ src/geom/cell_hex8.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_hex.$(obj-suffix):\
@@ -1899,6 +1956,7 @@ src/geom/cell_hex.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_inf.$(obj-suffix):\
@@ -1936,6 +1994,7 @@ src/geom/cell_inf_hex16.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_inf_hex18.$(obj-suffix):\
@@ -1971,6 +2030,7 @@ src/geom/cell_inf_hex18.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_inf_hex8.$(obj-suffix):\
@@ -2010,6 +2070,7 @@ src/geom/cell_inf_hex8.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_inf_hex.$(obj-suffix):\
@@ -2040,6 +2101,7 @@ src/geom/cell_inf_hex.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_inf_prism12.$(obj-suffix):\
@@ -2076,6 +2138,7 @@ src/geom/cell_inf_prism12.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_inf_prism6.$(obj-suffix):\
@@ -2116,6 +2179,7 @@ src/geom/cell_inf_prism6.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_inf_prism.$(obj-suffix):\
@@ -2147,6 +2211,7 @@ src/geom/cell_inf_prism.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_prism15.$(obj-suffix):\
@@ -2182,6 +2247,7 @@ src/geom/cell_prism15.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_prism18.$(obj-suffix):\
@@ -2217,6 +2283,7 @@ src/geom/cell_prism18.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_prism6.$(obj-suffix):\
@@ -2252,6 +2319,7 @@ src/geom/cell_prism6.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_prism.$(obj-suffix):\
@@ -2283,6 +2351,7 @@ src/geom/cell_prism.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_pyramid5.$(obj-suffix):\
@@ -2318,6 +2387,7 @@ src/geom/cell_pyramid5.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_pyramid.$(obj-suffix):\
@@ -2349,6 +2419,7 @@ src/geom/cell_pyramid.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_tet10.$(obj-suffix):\
@@ -2382,6 +2453,7 @@ src/geom/cell_tet10.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_tet4.$(obj-suffix):\
@@ -2415,6 +2487,7 @@ src/geom/cell_tet4.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/cell_tet.$(obj-suffix):\
@@ -2444,6 +2517,7 @@ src/geom/cell_tet.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/edge.$(obj-suffix):\
@@ -2470,6 +2544,7 @@ src/geom/edge.$(obj-suffix):\
     include/geom/node_elem.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/edge_edge2.$(obj-suffix):\
@@ -2496,6 +2571,7 @@ src/geom/edge_edge2.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/edge_edge3.$(obj-suffix):\
@@ -2522,6 +2598,7 @@ src/geom/edge_edge3.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/edge_edge4.$(obj-suffix):\
@@ -2548,6 +2625,7 @@ src/geom/edge_edge4.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/edge_inf_edge2.$(obj-suffix):\
@@ -2574,6 +2652,7 @@ src/geom/edge_inf_edge2.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/elem.$(obj-suffix):\
@@ -2646,6 +2725,7 @@ src/geom/elem.$(obj-suffix):\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/elem_quality.$(obj-suffix):\
@@ -2680,6 +2760,7 @@ src/geom/elem_refinement.$(obj-suffix):\
     include/geom/remote_elem.h\
     include/mesh/mesh_refinement.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/elem_type.$(obj-suffix):\
@@ -2723,6 +2804,7 @@ src/geom/face_inf_quad4.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/face_inf_quad6.$(obj-suffix):\
@@ -2753,6 +2835,7 @@ src/geom/face_inf_quad6.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/face_inf_quad.$(obj-suffix):\
@@ -2781,6 +2864,7 @@ src/geom/face_inf_quad.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/face_quad4.$(obj-suffix):\
@@ -2811,6 +2895,7 @@ src/geom/face_quad4.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/face_quad8.$(obj-suffix):\
@@ -2841,6 +2926,7 @@ src/geom/face_quad8.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/face_quad9.$(obj-suffix):\
@@ -2871,6 +2957,7 @@ src/geom/face_quad9.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/face_quad.$(obj-suffix):\
@@ -2899,6 +2986,7 @@ src/geom/face_quad.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/face_tri3.$(obj-suffix):\
@@ -2929,6 +3017,7 @@ src/geom/face_tri3.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/face_tri6.$(obj-suffix):\
@@ -2959,6 +3048,7 @@ src/geom/face_tri6.$(obj-suffix):\
     include/geom/point.h\
     include/geom/side.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/face_tri.$(obj-suffix):\
@@ -2987,6 +3077,7 @@ src/geom/face_tri.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/node.$(obj-suffix):\
@@ -3003,6 +3094,7 @@ src/geom/node.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/node_elem.$(obj-suffix):\
@@ -3028,6 +3120,7 @@ src/geom/node_elem.$(obj-suffix):\
     include/geom/node_elem.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/plane.$(obj-suffix):\
@@ -3038,7 +3131,8 @@ src/geom/plane.$(obj-suffix):\
     include/geom/plane.h\
     include/geom/point.h\
     include/geom/surface.h\
-    include/numerics/type_vector.h
+    include/numerics/type_vector.h\
+    include/utils/compare_types.h
 src/geom/point.$(obj-suffix):\
     src/geom/point.C
 src/geom/remote_elem.$(obj-suffix):\
@@ -3064,6 +3158,7 @@ src/geom/remote_elem.$(obj-suffix):\
     include/geom/point.h\
     include/geom/remote_elem.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/sphere.$(obj-suffix):\
@@ -3077,6 +3172,7 @@ src/geom/sphere.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/surface.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/surface.$(obj-suffix):\
@@ -3112,6 +3208,7 @@ src/mesh/boundary_info.$(obj-suffix):\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -3143,6 +3240,7 @@ src/mesh/boundary_mesh.$(obj-suffix):\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -3178,6 +3276,7 @@ src/mesh/diva_io.$(obj-suffix):\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -3214,6 +3313,7 @@ src/mesh/exodusII_io.$(obj-suffix):\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/solvers/system.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/fro_io.$(obj-suffix):\
@@ -3242,6 +3342,7 @@ src/mesh/fro_io.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_output.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/gmsh_io.$(obj-suffix):\
@@ -3271,6 +3372,7 @@ src/mesh/gmsh_io.$(obj-suffix):\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/gmv_io.$(obj-suffix):\
@@ -3314,6 +3416,7 @@ src/mesh/gmv_io.$(obj-suffix):\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
     include/utils/perf_log.h
@@ -3342,6 +3445,7 @@ src/mesh/gnuplot_io.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_output.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/inf_elem_builder.$(obj-suffix):\
@@ -3380,6 +3484,7 @@ src/mesh/inf_elem_builder.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_tools.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/legacy_xdr_io.$(obj-suffix):\
@@ -3422,6 +3527,7 @@ src/mesh/legacy_xdr_io.$(obj-suffix):\
     include/mesh/xdr_soln.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
+    include/utils/compare_types.h\
     include/utils/o_f_stream.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -3454,6 +3560,7 @@ src/mesh/matlab_io.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_input.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/medit_io.$(obj-suffix):\
@@ -3481,6 +3588,7 @@ src/mesh/medit_io.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_output.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/mesh_base.$(obj-suffix):\
@@ -3510,6 +3618,7 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/partitioning/metis_partitioner.h\
     include/partitioning/partitioner.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/point_locator_base.h
@@ -3543,6 +3652,7 @@ src/mesh/mesh_communication.$(obj-suffix):\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -3574,6 +3684,7 @@ src/mesh/mesh_communication_global_indices.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
     include/parallel/parallel_sort.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/mesh_data.$(obj-suffix):\
@@ -3602,6 +3713,7 @@ src/mesh/mesh_data.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/mesh_data_tetgen_support.$(obj-suffix):\
@@ -3652,6 +3764,7 @@ src/mesh/mesh_data_xdr_support.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_data.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_f_stream.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -3711,6 +3824,7 @@ src/mesh/mesh_generation.$(obj-suffix):\
     include/mesh/mesh_smoother_laplace.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/mesh_modification.$(obj-suffix):\
@@ -3745,6 +3859,7 @@ src/mesh/mesh_modification.$(obj-suffix):\
     include/mesh/mesh_tools.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/string_to_enum.h
@@ -3811,6 +3926,7 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     include/mesh/mesh_refinement.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
+    include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -3839,6 +3955,7 @@ src/mesh/mesh_refinement_flagging.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_refinement.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -3870,6 +3987,7 @@ src/mesh/mesh_refinement_smoothing.$(obj-suffix):\
     include/mesh/mesh_refinement.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/mesh_smoother.$(obj-suffix):\
@@ -3901,6 +4019,7 @@ src/mesh/mesh_smoother_laplace.$(obj-suffix):\
     include/mesh/mesh_tools.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/mesh_smoother_vsmoother.$(obj-suffix):\
@@ -3930,6 +4049,7 @@ src/mesh/mesh_smoother_vsmoother.$(obj-suffix):\
     include/mesh/mesh_tools.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/utility.h
@@ -3964,6 +4084,7 @@ src/mesh/mesh_tetgen_support.$(obj-suffix):\
     include/mesh/mesh_tetgen_support.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/mesh_tools.$(obj-suffix):\
@@ -3998,6 +4119,7 @@ src/mesh/mesh_tools.$(obj-suffix):\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -4035,6 +4157,7 @@ src/mesh/mesh_triangle_support.$(obj-suffix):\
     include/mesh/mesh_triangle_support.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/off_io.$(obj-suffix):\
@@ -4065,6 +4188,7 @@ src/mesh/off_io.$(obj-suffix):\
     include/mesh/mesh_input.h\
     include/mesh/off_io.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/parallel_mesh.$(obj-suffix):\
@@ -4096,6 +4220,7 @@ src/mesh/parallel_mesh.$(obj-suffix):\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -4124,6 +4249,7 @@ src/mesh/parallel_mesh_iterators.$(obj-suffix):\
     include/mesh/parallel_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -4151,6 +4277,7 @@ src/mesh/patch.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/patch.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/serial_mesh.$(obj-suffix):\
@@ -4180,6 +4307,7 @@ src/mesh/serial_mesh.$(obj-suffix):\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/serial_mesh_iterators.$(obj-suffix):\
@@ -4207,6 +4335,7 @@ src/mesh/serial_mesh_iterators.$(obj-suffix):\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/tecplot_io.$(obj-suffix):\
@@ -4234,6 +4363,7 @@ src/mesh/tecplot_io.$(obj-suffix):\
     include/mesh/mesh_output.h\
     include/mesh/tecplot_io.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/tetgen_io.$(obj-suffix):\
@@ -4268,6 +4398,7 @@ src/mesh/tetgen_io.$(obj-suffix):\
     include/mesh/mesh_output.h\
     include/mesh/tetgen_io.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/ucd_io.$(obj-suffix):\
@@ -4307,6 +4438,7 @@ src/mesh/ucd_io.$(obj-suffix):\
     include/mesh/mesh_output.h\
     include/mesh/ucd_io.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/unstructured_mesh.$(obj-suffix):\
@@ -4357,6 +4489,7 @@ src/mesh/unstructured_mesh.$(obj-suffix):\
     include/mesh/xdr_io.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/unv_io.$(obj-suffix):\
@@ -4403,6 +4536,7 @@ src/mesh/unv_io.$(obj-suffix):\
     include/mesh/mesh_output.h\
     include/mesh/unv_io.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/vtk_io.$(obj-suffix):\
@@ -4460,6 +4594,7 @@ src/mesh/vtk_io.$(obj-suffix):\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
@@ -4507,6 +4642,8 @@ src/mesh/xdr_io.$(obj-suffix):\
     include/mesh/xdr_io.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
+    include/partitioning/partitioner.h\
+    include/utils/compare_types.h\
     include/utils/o_f_stream.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -4648,6 +4785,7 @@ src/numerics/discontinuity_measure.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/solvers/system.h\
+    include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -4779,6 +4917,7 @@ src/numerics/exact_error_estimator.$(obj-suffix):\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
@@ -4825,6 +4964,7 @@ src/numerics/fourth_error_estimators.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/solvers/system.h\
+    include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -4883,6 +5023,7 @@ src/numerics/hp_coarsentest.$(obj-suffix):\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
     include/solvers/system.h\
+    include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
@@ -4939,6 +5080,7 @@ src/numerics/hp_singular.$(obj-suffix):\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
     include/solvers/system.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -4989,6 +5131,7 @@ src/numerics/jump_error_estimator.$(obj-suffix):\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
     include/solvers/system.h\
+    include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
@@ -5036,6 +5179,7 @@ src/numerics/kelly_error_estimator.$(obj-suffix):\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
     include/solvers/system.h\
+    include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -5083,6 +5227,7 @@ src/numerics/laspack_matrix.$(obj-suffix):\
     include/numerics/sparse_matrix.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/numerics/laspack_vector.$(obj-suffix):\
@@ -5187,6 +5332,7 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
@@ -5279,6 +5425,7 @@ src/numerics/patch_recovery_error_estimator.$(obj-suffix):\
     include/quadrature/quadrature_gauss.h\
     include/quadrature/quadrature_grid.h\
     include/solvers/system.h\
+    include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
@@ -5325,6 +5472,7 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/numerics/sparse_matrix.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/numerics/petsc_nonlinear_solver.$(obj-suffix):\
@@ -5413,13 +5561,15 @@ src/numerics/type_tensor.$(obj-suffix):\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
     include/numerics/type_tensor.h\
-    include/numerics/type_vector.h
+    include/numerics/type_vector.h\
+    include/utils/compare_types.h
 src/numerics/type_vector.$(obj-suffix):\
     src/numerics/type_vector.C\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
-    include/numerics/type_vector.h
+    include/numerics/type_vector.h\
+    include/utils/compare_types.h
 src/numerics/uniform_refinement_estimator.$(obj-suffix):\
     src/numerics/uniform_refinement_estimator.C\
     include/base/auto_ptr.h\
@@ -5474,6 +5624,7 @@ src/numerics/uniform_refinement_estimator.$(obj-suffix):\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
@@ -5545,6 +5696,7 @@ src/partitioning/centroid_partitioner.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/partitioning/centroid_partitioner.h\
     include/partitioning/partitioner.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/partitioning/linear_partitioner.$(obj-suffix):\
@@ -5573,6 +5725,7 @@ src/partitioning/linear_partitioner.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/partitioning/linear_partitioner.h\
     include/partitioning/partitioner.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/partitioning/metis_partitioner.$(obj-suffix):\
@@ -5602,6 +5755,7 @@ src/partitioning/metis_partitioner.$(obj-suffix):\
     include/partitioning/metis_partitioner.h\
     include/partitioning/partitioner.h\
     include/partitioning/sfc_partitioner.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/partitioning/parmetis_partitioner.$(obj-suffix):\
@@ -5632,6 +5786,7 @@ src/partitioning/parmetis_partitioner.$(obj-suffix):\
     include/partitioning/metis_partitioner.h\
     include/partitioning/parmetis_partitioner.h\
     include/partitioning/partitioner.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/partitioning/partitioner.$(obj-suffix):\
@@ -5660,6 +5815,7 @@ src/partitioning/partitioner.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
     include/partitioning/partitioner.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/partitioning/partitioner_factory.$(obj-suffix):\
@@ -5681,6 +5837,7 @@ src/partitioning/partitioner_factory.$(obj-suffix):\
     include/partitioning/parmetis_partitioner.h\
     include/partitioning/partitioner.h\
     include/partitioning/sfc_partitioner.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/partitioning/sfc_partitioner.$(obj-suffix):\
@@ -5710,6 +5867,7 @@ src/partitioning/sfc_partitioner.$(obj-suffix):\
     include/partitioning/linear_partitioner.h\
     include/partitioning/partitioner.h\
     include/partitioning/sfc_partitioner.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/quadrature/quadrature_build.$(obj-suffix):\
@@ -5730,7 +5888,8 @@ src/quadrature/quadrature_build.$(obj-suffix):\
     include/quadrature/quadrature_gauss.h\
     include/quadrature/quadrature_jacobi.h\
     include/quadrature/quadrature_simpson.h\
-    include/quadrature/quadrature_trap.h
+    include/quadrature/quadrature_trap.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature.$(obj-suffix):\
     src/quadrature/quadrature.C\
     include/base/auto_ptr.h\
@@ -5744,7 +5903,8 @@ src/quadrature/quadrature.$(obj-suffix):\
     include/enums/enum_quadrature_type.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
-    include/quadrature/quadrature.h
+    include/quadrature/quadrature.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_clough_1D.$(obj-suffix):\
     src/quadrature/quadrature_clough_1D.C\
     include/base/auto_ptr.h\
@@ -5760,7 +5920,8 @@ src/quadrature/quadrature_clough_1D.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_clough.h\
-    include/quadrature/quadrature_gauss.h
+    include/quadrature/quadrature_gauss.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_clough_2D.$(obj-suffix):\
     src/quadrature/quadrature_clough_2D.C\
     include/base/auto_ptr.h\
@@ -5776,7 +5937,8 @@ src/quadrature/quadrature_clough_2D.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_clough.h\
-    include/quadrature/quadrature_gauss.h
+    include/quadrature/quadrature_gauss.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_clough_3D.$(obj-suffix):\
     src/quadrature/quadrature_clough_3D.C\
     include/base/auto_ptr.h\
@@ -5791,7 +5953,8 @@ src/quadrature/quadrature_clough_3D.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
-    include/quadrature/quadrature_clough.h
+    include/quadrature/quadrature_clough.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_clough.$(obj-suffix):\
     src/quadrature/quadrature_clough.C
 src/quadrature/quadrature_gauss_1D.$(obj-suffix):\
@@ -5808,7 +5971,8 @@ src/quadrature/quadrature_gauss_1D.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
-    include/quadrature/quadrature_gauss.h
+    include/quadrature/quadrature_gauss.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_gauss_2D.$(obj-suffix):\
     src/quadrature/quadrature_gauss_2D.C\
     include/base/auto_ptr.h\
@@ -5824,7 +5988,8 @@ src/quadrature/quadrature_gauss_2D.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
-    include/quadrature/quadrature_jacobi.h
+    include/quadrature/quadrature_jacobi.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_gauss_3D.$(obj-suffix):\
     src/quadrature/quadrature_gauss_3D.C\
     include/base/auto_ptr.h\
@@ -5840,7 +6005,8 @@ src/quadrature/quadrature_gauss_3D.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
-    include/quadrature/quadrature_jacobi.h
+    include/quadrature/quadrature_jacobi.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_gauss.$(obj-suffix):\
     src/quadrature/quadrature_gauss.C
 src/quadrature/quadrature_grid_1D.$(obj-suffix):\
@@ -5857,7 +6023,8 @@ src/quadrature/quadrature_grid_1D.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
-    include/quadrature/quadrature_grid.h
+    include/quadrature/quadrature_grid.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_grid_2D.$(obj-suffix):\
     src/quadrature/quadrature_grid_2D.C\
     include/base/auto_ptr.h\
@@ -5872,7 +6039,8 @@ src/quadrature/quadrature_grid_2D.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
-    include/quadrature/quadrature_grid.h
+    include/quadrature/quadrature_grid.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_grid_3D.$(obj-suffix):\
     src/quadrature/quadrature_grid_3D.C\
     include/base/auto_ptr.h\
@@ -5887,7 +6055,8 @@ src/quadrature/quadrature_grid_3D.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
-    include/quadrature/quadrature_grid.h
+    include/quadrature/quadrature_grid.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_grid.$(obj-suffix):\
     src/quadrature/quadrature_grid.C
 src/quadrature/quadrature_jacobi_1D.$(obj-suffix):\
@@ -5904,7 +6073,8 @@ src/quadrature/quadrature_jacobi_1D.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
-    include/quadrature/quadrature_jacobi.h
+    include/quadrature/quadrature_jacobi.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_jacobi.$(obj-suffix):\
     src/quadrature/quadrature_jacobi.C
 src/quadrature/quadrature_rules.$(obj-suffix):\
@@ -5928,7 +6098,8 @@ src/quadrature/quadrature_simpson_1D.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
-    include/quadrature/quadrature_simpson.h
+    include/quadrature/quadrature_simpson.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_simpson_2D.$(obj-suffix):\
     src/quadrature/quadrature_simpson_2D.C\
     include/base/auto_ptr.h\
@@ -5943,7 +6114,8 @@ src/quadrature/quadrature_simpson_2D.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
-    include/quadrature/quadrature_simpson.h
+    include/quadrature/quadrature_simpson.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_simpson_3D.$(obj-suffix):\
     src/quadrature/quadrature_simpson_3D.C\
     include/base/auto_ptr.h\
@@ -5958,7 +6130,8 @@ src/quadrature/quadrature_simpson_3D.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
-    include/quadrature/quadrature_simpson.h
+    include/quadrature/quadrature_simpson.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_simpson.$(obj-suffix):\
     src/quadrature/quadrature_simpson.C
 src/quadrature/quadrature_trap_1D.$(obj-suffix):\
@@ -5975,7 +6148,8 @@ src/quadrature/quadrature_trap_1D.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
-    include/quadrature/quadrature_trap.h
+    include/quadrature/quadrature_trap.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_trap_2D.$(obj-suffix):\
     src/quadrature/quadrature_trap_2D.C\
     include/base/auto_ptr.h\
@@ -5990,7 +6164,8 @@ src/quadrature/quadrature_trap_2D.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
-    include/quadrature/quadrature_trap.h
+    include/quadrature/quadrature_trap.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_trap_3D.$(obj-suffix):\
     src/quadrature/quadrature_trap_3D.C\
     include/base/auto_ptr.h\
@@ -6005,7 +6180,8 @@ src/quadrature/quadrature_trap_3D.$(obj-suffix):\
     include/geom/point.h\
     include/numerics/type_vector.h\
     include/quadrature/quadrature.h\
-    include/quadrature/quadrature_trap.h
+    include/quadrature/quadrature_trap.h\
+    include/utils/compare_types.h
 src/quadrature/quadrature_trap.$(obj-suffix):\
     src/quadrature/quadrature_trap.C
 src/solvers/adaptive_time_solver.$(obj-suffix):\
@@ -6091,6 +6267,7 @@ src/solvers/continuation_system.$(obj-suffix):\
     include/solvers/system.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/solvers/diff_solver.$(obj-suffix):\
@@ -6142,6 +6319,7 @@ src/solvers/diff_system.$(obj-suffix):\
     include/solvers/system.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/solvers/eigen_system.$(obj-suffix):\
@@ -6190,6 +6368,7 @@ src/solvers/eigen_system.$(obj-suffix):\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
@@ -6273,6 +6452,7 @@ src/solvers/equation_systems.$(obj-suffix):\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
     include/utils/perf_log.h
@@ -6318,6 +6498,7 @@ src/solvers/equation_systems_io.$(obj-suffix):\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_f_stream.h\
     include/utils/o_string_stream.h\
@@ -6445,6 +6626,7 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
@@ -6525,6 +6707,7 @@ src/solvers/fem_system.$(obj-suffix):\
     include/solvers/system.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
@@ -6599,6 +6782,7 @@ src/solvers/implicit_system.$(obj-suffix):\
     include/solvers/explicit_system.h\
     include/solvers/implicit_system.h\
     include/solvers/system.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -6705,6 +6889,7 @@ src/solvers/newton_solver.$(obj-suffix):\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
     include/utils/perf_log.h
@@ -6815,6 +7000,7 @@ src/solvers/system.$(obj-suffix):\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
     include/utils/perf_log.h\
@@ -6856,6 +7042,7 @@ src/solvers/system_io.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
     include/solvers/system.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_f_stream.h\
     include/utils/o_string_stream.h\
@@ -6908,6 +7095,7 @@ src/solvers/system_projection.$(obj-suffix):\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
     include/solvers/system.h\
+    include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -6944,6 +7132,7 @@ src/solvers/time_solver.$(obj-suffix):\
     include/solvers/system.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/solvers/transient_system.$(obj-suffix):\
@@ -6971,6 +7160,7 @@ src/solvers/transient_system.$(obj-suffix):\
     include/solvers/nonlinear_implicit_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/utility.h
@@ -7023,6 +7213,7 @@ src/utils/error_vector.$(obj-suffix):\
     include/solvers/steady_system.h\
     include/solvers/system.h\
     include/solvers/transient_system.h\
+    include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
@@ -7101,6 +7292,7 @@ src/utils/point_locator_list.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/mesh_base.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/point_locator_base.h\
@@ -7130,6 +7322,7 @@ src/utils/point_locator_tree.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_tools.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/point_locator_base.h\
@@ -7178,6 +7371,7 @@ src/utils/tree.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_tools.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/tree.h\
@@ -7206,6 +7400,7 @@ src/utils/tree_node.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/mesh_base.h\
     include/numerics/type_vector.h\
+    include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/tree_node.h
