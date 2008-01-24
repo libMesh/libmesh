@@ -717,22 +717,17 @@ Real System::calculate_norm(NumericVector<Number>& v,
               Number u_h = 0.;
               for (unsigned int i=0; i != n_sf; ++i)
                 u_h += phi[i][qp] * (*local_v)(dof_indices[i]);
-#if   defined (USE_REAL_NUMBERS)
-              v_norm += component_scale[var] * JxW[qp] * u_h * u_h;
-#elif defined (USE_COMPLEX_NUMBERS)
-	      v_norm += component_scale[var] * JxW[qp] * norm(u_h);
-#endif
+	      v_norm += component_scale[var] * JxW[qp] * libmesh_norm(u_h);
               if (component_norm[var] > 0)
                 {
                   Gradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
-#if   defined (USE_REAL_NUMBERS)
                   v_norm += component_scale[var] * JxW[qp] *
+#if   defined (USE_REAL_NUMBERS)
                             (grad_u_h * grad_u_h);
 #elif defined (USE_COMPLEX_NUMBERS)
-                  v_norm += component_scale[var] * JxW[qp] *
-                            norm(grad_u_h * grad_u_h);
+                            std::abs(grad_u_h * grad_u_h);
 #endif
                 }
 

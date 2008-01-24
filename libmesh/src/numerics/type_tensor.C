@@ -124,6 +124,22 @@ bool TypeTensor<Real>::operator < (const TypeTensor<Real>& rhs) const
 
 
 
+template <>
+bool TypeTensor<Real>::operator > (const TypeTensor<Real>& rhs) const
+{
+  for (unsigned int i=0; i<DIM; i++)
+    for (unsigned int j=0; j<DIM; j++)
+      {
+        if ((*this)(i,j) > rhs(i,j))
+          return true;
+        if ((*this)(i,j) < rhs(i,j))
+          return false;
+      }
+  return false;
+}
+
+
+
 #ifdef USE_COMPLEX_NUMBERS
 template <>
 bool TypeTensor<Complex>::operator < (const TypeTensor<Complex>& rhs) const
@@ -138,6 +154,26 @@ bool TypeTensor<Complex>::operator < (const TypeTensor<Complex>& rhs) const
         if ((*this)(i,j).imag() < rhs(i,j).imag())
           return true;
         if ((*this)(i,j).imag() > rhs(i,j).imag())
+          return false;
+      }
+  return false;
+}
+
+
+
+template <>
+bool TypeTensor<Complex>::operator > (const TypeTensor<Complex>& rhs) const
+{
+  for (unsigned int i=0; i<DIM; i++)
+    for (unsigned int j=0; j<DIM; j++)
+      {
+        if ((*this)(i,j).real() > rhs(i,j).real())
+          return true;
+        if ((*this)(i,j).real() < rhs(i,j).real())
+          return false;
+        if ((*this)(i,j).imag() > rhs(i,j).imag())
+          return true;
+        if ((*this)(i,j).imag() < rhs(i,j).imag())
           return false;
       }
   return false;

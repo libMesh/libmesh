@@ -837,42 +837,4 @@ bool TypeVector<Real>::operator != (const TypeVector<Real>& rhs) const
   return (!(*this == rhs));
 }
 
-
-
-/*
-#ifdef USE_COMPLEX_NUMBERS
-
-template <>
-inline
-bool TypeVector<Complex>::operator == (const TypeVector<Complex>& rhs) const
-{
-#if DIM == 1
-  return (_coords[0] == rhs._coords[0]);
-#endif
-  
-#if DIM == 2
-  return (_coords[0] == rhs._coords[0] &&
-	  _coords[1] == rhs._coords[1]);
-#endif
-  
-#if DIM == 3
-  return (_coords[0] == rhs._coords[0] &&
-	  _coords[1] == rhs._coords[1] &&
-	  _coords[2] == rhs._coords[2]);
-#endif  
-}
-
-
-template <>
-inline
-bool TypeVector<Complex>::operator != (const TypeVector<Complex>& rhs) const
-{
-  return (!(*this == rhs));
-}
-
-
-#endif
-*/
-
-
 #endif // #define __type_vector_h__
