@@ -214,7 +214,7 @@ public:
 
   /**
    * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
-   * elements squared.
+   * element magnitudes squared.
    */
   Real size_sq() const;
 
