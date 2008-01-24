@@ -27,6 +27,7 @@
 
 // Local Includes
 #include "libmesh_common.h"
+#include "compare_types.h"
 #include "dense_vector_base.h"
 
 // Forward Declarations
@@ -57,12 +58,14 @@ public:
   /**
    * Copy-constructor.
    */
-  DenseVector (const DenseVector<T>& other_vector);
+  template <typename T2>
+  DenseVector (const DenseVector<T2>& other_vector);
 
   /**
    * Copy-constructor, from a \p std::vector.
    */
-  DenseVector (const std::vector<T>& other_vector);
+  template <typename T2>
+  DenseVector (const std::vector<T2>& other_vector);
   
   /**
    * Destructor.  Does nothing.
@@ -102,7 +105,8 @@ public:
   /**
    * Assignment operator.
    */
-  DenseVector<T>& operator = (const DenseVector<T>& other_vector);
+  template <typename T2>
+  DenseVector<T>& operator = (const DenseVector<T2>& other_vector);
   
   /**
    * STL-like swap method
@@ -126,14 +130,20 @@ public:
   
   /**
    * Adds \p factor times \p vec to this vector.
+   * This should only work if T += T2 * T3 is valid C++ and
+   * if T2 is scalar.  Return type is void
    */
-  void add (const T factor,
-	    const DenseVector<T>& vec);
+  template <typename T2, typename T3>
+  typename boostcopy::enable_if_c<
+    ScalarTraits<T2>::value, void >::type
+  add (const T2 factor,
+       const DenseVector<T3>& vec);
 
   /**
    * Adds \p vec to this vector.
    */
-  DenseVector<T>& operator+= (const DenseVector<T> &vec);
+  template <typename T2>
+  DenseVector<T>& operator+= (const DenseVector<T2> &vec);
   
   /**
    * @returns the minimum element in the vector.
@@ -169,19 +179,6 @@ public:
    */
   Real linfty_norm () const;
 
-#ifdef USE_COMPLEX_NUMBERS
-
-  /**
-   * For a complex-valued vector, let a real-valued
-   * vector being added to us (Note that the other
-   * way around would be wrong!). 
-   */
-  void add (const Complex factor,
-	    const DenseVector<Real>& vec);
-
-#endif
-
-
   /**
    * Access to the values array. This should be used with
    * caution but can  be used to speed up code compilation
@@ -212,8 +209,9 @@ DenseVector<T>::DenseVector(const unsigned int n) :
 
 
 template<typename T>
+template<typename T2>
 inline
-DenseVector<T>::DenseVector (const DenseVector<T>& other_vector) :
+DenseVector<T>::DenseVector (const DenseVector<T2>& other_vector) :
   DenseVectorBase<T>(),
   _val(other_vector._val)
 {  
@@ -222,8 +220,9 @@ DenseVector<T>::DenseVector (const DenseVector<T>& other_vector) :
 
 
 template<typename T>
+template<typename T2>
 inline
-DenseVector<T>::DenseVector (const std::vector<T>& other_vector) :
+DenseVector<T>::DenseVector (const std::vector<T2>& other_vector) :
   _val(other_vector)
 {  
 }
@@ -233,8 +232,9 @@ DenseVector<T>::DenseVector (const std::vector<T>& other_vector) :
 
 
 template<typename T>
+template<typename T2>
 inline
-DenseVector<T>& DenseVector<T>::operator = (const DenseVector<T>& other_vector)
+DenseVector<T>& DenseVector<T>::operator = (const DenseVector<T2>& other_vector)
 {
   _val = other_vector._val;
   
@@ -317,9 +317,12 @@ DenseVector<T>& DenseVector<T>::operator*= (const T factor)
 
 
 template<typename T>
+template<typename T2, typename T3>
 inline
-void DenseVector<T>::add (const T factor,
-			  const DenseVector<T>& vec)
+typename boostcopy::enable_if_c<
+  ScalarTraits<T2>::value, void >::type
+DenseVector<T>::add (const T2 factor,
+		     const DenseVector<T3>& vec)
 {
   assert (this->size() == vec.size());
 
@@ -330,8 +333,9 @@ void DenseVector<T>::add (const T factor,
 
 
 template<typename T>
+template<typename T2>
 inline
-DenseVector<T>& DenseVector<T>::operator+= (const DenseVector<T>& vec)
+DenseVector<T>& DenseVector<T>::operator+= (const DenseVector<T2>& vec)
 {
   assert (this->size() == vec.size());
 
@@ -420,31 +424,6 @@ Real DenseVector<T>::linfty_norm () const
     }
   return sqrt(my_norm);
 }
-
-
-
-#ifdef USE_COMPLEX_NUMBERS
-
-/*
- * For complex numbers, also offer a method
- * to add a real-valued vector to a complex-
- * valued vector (but not the other way around)!
- */
-template<>
-inline
-void DenseVector<Complex>::add (const Complex factor,
-				const DenseVector<Real>& vec)
-{
-  assert (this->size() == vec.size());
-
-  for (unsigned int i=0; i<this->size(); i++)
-    (*this)(i) += factor*vec(i);
-}
-
-#endif
-
-
-
 
 
 #endif // #ifndef __dense_vector_h__

@@ -67,7 +67,8 @@ public:
   /**
    * Copy-constructor.
    */
-  TypeTensor(const TypeTensor<T>& p);
+  template<typename T2>
+  TypeTensor(const TypeTensor<T2>& p);
   
   /**
    * Destructor.
@@ -77,7 +78,8 @@ public:
   /**
    * Assign to a tensor without creating a temporary.
    */
-  void assign (const TypeTensor<T> &);
+  template<typename T2>
+  void assign (const TypeTensor<T2> &);
 
   /**
    * Return the \f$ i,j^{th} \f$ element of the tensor.
@@ -93,17 +95,21 @@ public:
   /**
    * Add two tensors. 
    */
-  TypeTensor<T> operator + (const TypeTensor<T> &) const;
+  template<typename T2>
+  TypeTensor<typename CompareTypes<T, T2>::supertype>
+  operator + (const TypeTensor<T2> &) const;
 
   /**
    * Add to this tensor. 
    */
-  const TypeTensor<T> & operator += (const TypeTensor<T> &);
+  template<typename T2>
+  const TypeTensor<T> & operator += (const TypeTensor<T2> &);
   
   /**
    * Add to this tensor without creating a temporary.
    */
-  void add (const TypeTensor<T> &); 
+  template<typename T2>
+  void add (const TypeTensor<T2> &); 
   
   /**
    * Add a scaled tensor to this tensor without
@@ -115,17 +121,21 @@ public:
   /**
    * Subtract two tensors.
    */
-  TypeTensor<T> operator - (const TypeTensor<T> &) const;
+  template<typename T2>
+  TypeTensor<typename CompareTypes<T, T2>::supertype>
+  operator - (const TypeTensor<T2> &) const;
 
   /**
    * Subtract from this tensor. 
    */
-  const TypeTensor<T> & operator -= (const TypeTensor<T> &);
+  template<typename T2>
+  const TypeTensor<T> & operator -= (const TypeTensor<T2> &);
 
   /**
    * Subtract from this tensor without creating a temporary.
    */
-  void subtract (const TypeTensor<T> &); 
+  template<typename T2>
+  void subtract (const TypeTensor<T2> &); 
   
   /**
    * Subtract a scaled value from this tensor without
@@ -145,7 +155,7 @@ public:
   template <typename Scalar>
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
-    TypeTensor<T> >::type
+    TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
   operator * (const Scalar) const;
   
   /**
@@ -157,7 +167,11 @@ public:
   /**
    * Divide a tensor by a number, i.e. scale.
    */
-  TypeTensor<T> operator / (const T) const;
+  template <typename Scalar>
+  typename boostcopy::enable_if_c<
+    ScalarTraits<Scalar>::value,
+    TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
+  operator / (const Scalar) const;
 
   /**
    * Divide this tensor by a number, i.e. scale.
@@ -176,14 +190,16 @@ public:
    * The tensors may be of different types.
    */
   template <typename T2>
-  T contract (const TypeTensor<T2> &) const;
+  typename CompareTypes<T,T2>::supertype
+  contract (const TypeTensor<T2> &) const;
 
   /**
    * Multiply a tensor and vector together, i.e. matrix-vector product.
    * The tensor and vector may be of different types.
    */
   template <typename T2>
-  TypeVector<T> operator * (const TypeVector<T2> &) const;
+  TypeVector<typename CompareTypes<T,T2>::supertype>
+  operator * (const TypeVector<T2> &) const;
 
   /**
    * The transpose (with complex numbers not conjugated) of the tensor.
@@ -294,8 +310,9 @@ TypeTensor<T>::TypeTensor (const T xx,
 
 
 template <typename T>
+template<typename T2>
 inline
-TypeTensor<T>::TypeTensor (const TypeTensor <T> &p)
+TypeTensor<T>::TypeTensor (const TypeTensor <T2> &p)
 {
   // copy the nodes from vector p to me
   for (unsigned int i=0; i<DIM*DIM; i++)
@@ -313,8 +330,9 @@ TypeTensor<T>::~TypeTensor ()
 
 
 template <typename T>
+template<typename T2>
 inline
-void TypeTensor<T>::assign (const TypeTensor<T> &p)
+void TypeTensor<T>::assign (const TypeTensor<T2> &p)
 {
   for (unsigned int i=0; i<DIM; i++)
     _coords[i] = p._coords[i];
@@ -366,8 +384,10 @@ T & TypeTensor<T>::operator () (const unsigned int i,
 
 
 template <typename T>
+template<typename T2>
 inline
-TypeTensor<T> TypeTensor<T>::operator + (const TypeTensor<T> &p) const
+TypeTensor<typename CompareTypes<T, T2>::supertype>
+TypeTensor<T>::operator + (const TypeTensor<T2> &p) const
 {
  
 #if DIM == 1
@@ -399,8 +419,9 @@ TypeTensor<T> TypeTensor<T>::operator + (const TypeTensor<T> &p) const
 
 
 template <typename T>
+template<typename T2>
 inline
-const TypeTensor<T> & TypeTensor<T>::operator += (const TypeTensor<T> &p)
+const TypeTensor<T> & TypeTensor<T>::operator += (const TypeTensor<T2> &p)
 {
   this->add (p);
 
@@ -410,8 +431,9 @@ const TypeTensor<T> & TypeTensor<T>::operator += (const TypeTensor<T> &p)
 
 
 template <typename T>
+template<typename T2>
 inline
-void TypeTensor<T>::add (const TypeTensor<T> &p)
+void TypeTensor<T>::add (const TypeTensor<T2> &p)
 {
   for (unsigned int i=0; i<DIM*DIM; i++)
     _coords[i] += p._coords[i];
@@ -432,8 +454,10 @@ void TypeTensor<T>::add_scaled (const TypeTensor<T2> &p, const T factor)
 
 
 template <typename T>
+template<typename T2>
 inline
-TypeTensor<T> TypeTensor<T>::operator - (const TypeTensor<T> &p) const
+TypeTensor<typename CompareTypes<T, T2>::supertype>
+TypeTensor<T>::operator - (const TypeTensor<T2> &p) const
 {
 
 #if DIM == 1
@@ -465,8 +489,9 @@ TypeTensor<T> TypeTensor<T>::operator - (const TypeTensor<T> &p) const
 
 
 template <typename T>
+template <typename T2>
 inline
-const TypeTensor<T> & TypeTensor<T>::operator -= (const TypeTensor<T> &p)
+const TypeTensor<T> & TypeTensor<T>::operator -= (const TypeTensor<T2> &p)
 {
   this->subtract (p);
 
@@ -476,8 +501,9 @@ const TypeTensor<T> & TypeTensor<T>::operator -= (const TypeTensor<T> &p)
 
 
 template <typename T>
+template <typename T2>
 inline
-void TypeTensor<T>::subtract (const TypeTensor<T>& p)
+void TypeTensor<T>::subtract (const TypeTensor<T2>& p)
 {
   for (unsigned int i=0; i<DIM*DIM; i++)
     _coords[i] -= p._coords[i];
@@ -533,31 +559,33 @@ template <typename Scalar>
 inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
-  TypeTensor<T> >::type
+  TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
 TypeTensor<T>::operator * (const Scalar factor) const
 {
+  typedef typename CompareTypes<T, Scalar>::supertype TS;
+
 
 #if DIM == 1
-  return TypeTensor(_coords[0]*factor);
+  return TypeTensor<TS>(_coords[0]*factor);
 #endif
   
 #if DIM == 2 
-  return TypeTensor(_coords[0]*factor,
-		    _coords[1]*factor,
-		    _coords[2]*factor,
-		    _coords[3]*factor);
+  return TypeTensor<TS>(_coords[0]*factor,
+		        _coords[1]*factor,
+		        _coords[2]*factor,
+		        _coords[3]*factor);
 #endif
   
 #if DIM == 3
-  return TypeTensor(_coords[0]*factor,
-		    _coords[1]*factor, 
-		    _coords[2]*factor, 
-		    _coords[3]*factor, 
-		    _coords[4]*factor, 
-		    _coords[5]*factor, 
-		    _coords[6]*factor, 
-		    _coords[7]*factor, 
-		    _coords[8]*factor);
+  return TypeTensor<TS>(_coords[0]*factor,
+		        _coords[1]*factor, 
+		        _coords[2]*factor, 
+		        _coords[3]*factor, 
+		        _coords[4]*factor, 
+		        _coords[5]*factor, 
+		        _coords[6]*factor, 
+		        _coords[7]*factor, 
+		        _coords[8]*factor);
 #endif  
 }
 
@@ -567,7 +595,7 @@ template <typename T, typename Scalar>
 inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
-  const TypeVector<T> >::type
+  TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
 operator * (const Scalar factor,
 	    const TypeTensor<T> &t)
 {
@@ -591,32 +619,38 @@ const TypeTensor<T> & TypeTensor<T>::operator *= (const Scalar factor)
 
 
 template <typename T>
+template <typename Scalar>
 inline
-TypeTensor<T> TypeTensor<T>::operator / (const T factor) const
+typename boostcopy::enable_if_c<
+  ScalarTraits<Scalar>::value,
+  TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
+TypeTensor<T>::operator / (const Scalar factor) const
 {
   assert (factor != static_cast<T>(0.));
+
+  typedef typename CompareTypes<T, Scalar>::supertype TS;
   
 #if DIM == 1
-  return TypeTensor(_coords[0]/factor);
+  return TypeTensor<TS>(_coords[0]/factor);
 #endif
   
 #if DIM == 2 
-  return TypeTensor(_coords[0]/factor,
-		    _coords[1]/factor,
-		    _coords[2]/factor,
-		    _coords[3]/factor);
+  return TypeTensor<TS>(_coords[0]/factor,
+		        _coords[1]/factor,
+		        _coords[2]/factor,
+		        _coords[3]/factor);
 #endif
   
 #if DIM == 3
-  return TypeTensor(_coords[0]/factor,
-		    _coords[1]/factor, 
-		    _coords[2]/factor, 
-		    _coords[3]/factor, 
-		    _coords[4]/factor, 
-		    _coords[5]/factor, 
-		    _coords[6]/factor, 
-		    _coords[7]/factor, 
-		    _coords[8]/factor);
+  return TypeTensor<TS>(_coords[0]/factor,
+		        _coords[1]/factor, 
+		        _coords[2]/factor, 
+		        _coords[3]/factor, 
+		        _coords[4]/factor, 
+		        _coords[5]/factor, 
+		        _coords[6]/factor, 
+		        _coords[7]/factor, 
+		        _coords[8]/factor);
 #endif
   
 }
@@ -671,9 +705,10 @@ const TypeTensor<T> & TypeTensor<T>::operator /= (const T factor)
 template <typename T>
 template <typename T2>
 inline
-TypeVector<T> TypeTensor<T>::operator * (const TypeVector<T2> &p) const
+TypeVector<typename CompareTypes<T,T2>::supertype>
+TypeTensor<T>::operator * (const TypeVector<T2> &p) const
 {
-  TypeVector<T> returnval;
+  TypeVector<typename CompareTypes<T,T2>::supertype> returnval;
   for (unsigned int i=0; i<DIM; i++)
     for (unsigned int j=0; j<DIM; j++)
       returnval(i) += (*this)(i,j)*p(j);
@@ -706,9 +741,10 @@ TypeTensor<T> TypeTensor<T>::operator * (const TypeTensor<T2> &p) const
 template <typename T>
 template <typename T2>
 inline
-T TypeTensor<T>::contract (const TypeTensor<T2> &t) const
+typename CompareTypes<T,T2>::supertype
+TypeTensor<T>::contract (const TypeTensor<T2> &t) const
 {
-  T sum = 0.;
+  typename CompareTypes<T,T2>::supertype sum = 0.;
   for (unsigned int i=0; i<DIM*DIM; i++)
     sum += _coords[i]*t._coords[i];
   return sum;
