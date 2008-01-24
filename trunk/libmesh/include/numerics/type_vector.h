@@ -202,8 +202,8 @@ public:
   Real size() const;
 
   /**
-   * Returns the magnitude of the vector squared, i.e. the sum of the elements
-   * squared.
+   * Returns the magnitude of the vector squared, i.e. the sum of the element
+   * magnitudes squared.
    */
   Real size_sq() const;
 
