@@ -109,11 +109,11 @@ Real DistributedVector<T>::linfty_norm () const
   assert (_values.size() == _local_size);
   assert ((_last_local_index - _first_local_index) == _local_size);
 
-  double local_linfty = 0.;
+  Real local_linfty = 0.;
   
   for (unsigned int i=0; i<local_size(); i++)
     local_linfty  = std::max(local_linfty,
-			     static_cast<double>(std::abs(_values[i]))
+			     static_cast<Real>(std::abs(_values[i]))
 			     ); // Note we static_cast so that both
                                 // types are the same, as required
                                 // by std::max
