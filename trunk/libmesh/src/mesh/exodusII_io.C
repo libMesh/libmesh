@@ -381,7 +381,7 @@ namespace exII {
     /**
      * Writes the vector of values to a nodal variable.
      */
-    void write_nodal_values(int var_id, const std::vector<double> & values, int timestep);
+    void write_nodal_values(int var_id, const std::vector<Number> & values, int timestep);
 
 
     //-------------------------------------------------------------------------
@@ -1127,7 +1127,7 @@ namespace exII {
     check_err(ex_err, "Error setting nodal variable names.");
   }
 
-  void ExodusII::write_nodal_values(int var_id, const std::vector<double> & values, int timestep)
+  void ExodusII::write_nodal_values(int var_id, const std::vector<Number> & values, int timestep)
   {
     ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &values[0]);
     check_err(ex_err, "Error writing nodal values.");
