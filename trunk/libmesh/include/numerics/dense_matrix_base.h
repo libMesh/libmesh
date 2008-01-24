@@ -26,6 +26,7 @@
 
 // Local Includes
 #include "libmesh_common.h"
+#include "compare_types.h"
 
 // Forward Delcarations
 template <typename T> class DenseVectorBase;
@@ -125,22 +126,14 @@ public:
   
   /**
    * Adds \p factor to every element in the matrix.
+   * This should only work if T += T2 * T3 is valid C++ and
+   * if T2 is scalar.  Return type is void 
    */
-  void add (const T factor,
-	    const DenseMatrixBase<T>& mat);
-  
-    
-#ifdef USE_COMPLEX_NUMBERS
-  
-  /**
-   * For a complex-valued matrix, let a real-valued
-   * matrix being added to us (Note that the other
-   * way around would be wrong!). 
-   */
-  void add (const Complex factor,
-	    const DenseMatrixBase<Real>& mat);
-  
-#endif
+  template <typename T2, typename T3>
+  typename boostcopy::enable_if_c<
+    ScalarTraits<T2>::value, void >::type
+  add (const T2 factor,
+       const DenseMatrixBase<T3>& mat);
    
 protected:
   
@@ -183,9 +176,12 @@ protected:
 
 
 template<typename T>
+template<typename T2, typename T3>
 inline
-void DenseMatrixBase<T>::add (const T factor,
-			      const DenseMatrixBase<T>& mat)
+typename boostcopy::enable_if_c<
+  ScalarTraits<T2>::value, void >::type
+DenseMatrixBase<T>::add (const T2 factor,
+			 const DenseMatrixBase<T3>& mat)
 {
   assert (this->m() == mat.m());
   assert (this->n() == mat.n());
@@ -194,36 +190,6 @@ void DenseMatrixBase<T>::add (const T factor,
     for (unsigned int i=0; i<this->m(); i++)
       this->el(i,j) += factor*mat.el(i,j);
 }
-
-
-
-#ifdef USE_COMPLEX_NUMBERS
-
-/*
- * For complex numbers, also offer a method
- * to add a real-valued matrix to a complex-de
- * valued matrix (but not the other way around)!
- */
-template<>
-inline
-void DenseMatrixBase<Complex>::add (const Complex factor,
-				    const DenseMatrixBase<Real>& mat)
-{
-  assert (this->m() == mat.m());
-  assert (this->n() == mat.n());
-
-  for (unsigned int j=0; j<this->n(); j++)
-    for (unsigned int i=0; i<this->m(); i++)
-      this->el(i,j) += factor*mat.el(i,j);
-}
-
-
-#endif
-
-
-
-
-
 
 
 #endif // #ifndef __dense_matrix_base_h__
