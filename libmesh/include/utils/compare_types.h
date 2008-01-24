@@ -25,6 +25,73 @@
 // System includes
 #include <complex>
 
+// Copy of boost's enable_if_c
+
+namespace boostcopy {
+  template <bool B, class T = void>
+    struct enable_if_c {
+      typedef T type;
+    };
+
+  template <class T>
+    struct enable_if_c<false, T> {};
+}
+
+
+
+// Complete list of scalar classes, needed for disambiguation
+template <typename T>
+struct ScalarTraits {
+      static const bool value = false;
+};
+
+template<>
+struct ScalarTraits<signed char> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<char> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<short> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<int> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<long> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<unsigned char> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<unsigned short> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<unsigned int> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<unsigned long> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<float> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<double> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<long double> { static const bool value = true; };
+
+template<>
+struct ScalarTraits<std::complex<float> > { static const bool value = true; };
+
+template<>
+struct ScalarTraits<std::complex<double> > { static const bool value = true; };
+
+template<>
+struct ScalarTraits<std::complex<long double> > { static const bool value = true; };
+
+
+
 // Operators using different but compatible types need a return value
 // based on whichever type the other can be upconverted into.  For
 // instance, the proper return type for
