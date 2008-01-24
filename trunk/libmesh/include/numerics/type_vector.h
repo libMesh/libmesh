@@ -29,71 +29,6 @@
 #include "libmesh_common.h"
 #include "compare_types.h"
 
-// Copy of boost enable_if_c
-
-namespace boostcopy {
-  template <bool B, class T = void>
-    struct enable_if_c {
-      typedef T type;
-    };
-
-  template <class T>
-    struct enable_if_c<false, T> {};
-
-}
-
-// Complete list of scalar classes, needed for disambiguation
-template <typename T>
-struct ScalarTraits {
-  static const bool value = false;
-};
-
-template<>
-struct ScalarTraits<signed char> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<char> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<short> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<int> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<long> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<unsigned char> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<unsigned short> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<unsigned int> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<unsigned long> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<float> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<double> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<long double> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<std::complex<float> > { static const bool value = true; };
-
-template<>
-struct ScalarTraits<std::complex<double> > { static const bool value = true; };
-
-template<>
-struct ScalarTraits<std::complex<long double> > { static const bool value = true; };
-
-
 // Forward declaration for friend class
 template <typename T>
 class TypeTensor;
@@ -130,7 +65,8 @@ public:
   /**
    * Copy-constructor.
    */
-  TypeVector (const TypeVector<T>& p);
+  template <typename T2>
+  TypeVector (const TypeVector<T2>& p);
   
   /**
    * Destructor.
@@ -140,7 +76,8 @@ public:
   /**
    * Assign to a vector without creating a temporary.
    */
-  void assign (const TypeVector<T> &);
+  template <typename T2>
+  void assign (const TypeVector<T2> &);
 
   /**
    * Return the \f$ i^{th} \f$ element of the vector.
@@ -375,8 +312,9 @@ TypeVector<T>::TypeVector (const T x,
 
 
 template <typename T>
+template <typename T2>
 inline
-TypeVector<T>::TypeVector (const TypeVector<T> &p)
+TypeVector<T>::TypeVector (const TypeVector<T2> &p)
 {
   // copy the nodes from vector p to me
   for (unsigned int i=0; i<DIM; i++)
@@ -394,8 +332,9 @@ TypeVector<T>::~TypeVector ()
 
 
 template <typename T>
+template <typename T2>
 inline
-void TypeVector<T>::assign (const TypeVector<T> &p)
+void TypeVector<T>::assign (const TypeVector<T2> &p)
 {
   for (unsigned int i=0; i<DIM; i++)
     _coords[i] = p._coords[i];
