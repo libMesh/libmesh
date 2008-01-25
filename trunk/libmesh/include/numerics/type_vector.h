@@ -48,6 +48,9 @@ class TypeTensor;
 template <typename T>
 class TypeVector
 {
+template <typename T2>
+friend class TypeVector;
+
 friend class TypeTensor<T>;
 
 protected:

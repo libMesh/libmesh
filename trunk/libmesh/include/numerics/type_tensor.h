@@ -44,6 +44,9 @@
 template <typename T>
 class TypeTensor
 {
+template <typename T2>
+friend class TypeTensor;
+
 protected:
 
   /**
