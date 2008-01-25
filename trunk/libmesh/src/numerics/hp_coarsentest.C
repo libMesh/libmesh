@@ -418,27 +418,14 @@ void HPCoarsenTest::select_refinement (System &system)
                     }
                 }
 
-#ifndef USE_COMPLEX_NUMBERS
 	      p_error_per_cell[e_id] += component_scale[var] * 
-		(*JxW)[qp] * value_error * value_error;
+		(*JxW)[qp] * libmesh_norm(value_error);
               if (cont == C_ZERO || cont == C_ONE)
 	        p_error_per_cell[e_id] += component_scale[var] *
-		  (*JxW)[qp] * grad_error * grad_error;
+		  (*JxW)[qp] * grad_error.size_sq();
               if (cont == C_ONE)
 	        p_error_per_cell[e_id] += component_scale[var] *
-		  (*JxW)[qp] * hessian_error.contract(hessian_error);
-#else
-	      p_error_per_cell[e_id] += component_scale[var] * 
-		(*JxW)[qp] * std::norm(value_error);
-              if (cont == C_ZERO || cont == C_ONE)
-	        p_error_per_cell[e_id] += component_scale[var] *
-		  (*JxW)[qp] * std::abs(grad_error*grad_error);
-              if (cont == C_ONE)
-	        p_error_per_cell[e_id] += component_scale[var] *
-		  (*JxW)[qp] * std::abs(hessian_error.contract(hessian_error));
-#endif
-
-
+		  (*JxW)[qp] * hessian_error.size_sq();
             }
 
 	  // Calculate this variable's contribution to the h
@@ -499,25 +486,14 @@ void HPCoarsenTest::select_refinement (System &system)
 			// hessian_error -= (*d2phi_coarse)[i][qp] * Uc(i);
                     }
 
-#ifndef USE_COMPLEX_NUMBERS
 	          h_error_per_cell[e_id] += component_scale[var] * 
-		    (*JxW)[qp] * value_error * value_error;
+		    (*JxW)[qp] * libmesh_norm(value_error);
                   if (cont == C_ZERO || cont == C_ONE)
 	            h_error_per_cell[e_id] += component_scale[var] * 
-		      (*JxW)[qp] * grad_error * grad_error;
+		      (*JxW)[qp] * grad_error.size_sq();
                   if (cont == C_ONE)
 	            h_error_per_cell[e_id] += component_scale[var] * 
-		      (*JxW)[qp] * hessian_error.contract(hessian_error);
-#else
-		  h_error_per_cell[e_id] += component_scale[var] * 
-		    (*JxW)[qp] * std::norm(value_error);
-		  if (cont == C_ZERO || cont == C_ONE)
-		    h_error_per_cell[e_id] += component_scale[var] *
-		      (*JxW)[qp] * std::abs(grad_error*grad_error);
-		  if (cont == C_ONE)
-		    h_error_per_cell[e_id] += component_scale[var] *
-		      (*JxW)[qp] * std::abs(hessian_error.contract(hessian_error));
-#endif
+		      (*JxW)[qp] * hessian_error.size_sq();
                 }
 
             }

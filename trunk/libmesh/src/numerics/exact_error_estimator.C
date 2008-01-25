@@ -320,20 +320,9 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 
       Number u_h = 0.;
 
-#ifndef USE_COMPLEX_NUMBERS
-      RealGradient grad_u_h;
-#else
-      // Gradient     grad_u_h;
-      RealGradient grad_u_h_re;
-      RealGradient grad_u_h_im;
-#endif
+      Gradient grad_u_h;
 #ifdef ENABLE_SECOND_DERIVATIVES
-  #ifndef USE_COMPLEX_NUMBERS
-      RealTensor grad2_u_h;
-  #else
-      RealTensor grad2_u_h_re;
-      RealTensor grad2_u_h_im;
-  #endif
+      Tensor grad2_u_h;
 #endif
 
       // Compute solution values at the current
@@ -344,28 +333,11 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
         {
           // Values from current solution.
           u_h      += phi_values[i][qp]*Uelem(i);
-#ifndef USE_COMPLEX_NUMBERS
           grad_u_h += dphi_values[i][qp]*Uelem(i);
-#else
-          grad_u_h_re += dphi_values[i][qp]*Uelem(i).real();
-          grad_u_h_im += dphi_values[i][qp]*Uelem(i).imag();
-#endif
 #ifdef ENABLE_SECOND_DERIVATIVES
-  #ifndef USE_COMPLEX_NUMBERS
           grad2_u_h += d2phi_values[i][qp]*Uelem(i);
-  #else
-          grad2_u_h_re += d2phi_values[i][qp]*Uelem(i).real();
-          grad2_u_h_im += d2phi_values[i][qp]*Uelem(i).imag();
-  #endif
 #endif
         }
-
-#ifdef USE_COMPLEX_NUMBERS
-      Gradient grad_u_h (grad_u_h_re, grad_u_h_im);
-  #ifdef ENABLE_SECOND_DERIVATIVES
-      Tensor grad2_u_h (grad2_u_h_re, grad2_u_h_im);
-  #endif
-#endif
 
       // Compute the value of the error at this quadrature point
       Number val_error = 0;
@@ -387,11 +359,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 	  else if(_equation_systems_fine)
 	    grad_error = grad_u_h - fine_values->gradient(q_point[qp]);
 
-#ifndef USE_COMPLEX_NUMBERS
-          H1seminormsq += JxW[qp]*(grad_error*grad_error);
-#else
-          H1seminormsq += JxW[qp]*std::abs(grad_error*grad_error);
-#endif
+          H1seminormsq += JxW[qp]*grad_error.size_sq();
         }
 
 
@@ -406,7 +374,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 	  else if (_equation_systems_fine)
 	    grad2_error = grad2_u_h - fine_values->hessian(q_point[qp]);
 
-          H2seminormsq += JxW[qp]*std::abs(grad2_error.contract(grad2_error));
+          H2seminormsq += JxW[qp]*grad2_error.size_sq();
         }
 #endif
 

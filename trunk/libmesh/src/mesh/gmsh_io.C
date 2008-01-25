@@ -901,29 +901,23 @@ void GmshIO::write_post (const std::string& fname,
               for (unsigned int i=0; i < elem->n_vertices(); i++)   // loop over vertices
                 if (this->binary())
                   {
-#ifndef USE_COMPLEX_NUMBERS
-                    double tmp = (*v)[elem->node(i)*n_vars + ivar];
-#else
+#ifdef USE_COMPLEX_NUMBERS
 		    std::cout << "WARNING: Gmsh::write_post does not fully support "
 			      << "complex numbers. Will only write the real part of "
 			      << "variable " << varname << std::endl;
-
-		    double tmp = (*v)[elem->node(i)*n_vars + ivar].real();
 #endif
+                    double tmp = libmesh_real((*v)[elem->node(i)*n_vars + ivar]);
                     std::memcpy(buf, &tmp, sizeof(double));
                     out.write(reinterpret_cast<char *>(buf), sizeof(double));
                   }
                 else
 		  {
-#ifndef USE_COMPLEX_NUMBERS
-		    out << (*v)[elem->node(i)*n_vars + ivar] << "\n";
-#else
+#ifdef USE_COMPLEX_NUMBERS
 		    std::cout << "WARNING: Gmsh::write_post does not fully support "
 			      << "complex numbers. Will only write the real part of "
 			      << "variable " << varname << std::endl;
-
-		    out << (*v)[elem->node(i)*n_vars + ivar].real() << "\n";
 #endif
+		    out << libmesh_real((*v)[elem->node(i)*n_vars + ivar]) << "\n";
 		  }
             }
           if (this->binary())

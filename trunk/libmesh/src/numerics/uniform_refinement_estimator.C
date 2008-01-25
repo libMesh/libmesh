@@ -383,20 +383,9 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                 {
                   Number u_fine = 0., u_coarse = 0.;
 
-#ifndef USE_COMPLEX_NUMBERS
-                  RealGradient grad_u_fine, grad_u_coarse;
-#else
-                  // Gradient     grad_u_fine;
-                  RealGradient grad_u_fine_re, grad_u_coarse_re;
-                  RealGradient grad_u_fine_im, grad_u_coarse_im;
-#endif
+                  Gradient grad_u_fine, grad_u_coarse;
 #ifdef ENABLE_SECOND_DERIVATIVES
-  #ifndef USE_COMPLEX_NUMBERS
-                  RealTensor grad2_u_fine, grad2_u_coarse;
-  #else
-                  RealTensor grad2_u_fine_re, grad2_u_coarse_re;
-                  RealTensor grad2_u_fine_im, grad2_u_coarse_im;
-  #endif
+                  Tensor grad2_u_fine, grad2_u_coarse;
 #endif
 
                   // Compute solution values at the current
@@ -407,36 +396,13 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                     {
                       u_fine            += phi[i][qp]*system.current_solution (dof_indices[i]);
                       u_coarse          += phi[i][qp]*(*projected_solution) (dof_indices[i]);
-#ifndef USE_COMPLEX_NUMBERS
                       grad_u_fine       += dphi[i][qp]*system.current_solution (dof_indices[i]);
                       grad_u_coarse     += dphi[i][qp]*(*projected_solution) (dof_indices[i]);
-#else
-                      grad_u_fine_re    += dphi[i][qp]*system.current_solution (dof_indices[i]).real();
-                      grad_u_fine_im    += dphi[i][qp]*system.current_solution (dof_indices[i]).imag();
-                      grad_u_coarse_re  += dphi[i][qp]*(*projected_solution) (dof_indices[i]).real();
-                      grad_u_coarse_im  += dphi[i][qp]*(*projected_solution) (dof_indices[i]).imag();
-#endif
 #ifdef ENABLE_SECOND_DERIVATIVES
-  #ifndef USE_COMPLEX_NUMBERS
                       grad2_u_fine      += d2phi[i][qp]*system.current_solution (dof_indices[i]);
                       grad2_u_coarse    += d2phi[i][qp]*(*projected_solution) (dof_indices[i]);
-  #else
-                      grad2_u_fine_re   += d2phi[i][qp]*system.current_solution (dof_indices[i]).real();
-                      grad2_u_fine_im   += d2phi[i][qp]*system.current_solution (dof_indices[i]).imag();
-                      grad2_u_coarse_re += d2phi[i][qp]*(*projected_solution) (dof_indices[i]).real();
-                      grad2_u_coarse_im += d2phi[i][qp]*(*projected_solution) (dof_indices[i]).imag();
-  #endif
 #endif
                     }
-
-#ifdef USE_COMPLEX_NUMBERS
-                  Gradient grad_u_fine (grad_u_fine_re, grad_u_fine_im);
-                  Gradient grad_u_coarse (grad_u_coarse_re, grad_u_coarse_im);
-  #ifdef ENABLE_SECOND_DERIVATIVES
-                  Tensor grad2_u_fine (grad2_u_fine_re, grad2_u_fine_im);
-                  Tensor grad2_u_coarse (grad2_u_coarse_re, grad2_u_coarse_im);
-  #endif
-#endif
 
                   // Compute the value of the error at this quadrature point
                   const Number val_error = u_fine - u_coarse;
@@ -454,11 +420,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                       Gradient grad_error = grad_u_fine - grad_u_coarse;
 
                       H1seminormsq += JxW[qp] * var_scale *
-#ifndef USE_COMPLEX_NUMBERS
-                        (grad_error*grad_error);
-#else
-                        std::abs(grad_error*grad_error);
-#endif
+                        grad_error.size_sq();
                       assert (H1seminormsq >= 0.);
                     }
 
@@ -470,11 +432,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                       Tensor grad2_error = grad2_u_fine - grad2_u_coarse;
 
 		      H2seminormsq += JxW[qp] * var_scale *
-#  ifndef USE_COMPLEX_NUMBERS
-                        grad2_error.contract(grad2_error);
-#  else
-                        std::abs(grad2_error.contract(grad2_error));
-#  endif
+                        grad2_error.size_sq();
                       assert (H2seminormsq >= 0.);
                     }
 #endif
