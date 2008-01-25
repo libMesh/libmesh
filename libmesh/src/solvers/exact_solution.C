@@ -398,20 +398,9 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
 	  Number u_h = 0.;
 
-#ifndef USE_COMPLEX_NUMBERS
-	 RealGradient grad_u_h;
-#else
-	 // Gradient     grad_u_h;
-	 RealGradient grad_u_h_re;
-	 RealGradient grad_u_h_im;
-#endif
+	  Gradient grad_u_h;
 #ifdef ENABLE_SECOND_DERIVATIVES
-  #ifndef USE_COMPLEX_NUMBERS
-	 RealTensor grad2_u_h;
-  #else
-	 RealTensor grad2_u_h_re;
-	 RealTensor grad2_u_h_im;
-  #endif
+	  Tensor grad2_u_h;
 #endif
   
 
@@ -423,28 +412,11 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	    {
 	      // Values from current solution.
 	      u_h      += phi_values[i][qp]*computed_system.current_solution  (dof_indices[i]);
-#ifndef USE_COMPLEX_NUMBERS
 	      grad_u_h += dphi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
-#else
-	      grad_u_h_re += dphi_values[i][qp]*computed_system.current_solution (dof_indices[i]).real();
-	      grad_u_h_im += dphi_values[i][qp]*computed_system.current_solution (dof_indices[i]).imag();
-#endif
 #ifdef ENABLE_SECOND_DERIVATIVES
-  #ifndef USE_COMPLEX_NUMBERS
 	      grad2_u_h += d2phi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
-  #else
-	      grad2_u_h_re += d2phi_values[i][qp]*computed_system.current_solution (dof_indices[i]).real();
-	      grad2_u_h_im += d2phi_values[i][qp]*computed_system.current_solution (dof_indices[i]).imag();
-  #endif
 #endif
 	    }
-
-#ifdef USE_COMPLEX_NUMBERS
-	  Gradient grad_u_h (grad_u_h_re, grad_u_h_im);
-  #ifdef ENABLE_SECOND_DERIVATIVES
-	  Tensor grad2_u_h (grad2_u_h_re, grad2_u_h_im);
-  #endif
-#endif
 
 	  // Compute the value of the error at this quadrature point
 	  Number exact_val = 0.0;
@@ -457,7 +429,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  const Number val_error = u_h - exact_val;
 
 	  // Add the squares of the error to each contribution
-	  error_vals[0] += JxW[qp]*(val_error*val_error);
+	  error_vals[0] += JxW[qp]*libmesh_norm(val_error);
 
 
 	  // Compute the value of the error in the gradient at this
@@ -471,7 +443,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
 	  const Gradient grad_error = grad_u_h - exact_grad;
 
-	  error_vals[1] += JxW[qp]*(grad_error*grad_error);
+	  error_vals[1] += JxW[qp]*grad_error.size_sq();
 
 
 #ifdef ENABLE_SECOND_DERIVATIVES
@@ -486,7 +458,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
 	  const Tensor grad2_error = grad2_u_h - exact_hess;
 
-	  error_vals[2] += JxW[qp]*(grad2_error.contract(grad2_error));
+	  error_vals[2] += JxW[qp]*grad2_error.size_sq();
 #endif
 	  
 	} // end qp loop

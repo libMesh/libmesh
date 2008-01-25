@@ -723,12 +723,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
                   Gradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm += component_scale[var] * JxW[qp] *
-#if   defined (USE_REAL_NUMBERS)
-                            (grad_u_h * grad_u_h);
-#elif defined (USE_COMPLEX_NUMBERS)
-                            std::abs(grad_u_h * grad_u_h);
-#endif
+                  v_norm += component_scale[var] * JxW[qp] * grad_u_h.size_sq();
                 }
 
 #ifdef ENABLE_SECOND_DERIVATIVES
@@ -737,12 +732,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
                   Tensor hess_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm += component_scale[var] * JxW[qp] *
-#if   defined (USE_REAL_NUMBERS)
-                            hess_u_h.contract(hess_u_h);
-#elif defined (USE_COMPLEX_NUMBERS)
-                            std::abs(hess_u_h.contract(hess_u_h));
-#endif
+                  v_norm += component_scale[var] * JxW[qp] * hess_u_h.size_sq();
                 }
 #endif
             }
