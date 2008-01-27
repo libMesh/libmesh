@@ -1620,32 +1620,6 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
   switch (mode)
     {
     case ENCODE:
-      {
-#ifdef HAVE_XDR
-
-	assert (this->is_open());
-
-	if (len > 0)
-	  xdr_vector(xdrs, 
-		     (char*) val,
-		     len,
-		     sizeof(double),
-		     (xdrproc_t) xdr_double);
-
-#else
-	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
-
-	error();
-
-#endif	
-	return;
-      }
-
     case DECODE:
       {
 #ifdef HAVE_XDR
@@ -1720,6 +1694,109 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 }
 
 
+template <>
+void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const unsigned int line_break)
+{
+  switch (mode)
+    {
+    case ENCODE:
+    case DECODE:
+      {
+#ifdef HAVE_XDR
+
+	assert (this->is_open());
+
+
+	if (len > 0)
+	  {
+	    std::vector<double> io_buffer (2*len);
+	    
+	    // Fill io_buffer if we are writing.
+	    if (mode == ENCODE)
+	      for (unsigned int i=0, cnt=0; i<len; i++)
+		{
+		  io_buffer[cnt++] = val[i].real();
+		  io_buffer[cnt++] = val[i].imag();
+		} 
+	      
+	    xdr_vector(xdrs, 
+		       (char*) &io_buffer[0],
+		       2*len,
+		       sizeof(double),
+		       (xdrproc_t) xdr_double);
+	    
+	    // Fill val array if we are reading.
+	    if (mode == DECODE)
+	      for (unsigned int i=0, cnt=0; i<len; i++)
+		{
+		  val[i].real() = io_buffer[cnt++];
+		  val[i].imag() = io_buffer[cnt++];
+		} 
+	  }
+#else
+	
+	std::cerr << "ERROR: Functionality is not available." << std::endl
+		  << "Make sure HAVE_XDR is defined at build time" 
+		  << std::endl
+		  << "The XDR interface is not available in this installation"
+		  << std::endl;
+
+	error();
+
+#endif
+	return;
+      }
+
+    case READ:
+      {
+	assert (in.good());
+
+	for (unsigned int i=0; i<len; i++)
+	  {
+	    assert (in.good());
+	    in >> val[i].real() >> val[i].imag();
+	  }
+
+	return;	
+      }
+
+    case WRITE:
+      {
+	assert (out.good());
+
+	if (line_break == libMesh::invalid_uint)
+	  for (unsigned int i=0; i<len; i++)
+	    {
+	      assert (out.good());
+	      OFSRealscientific(out,17,val[i].real()) << " ";
+	      OFSRealscientific(out,17,val[i].imag()) << " ";
+	    }
+	else
+	  {
+	    unsigned int cnt=0;
+	    while (cnt < len)
+	      {
+		for (unsigned int i=0; i<std::min(line_break,len); i++)
+		  {
+		    assert (out.good());
+		    OFSRealscientific(out,17,val[cnt].real()) << " ";
+		    OFSRealscientific(out,17,val[cnt].imag()) << " ";
+		    cnt++;
+		  }
+		assert (out.good());
+		out << '\n';
+	      }
+	  }
+
+	return;	
+      }
+
+    default:
+      error();
+    }
+}
+
+
 void Xdr::comment (std::string &comment)
 {
   switch (mode)
@@ -1754,5 +1831,5 @@ void Xdr::comment (std::string &comment)
 
 
 //
-template void Xdr::data_stream<int>           (int *val,         const unsigned int len, const unsigned int line_break);
+template void Xdr::data_stream<int>          (int *val,          const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned int> (unsigned int *val, const unsigned int len, const unsigned int line_break);
