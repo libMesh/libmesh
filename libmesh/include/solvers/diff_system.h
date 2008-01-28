@@ -34,8 +34,6 @@
 #include "transient_system.h"
 
 // Forward Declarations
-class FEBase;
-class QBase;
 class TimeSolver;
 
 template <typename T> class NumericVector;

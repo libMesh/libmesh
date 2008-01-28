@@ -35,6 +35,8 @@
 
 // Forward Declarations
 
+class FEBase;
+class QBase;
 template <typename T> class NumericVector;
 
 /**
