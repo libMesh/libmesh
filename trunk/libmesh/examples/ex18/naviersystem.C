@@ -410,7 +410,7 @@ bool NavierSystem::side_constraint (bool request_jacobian)
     }
 
   // Pin p = 0 at the origin
-  if (elem->contains_point(Point(0.)))
+  if (elem->contains_point(Point(0.,0.)))
     {
       // The pressure penalty value.  \f$ \frac{1}{\epsilon} \f$
       const Real penalty = 1.e9;
