@@ -520,7 +520,7 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 // 2.3.x & newer
 #else
   
-  ierr = MatAXPY(_mat, a, X->_mat, SAME_NONZERO_PATTERN);
+  ierr = MatAXPY(_mat, a, X->_mat, DIFFERENT_NONZERO_PATTERN);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
 #endif
