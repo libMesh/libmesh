@@ -407,6 +407,7 @@ void GmshIO::read_mesh(std::istream& in)
           mesh.reserve_elem (numElem);
 
           // read the elements
+	  unsigned int elem_id_counter = 0;
           for (unsigned int iel=0; iel<numElem; ++iel)      
             {
               unsigned int id, type, physical, elementary,
@@ -445,8 +446,11 @@ void GmshIO::read_mesh(std::istream& in)
                 {
                   // add the elements to the mesh
                   Elem* elem = Elem::build(eletype.type).release();
-                  elem->set_id(iel);
+                  elem->set_id(elem_id_counter);
                   mesh.add_elem(elem);
+
+		  // different to iel, lower dimensional elems aren't added
+		  elem_id_counter++;
 
                   // check number of nodes. We cannot do that for version 2.0
                   if (version <= 1.0) 
