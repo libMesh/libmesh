@@ -164,10 +164,10 @@ void MeshRefinement::create_parent_error_vector
 #ifdef DEBUG
   for (unsigned int i=0; i != error_per_cell.size(); ++i)
     {
+      assert(error_per_cell[i] >= 0);
   // isnan() isn't standard C++ yet
   #ifdef isnan
       assert(!isnan(error_per_cell[i]));
-      assert(error_per_cell[i] >= 0);
   #endif
     }
 #endif // #ifdef DEBUG
@@ -184,6 +184,9 @@ void MeshRefinement::create_parent_error_vector
     {
       Elem* elem   = *elem_it;
       Elem* parent = elem->parent();
+
+      // Active elements are uncoarsenable
+      error_per_parent[elem->id()] = -1.0;
 
       // Grandparents and up are uncoarsenable
       while (parent)
@@ -248,9 +251,15 @@ void MeshRefinement::create_parent_error_vector
   for (unsigned int i = 0; i != error_per_parent.size(); ++i)
     {
       // If this element isn't a coarsenable parent with error, we
-      // have nothing to do.
-      if (error_per_parent[i] == -1.0)
-        continue;
+      // have nothing to do.  Just flag it as -1 and move on
+      // Note that Parallel::sum might have left uncoarsenable
+      // elements with error_per_parent=-n_proc, so reset it to
+      // error_per_parent=-1
+      if (error_per_parent[i] < 0.)
+        {
+          error_per_parent[i] = -1.;
+          continue;
+        }
 
       // The error estimator might have already given us an
       // estimate on the coarsenable parent elements; if so then
