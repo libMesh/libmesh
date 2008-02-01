@@ -25,7 +25,7 @@
 // C++ includes
 
 // Local includes
-#include "time_solver.h"
+#include "unsteady_solver.h"
 
 /**
  * This class defines a theta-method (defaulting to Backward
@@ -46,18 +46,13 @@
 
 // ------------------------------------------------------------
 // Solver class definition
-class Euler2Solver : public TimeSolver
+class Euler2Solver : public UnsteadySolver
 {
 public:
   /**
-   * The type of system
-   */
-  typedef DifferentiableSystem sys_type;
-  
-  /**
    * The parent class
    */
-  typedef TimeSolver Parent;
+  typedef UnsteadySolver Parent;
   
   /**
    * Constructor. Requires a reference to the system

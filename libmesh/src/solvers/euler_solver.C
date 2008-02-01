@@ -6,7 +6,7 @@
 
 
 EulerSolver::EulerSolver (sys_type& s)
- : TimeSolver(s), theta(1.)
+ : UnsteadySolver(s), theta(1.)
 {
 }
 

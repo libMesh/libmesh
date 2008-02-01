@@ -25,15 +25,15 @@
 // C++ includes
 
 // Local includes
-#include "time_solver.h"
+#include "unsteady_solver.h"
 
 // Forward declarations
 class System;
 
 /**
- * This class wraps another TimeSolver derived class, and compares the results
- * of timestepping with deltat and timestepping with 2*deltat to adjust
- * future timestep lengths.
+ * This class wraps another UnsteadySolver derived class, and compares
+ * the results of timestepping with deltat and timestepping with
+ * 2*deltat to adjust future timestep lengths.
  *
  * Currently this class only works on fully coupled Systems
  *
@@ -46,18 +46,13 @@ class System;
 
 // ------------------------------------------------------------
 // Solver class definition
-class AdaptiveTimeSolver : public TimeSolver
+class AdaptiveTimeSolver : public UnsteadySolver
 {
 public:
   /**
-   * The type of system
-   */
-  typedef DifferentiableSystem sys_type;
-  
-  /**
    * The parent class
    */
-  typedef TimeSolver Parent;
+  typedef UnsteadySolver Parent;
   
   /**
    * Constructor. Requires a reference to the system
@@ -101,7 +96,7 @@ public:
   /**
    * This object is used to take timesteps
    */
-  AutoPtr<TimeSolver> core_time_solver;
+  AutoPtr<UnsteadySolver> core_time_solver;
 
   /**
    * The error calculations can be done in
