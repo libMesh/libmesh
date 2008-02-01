@@ -7,7 +7,7 @@
 
 
 AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type& s)
- : TimeSolver(s),
+ : UnsteadySolver(s),
    core_time_solver(new EulerSolver(s)),
    target_tolerance(1.e-3), upper_tolerance(0.0),
    max_deltat(0.),

@@ -1,4 +1,4 @@
-// $Id$
+// $Id: time_solver.h 2501 2007-11-20 02:33:29Z benkirk $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
@@ -19,8 +19,8 @@
 
 
 
-#ifndef __time_solver_h__
-#define __time_solver_h__
+#ifndef __unsteady_solver_h__
+#define __unsteady_solver_h__
 
 // C++ includes
 
@@ -28,47 +28,40 @@
 #include "auto_ptr.h"
 #include "libmesh_common.h"
 #include "numeric_vector.h"
-#include "reference_counted_object.h"
+#include "time_solver.h"
 
 // Forward Declarations
-class DiffSolver;
-class TimeSolver;
-class DifferentiableSystem;
+class UnsteadySolver;
 
 /**
  * This is a generic class that defines a solver to handle
  * time integration of DifferentiableSystems.
  *
- * A user can define a solver by deriving from this class and 
- * implementing certain functions.
+ * A user can define a solver for unsteady problems by deriving
+ * from this class and implementing certain functions.
  *
  * This class is part of the new DifferentiableSystem framework,
  * which is still experimental.  Users of this framework should
  * beware of bugs and future API changes.
  *
- * @author Roy H. Stogner 2006
+ * @author Roy H. Stogner 2008
  */
 
 // ------------------------------------------------------------
-// Solver class definition
-class TimeSolver : public ReferenceCountedObject<TimeSolver>
+// UnsteadySolver class definition
+class UnsteadySolver : public TimeSolver
 {
 public:
-  /**
-   * The type of system
-   */
-  typedef DifferentiableSystem sys_type;
-  
   /**
    * Constructor. Requires a reference to the system
    * to be solved.
    */
-  TimeSolver (sys_type& s);
+  UnsteadySolver (sys_type& s);
   
   /**
    * Destructor.
    */
-  virtual ~TimeSolver ();
+  virtual ~UnsteadySolver ();
 
   /**
    * The initialization function.  This method is used to
@@ -77,16 +70,9 @@ public:
   virtual void init ();
 
   /**
-   * The reinitialization function.  This method is used after
-   * changes in the mesh
-   */
-  virtual void reinit ();
-
-  /**
-   * This method solves for the solution at the next timestep (or
-   * solves for a steady-state solution).  Usually we will only need
-   * to solve one (non)linear system per timestep, but more complex
-   * subclasses may override this.
+   * This method solves for the solution at the next timestep.
+   * Usually we will only need to solve one (non)linear system per timestep,
+   * but more complex subclasses may override this.
    */
   virtual void solve ();
 
@@ -99,49 +85,19 @@ public:
   virtual void advance_timestep ();
 
   /**
-   * This method uses the DifferentiableSystem's
-   * element_time_derivative() and element_constraint()
-   * to build a full residual on an element.  What combination
-   * it uses will depend on the type of solver.  See
-   * the subclasses for more details.
+   * This method should return the expected convergence order of the
+   * (non-local) error of the time discretization scheme - e.g. 2 for the
+   * O(deltat^2) Crank-Nicholson, or 1 for the O(deltat) Backward Euler.
+   *
+   * Useful for adaptive timestepping schemes.
    */
-  virtual bool element_residual (bool get_jacobian) = 0;
-
-  /**
-   * This method uses the DifferentiableSystem's
-   * side_time_derivative() and side_constraint()
-   * to build a full residual on an element's side.
-   * What combination it uses will depend on the type
-   * of solver.  See the subclasses for more details.
-   */
-  virtual bool side_residual (bool get_jacobian) = 0;
-
-  /**
-   * This method is for subclasses or users to override
-   * to do arbitrary processing between timesteps
-   */
-  virtual void before_timestep () {}
+  virtual Real error_order () const = 0;
 
   /**
    * @returns the old nonlinear solution for the specified global
    * DOF.
    */
   Number old_nonlinear_solution (const unsigned int global_dof_number) const;
-
-  /**
-   * @returns a constant reference to the system we are solving.
-   */
-  const sys_type & system () const { return _system; }
-
-  /**
-   * An implicit linear or nonlinear solver to use at each timestep.
-   */
-  virtual AutoPtr<DiffSolver> &diff_solver();
-
-  /**
-   * Print extra debugging information if quiet ==  false.
-   */
-  bool quiet;
 
   /**
    * Computes the size of ||u^{n+1} - u^{n}|| in some norm.
@@ -159,32 +115,17 @@ public:
 
   /**
    * This value (which defaults to zero) is the number of times the
-   * TimeSolver is allowed to halve deltat and let the DiffSolver
+   * UnsteadySolver is allowed to halve deltat and let the DiffSolver
    * repeat the latest failed solve with a reduced timestep.  Note
    * that this has no effect for SteadySolvers.  Note that you must
    * set at least one of the DiffSolver flags
    * "continue_after_max_iterations" or
-   * "continue_after_backtrack_failure" to allow the TimeSolver to
+   * "continue_after_backtrack_failure" to allow the UnsteadySolver to
    * retry the solve.
    */
   unsigned int reduce_deltat_on_diffsolver_failure;
   
 protected:
-
-  /**
-   * An implicit linear or nonlinear solver to use at each timestep.
-   */
-  AutoPtr<DiffSolver> _diff_solver;
-
-  /**
-   * @returns a writeable reference to the system we are solving.
-   */
-  sys_type & system () { return _system; }
-  
-  /**
-   * A reference to the system we are solving.
-   */
-  sys_type& _system;
 
   /**
    * A bool that will be true the first time solve() is called,
