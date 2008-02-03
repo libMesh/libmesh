@@ -140,15 +140,13 @@ void EquationSystems::read (const std::string& name,
           std::string system_string = "bunzip2 -f -k ";
           system_string += name;
           std::system(system_string.c_str());
-        }
-#ifdef HAVE_MPI
-      MPI_Barrier(libMesh::COMM_WORLD);
-#endif // HAVE_MPI
+        }					
+      Parallel::barrier(); // Not sure we need this any more? BSK, 2/3/2008
       STOP_LOG("system(bunzip2)", "EquationSystems");
     }
 
   
-  Xdr io ((libMesh::processor_id() == 0) ? name : "", mode);
+  Xdr io ((libMesh::processor_id() == 0) ? new_name : "", mode);
   assert (io.reading());
 	  
   {
