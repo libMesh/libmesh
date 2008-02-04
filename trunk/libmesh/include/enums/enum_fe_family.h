@@ -67,7 +67,7 @@ namespace libMeshEnums {
 
 using namespace libMeshEnums;
 
-#endif // #ifndef __fe_family_h__
+#endif // #ifndef __enum_fe_family_h__
 
 
 
