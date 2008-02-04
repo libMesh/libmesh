@@ -1442,19 +1442,19 @@ namespace Parallel
   inline void isend (const unsigned int,
 		     std::vector<T> &,
 		     request &,
-		     const unsigned int) {}
+		     const int) {}
 
   // Blocking receives don't make sense on one processor
   template <typename T>
   inline void recv (const unsigned int,
 		    std::vector<T> &,
-		    const unsigned int) { error(); }
+		    const int) { error(); }
 
   template <typename T>
   inline void irecv (const unsigned int,
 		     std::vector<T> &,
 		     request &,
-		     const unsigned int) {}
+		     const int) {}
   
   inline void wait (request &) {}
   
