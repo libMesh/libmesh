@@ -153,7 +153,7 @@ public:
    * then you'll get a result of zero since old_nonlinear_solution
    * is set equal to nonlinear_solution in this function.
    */
-  Real du(const SystemNorm& norm) const;
+  virtual Real du(const SystemNorm& norm) const = 0;
 
   /**
    * This value (which defaults to zero) is the number of times the
