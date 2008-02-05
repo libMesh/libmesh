@@ -27,6 +27,7 @@
 
 // Local Includes
 #include "libmesh_common.h" // for Number
+#include "enum_norm_type.h"
 
 
 // Forward Declarations
@@ -156,6 +157,14 @@ public:
   Number h2_error(const std::string& sys_name,
 		const std::string& unknown_name);
   
+  /**
+   * This function returns the error in the requested norm for the system
+   * sys_name for the unknown unknown_name.  Note that no error computations
+   * are actually performed, you must call compute_error() for that.
+   */
+  Number error_norm(const std::string& sys_name,
+	            const std::string& unknown_name,
+	            const NormType& norm);
 private:
   
   /**

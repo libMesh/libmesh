@@ -302,5 +302,5 @@ AutoPtr<DiffSolver> & AdaptiveTimeSolver::diff_solver()
 Real AdaptiveTimeSolver::calculate_norm(System &s,
                                         NumericVector<Number> &v)
 {
-  return s.calculate_norm(v, component_norm, component_scale);
+  return s.calculate_norm(v, component_norm);
 }
