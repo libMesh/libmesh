@@ -59,6 +59,7 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_point_locator_type.h\
     include/enums/enum_solver_package.h\
@@ -82,6 +83,7 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/numerics/vector_value.h\
     include/parallel/parallel.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
@@ -537,6 +539,7 @@ src/fe/fe_compute_data.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -550,6 +553,7 @@ src/fe/fe_compute_data.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
@@ -3298,6 +3302,7 @@ src/mesh/exodusII_io.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -3313,6 +3318,7 @@ src/mesh/exodusII_io.$(obj-suffix):\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -3393,6 +3399,7 @@ src/mesh/gmv_io.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -3415,6 +3422,7 @@ src/mesh/gmv_io.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
@@ -3879,6 +3887,7 @@ src/mesh/mesh_output.$(obj-suffix):\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -3894,6 +3903,7 @@ src/mesh/mesh_output.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
@@ -4557,6 +4567,7 @@ src/mesh/vtk_io.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -4593,6 +4604,7 @@ src/mesh/vtk_io.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
@@ -4770,6 +4782,7 @@ src/numerics/discontinuity_measure.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -4790,6 +4803,7 @@ src/numerics/discontinuity_measure.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/o_string_stream.h\
@@ -4846,6 +4860,7 @@ src/numerics/error_estimator.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -4860,6 +4875,7 @@ src/numerics/error_estimator.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/error_vector.h\
     include/utils/o_string_stream.h\
@@ -4886,6 +4902,7 @@ src/numerics/exact_error_estimator.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
@@ -4922,6 +4939,7 @@ src/numerics/exact_error_estimator.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/error_vector.h\
@@ -4950,6 +4968,7 @@ src/numerics/fourth_error_estimators.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -4970,6 +4989,7 @@ src/numerics/fourth_error_estimators.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/o_string_stream.h\
@@ -5001,6 +5021,7 @@ src/numerics/hp_coarsentest.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
@@ -5029,6 +5050,7 @@ src/numerics/hp_coarsentest.$(obj-suffix):\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/mapvector.h\
@@ -5060,6 +5082,7 @@ src/numerics/hp_singular.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
@@ -5086,6 +5109,7 @@ src/numerics/hp_singular.$(obj-suffix):\
     include/numerics/vector_value.h\
     include/quadrature/quadrature.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
@@ -5110,6 +5134,7 @@ src/numerics/jump_error_estimator.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
@@ -5137,6 +5162,7 @@ src/numerics/jump_error_estimator.$(obj-suffix):\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/mapvector.h\
@@ -5162,6 +5188,7 @@ src/numerics/kelly_error_estimator.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
@@ -5185,6 +5212,7 @@ src/numerics/kelly_error_estimator.$(obj-suffix):\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/o_string_stream.h\
@@ -5307,6 +5335,7 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_point_locator_type.h\
     include/enums/enum_solver_package.h\
@@ -5340,6 +5369,7 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
@@ -5405,6 +5435,7 @@ src/numerics/patch_recovery_error_estimator.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
@@ -5435,6 +5466,7 @@ src/numerics/patch_recovery_error_estimator.$(obj-suffix):\
     include/quadrature/quadrature_gauss.h\
     include/quadrature/quadrature_grid.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/error_vector.h\
     include/utils/mapvector.h\
@@ -5602,6 +5634,7 @@ src/numerics/uniform_refinement_estimator.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
@@ -5635,6 +5668,7 @@ src/numerics/uniform_refinement_estimator.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/error_vector.h\
@@ -6207,6 +6241,7 @@ src/solvers/adaptive_time_solver.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6225,6 +6260,7 @@ src/solvers/adaptive_time_solver.$(obj-suffix):\
     include/solvers/implicit_system.h\
     include/solvers/linear_implicit_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
     include/solvers/unsteady_solver.h\
@@ -6249,6 +6285,7 @@ src/solvers/continuation_system.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
@@ -6279,6 +6316,7 @@ src/solvers/continuation_system.$(obj-suffix):\
     include/solvers/linear_implicit_system.h\
     include/solvers/newton_solver.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
@@ -6313,6 +6351,7 @@ src/solvers/diff_system.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6331,6 +6370,7 @@ src/solvers/diff_system.$(obj-suffix):\
     include/solvers/implicit_system.h\
     include/solvers/linear_implicit_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
@@ -6356,6 +6396,7 @@ src/solvers/eigen_system.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6381,6 +6422,7 @@ src/solvers/eigen_system.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
@@ -6399,6 +6441,7 @@ src/solvers/eigen_time_solver.$(obj-suffix):\
     include/enums/enum_eigen_solver_type.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6419,6 +6462,7 @@ src/solvers/eigen_time_solver.$(obj-suffix):\
     include/solvers/implicit_system.h\
     include/solvers/linear_implicit_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
@@ -6444,6 +6488,7 @@ src/solvers/equation_systems.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6466,6 +6511,7 @@ src/solvers/equation_systems.$(obj-suffix):\
     include/solvers/nonlinear_implicit_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
@@ -6490,6 +6536,7 @@ src/solvers/equation_systems_io.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6512,6 +6559,7 @@ src/solvers/equation_systems_io.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
@@ -6531,6 +6579,7 @@ src/solvers/euler2_solver.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6548,6 +6597,7 @@ src/solvers/euler2_solver.$(obj-suffix):\
     include/solvers/implicit_system.h\
     include/solvers/linear_implicit_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
     include/solvers/unsteady_solver.h\
@@ -6565,6 +6615,7 @@ src/solvers/euler_solver.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6582,6 +6633,7 @@ src/solvers/euler_solver.$(obj-suffix):\
     include/solvers/implicit_system.h\
     include/solvers/linear_implicit_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
     include/solvers/unsteady_solver.h\
@@ -6608,6 +6660,7 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
@@ -6644,6 +6697,7 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
@@ -6661,11 +6715,13 @@ src/solvers/explicit_system.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/solvers/explicit_system.h\
-    include/solvers/system.h
+    include/solvers/system.h\
+    include/solvers/system_norm.h
 src/solvers/fem_system.$(obj-suffix):\
     src/solvers/fem_system.C\
     include/base/auto_ptr.h\
@@ -6686,6 +6742,7 @@ src/solvers/fem_system.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
@@ -6724,6 +6781,7 @@ src/solvers/fem_system.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
@@ -6743,6 +6801,7 @@ src/solvers/frequency_system.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
@@ -6759,6 +6818,7 @@ src/solvers/frequency_system.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
@@ -6782,6 +6842,7 @@ src/solvers/implicit_system.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6801,6 +6862,7 @@ src/solvers/implicit_system.$(obj-suffix):\
     include/solvers/explicit_system.h\
     include/solvers/implicit_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
@@ -6817,6 +6879,7 @@ src/solvers/linear_implicit_system.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
@@ -6832,6 +6895,7 @@ src/solvers/linear_implicit_system.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
@@ -6848,6 +6912,7 @@ src/solvers/newmark_system.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6862,6 +6927,7 @@ src/solvers/newmark_system.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
@@ -6879,6 +6945,7 @@ src/solvers/newton_solver.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
@@ -6907,6 +6974,7 @@ src/solvers/newton_solver.$(obj-suffix):\
     include/solvers/newton_solver.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
@@ -6924,6 +6992,7 @@ src/solvers/nonlinear_implicit_system.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6938,6 +7007,7 @@ src/solvers/nonlinear_implicit_system.$(obj-suffix):\
     include/solvers/nonlinear_implicit_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
@@ -6953,6 +7023,7 @@ src/solvers/steady_solver.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6971,6 +7042,7 @@ src/solvers/steady_solver.$(obj-suffix):\
     include/solvers/linear_implicit_system.h\
     include/solvers/steady_solver.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
@@ -6996,6 +7068,7 @@ src/solvers/system.$(obj-suffix):\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
@@ -7019,6 +7092,7 @@ src/solvers/system.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
@@ -7045,6 +7119,7 @@ src/solvers/system_io.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -7062,6 +7137,7 @@ src/solvers/system_io.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_f_stream.h\
@@ -7088,6 +7164,7 @@ src/solvers/system_projection.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
@@ -7115,6 +7192,7 @@ src/solvers/system_projection.$(obj-suffix):\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
@@ -7131,6 +7209,7 @@ src/solvers/time_solver.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -7150,6 +7229,7 @@ src/solvers/time_solver.$(obj-suffix):\
     include/solvers/implicit_system.h\
     include/solvers/linear_implicit_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
@@ -7167,6 +7247,7 @@ src/solvers/transient_system.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -7179,6 +7260,7 @@ src/solvers/transient_system.$(obj-suffix):\
     include/solvers/linear_implicit_system.h\
     include/solvers/nonlinear_implicit_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
@@ -7196,6 +7278,7 @@ src/solvers/unsteady_solver.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -7215,6 +7298,7 @@ src/solvers/unsteady_solver.$(obj-suffix):\
     include/solvers/implicit_system.h\
     include/solvers/linear_implicit_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/time_solver.h\
     include/solvers/transient_system.h\
     include/solvers/unsteady_solver.h\
@@ -7241,6 +7325,7 @@ src/utils/error_vector.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -7269,6 +7354,7 @@ src/utils/error_vector.$(obj-suffix):\
     include/solvers/newmark_system.h\
     include/solvers/steady_system.h\
     include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/error_vector.h\
