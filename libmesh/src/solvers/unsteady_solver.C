@@ -123,7 +123,7 @@ const
 
 
 
-Real UnsteadySolver::du(unsigned char norm_type)
+Real UnsteadySolver::du(const SystemNorm &norm) const
 {
 
   AutoPtr<NumericVector<Number> > solution_copy =
@@ -133,16 +133,16 @@ Real UnsteadySolver::du(unsigned char norm_type)
 
   solution_copy->close();
 
-  if (norm_type==0)
+  if (norm.type(0) == DISCRETE_L2)
     return solution_copy->l2_norm();
 
-  else if (norm_type==1)
+  else if (norm.type(0) == DISCRETE_L1)
     return solution_copy->l1_norm();
 
   else
     {
       std::cout << "Unrecognized norm "
-		<< norm_type
+		<< norm.type(0)
 		<< " requested.";
       error();
     }
