@@ -26,6 +26,7 @@
 
 // Local includes
 #include "auto_ptr.h"
+#include "system_norm.h"
 #include "libmesh_common.h"
 #include "numeric_vector.h"
 #include "reference_counted_object.h"
@@ -145,9 +146,6 @@ public:
 
   /**
    * Computes the size of ||u^{n+1} - u^{n}|| in some norm.
-   * Supported norms are
-   * l2: norm_type=0
-   * l1: norm_type=1
    * 
    * Note that, while you can always call this function, its
    * result may or may not be very meaningful.  For example, if
@@ -155,7 +153,7 @@ public:
    * then you'll get a result of zero since old_nonlinear_solution
    * is set equal to nonlinear_solution in this function.
    */
-  Real du(unsigned char norm_type=0);
+  Real du(const SystemNorm& norm) const;
 
   /**
    * This value (which defaults to zero) is the number of times the

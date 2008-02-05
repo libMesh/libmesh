@@ -621,38 +621,35 @@ unsigned short int System::variable_number (const std::string& var) const
 
 Real System::calculate_norm(NumericVector<Number>& v,
                             unsigned int var,
-                            unsigned char norm_type) const
+                            NormType norm_type) const
 {
-  std::vector<unsigned char> component_norm(this->n_vars(), 0);
-  std::vector<float> component_scale(this->n_vars(), 0.0);
-  component_norm[var] = norm_type;
-  component_scale[var] = 1.0;
-  return this->calculate_norm(v, component_norm, component_scale);
+  std::vector<NormType> norms(this->n_vars(), L2);
+  std::vector<Real> weights(this->n_vars(), 0.0);
+  norms[var] = norm_type;
+  weights[var] = 1.0;
+  Real val = this->calculate_norm(v, SystemNorm(norms, weights));
+  return val;
 }
 
 
 
 Real System::calculate_norm(NumericVector<Number>& v,
-                            std::vector<unsigned char> &component_norm,
-                            std::vector<float> &component_scale) const
+                            const SystemNorm &norm) const
 {
   // This function must be run on all processors at once
   parallel_only();
 
   START_LOG ("calculate_norm()", "System");
 
-  if (component_norm.empty())
+  if (norm.is_discrete())
     {
-      assert (component_scale.empty());
       STOP_LOG ("calculate_norm()", "System");
-      return v.l2_norm();
-    }
-
-  assert (component_norm.size() == this->n_vars());
-
-  if (component_scale.size() != this->n_vars())
-    {
-      component_scale.resize(this->n_vars(), 1.0);
+      if (norm.type(0) == DISCRETE_L1)
+        return v.l1_norm();
+      if (norm.type(0) == DISCRETE_L2)
+        return v.l2_norm();
+      if (norm.type(0) == DISCRETE_L_INF)
+        return v.linfty_norm();
     }
 
   // Zero the norm before summation
@@ -669,7 +666,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
   for (unsigned int var=0; var != this->n_vars(); ++var)
     {
       // Skip any variables we don't need to integrate
-      if (component_scale[var] == 0.0)
+      if (norm.weight(var) == 0.0)
         continue;
 
       const FEType& fe_type = this->get_dof_map().variable_type(var);
@@ -683,11 +680,14 @@ Real System::calculate_norm(NumericVector<Number>& v,
       const std::vector<std::vector<Real> >& phi = fe->get_phi();
 
       const std::vector<std::vector<RealGradient> >* dphi = NULL;
-      if (component_norm[var] > 0)
+      if (norm.type(var) == H1 ||
+          norm.type(var) == H2 ||
+          norm.type(var) == H1_SEMINORM)
         dphi = &(fe->get_dphi());
 #ifdef ENABLE_SECOND_DERIVATIVES
       const std::vector<std::vector<RealTensor> >*   d2phi = NULL;
-      if (component_norm[var] > 1)
+      if (norm.type(var) == H2 ||
+          norm.type(var) == H2_SEMINORM)
         d2phi = &(fe->get_d2phi());
 #endif
 
@@ -717,22 +717,28 @@ Real System::calculate_norm(NumericVector<Number>& v,
               Number u_h = 0.;
               for (unsigned int i=0; i != n_sf; ++i)
                 u_h += phi[i][qp] * (*local_v)(dof_indices[i]);
-	      v_norm += component_scale[var] * JxW[qp] * libmesh_norm(u_h);
-              if (component_norm[var] > 0)
+	      v_norm += norm.weight(var) * norm.weight(var) *
+                        JxW[qp] * libmesh_norm(u_h);
+              if (norm.type(var) == H1 ||
+                  norm.type(var) == H2 ||
+                  norm.type(var) == H1_SEMINORM)
                 {
                   Gradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm += component_scale[var] * JxW[qp] * grad_u_h.size_sq();
+                  v_norm += norm.weight(var) * norm.weight(var) *
+                            JxW[qp] * grad_u_h.size_sq();
                 }
 
 #ifdef ENABLE_SECOND_DERIVATIVES
-              if (component_norm[var] > 1)
+              if (norm.type(var) == H2 ||
+                  norm.type(var) == H2_SEMINORM)
                 {
                   Tensor hess_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm += component_scale[var] * JxW[qp] * hess_u_h.size_sq();
+                  v_norm += norm.weight(var) * norm.weight(var) *
+                            JxW[qp] * hess_u_h.size_sq();
                 }
 #endif
             }

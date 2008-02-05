@@ -99,13 +99,9 @@ public:
   AutoPtr<UnsteadySolver> core_time_solver;
 
   /**
-   * The error calculations can be done in
-   * H0 (L2) norm with component_norm[var] = 0,
-   * H1 norm with component_norm[var] = 1, 
-   * H2 norm with component_norm[var] = 2, 
-   * or most cheaply in l2 norm by just leaving component_norm empty
+   * Error calculations are done in this norm, DISCRETE_L2 by default.
    */
-  std::vector<unsigned char> component_norm;
+  SystemNorm component_norm;
 
   /**
    * If component_norms is non-empty, each variable's contribution to the error

@@ -26,11 +26,12 @@
 #include <vector>
 
 // Local Includes
-#include "libmesh_common.h"
-#include "fe_type.h"
 #include "auto_ptr.h"
-#include "reference_counted_object.h"
 #include "enum_xdr_mode.h"
+#include "fe_type.h"
+#include "libmesh_common.h"
+#include "reference_counted_object.h"
+#include "system_norm.h"
 
 
 // Forward Declarations
@@ -389,21 +390,19 @@ public:
   const FEType & variable_type (const std::string& var) const;
 
   /**
-   * @returns a norm of variable \p var in the vector \p v, in the L2 norm if
-   * \p component_norm == 0, the H1 norm if \p component_norm == 1, or the H2
-   * norm if \p component_norm == 2.
+   * @returns a norm of variable \p var in the vector \p v, in the specified
+   * norm (e.g. L2, H0, H1)
    */
   Real calculate_norm(NumericVector<Number>& v,
 		      unsigned int var = 0,
-		      unsigned char norm_type = 0) const;
+		      NormType norm_type = L2) const;
 
   /**
    * @returns a norm of the vector \p v, using \p component_norm and \p
    * component_scale to choose and weight the norms of each variable.
    */
   Real calculate_norm(NumericVector<Number>& v,
-		      std::vector<unsigned char> &component_norm,
-		      std::vector<float> &component_scale) const;
+		      const SystemNorm &norm) const;
 
   /**
    * Reads the basic data header for this System.

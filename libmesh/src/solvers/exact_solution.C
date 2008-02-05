@@ -185,6 +185,39 @@ void ExactSolution::compute_error(const std::string& sys_name,
 
 
 
+Number ExactSolution::error_norm(const std::string& sys_name,
+			         const std::string& unknown_name,
+                                 const NormType& norm)
+{
+  // Check the inputs for validity, and get a reference
+  // to the proper location to store the error
+  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
+							unknown_name);
+  
+  switch (norm)
+    {
+    case L2:
+      return std::sqrt(error_vals[0]);
+    case H1:
+      return std::sqrt(error_vals[0] + error_vals[1]);
+    case H2:
+      return std::sqrt(error_vals[0] + error_vals[1] + error_vals[2]);
+    case H1_SEMINORM:
+      return std::sqrt(error_vals[1]);
+    case H2_SEMINORM:
+      return std::sqrt(error_vals[2]);
+    // Currently only Sobolev norms/seminorms are supported
+    default:
+      error();
+    }
+}
+
+
+
+
+
+
+
 Number ExactSolution::l2_error(const std::string& sys_name,
 			       const std::string& unknown_name)
 {
