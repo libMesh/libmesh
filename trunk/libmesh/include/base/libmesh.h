@@ -113,6 +113,13 @@ namespace libMesh {
   bool on_command_line (const std::string& arg);  
 
   /**
+   * \returns the value associated with name on the command line if it is specified,
+   * otherwise return the default, provided value.
+   */
+  template <typename T>
+  T command_line_value (const std::string &, T);  
+
+  /**
    * The imaginary unit, \f$ \sqrt{-1} \f$.
    */
 #ifdef USE_COMPLEX_NUMBERS
@@ -183,6 +190,7 @@ bool libMesh::closed()
 {
   return !libMesh::initialized();
 }
+
 
 
 #endif // #define __libmesh_h__

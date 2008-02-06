@@ -32,7 +32,48 @@
 #include "serial_mesh.h"
 #include "parallel_mesh.h"
 #include "mesh_communication.h"
+#include "elem_range.h"
+#include "threads.h"
 
+
+
+// ------------------------------------------------------------
+// anonymous namespace for helper classes
+namespace {
+  /**
+   * SumElemWeight(Range) sums the number of nodes per element 
+   * for each element in the provided range. The join() method
+   * defines how to combine the reduction operation from two
+   * distinct instances of this class which may be executed on 
+   * separate threads.
+   */
+  class SumElemWeight
+  {
+  public:
+    SumElemWeight () : 
+      _weight(0) 
+    {}
+
+    SumElemWeight (SumElemWeight &, Threads::split) : 
+      _weight(0)
+    {}
+    
+    void operator()(const ConstElemRange &range)
+    { 
+      for (ConstElemRange::const_iterator it = range.begin(); it !=range.end(); ++it)
+	_weight += (*it)->n_nodes();
+    }
+
+    unsigned int weight() const 
+    { return _weight; }
+    
+    void join (const SumElemWeight &other)
+    { _weight += other.weight(); }
+
+  private:
+    unsigned int _weight;
+  };
+}
 
 
 
@@ -40,30 +81,24 @@
 // MeshTools functions
 unsigned int MeshTools::total_weight(const MeshBase& mesh)
 {
-  unsigned int weight=0;
-
-  MeshBase::const_element_iterator       el  = mesh.elements_begin();
-  const MeshBase::const_element_iterator end = mesh.elements_end(); 
-
-  for ( ; el != end; ++el)
-    weight += (*el)->n_nodes();
+  SumElemWeight sew;
   
-  return weight;
+  Threads::parallel_reduce (ConstElemRange (mesh.elements_begin(),
+					    mesh.elements_end()),
+			    sew);
+  return sew.weight();
 }
 
 
 
 unsigned int MeshTools::weight(const MeshBase& mesh, const unsigned int pid)
 {
-  unsigned int weight=0;
-
-  MeshBase::const_element_iterator       el  = mesh.pid_elements_begin(pid);
-  const MeshBase::const_element_iterator end = mesh.pid_elements_end(pid); 
-
-  for ( ; el != end; ++el)
-    weight += (*el)->n_nodes();
+  SumElemWeight sew;
   
-  return weight;
+  Threads::parallel_reduce (ConstElemRange (mesh.pid_elements_begin(pid),
+					    mesh.pid_elements_end(pid)),
+			    sew);
+  return sew.weight();
 }
 
 

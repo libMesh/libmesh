@@ -140,6 +140,10 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
+/* Flag indicating whether the library shall be compiled to use the Threading
+   Building Blocks */
+#undef HAVE_TBB_API
+
 /* Flag indicating whether the library shall be compiled to use the Tecplot
    interface */
 #undef HAVE_TECPLOT_API
@@ -181,22 +185,22 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* The size of `double', as computed by sizeof. */
+/* The size of a `double', as computed by sizeof. */
 #undef SIZEOF_DOUBLE
 
-/* The size of `float', as computed by sizeof. */
+/* The size of a `float', as computed by sizeof. */
 #undef SIZEOF_FLOAT
 
-/* The size of `int', as computed by sizeof. */
+/* The size of a `int', as computed by sizeof. */
 #undef SIZEOF_INT
 
-/* The size of `long int', as computed by sizeof. */
+/* The size of a `long int', as computed by sizeof. */
 #undef SIZEOF_LONG_INT
 
-/* The size of `short int', as computed by sizeof. */
+/* The size of a `short int', as computed by sizeof. */
 #undef SIZEOF_SHORT_INT
 
-/* The size of `void *', as computed by sizeof. */
+/* The size of a `void *', as computed by sizeof. */
 #undef SIZEOF_VOID_P
 
 /* Define to 1 if you have the ANSI C header files. */

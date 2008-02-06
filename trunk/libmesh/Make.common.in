@@ -281,6 +281,11 @@ ifeq ($(enable-optional),yes)
   libmesh_LIBS    += @SFC_LIB@
   libmesh_INCLUDE += @SFC_INCLUDE@
 
+  # if TBB is used, we need the 
+  # header path and the lib
+  libmesh_LIBS    += @TBB_LIBRARY@
+  libmesh_INCLUDE += @TBB_INCLUDE@
+
   # if gzstreams are used, we need the 
   # header path and the lib
   libmesh_LIBS    += @GZSTREAM_LIB@

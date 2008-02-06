@@ -28,7 +28,7 @@
 #include "getpot.h"
 #include "reference_counter.h"
 #include "remote_elem.h"
-
+#include "threads.h"
 
 
 
@@ -62,6 +62,7 @@ extern "C"
 // Local anonymous namespace to hold miscelaneous variables
 namespace {
   AutoPtr<GetPot> command_line (NULL);
+  AutoPtr<Threads::task_scheduler_init> task_scheduler (NULL);
 #if defined(HAVE_MPI)
   bool libmesh_initialized_mpi = false;
 #endif
@@ -70,7 +71,7 @@ namespace {
 
 
 // ------------------------------------------------------------
-// libMesh data initialization
+// libMeshdata initialization
 #ifdef HAVE_MPI
 MPI_Comm           libMesh::COMM_WORLD = MPI_COMM_NULL;
 #endif
@@ -126,7 +127,15 @@ void libMesh::init (int &argc, char** & argv,
   assert (!libMesh::initialized());
   
   // Build a command-line parser.
-  command_line.reset(new GetPot (argc, argv));
+  command_line.reset (new GetPot (argc, argv));
+
+  // Build a task scheduler
+  {
+    int n_threads = 
+      libMesh::command_line_value ("--n_threads", Threads::task_scheduler_init::automatic);
+    
+    task_scheduler.reset (new Threads::task_scheduler_init(n_threads));
+  }
 
   // Construct singletons who may be at risk of the
   // "static initialization order fiasco"
@@ -226,6 +235,9 @@ int libMesh::close ()
   // Delete reference counted singleton(s)
   delete remote_elem;
 
+  // Clear the thread task manager we started
+  task_scheduler.reset();
+
 #if defined(HAVE_MPI)
   // Allow the user to bypass MPI finalization
   if (!libMesh::on_command_line ("--disable-mpi"))
@@ -304,6 +316,20 @@ bool libMesh::on_command_line (const std::string& arg)
 
 
 
+template <typename T>
+T libMesh::command_line_value (const std::string &name, T value)
+{
+  // Make sure the command line parser is ready for use
+  assert (command_line.get() != NULL);
+  
+    // only if the variable exists in the file
+    if (command_line->have_variable(name.c_str()))
+      value = (*command_line)(name.c_str(), value);      
+
+    return value;
+}
+
+
 SolverPackage libMesh::default_solver_package ()
 {
   assert (libMesh::initialized());
@@ -335,3 +361,10 @@ SolverPackage libMesh::default_solver_package ()
   
   return libMeshPrivateData::_solver_package;  
 }
+
+
+
+//-------------------------------------------------------------------------------
+template int          libMesh::command_line_value (const std::string&, int);
+template Real         libMesh::command_line_value (const std::string&, Real);
+template std::string  libMesh::command_line_value (const std::string&, std::string);
