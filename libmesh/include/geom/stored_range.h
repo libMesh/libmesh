@@ -56,6 +56,15 @@ public:
   typedef typename std::vector<object_type>::const_iterator const_iterator;
 
   /**
+   * Constructor. Optionally takes the \p grainsize parameter, which is the
+   * smallest chunk the range may be broken into for parallel
+   * execution.
+   */
+  StoredRange (const unsigned int grainsize = 1000) :
+  _grainsize(grainsize)
+  {}
+
+  /**
    * Constructor.  Takes the beginning and end of the range.  
    * Optionally takes the \p grainsize parameter, which is the
    * smallest chunk the range may be broken into for parallel

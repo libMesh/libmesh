@@ -132,7 +132,6 @@ namespace { // anonymous namespace for helper functions
 #if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
 void MeshCommunication::find_global_indices (MeshBase& mesh) const
 {
-
   START_LOG ("find_global_indices()", "MeshCommunication");
 
   // This method determines partition-agnostic global indices
