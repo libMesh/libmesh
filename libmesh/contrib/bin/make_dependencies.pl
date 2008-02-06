@@ -58,7 +58,7 @@ foreach $file (keys %include_files) {
 }
 
 # print dependency list
-foreach $file (@input_files) {
+foreach $file (sort @input_files) {
     $file =~ /(.*)\.(C)/;
 
     # replace the .C with .$object_suffix
