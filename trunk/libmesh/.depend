@@ -125,6 +125,7 @@ src/base/libmesh.$(obj-suffix):\
     include/geom/point.h\
     include/geom/remote_elem.h\
     include/numerics/type_vector.h\
+    include/parallel/threads.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -3684,14 +3685,18 @@ src/mesh/mesh_communication_global_indices.$(obj-suffix):\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
     include/geom/elem.h\
+    include/geom/elem_range.h\
     include/geom/node.h\
+    include/geom/node_range.h\
     include/geom/point.h\
+    include/geom/stored_range.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_communication.h\
     include/mesh/mesh_tools.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
     include/parallel/parallel_sort.h\
+    include/parallel/threads.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
