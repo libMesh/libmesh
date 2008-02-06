@@ -31,6 +31,8 @@
 #include "parallel.h"
 #include "parallel_sort.h"
 #include "elem.h"
+#include "elem_range.h"
+#include "node_range.h"
 #ifdef HAVE_LIBHILBERT
 #  include "hilbert.h"
 #endif
@@ -78,6 +80,48 @@ namespace { // anonymous namespace for helper functions
 
     return index;
   }
+
+  // Helper class for threaded Hilbert key computation
+  class ComputeHilbertKeys 
+  {
+  public:
+    ComputeHilbertKeys (const MeshTools::BoundingBox &bbox,
+			std::vector<Hilbert::HilbertIndices> &keys) :
+      _bbox(bbox),
+      _keys(keys)
+    {}
+							
+    // computes the hilbert index for a node
+    void operator() (const ConstNodeRange &range) const
+    {
+      unsigned int pos = range.first_idx();
+      for (ConstNodeRange::const_iterator it = range.begin(); it!=range.end(); ++it)
+	{
+	  const Node* node = (*it);
+	  assert (node != NULL);
+	  assert (pos < _keys.size());
+	  _keys[pos++] = get_hilbert_index (*node, _bbox);
+	}	
+    }
+
+    // computes the hilbert index for an element
+    void operator() (const ConstElemRange &range) const
+    { 
+      unsigned int pos = range.first_idx();
+      for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
+	{
+	  const Elem* elem = (*it);
+	  assert (elem != NULL);
+	  assert (pos < _keys.size());
+	  _keys[pos++] = get_hilbert_index (elem->centroid(), _bbox);
+	}	
+    }
+
+  private:					
+    const MeshTools::BoundingBox &_bbox;
+    std::vector<Hilbert::HilbertIndices> &_keys;
+  };
+
 }
 #endif
 
@@ -117,35 +161,20 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
     node_keys, elem_keys;
   
   {
-    node_keys.reserve (mesh.n_local_nodes());  
-    elem_keys.reserve (mesh.n_local_elem()); 
-    
     // Nodes first
     {
-      MeshBase::const_node_iterator       it  = mesh.local_nodes_begin();
-      const MeshBase::const_node_iterator end = mesh.local_nodes_end();
-
-      for (; it != end; ++it)
-	{
-	  const Node* node = (*it);
-	  assert (node != NULL);
-	  
-	  node_keys.push_back(get_hilbert_index (*node, bbox));
-	}
+      ConstNodeRange nr (mesh.local_nodes_begin(),
+			 mesh.local_nodes_end());
+      node_keys.resize (nr.size()); 
+      Threads::parallel_for (nr, ComputeHilbertKeys (bbox, node_keys));
     }
     
     // Elements next
     {
-      MeshBase::const_element_iterator       it  = mesh.local_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.local_elements_end();
-
-      for (; it != end; ++it)
-	{
-	  const Elem* elem = (*it);
-	  assert (elem != NULL);
-
-	  elem_keys.push_back(get_hilbert_index (elem->centroid(), bbox));
-	}
+      ConstElemRange er (mesh.local_elements_begin(),
+			 mesh.local_elements_end());
+      elem_keys.resize (er.size());
+      Threads::parallel_for (er, ComputeHilbertKeys (bbox, elem_keys));
     }    
   } // done computing Hilbert keys
 
@@ -444,7 +473,7 @@ void MeshCommunication::find_global_indices (MeshBase& mesh) const
 
   STOP_LOG ("find_global_indices()", "MeshCommunication");
 }
-#else
+#else // HAVE_LIBHILBERT, HAVE_MPI
 void MeshCommunication::find_global_indices (MeshBase&) const
 {
 }

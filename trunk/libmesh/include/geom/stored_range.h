@@ -83,8 +83,10 @@ public:
    * vector.
    */
   StoredRange (const StoredRange<iterator_type,object_type> &er):
-    _end(er._end),
+    _end(er._end), 
     _begin(er._begin),
+    _last(er._last),
+    _first(er._first),
     _grainsize(er._grainsize)
   {
     // specifically, do *not* copy the vector
@@ -98,16 +100,23 @@ public:
   StoredRange (StoredRange<iterator_type,object_type> &r, Threads::split ) : 
     _end(r._end),
     _begin(r._begin),
+    _last(r._last),
+    _first(r._first),
     _grainsize(r._grainsize)
   {
     const_iterator
       beginning = r._begin,
-      middle    = beginning,
-      ending    = r._end;
+      ending    = r._end,
+      middle    = beginning + std::distance(beginning, ending)/2u;
     
-    std::advance(middle, std::distance(beginning, ending)/2u);
-     
     r._end = _begin = middle;
+
+    unsigned int
+      first = r._first,
+      last  = r._last,
+      half  = first + (last-first)/2u;
+
+    r._last = _first = half;
   }
     
   /**
@@ -123,6 +132,9 @@ public:
     
     _begin = _objs.begin();
     _end   = _objs.end();
+
+    _first = 0;
+    _last  = _objs.size();
   }
 
   /**
@@ -134,6 +146,9 @@ public:
   {
     _begin = _objs.begin();
     _end   = _objs.end();
+
+    _first = 0;
+    _last  = _objs.size();
   }
   
   /**
@@ -147,6 +162,16 @@ public:
   const_iterator end () const { return _end; }
 
   /**
+   * Index in the stored vector of the first object.
+   */
+  unsigned int first_idx () const { return _first; }
+
+  /**
+   * Index in the stored vector of the last object.
+   */
+  unsigned int last_idx () const { return _last; }
+
+  /**
    * The grain size for the range.  The range will be subdivided into 
    * subranges not to exceed the grain size.
    */
@@ -156,6 +181,11 @@ public:
    * Set the grain size.
    */
   void  grainsize (const unsigned int &gs) {_grainsize = gs;}
+
+  /**
+   * \return the size of the range.
+   */
+  unsigned int size () const { return std::distance(_begin, _end); }
 
   //------------------------------------------------------------------------
   // Methods that implement Range concept
@@ -175,6 +205,8 @@ private:
 
   const_iterator _end;
   const_iterator _begin;
+  unsigned int _last;
+  unsigned int _first;
   unsigned int _grainsize;
   std::vector<object_type> _objs;
 };
