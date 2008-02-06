@@ -133,5 +133,5 @@ Real UnsteadySolver::du(const SystemNorm &norm) const
 
   solution_copy->close();
 
-  return _system.calculate_norm(solution_copy, norm);
+  return _system.calculate_norm(*solution_copy, norm);
 }
