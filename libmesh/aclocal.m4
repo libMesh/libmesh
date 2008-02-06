@@ -889,6 +889,45 @@ AC_DEFUN(CONFIGURE_SLEPC,
   AC_SUBST(enableslepc)
 ])
 dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
+dnl Threading Building Blocks
+dnl -------------------------------------------------------------
+AC_DEFUN(CONFIGURE_TBB,
+[
+  AC_ARG_WITH(tbb,
+              AC_HELP_STRING([--with-tbb=PATH],[Specify the path where Threading Building Blocks is installed]),
+              withtbb=$withval,
+              withtbb=no)
+
+  AC_ARG_WITH(tbb-lib,
+              AC_HELP_STRING([--with-tbb-lib=PATH],[Specify the path to Threading Building Blocks libraries]),
+              withtbblib=$withval,
+              withtbblib=no)
+
+  if test "$withtbb" != no ; then
+    AC_CHECK_FILE($withtbb/include/tbb/task_scheduler_init.h,
+                      TBB_INCLUDE_PATH=$withtbb/include)
+    if test "$withtbblib" != no ; then
+      TBB_LIBS=$withtbblib
+    else	
+      TBB_LIBS=""
+    fi
+  fi
+
+  if (test -r $TBB_INCLUDE_PATH/tbb/task_scheduler_init.h) ; then
+    TBB_LIBRARY=$TBB_LIBS
+    TBB_INCLUDE=-I$TBB_INCLUDE_PATH
+    AC_SUBST(TBB_LIBRARY)
+    AC_SUBST(TBB_INCLUDE)
+    AC_DEFINE(HAVE_TBB_API, 1,
+              [Flag indicating whether the library shall be compiled to use the Threading Building Blocks])
+    AC_MSG_RESULT(<<< Configuring library with Intel TBB threading support >>>)
+  fi
+])
+dnl -------------------------------------------------------------
                                                                                        
 
 

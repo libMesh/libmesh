@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC enableshared GXX_VERSION CXXFLAGS_OPT CXXFLAGS_DBG CXXFLAGS_DVL CFLAGS_OPT CFLAGS_DBG CFLAGS_DVL CXXDEPFLAG CXXSHAREDFLAG RPATHFLAG PROFILING_FLAGS OPROFILE_FLAGS CXXCPP EGREP MPCXX PWD enablexdr enablecomplex enableoptional F77 FFLAGS ac_ct_F77 FLIBS PETSC_ARCH PETSC_DIR petscversion petscmajorminor MPI_IMPL MPI MPI_LIBS MPI_LIBS_PATH MPI_LIBS_PATHS MPI_INCLUDES_PATH MPI_INCLUDES_PATHS enablepetsc SLEPC_DIR slepcversion enableslepc LASPACK_INCLUDE LASPACK_LIB enablelaspack SFC_INCLUDE SFC_LIB enablesfc GZSTREAM_INCLUDE GZSTREAM_LIB enablegz TECPLOT_LIBRARY TECPLOT_INCLUDE METIS_INCLUDE METIS_LIB PARMETIS_INCLUDE PARMETIS_LIB enablemetis enableparmetis DOXYGEN DOT DOTPATH HAVE_DOT TETGEN_INCLUDE TETGEN_LIBRARY enabletetgen TRIANGLE_INCLUDE TRIANGLE_LIBRARY enabletriangle GMV_INCLUDE GMV_LIBRARY enablegmv VTK_INCLUDE VTK_LIBRARY enablevtk NETCDF_INCLUDE NETCDF_LIBRARY enablenetcdf EXODUS_INCLUDE EXODUS_LIBRARY enableexodus LIBHILBERT_INCLUDE LIBHILBERT_LIBRARY enablelibhilbert PERL LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC enableshared GXX_VERSION CXXFLAGS_OPT CXXFLAGS_DBG CXXFLAGS_DVL CFLAGS_OPT CFLAGS_DBG CFLAGS_DVL CXXDEPFLAG CXXSHAREDFLAG RPATHFLAG PROFILING_FLAGS OPROFILE_FLAGS CXXCPP EGREP MPCXX PWD enablexdr enablecomplex enableoptional F77 FFLAGS ac_ct_F77 FLIBS PETSC_ARCH PETSC_DIR petscversion petscmajorminor MPI_IMPL MPI MPI_LIBS MPI_LIBS_PATH MPI_LIBS_PATHS MPI_INCLUDES_PATH MPI_INCLUDES_PATHS enablepetsc SLEPC_DIR slepcversion enableslepc TBB_LIBRARY TBB_INCLUDE LASPACK_INCLUDE LASPACK_LIB enablelaspack SFC_INCLUDE SFC_LIB enablesfc GZSTREAM_INCLUDE GZSTREAM_LIB enablegz TECPLOT_LIBRARY TECPLOT_INCLUDE METIS_INCLUDE METIS_LIB PARMETIS_INCLUDE PARMETIS_LIB enablemetis enableparmetis DOXYGEN DOT DOTPATH HAVE_DOT TETGEN_INCLUDE TETGEN_LIBRARY enabletetgen TRIANGLE_INCLUDE TRIANGLE_LIBRARY enabletriangle GMV_INCLUDE GMV_LIBRARY enablegmv VTK_INCLUDE VTK_LIBRARY enablevtk NETCDF_INCLUDE NETCDF_LIBRARY enablenetcdf EXODUS_INCLUDE EXODUS_LIBRARY enableexodus LIBHILBERT_INCLUDE LIBHILBERT_LIBRARY enablelibhilbert PERL LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -879,6 +879,8 @@ Optional Features:
   --enable-mpi            build with MPI message passing support
   --enable-petsc          build with PETSc iterative solver suppport
   --enable-slepc          build with SLEPc eigen solver support
+  --enable-tbb            build with threading support via Threading Building
+                          Blocks
   --enable-laspack        build with LASPACK iterative solver suppport
   --enable-sfc            build with space-filling curves suppport
   --enable-gzstreams      build with gzstreams compressed I/O suppport
@@ -902,6 +904,10 @@ Optional Packages:
   --with-f77=F77          Fortran compiler to use
   --with-mpi=PATH         Prefix where MPI is installed (MPIHOME)
   --with-gm=PATH          Prefix where GM is installed (GMHOME)
+  --with-tbb=PATH         Specify the path where Threading Building Blocks is
+                          installed
+  --with-tbb-lib=PATH     Specify the path to Threading Building Blocks
+                          libraries
   --with-tecplot=PATH     Specify the path where Tecplot is installed
   --with-vtk-include=PATH Specify the path for VTK header files
   --with-vtk-lib=PATH     Specify the path for VTK libs
@@ -8730,7 +8736,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:8733:" \
+echo "$as_me:8739:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8924,7 +8930,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:8927: \"$ac_link\") >&5
+(eval echo $as_me:8933: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -9002,7 +9008,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:9005: \"$ac_link\") >&5
+(eval echo $as_me:9011: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -10760,6 +10766,81 @@ echo "${ECHO_T}<<< Configuring library with SLEPc version $slepcversion support 
   fi
 
 
+
+fi
+
+
+
+# Check whether --enable-tbb or --disable-tbb was given.
+if test "${enable_tbb+set}" = set; then
+  enableval="$enable_tbb"
+  enabletbb=$enableval
+else
+  enabletbb=yes
+fi;
+if (test "$enabletbb" != no) ; then
+
+
+# Check whether --with-tbb or --without-tbb was given.
+if test "${with_tbb+set}" = set; then
+  withval="$with_tbb"
+  withtbb=$withval
+else
+  withtbb=no
+fi;
+
+
+# Check whether --with-tbb-lib or --without-tbb-lib was given.
+if test "${with_tbb_lib+set}" = set; then
+  withval="$with_tbb_lib"
+  withtbblib=$withval
+else
+  withtbblib=no
+fi;
+
+  if test "$withtbb" != no ; then
+    as_ac_File=`echo "ac_cv_file_$withtbb/include/tbb/task_scheduler_init.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $withtbb/include/tbb/task_scheduler_init.h" >&5
+echo $ECHO_N "checking for $withtbb/include/tbb/task_scheduler_init.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$withtbb/include/tbb/task_scheduler_init.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  TBB_INCLUDE_PATH=$withtbb/include
+fi
+
+    if test "$withtbblib" != no ; then
+      TBB_LIBS=$withtbblib
+    else
+      TBB_LIBS=""
+    fi
+  fi
+
+  if (test -r $TBB_INCLUDE_PATH/tbb/task_scheduler_init.h) ; then
+    TBB_LIBRARY=$TBB_LIBS
+    TBB_INCLUDE=-I$TBB_INCLUDE_PATH
+
+
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_TBB_API 1
+_ACEOF
+
+    echo "$as_me:$LINENO: result: <<< Configuring library with Intel TBB threading support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with Intel TBB threading support >>>" >&6
+  fi
 
 fi
 
@@ -12670,6 +12751,8 @@ s,@enablepetsc@,$enablepetsc,;t t
 s,@SLEPC_DIR@,$SLEPC_DIR,;t t
 s,@slepcversion@,$slepcversion,;t t
 s,@enableslepc@,$enableslepc,;t t
+s,@TBB_LIBRARY@,$TBB_LIBRARY,;t t
+s,@TBB_INCLUDE@,$TBB_INCLUDE,;t t
 s,@LASPACK_INCLUDE@,$LASPACK_INCLUDE,;t t
 s,@LASPACK_LIB@,$LASPACK_LIB,;t t
 s,@enablelaspack@,$enablelaspack,;t t
