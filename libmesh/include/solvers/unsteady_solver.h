@@ -110,18 +110,6 @@ public:
    */
   virtual Real du(const SystemNorm& norm) const;
 
-  /**
-   * This value (which defaults to zero) is the number of times the
-   * UnsteadySolver is allowed to halve deltat and let the DiffSolver
-   * repeat the latest failed solve with a reduced timestep.  Note
-   * that this has no effect for SteadySolvers.  Note that you must
-   * set at least one of the DiffSolver flags
-   * "continue_after_max_iterations" or
-   * "continue_after_backtrack_failure" to allow the UnsteadySolver to
-   * retry the solve.
-   */
-  unsigned int reduce_deltat_on_diffsolver_failure;
-  
 protected:
 
   /**
