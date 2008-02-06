@@ -448,6 +448,91 @@ bool NavierSystem::side_constraint (bool request_jacobian)
 }
 
 
+// We override the default mass_residual function,
+// because in the non-dimensionalized Navier-Stokes equations
+// the time derivative of velocity has a Reynolds number coefficient.
+// Alternatively we could divide the whole equation by
+// Reynolds number (or choose a more complicated non-dimensionalization
+// of time), but this gives us an opportunity to demonstrate overriding
+// FEMSystem::mass_residual()
+bool NavierSystem::mass_residual (bool request_jacobian)
+{
+  // The subvectors and submatrices we need to fill:
+  const unsigned int dim = this->get_mesh().mesh_dimension();
+
+  // Element Jacobian * quadrature weight for interior integration
+  const std::vector<Real> &JxW = fe_velocity->get_JxW();
+
+  // The velocity shape functions at interior quadrature points.
+  const std::vector<std::vector<Real> >& phi = fe_velocity->get_phi();
+
+  // The subvectors and submatrices we need to fill:
+  DenseSubVector<Number> &Fu = *elem_subresiduals[u_var];
+  DenseSubVector<Number> &Fv = *elem_subresiduals[v_var];
+  DenseSubVector<Number> &Fw = *elem_subresiduals[w_var];
+  DenseSubMatrix<Number> &Kuu = *elem_subjacobians[u_var][u_var];
+  DenseSubMatrix<Number> &Kvv = *elem_subjacobians[v_var][v_var];
+  DenseSubMatrix<Number> &Kww = *elem_subjacobians[w_var][w_var];
+
+  // The number of local degrees of freedom in velocity
+  const unsigned int n_u_dofs = dof_indices_var[u_var].size();
+
+  unsigned int n_qpoints = element_qrule->n_points();
+
+  for (unsigned int qp = 0; qp != n_qpoints; ++qp)
+    {
+      Number u = interior_value(u_var, qp),
+             v = interior_value(v_var, qp),
+             w = interior_value(w_var, qp);
+
+      // We pull as many calculations as possible outside of loops
+      Number JxWxRe   = JxW[qp] * Reynolds;
+      Number JxWxRexU = JxWxRe * u;
+      Number JxWxRexV = JxWxRe * v;
+      Number JxWxRexW = JxWxRe * w;
+
+      for (unsigned int i = 0; i != n_u_dofs; ++i)
+        {
+          Fu(i) += JxWxRexU * phi[i][qp];
+          Fv(i) += JxWxRexV * phi[i][qp];
+          if (dim == 3)
+            Fw(i) += JxWxRexW * phi[i][qp];
+
+          if (request_jacobian && elem_solution_derivative)
+            {
+              assert (elem_solution_derivative == 1.0);
+
+              Number JxWxRexPhiI = JxWxRe * phi[i][qp];
+              Number JxWxRexPhiII = JxWxRexPhiI * phi[i][qp];
+              Kuu(i,i) += JxWxRexPhiII;
+              Kvv(i,i) += JxWxRexPhiII;
+              if (dim == 3)
+                Kww(i,i) += JxWxRexPhiII;
+
+              // The mass matrix is symmetric, so we calculate
+              // one triangle and add it to both upper and lower
+              // triangles
+              for (unsigned int j = i+1; j != n_u_dofs; ++j)
+                {
+                  Number Kij = JxWxRexPhiI * phi[j][qp];
+                  Kuu(i,j) += Kij;
+                  Kuu(j,i) += Kij;
+                  Kvv(i,j) += Kij;
+                  Kvv(j,i) += Kij;
+                  if (dim == 3)
+                    {
+                      Kww(i,j) += Kij;
+                      Kww(j,i) += Kij;
+                    }
+                }
+            }
+        }
+    }
+
+  return request_jacobian;
+}
+
+
 
 Point NavierSystem::forcing(const Point& p)
 {

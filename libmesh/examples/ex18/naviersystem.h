@@ -43,6 +43,9 @@ public:
   virtual bool element_constraint (bool request_jacobian);
   virtual bool side_constraint (bool request_jacobian);
 
+  // Mass matrix part
+  virtual bool mass_residual (bool request_jacobian);
+
   // Indices for each variable;
   unsigned int p_var, u_var, v_var, w_var;
 
