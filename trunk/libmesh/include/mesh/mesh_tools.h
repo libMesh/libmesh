@@ -124,35 +124,33 @@ namespace MeshTools
   
   /**
    * @returns two points defining a cartesian box that bounds the
-   * elements belonging to processor pid.  If no processor id is specified
-   * the bounding box for the whole mesh is returned.
+   * elements belonging to processor pid. 
    */
   BoundingBox
   processor_bounding_box (const MeshBase& mesh,
-			  const unsigned int pid = libMesh::invalid_uint);
+			  const unsigned int pid);
 
   /**
    * Same, but returns a sphere instead of a box.
    */
   Sphere 
   processor_bounding_sphere (const MeshBase& mesh,
-			     const unsigned int pid = libMesh::invalid_uint);
+			     const unsigned int pid);
 
   /**
    * @returns two points defining a Cartesian box that bounds the
-   * elements belonging to subdomain sid.  If no subdomain id is specified
-   * the bounding box for the whole mesh is returned.
+   * elements belonging to subdomain sid.
    */
   std::pair<Point, Point> 
   subdomain_bounding_box (const MeshBase& mesh,
-			  const unsigned int sid = libMesh::invalid_uint);
+			  const unsigned int sid);
 
   /**
    * Same, but returns a sphere instead of a box.
    */
   Sphere 
   subdomain_bounding_sphere (const MeshBase& mesh,
-			     const unsigned int pid = libMesh::invalid_uint);
+			     const unsigned int pid);
 
 
   /**

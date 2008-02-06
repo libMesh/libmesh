@@ -33,6 +33,7 @@
 #include "parallel_mesh.h"
 #include "mesh_communication.h"
 #include "elem_range.h"
+#include "node_range.h"
 #include "threads.h"
 
 
@@ -72,6 +73,84 @@ namespace {
 
   private:
     unsigned int _weight;
+  };
+
+
+  /**
+   * FindBBox(Range) computes the bounding box for the objects
+   * in the specified range.  This class may be split and subranges
+   * can be executed on separate threads.  The join() method
+   * defines how the results from two separate threads are combined.
+   */
+  class FindBBox
+  {
+  public:
+    FindBBox () :
+      _vmin(3,  std::numeric_limits<Real>::max()),
+      _vmax(3, -std::numeric_limits<Real>::max())
+    {}
+
+    FindBBox (FindBBox &other, Threads::split) :
+      _vmin(other._vmin),
+      _vmax(other._vmax)
+    {}
+
+    std::vector<Real> & min() { return _vmin; }
+    std::vector<Real> & max() { return _vmax; }
+    
+    void operator()(const ConstNodeRange &range)
+    {
+      for (ConstNodeRange::const_iterator it = range.begin(); it != range.end(); ++it)
+	{
+          const Node *node = *it;
+	  assert (node != NULL);
+	  
+	  for (unsigned int i=0; i<3; i++)
+	    {
+	      _vmin[i] = std::min(_vmin[i], (*node)(i));
+	      _vmax[i] = std::max(_vmax[i], (*node)(i));
+	    }      
+        }
+    }
+
+    void operator()(const ConstElemRange &range)
+    {
+      for (ConstElemRange::const_iterator it = range.begin(); it != range.end(); ++it)
+	{
+          const Elem *elem = *it;
+	  assert (elem != NULL);
+
+	  for (unsigned int n=0; n<elem->n_nodes(); n++)
+	    for (unsigned int i=0; i<3; i++)
+	      {
+		_vmin[i] = std::min(_vmin[i], elem->point(n)(i));
+		_vmax[i] = std::max(_vmax[i], elem->point(n)(i));
+	      }      
+        }
+    }
+
+    void join (const FindBBox &other)
+    {
+      for (unsigned int i=0; i<3; i++)
+	{
+	  _vmin[i] = std::min(_vmin[i], other._vmin[i]);
+	  _vmax[i] = std::max(_vmax[i], other._vmax[i]);
+	}      
+    }
+
+    MeshTools::BoundingBox bbox () const
+    {
+      Point pmin(_vmin[0], _vmin[1], _vmin[2]);
+      Point pmax(_vmax[0], _vmax[1], _vmax[2]);
+
+      const MeshTools::BoundingBox ret_val(pmin, pmax);
+
+      return ret_val;        
+    }
+    
+  private:
+    std::vector<Real> _vmin;
+    std::vector<Real> _vmax;
   };
 }
 
@@ -172,9 +251,20 @@ void MeshTools::find_boundary_nodes (const MeshBase& mesh,
 MeshTools::BoundingBox
 MeshTools::bounding_box(const MeshBase& mesh)
 {
-  // processor bounding box with no arguments
-  // computes the global bounding box
-  return processor_bounding_box(mesh);
+  // This function must be run on all processors at once
+  parallel_only();
+
+  FindBBox find_bbox;
+  
+  Threads::parallel_reduce (ConstNodeRange (mesh.local_nodes_begin(),
+					    mesh.local_nodes_end()),
+			    find_bbox);
+  here();
+  // Compare the bounding boxes across processors
+  Parallel::min(find_bbox.min());
+  Parallel::max(find_bbox.max());
+
+  return find_bbox.bbox();
 }
 
 
@@ -196,58 +286,15 @@ MeshTools::BoundingBox
 MeshTools::processor_bounding_box (const MeshBase& mesh,
 				   const unsigned int pid)
 {
-  assert (mesh.n_nodes() != 0);
+  assert (pid < libMesh::n_processors());
 
-  std::vector<Real> vmin(3, std::numeric_limits<Real>::max());
-  std::vector<Real> vmax(3, -std::numeric_limits<Real>::max());
-
-  // By default no processor is specified and we compute
-  // the bounding box for the whole domain.
-  if (pid == libMesh::invalid_uint)
-    {
-      // This function must be run on all processors at once
-      // to calculate on the whole domain
-      parallel_only();
-
-      MeshBase::const_node_iterator       it  = mesh.local_nodes_begin();
-      const MeshBase::const_node_iterator end = mesh.local_nodes_end();
-
-      for (; it != end; ++it)
-        {
-          Node *node = *it;
-	  for (unsigned int i=0; i<mesh.spatial_dimension(); i++)
-	    {
-	      vmin[i] = std::min(vmin[i], (*node)(i));
-	      vmax[i] = std::max(vmax[i], (*node)(i));
-	    }      
-        }
-
-      // Compare the bounding boxes across processors
-      Parallel::min(vmin);
-      Parallel::max(vmax);
-    }
-  // if a specific processor id is specified then we need
-  // to only consider those elements living on that processor
-  else
-    {
-      MeshBase::const_element_iterator       el  = mesh.pid_elements_begin(pid);
-      const MeshBase::const_element_iterator end = mesh.pid_elements_end(pid);
-
-      for (; el != end; ++el)
-	for (unsigned int n=0; n<(*el)->n_nodes(); n++)
-	  for (unsigned int i=0; i<mesh.spatial_dimension(); i++)
-	    {
-	      vmin[i] = std::min(vmin[i], mesh.point((*el)->node(n))(i));
-	      vmax[i] = std::max(vmax[i], mesh.point((*el)->node(n))(i));
-	    }      
-    }
-
-  Point pmin(vmin[0], vmin[1], vmin[2]);
-  Point pmax(vmax[0], vmax[1], vmax[2]);
-
-  const BoundingBox ret_val(pmin, pmax);
-
-  return ret_val;  
+  FindBBox find_bbox;
+  
+  Threads::parallel_reduce (ConstElemRange (mesh.pid_elements_begin(pid),
+					    mesh.pid_elements_end(pid)),
+			    find_bbox);
+  
+  return find_bbox.bbox();
 }
 
 
@@ -275,34 +322,17 @@ MeshTools::subdomain_bounding_box (const MeshBase& mesh,
   Point min( 1.e30,  1.e30,  1.e30);
   Point max(-1.e30, -1.e30, -1.e30);
 
-  // By default no subdomain is specified and we compute
-  // the bounding box for the whole domain.
-  if (sid == libMesh::invalid_uint)
-    {
-      for (unsigned int n=0; n<mesh.n_nodes(); n++)
+  for (unsigned int e=0; e<mesh.n_elem(); e++)
+    if (mesh.elem(e)->subdomain_id() == sid)
+      for (unsigned int n=0; n<mesh.elem(e)->n_nodes(); n++)
 	for (unsigned int i=0; i<mesh.spatial_dimension(); i++)
 	  {
-	    min(i) = std::min(min(i), mesh.point(n)(i));
-	    max(i) = std::max(max(i), mesh.point(n)(i));
+	    min(i) = std::min(min(i), mesh.point(mesh.elem(e)->node(n))(i));
+	    max(i) = std::max(max(i), mesh.point(mesh.elem(e)->node(n))(i));
 	  }      
-    }
-
-  // if a specific subdomain id is specified then we need
-  // to only consider those elements living on that subdomain
-  else
-    {
-      for (unsigned int e=0; e<mesh.n_elem(); e++)
-	if (mesh.elem(e)->subdomain_id() == sid)
-	  for (unsigned int n=0; n<mesh.elem(e)->n_nodes(); n++)
-	    for (unsigned int i=0; i<mesh.spatial_dimension(); i++)
-	      {
-		min(i) = std::min(min(i), mesh.point(mesh.elem(e)->node(n))(i));
-		max(i) = std::max(max(i), mesh.point(mesh.elem(e)->node(n))(i));
-	      }      
-    }
-
+  
   const BoundingBox ret_val(min, max);
-
+  
   return ret_val;  
 }
 
