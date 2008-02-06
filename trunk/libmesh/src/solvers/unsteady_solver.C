@@ -9,7 +9,6 @@
 
 UnsteadySolver::UnsteadySolver (sys_type& s)
   : TimeSolver(s),
-    reduce_deltat_on_diffsolver_failure(0),
     first_solve                  (true),
     old_local_nonlinear_solution (NumericVector<Number>::build())
 {

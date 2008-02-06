@@ -9,6 +9,7 @@
 
 TimeSolver::TimeSolver (sys_type& s)
   : quiet(true),
+    reduce_deltat_on_diffsolver_failure(0),
     _diff_solver                 (NULL),
     _system                      (s)
 {
