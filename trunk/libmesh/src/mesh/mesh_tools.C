@@ -259,7 +259,6 @@ MeshTools::bounding_box(const MeshBase& mesh)
   Threads::parallel_reduce (ConstNodeRange (mesh.local_nodes_begin(),
 					    mesh.local_nodes_end()),
 			    find_bbox);
-  here();
   // Compare the bounding boxes across processors
   Parallel::min(find_bbox.min());
   Parallel::max(find_bbox.max());
