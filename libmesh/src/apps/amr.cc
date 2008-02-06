@@ -1,16 +1,18 @@
-#include "libmesh.h"
-#include "fe.h"
-#include "quadrature_gauss.h"
-#include "mesh.h"
-#include "dof_map.h"
-#include "steady_system.h"
-#include "equation_systems.h"
-#include "mesh_refinement.h"
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
+#include "coupling_matrix.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
+#include "dof_map.h"
+#include "elem.h"
+#include "equation_systems.h"
+#include "fe.h"
 #include "gmv_io.h"
+#include "libmesh.h"
+#include "linear_implicit_system.h"
+#include "mesh.h"
+#include "mesh_refinement.h"
+#include "numeric_vector.h"
+#include "quadrature_gauss.h"
+#include "sparse_matrix.h"
 
 
 
@@ -55,14 +57,15 @@ int main (int argc, char** argv)
     // Set up the equation system(s)
     EquationSystems es (mesh);
 
-    SteadySystem& primary = es.add_system<SteadySystem>("primary");
+    LinearImplicitSystem& primary =
+      es.add_system<LinearImplicitSystem>("primary");
 
     primary.add_variable ("U", FIRST);
     primary.add_variable ("V", FIRST);
 
-    primary.get_dof_map()._dof_coupling.resize(2);      
-    primary.get_dof_map()._dof_coupling(0,0) = 1;
-    primary.get_dof_map()._dof_coupling(1,1) = 1;
+    primary.get_dof_map()._dof_coupling->resize(2);      
+    (*primary.get_dof_map()._dof_coupling)(0,0) = 1;
+    (*primary.get_dof_map()._dof_coupling)(1,1) = 1;
     
     primary.attach_assemble_function(assemble);
     
@@ -107,7 +110,7 @@ void assemble(EquationSystems& es,
 {
   assert (system_name == "primary");
   
-  const Mesh& mesh       = es.get_mesh();
+  const MeshBase& mesh   = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
   
   // Also use a 3x3x3 quadrature rule (3D).  Then tell the FE
@@ -124,7 +127,8 @@ void assemble(EquationSystems& es,
   
   fe_face->attach_quadrature_rule(&qface);
   
-  SteadySystem& system = es.get_system<SteadySystem>("primary");
+  LinearImplicitSystem& system =
+    es.get_system<LinearImplicitSystem>("primary");
   
   
   // These are references to cell-specific data
