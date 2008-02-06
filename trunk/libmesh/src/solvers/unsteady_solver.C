@@ -133,20 +133,5 @@ Real UnsteadySolver::du(const SystemNorm &norm) const
 
   solution_copy->close();
 
-  if (norm.type(0) == DISCRETE_L2)
-    return solution_copy->l2_norm();
-
-  else if (norm.type(0) == DISCRETE_L1)
-    return solution_copy->l1_norm();
-
-  else
-    {
-      std::cout << "Unrecognized norm "
-		<< norm.type(0)
-		<< " requested.";
-      error();
-    }
-
-  return 0.;
-    
+  return _system.calculate_norm(solution_copy, norm);
 }
