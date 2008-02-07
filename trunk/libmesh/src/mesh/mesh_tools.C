@@ -160,12 +160,10 @@ namespace {
 // MeshTools functions
 unsigned int MeshTools::total_weight(const MeshBase& mesh)
 {
-  SumElemWeight sew;
+  unsigned int weight = MeshTools::weight (mesh, libMesh::processor_id());
+  Parallel::sum(weight);
   
-  Threads::parallel_reduce (ConstElemRange (mesh.elements_begin(),
-					    mesh.elements_end()),
-			    sew);
-  return sew.weight();
+  return weight;
 }
 
 
