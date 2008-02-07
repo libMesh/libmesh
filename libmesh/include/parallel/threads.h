@@ -34,6 +34,7 @@
 #  include "tbb/parallel_reduce.h"
 #  include "tbb/task_scheduler_init.h"
 #  include "tbb/spin_mutex.h"
+#  include "tbb/atomic.h"
 #endif
 
 /**
@@ -102,7 +103,16 @@ namespace Threads
    */
   typedef tbb::spin_mutex spin_mutex;
 
+  //-------------------------------------------------------------------
+  /**
+   * Defines atomic operations which can only be executed on a 
+   * single thread at a time.  This is used in reference counting,
+   * for example, to allow count++/count-- to work.
+   */
+  template <typename T>
+  class atomic : public tbb::atomic<T> {};
 
+  
 
 #else //HAVE_TBB_API
 
@@ -191,6 +201,16 @@ namespace Threads
    * Defines atomic operations which can only be executed on a 
    * single thread at a time.
    */
+  template <typename T>
+  class atomic
+  {
+  public:
+    atomic () : _val(0) {}
+    operator T& () { return _val; }
+  private:
+    T _val;
+  };
+
   
 
 #endif // #ifdef HAVE_TBB_API
