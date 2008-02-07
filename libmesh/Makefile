@@ -28,6 +28,14 @@ srcfiles 	:= $(wildcard src/*/*.C)
 examplesrcfiles	:= $(wildcard examples/ex*/*.C)
 
 #
+# apps source files
+appsrcfiles	:= $(wildcard src/apps/*.cc)
+
+#
+# apps binary files
+appbinfiles	:= $(patsubst %.cc, %, $(addprefix bin/, $(notdir $(appsrcfiles))))
+
+#
 # object files
 objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 
@@ -46,7 +54,7 @@ target := $(mesh_library)
 ifeq ($(syn-mode),on)
   all:: $(objects)
 else
-  all:: $(target)
+  all:: $(target) $(appbinfiles)
 endif
 ###############################################################################
 
@@ -165,7 +173,7 @@ clobber:
 	@$(MAKE) clean
 	@$(MAKE) -C contrib $(MAKECMDGOALS)
 	@$(MAKE) -C examples $(MAKECMDGOALS)
-	@rm -rf config.status $(targ_dir) bin/grid2grid bin/meshtool bin/testexodus bin/amr bin/compare
+	@rm -rf config.status $(targ_dir) $(appbinfiles)
 
 #
 # Make clobber, remove documentation, removes all libraries & object files for all modes
@@ -248,7 +256,8 @@ cvsweb:
 # and is a standalone program, then make bin/foo will work.
 #
 bin/% : src/apps/%.cc $(mesh_library)
-	$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) $< -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS)
+	@echo "Building $@"
+	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) $< -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS)
 
 #
 # In the contrib/bin directory, we run the test_headers.sh shell
