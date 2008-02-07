@@ -36,8 +36,8 @@ ReferenceCounter::Counts ReferenceCounter::_counts;
 
 #endif
 
-unsigned int             ReferenceCounter::_n_objects=0;
-Threads::spin_mutex      ReferenceCounter:: _mutex;
+Threads::atomic<unsigned int> ReferenceCounter::_n_objects;
+Threads::spin_mutex  ReferenceCounter::_mutex;
 
 
 // ------------------------------------------------------------
