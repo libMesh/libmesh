@@ -29,7 +29,7 @@
 #include "point.h"
 #include "elem_quality.h"
 #include "gmv_io.h"
-#include "xdr_io.h"
+#include "legacy_xdr_io.h"
 #include "statistics.h"
 #include "inf_elem_builder.h"
 #include "mesh_data.h"
@@ -612,9 +612,9 @@ int main (int argc, char** argv)
      * Possibly read the solution
      */
     if (names.size() == 3)
-      XdrIO(mesh,true).read_mgf_soln(names[2],
-				     soln,
-				     var_names);
+      LegacyXdrIO(mesh,true).read_mgf_soln(names[2],
+				           soln,
+				           var_names);
 
 
 
