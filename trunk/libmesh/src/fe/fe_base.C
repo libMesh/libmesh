@@ -34,6 +34,7 @@
 #include "numeric_vector.h"
 #include "quadrature.h"
 #include "quadrature_gauss.h"
+#include "threads.h"
 
 
 
@@ -1759,12 +1760,19 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 		    if (std::abs(their_dof_value) < 1.e-5)
 		      continue;
 
-		    DofConstraintRow& constraint_row =
-                      constraints[my_dof_g];
+		    // since we may be running this method concurretly 
+		    // on multiple threads we need to acquire a lock 
+		    // before modifying the shared constraint_row object.
+		    {
+		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
-		    constraint_row.insert(std::make_pair(their_dof_g,
-						         their_dof_value));
-	          }
+		      DofConstraintRow& constraint_row =
+			constraints[my_dof_g];
+		      
+		      constraint_row.insert(std::make_pair(their_dof_g,
+							   their_dof_value));
+		    }
+		  }
 	      }
 	  }
         // p refinement constraints:
@@ -2034,12 +2042,19 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 		      if (std::abs(their_dof_value) < 1.e-5)
 		        continue;
 
-		      DofConstraintRow& constraint_row =
-                        constraints[my_dof_g];
+		      // since we may be running this method concurretly 
+		      // on multiple threads we need to acquire a lock 
+		      // before modifying the shared constraint_row object.
+		      {
+			Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
-		      constraint_row.insert(std::make_pair(their_dof_g,
-						           their_dof_value));
-	            }
+			DofConstraintRow& constraint_row =
+			  constraints[my_dof_g];
+
+			constraint_row.insert(std::make_pair(their_dof_g,
+							     their_dof_value));
+		      }
+		    }
 	        }
 	    }
           // p refinement constraints:

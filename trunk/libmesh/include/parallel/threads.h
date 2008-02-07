@@ -33,6 +33,7 @@
 #  include "tbb/parallel_for.h"
 #  include "tbb/parallel_reduce.h"
 #  include "tbb/task_scheduler_init.h"
+#  include "tbb/spin_mutex.h"
 #endif
 
 /**
@@ -94,6 +95,12 @@ namespace Threads
   void parallel_reduce (const Range &range, Body &body, const Partitioner &partitioner)
   { tbb::parallel_reduce (range, body, partitioner); }
 
+  //-------------------------------------------------------------------
+  /**
+   * Spin mutex.  Implements mutual exclusion by busy-waiting in user
+   * space for the lock to be acquired.
+   */
+  typedef tbb::spin_mutex spin_mutex;
 
 
 
@@ -159,7 +166,42 @@ namespace Threads
   void parallel_reduce (const Range &range, Body &body, const Partitioner &)
   { body(range); }
 
-#endif
-}
+  //-------------------------------------------------------------------
+  /**
+   * Spin mutex.  Implements mutual exclusion by busy-waiting in user
+   * space for the lock to be acquired.
+   */
+  class spin_mutex 
+  {
+  public:
+    spin_mutex() {}
+
+    class scoped_lock 
+    {
+    public:
+      scoped_lock () {}
+      scoped_lock ( spin_mutex&  ) {} 
+      void acquire ( spin_mutex& ) {}
+      void release () {}
+    };
+  };
+
+  //-------------------------------------------------------------------
+  /**
+   * Defines atomic operations which can only be executed on a 
+   * single thread at a time.
+   */
+  
+
+#endif // #ifdef HAVE_TBB_API
+
+  /**
+   * A spin mutex object which 
+   */
+  extern spin_mutex spin_mtx;
+
+
+
+} // namespace Threads
 
 #endif // #define __threads_h__
