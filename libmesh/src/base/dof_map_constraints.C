@@ -37,7 +37,66 @@
 #include "numeric_vector.h" // likewise
 #include "parallel.h"
 #include "point_locator_base.h"
+#include "elem_range.h"
 
+
+
+// Anonymous namespace to hold helper classes
+namespace {
+
+  class ComputeConstraints
+  {
+  public:
+    ComputeConstraints (DofConstraints &constraints,
+			DofMap &dof_map,
+#ifdef ENABLE_PERIODIC
+			PeriodicBoundaries &periodic_boundaries,
+#endif
+			const MeshBase &mesh,
+			const unsigned int variable_number) :
+      _constraints(constraints),
+      _dof_map(dof_map),
+#ifdef ENABLE_PERIODIC
+      _periodic_boundaries(periodic_boundaries),
+#endif
+      _mesh(mesh),
+      _variable_number(variable_number)
+    {}
+
+    void operator()(const ConstElemRange &range) const
+    {
+      for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
+        {
+#ifdef ENABLE_AMR
+	  FEInterface::compute_constraints (_constraints,
+					    _dof_map,
+					    _variable_number,
+					    *it);
+#endif
+#ifdef ENABLE_PERIODIC
+          // FIXME: periodic constraints won't work on a non-serial
+          // mesh unless it's kept ghost elements from opposing
+          // boundaries!
+	  FEInterface::compute_periodic_constraints (_constraints,
+					             _dof_map,
+                                                     _periodic_boundaries,
+						     _mesh,
+					             _variable_number,
+					             *it);
+#endif
+        }
+    }
+
+  private:
+    DofConstraints &_constraints;
+    DofMap &_dof_map;
+#ifdef ENABLE_PERIODIC
+    PeriodicBoundaries &_periodic_boundaries;
+#endif
+    const MeshBase &_mesh;
+    const unsigned int _variable_number;    
+  };
+}
 
 
 
@@ -69,44 +128,40 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
   
   // clear any existing constraints.
   _dof_constraints.clear();
+
+  // define the range of elements of interest
+  ConstElemRange range;
+  {
+    // With SerialMesh or a serial ParallelMesh, every processor
+    // computes every constraint
+    MeshBase::const_element_iterator
+      elem_begin = mesh.elements_begin(),
+      elem_end   = mesh.elements_end();
+    
+    // With a parallel ParallelMesh, processors compute only
+    // their local constraints
+    if (!mesh.is_serial())
+      {
+	elem_begin = mesh.local_elements_begin();
+	elem_end   = mesh.local_elements_end(); 
+      }
+
+    // set the range to contain the specified elements
+    range.reset (elem_begin, elem_end);
+  }
   
-  // Look at all the variables in the system
+  // Look at all the variables in the system.  Reset the element
+  // range at each iteration -- there is no need to reconstruct it.
   for (unsigned int variable_number=0; variable_number<this->n_variables();
-       ++variable_number)
-    {
-      // With SerialMesh or a serial ParallelMesh, every processor
-      // computes every constraint
-      MeshBase::const_element_iterator  elem_it = mesh.elements_begin(),
-                                       elem_end = mesh.elements_end();
-      // With a parallel ParallelMesh, processors compute only
-      // their local constraints
-      if (!mesh.is_serial())
-        {
-          elem_it = mesh.local_elements_begin();
-          elem_end = mesh.local_elements_end(); 
-        }
-      
-      for ( ; elem_it != elem_end; ++elem_it)
-        {
-#ifdef ENABLE_AMR
-	  FEInterface::compute_constraints (_dof_constraints,
-					    *this,
-					    variable_number,
-					    *elem_it);
-#endif
+       ++variable_number, range.reset())
+    Threads::parallel_for (range,
+			   ComputeConstraints (_dof_constraints,
+					       *this,
 #ifdef ENABLE_PERIODIC
-          // FIXME: periodic constraints won't work on a non-serial
-          // mesh unless it's kept ghost elements from opposing
-          // boundaries!
-	  FEInterface::compute_periodic_constraints (_dof_constraints,
-					             *this,
-                                                     _periodic_boundaries,
-						     mesh,
-					             variable_number,
-					             *elem_it);
+					       _periodic_boundaries,
 #endif
-        }
-    }
+					       mesh,
+					       variable_number));
 
   // With a parallelized Mesh, we've computed our local constraints,
   // but they may depend on non-local constraints that we'll need to
@@ -1093,6 +1148,12 @@ void DofMap::constrain_p_dofs (unsigned int var,
 	  FEInterface::n_dofs_at_node (dim, low_p_fe_type, type, n);
         const unsigned int high_nc =
 	  FEInterface::n_dofs_at_node (dim, high_p_fe_type, type, n);
+	
+	// since we may be running this method concurretly 
+	// on multiple threads we need to acquire a lock 
+	// before modifying the _dof_constraints object.
+	Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+	
         if (elem->is_vertex(n))
           {
 	    // Add "this is zero" constraint rows for high p vertex

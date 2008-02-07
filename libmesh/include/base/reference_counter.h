@@ -24,7 +24,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-
+#include "threads.h"
 
 // C++ includes
 #include <string>
@@ -116,6 +116,11 @@ protected:
    * information when the number returns to 0.
    */
   static unsigned int _n_objects;
+
+  /**
+   * Mutual exclusion object to enable thread-safe reference counting.
+   */
+  static Threads::spin_mutex _mutex;
 };
 
 
@@ -124,6 +129,7 @@ protected:
 // ReferenceCounter class inline methods
 inline ReferenceCounter::ReferenceCounter()
 {
+  Threads::spin_mutex::scoped_lock lock(_mutex);
   _n_objects++;
 }
 
@@ -131,6 +137,7 @@ inline ReferenceCounter::ReferenceCounter()
 
 inline ReferenceCounter::~ReferenceCounter()
 {
+  Threads::spin_mutex::scoped_lock lock(_mutex);
   _n_objects--;
 }
 
@@ -143,6 +150,7 @@ inline ReferenceCounter::~ReferenceCounter()
 inline
 void ReferenceCounter::increment_constructor_count (const std::string& name)
 {
+  Threads::spin_mutex::scoped_lock lock(_mutex);
   std::pair<unsigned int, unsigned int>& p = _counts[name];
 
   p.first++;
@@ -160,6 +168,7 @@ void ReferenceCounter::increment_constructor_count (const std::string&)
 inline
 void ReferenceCounter::increment_destructor_count (const std::string& name)
 {
+  Threads::spin_mutex::scoped_lock lock(_mutex);
   std::pair<unsigned int, unsigned int>& p = _counts[name];
 
   p.second++;

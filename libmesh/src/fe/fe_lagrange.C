@@ -25,6 +25,7 @@
 #include "fe_macro.h"
 #include "fe_interface.h"
 #include "elem.h"
+#include "threads.h"
 
 
 
@@ -746,6 +747,11 @@ void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 		  if ((std::abs(their_dof_value) > 1.e-5) &&
 		      (std::abs(their_dof_value) < .999)) 
 		    {
+		      // since we may be running this method concurretly 
+		      // on multiple threads we need to acquire a lock 
+		      // before modifying the shared constraint_row object.		      
+		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
 		      // A reference to the constraint row.
 		      DofConstraintRow& constraint_row = constraints[my_dof_g];
 		      
