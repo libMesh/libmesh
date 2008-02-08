@@ -165,7 +165,9 @@ unsigned int MeshTools::total_weight(const MeshBase& mesh)
       parallel_only();
       unsigned int weight = MeshTools::weight (mesh, libMesh::processor_id());
       Parallel::sum(weight);
-      return weight;
+      unsigned int unparitioned_weight =
+        MeshTools::weight (mesh, DofObject::invalid_processor_id);
+      return weight + unpartitioned_weight;
     }
   
   SumElemWeight sew;
