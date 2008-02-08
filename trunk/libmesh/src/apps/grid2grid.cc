@@ -13,7 +13,7 @@
 #include "quadrature_gauss.h"
 #include "tecplot_io.h"
 #include "tree.h"
-#include "xdr_io.h"
+#include "legacy_xdr_io.h"
 
 
 
@@ -64,17 +64,17 @@ int main (int argc, char** argv)
     // Read the coarse solution
     {
       std::cout << "Reading Soln " << argv[4] << std::endl;
-      XdrIO(mesh_coarse,true).read_mgf_soln(std::string(argv[4]),
-					    coarse_solution,
-					    coarse_var_names);
+      LegacyXdrIO(mesh_coarse,true).read_mgf_soln(std::string(argv[4]),
+					          coarse_solution,
+					          coarse_var_names);
     }
 
     // Read the fine solution
     {
       std::cout << "Reading Soln " << argv[5] << std::endl;
-      XdrIO(mesh_fine,true).read_mgf_soln(std::string(argv[5]),
-					  fine_solution,
-					  fine_var_names);
+      LegacyXdrIO(mesh_fine,true).read_mgf_soln(std::string(argv[5]),
+					        fine_solution,
+					        fine_var_names);
     }
 
   
