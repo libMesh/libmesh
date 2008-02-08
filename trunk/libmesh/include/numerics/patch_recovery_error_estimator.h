@@ -30,10 +30,10 @@
 #include "enum_order.h"
 #include "patch.h"
 #include "point.h"
+#include "elem_range.h"
 
 // Forward Declarations
 class Elem;
-
 
 
 /**
@@ -89,10 +89,36 @@ private:
    * Returns the spectral polynomial basis function values at a point x,y,z
    */
   
-  std::vector<Real> specpoly(const unsigned int dim,
-			     const Order order,
-			     const Point p,
-			     const unsigned int matsize);
+  static std::vector<Real> specpoly(const unsigned int dim,
+				    const Order order,
+				    const Point p,
+				    const unsigned int matsize);
+
+  /**
+   * Class to compute the error contribution for a range
+   * of elements. May be executed in parallel on separate threads.
+   */
+  class EstimateError
+  {
+  public:
+    EstimateError (const System& sys,
+		   const PatchRecoveryErrorEstimator &ee,
+		   ErrorVector& epc) :
+      system(sys),
+      error_estimator(ee),
+      error_per_cell(epc)
+    {}
+
+    void operator()(const ConstElemRange &range) const;
+    
+  private:
+
+    const System &system;
+    const PatchRecoveryErrorEstimator &error_estimator;
+    ErrorVector &error_per_cell;    
+  };
+
+  friend class EsitmateError;
 };
 
 
