@@ -26,7 +26,6 @@
 
 // Local Includes
 #include "libmesh_common.h"
-#include "libmesh_logging.h"
 #include "patch.h"
 #include "elem.h"
 
@@ -75,20 +74,17 @@ void Patch::find_face_neighbors(std::set<const Elem *> &new_neighbors)
 
 void Patch::add_face_neighbors()
 {
-  START_LOG("add_face_neighbors()", "Patch");
   std::set<const Elem *> new_neighbors;
 
   this->find_face_neighbors(new_neighbors);
     
   this->insert(new_neighbors.begin(), new_neighbors.end());
-  STOP_LOG("add_face_neighbors()", "Patch");
 }
 
 
 
 void Patch::add_local_face_neighbors()
 {
-  START_LOG("add_local_face_neighbors()", "Patch");
   std::set<const Elem *> new_neighbors;
 
   this->find_face_neighbors(new_neighbors);
@@ -105,7 +101,6 @@ void Patch::add_local_face_neighbors()
     }
 
   this->insert(new_neighbors.begin(), new_neighbors.end());
-  STOP_LOG("add_local_face_neighbors()", "Patch");
 }
     
 
@@ -132,20 +127,17 @@ void Patch::find_point_neighbors(std::set<const Elem *> &new_neighbors)
 
 void Patch::add_point_neighbors()
 {
-  START_LOG("add_point_neighbors()", "Patch");
   std::set<const Elem *> new_neighbors;
 
   this->find_point_neighbors(new_neighbors);
     
   this->insert(new_neighbors.begin(), new_neighbors.end());
-  STOP_LOG("add_point_neighbors()", "Patch");
 }
 
 
   
 void Patch::add_local_point_neighbors()
 {
-  START_LOG("add_local_point_neighbors()", "Patch");
   std::set<const Elem *> new_neighbors;
 
   this->find_point_neighbors(new_neighbors);
@@ -160,7 +152,6 @@ void Patch::add_local_point_neighbors()
 	  libMesh::processor_id()) // ... if the neighbor belongs to this processor
 	this->insert (neighbor);   // ... then add it to the patch
     }
-  STOP_LOG("add_local_point_neighbors()", "Patch");
 }
   
 
@@ -169,7 +160,6 @@ void Patch::build_around_element (const Elem* e0,
                                   const unsigned int target_patch_size,
                                   PMF patchtype)
 {
-  START_LOG("build_around_element()", "Patch");
   
   // Make sure we are building a patch for an active element.
   assert (e0 != NULL);
@@ -196,9 +186,7 @@ void Patch::build_around_element (const Elem* e0,
       const unsigned int old_patch_size = this->size();
       
       // We profile the patch-extending functions separately
-      PAUSE_LOG("build_around_element()", "Patch");
       (this->*patchtype)();
-      RESTART_LOG("build_around_element()", "Patch");
       
       // Check for a "stagnant" patch
       if (this->size() == old_patch_size)
@@ -234,5 +222,4 @@ void Patch::build_around_element (const Elem* e0,
   }
 #endif
 
-  STOP_LOG("build_around_element()", "Patch");
 }
