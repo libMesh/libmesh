@@ -32,7 +32,7 @@
 #include "libmesh_common.h"
 #include "reference_counted_object.h"
 #include "system_norm.h"
-
+#include "elem_range.h"
 
 // Forward Declarations
 class System;
@@ -731,7 +731,77 @@ private:
    * additional vectors were actually written for this file.
    */
   bool _additional_data_written;
-  
+
+
+  /**
+   * This class implements projecting a vector from 
+   * an old mesh to the newly refined mesh.  This
+   * may be exectued in parallel on multiple threads.
+   */
+  class ProjectVector 
+  {
+  private:
+    const System                &system;
+    const NumericVector<Number> &old_vector;
+    NumericVector<Number>       &new_vector;
+
+  public:
+    ProjectVector (const System &system_in,
+		   const NumericVector<Number> &old_v_in,
+		   NumericVector<Number> &new_v_in) :
+    system(system_in),
+    old_vector(old_v_in),
+    new_vector(new_v_in)
+    {}
+    
+    void operator()(const ConstElemRange &range) const;
+  };
+
+
+  /**
+   * This class implements projecting a vector from 
+   * an old mesh to the newly refined mesh.  This
+   * may be exectued in parallel on multiple threads.
+   */
+  class ProjectSolution
+  {
+  private:
+    const System                &system;
+
+    Number (* fptr)(const Point& p,
+		    const Parameters& parameters,
+		    const std::string& sys_name,
+		    const std::string& unknown_name);
+
+    Gradient (* gptr)(const Point& p,
+		      const Parameters& parameters,
+		      const std::string& sys_name,
+		      const std::string& unknown_name);
+
+    Parameters &parameters;
+    NumericVector<Number>       &new_vector;
+
+  public:
+    ProjectSolution (const System &system_in,
+		     Number fptr_in(const Point& p,
+				    const Parameters& parameters,
+				    const std::string& sys_name,
+				    const std::string& unknown_name),
+		     Gradient gptr_in(const Point& p,
+				      const Parameters& parameters,
+				      const std::string& sys_name,
+				      const std::string& unknown_name),
+		     Parameters &parameters_in,
+		     NumericVector<Number> &new_v_in) :
+    system(system_in),
+    fptr(fptr_in),
+    gptr(gptr_in),
+    parameters(parameters_in),
+    new_vector(new_v_in)
+    {}
+    
+    void operator()(const ConstElemRange &range) const;
+  };
 };
 
 
