@@ -133,6 +133,23 @@ void libMesh::init (int &argc, char** & argv,
   {
     int n_threads = 
       libMesh::command_line_value ("--n_threads", Threads::task_scheduler_init::automatic);
+
+#ifdef ENABLE_PERFORMANCE_LOGGING
+    // allow the user to disable performance logging at run-time.    
+    if (libMesh::on_command_line ("--disable-perflog"))
+      libMesh::perflog.disable_logging();
+      
+#  ifdef HAVE_TBB_API
+    // performance logging is currently not thread-safe.
+    // but only do this when threading is actually enabled
+    // to avoid unwarranted warnings.
+    else if (n_threads != 1)
+      {
+	std::cout << "WARNING:  performance logging is currently not thread-safe.  Disabling." << std::endl;
+	libMesh::perflog.disable_logging();
+      }
+#  endif
+#endif
     
     task_scheduler.reset (new Threads::task_scheduler_init(n_threads));
   }

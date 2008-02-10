@@ -129,6 +129,11 @@ class PerfLog
   void clear();
 
   /**
+   * Disables performance logging for an active object.
+   */
+  void disable_logging() { log_events = false; }
+
+  /**
    * Start monitoring the event named \p label.
    */
   void start_event(const std::string &label,
@@ -192,7 +197,7 @@ class PerfLog
   /**
    * Flag to optionally disable all logging.
    */
-  const bool log_events;
+  bool log_events;
 
   /**
    * The total running time for recorded events.
