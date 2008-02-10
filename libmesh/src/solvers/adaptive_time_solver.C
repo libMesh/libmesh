@@ -59,7 +59,7 @@ void AdaptiveTimeSolver::solve()
   // enough
   bool max_tolerance_met = false;
 
-  // Calcualting error values each time
+  // Calculating error values each time
   Real single_norm(0.), double_norm(0.), error_norm(0.),
        relative_error(0.);
  
