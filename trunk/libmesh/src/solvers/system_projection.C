@@ -35,7 +35,7 @@
 #include "fe_base.h"
 #include "quadrature_gauss.h"
 #include "dense_vector.h"
-
+#include "threads.h"
 
 
 // ------------------------------------------------------------
@@ -71,7 +71,6 @@ void System::project_vector (const NumericVector<Number>& old_v,
   new_v.clear();
 
   // Resize the new vector and get a serial version.
-
   NumericVector<Number> *new_vector_ptr;
   AutoPtr<NumericVector<Number> > new_vector_built;
   NumericVector<Number> *local_old_vector;
@@ -108,22 +107,142 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
   NumericVector<Number> &new_vector = *new_vector_ptr;
   const NumericVector<Number> &old_vector = *old_vector_ptr;
-   
-#ifdef ENABLE_AMR
+    
+#ifdef ENABLE_AMR 
 
+  Threads::parallel_for (ConstElemRange (this->get_mesh().active_local_elements_begin(),
+					 this->get_mesh().active_local_elements_end(),
+					 1000),
+			 ProjectVector(*this,
+				       old_vector,
+				       new_vector)
+			 );
+
+  new_vector.close();
+
+  // If the old vector was serial, we probably need to send our values
+  // to other processors
+  if (old_v.size() == old_v.local_size())
+    {
+      AutoPtr<NumericVector<Number> > dist_v = NumericVector<Number>::build();
+      dist_v->init(this->n_dofs(), this->n_local_dofs());
+      dist_v->close();
+    
+      for (unsigned int i=0; i!=dist_v->size(); i++)
+        if (new_vector(i) != 0.0)
+          dist_v->set(i, new_vector(i));
+
+      dist_v->close();
+
+      dist_v->localize (new_v);
+      new_v.close();
+    }
+  // If the old vector was parallel, we need to update it
+  // and free the localized copies
+  else
+    {
+      // We may have to set dof values that this processor doesn't
+      // own in certain special cases, like LAGRANGE FIRST or
+      // HERMITE THIRD elements on second-order meshes
+      for (unsigned int i=0; i!=new_v.size(); i++)
+        if (new_vector(i) != 0.0)
+          new_v.set(i, new_vector(i));
+      new_v.close();
+    }
+
+  this->get_dof_map().enforce_constraints_exactly(*this, &new_v);
+
+#else
+
+  // AMR is disabled: simply copy the vector
+  new_vector = old_vector;
+  
+#endif // #ifdef ENABLE_AMR
+
+  STOP_LOG("project_vector()", "System");
+}
+
+
+
+/**
+ * This method projects an analytic function onto the solution via L2
+ * projections and nodal interpolations on each element.
+ */
+void System::project_solution (Number fptr(const Point& p,
+                                           const Parameters& parameters,
+                                           const std::string& sys_name,
+                                           const std::string& unknown_name),
+                               Gradient gptr(const Point& p,
+                                             const Parameters& parameters,
+                                             const std::string& sys_name,
+                                             const std::string& unknown_name),
+                               Parameters& parameters) const
+{
+  this->project_vector(fptr, gptr, parameters, *solution);
+
+  solution->localize(*current_local_solution);
+}
+
+
+
+/**
+ * This method projects an analytic function via L2 projections and
+ * nodal interpolations on each element.
+ */
+void System::project_vector (Number fptr(const Point& p,
+                                         const Parameters& parameters,
+                                         const std::string& sys_name,
+                                         const std::string& unknown_name),
+                             Gradient gptr(const Point& p,
+                                           const Parameters& parameters,
+                                           const std::string& sys_name,
+                                           const std::string& unknown_name),
+                             Parameters& parameters,
+                             NumericVector<Number>& new_vector) const
+{
+  START_LOG ("project_vector()", "System");
+
+  Threads::parallel_for (ConstElemRange (this->get_mesh().active_local_elements_begin(),
+					 this->get_mesh().active_local_elements_end(),
+					 1000),
+			 ProjectSolution(*this,
+					 fptr,
+					 gptr,
+					 parameters,
+					 new_vector)
+			 );
+
+
+  new_vector.close();
+
+#ifdef ENABLE_AMR
+  this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
+#endif
+
+  STOP_LOG("project_vector()", "System");
+}
+
+
+
+void System::ProjectVector::operator()(const ConstElemRange &range) const
+{
   // A vector for Lagrange element interpolation, indicating if we
-  // have visited a DOF yet
+  // have visited a DOF yet.  Note that this is thread-local storage,
+  // hence shared DOFS that live on thread boundaries may be doubly
+  // computed.  It is expected that this will be more efficient
+  // than locking a thread-global version of already_done, though.
+  //
   // FIXME: we should use this for non-Lagrange coarsening, too
-  std::vector<bool> already_done (this->n_dofs(), false);
+  std::vector<bool> already_done (system.n_dofs(), false);
 
   // The number of variables in this system
-  const unsigned int n_variables = this->n_vars();
+  const unsigned int n_variables = system.n_vars();
 
   // The dimensionality of the current mesh
-  const unsigned int dim = _mesh.mesh_dimension();
+  const unsigned int dim = system.get_mesh().mesh_dimension();
 
   // The DofMap for this system
-  const DofMap& dof_map = this->get_dof_map();
+  const DofMap& dof_map = system.get_dof_map();
 
   // The element matrix and RHS for projections.
   // Note that Ke is always real-valued, whereas
@@ -193,13 +312,8 @@ void System::project_vector (const NumericVector<Number>& old_v,
       // Side/edge DOF indices
       std::vector<unsigned int> new_side_dofs, old_side_dofs;
    
-      // Iterators for the active elements on local processor
-      MeshBase::element_iterator       elem_it =
-		      _mesh.active_local_elements_begin();
-      const MeshBase::element_iterator elem_end = 
-		      _mesh.active_local_elements_end();
-   
-      for ( ; elem_it != elem_end; ++elem_it)
+      // Iterate over the elements in the range
+      for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
 	{
 	  const Elem* elem = *elem_it;
 	  const Elem* parent = elem->parent();
@@ -472,96 +586,23 @@ void System::project_vector (const NumericVector<Number>& old_v,
               (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
           }  // end fe_type if()
 
-	  for (unsigned int i = 0; i < new_n_dofs; i++) 
-	    if (Ue(i) != 0.)
-              new_vector.set(new_dof_indices[i], Ue(i));
+	  // Lock the new_vector since it is shared among threads.
+	  {
+	    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+	    for (unsigned int i = 0; i < new_n_dofs; i++) 
+	      if (Ue(i) != 0.)
+		new_vector.set(new_dof_indices[i], Ue(i));
+	  }
         }  // end elem loop
     } // end variables loop
-
-  new_vector.close();
-
-  // If the old vector was serial, we probably need to send our values
-  // to other processors
-  if (old_v.size() == old_v.local_size())
-    {
-      AutoPtr<NumericVector<Number> > dist_v = NumericVector<Number>::build();
-      dist_v->init(this->n_dofs(), this->n_local_dofs());
-      dist_v->close();
-    
-      for (unsigned int i=0; i!=dist_v->size(); i++)
-        if (new_vector(i) != 0.0)
-          dist_v->set(i, new_vector(i));
-
-      dist_v->close();
-
-      dist_v->localize (new_v);
-      new_v.close();
-    }
-  // If the old vector was parallel, we need to update it
-  // and free the localized copies
-  else
-    {
-      // We may have to set dof values that this processor doesn't
-      // own in certain special cases, like LAGRANGE FIRST or
-      // HERMITE THIRD elements on second-order meshes
-      for (unsigned int i=0; i!=new_v.size(); i++)
-        if (new_vector(i) != 0.0)
-          new_v.set(i, new_vector(i));
-      new_v.close();
-    }
-
-  dof_map.enforce_constraints_exactly(*this, &new_v);
-
-#else
-
-  // AMR is disabled: simply copy the vector
-  new_vector = old_vector;
-  
-#endif // #ifdef ENABLE_AMR
-
-  STOP_LOG("project_vector()", "System");
 }
 
 
 
-/**
- * This method projects an analytic function onto the solution via L2
- * projections and nodal interpolations on each element.
- */
-void System::project_solution (Number fptr(const Point& p,
-                                           const Parameters& parameters,
-                                           const std::string& sys_name,
-                                           const std::string& unknown_name),
-                               Gradient gptr(const Point& p,
-                                             const Parameters& parameters,
-                                             const std::string& sys_name,
-                                             const std::string& unknown_name),
-                               Parameters& parameters) const
+
+void System::ProjectSolution::operator()(const ConstElemRange &range) const
 {
-  this->project_vector(fptr, gptr, parameters, *solution);
-
-  solution->localize(*current_local_solution);
-}
-
-
-
-/**
- * This method projects an analytic function via L2 projections and
- * nodal interpolations on each element.
- */
-void System::project_vector (Number fptr(const Point& p,
-                                         const Parameters& parameters,
-                                         const std::string& sys_name,
-                                         const std::string& unknown_name),
-                             Gradient gptr(const Point& p,
-                                           const Parameters& parameters,
-                                           const std::string& sys_name,
-                                           const std::string& unknown_name),
-                             Parameters& parameters,
-                             NumericVector<Number>& new_vector) const
-{
-  START_LOG ("project_vector()", "System");
-
   // We need data to project
   assert(fptr);
 
@@ -573,13 +614,13 @@ void System::project_vector (Number fptr(const Point& p,
    */
 
   // The number of variables in this system
-  const unsigned int n_variables = this->n_vars();
+  const unsigned int n_variables = system.n_vars();
 
   // The dimensionality of the current mesh
-  const unsigned int dim = _mesh.mesh_dimension();
+  const unsigned int dim = system.get_mesh().mesh_dimension();
 
   // The DofMap for this system
-  const DofMap& dof_map = this->get_dof_map();
+  const DofMap& dof_map = system.get_dof_map();
 
   // The element matrix and RHS for projections.
   // Note that Ke is always real-valued, whereas
@@ -636,13 +677,8 @@ void System::project_vector (Number fptr(const Point& p,
       // Side/edge DOF indices
       std::vector<unsigned int> side_dofs;
    
-      // Iterators for the active elements on local processor
-      MeshBase::element_iterator       elem_it =
-		      _mesh.active_local_elements_begin();
-      const MeshBase::element_iterator elem_end = 
-		      _mesh.active_local_elements_end();
-   
-      for ( ; elem_it != elem_end; ++elem_it)
+      // Iterate over all the elements in the range
+      for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
 	{
 	  const Elem* elem = *elem_it;
 
@@ -698,8 +734,8 @@ void System::project_vector (Number fptr(const Point& p,
                   assert(nc == 1);
 		  Ue(current_dof) = fptr(elem->point(n),
                                          parameters,
-                                         this->name(),
-                                         this->variable_name(var));
+                                         system.name(),
+                                         system.variable_name(var));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                 }
@@ -708,14 +744,14 @@ void System::project_vector (Number fptr(const Point& p,
                 {
                   Ue(current_dof) = fptr(elem->point(n),
                                          parameters,
-                                         this->name(),
-                                         this->variable_name(var));
+                                         system.name(),
+                                         system.variable_name(var));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                   Gradient g = gptr(elem->point(n),
                                     parameters,
-                                    this->name(),
-                                    this->variable_name(var));
+                                    system.name(),
+                                    system.variable_name(var));
                   // x derivative
                   Ue(current_dof) = g(0);
                   dof_is_fixed[current_dof] = true;
@@ -729,12 +765,12 @@ void System::project_vector (Number fptr(const Point& p,
                       nxplus(0) += TOLERANCE;
                       Gradient gxminus = gptr(nxminus,
                                               parameters,
-                                              this->name(),
-                                              this->variable_name(var));
+                                              system.name(),
+                                              system.variable_name(var));
                       Gradient gxplus = gptr(nxminus,
                                              parameters,
-                                             this->name(),
-                                             this->variable_name(var));
+                                             system.name(),
+                                             system.variable_name(var));
                       // y derivative
                       Ue(current_dof) = g(1);
                       dof_is_fixed[current_dof] = true;
@@ -763,12 +799,12 @@ void System::project_vector (Number fptr(const Point& p,
                           nyplus(1) += TOLERANCE;
                           Gradient gyminus = gptr(nyminus,
                                                   parameters,
-                                                  this->name(),
-                                                  this->variable_name(var));
+                                                  system.name(),
+                                                  system.variable_name(var));
                           Gradient gyplus = gptr(nyminus,
                                                  parameters,
-                                                 this->name(),
-                                                 this->variable_name(var));
+                                                 system.name(),
+                                                 system.variable_name(var));
                           // xz derivative
                           Ue(current_dof) = (gyplus(2) - gyminus(2))
                                             / 2. / TOLERANCE;
@@ -789,20 +825,20 @@ void System::project_vector (Number fptr(const Point& p,
                           nxpyp(1) += TOLERANCE;
                           Gradient gxmym = gptr(nxmym,
                                                 parameters,
-                                                this->name(),
-                                                this->variable_name(var));
+                                                system.name(),
+                                                system.variable_name(var));
                           Gradient gxmyp = gptr(nxmyp,
                                                 parameters,
-                                                this->name(),
-                                                this->variable_name(var));
+                                                system.name(),
+                                                system.variable_name(var));
                           Gradient gxpym = gptr(nxpym,
                                                 parameters,
-                                                this->name(),
-                                                this->variable_name(var));
+                                                system.name(),
+                                                system.variable_name(var));
                           Gradient gxpyp = gptr(nxpyp,
                                                 parameters,
-                                                this->name(),
-                                                this->variable_name(var));
+                                                system.name(),
+                                                system.variable_name(var));
                           Number gxzplus = (gxpyp(2) - gxmyp(2))
                                          / 2. / TOLERANCE;
                           Number gxzminus = (gxpym(2) - gxmym(2))
@@ -823,14 +859,14 @@ void System::project_vector (Number fptr(const Point& p,
                   assert(nc == 1 + dim);
 		  Ue(current_dof) = fptr(elem->point(n),
                                          parameters,
-                                         this->name(),
-                                         this->variable_name(var));
+                                         system.name(),
+                                         system.variable_name(var));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                   Gradient g = gptr(elem->point(n),
                                     parameters,
-                                    this->name(),
-                                    this->variable_name(var));
+                                    system.name(),
+                                    system.variable_name(var));
                   for (unsigned int i=0; i!= dim; ++i)
                     {
 		      Ue(current_dof) = g(i);
@@ -876,14 +912,14 @@ void System::project_vector (Number fptr(const Point& p,
 	            // solution at the quadrature point	      
 	            Number fineval = fptr(xyz_values[qp],
                                           parameters,
-                                          this->name(),
-                                          this->variable_name(var));
+                                          system.name(),
+                                          system.variable_name(var));
 	            // solution grad at the quadrature point	      
 	            Gradient finegrad;
                     if (cont == C_ONE)
                       finegrad = gptr(xyz_values[qp], parameters,
-                                      this->name(),
-				      this->variable_name(var));
+                                      system.name(),
+				      system.variable_name(var));
 
                     // Form edge projection matrix
                     for (unsigned int sidei=0, freei=0; 
@@ -972,14 +1008,14 @@ void System::project_vector (Number fptr(const Point& p,
 	            // solution at the quadrature point	      
 	            Number fineval = fptr(xyz_values[qp],
                                           parameters,
-                                          this->name(),
-                                          this->variable_name(var));
+                                          system.name(),
+                                          system.variable_name(var));
 	            // solution grad at the quadrature point	      
 	            Gradient finegrad;
                     if (cont == C_ONE)
                       finegrad = gptr(xyz_values[qp], parameters,
-                                      this->name(),
-				      this->variable_name(var));
+                                      system.name(),
+				      system.variable_name(var));
 
                     // Form side projection matrix
                     for (unsigned int sidei=0, freei=0;
@@ -1063,14 +1099,14 @@ void System::project_vector (Number fptr(const Point& p,
 	      // solution at the quadrature point	      
 	      Number fineval = fptr(xyz_values[qp],
                                     parameters,
-                                    this->name(),
-                                    this->variable_name(var));
+                                    system.name(),
+                                    system.variable_name(var));
 	      // solution grad at the quadrature point	      
 	      Gradient finegrad;
               if (cont == C_ONE)
                 finegrad = gptr(xyz_values[qp], parameters,
-                                this->name(),
-				this->variable_name(var));
+                                system.name(),
+				system.variable_name(var));
 
               // Form interior projection matrix
               for (unsigned int i=0, freei=0; i != n_dofs; ++i)
@@ -1128,23 +1164,20 @@ void System::project_vector (Number fptr(const Point& p,
 	    first = new_vector.first_local_index(),
 	    last  = new_vector.last_local_index();
 	  
-          for (unsigned int i = 0; i < n_dofs; i++) 
-// We may be projecting a new zero value onto
-// an old nonzero approximation - RHS
-//	    if (Ue(i) != 0.)
+	  // Lock the new_vector since it is shared among threads.
+	  {
+	    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+	    
+	    for (unsigned int i = 0; i < n_dofs; i++) 
+	      // We may be projecting a new zero value onto
+	      // an old nonzero approximation - RHS
+	      // if (Ue(i) != 0.)
 	      if ((dof_indices[i] >= first) &&
 		  (dof_indices[i] <  last))
                 {
                   new_vector.set(dof_indices[i], Ue(i));
                 }
+	  }
         }  // end elem loop
     } // end variables loop
-
-  new_vector.close();
-
-#ifdef ENABLE_AMR
-  dof_map.enforce_constraints_exactly(*this, &new_vector);
-#endif
-
-  STOP_LOG("project_vector()", "System");
 }
