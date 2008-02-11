@@ -28,11 +28,13 @@
 
 // Threading building blocks includes
 #ifdef HAVE_TBB_API
+#  include "libmesh_logging.h" // only mess with the perflog if we are really multithreaded
 #  include "tbb/tbb_stddef.h"
 #  include "tbb/blocked_range.h"
 #  include "tbb/parallel_for.h"
 #  include "tbb/parallel_reduce.h"
 #  include "tbb/task_scheduler_init.h"
+#  include "tbb/partitioner.h"
 #  include "tbb/spin_mutex.h"
 #  include "tbb/atomic.h"
 #endif
@@ -64,7 +66,17 @@ namespace Threads
   template <typename Range, typename Body>
   inline
   void parallel_for (const Range &range, const Body &body)
-  { tbb::parallel_for (range, body); }
+  {
+#ifdef ENABLE_PERFORMANCE_LOGGING
+    libMesh::perflog.disable_logging();
+#endif   
+
+    tbb::parallel_for (range, body, tbb::auto_partitioner()); 
+
+#ifdef ENABLE_PERFORMANCE_LOGGING
+    libMesh::perflog.enable_logging();
+#endif
+  }
 
   //-------------------------------------------------------------------
   /**
@@ -74,7 +86,17 @@ namespace Threads
   template <typename Range, typename Body, typename Partitioner>
   inline
   void parallel_for (const Range &range, const Body &body, const Partitioner &partitioner)
-  { tbb::parallel_for (range, body, partitioner); }
+  { 
+#ifdef ENABLE_PERFORMANCE_LOGGING
+    libMesh::perflog.disable_logging();
+#endif   
+
+    tbb::parallel_for (range, body, partitioner); 
+
+#ifdef ENABLE_PERFORMANCE_LOGGING
+    libMesh::perflog.enable_logging();
+#endif
+  }
 
   //-------------------------------------------------------------------
   /**
@@ -84,7 +106,17 @@ namespace Threads
   template <typename Range, typename Body>
   inline
   void parallel_reduce (const Range &range, Body &body)
-  { tbb::parallel_reduce (range, body); }
+  { 
+#ifdef ENABLE_PERFORMANCE_LOGGING
+    libMesh::perflog.disable_logging();
+#endif   
+
+    tbb::parallel_reduce (range, body); 
+
+#ifdef ENABLE_PERFORMANCE_LOGGING
+    libMesh::perflog.enable_logging();
+#endif
+  }
 
   //-------------------------------------------------------------------
   /**
@@ -94,7 +126,18 @@ namespace Threads
   template <typename Range, typename Body, typename Partitioner>
   inline
   void parallel_reduce (const Range &range, Body &body, const Partitioner &partitioner)
-  { tbb::parallel_reduce (range, body, partitioner); }
+  { 
+#ifdef ENABLE_PERFORMANCE_LOGGING
+    libMesh::perflog.disable_logging();
+#endif   
+
+    tbb::parallel_reduce (range, body); 
+
+#ifdef ENABLE_PERFORMANCE_LOGGING
+    libMesh::perflog.enable_logging();
+#endif
+  }
+
 
   //-------------------------------------------------------------------
   /**

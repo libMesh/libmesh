@@ -134,6 +134,11 @@ class PerfLog
   void disable_logging() { log_events = false; }
 
   /**
+   * Enables performance logging for an active object.
+   */
+  void enable_logging() { log_events = true; }
+
+  /**
    * Start monitoring the event named \p label.
    */
   void start_event(const std::string &label,
