@@ -27,23 +27,23 @@
 namespace libMeshEnums {
   
   /**
-   * \enum libMeshEnums::NormType defines an \p enum for norms
+   * \enum libMeshEnums::FEMNormType defines an \p enum for norms
    * defined on vectors of finite element coefficients
    */
 		 // Hilbert norms and seminorms in FE space
-  enum NormType {L2             = 0,
-		 H1             = 1,
-		 H2             = 2,
+  enum FEMNormType {L2             = 0,
+		    H1             = 1,
+		    H2             = 2,
 
-		 H1_SEMINORM    = 10,
-		 H2_SEMINORM    = 11,
+		    H1_SEMINORM    = 10,
+		    H2_SEMINORM    = 11,
 
-                 // discrete vector norms
-                 DISCRETE_L1    = 20,
-		 DISCRETE_L2    = 21,
-		 DISCRETE_L_INF = 22,
+                    // discrete vector norms
+                    DISCRETE_L1    = 20,
+		    DISCRETE_L2    = 21,
+		    DISCRETE_L_INF = 22,
 
-		 INVALID_NORM   = 42};
+		    INVALID_NORM   = 42};
 }
 
 using namespace libMeshEnums;

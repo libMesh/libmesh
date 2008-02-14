@@ -395,7 +395,7 @@ public:
    */
   Real calculate_norm(NumericVector<Number>& v,
 		      unsigned int var = 0,
-		      NormType norm_type = L2) const;
+		      FEMNormType norm_type = L2) const;
 
   /**
    * @returns a norm of the vector \p v, using \p component_norm and \p

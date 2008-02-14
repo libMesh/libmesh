@@ -164,7 +164,7 @@ public:
    */
   Number error_norm(const std::string& sys_name,
 	            const std::string& unknown_name,
-	            const NormType& norm);
+	            const FEMNormType& norm);
 private:
   
   /**
