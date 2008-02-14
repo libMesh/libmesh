@@ -61,6 +61,7 @@ Real FE<1,XYZ>::shape(const Elem* elem,
 		      const Point& p)
 {
   assert (elem != NULL);
+  assert (i <= order + elem->p_level());
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -76,48 +77,31 @@ Real FE<1,XYZ>::shape(const Elem* elem,
   const Real xc = centroid(0);
   const Real dx = x - xc;
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
-	
-  switch (totalorder)
+  // monomials. since they are heirarchic we only need one case block.
+  switch (i)
     {
-      // monomials. since they are heirarchic we only need one case block.
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
-      {
-	assert (i < 5);
-	
-	switch (i)
-	  {
-	  case 0:
-	    return 1.;
+    case 0:
+      return 1.;
 
-	  case 1:
-	    return dx;
-	    
-	  case 2:
-	    return dx*dx;
-	    
-	  case 3:
-	    return dx*dx*dx;
-	    
-	  case 4:
-	    return dx*dx*dx*dx;
-	    
-	  default:
-	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
-	  }
-      }
-      
+    case 1:
+      return dx;
+    
+    case 2:
+      return dx*dx;
+    
+    case 3:
+      return dx*dx*dx;
+    
+    case 4:
+      return dx*dx*dx*dx;
+    
     default:
-      {
-	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-	error();
-      }
+      Real val = 1.;
+      for (unsigned int index = 0; index != i; ++index)
+        val *= dx;
+      return val;
     }
-
+      
   error();
   return 0.;
 
@@ -150,6 +134,7 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
 			    const Point& p)
 {
   assert (elem != NULL);
+  assert (i <= order + elem->p_level());
   
   // only d()/dxi in 1D!
   
@@ -169,48 +154,29 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
   const Real xc = centroid(0);
   const Real dx = x - xc;
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
-	
-  switch (totalorder)
-    {      
-      // monomials. since they are heirarchic we only need one case block.
-    case CONSTANT:
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
-      {
-	assert (i < 5);
+  // monomials. since they are heirarchic we only need one case block.
+  switch (i)
+    {
+    case 0:
+      return 0.;
 
-	switch (i)
-	  {
-	  case 0:
-	    return 0.;
-
-	  case 1:
-	    return 1.;
-	    
-	  case 2:
-	    return 2.*dx;
-	    
-	  case 3:
-	    return 3.*dx*dx;
-	    
-	  case 4:
-	    return 4.*dx*dx*dx;
-	    
-	  default:
-	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
-	  }
-      }
-
-      
+    case 1:
+      return 1.;
+    
+    case 2:
+      return 2.*dx;
+    
+    case 3:
+      return 3.*dx*dx;
+    
+    case 4:
+      return 4.*dx*dx*dx;
+    
     default:
-      {
-	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-	error();
-      }
+      Real val = i;
+      for (unsigned int index = 1; index != i; ++index)
+        val *= dx;
+      return val;
     }
 
   error();
@@ -237,19 +203,58 @@ Real FE<1,XYZ>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<1,XYZ>::shape_second_deriv(const Elem*,
-			           const Order,
-			           const unsigned int,
-			           const unsigned int,
-			           const Point&)
+Real FE<1,XYZ>::shape_second_deriv(const Elem* elem,
+			           const Order order,
+			           const unsigned int i,
+			           const unsigned int j,
+			           const Point& p)
 {
-  static bool warning_given = false;
+  assert (elem != NULL);
+  assert (i <= order + elem->p_level());
+  
+  // only d2()/dxi2 in 1D!
+  
+  assert (j == 0);
+	
+  // Only recompute the centroid if the element
+  // has changed from the last one we computed.
+  // This avoids repeated centroid calculations
+  // when called in succession with the same element.
+  if (elem->id() != old_elem_id)
+    {
+      centroid = elem->centroid();
+      old_elem_id = elem->id();
+    }
+    
+  const Real x  = p(0);
+  const Real xc = centroid(0);
+  const Real dx = x - xc;
 
-  if (!warning_given)
-  std::cerr << "Second derivatives for XYZ elements "
-            << " are not yet implemented!"
-            << std::endl;
+  // monomials. since they are heirarchic we only need one case block.
+  switch (i)
+    {
+    case 0:
+      return 0.;
 
-  warning_given = true;
+    case 1:
+      return 0.;
+    
+    case 2:
+      return 2.;
+    
+    case 3:
+      return 6.*dx;
+    
+    case 4:
+      return 12.*dx*dx;
+    
+    default:
+      Real val = 2.;
+      for (unsigned int index = 2; index != i; ++index)
+        val *= (index+1) * dx;
+      return val;
+    }
+
+  error();
   return 0.;
 }
