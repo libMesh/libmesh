@@ -110,6 +110,11 @@ public:
   const sys_type & system () const { return _system; }
 
   /**
+   * @returns a writeable reference to the system we are solving.
+   */
+  sys_type & system () { return _system; }
+  
+  /**
    * The DiffSolver should not print anything to std::cout
    * unless quiet is set to false
    */
@@ -263,11 +268,6 @@ protected:
    */
   unsigned int _inner_iterations;
 
-  /**
-   * @returns a writeable reference to the system we are solving.
-   */
-  sys_type & system () { return _system; }
-  
   /**
    * A reference to the system we are solving.
    */

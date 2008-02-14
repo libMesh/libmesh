@@ -187,7 +187,7 @@ void ExactSolution::compute_error(const std::string& sys_name,
 
 Number ExactSolution::error_norm(const std::string& sys_name,
 			         const std::string& unknown_name,
-                                 const NormType& norm)
+                                 const FEMNormType& norm)
 {
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error

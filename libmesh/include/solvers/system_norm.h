@@ -56,7 +56,7 @@ public:
    * and systems for which the same norm type should be used with a
    * weight of one on each variable.
    */
-  SystemNorm(const NormType &t);
+  SystemNorm(const FEMNormType &t);
   
   /**
    * Constructor, for unweighted sobolev norms on systems with multiple
@@ -65,7 +65,7 @@ public:
    * For a system with n variables, the final norm will be the l2 norm of the
    * n-vector of the norms in each variable.
    */
-  SystemNorm(const std::vector<NormType> &norms);
+  SystemNorm(const std::vector<FEMNormType> &norms);
 
   /**
    * Constructor, for weighted sobolev norms on systems with multiple
@@ -74,7 +74,7 @@ public:
    * For a system with n variables, the final norm will be the l2 norm of the
    * n-vector of the norms in each variable, each multiplied by weight.
    */
-  SystemNorm(const std::vector<NormType> &norms, std::vector<Real> &weights);
+  SystemNorm(const std::vector<FEMNormType> &norms, std::vector<Real> &weights);
 
   /**
    * Copy Constructor
@@ -89,7 +89,7 @@ public:
   /**
    * Returns the type of the norm in variable var
    */
-  NormType type(unsigned int var) const;
+  FEMNormType type(unsigned int var) const;
 
   /**
    * Returns the weight corresponding to the norm in variable var
@@ -97,7 +97,7 @@ public:
   Real weight(unsigned int var) const;
 
 private:
-  std::vector<NormType> _norms;
+  std::vector<FEMNormType> _norms;
 
   std::vector<Real> _weights;
 };
@@ -115,14 +115,14 @@ SystemNorm::SystemNorm::SystemNorm() :
 
 
 inline
-SystemNorm::SystemNorm::SystemNorm(const NormType &t) :
+SystemNorm::SystemNorm::SystemNorm(const FEMNormType &t) :
     _norms(1, t), _weights(1, 1.0)
 { 
 }
 
 
 inline
-SystemNorm::SystemNorm(const std::vector<NormType> &norms) :
+SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms) :
     _norms(norms), _weights(1, 1.0)
 {
   if (_norms.empty())
@@ -131,7 +131,7 @@ SystemNorm::SystemNorm(const std::vector<NormType> &norms) :
 
 
 inline
-SystemNorm::SystemNorm(const std::vector<NormType> &norms,
+SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
 		       std::vector<Real> &weights) :
     _norms(norms), _weights(weights)
 {
@@ -165,7 +165,7 @@ bool SystemNorm::is_discrete() const
 
 
 inline
-NormType SystemNorm::type(unsigned int var) const
+FEMNormType SystemNorm::type(unsigned int var) const
 {
   assert (!_norms.empty());
 

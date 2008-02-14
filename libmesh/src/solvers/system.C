@@ -621,9 +621,9 @@ unsigned short int System::variable_number (const std::string& var) const
 
 Real System::calculate_norm(NumericVector<Number>& v,
                             unsigned int var,
-                            NormType norm_type) const
+                            FEMNormType norm_type) const
 {
-  std::vector<NormType> norms(this->n_vars(), L2);
+  std::vector<FEMNormType> norms(this->n_vars(), L2);
   std::vector<Real> weights(this->n_vars(), 0.0);
   norms[var] = norm_type;
   weights[var] = 1.0;
