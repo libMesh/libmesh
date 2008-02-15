@@ -1956,7 +1956,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
-	      return 4;
+	      return unlimited;
 	    default:
 	      return unknown;
 	  }
@@ -2048,7 +2048,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
-	      return 4;
+	      return unlimited;
 	    default:
 	      return unknown;
 	  }
