@@ -77,7 +77,7 @@ Real FE<1,XYZ>::shape(const Elem* elem,
   const Real xc = centroid(0);
   const Real dx = x - xc;
 
-  // monomials. since they are heirarchic we only need one case block.
+  // monomials. since they are hierarchic we only need one case block.
   switch (i)
     {
     case 0:
@@ -154,7 +154,7 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
   const Real xc = centroid(0);
   const Real dx = x - xc;
 
-  // monomials. since they are heirarchic we only need one case block.
+  // monomials. since they are hierarchic we only need one case block.
   switch (i)
     {
     case 0:
@@ -230,12 +230,10 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem* elem,
   const Real xc = centroid(0);
   const Real dx = x - xc;
 
-  // monomials. since they are heirarchic we only need one case block.
+  // monomials. since they are hierarchic we only need one case block.
   switch (i)
     {
     case 0:
-      return 0.;
-
     case 1:
       return 0.;
     

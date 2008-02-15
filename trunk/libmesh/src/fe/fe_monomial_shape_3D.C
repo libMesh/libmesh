@@ -35,147 +35,144 @@ Real FE<3,MONOMIAL>::shape(const ElemType,
 {
 #if DIM == 3
     
-  switch (order)
+  const Real xi   = p(0);
+  const Real eta  = p(1);
+  const Real zeta = p(2);
+
+  assert (i < (static_cast<unsigned int>(order)+1)*
+              (static_cast<unsigned int>(order)+2)*
+              (static_cast<unsigned int>(order)+3)/6);
+
+    // monomials. since they are hierarchic we only need one case block.
+  switch (i)
     {
-      // monomials. since they are heirarchic we only need one case block.
-    case CONSTANT:
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
-      {
-	assert (i < 35);
-
-	const Real xi   = p(0);
-	const Real eta  = p(1);
-	const Real zeta = p(2);
-
-	switch (i)
-	  {
-	    // constant
-	  case 0:
-	    return 1.;
-
-	    // linears
-	  case 1:
-	    return xi;
-	    
-	  case 2:
-	    return eta;
-	    
-	  case 3:
-	    return zeta;
-
-	    // quadratics
-	  case 4:
-	    return xi*xi;
-	    
-	  case 5:
-	    return eta*eta;
-	    
-	  case 6:
-	    return zeta*zeta;
-
-	  case 7:
-	    return xi*eta;
-
-	  case 8:
-	    return xi*zeta;
-
-	  case 9:
-	    return zeta*eta;
-
-	    // cubics
-	  case 10:
-	    return xi*xi*xi;
-
-	  case 11:
-	    return eta*eta*eta;
-
-	  case 12:
-	    return zeta*zeta*zeta;
-
-	  case 13:
-	    return xi*eta*zeta;
-
-	  case 14:
-	    return eta*eta*zeta;
-
-	  case 15:
-	    return eta*zeta*zeta;
-
-	  case 16:
-	    return xi*zeta*zeta;
-
-	  case 17:
-	    return xi*xi*zeta;
-
-	  case 18:
-	    return xi*xi*eta;
-
-	  case 19:
-	    return xi*eta*eta;
-
-	    // quartics
-	  case 20:
-	    return xi*xi*xi*xi;
-
-	  case 21:
-	    return eta*eta*eta*eta;
-
-	  case 22:
-	    return zeta*zeta*zeta*zeta;
-	  case 23:
-	    return xi*xi*xi*eta;
-
-	  case 24:
-	    return xi*xi*xi*zeta;
-
-	  case 25:
-	    return xi*xi*eta*eta;
-
-	  case 26:
-	    return xi*xi*eta*zeta;
-
-	  case 27:
-	    return xi*xi*zeta*zeta;
-
-	  case 28:
-	    return xi*eta*eta*eta;
-
-	  case 29:
-	    return xi*eta*eta*zeta;
-
-	  case 30:
-	    return xi*eta*zeta*zeta;
-
-	  case 31:
-	    return xi*zeta*zeta*zeta;
-
-	  case 32:
-	    return eta*eta*eta*zeta;
-
-	  case 33:
-	    return eta*eta*zeta*zeta;
-
-	  case 34:
-	    return eta*zeta*zeta*zeta;
-	    	    
-	  default:
-	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
-	  }
-      }
-
-
-            
-      // unsupported order
+      // constant
+    case 0:
+      return 1.;
+  
+      // linears
+    case 1:
+      return xi;
+      
+    case 2:
+      return eta;
+      
+    case 3:
+      return zeta;
+  
+      // quadratics
+    case 4:
+      return xi*xi;
+      
+    case 5:
+      return xi*eta;
+      
+    case 6:
+      return eta*eta;
+  
+    case 7:
+      return xi*zeta;
+  
+    case 8:
+      return zeta*eta;
+  
+    case 9:
+      return zeta*zeta;
+  
+      // cubics
+    case 10:
+      return xi*xi*xi;
+  
+    case 11:
+      return xi*xi*eta;
+  
+    case 12:
+      return xi*eta*eta;
+  
+    case 13:
+      return eta*eta*eta;
+  
+    case 14:
+      return xi*xi*zeta;
+  
+    case 15:
+      return xi*eta*zeta;
+  
+    case 16:
+      return eta*eta*zeta;
+  
+    case 17:
+      return xi*zeta*zeta;
+  
+    case 18:
+      return eta*zeta*zeta;
+  
+    case 19:
+      return zeta*zeta*zeta;
+  
+      // quartics
+    case 20:
+      return xi*xi*xi*xi;
+  
+    case 21:
+      return xi*xi*xi*eta;
+  
+    case 22:
+      return xi*xi*eta*eta;
+  
+    case 23:
+      return xi*eta*eta*eta;
+  
+    case 24:
+      return eta*eta*eta*eta;
+  
+    case 25:
+      return xi*xi*xi*zeta;
+  
+    case 26:
+      return xi*xi*eta*zeta;
+  
+    case 27:
+      return xi*eta*eta*zeta;
+  
+    case 28:
+      return eta*eta*eta*zeta;
+  
+    case 29:
+      return xi*xi*zeta*zeta;
+  
+    case 30:
+      return xi*eta*zeta*zeta;
+  
+    case 31:
+      return eta*eta*zeta*zeta;
+  
+    case 32:
+      return xi*zeta*zeta*zeta;
+  
+    case 33:
+      return eta*zeta*zeta*zeta;
+  
+    case 34:
+      return zeta*zeta*zeta*zeta;
+      	    
     default:
-      {
-	std::cerr << "ERROR: Unsupported 3D FE order!: " << order
-		  << std::endl;
-	error();
+      unsigned int o = 0;
+      for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+      unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+      unsigned int ny = 0, nz = 0;
+      for (unsigned int block=o+1; block <= i2; block += (o-nz)) {
+        nz++; ny = i2 - block;
       }
+      unsigned int nx = o - ny - nz;
+      Real val = 1.;
+      for (unsigned int index=0; index != nx; index++)
+        val *= xi;
+      for (unsigned int index=0; index != ny; index++)
+        val *= eta;
+      for (unsigned int index=0; index != nz; index++)
+        val *= zeta;
+      return val;
     }
 
 #endif
@@ -211,402 +208,423 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
   
   assert (j<3);
   
-  switch (order)
+  assert (i < (static_cast<unsigned int>(order)+1)*
+              (static_cast<unsigned int>(order)+2)*
+              (static_cast<unsigned int>(order)+3)/6);
+
+
+  const Real xi   = p(0);
+  const Real eta  = p(1);
+  const Real zeta = p(2);
+
+  // monomials. since they are hierarchic we only need one case block.
+  switch (j)
     {
-      // monomials. since they are heirarchic we only need one case block.
-    case CONSTANT:
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
+      // d()/dxi
+    case 0:
       {
-	assert (i < 35);
-
-	const Real xi   = p(0);
-	const Real eta  = p(1);
-	const Real zeta = p(2);
-
-	switch (j)
-	  {
-	    // d()/dxi
-	  case 0:
-	    {
-	      switch (i)
-		{
-		  // constant
-		case 0:
-		  return 0.;
-		  
-		  // linear
-		case 1:
-		  return 1.;
-		  
-		case 2:
-		  return 0.;
-		  
-		case 3:
-		  return 0.;
-
-		  // quadratic
-		case 4:
-		  return 2.*xi;
-		  
-		case 5:
-		  return 0.;
-		  
-		case 6:
-		  return 0.;
-		  
-		case 7:
-		  return eta;
-		  
-		case 8:
-		  return zeta;
-		  
-		case 9:
-		  return 0.;
-
-		  // cubic
-		case 10:
-		  return 3.*xi*xi;
-
-		case 11:
-		  return 0.;
-
-		case 12:
-		  return 0.;
-
-		case 13:
-		  return eta*zeta;
-
-		case 14:
-		  return 0.;
-
-		case 15:
-		  return 0.;
-
-		case 16:
-		  return zeta*zeta;
-
-		case 17:
-		  return 2.*xi*zeta;
-
-		case 18:
-		  return 2.*xi*eta;
-
-		case 19:
-		  return eta*eta;
-
-		  // quartics
-		case 20:
-		  return 4.*xi*xi*xi;
-
-		case 21:
-		  return 0.;
-
-		case 22:
-		  return 0.;
-
-		case 23:
-		  return 3.*xi*xi*eta;
-
-		case 24:
-		  return 3.*xi*xi*zeta;
-
-		case 25:
-		  return 2.*xi*eta*eta;
-
-		case 26:
-		  return 2.*xi*eta*zeta;
-
-		case 27:
-		  return 2.*xi*zeta*zeta;
-
-		case 28:
-		  return eta*eta*eta;
-
-		case 29:
-		  return eta*eta*zeta;
-
-		case 30:
-		  return eta*zeta*zeta;
-
-		case 31:
-		  return zeta*zeta*zeta;
-
-		case 32:
-		  return 0.;
-
-		case 33:
-		  return 0.;
-
-		case 34:
-		  return 0.;
-		  
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-
-	    
-	    // d()/deta
-	  case 1:
-	    {
-	      switch (i)
-		{
-		  // constant
-		case 0:
-		  return 0.;
-		  
-		  // linear
-		case 1:
-		  return 0.;
-		  
-		case 2:
-		  return 1.;
-		  
-		case 3:
-		  return 0.;
-
-		  // quadratic
-		case 4:
-		  return 0.;
-		  
-		case 5:
-		  return 2.*eta;
-		  
-		case 6:
-		  return 0.;
-		  
-		case 7:
-		  return xi;
-		  
-		case 8:
-		  return 0.;
-		  
-		case 9:
-		  return zeta;
-
-		  // cubic
-		case 10:
-		  return 0.;
-
-		case 11:
-		  return 3.*eta*eta;
-
-		case 12:
-		  return 0.;
-
-		case 13:
-		  return xi*zeta;
-
-		case 14:
-		  return 2.*eta*zeta;
-
-		case 15:
-		  return zeta*zeta;
-
-		case 16:
-		  return 0.;
-
-		case 17:
-		  return 0.;
-
-		case 18:
-		  return xi*xi;
-
-		case 19:
-		  return 2.*xi*eta;
-
-		  // quartics
-		case 20:
-		  return 0.;
-
-		case 21:
-		  return 4.*eta*eta*eta;
-
-		case 22:
-		  return 0.;
-
-		case 23:
-		  return xi*xi*xi;
-
-		case 24:
-		  return 0.;
-
-		case 25:
-		  return 2.*xi*xi*eta;
-
-		case 26:
-		  return xi*xi*zeta;
-
-		case 27:
-		  return 0.;
-
-		case 28:
-		  return 3.*xi*eta*eta;
-
-		case 29:
-		  return 2.*xi*eta*zeta;
-
-		case 30:
-		  return xi*zeta*zeta;
-
-		case 31:
-		  return 0.;
-
-		case 32:
-		  return 3.*eta*eta*zeta;
-
-		case 33:
-		  return 2.*eta*zeta*zeta;
-
-		case 34:
-		  return zeta*zeta*zeta;
-		  
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-
-	    
-	    // d()/dzeta
-	  case 2:
-	    {
-	      switch (i)
-		{
-		  // constant
-		case 0:
-		  return 0.;
-		  
-		  // linear
-		case 1:
-		  return 0.;
-		  
-		case 2:
-		  return 0.;
-		  
-		case 3:
-		  return 1.;
-
-		  // quadratic
-		case 4:
-		  return 0.;
-		  
-		case 5:
-		  return 0.;
-		  
-		case 6:
-		  return 2.*zeta;
-		  
-		case 7:
-		  return 0.;
-		  
-		case 8:
-		  return xi;
-		  
-		case 9:
-		  return eta;
-
-		  // cubic
-		case 10:
-		  return 0.;
-
-		case 11:
-		  return 0.;
-
-		case 12:
-		  return 3.*zeta*zeta;
-
-		case 13:
-		  return xi*eta;
-
-		case 14:
-		  return eta*eta;
-
-		case 15:
-		  return 2.*eta*zeta;
-
-		case 16:
-		  return 2.*xi*zeta;
-
-		case 17:
-		  return xi*xi;
-
-		case 18:
-		  return 0.;
-
-		case 19:
-		  return 0.;
-
-		  // quartics
-		case 20:
-		  return 0.;
-
-		case 21:
-		  return 0.;
-
-		case 22:
-		  return 4.*zeta*zeta*zeta;
-
-		case 23:
-		  return 0.;
-
-		case 24:
-		  return xi*xi*xi;
-
-		case 25:
-		  return 0.;
-
-		case 26:
-		  return xi*xi*eta;
-
-		case 27:
-		  return 2.*xi*xi*zeta;
-
-		case 28:
-		  return 0.;
-
-		case 29:
-		  return xi*eta*eta;
-
-		case 30:
-		  return 2.*xi*eta*zeta;
-
-		case 31:
-		  return 3.*xi*zeta*zeta;
-
-		case 32:
-		  return eta*eta*eta;
-
-		case 33:
-		  return 2.*eta*eta*zeta;
-
-		case 34:
-		  return 3.*eta*zeta*zeta;
-		  
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-
-	    
-	  default:
-	    error();
-	  }
+        switch (i)
+  	{
+  	  // constant
+  	case 0:
+  	  return 0.;
+  	  
+  	  // linear
+  	case 1:
+  	  return 1.;
+  	  
+  	case 2:
+  	  return 0.;
+  	  
+  	case 3:
+  	  return 0.;
+  
+  	  // quadratic
+  	case 4:
+  	  return 2.*xi;
+  	  
+  	case 5:
+  	  return eta;
+  	  
+  	case 6:
+  	  return 0.;
+  	  
+  	case 7:
+  	  return zeta;
+  	  
+  	case 8:
+  	  return 0.;
+  	  
+  	case 9:
+  	  return 0.;
+  
+  	  // cubic
+  	case 10:
+  	  return 3.*xi*xi;
+  
+  	case 11:
+  	  return 2.*xi*eta;
+  
+  	case 12:
+  	  return eta*eta;
+  
+  	case 13:
+  	  return 0.;
+  
+  	case 14:
+  	  return 2.*xi*zeta;
+  
+  	case 15:
+  	  return eta*zeta;
+  
+  	case 16:
+  	  return 0.;
+  
+  	case 17:
+  	  return zeta*zeta;
+  
+  	case 18:
+  	  return 0.;
+  
+  	case 19:
+  	  return 0.;
+  
+  	  // quartics
+  	case 20:
+  	  return 4.*xi*xi*xi;
+  
+  	case 21:
+  	  return 3.*xi*xi*eta;
+  
+  	case 22:
+  	  return 2.*xi*eta*eta;
+  
+  	case 23:
+  	  return eta*eta*eta;
+  
+  	case 24:
+  	  return 0.;
+  
+  	case 25:
+  	  return 3.*xi*xi*zeta;
+  
+  	case 26:
+  	  return 2.*xi*eta*zeta;
+  
+  	case 27:
+  	  return eta*eta*zeta;
+  
+  	case 28:
+  	  return 0.;
+  
+  	case 29:
+  	  return 2.*xi*zeta*zeta;
+  
+  	case 30:
+  	  return eta*zeta*zeta;
+  
+  	case 31:
+  	  return 0.;
+  
+  	case 32:
+  	  return zeta*zeta*zeta;
+  
+  	case 33:
+  	  return 0.;
+  
+  	case 34:
+  	  return 0.;
+  	  
+  	default:
+          unsigned int o = 0;
+          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+          unsigned int ny = 0, nz = 0;
+          for (unsigned int block=o+1; block <= i2; block += (o-nz)) {
+            nz++; ny = i2 - block;
+          }
+          unsigned int nx = o - ny - nz;
+          Real val = nx;
+          for (unsigned int index=1; index < nx; index++)
+            val *= xi;
+          for (unsigned int index=0; index != ny; index++)
+            val *= eta;
+          for (unsigned int index=0; index != nz; index++)
+            val *= zeta;
+          return val;
+  	}
       }
-
-
-            
-      // unsupported order
-    default:
+  
+      
+      // d()/deta
+    case 1:
       {
-	std::cerr << "ERROR: Unsupported 3D FE order!: " << order
-		  << std::endl;
-	error();
+        switch (i)
+  	{
+  	  // constant
+  	case 0:
+  	  return 0.;
+  	  
+  	  // linear
+  	case 1:
+  	  return 0.;
+  	  
+  	case 2:
+  	  return 1.;
+  	  
+  	case 3:
+  	  return 0.;
+  
+  	  // quadratic
+  	case 4:
+  	  return 0.;
+  	  
+  	case 5:
+  	  return xi;
+  	  
+  	case 6:
+  	  return 2.*eta;
+  	  
+  	case 7:
+  	  return 0.;
+  	  
+  	case 8:
+  	  return zeta;
+  	  
+  	case 9:
+  	  return 0.;
+  
+  	  // cubic
+  	case 10:
+  	  return 0.;
+  
+  	case 11:
+  	  return xi*xi;
+  
+  	case 12:
+  	  return 2.*xi*eta;
+  
+  	case 13:
+  	  return 3.*eta*eta;
+  
+  	case 14:
+  	  return 0.;
+  
+  	case 15:
+  	  return xi*zeta;
+  
+  	case 16:
+  	  return 2.*eta*zeta;
+  
+  	case 17:
+  	  return 0.;
+  
+  	case 18:
+  	  return zeta*zeta;
+  
+  	case 19:
+  	  return 0.;
+  
+  	  // quartics
+  	case 20:
+  	  return 0.;
+  
+  	case 21:
+  	  return xi*xi*xi;
+  
+  	case 22:
+  	  return 2.*xi*xi*eta;
+  
+  	case 23:
+  	  return 3.*xi*eta*eta;
+  
+  	case 24:
+  	  return 4.*eta*eta*eta;
+  
+  	case 25:
+  	  return 0.;
+  
+  	case 26:
+  	  return xi*xi*zeta;
+  
+  	case 27:
+  	  return 2.*xi*eta*zeta;
+  
+  	case 28:
+  	  return 3.*eta*eta*zeta;
+  
+  	case 29:
+  	  return 0.;
+  
+  	case 30:
+  	  return xi*zeta*zeta;
+  
+  	case 31:
+  	  return 2.*eta*zeta*zeta;
+  
+  	case 32:
+  	  return 0.;
+  
+  	case 33:
+  	  return zeta*zeta*zeta;
+  
+  	case 34:
+  	  return 0.;
+  	  
+  	default:
+          unsigned int o = 0;
+          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+          unsigned int ny = 0, nz = 0;
+          for (unsigned int block=o+1; block <= i2; block += (o-nz)) {
+            nz++; ny = i2 - block;
+          }
+          unsigned int nx = o - ny - nz;
+          Real val = ny;
+          for (unsigned int index=0; index != nx; index++)
+            val *= xi;
+          for (unsigned int index=1; index < ny; index++)
+            val *= eta;
+          for (unsigned int index=0; index != nz; index++)
+            val *= zeta;
+          return val;
+  	}
+      }
+  
+      
+      // d()/dzeta
+    case 2:
+      {
+        switch (i)
+  	{
+  	  // constant
+  	case 0:
+  	  return 0.;
+  	  
+  	  // linear
+  	case 1:
+  	  return 0.;
+  	  
+  	case 2:
+  	  return 0.;
+  	  
+  	case 3:
+  	  return 1.;
+  
+  	  // quadratic
+  	case 4:
+  	  return 0.;
+  	  
+  	case 5:
+  	  return 0.;
+  	  
+  	case 6:
+  	  return 0.;
+  	  
+  	case 7:
+  	  return xi;
+  	  
+  	case 8:
+  	  return eta;
+  	  
+  	case 9:
+  	  return 2.*zeta;
+  
+  	  // cubic
+  	case 10:
+  	  return 0.;
+  
+  	case 11:
+  	  return 0.;
+  
+  	case 12:
+  	  return 0.;
+  
+  	case 13:
+  	  return 0.;
+  
+  	case 14:
+  	  return xi*xi;
+  
+  	case 15:
+  	  return xi*eta;
+  
+  	case 16:
+  	  return eta*eta;
+  
+  	case 17:
+  	  return 2.*xi*zeta;
+  
+  	case 18:
+  	  return 2.*eta*zeta;
+  
+  	case 19:
+  	  return 3.*zeta*zeta;
+  
+  	  // quartics
+  	case 20:
+  	  return 0.;
+  
+  	case 21:
+  	  return 0.;
+  
+  	case 22:
+  	  return 0.;
+  
+  	case 23:
+  	  return 0.;
+  
+  	case 24:
+  	  return 0.;
+  
+  	case 25:
+  	  return xi*xi*xi;
+  
+  	case 26:
+  	  return xi*xi*eta;
+  
+  	case 27:
+  	  return xi*eta*eta;
+  
+  	case 28:
+  	  return eta*eta*eta;
+  
+  	case 29:
+  	  return 2.*xi*xi*zeta;
+  
+  	case 30:
+  	  return 2.*xi*eta*zeta;
+  
+  	case 31:
+  	  return 2.*eta*eta*zeta;
+  
+  	case 32:
+  	  return 3.*xi*zeta*zeta;
+  
+  	case 33:
+  	  return 3.*eta*zeta*zeta;
+  
+  	case 34:
+  	  return 4.*zeta*zeta*zeta;
+  	  
+  	default:
+          unsigned int o = 0;
+          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+          unsigned int ny = 0, nz = 0;
+          for (unsigned int block=o+1; block <= i2; block += (o-nz)) {
+            nz++; ny = i2 - block;
+          }
+          unsigned int nx = o - ny - nz;
+          Real val = nz;
+          for (unsigned int index=0; index != nx; index++)
+            val *= xi;
+          for (unsigned int index=0; index != ny; index++)
+            val *= eta;
+          for (unsigned int index=1; index < nz; index++)
+            val *= zeta;
+          return val;
+  	}
       }
     }
 
@@ -644,582 +662,641 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
   
   assert (j<6);
   
-  switch (order)
+  assert (i < (static_cast<unsigned int>(order)+1)*
+              (static_cast<unsigned int>(order)+2)*
+              (static_cast<unsigned int>(order)+3)/6);
+
+  const Real xi   = p(0);
+  const Real eta  = p(1);
+  const Real zeta = p(2);
+
+    // monomials. since they are hierarchic we only need one case block.
+  switch (j)
     {
-      // monomials. since they are heirarchic we only need one case block.
-    case CONSTANT:
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
+      // d^2()/dxi^2
+    case 0:
       {
-	assert (i < 35);
-
-	const Real xi   = p(0);
-	const Real eta  = p(1);
-	const Real zeta = p(2);
-
-	switch (j)
-	  {
-	    // d^2()/dxi^2
-	  case 0:
-	    {
-	      switch (i)
-		{
-		  // constant
-		case 0:
-		  
-		  // linear
-		case 1:
-		case 2:
-		case 3:
-		  return 0.;
-
-		  // quadratic
-		case 4:
-		  return 2.;
-		  
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		  return 0.;
-
-		  // cubic
-		case 10:
-		  return 6.*xi;
-
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		  return 0.;
-
-		case 17:
-		  return 2.*zeta;
-
-		case 18:
-		  return 2.*eta;
-
-		case 19:
-		  return 0.;
-
-		  // quartics
-		case 20:
-		  return 12.*xi*xi;
-
-		case 21:
-		case 22:
-		  return 0.;
-
-		case 23:
-		  return 6.*xi*eta;
-
-		case 24:
-		  return 6.*xi*zeta;
-
-		case 25:
-		  return 2.*eta*eta;
-
-		case 26:
-		  return 2.*eta*zeta;
-
-		case 27:
-		  return 2.*zeta*zeta;
-
-		case 28:
-		case 29:
-		case 30:
-		case 31:
-		case 32:
-		case 33:
-		case 34:
-		  return 0.;
-		  
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-
-
-	    // d^2()/dxideta
-	  case 1:
-	    {
-	      switch (i)
-		{
-		  // constant
-		case 0:
-		  
-		  // linear
-		case 1:
-		case 2:
-		case 3:
-		  return 0.;
-
-		  // quadratic
-		case 4:
-		case 5:
-		case 6:
-		  return 0.;
-		  
-		case 7:
-		  return 1.;
-		  
-		case 8:
-		case 9:
-		  return 0.;
-
-		  // cubic
-		case 10:
-		case 11:
-		case 12:
-		  return 0.;
-
-		case 13:
-		  return zeta;
-
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-		  return 0.;
-
-		case 18:
-		  return 2.*xi;
-
-		case 19:
-		  return 2.*eta;
-
-		  // quartics
-		case 20:
-		case 21:
-		case 22:
-		  return 0.;
-
-		case 23:
-		  return 3.*xi*xi;
-
-		case 24:
-		  return 0.;
-
-		case 25:
-		  return 4.*xi*eta;
-
-		case 26:
-		  return 2.*xi*zeta;
-
-		case 27:
-		  return 0.;
-
-		case 28:
-		  return 3.*eta*eta;
-
-		case 29:
-		  return 2.*eta*zeta;
-
-		case 30:
-		  return zeta*zeta;
-
-		case 31:
-		case 32:
-		case 33:
-		case 34:
-		  return 0.;
-		  
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-
-	    
-	    // d^2()/deta^2
-	  case 2:
-	    {
-	      switch (i)
-		{
-		  // constant
-		case 0:
-		  
-		  // linear
-		case 1:
-		case 2:
-		case 3:
-		  return 0.;
-
-		  // quadratic
-		case 4:
-		  return 0.;
-		  
-		case 5:
-		  return 2.;
-		  
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		  return 0.;
-
-		  // cubic
-		case 10:
-		  return 0.;
-
-		case 11:
-		  return 6.*eta;
-
-		case 12:
-		case 13:
-		  return 0.;
-
-		case 14:
-		  return 2.*zeta;
-
-		case 15:
-		  return zeta*zeta;
-
-		case 16:
-		case 17:
-		case 18:
-		  return 0.;
-
-		case 19:
-		  return 2.*xi;
-
-		  // quartics
-		case 20:
-		  return 0.;
-
-		case 21:
-		  return 12.*eta*eta;
-
-		case 22:
-		case 23:
-		case 24:
-		  return 0.;
-
-		case 25:
-		  return 2.*xi*xi;
-
-		case 26:
-		case 27:
-		  return 0.;
-
-		case 28:
-		  return 6.*xi*eta;
-
-		case 29:
-		  return 2.*xi*zeta;
-
-		case 30:
-		case 31:
-		  return 0.;
-
-		case 32:
-		  return 6.*eta*zeta;
-
-		case 33:
-		  return 2.*zeta*zeta;
-
-		case 34:
-		  return 0.;
-		  
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-
-	    
-	    // d^2()/dxidzeta
-	  case 3:
-	    {
-	      switch (i)
-		{
-		  // constant
-		case 0:
-		  
-		  // linear
-		case 1:
-		case 2:
-		case 3:
-		  return 0.;
-
-		  // quadratic
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		  return 0.;
-		  
-		case 8:
-		  return 1.;
-		  
-		case 9:
-		  return 0.;
-
-		  // cubic
-		case 10:
-		case 11:
-		case 12:
-		  return 0.;
-
-		case 13:
-		  return eta;
-
-		case 14:
-		case 15:
-		  return 0.;
-
-		case 16:
-		  return 2.*zeta;
-
-		case 17:
-		  return 2.*xi;
-
-		case 18:
-		case 19:
-		  return 0.;
-
-		  // quartics
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		  return 0.;
-
-		case 24:
-		  return 3.*xi*xi;
-
-		case 25:
-		  return 0.;
-
-		case 26:
-		  return 2.*xi*eta;
-
-		case 27:
-		  return 4.*xi*zeta;
-
-		case 28:
-		  return 0.;
-
-		case 29:
-		  return eta*eta;
-
-		case 30:
-		  return 2.*eta*zeta;
-
-		case 31:
-		  return 3.*zeta*zeta;
-
-		case 32:
-		case 33:
-		case 34:
-		  return 0.;
-		  
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-
-	    // d^2()/detadzeta
-	  case 4:
-	    {
-	      switch (i)
-		{
-		  // constant
-		case 0:
-		  
-		  // linear
-		case 1:
-		case 2:
-		case 3:
-		  return 0.;
-
-		  // quadratic
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		  return 0.;
-		  
-		case 9:
-		  return 1.;
-
-		  // cubic
-		case 10:
-		case 11:
-		case 12:
-		  return 0.;
-
-		case 13:
-		  return xi;
-
-		case 14:
-		  return 2.*eta;
-
-		case 15:
-		  return 2.*zeta;
-
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		  return 0.;
-
-		  // quartics
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		  return 0.;
-
-		case 26:
-		  return xi*xi;
-
-		case 27:
-		case 28:
-		  return 0.;
-
-		case 29:
-		  return 2.*xi*eta;
-
-		case 30:
-		  return 2.*xi*zeta;
-
-		case 31:
-		  return 0.;
-
-		case 32:
-		  return 3.*eta*eta;
-
-		case 33:
-		  return 4.*eta*zeta;
-
-		case 34:
-		  return 3.*zeta*zeta;
-		  
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-
-
-	    // d^2()/dzeta^2
-	  case 5:
-	    {
-	      switch (i)
-		{
-		  // constant
-		case 0:
-		  
-		  // linear
-		case 1:
-		case 2:
-		case 3:
-		  return 0.;
-
-		  // quadratic
-		case 4:
-		case 5:
-		  return 0.;
-		  
-		case 6:
-		  return 2.;
-		  
-		case 7:
-		case 8:
-		case 9:
-		  return 0.;
-
-		  // cubic
-		case 10:
-		case 11:
-		  return 0.;
-
-		case 12:
-		  return 6.*zeta;
-
-		case 13:
-		case 14:
-		  return 0.;
-
-		case 15:
-		  return 2.*eta;
-
-		case 16:
-		  return 2.*xi;
-
-		case 17:
-		case 18:
-		case 19:
-		  return 0.;
-
-		  // quartics
-		case 20:
-		case 21:
-		  return 0.;
-
-		case 22:
-		  return 12.*zeta*zeta;
-
-		case 23:
-		case 24:
-		case 25:
-		case 26:
-		  return 0.;
-
-		case 27:
-		  return 2.*xi*xi;
-
-		case 28:
-		case 29:
-		  return 0.;
-
-		case 30:
-		  return 2.*xi*eta;
-
-		case 31:
-		  return 6.*xi*zeta;
-
-		case 32:
-		  return 0.;
-
-		case 33:
-		  return 2.*eta*eta;
-
-		case 34:
-		  return 6.*eta*zeta;
-		  
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-
-	    
-	  default:
-	    error();
-	  }
-	}
+        switch (i)
+  	{
+  	  // constant
+  	case 0:
+  	  
+  	  // linear
+  	case 1:
+  	case 2:
+  	case 3:
+  	  return 0.;
+
+  	  // quadratic
+  	case 4:
+  	  return 2.;
+  	  
+  	case 5:
+  	case 6:
+  	case 7:
+  	case 8:
+  	case 9:
+  	  return 0.;
+
+  	  // cubic
+  	case 10:
+  	  return 6.*xi;
+
+  	case 11:
+  	  return 2.*eta;
+
+  	case 12:
+  	case 13:
+  	  return 0.;
+
+  	case 14:
+  	  return 2.*zeta;
+
+  	case 15:
+  	case 16:
+  	case 17:
+  	case 18:
+  	case 19:
+  	  return 0.;
+
+  	  // quartics
+  	case 20:
+  	  return 12.*xi*xi;
+
+  	case 21:
+  	  return 6.*xi*eta;
+
+  	case 22:
+  	  return 2.*eta*eta;
+
+  	case 23:
+  	case 24:
+  	  return 0.;
+
+  	case 25:
+  	  return 6.*xi*zeta;
+
+  	case 26:
+  	  return 2.*eta*zeta;
+
+  	case 27:
+  	case 28:
+  	  return 0.;
+
+  	case 29:
+  	  return 2.*zeta*zeta;
+
+  	case 30:
+  	case 31:
+  	case 32:
+  	case 33:
+  	case 34:
+  	  return 0.;
+  	  
+  	default:
+          unsigned int o = 0;
+          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+          unsigned int ny = 0, nz = 0;
+          for (unsigned int block=o+1; block <= i2; block += (o-nz)) {
+            nz++; ny = i2 - block;
+          }
+          unsigned int nx = o - ny - nz;
+          Real val = nx * (nx - 1);
+          for (unsigned int index=2; index < nx; index++)
+            val *= xi;
+          for (unsigned int index=0; index != ny; index++)
+            val *= eta;
+          for (unsigned int index=0; index != nz; index++)
+            val *= zeta;
+          return val;
+  	}
       }
 
 
-            
-      // unsupported order
+      // d^2()/dxideta
+    case 1:
+      {
+        switch (i)
+  	{
+  	  // constant
+  	case 0:
+  	  
+  	  // linear
+  	case 1:
+  	case 2:
+  	case 3:
+  	  return 0.;
+
+  	  // quadratic
+  	case 4:
+  	  return 0.;
+
+  	case 5:
+  	  return 1.;
+
+  	case 6:
+  	case 7:
+  	case 8:
+  	case 9:
+  	  return 0.;
+
+  	  // cubic
+  	case 10:
+  	  return 0.;
+
+  	case 11:
+  	  return 2.*xi;
+
+  	case 12:
+  	  return 2.*eta;
+
+  	case 13:
+  	case 14:
+  	  return 0.;
+
+  	case 15:
+  	  return zeta;
+
+  	case 16:
+  	case 17:
+  	case 18:
+  	case 19:
+  	  return 0.;
+
+  	  // quartics
+  	case 20:
+  	  return 0.;
+
+  	case 21:
+  	  return 3.*xi*xi;
+
+  	case 22:
+  	  return 4.*xi*eta;
+
+  	case 23:
+  	  return 3.*eta*eta;
+
+  	case 24:
+  	case 25:
+  	  return 0.;
+
+  	case 26:
+  	  return 2.*xi*zeta;
+
+  	case 27:
+  	  return 2.*eta*zeta;
+
+  	case 28:
+  	case 29:
+  	  return 0.;
+
+  	case 30:
+  	  return zeta*zeta;
+
+  	case 31:
+  	case 32:
+  	case 33:
+  	case 34:
+  	  return 0.;
+  	  
+  	default:
+          unsigned int o = 0;
+          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+          unsigned int ny = 0, nz = 0;
+          for (unsigned int block=o+1; block <= i2; block += (o-nz)) {
+            nz++; ny = i2 - block;
+          }
+          unsigned int nx = o - ny - nz;
+          Real val = nx * ny;
+          for (unsigned int index=1; index < nx; index++)
+            val *= xi;
+          for (unsigned int index=1; index < ny; index++)
+            val *= eta;
+          for (unsigned int index=0; index != nz; index++)
+            val *= zeta;
+          return val;
+  	}
+      }
+
+      
+      // d^2()/deta^2
+    case 2:
+      {
+        switch (i)
+  	{
+  	  // constant
+  	case 0:
+  	  
+  	  // linear
+  	case 1:
+  	case 2:
+  	case 3:
+  	  return 0.;
+
+  	  // quadratic
+  	case 4:
+  	case 5:
+  	  return 0.;
+  	  
+  	case 6:
+  	  return 2.;
+
+  	case 7:
+  	case 8:
+  	case 9:
+  	  return 0.;
+
+  	  // cubic
+  	case 10:
+  	case 11:
+  	  return 0.;
+
+  	case 12:
+  	  return 2.*xi;
+  	case 13:
+  	  return 6.*eta;
+
+  	case 14:
+  	case 15:
+  	  return 0.;
+
+  	case 16:
+  	  return 2.*zeta;
+
+  	case 17:
+  	case 18:
+  	case 19:
+  	  return 0.;
+
+  	  // quartics
+  	case 20:
+  	case 21:
+  	  return 0.;
+
+  	case 22:
+  	  return 2.*xi*xi;
+
+  	case 23:
+  	  return 6.*xi*eta;
+
+  	case 24:
+  	  return 12.*eta*eta;
+
+  	case 25:
+  	case 26:
+  	  return 0.;
+
+  	case 27:
+  	  return 2.*xi*zeta;
+
+  	case 28:
+  	  return 6.*eta*zeta;
+
+  	case 29:
+  	case 30:
+  	  return 0.;
+
+  	case 31:
+  	  return 2.*zeta*zeta;
+
+  	case 32:
+  	case 33:
+  	case 34:
+  	  return 0.;
+  	  
+  	default:
+          unsigned int o = 0;
+          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+          unsigned int ny = 0, nz = 0;
+          for (unsigned int block=o+1; block <= i2; block += (o-nz)) {
+            nz++; ny = i2 - block;
+          }
+          unsigned int nx = o - ny - nz;
+          Real val = ny * (ny - 1);
+          for (unsigned int index=0; index != nx; index++)
+            val *= xi;
+          for (unsigned int index=2; index < ny; index++)
+            val *= eta;
+          for (unsigned int index=0; index != nz; index++)
+            val *= zeta;
+          return val;
+  	}
+      }
+
+      
+      // d^2()/dxidzeta
+    case 3:
+      {
+        switch (i)
+  	{
+  	  // constant
+  	case 0:
+  	  
+  	  // linear
+  	case 1:
+  	case 2:
+  	case 3:
+  	  return 0.;
+
+  	  // quadratic
+  	case 4:
+  	case 5:
+  	case 6:
+  	  return 0.;
+
+  	case 7:
+  	  return 1.;
+  	  
+  	case 8:
+  	case 9:
+  	  return 0.;
+
+  	  // cubic
+  	case 10:
+  	case 11:
+  	case 12:
+  	case 13:
+  	  return 0.;
+
+  	case 14:
+  	  return 2.*xi;
+
+  	case 15:
+  	  return eta;
+
+  	case 16:
+  	  return 0.;
+
+  	case 17:
+  	  return 2.*zeta;
+
+  	case 18:
+  	case 19:
+  	  return 0.;
+
+  	  // quartics
+  	case 20:
+  	case 21:
+  	case 22:
+  	case 23:
+  	case 24:
+  	  return 0.;
+
+  	case 25:
+  	  return 3.*xi*xi;
+
+  	case 26:
+  	  return 2.*xi*eta;
+
+  	case 27:
+  	  return eta*eta;
+
+  	case 28:
+  	  return 0.;
+
+  	case 29:
+  	  return 4.*xi*zeta;
+
+  	case 30:
+  	  return 2.*eta*zeta;
+
+  	case 31:
+  	  return 0.;
+
+  	case 32:
+  	  return 3.*zeta*zeta;
+
+  	case 33:
+  	case 34:
+  	  return 0.;
+  	  
+  	default:
+          unsigned int o = 0;
+          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+          unsigned int ny = 0, nz = 0;
+          for (unsigned int block=o+1; block <= i2; block += (o-nz)) {
+            nz++; ny = i2 - block;
+          }
+          unsigned int nx = o - ny - nz;
+          Real val = nx * nz;
+          for (unsigned int index=1; index < nx; index++)
+            val *= xi;
+          for (unsigned int index=0; index != ny; index++)
+            val *= eta;
+          for (unsigned int index=1; index < nz; index++)
+            val *= zeta;
+          return val;
+  	}
+      }
+
+      // d^2()/detadzeta
+    case 4:
+      {
+        switch (i)
+  	{
+  	  // constant
+  	case 0:
+  	  
+  	  // linear
+  	case 1:
+  	case 2:
+  	case 3:
+  	  return 0.;
+
+  	  // quadratic
+  	case 4:
+  	case 5:
+  	case 6:
+  	case 7:
+  	  return 0.;
+
+  	case 8:
+  	  return 1.;
+  	  
+  	case 9:
+  	  return 0.;
+
+  	  // cubic
+  	case 10:
+  	case 11:
+  	case 12:
+  	case 13:
+  	case 14:
+  	  return 0.;
+
+  	case 15:
+  	  return xi;
+
+  	case 16:
+  	  return 2.*eta;
+
+  	case 17:
+  	  return 0.;
+
+  	case 18:
+  	  return 2.*zeta;
+
+  	case 19:
+  	  return 0.;
+
+  	  // quartics
+  	case 20:
+  	case 21:
+  	case 22:
+  	case 23:
+  	case 24:
+  	case 25:
+  	  return 0.;
+
+  	case 26:
+  	  return xi*xi;
+
+  	case 27:
+  	  return 2.*xi*eta;
+
+  	case 28:
+  	  return 3.*eta*eta;
+
+  	case 29:
+  	  return 0.;
+
+  	case 30:
+  	  return 2.*xi*zeta;
+
+  	case 31:
+  	  return 4.*eta*zeta;
+
+  	case 32:
+  	  return 0.;
+
+  	case 33:
+  	  return 3.*zeta*zeta;
+
+  	case 34:
+  	  return 0.;
+  	  
+  	default:
+          unsigned int o = 0;
+          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+          unsigned int ny = 0, nz = 0;
+          for (unsigned int block=o+1; block <= i2; block += (o-nz)) {
+            nz++; ny = i2 - block;
+          }
+          unsigned int nx = o - ny - nz;
+          Real val = ny * nz;
+          for (unsigned int index=0; index != nx; index++)
+            val *= xi;
+          for (unsigned int index=1; index < ny; index++)
+            val *= eta;
+          for (unsigned int index=1; index < nz; index++)
+            val *= zeta;
+          return val;
+  	}
+      }
+
+
+      // d^2()/dzeta^2
+    case 5:
+      {
+        switch (i)
+  	{
+  	  // constant
+  	case 0:
+  	  
+  	  // linear
+  	case 1:
+  	case 2:
+  	case 3:
+  	  return 0.;
+
+  	  // quadratic
+  	case 4:
+  	case 5:
+  	case 6:
+  	case 7:
+  	case 8:
+  	  return 0.;
+
+  	case 9:
+  	  return 2.;
+
+  	  // cubic
+  	case 10:
+  	case 11:
+  	case 12:
+  	case 13:
+  	case 14:
+  	case 15:
+  	case 16:
+  	  return 0.;
+
+  	case 17:
+  	  return 2.*xi;
+
+  	case 18:
+  	  return 2.*eta;
+
+  	case 19:
+  	  return 6.*zeta;
+
+  	  // quartics
+  	case 20:
+  	case 21:
+  	case 22:
+  	case 23:
+  	case 24:
+  	case 25:
+  	case 26:
+  	case 27:
+  	case 28:
+  	  return 0.;
+
+  	case 29:
+  	  return 2.*xi*xi;
+
+  	case 30:
+  	  return 2.*xi*eta;
+
+  	case 31:
+  	  return 2.*eta*eta;
+
+  	case 32:
+  	  return 6.*xi*zeta;
+
+  	case 33:
+  	  return 6.*eta*zeta;
+
+  	case 34:
+  	  return 12.*zeta*zeta;
+  	  
+  	default:
+          unsigned int o = 0;
+          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+          unsigned int ny = 0, nz = 0;
+          for (unsigned int block=o+1; block <= i2; block += (o-nz)) {
+            nz++; ny = i2 - block;
+          }
+          unsigned int nx = o - ny - nz;
+          Real val = nz * (nz - 1);
+          for (unsigned int index=0; index != nx; index++)
+            val *= xi;
+          for (unsigned int index=0; index != ny; index++)
+            val *= eta;
+          for (unsigned int index=2; index < nz; index++)
+            val *= zeta;
+          return val;
+  	}
+      }
+
+      
     default:
-      {
-	std::cerr << "ERROR: Unsupported 3D FE order!: " << order
-		  << std::endl;
-	error();
-      }
+      error();
     }
 
 #endif

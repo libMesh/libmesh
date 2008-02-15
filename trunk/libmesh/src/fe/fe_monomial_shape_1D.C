@@ -35,47 +35,33 @@ Real FE<1,MONOMIAL>::shape(const ElemType,
 {
   const Real xi = p(0);
 
+  assert (i <= static_cast<unsigned int>(order));
 	
-  switch (order)
+  // monomials. since they are hierarchic we only need one case block.
+  switch (i)
     {
-      // monomials. since they are heirarchic we only need one case block.
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
-      {
-	assert (i < 5);
+    case 0:
+      return 1.;
 
-	switch (i)
-	  {
-	  case 0:
-	    return 1.;
-
-	  case 1:
-	    return xi;
-	    
-	  case 2:
-	    return xi*xi;
-	    
-	  case 3:
-	    return xi*xi*xi;
-	    
-	  case 4:
-	    return xi*xi*xi*xi;
-	    
-	  default:
-	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
-	  }
-      }
-      
+    case 1:
+      return xi;
+    
+    case 2:
+      return xi*xi;
+    
+    case 3:
+      return xi*xi*xi;
+    
+    case 4:
+      return xi*xi*xi*xi;
+    
     default:
-      {
-	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-	error();
-      }
+      Real val = 1.;
+      for (unsigned int index = 0; index != i; ++index)
+        val *= xi;
+      return val;
     }
-
+      
   error();
   return 0.;
 }
@@ -108,47 +94,31 @@ Real FE<1,MONOMIAL>::shape_deriv(const ElemType,
 	
   const Real xi = p(0);
 
+  assert (i <= static_cast<unsigned int>(order));
 	
-  switch (order)
-    {      
-      // monomials. since they are heirarchic we only need one case block.
-    case CONSTANT:
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
-      {
-	assert (i < 5);
+  // monomials. since they are hierarchic we only need one case block.
+  switch (i)
+    {
+    case 0:
+      return 0.;
 
-	switch (i)
-	  {
-	  case 0:
-	    return 0.;
-
-	  case 1:
-	    return 1.;
-	    
-	  case 2:
-	    return 2.*xi;
-	    
-	  case 3:
-	    return 3.*xi*xi;
-	    
-	  case 4:
-	    return 4.*xi*xi*xi;
-	    
-	  default:
-	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
-	  }
-      }
-
-      
+    case 1:
+      return 1.;
+    
+    case 2:
+      return 2.*xi;
+    
+    case 3:
+      return 3.*xi*xi;
+    
+    case 4:
+      return 4.*xi*xi*xi;
+    
     default:
-      {
-	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-	error();
-      }
+      Real val = i;
+      for (unsigned int index = 1; index != i; ++index)
+        val *= xi;
+      return val;
     }
 
   error();
@@ -185,45 +155,28 @@ Real FE<1,MONOMIAL>::shape_second_deriv(const ElemType,
 	
   const Real xi = p(0);
 
-	
-  switch (order)
-    {      
-      // monomials. since they are heirarchic we only need one case block.
-    case CONSTANT:
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
-      {
-	assert (i < 5);
+  assert (i <= static_cast<unsigned int>(order));
 
-	switch (i)
-	  {
-	  case 0:
-	  case 1:
-	    return 0.;
+  switch (i)
+    {
+    case 0:
+    case 1:
+      return 0.;
 	    
-	  case 2:
-	    return 2.;
-	    
-	  case 3:
-	    return 6.*xi;
-	    
-	  case 4:
-	    return 12.*xi*xi;
-	    
-	  default:
-	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
-	  }
-      }
-
-      
+    case 2:
+      return 2.;
+    
+    case 3:
+      return 6.*xi;
+    
+    case 4:
+      return 12.*xi*xi;
+    
     default:
-      {
-	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-	error();
-      }
+      Real val = 2.;
+      for (unsigned int index = 2; index != i; ++index)
+        val *= (index+1) * xi;
+      return val;
     }
 
   error();

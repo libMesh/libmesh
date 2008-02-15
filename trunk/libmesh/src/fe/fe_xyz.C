@@ -565,10 +565,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 
       // For other bases do interpolation at the nodes
       // explicitly.
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
+    default:
       {
 
 	const unsigned int n_sf =
@@ -590,11 +587,6 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	  }
 
 	return;
-      }
-      
-    default:
-      {
-	error();
       }
     }
 }
@@ -782,7 +774,41 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       
     default:
       {
-	error();
+        const unsigned int order = static_cast<unsigned int>(o);
+	switch (t)
+	  {
+	  case EDGE2:
+	  case EDGE3:
+	    return (order+1);
+
+	  case TRI3:
+	  case TRI6:
+	  case QUAD4:
+	  case QUAD8:
+	  case QUAD9:
+	    return (order+1)*(order+2)/2;
+
+	  case TET4:
+	  case TET10:
+	  case HEX8:
+	  case HEX20:
+	  case HEX27:
+	  case PRISM6:
+	  case PRISM15:
+	  case PRISM18:
+	  case PYRAMID5:
+	    return (order+1)*(order+2)*(order+3)/6;
+	    
+	  default:
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    }
+	  }
       }
     }
   
@@ -988,11 +1014,45 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	    }
 	  }
       }
-
-
       
-      // Otherwise no DOFS per element
     default:
+      {
+        const unsigned int order = static_cast<unsigned int>(o);
+	switch (t)
+	  {
+	  case EDGE2:
+	  case EDGE3:
+	    return (order+1);
+
+	  case TRI3:
+	  case TRI6:
+	  case QUAD4:
+	  case QUAD8:
+	  case QUAD9:
+	    return (order+1)*(order+2)/2;
+
+	  case TET4:
+	  case TET10:
+	  case HEX8:
+	  case HEX20:
+	  case HEX27:
+	  case PRISM6:
+	  case PRISM15:
+	  case PRISM18:
+	  case PYRAMID5:
+	    return (order+1)*(order+2)*(order+3)/6;
+	    
+	  default:
+	    {
+#ifdef DEBUG
+	      std::cerr << "ERROR: Bad ElemType = " << t
+			<< " for " << o << "th order approximation!" 
+			<< std::endl;
+#endif
+	      error();	    
+	    }
+	  }
+      }
       return 0;
     }
 }

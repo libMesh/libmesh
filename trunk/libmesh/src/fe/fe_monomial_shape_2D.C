@@ -35,86 +35,75 @@ Real FE<2,MONOMIAL>::shape(const ElemType,
 {
 #if DIM > 1
   
-  switch (order)
+  assert (i < (static_cast<unsigned int>(order)+1)*
+               (static_cast<unsigned int>(order)+2)/2);
+
+  const Real xi  = p(0);
+  const Real eta = p(1);
+
+  switch (i)
     {
-      // monomials. since they are heirarchic we only need one case block.
-    case CONSTANT:
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
-      {
-	assert (i < 15);
+      // constant
+    case 0:
+      return 1.;
 
-	const Real xi  = p(0);
-	const Real eta = p(1);
+      // linear
+    case 1:
+      return xi;
+    
+    case 2:
+      return eta;
 
-	switch (i)
-	  {
-	    // constant
-	  case 0:
-	    return 1.;
+      // quadratics
+    case 3:
+      return xi*xi;
+    
+    case 4:
+      return xi*eta;
+    
+    case 5:
+      return eta*eta;
 
-	    // linear
-	  case 1:
-	    return xi;
-	    
-	  case 2:
-	    return eta;
+      // cubics
+    case 6:
+      return xi*xi*xi;
 
-	    // quadratics
-	  case 3:
-	    return xi*xi;
-	    
-	  case 4:
-	    return xi*eta;
-	    
-	  case 5:
-	    return eta*eta;
+    case 7:
+      return xi*xi*eta;
 
-	    // cubics
-	  case 6:
-	    return xi*xi*xi;
+    case 8:
+      return xi*eta*eta;
 
-	  case 7:
-	    return eta*eta*eta;
+    case 9:
+      return eta*eta*eta;
 
-	  case 8:
-	    return xi*xi*eta;
+      // quartics
+    case 10:
+      return xi*xi*xi*xi;
 
-	  case 9:
-	    return xi*eta*eta;
+    case 11:
+      return xi*xi*xi*eta;
 
-	    // quartics
-	  case 10:
-	    return xi*xi*xi*xi;
+    case 12:
+      return xi*xi*eta*eta;
 
-	  case 11:
-	    return eta*eta*eta*eta;
+    case 13:
+      return xi*eta*eta*eta;
 
-	  case 12:
-	    return xi*xi*eta*eta;
-
-	  case 13:
-	    return xi*xi*xi*eta;
-
-	  case 14:
-	    return xi*eta*eta*eta;
-	    
-	  default:
-	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
-	  }
-      }
-
-      
-      // unsupported order
+    case 14:
+      return eta*eta*eta*eta;
+    
     default:
-      {
-	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
-		  << std::endl;
-	error();
-      }
+      unsigned int o = 0;
+      for (; i >= (o+1)*(o+2)/2; o++) { }
+      unsigned int ny = i - (o*(o+1)/2);
+      unsigned int nx = o - ny;
+      Real val = 1.;
+      for (unsigned int index=0; index != nx; index++)
+        val *= xi;
+      for (unsigned int index=0; index != ny; index++)
+        val *= eta;
+      return val;
     }
 
   error();
@@ -151,159 +140,153 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
   
   assert (j<2);
 
-  switch (order)
+  assert (i < (static_cast<unsigned int>(order)+1)*
+               (static_cast<unsigned int>(order)+2)/2);
+
+  const Real xi  = p(0);
+  const Real eta = p(1);
+
+  // monomials. since they are hierarchic we only need one case block.
+
+  switch (j)
     {
-      // monomials. since they are heirarchic we only need one case block.
-    case CONSTANT:
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
+      // d()/dxi
+    case 0:
       {
-	assert (i < 15);
-
-	const Real xi  = p(0);
-	const Real eta = p(1);
-
-	switch (j)
+        switch (i)
 	  {
-	    // d()/dxi
+	    // constants
 	  case 0:
-	    {
-	      switch (i)
-		{
-		  // constants
-		case 0:
-		  return 0.;
-		    
-		  // linears
-		case 1:
-		  return 1.;
-		    
-		case 2:
-		  return 0.;
-
-		  // quadratics
-		case 3:
-		  return 2.*xi;
-		    
-		case 4:
-		  return eta;
-		    
-		case 5:
-		  return 0.;
-
-		  // cubics
-		case 6:
-		  return 3.*xi*xi;
-		    
-		case 7:
-		  return 0.;
-		    
-		case 8:
-		  return 2.*xi*eta;
-		    
-		case 9:
-		  return eta*eta;
-		    
-		  // quartics
-		case 10:
-		  return 4.*xi*xi*xi;
-		    
-		case 11:
-		  return 0.;
-		    
-		case 12:
-		  return 2.*xi*eta*eta;
-		    
-		case 13:
-		  return 3.*xi*xi*eta;
-		    
-		case 14:
-		  return eta*eta*eta;
-		    
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-
-	      
-	    // d()/deta
+	    return 0.;
+	    
+	    // linears
 	  case 1:
-	    {
-	      switch (i)
-		{
-		  // constants
-		case 0:
-		  return 0.;
-		    
-		  // linears
-		case 1:
-		  return 0.;
-		    
-		case 2:
-		  return 1.;
+	    return 1.;
+	    
+	  case 2:
+	    return 0.;
 
-		  // quadratics
-		case 3:
-		  return 0.;
-		    
-		case 4:
-		  return xi;
-		    
-		case 5:
-		  return 2.*eta;
+	    // quadratics
+	  case 3:
+	    return 2.*xi;
+	    
+	  case 4:
+	    return eta;
+	    
+	  case 5:
+	    return 0.;
 
-		  // cubics
-		case 6:
-		  return 0.;
-		    
-		case 7:
-		  return 3.*eta*eta;
-		    
-		case 8:
-		  return xi*xi;
-		    
-		case 9:
-		  return 2.*xi*eta;
-		    
-		  // quartics
-		case 10:
-		  return 0.;
-		    
-		case 11:
-		  return 4.*eta*eta*eta;
-		    
-		case 12:
-		  return 2.*xi*xi*eta;
-		    
-		case 13:
-		  return xi*xi*xi;
-		    
-		case 14:
-		  return 3.*xi*eta*eta;
-		    
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-	      
-	      
-	  default:
-	    error();
+	    // cubics
+	  case 6:
+	    return 3.*xi*xi;
+	    
+	  case 7:
+	    return 2.*xi*eta;
+	    
+	  case 8:
+	    return eta*eta;
+	    
+	  case 9:
+	    return 0.;
+	    
+	    // quartics
+	  case 10:
+	    return 4.*xi*xi*xi;
+	    
+	  case 11:
+	    return 3.*xi*xi*eta;
+	    
+	  case 12:
+	    return 2.*xi*eta*eta;
+	    
+	  case 13:
+	    return eta*eta*eta;
+	    
+	  case 14:
+	    return 0.;
+	    
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)/2; o++) { }
+            unsigned int ny = i - (o*(o+1)/2);
+            unsigned int nx = o - ny;
+            Real val = nx;
+            for (unsigned int index=1; index < nx; index++)
+              val *= xi;
+            for (unsigned int index=0; index != ny; index++)
+              val *= eta;
+            return val;
 	  }
       }
 
       
-      
-      // unsupported order
-    default:
+      // d()/deta
+    case 1:
       {
-	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
-		  << std::endl;
-	error();
+        switch (i)
+	  {
+	    // constants
+	  case 0:
+	    return 0.;
+    
+	    // linears
+	  case 1:
+	    return 0.;
+	    
+	  case 2:
+	    return 1.;
+
+	    // quadratics
+	  case 3:
+	    return 0.;
+	    
+	  case 4:
+	    return xi;
+	    
+	  case 5:
+	    return 2.*eta;
+
+	    // cubics
+	  case 6:
+	    return 0.;
+	    
+	  case 7:
+	    return xi*xi;
+	    
+	  case 8:
+	    return 2.*xi*eta;
+	    
+	  case 9:
+	    return 3.*eta*eta;
+	    
+	    // quartics
+	  case 10:
+	    return 0.;
+	    
+	  case 11:
+	    return xi*xi*xi;
+	    
+	  case 12:
+	    return 2.*xi*xi*eta;
+	    
+	  case 13:
+	    return 3.*xi*eta*eta;
+	    
+	  case 14:
+	    return 4.*eta*eta*eta;
+	    
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)/2; o++) { }
+            unsigned int ny = i - (o*(o+1)/2);
+            unsigned int nx = o - ny;
+            Real val = ny;
+            for (unsigned int index=0; index != nx; index++)
+              val *= xi;
+            for (unsigned int index=1; index < ny; index++)
+              val *= eta;
+            return val;
+	  }
       }
     }
 
@@ -342,201 +325,200 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
   
   assert (j<=2);
 
-  switch (order)
+  assert (i < (static_cast<unsigned int>(order)+1)*
+               (static_cast<unsigned int>(order)+2)/2);
+
+  const Real xi  = p(0);
+  const Real eta = p(1);
+
+  // monomials. since they are hierarchic we only need one case block.
+
+  switch (j)
     {
-      // monomials. since they are heirarchic we only need one case block.
-    case CONSTANT:
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
+      // d^2()/dxi^2
+    case 0:
       {
-	assert (i < 15);
-
-	const Real xi  = p(0);
-	const Real eta = p(1);
-
-	switch (j)
+        switch (i)
 	  {
-	    // d^2()/dxi^2
+	    // constants
 	  case 0:
-	    {
-	      switch (i)
-		{
-		  // constants
-		case 0:
-		  // linears
-		case 1:
-		case 2:
-		  return 0.;
-
-		  // quadratics
-		case 3:
-		  return 2.;
-		    
-		case 4:
-		case 5:
-		  return 0.;
-
-		  // cubics
-		case 6:
-		  return 6.*xi;
-		    
-		case 7:
-		  return 0.;
-		    
-		case 8:
-		  return 2.*eta;
-		    
-		case 9:
-		  return 0.;
-		    
-		  // quartics
-		case 10:
-		  return 12.*xi*xi;
-		    
-		case 11:
-		  return 0.;
-		    
-		case 12:
-		  return 2.*eta*eta;
-		    
-		case 13:
-		  return 6.*xi*eta;
-		    
-		case 14:
-		  return 0.;
-		    
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-
-	    // d^2()/dxideta
+	    // linears
 	  case 1:
-	    {
-	      switch (i)
-		{
-		  // constants
-		case 0:
-		    
-		  // linears
-		case 1:
-		case 2:
-		  return 0.;
-
-		  // quadratics
-		case 3:
-		  return 0.;
-		    
-		case 4:
-		  return 1.;
-		    
-		case 5:
-		  return 0.;
-
-		  // cubics
-		case 6:
-		case 7:
-		  return 0.;
-		    
-		case 8:
-		  return 2.*xi;
-		    
-		case 9:
-		  return 2.*eta;
-		    
-		  // quartics
-		case 10:
-		case 11:
-		  return 0.;
-		    
-		case 12:
-		  return 4.*xi*eta;
-		    
-		case 13:
-		  return 3.*xi*xi;
-		    
-		case 14:
-		  return 3.*eta*eta;
-		    
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-	      
-	    // d^2()/deta^2
 	  case 2:
-	    {
-	      switch (i)
-		{
-		  // constants
-		case 0:
-		    
-		  // linears
-		case 1:
-		case 2:
-		  return 0.;
+	    return 0.;
 
-		  // quadratics
-		case 3:
-		case 4:
-		  return 0.;
-		    
-		case 5:
-		  return 2.;
+	    // quadratics
+	  case 3:
+	    return 2.;
+	    
+	  case 4:
+	  case 5:
+	    return 0.;
 
-		  // cubics
-		case 6:
-		  return 0.;
-		    
-		case 7:
-		  return 6.*eta;
-		    
-		case 8:
-		  return 0.;
-		    
-		case 9:
-		  return 2.*xi;
-		    
-		  // quartics
-		case 10:
-		  return 0.;
-		    
-		case 11:
-		  return 12.*eta*eta;
-		    
-		case 12:
-		  return 2.*xi*xi;
-		    
-		case 13:
-		  return 0.;
-		    
-		case 14:
-		  return 6.*xi*eta;
-		    
-		default:
-		  std::cerr << "Invalid shape function index!" << std::endl;
-		  error();
-		}
-	    }
-	      
-	      
-	  default:
-	    error();
+	    // cubics
+	  case 6:
+	    return 6.*xi;
+	    
+	  case 7:
+	    return 2.*eta;
+	    
+	  case 8:
+	  case 9:
+	    return 0.;
+	    
+	    // quartics
+	  case 10:
+	    return 12.*xi*xi;
+	    
+	  case 11:
+	    return 6.*xi*eta;
+	    
+	  case 12:
+	    return 2.*eta*eta;
+	    
+	  case 13:
+	  case 14:
+	    return 0.;
+	    
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)/2; o++) { }
+            unsigned int ny = i - (o*(o+1)/2);
+            unsigned int nx = o - ny;
+            Real val = nx * (nx - 1);
+            for (unsigned int index=2; index < nx; index++)
+              val *= xi;
+            for (unsigned int index=0; index != ny; index++)
+              val *= eta;
+            return val;
 	  }
       }
 
-      
-      
-      // unsupported order
-    default:
+      // d^2()/dxideta
+    case 1:
       {
-	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
-		  << std::endl;
-	error();
+        switch (i)
+	  {
+	    // constants
+	  case 0:
+	    
+	    // linears
+	  case 1:
+	  case 2:
+	    return 0.;
+
+	    // quadratics
+	  case 3:
+	    return 0.;
+	    
+	  case 4:
+	    return 1.;
+	    
+	  case 5:
+	    return 0.;
+
+	    // cubics
+	  case 6:
+	    return 0.;
+	  case 7:
+	    return 2.*xi;
+	    
+	  case 8:
+	    return 2.*eta;
+	    
+	  case 9:
+	    return 0.;
+	    
+	    // quartics
+	  case 10:
+	    return 0.;
+
+	  case 11:
+	    return 3.*xi*xi;
+	    
+	  case 12:
+	    return 4.*xi*eta;
+	    
+	  case 13:
+	    return 3.*eta*eta;
+	    
+	  case 14:
+	    return 0.;
+	    
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)/2; o++) { }
+            unsigned int ny = i - (o*(o+1)/2);
+            unsigned int nx = o - ny;
+            Real val = nx * ny;
+            for (unsigned int index=1; index < nx; index++)
+              val *= xi;
+            for (unsigned int index=1; index < ny; index++)
+              val *= eta;
+            return val;
+	  }
+      }
+	      
+      // d^2()/deta^2
+    case 2:
+      {
+        switch (i)
+	  {
+	    // constants
+	  case 0:
+	    
+	    // linears
+	  case 1:
+	  case 2:
+	    return 0.;
+
+	    // quadratics
+	  case 3:
+	  case 4:
+	    return 0.;
+	    
+	  case 5:
+	    return 2.;
+
+	    // cubics
+	  case 6:
+	    return 0.;
+	    
+	  case 7:
+	    return 0.;
+	    
+	  case 8:
+	    return 2.*xi;
+	    
+	  case 9:
+	    return 6.*eta;
+	    
+	    // quartics
+	  case 10:
+	  case 11:
+	    return 0.;
+	    
+	  case 12:
+	    return 2.*xi*xi;
+	    
+	  case 13:
+	    return 6.*xi*eta;
+	    
+	  case 14:
+	    return 12.*eta*eta;
+	    
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)/2; o++) { }
+            unsigned int ny = i - (o*(o+1)/2);
+            unsigned int nx = o - ny;
+            Real val = ny * (ny - 1);
+            for (unsigned int index=0; index != nx; index++)
+              val *= xi;
+            for (unsigned int index=2; index < ny; index++)
+              val *= eta;
+            return val;
+	  }
       }
     }
 
