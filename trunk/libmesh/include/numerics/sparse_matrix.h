@@ -33,12 +33,13 @@
 #include "reference_counted_object.h"
 #include "libmesh.h"
 
-
 // forward declarations
 template <typename T> class SparseMatrix;
 template <typename T> class DenseMatrix;
 template <typename T> inline std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
 class DofMap;
+namespace SparsityPattern { class Graph; }
+
 
 /**
  * Generic sparse matrix. This class contains
@@ -99,11 +100,21 @@ public:
   { _dof_map = &dof_map; }
 
   /**
+   * \p returns true if this sparse matrix format needs to be fed the 
+   * graph of the sparse matrix.  This is true in the case of the \p LaspackMatrix, 
+   * but not for the \p PetscMatrix.  In the case where the full graph is not
+   * required we can efficiently approximate it to provide a good estimate of the 
+   * required size of the sparse matrix.
+   */ 
+  virtual bool need_full_sparsity_pattern() const 
+  { return false; }  
+
+  /**
    * Updates the matrix sparsity pattern. When your \p SparseMatrix<T>
    * implementation does not need this data simply do
    * not overload this method.
    */
-  virtual void update_sparsity_pattern (const std::vector<std::vector<unsigned int> >&) {}
+  virtual void update_sparsity_pattern (const SparsityPattern::Graph &) {}
   
   /**
    * Initialize a Sparse matrix that is of global

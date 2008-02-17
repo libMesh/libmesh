@@ -89,11 +89,17 @@ public:
   ~LaspackMatrix ();
 
   /**
+   * The \p LaspackMatrix needs the full sparsity pattern.
+   */ 
+  bool need_full_sparsity_pattern() const 
+  { return true; }
+
+  /**
    * Updates the matrix sparsity pattern.  This will
    * tell the underlying matrix storage scheme how
    * to map the \f$ (i,j) \f$ elements.
    */
-  void update_sparsity_pattern (const std::vector<std::vector<unsigned int> >&);
+  void update_sparsity_pattern (const SparsityPattern::Graph &);
   
   /**
    * Initialize a Laspack matrix that is of global

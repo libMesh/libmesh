@@ -11,7 +11,7 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// Lesser General Public  License for more details.
   
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
@@ -37,6 +37,7 @@
 #include "parallel.h"
 #include "sparse_matrix.h"
 #include "string_to_enum.h"
+#include "threads_allocators.h"
 
 
 
@@ -212,7 +213,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
                   requested->set_dof_number
                     (this->sys_number(), v, 0, first_dof);
 
-		  // don't forget to add these remore dofs to the _send_list
+		  // don't forget to add these remote dofs to the _send_list
 		  for (unsigned int comp=0; comp!=n_comp; ++comp)
 		    _send_list.push_back(first_dof+comp);
                 }
@@ -1049,323 +1050,64 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 
   START_LOG("compute_sparsity()", "DofMap");
 
-
   // Compute the sparsity structure of the global matrix.  This can be
   // fed into a PetscMatrix to allocate exacly the number of nonzeros
   // necessary to store the matrix.  This algorithm should be linear
   // in the (# of elements)*(# nodes per element)
   const unsigned int proc_id           = mesh.processor_id();
   const unsigned int n_dofs_on_proc    = this->n_dofs_on_processor(proc_id);
-  const unsigned int first_dof_on_proc = this->first_dof(proc_id);
-  const unsigned int end_dof_on_proc   = this->end_dof(proc_id);
-
-  std::vector<std::vector<unsigned int> > sparsity_pattern (n_dofs_on_proc);
 
   static const bool implicit_neighbor_dofs = 
     libMesh::on_command_line ("--implicit_neighbor_dofs");
 
-  MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator elem_end = mesh.active_elements_end(); 
-
-  // If the user did not explicitly specify the DOF coupling
-  // then all the DOFS are coupled to each other.  Furthermore,
-  // we can take a shortcut and do this more quickly here.  So
-  // we use an if-test.
-  if ((_dof_coupling == NULL) || (_dof_coupling->empty()))
-    {
-      std::vector<unsigned int>
-	element_dofs,
-	neighbor_dofs,
-	dofs_to_add;
-
-      for ( ; elem_it != elem_end; ++elem_it)
-	{
-	  const Elem* const elem = *elem_it;
-
-	  // Get the global indices of the DOFs with support on this element
-	  this->dof_indices (elem, element_dofs);
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
-	  this->find_connected_dofs (element_dofs);
-#endif
-
-	  // We can be more efficient if we sort the element DOFs
-	  // into increasing order
-	  std::sort(element_dofs.begin(), element_dofs.end());
-	  
-	  const unsigned int n_dofs_on_element = element_dofs.size();
-	    
-	  for (unsigned int i=0; i<n_dofs_on_element; i++)
-	    {
-	      const unsigned int ig = element_dofs[i];
-	      
-	      // Only bother if this matrix row will be stored
-	      // on this processor.
-	      if ((ig >= first_dof_on_proc) &&
-		  (ig < end_dof_on_proc))
-		{
-		  // This is what I mean
-		  // assert ((ig - first_dof_on_proc) >= 0);
-		  // but do the test like this because ig and
-		  // first_dof_on_proc are unsigned ints
-		  assert (ig >= first_dof_on_proc);
-		  assert ((ig - first_dof_on_proc) < sparsity_pattern.size());
-		  
-		  std::vector<unsigned int>& row =
-		    sparsity_pattern[ig - first_dof_on_proc];
-
-		  // If the row is empty we will add *all* the element DOFs,
-		  // so just do that.
-		  if (row.empty())
-		    {
-		      row = element_dofs;
-		    }
-		  else
-		    {		  
-		      // Build a list of the DOF indices not found in the
-		      // sparsity pattern
-		      dofs_to_add.clear();
-
-		      // Cache iterators.  Low will move forward, subsequent
-		      // searches will be on smaller ranges
-		      std::vector<unsigned int>::iterator
-			low  = std::lower_bound (row.begin(), row.end(), element_dofs.front()),
-			high = std::upper_bound (low,         row.end(), element_dofs.back());
-		  
-		      for (unsigned int j=0; j<n_dofs_on_element; j++)
-			{
-			  const unsigned int jg = element_dofs[j];
-			  
-			  // See if jg is in the sorted range
-			  std::pair<std::vector<unsigned int>::iterator,
-			            std::vector<unsigned int>::iterator>
-			    pos = std::equal_range (low, high, jg);
-			
-			  // Must add jg if it wasn't found
-			  if (pos.first == pos.second)
-			    dofs_to_add.push_back(jg);
-			
-			  // pos.first is now a valid lower bound for any
-			  // remaining element DOFs. (That's why we sorted them.)
-			  // Use it for the next search
-			  low = pos.first;
-			}
-
-		      // Add to the sparsity pattern
-		      if (!dofs_to_add.empty())
-			{
-			  const unsigned int old_size = row.size();
-			  
-			  row.insert (row.end(),
-				      dofs_to_add.begin(),
-				      dofs_to_add.end());
-		      
-			  //std::inplace_merge (row.begin(), row.begin()+old_size, row.end());
-			  this->sort_sparsity_row (row.begin(), row.begin()+old_size, row.end());
-			}
-		    }
-		  
-		  // Now (possibly) add dofs from neighboring elements
-		  // TODO:[BSK] optimize this like above!
-		  if (implicit_neighbor_dofs)
-		    for (unsigned int s=0; s<elem->n_sides(); s++)
-		      if (elem->neighbor(s) != NULL)
-			{
-			  const Elem* const neighbor = elem->neighbor(s);
-			  
-			  this->dof_indices (neighbor, neighbor_dofs);
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
-			  this->find_connected_dofs (neighbor_dofs);
-#endif
-			  
-			  const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
-			  
-			  for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
-			    {
-			      const unsigned int jg = neighbor_dofs[j];
-			      
-			      // See if jg is in the sorted range
-			      std::pair<std::vector<unsigned int>::iterator,
-				        std::vector<unsigned int>::iterator>
-				pos = std::equal_range (row.begin(), row.end(), jg);
-			    
-			      // Insert jg if it wasn't found
-			      if (pos.first == pos.second)
-				row.insert (pos.first, jg);
-			    }
-			
-			}
-		}
-	    }
-	}      
-    } 
-
-
   
-  // This is what we do in the case that the user has specified
-  // explicit DOF coupling.
-  else
-    {
-      assert (_dof_coupling != NULL);
-      assert (_dof_coupling->size() ==
-	      this->n_variables());
-      
-      const unsigned int n_var = this->n_variables();
-      
-      std::vector<unsigned int>
-	element_dofs_i,
-	element_dofs_j,
-	dofs_to_add;
-
-      for ( ; elem_it != elem_end; ++elem_it)
-	for (unsigned int vi=0; vi<n_var; vi++)
-	  {
-	    const Elem* const elem = *elem_it;
-	    
-	    // Find element dofs for variable vi
-	    this->dof_indices (elem, element_dofs_i, vi);
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
-	    this->find_connected_dofs (element_dofs_i);
-#endif
-
-	    // We can be more efficient if we sort the element DOFs
-	    // into increasing order
-	    std::sort(element_dofs_i.begin(), element_dofs_i.end());
-	    const unsigned int n_dofs_on_element_i = element_dofs_i.size();
-	    
-	    for (unsigned int vj=0; vj<n_var; vj++)
-	      if ((*_dof_coupling)(vi,vj)) // If vi couples to vj
-		{
-		  // Find element dofs for variable vj, note that
-		  // if vi==vj we already have the dofs.
-		  if (vi != vj)
-		    {
-		      this->dof_indices (elem, element_dofs_j, vj);
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
-		      this->find_connected_dofs (element_dofs_j);
-#endif
-
-		      // We can be more efficient if we sort the element DOFs
-		      // into increasing order
-		      std::sort (element_dofs_j.begin(), element_dofs_j.end());
-		    }
-		  else
-		    element_dofs_j = element_dofs_i;
-		  
-		  const unsigned int n_dofs_on_element_j =
-		    element_dofs_j.size();
-		  
-		  for (unsigned int i=0; i<n_dofs_on_element_i; i++)
-		    {
-		      const unsigned int ig = element_dofs_i[i];
-		      
-		      // Only bother if this matrix row will be stored
-		      // on this processor.
-		      if ((ig >= first_dof_on_proc) &&
-			  (ig < end_dof_on_proc))
-			{
-			  // This is what I mean
-			  // assert ((ig - first_dof_on_proc) >= 0);
-			  // but do the test like this because ig and
-			  // first_dof_on_proc are unsigned ints
-			  assert (ig >= first_dof_on_proc);
-			  assert (ig < (sparsity_pattern.size() +
-					first_dof_on_proc));
-			  
-			  std::vector<unsigned int>& row =
-			    sparsity_pattern[ig - first_dof_on_proc];
-
-			  // If the row is empty we will add *all* the element j DOFs,
-			  // so just do that.
-			  if (row.empty())
-			    {
-			      row = element_dofs_j;
-			    }
-			  else
-			    {		  
-			      // Build a list of the DOF indices not found in the
-			      // sparsity pattern
-			      dofs_to_add.clear();
-
-			      // Cache iterators.  Low will move forward, subsequent
-			      // searches will be on smaller ranges
-			      std::vector<unsigned int>::iterator
-				low  = std::lower_bound (row.begin(), row.end(), element_dofs_j.front()),
-				high = std::upper_bound (low,         row.end(), element_dofs_j.back());
-
-			      for (unsigned int j=0; j<n_dofs_on_element_j; j++)
-				{
-				  const unsigned int jg = element_dofs_j[j];
-				  
-				  // See if jg is in the sorted range
-				  std::pair<std::vector<unsigned int>::iterator,
-				            std::vector<unsigned int>::iterator>
-				    pos = std::equal_range (low, high, jg);
-			      
-				  // Must add jg if it wasn't found
-				  if (pos.first == pos.second)
-				    dofs_to_add.push_back(jg);
-				
-				  // pos.first is now a valid lower bound for any
-				  // remaining element j DOFs. (That's why we sorted them.)
-				  // Use it for the next search
-				  low = pos.first;
-				}
-			      
-			      // Add to the sparsity pattern
-			      if (!dofs_to_add.empty())
-				{
-				  const unsigned int old_size = row.size();
-				  
-				  row.insert (row.end(),
-					      dofs_to_add.begin(),
-					      dofs_to_add.end());
-		      
-				  this->sort_sparsity_row (row.begin(), row.begin()+old_size, row.end());
-				}
-			    }
-			}
-		    }
-		}
-	  }
-    }
-
-
-  
-  // Now the full sparsity structure is built for all of the
-  // DOFs connected to our rows of the matrix.
-  _n_nz.resize (n_dofs_on_proc);
-  _n_oz.resize (n_dofs_on_proc);
-
-  // First zero the counters.
-  std::fill(_n_nz.begin(), _n_nz.end(), 0);
-  std::fill(_n_oz.begin(), _n_oz.end(), 0);
-  
-  for (unsigned int i=0; i<n_dofs_on_proc; i++)
-    {
-      // Get the row of the sparsity pattern
-      const std::vector<unsigned int>& row = sparsity_pattern[i];
-
-      for (unsigned int j=0; j<row.size(); j++)
-	if ((row[j] < first_dof_on_proc) || (row[j] >= end_dof_on_proc))
-	  _n_oz[i]++;
-	else
-	  _n_nz[i]++;
-    }
-
-  
-  STOP_LOG("compute_sparsity()", "DofMap");
-
-  
-  // We are done with the sparsity_pattern.  However, quite a
-  // lot has gone into computing it.  It is possible that some
-  // \p SparseMatrix implementations want to see it.  Let them
-  // see it before we throw it away.
+  // We can be more efficient in the threaded sparsity pattern assembly
+  // if we don't need the exact pattern.  For some sparse matrix formats
+  // a good upper bound will suffice.
+  bool need_full_sparsity_pattern=false;
   std::vector<SparseMatrix<Number>* >::iterator
     pos = _matrices.begin(),
     end = _matrices.end();
       
   for (; pos != end; ++pos)
-    (*pos)->update_sparsity_pattern (sparsity_pattern);     
+    if ((*pos)->need_full_sparsity_pattern())
+      need_full_sparsity_pattern = true;
+  
+  // We can compute the sparsity pattern in parallel on multiple
+  // threads.  The goal is for each thread to compute the full sparsity
+  // pattern for a subset of elements.  These sparsity patterns can
+  // be efficiently merged in the SparsityPattern::Build::join()
+  // method, especially if there is not too much overlap between them.
+  // Even better, if the full sparsity pattern is not needed then
+  // the number of nonzeros per row can be estimated from the
+  // sparsity patterns created on each thread.
+  SparsityPattern::Build sp (mesh,
+			     *this,
+			     _dof_coupling,
+			     implicit_neighbor_dofs,
+			     need_full_sparsity_pattern);
+  
+  Threads::parallel_reduce (ConstElemRange (mesh.active_elements_begin(),
+					    mesh.active_elements_end()), sp);
+  
+  assert (sp.sparsity_pattern.size() == n_dofs_on_proc);
+
+  // steal the n_nz and n_oz arrays from sp -- it won't need them any more,
+  // and this is more efficient than copying them.
+  _n_nz.swap(sp.n_nz);
+  _n_oz.swap(sp.n_oz);
+  
+  STOP_LOG("compute_sparsity()", "DofMap");
+  
+  // We are done with the sparsity_pattern.  However, quite a
+  // lot has gone into computing it.  It is possible that some
+  // \p SparseMatrix implementations want to see it.  Let them
+  // see it before we throw it away.
+  pos = _matrices.begin();
+  end = _matrices.end();
+      
+  for (; pos != end; ++pos)
+    (*pos)->update_sparsity_pattern (sp.sparsity_pattern);     
 }
 
 
@@ -1849,9 +1591,374 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 
 #if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
 
-void DofMap::_dummy_function(void)
+void SparsityPattern::_dummy_function(void)
 {
 }
 
 #endif
 
+
+
+void SparsityPattern::Build::operator()(const ConstElemRange &range)
+{
+  // Compute the sparsity structure of the global matrix.  This can be
+  // fed into a PetscMatrix to allocate exacly the number of nonzeros
+  // necessary to store the matrix.  This algorithm should be linear
+  // in the (# of elements)*(# nodes per element)
+  const unsigned int proc_id           = mesh.processor_id();
+  const unsigned int n_dofs_on_proc    = dof_map.n_dofs_on_processor(proc_id);
+  const unsigned int first_dof_on_proc = dof_map.first_dof(proc_id);
+  const unsigned int end_dof_on_proc   = dof_map.end_dof(proc_id);
+
+  sparsity_pattern.resize(n_dofs_on_proc);
+  
+  // If the user did not explicitly specify the DOF coupling
+  // then all the DOFS are coupled to each other.  Furthermore,
+  // we can take a shortcut and do this more quickly here.  So
+  // we use an if-test.
+  if ((dof_coupling == NULL) || (dof_coupling->empty()))
+    {
+      std::vector<unsigned int>
+	element_dofs,
+	neighbor_dofs,
+	dofs_to_add;
+
+      std::vector<const Elem*> active_neighbors;
+
+      for (ConstElemRange::const_iterator elem_it = range.begin() ; elem_it != range.end(); ++elem_it)
+	{
+	  const Elem* const elem = *elem_it;
+
+	  // Get the global indices of the DOFs with support on this element
+	  dof_map.dof_indices (elem, element_dofs);
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+	  dof_map.find_connected_dofs (element_dofs);
+#endif
+
+	  // We can be more efficient if we sort the element DOFs
+	  // into increasing order
+	  std::sort(element_dofs.begin(), element_dofs.end());
+	  
+	  const unsigned int n_dofs_on_element = element_dofs.size();
+	    
+	  for (unsigned int i=0; i<n_dofs_on_element; i++)
+	    {
+	      const unsigned int ig = element_dofs[i];
+	      
+	      // Only bother if this matrix row will be stored
+	      // on this processor.
+	      if ((ig >= first_dof_on_proc) &&
+		  (ig <  end_dof_on_proc))
+		{
+		  // This is what I mean
+		  // assert ((ig - first_dof_on_proc) >= 0);
+		  // but do the test like this because ig and
+		  // first_dof_on_proc are unsigned ints
+		  assert (ig >= first_dof_on_proc);
+		  assert ((ig - first_dof_on_proc) < sparsity_pattern.size());
+		  
+		  SparsityPattern::Row &row = sparsity_pattern[ig - first_dof_on_proc];
+
+		  // If the row is empty we will add *all* the element DOFs,
+		  // so just do that.
+		  if (row.empty())
+		    {
+ 		      row.insert(row.end(),
+				 element_dofs.begin(),
+				 element_dofs.end());
+		    }
+		  else
+		    {		  
+		      // Build a list of the DOF indices not found in the
+		      // sparsity pattern
+		      dofs_to_add.clear();
+
+		      // Cache iterators.  Low will move forward, subsequent
+		      // searches will be on smaller ranges
+		      SparsityPattern::Row::iterator
+			low  = std::lower_bound (row.begin(), row.end(), element_dofs.front()),
+			high = std::upper_bound (low,         row.end(), element_dofs.back());
+		  
+		      for (unsigned int j=0; j<n_dofs_on_element; j++)
+			{
+			  const unsigned int jg = element_dofs[j];
+			  
+			  // See if jg is in the sorted range
+			  std::pair<SparsityPattern::Row::iterator,
+			            SparsityPattern::Row::iterator>
+			    pos = std::equal_range (low, high, jg);
+			
+			  // Must add jg if it wasn't found
+			  if (pos.first == pos.second)
+			    dofs_to_add.push_back(jg);
+			
+			  // pos.first is now a valid lower bound for any
+			  // remaining element DOFs. (That's why we sorted them.)
+			  // Use it for the next search
+			  low = pos.first;
+			}
+
+		      // Add to the sparsity pattern
+		      if (!dofs_to_add.empty())
+			{
+			  const unsigned int old_size = row.size();
+			  
+			  row.insert (row.end(),
+				      dofs_to_add.begin(),
+				      dofs_to_add.end());
+		      
+			  SparsityPattern::sort_row (row.begin(), row.begin()+old_size, row.end());
+			}
+		    }
+		  
+		  // Now (possibly) add dofs from neighboring elements
+		  // TODO:[BSK] optimize this like above!
+		  if (implicit_neighbor_dofs)
+		    for (unsigned int s=0; s<elem->n_sides(); s++)
+		      {
+			const Elem* const neighbor_0 = elem->neighbor(s);
+			neighbor_0->active_family_tree_by_neighbor(active_neighbors,elem);
+			for (unsigned int a=0; a != active_neighbors.size(); ++a)
+			  {
+			    const Elem *neighbor = active_neighbors[a];
+			    
+			    dof_map.dof_indices (neighbor, neighbor_dofs);
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+			    dof_map.find_connected_dofs (neighbor_dofs);
+#endif			      
+			    const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
+			    
+			    for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
+			      {
+				const unsigned int jg = neighbor_dofs[j];
+			        
+				// See if jg is in the sorted range
+				std::pair<SparsityPattern::Row::iterator,
+				          SparsityPattern::Row::iterator>
+			    	pos = std::equal_range (row.begin(), row.end(), jg);
+			        
+				// Insert jg if it wasn't found
+				if (pos.first == pos.second)
+				  row.insert (pos.first, jg);
+                              }    
+			  }
+		      }
+		}
+	    }
+	}      
+    } 
+
+
+  
+  // This is what we do in the case that the user has specified
+  // explicit DOF coupling.
+  else
+    {
+      assert (dof_coupling != NULL);
+      assert (dof_coupling->size() ==
+	      dof_map.n_variables());
+      
+      const unsigned int n_var = dof_map.n_variables();
+      
+      std::vector<unsigned int>
+	element_dofs_i,
+	element_dofs_j,
+	dofs_to_add;
+
+
+      for (ConstElemRange::const_iterator elem_it = range.begin() ; elem_it != range.end(); ++elem_it)
+	for (unsigned int vi=0; vi<n_var; vi++)
+	  {
+	    const Elem* const elem = *elem_it;
+	    
+	    // Find element dofs for variable vi
+	    dof_map.dof_indices (elem, element_dofs_i, vi);
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+	    dof_map.find_connected_dofs (element_dofs_i);
+#endif
+
+	    // We can be more efficient if we sort the element DOFs
+	    // into increasing order
+	    std::sort(element_dofs_i.begin(), element_dofs_i.end());
+	    const unsigned int n_dofs_on_element_i = element_dofs_i.size();
+	    
+	    for (unsigned int vj=0; vj<n_var; vj++)
+	      if ((*dof_coupling)(vi,vj)) // If vi couples to vj
+		{
+		  // Find element dofs for variable vj, note that
+		  // if vi==vj we already have the dofs.
+		  if (vi != vj)
+		    {
+		      dof_map.dof_indices (elem, element_dofs_j, vj);
+#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+		      dof_map.find_connected_dofs (element_dofs_j);
+#endif
+
+		      // We can be more efficient if we sort the element DOFs
+		      // into increasing order
+		      std::sort (element_dofs_j.begin(), element_dofs_j.end());
+		    }
+		  else
+		    element_dofs_j = element_dofs_i;
+		  
+		  const unsigned int n_dofs_on_element_j =
+		    element_dofs_j.size();
+		  
+		  for (unsigned int i=0; i<n_dofs_on_element_i; i++)
+		    {
+		      const unsigned int ig = element_dofs_i[i];
+		      
+		      // We are only interested in computing the sparsity pattern
+		      // for the rows in [range.begin(),range.end()).  So, if this
+		      // element's DOFs are not in that range just go ahead to the
+		      // next one.
+		      //	      
+		      // Also, only bother if this matrix row will be stored
+		      // on this processor.
+		      if ((ig >= first_dof_on_proc) &&
+			  (ig <  end_dof_on_proc))			
+			{
+			  // This is what I mean
+			  // assert ((ig - first_dof_on_proc) >= 0);
+			  // but do the test like this because ig and
+			  // first_dof_on_proc are unsigned ints
+			  assert (ig >= first_dof_on_proc);
+			  assert (ig < (sparsity_pattern.size() +
+					first_dof_on_proc));
+			  
+			  SparsityPattern::Row &row = sparsity_pattern[ig - first_dof_on_proc];
+
+			  // If the row is empty we will add *all* the element j DOFs,
+			  // so just do that.
+			  if (row.empty())
+			    {
+			      row.insert(row.end(),
+					 element_dofs_j.begin(),
+					 element_dofs_j.end());
+			    }
+			  else
+			    {		  
+			      // Build a list of the DOF indices not found in the
+			      // sparsity pattern
+			      dofs_to_add.clear();
+
+			      // Cache iterators.  Low will move forward, subsequent
+			      // searches will be on smaller ranges
+			      SparsityPattern::Row::iterator
+				low  = std::lower_bound (row.begin(), row.end(), element_dofs_j.front()),
+				high = std::upper_bound (low,         row.end(), element_dofs_j.back());
+
+			      for (unsigned int j=0; j<n_dofs_on_element_j; j++)
+				{
+				  const unsigned int jg = element_dofs_j[j];
+				  
+				  // See if jg is in the sorted range
+				  std::pair<SparsityPattern::Row::iterator,
+				            SparsityPattern::Row::iterator>
+				    pos = std::equal_range (low, high, jg);
+			      
+				  // Must add jg if it wasn't found
+				  if (pos.first == pos.second)
+				    dofs_to_add.push_back(jg);
+				
+				  // pos.first is now a valid lower bound for any
+				  // remaining element j DOFs. (That's why we sorted them.)
+				  // Use it for the next search
+				  low = pos.first;
+				}
+			      
+			      // Add to the sparsity pattern
+			      if (!dofs_to_add.empty())
+				{
+				  const unsigned int old_size = row.size();
+				  
+				  row.insert (row.end(),
+					      dofs_to_add.begin(),
+					      dofs_to_add.end());
+		      
+				  SparsityPattern::sort_row (row.begin(), row.begin()+old_size, row.end());
+				}
+			    }
+			}
+		    }
+		}
+	  }
+    }
+  
+  // Now the full sparsity structure is built for all of the
+  // DOFs connected to our rows of the matrix.
+  n_nz.resize (n_dofs_on_proc);
+  n_oz.resize (n_dofs_on_proc);
+
+  // First zero the counters.
+  std::fill(n_nz.begin(), n_nz.end(), 0);
+  std::fill(n_oz.begin(), n_oz.end(), 0);
+  
+  for (unsigned int i=0; i<n_dofs_on_proc; i++)
+    {
+      // Get the row of the sparsity pattern
+      const SparsityPattern::Row &row = sparsity_pattern[i];
+
+      for (unsigned int j=0; j<row.size(); j++)
+	if ((row[j] < first_dof_on_proc) || (row[j] >= end_dof_on_proc))
+	  n_oz[i]++;
+	else
+	  n_nz[i]++;
+    }
+}
+
+
+
+void SparsityPattern::Build::join (const SparsityPattern::Build &other)
+{
+  const unsigned int proc_id           = mesh.processor_id();
+  const unsigned int n_global_dofs     = dof_map.n_dofs();
+  const unsigned int n_dofs_on_proc    = dof_map.n_dofs_on_processor(proc_id);
+  const unsigned int first_dof_on_proc = dof_map.first_dof(proc_id);
+  const unsigned int end_dof_on_proc   = dof_map.end_dof(proc_id);
+
+  assert (sparsity_pattern.size() ==  other.sparsity_pattern.size());
+  assert (n_nz.size() == sparsity_pattern.size());
+  assert (n_oz.size() == sparsity_pattern.size());
+  
+  for (unsigned int r=0; r<n_dofs_on_proc; r++)
+    {
+      // incriment the number of on and off-processor nonzeros in this row
+      // (note this will be an upper bound unless we need the full sparsity pattern)
+      n_nz[r] += other.n_nz[r];  n_nz[r] = std::min(n_nz[r], n_dofs_on_proc);
+      n_oz[r] += other.n_oz[r];  n_oz[r] = std::min(n_oz[r], n_global_dofs-n_nz[r]);
+
+      if (need_full_sparsity_pattern)
+	{
+	  SparsityPattern::Row       &my_row    = sparsity_pattern[r];
+	  const SparsityPattern::Row &their_row = other.sparsity_pattern[r];
+      
+	  // simple copy if I have no dofs
+	  if (my_row.empty())
+	    my_row = their_row;
+	  
+	  // otherwise add their DOFs to mine, resort, and re-unique the row
+	  else if (!their_row.empty()) // do nothing for the trivial case where 
+	    {                          // their row is empty
+	      const unsigned int my_old_size = my_row.size();
+	      
+	      my_row.insert (my_row.end(),
+			     their_row.begin(),
+			     their_row.end());
+	  
+	      SparsityPattern::sort_row (my_row.begin(), my_row.begin()+my_old_size, my_row.end());
+	      
+	      my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
+	    }
+
+	  // fix the number of on and off-processor nonzeros in this row
+	  n_nz[r] = n_oz[r] = 0;
+	  
+	  for (unsigned int j=0; j<my_row.size(); j++)
+	    if ((my_row[j] < first_dof_on_proc) || (my_row[j] >= end_dof_on_proc))
+	      n_oz[r]++;
+	    else
+	      n_nz[r]++;
+	}
+    }
+}
