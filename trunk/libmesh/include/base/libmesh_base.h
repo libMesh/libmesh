@@ -36,6 +36,10 @@ namespace libMesh {
    */
   unsigned int processor_id();
 
+  /**
+   * @returns the maximum number of threads used in the simulation.
+   */
+  unsigned int n_threads();
 
   /**
    * Namespaces don't provide private data,
@@ -54,6 +58,11 @@ namespace libMesh {
      * The local processor id.
      */
     extern int _processor_id;
+    
+    /**
+     * Total number of threads possible.
+     */
+    extern int _n_threads;
   }
 }
 
@@ -73,6 +82,15 @@ inline
 unsigned int libMesh::processor_id()
 {
   return static_cast<unsigned int>(libMeshPrivateData::_processor_id);
+}
+
+
+
+
+inline
+unsigned int libMesh::n_threads()
+{
+  return static_cast<unsigned int>(libMeshPrivateData::_n_threads);
 }
 
 
