@@ -102,6 +102,7 @@ const unsigned int libMesh::invalid_uint = static_cast<unsigned int>(-1);
 // libMesh::libMeshPrivateData data initialization
 int           libMesh::libMeshPrivateData::_n_processors = 1;
 int           libMesh::libMeshPrivateData::_processor_id = 0;
+int           libMesh::libMeshPrivateData::_n_threads = 1; /* Threads::task_scheduler_init::automatic; */
 bool          libMesh::libMeshPrivateData::_is_initialized = false;
 SolverPackage libMesh::libMeshPrivateData::_solver_package =
 #if   defined(HAVE_PETSC)   // PETSc is the default
@@ -131,27 +132,14 @@ void libMesh::init (int &argc, char** & argv,
 
   // Build a task scheduler
   {
-    int n_threads = 
-      libMesh::command_line_value ("--n_threads", Threads::task_scheduler_init::automatic);
+    // Get the requested number of threads, defaults to 1 to avoid MPI and 
+    // multithreading competition.  If you would like to use MPI and multithreading 
+    // at the same time then (n_mpi_processes_per_node)x(n_threads) should be the
+    //  number of processing cores per node.
+    libMesh::libMeshPrivateData::_n_threads = 
+      libMesh::command_line_value ("--n_threads", 1);
 
-// #ifdef ENABLE_PERFORMANCE_LOGGING
-//     // allow the user to disable performance logging at run-time.    
-//     if (libMesh::on_command_line ("--disable-perflog"))
-//       libMesh::perflog.disable_logging();
-      
-// // #  ifdef HAVE_TBB_API
-// //     // performance logging is currently not thread-safe.
-// //     // but only do this when threading is actually enabled
-// //     // to avoid unwarranted warnings.
-// //     else if (n_threads != 1)
-// //       {
-// // 	std::cout << "WARNING:  performance logging is currently not thread-safe.  Disabling." << std::endl;
-// // 	libMesh::perflog.disable_logging();
-// //       }
-// // #  endif
-// #endif
-    
-    task_scheduler.reset (new Threads::task_scheduler_init(n_threads));
+    task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
   }
 
   // Construct singletons who may be at risk of the
