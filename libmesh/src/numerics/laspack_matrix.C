@@ -33,8 +33,7 @@
 //-----------------------------------------------------------------------
 // LaspackMatrix members
 template <typename T> 
-void LaspackMatrix<T>::update_sparsity_pattern (const std::vector<std::vector<unsigned int> >&
-						sparsity_pattern)
+void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sparsity_pattern)
 {
   // clear data, start over
   this->clear ();    
@@ -66,8 +65,7 @@ void LaspackMatrix<T>::update_sparsity_pattern (const std::vector<std::vector<un
     for (unsigned int row=0; row<n_rows; row++)
       {
 	// insert the row indices
-	for (std::vector<unsigned int>::const_iterator col =
-	       sparsity_pattern[row].begin();
+	for (SparsityPattern::Row::const_iterator col = sparsity_pattern[row].begin();
 	     col != sparsity_pattern[row].end(); ++col)
 	  {
 	    assert (pos != _csr.end());

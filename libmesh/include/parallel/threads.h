@@ -39,12 +39,14 @@
 #  include "tbb/atomic.h"
 #endif
 
+
 /**
  * The Threads namespace is for wrapper functions
  * for common general multithreading algorithms and tasks.
  */
 namespace Threads
 {
+
 #ifdef HAVE_TBB_API
   //-------------------------------------------------------------------
   /**
@@ -52,11 +54,16 @@ namespace Threads
    */
   typedef tbb::task_scheduler_init task_scheduler_init;
 
+
+
+  //-------------------------------------------------------------------
   /**
    * Dummy "splitting object" used to distinguish splitting constructors
    * from copy constructors.
    */
   typedef tbb::split split;
+
+
 
   //-------------------------------------------------------------------
   /**
@@ -78,6 +85,8 @@ namespace Threads
 #endif
   }
 
+
+
   //-------------------------------------------------------------------
   /**
    * Exectue the provided function object in parallel on the specified 
@@ -98,6 +107,8 @@ namespace Threads
 #endif
   }
 
+
+
   //-------------------------------------------------------------------
   /**
    * Exectue the provided reduction operation in parallel on the specified 
@@ -111,12 +122,14 @@ namespace Threads
     libMesh::perflog.disable_logging();
 #endif   
 
-    tbb::parallel_reduce (range, body); 
+    tbb::parallel_reduce (range, body, tbb::auto_partitioner()); 
 
 #ifdef ENABLE_PERFORMANCE_LOGGING
     libMesh::perflog.enable_logging();
 #endif
   }
+
+
 
   //-------------------------------------------------------------------
   /**
@@ -137,6 +150,7 @@ namespace Threads
     libMesh::perflog.enable_logging();
 #endif
   }
+
 
 
   //-------------------------------------------------------------------
@@ -253,11 +267,143 @@ namespace Threads
   private:
     T _val;
   };
-
   
 
 #endif // #ifdef HAVE_TBB_API
 
+
+
+//   /**
+//    * Blocked range which can be subdivided and executed in parallel.
+//    */
+//   template <typename T>
+//   class BlockedRange 
+//   {
+//   public:
+//     /**
+//      * Allows an \p StoredRange to behave like an STL container.
+//      */
+//     typedef T const_iterator;
+
+//     /**
+//      * Constructor. Optionally takes the \p grainsize parameter, which is the
+//      * smallest chunk the range may be broken into for parallel
+//      * execution.
+//      */
+//     BlockedRange (const unsigned int grainsize = 1000) :
+//       _grainsize(grainsize)
+//     {}
+
+//     /**
+//      * Constructor.  Takes the beginning and end of the range.  
+//      * Optionally takes the \p grainsize parameter, which is the
+//      * smallest chunk the range may be broken into for parallel
+//      * execution.
+//      */
+//     BlockedRange (const const_iterator first,
+// 		  const const_iterator last,
+// 		  const unsigned int grainsize = 1000) :
+//       _grainsize(grainsize)
+//     {
+//       this->reset(first, last);
+//     }
+
+//     /**
+//      * Copy constructor.  The \p StoredRange can be copied into
+//      * subranges for parallel execution.  In this way the 
+//      * initial \p StoredRange can be thought of as the root of
+//      * a binary tree.  The root element is the only element
+//      * which interacts with the user.  It takes a specified
+//      * range of objects and packs it into a contiguous vector
+//      * which can be split efficiently. However, there is no need
+//      * for the child ranges to contain this vector, so long as
+//      * the parent outlives the children.  So we implement
+//      * the copy constructor to specifically omit the \p _objs
+//      * vector.
+//      */
+//     BlockedRange (const BlockedRange<T> &r):
+//       _end(r._end), 
+//       _begin(r._begin),
+//       _grainsize(r._grainsize)
+//     {}
+    
+//     /**
+//      * Splits the range \p r.  The first half
+//      * of the range is left in place, the second
+//      * half of the range is placed in *this.
+//      */
+//     BlockedRange (BlockedRange<T> &r, Threads::split ) : 
+//       _end(r._end),
+//       _begin(r._begin),
+//       _grainsize(r._grainsize)
+//     {
+//       const_iterator
+// 	beginning = r._begin,
+// 	ending    = r._end,
+// 	middle    = beginning + (ending - beginning)/2u;
+    
+//       r._end = _begin = middle;
+//     }
+    
+//     /**
+//      * Resets the \p StoredRange to contain [first,last).
+//      */ 
+//     void reset (const const_iterator first,
+// 		const const_iterator last)
+//     {
+//       _begin = first;
+//       _end   = last;
+//     }
+    
+//     /**
+//      * Beginning of the range.
+//      */
+//     const_iterator begin () const { return _begin; }  
+    
+//     /**
+//      * End of the range.
+//      */
+//     const_iterator end () const { return _end; }
+    
+//     /**
+//      * The grain size for the range.  The range will be subdivided into 
+//      * subranges not to exceed the grain size.
+//      */
+//     unsigned int grainsize () const {return _grainsize;}
+    
+//     /**
+//      * Set the grain size.
+//      */
+//     void grainsize (const unsigned int &gs) {_grainsize = gs;}
+    
+//     /**
+//      * \return the size of the range.
+//      */
+//     int size () const { return (_end -_begin); }
+
+//     //------------------------------------------------------------------------
+//     // Methods that implement Range concept
+//     //------------------------------------------------------------------------
+    
+//     /**
+//      * Returns true if the range is empty.
+//      */  
+//     bool empty() const { return (_begin == _end); }
+    
+//     /**
+//      * Returns true if the range can be subdivided.
+//      */
+//     bool is_divisible() const { return static_cast<int>(this->grainsize()) < (_end - _begin); }
+
+//   private:
+    
+//     const_iterator _end;
+//     const_iterator _begin;
+//     unsigned int _grainsize;
+//   };
+
+
+  
   /**
    * A spin mutex object which 
    */

@@ -35,6 +35,10 @@
 #include "reference_counted_object.h"
 #include "libmesh.h" // libMesh::invalid_uint
 #include "vector_value.h" // RealVectorValue
+#include "threads.h"
+#include "threads_allocators.h"
+#include "elem_range.h"
+
 
 // Forward Declarations
 class DofMap;
@@ -54,15 +58,98 @@ template <typename T> class NumericVector;
 
 
 
+// ------------------------------------------------------------
+// Sparsity Pattern
+
 /**
- * This class handles the numbering of degrees of freedom on a mesh.
- * For systems of equations the class supports a fixed number of variables.
- * The degrees of freedom are numbered such that sequential, contiguous blocks
- * correspond to distinct subdomains.  This is so that the resulting data
- * structures will work well with parallel linear algebra packages.
- *
- * @author Benjamin S. Kirk, 2002-2007
+ * This defines the sparsity pattern, or graph, of a sparse matrix.
+ * The format is quite simple -- the global indices of the nonzero entries
+ * in each row are packed into a vector.  The global indices (i,j) of the 
+ * nth nonzero entry of row i are given by j = sparsity_pattern[i][n];
  */
+namespace SparsityPattern // use a namespace so member classes can be forward-declared.
+{
+  typedef std::vector<unsigned int, Threads::scalable_allocator<unsigned int> > Row;
+  class Graph : public std::vector<Row> {};
+  
+  /**
+   * Splices the two sorted ranges [begin,middle) and [middle,end)
+   * into one sorted range [begin,end).  This method is much like
+   * std::inplace_merge except it assumes the intersection
+   * of the two sorted ranges is empty and that any element in
+   * each range occurs only once in that range.  Additionally,
+   * this sort occurs in-place, while std::inplace_merge may
+   * use a temporary buffer.
+   */ 
+  template<typename BidirectionalIterator>
+  static void sort_row (const BidirectionalIterator begin,
+			BidirectionalIterator       middle,
+			const BidirectionalIterator end);
+
+  /**
+   * This helper class can be called on multiple threads to compute 
+   * the sparsity pattern (or graph) of the sparse matrix resulting
+   * from the discretization.  This pattern may be used directly by
+   * a particular sparse matrix format (e.g. \p LaspackMatrix)
+   * or indirectly (e.g. \p PetscMatrix).  In the latter case the
+   * number of nonzeros per row of the matrix is needed for efficient 
+   * preallocation.  In this case it suffices to provide estimate
+   * (but bounding) values, and in this case the threaded method can
+   * take some short-cuts for efficiency.
+   */
+  class Build
+  {
+  private:
+    const MeshBase &mesh;
+    const DofMap &dof_map;
+    const CouplingMatrix *dof_coupling;
+    const bool implicit_neighbor_dofs;
+    const bool need_full_sparsity_pattern;
+
+  public:
+
+    SparsityPattern::Graph sparsity_pattern;
+    std::vector<unsigned int> n_nz;
+    std::vector<unsigned int> n_oz;
+    
+    Build (const MeshBase &mesh_in,
+	   const DofMap &dof_map_in,
+	   const CouplingMatrix *dof_coupling_in,
+	   const bool implicit_neighbor_dofs_in,
+	   const bool need_full_sparsity_pattern_in) :
+      mesh(mesh_in),
+      dof_map(dof_map_in),
+      dof_coupling(dof_coupling_in),
+      implicit_neighbor_dofs(implicit_neighbor_dofs_in),
+      need_full_sparsity_pattern(need_full_sparsity_pattern_in)
+    {}
+
+    Build (Build &other, Threads::split) :
+      mesh(other.mesh),
+      dof_map(other.dof_map),
+      dof_coupling(other.dof_coupling),
+      implicit_neighbor_dofs(other.implicit_neighbor_dofs),
+      need_full_sparsity_pattern(other.need_full_sparsity_pattern)
+    {}
+
+    void operator()(const ConstElemRange &range);
+
+    void join (const Build &other);
+  };
+
+#if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
+  /**
+   * Dummy function that does nothing but can be used to prohibit
+   * compiler optimization in some situations where some compilers
+   * have optimization bugs.
+   */
+  static void _dummy_function(void);
+#endif
+  
+}
+
+
+
 
 // ------------------------------------------------------------
 // AMR constraint matrix types
@@ -71,7 +158,9 @@ template <typename T> class NumericVector;
 /**
  * A row of the Dof constraint matrix.
  */
-typedef std::map<unsigned int, Real> DofConstraintRow;
+typedef std::map<unsigned int, Real, 
+                 std::less<unsigned int>, 
+                 Threads::scalable_allocator<std::pair<const unsigned int, Real> > > DofConstraintRow;
 
 /** 
  * The constraint matrix storage format. 
@@ -79,7 +168,10 @@ typedef std::map<unsigned int, Real> DofConstraintRow;
  * declarations and future flexibility.  Don't delete this from
  * a pointer-to-std::map; the destructor isn't virtual!
  */
-class DofConstraints : public std::map<unsigned int, DofConstraintRow>
+class DofConstraints : public std::map<unsigned int, 
+                                       DofConstraintRow, 
+                                       std::less<unsigned int>, 
+                                       Threads::scalable_allocator<std::pair<const unsigned int, DofConstraintRow> > >
 {
 };
 #endif // ENABLE_AMR || ENABLE_PERIODIC
@@ -90,7 +182,7 @@ class DofConstraints : public std::map<unsigned int, DofConstraintRow>
 
 #ifdef ENABLE_PERIODIC
 /**
- * A row of the Dof constraint matrix.
+ * The definition of a periodic boundary.
  */
 class PeriodicBoundary
 {
@@ -132,10 +224,20 @@ private:
 };
 #endif // ENABLE_PERIODIC
 
+
   
 // ------------------------------------------------------------
 // Dof Map class definition
 
+/**
+ * This class handles the numbering of degrees of freedom on a mesh.
+ * For systems of equations the class supports a fixed number of variables.
+ * The degrees of freedom are numbered such that sequential, contiguous blocks
+ * correspond to distinct subdomains.  This is so that the resulting data
+ * structures will work well with parallel linear algebra packages.
+ *
+ * @author Benjamin S. Kirk, 2002-2007
+ */
 class DofMap : public ReferenceCountedObject<DofMap>
 {
 public:
@@ -555,20 +657,6 @@ private:
   void distribute_local_dofs_node_major (unsigned int& next_free_dof,
 				         MeshBase& mesh,
 				         const bool build_send_list);
-  
-  /**
-   * Splices the two sorted ranges [begin,middle) and [middle,end)
-   * into one sorted range [begin,end).  This method is much like
-   * std::inplace_merge except it assumes the intersection
-   * of the two sorted ranges is empty and that any element in
-   * each range occurs only once in that range.  Additionally,
-   * this sort occurs in-place, while std::inplace_merge may
-   * use a temporary buffer.
-   */ 
-  template<typename BidirectionalIterator>
-  void sort_sparsity_row (const BidirectionalIterator begin,
-			  BidirectionalIterator       middle,
-			  const BidirectionalIterator end);
     
   /**
    * Adds entries to the \p _send_list vector corresponding to DoFs
@@ -604,7 +692,7 @@ private:
    * Finds all the DOFS associated with the element DOFs elem_dofs.
    * This will account for off-element couplings via hanging nodes.
    */
-  void find_connected_dofs (std::vector<unsigned int>& elem_dofs) const;
+  void find_connected_dofs (std::vector<unsigned int> &elem_dofs) const;
   
 #endif
 
@@ -687,15 +775,7 @@ private:
   PeriodicBoundaries _periodic_boundaries;
 #endif
 
-
-#if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
-  /**
-   * Dummy function that does nothing but can be used to prohibit
-   * compiler optimization in some situations where some compilers
-   * have optimization bugs.
-   */
-  static void _dummy_function(void);
-#endif
+  friend class SparsityPattern::Build;
 };
 
 
@@ -752,9 +832,11 @@ unsigned int DofMap::sys_number() const
 
 
 
+// ------------------------------------------------------------
+// SparsityPattern inline member functions
 template<typename BidirectionalIterator>
 inline
-void DofMap::sort_sparsity_row (const BidirectionalIterator begin,
+void SparsityPattern::sort_row (const BidirectionalIterator begin,
 				BidirectionalIterator       middle,
 				const BidirectionalIterator end)
 {
@@ -814,7 +896,6 @@ void DofMap::sort_sparsity_row (const BidirectionalIterator begin,
 
 // ------------------------------------------------------------
 // PeriodicBoundary inline member functions
-
 #ifdef ENABLE_PERIODIC
 
 inline
