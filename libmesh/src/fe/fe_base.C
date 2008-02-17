@@ -1572,6 +1572,8 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 				       const unsigned int variable_number,
 				       const Elem* elem)
 {
+  assert (elem != NULL);
+
   const unsigned int Dim = elem->dim();
 
   // Only constrain elements in 2,3D.
@@ -1581,8 +1583,6 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
   // Only constrain active elements with this method
   if (!elem->active())
     return;
-
-  assert (elem != NULL);
 
   const FEType& base_fe_type = dof_map.variable_type(variable_number);
 
@@ -1609,6 +1609,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
   const std::vector<Point> *face_normals = NULL;
   const std::vector<std::vector<RealGradient> > *dphi = NULL;
   const std::vector<std::vector<RealGradient> > *neigh_dphi = NULL;
+
   std::vector<unsigned int> my_dof_indices, neigh_dof_indices;
   std::vector<unsigned int> my_side_dofs, neigh_side_dofs;
 
@@ -1666,6 +1667,15 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
               (const_cast<Elem *>(neigh))->hack_p_level(min_p_level);
 
 	    my_fe->reinit(elem, s);
+	    
+	    // This function gets called element-by-element, so there
+	    // will be a lot of memory allocation going on.  We can 
+	    // at least minimize this for the case of the dof indices
+	    // by efficiently preallocating the requisite storage.
+	    // n_nodes is not necessarily n_dofs, but it is better
+	    // than nothing!
+	    my_dof_indices.reserve    (elem->n_nodes());
+	    neigh_dof_indices.reserve (neigh->n_nodes());
 
 	    dof_map.dof_indices (elem, my_dof_indices,
 			         variable_number);
@@ -1673,7 +1683,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 			         variable_number);
 
 	    const unsigned int n_qp = my_qface.n_points();
-
+	    
 	    FEInterface::inverse_map (Dim, base_fe_type, neigh,
                                       q_point, neigh_qface);
 
@@ -1681,7 +1691,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 
 	    // We're only concerned with DOFs whose values (and/or first
 	    // derivatives for C1 elements) are supported on side nodes
-	    FEInterface::dofs_on_side(elem, Dim, base_fe_type, s, my_side_dofs);
+	    FEInterface::dofs_on_side(elem,  Dim, base_fe_type, s,       my_side_dofs);
 	    FEInterface::dofs_on_side(neigh, Dim, base_fe_type, s_neigh, neigh_side_dofs);
 
             // We're done with functions that examine Elem::p_level(),
@@ -1805,14 +1815,18 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 				           const unsigned int variable_number,
 				           const Elem* elem)
 {
-  const unsigned int Dim = elem->dim();
+  // Only bother if we truly have periodic boundaries
+  if (boundaries.empty())
+    return;
 
+  assert (elem != NULL);
+  
   // Only constrain active elements with this method
   if (!elem->active())
     return;
 
-  assert (elem != NULL);
-
+  const unsigned int Dim = elem->dim();
+  
   const FEType& base_fe_type = dof_map.variable_type(variable_number);
 
   // Construct FE objects for this element and its pseudo-neighbors.

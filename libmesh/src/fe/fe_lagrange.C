@@ -674,11 +674,11 @@ void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
   if (Dim == 1)
     return;
 
+  assert (elem != NULL);
+
   // Only constrain active and ancestor elements
   if (elem->subactive())
     return;
-
-  assert (elem != NULL);
 
   FEType fe_type = dof_map.variable_type(variable_number);
   fe_type.order = static_cast<Order>(fe_type.order + elem->p_level());
@@ -702,6 +702,13 @@ void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 	  
 	  const AutoPtr<Elem> my_side     (elem->build_side(s));
 	  const AutoPtr<Elem> parent_side (parent->build_side(s));
+
+	  // This function gets called element-by-element, so there
+	  // will be a lot of memory allocation going on.  We can 
+	  // at least minimize this for the case of the dof indices
+	  // by efficiently preallocating the requisite storage.
+	  my_dof_indices.reserve (my_side->n_nodes());
+	  parent_dof_indices.reserve (parent_side->n_nodes());
 
 	  dof_map.dof_indices (my_side.get(), my_dof_indices,
 			       variable_number);
