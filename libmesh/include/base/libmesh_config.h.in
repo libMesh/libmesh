@@ -34,6 +34,9 @@
 /* Flag indicating if the library should be built with second derivatives */
 #undef ENABLE_SECOND_DERIVATIVES
 
+/* Flag indicating bzip2/bunzip2 are available for handlingcompressed files */
+#undef HAVE_BZIP
+
 /* Define to 1 if you have the <csignal> header file. */
 #undef HAVE_CSIGNAL
 
