@@ -71,14 +71,15 @@ public:
    */
   enum ReadFlags { READ_HEADER           = 1,
                    READ_DATA             = 2,
-                   READ_ADDITIONAL_DATA  = 4 };
+                   READ_ADDITIONAL_DATA  = 4,
+                   READ_LEGACY_FORMAT    = 8 };
 
   /**
    * Define enumeration to set properties in EquationSystems::write()
    */
   enum WriteFlags { WRITE_DATA             = 1,
                     WRITE_ADDITIONAL_DATA  = 2,
-                    WRITE_PARALLEL_FILES   = 4};
+                    WRITE_PARALLEL_FILES   = 4 };
   
   /**
    * Constructor.
