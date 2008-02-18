@@ -409,7 +409,8 @@ public:
    */
   void read_header (Xdr& io, 
 		    const bool read_header=true,
-		    const bool read_additional_data=true);
+		    const bool read_additional_data=true,
+		    const bool read_legacy_format=false);
 
   /**
    * Reads additional data, namely vectors, for this System.

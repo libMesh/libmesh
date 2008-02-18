@@ -59,7 +59,8 @@ namespace {
 // System class implementation
 void System::read_header (Xdr& io,
 			  const bool read_header,
-			  const bool read_additional_data)
+			  const bool read_additional_data,
+			  const bool read_legacy_format)
 {
   // This method implements the input of a
   // System object, embedded in the output of
@@ -133,7 +134,25 @@ void System::read_header (Xdr& io,
 	FEType type;
 	type.order  = static_cast<Order>(order);
 	type.family = static_cast<FEFamily>(fam);
-	
+
+	// Check for incompatibilities.  The shape function indexing was
+	// changed for the monomial and xyz finite element families to 
+	// simplify extension to arbitrary p.  The consequence is that 
+	// old restart files will not be read correctly.  This is expected
+	// to be an unlikely occurance, but catch it anyway.
+	if (read_legacy_format)
+	  if ((type.family == MONOMIAL || type.family == XYZ) && 
+	      ((type.order > 2 && this->get_mesh().mesh_dimension() == 2) ||
+	       (type.order > 1 && this->get_mesh().mesh_dimension() == 3)))
+	    {
+	      here();
+	      std::cout << "*****************************************************************\n"
+			<< "* WARNING: reading a potentially incompatible restart file!!!   *\n"
+			<< "*  contact libmesh-users@lists.sourceforge.net for more details *\n"
+			<< "*****************************************************************"
+			<< std::endl;
+	    }
+			
 #ifdef ENABLE_INFINITE_ELEMENTS
 	
 	// Read additional information for infinite elements	

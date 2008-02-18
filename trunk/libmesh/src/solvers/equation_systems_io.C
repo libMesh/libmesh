@@ -35,14 +35,28 @@
 #include "xdr_cxx.h"
 
 // Forward Declarations
+
 // Anonymous namespace for implementation details.
 namespace {
-  std::string local_file_name (const std::string &basename)
+  std::string local_file_name (const std::string &name)
   {
+    std::string basename(name);
     char buf[256];
-    std::sprintf(buf, "%s.%04d", basename.c_str(),libMesh::processor_id());
-    std::string filename(buf);
-    return filename;
+
+    if (basename.size() - basename.rfind(".bz2") == 4)
+      {
+	basename.erase(basename.end()-4, basename.end());
+	std::sprintf(buf, "%s.%04d.bz2", basename.c_str(), libMesh::processor_id());
+      }
+    else if (basename.size() - basename.rfind(".gz") == 3)
+      {
+	basename.erase(basename.end()-3, basename.end());
+	std::sprintf(buf, "%s.%04d.gz", basename.c_str(), libMesh::processor_id());
+      }
+    else
+      std::sprintf(buf, "%s.%04d", basename.c_str(), libMesh::processor_id());
+      
+    return std::string(buf);
   }
 }
 
@@ -55,8 +69,6 @@ void EquationSystems::read (const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
                             const unsigned int read_flags)
 {
-  START_LOG("read()","EquationSystems");
-  
   /**
    * This program implements the output of an 
    * EquationSystems object.  This warrants some 
@@ -124,42 +136,42 @@ void EquationSystems::read (const std::string& name,
    const bool read_header          = read_flags & EquationSystems::READ_HEADER;
    const bool read_data            = read_flags & EquationSystems::READ_DATA;
    const bool read_additional_data = read_flags & EquationSystems::READ_ADDITIONAL_DATA;
+   const bool read_legacy_format   = read_flags & EquationSystems::READ_LEGACY_FORMAT;
          bool read_parallel_files  = false;
 
-
-   static const bool read_legacy_restart_format = libMesh::on_command_line ("--read_legacy_restart_format");
-   
-  // Nasty hack for reading/writing zipped files
-  std::string new_name = name;
-  if (name.size() - name.rfind(".bz2") == 4)
-    {
-      new_name.erase(new_name.end() - 4, new_name.end());
-      START_LOG("system(bunzip2)", "EquationSystems");
-      if (libMesh::processor_id() == 0)
-        {
-          std::string system_string = "bunzip2 -f -k ";
-          system_string += name;
-          std::system(system_string.c_str());
-        }					
-      Parallel::barrier(); // Not sure we need this any more? BSK, 2/3/2008
-      STOP_LOG("system(bunzip2)", "EquationSystems");
-    }
-
-  
-  Xdr io ((libMesh::processor_id() == 0) ? new_name : "", mode);
+  // This will unzip a file with .bz2 as the extension, otherwise it
+  // simply returns the name if the file need not be unzipped.
+  Xdr io ((libMesh::processor_id() == 0) ? name : "", mode);
   assert (io.reading());
 	  
   {
     // 1.)
     // Read the version header.
     std::string version = "legacy";
-    if (!read_legacy_restart_format)
+    if (!read_legacy_format)
       {
 	if (libMesh::processor_id() == 0) io.data(version);	
 	Parallel::broadcast(version);
+	
+	// All processors have the version header, if it does not contain
+	// "libMesh" something then it is a legacy file.
+	if (!(version.find("libMesh") < version.size()))
+	  {
+	    io.close();
+	    
+	    // Recursively call this read() function but with the 
+	    // EquationSystems::READ_LEGACY_FORMAT bit set.
+	    this->read (name, mode, (read_flags | EquationSystems::READ_LEGACY_FORMAT));
+	    return;
+	  }
+
 	read_parallel_files = (version.rfind(" parallel") < version.size());
       }
-    
+    else
+      deprecated();
+
+  START_LOG("read()","EquationSystems");
+      
     // 2.)  
     // Read the number of equation systems
     unsigned int n_sys=0;
@@ -188,7 +200,8 @@ void EquationSystems::read (const std::string& name,
 	System& new_system = this->get_system(sys_name);	  
 	new_system.read_header (io,
 				read_header,
-				read_additional_data);
+				read_additional_data,
+				read_legacy_format);
       }
   }
       
@@ -207,7 +220,7 @@ void EquationSystems::read (const std::string& name,
       // the EquationSystems::read() method should look constant from the mesh
       // perspective, but we need to assign a temporary numbering to the nodes
       // and elements in the mesh, which requires that we abuse const_cast
-      if (!read_legacy_restart_format)
+      if (!read_legacy_format)
 	{
 	  MeshBase &mesh = const_cast<MeshBase&>(this->get_mesh());
 	  MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
@@ -219,7 +232,7 @@ void EquationSystems::read (const std::string& name,
 	pos = _systems.begin();
       
       for (; pos != _systems.end(); ++pos)
-	if (read_legacy_restart_format)
+	if (read_legacy_format)
 	  {
 	    deprecated();
 	    pos->second->read_legacy_data (io, read_additional_data);
@@ -232,7 +245,7 @@ void EquationSystems::read (const std::string& name,
 
       
       // Undo the temporary numbering.
-      if (!read_legacy_restart_format)
+      if (!read_legacy_format)
 	if (dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh)))
 	  {
 	    ParallelMesh *mesh = dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh));    
@@ -250,11 +263,6 @@ void EquationSystems::read (const std::string& name,
 	    error();
 	  }	  
     }  
-
-  // If we temporarily decompressed a .bz2 file, remove the
-  // uncompressed version
-  if (name.size() - name.rfind(".bz2") == 4)
-    std::remove(new_name.c_str());
 
   STOP_LOG("read()","EquationSystems");
   
@@ -344,18 +352,13 @@ void EquationSystems::write(const std::string& name,
    const bool write_parallel_files  = write_flags & EquationSystems::WRITE_PARALLEL_FILES;
    const bool write_additional_data = write_flags & EquationSystems::WRITE_ADDITIONAL_DATA;
 
-  // Nasty hack for reading/writing zipped files
-  std::string new_name = name;
-  if (name.size() - name.rfind(".bz2") == 4)
-    new_name.erase(new_name.end() - 4, new_name.end());
-  
   // New scope so that io will close before we try to zip the file
   {
-    START_LOG("write()","EquationSystems");
-
-    Xdr io((libMesh::processor_id()==0) ? new_name : "", mode);    
+    Xdr io((libMesh::processor_id()==0) ? name : "", mode);    
     assert (io.writing());
     
+    START_LOG("write()","EquationSystems");
+
     const unsigned int proc_id = libMesh::processor_id();
     unsigned int n_sys         = this->n_systems();
     
@@ -431,30 +434,10 @@ void EquationSystems::write(const std::string& name,
 	      pos->second->write_serialized_data (io,write_additional_data);
 	  }
       }
-
+	
     STOP_LOG("write()","EquationSystems");
   }
-
-
-  // Nasty hack for reading/writing zipped files
-  if (name.size() - name.rfind(".bz2") == 4)
-    {
-      START_LOG("system(bzip2)", "EquationSystems");
-#ifdef HAVE_MPI
-      MPI_Barrier(libMesh::COMM_WORLD);
-#endif
-      if (libMesh::processor_id() == 0)
-        {
-          std::string system_string = "bzip2 -f ";
-          system_string += new_name;
-          std::system(system_string.c_str());
-        }
-#ifdef HAVE_MPI
-      MPI_Barrier(libMesh::COMM_WORLD);
-#endif
-      STOP_LOG("system(bzip2)", "EquationSystems");
-    }
-
+ 
   // the EquationSystems::write() method should look constant,
   // but we need to undo the temporary numbering of the nodes
   // and elements in the mesh, which requires that we abuse const_cast
