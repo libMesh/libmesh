@@ -4059,7 +4059,6 @@ src/mesh/mesh_data_xdr_support.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
-    include/utils/o_f_stream.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/xdr_cxx.h
@@ -4995,7 +4994,6 @@ src/mesh/xdr_io.$(obj-suffix):\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
     include/utils/compare_types.h\
-    include/utils/o_f_stream.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/xdr_cxx.h
@@ -7201,7 +7199,6 @@ src/solvers/equation_systems_io.$(obj-suffix):\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
-    include/utils/o_f_stream.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
     include/utils/perf_log.h\
@@ -7950,7 +7947,6 @@ src/solvers/system_io.$(obj-suffix):\
     include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
-    include/utils/o_f_stream.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/xdr_cxx.h
@@ -8436,12 +8432,15 @@ src/utils/utility.$(obj-suffix):\
     include/utils/utility.h
 src/utils/xdr_cxx.$(obj-suffix):\
     src/utils/xdr_cxx.C\
+    include/base/auto_ptr.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_logging.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
+    include/parallel/parallel.h\
     include/utils/o_f_stream.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\

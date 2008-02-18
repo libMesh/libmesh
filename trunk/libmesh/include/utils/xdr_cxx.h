@@ -26,13 +26,14 @@
 #include "libmesh_common.h"
 #include "libmesh.h"
 #include "enum_xdr_mode.h"
-#include "o_f_stream.h"
+#include "auto_ptr.h"
 
 // C++ includes
 #ifdef HAVE_XDR
 #  include <rpc/rpc.h>
 #endif
 
+#include <iosfwd>
 #include <vector>
 #include <string>
 #ifdef USE_COMPLEX_NUMBERS
@@ -428,6 +429,11 @@ private:
    */ 
   const XdrMODE mode;
 
+  /**
+   * The file name
+   */
+  std::string file_name;
+
 #ifdef HAVE_XDR
   
   /**
@@ -446,23 +452,26 @@ private:
 #endif
 
   /**
-   * The output file stream.
-   * Use the customized class to enable
-   * features also for compilers with broken
-   * iostream
-   */
-  OFStream out;
-
-  /**
    * The input file stream.
    */
-  std::ifstream in;
+  AutoPtr<std::istream> in;
+
+  /**
+   * The output file stream.
+   */
+  AutoPtr<std::ostream> out;
 
   /**
    * A buffer to put comment strings into.
    */
   const int comm_len;
   char comm[xdr_MAX_STRING_LENGTH];  
+
+  /**
+   * Are we reading/writing bzipped or gzipped files?
+   */
+  bool gzipped_file;
+  bool bzipped_file;
 };
 
 
