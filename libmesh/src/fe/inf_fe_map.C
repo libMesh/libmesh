@@ -127,7 +127,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
   
   // How much did the point on the reference
   // element change by in this Newton step?
-  Real error = 0.;
+  Real inverse_map_error = 0.;
   
   
   // The point on the reference element.  This is
@@ -358,7 +358,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
       
       // determine the error in computing the local coordinates
       // in the base: ||P_n+1 - P_n||
-      error = dp.size();
+      inverse_map_error = dp.size();
 
       
       // P_n+1 = P_n + dp
@@ -385,7 +385,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 			  << dp
 			  << "   p="
 			  << p
-			  << "   error=" << error
+			  << "   error=" << inverse_map_error
 			  << std::endl;
 	      }
 	    }
@@ -403,7 +403,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	  //  }
 	}
     }
-  while (error > tolerance);
+  while (inverse_map_error > tolerance);
 
 
   
@@ -538,7 +538,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
       const Order radial_mapping_order (Radial::mapping_order());    
       
       unsigned int cnt = 0;
-      Real error = 0.;
+      inverse_map_error = 0.;
       
       // Newton iteration in 1-D
       do
@@ -568,7 +568,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	  if (v >= 1.)
 	    v = .9999;
 	  
-	  error = fabs(dp);
+	  inverse_map_error = std::fabs(dp);
 	  
 	  // increment iteration count
 	  cnt ++;
@@ -583,7 +583,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	  
 	  
 	}
-      while (error > tolerance);
+      while (inverse_map_error > tolerance);
 
       switch (Dim)
 	{
