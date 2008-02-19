@@ -66,7 +66,7 @@ The library is known to work with the following compilers:
     </ul>
   <li>Intel ICC/ECC</li>
     <ul>
-      <li><code>icc/ifort</code> 9.x, 8.x</li>
+      <li><code>icc/ifort</code> 10.x, 9.x, 8.x</li>
       <li><code>icc/ifc</code> 7.x</li>
       <li><code>icc/ifc</code> 6.0</li>
       <li>Earlier versions (&lt;= 5.0) not supported</li>
