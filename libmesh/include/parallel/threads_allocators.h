@@ -53,8 +53,8 @@ namespace Threads
   public:
     typedef T* pointer;
     typedef const T* const_pointer;
-    typedef T& reference;
-    typedef const T& const_reference;
+//     typedef T& reference;              // Intel 7.1 tries to instantiate an allocator<void>, 
+//     typedef const T& const_reference;  // so we can't typedef a reference to void.
     typedef T value_type;
     typedef size_t size_type;
     typedef ptrdiff_t difference_type;
@@ -92,8 +92,8 @@ namespace Threads
   public:
     typedef T* pointer;
     typedef const T* const_pointer;
-    typedef T& reference;
-    typedef const T& const_reference;
+//     typedef T& reference;              // Intel 7.1 tries to instantiate an allocator<void>, 
+//     typedef const T& const_reference;  // so we can't typedef a reference to void.
     typedef T value_type;
     typedef size_t size_type;
     typedef ptrdiff_t difference_type;

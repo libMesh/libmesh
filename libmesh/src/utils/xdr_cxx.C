@@ -1826,6 +1826,7 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 }
 
 
+#ifdef USE_COMPLEX_NUMBERS
 template <>
 void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const unsigned int line_break)
 {
@@ -1927,7 +1928,7 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
       error();
     }
 }
-
+#endif // # USE_COMPLEX_NUMBERS
 
 void Xdr::comment (std::string &comment)
 {

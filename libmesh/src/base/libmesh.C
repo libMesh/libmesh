@@ -370,6 +370,6 @@ SolverPackage libMesh::default_solver_package ()
 
 
 //-------------------------------------------------------------------------------
-template int          libMesh::command_line_value (const std::string&, int);
-template Real         libMesh::command_line_value (const std::string&, Real);
-template std::string  libMesh::command_line_value (const std::string&, std::string);
+template int          libMesh::command_line_value<int>         (const std::string&, int);
+template Real         libMesh::command_line_value<Real>        (const std::string&, Real);
+template std::string  libMesh::command_line_value<std::string> (const std::string&, std::string);

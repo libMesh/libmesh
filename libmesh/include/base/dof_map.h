@@ -143,7 +143,7 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
    * compiler optimization in some situations where some compilers
    * have optimization bugs.
    */
-  static void _dummy_function(void);
+  void _dummy_function(void);
 #endif
   
 }
@@ -861,7 +861,7 @@ void SparsityPattern::sort_row (const BidirectionalIterator begin,
 #if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
 	  /* Prohibit optimization at this point since gcc 3.3.5 seems
 	     to have a bug.  */
-	  this->_dummy_function();
+	  SparsityPattern::_dummy_function();
 #endif
 
 	  if (a == begin) break;

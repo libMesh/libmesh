@@ -84,7 +84,7 @@ unsigned int NewtonSolver::solve()
 #ifdef isnan
       if (isnan(current_residual))
         {
-          std::cout << "  Nonlinear solver DIVERGED at step " << l
+          std::cout << "  Nonlinear solver DIVERGED at step " << last_residual
                     << " with norm Not-a-Number"
                     << std::endl;
           error();
