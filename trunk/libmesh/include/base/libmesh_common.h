@@ -184,37 +184,81 @@ namespace libMesh
 // These are useful macros that behave like functions in the code.
 // If you want to make sure you are accessing a section of code just
 // stick a here(); in it, for example
-#undef here
-#define here()     { std::cout << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; }
+  inline
+  void here()
+  {
+    std::cout << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl;
+  }
 
 // the stop() macro will stop the code until a SIGCONT signal is recieved.  This is useful, for example, when
 // determining the memory used by a given operation.  A stop() could be instered before and after a questionable
 // operation and the delta memory can be obtained from a ps or top.  This macro only works for serial cases.
-#undef stop
-#ifdef HAVE_CSIGNAL
+#if defined(HAVE_CSIGNAL) && defined(HAVE_UNISTD_H) && defined(HAVE_SYS_TYPES_H)
 #  include <csignal>
-#  define stop()     { if (libMesh::n_processors() == 1) { here(); std::cout << "Stopping process " << getpid() << "..." << std::endl; std::raise(SIGSTOP); std::cout << "Continuing process " << getpid() << "..." << std::endl; } }
+#  include <sys/types.h>
+#  include <unistd.h>
+  inline
+  void stop()
+  {
+    if (libMesh::n_processors() == 1)
+      {
+	here();
+	std::cout << "Stopping process " << getpid() << "..." << std::endl;
+	std::raise(SIGSTOP);
+	std::cout << "Continuing process " << getpid() << "..." << std::endl;
+      }
+  }
 #else
-#  define stop()     { if (libMesh::n_processors() == 1) { here(); std::cerr << "WARNING:  stop() does not work without the <csignal> header file!" << std::endl; } }
+  inline
+  void stop()
+  {
+    if (libMesh::n_processors() == 1)
+      {
+	here();
+	std::cerr << "WARNING:  stop() does not work without the <csignal> header file!" << std::endl;
+      }
+  }
 #endif
 
 
 // The error() macro prints a message and aborts the code
-#undef error
 #ifdef HAVE_MPI
-#  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; if (libMesh::n_processors() > 1) MPI_Abort(libMesh::COMM_WORLD,1); std::abort(); }
+  inline
+  void error() 
+  {
+    std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl;
+    if (libMesh::n_processors() > 1) MPI_Abort(libMesh::COMM_WORLD,1);
+    std::abort();
+  }
 #else
-#  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; std::abort(); }
+  inline
+  void error()
+  {
+    std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl;
+    std::abort();
+  }
 #endif
 
 // The untested macro warns that you are using untested code
-#undef untested
-#define untested() { std::cout << "*** Warning, This code is untested, experimental, or likely to see future API changes: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }
+inline
+void untested()
+{
+  std::cout << "*** Warning, This code is untested, experimental, or likely to see future API changes: "
+	    << __FILE__ << ", line " << __LINE__
+	    << ", compiled " << __DATE__ << " at " << __TIME__ << " ***"
+	    << std::endl;
+}
 
 
 // The deprecated macro warns that you are using deprecated code
-#undef deprecated
-#define deprecated() { std::cout << "*** Warning, This Code is Deprecated! " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }
+inline
+void deprecated()
+{
+  std::cout << "*** Warning, This Code is Deprecated! "
+	    << __FILE__ << ", line " << __LINE__
+	    << ", compiled " << __DATE__ << " at " << __TIME__ << " ***"
+	    << std::endl;
+}
 
 
 

@@ -69,11 +69,38 @@ namespace {
   };
 
   // comparison operator
-  bool operator < (const unsigned int other_elem_id,
+  bool operator < (const unsigned int &other_elem_id,
 		   const ElemBCData &elem_bc)
   {
     return other_elem_id < elem_bc.elem_id;
   }
+
+  bool operator < (const ElemBCData &elem_bc,
+		   const unsigned int &other_elem_id)
+    
+  {
+    return elem_bc.elem_id < other_elem_id;
+  }
+
+
+  // For some reason SunStudio does not seem to accept the above
+  // comparison functions for use in
+  // std::equal_range (ElemBCData::iterator, ElemBCData::iterator, unsigned int);
+  struct CompareIntElemBCData
+  {
+    bool operator()(const unsigned int &other_elem_id,
+		    const ElemBCData &elem_bc)
+    {
+      return other_elem_id < elem_bc.elem_id;
+    }
+
+    bool operator()(const ElemBCData &elem_bc,
+		    const unsigned int &other_elem_id)
+    
+    {
+      return elem_bc.elem_id < other_elem_id;
+    }
+  };
 }
 
 
@@ -988,7 +1015,11 @@ void XdrIO::read_serialized_bcs (Xdr &io)
       // data structure has not been initialized.
       for (std::pair<std::vector<ElemBCData>::iterator,
 	             std::vector<ElemBCData>::iterator> pos; it!=end; ++it)
+#ifdef __SUNPRO_CC
+	for (pos = std::equal_range (elem_bc_data.begin(), elem_bc_data.end(), (*it)->id(), CompareIntElemBCData());
+#else
 	for (pos = std::equal_range (elem_bc_data.begin(), elem_bc_data.end(), (*it)->id());
+#endif
 	     pos.first != pos.second; ++pos.first)
 	  {
 	    assert (pos.first->elem_id == (*it)->id());

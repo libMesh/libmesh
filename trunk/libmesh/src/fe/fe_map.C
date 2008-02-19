@@ -636,7 +636,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
   
   // How much did the point on the reference
   // element change by in this Newton step?
-  Real error = 0.;
+  Real inverse_map_error = 0.;
   
   //  The point on the reference element.  This is
   //  the "initial guess" for Newton's method.  The
@@ -861,7 +861,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
 
       //  ||P_n+1 - P_n||
-      error = dp.size();
+      inverse_map_error = dp.size();
 
       //  P_n+1 = P_n + dp
       p.add (dp);
@@ -897,7 +897,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			<< dp
 			<< "   p="
 			<< p
-			<< "   error=" << error
+			<< "   error=" << inverse_map_error
                         << "   in element " << elem->id()
 			<< std::endl;
 
@@ -925,7 +925,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    }
 	}
     }
-  while (error > tolerance);
+  while (inverse_map_error > tolerance);
 
 
 
