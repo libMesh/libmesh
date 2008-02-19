@@ -262,11 +262,12 @@ void Xdr::close ()
     case READ:
       {
 	if (in.get() != NULL)
-	  in.reset();    
-
-	if (bzipped_file)
-	  remove_unzipped_file(file_name);
-
+	  {
+	    in.reset();    
+	    
+	    if (bzipped_file)
+	      remove_unzipped_file(file_name);
+	  }
 	file_name = "";
 	return;
       }
@@ -274,11 +275,12 @@ void Xdr::close ()
     case WRITE:
       {
 	if (out.get() != NULL)
-	  out.reset();      
+	  {
+	    out.reset();      
 
-	if (bzipped_file)
-	  zip_file(std::string(file_name.begin(), file_name.end()-4));
-
+	    if (bzipped_file)
+	      zip_file(std::string(file_name.begin(), file_name.end()-4));
+	  }
 	file_name = "";
 	return;
       }
@@ -323,12 +325,16 @@ bool Xdr::is_open() const
       
     case READ:
       {
-	return in->good();
+	if (in.get() != NULL)
+	  return in->good();
+	return false;
       }
 
     case WRITE:
       {
-	return out->good();
+	if (out.get() != NULL)
+	  return out->good();
+	return false;
       }
 
     default:
