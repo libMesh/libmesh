@@ -93,8 +93,15 @@ bool LegacyXdrIO::binary () const
 }
 
 
+
 void LegacyXdrIO::read (const std::string& name)
 {
+  // This is a serial-only process for now;
+  // the Mesh should be read on processor 0 and
+  // broadcast later
+  if (libMesh::processor_id() != 0)
+    return;
+  
   if (this->binary())
     this->read_binary (name);
   else

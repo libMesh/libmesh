@@ -58,6 +58,22 @@
 #endif
 
 
+
+// ------------------------------------------------------------
+// Anonymous namespace for implementation details
+namespace {
+  bool is_parallel_file_format (const std::string &name)
+  {
+    // Certain mesh formats support parallel I/O, including the
+    // "new" Xdr format.
+    return ((name.rfind(".xda") < name.size()) ||
+	    (name.rfind(".xdr") < name.size())
+	    );
+  }
+}
+
+
+
 // ------------------------------------------------------------
 // UnstructuredMesh class member functions
 UnstructuredMesh::UnstructuredMesh (unsigned int d) :
@@ -401,7 +417,7 @@ this->assert_valid_neighbors();
 
 
 void UnstructuredMesh::read (const std::string& name,
-		 MeshData* mesh_data)
+			     MeshData* mesh_data)
 {
   // See if the file exists.  Perform this check on all processors
   // so that the code is terminated properly in the case that the
@@ -418,118 +434,144 @@ void UnstructuredMesh::read (const std::string& name,
       }
   }
 
-  
-  START_LOG("read()", "Mesh");
-  
   // Set the skip_renumber_nodes_and_elements flag on all processors.
   // This ensures that renumber_nodes_and_elements is *not* called
   // during prepare_for_use() for certain types of mesh files.
   // This is required in cases where there is an associated solution
   // file which expects a certain ordering of the nodes.
-  const bool skip_renumber_nodes_and_elements =
-    ((name.rfind(".xda") < name.size()) ||
-     (name.rfind(".xdr") < name.size()) ||
-     (name.rfind(".gmv") < name.size()) 
-     );
+  bool skip_renumber_nodes_and_elements = (name.rfind(".gmv") < name.size());
   
-  // Read the file based on extension.  Only processor 0
-  // needs to read the mesh.  It will then broadcast it and
-  // the other processors will pick it up
-  if (libMesh::processor_id() == 0)
-    {
-      // Nasty hack for reading/writing zipped files
-      std::string new_name = name;
-      if (name.size() - name.rfind(".bz2") == 4)
-        {
-          new_name.erase(new_name.end() - 4, new_name.end());
-          std::string system_string = "bunzip2 -f -k ";
-          system_string += name;
-          START_LOG("system(bunzip2)", "Mesh");
-          std::system(system_string.c_str());
-          STOP_LOG("system(bunzip2)", "Mesh");
-        }
-
-      if (new_name.rfind(".mat") < new_name.size())
-	MatlabIO(*this).read(new_name);
-      
-      else if (new_name.rfind(".ucd") < new_name.size())
-	UCDIO(*this).read (new_name);
-      
-      else if (new_name.rfind(".exd") < new_name.size())
-	ExodusII_IO(*this).read (new_name);
-      
-      else if ((new_name.rfind(".off")  < new_name.size()) ||
-	       (new_name.rfind(".ogl")  < new_name.size()) ||
-	       (new_name.rfind(".oogl") < new_name.size()))
-	OFFIO(*this).read (new_name);
-     
-      else if (new_name.rfind(".xda") < new_name.size())
-	XdrIO(*this).read (new_name);
-      
-      else if (new_name.rfind(".xdr")  < new_name.size())
-	XdrIO(*this,true).read (new_name);
-      
-      else if (new_name.rfind(".mgf") < new_name.size())
-	LegacyXdrIO(*this,true).read_mgf (new_name);
-      
-      else if (new_name.rfind(".unv") < new_name.size())
+  // Look for parallel formats first
+  if (is_parallel_file_format(name))
+    {      
+      // no need to handling bz2 files here -- the Xdr class does that.
+      if ((name.rfind(".xda") < name.size()) ||
+	  (name.rfind(".xdr") < name.size()))
 	{
-	  if (mesh_data == NULL)
+	  XdrIO xdr_io(*this);
+
+	  // .xda* ==> bzip2/gzip/ASCII flavors
+	  if (name.rfind(".xda") < name.size())
 	    {
-	      std::cerr << "Error! You must pass a "
-			<< "valid MeshData pointer to "
-			<< "read UNV files!" << std::endl;
-	      error();
+	      xdr_io.binary() = false;
+	      xdr_io.read (name);
 	    }
-	  UNVIO(*this, *mesh_data).read (new_name);
+	  else // .xdr* ==> true binary XDR file
+	    {
+	      xdr_io.binary() = true;
+	      xdr_io.read (name);
+	    }
+
+	  // The xdr_io object gets constructed with legacy() == false.
+	  // if legacy() == true then it means that a legacy file was detected and
+	  // thus processor 0 performed the read. We therefore need to broadcast the
+	  // mesh.  Further, for this flavor of mesh solution data ordering is tied
+	  // to the node ordering, so we better not reorder the nodes!
+	  if (xdr_io.legacy())
+	    {
+	      deprecated();
+	      skip_renumber_nodes_and_elements = true;
+	      MeshCommunication().broadcast(*this);
+	    }
+	}      
+    }
+
+  // Serial mesh formats
+  else
+    {
+      START_LOG("read()", "Mesh");  
+  
+      // Read the file based on extension.  Only processor 0
+      // needs to read the mesh.  It will then broadcast it and
+      // the other processors will pick it up
+      if (libMesh::processor_id() == 0)
+	{
+	  // Nasty hack for reading/writing zipped files
+	  std::string new_name = name;
+	  if (name.size() - name.rfind(".bz2") == 4)
+	    {
+	      new_name.erase(new_name.end() - 4, new_name.end());
+	      std::string system_string = "bunzip2 -f -k ";
+	      system_string += name;
+	      START_LOG("system(bunzip2)", "Mesh");
+	      std::system(system_string.c_str());
+	      STOP_LOG("system(bunzip2)", "Mesh");
+	    }
+
+	  if (new_name.rfind(".mat") < new_name.size())
+	    MatlabIO(*this).read(new_name);
+	  
+	  else if (new_name.rfind(".ucd") < new_name.size())
+	    UCDIO(*this).read (new_name);
+	  
+	  else if (new_name.rfind(".exd") < new_name.size())
+	    ExodusII_IO(*this).read (new_name);
+	  
+	  else if ((new_name.rfind(".off")  < new_name.size()) ||
+		   (new_name.rfind(".ogl")  < new_name.size()) ||
+		   (new_name.rfind(".oogl") < new_name.size()))
+	    OFFIO(*this).read (new_name);
+     
+	  else if (new_name.rfind(".mgf") < new_name.size())
+	    LegacyXdrIO(*this,true).read_mgf (new_name);
+      
+	  else if (new_name.rfind(".unv") < new_name.size())
+	    {
+	      if (mesh_data == NULL)
+		{
+		  std::cerr << "Error! You must pass a "
+			    << "valid MeshData pointer to "
+			    << "read UNV files!" << std::endl;
+		  error();
+		}
+	      UNVIO(*this, *mesh_data).read (new_name);
+	    }
+      
+	  else if ((new_name.rfind(".node")  < new_name.size()) ||
+		   (new_name.rfind(".ele")   < new_name.size()))
+	    TetGenIO(*this,mesh_data).read (new_name);
+
+	  else if (new_name.rfind(".msh") < new_name.size())
+	    GmshIO(*this).read (new_name);
+
+	  else if (new_name.rfind(".gmv") < new_name.size())
+	    GMVIO(*this).read (new_name);
+
+	  else if (new_name.rfind(".vtu") < new_name.size())
+	    VTKIO(*this).read(new_name);
+      
+	  else
+	    {
+	      std::cerr << " ERROR: Unrecognized file extension: " << name
+			<< "\n   I understand the following:\n\n"
+			<< "     *.mat  -- Matlab triangular ASCII file\n"
+			<< "     *.ucd  -- AVS's ASCII UCD format\n"
+			<< "     *.gmv  -- LANL's General Mesh Viewer format\n"
+			<< "     *.off  -- OOGL OFF surface format\n"
+			<< "     *.exd  -- Sandia's ExodusII format\n"
+			<< "     *.xda  -- Internal ASCII format\n"
+			<< "     *.xdr  -- Internal binary format,\n"
+			<< "               compatible with XdrMGF\n"
+			<< "     *.unv  -- I-deas Universal format\n"
+			<< std::endl;
+	      error();	  
+	    }    
+	  
+	  // If we temporarily decompressed a .bz2 file, remove the
+	  // uncompressed version
+	  if (name.size() - name.rfind(".bz2") == 4)
+	    std::remove(new_name.c_str());
 	}
       
-      else if ((new_name.rfind(".node")  < new_name.size()) ||
-	       (new_name.rfind(".ele")   < new_name.size()))
-	TetGenIO(*this,mesh_data).read (new_name);
+  
+      STOP_LOG("read()", "Mesh");
 
-      else if (new_name.rfind(".msh") < new_name.size())
-	GmshIO(*this).read (new_name);
-
-      else if (new_name.rfind(".gmv") < new_name.size())
-	GMVIO(*this).read (new_name);
-
-      else if (new_name.rfind(".vtu") < new_name.size())
-	VTKIO(*this).read(new_name);
-      
-      else
-	{
-	  std::cerr << " ERROR: Unrecognized file extension: " << name
-		    << "\n   I understand the following:\n\n"
-		    << "     *.mat  -- Matlab triangular ASCII file\n"
-		    << "     *.ucd  -- AVS's ASCII UCD format\n"
-		    << "     *.gmv  -- LANL's General Mesh Viewer format\n"
-		    << "     *.off  -- OOGL OFF surface format\n"
-		    << "     *.exd  -- Sandia's ExodusII format\n"
-		    << "     *.xda  -- Internal ASCII format\n"
-		    << "     *.xdr  -- Internal binary format,\n"
-		    << "               compatible with XdrMGF\n"
-		    << "     *.unv  -- I-deas Universal format\n"
-		    << std::endl;
-	  error();	  
-	}    
-
-      // If we temporarily decompressed a .bz2 file, remove the
-      // uncompressed version
-      if (name.size() - name.rfind(".bz2") == 4)
-        std::remove(new_name.c_str());
+      // Send the mesh & bcs (which are now only on processor 0) to the other
+      // processors
+      MeshCommunication().broadcast (*this);
     }
-  
-  STOP_LOG("read()", "Mesh");
 
-  // Send the mesh & bcs (which are now only on processor 0) to the other
-  // processors
-  {
-    MeshCommunication mesh_communication;
   
-    mesh_communication.broadcast (*this);
-  }
-
   // Done reading the mesh.  Now prepare it for use.
   this->prepare_for_use(skip_renumber_nodes_and_elements);
 
@@ -538,118 +580,123 @@ void UnstructuredMesh::read (const std::string& name,
 
 
 void UnstructuredMesh::write (const std::string& name,
-		  MeshData* mesh_data)
+			      MeshData* mesh_data)
 {
-  START_LOG("write()", "Mesh");
-
-  // Nasty hack for reading/writing zipped files
-  std::string new_name = name;
-  if (name.size() - name.rfind(".bz2") == 4)
-    new_name.erase(new_name.end() - 4, new_name.end());
-  
-  // New scope so that io will close before we try to zip the file
-  {
-  // Write the file based on extension
-  if (new_name.rfind(".dat") < new_name.size())
-    TecplotIO(*this).write (new_name);
-    
-  else if (new_name.rfind(".plt") < new_name.size())
-    TecplotIO(*this,true).write (new_name);
-    
-  else if (new_name.rfind(".ucd") < new_name.size())
-    UCDIO (*this).write (new_name);
-    
-  else if (new_name.rfind(".gmv") < new_name.size())
-    if (this->n_partitions() > 1)
-      GMVIO(*this).write (new_name);
-    else
-      {
-	GMVIO io(*this);
-	io.partitioning() = false;
-	io.write (new_name);
-      }
-    
-  else if (new_name.rfind(".ugrid") < new_name.size())
-    DivaIO(*this).write(new_name);
-    
-  else if (new_name.rfind(".xda") < new_name.size())
-    XdrIO(*this).write(new_name);
-    
-  else if (new_name.rfind(".xdr") < new_name.size())
-    XdrIO(*this,true).write(new_name);
-    
-  else if (new_name.rfind(".mgf")  < new_name.size())
-    LegacyXdrIO(*this,true).write_mgf(new_name);
-    
-  else if (new_name.rfind(".unv") < new_name.size())
-    {
-      if (mesh_data == NULL)
-	{
-	  std::cerr << "Error! You must pass a "
-		    << "valid MeshData pointer to "
-		    << "write UNV files!" << std::endl;
-	  error();
-	}
-      UNVIO(*this, *mesh_data).write (new_name);
+  // parallel formats are special -- they may choose to write
+  // separate files, let's not try to handle the zipping here.
+  if (is_parallel_file_format(name))
+    {	
+      // no need to handling bz2 files here -- the Xdr class does that.
+      if (name.rfind(".xda") < name.size())
+	XdrIO(*this).write(name);
+	
+      else if (name.rfind(".xdr") < name.size())
+	XdrIO(*this,true).write(name);
     }
 
-  else if (new_name.rfind(".mesh") < new_name.size())
-    MEDITIO(*this).write (new_name);
-
-  else if (new_name.rfind(".poly") < new_name.size())
-    TetGenIO(*this).write (new_name);
-
-  else if (new_name.rfind(".msh") < new_name.size())
-    GmshIO(*this).write (new_name);
-    
-  else if (new_name.rfind(".fro") < new_name.size())
-    FroIO(*this).write (new_name);
-
-  else if (new_name.rfind(".vtu") < new_name.size())
-    VTKIO(*this).write (new_name);
-  
+  // serial file formats
   else
     {
-      std::cerr << " ERROR: Unrecognized file extension: " << name
-		<< "\n   I understand the following:\n\n"
-		<< "     *.dat   -- Tecplot ASCII file\n"
-		<< "     *.plt   -- Tecplot binary file\n"
-		<< "     *.ucd   -- AVS's ASCII UCD format\n"
-		<< "     *.ugrid -- Kelly's DIVA ASCII format\n"
-		<< "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
-		<< "     *.xda   -- Internal ASCII format\n"
-		<< "     *.xdr   -- Internal binary format,\n"
-		<< "                compatible with XdrMGF\n"
-		<< "     *.unv   -- I-deas Universal format\n"
-		<< "     *.mesh  -- MEdit mesh format\n"
-		<< "     *.poly  -- TetGen ASCII file\n"
-		<< "     *.msh   -- GMSH ASCII file\n"
-		<< "     *.fro   -- ACDL's surface triangulation file\n"
-		<< std::endl
-		<< "\n Exiting without writing output\n";
-    }    
-  }
+      START_LOG("write()", "Mesh");
+
+      // Nasty hack for reading/writing zipped files
+      std::string new_name = name;
+      if (name.size() - name.rfind(".bz2") == 4)
+	new_name.erase(new_name.end() - 4, new_name.end());
   
-  // Nasty hack for reading/writing zipped files
-  if (name.size() - name.rfind(".bz2") == 4)
-    {
-      START_LOG("system(bzip2)", "Mesh");
-#ifdef HAVE_MPI
-      MPI_Barrier(libMesh::COMM_WORLD);
-#endif
-      if (libMesh::processor_id() == 0)
-        {
-          std::string system_string = "bzip2 -f ";
-          system_string += new_name;
-          std::system(system_string.c_str());
-        }
-#ifdef HAVE_MPI
-      MPI_Barrier(libMesh::COMM_WORLD);
-#endif
-      STOP_LOG("system(bzip2)", "Mesh");
-    }
+      // New scope so that io will close before we try to zip the file
+      {
+	// Write the file based on extension
+	if (new_name.rfind(".dat") < new_name.size())
+	  TecplotIO(*this).write (new_name);
+	
+	else if (new_name.rfind(".plt") < new_name.size())
+	  TecplotIO(*this,true).write (new_name);
+	
+	else if (new_name.rfind(".ucd") < new_name.size())
+	  UCDIO (*this).write (new_name);
+	
+	else if (new_name.rfind(".gmv") < new_name.size())
+	  if (this->n_partitions() > 1)
+	    GMVIO(*this).write (new_name);
+	  else
+	    {
+	      GMVIO io(*this);
+	      io.partitioning() = false;
+	      io.write (new_name);
+	    }
+	
+	else if (new_name.rfind(".ugrid") < new_name.size())
+	  DivaIO(*this).write(new_name);
+    
+	else if (new_name.rfind(".mgf")  < new_name.size())
+	  LegacyXdrIO(*this,true).write_mgf(new_name);
+	
+	else if (new_name.rfind(".unv") < new_name.size())
+	  {
+	    if (mesh_data == NULL)
+	      {
+		std::cerr << "Error! You must pass a "
+			  << "valid MeshData pointer to "
+			  << "write UNV files!" << std::endl;
+		error();
+	      }
+	    UNVIO(*this, *mesh_data).write (new_name);
+	  }
+	
+	else if (new_name.rfind(".mesh") < new_name.size())
+	  MEDITIO(*this).write (new_name);
+	
+	else if (new_name.rfind(".poly") < new_name.size())
+	  TetGenIO(*this).write (new_name);
+	
+	else if (new_name.rfind(".msh") < new_name.size())
+	  GmshIO(*this).write (new_name);
+	
+	else if (new_name.rfind(".fro") < new_name.size())
+	  FroIO(*this).write (new_name);
+	
+	else if (new_name.rfind(".vtu") < new_name.size())
+	  VTKIO(*this).write (new_name);
+	
+	else
+	  {
+	    std::cerr << " ERROR: Unrecognized file extension: " << name
+		      << "\n   I understand the following:\n\n"
+		      << "     *.dat   -- Tecplot ASCII file\n"
+		      << "     *.plt   -- Tecplot binary file\n"
+		      << "     *.ucd   -- AVS's ASCII UCD format\n"
+		      << "     *.ugrid -- Kelly's DIVA ASCII format\n"
+		      << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
+		      << "     *.xda   -- Internal ASCII format\n"
+		      << "     *.xdr   -- Internal binary format,\n"
+		      << "                compatible with XdrMGF\n"
+		      << "     *.unv   -- I-deas Universal format\n"
+		      << "     *.mesh  -- MEdit mesh format\n"
+		      << "     *.poly  -- TetGen ASCII file\n"
+		      << "     *.msh   -- GMSH ASCII file\n"
+		      << "     *.fro   -- ACDL's surface triangulation file\n"
+		      << std::endl
+		      << "\n Exiting without writing output\n";
+	  }    
+      }
   
-  STOP_LOG("write()", "Mesh");
+      // Nasty hack for reading/writing zipped files
+      if (name.size() - name.rfind(".bz2") == 4)
+	{
+	  START_LOG("system(bzip2)", "Mesh");
+	  if (libMesh::processor_id() == 0)
+	    {
+	      std::string system_string = "bzip2 -f ";
+	      system_string += new_name;
+	      std::system(system_string.c_str());
+	    }
+	  Parallel::barrier();
+	  STOP_LOG("system(bzip2)", "Mesh");
+	}
+      
+      STOP_LOG("write()", "Mesh");
+    }  
 }
 
 
