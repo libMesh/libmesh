@@ -721,13 +721,21 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
 
 void XdrIO::read (const std::string& name)
 {
-  Xdr io (name, this->binary() ? DECODE : READ);
+  // Only open the file on processor 0 -- this is especially important because
+  // there may be an underlying bzip/bunzip going on, and multiple simultaneous
+  // calls will produce a race condition.
+  Xdr io (libMesh::processor_id() == 0 ? name : "", this->binary() ? DECODE : READ);
    
   // convenient reference to our mesh
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
-  io.data (this->version());
+  // get the version string.   
+  if (libMesh::processor_id() == 0)    
+    io.data (this->version());
+  Parallel::broadcast (this->version());  
   
+  // note that for "legacy" files the first entry is an
+  // integer -- not a string at all.
   this->legacy() = !(this->version().find("libMesh") < this->version().size());
 
   // Check for a legacy version format.
@@ -751,6 +759,8 @@ void XdrIO::read (const std::string& name)
       io.data (this->partition_map_file_name());      // std::cout << "pid_file=" << this->partition_map_file_name()      << std::endl;
       io.data (this->polynomial_level_file_name());   // std::cout << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
     }
+
+  //TODO:[BSK] a little extra effort here could change this to two broadcasts...
   Parallel::broadcast (n_elem);
   Parallel::broadcast (n_nodes);
   Parallel::broadcast (this->boundary_condition_file_name());
