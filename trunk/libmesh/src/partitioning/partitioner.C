@@ -39,11 +39,16 @@ void Partitioner::partition (MeshBase& mesh,
   if (!mesh.is_serial())
     return;
 
+  // we cannot partition into more pieces than we have
+  // active elements!
+  const unsigned int n_parts =
+    std::min(mesh.n_active_elem(), n);
+  
   // Set the number of partitions in the mesh
-  mesh.set_n_partitions()=n;
+  mesh.set_n_partitions()=n_parts;
 
   // Call the partitioning function
-  this->_do_partition(mesh,n);
+  this->_do_partition(mesh,n_parts);
 
   // Set the node's processor ids
   Partitioner::set_node_processor_ids(mesh);
@@ -56,11 +61,16 @@ void Partitioner::partition (MeshBase& mesh,
 void Partitioner::repartition (MeshBase& mesh,
 			       const unsigned int n)
 {
+  // we cannot partition into more pieces than we have
+  // active elements!
+  const unsigned int n_parts =
+    std::min(mesh.n_active_elem(), n);
+  
   // Set the number of partitions in the mesh
-  mesh.set_n_partitions()=n;
+  mesh.set_n_partitions()=n_parts;
   
   // Call the partitioning function
-  this->_do_repartition(mesh,n);
+  this->_do_repartition(mesh,n_parts);
 
   // Set the node's processor ids
   Partitioner::set_node_processor_ids(mesh);
