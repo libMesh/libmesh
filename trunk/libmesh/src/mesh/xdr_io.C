@@ -97,8 +97,7 @@ namespace {
     }
 
     bool operator()(const ElemBCData &elem_bc,
-		    const unsigned int &other_elem_id)
-    
+		    const unsigned int &other_elem_id)    
     {
       return elem_bc.elem_id < other_elem_id;
     }
@@ -119,7 +118,7 @@ XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase>(mesh),
   _binary             (binary),
-  _legacy             (true),
+  _legacy             (false),
   _version            ("libMesh-0.7.0+"),
   _bc_file_name       ("n/a"),
   _partition_map_file ("n/a"),
@@ -148,6 +147,7 @@ void XdrIO::write (const std::string& name)
 {
   if (this->legacy())
     {
+      deprecated();
       LegacyXdrIO(MeshOutput<MeshBase>::mesh(), this->binary()).write(name);
       return;
     }
@@ -722,8 +722,6 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
 void XdrIO::read (const std::string& name)
 {
   Xdr io (name, this->binary() ? DECODE : READ);
-
-  START_LOG("read()","XdrIO");
    
   // convenient reference to our mesh
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
@@ -735,20 +733,23 @@ void XdrIO::read (const std::string& name)
   // Check for a legacy version format.
   if (this->legacy())
     {
+      deprecated();
       io.close();
       LegacyXdrIO(mesh, this->binary()).read(name);
       return;
     }
+
+  START_LOG("read()","XdrIO");
   
   unsigned int n_elem, n_nodes;
   if (libMesh::processor_id() == 0)
     {
       io.data (n_elem);
       io.data (n_nodes);
-      io.data (this->boundary_condition_file_name()); std::cout << "bc_file="  << this->boundary_condition_file_name() << std::endl;
-      io.data (this->subdomain_map_file_name());      std::cout << "sid_file=" << this->subdomain_map_file_name()      << std::endl;
-      io.data (this->partition_map_file_name());      std::cout << "pid_file=" << this->partition_map_file_name()      << std::endl;
-      io.data (this->polynomial_level_file_name());   std::cout << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
+      io.data (this->boundary_condition_file_name()); // std::cout << "bc_file="  << this->boundary_condition_file_name() << std::endl;
+      io.data (this->subdomain_map_file_name());      // std::cout << "sid_file=" << this->subdomain_map_file_name()      << std::endl;
+      io.data (this->partition_map_file_name());      // std::cout << "pid_file=" << this->partition_map_file_name()      << std::endl;
+      io.data (this->polynomial_level_file_name());   // std::cout << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
     }
   Parallel::broadcast (n_elem);
   Parallel::broadcast (n_nodes);

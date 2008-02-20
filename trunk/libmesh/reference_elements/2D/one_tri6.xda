@@ -1,23 +1,19 @@
-LIBM 0
-1	 # Num. Elements
-6	 # Num. Nodes
-8	 # Sum of Element Weights
-3	 # Num. Boundary Conds.
-65536	 # String Size (ignore) 
-1	 # Num. Element Blocks.
-4 	 # Element types in each block.
-1 	 # Num. of elements in each block.
-Id String
-Title String
-0 1 2 3 4 5 0 -1
-0. 0. 0. 
-1. 0. 0. 
-0. 1. 0.
-.5 0. 0.
-.5 .5 0.
-0. .5 0.
-
-0 0 0
-0 1 1
-0 2 2
-
+libMesh-0.7.0+	 
+1	 # number of elements
+6	 # number of nodes
+.	 # boundary condition specification file
+n/a	 # subdomain id specification file
+n/a	 # processor id specification file
+n/a	 # p-level specification file
+1	 # n_elem at level 0, [ type (n0 ... nN-1) ]
+4 0 1 2 3 4 5 
+0.00000000000000000e+00 0.00000000000000000e+00 0.00000000000000000e+00 
+1.00000000000000000e+00 0.00000000000000000e+00 0.00000000000000000e+00 
+0.00000000000000000e+00 1.00000000000000000e+00 0.00000000000000000e+00 
+5.00000000000000000e-01 0.00000000000000000e+00 0.00000000000000000e+00 
+5.00000000000000000e-01 5.00000000000000000e-01 0.00000000000000000e+00 
+0.00000000000000000e+00 5.00000000000000000e-01 0.00000000000000000e+00 
+3	 # number of boundary conditions
+0 0 0 
+0 1 1 
+0 2 2 
