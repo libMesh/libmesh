@@ -35,6 +35,20 @@
 
 
 
+//-----------------------------------------------
+// anonymous namespace for implementation details
+namespace {
+
+#ifdef ENABLE_AMR
+  const unsigned int packed_elem_header_size = 9;
+#else
+  const unsigned int packed_elem_header_size = 3;
+#endif
+
+}
+
+
+
 // ------------------------------------------------------------
 // MeshCommunication class members
 void MeshCommunication::clear ()
@@ -117,12 +131,6 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
   this->broadcast_bcs  (mesh, *(mesh.boundary_info));
 }
 
-
-#ifdef ENABLE_AMR
-const unsigned int packed_elem_header_size = 9;
-#else
-const unsigned int packed_elem_header_size = 3;
-#endif
 
 
 #ifdef HAVE_MPI
@@ -688,9 +696,8 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 						
     for (unsigned int level=0; level<=local_n_levels; level++)
       {
-	// TODO:[BSK] implement local_level_elements iterators
-	ParallelMesh::element_iterator        it  = mesh.level_elements_begin(level);
-	const ParallelMesh::element_iterator  end = mesh.level_elements_end(level);
+	ParallelMesh::element_iterator        it  = mesh.local_level_elements_begin(level);
+	const ParallelMesh::element_iterator  end = mesh.local_level_elements_end(level);
 
 	for (; it != end; ++it)
 	  {
@@ -703,7 +710,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	    assert (elem->processor_id() != DofObject::invalid_processor_id);
 
 	    // Only local elements!
-	    if (elem->processor_id() != libMesh::processor_id()) continue;
+	    assert (elem->processor_id() == libMesh::processor_id());
 
 	    pack_element (conn, elem);	    
 	  }
