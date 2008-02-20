@@ -118,7 +118,7 @@ XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase>(mesh),
   _binary             (binary),
-  _legacy             (false),
+  _legacy             (true),
   _version            ("libMesh-0.7.0+"),
   _bc_file_name       ("n/a"),
   _partition_map_file ("n/a"),
