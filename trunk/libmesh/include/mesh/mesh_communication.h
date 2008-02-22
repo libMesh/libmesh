@@ -28,7 +28,7 @@
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
-
+#include "mesh_tools.h"
 
 // Forward declarations
 class MeshBase;
@@ -117,8 +117,19 @@ public:
    * method can also be useful for identifying duplicate nodes 
    * which may occur during parallel refinement.
    */
-  void find_global_indices (MeshBase& ) const;
+  void assign_global_indices (MeshBase& ) const;
 
+
+  /**
+   * This method determines a globally unique, partition-agnostic
+   * index for each object in the input range.
+   */
+  template <typename ForwardIterator>
+  void find_global_indices (const MeshTools::BoundingBox &,
+			    const ForwardIterator &,
+			    const ForwardIterator &,
+			    std::vector<unsigned int> &) const;
+  
 private:
 
   void broadcast_mesh (MeshBase& ) const;
