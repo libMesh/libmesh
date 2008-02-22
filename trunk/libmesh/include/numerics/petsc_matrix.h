@@ -285,6 +285,11 @@ public:
   void print_matlab(const std::string name="NULL") const;
 
   /**
+   * Swaps the raw PETSc matrix context pointers.
+   */
+  void swap (PetscMatrix<T> &);
+
+  /**
    * Returns the raw PETSc matrix context pointer.  Note this is generally
    * not required in user-level code. Just don't do anything crazy like
    * calling MatDestroy()!
@@ -319,7 +324,7 @@ private:
    * This boolean value should only be set to false
    * for the constructor which takes a PETSc Mat object. 
    */
-  const bool _destroy_mat_on_exit;
+  bool _destroy_mat_on_exit;
 };
 
 
@@ -613,6 +618,16 @@ bool PetscMatrix<T>::closed() const
 
   return (assembled == PETSC_TRUE);
 }
+
+
+template <typename T>
+inline
+void PetscMatrix<T>::swap(PetscMatrix<T> &m) 
+{
+  std::swap(_mat, m._mat);
+  std::swap(_destroy_mat_on_exit, m._destroy_mat_on_exit);
+}
+
 
 
 
