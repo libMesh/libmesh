@@ -270,6 +270,12 @@ MeshTools::bounding_box(const MeshBase& mesh)
   Threads::parallel_reduce (ConstNodeRange (mesh.local_nodes_begin(),
 					    mesh.local_nodes_end()),
 			    find_bbox);
+
+  // and the unpartitioned nodes
+  Threads::parallel_reduce (ConstNodeRange (mesh.pid_nodes_begin(DofObject::invalid_processor_id),
+					    mesh.pid_nodes_end(DofObject::invalid_processor_id)),
+			    find_bbox);
+
   // Compare the bounding boxes across processors
   Parallel::min(find_bbox.min());
   Parallel::max(find_bbox.max());
@@ -721,7 +727,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<un
 
 void MeshTools::Private::globally_renumber_nodes_and_elements (MeshBase& mesh)
 {
-  MeshCommunication().find_global_indices(mesh);
+  MeshCommunication().assign_global_indices(mesh);
 }
 
 
