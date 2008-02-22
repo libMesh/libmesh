@@ -412,6 +412,11 @@ public:
 				const std::vector<unsigned int>& rows) const;
 
   /**
+   * Swaps the raw PETSc vector context pointers.
+   */
+  void swap (PetscVector<T> &v);
+
+  /**
    * Returns the raw PETSc vector context pointer.  Note this is generally
    * not required in user-level code. Just don't do anything crazy like
    * calling VecDestroy()!
@@ -432,7 +437,7 @@ private:
    * This boolean value should only be set to false
    * for the constructor which takes a PETSc Vec object. 
    */
-  const bool _destroy_vec_on_exit;
+  bool _destroy_vec_on_exit;
 };
 
 
@@ -748,6 +753,16 @@ Real PetscVector<T>::max() const
 
   // this return value is correct: VecMax returns a PetscReal
   return static_cast<Real>(max);
+}
+
+
+
+template <typename T>
+inline
+void PetscVector<T>::swap (PetscVector<T> &v)
+{
+  std::swap(_vec, v._vec);
+  std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
 }
 
 
