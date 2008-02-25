@@ -201,6 +201,15 @@ ParallelMesh::active_pid_elements_begin (const unsigned int proc_id)
 
 
 
+// unpartitioned elements begin() accessor
+ParallelMesh::element_iterator
+ParallelMesh::unpartitioned_elements_begin ()
+{
+  return this->pid_elements_begin(DofObject::invalid_processor_id);
+}
+
+
+
 
 
 
@@ -373,6 +382,15 @@ ParallelMesh::active_pid_elements_begin (const unsigned int proc_id) const
 {
   Predicates::ActivePID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
+// unpartitioned elements begin() accessor
+ParallelMesh::const_element_iterator
+ParallelMesh::unpartitioned_elements_begin () const
+{
+  return this->pid_elements_begin(DofObject::invalid_processor_id);
 }
 
 
@@ -553,6 +571,15 @@ ParallelMesh::active_pid_elements_end (const unsigned int proc_id)
 
 
 
+// unpartitioned elements end() accessor
+ParallelMesh::element_iterator
+ParallelMesh::unpartitioned_elements_end ()
+{
+  return this->pid_elements_end(DofObject::invalid_processor_id);
+}
+
+
+
 
 
 
@@ -727,6 +754,15 @@ ParallelMesh::active_pid_elements_end (const unsigned int proc_id) const
 {
   Predicates::ActivePID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
+// unpartitioned elements end() accessor
+ParallelMesh::const_element_iterator
+ParallelMesh::unpartitioned_elements_end () const
+{
+  return this->pid_elements_end(DofObject::invalid_processor_id);
 }
 
 

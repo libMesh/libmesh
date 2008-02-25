@@ -184,6 +184,8 @@ public:
   element_iterator active_pid_elements_begin (const unsigned int proc_id);
   element_iterator active_pid_elements_end   (const unsigned int proc_id);
 
+  element_iterator unpartitioned_elements_begin ();
+  element_iterator unpartitioned_elements_end ();
   
   
   /**
@@ -239,6 +241,9 @@ public:
 
   const_element_iterator active_pid_elements_begin (const unsigned int proc_id) const;
   const_element_iterator active_pid_elements_end   (const unsigned int proc_id) const;
+
+  const_element_iterator unpartitioned_elements_begin () const;
+  const_element_iterator unpartitioned_elements_end () const;
   
   
   
