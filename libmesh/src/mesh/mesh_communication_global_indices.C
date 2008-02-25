@@ -715,9 +715,10 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 }
 #else // HAVE_LIBHILBERT, HAVE_MPI
 template <typename ForwardIterator>
-void MeshCommunication::find_global_indices (const ForwardIterator &begin,
-					     const ForwardIterator &end,
-					     std::vector<unsigned int> &index_map) const
+void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &,
+					     const ForwardIterator &,
+					     const ForwardIterator &,
+					     std::vector<unsigned int> &) const
 {
 }
 #endif // HAVE_LIBHILBERT, HAVE_MPI
