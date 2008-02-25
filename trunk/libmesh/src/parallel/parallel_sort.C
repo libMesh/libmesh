@@ -58,10 +58,29 @@ Sort<KeyType>::Sort(std::vector<KeyType>& d,
 template <typename KeyType>
 void Sort<KeyType>::sort()
 {
-  this->binsort();
-  this->communicate_bins();
-  this->sort_local_bin();
+  // Find the global data size.  The sorting
+  // algorithms assume they have a range to
+  // work with, so catch the degenerate cases here
+  unsigned int global_data_size = _data.size();
 
+  Parallel::sum (global_data_size);
+
+  if (global_data_size < 2)
+    {
+      // the entire global range is either empty
+      // or contains only one element
+      _my_bin = _data;
+
+      Parallel::allgather (static_cast<unsigned int>(_my_bin.size()),
+			   _local_bin_sizes);
+    }
+  else
+    {
+      this->binsort();
+      this->communicate_bins();
+      this->sort_local_bin();
+    }
+  
   // Set sorted flag to true
   _bin_is_sorted = true;
 }
@@ -70,7 +89,7 @@ void Sort<KeyType>::sort()
 
 template <typename KeyType>
 void Sort<KeyType>::binsort()
-{
+{  
   // Find the global min and max from all the
   // processors.
   std::vector<KeyType> global_min_max(2);
