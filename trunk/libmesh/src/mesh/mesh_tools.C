@@ -442,12 +442,13 @@ unsigned int MeshTools::n_active_levels(const MeshBase& mesh)
   unsigned int nl = MeshTools::n_active_local_levels(mesh);
 
   MeshBase::const_element_iterator el =
-    mesh.active_pid_elements_begin(DofObject::invalid_processor_id);
+    mesh.unpartitioned_elements_begin();
   const MeshBase::const_element_iterator end_el =
-    mesh.active_pid_elements_end(DofObject::invalid_processor_id);
+    mesh.unpartitioned_elements_end();
 
   for( ; el != end_el; ++el)
-    nl = std::max((*el)->level() + 1, nl);
+    if ((*el)->active())
+      nl = std::max((*el)->level() + 1, nl);
 
   Parallel::max(nl);
   return nl;
@@ -477,9 +478,9 @@ unsigned int MeshTools::n_levels(const MeshBase& mesh)
   unsigned int nl = MeshTools::n_local_levels(mesh);
 
   MeshBase::const_element_iterator el =
-    mesh.pid_elements_begin(DofObject::invalid_processor_id);
+    mesh.unpartitioned_elements_begin();
   const MeshBase::const_element_iterator end_el =
-    mesh.pid_elements_end(DofObject::invalid_processor_id);
+    mesh.unpartitioned_elements_end();
 
   for( ; el != end_el; ++el)
     nl = std::max((*el)->level() + 1, nl);
@@ -506,8 +507,8 @@ void MeshTools::get_not_subactive_node_ids(const MeshBase& mesh,
 
 
 
-unsigned int MeshTools::n_elem (MeshBase::const_element_iterator& begin,
-                                MeshBase::const_element_iterator& end)
+unsigned int MeshTools::n_elem (const MeshBase::const_element_iterator& begin,
+                                const MeshBase::const_element_iterator& end)
 {
   return std::distance(begin, end);
 }
@@ -529,8 +530,8 @@ unsigned int MeshTools::n_p_levels (const MeshBase& mesh)
     max_p_level = std::max((*el)->p_level(), max_p_level);
 
   // then any unpartitioned objects
-  el     = mesh.pid_elements_begin(DofObject::invalid_processor_id);
-  end_el = mesh.pid_elements_end(DofObject::invalid_processor_id);
+  el     = mesh.unpartitioned_elements_begin();
+  end_el = mesh.unpartitioned_elements_end();
 
   for( ; el != end_el; ++el)
     max_p_level = std::max((*el)->p_level(), max_p_level);
@@ -551,10 +552,10 @@ void MeshTools::find_nodal_neighbors(const MeshBase&, const Node& n,
   std::vector<const Elem*>::const_iterator el     = nodes_to_elem_map[global_id].begin();
   std::vector<const Elem*>::const_iterator end_el = nodes_to_elem_map[global_id].end();
   
-  unsigned int n_ed=0; //Number of edges on the element
-  unsigned int ed=0; //Current edge
-  unsigned int l_n=0; //Local node number
-  unsigned int o_n=0; //Other node on this edge
+  unsigned int n_ed=0; // Number of edges on the element
+  unsigned int ed=0;   // Current edge
+  unsigned int l_n=0;  // Local node number
+  unsigned int o_n=0;  // Other node on this edge
   
   //Assume we find a edge... then prove ourselves wrong...
   bool found_edge=true;
