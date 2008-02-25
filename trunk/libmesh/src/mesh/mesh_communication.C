@@ -1057,10 +1057,10 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
 
   // We don't want to delete any element that shares a node
   // with or is an ancestor of an unpartitioned element either.
-  MeshBase::const_element_iterator u_elem_it =
-    mesh.pid_elements_begin(DofObject::invalid_processor_id),
-                                   u_end     =
-    mesh.pid_elements_end(DofObject::invalid_processor_id);
+  MeshBase::const_element_iterator
+    u_elem_it = mesh.unpartitioned_elements_begin(),
+    u_end     = mesh.unpartitioned_elements_end();
+  
   for (; u_elem_it != u_end; ++u_elem_it)
     {
       const Elem *elem = *u_elem_it;
