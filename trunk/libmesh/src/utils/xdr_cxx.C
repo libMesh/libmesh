@@ -1494,7 +1494,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 	
 	    double _r, _i;
 	    *in >> _r;
-	    in  >> _i;
+	    *in >> _i;
 	    v[i] = std::complex<double>(_r,_i);
 	  }
 
