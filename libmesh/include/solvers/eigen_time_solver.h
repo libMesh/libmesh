@@ -132,7 +132,7 @@ public:
    * successive solution iterates ||u^{n+1} - u^{n}|| in some norm,
    * but for this class just returns 0.
    */
-  Real du (unsigned char) { return 0.; }
+  virtual Real du (const SystemNorm&) const { return 0.; }
 
   /**
    * The EigenSolver object.  This is what actually 
