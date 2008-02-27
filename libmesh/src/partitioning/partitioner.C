@@ -28,13 +28,18 @@
 #include "partitioner.h"
 #include "mesh_tools.h"
 #include "mesh_communication.h"
+#include "libmesh_logging.h"
+
+
+
+// ------------------------------------------------------------
+// Partitioner static data
+const unsigned int Partitioner::communication_blocksize = 100; //1000000;
 
 
 
 // ------------------------------------------------------------
 // Partitioner implementation
-
-
 void Partitioner::partition (MeshBase& mesh,
 			     const unsigned int n)
 {
@@ -200,6 +205,8 @@ void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
 
 void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 {
+  START_LOG("set_parent_processor_ids()","Partitioner");
+  
   // If the mesh is serial we have access to all the elements,
   // in particular all the active ones.  We can therefore set
   // the parent processor ids indirecly through their children.
@@ -238,17 +245,101 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 	}
     }
 
-  // 
+  // When the mesh is parallel we cannot guarantee that parents have access to
+  // all their children.
   else
     {
-      error();
+      // We will use a brute-force approach here.  Each processor finds its parent
+      // elements and sets the parent pid to the minimum of its local children.
+      // A global reduction is then performed to make sure the true minimum is found.
+      // As noted, this is required because we cannot guarantee that a parent has
+      // access to all its children on any single processor.
+      parallel_only();
+      assert(MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
+			       mesh.unpartitioned_elements_end()) == 0);
+
+      const unsigned int max_elem_id = mesh.max_elem_id();
+
+      std::vector<unsigned short int>
+	parent_processor_ids (std::min(communication_blocksize,
+				       max_elem_id));
+      
+      for (unsigned int blk=0, last_elem_id=0; last_elem_id<max_elem_id; blk++)
+	{
+ 	                      last_elem_id = std::min((blk+1)*communication_blocksize, max_elem_id);
+	  const unsigned int first_elem_id = blk*communication_blocksize;
+
+	  std::fill (parent_processor_ids.begin(),
+		     parent_processor_ids.end(),
+		     DofObject::invalid_processor_id);
+
+	  // first build up local contributions to parent_processor_ids
+	  MeshBase::element_iterator       not_it  = mesh.not_active_elements_begin();
+	  const MeshBase::element_iterator not_end = mesh.not_active_elements_end(); 
+
+	  bool have_parent_in_block = false;
+	  
+	  for ( ; not_it != not_end; ++not_it)
+	    {
+	      Elem *parent = *not_it;
+
+	      const unsigned int parent_idx = parent->id();
+	      assert (parent_idx < max_elem_id);
+
+	      if ((parent_idx >= first_elem_id) &&
+		  (parent_idx <  last_elem_id))
+		{
+		  have_parent_in_block = true;
+		  unsigned short int parent_pid = DofObject::invalid_processor_id;
+
+		  for (unsigned int c=0; c<parent->n_children(); c++)
+		    parent_pid = std::min (parent_pid, parent->child(c)->processor_id());
+		  
+		  const unsigned int packed_idx = parent_idx - first_elem_id;
+		  assert (packed_idx < parent_processor_ids.size());
+
+		  parent_processor_ids[packed_idx] = parent_pid;
+		}
+	    }
+
+	  // then find the global minimum
+	  Parallel::min (parent_processor_ids);
+
+	  // and assign the ids, if we have a parent in this block.
+	  if (have_parent_in_block)
+	    for (not_it = mesh.not_active_elements_begin();
+		 not_it != not_end; ++not_it)
+	      {
+		Elem *parent = *not_it;
+		
+		const unsigned int parent_idx = parent->id();
+		
+		if ((parent_idx >= first_elem_id) &&
+		    (parent_idx <  last_elem_id))
+		  {
+		    const unsigned int packed_idx = parent_idx - first_elem_id;
+		    assert (packed_idx < parent_processor_ids.size());
+		    
+		    const unsigned short int parent_pid =
+		      parent_processor_ids[packed_idx];
+		    
+		    assert (parent_pid != DofObject::invalid_processor_id);
+		    
+		    parent->processor_id() = parent_pid;
+		  }
+	      }
+	}
     }
+  
+  STOP_LOG("set_parent_processor_ids()","Partitioner");
 }
 
 
 
 void Partitioner::set_node_processor_ids(MeshBase& mesh)
 {
+  START_LOG("set_node_processor_ids()","Partitioner");
+
   // This function must be run on all processors at once
   parallel_only();
 
@@ -439,4 +530,6 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
           node->processor_id(filled_request[i]);           //  the number of partitions may
         }                                                  //  not equal the number of processors
     }
+  
+  STOP_LOG("set_node_processor_ids()","Partitioner");
 }
