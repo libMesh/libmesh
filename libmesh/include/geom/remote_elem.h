@@ -72,6 +72,9 @@ class RemoteElem : public Elem
   
   virtual unsigned int key (const unsigned int) const
   { error(); return 0; }
+
+  virtual bool is_remote () const
+  { return true; }
   
   virtual void connectivity(const unsigned int,
 			    const IOPackage,
