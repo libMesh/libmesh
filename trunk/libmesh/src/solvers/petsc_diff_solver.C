@@ -69,8 +69,10 @@ __libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void *ctx)
   sys.update();
 
   // Do DiffSystem assembly
+  PAUSE_LOG("solve()", "PetscDiffSolver");
   sys.assembly(true, false);
   R_system.close();
+  RESTART_LOG("solve()", "PetscDiffSolver");
 
   // Swap back
   X_input.swap(X_system);
@@ -116,8 +118,10 @@ __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *j, Mat *pc,
   sys.update();
 
   // Do DiffSystem assembly
+  PAUSE_LOG("solve()", "PetscDiffSolver");
   sys.assembly(false, true);
   J_system.close();
+  RESTART_LOG("solve()", "PetscDiffSolver");
 
   // Swap back
   X_input.swap(X_system);
