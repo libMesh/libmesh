@@ -122,6 +122,12 @@ protected:
    */
   virtual void _do_repartition (MeshBase& mesh,
 				const unsigned int n) { this->_do_partition (mesh, n); }
+
+  /**
+   * The blocksize to use when doing blocked parallel communication.  This limits the
+   * maximum vector size which can be used in a single communication step.
+   */
+  static const unsigned int communication_blocksize;
 };
 
 
