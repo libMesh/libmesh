@@ -85,10 +85,10 @@ endif
 # shared library
 #
 $(mesh_library_dir)/libmesh$(shared_libext): $(objects)
-	@$(MAKE) -C contrib
 	@$(shell mkdir -p $(mesh_library_dir))
 	@echo "Linking "$@
 	@$(libmesh_CXX) $(libmesh_CXXSHAREDFLAG) -o $(mesh_library) $(objects) $(libmesh_LDFLAGS)
+	@$(MAKE) -C contrib
 
 #
 # Build just object files

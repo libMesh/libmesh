@@ -78,6 +78,19 @@ class Partitioner
 		    const unsigned int n=libMesh::n_processors());
 
   /**
+   * This function 
+   */
+  static void partition_unpartitioned_elements (MeshBase &mesh, 
+						const unsigned int n=libMesh::n_processors());
+
+  /**
+   * This function is called after partitioning to set the processor IDs
+   * for the inactive parent elements.  A Parent's processor ID is the same
+   * as its first child.
+   */
+  static void set_parent_processor_ids(MeshBase& mesh);
+
+  /**
    * This function is called after partitioning to set the processor IDs
    * for the nodes.  By definition, a Node's processor ID is the minimum
    * processor ID for all of the elements which share the node.

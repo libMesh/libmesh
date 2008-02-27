@@ -26,6 +26,9 @@
 #include "mesh_base.h"
 #include "parallel.h"
 #include "partitioner.h"
+#include "mesh_tools.h"
+#include "mesh_communication.h"
+
 
 
 // ------------------------------------------------------------
@@ -36,8 +39,8 @@ void Partitioner::partition (MeshBase& mesh,
 			     const unsigned int n)
 {
   // For now we don't repartition in parallel
-  if (!mesh.is_serial())
-    return;
+  //if (!mesh.is_serial())
+  //  return;
 
   // we cannot partition into more pieces than we have
   // active elements!
@@ -47,8 +50,20 @@ void Partitioner::partition (MeshBase& mesh,
   // Set the number of partitions in the mesh
   mesh.set_n_partitions()=n_parts;
 
+  if (n_parts == 1)
+    {
+      this->single_partition (mesh);
+      return;
+    }
+  
+  // First assign a temporary partitioning to any unpartitioned elements
+  Partitioner::partition_unpartitioned_elements(mesh, n_parts);
+  
   // Call the partitioning function
   this->_do_partition(mesh,n_parts);
+
+  // Set the parent's processor ids
+  Partitioner::set_parent_processor_ids(mesh);
 
   // Set the node's processor ids
   Partitioner::set_node_processor_ids(mesh);
@@ -68,10 +83,22 @@ void Partitioner::repartition (MeshBase& mesh,
   
   // Set the number of partitions in the mesh
   mesh.set_n_partitions()=n_parts;
+
+  if (n_parts == 1)
+    {
+      this->single_partition (mesh);
+      return;
+    }
+  
+  // First assign a temporary partitioning to any unpartitioned elements
+  Partitioner::partition_unpartitioned_elements(mesh, n_parts);
   
   // Call the partitioning function
   this->_do_repartition(mesh,n_parts);
-
+  
+  // Set the parent's processor ids
+  Partitioner::set_parent_processor_ids(mesh);
+  
   // Set the node's processor ids
   Partitioner::set_node_processor_ids(mesh);
 }
@@ -99,24 +126,198 @@ void Partitioner::single_partition (MeshBase& mesh)
 
 
 
+void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
+						    const unsigned int n_subdomains)
+{
+  MeshBase::const_element_iterator       it  = mesh.unpartitioned_elements_begin();
+  const MeshBase::const_element_iterator end = mesh.unpartitioned_elements_end();
+
+  const unsigned int n_unpartitioned_elements = MeshTools::n_elem (it, end);
+
+  // the unpartitioned elements must exist on all processors. If the range is empty on one
+  // it is empty on all, and we can quit right here.
+  if (!n_unpartitioned_elements) return;
+	 
+  // find the target subdomain sizes
+  std::vector<unsigned int> subdomain_bounds(libMesh::n_processors());
+
+  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+    {
+      unsigned int tgt_subdomain_size = 0;
+
+      // watch out for the case that n_subdomains < n_processors
+      if (pid < n_subdomains)
+	{
+	  tgt_subdomain_size = n_unpartitioned_elements/n_subdomains;
+      
+	  if (pid < n_unpartitioned_elements%n_subdomains)
+	    tgt_subdomain_size++;
+
+	}
+      
+      //std::cout << "pid, #= " << pid << ", " << tgt_subdomain_size << std::endl;
+      if (pid == 0)
+	subdomain_bounds[0] = tgt_subdomain_size;
+      else
+	subdomain_bounds[pid] = subdomain_bounds[pid-1] + tgt_subdomain_size;
+    }
+  
+  assert (subdomain_bounds.back() == n_unpartitioned_elements);  
+  
+  // create the unique mapping for all unpartitioned elements independent of partitioning
+  // determine the global indexing for all the unpartitoned elements
+  std::vector<unsigned int> global_indices;
+    
+  // Calling this on all processors a unique range in [0,n_unpartitioned_elements) is constructed.  
+  // Only the indices for the elements we pass in are returned in the array.
+  MeshCommunication().find_global_indices (MeshTools::bounding_box(mesh), it, end, 
+					   global_indices);
+  
+  for (unsigned int cnt=0; it != end; ++it)
+    {
+      Elem *elem = *it;
+      
+      assert (cnt < global_indices.size());
+      const unsigned int global_index =
+	global_indices[cnt++];
+      
+      assert (global_index < subdomain_bounds.back());
+      assert (global_index < n_unpartitioned_elements);
+
+      const unsigned int subdomain_id =
+	std::distance(subdomain_bounds.begin(),
+		      std::upper_bound(subdomain_bounds.begin(),
+				       subdomain_bounds.end(),
+				       global_index));
+      assert (subdomain_id < n_subdomains);
+     
+      elem->processor_id() = subdomain_id;		
+      //std::cout << "assigning " << global_index << " to " << subdomain_id << std::endl;	      
+    }
+}
+
+
+
+void Partitioner::set_parent_processor_ids(MeshBase& mesh)
+{
+  // If the mesh is serial we have access to all the elements,
+  // in particular all the active ones.  We can therefore set
+  // the parent processor ids indirecly through their children.
+  // By convention a parent is assigned to the minimum processor
+  // of all its children.
+  if (mesh.is_serial())
+    {
+      // Loop over all the active elements in the mesh  
+      MeshBase::element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::element_iterator end = mesh.active_elements_end();
+      
+      for ( ; it!=end; ++it)
+	{
+	  Elem *child  = *it;
+	  Elem *parent = child->parent();
+
+	  while (parent)
+	    {
+	      // invalidate the parent id, otherwise the min below
+	      // will not work if the current parent id is less
+	      // than all the children!
+	      parent->invalidate_processor_id();
+	      
+	      for(unsigned int c=0; c<parent->n_children(); c++)
+		{
+		  child = parent->child(c);
+		  assert(child);
+		  assert(!child->is_remote());
+		  assert(child->processor_id() != DofObject::invalid_processor_id);
+		  parent->processor_id() = std::min(parent->processor_id(),
+						    child->processor_id());
+		}	      
+	      parent = parent->parent();
+	    }
+	  
+	}
+    }
+
+  // 
+  else
+    {
+      error();
+    }
+}
+
+
 
 void Partitioner::set_node_processor_ids(MeshBase& mesh)
 {
   // This function must be run on all processors at once
   parallel_only();
 
-  // Unset any previously-set node processor ids
-  // (maybe from previous partitionings).
+  // If we have any unpartitioned elements at this 
+  // stage there is a problem
+  assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
+			    mesh.unpartitioned_elements_end()) == 0);
+
+
+//   const unsigned int orig_n_local_nodes = mesh.n_local_nodes();
+
+//   std::cerr << "[" << libMesh::processor_id() << "]: orig_n_local_nodes="
+// 	    << orig_n_local_nodes << std::endl;
+
+  // Build up request sets.  Each node is currently owned by a processor because
+  // it is connected to an element owned by that processor.  However, during the
+  // repartitioning phase that element may have been assigned a new processor id, but
+  // it is still resident on the original processor.  We need to know where to look
+  // for new ids before assigning new ids, otherwise we may be asking the wrong processors
+  // for the wrong information.
+  //
+  // The only remaining issue is what to do with unpartitioned nodes.  Since they are required
+  // to live on all processors we can simply rely on ourselves to number them properly.
+  std::vector<std::vector<unsigned int> >
+    requested_node_ids(libMesh::n_processors());
+
+  // Loop over all the nodes, count the ones on each processor.  We can skip ourself
+  std::vector<unsigned int> ghost_nodes_from_proc(libMesh::n_processors(), 0);
+
   MeshBase::node_iterator       node_it  = mesh.nodes_begin();
   const MeshBase::node_iterator node_end = mesh.nodes_end();
   
-  for ( ; node_it != node_end; ++node_it)
+  for (; node_it != node_end; ++node_it)
     {
       Node *node = *node_it;
       assert(node);
+      const unsigned int current_pid = node->processor_id();
+      if (current_pid != libMesh::processor_id() &&
+	  current_pid != DofObject::invalid_processor_id)
+	{
+	  assert(current_pid < ghost_nodes_from_proc.size());
+	  ghost_nodes_from_proc[current_pid]++;
+	}
+    }
+
+  // We know how many objects live on each processor, so reserve()
+  // space for each.
+  for (unsigned int pid=0; pid != libMesh::n_processors(); ++pid)
+    requested_node_ids[pid].reserve(ghost_nodes_from_proc[pid]);
+
+  // We need to get the new pid for each node from the processor
+  // which *currently* owns the node.  We can safely skip ourself
+  for (node_it = mesh.nodes_begin(); node_it != node_end; ++node_it)
+    {
+      Node *node = *node_it;
+      assert(node);
+      const unsigned int current_pid = node->processor_id();      
+      if (current_pid != libMesh::processor_id() &&
+	  current_pid != DofObject::invalid_processor_id)
+	{
+	  assert(current_pid < requested_node_ids.size());
+	  assert(requested_node_ids[current_pid].size() <
+		 ghost_nodes_from_proc[current_pid]);
+	  requested_node_ids[current_pid].push_back(node->id());
+	}
+      
+      // Unset any previously-set node processor ids
       node->invalidate_processor_id();
     }
-  
   
   // Loop over all the active elements
   MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
@@ -126,6 +327,8 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
     {
       Elem* elem = *elem_it;
       assert(elem);
+
+      assert (elem->processor_id() != DofObject::invalid_processor_id);
       
       // For each node, set the processor ID to the min of
       // its current value and this Element's processor id.
@@ -143,49 +346,61 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
     {
       Elem* elem = *sub_it;
       assert(elem);
+
+      assert (elem->processor_id() != DofObject::invalid_processor_id);
       
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
         if (elem->get_node(n)->processor_id() == DofObject::invalid_processor_id)
-	  elem->get_node(n)->processor_id() = std::min(elem->get_node(n)->processor_id(),
-						       elem->processor_id());
+	  elem->get_node(n)->processor_id() = elem->processor_id();
     }
 
-  // At this point, if we're in parallel, all our own processor ids
-  // should be correct, but ghost nodes may be incorrect.  However,
-  // our tenative processor ids will let us know who to ask.
-
-  // Loop over all the nodes, count the ones on each processor
-  std::vector<unsigned int>
-    ghost_objects_from_proc(libMesh::n_processors(), 0);
-
-  node_it  = mesh.nodes_begin();
-  for ( ; node_it != node_end; ++node_it)
+  // Same for the inactive elements -- we will have already gotten most of these
+  // nodes, *except* for the case of a parent with a subset of children which are
+  // ghost elements.  In that case some of the parent nodes will not have been
+  // properly handled yet
+  MeshBase::element_iterator       not_it  = mesh.not_active_elements_begin();
+  const MeshBase::element_iterator not_end = mesh.not_active_elements_end(); 
+  
+  for ( ; not_it != not_end; ++not_it)
     {
-      Node *node = *node_it;
-      assert(node);
-      unsigned int obj_procid = node->processor_id();
-      assert(obj_procid != DofObject::invalid_processor_id);
-      ghost_objects_from_proc[obj_procid]++;
+      Elem* elem = *not_it;
+      assert(elem);
+
+      assert (elem->processor_id() != DofObject::invalid_processor_id);
+      
+      for (unsigned int n=0; n<elem->n_nodes(); ++n)
+        if (elem->get_node(n)->processor_id() == DofObject::invalid_processor_id)
+	  elem->get_node(n)->processor_id() = elem->processor_id();
     }
 
-  // Request sets to send to each processor
-  std::vector<std::vector<unsigned int> >
-    requested_ids(libMesh::n_processors());
+#ifndef NDEBUG
+  {
+    // make sure all the nodes connected to any element have received a
+    // valid processor id
+    std::set<const Node*> used_nodes;
+    MeshBase::element_iterator       all_it  = mesh.elements_begin();
+    const MeshBase::element_iterator all_end = mesh.elements_end(); 
+  
+    for ( ; all_it != all_end; ++all_it)
+      {
+	Elem* elem = *all_it;
+	assert(elem);
+	assert(elem->processor_id() != DofObject::invalid_processor_id);
+	for (unsigned int n=0; n<elem->n_nodes(); ++n)
+	  used_nodes.insert(elem->get_node(n));
+      }
 
-  // We know how many objects live on each processor, so reserve()
-  // space for each.
-  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
-    if (p != libMesh::processor_id())
-      requested_ids[p].reserve(ghost_objects_from_proc[p]);
+    for (node_it = mesh.nodes_begin(); node_it != node_end; ++node_it)
+      {
+	Node *node = *node_it;
+	assert(node);
+	assert(used_nodes.count(node));
+	assert(node->processor_id() != DofObject::invalid_processor_id);
+      }
+  }
+#endif
 
-  node_it  = mesh.nodes_begin();
-  for ( ; node_it != node_end; ++node_it)
-    {
-      Node *node = *node_it;
-      requested_ids[node->processor_id()].push_back(node->id());
-    }
-
-  // Next set ghost object ids from other processors
+  // Next set node ids from other processors, excluding self
   for (unsigned int p=1; p != libMesh::n_processors(); ++p)
     {
       // Trade my requests with processor procup and procdown
@@ -195,30 +410,33 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
                                libMesh::processor_id() - p) %
                                libMesh::n_processors();
       std::vector<unsigned int> request_to_fill;
-      Parallel::send_receive(procup, requested_ids[procup],
+      Parallel::send_receive(procup, requested_node_ids[procup],
                              procdown, request_to_fill);
 
-      // Fill those requests
-      std::vector<unsigned int> new_ids(request_to_fill.size());
+      // Fill those requests in-place
       for (unsigned int i=0; i != request_to_fill.size(); ++i)
         {
           Node *node = mesh.node_ptr(request_to_fill[i]);
           assert(node);
-          new_ids[i] = node->processor_id();
-        }
+	  const unsigned int new_pid = node->processor_id();
+	  assert (new_pid != DofObject::invalid_processor_id);
+	  assert (new_pid < mesh.n_partitions()); // this is the correct test --
+          request_to_fill[i] = new_pid;           //  the number of partitions may
+        }                                         //  not equal the number of processors
 
       // Trade back the results
       std::vector<unsigned int> filled_request;
-      Parallel::send_receive(procdown, new_ids,
-                             procup, filled_request);
-      assert(filled_request.size() == requested_ids[procup].size());
+      Parallel::send_receive(procdown, request_to_fill,
+                             procup,   filled_request);
+      assert(filled_request.size() == requested_node_ids[procup].size());
       
       // And copy the id changes we've now been informed of
       for (unsigned int i=0; i != filled_request.size(); ++i)
         {
-          Node *node = mesh.node_ptr(requested_ids[procup][i]);
-          assert(filled_request[i] < libMesh::n_processors());
-          node->processor_id(filled_request[i]);
-        }
+          Node *node = mesh.node_ptr(requested_node_ids[procup][i]);
+	  assert(node);
+          assert(filled_request[i] < mesh.n_partitions()); // this is the correct test --
+          node->processor_id(filled_request[i]);           //  the number of partitions may
+        }                                                  //  not equal the number of processors
     }
 }

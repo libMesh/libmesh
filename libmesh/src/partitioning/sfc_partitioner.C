@@ -178,11 +178,7 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 	  
 	Elem* elem = reverse_map[table[i]-1];
 
-        while (elem)
-          {
-	    elem->processor_id() = i/blksize;
-            elem = elem->parent();
-          }
+	elem->processor_id() = i/blksize;
       }
   }
   

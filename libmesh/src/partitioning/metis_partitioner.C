@@ -20,6 +20,7 @@
 
 
 // C++ Includes   -----------------------------------
+#include <map>
 
 // Local Includes -----------------------------------
 #include "libmesh_config.h"
@@ -27,6 +28,7 @@
 #include "metis_partitioner.h"
 #include "libmesh_logging.h"
 #include "elem.h"
+#include "mesh_communication.h"
 
 #ifdef HAVE_METIS
 // MIPSPro 7.4.2 gets confused about these nested namespaces
@@ -58,7 +60,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
       this->single_partition (mesh);
       return;
     }
-
+  
 // What to do if the Metis library IS NOT present
 #ifndef HAVE_METIS
 
@@ -73,24 +75,15 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   
 // What to do if the Metis library IS present
 #else
-
+  
   START_LOG("partition()", "MetisPartitioner");
 
   const unsigned int n_active_elem = mesh.n_active_elem();
-  const unsigned int n_elem        = mesh.n_elem();
   
-  // build the graph
-  // the forward_map maps each active element id
-  // into a contiguous block of indices for Metis
-  std::vector<unsigned int> forward_map (n_elem, libMesh::invalid_uint);
-  
-  std::vector<int> xadj;
-  std::vector<int> adjncy;
+  // build the graph  
   std::vector<int> options(5);
   std::vector<int> vwgt(n_active_elem);
   std::vector<int> part(n_active_elem);
-
-  xadj.reserve(n_active_elem+1);
   
   int
     n = static_cast<int>(n_active_elem),  // number of "nodes" (elements)
@@ -101,59 +94,69 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
     nparts  = static_cast<int>(n_pieces), // number of subdomains to create
     edgecut = 0;                          // the numbers of edges cut by the
                                           //   resulting partition
-
+  
   // Set the options
   options[0] = 0; // use default options
 
-
   // Metis will only consider the active elements.
   // We need to map the active element ids into a
-  // contiguous range.
+  // contiguous range.  Further, we want the unique range indexing to be
+  // independednt of the element ordering, otherwise a circular dependency
+  // can result in which the partitioning depends on the ordering which 
+  // depends on the partitioning...
+  std::map<const Elem*, unsigned int> global_index_map;
   {
-
-    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
-
-    unsigned int el_num = 0;
-
-    for (; elem_it != elem_end; ++elem_it)
+    std::vector<unsigned int> global_index;
+    
+    MeshBase::element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::element_iterator end = mesh.active_elements_end(); 
+    
+    MeshCommunication().find_global_indices (MeshTools::bounding_box(mesh),
+					     it, end, global_index);
+    
+    assert (global_index.size() == n_active_elem);    
+    
+    for (unsigned int cnt=0; it != end; ++it)
       {
-	assert ((*elem_it)->id() < forward_map.size());
+	const Elem *elem = *it;
+	assert (!global_index_map.count(elem));
 	
-	forward_map[(*elem_it)->id()] = el_num++;
+	global_index_map[elem]  = global_index[cnt++];
       }
-
-    assert (el_num == n_active_elem);
-   }
+    assert (global_index_map.size() == n_active_elem);    
+  }
   
   
   // build the graph in CSR format.  Note that
   // the edges in the graph will correspond to
   // face neighbors
+  std::vector<int> xadj, adjncy;
   {
-    std::vector<const Elem*> neighbors_offspring;
+    std::vector<const Elem*> neighbors_offspring;    
     
-
     MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
-
+    
     // This will be exact when there is no refinement and all the
     // elements are of the same type.
-    adjncy.reserve (n_active_elem*(*elem_it)->n_neighbors());
+    unsigned int graph_size=0;
+    std::vector<std::vector<unsigned int> > graph(n_active_elem);
     
     for (; elem_it != elem_end; ++elem_it)
       {
 	const Elem* elem = *elem_it;
-
-	assert (elem->id() < forward_map.size());
-	assert (forward_map[elem->id()] != libMesh::invalid_uint);
 	
+	assert (global_index_map.count(elem));
+	
+	const unsigned int elem_global_index = 
+	  global_index_map[elem];
+	
+	assert (elem_global_index < vwgt.size());
+	assert (elem_global_index < graph.size());
+
 	// maybe there is a better weight?
 	// The weight is used to define what a balanced graph is
-	vwgt[forward_map[elem->id()]] = elem->n_nodes(); 
-
-	// The beginning of the adjacency array for this elem
-	xadj.push_back(adjncy.size());
+	vwgt[elem_global_index] = elem->n_nodes(); 
 
 	// Loop over the element's neighbors.  An element
 	// adjacency corresponds to a face neighbor
@@ -167,10 +170,13 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 		// as a connection
 		if (neighbor->active())
 		  {
-		    assert (neighbor->id() < forward_map.size());
-		    assert (forward_map[neighbor->id()] != libMesh::invalid_uint);
-
-		    adjncy.push_back (forward_map[neighbor->id()]);
+		    assert (global_index_map.count(neighbor));
+		    
+		    const unsigned int neighbor_global_index = 
+		      global_index_map[neighbor];
+		    
+		    graph[elem_global_index].push_back(neighbor_global_index);
+		    graph_size++;
 		  }
   
 #ifdef ENABLE_AMR
@@ -204,10 +210,13 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 			if (child->neighbor(ns) == elem)
 			  {
 			    assert (child->active());
-			    assert (child->id() < forward_map.size());
-			    assert (forward_map[child->id()] != libMesh::invalid_uint);
-			
-			    adjncy.push_back (forward_map[child->id()]);
+			    assert (global_index_map.count(child));
+
+			    const unsigned int child_global_index =
+			      global_index_map[child];
+			    
+			    graph[elem_global_index].push_back(child_global_index);
+			    graph_size++;
 			  }
 		      }
 		  }
@@ -218,23 +227,39 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 	  }
       }
     
+    // Convert the graph into the format Metis wants
+    xadj.reserve(n_active_elem+1);
+    adjncy.reserve(graph_size);
+    
+    for (unsigned int r=0; r<graph.size(); r++)
+      {
+	xadj.push_back(adjncy.size());
+	std::vector<unsigned int> graph_row; // build this emtpy
+	graph_row.swap(graph[r]); // this will deallocate at the end of scope
+	adjncy.insert(adjncy.end(),
+		      graph_row.begin(),
+		      graph_row.end());
+      }
+
     // The end of the adjacency array for the last elem
     xadj.push_back(adjncy.size());
     
+    assert (adjncy.size() == graph_size);
+    assert (xadj.size() == n_active_elem+1);    
   } // done building the graph
-
-
-if (adjncy.empty())
-  adjncy.push_back(0);
-
+  
+  
+  if (adjncy.empty())
+    adjncy.push_back(0);
+  
   // Select which type of partitioning to create
-
+  
   // Use recursive if the number of partitions is less than or equal to 8
   if (n_pieces <= 8)
     Metis::METIS_PartGraphRecursive(&n, &xadj[0], &adjncy[0], &vwgt[0], NULL,
 				    &wgtflag, &numflag, &nparts, &options[0],
 				    &edgecut, &part[0]);
-
+  
   // Otherwise  use kway
   else
     Metis::METIS_PartGraphKway(&n, &xadj[0], &adjncy[0], &vwgt[0], NULL,
@@ -246,29 +271,27 @@ if (adjncy.empty())
   // the processor id for each active element, but in terms of
   // the contiguous indexing we defined above
   {
-
-    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
-
-    for (; elem_it != elem_end; ++elem_it)
+    MeshBase::element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::element_iterator end = mesh.active_elements_end(); 
+    
+    for (; it!=end; ++it)
       {
-	Elem* elem = *elem_it;
-
-	assert (elem->id() < forward_map.size());
-	assert (forward_map[elem->id()] != libMesh::invalid_uint);
+	Elem* elem = *it;
 	
-	const unsigned int elem_procid =
-	  static_cast<short int>(part[forward_map[elem->id()]]);	
-        while (elem)
-          {
-            elem->processor_id() = elem_procid;
-            elem = elem->parent();
-          }
+	assert (global_index_map.count(elem));
+	
+	const unsigned int elem_global_index = 
+	  global_index_map[elem];
+	
+	assert (elem_global_index < part.size());
+	const unsigned int elem_procid =  static_cast<short int>(part[elem_global_index]);
+    
+        elem->processor_id() = elem_procid;
       }
   }
 
   STOP_LOG("partition()", "MetisPartitioner");
-  
 #endif
-  
 }
+  
+

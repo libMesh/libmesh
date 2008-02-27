@@ -59,21 +59,14 @@ void LinearPartitioner::_do_partition (MeshBase& mesh,
 	if ((e/blksize) < n)
           {
             Elem *elem = *elem_it;
-            while (elem)
-              {
-	        elem->processor_id() = e/blksize;
-                elem = elem->parent();
-              }
+	    elem->processor_id() = e/blksize;
           }
 	else
           {
             Elem *elem = *elem_it;
-            while (elem)
-              {
-	        elem->processor_id() = 0;
-                elem = elem->parent();
-              }
-          }
+	    elem->processor_id() = 0;
+	    elem = elem->parent();
+	  }
 	
 	e++;
       }

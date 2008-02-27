@@ -25,6 +25,7 @@
 // C++ Includes   -----------------------------------
 #include <string>
 #include <vector>
+#include <map>
 
 // Local Includes -----------------------------------
 #include "partitioner.h"
@@ -87,10 +88,16 @@ private:
   void assign_partitioning (MeshBase& mesh);
 
   /**
+   * The number of active elements on each processor.  Note that
+   * ParMETIS requires that each processor have some active elements,
+   * it will abort if any processor passes a NULL _part array.
+   */
+  std::vector<unsigned int> _n_active_elem_on_proc;
+  
+  /**
    * Maps active element ids into a contiguous range, as needed by ParMETIS.
    */
-  std::vector<unsigned int> _forward_map;
-  unsigned int _first_local_elem;
+  std::map<unsigned int, unsigned int> _global_index_by_pid_map;
   
   /**
    * Data structures used by ParMETIS to describe the connectivity graph
@@ -110,7 +117,6 @@ private:
   int _numflag;
   int _nparts;
   int _edgecut;
-
 
 #endif
 };

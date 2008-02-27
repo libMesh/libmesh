@@ -153,7 +153,8 @@ int main (int argc, char** argv)
 		    << std::endl;
 	  
 	  // Write the system.
-	  equation_systems.write (argv[1], libMeshEnums::WRITE);
+	  equation_systems.write (argv[1], libMeshEnums::WRITE, (EquationSystems::WRITE_DATA |
+								 EquationSystems::WRITE_PARALLEL_FILES));
 	  
 	  // Clear the equation systems data structure.
 	  equation_systems.clear ();
