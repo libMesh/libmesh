@@ -231,6 +231,19 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   void make_links_to_me_remote ();
 
+  /** 
+   * Returns true if this element is remote, false otherwise.
+   * A remote element (see \p RemoteElem) is a syntactic convenience --
+   * it is a placeholder for an element which exists on some other
+   * processor.  Local elements are required to have valid neighbors,
+   * and these ghost elements may have remote neighbors for data
+   * structure consistency.  The use of remote elements helps assure
+   * that any element we may access has a NULL neighbor if and only if
+   * it lies on the physical boundary of the domain.
+   */
+  virtual bool is_remote () const
+  { return false; }
+
   /**
    * Returns the connectivity for this element in a specific
    * format, which is specified by the IOPackage tag.  This
