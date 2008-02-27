@@ -30,10 +30,13 @@
 
 // Local includes
 #include "mesh_base.h"
-#include "metis_partitioner.h" // for default partitioning
+#include "parmetis_partitioner.h" // for default partitioning
+#include "metis_partitioner.h"    // for default partitioning
 #include "elem.h"
 #include "boundary_info.h"
 #include "point_locator_base.h"
+#include "mesh_tools.h"
+
 
 
 // ------------------------------------------------------------
@@ -95,6 +98,9 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
   // Partition the mesh.
   this->partition();
   
+  if(!skip_renumber_nodes_and_elements)
+    this->renumber_nodes_and_elements();
+
   // Reset our PointLocator.  This needs to happen any time the elements
   // in the underlying elements in the mesh have changed, so we do it here.
   this->clear_point_locator();
@@ -107,17 +113,8 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 
 unsigned int MeshBase::n_active_elem () const
 {
-    return static_cast<unsigned int>(std::distance (this->active_elements_begin(),
-						    this->active_elements_end()));
-//   unsigned int num=0;
-
-//   const_element_iterator       el  = this->active_elements_begin();
-//   const const_element_iterator end = this->active_elements_end(); 
-  
-//   for (; el!=end; ++el)
-//     num++;
-
-//   return num;
+  return static_cast<unsigned int>(std::distance (this->active_elements_begin(),
+						  this->active_elements_end()));
 }
 
  
@@ -145,58 +142,35 @@ void MeshBase::clear ()
 
 unsigned int MeshBase::n_nodes_on_proc (const unsigned int proc_id) const
 {
-    // We're either counting a processor's nodes or unpartitioned
-    // nodes
-    assert (proc_id < libMesh::n_processors() ||
-            proc_id == DofObject::invalid_processor_id);
-
-    return static_cast<unsigned int>(std::distance (this->pid_nodes_begin(proc_id),
-						    this->pid_nodes_end  (proc_id)));
+  // We're either counting a processor's nodes or unpartitioned
+  // nodes
+  assert (proc_id < libMesh::n_processors() ||
+	  proc_id == DofObject::invalid_processor_id);
+  
+  return static_cast<unsigned int>(std::distance (this->pid_nodes_begin(proc_id),
+						  this->pid_nodes_end  (proc_id)));
 }
 
 
 
 unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
 {
-    // We're either counting a processor's elements or unpartitioned
-    // elements
-    assert (proc_id < libMesh::n_processors() ||
-            proc_id == DofObject::invalid_processor_id);
-
-    return static_cast<unsigned int>(std::distance (this->pid_elements_begin(proc_id),
-						    this->pid_elements_end  (proc_id)));
-//   assert (proc_id < libMesh::n_processors());
-
-//   unsigned int ne=0;
-
-//   const_element_iterator       el  = this->pid_elements_begin(proc_id);
-//   const const_element_iterator end = this->pid_elements_end(proc_id);
-
-//   for (; el!=end; ++el)
-//     ne++;
-
-//   return ne;
+  // We're either counting a processor's elements or unpartitioned
+  // elements
+  assert (proc_id < libMesh::n_processors() ||
+	  proc_id == DofObject::invalid_processor_id);
+  
+  return static_cast<unsigned int>(std::distance (this->pid_elements_begin(proc_id),
+						  this->pid_elements_end  (proc_id)));
 }
 
 
 
 unsigned int MeshBase::n_active_elem_on_proc (const unsigned int proc_id) const
 {
-    assert (proc_id < libMesh::n_processors());
-    return static_cast<unsigned int>(std::distance (this->active_pid_elements_begin(proc_id),
-						    this->active_pid_elements_end  (proc_id)));
-//   assert (proc_id < libMesh::n_processors());
-
-//   unsigned int ne=0;
-
-//   const_element_iterator       el  = this->active_pid_elements_begin(proc_id);
-//   const const_element_iterator end = this->active_pid_elements_end(proc_id);
-
-  
-//   for (; el!=end; ++el)
-//     ne++;
-
-//   return ne;
+  assert (proc_id < libMesh::n_processors());
+  return static_cast<unsigned int>(std::distance (this->active_pid_elements_begin(proc_id),
+						  this->active_pid_elements_end  (proc_id)));
 }
   
 
@@ -271,8 +245,16 @@ std::ostream& operator << (std::ostream& os, const MeshBase& m)
 
 void MeshBase::partition (const unsigned int n_parts)
 {
-  MetisPartitioner partitioner;
-  partitioner.partition (*this, n_parts); 
+  if (this->is_serial())
+    {
+      MetisPartitioner partitioner;
+      partitioner.partition (*this, n_parts);
+    }
+  else
+    {
+      ParmetisPartitioner partitioner;
+      partitioner.partition (*this, n_parts);
+    }
 }
 
 
