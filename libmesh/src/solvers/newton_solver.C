@@ -213,7 +213,7 @@ Real NewtonSolver::line_search(Real tol,
 NewtonSolver::NewtonSolver (sys_type& s)
   : Parent(s),
     require_residual_reduction(true),
-    brent_line_search(false),
+    brent_line_search(true),
     minsteplength(1e-5),
     linear_tolerance_multiplier(1e-3),
     linear_solver(LinearSolver<Number>::build())

@@ -87,14 +87,11 @@ public:
    * lengths when required.  If so, brent_line_search is an option.
    * If brent_line_search is set to false, the solver reduces the
    * length of its steps by 1/2 iteratively until it finds residual
-   * reduction.  If true, step lengths are first reduced by
-   * potentially large values to find some residual reduction, then
-   * Brent's method is used to find as much residual reduction as
-   * possible.
+   * reduction.  If true, step lengths are first reduced by 1/2 or
+   * more to find some residual reduction, then Brent's method is used
+   * to find as much residual reduction as possible.
    *
-   * brent_line_search is currently set to false by default; set it
-   * to true to attempt to perform fewer linear solves and jacobian
-   * assemblies at the potential expense of more residual assemblies.
+   * brent_line_search is currently set to true by default.
    */
   bool brent_line_search;
 
