@@ -83,6 +83,22 @@ public:
   bool require_residual_reduction;
 
   /**
+   * If require_residual_reduction is true, the solver may reduce step
+   * lengths when required.  If so, brent_line_search is an option.
+   * If brent_line_search is set to false, the solver reduces the
+   * length of its steps by 1/2 iteratively until it finds residual
+   * reduction.  If true, step lengths are first reduced by
+   * potentially large values to find some residual reduction, then
+   * Brent's method is used to find as much residual reduction as
+   * possible.
+   *
+   * brent_line_search is currently set to false by default; set it
+   * to true to attempt to perform fewer linear solves and jacobian
+   * assemblies at the potential expense of more residual assemblies.
+   */
+  bool brent_line_search;
+
+  /**
    * If the quasi-Newton step length must be reduced to below this
    * factor to give a residual reduction, then the Newton solver
    * dies with an error()
@@ -105,6 +121,16 @@ protected:
    * like PETSc or LASPACK.
    */
   AutoPtr<LinearSolver<Number> > linear_solver;
+
+  /**
+   * This does a line search in the direction opposite linear_solution
+   * to try and minimize the residual of newton_iterate.
+   * newton_iterate is moved to the end of the quasiNewton step, and
+   * the return value is the substep size.
+   */
+  Real line_search(Real tol, Real last_residual, Real current_residual,
+		   NumericVector<Number> &newton_iterate,
+		   const NumericVector<Number> &linear_solution);
 
   /**
    * This prints output for the convergence criteria based on
