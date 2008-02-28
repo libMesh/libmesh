@@ -72,14 +72,53 @@ namespace Parallel
    * Default message tag id
    */
   const int any_tag=MPI_ANY_TAG;
+
+  /**
+   * Accept from any source
+   */
+  const int any_source=MPI_ANY_SOURCE;
+  
 #else
   // These shouldn't be needed
   typedef unsigned int data_type;
   typedef unsigned int request;
 
   const int any_tag=-1;
+  const int any_source=0;
 #endif // HAVE_MPI
 
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Encapsulates the MPI_Status struct.  Allows the source of the message
+   * to be determined.
+   */
+  class Status
+  {
+  public:
+    Status () {}
+    
+#ifndef HAVE_MPI
+    
+    int source () const
+    { return 0; }
+
+#else
+    
+    Status (const MPI_Status &mpi_status) : _status(mpi_status) {}
+
+    int source () const
+    { return _status.MPI_SOURCE; }    
+    
+  private:
+
+    MPI_Status _status;
+#endif
+      
+  };
+
+  
   //-------------------------------------------------------------------
   /**
    * Pause execution until all processors reach a certain point.
@@ -171,9 +210,9 @@ namespace Parallel
    * Blocking-receive vector from one processor.
    */
   template <typename T>
-  inline void recv (const unsigned int src_processor_id,
-		    std::vector<T> &buf,
-		    const int tag=any_tag);
+  inline Status recv (const unsigned int src_processor_id,
+		      std::vector<T> &buf,
+		      const int tag=any_tag);
 
   //-------------------------------------------------------------------
   /**
@@ -624,11 +663,13 @@ namespace Parallel
 
 
   template <typename T>
-  inline void recv (const unsigned int src_processor_id,
-		    std::vector<T> &buf,
-		    const int tag)
+  inline Status recv (const unsigned int src_processor_id,
+		      std::vector<T> &buf,
+		      const int tag)
   {
     START_LOG("recv()", "Parallel");
+
+    MPI_Status status;
     
     const int ierr =	  
       MPI_Recv (buf.empty() ? NULL : &buf[0],
@@ -637,19 +678,23 @@ namespace Parallel
 		src_processor_id,
 		tag,
 		libMesh::COMM_WORLD,
-		MPI_STATUS_IGNORE);    
+		&status);
     assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("recv()", "Parallel");
+
+    return Status(status);
   }
 
 
   template <typename T>
-  inline void recv (const unsigned int src_processor_id,
-		    std::vector<std::complex<T> > &buf,
-		    const int tag)
+  inline Status recv (const unsigned int src_processor_id,
+		      std::vector<std::complex<T> > &buf,
+		      const int tag)
   {
     START_LOG("recv()", "Parallel");
+
+    MPI_Status status;
     
     const int ierr =	  
       MPI_Recv (buf.empty() ? NULL : &buf[0],
@@ -658,10 +703,12 @@ namespace Parallel
 		src_processor_id,
 		tag,
 		libMesh::COMM_WORLD,
-		MPI_STATUS_IGNORE);    
+		&status);
     assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("recv()", "Parallel");
+
+    return Status(status);
   }
 
 
@@ -735,9 +782,9 @@ namespace Parallel
   
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
-                           T &send,
+			   T &send,
 			   const unsigned int source_processor_id,
-                           T &recv)
+			   T &recv)
   {
     START_LOG("send_receive()", "Parallel");
 
@@ -755,9 +802,9 @@ namespace Parallel
 
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
-                           std::complex<T> &send,
+			   std::complex<T> &send,
 			   const unsigned int source_processor_id,
-                           std::complex<T> &recv)
+			   std::complex<T> &recv)
   {
     START_LOG("send_receive()", "Parallel");
 
@@ -776,9 +823,9 @@ namespace Parallel
 
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
-                           std::vector<T> &send,
+			   std::vector<T> &send,
 			   const unsigned int source_processor_id,
-                           std::vector<T> &recv)
+			   std::vector<T> &recv)
   {
     START_LOG("send_receive()", "Parallel");
 
@@ -807,9 +854,9 @@ namespace Parallel
 
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
-                           std::vector<std::complex<T> > &send,
+			   std::vector<std::complex<T> > &send,
 			   const unsigned int source_processor_id,
-                           std::vector<std::complex<T> > &recv)
+			   std::vector<std::complex<T> > &recv)
   {
     START_LOG("send_receive()", "Parallel");
 
@@ -839,9 +886,9 @@ namespace Parallel
 
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
-                           std::vector<T> &send,
+			   std::vector<T> &send,
 			   const unsigned int source_processor_id,
-                           std::vector<T> &recv,
+			   std::vector<T> &recv,
 			   MPI_Datatype &type)
   {
     START_LOG("send_receive()", "Parallel");
@@ -872,9 +919,9 @@ namespace Parallel
 
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
-                           std::vector<std::vector<T> > &send,
-			   const unsigned int source_processor_id,
-                           std::vector<std::vector<T> > &recv)
+			     std::vector<std::vector<T> > &send,
+			     const unsigned int source_processor_id,
+			     std::vector<std::vector<T> > &recv)
   {
     START_LOG("send_receive()", "Parallel");
 
@@ -1496,9 +1543,9 @@ namespace Parallel
 
   // Blocking receives don't make sense on one processor
   template <typename T>
-  inline void recv (const unsigned int,
-		    std::vector<T> &,
-		    const int) { error(); }
+  inline Status recv (const unsigned int,
+		      std::vector<T> &,
+		      const int) { error(); return Status(); }
 
   template <typename T>
   inline void irecv (const unsigned int,
