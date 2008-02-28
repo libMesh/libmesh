@@ -82,14 +82,22 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // Build the side of interest 
   const AutoPtr<Elem> side(elem->build_side(s));
 
+
+  // Find the max p_level to select 
+  // the right quadrature rule for side integration
+  unsigned int side_p_level = elem->p_level();
+  if (elem->neighbor(s) != NULL)
+     side_p_level = std::max(side_p_level, elem->neighbor(s)->p_level());
+     
   // initialize quadrature rule
-  qrule->init(side->type(), elem->p_level());
+  qrule->init(side->type(), side_p_level);
 
   // FIXME - could this break if the same FE object was used
   // for both volume and face integrals? - RHS
   // We might not need to reinitialize the shape functions
-  if ((this->get_type() != elem->type()) ||
-      (s != last_side) ||
+  if ((this->get_type() != elem->type())    ||
+      (s != last_side)                      || 
+      (this->get_p_level() != side_p_level) ||
       this->shapes_need_reinit())
     {
       // Set the element type
@@ -97,6 +105,9 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
       // Set the last_side
       last_side = s;
+      
+      // Set the last p level
+      _p_level = side_p_level;
       
       // Initialize the face shape functions
       this->init_face_shape_functions (qrule->get_points(),  side.get());
@@ -111,7 +122,6 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // Find where the integration points are located on the
   // full element.
   std::vector<Point> qp; this->inverse_map (elem, xyz, qp, tolerance);
-  
   
   // compute the shape function and derivative values
   // at the points qp
@@ -556,7 +566,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	    const Real denominator = E*G - F*F;
 	    assert (denominator != 0.);
 	    curvatures[p] = 0.5*numerator/denominator;
-	  }    
+	  }  
     	
 	// compute the jacobian at the quadrature points, see
 	// http://sp81.msi.umn.edu:999/fluent/fidap/help/theory/thtoc.htm
