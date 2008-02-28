@@ -133,6 +133,81 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
 
 
 
+#ifndef HAVE_MPI // avoid spurious gcc warnings
+void MeshCommunication::redistribute (ParallelMesh &) const
+{
+  // no MPI, no redistribution
+  return;
+}
+#else
+void MeshCommunication::redistribute (ParallelMesh &mesh) const
+{
+  // This method will be called after a new partitioning has been 
+  // assigned to the elements.  This partitioning was defined in
+  // terms of the active elements, and "trickled down" to the
+  // parents and nodes as to be consistent.
+  //
+  // The point is that the entire concept of local elements is
+  // kinda shaky in this method.  Elements which were previously
+  // local may now be assigned to other processors, so we need to
+  // send those off.  Similarly, we need to accept elements from
+  // other processors.  
+  // 
+  // The approach is as follows:
+  // (1) send all elements we have stored to their proper homes
+  // (2) receive elements from all processors, watching for duplicates
+  // (3) deleting all nonlocal elements elements
+  // (4) obtaining required ghost elements from neighboring processors
+  parallel_only();
+  assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
+			    mesh.unpartitioned_elements_end()) == 0);
+
+  // Figure out how many nodes and elements we have which are assigned to each
+  // processor.  send_n_nodes_and_elem_per_proc contains the number of nodes/elements
+  // we will be sending to each processor, recv_n_nodes_and_elem_per_proc contains
+  // the number of nodes/elements we will be receiving from each processor.
+  std::vector<unsigned int> send_n_nodes_and_elem_per_proc;
+  send_n_nodes_and_elem_per_proc.reserve(2*libMesh::n_processors());
+
+  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+    {
+      send_n_nodes_and_elem_per_proc.push_back(MeshTools::n_nodes(mesh.pid_nodes_begin(pid),
+								  mesh.pid_nodes_end(pid)));
+      
+      send_n_nodes_and_elem_per_proc.push_back(MeshTools::n_elem(mesh.pid_elements_begin(pid),
+								 mesh.pid_elements_end(pid)));
+    }
+  
+  std::vector<unsigned int> recv_n_nodes_and_elem_per_proc(send_n_nodes_and_elem_per_proc);
+
+  Parallel::alltoall (recv_n_nodes_and_elem_per_proc);
+
+  // In general we will only need to communicate with a subset of the other processors.
+  std::vector<bool>
+    send_pair(libMesh::n_processors(),false),
+    recv_pair(libMesh::n_processors(),false);
+
+  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+    {
+      if (send_n_nodes_and_elem_per_proc[2*pid+0] || // we have nodes to send
+	  send_n_nodes_and_elem_per_proc[2*pid+1])   // we have elements to send
+	send_pair[pid] = true;
+
+      if (recv_n_nodes_and_elem_per_proc[2*pid+0] || // we will receive nodes
+	  recv_n_nodes_and_elem_per_proc[2*pid+1])   // we will receive elements
+	recv_pair[pid] = true;
+
+//       if (send_pair[pid])
+// 	std::cerr << "Processor [" << libMesh::processor_id() << "] will send to processor ["
+// 		  << pid << "]\n"; 
+//       if (recv_pair[pid])
+// 	std::cerr << "Processor [" << libMesh::processor_id() << "] will receive from processor ["
+// 		  << pid << "]\n"; 
+    }
+}
+#endif // HAVE_MPI
+
+
 #ifdef HAVE_MPI
 void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
 #else // avoid spurious gcc warnings
