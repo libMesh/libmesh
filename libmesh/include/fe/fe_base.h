@@ -542,6 +542,12 @@ public:
   ElemType get_type()  const { return elem_type; }
 
   /**
+   * @returns the p refinement level that the current shape
+   * functions have been calculated for.
+   */
+  unsigned int get_p_level() const { return _p_level; }
+
+  /**
    * @returns the FE Type (approximation order and family) of the finite element.
    */
   FEType get_fe_type()  const { return fe_type; }
