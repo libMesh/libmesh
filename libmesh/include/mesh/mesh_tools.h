@@ -68,7 +68,7 @@ namespace MeshTools
    * A feasible load balancing scheme is to keep the weight per processor as
    * uniform as possible.
    */
-  unsigned int total_weight (const MeshBase& mesh);
+  unsigned int total_weight (const MeshBase &mesh);
   
   /**
    * This function returns the sum over all the elemenents on processor \p pid
@@ -76,7 +76,7 @@ namespace MeshTools
    * A feasible load balancing scheme is to keep the weight per processor as
    * uniform as possible.
    */
-  unsigned int weight (const MeshBase& mesh, const unsigned int pid=libMesh::processor_id());
+  unsigned int weight (const MeshBase &mesh, const unsigned int pid=libMesh::processor_id());
   
   /**
    * After calling this function the input vector \p nodes_to_elem_map
@@ -84,13 +84,13 @@ namespace MeshTools
    * \p nodes_to_elem_map[i][j] is the global number of \f$ j^{th} \f$
    * element connected to node \p i.
    */
-  void build_nodes_to_elem_map (const MeshBase& mesh,
-				std::vector<std::vector<unsigned int> >& nodes_to_elem_map);
+  void build_nodes_to_elem_map (const MeshBase &mesh,
+				std::vector<std::vector<unsigned int> > &nodes_to_elem_map);
   
   /**
    * The same, except element pointers are returned instead of indices.
    */
-  void build_nodes_to_elem_map (const MeshBase& mesh,
+  void build_nodes_to_elem_map (const MeshBase &mesh,
 				std::vector<std::vector<const Elem*> >&	nodes_to_elem_map);
 
 
@@ -99,14 +99,14 @@ namespace MeshTools
 //    * to triangles.  \p QUAD4s will be converted to \p TRI3s, \p QUAD8s
 //    * and \p QUAD9s will be converted to \p TRI6s. 
 //    */
-//   void all_tri (MeshBase& mesh);
+//   void all_tri (MeshBase &mesh);
 
   /**
    * Fills the vector "on_boundary" with flags that tell whether each node
    * is on the domain boundary (true)) or not (false).
    */
-  void find_boundary_nodes (const MeshBase& mesh,
-			    std::vector<bool>& on_boundary);
+  void find_boundary_nodes (const MeshBase &mesh,
+			    std::vector<bool> &on_boundary);
 
   /**
    * @returns two points defining a cartesian box that bounds the
@@ -114,27 +114,27 @@ namespace MeshTools
    * is the maximim.
    */
   BoundingBox
-  bounding_box (const MeshBase& mesh);
+  bounding_box (const MeshBase &mesh);
 
   /**
    * Same, but returns a sphere instead of a box.
    */
   Sphere
-  bounding_sphere (const MeshBase& mesh);
+  bounding_sphere (const MeshBase &mesh);
   
   /**
    * @returns two points defining a cartesian box that bounds the
    * elements belonging to processor pid. 
    */
   BoundingBox
-  processor_bounding_box (const MeshBase& mesh,
+  processor_bounding_box (const MeshBase &mesh,
 			  const unsigned int pid);
 
   /**
    * Same, but returns a sphere instead of a box.
    */
   Sphere 
-  processor_bounding_sphere (const MeshBase& mesh,
+  processor_bounding_sphere (const MeshBase &mesh,
 			     const unsigned int pid);
 
   /**
@@ -142,14 +142,14 @@ namespace MeshTools
    * elements belonging to subdomain sid.
    */
   std::pair<Point, Point> 
-  subdomain_bounding_box (const MeshBase& mesh,
+  subdomain_bounding_box (const MeshBase &mesh,
 			  const unsigned int sid);
 
   /**
    * Same, but returns a sphere instead of a box.
    */
   Sphere 
-  subdomain_bounding_sphere (const MeshBase& mesh,
+  subdomain_bounding_sphere (const MeshBase &mesh,
 			     const unsigned int pid);
 
 
@@ -157,21 +157,21 @@ namespace MeshTools
    * Return a vector of all element types for the mesh.  Implemented
    * in terms of element_iterators.
    */
-  void elem_types (const MeshBase& mesh,
-		   std::vector<ElemType>& et);
+  void elem_types (const MeshBase &mesh,
+		   std::vector<ElemType> &et);
   
   /**
    * Return the number of elements of type \p type.  Implemented
    * in terms of type_element_iterators.
    */
-  unsigned int n_elem_of_type (const MeshBase& mesh,
+  unsigned int n_elem_of_type (const MeshBase &mesh,
 			       const ElemType type);
 
   /**
    * Return the number of active elements of type \p type.
    * Implemented in terms of active_type_element_iterators.
    */
-  unsigned int n_active_elem_of_type (const MeshBase& mesh,
+  unsigned int n_active_elem_of_type (const MeshBase &mesh,
 				      const ElemType type);
 
   /**
@@ -182,7 +182,7 @@ namespace MeshTools
    * a single function which takes a range of iterators and returns the
    * std::distance between them.
    */
-  unsigned int n_non_subactive_elem_of_type_at_level(const MeshBase& mesh,
+  unsigned int n_non_subactive_elem_of_type_at_level(const MeshBase &mesh,
                                                      const ElemType type,
                                                      const unsigned int level);
 
@@ -191,35 +191,35 @@ namespace MeshTools
    * Implemented by looping over all the local elements and finding the
    * maximum level, then summing in parallel.
    */
-  unsigned int n_levels(const MeshBase& mesh);
+  unsigned int n_levels(const MeshBase &mesh);
 
   /**
    * Return the number of levels of refinement in the local mesh.
    * Implemented by looping over all the local elements and finding the
    * maximum level.
    */
-  unsigned int n_local_levels(const MeshBase& mesh);
+  unsigned int n_local_levels(const MeshBase &mesh);
  
   /**
    * Return the number of levels of refinement in the active mesh.
    * Implemented by looping over all the active local elements and finding
    * the maximum level, then summing in parallel.
    */
-  unsigned int n_active_levels(const MeshBase& mesh);
+  unsigned int n_active_levels(const MeshBase &mesh);
 
   /**
    * Return the number of levels of refinement in the active local mesh.
    * Implemented by looping over all the active local elements and finding
    * the maximum level.
    */
-  unsigned int n_active_local_levels(const MeshBase& mesh);
+  unsigned int n_active_local_levels(const MeshBase &mesh);
 
   /**
    * Return the number of p-levels of refinement in the mesh.
    * Implemented by looping over all the local elements and finding the
    * maximum p-level, then summing in parallel.
    */
-  unsigned int n_p_levels (const MeshBase& mesh);
+  unsigned int n_p_levels (const MeshBase &mesh);
  
   /**
    * Builds a set of node IDs for nodes which belong to non-subactive
@@ -227,14 +227,23 @@ namespace MeshTools
    * or inactive.  This is useful for determining which nodes should be
    * written to a data file, and is used by the XDA mesh writing methods.
    */
-  void get_not_subactive_node_ids(const MeshBase& mesh, 
-                                  std::set<unsigned int>& not_subactive_node_ids);
+  void get_not_subactive_node_ids(const MeshBase &mesh, 
+                                  std::set<unsigned int> &not_subactive_node_ids);
 
   /**
-   * Count up the number of elements of a specific type (as defined by an iterator range).
+   * Count up the number of elements of a specific type
+   * (as defined by an iterator range).
    */
-   unsigned int n_elem (const MeshBase::const_element_iterator& begin,
-                        const MeshBase::const_element_iterator& end);
+   unsigned int n_elem (const MeshBase::const_element_iterator &begin,
+                        const MeshBase::const_element_iterator &end);
+
+
+  /**
+   * Count up the number of nodes of a specific type
+   * (as defined by an iterator range).
+   */
+   unsigned int n_nodes (const MeshBase::const_node_iterator &begin,
+			 const MeshBase::const_node_iterator &end);
 
 
   /**
@@ -247,9 +256,9 @@ namespace MeshTools
     * Given a mesh and a node in the mesh, the vector will be filled with
     * every node directly attached to the given one.
     */
-   void find_nodal_neighbors(const MeshBase& mesh, const Node& n, 
-                             std::vector<std::vector<const Elem*> >& nodes_to_elem_map, 
-                             std::vector<const Node*>& neighbors);
+   void find_nodal_neighbors(const MeshBase &mesh, const Node &n, 
+                             std::vector<std::vector<const Elem*> > &nodes_to_elem_map, 
+                             std::vector<const Node*> &neighbors);
    
    /**
     * Given a mesh hanging_nodes will be filled with an associative array keyed off the
@@ -257,7 +266,7 @@ namespace MeshTools
     * parents of the node (meaning the two nodes to either side of it that make up
     * the side the hanging node is on.
     */
-   void find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<unsigned int, std::vector<unsigned int> >& hanging_nodes);
+   void find_hanging_nodes_and_parents(const MeshBase &mesh, std::map<unsigned int, std::vector<unsigned int> > &hanging_nodes);
 
   // There is no reason for users to call functions in the MeshTools::Private namespace.
   namespace Private {

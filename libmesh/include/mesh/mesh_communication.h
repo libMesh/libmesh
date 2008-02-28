@@ -84,6 +84,19 @@ public:
    * associated with it.
    */
   void broadcast (MeshBase& ) const;
+  
+  /**
+   * This method takes a parallel distributed mesh and redistributes 
+   * the elements.  Specifically, any elements stored on a given 
+   * processor are sent to the processor which "owns" them.  Similarly,
+   * any elements assigned to the current processor but stored on 
+   * another are received. Once this step is completed any required ghost
+   * elements are updated.  The final result is that each processor stores
+   * only the elements it actually owns and any ghost elements required
+   * to satisfy data dependencies. This method can be invoked after a 
+   * partitioning step to affect the new partitioning.   
+   */
+  void redistribute (ParallelMesh& ) const;
 
   /**
    * This method takes an input \p ParallelMesh which may be
@@ -129,7 +142,7 @@ public:
 			    const ForwardIterator &,
 			    const ForwardIterator &,
 			    std::vector<unsigned int> &) const;
-  
+
 private:
 
   void broadcast_mesh (MeshBase& ) const;

@@ -262,6 +262,17 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Effectively transposes the input vector across all processors.  
+   * The jth entry on processor i is replaced with the ith entry 
+   * from processor j.
+   */
+  template <typename T>
+  inline void alltoall(std::vector<T> &r);
+
+
+
+  //-------------------------------------------------------------------
+  /**
    * Take a local value and broadcast it to all processors.
    * Optionally takes the \p root_id processor, which specifies
    * the processor intiating the broadcast.
@@ -1164,7 +1175,7 @@ namespace Parallel
     else
       recv[0] = send;
   }
- 
+  
 
 
   /**
@@ -1286,6 +1297,45 @@ namespace Parallel
     assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("allgather()", "Parallel");
+  }
+  
+
+
+  /**
+   * Replaces the input buffer with the result of MPI_Alltoall.
+   * The vector size must be of te form N*n_procs, where N is 
+   * the number of elements to be sent/received from each 
+   * processor.
+   */
+  template <typename T>
+  inline void alltoall(std::vector<T> &buf)
+  {
+    if (libMesh::n_processors() == 1)
+      return;
+
+    START_LOG("alltoall()", "Parallel");
+
+    // the per-processor size.  this is the same for all
+    // processors using MPI_Alltoall, could be variable
+    // using MPI_Alltoallv
+    const unsigned int size_per_proc = 
+      buf.size()/libMesh::n_processors();
+
+    assert (buf.size()%libMesh::n_processors() == 0);
+
+    std::vector<T> tmp(buf);
+    
+    const int ierr = 
+      MPI_Alltoall (tmp.empty() ? NULL : &tmp[0],
+		    size_per_proc,
+		    datatype<T>(),
+		    buf.empty() ? NULL : &buf[0],
+		    size_per_proc,
+		    datatype<T>(),
+		    libMesh::COMM_WORLD);
+    assert (ierr == MPI_SUCCESS);
+    
+    STOP_LOG("alltoall()", "Parallel");
   }
 
 
@@ -1493,6 +1543,9 @@ namespace Parallel
 
   template <typename T>
   inline void allgather(std::vector<T> &) {}
+
+  template <typename T>
+  inline void alltoall(std::vector<T> &) {}
 
   template <typename T>
     inline void broadcast (T &, const unsigned int =0) {}

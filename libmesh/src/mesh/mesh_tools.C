@@ -507,8 +507,16 @@ void MeshTools::get_not_subactive_node_ids(const MeshBase& mesh,
 
 
 
-unsigned int MeshTools::n_elem (const MeshBase::const_element_iterator& begin,
-                                const MeshBase::const_element_iterator& end)
+unsigned int MeshTools::n_elem (const MeshBase::const_element_iterator &begin,
+                                const MeshBase::const_element_iterator &end)
+{
+  return std::distance(begin, end);
+}
+
+
+
+unsigned int MeshTools::n_nodes (const MeshBase::const_node_iterator &begin,
+				 const MeshBase::const_node_iterator &end)
 {
   return std::distance(begin, end);
 }
