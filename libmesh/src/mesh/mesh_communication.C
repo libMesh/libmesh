@@ -45,6 +45,57 @@ namespace {
   const unsigned int packed_elem_header_size = 3;
 #endif
 
+
+#ifdef HAVE_MPI
+  /**
+   * Convenient way to communicate nodes.
+   */
+  struct PackedNode
+  {
+    unsigned int id;
+    Real x;
+    Real y;
+    Real z;
+
+    PackedNode () :
+      id(0),
+      x(0.),
+      y(0.),
+      z(0.)
+    {}
+
+    PackedNode (const Node &node) :
+      id(node.id()),
+      x(node(0)),
+      y(node(1)),
+      z(node(2))
+    {}
+
+    AutoPtr<Node> build_node () const
+    {
+      return AutoPtr<Node>(new Node(x,y,z,id)); 
+    }
+
+    Point build_point () const
+    {
+      return Point(x,y,z);
+    }
+    
+    static MPI_Datatype create_mpi_datatype ()
+    {
+      MPI_Datatype packed_node_type;
+      MPI_Datatype types[] = { MPI_UNSIGNED, MPI_REAL };
+      int blocklengths[] = { 1, 3 };
+      MPI_Aint displs[] = { 0, sizeof(unsigned int) };
+
+      MPI_Type_create_struct (2, blocklengths, displs, types, &packed_node_type);
+
+      return packed_node_type;
+    }
+    
+  };
+#endif
+  
 }
 
 
@@ -162,48 +213,144 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
 			    mesh.unpartitioned_elements_end()) == 0);
 
+  // register a derived datatype to use in shipping nodes  
+  MPI_Datatype packed_node_datatype = PackedNode::create_mpi_datatype();
+  MPI_Type_commit (&packed_node_datatype);
+
   // Figure out how many nodes and elements we have which are assigned to each
   // processor.  send_n_nodes_and_elem_per_proc contains the number of nodes/elements
   // we will be sending to each processor, recv_n_nodes_and_elem_per_proc contains
   // the number of nodes/elements we will be receiving from each processor.
-  std::vector<unsigned int> send_n_nodes_and_elem_per_proc;
-  send_n_nodes_and_elem_per_proc.reserve(2*libMesh::n_processors());
-
+  std::vector<unsigned int> send_n_nodes_and_elem_per_proc(2*libMesh::n_processors(), 0);
+  
+  std::vector<std::vector<PackedNode> >
+    nodes_sent(libMesh::n_processors());
+  
   for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
-    {
-      send_n_nodes_and_elem_per_proc.push_back(MeshTools::n_nodes(mesh.pid_nodes_begin(pid),
-								  mesh.pid_nodes_end(pid)));
+    if (pid != libMesh::processor_id()) // don't send to ourselves!!
+      {
+	MeshBase::const_element_iterator       elem_it  = mesh.pid_elements_begin(pid);
+	const MeshBase::const_element_iterator elem_end = mesh.pid_elements_end(pid);
       
-      send_n_nodes_and_elem_per_proc.push_back(MeshTools::n_elem(mesh.pid_elements_begin(pid),
-								 mesh.pid_elements_end(pid)));
-    }
+	// we can get the number of elements directly
+	send_n_nodes_and_elem_per_proc[2*pid+1] = MeshTools::n_elem(elem_it, elem_end);
+	
+	// but the nodes for this pid are defined implicitly in terms of the
+	// element connectivity
+	std::set<const Node*> connected_nodes;
+	
+	for (; elem_it!=elem_end; ++elem_it)
+	  for (unsigned int n=0; n<(*elem_it)->n_nodes(); n++)
+	    connected_nodes.insert ((*elem_it)->get_node(n));
+	
+	// Now that we have the nodes we can build the send buffer and ship it off,
+	// but only do that if it is not empty, otherwise we will incur unnecessary
+	// communication costs for 0-length messages
+	if (!connected_nodes.empty())
+	  {
+	    // the number of nodes we will ship to pid
+	    send_n_nodes_and_elem_per_proc[2*pid+0] = connected_nodes.size();
+	    
+	    nodes_sent[pid].reserve(connected_nodes.size());
+	    
+	    for (std::set<const Node*>::const_iterator node_it = connected_nodes.begin();
+		 node_it != connected_nodes.end(); ++node_it)
+	      {
+		const Node *node = *node_it;
+		nodes_sent[pid].push_back(PackedNode(*node));
+	      }
+	  }
+      }
   
   std::vector<unsigned int> recv_n_nodes_and_elem_per_proc(send_n_nodes_and_elem_per_proc);
 
   Parallel::alltoall (recv_n_nodes_and_elem_per_proc);
 
   // In general we will only need to communicate with a subset of the other processors.
+  // I can't immediately think of a case where we will send elements but not nodes, but
+  // these are only bools and we have the information anyway...
   std::vector<bool>
-    send_pair(libMesh::n_processors(),false),
-    recv_pair(libMesh::n_processors(),false);
+    send_node_pair(libMesh::n_processors(),false), send_elem_pair(libMesh::n_processors(),false),
+    recv_node_pair(libMesh::n_processors(),false), recv_elem_pair(libMesh::n_processors(),false);
+  
+  unsigned int
+    n_send_node_pairs=0, n_send_elem_pairs=0,
+    n_recv_node_pairs=0, n_recv_elem_pairs=0,
+    max_n_nodes_received=0;
+  
+  std::vector<Parallel::request> node_send_requests, elem_send_requests;
 
   for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
     {
-      if (send_n_nodes_and_elem_per_proc[2*pid+0] || // we have nodes to send
-	  send_n_nodes_and_elem_per_proc[2*pid+1])   // we have elements to send
-	send_pair[pid] = true;
+      if (send_n_nodes_and_elem_per_proc[2*pid+0]) // we have nodes to send
+	{
+	  send_node_pair[pid] = true;
+	  n_send_node_pairs++;
 
-      if (recv_n_nodes_and_elem_per_proc[2*pid+0] || // we will receive nodes
-	  recv_n_nodes_and_elem_per_proc[2*pid+1])   // we will receive elements
-	recv_pair[pid] = true;
+	  // send the nodes off to the destination processor
+	  node_send_requests.push_back(Parallel::request());
+	  
+	  Parallel::isend (pid,
+			   nodes_sent[pid],
+			   packed_node_datatype,
+			   node_send_requests.back(),
+			   /* tag = */ 0);			   
+	}
+      
+      if (send_n_nodes_and_elem_per_proc[2*pid+1]) // we have elements to send
+	{
+	  send_elem_pair[pid] = true;
+	  n_send_elem_pairs++;
+	}
 
-//       if (send_pair[pid])
-// 	std::cerr << "Processor [" << libMesh::processor_id() << "] will send to processor ["
-// 		  << pid << "]\n"; 
-//       if (recv_pair[pid])
-// 	std::cerr << "Processor [" << libMesh::processor_id() << "] will receive from processor ["
-// 		  << pid << "]\n"; 
+      if (recv_n_nodes_and_elem_per_proc[2*pid+0]) // we have nodes to receive
+	{
+	  recv_node_pair[pid] = true;
+	  n_recv_node_pairs++;
+	  max_n_nodes_received = std::max(max_n_nodes_received,
+					  recv_n_nodes_and_elem_per_proc[2*pid+0]);
+	}
+      
+      if (recv_n_nodes_and_elem_per_proc[2*pid+1]) // we have elements to receive
+	{
+	  recv_elem_pair[pid] = true;
+	  n_recv_elem_pairs++;
+	}
     }
+
+  // Receive our nodes.  Size this array for the largest message
+  std::vector<PackedNode> received_nodes(max_n_nodes_received);
+
+  // We now know how many processors will be sending us information
+  for (unsigned int node_comm_step=0; node_comm_step<n_recv_node_pairs; node_comm_step++)
+    {
+      // but we don't necessarily want to impose an ordering, so
+      // just grap whatever message is next.
+      Parallel::Status status =
+	Parallel::recv (Parallel::any_source,
+			received_nodes,
+			packed_node_datatype,
+			/* tag = */ 0);
+
+      const unsigned int source_pid = status.source();
+      const unsigned int n_nodes_received =
+	recv_n_nodes_and_elem_per_proc[2*source_pid+0];
+      assert (n_nodes_received <= received_nodes.size());
+      assert (recv_node_pair[source_pid]);
+
+      for (unsigned int n=0; n<n_nodes_received; n++)
+	{
+	  Node *node = received_nodes[n].build_node().release();
+	  mesh.insert_node(node);
+	}
+    }
+
+  // Wait for all sends to complete
+  Parallel::wait (node_send_requests);
+
+  // unregister MPI datatypes
+  MPI_Type_free (&packed_node_datatype);
+  
 }
 #endif // HAVE_MPI
 
