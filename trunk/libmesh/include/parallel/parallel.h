@@ -207,11 +207,32 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Nonblocking-send vector to one processor with user-defined type.
+   */
+  template <typename T>
+  inline void isend (const unsigned int dest_processor_id,
+		     std::vector<T> &buf,
+		     MPI_Datatype &type,
+		     request &r,
+		     const int tag=0);
+
+  //-------------------------------------------------------------------
+  /**
    * Blocking-receive vector from one processor.
    */
   template <typename T>
   inline Status recv (const unsigned int src_processor_id,
 		      std::vector<T> &buf,
+		      const int tag=any_tag);
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-receive vector from one processor with user-defined type
+   */
+  template <typename T>
+  inline Status recv (const unsigned int src_processor_id,
+		      std::vector<T> &buf,
+		      MPI_Datatype &type,
 		      const int tag=any_tag);
 
   //-------------------------------------------------------------------
@@ -663,6 +684,30 @@ namespace Parallel
 
 
   template <typename T>
+  inline void isend (const unsigned int dest_processor_id,
+		     std::vector<T> &buf,
+		     MPI_Datatype &type,
+		     request &r,
+		     const int tag)
+  {
+    START_LOG("isend()", "Parallel");
+    
+    const int ierr =	  
+      MPI_Isend (buf.empty() ? NULL : &buf[0],
+		 buf.size(),
+		 type,
+		 dest_processor_id,
+		 tag,
+		 libMesh::COMM_WORLD,
+		 &r);    
+    assert (ierr == MPI_SUCCESS);
+    
+    STOP_LOG("isend()", "Parallel");
+  }
+
+
+
+  template <typename T>
   inline Status recv (const unsigned int src_processor_id,
 		      std::vector<T> &buf,
 		      const int tag)
@@ -675,6 +720,33 @@ namespace Parallel
       MPI_Recv (buf.empty() ? NULL : &buf[0],
 		buf.size(),
 		datatype<T>(),
+		src_processor_id,
+		tag,
+		libMesh::COMM_WORLD,
+		&status);
+    assert (ierr == MPI_SUCCESS);
+    
+    STOP_LOG("recv()", "Parallel");
+
+    return Status(status);
+  }
+
+
+
+  template <typename T>
+  inline Status recv (const unsigned int src_processor_id,
+		      std::vector<T> &buf,
+		      MPI_Datatype &type,
+		      const int tag)
+  {
+    START_LOG("recv()", "Parallel");
+
+    MPI_Status status;
+    
+    const int ierr =	  
+      MPI_Recv (buf.empty() ? NULL : &buf[0],
+		buf.size(),
+		type,
 		src_processor_id,
 		tag,
 		libMesh::COMM_WORLD,
