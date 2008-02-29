@@ -1,5 +1,5 @@
 # Maximum number of refinement steps
-max_r_steps = 9
+max_r_steps = 10
 
 # Maximum h refinement level for an element.
 max_r_level = 15
@@ -30,7 +30,7 @@ approx_order = 2
 # kelly => inter-element normal derivative jumps
 # patch => patch gradient recovery
 # uniform => uniform refinement
-indicator_type = patch
+indicator_type = kelly
 
 # Mesh refinement type: h, p, matchedhp, or hp
 # Use HIERARCHIC or HERMITE functions with p/matchedhp/hp,
@@ -42,7 +42,7 @@ refinement_type = h
 # Mesh dimensionality
 # We generate 1D meshes on [-1, 0].
 # We load lshaped.xda for 2 dimensional problems, lshaped3D.xda for 3
-dimension = 3
+dimension = 2
 
 # Element type - tensor or simplex
 # simplex is currently only supported in 2D

@@ -70,9 +70,6 @@
 #include "numeric_vector.h"
 #include "elem.h"
 #include "string_to_enum.h"
-#include "tbb/tick_count.h"
-#include "elem_range.h"
-#include "threads.h"
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our Laplace problem.  Note that the
@@ -96,16 +93,6 @@ Gradient exact_derivative(const Point& p,
 			  const Parameters&,   // EquationSystems parameters, not needed
 			  const std::string&,  // sys_name, not needed
 			  const std::string&); // unk_name, not needed);
-struct perfstuff
-{
-  double elapsed_time;
-  unsigned int count;
-};
-
-namespace {
-  perfstuff matrix_assembly;
-  perfstuff error_est;
-}
 
 
 // These are non-const because the input file may change it,
@@ -320,13 +307,8 @@ int main(int argc, char** argv)
 		    // Compute the error for each active element using
 		    // the provided indicator.  Note in general you
 		    // will need to provide an error estimator
-                    // specifically designed for your application.		    
-		    tbb::tick_count t0 = tbb::tick_count::now();
-		    error_estimator.estimate_error (system,
-						    error);
-		    tbb::tick_count t1 = tbb::tick_count::now();
-		    error_est.elapsed_time = (t1-t0).seconds();
-		    error_est.count++;
+                    // specifically designed for your application.
+		    error_estimator.estimate_error (system, error);
                   }
                 else if (indicator_type == "patch")
                   {
@@ -334,13 +316,8 @@ int main(int argc, char** argv)
                     // good estimate of the solution interpolation
                     // error.
 		    PatchRecoveryErrorEstimator error_estimator;
-		    
-		    tbb::tick_count t0 = tbb::tick_count::now();
-		    error_estimator.estimate_error (system,
-						    error);
-		    tbb::tick_count t1 = tbb::tick_count::now();
-		    error_est.elapsed_time = (t1-t0).seconds();
-		    error_est.count++;
+
+		    error_estimator.estimate_error (system, error);
                   }
                 else if (indicator_type == "uniform")
                   {
@@ -454,10 +431,6 @@ int main(int argc, char** argv)
     //     out << "polyfit(log10(e(:,1)), log10(e(:,3)), 1)" << std::endl;
   }
 #endif // #ifndef ENABLE_AMR
-
-  std::cout << "matrix_assembly.elapsed_time=" << matrix_assembly.elapsed_time
-	    << "\nerror_estimator.elapsed_time=" << error_est.elapsed_time
-	    << std::endl;
   
   // All done.  
   return libMesh::close ();
@@ -566,256 +539,7 @@ Gradient exact_derivative(const Point& p,
 }
 
 
-class AssembleLaplace 
-{
-private:
-  EquationSystems &es;
-  const std::string &system_name;
 
-public:
-  AssembleLaplace (EquationSystems &es_in,
-		   const std::string &system_name_in) :
-    es(es_in),
-    system_name(system_name_in)
-  {}
-
-  void operator()(const ConstElemRange &range) const
-  {
-#ifdef ENABLE_AMR
-    // It is a good idea to make sure we are assembling
-    // the proper system.
-    assert (system_name == "Laplace");
-  
-  
-    // Declare a performance log.  Give it a descriptive
-    // string to identify what part of the code we are
-    // logging, since there may be many PerfLogs in an
-    // application.
-    PerfLog perf_log ("Matrix Assembly",false);
-    
-      // Get a constant reference to the mesh object.
-    const MeshBase& mesh = es.get_mesh();
-  
-    // The dimension that we are running
-    const unsigned int dim = mesh.mesh_dimension();
-  
-    // Get a reference to the LinearImplicitSystem we are solving
-    LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Laplace");
-    
-    // A reference to the \p DofMap object for this system.  The \p DofMap
-    // object handles the index translation from node and element numbers
-    // to degree of freedom numbers.  We will talk more about the \p DofMap
-    // in future examples.
-    const DofMap& dof_map = system.get_dof_map();
-  
-    // Get a constant reference to the Finite Element type
-    // for the first (and only) variable in the system.
-    FEType fe_type = dof_map.variable_type(0);
-  
-    // Build a Finite Element object of the specified type.  Since the
-    // \p FEBase::build() member dynamically creates memory we will
-    // store the object as an \p AutoPtr<FEBase>.  This can be thought
-    // of as a pointer that will clean up after itself.
-    AutoPtr<FEBase> fe      (FEBase::build(dim, fe_type));
-    AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-    
-    // Quadrature rules for numerical integration.
-    AutoPtr<QBase> qrule(fe_type.default_quadrature_rule(dim));
-    AutoPtr<QBase> qface(fe_type.default_quadrature_rule(dim-1));
-  
-    // Tell the finite element object to use our quadrature rule.
-    fe->attach_quadrature_rule      (qrule.get());
-    fe_face->attach_quadrature_rule (qface.get());
-  
-    // Here we define some references to cell-specific data that
-    // will be used to assemble the linear system.
-    // We begin with the element Jacobian * quadrature weight at each
-    // integration point.   
-    const std::vector<Real>& JxW      = fe->get_JxW();
-    const std::vector<Real>& JxW_face = fe_face->get_JxW();
-  
-    // The physical XY locations of the quadrature points on the element.
-    // These might be useful for evaluating spatially varying material
-    // properties or forcing functions at the quadrature points.
-    const std::vector<Point>& q_point = fe->get_xyz();
-  
-    // The element shape functions evaluated at the quadrature points.
-    // For this simple problem we usually only need them on element
-    // boundaries.
-    const std::vector<std::vector<Real> >& phi = fe->get_phi();
-    const std::vector<std::vector<Real> >& psi = fe_face->get_phi();
-  
-    // The element shape function gradients evaluated at the quadrature
-    // points.
-    const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
-  
-    // The XY locations of the quadrature points used for face integration
-    const std::vector<Point>& qface_points = fe_face->get_xyz();
-  
-    // Define data structures to contain the element matrix
-    // and right-hand-side vector contribution.  Following
-    // basic finite element terminology we will denote these
-    // "Ke" and "Fe". More detail is in example 3.
-    DenseMatrix<Number> Ke;
-    DenseVector<Number> Fe;
-  
-    // This vector will hold the degree of freedom indices for
-    // the element.  These define where in the global system
-    // the element degrees of freedom get mapped.
-    std::vector<unsigned int> dof_indices;
-  
-    // Now we will loop over all the elements in the mesh.  We will
-    // compute the element matrix and right-hand-side contribution.  See
-    // example 3 for a discussion of the element iterators.  Here we use
-    // the \p const_active_local_elem_iterator to indicate we only want
-    // to loop over elements that are assigned to the local processor
-    // which are "active" in the sense of AMR.  This allows each
-    // processor to compute its components of the global matrix for
-    // active elements while ignoring parent elements which have been
-    // refined.
-    for (ConstElemRange::const_iterator el=range.begin(); el!=range.end(); ++el)
-      {
-        // Start logging the shape function initialization.
-        // This is done through a simple function call with
-        // the name of the event to log.
-        perf_log.start_event("elem init");      
-  
-        // Store a pointer to the element we are currently
-        // working on.  This allows for nicer syntax later.
-        const Elem* elem = *el;
-  
-        // Get the degree of freedom indices for the
-        // current element.  These define where in the global
-        // matrix and right-hand-side this element will
-        // contribute to.
-        dof_map.dof_indices (elem, dof_indices);
-  
-        // Compute the element-specific data for the current
-        // element.  This involves computing the location of the
-        // quadrature points (q_point) and the shape functions
-        // (phi, dphi) for the current element.
-        fe->reinit (elem);
-  
-        // Zero the element matrix and right-hand side before
-        // summing them.  We use the resize member here because
-        // the number of degrees of freedom might have changed from
-        // the last element.  Note that this will be the case if the
-        // element type is different (i.e. the last element was a
-        // triangle, now we are on a quadrilateral).
-        Ke.resize (dof_indices.size(),
-  		 dof_indices.size());
-  
-        Fe.resize (dof_indices.size());
-  
-        // Stop logging the shape function initialization.
-        // If you forget to stop logging an event the PerfLog
-        // object will probably catch the error and abort.
-        perf_log.stop_event("elem init");      
-  
-        // Now we will build the element matrix.  This involves
-        // a double loop to integrate the test funcions (i) against
-        // the trial functions (j).
-        //
-        // Now start logging the element matrix computation
-        perf_log.start_event ("Ke");
-  
-        for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-  	for (unsigned int i=0; i<dphi.size(); i++)
-  	  for (unsigned int j=0; j<dphi.size(); j++)
-  	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-  
-        // We need a forcing function to make the 1D case interesting
-        if (dim == 1)
-          for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-            {
-              Real x = q_point[qp](0);
-              Real f = singularity ? sqrt(3.)/9.*pow(-x, -4./3.) :
-                                     cos(x);
-              for (unsigned int i=0; i<dphi.size(); ++i)
-                Fe(i) += JxW[qp]*phi[i][qp]*f;
-            }
-  
-        // Stop logging the matrix computation
-        perf_log.stop_event ("Ke");
-  
-  
-        // At this point the interior element integration has
-        // been completed.  However, we have not yet addressed
-        // boundary conditions.  For this example we will only
-        // consider simple Dirichlet boundary conditions imposed
-        // via the penalty method.
-        //
-        // This approach adds the L2 projection of the boundary
-        // data in penalty form to the weak statement.  This is
-        // a more generic approach for applying Dirichlet BCs
-        // which is applicable to non-Lagrange finite element
-        // discretizations.
-        {
-  	// Start logging the boundary condition computation
-  	perf_log.start_event ("BCs");
-  
-  	// The penalty value.  
-  	const Real penalty = 1.e10;
-  
-  	// The following loops over the sides of the element.
-  	// If the element has no neighbor on a side then that
-  	// side MUST live on a boundary of the domain.
-  	for (unsigned int s=0; s<elem->n_sides(); s++)
-  	  if (elem->neighbor(s) == NULL)
-  	    {
-  	      fe_face->reinit(elem,s);
-  	      
-  	      for (unsigned int qp=0; qp<qface->n_points(); qp++)
-  		{
-  		  const Number value = exact_solution (qface_points[qp],
-  						       es.parameters,
-  						       "null",
-  						       "void");
-  
-  		  // RHS contribution
-  		  for (unsigned int i=0; i<psi.size(); i++)
-  		    Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
-  
-  		  // Matrix contribution
-  		  for (unsigned int i=0; i<psi.size(); i++)
-  		    for (unsigned int j=0; j<psi.size(); j++)
-  		      Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
-  		}
-  	    } 
-  	
-  	// Stop logging the boundary condition computation
-  	perf_log.stop_event ("BCs");
-        } 
-        
-  
-        // The element matrix and right-hand-side are now built
-        // for this element.  Add them to the global matrix and
-        // right-hand-side vector.  The \p PetscMatrix::add_matrix()
-        // and \p PetscVector::add_vector() members do this for us.
-        // Start logging the insertion of the local (element)
-        // matrix and vector into the global matrix and vector
-        perf_log.start_event ("matrix insertion");
-  
-        dof_map.constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
-	{
-	  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-	  system.matrix->add_matrix (Ke, dof_indices);
-	}
-	{
-	  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-	  system.rhs->add_vector    (Fe, dof_indices);
-	}
-        // Start logging the insertion of the local (element)
-        // matrix and vector into the global matrix and vector
-        perf_log.stop_event ("matrix insertion");
-      }
-  
-    // That's it.  We don't need to do anything else to the
-    // PerfLog.  When it goes out of scope (at this function return)
-    // it will print its log to the screen. Pretty easy, huh?
-#endif // #ifdef ENABLE_AMR
-  }
-};
 
 
 
@@ -827,12 +551,235 @@ public:
 void assemble_laplace(EquationSystems& es,
                       const std::string& system_name)
 {
-  // Get a constant reference to the mesh object.
+#ifdef ENABLE_AMR
+  // It is a good idea to make sure we are assembling
+  // the proper system.
+  assert (system_name == "Laplace");
+
+
+  // Declare a performance log.  Give it a descriptive
+  // string to identify what part of the code we are
+  // logging, since there may be many PerfLogs in an
+  // application.
+  PerfLog perf_log ("Matrix Assembly",false);
+  
+    // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
-  std::cout << "mesh.n_elem()=" << mesh.n_elem() << std::endl;
-  Threads::parallel_for (ConstElemRange (mesh.active_local_elements_begin(),
-					 mesh.active_local_elements_end()),
-			 AssembleLaplace (es, 
-					  system_name)
-			 );
+
+  // The dimension that we are running
+  const unsigned int dim = mesh.mesh_dimension();
+
+  // Get a reference to the LinearImplicitSystem we are solving
+  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Laplace");
+  
+  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // object handles the index translation from node and element numbers
+  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // in future examples.
+  const DofMap& dof_map = system.get_dof_map();
+
+  // Get a constant reference to the Finite Element type
+  // for the first (and only) variable in the system.
+  FEType fe_type = dof_map.variable_type(0);
+
+  // Build a Finite Element object of the specified type.  Since the
+  // \p FEBase::build() member dynamically creates memory we will
+  // store the object as an \p AutoPtr<FEBase>.  This can be thought
+  // of as a pointer that will clean up after itself.
+  AutoPtr<FEBase> fe      (FEBase::build(dim, fe_type));
+  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+  
+  // Quadrature rules for numerical integration.
+  AutoPtr<QBase> qrule(fe_type.default_quadrature_rule(dim));
+  AutoPtr<QBase> qface(fe_type.default_quadrature_rule(dim-1));
+
+  // Tell the finite element object to use our quadrature rule.
+  fe->attach_quadrature_rule      (qrule.get());
+  fe_face->attach_quadrature_rule (qface.get());
+
+  // Here we define some references to cell-specific data that
+  // will be used to assemble the linear system.
+  // We begin with the element Jacobian * quadrature weight at each
+  // integration point.   
+  const std::vector<Real>& JxW      = fe->get_JxW();
+  const std::vector<Real>& JxW_face = fe_face->get_JxW();
+
+  // The physical XY locations of the quadrature points on the element.
+  // These might be useful for evaluating spatially varying material
+  // properties or forcing functions at the quadrature points.
+  const std::vector<Point>& q_point = fe->get_xyz();
+
+  // The element shape functions evaluated at the quadrature points.
+  // For this simple problem we usually only need them on element
+  // boundaries.
+  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> >& psi = fe_face->get_phi();
+
+  // The element shape function gradients evaluated at the quadrature
+  // points.
+  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+
+  // The XY locations of the quadrature points used for face integration
+  const std::vector<Point>& qface_points = fe_face->get_xyz();
+
+  // Define data structures to contain the element matrix
+  // and right-hand-side vector contribution.  Following
+  // basic finite element terminology we will denote these
+  // "Ke" and "Fe". More detail is in example 3.
+  DenseMatrix<Number> Ke;
+  DenseVector<Number> Fe;
+
+  // This vector will hold the degree of freedom indices for
+  // the element.  These define where in the global system
+  // the element degrees of freedom get mapped.
+  std::vector<unsigned int> dof_indices;
+
+  // Now we will loop over all the elements in the mesh.  We will
+  // compute the element matrix and right-hand-side contribution.  See
+  // example 3 for a discussion of the element iterators.  Here we use
+  // the \p const_active_local_elem_iterator to indicate we only want
+  // to loop over elements that are assigned to the local processor
+  // which are "active" in the sense of AMR.  This allows each
+  // processor to compute its components of the global matrix for
+  // active elements while ignoring parent elements which have been
+  // refined.
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
+  
+  for ( ; el != end_el; ++el)
+    {
+      // Start logging the shape function initialization.
+      // This is done through a simple function call with
+      // the name of the event to log.
+      perf_log.start_event("elem init");      
+
+      // Store a pointer to the element we are currently
+      // working on.  This allows for nicer syntax later.
+      const Elem* elem = *el;
+
+      // Get the degree of freedom indices for the
+      // current element.  These define where in the global
+      // matrix and right-hand-side this element will
+      // contribute to.
+      dof_map.dof_indices (elem, dof_indices);
+
+      // Compute the element-specific data for the current
+      // element.  This involves computing the location of the
+      // quadrature points (q_point) and the shape functions
+      // (phi, dphi) for the current element.
+      fe->reinit (elem);
+
+      // Zero the element matrix and right-hand side before
+      // summing them.  We use the resize member here because
+      // the number of degrees of freedom might have changed from
+      // the last element.  Note that this will be the case if the
+      // element type is different (i.e. the last element was a
+      // triangle, now we are on a quadrilateral).
+      Ke.resize (dof_indices.size(),
+		 dof_indices.size());
+
+      Fe.resize (dof_indices.size());
+
+      // Stop logging the shape function initialization.
+      // If you forget to stop logging an event the PerfLog
+      // object will probably catch the error and abort.
+      perf_log.stop_event("elem init");      
+
+      // Now we will build the element matrix.  This involves
+      // a double loop to integrate the test funcions (i) against
+      // the trial functions (j).
+      //
+      // Now start logging the element matrix computation
+      perf_log.start_event ("Ke");
+
+      for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+	for (unsigned int i=0; i<dphi.size(); i++)
+	  for (unsigned int j=0; j<dphi.size(); j++)
+	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+
+      // We need a forcing function to make the 1D case interesting
+      if (dim == 1)
+        for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+          {
+            Real x = q_point[qp](0);
+            Real f = singularity ? sqrt(3.)/9.*pow(-x, -4./3.) :
+                                   cos(x);
+            for (unsigned int i=0; i<dphi.size(); ++i)
+              Fe(i) += JxW[qp]*phi[i][qp]*f;
+          }
+
+      // Stop logging the matrix computation
+      perf_log.stop_event ("Ke");
+
+
+      // At this point the interior element integration has
+      // been completed.  However, we have not yet addressed
+      // boundary conditions.  For this example we will only
+      // consider simple Dirichlet boundary conditions imposed
+      // via the penalty method.
+      //
+      // This approach adds the L2 projection of the boundary
+      // data in penalty form to the weak statement.  This is
+      // a more generic approach for applying Dirichlet BCs
+      // which is applicable to non-Lagrange finite element
+      // discretizations.
+      {
+	// Start logging the boundary condition computation
+	perf_log.start_event ("BCs");
+
+	// The penalty value.  
+	const Real penalty = 1.e10;
+
+	// The following loops over the sides of the element.
+	// If the element has no neighbor on a side then that
+	// side MUST live on a boundary of the domain.
+	for (unsigned int s=0; s<elem->n_sides(); s++)
+	  if (elem->neighbor(s) == NULL)
+	    {
+	      fe_face->reinit(elem,s);
+	      
+	      for (unsigned int qp=0; qp<qface->n_points(); qp++)
+		{
+		  const Number value = exact_solution (qface_points[qp],
+						       es.parameters,
+						       "null",
+						       "void");
+
+		  // RHS contribution
+		  for (unsigned int i=0; i<psi.size(); i++)
+		    Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
+
+		  // Matrix contribution
+		  for (unsigned int i=0; i<psi.size(); i++)
+		    for (unsigned int j=0; j<psi.size(); j++)
+		      Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
+		}
+	    } 
+	
+	// Stop logging the boundary condition computation
+	perf_log.stop_event ("BCs");
+      } 
+      
+
+      // The element matrix and right-hand-side are now built
+      // for this element.  Add them to the global matrix and
+      // right-hand-side vector.  The \p PetscMatrix::add_matrix()
+      // and \p PetscVector::add_vector() members do this for us.
+      // Start logging the insertion of the local (element)
+      // matrix and vector into the global matrix and vector
+      perf_log.start_event ("matrix insertion");
+
+      dof_map.constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
+      system.matrix->add_matrix (Ke, dof_indices);
+      system.rhs->add_vector    (Fe, dof_indices);
+
+      // Start logging the insertion of the local (element)
+      // matrix and vector into the global matrix and vector
+      perf_log.stop_event ("matrix insertion");
+    }
+
+  // That's it.  We don't need to do anything else to the
+  // PerfLog.  When it goes out of scope (at this function return)
+  // it will print its log to the screen. Pretty easy, huh?
+#endif // #ifdef ENABLE_AMR
 }
