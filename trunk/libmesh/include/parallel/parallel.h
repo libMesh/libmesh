@@ -788,6 +788,14 @@ namespace Parallel
   {
     START_LOG("send_receive()", "Parallel");
 
+    if (dest_processor_id   == libMesh::processor_id() &&
+	source_processor_id == libMesh::processor_id())
+      {
+	recv = send;
+	STOP_LOG("send_receive()", "Parallel");
+	return;
+      }
+
     MPI_Status status;
     MPI_Sendrecv(&send, 1, datatype<T>(),
 		 dest_processor_id, 0,
@@ -807,6 +815,14 @@ namespace Parallel
 			   std::complex<T> &recv)
   {
     START_LOG("send_receive()", "Parallel");
+
+    if (dest_processor_id   == libMesh::processor_id() &&
+	source_processor_id == libMesh::processor_id())
+      {
+	recv = send;
+	STOP_LOG("send_receive()", "Parallel");
+	return;
+      }
 
     MPI_Status status;
     MPI_Sendrecv(&send, 2, datatype<T>(),
@@ -828,6 +844,14 @@ namespace Parallel
 			   std::vector<T> &recv)
   {
     START_LOG("send_receive()", "Parallel");
+
+    if (dest_processor_id   == libMesh::processor_id() &&
+	source_processor_id == libMesh::processor_id())
+      {
+	recv = send;
+	STOP_LOG("send_receive()", "Parallel");
+	return;
+      }
 
     // Trade buffer sizes first
     unsigned int sendsize = send.size(), recvsize;
@@ -859,6 +883,14 @@ namespace Parallel
 			   std::vector<std::complex<T> > &recv)
   {
     START_LOG("send_receive()", "Parallel");
+
+    if (dest_processor_id   == libMesh::processor_id() &&
+	source_processor_id == libMesh::processor_id())
+      {
+	recv = send;
+	STOP_LOG("send_receive()", "Parallel");
+	return;
+      }
 
     // Trade buffer sizes first
     unsigned int sendsize = send.size(), recvsize;
@@ -893,6 +925,14 @@ namespace Parallel
   {
     START_LOG("send_receive()", "Parallel");
 
+    if (dest_processor_id   == libMesh::processor_id() &&
+	source_processor_id == libMesh::processor_id())
+      {
+	recv = send;
+	STOP_LOG("send_receive()", "Parallel");
+	return;
+      }
+
     // Trade buffer sizes first
     unsigned int sendsize = send.size(), recvsize;
     MPI_Status status;
@@ -924,6 +964,14 @@ namespace Parallel
 			     std::vector<std::vector<T> > &recv)
   {
     START_LOG("send_receive()", "Parallel");
+
+    if (dest_processor_id   == libMesh::processor_id() &&
+	source_processor_id == libMesh::processor_id())
+      {
+	recv = send;
+	STOP_LOG("send_receive()", "Parallel");
+	return;
+      }
 
     // Trade outer buffer sizes first
     unsigned int sendsize = send.size(), recvsize;
