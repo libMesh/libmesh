@@ -74,205 +74,202 @@
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side.
 void assemble_stokes (EquationSystems& es,
-		      const std::string& system_name);
+                      const std::string& system_name);
 
 // The main program.
 int main (int argc, char** argv)
 {
   // Initialize libMesh.
-  libMesh::init (argc, argv);
-  {    
-    // Set the dimensionality of the mesh = 2
-    const unsigned int dim = 2;     
-    
-    // Create a two-dimensional mesh.
-    Mesh mesh (dim);
-    
-    // Use the MeshTools::Generation mesh generator to create a uniform
-    // grid on the square [-1,1]^D.  We instruct the mesh generator
-    // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
-    // elements in 3D.  Building these higher-order elements allows
-    // us to use higher-order approximation, as in example 3.
-    MeshTools::Generation::build_square (mesh,
-					 20, 20,
-					 0., 1.,
-					 0., 1.,
-					 QUAD9);
-    
-    // Print information about the mesh to the screen.
-    mesh.print_info();
-    
-    // Create an equation systems object.
-    EquationSystems equation_systems (mesh);
-    
-    // Declare the system and its variables.
+  LibMeshInit init (argc, argv);
+
+  // Set the dimensionality of the mesh = 2
+  const unsigned int dim = 2;     
+  
+  // Create a two-dimensional mesh.
+  Mesh mesh (dim);
+  
+  // Use the MeshTools::Generation mesh generator to create a uniform
+  // grid on the square [-1,1]^D.  We instruct the mesh generator
+  // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
+  // elements in 3D.  Building these higher-order elements allows
+  // us to use higher-order approximation, as in example 3.
+  MeshTools::Generation::build_square (mesh,
+                                       20, 20,
+                                       0., 1.,
+                                       0., 1.,
+                                       QUAD9);
+  
+  // Print information about the mesh to the screen.
+  mesh.print_info();
+  
+  // Create an equation systems object.
+  EquationSystems equation_systems (mesh);
+  
+  // Declare the system and its variables.
+  // Creates a transient system named "Navier-Stokes"
+  TransientLinearImplicitSystem & system = 
+    equation_systems.add_system<TransientLinearImplicitSystem> ("Navier-Stokes");
+  
+  // Add the variables "u" & "v" to "Navier-Stokes".  They
+  // will be approximated using second-order approximation.
+  system.add_variable ("u", SECOND);
+  system.add_variable ("v", SECOND);
+
+  // Add the variable "p" to "Navier-Stokes". This will
+  // be approximated with a first-order basis,
+  // providing an LBB-stable pressure-velocity pair.
+  system.add_variable ("p", FIRST);
+
+  // Give the system a pointer to the matrix assembly
+  // function.
+  system.attach_assemble_function (assemble_stokes);
+  
+  // Initialize the data structures for the equation system.
+  equation_systems.init ();
+
+  // Prints information about the system to the screen.
+  equation_systems.print_info();
+
+  // Create a performance-logging object for this example
+  PerfLog perf_log("Example 13");
+  
+  // Now we begin the timestep loop to compute the time-accurate
+  // solution of the equations.
+  const Real dt = 0.01;
+  Real time     = 0.0;
+  const unsigned int n_timesteps = 15;
+
+  // The number of steps and the stopping criterion are also required
+  // for the nonlinear iterations.
+  const unsigned int n_nonlinear_steps = 15;
+  const Real nonlinear_tolerance       = 1.e-3;
+
+  // We also set a standard linear solver flag in the EquationSystems object
+  // which controls the maxiumum number of linear solver iterations allowed.
+  equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
+  
+  // Tell the system of equations what the timestep is by using
+  // the set_parameter function.  The matrix assembly routine can
+  // then reference this parameter.
+  equation_systems.parameters.set<Real> ("dt")   = dt;
+
+  // Get a reference to the Stokes system to use later.
+  TransientLinearImplicitSystem&  navier_stokes_system =
+        equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
+
+  // The first thing to do is to get a copy of the solution at
+  // the current nonlinear iteration.  This value will be used to
+  // determine if we can exit the nonlinear loop.
+  AutoPtr<NumericVector<Number> >
+    last_nonlinear_soln (navier_stokes_system.solution->clone());
+
+  for (unsigned int t_step=0; t_step<n_timesteps; ++t_step)
     {
-      // Creates a transient system named "Navier-Stokes"
-      TransientLinearImplicitSystem & system = 
-	equation_systems.add_system<TransientLinearImplicitSystem> ("Navier-Stokes");
+      // Incremenet the time counter, set the time and the
+      // time step size as parameters in the EquationSystem.
+      time += dt;
+
+      // Let the system of equations know the current time.
+      // This might be necessary for a time-dependent forcing
+      // function for example.
+      equation_systems.parameters.set<Real> ("time") = time;
+
+      // A pretty update message
+      std::cout << "\n\n*** Solving time step " << t_step << ", time = " << time << " ***" << std::endl;
+
+      // Now we need to update the solution vector from the
+      // previous time step.  This is done directly through
+      // the reference to the Stokes system.
+      *navier_stokes_system.old_local_solution = *navier_stokes_system.current_local_solution;
+
+      // At the beginning of each solve, reset the linear solver tolerance
+      // to a "reasonable" starting value.
+      const Real initial_linear_solver_tol = 1.e-6;
+      equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
+
+      // Now we begin the nonlinear loop
+      for (unsigned int l=0; l<n_nonlinear_steps; ++l)
+        {
+          // Update the nonlinear solution.
+          last_nonlinear_soln->zero();
+          last_nonlinear_soln->add(*navier_stokes_system.solution);
+          
+          // Assemble & solve the linear system.
+          perf_log.start_event("linear solve");
+          equation_systems.get_system("Navier-Stokes").solve();
+          perf_log.stop_event("linear solve");
+
+          // Compute the difference between this solution and the last
+          // nonlinear iterate.
+          last_nonlinear_soln->add (-1., *navier_stokes_system.solution);
+
+          // Close the vector before computing its norm
+          last_nonlinear_soln->close();
+
+          // Compute the l2 norm of the difference
+          const Real norm_delta = last_nonlinear_soln->l2_norm();
+
+          // How many iterations were required to solve the linear system?
+          const unsigned int n_linear_iterations = navier_stokes_system.n_linear_iterations();
+          
+          // What was the final residual of the linear system?
+          const Real final_linear_residual = navier_stokes_system.final_linear_residual();
+          
+          // Print out convergence information for the linear and
+          // nonlinear iterations.
+          std::cout << "Linear solver converged at step: "
+                    << n_linear_iterations
+                    << ", final residual: "
+                    << final_linear_residual
+                    << "  Nonlinear convergence: ||u - u_old|| = "
+                    << norm_delta
+                    << std::endl;
+
+          // Terminate the solution iteration if the difference between
+          // this nonlinear iterate and the last is sufficiently small, AND
+          // if the most recent linear system was solved to a sufficient tolerance.
+          if ((norm_delta < nonlinear_tolerance) &&
+              (navier_stokes_system.final_linear_residual() < nonlinear_tolerance))
+            {
+              std::cout << " Nonlinear solver converged at step "
+                        << l
+                        << std::endl;
+              break;
+            }
+          
+          // Otherwise, decrease the linear system tolerance.  For the inexact Newton
+          // method, the linear solver tolerance needs to decrease as we get closer to
+          // the solution to ensure quadratic convergence.  The new linear solver tolerance
+          // is chosen (heuristically) as the square of the previous linear system residual norm.
+          //Real flr2 = final_linear_residual*final_linear_residual;
+          equation_systems.parameters.set<Real> ("linear solver tolerance") =
+            Utility::pow<2>(final_linear_residual);
+
+        } // end nonlinear loop
       
-      // Add the variables "u" & "v" to "Navier-Stokes".  They
-      // will be approximated using second-order approximation.
-      system.add_variable ("u", SECOND);
-      system.add_variable ("v", SECOND);
-
-      // Add the variable "p" to "Navier-Stokes". This will
-      // be approximated with a first-order basis,
-      // providing an LBB-stable pressure-velocity pair.
-      system.add_variable ("p", FIRST);
-
-      // Give the system a pointer to the matrix assembly
-      // function.
-      system.attach_assemble_function (assemble_stokes);
+      // Write out every nth timestep to file.
+      const unsigned int write_interval = 1;
       
-      // Initialize the data structures for the equation system.
-      equation_systems.init ();
+      if ((t_step+1)%write_interval == 0)
+        {
+          OStringStream file_name;
 
-      // Prints information about the system to the screen.
-      equation_systems.print_info();
-    }
+          // We write the file name in the gmv auto-read format.
+          file_name << "out.gmv.";
+          OSSRealzeroright(file_name,3,0, t_step + 1);
+          
+          // We currently have to serialize for I/O.
+          equation_systems.allgather();
 
-    // Create a performance-logging object for this example
-    PerfLog perf_log("Example 13");
-    
-    // Now we begin the timestep loop to compute the time-accurate
-    // solution of the equations.
-    const Real dt = 0.01;
-    Real time     = 0.0;
-    const unsigned int n_timesteps = 15;
+          GMVIO(mesh).write_equation_systems (file_name.str(),
+                                              equation_systems);
 
-    // The number of steps and the stopping criterion are also required
-    // for the nonlinear iterations.
-    const unsigned int n_nonlinear_steps = 15;
-    const Real nonlinear_tolerance       = 1.e-3;
-
-    // We also set a standard linear solver flag in the EquationSystems object
-    // which controls the maxiumum number of linear solver iterations allowed.
-    equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
-    
-    // Tell the system of equations what the timestep is by using
-    // the set_parameter function.  The matrix assembly routine can
-    // then reference this parameter.
-    equation_systems.parameters.set<Real> ("dt")   = dt;
-
-    // Get a reference to the Stokes system to use later.
-    TransientLinearImplicitSystem&  navier_stokes_system =
-	  equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
-
-    // The first thing to do is to get a copy of the solution at
-    // the current nonlinear iteration.  This value will be used to
-    // determine if we can exit the nonlinear loop.
-    AutoPtr<NumericVector<Number> >
-      last_nonlinear_soln (navier_stokes_system.solution->clone());
-
-    for (unsigned int t_step=0; t_step<n_timesteps; ++t_step)
-      {
-	// Incremenet the time counter, set the time and the
-	// time step size as parameters in the EquationSystem.
-	time += dt;
-
-	// Let the system of equations know the current time.
-	// This might be necessary for a time-dependent forcing
-	// function for example.
-	equation_systems.parameters.set<Real> ("time") = time;
-
-	// A pretty update message
-	std::cout << "\n\n*** Solving time step " << t_step << ", time = " << time << " ***" << std::endl;
-
-	// Now we need to update the solution vector from the
-	// previous time step.  This is done directly through
-	// the reference to the Stokes system.
-	*navier_stokes_system.old_local_solution = *navier_stokes_system.current_local_solution;
-
-	// At the beginning of each solve, reset the linear solver tolerance
-	// to a "reasonable" starting value.
-	const Real initial_linear_solver_tol = 1.e-6;
-	equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
-
-	// Now we begin the nonlinear loop
-	for (unsigned int l=0; l<n_nonlinear_steps; ++l)
-	  {
-	    // Update the nonlinear solution.
-	    last_nonlinear_soln->zero();
-	    last_nonlinear_soln->add(*navier_stokes_system.solution);
-	    
-	    // Assemble & solve the linear system.
-	    perf_log.start_event("linear solve");
-	    equation_systems.get_system("Navier-Stokes").solve();
-	    perf_log.stop_event("linear solve");
-
-	    // Compute the difference between this solution and the last
-	    // nonlinear iterate.
-	    last_nonlinear_soln->add (-1., *navier_stokes_system.solution);
-
-	    // Close the vector before computing its norm
-	    last_nonlinear_soln->close();
-
-	    // Compute the l2 norm of the difference
-	    const Real norm_delta = last_nonlinear_soln->l2_norm();
-
-	    // How many iterations were required to solve the linear system?
-	    const unsigned int n_linear_iterations = navier_stokes_system.n_linear_iterations();
-	    
-	    // What was the final residual of the linear system?
-	    const Real final_linear_residual = navier_stokes_system.final_linear_residual();
-	    
-	    // Print out convergence information for the linear and
-	    // nonlinear iterations.
-	    std::cout << "Linear solver converged at step: "
-		      << n_linear_iterations
-		      << ", final residual: "
-		      << final_linear_residual
-		      << "  Nonlinear convergence: ||u - u_old|| = "
-		      << norm_delta
-		      << std::endl;
-
-	    // Terminate the solution iteration if the difference between
-	    // this nonlinear iterate and the last is sufficiently small, AND
-	    // if the most recent linear system was solved to a sufficient tolerance.
-	    if ((norm_delta < nonlinear_tolerance) &&
-		(navier_stokes_system.final_linear_residual() < nonlinear_tolerance))
-	      {
-		std::cout << " Nonlinear solver converged at step "
-			  << l
-			  << std::endl;
-		break;
-	      }
-	    
-	    // Otherwise, decrease the linear system tolerance.  For the inexact Newton
-	    // method, the linear solver tolerance needs to decrease as we get closer to
-	    // the solution to ensure quadratic convergence.  The new linear solver tolerance
-	    // is chosen (heuristically) as the square of the previous linear system residual norm.
-	    //Real flr2 = final_linear_residual*final_linear_residual;
-	    equation_systems.parameters.set<Real> ("linear solver tolerance") =
-	      Utility::pow<2>(final_linear_residual);
-
-	  } // end nonlinear loop
-	
-	// Write out every nth timestep to file.
-	const unsigned int write_interval = 1;
-	
-	if ((t_step+1)%write_interval == 0)
-	  {
-	    OStringStream file_name;
-
-	    // We write the file name in the gmv auto-read format.
-	    file_name << "out.gmv.";
-	    OSSRealzeroright(file_name,3,0, t_step + 1);
-	    
-            // We currently have to serialize for I/O.
-            equation_systems.allgather();
-
-	    GMVIO(mesh).write_equation_systems (file_name.str(),
-						equation_systems);
-
-            mesh.delete_remote_elements();
-	  }
-      } // end timestep loop.
-  }
+          mesh.delete_remote_elements();
+        }
+    } // end timestep loop.
   
   // All done.  
-  return libMesh::close ();
+  return 0;
 }
 
 
@@ -283,7 +280,7 @@ int main (int argc, char** argv)
 // The matrix assembly function to be called at each time step to
 // prepare for the linear solve.
 void assemble_stokes (EquationSystems& es,
-		      const std::string& system_name)
+                      const std::string& system_name)
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
@@ -472,107 +469,107 @@ void assemble_stokes (EquationSystems& es,
       // solution degree-of-freedom values by the appropriate
       // weight functions.
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	{
-	  // Values to hold the solution & its gradient at the previous timestep.
-	  Number   u = 0., u_old = 0.;
-	  Number   v = 0., v_old = 0.;
-	  Number   p_old = 0.;
-	  Gradient grad_u, grad_u_old;
-	  Gradient grad_v, grad_v_old;
-	  
-	  // Compute the velocity & its gradient from the previous timestep
-	  // and the old Newton iterate.
-	  for (unsigned int l=0; l<n_u_dofs; l++)
-	    {
-	      // From the old timestep:
-	      u_old += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_u[l]);
-	      v_old += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_v[l]);
-	      grad_u_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_u[l]));
-	      grad_v_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_v[l]));
+        {
+          // Values to hold the solution & its gradient at the previous timestep.
+          Number   u = 0., u_old = 0.;
+          Number   v = 0., v_old = 0.;
+          Number   p_old = 0.;
+          Gradient grad_u, grad_u_old;
+          Gradient grad_v, grad_v_old;
+          
+          // Compute the velocity & its gradient from the previous timestep
+          // and the old Newton iterate.
+          for (unsigned int l=0; l<n_u_dofs; l++)
+            {
+              // From the old timestep:
+              u_old += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_u[l]);
+              v_old += phi[l][qp]*navier_stokes_system.old_solution (dof_indices_v[l]);
+              grad_u_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_u[l]));
+              grad_v_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_v[l]));
 
-	      // From the previous Newton iterate:
-	      u += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_u[l]); 
-	      v += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_v[l]);
-	      grad_u.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_u[l]));
-	      grad_v.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_v[l]));
-	    }
+              // From the previous Newton iterate:
+              u += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_u[l]); 
+              v += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_v[l]);
+              grad_u.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_u[l]));
+              grad_v.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_v[l]));
+            }
 
-	  // Compute the old pressure value at this quadrature point.
-	  for (unsigned int l=0; l<n_p_dofs; l++)
-	    {
-	      p_old += psi[l][qp]*navier_stokes_system.old_solution (dof_indices_p[l]);
-	    }
+          // Compute the old pressure value at this quadrature point.
+          for (unsigned int l=0; l<n_p_dofs; l++)
+            {
+              p_old += psi[l][qp]*navier_stokes_system.old_solution (dof_indices_p[l]);
+            }
 
-	  // Definitions for convenience.  It is sometimes simpler to do a
-	  // dot product if you have the full vector at your disposal.
-	  const NumberVectorValue U_old (u_old, v_old);
-	  const NumberVectorValue U     (u,     v);
-	  const Number  u_x = grad_u(0);
-	  const Number  u_y = grad_u(1);
-	  const Number  v_x = grad_v(0);
-	  const Number  v_y = grad_v(1);
-	  
-	  // First, an i-loop over the velocity degrees of freedom.
-	  // We know that n_u_dofs == n_v_dofs so we can compute contributions
-	  // for both at the same time.
-	  for (unsigned int i=0; i<n_u_dofs; i++)
-	    {
-	      Fu(i) += JxW[qp]*(u_old*phi[i][qp] -                            // mass-matrix term 
-				(1.-theta)*dt*(U_old*grad_u_old)*phi[i][qp] + // convection term
-				(1.-theta)*dt*p_old*dphi[i][qp](0)  -         // pressure term on rhs
-				(1.-theta)*dt*(grad_u_old*dphi[i][qp]) +      // diffusion term on rhs
-				theta*dt*(U*grad_u)*phi[i][qp]);              // Newton term
+          // Definitions for convenience.  It is sometimes simpler to do a
+          // dot product if you have the full vector at your disposal.
+          const NumberVectorValue U_old (u_old, v_old);
+          const NumberVectorValue U     (u,     v);
+          const Number  u_x = grad_u(0);
+          const Number  u_y = grad_u(1);
+          const Number  v_x = grad_v(0);
+          const Number  v_y = grad_v(1);
+          
+          // First, an i-loop over the velocity degrees of freedom.
+          // We know that n_u_dofs == n_v_dofs so we can compute contributions
+          // for both at the same time.
+          for (unsigned int i=0; i<n_u_dofs; i++)
+            {
+              Fu(i) += JxW[qp]*(u_old*phi[i][qp] -                            // mass-matrix term 
+                                (1.-theta)*dt*(U_old*grad_u_old)*phi[i][qp] + // convection term
+                                (1.-theta)*dt*p_old*dphi[i][qp](0)  -         // pressure term on rhs
+                                (1.-theta)*dt*(grad_u_old*dphi[i][qp]) +      // diffusion term on rhs
+                                theta*dt*(U*grad_u)*phi[i][qp]);              // Newton term
 
-		
-	      Fv(i) += JxW[qp]*(v_old*phi[i][qp] -                             // mass-matrix term
-				(1.-theta)*dt*(U_old*grad_v_old)*phi[i][qp] +  // convection term
-				(1.-theta)*dt*p_old*dphi[i][qp](1) -           // pressure term on rhs
-				(1.-theta)*dt*(grad_v_old*dphi[i][qp]) +       // diffusion term on rhs
-				theta*dt*(U*grad_v)*phi[i][qp]);               // Newton term
-	    
+                
+              Fv(i) += JxW[qp]*(v_old*phi[i][qp] -                             // mass-matrix term
+                                (1.-theta)*dt*(U_old*grad_v_old)*phi[i][qp] +  // convection term
+                                (1.-theta)*dt*p_old*dphi[i][qp](1) -           // pressure term on rhs
+                                (1.-theta)*dt*(grad_v_old*dphi[i][qp]) +       // diffusion term on rhs
+                                theta*dt*(U*grad_v)*phi[i][qp]);               // Newton term
+            
 
-	      // Note that the Fp block is identically zero unless we are using
-	      // some kind of artificial compressibility scheme...
+              // Note that the Fp block is identically zero unless we are using
+              // some kind of artificial compressibility scheme...
 
-	      // Matrix contributions for the uu and vv couplings.
-	      for (unsigned int j=0; j<n_u_dofs; j++)
-		{
-		  Kuu(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                // mass matrix term
-				       theta*dt*(dphi[i][qp]*dphi[j][qp]) +   // diffusion term
-				       theta*dt*(U*dphi[j][qp])*phi[i][qp] +  // convection term
-				       theta*dt*u_x*phi[i][qp]*phi[j][qp]);   // Newton term
+              // Matrix contributions for the uu and vv couplings.
+              for (unsigned int j=0; j<n_u_dofs; j++)
+                {
+                  Kuu(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                // mass matrix term
+                                       theta*dt*(dphi[i][qp]*dphi[j][qp]) +   // diffusion term
+                                       theta*dt*(U*dphi[j][qp])*phi[i][qp] +  // convection term
+                                       theta*dt*u_x*phi[i][qp]*phi[j][qp]);   // Newton term
 
-		  Kuv(i,j) += JxW[qp]*theta*dt*u_y*phi[i][qp]*phi[j][qp];     // Newton term
-		  
-		  Kvv(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                // mass matrix term
-				       theta*dt*(dphi[i][qp]*dphi[j][qp]) +   // diffusion term
-				       theta*dt*(U*dphi[j][qp])*phi[i][qp] +  // convection term
-				       theta*dt*v_y*phi[i][qp]*phi[j][qp]);   // Newton term
+                  Kuv(i,j) += JxW[qp]*theta*dt*u_y*phi[i][qp]*phi[j][qp];     // Newton term
+                  
+                  Kvv(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                // mass matrix term
+                                       theta*dt*(dphi[i][qp]*dphi[j][qp]) +   // diffusion term
+                                       theta*dt*(U*dphi[j][qp])*phi[i][qp] +  // convection term
+                                       theta*dt*v_y*phi[i][qp]*phi[j][qp]);   // Newton term
 
-		  Kvu(i,j) += JxW[qp]*theta*dt*v_x*phi[i][qp]*phi[j][qp];     // Newton term
-		}
+                  Kvu(i,j) += JxW[qp]*theta*dt*v_x*phi[i][qp]*phi[j][qp];     // Newton term
+                }
 
-	      // Matrix contributions for the up and vp couplings.
-	      for (unsigned int j=0; j<n_p_dofs; j++)
-		{
-		  Kup(i,j) += JxW[qp]*(-theta*dt*psi[j][qp]*dphi[i][qp](0));
-		  Kvp(i,j) += JxW[qp]*(-theta*dt*psi[j][qp]*dphi[i][qp](1));
-		}
-	    }
+              // Matrix contributions for the up and vp couplings.
+              for (unsigned int j=0; j<n_p_dofs; j++)
+                {
+                  Kup(i,j) += JxW[qp]*(-theta*dt*psi[j][qp]*dphi[i][qp](0));
+                  Kvp(i,j) += JxW[qp]*(-theta*dt*psi[j][qp]*dphi[i][qp](1));
+                }
+            }
 
-	  // Now an i-loop over the pressure degrees of freedom.  This code computes
-	  // the matrix entries due to the continuity equation.  Note: To maintain a
-	  // symmetric matrix, we may (or may not) multiply the continuity equation by
-	  // negative one.  Here we do not.
-	  for (unsigned int i=0; i<n_p_dofs; i++)
-	    {
-	      for (unsigned int j=0; j<n_u_dofs; j++)
-		{
-		  Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
-		  Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
-		}
-	    }
-	} // end of the quadrature point qp-loop
+          // Now an i-loop over the pressure degrees of freedom.  This code computes
+          // the matrix entries due to the continuity equation.  Note: To maintain a
+          // symmetric matrix, we may (or may not) multiply the continuity equation by
+          // negative one.  Here we do not.
+          for (unsigned int i=0; i<n_p_dofs; i++)
+            {
+              for (unsigned int j=0; j<n_u_dofs; j++)
+                {
+                  Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
+                  Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
+                }
+            }
+        } // end of the quadrature point qp-loop
 
       
       // At this point the interior element integration has
@@ -584,72 +581,72 @@ void assemble_stokes (EquationSystems& es,
       // the matrix resulting from the L2 projection penalty
       // approach introduced in example 3.
       {
-	// The penalty value.  \f$ \frac{1}{\epsilon \f$
-	const Real penalty = 1.e10;
-		  
-	// The following loops over the sides of the element.
-	// If the element has no neighbor on a side then that
-	// side MUST live on a boundary of the domain.
-	for (unsigned int s=0; s<elem->n_sides(); s++)
-	  if (elem->neighbor(s) == NULL)
-	    {
-	      // Get the boundary ID for side 's'.
-	      // These are set internally by build_square().
-	      // 0=bottom
-	      // 1=right
-	      // 2=top
-	      // 3=left
-	      short int bc_id = mesh.boundary_info->boundary_id (elem,s);
-	      if (bc_id==BoundaryInfo::invalid_id)
-		  error();
+        // The penalty value.  \f$ \frac{1}{\epsilon \f$
+        const Real penalty = 1.e10;
+                  
+        // The following loops over the sides of the element.
+        // If the element has no neighbor on a side then that
+        // side MUST live on a boundary of the domain.
+        for (unsigned int s=0; s<elem->n_sides(); s++)
+          if (elem->neighbor(s) == NULL)
+            {
+              // Get the boundary ID for side 's'.
+              // These are set internally by build_square().
+              // 0=bottom
+              // 1=right
+              // 2=top
+              // 3=left
+              short int bc_id = mesh.boundary_info->boundary_id (elem,s);
+              if (bc_id==BoundaryInfo::invalid_id)
+                  error();
 
-	      
-	      AutoPtr<Elem> side (elem->build_side(s));
-	      	      
-	      // Loop over the nodes on the side.
-	      for (unsigned int ns=0; ns<side->n_nodes(); ns++)
-		{
-		  // Get the boundary values.
-		   
-		  // Set u = 1 on the top boundary, 0 everywhere else
-		  const Real u_value = (bc_id==2) ? 1. : 0.;
-		  
-		  // Set v = 0 everywhere
-		  const Real v_value = 0.;
-		  
-		  // Find the node on the element matching this node on
-		  // the side.  That defined where in the element matrix
-		  // the boundary condition will be applied.
-		  for (unsigned int n=0; n<elem->n_nodes(); n++)
-		    if (elem->node(n) == side->node(ns))
-		      {
-			// Matrix contribution.
-			Kuu(n,n) += penalty;
-			Kvv(n,n) += penalty;
-		  		  
-			// Right-hand-side contribution.
-			Fu(n) += penalty*u_value;
-			Fv(n) += penalty*v_value;
-		      }
-		} // end face node loop	  
-	    } // end if (elem->neighbor(side) == NULL)
-	
-	// Pin the pressure to zero at global node number "pressure_node".
-	// This effectively removes the non-trivial null space of constant
-	// pressure solutions.
-	const bool pin_pressure = true;
-	if (pin_pressure)
-	  {
-	    const unsigned int pressure_node = 0;
-	    const Real p_value               = 0.0;
-	    for (unsigned int c=0; c<elem->n_nodes(); c++)
-	      if (elem->node(c) == pressure_node)
-		{
-		  Kpp(c,c) += penalty;
-		  Fp(c)    += penalty*p_value;
-		}
-	  }
-      } // end boundary condition section	  
+              
+              AutoPtr<Elem> side (elem->build_side(s));
+                            
+              // Loop over the nodes on the side.
+              for (unsigned int ns=0; ns<side->n_nodes(); ns++)
+                {
+                  // Get the boundary values.
+                   
+                  // Set u = 1 on the top boundary, 0 everywhere else
+                  const Real u_value = (bc_id==2) ? 1. : 0.;
+                  
+                  // Set v = 0 everywhere
+                  const Real v_value = 0.;
+                  
+                  // Find the node on the element matching this node on
+                  // the side.  That defined where in the element matrix
+                  // the boundary condition will be applied.
+                  for (unsigned int n=0; n<elem->n_nodes(); n++)
+                    if (elem->node(n) == side->node(ns))
+                      {
+                        // Matrix contribution.
+                        Kuu(n,n) += penalty;
+                        Kvv(n,n) += penalty;
+                                    
+                        // Right-hand-side contribution.
+                        Fu(n) += penalty*u_value;
+                        Fv(n) += penalty*v_value;
+                      }
+                } // end face node loop          
+            } // end if (elem->neighbor(side) == NULL)
+        
+        // Pin the pressure to zero at global node number "pressure_node".
+        // This effectively removes the non-trivial null space of constant
+        // pressure solutions.
+        const bool pin_pressure = true;
+        if (pin_pressure)
+          {
+            const unsigned int pressure_node = 0;
+            const Real p_value               = 0.0;
+            for (unsigned int c=0; c<elem->n_nodes(); c++)
+              if (elem->node(c) == pressure_node)
+                {
+                  Kpp(c,c) += penalty;
+                  Fp(c)    += penalty*p_value;
+                }
+          }
+      } // end boundary condition section          
       
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and

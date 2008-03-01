@@ -56,86 +56,83 @@
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side.
 void assemble_stokes (EquationSystems& es,
-		      const std::string& system_name);
+                      const std::string& system_name);
 
 // The main program.
 int main (int argc, char** argv)
 {
   // Initialize libMesh.
-  libMesh::init (argc, argv);
-  {    
-    // Set the dimensionality of the mesh = 2
-    const unsigned int dim = 2;     
+  LibMeshInit init (argc, argv);
+
+  // Set the dimensionality of the mesh = 2
+  const unsigned int dim = 2;     
     
-    // Create a two-dimensional mesh.
-    Mesh mesh (dim);
+  // Create a two-dimensional mesh.
+  Mesh mesh (dim);
     
-    // Use the MeshTools::Generation mesh generator to create a uniform
-    // grid on the square [-1,1]^D.  We instruct the mesh generator
-    // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
-    // elements in 3D.  Building these higher-order elements allows
-    // us to use higher-order approximation, as in example 3.
-    MeshTools::Generation::build_square (mesh,
-					 15, 15,
-					 0., 1.,
-					 0., 1.,
-					 QUAD9);
-    
-    // Print information about the mesh to the screen.
-    mesh.print_info();
-    
-    // Create an equation systems object.
-    EquationSystems equation_systems (mesh);
-    
-    // Declare the system and its variables.
-    {
-      // Creates a transient system named "Convection-Diffusion"
-      LinearImplicitSystem & system = 
-	equation_systems.add_system<LinearImplicitSystem> ("Stokes");
+  // Use the MeshTools::Generation mesh generator to create a uniform
+  // grid on the square [-1,1]^D.  We instruct the mesh generator
+  // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
+  // elements in 3D.  Building these higher-order elements allows
+  // us to use higher-order approximation, as in example 3.
+  MeshTools::Generation::build_square (mesh,
+                                       15, 15,
+                                       0., 1.,
+                                       0., 1.,
+                                       QUAD9);
+  
+  // Print information about the mesh to the screen.
+  mesh.print_info();
+  
+  // Create an equation systems object.
+  EquationSystems equation_systems (mesh);
+  
+  // Declare the system and its variables.
+  // Create a transient system named "Convection-Diffusion"
+  LinearImplicitSystem & system = 
+    equation_systems.add_system<LinearImplicitSystem> ("Stokes");
+  
+  // Add the variables "u" & "v" to "Stokes".  They
+  // will be approximated using second-order approximation.
+  system.add_variable ("u", SECOND);
+  system.add_variable ("v", SECOND);
+
+  // Add the variable "p" to "Stokes". This will
+  // be approximated with a first-order basis,
+  // providing an LBB-stable pressure-velocity pair.
+  system.add_variable ("p", FIRST);
+
+  // Give the system a pointer to the matrix assembly
+  // function.
+  system.attach_assemble_function (assemble_stokes);
+  
+  // Initialize the data structures for the equation system.
+  equation_systems.init ();
+
+  equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
+  equation_systems.parameters.set<Real>        ("linear solver tolerance") = TOLERANCE;
       
-      // Add the variables "u" & "v" to "Stokes".  They
-      // will be approximated using second-order approximation.
-      system.add_variable ("u", SECOND);
-      system.add_variable ("v", SECOND);
-
-      // Add the variable "p" to "Stokes". This will
-      // be approximated with a first-order basis,
-      // providing an LBB-stable pressure-velocity pair.
-      system.add_variable ("p", FIRST);
-
-      // Give the system a pointer to the matrix assembly
-      // function.
-      system.attach_assemble_function (assemble_stokes);
-      
-      // Initialize the data structures for the equation system.
-      equation_systems.init ();
-
-      equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
-      equation_systems.parameters.set<Real>        ("linear solver tolerance") = TOLERANCE;
-      
-      // Prints information about the system to the screen.
-      equation_systems.print_info();
-    }
+  // Prints information about the system to the screen.
+  equation_systems.print_info();
     
-    // Assemble & solve the linear system,
-    // then write the solution.
-    equation_systems.get_system("Stokes").solve();
+  // Assemble & solve the linear system,
+  // then write the solution.
+  equation_systems.get_system("Stokes").solve();
 
-    // We currently have to serialize for I/O.
-    equation_systems.allgather();
+  // We currently have to serialize for I/O.
+  equation_systems.allgather();
 
-    GMVIO(mesh).write_equation_systems ("out.gmv",
-					equation_systems);
+  GMVIO(mesh).write_equation_systems ("out.gmv",
+                                      equation_systems);
 
-    mesh.delete_remote_elements();
-  }
+  mesh.delete_remote_elements();
   
   // All done.  
-  return libMesh::close ();
+  return 0;
 }
 
 void assemble_stokes (EquationSystems& es,
-		      const std::string& system_name)
+                      const std::string& system_name)
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
@@ -302,43 +299,43 @@ void assemble_stokes (EquationSystems& es,
       
       // Now we will build the element matrix.
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	{
-	  // Assemble the u-velocity row
-	  // uu coupling
-	  for (unsigned int i=0; i<n_u_dofs; i++)
-	    for (unsigned int j=0; j<n_u_dofs; j++)
-	      Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+        {
+          // Assemble the u-velocity row
+          // uu coupling
+          for (unsigned int i=0; i<n_u_dofs; i++)
+            for (unsigned int j=0; j<n_u_dofs; j++)
+              Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 
-	  // up coupling
-	  for (unsigned int i=0; i<n_u_dofs; i++)
-	    for (unsigned int j=0; j<n_p_dofs; j++)
-	      Kup(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](0);
+          // up coupling
+          for (unsigned int i=0; i<n_u_dofs; i++)
+            for (unsigned int j=0; j<n_p_dofs; j++)
+              Kup(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](0);
 
 
-	  // Assemble the v-velocity row
-	  // vv coupling
-	  for (unsigned int i=0; i<n_v_dofs; i++)
-	    for (unsigned int j=0; j<n_v_dofs; j++)
-	      Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+          // Assemble the v-velocity row
+          // vv coupling
+          for (unsigned int i=0; i<n_v_dofs; i++)
+            for (unsigned int j=0; j<n_v_dofs; j++)
+              Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 
-	  // vp coupling
-	  for (unsigned int i=0; i<n_v_dofs; i++)
-	    for (unsigned int j=0; j<n_p_dofs; j++)
-	      Kvp(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](1);
+          // vp coupling
+          for (unsigned int i=0; i<n_v_dofs; i++)
+            for (unsigned int j=0; j<n_p_dofs; j++)
+              Kvp(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](1);
 
-	  
-	  // Assemble the pressure row
-	  // pu coupling
-	  for (unsigned int i=0; i<n_p_dofs; i++)
-	    for (unsigned int j=0; j<n_u_dofs; j++)
-	      Kpu(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](0);
+          
+          // Assemble the pressure row
+          // pu coupling
+          for (unsigned int i=0; i<n_p_dofs; i++)
+            for (unsigned int j=0; j<n_u_dofs; j++)
+              Kpu(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](0);
 
-	  // pv coupling
-	  for (unsigned int i=0; i<n_p_dofs; i++)
-	    for (unsigned int j=0; j<n_v_dofs; j++)
-	      Kpv(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](1);
-	  
-	} // end of the quadrature point qp-loop
+          // pv coupling
+          for (unsigned int i=0; i<n_p_dofs; i++)
+            for (unsigned int j=0; j<n_v_dofs; j++)
+              Kpv(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](1);
+          
+        } // end of the quadrature point qp-loop
 
       // At this point the interior element integration has
       // been completed.  However, we have not yet addressed
@@ -349,51 +346,51 @@ void assemble_stokes (EquationSystems& es,
       // the matrix resulting from the L2 projection penalty
       // approach introduced in example 3.
       {
-	// The following loops over the sides of the element.
-	// If the element has no neighbor on a side then that
-	// side MUST live on a boundary of the domain.
-	for (unsigned int s=0; s<elem->n_sides(); s++)
-	  if (elem->neighbor(s) == NULL)
-	    {
-	      AutoPtr<Elem> side (elem->build_side(s));
-	      	      
-	      // Loop over the nodes on the side.
-	      for (unsigned int ns=0; ns<side->n_nodes(); ns++)
-		{
-		  // The location on the boundary of the current
-		  // node.
-		   
-		  // const Real xf = side->point(ns)(0);
-		  const Real yf = side->point(ns)(1);
-		  
-		  // The penalty value.  \f$ \frac{1}{\epsilon \f$
-		  const Real penalty = 1.e10;
-		  
-		  // The boundary values.
-		   
-		  // Set u = 1 on the top boundary, 0 everywhere else
-		  const Real u_value = (yf > .99) ? 1. : 0.;
-		  
-		  // Set v = 0 everywhere
-		  const Real v_value = 0.;
-		  
-		  // Find the node on the element matching this node on
-		  // the side.  That defined where in the element matrix
-		  // the boundary condition will be applied.
-		  for (unsigned int n=0; n<elem->n_nodes(); n++)
-		    if (elem->node(n) == side->node(ns))
-		      {
-			// Matrix contribution.
-			Kuu(n,n) += penalty;
-			Kvv(n,n) += penalty;
-		  		  
-			// Right-hand-side contribution.
-			Fu(n) += penalty*u_value;
-			Fv(n) += penalty*v_value;
-		      }
-		} // end face node loop	  
-	    } // end if (elem->neighbor(side) == NULL)
-      } // end boundary condition section	  
+        // The following loops over the sides of the element.
+        // If the element has no neighbor on a side then that
+        // side MUST live on a boundary of the domain.
+        for (unsigned int s=0; s<elem->n_sides(); s++)
+          if (elem->neighbor(s) == NULL)
+            {
+              AutoPtr<Elem> side (elem->build_side(s));
+                            
+              // Loop over the nodes on the side.
+              for (unsigned int ns=0; ns<side->n_nodes(); ns++)
+                {
+                  // The location on the boundary of the current
+                  // node.
+                   
+                  // const Real xf = side->point(ns)(0);
+                  const Real yf = side->point(ns)(1);
+                  
+                  // The penalty value.  \f$ \frac{1}{\epsilon \f$
+                  const Real penalty = 1.e10;
+                  
+                  // The boundary values.
+                   
+                  // Set u = 1 on the top boundary, 0 everywhere else
+                  const Real u_value = (yf > .99) ? 1. : 0.;
+                  
+                  // Set v = 0 everywhere
+                  const Real v_value = 0.;
+                  
+                  // Find the node on the element matching this node on
+                  // the side.  That defined where in the element matrix
+                  // the boundary condition will be applied.
+                  for (unsigned int n=0; n<elem->n_nodes(); n++)
+                    if (elem->node(n) == side->node(ns))
+                      {
+                        // Matrix contribution.
+                        Kuu(n,n) += penalty;
+                        Kvv(n,n) += penalty;
+                                    
+                        // Right-hand-side contribution.
+                        Fu(n) += penalty*u_value;
+                        Fv(n) += penalty*v_value;
+                      }
+                } // end face node loop          
+            } // end if (elem->neighbor(side) == NULL)
+      } // end boundary condition section          
       
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and

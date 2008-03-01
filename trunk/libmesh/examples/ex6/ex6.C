@@ -75,13 +75,13 @@
 // Function prototype.  This is similar to the Poisson
 // assemble function of example 4.  
 void assemble_wave (EquationSystems& es,
-		    const std::string& system_name);
+                    const std::string& system_name);
 
 // Begin the main program.
 int main (int argc, char** argv)
 {
   // Initialize libMesh, like in example 2.
-  libMesh::init (argc, argv);
+  LibMeshInit init (argc, argv);
   
   // This example requires Infinite Elements   
 #ifndef ENABLE_INFINITE_ELEMENTS
@@ -93,125 +93,120 @@ int main (int argc, char** argv)
 
 #else
   
-  // Braces are used to force object scope, like in example 2      
-  {        
-    // For the moment, only allow 3D     
-    const unsigned int dim = 3; 
-    
-    // Tell the user what we are doing.
-    std::cout << "Running ex6 with dim = " << dim << std::endl << std::endl;        
-    
-    // Create a mesh with user-defined dimension 
-    Mesh mesh (dim);
+  // For the moment, only allow 3D     
+  const unsigned int dim = 3; 
+  
+  // Tell the user what we are doing.
+  std::cout << "Running ex6 with dim = " << dim << std::endl << std::endl;        
+  
+  // Create a mesh with user-defined dimension 
+  Mesh mesh (dim);
 
-    // Use the internal mesh generator to create elements
-    // on the square [-1,1]^3, of type Hex8.
-    MeshTools::Generation::build_cube (mesh,
-				       4, 4, 4,
-				       -1., 1.,
-				       -1., 1.,
-				       -1., 1.,
-				       HEX8);
-    
-    // Print information about the mesh to the screen.
-    mesh.print_info();
+  // Use the internal mesh generator to create elements
+  // on the square [-1,1]^3, of type Hex8.
+  MeshTools::Generation::build_cube (mesh,
+                                     4, 4, 4,
+                                     -1., 1.,
+                                     -1., 1.,
+                                     -1., 1.,
+                                     HEX8);
+  
+  // Print information about the mesh to the screen.
+  mesh.print_info();
 
-    // Write the mesh before the infinite elements are added
-    GMVIO(mesh).write ("orig_mesh.gmv");
+  // Write the mesh before the infinite elements are added
+  GMVIO(mesh).write ("orig_mesh.gmv");
 
-    // Normally, when a mesh is imported or created in
-    // libMesh, only conventional elements exist.  The infinite
-    // elements used here, however, require prescribed
-    // nodal locations (with specified distances from an imaginary
-    // origin) and configurations that a conventional mesh creator 
-    // in general does not offer.  Therefore, an efficient method
-    // for building infinite elements is offered.  It can account
-    // for symmetry planes and creates infinite elements in a fully
-    // automatic way.
-    //
-    // Right now, the simplified interface is used, automatically
-    // determining the origin.  Check \p MeshBase for a generalized
-    // method that can even return the element faces of interior
-    // vibrating surfaces.  The \p bool determines whether to be 
-    // verbose.
-    InfElemBuilder builder(mesh);
-    builder.build_inf_elem(true);
+  // Normally, when a mesh is imported or created in
+  // libMesh, only conventional elements exist.  The infinite
+  // elements used here, however, require prescribed
+  // nodal locations (with specified distances from an imaginary
+  // origin) and configurations that a conventional mesh creator 
+  // in general does not offer.  Therefore, an efficient method
+  // for building infinite elements is offered.  It can account
+  // for symmetry planes and creates infinite elements in a fully
+  // automatic way.
+  //
+  // Right now, the simplified interface is used, automatically
+  // determining the origin.  Check \p MeshBase for a generalized
+  // method that can even return the element faces of interior
+  // vibrating surfaces.  The \p bool determines whether to be 
+  // verbose.
+  InfElemBuilder builder(mesh);
+  builder.build_inf_elem(true);
 
-    // Print information about the mesh to the screen.
-    mesh.print_info();
+  // Print information about the mesh to the screen.
+  mesh.print_info();
 
-    // Write the mesh with the infinite elements added.
-    // Compare this to the original mesh.
-    GMVIO(mesh).write ("ifems_added.gmv");
+  // Write the mesh with the infinite elements added.
+  // Compare this to the original mesh.
+  GMVIO(mesh).write ("ifems_added.gmv");
 
-    // After building infinite elements, we have to let 
-    // the elements find their neighbors again.
-    mesh.find_neighbors();
-    
-    // Create an equation systems object, where \p ThinSystem
-    // offers only the crucial functionality for solving a 
-    // system.  Use \p ThinSystem when you want the sleekest
-    // system possible.
-    EquationSystems equation_systems (mesh);
-    
-    // Declare the system and its variables.
-    {
-      // Create a system named "Wave".  This can
-      // be a simple, steady system
-      equation_systems.add_system<LinearImplicitSystem> ("Wave");
-            
-      // Create an FEType describing the approximation
-      // characteristics of the InfFE object.  Note that
-      // the constructor automatically defaults to some
-      // sensible values.  But use \p FIRST order 
-      // approximation.
-      FEType fe_type(FIRST);
-      
-      // Add the variable "p" to "Wave".  Note that there exist
-      // various approaches in adding variables.  In example 3, 
-      // \p add_variable took the order of approximation and used
-      // default values for the \p FEFamily, while here the \p FEType 
-      // is used.
-      equation_systems.get_system("Wave").add_variable("p", fe_type);
-      
-      // Give the system a pointer to the matrix assembly
-      // function.
-      equation_systems.get_system("Wave").attach_assemble_function (assemble_wave);
-      
-      // Set the speed of sound and fluid density
-      // as \p EquationSystems parameter,
-      // so that \p assemble_wave() can access it.
-      equation_systems.parameters.set<Real>("speed")          = 1.;
-      equation_systems.parameters.set<Real>("fluid density")  = 1.;
-      
-      // Initialize the data structures for the equation system.
-      equation_systems.init();
-      
-      // Prints information about the system to the screen.
-      equation_systems.print_info();
-    }
-    
-    // Solve the system "Wave".
-    equation_systems.get_system("Wave").solve();
-    
-    // We currently have to serialize for I/O.
-    equation_systems.allgather();
+  // After building infinite elements, we have to let 
+  // the elements find their neighbors again.
+  mesh.find_neighbors();
+  
+  // Create an equation systems object, where \p ThinSystem
+  // offers only the crucial functionality for solving a 
+  // system.  Use \p ThinSystem when you want the sleekest
+  // system possible.
+  EquationSystems equation_systems (mesh);
+  
+  // Declare the system and its variables.
+  // Create a system named "Wave".  This can
+  // be a simple, steady system
+  equation_systems.add_system<LinearImplicitSystem> ("Wave");
+        
+  // Create an FEType describing the approximation
+  // characteristics of the InfFE object.  Note that
+  // the constructor automatically defaults to some
+  // sensible values.  But use \p FIRST order 
+  // approximation.
+  FEType fe_type(FIRST);
+  
+  // Add the variable "p" to "Wave".  Note that there exist
+  // various approaches in adding variables.  In example 3, 
+  // \p add_variable took the order of approximation and used
+  // default values for the \p FEFamily, while here the \p FEType 
+  // is used.
+  equation_systems.get_system("Wave").add_variable("p", fe_type);
+  
+  // Give the system a pointer to the matrix assembly
+  // function.
+  equation_systems.get_system("Wave").attach_assemble_function (assemble_wave);
+  
+  // Set the speed of sound and fluid density
+  // as \p EquationSystems parameter,
+  // so that \p assemble_wave() can access it.
+  equation_systems.parameters.set<Real>("speed")          = 1.;
+  equation_systems.parameters.set<Real>("fluid density")  = 1.;
+  
+  // Initialize the data structures for the equation system.
+  equation_systems.init();
+  
+  // Prints information about the system to the screen.
+  equation_systems.print_info();
 
-    // Write the whole EquationSystems object to file.
-    // For infinite elements, the concept of nodal_soln()
-    // is not applicable. Therefore, writing the mesh in
-    // some format @e always gives all-zero results at
-    // the nodes of the infinite elements.  Instead,
-    // use the FEInterface::compute_data() methods to
-    // determine physically correct results within an
-    // infinite element.
-    equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
+  // Solve the system "Wave".
+  equation_systems.get_system("Wave").solve();
+  
+  // We currently have to serialize for I/O.
+  equation_systems.allgather();
 
-    mesh.delete_remote_elements();
-  }
+  // Write the whole EquationSystems object to file.
+  // For infinite elements, the concept of nodal_soln()
+  // is not applicable. Therefore, writing the mesh in
+  // some format @e always gives all-zero results at
+  // the nodes of the infinite elements.  Instead,
+  // use the FEInterface::compute_data() methods to
+  // determine physically correct results within an
+  // infinite element.
+  equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
+
+  mesh.delete_remote_elements();
   
   // All done.  
-  return libMesh::close ();
+  return 0;
 
 #endif // else part of ifndef ENABLE_INFINITE_ELEMENTS
 }
@@ -219,7 +214,7 @@ int main (int argc, char** argv)
 // This function assembles the system matrix and right-hand-side
 // for the discrete form of our wave equation.
 void assemble_wave(EquationSystems& es,
-		   const std::string& system_name)
+                   const std::string& system_name)
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
@@ -328,29 +323,29 @@ void assemble_wave(EquationSystems& es,
       // Up to now, we do not know what kind of element we
       // have.  Aske the element of what type it is:        
       if (elem->infinite())
-        {	   
-	  // We have an infinite element.  Let \p cfe point
-	  // to our \p InfFE object.  This is handled through
-	  // an AutoPtr.  Through the \p AutoPtr::get() we "borrow"
-	  // the pointer, while the \p  AutoPtr \p inf_fe is
-	  // still in charge of memory management.	   
-	  cfe = inf_fe.get(); 
-	}
+        {           
+          // We have an infinite element.  Let \p cfe point
+          // to our \p InfFE object.  This is handled through
+          // an AutoPtr.  Through the \p AutoPtr::get() we "borrow"
+          // the pointer, while the \p  AutoPtr \p inf_fe is
+          // still in charge of memory management.           
+          cfe = inf_fe.get(); 
+        }
       else
         {
-	  // This is a conventional finite element.  Let \p fe handle it.	   
-  	  cfe = fe.get();
-	  
-	  // Boundary conditions.
-	  // Here we just zero the rhs-vector. For natural boundary 
-	  // conditions check e.g. previous examples.	   
-	  {	      
-	    // Zero the RHS for this element. 	       
-	    Fe.resize (dof_indices.size());
-	    
-	    system.rhs->add_vector (Fe, dof_indices);
-	  } // end boundary condition section	     
-	} // else ( if (elem->infinite())) )
+          // This is a conventional finite element.  Let \p fe handle it.           
+            cfe = fe.get();
+          
+          // Boundary conditions.
+          // Here we just zero the rhs-vector. For natural boundary 
+          // conditions check e.g. previous examples.           
+          {              
+            // Zero the RHS for this element.                
+            Fe.resize (dof_indices.size());
+            
+            system.rhs->add_vector (Fe, dof_indices);
+          } // end boundary condition section             
+        } // else ( if (elem->infinite())) )
 
       // This is slightly different from the Poisson solver:
       // Since the finite element object may change, we have to
@@ -402,63 +397,63 @@ void assemble_wave(EquationSystems& es,
       
       // Loop over the quadrature points.        
       for (unsigned int qp=0; qp<max_qp; qp++)
-        {	  
-	  // Similar to the modified access to the number of quadrature 
-	  // points, the number of shape functions may also be obtained
-	  // in a different manner.  This offers the great advantage
-	  // of being valid for both finite and infinite elements.	   
-	  const unsigned int n_sf = cfe->n_shape_functions();
+        {          
+          // Similar to the modified access to the number of quadrature 
+          // points, the number of shape functions may also be obtained
+          // in a different manner.  This offers the great advantage
+          // of being valid for both finite and infinite elements.           
+          const unsigned int n_sf = cfe->n_shape_functions();
 
-	  // Now we will build the element matrices.  Since the infinite
-	  // elements are based on a Petrov-Galerkin scheme, the
-	  // resulting system matrices are non-symmetric. The additional
-	  // weight, described before, is part of the trial space.
-	  //
-	  // For the finite elements, though, these matrices are symmetric
-	  // just as we know them, since the additional fields \p dphase,
-	  // \p weight, and \p dweight are initialized appropriately.
-	  //
-	  // test functions:    weight[qp]*phi[i][qp]
-	  // trial functions:   phi[j][qp]
-	  // phase term:        phase[qp]
-	  // 
-	  // derivatives are similar, but note that these are of type
-	  // Point, not of type Real.	   
-	  for (unsigned int i=0; i<n_sf; i++)
-	    for (unsigned int j=0; j<n_sf; j++)
-	      {
-		//         (ndt*Ht + nHt*d) * nH 
-		Ke(i,j) +=
-		  (                            //    (                         
-		   (                           //      (                       
-		    dweight[qp] * phi[i][qp]   //        Point * Real  = Point 
-		    +                          //        +                     
-		    dphi[i][qp] * weight[qp]   //        Point * Real  = Point 
-		    ) * dphi[j][qp]            //      )       * Point = Real  
-		   ) * JxW[qp];                //    )         * Real  = Real  
+          // Now we will build the element matrices.  Since the infinite
+          // elements are based on a Petrov-Galerkin scheme, the
+          // resulting system matrices are non-symmetric. The additional
+          // weight, described before, is part of the trial space.
+          //
+          // For the finite elements, though, these matrices are symmetric
+          // just as we know them, since the additional fields \p dphase,
+          // \p weight, and \p dweight are initialized appropriately.
+          //
+          // test functions:    weight[qp]*phi[i][qp]
+          // trial functions:   phi[j][qp]
+          // phase term:        phase[qp]
+          // 
+          // derivatives are similar, but note that these are of type
+          // Point, not of type Real.           
+          for (unsigned int i=0; i<n_sf; i++)
+            for (unsigned int j=0; j<n_sf; j++)
+              {
+                //         (ndt*Ht + nHt*d) * nH 
+                Ke(i,j) +=
+                  (                            //    (                         
+                   (                           //      (                       
+                    dweight[qp] * phi[i][qp]   //        Point * Real  = Point 
+                    +                          //        +                     
+                    dphi[i][qp] * weight[qp]   //        Point * Real  = Point 
+                    ) * dphi[j][qp]            //      )       * Point = Real  
+                   ) * JxW[qp];                //    )         * Real  = Real  
 
-		// (d*Ht*nmut*nH - ndt*nmu*Ht*H - d*nHt*nmu*H)
-		Ce(i,j) +=
-		  (                                //    (                         
-		   (dphase[qp] * dphi[j][qp])      //      (Point * Point) = Real  
-		   * weight[qp] * phi[i][qp]       //      * Real * Real   = Real  
-		   -                               //      -                       
-		   (dweight[qp] * dphase[qp])      //      (Point * Point) = Real  
-		   * phi[i][qp] * phi[j][qp]       //      * Real * Real   = Real  
-		   -                               //      -                       
-		   (dphi[i][qp] * dphase[qp])      //      (Point * Point) = Real  
-		   * weight[qp] * phi[j][qp]       //      * Real * Real   = Real  
-		   ) * JxW[qp];                    //    )         * Real  = Real  
-		
-		// (d*Ht*H * (1 - nmut*nmu))
-		Me(i,j) +=
-		  (                                       //    (                                  
-		   (1. - (dphase[qp] * dphase[qp]))       //      (Real  - (Point * Point)) = Real 
-		   * phi[i][qp] * phi[j][qp] * weight[qp] //      * Real *  Real  * Real    = Real 
-		   ) * JxW[qp];                           //    ) * Real                    = Real 
+                // (d*Ht*nmut*nH - ndt*nmu*Ht*H - d*nHt*nmu*H)
+                Ce(i,j) +=
+                  (                                //    (                         
+                   (dphase[qp] * dphi[j][qp])      //      (Point * Point) = Real  
+                   * weight[qp] * phi[i][qp]       //      * Real * Real   = Real  
+                   -                               //      -                       
+                   (dweight[qp] * dphase[qp])      //      (Point * Point) = Real  
+                   * phi[i][qp] * phi[j][qp]       //      * Real * Real   = Real  
+                   -                               //      -                       
+                   (dphi[i][qp] * dphase[qp])      //      (Point * Point) = Real  
+                   * weight[qp] * phi[j][qp]       //      * Real * Real   = Real  
+                   ) * JxW[qp];                    //    )         * Real  = Real  
+                
+                // (d*Ht*H * (1 - nmut*nmu))
+                Me(i,j) +=
+                  (                                       //    (                                  
+                   (1. - (dphase[qp] * dphase[qp]))       //      (Real  - (Point * Point)) = Real 
+                   * phi[i][qp] * phi[j][qp] * weight[qp] //      * Real *  Real  * Real    = Real 
+                   ) * JxW[qp];                           //    ) * Real                    = Real 
 
-	      } // end of the matrix summation loop
-	} // end of quadrature point loop
+              } // end of the matrix summation loop
+        } // end of quadrature point loop
 
       // The element matrices are now built for this element.  
       // Collect them in Ke, and then add them to the global matrix.  
@@ -477,20 +472,20 @@ void assemble_wave(EquationSystems& es,
     const MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
     
     for (; nd != nd_end; ++nd)
-      {	
-	// Get a reference to the current node.
-	const Node& node = **nd;
-	
-	// Check the location of the current node.
-	if (fabs(node(0)) < TOLERANCE &&
-	    fabs(node(1)) < TOLERANCE &&
-	    fabs(node(2)) < TOLERANCE)
-	  {
-	    // The global number of the respective degree of freedom.
-	    unsigned int dn = node.dof_number(0,0,0);
+      {        
+        // Get a reference to the current node.
+        const Node& node = **nd;
+        
+        // Check the location of the current node.
+        if (fabs(node(0)) < TOLERANCE &&
+            fabs(node(1)) < TOLERANCE &&
+            fabs(node(2)) < TOLERANCE)
+          {
+            // The global number of the respective degree of freedom.
+            unsigned int dn = node.dof_number(0,0,0);
 
-	    system.rhs->add (dn, 1.);
-	  }
+            system.rhs->add (dn, 1.);
+          }
       }
   }
 

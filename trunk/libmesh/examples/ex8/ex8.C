@@ -81,25 +81,25 @@
 // the linear system for our problem, governed by the linear
 // wave equation.
 void assemble_wave(EquationSystems& es,
-		   const std::string& system_name);
+                   const std::string& system_name);
 
 
 // Function Prototype.  This function will be used to apply the
 // initial conditions.
 void apply_initial(EquationSystems& es,
-		   const std::string& system_name);
+                   const std::string& system_name);
 
 // Function Prototype.  This function imposes
 // Dirichlet Boundary conditions via the penalty
 // method after the system is assembled.
 void fill_dirichlet_bc(EquationSystems& es,
-		       const std::string& system_name);
+                       const std::string& system_name);
 
 // The main program
 int main (int argc, char** argv)
 {
   // Initialize Petsc, like in example 2.
-  libMesh::init (argc, argv);
+  LibMeshInit init (argc, argv);
 
 #ifdef ENABLE_PARMESH
   if (libMesh::processor_id() == 0)
@@ -109,246 +109,238 @@ int main (int argc, char** argv)
               << std::endl;
 #else
 
-  // Braces are used to force object scope.
-  {
-    // Check for proper usage.
-    if (argc < 2)
-      {
-        if (libMesh::processor_id() == 0)
-	  std::cerr << "Usage: " << argv[0] << " [meshfile]"
-		    << std::endl;
-	
-	error();
-      }
-    
-    // Tell the user what we are doing.
-    else 
-      {
-	std::cout << "Running " << argv[0];
-	
-	for (int i=1; i<argc; i++)
-	  std::cout << " " << argv[i];
-	
-	std::cout << std::endl << std::endl;
-
-      }
-
-    // LasPack solvers don't work so well for this example
-    // (not sure why).  Print a warning to the user if PETSc
-    // is not available, or if they are using LasPack solvers.
-#ifdef HAVE_PETSC
-    if ((libMesh::on_command_line("--use-laspack")) ||
-	(libMesh::on_command_line("--disable-petsc")))
-#endif
-      {
-	std::cout << "WARNING! It appears you are using the\n"
-		  << "LasPack solvers.  ex8 is known not to converge\n"
-		  << "using LasPack, but should work OK with PETSc.\n"
-		  << "If possible, download and install the PETSc\n"
-		  << "library from www-unix.mcs.anl.gov/petsc/petsc-2/\n"
-		  << std::endl;
-      }
-    
-    // Get the name of the mesh file
-    // from the command line.
-    std::string mesh_file = argv[1];
-    std::cout << "Mesh file is: " << mesh_file << std::endl;
-
-    // For now, restrict to dim=3, though this
-    // may easily be changed, see example 4
-    const unsigned int dim = 3;
-
-    // Create a dim-dimensional mesh.
-    Mesh mesh (dim);
-    MeshData mesh_data(mesh);
-    
-    // Read the meshfile specified in the command line or
-    // use the internal mesh generator to create a uniform
-    // grid on an elongated cube.
-    mesh.read(mesh_file, &mesh_data);
-     
-    // mesh.build_cube (10, 10, 40,
-    //		       -1., 1.,
-    //		       -1., 1.,
-    //	                0., 4.,
-    //	                HEX8);
-
-    // Print information about the mesh to the screen.
-    mesh.print_info();
-
-    // The node that should be monitored.
-    const unsigned int result_node = 274;
-
-    
-    // Time stepping issues
-    //
-    // Note that the total current time is stored as a parameter
-    // in the \pEquationSystems object.
-    //
-    // the time step size
-    const Real delta_t = .0000625;
-
-    // The number of time steps.
-    unsigned int n_time_steps = 300;
-    
-    // Create an equation systems object.
-    EquationSystems equation_systems (mesh);
-
-    // Declare the system and its variables.
+  // Check for proper usage.
+  if (argc < 2)
     {
-      // Creates a NewmarkSystem named "Wave"
-      equation_systems.add_system<NewmarkSystem> ("Wave");
-
-      // Use a handy reference to this system
-      NewmarkSystem & t_system = equation_systems.get_system<NewmarkSystem> ("Wave");
+      if (libMesh::processor_id() == 0)
+        std::cerr << "Usage: " << argv[0] << " [meshfile]"
+                  << std::endl;
       
-      // Adds the variable "p" to "Wave".   "p"
-      // will be approximated using first-order approximation.
-      t_system.add_variable("p", FIRST);
-
-      // Give the system a pointer to the matrix assembly
-      // function and the initial condition function defined
-      // below.
-      t_system.attach_assemble_function  (assemble_wave);
-      t_system.attach_init_function      (apply_initial);
+      error();
+    }
   
-      // Set the time step size, and optionally the
-      // Newmark parameters, so that \p NewmarkSystem can 
-      // compute integration constants.  Here we simply use 
-      // pass only the time step and use default values 
-      // for \p alpha=.25  and \p delta=.5.
-      t_system.set_newmark_parameters(delta_t);
+  // Tell the user what we are doing.
+  else 
+    {
+      std::cout << "Running " << argv[0];
+      
+      for (int i=1; i<argc; i++)
+        std::cout << " " << argv[i];
+      
+      std::cout << std::endl << std::endl;
 
-      // Set the speed of sound and fluid density
-      // as \p EquationSystems parameter,
-      // so that \p assemble_wave() can access it.
-      equation_systems.parameters.set<Real>("speed")          = 1000.;
-      equation_systems.parameters.set<Real>("fluid density")  = 1000.;
-
-      // Store the current time as an
-      // \p EquationSystems parameter, so that
-      // \p fill_dirichlet_bc() can access it.
-      equation_systems.parameters.set<Real>("time")           = 0.;
-
-      // Initialize the data structures for the equation system.
-      equation_systems.init();
-
-      // Prints information about the system to the screen.
-      equation_systems.print_info();
     }
 
-    // A file to store the results at certain nodes.
-    std::ofstream res_out("pressure_node.res");
+  // LasPack solvers don't work so well for this example
+  // (not sure why).  Print a warning to the user if PETSc
+  // is not available, or if they are using LasPack solvers.
+#ifdef HAVE_PETSC
+  if ((libMesh::on_command_line("--use-laspack")) ||
+      (libMesh::on_command_line("--disable-petsc")))
+#endif
+    {
+      std::cout << "WARNING! It appears you are using the\n"
+                << "LasPack solvers.  ex8 is known not to converge\n"
+                << "using LasPack, but should work OK with PETSc.\n"
+                << "If possible, download and install the PETSc\n"
+                << "library from www-unix.mcs.anl.gov/petsc/petsc-2/\n"
+                << std::endl;
+    }
+  
+  // Get the name of the mesh file
+  // from the command line.
+  std::string mesh_file = argv[1];
+  std::cout << "Mesh file is: " << mesh_file << std::endl;
 
-    // get the dof_numbers for the nodes that
-    // should be monitored.
-    const unsigned int res_node_no = result_node;
-    const Node& res_node = mesh.node(res_node_no-1);
-    unsigned int dof_no = res_node.dof_number(0,0,0);
+  // For now, restrict to dim=3, though this
+  // may easily be changed, see example 4
+  const unsigned int dim = 3;
 
-    // Use a handy reference to this system
-    NewmarkSystem& t_system = equation_systems.get_system<NewmarkSystem> ("Wave");
-       
-    // Assemble the time independent system matrices and rhs.
-    // This function will also compute the effective system matrix
-    // K~=K+a_0*M+a_1*C and apply user specified initial
-    // conditions. 
-    t_system.assemble();
+  // Create a dim-dimensional mesh.
+  Mesh mesh (dim);
+  MeshData mesh_data(mesh);
+  
+  // Read the meshfile specified in the command line or
+  // use the internal mesh generator to create a uniform
+  // grid on an elongated cube.
+  mesh.read(mesh_file, &mesh_data);
+   
+  // mesh.build_cube (10, 10, 40,
+  //                       -1., 1.,
+  //                       -1., 1.,
+  //                        0., 4.,
+  //                        HEX8);
 
-    // Now solve for each time step.
-    // For convenience, use a local buffer of the 
-    // current time.  But once this time is updated,
-    // also update the \p EquationSystems parameter
-    // Start with t_time = 0 and write a short header
-    // to the nodal result file
-    Real t_time = 0.;
-    res_out << "# pressure at node " << res_node_no << "\n"
-	    << "# time\tpressure\n"
-	    << t_time << "\t" << 0 << std::endl;
+  // Print information about the mesh to the screen.
+  mesh.print_info();
+
+  // The node that should be monitored.
+  const unsigned int result_node = 274;
+
+  
+  // Time stepping issues
+  //
+  // Note that the total current time is stored as a parameter
+  // in the \pEquationSystems object.
+  //
+  // the time step size
+  const Real delta_t = .0000625;
+
+  // The number of time steps.
+  unsigned int n_time_steps = 300;
+  
+  // Create an equation systems object.
+  EquationSystems equation_systems (mesh);
+
+  // Declare the system and its variables.
+  // Create a NewmarkSystem named "Wave"
+  equation_systems.add_system<NewmarkSystem> ("Wave");
+
+  // Use a handy reference to this system
+  NewmarkSystem & t_system = equation_systems.get_system<NewmarkSystem> ("Wave");
+  
+  // Add the variable "p" to "Wave".   "p"
+  // will be approximated using first-order approximation.
+  t_system.add_variable("p", FIRST);
+
+  // Give the system a pointer to the matrix assembly
+  // function and the initial condition function defined
+  // below.
+  t_system.attach_assemble_function  (assemble_wave);
+  t_system.attach_init_function      (apply_initial);
+
+  // Set the time step size, and optionally the
+  // Newmark parameters, so that \p NewmarkSystem can 
+  // compute integration constants.  Here we simply use 
+  // pass only the time step and use default values 
+  // for \p alpha=.25  and \p delta=.5.
+  t_system.set_newmark_parameters(delta_t);
+
+  // Set the speed of sound and fluid density
+  // as \p EquationSystems parameter,
+  // so that \p assemble_wave() can access it.
+  equation_systems.parameters.set<Real>("speed")          = 1000.;
+  equation_systems.parameters.set<Real>("fluid density")  = 1000.;
+
+  // Store the current time as an
+  // \p EquationSystems parameter, so that
+  // \p fill_dirichlet_bc() can access it.
+  equation_systems.parameters.set<Real>("time")           = 0.;
+
+  // Initialize the data structures for the equation system.
+  equation_systems.init();
+
+  // Prints information about the system to the screen.
+  equation_systems.print_info();
+
+  // A file to store the results at certain nodes.
+  std::ofstream res_out("pressure_node.res");
+
+  // get the dof_numbers for the nodes that
+  // should be monitored.
+  const unsigned int res_node_no = result_node;
+  const Node& res_node = mesh.node(res_node_no-1);
+  unsigned int dof_no = res_node.dof_number(0,0,0);
+
+  // Assemble the time independent system matrices and rhs.
+  // This function will also compute the effective system matrix
+  // K~=K+a_0*M+a_1*C and apply user specified initial
+  // conditions. 
+  t_system.assemble();
+
+  // Now solve for each time step.
+  // For convenience, use a local buffer of the 
+  // current time.  But once this time is updated,
+  // also update the \p EquationSystems parameter
+  // Start with t_time = 0 and write a short header
+  // to the nodal result file
+  Real t_time = 0.;
+  res_out << "# pressure at node " << res_node_no << "\n"
+          << "# time\tpressure\n"
+          << t_time << "\t" << 0 << std::endl;
 
 
-    for (unsigned int time_step=0; time_step<n_time_steps; time_step++)
-      {
-	// Update the time.  Both here and in the
-	// \p EquationSystems object
-	t_time += delta_t;
-	equation_systems.parameters.set<Real>("time")  = t_time;
+  for (unsigned int time_step=0; time_step<n_time_steps; time_step++)
+    {
+      // Update the time.  Both here and in the
+      // \p EquationSystems object
+      t_time += delta_t;
+      equation_systems.parameters.set<Real>("time")  = t_time;
 
-	// Update the rhs.
-	t_system.update_rhs();
+      // Update the rhs.
+      t_system.update_rhs();
 
-	// Impose essential boundary conditions.
-	// Not that since the matrix is only assembled once,
-	// the penalty parameter should be added to the matrix
-	// only in the first time step.  The applied
-	// boundary conditions may be time-dependent and hence
-	// the rhs vector is considered in each time step. 
-	if (time_step == 0)
-	  {
-	    // The local function \p fill_dirichlet_bc()
-	    // may also set Dirichlet boundary conditions for the
-	    // matrix.  When you set the flag as shown below,
-	    // the flag will return true.  If you want it to return
-	    // false, simply do not set it.
-	    equation_systems.parameters.set<bool>("Newmark set BC for Matrix") = true;
+      // Impose essential boundary conditions.
+      // Not that since the matrix is only assembled once,
+      // the penalty parameter should be added to the matrix
+      // only in the first time step.  The applied
+      // boundary conditions may be time-dependent and hence
+      // the rhs vector is considered in each time step. 
+      if (time_step == 0)
+        {
+          // The local function \p fill_dirichlet_bc()
+          // may also set Dirichlet boundary conditions for the
+          // matrix.  When you set the flag as shown below,
+          // the flag will return true.  If you want it to return
+          // false, simply do not set it.
+          equation_systems.parameters.set<bool>("Newmark set BC for Matrix") = true;
 
-	    fill_dirichlet_bc(equation_systems, "Wave");
+          fill_dirichlet_bc(equation_systems, "Wave");
 
-	    // unset the flag, so that it returns false
-	    equation_systems.parameters.set<bool>("Newmark set BC for Matrix") = false;
-	  }
-	else
-	  fill_dirichlet_bc(equation_systems, "Wave");
+          // unset the flag, so that it returns false
+          equation_systems.parameters.set<bool>("Newmark set BC for Matrix") = false;
+        }
+      else
+        fill_dirichlet_bc(equation_systems, "Wave");
 
-	// Solve the system "Wave".
-	t_system.solve();
+      // Solve the system "Wave".
+      t_system.solve();
 
-	// After solving the system, write the solution
-	// to a GMV-formatted plot file.
-	// Do only for a few time steps.
-	if (time_step == 30 || time_step == 60 ||
-	    time_step == 90 || time_step == 120 )
-	  {
-	    char buf[14];
-	    sprintf (buf, "out.%03d.gmv", time_step);
+      // After solving the system, write the solution
+      // to a GMV-formatted plot file.
+      // Do only for a few time steps.
+      if (time_step == 30 || time_step == 60 ||
+          time_step == 90 || time_step == 120 )
+        {
+          char buf[14];
+          sprintf (buf, "out.%03d.gmv", time_step);
 
-            // We currently have to serialize for I/O.
-            equation_systems.allgather();
+          // We currently have to serialize for I/O.
+          equation_systems.allgather();
 
-	    GMVIO(mesh).write_equation_systems (buf,
-						equation_systems);
+          GMVIO(mesh).write_equation_systems (buf,
+                                              equation_systems);
 
-            mesh.delete_remote_elements();
-	  }
+          mesh.delete_remote_elements();
+        }
 
-	// Update the p, v and a.
-	t_system.update_u_v_a();
+      // Update the p, v and a.
+      t_system.update_u_v_a();
 
-	// dof_no may not be local in parallel runs, so we may need a
-        // global displacement vector
-        NumericVector<Number> &displacement
-          = t_system.get_vector("displacement");
-        std::vector<Number> global_displacement(displacement.size());
-        displacement.localize(global_displacement);
+      // dof_no may not be local in parallel runs, so we may need a
+      // global displacement vector
+      NumericVector<Number> &displacement
+        = t_system.get_vector("displacement");
+      std::vector<Number> global_displacement(displacement.size());
+      displacement.localize(global_displacement);
 
-	// Write nodal results to file.  The results can then
-	// be viewed with e.g. gnuplot (run gnuplot and type
-	// 'plot "pressure_node.res" with lines' in the command line)
-        res_out << t_time << "\t"
-		<< global_displacement[dof_no]
-		<< std::endl;
-      }
-  }
+      // Write nodal results to file.  The results can then
+      // be viewed with e.g. gnuplot (run gnuplot and type
+      // 'plot "pressure_node.res" with lines' in the command line)
+      res_out << t_time << "\t"
+              << global_displacement[dof_no]
+              << std::endl;
+    }
 #endif
   
   // All done.  
-  return libMesh::close ();
+  return 0;
 }
 
 // This function assembles the system matrix and right-hand-side
 // for our wave equation.
 void assemble_wave(EquationSystems& es,
-		   const std::string& system_name)
+                   const std::string& system_name)
 {  
   // It is a good idea to make sure we are assembling
   // the proper system.
@@ -466,89 +458,89 @@ void assemble_wave(EquationSystems& es,
       {
         const unsigned int n_dof_indices = dof_indices.size();
 
-	Ke.resize          (n_dof_indices, n_dof_indices);
-	Ce.resize          (n_dof_indices, n_dof_indices);
-	Me.resize          (n_dof_indices, n_dof_indices);
-	zero_matrix.resize (n_dof_indices, n_dof_indices);
-	Fe.resize          (n_dof_indices);
+        Ke.resize          (n_dof_indices, n_dof_indices);
+        Ce.resize          (n_dof_indices, n_dof_indices);
+        Me.resize          (n_dof_indices, n_dof_indices);
+        zero_matrix.resize (n_dof_indices, n_dof_indices);
+        Fe.resize          (n_dof_indices);
       }
 
       // Now loop over the quadrature points.  This handles
       // the numeric integration.
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	{
-	  // Now we will build the element matrix.  This involves
-	  // a double loop to integrate the test funcions (i) against
-	  // the trial functions (j).
-	  for (unsigned int i=0; i<phi.size(); i++)
-	    for (unsigned int j=0; j<phi.size(); j++)
-	      {
-		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-		Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
-		           *1./(speed*speed);
-	      } // end of the matrix summation loop	  
-	} // end of quadrature point loop
+        {
+          // Now we will build the element matrix.  This involves
+          // a double loop to integrate the test funcions (i) against
+          // the trial functions (j).
+          for (unsigned int i=0; i<phi.size(); i++)
+            for (unsigned int j=0; j<phi.size(); j++)
+              {
+                Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
+                           *1./(speed*speed);
+              } // end of the matrix summation loop          
+        } // end of quadrature point loop
 
       // Now compute the contribution to the element matrix and the
       // right-hand-side vector if the current element lies on the
       // boundary. 
       {
-	// In this example no natural boundary conditions will
-	// be considered.  The code is left here so it can easily
-	// be extended.
-	// 
-	// don't do this for any side
-	for (unsigned int side=0; side<elem->n_sides(); side++)
-	  if (!true)
-	    // if (elem->neighbor(side) == NULL)
-	    {
-	      // Declare a special finite element object for
-	      // boundary integration.
-	      AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-	      
-	      // Boundary integration requires one quadraure rule,
-	      // with dimensionality one less than the dimensionality
-	      // of the element.
-	      QGauss qface(dim-1, SECOND);
-	      
-	      // Tell the finte element object to use our
-	      // quadrature rule.
-	      fe_face->attach_quadrature_rule (&qface);
-	      
-	      // The value of the shape functions at the quadrature
-	      // points.
-	      const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
-	      
-	      // The Jacobian * Quadrature Weight at the quadrature
-	      // points on the face.
-	      const std::vector<Real>& JxW_face = fe_face->get_JxW();
-	      
-	      // Compute the shape function values on the element
-	      // face.
-	      fe_face->reinit(elem, side);
+        // In this example no natural boundary conditions will
+        // be considered.  The code is left here so it can easily
+        // be extended.
+        // 
+        // don't do this for any side
+        for (unsigned int side=0; side<elem->n_sides(); side++)
+          if (!true)
+            // if (elem->neighbor(side) == NULL)
+            {
+              // Declare a special finite element object for
+              // boundary integration.
+              AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+              
+              // Boundary integration requires one quadraure rule,
+              // with dimensionality one less than the dimensionality
+              // of the element.
+              QGauss qface(dim-1, SECOND);
+              
+              // Tell the finte element object to use our
+              // quadrature rule.
+              fe_face->attach_quadrature_rule (&qface);
+              
+              // The value of the shape functions at the quadrature
+              // points.
+              const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+              
+              // The Jacobian * Quadrature Weight at the quadrature
+              // points on the face.
+              const std::vector<Real>& JxW_face = fe_face->get_JxW();
+              
+              // Compute the shape function values on the element
+              // face.
+              fe_face->reinit(elem, side);
 
-	      // Here we consider a normal acceleration acc_n=1 applied to
-	      // the whole boundary of our mesh.
-	      const Real acc_n_value = 1.0;
-	      
-	      // Loop over the face quadrature points for integration.
-	      for (unsigned int qp=0; qp<qface.n_points(); qp++)
-		{
-		  // Right-hand-side contribution due to prescribed
-		  // normal acceleration.
-		  for (unsigned int i=0; i<phi_face.size(); i++)
-		    {
-		      Fe(i) += acc_n_value*rho
-			*phi_face[i][qp]*JxW_face[qp];
-		    }
-		} // end face quadrature point loop	  
-	    } // end if (elem->neighbor(side) == NULL)
-	
-	// In this example the Dirichlet boundary conditions will be 
-	// imposed via panalty method after the
-	// system is assembled.
-	
-      } // end boundary condition section	  
+              // Here we consider a normal acceleration acc_n=1 applied to
+              // the whole boundary of our mesh.
+              const Real acc_n_value = 1.0;
+              
+              // Loop over the face quadrature points for integration.
+              for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                {
+                  // Right-hand-side contribution due to prescribed
+                  // normal acceleration.
+                  for (unsigned int i=0; i<phi_face.size(); i++)
+                    {
+                      Fe(i) += acc_n_value*rho
+                        *phi_face[i][qp]*JxW_face[qp];
+                    }
+                } // end face quadrature point loop          
+            } // end if (elem->neighbor(side) == NULL)
+        
+        // In this example the Dirichlet boundary conditions will be 
+        // imposed via panalty method after the
+        // system is assembled.
+        
+      } // end boundary condition section          
 
       // Finally, simply add the contributions to the additional
       // matrices and vector.
@@ -571,7 +563,7 @@ void assemble_wave(EquationSystems& es,
 
 // This function applies the initial conditions
 void apply_initial(EquationSystems& es,
-		   const std::string& system_name)
+                   const std::string& system_name)
 {
   // Get a reference to our system, as before
   NewmarkSystem & t_system = es.get_system<NewmarkSystem> (system_name);
@@ -592,7 +584,7 @@ void apply_initial(EquationSystems& es,
 
 // This function applies the Dirichlet boundary conditions
 void fill_dirichlet_bc(EquationSystems& es,
-		       const std::string& system_name)
+                       const std::string& system_name)
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
@@ -635,28 +627,28 @@ void fill_dirichlet_bc(EquationSystems& es,
       const Real z_coo = 4.;
 
       if (fabs(curr_node(2)-z_coo) < TOLERANCE)
-	{
-	  // The global number of the respective degree of freedom.
-	  unsigned int dn = curr_node.dof_number(0,0,0);
+        {
+          // The global number of the respective degree of freedom.
+          unsigned int dn = curr_node.dof_number(0,0,0);
 
-	  // The penalty parameter.
-	  const Real penalty = 1.e10;
+          // The penalty parameter.
+          const Real penalty = 1.e10;
 
-	  // Here we apply sinusoidal pressure values for 0<t<0.002
-	  // at one end of the pipe-mesh.
-	  Real p_value;
-	  if (current_time < .002 )
-	    p_value = sin(2*pi*current_time/.002);
-	  else
-	    p_value = .0;
+          // Here we apply sinusoidal pressure values for 0<t<0.002
+          // at one end of the pipe-mesh.
+          Real p_value;
+          if (current_time < .002 )
+            p_value = sin(2*pi*current_time/.002);
+          else
+            p_value = .0;
 
-	  // Now add the contributions to the matrix and the rhs.
-	  rhs.add(dn, p_value*penalty);
+          // Now add the contributions to the matrix and the rhs.
+          rhs.add(dn, p_value*penalty);
 
-	  // Add the panalty parameter to the global matrix
-	  // if desired.
-	  if (do_for_matrix)
-	    matrix.add(dn, dn, penalty);
-	}
+          // Add the panalty parameter to the global matrix
+          // if desired.
+          if (do_for_matrix)
+            matrix.add(dn, dn, penalty);
+        }
     } // loop n_cnt
 }

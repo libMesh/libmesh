@@ -35,63 +35,57 @@ int main (int argc, char** argv)
 {
   // Initialize the library.  This is necessary because the library
   // may depend on a number of other libraries (i.e. MPI  and Petsc)
-  // that require initialization before use.
-  libMesh::init (argc, argv);
-  // Force all our objects to have local scope.  By declaring
-  // libMesh objects in the next pair of braces we can assert
-  // that they will go out of scope (and should have been deleted)
-  // before we return from main.  This allows the library to do
-  // internal reference counting and assure memory is not leaked.
-  {    
-    // Check for proper usage. The program is designed to be run
-    // as follows:
-    // ./ex1 -d DIM input_mesh_name [output_mesh_name]
-    // where [output_mesh_name] is an optional parameter giving
-    // a filename to write the mesh into.
-    if (argc < 4)
-      {
-        if (libMesh::processor_id() == 0)
-	  std::cerr << "Usage: " << argv[0] << " -d 2 in.mesh [out.mesh]"
-		    << std::endl;
-	
-	// This handy function will print the file name, line number,
-	// and then abort.  Currently the library does not use C++
-	// exception handling.
-	error();
-      }
-    
-    // Get the dimensionality of the mesh from argv[2]
-    const unsigned int dim = std::atoi(argv[2]);
-    
-    // Create a mesh with the requested dimension.
-    Mesh mesh(dim);
-    
-    // Read the input mesh.
-    mesh.read (argv[3]);
-    
-    mesh.find_neighbors();
+  // that require initialization before use.  When the LibMeshInit
+  // object goes out of scope, other libraries and resources are
+  // finalized.
+  LibMeshInit init (argc, argv);
 
-    // Print information about the mesh to the screen.
-    mesh.print_info();
-    
-    // Write the output mesh if the user specified an
-    // output file name.
-    if (argc == 5)
-      {
-        // We currently have to serialize for I/O.
-        mesh.allgather();
+  // Check for proper usage. The program is designed to be run
+  // as follows:
+  // ./ex1 -d DIM input_mesh_name [output_mesh_name]
+  // where [output_mesh_name] is an optional parameter giving
+  // a filename to write the mesh into.
+  if (argc < 4)
+    {
+      if (libMesh::processor_id() == 0)
+        std::cerr << "Usage: " << argv[0] << " -d 2 in.mesh [out.mesh]"
+                  << std::endl;
+      
+      // This handy function will print the file name, line number,
+      // and then abort.  Currently the library does not use C++
+      // exception handling.
+      error();
+    }
+  
+  // Get the dimensionality of the mesh from argv[2]
+  const unsigned int dim = std::atoi(argv[2]);
+  
+  // Create a mesh with the requested dimension.
+  Mesh mesh(dim);
+  
+  // Read the input mesh.
+  mesh.read (argv[3]);
+  
+  mesh.find_neighbors();
 
-        mesh.write (argv[4]);
+  // Print information about the mesh to the screen.
+  mesh.print_info();
+  
+  // Write the output mesh if the user specified an
+  // output file name.
+  if (argc == 5)
+    {
+      // We currently have to serialize for I/O.
+      mesh.allgather();
 
-        mesh.delete_remote_elements();
-      }
-    // At this closing brace all of our objects will be forced
-    // out of scope and will get deconstructed.
-  }
-  // All done.  Call the libMesh::close() function to close any
-  // external libraries and check for leaked memory.  To be absolutey
-  // certain this is called last we will return its value.  This
-  // also allows main to return nonzero if memory is leaked, which
-  // can be useful for testing purposes.
-  return libMesh::close();
+      mesh.write (argv[4]);
+
+      mesh.delete_remote_elements();
+    }
+
+  // All done.  libMesh objects are destroyed here.  Because the
+  // LibMeshInit object was created first, its destruction occurs
+  // last, and it's destructor finalizes any external libraries and
+  // checks for leaked memory.
+  return 0;
 }
