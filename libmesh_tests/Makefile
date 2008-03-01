@@ -3,13 +3,15 @@
 test_source := $(shell find ./ -name "*.cc")
 tests       := $(patsubst %.cc, %, ${test_source}) 
 
-build_test := $(echo $(test))
-run_test   := $(echo "Running ./$(test)" ; ./$(test))
+
+all: run_tests
 
 
+build_tests: $(tests)
 
-all: $(tests) $(tests_source) driver.C
-	$(foreach test, $(tests), $(build_test))
+
+run_tests: build_tests
+	for test in $(tests); do $$test; done
 
 
 %: %.cc driver.C
