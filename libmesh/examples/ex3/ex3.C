@@ -70,99 +70,93 @@ void assemble_poisson(EquationSystems& es,
 
 // Function prototype for the exact solution.
 Real exact_solution (const Real x,
-		     const Real y,
-		     const Real z = 0.);
+                     const Real y,
+                     const Real z = 0.);
 
 int main (int argc, char** argv)
 {
+  // Initialize libraries, like in example 2.
+  LibMeshInit init (argc, argv);
+
+  // Brief message to the user regarding the program name
+  // and command line arguments.
+  std::cout << "Running " << argv[0];
   
-  // Initialize Petsc, like in example 2.
-  libMesh::init (argc, argv);
-
+  for (int i=1; i<argc; i++)
+    std::cout << " " << argv[i];
   
-  // Braces are used to force object scope, like in example 2
-  {
-    
-    // Brief message to the user regarding the program name
-    // and command line arguments.
-    std::cout << "Running " << argv[0];
-    
-    for (int i=1; i<argc; i++)
-      std::cout << " " << argv[i];
-    
-    std::cout << std::endl << std::endl;
-    
-    // Create a 2D mesh.
-    Mesh mesh (2);
-    
-    
-    // Use the MeshTools::Generation mesh generator to create a uniform
-    // grid on the square [-1,1]^2.  We instruct the mesh generator
-    // to build a mesh of 15x15 QUAD9 elements.  Building QUAD9
-    // elements instead of the default QUAD4's we used in example 2
-    // allow us to use higher-order approximation.
-    MeshTools::Generation::build_square (mesh, 
-					 15, 15,
-					 -1., 1.,
-					 -1., 1.,
-					 QUAD9);
+  std::cout << std::endl << std::endl;
+  
+  // Create a 2D mesh.
+  Mesh mesh (2);
+  
+  
+  // Use the MeshTools::Generation mesh generator to create a uniform
+  // grid on the square [-1,1]^2.  We instruct the mesh generator
+  // to build a mesh of 15x15 QUAD9 elements.  Building QUAD9
+  // elements instead of the default QUAD4's we used in example 2
+  // allow us to use higher-order approximation.
+  MeshTools::Generation::build_square (mesh, 
+                                       15, 15,
+                                       -1., 1.,
+                                       -1., 1.,
+                                       QUAD9);
 
-    // Print information about the mesh to the screen.
-    // Note that 5x5 QUAD9 elements actually has 11x11 nodes,
-    // so this mesh is significantly larger than the one in example 2.
-    mesh.print_info();
-    
-    // Create an equation systems object.
-    EquationSystems equation_systems (mesh);
-    
-    // Declare the Poisson system and its variables.
-    // The Poisson system is another example of a steady system.
-    equation_systems.add_system<LinearImplicitSystem> ("Poisson");
+  // Print information about the mesh to the screen.
+  // Note that 5x5 QUAD9 elements actually has 11x11 nodes,
+  // so this mesh is significantly larger than the one in example 2.
+  mesh.print_info();
+  
+  // Create an equation systems object.
+  EquationSystems equation_systems (mesh);
+  
+  // Declare the Poisson system and its variables.
+  // The Poisson system is another example of a steady system.
+  equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
-    // Adds the variable "u" to "Poisson".  "u"
-    // will be approximated using second-order approximation.
-    equation_systems.get_system("Poisson").add_variable("u", SECOND);
+  // Adds the variable "u" to "Poisson".  "u"
+  // will be approximated using second-order approximation.
+  equation_systems.get_system("Poisson").add_variable("u", SECOND);
 
-    // Give the system a pointer to the matrix assembly
-    // function.  This will be called when needed by the
-    // library.
-    equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
-    
-    // Initialize the data structures for the equation system.
-    equation_systems.init();
-    
-    // Prints information about the system to the screen.
-    equation_systems.print_info();
+  // Give the system a pointer to the matrix assembly
+  // function.  This will be called when needed by the
+  // library.
+  equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
+  
+  // Initialize the data structures for the equation system.
+  equation_systems.init();
+  
+  // Prints information about the system to the screen.
+  equation_systems.print_info();
 
-    // Solve the system "Poisson".  Note that calling this
-    // member will assemble the linear system and invoke
-    // the default Petsc solver, however the solver can be
-    // controlled from the command line.  For example,
-    // you can invoke conjugate gradient with:
-    //
-    // ./ex3 -ksp_type cg
-    //
-    // and you can get a nice X-window that monitors the solver
-    // convergence with:
-    //
-    // ./ex3 -ksp_xmonitor
-    //
-    // if you linked against the appropriate X libraries when you
-    // built PETSc.
-    equation_systems.get_system("Poisson").solve();
+  // Solve the system "Poisson".  Note that calling this
+  // member will assemble the linear system and invoke
+  // the default Petsc solver, however the solver can be
+  // controlled from the command line.  For example,
+  // you can invoke conjugate gradient with:
+  //
+  // ./ex3 -ksp_type cg
+  //
+  // and you can get a nice X-window that monitors the solver
+  // convergence with:
+  //
+  // ./ex3 -ksp_xmonitor
+  //
+  // if you linked against the appropriate X libraries when you
+  // built PETSc.
+  equation_systems.get_system("Poisson").solve();
 
-    // We currently have to serialize for I/O.
-    equation_systems.allgather();
+  // We currently have to serialize for I/O.
+  equation_systems.allgather();
 
-    // After solving the system write the solution
-    // to a GMV-formatted plot file.
-    GMVIO (mesh).write_equation_systems ("out.gmv", equation_systems);
+  // After solving the system write the solution
+  // to a GMV-formatted plot file.
+  GMVIO (mesh).write_equation_systems ("out.gmv", equation_systems);
 
-    mesh.delete_remote_elements();
-  }
+  mesh.delete_remote_elements();
 
   // All done.  
-  return libMesh::close();
+  return 0;
 }
 
 
@@ -310,58 +304,58 @@ void assemble_poisson(EquationSystems& es,
       // The  DenseMatrix::resize() and the  DenseVector::resize()
       // members will automatically zero out the matrix  and vector.
       Ke.resize (dof_indices.size(),
-		 dof_indices.size());
+                 dof_indices.size());
 
       Fe.resize (dof_indices.size());
 
       // Now loop over the quadrature points.  This handles
       // the numeric integration.
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	{
+        {
 
-	  // Now we will build the element matrix.  This involves
-	  // a double loop to integrate the test funcions (i) against
-	  // the trial functions (j).
-	  for (unsigned int i=0; i<phi.size(); i++)
-	    for (unsigned int j=0; j<phi.size(); j++)
-	      {
-		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-	      }
-	  
-	  // This is the end of the matrix summation loop
-	  // Now we build the element right-hand-side contribution.
-	  // This involves a single loop in which we integrate the
-	  // "forcing function" in the PDE against the test functions.
-	  {
-	    const Real x = q_point[qp](0);
-	    const Real y = q_point[qp](1);
-	    const Real eps = 1.e-3;
-	    
+          // Now we will build the element matrix.  This involves
+          // a double loop to integrate the test funcions (i) against
+          // the trial functions (j).
+          for (unsigned int i=0; i<phi.size(); i++)
+            for (unsigned int j=0; j<phi.size(); j++)
+              {
+                Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+              }
+          
+          // This is the end of the matrix summation loop
+          // Now we build the element right-hand-side contribution.
+          // This involves a single loop in which we integrate the
+          // "forcing function" in the PDE against the test functions.
+          {
+            const Real x = q_point[qp](0);
+            const Real y = q_point[qp](1);
+            const Real eps = 1.e-3;
+            
 
-	    // "fxy" is the forcing function for the Poisson equation.
-	    // In this case we set fxy to be a finite difference
-	    // Laplacian approximation to the (known) exact solution.
-	    //
-	    // We will use the second-order accurate FD Laplacian
-	    // approximation, which in 2D is
-	    //
-	    // u_xx + u_yy = (u(i,j-1) + u(i,j+1) +
-	    //                u(i-1,j) + u(i+1,j) +
-	    //                -4*u(i,j))/h^2
-	    //
-	    // Since the value of the forcing function depends only
-	    // on the location of the quadrature point (q_point[qp])
-	    // we will compute it here, outside of the i-loop
-	    const Real fxy = -(exact_solution(x,y-eps) +
-			       exact_solution(x,y+eps) +
-			       exact_solution(x-eps,y) +
-			       exact_solution(x+eps,y) -
-			       4.*exact_solution(x,y))/eps/eps;
-	    
-	    for (unsigned int i=0; i<phi.size(); i++)
-	      Fe(i) += JxW[qp]*fxy*phi[i][qp];
-	  } 
-	} 
+            // "fxy" is the forcing function for the Poisson equation.
+            // In this case we set fxy to be a finite difference
+            // Laplacian approximation to the (known) exact solution.
+            //
+            // We will use the second-order accurate FD Laplacian
+            // approximation, which in 2D is
+            //
+            // u_xx + u_yy = (u(i,j-1) + u(i,j+1) +
+            //                u(i-1,j) + u(i+1,j) +
+            //                -4*u(i,j))/h^2
+            //
+            // Since the value of the forcing function depends only
+            // on the location of the quadrature point (q_point[qp])
+            // we will compute it here, outside of the i-loop
+            const Real fxy = -(exact_solution(x,y-eps) +
+                               exact_solution(x,y+eps) +
+                               exact_solution(x-eps,y) +
+                               exact_solution(x+eps,y) -
+                               4.*exact_solution(x,y))/eps/eps;
+            
+            for (unsigned int i=0; i<phi.size(); i++)
+              Fe(i) += JxW[qp]*fxy*phi[i][qp];
+          } 
+        } 
       
       // We have now reached the end of the RHS summation,
       // and the end of quadrature point loop, so
@@ -395,56 +389,56 @@ void assemble_poisson(EquationSystems& es,
       // \frac{1}{\epsilon} is the penalty parameter, defined such that \epsilon << 1
       {
 
-	// The following loop is over the sides of the element.
-	// If the element has no neighbor on a side then that
-	// side MUST live on a boundary of the domain.
-	for (unsigned int side=0; side<elem->n_sides(); side++)
-	  if (elem->neighbor(side) == NULL)
-	    {
-	      // The value of the shape functions at the quadrature
-	      // points.
-	      const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
-	      
-	      // The Jacobian * Quadrature Weight at the quadrature
-	      // points on the face.
-	      const std::vector<Real>& JxW_face = fe_face->get_JxW();
-	      
-	      // The XYZ locations (in physical space) of the
-	      // quadrature points on the face.  This is where
-	      // we will interpolate the boundary value function.
-	      const std::vector<Point >& qface_point = fe_face->get_xyz();
-	      
-	      // Compute the shape function values on the element
-	      // face.
-	      fe_face->reinit(elem, side);
-	      
-	      // Loop over the face quadrature points for integration.
-	      for (unsigned int qp=0; qp<qface.n_points(); qp++)
-		{
+        // The following loop is over the sides of the element.
+        // If the element has no neighbor on a side then that
+        // side MUST live on a boundary of the domain.
+        for (unsigned int side=0; side<elem->n_sides(); side++)
+          if (elem->neighbor(side) == NULL)
+            {
+              // The value of the shape functions at the quadrature
+              // points.
+              const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+              
+              // The Jacobian * Quadrature Weight at the quadrature
+              // points on the face.
+              const std::vector<Real>& JxW_face = fe_face->get_JxW();
+              
+              // The XYZ locations (in physical space) of the
+              // quadrature points on the face.  This is where
+              // we will interpolate the boundary value function.
+              const std::vector<Point >& qface_point = fe_face->get_xyz();
+              
+              // Compute the shape function values on the element
+              // face.
+              fe_face->reinit(elem, side);
+              
+              // Loop over the face quadrature points for integration.
+              for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                {
 
-		  // The location on the boundary of the current
-		  // face quadrature point.
-		  const Real xf = qface_point[qp](0);
-		  const Real yf = qface_point[qp](1);
+                  // The location on the boundary of the current
+                  // face quadrature point.
+                  const Real xf = qface_point[qp](0);
+                  const Real yf = qface_point[qp](1);
 
-		  // The penalty value.  \frac{1}{\epsilon}
-		  // in the discussion above.
-		  const Real penalty = 1.e10;
+                  // The penalty value.  \frac{1}{\epsilon}
+                  // in the discussion above.
+                  const Real penalty = 1.e10;
 
-		  // The boundary value.
-		  const Real value = exact_solution(xf, yf);
-		  
-		  // Matrix contribution of the L2 projection. 
-		  for (unsigned int i=0; i<phi_face.size(); i++)
-		    for (unsigned int j=0; j<phi_face.size(); j++)
-		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+                  // The boundary value.
+                  const Real value = exact_solution(xf, yf);
+                  
+                  // Matrix contribution of the L2 projection. 
+                  for (unsigned int i=0; i<phi_face.size(); i++)
+                    for (unsigned int j=0; j<phi_face.size(); j++)
+                      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
 
-		  // Right-hand-side contribution of the L2
-		  // projection.
-		  for (unsigned int i=0; i<phi_face.size(); i++)
-		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-		} 
-	    }
+                  // Right-hand-side contribution of the L2
+                  // projection.
+                  for (unsigned int i=0; i<phi_face.size(); i++)
+                    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+                } 
+            }
       }
       
       // We have now finished the quadrature point loop,

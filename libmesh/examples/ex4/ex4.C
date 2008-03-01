@@ -92,170 +92,165 @@ void assemble_poisson(EquationSystems& es,
 
 // Exact solution function prototype.
 Real exact_solution (const Real x,
-		     const Real y = 0.,
-		     const Real z = 0.);
+                     const Real y = 0.,
+                     const Real z = 0.);
 
 // Begin the main program.
 int main (int argc, char** argv)
 {
   // Initialize libMesh and any dependent libaries, like in example 2.
-  libMesh::init (argc, argv);
+  LibMeshInit init (argc, argv);
 
   // Declare a performance log for the main program
   // PerfLog perf_main("Main Program");
   
-  // Braces are used to force object scope, like in example 2
-  {
-    // Create a GetPot object to parse the command line
-    GetPot command_line (argc, argv);
-    
-    // Check for proper calling arguments.
-    if (argc < 3)
-      {
-        if (libMesh::processor_id() == 0)
-	  std::cerr << "Usage:\n"
-		    <<"\t " << argv[0] << " -d 2(3)" << " -n 15"
-		    << std::endl;
-
-	// This handy function will print the file name, line number,
-	// and then abort.  Currrently the library does not use C++
-	// exception handling.
-	error();
-      }
-    
-    // Brief message to the user regarding the program name
-    // and command line arguments.
-    else 
-      {
-	std::cout << "Running " << argv[0];
-	
-	for (int i=1; i<argc; i++)
-	  std::cout << " " << argv[i];
-	
-	std::cout << std::endl << std::endl;
-      }
-    
-
-    // Read problem dimension from command line.  Use int
-    // instead of unsigned since the GetPot overload is ambiguous
-    // otherwise.
-    int dim = 2;
-    if ( command_line.search(1, "-d") )
-      dim = command_line.next(dim);
-    
-    // Read number of elements from command line
-    int ps = 15;
-    if ( command_line.search(1, "-n") )
-      ps = command_line.next(ps);
-    
-    // Read FE order from command line
-    std::string order = "SECOND"; 
-    if ( command_line.search(2, "-Order", "-o") )
-      order = command_line.next(order);
-
-    // Read FE Family from command line
-    std::string family = "LAGRANGE"; 
-    if ( command_line.search(2, "-FEFamily", "-f") )
-      family = command_line.next(family);
-    
-    // Cannot use dicontinuous basis.
-    if ((family == "MONOMIAL") || (family == "XYZ"))
-      {
-	std::cout << "ex4 currently requires a C^0 (or higher) FE basis." << std::endl;
-	error();
-      }
-      
-    // Create a mesh with user-defined dimension.
-    Mesh mesh (dim);
-    
-
-    // Use the MeshTools::Generation mesh generator to create a uniform
-    // grid on the square [-1,1]^D.  We instruct the mesh generator
-    // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
-    // elements in 3D.  Building these higher-order elements allows
-    // us to use higher-order approximation, as in example 3.
-    if ((family == "LAGRANGE") && (order == "FIRST"))
-      {
-	// No reason to use high-order geometric elements if we are
-	// solving with low-order finite elements.
-	MeshTools::Generation::build_cube (mesh,
-					   ps, ps, ps,
-					   -1., 1.,
-					   -1., 1.,
-					   -1., 1.,
-					   (dim==1)    ? EDGE2 : 
-					   ((dim == 2) ? QUAD4 : HEX8));
-      }
-    
-    else
-      {
-	MeshTools::Generation::build_cube (mesh,
-					   ps, ps, ps,
-					   -1., 1.,
-					   -1., 1.,
-					   -1., 1.,
-					   (dim==1)    ? EDGE3 : 
-					   ((dim == 2) ? QUAD9 : HEX27));
-      }
-
-    
-    // Print information about the mesh to the screen.
-    mesh.print_info();
-    
-    
-    // Create an equation systems object.
-    EquationSystems equation_systems (mesh);
-    
-    // Declare the system and its variables.
+  // Create a GetPot object to parse the command line
+  GetPot command_line (argc, argv);
+  
+  // Check for proper calling arguments.
+  if (argc < 3)
     {
-      // Creates a system named "Poisson"
-      LinearImplicitSystem& system =
-	equation_systems.add_system<LinearImplicitSystem> ("Poisson");
+      if (libMesh::processor_id() == 0)
+        std::cerr << "Usage:\n"
+                  <<"\t " << argv[0] << " -d 2(3)" << " -n 15"
+                  << std::endl;
 
-      
-      // Adds the variable "u" to "Poisson".  "u"
-      // will be approximated using second-order approximation.
-      system.add_variable("u",
-			  Utility::string_to_enum<Order>   (order),
-			  Utility::string_to_enum<FEFamily>(family));
-
-      // Give the system a pointer to the matrix assembly
-      // function.
-      system.attach_assemble_function (assemble_poisson);
-      
-      // Initialize the data structures for the equation system.
-      equation_systems.init();
-
-      // Prints information about the system to the screen.
-      equation_systems.print_info();
+      // This handy function will print the file name, line number,
+      // and then abort.  Currrently the library does not use C++
+      // exception handling.
+      error();
     }
-    mesh.print_info();
-
-    // Solve the system "Poisson", just like example 2.
-    equation_systems.get_system("Poisson").solve();
-    equation_systems.allgather();
-
-    // We currently have to serialize for I/O.
-    equation_systems.allgather();
-
-    // After solving the system write the solution
-    // to a GMV-formatted plot file.
-    if(dim == 1)
-    {        
-      GnuPlotIO plot(mesh,"Example 4, 1D",GnuPlotIO::GRID_ON);
-      plot.write_equation_systems("out_1",equation_systems);
-    }
-    else
+  
+  // Brief message to the user regarding the program name
+  // and command line arguments.
+  else 
     {
-      GMVIO (mesh).write_equation_systems ((dim == 3) ? 
-        "out_3.gmv" : "out_2.gmv",equation_systems);
+      std::cout << "Running " << argv[0];
+      
+      for (int i=1; i<argc; i++)
+        std::cout << " " << argv[i];
+      
+      std::cout << std::endl << std::endl;
+    }
+  
+
+  // Read problem dimension from command line.  Use int
+  // instead of unsigned since the GetPot overload is ambiguous
+  // otherwise.
+  int dim = 2;
+  if ( command_line.search(1, "-d") )
+    dim = command_line.next(dim);
+  
+  // Read number of elements from command line
+  int ps = 15;
+  if ( command_line.search(1, "-n") )
+    ps = command_line.next(ps);
+  
+  // Read FE order from command line
+  std::string order = "SECOND"; 
+  if ( command_line.search(2, "-Order", "-o") )
+    order = command_line.next(order);
+
+  // Read FE Family from command line
+  std::string family = "LAGRANGE"; 
+  if ( command_line.search(2, "-FEFamily", "-f") )
+    family = command_line.next(family);
+  
+  // Cannot use dicontinuous basis.
+  if ((family == "MONOMIAL") || (family == "XYZ"))
+    {
+      std::cout << "ex4 currently requires a C^0 (or higher) FE basis." << std::endl;
+      error();
+    }
+    
+  // Create a mesh with user-defined dimension.
+  Mesh mesh (dim);
+  
+
+  // Use the MeshTools::Generation mesh generator to create a uniform
+  // grid on the square [-1,1]^D.  We instruct the mesh generator
+  // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
+  // elements in 3D.  Building these higher-order elements allows
+  // us to use higher-order approximation, as in example 3.
+  if ((family == "LAGRANGE") && (order == "FIRST"))
+    {
+      // No reason to use high-order geometric elements if we are
+      // solving with low-order finite elements.
+      MeshTools::Generation::build_cube (mesh,
+                                         ps, ps, ps,
+                                         -1., 1.,
+                                         -1., 1.,
+                                         -1., 1.,
+                                         (dim==1)    ? EDGE2 : 
+                                         ((dim == 2) ? QUAD4 : HEX8));
+    }
+  
+  else
+    {
+      MeshTools::Generation::build_cube (mesh,
+                                         ps, ps, ps,
+                                         -1., 1.,
+                                         -1., 1.,
+                                         -1., 1.,
+                                         (dim==1)    ? EDGE3 : 
+                                         ((dim == 2) ? QUAD9 : HEX27));
     }
 
-    mesh.delete_remote_elements();
+  
+  // Print information about the mesh to the screen.
+  mesh.print_info();
+  
+  
+  // Create an equation systems object.
+  EquationSystems equation_systems (mesh);
+  
+  // Declare the system and its variables.
+  // Create a system named "Poisson"
+  LinearImplicitSystem& system =
+    equation_systems.add_system<LinearImplicitSystem> ("Poisson");
+
+  
+  // Add the variable "u" to "Poisson".  "u"
+  // will be approximated using second-order approximation.
+  system.add_variable("u",
+                      Utility::string_to_enum<Order>   (order),
+                      Utility::string_to_enum<FEFamily>(family));
+
+  // Give the system a pointer to the matrix assembly
+  // function.
+  system.attach_assemble_function (assemble_poisson);
+  
+  // Initialize the data structures for the equation system.
+  equation_systems.init();
+
+  // Print information about the system to the screen.
+  equation_systems.print_info();
+  mesh.print_info();
+
+  // Solve the system "Poisson", just like example 2.
+  equation_systems.get_system("Poisson").solve();
+  equation_systems.allgather();
+
+  // We currently have to serialize for I/O.
+  equation_systems.allgather();
+
+  // After solving the system write the solution
+  // to a GMV-formatted plot file.
+  if(dim == 1)
+  {        
+    GnuPlotIO plot(mesh,"Example 4, 1D",GnuPlotIO::GRID_ON);
+    plot.write_equation_systems("out_1",equation_systems);
   }
+  else
+  {
+    GMVIO (mesh).write_equation_systems ((dim == 3) ? 
+      "out_3.gmv" : "out_2.gmv",equation_systems);
+  }
+
+  mesh.delete_remote_elements();
   
   // All done.  
-  return libMesh::close ();
+  return 0;
 }
 
 
@@ -317,7 +312,7 @@ void assemble_poisson(EquationSystems& es,
   // Declare a special finite element object for
   // boundary integration.
   AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-	      
+              
   // Boundary integration requires one quadraure rule,
   // with dimensionality one less than the dimensionality
   // of the element.
@@ -399,7 +394,7 @@ void assemble_poisson(EquationSystems& es,
       // element type is different (i.e. the last element was a
       // triangle, now we are on a quadrilateral).
       Ke.resize (dof_indices.size(),
-		 dof_indices.size());
+                 dof_indices.size());
 
       Fe.resize (dof_indices.size());
 
@@ -420,10 +415,10 @@ void assemble_poisson(EquationSystems& es,
       perf_log.start_event ("Ke");
 
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	for (unsigned int i=0; i<phi.size(); i++)
-	  for (unsigned int j=0; j<phi.size(); j++)
-	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-	    
+        for (unsigned int i=0; i<phi.size(); i++)
+          for (unsigned int j=0; j<phi.size(); j++)
+            Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+            
 
       // Stop logging the matrix computation
       perf_log.stop_event ("Ke");
@@ -436,37 +431,37 @@ void assemble_poisson(EquationSystems& es,
       perf_log.start_event ("Fe");
       
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	{
-	  // fxy is the forcing function for the Poisson equation.
-	  // In this case we set fxy to be a finite difference
-	  // Laplacian approximation to the (known) exact solution.
-	  //
-	  // We will use the second-order accurate FD Laplacian
-	  // approximation, which in 2D on a structured grid is
-	  //
-	  // u_xx + u_yy = (u(i-1,j) + u(i+1,j) +
-	  //                u(i,j-1) + u(i,j+1) +
-	  //                -4*u(i,j))/h^2
-	  //
-	  // Since the value of the forcing function depends only
-	  // on the location of the quadrature point (q_point[qp])
-	  // we will compute it here, outside of the i-loop	  
-	  const Real x = q_point[qp](0);
-	  const Real y = q_point[qp](1);
-	  const Real z = q_point[qp](2);
-	  const Real eps = 1.e-3;
+        {
+          // fxy is the forcing function for the Poisson equation.
+          // In this case we set fxy to be a finite difference
+          // Laplacian approximation to the (known) exact solution.
+          //
+          // We will use the second-order accurate FD Laplacian
+          // approximation, which in 2D on a structured grid is
+          //
+          // u_xx + u_yy = (u(i-1,j) + u(i+1,j) +
+          //                u(i,j-1) + u(i,j+1) +
+          //                -4*u(i,j))/h^2
+          //
+          // Since the value of the forcing function depends only
+          // on the location of the quadrature point (q_point[qp])
+          // we will compute it here, outside of the i-loop          
+          const Real x = q_point[qp](0);
+          const Real y = q_point[qp](1);
+          const Real z = q_point[qp](2);
+          const Real eps = 1.e-3;
 
-	  const Real uxx = (exact_solution(x-eps,y,z) +
-			    exact_solution(x+eps,y,z) +
-			    -2.*exact_solution(x,y,z))/eps/eps;
-	      
-	  const Real uyy = (exact_solution(x,y-eps,z) +
-			    exact_solution(x,y+eps,z) +
-			    -2.*exact_solution(x,y,z))/eps/eps;
-	  
-	  const Real uzz = (exact_solution(x,y,z-eps) +
-			    exact_solution(x,y,z+eps) +
-			    -2.*exact_solution(x,y,z))/eps/eps;
+          const Real uxx = (exact_solution(x-eps,y,z) +
+                            exact_solution(x+eps,y,z) +
+                            -2.*exact_solution(x,y,z))/eps/eps;
+              
+          const Real uyy = (exact_solution(x,y-eps,z) +
+                            exact_solution(x,y+eps,z) +
+                            -2.*exact_solution(x,y,z))/eps/eps;
+          
+          const Real uzz = (exact_solution(x,y,z-eps) +
+                            exact_solution(x,y,z+eps) +
+                            -2.*exact_solution(x,y,z))/eps/eps;
 
           Real fxy;
           if(dim==1)
@@ -478,13 +473,13 @@ void assemble_poisson(EquationSystems& es,
           }
           else
           {
-	    fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+            fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
           } 
 
-	  // Add the RHS contribution
-	  for (unsigned int i=0; i<phi.size(); i++)
-	    Fe(i) += JxW[qp]*fxy*phi[i][qp];	  
-	}
+          // Add the RHS contribution
+          for (unsigned int i=0; i<phi.size(); i++)
+            Fe(i) += JxW[qp]*fxy*phi[i][qp];          
+        }
       
       // Stop logging the right-hand-side computation
       perf_log.stop_event ("Fe");
@@ -496,20 +491,20 @@ void assemble_poisson(EquationSystems& es,
       // via the penalty method. This is discussed at length in
       // example 3.
       {
-	
-	// Start logging the boundary condition computation
-	perf_log.start_event ("BCs");
+        
+        // Start logging the boundary condition computation
+        perf_log.start_event ("BCs");
 
-	// The following loops over the sides of the element.
-	// If the element has no neighbor on a side then that
-	// side MUST live on a boundary of the domain.
-	for (unsigned int side=0; side<elem->n_sides(); side++)
-	  if (elem->neighbor(side) == NULL)
-	    {
+        // The following loops over the sides of the element.
+        // If the element has no neighbor on a side then that
+        // side MUST live on a boundary of the domain.
+        for (unsigned int side=0; side<elem->n_sides(); side++)
+          if (elem->neighbor(side) == NULL)
+            {
             
               // The penalty value.  \frac{1}{\epsilon}
-	      // in the discussion above.
-	      const Real penalty = 1.e10;
+              // in the discussion above.
+              const Real penalty = 1.e10;
 
               // The value of the shape functions at the quadrature
               // points.
@@ -553,9 +548,9 @@ void assemble_poisson(EquationSystems& es,
               } 
             }
             
-	
-	// Stop logging the boundary condition computation
-	perf_log.stop_event ("BCs");
+        
+        // Stop logging the boundary condition computation
+        perf_log.stop_event ("BCs");
       } 
       
 

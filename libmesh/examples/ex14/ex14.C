@@ -84,15 +84,15 @@ void assemble_laplace(EquationSystems& es,
 // Prototype for calculation of the exact solution.  Useful
 // for setting boundary conditions.
 Number exact_solution(const Point& p,
-		      const Parameters&,   // EquationSystem parameters, not needed
-		      const std::string&,  // sys_name, not needed
-		      const std::string&); // unk_name, not needed);
+                      const Parameters&,   // EquationSystem parameters, not needed
+                      const std::string&,  // sys_name, not needed
+                      const std::string&); // unk_name, not needed);
 
 // Prototype for calculation of the gradient of the exact solution.  
 Gradient exact_derivative(const Point& p,
-			  const Parameters&,   // EquationSystems parameters, not needed
-			  const std::string&,  // sys_name, not needed
-			  const std::string&); // unk_name, not needed);
+                          const Parameters&,   // EquationSystems parameters, not needed
+                          const std::string&,  // sys_name, not needed
+                          const std::string&); // unk_name, not needed);
 
 
 // These are non-const because the input file may change it,
@@ -108,7 +108,7 @@ bool singularity = true;
 int main(int argc, char** argv)
 {
   // Initialize libMesh.
-  libMesh::init (argc, argv);
+  LibMeshInit init (argc, argv);
 
 #ifndef ENABLE_AMR
   if (libMesh::processor_id() == 0)
@@ -118,322 +118,311 @@ int main(int argc, char** argv)
   return 0;
 #else
 
-  {
-    // Parse the input file
-    GetPot input_file("ex14.in");
+  // Parse the input file
+  GetPot input_file("ex14.in");
 
-    // Read in parameters from the input file
-    const unsigned int max_r_steps    = input_file("max_r_steps", 3);
-    const unsigned int max_r_level    = input_file("max_r_level", 3);
-    const Real refine_percentage      = input_file("refine_percentage", 0.5);
-    const Real coarsen_percentage     = input_file("coarsen_percentage", 0.5);
-    const unsigned int uniform_refine = input_file("uniform_refine",0);
-    const std::string refine_type     = input_file("refinement_type", "h");
-    const std::string approx_type     = input_file("approx_type", "LAGRANGE");
-    const unsigned int approx_order   = input_file("approx_order", 1);
-    const std::string element_type    = input_file("element_type", "tensor");
-    const int extra_error_quadrature  = input_file("extra_error_quadrature", 0);
-    const int max_linear_iterations   = input_file("max_linear_iterations", 5000);
-    dim = input_file("dimension", 2);
-    const std::string indicator_type = input_file("indicator_type", "kelly");
-    singularity = input_file("singularity", true);
-    
-    // Output file for plotting the error as a function of
-    // the number of degrees of freedom.
-    std::string approx_name = "";
-    if (element_type == "tensor")
-      approx_name += "bi";
-    if (approx_order == 1)
-      approx_name += "linear";
-    else if (approx_order == 2)
-      approx_name += "quadratic";
-    else if (approx_order == 3)
-      approx_name += "cubic";
-    else if (approx_order == 4)
-      approx_name += "quartic";
+  // Read in parameters from the input file
+  const unsigned int max_r_steps    = input_file("max_r_steps", 3);
+  const unsigned int max_r_level    = input_file("max_r_level", 3);
+  const Real refine_percentage      = input_file("refine_percentage", 0.5);
+  const Real coarsen_percentage     = input_file("coarsen_percentage", 0.5);
+  const unsigned int uniform_refine = input_file("uniform_refine",0);
+  const std::string refine_type     = input_file("refinement_type", "h");
+  const std::string approx_type     = input_file("approx_type", "LAGRANGE");
+  const unsigned int approx_order   = input_file("approx_order", 1);
+  const std::string element_type    = input_file("element_type", "tensor");
+  const int extra_error_quadrature  = input_file("extra_error_quadrature", 0);
+  const int max_linear_iterations   = input_file("max_linear_iterations", 5000);
+  dim = input_file("dimension", 2);
+  const std::string indicator_type = input_file("indicator_type", "kelly");
+  singularity = input_file("singularity", true);
+  
+  // Output file for plotting the error as a function of
+  // the number of degrees of freedom.
+  std::string approx_name = "";
+  if (element_type == "tensor")
+    approx_name += "bi";
+  if (approx_order == 1)
+    approx_name += "linear";
+  else if (approx_order == 2)
+    approx_name += "quadratic";
+  else if (approx_order == 3)
+    approx_name += "cubic";
+  else if (approx_order == 4)
+    approx_name += "quartic";
 
-    std::string output_file = approx_name;
-    output_file += "_";
-    output_file += refine_type;
-    if (uniform_refine == 0)
-      output_file += "_adaptive.m";
-    else
-      output_file += "_uniform.m";
-    
-    std::ofstream out (output_file.c_str());
-    out << "% dofs     L2-error     H1-error" << std::endl;
-    out << "e = [" << std::endl;
-    
-    // Create an n-dimensional mesh.
-    Mesh mesh (dim);
-    
-    // Read in the mesh
-    if (dim == 1)
-      MeshTools::Generation::build_line(mesh,1,-1.,0.);
-    else if (dim == 2)
-      mesh.read("lshaped.xda");
-    else
-      mesh.read("lshaped3D.xda");
+  std::string output_file = approx_name;
+  output_file += "_";
+  output_file += refine_type;
+  if (uniform_refine == 0)
+    output_file += "_adaptive.m";
+  else
+    output_file += "_uniform.m";
+  
+  std::ofstream out (output_file.c_str());
+  out << "% dofs     L2-error     H1-error" << std::endl;
+  out << "e = [" << std::endl;
+  
+  // Create an n-dimensional mesh.
+  Mesh mesh (dim);
+  
+  // Read in the mesh
+  if (dim == 1)
+    MeshTools::Generation::build_line(mesh,1,-1.,0.);
+  else if (dim == 2)
+    mesh.read("lshaped.xda");
+  else
+    mesh.read("lshaped3D.xda");
 
-    // Use triangles if the config file says so
-    if (element_type == "simplex")
-      MeshTools::Modification::all_tri(mesh);
+  // Use triangles if the config file says so
+  if (element_type == "simplex")
+    MeshTools::Modification::all_tri(mesh);
 
-    // We used first order elements to describe the geometry,
-    // but we may need second order elements to hold the degrees
-    // of freedom
-    if (approx_order > 1 || refine_type != "h")
-      mesh.all_second_order();
+  // We used first order elements to describe the geometry,
+  // but we may need second order elements to hold the degrees
+  // of freedom
+  if (approx_order > 1 || refine_type != "h")
+    mesh.all_second_order();
 
-    // Mesh Refinement object
-    MeshRefinement mesh_refinement(mesh);
-    mesh_refinement.refine_fraction() = refine_percentage;
-    mesh_refinement.coarsen_fraction() = coarsen_percentage;
-    mesh_refinement.max_h_level() = max_r_level;
+  // Mesh Refinement object
+  MeshRefinement mesh_refinement(mesh);
+  mesh_refinement.refine_fraction() = refine_percentage;
+  mesh_refinement.coarsen_fraction() = coarsen_percentage;
+  mesh_refinement.max_h_level() = max_r_level;
 
-    // Create an equation systems object.
-    EquationSystems equation_systems (mesh);
+  // Create an equation systems object.
+  EquationSystems equation_systems (mesh);
 
-    // Declare the system and its variables.
+  // Declare the system and its variables.
+  // Creates a system named "Laplace"
+  LinearImplicitSystem& system =
+    equation_systems.add_system<LinearImplicitSystem> ("Laplace");
+  
+  // Adds the variable "u" to "Laplace", using 
+  // the finite element type and order specified
+  // in the config file
+  system.add_variable("u", static_cast<Order>(approx_order),
+                      Utility::string_to_enum<FEFamily>(approx_type));
+
+  // Give the system a pointer to the matrix assembly
+  // function.
+  system.attach_assemble_function (assemble_laplace);
+
+  // Initialize the data structures for the equation system.
+  equation_systems.init();
+
+  // Set linear solver max iterations
+  equation_systems.parameters.set<unsigned int>("linear solver maximum iterations")
+    = max_linear_iterations;
+
+  // Linear solver tolerance.
+  equation_systems.parameters.set<Real>("linear solver tolerance") =
+    TOLERANCE * TOLERANCE * TOLERANCE;
+  
+  // Prints information about the system to the screen.
+  equation_systems.print_info();
+
+  // Construct ExactSolution object and attach solution functions
+  ExactSolution exact_sol(equation_systems);
+  exact_sol.attach_exact_value(exact_solution);
+  exact_sol.attach_exact_deriv(exact_derivative);
+
+  // Use higher quadrature order for more accurate error results
+  exact_sol.extra_quadrature_order(extra_error_quadrature);
+
+  // A refinement loop.
+  for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
     {
-      // Creates a system named "Laplace"
-      LinearImplicitSystem& system =
-	equation_systems.add_system<LinearImplicitSystem> ("Laplace");
+      std::cout << "Beginning Solve " << r_step << std::endl;
       
-      // Adds the variable "u" to "Laplace", using 
-      // the finite element type and order specified
-      // in the config file
-      system.add_variable("u", static_cast<Order>(approx_order),
-                          Utility::string_to_enum<FEFamily>(approx_type));
+      // Solve the system "Laplace", just like example 2.
+      system.solve();
 
-      // Give the system a pointer to the matrix assembly
-      // function.
-      system.attach_assemble_function (assemble_laplace);
+      std::cout << "System has: " << equation_systems.n_active_dofs()
+                << " degrees of freedom."
+                << std::endl;
 
-      // Initialize the data structures for the equation system.
-      equation_systems.init();
-
-      // Set linear solver max iterations
-      equation_systems.parameters.set<unsigned int>("linear solver maximum iterations")
-        = max_linear_iterations;
-
-      // Linear solver tolerance.
-      equation_systems.parameters.set<Real>("linear solver tolerance") =
-        TOLERANCE * TOLERANCE * TOLERANCE;
+      std::cout << "Linear solver converged at step: "
+                << system.n_linear_iterations()
+                << ", final residual: "
+                << system.final_linear_residual()
+                << std::endl;
       
-      // Prints information about the system to the screen.
-      equation_systems.print_info();
-    }
+      // Compute the error.
+      exact_sol.compute_error("Laplace", "u");
 
-    // Construct ExactSolution object and attach solution functions
-    ExactSolution exact_sol(equation_systems);
-    exact_sol.attach_exact_value(exact_solution);
-    exact_sol.attach_exact_deriv(exact_derivative);
+      // Print out the error values
+      std::cout << "L2-Error is: "
+                << exact_sol.l2_error("Laplace", "u")
+                << std::endl;
+      std::cout << "H1-Error is: "
+                << exact_sol.h1_error("Laplace", "u")
+                << std::endl;
 
-    // Use higher quadrature order for more accurate error results
-    exact_sol.extra_quadrature_order(extra_error_quadrature);
+      // Print to output file
+      out << equation_systems.n_active_dofs() << " "
+          << exact_sol.l2_error("Laplace", "u") << " "
+          << exact_sol.h1_error("Laplace", "u") << std::endl;
 
-    // Convenient reference to the system
-    LinearImplicitSystem& system =
-      equation_systems.get_system<LinearImplicitSystem>("Laplace");
+      // Possibly refine the mesh
+      if (r_step+1 != max_r_steps)
+        {
+          std::cout << "  Refining the mesh..." << std::endl;
 
-    // A refinement loop.
-    for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
-      {
-	std::cout << "Beginning Solve " << r_step << std::endl;
-	
-	// Solve the system "Laplace", just like example 2.
-	system.solve();
+          if (uniform_refine == 0)
+            {
 
-	std::cout << "System has: " << equation_systems.n_active_dofs()
-		  << " degrees of freedom."
-		  << std::endl;
+              // The \p ErrorVector is a particular \p StatisticsVector
+              // for computing error information on a finite element mesh.
+              ErrorVector error;
+              
+              if (indicator_type == "exact")
+                {
+                  // The \p ErrorEstimator class interrogates a
+                  // finite element solution and assigns to each
+                  // element a positive error value.
+                  // This value is used for deciding which elements to
+                  // refine and which to coarsen.
+                  // For these simple test problems, we can use
+                  // numerical quadrature of the exact error between
+                  // the approximate and analytic solutions.
+                  // However, for real problems, we would need an error
+                  // indicator which only relies on the approximate
+                  // solution.
+                  ExactErrorEstimator error_estimator;
 
-	std::cout << "Linear solver converged at step: "
-		  << system.n_linear_iterations()
-		  << ", final residual: "
-		  << system.final_linear_residual()
-		  << std::endl;
-	
-	// Compute the error.
-	exact_sol.compute_error("Laplace", "u");
+                  error_estimator.attach_exact_value(exact_solution);
+                  error_estimator.attach_exact_deriv(exact_derivative);
 
-	// Print out the error values
-	std::cout << "L2-Error is: "
-		  << exact_sol.l2_error("Laplace", "u")
-		  << std::endl;
-	std::cout << "H1-Error is: "
-		  << exact_sol.h1_error("Laplace", "u")
-		  << std::endl;
+                  // We optimize in H1 norm
+                  error_estimator.sobolev_order() = 1;
 
-	// Print to output file
-	out << equation_systems.n_active_dofs() << " "
-	    << exact_sol.l2_error("Laplace", "u") << " "
-	    << exact_sol.h1_error("Laplace", "u") << std::endl;
+                  // Compute the error for each active element using
+                  // the provided indicator.  Note in general you
+                  // will need to provide an error estimator
+                  // specifically designed for your application.
+                  error_estimator.estimate_error (system, error);
+                }
+              else if (indicator_type == "patch")
+                {
+                  // The patch recovery estimator should give a
+                  // good estimate of the solution interpolation
+                  // error.
+                  PatchRecoveryErrorEstimator error_estimator;
 
-	// Possibly refine the mesh
-	if (r_step+1 != max_r_steps)
-	  {
-	    std::cout << "  Refining the mesh..." << std::endl;
+                  error_estimator.estimate_error (system, error);
+                }
+              else if (indicator_type == "uniform")
+                {
+                  // Error indication based on uniform refinement
+                  // is reliable, but very expensive.
+                  UniformRefinementEstimator error_estimator;
 
-	    if (uniform_refine == 0)
-              {
+                  error_estimator.estimate_error (system, error);
+                }
+              else
+                {
+                  assert (indicator_type == "kelly");
 
-		// The \p ErrorVector is a particular \p StatisticsVector
-		// for computing error information on a finite element mesh.
-		ErrorVector error;
-		
-                if (indicator_type == "exact")
-                  {
-		    // The \p ErrorEstimator class interrogates a
-                    // finite element solution and assigns to each
-                    // element a positive error value.
-		    // This value is used for deciding which elements to
-                    // refine and which to coarsen.
-                    // For these simple test problems, we can use
-                    // numerical quadrature of the exact error between
-                    // the approximate and analytic solutions.
-                    // However, for real problems, we would need an error
-                    // indicator which only relies on the approximate
-                    // solution.
-                    ExactErrorEstimator error_estimator;
+                  // The Kelly error estimator is based on 
+                  // an error bound for the Poisson problem
+                  // on linear elements, but is useful for
+                  // driving adaptive refinement in many problems
+                  KellyErrorEstimator error_estimator;
 
-                    error_estimator.attach_exact_value(exact_solution);
-                    error_estimator.attach_exact_deriv(exact_derivative);
+                  error_estimator.estimate_error (system, error);
+                }
+              
+              // This takes the error in \p error and decides which elements
+              // will be coarsened or refined.  Any element within 20% of the
+              // maximum error on any element will be refined, and any
+              // element within 10% of the minimum error on any element might
+              // be coarsened. Note that the elements flagged for refinement
+              // will be refined, but those flagged for coarsening _might_ be
+              // coarsened.
+              mesh_refinement.flag_elements_by_error_fraction (error);
 
-                    // We optimize in H1 norm
-                    error_estimator.sobolev_order() = 1;
+              // If we are doing adaptive p refinement, we want
+              // elements flagged for that instead.
+              if (refine_type == "p")
+                mesh_refinement.switch_h_to_p_refinement();
+              // If we are doing "matched hp" refinement, we
+              // flag elements for both h and p
+              if (refine_type == "matchedhp")
+                mesh_refinement.add_p_to_h_refinement();
+              // If we are doing hp refinement, we 
+              // try switching some elements from h to p
+              if (refine_type == "hp")
+                {
+                  HPCoarsenTest hpselector;
+                  hpselector.select_refinement(system);
+                }
+              // If we are doing "singular hp" refinement, we 
+              // try switching most elements from h to p
+              if (refine_type == "singularhp")
+                {
+                  // This only differs from p refinement for
+                  // the singular problem
+                  assert (singularity);
+                  HPSingularity hpselector;
+                  // Our only singular point is at the origin
+                  hpselector.singular_points.push_back(Point());
+                  hpselector.select_refinement(system);
+                }
+              
+              // This call actually refines and coarsens the flagged
+              // elements.
+              mesh_refinement.refine_and_coarsen_elements();
+            }
 
-		    // Compute the error for each active element using
-		    // the provided indicator.  Note in general you
-		    // will need to provide an error estimator
-                    // specifically designed for your application.
-		    error_estimator.estimate_error (system, error);
-                  }
-                else if (indicator_type == "patch")
-                  {
-                    // The patch recovery estimator should give a
-                    // good estimate of the solution interpolation
-                    // error.
-		    PatchRecoveryErrorEstimator error_estimator;
+          else if (uniform_refine == 1)
+            {
+              if (refine_type == "h" || refine_type == "hp" ||
+                  refine_type == "matchedhp")
+                mesh_refinement.uniformly_refine(1);
+              if (refine_type == "p" || refine_type == "hp" ||
+                  refine_type == "matchedhp")
+                mesh_refinement.uniformly_p_refine(1);
+            }
+        
+          // This call reinitializes the \p EquationSystems object for
+          // the newly refined mesh.  One of the steps in the
+          // reinitialization is projecting the \p solution,
+          // \p old_solution, etc... vectors from the old mesh to
+          // the current one.
+          equation_systems.reinit ();
+        }
+    }            
+  
+  // We currently have to serialize for I/O.
+  equation_systems.allgather();
 
-		    error_estimator.estimate_error (system, error);
-                  }
-                else if (indicator_type == "uniform")
-                  {
-                    // Error indication based on uniform refinement
-                    // is reliable, but very expensive.
-                    UniformRefinementEstimator error_estimator;
+  // Write out the solution
+  // After solving the system write the solution
+  // to a GMV-formatted plot file.
+  GMVIO (mesh).write_equation_systems ("lshaped.gmv",
+                                       equation_systems);
 
-		    error_estimator.estimate_error (system, error);
-                  }
-                else
-                  {
-                    assert (indicator_type == "kelly");
+  mesh.delete_remote_elements();
 
-                    // The Kelly error estimator is based on 
-                    // an error bound for the Poisson problem
-                    // on linear elements, but is useful for
-                    // driving adaptive refinement in many problems
-		    KellyErrorEstimator error_estimator;
-
-		    error_estimator.estimate_error (system, error);
-                  }
-		
-		// This takes the error in \p error and decides which elements
-		// will be coarsened or refined.  Any element within 20% of the
-		// maximum error on any element will be refined, and any
-		// element within 10% of the minimum error on any element might
-		// be coarsened. Note that the elements flagged for refinement
-		// will be refined, but those flagged for coarsening _might_ be
-		// coarsened.
-		mesh_refinement.flag_elements_by_error_fraction (error);
-
-                // If we are doing adaptive p refinement, we want
-                // elements flagged for that instead.
-                if (refine_type == "p")
-                  mesh_refinement.switch_h_to_p_refinement();
-                // If we are doing "matched hp" refinement, we
-                // flag elements for both h and p
-                if (refine_type == "matchedhp")
-                  mesh_refinement.add_p_to_h_refinement();
-                // If we are doing hp refinement, we 
-                // try switching some elements from h to p
-                if (refine_type == "hp")
-	          {
-		    HPCoarsenTest hpselector;
-                    hpselector.select_refinement(system);
-	          }
-                // If we are doing "singular hp" refinement, we 
-                // try switching most elements from h to p
-                if (refine_type == "singularhp")
-	          {
-                    // This only differs from p refinement for
-                    // the singular problem
-                    assert (singularity);
-		    HPSingularity hpselector;
-                    // Our only singular point is at the origin
-                    hpselector.singular_points.push_back(Point());
-                    hpselector.select_refinement(system);
-	          }
-		
-		// This call actually refines and coarsens the flagged
-		// elements.
-		mesh_refinement.refine_and_coarsen_elements();
-	      }
-
-	    else if (uniform_refine == 1)
-              {
-                if (refine_type == "h" || refine_type == "hp" ||
-                    refine_type == "matchedhp")
-                  mesh_refinement.uniformly_refine(1);
-                if (refine_type == "p" || refine_type == "hp" ||
-                    refine_type == "matchedhp")
-                  mesh_refinement.uniformly_p_refine(1);
-              }
-	    
-	    // This call reinitializes the \p EquationSystems object for
-	    // the newly refined mesh.  One of the steps in the
-	    // reinitialization is projecting the \p solution,
-	    // \p old_solution, etc... vectors from the old mesh to
-	    // the current one.
-	    equation_systems.reinit ();
-	  }
-      }	    
-    
-    
-
-    
-    // We currently have to serialize for I/O.
-    equation_systems.allgather();
-
-    // Write out the solution
-    // After solving the system write the solution
-    // to a GMV-formatted plot file.
-    GMVIO (mesh).write_equation_systems ("lshaped.gmv",
-    					 equation_systems);
-
-    mesh.delete_remote_elements();
-
-    // Close up the output file.
-    out << "];" << std::endl;
-    out << "hold on" << std::endl;
-    out << "plot(e(:,1), e(:,2), 'bo-');" << std::endl;
-    out << "plot(e(:,1), e(:,3), 'ro-');" << std::endl;
-    //    out << "set(gca,'XScale', 'Log');" << std::endl;
-    //    out << "set(gca,'YScale', 'Log');" << std::endl;
-    out << "xlabel('dofs');" << std::endl;
-    out << "title('" << approx_name << " elements');" << std::endl;
-    out << "legend('L2-error', 'H1-error');" << std::endl;
-    //     out << "disp('L2-error linear fit');" << std::endl;
-    //     out << "polyfit(log10(e(:,1)), log10(e(:,2)), 1)" << std::endl;
-    //     out << "disp('H1-error linear fit');" << std::endl;
-    //     out << "polyfit(log10(e(:,1)), log10(e(:,3)), 1)" << std::endl;
-  }
+  // Close up the output file.
+  out << "];" << std::endl;
+  out << "hold on" << std::endl;
+  out << "plot(e(:,1), e(:,2), 'bo-');" << std::endl;
+  out << "plot(e(:,1), e(:,3), 'ro-');" << std::endl;
+  //    out << "set(gca,'XScale', 'Log');" << std::endl;
+  //    out << "set(gca,'YScale', 'Log');" << std::endl;
+  out << "xlabel('dofs');" << std::endl;
+  out << "title('" << approx_name << " elements');" << std::endl;
+  out << "legend('L2-error', 'H1-error');" << std::endl;
+  //     out << "disp('L2-error linear fit');" << std::endl;
+  //     out << "polyfit(log10(e(:,1)), log10(e(:,2)), 1)" << std::endl;
+  //     out << "disp('H1-error linear fit');" << std::endl;
+  //     out << "polyfit(log10(e(:,1)), log10(e(:,3)), 1)" << std::endl;
 #endif // #ifndef ENABLE_AMR
   
   // All done.  
-  return libMesh::close ();
+  return 0;
 }
 
 
@@ -443,9 +432,9 @@ int main(int argc, char** argv)
 // to obtain an angle from atan2 in the correct
 // quadrant.
 Number exact_solution(const Point& p,
-		      const Parameters&,  // parameters, not needed
-		      const std::string&, // sys_name, not needed
-		      const std::string&) // unk_name, not needed
+                      const Parameters&,  // parameters, not needed
+                      const std::string&, // sys_name, not needed
+                      const std::string&) // unk_name, not needed
 {
   const Real x = p(0);
   const Real y = (dim > 1) ? p(1) : 0.;
@@ -462,7 +451,7 @@ Number exact_solution(const Point& p,
 
       // Make the 3D solution similar
       const Real z = (dim > 2) ? p(2) : 0;
-		  
+                  
       return pow(x*x + y*y, 1./3.)*sin(2./3.*theta) + z;
     }
   else
@@ -483,9 +472,9 @@ Number exact_solution(const Point& p,
 // to obtain an angle from atan2 in the correct
 // quadrant.
 Gradient exact_derivative(const Point& p,
-			  const Parameters&,  // parameters, not needed
-			  const std::string&, // sys_name, not needed
-			  const std::string&) // unk_name, not needed
+                          const Parameters&,  // parameters, not needed
+                          const std::string&, // sys_name, not needed
+                          const std::string&) // unk_name, not needed
 {
   // Gradient value to be returned.
   Gradient gradu;
@@ -676,7 +665,7 @@ void assemble_laplace(EquationSystems& es,
       // element type is different (i.e. the last element was a
       // triangle, now we are on a quadrilateral).
       Ke.resize (dof_indices.size(),
-		 dof_indices.size());
+                 dof_indices.size());
 
       Fe.resize (dof_indices.size());
 
@@ -693,9 +682,9 @@ void assemble_laplace(EquationSystems& es,
       perf_log.start_event ("Ke");
 
       for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-	for (unsigned int i=0; i<dphi.size(); i++)
-	  for (unsigned int j=0; j<dphi.size(); j++)
-	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+        for (unsigned int i=0; i<dphi.size(); i++)
+          for (unsigned int j=0; j<dphi.size(); j++)
+            Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 
       // We need a forcing function to make the 1D case interesting
       if (dim == 1)
@@ -724,40 +713,40 @@ void assemble_laplace(EquationSystems& es,
       // which is applicable to non-Lagrange finite element
       // discretizations.
       {
-	// Start logging the boundary condition computation
-	perf_log.start_event ("BCs");
+        // Start logging the boundary condition computation
+        perf_log.start_event ("BCs");
 
-	// The penalty value.  
-	const Real penalty = 1.e10;
+        // The penalty value.  
+        const Real penalty = 1.e10;
 
-	// The following loops over the sides of the element.
-	// If the element has no neighbor on a side then that
-	// side MUST live on a boundary of the domain.
-	for (unsigned int s=0; s<elem->n_sides(); s++)
-	  if (elem->neighbor(s) == NULL)
-	    {
-	      fe_face->reinit(elem,s);
-	      
-	      for (unsigned int qp=0; qp<qface->n_points(); qp++)
-		{
-		  const Number value = exact_solution (qface_points[qp],
-						       es.parameters,
-						       "null",
-						       "void");
+        // The following loops over the sides of the element.
+        // If the element has no neighbor on a side then that
+        // side MUST live on a boundary of the domain.
+        for (unsigned int s=0; s<elem->n_sides(); s++)
+          if (elem->neighbor(s) == NULL)
+            {
+              fe_face->reinit(elem,s);
+              
+              for (unsigned int qp=0; qp<qface->n_points(); qp++)
+                {
+                  const Number value = exact_solution (qface_points[qp],
+                                                       es.parameters,
+                                                       "null",
+                                                       "void");
 
-		  // RHS contribution
-		  for (unsigned int i=0; i<psi.size(); i++)
-		    Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
+                  // RHS contribution
+                  for (unsigned int i=0; i<psi.size(); i++)
+                    Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
 
-		  // Matrix contribution
-		  for (unsigned int i=0; i<psi.size(); i++)
-		    for (unsigned int j=0; j<psi.size(); j++)
-		      Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
-		}
-	    } 
-	
-	// Stop logging the boundary condition computation
-	perf_log.stop_event ("BCs");
+                  // Matrix contribution
+                  for (unsigned int i=0; i<psi.size(); i++)
+                    for (unsigned int j=0; j<psi.size(); j++)
+                      Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
+                }
+            } 
+        
+        // Stop logging the boundary condition computation
+        perf_log.stop_event ("BCs");
       } 
       
 

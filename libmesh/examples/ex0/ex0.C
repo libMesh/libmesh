@@ -54,8 +54,10 @@ int main(int argc, char** argv)
 {   
   // Initialize the library.  This is necessary because the library
   // may depend on a number of other libraries (i.e. MPI  and Petsc)
-  // that require initialization before use. 
-  libMesh::init(argc, argv);
+  // that require initialization before use.  When the LibMeshInit
+  // object goes out of scope, other libraries and resources are
+  // finalized.
+  LibMeshInit init (argc, argv);
 
 #ifndef ENABLE_AMR
   if (libMesh::processor_id() == 0)
@@ -65,50 +67,49 @@ int main(int argc, char** argv)
   return 0;
 #else
 
-  {
-    // Create a new 1 dimensional mesh
-    const unsigned int dim = 1;
-    Mesh mesh(dim);
+  // Create a new 1 dimensional mesh
+  const unsigned int dim = 1;
+  Mesh mesh(dim);
 
-    // Build a 1D mesh with 4 elements from x=0 to x=1, using 
-    // EDGE3 (i.e. quadratic) 1D elements. They are called EDGE3 elements
-    // because a quadratic element contains 3 nodes.
-    MeshTools::Generation::build_line(mesh,4,0.,1.,EDGE3);
+  // Build a 1D mesh with 4 elements from x=0 to x=1, using 
+  // EDGE3 (i.e. quadratic) 1D elements. They are called EDGE3 elements
+  // because a quadratic element contains 3 nodes.
+  MeshTools::Generation::build_line(mesh,4,0.,1.,EDGE3);
 
-    // Define the equation systems object and the system we are going
-    // to solve. See Example 2 for more details.
-    EquationSystems equation_systems(mesh);
-    LinearImplicitSystem& system = equation_systems.add_system
-      <LinearImplicitSystem>("1D");
+  // Define the equation systems object and the system we are going
+  // to solve. See Example 2 for more details.
+  EquationSystems equation_systems(mesh);
+  LinearImplicitSystem& system = equation_systems.add_system
+    <LinearImplicitSystem>("1D");
 
-    // Add a variable "u" to the system, using second-order approximation
-    system.add_variable("u",SECOND);
+  // Add a variable "u" to the system, using second-order approximation
+  system.add_variable("u",SECOND);
 
-    // Give the system a pointer to the matrix assembly function. This 
-    // will be called when needed by the library.
-    system.attach_assemble_function(assemble_1D);
+  // Give the system a pointer to the matrix assembly function. This 
+  // will be called when needed by the library.
+  system.attach_assemble_function(assemble_1D);
 
-    // Define the mesh refinement object that takes care of adaptively
-    // refining the mesh.
-    MeshRefinement mesh_refinement(mesh);
+  // Define the mesh refinement object that takes care of adaptively
+  // refining the mesh.
+  MeshRefinement mesh_refinement(mesh);
 
-    // These parameters determine the proportion of elements that will
-    // be refined and coarsened. Any element within 30% of the maximum 
-    // error on any element will be refined, and any element within 30% 
-    // of the minimum error on any element might be coarsened
-    mesh_refinement.refine_fraction()  = 0.7;
-    mesh_refinement.coarsen_fraction() = 0.3;
-    // We won't refine any element more than 5 times in total
-    mesh_refinement.max_h_level()      = 5;
+  // These parameters determine the proportion of elements that will
+  // be refined and coarsened. Any element within 30% of the maximum 
+  // error on any element will be refined, and any element within 30% 
+  // of the minimum error on any element might be coarsened
+  mesh_refinement.refine_fraction()  = 0.7;
+  mesh_refinement.coarsen_fraction() = 0.3;
+  // We won't refine any element more than 5 times in total
+  mesh_refinement.max_h_level()      = 5;
 
-    // Initialize the data structures for the equation system.
-    equation_systems.init();
+  // Initialize the data structures for the equation system.
+  equation_systems.init();
 
-    // Refinement parameters
-    const unsigned int max_r_steps = 5; // Refine the mesh 5 times
+  // Refinement parameters
+  const unsigned int max_r_steps = 5; // Refine the mesh 5 times
 
-    // Define the refinement loop
-    for(unsigned int r_step=0; r_step<=max_r_steps; r_step++)
+  // Define the refinement loop
+  for(unsigned int r_step=0; r_step<=max_r_steps; r_step++)
     {
       // Solve the equation system
       equation_systems.get_system("1D").solve();
@@ -117,51 +118,47 @@ int main(int argc, char** argv)
       // of this loop, since we do not want to refine the mesh unless we are
       // going to solve the equation system for that refined mesh.
       if(r_step != max_r_steps)
-      {
-        // Define object for error estimation, see Example 10 for more details.
-        ErrorVector error;
-        KellyErrorEstimator error_estimator;
+        {
+          // Objects for error estimation, see Example 10 for more details.
+          ErrorVector error;
+          KellyErrorEstimator error_estimator;
 
-        // Compute the error for each active element
-        error_estimator.estimate_error(system, error);
+          // Compute the error for each active element
+          error_estimator.estimate_error(system, error);
 
-        // Flag elements to be refined and coarsened
-        mesh_refinement.flag_elements_by_error_fraction (error);
+          // Flag elements to be refined and coarsened
+          mesh_refinement.flag_elements_by_error_fraction (error);
 
-        // Perform refinement and coarsening
-        mesh_refinement.refine_and_coarsen_elements();
+          // Perform refinement and coarsening
+          mesh_refinement.refine_and_coarsen_elements();
 
-        // Reinitialize the equation_systems object for the newly refined
-        // mesh. One of the steps in this is project the solution onto the 
-        // new mesh
-        equation_systems.reinit();
-      }
-
-
+          // Reinitialize the equation_systems object for the newly refined
+          // mesh. One of the steps in this is project the solution onto the 
+          // new mesh
+          equation_systems.reinit();
+        }
     }
 
-    // We currently have to serialize for I/O.
-    equation_systems.allgather();
+  // We currently have to serialize for I/O.
+  equation_systems.allgather();
 
-    // Construct gnuplot plotting object, pass in mesh, title of plot
-    // and boolean to indicate use of grid in plot. The grid is used to
-    // show the edges of each element in the mesh.
-    GnuPlotIO plot(mesh,"Example 0", GnuPlotIO::GRID_ON);
+  // Construct gnuplot plotting object, pass in mesh, title of plot
+  // and boolean to indicate use of grid in plot. The grid is used to
+  // show the edges of each element in the mesh.
+  GnuPlotIO plot(mesh,"Example 0", GnuPlotIO::GRID_ON);
 
-    // Write out script to be called from within gnuplot:
-    // Load gnuplot, then type "call 'gnuplot_script'" from gnuplot prompt
-    plot.write_equation_systems("gnuplot_script",equation_systems);
+  // Write out script to be called from within gnuplot:
+  // Load gnuplot, then type "call 'gnuplot_script'" from gnuplot prompt
+  plot.write_equation_systems("gnuplot_script",equation_systems);
 
-    mesh.delete_remote_elements();
-  }  
+  mesh.delete_remote_elements();
 #endif // #ifndef ENABLE_AMR
   
-  // All done.  Call the libMesh::close() function to close any
-  // external libraries and check for leaked memory.  To be absolutey
-  // certain this is called last we will return its value.  This
-  // also allows main to return nonzero if memory is leaked, which
-  // can be useful for testing purposes.
-  return libMesh::close();
+  // All done.  libMesh objects are destroyed here.  Because the
+  // LibMeshInit object was created first, its destruction occurs
+  // last, and it's destructor finalizes any external libraries and
+  // checks for leaked memory.
+  return 0;
 }
 
 

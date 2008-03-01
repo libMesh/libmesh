@@ -69,9 +69,9 @@ void assemble_biharmonic(EquationSystems& es,
 // Prototypes for calculation of the exact solution.  Necessary
 // for setting boundary conditions.
 Number exact_2D_solution(const Point& p,
-		         const Parameters&,   // parameters, not needed
-		         const std::string&,  // sys_name, not needed
-		         const std::string&); // unk_name, not needed);
+                         const Parameters&,   // parameters, not needed
+                         const std::string&,  // sys_name, not needed
+                         const std::string&); // unk_name, not needed);
 
 Number exact_3D_solution(const Point& p,
   const Parameters&, const std::string&, const std::string&);
@@ -109,8 +109,7 @@ Number (*forcing_function)(const Point& p);
 int main(int argc, char** argv)
 {
   // Initialize libMesh.
-  libMesh::init (argc, argv);
-
+  LibMeshInit init (argc, argv);
 
 #ifndef ENABLE_AMR
   if (libMesh::processor_id() == 0)
@@ -123,269 +122,258 @@ int main(int argc, char** argv)
 #ifndef ENABLE_SECOND_DERIVATIVES
   if (libMesh::processor_id() == 0)
     std::cerr << "ERROR: This example requires the library to be "
-	      << "compiled with second derivatives support!"
-	      << std::endl;
+              << "compiled with second derivatives support!"
+              << std::endl;
   return 0;
 #else
 
-  {
-    
-    // Parse the input file
-    GetPot input_file("ex15.in");
+  // Parse the input file
+  GetPot input_file("ex15.in");
 
-    // Read in parameters from the input file
-    const unsigned int max_r_level = input_file("max_r_level", 10);
-    const unsigned int max_r_steps = input_file("max_r_steps", 4);
-    const std::string approx_type  = input_file("approx_type",
-						"HERMITE");
-    const unsigned int uniform_refine =
-		    input_file("uniform_refine", 0);
-    const Real refine_percentage =
-		    input_file("refine_percentage", 0.5);
-    const Real coarsen_percentage =
-		    input_file("coarsen_percentage", 0.5);
-    const unsigned int dim =
-		    input_file("dimension", 2);
-    const unsigned int max_linear_iterations =
-		    input_file("max_linear_iterations", 10000);
+  // Read in parameters from the input file
+  const unsigned int max_r_level = input_file("max_r_level", 10);
+  const unsigned int max_r_steps = input_file("max_r_steps", 4);
+  const std::string approx_type  = input_file("approx_type",
+                                              "HERMITE");
+  const unsigned int uniform_refine =
+                  input_file("uniform_refine", 0);
+  const Real refine_percentage =
+                  input_file("refine_percentage", 0.5);
+  const Real coarsen_percentage =
+                  input_file("coarsen_percentage", 0.5);
+  const unsigned int dim =
+                  input_file("dimension", 2);
+  const unsigned int max_linear_iterations =
+                  input_file("max_linear_iterations", 10000);
 
-    // We have only defined 2 and 3 dimensional problems
-    assert (dim == 2 || dim == 3);
+  // We have only defined 2 and 3 dimensional problems
+  assert (dim == 2 || dim == 3);
 
-    // Currently only the Hermite cubics give a 3D C^1 basis
-    assert (dim == 2 || approx_type == "HERMITE");
+  // Currently only the Hermite cubics give a 3D C^1 basis
+  assert (dim == 2 || approx_type == "HERMITE");
 
-    // Create a dim-dimensional mesh.
-    Mesh mesh (dim);
-    
-    // Output file for plotting the error 
-    std::string output_file = "";
+  // Create a dim-dimensional mesh.
+  Mesh mesh (dim);
+  
+  // Output file for plotting the error 
+  std::string output_file = "";
 
-    if (dim == 2)
-      output_file += "2D_";
-    else if (dim == 3)
-      output_file += "3D_";
+  if (dim == 2)
+    output_file += "2D_";
+  else if (dim == 3)
+    output_file += "3D_";
 
-    if (approx_type == "HERMITE")
-      output_file += "hermite_";
-    else if (approx_type == "SECOND")
-      output_file += "reducedclough_";
-    else
-      output_file += "clough_";
+  if (approx_type == "HERMITE")
+    output_file += "hermite_";
+  else if (approx_type == "SECOND")
+    output_file += "reducedclough_";
+  else
+    output_file += "clough_";
 
-    if (uniform_refine == 0)
-      output_file += "adaptive";
-    else
-      output_file += "uniform";
+  if (uniform_refine == 0)
+    output_file += "adaptive";
+  else
+    output_file += "uniform";
 
-    std::string gmv_file = output_file;
-    gmv_file += ".gmv";
-    output_file += ".m";
+  std::string gmv_file = output_file;
+  gmv_file += ".gmv";
+  output_file += ".m";
 
-    std::ofstream out (output_file.c_str());
-    out << "% dofs     L2-error     H1-error      H2-error\n"
-	<< "e = [\n";
-    
-    // Set up the dimension-dependent coarse mesh and solution
-    // We build more than one cell so as to avoid bugs on fewer than 
-    // 4 processors in 2D or 8 in 3D.
-    if (dim == 2)
-      {
-        MeshTools::Generation::build_square(mesh, 2, 2);
-        exact_solution = &exact_2D_solution;
-        exact_derivative = &exact_2D_derivative;
-        exact_hessian = &exact_2D_hessian;
-        forcing_function = &forcing_function_2D;
-      }
-    else if (dim == 3)
-      {
-        MeshTools::Generation::build_cube(mesh, 2, 2, 2);
-        exact_solution = &exact_3D_solution;
-        exact_derivative = &exact_3D_derivative;
-        exact_hessian = &exact_3D_hessian;
-        forcing_function = &forcing_function_3D;
-      }
-
-    // Convert the mesh to second order: necessary for computing with
-    // Clough-Tocher elements, useful for getting slightly less 
-    // broken gmv output with Hermite elements
-    mesh.all_second_order();
-
-    // Convert it to triangles if necessary
-    if (approx_type != "HERMITE")
-      MeshTools::Modification::all_tri(mesh);
-
-    // Mesh Refinement object
-    MeshRefinement mesh_refinement(mesh);
-    mesh_refinement.refine_fraction() = refine_percentage;
-    mesh_refinement.coarsen_fraction() = coarsen_percentage;
-    mesh_refinement.max_h_level() = max_r_level;
-
-    // Create an equation systems object.
-    EquationSystems equation_systems (mesh);
-
-    // Declare the system and its variables.
+  std::ofstream out (output_file.c_str());
+  out << "% dofs     L2-error     H1-error      H2-error\n"
+      << "e = [\n";
+  
+  // Set up the dimension-dependent coarse mesh and solution
+  // We build more than one cell so as to avoid bugs on fewer than 
+  // 4 processors in 2D or 8 in 3D.
+  if (dim == 2)
     {
-      // Creates a system named "Biharmonic"
-      LinearImplicitSystem& system =
-	equation_systems.add_system<LinearImplicitSystem> ("Biharmonic");
-
-      // Adds the variable "u" to "Biharmonic".  "u"
-      // will be approximated using Hermite tensor product squares
-      // or (possibly reduced) cubic Clough-Tocher triangles
-      if (approx_type == "HERMITE")
-        system.add_variable("u", THIRD, HERMITE);
-      else if (approx_type == "SECOND")
-        system.add_variable("u", SECOND, CLOUGH);
-      else if (approx_type == "CLOUGH")
-        system.add_variable("u", THIRD, CLOUGH);
-      else
-        error();
-
-      // Give the system a pointer to the matrix assembly
-      // function.
-      system.attach_assemble_function
-		      (assemble_biharmonic);
-      
-      // Initialize the data structures for the equation system.
-      equation_systems.init();
-
-      // Set linear solver max iterations
-      equation_systems.parameters.set<unsigned int>
-		      ("linear solver maximum iterations") =
-                      max_linear_iterations;
-
-      // Linear solver tolerance.
-      equation_systems.parameters.set<Real>
-		      ("linear solver tolerance") = TOLERANCE * TOLERANCE;
-      
-      // Prints information about the system to the screen.
-      equation_systems.print_info();
+      MeshTools::Generation::build_square(mesh, 2, 2);
+      exact_solution = &exact_2D_solution;
+      exact_derivative = &exact_2D_derivative;
+      exact_hessian = &exact_2D_hessian;
+      forcing_function = &forcing_function_2D;
+    }
+  else if (dim == 3)
+    {
+      MeshTools::Generation::build_cube(mesh, 2, 2, 2);
+      exact_solution = &exact_3D_solution;
+      exact_derivative = &exact_3D_derivative;
+      exact_hessian = &exact_3D_hessian;
+      forcing_function = &forcing_function_3D;
     }
 
-    // Construct ExactSolution object and attach function to compute exact solution
-    ExactSolution exact_sol(equation_systems);
-    exact_sol.attach_exact_value(exact_solution);
-    exact_sol.attach_exact_deriv(exact_derivative);
-    exact_sol.attach_exact_hessian(exact_hessian);
+  // Convert the mesh to second order: necessary for computing with
+  // Clough-Tocher elements, useful for getting slightly less 
+  // broken gmv output with Hermite elements
+  mesh.all_second_order();
 
-    // Construct zero solution object, useful for computing solution norms
-    // Attaching "zero_solution" functions is unnecessary
-    ExactSolution zero_sol(equation_systems);
+  // Convert it to triangles if necessary
+  if (approx_type != "HERMITE")
+    MeshTools::Modification::all_tri(mesh);
 
-    // Convenient reference to the system
-    LinearImplicitSystem& system = 
-      equation_systems.get_system<LinearImplicitSystem>("Biharmonic");
+  // Mesh Refinement object
+  MeshRefinement mesh_refinement(mesh);
+  mesh_refinement.refine_fraction() = refine_percentage;
+  mesh_refinement.coarsen_fraction() = coarsen_percentage;
+  mesh_refinement.max_h_level() = max_r_level;
 
-    // A refinement loop.
-    for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
-      {
-        mesh.print_info();
-        equation_systems.print_info();
+  // Create an equation systems object.
+  EquationSystems equation_systems (mesh);
 
-	std::cout << "Beginning Solve " << r_step << std::endl;
-	
-	// Solve the system "Biharmonic", just like example 2.
-	system.solve();
+  // Declare the system and its variables.
+  // Create a system named "Biharmonic"
+  LinearImplicitSystem& system =
+    equation_systems.add_system<LinearImplicitSystem> ("Biharmonic");
 
-	std::cout << "Linear solver converged at step: "
-		  << system.n_linear_iterations()
-		  << ", final residual: "
-		  << system.final_linear_residual()
-		  << std::endl;
+  // Adds the variable "u" to "Biharmonic".  "u"
+  // will be approximated using Hermite tensor product squares
+  // or (possibly reduced) cubic Clough-Tocher triangles
+  if (approx_type == "HERMITE")
+    system.add_variable("u", THIRD, HERMITE);
+  else if (approx_type == "SECOND")
+    system.add_variable("u", SECOND, CLOUGH);
+  else if (approx_type == "CLOUGH")
+    system.add_variable("u", THIRD, CLOUGH);
+  else
+    error();
 
-	// Compute the error.
-	exact_sol.compute_error("Biharmonic", "u");
-	// Compute the norm.
-	zero_sol.compute_error("Biharmonic", "u");
+  // Give the system a pointer to the matrix assembly
+  // function.
+  system.attach_assemble_function (assemble_biharmonic);
+      
+  // Initialize the data structures for the equation system.
+  equation_systems.init();
 
-	// Print out the error values
-	std::cout << "L2-Norm is: "
-		  << zero_sol.l2_error("Biharmonic", "u")
-		  << std::endl;
-	std::cout << "H1-Norm is: "
-		  << zero_sol.h1_error("Biharmonic", "u")
-		  << std::endl;
-	std::cout << "H2-Norm is: "
-		  << zero_sol.h2_error("Biharmonic", "u")
-		  << std::endl
-		  << std::endl;
-	std::cout << "L2-Error is: "
-		  << exact_sol.l2_error("Biharmonic", "u")
-		  << std::endl;
-	std::cout << "H1-Error is: "
-		  << exact_sol.h1_error("Biharmonic", "u")
-		  << std::endl;
-	std::cout << "H2-Error is: "
-		  << exact_sol.h2_error("Biharmonic", "u")
-		  << std::endl
-		  << std::endl;
+  // Set linear solver max iterations
+  equation_systems.parameters.set<unsigned int>
+    ("linear solver maximum iterations") = max_linear_iterations;
 
-	// Print to output file
-	out << equation_systems.n_active_dofs() << " "
-	    << exact_sol.l2_error("Biharmonic", "u") << " "
-	    << exact_sol.h1_error("Biharmonic", "u") << " "
-	    << exact_sol.h2_error("Biharmonic", "u") << std::endl;
+  // Linear solver tolerance.
+  equation_systems.parameters.set<Real>
+    ("linear solver tolerance") = TOLERANCE * TOLERANCE;
+      
+  // Prints information about the system to the screen.
+  equation_systems.print_info();
 
-	// Possibly refine the mesh
-	if (r_step+1 != max_r_steps)
-	  {
-	    std::cout << "  Refining the mesh..." << std::endl;
+  // Construct ExactSolution object and attach function to compute exact solution
+  ExactSolution exact_sol(equation_systems);
+  exact_sol.attach_exact_value(exact_solution);
+  exact_sol.attach_exact_deriv(exact_derivative);
+  exact_sol.attach_exact_hessian(exact_hessian);
 
-	    if (uniform_refine == 0)
-	      {
-		ErrorVector error;
-		LaplacianErrorEstimator error_estimator;
+  // Construct zero solution object, useful for computing solution norms
+  // Attaching "zero_solution" functions is unnecessary
+  ExactSolution zero_sol(equation_systems);
 
-		error_estimator.estimate_error(system, error);
-                mesh_refinement.flag_elements_by_elem_fraction (error);
+  // A refinement loop.
+  for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
+    {
+      mesh.print_info();
+      equation_systems.print_info();
 
-		std::cout << "Mean Error: " << error.mean() <<
-				std::endl;
-		std::cout << "Error Variance: " << error.variance() <<
-				std::endl;
+      std::cout << "Beginning Solve " << r_step << std::endl;
+      
+      // Solve the system "Biharmonic", just like example 2.
+      system.solve();
 
-		mesh_refinement.refine_and_coarsen_elements();
-              }
-	    else
-	      {
-                mesh_refinement.uniformly_refine(1);
-              }
-		
-	    // This call reinitializes the \p EquationSystems object for
-	    // the newly refined mesh.  One of the steps in the
-	    // reinitialization is projecting the \p solution,
-	    // \p old_solution, etc... vectors from the old mesh to
-	    // the current one.
-	    equation_systems.reinit ();
-	  }
-      }	    
-    
-    // We currently have to serialize for I/O.
-    equation_systems.allgather();
+      std::cout << "Linear solver converged at step: "
+                << system.n_linear_iterations()
+                << ", final residual: "
+                << system.final_linear_residual()
+                << std::endl;
 
-    // Write out the solution
-    // After solving the system write the solution
-    // to a GMV-formatted plot file.
-    GMVIO (mesh).write_equation_systems (gmv_file,
-    					 equation_systems);
+      // Compute the error.
+      exact_sol.compute_error("Biharmonic", "u");
+      // Compute the norm.
+      zero_sol.compute_error("Biharmonic", "u");
 
-    mesh.delete_remote_elements();
+      // Print out the error values
+      std::cout << "L2-Norm is: "
+                << zero_sol.l2_error("Biharmonic", "u")
+                << std::endl;
+      std::cout << "H1-Norm is: "
+                << zero_sol.h1_error("Biharmonic", "u")
+                << std::endl;
+      std::cout << "H2-Norm is: "
+                << zero_sol.h2_error("Biharmonic", "u")
+                << std::endl
+                << std::endl;
+      std::cout << "L2-Error is: "
+                << exact_sol.l2_error("Biharmonic", "u")
+                << std::endl;
+      std::cout << "H1-Error is: "
+                << exact_sol.h1_error("Biharmonic", "u")
+                << std::endl;
+      std::cout << "H2-Error is: "
+                << exact_sol.h2_error("Biharmonic", "u")
+                << std::endl
+                << std::endl;
 
-    // Close up the output file.
-    out << "];\n"
-	<< "hold on\n"
-	<< "loglog(e(:,1), e(:,2), 'bo-');\n"
-	<< "loglog(e(:,1), e(:,3), 'ro-');\n"
-	<< "loglog(e(:,1), e(:,4), 'go-');\n"
-	<< "xlabel('log(dofs)');\n"
-	<< "ylabel('log(error)');\n"
-	<< "title('C1 " << approx_type << " elements');\n"
-	<< "legend('L2-error', 'H1-error', 'H2-error');\n";
-  }
+      // Print to output file
+      out << equation_systems.n_active_dofs() << " "
+          << exact_sol.l2_error("Biharmonic", "u") << " "
+          << exact_sol.h1_error("Biharmonic", "u") << " "
+          << exact_sol.h2_error("Biharmonic", "u") << std::endl;
+
+      // Possibly refine the mesh
+      if (r_step+1 != max_r_steps)
+        {
+          std::cout << "  Refining the mesh..." << std::endl;
+
+          if (uniform_refine == 0)
+            {
+              ErrorVector error;
+              LaplacianErrorEstimator error_estimator;
+
+              error_estimator.estimate_error(system, error);
+              mesh_refinement.flag_elements_by_elem_fraction (error);
+
+              std::cout << "Mean Error: " << error.mean() <<
+                              std::endl;
+              std::cout << "Error Variance: " << error.variance() <<
+                              std::endl;
+
+              mesh_refinement.refine_and_coarsen_elements();
+            }
+          else
+            {
+              mesh_refinement.uniformly_refine(1);
+            }
+              
+          // This call reinitializes the \p EquationSystems object for
+          // the newly refined mesh.  One of the steps in the
+          // reinitialization is projecting the \p solution,
+          // \p old_solution, etc... vectors from the old mesh to
+          // the current one.
+          equation_systems.reinit ();
+        }
+    }            
+  
+  // We currently have to serialize for I/O.
+  equation_systems.allgather();
+
+  // Write out the solution
+  // After solving the system write the solution
+  // to a GMV-formatted plot file.
+  GMVIO (mesh).write_equation_systems (gmv_file,
+                                           equation_systems);
+
+  mesh.delete_remote_elements();
+
+  // Close up the output file.
+  out << "];\n"
+      << "hold on\n"
+      << "loglog(e(:,1), e(:,2), 'bo-');\n"
+      << "loglog(e(:,1), e(:,3), 'ro-');\n"
+      << "loglog(e(:,1), e(:,4), 'go-');\n"
+      << "xlabel('log(dofs)');\n"
+      << "ylabel('log(error)');\n"
+      << "title('C1 " << approx_type << " elements');\n"
+      << "legend('L2-error', 'H1-error', 'H2-error');\n";
   
   // All done.  
-  return libMesh::close ();
+  return 0;
 #endif // #ifndef ENABLE_SECOND_DERIVATIVES
 #endif // #ifndef ENABLE_AMR
 }
@@ -393,9 +381,9 @@ int main(int argc, char** argv)
 
 
 Number exact_2D_solution(const Point& p,
-		         const Parameters&,  // parameters, not needed
-		         const std::string&, // sys_name, not needed
-		         const std::string&) // unk_name, not needed
+                         const Parameters&,  // parameters, not needed
+                         const std::string&, // sys_name, not needed
+                         const std::string&) // unk_name, not needed
 {
   // x and y coordinates in space
   const Real x = p(0);
@@ -408,9 +396,9 @@ Number exact_2D_solution(const Point& p,
 
 // We now define the gradient of the exact solution
 Gradient exact_2D_derivative(const Point& p,
-			     const Parameters&,  // parameters, not needed
-			     const std::string&, // sys_name, not needed
-			     const std::string&) // unk_name, not needed
+                             const Parameters&,  // parameters, not needed
+                             const std::string&, // sys_name, not needed
+                             const std::string&) // unk_name, not needed
 {
   // x and y coordinates in space
   const Real x = p(0);
@@ -428,9 +416,9 @@ Gradient exact_2D_derivative(const Point& p,
 
 // We now define the hessian of the exact solution
 Tensor exact_2D_hessian(const Point& p,
-			const Parameters&,  // parameters, not needed
-			const std::string&, // sys_name, not needed
-			const std::string&) // unk_name, not needed
+                        const Parameters&,  // parameters, not needed
+                        const std::string&, // sys_name, not needed
+                        const std::string&) // unk_name, not needed
 {
   // Second derivatives to be returned.
   Tensor hessu;
@@ -464,9 +452,9 @@ Number forcing_function_2D(const Point& p)
 
 
 Number exact_3D_solution(const Point& p,
-		         const Parameters&,  // parameters, not needed
-		         const std::string&, // sys_name, not needed
-		         const std::string&) // unk_name, not needed
+                         const Parameters&,  // parameters, not needed
+                         const std::string&, // sys_name, not needed
+                         const std::string&) // unk_name, not needed
 {
   // xyz coordinates in space
   const Real x = p(0);
@@ -479,9 +467,9 @@ Number exact_3D_solution(const Point& p,
 
 
 Gradient exact_3D_derivative(const Point& p,
-			     const Parameters&,  // parameters, not needed
-			     const std::string&, // sys_name, not needed
-			     const std::string&) // unk_name, not needed
+                             const Parameters&,  // parameters, not needed
+                             const std::string&, // sys_name, not needed
+                             const std::string&) // unk_name, not needed
 {
   // First derivatives to be returned.
   Gradient gradu;
@@ -501,9 +489,9 @@ Gradient exact_3D_derivative(const Point& p,
 
 // We now define the hessian of the exact solution
 Tensor exact_3D_hessian(const Point& p,
-			const Parameters&,  // parameters, not needed
-			const std::string&, // sys_name, not needed
-			const std::string&) // unk_name, not needed
+                        const Parameters&,  // parameters, not needed
+                        const std::string&, // sys_name, not needed
+                        const std::string&) // unk_name, not needed
 {
   // Second derivatives to be returned.
   Tensor hessu;
@@ -605,7 +593,7 @@ void assemble_biharmonic(EquationSystems& es,
   // Declare a special finite element object for
   // boundary integration.
   AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-	      
+              
   // Boundary integration requires another quadraure rule,
   // with dimensionality one less than the dimensionality
   // of the element.
@@ -684,7 +672,7 @@ void assemble_biharmonic(EquationSystems& es,
       // Zero the element matrix and right-hand side before
       // summing them.
       Ke.resize (dof_indices.size(),
-		 dof_indices.size());
+                 dof_indices.size());
 
       Fe.resize (dof_indices.size());
 
@@ -709,15 +697,15 @@ void assemble_biharmonic(EquationSystems& es,
 
       for (unsigned int qp=0; qp<qrule->n_points(); qp++)
         {
-	  for (unsigned int i=0; i<phi.size(); i++)
+          for (unsigned int i=0; i<phi.size(); i++)
             {
               shape_laplacian[i] = d2phi[i][qp](0,0)+d2phi[i][qp](1,1);
               if (dim == 3)
                  shape_laplacian[i] += d2phi[i][qp](2,2);
             }
-	  for (unsigned int i=0; i<phi.size(); i++)
-	    for (unsigned int j=0; j<phi.size(); j++)
-	      Ke(i,j) += JxW[qp]*
+          for (unsigned int i=0; i<phi.size(); i++)
+            for (unsigned int j=0; j<phi.size(); j++)
+              Ke(i,j) += JxW[qp]*
                          shape_laplacian[i]*shape_laplacian[j];
         }
 
@@ -733,28 +721,28 @@ void assemble_biharmonic(EquationSystems& es,
       // problem: Dirichlet boundary conditions include *both*
       // boundary values and boundary normal fluxes.
       {
-	// Start logging the boundary condition computation
-	perf_log.start_event ("BCs");
+        // Start logging the boundary condition computation
+        perf_log.start_event ("BCs");
 
-	// The penalty values, for solution boundary trace and flux.  
-	const Real penalty = 1e10;
-	const Real penalty2 = 1e10;
+        // The penalty values, for solution boundary trace and flux.  
+        const Real penalty = 1e10;
+        const Real penalty2 = 1e10;
 
-	// The following loops over the sides of the element.
-	// If the element has no neighbor on a side then that
-	// side MUST live on a boundary of the domain.
-	for (unsigned int s=0; s<elem->n_sides(); s++)
-	  if (elem->neighbor(s) == NULL)
-	    {
+        // The following loops over the sides of the element.
+        // If the element has no neighbor on a side then that
+        // side MUST live on a boundary of the domain.
+        for (unsigned int s=0; s<elem->n_sides(); s++)
+          if (elem->neighbor(s) == NULL)
+            {
               // The value of the shape functions at the quadrature
               // points.
-	      const std::vector<std::vector<Real> >&  phi_face =
-			      fe_face->get_phi();
+              const std::vector<std::vector<Real> >&  phi_face =
+                              fe_face->get_phi();
 
-	      // The value of the shape function derivatives at the
-	      // quadrature points.
+              // The value of the shape function derivatives at the
+              // quadrature points.
               const std::vector<std::vector<RealGradient> >& dphi_face =
-			      fe_face->get_dphi();
+                              fe_face->get_dphi();
 
               // The Jacobian * Quadrature Weight at the quadrature
               // points on the face.
@@ -765,8 +753,8 @@ void assemble_biharmonic(EquationSystems& es,
               // we will interpolate the boundary value function.
               const std::vector<Point>& qface_point = fe_face->get_xyz();
 
-	      const std::vector<Point>& face_normals =
-			      fe_face->get_normals();
+              const std::vector<Point>& face_normals =
+                              fe_face->get_normals();
 
               // Compute the shape function values on the element
               // face.
@@ -776,48 +764,48 @@ void assemble_biharmonic(EquationSystems& es,
               for (unsigned int qp=0; qp<qface->n_points(); qp++)
                 {
                   // The boundary value.
-		  Number value = exact_solution(qface_point[qp],
-					        es.parameters, "null",
-					        "void");
-		  Gradient flux = exact_2D_derivative(qface_point[qp],
+                  Number value = exact_solution(qface_point[qp],
+                                                es.parameters, "null",
+                                                "void");
+                  Gradient flux = exact_2D_derivative(qface_point[qp],
                                                       es.parameters,
-						      "null", "void");
+                                                      "null", "void");
 
                   // Matrix contribution of the L2 projection.
-		  // Note that the basis function values are
-		  // integrated against test function values while
-		  // basis fluxes are integrated against test function
-		  // fluxes.
+                  // Note that the basis function values are
+                  // integrated against test function values while
+                  // basis fluxes are integrated against test function
+                  // fluxes.
                   for (unsigned int i=0; i<phi_face.size(); i++)
                     for (unsigned int j=0; j<phi_face.size(); j++)
-		      Ke(i,j) += JxW_face[qp] *
-				 (penalty * phi_face[i][qp] *
-				  phi_face[j][qp] + penalty2
-				  * (dphi_face[i][qp] *
-				  face_normals[qp]) *
-				  (dphi_face[j][qp] *
-				   face_normals[qp]));
+                      Ke(i,j) += JxW_face[qp] *
+                                 (penalty * phi_face[i][qp] *
+                                  phi_face[j][qp] + penalty2
+                                  * (dphi_face[i][qp] *
+                                  face_normals[qp]) *
+                                  (dphi_face[j][qp] *
+                                   face_normals[qp]));
 
                   // Right-hand-side contribution of the L2
                   // projection.
                   for (unsigned int i=0; i<phi_face.size(); i++)
                     Fe(i) += JxW_face[qp] *
-				    (penalty * value * phi_face[i][qp]
-				     + penalty2 * 
-				     (flux * face_normals[qp])
-				    * (dphi_face[i][qp]
-				       * face_normals[qp]));
+                                    (penalty * value * phi_face[i][qp]
+                                     + penalty2 * 
+                                     (flux * face_normals[qp])
+                                    * (dphi_face[i][qp]
+                                       * face_normals[qp]));
 
                 }
-	    } 
-	
-	// Stop logging the boundary condition computation
-	perf_log.stop_event ("BCs");
+            } 
+        
+        // Stop logging the boundary condition computation
+        perf_log.stop_event ("BCs");
       } 
 
       for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-	for (unsigned int i=0; i<phi.size(); i++)
-	  Fe(i) += JxW[qp]*phi[i][qp]*forcing_function(q_point[qp]);
+        for (unsigned int i=0; i<phi.size(); i++)
+          Fe(i) += JxW[qp]*phi[i][qp]*forcing_function(q_point[qp]);
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
