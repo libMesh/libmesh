@@ -71,8 +71,12 @@ void unit_test ()
   std::cout << "Running with NumericVectorType=DistributedVector<Real>" << std::endl;
   run_test< DistributedVector<Real> >();
 
+// Why is this here?  We don't instantiate DistributedVector<float> 
+// in the library - RHS
+/*
   std::cout << "\n\nRunning with NumericVectorType=DistributedVector<float>" << std::endl;
   run_test< DistributedVector<float> >();
+*/
 
 #ifdef HAVE_PETSC
 
