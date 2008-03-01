@@ -138,7 +138,7 @@ public:
    * \p set_frequencies_by_steps(30.) lets this object
    * solve the system for only this single frequency.
    * By default, the solution for each frequency is copied
-   * to a separate \p DistributedVector.  This feature
+   * to a separate \p NumericVector.  This feature
    * can be disabled with \p allocate_solution_duplicates=false.
    */
   void set_frequencies_by_steps (const Real base_freq,
@@ -152,7 +152,7 @@ public:
    * distributed in the interval 
    * \f$ [ \texttt{min\_freq, max\_freq} ] \f$ .
    * By default, the solution for each frequency is copied
-   * to a separate \p DistributedVector.  This feature
+   * to a separate \p NumericVector.  This feature
    * can be disabled with \p allocate_solution_duplicates=false.
    */
   void set_frequencies_by_range (const Real min_freq,
@@ -164,7 +164,7 @@ public:
    * Set the frequency range by simply copying the values
    * from \p frequencies.
    * By default, the solution for each frequency is copied
-   * to a separate \p DistributedVector.  This feature
+   * to a separate \p NumericVector.  This feature
    * can be disabled with \p allocate_solution_duplicates=false.
    */
   void set_frequencies (const std::vector<Real>& frequencies,
