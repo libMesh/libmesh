@@ -212,7 +212,7 @@ namespace Parallel
   template <typename T>
   inline void isend (const unsigned int dest_processor_id,
 		     std::vector<T> &buf,
-		     MPI_Datatype &type,
+		     data_type &type,
 		     request &r,
 		     const int tag=0);
 
@@ -232,7 +232,7 @@ namespace Parallel
   template <typename T>
   inline Status recv (const unsigned int src_processor_id,
 		      std::vector<T> &buf,
-		      MPI_Datatype &type,
+		      data_type &type,
 		      const int tag=any_tag);
 
   //-------------------------------------------------------------------
