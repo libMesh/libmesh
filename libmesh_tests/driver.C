@@ -32,20 +32,17 @@ int main (int argc, char** argv)
   // Initialize the library.  This is necessary because the library
   // may depend on a number of other libraries (i.e. MPI  and Petsc)
   // that require initialization before use. 
-  libMesh::init(argc, argv);
+  LibMeshInit init(argc, argv);
 
-  {
-    std::cout << "Running";
-    for (int i=0; i<argc; i++)
-      std::cout << " " << argv[i];
-    std::cout << std::endl;
-    
-    // Run the test.  All unit tests are implemented
-    // in a function called unit_test().
-    // We link the tests in one at a time.
-    unit_test();
-  }
+  std::cout << "Running";
+  for (int i=0; i<argc; i++)
+    std::cout << " " << argv[i];
+  std::cout << std::endl;
+  
+  // Run the test.  All unit tests are implemented
+  // in a function called unit_test().
+  // We link the tests in one at a time.
+  unit_test();
 
-  return libMesh::close();
-
+  return 0;
 }
