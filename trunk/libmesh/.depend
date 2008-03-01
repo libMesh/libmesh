@@ -7,6 +7,7 @@ src/base/dof_map.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -52,6 +53,7 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -104,6 +106,7 @@ src/base/dof_object.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -120,6 +123,7 @@ src/base/libmesh.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -152,6 +156,7 @@ src/base/reference_counter.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counter.h\
     include/enums/enum_solver_package.h\
@@ -166,6 +171,7 @@ src/fe/fe.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -205,6 +211,7 @@ src/fe/fe_base.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -255,6 +262,7 @@ src/fe/fe_bernstein.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -291,6 +299,7 @@ src/fe/fe_bernstein_shape_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -327,6 +336,7 @@ src/fe/fe_bernstein_shape_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -364,6 +374,7 @@ src/fe/fe_bernstein_shape_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -399,6 +410,7 @@ src/fe/fe_boundary.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -437,6 +449,7 @@ src/fe/fe_clough.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -473,6 +486,7 @@ src/fe/fe_clough_shape_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -508,6 +522,7 @@ src/fe/fe_clough_shape_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -543,6 +558,7 @@ src/fe/fe_clough_shape_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -578,6 +594,7 @@ src/fe/fe_compute_data.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -625,6 +642,7 @@ src/fe/fe_hermite.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -661,6 +679,7 @@ src/fe/fe_hermite_shape_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -697,6 +716,7 @@ src/fe/fe_hermite_shape_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -733,6 +753,7 @@ src/fe/fe_hermite_shape_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -769,6 +790,7 @@ src/fe/fe_hierarchic.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -805,6 +827,7 @@ src/fe/fe_hierarchic_shape_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -841,6 +864,7 @@ src/fe/fe_hierarchic_shape_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -878,6 +902,7 @@ src/fe/fe_hierarchic_shape_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -915,6 +940,7 @@ src/fe/fe_interface.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -955,6 +981,7 @@ src/fe/fe_interface_inf_fe.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -985,6 +1012,7 @@ src/fe/fe_lagrange.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1026,6 +1054,7 @@ src/fe/fe_lagrange_shape_0D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1061,6 +1090,7 @@ src/fe/fe_lagrange_shape_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1096,6 +1126,7 @@ src/fe/fe_lagrange_shape_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1131,6 +1162,7 @@ src/fe/fe_lagrange_shape_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1166,6 +1198,7 @@ src/fe/fe_map.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1202,6 +1235,7 @@ src/fe/fe_monomial.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1238,6 +1272,7 @@ src/fe/fe_monomial_shape_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1273,6 +1308,7 @@ src/fe/fe_monomial_shape_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1308,6 +1344,7 @@ src/fe/fe_monomial_shape_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1343,6 +1380,7 @@ src/fe/fe_szabab.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1379,6 +1417,7 @@ src/fe/fe_szabab_shape_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1414,6 +1453,7 @@ src/fe/fe_szabab_shape_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1449,6 +1489,7 @@ src/fe/fe_szabab_shape_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -1476,6 +1517,7 @@ src/fe/fe_type.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -1503,6 +1545,7 @@ src/fe/fe_xyz.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1539,6 +1582,7 @@ src/fe/fe_xyz_boundary.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1577,6 +1621,7 @@ src/fe/fe_xyz_shape_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1612,6 +1657,7 @@ src/fe/fe_xyz_shape_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1647,6 +1693,7 @@ src/fe/fe_xyz_shape_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1682,6 +1729,7 @@ src/fe/inf_fe.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1724,6 +1772,7 @@ src/fe/inf_fe_base_radial.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1761,6 +1810,7 @@ src/fe/inf_fe_boundary.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1798,6 +1848,7 @@ src/fe/inf_fe_jacobi_20_00_eval.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -1825,6 +1876,7 @@ src/fe/inf_fe_jacobi_30_00_eval.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -1852,6 +1904,7 @@ src/fe/inf_fe_lagrange_eval.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -1879,6 +1932,7 @@ src/fe/inf_fe_legendre_eval.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -1908,6 +1962,7 @@ src/fe/inf_fe_map.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -1944,6 +1999,7 @@ src/fe/inf_fe_map_eval.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -1972,6 +2028,7 @@ src/fe/inf_fe_static.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2013,6 +2070,7 @@ src/geom/cell_hex.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2044,6 +2102,7 @@ src/geom/cell_hex20.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2079,6 +2138,7 @@ src/geom/cell_hex27.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2114,6 +2174,7 @@ src/geom/cell_hex8.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2151,6 +2212,7 @@ src/geom/cell_inf_hex.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2184,6 +2246,7 @@ src/geom/cell_inf_hex16.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2222,6 +2285,7 @@ src/geom/cell_inf_hex18.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2260,6 +2324,7 @@ src/geom/cell_inf_hex8.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2302,6 +2367,7 @@ src/geom/cell_inf_prism.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2336,6 +2402,7 @@ src/geom/cell_inf_prism12.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2375,6 +2442,7 @@ src/geom/cell_inf_prism6.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2418,6 +2486,7 @@ src/geom/cell_prism.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2452,6 +2521,7 @@ src/geom/cell_prism15.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2490,6 +2560,7 @@ src/geom/cell_prism18.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2528,6 +2599,7 @@ src/geom/cell_prism6.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2566,6 +2638,7 @@ src/geom/cell_pyramid.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2600,6 +2673,7 @@ src/geom/cell_pyramid5.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2638,6 +2712,7 @@ src/geom/cell_tet.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2670,6 +2745,7 @@ src/geom/cell_tet10.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2706,6 +2782,7 @@ src/geom/cell_tet4.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2742,6 +2819,7 @@ src/geom/edge.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2771,6 +2849,7 @@ src/geom/edge_edge2.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2800,6 +2879,7 @@ src/geom/edge_edge3.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2829,6 +2909,7 @@ src/geom/edge_edge4.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2858,6 +2939,7 @@ src/geom/edge_inf_edge2.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2887,6 +2969,7 @@ src/geom/elem.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2959,6 +3042,7 @@ src/geom/elem_quality.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
     include/geom/elem_quality.h
@@ -2970,6 +3054,7 @@ src/geom/elem_refinement.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -2996,6 +3081,7 @@ src/geom/elem_type.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/enums/enum_elem_type.h\
     include/geom/elem_type.h
 src/geom/face.$(obj-suffix):\
@@ -3008,6 +3094,7 @@ src/geom/face_inf_quad.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3039,6 +3126,7 @@ src/geom/face_inf_quad4.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3076,6 +3164,7 @@ src/geom/face_inf_quad6.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3109,6 +3198,7 @@ src/geom/face_quad.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3140,6 +3230,7 @@ src/geom/face_quad4.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3173,6 +3264,7 @@ src/geom/face_quad8.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3206,6 +3298,7 @@ src/geom/face_quad9.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3239,6 +3332,7 @@ src/geom/face_tri.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3270,6 +3364,7 @@ src/geom/face_tri3.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3303,6 +3398,7 @@ src/geom/face_tri6.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3336,6 +3432,7 @@ src/geom/node.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -3355,6 +3452,7 @@ src/geom/node_elem.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3380,6 +3478,7 @@ src/geom/plane.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/geom/plane.h\
     include/geom/point.h\
     include/geom/surface.h\
@@ -3395,6 +3494,7 @@ src/geom/remote_elem.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3421,6 +3521,7 @@ src/geom/sphere.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/enums/enum_solver_package.h\
     include/geom/point.h\
     include/geom/sphere.h\
@@ -3439,6 +3540,7 @@ src/mesh/boundary_info.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3476,6 +3578,7 @@ src/mesh/boundary_mesh.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3510,6 +3613,7 @@ src/mesh/diva_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3548,6 +3652,7 @@ src/mesh/exodusII_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3590,6 +3695,7 @@ src/mesh/fro_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3621,6 +3727,7 @@ src/mesh/gmsh_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3653,6 +3760,7 @@ src/mesh/gmv_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3704,6 +3812,7 @@ src/mesh/gnuplot_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3734,6 +3843,7 @@ src/mesh/inf_elem_builder.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3774,6 +3884,7 @@ src/mesh/legacy_xdr_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3820,6 +3931,7 @@ src/mesh/matlab_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3853,6 +3965,7 @@ src/mesh/medit_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3883,6 +3996,7 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3900,9 +4014,11 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/boundary_info.h\
     include/mesh/mesh_base.h\
+    include/mesh/mesh_tools.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/metis_partitioner.h\
+    include/partitioning/parmetis_partitioner.h\
     include/partitioning/partitioner.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
@@ -3916,6 +4032,7 @@ src/mesh/mesh_communication.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3951,6 +4068,7 @@ src/mesh/mesh_communication_global_indices.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -3986,6 +4104,7 @@ src/mesh/mesh_data.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4014,6 +4133,7 @@ src/mesh/mesh_data_tetgen_support.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/mesh/mesh_data.h\
@@ -4026,6 +4146,7 @@ src/mesh/mesh_data_unv_support.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/mesh/mesh_data.h\
@@ -4039,6 +4160,7 @@ src/mesh/mesh_data_xdr_support.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4070,6 +4192,7 @@ src/mesh/mesh_generation.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4129,6 +4252,7 @@ src/mesh/mesh_modification.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4166,6 +4290,7 @@ src/mesh/mesh_output.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4214,6 +4339,7 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4248,6 +4374,7 @@ src/mesh/mesh_refinement_flagging.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4279,6 +4406,7 @@ src/mesh/mesh_refinement_smoothing.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4312,6 +4440,7 @@ src/mesh/mesh_smoother_laplace.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4344,6 +4473,7 @@ src/mesh/mesh_smoother_vsmoother.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4377,6 +4507,7 @@ src/mesh/mesh_tetgen_support.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4413,6 +4544,7 @@ src/mesh/mesh_tools.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4453,6 +4585,7 @@ src/mesh/mesh_triangle_support.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4492,6 +4625,7 @@ src/mesh/off_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4525,6 +4659,7 @@ src/mesh/parallel_mesh.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4560,6 +4695,7 @@ src/mesh/parallel_mesh_iterators.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4591,6 +4727,7 @@ src/mesh/patch.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4619,6 +4756,7 @@ src/mesh/serial_mesh.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4650,6 +4788,7 @@ src/mesh/serial_mesh_iterators.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4680,6 +4819,7 @@ src/mesh/tecplot_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4710,6 +4850,7 @@ src/mesh/tetgen_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4747,6 +4888,7 @@ src/mesh/ucd_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4789,6 +4931,7 @@ src/mesh/unstructured_mesh.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4841,6 +4984,7 @@ src/mesh/unv_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4890,6 +5034,7 @@ src/mesh/vtk_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -4953,6 +5098,7 @@ src/mesh/xdr_head.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/mesh/legacy_xdr_io.h\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
@@ -4967,6 +5113,7 @@ src/mesh/xdr_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5002,6 +5149,7 @@ src/mesh/xdr_mesh.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/enums/enum_elem_type.h\
     include/mesh/legacy_xdr_io.h\
     include/mesh/mesh_input.h\
@@ -5016,6 +5164,7 @@ src/mesh/xdr_mgf.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/mesh/legacy_xdr_io.h\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
@@ -5026,6 +5175,7 @@ src/mesh/xdr_soln.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/mesh/legacy_xdr_io.h\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
@@ -5039,6 +5189,7 @@ src/numerics/analytic_function.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/numerics/analytic_function.h\
     include/numerics/function_base.h
 src/numerics/coupling_matrix.$(obj-suffix):\
@@ -5049,6 +5200,7 @@ src/numerics/dense_matrix.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/enums/enum_solver_package.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
@@ -5062,6 +5214,7 @@ src/numerics/dense_matrix_base.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector_base.h\
     include/utils/compare_types.h
@@ -5070,6 +5223,7 @@ src/numerics/dense_submatrix.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_submatrix.h\
@@ -5082,6 +5236,7 @@ src/numerics/dense_subvector.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/numerics/dense_subvector.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
@@ -5091,6 +5246,7 @@ src/numerics/dense_vector.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/utils/compare_types.h
@@ -5099,6 +5255,7 @@ src/numerics/dense_vector_base.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/numerics/dense_vector_base.h
 src/numerics/discontinuity_measure.$(obj-suffix):\
     src/numerics/discontinuity_measure.C\
@@ -5108,6 +5265,7 @@ src/numerics/discontinuity_measure.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5157,6 +5315,7 @@ src/numerics/distributed_vector.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -5177,6 +5336,7 @@ src/numerics/eigen_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -5200,6 +5360,7 @@ src/numerics/error_estimator.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5251,6 +5412,7 @@ src/numerics/exact_error_estimator.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5321,6 +5483,7 @@ src/numerics/fourth_error_estimators.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5368,6 +5531,7 @@ src/numerics/function_base.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/numerics/function_base.h
 src/numerics/hp_coarsentest.$(obj-suffix):\
     src/numerics/hp_coarsentest.C\
@@ -5378,6 +5542,7 @@ src/numerics/hp_coarsentest.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5434,6 +5599,7 @@ src/numerics/hp_selector.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/numerics/hp_selector.h
 src/numerics/hp_singular.$(obj-suffix):\
     src/numerics/hp_singular.C\
@@ -5443,6 +5609,7 @@ src/numerics/hp_singular.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5498,6 +5665,7 @@ src/numerics/jump_error_estimator.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5556,6 +5724,7 @@ src/numerics/kelly_error_estimator.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5608,6 +5777,7 @@ src/numerics/laspack_linear_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -5637,6 +5807,7 @@ src/numerics/laspack_matrix.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5672,6 +5843,7 @@ src/numerics/laspack_vector.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -5696,6 +5868,7 @@ src/numerics/linear_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -5729,6 +5902,7 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5795,6 +5969,7 @@ src/numerics/nonlinear_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -5811,6 +5986,7 @@ src/numerics/numeric_vector.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -5836,6 +6012,7 @@ src/numerics/patch_recovery_error_estimator.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5896,6 +6073,7 @@ src/numerics/petsc_linear_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -5921,6 +6099,7 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -5957,6 +6136,7 @@ src/numerics/petsc_nonlinear_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -5978,6 +6158,7 @@ src/numerics/petsc_vector.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6002,6 +6183,7 @@ src/numerics/slepc_eigen_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6024,6 +6206,7 @@ src/numerics/sparse_matrix.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6043,6 +6226,7 @@ src/numerics/type_tensor.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/utils/compare_types.h
@@ -6051,6 +6235,7 @@ src/numerics/type_vector.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/numerics/type_vector.h\
     include/utils/compare_types.h
 src/numerics/uniform_refinement_estimator.$(obj-suffix):\
@@ -6062,6 +6247,7 @@ src/numerics/uniform_refinement_estimator.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -6126,6 +6312,7 @@ src/parallel/parallel_bin_sorter.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/enums/enum_solver_package.h\
     include/parallel/parallel.h\
@@ -6140,6 +6327,7 @@ src/parallel/parallel_histogram.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/enums/enum_solver_package.h\
     include/parallel/parallel.h\
@@ -6153,6 +6341,7 @@ src/parallel/parallel_sort.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/enums/enum_solver_package.h\
     include/parallel/parallel.h\
@@ -6166,6 +6355,7 @@ src/parallel/threads.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/enums/enum_solver_package.h\
     include/parallel/threads.h\
@@ -6179,6 +6369,7 @@ src/partitioning/centroid_partitioner.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -6209,6 +6400,7 @@ src/partitioning/linear_partitioner.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -6239,6 +6431,7 @@ src/partitioning/metis_partitioner.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -6254,6 +6447,8 @@ src/partitioning/metis_partitioner.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/mesh/mesh_base.h\
+    include/mesh/mesh_communication.h\
+    include/mesh/mesh_tools.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/metis_partitioner.h\
@@ -6270,6 +6465,7 @@ src/partitioning/parmetis_partitioner.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -6285,6 +6481,8 @@ src/partitioning/parmetis_partitioner.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/mesh/mesh_base.h\
+    include/mesh/mesh_communication.h\
+    include/mesh/mesh_tools.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
     include/parallel/threads.h\
@@ -6302,6 +6500,7 @@ src/partitioning/partitioner.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -6317,6 +6516,8 @@ src/partitioning/partitioner.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/mesh/mesh_base.h\
+    include/mesh/mesh_communication.h\
+    include/mesh/mesh_tools.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
     include/parallel/threads.h\
@@ -6332,6 +6533,7 @@ src/partitioning/partitioner_factory.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/enums/enum_solver_package.h\
     include/geom/point.h\
     include/numerics/type_vector.h\
@@ -6354,6 +6556,7 @@ src/partitioning/sfc_partitioner.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -6384,6 +6587,7 @@ src/quadrature/quadrature.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6405,6 +6609,7 @@ src/quadrature/quadrature_build.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6433,6 +6638,7 @@ src/quadrature/quadrature_clough_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6456,6 +6662,7 @@ src/quadrature/quadrature_clough_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6479,6 +6686,7 @@ src/quadrature/quadrature_clough_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6503,6 +6711,7 @@ src/quadrature/quadrature_gauss_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6525,6 +6734,7 @@ src/quadrature/quadrature_gauss_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6548,6 +6758,7 @@ src/quadrature/quadrature_gauss_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6573,6 +6784,7 @@ src/quadrature/quadrature_grid_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6595,6 +6807,7 @@ src/quadrature/quadrature_grid_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6617,6 +6830,7 @@ src/quadrature/quadrature_grid_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6641,6 +6855,7 @@ src/quadrature/quadrature_jacobi_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6661,6 +6876,7 @@ src/quadrature/quadrature_rules.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/enums/enum_quadrature_type.h\
     include/quadrature/quadrature_rules.h
 src/quadrature/quadrature_simpson.$(obj-suffix):\
@@ -6672,6 +6888,7 @@ src/quadrature/quadrature_simpson_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6694,6 +6911,7 @@ src/quadrature/quadrature_simpson_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6716,6 +6934,7 @@ src/quadrature/quadrature_simpson_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6740,6 +6959,7 @@ src/quadrature/quadrature_trap_1D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6762,6 +6982,7 @@ src/quadrature/quadrature_trap_2D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6784,6 +7005,7 @@ src/quadrature/quadrature_trap_3D.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6807,6 +7029,7 @@ src/solvers/adaptive_time_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -6860,6 +7083,7 @@ src/solvers/continuation_system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -6919,6 +7143,7 @@ src/solvers/diff_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -6940,6 +7165,7 @@ src/solvers/diff_system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -6993,6 +7219,7 @@ src/solvers/eigen_system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7050,6 +7277,7 @@ src/solvers/eigen_time_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7106,6 +7334,7 @@ src/solvers/equation_systems.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7158,6 +7387,7 @@ src/solvers/equation_systems_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7211,6 +7441,7 @@ src/solvers/euler2_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7263,6 +7494,7 @@ src/solvers/euler_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7316,6 +7548,7 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7384,6 +7617,7 @@ src/solvers/explicit_system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7423,6 +7657,7 @@ src/solvers/fem_system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7493,6 +7728,7 @@ src/solvers/frequency_system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7544,6 +7780,7 @@ src/solvers/implicit_system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7592,6 +7829,7 @@ src/solvers/linear_implicit_system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7641,6 +7879,7 @@ src/solvers/newmark_system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7690,6 +7929,7 @@ src/solvers/newton_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7752,6 +7992,7 @@ src/solvers/nonlinear_implicit_system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7801,6 +8042,7 @@ src/solvers/petsc_diff_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7858,6 +8100,7 @@ src/solvers/steady_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7913,6 +8156,7 @@ src/solvers/system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -7970,6 +8214,7 @@ src/solvers/system_io.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -8017,6 +8262,7 @@ src/solvers/system_projection.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -8074,6 +8320,7 @@ src/solvers/time_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -8128,6 +8375,7 @@ src/solvers/transient_system.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -8175,6 +8423,7 @@ src/solvers/unsteady_solver.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -8230,6 +8479,7 @@ src/utils/error_vector.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -8291,12 +8541,14 @@ src/utils/o_f_stream.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/utils/o_f_stream.h
 src/utils/perf_log.$(obj-suffix):\
     src/utils/perf_log.C\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/utils/plt_loader.$(obj-suffix):\
@@ -8304,12 +8556,14 @@ src/utils/plt_loader.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/utils/plt_loader.h
 src/utils/plt_loader_read.$(obj-suffix):\
     src/utils/plt_loader_read.C\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/utils/plt_loader.h\
     include/utils/utility.h
 src/utils/plt_loader_write.$(obj-suffix):\
@@ -8317,6 +8571,7 @@ src/utils/plt_loader_write.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/utils/plt_loader.h
 src/utils/point_locator_base.$(obj-suffix):\
     src/utils/point_locator_base.C\
@@ -8325,6 +8580,7 @@ src/utils/point_locator_base.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
@@ -8345,6 +8601,7 @@ src/utils/point_locator_list.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -8376,6 +8633,7 @@ src/utils/point_locator_tree.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -8409,6 +8667,7 @@ src/utils/statistics.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/enums/enum_solver_package.h\
     include/utils/o_string_stream.h\
@@ -8419,6 +8678,7 @@ src/utils/string_to_enum.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/enums/enum_elem_type.h\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
@@ -8433,6 +8693,7 @@ src/utils/tree.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -8460,6 +8721,7 @@ src/utils/tree_node.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/base/multi_predicates.h\
     include/base/reference_counted_object.h\
@@ -8486,6 +8748,7 @@ src/utils/utility.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/utils/o_string_stream.h\
     include/utils/utility.h
 src/utils/xdr_cxx.$(obj-suffix):\
@@ -8495,6 +8758,7 @@ src/utils/xdr_cxx.$(obj-suffix):\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
     include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
     include/base/libmesh_logging.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\

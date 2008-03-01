@@ -117,11 +117,12 @@ SolverPackage libMesh::libMeshPrivateData::_solver_package =
 
 // ------------------------------------------------------------
 // libMesh functions
+namespace libMesh {
 #ifndef HAVE_MPI
-void libMesh::init (int &argc, char** & argv)
+void _init (int &argc, char** & argv)
 #else
-void libMesh::init (int &argc, char** & argv,
-		    MPI_Comm COMM_WORLD_IN)
+void _init (int &argc, char** & argv,
+	    MPI_Comm COMM_WORLD_IN)
 #endif
 {
   // should _not_ be initialized already.
@@ -235,7 +236,7 @@ void libMesh::init (int &argc, char** & argv,
 
 
 
-int libMesh::close ()
+int _close ()
 {
   // Delete reference counted singleton(s)
   delete remote_elem;
@@ -247,6 +248,19 @@ int libMesh::close ()
   // Allow the user to bypass MPI finalization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
+      // We may be here in only one process,
+      // because an uncaught error() exception
+      // called the LibMeshInit destructor.
+      //
+      // If that's the case, we need to MPI_Abort(),
+      // not just wait for other processes that
+      // might never get to MPI_Finalize()
+      if (libmesh_initialized_mpi &&
+          std::uncaught_exception())
+        {
+          std::cerr << "Uncaught exception - aborting" << std::endl;
+          MPI_Abort(libMesh::COMM_WORLD,1);
+        }
 # if defined(HAVE_PETSC) 
 
       // Allow the user to bypass PETSc finalization
@@ -308,6 +322,54 @@ int libMesh::close ()
   // deleted.
   return static_cast<int>(ReferenceCounter::n_objects());
 }
+}
+
+
+
+#ifndef HAVE_MPI
+void libMesh::init (int &argc, char** & argv)
+{
+  deprecated();  // Use LibMeshInit instead
+  libMesh::_init(argc, argv);
+}
+#else
+void libMesh::init (int &argc, char** & argv,
+		    MPI_Comm COMM_WORLD_IN)
+{
+  deprecated();  // Use LibMeshInit instead
+  libMesh::_init(argc, argv, COMM_WORLD_IN);
+}
+#endif
+
+
+
+
+int libMesh::close ()
+{
+  deprecated();  // Use LibMeshInit instead
+  return libMesh::_close();
+}
+
+
+
+#ifndef HAVE_MPI
+LibMeshInit::LibMeshInit (int &argc, char** & argv)
+{
+  libMesh::_init(argc, argv);
+}
+#else
+LibMeshInit::LibMeshInit (int &argc, char** & argv,
+		          MPI_Comm COMM_WORLD_IN)
+{
+  libMesh::_init(argc, argv, COMM_WORLD_IN);
+}
+#endif
+
+LibMeshInit::~LibMeshInit()
+{
+  libMesh::_close();
+}
+
 
 
 

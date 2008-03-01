@@ -44,6 +44,37 @@ class PerfLog;
 
 
 /**
+ * The \p LibMeshInit class, when constructed, initializes
+ * the dependent libraries (e.g. MPI or PETSC) and does the 
+ * command line parsing needed by libMesh.  The LibMeshInit
+ * destructor closes those libraries properly.
+ *
+ * For most users, a single LibMeshInit object should be created at
+ * the start of your main() function.  This object replaces the
+ * previous libMesh::init()/libMesh::close() methods, which are
+ * now deprecated.
+ */
+class LibMeshInit
+{
+public:
+#ifdef HAVE_MPI
+  /**
+   * Initialize the library for use, with the command line options
+   * provided.  This will e.g. call PetscInitialize if PETSC is
+   * available.  You must create a LibMeshInit object before using any
+   * of the library functionality.  This method may take an optional
+   * parameter to use a user-specified MPI communicator.
+   */
+  LibMeshInit(int & argc, char** & argv,
+	      MPI_Comm COMM_WORLD_IN=MPI_COMM_WORLD);
+#else
+  LibMeshInit(int & argc, char** & argv);
+#endif
+	
+  ~LibMeshInit();
+};
+
+/**
  * The \p libMesh namespace provides an interface to certain functionality
  * in the library.  It provides a uniform \p init() method that
  * initializes any other dependent libraries (e.g. MPI or PETSC),
@@ -57,8 +88,11 @@ namespace libMesh {
   
   /**
    * Initialize the library for use.  This will call
-   * PetscInitialize if PETSC is available.  You must call
-   * this method before using any of the library functionality.
+   * PetscInitialize if PETSC is available.
+   *
+   * You must perform an initialization before using any of the
+   * library functionality, but libMesh::init() is a deprecated
+   * way to do so.  Create a LibMeshInit object instead.
    */
   void init (int & argc, char** & argv);
 
@@ -66,9 +100,12 @@ namespace libMesh {
   
   /**
    * Initialize the library for use.  This will call
-   * PetscInitialize if PETSC is available.  You must call
-   * this method before using any of the library functionality.
+   * PetscInitialize if PETSC is available.
    * This method takes an optional parameter 
+   *
+   * You must perform an initialization before using any of the
+   * library functionality, but libMesh::init() is a deprecated
+   * way to do so.  Create a LibMeshInit object instead.
    */
   void init (int & argc, char** & argv,
 	     MPI_Comm COMM_WORLD_IN=MPI_COMM_WORLD);
@@ -76,7 +113,7 @@ namespace libMesh {
 #endif
 
   /**
-   * Checks that the \p init() member has been called.  If it
+   * Checks that library initialization has been done.  If it
    * hasn't an error message is printed and the code aborts.
    * It is useful to \p assert(libMesh::initialized()) in library
    * object constructors.
@@ -89,11 +126,16 @@ namespace libMesh {
    * all other library objects have gone out of scope, as it
    * interrogates the \p ReferenceCounter object to look for memory
    * leaks.
+   *
+   * libMesh::init() and libMesh::close() are a deprecated method
+   * of library initialization.  Create a LibMeshInit object to
+   * begin using the library; when the LibMeshInit object is
+   * destroyed the library will be closed.
    */
   int close ();
 
   /**
-   * Checks that the \p close() member has been called. This should
+   * Checks that the library has been closed.  This should
    * always return false when called from a library object.
    * It is useful to \p assert(!libMesh::closed()) in library
    * object destructors.
