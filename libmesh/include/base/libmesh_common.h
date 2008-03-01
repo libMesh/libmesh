@@ -41,6 +41,7 @@
 
 // _basic_ library functionality
 #include "libmesh_base.h"
+#include "libmesh_exceptions.h"
 
 
 
@@ -199,13 +200,9 @@ namespace libMesh
 #endif
 
 
-// The error() macro prints a message and aborts the code
+// The error() macro prints a message and throws a generic exception
 #undef error
-#ifdef HAVE_MPI
-#  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; if (libMesh::n_processors() > 1) MPI_Abort(libMesh::COMM_WORLD,1); std::abort(); }
-#else
-#  define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; std::abort(); }
-#endif
+#define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; throw libMesh::LogicError(); }
 
 // The untested macro warns that you are using untested code
 #undef untested
