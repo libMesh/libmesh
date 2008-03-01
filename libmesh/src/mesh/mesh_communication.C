@@ -88,7 +88,11 @@ namespace {
       int blocklengths[] = { 1, 3 };
       MPI_Aint displs[] = { 0, sizeof(unsigned int) };
 
+#if MPI_VERSION > 1
       MPI_Type_create_struct (2, blocklengths, displs, types, &packed_node_type);
+#else
+      MPI_Type_struct (2, blocklengths, displs, types, &packed_node_type);
+#endif
 
       return packed_node_type;
     }
