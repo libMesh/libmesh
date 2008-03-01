@@ -7,6 +7,7 @@ EXECUTABLE=run_tests
 DEPEND= makedepend
 
 all: $(EXECUTABLE)
+	./$(EXECUTABLE)
 	
 $(EXECUTABLE): depend $(SOURCES) $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
