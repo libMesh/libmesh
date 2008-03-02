@@ -469,7 +469,6 @@ void UnstructuredMesh::read (const std::string& name,
 	  // to the node ordering, so we better not reorder the nodes!
 	  if (xdr_io.legacy())
 	    {
-	      deprecated();
 	      skip_renumber_nodes_and_elements = true;
 	      MeshCommunication().broadcast(*this);
 	    }
