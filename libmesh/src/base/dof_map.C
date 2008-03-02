@@ -1715,37 +1715,39 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		  // TODO:[BSK] optimize this like above!
 		  if (implicit_neighbor_dofs)
 		    for (unsigned int s=0; s<elem->n_sides(); s++)
-		      {
-			const Elem* const neighbor_0 = elem->neighbor(s);
-			neighbor_0->active_family_tree_by_neighbor(active_neighbors,elem);
-			for (unsigned int a=0; a != active_neighbors.size(); ++a)
-			  {
-			    const Elem *neighbor = active_neighbors[a];
-			    
-			    dof_map.dof_indices (neighbor, neighbor_dofs);
+		      if (elem->neighbor(s) != NULL)
+			{
+			  const Elem* const neighbor_0 = elem->neighbor(s);
+			  neighbor_0->active_family_tree_by_neighbor(active_neighbors,elem);
+			  
+			  for (unsigned int a=0; a != active_neighbors.size(); ++a)
+			    {
+			      const Elem *neighbor = active_neighbors[a];
+			      
+			      dof_map.dof_indices (neighbor, neighbor_dofs);
 #if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
-			    dof_map.find_connected_dofs (neighbor_dofs);
+			      dof_map.find_connected_dofs (neighbor_dofs);
 #endif			      
-			    const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
-			    
-			    for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
-			      {
-				const unsigned int jg = neighbor_dofs[j];
+			      const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
+			      
+			      for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
+				{
+				  const unsigned int jg = neighbor_dofs[j];
+				  
+				  // See if jg is in the sorted range
+				  std::pair<SparsityPattern::Row::iterator,
+				            SparsityPattern::Row::iterator>
+				    pos = std::equal_range (row.begin(), row.end(), jg);
 			        
-				// See if jg is in the sorted range
-				std::pair<SparsityPattern::Row::iterator,
-				          SparsityPattern::Row::iterator>
-			    	pos = std::equal_range (row.begin(), row.end(), jg);
-			        
-				// Insert jg if it wasn't found
-				if (pos.first == pos.second)
-				  row.insert (pos.first, jg);
-                              }    
-			  }
-		      }
+				  // Insert jg if it wasn't found
+				  if (pos.first == pos.second)
+				    row.insert (pos.first, jg);
+				}    
+			    }
+			}
 		}
 	    }
-	}      
+	}	      
     } 
 
 
