@@ -836,7 +836,8 @@ void Elem::family_tree (std::vector<const Elem*>& family,
   // Do not clear the vector any more.
   if (!this->active())
     for (unsigned int c=0; c<this->n_children(); c++)
-      this->child(c)->family_tree (family, false);
+      if (!this->child(c)->is_remote())
+	this->child(c)->family_tree (family, false);
 }
 
 
@@ -856,8 +857,8 @@ void Elem::active_family_tree (std::vector<const Elem*>& active_family,
   // Do not clear the vector any more.
   else 
     for (unsigned int c=0; c<this->n_children(); c++)
-      this->child(c)->active_family_tree (active_family, false);
-
+      if (!this->child(c)->is_remote())
+	this->child(c)->active_family_tree (active_family, false);
 }
 
 
@@ -898,7 +899,8 @@ void Elem::active_family_tree_by_neighbor (std::vector<const Elem*>& family,
     family.clear();
 
   // This only makes sense if we're already a neighbor
-  assert (this->is_neighbor(neighbor));
+  if (this->level() >= neighbor->level())
+    assert (this->is_neighbor(neighbor));
 
   // Add an active element to the family tree.
   if (this->active())
