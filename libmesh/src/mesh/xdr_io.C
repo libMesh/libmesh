@@ -41,7 +41,6 @@
 #include "libmesh_logging.h"
 
 
-
 //-----------------------------------------------
 // anonymous namespace for implementation details
 namespace {
@@ -118,7 +117,7 @@ XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase>(mesh),
   _binary             (binary),
-  _legacy             (true),
+  _legacy             (false),
   _version            ("libMesh-0.7.0+"),
   _bc_file_name       ("n/a"),
   _partition_map_file ("n/a"),
@@ -741,7 +740,6 @@ void XdrIO::read (const std::string& name)
   // Check for a legacy version format.
   if (this->legacy())
     {
-      deprecated();
       io.close();
       LegacyXdrIO(mesh, this->binary()).read(name);
       return;
