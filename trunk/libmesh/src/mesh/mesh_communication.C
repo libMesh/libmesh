@@ -218,19 +218,6 @@ void MeshCommunication::clear ()
 
 
 
-void MeshCommunication::broadcast (MeshBase& mesh) const
-{
-  // Don't need to do anything if there is
-  // only one processor.
-  if (libMesh::n_processors() == 1)
-    return;
-  
-  this->broadcast_mesh (mesh);
-  this->broadcast_bcs  (mesh, *(mesh.boundary_info));
-}
-
-
-
 #ifndef HAVE_MPI // avoid spurious gcc warnings
 void MeshCommunication::redistribute (ParallelMesh &) const
 {
@@ -272,18 +259,24 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   // we will be sending to each processor, recv_n_nodes_and_elem_per_proc contains
   // the number of nodes/elements we will be receiving from each processor.
   // Format:
-  //  send_n_nodes_and_elem_per_proc[3*pid+0] = number of nodes to send to pid
-  //  send_n_nodes_and_elem_per_proc[3*pid+1] = number of elements to send to pid
-  //  send_n_nodes_and_elem_per_proc[3*pid+2] = connectivity buffer size
-  std::vector<unsigned int> send_n_nodes_and_elem_per_proc(3*libMesh::n_processors(), 0);
+  //  send_n_nodes_and_elem_per_proc[5*pid+0] = number of nodes to send to pid
+  //  send_n_nodes_and_elem_per_proc[5*pid+1] = number of elements to send to pid
+  //  send_n_nodes_and_elem_per_proc[5*pid+2] = connectivity buffer size
+  //  send_n_nodes_and_elem_per_proc[5*pid+3] = node bc buffer size
+  //  send_n_nodes_and_elem_per_proc[5*pid+4] = element bc buffer size
+  std::vector<unsigned int> send_n_nodes_and_elem_per_proc(5*libMesh::n_processors(), 0);
   
   std::vector<std::vector<PackedNode> >
     nodes_sent(libMesh::n_processors());
 
   std::vector<std::vector<int> > 
-    elements_sent(libMesh::n_processors());
+    elements_sent(libMesh::n_processors()),
+    node_bcs_sent(libMesh::n_processors()),
+    element_bcs_sent(libMesh::n_processors());
     
-  std::vector<Parallel::request> node_send_requests, element_send_requests;
+  std::vector<Parallel::request>
+    node_send_requests, element_send_requests,
+    node_bc_requests,   element_bc_requests;
 
   for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
     if (pid != libMesh::processor_id()) // don't send to ourselves!!
@@ -356,13 +349,26 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	if (!connected_nodes.empty())
 	  {
 	    // the number of nodes we will ship to pid
-	    send_n_nodes_and_elem_per_proc[3*pid+0] = connected_nodes.size();
+	    send_n_nodes_and_elem_per_proc[5*pid+0] = connected_nodes.size();
 	    
 	    nodes_sent[pid].reserve(connected_nodes.size());
 	    
 	    for (std::set<const Node*>::const_iterator node_it = connected_nodes.begin();
 		 node_it != connected_nodes.end(); ++node_it)
-	      nodes_sent[pid].push_back(PackedNode(**node_it));
+	      {
+		nodes_sent[pid].push_back(PackedNode(**node_it));
+
+		// add the node if it has BCs
+		if (mesh.boundary_info->boundary_id(*node_it) !=
+		    mesh.boundary_info->invalid_id)
+		  {
+		    node_bcs_sent[pid].push_back((*node_it)->id());
+		    node_bcs_sent[pid].push_back(mesh.boundary_info->boundary_id(*node_it));
+		  }
+	      }
+
+	    // the size of the node bc buffer we will ship to pid
+	    send_n_nodes_and_elem_per_proc[5*pid+3] = node_bcs_sent[pid].size();	    
 	    
 	    // send the nodes off to the destination processor
 	    node_send_requests.push_back(Parallel::request());
@@ -371,20 +377,44 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 			     nodes_sent[pid],
 			     packed_node_datatype,
 			     node_send_requests.back(),
-			     /* tag = */ 0);			   
+			     /* tag = */ 0);
+
+	    if (!node_bcs_sent[pid].empty())
+	      {
+		node_bc_requests.push_back(Parallel::request());
+
+		Parallel::isend (pid,
+				 node_bcs_sent[pid],
+				 node_bc_requests.back(),
+				 /* tag = */ 2);
+	      }
 	  }
 	
 	if (!elements_to_send.empty())
 	  {
 	    // the number of elements we will send to this processor
-	    send_n_nodes_and_elem_per_proc[3*pid+1] = elements_to_send.size();
+	    send_n_nodes_and_elem_per_proc[5*pid+1] = elements_to_send.size();
 
 	    for (std::set<const Elem*, CompareElemIdsByLevel>::const_iterator 
 		   elem_it = elements_to_send.begin(); elem_it != elements_to_send.end(); ++elem_it)
-	      pack_element (elements_sent[pid], *elem_it);	     
+	      {
+		pack_element (elements_sent[pid], *elem_it);
 
+		// if this is a level-0 element look for boundary conditions
+	        if ((*elem_it)->level() == 0)
+		  for (unsigned int s=0; s<(*elem_it)->n_sides(); s++)
+		    if ((*elem_it)->neighbor(s) == NULL)
+		      if (mesh.boundary_info->boundary_id (*elem_it, s) !=
+			  mesh.boundary_info->invalid_id)
+			{
+			  element_bcs_sent[pid].push_back ((*elem_it)->id());
+			  element_bcs_sent[pid].push_back (s);
+			  element_bcs_sent[pid].push_back (mesh.boundary_info->boundary_id (*elem_it, s));
+			}
+	      }
+	    
 	    // the packed connectivity size to send to this processor
-	    send_n_nodes_and_elem_per_proc[3*pid+2] = elements_sent[pid].size();
+	    send_n_nodes_and_elem_per_proc[5*pid+2] = elements_sent[pid].size();
 
 	    // send the elements off to the destination processor
 	    element_send_requests.push_back(Parallel::request());
@@ -393,6 +423,19 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 			     elements_sent[pid],
 			     element_send_requests.back(),
 			     /* tag = */ 1);
+
+	    // the size of the element bc buffer we will ship to pid
+	    send_n_nodes_and_elem_per_proc[5*pid+4] = element_bcs_sent[pid].size();
+
+	    if (!element_bcs_sent[pid].empty())
+	      {
+		element_bc_requests.push_back(Parallel::request());
+
+		Parallel::isend (pid,
+				 element_bcs_sent[pid],
+				 element_bc_requests.back(),
+				 /* tag = */ 3);
+	      }
 	  }
       }
   
@@ -408,215 +451,320 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
     recv_node_pair(libMesh::n_processors(),false), recv_elem_pair(libMesh::n_processors(),false);
   
   unsigned int
-    n_send_node_pairs=0, n_send_elem_pairs=0,
-    n_recv_node_pairs=0, n_recv_elem_pairs=0,
-    max_n_nodes_received=0, max_conn_size_received=0;
+    n_send_node_pairs=0,    n_send_elem_pairs=0,
+    n_send_node_bc_pairs=0, n_send_elem_bc_pairs=0, 
+    n_recv_node_pairs=0,    n_recv_elem_pairs=0,
+    n_recv_node_bc_pairs=0, n_recv_elem_bc_pairs=0, 
+    max_n_nodes_received=0, max_conn_size_received=0,
+    max_node_bcs_received=0, max_elem_bcs_received=0;
 
   for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
     {
-      if (send_n_nodes_and_elem_per_proc[3*pid+0]) // we have nodes to send
+      if (send_n_nodes_and_elem_per_proc[5*pid+0]) // we have nodes to send
 	{
 	  send_node_pair[pid] = true;
 	  n_send_node_pairs++;
+
+	  if (send_n_nodes_and_elem_per_proc[5*pid+3]) // and node bcs
+	    n_send_node_bc_pairs++;
 	}
       
-      if (send_n_nodes_and_elem_per_proc[3*pid+1]) // we have elements to send
+      if (send_n_nodes_and_elem_per_proc[5*pid+1]) // we have elements to send
 	{
 	  send_elem_pair[pid] = true;
 	  n_send_elem_pairs++;
+
+	  if (send_n_nodes_and_elem_per_proc[5*pid+4]) // and element bcs
+	    n_send_elem_bc_pairs++;
 	}
 
-      if (recv_n_nodes_and_elem_per_proc[3*pid+0]) // we have nodes to receive
+      if (recv_n_nodes_and_elem_per_proc[5*pid+0]) // we have nodes to receive
 	{
 	  recv_node_pair[pid] = true;
 	  n_recv_node_pairs++;
 	  max_n_nodes_received = std::max(max_n_nodes_received,
-					  recv_n_nodes_and_elem_per_proc[3*pid+0]);
+					  recv_n_nodes_and_elem_per_proc[5*pid+0]);
+
+	  if (recv_n_nodes_and_elem_per_proc[5*pid+3]) // and node bcs
+	    {
+	      n_recv_node_bc_pairs++;
+	      max_node_bcs_received = std::max(max_node_bcs_received,
+					       recv_n_nodes_and_elem_per_proc[5*pid+3]);
+	    }		
 	}
       
-      if (recv_n_nodes_and_elem_per_proc[3*pid+1]) // we have elements to receive
+      if (recv_n_nodes_and_elem_per_proc[5*pid+1]) // we have elements to receive
 	{
 	  recv_elem_pair[pid] = true;
 	  n_recv_elem_pairs++;
 	  max_conn_size_received = std::max(max_conn_size_received,
-					    recv_n_nodes_and_elem_per_proc[3*pid+2]);
+					    recv_n_nodes_and_elem_per_proc[5*pid+2]);
+
+	  if (recv_n_nodes_and_elem_per_proc[5*pid+4]) // and element bcs
+	    {
+	      n_recv_elem_bc_pairs++;
+	      max_elem_bcs_received = std::max(max_elem_bcs_received,
+					       recv_n_nodes_and_elem_per_proc[5*pid+4]);
+	    }
 	}
     }
-  assert (n_send_node_pairs == node_send_requests.size());
-  assert (n_send_elem_pairs == element_send_requests.size());
+  assert (n_send_node_pairs    == node_send_requests.size());
+  assert (n_send_elem_pairs    == element_send_requests.size());
+  assert (n_send_node_bc_pairs == node_bc_requests.size());
+  assert (n_send_elem_bc_pairs == element_bc_requests.size());
 
   // Receive nodes.  Size this array for the largest message.
-  std::vector<PackedNode> received_nodes(max_n_nodes_received);
+  {
+    std::vector<PackedNode> received_nodes(max_n_nodes_received);
 
-  // We now know how many processors will be sending us nodes.
-  for (unsigned int node_comm_step=0; node_comm_step<n_recv_node_pairs; node_comm_step++)
-    {
-      // but we don't necessarily want to impose an ordering, so
-      // just grab whatever message is next.
-      Parallel::Status status =
-	Parallel::recv (Parallel::any_source,
-			received_nodes,
-			packed_node_datatype,
-			/* tag = */ 0);
-      const unsigned int source_pid = status.source();
-      const unsigned int n_nodes_received =
-	recv_n_nodes_and_elem_per_proc[3*source_pid+0];
-      assert (n_nodes_received <= received_nodes.size());
-      assert (status.size() == n_nodes_received);
-      assert (recv_node_pair[source_pid]);
+    // We now know how many processors will be sending us nodes.
+    for (unsigned int node_comm_step=0; node_comm_step<n_recv_node_pairs; node_comm_step++)
+      {
+	// but we don't necessarily want to impose an ordering, so
+	// just grab whatever message is available next.
+	Parallel::Status status =
+	  Parallel::recv (Parallel::any_source,
+			  received_nodes,
+			  packed_node_datatype,
+			  /* tag = */ 0);
+	const unsigned int source_pid = status.source();
+	const unsigned int n_nodes_received =
+	  recv_n_nodes_and_elem_per_proc[5*source_pid+0];
+	assert (n_nodes_received <= received_nodes.size());
+	assert (status.size() == n_nodes_received);
+	assert (recv_node_pair[source_pid]);
+	
+	for (unsigned int n=0; n<n_nodes_received; n++)
+	  {
+	    Node *node = received_nodes[n].build_node().release();
+	    mesh.insert_node(node); // insert_node works even if the
+	  }                         // node already exists in the mesh,
+      }                             // in which case it overwrites (x,y,z)
+  }
 
-      for (unsigned int n=0; n<n_nodes_received; n++)
-	{
-	  Node *node = received_nodes[n].build_node().release();
-	  mesh.insert_node(node); // insert_node works even if the
-	}                         // node already exists in the mesh,
-    }                             // in which case it overwrites (x,y,z)
+  // Receive BCs for those nodes.
+  {
+    std::vector<int> received_node_bcs(max_node_bcs_received);
 
+    // again, receive all the messages in whatever order they come.
+    for (unsigned int node_comm_step=0; node_comm_step<n_recv_node_bc_pairs; node_comm_step++)
+      {
+	Parallel::Status status =
+	  Parallel::recv (Parallel::any_source,
+			  received_node_bcs,
+			  /* tag = */ 2);
+	const unsigned int source_pid = status.source();
+	assert (status.size() == recv_n_nodes_and_elem_per_proc[5*source_pid+3]);
+
+	const unsigned int buffer_size = status.size();
+	unsigned int cnt=0;
+
+	while (cnt < buffer_size)
+	  {
+	    const unsigned int node_id = received_node_bcs[cnt++];
+	    const int bc_id            = received_node_bcs[cnt++];
+
+	    assert (mesh.node_ptr(node_id));
+	    mesh.boundary_info->add_node (mesh.node_ptr(node_id), bc_id);
+	  }	
+      }
+  }
+
+
+  
   // Receive elements.  Size this array for the largest message.
-  std::vector<unsigned int> received_elements(max_conn_size_received);
+  {
+    std::vector<unsigned int> received_elements(max_conn_size_received);
 
-  // Similarly we know how many processors are sending us elements, 
-  // but we don't really care in what order we receive them.
-  for (unsigned int elem_comm_step=0; elem_comm_step<n_recv_elem_pairs; elem_comm_step++)
-    {
-      Parallel::Status status =
-	Parallel::recv (Parallel::any_source,
-			received_elements,
-			/* tag = */ 1);
-      const unsigned int source_pid = status.source();
-      const unsigned int n_elem_received = 
-	recv_n_nodes_and_elem_per_proc[3*source_pid+1];
-      assert (recv_elem_pair[source_pid]);
-      assert (recv_n_nodes_and_elem_per_proc[3*source_pid+2] 
-	      <= received_elements.size());
-      assert (recv_n_nodes_and_elem_per_proc[3*source_pid+2] 
-	      == status.size());
+    // Similarly we know how many processors are sending us elements, 
+    // but we don't really care in what order we receive them.
+    for (unsigned int elem_comm_step=0; elem_comm_step<n_recv_elem_pairs; elem_comm_step++)
+      {
+	Parallel::Status status =
+	  Parallel::recv (Parallel::any_source,
+			  received_elements,
+			  /* tag = */ 1);
+	const unsigned int source_pid = status.source();
+	const unsigned int n_elem_received = 
+	  recv_n_nodes_and_elem_per_proc[5*source_pid+1];
+	assert (recv_elem_pair[source_pid]);
+	assert (recv_n_nodes_and_elem_per_proc[5*source_pid+2] 
+		<= received_elements.size());
+	assert (recv_n_nodes_and_elem_per_proc[5*source_pid+2] 
+		== status.size());
 
-      // iterate through the input buffer and add the elements
-      const unsigned int xfer_buffer_size = status.size();
-      unsigned int cnt=0;
-      unsigned int current_elem=0;
-      while (cnt < xfer_buffer_size)
-	{
-	  // Unpack the element header
+	// iterate through the input buffer and add the elements
+	const unsigned int xfer_buffer_size = status.size();
+	unsigned int cnt=0;
+	unsigned int current_elem=0;
+	while (cnt < xfer_buffer_size)
+	  {
+	    // Unpack the element header
 #ifdef ENABLE_AMR
-	  const unsigned int elem_level  = received_elements[cnt++];
-	  const unsigned int p_level     = received_elements[cnt++];
-	  const Elem::RefinementState refinement_flag =
-	    static_cast<Elem::RefinementState>(received_elements[cnt++]);
-	  const Elem::RefinementState p_refinement_flag =
-	    static_cast<Elem::RefinementState>(received_elements[cnt++]);
+	    const unsigned int elem_level  = received_elements[cnt++];
+	    const unsigned int p_level     = received_elements[cnt++];
+	    const Elem::RefinementState refinement_flag =
+	      static_cast<Elem::RefinementState>(received_elements[cnt++]);
+	    const Elem::RefinementState p_refinement_flag =
+	      static_cast<Elem::RefinementState>(received_elements[cnt++]);
 #else
-	  const unsigned int elem_level = 0;
+	    const unsigned int elem_level = 0;
 #endif
-	  const ElemType elem_type       = static_cast<ElemType>(received_elements[cnt++]);
-	  const unsigned int elem_PID    = received_elements[cnt++];
-	  const int subdomain_ID         = received_elements[cnt++];
-	  const unsigned int self_ID     = received_elements[cnt++];
+	    const ElemType elem_type       = static_cast<ElemType>(received_elements[cnt++]);
+	    const unsigned int elem_PID    = received_elements[cnt++];
+	    const int subdomain_ID         = received_elements[cnt++];
+	    const unsigned int self_ID     = received_elements[cnt++];
 #ifdef ENABLE_AMR
-	  const int parent_ID            = received_elements[cnt++];
-	  const unsigned int which_child = received_elements[cnt++];
+	    const int parent_ID            = received_elements[cnt++];
+	    const unsigned int which_child = received_elements[cnt++];
 #endif
-
-	  // The ParallelMesh::elem(i) member will return NULL if the element
-	  // is not in the mesh.  We rely on that here, so it better not change!
-	  Elem *elem = mesh.elem(self_ID);
-
-	  // if we already have this element, make sure its properties match
-	  // but then go on
-	  if (elem)
-	    {
-	      assert (elem->level() == elem_level);
-	      assert (elem->id() == self_ID);
-	      assert (elem->processor_id() == elem_PID);
-	      assert (elem->subdomain_id() == subdomain_ID);
-	      assert (elem->type() == elem_type);
-#ifdef ENABLE_AMR
-	      assert (elem->p_level() == p_level);
-	      assert (elem->refinement_flag() == refinement_flag);
-	      assert (elem->p_refinement_flag() == p_refinement_flag);
-
-	      if (elem->level() > 0)
-		{
-		  assert (elem->parent()->id() == static_cast<unsigned int>(parent_ID));
-		  assert (elem->parent()->child(which_child) == elem);
-		}	      
-#endif
-	      assert (elem->n_nodes() == Elem::type_to_n_nodes_map[elem_type]);
-
-	      // skip the connectivity for this element
-	      cnt += elem->n_nodes();
-	    }
-	  else
-	    {
-	      // We need to add the element.
-#ifdef ENABLE_AMR
-	      // maybe find the parent
-	      if (elem_level > 0)
-		{
-		  Elem *parent = mesh.elem(parent_ID);
-
-		  // Note that we were very careful to construct the send connectivity
-		  // so that parents are encountered before children.  So if we get here
-		  // and can't find the parent that is a fatal error.
-		  if (parent == NULL)
-		    {
-		      std::cerr << "Parent element with ID " << parent_ID 
-				<< " not found." << std::endl; 
-		      error();
-		    }
-
-		  elem = Elem::build(elem_type, parent).release();
-		  assert (elem);
-		  parent->add_child(elem, which_child);
-		  assert (parent->type() == elem->type());
-		  assert (parent->child(which_child) == elem);
-		}
-	      else
-		{
-		  assert (parent_ID == -1);
-#endif // ENABLE_AMR
-		  elem = Elem::build(elem_type).release();
-		  assert (elem);
-#ifdef ENABLE_AMR
-		}
-		      
-	      // Assign the IDs
-	      elem->set_p_level(p_level);
-	      elem->set_refinement_flag(refinement_flag);
-	      elem->set_p_refinement_flag(p_refinement_flag);
-	      assert (elem->level() == static_cast<unsigned int>(elem_level));
-#endif
-	      elem->processor_id() = elem_PID;
-	      elem->subdomain_id() = subdomain_ID;
-	      elem->set_id()       = self_ID;
 	    
-	      // Assign the connectivity
-	      for (unsigned int n=0; n<elem->n_nodes(); n++)
-		{
-		  assert (cnt < received_elements.size());		  
-		  elem->set_node(n) = mesh.node_ptr (received_elements[cnt++]);
-		}
+	    // The ParallelMesh::elem(i) member will return NULL if the element
+	    // is not in the mesh.  We rely on that here, so it better not change!
+	    Elem *elem = mesh.elem(self_ID);
+	    
+	    // if we already have this element, make sure its properties match
+	    // but then go on
+	    if (elem)
+	      {
+		assert (elem->level() == elem_level);
+		assert (elem->id() == self_ID);
+		assert (elem->processor_id() == elem_PID);
+		assert (elem->subdomain_id() == subdomain_ID);
+		assert (elem->type() == elem_type);
+#ifdef ENABLE_AMR
+		assert (elem->p_level() == p_level);
+		assert (elem->refinement_flag() == refinement_flag);
+		assert (elem->p_refinement_flag() == p_refinement_flag);
+		
+		if (elem->level() > 0)
+		  {
+		    assert (elem->parent()->id() == static_cast<unsigned int>(parent_ID));
+		    assert (elem->parent()->child(which_child) == elem);
+		  }	      
+#endif
+		assert (elem->n_nodes() == Elem::type_to_n_nodes_map[elem_type]);
 	      
-	      // Good to go.  Add to the mesh.
-	      mesh.insert_elem(elem);
-	    }
-	  
-	  current_elem++;
-	}
-      assert (current_elem == n_elem_received);
-    }
+		// skip the connectivity for this element
+		cnt += elem->n_nodes();
+	      }
+	    else
+	      {
+		// We need to add the element.
+#ifdef ENABLE_AMR
+		// maybe find the parent
+		if (elem_level > 0)
+		  {
+		    Elem *parent = mesh.elem(parent_ID);
+		    
+		    // Note that we were very careful to construct the send connectivity
+		    // so that parents are encountered before children.  So if we get here
+		    // and can't find the parent that is a fatal error.
+		    if (parent == NULL)
+		      {
+			std::cerr << "Parent element with ID " << parent_ID 
+				  << " not found." << std::endl; 
+			error();
+		      }
+		    
+		    elem = Elem::build(elem_type, parent).release();
+		    assert (elem);
+		    parent->add_child(elem, which_child);
+		    assert (parent->type() == elem->type());
+		    assert (parent->child(which_child) == elem);
+		  }
+		else
+		  {
+		    assert (parent_ID == -1);
+#endif // ENABLE_AMR
+		    elem = Elem::build(elem_type).release();
+		    assert (elem);
+#ifdef ENABLE_AMR
+		  }
+		
+		// Assign the IDs
+		elem->set_p_level(p_level);
+		elem->set_refinement_flag(refinement_flag);
+		elem->set_p_refinement_flag(p_refinement_flag);
+		assert (elem->level() == static_cast<unsigned int>(elem_level));
+#endif
+		elem->processor_id() = elem_PID;
+		elem->subdomain_id() = subdomain_ID;
+		elem->set_id()       = self_ID;
+		
+		// Assign the connectivity
+		for (unsigned int n=0; n<elem->n_nodes(); n++)
+		  {
+		    assert (cnt < received_elements.size());		  
+		    elem->set_node(n) = mesh.node_ptr (received_elements[cnt++]);
+		  }
+		
+		// Good to go.  Add to the mesh.
+		mesh.insert_elem(elem);
+	      }
+	    
+	    current_elem++;
+	  }
+	assert (current_elem == n_elem_received);
+      }
+  }
+
+  // Receive boundary conditions for those elements
+  {
+    std::vector<int> received_element_bcs(max_elem_bcs_received);
+    
+    // again, receive all the messages in whatever order they come.
+    for (unsigned int elem_comm_step=0; elem_comm_step<n_recv_elem_bc_pairs; elem_comm_step++)
+      {
+	Parallel::Status status =
+	  Parallel::recv (Parallel::any_source,
+			  received_element_bcs,
+			  /* tag = */ 3);
+	const unsigned int source_pid = status.source();
+	assert (status.size() == recv_n_nodes_and_elem_per_proc[5*source_pid+4]);
+
+	const unsigned int buffer_size = status.size();
+	unsigned int cnt=0;
+
+	while (cnt < buffer_size)
+	  {
+	    const unsigned int elem_id = received_element_bcs[cnt++];
+	    const unsigned int side    = received_element_bcs[cnt++];
+	    const int bc_id            = received_element_bcs[cnt++];
+
+	    assert (mesh.elem(elem_id));
+	    mesh.boundary_info->add_side (mesh.elem(elem_id), side, bc_id);
+	  }
+      }    
+  }
 
   // Wait for all sends to complete
   Parallel::wait (node_send_requests);
+  Parallel::wait (node_bc_requests);
   Parallel::wait (element_send_requests);
-
+  Parallel::wait (element_bc_requests);
+  
   // unregister MPI datatypes
   MPI_Type_free (&packed_node_datatype);
   
   STOP_LOG("redistribute()","MeshCommunication");  
 }
 #endif // HAVE_MPI
+
+
+
+
+void MeshCommunication::broadcast (MeshBase& mesh) const
+{
+  // Don't need to do anything if there is
+  // only one processor.
+  if (libMesh::n_processors() == 1)
+    return;
+  
+  this->broadcast_mesh (mesh);
+  this->broadcast_bcs  (mesh, *(mesh.boundary_info));
+}
+
 
 
 #ifdef HAVE_MPI
