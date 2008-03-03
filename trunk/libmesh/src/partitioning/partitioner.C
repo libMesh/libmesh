@@ -34,7 +34,7 @@
 
 // ------------------------------------------------------------
 // Partitioner static data
-const unsigned int Partitioner::communication_blocksize = 100; //1000000;
+const unsigned int Partitioner::communication_blocksize = 1000000;
 
 
 
