@@ -542,15 +542,23 @@ dnl -------------------------------------------------------------
 dnl -------------------------------------------------------------
 dnl Compressed Files with bzip2
 dnl -------------------------------------------------------------
-dnl           Var   | look for | name if found | name if not | where
-AC_CHECK_PROG(BZIP2,  bzip2,      bzip2,           none,      $PATH)
-if test "$BZIP2" = bzip2; then
-    AC_CHECK_PROG(BUNZIP2,  bunzip2,     bunzip2,        none,      $PATH)
-    if test "$BUNZIP2" = bunzip2; then
-      AC_MSG_RESULT(<<< Using bzip2/bunzip2 for writing/reading compressed .bz2 files >>>)
-      AC_DEFINE(HAVE_BZIP, 1,
-                [Flag indicating bzip2/bunzip2 are available for handlingcompressed files])
-    fi
+AC_ARG_ENABLE(bzip2,
+              AC_HELP_STRING([--enable-bzip2],
+                             [build with bzip2 compressed I/O suppport]),
+              enablebz2=$enableval,
+              enablebz2=yes)
+
+if (test "$enablebz2" != no) ; then
+   dnl           Var   | look for | name if found | name if not | where
+   AC_CHECK_PROG(BZIP2,  bzip2,      bzip2,           none,      $PATH)
+   if test "$BZIP2" = bzip2; then
+       AC_CHECK_PROG(BUNZIP2,  bunzip2,     bunzip2,        none,      $PATH)
+       if test "$BUNZIP2" = bunzip2; then
+         AC_MSG_RESULT(<<< Using bzip2/bunzip2 for writing/reading compressed .bz2 files >>>)
+         AC_DEFINE(HAVE_BZIP, 1,
+                   [Flag indicating bzip2/bunzip2 are available for handlingcompressed files])
+       fi
+   fi
 fi
 dnl -------------------------------------------------------------
 
