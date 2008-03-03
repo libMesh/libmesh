@@ -51,6 +51,24 @@ namespace {
   // - If the library exhausts memory during IO you might reduce this parameter.
   
   const unsigned int io_blksize = 256000;
+
+
+  /**
+   * Comparison object to use with DofObject pointers.  This sorts by id(),
+   * so when we iterate over a set of DofObjects we visit the objects in
+   * order of increasing ID.
+   */
+  struct CompareDofObjectsByID
+  {
+    bool operator()(const DofObject *a,
+		    const DofObject *b) const
+    {
+      assert (a);
+      assert (b);
+
+      return a->id() < b->id();
+    }
+  };
 }
 
 
@@ -410,6 +428,34 @@ void System::read_parallel_data (Xdr &io,
    */ 
   assert (io.reading());
   assert (io.is_open());
+
+  // build the ordered nodes and element maps.
+  // when writing/reading parallel files we need to iterate
+  // over our nodes/elements in order of increasing global id().
+  // however, this is not guaranteed to be ordering we obtain
+  // by using the node_iterators/element_iterators directly.
+  // so build a set, sorted by id(), that provides the ordering.
+  // further, for memory economy build the set but then transfer
+  // its contents to vectors, which will be sorted.
+  std::vector<const DofObject*> ordered_nodes, ordered_elements;
+  {    
+    std::set<const DofObject*, CompareDofObjectsByID>
+      ordered_nodes_set (this->get_mesh().local_nodes_begin(),
+			 this->get_mesh().local_nodes_end());
+      
+      ordered_nodes.insert(ordered_nodes.end(),
+			   ordered_nodes_set.begin(),
+			   ordered_nodes_set.end());
+  }
+  {
+    std::set<const DofObject*, CompareDofObjectsByID>
+      ordered_elements_set (this->get_mesh().local_elements_begin(),
+			    this->get_mesh().local_elements_end());
+      
+      ordered_elements.insert(ordered_elements.end(),
+			      ordered_elements_set.begin(),
+			      ordered_elements_set.end());
+  }
   
   std::vector<Number> io_buffer;
   
@@ -418,7 +464,7 @@ void System::read_parallel_data (Xdr &io,
   // Actually read the solution components
   // for the ith system to disk
   io.data(io_buffer);
-	  
+  
   const unsigned int sys_num = this->number();
   const unsigned int n_vars  = this->n_vars();
 
@@ -428,36 +474,26 @@ void System::read_parallel_data (Xdr &io,
   for (unsigned int var=0; var<n_vars; var++)
     {
       // First read the node DOF values
-      {	
-	MeshBase::const_node_iterator
-	  it  = this->get_mesh().local_nodes_begin(),
-	  end = this->get_mesh().local_nodes_end();
-	
-	for (; it != end; ++it)
-	  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-	    {
-	      assert ((*it)->dof_number(sys_num, var, comp) !=
-		      DofObject::invalid_id);
-	      assert (cnt < io_buffer.size());
-	      this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
-	    }
-      }
+      for (std::vector<const DofObject*>::const_iterator
+	     it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
+	for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+	  {
+	    assert ((*it)->dof_number(sys_num, var, comp) !=
+		    DofObject::invalid_id);
+	    assert (cnt < io_buffer.size());
+	    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+	  }
 
       // Then read the element DOF values
-      {	
-	MeshBase::const_element_iterator
-	  it  = this->get_mesh().local_elements_begin(),
-	  end = this->get_mesh().local_elements_end();
-	
-	for (; it != end; ++it)
-	  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-	    {
-	      assert ((*it)->dof_number(sys_num, var, comp) !=
-		      DofObject::invalid_id);
-	      assert (cnt < io_buffer.size());
-	      this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
-	    }
-      }
+      for (std::vector<const DofObject*>::const_iterator
+	     it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
+	for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+	  {
+	    assert ((*it)->dof_number(sys_num, var, comp) !=
+		    DofObject::invalid_id);
+	    assert (cnt < io_buffer.size());
+	    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+	  }      
     }
   
   // Only read additional vectors if wanted  
@@ -481,36 +517,26 @@ void System::read_parallel_data (Xdr &io,
 	  for (unsigned int var=0; var<n_vars; var++)
 	    {
 	      // First read the node DOF values
-	      {	
-		MeshBase::const_node_iterator
-		  it  = this->get_mesh().local_nodes_begin(),
-		  end = this->get_mesh().local_nodes_end();
-		
-		for (; it != end; ++it)
-		  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-		    {
-		      assert ((*it)->dof_number(sys_num, var, comp) !=
-			      DofObject::invalid_id);
-		      assert (cnt < io_buffer.size());
-		      this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
-		    }
-	      }
+	      for (std::vector<const DofObject*>::const_iterator
+		     it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
+		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+		  {
+		    assert ((*it)->dof_number(sys_num, var, comp) !=
+			    DofObject::invalid_id);
+		    assert (cnt < io_buffer.size());
+		    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+		  }	     
 	      
 	      // Then read the element DOF values
-	      {	
-		MeshBase::const_element_iterator
-		  it  = this->get_mesh().local_elements_begin(),
-		  end = this->get_mesh().local_elements_end();
-		
-		for (; it != end; ++it)
-		  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-		    {
-		      assert ((*it)->dof_number(sys_num, var, comp) !=
-			      DofObject::invalid_id);
-		      assert (cnt < io_buffer.size());
-		      this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
-		    }
-	      }
+	      for (std::vector<const DofObject*>::const_iterator
+		     it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
+		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+		  {
+		    assert ((*it)->dof_number(sys_num, var, comp) !=
+			    DofObject::invalid_id);
+		    assert (cnt < io_buffer.size());
+		    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+		  }	      
 	    }
 	}
     }
@@ -1187,9 +1213,37 @@ void System::write_parallel_data (Xdr &io,
   std::string comment;
   
   assert (io.writing());
-  
+
   std::vector<Number> io_buffer; io_buffer.reserve(this->solution->local_size());
-	  
+
+  // build the ordered nodes and element maps.
+  // when writing/reading parallel files we need to iterate
+  // over our nodes/elements in order of increasing global id().
+  // however, this is not guaranteed to be ordering we obtain
+  // by using the node_iterators/element_iterators directly.
+  // so build a set, sorted by id(), that provides the ordering.
+  // further, for memory economy build the set but then transfer
+  // its contents to vectors, which will be sorted.
+  std::vector<const DofObject*> ordered_nodes, ordered_elements;
+  {    
+    std::set<const DofObject*, CompareDofObjectsByID>
+      ordered_nodes_set (this->get_mesh().local_nodes_begin(),
+			 this->get_mesh().local_nodes_end());
+      
+      ordered_nodes.insert(ordered_nodes.end(),
+			   ordered_nodes_set.begin(),
+			   ordered_nodes_set.end());
+  }
+  {
+    std::set<const DofObject*, CompareDofObjectsByID>
+      ordered_elements_set (this->get_mesh().local_elements_begin(),
+			    this->get_mesh().local_elements_end());
+      
+      ordered_elements.insert(ordered_elements.end(),
+			      ordered_elements_set.begin(),
+			      ordered_elements_set.end());
+  }
+  
   const unsigned int sys_num = this->number();
   const unsigned int n_vars  = this->n_vars();
   
@@ -1197,37 +1251,29 @@ void System::write_parallel_data (Xdr &io,
   for (unsigned int var=0; var<n_vars; var++)
     {
       // First write the node DOF values
-      {	
-	MeshBase::const_node_iterator
-	  it  = this->get_mesh().local_nodes_begin(),
-	  end = this->get_mesh().local_nodes_end();
-	
-	for (; it != end; ++it)
-	  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-	    {
-	      assert ((*it)->dof_number(sys_num, var, comp) !=
-		      DofObject::invalid_id);
-	      
-	      io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));
-	    }
-      }
+      for (std::vector<const DofObject*>::const_iterator
+	     it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)      
+	for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+	  {
+	    //std::cout << "(*it)->id()=" << (*it)->id() << std::endl;
+	    assert ((*it)->dof_number(sys_num, var, comp) !=
+		    DofObject::invalid_id);
+	    
+	    io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));
+	  }
 
       // Then write the element DOF values
-      {	
-	MeshBase::const_element_iterator
-	  it  = this->get_mesh().local_elements_begin(),
-	  end = this->get_mesh().local_elements_end();
-	
-	for (; it != end; ++it)
-	  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-	    {
-	      assert ((*it)->dof_number(sys_num, var, comp) !=
-		      DofObject::invalid_id);
+      for (std::vector<const DofObject*>::const_iterator
+	     it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
+	for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+	  {
+	    assert ((*it)->dof_number(sys_num, var, comp) !=
+		    DofObject::invalid_id);
 	      
-	      io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));    
-	    }
-      }
+	    io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));    
+	  }
     }
+  
   // 9.)
   //
   // Actually write the reordered solution vector 
@@ -1256,37 +1302,28 @@ void System::write_parallel_data (Xdr &io,
 	  for (unsigned int var=0; var<n_vars; var++)
 	    {
 	      // First write the node DOF values
-	      {	
-		MeshBase::const_node_iterator
-		  it  = this->get_mesh().local_nodes_begin(),
-		  end = this->get_mesh().local_nodes_end();
-	
-		for (; it != end; ++it)
-		  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-		    {
-		      assert ((*it)->dof_number(sys_num, var, comp) !=
-			      DofObject::invalid_id);
+	      for (std::vector<const DofObject*>::const_iterator
+		     it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)      
+		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+		  {
+		    assert ((*it)->dof_number(sys_num, var, comp) !=
+			    DofObject::invalid_id);
 		      
-		      io_buffer.push_back((*pos->second)((*it)->dof_number(sys_num, var, comp)));   
-		    }
-	      }
+		    io_buffer.push_back((*pos->second)((*it)->dof_number(sys_num, var, comp)));   
+		  }
 
 	      // Then write the element DOF values
-	      {	
-		MeshBase::const_element_iterator
-		  it  = this->get_mesh().local_elements_begin(),
-		  end = this->get_mesh().local_elements_end();
-	
-		for (; it != end; ++it)
-		  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-		    {
-		      assert ((*it)->dof_number(sys_num, var, comp) !=
-			      DofObject::invalid_id);
+	      for (std::vector<const DofObject*>::const_iterator
+		     it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
+		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+		  {
+		    assert ((*it)->dof_number(sys_num, var, comp) !=
+			    DofObject::invalid_id);
 	      
-		      io_buffer.push_back((*pos->second)((*it)->dof_number(sys_num, var, comp)));
-		    }
-	      }
+		    io_buffer.push_back((*pos->second)((*it)->dof_number(sys_num, var, comp)));
+		  }
 	    }
+	  
 	  // 10.)
 	  //
 	  // Actually write the reordered additional vector 
