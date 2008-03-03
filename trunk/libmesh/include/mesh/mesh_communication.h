@@ -156,7 +156,7 @@ private:
    * This includes all the information needed to rebuild the element
    * on a remote processor, including refinement state.
    */
-  void pack_element (std::vector<int> &conn, const Elem* &elem) const;
+  void pack_element (std::vector<int> &conn, const Elem* elem) const;
 
 //   /**
 //    * The processors who neighbor the current

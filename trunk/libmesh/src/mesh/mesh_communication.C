@@ -1622,7 +1622,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
 // [ level p_level r_flag p_flag etype subdomain_id 
 //   self_ID parent_ID which_child node_0 node_1 ... node_n]
 // We cannot use unsigned int because parent_ID can be negative
-void MeshCommunication::pack_element (std::vector<int> &conn, const Elem* const elem) const
+void MeshCommunication::pack_element (std::vector<int> &conn, const Elem* elem) const
 {
   assert (elem != NULL);
 
