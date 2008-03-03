@@ -91,8 +91,8 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
-   * Encapsulates the MPI_Status struct.  Allows the source of the message
-   * to be determined.
+   * Encapsulates the MPI_Status struct.  Allows the source and size 
+   * of the message to be determined.
    */
   class Status
   {
@@ -106,14 +106,29 @@ namespace Parallel
 
 #else
     
-    Status (const MPI_Status &mpi_status) : _status(mpi_status) {}
+    Status (const MPI_Status &mpi_status,
+	    const MPI_Datatype &data_type) :
+      _status(mpi_status),
+      _datatype(data_type)           
+    {}
 
     int source () const
-    { return _status.MPI_SOURCE; }    
-    
+    { 
+      return _status.MPI_SOURCE; 
+    }    
+  
+    unsigned int size () const
+    {
+      int msg_size;
+      MPI_Get_count (const_cast<MPI_Status*>(&_status), _datatype, &msg_size);
+      assert (msg_size >= 0);
+      return msg_size;
+    }
+
   private:
 
-    MPI_Status _status;
+    MPI_Status   _status;
+    MPI_Datatype _datatype;
 #endif
       
   };
@@ -728,7 +743,7 @@ namespace Parallel
     
     STOP_LOG("recv()", "Parallel");
 
-    return Status(status);
+    return Status(status, datatype<T>());
   }
 
 
@@ -755,7 +770,7 @@ namespace Parallel
     
     STOP_LOG("recv()", "Parallel");
 
-    return Status(status);
+    return Status(status, type);
   }
 
 
@@ -780,7 +795,7 @@ namespace Parallel
     
     STOP_LOG("recv()", "Parallel");
 
-    return Status(status);
+    return Status(status, datatype<T>());
   }
 
 
