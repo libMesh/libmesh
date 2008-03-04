@@ -43,12 +43,8 @@ class DofObject;
  *
  * This class is intended to be extremely lightweight.  To help acheive
  * this goal no \p std::vector<> or anything else that might be heavy
- * is used to store the degree of freedom indices.  If the library is
- * configured with \p --enable-expensive then there can be multiple
- * components in any variable, if the library is configured with
- * \p --disable-expensive then there can be at MOST one component
- * per variable, i.e n_comp(sys,var) <= 1.
- *
+ * is used to store the degree of freedom indices.
+ * 
  * \author Benjamin S. Kirk
  * \date 2003
  * \version $Revision$
@@ -468,7 +464,6 @@ bool DofObject::valid_id () const
 inline
 unsigned short int DofObject::processor_id () const
 {
-  assert (this->valid_processor_id());
   return _processor_id;
 }
 
