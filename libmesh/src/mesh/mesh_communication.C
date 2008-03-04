@@ -53,6 +53,7 @@ namespace {
   struct PackedNode
   {
     unsigned int id;
+    unsigned int pid;
     Real x;
     Real y;
     Real z;
@@ -66,6 +67,7 @@ namespace {
 
     PackedNode (const Node &node) :
       id(node.id()),
+      pid(node.processor_id()),
       x(node(0)),
       y(node(1)),
       z(node(2))
@@ -73,7 +75,9 @@ namespace {
 
     AutoPtr<Node> build_node () const
     {
-      return AutoPtr<Node>(new Node(x,y,z,id)); 
+      AutoPtr<Node> node(new Node(x,y,z,id));
+      node->processor_id() = pid;
+      return node;
     }
 
     Point build_point () const
@@ -89,12 +93,12 @@ namespace {
   {
     MPI_Datatype packed_node_type;
     MPI_Datatype types[] = { MPI_UNSIGNED, MPI_REAL };
-    int blocklengths[] = { 1, 3 };
+    int blocklengths[] = { 2, 3 };
     MPI_Aint displs[2];
     
     // create a Packed node and get the addresses of the elements.
-    // this will properly handle id getting padded, for example,
-    // in which case id and x may not be sizeof(unsigned int) apart.
+    // this will properly handle id/pid getting padded, for example,
+    // in which case id and x may not be 2*sizeof(unsigned int) apart.
     PackedNode pn;
 
     MPI_Address (&pn.id, &displs[0]);
