@@ -54,13 +54,13 @@ class MeshInput
    * Default constructor. Will set the _obj to NULL, effectively
    * rendering this object useless.
    */
-  MeshInput ();
+  MeshInput (bool is_parallel_format = false);
   
   /**
    * Constructor.  Takes a writeable reference to an object.
    * This is the constructor required to read an object.
    */
-  MeshInput (MT&);
+  MeshInput (MT&, const bool is_parallel_format = false);
   
  public:
 
@@ -98,6 +98,13 @@ class MeshInput
    * This allows us to read the object from file.
    */ 
   MT* _obj;
+
+  /**
+   * Flag specifying whether this format is parallel-capable.
+   * If this is false (default) I/O is only permitted when the mesh
+   * has been serialized.
+   */
+  const bool _is_parallel_format;
 };
 
 
@@ -106,8 +113,9 @@ class MeshInput
 // MeshInput inline members
 template <class MT>
 inline
-MeshInput<MT>::MeshInput () :
-  _obj (NULL)
+MeshInput<MT>::MeshInput (const bool is_parallel_format) :
+  _obj (NULL),
+  _is_parallel_format(is_parallel_format)
 {
 }
 
@@ -115,10 +123,11 @@ MeshInput<MT>::MeshInput () :
 
 template <class MT>
 inline
-MeshInput<MT>::MeshInput (MT& obj) :
-  _obj (&obj)
+MeshInput<MT>::MeshInput (MT& obj, const bool is_parallel_format) :
+  _obj (&obj),
+  _is_parallel_format(is_parallel_format)
 {
-  if (!this->mesh().is_serial())
+  if (!_is_parallel_format && !this->mesh().is_serial())
     {
       std::cerr << "ERROR:  This I/O operation is only supported for meshes which have been serialized!"
 		<< std::endl;

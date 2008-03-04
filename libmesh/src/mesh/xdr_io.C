@@ -114,8 +114,8 @@ const unsigned int XdrIO::io_blksize = 128000;
 // ------------------------------------------------------------
 // XdrIO members
 XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase>(mesh),
+  MeshInput<MeshBase> (mesh,/* is_parallel_format = */ true),
+  MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
   _binary             (binary),
   _legacy             (false),
   _version            ("libMesh-0.7.0+"),
@@ -129,7 +129,7 @@ XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
 
 
 XdrIO::XdrIO (const MeshBase& mesh, const bool binary) :
-  MeshOutput<MeshBase>(mesh),
+  MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
   _binary (binary)
 {
 }
