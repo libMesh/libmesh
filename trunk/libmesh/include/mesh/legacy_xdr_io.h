@@ -41,7 +41,7 @@ class MeshData;
 // ------------------------------------------------------------
 // LegacyXdrIO class definition
 class LegacyXdrIO : public MeshInput<MeshBase>,
-	      public MeshOutput<MeshBase>
+	            public MeshOutput<MeshBase>
 {
 
  public:

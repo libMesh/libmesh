@@ -55,13 +55,13 @@ class MeshOutput
    * Default constructor. Will set the _obj to NULL, effectively
    * rendering this object useless.
    */
-  MeshOutput ();
+  MeshOutput (const bool is_parallel_format = false);
   
   /**
    * Constructor.  Takes a reference to a constant object.
    * This constructor will only allow us to write the object.
    */
-  MeshOutput (const MT&);
+  MeshOutput (const MT&, const bool is_parallel_format = false);
 
   
  public:
@@ -111,6 +111,13 @@ class MeshOutput
   const MT* const _obj;
 
   /**
+   * Flag specifying whether this format is parallel-capable.
+   * If this is false (default) I/O is only permitted when the mesh
+   * has been serialized.
+   */
+  const bool _is_parallel_format;
+
+  /**
    * A helper function which allows us to fill temporary
    * name and solution vectors with an EquationSystems object
    */
@@ -125,10 +132,20 @@ class MeshOutput
 // MeshOutput inline members
 template <class MT>
 inline
-MeshOutput<MT>::MeshOutput (const MT& obj) :
-  _obj (&obj)
+MeshOutput<MT>::MeshOutput (const bool is_parallel_format) :
+  _obj(NULL),
+  _is_parallel_format(is_parallel_format)
+{}
+
+
+
+template <class MT>
+inline
+MeshOutput<MT>::MeshOutput (const MT& obj, const bool is_parallel_format) :
+  _obj (&obj),
+  _is_parallel_format(is_parallel_format)
 {
-  if (!this->mesh().is_serial())
+  if (!_is_parallel_format && !this->mesh().is_serial())
     {
       std::cerr << "ERROR:  This I/O operation is only supported for meshes which have been serialized!"
 		<< std::endl;
