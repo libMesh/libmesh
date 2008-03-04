@@ -173,8 +173,7 @@ public:
   /**
    * @returns the number of element-based boundary conditions.
    */
-  unsigned int n_boundary_conds () const
-  { return _boundary_side_id.size(); }
+  unsigned int n_boundary_conds () const;
   
   /**
    * Creates a list of nodes and ids for those nodes.

@@ -28,6 +28,9 @@
 #include "boundary_mesh.h"
 #include "elem.h"
 #include "mesh_data.h"
+#include "parallel.h"
+
+
 
 //------------------------------------------------------
 // BoundaryInfo static member initializations
@@ -351,6 +354,33 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
   // if we get here, we found elem in the data structure but not
   // the requested boundary id, so return the default value
   return libMesh::invalid_uint;  
+}
+
+
+
+unsigned int BoundaryInfo::n_boundary_conds () const
+{
+  // in serial we know the number of bcs from the
+  // size of the container
+  if (_mesh.is_serial())
+    return _boundary_side_id.size();
+
+  // in parallel we need to sum the number of local bcs
+  parallel_only();
+  
+  unsigned int nbcs=0;
+
+  std::multimap<const Elem*,
+                std::pair<unsigned short int,
+                          short int> >::const_iterator pos;
+
+  for (pos=_boundary_side_id.begin(); pos != _boundary_side_id.end(); ++pos)
+    if (pos->first->processor_id() == libMesh::processor_id())
+      nbcs++;
+  
+  Parallel::sum (nbcs);
+  
+  return nbcs;
 }
 
 
