@@ -114,6 +114,8 @@ void Partitioner::repartition (MeshBase& mesh,
 
 void Partitioner::single_partition (MeshBase& mesh)
 {
+  START_LOG("single_partition()","Partitioner");
+  
   // Loop over all the elements and assign them to processor 0.
   MeshBase::element_iterator       elem_it  = mesh.elements_begin();
   const MeshBase::element_iterator elem_end = mesh.elements_end(); 
@@ -127,6 +129,8 @@ void Partitioner::single_partition (MeshBase& mesh)
   
   for ( ; node_it != node_end; ++node_it)
     (*node_it)->processor_id() = 0;
+
+  STOP_LOG("single_partition()","Partitioner");
 }
 
 
