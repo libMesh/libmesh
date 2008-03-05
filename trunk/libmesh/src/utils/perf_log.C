@@ -437,29 +437,7 @@ void PerfLog::print_log() const
 void PerfLog::start_event(const std::string &label,
 			  const std::string &header)
 {
-  deprecated();
-  std::cout << "Use PerfLog::push()/PerfLog::pop()!"
-	    << std::endl;
-  
-  if (log_events)
-    {
-      // Get a reference to the event data to avoid
-      // repeated map lookups
-      PerfData& perf_data = log[std::make_pair(header,label)];
-      
-      // make sure we aren't currently
-      // monitoring this event      
-      if (perf_data.open)
-	{
-	  std::cerr << "ERROR logging event " << label << std::endl
-		    << "Did you forget to stop logging it?" << std::endl;
-	  error();
-	}
-
-      perf_data.open = true;
-      
-      gettimeofday (&perf_data.tstart, NULL);
-    }
+  this->push(label,header);
 }
 
 
@@ -467,102 +445,23 @@ void PerfLog::start_event(const std::string &label,
 void PerfLog::stop_event(const std::string &label,
 			 const std::string &header)
 {
-  deprecated();
-  std::cout << "Use PerfLog::push()/PerfLog::pop()!"
-	    << std::endl;
-  
-  if (log_events)
-    {
-      // Get a reference to the event data to avoid
-      // repeated map lookups
-      PerfData& perf_data = log[std::make_pair(header,label)];
-      
-      // make sure we are currently
-      // monitoring this event
-      if (!perf_data.open)
-	{
-	  std::cerr << "ERROR logging event " << label << std::endl
-		    << "Did you forget to start or restart it?" << std::endl;
-	  error();
-	}
-      
-      perf_data.open = false;
-      
-      struct timeval tstop;
-
-      gettimeofday (&tstop, NULL);
-
-      const double elapsed_time = (static_cast<double>(tstop.tv_sec  - perf_data.tstart.tv_sec) +
-				   static_cast<double>(tstop.tv_usec - perf_data.tstart.tv_usec)*1.e-6);      
-
-      total_time         += elapsed_time;
-      perf_data.tot_time += elapsed_time;
-      perf_data.count++;	 
-    }
+  this->pop(label,header);
 }
 
 
 
-void PerfLog::pause_event(const std::string &label,
-			  const std::string &header)
-{
-  deprecated();
-  std::cout << "Use PerfLog::push()/PerfLog::pop()!"
-	    << std::endl;
-  
-  if (log_events)
-    {
-      // Get a reference to the event data to avoid
-      // repeated map lookups
-      PerfData& perf_data = log[std::make_pair(header,label)];
-      
-      // make sure we are currently
-      // monitoring this event
-      if (!perf_data.open)
-	{
-	  std::cerr << "ERROR pausing event " << label << std::endl
-		    << "Did you forget to start logging it?" << std::endl;	  
-	  error();
-	}
-      
-      struct timeval tstop;
-
-      gettimeofday (&tstop, NULL);
-
-      const double elapsed_time = (static_cast<double>(tstop.tv_sec  - perf_data.tstart.tv_sec) +
-				   static_cast<double>(tstop.tv_usec - perf_data.tstart.tv_usec)*1.e-6);      
-
-      total_time         += elapsed_time;
-      perf_data.tot_time += elapsed_time;
-    }
+void PerfLog::pause_event(const std::string &,
+			  const std::string &)
+{  
+  // nothing to do.  pushing the next object on the stack will handle it
 }
 
 
 
-void PerfLog::restart_event(const std::string &label,
-			    const std::string &header)
+void PerfLog::restart_event(const std::string &,
+			    const std::string &)
 {
-  deprecated();
-  std::cout << "Use PerfLog::push()/PerfLog::pop()!"
-	    << std::endl;
-  
-  if (log_events)
-    {
-      // Get a reference to the event data to avoid
-      // repeated map lookups
-      PerfData& perf_data = log[std::make_pair(header,label)];
-      
-      // make sure we are currently
-      // monitoring this event
-      if (!perf_data.open)
-	{
-	  std::cerr << "ERROR restarting event " << label << std::endl
-		    << "Did you forget to start or pause it?" << std::endl;	  
-	  error();
-	}
-      
-      gettimeofday (&perf_data.tstart, NULL);
-    }
+  // nothing to do.  popping the top off the stack will handle it.
 }
 
 
