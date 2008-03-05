@@ -640,7 +640,7 @@ void assemble_laplace(EquationSystems& es,
       // Start logging the shape function initialization.
       // This is done through a simple function call with
       // the name of the event to log.
-      perf_log.start_event("elem init");      
+      perf_log.push("elem init");      
 
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
@@ -672,14 +672,14 @@ void assemble_laplace(EquationSystems& es,
       // Stop logging the shape function initialization.
       // If you forget to stop logging an event the PerfLog
       // object will probably catch the error and abort.
-      perf_log.stop_event("elem init");      
+      perf_log.pop("elem init");      
 
       // Now we will build the element matrix.  This involves
       // a double loop to integrate the test funcions (i) against
       // the trial functions (j).
       //
       // Now start logging the element matrix computation
-      perf_log.start_event ("Ke");
+      perf_log.push ("Ke");
 
       for (unsigned int qp=0; qp<qrule->n_points(); qp++)
         for (unsigned int i=0; i<dphi.size(); i++)
@@ -698,7 +698,7 @@ void assemble_laplace(EquationSystems& es,
           }
 
       // Stop logging the matrix computation
-      perf_log.stop_event ("Ke");
+      perf_log.pop ("Ke");
 
 
       // At this point the interior element integration has
@@ -714,7 +714,7 @@ void assemble_laplace(EquationSystems& es,
       // discretizations.
       {
         // Start logging the boundary condition computation
-        perf_log.start_event ("BCs");
+        perf_log.push ("BCs");
 
         // The penalty value.  
         const Real penalty = 1.e10;
@@ -746,7 +746,7 @@ void assemble_laplace(EquationSystems& es,
             } 
         
         // Stop logging the boundary condition computation
-        perf_log.stop_event ("BCs");
+        perf_log.pop ("BCs");
       } 
       
 
@@ -756,7 +756,7 @@ void assemble_laplace(EquationSystems& es,
       // and \p PetscVector::add_vector() members do this for us.
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
-      perf_log.start_event ("matrix insertion");
+      perf_log.push ("matrix insertion");
 
       dof_map.constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
       system.matrix->add_matrix (Ke, dof_indices);
@@ -764,7 +764,7 @@ void assemble_laplace(EquationSystems& es,
 
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
-      perf_log.stop_event ("matrix insertion");
+      perf_log.pop ("matrix insertion");
     }
 
   // That's it.  We don't need to do anything else to the

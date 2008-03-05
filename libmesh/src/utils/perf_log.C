@@ -437,6 +437,10 @@ void PerfLog::print_log() const
 void PerfLog::start_event(const std::string &label,
 			  const std::string &header)
 {
+  deprecated();
+  std::cout << "Use PerfLog::push()/PerfLog::pop()!"
+	    << std::endl;
+  
   if (log_events)
     {
       // Get a reference to the event data to avoid
@@ -463,6 +467,10 @@ void PerfLog::start_event(const std::string &label,
 void PerfLog::stop_event(const std::string &label,
 			 const std::string &header)
 {
+  deprecated();
+  std::cout << "Use PerfLog::push()/PerfLog::pop()!"
+	    << std::endl;
+  
   if (log_events)
     {
       // Get a reference to the event data to avoid
@@ -498,6 +506,10 @@ void PerfLog::stop_event(const std::string &label,
 void PerfLog::pause_event(const std::string &label,
 			  const std::string &header)
 {
+  deprecated();
+  std::cout << "Use PerfLog::push()/PerfLog::pop()!"
+	    << std::endl;
+  
   if (log_events)
     {
       // Get a reference to the event data to avoid
@@ -530,6 +542,10 @@ void PerfLog::pause_event(const std::string &label,
 void PerfLog::restart_event(const std::string &label,
 			    const std::string &header)
 {
+  deprecated();
+  std::cout << "Use PerfLog::push()/PerfLog::pop()!"
+	    << std::endl;
+  
   if (log_events)
     {
       // Get a reference to the event data to avoid

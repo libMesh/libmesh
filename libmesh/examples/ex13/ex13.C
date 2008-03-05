@@ -195,9 +195,9 @@ int main (int argc, char** argv)
           last_nonlinear_soln->add(*navier_stokes_system.solution);
           
           // Assemble & solve the linear system.
-          perf_log.start_event("linear solve");
+          perf_log.push("linear solve");
           equation_systems.get_system("Navier-Stokes").solve();
-          perf_log.stop_event("linear solve");
+          perf_log.pop("linear solve");
 
           // Compute the difference between this solution and the last
           // nonlinear iterate.
