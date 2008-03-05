@@ -32,6 +32,7 @@
 
 // Local includes
 #include "libmesh_config.h"
+#include "libmesh_logging.h"
 #include "gmv_io.h"
 #include "mesh_base.h"
 #include "elem.h"
