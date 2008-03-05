@@ -235,11 +235,15 @@ void GMVIO::write_nodal_data (const std::string& fname,
                               const std::vector<Number>& soln,
                               const std::vector<std::string>& names)
 {
+  START_LOG("write_nodal_data()", "GMVIO");
+
   if (libMesh::processor_id() == 0)
     if (this->binary())
       this->write_binary (fname, &soln, &names);
     else
       this->write_ascii_old_impl  (fname, &soln, &names);
+
+  STOP_LOG("write_nodal_data()", "GMVIO");
 }
 
 
