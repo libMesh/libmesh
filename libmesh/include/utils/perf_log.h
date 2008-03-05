@@ -29,6 +29,7 @@
 
 // C++ includes
 #include <string>
+#include <stack>
 #include <map>
 #include <sys/time.h>
 
@@ -57,9 +58,11 @@ class PerfData
   PerfData () :
     tot_time(0.),
     count(0),
-    open(false)
+    open(false),
+    called_recursively(0)
     {}
 
+  
   /**
    * Total time spent in this event.
    */
@@ -83,6 +86,14 @@ class PerfData
    * be true while the event is executing.
    */
   bool open;
+
+  void   start ();
+  void   restart ();
+  double pause ();
+  double stopit ();
+    
+  int called_recursively;
+    
 };
 
 
@@ -138,6 +149,19 @@ class PerfLog
    */
   void enable_logging() { log_events = true; }
 
+
+  /**
+   * Push the event \p label onto the stack, pausing any active event.
+   */
+  void push (const std::string &label,
+	     const std::string &header="");
+  
+  /**
+   * Pop the event \p label off the stack, resuming any lower event.
+   */
+  void pop (const std::string &label,
+	    const std::string &header="");
+  
   /**
    * Start monitoring the event named \p label.
    */
@@ -213,13 +237,18 @@ class PerfLog
    * The time we were constructed or last cleared.
    */
   struct timeval tstart;
-
+  
   /**
    * The actual log.
    */
   std::map<std::pair<std::string,
 		     std::string>,
 	   PerfData> log;
+
+  /**
+   * A stack to hold the current performance log trace.
+   */
+  std::stack<PerfData*> log_stack;
   
   /**
    * Flag indicating if print_log() has been called.
@@ -227,7 +256,7 @@ class PerfLog
    * data the first time that print_log() is called.
    */
   static bool called;
-
+  
   /**
    * Prints a line of 'n' repeated characters 'c'
    * to the output string stream "out".
@@ -240,7 +269,101 @@ class PerfLog
 
 
 // ------------------------------------------------------------
+// PerfData class member funcions
+inline
+void PerfData::start ()
+{
+  this->count++;
+  this->called_recursively++;
+  gettimeofday (&(this->tstart), NULL);
+}
+
+
+
+inline
+void PerfData::restart ()
+{
+  gettimeofday (&(this->tstart), NULL);
+}
+
+
+
+inline
+double PerfData::pause ()
+{
+  // save the start times, reuse the structure we have rather than create
+  // a new one.
+  const double
+    tstart_tv_sec  = this->tstart.tv_sec,
+    tstart_tv_usec = this->tstart.tv_usec;
+  
+  gettimeofday (&(this->tstart), NULL);
+  
+  const double elapsed_time = (static_cast<double>(this->tstart.tv_sec  - tstart_tv_sec) +
+			       static_cast<double>(this->tstart.tv_usec - tstart_tv_usec)*1.e-6);      
+  
+  this->tot_time += elapsed_time;
+
+  return elapsed_time;
+}
+
+
+inline
+double PerfData::stopit ()
+{
+  // stopit is just like pause except decriments the 
+  // recursive call counter
+  
+  this->called_recursively--;
+  return this->pause();
+}
+
+
+
+// ------------------------------------------------------------
 // PerfLog class inline member funcions
+inline
+void PerfLog::push (const std::string &label,
+		    const std::string &header)
+{
+  if (this->log_events)
+    {
+      // Get a reference to the event data to avoid
+      // repeated map lookups
+      PerfData *perf_data = &(log[std::make_pair(header,label)]);
+
+      if (!log_stack.empty())
+	total_time += 
+	  log_stack.top()->pause();
+      
+      perf_data->start();
+      log_stack.push(perf_data);
+    }
+}
+
+
+
+inline
+void PerfLog::pop (const std::string &label,
+		   const std::string &header)
+{
+  if (this->log_events)
+    {
+      assert (!log_stack.empty());
+
+#ifndef NDEBUG
+      PerfData *perf_data = &(log[std::make_pair(header,label)]);
+      assert (perf_data == log_stack.top());
+#endif
+
+      total_time += log_stack.top()->stopit();
+
+      log_stack.pop();
+
+      if (!log_stack.empty())
+	log_stack.top()->restart();
+    }
+}
 
 // Typedefs we might need
 #ifdef HAVE_LOCALE

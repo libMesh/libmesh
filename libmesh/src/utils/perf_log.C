@@ -34,7 +34,6 @@
 
 
 
-
 // ------------------------------------------------------------
 // PerfLog class member funcions
 
@@ -48,7 +47,7 @@ PerfLog::PerfLog(const std::string& ln,
   total_time(0.)
 {
   if (log_events)
-    clear();
+    this->clear();
 }
 
 
@@ -56,7 +55,7 @@ PerfLog::PerfLog(const std::string& ln,
 PerfLog::~PerfLog()
 {
   if (log_events)
-    print_log();
+    this->print_log();
 }
 
 
@@ -83,6 +82,9 @@ void PerfLog::clear()
       gettimeofday (&tstart, NULL);
   
       log.clear();
+
+      while (!log_stack.empty())
+	log_stack.pop();
     }
 }
 
