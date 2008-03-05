@@ -1213,14 +1213,14 @@ namespace Parallel
 	return;
       }
     
-    START_LOG("gather()", "Parallel");
-    
     std::vector<int>
       sendlengths  (libMesh::n_processors(), 0),
       displacements(libMesh::n_processors(), 0);
 
     const int mysize = r.size();
     Parallel::allgather(mysize, sendlengths);
+    
+    START_LOG("gather()", "Parallel");
 
     // Find the total size of the final array and
     // set up the displacement offsets for each processor.
@@ -1270,14 +1270,14 @@ namespace Parallel
 	return;
       }
     
-    START_LOG("gather()", "Parallel");
-    
     std::vector<int>
       sendlengths  (libMesh::n_processors(), 0),
       displacements(libMesh::n_processors(), 0);
 
     const int mysize = r.size() * 2;
     Parallel::allgather(mysize, sendlengths);
+    
+    START_LOG("gather()", "Parallel");
 
     // Find the total size of the final array and
     // set up the displacement offsets for each processor.
@@ -1319,6 +1319,7 @@ namespace Parallel
   inline void allgather(T send,
 			std::vector<T> &recv)
   {
+    START_LOG ("allgather()","Parallel");
     //assert(recv.size() == libMesh::n_processors());
     recv.resize(libMesh::n_processors());
     
@@ -1334,6 +1335,8 @@ namespace Parallel
       }
     else
       recv[0] = send;
+
+    STOP_LOG ("allgather()","Parallel");
   }
 
 
@@ -1342,6 +1345,7 @@ namespace Parallel
   inline void allgather(std::complex<T> send,
 			std::vector<std::complex<T> > &recv)
   {
+    START_LOG ("allgather()","Parallel");
     //assert(recv.size() == libMesh::n_processors());
     recv.resize(libMesh::n_processors());
 
@@ -1356,6 +1360,8 @@ namespace Parallel
       }
     else
       recv[0] = send;
+
+    STOP_LOG ("allgather()","Parallel");
   }
   
 
