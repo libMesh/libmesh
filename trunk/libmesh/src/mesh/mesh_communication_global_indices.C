@@ -537,9 +537,9 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
   // (3) get the min/max value on each processor
   // (4) determine the position in the global ranking for
   //     each local object
-
   index_map.clear();
-  
+  index_map.reserve(std::distance (begin, end));
+
   // Set up a derived MPI datatype to handle communication of HilbertIndices
   MPI_Datatype hilbert_type;
   MPI_Type_contiguous (3, MPI_UNSIGNED, &hilbert_type);
@@ -560,45 +560,47 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 	if ((*it)->processor_id() == DofObject::invalid_processor_id)
 	  hilbert_keys.push_back(get_hilbert_index (*it, bbox));
   }
-
+  
   //-------------------------------------------------------------
   // (2) parallel sort the Hilbert keys
+  PAUSE_LOG ("find_global_indices()", "MeshCommunication");
+  START_LOG ("parallel_sort()", "MeshCommunication");  
   Parallel::Sort<Hilbert::HilbertIndices> sorter (hilbert_keys);
   sorter.sort(); 
-    
+  STOP_LOG ("parallel_sort()", "MeshCommunication");
+  RESTART_LOG ("find_global_indices()", "MeshCommunication");
   const std::vector<Hilbert::HilbertIndices> &my_bin = sorter.bin();
+
+  // The number of objects in my_bin on each processor
+  std::vector<unsigned int> bin_sizes(libMesh::n_processors());
+  Parallel::allgather (static_cast<unsigned int>(my_bin.size()), bin_sizes);
+    
+  // The offset of my first global index
+  unsigned int my_offset = 0;
+  for (unsigned int pid=0; pid<libMesh::processor_id(); pid++)
+    my_offset += bin_sizes[pid];
   
   //-------------------------------------------------------------
   // (3) get the max value on each processor
   std::vector<Hilbert::HilbertIndices>    
     upper_bounds(libMesh::n_processors());
-
-  { // limit scope of temporaries
-    std::vector<Hilbert::HilbertIndices> recvbuf(libMesh::n_processors());
-    std::vector<unsigned short int> /* do not use a vector of bools here since it is not always so! */
-      empty_bin (libMesh::n_processors());
+    
+  // limit scope of temporaries
+  {
     Hilbert::HilbertIndices my_max;
     
-    Parallel::allgather (static_cast<unsigned short int>(my_bin.empty()), empty_bin);
-     	       
     if (!my_bin.empty()) my_max = my_bin.back();
-
-    MPI_Allgather (&my_max,      1, hilbert_type,
-		   &recvbuf[0], 1, hilbert_type,
+    
+    MPI_Allgather (&my_max,          1, hilbert_type,
+		   &upper_bounds[0], 1, hilbert_type,
 		   libMesh::COMM_WORLD);
 
     // Be cereful here.  The *_upper_bounds will be used to find the processor
     // a given object belongs to.  So, if a processor contains no objects (possible!)
     // then copy the bound from the lower processor id.
-    for (unsigned int p=0; p<libMesh::n_processors(); p++)
-      {
-	upper_bounds[p] = recvbuf[p];
-
-	if (p > 0) // default hilbert index value is the OK upper bound for processor 0.
-	  if (empty_bin[p]) upper_bounds[p] = upper_bounds[p-1];
-      }
+    for (unsigned int p=1; p<libMesh::n_processors(); p++)
+      if (!bin_sizes[p]) upper_bounds[p] = upper_bounds[p-1];
   }
-
 
 
   //-------------------------------------------------------------
@@ -629,18 +631,15 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 	assert (pid < libMesh::n_processors());
 
 	requested_ids[pid].push_back(hi);
+
+	// go ahead and put pid in index_map, that way we 
+	// don't have to repeat the std::lower_bound()
+	index_map.push_back(pid);
       }
 
-    // The number of objects in my_bin on each processor
-    std::vector<unsigned int> bin_sizes(libMesh::n_processors());
-    Parallel::allgather (static_cast<unsigned int>(my_bin.size()), bin_sizes);
-    
-    // The offset of my first global index
-    unsigned int my_offset = 0;
-    for (unsigned int pid=0; pid<libMesh::processor_id(); pid++)
-      my_offset += bin_sizes[pid];
-
     // start with pid=0, so that we will trade with ourself
+    std::vector<Hilbert::HilbertIndices> request_to_fill;
+    std::vector<unsigned int> global_ids;
     for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
       {
 	// Trade my requests with processor procup and procdown
@@ -650,13 +649,12 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
                                        libMesh::processor_id() - pid) %
                                        libMesh::n_processors();
 
-	std::vector<Hilbert::HilbertIndices> request_to_fill;
 	Parallel::send_receive(procup, requested_ids[procup],
 			       procdown, request_to_fill,
 			       hilbert_type);	  
 
 	// Fill the requests
-	std::vector<unsigned int> global_ids; /**/ global_ids.reserve(request_to_fill.size());
+	global_ids.clear(); /**/ global_ids.reserve(request_to_fill.size());
 	for (unsigned int idx=0; idx<request_to_fill.size(); idx++)
 	  {
 	    const Hilbert::HilbertIndices &hi = request_to_fill[idx];
@@ -686,22 +684,26 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
       for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 	next_obj_on_proc.push_back(filled_request[pid].begin());
       
-      for (ForwardIterator it = begin; it != end; ++it)
+      unsigned int cnt=0;
+      for (ForwardIterator it = begin; it != end; ++it, cnt++)
 	{
 	  const Hilbert::HilbertIndices hi = 
 	    get_hilbert_index (*it, bbox);
-	  const unsigned int pid = 
-	    std::distance (upper_bounds.begin(), 
-			   std::lower_bound(upper_bounds.begin(), 
-					    upper_bounds.end(),
-					    hi));
+// 	  const unsigned int pid = 
+// 	    std::distance (upper_bounds.begin(), 
+// 			   std::lower_bound(upper_bounds.begin(), 
+// 					    upper_bounds.end(),
+// 					    hi));
+
+	  const unsigned int pid = index_map[cnt];
 	  
 	  assert (pid < libMesh::n_processors());
 	  assert (next_obj_on_proc[pid] != filled_request[pid].end());
 	  
 	  const unsigned int global_index = *next_obj_on_proc[pid];
-	  index_map.push_back(global_index);
-	  
+// 	  index_map.push_back(global_index);
+	  index_map[cnt] = global_index;
+
 	  ++next_obj_on_proc[pid];
 	}
     }
