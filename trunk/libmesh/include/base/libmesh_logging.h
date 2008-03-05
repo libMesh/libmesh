@@ -34,14 +34,10 @@
 
 // Note the log is in libMesh, so we need to include it.
 #  include "libmesh.h"
-// #  define START_LOG(a,b)   { libMesh::perflog.start_event(a,b); }
-// #  define STOP_LOG(a,b)    { libMesh::perflog.stop_event(a,b); }
-// #  define PAUSE_LOG(a,b)   { libMesh::perflog.pause_event(a,b); }
-// #  define RESTART_LOG(a,b) { libMesh::perflog.restart_event(a,b); }
 #  define START_LOG(a,b)   { libMesh::perflog.push(a,b); }
 #  define STOP_LOG(a,b)    { libMesh::perflog.pop(a,b); }
-#  define PAUSE_LOG(a,b)   { /* libMesh::perflog.pause_event(a,b); */ } 
-#  define RESTART_LOG(a,b) { /* libMesh::perflog.restart_event(a,b); */ }
+#  define PAUSE_LOG(a,b)   { deprecated(); }
+#  define RESTART_LOG(a,b) { deprecated{}; }
 
 #else
 

@@ -59,9 +59,7 @@ Real NewtonSolver::line_search(Real tol,
                   << bx << std::endl;
 
       // Check residual with fractional Newton step
-      PAUSE_LOG("solve()", "NewtonSolver");
       _system.assembly (true, false);
-      RESTART_LOG("solve()", "NewtonSolver");
 
       rhs.close();
       current_residual = rhs.l2_norm();
@@ -166,9 +164,7 @@ Real NewtonSolver::line_search(Real tol,
         std::cout << "  Shrinking Newton step to "
                   << bx << std::endl;
 
-      PAUSE_LOG("solve()", "NewtonSolver");
       _system.assembly (true, false);
-      RESTART_LOG("solve()", "NewtonSolver");
 
       rhs.close();
       Real fu = rhs.l2_norm();
@@ -276,9 +272,7 @@ unsigned int NewtonSolver::solve()
       if (!quiet)
         std::cout << "Assembling System" << std::endl;
 
-      PAUSE_LOG("solve()", "NewtonSolver");
       _system.assembly(true, true);
-      RESTART_LOG("solve()", "NewtonSolver");
       rhs.close();
       Real current_residual = rhs.l2_norm();
       last_residual = current_residual;
@@ -328,7 +322,6 @@ unsigned int NewtonSolver::solve()
         std::cout << "Linear solve starting, tolerance " 
                   << current_linear_tolerance << std::endl;
 
-      PAUSE_LOG("solve()", "NewtonSolver");
       // Solve the linear system.  Two cases:
       const std::pair<unsigned int, Real> rval =
         (_system.have_matrix("Preconditioner")) ?
@@ -342,7 +335,6 @@ unsigned int NewtonSolver::solve()
                               max_linear_iterations);
       // We may need to localize a parallel solution
       _system.update ();
-      RESTART_LOG("solve()", "NewtonSolver");
       // The linear solver may not have fit our constraints exactly
 #ifdef ENABLE_AMR
       _system.get_dof_map().enforce_constraints_exactly(_system, &linear_solution);
@@ -370,9 +362,7 @@ unsigned int NewtonSolver::solve()
       newton_iterate.close();
 
       // Check residual with full Newton step
-      PAUSE_LOG("solve()", "NewtonSolver");
       _system.assembly(true, false);
-      RESTART_LOG("solve()", "NewtonSolver");
 
       rhs.close();
       current_residual = rhs.l2_norm();

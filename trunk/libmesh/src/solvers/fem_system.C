@@ -623,14 +623,12 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
       // Initialize all the interior FE objects on elem.
       // Logging of FE::reinit is done in the FE functions
-      PAUSE_LOG(log_name, "FEMSystem");
       std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
       for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
            i != fe_end; ++i)
         {
           i->second->reinit(elem);
         }
-      RESTART_LOG(log_name, "FEMSystem");
       
       bool jacobian_computed = time_solver->element_residual(get_jacobian);
 
@@ -640,9 +638,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
           // Make sure we didn't compute a jacobian and lie about it
           assert(elem_jacobian.l1_norm() == 0.0);
           // Logging of numerical jacobians is done separately
-          PAUSE_LOG(log_name, "FEMSystem");
           this->numerical_elem_jacobian();
-          RESTART_LOG(log_name, "FEMSystem");
         }
 
       // Compute a numeric jacobian if we're asked to verify the
@@ -654,9 +650,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
           elem_jacobian.zero();
           // Logging of numerical jacobians is done separately
-          PAUSE_LOG(log_name, "FEMSystem");
           this->numerical_elem_jacobian();
-          RESTART_LOG(log_name, "FEMSystem");
 
           Real analytic_norm = analytic_jacobian.l1_norm();
           Real numerical_norm = elem_jacobian.l1_norm();
@@ -699,14 +693,12 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
           // Initialize all the interior FE objects on elem/side.
           // Logging of FE::reinit is done in the FE functions
-          PAUSE_LOG(log_name, "FEMSystem");
           fe_end = side_fe.end();
           for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
                i != fe_end; ++i)
             {
               i->second->reinit(elem, side);
             }
-          RESTART_LOG(log_name, "FEMSystem");
 
           DenseMatrix<Number> old_jacobian;
           // If we're in DEBUG mode, we should always verify that the
@@ -734,9 +726,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               assert(elem_jacobian.l1_norm() == 0.0);
 #endif
               // Logging of numerical jacobians is done separately
-              PAUSE_LOG(log_name, "FEMSystem");
               this->numerical_side_jacobian();
-              RESTART_LOG(log_name, "FEMSystem");
 
               // If we're in DEBUG mode or if
 	      // verify_analytic_jacobians is on, we've moved
@@ -757,9 +747,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
               elem_jacobian.zero();
               // Logging of numerical jacobians is done separately
-              PAUSE_LOG(log_name, "FEMSystem");
               this->numerical_side_jacobian();
-              RESTART_LOG(log_name, "FEMSystem");
 
               Real analytic_norm = analytic_jacobian.l1_norm();
               Real numerical_norm = elem_jacobian.l1_norm();
@@ -927,14 +915,12 @@ void FEMSystem::postprocess ()
       // Logging of FE::reinit is done in the FE functions
       if (fe_reinit_during_postprocess)
         {
-          PAUSE_LOG("postprocess()", "FEMSystem");
           std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
           for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
                i != fe_end; ++i)
             {
               i->second->reinit(elem);
             }
-          RESTART_LOG("postprocess()", "FEMSystem");
         }
       
       this->element_postprocess();
@@ -951,7 +937,6 @@ void FEMSystem::postprocess ()
           // Logging of FE::reinit is done in the FE functions
           if (fe_reinit_during_postprocess)
             {
-              PAUSE_LOG("postprocess()", "FEMSystem");
               std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
               fe_end = side_fe.end();
               for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
@@ -959,7 +944,6 @@ void FEMSystem::postprocess ()
                 {
                   i->second->reinit(elem, side);
                 }
-              RESTART_LOG("postprocess()", "FEMSystem");
             }
 
           this->side_postprocess();

@@ -563,12 +563,10 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
   
   //-------------------------------------------------------------
   // (2) parallel sort the Hilbert keys
-  PAUSE_LOG ("find_global_indices()", "MeshCommunication");
   START_LOG ("parallel_sort()", "MeshCommunication");  
   Parallel::Sort<Hilbert::HilbertIndices> sorter (hilbert_keys);
   sorter.sort(); 
   STOP_LOG ("parallel_sort()", "MeshCommunication");
-  RESTART_LOG ("find_global_indices()", "MeshCommunication");
   const std::vector<Hilbert::HilbertIndices> &my_bin = sorter.bin();
 
   // The number of objects in my_bin on each processor
