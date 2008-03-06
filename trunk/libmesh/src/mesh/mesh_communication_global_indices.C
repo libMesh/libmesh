@@ -548,23 +548,36 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 
   //-------------------------------------------------------------
   // (1) compute Hilbert keys
-  std::vector<Hilbert::HilbertIndices> hilbert_keys;
+  // These aren't trivial to compute, and we will need them again.
+  // But the binsort will sort the input vector, trashing the order
+  // that we'd like to rely on.  So, two vectors...
+  std::vector<Hilbert::HilbertIndices> 
+    sorted_hilbert_keys,
+    hilbert_keys;
+  sorted_hilbert_keys.reserve(index_map.capacity());
+  hilbert_keys.reserve(index_map.capacity());
   {
+    START_LOG("compute_hilbert_indices()", "MeshCommunication");
     for (ForwardIterator it=begin; it!=end; ++it)
-      if ((*it)->processor_id() == libMesh::processor_id())
-	hilbert_keys.push_back(get_hilbert_index (*it, bbox));
-    
-    // someone needs to take care of unpartitioned objects!
-    if (libMesh::processor_id() == 0)
-      for (ForwardIterator it=begin; it!=end; ++it)
-	if ((*it)->processor_id() == DofObject::invalid_processor_id)
-	  hilbert_keys.push_back(get_hilbert_index (*it, bbox));
+      {
+	const Hilbert::HilbertIndices hi(get_hilbert_index (*it, bbox));
+	hilbert_keys.push_back(hi);
+	
+	if ((*it)->processor_id() == libMesh::processor_id())
+	  sorted_hilbert_keys.push_back(hi);
+
+	// someone needs to take care of unpartitioned objects!
+	if ((libMesh::processor_id() == 0) &&
+	    ((*it)->processor_id() == DofObject::invalid_processor_id))
+	  sorted_hilbert_keys.push_back(hi);
+      }    
+    STOP_LOG("compute_hilbert_indices()", "MeshCommunication");
   }
   
   //-------------------------------------------------------------
   // (2) parallel sort the Hilbert keys
   START_LOG ("parallel_sort()", "MeshCommunication");  
-  Parallel::Sort<Hilbert::HilbertIndices> sorter (hilbert_keys);
+  Parallel::Sort<Hilbert::HilbertIndices> sorter (sorted_hilbert_keys);
   sorter.sort(); 
   STOP_LOG ("parallel_sort()", "MeshCommunication");
   const std::vector<Hilbert::HilbertIndices> &my_bin = sorter.bin();
@@ -616,20 +629,23 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
       filled_request (libMesh::n_processors());
 
     // build up list of requests
+    std::vector<Hilbert::HilbertIndices>::const_iterator hi = 
+      hilbert_keys.begin();
+
     for (ForwardIterator it = begin; it != end; ++it)
       {
-	const Hilbert::HilbertIndices hi = 
-	  get_hilbert_index (*it, bbox);
+	assert (hi != hilbert_keys.end());
 	const unsigned int pid = 
 	  std::distance (upper_bounds.begin(), 
 			 std::lower_bound(upper_bounds.begin(), 
 					  upper_bounds.end(),
-					  hi));
+					  *hi));
 
 	assert (pid < libMesh::n_processors());
 
-	requested_ids[pid].push_back(hi);
+	requested_ids[pid].push_back(*hi);
 
+	hi++;
 	// go ahead and put pid in index_map, that way we 
 	// don't have to repeat the std::lower_bound()
 	index_map.push_back(pid);
@@ -685,21 +701,12 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
       unsigned int cnt=0;
       for (ForwardIterator it = begin; it != end; ++it, cnt++)
 	{
-	  const Hilbert::HilbertIndices hi = 
-	    get_hilbert_index (*it, bbox);
-// 	  const unsigned int pid = 
-// 	    std::distance (upper_bounds.begin(), 
-// 			   std::lower_bound(upper_bounds.begin(), 
-// 					    upper_bounds.end(),
-// 					    hi));
-
 	  const unsigned int pid = index_map[cnt];
 	  
 	  assert (pid < libMesh::n_processors());
 	  assert (next_obj_on_proc[pid] != filled_request[pid].end());
 	  
 	  const unsigned int global_index = *next_obj_on_proc[pid];
-// 	  index_map.push_back(global_index);
 	  index_map[cnt] = global_index;
 
 	  ++next_obj_on_proc[pid];
