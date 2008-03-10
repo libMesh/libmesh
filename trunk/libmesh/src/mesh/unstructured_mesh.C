@@ -51,7 +51,9 @@
 #include "legacy_xdr_io.h"
 #include "vtk_io.h"
 
-#if   defined(HAVE_HASH_MAP)
+#if   defined(HAVE_UNORDERED_MAP)
+# include <tr1/unordered_map>
+#elif defined(HAVE_HASH_MAP)
 # include <hash_map>
 #elif defined(HAVE_EXT_HASH_MAP)
 # include <ext/hash_map>
@@ -210,7 +212,9 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
     typedef std::pair<Elem*, unsigned char> val_type;
     typedef std::pair<key_type, val_type>   key_val_pair;
     
-#if   defined(HAVE_HASH_MAP)    
+#if   defined(HAVE_UNORDERED_MAP)
+    typedef std::tr1::unordered_multimap<key_type, val_type> map_type;    
+#elif defined(HAVE_HASH_MAP)    
     typedef std::hash_multimap<key_type, val_type> map_type;    
 #elif defined(HAVE_EXT_HASH_MAP)
 # if    (__GNUC__ == 3) && (__GNUC_MINOR__ == 0) // gcc 3.0   
@@ -322,7 +326,7 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
 		
 		// use the lower bound as a hint for
 		// where to put it.
-#if defined(HAVE_HASH_MAP) || defined(HAVE_EXT_HASH_MAP)
+#if defined(HAVE_UNORDERED_MAP) || defined(HAVE_HASH_MAP) || defined(HAVE_EXT_HASH_MAP)
 		side_to_elem_map.insert (kvp);
 #else
 		side_to_elem_map.insert (bounds.first,kvp);

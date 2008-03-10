@@ -260,24 +260,25 @@ void DivaIO::write_stream (std::ostream& out)
    */
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     if (mesh.elem(e)->active())
-      if (mesh.elem(e)->type() == TET4)
-	{
-	  out << mesh.elem(e)->node(0)+1 << " "
-	      << mesh.elem(e)->node(1)+1 << " "
-	      << mesh.elem(e)->node(2)+1 << " "
-	      << mesh.elem(e)->node(3)+1 << '\n';
-	}
-      else if (mesh.elem(e)->type() == TET10)
-	{
-	  out << mesh.elem(e)->node(0)+1 << " "
-	      << mesh.elem(e)->node(4)+1 << " "
-	      << mesh.elem(e)->node(6)+1 << " "
-	      << mesh.elem(e)->node(7)+1 << '\n';
+      {
+	if (mesh.elem(e)->type() == TET4)
+	  {
+	    out << mesh.elem(e)->node(0)+1 << " "
+		<< mesh.elem(e)->node(1)+1 << " "
+		<< mesh.elem(e)->node(2)+1 << " "
+		<< mesh.elem(e)->node(3)+1 << '\n';
+	  }
+	else if (mesh.elem(e)->type() == TET10)
+	  {
+	    out << mesh.elem(e)->node(0)+1 << " "
+		<< mesh.elem(e)->node(4)+1 << " "
+		<< mesh.elem(e)->node(6)+1 << " "
+		<< mesh.elem(e)->node(7)+1 << '\n';
 	    
-	  out << mesh.elem(e)->node(4)+1 << " "
-	      << mesh.elem(e)->node(1)+1 << " "
-	      << mesh.elem(e)->node(5)+1 << " "
-	      << mesh.elem(e)->node(8)+1 << '\n';	
+	    out << mesh.elem(e)->node(4)+1 << " "
+		<< mesh.elem(e)->node(1)+1 << " "
+		<< mesh.elem(e)->node(5)+1 << " "
+		<< mesh.elem(e)->node(8)+1 << '\n';	
 	    
 	  out << mesh.elem(e)->node(6)+1 << " "
 	      << mesh.elem(e)->node(5)+1 << " "
@@ -309,7 +310,7 @@ void DivaIO::write_stream (std::ostream& out)
 	      << mesh.elem(e)->node(9)+1 << " "
 	      << mesh.elem(e)->node(7)+1 << '\n';	
 	}
-
+      }
 
 
   /**
@@ -333,20 +334,21 @@ void DivaIO::write_stream (std::ostream& out)
    */
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     if (mesh.elem(e)->active())
-      if (mesh.elem(e)->type() == PRISM6)
-	{
-	  out << mesh.elem(e)->node(0)+1 << " "
-	      << mesh.elem(e)->node(1)+1 << " "
-	      << mesh.elem(e)->node(2)+1 << " "
-	      << mesh.elem(e)->node(3)+1 << " "
-	      << mesh.elem(e)->node(4)+1 << " "
-	      << mesh.elem(e)->node(5)+1 << '\n';
-	}
-      else if (mesh.elem(e)->type() == PRISM18)
-	{
-	  error();
-	}
-
+      {
+	if (mesh.elem(e)->type() == PRISM6)
+	  {
+	    out << mesh.elem(e)->node(0)+1 << " "
+		<< mesh.elem(e)->node(1)+1 << " "
+		<< mesh.elem(e)->node(2)+1 << " "
+		<< mesh.elem(e)->node(3)+1 << " "
+		<< mesh.elem(e)->node(4)+1 << " "
+		<< mesh.elem(e)->node(5)+1 << '\n';
+	  }
+	else if (mesh.elem(e)->type() == PRISM18)
+	  {
+	    error();
+	  }
+      }
 
 
   /**

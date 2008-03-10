@@ -22,6 +22,10 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
+      *4.4*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.4 >>>)
+  	GXX_VERSION=gcc4.4
+  	;;
       *4.3*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-4.3 >>>)
   	GXX_VERSION=gcc4.3
@@ -359,6 +363,12 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
       dnl 
       dnl Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
       dnl        when dealing with C APIs that take void* pointers.
+      gcc4.3)
+	 CXXFLAGS_OPT="$CXXFLAGS_OPT -std=c++0x -Wdisabled-optimization"
+         CXXFLAGS_DVL="$CXXFLAGS_DVL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
+         CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+  	 ;;
+
       gcc3.* | gcc4.*)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
          CXXFLAGS_DVL="$CXXFLAGS_DVL -Woverloaded-virtual -Wdisabled-optimization"

@@ -32,7 +32,9 @@
 #include <vector>
 #include <list>
 
-#if   defined(HAVE_HASH_MAP)
+#if   defined(HAVE_UNORDERED_MAP)
+# include <tr1/unordered_map>
+#elif defined(HAVE_HASH_MAP)
 # include <hash_map>
 #elif defined(HAVE_EXT_HASH_MAP)
 # include <ext/hash_map>
@@ -614,7 +616,9 @@ private:
    * For efficiency we will use a hashed multimap if it is
    * available, otherwise a regular multimap.
    */
-#if   defined(HAVE_HASH_MAP)    
+#if   defined(HAVE_UNORDERED_MAP)
+    typedef std::tr1::unordered_multimap<unsigned int, Node*> map_type;
+#elif defined(HAVE_HASH_MAP)    
     typedef std::hash_multimap<unsigned int, Node*> map_type;    
 #elif defined(HAVE_EXT_HASH_MAP)
 # if   (__GNUC__ == 3) && (__GNUC_MINOR__ == 0) // gcc 3.0   
