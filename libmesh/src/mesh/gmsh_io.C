@@ -22,6 +22,7 @@
 // C++ includes
 #include <fstream>
 #include <set>
+#include <cstring> // std::memcpy, std::strncmp
 
 // Local includes
 #include "libmesh_config.h"

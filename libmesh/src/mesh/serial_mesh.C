@@ -251,7 +251,7 @@ Node* SerialMesh::add_point (const Point& p,
     else
       _nodes.resize(id+1);
   else
-    _nodes.push_back (NULL);
+    _nodes.push_back (static_cast<Node*>(NULL));
   
   // if the node already exists, then assign new (x,y,z) values
   if (n)

@@ -224,10 +224,12 @@ namespace
 void GMVIO::write (const std::string& fname)
 {
   if (libMesh::processor_id() == 0)
-    if (this->binary())
-      this->write_binary (fname);
-    else
-      this->write_ascii_old_impl  (fname);
+    {
+      if (this->binary())
+	this->write_binary (fname);
+      else
+	this->write_ascii_old_impl  (fname);
+    }
 }
 
 
@@ -239,11 +241,13 @@ void GMVIO::write_nodal_data (const std::string& fname,
   START_LOG("write_nodal_data()", "GMVIO");
 
   if (libMesh::processor_id() == 0)
-    if (this->binary())
-      this->write_binary (fname, &soln, &names);
-    else
-      this->write_ascii_old_impl  (fname, &soln, &names);
-
+    {
+      if (this->binary())
+	this->write_binary (fname, &soln, &names);
+      else
+	this->write_ascii_old_impl  (fname, &soln, &names);
+    }
+  
   STOP_LOG("write_nodal_data()", "GMVIO");
 }
 

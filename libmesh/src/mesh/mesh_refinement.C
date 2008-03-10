@@ -108,7 +108,7 @@ Node* MeshRefinement::add_point (const Point& p,
 
   // Add the node to the map.  In the case of the
   // std::multimap use pos.first as a hint for where to put it
-#if defined(HAVE_HASH_MAP) || defined(HAVE_EXT_HASH_MAP)
+#if defined(HAVE_UNORDERED_MAP) ||  defined(HAVE_HASH_MAP) || defined(HAVE_EXT_HASH_MAP)
   _new_nodes_map.insert(std::make_pair(key, node));
 #else
   _new_nodes_map.insert(pos.first, std::make_pair(key, node));

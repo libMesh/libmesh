@@ -23,6 +23,7 @@
 // C++ includes
 #include <cstdio>  // for std::FILE
 #include <string>
+#include <cstring> // std::strlen, std::strcmp
 #include <fstream> // for std::ifstream
 #include <sstream>
 

@@ -631,7 +631,7 @@ MeshDataUnvHeader::MeshDataUnvHeader() :
   _desired_dataset_label (libMesh::invalid_uint)
 {
   id_lines_1_to_5.resize(5);
-  std::fill (id_lines_1_to_5.begin(), id_lines_1_to_5.end(), "libMesh default");
+  std::fill (id_lines_1_to_5.begin(), id_lines_1_to_5.end(), std::string("libMesh default"));
   /*
    * resize analysis specific data.
    */

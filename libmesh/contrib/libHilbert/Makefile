@@ -58,7 +58,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f *.o *.g.o *.pg.o *.sy.o
+	@rm -f src/*.o
 	@rm -f $(EXTERNAL_LIBDIR)/lib$(pkgname).*
 
 distclean:
