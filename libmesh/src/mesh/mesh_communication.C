@@ -307,8 +307,12 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	      // in the set its entire family tree is already in the set.
 	      if (!elements_to_send.count(top_parent))
 		{
+#ifdef ENABLE_AMR
 		  top_parent->family_tree(family_tree);
-		  
+#else
+		  family_tree.clear();
+		  family_tree.push_back(top_parent);
+#endif
 		  for (unsigned int e=0; e<family_tree.size(); e++)
 		    {
 		      const Elem *elem = family_tree[e];
@@ -328,8 +332,12 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		      
 		      if (!elements_to_send.count(top_parent))
 			{
+#ifdef ENABLE_AMR
 			  top_parent->family_tree(family_tree);
-			  
+#else
+			  family_tree.clear();
+			  family_tree.push_back(top_parent);
+#endif			  
 			  for (unsigned int e=0; e<family_tree.size(); e++)
 			    {
 			      const Elem *elem = family_tree[e];

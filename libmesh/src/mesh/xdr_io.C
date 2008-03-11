@@ -334,9 +334,10 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 	      if (write_subdomain_id)
 		output_buffer.push_back(*it); /* subdomain id */ ++it;
 
+#ifdef ENABLE_AMR
 	      if (write_p_level)
 		output_buffer.push_back(*it); /* p level      */ ++it;
-	      
+#endif
 	      for (unsigned int node=0; node<n_nodes; node++, ++it)
 		output_buffer.push_back(*it);
 	      
@@ -346,6 +347,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
     }
   Parallel::wait (request_handle);
 
+#ifdef ENABLE_AMR  
   //--------------------------------------------------------------------
   // Next write the remaining elements indirectly through their parents.
   // This will insure that the children are written in the proper order
@@ -506,6 +508,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 	parent_id_map.swap(child_id_map); /**/ child_id_map.clear();
       }
     }
+#endif // ENABLE_AMR
   if (libMesh::processor_id() == 0)
     assert (next_global_elem == n_elem);
   
@@ -883,7 +886,6 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	  elem->subdomain_id() = subdomain_id;
 #ifdef ENABLE_AMR
 	  elem->hack_p_level(p_level);
-#endif
 
 	  if (parent)
 	    {
@@ -891,6 +893,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	      parent->set_refinement_flag (Elem::INACTIVE);
 	      elem->set_refinement_flag   (Elem::JUST_REFINED);
 	    }
+#endif
 
 	  for (unsigned int n=0; n<elem->n_nodes(); n++, ++it)
 	    {

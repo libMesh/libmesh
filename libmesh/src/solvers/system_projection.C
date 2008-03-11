@@ -223,7 +223,11 @@ void System::project_vector (Number fptr(const Point& p,
 }
 
 
-
+#ifndef ENABLE_AMR
+void System::ProjectVector::operator()(const ConstElemRange &) const
+{
+  error();
+#else
 void System::ProjectVector::operator()(const ConstElemRange &range) const
 {
   // A vector for Lagrange element interpolation, indicating if we
@@ -596,6 +600,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 	  }
         }  // end elem loop
     } // end variables loop
+#endif // ENABLE_AMR
 }
 
 
