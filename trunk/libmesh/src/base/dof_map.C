@@ -1722,7 +1722,12 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		      if (elem->neighbor(s) != NULL)
 			{
 			  const Elem* const neighbor_0 = elem->neighbor(s);
+#ifdef ENABLE_AMR
 			  neighbor_0->active_family_tree_by_neighbor(active_neighbors,elem);
+#else
+			  active_neighbors.clear();
+			  active_neighbors.push_back(neighbor_0);
+#endif
 			  
 			  for (unsigned int a=0; a != active_neighbors.size(); ++a)
 			    {

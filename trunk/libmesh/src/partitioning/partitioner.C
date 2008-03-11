@@ -224,6 +224,7 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
       
       for ( ; it!=end; ++it)
 	{
+#ifdef ENABLE_AMR
 	  Elem *child  = *it;
 	  Elem *parent = child->parent();
 
@@ -245,6 +246,9 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 		}	      
 	      parent = parent->parent();
 	    }
+#else
+	  assert ((*it)->level() == 0);
+#endif
 	  
 	}
     }
@@ -285,6 +289,7 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 	  
 	  for ( ; not_it != not_end; ++not_it)
 	    {
+#ifdef ENABLE_AMR
 	      Elem *parent = *not_it;
 
 	      const unsigned int parent_idx = parent->id();
@@ -304,6 +309,10 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 
 		  parent_processor_ids[packed_idx] = parent_pid;
 		}
+#else
+	      // without AMR there should be no inactive elements
+	      error();
+#endif
 	    }
 
 	  // then find the global minimum
