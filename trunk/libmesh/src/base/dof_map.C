@@ -281,7 +281,8 @@ void DofMap::reinit(MeshBase& mesh)
   
   //------------------------------------------------------------
   // Set the old_dof_objects for the elements that
-  // weren't just created
+  // weren't just created, if these old dof objects
+  // had variables
   {
     MeshBase::element_iterator       elem_it  = mesh.elements_begin();
     const MeshBase::element_iterator elem_end = mesh.elements_end();
@@ -298,11 +299,14 @@ void DofMap::reinit(MeshBase& mesh)
 	    Node* node = elem->get_node(n);
 
 	    if (node->old_dof_object == NULL)
-	      node->set_old_dof_object();
+	      if (node->has_dofs())
+		node->set_old_dof_object();
 	  }
 
 	assert (elem->old_dof_object == NULL);
-	elem->set_old_dof_object();
+
+	if (elem->has_dofs())
+	  elem->set_old_dof_object();
       }
   }
 

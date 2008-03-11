@@ -237,6 +237,12 @@ public:
 		      const unsigned int var,
 		      const unsigned int comp,
 		      const unsigned int dn);
+
+  /**
+   * @returns true if any system has variables which have been assigned,
+   * false otherwise
+   */
+  bool has_dofs() const;
   
   /**
    * Implemented in Elem and Node.
@@ -524,6 +530,7 @@ unsigned int DofObject::n_vars(const unsigned int s) const
 
 
 
+
 inline
 unsigned int DofObject::n_comp(const unsigned int s,
 			       const unsigned int var) const
@@ -567,6 +574,18 @@ unsigned int DofObject::dof_number(const unsigned int s,
     return invalid_id;
   else
     return (_dof_ids[s][var] + comp);
+}
+
+
+
+inline
+bool DofObject::has_dofs () const
+{
+  for (unsigned int s=0; s<this->n_systems(); s++)
+    if (this->n_vars(s))
+      return true;
+
+  return false;
 }
   
 
