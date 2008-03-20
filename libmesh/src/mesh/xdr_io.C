@@ -415,7 +415,13 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 	    {
 	      recv_conn.resize(xfer_buf_sizes[pid]);
+#ifdef HAVE_MPI
 	      Parallel::recv (pid, recv_conn);	
+#else
+	      assert (libMesh::n_processors() == 1);
+	      assert (libMesh::processor_id() == pid);
+	      recv_conn = xfer_conn;
+#endif
 	      // at a minimum, the buffer should contain the number of elements,
 	      // which could be 0.
 	      assert (!recv_conn.empty());
