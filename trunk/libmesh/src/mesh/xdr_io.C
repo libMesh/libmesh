@@ -715,8 +715,13 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
       for (unsigned int pid=0, elem_offset=0; pid<libMesh::n_processors(); pid++)
 	{
 	  recv_bcs.resize(bc_sizes[pid]);
+#ifdef HAVE_MPI
 	  Parallel::recv (pid, recv_bcs);
-	  
+#else
+	  assert (libMesh::n_processors() == 1);
+	  assert (libMesh::processor_id() == pid);
+	  recv_bcs = xfer_bcs;
+#endif
 	  const unsigned int n_local_level_0_elem 
 	    = recv_bcs.back(); recv_bcs.pop_back();
 	  
