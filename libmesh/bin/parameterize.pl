@@ -70,7 +70,9 @@ sub parameterizeonevariable {
 
 	foreach my $fixedname (@$fixednamesref) {
 		my $fixedvalue = $$fixedvaluesref[$index++];
-		$fixedsubdir .= $fixedname . "=" . $fixedvalue . "/";
+		$fixedvalue =~ s/ /_/g;
+		$fixedvalue =~ s/\'/_/g;
+		$fixedsubdir .= $fixedname . "_" . $fixedvalue . "/";
 	}
 
 	if (scalar(@$varnamesref) > 0) {
@@ -86,7 +88,9 @@ sub parameterizeonevariable {
 			        + $nextlist[1]/2; $value += $nextlist[1]) {
 		        	my $finalvalue = eval('$value ' . $nextcomment);
 				push @$fixedvaluesref, $finalvalue;
-				my $newsubdir = $fixedsubdir . $nextname . "="
+				$finalvalue =~ s/ /_/g;
+				$finalvalue =~ s/\'/_/g;
+				my $newsubdir = $fixedsubdir . $nextname . "_"
 			  	. $finalvalue . "/";
 				mkdir $newsubdir;
 			       	opendir NEWSUBDIR, $newsubdir
@@ -102,7 +106,9 @@ sub parameterizeonevariable {
 			foreach my $value (@nextlist) {
 		        	my $finalvalue = eval('$value ' . $nextcomment);
 				push @$fixedvaluesref, $finalvalue;
-				my $newsubdir = $fixedsubdir . $nextname . "="
+				$finalvalue =~ s/ /_/g;
+				$finalvalue =~ s/\'/_/g;
+				my $newsubdir = $fixedsubdir . $nextname . "_"
 			  	. $finalvalue . "/";
 				mkdir $newsubdir;
 			       	opendir NEWSUBDIR, $newsubdir
