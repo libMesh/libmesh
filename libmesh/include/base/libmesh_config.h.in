@@ -158,6 +158,10 @@
    */
 #undef HAVE_TRIANGLE
 
+/* Flag indicating whether the library shall be compiled to use the Trilinos
+   solver collection */
+#undef HAVE_TRILINOS
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 

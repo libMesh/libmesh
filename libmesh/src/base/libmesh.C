@@ -105,11 +105,13 @@ int           libMesh::libMeshPrivateData::_processor_id = 0;
 int           libMesh::libMeshPrivateData::_n_threads = 1; /* Threads::task_scheduler_init::automatic; */
 bool          libMesh::libMeshPrivateData::_is_initialized = false;
 SolverPackage libMesh::libMeshPrivateData::_solver_package =
-#if   defined(HAVE_PETSC)   // PETSc is the default
+#if   defined(HAVE_PETSC)    // PETSc is the default
                                                        PETSC_SOLVERS;
-#elif defined(HAVE_LASPACK) // Use LASPACK if PETSc isn't there
+#elif defined(HAVE_TRILINOS) // Use Trilinos if PETSc isn't there
+                                                       TRILINOS_SOLVERS;
+#elif defined(HAVE_LASPACK)  // Use LASPACK if neither are there
                                                        LASPACK_SOLVERS;
-#else                       // No valid linear solver package at compile time
+#else                        // No valid linear solver package at compile time
                                                        INVALID_SOLVER_PACKAGE;
 #endif
 
@@ -413,6 +415,12 @@ SolverPackage libMesh::default_solver_package ()
       if (libMesh::on_command_line ("--use-petsc"))
 	libMeshPrivateData::_solver_package = PETSC_SOLVERS;
 #endif
+
+#ifdef HAVE_TRILINOS
+      if (libMesh::on_command_line ("--use-trilinos") ||
+	  libMesh::on_command_line ("--disable-petsc"))
+	libMeshPrivateData::_solver_package = TRILINOS_SOLVERS;
+#endif
       
 #ifdef HAVE_LASPACK
       if (libMesh::on_command_line ("--use-laspack"  ) ||
@@ -420,7 +428,8 @@ SolverPackage libMesh::default_solver_package ()
 	libMeshPrivateData::_solver_package = LASPACK_SOLVERS;
 #endif
 
-      if (libMesh::on_command_line ("--disable-laspack"  ) &&
+      if (libMesh::on_command_line ("--disable-laspack") &&
+	  libMesh::on_command_line ("--disable-trilinos") &&
 	  libMesh::on_command_line ("--disable-petsc"))
 	libMeshPrivateData::_solver_package = INVALID_SOLVER_PACKAGE;
     }

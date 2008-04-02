@@ -484,6 +484,21 @@ dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
+dnl Trilinos -- enabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(trilinos,
+              AC_HELP_STRING([--enable-trilinos],
+                             [build with Trilinos suppport]),
+              enabletrilinos=$enableval,
+              enabletrilinos=yes)
+if test "$enabletrilinos" != no ; then
+   CONFIGURE_TRILINOS
+fi
+dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
 dnl Intel's Threading Building Blocks  -- enabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(tbb,

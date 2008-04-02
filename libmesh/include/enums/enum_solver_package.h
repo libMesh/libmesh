@@ -39,6 +39,7 @@ namespace libMeshEnums {
   enum SolverPackage
     { 
       PETSC_SOLVERS=0,
+      TRILINOS_SOLVERS,
       LASPACK_SOLVERS,
       SLEPC_SOLVERS,
       
