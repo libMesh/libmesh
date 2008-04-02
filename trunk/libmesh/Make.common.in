@@ -61,6 +61,10 @@ MPI_IMPL             = @MPI_IMPL@
 MPI_INCLUDE          = @MPI_INCLUDES_PATHS@
 MPI_LIB              = @MPI_LIBS_PATHS@ @MPI_LIBS@
 
+# Trilinos configuration
+enable-trilinos         = @enabletrilinos@
+AZTECOO_MAKEFILE_EXPORT = @AZTECOO_MAKEFILE_EXPORT@
+
 # Doxygen for generating documentation
 doxygen		     = @DOXYGEN@
 
@@ -338,6 +342,13 @@ ifeq ($(enable-optional),yes)
     libmesh_LIBS    += @LIBHILBERT_LIBRARY@
     libmesh_INCLUDE += @LIBHILBERT_INCLUDE@
   endif
+
+  # Trilinos
+  ifeq ($(enable-trilinos),yes)
+      include @AZTECOO_MAKEFILE_EXPORT@
+      libmesh_LIBS    += $(AZTECOO_LIBS)
+      libmesh_INCLUDE += $(AZTECOO_INCLUDES)
+  endif	
 
   #############################################################################
   # SLEPc
