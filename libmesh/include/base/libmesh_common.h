@@ -26,17 +26,17 @@
 // The library configuration options
 #include "libmesh_config.h"
 
+// Include the MPI definition
+#ifdef HAVE_MPI
+# include <mpi.h>
+#endif
+
 // C/C++ includes everyone should know about
 #include <iostream> // needed for std::cout, std::cerr
 #include <complex>
 #include <cassert>
 #ifdef HAVE_STDLIB_H
 # include <cstdlib>
-#endif
-
-// Include the MPI definition
-#ifdef HAVE_MPI
-# include <mpi.h>
 #endif
 
 // _basic_ library functionality
