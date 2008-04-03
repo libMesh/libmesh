@@ -35,10 +35,6 @@
 #include <complex>
 #include <limits>
 
-#ifdef HAVE_MPI
-# include <mpi.h>
-#endif
-
 // Local includes
 #include "numeric_vector.h"
 #include "parallel.h"
