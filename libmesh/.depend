@@ -3565,6 +3565,7 @@ src/mesh/boundary_info.$(obj-suffix):\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/parallel/parallel.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
@@ -5352,6 +5353,28 @@ src/numerics/eigen_solver.$(obj-suffix):\
     include/parallel/threads.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/numerics/epetra_vector.$(obj-suffix):\
+    src/numerics/epetra_vector.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_solver_package.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
+    include/numerics/epetra_vector.h\
+    include/numerics/numeric_vector.h\
+    include/parallel/parallel.h\
+    include/parallel/threads.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h\
+    include/utils/utility.h
 src/numerics/error_estimator.$(obj-suffix):\
     src/numerics/error_estimator.C\
     include/base/auto_ptr.h\
