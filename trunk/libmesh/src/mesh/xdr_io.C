@@ -1055,7 +1055,7 @@ void XdrIO::read_serialized_bcs (Xdr &io)
       // data structure has not been initialized.
       for (std::pair<std::vector<ElemBCData>::iterator,
 	             std::vector<ElemBCData>::iterator> pos; it!=end; ++it)
-#ifdef __SUNPRO_CC
+#if defined(__SUNPRO_CC) || defined(__PGI)
 	for (pos = std::equal_range (elem_bc_data.begin(), elem_bc_data.end(), (*it)->id(), CompareIntElemBCData());
 #else
 	for (pos = std::equal_range (elem_bc_data.begin(), elem_bc_data.end(), (*it)->id());
