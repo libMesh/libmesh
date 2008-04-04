@@ -429,7 +429,7 @@ private:
 /*----------------------- Inline functions ----------------------------------*/
 
 
-/*
+
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector ()
@@ -463,7 +463,7 @@ EpetraVector<T>::EpetraVector (const unsigned int n,
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector (Vec v)
+EpetraVector<T>::EpetraVector (Epetra_Vector v)
   : _destroy_vec_on_exit(false)
 {
   this->_vec = v;
@@ -480,7 +480,7 @@ EpetraVector<T>::~EpetraVector ()
   this->clear ();
 }
 
-
+/*
 
 template <typename T>
 inline
