@@ -716,11 +716,17 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   
       portland_group)
 	  CXXFLAGS_DBG="-g --no_using_std"
-          CXXFLAGS_OPT="-O2 --no_using_std -fast --no_exceptions -Minform=severe"
+          CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
 	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
 	  CFLAGS_DBG="-g"
           CFLAGS_OPT="-O2"
           CFLAGS_DVL="$CFLAGS_DBG"
+
+          dnl Disable exception handling if we don't use it
+          if test "$enableexceptions" = no ; then
+	    CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
+          fi
 
           dnl Position-independent code for shared libraries
           if test "$enableshared" = yes ; then

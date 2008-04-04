@@ -69,6 +69,22 @@ AC_ARG_ENABLE(shared,
 AC_SUBST(enableshared)	
 dnl --------------------------------------------------------------
 
+dnl --------------------------------------------------------------
+dnl C++ exceptions - enabled by default
+dnl --------------------------------------------------------------
+AC_ARG_ENABLE(exceptions,
+              AC_HELP_STRING([--enable-exceptions],
+                             [throw exceptions on unexpected errors]),
+              enableexceptions=$enableval,
+              enableexceptions=yes)
+
+if test "$enableexceptions" != no ; then
+  AC_DEFINE(ENABLE_EXCEPTIONS, 1,
+           [Flag indicating if the library should be built to throw C++ exceptions on unexpected errors])
+  AC_MSG_RESULT(<<< Configuring library with exception throwing support >>>)
+fi
+dnl --------------------------------------------------------------
+
 dnl See aclocal.m4 for the definition of this function.  It can
 dnl figure out which version of a particular compiler, e.g. GCC 4.0,
 dnl you are using.

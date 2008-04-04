@@ -22,6 +22,9 @@
 #ifndef __libmesh_exceptions_h__
 #define __libmesh_exceptions_h__
 
+#include "libmesh_config.h"
+
+#ifdef ENABLE_EXCEPTIONS
 #include <stdexcept>
 
 
@@ -36,5 +39,13 @@ public:
 };
   
 }
+
+#define LIBMESH_THROW(e) { throw e; }
+
+#else
+
+#define LIBMESH_THROW(e) { std::abort(); }
+
+#endif // ENABLE_EXCEPTIONS
 
 #endif // #define __libmesh_exceptions_h__

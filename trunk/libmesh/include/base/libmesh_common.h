@@ -202,7 +202,7 @@ namespace libMesh
 
 // The error() macro prints a message and throws a generic exception
 #undef error
-#define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; throw libMesh::LogicError(); }
+#define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::LogicError()); }
 
 // The untested macro warns that you are using untested code
 #undef untested
