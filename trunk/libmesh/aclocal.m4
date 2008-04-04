@@ -22,43 +22,43 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
-      *4.4*)
+      *4.4.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-4.4 >>>)
   	GXX_VERSION=gcc4.4
   	;;
-      *4.3*)
+      *4.3.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-4.3 >>>)
   	GXX_VERSION=gcc4.3
   	;;
-      *4.2*)
+      *4.2.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-4.2 >>>)
   	GXX_VERSION=gcc4.2
   	;;
-      *4.1*)
+      *4.1.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-4.1 >>>)
   	GXX_VERSION=gcc4.1
   	;;
-      *4.0*)
+      *4.0.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-4.0 >>>)
   	GXX_VERSION=gcc4.0
   	;;
-      *3.4*)
+      *3.4.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-3.4 >>>)
   	GXX_VERSION=gcc3.4
   	;;
-      *3.3*)
+      *3.3.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-3.3 >>>)
   	GXX_VERSION=gcc3.3
   	;;
-      *3.2*)
+      *3.2.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-3.2 >>>)
   	GXX_VERSION=gcc3.2
   	;;
-      *3.1*)
+      *3.1.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-3.1 >>>)
   	GXX_VERSION=gcc3.1
   	;;
-      *3.0*)
+      *3.0.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-3.0 >>>)
   	GXX_VERSION=gcc3.0
   	;;
