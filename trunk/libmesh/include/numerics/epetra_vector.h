@@ -420,6 +420,11 @@ private:
   Epetra_Vector * _vec;
 
   /**
+   * Holds the distributed Map
+   */
+  Epetra_Map * _map;
+
+  /**
    * This boolean value should only be set to false
    * for the constructor which takes a Epetra Vec object. 
    */
@@ -486,7 +491,9 @@ void EpetraVector<T>::init (const unsigned int n,
 			   const unsigned int n_local,
 			   const bool fast)
 {
-  _vec = new Epetra_Vector(Epetra_Map(n, n_local, 0, libMesh::COMM_WORLD));
+  _map = new Epetra_Map(n, n_local, 0, libMesh::COMM_WORLD);
+  
+  _vec = new Epetra_Vector(*_map);
   
   this->_is_initialized = true;
   
@@ -573,20 +580,13 @@ unsigned int EpetraVector<T>::local_size () const
   return _vec->MyLength();
 }
 
-/*
-
 template <typename T>
 inline
 unsigned int EpetraVector<T>::first_local_index () const
 {
   assert (this->initialized());
   
-  int ierr=0, epetra_first=0, epetra_last=0;
-  
-  ierr = VecGetOwnershipRange (_vec, &epetra_first, &epetra_last);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-  return static_cast<unsigned int>(epetra_first);
+  return _map->MinLID();
 }
 
 
@@ -597,14 +597,8 @@ unsigned int EpetraVector<T>::last_local_index () const
 {
   assert (this->initialized());
   
-  int ierr=0, epetra_first=0, epetra_last=0;
-  
-  ierr = VecGetOwnershipRange (_vec, &epetra_first, &epetra_last);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-  return static_cast<unsigned int>(epetra_last);
+  return _map->MaxLID();
 }
-
 
 
 template <typename T>
@@ -615,19 +609,7 @@ T EpetraVector<T>::operator() (const unsigned int i) const
   assert ( ((i >= this->first_local_index()) &&
 	    (i <  this->last_local_index())) );
 
-  int ierr=0;
-  EpetraScalar *values, value=0.;
-  
-
-  ierr = VecGetArray(_vec, &values);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-  value = values[i - this->first_local_index()];
-  
-  ierr = VecRestoreArray (_vec, &values);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-  return static_cast<T>(value);
+  return (*_vec)[i];
 }
 
 
@@ -638,14 +620,11 @@ Real EpetraVector<T>::min () const
 {
   assert (this->initialized());
 
-  int index=0, ierr=0;
-  EpetraReal min=0.;
+  T value;
 
-  ierr = VecMin (_vec, &index, &min);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  _vec->MinValue(&value);
 
-  // this return value is correct: VecMin returns a EpetraReal
-  return static_cast<Real>(min);
+  return value;
 }
 
 
@@ -656,17 +635,12 @@ Real EpetraVector<T>::max() const
 {
   assert (this->initialized());
 
-  int index=0, ierr=0;
-  EpetraReal max=0.;
+  T value;
 
-  ierr = VecMax (_vec, &index, &max);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  _vec->MaxValue(&value);
 
-  // this return value is correct: VecMax returns a EpetraReal
-  return static_cast<Real>(max);
+  return value;
 }
-
-
 
 template <typename T>
 inline
@@ -675,7 +649,7 @@ void EpetraVector<T>::swap (EpetraVector<T> &v)
   std::swap(_vec, v._vec);
   std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
 }
-*/
+
 
 #endif // #ifdef HAVE_EPETRA
 #endif // #ifdef __epetra_vector_h__
