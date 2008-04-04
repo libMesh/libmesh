@@ -1352,6 +1352,7 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-shared         build shared libraries
+  --enable-exceptions     throw exceptions on unexpected errors
   --enable-everything     treat all applicable options as enabled
   --enable-amr            build with adaptive mesh refinement (AMR) suppport
   --enable-periodic       build with periodic boundary condition suppport
@@ -3329,6 +3330,24 @@ fi
 
 
 
+# Check whether --enable-exceptions was given.
+if test "${enable_exceptions+set}" = set; then
+  enableval=$enable_exceptions; enableexceptions=$enableval
+else
+  enableexceptions=yes
+fi
+
+
+if test "$enableexceptions" != no ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_EXCEPTIONS 1
+_ACEOF
+
+  { echo "$as_me:$LINENO: result: <<< Configuring library with exception throwing support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with exception throwing support >>>" >&6; }
+fi
+
 
       REAL_GXX=`($CXX -v 2>&1) | grep "gcc version"`
 
@@ -3910,11 +3929,16 @@ echo "${ECHO_T}Unknown Intel complier" >&6; }
 
       portland_group)
 	  CXXFLAGS_DBG="-g --no_using_std"
-          CXXFLAGS_OPT="-O2 --no_using_std -fast --no_exceptions -Minform=severe"
+          CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
 	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
 	  CFLAGS_DBG="-g"
           CFLAGS_OPT="-O2"
           CFLAGS_DVL="$CFLAGS_DBG"
+
+                    if test "$enableexceptions" = no ; then
+	    CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
+            CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
+          fi
 
                     if test "$enableshared" = yes ; then
             CXXFLAGS_OPT="$CXXFLAGS_OPT -fpic"

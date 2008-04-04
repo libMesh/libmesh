@@ -23,6 +23,10 @@
    support */
 #undef ENABLE_PERFORMANCE_LOGGING
 
+/* Flag indicating if the library should be built to throw C++ exceptions
+   on unexpected errors */
+#undef ENABLE_EXCEPTIONS
+
 /* Flag indicating if the library should be built with periodic boundary
    condition support */
 #undef ENABLE_PERIODIC
