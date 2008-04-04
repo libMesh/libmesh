@@ -33,6 +33,9 @@
 // Local includes
 #include "numeric_vector.h"
 
+// Trilinos includes
+#include<Epetra_Vector.h>
+
 // forward declarations
 template <typename T> class SparseMatrix;
 
@@ -72,7 +75,7 @@ public:
    * This allows ownership of v to remain with the original creator,
    * and to simply provide additional functionality with the EpetraVector.
    */
-  EpetraVector(Vec v);
+  EpetraVector(Epetra_Vector v);
   
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -403,7 +406,7 @@ public:
    * not required in user-level code. Just don't do anything crazy like
    * calling VecDestroy()!
    */
-  Vec vec () { assert (_vec != NULL); return _vec; }
+  Epetra_Vector & vec () { assert (_vec != NULL); return _vec; }
 
 
   
@@ -426,7 +429,7 @@ private:
 /*----------------------- Inline functions ----------------------------------*/
 
 
-
+/*
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector ()
@@ -746,7 +749,7 @@ void EpetraVector<T>::swap (EpetraVector<T> &v)
   std::swap(_vec, v._vec);
   std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
 }
-
+*/
 
 #endif // #ifdef HAVE_EPETRA
 #endif // #ifdef __epetra_vector_h__

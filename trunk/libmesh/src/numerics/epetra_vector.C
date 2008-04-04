@@ -24,22 +24,11 @@
 
 #ifdef HAVE_TRILINOS
 
+#if 0
+
 #include "parallel.h"
 #include "utility.h"
 #include "dense_vector.h"
-#include "epetra_macro.h"
-
-//-----------------------------------------------------------------------
-// EpetraVector members
-
-// void EpetraVector<T>::init (const NumericVector<T>& v, const bool fast)
-// {
-//   error();
-  
-//   init (v.local_size(), v.size(), fast);
-
-//   vec = dynamic_cast<const EpetraVector<T>&>(v).vec;
-// }
 
 template <typename T>
 T EpetraVector<T>::sum () const
@@ -1030,6 +1019,6 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& subvector,
 // Explicit instantiations
 template class EpetraVector<Number>;
 
-
+#endif // if 0
 
 #endif // #ifdef HAVE_EPETRA
