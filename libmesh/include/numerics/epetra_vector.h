@@ -35,6 +35,7 @@
 
 // Trilinos includes
 #include<Epetra_Vector.h>
+#include<Epetra_Map.h>
 
 // forward declarations
 template <typename T> class SparseMatrix;
@@ -416,7 +417,7 @@ private:
    * Actual Epetra vector datatype
    * to hold vector entries
    */
-  Epetra_Vector _vec;
+  Epetra_Vector * _vec;
 
   /**
    * This boolean value should only be set to false
@@ -460,7 +461,6 @@ EpetraVector<T>::EpetraVector (const unsigned int n,
 
 
 
-
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector (Epetra_Vector v)
@@ -480,48 +480,15 @@ EpetraVector<T>::~EpetraVector ()
   this->clear ();
 }
 
-/*
-
 template <typename T>
 inline
 void EpetraVector<T>::init (const unsigned int n,
 			   const unsigned int n_local,
 			   const bool fast)
 {
-  int ierr=0;
-  int epetra_n=static_cast<int>(n);
-  int epetra_n_local=static_cast<int>(n_local);
-
-
-  // Clear initialized vectors 
-  if (this->initialized())
-    this->clear();
-
-  
-  // create a sequential vector if on only 1 processor 
-  if (n_local == n)
-    {
-      ierr = VecCreateSeq (EPETRA_COMM_SELF, epetra_n, &_vec);
-             CHKERRABORT(EPETRA_COMM_SELF,ierr);
-      
-      ierr = VecSetFromOptions (_vec);
-             CHKERRABORT(EPETRA_COMM_SELF,ierr);
-    }
-  // otherwise create an MPI-enabled vector
-  else
-    {
-      assert (n_local < n);
-      
-      ierr = VecCreateMPI (libMesh::COMM_WORLD, epetra_n_local, epetra_n,
-			   &_vec);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
-      ierr = VecSetFromOptions (_vec);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }  
+  _vec = new Epetra_Vector(Epetra_Map(n, n_local, 0, libMesh::COMM_WORLD));
   
   this->_is_initialized = true;
-  
   
   if (fast == false)
     this->zero ();
@@ -543,14 +510,7 @@ template <typename T>
 inline
 void EpetraVector<T>::close ()
 {
-  assert (this->initialized());
-  
-  int ierr=0;
-  
-  ierr = VecAssemblyBegin(_vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  ierr = VecAssemblyEnd(_vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  assert (this->initialized());  
 
   this->_is_closed = true;
 }
@@ -562,12 +522,7 @@ inline
 void EpetraVector<T>::clear ()
 {
   if ((this->initialized()) && (this->_destroy_vec_on_exit))
-    {
-      int ierr=0;
-
-      ierr = VecDestroy(_vec);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
+    delete _vec;
 
   this->_is_closed = this->_is_initialized = false;
 }
@@ -579,24 +534,8 @@ inline
 void EpetraVector<T>::zero ()
 {
   assert (this->initialized());
-  
-  int ierr=0;
 
-  EpetraScalar z=0.;
-
-#if EPETRA_VERSION_LESS_THAN(2,3,0)  
-  
-  // 2.2.x & earlier style
-  ierr = VecSet (&z, _vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-#else
-  
-  // 2.3.x & newer
-  ierr = VecSet (_vec, z);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-#endif
+  _vec->PutScalar(0.0);
 }
 
 
@@ -618,17 +557,9 @@ template <typename T>
 inline
 unsigned int EpetraVector<T>::size () const
 {
-  assert (this->initialized());
-  
-  int ierr=0, epetra_size=0;
-  
-  if (!this->initialized())
-    return 0;
-  
-  ierr = VecGetSize(_vec, &epetra_size);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  assert (this->initialized());  
 
-  return static_cast<unsigned int>(epetra_size);
+  return _vec->GlobalLength();
 }
 
 
@@ -639,15 +570,10 @@ unsigned int EpetraVector<T>::local_size () const
 {
   assert (this->initialized());
   
-  int ierr=0, epetra_size=0;
-  
-  ierr = VecGetLocalSize(_vec, &epetra_size);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-  return static_cast<unsigned int>(epetra_size);
+  return _vec->MyLength();
 }
 
-
+/*
 
 template <typename T>
 inline
