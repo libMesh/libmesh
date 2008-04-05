@@ -466,10 +466,10 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
               dnl Note: In Version 8.1 (and possibly newer?) the -inline_debug_info
               dnl       option causes a segmentation fault in libmesh.C, probably others...
 
-              dnl CPU-specific flags: -axK is for ia32, -xP is for x86_64
+              dnl CPU-specific flags: -axK is for ia32, -xW is for x86_64
               INTEL_AX_FLAG="-tpp6 -axK"
               if test $target_cpu = "x86_64" ; then
-                INTEL_AX_FLAG="-xP"
+                INTEL_AX_FLAG="-xW"
               fi
 
               CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
@@ -492,10 +492,10 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
               dnl Note: In Version 8.1 (and possibly newer?) the -inline_debug_info
               dnl       option causes a segmentation fault in libmesh.C, probably others...
 
-              dnl CPU-specific flags: -axK is for ia32, -xP is for x86_64
+              dnl CPU-specific flags: -axK is for ia32, -xW is for x86_64
               INTEL_AX_FLAG="-tpp6 -axK"
               if test $target_cpu = "x86_64" ; then
-                INTEL_AX_FLAG="-xP"
+                INTEL_AX_FLAG="-xW"
               fi
 
               CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
