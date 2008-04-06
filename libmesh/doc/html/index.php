@@ -4,7 +4,9 @@
 
 <HTML>
 <head>
+  
   <title>libMesh - C++ Finite Element Library</title>
+  <meta name="verify-v1" content="X3cfnoMNiuo9l+ZWNoTZv590OCrbnVJsxCDsWZdzFmw=">
   <META name="description" content="A parallel adaptive C++ finite element library for simulating partial differential equations.">
   <META name="keywords" content="finite element, finite element method, finite element modeling, finite element modelling, finite element software, finite element methods, science math numerical analysis, science math numerical analysis software, numerical analysis research group, partial differential equations, applied partial differential equations, elliptic parabolic hyperbolic partial differential equations, finite element analysis modeling software, system of linear equation solver, simultaneous linear equation solver, computational fluid dynamics software">
   <META name="robots" content="index, follow">
@@ -79,8 +81,7 @@ focus on the physics they are modeling.
 <code>libMesh</code> currently supports 1D, 2D, and 3D steady and transient finite element simulations.
 The library makes use of high-quality, <a href="externalsoftware.php">existing software</a> whenever possible.
 <a href="http://www-unix.mcs.anl.gov/petsc/petsc-2">PETSc</a> is
-used for the solution of linear systems on both serial and
-parallel platforms, and
+used for the solution of linear systems on both serial and parallel platforms, and
 <a href="http://www.mgnet.org/mgnet/Codes/laspack/html/laspack.html">LASPack</a>
 is included with the library to provide linear solver support on serial machines.
 An optional interface to <a href="http://www.grycap.upv.es/slepc">SLEPc</a> is also

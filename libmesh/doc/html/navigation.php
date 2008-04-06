@@ -68,6 +68,8 @@ function load_style($root)
     <?php echo "<a class=\"L1\" href = \"", $root, "wiki/index.php/Gallery\" title=\"Results From Applications Which Use libMesh\">Gallery</a><BR>"; ?>
     <?php echo "<a class=\"L1\" href = \"", $root, "wiki\" title=\"External Wiki Page\">Wiki</a><BR>"; ?>
 </div>
+
+
 <?php } ?>
 
 
@@ -82,6 +84,18 @@ function load_style($root)
 <?php } ?>
 
 <?php function make_footer() { ?>
+
+<div class="search">
+  <!-- Google CSE Search Box Begins  -->
+  <form action="http://www.google.com/cse" id="cse-search-box">
+    <input type="hidden" name="cx" value="012399064992308798676:e_bxmf5nqrq">
+    <input type="text" name="q" size="25">
+    <input type="submit" name="sa" value="Search">
+  </form>
+  <script type="text/javascript" src="http://www.google.com/coop/cse/brand?form=cse-search-box&lang=en"></script>
+  <!-- Google CSE Search Box Ends -->
+</div>
+
 <hr>
 <i>Site Created By:</i>
 <!-- <a href="mailto:libmesh-users@lists.sourceforge.net">libMesh Developers</a><br> -->
@@ -94,6 +108,16 @@ function load_style($root)
 <br>
 <A href="http://sourceforge.net">
 <IMG src="http://sourceforge.net/sflogo.php?group_id=71130&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></A>
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ?  "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-4055735-1");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
 									    
 <?php } ?>
 
