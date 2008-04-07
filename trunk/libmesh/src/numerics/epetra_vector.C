@@ -854,5 +854,4 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& subvector,
 template class EpetraVector<Number>;
 
 #endif // if 0
-
 #endif // #ifdef HAVE_EPETRA
