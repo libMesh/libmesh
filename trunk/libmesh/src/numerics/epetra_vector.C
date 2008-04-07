@@ -24,76 +24,68 @@
 
 #ifdef HAVE_TRILINOS
 
-#if 0
-
 #include "parallel.h"
 #include "utility.h"
 #include "dense_vector.h"
+#include "parallel.h"
 
 template <typename T>
 T EpetraVector<T>::sum () const
 {
   assert(this->closed());
   
-  int ierr=0;
-  EpetraScalar value=0.;
-  
-  ierr = VecSum (_vec, &value);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-  return static_cast<T>(value);
-}
+  const unsigned int n = _vec->GlobalLength();
+  const unsigned int nl = _vec->MyLength();
 
+  T sum=0.0;
+
+  T * values = _vec->Values();
+  
+  for (int i=0; i<nl; i++)
+    sum += values[i];
+
+  Parallel::sum<T>(sum);
+  
+  return sum;
+}
 
 template <typename T>
 Real EpetraVector<T>::l1_norm () const
 {
   assert(this->closed());
+
+  Real value;
+
+  _vec->Norm1(&value);
   
-  int ierr=0;
-  EpetraReal value=0.;
-  
-  ierr = VecNorm (_vec, NORM_1, &value);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-  return static_cast<Real>(value);
+  return value;
 }
-
-
 
 template <typename T>
 Real EpetraVector<T>::l2_norm () const
 {
   assert(this->closed());
   
-  int ierr=0;
-  EpetraReal value=0.;
+  Real value;
+
+  _vec->Norm2(&value);
   
-  ierr = VecNorm (_vec, NORM_2, &value);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-  return static_cast<Real>(value);
+  return value;
 }
-
-
-
 
 template <typename T>
 Real EpetraVector<T>::linfty_norm () const
 {
   assert(this->closed());
   
-  int ierr=0;
-  EpetraReal value=0.;
+  Real value;
+
+  _vec->NormInf(&value);
   
-  ierr = VecNorm (_vec, NORM_INFINITY, &value);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-  return static_cast<Real>(value);
+  return value;
 }
 
-
-
+#if 0
 
 template <typename T>
 NumericVector<T>&
