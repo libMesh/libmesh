@@ -34,7 +34,6 @@ T EpetraVector<T>::sum () const
 {
   assert(this->closed());
   
-  const unsigned int n = _vec->GlobalLength();
   const unsigned int nl = _vec->MyLength();
 
   T sum=0.0;
@@ -85,8 +84,6 @@ Real EpetraVector<T>::linfty_norm () const
   return value;
 }
 
-#if 0
-
 template <typename T>
 NumericVector<T>&
 EpetraVector<T>::operator += (const NumericVector<T>& v)
@@ -117,13 +114,8 @@ template <typename T>
 void EpetraVector<T>::set (const unsigned int i, const T value)
 {
   assert(i<size());
-  
-  int ierr=0;
-  int i_val = static_cast<int>(i);
-  EpetraScalar epetra_value = static_cast<EpetraScalar>(value);
 
-  ierr = VecSetValues (_vec, 1, &i_val, &epetra_value, INSERT_VALUES);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  _vec->ReplaceGlobalValues(1,&value,&i);
 
   this->_is_closed = false;
 }
@@ -135,12 +127,7 @@ void EpetraVector<T>::add (const unsigned int i, const T value)
 {
   assert(i<size());
   
-  int ierr=0;
-  int i_val = static_cast<int>(i);
-  EpetraScalar epetra_value = static_cast<EpetraScalar>(value);
-
-  ierr = VecSetValues (_vec, 1, &i_val, &epetra_value, ADD_VALUES);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  _vec->SumIntoGlobalValues(1,&value,&i);
 
   this->_is_closed = false;
 }
@@ -152,9 +139,8 @@ void EpetraVector<T>::add_vector (const std::vector<T>& v,
 				 const std::vector<unsigned int>& dof_indices)
 {
   assert (v.size() == dof_indices.size());
-
-  for (unsigned int i=0; i<v.size(); i++)
-    this->add (dof_indices[i], v[i]);
+  
+  _vec->SumIntoGlobalValues(v.size(),&v[0],&dof_indices[0]);
 }
 
 
@@ -170,7 +156,9 @@ void EpetraVector<T>::add_vector (const NumericVector<T>& V,
 }
 
 
+#if 0
 
+// TODO: fill this in after creating an EpetraMatrix
 template <typename T>
 void EpetraVector<T>::add_vector (const NumericVector<T>& V_in,
 				 const SparseMatrix<T>& A_in)
@@ -191,7 +179,7 @@ void EpetraVector<T>::add_vector (const NumericVector<T>& V_in,
          CHKERRABORT(libMesh::COMM_WORLD,ierr); 
 }
 
-
+#endif
 
 template <typename T>
 void EpetraVector<T>::add_vector (const DenseVector<T>& V,
@@ -199,40 +187,21 @@ void EpetraVector<T>::add_vector (const DenseVector<T>& V,
 {
   assert (V.size() == dof_indices.size());
 
-  for (unsigned int i=0; i<V.size(); i++)
-    this->add (dof_indices[i], V(i));
+  this->add_vector(V.get_values[0], dof_indices);
 }
-
-
 
 template <typename T>
 void EpetraVector<T>::add (const T v_in)
 {
-  int ierr=0;
-  EpetraScalar* values;
-  const EpetraScalar v = static_cast<EpetraScalar>(v_in);  
-  const int n   = static_cast<int>(this->local_size());
-  const int fli = static_cast<int>(this->first_local_index());
+  const unsigned int nl = _vec->MyLength();
+
+  T * values = _vec->Values();
   
-  for (int i=0; i<n; i++)
-    {
-      ierr = VecGetArray (_vec, &values);
-  	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
-      int ig = fli + i;      
-      
-      EpetraScalar value = (values[ig] + v);
-      
-      ierr = VecRestoreArray (_vec, &values);
-  	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
-      ierr = VecSetValues (_vec, 1, &ig, &value, INSERT_VALUES);
- 	     CHKERRABORT(libMesh::COMM_WORLD,ierr); 
-    }
+  for (int i=0; i<nl; i++)
+    values[i]+=v_in;
 
   this->_is_closed = false;
 }
-
 
 
 template <typename T>
@@ -241,36 +210,16 @@ void EpetraVector<T>::add (const NumericVector<T>& v)
   this->add (1., v);
 }
 
-
-
 template <typename T>
 void EpetraVector<T>::add (const T a_in, const NumericVector<T>& v_in)
 {
-  int ierr = 0;
-  EpetraScalar a = static_cast<EpetraScalar>(a_in);
-
   const EpetraVector<T>* v = dynamic_cast<const EpetraVector<T>*>(&v_in);
 
   assert (v != NULL);
   assert(this->size() == v->size());
-  
 
-#if EPETRA_VERSION_LESS_THAN(2,3,0)
-	 
-  // 2.2.x & earlier style
-  ierr = VecAXPY(&a, v->_vec, _vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-#else
-	 
-  // 2.3.x & later style
-  ierr = VecAXPY(_vec, a, v->_vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
-#endif
+  _vec->Update(a_in,*v,1);
 }
-
-
 
 template <typename T>
 void EpetraVector<T>::insert (const std::vector<T>& v,
@@ -278,8 +227,7 @@ void EpetraVector<T>::insert (const std::vector<T>& v,
 {
   assert (v.size() == dof_indices.size());
 
-  for (unsigned int i=0; i<v.size(); i++)
-    this->set (dof_indices[i], v[i]);
+  _vec->ReplaceGlobalValues(v.size(),&v[0],&dof_indices[0]);
 }
 
 
@@ -289,6 +237,8 @@ void EpetraVector<T>::insert (const NumericVector<T>& V,
 			     const std::vector<unsigned int>& dof_indices)
 {
   assert (V.size() == dof_indices.size());
+
+  // TODO: If V is an EpetraVector this can be optimized
 
   for (unsigned int i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
@@ -302,8 +252,7 @@ void EpetraVector<T>::insert (const DenseVector<T>& V,
 {
   assert (V.size() == dof_indices.size());
 
-  for (unsigned int i=0; i<V.size(); i++)
-    this->set (dof_indices[i], V(i));
+  this->insert(V.getValues(),dof_indices);
 }
 
 
@@ -311,75 +260,31 @@ void EpetraVector<T>::insert (const DenseVector<T>& V,
 template <typename T>
 void EpetraVector<T>::scale (const T factor_in)
 {
-  int ierr = 0;
-  EpetraScalar factor = static_cast<EpetraScalar>(factor_in);
-  
-#if EPETRA_VERSION_LESS_THAN(2,3,0)
-
-  // 2.2.x & earlier style
-  ierr = VecScale(&factor, _vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-#else
-  
-  // 2.3.x & later style	 
-  ierr = VecScale(_vec, factor);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-#endif
+  _vec->Scale(factor_in);
 }
-
 
 
 
 template <typename T>
-T EpetraVector<T>::dot (const NumericVector<T>& V) const
+T EpetraVector<T>::dot (const NumericVector<T>& V_in) const
 {
-  // Error flag
-  int ierr = 0;
-  
-  // Return value
-  EpetraScalar value=0.;
-  
-  // Make sure the NumericVector passed in is really a EpetraVector
-  const EpetraVector<T>* v = dynamic_cast<const EpetraVector<T>*>(&V);
-  assert (v != NULL);
+  const EpetraVector<T>* V = dynamic_cast<const EpetraVector<T>*>(&V_in);
 
-  // 2.3.x (at least) style.  Untested for previous versions.
-  ierr = VecDot(this->_vec, v->_vec, &value);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  assert(V);
+  
+  T result=0.0;
 
-  return static_cast<T>(value);
+  _vec->Dot(*V, &result);
+
+  return result;
 }
-
-
 
 
 template <typename T>
 NumericVector<T>& 
 EpetraVector<T>::operator = (const T s_in)
 {
-  assert(this->closed());
-
-  int ierr = 0;
-  EpetraScalar s = static_cast<EpetraScalar>(s_in);
-
-  if (this->size() != 0)
-    {
-#if EPETRA_VERSION_LESS_THAN(2,3,0)
-      
-  // 2.2.x & earlier style
-  ierr = VecSet(&s, _vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	     
-#else
-
-  // 2.3.x & later style	 
-  ierr = VecSet(_vec, s);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	     
-#endif
-    }
+  _vec->PutScalar(s_in);
   
   return *this;
 }
@@ -405,20 +310,7 @@ template <typename T>
 EpetraVector<T>&
 EpetraVector<T>::operator = (const EpetraVector<T>& v)
 {
-  if (v.initialized())
-    {
-      this->init (v.size(), v.local_size());
-      this->_is_closed      = v._is_closed;
-      this->_is_initialized = v._is_initialized;
-  
-      if (v.size() != 0)
-	{
-	  int ierr = 0;
-
-	  ierr = VecCopy (v._vec, this->_vec);
-       	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	}
-    }
+  (*_vec) = v;
   
   return *this;
 }
@@ -429,44 +321,34 @@ template <typename T>
 NumericVector<T>&
 EpetraVector<T>::operator = (const std::vector<T>& v)
 {
-  const unsigned int nl   = this->local_size();
-  const unsigned int ioff = this->first_local_index();
-  int ierr=0;
-  EpetraScalar* values;
-      
+  T * values = _vec->Values();
+  
   /**
    * Case 1:  The vector is the same size of
    * The global vector.  Only add the local components.
    */
-  if (this->size() == v.size())
-    {
-      ierr = VecGetArray (_vec, &values);
- 	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-      for (unsigned int i=0; i<nl; i++)
-	values[i] =  static_cast<EpetraScalar>(v[i+ioff]);
-      
-      ierr = VecRestoreArray (_vec, &values);
-	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
+  if(this->size() == v.size())
+  {
+    const unsigned int nl=this->local_size();
+    const unsigned int fli=this->first_local_index();
+    
+    for(unsigned int i=0;i<nl;i++)
+      values[i]=v[fli+i];
+  }
 
   /**
    * Case 2: The vector is the same size as our local
    * piece.  Insert directly to the local piece.
    */
   else
-    {
-      assert (this->local_size() == v.size());
-
-      ierr = VecGetArray (_vec, &values);
-	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-      for (unsigned int i=0; i<nl; i++)
-	values[i] = static_cast<EpetraScalar>(v[i]);
-      
-      ierr = VecRestoreArray (_vec, &values);
-	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
+  {
+    assert(v.size()==this->local_size());
+    
+    const unsigned int nl=this->local_size();
+    
+    for(unsigned int i=0;i<nl;i++)
+      values[i]=v[i];
+  }
 
   return *this;
 }
@@ -478,57 +360,17 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in) const
 {
   EpetraVector<T>* v_local = dynamic_cast<EpetraVector<T>*>(&v_local_in);
 
-  assert (v_local != NULL);
-  assert (v_local->local_size() == this->size());
+  assert(v_local);
 
-  int ierr = 0;
-  const int n = this->size();
-
-  IS is;
-  VecScatter scatter;
-
-  // Create idx, idx[i] = i;
-  std::vector<int> idx(n); Utility::iota (idx.begin(), idx.end(), 0);
-
-  // Create the index set & scatter object
-  ierr = ISCreateGeneral(libMesh::COMM_WORLD, n, &idx[0], &is);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-  ierr = VecScatterCreate(_vec,          is,
-			  v_local->_vec, is,
-			  &scatter);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-  // Perform the scatter
-#if EPETRA_VERSION_LESS_THAN(2,3,3)
-	 
-  ierr = VecScatterBegin(_vec, v_local->_vec, INSERT_VALUES,
-			 SCATTER_FORWARD, scatter);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  Epetra_Map rootMap = Epetra_Util::Create_Root_Map( *_map, libMesh::processor_id() );
+  Epetra_Import importer(rootMap, *_map);
+  v_local.ReplaceMap(rootMap);
   
-  ierr = VecScatterEnd  (_vec, v_local->_vec, INSERT_VALUES,
-			 SCATTER_FORWARD, scatter);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-#else
-  // API argument order change in Epetra 2.3.3
-  ierr = VecScatterBegin(scatter, _vec, v_local->_vec,
-			 INSERT_VALUES, SCATTER_FORWARD);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-  ierr = VecScatterEnd  (scatter, _vec, v_local->_vec,
-                         INSERT_VALUES, SCATTER_FORWARD);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-#endif
-
-  // Clean up
-  ierr = ISDestroy (is);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-  ierr = VecScatterDestroy(scatter);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  v_local.Import(*_vec, importer, Insert);
 }
 
 
+#if 0
 
 template <typename T>
 void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
