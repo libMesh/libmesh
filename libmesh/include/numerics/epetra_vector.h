@@ -471,7 +471,7 @@ inline
 EpetraVector<T>::EpetraVector (Epetra_Vector v)
   : _destroy_vec_on_exit(false)
 {
-  this->_vec = v;
+  (*_vec) = v;
   this->_is_initialized = true;
 }
 
