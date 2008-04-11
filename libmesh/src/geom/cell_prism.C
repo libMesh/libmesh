@@ -22,6 +22,7 @@
 
 // Local includes
 #include "cell_prism.h"
+#include "cell_prism6.h"
 #include "face_quad4.h"
 #include "face_tri3.h"
 
@@ -157,6 +158,20 @@ AutoPtr<DofObject> Prism::side (const unsigned int i) const
   Elem* facet = new Tri3;
   AutoPtr<DofObject> ap_facet(facet);
   return ap_facet;
+}
+
+
+
+bool Prism::is_child_on_side(const unsigned int c,
+                             const unsigned int s) const
+{
+  assert (c < this->n_children());
+  assert (s < this->n_sides());
+
+  for (unsigned int i = 0; i != 4; ++i)
+    if (Prism6::side_nodes_map[s][i] == c)
+      return true;
+  return false;
 }
 
 

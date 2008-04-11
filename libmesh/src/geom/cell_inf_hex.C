@@ -198,6 +198,16 @@ AutoPtr<DofObject> InfHex::side (const unsigned int i) const
 
 
 
+bool InfHex::is_child_on_side(const unsigned int c,
+                              const unsigned int s) const
+{
+  assert (c < this->n_children());
+  assert (s < this->n_sides());
+
+  return (s == 0 || c+1 == s || c == s%4);
+}
+
+
 
 Real InfHex::quality (const ElemQuality q) const
 {

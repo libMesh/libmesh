@@ -42,3 +42,16 @@ AutoPtr<Elem> Edge::build_side (const unsigned int i, bool) const
   nodeelem->set_node(0) = this->get_node(i);
   return AutoPtr<Elem>(nodeelem);
 }
+
+
+bool Edge::is_child_on_side(const unsigned int c,
+                            const unsigned int s) const
+{
+  assert (c < this->n_children());
+  assert (s < this->n_sides());
+
+  return (c == s);
+}
+
+
+

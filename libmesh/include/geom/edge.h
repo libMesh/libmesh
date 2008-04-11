@@ -96,6 +96,13 @@ class Edge : public Elem
    */
   unsigned int n_children() const { return 2; }
 
+  /*
+   * @returns true iff the specified child is on the
+   * specified side
+   */
+  virtual bool is_child_on_side(const unsigned int c,
+			        const unsigned int s) const;
+  
 //   /**
 //    * @returns 1
 //    */

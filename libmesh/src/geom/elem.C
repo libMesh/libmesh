@@ -809,19 +809,6 @@ bool Elem::is_child_on_edge(const unsigned int c,
 }
 
 
-bool Elem::is_child_on_side(const unsigned int c,
-                            const unsigned int s) const
-{
-  assert (c < this->n_children());
-  assert (s < this->n_sides());
-
-  Elem *child = this->child(c);
-  return ((child->neighbor(s) == NULL) // on boundary
-      || (child->neighbor(s)->parent() != this));
-}
-
-
-
 void Elem::family_tree (std::vector<const Elem*>& family,
 			const bool reset) const
 {

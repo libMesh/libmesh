@@ -22,6 +22,7 @@
 
 // Local includes
 #include "cell_pyramid.h"
+#include "cell_pyramid5.h"
 #include "face_tri3.h"
 #include "face_quad4.h"
 
@@ -156,4 +157,18 @@ AutoPtr<DofObject> Pyramid::side (const unsigned int i) const
   AutoPtr<DofObject> ap_face(NULL);
 
   return ap_face;
+}
+
+
+
+bool Pyramid::is_child_on_side(const unsigned int c,
+                             const unsigned int s) const
+{
+  assert (c < this->n_children());
+  assert (s < this->n_sides());
+
+  for (unsigned int i = 0; i != 4; ++i)
+    if (Pyramid5::side_nodes_map[s][i] == c)
+      return true;
+  return false;
 }

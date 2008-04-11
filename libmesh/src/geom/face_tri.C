@@ -104,6 +104,18 @@ AutoPtr<DofObject> Tri::side (const unsigned int i) const
 }
 
 
+
+bool Tri::is_child_on_side(const unsigned int c,
+                           const unsigned int s) const
+{
+  assert (c < this->n_children());
+  assert (s < this->n_sides());
+
+  return (c == s || c == (s+1)%3);
+}
+
+
+
 Real Tri::quality (const ElemQuality q) const
 {
   switch (q)

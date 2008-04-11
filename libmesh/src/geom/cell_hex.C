@@ -23,6 +23,7 @@
 
 // Local includes
 #include "cell_hex.h"
+#include "cell_hex8.h"
 #include "face_quad4.h"
 
 
@@ -176,6 +177,20 @@ AutoPtr<DofObject> Hex::side (const unsigned int i) const
   error();
   AutoPtr<DofObject> ap(face);
   return ap;
+}
+
+
+
+bool Hex::is_child_on_side(const unsigned int c,
+                           const unsigned int s) const
+{
+  assert (c < this->n_children());
+  assert (s < this->n_sides());
+
+  for (unsigned int i = 0; i != 4; ++i)
+    if (Hex8::side_nodes_map[s][i] == c)
+      return true;
+  return false;
 }
 
 

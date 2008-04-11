@@ -136,28 +136,23 @@ class NodeElem : public Elem
   virtual bool is_vertex(const unsigned int) const { return true; }
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * NodeElem objects don't have faces or sides
    */
   virtual bool is_edge(const unsigned int) const { return false; }
 
-  /**
-   * @returns true iff the specified (local) node number is a face.
-   */
   virtual bool is_face(const unsigned int) const { return false; }
   
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
-   */
-  virtual bool is_node_on_side(const unsigned int,
-			       const unsigned int) const { error(); return false; }
+  virtual bool is_child_on_side(const unsigned int,
+			        const unsigned int) const
+  { error(); return false; }
   
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge (i.e. "returns true" in 1D)
-   */
+  virtual bool is_node_on_side(const unsigned int,
+			       const unsigned int) const
+  { error(); return false; }
+  
   virtual bool is_node_on_edge(const unsigned int,
-			       const unsigned int) const { error(); return false; }
+			       const unsigned int) const 
+  { error(); return false; }
   
   /*
    * @returns true iff the element map is definitely affine within

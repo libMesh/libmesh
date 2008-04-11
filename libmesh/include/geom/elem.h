@@ -639,7 +639,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-			        const unsigned int s) const;
+			        const unsigned int s) const = 0;
   
   /*
    * @returns true iff the specified child is on the
