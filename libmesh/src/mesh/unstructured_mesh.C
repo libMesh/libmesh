@@ -242,9 +242,7 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
 	for (unsigned int ms=0; ms<element->n_neighbors(); ms++)
 	  {
 	  next_side:
-	    
-	    if (element->neighbor(ms) == NULL ||
-	        element->neighbor(ms) == remote_elem)
+	    if (element->neighbor(ms) == NULL)
 	      {
 		// Get the key for the side of this element
 		const unsigned int key = element->key(ms);
@@ -364,21 +362,8 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
           assert(parent);
 
           for (unsigned int s=0; s < elem->n_neighbors(); s++)
-            if (elem->neighbor(s) == NULL ||
-                elem->neighbor(s) == remote_elem)
+            if (elem->neighbor(s) == NULL)
             {	    
-              if (elem->neighbor(s) == remote_elem)
-                {
-                  // Our "remote" neighbor might have been
-                  // gathered again, but not found because
-                  // it's coarser than we are.  But if this
-                  // potential neighbor is internal to our
-                  // parent then it's really not there.
-                  unsigned int c = parent->which_child_am_i(elem);
-                  if (!parent->is_child_on_side(c, s))
-                    continue;
-                }
-
               elem->set_neighbor(s, elem->parent()->neighbor(s));
 
 #ifdef DEBUG	    
@@ -388,8 +373,16 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
                 // we don't care about neighbors of subactive element.
                 if ((!neigh->active()) && (!elem->subactive()))
                 {
+                  std::cerr << "On processor " << libMesh::processor_id() 
+                            << std::endl;
                   std::cerr << "Bad element ID = " << elem->id() 
-                    << ", Bad neighbor ID = " << neigh->id() << std::endl;
+                    << ", Side " << s << ", Bad neighbor ID = " << neigh->id() << std::endl;
+                  std::cerr << "Bad element proc_ID = " << elem->processor_id() 
+                    << ", Bad neighbor proc_ID = " << neigh->processor_id() << std::endl;
+                  std::cerr << "Bad element size = " << elem->hmax() 
+                    << ", Bad neighbor size = " << neigh->hmax() << std::endl;
+                  std::cerr << "Bad element center = " << elem->centroid() 
+                    << ", Bad neighbor center = " << neigh->centroid() << std::endl;
                   std::cerr << "ERROR: " 
                     << (elem->active()?"Active":"Ancestor")
                     << " Element at level "
