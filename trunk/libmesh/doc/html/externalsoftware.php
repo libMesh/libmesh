@@ -16,19 +16,23 @@
 <h1>External Packages</h1>
 <code>libMesh</code> interfaces to a number of high-quality software packages to provide certain functionality.  This page provides a list of packages and a description of their use in the library.
 
+<h2>MPI</h2> The <a href="http://www-unix.mcs.anl.gov/mpi">Message Passing Interface</a> is a standard for parallel programming using the message passing model. PETSc requires MPI for its functionality.  <code>libMesh</code> makes use of MPI to when running in parallel for certain operations, including its <code>ParallelMesh</code> distributed-memory, fully unstructured mesh implementation. 
+
+<h2>TBB</h2> Since February 2008 <code>libMesh</code> can be configured to use the <a href="http://threadingbuildingblocks.org/">Threading Building Blocks</a> for thread-based parallelism on shared memory machines.  Several key algorithms in the library have been refactored to be multithreaded, and this effort will continue as additional profiling reveals additional serial bottlenecks.  It is envisioned that for certain classes of problems multilevel parallelism (e.g. message passing between nodes and threading within nodes) will prove more scalable than message passing alone, especially with the introduction of commodity multi-core processors.  The reality is that for implicit problems this can only be achieved with a parallel linear algebra library that also uses multilevel parallelism.
+
 <hr>
 <h2>PETSc - Parallel Linear & Nonlinear Solvers</h2> The Portable, Extensible Toolkit for Scientific Computation <a href="http://www-unix.mcs.anl.gov/petsc/petsc-2">(PETSc)</a> is a suite of data structures and routines for the scalable (parallel) solution of scientific applications modeled by partial differential equations.
 
 <h3>SLEPc</h3> The Scalable Library for Eigenvalue Computations <a href="http://www.grycap.upv.es/slepc">(SLEPc)</a> is a library for the solution of large scale sparse eigenvalue problems on parallel computers. It is an extension of PETSc and can be used for either standard or generalized eigenproblems, with real or complex arithmetic.
 
-<h3>MPI</h3> The <a href="http://www-unix.mcs.anl.gov/mpi">Message Passing Interface</a> is a standard for parallel programming using the message passing model. PETSc requires MPI for its functionality.  <code>libMesh</code> makes use of MPI to when running in parallel for certain operations, including its <code>ParallelMesh</code> distributed-memory, fully unstructured mesh implementation. 
-
-<h3>TBB</h3> Since February 2008 <code>libMesh</code> can be configured to use the <a href="http://threadingbuildingblocks.org/">Threading Building Blocks</a> for thread-based parallelism on shared memory machines.  Several key algorithms in the library have been refactored to be multithreaded, and this effort will continue as additional profiling reveals additional serial bottlenecks.  It is envisioned that for certain classes of problems multilevel parallelism (e.g. message passing between nodes and threading within nodes) will prove more scalable than message passing alone, especially with the introduction of commodity multi-core processors.  The reality is that for implicit problems this can only be achieved with a parallel linear algebra library that also uses multilevel parallelism.
-
 <h3>BLAS</h3> The <a href="http://www.netlib.org/blas">Basic Linear Algebra Subprograms</a> are routines that provide standard building blocks for performing basic vector and matrix operations. The Level 1 BLAS perform scalar, vector and vector-vector operations, the Level 2 BLAS perform matrix-vector operations, and the Level 3 BLAS perform matrix-matrix operations. High-performance implementations of the BLAS are generally provided by computer hardware manufacturers for a particular architecture.  PETSc makes extensive use of the BLAS hence a high-performance BLAS implementation is key to achieving high performance from the PETSc linear solvers.
 
 <h3>LAPACK</h3>
 <a href="http://www.netlib.org/lapack">LAPACK</a> s written in Fortran77 and provides routines for solving systems of simultaneous linear equations, least-squares solutions of linear systems of equations, eigenvalue problems, and singular value problems. The associated matrix factorizations (LU, Cholesky, QR, SVD, Schur, generalized Schur) are also provided, as are related computations such as reordering of the Schur factorizations and estimating condition numbers. Dense and banded matrices are handled, but not general sparse matrices.  PETSc makes use of LAPACK in several computational kernels within its linear solver framework.
+
+<hr>
+<h2>Trilinos</h2>
+<a href="http://trilinos.sandia.gov">The Trilinos Project</a> is an effort to develop and implement robust algorithms and enabling technologies using modern object-oriented software design, while still leveraging the value of established libraries. It emphasizes abstract interfaces for maximum flexibility of component interchanging, and provides a full-featured set of concrete classes that implement all abstract interfaces. Current development efforts will permit <code>libMesh</code> can use the Epetra parallel matrix and vector data structures, as well as the AztecOO parallel linear solvers.
 
 <hr>
 <h2>LASPack - Serial Linear Solvers</h2>
