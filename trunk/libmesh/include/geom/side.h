@@ -115,11 +115,15 @@ class Side : public SideType
   }
 
   /**
-   * @returns 0. Sides effectively do not have sides, so
-   * don't even ask!
+   * @Sides effectively do not have sides, so don't even ask!
    */
-  virtual unsigned int n_sides () const { return 0; }
+  virtual unsigned int n_sides () const 
+  { error(); return 0; }
 
+  virtual bool is_child_on_side(const unsigned int,
+			        const unsigned int) const
+  { error(); return false; }
+  
   
  private:
 

@@ -119,6 +119,15 @@ AutoPtr<DofObject> InfQuad::side (const unsigned int i) const
 
 
 
+bool InfQuad::is_child_on_side(const unsigned int c,
+                               const unsigned int s) const
+{
+  assert (c < this->n_children());
+  assert (s < this->n_sides());
+
+  return (s == 0 || s == c+1);
+}
+
 
 
 Real InfQuad::quality (const ElemQuality) const

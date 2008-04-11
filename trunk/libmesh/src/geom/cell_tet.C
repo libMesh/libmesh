@@ -22,6 +22,7 @@
 
 // Local includes
 #include "cell_tet.h"
+#include "cell_tet4.h"
 #include "face_tri3.h"
 
 
@@ -122,6 +123,20 @@ AutoPtr<DofObject> Tet::side (const unsigned int i) const
   error();
   AutoPtr<DofObject> ap_face(face);
   return ap_face;
+}
+
+
+
+bool Tet::is_child_on_side(const unsigned int c,
+                           const unsigned int s) const
+{
+  assert (c < this->n_children());
+  assert (s < this->n_sides());
+
+  for (unsigned int i = 0; i != 3; ++i)
+    if (Tet4::side_nodes_map[s][i] == c)
+      return true;
+  return false;
 }
 
 

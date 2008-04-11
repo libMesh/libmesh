@@ -116,6 +116,13 @@ public:
    */
   unsigned int n_children() const { return 2; }
   
+  /*
+   * @returns true iff the specified child is on the
+   * specified side
+   */
+  virtual bool is_child_on_side(const unsigned int c,
+			        const unsigned int s) const;
+  
   /**
    * @returns an id associated with the \p s side of this element.
    * The id is not necessariy unique, but should be close.  This is

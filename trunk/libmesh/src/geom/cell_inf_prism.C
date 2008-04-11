@@ -156,4 +156,15 @@ AutoPtr<DofObject> InfPrism::side (const unsigned int i) const
 
 
 
+bool InfPrism::is_child_on_side(const unsigned int c,
+                                const unsigned int s) const
+{
+  assert (c < this->n_children());
+  assert (s < this->n_sides());
+
+  return (s == 0 || c+1 == s || c == s%3);
+}
+
+
+
 #endif // ifdef ENABLE_INFINITE_ELEMENTS
