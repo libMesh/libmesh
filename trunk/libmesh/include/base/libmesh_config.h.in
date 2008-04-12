@@ -27,6 +27,10 @@
    on unexpected errors */
 #undef ENABLE_EXCEPTIONS
 
+/* Flag indicating if the library should be built to output stack
+ * trace files on unexpected errors */
+#undef ENABLE_TRACEFILES
+
 /* Flag indicating if the library should be built with periodic boundary
    condition support */
 #undef ENABLE_PERIODIC

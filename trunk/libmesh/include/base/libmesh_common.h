@@ -33,6 +33,7 @@
 
 // C/C++ includes everyone should know about
 #include <iostream> // needed for std::cout, std::cerr
+#include <fstream> // needed for argument to print_trace()
 #include <complex>
 #include <cassert>
 #ifdef HAVE_STDLIB_H
@@ -42,6 +43,10 @@
 // _basic_ library functionality
 #include "libmesh_base.h"
 #include "libmesh_exceptions.h"
+
+#ifdef ENABLE_TRACEFILES
+#  include "print_trace.h"
+#endif
 
 
 
@@ -199,10 +204,21 @@ namespace libMesh
 #  define stop()     { if (libMesh::n_processors() == 1) { here(); std::cerr << "WARNING:  stop() does not work without the <csignal> header file!" << std::endl; } }
 #endif
 
+// The libmesh_assert() macro acts like C's assert(), but throws an error()
+// (including stack trace, etc) instead of just exiting
+#ifdef NDEBUG
+#define libmesh_assert(asserted) { }
+#else
+#define libmesh_assert(asserted)  { if (!(asserted)) { std::cerr << "Assertion `" #asserted "' failed." << std::endl; error(); } }
+#endif
 
 // The error() macro prints a message and throws a generic exception
 #undef error
+#ifdef ENABLE_TRACEFILES
+#define error()    { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); print_trace(traceout); std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::LogicError()); }
+#else
 #define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::LogicError()); }
+#endif
 
 // The untested macro warns that you are using untested code
 #undef untested
