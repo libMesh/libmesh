@@ -85,6 +85,22 @@ if test "$enableexceptions" != no ; then
 fi
 dnl --------------------------------------------------------------
 
+dnl --------------------------------------------------------------
+dnl Write stack trace output files on error() - disabled by default
+dnl --------------------------------------------------------------
+AC_ARG_ENABLE(tracefiles,
+              AC_HELP_STRING([--enable-tracefiles],
+                             [write stack trace files on unexpected errors]),
+              enabletracefiles=$enableval,
+              enabletracefiles=no)
+
+if test "$enabletracefiles" != no ; then
+  AC_DEFINE(ENABLE_TRACEFILES, 1,
+           [Flag indicating if the library should be built to write stack trace files on unexpected errors])
+  AC_MSG_RESULT(<<< Configuring library with stack trace file support >>>)
+fi
+dnl --------------------------------------------------------------
+
 dnl See aclocal.m4 for the definition of this function.  It can
 dnl figure out which version of a particular compiler, e.g. GCC 4.0,
 dnl you are using.
