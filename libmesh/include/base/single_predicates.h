@@ -100,6 +100,28 @@ namespace Predicates
   };
 
 
+  // The ancestor predicate returns true if the pointer is ancestor.
+  template <typename T>
+  struct ancestor : predicate<T>
+  {
+    virtual ~ancestor() {}
+    virtual bool operator()(const T& it) const { return (*it)->ancestor(); }
+    
+  protected:
+    virtual predicate<T>* clone() const { return new ancestor<T>(*this); }
+  };
+
+  // The not_ancestor predicate returns true when the pointer is not ancestor
+  template <typename T>
+  struct not_ancestor : ancestor<T>
+  {
+    virtual bool operator()(const T& it) const { return !ancestor<T>::operator()(it); }
+
+  protected:
+    virtual predicate<T>* clone() const { return new not_ancestor<T>(*this); }
+  };
+
+
   // The subactive predicate returns true if the pointer is subactive.
   template <typename T>
   struct subactive : predicate<T>

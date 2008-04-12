@@ -139,11 +139,17 @@ public:
   element_iterator active_elements_begin ();
   element_iterator active_elements_end   ();
 
+  element_iterator ancestor_elements_begin ();
+  element_iterator ancestor_elements_end   ();
+
   element_iterator subactive_elements_begin ();
   element_iterator subactive_elements_end   ();
 
   element_iterator not_active_elements_begin ();
   element_iterator not_active_elements_end   ();
+
+  element_iterator not_ancestor_elements_begin ();
+  element_iterator not_ancestor_elements_end   ();
 
   element_iterator not_subactive_elements_begin ();
   element_iterator not_subactive_elements_end   ();
@@ -197,11 +203,17 @@ public:
   const_element_iterator active_elements_begin() const;
   const_element_iterator active_elements_end()   const;
   
+  const_element_iterator ancestor_elements_begin() const;
+  const_element_iterator ancestor_elements_end()   const;
+  
   const_element_iterator subactive_elements_begin() const;
   const_element_iterator subactive_elements_end()   const;
   
   const_element_iterator not_active_elements_begin() const;
   const_element_iterator not_active_elements_end()   const;
+
+  const_element_iterator not_ancestor_elements_begin() const;
+  const_element_iterator not_ancestor_elements_end()   const;
 
   const_element_iterator not_subactive_elements_begin() const;
   const_element_iterator not_subactive_elements_end()   const;

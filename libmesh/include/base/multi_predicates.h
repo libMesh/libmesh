@@ -166,6 +166,36 @@ namespace Predicates
 
   
 
+  // Instantiation for the Ancestor abstract_multi_predicate
+  template <typename T>
+  struct Ancestor : abstract_multi_predicate<T>
+  {
+    // Constructor, pushes back two single predicates
+    Ancestor()
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new ancestor<T>);
+    }
+  };
+
+
+  
+
+  // Instantiation for the NotAncestor abstract_multi_predicate
+  template <typename T>
+  struct NotAncestor : abstract_multi_predicate<T>
+  {
+    // Constructor, pushes back two single predicates
+    NotAncestor()
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new not_ancestor<T>);
+    }
+  };
+
+
+
+  
   // Instantiation for the SubActive abstract_multi_predicate
   template <typename T>
   struct SubActive : abstract_multi_predicate<T>

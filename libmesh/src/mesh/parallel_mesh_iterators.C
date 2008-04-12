@@ -61,6 +61,26 @@ ParallelMesh::not_active_elements_begin ()
 
 
 
+// ancestor elements begin() accessor
+ParallelMesh::element_iterator
+ParallelMesh::ancestor_elements_begin ()
+{
+  Predicates::Ancestor<elem_iterator_imp> p;
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
+// not ancestor elements begin() accessor
+ParallelMesh::element_iterator
+ParallelMesh::not_ancestor_elements_begin ()
+{
+  Predicates::Ancestor<elem_iterator_imp> p;
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
 // subactive elements begin() accessor
 ParallelMesh::element_iterator
 ParallelMesh::subactive_elements_begin ()
@@ -241,6 +261,26 @@ ParallelMesh::const_element_iterator
 ParallelMesh::not_active_elements_begin () const
 {
   Predicates::NotActive<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
+// const ancestor begin() accessor
+ParallelMesh::const_element_iterator
+ParallelMesh::ancestor_elements_begin () const
+{
+  Predicates::Ancestor<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
+// const not ancestor begin() accessor
+ParallelMesh::const_element_iterator
+ParallelMesh::not_ancestor_elements_begin () const
+{
+  Predicates::Ancestor<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -431,6 +471,26 @@ ParallelMesh::not_active_elements_end ()
 
 
 
+// ancestor end() accessor
+ParallelMesh::element_iterator
+ParallelMesh::ancestor_elements_end ()
+{
+  Predicates::Ancestor<elem_iterator_imp> p;
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
+// ancestor end() accessor
+ParallelMesh::element_iterator
+ParallelMesh::not_ancestor_elements_end ()
+{
+  Predicates::Ancestor<elem_iterator_imp> p;
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
 // subactive end() accessor
 ParallelMesh::element_iterator
 ParallelMesh::subactive_elements_end ()
@@ -614,6 +674,26 @@ ParallelMesh::const_element_iterator
 ParallelMesh::not_active_elements_end () const
 {
   Predicates::NotActive<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
+// ancestor const end() accessor
+ParallelMesh::const_element_iterator
+ParallelMesh::ancestor_elements_end () const
+{
+  Predicates::Ancestor<const_elem_iterator_imp> p;
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
+// not ancestor const end() accessor
+ParallelMesh::const_element_iterator
+ParallelMesh::not_ancestor_elements_end () const
+{
+  Predicates::Ancestor<const_elem_iterator_imp> p;
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 
