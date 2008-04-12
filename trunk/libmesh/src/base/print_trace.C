@@ -64,20 +64,19 @@ std::string abi_demangle(const char *name)
   return goodname;
 }
 
-void print_trace(void)
+void print_trace(std::ostream &out)
 {
   void *addresses[10];
   char **strings;
 
   int size = backtrace(addresses, 10);
   strings = backtrace_symbols(addresses, size);
-  std::cerr << "Stack frames: " << size << std::endl;
+  out << "Stack frames: " << size << std::endl;
   for(int i = 0; i < size; i++)
     {
-//      std::cerr << i << ": " << (int)addresses[i] << std::endl;
-//      std::cerr << abi_demangle(strings[i]) << std::endl;
-      std::cerr << i << ": "
-                << abi_demangle(strings[i]) << std::endl;
+//      out << i << ": " << (int)addresses[i] << std::endl;
+//      out << abi_demangle(strings[i]) << std::endl;
+      out << i << ": " << abi_demangle(strings[i]) << std::endl;
     }
   free(strings);
 }
