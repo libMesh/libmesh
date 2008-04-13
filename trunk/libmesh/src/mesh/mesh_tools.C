@@ -734,6 +734,59 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<un
 
 
 
+#ifdef DEBUG
+void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
+{
+  std::vector<bool> node_is_touched(mesh.max_node_id(), false);
+
+  const MeshBase::const_element_iterator el_end =
+    mesh.active_local_elements_end();
+  for (MeshBase::const_element_iterator el = 
+       mesh.active_local_elements_begin(); el != el_end; ++el)
+    {
+      const Elem* elem = *el;
+      libmesh_assert (elem);
+      unsigned int elemprocid = elem->processor_id();
+
+      for (unsigned int i=0; i != elem->n_nodes(); ++i)
+        {
+          const Node *node = elem->get_node(i);
+          unsigned int nodeid = node->id();
+          unsigned int nodeprocid = node->processor_id();
+          if (nodeprocid == elemprocid)
+            node_is_touched[nodeid] = true;
+        }
+    }
+
+  const MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
+  for (MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
+       nd != nd_end; ++nd)
+    {
+      const Node *node = *nd;
+      libmesh_assert(node);
+
+      unsigned int nodeid = node->id();
+      libmesh_assert(node_is_touched[nodeid]);
+    }
+}
+
+
+
+void MeshTools::libmesh_assert_valid_neighbors(const MeshBase &mesh)
+{
+  const MeshBase::const_element_iterator el_end = mesh.elements_end();
+  for (MeshBase::const_element_iterator el = mesh.elements_begin();
+       el != el_end; ++el)
+    {
+      const Elem* elem = *el;
+      libmesh_assert (elem);
+      elem->libmesh_assert_valid_neighbors();
+    }
+}
+#endif
+
+
+
 void MeshTools::Private::globally_renumber_nodes_and_elements (MeshBase& mesh)
 {
   MeshCommunication().assign_global_indices(mesh);
