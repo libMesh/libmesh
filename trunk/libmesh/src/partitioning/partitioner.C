@@ -44,8 +44,8 @@ void Partitioner::partition (MeshBase& mesh,
 			     const unsigned int n)
 {
   // For now we don't repartition in parallel
-  //if (!mesh.is_serial())
-  //  return;
+  if (!mesh.is_serial())
+    return;
 
   // we cannot partition into more pieces than we have
   // active elements!
@@ -282,8 +282,8 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 		     DofObject::invalid_processor_id);
 
 	  // first build up local contributions to parent_processor_ids
-	  MeshBase::element_iterator       not_it  = mesh.not_active_elements_begin();
-	  const MeshBase::element_iterator not_end = mesh.not_active_elements_end(); 
+	  MeshBase::element_iterator       not_it  = mesh.ancestor_elements_begin();
+	  const MeshBase::element_iterator not_end = mesh.ancestor_elements_end(); 
 
 	  bool have_parent_in_block = false;
 	  
@@ -320,7 +320,7 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 
 	  // and assign the ids, if we have a parent in this block.
 	  if (have_parent_in_block)
-	    for (not_it = mesh.not_active_elements_begin();
+	    for (not_it = mesh.ancestor_elements_begin();
 		 not_it != not_end; ++not_it)
 	      {
 		Elem *parent = *not_it;
