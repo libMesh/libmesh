@@ -216,7 +216,9 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
     typedef std::pair<Elem*, unsigned char> val_type;
     typedef std::pair<key_type, val_type>   key_val_pair;
     
-#if   defined(HAVE_UNORDERED_MAP) || defined(HAVE_TR1_UNORDERED_MAP)
+#if   defined(HAVE_UNORDERED_MAP)
+    typedef std::unordered_multimap<key_type, val_type> map_type;    
+#elif defined(HAVE_TR1_UNORDERED_MAP)
     typedef std::tr1::unordered_multimap<key_type, val_type> map_type;    
 #elif defined(HAVE_HASH_MAP)    
     typedef std::hash_multimap<key_type, val_type> map_type;    
