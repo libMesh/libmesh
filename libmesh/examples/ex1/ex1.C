@@ -54,7 +54,7 @@ int main (int argc, char** argv)
       // This handy function will print the file name, line number,
       // and then abort.  Currently the library does not use C++
       // exception handling.
-      error();
+      libmesh_error();
     }
   
   // Get the dimensionality of the mesh from argv[2]

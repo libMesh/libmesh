@@ -112,7 +112,7 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
     }
   }
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -140,7 +140,7 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
     }
   }
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -161,7 +161,7 @@ Real clough_raw_shape(const unsigned int basis_num,
         return -xi*xi + xi*xi*xi;
     }
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -180,7 +180,7 @@ Real FE<1,CLOUGH>::shape(const ElemType,
 	    << "to construct gradient-based degrees of freedom."
 	    << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -224,21 +224,21 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
 		case 3:
                   return d2xd2x * clough_raw_shape(3, p);
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -255,7 +255,7 @@ Real FE<1,CLOUGH>::shape_deriv(const ElemType,
 	    << "to construct gradient-based degrees of freedom."
 	    << std::endl;
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -298,21 +298,21 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem* elem,
 		case 3:
                   return d2xd2x * clough_raw_shape_deriv(3, j, p);
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -355,20 +355,20 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem* elem,
 		case 3:
                   return d2xd2x * clough_raw_shape_second_deriv(3, j, p);
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }

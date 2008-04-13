@@ -53,7 +53,7 @@ Real FE<1,LAGRANGE>::shape(const ElemType,
 	   
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -77,7 +77,7 @@ Real FE<1,LAGRANGE>::shape(const ElemType,
 	    
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -104,19 +104,19 @@ Real FE<1,LAGRANGE>::shape(const ElemType,
 	   
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       
     default:
       {
 	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-	error();
+	libmesh_error();
       }
     }
 
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -166,7 +166,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
 	    
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
 	
@@ -189,7 +189,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
 	   
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -215,7 +215,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
 	    
 	  default:
 	    std::cerr << "Invalid shape function index!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -223,11 +223,11 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
     default:
       {
 	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-	error();
+	libmesh_error();
       }
     }
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -289,7 +289,7 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
 	    {
 	      std::cerr << "Invalid shape function index requested!"
 			<< std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
       } // end case SECOND
@@ -314,7 +314,7 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
           {
             std::cerr << "Invalid shape function index requested!"
                       << std::endl;
-            error();
+            libmesh_error();
           }
         }
      } // end case THIRD
@@ -323,11 +323,11 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
     default:
       {
 	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-	error();
+	libmesh_error();
       }
     } // end switch (order)
   
-  error();
+  libmesh_error();
   return 0.;
 }
 

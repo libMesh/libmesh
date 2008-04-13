@@ -142,7 +142,7 @@ Real hermite_bases_2D
             coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]];
             bases1D[0] += 2; bases1D[1] += 2; break;
           default:
-            error();
+            libmesh_error();
         }
     }
   // Edges
@@ -176,7 +176,7 @@ Real hermite_bases_2D
             coef = dxdxi[0][0];
           break;
         default:
-          error();
+          libmesh_error();
         }
     }
   // Interior
@@ -206,7 +206,7 @@ Real FE<2,HERMITE>::shape(const ElemType,
 	    << "to construct gradient-based degrees of freedom."
 	    << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -244,10 +244,10 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
       }
     default:
       std::cerr << "ERROR: Unsupported element type!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -264,7 +264,7 @@ Real FE<2,HERMITE>::shape_deriv(const ElemType,
 	    << "to construct gradient-based degrees of freedom."
 	    << std::endl;
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -310,15 +310,15 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
                 FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
                 FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1));
             default:
-              error();
+              libmesh_error();
           }
       }
     default:
       std::cerr << "ERROR: Unsupported element type!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -368,14 +368,14 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
               FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
               FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[1],p(1));
           default:
-            error();
+            libmesh_error();
           }
       }
     default:
       std::cerr << "ERROR: Unsupported element type!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }

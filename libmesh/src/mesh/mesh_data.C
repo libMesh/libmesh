@@ -271,7 +271,7 @@ void MeshData::read (const std::string& name)
 		    << "     *.xtr  -- Internal binary data format\n"
 		    << "     *.unv  -- I-deas format\n"
 		    << std::endl;
-	  error();
+	  libmesh_error();
 	  
 	}    
     }
@@ -319,7 +319,7 @@ void MeshData::write (const std::string& name)
 		  << "     *.xtr  -- Internal binary data format\n"
 		  << "     *.unv  -- I-deas format\n"
 		  << std::endl;
-	error();
+	libmesh_error();
 
       }    
   }
@@ -391,7 +391,7 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
 	  std::cerr << "ERROR: Have no Node* associated with the foreign id = "
 		    << fid
 		    << std::endl;
-	  error();
+	  libmesh_error();
 	  return NULL;
 	}
       else
@@ -404,7 +404,7 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
       return this->_mesh.node_ptr(fid);
 
   // should never get here
-  error();
+  libmesh_error();
   return NULL;
 }
 
@@ -431,7 +431,7 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
 		    << "with the libMesh id = "
 		    << n->id()
 		    << std::endl;
-	  error();
+	  libmesh_error();
 	  return 0;
 	}
       else
@@ -443,7 +443,7 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
     return n->id();
 
   // should never get here
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -469,7 +469,7 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
 	  std::cerr << "ERROR: Have no Elem* associated with the foreign id = "
 		    << fid
 		    << std::endl;
-	  error();
+	  libmesh_error();
 	  return NULL;
 	}
       else
@@ -481,7 +481,7 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
     return this->_mesh.elem(fid);
 
   // should never get here
-  error();
+  libmesh_error();
   return NULL;
 }
 
@@ -508,7 +508,7 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
 		    << "with the libMesh id = "
 		    << e->id()
 		    << std::endl;
-	  error();
+	  libmesh_error();
 	  return 0;
 	}
       else
@@ -520,7 +520,7 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
     return e->id();
 
   // should never get here
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -542,7 +542,7 @@ void MeshData::insert_node_data (std::map<const Node*,
     {
       std::cerr << "ERROR: Nodal data already closed!  Use clear() first!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   assert (this->_node_data.empty());
@@ -569,7 +569,7 @@ void MeshData::insert_node_data (std::map<const Node*,
       {
 	std::cerr << "ERROR: Size mismatch."
 		  << std::endl;
-	error();
+	libmesh_error();
       }
 #endif
 
@@ -606,7 +606,7 @@ void MeshData::insert_elem_data (std::map<const Elem*,
     {
       std::cerr << "ERROR: Element data already closed!  Use clear() first!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   assert (this->_elem_data.empty());
@@ -627,7 +627,7 @@ void MeshData::insert_elem_data (std::map<const Elem*,
       {
 	std::cerr << "ERROR: Size mismatch."
 		  << std::endl;
-	error();
+	libmesh_error();
       }
 #endif
 

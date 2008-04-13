@@ -32,7 +32,7 @@ void NodeElem::connectivity(const unsigned int,
 			    const IOPackage,
 			    std::vector<unsigned int>&) const
 {
-  error();
+  libmesh_error();
 }
 
 #ifdef ENABLE_AMR

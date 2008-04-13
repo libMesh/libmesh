@@ -450,7 +450,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
     default:
       {
 	std::cout << "Undefined element type!." << std::endl;
-	error();
+	libmesh_error();
       }
     }
   

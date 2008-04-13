@@ -220,7 +220,7 @@ void DenseMatrix<T>::lu_solve (DenseVector<T>& b,
 	std::cerr << "Error! This matrix already has a "
 		  << "different decomposition..."
 		  << std::endl;
-	error();
+	libmesh_error();
       }
     }
 
@@ -338,7 +338,7 @@ void DenseMatrix<T>::_lu_decompose (const bool partial_pivot)
   // Do partial pivoting.
   else
     {
-      error();
+      libmesh_error();
     }
   
   // Set the flag for LU decomposition
@@ -360,7 +360,7 @@ T DenseMatrix<T>::det ()
       std::cerr << "Error! Can't compute the determinant under "
 		<< "the current decomposition."
 		<< std::endl;
-      error();
+      libmesh_error();
     }
   
   // A variable to keep track of the running product of diagonal terms.
@@ -408,7 +408,7 @@ void DenseMatrix<T>::cholesky_solve (DenseVector<T2>& b,
 	std::cerr << "Error! This matrix already has a "
 		  << "different decomposition..."
 		  << std::endl;
-	error();
+	libmesh_error();
       }
     }
 
@@ -454,7 +454,7 @@ void DenseMatrix<T>::_cholesky_decompose ()
 		  std::cerr << "Error! Can only use Cholesky decomposition "
 			    << "with symmetric positive definite matrices."
 			    << std::endl;
-		  error();
+		  libmesh_error();
 		}
 #endif
 

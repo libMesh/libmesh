@@ -91,7 +91,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
                       << " in element " 
                       << elem->id()
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 
 	// The inverse Jacobian entries also come from the
@@ -170,7 +170,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
                       << " in element " 
                       << elem->id()
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 	    
 	JxW[p] = jac*qw[p];
@@ -230,7 +230,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
                       << " in element " 
                       << elem->id()
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 	      
 	const Real inv_det = 1./det;
@@ -338,7 +338,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
                       << " in element " 
                       << elem->id()
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 
 	JxW[p] = jac*qw[p];
@@ -364,7 +364,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -855,7 +855,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
 	  //  Some other dimension?
 	default:
-	  error();
+	  libmesh_error();
 	} // end switch(Dim), dp now computed
 
 
@@ -909,7 +909,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
                             << " in element " << elem->id()
 			    << std::endl;
 
-		  error();
+		  libmesh_error();
 		}
 	    }
 	  //  Return a far off point when secure is false - this

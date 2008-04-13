@@ -119,7 +119,7 @@ int main (int argc, char** argv)
           std::cerr << std::endl;
         }
       
-      error();
+      libmesh_error();
     }
   
   

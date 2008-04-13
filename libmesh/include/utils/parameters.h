@@ -359,7 +359,7 @@ const T& Parameters::get (const std::string& name) const
 		<< name << "\":" << std::endl
 		<< *this;
       
-      error();
+      libmesh_error();
     }
 
   Parameters::const_iterator it = _values.find(name);

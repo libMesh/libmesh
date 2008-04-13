@@ -398,7 +398,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 	
     default:
       // Hm?
-      error();
+      libmesh_error();
   }
 
 
@@ -433,7 +433,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
         {	  
 	  std::cerr << "ERROR: This is not a linear element: type=" 
 		    << lo_elem->type() << std::endl;
-	  error();
+	  libmesh_error();
 	}
 
       // this does _not_ work for refined elements
@@ -836,7 +836,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 			      default:
 				{
 				  std::cerr << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
-				  error();
+				  libmesh_error();
 				}
 			      }
 			  }
@@ -877,7 +877,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 			      default:
 				{
 				  std::cerr << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
-				  error();
+				  libmesh_error();
 				}
 			      }
 			  } // end edge_swap==true

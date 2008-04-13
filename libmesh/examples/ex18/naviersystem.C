@@ -573,7 +573,7 @@ Point NavierSystem::forcing(const Point& p)
 
     default:
       {
-	error();
+	libmesh_error();
       }
     }
 }

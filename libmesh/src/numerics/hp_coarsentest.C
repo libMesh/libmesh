@@ -165,7 +165,7 @@ void HPCoarsenTest::select_refinement (System &system)
 		    << std::endl
 		    << " n_vars=" << n_vars
 		    << std::endl;
-	  error();
+	  libmesh_error();
 	}
     }
   else

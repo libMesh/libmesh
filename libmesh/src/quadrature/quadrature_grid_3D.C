@@ -138,11 +138,11 @@ void QGrid::init_3D(const ElemType _type,
     default:
       {
 	std::cerr << "ERROR: Unsupported type: " << _type << std::endl;
-	error();
+	libmesh_error();
       }
     }
 
-  error();
+  libmesh_error();
 
   return;
   

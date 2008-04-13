@@ -102,11 +102,11 @@ void Edge2::connectivity(const unsigned int sc,
 
     default:
       {
-	error();
+	libmesh_error();
       }
     }
 
-  error();
+  libmesh_error();
 }
 
 

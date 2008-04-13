@@ -52,7 +52,7 @@ unsigned int Tri::key (const unsigned int s) const
 
   
   // We will never get here...  Look at the code above.
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -92,13 +92,13 @@ AutoPtr<DofObject> Tri::side (const unsigned int i) const
       }
     default:
       {
-	error();
+	libmesh_error();
       }
     }
 
   
   // We will never get here...  Look at the code above.
-  error();
+  libmesh_error();
   AutoPtr<DofObject> ap_edge(edge);
   return ap_edge;
 }

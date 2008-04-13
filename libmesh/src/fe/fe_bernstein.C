@@ -100,14 +100,14 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
       
     default:
       {
-	error();
+	libmesh_error();
 	return;
       }
     }
 
   
   // How did we get here?
-  error();  
+  libmesh_error();  
   return;
 }
 
@@ -131,7 +131,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	else if (o == 2)
 	  return 8;
 	else
-	  error();  
+	  libmesh_error();  
       }
     case QUAD9:
       return ((o+1)*(o+1));
@@ -144,7 +144,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	else if (o == 2)
 	  return 20;
 	else
-	  error();
+	  libmesh_error();
       }
     case HEX27:
       return ((o+1)*(o+1)*(o+1));
@@ -160,10 +160,10 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	return ((o+1)*(o+2)*(o+3)/6); 
       }
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
   return 0;
 
   // old code
@@ -194,7 +194,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 // 	    return 8;
 
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 // 	  }
 //       }
 
@@ -227,7 +227,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 // 	    return 27;
 
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 // 	  }
 //       }
 
@@ -255,7 +255,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 // 	    return 64;
 
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 // 	  }
 //       }
 
@@ -283,7 +283,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 // 	    return 125;
 
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 // 	  }
 //       }
 
@@ -308,7 +308,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 // 	    return 216;
 
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 // 	  }
 //       }
 
@@ -333,17 +333,17 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 // 	    return 343;
 
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 // 	  }
 //       }
       
 //     default:
 //       {
-// 	error();
+// 	libmesh_error();
 //       }
 //     }
   
-//   error();  
+//   libmesh_error();  
 //   return 0;
 }
 
@@ -368,7 +368,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  assert (o>1);
 	  return (o-1);
 	default:
-	  error();		  
+	  libmesh_error();		  
 	}
     case TRI6:
       switch (n)
@@ -384,7 +384,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  return (o-1);
         // Internal DoFs are associated with the elem, not its nodes
 	default:
-	  error();
+	  libmesh_error();
 	}
     case QUAD8:
       assert (n<8);
@@ -410,7 +410,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    return 0;
 	    
 	  default:
-	    error();		  
+	    libmesh_error();		  
 	  }
       }
     case HEX8:
@@ -459,7 +459,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  return 0;
 	  
 	default:
-	  error();
+	  libmesh_error();
         }
     case TET4:
       assert(n<4);
@@ -484,15 +484,15 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  return (o-1);
 	  
 	default:
-	  error();
+	  libmesh_error();
 	}
       
     default:
-      error();
+      libmesh_error();
       
     }
 
-  error();
+  libmesh_error();
   return 0;
 
 //   switch (o)
@@ -516,7 +516,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 0;
 		  
 // 		default:
-// 		  error();		  
+// 		  libmesh_error();		  
 // 		}
 // 	    }
 
@@ -538,7 +538,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 0;
 
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 	    
@@ -566,7 +566,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 0;
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -592,7 +592,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 0;
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -641,7 +641,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 	    }
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 	    
 // 	  }
 //       }
@@ -708,7 +708,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 	    }
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 	    
 // 	  }
 //       }
@@ -734,7 +734,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 2;
 		  
 // 		default:
-// 		  error();		  
+// 		  libmesh_error();		  
 // 		}
 // 	    }
 
@@ -758,7 +758,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 	      return 1;
 
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -786,7 +786,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 4;
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -811,7 +811,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 2;
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -859,7 +859,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 	    }
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 	    
 // 	  }
 //       }
@@ -885,7 +885,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 3;
 		  
 // 		default:
-// 		  error();		  
+// 		  libmesh_error();		  
 // 		}
 // 	    }
 
@@ -909,7 +909,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 3;
 
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -937,7 +937,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 9;
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -961,7 +961,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 3;
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -1009,7 +1009,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 	    }
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 	    
 // 	  }
 //       }
@@ -1035,7 +1035,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 4;
 		  
 // 		default:
-// 		  error();		  
+// 		  libmesh_error();		  
 // 		}
 // 	    }
 
@@ -1059,7 +1059,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 6;
 
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -1087,7 +1087,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 16;
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -1135,7 +1135,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 	    }
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 	    
 // 	  } // switch ElemType
 //       } // case FIFTH
@@ -1160,7 +1160,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 5;
 		  
 // 		default:
-// 		  error();		  
+// 		  libmesh_error();		  
 // 		}
 // 	    }
 
@@ -1184,7 +1184,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 10;
 
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -1212,7 +1212,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 		  return 25;
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -1260,18 +1260,18 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 	    }
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 	    
 // 	  } // switch ElemType
 //       } // case SIXTH
 
       
 //     default:
-//       error();
+//       libmesh_error();
 //       
 //     }
   
-//   error();
+//   libmesh_error();
 //   return 0;
 
 }
@@ -1310,10 +1310,10 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       assert (o<3);
 	return 0;
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
   return 0;
 
 //   switch (o)
@@ -1364,7 +1364,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	    
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 	    
 // 	  }
 //       }
@@ -1414,7 +1414,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 	    
 // 	  }
 //       }
@@ -1460,7 +1460,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 	    
 // 	  }
 //       }
@@ -1506,7 +1506,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 	    
 // 	  }
 //       }
@@ -1548,7 +1548,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 	    
 // 	  }
 //       }
@@ -1590,7 +1590,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 	    
 // 	  }
 //       }

@@ -59,7 +59,7 @@ unsigned int InfQuad::key (const unsigned int s) const
     }
 
   // We will never get here...  Look at the code above.
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -107,13 +107,13 @@ AutoPtr<DofObject> InfQuad::side (const unsigned int i) const
 
     default:
       {
-	error();
+	libmesh_error();
 	AutoPtr<DofObject> ap(NULL);  return ap;
       }
     }
 
   // We will never get here...  Look at the code above.
-  error();
+  libmesh_error();
   AutoPtr<DofObject> ap(NULL);  return ap;
 }
 

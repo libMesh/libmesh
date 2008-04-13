@@ -105,7 +105,7 @@ void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem*,
 
   std::cerr << "ERROR: Edge conditions for infinite elements "
 	    << "not implemented!" << std::endl;
-  error();
+  libmesh_error();
 }
 
 

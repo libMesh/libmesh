@@ -118,7 +118,7 @@ int main (int argc, char** argv)
       // This handy function will print the file name, line number,
       // and then abort.  Currrently the library does not use C++
       // exception handling.
-      error();
+      libmesh_error();
     }
   
   // Brief message to the user regarding the program name
@@ -160,7 +160,7 @@ int main (int argc, char** argv)
   if ((family == "MONOMIAL") || (family == "XYZ"))
     {
       std::cout << "ex4 currently requires a C^0 (or higher) FE basis." << std::endl;
-      error();
+      libmesh_error();
     }
     
   // Create a mesh with user-defined dimension.

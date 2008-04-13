@@ -59,7 +59,7 @@ Real FE<0,LAGRANGE>::shape_deriv(const ElemType,
 				 const Point&)
 {
   // No spatial derivatives in 0D!
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -73,7 +73,7 @@ Real FE<0,LAGRANGE>::shape_deriv(const Elem*,
 				 const Point&)
 {
   // No spatial derivatives in 0D!
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -88,7 +88,7 @@ Real FE<0,LAGRANGE>::shape_second_deriv(const ElemType,
 					const Point&)
 {
   // No spatial derivatives in 0D!
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -102,6 +102,6 @@ Real FE<0,LAGRANGE>::shape_second_deriv(const Elem*,
 				        const Point&)
 {
   // No spatial derivatives in 0D!
-  error();
+  libmesh_error();
   return 0.;
 }

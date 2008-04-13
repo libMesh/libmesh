@@ -373,7 +373,7 @@ T & TypeTensor<T>::operator () (const unsigned int i,
 //       std::cerr << "ERROR:  You are assigning to a tensor component" << std::endl
 // 		<< "that is out of range for the compiled DIM!"      << std::endl
 // 		<< " DIM=" << DIM << " , i=" << i << " , j=" << j << std::endl;
-      error();
+      libmesh_error();
     }
   
 #endif

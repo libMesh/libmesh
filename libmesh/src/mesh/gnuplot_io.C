@@ -83,7 +83,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
     {
       std::cerr << "ERROR: opening output file " << fname
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   // The number of variables in the equation system
@@ -164,7 +164,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
   if (!data.good())
     {
       std::cerr << "ERROR: opening output data file " << std::endl;
-      error();
+      libmesh_error();
     }
 
   data << "# This file contains libMesh solution data "

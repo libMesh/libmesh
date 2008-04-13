@@ -87,7 +87,7 @@ void CentroidPartitioner::_do_partition (MeshBase& mesh,
 	break;
       } 
     default:
-      error();
+      libmesh_error();
     }
 
   

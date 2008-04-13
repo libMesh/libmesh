@@ -117,7 +117,7 @@ void Edge3::connectivity(const unsigned int sc,
 	    return;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -139,13 +139,13 @@ void Edge3::connectivity(const unsigned int sc,
 	    return;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
     default:
       {
-	error();
+	libmesh_error();
       }
     }
 }

@@ -189,7 +189,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
       
     default:
       // Unknown access type
-      error();
+      libmesh_error();
 
     }
   

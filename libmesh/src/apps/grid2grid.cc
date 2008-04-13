@@ -33,7 +33,7 @@ int main (int argc, char** argv)
 		  << " ivar m0.mesh m1.mesh s0.soln s1.soln"
 		  << std::endl;
 	
-	error();
+	libmesh_error();
       }
 
     // declare the coarse and fine meshes.

@@ -500,7 +500,7 @@ protected:
    */
   virtual void init_base_shape_functions(const std::vector<Point>&,
 					 const Elem*)
-  { error(); }
+  { libmesh_error(); }
 
   /**
    * Some of the member data only depend on the radial part of the
@@ -839,7 +839,7 @@ Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
       return 0.;
 
     default:
-      error();
+      libmesh_error();
       return 0.;
   }
 }

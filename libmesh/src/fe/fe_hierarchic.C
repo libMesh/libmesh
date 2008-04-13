@@ -114,10 +114,10 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
     case TRI6:
       return ((o+1)*(o+2)/2);
     default:
-      error();
+      libmesh_error();
     }
   
-  error();  
+  libmesh_error();  
   return 0;
 }
 
@@ -142,7 +142,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	case 2:
 	  return 0;
 	default:
-	  error();		  
+	  libmesh_error();		  
 	}
     case TRI6:
       switch (n)
@@ -159,7 +159,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 
         // Internal DoFs are associated with the elem, not its nodes
 	default:
-	  error();
+	  libmesh_error();
 	}
     case QUAD4:
       assert (n < 4);
@@ -185,7 +185,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
           return 0;
 		  
 	default:
-	  error();
+	  libmesh_error();
 	}
     case HEX8:
       assert (n < 8);
@@ -232,17 +232,17 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	case 26:
 	  return 0;
 	default:
-	  error();
+	  libmesh_error();
         }
     default:
 #ifdef DEBUG
       std::cerr << "ERROR: Bad ElemType = " << t
 		<< std::endl;
 #endif
-      error();	    
+      libmesh_error();	    
     }
   
-  error();
+  libmesh_error();
   
   return 0;
 }
@@ -278,11 +278,11 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       std::cerr << "ERROR: Bad ElemType = " << t
 		<< std::endl;
 #endif
-      error();	    
+      libmesh_error();	    
     }
  
   // Will never get here...
-  error();
+  libmesh_error();
   return 0;
 }
 

@@ -185,7 +185,7 @@ void DofMap::add_constraint_row (const unsigned int dof_number,
       {
 	std::cerr << "ERROR: DOF " << dof_number << " was already constrained!"
 		  << std::endl;
-	error();
+	libmesh_error();
       }
   
   std::pair<unsigned int, DofConstraintRow> kv(dof_number, constraint_row);

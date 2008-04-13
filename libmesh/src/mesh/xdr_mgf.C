@@ -89,7 +89,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 		      << fn
 		      << " failed."
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 
 	// Create the XDR handle 
@@ -114,7 +114,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 		      << fn
 		      << " failed."
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 
 	break;
@@ -131,7 +131,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 		      << fn
 		      << " failed."
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 
 	break;
@@ -140,7 +140,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
     default:
       {
 	std::cout << "Unrecognized file access type!" << std::endl;
-	error();
+	libmesh_error();
       }
     }
 
@@ -173,7 +173,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 	  name << "LIBM " << this->get_num_levels();
 
 	else
-	  error();
+	  libmesh_error();
 
 	// Fill the buffer
 	std::sprintf(&buf[0], "%s", name.str().c_str());
@@ -247,7 +247,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 
 
@@ -276,7 +276,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 	{
 	  std::cerr << "No originating software can be determined. Error." 
 		    << std::endl;
-	  error();
+	  libmesh_error();
 	}
     }
   
@@ -339,7 +339,7 @@ int XdrMGF::dataBlk(int* array, int numvar, int size)
 
     default:
       // Unknown access type
-      error();
+      libmesh_error();
     }
 
   return totalSize;
@@ -410,7 +410,7 @@ int XdrMGF::dataBlk(Real* array, int numvar, int size)
 
     default:
       // Unknown access type
-      error();
+      libmesh_error();
     }
       
   return totalSize;

@@ -248,7 +248,7 @@ public:
    * Implemented in Elem and Node.
    */
   virtual bool operator==(const DofObject& ) const
-  { error(); return false; }
+  { libmesh_error(); return false; }
 
   
   /**
@@ -493,7 +493,7 @@ void DofObject::processor_id (const unsigned int id)
       std::cerr << "ERROR: id too large for unsigned short int!" << std::endl
 		<< "Recompile with DofObject::_processor_id larger!" << std::endl;
       
-      error();
+     libmesh_error();
     }
 
 #endif

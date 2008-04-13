@@ -116,7 +116,7 @@ QuadratureType QJacobi::type() const
 
   else
     { 
-      error();
+      libmesh_error();
       return INVALID_Q_RULE;
     }
 }

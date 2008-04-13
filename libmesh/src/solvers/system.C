@@ -500,7 +500,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
 		<< std::endl
 		<< " any more.  You should have done this earlier."
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   // Otherwise build the vector and return it.
@@ -524,7 +524,7 @@ const NumericVector<Number> & System::get_vector (const std::string& vec_name) c
 		<< vec_name
 		<< " does not exist in this system!"
 		<< std::endl;      
-      error();
+      libmesh_error();
     }
   
   return *(pos->second);
@@ -543,7 +543,7 @@ NumericVector<Number> & System::get_vector (const std::string& vec_name)
 		<< vec_name
 		<< " does not exist in this system!"
 		<< std::endl;      
-      error();
+      libmesh_error();
     }
   
   return *(pos->second);
@@ -565,7 +565,7 @@ void System::add_variable (const std::string& var,
 		<< var
 		<< " has already been added for this system!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
   
   // Add the variable to the list
@@ -611,7 +611,7 @@ unsigned short int System::variable_number (const std::string& var) const
 		<< var
 		<< " does not exist in this system!"
 		<< std::endl;      
-      error();
+      libmesh_error();
     }
   
   return pos->second;

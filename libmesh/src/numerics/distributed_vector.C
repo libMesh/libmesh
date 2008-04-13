@@ -374,7 +374,7 @@ DistributedVector<T>::operator = (const DistributedVector<T>& v)
     }
   else
     {
-      error();
+      libmesh_error();
     }
   
   return *this;
@@ -399,7 +399,7 @@ DistributedVector<T>::operator = (const std::vector<T>& v)
 
   else
     {
-      error();
+      libmesh_error();
     }
 
   

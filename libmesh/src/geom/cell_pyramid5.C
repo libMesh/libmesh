@@ -130,7 +130,7 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
 
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	  }
 	}
     }
@@ -192,14 +192,14 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
 	  }
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	  }
 	}
     }
 
   
   // We'll never get here.
-  error();
+  libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -250,10 +250,10 @@ void Pyramid5::connectivity(const unsigned int sc,
       }
       
     default:
-      error();
+      libmesh_error();
     }
 
-    error();
+    libmesh_error();
 }
 
 

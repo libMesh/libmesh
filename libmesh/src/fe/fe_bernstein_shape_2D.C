@@ -39,7 +39,7 @@ Real FE<2,BERNSTEIN>::shape(const ElemType,
 	    << "because edge orientation is needed."
 	    << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -163,7 +163,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	      case 1: return x;  //f0,1,1
 	      case 2: return y;  //f1,0,1
 
-	      default: error(); return 0;
+	      default: libmesh_error(); return 0;
 	      }
 	  }
 	case SECOND:
@@ -184,7 +184,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	      case 4: return 2.*x*y;
 	      case 5: return 2.*r*y;
 
-	      default: error(); return 0;
+	      default: libmesh_error(); return 0;
 	      }
 	  }
 	case THIRD:
@@ -218,7 +218,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 		
 	      case 9: return 6.*x*y*r;
 
-	      default: error(); return 0;
+	      default: libmesh_error(); return 0;
 	      }
 	  }
 	case FOURTH:
@@ -260,7 +260,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	      case 13: return 12.*x*x*y*r;
 	      case 14: return 12.*x*y*y*r;
 	
-	      default: error(); return 0;		
+	      default: libmesh_error(); return 0;		
 	      }
 	  }	
 	case FIFTH:
@@ -307,7 +307,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	      case 19: return 20.*pow<3>(x)*y*r;
 	      case 20: return 30.*pow<2>(x)*pow<2>(y)*r;
 		
-	      default: error(); return 0;		
+	      default: libmesh_error(); return 0;		
 	      }
 	  }
 	case SIXTH:
@@ -361,13 +361,13 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	      case 26: return 60.*pow<3>(x)*pow<2>(y)*r;
 	      case 27: return 30.*pow<4>(x)*y*r;
 		
-	      default: error(); return 0;		
+	      default: libmesh_error(); return 0;		
 	      } // switch shape
 	  } // case TRI6
 	default:
 	  {
 	    std::cerr << "ERROR: element order!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 	  
 
@@ -377,7 +377,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
     default:
       {
 	std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	error();
+	libmesh_error();
       }
       
     } // switch type
@@ -426,7 +426,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    
 // 	  }
 // 	default:
-// 	  error();
+// 	  libmesh_error();
 // 	}
       
 //     case SECOND:
@@ -492,7 +492,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    
 // 	  }
 // 	default:
-// 	  error();
+// 	  libmesh_error();
 // 	}
       
 //     case THIRD:
@@ -625,7 +625,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	  }
 	  
 // 	default:
-// 	  error();
+// 	  libmesh_error();
 	  
 // 	}
       
@@ -703,7 +703,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	  }
 	  
 // 	default:
-// 	  error();
+// 	  libmesh_error();
 	  
 // 	}
       
@@ -785,7 +785,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    
 // 	  }
 // 	default:
-// 	  error();	
+// 	  libmesh_error();	
 // 	}			
       
 //     case SIXTH:
@@ -875,7 +875,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	  } // case QUAD8/9
 	  
 // 	default:
-// 	  error();	
+// 	  libmesh_error();	
 	  
 // 	}
 //       // 7th-order Bernstein.
@@ -929,7 +929,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    } // case QUAD8/QUAD9
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 
 // 	  } // switch type
 
@@ -939,10 +939,10 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 //       // by default throw an error
 //     default:
 //       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-//       error();
+//       libmesh_error();
 //     }
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -959,7 +959,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const ElemType,
 	    << "because edge orientation is needed."
 	    << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -1077,7 +1077,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		    FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[8], 0, eta));
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	  }	      
       }
       
@@ -1113,14 +1113,14 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 	    
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
       
     default:
       {
 	std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	error();
+	libmesh_error();
       }
       
     }
@@ -1168,7 +1168,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  
 
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 	    
@@ -1199,12 +1199,12 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}	      
 // 	    }
 
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 // 	  }
 //       }
 
@@ -1247,7 +1247,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  
 
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 	    
@@ -1282,7 +1282,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[8], 0, eta));
 
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}	      
 // 	    }
 
@@ -1313,12 +1313,12 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}	      
 // 	    }
 
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 // 	  }
 //       }
       
@@ -1372,7 +1372,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 	    
@@ -1413,12 +1413,12 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 // 	  }
 //       }
       
@@ -1466,7 +1466,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
@@ -1508,12 +1508,12 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			    FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 		    
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 // 	  }
 //       }
       
@@ -1562,7 +1562,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    } // case TRI6
 	    
@@ -1603,12 +1603,12 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 				FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 			
 // 		      default:
-// 			error();
+// 			libmesh_error();
 // 		      }
 // 	    } // case QUAD8/9
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 // 	  } 
 	
 //       }
@@ -1656,7 +1656,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    } // case TRI6
 	    
@@ -1697,12 +1697,12 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    } // case QUAD8/9
 	    
 // 	  default:
-// 	    error();
+// 	    libmesh_error();
 // 	  } 
 
 // 	// 7th-order Bernstein.
@@ -1765,12 +1765,12 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			      FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 		    
 // 		  default:
-// 		    error();
+// 		    libmesh_error();
 // 		  }
 // 	      }
 	      
 // 	    default:
-// 	      error();
+// 	      libmesh_error();
 // 	    }
 // 	}
 	
@@ -1778,11 +1778,11 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 //       // by default throw an error;call the orientation-independent shape functions
 //     default:
 //       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-//       error();
+//       libmesh_error();
 //     }
   
   
-  error();
+  libmesh_error();
   return 0.;
 }
 

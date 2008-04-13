@@ -468,7 +468,7 @@ T_sys & EquationSystems::add_system (const std::string& name)
 //		<< " named " << name
 //		<< std::endl;
 
-//      error();
+//      libmesh_error();
 
       ptr = &(this->get_system<T_sys>(name));
     }
@@ -509,7 +509,7 @@ const T_sys & EquationSystems::get_system (const unsigned int num) const
     {
       std::cerr << "ERROR: no system number " << num << " found!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   // Attempt dynamic cast
@@ -521,7 +521,7 @@ const T_sys & EquationSystems::get_system (const unsigned int num) const
       std::cerr << "ERROR: cannot convert system "
 		<< num << " to requested type!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
   
   return *ptr;
@@ -548,7 +548,7 @@ T_sys & EquationSystems::get_system (const unsigned int num)
     {
       std::cerr << "ERROR: no system number " << num << " found!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   // Attempt dynamic cast
@@ -560,7 +560,7 @@ T_sys & EquationSystems::get_system (const unsigned int num)
       std::cerr << "ERROR: cannot convert system "
 		<< num << " to requested type!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   return *ptr; 
@@ -582,7 +582,7 @@ const T_sys & EquationSystems::get_system (const std::string& name) const
     {
       std::cerr << "ERROR: no system named \"" << name << "\" found!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   // Attempt dynamic cast
@@ -594,7 +594,7 @@ const T_sys & EquationSystems::get_system (const std::string& name) const
       std::cerr << "ERROR: cannot convert system \""
 		<< name << "\" to requested type!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   return *ptr; 
@@ -616,7 +616,7 @@ T_sys & EquationSystems::get_system (const std::string& name)
     {
       std::cerr << "ERROR: no system named " << name << " found!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   // Attempt dynamic cast
@@ -628,7 +628,7 @@ T_sys & EquationSystems::get_system (const std::string& name)
       std::cerr << "ERROR: cannot convert system \""
 		<< name << "\" to requested type!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   return *ptr; 

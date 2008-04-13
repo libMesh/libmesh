@@ -139,7 +139,7 @@ Tree<N>::Tree (const Tree<N>& other_tree) :
   root       (other_tree.root),
   build_type (other_tree.build_type)
 {
-  error();
+  libmesh_error();
 }
 
 

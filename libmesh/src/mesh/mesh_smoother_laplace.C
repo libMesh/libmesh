@@ -221,7 +221,7 @@ void LaplaceMeshSmoother::init()
 		  << _mesh.mesh_dimension()
 		  << "mesh.  Aborting..."
 		  << std::endl;
-	error();
+	libmesh_error();
       }
       
     }

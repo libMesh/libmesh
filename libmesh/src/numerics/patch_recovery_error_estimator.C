@@ -98,7 +98,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	  }
 	  
 	default:
-	  error();
+	  libmesh_error();
 	}
     }
 
@@ -143,7 +143,7 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 		  << std::endl
 		  << ", n_vars=" << n_vars
 		  << std::endl;
-	error();
+	libmesh_error();
       }
 
 
@@ -347,7 +347,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 #else
 		      std::cerr << "ERROR:  --enable-second-derivatives is required\n"
 				<< "        for _sobolev_order == 2!\n";
-		      error();
+		      libmesh_error();
 #endif
                     }
 		} // end quadrature loop
@@ -448,7 +448,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 #else
 		      std::cerr << "ERROR:  --enable-second-derivatives is required\n"
 				<< "        for _sobolev_order == 2!\n";
-		      error();
+		      libmesh_error();
 #endif
                 }
               for (unsigned int i=0; i != 6; ++i)

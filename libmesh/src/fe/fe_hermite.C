@@ -98,11 +98,11 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 		  << " for " << o << "th order approximation!" 
 		  << std::endl;
 #endif
-        error();	    
+        libmesh_error();	    
       }
     }
   
-  error();  
+  libmesh_error();  
   return 0;
 }
 
@@ -131,7 +131,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
             return 0;
 
 	  default:
-	    error();
+	    libmesh_error();
 	}
       }
 	    
@@ -160,7 +160,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
             return 0;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 	    
@@ -209,7 +209,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	    return 0;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 	    
@@ -220,12 +220,12 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 		  << " for " << o << "th order approximation!" 
 		  << std::endl;
 #endif
-        error();	    
+        libmesh_error();	    
       }
 	    
     }
   
-  error();
+  libmesh_error();
   
   return 0;
 }
@@ -261,12 +261,12 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 		  << " for " << o << "th order approximation!" 
 		  << std::endl;
 #endif
-        error();	    
+        libmesh_error();	    
       }
     }
  
   // Will never get here...
-  error();
+  libmesh_error();
   return 0;
 }
 

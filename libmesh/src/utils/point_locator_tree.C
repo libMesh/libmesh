@@ -147,7 +147,7 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 	    {
 	      std::cerr << "ERROR: Initialize master first, then servants!"
 			<< std::endl;
-	      error();
+	      libmesh_error();
 	    }
         }
 
@@ -185,7 +185,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 	    /* No element seems to contain this point.  If out-of-mesh
 	       mode is enabled, just return NULL.  If not, however, we
 	       have to perform a linear search before we call \p
-	       error() since in the case of curved elements, the
+	       libmesh_error() since in the case of curved elements, the
 	       bounding box computed in \p TreeNode::insert(const
 	       Elem*) might be slightly inaccurate.  */
 	    if(!_out_of_mesh_mode)
@@ -205,7 +205,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 			      << std:: endl
 			      << " ******** that contains the Point "
 			      << p;
-		    error();
+		    libmesh_error();
 		  }
 	      }
 	  }
@@ -235,7 +235,7 @@ void PointLocatorTree::enable_out_of_mesh_mode (void)
 	if (!(*pos)->has_affine_map())
 	  {
 	    std::cerr << "ERROR: Out-of-mesh mode is currently only supported if all elements have affine mappings." << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 #endif
       

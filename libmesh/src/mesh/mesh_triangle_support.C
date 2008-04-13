@@ -264,7 +264,7 @@ void Triangle::copy_tri_to_mesh(const triangulateio& triangle_data_input,
         default:
 	  {
 	    std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 	}
     }
@@ -492,13 +492,13 @@ flags << "zBPQq";
       
     case INVALID_TRIANGULATION_TYPE:
       {
-	error();
+	libmesh_error();
 	break;
       }
       
     default:
       {
-	error();
+	libmesh_error();
       }
     }
 
@@ -521,7 +521,7 @@ flags << "zBPQq";
     default:
       {
 	std::cerr << "ERROR: Unrecognized triangular element type." << std::endl;
-	error();
+	libmesh_error();
       }
     }
 

@@ -322,11 +322,11 @@ void QJacobi::init_1D(const ElemType,
 	    std::cerr << "Quadrature rule " << _order
 		      << " not supported!" << std::endl;
 	      
-	    error();
+	    libmesh_error();
 	  }
 	}
 
-      error();
+      libmesh_error();
     }
 
 
@@ -618,11 +618,11 @@ void QJacobi::init_1D(const ElemType,
 	    std::cerr << "Quadrature rule " << _order
 		      << " not supported!" << std::endl;
 	      
-	    error();
+	    libmesh_error();
 	  }
 	}
 
-      error();
+      libmesh_error();
     }
 
   else

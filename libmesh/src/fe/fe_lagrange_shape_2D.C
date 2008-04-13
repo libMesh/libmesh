@@ -81,7 +81,7 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 		  return zeta2;
 		  
 		default:
-		  error();
+		  libmesh_error();
 		  
 		}
 	    }
@@ -90,7 +90,7 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 	    {
 	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
 			<< std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
       }
@@ -135,7 +135,7 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 		  return .5*(1. - xi)*(1. - eta*eta);
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	    
@@ -184,7 +184,7 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 		  return 4.*zeta2*zeta0;
 	    
 		default:
-		  error();
+		  libmesh_error();
 	    
 		}
 	    }
@@ -193,7 +193,7 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 	    {
 	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
 			<< std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
       }
@@ -205,11 +205,11 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
       {
 	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
 		  << std::endl;
-	error();
+	libmesh_error();
       }
     }
 
-  error();
+  libmesh_error();
   return 0.;
 
 #endif
@@ -277,7 +277,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 			  FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i1[i], 0, eta));
 		  
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 
@@ -311,7 +311,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 			return dzeta2dxi;
 			
 		      default:
-			error();
+			libmesh_error();
 		      }
 		  }
 		  // d()/deta
@@ -329,12 +329,12 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 			return dzeta2deta;
 			
 		      default:
-			error();
+			libmesh_error();
 			
 		      }
 		  }
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	    
@@ -342,7 +342,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 	    {
 	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
 			<< std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
       }
@@ -395,7 +395,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 		      return .5*(-1.)*(1. - eta*eta);
 		
 		    default:
-		      error();
+		      libmesh_error();
 		    }
 	    
 		  // d/deta
@@ -431,11 +431,11 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 		      return .5*(1. - xi)*(-2.*eta);
 		
 		    default:
-		      error();
+		      libmesh_error();
 		    }
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	    
@@ -464,7 +464,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 			  FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i1[i], 0, eta));
 		  
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	    
@@ -509,7 +509,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 			return 4.*zeta2*dzeta0dxi + 4*zeta0*dzeta2dxi;
 		 
 		      default:
-			error();
+			libmesh_error();
 		      }
 		  }
 		      
@@ -536,11 +536,11 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 			return 4.*zeta2*dzeta0deta + 4*zeta0*dzeta2deta;
 		 
 		      default:
-			error();
+			libmesh_error();
 		      }
 		  }
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	    
@@ -548,7 +548,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 	    {
 	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
 			<< std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
       }
@@ -560,12 +560,12 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
       {
 	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
 		  << std::endl;
-	error();
+	libmesh_error();
       }
     }
 
 
-  error();
+  libmesh_error();
   return 0.;
 
 #endif
@@ -644,7 +644,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 		  {
 		    std::cerr << "ERROR: Invalid derivative requested! "
 			      << std::endl;
-		    error();
+		    libmesh_error();
 		  }
 		}
 	    }
@@ -660,7 +660,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 	    {
 	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
 			<< std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	    
 	  } // end switch (type)
@@ -708,7 +708,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 			{
 			  std::cerr << "Invalid shape function index requested!"
 				    << std::endl;
-			  error();
+			  libmesh_error();
 			}
 		      }
 		  }
@@ -746,7 +746,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 			{
 			  std::cerr << "Invalid shape function index requested!"
 				    << std::endl;
-			  error();
+			  libmesh_error();
 			}
 		      }
 		  }
@@ -778,7 +778,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 			{
 			  std::cerr << "Invalid shape function index requested!"
 				    << std::endl;
-			  error();
+			  libmesh_error();
 			}
 		      }
 		  }
@@ -788,7 +788,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 		  {
 		    std::cerr << "ERROR: Invalid derivative requested! "
 			      << std::endl;
-		    error();
+		    libmesh_error();
 		  }
 		} // end switch (j)
 	    } // end case QUAD8
@@ -826,7 +826,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 		  {
 		    std::cerr << "ERROR: Invalid derivative requested! "
 			      << std::endl;
-		    error();
+		    libmesh_error();
 		  }
 		}  // end switch (j)
 	    } // end case QUAD9
@@ -872,7 +872,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 			{
 			  std::cerr << "Invalid shape function index requested!"
 				    << std::endl;
-			  error();
+			  libmesh_error();
 			}
 		      }
 		  }
@@ -904,7 +904,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 			{
 			  std::cerr << "Invalid shape function index requested!"
 				    << std::endl;
-			  error();
+			  libmesh_error();
 			}
 		      }
 		  }
@@ -936,7 +936,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 			{
 			  std::cerr << "Invalid shape function index requested!"
 				    << std::endl;
-			  error();
+			  libmesh_error();
 			} 
 		      }
 		  }
@@ -945,7 +945,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 		  {
 		    std::cerr << "ERROR: Invalid derivative requested! "
 			      << std::endl;
-		    error();
+		    libmesh_error();
 		  }
 		} // end switch (j)
 	    }  // end case TRI6
@@ -954,7 +954,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 	    {
 	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
 			<< std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
       } // end case SECOND
@@ -966,13 +966,13 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
       {
 	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
 		  << std::endl;
-	error();
+	libmesh_error();
       }
       
     } // end switch (order)
 
   
-  error();
+  libmesh_error();
   return 0.;
 #endif // DIM > 1
 }

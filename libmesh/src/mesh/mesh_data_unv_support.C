@@ -67,7 +67,7 @@ void MeshData::read_unv (const std::string& file_name)
 		<< "files and libraries to read and write "
 		<< "compressed streams."
 		<< std::endl;
-      error();
+      libmesh_error();
 #endif
       return;
     }
@@ -98,7 +98,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
     {
       std::cerr << "ERROR: Input file not good." 
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   const std::string _label_dataset_mesh_data = "2414";
@@ -269,7 +269,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 	    {
 	      std::cerr << "ERROR: Currently only Data at nodes is supported." 
 			<< std::endl;
-	      error();
+	      libmesh_error();
 	    }
 
 
@@ -348,7 +348,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 		      std::cerr << "ERROR: Complex data only supported" << std::endl
 				<< "when libMesh is configured with --enable-complex!"
 				<< std::endl;
-		      error();
+		      libmesh_error();
 #endif
 		    }
 
@@ -356,7 +356,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 		    {
 		      std::cerr << "ERROR: Data type not supported." 
 				<< std::endl;
-		      error();
+		      libmesh_error();
 		    }
 
 		} // end loop data_cnt
@@ -424,7 +424,7 @@ void MeshData::write_unv (const std::string& file_name)
 		<< "files and libraries to read and write "
 		<< "compressed streams."
 		<< std::endl;
-      error();
+      libmesh_error();
 #endif
       return;
       
@@ -453,7 +453,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
     {
       std::cerr << "ERROR: Output file not good." 
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
 

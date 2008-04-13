@@ -177,7 +177,7 @@ AutoPtr<Elem> Quad4::build_side (const unsigned int i,
 	  }
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	  }
 	}
     }
@@ -221,10 +221,10 @@ void Quad4::connectivity(const unsigned int sf,
       }
 
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
 }
 
 

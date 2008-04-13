@@ -910,7 +910,7 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
     }
   }
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -1242,7 +1242,7 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
     }
   }
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -1423,7 +1423,7 @@ Real clough_raw_shape(const unsigned int basis_num,
           }
     }
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -1442,7 +1442,7 @@ Real FE<2,CLOUGH>::shape(const ElemType,
 	    << "to construct gradient-based degrees of freedom."
 	    << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -1535,12 +1535,12 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
                     + 0.5 * N20y * d2nd2n * clough_raw_shape(10, p)
                     + 0.5 * N21y * d1nd1n * clough_raw_shape(9, p);
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // 3rd-order Clough-Tocher element
@@ -1610,21 +1610,21 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
                   return d3nd3n * clough_raw_shape(11, p);
 		  
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -1641,7 +1641,7 @@ Real FE<2,CLOUGH>::shape_deriv(const ElemType,
 	    << "to construct gradient-based degrees of freedom."
 	    << std::endl;
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -1735,12 +1735,12 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
                     + 0.5 * N20y * d2nd2n * clough_raw_shape_deriv(10, j, p)
                     + 0.5 * N21y * d1nd1n * clough_raw_shape_deriv(9, j, p);
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // 3rd-order Clough-Tocher element
@@ -1810,21 +1810,21 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
                   return d3nd3n * clough_raw_shape_deriv(11, j, p);
 		  
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -1918,12 +1918,12 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
                     + 0.5 * N20y * d2nd2n * clough_raw_shape_second_deriv(10, j, p)
                     + 0.5 * N21y * d1nd1n * clough_raw_shape_second_deriv(9, j, p);
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // 3rd-order Clough-Tocher element
@@ -1993,20 +1993,20 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
                   return d3nd3n * clough_raw_shape_second_deriv(11, j, p);
 		  
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }

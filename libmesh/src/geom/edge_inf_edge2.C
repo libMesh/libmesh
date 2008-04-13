@@ -89,10 +89,10 @@ void InfEdge2::connectivity(const unsigned int se,
       }
 
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
 }
 
 

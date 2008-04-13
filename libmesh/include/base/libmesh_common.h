@@ -191,7 +191,7 @@ namespace libMesh
 // If you want to make sure you are accessing a section of code just
 // stick a here(); in it, for example
 #undef here
-#define here()     { std::cout << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; }
+#define here()     do { std::cout << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; } while (0)
 
 // the stop() macro will stop the code until a SIGCONT signal is recieved.  This is useful, for example, when
 // determining the memory used by a given operation.  A stop() could be instered before and after a questionable
@@ -199,35 +199,42 @@ namespace libMesh
 #undef stop
 #ifdef HAVE_CSIGNAL
 #  include <csignal>
-#  define stop()     { if (libMesh::n_processors() == 1) { here(); std::cout << "Stopping process " << getpid() << "..." << std::endl; std::raise(SIGSTOP); std::cout << "Continuing process " << getpid() << "..." << std::endl; } }
+#  define stop()     do { if (libMesh::n_processors() == 1) { here(); std::cout << "Stopping process " << getpid() << "..." << std::endl; std::raise(SIGSTOP); std::cout << "Continuing process " << getpid() << "..." << std::endl; } } while(0)
 #else
-#  define stop()     { if (libMesh::n_processors() == 1) { here(); std::cerr << "WARNING:  stop() does not work without the <csignal> header file!" << std::endl; } }
+#  define stop()     do { if (libMesh::n_processors() == 1) { here(); std::cerr << "WARNING:  stop() does not work without the <csignal> header file!" << std::endl; } } while(0)
 #endif
 
-// The libmesh_assert() macro acts like C's assert(), but throws an error()
-// (including stack trace, etc) instead of just exiting
+// The libmesh_assert() macro acts like C's assert(), but throws a 
+// libmesh_error() (including stack trace, etc) instead of just exiting
 #ifdef NDEBUG
-#define libmesh_assert(asserted) { }
+#define libmesh_assert(asserted) 
 #else
-#define libmesh_assert(asserted)  { if (!(asserted)) { std::cerr << "Assertion `" #asserted "' failed." << std::endl; error(); } }
+#define libmesh_assert(asserted)  do { if (!(asserted)) { std::cerr << "Assertion `" #asserted "' failed." << std::endl; libmesh_error(); } } while(0)
+#endif
+
+// The libmesh_error() macro prints a message and throws a generic exception
+#ifdef ENABLE_TRACEFILES
+#define libmesh_error()    do { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); print_trace(traceout); std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::LogicError()); } while(0)
+#else
+#define libmesh_error()    do { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::LogicError()); } while(0)
 #endif
 
 // The error() macro prints a message and throws a generic exception
+// Use libmesh_error() instead; error() is deprecated to avoid namespace
+// conflicts
 #undef error
-#ifdef ENABLE_TRACEFILES
-#define error()    { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); print_trace(traceout); std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::LogicError()); }
-#else
-#define error()    { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::LogicError()); }
-#endif
+#define error()    do { \
+std::cout << "error() is deprecated; use libmesh_error() instead!" \
+          << std::endl; libmesh_error(); } while(0)
 
 // The untested macro warns that you are using untested code
 #undef untested
-#define untested() { std::cout << "*** Warning, This code is untested, experimental, or likely to see future API changes: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }
+#define untested() do { std::cout << "*** Warning, This code is untested, experimental, or likely to see future API changes: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; } while (0)
 
 
 // The deprecated macro warns that you are using deprecated code
 #undef deprecated
-#define deprecated() { std::cout << "*** Warning, This Code is Deprecated! " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; }
+#define deprecated() do { std::cout << "*** Warning, This Code is Deprecated! " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; } while(0)
 
 
 

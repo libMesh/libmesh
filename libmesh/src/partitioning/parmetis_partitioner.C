@@ -169,7 +169,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
     if (!all_have_active_elements)
       {
 	if (!mesh.is_serial())
-	  error();
+	  libmesh_error();
 
 	// Cowardly revert to METIS, although this requires a serial mesh
 	STOP_LOG ("repartition()", "ParmetisPartitioner");
@@ -357,7 +357,7 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
       {
 	std::cerr << "ERROR:  ParmetisPartitioner cannot handle unpartitioned objects!"
 		  << std::endl;
-	error();
+	libmesh_error();
       }    
   }
 

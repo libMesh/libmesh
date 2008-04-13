@@ -155,7 +155,7 @@ protected:
   float embedding_matrix (const unsigned int,
 			 const unsigned int,
 			 const unsigned int) const
-  { error(); return 0.; }
+  { libmesh_error(); return 0.; }
   
 #endif
 };

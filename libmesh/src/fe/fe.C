@@ -648,7 +648,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 
 
     default:
-      error();
+      libmesh_error();
     }
   
   // Stop logging the shape function initialization

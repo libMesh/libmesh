@@ -669,7 +669,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 		          out << conn[i] << " ";
 		      }
 		    else
-		      error();
+		      libmesh_error();
                   }
               else // !this->subdivide_second_order()
                 {
@@ -835,7 +835,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 				  << "\nPossibly a dim-1 dimensional "
 			          << "element?  Aborting..."
 			          << std::endl;
-		        error();
+		        libmesh_error();
 		      }
 		
 		    out << '\n';
@@ -889,7 +889,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 			        << "type.  Possibly a dim-1 dimensional "
 			        << "element?  Aborting..."
 			        << std::endl;
-		      error();
+		      libmesh_error();
 		    }
 		
 		  out << '\n';
@@ -900,7 +900,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 	}
 	
       default:
-	error();
+	libmesh_error();
       }
     
     out << '\n';
@@ -1229,7 +1229,7 @@ void GMVIO::write_binary (const std::string& fname,
           }
         break;
       default:
-        error();
+        libmesh_error();
 	
       }
   }
@@ -1598,7 +1598,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 		  }
 		else
 		  {
-		    error();
+		    libmesh_error();
 		  }
 		
 		out << std::endl;
@@ -1638,7 +1638,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
                   }
 		else
 		  {
-		    error();
+		    libmesh_error();
 		  }
 		
 		out << std::endl;
@@ -1689,7 +1689,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
                   }
 		else
 		  {
-		    error();
+		    libmesh_error();
 		  }
 		
 		out << std::endl;
@@ -1699,7 +1699,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	}
 	
       default:
-	error();
+	libmesh_error();
       }
     
     out << std::endl;
@@ -1852,7 +1852,7 @@ void GMVIO::read (const std::string& name)
 #ifndef HAVE_GMV
 
   std::cerr << "Cannot read a GMV file without the GMV API." << std::endl;
-  error();
+  libmesh_error();
 
 #else
   // Clear the mesh so we are sure to start from a pristeen state.
@@ -1866,7 +1866,7 @@ void GMVIO::read (const std::string& name)
   if (ierr != 0)
     {
       std::cerr << "GMV::gmvread_open_fromfileskip failed!" << std::endl;
-      error();
+      libmesh_error();
     }
 
   
@@ -1888,7 +1888,7 @@ void GMVIO::read (const std::string& name)
       if (GMV::gmv_data.keyword == GMVERROR)
         {
 	  std::cerr << "Encountered GMVERROR while reading!" << std::endl;
-	  error();
+	  libmesh_error();
         }
 
       /*  Process the data.  */
@@ -1904,7 +1904,7 @@ void GMVIO::read (const std::string& name)
 	    else if (GMV::gmv_data.num2 == NODE_V)
 	      {
 		std::cerr << "Unsupported GMV data type NODE_V!" << std::endl;
-		error();
+		libmesh_error();
 	      }
 	    break;
 	  }
@@ -1964,7 +1964,7 @@ void GMVIO::read (const std::string& name)
 	    std::cerr << "Encountered unknown GMV keyword "
 		      << GMV::gmv_data.keyword
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	  }
         } // end switch
     } // end while
@@ -2204,7 +2204,7 @@ ElemType GMVIO::_gmv_elem_to_libmesh_elem(const char* elemname)
 	    << elemname
 	    << " was read."
 	    << std::endl;
-  error();
+  libmesh_error();
 }
 
 
@@ -2271,7 +2271,7 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
 		{
 		  std::cerr << "Only FIRST-order LAGRANGE variables can be read from GMV files. "
 			    << "Skipping variable " << var_name << std::endl;
-		  //error();
+		  //libmesh_error();
 		  break;
 		}
 

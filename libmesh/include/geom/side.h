@@ -118,11 +118,11 @@ class Side : public SideType
    * @Sides effectively do not have sides, so don't even ask!
    */
   virtual unsigned int n_sides () const 
-  { error(); return 0; }
+  { libmesh_error(); return 0; }
 
   virtual bool is_child_on_side(const unsigned int,
 			        const unsigned int) const
-  { error(); return false; }
+  { libmesh_error(); return false; }
   
   
  private:

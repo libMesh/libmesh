@@ -398,7 +398,7 @@ void QGauss::init_3D(const ElemType _type,
 	    {
 	      std::cout << "Quadrature rule not supported!" << std::endl;
 		    
-	      error();
+	      libmesh_error();
 	    }
 	  }
       }
@@ -489,11 +489,11 @@ void QGauss::init_3D(const ElemType _type,
     default:
       {
 	std::cerr << "ERROR: Unsupported type: " << _type << std::endl;
-	error();
+	libmesh_error();
       }
     }
 
-  error();
+  libmesh_error();
 
   return;
   

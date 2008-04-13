@@ -145,7 +145,7 @@ void TecplotIO::write_ascii (const std::string& fname,
     {
       std::cerr << "ERROR: opening output file " << fname
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   // Get a constant reference to the mesh.
@@ -195,7 +195,7 @@ void TecplotIO::write_ascii (const std::string& fname,
     else
       {
 	// Dimension other than 1, 2, or 3?
-	error();
+	libmesh_error();
       }
     
     // Use default mesh color = black

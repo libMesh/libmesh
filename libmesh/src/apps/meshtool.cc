@@ -512,7 +512,7 @@ int main (int argc, char** argv)
 	std::cout << "ERROR:  you must specify the dimension on "
 		  << "the command line!\n\n"
 		  << argv[0] << " -d 3 ... for example\n\n";
-	error();
+	libmesh_error();
       }
 
     Mesh mesh(dim);
@@ -737,7 +737,7 @@ int main (int argc, char** argv)
 	  }
 
 	else
-	    error();
+	    libmesh_error();
 
 	if (verbose)
 	  std::cout << message << std::endl;
@@ -869,7 +869,7 @@ int main (int argc, char** argv)
 	      else if (names.size() == 3)
 		  new_mesh.write(names[1], soln, var_names);
 	      else
-		  error();
+		  libmesh_error();
 	    }
 	  else
 	    {
@@ -878,7 +878,7 @@ int main (int argc, char** argv)
 	      else if (names.size() == 3)
 		  mesh.write(names[1], soln, var_names);
 	      else
-		  error();
+		  libmesh_error();
 	    }
 
 
@@ -901,7 +901,7 @@ int main (int argc, char** argv)
 		mesh.boundary_info->sync(boundary_mesh, &boundary_mesh_data, &mesh_data);
 
 	      else
-		error();
+		libmesh_error();
 	      
 	      if (names.size() == 2)
 		GMVIO(boundary_mesh).write(boundary_name);

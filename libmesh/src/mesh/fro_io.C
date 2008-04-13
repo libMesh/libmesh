@@ -72,7 +72,7 @@ void FroIO::write (const std::string& fname)
 	      std::cerr << "ERROR:  .fro format only valid for triangles!\n"
 			<< "  writing of " << fname << " aborted.\n"
 			<< std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  
 	  out << ++e << " \t";

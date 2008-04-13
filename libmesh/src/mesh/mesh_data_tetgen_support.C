@@ -58,7 +58,7 @@ void MeshData::read_tetgen (const std::string& name)
     {
       std::cerr << "ERROR: Unrecognized file name: "
 		<< name << std::endl;
-      error();
+      libmesh_error();
     }
   
   // Set the streams from which to read in.
@@ -71,7 +71,7 @@ void MeshData::read_tetgen (const std::string& name)
 		<< "Error checking files "
 		<< name_node << " and "
 		<< name_ele  << std::endl;
-      error();
+      libmesh_error();
     }
 
   

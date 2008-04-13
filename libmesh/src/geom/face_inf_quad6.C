@@ -128,7 +128,7 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
 	    return ap;
 	  }
 	default:
-	  error();
+	  libmesh_error();
 	}
     }
 
@@ -170,14 +170,14 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
 	  }
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	    AutoPtr<Elem> ap(NULL);  return ap;
 	  }
 	}
     }
 
   // We will never get here...  
-  error();
+  libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -218,15 +218,15 @@ void InfQuad6::connectivity(const unsigned int sf,
 	    return;
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
       
     default:
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
 }
 
 

@@ -161,7 +161,7 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
 
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	  }
 	}
     }
@@ -246,13 +246,13 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
 	  }
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	  }
 	}
     }
   
   // We'll never get here.
-  error();
+  libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -396,7 +396,7 @@ void Prism18::connectivity(const unsigned int sc,
 	    }
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
       }
@@ -504,16 +504,16 @@ void Prism18::connectivity(const unsigned int sc,
 	    }
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
       }
 
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
 
 }
 
@@ -541,9 +541,9 @@ unsigned int Prism18::n_second_order_adjacent_vertices (const unsigned int n) co
 	return 4;
 
       default:
-	error();
+	libmesh_error();
     }
-  error();
+  libmesh_error();
   return static_cast<unsigned int>(-1);
 }
 
@@ -586,7 +586,7 @@ unsigned short int Prism18::second_order_adjacent_vertex (const unsigned int n,
 
     }
 
-  error();
+  libmesh_error();
   return libMesh::invalid_uint;
 }
 

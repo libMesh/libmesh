@@ -89,7 +89,8 @@ class MeshOutput
    */
   virtual void write_nodal_data (const std::string&,
 				 const std::vector<Number>&,
-				 const std::vector<std::string>&) { error(); }
+				 const std::vector<std::string>&)
+  { libmesh_error(); }
 
   
  protected:
@@ -149,7 +150,7 @@ MeshOutput<MT>::MeshOutput (const MT& obj, const bool is_parallel_format) :
     {
       std::cerr << "ERROR:  This I/O operation is only supported for meshes which have been serialized!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 }
 

@@ -145,13 +145,13 @@ AutoPtr<Elem> Tri3::build_side (const unsigned int i,
 	  }
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	  }
 	}
     }
   
   // We will never get here...  Look at the code above.
-  error();
+  libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -185,10 +185,10 @@ void Tri3::connectivity(const unsigned int sf,
       }
 
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
 }
 
 

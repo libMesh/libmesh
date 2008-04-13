@@ -346,7 +346,7 @@ void DivaIO::write_stream (std::ostream& out)
 	  }
 	else if (mesh.elem(e)->type() == PRISM18)
 	  {
-	    error();
+	    libmesh_error();
 	  }
       }
 

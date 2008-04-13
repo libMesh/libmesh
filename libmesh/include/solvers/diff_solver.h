@@ -141,7 +141,7 @@ public:
   bool continue_after_max_iterations;
 
   /**
-   * Defaults to false, telling the DiffSolver to throw an error() when
+   * Defaults to false, telling the DiffSolver to throw a libmesh_error() when
    * the backtracking scheme fails to find a descent direction.
    */
   bool continue_after_backtrack_failure;

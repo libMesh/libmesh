@@ -387,7 +387,7 @@ int TetGenMeshInterface::get_node_index (const Node* inode)
       return i;
 
   std::cerr << "Error! Node not found in the mesh!" << std::endl;
-  error();
+  libmesh_error();
   
   return 0;
 }
@@ -432,7 +432,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh (const double quali
   if (visited.size() != this->_mesh.n_elem())
     {
       std::cerr << "triangulate: hull not connected: element(s) not reached by others.\n";
-      error();
+      libmesh_error();
     } 
 
   // start triangulation method with empty holes list:
@@ -460,7 +460,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
 	if (elem->type() != TRI3)
 	  {
 	    std::cerr << "ERROR: Some of the elements in the original mesh were not TRI3!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 
 	for (unsigned int i=0; i<elem->n_neighbors(); ++i)
@@ -468,7 +468,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
 	    if (elem->neighbor(i) == NULL)
 	      {
 		std::cerr << "ERROR: Non-convex hull, cannot be tetrahedralized." << std::endl;
-		error();
+		libmesh_error();
 	      }
 	  }
       }

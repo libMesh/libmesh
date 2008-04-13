@@ -251,7 +251,7 @@ int _close ()
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
       // We may be here in only one process,
-      // because an uncaught error() exception
+      // because an uncaught libmesh_error() exception
       // called the LibMeshInit destructor.
       //
       // If that's the case, we need to MPI_Abort(),

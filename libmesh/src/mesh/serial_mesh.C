@@ -89,7 +89,7 @@ Node& SerialMesh::node (const unsigned int i)
       std::cout << " i=" << i
 		<< ", n_nodes()=" << this->n_nodes()
 		<< std::endl;
-      error();
+      libmesh_error();
     }
   
   assert (i < this->n_nodes());

@@ -146,7 +146,7 @@ void FrequencySystem::init_data ()
       else
         {
 	  std::cerr << "ERROR: Need to set frequencies before calling init(). " << std::endl;
-	  error();
+	  libmesh_error();
 	}
     }
 
@@ -199,7 +199,7 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
     {
       std::cerr << "ERROR: frequencies already initialized." 
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   EquationSystems& es =
@@ -241,7 +241,7 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
   if (_finished_set_frequencies)
     {
       std::cerr << "ERROR: frequencies already initialized. " << std::endl;
-      error();
+      libmesh_error();
     }
 
   EquationSystems& es =
@@ -281,7 +281,7 @@ void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
   if (_finished_set_frequencies)
     {
       std::cerr << "ERROR: frequencies already initialized. " << std::endl;
-      error();
+      libmesh_error();
     }
 
   EquationSystems& es =

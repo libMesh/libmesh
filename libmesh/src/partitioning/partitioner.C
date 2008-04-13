@@ -311,7 +311,7 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 		}
 #else
 	      // without AMR there should be no inactive elements
-	      error();
+	      libmesh_error();
 #endif
 	    }
 

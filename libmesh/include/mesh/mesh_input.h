@@ -131,7 +131,7 @@ MeshInput<MT>::MeshInput (MT& obj, const bool is_parallel_format) :
     {
       std::cerr << "ERROR:  This I/O operation is only supported for meshes which have been serialized!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 }
 
@@ -149,7 +149,7 @@ template <class MT>
 inline
 MT& MeshInput<MT>::mesh ()
 {
-  if (_obj == NULL) error();
+  if (_obj == NULL) libmesh_error();
   return *_obj;
 }
 

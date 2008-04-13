@@ -48,7 +48,7 @@ namespace {
 #else
     std::cerr << "ERROR: need bzip2/bunzip2 to handle .bz2 files!!!"
 	      << std::endl;
-    error();
+    libmesh_error();
 #endif
   }
 
@@ -67,7 +67,7 @@ namespace {
 #else
 	std::cerr << "ERROR: need bzip2/bunzip2 to handle .bz2 files!!!"
 		  << std::endl;
-	error();
+	libmesh_error();
 #endif
       }
     return new_name;
@@ -139,7 +139,7 @@ void Xdr::open (const std::string& name)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 	
 #endif
 	return;
@@ -161,7 +161,7 @@ void Xdr::open (const std::string& name)
 #else
 	    std::cerr << "ERROR: need gzstream to handle .gz files!!!"
 		      << std::endl;
-	    error();
+	    libmesh_error();
 #endif
 	  }
 	else
@@ -194,7 +194,7 @@ void Xdr::open (const std::string& name)
 #else
 	    std::cerr << "ERROR: need gzstream to handle .gz files!!!"
 		      << std::endl;
-	    error();
+	    libmesh_error();
 #endif
 	  }
 	else
@@ -216,7 +216,7 @@ void Xdr::open (const std::string& name)
       }
       
     default:
-      error();
+      libmesh_error();
     }  
 }
 
@@ -252,7 +252,7 @@ void Xdr::close ()
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 	
 #endif
 	file_name = "";
@@ -286,7 +286,7 @@ void Xdr::close ()
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -315,7 +315,7 @@ bool Xdr::is_open() const
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 	return false;	
 
@@ -338,7 +338,7 @@ bool Xdr::is_open() const
       }
 
     default:
-      error();
+      libmesh_error();
     }
 
   return false;
@@ -367,7 +367,7 @@ void Xdr::data (int& a, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -392,7 +392,7 @@ void Xdr::data (int& a, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -419,7 +419,7 @@ void Xdr::data (unsigned int& a, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -444,7 +444,7 @@ void Xdr::data (unsigned int& a, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -471,7 +471,7 @@ void Xdr::data (short int& a, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -496,7 +496,7 @@ void Xdr::data (short int& a, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -523,7 +523,7 @@ void Xdr::data (unsigned short int& a, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -548,7 +548,7 @@ void Xdr::data (unsigned short int& a, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -575,7 +575,7 @@ void Xdr::data (float& a, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -600,7 +600,7 @@ void Xdr::data (float& a, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -627,7 +627,7 @@ void Xdr::data (double& a, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -652,7 +652,7 @@ void Xdr::data (double& a, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -685,7 +685,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -716,7 +716,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -752,7 +752,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -784,7 +784,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -831,7 +831,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -865,7 +865,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -897,7 +897,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif	
 	return;
@@ -944,7 +944,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -978,7 +978,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -1010,7 +1010,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -1057,7 +1057,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -1091,7 +1091,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif	
 	return;
@@ -1123,7 +1123,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -1170,7 +1170,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -1204,7 +1204,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif	
 	return;
@@ -1236,7 +1236,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -1283,7 +1283,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -1317,7 +1317,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif	
 	return;
@@ -1352,7 +1352,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -1405,7 +1405,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -1441,7 +1441,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif	
 	return;
@@ -1472,7 +1472,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -1523,7 +1523,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -1565,7 +1565,7 @@ void Xdr::data (std::string& s, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -1600,7 +1600,7 @@ void Xdr::data (std::string& s, const char* comment)
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -1639,7 +1639,7 @@ void Xdr::data (std::string& s, const char* comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -1671,7 +1671,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif	
 	return;
@@ -1698,7 +1698,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -1746,7 +1746,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -1779,7 +1779,7 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -1827,7 +1827,7 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -1880,7 +1880,7 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
 
-	error();
+	libmesh_error();
 
 #endif
 	return;
@@ -1931,7 +1931,7 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 #endif // # USE_COMPLEX_NUMBERS
@@ -1961,7 +1961,7 @@ void Xdr::comment (std::string &comment)
       }
 
     default:
-      error();
+      libmesh_error();
     }
 }
 

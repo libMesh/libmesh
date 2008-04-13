@@ -129,7 +129,7 @@ int main (int argc, char** argv)
         std::cerr << "Usage: " << argv[0] << " -f [frequency]"
                   << std::endl;
       
-      error();
+      libmesh_error();
     }
   
   // Tell the user what we are doing.

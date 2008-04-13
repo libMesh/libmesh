@@ -49,7 +49,7 @@ NonlinearSolver<T>::build(const SolverPackage solver_package)
       std::cerr << "ERROR:  Unrecognized solver package: "
 		<< solver_package
 		<< std::endl;
-      error();
+      libmesh_error();
     }
     
   AutoPtr<NonlinearSolver<T> > ap(NULL);

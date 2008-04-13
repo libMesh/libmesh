@@ -147,7 +147,7 @@ public:
   
 //   void vtk_connectivity(const unsigned int,
 // 			std::vector<unsigned int>*) const
-//   { error(); }
+//   { libmesh_error(); }
   
 //   unsigned int vtk_element_type (const unsigned int) const
 //   { return 13; }

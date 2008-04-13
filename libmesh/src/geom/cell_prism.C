@@ -74,7 +74,7 @@ unsigned int Prism::key (const unsigned int s) const
     }
   
   // We'll never get here.
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -146,7 +146,7 @@ AutoPtr<DofObject> Prism::side (const unsigned int i) const
       }
     default:
       {
-	error();
+	libmesh_error();
         Elem* facet = new Tri3;
         AutoPtr<DofObject> ap_facet(facet);
         return ap_facet;
@@ -154,7 +154,7 @@ AutoPtr<DofObject> Prism::side (const unsigned int i) const
     }
 
   // We'll never get here.
-  error();
+  libmesh_error();
   Elem* facet = new Tri3;
   AutoPtr<DofObject> ap_facet(facet);
   return ap_facet;

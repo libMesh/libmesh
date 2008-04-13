@@ -47,11 +47,6 @@ namespace MeshTools {
  * but be fully parallelized in memory.
  * By "is intended" I mean that it doesn't work that way yet.  Don't
  * use this class unless you're developing or debugging it.
- *
- * Most methods are currently commented out, and will thus not redefine the
- * UnstructuredMesh:: versions of those functions.  Methods for which the
- * UnstructuredMesh:: version is obviously wrong for ParallelMesh have been
- * tagged by "error();"
 */
 
 // ------------------------------------------------------------

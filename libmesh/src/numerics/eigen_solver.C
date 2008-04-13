@@ -54,7 +54,7 @@ EigenSolver<T>::build(const SolverPackage solver_package)
       std::cerr << "ERROR:  Unrecognized eigen solver package: "
 		<< solver_package
 		<< std::endl;
-      error();
+      libmesh_error();
     }
     
   AutoPtr<EigenSolver<T> > ap(NULL);

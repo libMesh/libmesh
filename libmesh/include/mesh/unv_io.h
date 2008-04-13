@@ -305,7 +305,7 @@ bool UNVIO::beginning_of_dataset (std::istream& in_file,
     }
 
   // should never end up here
-  error();
+  libmesh_error();
   return false;
 }
 

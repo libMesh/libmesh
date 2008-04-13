@@ -55,7 +55,7 @@ Real FE<2,SZABAB>::shape(const ElemType,
 	    << "because edge orientation is needed."
 	    << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -106,7 +106,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case 5: return l3*l1*(-4.*sqrt6);	
 		  
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
     
@@ -132,7 +132,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 	   
@@ -181,7 +181,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case 9: return l1*l2*l3;
 	
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	    
@@ -227,7 +227,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	    }
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 	   
@@ -283,7 +283,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case 14: return l1*l2*l3*(2*l3-1);
 	
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	  
@@ -325,7 +325,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	    }
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
       
@@ -391,7 +391,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case 20: return l1*l2*l3*(1.0+(-6.0+6.0*l3)*l3);
 		  
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    } // case TRI6
 	    
@@ -437,7 +437,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	    } // case QUAD8/QUAD9
 
 	  default:
-	    error();
+	    libmesh_error();
 
 	  } // switch type
 
@@ -512,7 +512,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 
 		  
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    } // case TRI6
 
@@ -558,7 +558,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	    } // case QUAD8/QUAD9
 
 	  default:
-	    error();
+	    libmesh_error();
 
 	  } // switch type
 
@@ -645,7 +645,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case 35: return 0.125*l1*l2*l3*(-8.0+(240.0+(-1680.0+(4480.0+(-5040.0+2016.0*l3)*l3)*l3)*l3)*l3);
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    } // case TRI6
 	    
@@ -695,7 +695,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	    } // case QUAD8/QUAD9
 	    
 	  default:
-	    error();
+	    libmesh_error();
 
 	  } // switch type
 
@@ -705,11 +705,11 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
 
     } // switch order
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -728,7 +728,7 @@ Real FE<2,SZABAB>::shape_deriv(const ElemType,
 	    << "because edge orientation is needed."
 	    << std::endl;
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -790,7 +790,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		  
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 
@@ -823,12 +823,12 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 			  FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
-		  error();
+		  libmesh_error();
 		}	      
 	    }
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -872,7 +872,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		  
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	  
@@ -923,12 +923,12 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 	   
@@ -974,7 +974,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		  
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	
@@ -1026,12 +1026,12 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 	   
@@ -1078,7 +1078,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		  
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	
@@ -1133,12 +1133,12 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -1183,7 +1183,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		  
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	
@@ -1238,12 +1238,12 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -1288,7 +1288,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		  
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	
@@ -1347,12 +1347,12 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 		  
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
       
@@ -1361,11 +1361,11 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
       // by default throw an error;call the orientation-independent shape functions
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
 
   
-  error();
+  libmesh_error();
   return 0.;
 }
 

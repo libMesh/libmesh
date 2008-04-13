@@ -104,7 +104,7 @@ void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
       break;
       
     default: // std::cout<<"not properly specified"<<std::endl;
-      error();
+      libmesh_error();
       break;
       
     } 

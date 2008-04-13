@@ -261,7 +261,7 @@ AutoPtr<Elem> Elem::build(const ElemType type,
     default:
       {
 	std::cerr << "ERROR: Undefined element type!." << std::endl;
-	error();
+	libmesh_error();
       }
     }
   
@@ -654,10 +654,10 @@ void Elem::write_connectivity (std::ostream& out,
       }
 
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
 }
 
 
@@ -719,7 +719,7 @@ Real Elem::quality (const ElemQuality q) const
 
     
     // Will never get here...
-    error();
+    libmesh_error();
     return 0.;
 }
 
@@ -770,7 +770,7 @@ void Elem::add_child (Elem* elem)
 
   std::cerr << "Error: Tried to add a child to an element with full children array"
             << std::endl;
-  error();
+  libmesh_error();
 }
 
 
@@ -1155,7 +1155,7 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
 
     case PYRAMID5:
       {
-	// error(); 
+	// libmesh_error(); 
 	return INVALID_ELEM;
       }
 
@@ -1166,7 +1166,7 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
     // infinite elements
     case INFEDGE2:
       {
-	// error(); 
+	// libmesh_error(); 
 	return INVALID_ELEM;
       }
 

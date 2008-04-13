@@ -266,7 +266,7 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
 		<< n_binned
 		<< ", did not match the total number of entries, n="
 		<< n << "." << std::endl;
-      //error();
+      //libmesh_error();
     }
 #endif
 

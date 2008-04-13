@@ -173,7 +173,7 @@ SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string& mat_name)
 		<< std::endl
 		<< " any more.  You should have done this earlier."
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   // Return the matrix if it is already there.
@@ -200,7 +200,7 @@ const SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string& mat_
 		<< mat_name
 		<< " does not exist in this system!"
 		<< std::endl;      
-      error();
+      libmesh_error();
     }
   
   return *(pos->second);
@@ -219,7 +219,7 @@ SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string& mat_name)
 		<< mat_name
 		<< " does not exist in this system!"
 		<< std::endl;      
-      error();
+      libmesh_error();
     }
   
   return *(pos->second);

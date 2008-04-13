@@ -395,7 +395,7 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
                     << " neighbor at level " << neigh->level()
                     << std::endl;
                   GMVIO(*dynamic_cast<UnstructuredMesh*>(this)).write ("bad_mesh.gmv");
-                  error();
+                  libmesh_error();
                 }
 #endif // DEBUG
             }
@@ -427,7 +427,7 @@ void UnstructuredMesh::read (const std::string& name,
 	std::cerr << "ERROR: cannot locate specified file:\n\t"
 		  << name
 		  << std::endl;
-	error();
+	libmesh_error();
       }
   }
 
@@ -518,7 +518,7 @@ void UnstructuredMesh::read (const std::string& name,
 		  std::cerr << "Error! You must pass a "
 			    << "valid MeshData pointer to "
 			    << "read UNV files!" << std::endl;
-		  error();
+		  libmesh_error();
 		}
 	      UNVIO(*this, *mesh_data).read (new_name);
 	    }
@@ -550,7 +550,7 @@ void UnstructuredMesh::read (const std::string& name,
 			<< "               compatible with XdrMGF\n"
 			<< "     *.unv  -- I-deas Universal format\n"
 			<< std::endl;
-	      error();	  
+	      libmesh_error();	  
 	    }    
 	  
 	  // If we temporarily decompressed a .bz2 file, remove the
@@ -635,7 +635,7 @@ void UnstructuredMesh::write (const std::string& name,
 		std::cerr << "Error! You must pass a "
 			  << "valid MeshData pointer to "
 			  << "write UNV files!" << std::endl;
-		error();
+		libmesh_error();
 	      }
 	    UNVIO(*this, *mesh_data).write (new_name);
 	  }

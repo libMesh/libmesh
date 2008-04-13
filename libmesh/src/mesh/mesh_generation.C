@@ -97,7 +97,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
           default:
             {
 	      std::cerr << "ERROR: Unrecognized 1D element type." << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
 
@@ -126,7 +126,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
           default:
             {
               std::cerr << "ERROR: Unrecognized 1D element type." << std::endl;
-              error();
+              libmesh_error();
             }
           }
 
@@ -254,7 +254,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
           default:
             {
               std::cerr << "ERROR: Unrecognized 1D element type." << std::endl;
-              error();
+              libmesh_error();
             }
               
         }
@@ -302,7 +302,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             default:
               {
                 std::cerr << "ERROR: Unrecognized 1D element type." << std::endl;
-                error();                
+                libmesh_error();                
               }
           }
 
@@ -353,7 +353,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  default:
 	    {
 	      std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
 
@@ -383,7 +383,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  default:
 	    {
 	      std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
 
@@ -478,7 +478,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  default:
 	    {
 	      std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
 
@@ -644,7 +644,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  default:
 	    {
 	      std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
 
@@ -707,7 +707,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  default:
 	    {
 	      std::cerr << "ERROR: Unrecognized 3D element type." << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
 
@@ -740,7 +740,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  default:
 	    {
 	      std::cerr << "ERROR: Unrecognized 3D element type." << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
 
@@ -848,7 +848,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  default:
 	    {
 	      std::cerr << "ERROR: Unrecognized 3D element type." << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
 
@@ -1130,7 +1130,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  default:
 	    {
 	      std::cerr << "ERROR: Unrecognized 3D element type." << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 	  }
 
@@ -1232,7 +1232,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
     default:
       {
-	error();
+	libmesh_error();
       }
     }  
 
@@ -1302,7 +1302,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh&,
 					  const ElemType)
 {
  	std::cout << "Building a circle/sphere only works with AMR." << std::endl;
- 	error();
+ 	libmesh_error();
 }
 
 #else
@@ -1418,7 +1418,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 	    // build_square()) to do Tets, or Prisms for that matter.
 	    std::cerr << "Error: Only HEX8/27 currently supported."
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 
 	
@@ -1546,7 +1546,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
       } // end case 3
       
     default:
-      error();
+      libmesh_error();
       
     } // end switch (dim)
 
