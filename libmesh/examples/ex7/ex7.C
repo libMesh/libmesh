@@ -290,7 +290,7 @@ void assemble_helmholtz(EquationSystems& es,
     
   // It is a good idea to make sure we are assembling
   // the proper system.
-  assert (system_name == "Helmholtz");
+  libmesh_assert (system_name == "Helmholtz");
   
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
@@ -528,7 +528,7 @@ void assemble_helmholtz(EquationSystems& es,
     // adopt the corresponding value for the rhs vector.
     // Note that normal data was given in the mesh data file,
     // i.e. one value per node
-    assert(mesh_data.n_val_per_node() == 1);
+    libmesh_assert(mesh_data.n_val_per_node() == 1);
 
     MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
     const MeshBase::const_node_iterator node_end = mesh.nodes_end();
@@ -569,7 +569,7 @@ void add_M_C_K_helmholtz(EquationSystems& es,
   
   // It is a good idea to make sure we are assembling
   // the proper system.
-  assert (system_name == "Helmholtz");
+  libmesh_assert (system_name == "Helmholtz");
   
   // Get a reference to our system, as before
   FrequencySystem & f_system =

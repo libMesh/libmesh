@@ -204,7 +204,7 @@ int main (int argc, char** argv)
     // Create a mesh with the requested dimension.
     // Below we require a 3-dim mesh, therefore assert
     // it.
-    assert (dim == 3);
+    libmesh_assert (dim == 3);
     Mesh mesh(dim);
     MeshData mesh_data(mesh);
   
@@ -493,11 +493,11 @@ void create_artificial_data (const Mesh& mesh,
 
   const Real z_min = b_box.first (2);
   const Real z_max = b_box.second(2);
-  assert (fabs(z_max-z_min) > TOLERANCE);
+  libmesh_assert (fabs(z_max-z_min) > TOLERANCE);
 
   const Real x_min = b_box.first (0);
   const Real x_max = b_box.second(0);
-  assert (fabs(x_max-x_min) > TOLERANCE);
+  libmesh_assert (fabs(x_max-x_min) > TOLERANCE);
 
 
  //  const_node_iterator node_it = mesh.nodes_begin();

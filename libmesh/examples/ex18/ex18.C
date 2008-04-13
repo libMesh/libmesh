@@ -73,7 +73,7 @@ int main (int argc, char** argv)
   const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
   const unsigned int dim               = infile("dimension", 2);
 
-  assert (dim == 2 || dim == 3);
+  libmesh_assert (dim == 2 || dim == 3);
   // Create a n-dimensional mesh.
   Mesh mesh (dim);
   
@@ -128,7 +128,7 @@ int main (int argc, char** argv)
     {
       system.time_solver =
         AutoPtr<TimeSolver>(new SteadySolver(system));
-      assert(n_timesteps == 1);
+      libmesh_assert(n_timesteps == 1);
     }
 
   // Initialize the system
@@ -180,7 +180,7 @@ int main (int argc, char** argv)
             {
               // We can't adapt to both a tolerance and a mesh
               // size at once
-              assert (nelem_target == 0);
+              libmesh_assert (nelem_target == 0);
 
               UniformRefinementEstimator *u =
                 new UniformRefinementEstimator;
@@ -195,7 +195,7 @@ int main (int argc, char** argv)
             {
               // If we aren't adapting to a tolerance we need a
               // target mesh size
-              assert (nelem_target > 0);
+              libmesh_assert (nelem_target > 0);
 
               // Kelly is a lousy estimator to use for a problem
               // not in H1 - if we were doing more than a few
