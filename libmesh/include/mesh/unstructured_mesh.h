@@ -145,10 +145,12 @@ class UnstructuredMesh : public MeshBase
    */
   virtual void find_neighbors (bool reset_remote_elements = false);
 
+#ifdef DEBUG
   /**
    * A function for testing neighbor connectivity
    */
   void libmesh_assert_valid_neighbors () const;
+#endif
 
 #ifdef ENABLE_AMR
   /**

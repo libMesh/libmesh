@@ -172,6 +172,7 @@ UnstructuredMesh::~UnstructuredMesh ()
 
 
 
+#ifdef DEBUG
 void UnstructuredMesh::libmesh_assert_valid_neighbors() const
 {
   const const_element_iterator el_end = this->elements_end();
@@ -182,6 +183,7 @@ void UnstructuredMesh::libmesh_assert_valid_neighbors() const
       elem->libmesh_assert_valid_neighbors();
     }
 }
+#endif
 
 
 
