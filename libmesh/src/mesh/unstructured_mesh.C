@@ -172,21 +172,6 @@ UnstructuredMesh::~UnstructuredMesh ()
 
 
 
-#ifdef DEBUG
-void UnstructuredMesh::libmesh_assert_valid_neighbors() const
-{
-  const const_element_iterator el_end = this->elements_end();
-  for (const_element_iterator el = this->elements_begin(); el != el_end; ++el)
-    {
-      const Elem* elem = *el;
-      libmesh_assert (elem);
-      elem->libmesh_assert_valid_neighbors();
-    }
-}
-#endif
-
-
-
 void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
 {
   libmesh_assert(this->n_nodes() != 0);
@@ -413,7 +398,7 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
 #endif // AMR
 
 #ifdef DEBUG
-this->libmesh_assert_valid_neighbors();
+MeshTools::libmesh_assert_valid_neighbors(*this);
 #endif
 
   STOP_LOG("find_neighbors()", "Mesh");

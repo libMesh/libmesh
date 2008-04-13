@@ -268,6 +268,18 @@ namespace MeshTools
     */
    void find_hanging_nodes_and_parents(const MeshBase &mesh, std::map<unsigned int, std::vector<unsigned int> > &hanging_nodes);
 
+#ifdef DEBUG
+  /**
+   * A function for verifying correct processor assignment of nodes
+   */
+  void libmesh_assert_valid_node_procids (const MeshBase &mesh);
+
+  /**
+   * A function for verifying symmetry of neighbor connectivity
+   */
+  void libmesh_assert_valid_neighbors (const MeshBase &mesh);
+#endif
+
   // There is no reason for users to call functions in the MeshTools::Private namespace.
   namespace Private {
     /**

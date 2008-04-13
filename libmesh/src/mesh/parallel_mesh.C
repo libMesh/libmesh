@@ -851,7 +851,7 @@ void ParallelMesh::delete_remote_elements()
 {
 #ifdef DEBUG
 // Make sure our neighbor links are all fine
-  this->libmesh_assert_valid_neighbors();
+  MeshTools::libmesh_assert_valid_neighbors(*this);
 #endif
 
   _is_serial = false;
@@ -868,7 +868,7 @@ void ParallelMesh::delete_remote_elements()
   libmesh_assert(this->n_elem() == this->max_elem_id());
 
 // Make sure our neighbor links are all fine
-  this->libmesh_assert_valid_neighbors();
+  MeshTools::libmesh_assert_valid_neighbors(*this);
 
 // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
@@ -896,7 +896,7 @@ void ParallelMesh::allgather()
   libmesh_assert(this->n_elem() == this->max_elem_id());
 
 // Make sure our neighbor links are all fine
-  this->libmesh_assert_valid_neighbors();
+  MeshTools::libmesh_assert_valid_neighbors(*this);
 
 // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
