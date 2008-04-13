@@ -122,7 +122,7 @@ bool NavierSystem::element_time_derivative (bool request_jacobian)
   // The number of local degrees of freedom in each variable
   const unsigned int n_p_dofs = dof_indices_var[p_var].size();
   const unsigned int n_u_dofs = dof_indices_var[u_var].size(); 
-  assert (n_u_dofs == dof_indices_var[v_var].size()); 
+  libmesh_assert (n_u_dofs == dof_indices_var[v_var].size()); 
 
   // The subvectors and submatrices we need to fill:
   const unsigned int dim = this->get_mesh().mesh_dimension();
@@ -372,7 +372,7 @@ bool NavierSystem::side_constraint (bool request_jacobian)
       // u = 0 everywhere else
       short int boundary_id =
         this->get_mesh().boundary_info->boundary_id(elem, side);
-      assert (boundary_id != BoundaryInfo::invalid_id);
+      libmesh_assert (boundary_id != BoundaryInfo::invalid_id);
       const short int top_id = (dim==3) ? 5 : 2;
 
       Real u_value = 0.;
@@ -500,7 +500,7 @@ bool NavierSystem::mass_residual (bool request_jacobian)
 
           if (request_jacobian && elem_solution_derivative)
             {
-              assert (elem_solution_derivative == 1.0);
+              libmesh_assert (elem_solution_derivative == 1.0);
 
               Number JxWxRexPhiI = JxWxRe * phi[i][qp];
               Number JxWxRexPhiII = JxWxRexPhiI * phi[i][qp];

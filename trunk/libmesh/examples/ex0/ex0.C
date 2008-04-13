@@ -171,7 +171,7 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
 #ifdef ENABLE_AMR
 
   // It is a good idea to check we are solving the correct system
-  assert(system_name == "1D");
+  libmesh_assert(system_name == "1D");
 
   // Get a reference to the mesh object
   const MeshBase& mesh = es.get_mesh();

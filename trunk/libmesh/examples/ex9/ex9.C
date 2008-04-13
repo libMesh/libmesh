@@ -257,7 +257,7 @@ void init_cd (EquationSystems& es,
 {
   // It is a good idea to make sure we are initializing
   // the proper system.
-  assert (system_name == "Convection-Diffusion");
+  libmesh_assert (system_name == "Convection-Diffusion");
 
   // Get a reference to the Convection-Diffusion system object.
   TransientLinearImplicitSystem & system =
@@ -280,7 +280,7 @@ void assemble_cd (EquationSystems& es,
 #ifdef ENABLE_AMR
   // It is a good idea to make sure we are assembling
   // the proper system.
-  assert (system_name == "Convection-Diffusion");
+  libmesh_assert (system_name == "Convection-Diffusion");
   
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();

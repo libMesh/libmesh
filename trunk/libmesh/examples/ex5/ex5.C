@@ -198,7 +198,7 @@ int main (int argc, char** argv)
 void assemble_poisson(EquationSystems& es,
                       const std::string& system_name)
 {
-  assert (system_name == "Poisson");
+  libmesh_assert (system_name == "Poisson");
 
   const MeshBase& mesh = es.get_mesh();
 

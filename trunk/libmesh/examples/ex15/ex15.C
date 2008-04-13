@@ -147,10 +147,10 @@ int main(int argc, char** argv)
                   input_file("max_linear_iterations", 10000);
 
   // We have only defined 2 and 3 dimensional problems
-  assert (dim == 2 || dim == 3);
+  libmesh_assert (dim == 2 || dim == 3);
 
   // Currently only the Hermite cubics give a 3D C^1 basis
-  assert (dim == 2 || approx_type == "HERMITE");
+  libmesh_assert (dim == 2 || approx_type == "HERMITE");
 
   // Create a dim-dimensional mesh.
   Mesh mesh (dim);
@@ -549,7 +549,7 @@ void assemble_biharmonic(EquationSystems& es,
 
   // It is a good idea to make sure we are assembling
   // the proper system.
-  assert (system_name == "Biharmonic");
+  libmesh_assert (system_name == "Biharmonic");
 
   // Declare a performance log.  Give it a descriptive
   // string to identify what part of the code we are

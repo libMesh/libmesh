@@ -172,7 +172,7 @@ void assemble_poisson(EquationSystems& es,
   
   // It is a good idea to make sure we are assembling
   // the proper system.
-  assert (system_name == "Poisson");
+  libmesh_assert (system_name == "Poisson");
 
   
   // Get a constant reference to the mesh object.

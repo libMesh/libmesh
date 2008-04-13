@@ -201,7 +201,7 @@ void assemble_mass(EquationSystems& es,
   
   // It is a good idea to make sure we are assembling
   // the proper system.
-  assert (system_name == "Eigensystem");
+  libmesh_assert (system_name == "Eigensystem");
 
 #ifdef HAVE_SLEPC
 
