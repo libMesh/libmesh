@@ -32,8 +32,10 @@
 #include <vector>
 #include <list>
 
-#if   defined(HAVE_UNORDERED_MAP)
+#if   defined(HAVE_TR1_UNORDERED_MAP)
 # include <tr1/unordered_map>
+#elif defined(HAVE_UNORDERED_MAP)
+# include <unordered_map>
 #elif defined(HAVE_HASH_MAP)
 # include <hash_map>
 #elif defined(HAVE_EXT_HASH_MAP)
@@ -616,7 +618,7 @@ private:
    * For efficiency we will use a hashed multimap if it is
    * available, otherwise a regular multimap.
    */
-#if   defined(HAVE_UNORDERED_MAP)
+#if   defined(HAVE_UNORDERED_MAP) || defined(HAVE_TR1_UNORDERED_MAP)
     typedef std::tr1::unordered_multimap<unsigned int, Node*> map_type;
 #elif defined(HAVE_HASH_MAP)    
     typedef std::hash_multimap<unsigned int, Node*> map_type;    

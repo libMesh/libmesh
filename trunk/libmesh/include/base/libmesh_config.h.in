@@ -54,12 +54,6 @@
 /* Flag indicating whether the library will be compiled with Exodus support */
 #undef HAVE_EXODUS_API
 
-/* Define to 1 if you have the <ext/hash_map> header file. */
-#undef HAVE_EXT_HASH_MAP
-
-/* Define to 1 if you have the <ext/hash_set> header file. */
-#undef HAVE_EXT_HASH_SET
-
 /* define if the compiler supports GCC C++ ABI name demangling */
 #undef HAVE_GCC_ABI_DEMANGLE
 
@@ -74,12 +68,6 @@
 
 /* Flag indicating whether or not gzstreams are available */
 #undef HAVE_GZSTREAM
-
-/* Define to 1 if you have the <hash_map> header file. */
-#undef HAVE_HASH_MAP
-
-/* Define to 1 if you have the <hash_set> header file. */
-#undef HAVE_HASH_SET
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
@@ -176,8 +164,26 @@
 /* Define to 1 if you have the <unordered_map> header file. */
 #undef HAVE_UNORDERED_MAP
 
+/* Define to 1 if you have the <tr1/unordered_map> header file. */
+#undef HAVE_TR1_UNORDERED_MAP
+
+/* Define to 1 if you have the <hash_map> header file. */
+#undef HAVE_HASH_MAP
+
+/* Define to 1 if you have the <ext/hash_map> header file. */
+#undef HAVE_EXT_HASH_MAP
+
 /* Define to 1 if you have the <unordered_set> header file. */
 #undef HAVE_UNORDERED_SET
+
+/* Define to 1 if you have the <tr1/unordered_set> header file. */
+#undef HAVE_TR1_UNORDERED_SET
+
+/* Define to 1 if you have the <hash_set> header file. */
+#undef HAVE_HASH_SET
+
+/* Define to 1 if you have the <ext/hash_set> header file. */
+#undef HAVE_EXT_HASH_SET
 
 /* Flag indicating whether the library will be compiled with VTK support */
 #undef HAVE_VTK
