@@ -127,20 +127,20 @@ void MeshData::read_xdr (const std::string& name,
       {
 	std::cerr << "ERROR: File does not contain complex-valued data!"
 		  << std::endl;
-	error();
+	libmesh_error();
       }
 #elif USE_REAL_NUMBERS
     if (vtype != "REAL")
       {
 	std::cerr << "ERROR: File does not contain real-valued data!"
 		  << std::endl;
-	error();
+	libmesh_error();
       }
 #else
     /*
      * What number type is this?
      */
-    error();
+    libmesh_error();
 #endif
   }
 
@@ -202,7 +202,7 @@ void MeshData::read_xdr (const std::string& name,
 	    if (previous_values_size != values.size())
 	      {
 		std::cerr << "ERROR: Size mismatch for n_cnt = " << n_cnt << std::endl;
-		error();
+		libmesh_error();
 	      }
 	  }
 #endif
@@ -255,7 +255,7 @@ void MeshData::read_xdr (const std::string& name,
 	    if (previous_values_size != values.size())
 	      {
 		std::cerr << "ERROR: Size mismatch for n_cnt = " << n_cnt << std::endl;
-		error();
+		libmesh_error();
 	      }
 	  }
 #endif

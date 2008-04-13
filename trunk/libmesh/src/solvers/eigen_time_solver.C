@@ -162,7 +162,7 @@ bool EigenTimeSolver::element_residual(bool request_jacobian)
 
   else
     {
-      error();
+      libmesh_error();
       return false;
     }
 }
@@ -202,7 +202,7 @@ bool EigenTimeSolver::side_residual(bool request_jacobian)
 
   else
     {
-      error();
+      libmesh_error();
       return false;
     }
 }

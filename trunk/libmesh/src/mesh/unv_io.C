@@ -89,7 +89,7 @@ void UNVIO::read (const std::string& file_name)
 		<< "files and libraries to read and write "
 		<< "compressed streams."
 		<< std::endl;
-      error();
+      libmesh_error();
       
 #endif
       return;      
@@ -131,7 +131,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
       {
         std::cerr << "ERROR: Input file not good." 
 		  << std::endl;
-	error();
+	libmesh_error();
       }
 
     
@@ -205,13 +205,13 @@ void UNVIO::read_implementation (std::istream& in_stream)
     if (!found_elem)
       {
 	std::cerr << "ERROR: Could not find elements!" << std::endl;
-	error();
+	libmesh_error();
       }
 
     if (!found_node)
       {
 	std::cerr << "ERROR: Could not find nodes!" << std::endl;
-	error();
+	libmesh_error();
       }
 
 
@@ -222,7 +222,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
       {
         std::cerr << "ERROR: Cannot re-read input file." 
 		  << std::endl;
-	error();
+	libmesh_error();
       }
   }
 
@@ -250,7 +250,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
 	  this->element_in (in_stream);
 
 	else
-	  error();
+	  libmesh_error();
       }
 
 
@@ -286,7 +286,7 @@ void UNVIO::write (const std::string& file_name)
 		<< "files and libraries to read and write "
 		<< "compressed streams."
 		<< std::endl;
-      error();
+      libmesh_error();
       
 #endif
       
@@ -310,7 +310,7 @@ void UNVIO::write_implementation (std::ostream& out_file)
     {
       std::cerr << "ERROR: Output file not good." 
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
 
@@ -358,7 +358,7 @@ void UNVIO::count_nodes (std::istream& in_file)
     {
       std::cerr << "Error: Trying to scan nodes twice!" 
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
 
@@ -373,7 +373,7 @@ void UNVIO::count_nodes (std::istream& in_file)
     {
       std::cerr << "ERROR: Bad, already reached end of dataset before even starting to read nodes!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
  
@@ -446,7 +446,7 @@ void UNVIO::count_nodes (std::istream& in_file)
     {
       std::cerr << "ERROR: File ended before end of node dataset!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   if (this->verbose())
@@ -464,7 +464,7 @@ void UNVIO::count_elements (std::istream& in_file)
     {
       std::cerr << "Error: Trying to scan elements twice!" 
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
 
@@ -514,7 +514,7 @@ void UNVIO::count_elements (std::istream& in_file)
     {
       std::cerr << "ERROR: File ended before end of element dataset!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   if (this->verbose())
@@ -534,7 +534,7 @@ void UNVIO::node_in (std::istream& in_file)
   if (!ok)
     {
       std::cerr << "ERROR: Could not find node dataset!" << std::endl;
-      error();
+      libmesh_error();
     }
 
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -640,7 +640,7 @@ void UNVIO::element_in (std::istream& in_file)
   if (!ok)
     {
       std::cerr << "ERROR: Could not find element dataset!" << std::endl;
-      error();
+      libmesh_error();
     }
 
 
@@ -729,7 +729,7 @@ void UNVIO::element_in (std::istream& in_file)
 	    std::cerr << "ERROR: UNV-element type 43: Plane Stress Cubic Triangle"
 		      << " not supported." 
 		      << std::endl;
-	    error();	    
+	    libmesh_error();	    
 	    break;
 	  }
 	
@@ -782,7 +782,7 @@ void UNVIO::element_in (std::istream& in_file)
 	    std::cerr << "ERROR: UNV-element type 46: Plane Stress Cubic Quadrilateral"
 		      << " not supported." 
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	    break;
 	  }
 	
@@ -859,7 +859,7 @@ void UNVIO::element_in (std::istream& in_file)
 	    std::cerr << "Error: UNV-element type 117: Solid Cubic Brick"
 		      << " not supported." 
 		      << std::endl;
-	    error();	    
+	    libmesh_error();	    
 	    break;
 	  }
 	
@@ -886,7 +886,7 @@ void UNVIO::element_in (std::istream& in_file)
 		      << fe_descriptor_id
 		      << " not supported." 
 		      << std::endl;
-	    error();	    
+	    libmesh_error();	    
 	    break;
 	  }
 	}
@@ -1199,7 +1199,7 @@ void UNVIO::element_out(std::ostream& out_file)
 		      << " not supported in "
 		      << "UNVIO!"
 		      << std::endl;
-	    error();	
+	    libmesh_error();	
 	    break;
 	  }
 	}

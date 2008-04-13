@@ -192,7 +192,7 @@ void VTKIO::cells_to_vtk(const MeshBase& mesh, vtkUnstructuredGrid*& grid){
 	default:
 	  {
 		  std::cerr<<"element type "<<elem->type()<<" not implemented"<<std::endl;
-		  error();
+		  libmesh_error();
 	  }
 	}
 
@@ -307,7 +307,7 @@ void VTKIO::read (const std::string& name)
   std::cerr << "Cannot read VTK file: " << name
 	    << "\nYou must have VTK installed and correctly configured to read VTK meshes."
 	    << std::endl;
-  error();
+  libmesh_error();
 
 #else
   //std::cout<<"read "<<name <<std::endl;  
@@ -372,7 +372,7 @@ void VTKIO::read (const std::string& name)
 	  break;
 	default:
 	  std::cerr << "element type not implemented in vtkinterface " << cell->GetCellType() << std::endl;
-	  error();
+	  libmesh_error();
 	}
   // get the straightforward numbering from the VTK cells
   for(unsigned int j=0;j<elem->n_nodes();++j){
@@ -407,7 +407,7 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
   std::cerr << "Cannot write VTK file: " << fname
 	    << "\nYou must have VTK installed and correctly configured to read VTK meshes."
 	    << std::endl;
-  error();
+  libmesh_error();
   
 #else
   
@@ -450,7 +450,7 @@ void VTKIO::write (const std::string& name)
   std::cerr << "Cannot write VTK file: " << name
 	    << "\nYou must have VTK installed and correctly configured to write VTK meshes."
 	    << std::endl;
-  error();
+  libmesh_error();
 
 #else
   MeshBase& mesh = MeshInput<MeshBase>::mesh();

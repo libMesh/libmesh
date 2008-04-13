@@ -734,7 +734,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
     case 1:
       {
 	std::cout << "ERROR: Not implemented." << std::endl;
-	error();
+	libmesh_error();
 	break;
       }
 
@@ -745,7 +745,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
     case 2:
       {
 	std::cout << "ERROR: Not implemented." << std::endl;
-	error();
+	libmesh_error();
      	break;
       }
 
@@ -844,7 +844,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 
 
     default:
-      error();
+      libmesh_error();
     }
 
 
@@ -886,14 +886,14 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
     case 1:
       {
 	std::cout << "ERROR: Not implemented." << std::endl;
-	error();
+	libmesh_error();
 	break;
       }
 
     case 2:
       {
 	std::cout << "ERROR: Not implemented." << std::endl;
-	error();
+	libmesh_error();
 	break;
       }
     
@@ -956,7 +956,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
 
     default:
       {
-	error();
+	libmesh_error();
       }
     }
 

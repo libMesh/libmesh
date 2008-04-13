@@ -75,7 +75,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 
     default:
       // Unknown access type
-      error();
+      libmesh_error();
       
     }
   
@@ -126,7 +126,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 
 	default:
 	  // Unknown access type
-	  error();
+	  libmesh_error();
 	}
 
       
@@ -186,7 +186,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 
 	default:
 	  // Unknown access type
-	  error();
+	  libmesh_error();
 	}
 
 
@@ -267,7 +267,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 		  {
 		    std::cerr << "Error: Unrecognized character detected." 
 			      << std::endl;
-		    error();
+		    libmesh_error();
 		  }
 
                 // Otherwise, add the value to the neeb vector
@@ -282,7 +282,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 
 	default:
 	  // Unknown access type
-	  error();
+	  libmesh_error();
 	}
 
       if ((m_type == DECODE) || (m_type == R_ASCII)) 
@@ -295,7 +295,7 @@ int XdrMESH::header(XdrMHEAD *hd)
     }
   else  // Unknown Originator!
     {
-      error();
+      libmesh_error();
     }
   
   
@@ -349,7 +349,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 
     default:
       // Unknown access type
-      error();
+      libmesh_error();
     }
   
   return 1;

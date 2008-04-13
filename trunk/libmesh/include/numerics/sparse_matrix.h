@@ -308,7 +308,7 @@ public:
   {
     std::cerr << "ERROR: Not Implemented in base class yet!" << std::endl;
     std::cerr << "ERROR writing MATLAB file " << name << std::endl;
-    error();
+    libmesh_error();
   }
 
   /**
@@ -356,7 +356,7 @@ protected:
   {
     std::cerr << "Error! This function is not yet implemented in the base class!"
 	      << std::endl;
-    error();
+    libmesh_error();
   }
   
   /**

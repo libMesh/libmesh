@@ -149,7 +149,7 @@ unsigned int InfHex18::key (const unsigned int s) const
     }
 
   // We'll never get here.
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -180,7 +180,7 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
 	    return ap;
 	  }
 	default:
-	  error();
+	  libmesh_error();
 	}
     }
 
@@ -266,14 +266,14 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
 
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	    AutoPtr<Elem> ap(NULL);  return ap;
 	  }
 	}
     }
   
   // We'll never get here.
-  error();
+  libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -358,15 +358,15 @@ void InfHex18::connectivity(const unsigned int sc,
 	    return;
       
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
 }
 
 
@@ -391,10 +391,10 @@ unsigned int InfHex18::n_second_order_adjacent_vertices (const unsigned int n) c
 	return 4;
 
       default:
-	error();
+	libmesh_error();
     }
 
-  error();
+  libmesh_error();
   return libMesh::invalid_uint;
 }
 

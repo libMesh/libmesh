@@ -133,7 +133,7 @@ std::vector<Number>& ExactSolution::_check_inputs(const std::string& sys_name,
       std::cerr << "Cannot compute error, you must provide a "
 		<< "function which computes the exact solution."
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 */
   
@@ -146,7 +146,7 @@ std::vector<Number>& ExactSolution::_check_inputs(const std::string& sys_name,
       std::cerr << "Sorry, couldn't find the requested system '"
                 << sys_name << "'."
 		<< std::endl;
-      error();
+      libmesh_error();
     }
   
   // Make sure the requested unknown_name exists.
@@ -157,7 +157,7 @@ std::vector<Number>& ExactSolution::_check_inputs(const std::string& sys_name,
       std::cerr << "Sorry, couldn't find the requested variable '"
                 << unknown_name << "'."
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   // Return a reference to the proper error entry
@@ -208,7 +208,7 @@ Number ExactSolution::error_norm(const std::string& sys_name,
       return std::sqrt(error_vals[2]);
     // Currently only Sobolev norms/seminorms are supported
     default:
-      error();
+      libmesh_error();
     }
 }
 
@@ -250,7 +250,7 @@ Number ExactSolution::h1_error(const std::string& sys_name,
       std::cerr << "Cannot compute H1 error, you must provide a "
 		<< "function which computes the gradient of the exact solution."
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 */
   
@@ -282,7 +282,7 @@ Number ExactSolution::h2_error(const std::string& sys_name,
 		<< "which computes the gradient and hessian of the "
                 << "exact solution."
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 */
   

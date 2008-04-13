@@ -88,7 +88,7 @@ unsigned int Hex::key (const unsigned int s) const
     }
 
   // We'll never get here.
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -167,14 +167,14 @@ AutoPtr<DofObject> Hex::side (const unsigned int i) const
       }
     default:
       {
-	error();
+	libmesh_error();
 	AutoPtr<DofObject> ap(face);
         return ap;
       }
     }
 
   // We'll never get here.
-  error();
+  libmesh_error();
   AutoPtr<DofObject> ap(face);
   return ap;
 }
@@ -337,7 +337,7 @@ Real Hex::quality (const ElemQuality q) const
 
     
     // Will never get here...
-    error();
+    libmesh_error();
     return 0.;
 }
 

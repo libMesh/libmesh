@@ -224,7 +224,7 @@ void BoundaryInfo::add_node(const Node* node,
 		<< " That is reserved for internal use.\n"
 		<< std::endl;
 
-      error();
+      libmesh_error();
     }
   
   _boundary_node_id[node] = id;
@@ -258,7 +258,7 @@ void BoundaryInfo::add_side(const Elem* elem,
 		<< " That is reserved for internal use.\n"
 		<< std::endl;
 
-      error();
+      libmesh_error();
     }
   
   std::pair<unsigned short int, short int> p(side,id);

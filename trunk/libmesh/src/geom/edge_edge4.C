@@ -126,7 +126,7 @@ void Edge4::connectivity(const unsigned int sc,
           return;
 
         default:
-          error();
+          libmesh_error();
       }
 
   }
@@ -152,12 +152,12 @@ void Edge4::connectivity(const unsigned int sc,
           return;
 
         default:
-          error();
+          libmesh_error();
       }
    }
   
   default:
-    error();
+    libmesh_error();
 
   }
 

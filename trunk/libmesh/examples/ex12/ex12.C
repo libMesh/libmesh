@@ -115,7 +115,7 @@ int main (int argc, char** argv)
         std::cerr << "Usage: " << argv[0] << " -d <dim> in_mesh.unv"
                   << std::endl;
       
-      error();
+      libmesh_error();
     }
 
   // Get the dimensionality of the mesh from argv[2]
@@ -132,7 +132,7 @@ int main (int argc, char** argv)
         std::cerr << "ERROR:  This example works only properly with a Universal mesh file!"
                 << std::endl;
       
-      error();
+      libmesh_error();
     }
 
   // Some notes on <code>MeshData</code>:

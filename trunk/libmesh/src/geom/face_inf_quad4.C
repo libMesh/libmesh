@@ -186,18 +186,18 @@ AutoPtr<Elem> InfQuad4::build_side (const unsigned int i,
 	  }
 
 	default:
-	  error();
+	  libmesh_error();
 	}
     }
 
   else
     {
       // FIXME: Find out how to return non-proxy side
-      error();
+      libmesh_error();
     }
     
   // How did we get here
-  error();
+  libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -229,10 +229,10 @@ void InfQuad4::connectivity(const unsigned int sf,
 	conn[3] = this->node(2);
       }
     default:
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
 }
 
 

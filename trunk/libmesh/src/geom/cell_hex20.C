@@ -239,14 +239,14 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i,
 	  }
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	    return face;
 	  }
 	}
     }
   
   // We'll never get here.
-  error();
+  libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -291,7 +291,7 @@ void Hex20::connectivity(const unsigned int sc,
 	    return;
       
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -324,15 +324,15 @@ void Hex20::connectivity(const unsigned int sc,
 	    return;
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
       
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
 }
 
 

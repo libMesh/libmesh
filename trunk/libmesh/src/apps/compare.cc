@@ -318,7 +318,7 @@ int main (int argc, char** argv)
 	std::cout << "ERROR:  you must specify the dimension on "
 		  << "the command line!\n\n"
 		  << argv[0] << " -d 3 ... for example\n\n";
-	error();
+	libmesh_error();
       }
 
     if (quiet)
@@ -374,7 +374,7 @@ int main (int argc, char** argv)
     else
       {
 	std::cout << "Bad input specified." << std::endl;
-	error();
+	libmesh_error();
       }
 
     are_equal = do_compare (left_system, right_system, threshold, verbose);

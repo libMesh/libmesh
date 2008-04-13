@@ -190,14 +190,14 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
 	  }
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	    return face;
 	  }
 	}
     }
   
   // We'll never get here.
-  error();
+  libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -252,10 +252,10 @@ void Hex8::connectivity(const unsigned int sc,
       }
 
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
 }
 
 

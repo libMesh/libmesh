@@ -121,7 +121,7 @@ void MeshFunction::init (const Trees::BuildType point_locator_build_type)
 		    << std::endl
 		    << " the master has to be initialized first!"
 		    << std::endl;
-	  error();
+	  libmesh_error();
 	}
       else
         {
@@ -230,7 +230,7 @@ void MeshFunction::operator() (const Point& p,
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
 	{
 	  std::cerr << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
-	  error();
+	  libmesh_error();
 	}
     }
 #endif
@@ -328,7 +328,7 @@ void MeshFunction::gradient (const Point& p,
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
 	{
 	  std::cerr << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
-	  error();
+	  libmesh_error();
 	}
     }
 #endif
@@ -417,7 +417,7 @@ void MeshFunction::hessian (const Point& p,
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
 	{
 	  std::cerr << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
-	  error();
+	  libmesh_error();
 	}
     }
 #endif

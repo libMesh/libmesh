@@ -370,7 +370,7 @@ T & TypeVector<T>::operator () (const unsigned int i)
 // 		<< "that is out of range for the compiled DIM!"      << std::endl
 // 		<< " DIM=" << DIM << " , i=" << i
 // 		<< std::endl;
-      error();
+      libmesh_error();
     }
   
 #endif

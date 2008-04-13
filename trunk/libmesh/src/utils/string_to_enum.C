@@ -328,7 +328,7 @@ namespace Utility {
     init_elem_type_to_enum();
     
     if (!elem_type_to_enum.count(s))
-      error();
+      libmesh_error();
     
     return elem_type_to_enum[s];
   }
@@ -341,7 +341,7 @@ namespace Utility {
     init_enum_to_elem_type();
 
     if (!enum_to_elem_type.count(e))
-      error();
+      libmesh_error();
 
     return enum_to_elem_type[e];
   }
@@ -356,7 +356,7 @@ namespace Utility {
     init_order_to_enum();
     
     if (!order_to_enum.count(s))
-      error();
+      libmesh_error();
     
     return order_to_enum[s];
   }
@@ -369,7 +369,7 @@ namespace Utility {
     init_enum_to_order();
 
     if (!enum_to_order.count(o))
-      error();
+      libmesh_error();
 
     return enum_to_order[o];
   }
@@ -384,7 +384,7 @@ namespace Utility {
     init_fefamily_to_enum();
     
     if (!fefamily_to_enum.count(s))
-      error();
+      libmesh_error();
     
     return fefamily_to_enum[s];
   }
@@ -397,7 +397,7 @@ namespace Utility {
     init_enum_to_fefamily();
 
     if (!enum_to_fefamily.count(f))
-      error();
+      libmesh_error();
 
     return enum_to_fefamily[f];
   }
@@ -412,7 +412,7 @@ namespace Utility {
     init_inf_map_type_to_enum();
     
     if (!inf_map_type_to_enum.count(s))
-      error();
+      libmesh_error();
     
     return inf_map_type_to_enum[s];
   }
@@ -425,7 +425,7 @@ namespace Utility {
     init_enum_to_inf_map_type();
 
     if (!enum_to_inf_map_type.count(i))
-      error();
+      libmesh_error();
 
     return enum_to_inf_map_type[i];
   }
@@ -440,7 +440,7 @@ namespace Utility {
     init_quadrature_type_to_enum();
     
     if (!quadrature_type_to_enum.count(s))
-      error();
+      libmesh_error();
     
     return quadrature_type_to_enum[s];
   }
@@ -453,7 +453,7 @@ namespace Utility {
     init_enum_to_quadrature_type();
 
     if (!enum_to_quadrature_type.count(i))
-      error();
+      libmesh_error();
 
     return enum_to_quadrature_type[i];
   }

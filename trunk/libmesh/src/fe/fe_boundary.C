@@ -41,7 +41,7 @@ void FE<_dim,_type>::_func(const Elem*,        \
 {                                              \
   std::cerr << "ERROR: This method makes no sense for low-D elements!" \
 	    << std::endl;                      \
-  error();                                     \
+  libmesh_error();                                     \
 }
 
 REINIT_ERROR(0, CLOUGH, reinit)
@@ -600,7 +600,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 
 
     default:
-      error();
+      libmesh_error();
       
     }
   STOP_LOG("compute_face_map()", "FE");

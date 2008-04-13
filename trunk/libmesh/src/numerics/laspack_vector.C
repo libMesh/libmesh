@@ -317,7 +317,7 @@ LaspackVector<T>::operator = (const std::vector<T>& v)
       this->set (i, v[i]);
   
   else
-    error();
+    libmesh_error();
 
   return *this;
 }

@@ -360,7 +360,7 @@ void ContinuationSystem::continuation_solve()
 		<< "updates the continuation parameter."
 		<< std::endl;
       
-      error();
+      libmesh_error();
     }
 
   // Use extra precision for all the numbers printed in this function.
@@ -536,7 +536,7 @@ void ContinuationSystem::continuation_solve()
 		      // We shouldn't get here ... it means the linear solver did no work on a Newton
 		      // step other than the first one.  If this happens, we need to think more about our
 		      // tolerance selection.
-		      error();
+		      libmesh_error();
 		    }
 		}
 	      
@@ -590,7 +590,7 @@ void ContinuationSystem::continuation_solve()
 	  if (yrhsnorm == 0.0)
 	    {
 	      std::cout << "||G_Lambda|| = 0" << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 
 	  // We select a tolerance for the y-system which is based on the inexact Newton
@@ -797,7 +797,7 @@ void ContinuationSystem::continuation_solve()
 	      std::cout << "Backtracking failed." << std::endl;
 	  
 	      // 1.) Quit, exit program.
-	      //error();
+	      //libmesh_error();
 
 	      // 2.) Continue with last newton_stepfactor
 	      if (newton_step<3)
@@ -842,7 +842,7 @@ void ContinuationSystem::continuation_solve()
 	  if (*continuation_parameter < min_continuation_parameter)
 	    {
 	      std::cout << "Continuation parameter fell below min-allowable value." << std::endl;
-	      // error();
+	      // libmesh_error();
 	      break; // out of Newton iteration loop, newton_converged = false
 	    }
 	  
@@ -854,7 +854,7 @@ void ContinuationSystem::continuation_solve()
 			<< *continuation_parameter
 			<< " exceeded max-allowable value."
 			<< std::endl;
-	      // error();
+	      // libmesh_error();
 	      break; // out of Newton iteration loop, newton_converged = false
 	    }
 	  
@@ -926,7 +926,7 @@ void ContinuationSystem::continuation_solve()
   if (!arcstep_converged)
     {
       std::cout << "Arcstep failed to converge after max number of reductions! Exiting..." << std::endl;
-      error();
+      libmesh_error();
     }
   
   // Print converged solution control parameter and max value.
@@ -1418,7 +1418,7 @@ void ContinuationSystem::apply_predictor()
   else
     {
       // Unknown predictor
-      error();
+      libmesh_error();
     }
   
 }

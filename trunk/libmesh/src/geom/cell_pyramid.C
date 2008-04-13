@@ -74,7 +74,7 @@ unsigned int Pyramid::key (const unsigned int s) const
     }
 
   // We'll never get here.
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -146,14 +146,14 @@ AutoPtr<DofObject> Pyramid::side (const unsigned int i) const
       }
     default:
       {
-	error();
+	libmesh_error();
 	AutoPtr<DofObject> ap_face(NULL);
 	return ap_face;
       }
     }
 
   // We'll never get here.
-  error();
+  libmesh_error();
   AutoPtr<DofObject> ap_face(NULL);
 
   return ap_face;

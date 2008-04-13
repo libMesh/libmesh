@@ -134,7 +134,7 @@ class Edge : public Elem
    */
   AutoPtr<Elem> build_edge (const unsigned int) const
   //{ assert(i < n_nodes()); AutoPtr<DofObject> ap(new Node(*get_node(i))); return ap; }
-  { error(); AutoPtr<Elem> ap(NULL); return ap; }
+  { libmesh_error(); AutoPtr<Elem> ap(NULL); return ap; }
 
   
  protected:
@@ -147,7 +147,7 @@ class Edge : public Elem
    */
   unsigned int side_children_matrix (const unsigned int, 
 				     const unsigned int) const
-  { error(); return 0; }
+  { libmesh_error(); return 0; }
 
 #endif
   

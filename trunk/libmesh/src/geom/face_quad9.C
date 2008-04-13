@@ -193,7 +193,7 @@ unsigned int Quad9::key (const unsigned int s) const
 
 
   // We will never get here...  Look at the code above.
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -250,7 +250,7 @@ AutoPtr<Elem> Quad9::build_side (const unsigned int i,
 	  }
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	  }
 	}
     }
@@ -313,7 +313,7 @@ void Quad9::connectivity(const unsigned int sf,
 	    return;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -371,17 +371,17 @@ void Quad9::connectivity(const unsigned int sf,
 	    return;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }*/
       }
 
     default:
       {
-	error();
+	libmesh_error();
       }
     }
 
-  error();
+  libmesh_error();
 }
 
 
@@ -401,10 +401,10 @@ unsigned int Quad9::n_second_order_adjacent_vertices (const unsigned int n) cons
 	return 4;
 
       default:
-	error();
+	libmesh_error();
     }
 
-  error();
+  libmesh_error();
   return libMesh::invalid_uint;
 }
 

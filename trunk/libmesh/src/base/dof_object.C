@@ -152,7 +152,7 @@ void DofObject::set_n_systems (const unsigned int ns)
 		<< "Recompile with _n_systems set to a bigger type!"
 		<< std::endl;
       
-      error();
+      libmesh_error();
     }
 					
 #endif
@@ -257,7 +257,7 @@ void DofObject::set_n_vars(const unsigned int s,
 		<< "Recompile with _n_vars set to a bigger type!"
 		<< std::endl;
       
-      error();
+      libmesh_error();
     }
 					
 #endif
@@ -310,7 +310,7 @@ void DofObject::set_n_comp(const unsigned int s,
 		<< "Recompile with _n_comp set to a bigger type!"
 		<< std::endl;
       
-      error();
+      libmesh_error();
     }
   
 #endif

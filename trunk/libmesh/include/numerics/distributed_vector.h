@@ -281,7 +281,7 @@ public:
    */
   void add_vector (const NumericVector<T>&,
 		   const SparseMatrix<T>&)
-  { error(); }
+  { libmesh_error(); }
   
   /**
    * \f$U+=V\f$ where U and V are type 
@@ -497,7 +497,7 @@ void DistributedVector<T>::init (const unsigned int n,
     {
       std::cerr << "ERROR:  MPI is required for n != n_local!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
   
 #endif

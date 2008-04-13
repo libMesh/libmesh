@@ -294,7 +294,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	  default:
 	    std::cerr << "c >= N! : " << c
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 
 
@@ -350,7 +350,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    
 	  default:
 	    std::cerr << "c >= N!" << std::endl;
-	    error();
+	    libmesh_error();
 	    
 	  }
 
@@ -359,12 +359,12 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 
     default:
       std::cerr << "Only implemented for Octrees and QuadTrees!" << std::endl;
-      error();
+      libmesh_error();
 
     }
 
   // How did we get here?
-  error();
+  libmesh_error();
 
   Point min, max;  
   return std::make_pair (min, max);
@@ -519,7 +519,7 @@ const Elem* TreeNode<N>::find_element(const Point& p) const
 
   // Should never get here.  See if-else structure
   // above with return statements that must get executed.
-  error();
+  libmesh_error();
   
   return NULL;
 }

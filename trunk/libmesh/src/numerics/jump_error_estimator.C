@@ -135,7 +135,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 		    << std::endl
 		    << " n_vars=" << n_vars
 		    << std::endl;
-	  error();
+	  libmesh_error();
 	}
     }
   else

@@ -755,7 +755,7 @@ namespace exII {
     if (err < 0)
       {
 	std::cout << msg << std::endl;
-	error();
+	libmesh_error();
       }
   }
 
@@ -1174,10 +1174,10 @@ namespace exII {
     else
       {
 	std::cerr << "ERROR! Unrecognized element type: " << type << std::endl;
-	error();
+	libmesh_error();
       }
 
-    error();
+    libmesh_error();
   
     const Conversion conv(tri3_node_map, tri_edge_map, TRI3,"TRI3"); // dummy
     return conv;  
@@ -1257,10 +1257,10 @@ namespace exII {
 	}
 	
       default:
-	error();
+	libmesh_error();
       }
     
-    error();
+    libmesh_error();
     
     const Conversion conv(tri3_node_map, tri_edge_map, TRI3, "TRI3"); // dummy
     return conv;  
@@ -1288,7 +1288,7 @@ void ExodusII_IO::read (const std::string& fname)
   std::cerr <<  "ERROR, ExodusII API is not defined.\n"
 	    << "Input file " << fname << " cannot be read"
 	    << std::endl;
-  error();
+  libmesh_error();
     
 #else
   
@@ -1409,7 +1409,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
 
   std::cerr <<  "ERROR, ExodusII API is not defined.\n"
 	    << std::endl;
-  error();
+  libmesh_error();
     
   #else
 
@@ -1446,7 +1446,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 
   std::cerr <<  "ERROR, ExodusII API is not defined.\n"
 	    << std::endl;
-  error();
+  libmesh_error();
     
   #else
 

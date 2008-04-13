@@ -82,12 +82,12 @@ ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type (const ElemType type)
 	{
 	  std::cerr << "ERROR: Unsupported element type!: " << type
 		    << std::endl;
-	  error();
+	  libmesh_error();
 	}
     }
 
 
-  error();
+  libmesh_error();
   return INVALID_ELEM;
 }
 
@@ -111,7 +111,7 @@ unsigned int InfFE<Dim,T_radial,T_base>::Base::n_base_mapping_sf (const ElemType
   else
     {
       // whoa, cool infinite element!
-      error();
+      libmesh_error();
       return 0;
     }
 }

@@ -183,14 +183,14 @@ AutoPtr<Elem> Tet10::build_side (const unsigned int i,
 	  }
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	  }
 	}
     }
 
   
   // We'll never get here.
-  error();
+  libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -337,7 +337,7 @@ void Tet10::connectivity(const unsigned int sc,
 
 	  default:
 
-	    error();
+	    libmesh_error();
 	}
       }
 
@@ -442,16 +442,16 @@ void Tet10::connectivity(const unsigned int sc,
 
         default:
 
-        error();
+        libmesh_error();
       }
       */
       }
 
     default:
-      error();
+      libmesh_error();
   }
 
-  error();
+  libmesh_error();
 }
 
 

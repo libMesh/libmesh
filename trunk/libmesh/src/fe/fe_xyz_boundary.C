@@ -43,7 +43,7 @@ void FEXYZ<1>::reinit(const Elem*,
 {
   std::cerr << "ERROR: This method only makes sense for 2D elements!"
 	    << std::endl;
-  error();
+  libmesh_error();
 }
 
 
@@ -344,7 +344,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 
 
     default:
-      error();
+      libmesh_error();
       
     }
   STOP_LOG("compute_face_values()", "FE");

@@ -638,7 +638,7 @@ Real FE<3,HIERARCHIC>::shape(const ElemType,
             << "because edge and face orientation is needed."
             << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -681,12 +681,12 @@ Real FE<3,HIERARCHIC>::shape(const Elem* elem,
       }
 
     default:
-      error();
+      libmesh_error();
     }
   
 #endif
       
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -703,7 +703,7 @@ Real FE<3,HIERARCHIC>::shape_deriv(const ElemType,
   std::cerr << "Hierarchic polynomials require the element type\n"
             << "because edge and face orientation is needed."
             << std::endl;
-  error();
+  libmesh_error();
   
   return 0.;
 }
@@ -753,14 +753,14 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
     }
 
   default:
-    error();
+    libmesh_error();
   }
 
   return (FE<3,HIERARCHIC>::shape(elem, order, i, pp) -
           FE<3,HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
 #endif
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -776,7 +776,7 @@ Real FE<3,HIERARCHIC>::shape_second_deriv(const ElemType,
   std::cerr << "Hierarchic polynomials require the element type\n"
             << "because edge and face orientation is needed."
             << std::endl;
-  error();
+  libmesh_error();
   
   return 0.;
 }
@@ -852,7 +852,7 @@ Real FE<3,HIERARCHIC>::shape_second_deriv(const Elem* elem,
         break;
       }
     default:
-      error();
+      libmesh_error();
   }
   return (FE<3,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pp) -
           FE<3,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm))

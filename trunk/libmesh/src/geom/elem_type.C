@@ -122,7 +122,7 @@ std::string ElementTypes::basic_name (const ElemType t)
     default:
       {
 	std::cout << "Undefined element type!." << std::endl;
-	error();
+	libmesh_error();
       }
     }
   return its_name;
@@ -289,7 +289,7 @@ std::string ElementTypes::name(const ElemType t)
     default:
       {
 	std::cout << "Undefined element type!." << std::endl;
-	error();
+	libmesh_error();
       }
     }
   return its_name;

@@ -1389,7 +1389,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 			// level away.			 
 			else if ((neighbor->level()+1) < my_level)
 			  {
-			    error();
+			    libmesh_error();
 			  }
 			
 			
@@ -1398,7 +1398,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 			// active and we should never get here.			 
 			else
 			  {
-			    error();
+			    libmesh_error();
 			  }
 #endif		
 		      } 

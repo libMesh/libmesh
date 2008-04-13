@@ -48,7 +48,7 @@ Real FE<2,XYZ>::shape(const ElemType,
             << "because the centroid is needed."
             << std::endl;
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -150,7 +150,7 @@ Real FE<2,XYZ>::shape(const Elem* elem,
       return val;
     }
 
-  error();
+  libmesh_error();
   return 0.;
 
 #endif
@@ -169,7 +169,7 @@ Real FE<2,XYZ>::shape_deriv(const ElemType,
             << "because the centroid is needed."
             << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -351,10 +351,10 @@ switch (j)
 	      
 	      
   default:
-    error();
+    libmesh_error();
   }
 
-  error();
+  libmesh_error();
   return 0.;
 
 #endif
@@ -373,7 +373,7 @@ Real FE<2,XYZ>::shape_second_deriv(const ElemType,
             << "because the centroid is needed."
             << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -599,7 +599,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
       }
     }
 
-  error();
+  libmesh_error();
   return 0.;
 
 #endif

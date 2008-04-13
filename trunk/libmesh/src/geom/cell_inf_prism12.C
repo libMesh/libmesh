@@ -124,7 +124,7 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
 	    return ap;
 	  }
 	default:
-	  error();
+	  libmesh_error();
 	}
     }
 
@@ -191,7 +191,7 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
 
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	    AutoPtr<Elem> ap(NULL);  return ap;
 	  }
 	}
@@ -199,7 +199,7 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
 
   
   // We'll never get here.
-  error();
+  libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -284,17 +284,17 @@ void InfPrism12::connectivity(const unsigned int sc,
 	    return;
 
 	  default:
-	    error();
+	    libmesh_error();
       
 	  }
 
       }
 
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
 }
 
 

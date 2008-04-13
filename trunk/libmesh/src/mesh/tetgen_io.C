@@ -63,7 +63,7 @@ void TetGenIO::read (const std::string& name)
     {
       std::cerr << "ERROR: Unrecognized file name: "
 		<< name << std::endl;
-      error();
+      libmesh_error();
     }
 	
 
@@ -78,7 +78,7 @@ void TetGenIO::read (const std::string& name)
 		<< "Error checking files "
 		<< name_node << " and "
 		<< name_ele  << std::endl;
-      error();
+      libmesh_error();
     }
   std::cout<< "found the tetgen files to read " <<std::endl; 
 
@@ -211,7 +211,7 @@ void TetGenIO::element_in (std::istream& ele_stream)
 	{
 	  std::cerr << "Elements with " << n_nodes
 		    << " nodes are not supported in the LibMesh tetgen module\n";
-	  error();
+	  libmesh_error();
 	}
       elem->set_id(i);
       mesh.add_elem (elem);
@@ -258,7 +258,7 @@ void TetGenIO::write (const std::string& fname)
     {
       std::cerr << "ERROR: Unrecognized file name: "
                 << fname << std::endl;
-      error();
+      libmesh_error();
     }
 
   // Open the output file stream

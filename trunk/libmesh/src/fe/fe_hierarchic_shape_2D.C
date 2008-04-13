@@ -37,7 +37,7 @@ Real FE<2,HIERARCHIC>::shape(const ElemType,
 	    << "because edge orientation is needed."
 	    << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -223,7 +223,7 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 
     default:
       std::cerr << "ERROR: Unsupported element type!" << std::endl;
-      error();
+      libmesh_error();
     }
 
   return 0.;
@@ -242,7 +242,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const ElemType,
 	    << "because edge orientation is needed."
 	    << std::endl;
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -297,7 +297,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 		  
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -371,14 +371,14 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 		      FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
       }
       
     default:
       std::cerr << "ERROR: Unsupported element type!" << std::endl;
-      error();
+      libmesh_error();
     }
 
   return 0.;
@@ -397,7 +397,7 @@ Real FE<2,HIERARCHIC>::shape_second_deriv(const ElemType,
 	    << "because edge orientation is needed."
 	    << std::endl;
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -447,7 +447,7 @@ Real FE<2,HIERARCHIC>::shape_second_deriv(const Elem* elem,
 	break;
       }
     default:
-      error();
+      libmesh_error();
   }
   return (FE<2,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pp) -
 	  FE<2,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm)

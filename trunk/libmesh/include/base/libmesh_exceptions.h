@@ -31,7 +31,7 @@
 namespace libMesh {
 
 // A class to represent the internal "this should never happen"
-// errors to be thrown by "error();"
+// errors to be thrown by "libmesh_error();"
 class LogicError : public std::logic_error
 {
 public:

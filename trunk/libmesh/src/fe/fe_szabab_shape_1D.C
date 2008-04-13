@@ -69,17 +69,17 @@ Real FE<1,SZABAB>::shape(const ElemType,
 	  
 	default:
 	  std::cerr << "Invalid shape function index!" << std::endl;
-	  error();	    
+	  libmesh_error();	    
 	}
       
 //     default:
 //       {
 // 	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-// 	error();
+// 	libmesh_error();
 //       }
 //     }
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -139,17 +139,17 @@ Real FE<1,SZABAB>::shape_deriv(const ElemType,
 	  
 	default:
 	  std::cerr << "Invalid shape function index!" << std::endl;
-	  error();
+	  libmesh_error();
 	}
  
 //     default:
 //       {
 // 	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-// 	error();
+// 	libmesh_error();
 //       }
 //     }
 
-  error();
+  libmesh_error();
   return 0.;
 }
 

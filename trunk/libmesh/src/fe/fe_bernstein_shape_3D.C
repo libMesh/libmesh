@@ -41,7 +41,7 @@ Real FE<3,BERNSTEIN>::shape(const ElemType,
 	    << "because edge and face orientation is needed."
 	    << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -90,7 +90,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		case  3:  return zeta3;
 		  
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	    
@@ -120,7 +120,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 	}
       
@@ -157,7 +157,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		case  9:  return 2.*zeta2*zeta3;     
 		  
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 	    
@@ -249,7 +249,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 	
       }
@@ -322,7 +322,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 // 		case 19:  return 6.*zeta2*zeta0*zeta3;
 		  
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 	    
@@ -827,7 +827,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	    
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	    
 	  } //case HEX27
  
@@ -1343,18 +1343,18 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	  }	
       }
       
       
     default:
-      error();
+      libmesh_error();
     }
   
 #endif
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -1371,7 +1371,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const ElemType,
   std::cerr << "Bernstein polynomials require the element type\n"
 	    << "because edge and face orientation is needed."
 	    << std::endl;
-  error();
+  libmesh_error();
   
   return 0.;
 }
@@ -1446,7 +1446,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
 		  }                 
 		default:
-		  error();
+		  libmesh_error();
 		}
 		              
 	    }
@@ -1494,13 +1494,13 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta));
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -1553,7 +1553,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
 		  }                 
 		default:
-		  error();
+		  libmesh_error();
 		}
 		              
 	    }
@@ -1688,7 +1688,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[26], 0, zeta));
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 
@@ -1731,13 +1731,13 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta));
 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }
 
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -1790,7 +1790,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
 // 		  }                 
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
       
           		              
@@ -1838,7 +1838,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
 		  }                 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	      
 	    }
@@ -2358,13 +2358,13 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta_mapped));
 
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 // 	    }
 
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -2413,7 +2413,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
 		  }                 
 		default:
-		  error();
+		  libmesh_error();
 		}
 	    }	      
 
@@ -2932,24 +2932,24 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			  FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta_mapped));
 
 // 		default:
-// 		  error();
+// 		  libmesh_error();
 // 		}
 //	    }
 
 	    
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
 
     default:
-      error();
+      libmesh_error();
     }
 
 #endif
 
-  error();
+  libmesh_error();
   return 0.;
 }
 

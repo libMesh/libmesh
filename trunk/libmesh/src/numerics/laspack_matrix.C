@@ -137,7 +137,7 @@ void LaspackMatrix<T>::init (const unsigned int m,
 
   std::cerr << "ERROR: Only the init() member that uses the" << std::endl
 	    << "DofMap is implemented for Laspack matrices!" << std::endl;
-  error();
+  libmesh_error();
 
   this->_is_initialized = true;
 }

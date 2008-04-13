@@ -199,7 +199,7 @@ protected:
   {  
     std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
 	      << " is not implemented for 2D." << std::endl;
-    error();
+    libmesh_error();
   }
 #endif
 
@@ -219,7 +219,7 @@ protected:
   {  
     std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
 	      << " is not implemented for 3D." << std::endl;
-    error();
+    libmesh_error();
   }
 #endif
   

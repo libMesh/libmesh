@@ -75,7 +75,7 @@ void PerfLog::clear()
 	      << "event " << pos->first.second << " is still being monitored!"
 	      << std::endl;
 
-	    error();
+	    libmesh_error();
 	  }
 
       

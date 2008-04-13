@@ -260,7 +260,7 @@ void EquationSystems::read (const std::string& name,
 	  {
 	    std::cerr << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	  }	  
     }  
 
@@ -455,6 +455,6 @@ void EquationSystems::write(const std::string& name,
     {
       std::cerr << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 }

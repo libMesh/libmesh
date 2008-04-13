@@ -205,7 +205,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 		        << std::endl
 		        << " n_vars=" << system.n_vars()
 		        << std::endl;
-	      error();
+	      libmesh_error();
 	    }
         }
       else

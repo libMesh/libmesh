@@ -143,12 +143,12 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
     default:
       { 
 	std::cerr << "ERROR: Bad qt=" << _qt << std::endl;
-	error();
+	libmesh_error();
       }
     }
 
 
-  error();
+  libmesh_error();
   AutoPtr<QBase> ap(NULL);
   return ap;
 }

@@ -390,7 +390,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
   else
     {
       // I don't know what type of mesh it is.
-      error();
+      libmesh_error();
     }
 
   // read in the nodal coordinates and form points.
@@ -487,7 +487,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
                 {
                   std::cerr << "Parent element with ID " << parent_ID 
                             << " not found." << std::endl; 
-                  error();
+                  libmesh_error();
                 }
 
                 // Set the my_parent pointer
@@ -572,7 +572,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
                 }
               else
                 // We can probably handle this, but we don't expect it
-                error();
+                libmesh_error();
             }
         }
     }
@@ -587,7 +587,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
 	  {
 	    std::cerr << "ERROR: MeshData not implemented for MGF-style mesh."
 		      << std::endl;
-	    error();
+	    libmesh_error();
 	  }
 #endif
       
@@ -776,7 +776,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
     totalWeight = non_subactive_weight+2*numElem;
 
   else
-    error();
+    libmesh_error();
     
   // Set the total weight in the header
   mh.setSumWghts(totalWeight);
@@ -829,7 +829,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
               nn = mesh.elem(e)->n_nodes() + 2;
 
             else
-              error();
+              libmesh_error();
 
             // Loop over the connectivity entries for this element and write to conn.
             START_LOG("set connectivity", "LegacyXdrIO::write_mesh");

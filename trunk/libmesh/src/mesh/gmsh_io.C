@@ -353,11 +353,11 @@ void GmshIO::read_mesh(std::istream& in)
           in >> version >> format >> size;
           if(version != 2.0){
             std::cerr << "Error: Wrong msh file version " << version << "\n";
-            error();
+            libmesh_error();
           }
           if(format){
             std::cerr << "Error: Unknown data format for mesh\n";
-            error();
+            libmesh_error();
           }
         }
       
@@ -464,7 +464,7 @@ void GmshIO::read_mesh(std::istream& in)
                                     << ") does not match Libmesh definition. "
                                     << "I expected " << elem->n_nodes()
                                     << " nodes, but got " << nnodes << "\n";
-                          error();
+                          libmesh_error();
                         }
                     }
 
@@ -711,7 +711,7 @@ void GmshIO::write_post (const std::string& fname,
     {
       std::cerr << "ERROR: opening output file " << fname
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   // create a character buffer
@@ -808,7 +808,7 @@ void GmshIO::write_post (const std::string& fname,
                 {
                   std::cerr << "ERROR: Not existant element type "
                             << (*it)->type() << std::endl;
-                  error();
+                  libmesh_error();
                 }
               }
           }

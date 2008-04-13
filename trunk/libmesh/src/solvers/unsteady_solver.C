@@ -88,7 +88,7 @@ void UnsteadySolver::solve ()
 	  std::cout << "DiffSolver::solve() did not succeed after "
 		    << reduce_deltat_on_diffsolver_failure
 		    << " attempts." << std::endl;
-	  error();
+	  libmesh_error();
 	  
   	} // end if (backtracking_failed || max_iterations)
     } // end if (reduce_deltat_on_diffsolver_failure)

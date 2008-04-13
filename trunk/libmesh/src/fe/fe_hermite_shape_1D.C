@@ -118,7 +118,7 @@ Real FEHermite<1>::hermite_raw_shape_second_deriv
                 (i-4)*(i-5)*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
     }
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -155,7 +155,7 @@ Real FEHermite<1>::hermite_raw_shape_deriv
                 (i-4)*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
     }
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -191,7 +191,7 @@ Real FEHermite<1>::hermite_raw_shape
                 
     }
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -206,7 +206,7 @@ Real FE<1,HERMITE>::shape(const ElemType,
 	    << "to construct gradient-based degrees of freedom."
 	    << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -255,16 +255,16 @@ Real FE<1,HERMITE>::shape(const Elem* elem,
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -281,7 +281,7 @@ Real FE<1,HERMITE>::shape_deriv(const ElemType,
 	    << "to construct gradient-based degrees of freedom."
 	    << std::endl;
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -329,16 +329,16 @@ Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -386,15 +386,15 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
 	    }
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }

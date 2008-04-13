@@ -134,7 +134,7 @@ AutoPtr<Base> Factory<Base>::build (const std::string& name)
 	     it = factory_map().begin(); it != factory_map().end(); ++it)
         std::cerr << "  " << it->first << std::endl;
 
-      error();
+      libmesh_error();
       
       // Do this the stoopid way for IBM xlC
       AutoPtr<Base> ret_val (NULL);

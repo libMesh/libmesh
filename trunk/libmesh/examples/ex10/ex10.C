@@ -173,7 +173,7 @@ int main (int argc, char** argv)
       // This handy function will print the file name, line number,
       // and then abort.  Currrently the library does not use C++
       // exception handling.
-      error();
+      libmesh_error();
     }
 
   // This value is also obtained from the command line, and specifies
@@ -186,7 +186,7 @@ int main (int argc, char** argv)
   else
     {
       std::cout << "ERROR: Number of timesteps not specified\n" << std::endl;
-      error();
+      libmesh_error();
     }
 
 

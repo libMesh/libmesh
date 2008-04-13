@@ -456,7 +456,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * for an abstract Elem, it is an error.
    */
   virtual std::pair<Real,Real> qual_bounds (const ElemQuality) const
-  { error(); return std::make_pair(0.,0.); }
+  { libmesh_error(); return std::make_pair(0.,0.); }
   
   /**
    * @returns true if the point p is contained in this element, 
@@ -836,7 +836,7 @@ public:
    * all zero point would very likely lead to unexpected
    * behavior.
    */
-  virtual Point origin () const { error(); return Point(); }
+  virtual Point origin () const { libmesh_error(); return Point(); }
 
 #endif
 
@@ -1407,7 +1407,7 @@ unsigned int Elem::which_child_am_i (const Elem* e) const
   std::cerr << "ERROR:  which_child_am_i() was called with a non-child!" 
 	    << std::endl;
 
-  error();
+  libmesh_error();
 
   return libMesh::invalid_uint;
 }
@@ -1432,7 +1432,7 @@ void Elem::set_refinement_flag(RefinementState rflag)
 		<< std::endl
 		<< "Recompile with Elem:_*flag set to something bigger!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 #endif
 
@@ -1459,7 +1459,7 @@ void Elem::set_p_refinement_flag(RefinementState pflag)
 		<< std::endl
 		<< "Recompile with Elem:_*flag set to something bigger!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 #endif
 
@@ -1496,7 +1496,7 @@ void Elem::set_p_level(unsigned int p)
 		<< std::endl
 		<< "Recompile with Elem:_p_level set to something bigger!"
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 #endif
 

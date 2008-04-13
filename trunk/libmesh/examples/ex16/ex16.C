@@ -79,7 +79,7 @@ int main (int argc, char** argv)
         std::cerr << "\nUsage: " << argv[0]
                   << " -n <number of eigen values>"
                   << std::endl;
-      error();
+      libmesh_error();
     }
   
   // Tell the user what we are doing.

@@ -1674,7 +1674,7 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int,
 		    std::vector<T> &,
-		    const unsigned int) { error(); }
+		    const unsigned int) { libmesh_error(); }
 
   template <typename T>
   inline void isend (const unsigned int,
@@ -1686,7 +1686,7 @@ namespace Parallel
   template <typename T>
   inline Status recv (const unsigned int,
 		      std::vector<T> &,
-		      const int) { error(); return Status(); }
+		      const int) { libmesh_error(); return Status(); }
 
   template <typename T>
   inline void irecv (const unsigned int,

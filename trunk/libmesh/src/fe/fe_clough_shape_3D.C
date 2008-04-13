@@ -100,7 +100,7 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
     }
   }
 
-  error();
+  libmesh_error();
   return xi + eta + zeta;
 }
 
@@ -126,7 +126,7 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
     }
   }
 
-  error();
+  libmesh_error();
   return xi + eta + zeta;
 }
 
@@ -145,7 +145,7 @@ Real clough_raw_shape(const unsigned int basis_num,
           }
     }
 
-  error();
+  libmesh_error();
   return xi + eta + zeta;
 }
 
@@ -164,7 +164,7 @@ Real FE<3,CLOUGH>::shape(const ElemType,
 	    << "to construct gradient-based degrees of freedom."
 	    << std::endl;
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -181,7 +181,7 @@ Real FE<3,CLOUGH>::shape(const Elem* elem,
   std::cerr << "3D Clough elements not yet implemented."
 	    << std::endl;
   
-  error();
+  libmesh_error();
 
   clough_compute_coefs(elem);
 
@@ -196,16 +196,16 @@ Real FE<3,CLOUGH>::shape(const Elem* elem,
 	  {
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -222,7 +222,7 @@ Real FE<3,CLOUGH>::shape_deriv(const ElemType,
 	    << "to construct gradient-based degrees of freedom."
 	    << std::endl;
 
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -240,7 +240,7 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem* elem,
   std::cerr << "3D Clough elements not yet implemented."
 	    << std::endl;
   
-  error();
+  libmesh_error();
 
   clough_compute_coefs(elem);
 
@@ -255,16 +255,16 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem* elem,
 	  {
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -282,7 +282,7 @@ Real FE<3,CLOUGH>::shape_second_deriv(const Elem* elem,
   std::cerr << "3D Clough elements not yet implemented."
 	    << std::endl;
   
-  error();
+  libmesh_error();
 
   clough_compute_coefs(elem);
 
@@ -297,15 +297,15 @@ Real FE<3,CLOUGH>::shape_second_deriv(const Elem* elem,
 	  {
 	  default:
             std::cerr << "ERROR: Unsupported element type!" << std::endl;
-	    error();
+	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
   return 0.;
 }

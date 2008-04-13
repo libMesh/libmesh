@@ -85,7 +85,7 @@ unsigned int InfHex::key (const unsigned int s) const
     }
 
   // We'll never get here.
-  error();
+  libmesh_error();
  return 0;
 }
 
@@ -186,13 +186,13 @@ AutoPtr<DofObject> InfHex::side (const unsigned int i) const
 
     default:
       {
-	error();
+	libmesh_error();
 	AutoPtr<DofObject> ap(NULL);  return ap;
       }
     }
 
   // We'll never get here.
-  error();
+  libmesh_error();
   AutoPtr<DofObject> ap(NULL);  return ap;
 }
 
@@ -322,7 +322,7 @@ Real InfHex::quality (const ElemQuality q) const
 
     
     // Will never get here...
-    error();
+    libmesh_error();
     return 0.;
 }
 
@@ -331,7 +331,7 @@ Real InfHex::quality (const ElemQuality q) const
 std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
 {
   std::cerr << "ERROR: Not implemented." << std::endl;
-  error();
+  libmesh_error();
 
   std::pair<Real, Real> bounds;
 

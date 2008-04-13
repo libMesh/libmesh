@@ -676,7 +676,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		      {
 			std::cerr << "Parent element with ID " << parent_ID 
 				  << " not found." << std::endl; 
-			error();
+			libmesh_error();
 		      }
 		    
 		    elem = Elem::build(elem_type, parent).release();
@@ -969,7 +969,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 		  {
 		    std::cerr << "Parent element with ID " << parent_ID 
 			      << " not found." << std::endl; 
-		    error();
+		    libmesh_error();
 		  }
 		
                 assert (my_parent->refinement_flag() == Elem::INACTIVE);
@@ -1023,7 +1023,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
               mesh.add_elem(elem);
             else
               // We can probably handle this, but we don't expect it
-              error();
+              libmesh_error();
           }
 
       } // end if iam != cpu 0
@@ -1038,7 +1038,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 #else
 
   // no MPI but multiple processors? Huh??
-  error();
+  libmesh_error();
   
 #endif
 }
@@ -1178,7 +1178,7 @@ void MeshCommunication::broadcast_bcs (const MeshBase&,
 #else
 
   // no MPI but multiple processors? Huh??
-  error();
+  libmesh_error();
 
 #endif  
 }
@@ -1474,7 +1474,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 			  {
 			    std::cerr << "Parent element with ID " << parent_ID 
 				      << " not found." << std::endl; 
-			    error();
+			    libmesh_error();
 			  }
 		
 			elem = Elem::build(elem_type,my_parent).release();

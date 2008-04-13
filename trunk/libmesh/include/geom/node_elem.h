@@ -111,19 +111,19 @@ class NodeElem : public Elem
    * The \p Elem::side() member makes no sense for nodes.
    */
   AutoPtr<DofObject> side (const unsigned int) const
-  { error(); AutoPtr<DofObject> ap(NULL); return ap; }
+  { libmesh_error(); AutoPtr<DofObject> ap(NULL); return ap; }
 
   /**
    * The \p Elem::build_side() member makes no sense for nodes.
    */
   AutoPtr<Elem> build_side (const unsigned int, bool) const
-  { error(); AutoPtr<Elem> ap(NULL); return ap; }
+  { libmesh_error(); AutoPtr<Elem> ap(NULL); return ap; }
 
   /**
    * The \p Elem::build_edge() member makes no sense for nodes.
    */
   AutoPtr<Elem> build_edge (const unsigned int) const
-  { error(); AutoPtr<Elem> ap(NULL); return ap; }
+  { libmesh_error(); AutoPtr<Elem> ap(NULL); return ap; }
 
   /**
    * @returns 1
@@ -144,15 +144,15 @@ class NodeElem : public Elem
   
   virtual bool is_child_on_side(const unsigned int,
 			        const unsigned int) const
-  { error(); return false; }
+  { libmesh_error(); return false; }
   
   virtual bool is_node_on_side(const unsigned int,
 			       const unsigned int) const
-  { error(); return false; }
+  { libmesh_error(); return false; }
   
   virtual bool is_node_on_edge(const unsigned int,
 			       const unsigned int) const 
-  { error(); return false; }
+  { libmesh_error(); return false; }
   
   /*
    * @returns true iff the element map is definitely affine within
@@ -209,7 +209,7 @@ protected:
    */
   unsigned int side_children_matrix (const unsigned int, 
 				     const unsigned int) const
-  { error(); return 0; }
+  { libmesh_error(); return 0; }
 
 #endif
   

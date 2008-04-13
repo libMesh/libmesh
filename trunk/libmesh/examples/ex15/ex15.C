@@ -236,7 +236,7 @@ int main(int argc, char** argv)
   else if (approx_type == "CLOUGH")
     system.add_variable("u", THIRD, CLOUGH);
   else
-    error();
+    libmesh_error();
 
   // Give the system a pointer to the matrix assembly
   // function.

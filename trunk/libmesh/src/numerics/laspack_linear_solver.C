@@ -273,7 +273,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
     {
       std::cerr << "ERROR:  LASPACK Error: " << std::endl;
       WriteLASErrDescr(stdout);
-      error();
+      libmesh_error();
     }
 
   STOP_LOG("solve()", "LaspackLinearSolver");

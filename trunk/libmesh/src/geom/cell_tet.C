@@ -61,7 +61,7 @@ unsigned int Tet::key (const unsigned int s) const
     }
 
   // We'll never get here.
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -115,12 +115,12 @@ AutoPtr<DofObject> Tet::side (const unsigned int i) const
       }
     default:
       {
-	error();
+	libmesh_error();
       }
     }
 
   // We'll never get here.
-  error();
+  libmesh_error();
   AutoPtr<DofObject> ap_face(face);
   return ap_face;
 }

@@ -166,7 +166,7 @@ unsigned int Tri6::key (const unsigned int s) const
 
   
   // We will never get here...  Look at the code above.
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -215,7 +215,7 @@ AutoPtr<Elem> Tri6::build_side (const unsigned int i,
 	  }
 	default:
 	  {
-	    error();
+	    libmesh_error();
 	  }
 	}
     }
@@ -276,7 +276,7 @@ void Tri6::connectivity(const unsigned int sf,
 	    return;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -318,15 +318,15 @@ void Tri6::connectivity(const unsigned int sf,
 	    return;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
     default:
-      error();
+      libmesh_error();
     }
   
-  error();
+  libmesh_error();
 }
 
 

@@ -56,22 +56,22 @@ class RemoteElem : public Elem
   virtual ~RemoteElem() {}
 
   virtual const Point & point (const unsigned int i) const
-  { error(); return Elem::point(i); }
+  { libmesh_error(); return Elem::point(i); }
 
   virtual Point & point (const unsigned int i)
-  { error(); return Elem::point(i); }
+  { libmesh_error(); return Elem::point(i); }
 
   virtual unsigned int node (const unsigned int i) const
-  { error(); return Elem::node(i); }
+  { libmesh_error(); return Elem::node(i); }
 
   virtual Node* get_node (const unsigned int i) const
-  { error(); return Elem::get_node(i); }
+  { libmesh_error(); return Elem::get_node(i); }
 
   virtual Node* & set_node (const unsigned int i)
-  { error(); return Elem::set_node(i); }
+  { libmesh_error(); return Elem::set_node(i); }
   
   virtual unsigned int key (const unsigned int) const
-  { error(); return 0; }
+  { libmesh_error(); return 0; }
 
   virtual bool is_remote () const
   { return true; }
@@ -79,73 +79,73 @@ class RemoteElem : public Elem
   virtual void connectivity(const unsigned int,
 			    const IOPackage,
 			    std::vector<unsigned int>&) const
-  { error(); }
+  { libmesh_error(); }
 
   virtual ElemType type () const
   { return REMOTEELEM; }
   
   virtual unsigned int dim () const
-  { error(); return 0; }
+  { libmesh_error(); return 0; }
   
   virtual unsigned int n_nodes () const
-  { error(); return 0; }
+  { libmesh_error(); return 0; }
 
   virtual unsigned int n_sides () const 
-  { error(); return 0; }
+  { libmesh_error(); return 0; }
 
   virtual unsigned int n_vertices () const
-  { error(); return 0; }
+  { libmesh_error(); return 0; }
 
   virtual unsigned int n_edges () const
-  { error(); return 0; }
+  { libmesh_error(); return 0; }
 
   virtual unsigned int n_faces () const
-  { error(); return 0; }
+  { libmesh_error(); return 0; }
   
   virtual unsigned int n_children () const
-  { error(); return 0; }
+  { libmesh_error(); return 0; }
 
   virtual bool is_vertex(const unsigned int) const
-  { error(); return false; }
+  { libmesh_error(); return false; }
 
   virtual bool is_edge(const unsigned int) const
-  { error(); return false; }
+  { libmesh_error(); return false; }
 
   virtual bool is_face(const unsigned int) const
-  { error(); return false; }
+  { libmesh_error(); return false; }
   
   virtual bool is_node_on_side(const unsigned int,
 			       const unsigned int) const
-  { error(); return false; }
+  { libmesh_error(); return false; }
   
   virtual bool is_child_on_side(const unsigned int,
 			        const unsigned int) const
-  { error(); return false; }
+  { libmesh_error(); return false; }
   
   virtual bool is_node_on_edge(const unsigned int,
 			       const unsigned int) const
-  { error(); return false; }
+  { libmesh_error(); return false; }
 
   virtual unsigned int n_sub_elem () const
-  { error(); return 0; }
+  { libmesh_error(); return 0; }
 
   virtual AutoPtr<DofObject> side (const unsigned int) const
-  { error(); return AutoPtr<DofObject>(NULL); }
+  { libmesh_error(); return AutoPtr<DofObject>(NULL); }
   
   virtual AutoPtr<Elem> build_side (const unsigned int,
 				    bool) const
-  { error(); return AutoPtr<Elem>(NULL); }
+  { libmesh_error(); return AutoPtr<Elem>(NULL); }
 
   virtual AutoPtr<Elem> build_edge (const unsigned int) const
-  { error(); return AutoPtr<Elem>(NULL); }
+  { libmesh_error(); return AutoPtr<Elem>(NULL); }
 
   virtual Order default_order () const
-  { error(); return FIRST; }
+  { libmesh_error(); return FIRST; }
   
 #ifdef ENABLE_INFINITE_ELEMENTS
 
   virtual bool infinite () const
-  { error(); return false; }
+  { libmesh_error(); return false; }
 
 #endif
 
@@ -158,7 +158,7 @@ class RemoteElem : public Elem
   virtual float embedding_matrix (const unsigned int,
 				  const unsigned int,
 				  const unsigned int) const
-  { error(); return 0.; }
+  { libmesh_error(); return 0.; }
 
 #endif
 

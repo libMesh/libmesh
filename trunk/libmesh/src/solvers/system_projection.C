@@ -226,7 +226,7 @@ void System::project_vector (Number fptr(const Point& p,
 #ifndef ENABLE_AMR
 void System::ProjectVector::operator()(const ConstElemRange &) const
 {
-  error();
+  libmesh_error();
 #else
 void System::ProjectVector::operator()(const ConstElemRange &range) const
 {
@@ -880,7 +880,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                     }
                 }
               else
-                error();
+                libmesh_error();
             }
 
           // In 3D, project any edge values next

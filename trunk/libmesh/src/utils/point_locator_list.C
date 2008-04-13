@@ -134,7 +134,7 @@ void PointLocatorList::init ()
 	    {
 	      std::cerr << "ERROR: Initialize master first, then servants!"
 			<< std::endl;
-	      error();
+	      libmesh_error();
 	    }
         }
 
@@ -202,12 +202,12 @@ const Elem* PointLocatorList::operator() (const Point& p) const
 void PointLocatorList::enable_out_of_mesh_mode (void)
 {
   /* This functionality is not yet implemented for PointLocatorList.  */
-  error();
+  libmesh_error();
 }
 
 void PointLocatorList::disable_out_of_mesh_mode (void)
 {
   /* This functionality is not yet implemented for PointLocatorList.  */
-  error();
+  libmesh_error();
 }
 

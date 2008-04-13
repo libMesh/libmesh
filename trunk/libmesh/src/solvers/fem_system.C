@@ -681,7 +681,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
               std::cout.precision(old_precision);
 
-              error();
+              libmesh_error();
             }
         }
 
@@ -778,7 +778,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                             << analytic_jacobian << std::endl;
                   std::cout.precision(old_precision);
 
-                  error();
+                  libmesh_error();
                 }
               // Once we've verified a side, we'll want to add back the
               // rest of the accumulated jacobian

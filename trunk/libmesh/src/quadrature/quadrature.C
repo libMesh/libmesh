@@ -61,7 +61,7 @@ void QBase::init(const ElemType t,
       return;
 
     default:
-      error();
+      libmesh_error();
     }
 }
 

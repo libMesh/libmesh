@@ -73,11 +73,11 @@ void QClough::init_2D(const ElemType _type,
     default:
       {
 	std::cerr << "Element type not supported!:" << _type << std::endl;
-	error();
+	libmesh_error();
       }
     }
 
-  error();
+  libmesh_error();
 
   return;
 

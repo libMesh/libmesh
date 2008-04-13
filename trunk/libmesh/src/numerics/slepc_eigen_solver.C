@@ -456,7 +456,7 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
     default:
       std::cerr << "ERROR:  Unsupported SLEPc position of spectrum: "
 		<< this->_position_of_spectrum        << std::endl;
-      error();
+      libmesh_error();
     }
 }
 

@@ -119,13 +119,13 @@ class Edge4 : public Edge
   /**
    */
   unsigned int n_second_order_adjacent_vertices (const unsigned int) const
-      { error(); return 0;  }
+      { libmesh_error(); return 0;  }
 
   /**
    */
   unsigned short int second_order_adjacent_vertex (const unsigned int,
 						   const unsigned int) const
-      { error(); return 0; }
+      { libmesh_error(); return 0; }
 
 
 #ifdef ENABLE_INFINITE_ELEMENTS

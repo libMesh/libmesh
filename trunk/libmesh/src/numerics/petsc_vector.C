@@ -39,7 +39,7 @@
 
 // void PetscVector<T>::init (const NumericVector<T>& v, const bool fast)
 // {
-//   error();
+//   libmesh_error();
   
 //   init (v.local_size(), v.size(), fast);
 

@@ -62,7 +62,7 @@ Point InfFE<Dim,T_radial,T_map>::map (const Elem* inf_elem,
       break;
 #ifdef DEBUG
     default:
-	error();
+	libmesh_error();
 #endif
     }
       
@@ -115,7 +115,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
       here();
       std::cerr << "ERROR: InfFE::inverse_map is currently implemented only for\n"
 		<< " infinite elments of type InfHex8 and InfPrism6." << std::endl;
-      error();
+      libmesh_error();
     }
 
   
@@ -164,7 +164,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	here();
 	std::cerr << "ERROR: InfFE::inverse_map is not yet implemented"
 		  << " in 2d" << std::endl;
-	error();
+	libmesh_error();
 	break;
       }
 
@@ -351,7 +351,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	  
 	  // Some other dimension?
 	default:
-	  error();
+	  libmesh_error();
 	} // end switch(Dim), dp now computed
 
 
@@ -394,7 +394,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	    {
 	      std::cerr << "ERROR: Newton scheme FAILED to converge in "
 			<< cnt << " iterations!" << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 
 	  // else
@@ -516,7 +516,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	}
 	
       default:
-	error();
+	libmesh_error();
       } // end switch(Dim), p fully computed, including radial part
 
   // if we do not want the interpolated distance, then
@@ -578,7 +578,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	      std::cerr << "ERROR: 1D Newton scheme FAILED to converge"
 			<< std::endl;
 	      
-	      error();
+	      libmesh_error();
 	    }
 	  
 	  
@@ -603,7 +603,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	    break;
 	  }
 	default:
-	  error();
+	  libmesh_error();
 	}
     }
   

@@ -323,7 +323,7 @@ System & EquationSystems::add_system (const std::string& sys_type,
       std::cerr << "ERROR: Unknown system type: "
 		<< sys_type
 		<< std::endl;
-      error();
+      libmesh_error();
     }
 
   // Return a reference to the new system
@@ -345,7 +345,7 @@ void EquationSystems::delete_system (const std::string& name)
       std::cerr << "ERROR: no system named "
                 << name  << std::endl;
 
-      error();
+      libmesh_error();
     }
   
   delete _systems[name];
@@ -387,7 +387,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>&,
 					     const std::string&) const
 {
   //TODO:[BSK] re-implement this from the method below
-  error();
+  libmesh_error();
 
 //   // Get a reference to the named system
 //   const System& system = this->get_system(system_name);

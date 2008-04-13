@@ -95,7 +95,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
 
     default:
       std::cerr << "bad index i = " << i << std::endl;
-      error();
+      libmesh_error();
 
     }
 
@@ -174,7 +174,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
 
     default:
       std::cerr << "bad index i = " << i << std::endl;
-      error();
+      libmesh_error();
 
     }
 

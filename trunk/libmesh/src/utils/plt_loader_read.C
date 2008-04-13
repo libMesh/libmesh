@@ -39,7 +39,7 @@ void PltLoader::read (const std::string& name)
       std::cerr << "Error reading input file " << name
 		<< std::endl;
 
-      error(); // std::abort();
+      libmesh_error();
     }
     
 
@@ -199,7 +199,7 @@ void PltLoader::read_header (std::istream& in)
 	      {
 		std::cerr << "ERROR: Unexpected end-of-file!"
 			  << std::endl;
-		error(); // std::abort();
+		libmesh_error();
 	      }    
 	  
 	    // Found a Zone marker
@@ -405,7 +405,7 @@ void PltLoader::read_header (std::istream& in)
 	      {
 		std::cerr << "ERROR: Unexpected end-of-file!"
 			  << std::endl;
-		error(); // std::abort();
+		libmesh_error();
 	      }    
 	  
 	    // Found a Zone marker
@@ -564,7 +564,7 @@ void PltLoader::read_header (std::istream& in)
 		<< std::endl
 		<< this->version()
 		<< std::endl;
-      error(); // std::abort();
+      libmesh_error();
     }
   
 
@@ -663,7 +663,7 @@ void PltLoader::read_data (std::istream& in)
 	    {
 	      std::cerr << "ERROR: Unexpected end-of-file!"
 			<< std::endl;
-	      error(); // std::abort();
+	      libmesh_error();
 	    }
 
 	  // Get the number of repeated vars.
@@ -682,7 +682,7 @@ void PltLoader::read_data (std::istream& in)
 	      {
 		std::cerr << "ERROR:  I don't understand repeated variables yet!"
 			  << std::endl;
-		error(); // std::abort();
+		libmesh_error();
 	    
 		in.read (buf, SIZEOF_INT);
 		std::memcpy  (&rep_vars[v], buf, SIZEOF_INT);
@@ -748,7 +748,7 @@ void PltLoader::read_data (std::istream& in)
 		std::cerr << "ERROR: Unsupported Zone type: "
 			  << this->zone_type(zone)
 			  << std::endl;
-		error(); // std::abort();
+		libmesh_error();
 	      }
 	    } // end switch on zone type
 	}
@@ -775,7 +775,7 @@ void PltLoader::read_data (std::istream& in)
 	    {
 	      std::cerr << "ERROR: Unexpected end-of-file!"
 			<< std::endl;
-	      error(); // std::abort();
+	      libmesh_error();
 	    }
 
 	  // Get the variable data type
@@ -809,7 +809,7 @@ void PltLoader::read_data (std::istream& in)
 		      {
 			std::cerr << "ERROR:  I don't understand variable sharing!"
 				  << std::endl;
-			error(); // std::abort();
+			libmesh_error();
 		      }
 		  }
 	      }
@@ -838,7 +838,7 @@ void PltLoader::read_data (std::istream& in)
 		this->read_point_data (in, zone);
 
 	      else
-		error(); // std::abort();
+		libmesh_error();
 	    }
 	  else
 	    {
@@ -851,7 +851,7 @@ void PltLoader::read_data (std::istream& in)
 		this->read_fepoint_data (in, zone);
 
 	      else
-		error(); // std::abort();
+		libmesh_error();
 	    }
 	}
 
@@ -865,7 +865,7 @@ void PltLoader::read_data (std::istream& in)
 		    << std::endl
 		    << this->version()
 		    << std::endl;
-	  error(); // std::abort();
+	  libmesh_error();
 	}
       
     } // end loop on zones
@@ -934,7 +934,7 @@ void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
 	    std::cerr << "ERROR: Unsupported data type: "
 		      << this->var_type(var)
 		      << std::endl;
-	    error(); // std::abort();
+	    libmesh_error();
 	  }
 	}
     }
@@ -994,7 +994,7 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
 	      std::cerr << "ERROR: unsupported data type: "
 			<< this->var_type(var)
 			<< std::endl;
-	      error(); // std::abort();
+	      libmesh_error();
 	    }
 }
 
@@ -1052,7 +1052,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
 	    std::cerr << "ERROR: Unsupported data type: "
 		      << this->var_type(var)
 		      << std::endl;
-	    error(); // std::abort();
+	    libmesh_error();
 	  }
 	}
     }
@@ -1068,7 +1068,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
       {
 	std::cerr << "ERROR:  Repeated connectivity not supported!"
 		  << std::endl;
-	error(); // std::abort();
+	libmesh_error();
       }
 
     // Read the connectivity
@@ -1137,7 +1137,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
 	  std::cerr << "ERROR: unsupported data type: "
 		    << this->var_type(var)
 		    << std::endl;
-	  error(); // std::abort();
+	  libmesh_error();
 	}
 
   // Read the connectivity
@@ -1152,7 +1152,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
       {
 	std::cerr << "ERROR:  Repeated connectivity not supported!"
 		  << std::endl;
-	error(); // std::abort();
+	libmesh_error();
       }
 
     // Read the connectivity

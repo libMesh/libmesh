@@ -59,11 +59,11 @@ unsigned int FEInterface::ifem_n_shape_functions(const unsigned int dim,
       return InfFE<3,JACOBI_20_00,CARTESIAN>::n_shape_functions(fe_t, t);
 
     default:
-      error();
+      libmesh_error();
     }
 
   
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -95,11 +95,11 @@ unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
       return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, t);
 
     default:
-      error();
+      libmesh_error();
     }
 
   
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -131,11 +131,11 @@ unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
       return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, t, n);
 
     default:
-      error();
+      libmesh_error();
     }
 
   
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -167,11 +167,11 @@ unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
       return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs_per_elem(fe_t, t);
 
     default:
-      error();
+      libmesh_error();
     }
 
   
-  error();
+  libmesh_error();
   return 0;
 }
 
@@ -195,7 +195,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	  case INFINITE_MAP:
 	    {
 	      std::cerr << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
-	      error();
+	      libmesh_error();
 	      break;
 	    }
 
@@ -210,7 +210,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    }
 		  default:
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    error();
+		    libmesh_error();
 		}
 	      break;
 	    }
@@ -226,7 +226,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    }
 		  default:
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    error();
+		    libmesh_error();
 		}
 	      break;
 	    }
@@ -242,7 +242,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    }
 		  default:
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    error();
+		    libmesh_error();
 		}
 	      break;
 	    }
@@ -258,7 +258,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    }
 		  default:
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    error();
+		    libmesh_error();
 		}
 	      break;
 	    }
@@ -267,7 +267,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	    
 	  default:
 	    std::cerr << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
-	    error();
+	    libmesh_error();
 	    break;
 	  }
 
@@ -285,7 +285,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	  case INFINITE_MAP:
 	    {
 	      std::cerr << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
-	      error();
+	      libmesh_error();
 	      break;
 	    }
 
@@ -300,7 +300,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    }
 		  default:
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
-		    error();
+		    libmesh_error();
 		}
 	      break;
 	    }
@@ -316,7 +316,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    }
 		  default:
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
-		    error();
+		    libmesh_error();
 		}
 	      break;
 	    }
@@ -332,7 +332,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    }
 		  default:
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
-		    error();
+		    libmesh_error();
 		}
 	      break;
 	    }
@@ -348,7 +348,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    }
 		  default:
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
-		    error();
+		    libmesh_error();
 		}
 	      break;
 	    }
@@ -357,7 +357,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	    
 	  default:
 	    std::cerr << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
-	    error();
+	    libmesh_error();
 	    break;
 	  }
 
@@ -375,7 +375,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	  case INFINITE_MAP:
 	    {
 	      std::cerr << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
-	      error();
+	      libmesh_error();
 	      break;
 	    }
 
@@ -390,7 +390,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    }
 		  default:
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
-		    error();
+		    libmesh_error();
 		}
 	      break;
 	    }
@@ -406,7 +406,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    }
 		  default:
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
-		    error();
+		    libmesh_error();
 		}
 	      break;
 	    }
@@ -422,7 +422,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    }
 		  default:
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;		      
-		    error();
+		    libmesh_error();
 		}
 	      break;
 	    }
@@ -438,7 +438,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		    }
 		  default:
 		    std::cerr << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
-		    error();
+		    libmesh_error();
 		}
 	      break;
 	    }
@@ -447,7 +447,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	    
 	  default:
 	    std::cerr << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
-	    error();
+	    libmesh_error();
 	    break;
 	  }
 
@@ -455,7 +455,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
       }
 
     default:
-      error();
+      libmesh_error();
     }
   return;
 }
@@ -488,7 +488,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	    {
 	      std::cerr << "ERROR: Spherical and Ellipsoidal IFEMs not (yet) " << std::endl
 			<< "implemented." << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 
 /*
@@ -500,7 +500,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 */
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -518,7 +518,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	    {
 	      std::cerr << "ERROR: Spherical and Ellipsoidal IFEMs not (yet) " << std::endl
 			<< "implemented." << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 
 /*
@@ -530,7 +530,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 */
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
       }
@@ -549,7 +549,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	    {
 	      std::cerr << "ERROR: Spherical and Ellipsoidal IFEMs not (yet) " << std::endl
 			<< "implemented." << std::endl;
-	      error();
+	      libmesh_error();
 	    }
 
 /*
@@ -561,18 +561,18 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 */
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
       }
 
 
     default:
-      error();
+      libmesh_error();
     }
 
   
-  error();
+  libmesh_error();
   Point pt;
   return pt;
 }
@@ -599,7 +599,7 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
 	    return;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -614,7 +614,7 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
 	   return;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
       }
@@ -630,17 +630,17 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
 	   return;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
       }
 
 
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
   return;
 }
 
@@ -691,7 +691,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	    return InfFE<1,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -717,7 +717,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	    return InfFE<2,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
       }
@@ -744,18 +744,18 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	    return InfFE<3,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
       }
 
 
     default:
-      error();
+      libmesh_error();
     }
 
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -796,7 +796,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	    return InfFE<1,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
       }
 
@@ -822,7 +822,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	    return InfFE<2,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
       }
@@ -849,18 +849,18 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	    return InfFE<3,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
       }
 
 
     default:
-      error();
+      libmesh_error();
     }
 
   
-  error();
+  libmesh_error();
   return 0.;
 }
 
@@ -905,7 +905,7 @@ void FEInterface::ifem_compute_data(const unsigned int dim,
 	    break;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
 	break;
@@ -938,7 +938,7 @@ void FEInterface::ifem_compute_data(const unsigned int dim,
 	    break;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
 	break;
@@ -971,7 +971,7 @@ void FEInterface::ifem_compute_data(const unsigned int dim,
 	    break;
 
 	  default:
-	    error();
+	    libmesh_error();
 	  }
 
 	break;
@@ -979,7 +979,7 @@ void FEInterface::ifem_compute_data(const unsigned int dim,
 
 
     default:
-      error();
+      libmesh_error();
       break;
     }
 

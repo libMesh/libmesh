@@ -106,7 +106,7 @@ Real FE<2,MONOMIAL>::shape(const ElemType,
       return val;
     }
 
-  error();
+  libmesh_error();
   return 0.;
 
 #endif
@@ -290,7 +290,7 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
       }
     }
 
-  error();
+  libmesh_error();
   return 0.;
 
 #endif
@@ -522,7 +522,7 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
       }
     }
 
-  error();
+  libmesh_error();
   return 0.;
 
 #endif

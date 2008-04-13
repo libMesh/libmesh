@@ -126,19 +126,19 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
 	    return ap;
 	  }
 	default:
-	  error();
+	  libmesh_error();
 	}
     }
 
   else
     {
       // FIXME: Find out how to return non-proxy side
-      error();
+      libmesh_error();
     }
 
   
   // We'll never get here.
-  error();
+  libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -241,10 +241,10 @@ void InfHex8::connectivity(const unsigned int sc,
 
       
     default:
-      error();
+      libmesh_error();
     }
 
-  error();
+  libmesh_error();
 }
 
 

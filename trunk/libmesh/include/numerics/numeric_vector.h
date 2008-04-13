@@ -430,7 +430,7 @@ public:
   {
     std::cerr << "ERROR: Not Implemented in base class yet!" << std::endl;
     std::cerr << "ERROR writing MATLAB file " << name << std::endl;
-    error();
+    libmesh_error();
   }
 
   /**
@@ -443,7 +443,7 @@ public:
 				const std::vector<unsigned int>& ) const
   {
     std::cerr << "ERROR: Not Implemented in base class yet!" << std::endl;
-    error();
+    libmesh_error();
   }
     
 protected:
@@ -513,7 +513,7 @@ template <typename T>
 inline
 NumericVector<T> & NumericVector<T>::operator= (const T) 
 {
-  //  error();
+  //  libmesh_error();
 
   return *this;
 }
@@ -524,7 +524,7 @@ template <typename T>
 inline
 NumericVector<T> & NumericVector<T>::operator= (const NumericVector<T>&) 
 {
-  //  error();
+  //  libmesh_error();
 
   return *this;
 }
@@ -535,7 +535,7 @@ template <typename T>
 inline
 NumericVector<T> & NumericVector<T>::operator= (const std::vector<T>&) 
 {
-  //  error();
+  //  libmesh_error();
 
   return *this;
 }

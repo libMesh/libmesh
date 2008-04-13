@@ -57,7 +57,7 @@ void UCDIO::read (const std::string& file_name)
 		<< "files and libraries to read and write "
 		<< "compressed streams."
 		<< std::endl;
-      error();
+      libmesh_error();
       
 #endif
       return;      
@@ -88,7 +88,7 @@ void UCDIO::write (const std::string& file_name)
 		<< "files and libraries to read and write "
 		<< "compressed streams."
 		<< std::endl;
-      error();
+      libmesh_error();
       
 #endif
       return;      
@@ -187,7 +187,7 @@ void UCDIO::read_implementation (std::istream& in)
 	else if (type == "prism")
 	  elem = new Prism6;
 	else
-	  error();
+	  libmesh_error();
 	
 	for (unsigned int n=0; n<elem->n_nodes(); n++)
 	  {
