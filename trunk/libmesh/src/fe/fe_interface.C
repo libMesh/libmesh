@@ -1780,7 +1780,7 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 				       const unsigned int variable_number,
 				       const Elem* elem)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   const FEType& fe_t = dof_map.variable_type(variable_number);
   

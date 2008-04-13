@@ -60,13 +60,13 @@ void MEDITIO::write_ascii (const std::string& fname,
   //  (iii) no distinction between materials.
   //  (iv)  no vector output, just first scalar as output
 
-  // assert three dimensions (should be extended later)
-  assert (MeshOutput<MeshBase>::mesh().mesh_dimension() == 3);
+  // libmesh_assert three dimensions (should be extended later)
+  libmesh_assert (MeshOutput<MeshBase>::mesh().mesh_dimension() == 3);
 
   // Open the output file stream
   std::ofstream out (fname.c_str());
   
-  assert (out.good());
+  libmesh_assert (out.good());
 
   // Get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
@@ -203,7 +203,7 @@ void MEDITIO::write_ascii (const std::string& fname,
       std::string bbname = fname.substr(0,idx) + ".bb";
       
       std::ofstream bbout (bbname.c_str());
-      assert (bbout.good());      
+      libmesh_assert (bbout.good());      
 
       // Header: 3: 3D mesh, 1: scalar output, 2: node-indexed 
       const unsigned int n_vars = solution_names->size();

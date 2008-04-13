@@ -732,7 +732,7 @@ FE<Dim,T>::FE (const FEType& fet) :
   // Sanity check.  Make sure the
   // Family specified in the template instantiation
   // matches the one in the FEType object
-  assert (T == fe_type.family);
+  libmesh_assert (T == fe_type.family);
 }
 
 

@@ -112,7 +112,7 @@ Factory<Base>::Factory (const std::string& name)
 {
   // Make sure we haven't already added this name
   // to the map
-  assert (!factory_map().count(name));
+  libmesh_assert (!factory_map().count(name));
 
   factory_map()[name] = this;
 }

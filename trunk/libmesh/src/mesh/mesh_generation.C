@@ -80,7 +80,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
       // Build a 1D line
     case 1:      
       {
-	assert (nx != 0);
+	libmesh_assert (nx != 0);
 
         // Reserve elements
         switch (type)
@@ -327,8 +327,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
       // Build a 2D quadrilateral
     case 2:
       {
-	assert (nx != 0);
-	assert (ny != 0);
+	libmesh_assert (nx != 0);
+	libmesh_assert (ny != 0);
 
 	// Reserve elements.  The TRI3 and TRI6 meshes
 	// have twice as many elements...
@@ -676,9 +676,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
       // Build a 3D mesh using hexahedral or prismatic elements.
     case 3:
       {
-	assert (nx != 0);
-	assert (ny != 0);
-	assert (nz != 0);
+	libmesh_assert (nx != 0);
+	libmesh_assert (ny != 0);
+	libmesh_assert (nz != 0);
 
 
 	// Reserve elements.  Meshes with prismatic elements require
@@ -1253,7 +1253,7 @@ void MeshTools::Generation::build_line (UnstructuredMesh& mesh,
                                         const bool gauss_lobatto_grid)
 {
     // This method only makes sense in 1D!
-    assert(mesh.mesh_dimension() == 1);
+    libmesh_assert(mesh.mesh_dimension() == 1);
 
     build_cube(mesh,
                nx, 0, 0,
@@ -1275,7 +1275,7 @@ void MeshTools::Generation::build_square (UnstructuredMesh& mesh,
 					  const bool gauss_lobatto_grid)
 {
   // This method only makes sense in 2D!
-  assert (mesh.mesh_dimension() == 2);
+  libmesh_assert (mesh.mesh_dimension() == 2);
 
   // Call the build_cube() member to actually do the work for us.
   build_cube (mesh,
@@ -1312,9 +1312,9 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 					  const unsigned int nr,
 					  const ElemType type)
 {
-  assert (mesh.mesh_dimension() != 1);
-  assert (rad > 0.);
-  //assert (nr > 0); // must refine at least once otherwise will end up with a square/cube
+  libmesh_assert (mesh.mesh_dimension() != 1);
+  libmesh_assert (rad > 0.);
+  //libmesh_assert (nr > 0); // must refine at least once otherwise will end up with a square/cube
   
   START_LOG("build_sphere()", "MeshTools::Generation");
 

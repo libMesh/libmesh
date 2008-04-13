@@ -348,8 +348,8 @@ inline
 T TypeTensor<T>::operator () (const unsigned int i,
 			      const unsigned int j) const
 {
-  assert (i<3);
-  assert (j<3);
+  libmesh_assert (i<3);
+  libmesh_assert (j<3);
 
 #if DIM < 3
   if (i >= DIM || j >= DIM)
@@ -378,8 +378,8 @@ T & TypeTensor<T>::operator () (const unsigned int i,
   
 #endif
   
-  assert (i<DIM);
-  assert (j<DIM);
+  libmesh_assert (i<DIM);
+  libmesh_assert (j<DIM);
   
   return _coords[i*DIM+j];
 }
@@ -629,7 +629,7 @@ typename boostcopy::enable_if_c<
   TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
 TypeTensor<T>::operator / (const Scalar factor) const
 {
-  assert (factor != static_cast<T>(0.));
+  libmesh_assert (factor != static_cast<T>(0.));
 
   typedef typename CompareTypes<T, Scalar>::supertype TS;
   
@@ -694,7 +694,7 @@ template <typename T>
 inline
 const TypeTensor<T> & TypeTensor<T>::operator /= (const T factor)
 {
-  assert (factor != static_cast<T>(0.));
+  libmesh_assert (factor != static_cast<T>(0.));
   
   for (unsigned int i=0; i<DIM*DIM; i++)
     _coords[i] /= factor;

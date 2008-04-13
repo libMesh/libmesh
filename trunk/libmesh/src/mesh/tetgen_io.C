@@ -35,12 +35,12 @@ void TetGenIO::read (const std::string& name)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  assert(libMesh::processor_id() == 0);
+  libmesh_assert(libMesh::processor_id() == 0);
 
   std::string name_node, name_ele, dummy;
 
   // tetgen only works in 3D
-  assert (MeshInput<MeshBase>::mesh().mesh_dimension() == 3);
+  libmesh_assert (MeshInput<MeshBase>::mesh().mesh_dimension() == 3);
 
   // Check name for *.node or *.ele extension.
   // Set std::istream for node_stream and ele_stream.
@@ -119,7 +119,7 @@ void TetGenIO::read_nodes_and_elem (std::istream& node_stream,
 void TetGenIO::node_in (std::istream& node_stream)
 {
   // Check input buffer
-  assert (node_stream.good());
+  libmesh_assert (node_stream.good());
 
   // Get a reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -139,7 +139,7 @@ void TetGenIO::node_in (std::istream& node_stream)
   for (unsigned int i=0; i<_num_nodes; i++)
     {
       // Check input buffer
-      assert (node_stream.good());
+      libmesh_assert (node_stream.good());
       
       node_stream >> node_lab  // node number
 		  >> xyz(0)    // x-coordinate value
@@ -175,7 +175,7 @@ void TetGenIO::node_in (std::istream& node_stream)
 void TetGenIO::element_in (std::istream& ele_stream)
 {
   // Check input buffer
-  assert (ele_stream.good());
+  libmesh_assert (ele_stream.good());
 
   // Get a reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -196,7 +196,7 @@ void TetGenIO::element_in (std::istream& ele_stream)
 
   for (unsigned int i=0; i<_num_elements; i++)
     {
-      assert (ele_stream.good());
+      libmesh_assert (ele_stream.good());
       
       // TetGen only supports Tet4 and Tet10 elements.
       Elem* elem;
@@ -216,8 +216,8 @@ void TetGenIO::element_in (std::istream& ele_stream)
       elem->set_id(i);
       mesh.add_elem (elem);
 
-      assert (elem != NULL);
-      assert (elem->n_nodes() == n_nodes);
+      libmesh_assert (elem != NULL);
+      libmesh_assert (elem->n_nodes() == n_nodes);
 
       // Read the element label
       ele_stream >> element_lab;
@@ -251,8 +251,8 @@ void TetGenIO::element_in (std::istream& ele_stream)
  */
 void TetGenIO::write (const std::string& fname)
 {
-  // assert three dimensions (should be extended later)
-  assert (MeshOutput<MeshBase>::mesh().mesh_dimension() == 3);
+  // libmesh_assert three dimensions (should be extended later)
+  libmesh_assert (MeshOutput<MeshBase>::mesh().mesh_dimension() == 3);
 
   if (!(fname.rfind(".poly") < fname.size())) 
     {
@@ -264,7 +264,7 @@ void TetGenIO::write (const std::string& fname)
   // Open the output file stream
   std::ofstream out (fname.c_str());
   
-  assert (out.good());
+  libmesh_assert (out.good());
 
   // Get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();

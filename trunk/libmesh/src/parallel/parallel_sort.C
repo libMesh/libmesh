@@ -262,7 +262,7 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
   // each bin over all processors.
   std::vector<unsigned int> global_bin_sizes(_n_procs);
   
-  assert (_local_bin_sizes.size() == global_bin_sizes.size());
+  libmesh_assert (_local_bin_sizes.size() == global_bin_sizes.size());
 
   // Sum to find the total number of entries in each bin.
   // This is stored in global_bin_sizes.  Note, we

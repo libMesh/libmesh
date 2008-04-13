@@ -116,7 +116,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
         {
           unsigned int obj_procid = obj->processor_id();
           // We'd better be completely partitioned by now
-          assert(obj_procid != DofObject::invalid_processor_id);
+          libmesh_assert(obj_procid != DofObject::invalid_processor_id);
           ghost_objects_from_proc[obj_procid]++;
         }
     }
@@ -127,7 +127,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
 #ifdef DEBUG
   for (unsigned int p=0; p != libMesh::n_processors(); ++p)
-    assert(ghost_objects_from_proc[p] <= objects_on_proc[p]);
+    libmesh_assert(ghost_objects_from_proc[p] <= objects_on_proc[p]);
 #endif
 
   // Request sets to send to each processor
@@ -148,7 +148,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
     }
 #ifdef DEBUG
   for (unsigned int p=0; p != libMesh::n_processors(); ++p)
-    assert(requested_ids[p].size() == ghost_objects_from_proc[p]);
+    libmesh_assert(requested_ids[p].size() == ghost_objects_from_proc[p]);
 #endif
 
   // Next set ghost object n_comps from other processors
@@ -173,9 +173,9 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
       for (unsigned int i=0; i != request_to_fill.size(); ++i)
         {
           DofObject *requested = (this->*objects)(mesh, request_to_fill[i]);
-          assert(requested);
-          assert(requested->processor_id() == libMesh::processor_id());
-          assert(requested->n_vars(this->sys_number()) == n_variables);
+          libmesh_assert(requested);
+          libmesh_assert(requested->processor_id() == libMesh::processor_id());
+          libmesh_assert(requested->n_vars(this->sys_number()) == n_variables);
           for (unsigned int v=0; v != n_variables; ++v)
             {
               unsigned int n_comp =
@@ -183,7 +183,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
               ghost_data[i*2*n_variables+v] = n_comp;
               unsigned int first_dof = n_comp ?
                 requested->dof_number(this->sys_number(), v, 0) : 0;
-              assert(first_dof != DofObject::invalid_id);
+              libmesh_assert(first_dof != DofObject::invalid_id);
               ghost_data[i*2*n_variables+n_variables+v] = first_dof;
             }
         }
@@ -194,13 +194,13 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
                              procup, filled_request);
 
       // And copy the id changes we've now been informed of
-      assert(filled_request.size() ==
+      libmesh_assert(filled_request.size() ==
              requested_ids[procup].size() * 2 * n_variables);
       for (unsigned int i=0; i != requested_ids[procup].size(); ++i)
         {
           DofObject *requested = (this->*objects)(mesh, requested_ids[procup][i]);
-          assert(requested);
-          assert (requested->processor_id() == procup);
+          libmesh_assert(requested);
+          libmesh_assert (requested->processor_id() == procup);
           for (unsigned int v=0; v != n_variables; ++v)
             {
               unsigned int n_comp = filled_request[i*2*n_variables+v];
@@ -209,7 +209,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
                 {
                   unsigned int first_dof = 
                     filled_request[i*2*n_variables+n_variables+v];
-                  assert(first_dof != DofObject::invalid_id);
+                  libmesh_assert(first_dof != DofObject::invalid_id);
                   requested->set_dof_number
                     (this->sys_number(), v, 0, first_dof);
 
@@ -226,7 +226,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
   for (it = objects_begin; it != objects_end; ++it)
     {
       DofObject *obj = *it;
-      assert (obj);
+      libmesh_assert (obj);
       unsigned int n_variables = obj->n_vars(this->sys_number());
       for (unsigned int v=0; v != n_variables; ++v)
         {
@@ -234,7 +234,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
             obj->n_comp(this->sys_number(), v);
           unsigned int first_dof = n_comp ?
             obj->dof_number(this->sys_number(), v, 0) : 0;
-          assert(first_dof != DofObject::invalid_id);
+          libmesh_assert(first_dof != DofObject::invalid_id);
         }
     }
 #endif
@@ -244,7 +244,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
 void DofMap::reinit(MeshBase& mesh)
 {
-  assert (mesh.is_prepared());
+  libmesh_assert (mesh.is_prepared());
   
   START_LOG("reinit()", "DofMap");
   
@@ -265,7 +265,7 @@ void DofMap::reinit(MeshBase& mesh)
     for ( ; node_it != node_end; ++node_it)
       {
 	(*node_it)->clear_old_dof_object();
-	assert ((*node_it)->old_dof_object == NULL);
+	libmesh_assert ((*node_it)->old_dof_object == NULL);
       }
     
     MeshBase::element_iterator       elem_it  = mesh.elements_begin();
@@ -274,7 +274,7 @@ void DofMap::reinit(MeshBase& mesh)
     for ( ; elem_it != elem_end; ++elem_it)
       {
 	(*elem_it)->clear_old_dof_object();
-	assert ((*elem_it)->old_dof_object == NULL);
+	libmesh_assert ((*elem_it)->old_dof_object == NULL);
       }
   }
 
@@ -303,7 +303,7 @@ void DofMap::reinit(MeshBase& mesh)
 		node->set_old_dof_object();
 	  }
 
-	assert (elem->old_dof_object == NULL);
+	libmesh_assert (elem->old_dof_object == NULL);
 
 	if (elem->has_dofs())
 	  elem->set_old_dof_object();
@@ -449,8 +449,8 @@ void DofMap::reinit(MeshBase& mesh)
 	      // We've already allocated vertex DOFs
 	      if (elem->is_vertex(n))
 	        {
-		  assert(old_node_dofs >= vertex_dofs);
-		  assert(vertex_dofs >= new_node_dofs);
+		  libmesh_assert(old_node_dofs >= vertex_dofs);
+		  libmesh_assert(vertex_dofs >= new_node_dofs);
 		}
 	      // We need to allocate the rest
 	      else
@@ -498,7 +498,7 @@ void DofMap::reinit(MeshBase& mesh)
 		  // (overlapping) edge/face dofs if necessary
 		  else
 		    {
-		      assert(old_node_dofs >= vertex_dofs);
+		      libmesh_assert(old_node_dofs >= vertex_dofs);
                       if (new_node_dofs > old_node_dofs)
                         {
 		          node->set_n_comp(this->sys_number(), var,
@@ -614,14 +614,14 @@ void DofMap::distribute_dofs (MeshBase& mesh)
   // Log how long it takes to distribute the degrees of freedom
   START_LOG("distribute_dofs()", "DofMap");
 
-  assert (mesh.is_prepared());
+  libmesh_assert (mesh.is_prepared());
   
   const unsigned int proc_id = libMesh::processor_id();
   const unsigned int n_proc  = libMesh::n_processors();
   const unsigned int n_vars  = this->n_variables();
   
-  assert (n_vars > 0);
-  assert (proc_id < n_proc);
+  libmesh_assert (n_vars > 0);
+  libmesh_assert (proc_id < n_proc);
   
   // re-init in case the mesh has changed
   this->reinit(mesh);
@@ -667,7 +667,7 @@ void DofMap::distribute_dofs (MeshBase& mesh)
   else
     this->distribute_local_dofs_var_major (next_free_dof, mesh, true);
 
-  assert(next_free_dof == _end_df[proc_id]);
+  libmesh_assert(next_free_dof == _end_df[proc_id]);
 
   //------------------------------------------------------------
   // At this point, all n_comp and dof_number values on local
@@ -763,7 +763,7 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
       for (unsigned var=0; var<n_vars; var++)
         if (elem->n_comp(sys_num,var) > 0)
           {
-            assert (elem->dof_number(sys_num,var,0) ==
+            libmesh_assert (elem->dof_number(sys_num,var,0) ==
                     DofObject::invalid_id);
 
             elem->set_dof_number(sys_num,
@@ -793,7 +793,7 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
   for (; node_it != node_end; ++node_it)
     {
       DofObject *obj = *node_it;
-      assert(obj);
+      libmesh_assert(obj);
       unsigned int n_variables = obj->n_vars(this->sys_number());
       for (unsigned int v=0; v != n_variables; ++v)
         {
@@ -801,7 +801,7 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
             obj->n_comp(this->sys_number(), v);
           unsigned int first_dof = n_comp ?
             obj->dof_number(this->sys_number(), v, 0) : 0;
-          assert(first_dof != DofObject::invalid_id);
+          libmesh_assert(first_dof != DofObject::invalid_id);
         }
     }
 #endif
@@ -873,7 +873,7 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
           // Now number the element DOFS
           if (elem->n_comp(sys_num,var) > 0)
             {
-              assert (elem->dof_number(sys_num,var,0) ==
+              libmesh_assert (elem->dof_number(sys_num,var,0) ==
                       DofObject::invalid_id);
 
               elem->set_dof_number(sys_num,
@@ -904,7 +904,7 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
   for (; node_it != node_end; ++node_it)
     {
       DofObject *obj = *node_it;
-      assert(obj);
+      libmesh_assert(obj);
       unsigned int n_variables = obj->n_vars(this->sys_number());
       for (unsigned int v=0; v != n_variables; ++v)
         {
@@ -912,7 +912,7 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
             obj->n_comp(this->sys_number(), v);
           unsigned int first_dof = n_comp ?
             obj->dof_number(this->sys_number(), v, 0) : 0;
-          assert(first_dof != DofObject::invalid_id);
+          libmesh_assert(first_dof != DofObject::invalid_id);
         }
     }
 #endif
@@ -1049,8 +1049,8 @@ void DofMap::sort_send_list ()
 
 void DofMap::compute_sparsity(const MeshBase& mesh)
 {
-  assert (mesh.is_prepared());
-  assert (this->n_variables());
+  libmesh_assert (mesh.is_prepared());
+  libmesh_assert (this->n_variables());
 
   START_LOG("compute_sparsity()", "DofMap");
 
@@ -1094,7 +1094,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   Threads::parallel_reduce (ConstElemRange (mesh.active_elements_begin(),
 					    mesh.active_elements_end()), sp);
   
-  assert (sp.sparsity_pattern.size() == n_dofs_on_proc);
+  libmesh_assert (sp.sparsity_pattern.size() == n_dofs_on_proc);
 
   // steal the n_nz and n_oz arrays from sp -- it won't need them any more,
   // and this is more efficient than copying them.
@@ -1123,7 +1123,7 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 #ifdef ENABLE_AMR
 
   // Trivial mapping
-  assert (dof_indices.size() == Ue.size());
+  libmesh_assert (dof_indices.size() == Ue.size());
   bool has_constrained_dofs = false;
 
   for (unsigned int il=0; il<dof_indices.size(); il++)
@@ -1132,7 +1132,7 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 
       if (this->is_constrained_dof (ig)) has_constrained_dofs = true;
       
-      assert ((il >= Ug.first_local_index()) &&
+      libmesh_assert ((il >= Ug.first_local_index()) &&
 	      (il <  Ug.last_local_index()));
 
       Ue.el(il) = Ug(ig);
@@ -1150,8 +1150,8 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 
       this->build_constraint_matrix (C, constrained_dof_indices);
 
-      assert (dof_indices.size()             == C.m());
-      assert (constrained_dof_indices.size() == C.n());
+      libmesh_assert (dof_indices.size()             == C.m());
+      libmesh_assert (constrained_dof_indices.size() == C.n());
 
       // zero-out Ue
       Ue.zero();
@@ -1162,7 +1162,7 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 	  {
 	    const unsigned int jg = constrained_dof_indices[j];
 
-	    assert ((jg >= Ug.first_local_index()) &&
+	    libmesh_assert ((jg >= Ug.first_local_index()) &&
 		    (jg <  Ug.last_local_index()));
 	    
 	    Ue.el(i) += C(i,j)*Ug(jg); 	    
@@ -1172,13 +1172,13 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 #else
   
   // Trivial mapping
-  assert (dof_indices.size() == Ue.size());
+  libmesh_assert (dof_indices.size() == Ue.size());
   
   for (unsigned int il=0; il<dof_indices.size(); il++)
     {
       const unsigned int ig = dof_indices[il];
       
-      assert ((ig >= Ug.first_local_index()) && (ig <  Ug.last_local_index()));
+      libmesh_assert ((ig >= Ug.first_local_index()) && (ig <  Ug.last_local_index()));
 
       Ue.el(il) = Ug(ig);
     }
@@ -1194,7 +1194,7 @@ void DofMap::dof_indices (const Elem* const elem,
 {
   START_LOG("dof_indices()", "DofMap");
   
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
@@ -1258,13 +1258,13 @@ void DofMap::dof_indices (const Elem* const elem,
 	        // and we should never need the indices on such a node
 	        if (dof_offset < 0)
 	          {
-		    assert(!elem->active());
+		    libmesh_assert(!elem->active());
 		    di.resize(di.size() + nc, DofObject::invalid_id);
 	          }
                 else
 	          for (int i=node->n_comp(sys_num,v)-1; i>=dof_offset; i--)
 	            {
-		      assert (node->dof_number(sys_num,v,i) !=
+		      libmesh_assert (node->dof_number(sys_num,v,i) !=
 			      DofObject::invalid_id);
 		      di.push_back(node->dof_number(sys_num,v,i));
 	            }
@@ -1275,7 +1275,7 @@ void DofMap::dof_indices (const Elem* const elem,
             else
 	      for (unsigned int i=0; i<nc; i++)
 	        {
-		  assert (node->dof_number(sys_num,v,i) !=
+		  libmesh_assert (node->dof_number(sys_num,v,i) !=
 			  DofObject::invalid_id);
 		  di.push_back(node->dof_number(sys_num,v,i));
 	        }
@@ -1295,7 +1295,7 @@ void DofMap::dof_indices (const Elem* const elem,
 	      {
 		for (unsigned int i=0; i<nc; i++)
 		  {
-		    assert (elem->dof_number(sys_num,v,i) !=
+		    libmesh_assert (elem->dof_number(sys_num,v,i) !=
 			    DofObject::invalid_id);
 		    
 		    di.push_back(elem->dof_number(sys_num,v,i));
@@ -1303,14 +1303,14 @@ void DofMap::dof_indices (const Elem* const elem,
 	      }
 	    else
 	      {
-		assert(!elem->active() || fe_type.family == LAGRANGE);
+		libmesh_assert(!elem->active() || fe_type.family == LAGRANGE);
 		di.resize(di.size() + nc, DofObject::invalid_id);
 	      }
 	  }
       }
 
 #ifdef DEBUG
-  assert (tot_size == di.size());
+  libmesh_assert (tot_size == di.size());
 #endif
   
   STOP_LOG("dof_indices()", "DofMap");  
@@ -1326,8 +1326,8 @@ void DofMap::old_dof_indices (const Elem* const elem,
 {
   START_LOG("old_dof_indices()", "DofMap");
   
-  assert (elem != NULL);
-  assert (elem->old_dof_object != NULL);
+  libmesh_assert (elem != NULL);
+  libmesh_assert (elem->old_dof_object != NULL);
 	    
 
   const unsigned int n_nodes = elem->n_nodes();
@@ -1356,7 +1356,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
         int p_adjustment = 0;
         if (elem->p_refinement_flag() == Elem::JUST_REFINED)
           {
-            assert (elem->p_level() > 0);
+            libmesh_assert (elem->p_level() > 0);
             p_adjustment = -1;
           }
         else if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
@@ -1390,7 +1390,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
 								 fe_type,
 								 type,
 								 n);
-	    assert (node->old_dof_object != NULL);
+	    libmesh_assert (node->old_dof_object != NULL);
 	    
 	    // If this is a non-vertex on a hanging node with extra
 	    // degrees of freedom, we use the non-vertex dofs (which
@@ -1406,7 +1406,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
                 // or a just-coarsened element
 	        if (dof_offset < 0)
 	          {
-		    assert(!elem->active() || elem->refinement_flag() ==
+		    libmesh_assert(!elem->active() || elem->refinement_flag() ==
                            Elem::JUST_COARSENED);
 		    di.resize(di.size() + nc, DofObject::invalid_id);
 	          }
@@ -1414,7 +1414,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
 	          for (int i=node->old_dof_object->n_comp(sys_num,v)-1;
                        i>=dof_offset; i--)
 	            {
-		      assert (node->old_dof_object->dof_number(sys_num,v,i) !=
+		      libmesh_assert (node->old_dof_object->dof_number(sys_num,v,i) !=
 			      DofObject::invalid_id);
 		      di.push_back(node->old_dof_object->dof_number(sys_num,v,i));
 	            }
@@ -1425,7 +1425,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
             else
 	      for (unsigned int i=0; i<nc; i++)
 	        {
-		  assert (node->old_dof_object->dof_number(sys_num,v,i) !=
+		  libmesh_assert (node->old_dof_object->dof_number(sys_num,v,i) !=
 			  DofObject::invalid_id);
 		  di.push_back(node->old_dof_object->dof_number(sys_num,v,i));
 	        }
@@ -1444,11 +1444,11 @@ void DofMap::old_dof_indices (const Elem* const elem,
 	    if (elem->old_dof_object->n_systems() > sys_num &&
 		nc <= elem->old_dof_object->n_comp(sys_num,v))
 	      {
-		assert (elem->old_dof_object != NULL);
+		libmesh_assert (elem->old_dof_object != NULL);
 		
 		for (unsigned int i=0; i<nc; i++)
 		  {
-		    assert (elem->old_dof_object->dof_number(sys_num,v,i) !=
+		    libmesh_assert (elem->old_dof_object->dof_number(sys_num,v,i) !=
 			    DofObject::invalid_id);
 		    
 		    di.push_back(elem->old_dof_object->dof_number(sys_num,v,i));
@@ -1456,7 +1456,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
 	      }
 	    else
 	      {
-		assert(!elem->active() || fe_type.family == LAGRANGE ||
+		libmesh_assert(!elem->active() || fe_type.family == LAGRANGE ||
 		       elem->refinement_flag() == Elem::JUST_COARSENED);
 		di.resize(di.size() + nc, DofObject::invalid_id);
 	      }
@@ -1464,7 +1464,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
       }
   
 #ifdef DEBUG
-  assert (tot_size == di.size());
+  libmesh_assert (tot_size == di.size());
 #endif
   
   STOP_LOG("old_dof_indices()", "DofMap");  
@@ -1551,13 +1551,13 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 	DofConstraints::const_iterator
 	  pos = _dof_constraints.find(elem_dofs[i]);
 	
-	assert (pos != _dof_constraints.end());
+	libmesh_assert (pos != _dof_constraints.end());
 	
 	const DofConstraintRow& constraint_row = pos->second;
 	
 // adaptive p refinement currently gives us lots of empty constraint
 // rows - we should optimize those DoFs away in the future.  [RHS]
-//	assert (!constraint_row.empty());
+//	libmesh_assert (!constraint_row.empty());
 	
 	DofConstraintRow::const_iterator it     = constraint_row.begin();
 	DofConstraintRow::const_iterator it_end = constraint_row.end();
@@ -1659,11 +1659,11 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		  (ig <  end_dof_on_proc))
 		{
 		  // This is what I mean
-		  // assert ((ig - first_dof_on_proc) >= 0);
+		  // libmesh_assert ((ig - first_dof_on_proc) >= 0);
 		  // but do the test like this because ig and
 		  // first_dof_on_proc are unsigned ints
-		  assert (ig >= first_dof_on_proc);
-		  assert ((ig - first_dof_on_proc) < sparsity_pattern.size());
+		  libmesh_assert (ig >= first_dof_on_proc);
+		  libmesh_assert ((ig - first_dof_on_proc) < sparsity_pattern.size());
 		  
 		  SparsityPattern::Row &row = sparsity_pattern[ig - first_dof_on_proc];
 
@@ -1769,8 +1769,8 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
   // explicit DOF coupling.
   else
     {
-      assert (dof_coupling != NULL);
-      assert (dof_coupling->size() ==
+      libmesh_assert (dof_coupling != NULL);
+      libmesh_assert (dof_coupling->size() ==
 	      dof_map.n_variables());
       
       const unsigned int n_var = dof_map.n_variables();
@@ -1834,11 +1834,11 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 			  (ig <  end_dof_on_proc))			
 			{
 			  // This is what I mean
-			  // assert ((ig - first_dof_on_proc) >= 0);
+			  // libmesh_assert ((ig - first_dof_on_proc) >= 0);
 			  // but do the test like this because ig and
 			  // first_dof_on_proc are unsigned ints
-			  assert (ig >= first_dof_on_proc);
-			  assert (ig < (sparsity_pattern.size() +
+			  libmesh_assert (ig >= first_dof_on_proc);
+			  libmesh_assert (ig < (sparsity_pattern.size() +
 					first_dof_on_proc));
 			  
 			  SparsityPattern::Row &row = sparsity_pattern[ig - first_dof_on_proc];
@@ -1932,9 +1932,9 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
   const unsigned int first_dof_on_proc = dof_map.first_dof(proc_id);
   const unsigned int end_dof_on_proc   = dof_map.end_dof(proc_id);
 
-  assert (sparsity_pattern.size() ==  other.sparsity_pattern.size());
-  assert (n_nz.size() == sparsity_pattern.size());
-  assert (n_oz.size() == sparsity_pattern.size());
+  libmesh_assert (sparsity_pattern.size() ==  other.sparsity_pattern.size());
+  libmesh_assert (n_nz.size() == sparsity_pattern.size());
+  libmesh_assert (n_oz.size() == sparsity_pattern.size());
   
   for (unsigned int r=0; r<n_dofs_on_proc; r++)
     {

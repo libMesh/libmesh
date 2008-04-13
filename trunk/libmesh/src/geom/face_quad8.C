@@ -124,7 +124,7 @@ bool Quad8::is_face(const unsigned int) const
 bool Quad8::is_node_on_side(const unsigned int n,
 			    const unsigned int s) const
 {
-  assert(s < n_sides());
+  libmesh_assert(s < n_sides());
   for (unsigned int i = 0; i != 3; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -155,7 +155,7 @@ bool Quad8::has_affine_map() const
  
 unsigned int Quad8::key (const unsigned int s) const
 {
-  assert (s < this->n_sides());
+  libmesh_assert (s < this->n_sides());
   
   switch (s)
     {
@@ -191,7 +191,7 @@ unsigned int Quad8::key (const unsigned int s) const
 AutoPtr<Elem> Quad8::build_side (const unsigned int i,
 				 bool proxy) const
 {
-  assert (i < this->n_sides());
+  libmesh_assert (i < this->n_sides());
 
   if (proxy)
     {
@@ -257,8 +257,8 @@ void Quad8::connectivity(const unsigned int sf,
 			 const IOPackage iop,
 			 std::vector<unsigned int>& conn) const
 {
-  assert (sf < this->n_sub_elem());
-  assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert (sf < this->n_sub_elem());
+  libmesh_assert (iop != INVALID_IO_PACKAGE);
 
   switch (iop)
     {
@@ -405,9 +405,9 @@ void Quad8::connectivity(const unsigned int sf,
 unsigned short int Quad8::second_order_adjacent_vertex (const unsigned int n,
 							const unsigned int v) const
 { 
-  assert (n >= this->n_vertices());
-  assert (n <  this->n_nodes());
-  assert (v < 2);
+  libmesh_assert (n >= this->n_vertices());
+  libmesh_assert (n <  this->n_nodes());
+  libmesh_assert (v < 2);
   // use the matrix from \p face_quad.C
   return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
 }
@@ -417,8 +417,8 @@ unsigned short int Quad8::second_order_adjacent_vertex (const unsigned int n,
 std::pair<unsigned short int, unsigned short int>
 Quad8::second_order_child_vertex (const unsigned int n) const
 {
-  assert (n >= this->n_vertices());
-  assert (n < this->n_nodes());
+  libmesh_assert (n >= this->n_vertices());
+  libmesh_assert (n < this->n_nodes());
   /*
    * the _second_order_vertex_child_* vectors are
    * stored in face_quad.C, since they are identical

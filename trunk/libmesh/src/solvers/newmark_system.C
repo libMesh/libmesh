@@ -155,7 +155,7 @@ void NewmarkSystem::assemble ()
 
 void NewmarkSystem::initial_conditions ()
 {
-  // assert (init_cond_fptr != NULL);
+  // libmesh_assert (init_cond_fptr != NULL);
 
   // Log how long the user's matrix assembly code takes
   START_LOG("initial_conditions ()", "NewmarkSystem");
@@ -265,7 +265,7 @@ void NewmarkSystem::set_newmark_parameters (const Real delta_T,
 					    const Real alpha,
 					    const Real delta)
 {
-  assert(delta_T != 0.);
+  libmesh_assert(delta_T != 0.);
 
     // Get a reference to the EquationSystems
   EquationSystems& es =

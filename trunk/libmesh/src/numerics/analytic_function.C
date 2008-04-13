@@ -34,7 +34,7 @@ AnalyticFunction::AnalyticFunction (Number fptr(const Point& p,
   FunctionBase (),
   _number_fptr (fptr)
 {
-  assert (fptr != NULL);
+  libmesh_assert (fptr != NULL);
   this->_initialized = true;
 }
 
@@ -47,7 +47,7 @@ AnalyticFunction::AnalyticFunction (void fptr(DenseVector<Number>& output,
   FunctionBase (),
   _vector_fptr (fptr)
 {
-  assert (fptr != NULL);
+  libmesh_assert (fptr != NULL);
   this->_initialized = true;
 }
 
@@ -65,7 +65,7 @@ AnalyticFunction::~AnalyticFunction ()
 void AnalyticFunction::init ()
 {
   // dumb double-test
-  assert ((_number_fptr != NULL) || (_vector_fptr != NULL));
+  libmesh_assert ((_number_fptr != NULL) || (_vector_fptr != NULL));
 
   // definitely ready
   this->_initialized = true;

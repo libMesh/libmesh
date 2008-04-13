@@ -782,7 +782,7 @@ void FEBase::compute_shape_functions (const Elem*)
 
 bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real eps)
 {
-  assert (eps >= 0.);
+  libmesh_assert (eps >= 0.);
   
   const Real xi   = p(0);
   const Real eta  = p(1);
@@ -1298,7 +1298,7 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
         for (unsigned int i=0; i != free_dofs; ++i)
           {
             Number &ui = Ue(new_side_dofs[free_dof[i]]);
-            assert(std::abs(ui) < TOLERANCE ||
+            libmesh_assert(std::abs(ui) < TOLERANCE ||
                    std::abs(ui - Uedge(i)) < TOLERANCE);
             ui = Uedge(i);
             dof_is_fixed[new_side_dofs[free_dof[i]]] =
@@ -1439,7 +1439,7 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
         for (unsigned int i=0; i != free_dofs; ++i)
           {
             Number &ui = Ue(new_side_dofs[free_dof[i]]);
-            assert(std::abs(ui) < TOLERANCE ||
+            libmesh_assert(std::abs(ui) < TOLERANCE ||
                    std::abs(ui - Uside(i)) < TOLERANCE);
             ui = Uside(i);
             dof_is_fixed[new_side_dofs[free_dof[i]]] =
@@ -1554,7 +1554,7 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
   for (unsigned int i=0; i != free_dofs; ++i)
     {
       Number &ui = Ue(free_dof[i]);
-      assert(std::abs(ui) < TOLERANCE ||
+      libmesh_assert(std::abs(ui) < TOLERANCE ||
              std::abs(ui - Uint(i)) < TOLERANCE);
       ui = Uint(i);
       dof_is_fixed[free_dof[i]] = true;
@@ -1562,7 +1562,7 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
 
   // Make sure every DoF got reached!
   for (unsigned int i=0; i != new_n_dofs; ++i)
-    assert(dof_is_fixed[i]);
+    libmesh_assert(dof_is_fixed[i]);
 }
 
 
@@ -1572,7 +1572,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 				       const unsigned int variable_number,
 				       const Elem* elem)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   const unsigned int Dim = elem->dim();
 
@@ -1593,7 +1593,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
   // We don't need to constrain discontinuous elements
   if (cont == DISCONTINUOUS)
     return;
-  assert (cont == C_ZERO || cont == C_ONE);
+  libmesh_assert (cont == C_ZERO || cont == C_ONE);
 
   AutoPtr<FEBase> neigh_fe (FEBase::build(Dim, base_fe_type));
 
@@ -1645,12 +1645,12 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
         if (neigh->level() < elem->level()) 
           {
 	    unsigned int s_neigh = neigh->which_neighbor_am_i(elem);
-            assert (s_neigh < neigh->n_neighbors());
+            libmesh_assert (s_neigh < neigh->n_neighbors());
 
             // Find the minimum p level; we build the h constraint
             // matrix with this and then constrain away all higher p
             // DoFs.
-            assert(neigh->active());
+            libmesh_assert(neigh->active());
             const unsigned int min_p_level =
               std::min(elem->p_level(), neigh->p_level());
 
@@ -1702,7 +1702,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
               (const_cast<Elem *>(neigh))->hack_p_level(old_neigh_level);
 
 	    const unsigned int n_side_dofs = my_side_dofs.size();
-	    assert(n_side_dofs == neigh_side_dofs.size());
+	    libmesh_assert(n_side_dofs == neigh_side_dofs.size());
 
 	    Ke.resize (n_side_dofs, n_side_dofs);
 	    Ue.resize(n_side_dofs);
@@ -1753,18 +1753,18 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 	      {
 	        const unsigned int i = neigh_side_dofs[is];
 	        const unsigned int their_dof_g = neigh_dof_indices[i];
-                assert(their_dof_g != DofObject::invalid_id);
+                libmesh_assert(their_dof_g != DofObject::invalid_id);
 	        for (unsigned int js = 0; js != n_side_dofs; ++js)
 	          {
 	            const unsigned int j = my_side_dofs[js];
 	            const unsigned int my_dof_g = my_dof_indices[j];
-                    assert(my_dof_g != DofObject::invalid_id);
+                    libmesh_assert(my_dof_g != DofObject::invalid_id);
 		    const Real their_dof_value = Ue[is](js);
 		    if (their_dof_g == my_dof_g)
 		      {
-		        assert(std::abs(their_dof_value-1.) < 1.e-5);
+		        libmesh_assert(std::abs(their_dof_value-1.) < 1.e-5);
 		        for (unsigned int k = 0; k != n_side_dofs; ++k)
-		          assert(k == is || std::abs(Ue[k](js)) < 1.e-5);
+		          libmesh_assert(k == is || std::abs(Ue[k](js)) < 1.e-5);
 		        continue;
 		      }
 		    if (std::abs(their_dof_value) < 1.e-5)
@@ -1795,7 +1795,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
           {
             // Adaptive p refinement of non-hierarchic bases will
             // require more coding
-            assert(my_fe->is_hierarchic());
+            libmesh_assert(my_fe->is_hierarchic());
             dof_map.constrain_p_dofs(variable_number, elem,
                                      s, min_p_level);
           }
@@ -1819,7 +1819,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
   if (boundaries.empty())
     return;
 
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   // Only constrain active elements with this method
   if (!elem->active())
@@ -1836,7 +1836,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
   // We don't need to constrain discontinuous elements
   if (cont == DISCONTINUOUS)
     return;
-  assert (cont == C_ZERO || cont == C_ONE);
+  libmesh_assert (cont == C_ZERO || cont == C_ONE);
 
   AutoPtr<FEBase> neigh_fe (FEBase::build(Dim, base_fe_type));
 
@@ -1894,13 +1894,13 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
             {
 	      unsigned int s_neigh = 
                 mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
-              assert(s_neigh != libMesh::invalid_uint);
+              libmesh_assert(s_neigh != libMesh::invalid_uint);
 
 #ifdef ENABLE_AMR
               // Find the minimum p level; we build the h constraint
               // matrix with this and then constrain away all higher p
               // DoFs.
-              assert(neigh->active());
+              libmesh_assert(neigh->active());
               const unsigned int min_p_level =
                 std::min(elem->p_level(), neigh->p_level());
 
@@ -1952,7 +1952,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 #endif // #ifdef ENABLE_AMR
 
 	      const unsigned int n_side_dofs = my_side_dofs.size();
-	      assert(n_side_dofs == neigh_side_dofs.size());
+	      libmesh_assert(n_side_dofs == neigh_side_dofs.size());
 
 	      Ke.resize (n_side_dofs, n_side_dofs);
 	      Ue.resize(n_side_dofs);
@@ -2009,7 +2009,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 	        {
 	          const unsigned int i = neigh_side_dofs[is];
 	          const unsigned int their_dof_g = neigh_dof_indices[i];
-                  assert(their_dof_g != DofObject::invalid_id);
+                  libmesh_assert(their_dof_g != DofObject::invalid_id);
 
                   if (!dof_map.is_constrained_dof(their_dof_g))
                     continue;
@@ -2021,7 +2021,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 	            {
 	              const unsigned int j = my_side_dofs[js];
 	              const unsigned int my_dof_g = my_dof_indices[j];
-                      assert(my_dof_g != DofObject::invalid_id);
+                      libmesh_assert(my_dof_g != DofObject::invalid_id);
 
                       if (their_constraint_row.count(my_dof_g))
                         recursive_constraint[js] = true;
@@ -2031,7 +2031,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 	        {
 	          const unsigned int i = neigh_side_dofs[is];
 	          const unsigned int their_dof_g = neigh_dof_indices[i];
-                  assert(their_dof_g != DofObject::invalid_id);
+                  libmesh_assert(their_dof_g != DofObject::invalid_id);
 
 	          for (unsigned int js = 0; js != n_side_dofs; ++js)
 	            {
@@ -2040,7 +2040,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 
 	              const unsigned int j = my_side_dofs[js];
 	              const unsigned int my_dof_g = my_dof_indices[j];
-                      assert(my_dof_g != DofObject::invalid_id);
+                      libmesh_assert(my_dof_g != DofObject::invalid_id);
 
                       if (dof_map.is_constrained_dof(my_dof_g))
                         continue;
@@ -2048,9 +2048,9 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 		      const Real their_dof_value = Ue[is](js);
 		      if (their_dof_g == my_dof_g)
 		        {
-		          assert(std::abs(their_dof_value-1.) < 1.e-5);
+		          libmesh_assert(std::abs(their_dof_value-1.) < 1.e-5);
 		          for (unsigned int k = 0; k != n_side_dofs; ++k)
-		            assert(k == is || std::abs(Ue[k](js)) < 1.e-5);
+		            libmesh_assert(k == is || std::abs(Ue[k](js)) < 1.e-5);
 		          continue;
 		        }
 		      if (std::abs(their_dof_value) < 1.e-5)
@@ -2082,7 +2082,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
             {
               // Adaptive p refinement of non-hierarchic bases will
               // require more coding
-              assert(my_fe->is_hierarchic());
+              libmesh_assert(my_fe->is_hierarchic());
               dof_map.constrain_p_dofs(variable_number, elem,
                                        s, min_p_level);
             }

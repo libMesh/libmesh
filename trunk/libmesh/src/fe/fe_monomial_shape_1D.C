@@ -35,7 +35,7 @@ Real FE<1,MONOMIAL>::shape(const ElemType,
 {
   const Real xi = p(0);
 
-  assert (i <= static_cast<unsigned int>(order));
+  libmesh_assert (i <= static_cast<unsigned int>(order));
 	
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
@@ -74,7 +74,7 @@ Real FE<1,MONOMIAL>::shape(const Elem* elem,
 			   const unsigned int i,
 			   const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   return FE<1,MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
 }
@@ -90,11 +90,11 @@ Real FE<1,MONOMIAL>::shape_deriv(const ElemType,
 {
   // only d()/dxi in 1D!
   
-  assert (j == 0);
+  libmesh_assert (j == 0);
 	
   const Real xi = p(0);
 
-  assert (i <= static_cast<unsigned int>(order));
+  libmesh_assert (i <= static_cast<unsigned int>(order));
 	
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
@@ -134,7 +134,7 @@ Real FE<1,MONOMIAL>::shape_deriv(const Elem* elem,
 				 const unsigned int j,
 				 const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   return FE<1,MONOMIAL>::shape_deriv(elem->type(),
 				     static_cast<Order>(order + elem->p_level()), i, j, p);
@@ -151,11 +151,11 @@ Real FE<1,MONOMIAL>::shape_second_deriv(const ElemType,
 {
   // only d()/dxi in 1D!
   
-  assert (j == 0);
+  libmesh_assert (j == 0);
 	
   const Real xi = p(0);
 
-  assert (i <= static_cast<unsigned int>(order));
+  libmesh_assert (i <= static_cast<unsigned int>(order));
 
   switch (i)
     {
@@ -192,7 +192,7 @@ Real FE<1,MONOMIAL>::shape_second_deriv(const Elem* elem,
 				        const unsigned int j,
 				        const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   return FE<1,MONOMIAL>::shape_second_deriv(elem->type(),
 				            static_cast<Order>(order + elem->p_level()), i, j, p);

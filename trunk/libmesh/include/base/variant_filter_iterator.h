@@ -25,7 +25,6 @@
 #include <iterator>
 #include <algorithm> // for std::swap
 #include <cstdlib>   // for std::abort()
-#include <assert.h>
 
 #if defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER)
 #include <typeinfo>
@@ -285,7 +284,7 @@ public:
      */
     virtual bool operator() (const IterBase* in) const
     {
-      assert (in != NULL);
+      libmesh_assert (in != NULL);
       
       // Attempt downcast
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))

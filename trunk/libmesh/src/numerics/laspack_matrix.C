@@ -39,7 +39,7 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
   this->clear ();    
 
   // big trouble if this fails!
-  assert (this->_dof_map != NULL);
+  libmesh_assert (this->_dof_map != NULL);
   
   const unsigned int n_rows = sparsity_pattern.size();
 
@@ -68,7 +68,7 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
 	for (SparsityPattern::Row::const_iterator col = sparsity_pattern[row].begin();
 	     col != sparsity_pattern[row].end(); ++col)
 	  {
-	    assert (pos != _csr.end());
+	    libmesh_assert (pos != _csr.end());
 	    *pos = *col;
 	    ++pos;
 	  }
@@ -79,12 +79,12 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
 
 
   // Initialize the matrix
-  assert (!this->initialized());
+  libmesh_assert (!this->initialized());
   this->init ();
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   //std::cout << "n_rows=" << n_rows << std::endl;
   //std::cout << "m()=" << m() << std::endl;
-  assert (n_rows == this->m());
+  libmesh_assert (n_rows == this->m());
 
   // Tell the matrix about its structure.  Initialize it
   // to zero.
@@ -109,7 +109,7 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
 	  // 	    << ")" << std::endl;
 	  //std::cout << "pos(i,j)=" << pos(i,j)
 	  //          << std::endl;	  
-	  assert (this->pos(i,j) == l);
+	  libmesh_assert (this->pos(i,j) == l);
 	  Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
 	}
     }
@@ -129,10 +129,10 @@ void LaspackMatrix<T>::init (const unsigned int m,
 			     const unsigned int)
 {
   // noz ignored...  only used for multiple processors!
-  assert (m == m_l);
-  assert (n == n_l);
-  assert (m == n);
-  assert (nnz > 0);
+  libmesh_assert (m == m_l);
+  libmesh_assert (n == n_l);
+  libmesh_assert (m == n);
+  libmesh_assert (nnz > 0);
 
 
   std::cerr << "ERROR: Only the init() member that uses the" << std::endl
@@ -152,7 +152,7 @@ void LaspackMatrix<T>::init ()
     return;
   
   // We need the DofMap for this!
-  assert (this->_dof_map != NULL);
+  libmesh_assert (this->_dof_map != NULL);
 
   // Clear intialized matrices
   if (this->initialized())
@@ -164,16 +164,16 @@ void LaspackMatrix<T>::init ()
   const unsigned int m_l = n_l;
 
   // Laspack Matrices only work for uniprocessor cases
-  assert (m   == n);
-  assert (m_l == m);
-  assert (n_l == n);
+  libmesh_assert (m   == n);
+  libmesh_assert (m_l == m);
+  libmesh_assert (n_l == n);
 
   const std::vector<unsigned int>& n_nz = this->_dof_map->get_n_nz();
   const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
 
   // Make sure the sparsity pattern isn't empty
-  assert (n_nz.size() == n_l);
-  assert (n_oz.size() == n_l);
+  libmesh_assert (n_nz.size() == n_l);
+  libmesh_assert (n_oz.size() == n_l);
   
   if (m==0)
     return;
@@ -182,7 +182,7 @@ void LaspackMatrix<T>::init ()
 
   this->_is_initialized = true;
   
-  assert (m == this->m());
+  libmesh_assert (m == this->m());
 }
 
 

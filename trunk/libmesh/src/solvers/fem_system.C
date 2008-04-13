@@ -36,12 +36,12 @@ FEMSystem::~FEMSystem ()
 Number FEMSystem::interior_value(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  assert (elem_subsolutions.size() > var);
-  assert (elem_subsolutions[var] != NULL);
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get shape function values at quadrature point
@@ -62,12 +62,12 @@ Number FEMSystem::interior_value(unsigned int var, unsigned int qp)
 Gradient FEMSystem::interior_gradient(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  assert (elem_subsolutions.size() > var);
-  assert (elem_subsolutions[var] != NULL);
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get shape function values at quadrature point
@@ -89,12 +89,12 @@ Gradient FEMSystem::interior_gradient(unsigned int var, unsigned int qp)
 Tensor FEMSystem::interior_hessian(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  assert (elem_subsolutions.size() > var);
-  assert (elem_subsolutions[var] != NULL);
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get shape function values at quadrature point
@@ -116,12 +116,12 @@ Tensor FEMSystem::interior_hessian(unsigned int var, unsigned int qp)
 Number FEMSystem::side_value(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  assert (elem_subsolutions.size() > var);
-  assert (elem_subsolutions[var] != NULL);
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get shape function values at quadrature point
@@ -142,12 +142,12 @@ Number FEMSystem::side_value(unsigned int var, unsigned int qp)
 Gradient FEMSystem::side_gradient(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  assert (elem_subsolutions.size() > var);
-  assert (elem_subsolutions[var] != NULL);
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get shape function values at quadrature point
@@ -169,12 +169,12 @@ Gradient FEMSystem::side_gradient(unsigned int var, unsigned int qp)
 Tensor FEMSystem::side_hessian(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  assert (elem_subsolutions.size() > var);
-  assert (elem_subsolutions[var] != NULL);
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get shape function values at quadrature point
@@ -196,13 +196,13 @@ Tensor FEMSystem::side_hessian(unsigned int var, unsigned int qp)
 Number FEMSystem::point_value(unsigned int var, Point &p)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   
   // Get current local coefficients
-  assert (elem_subsolutions.size() > var);
-  assert (elem_subsolutions[var] != NULL);
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   Number u = 0.;
@@ -223,12 +223,12 @@ Number FEMSystem::point_value(unsigned int var, Point &p)
 Number FEMSystem::fixed_interior_value(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  assert (elem_fixed_subsolutions.size() > var);
-  assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert (elem_fixed_subsolutions.size() > var);
+  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get shape function values at quadrature point
@@ -249,12 +249,12 @@ Number FEMSystem::fixed_interior_value(unsigned int var, unsigned int qp)
 Gradient FEMSystem::fixed_interior_gradient(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  assert (elem_fixed_subsolutions.size() > var);
-  assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert (elem_fixed_subsolutions.size() > var);
+  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get shape function values at quadrature point
@@ -276,12 +276,12 @@ Gradient FEMSystem::fixed_interior_gradient(unsigned int var, unsigned int qp)
 Tensor FEMSystem::fixed_interior_hessian(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  assert (elem_fixed_subsolutions.size() > var);
-  assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert (elem_fixed_subsolutions.size() > var);
+  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get shape function values at quadrature point
@@ -303,12 +303,12 @@ Tensor FEMSystem::fixed_interior_hessian(unsigned int var, unsigned int qp)
 Number FEMSystem::fixed_side_value(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  assert (elem_fixed_subsolutions.size() > var);
-  assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert (elem_fixed_subsolutions.size() > var);
+  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get shape function values at quadrature point
@@ -329,12 +329,12 @@ Number FEMSystem::fixed_side_value(unsigned int var, unsigned int qp)
 Gradient FEMSystem::fixed_side_gradient(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  assert (elem_fixed_subsolutions.size() > var);
-  assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert (elem_fixed_subsolutions.size() > var);
+  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get shape function values at quadrature point
@@ -356,12 +356,12 @@ Gradient FEMSystem::fixed_side_gradient(unsigned int var, unsigned int qp)
 Tensor FEMSystem::fixed_side_hessian(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  assert (elem_fixed_subsolutions.size() > var);
-  assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert (elem_fixed_subsolutions.size() > var);
+  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get shape function values at quadrature point
@@ -383,13 +383,13 @@ Tensor FEMSystem::fixed_side_hessian(unsigned int var, unsigned int qp)
 Number FEMSystem::fixed_point_value(unsigned int var, Point &p)
 {
   // Get local-to-global dof index lookup
-  assert (dof_indices.size() > var);
+  libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   
   // Get current local coefficients
-  assert (elem_fixed_subsolutions.size() > var);
-  assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert (elem_fixed_subsolutions.size() > var);
+  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   Number u = 0.;
@@ -456,7 +456,7 @@ void FEMSystem::init_data ()
 
   unsigned int n_vars = this->n_vars();
 
-  assert (n_vars);
+  libmesh_assert (n_vars);
   FEType hardest_fe_type = this->variable_type(0);
 
   for (unsigned int i=0; i != n_vars; ++i)
@@ -465,7 +465,7 @@ void FEMSystem::init_data ()
 
       // FIXME - we don't yet handle mixed finite elements from
       // different families which require different quadrature rules
-      // assert (fe_type.family == hardest_fe_type.family);
+      // libmesh_assert (fe_type.family == hardest_fe_type.family);
 
       if (fe_type.order > hardest_fe_type.order)
         hardest_fe_type = fe_type;
@@ -499,7 +499,7 @@ void FEMSystem::init_data ()
 
 void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 {
-  assert(get_residual || get_jacobian);
+  libmesh_assert(get_residual || get_jacobian);
   std::string log_name;
   if (get_residual && get_jacobian)
     log_name = "assembly()";
@@ -557,7 +557,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
   // In time-dependent problems, the nonlinear function we're trying
   // to solve at each timestep may depend on the particular solver
   // we're using
-  assert (time_solver.get() != NULL);
+  libmesh_assert (time_solver.get() != NULL);
 
   // Build the residual and jacobian contributions on every active
   // mesh element on this processor
@@ -619,7 +619,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
              dof_indices_var[i].size());
           sub_dofs += dof_indices_var[i].size();
         }
-      assert(sub_dofs == n_dofs);
+      libmesh_assert(sub_dofs == n_dofs);
 
       // Initialize all the interior FE objects on elem.
       // Logging of FE::reinit is done in the FE functions
@@ -636,7 +636,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
       if (get_jacobian && !jacobian_computed)
         {
           // Make sure we didn't compute a jacobian and lie about it
-          assert(elem_jacobian.l1_norm() == 0.0);
+          libmesh_assert(elem_jacobian.l1_norm() == 0.0);
           // Logging of numerical jacobians is done separately
           this->numerical_elem_jacobian();
         }
@@ -723,7 +723,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 	      // so we can make sure side_residual didn't compute a
               // jacobian and lie about it
 #ifdef DEBUG
-              assert(elem_jacobian.l1_norm() == 0.0);
+              libmesh_assert(elem_jacobian.l1_norm() == 0.0);
 #endif
               // Logging of numerical jacobians is done separately
               this->numerical_side_jacobian();
@@ -909,7 +909,7 @@ void FEMSystem::postprocess ()
 
           sub_dofs += dof_indices_var[i].size();
         }
-      assert(sub_dofs == n_dofs);
+      libmesh_assert(sub_dofs == n_dofs);
 
       // Optionally initialize all the interior FE objects on elem.
       // Logging of FE::reinit is done in the FE functions
@@ -1068,7 +1068,7 @@ bool FEMSystem::mass_residual (bool request_jacobian)
               Fu(i) += JxWxU * phi[i][qp];
               if (request_jacobian && elem_solution_derivative)
                 {
-                  assert (elem_solution_derivative == 1.0);
+                  libmesh_assert (elem_solution_derivative == 1.0);
 
                   Number JxWxPhiI = JxW[qp] * phi[i][qp];
                   Kuu(i,i) += JxWxPhiI * phi[i][qp];

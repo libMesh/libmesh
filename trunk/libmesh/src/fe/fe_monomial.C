@@ -48,7 +48,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
       // Constant shape functions
     case CONSTANT:
       {
-	assert (elem_soln.size() == 1);
+	libmesh_assert (elem_soln.size() == 1);
 	
 	const Number val = elem_soln[0];
 	
@@ -72,7 +72,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	    const Point mapped_point = FE<Dim,T>::inverse_map(elem,
 							      elem->point(n));
 
-	    assert (elem_soln.size() == n_sf);
+	    libmesh_assert (elem_soln.size() == n_sf);
 
 	    // Zero before summation
 	    nodal_soln[n] = 0;

@@ -100,24 +100,24 @@ class ParallelMesh : public UnstructuredMesh
   /**
    * Verify id and processor_id consistency of a parallel
    * objects container.
-   * Calls assert() on each possible failure in that container.
+   * Calls libmesh_assert() on each possible failure in that container.
    */
   template <typename T>
-  void assert_valid_parallel_object_ids(const mapvector<T*>&) const;
+  void libmesh_assert_valid_parallel_object_ids(const mapvector<T*>&) const;
 
   /**
    * Verify id and processor_id consistency of our elements and
    * nodes containers.
-   * Calls assert() on each possible failure.
+   * Calls libmesh_assert() on each possible failure.
    */
-  void assert_valid_parallel_ids() const;
+  void libmesh_assert_valid_parallel_ids() const;
 
   /**
    * Verify refinement_flag and p_refinement_flag consistency of our
    * elements containers.
-   * Calls assert() on each possible failure.
+   * Calls libmesh_assert() on each possible failure.
    */
-  void assert_valid_parallel_flags() const;
+  void libmesh_assert_valid_parallel_flags() const;
 
   /**
    * Renumber a parallel objects container

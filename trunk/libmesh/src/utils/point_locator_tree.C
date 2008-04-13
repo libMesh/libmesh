@@ -87,7 +87,7 @@ void PointLocatorTree::clear ()
 
 void PointLocatorTree::init (const Trees::BuildType build_type)
 {
-  assert (this->_tree == NULL); 
+  libmesh_assert (this->_tree == NULL); 
 
   if (this->_initialized)
     {
@@ -172,7 +172,7 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 
 const Elem* PointLocatorTree::operator() (const Point& p) const
 {
-  assert (this->_initialized);
+  libmesh_assert (this->_initialized);
   
   // First check the element from last time before asking the tree
   if (this->_element==NULL || !(this->_element->contains_point(p)))
@@ -212,7 +212,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
     }
   
   // the element should be active
-  assert (this->_element->active());
+  libmesh_assert (this->_element->active());
 
   // return the element
   return this->_element;

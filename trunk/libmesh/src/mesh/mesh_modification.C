@@ -41,10 +41,10 @@ void MeshTools::Modification::distort (MeshBase& mesh,
 				       const Real factor,
 				       const bool perturb_boundary)
 {
-  assert (mesh.mesh_dimension() != 1);
-  assert (mesh.n_nodes());
-  assert (mesh.n_elem());
-  assert ((factor >= 0.) && (factor <= 1.));
+  libmesh_assert (mesh.mesh_dimension() != 1);
+  libmesh_assert (mesh.n_nodes());
+  libmesh_assert (mesh.n_elem());
+  libmesh_assert ((factor >= 0.) && (factor <= 1.));
 
   START_LOG("distort()", "MeshTools::Modification");
 
@@ -131,7 +131,7 @@ void MeshTools::Modification::translate (MeshBase& mesh,
 // void MeshTools::Modification::rotate2D (MeshBase& mesh,
 //                                         const Real alpha)
 // {
-//   assert (mesh.mesh_dimension() != 1);
+//   libmesh_assert (mesh.mesh_dimension() != 1);
 
 //   const Real pi = std::acos(-1);
 //   const Real  a = alpha/180.*pi;
@@ -155,7 +155,7 @@ void MeshTools::Modification::rotate (MeshBase& mesh,
 				      const Real theta,
 				      const Real psi)
 {
-  assert (mesh.mesh_dimension() != 1);
+  libmesh_assert (mesh.mesh_dimension() != 1);
 
   const Real pi = std::acos(-1.);
   const Real  p = -phi/180.*pi;
@@ -189,7 +189,7 @@ void MeshTools::Modification::scale (MeshBase& mesh,
   
   if (ys == 0.)
     {
-      assert (zs == 0.);
+      libmesh_assert (zs == 0.);
 
       y_scale = z_scale = x_scale;
     }
@@ -244,7 +244,7 @@ void UnstructuredMesh::all_first_order ()
     {
       Elem* so_elem = *it;
 
-      assert (so_elem != NULL);
+      libmesh_assert (so_elem != NULL);
 
       /*
        * build the first-order equivalent, add to
@@ -279,7 +279,7 @@ void UnstructuredMesh::all_first_order ()
       lo_elem->set_p_refinement_flag(so_elem->p_refinement_flag());
 #endif
 
-      assert (lo_elem->n_vertices() == so_elem->n_vertices());
+      libmesh_assert (lo_elem->n_vertices() == so_elem->n_vertices());
 
       /*
        * By definition the vertices of the linear and
@@ -295,7 +295,7 @@ void UnstructuredMesh::all_first_order ()
        * boundary conditions will be removed from the BoundaryInfo
        * data structure by insert_elem.
        */
-      assert (lo_elem->n_sides() == so_elem->n_sides());
+      libmesh_assert (lo_elem->n_sides() == so_elem->n_sides());
 	
       for (unsigned int s=0; s<so_elem->n_sides(); s++)
 	{
@@ -343,7 +343,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
     return;
 
   // does this work also in parallel?
-  // assert (this->n_processors() == 1);
+  // libmesh_assert (this->n_processors() == 1);
 
   START_LOG("all_second_order()", "Mesh");
 
@@ -426,7 +426,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
       // the linear-order element
       Elem* lo_elem = *it;
 
-      assert (lo_elem != NULL);
+      libmesh_assert (lo_elem != NULL);
 
       // make sure it is linear order
       if (lo_elem->default_order() != FIRST)
@@ -437,7 +437,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 	}
 
       // this does _not_ work for refined elements
-      assert (lo_elem->level () == 0);
+      libmesh_assert (lo_elem->level () == 0);
 
       /*
        * build the second-order equivalent, add to
@@ -451,7 +451,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 	Elem::build (Elem::second_order_equivalent_type(lo_elem->type(), 
 							full_ordered) ).release();
 
-      assert (lo_elem->n_vertices() == so_elem->n_vertices());
+      libmesh_assert (lo_elem->n_vertices() == so_elem->n_vertices());
 
 
       /*
@@ -534,7 +534,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 	  // yes, already added.
 	  else
 	    {
-	      assert (pos.first->second != NULL);
+	      libmesh_assert (pos.first->second != NULL);
 	      
 	      so_elem->set_node(son) = pos.first->second;
 	    }
@@ -547,7 +547,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * boundary conditions will be removed from the BoundaryInfo
        * data structure by insert_elem.
        */
-      assert (lo_elem->n_sides() == so_elem->n_sides());
+      libmesh_assert (lo_elem->n_sides() == so_elem->n_sides());
 	
       for (unsigned int s=0; s<lo_elem->n_sides(); s++)
 	{
@@ -612,7 +612,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	const ElemType etype = (*el)->type();
 
 	// all_tri currently only works on coarse meshes
-	assert ((*el)->parent() == NULL);
+	libmesh_assert ((*el)->parent() == NULL);
 
 	// We split the quads using the shorter of the two diagonals
 	// to maintain the best angle properties.
@@ -916,18 +916,18 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
     {
       // By this time, we should have removed all of the original boundary sides
       // - except on a hybrid mesh, where we can't "start from a blank slate"! - RHS
-      // assert (mesh.boundary_info->n_boundary_conds()==0);
+      // libmesh_assert (mesh.boundary_info->n_boundary_conds()==0);
 
       // Clear the boundary info, to be sure and start from a blank slate.
       // mesh.boundary_info->clear();
 
       // If the old mesh had boundary data, the new mesh better have some.
-      assert (new_bndry_elements.size() > 0);
+      libmesh_assert (new_bndry_elements.size() > 0);
 
       // We should also be sure that the lengths of the new boundary data vectors
       // are all the same.
-      assert (new_bndry_elements.size() == new_bndry_sides.size());
-      assert (new_bndry_sides.size()    == new_bndry_ids.size());
+      libmesh_assert (new_bndry_elements.size() == new_bndry_sides.size());
+      libmesh_assert (new_bndry_sides.size()    == new_bndry_ids.size());
 
       // Add the new boundary info to the mesh
       for (unsigned int s=0; s<new_bndry_elements.size(); ++s)
@@ -951,7 +951,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
   /**
    * This implementation assumes every element "side" has only 2 nodes.
    */
-  assert (mesh.mesh_dimension() == 2);
+  libmesh_assert (mesh.mesh_dimension() == 2);
   
   /*
    * find the boundary nodes
@@ -1191,8 +1191,8 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
     
     // Make sure we saved the same number of boundary conditions
     // in each vector.
-    assert (saved_boundary_elements.size() == saved_bc_ids.size());
-    assert (saved_bc_ids.size()            == saved_bc_sides.size());
+    libmesh_assert (saved_boundary_elements.size() == saved_bc_ids.size());
+    libmesh_assert (saved_bc_ids.size()            == saved_bc_sides.size());
   }
 
   

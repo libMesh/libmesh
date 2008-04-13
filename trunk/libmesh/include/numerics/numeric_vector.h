@@ -560,7 +560,7 @@ template <>
 inline
 void NumericVector<Complex>::print(std::ostream& os) const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   os << "Size\tglobal =  " << this->size()
      << "\t\tlocal =  " << this->local_size() << std::endl;
   
@@ -578,7 +578,7 @@ template <typename T>
 inline
 void NumericVector<T>::print(std::ostream& os) const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   os << "Size\tglobal =  " << this->size()
      << "\t\tlocal =  " << this->local_size() << std::endl;
 
@@ -593,7 +593,7 @@ template <>
 inline
 void NumericVector<Complex>::print_global(std::ostream& os) const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   std::vector<Complex> v(this->size());
   this->localize(v);
@@ -615,7 +615,7 @@ template <typename T>
 inline
 void NumericVector<T>::print_global(std::ostream& os) const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   std::vector<T> v(this->size());
   this->localize(v);

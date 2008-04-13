@@ -40,13 +40,13 @@ void MeshData::read_unv (const std::string& file_name)
   /*
    * we should better be active or in compatibility mode
    */
-  assert (this->_active || this->_compatibility_mode);
+  libmesh_assert (this->_active || this->_compatibility_mode);
 
   /*
    * When reading data, make sure the id maps are ok
    */
-  assert (this->_node_id_map_closed);
-  assert (this->_elem_id_map_closed);
+  libmesh_assert (this->_node_id_map_closed);
+  libmesh_assert (this->_elem_id_map_closed);
 
   /*
    * clear the data, but keep the id maps
@@ -386,7 +386,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
    * finished reading.  Ready for use, provided
    * there was any data contained in the file.
    */
-  assert ((this->_node_data.size() != 0) || (this->_elem_data.size() != 0));
+  libmesh_assert ((this->_node_data.size() != 0) || (this->_elem_data.size() != 0));
 
   this->_node_data_closed = true;
   this->_elem_data_closed = true;
@@ -402,17 +402,17 @@ void MeshData::write_unv (const std::string& file_name)
   /*
    * we should better be active or in compatibility mode
    */
-  assert (this->_active || this->_compatibility_mode);
+  libmesh_assert (this->_active || this->_compatibility_mode);
 
   /*
    * make sure the id maps are ready
    * and that we have data to write
    */
-  assert (this->_node_id_map_closed);
-  assert (this->_elem_id_map_closed);
+  libmesh_assert (this->_node_id_map_closed);
+  libmesh_assert (this->_elem_id_map_closed);
 
-  assert (this->_node_data_closed);
-  assert (this->_elem_data_closed);
+  libmesh_assert (this->_node_data_closed);
+  libmesh_assert (this->_elem_data_closed);
 
   if (file_name.rfind(".gz") < file_name.size())
     {
@@ -467,7 +467,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
   /*
    * Currently this function handles only nodal data.
    */
-  assert (!_node_data.empty());
+  libmesh_assert (!_node_data.empty());
 
   if (!_elem_data.empty())
       std::cerr << "WARNING: MeshData currently only supports nodal data for Universal files."
@@ -576,10 +576,10 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
       std::sprintf(buf, "%10i\n", f_n_id);
       out_file << buf;
 
-      /* since we are iterating over our own map, this assert
+      /* since we are iterating over our own map, this libmesh_assert
        * should never break...
        */
-      assert (this->has_data(node));
+      libmesh_assert (this->has_data(node));
 
       // const reference to the nodal values
       const std::vector<Number>& values = this->get_data(node);

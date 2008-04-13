@@ -475,9 +475,9 @@ PltLoader::~PltLoader()
 inline
 const std::string & PltLoader::var_name (const unsigned int v) const
 {
-  assert (v < this->n_vars());
-  assert (v < _var_names.size());
-  assert (this->n_vars() == _var_names.size());
+  libmesh_assert (v < this->n_vars());
+  libmesh_assert (v < _var_names.size());
+  libmesh_assert (this->n_vars() == _var_names.size());
 
   return _var_names[v];
 }
@@ -487,9 +487,9 @@ const std::string & PltLoader::var_name (const unsigned int v) const
 inline
 std::string & PltLoader::var_name (const unsigned int v)
 {
-  assert (v < this->n_vars());
-  assert (v < _var_names.size());
-  assert (this->n_vars() == _var_names.size());
+  libmesh_assert (v < this->n_vars());
+  libmesh_assert (v < _var_names.size());
+  libmesh_assert (this->n_vars() == _var_names.size());
 
   return _var_names[v];
 }
@@ -499,9 +499,9 @@ std::string & PltLoader::var_name (const unsigned int v)
 inline
 unsigned int PltLoader::var_type (const unsigned int v) const
 {
-  assert (v < this->n_vars());
-  assert (v < _var_types.size());
-  assert (this->n_vars() == _var_types.size());
+  libmesh_assert (v < this->n_vars());
+  libmesh_assert (v < _var_types.size());
+  libmesh_assert (this->n_vars() == _var_types.size());
 
   return _var_types[v];
 }
@@ -511,9 +511,9 @@ unsigned int PltLoader::var_type (const unsigned int v) const
 inline
 unsigned int & PltLoader::var_type (const unsigned int v)
 {
-  assert (v < this->n_vars());
-  assert (v < _var_types.size());
-  assert (this->n_vars() == _var_types.size());
+  libmesh_assert (v < this->n_vars());
+  libmesh_assert (v < _var_types.size());
+  libmesh_assert (this->n_vars() == _var_types.size());
 
   return _var_types[v];
 }
@@ -523,9 +523,9 @@ unsigned int & PltLoader::var_type (const unsigned int v)
 inline
 unsigned int PltLoader::zone_type (const unsigned int z) const
 {
-  assert (z < this->n_zones());
-  assert (z < _zone_types.size());
-  assert (this->n_zones() == _zone_types.size());
+  libmesh_assert (z < this->n_zones());
+  libmesh_assert (z < _zone_types.size());
+  libmesh_assert (this->n_zones() == _zone_types.size());
 
   return _zone_types[z];
 }
@@ -535,9 +535,9 @@ unsigned int PltLoader::zone_type (const unsigned int z) const
 inline
 unsigned int & PltLoader::zone_type (const unsigned int z)
 {
-  assert (z < this->n_zones());
-  assert (z < _zone_types.size());
-  assert (this->n_zones() == _zone_types.size());
+  libmesh_assert (z < this->n_zones());
+  libmesh_assert (z < _zone_types.size());
+  libmesh_assert (this->n_zones() == _zone_types.size());
 
   return _zone_types[z];
 }
@@ -547,9 +547,9 @@ unsigned int & PltLoader::zone_type (const unsigned int z)
 inline
 const std::string & PltLoader::zone_name (const unsigned int z) const
 {
-  assert (z < this->n_zones());
-  assert (z < _zone_names.size());
-  assert (this->n_zones() == _zone_names.size());
+  libmesh_assert (z < this->n_zones());
+  libmesh_assert (z < _zone_names.size());
+  libmesh_assert (this->n_zones() == _zone_names.size());
 
   return _zone_names[z];
 }
@@ -559,9 +559,9 @@ const std::string & PltLoader::zone_name (const unsigned int z) const
 inline
 std::string & PltLoader::zone_name (const unsigned int z)
 {
-  assert (z < this->n_zones());
-  assert (z < _zone_names.size());
-  assert (this->n_zones() == _zone_names.size());
+  libmesh_assert (z < this->n_zones());
+  libmesh_assert (z < _zone_names.size());
+  libmesh_assert (this->n_zones() == _zone_names.size());
 
   return _zone_names[z];
 }
@@ -571,9 +571,9 @@ std::string & PltLoader::zone_name (const unsigned int z)
 inline
 unsigned int PltLoader::zone_pack (const unsigned int z) const
 {
-  assert (z < this->n_zones());
-  assert (z < _zone_pack.size());
-  assert (this->n_zones() == _zone_pack.size());
+  libmesh_assert (z < this->n_zones());
+  libmesh_assert (z < _zone_pack.size());
+  libmesh_assert (this->n_zones() == _zone_pack.size());
 
   return _zone_pack[z];
 }
@@ -583,9 +583,9 @@ unsigned int PltLoader::zone_pack (const unsigned int z) const
 inline
 unsigned int & PltLoader::zone_pack (const unsigned int z)
 {
-  assert (z < this->n_zones());
-  assert (z < _zone_pack.size());
-  assert (this->n_zones() == _zone_pack.size());
+  libmesh_assert (z < this->n_zones());
+  libmesh_assert (z < _zone_pack.size());
+  libmesh_assert (this->n_zones() == _zone_pack.size());
 
   return _zone_pack[z];
 }
@@ -595,8 +595,8 @@ unsigned int & PltLoader::zone_pack (const unsigned int z)
 inline
 unsigned int PltLoader::imax (const unsigned int z) const
 {
-  assert (z < this->n_zones());
-  assert (_imax.size() == this->n_zones());
+  libmesh_assert (z < this->n_zones());
+  libmesh_assert (_imax.size() == this->n_zones());
 
   return _imax[z];
 }
@@ -606,8 +606,8 @@ unsigned int PltLoader::imax (const unsigned int z) const
 inline
 unsigned int & PltLoader::imax (const unsigned int z)
 {
-  assert (z < this->n_zones());
-  assert (_imax.size() == this->n_zones());
+  libmesh_assert (z < this->n_zones());
+  libmesh_assert (_imax.size() == this->n_zones());
 
   return _imax[z];
 }
@@ -617,8 +617,8 @@ unsigned int & PltLoader::imax (const unsigned int z)
 inline
 unsigned int PltLoader::jmax (const unsigned int z) const
 {
-  assert (z < this->n_zones());
-  assert (_jmax.size() == this->n_zones());
+  libmesh_assert (z < this->n_zones());
+  libmesh_assert (_jmax.size() == this->n_zones());
 
   return _jmax[z];
 }
@@ -628,8 +628,8 @@ unsigned int PltLoader::jmax (const unsigned int z) const
 inline
 unsigned int & PltLoader::jmax (const unsigned int z)
 {
-  assert (z < this->n_zones());
-  assert (_jmax.size() == this->n_zones());
+  libmesh_assert (z < this->n_zones());
+  libmesh_assert (_jmax.size() == this->n_zones());
 
   return _jmax[z];
 }
@@ -639,8 +639,8 @@ unsigned int & PltLoader::jmax (const unsigned int z)
 inline
 unsigned int PltLoader::kmax (const unsigned int z) const
 {
-  assert (z < this->n_zones());
-  assert (_kmax.size() == this->n_zones());
+  libmesh_assert (z < this->n_zones());
+  libmesh_assert (_kmax.size() == this->n_zones());
 
   return _kmax[z];
 }
@@ -650,8 +650,8 @@ unsigned int PltLoader::kmax (const unsigned int z) const
 inline
 unsigned int & PltLoader::kmax (const unsigned int z)
 {
-  assert (z < this->n_zones());
-  assert (_kmax.size() == this->n_zones());
+  libmesh_assert (z < this->n_zones());
+  libmesh_assert (_kmax.size() == this->n_zones());
 
   return _kmax[z];
 }
@@ -661,10 +661,10 @@ unsigned int & PltLoader::kmax (const unsigned int z)
 inline
 unsigned int PltLoader::n_nodes (const unsigned int z) const
 {
-  assert (z < this->n_zones());
+  libmesh_assert (z < this->n_zones());
   
   // Only for unstructured zones!
-  assert (this->zone_type(z) > 1);
+  libmesh_assert (this->zone_type(z) > 1);
   
   return this->imax(z);
 }
@@ -674,10 +674,10 @@ unsigned int PltLoader::n_nodes (const unsigned int z) const
 inline
 unsigned int PltLoader::n_elem (const unsigned int z) const
 {
-  assert (z < this->n_zones());
+  libmesh_assert (z < this->n_zones());
   
   // Only for unstructured zones!
-  assert (this->zone_type(z) > 1);
+  libmesh_assert (this->zone_type(z) > 1);
   
   return this->jmax(z);
 }
@@ -687,10 +687,10 @@ unsigned int PltLoader::n_elem (const unsigned int z) const
 inline
 PltLoader::FEType PltLoader::elem_type (const unsigned int z) const
 {
-  assert (z < this->n_zones());
+  libmesh_assert (z < this->n_zones());
   
   // Only for unstructured zones!
-  assert (this->zone_type(z) > 1);
+  libmesh_assert (this->zone_type(z) > 1);
   
   return static_cast<FEType>(this->kmax(z));
 }

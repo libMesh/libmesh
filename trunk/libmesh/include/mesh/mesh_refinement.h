@@ -250,19 +250,19 @@ public:
   /**
    * Returns true if and only if the mesh is level one smooth
    * Returns false otherwise
-   * Aborts the program if assert_yes is true and 
+   * Aborts the program if libmesh_assert_yes is true and 
    * the mesh is not level one smooth
    */
-  bool test_level_one (bool assert_yes = false);
+  bool test_level_one (bool libmesh_assert_yes = false);
   
   /**
    * Returns true if and only if the mesh has no elements
    * flagged to be coarsened or refined
    * Returns false otherwise
-   * Aborts the program if assert_yes is true and 
+   * Aborts the program if libmesh_assert_yes is true and 
    * the mesh has flagged elements
    */
-  bool test_unflagged (bool assert_yes = false);
+  bool test_unflagged (bool libmesh_assert_yes = false);
   
   /**
    * Add point \p p to the mesh. The function returns a pointer to

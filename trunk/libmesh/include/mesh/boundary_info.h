@@ -313,7 +313,7 @@ public:
 inline
 void BoundaryInfo::remove (const Node* node)
 {
-  assert (node != NULL);
+  libmesh_assert (node != NULL);
   
   // Erase everything associated with node
   _boundary_node_id.erase (node);
@@ -324,7 +324,7 @@ void BoundaryInfo::remove (const Node* node)
 inline
 void BoundaryInfo::remove (const Elem* elem)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   // Erase everything associated with elem
   _boundary_side_id.erase (elem);

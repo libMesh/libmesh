@@ -78,7 +78,7 @@ int main (int argc, char** argv)
     }
 
   
-    assert (fine_var_names == coarse_var_names);
+    libmesh_assert (fine_var_names == coarse_var_names);
 
 
     std::vector<Number>      diff_solution  (fine_solution.size());
@@ -99,14 +99,14 @@ int main (int argc, char** argv)
       std::cout << "looking for centroid of element " << e << std::endl;
       const Elem* elem = octree_coarse.find_element(mesh_coarse.elem(e)->centroid(mesh_coarse));
 
-      assert (elem != NULL);
+      libmesh_assert (elem != NULL);
       }
       for (unsigned int n=0; n<mesh_coarse.n_nodes(); n++)
       {
       std::cout << "looking for node " << n << std::endl;
       const Elem* elem = octree_coarse.find_element(mesh_coarse.vertex(n));
 
-      assert (elem != NULL);
+      libmesh_assert (elem != NULL);
       }
     */
 
@@ -156,7 +156,7 @@ int main (int argc, char** argv)
 	    {
 	      Number fine_soln=0., coarse_soln=0.;
 
-	      assert (fe_fine.n_shape_functions() == fine_element->n_nodes());
+	      libmesh_assert (fe_fine.n_shape_functions() == fine_element->n_nodes());
 	    
 	      for (unsigned int i=0; i<fe_fine.n_shape_functions(); i++)
 		{
@@ -177,7 +177,7 @@ int main (int argc, char** argv)
 
 		  coarse_element = const_cast<Elem*>(octree_coarse.find_element(q_point[gp]));
 		
-		  assert (coarse_element != NULL);
+		  libmesh_assert (coarse_element != NULL);
 				
 		  // Recompute the element--specific data for the new coarse-mesh element.
 		  fe_coarse.reinit (coarse_element);
@@ -244,7 +244,7 @@ int main (int argc, char** argv)
 		    
 		      coarse_element = const_cast<Elem*>(octree_coarse.find_element(p));
 		
-		      assert (coarse_element != NULL);
+		      libmesh_assert (coarse_element != NULL);
 		    
 		      // Recompute the element--specific data for the new coarse-mesh element.
 		      fe_coarse.reinit (coarse_element);

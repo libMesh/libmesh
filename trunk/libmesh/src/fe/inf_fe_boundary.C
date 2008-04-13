@@ -41,13 +41,13 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
 					const Real tolerance)
 {
   // We don't do this for 1D elements!
-  assert (Dim != 1);
+  libmesh_assert (Dim != 1);
 
-  assert (inf_elem  != NULL);
-  assert (qrule     != NULL);
+  libmesh_assert (inf_elem  != NULL);
+  libmesh_assert (qrule     != NULL);
 
   // Don't do this for the base
-  assert (s != 0);
+  libmesh_assert (s != 0);
   
   // Build the side of interest 
   const AutoPtr<Elem> side(inf_elem->build_side(s));
@@ -101,7 +101,7 @@ void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem*,
 					     const Real)
 {
   // We don't do this for 1D elements!
-  //assert (Dim != 1);
+  //libmesh_assert (Dim != 1);
 
   std::cerr << "ERROR: Edge conditions for infinite elements "
 	    << "not implemented!" << std::endl;
@@ -115,10 +115,10 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Point>&,
 							   const Elem* inf_side)
 {
-  assert (inf_side != NULL);
+  libmesh_assert (inf_side != NULL);
 
   // Currently, this makes only sense in 3-D!
-  assert (Dim == 3);
+  libmesh_assert (Dim == 3);
 
   // Initialiize the radial shape functions
   this->init_radial_shape_functions(inf_side);
@@ -132,7 +132,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
   // base_fe still corresponds to the (dim-1)-dimensional base of the InfFE object,
   // so update the fe_base.
   {
-    assert (Dim == 3);
+    libmesh_assert (Dim == 3);
 
     AutoPtr<FEBase> ap_fb(FEBase::build(Dim-2, this->fe_type));
     if (base_fe != NULL)
@@ -185,8 +185,8 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 				_base_node_index[n], 
 				_radial_node_index[n]);
 
-	  assert (_base_node_index[n]   < n_base_mapping_shape_functions);
-	  assert (_radial_node_index[n] < n_radial_mapping_sf);
+	  libmesh_assert (_base_node_index[n]   < n_base_mapping_shape_functions);
+	  libmesh_assert (_radial_node_index[n] < n_radial_mapping_sf);
 	}
       
     }
@@ -251,8 +251,8 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
     const std::vector<Real>&   radial_qw = radial_qrule->get_weights();
     const std::vector<Real>&   base_qw   = base_qrule->get_weights();
 
-    assert (radial_qw.size() == n_radial_qp);
-    assert (base_qw.size()   == n_base_qp);
+    libmesh_assert (radial_qw.size() == n_radial_qp);
+    libmesh_assert (base_qw.size()   == n_base_qp);
 
     for (unsigned int rp=0; rp<n_radial_qp; rp++)
       for (unsigned int bp=0; bp<n_base_qp; bp++)

@@ -137,8 +137,8 @@ namespace { // anonymous namespace for helper functions
       for (ConstNodeRange::const_iterator it = range.begin(); it!=range.end(); ++it)
 	{
 	  const Node* node = (*it);
-	  assert (node != NULL);
-	  assert (pos < _keys.size());
+	  libmesh_assert (node != NULL);
+	  libmesh_assert (pos < _keys.size());
 	  _keys[pos++] = get_hilbert_index (*node, _bbox);
 	}	
     }
@@ -150,8 +150,8 @@ namespace { // anonymous namespace for helper functions
       for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
 	{
 	  const Elem* elem = (*it);
-	  assert (elem != NULL);
-	  assert (pos < _keys.size());
+	  libmesh_assert (elem != NULL);
+	  libmesh_assert (pos < _keys.size());
 	  _keys[pos++] = get_hilbert_index (elem->centroid(), _bbox);
 	}	
     }
@@ -296,7 +296,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
       for (; it != end; ++it)
 	{
 	  const Node* node = (*it);
-	  assert (node != NULL);
+	  libmesh_assert (node != NULL);
 	  const Hilbert::HilbertIndices hi = 
 	    get_hilbert_index (*node, bbox);
 	  const unsigned int pid = 
@@ -305,7 +305,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 					    node_upper_bounds.end(),
 					    hi));
 
-	  assert (pid < libMesh::n_processors());
+	  libmesh_assert (pid < libMesh::n_processors());
 
 	  requested_ids[pid].push_back(hi);
 	}
@@ -339,13 +339,13 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	  for (unsigned int idx=0; idx<request_to_fill.size(); idx++)
 	    {
 	      const Hilbert::HilbertIndices &hi = request_to_fill[idx];
-	      assert (hi <= node_upper_bounds[libMesh::processor_id()]);
+	      libmesh_assert (hi <= node_upper_bounds[libMesh::processor_id()]);
 	      
 	      // find the requested index in my node bin
 	      std::vector<Hilbert::HilbertIndices>::const_iterator pos =
 		 std::lower_bound (my_node_bin.begin(), my_node_bin.end(), hi);
-	      assert (pos != my_node_bin.end());
-	      assert (*pos == hi);
+	      libmesh_assert (pos != my_node_bin.end());
+	      libmesh_assert (*pos == hi);
 	      
 	      // Finally, assign the global index based off the position of the index
 	      // in my array, properly offset.
@@ -371,7 +371,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	for (; it != end; ++it)
 	  {
 	    Node* node = (*it);
-	    assert (node != NULL);
+	    libmesh_assert (node != NULL);
 	    const Hilbert::HilbertIndices hi = 
 	      get_hilbert_index (*node, bbox);
 	    const unsigned int pid = 
@@ -380,11 +380,11 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 					      node_upper_bounds.end(),
 					      hi));
 
-	    assert (pid < libMesh::n_processors());
-	    assert (next_obj_on_proc[pid] != filled_request[pid].end());
+	    libmesh_assert (pid < libMesh::n_processors());
+	    libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
 	    const unsigned int global_index = *next_obj_on_proc[pid];
-	    assert (global_index < mesh.n_nodes());
+	    libmesh_assert (global_index < mesh.n_nodes());
 	    node->set_id() = global_index;
 	    
 	    ++next_obj_on_proc[pid];
@@ -408,7 +408,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
       for (; it != end; ++it)
 	{
 	  const Elem* elem = (*it);
-	  assert (elem != NULL);
+	  libmesh_assert (elem != NULL);
 	  const Hilbert::HilbertIndices hi = 
 	    get_hilbert_index (elem->centroid(), bbox);
 	  const unsigned int pid = 
@@ -417,7 +417,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 					    elem_upper_bounds.end(),
 					    hi));
 
-	  assert (pid < libMesh::n_processors());
+	  libmesh_assert (pid < libMesh::n_processors());
 
 	  requested_ids[pid].push_back(hi);
 	}
@@ -451,13 +451,13 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	  for (unsigned int idx=0; idx<request_to_fill.size(); idx++)
 	    {
 	      const Hilbert::HilbertIndices &hi = request_to_fill[idx];
-	      assert (hi <= elem_upper_bounds[libMesh::processor_id()]);
+	      libmesh_assert (hi <= elem_upper_bounds[libMesh::processor_id()]);
 	      
 	      // find the requested index in my elem bin
 	      std::vector<Hilbert::HilbertIndices>::const_iterator pos =
 		std::lower_bound (my_elem_bin.begin(), my_elem_bin.end(), hi);
-	      assert (pos != my_elem_bin.end());
-	      assert (*pos == hi);
+	      libmesh_assert (pos != my_elem_bin.end());
+	      libmesh_assert (*pos == hi);
 	      
 	      // Finally, assign the global index based off the position of the index
 	      // in my array, properly offset.
@@ -483,7 +483,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	for (; it != end; ++it)
 	  {
 	    Elem* elem = (*it);
-	    assert (elem != NULL);
+	    libmesh_assert (elem != NULL);
 	    const Hilbert::HilbertIndices hi = 
 	      get_hilbert_index (elem->centroid(), bbox);
 	    const unsigned int pid = 
@@ -492,11 +492,11 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 					      elem_upper_bounds.end(),
 					      hi));
 
-	    assert (pid < libMesh::n_processors());
-	    assert (next_obj_on_proc[pid] != filled_request[pid].end());
+	    libmesh_assert (pid < libMesh::n_processors());
+	    libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
 	    const unsigned int global_index = *next_obj_on_proc[pid];
-	    assert (global_index < mesh.n_elem());
+	    libmesh_assert (global_index < mesh.n_elem());
 	    elem->set_id() = global_index;
 	    
 	    ++next_obj_on_proc[pid];
@@ -634,14 +634,14 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 
     for (ForwardIterator it = begin; it != end; ++it)
       {
-	assert (hi != hilbert_keys.end());
+	libmesh_assert (hi != hilbert_keys.end());
 	const unsigned int pid = 
 	  std::distance (upper_bounds.begin(), 
 			 std::lower_bound(upper_bounds.begin(), 
 					  upper_bounds.end(),
 					  *hi));
 
-	assert (pid < libMesh::n_processors());
+	libmesh_assert (pid < libMesh::n_processors());
 
 	requested_ids[pid].push_back(*hi);
 
@@ -672,13 +672,13 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 	for (unsigned int idx=0; idx<request_to_fill.size(); idx++)
 	  {
 	    const Hilbert::HilbertIndices &hi = request_to_fill[idx];
-	    assert (hi <= upper_bounds[libMesh::processor_id()]);
+	    libmesh_assert (hi <= upper_bounds[libMesh::processor_id()]);
 	    
 	    // find the requested index in my node bin
 	    std::vector<Hilbert::HilbertIndices>::const_iterator pos =
 	      std::lower_bound (my_bin.begin(), my_bin.end(), hi);
-	    assert (pos != my_bin.end());
-	    assert (*pos == hi);
+	    libmesh_assert (pos != my_bin.end());
+	    libmesh_assert (*pos == hi);
 	    
 	    // Finally, assign the global index based off the position of the index
 	    // in my array, properly offset.
@@ -703,8 +703,8 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 	{
 	  const unsigned int pid = index_map[cnt];
 	  
-	  assert (pid < libMesh::n_processors());
-	  assert (next_obj_on_proc[pid] != filled_request[pid].end());
+	  libmesh_assert (pid < libMesh::n_processors());
+	  libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
 	  
 	  const unsigned int global_index = *next_obj_on_proc[pid];
 	  index_map[cnt] = global_index;

@@ -277,7 +277,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  assert(libMesh::processor_id() == 0);
+  libmesh_assert(libMesh::processor_id() == 0);
 
   // get a writeable reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -506,7 +506,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
                 my_parent->add_child(elem);
 
                 // sanity check
-                assert (my_parent->type() == elem->type());
+                libmesh_assert (my_parent->type() == elem->type());
               }
 
               // Add level-0 elements to the mesh 
@@ -647,7 +647,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
   const unsigned int          n_levels = MeshTools::n_levels(mesh);
 
   // The Legacy Xdr IO code only works if we have a serialized mesh
-  assert (mesh.is_serial());
+  libmesh_assert (mesh.is_serial());
 
   // In which case only processor 0 needs to do any writing
   if (libMesh::processor_id() != 0)
@@ -757,7 +757,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
       mh.set_num_elem_each_block(neeb);
     }
   else
-    assert(etypes.size() == 1);
+    libmesh_assert(etypes.size() == 1);
   
   mh.setNumEl(numElem);
   mh.setNumNodes(node_map.size());
@@ -849,7 +849,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
                 std::map<unsigned int, unsigned int>::iterator pos = 
                   node_map.find(mesh.elem(e)->node(n-nstart));
 
-                assert (pos != node_map.end());
+                libmesh_assert (pos != node_map.end());
 
                 connectivity_value = (*pos).second;
               }
@@ -1052,7 +1052,7 @@ void LegacyXdrIO::write_soln (const std::string& name,
   s.header(&sh); // Needs to work for both types of file
   
   // Write the solution vector
-  assert (soln.size() == var_names.size()*mesh.n_nodes());
+  libmesh_assert (soln.size() == var_names.size()*mesh.n_nodes());
   
   s.values(&soln[0], mesh.n_nodes());
 }

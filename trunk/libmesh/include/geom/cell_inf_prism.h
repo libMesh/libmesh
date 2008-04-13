@@ -125,7 +125,7 @@ InfPrism::InfPrism(const unsigned int nn, Elem* p) :
 // inline
 // unsigned int InfPrism::n_children_per_side(const unsigned int s) const
 // {
-//   assert (s < this->n_sides());
+//   libmesh_assert (s < this->n_sides());
 
 //   switch (s)
 //   {
@@ -136,7 +136,7 @@ InfPrism::InfPrism(const unsigned int nn, Elem* p) :
 //     default:
 //       // on infinite faces (sides), only 2 children exist
 //       //
-//       // note that the face at infinity is already caught by the assertion
+//       // note that the face at infinity is already caught by the libmesh_assertion
 //       return 2;
 //   }
 // }

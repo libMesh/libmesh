@@ -57,8 +57,8 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	  {
 	  case EDGE3:
 	    {
-	      assert (elem_soln.size()  == 2);
-	      assert (nodal_soln.size() == 3);
+	      libmesh_assert (elem_soln.size()  == 2);
+	      libmesh_assert (nodal_soln.size() == 3);
 
 	      nodal_soln[0] = elem_soln[0];
 	      nodal_soln[1] = elem_soln[1];
@@ -69,8 +69,8 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 
           case EDGE4:
             {
-              assert(elem_soln.size() == 2);
-              assert(nodal_soln.size() == 4);
+              libmesh_assert(elem_soln.size() == 2);
+              libmesh_assert(nodal_soln.size() == 4);
 
               nodal_soln[0] = elem_soln[0];
               nodal_soln[1] = elem_soln[1];
@@ -83,8 +83,8 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	    
 	  case TRI6:
 	    {
-	      assert (elem_soln.size()  == 3);
-	      assert (nodal_soln.size() == 6);
+	      libmesh_assert (elem_soln.size()  == 3);
+	      libmesh_assert (nodal_soln.size() == 6);
 	      
 	      nodal_soln[0] = elem_soln[0];
 	      nodal_soln[1] = elem_soln[1];
@@ -100,12 +100,12 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	  case QUAD8:
 	  case QUAD9:
 	    {
-	      assert (elem_soln.size()  == 4);
+	      libmesh_assert (elem_soln.size()  == 4);
 	      
 	      if (type == QUAD8)
-		assert (nodal_soln.size() == 8);
+		libmesh_assert (nodal_soln.size() == 8);
 	      else
-		assert (nodal_soln.size() == 9);
+		libmesh_assert (nodal_soln.size() == 9);
 
 	      
 	      nodal_soln[0] = elem_soln[0];
@@ -126,8 +126,8 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	    
 	  case TET10:
 	    {
-	      assert (elem_soln.size()  == 4);
-	      assert (nodal_soln.size() == 10);
+	      libmesh_assert (elem_soln.size()  == 4);
+	      libmesh_assert (nodal_soln.size() == 10);
 	      
 	      nodal_soln[0] = elem_soln[0];
 	      nodal_soln[1] = elem_soln[1];
@@ -147,12 +147,12 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	  case HEX20:
 	  case HEX27:
 	    {
-	      assert (elem_soln.size()  == 8);
+	      libmesh_assert (elem_soln.size()  == 8);
 	      
 	      if (type == HEX20)
-		assert (nodal_soln.size() == 20);
+		libmesh_assert (nodal_soln.size() == 20);
 	      else
-		assert (nodal_soln.size() == 27);
+		libmesh_assert (nodal_soln.size() == 27);
 	      
 	      nodal_soln[0]  = elem_soln[0];
 	      nodal_soln[1]  = elem_soln[1];
@@ -195,12 +195,12 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	  case PRISM15:
 	  case PRISM18:
 	    {
-	      assert (elem_soln.size()  == 6);
+	      libmesh_assert (elem_soln.size()  == 6);
 
 	      if (type == PRISM15)
-		assert (nodal_soln.size() == 15);
+		libmesh_assert (nodal_soln.size() == 15);
 	      else
-		assert (nodal_soln.size() == 18);
+		libmesh_assert (nodal_soln.size() == 18);
 	      
 	      nodal_soln[0]  = elem_soln[0];
 	      nodal_soln[1]  = elem_soln[1];
@@ -247,8 +247,8 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	  {
 	  case EDGE4:
             {
-              assert(elem_soln.size()  == 3);
-              assert(nodal_soln.size() == 4);
+              libmesh_assert(elem_soln.size()  == 3);
+              libmesh_assert(nodal_soln.size() == 4);
 
               // Project quadratic solution onto cubic element nodes
               nodal_soln[0] = elem_soln[0];
@@ -674,7 +674,7 @@ void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
   if (Dim == 1)
     return;
 
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   // Only constrain active and ancestor elements
   if (elem->subactive())
@@ -698,7 +698,7 @@ void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 	  // This can't happen...  Only level-0 elements have NULL
 	  // parents, and no level-0 elements can be at a higher
 	  // level than their neighbors!
-	  assert (parent != NULL);
+	  libmesh_assert (parent != NULL);
 	  
 	  const AutoPtr<Elem> my_side     (elem->build_side(s));
 	  const AutoPtr<Elem> parent_side (parent->build_side(s));
@@ -719,7 +719,7 @@ void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 	       my_dof<FEInterface::n_dofs(Dim-1, fe_type, my_side->type());
 	       my_dof++)
 	    {
-	      assert (my_dof < my_side->n_nodes());
+	      libmesh_assert (my_dof < my_side->n_nodes());
 	      
 	      // My global dof index.
 	      const unsigned int my_dof_g = my_dof_indices[my_dof];
@@ -737,7 +737,7 @@ void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 		   their_dof<FEInterface::n_dofs(Dim-1, fe_type, parent_side->type());
 		   their_dof++)
 		{
-		  assert (their_dof < parent_side->n_nodes());
+		  libmesh_assert (their_dof < parent_side->n_nodes());
 		  
 	          // Their global dof index.
 	          const unsigned int their_dof_g =
@@ -769,7 +769,7 @@ void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 		  // Protect for the case u_i = 0.999 u_j,
 		  // in which case i better equal j.
 		  else if (their_dof_value >= .999)
-		    assert (my_dof_g == their_dof_g);
+		    libmesh_assert (my_dof_g == their_dof_g);
 #endif
 		}		      
 	    }

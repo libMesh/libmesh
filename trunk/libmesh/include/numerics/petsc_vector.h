@@ -421,7 +421,7 @@ public:
    * not required in user-level code. Just don't do anything crazy like
    * calling VecDestroy()!
    */
-  Vec vec () { assert (_vec != NULL); return _vec; }
+  Vec vec () { libmesh_assert (_vec != NULL); return _vec; }
 
 
   
@@ -525,7 +525,7 @@ void PetscVector<T>::init (const unsigned int n,
   // otherwise create an MPI-enabled vector
   else
     {
-      assert (n_local < n);
+      libmesh_assert (n_local < n);
       
       ierr = VecCreateMPI (libMesh::COMM_WORLD, petsc_n_local, petsc_n,
 			   &_vec);
@@ -558,7 +558,7 @@ template <typename T>
 inline
 void PetscVector<T>::close ()
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int ierr=0;
   
@@ -593,7 +593,7 @@ template <typename T>
 inline
 void PetscVector<T>::zero ()
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int ierr=0;
 
@@ -633,7 +633,7 @@ template <typename T>
 inline
 unsigned int PetscVector<T>::size () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int ierr=0, petsc_size=0;
   
@@ -652,7 +652,7 @@ template <typename T>
 inline
 unsigned int PetscVector<T>::local_size () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int ierr=0, petsc_size=0;
   
@@ -668,7 +668,7 @@ template <typename T>
 inline
 unsigned int PetscVector<T>::first_local_index () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int ierr=0, petsc_first=0, petsc_last=0;
   
@@ -684,7 +684,7 @@ template <typename T>
 inline
 unsigned int PetscVector<T>::last_local_index () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int ierr=0, petsc_first=0, petsc_last=0;
   
@@ -700,8 +700,8 @@ template <typename T>
 inline
 T PetscVector<T>::operator() (const unsigned int i) const
 {
-  assert (this->initialized());
-  assert ( ((i >= this->first_local_index()) &&
+  libmesh_assert (this->initialized());
+  libmesh_assert ( ((i >= this->first_local_index()) &&
 	    (i <  this->last_local_index())) );
 
   int ierr=0;
@@ -725,7 +725,7 @@ template <typename T>
 inline
 Real PetscVector<T>::min () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   int index=0, ierr=0;
   PetscReal min=0.;
@@ -743,7 +743,7 @@ template <typename T>
 inline
 Real PetscVector<T>::max() const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   int index=0, ierr=0;
   PetscReal max=0.;

@@ -26,7 +26,6 @@
 // type of iterator you will be using.
 
 
-#include <assert.h>
 #include <vector>
 #include <iterator>
 
@@ -71,7 +70,7 @@ template <typename KeyType>
 inline
 unsigned int BinSorter<KeyType>::sizeof_bin (const unsigned int bin) const
 {
-  assert ((bin+1) < bin_iters.size());
+  libmesh_assert ((bin+1) < bin_iters.size());
 
   // The size of the bin is defined by the distance between
   // its bounding iterators

@@ -176,7 +176,7 @@ Real FE<3,CLOUGH>::shape(const Elem* elem,
 			     const unsigned int,
 			     const Point&)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   std::cerr << "3D Clough elements not yet implemented."
 	    << std::endl;
@@ -235,7 +235,7 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem* elem,
 				   const unsigned int,
 				   const Point&)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   std::cerr << "3D Clough elements not yet implemented."
 	    << std::endl;
@@ -277,7 +277,7 @@ Real FE<3,CLOUGH>::shape_second_deriv(const Elem* elem,
                                       const unsigned int,
                                       const Point&)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   std::cerr << "3D Clough elements not yet implemented."
 	    << std::endl;

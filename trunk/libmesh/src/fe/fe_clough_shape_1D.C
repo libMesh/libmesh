@@ -192,7 +192,7 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
 			     const unsigned int i,
 			     const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   clough_compute_coefs(elem);
 
@@ -211,7 +211,7 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
 	  case EDGE2:
 	  case EDGE3:
 	    {
-	      assert (i<4);
+	      libmesh_assert (i<4);
 
 	      switch (i)
 		{
@@ -268,7 +268,7 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem* elem,
 				   const unsigned int j,
 				   const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   clough_compute_coefs(elem);
 
@@ -325,7 +325,7 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem* elem,
                                       const unsigned int j,
                                       const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   clough_compute_coefs(elem);
 

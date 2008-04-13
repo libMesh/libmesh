@@ -278,8 +278,8 @@ inline
 bool UNVIO::beginning_of_dataset (std::istream& in_file, 
 				  const std::string& ds_name) const
 {
-  assert (in_file.good());
-  assert (!ds_name.empty());
+  libmesh_assert (in_file.good());
+  libmesh_assert (!ds_name.empty());
 
   std::string olds, news;
 
@@ -327,7 +327,7 @@ Real UNVIO::D_to_e (std::string& number) const
   const std::string::size_type position = number.find("D",6);
 #endif
 
-  assert (position != std::string::npos);
+  libmesh_assert (position != std::string::npos);
   number.replace(position, 1, "e"); 
 
   return std::atof (number.c_str());

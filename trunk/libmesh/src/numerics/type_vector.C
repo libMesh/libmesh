@@ -38,7 +38,7 @@ TypeVector<T> TypeVector<T>::unit() const
 
   const Real length = size();
   
-  assert (length != static_cast<Real>(0.));
+  libmesh_assert (length != static_cast<Real>(0.));
   
 #if DIM == 1
   return TypeVector<T>(_coords[0]/length);
@@ -93,7 +93,7 @@ template <typename T>
 void TypeVector<T>::write_unformatted (std::ostream &out,
 				       const bool newline) const
 {
-  assert (out);
+  libmesh_assert (out);
 
   out << std::setiosflags(std::ios::showpoint)
       << (*this)(0) << " "

@@ -1454,7 +1454,7 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
 			     const unsigned int i,
 			     const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   clough_compute_coefs(elem);
 
@@ -1472,7 +1472,7 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
 	    // C1 functions on the Clough-Tocher triangle.
 	  case TRI6:
 	    {
-	      assert (i<9);
+	      libmesh_assert (i<9);
             // FIXME: it would be nice to calculate (and cache)
             // clough_raw_shape(j,p) only once per triangle, not 1-7
             // times
@@ -1551,7 +1551,7 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
 	    // C1 functions on the Clough-Tocher triangle.
 	  case TRI6:
 	    {
-	      assert (i<12);
+	      libmesh_assert (i<12);
 
             // FIXME: it would be nice to calculate (and cache)
             // clough_raw_shape(j,p) only once per triangle, not 1-7
@@ -1654,7 +1654,7 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
 				   const unsigned int j,
 				   const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   clough_compute_coefs(elem);
 
@@ -1672,7 +1672,7 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
 	    // C1 functions on the Clough-Tocher triangle.
 	  case TRI6:
 	    {
-	      assert (i<9);
+	      libmesh_assert (i<9);
             // FIXME: it would be nice to calculate (and cache)
             // clough_raw_shape(j,p) only once per triangle, not 1-7
             // times
@@ -1751,7 +1751,7 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
 	    // C1 functions on the Clough-Tocher triangle.
 	  case TRI6:
 	    {
-	      assert (i<12);
+	      libmesh_assert (i<12);
 
             // FIXME: it would be nice to calculate (and cache)
             // clough_raw_shape(j,p) only once per triangle, not 1-7
@@ -1837,7 +1837,7 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
                                       const unsigned int j,
                                       const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   clough_compute_coefs(elem);
 
@@ -1855,7 +1855,7 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
 	    // C1 functions on the Clough-Tocher triangle.
 	  case TRI6:
 	    {
-	      assert (i<9);
+	      libmesh_assert (i<9);
             // FIXME: it would be nice to calculate (and cache)
             // clough_raw_shape(j,p) only once per triangle, not 1-7
             // times
@@ -1934,7 +1934,7 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
 	    // C1 functions on the Clough-Tocher triangle.
 	  case TRI6:
 	    {
-	      assert (i<12);
+	      libmesh_assert (i<12);
 
             // FIXME: it would be nice to calculate (and cache)
             // clough_raw_shape(j,p) only once per triangle, not 1-7

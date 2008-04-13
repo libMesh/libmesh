@@ -130,7 +130,7 @@ KellyErrorEstimator::boundary_side_integration ()
 
           // Be sure the BC function still thinks we're on the 
           // flux boundary.
-          assert (flux_bc.first == true);
+          libmesh_assert (flux_bc.first == true);
 
           // The solution gradient from each element
           Gradient grad_fine;

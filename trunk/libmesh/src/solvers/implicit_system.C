@@ -91,7 +91,7 @@ void ImplicitSystem::init_data ()
 
 void ImplicitSystem::init_matrices ()
 {
-  assert (matrix != NULL);
+  libmesh_assert (matrix != NULL);
 
   // Check for quick return in case the system matrix
   // (and by extension all the matrices) has already
@@ -109,7 +109,7 @@ void ImplicitSystem::init_matrices ()
   for (matrices_iterator pos = _matrices.begin();
        pos != _matrices.end(); ++pos)
     {
-      assert (!pos->second->initialized());
+      libmesh_assert (!pos->second->initialized());
       dof_map.attach_matrix (*(pos->second));
     }
   
@@ -149,10 +149,10 @@ void ImplicitSystem::reinit ()
 
 void ImplicitSystem::assemble ()
 {
-  assert (matrix != NULL);
-  assert (matrix->initialized());
-  assert (rhs    != NULL);
-  assert (rhs->initialized());
+  libmesh_assert (matrix != NULL);
+  libmesh_assert (matrix->initialized());
+  libmesh_assert (rhs    != NULL);
+  libmesh_assert (rhs->initialized());
 
   // Zero the matrix and RHS
   matrix->zero ();
@@ -239,5 +239,5 @@ void ImplicitSystem::add_system_matrix ()
   if (matrix == NULL)
     matrix = &(this->add_matrix ("System Matrix"));
 
-  assert (matrix != NULL);
+  libmesh_assert (matrix != NULL);
 }

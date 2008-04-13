@@ -114,7 +114,7 @@ inline
 Number AnalyticFunction::operator() (const Point& p, 
 				     const Real time)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   return (this->_number_fptr(p, time));
 }
 
@@ -125,7 +125,7 @@ void AnalyticFunction::operator() (const Point& p,
 				   const Real time,
 				   DenseVector<Number>& output)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   this->_vector_fptr(output, p, time);
   return;
 }

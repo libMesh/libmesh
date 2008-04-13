@@ -82,7 +82,7 @@ private:
 inline
 void SFCPartitioner::set_sfc_type (const std::string& sfc_type)
 {
-  assert ((sfc_type == "Hilbert") ||
+  libmesh_assert ((sfc_type == "Hilbert") ||
 	  (sfc_type == "Morton"));
 
   _sfc_type = sfc_type;

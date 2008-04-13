@@ -67,15 +67,15 @@ bool Edge3::is_face(const unsigned int ) const
 bool Edge3::is_node_on_side(const unsigned int n,
 			    const unsigned int s) const
 {
-  assert(s < 2);
-  assert(n < 3);
+  libmesh_assert(s < 2);
+  libmesh_assert(n < 3);
   return (s == n);
 }
 
 bool Edge3::is_node_on_edge(const unsigned int,
 			    const unsigned int e) const
 {
-  assert(e == 0);
+  libmesh_assert(e == 0);
   return true;
 }
 
@@ -93,9 +93,9 @@ void Edge3::connectivity(const unsigned int sc,
 			 const IOPackage iop,
 			 std::vector<unsigned int>& conn) const
 {
-  assert (sc <= 1);
-  assert (sc < this->n_sub_elem());
-  assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert (sc <= 1);
+  libmesh_assert (sc < this->n_sub_elem());
+  libmesh_assert (iop != INVALID_IO_PACKAGE);
 
   // Create storage
   conn.resize(2);
@@ -178,7 +178,7 @@ Real Edge3::volume () const
   const Real ba=b/a; 
   const Real ca=c/a; 
 
-  assert (1.-ba+ca>0.);
+  libmesh_assert (1.-ba+ca>0.);
   
   const Real s1 = std::sqrt(1. - ba + ca);
   const Real s2 = std::sqrt(1. + ba + ca);

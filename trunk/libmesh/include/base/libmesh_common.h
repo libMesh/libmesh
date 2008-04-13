@@ -35,7 +35,7 @@
 #include <iostream> // needed for std::cout, std::cerr
 #include <fstream> // needed for argument to print_trace()
 #include <complex>
-#include <cassert>
+// #include <cassert>  // Use libmesh_assert() now
 #ifdef HAVE_STDLIB_H
 # include <cstdlib>
 #endif

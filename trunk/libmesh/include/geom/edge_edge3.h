@@ -58,7 +58,7 @@ class Edge3 : public Edge
   Edge3 (const unsigned int nn,
 	 const unsigned int ns,
 	 Elem* p) :
-    Edge(nn, p) { assert (ns == 0); }
+    Edge(nn, p) { libmesh_assert (ns == 0); }
 
   
   /**

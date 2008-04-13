@@ -128,8 +128,8 @@ namespace {
     bool operator()(const Elem *a,
 		    const Elem *b) const
     {
-      assert (a);
-      assert (b);
+      libmesh_assert (a);
+      libmesh_assert (b);
       
       if (a->level() == b->level())
 	{
@@ -248,8 +248,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   // (3) deleting all nonlocal elements elements
   // (4) obtaining required ghost elements from neighboring processors
   parallel_only();
-  assert (!mesh.is_serial());
-  assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
+  libmesh_assert (!mesh.is_serial());
+  libmesh_assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
 			    mesh.unpartitioned_elements_end()) == 0);
 
   START_LOG("redistribute()","MeshCommunication");
@@ -520,10 +520,10 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    }
 	}
     }
-  assert (n_send_node_pairs    == node_send_requests.size());
-  assert (n_send_elem_pairs    == element_send_requests.size());
-  assert (n_send_node_bc_pairs == node_bc_requests.size());
-  assert (n_send_elem_bc_pairs == element_bc_requests.size());
+  libmesh_assert (n_send_node_pairs    == node_send_requests.size());
+  libmesh_assert (n_send_elem_pairs    == element_send_requests.size());
+  libmesh_assert (n_send_node_bc_pairs == node_bc_requests.size());
+  libmesh_assert (n_send_elem_bc_pairs == element_bc_requests.size());
 
   // Receive nodes.  Size this array for the largest message.
   {
@@ -542,9 +542,9 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	const unsigned int source_pid = status.source();
 	const unsigned int n_nodes_received =
 	  recv_n_nodes_and_elem_per_proc[5*source_pid+0];
-	assert (n_nodes_received <= received_nodes.size());
-	assert (status.size() == n_nodes_received);
-	assert (recv_node_pair[source_pid]);
+	libmesh_assert (n_nodes_received <= received_nodes.size());
+	libmesh_assert (status.size() == n_nodes_received);
+	libmesh_assert (recv_node_pair[source_pid]);
 	
 	for (unsigned int n=0; n<n_nodes_received; n++)
 	  {
@@ -566,7 +566,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 			  received_node_bcs,
 			  /* tag = */ 2);
 	const unsigned int source_pid = status.source();
-	assert (status.size() == recv_n_nodes_and_elem_per_proc[5*source_pid+3]);
+	libmesh_assert (status.size() == recv_n_nodes_and_elem_per_proc[5*source_pid+3]);
 
 	const unsigned int buffer_size = status.size();
 	unsigned int cnt=0;
@@ -576,7 +576,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    const unsigned int node_id = received_node_bcs[cnt++];
 	    const int bc_id            = received_node_bcs[cnt++];
 
-	    assert (mesh.node_ptr(node_id));
+	    libmesh_assert (mesh.node_ptr(node_id));
 	    mesh.boundary_info->add_node (mesh.node_ptr(node_id), bc_id);
 	  }	
       }
@@ -599,10 +599,10 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	const unsigned int source_pid = status.source();
 	const unsigned int n_elem_received = 
 	  recv_n_nodes_and_elem_per_proc[5*source_pid+1];
-	assert (recv_elem_pair[source_pid]);
-	assert (recv_n_nodes_and_elem_per_proc[5*source_pid+2] 
+	libmesh_assert (recv_elem_pair[source_pid]);
+	libmesh_assert (recv_n_nodes_and_elem_per_proc[5*source_pid+2] 
 		<= received_elements.size());
-	assert (recv_n_nodes_and_elem_per_proc[5*source_pid+2] 
+	libmesh_assert (recv_n_nodes_and_elem_per_proc[5*source_pid+2] 
 		== status.size());
 
 	// iterate through the input buffer and add the elements
@@ -639,23 +639,23 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    // but then go on
 	    if (elem)
 	      {
-		assert (elem->level() == elem_level);
-		assert (elem->id() == self_ID);
-		assert (elem->processor_id() == elem_PID);
-		assert (elem->subdomain_id() == subdomain_ID);
-		assert (elem->type() == elem_type);
+		libmesh_assert (elem->level() == elem_level);
+		libmesh_assert (elem->id() == self_ID);
+		libmesh_assert (elem->processor_id() == elem_PID);
+		libmesh_assert (elem->subdomain_id() == subdomain_ID);
+		libmesh_assert (elem->type() == elem_type);
 #ifdef ENABLE_AMR
-		assert (elem->p_level() == p_level);
-		assert (elem->refinement_flag() == refinement_flag);
-		assert (elem->p_refinement_flag() == p_refinement_flag);
+		libmesh_assert (elem->p_level() == p_level);
+		libmesh_assert (elem->refinement_flag() == refinement_flag);
+		libmesh_assert (elem->p_refinement_flag() == p_refinement_flag);
 		
 		if (elem->level() > 0)
 		  {
-		    assert (elem->parent()->id() == static_cast<unsigned int>(parent_ID));
-		    assert (elem->parent()->child(which_child) == elem);
+		    libmesh_assert (elem->parent()->id() == static_cast<unsigned int>(parent_ID));
+		    libmesh_assert (elem->parent()->child(which_child) == elem);
 		  }	      
 #endif
-		assert (elem->n_nodes() == Elem::type_to_n_nodes_map[elem_type]);
+		libmesh_assert (elem->n_nodes() == Elem::type_to_n_nodes_map[elem_type]);
 	      
 		// skip the connectivity for this element
 		cnt += elem->n_nodes();
@@ -680,17 +680,17 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		      }
 		    
 		    elem = Elem::build(elem_type, parent).release();
-		    assert (elem);
+		    libmesh_assert (elem);
 		    parent->add_child(elem, which_child);
-		    assert (parent->type() == elem->type());
-		    assert (parent->child(which_child) == elem);
+		    libmesh_assert (parent->type() == elem->type());
+		    libmesh_assert (parent->child(which_child) == elem);
 		  }
 		else
 		  {
-		    assert (parent_ID == -1);
+		    libmesh_assert (parent_ID == -1);
 #endif // ENABLE_AMR
 		    elem = Elem::build(elem_type).release();
-		    assert (elem);
+		    libmesh_assert (elem);
 #ifdef ENABLE_AMR
 		  }
 		
@@ -698,7 +698,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		elem->set_p_level(p_level);
 		elem->set_refinement_flag(refinement_flag);
 		elem->set_p_refinement_flag(p_refinement_flag);
-		assert (elem->level() == static_cast<unsigned int>(elem_level));
+		libmesh_assert (elem->level() == static_cast<unsigned int>(elem_level));
 #endif
 		elem->processor_id() = elem_PID;
 		elem->subdomain_id() = subdomain_ID;
@@ -707,7 +707,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		// Assign the connectivity
 		for (unsigned int n=0; n<elem->n_nodes(); n++)
 		  {
-		    assert (cnt < received_elements.size());		  
+		    libmesh_assert (cnt < received_elements.size());		  
 		    elem->set_node(n) = mesh.node_ptr (received_elements[cnt++]);
 		  }
 		
@@ -717,7 +717,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    
 	    current_elem++;
 	  }
-	assert (current_elem == n_elem_received);
+	libmesh_assert (current_elem == n_elem_received);
       }
   }
 
@@ -733,7 +733,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 			  received_element_bcs,
 			  /* tag = */ 3);
 	const unsigned int source_pid = status.source();
-	assert (status.size() == recv_n_nodes_and_elem_per_proc[5*source_pid+4]);
+	libmesh_assert (status.size() == recv_n_nodes_and_elem_per_proc[5*source_pid+4]);
 
 	const unsigned int buffer_size = status.size();
 	unsigned int cnt=0;
@@ -744,7 +744,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    const unsigned int side    = received_element_bcs[cnt++];
 	    const int bc_id            = received_element_bcs[cnt++];
 
-	    assert (mesh.elem(elem_id));
+	    libmesh_assert (mesh.elem(elem_id));
 	    mesh.boundary_info->add_side (mesh.elem(elem_id), side, bc_id);
 	  }
       }    
@@ -842,9 +842,9 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 
 	for (; it != it_end; ++it)
 	  {
-	    assert (*it != NULL);
-            assert (!(*it)->valid_processor_id());
-            assert ((*it)->id()*3 == pts.size());
+	    libmesh_assert (*it != NULL);
+            libmesh_assert (!(*it)->valid_processor_id());
+            libmesh_assert ((*it)->id()*3 == pts.size());
 	    
 	    const Point& p = **it;
 	    
@@ -857,7 +857,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
       pts.resize (3*n_nodes);
 
     // Sanity check for all processors
-    assert (pts.size() == (3*n_nodes));
+    libmesh_assert (pts.size() == (3*n_nodes));
     
     // Broadcast the pts vector
     Parallel::broadcast (pts);
@@ -866,7 +866,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     // processor 0.
     if (libMesh::processor_id() != 0)
       {
-	assert (mesh.n_nodes() == 0);
+	libmesh_assert (mesh.n_nodes() == 0);
 	
 	for (unsigned int i=0; i<pts.size(); i += 3)
 	  mesh.add_point (Point(pts[i+0],
@@ -875,7 +875,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 			  i/3);
       }
     
-    assert (mesh.n_nodes() == n_nodes);
+    libmesh_assert (mesh.n_nodes() == n_nodes);
   } // Done distributing the nodes
 
   
@@ -910,8 +910,8 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	    
 	    for (; it != it_end; ++it)
 	      {
-                assert (*it);
-                assert (!(*it)->valid_processor_id());
+                libmesh_assert (*it);
+                libmesh_assert (!(*it)->valid_processor_id());
 		const Elem* elem = *it;
 		pack_element (conn, elem);
 	      }
@@ -921,7 +921,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
       conn.resize (packed_elem_header_size*n_elem + total_weight);
     
     // Sanity check for all processors
-    assert (conn.size() == (packed_elem_header_size*n_elem + total_weight));
+    libmesh_assert (conn.size() == (packed_elem_header_size*n_elem + total_weight));
     
     // Broadcast the element connectivity
     Parallel::broadcast (conn);
@@ -930,7 +930,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
     // processor 0.
     if (libMesh::processor_id() != 0)
       {
-	assert (mesh.n_elem() == 0);
+	libmesh_assert (mesh.n_elem() == 0);
 	
 	unsigned int cnt = 0;
 
@@ -972,17 +972,17 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 		    libmesh_error();
 		  }
 		
-                assert (my_parent->refinement_flag() == Elem::INACTIVE);
+                libmesh_assert (my_parent->refinement_flag() == Elem::INACTIVE);
 		
 		elem = Elem::build(elem_type,my_parent).release();
 		my_parent->add_child(elem);
-		assert (my_parent->type() == elem->type());
-                assert (my_parent->child(which_child) == elem);
+		libmesh_assert (my_parent->type() == elem->type());
+                libmesh_assert (my_parent->child(which_child) == elem);
 	      }
 	    
             else // level 0 element has no parent
 	      {
-		assert (level == 0);
+		libmesh_assert (level == 0);
 #endif 
 		
 		// should be able to just use the integer elem_type
@@ -991,7 +991,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	      }
 
 	    // Assign the IDs
-	    assert (elem->level() == static_cast<unsigned int>(level));
+	    libmesh_assert (elem->level() == static_cast<unsigned int>(level));
 	    elem->set_refinement_flag(refinement_flag); 
 	    elem->set_p_refinement_flag(p_refinement_flag); 
 	    elem->set_p_level(p_level); 
@@ -1007,7 +1007,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 	    // Assign the connectivity
 	    for (unsigned int n=0; n<elem->n_nodes(); n++)
 	      {
-		assert (cnt < conn.size());
+		libmesh_assert (cnt < conn.size());
 		
 		elem->set_node(n) = mesh.node_ptr (conn[cnt++]);
 	      }
@@ -1029,7 +1029,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
       } // end if iam != cpu 0
     
     
-    assert (mesh.n_elem() == n_elem);
+    libmesh_assert (mesh.n_elem() == n_elem);
   } // Done distributing the elements
 
 
@@ -1080,8 +1080,8 @@ void MeshCommunication::broadcast_bcs (const MeshBase&,
     if (libMesh::processor_id() == 0)
       boundary_info.build_side_list (el_id, side_id, bc_id);
 
-    assert (el_id.size() == side_id.size());
-    assert (el_id.size() == bc_id.size());
+    libmesh_assert (el_id.size() == side_id.size());
+    libmesh_assert (el_id.size() == bc_id.size());
     
     unsigned int n_bcs = el_id.size();
 
@@ -1109,16 +1109,16 @@ void MeshCommunication::broadcast_bcs (const MeshBase&,
 	if (libMesh::processor_id() != 0)
 	  for (unsigned int e=0; e<n_bcs; e++)
 	    {
-	      assert (el_id[e] < mesh.n_elem());
+	      libmesh_assert (el_id[e] < mesh.n_elem());
 	      
 	      const Elem* elem = mesh.elem(el_id[e]);
 
-	      assert (elem != NULL);
+	      libmesh_assert (elem != NULL);
 
 	      // sanity: be sure that the element returned by mesh.elem() really has id()==el_id[e]
-	      assert(elem->id() == el_id[e]);
+	      libmesh_assert(elem->id() == el_id[e]);
 
-	      assert (side_id[e] < elem->n_sides());
+	      libmesh_assert (side_id[e] < elem->n_sides());
 	    
 	      boundary_info.add_side (elem, side_id[e], bc_id[e]);
 	    }
@@ -1135,7 +1135,7 @@ void MeshCommunication::broadcast_bcs (const MeshBase&,
     if (libMesh::processor_id() == 0)
       boundary_info.build_node_list (node_id, bc_id);
 
-    assert (node_id.size() == bc_id.size());
+    libmesh_assert (node_id.size() == bc_id.size());
     
     unsigned int n_bcs = node_id.size();
 
@@ -1159,14 +1159,14 @@ void MeshCommunication::broadcast_bcs (const MeshBase&,
 	if (libMesh::processor_id() != 0)
 	  for (unsigned int n=0; n<n_bcs; n++)
 	    {
-	      assert (node_id[n] < mesh.n_nodes());
+	      libmesh_assert (node_id[n] < mesh.n_nodes());
 	      
 	      const Node* node = mesh.node_ptr (node_id[n]);
 
-	      assert (node != NULL);
+	      libmesh_assert (node != NULL);
 	      
 	      // sanity: be sure that the node returned by mesh.node_ptr() really has id()==node_id[n]
-	      assert(node->id() == node_id[n]);
+	      libmesh_assert(node->id() == node_id[n]);
 	    
 	      boundary_info.add_node (node, bc_id[n]);
 	    }
@@ -1188,7 +1188,7 @@ void MeshCommunication::broadcast_bcs (const MeshBase&,
 void MeshCommunication::allgather (ParallelMesh& mesh) const
 {
   // The mesh should know it's about to be serialized
-  assert (mesh.is_serial());
+  libmesh_assert (mesh.is_serial());
 
   this->allgather_mesh (mesh);
   this->allgather_bcs  (mesh, *(mesh.boundary_info));
@@ -1243,8 +1243,8 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	n_elem[p]  = n_objects[idx++];	
       }
 
-    assert (mesh.n_local_nodes() == n_nodes[libMesh::processor_id()]);
-    assert (mesh.n_local_elem()  ==  n_elem[libMesh::processor_id()]);
+    libmesh_assert (mesh.n_local_nodes() == n_nodes[libMesh::processor_id()]);
+    libmesh_assert (mesh.n_local_elem()  ==  n_elem[libMesh::processor_id()]);
   }
 
   std::vector<unsigned int>
@@ -1278,7 +1278,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 
     for (; it != end; ++it)
       {
-	assert (*it != NULL);
+	libmesh_assert (*it != NULL);
 	    
 	const Point &p = **it;
 
@@ -1287,7 +1287,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	xyz.push_back(p(2));
       }
 
-    assert (xyz.size() == 3*n_nodes[libMesh::processor_id()]);
+    libmesh_assert (xyz.size() == 3*n_nodes[libMesh::processor_id()]);
 
     // Get values from other processors
     Parallel::allgather (xyz);
@@ -1306,15 +1306,15 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	  // and add it to our mesh.
 	  for (unsigned int global_idx = first_global_idx; global_idx<last_global_idx; global_idx++)
 	    {
-	      assert ((3*global_idx + 2) < xyz.size());
+	      libmesh_assert ((3*global_idx + 2) < xyz.size());
 	      
 	      Node *node = Node::build(xyz[3*global_idx + 0],
 				       xyz[3*global_idx + 1],
 				       xyz[3*global_idx + 2],
 				       global_idx).release();
 	      
-	      assert (node != NULL);
-	      assert (node->id() == global_idx);
+	      libmesh_assert (node != NULL);
+	      libmesh_assert (node->id() == global_idx);
 	      
 	      node->processor_id() = p;
 
@@ -1323,7 +1323,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	}
     
     // Check the result
-    assert (global_n_nodes == mesh.n_nodes());
+    libmesh_assert (global_n_nodes == mesh.n_nodes());
   }
   
   //----------------------------------------------------
@@ -1351,20 +1351,20 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	  {
 	    const Elem* elem = *it;
 
-	    assert (elem != NULL);
-	    assert (elem->level() == level);
+	    libmesh_assert (elem != NULL);
+	    libmesh_assert (elem->level() == level);
 	    
 	    // We're not handling unpartitioned elements!
-	    assert (elem->processor_id() != DofObject::invalid_processor_id);
+	    libmesh_assert (elem->processor_id() != DofObject::invalid_processor_id);
 
 	    // Only local elements!
-	    assert (elem->processor_id() == libMesh::processor_id());
+	    libmesh_assert (elem->processor_id() == libMesh::processor_id());
 
 	    pack_element (conn, elem);	    
 	  }
       } // ...that was easy.
 
-    assert (conn.size() == 
+    libmesh_assert (conn.size() == 
       packed_elem_header_size*n_elem[libMesh::processor_id()] + local_weight);
 
     // Get the size of the connectivity array on each processor
@@ -1419,13 +1419,13 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
                 const unsigned int self_ID    = conn[cnt++];
 		// We require contiguous numbering on each processor
 		// for elements.
-		assert (self_ID >= first_global_idx);
-		assert (self_ID  < last_global_idx);
+		libmesh_assert (self_ID >= first_global_idx);
+		libmesh_assert (self_ID  < last_global_idx);
 #ifdef ENABLE_AMR
                 const int parent_ID           = conn[cnt++];
                 const int which_child         = conn[cnt++];
 
-		assert ((elem_level == 0) || (parent_ID != -1));
+		libmesh_assert ((elem_level == 0) || (parent_ID != -1));
   
 		// Ignore elements not matching the current level.
 		if (elem_level > level) // skip elem->n_nodes() entries in the conn array.
@@ -1440,18 +1440,18 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
                     // No need to construct a dummy element of this type
 		    const Elem* elem = mesh.elem(self_ID);
 
-                    assert (elem);
+                    libmesh_assert (elem);
 #ifdef ENABLE_AMR
-		    assert (!elem->parent() ||
+		    libmesh_assert (!elem->parent() ||
                             elem->parent()->id() ==
                             static_cast<unsigned int>(parent_ID));
-		    assert (elem->p_level()           == p_level);
-		    assert (elem->refinement_flag()   == refinement_flag);
-		    assert (elem->p_refinement_flag() == p_refinement_flag);
+		    libmesh_assert (elem->p_level()           == p_level);
+		    libmesh_assert (elem->refinement_flag()   == refinement_flag);
+		    libmesh_assert (elem->p_refinement_flag() == p_refinement_flag);
 #endif
-		    assert (elem->type()              == elem_type);
-		    assert (elem->subdomain_id()      == subdomain_ID);
-		    assert (elem->id()                == self_ID);
+		    libmesh_assert (elem->type()              == elem_type);
+		    libmesh_assert (elem->subdomain_id()      == subdomain_ID);
+		    libmesh_assert (elem->id()                == self_ID);
 
 		    cnt += elem->n_nodes();
 		  }
@@ -1478,17 +1478,17 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 			  }
 		
 			elem = Elem::build(elem_type,my_parent).release();
-		        assert (elem);
+		        libmesh_assert (elem);
 			my_parent->add_child(elem, which_child);
-			assert (my_parent->type() == elem->type());
-                        assert (my_parent->child(which_child) == elem);
+			libmesh_assert (my_parent->type() == elem->type());
+                        libmesh_assert (my_parent->child(which_child) == elem);
 		      }
 		    else
                       {
-                        assert (parent_ID == -1);
+                        libmesh_assert (parent_ID == -1);
 #endif // ENABLE_AMR
 		        elem = Elem::build(elem_type).release();
-		        assert (elem);
+		        libmesh_assert (elem);
 #ifdef ENABLE_AMR
                       }
 		      
@@ -1496,17 +1496,17 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 		    elem->set_p_level(p_level);
 		    elem->set_refinement_flag(refinement_flag);
 		    elem->set_p_refinement_flag(p_refinement_flag);
-		    assert (elem->level() == static_cast<unsigned int>(level));
+		    libmesh_assert (elem->level() == static_cast<unsigned int>(level));
 #endif
 		    elem->subdomain_id() = subdomain_ID;
-		    assert (elem_PID == p);
+		    libmesh_assert (elem_PID == p);
 		    elem->processor_id() = elem_PID;
 		    elem->set_id()       = self_ID;
 	    
 		    // Assign the connectivity
 		    for (unsigned int n=0; n<elem->n_nodes(); n++)
 		      {
-			assert (cnt < conn.size());
+			libmesh_assert (cnt < conn.size());
 			
 			elem->set_node(n) = mesh.node_ptr (conn[cnt++]);
 		      }
@@ -1520,7 +1520,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	  }   
 
     // Check the result
-    assert (global_n_elem == mesh.n_elem());
+    libmesh_assert (global_n_elem == mesh.n_elem());
   }
 
   // All done!
@@ -1554,8 +1554,8 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
     
     boundary_info.build_side_list (el_id, side_id, bc_id);
 
-    assert (el_id.size() == side_id.size());
-    assert (el_id.size() == bc_id.size());
+    libmesh_assert (el_id.size() == side_id.size());
+    libmesh_assert (el_id.size() == bc_id.size());
     
     const unsigned int n_bcs = el_id.size();
 
@@ -1568,10 +1568,10 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
 	const Elem* elem = mesh.elem(el_id[bc]);
 	
 	// sanity: be sure that the element returned by mesh.elem() really has id()==el_id[e]
-	assert(elem != NULL);
-	assert(elem->id() == el_id[bc]);
-	assert(elem->level() == 0);
-	assert(side_id[bc] < elem->n_sides());
+	libmesh_assert(elem != NULL);
+	libmesh_assert(elem->id() == el_id[bc]);
+	libmesh_assert(elem->level() == 0);
+	libmesh_assert(side_id[bc] < elem->n_sides());
 
 	if (elem->processor_id() == libMesh::processor_id())
 	  {
@@ -1591,7 +1591,7 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
     
     boundary_info.build_node_list (node_id, bc_id);
 
-    assert (node_id.size() == bc_id.size());
+    libmesh_assert (node_id.size() == bc_id.size());
 
     const unsigned int n_bcs = node_id.size();
 
@@ -1603,8 +1603,8 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
       {
 	const Node* node = mesh.node_ptr(node_id[bc]);
 	
-	assert(node != NULL);
-	assert(node->id() == node_id[bc]);
+	libmesh_assert(node != NULL);
+	libmesh_assert(node->id() == node_id[bc]);
 
 	if (node->processor_id() == libMesh::processor_id())
 	  {
@@ -1665,7 +1665,7 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
   unsigned int global_n_bc_ids = n_bc_ids;
   
   Parallel::max (global_n_bc_ids);
-  assert (n_bc_ids == global_n_bc_ids);
+  libmesh_assert (n_bc_ids == global_n_bc_ids);
   
 #endif
   
@@ -1679,7 +1679,7 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
 void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
 {
   // The mesh should know it's about to be parallelized
-  assert (!mesh.is_serial());
+  libmesh_assert (!mesh.is_serial());
 
   START_LOG("delete_remote_elements()", "MeshCommunication");
 
@@ -1754,7 +1754,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
       for (; lev_elem_it != lev_end; ++lev_elem_it)
         {
           Elem *elem = *lev_elem_it;
-          assert (elem);
+          libmesh_assert (elem);
           if (!semilocal_elems[elem->id()])
             {
               // Make sure we don't leave any invalid pointers
@@ -1784,7 +1784,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
 // We cannot use unsigned int because parent_ID can be negative
 void MeshCommunication::pack_element (std::vector<int> &conn, const Elem* elem) const
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
 #ifdef ENABLE_AMR
   conn.push_back (static_cast<int>(elem->level()));

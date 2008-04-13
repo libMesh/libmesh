@@ -218,7 +218,7 @@ Real FE<1,HERMITE>::shape(const Elem* elem,
 			  const unsigned int i,
 			  const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   hermite_compute_coefs(elem);
 
@@ -237,7 +237,7 @@ Real FE<1,HERMITE>::shape(const Elem* elem,
 	  case EDGE2:
 	  case EDGE3:
 	    {
-	      assert (i<4);
+	      libmesh_assert (i<4);
 
 	      switch (i)
 		{
@@ -294,7 +294,7 @@ Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
 				const unsigned int,
 				const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   hermite_compute_coefs(elem);
 
@@ -351,7 +351,7 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
                                        const unsigned int,
                                        const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   hermite_compute_coefs(elem);
 

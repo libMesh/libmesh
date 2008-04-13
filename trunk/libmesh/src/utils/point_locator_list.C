@@ -81,7 +81,7 @@ void PointLocatorList::clear ()
 
 void PointLocatorList::init ()
 {
-  assert (this->_list == NULL); 
+  libmesh_assert (this->_list == NULL); 
 
   if (this->_initialized)
     {
@@ -151,7 +151,7 @@ void PointLocatorList::init ()
 
 const Elem* PointLocatorList::operator() (const Point& p) const
 {
-  assert (this->_initialized);
+  libmesh_assert (this->_initialized);
 
   // Ask the list.  This is quite expensive, since
   // we loop through the whole list to try to find
@@ -191,7 +191,7 @@ const Elem* PointLocatorList::operator() (const Point& p) const
       }
 
     // the element should be active
-    assert (last_elem->active());
+    libmesh_assert (last_elem->active());
 
     // return the element
     return (last_elem);

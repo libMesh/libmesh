@@ -62,8 +62,8 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType& fet) :
 
 {
   // Sanity checks
-  assert (T_radial == fe_type.radial_family);
-  assert (T_map    == fe_type.inf_map);
+  libmesh_assert (T_radial == fe_type.radial_family);
+  libmesh_assert (T_map    == fe_type.inf_map);
 
   // build the base_fe object, handle the AutoPtr
   if (Dim != 1)
@@ -113,8 +113,8 @@ InfFE<Dim,T_radial,T_map>::~InfFE ()
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
 {
-  assert (q       != NULL);
-  assert (base_fe != NULL);
+  libmesh_assert (q       != NULL);
+  libmesh_assert (base_fe != NULL);
 
   const Order base_int_order   = q->get_order();
   const Order radial_int_order = static_cast<Order>(2 * (static_cast<unsigned int>(fe_type.radial_order) + 1) +2);
@@ -157,11 +157,11 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
 				       const std::vector<Point>* const pts)
 {
-  assert (base_fe        != NULL);
-  assert (base_fe->qrule != NULL);
-  assert (base_fe->qrule == base_qrule);
-  assert (radial_qrule   != NULL);
-  assert (inf_elem       != NULL);
+  libmesh_assert (base_fe        != NULL);
+  libmesh_assert (base_fe->qrule != NULL);
+  libmesh_assert (base_fe->qrule == base_qrule);
+  libmesh_assert (radial_qrule   != NULL);
+  libmesh_assert (inf_elem       != NULL);
 
   if (pts == NULL)
     {
@@ -283,8 +283,8 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* inf_elem)
 {
-  assert (radial_qrule != NULL);
-  assert (inf_elem     != NULL);
+  libmesh_assert (radial_qrule != NULL);
+  libmesh_assert (inf_elem     != NULL);
 
  
   /**
@@ -379,7 +379,7 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* inf_elem
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 {
-  assert (inf_elem     != NULL);
+  libmesh_assert (inf_elem     != NULL);
  
   
   // Start logging the radial shape function initialization
@@ -461,8 +461,8 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 			      n,
 			      _base_node_index[n], 
 			      _radial_node_index[n]);
-	assert (_base_node_index[n]   < n_base_mapping_shape_functions);
-	assert (_radial_node_index[n] < n_radial_mapping_sf);
+	libmesh_assert (_base_node_index[n]   < n_base_mapping_shape_functions);
+	libmesh_assert (_radial_node_index[n] < n_radial_mapping_sf);
       }
 
     // fill the shape index map
@@ -473,8 +473,8 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 			       n,
 			       _base_shape_index[n], 
 			       _radial_shape_index[n]);
-	assert (_base_shape_index[n]   < n_base_approx_shape_functions);
-	assert (_radial_shape_index[n] < n_radial_approx_sf);
+	libmesh_assert (_base_shape_index[n]   < n_base_approx_shape_functions);
+	libmesh_assert (_radial_shape_index[n] < n_radial_approx_sf);
       }
   }
  
@@ -668,12 +668,12 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     // (b) form a std::vector<Real> which contains the appropriate weights
     //     of the combined quadrature rule!
     const std::vector<Point>&  radial_qp = radial_qrule->get_points();
-    assert (radial_qp.size() == n_radial_qp);
+    libmesh_assert (radial_qp.size() == n_radial_qp);
 
     const std::vector<Real>&   radial_qw = radial_qrule->get_weights();
     const std::vector<Real>&   base_qw   = base_qrule->get_weights();
-    assert (radial_qw.size() == n_radial_qp);
-    assert (base_qw.size()   == n_base_qp);
+    libmesh_assert (radial_qw.size() == n_radial_qp);
+    libmesh_assert (base_qw.size()   == n_base_qp);
 
     for (unsigned int rp=0; rp<n_radial_qp; rp++)
       for (unsigned int bp=0; bp<n_base_qp; bp++)
@@ -700,10 +700,10 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 {
-  assert (inf_elem != NULL);
+  libmesh_assert (inf_elem != NULL);
   // at least check whether the base element type is correct.
   // otherwise this version of computing dist would give problems
-  assert (base_elem->type() == Base::get_elem_type(inf_elem->type()));
+  libmesh_assert (base_elem->type() == Base::get_elem_type(inf_elem->type()));
 
 
   /**
@@ -794,10 +794,10 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 
 
 
-	assert (phi.size()       == n_total_approx_sf);
-	assert (dphidxi.size()   == n_total_approx_sf);
-	assert (dphideta.size()  == n_total_approx_sf);
-	assert (dphidzeta.size() == n_total_approx_sf);
+	libmesh_assert (phi.size()       == n_total_approx_sf);
+	libmesh_assert (dphidxi.size()   == n_total_approx_sf);
+	libmesh_assert (dphideta.size()  == n_total_approx_sf);
+	libmesh_assert (dphidzeta.size() == n_total_approx_sf);
 	
 	// compute the overall approximation shape functions,
 	// pick the appropriate radial and base shapes through using
@@ -817,10 +817,10 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 	      }
 
 	
-	assert (phi_map.size()       == n_total_mapping_sf);
-	assert (dphidxi_map.size()   == n_total_mapping_sf);
-	assert (dphideta_map.size()  == n_total_mapping_sf);
-	assert (dphidzeta_map.size() == n_total_mapping_sf);
+	libmesh_assert (phi_map.size()       == n_total_mapping_sf);
+	libmesh_assert (dphidxi_map.size()   == n_total_mapping_sf);
+	libmesh_assert (dphideta_map.size()  == n_total_mapping_sf);
+	libmesh_assert (dphidzeta_map.size() == n_total_mapping_sf);
 	
 	// compute the overall mapping functions,
 	// pick the appropriate radial and base entries through using
@@ -863,7 +863,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
 {
-  assert (radial_qrule != NULL);
+  libmesh_assert (radial_qrule != NULL);
 
 
   

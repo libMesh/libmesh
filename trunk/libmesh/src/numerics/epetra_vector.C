@@ -32,7 +32,7 @@
 template <typename T>
 T EpetraVector<T>::sum () const
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
   
   const unsigned int nl = _vec->MyLength();
 
@@ -51,7 +51,7 @@ T EpetraVector<T>::sum () const
 template <typename T>
 Real EpetraVector<T>::l1_norm () const
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
 
   Real value;
 
@@ -63,7 +63,7 @@ Real EpetraVector<T>::l1_norm () const
 template <typename T>
 Real EpetraVector<T>::l2_norm () const
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
   
   Real value;
 
@@ -75,7 +75,7 @@ Real EpetraVector<T>::l2_norm () const
 template <typename T>
 Real EpetraVector<T>::linfty_norm () const
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
   
   Real value;
 
@@ -88,7 +88,7 @@ template <typename T>
 NumericVector<T>&
 EpetraVector<T>::operator += (const NumericVector<T>& v)
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
   
   this->add(1., v);
   
@@ -101,7 +101,7 @@ template <typename T>
 NumericVector<T>&
 EpetraVector<T>::operator -= (const NumericVector<T>& v)
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
   
   this->add(-1., v);
   
@@ -113,7 +113,7 @@ EpetraVector<T>::operator -= (const NumericVector<T>& v)
 template <typename T>
 void EpetraVector<T>::set (const unsigned int i, const T value)
 {
-  assert(i<size());
+  libmesh_assert(i<size());
 
   _vec->ReplaceGlobalValues(1,&value,&i);
 
@@ -125,7 +125,7 @@ void EpetraVector<T>::set (const unsigned int i, const T value)
 template <typename T>
 void EpetraVector<T>::add (const unsigned int i, const T value)
 {
-  assert(i<size());
+  libmesh_assert(i<size());
   
   _vec->SumIntoGlobalValues(1,&value,&i);
 
@@ -138,7 +138,7 @@ template <typename T>
 void EpetraVector<T>::add_vector (const std::vector<T>& v,
 				 const std::vector<unsigned int>& dof_indices)
 {
-  assert (v.size() == dof_indices.size());
+  libmesh_assert (v.size() == dof_indices.size());
   
   _vec->SumIntoGlobalValues(v.size(),&v[0],&dof_indices[0]);
 }
@@ -149,7 +149,7 @@ template <typename T>
 void EpetraVector<T>::add_vector (const NumericVector<T>& V,
 				 const std::vector<unsigned int>& dof_indices)
 {
-  assert (V.size() == dof_indices.size());
+  libmesh_assert (V.size() == dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->add (dof_indices[i], V(i));
@@ -166,8 +166,8 @@ void EpetraVector<T>::add_vector (const NumericVector<T>& V_in,
   const EpetraVector<T>* V = dynamic_cast<const EpetraVector<T>*>(&V_in);
   const EpetraMatrix<T>* A = dynamic_cast<const EpetraMatrix<T>*>(&A_in);
 
-  assert (V != NULL);
-  assert (A != NULL);
+  libmesh_assert (V != NULL);
+  libmesh_assert (A != NULL);
   
   int ierr=0;
 
@@ -185,7 +185,7 @@ template <typename T>
 void EpetraVector<T>::add_vector (const DenseVector<T>& V,
 				 const std::vector<unsigned int>& dof_indices)
 {
-  assert (V.size() == dof_indices.size());
+  libmesh_assert (V.size() == dof_indices.size());
 
   this->add_vector(V.get_values[0], dof_indices);
 }
@@ -215,8 +215,8 @@ void EpetraVector<T>::add (const T a_in, const NumericVector<T>& v_in)
 {
   const EpetraVector<T>* v = dynamic_cast<const EpetraVector<T>*>(&v_in);
 
-  assert (v != NULL);
-  assert(this->size() == v->size());
+  libmesh_assert (v != NULL);
+  libmesh_assert(this->size() == v->size());
 
   _vec->Update(a_in,*v,1);
 }
@@ -225,7 +225,7 @@ template <typename T>
 void EpetraVector<T>::insert (const std::vector<T>& v,
 			     const std::vector<unsigned int>& dof_indices)
 {
-  assert (v.size() == dof_indices.size());
+  libmesh_assert (v.size() == dof_indices.size());
 
   _vec->ReplaceGlobalValues(v.size(),&v[0],&dof_indices[0]);
 }
@@ -236,7 +236,7 @@ template <typename T>
 void EpetraVector<T>::insert (const NumericVector<T>& V,
 			     const std::vector<unsigned int>& dof_indices)
 {
-  assert (V.size() == dof_indices.size());
+  libmesh_assert (V.size() == dof_indices.size());
 
   // TODO: If V is an EpetraVector this can be optimized
 
@@ -250,7 +250,7 @@ template <typename T>
 void EpetraVector<T>::insert (const DenseVector<T>& V,
 			     const std::vector<unsigned int>& dof_indices)
 {
-  assert (V.size() == dof_indices.size());
+  libmesh_assert (V.size() == dof_indices.size());
 
   this->insert(V.getValues(),dof_indices);
 }
@@ -270,7 +270,7 @@ T EpetraVector<T>::dot (const NumericVector<T>& V_in) const
 {
   const EpetraVector<T>* V = dynamic_cast<const EpetraVector<T>*>(&V_in);
 
-  assert(V);
+  libmesh_assert(V);
   
   T result=0.0;
 
@@ -297,7 +297,7 @@ EpetraVector<T>::operator = (const NumericVector<T>& v_in)
 {
   const EpetraVector<T>* v = dynamic_cast<const EpetraVector<T>*>(&v_in);
 
-  assert (v != NULL);
+  libmesh_assert (v != NULL);
   
   *this = *v;
   
@@ -342,7 +342,7 @@ EpetraVector<T>::operator = (const std::vector<T>& v)
    */
   else
   {
-    assert(v.size()==this->local_size());
+    libmesh_assert(v.size()==this->local_size());
     
     const unsigned int nl=this->local_size();
     
@@ -360,7 +360,7 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in) const
 {
   EpetraVector<T>* v_local = dynamic_cast<EpetraVector<T>*>(&v_local_in);
 
-  assert(v_local);
+  libmesh_assert(v_local);
 
   Epetra_Map rootMap = Epetra_Util::Create_Root_Map( *_map, libMesh::processor_id() );
   Epetra_Import importer(rootMap, *_map);
@@ -378,9 +378,9 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
 {
   EpetraVector<T>* v_local = dynamic_cast<EpetraVector<T>*>(&v_local_in);
 
-  assert (v_local != NULL);
-  assert (v_local->local_size() == this->size());
-  assert (send_list.size()     <= v_local->size());
+  libmesh_assert (v_local != NULL);
+  libmesh_assert (v_local->local_size() == this->size());
+  libmesh_assert (send_list.size()     <= v_local->size());
   
   int ierr=0;
   const int n_sl = send_list.size();
@@ -446,10 +446,10 @@ void EpetraVector<T>::localize (const unsigned int first_local_idx,
 			       const std::vector<unsigned int>& send_list)
 {
   // Only good for serial vectors.
-  assert (this->size() == this->local_size());
-  assert (last_local_idx > first_local_idx);
-  assert (send_list.size() <= this->size());
-  assert (last_local_idx < this->size());
+  libmesh_assert (this->size() == this->local_size());
+  libmesh_assert (last_local_idx > first_local_idx);
+  libmesh_assert (send_list.size() <= this->size());
+  libmesh_assert (last_local_idx < this->size());
   
   const unsigned int size       = this->size();
   const unsigned int local_size = (last_local_idx - first_local_idx + 1);
@@ -699,8 +699,8 @@ void EpetraVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
 template <typename T>
 void EpetraVector<T>::print_matlab (const std::string name) const
 {
-  assert (this->initialized());
-  assert (this->closed());
+  libmesh_assert (this->initialized());
+  libmesh_assert (this->closed());
   
   int ierr=0; 
   EpetraViewer epetra_viewer;
@@ -765,7 +765,7 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& subvector,
   
   // Make sure the passed int subvector is really a EpetraVector
   EpetraVector<T>* epetra_subvector = dynamic_cast<EpetraVector<T>*>(&subvector);
-  assert(epetra_subvector != NULL);
+  libmesh_assert(epetra_subvector != NULL);
   
   // If the epetra_subvector is already initialized, we assume that the
   // user has already allocated the *correct* amount of space for it.

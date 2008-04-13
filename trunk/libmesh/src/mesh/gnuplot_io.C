@@ -62,7 +62,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
    			       const std::vector<Number>* soln,
 			       const std::vector<std::string>* names)
 {
-  assert(libMesh::processor_id() == 0);
+  libmesh_assert(libMesh::processor_id() == 0);
 
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
@@ -71,10 +71,10 @@ void GnuPlotIO::write_solution(const std::string& fname,
   const std::string data_file_name = data_stream_name.str();
   
   // This class is designed only for use with 1D meshes
-  assert (mesh.mesh_dimension() == 1);
+  libmesh_assert (mesh.mesh_dimension() == 1);
 
   // Make sure we have a solution to plot
-  assert ((names != NULL) && (soln != NULL));
+  libmesh_assert ((names != NULL) && (soln != NULL));
 
   // Create an output stream for script file
   std::ofstream out(fname.c_str());

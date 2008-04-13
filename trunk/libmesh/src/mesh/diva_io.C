@@ -67,7 +67,7 @@ void DivaIO::write_stream (std::ostream& out)
   */
 
   // Be sure the stream has been created successfully.
-  assert (out.good());
+  libmesh_assert (out.good());
   
   // Can't use a constant mesh reference since we have to
   // sync the boundary info.

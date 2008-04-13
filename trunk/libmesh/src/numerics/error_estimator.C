@@ -69,7 +69,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
 {
   // This is a brand-new function; if you're using it you should
   // already have stopped using component_mask
-  assert(component_mask.empty());
+  libmesh_assert(component_mask.empty());
 
   std::vector<float> old_component_scale = this->component_scale;
 
@@ -87,7 +87,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
 
       if (s)
         {
-          assert(error_per_cell.size() == system_error_per_cell.size());
+          libmesh_assert(error_per_cell.size() == system_error_per_cell.size());
           for (unsigned int i=0; i != error_per_cell.size(); ++i)
             error_per_cell[i] += system_error_per_cell[i];
         }
@@ -111,7 +111,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
 {
   // This is a brand-new function; if you're using it you should
   // already have stopped using component_mask
-  assert(component_mask.empty());
+  libmesh_assert(component_mask.empty());
 
   std::vector<float> old_component_scale = this->component_scale;
 

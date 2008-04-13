@@ -405,7 +405,7 @@ public:
    */
   virtual Point point(const unsigned int n) const
   {
-    assert (n < _points.size());
+    libmesh_assert (n < _points.size());
     return _points[n];
   }
 

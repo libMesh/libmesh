@@ -101,7 +101,7 @@ void DifferentiableSystem::init_data ()
   _time_evolving.resize(this->n_vars(), false);
 
   // Do any initialization our solvers need
-  assert (time_solver.get() != NULL);
+  libmesh_assert (time_solver.get() != NULL);
   time_solver->init();
 
   // Next initialize ImplicitSystem data

@@ -93,7 +93,7 @@ void CentroidPartitioner::_do_partition (MeshBase& mesh,
   
   // Make sure the user has not handed us an
   // invalid number of partitions.
-  assert (n > 0);
+  libmesh_assert (n > 0);
 
   // the number of elements, e.g. 1000
   const unsigned int n_elem      = mesh.n_elem();
@@ -102,7 +102,7 @@ void CentroidPartitioner::_do_partition (MeshBase& mesh,
 
   // Make sure the mesh hasn't changed since the
   // last time we computed the centroids.
-  assert (mesh.n_elem() == _elem_centroids.size());
+  libmesh_assert (mesh.n_elem() == _elem_centroids.size());
 
   for (unsigned int i=0; i<n_elem; i++)
     {

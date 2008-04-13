@@ -40,11 +40,11 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 						  const std::vector<TriangleInterface::Hole*>* holes)
 {
   // Check for existing nodes and compatible dimension.
-  assert (mesh.mesh_dimension() == 2);
-  assert (nx >= 1); // need at least 1 element in x-direction
-  assert (ny >= 1); // need at least 1 element in y-direction
-  assert (xmin < xmax);
-  assert (ymin < ymax);
+  libmesh_assert (mesh.mesh_dimension() == 2);
+  libmesh_assert (nx >= 1); // need at least 1 element in x-direction
+  libmesh_assert (ny >= 1); // need at least 1 element in y-direction
+  libmesh_assert (xmin < xmax);
+  libmesh_assert (ymin < ymax);
 
   // Clear out any data which may have been in the Mesh
   mesh.clear();
@@ -70,7 +70,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
     mesh.add_point(Point(xmin,  ymax - p*delta_y)); 
 		   
   // Be sure we added as many points as we thought we did
-  assert (mesh.n_nodes() == 2*(nx+ny));
+  libmesh_assert (mesh.n_nodes() == 2*(nx+ny));
 
   // Construct the Triangle Interface object
   TriangleInterface t(mesh);
@@ -287,7 +287,7 @@ void TriangleInterface::triangulate()
   // Currently, we don't support specifying user-defined segments
   // *and* having holes
   if (have_holes)
-    assert (this->segments.empty());
+    libmesh_assert (this->segments.empty());
   
   // If the initial PSLG is really simple, e.g. an L-shaped domain or
   // a square/rectangle, the resulting triangulation may be very

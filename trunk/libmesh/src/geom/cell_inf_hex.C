@@ -38,7 +38,7 @@
 // InfHex class member functions
 unsigned int InfHex::key (const unsigned int s) const
 {
-  assert (s < this->n_sides());
+  libmesh_assert (s < this->n_sides());
 
   switch (s)
     {
@@ -93,7 +93,7 @@ unsigned int InfHex::key (const unsigned int s) const
 
 AutoPtr<DofObject> InfHex::side (const unsigned int i) const
 {
-  assert (i < this->n_sides());
+  libmesh_assert (i < this->n_sides());
 
   /*
    *Think of a unit cube: (-1,1) x (-1,1)x (-1,1),
@@ -201,8 +201,8 @@ AutoPtr<DofObject> InfHex::side (const unsigned int i) const
 bool InfHex::is_child_on_side(const unsigned int c,
                               const unsigned int s) const
 {
-  assert (c < this->n_children());
-  assert (s < this->n_sides());
+  libmesh_assert (c < this->n_children());
+  libmesh_assert (s < this->n_sides());
 
   return (s == 0 || c+1 == s || c == s%4);
 }
@@ -235,7 +235,7 @@ Real InfHex::quality (const ElemQuality q) const
 	const Real min = std::min(d02, d13);
 	const Real max = std::max(d02, d13);
 
-	assert (max != 0.0);
+	libmesh_assert (max != 0.0);
 	
 	return min / max;
 
@@ -293,7 +293,7 @@ Real InfHex::quality (const ElemQuality q) const
 	const Real d13 = this->length(1,3);
 	const Real max_diag = std::max(d02, d13);
 
-	assert ( max_diag != 0.0 );
+	libmesh_assert ( max_diag != 0.0 );
 
 	/**
 	 * Compute the minimum edge length in the base.

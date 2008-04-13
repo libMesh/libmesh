@@ -278,7 +278,7 @@ template<typename T>
 inline
 T DenseVector<T>::operator () (const unsigned int i) const
 {
-  assert (i < _val.size());
+  libmesh_assert (i < _val.size());
   
   return _val[i]; 
 }
@@ -289,7 +289,7 @@ template<typename T>
 inline
 T & DenseVector<T>::operator () (const unsigned int i)
 {
-  assert (i < _val.size());
+  libmesh_assert (i < _val.size());
   
   return _val[i]; 
 }
@@ -324,7 +324,7 @@ typename boostcopy::enable_if_c<
 DenseVector<T>::add (const T2 factor,
 		     const DenseVector<T3>& vec)
 {
-  assert (this->size() == vec.size());
+  libmesh_assert (this->size() == vec.size());
 
   for (unsigned int i=0; i<this->size(); i++)
     (*this)(i) += factor*vec(i);
@@ -337,7 +337,7 @@ template<typename T2>
 inline
 DenseVector<T>& DenseVector<T>::operator+= (const DenseVector<T2>& vec)
 {
-  assert (this->size() == vec.size());
+  libmesh_assert (this->size() == vec.size());
 
   for (unsigned int i=0; i<this->size(); i++)
     (*this)(i) += vec(i);
@@ -351,7 +351,7 @@ template<typename T>
 inline
 Real DenseVector<T>::min () const
 {
-  assert (this->size());
+  libmesh_assert (this->size());
   Real my_min = libmesh_real((*this)(0));
 
   for (unsigned int i=1; i!=this->size(); i++)
@@ -368,7 +368,7 @@ template<typename T>
 inline
 Real DenseVector<T>::max () const
 {
-  assert (this->size());
+  libmesh_assert (this->size());
   Real my_max = libmesh_real((*this)(0));
 
   for (unsigned int i=1; i!=this->size(); i++)

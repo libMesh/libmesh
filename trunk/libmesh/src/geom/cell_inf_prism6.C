@@ -81,7 +81,7 @@ bool InfPrism6::is_face(const unsigned int) const
 bool InfPrism6::is_node_on_side(const unsigned int n,
 				const unsigned int s) const
 {
-  assert(s < n_sides());
+  libmesh_assert(s < n_sides());
   for (unsigned int i = 0; i != 4; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -91,7 +91,7 @@ bool InfPrism6::is_node_on_side(const unsigned int n,
 bool InfPrism6::is_node_on_edge(const unsigned int n,
 				const unsigned int e) const
 {
-  assert(e < n_edges());
+  libmesh_assert(e < n_edges());
   for (unsigned int i = 0; i != 2; ++i)
     if (edge_nodes_map[e][i] == n)
       return true;
@@ -102,7 +102,7 @@ bool InfPrism6::is_node_on_edge(const unsigned int n,
 AutoPtr<Elem> InfPrism6::build_side (const unsigned int i,
 				     bool proxy) const
 {
-  assert (i < this->n_sides());
+  libmesh_assert (i < this->n_sides());
 
   if (proxy)
     {
@@ -142,7 +142,7 @@ AutoPtr<Elem> InfPrism6::build_side (const unsigned int i,
 
 AutoPtr<Elem> InfPrism6::build_edge (const unsigned int i) const
 {
-  assert(i < n_edges());
+  libmesh_assert(i < n_edges());
 
   if (i < 3)
     return AutoPtr<Elem>(new SideEdge<Edge2,InfPrism6>(this,i));
@@ -217,9 +217,9 @@ void InfPrism6::connectivity(const unsigned int sc,
 			     const IOPackage iop,
 			     std::vector<unsigned int>& conn) const
 {
-  assert (_nodes != NULL);
-  assert (sc < this->n_sub_elem());
-  assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert (_nodes != NULL);
+  libmesh_assert (sc < this->n_sub_elem());
+  libmesh_assert (iop != INVALID_IO_PACKAGE);
 
   switch (iop)
     {

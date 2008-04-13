@@ -152,7 +152,7 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
       
     default:
       {
-	assert (order>6);
+	libmesh_assert (order>6);
 
 	// Use this for arbitrary orders.
 	// Note that this implementation is less efficient.
@@ -198,7 +198,7 @@ Real FE<1,BERNSTEIN>::shape(const Elem* elem,
 			    const unsigned int i,
 			    const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   return FE<1,BERNSTEIN>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
 }
@@ -214,7 +214,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
 {
   // only d()/dxi in 1D!
   
-  assert (j == 0);
+  libmesh_assert (j == 0);
   
   const Real xi = p(0);
   
@@ -333,7 +333,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
       
     default:
       {
-	assert (order>6);
+	libmesh_assert (order>6);
 
 	// Use this for arbitrary orders
 	const int p_order = static_cast<unsigned int>(order);
@@ -382,7 +382,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const Elem* elem,
 				  const unsigned int j,
 				  const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   return FE<1,BERNSTEIN>::shape_deriv(elem->type(),
 				      static_cast<Order>(order + elem->p_level()), i, j, p);

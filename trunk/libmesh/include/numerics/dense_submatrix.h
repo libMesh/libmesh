@@ -208,8 +208,8 @@ void DenseSubMatrix<T>::reposition(const unsigned int ioff,
   this->_n = n;
 
   // Make sure we still fit in the parent matrix.
-  assert ((this->i_off() + this->m()) <= _parent_matrix.m());
-  assert ((this->j_off() + this->n()) <= _parent_matrix.n());
+  libmesh_assert ((this->i_off() + this->m()) <= _parent_matrix.m());
+  libmesh_assert ((this->j_off() + this->n()) <= _parent_matrix.n());
 }
 
 
@@ -231,10 +231,10 @@ inline
 T DenseSubMatrix<T>::operator () (const unsigned int i,
 				  const unsigned int j) const
 {
-  assert (i < this->m());
-  assert (j < this->n());
-  assert (i + this->i_off() < _parent_matrix.m());
-  assert (j + this->j_off() < _parent_matrix.n());
+  libmesh_assert (i < this->m());
+  libmesh_assert (j < this->n());
+  libmesh_assert (i + this->i_off() < _parent_matrix.m());
+  libmesh_assert (j + this->j_off() < _parent_matrix.n());
   
   return _parent_matrix (i + this->i_off(),
 			 j + this->j_off());
@@ -246,10 +246,10 @@ inline
 T & DenseSubMatrix<T>::operator () (const unsigned int i,
 				    const unsigned int j)
 {
-  assert (i < this->m());
-  assert (j < this->n());
-  assert (i + this->i_off() < _parent_matrix.m());
-  assert (j + this->j_off() < _parent_matrix.n());
+  libmesh_assert (i < this->m());
+  libmesh_assert (j < this->n());
+  libmesh_assert (i + this->i_off() < _parent_matrix.m());
+  libmesh_assert (j + this->j_off() < _parent_matrix.n());
   
   return _parent_matrix (i + this->i_off(),
 			 j + this->j_off());

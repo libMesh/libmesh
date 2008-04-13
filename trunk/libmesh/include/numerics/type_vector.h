@@ -344,7 +344,7 @@ template <typename T>
 inline
 T TypeVector<T>::operator () (const unsigned int i) const
 {
-  assert (i<3);
+  libmesh_assert (i<3);
 
 #if DIM < 3
   
@@ -375,7 +375,7 @@ T & TypeVector<T>::operator () (const unsigned int i)
   
 #endif
   
-  assert (i<DIM);
+  libmesh_assert (i<DIM);
   
   return _coords[i];
 }
@@ -626,7 +626,7 @@ typename boostcopy::enable_if_c<
   TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
 TypeVector<T>::operator / (const Scalar factor) const
 {
-  assert (factor != static_cast<T>(0.));
+  libmesh_assert (factor != static_cast<T>(0.));
 
   typedef typename CompareTypes<T, Scalar>::supertype TS;
   
@@ -655,7 +655,7 @@ inline
 const TypeVector<T> &
 TypeVector<T>::operator /= (const T factor)
 {
-  assert (factor != static_cast<T>(0.));
+  libmesh_assert (factor != static_cast<T>(0.));
   
   for (unsigned int i=0; i<DIM; i++)
     _coords[i] /= factor;
@@ -696,7 +696,7 @@ TypeVector<typename CompareTypes<T, T2>::supertype>
 TypeVector<T>::cross(const TypeVector<T2>& p) const
 {
   typedef typename CompareTypes<T, T2>::supertype TS;
-  assert (DIM == 3);
+  libmesh_assert (DIM == 3);
 
   // |     i          j          k    |
   // |(*this)(0) (*this)(1) (*this)(2)|

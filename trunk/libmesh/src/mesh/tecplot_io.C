@@ -136,7 +136,7 @@ void TecplotIO::write_ascii (const std::string& fname,
 			     const std::vector<std::string>* solution_names)
 {
   // Should only do this on processor 0!
-  assert (libMesh::processor_id() == 0);
+  libmesh_assert (libMesh::processor_id() == 0);
   
   // Create an output stream
   std::ofstream out(fname.c_str());
@@ -394,7 +394,7 @@ void TecplotIO::write_binary (const std::string& fname,
 		   &tec_debug,
 		   &is_double);
     
-    assert (ierr == 0);
+    libmesh_assert (ierr == 0);
     
     ierr = TECZNE (NULL,
 		   &num_nodes,
@@ -403,7 +403,7 @@ void TecplotIO::write_binary (const std::string& fname,
 		   (char*) "FEBLOCK",
 		   NULL);
     
-    assert (ierr == 0);
+    libmesh_assert (ierr == 0);
 
     
     int total =
@@ -418,15 +418,15 @@ void TecplotIO::write_binary (const std::string& fname,
 		   &tm.nodalData[0],
 		   &is_double);
     
-    assert (ierr == 0);
+    libmesh_assert (ierr == 0);
     
     ierr = TECNOD (&tm.connData[0]);
     
-    assert (ierr == 0);
+    libmesh_assert (ierr == 0);
     
     ierr = TECEND ();
     
-    assert (ierr == 0);
+    libmesh_assert (ierr == 0);
   }
       
 #endif

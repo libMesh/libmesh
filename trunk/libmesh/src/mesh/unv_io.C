@@ -239,7 +239,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
   {
     // Read the datasets in the order that
     // we already know
-    assert (order_of_datasets.size()==2);
+    libmesh_assert (order_of_datasets.size()==2);
 
     for (unsigned int ds=0; ds < order_of_datasets.size(); ds++)
       {
@@ -565,7 +565,7 @@ void UNVIO::node_in (std::istream& in_file)
 
       for(unsigned int i=0; i<this->_n_nodes; i++)
         {
-	  assert (!in_file.eof());
+	  libmesh_assert (!in_file.eof());
 
 	  in_file >> node_lab                // read the node label
 		  >> exp_coord_sys_num       // (not supported yet)
@@ -596,7 +596,7 @@ void UNVIO::node_in (std::istream& in_file)
       // just plain import.
       for (unsigned int i=0;i<this->_n_nodes;i++)
         {
-	  assert (!in_file.eof());
+	  libmesh_assert (!in_file.eof());
 
 	  in_file >> node_lab                // read the node label
 		  >> exp_coord_sys_num       // (not supported yet)
@@ -901,9 +901,9 @@ void UNVIO::element_in (std::istream& in_file)
 				   it_end,
 				   node_labels[j]);
 
-	  // it better be there, so assert that it was found.
-	  assert (it.first  != it.second);
-	  assert (*(it.first) == node_labels[j]);
+	  // it better be there, so libmesh_assert that it was found.
+	  libmesh_assert (it.first  != it.second);
+	  libmesh_assert (*(it.first) == node_labels[j]);
 
 	  // Now, the distance between this UNV id and the beginning of
 	  // the _assign_nodes vector will give us a unique id in the
@@ -913,7 +913,7 @@ void UNVIO::element_in (std::istream& in_file)
 							    it.first);
 
 	  // Make sure we didn't get an out-of-bounds id
-	  assert (assigned_node < this->_n_nodes);
+	  libmesh_assert (assigned_node < this->_n_nodes);
 	  
 	  elem->set_node(assign_elem_nodes[j]) =
 	    mesh.node_ptr(assigned_node);
@@ -935,7 +935,7 @@ void UNVIO::element_in (std::istream& in_file)
 void UNVIO::node_out (std::ostream& out_file)
 {
   
-  assert (this->_mesh_data.active() ||
+  libmesh_assert (this->_mesh_data.active() ||
 	  this->_mesh_data.compatibility_mode());
 
 
@@ -1000,7 +1000,7 @@ void UNVIO::node_out (std::ostream& out_file)
 
 void UNVIO::element_out(std::ostream& out_file)
 {
-  assert (this->_mesh_data.active() ||
+  libmesh_assert (this->_mesh_data.active() ||
 	  this->_mesh_data.compatibility_mode());
 
   if (this->verbose())

@@ -96,7 +96,7 @@ Node* MeshRefinement::add_point (const Point& p,
       ++pos.first;
     
   // If we get here pos.first == pos.second.
-  assert (pos.first == pos.second); // still not found
+  libmesh_assert (pos.first == pos.second); // still not found
                                     // so we better add it
 
   // Add the node, with a default id and the requested
@@ -104,7 +104,7 @@ Node* MeshRefinement::add_point (const Point& p,
   Node* node = _mesh.add_point (p, DofObject::invalid_id,
                                 processor_id);
 
-  assert (node != NULL);
+  libmesh_assert (node != NULL);
 
   // Add the node to the map.  In the case of the
   // std::multimap use pos.first as a hint for where to put it
@@ -123,7 +123,7 @@ Node* MeshRefinement::add_point (const Point& p,
 
 Elem* MeshRefinement::add_elem (Elem* elem)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   
 //   // If the unused_elements has any iterators from
@@ -164,10 +164,10 @@ void MeshRefinement::create_parent_error_vector
 #ifdef DEBUG
   for (unsigned int i=0; i != error_per_cell.size(); ++i)
     {
-      assert(error_per_cell[i] >= 0);
+      libmesh_assert(error_per_cell[i] >= 0);
   // isnan() isn't standard C++ yet
   #ifdef isnan
-      assert(!isnan(error_per_cell[i]));
+      libmesh_assert(!isnan(error_per_cell[i]));
   #endif
     }
 #endif // #ifdef DEBUG
@@ -195,7 +195,7 @@ void MeshRefinement::create_parent_error_vector
           if (parent)
             {
               const unsigned int parentid  = parent->id();
-              assert (parentid < error_per_parent.size());
+              libmesh_assert (parentid < error_per_parent.size());
               error_per_parent[parentid] = -1.0;
             }
         }
@@ -229,7 +229,7 @@ void MeshRefinement::create_parent_error_vector
       if (parent)
         {
           const unsigned int parentid  = parent->id();
-          assert (parentid < error_per_parent.size());
+          libmesh_assert (parentid < error_per_parent.size());
 
 	  // If the parent has grandchildren we won't be able to
 	  // coarsen it, so forget it.  Otherwise, add this child's
@@ -345,7 +345,7 @@ void MeshRefinement::update_nodes_map ()
 
 
 
-bool MeshRefinement::test_level_one (bool assert_pass)
+bool MeshRefinement::test_level_one (bool libmesh_assert_pass)
 {
   // This function must be run on all processors at once
   parallel_only();
@@ -383,9 +383,9 @@ bool MeshRefinement::test_level_one (bool assert_pass)
 
   if (failure)
     {
-      // We didn't pass the level one test, so assert that 
+      // We didn't pass the level one test, so libmesh_assert that 
       // we're allowed not to
-      assert(!assert_pass);
+      libmesh_assert(!libmesh_assert_pass);
       return false;
     }
   return true;
@@ -393,7 +393,7 @@ bool MeshRefinement::test_level_one (bool assert_pass)
 
 
 
-bool MeshRefinement::test_unflagged (bool assert_pass)
+bool MeshRefinement::test_unflagged (bool libmesh_assert_pass)
 {
   // This function must be run on all processors at once
   parallel_only();
@@ -425,8 +425,8 @@ bool MeshRefinement::test_unflagged (bool assert_pass)
   if (found_flag)
     {
       // We didn't pass the "elements are unflagged" test,
-      // so assert that we're allowed not to
-      assert(!assert_pass);
+      // so libmesh_assert that we're allowed not to
+      libmesh_assert(!libmesh_assert_pass);
       return false;
     }
   return true;
@@ -452,7 +452,7 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 
   // We can't yet turn a non-level-one mesh into a level-one mesh
   if (_maintain_level_one)
-    assert(test_level_one(true));
+    libmesh_assert(test_level_one(true));
 
   // Possibly clean up the refinement flags from
   // a previous step
@@ -515,8 +515,8 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
                min_satisfied = satisfied;
           Parallel::max(max_satisfied);
           Parallel::min(min_satisfied);
-          assert (satisfied == max_satisfied);
-          assert (satisfied == min_satisfied);
+          libmesh_assert (satisfied == max_satisfied);
+          libmesh_assert (satisfied == min_satisfied);
 #endif
         }
       while (!satisfied);
@@ -528,12 +528,12 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
     this->_coarsen_elements ();
 
   if (_maintain_level_one)
-    assert(test_level_one(true));
-  assert(this->make_coarsening_compatible(maintain_level_one));
-  assert(this->make_refinement_compatible(maintain_level_one));
+    libmesh_assert(test_level_one(true));
+  libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
+  libmesh_assert(this->make_refinement_compatible(maintain_level_one));
 // FIXME: This won't pass unless we add a redundant find_neighbors()
 // call or replace find_neighbors() with on-the-fly neighbor updating
-// assert(!this->eliminate_unrefined_patches());
+// libmesh_assert(!this->eliminate_unrefined_patches());
 
   // We can't contract the mesh ourselves anymore - a System might
   // need to restrict old coefficient vectors first
@@ -545,13 +545,13 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
     this->_refine_elements();
 
   if (_maintain_level_one)
-    assert(test_level_one(true));
-  assert(test_unflagged(true));
-  assert(this->make_coarsening_compatible(maintain_level_one));
-  assert(this->make_refinement_compatible(maintain_level_one));
+    libmesh_assert(test_level_one(true));
+  libmesh_assert(test_unflagged(true));
+  libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
+  libmesh_assert(this->make_refinement_compatible(maintain_level_one));
 // FIXME: This won't pass unless we add a redundant find_neighbors()
 // call or replace find_neighbors() with on-the-fly neighbor updating
-// assert(!this->eliminate_unrefined_patches());
+// libmesh_assert(!this->eliminate_unrefined_patches());
 
   // Finally, the new mesh needs to be prepared for use
   if (coarsening_changed_mesh || refining_changed_mesh)
@@ -592,7 +592,7 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 
   // We can't yet turn a non-level-one mesh into a level-one mesh
   if (_maintain_level_one)
-    assert(test_level_one(true));
+    libmesh_assert(test_level_one(true));
 
   // Possibly clean up the refinement flags from
   // a previous step
@@ -651,8 +651,8 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
                min_satisfied = satisfied;
           Parallel::max(max_satisfied);
           Parallel::min(min_satisfied);
-          assert (satisfied == max_satisfied);
-          assert (satisfied == min_satisfied);
+          libmesh_assert (satisfied == max_satisfied);
+          libmesh_assert (satisfied == min_satisfied);
 #endif
         }
       while (!satisfied);
@@ -664,11 +664,11 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
     this->_coarsen_elements ();
 
   if (_maintain_level_one)
-    assert(test_level_one(true));
-  assert(this->make_coarsening_compatible(maintain_level_one));
+    libmesh_assert(test_level_one(true));
+  libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
 // FIXME: This won't pass unless we add a redundant find_neighbors()
 // call or replace find_neighbors() with on-the-fly neighbor updating
-// assert(!this->eliminate_unrefined_patches());
+// libmesh_assert(!this->eliminate_unrefined_patches());
     
   // We can't contract the mesh ourselves anymore - a System might
   // need to restrict old coefficient vectors first
@@ -704,7 +704,7 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
     _maintain_level_one = _face_level_mismatch_limit;
 
   if (_maintain_level_one)
-    assert(test_level_one(true));
+    libmesh_assert(test_level_one(true));
 
   // Possibly clean up the refinement flags from
   // a previous step
@@ -765,8 +765,8 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
                min_satisfied = satisfied;
           Parallel::max(max_satisfied);
           Parallel::min(min_satisfied);
-          assert (satisfied == max_satisfied);
-          assert (satisfied == min_satisfied);
+          libmesh_assert (satisfied == max_satisfied);
+          libmesh_assert (satisfied == min_satisfied);
 #endif
         }
       while (!satisfied);
@@ -779,11 +779,11 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
     this->_refine_elements();
 
   if (_maintain_level_one)
-    assert(test_level_one(true));
-  assert(this->make_refinement_compatible(maintain_level_one));
+    libmesh_assert(test_level_one(true));
+  libmesh_assert(this->make_refinement_compatible(maintain_level_one));
 // FIXME: This won't pass unless we add a redundant find_neighbors()
 // call or replace find_neighbors() with on-the-fly neighbor updating
-// assert(!this->eliminate_unrefined_patches());
+// libmesh_assert(!this->eliminate_unrefined_patches());
     
   // Finally, the new mesh needs to be prepared for use
   if (mesh_changed)
@@ -817,11 +817,11 @@ bool MeshRefinement::make_flags_parallel_consistent()
        it != end; ++it)
     {
       Elem *elem = *it;
-      assert (elem);
+      libmesh_assert (elem);
       unsigned int elem_procid = elem->processor_id();
 
       // Assume we're partitioned before we try any AMR
-      assert(elem_procid != DofObject::invalid_processor_id);
+      libmesh_assert(elem_procid != DofObject::invalid_processor_id);
 
       ghost_elems_from_proc[elem_procid]++;
     }
@@ -881,8 +881,8 @@ bool MeshRefinement::make_flags_parallel_consistent()
                              procdown, foreign_rflags);
       Parallel::send_receive(procup, current_pflags[procup],
                              procdown, foreign_pflags);
-      assert (request_to_fill.size() == foreign_rflags.size());
-      assert (request_to_fill.size() == foreign_pflags.size());
+      libmesh_assert (request_to_fill.size() == foreign_rflags.size());
+      libmesh_assert (request_to_fill.size() == foreign_pflags.size());
 #endif
 
       // Fill those requests.
@@ -901,29 +901,29 @@ bool MeshRefinement::make_flags_parallel_consistent()
             static_cast<Elem::RefinementState>(foreign_pflags[i]);
 
           // Make sure all our flags are for new operations
-          assert (frflag != Elem::JUST_REFINED);
-          assert (frflag != Elem::JUST_COARSENED);
-          assert (rflags[i] != Elem::JUST_REFINED);
-          assert (rflags[i] != Elem::JUST_COARSENED);
-          assert (fpflag != Elem::JUST_REFINED);
-          assert (fpflag != Elem::JUST_COARSENED);
-          assert (pflags[i] != Elem::JUST_REFINED);
-          assert (pflags[i] != Elem::JUST_COARSENED);
+          libmesh_assert (frflag != Elem::JUST_REFINED);
+          libmesh_assert (frflag != Elem::JUST_COARSENED);
+          libmesh_assert (rflags[i] != Elem::JUST_REFINED);
+          libmesh_assert (rflags[i] != Elem::JUST_COARSENED);
+          libmesh_assert (fpflag != Elem::JUST_REFINED);
+          libmesh_assert (fpflag != Elem::JUST_COARSENED);
+          libmesh_assert (pflags[i] != Elem::JUST_REFINED);
+          libmesh_assert (pflags[i] != Elem::JUST_COARSENED);
 
           // Make sure none of the foreign flags are more
           // conservative than our own
-          assert (!(rflags[i] != Elem::REFINE &&
+          libmesh_assert (!(rflags[i] != Elem::REFINE &&
                     frflag == Elem::REFINE));
-          assert (!(pflags[i] != Elem::REFINE &&
+          libmesh_assert (!(pflags[i] != Elem::REFINE &&
                     fpflag == Elem::REFINE));
 /*
-          assert (!(rflags[i] == Elem::COARSEN &&
+          libmesh_assert (!(rflags[i] == Elem::COARSEN &&
                     frflag != Elem::COARSEN));
-          assert (!(pflags[i] == Elem::COARSEN &&
+          libmesh_assert (!(pflags[i] == Elem::COARSEN &&
                     fpflag != Elem::COARSEN));
-          assert (!(rflags[i] == Elem::COARSEN_INACTIVE &&
+          libmesh_assert (!(rflags[i] == Elem::COARSEN_INACTIVE &&
                     frflag != Elem::COARSEN_INACTIVE));
-          assert (!(pflags[i] == Elem::COARSEN_INACTIVE &&
+          libmesh_assert (!(pflags[i] == Elem::COARSEN_INACTIVE &&
                     fpflag != Elem::COARSEN_INACTIVE));
 */
 #endif
@@ -935,8 +935,8 @@ bool MeshRefinement::make_flags_parallel_consistent()
                              procup, ghost_rflags);
       Parallel::send_receive(procdown, pflags,
                              procup, ghost_pflags);
-      assert (ghost_rflags.size() == requested_ids[procup].size());
-      assert (ghost_pflags.size() == requested_ids[procup].size());
+      libmesh_assert (ghost_rflags.size() == requested_ids[procup].size());
+      libmesh_assert (ghost_pflags.size() == requested_ids[procup].size());
 
       // And see if we need to change any flags
       for (unsigned int i=0; i != requested_ids[procup].size(); ++i)
@@ -1128,7 +1128,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                            // grandchildren
 			  const Elem* neighbor = elem->neighbor(n);
 
-                           assert(neighbor->has_children());
+                           libmesh_assert(neighbor->has_children());
 	                   for (unsigned int c=0; c!=neighbor->n_children(); c++)
                              {
                                Elem *subneighbor = neighbor->child(c);
@@ -1433,7 +1433,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 		        } 
 		      else // I have an inactive neighbor
 		        {
-                           assert(neighbor->has_children());
+                           libmesh_assert(neighbor->has_children());
 	                   for (unsigned int c=0; c!=neighbor->n_children(); c++)
                              {
                                Elem *subneighbor = neighbor->child(c);
@@ -1446,7 +1446,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 			           {
                                      // We should already be level one
                                      // compatible
-                                     assert(subneighbor->p_level() + 2u > 
+                                     libmesh_assert(subneighbor->p_level() + 2u > 
                                             my_p_level);
 			             subneighbor->set_p_refinement_flag(Elem::REFINE);
 			             level_one_satisfied = false;
@@ -1506,7 +1506,7 @@ bool MeshRefinement::_coarsen_elements ()
       Elem* elem = *it;
 
       // Not necessary when using elem_iterator
-      // assert (elem != NULL);
+      // libmesh_assert (elem != NULL);
       
       // active elements flagged for coarsening will
       // no longer be deleted until MeshRefinement::contract()
@@ -1514,7 +1514,7 @@ bool MeshRefinement::_coarsen_elements ()
 	{
 	  // Huh?  no level-0 element should be active
 	  // and flagged for coarsening.
-	  assert (elem->level() != 0);
+	  libmesh_assert (elem->level() != 0);
 	  
 	  // Remove this element from any neighbor
 	  // lists that point to it.
@@ -1542,7 +1542,7 @@ bool MeshRefinement::_coarsen_elements ()
       else if (elem->refinement_flag() == Elem::COARSEN_INACTIVE)
 	{
 	  elem->coarsen();
-	  assert (elem->active());
+	  libmesh_assert (elem->active());
 
 	  // the mesh has certainly changed
 	  mesh_changed = true;
@@ -1637,7 +1637,7 @@ bool MeshRefinement::_refine_elements ()
 #ifdef DEBUG
       unsigned int next_proc_id =
         local_copy_of_elements[e]->processor_id();
-      assert (_mesh.is_serial() || next_proc_id >= proc_id);
+      libmesh_assert (_mesh.is_serial() || next_proc_id >= proc_id);
       proc_id = next_proc_id;
 #endif
       local_copy_of_elements[e]->refine(*this);
@@ -1686,9 +1686,9 @@ void MeshRefinement::make_nodes_parallel_consistent()
        it != end; ++it)
     {
       Node *node = *it;
-      assert (node);
+      libmesh_assert (node);
       unsigned int node_procid = node->processor_id();
-      assert (node_procid != DofObject::invalid_processor_id);
+      libmesh_assert (node_procid != DofObject::invalid_processor_id);
 
       ghost_objects_from_proc[node_procid]++;
     }
@@ -1750,8 +1750,8 @@ void MeshRefinement::make_nodes_parallel_consistent()
                              procdown, request_to_fill_y);
       Parallel::send_receive(procup, requested_nodes_z[procup],
                              procdown, request_to_fill_z);
-      assert (request_to_fill_x.size() == request_to_fill_y.size());
-      assert (request_to_fill_x.size() == request_to_fill_z.size());
+      libmesh_assert (request_to_fill_x.size() == request_to_fill_y.size());
+      libmesh_assert (request_to_fill_x.size() == request_to_fill_z.size());
 
       // Find the processor id (and if it's local, the id)
       // of each requested node
@@ -1769,7 +1769,7 @@ void MeshRefinement::make_nodes_parallel_consistent()
             pos = _new_nodes_map.equal_range(key);
 
           // We'd better find every node we're asked for
-          assert (pos.first != pos.second);
+          libmesh_assert (pos.first != pos.second);
 
           Node *node = NULL;
           // FIXME - what tolerance should we use?
@@ -1782,12 +1782,12 @@ void MeshRefinement::make_nodes_parallel_consistent()
             else
               {
                 // Make sure this map conflict isn't a key bug
-                assert (this->point_key(*(pos.first->second)) == 
+                libmesh_assert (this->point_key(*(pos.first->second)) == 
                         this->point_key(p));
               }
 
           // We'd better have found every node we're asked for
-          assert (node);
+          libmesh_assert (node);
 
           // Return the node's correct processor id,
           // and our (correct if it's local) id for it.
@@ -1801,8 +1801,8 @@ void MeshRefinement::make_nodes_parallel_consistent()
                              procup, filled_node_proc_ids);
       Parallel::send_receive(procdown, node_ids,
                              procup, filled_node_ids);
-      assert (requested_nodes_x[procup].size() == filled_node_proc_ids.size());
-      assert (requested_nodes_x[procup].size() == filled_node_ids.size());
+      libmesh_assert (requested_nodes_x[procup].size() == filled_node_proc_ids.size());
+      libmesh_assert (requested_nodes_x[procup].size() == filled_node_ids.size());
 
       // Set the ghost node processor ids and ids we've now been
       // informed of, and build request sets for ids we need to
@@ -1813,7 +1813,7 @@ void MeshRefinement::make_nodes_parallel_consistent()
           const unsigned int new_procid = filled_node_proc_ids[i];
 
           // Set ids of and move nodes where we asked their local processor
-          assert (node->processor_id() == procup);
+          libmesh_assert (node->processor_id() == procup);
           if (procup == new_procid)
             {
               const unsigned int old_id = requested_nodes_id[procup][i],
@@ -1865,8 +1865,8 @@ void MeshRefinement::make_nodes_parallel_consistent()
                              procdown, rerequest_to_fill_y);
       Parallel::send_receive(procup, rerequested_nodes_z[procup],
                              procdown, rerequest_to_fill_z);
-      assert (rerequest_to_fill_x.size() == rerequest_to_fill_y.size());
-      assert (rerequest_to_fill_x.size() == rerequest_to_fill_z.size());
+      libmesh_assert (rerequest_to_fill_x.size() == rerequest_to_fill_y.size());
+      libmesh_assert (rerequest_to_fill_x.size() == rerequest_to_fill_z.size());
 
       // Find the id of each rerequested node
       std::vector<unsigned int> node_ids(rerequest_to_fill_x.size());
@@ -1882,7 +1882,7 @@ void MeshRefinement::make_nodes_parallel_consistent()
             pos = _new_nodes_map.equal_range(key);
 
           // We'd better find every node we're asked for
-          assert (pos.first != pos.second);
+          libmesh_assert (pos.first != pos.second);
 
           Node *node = NULL;
           // FIXME - what tolerance should we use?
@@ -1894,7 +1894,7 @@ void MeshRefinement::make_nodes_parallel_consistent()
               }
 
           // We'd better have found every node we're asked for
-          assert (node);
+          libmesh_assert (node);
 
           // Return the node's correct id
           node_ids[i] = node->id();
@@ -1904,7 +1904,7 @@ void MeshRefinement::make_nodes_parallel_consistent()
       std::vector<unsigned int> filled_node_ids;
       Parallel::send_receive(procdown, node_ids,
                              procup, filled_node_ids);
-      assert (rerequested_nodes_x[procup].size() == filled_node_ids.size());
+      libmesh_assert (rerequested_nodes_x[procup].size() == filled_node_ids.size());
 
       // Set the ghost node ids we've now been informed of
       for (unsigned int i=0; i != filled_node_ids.size(); ++i)
@@ -1944,7 +1944,7 @@ void MeshRefinement::make_elems_parallel_consistent()
           elem_procid == libMesh::processor_id())
         continue;
 
-      assert (elem_procid != DofObject::invalid_processor_id);
+      libmesh_assert (elem_procid != DofObject::invalid_processor_id);
 
       ghost_objects_from_proc[elem_procid]++;
     }
@@ -1983,8 +1983,8 @@ void MeshRefinement::make_elems_parallel_consistent()
   for (unsigned int p=0; p != libMesh::n_processors(); ++p)
     if (p != libMesh::processor_id())
       {
-        assert(requested_parent_ids[p].size() == ghost_objects_from_proc[p]);
-        assert(requested_child_nums[p].size() == ghost_objects_from_proc[p]);
+        libmesh_assert(requested_parent_ids[p].size() == ghost_objects_from_proc[p]);
+        libmesh_assert(requested_child_nums[p].size() == ghost_objects_from_proc[p]);
       }
 #endif
 
@@ -2003,7 +2003,7 @@ void MeshRefinement::make_elems_parallel_consistent()
                              procdown, request_to_fill_parent_ids);
       Parallel::send_receive(procup, requested_child_nums[procup],
                              procdown, request_to_fill_child_nums);
-      assert (request_to_fill_parent_ids.size() ==
+      libmesh_assert (request_to_fill_parent_ids.size() ==
               request_to_fill_child_nums.size());
 
       // Find the id of each requested element
@@ -2011,11 +2011,11 @@ void MeshRefinement::make_elems_parallel_consistent()
       for (unsigned int i=0; i != request_to_fill_parent_ids.size(); ++i)
         {
           Elem *parent = _mesh.elem(request_to_fill_parent_ids[i]);
-          assert (parent);
-          assert (parent->has_children());
+          libmesh_assert (parent);
+          libmesh_assert (parent->has_children());
           Elem *child = parent->child(request_to_fill_child_nums[i]);
-          assert (child);
-          assert (child->active());
+          libmesh_assert (child);
+          libmesh_assert (child->active());
 
           // Return the child element's correct id
           elem_ids[i] = child->id();
@@ -2025,17 +2025,17 @@ void MeshRefinement::make_elems_parallel_consistent()
       std::vector<unsigned int> filled_elem_ids;
       Parallel::send_receive(procdown, elem_ids,
                              procup, filled_elem_ids);
-      assert (requested_parent_ids[procup].size() == filled_elem_ids.size());
+      libmesh_assert (requested_parent_ids[procup].size() == filled_elem_ids.size());
 
       // Set those ghost element ids
       for (unsigned int i=0; i != filled_elem_ids.size(); ++i)
         {
           Elem *parent = _mesh.elem(requested_parent_ids[procup][i]);
-          assert (parent);
-          assert (parent->has_children());
+          libmesh_assert (parent);
+          libmesh_assert (parent->has_children());
           Elem *child = parent->child(requested_child_nums[procup][i]);
-          assert (child);
-          assert (child->active());
+          libmesh_assert (child);
+          libmesh_assert (child->active());
           const unsigned int old_id = child->id(),
                              new_id = filled_elem_ids[i];
           if (old_id != new_id)

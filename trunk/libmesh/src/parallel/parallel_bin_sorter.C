@@ -19,7 +19,6 @@
 
 
 // C++ includes
-#include <assert.h>
 #include <iterator>   // std::distance(), std::advance()
 #include <algorithm>  // std::swap
 #include <iostream>   // std::cout
@@ -42,13 +41,13 @@ template <typename KeyType>
 BinSorter<KeyType>::BinSorter (const std::vector<KeyType>& d) :
   data(d)
 {
-  // Assume (& assert) we are working with a sorted range
+  // Assume (& libmesh_assert) we are working with a sorted range
 
   // Ah...  is_sorted is an STL extension!
-  //assert (std::is_sorted (data.begin(), data.end()));
+  //libmesh_assert (std::is_sorted (data.begin(), data.end()));
 
   // Home-grown is_sorted
-  assert (Parallel::Utils::is_sorted (data));
+  libmesh_assert (Parallel::Utils::is_sorted (data));
 }
 
 
@@ -58,7 +57,7 @@ void BinSorter<KeyType>::binsort (const unsigned int nbins,
 				  KeyType max,
 				  KeyType min)
 {
-  assert (min < max);
+  libmesh_assert (min < max);
   
   // Build a histogram in parallel from our data.
   // Use this to create quasi-uniform bins.

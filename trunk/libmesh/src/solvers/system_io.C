@@ -63,8 +63,8 @@ namespace {
     bool operator()(const DofObject *a,
 		    const DofObject *b) const
     {
-      assert (a);
-      assert (b);
+      libmesh_assert (a);
+      libmesh_assert (b);
 
       return a->id() < b->id();
     }
@@ -109,7 +109,7 @@ void System::read_header (Xdr& io,
   //     9.) the name of the additional vector  (string)
   //
   // end system
-  assert (io.reading());
+  libmesh_assert (io.reading());
   
   // Possibly clear data structures and start from scratch.
   if (read_header)
@@ -216,8 +216,8 @@ void System::read_header (Xdr& io,
       if (read_additional_data)
 	{
 	  // sanity checks
-	  assert(this->_can_add_vectors);
-	  assert(this->_vectors.count(vec_name) == 0);
+	  libmesh_assert(this->_can_add_vectors);
+	  libmesh_assert(this->_vectors.count(vec_name) == 0);
 
 	  this->add_vector(vec_name);
 	}
@@ -242,7 +242,7 @@ void System::read_legacy_data (Xdr& io,
   //                                                                
   //      11.) The global additional vector, re-ordered to be       
   //           node-major (More on this later.)
-  assert (io.reading());
+  libmesh_assert (io.reading());
 
   // read and reordering buffers
   std::vector<Number> global_vector;
@@ -262,7 +262,7 @@ void System::read_legacy_data (Xdr& io,
     //std::cout << "global_vector.size()=" << global_vector.size() << std::endl;
     //std::cout << "this->n_dofs()=" << this->n_dofs() << std::endl;
     
-    assert (global_vector.size() == this->n_dofs());
+    libmesh_assert (global_vector.size() == this->n_dofs());
 	
     unsigned int cnt=0;
 
@@ -280,10 +280,10 @@ void System::read_legacy_data (Xdr& io,
   	  for (; it != end; ++it)
 	    for (unsigned int index=0; index<(*it)->n_comp(sys,var); index++)
 	      {
-	        assert ((*it)->dof_number(sys, var, index) !=
+	        libmesh_assert ((*it)->dof_number(sys, var, index) !=
 			DofObject::invalid_id);
 		
-                assert (cnt < global_vector.size());
+                libmesh_assert (cnt < global_vector.size());
                 
                 reordered_vector[(*it)->dof_number(sys, var, index)] =
 	  	  global_vector[cnt++]; 
@@ -299,10 +299,10 @@ void System::read_legacy_data (Xdr& io,
 	  for (; it != end; ++it)
 	    for (unsigned int index=0; index<(*it)->n_comp(sys,var); index++)
 	      {  
-		assert ((*it)->dof_number(sys, var, index) !=
+		libmesh_assert ((*it)->dof_number(sys, var, index) !=
 			DofObject::invalid_id);
 		
-		assert (cnt < global_vector.size());
+		libmesh_assert (cnt < global_vector.size());
 		
 		reordered_vector[(*it)->dof_number(sys, var, index)] =
 		  global_vector[cnt++]; 
@@ -347,7 +347,7 @@ void System::read_legacy_data (Xdr& io,
 	
 	      reordered_vector.resize(global_vector.size());	
 
-	      assert (global_vector.size() == this->n_dofs());
+	      libmesh_assert (global_vector.size() == this->n_dofs());
 	
 	      unsigned int cnt=0;
 
@@ -365,10 +365,10 @@ void System::read_legacy_data (Xdr& io,
 		    for (; it!=end; ++it)
 		      for (unsigned int index=0; index<(*it)->n_comp(sys,var); index++)
 			{
-			  assert ((*it)->dof_number(sys, var, index) !=
+			  libmesh_assert ((*it)->dof_number(sys, var, index) !=
 				  DofObject::invalid_id);
 			  
-			  assert (cnt < global_vector.size());
+			  libmesh_assert (cnt < global_vector.size());
 			  
 			  reordered_vector[(*it)->dof_number(sys, var, index)] =
 			    global_vector[cnt++]; 
@@ -384,10 +384,10 @@ void System::read_legacy_data (Xdr& io,
 		    for (; it!=end; ++it)
 		      for (unsigned int index=0; index<(*it)->n_comp(sys,var); index++)
 			{  
-			  assert ((*it)->dof_number(sys, var, index) !=
+			  libmesh_assert ((*it)->dof_number(sys, var, index) !=
 				  DofObject::invalid_id);
 			  
-			  assert (cnt < global_vector.size());
+			  libmesh_assert (cnt < global_vector.size());
 			  
 			  reordered_vector[(*it)->dof_number(sys, var, index)] =
 			    global_vector[cnt++]; 
@@ -426,8 +426,8 @@ void System::read_parallel_data (Xdr &io,
    * ASCII output.  Thus this one section of code will read XDR or ASCII
    * files with no changes.
    */ 
-  assert (io.reading());
-  assert (io.is_open());
+  libmesh_assert (io.reading());
+  libmesh_assert (io.is_open());
 
   // build the ordered nodes and element maps.
   // when writing/reading parallel files we need to iterate
@@ -478,9 +478,9 @@ void System::read_parallel_data (Xdr &io,
 	     it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
 	for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
 	  {
-	    assert ((*it)->dof_number(sys_num, var, comp) !=
+	    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
 		    DofObject::invalid_id);
-	    assert (cnt < io_buffer.size());
+	    libmesh_assert (cnt < io_buffer.size());
 	    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
 	  }
 
@@ -489,9 +489,9 @@ void System::read_parallel_data (Xdr &io,
 	     it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
 	for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
 	  {
-	    assert ((*it)->dof_number(sys_num, var, comp) !=
+	    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
 		    DofObject::invalid_id);
-	    assert (cnt < io_buffer.size());
+	    libmesh_assert (cnt < io_buffer.size());
 	    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
 	  }      
     }
@@ -521,9 +521,9 @@ void System::read_parallel_data (Xdr &io,
 		     it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
 		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
 		  {
-		    assert ((*it)->dof_number(sys_num, var, comp) !=
+		    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
 			    DofObject::invalid_id);
-		    assert (cnt < io_buffer.size());
+		    libmesh_assert (cnt < io_buffer.size());
 		    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
 		  }	     
 	      
@@ -532,9 +532,9 @@ void System::read_parallel_data (Xdr &io,
 		     it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
 		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
 		  {
-		    assert ((*it)->dof_number(sys_num, var, comp) !=
+		    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
 			    DofObject::invalid_id);
-		    assert (cnt < io_buffer.size());
+		    libmesh_assert (cnt < io_buffer.size());
 		    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
 		  }	      
 	    }
@@ -656,7 +656,7 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int var
 	for (unsigned int idx=0; idx<recv_ids[pid].size(); idx+=3)
 	  {
 	    const unsigned int local_idx = recv_ids[pid][idx+0]-first_object;
-	    assert (local_idx < std::min(io_blksize,n_objects));
+	    libmesh_assert (local_idx < std::min(io_blksize,n_objects));
 	    const unsigned int n_comp    = recv_ids[pid][idx+1];
 	    const unsigned int start_pos = recv_ids[pid][idx+2];
 	    
@@ -688,17 +688,17 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int var
 	      
 	      for (unsigned int comp=0; comp<n_comp; comp++)
 		{
-		  assert (next_value != input_buffer.end());
+		  libmesh_assert (next_value != input_buffer.end());
 		  if (pid == libMesh::processor_id())
 		    {
-		      assert ((start_pos+comp) < local_values.size());
+		      libmesh_assert ((start_pos+comp) < local_values.size());
 		      local_values[start_pos+comp] = *next_value;
 		    }
 		  ++next_value;
 		  ++processed_size;				
 		}
 	    }
-	assert (processed_size == input_buffer.size());
+	libmesh_assert (processed_size == input_buffer.size());
       }
       
       // A subset of the components (potentially null set) will match our objects in
@@ -710,22 +710,22 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int var
 	    (*it)->n_comp(sys_num,var))      // var has a nonzero # of components on this object
 	  {
 	    const unsigned int local_idx = (*it)->id()-first_object;
-	    assert (local_idx < std::min(io_blksize,n_objects));
+	    libmesh_assert (local_idx < std::min(io_blksize,n_objects));
 
 	    const unsigned int pid       = idx_map[3*local_idx+0];
 	    const unsigned int n_comp    = idx_map[3*local_idx+1];
 	    const unsigned int start_pos = idx_map[3*local_idx+2];
 	    
-	    assert (pid == libMesh::processor_id());
-	    assert (n_comp == (*it)->n_comp(sys_num, var));
+	    libmesh_assert (pid == libMesh::processor_id());
+	    libmesh_assert (n_comp == (*it)->n_comp(sys_num, var));
 	    
 	    for (unsigned int comp=0; comp<n_comp; comp++)
 	      {
-		assert ((start_pos+comp) < local_values.size());
+		libmesh_assert ((start_pos+comp) < local_values.size());
 		const Number &value = local_values[start_pos+comp];				
 		const unsigned int dof_index = (*it)->dof_number (sys_num, var, comp);
-		assert (dof_index >= vec.first_local_index());
-		assert (dof_index <  vec.last_local_index());
+		libmesh_assert (dof_index >= vec.first_local_index());
+		libmesh_assert (dof_index <  vec.last_local_index());
 		//std::cout << "di=" << dof_index << ", val=" << value << std::endl;
 		vec.set (dof_index, value);
 		++n_assigned_vals;
@@ -746,13 +746,13 @@ void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
   // In parallel we better be reading a parallel vector -- if not
   // we will not set all of its components below!!
   if (libMesh::n_processors() > 1)
-    assert (vec.size() != vec.local_size());
+    libmesh_assert (vec.size() != vec.local_size());
    
   // If this is not the same on all processors we're in trouble!
   Parallel::verify(io_blksize);
 #endif
   
-  assert (io.reading());
+  libmesh_assert (io.reading());
 
   // vector length
   unsigned int vector_length=0, n_assigned_vals=0;
@@ -786,7 +786,7 @@ void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
 						   vec);
     } // end variable loop
   Parallel::sum (n_assigned_vals);
-  assert (n_assigned_vals == vector_length);
+  libmesh_assert (n_assigned_vals == vector_length);
 }
 
 
@@ -825,7 +825,7 @@ void System::write_header (Xdr& io,
    *
    * end system
    */ 
-  assert (io.writing());
+  libmesh_assert (io.writing());
 
 
   // Only write the header information
@@ -1006,7 +1006,7 @@ void System::write_header (Xdr& io,
 //    * ASCII output.  Thus this one section of code will read XDR or ASCII
 //    * files with no changes.
 //    */ 
-//   assert (io.writing());
+//   libmesh_assert (io.writing());
 
 //   const unsigned int proc_id = this->get_mesh().processor_id();
  
@@ -1051,10 +1051,10 @@ void System::write_header (Xdr& io,
 //             const unsigned int node = *it;
 // 	    for (unsigned int index=0; index<this->get_mesh().node(node).n_comp(sys_num, var); index++)
 // 	      {
-//                 assert (this->get_mesh().node(node).id() == node);
-// 		assert (this->get_mesh().node(node).dof_number(sys_num, var, index) !=
+//                 libmesh_assert (this->get_mesh().node(node).id() == node);
+// 		libmesh_assert (this->get_mesh().node(node).dof_number(sys_num, var, index) !=
 // 			DofObject::invalid_id);
-// 		assert (cnt < reordered_soln.size());
+// 		libmesh_assert (cnt < reordered_soln.size());
 		
 // 		reordered_soln[cnt++] = 
 // 		  global_vector[this->get_mesh().node(node).dof_number(sys_num, var, index)];
@@ -1070,10 +1070,10 @@ void System::write_header (Xdr& io,
 // 	    for (; it!=end; ++it)
 // 	      for (unsigned int index=0; index<(*it)->n_comp(sys_num, var); index++)
 // 	        {
-// 		  assert ((*it)->dof_number(sys_num, var, index) !=
+// 		  libmesh_assert ((*it)->dof_number(sys_num, var, index) !=
 // 			  DofObject::invalid_id);
 			
-// 		  assert (cnt < reordered_soln.size());
+// 		  libmesh_assert (cnt < reordered_soln.size());
 			
 // 		  reordered_soln[cnt++] = 
 // 		      global_vector[(*it)->dof_number(sys_num, var, index)];
@@ -1137,9 +1137,9 @@ void System::write_header (Xdr& io,
 // 		    for (; it !=end; ++it)
 // 		      for (unsigned int index=0; index<(*it)->n_comp(sys_num, var); index++)
 // 			{
-// 			  assert ((*it)->dof_number(sys_num, var, index) !=
+// 			  libmesh_assert ((*it)->dof_number(sys_num, var, index) !=
 // 				  DofObject::invalid_id);			  
-// 			  assert (cnt < reordered_soln.size());
+// 			  libmesh_assert (cnt < reordered_soln.size());
 			  
 // 			  reordered_soln[cnt++] = 
 // 			    global_vector[(*it)->dof_number(sys_num, var, index)];
@@ -1155,9 +1155,9 @@ void System::write_header (Xdr& io,
 // 		    for (; it!=end; ++it)
 // 		      for (unsigned int index=0; index<(*it)->n_comp(sys_num, var); index++)
 // 			{
-// 			  assert ((*it)->dof_number(sys_num, var, index) !=
+// 			  libmesh_assert ((*it)->dof_number(sys_num, var, index) !=
 // 				  DofObject::invalid_id);			    
-// 			  assert (cnt < reordered_soln.size());
+// 			  libmesh_assert (cnt < reordered_soln.size());
 			  
 // 			  reordered_soln[cnt++] = 
 // 			    global_vector[(*it)->dof_number(sys_num, var, index)];
@@ -1212,7 +1212,7 @@ void System::write_parallel_data (Xdr &io,
    */ 
   std::string comment;
   
-  assert (io.writing());
+  libmesh_assert (io.writing());
 
   std::vector<Number> io_buffer; io_buffer.reserve(this->solution->local_size());
 
@@ -1256,7 +1256,7 @@ void System::write_parallel_data (Xdr &io,
 	for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
 	  {
 	    //std::cout << "(*it)->id()=" << (*it)->id() << std::endl;
-	    assert ((*it)->dof_number(sys_num, var, comp) !=
+	    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
 		    DofObject::invalid_id);
 	    
 	    io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));
@@ -1267,7 +1267,7 @@ void System::write_parallel_data (Xdr &io,
 	     it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
 	for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
 	  {
-	    assert ((*it)->dof_number(sys_num, var, comp) !=
+	    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
 		    DofObject::invalid_id);
 	      
 	    io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));    
@@ -1306,7 +1306,7 @@ void System::write_parallel_data (Xdr &io,
 		     it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)      
 		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
 		  {
-		    assert ((*it)->dof_number(sys_num, var, comp) !=
+		    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
 			    DofObject::invalid_id);
 		      
 		    io_buffer.push_back((*pos->second)((*it)->dof_number(sys_num, var, comp)));   
@@ -1317,7 +1317,7 @@ void System::write_parallel_data (Xdr &io,
 		     it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
 		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
 		  {
-		    assert ((*it)->dof_number(sys_num, var, comp) !=
+		    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
 			    DofObject::invalid_id);
 	      
 		    io_buffer.push_back((*pos->second)((*it)->dof_number(sys_num, var, comp)));
@@ -1452,8 +1452,8 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
 	    
 	    for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
 	      {
-		assert ((*it)->dof_number(sys_num, var, comp) >= vec.first_local_index());
-		assert ((*it)->dof_number(sys_num, var, comp) <  vec.last_local_index());
+		libmesh_assert ((*it)->dof_number(sys_num, var, comp) >= vec.first_local_index());
+		libmesh_assert ((*it)->dof_number(sys_num, var, comp) <  vec.last_local_index());
 		xfer_vals.push_back(vec((*it)->dof_number(sys_num, var, comp)));
 	      }
 	  }
@@ -1520,7 +1520,7 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
 	      val_iters.push_back(recv_vals[pid].begin());
 	    }
 	  
-	  assert (tot_id_size <= 2*std::min(io_blksize,n_objects));
+	  libmesh_assert (tot_id_size <= 2*std::min(io_blksize,n_objects));
 	  
 	  // Create a map to avoid searching.  This will allow us to
 	  // traverse the received values in [first_object,last_object) order.
@@ -1529,7 +1529,7 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
 	    for (unsigned int idx=0; idx<recv_ids[pid].size(); idx+=2)
 	      {
 		const unsigned int local_idx = recv_ids[pid][idx+0]-first_object;
-		assert (local_idx < std::min(io_blksize,n_objects));
+		libmesh_assert (local_idx < std::min(io_blksize,n_objects));
 		const unsigned int n_comp    = recv_ids[pid][idx+1];
 		
 		idx_map[3*local_idx+0] = pid;
@@ -1548,11 +1548,11 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
 		
 		for (unsigned int comp=0; comp<n_comp; comp++)
 		  {
-		    assert (first_pos + comp < recv_vals[pid].size());
+		    libmesh_assert (first_pos + comp < recv_vals[pid].size());
 		    output_vals.push_back(recv_vals[pid][first_pos + comp]);
 		  }
 	      }
-	  assert (output_vals.size() == tot_val_size);
+	  libmesh_assert (output_vals.size() == tot_val_size);
 	  
 	  // write the stream
 	  io.data_stream (output_vals.empty() ? NULL : &output_vals[0], output_vals.size());
@@ -1570,8 +1570,8 @@ void System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec)
   parallel_only();
   
   // If this is not the same on all processors we're in trouble!
-  assert (Parallel::verify(io_blksize));
-  assert (io.writing());
+  libmesh_assert (Parallel::verify(io_blksize));
+  libmesh_assert (io.writing());
   
   unsigned int vec_length = vec.size();
   if (libMesh::processor_id() == 0) io.data (vec_length, "# vector length");
@@ -1603,7 +1603,7 @@ void System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec)
     } // end variable loop
 
   if (libMesh::processor_id() == 0)
-    assert(written_length == vec_length);
+    libmesh_assert(written_length == vec_length);
 }
 
 

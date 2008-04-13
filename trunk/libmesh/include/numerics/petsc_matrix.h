@@ -294,7 +294,7 @@ public:
    * not required in user-level code. Just don't do anything crazy like
    * calling MatDestroy()!
    */
-  Mat mat () { assert (_mat != NULL); return _mat; }
+  Mat mat () { libmesh_assert (_mat != NULL); return _mat; }
 
   
 protected:
@@ -387,7 +387,7 @@ template <typename T>
 inline
 unsigned int PetscMatrix<T>::m () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int petsc_m=0, petsc_n=0, ierr=0;
 
@@ -402,7 +402,7 @@ template <typename T>
 inline
 unsigned int PetscMatrix<T>::n () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int petsc_m=0, petsc_n=0, ierr=0;
 
@@ -417,7 +417,7 @@ template <typename T>
 inline
 unsigned int PetscMatrix<T>::row_start () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int start=0, stop=0, ierr=0;
 
@@ -433,7 +433,7 @@ template <typename T>
 inline
 unsigned int PetscMatrix<T>::row_stop () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int start=0, stop=0, ierr=0;
 
@@ -451,7 +451,7 @@ void PetscMatrix<T>::set (const unsigned int i,
 			  const unsigned int j,
 			  const T value)
 {  
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int ierr=0, i_val=i, j_val=j;
 
@@ -469,7 +469,7 @@ void PetscMatrix<T>::add (const unsigned int i,
 			  const unsigned int j,
 			  const T value)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int ierr=0, i_val=i, j_val=j;
 
@@ -499,17 +499,17 @@ template <typename T>
 inline
 void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   // sanity check. but this cannot avoid 
   // crash due to incompatible sparsity structure...
-  assert (this->m() == X_in.m());
-  assert (this->n() == X_in.n());
+  libmesh_assert (this->m() == X_in.m());
+  libmesh_assert (this->n() == X_in.n());
 
   PetscScalar     a = static_cast<PetscScalar>      (a_in);
   PetscMatrix<T>* X = dynamic_cast<PetscMatrix<T>*> (&X_in);
 
-  assert (X != NULL);
+  libmesh_assert (X != NULL);
   
   int ierr=0;
 
@@ -539,7 +539,7 @@ inline
 T PetscMatrix<T>::operator () (const unsigned int i,
 			       const unsigned int j) const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
 #if PETSC_VERSION_LESS_THAN(2,2,1)
 
@@ -584,8 +584,8 @@ T PetscMatrix<T>::operator () (const unsigned int i,
       const int j = std::distance (const_cast<int*>(&petsc_cols[0]),
 				   const_cast<int*>(p.first));
       
-      assert (j < ncols);
-      assert (petsc_cols[j] == j_val);
+      libmesh_assert (j < ncols);
+      libmesh_assert (petsc_cols[j] == j_val);
       
       value = static_cast<T> (petsc_row[j]);
       
@@ -608,7 +608,7 @@ template <typename T>
 inline
 bool PetscMatrix<T>::closed() const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int ierr=0;
   PetscTruth assembled;
@@ -636,7 +636,7 @@ template <typename T>
 inline
 void PetscMatrix<T>::print_personal(std::ostream& os) const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
 #ifndef NDEBUG
   if (os != std::cout)

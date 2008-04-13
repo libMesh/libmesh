@@ -37,7 +37,7 @@
 // InfPrism class member functions
 unsigned int InfPrism::key (const unsigned int s) const
 {
-  assert (s < this->n_sides());
+  libmesh_assert (s < this->n_sides());
   
   switch (s)
     {
@@ -82,7 +82,7 @@ unsigned int InfPrism::key (const unsigned int s) const
 
 AutoPtr<DofObject> InfPrism::side (const unsigned int i) const
 {
-  assert (i < this->n_sides());
+  libmesh_assert (i < this->n_sides());
   
   switch (i)
     {
@@ -159,8 +159,8 @@ AutoPtr<DofObject> InfPrism::side (const unsigned int i) const
 bool InfPrism::is_child_on_side(const unsigned int c,
                                 const unsigned int s) const
 {
-  assert (c < this->n_children());
-  assert (s < this->n_sides());
+  libmesh_assert (c < this->n_children());
+  libmesh_assert (s < this->n_sides());
 
   return (s == 0 || c+1 == s || c == s%3);
 }

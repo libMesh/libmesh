@@ -301,7 +301,7 @@ void VTKIO::read (const std::string& name)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  assert(libMesh::processor_id() == 0);
+  libmesh_assert(libMesh::processor_id() == 0);
 
 #ifndef HAVE_VTK
   std::cerr << "Cannot read VTK file: " << name
@@ -424,7 +424,7 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
   //   const MeshData& md = es.get_mesh_data();
   //   if(es.has_mesh_data())
   //      meshdata_to_vtk(md,_vtk_grid);
-  //   assert (soln.size() ==mesh.n_nodes()*names.size());
+  //   libmesh_assert (soln.size() ==mesh.n_nodes()*names.size());
   solution_to_vtk(es,_vtk_grid);
 
 #ifdef DEBUG

@@ -119,9 +119,9 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
 
   // We cast to pointers so we can be sure that they succeeded
   // by comparing the result against NULL.
-  assert(matrix   != NULL);
-  assert(solution != NULL);
-  assert(rhs      != NULL);
+  libmesh_assert(matrix   != NULL);
+  libmesh_assert(solution != NULL);
+  libmesh_assert(rhs      != NULL);
   
   // Zero-out the solution to prevent the solver from exiting in 0
   // iterations (?)

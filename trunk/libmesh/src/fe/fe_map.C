@@ -36,7 +36,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
                                       const Elem* elem,
                                       unsigned int p)
 {
-  assert (elem  != NULL);
+  libmesh_assert (elem  != NULL);
 
   switch (this->dim)
     {
@@ -413,7 +413,7 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
    // Start logging the map computation.
   START_LOG("compute_affine_map()", "FE");  
 
-  assert (elem  != NULL);
+  libmesh_assert (elem  != NULL);
 
   const unsigned int        n_qp = qw.size();
 
@@ -496,7 +496,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
    // Start logging the map computation.
   START_LOG("compute_map()", "FE");
 
-  assert (elem  != NULL);
+  libmesh_assert (elem  != NULL);
   
   const unsigned int        n_qp = qw.size();
 
@@ -518,7 +518,7 @@ template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map (const Elem* elem,
 		      const Point& reference_point)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
     
   Point p;
 
@@ -544,7 +544,7 @@ template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map_xi (const Elem* elem,
 			 const Point& reference_point)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
     
   Point p;
 
@@ -571,7 +571,7 @@ template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map_eta (const Elem* elem,
 			  const Point& reference_point)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
     
   Point p;
 
@@ -598,7 +598,7 @@ template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map_zeta (const Elem* elem,
 			   const Point& reference_point)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
     
   Point p;
 
@@ -627,8 +627,8 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			      const Real tolerance,
 			      const bool secure)
 {
-  assert (elem != NULL);
-  assert (tolerance >= 0.);
+  libmesh_assert (elem != NULL);
+  libmesh_assert (tolerance >= 0.);
 
   
   // Start logging the map inversion.  
@@ -701,7 +701,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    const Real G = dxi*dxi;
 	    
 	    if (secure)
-	      assert (G > 0.);
+	      libmesh_assert (G > 0.);
 	    
 	    const Real Ginv = 1./G;
 	    
@@ -711,7 +711,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
             // Assume that no master elements have radius > 4
 	    if (secure)
-	      assert (dp.size() < 4);
+	      libmesh_assert (dp.size() < 4);
 
 	    break;
 	  }
@@ -753,7 +753,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    const Real det = (G11*G22 - G12*G21);
 	    
 	    if (secure)
-	      assert (det != 0.);
+	      libmesh_assert (det != 0.);
 
 	    const Real inv_det = 1./det;
 	    
@@ -773,7 +773,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
             // Assume that no master elements have radius > 4
 	    if (secure)
-	      assert (dp.size() < 4);
+	      libmesh_assert (dp.size() < 4);
 
 	    break;
 	  }
@@ -816,7 +816,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			      J13*(J21*J32 - J22*J31));
 	    
 	    if (secure)
-	      assert (det != 0.);
+	      libmesh_assert (det != 0.);
 
 	    const Real inv_det = 1./det;
 	    
@@ -847,7 +847,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
             // Assume that no master elements have radius > 4
 	    if (secure)
-	      assert (dp.size() < 4);
+	      libmesh_assert (dp.size() < 4);
 
 	    break;
 	  }

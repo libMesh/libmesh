@@ -125,7 +125,7 @@ int TetGenWrapper::get_triface_node(const int i, const int j)
 
 REAL TetGenWrapper::get_element_attribute(const int i)
 {
-  assert(tetgen_output->numberoftetrahedronattributes>0);
+  libmesh_assert(tetgen_output->numberoftetrahedronattributes>0);
   return tetgen_output->tetrahedronattributelist[tetgen_output->numberoftetrahedronattributes*i];
 }
 
@@ -143,7 +143,7 @@ void TetGenWrapper::set_switches(const std::string& s)
 {
   // Copy the string to a temporary buffer for passing to the C API
   char buffer[256];
-  assert (s.size() < sizeof(buffer)-1);
+  libmesh_assert (s.size() < sizeof(buffer)-1);
   buffer[ s.copy( buffer , sizeof( buffer ) - 1 ) ] = '\0' ;
   
   if (!tetgen_be.parse_commandline(buffer)) 
@@ -397,7 +397,7 @@ int TetGenMeshInterface::get_node_index (const Node* inode)
 void TetGenMeshInterface::triangulate_conformingDelaunayMesh (const double quality_constraint,
 							      const double volume_constraint)   
 {
-  // >>> assert usage of TRI3 hull elements (no other elements! => mesh.all_tri() )
+  // >>> libmesh_assert usage of TRI3 hull elements (no other elements! => mesh.all_tri() )
 
   // thorough check of hull integrity:
   // loop over hull with breadth-first search:
@@ -411,7 +411,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh (const double quali
     {
       Elem* elem = current.back();
 
-      assert (elem != NULL);
+      libmesh_assert (elem != NULL);
   
       // Attempt to insert this element into the visited set.
       visited.insert(elem);

@@ -35,7 +35,7 @@
 
 #undef parallel_only
 #ifndef NDEBUG
-  #define parallel_only() { assert(Parallel::verify(std::string(__FILE__))); assert(Parallel::verify(__LINE__)); }
+  #define parallel_only() { libmesh_assert(Parallel::verify(std::string(__FILE__))); libmesh_assert(Parallel::verify(__LINE__)); }
 #else
   #define parallel_only() { }
 #endif
@@ -121,7 +121,7 @@ namespace Parallel
     {
       int msg_size;
       MPI_Get_count (const_cast<MPI_Status*>(&_status), _datatype, &msg_size);
-      assert (msg_size >= 0);
+      libmesh_assert (msg_size >= 0);
       return msg_size;
     }
 
@@ -626,7 +626,7 @@ namespace Parallel
 		dest_processor_id,
 		tag,
 		libMesh::COMM_WORLD);    
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("send()", "Parallel");
   }
@@ -646,7 +646,7 @@ namespace Parallel
 		dest_processor_id,
 		tag,
 		libMesh::COMM_WORLD);    
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("send()", "Parallel");
   }
@@ -669,7 +669,7 @@ namespace Parallel
 		 tag,
 		 libMesh::COMM_WORLD,
 		 &r);    
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("isend()", "Parallel");
   }
@@ -691,7 +691,7 @@ namespace Parallel
 		 tag,
 		 libMesh::COMM_WORLD,
 		 &r);    
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("isend()", "Parallel");
   }
@@ -715,7 +715,7 @@ namespace Parallel
 		 tag,
 		 libMesh::COMM_WORLD,
 		 &r);    
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("isend()", "Parallel");
   }
@@ -739,7 +739,7 @@ namespace Parallel
 		tag,
 		libMesh::COMM_WORLD,
 		&status);
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("recv()", "Parallel");
 
@@ -766,7 +766,7 @@ namespace Parallel
 		tag,
 		libMesh::COMM_WORLD,
 		&status);
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("recv()", "Parallel");
 
@@ -791,7 +791,7 @@ namespace Parallel
 		tag,
 		libMesh::COMM_WORLD,
 		&status);
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("recv()", "Parallel");
 
@@ -816,7 +816,7 @@ namespace Parallel
 		 tag,
 		 libMesh::COMM_WORLD,
 		 &r);    
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("irecv()", "Parallel");
   }
@@ -838,7 +838,7 @@ namespace Parallel
 		 tag,
 		 libMesh::COMM_WORLD,
 		 &r);    
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("irecv()", "Parallel");
   }
@@ -1105,7 +1105,7 @@ namespace Parallel
       {
 	out = std::copy(send[i].begin(), send[i].end(), out);
       }
-    assert(out == senddata.end());
+    libmesh_assert(out == senddata.end());
     
     MPI_Sendrecv(sendsizesum ? &senddata[0] : NULL, sendsizesum,
 		 datatype<T>(), dest_processor_id, 0,
@@ -1121,7 +1121,7 @@ namespace Parallel
 	std::copy(in, in + recvsizes[i], recv[i].begin());
 	in += recvsizes[i];
       }
-    assert(in == recvdata.end());
+    libmesh_assert(in == recvdata.end());
 
     STOP_LOG("send_receive()", "Parallel");
   }
@@ -1132,7 +1132,7 @@ namespace Parallel
 		     T send,
 		     std::vector<T> &recv)
   {
-    assert(root_id < libMesh::n_processors());
+    libmesh_assert(root_id < libMesh::n_processors());
 
     if (libMesh::processor_id() == root_id)
       recv.resize(libMesh::n_processors());
@@ -1159,7 +1159,7 @@ namespace Parallel
 		     std::complex<T> send,
 		     std::vector<std::complex<T> > &recv)
   {
-    assert(root_id < libMesh::n_processors());
+    libmesh_assert(root_id < libMesh::n_processors());
 
     if (libMesh::processor_id() == root_id)
       recv.resize(libMesh::n_processors());
@@ -1209,7 +1209,7 @@ namespace Parallel
   {
     if (libMesh::n_processors() == 1)
       {
-	assert (libMesh::processor_id()==root_id);
+	libmesh_assert (libMesh::processor_id()==root_id);
 	return;
       }
     
@@ -1254,7 +1254,7 @@ namespace Parallel
 		   root_id,
 		   libMesh::COMM_WORLD);
 
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("gather()", "Parallel");
   }
@@ -1266,7 +1266,7 @@ namespace Parallel
   {
     if (libMesh::n_processors() == 1)
       {
-	assert (libMesh::processor_id()==root_id);
+	libmesh_assert (libMesh::processor_id()==root_id);
 	return;
       }
     
@@ -1309,7 +1309,7 @@ namespace Parallel
 		   r.empty() ? NULL : &r[0], &sendlengths[0],
 		   &displacements[0], datatype<T>(),
 		   root_id, libMesh::COMM_WORLD);
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("gather()", "Parallel");
   }
@@ -1320,7 +1320,7 @@ namespace Parallel
 			std::vector<T> &recv)
   {
     START_LOG ("allgather()","Parallel");
-    //assert(recv.size() == libMesh::n_processors());
+    //libmesh_assert(recv.size() == libMesh::n_processors());
     recv.resize(libMesh::n_processors());
     
     if (libMesh::n_processors() > 1)
@@ -1346,7 +1346,7 @@ namespace Parallel
 			std::vector<std::complex<T> > &recv)
   {
     START_LOG ("allgather()","Parallel");
-    //assert(recv.size() == libMesh::n_processors());
+    //libmesh_assert(recv.size() == libMesh::n_processors());
     recv.resize(libMesh::n_processors());
 
     if (libMesh::n_processors() > 1)
@@ -1432,7 +1432,7 @@ namespace Parallel
 		      r.empty()     ? NULL : &r[0],     &sendlengths[0],
 		      &displacements[0], datatype<T>(), libMesh::COMM_WORLD);
 
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("allgather()", "Parallel");
   }
@@ -1482,7 +1482,7 @@ namespace Parallel
 		      r.empty()     ? NULL : &r[0],     &sendlengths[0],
 		      &displacements[0], datatype<T>(),
 		      libMesh::COMM_WORLD);
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("allgather()", "Parallel");
   }
@@ -1509,7 +1509,7 @@ namespace Parallel
     const unsigned int size_per_proc = 
       buf.size()/libMesh::n_processors();
 
-    assert (buf.size()%libMesh::n_processors() == 0);
+    libmesh_assert (buf.size()%libMesh::n_processors() == 0);
 
     std::vector<T> tmp(buf);
     
@@ -1521,7 +1521,7 @@ namespace Parallel
 		    size_per_proc,
 		    datatype<T>(),
 		    libMesh::COMM_WORLD);
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("alltoall()", "Parallel");
   }
@@ -1533,7 +1533,7 @@ namespace Parallel
   {
     if (libMesh::n_processors() == 1)
       {
-	assert (libMesh::processor_id() == root_id);
+	libmesh_assert (libMesh::processor_id() == root_id);
 	return;
       }
     
@@ -1543,7 +1543,7 @@ namespace Parallel
     const int ierr =
       MPI_Bcast (&data, 1, datatype<T>(), root_id, libMesh::COMM_WORLD);
 
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("broadcast()", "Parallel");
   }
@@ -1554,7 +1554,7 @@ namespace Parallel
   {
     if (libMesh::n_processors() == 1)
       {
-	assert (libMesh::processor_id() == root_id);
+	libmesh_assert (libMesh::processor_id() == root_id);
 	return;
       }
     
@@ -1563,7 +1563,7 @@ namespace Parallel
     // Spread data to remote processors.
     const int ierr =
       MPI_Bcast (&data, 2, datatype<T>(), root_id, libMesh::COMM_WORLD);
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("broadcast()", "Parallel");
   }
@@ -1575,7 +1575,7 @@ namespace Parallel
   {
     if (libMesh::n_processors() == 1)
       {
-	assert (libMesh::processor_id() == root_id);
+	libmesh_assert (libMesh::processor_id() == root_id);
 	return;
       }
 
@@ -1596,7 +1596,7 @@ namespace Parallel
       data.push_back(data_c[i]);
     
     if (libMesh::processor_id() == root_id)
-      assert(data == orig);
+      libmesh_assert(data == orig);
   }
 
 
@@ -1606,7 +1606,7 @@ namespace Parallel
   {
     if (libMesh::n_processors() == 1)
       {
-	assert (libMesh::processor_id() == root_id);
+	libmesh_assert (libMesh::processor_id() == root_id);
 	return;
       }
 
@@ -1618,7 +1618,7 @@ namespace Parallel
       MPI_Bcast (data.empty() ? NULL : &data[0], data.size(), datatype<T>(),
 		 root_id, libMesh::COMM_WORLD);
 
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("broadcast()", "Parallel");
   }
@@ -1630,7 +1630,7 @@ namespace Parallel
   {
     if (libMesh::n_processors() == 1)
       {
-	assert (libMesh::processor_id() == root_id);
+	libmesh_assert (libMesh::processor_id() == root_id);
 	return;
       }
 
@@ -1641,7 +1641,7 @@ namespace Parallel
     const int ierr =
       MPI_Bcast (data.empty() ? NULL : &data[0], data.size() * 2, datatype<T>(),
 		 root_id, libMesh::COMM_WORLD);
-    assert (ierr == MPI_SUCCESS);
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("broadcast()", "Parallel");
   }
@@ -1704,7 +1704,7 @@ namespace Parallel
 			   const unsigned int recv_source,
                            T &recv)
   {
-    assert (send_tgt == recv_source);
+    libmesh_assert (send_tgt == recv_source);
     recv = send;
   }
 
@@ -1713,7 +1713,7 @@ namespace Parallel
 		     T send,
 		     std::vector<T> &recv)
   {
-    assert (!root_id);
+    libmesh_assert (!root_id);
     recv.resize(1);
     recv[0] = send;
   }

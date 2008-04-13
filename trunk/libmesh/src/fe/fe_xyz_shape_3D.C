@@ -62,7 +62,7 @@ Real FE<3,XYZ>::shape(const Elem* elem,
 {
 #if DIM == 3
   
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -85,7 +85,7 @@ Real FE<3,XYZ>::shape(const Elem* elem,
   const Real dz = z - zc;
 
   const unsigned int totalorder = order + elem->p_level();
-  assert (i < (static_cast<unsigned int>(totalorder)+1)*
+  libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
               (static_cast<unsigned int>(totalorder)+2)/6);
     
@@ -254,8 +254,8 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 {
 #if DIM == 3
 
-  assert (elem != NULL);
-  assert (j<3);
+  libmesh_assert (elem != NULL);
+  libmesh_assert (j<3);
   
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -278,7 +278,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   const Real dz = z - zc;
 
   const unsigned int totalorder = static_cast<Order>(order + elem->p_level());
-  assert (i < (static_cast<unsigned int>(totalorder)+1)*
+  libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
               (static_cast<unsigned int>(totalorder)+2)/6);
 
@@ -727,8 +727,8 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 {
 #if DIM == 3
 
-  assert (elem != NULL);
-  assert (j<3);
+  libmesh_assert (elem != NULL);
+  libmesh_assert (j<3);
   
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -751,7 +751,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   const Real dz = z - zc;
 
   const unsigned int totalorder = static_cast<Order>(order + elem->p_level());
-  assert (i < (static_cast<unsigned int>(totalorder)+1)*
+  libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
               (static_cast<unsigned int>(totalorder)+2)/6);
 

@@ -94,12 +94,12 @@ MeshFunction::~MeshFunction ()
 void MeshFunction::init (const Trees::BuildType point_locator_build_type)
 {
   // are indices of the desired variable(s) provided?
-  assert (this->_system_vars.size() > 0);
+  libmesh_assert (this->_system_vars.size() > 0);
 
   // Don't do twice...
   if (this->_initialized)
     {
-      assert(this->_point_locator != NULL);
+      libmesh_assert(this->_point_locator != NULL);
       return;
     }
 
@@ -170,9 +170,9 @@ MeshFunction::clear ()
 Number MeshFunction::operator() (const Point& p, 
 				 const Real time)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   // At the moment the function we call ignores the time
-  assert (time == 0.);
+  libmesh_assert (time == 0.);
   
   DenseVector<Number> buf (1);
   this->operator() (p, time, buf);
@@ -184,9 +184,9 @@ Number MeshFunction::operator() (const Point& p,
 Gradient MeshFunction::gradient (const Point& p, 
 				 const Real time)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   // At the moment the function we call ignores the time
-  assert (time == 0.);
+  libmesh_assert (time == 0.);
   
   std::vector<Gradient> buf (1);
   this->gradient(p, time, buf);
@@ -199,9 +199,9 @@ Gradient MeshFunction::gradient (const Point& p,
 Tensor MeshFunction::hessian (const Point& p, 
 			      const Real time)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   // At the moment the function we call ignores the time
-  assert (time == 0.);
+  libmesh_assert (time == 0.);
   
   std::vector<Tensor> buf (1);
   this->hessian(p, time, buf);
@@ -215,7 +215,7 @@ void MeshFunction::operator() (const Point& p,
 			       const Real,
 			       DenseVector<Number>& output)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   /* Ensure that in the case of a master mesh function, the
      out-of-mesh mode is enabled either for both or for none.  This is
@@ -313,7 +313,7 @@ void MeshFunction::gradient (const Point& p,
 			     const Real,
 			     std::vector<Gradient>& output)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   /* Ensure that in the case of a master mesh function, the
      out-of-mesh mode is enabled either for both or for none.  This is
@@ -402,7 +402,7 @@ void MeshFunction::hessian (const Point& p,
 			    const Real,
 			    std::vector<Tensor>& output)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   /* Ensure that in the case of a master mesh function, the
      out-of-mesh mode is enabled either for both or for none.  This is
@@ -490,13 +490,13 @@ void MeshFunction::hessian (const Point& p,
 
 const PointLocatorBase& MeshFunction::get_point_locator (void) const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   return *_point_locator;
 }
 
 void MeshFunction::enable_out_of_mesh_mode(const DenseVector<Number>& value)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   _point_locator->enable_out_of_mesh_mode();
   _out_of_mesh_mode = true;
   _out_of_mesh_value = value;
@@ -511,7 +511,7 @@ void MeshFunction::enable_out_of_mesh_mode(const Number& value)
 
 void MeshFunction::disable_out_of_mesh_mode(void)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   _point_locator->disable_out_of_mesh_mode();
   _out_of_mesh_mode = false;
 }

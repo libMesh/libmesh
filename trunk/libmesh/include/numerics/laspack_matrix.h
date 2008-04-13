@@ -363,14 +363,14 @@ void LaspackMatrix<T>::zero ()
       const unsigned int len = (_row_start[row+1] - _row_start[row]);
 	
       // Make sure we agree on the row length
-      assert (len == Q_GetLen(&_QMat, row+1));
+      libmesh_assert (len == Q_GetLen(&_QMat, row+1));
       
       for (unsigned int l=0; l<len; l++)
 	{
 	  const unsigned int j = *(r_start + l);
 
 	  // Make sure the data structures are working
-	  assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
+	  libmesh_assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
 	  
 	  Q_SetEntry (&_QMat, row+1, l, j+1, 0.);
 	}
@@ -383,7 +383,7 @@ template <typename T>
 inline
 unsigned int LaspackMatrix<T>::m () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   return static_cast<unsigned int>(Q_GetDim(const_cast<QMatrix*>(&_QMat)));
 }
@@ -394,7 +394,7 @@ template <typename T>
 inline
 unsigned int LaspackMatrix<T>::n () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   return static_cast<unsigned int>(Q_GetDim(const_cast<QMatrix*>(&_QMat)));
 }
@@ -425,15 +425,15 @@ void LaspackMatrix<T>::set (const unsigned int i,
 			    const unsigned int j,
 			    const T value)
 {
-  assert (this->initialized());
-  assert (i < this->m());
-  assert (j < this->n());
+  libmesh_assert (this->initialized());
+  libmesh_assert (i < this->m());
+  libmesh_assert (j < this->n());
   
   const unsigned int position = this->pos(i,j);
 
   // Sanity check
-  assert (*(_row_start[i]+position) == j);
-  assert ((j+1) == Q_GetPos (&_QMat, i+1, position));
+  libmesh_assert (*(_row_start[i]+position) == j);
+  libmesh_assert ((j+1) == Q_GetPos (&_QMat, i+1, position));
 
   Q_SetEntry (&_QMat, i+1, position, j+1, value);
 }
@@ -446,14 +446,14 @@ void LaspackMatrix<T>::add (const unsigned int i,
 			    const unsigned int j,
 			    const T value)
 {
-  assert (this->initialized());
-  assert (i < this->m());
-  assert (j < this->n());
+  libmesh_assert (this->initialized());
+  libmesh_assert (i < this->m());
+  libmesh_assert (j < this->n());
   
   const unsigned int position = this->pos(i,j);
 
   // Sanity check
-  assert (*(_row_start[i]+position) == j);
+  libmesh_assert (*(_row_start[i]+position) == j);
 
   Q_AddVal (&_QMat, i+1, position, value);
 }
@@ -477,9 +477,9 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 				  const std::vector<unsigned int>& cols)
 		    
 {
-  assert (this->initialized());
-  assert (dm.m() == rows.size());
-  assert (dm.n() == cols.size());
+  libmesh_assert (this->initialized());
+  libmesh_assert (dm.m() == rows.size());
+  libmesh_assert (dm.n() == cols.size());
 
   
   for (unsigned int i=0; i<rows.size(); i++)
@@ -492,14 +492,14 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 template <typename T>
 void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 {
-  assert (this->initialized());
-  assert (this->m() == X_in.m());
-  assert (this->n() == X_in.n());
+  libmesh_assert (this->initialized());
+  libmesh_assert (this->m() == X_in.m());
+  libmesh_assert (this->n() == X_in.n());
 
   LaspackMatrix<T>* X = dynamic_cast<LaspackMatrix<T>*> (&X_in);
   _LPNumber         a = static_cast<_LPNumber>          (a_in);
   
-  assert(X != NULL);
+  libmesh_assert(X != NULL);
   
   // loops taken from LaspackMatrix<T>::zero ()
 
@@ -513,9 +513,9 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
       const unsigned int len = (_row_start[row+1] - _row_start[row]);
 
       // Make sure we agree on the row length
-      assert (len == Q_GetLen(&_QMat, row+1));
+      libmesh_assert (len == Q_GetLen(&_QMat, row+1));
       // compare matrix sparsity structures
-      assert (len == Q_GetLen(&(X->_QMat), row+1));
+      libmesh_assert (len == Q_GetLen(&(X->_QMat), row+1));
 	
       
       for (unsigned int l=0; l<len; l++)
@@ -523,7 +523,7 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 	  const unsigned int j = *(r_start + l);
 
 	  // Make sure the data structures are working
-	  assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
+	  libmesh_assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
 
 	  const _LPNumber value = a * Q_GetEl(const_cast<QMatrix*>(&(X->_QMat)), row+1, j+1);
 	  Q_AddVal   (&_QMat, row+1, l, value);
@@ -539,9 +539,9 @@ inline
 T LaspackMatrix<T>::operator () (const unsigned int i,
 				 const unsigned int j) const
 {
-  assert (this->initialized());
-  assert (i < this->m());
-  assert (j < this->n());
+  libmesh_assert (this->initialized());
+  libmesh_assert (i < this->m());
+  libmesh_assert (j < this->n());
   
   return Q_GetEl (const_cast<QMatrix*>(&_QMat), i+1, j+1);
 }
@@ -554,10 +554,10 @@ unsigned int LaspackMatrix<T>::pos (const unsigned int i,
 				    const unsigned int j) const
 {
   //std::cout << "m()=" << m() << std::endl;
-  assert (i < this->m());
-  assert (j < this->n());
-  assert (i+1 < _row_start.size());
-  assert (_row_start.back() == _csr.end());
+  libmesh_assert (i < this->m());
+  libmesh_assert (j < this->n());
+  libmesh_assert (i+1 < _row_start.size());
+  libmesh_assert (_row_start.back() == _csr.end());
 
   // note this requires the _csr to be 
   std::pair<std::vector<unsigned int>::const_iterator,
@@ -567,10 +567,10 @@ unsigned int LaspackMatrix<T>::pos (const unsigned int i,
 		      j);
 
   // Make sure the row contains the element j
-  assert (p.first != p.second);
+  libmesh_assert (p.first != p.second);
 
   // Make sure the values match
-  assert (*p.first == j);
+  libmesh_assert (*p.first == j);
 
   // Return the position in the compressed row
   return std::distance (_row_start[i], p.first);

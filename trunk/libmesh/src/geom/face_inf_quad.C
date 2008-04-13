@@ -34,7 +34,7 @@
 // InfQuad class member functions
 unsigned int InfQuad::key (const unsigned int s) const
 {
-  assert (s < this->n_sides());
+  libmesh_assert (s < this->n_sides());
 
 
   switch (s)
@@ -67,7 +67,7 @@ unsigned int InfQuad::key (const unsigned int s) const
 
 AutoPtr<DofObject> InfQuad::side (const unsigned int i) const
 {
-  assert (i < this->n_sides());
+  libmesh_assert (i < this->n_sides());
 
 
   switch (i)
@@ -122,8 +122,8 @@ AutoPtr<DofObject> InfQuad::side (const unsigned int i) const
 bool InfQuad::is_child_on_side(const unsigned int c,
                                const unsigned int s) const
 {
-  assert (c < this->n_children());
-  assert (s < this->n_sides());
+  libmesh_assert (c < this->n_children());
+  libmesh_assert (s < this->n_sides());
 
   return (s == 0 || s == c+1);
 }

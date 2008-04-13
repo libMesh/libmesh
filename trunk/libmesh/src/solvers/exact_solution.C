@@ -70,7 +70,7 @@ ExactSolution::ExactSolution(EquationSystems& es) :
 
 void ExactSolution::attach_reference_solution (EquationSystems* es_fine)
 {
-  assert (es_fine != NULL);
+  libmesh_assert (es_fine != NULL);
   _equation_systems_fine = es_fine;
 
   // If we're using a fine grid solution, we're not using exact values
@@ -85,7 +85,7 @@ void ExactSolution::attach_exact_value (Number fptr(const Point& p,
 						    const std::string& sys_name,
 						    const std::string& unknown_name))
 {
-  assert (fptr != NULL);
+  libmesh_assert (fptr != NULL);
   _exact_value = fptr;
 
   // If we're using exact values, we're not using a fine grid solution
@@ -98,7 +98,7 @@ void ExactSolution::attach_exact_deriv (Gradient fptr(const Point& p,
 						      const std::string& sys_name,
 						      const std::string& unknown_name))
 {
-  assert (fptr != NULL);
+  libmesh_assert (fptr != NULL);
   _exact_deriv = fptr;
 
   // If we're using exact values, we're not using a fine grid solution
@@ -111,7 +111,7 @@ void ExactSolution::attach_exact_hessian (Tensor fptr(const Point& p,
 						      const std::string& sys_name,
 						      const std::string& unknown_name))
 {
-  assert (fptr != NULL);
+  libmesh_assert (fptr != NULL);
   _exact_hessian = fptr;
 
   // If we're using exact values, we're not using a fine grid solution
@@ -310,7 +310,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   parallel_only();
 
   // Make sure we aren't "overconfigured"
-  assert (!(_exact_value && _equation_systems_fine));
+  libmesh_assert (!(_exact_value && _equation_systems_fine));
 
   // Get a reference to the system whose error is being computed.
   // If we have a fine grid, however, we'll integrate on that instead

@@ -398,20 +398,20 @@ void DofObject::clear_dofs ()
       for (unsigned int s=0; s<this->n_systems(); s++)
 	if (this->n_vars(s) != 0) // This has only been allocated if 
 	  {                       // variables were declared
-	    assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
-	    assert (_n_comp[s]  != NULL); delete [] _n_comp[s];  _n_comp[s]  = NULL;
+	    libmesh_assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
+	    libmesh_assert (_n_comp[s]  != NULL); delete [] _n_comp[s];  _n_comp[s]  = NULL;
 	  }
       
-      assert (_n_vars  != NULL); delete [] _n_vars;  _n_vars  = NULL; 
-      assert (_n_comp  != NULL); delete [] _n_comp;  _n_comp  = NULL;
-      assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
+      libmesh_assert (_n_vars  != NULL); delete [] _n_vars;  _n_vars  = NULL; 
+      libmesh_assert (_n_comp  != NULL); delete [] _n_comp;  _n_comp  = NULL;
+      libmesh_assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
     }
   
   // Make sure we cleaned up
   // (or there was nothing there)
-  assert (_n_vars  == NULL);
-  assert (_n_comp  == NULL);
-  assert (_dof_ids == NULL);
+  libmesh_assert (_n_vars  == NULL);
+  libmesh_assert (_n_comp  == NULL);
+  libmesh_assert (_dof_ids == NULL);
   
   // No systems now.
   _n_systems = 0;
@@ -423,7 +423,7 @@ inline
 unsigned int DofObject::n_dofs (const unsigned int s,
 				const unsigned int var) const
 {
-  assert (s < this->n_systems());
+  libmesh_assert (s < this->n_systems());
   
   unsigned int num = 0;
 
@@ -446,7 +446,7 @@ unsigned int DofObject::n_dofs (const unsigned int s,
 inline
 unsigned int DofObject::id () const
 {
-  assert (this->valid_id());
+  libmesh_assert (this->valid_id());
   return _id;
 }
 
@@ -522,8 +522,8 @@ unsigned int DofObject::n_systems () const
 inline
 unsigned int DofObject::n_vars(const unsigned int s) const
 {
-  assert (s < this->n_systems());
-  assert (_n_vars != NULL);
+  libmesh_assert (s < this->n_systems());
+  libmesh_assert (_n_vars != NULL);
   
   return static_cast<unsigned int>(_n_vars[s]);
 }
@@ -535,11 +535,11 @@ inline
 unsigned int DofObject::n_comp(const unsigned int s,
 			       const unsigned int var) const
 {
-  assert (s < this->n_systems());
-  assert (_dof_ids != NULL);
-  assert (_dof_ids[s] != NULL);
-  assert (_n_comp != NULL);
-  assert (_n_comp[s] != NULL);
+  libmesh_assert (s < this->n_systems());
+  libmesh_assert (_dof_ids != NULL);
+  libmesh_assert (_dof_ids[s] != NULL);
+  libmesh_assert (_n_comp != NULL);
+  libmesh_assert (_n_comp[s] != NULL);
 
 # ifdef DEBUG
   // Does this ever happen?  I doubt it... 3/7/2003 (BSK)
@@ -564,11 +564,11 @@ unsigned int DofObject::dof_number(const unsigned int s,
 				   const unsigned int var,
 				   const unsigned int comp) const
 {
-  assert (s < this->n_systems());
-  assert (var  < this->n_vars(s));
-  assert (_dof_ids != NULL);
-  assert (_dof_ids[s] != NULL);  
-  assert (comp < this->n_comp(s,var));
+  libmesh_assert (s < this->n_systems());
+  libmesh_assert (var  < this->n_vars(s));
+  libmesh_assert (_dof_ids != NULL);
+  libmesh_assert (_dof_ids[s] != NULL);  
+  libmesh_assert (comp < this->n_comp(s,var));
   
   if (_dof_ids[s][var] == invalid_id)
     return invalid_id;

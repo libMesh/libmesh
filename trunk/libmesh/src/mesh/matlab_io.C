@@ -42,7 +42,7 @@ void MatlabIO::read_stream(std::istream& in)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  assert(libMesh::processor_id() == 0);
+  libmesh_assert(libMesh::processor_id() == 0);
 
   // Get a reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -51,10 +51,10 @@ void MatlabIO::read_stream(std::istream& in)
   mesh.clear();
   
   // PDE toolkit only works in 2D
-  assert(mesh.mesh_dimension() == 2);
+  libmesh_assert(mesh.mesh_dimension() == 2);
 
   // Check the input buffer
-  assert (in.good());
+  libmesh_assert (in.good());
 
   unsigned int nNodes=0, nElem=0;
 
@@ -62,8 +62,8 @@ void MatlabIO::read_stream(std::istream& in)
      >> nElem;   // Read the number of elements
 
   // Sort of check that it worked
-  assert(nNodes > 0);
-  assert(nElem > 0);
+  libmesh_assert(nNodes > 0);
+  libmesh_assert(nElem > 0);
 
   // Read the nodal coordinates
   {

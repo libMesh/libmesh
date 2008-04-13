@@ -162,11 +162,11 @@ void Patch::build_around_element (const Elem* e0,
 {
   
   // Make sure we are building a patch for an active element.
-  assert (e0 != NULL);
-  assert (e0->active());
+  libmesh_assert (e0 != NULL);
+  libmesh_assert (e0->active());
   // Make sure we are either starting with a local element or
   // requesting a nonlocal patch
-  assert ((patchtype != &Patch::add_local_face_neighbors &&
+  libmesh_assert ((patchtype != &Patch::add_local_face_neighbors &&
            patchtype != &Patch::add_local_point_neighbors) ||
            e0->processor_id() == libMesh::processor_id());
   
@@ -214,10 +214,10 @@ void Patch::build_around_element (const Elem* e0,
 	// Convenience.  Keep the syntax simple.
 	const Elem* elem = *it;
 
-	assert (elem->active());
+	libmesh_assert (elem->active());
         if ((patchtype == &Patch::add_local_face_neighbors ||
              patchtype == &Patch::add_local_point_neighbors))
-	  assert (elem->processor_id() == libMesh::processor_id());
+	  libmesh_assert (elem->processor_id() == libMesh::processor_id());
       }
   }
 #endif

@@ -74,10 +74,10 @@ void FE<Dim,T>::reinit(const Elem* elem,
 		       const unsigned int s,
 		       const Real tolerance)
 {
-  assert (elem  != NULL);
-  assert (qrule != NULL);
+  libmesh_assert (elem  != NULL);
+  libmesh_assert (qrule != NULL);
   // We now do this for 1D elements!
-  // assert (Dim != 1);
+  // libmesh_assert (Dim != 1);
 
   // Build the side of interest 
   const AutoPtr<Elem> side(elem->build_side(s));
@@ -138,10 +138,10 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
 		            const unsigned int e,
 			    const Real tolerance)
 {
-  assert (elem  != NULL);
-  assert (qrule != NULL);
+  libmesh_assert (elem  != NULL);
+  libmesh_assert (qrule != NULL);
   // We don't do this for 1D elements!
-  assert (Dim != 1);
+  libmesh_assert (Dim != 1);
 
   // Build the side of interest 
   const AutoPtr<Elem> edge(elem->build_edge(e));
@@ -188,7 +188,7 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_face_shape_functions(const std::vector<Point>& qp,
 					  const Elem* side)
 {
-  assert (side  != NULL);
+  libmesh_assert (side  != NULL);
   
   /**
    * Start logging the shape function initialization
@@ -279,7 +279,7 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_edge_shape_functions(const std::vector<Point>& qp,
 					  const Elem* edge)
 {
-  assert (edge != NULL);
+  libmesh_assert (edge != NULL);
   
   /**
    * Start logging the shape function initialization
@@ -334,7 +334,7 @@ void FE<Dim,T>::init_edge_shape_functions(const std::vector<Point>& qp,
 void FEBase::compute_face_map(const std::vector<Real>& qw,
 			      const Elem* side)
 {
-  assert (side  != NULL);
+  libmesh_assert (side  != NULL);
 
   START_LOG("compute_face_map()", "FE");
 
@@ -365,17 +365,17 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
         // We need to look back at the full edge to figure out the normal
         // vector
         const Elem *elem = side->parent();
-        assert (elem);
+        libmesh_assert (elem);
         if (side->node(0) == elem->node(0))
           normals[0] = Point(-1.);
         else
           {
-            assert (side->node(0) == elem->node(1));
+            libmesh_assert (side->node(0) == elem->node(1));
             normals[0] = Point(1.);
           }
 
         // Calculate x at the point
-	assert (psi_map.size() == 1);
+	libmesh_assert (psi_map.size() == 1);
         // In the unlikely event we have multiple quadrature
         // points, they'll be in the same place
 	for (unsigned int p=0; p<n_qp; p++)
@@ -446,7 +446,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	    // For the second tangent, we need to refer to the full
 	    // element's (not just the edge's) Jacobian.
 	    const Elem *elem = side->parent();
-	    assert (elem != NULL);
+	    libmesh_assert (elem != NULL);
 
 	    // Inverse map xyz[p] to a reference point on the parent...
 	    Point reference_point = FE<2,LAGRANGE>::inverse_map(elem, xyz[p]);
@@ -475,7 +475,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	    // negative curvature.  Be sure to take that into account!
 	    const Real numerator   = d2xyzdxi2_map[p] * normals[p];
 	    const Real denominator = dxyzdxi_map[p].size_sq();
-	    assert (denominator != 0);
+	    libmesh_assert (denominator != 0);
 	    curvatures[p] = numerator / denominator;
 	  }
 	
@@ -484,7 +484,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	  {
 	    const Real jac = dxyzdxi_map[p].size();
 	    
-	    assert (jac > 0.);
+	    libmesh_assert (jac > 0.);
 	    
 	    JxW[p] = jac*qw[p];
 	  }
@@ -564,7 +564,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	    
 	    const Real numerator   = E*N -2.*F*M + G*L;
 	    const Real denominator = E*G - F*F;
-	    assert (denominator != 0.);
+	    libmesh_assert (denominator != 0.);
 	    curvatures[p] = 0.5*numerator/denominator;
 	  }  
     	
@@ -589,7 +589,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	    
 	    const Real jac = std::sqrt(g11*g22 - g12*g21);
 	    
-	    assert (jac > 0.);
+	    libmesh_assert (jac > 0.);
 
 	    JxW[p] = jac*qw[p];
 	  }
@@ -612,7 +612,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 void FEBase::compute_edge_map(const std::vector<Real>& qw,
 			      const Elem* edge)
 {
-  assert (edge != NULL);
+  libmesh_assert (edge != NULL);
 
   if (dim == 2)
     {
@@ -623,7 +623,7 @@ void FEBase::compute_edge_map(const std::vector<Real>& qw,
       return;
     }
 
-  assert (dim == 3);  // 1D is unnecessary and currently unsupported
+  libmesh_assert (dim == 3);  // 1D is unnecessary and currently unsupported
 
   START_LOG("compute_edge_map()", "FE");
 
@@ -680,7 +680,7 @@ void FEBase::compute_edge_map(const std::vector<Real>& qw,
 				 dydxi_map(p)*dydxi_map(p) +
 				 dzdxi_map(p)*dzdxi_map(p));
 	    
-      assert (jac > 0.);
+      libmesh_assert (jac > 0.);
 
       JxW[p] = jac*qw[p];
     }

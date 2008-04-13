@@ -49,14 +49,14 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 			     const unsigned int i,
 			     const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
   using Utility::pow;
 
   const Order totalorder = static_cast<Order>(order+elem->p_level());
-  assert(totalorder > 0);
+  libmesh_assert(totalorder > 0);
   
   switch (elem->type())
     {      
@@ -67,8 +67,8 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 	const Real zeta2 = p(1);
 	const Real zeta0 = 1. - zeta1 - zeta2;
 	      
-	assert (i<(totalorder+1u)*(totalorder+2u)/2);
-	assert (elem->type() == TRI6 || totalorder < 2);
+	libmesh_assert (i<(totalorder+1u)*(totalorder+2u)/2);
+	libmesh_assert (elem->type() == TRI6 || totalorder < 2);
 
         // Vertex DoFs
         if (i == 0)
@@ -161,7 +161,7 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
 
     // Hierarchic shape functions on the quadrilateral.
     case QUAD4:
-      assert (totalorder < 2);
+      libmesh_assert (totalorder < 2);
     case QUAD8:
     case QUAD9:
       {
@@ -169,7 +169,7 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
         const Real xi  = p(0);
         const Real eta = p(1);
       
-        assert (i < (totalorder+1u)*(totalorder+1u));
+        libmesh_assert (i < (totalorder+1u)*(totalorder+1u));
 
 // Example i, i0, i1 values for totalorder = 5:
 //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
@@ -255,13 +255,13 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 				   const unsigned int j,
 				   const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order+elem->p_level());
 
-  assert (totalorder > 0);
+  libmesh_assert (totalorder > 0);
   
   switch (type)
     {
@@ -271,7 +271,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
       {
 	const Real eps = 1.e-6;
 	      
-	assert (j < 2);
+	libmesh_assert (j < 2);
 	      
 	switch (j)
 	  {
@@ -302,7 +302,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
       }
 
     case QUAD4:
-      assert (totalorder < 2);
+      libmesh_assert (totalorder < 2);
     case QUAD8:
     case QUAD9:
       {
@@ -310,7 +310,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
 	const Real xi  = p(0);
 	const Real eta = p(1);
 
-        assert (i < (totalorder+1u)*(totalorder+1u));
+        libmesh_assert (i < (totalorder+1u)*(totalorder+1u));
 
 // Example i, i0, i1 values for totalorder = 5:
 //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
@@ -410,7 +410,7 @@ Real FE<2,HIERARCHIC>::shape_second_deriv(const Elem* elem,
 				          const unsigned int j,
 				          const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   // I have been lazy here and am using finite differences
   // to compute the derivatives!

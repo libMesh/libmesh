@@ -62,7 +62,7 @@ namespace
     // the number of DoFs per edge appears everywhere:
     const unsigned int e = totalorder - 1u;
 
-    assert (i<(totalorder+1u)*(totalorder+1u)*(totalorder+1u));
+    libmesh_assert (i<(totalorder+1u)*(totalorder+1u)*(totalorder+1u));
 
     Real xi_saved = xi, eta_saved = eta, zeta_saved = zeta;
 
@@ -652,7 +652,7 @@ Real FE<3,HIERARCHIC>::shape(const Elem* elem,
 {
 #if DIM == 3
   
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order+elem->p_level());
@@ -661,10 +661,10 @@ Real FE<3,HIERARCHIC>::shape(const Elem* elem,
     {
     case HEX8:
     case HEX20:
-      assert(totalorder < 2);
+      libmesh_assert(totalorder < 2);
     case HEX27:
       {
-        assert (i<(totalorder+1u)*(totalorder+1u)*(totalorder+1u));
+        libmesh_assert (i<(totalorder+1u)*(totalorder+1u)*(totalorder+1u));
         
         // Compute hex shape functions as a tensor-product
         Real xi   = p(0);
@@ -718,9 +718,9 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
                                    const Point& p)
 {
 #if DIM == 3
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
-  assert (j < 3);
+  libmesh_assert (j < 3);
   
   // cheat by using finite difference approximations:
   const Real eps = 1.e-6;
@@ -790,7 +790,7 @@ Real FE<3,HIERARCHIC>::shape_second_deriv(const Elem* elem,
                                           const unsigned int j,
                                           const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   const Real eps = 1.e-6;
   Point pp, pm;

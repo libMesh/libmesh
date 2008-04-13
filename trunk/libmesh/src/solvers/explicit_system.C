@@ -107,5 +107,5 @@ void ExplicitSystem::add_system_rhs ()
   if (rhs == NULL)
     rhs = &(this->add_vector ("RHS Vector", false));
 
-  assert (rhs != NULL);
+  libmesh_assert (rhs != NULL);
 }

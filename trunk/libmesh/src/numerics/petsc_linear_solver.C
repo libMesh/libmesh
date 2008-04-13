@@ -283,10 +283,10 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 
   // We cast to pointers so we can be sure that they succeeded
   // by comparing the result against NULL.
-  assert(matrix   != NULL);
-  assert(precond  != NULL);
-  assert(solution != NULL);
-  assert(rhs      != NULL);
+  libmesh_assert(matrix   != NULL);
+  libmesh_assert(precond  != NULL);
+  libmesh_assert(solution != NULL);
+  libmesh_assert(rhs      != NULL);
   
   this->init (matrix);
 

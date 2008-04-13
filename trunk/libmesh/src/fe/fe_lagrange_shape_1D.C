@@ -41,7 +41,7 @@ Real FE<1,LAGRANGE>::shape(const ElemType,
       // Lagrange linears
     case FIRST:
       {
-	assert (i<2);
+	libmesh_assert (i<2);
 	
 	switch (i)
 	  {
@@ -62,7 +62,7 @@ Real FE<1,LAGRANGE>::shape(const ElemType,
       // Lagrange quadratics
     case SECOND:
       {
-	assert (i<3);
+	libmesh_assert (i<3);
 	
 	switch (i)
 	  {
@@ -86,7 +86,7 @@ Real FE<1,LAGRANGE>::shape(const ElemType,
       // Lagrange cubics
     case THIRD:
       {
-	assert (i<4);
+	libmesh_assert (i<4);
 	
 	switch (i)
 	  {
@@ -128,7 +128,7 @@ Real FE<1,LAGRANGE>::shape(const Elem* elem,
 			   const unsigned int i,
 			   const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   return FE<1,LAGRANGE>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
 }
@@ -144,7 +144,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
 {
   // only d()/dxi in 1D!
   
-  assert (j == 0);
+  libmesh_assert (j == 0);
 	
   const Real xi = p(0);
 
@@ -154,7 +154,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
       // Lagrange linear shape function derivatives
     case FIRST:
       {
-	assert (i<2);
+	libmesh_assert (i<2);
 	
 	switch (i)
 	  {
@@ -174,7 +174,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
       // Lagrange quadratic shape function derivatives
     case SECOND:
       {
-	assert (i<3);
+	libmesh_assert (i<3);
 	
 	switch (i)
 	  {
@@ -197,7 +197,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
       // Lagrange cubic shape function derivatives
     case THIRD:
       {
-	assert (i<4);
+	libmesh_assert (i<4);
 	
 	switch (i)
 	  {
@@ -240,7 +240,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const Elem* elem,
 				 const unsigned int j,
 				 const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   return FE<1,LAGRANGE>::shape_deriv(elem->type(),
 				     static_cast<Order>(order + elem->p_level()), i, j, p);
@@ -260,7 +260,7 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
   // depend on xi only!
 
   const Real xi = p(0);
-  assert (j == 0);
+  libmesh_assert (j == 0);
   
   switch (order)
     {
@@ -340,7 +340,7 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const Elem* elem,
 				        const unsigned int j,
 				        const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   return FE<1,LAGRANGE>::shape_second_deriv(elem->type(),
 				            static_cast<Order>(order + elem->p_level()), i, j, p);

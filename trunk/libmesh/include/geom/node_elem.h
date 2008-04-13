@@ -55,7 +55,7 @@ class NodeElem : public Elem
   NodeElem (const unsigned int nn,
          const unsigned int ns,
          Elem* p) :
-    Elem(nn, ns, p) { assert(nn == 1); assert (ns == 0); }
+    Elem(nn, ns, p) { libmesh_assert(nn == 1); libmesh_assert (ns == 0); }
 
   /**
    * Default node element, takes number of nodes and 

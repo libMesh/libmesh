@@ -66,7 +66,7 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 	  {
 	    const unsigned int node_number = elem->node(n);
 
-	    assert (node_number < max_level_at_node.size());
+	    libmesh_assert (node_number < max_level_at_node.size());
 	    
 	    max_level_at_node[node_number] =
 	      std::max (max_level_at_node[node_number], elem_level);
@@ -286,7 +286,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
       // Test the parent if that is already flagged for coarsening
       else if (elem->refinement_flag() == Elem::COARSEN)
         {
-          assert(elem->parent());
+          libmesh_assert(elem->parent());
 	  elem = elem->parent();
           // FIXME - this doesn't seem right - RHS
           if (elem->refinement_flag() != Elem::COARSEN_INACTIVE)
@@ -300,7 +300,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
         my_p_adjustment = 1;
       else if (elem->p_refinement_flag() == Elem::COARSEN)
         {
-          assert(elem->p_level() > 0);
+          libmesh_assert(elem->p_level() > 0);
           my_p_adjustment = -1;
         }
       const unsigned int my_new_p_level = elem->p_level() +
@@ -342,7 +342,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
                     p_adjustment = 1;
                   else if (neighbor->p_refinement_flag() == Elem::COARSEN)
                     {
-                      assert(neighbor->p_level() > 0);
+                      libmesh_assert(neighbor->p_level() > 0);
                       p_adjustment = -1;
                     }
                   if (my_new_p_level >= neighbor->p_level() + p_adjustment)
@@ -375,7 +375,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
             {
               for (unsigned int c=0; c<elem->n_children(); c++)
                 {
-                  assert(elem->child(c)->refinement_flag() ==
+                  libmesh_assert(elem->child(c)->refinement_flag() ==
                          Elem::COARSEN);
                   elem->child(c)->set_refinement_flag(Elem::DO_NOTHING);
                 }

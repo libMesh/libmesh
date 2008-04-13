@@ -82,7 +82,7 @@ template <typename T>
 void TypeTensor<T>::write_unformatted (std::ostream &out,
 				       const bool newline) const
 {
-  assert (out);
+  libmesh_assert (out);
 
   out << std::setiosflags(std::ios::showpoint)
       << (*this)(0,0) << " "

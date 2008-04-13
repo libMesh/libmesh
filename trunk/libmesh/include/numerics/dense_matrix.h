@@ -445,9 +445,9 @@ inline
 T DenseMatrix<T>::operator () (const unsigned int i,
 			       const unsigned int j) const
 {
-  assert (i*j<_val.size());
-  assert (i < this->_m);
-  assert (j < this->_n);
+  libmesh_assert (i*j<_val.size());
+  libmesh_assert (i < this->_m);
+  libmesh_assert (j < this->_n);
   
   
   //  return _val[(i) + (this->_m)*(j)]; // col-major
@@ -461,9 +461,9 @@ inline
 T & DenseMatrix<T>::operator () (const unsigned int i,
 				 const unsigned int j)
 {
-  assert (i*j<_val.size());
-  assert (i < this->_m);
-  assert (j < this->_n);
+  libmesh_assert (i*j<_val.size());
+  libmesh_assert (i < this->_m);
+  libmesh_assert (j < this->_n);
   
   //return _val[(i) + (this->_m)*(j)]; // col-major
   return _val[(i)*(this->_n) + (j)]; // row-major
@@ -519,8 +519,8 @@ template<typename T>
 inline
 Real DenseMatrix<T>::min () const
 {
-  assert (this->_m);
-  assert (this->_n);
+  libmesh_assert (this->_m);
+  libmesh_assert (this->_n);
   Real my_min = libmesh_real((*this)(0,0));
 
   for (unsigned int i=0; i!=this->_m; i++)
@@ -540,8 +540,8 @@ template<typename T>
 inline
 Real DenseMatrix<T>::max () const
 {
-  assert (this->_m);
-  assert (this->_n);
+  libmesh_assert (this->_m);
+  libmesh_assert (this->_n);
   Real my_max = libmesh_real((*this)(0,0));
 
   for (unsigned int i=0; i!=this->_m; i++)
@@ -561,8 +561,8 @@ template<typename T>
 inline
 Real DenseMatrix<T>::l1_norm () const
 {
-  assert (this->_m);
-  assert (this->_n);
+  libmesh_assert (this->_m);
+  libmesh_assert (this->_n);
 
   Real columnsum = 0.;
   for (unsigned int i=0; i!=this->_m; i++)
@@ -588,8 +588,8 @@ template<typename T>
 inline
 Real DenseMatrix<T>::linfty_norm () const
 {
-  assert (this->_m);
-  assert (this->_n);
+  libmesh_assert (this->_m);
+  libmesh_assert (this->_n);
 
   Real rowsum = 0.;
   for (unsigned int j=0; j!=this->_n; j++)
@@ -631,8 +631,8 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 // 			      const T val,
 // 			      DenseVector<T>& rhs)
 // {
-//   assert (this->_m == rhs.size());
-//   assert (iv == jv);
+//   libmesh_assert (this->_m == rhs.size());
+//   libmesh_assert (iv == jv);
 
 
 //   // move the known value into the RHS

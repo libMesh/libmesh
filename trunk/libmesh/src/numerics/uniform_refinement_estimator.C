@@ -87,12 +87,12 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
   if (_es)
     {
-      assert(!_system);
-      assert(_es->n_systems());
+      libmesh_assert(!_system);
+      libmesh_assert(_es->n_systems());
       _system = &(_es->get_system(0));
-      assert(&(_system->get_equation_systems()) == _es);
+      libmesh_assert(&(_system->get_equation_systems()) == _es);
 
-      assert(_es->n_systems());
+      libmesh_assert(_es->n_systems());
       for (unsigned int i=0; i != _es->n_systems(); ++i)
       // We have to break the rules here, because we can't refine a const System
         system_list.push_back(const_cast<System *>(&(_es->get_system(i))));
@@ -101,14 +101,14 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       // each variable's contributions to it.
       if (_component_scales)
         {
-          assert(!errors_per_cell);
+          libmesh_assert(!errors_per_cell);
           component_scales = _component_scales;
         }
       else
       // If we're computing many vectors, we just need to know which
       // variables to skip
         {
-          assert (errors_per_cell);
+          libmesh_assert (errors_per_cell);
 
           component_scales = new std::map<const System*, std::vector<float> >;
           for (unsigned int i=0; i!= _es->n_systems(); ++i)
@@ -131,11 +131,11 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
     }
   else
     {
-      assert(_system);
+      libmesh_assert(_system);
       // We have to break the rules here, because we can't refine a const System
       system_list.push_back(const_cast<System *>(_system));
 
-      assert(!_component_scales);
+      libmesh_assert(!_component_scales);
       component_scales = new std::map<const System*, std::vector<float> >;
       (*component_scales)[_system] = component_scale;
     }
@@ -160,7 +160,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
     }
   else
     {
-      assert(errors_per_cell);
+      libmesh_assert(errors_per_cell);
       for (ErrorMap::iterator i = errors_per_cell->begin();
            i != errors_per_cell->end(); ++i)
         {
@@ -244,7 +244,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   // Uniformly refine the mesh
   MeshRefinement mesh_refinement(mesh);
 
-  assert (number_h_refinements > 0 || number_p_refinements > 0);
+  libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
 
   // FIXME: this may break if there is more than one System
   // on this mesh but estimate_error was still called instead of
@@ -314,7 +314,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
           ErrorVector *err_vec = error_per_cell;
           if (!err_vec)
             {
-              assert(errors_per_cell);
+              libmesh_assert(errors_per_cell);
 	      err_vec =
 		(*errors_per_cell)[std::make_pair(&system,var)];
             }
@@ -356,7 +356,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
               unsigned int e_id = coarse->id();
               while (e_id >= max_coarse_elem_id)
                 {
-                  assert (coarse->parent());
+                  libmesh_assert (coarse->parent());
                   coarse = coarse->parent();
                   e_id = coarse->id();
                 }
@@ -410,7 +410,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                   // Add the squares of the error to each contribution
 		  L2normsq += JxW[qp] * var_scale *
                     libmesh_norm(val_error);
-                  assert (L2normsq     >= 0.);
+                  libmesh_assert (L2normsq     >= 0.);
 
 
                   // Compute the value of the error in the gradient at this
@@ -421,7 +421,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
                       H1seminormsq += JxW[qp] * var_scale *
                         grad_error.size_sq();
-                      assert (H1seminormsq >= 0.);
+                      libmesh_assert (H1seminormsq >= 0.);
                     }
 
 #ifdef ENABLE_SECOND_DERIVATIVES
@@ -433,7 +433,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
 		      H2seminormsq += JxW[qp] * var_scale *
                         grad2_error.size_sq();
-                      assert (H2seminormsq >= 0.);
+                      libmesh_assert (H2seminormsq >= 0.);
                     }
 #endif
                 } // end qp loop
@@ -453,7 +453,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
 
   // Uniformly coarsen the mesh, without projecting the solution
-  assert (number_h_refinements > 0 || number_p_refinements > 0);
+  libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
 
   for (unsigned int i = 0; i != number_h_refinements; ++i)
     {
@@ -469,7 +469,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
     }
 
   // We should be back where we started
-  assert(n_coarse_elem == mesh.n_elem());
+  libmesh_assert(n_coarse_elem == mesh.n_elem());
 
   // Each processor has now computed the error contribuions
   // for its local elements.  We need to sum the vector

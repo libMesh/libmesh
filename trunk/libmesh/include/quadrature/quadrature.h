@@ -99,7 +99,7 @@ public:
    * @returns the number of points associated with the quadrature rule.
    */    
   unsigned int n_points() const
-    { assert (!_points.empty()); return _points.size(); }
+    { libmesh_assert (!_points.empty()); return _points.size(); }
 
   /**
    * @returns the dimension of the quadrature rule.
@@ -132,13 +132,13 @@ public:
    * @returns the \f$ i^{th} \f$ quadrature point on the reference object.
    */
   Point qp(const unsigned int i) const
-    { assert (i < _points.size()); return _points[i]; }
+    { libmesh_assert (i < _points.size()); return _points[i]; }
 
   /**
    * @returns the \f$ i^{th} \f$ quadrature weight.
    */
   Real w(const unsigned int i) const
-    { assert (i < _weights.size()); return _weights[i]; }
+    { libmesh_assert (i < _weights.size()); return _weights[i]; }
   
   /**
    * Initializes the data structures to contain a quadrature rule
@@ -338,8 +338,8 @@ QBase::QBase(const unsigned int d,
 inline
 void QBase::print_info(std::ostream& os) const
 {
-  assert(!_points.empty());
-  assert(!_weights.empty());
+  libmesh_assert(!_points.empty());
+  libmesh_assert(!_weights.empty());
 
   os << "N_Q_Points=" << this->n_points() << std::endl << std::endl;
   for (unsigned int qp=0; qp<this->n_points(); qp++)

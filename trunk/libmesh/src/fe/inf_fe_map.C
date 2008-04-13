@@ -39,8 +39,8 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Point InfFE<Dim,T_radial,T_map>::map (const Elem* inf_elem,
 				      const Point& reference_point)
 {
-  assert (inf_elem != NULL);
-  assert (Dim != 0);
+  libmesh_assert (inf_elem != NULL);
+  libmesh_assert (Dim != 0);
 
   AutoPtr<Elem>      base_elem (Base::build_elem (inf_elem));
 
@@ -91,8 +91,8 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 					      const bool secure,
 					      const bool interpolated)
 {
-  assert (inf_elem != NULL);
-  assert (tolerance >= 0.);
+  libmesh_assert (inf_elem != NULL);
+  libmesh_assert (tolerance >= 0.);
 
   
   // Start logging the map inversion.
@@ -278,7 +278,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	    const Real G = dxi*dxi;
 	    
 	    if (secure)
-	      assert (G > 0.);
+	      libmesh_assert (G > 0.);
 	    
 	    const Real Ginv = 1./G;
 	    
@@ -323,8 +323,8 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	    
 	    if (secure)
 	      {
-		assert (det > 0.);
-		assert (std::abs(det) > 1.e-10);
+		libmesh_assert (det > 0.);
+		libmesh_assert (std::abs(det) > 1.e-10);
 	      }
 
 	    const Real inv_det = 1./det;

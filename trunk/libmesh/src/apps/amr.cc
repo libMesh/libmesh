@@ -108,7 +108,7 @@ int main (int argc, char** argv)
 void assemble(EquationSystems& es,
 	      const std::string& system_name)
 {
-  assert (system_name == "primary");
+  libmesh_assert (system_name == "primary");
   
   const MeshBase& mesh   = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();

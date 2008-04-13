@@ -30,7 +30,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
 				     const Order, /* not used */
 				     const unsigned int i)
 {
-  assert (-1.-1.e-5 <= v && v < 1.);
+  libmesh_assert (-1.-1.e-5 <= v && v < 1.);
 
   switch (i)
     {
@@ -109,7 +109,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
 					   const Order, /* not used */
 					   const unsigned int i)
 {
-  assert (-1.-1.e-5 <= v && v < 1.);
+  libmesh_assert (-1.-1.e-5 <= v && v < 1.);
 
   switch (i)
     {

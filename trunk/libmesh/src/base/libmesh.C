@@ -128,7 +128,7 @@ void _init (int &argc, char** & argv,
 #endif
 {
   // should _not_ be initialized already.
-  assert (!libMesh::initialized());
+  libmesh_assert (!libMesh::initialized());
   
   // Build a command-line parser.
   command_line.reset (new GetPot (argc, argv));
@@ -194,14 +194,14 @@ void _init (int &argc, char** & argv,
 #else
 
   // No MPI, can only be uniprocessor
-  assert (libMeshPrivateData::_n_processors == 1);
-  assert (libMeshPrivateData::_processor_id == 0);
+  libmesh_assert (libMeshPrivateData::_n_processors == 1);
+  libmesh_assert (libMeshPrivateData::_processor_id == 0);
   
 #endif
   
   // Could we have gotten bad values from the above calls?
-  assert (libMeshPrivateData::_n_processors >  0);
-  assert (libMeshPrivateData::_processor_id >= 0);
+  libmesh_assert (libMeshPrivateData::_n_processors >  0);
+  libmesh_assert (libMeshPrivateData::_processor_id >= 0);
 
   // Re-parse the command-line arguments.  Note that PETSc and MPI
   // initialization above may have removed command line arguments
@@ -232,8 +232,8 @@ void _init (int &argc, char** & argv,
   // Make sure these work.  Library methods
   // depend on these being implemented properly,
   // so this is a good time to test them!
-  assert (libMesh::initialized());
-  assert (!libMesh::closed());
+  libmesh_assert (libMesh::initialized());
+  libmesh_assert (!libMesh::closed());
 }
 
 
@@ -378,7 +378,7 @@ LibMeshInit::~LibMeshInit()
 bool libMesh::on_command_line (const std::string& arg)
 {
   // Make sure the command line parser is ready for use
-  assert (command_line.get() != NULL);
+  libmesh_assert (command_line.get() != NULL);
   
   return command_line->search (arg);
 }
@@ -389,7 +389,7 @@ template <typename T>
 T libMesh::command_line_value (const std::string &name, T value)
 {
   // Make sure the command line parser is ready for use
-  assert (command_line.get() != NULL);
+  libmesh_assert (command_line.get() != NULL);
   
     // only if the variable exists in the file
     if (command_line->have_variable(name.c_str()))
@@ -401,7 +401,7 @@ T libMesh::command_line_value (const std::string &name, T value)
 
 SolverPackage libMesh::default_solver_package ()
 {
-  assert (libMesh::initialized());
+  libmesh_assert (libMesh::initialized());
   
   static bool called = false;
 

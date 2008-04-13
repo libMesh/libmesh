@@ -41,9 +41,9 @@ __libmesh_petsc_diff_solver_monitor (SNES, PetscInt its,
 PetscErrorCode
 __libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void *ctx)
 {
-  assert (x   != NULL);
-  assert (r   != NULL);
-  assert (ctx != NULL);
+  libmesh_assert (x   != NULL);
+  libmesh_assert (r   != NULL);
+  libmesh_assert (ctx != NULL);
 
   PetscDiffSolver& solver =
     *(static_cast<PetscDiffSolver*> (ctx));
@@ -85,10 +85,10 @@ PetscErrorCode
 __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *j, Mat *pc,
                                       MatStructure *msflag, void *ctx)
 {
-  assert (x   != NULL);
-  assert (j   != NULL);
-//  assert (pc  == j);  // We don't use separate preconditioners yet
-  assert (ctx != NULL);
+  libmesh_assert (x   != NULL);
+  libmesh_assert (j   != NULL);
+//  libmesh_assert (pc  == j);  // We don't use separate preconditioners yet
+  libmesh_assert (ctx != NULL);
 
   PetscDiffSolver& solver =
     *(static_cast<PetscDiffSolver*> (ctx));

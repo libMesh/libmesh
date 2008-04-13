@@ -171,7 +171,7 @@ void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
 	subdomain_bounds[pid] = subdomain_bounds[pid-1] + tgt_subdomain_size;
     }
   
-  assert (subdomain_bounds.back() == n_unpartitioned_elements);  
+  libmesh_assert (subdomain_bounds.back() == n_unpartitioned_elements);  
   
   // create the unique mapping for all unpartitioned elements independent of partitioning
   // determine the global indexing for all the unpartitoned elements
@@ -186,19 +186,19 @@ void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
     {
       Elem *elem = *it;
       
-      assert (cnt < global_indices.size());
+      libmesh_assert (cnt < global_indices.size());
       const unsigned int global_index =
 	global_indices[cnt++];
       
-      assert (global_index < subdomain_bounds.back());
-      assert (global_index < n_unpartitioned_elements);
+      libmesh_assert (global_index < subdomain_bounds.back());
+      libmesh_assert (global_index < n_unpartitioned_elements);
 
       const unsigned int subdomain_id =
 	std::distance(subdomain_bounds.begin(),
 		      std::upper_bound(subdomain_bounds.begin(),
 				       subdomain_bounds.end(),
 				       global_index));
-      assert (subdomain_id < n_subdomains);
+      libmesh_assert (subdomain_id < n_subdomains);
      
       elem->processor_id() = subdomain_id;		
       //std::cout << "assigning " << global_index << " to " << subdomain_id << std::endl;	      
@@ -238,16 +238,16 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 	      for(unsigned int c=0; c<parent->n_children(); c++)
 		{
 		  child = parent->child(c);
-		  assert(child);
-		  assert(!child->is_remote());
-		  assert(child->processor_id() != DofObject::invalid_processor_id);
+		  libmesh_assert(child);
+		  libmesh_assert(!child->is_remote());
+		  libmesh_assert(child->processor_id() != DofObject::invalid_processor_id);
 		  parent->processor_id() = std::min(parent->processor_id(),
 						    child->processor_id());
 		}	      
 	      parent = parent->parent();
 	    }
 #else
-	  assert ((*it)->level() == 0);
+	  libmesh_assert ((*it)->level() == 0);
 #endif
 	  
 	}
@@ -263,7 +263,7 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
       // As noted, this is required because we cannot guarantee that a parent has
       // access to all its children on any single processor.
       parallel_only();
-      assert(MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
+      libmesh_assert(MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
 			       mesh.unpartitioned_elements_end()) == 0);
 
       const unsigned int max_elem_id = mesh.max_elem_id();
@@ -293,7 +293,7 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 	      Elem *parent = *not_it;
 
 	      const unsigned int parent_idx = parent->id();
-	      assert (parent_idx < max_elem_id);
+	      libmesh_assert (parent_idx < max_elem_id);
 
 	      if ((parent_idx >= first_elem_id) &&
 		  (parent_idx <  last_elem_id))
@@ -305,7 +305,7 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 		    parent_pid = std::min (parent_pid, parent->child(c)->processor_id());
 		  
 		  const unsigned int packed_idx = parent_idx - first_elem_id;
-		  assert (packed_idx < parent_processor_ids.size());
+		  libmesh_assert (packed_idx < parent_processor_ids.size());
 
 		  parent_processor_ids[packed_idx] = parent_pid;
 		}
@@ -331,12 +331,12 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 		    (parent_idx <  last_elem_id))
 		  {
 		    const unsigned int packed_idx = parent_idx - first_elem_id;
-		    assert (packed_idx < parent_processor_ids.size());
+		    libmesh_assert (packed_idx < parent_processor_ids.size());
 		    
 		    const unsigned short int parent_pid =
 		      parent_processor_ids[packed_idx];
 		    
-		    assert (parent_pid != DofObject::invalid_processor_id);
+		    libmesh_assert (parent_pid != DofObject::invalid_processor_id);
 		    
 		    parent->processor_id() = parent_pid;
 		  }
@@ -358,7 +358,7 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
 
   // If we have any unpartitioned elements at this 
   // stage there is a problem
-  assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
+  libmesh_assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
 			    mesh.unpartitioned_elements_end()) == 0);
 
 
@@ -388,12 +388,12 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
   for (; node_it != node_end; ++node_it)
     {
       Node *node = *node_it;
-      assert(node);
+      libmesh_assert(node);
       const unsigned int current_pid = node->processor_id();
       if (current_pid != libMesh::processor_id() &&
 	  current_pid != DofObject::invalid_processor_id)
 	{
-	  assert(current_pid < ghost_nodes_from_proc.size());
+	  libmesh_assert(current_pid < ghost_nodes_from_proc.size());
 	  ghost_nodes_from_proc[current_pid]++;
 	}
     }
@@ -408,13 +408,13 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
   for (node_it = mesh.nodes_begin(); node_it != node_end; ++node_it)
     {
       Node *node = *node_it;
-      assert(node);
+      libmesh_assert(node);
       const unsigned int current_pid = node->processor_id();      
       if (current_pid != libMesh::processor_id() &&
 	  current_pid != DofObject::invalid_processor_id)
 	{
-	  assert(current_pid < requested_node_ids.size());
-	  assert(requested_node_ids[current_pid].size() <
+	  libmesh_assert(current_pid < requested_node_ids.size());
+	  libmesh_assert(requested_node_ids[current_pid].size() <
 		 ghost_nodes_from_proc[current_pid]);
 	  requested_node_ids[current_pid].push_back(node->id());
 	}
@@ -430,9 +430,9 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
   for ( ; elem_it != elem_end; ++elem_it)
     {
       Elem* elem = *elem_it;
-      assert(elem);
+      libmesh_assert(elem);
 
-      assert (elem->processor_id() != DofObject::invalid_processor_id);
+      libmesh_assert (elem->processor_id() != DofObject::invalid_processor_id);
       
       // For each node, set the processor ID to the min of
       // its current value and this Element's processor id.
@@ -449,9 +449,9 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
   for ( ; sub_it != sub_end; ++sub_it)
     {
       Elem* elem = *sub_it;
-      assert(elem);
+      libmesh_assert(elem);
 
-      assert (elem->processor_id() != DofObject::invalid_processor_id);
+      libmesh_assert (elem->processor_id() != DofObject::invalid_processor_id);
       
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
         if (elem->get_node(n)->processor_id() == DofObject::invalid_processor_id)
@@ -468,9 +468,9 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
   for ( ; not_it != not_end; ++not_it)
     {
       Elem* elem = *not_it;
-      assert(elem);
+      libmesh_assert(elem);
 
-      assert (elem->processor_id() != DofObject::invalid_processor_id);
+      libmesh_assert (elem->processor_id() != DofObject::invalid_processor_id);
       
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
         if (elem->get_node(n)->processor_id() == DofObject::invalid_processor_id)
@@ -488,8 +488,8 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
     for ( ; all_it != all_end; ++all_it)
       {
 	Elem* elem = *all_it;
-	assert(elem);
-	assert(elem->processor_id() != DofObject::invalid_processor_id);
+	libmesh_assert(elem);
+	libmesh_assert(elem->processor_id() != DofObject::invalid_processor_id);
 	for (unsigned int n=0; n<elem->n_nodes(); ++n)
 	  used_nodes.insert(elem->get_node(n));
       }
@@ -497,9 +497,9 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
     for (node_it = mesh.nodes_begin(); node_it != node_end; ++node_it)
       {
 	Node *node = *node_it;
-	assert(node);
-	assert(used_nodes.count(node));
-	assert(node->processor_id() != DofObject::invalid_processor_id);
+	libmesh_assert(node);
+	libmesh_assert(used_nodes.count(node));
+	libmesh_assert(node->processor_id() != DofObject::invalid_processor_id);
       }
   }
 #endif
@@ -521,10 +521,10 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
       for (unsigned int i=0; i != request_to_fill.size(); ++i)
         {
           Node *node = mesh.node_ptr(request_to_fill[i]);
-          assert(node);
+          libmesh_assert(node);
 	  const unsigned int new_pid = node->processor_id();
-	  assert (new_pid != DofObject::invalid_processor_id);
-	  assert (new_pid < mesh.n_partitions()); // this is the correct test --
+	  libmesh_assert (new_pid != DofObject::invalid_processor_id);
+	  libmesh_assert (new_pid < mesh.n_partitions()); // this is the correct test --
           request_to_fill[i] = new_pid;           //  the number of partitions may
         }                                         //  not equal the number of processors
 
@@ -532,14 +532,14 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
       std::vector<unsigned int> filled_request;
       Parallel::send_receive(procdown, request_to_fill,
                              procup,   filled_request);
-      assert(filled_request.size() == requested_node_ids[procup].size());
+      libmesh_assert(filled_request.size() == requested_node_ids[procup].size());
       
       // And copy the id changes we've now been informed of
       for (unsigned int i=0; i != filled_request.size(); ++i)
         {
           Node *node = mesh.node_ptr(requested_node_ids[procup][i]);
-	  assert(node);
-          assert(filled_request[i] < mesh.n_partitions()); // this is the correct test --
+	  libmesh_assert(node);
+          libmesh_assert(filled_request[i] < mesh.n_partitions()); // this is the correct test --
           node->processor_id(filled_request[i]);           //  the number of partitions may
         }                                                  //  not equal the number of processors
     }

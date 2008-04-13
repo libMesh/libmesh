@@ -125,7 +125,7 @@ DiscontinuityMeasure::boundary_side_integration ()
 
           // Be sure the BC function still thinks we're on the 
           // essential boundary.
-          assert (essential_bc.first == true);
+          libmesh_assert (essential_bc.first == true);
 
           // The solution gradient from each element
           Number u_fine = 0.;

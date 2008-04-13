@@ -19,14 +19,12 @@
 
 
 // C++ includes
-#include <assert.h>
 #include <iterator>   // std::distance(), std::advance()
 #include <algorithm>  // std::swap
 #include <iostream>   // std::cout
 
 // Local includes
 #include "parallel_histogram.h"
-#include "libmesh_common.h"
 #ifdef HAVE_LIBHILBERT
 #  include "hilbert.h"
 #endif
@@ -40,7 +38,7 @@ template <typename KeyType>
 Histogram<KeyType>::Histogram (const std::vector<KeyType>& d) :
   data(d)
 {
-  assert (Parallel::Utils::is_sorted (data));
+  libmesh_assert (Parallel::Utils::is_sorted (data));
 }
 
 
@@ -50,7 +48,7 @@ void Histogram<KeyType>::make_histogram (const unsigned int nbins,
 					  KeyType max,
 					  KeyType min)
 {
-  assert (min < max);
+  libmesh_assert (min < max);
   
   // The width of each bin.  Store this as a floating point value
   double bin_width = (Parallel::Utils::to_double(max)-

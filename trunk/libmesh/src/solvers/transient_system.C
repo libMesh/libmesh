@@ -134,10 +134,10 @@ void TransientSystem<Base>::re_update ()
   const unsigned int end_local_dof  = Base::get_dof_map().end_dof();
 
   // Check sizes
-  assert (end_local_dof >= first_local_dof);
-  assert (send_list.size() >= end_local_dof - first_local_dof);
-  assert (older_local_solution->size() >= send_list.size());
-  assert (old_local_solution->size()   >= send_list.size());
+  libmesh_assert (end_local_dof >= first_local_dof);
+  libmesh_assert (send_list.size() >= end_local_dof - first_local_dof);
+  libmesh_assert (older_local_solution->size() >= send_list.size());
+  libmesh_assert (old_local_solution->size()   >= send_list.size());
 
   // Make sure we have something to do
   if (first_local_dof == end_local_dof)
@@ -161,8 +161,8 @@ template <class Base>
 Number TransientSystem<Base>::old_solution (const unsigned int global_dof_number) const
 {
   // Check the sizes
-  assert (global_dof_number < this->get_dof_map().n_dofs());
-  assert (global_dof_number < old_local_solution->size());
+  libmesh_assert (global_dof_number < this->get_dof_map().n_dofs());
+  libmesh_assert (global_dof_number < old_local_solution->size());
    
   return (*old_local_solution)(global_dof_number);
 }
@@ -173,8 +173,8 @@ template <class Base>
 Number TransientSystem<Base>::older_solution (const unsigned int global_dof_number) const
 {
   // Check the sizes
-  assert (global_dof_number < this->get_dof_map().n_dofs());
-  assert (global_dof_number < older_local_solution->size());
+  libmesh_assert (global_dof_number < this->get_dof_map().n_dofs());
+  libmesh_assert (global_dof_number < older_local_solution->size());
    
   return (*older_local_solution)(global_dof_number);
 }
