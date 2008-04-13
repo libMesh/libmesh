@@ -106,7 +106,7 @@ bool Quad4::is_face(const unsigned int) const
 bool Quad4::is_node_on_side(const unsigned int n,
 			    const unsigned int s) const
 {
-  assert(s < n_sides());
+  libmesh_assert(s < n_sides());
   for (unsigned int i = 0; i != 2; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -126,7 +126,7 @@ bool Quad4::has_affine_map() const
 AutoPtr<Elem> Quad4::build_side (const unsigned int i,
 				 bool proxy) const
 {
-  assert (i < this->n_sides());
+  libmesh_assert (i < this->n_sides());
 
   if (proxy)
     {
@@ -194,8 +194,8 @@ void Quad4::connectivity(const unsigned int sf,
 			 const IOPackage iop,
 			 std::vector<unsigned int>& conn) const
 {
-  assert (sf < this->n_sub_elem());
-  assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert (sf < this->n_sub_elem());
+  libmesh_assert (iop != INVALID_IO_PACKAGE);
 
   // Create storage.
   conn.resize(4);

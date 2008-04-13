@@ -395,7 +395,7 @@ template <typename T>
 inline
 void SparseMatrix<T>::print(std::ostream& os) const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   for (unsigned int i=0; i<this->m(); i++)
     {

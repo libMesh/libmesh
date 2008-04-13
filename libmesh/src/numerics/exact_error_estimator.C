@@ -46,7 +46,7 @@ void ExactErrorEstimator::attach_exact_value (Number fptr(const Point& p,
                                                           const std::string& sys_name,
                                                           const std::string& unknown_name))
 {
-  assert (fptr != NULL);
+  libmesh_assert (fptr != NULL);
   _exact_value = fptr;
 
   // If we're not using a fine grid solution
@@ -60,7 +60,7 @@ void ExactErrorEstimator::attach_exact_deriv (Gradient fptr(const Point& p,
                                                             const std::string& sys_name,
                                                             const std::string& unknown_name))
 {
-  assert (fptr != NULL);
+  libmesh_assert (fptr != NULL);
   _exact_deriv = fptr;
 
   // If we're not using a fine grid solution
@@ -74,7 +74,7 @@ void ExactErrorEstimator::attach_exact_hessian (Tensor fptr(const Point& p,
                                                             const std::string& sys_name,
                                                             const std::string& unknown_name))
 {
-  assert (fptr != NULL);
+  libmesh_assert (fptr != NULL);
   _exact_hessian = fptr;
 
   // If we're not using a fine grid solution
@@ -83,7 +83,7 @@ void ExactErrorEstimator::attach_exact_hessian (Tensor fptr(const Point& p,
 
 void ExactErrorEstimator::attach_reference_solution (EquationSystems* es_fine)
 {
-  assert (es_fine != NULL);
+  libmesh_assert (es_fine != NULL);
   _equation_systems_fine = es_fine;
 
   // If we're using a fine grid solution, we're not using exact values
@@ -265,7 +265,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
       
       if (error_per_cell[i] != 0.)
 	{
-	  assert (error_per_cell[i] > 0.);
+	  libmesh_assert (error_per_cell[i] > 0.);
 	  error_per_cell[i] = std::sqrt(error_per_cell[i]);
 	}
       
@@ -380,8 +380,8 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 
     } // end qp loop
 
-  assert (L2normsq     >= 0.);
-  assert (H1seminormsq >= 0.);
+  libmesh_assert (L2normsq     >= 0.);
+  libmesh_assert (H1seminormsq >= 0.);
 	  
   Real error_val = L2normsq;
   if (_sobolev_order > 0)

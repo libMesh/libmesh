@@ -173,8 +173,8 @@ void EigenSystem::solve ()
   EquationSystems& es = this->get_equation_systems();
 
   // check that necessary parameters have been set
-  assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
-  assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
+  libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
+  libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
 
   if (this->assemble_before_solve)
     // Assemble the linear system
@@ -207,7 +207,7 @@ void EigenSystem::solve ()
   
   else
     {
-      assert (matrix_B == NULL);
+      libmesh_assert (matrix_B == NULL);
       
       //in case of a standard eigenproblem
       solve_data = eigen_solver->solve_standard (*matrix_A, nev, ncv, tol, maxits);

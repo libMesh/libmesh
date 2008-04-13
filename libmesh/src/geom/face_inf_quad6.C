@@ -68,7 +68,7 @@ bool InfQuad6::is_face(const unsigned int) const
 bool InfQuad6::is_node_on_side(const unsigned int n,
 			       const unsigned int s) const
 {
-  assert(s < n_sides());
+  libmesh_assert(s < n_sides());
   for (unsigned int i = 0; i != 3; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -110,7 +110,7 @@ const float InfQuad6::_embedding_matrix[2][6][6] =
 AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
 				    bool proxy) const
 {
-  // assert (i < this->n_sides());
+  // libmesh_assert (i < this->n_sides());
 
   if (proxy)
     {
@@ -188,8 +188,8 @@ void InfQuad6::connectivity(const unsigned int sf,
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const
 {
-  assert (sf < this->n_sub_elem());
-  assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert (sf < this->n_sub_elem());
+  libmesh_assert (iop != INVALID_IO_PACKAGE);
 
   conn.resize(4);
 
@@ -235,9 +235,9 @@ void InfQuad6::connectivity(const unsigned int sf,
 unsigned short int InfQuad6::second_order_adjacent_vertex (const unsigned int n,
 							   const unsigned int v) const
 { 
-  assert (n >= this->n_vertices());
-  assert (n <  this->n_nodes());
-  assert (v < 2);
+  libmesh_assert (n >= this->n_vertices());
+  libmesh_assert (n <  this->n_nodes());
+  libmesh_assert (v < 2);
   return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
 }
 
@@ -254,8 +254,8 @@ const unsigned short int InfQuad6::_second_order_adjacent_vertices[2][2] =
 std::pair<unsigned short int, unsigned short int>
 InfQuad6::second_order_child_vertex (const unsigned int n) const
 {
-  assert (n >= this->n_vertices());
-  assert (n < this->n_nodes());
+  libmesh_assert (n >= this->n_vertices());
+  libmesh_assert (n < this->n_nodes());
 
   return std::pair<unsigned short int, unsigned short int>
     (0, 2*n-7);

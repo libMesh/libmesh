@@ -126,7 +126,7 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node (const Order o_radial,
 								const unsigned int n_onion)
 {
-  assert (n_onion < 2);
+  libmesh_assert (n_onion < 2);
 
   if (n_onion == 0)
     /*

@@ -432,7 +432,7 @@ void LaspackVector<T>::init (const unsigned int n,
 			     const bool fast)
 {
   // Laspack vectors only for serial cases.
-  assert (n == n_local);
+  libmesh_assert (n == n_local);
 
   // Clear initialized vectors
   if (this->initialized())
@@ -471,7 +471,7 @@ template <typename T>
 inline
 void LaspackVector<T>::close ()
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   this->_is_closed = true;
 }
@@ -495,7 +495,7 @@ void LaspackVector<T>::clear ()
 template <typename T> inline
 void LaspackVector<T>::zero ()
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   V_SetAllCmp (&_vec, 0.);
 }
@@ -519,7 +519,7 @@ template <typename T>
 inline
 unsigned int LaspackVector<T>::size () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   return static_cast<unsigned int>(V_GetDim(const_cast<QVector*>(&_vec)));
 }
@@ -530,7 +530,7 @@ template <typename T>
 inline
 unsigned int LaspackVector<T>::local_size () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   return this->size();
 }
@@ -541,7 +541,7 @@ template <typename T>
 inline
 unsigned int LaspackVector<T>::first_local_index () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   return 0;
 }
@@ -552,7 +552,7 @@ template <typename T>
 inline
 unsigned int LaspackVector<T>::last_local_index () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   return this->size();
 }
@@ -563,8 +563,8 @@ template <typename T>
 inline
 void LaspackVector<T>::set (const unsigned int i, const T value)
 {
-  assert (this->initialized());
-  assert (i < this->size());
+  libmesh_assert (this->initialized());
+  libmesh_assert (i < this->size());
   
   V_SetCmp (&_vec, i+1, value);
 }
@@ -575,8 +575,8 @@ template <typename T>
 inline
 void LaspackVector<T>::add (const unsigned int i, const T value)
 {
-  assert (this->initialized());
-  assert (i < this->size());
+  libmesh_assert (this->initialized());
+  libmesh_assert (i < this->size());
   
   V_AddCmp (&_vec, i+1, value);
 }
@@ -587,8 +587,8 @@ template <typename T>
 inline
 T LaspackVector<T>::operator() (const unsigned int i) const
 {
-  assert (this->initialized());
-  assert ( ((i >= this->first_local_index()) &&
+  libmesh_assert (this->initialized());
+  libmesh_assert ( ((i >= this->first_local_index()) &&
 	    (i <  this->last_local_index())) );
 
   

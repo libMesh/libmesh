@@ -88,18 +88,18 @@ DofObject::DofObject (const DofObject& dof_obj) :
   // Check that everything worked
 #ifdef DEBUG
 
-  assert (this->n_systems() == dof_obj.n_systems());
+  libmesh_assert (this->n_systems() == dof_obj.n_systems());
 
   for (unsigned int s=0; s<this->n_systems(); s++)
     {
-      assert (this->n_vars(s) == dof_obj.n_vars(s));
+      libmesh_assert (this->n_vars(s) == dof_obj.n_vars(s));
 
       for (unsigned int v=0; v<this->n_vars(s); v++)
 	{
-	  assert (this->n_comp(s,v) == dof_obj.n_comp(s,v));
+	  libmesh_assert (this->n_comp(s,v) == dof_obj.n_comp(s,v));
 
 	  for (unsigned int c=0; c<this->n_comp(s,v); c++)
-	    assert (this->dof_number(s,v,c) == dof_obj.dof_number(s,v,c));
+	    libmesh_assert (this->dof_number(s,v,c) == dof_obj.dof_number(s,v,c));
 	}
     }
   
@@ -128,7 +128,7 @@ void DofObject::set_old_dof_object ()
 {
   this->clear_old_dof_object();
 
-  assert (this->old_dof_object == NULL);
+  libmesh_assert (this->old_dof_object == NULL);
   
   // Make a new DofObject, assign a copy of \p this.
   // Make sure the copy ctor for DofObject works!!
@@ -198,9 +198,9 @@ void DofObject::add_system()
 	}
   
       // Delete old storage
-      assert (_n_vars  != NULL); delete [] _n_vars;  _n_vars  = NULL;
-      assert (_n_comp  != NULL); delete [] _n_comp;  _n_comp  = NULL;
-      assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
+      libmesh_assert (_n_vars  != NULL); delete [] _n_vars;  _n_vars  = NULL;
+      libmesh_assert (_n_comp  != NULL); delete [] _n_comp;  _n_comp  = NULL;
+      libmesh_assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
   
       // Allocate space for new system
       _n_vars  = new unsigned char  [this->n_systems()+1];
@@ -216,15 +216,15 @@ void DofObject::add_system()
 	}
       
       // Delete temporary storage
-      assert (old_n_vars  != NULL); delete [] old_n_vars;  old_n_vars  = NULL;
-      assert (old_n_comp  != NULL); delete [] old_n_comp;  old_n_comp  = NULL;
-      assert (old_dof_ids != NULL); delete [] old_dof_ids; old_dof_ids = NULL;
+      libmesh_assert (old_n_vars  != NULL); delete [] old_n_vars;  old_n_vars  = NULL;
+      libmesh_assert (old_n_comp  != NULL); delete [] old_n_comp;  old_n_comp  = NULL;
+      libmesh_assert (old_dof_ids != NULL); delete [] old_dof_ids; old_dof_ids = NULL;
     }
   else
     {
-      assert (_n_vars  == NULL);
-      assert (_n_comp  == NULL);
-      assert (_dof_ids == NULL);
+      libmesh_assert (_n_vars  == NULL);
+      libmesh_assert (_n_comp  == NULL);
+      libmesh_assert (_dof_ids == NULL);
       
       // Allocate space for new system
       _n_vars  = new unsigned char  [this->n_systems()+1];
@@ -246,8 +246,8 @@ void DofObject::add_system()
 void DofObject::set_n_vars(const unsigned int s,
 			   const unsigned int nvars)
 {
-  assert (s < this->n_systems());
-  assert (_n_vars != NULL);
+  libmesh_assert (s < this->n_systems());
+  libmesh_assert (_n_vars != NULL);
 
 #ifdef DEBUG
 
@@ -267,9 +267,9 @@ void DofObject::set_n_vars(const unsigned int s,
   // If we already have memory allocated clear it.
   if (this->n_vars(s) != 0)
     {
-      assert (_n_comp[s]  != NULL); delete [] _n_comp[s];  _n_comp[s]  = NULL;
-      assert (_dof_ids    != NULL);
-      assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
+      libmesh_assert (_n_comp[s]  != NULL); delete [] _n_comp[s];  _n_comp[s]  = NULL;
+      libmesh_assert (_dof_ids    != NULL);
+      libmesh_assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
     }
 
   // Reset the number of variables in the system  
@@ -294,10 +294,10 @@ void DofObject::set_n_comp(const unsigned int s,
 			   const unsigned int var,
 			   const unsigned int ncomp)
 {
-  assert (s < this->n_systems());
-  assert (var < this->n_vars(s));
-  assert (_dof_ids != NULL);
-  assert (_dof_ids[s] != NULL);
+  libmesh_assert (s < this->n_systems());
+  libmesh_assert (var < this->n_vars(s));
+  libmesh_assert (_dof_ids != NULL);
+  libmesh_assert (_dof_ids[s] != NULL);
   
   // Check for trivial return
   if (ncomp == this->n_comp(s,var)) return;
@@ -322,8 +322,8 @@ void DofObject::set_n_comp(const unsigned int s,
       _dof_ids[s][var] = (invalid_id - 1);
     }
   
-  assert (_n_comp != NULL);
-  assert (_n_comp[s] != NULL);
+  libmesh_assert (_n_comp != NULL);
+  libmesh_assert (_n_comp[s] != NULL);
     
   _n_comp[s][var]  = static_cast<unsigned char>(ncomp);
 }
@@ -335,19 +335,19 @@ void DofObject::set_dof_number(const unsigned int s,
 			       const unsigned int comp,
 			       const unsigned int dn)
 {
-  assert (s < this->n_systems());
-  assert (var  < this->n_vars(s));
-  assert (_dof_ids != NULL);
-  assert (_dof_ids[s] != NULL);
-  assert (comp < this->n_comp(s,var));
+  libmesh_assert (s < this->n_systems());
+  libmesh_assert (var  < this->n_vars(s));
+  libmesh_assert (_dof_ids != NULL);
+  libmesh_assert (_dof_ids[s] != NULL);
+  libmesh_assert (comp < this->n_comp(s,var));
   
   //We intend to change all dof numbers together or not at all
   if (comp)
-    assert ((dn == invalid_id && _dof_ids[s][var] == invalid_id) || 
+    libmesh_assert ((dn == invalid_id && _dof_ids[s][var] == invalid_id) || 
             (dn == _dof_ids[s][var] + comp));
   else
     _dof_ids[s][var] = dn;
 
 
-  assert(this->dof_number(s, var, comp) == dn);
+  libmesh_assert(this->dof_number(s, var, comp) == dn);
 }

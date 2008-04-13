@@ -40,7 +40,7 @@ void FroIO::write (const std::string& fname)
   if (libMesh::processor_id() == 0)
     {
       std::ofstream out (fname.c_str());
-      assert (out.good());
+      libmesh_assert (out.good());
 
       const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 

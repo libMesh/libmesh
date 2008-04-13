@@ -33,7 +33,7 @@ Real FE<0,LAGRANGE>::shape(const ElemType,
 			   const unsigned int i,
 			   const Point&)
 {
-  assert (i < 1);
+  libmesh_assert (i < 1);
   return 1.;
 }
 
@@ -45,7 +45,7 @@ Real FE<0,LAGRANGE>::shape(const Elem*,
 			   const unsigned int i,
 			   const Point&)
 {
-  assert (i < 1);
+  libmesh_assert (i < 1);
   return 1.;
 }
 

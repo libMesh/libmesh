@@ -53,7 +53,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
       // Constant shape functions
     case CONSTANT:
       {
-	assert (elem_soln.size() == 1);
+	libmesh_assert (elem_soln.size() == 1);
 	
 	const Number val = elem_soln[0];
 	
@@ -82,7 +82,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	    const Point mapped_point = FE<Dim,T>::inverse_map(elem,
 							      elem->point(n));
 
-	    assert (elem_soln.size() == n_sf);
+	    libmesh_assert (elem_soln.size() == n_sf);
 
 	    // Zero before summation
 	    nodal_soln[n] = 0;
@@ -123,7 +123,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
     case EDGE3:
       return (o+1);
     case QUAD4:
-      assert(o < 2);
+      libmesh_assert(o < 2);
     case QUAD8:
       {
 	if (o == 1)
@@ -136,7 +136,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
     case QUAD9:
       return ((o+1)*(o+1));
     case HEX8:
-      assert(o < 2);
+      libmesh_assert(o < 2);
     case HEX20:
       {
 	if (o == 1)
@@ -149,14 +149,14 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
     case HEX27:
       return ((o+1)*(o+1)*(o+1));
     case TRI3:
-      assert (o<2);
+      libmesh_assert (o<2);
     case TRI6:
       return ((o+1)*(o+2)/2);
     case TET4:
-      assert (o<2);
+      libmesh_assert (o<2);
     case TET10:
       {
-	assert (o<3);
+	libmesh_assert (o<3);
 	return ((o+1)*(o+2)*(o+3)/6); 
       }
     default:
@@ -365,7 +365,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	case 1:
 	  return 1;
 	case 2:
-	  assert (o>1);
+	  libmesh_assert (o>1);
 	  return (o-1);
 	default:
 	  libmesh_error();		  
@@ -387,8 +387,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  libmesh_error();
 	}
     case QUAD8:
-      assert (n<8);
-      assert (o<3);
+      libmesh_assert (n<8);
+      libmesh_assert (o<3);
     case QUAD9:
       {
 	switch (n)
@@ -414,11 +414,11 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  }
       }
     case HEX8:
-      assert (n < 8);
-      assert (o < 2);
+      libmesh_assert (n < 8);
+      libmesh_assert (o < 2);
     case HEX20:
-      assert (n < 20);
-      assert (o < 3);
+      libmesh_assert (n < 20);
+      libmesh_assert (o < 3);
     case HEX27:
       switch (n)
 	{
@@ -462,11 +462,11 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  libmesh_error();
         }
     case TET4:
-      assert(n<4);
-      assert(o<2);
+      libmesh_assert(n<4);
+      libmesh_assert(o<2);
     case TET10:
-      assert (o<3);
-      assert (n<10);
+      libmesh_assert (o<3);
+      libmesh_assert (n<10);
       switch (n)
 	{
 	case 0:
@@ -657,7 +657,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 	  case EDGE2:
 // 	  case EDGE3:
 // 	    {
-// 	      assert (n<3);
+// 	      libmesh_assert (n<3);
 // 	      return 1;
 // 	    }
 
@@ -665,21 +665,21 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 	    // The 2D Bernstein defined on a 6-noded triangle
 // 	  case TRI6:
 // 	    {
-// 	      assert (n<6);
+// 	      libmesh_assert (n<6);
 // 	      return 1;
 // 	    }
 
 // 	    // The 8-noded quadrilateral
 // 	  case QUAD8:
 // 	    {
-// 	      assert (n<8);
+// 	      libmesh_assert (n<8);
 // 	      return 1;
 // 	    }
 // 	    // The 2D tensor-product Bernsteins defined on a
 // 	    // nine-noded quadrilateral.
 // 	  case QUAD9:
 // 	    {
-// 	      assert (n<9);
+// 	      libmesh_assert (n<9);
 // 	      return 1;
 // 	    }
 
@@ -687,7 +687,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 	    // The 3D Bernsteins defined on a ten-noded tetrahedral.
 // 	  case TET10:
 // 	    {
-// 	      assert(n<10);
+// 	      libmesh_assert(n<10);
 // 	      return 1;
 // 	    }
 
@@ -695,7 +695,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 	    // 20-noded hexahedral.
 // 	  case HEX20:
 // 	    {
-// 	      assert(n<20);
+// 	      libmesh_assert(n<20);
 // 	      return 1;
 // 	    }
 
@@ -703,7 +703,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 // 	    // twenty-seven noded hexahedral.
 // 	  case HEX27:
 // 	    {
-// 	      assert(n<27);
+// 	      libmesh_assert(n<27);
 // 	      return 1;
 // 	    }
 	    
@@ -1298,16 +1298,16 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
     case QUAD9:
       return ((o-1)*(o-1));
     case HEX8:
-      assert(o < 2);
+      libmesh_assert(o < 2);
     case HEX20:
-      assert(o < 3);
+      libmesh_assert(o < 3);
       return 0;
     case HEX27:
       return ((o-1)*(o-1)*(o-1));
     case TET4:
-      assert (o<2);
+      libmesh_assert (o<2);
     case TET10:
-      assert (o<3);
+      libmesh_assert (o<3);
 	return 0;
     default:
       libmesh_error();

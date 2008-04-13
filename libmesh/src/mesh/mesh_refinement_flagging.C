@@ -62,8 +62,8 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
 
   // Check for valid fractions..
   // The fraction values must be in [0,1]
-  assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
-  assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
+  libmesh_assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
+  libmesh_assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
 
   // Clean up the refinement flags.  These could be left
   // over from previous refinement steps.
@@ -95,7 +95,7 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
   for (; elem_it != elem_end; ++elem_it)
   {
     const unsigned int id  = (*elem_it)->id();
-    assert (id < error_per_cell.size());
+    libmesh_assert (id < error_per_cell.size());
 
     error_max = std::max (error_max, error_per_cell[id]);
     error_min = std::min (error_min, error_per_cell[id]);
@@ -130,7 +130,7 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
     Elem* elem             = *elem_it;
     const unsigned int id  = elem->id();
 
-    assert (id < error_per_cell.size());
+    libmesh_assert (id < error_per_cell.size());
       
     const float elem_error = error_per_cell[id];
 
@@ -166,9 +166,9 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
 {
   // Check for valid fractions..
   // The fraction values must be in [0,1]
-  assert (_coarsen_threshold  >= 0. && _refine_fraction  <= 1.);
-  assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
-  assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
+  libmesh_assert (_coarsen_threshold  >= 0. && _refine_fraction  <= 1.);
+  libmesh_assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
+  libmesh_assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
 
   // How much error per cell will we tolerate?
   const Real local_refinement_tolerance =
@@ -228,13 +228,13 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 {
   // Check for valid fractions..
   // The fraction values must be in [0,1]
-  assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
-  assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
+  libmesh_assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
+  libmesh_assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
 
   // This function is currently only coded to work when coarsening by
   // parents - it's too hard to guess how many coarsenings will be
   // performed otherwise.
-  assert (_coarsen_by_parents);
+  libmesh_assert (_coarsen_by_parents);
   
   // The number of active elements in the mesh - hopefully less than
   // 2 billion on 32 bit machines
@@ -267,7 +267,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   for (; elem_it != elem_end; ++elem_it)
     {
       unsigned int eid = (*elem_it)->id();
-      assert(eid < error_per_cell.size());
+      libmesh_assert(eid < error_per_cell.size());
       sorted_error.push_back
         (std::make_pair(error_per_cell[eid], eid));
     }
@@ -368,7 +368,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
       unsigned int parent_id = sorted_parent_error[i].second;
       Elem *parent = _mesh.elem(parent_id);
-      assert(parent->has_children());
+      libmesh_assert(parent->has_children());
       for (unsigned int c=0; c != parent->n_children(); ++c)
         {
           Elem *elem = parent->child(c);
@@ -413,8 +413,8 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
 
   // Check for valid fractions..
   // The fraction values must be in [0,1]
-  assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
-  assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
+  libmesh_assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
+  libmesh_assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
 
   // The number of active elements in the mesh
   const unsigned int n_active_elem  = _mesh.n_elem();
@@ -552,8 +552,8 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
   const Real stddev = std::sqrt (error_per_cell.variance());
   
   // Check for valid fractions
-  assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
-  assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
+  libmesh_assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
+  libmesh_assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
 
   // The refine and coarsen cutoff
   const Real refine_cutoff  =  mean + _refine_fraction  * stddev;
@@ -569,7 +569,7 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
       Elem* elem             = *elem_it;
       const unsigned int id  = elem->id();
 
-      assert (id < error_per_cell.size());
+      libmesh_assert (id < error_per_cell.size());
       
       const float elem_error = error_per_cell[id];
 

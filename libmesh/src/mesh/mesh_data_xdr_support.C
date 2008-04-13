@@ -74,12 +74,12 @@ void MeshData::read_xdr (const std::string& name,
 
 
   // we should better be active or in compatibility mode
-  assert (_active || _compatibility_mode);
+  libmesh_assert (_active || _compatibility_mode);
 
 
   // make sure the id maps are ready
-  assert (_node_id_map_closed);
-  assert (_elem_id_map_closed);
+  libmesh_assert (_node_id_map_closed);
+  libmesh_assert (_elem_id_map_closed);
 
 
   /**
@@ -275,7 +275,7 @@ void MeshData::read_xdr (const std::string& name,
    * finished reading.  Now ready for use, provided
    * there was any data contained in the file.
    */
-  assert ((this->_node_data.size() != 0) || (this->_elem_data.size() != 0));
+  libmesh_assert ((this->_node_data.size() != 0) || (this->_elem_data.size() != 0));
 
   this->_node_data_closed = true;
   this->_elem_data_closed = true;
@@ -331,11 +331,11 @@ void MeshData::write_xdr (const std::string& name,
    * make sure the id maps are ready
    * and that we have data to write
    */
-  assert (_node_id_map_closed);
-  assert (_elem_id_map_closed);
+  libmesh_assert (_node_id_map_closed);
+  libmesh_assert (_elem_id_map_closed);
 
-  assert (_node_data_closed);
-  assert (_elem_data_closed);
+  libmesh_assert (_node_data_closed);
+  libmesh_assert (_elem_data_closed);
   
 
   Xdr io(name, mode);
@@ -424,9 +424,9 @@ better_you_choke_this...
       {
 	/* 
 	 * since we are iterating over our @e own 
-	 * map, this assert should never break...
+	 * map, this libmesh_assert should never break...
 	 */
-	assert (this->has_data(node));
+	libmesh_assert (this->has_data(node));
 
 	const std::vector<Number>& values = this->get_data(node);
 	
@@ -472,9 +472,9 @@ better_you_choke_this...
       {
 	/* 
 	 * since we are iterating over our @e own 
-	 * map, this assert should never break...
+	 * map, this libmesh_assert should never break...
 	 */
-	assert (this->has_data(elem));
+	libmesh_assert (this->has_data(elem));
 
 	const std::vector<Number>& values = this->get_data(elem);
 	

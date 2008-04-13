@@ -91,7 +91,7 @@ void PetscMatrix<T>::init (const unsigned int m,
 template <typename T>
 void PetscMatrix<T>::init ()
 {
-  assert (this->_dof_map != NULL);
+  libmesh_assert (this->_dof_map != NULL);
   
   {
     // Clear initialized matrices
@@ -116,8 +116,8 @@ void PetscMatrix<T>::init ()
   const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
 
   // Make sure the sparsity pattern isn't empty
-  assert (n_nz.size() == n_l);
-  assert (n_oz.size() == n_l);
+  libmesh_assert (n_nz.size() == n_l);
+  libmesh_assert (n_oz.size() == n_l);
   
   if (m==0)
     return;
@@ -172,7 +172,7 @@ void PetscMatrix<T>::init ()
 template <typename T>
 void PetscMatrix<T>::zero ()
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int ierr=0;
 
@@ -201,13 +201,13 @@ void PetscMatrix<T>::clear ()
 template <typename T>
 Real PetscMatrix<T>::l1_norm () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int ierr=0;
   PetscReal petsc_value;
   Real value;
   
-  assert (this->closed());
+  libmesh_assert (this->closed());
 
   ierr = MatNorm(_mat, NORM_1, &petsc_value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -222,13 +222,13 @@ Real PetscMatrix<T>::l1_norm () const
 template <typename T>
 Real PetscMatrix<T>::linfty_norm () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   int ierr=0;
   PetscReal petsc_value;
   Real value;
   
-  assert (this->closed());
+  libmesh_assert (this->closed());
 
   ierr = MatNorm(_mat, NORM_INFINITY, &petsc_value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -243,9 +243,9 @@ Real PetscMatrix<T>::linfty_norm () const
 template <typename T>
 void PetscMatrix<T>::print_matlab (const std::string name) const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
-  // assert (this->closed());
+  // libmesh_assert (this->closed());
   this->close();
   
   int ierr=0; 
@@ -304,13 +304,13 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 				const std::vector<unsigned int>& rows,
 				const std::vector<unsigned int>& cols)
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   const unsigned int m = dm.m();
   const unsigned int n = dm.n();
 
-  assert (rows.size() == m);
-  assert (cols.size() == n);
+  libmesh_assert (rows.size() == m);
+  libmesh_assert (cols.size() == n);
   
   int ierr=0;
 
@@ -338,7 +338,7 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
   
   // Attempt to cast the input matrix to a PetscMatrix*
   PetscMatrix<T>* petsc_submatrix = dynamic_cast<PetscMatrix<T>*>(&submatrix);
-  assert(petsc_submatrix != NULL);
+  libmesh_assert(petsc_submatrix != NULL);
 
   // Construct row and column index sets.
   int ierr=0;

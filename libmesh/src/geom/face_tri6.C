@@ -115,7 +115,7 @@ bool Tri6::is_face(const unsigned int) const
 bool Tri6::is_node_on_side(const unsigned int n,
 			   const unsigned int s) const
 {
-  assert(s < n_sides());
+  libmesh_assert(s < n_sides());
   for (unsigned int i = 0; i != 3; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -144,7 +144,7 @@ bool Tri6::has_affine_map() const
 
 unsigned int Tri6::key (const unsigned int s) const
 {
-  assert (s < this->n_sides());
+  libmesh_assert (s < this->n_sides());
 
   switch (s)
     {
@@ -175,7 +175,7 @@ unsigned int Tri6::key (const unsigned int s) const
 AutoPtr<Elem> Tri6::build_side (const unsigned int i,
 				bool proxy) const
 {
-  assert (i < this->n_sides());
+  libmesh_assert (i < this->n_sides());
 
   if (proxy)
     {
@@ -229,8 +229,8 @@ void Tri6::connectivity(const unsigned int sf,
 			const IOPackage iop,
 			std::vector<unsigned int>& conn) const
 {
-  assert (sf < this->n_sub_elem());
-  assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert (sf < this->n_sub_elem());
+  libmesh_assert (iop != INVALID_IO_PACKAGE);
 
   switch (iop)
     {
@@ -336,9 +336,9 @@ void Tri6::connectivity(const unsigned int sf,
 unsigned short int Tri6::second_order_adjacent_vertex (const unsigned int n,
 						       const unsigned int v) const
 { 
-  assert (n >= this->n_vertices());
-  assert (n <  this->n_nodes());
-  assert (v < 2);
+  libmesh_assert (n >= this->n_vertices());
+  libmesh_assert (n <  this->n_nodes());
+  libmesh_assert (v < 2);
   return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
 }
 
@@ -356,8 +356,8 @@ const unsigned short int Tri6::_second_order_adjacent_vertices[3][2] =
 std::pair<unsigned short int, unsigned short int>
 Tri6::second_order_child_vertex (const unsigned int n) const
 {
-  assert (n >= this->n_vertices());
-  assert (n < this->n_nodes());
+  libmesh_assert (n >= this->n_vertices());
+  libmesh_assert (n < this->n_nodes());
   return std::pair<unsigned short int, unsigned short int>
     (_second_order_vertex_child_number[n],
      _second_order_vertex_child_index[n]);

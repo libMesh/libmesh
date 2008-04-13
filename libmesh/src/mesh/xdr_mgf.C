@@ -224,7 +224,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 	// further below is ok...
 	std::string buf_buf;
 	std::getline (mp_in, buf_buf, '\n');
-	assert (buf_buf.size() <= bufLen);
+	libmesh_assert (buf_buf.size() <= bufLen);
 
 	buf_buf.copy (buf, std::string::npos);
 #else
@@ -322,7 +322,7 @@ int XdrMGF::dataBlk(int* array, int numvar, int size)
 
     case (XdrMGF::R_ASCII):
       {
-	assert (mp_in.good());
+	libmesh_assert (mp_in.good());
 	
 	for (int i=0; i<size; i++)
 	  {
@@ -393,11 +393,11 @@ int XdrMGF::dataBlk(Real* array, int numvar, int size)
 
     case (XdrMGF::R_ASCII):
       {
-	assert (mp_in.good());
+	libmesh_assert (mp_in.good());
 	
 	for (int i=0; i<size; i++)
 	  {
-	    assert (mp_in.good());
+	    libmesh_assert (mp_in.good());
 	
 	    for (int j=0; j<numvar; j++)
 	      mp_in >> array[i*numvar + j];

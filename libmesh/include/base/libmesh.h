@@ -115,7 +115,7 @@ namespace libMesh {
   /**
    * Checks that library initialization has been done.  If it
    * hasn't an error message is printed and the code aborts.
-   * It is useful to \p assert(libMesh::initialized()) in library
+   * It is useful to \p libmesh_assert(libMesh::initialized()) in library
    * object constructors.
    */
   bool initialized ();
@@ -137,7 +137,7 @@ namespace libMesh {
   /**
    * Checks that the library has been closed.  This should
    * always return false when called from a library object.
-   * It is useful to \p assert(!libMesh::closed()) in library
+   * It is useful to \p libmesh_assert(!libMesh::closed()) in library
    * object destructors.
    */
   bool closed ();

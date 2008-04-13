@@ -892,7 +892,7 @@ unsigned int System::n_vars() const
 inline
 const std::string & System::variable_name (const unsigned int i) const
 {
-  assert (i < n_vars());
+  libmesh_assert (i < n_vars());
 
   return _var_names[i];
 }
@@ -913,7 +913,7 @@ const FEType & System::variable_type (const std::string& var) const
   std::map<std::string, FEType>::const_iterator
     pos = _var_type.find(var);
 
-  assert (pos != _var_type.end());
+  libmesh_assert (pos != _var_type.end());
   
   return pos->second;
 }

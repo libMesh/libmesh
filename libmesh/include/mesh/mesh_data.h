@@ -836,8 +836,8 @@ inline
 Number MeshData::operator() (const Node* node, 
 			     const unsigned int i) const
 {
-  assert (_active || _compatibility_mode);
-  assert (_node_data_closed);
+  libmesh_assert (_active || _compatibility_mode);
+  libmesh_assert (_node_data_closed);
 
   std::map<const Node*, 
            std::vector<Number> >::const_iterator pos = _node_data.find(node);
@@ -846,7 +846,7 @@ Number MeshData::operator() (const Node* node,
       return libMesh::zero;
 
   // we only get here when pos != _node_data.end()
-  assert (i < pos->second.size());
+  libmesh_assert (i < pos->second.size());
   return pos->second[i];
 }
 
@@ -855,8 +855,8 @@ Number MeshData::operator() (const Node* node,
 inline
 bool MeshData::has_data (const Node* node) const
 {
-  assert (_active || _compatibility_mode);
-  assert (_node_data_closed);
+  libmesh_assert (_active || _compatibility_mode);
+  libmesh_assert (_node_data_closed);
 
   std::map<const Node*, 
            std::vector<Number> >::const_iterator pos = _node_data.find(node);
@@ -869,8 +869,8 @@ bool MeshData::has_data (const Node* node) const
 inline
 const std::vector<Number>& MeshData::get_data (const Node* node) const
 {
-  assert (_active || _compatibility_mode);
-  assert (_node_data_closed);
+  libmesh_assert (_active || _compatibility_mode);
+  libmesh_assert (_node_data_closed);
 
   std::map<const Node*, 
            std::vector<Number> >::const_iterator pos = _node_data.find(node);
@@ -919,8 +919,8 @@ inline
 Number MeshData::operator() (const Elem* elem, 
 			     const unsigned int i) const
 {
-  assert (_active || _compatibility_mode);
-  assert (_elem_data_closed);
+  libmesh_assert (_active || _compatibility_mode);
+  libmesh_assert (_elem_data_closed);
 
   std::map<const Elem*, 
            std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
@@ -929,7 +929,7 @@ Number MeshData::operator() (const Elem* elem,
     return libMesh::zero;
   
   // we only get here when pos != _elem_data.end()  
-  assert (i < pos->second.size());
+  libmesh_assert (i < pos->second.size());
   return pos->second[i];
 }
 
@@ -938,8 +938,8 @@ Number MeshData::operator() (const Elem* elem,
 inline
 bool MeshData::has_data (const Elem* elem) const
 {
-  assert (_active || _compatibility_mode);
-  assert (_elem_data_closed);
+  libmesh_assert (_active || _compatibility_mode);
+  libmesh_assert (_elem_data_closed);
 
   std::map<const Elem*, 
            std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
@@ -952,8 +952,8 @@ bool MeshData::has_data (const Elem* elem) const
 inline
 const std::vector<Number>& MeshData::get_data (const Elem* elem) const
 {
-  assert (_active || _compatibility_mode);
-  assert (_elem_data_closed);
+  libmesh_assert (_active || _compatibility_mode);
+  libmesh_assert (_elem_data_closed);
 
   std::map<const Elem*, 
            std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
@@ -1036,10 +1036,10 @@ void MeshData::add_foreign_node_id (const Node* node,
 {
   if (_active)
     {
-      assert (!_node_id_map_closed);
-      assert (node                             != NULL);
-      assert (_node_id.find(node)              == _node_id.end());
-      assert (_id_node.find(foreign_node_id)   == _id_node.end());
+      libmesh_assert (!_node_id_map_closed);
+      libmesh_assert (node                             != NULL);
+      libmesh_assert (_node_id.find(node)              == _node_id.end());
+      libmesh_assert (_id_node.find(foreign_node_id)   == _id_node.end());
 
       /*
        * _always_ insert in _id_node and _node_id.  If we would 
@@ -1062,10 +1062,10 @@ void MeshData::add_foreign_elem_id (const Elem* elem,
 {
   if (_active)
     {
-      assert (!_elem_id_map_closed);
-      assert (elem                             != NULL);
-      assert (_elem_id.find(elem)              == _elem_id.end());
-      assert (_id_elem.find(foreign_elem_id)   == _id_elem.end());
+      libmesh_assert (!_elem_id_map_closed);
+      libmesh_assert (elem                             != NULL);
+      libmesh_assert (_elem_id.find(elem)              == _elem_id.end());
+      libmesh_assert (_id_elem.find(foreign_elem_id)   == _id_elem.end());
 
       _elem_id.insert(std::make_pair(elem, foreign_elem_id));
       _id_elem.insert(std::make_pair(foreign_elem_id, elem));
@@ -1076,7 +1076,7 @@ void MeshData::add_foreign_elem_id (const Elem* elem,
 inline
 const MeshDataUnvHeader & MeshData::get_unv_header () const
 {
-  assert (this->_unv_header != NULL);
+  libmesh_assert (this->_unv_header != NULL);
   return *this->_unv_header;
 }
 
@@ -1084,7 +1084,7 @@ const MeshDataUnvHeader & MeshData::get_unv_header () const
 inline
 void MeshData::set_unv_header (MeshDataUnvHeader* unv_header)
 {
-  assert (unv_header != NULL);
+  libmesh_assert (unv_header != NULL);
   this->_unv_header = unv_header;
 }
 

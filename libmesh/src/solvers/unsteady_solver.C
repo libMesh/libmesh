@@ -114,8 +114,8 @@ void UnsteadySolver::advance_timestep ()
 Number UnsteadySolver::old_nonlinear_solution(const unsigned int global_dof_number)
 const
 {
-  assert (global_dof_number < _system.get_dof_map().n_dofs());
-  assert (global_dof_number < old_local_nonlinear_solution->size());
+  libmesh_assert (global_dof_number < _system.get_dof_map().n_dofs());
+  libmesh_assert (global_dof_number < old_local_nonlinear_solution->size());
 
   return (*old_local_nonlinear_solution)(global_dof_number);
 }

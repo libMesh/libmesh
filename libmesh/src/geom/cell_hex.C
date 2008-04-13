@@ -33,7 +33,7 @@
 // Hex class member functions
 unsigned int Hex::key (const unsigned int s) const
 {
-  assert (s < this->n_sides());
+  libmesh_assert (s < this->n_sides());
 
   // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
   switch (s)
@@ -96,7 +96,7 @@ unsigned int Hex::key (const unsigned int s) const
 
 AutoPtr<DofObject> Hex::side (const unsigned int i) const
 {
-  assert (i < this->n_sides());
+  libmesh_assert (i < this->n_sides());
 
 
   
@@ -184,8 +184,8 @@ AutoPtr<DofObject> Hex::side (const unsigned int i) const
 bool Hex::is_child_on_side(const unsigned int c,
                            const unsigned int s) const
 {
-  assert (c < this->n_children());
-  assert (s < this->n_sides());
+  libmesh_assert (c < this->n_children());
+  libmesh_assert (s < this->n_sides());
 
   for (unsigned int i = 0; i != 4; ++i)
     if (Hex8::side_nodes_map[s][i] == c)
@@ -222,7 +222,7 @@ Real Hex::quality (const ElemQuality q) const
 	const Real min = std::min(d06, std::min(d35, std::min(d17, d24)));
 	const Real max = std::max(d06, std::max(d35, std::max(d17, d24)));
 
-	assert (max != 0.0);
+	libmesh_assert (max != 0.0);
 	
 	return min / max;
 
@@ -300,7 +300,7 @@ Real Hex::quality (const ElemQuality q) const
 	const Real d24 = this->length(2,4);
 	const Real max_diag = std::max(d06, std::max(d17, std::max(d35, d24)));
 
-	assert ( max_diag != 0.0 );
+	libmesh_assert ( max_diag != 0.0 );
 
 	/**
 	 * Compute the minimum edge length.

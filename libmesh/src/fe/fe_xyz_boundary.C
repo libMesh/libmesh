@@ -54,10 +54,10 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
 			const unsigned int s,
 			const Real)
 {
-  assert (elem  != NULL);
-  assert (this->qrule != NULL);
+  libmesh_assert (elem  != NULL);
+  libmesh_assert (this->qrule != NULL);
   // We don't do this for 1D elements!
-  assert (Dim != 1);
+  libmesh_assert (Dim != 1);
 
   // Build the side of interest 
   const AutoPtr<Elem> side(elem->build_side(s));
@@ -87,8 +87,8 @@ template <unsigned int Dim>
 void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 				     const Elem* side)
 {
-  assert (elem != NULL);
-  assert (side != NULL);
+  libmesh_assert (elem != NULL);
+  libmesh_assert (side != NULL);
 
   START_LOG("compute_face_values()", "FEXYZ");
 
@@ -184,7 +184,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	    // negative curvature.  Be sure to take that into account!
 	    const Real numerator   = this->d2xyzdxi2_map[p] * this->normals[p];
 	    const Real denominator = this->dxyzdxi_map[p].size_sq();
-	    assert (denominator != 0);
+	    libmesh_assert (denominator != 0);
 	    this->curvatures[p] = numerator / denominator;
 	  }
 	
@@ -194,7 +194,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	    const Real jac = std::sqrt(this->dxdxi_map(p)*this->dxdxi_map(p) +
 				       this->dydxi_map(p)*this->dydxi_map(p));
 	    
-	    assert (jac > 0.);
+	    libmesh_assert (jac > 0.);
 	    
 	    this->JxW[p] = jac*qw[p];
 	  }
@@ -292,7 +292,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	    
 	    const Real numerator   = E*N -2.*F*M + G*L;
 	    const Real denominator = E*G - F*F;
-	    assert (denominator != 0.);
+	    libmesh_assert (denominator != 0.);
 	    this->curvatures[p] = 0.5*numerator/denominator;
 	  }    
     	
@@ -317,7 +317,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	    
 	    const Real jac = std::sqrt(g11*g22 - g12*g21);
 	    
-	    assert (jac > 0.);
+	    libmesh_assert (jac > 0.);
 
 	    this->JxW[p] = jac*qw[p];
 	  }

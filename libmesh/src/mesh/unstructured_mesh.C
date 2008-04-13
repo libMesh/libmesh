@@ -81,7 +81,7 @@ namespace {
 UnstructuredMesh::UnstructuredMesh (unsigned int d) :
   MeshBase (d)
 {
-  assert (libMesh::initialized());
+  libmesh_assert (libMesh::initialized());
 }
 
 
@@ -90,10 +90,10 @@ void UnstructuredMesh::copy_nodes_and_elements
   (const UnstructuredMesh& other_mesh)
 {
   // We're assuming our subclass data needs no copy
-  assert(_n_sbd == other_mesh._n_sbd);
-  assert(_n_parts == other_mesh._n_parts);
-  assert(_dim == other_mesh._dim);
-  assert(_is_prepared == other_mesh._is_prepared);
+  libmesh_assert(_n_sbd == other_mesh._n_sbd);
+  libmesh_assert(_n_parts == other_mesh._n_parts);
+  libmesh_assert(_dim == other_mesh._dim);
+  libmesh_assert(_is_prepared == other_mesh._is_prepared);
 
   //Copy in Nodes
   {
@@ -135,7 +135,7 @@ void UnstructuredMesh::copy_nodes_and_elements
           newparent->add_child(elem);
 
           // We'd better be adding these in the correct order
-          assert (newparent->which_child_am_i(elem) ==
+          libmesh_assert (newparent->which_child_am_i(elem) ==
                   old->parent()->which_child_am_i(old));
         }
       
@@ -163,19 +163,19 @@ UnstructuredMesh::~UnstructuredMesh ()
 {
 //  this->clear ();  // Nothing to clear at this level
   
-  assert (!libMesh::closed());
+  libmesh_assert (!libMesh::closed());
 }
 
 
 
-void UnstructuredMesh::assert_valid_neighbors() const
+void UnstructuredMesh::libmesh_assert_valid_neighbors() const
 {
   const const_element_iterator el_end = this->elements_end();
   for (const_element_iterator el = this->elements_begin(); el != el_end; ++el)
     {
       const Elem* elem = *el;
-      assert (elem);
-      elem->assert_valid_neighbors();
+      libmesh_assert (elem);
+      elem->libmesh_assert_valid_neighbors();
     }
 }
 
@@ -183,8 +183,8 @@ void UnstructuredMesh::assert_valid_neighbors() const
 
 void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
 {
-  assert(this->n_nodes() != 0);
-  assert(this->n_elem()  != 0);
+  libmesh_assert(this->n_nodes() != 0);
+  libmesh_assert(this->n_elem()  != 0);
 
   // This function must be run on all processors at once
   parallel_only();
@@ -267,8 +267,8 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
 			// Get the side for the neighboring element
 			const unsigned int ns = bounds.first->second.second;
 			const AutoPtr<DofObject> their_side(neighbor->side(ns));
-                        //assert (my_side.get() != NULL);
-                        //assert (their_side.get() != NULL);			
+                        //libmesh_assert (my_side.get() != NULL);
+                        //libmesh_assert (their_side.get() != NULL);			
 
 			// If found a match wbounds.firsth my side
                         //
@@ -357,9 +357,9 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
            el != end; ++el)
         {
           Elem* elem = *el;
-          assert(elem);
+          libmesh_assert(elem);
           Elem* parent = elem->parent();
-          assert(parent);
+          libmesh_assert(parent);
 
           for (unsigned int s=0; s < elem->n_neighbors(); s++)
             if (elem->neighbor(s) == NULL)
@@ -405,7 +405,7 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
 #endif // AMR
 
 #ifdef DEBUG
-this->assert_valid_neighbors();
+this->libmesh_assert_valid_neighbors();
 #endif
 
   STOP_LOG("find_neighbors()", "Mesh");
@@ -795,8 +795,8 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
   // This may happen if the user accidently passes the original mesh into
   // this function!  We will check this by making sure we did not just
   // clear ourself.
-  assert (this->n_nodes() != 0);
-  assert (this->n_elem()  != 0); 
+  libmesh_assert (this->n_nodes() != 0);
+  libmesh_assert (this->n_elem()  != 0); 
 
   // How the nodes on this mesh will be renumbered to nodes
   // on the new_mesh.  
@@ -823,12 +823,12 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
       Elem* new_elem = 
 	new_mesh.add_elem (Elem::build(old_elem->type()).release());
 
-      assert (new_elem != NULL);
+      libmesh_assert (new_elem != NULL);
 	
       // Loop over the nodes on this element.  
       for (unsigned int n=0; n<old_elem->n_nodes(); n++)
 	{
-	  assert (old_elem->node(n) < new_node_numbers.size());
+	  libmesh_assert (old_elem->node(n) < new_node_numbers.size());
 
 	  if (new_node_numbers[old_elem->node(n)] == libMesh::invalid_uint)
 	    {
@@ -842,7 +842,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
 	    }
 
 	  // Define this element's connectivity on the new mesh
-	  assert (new_node_numbers[old_elem->node(n)] < new_mesh.n_nodes());
+	  libmesh_assert (new_node_numbers[old_elem->node(n)] < new_mesh.n_nodes());
 	    
 	  new_elem->set_node(n) = new_mesh.node_ptr (new_node_numbers[old_elem->node(n)]);
 	}
@@ -882,7 +882,7 @@ bool UnstructuredMesh::contract ()
     if (*in != NULL)
       {
 	Elem* elem = *in;
-	assert(elem->active() || elem->subactive() || elem->ancestor());
+	libmesh_assert(elem->active() || elem->subactive() || elem->ancestor());
       }
   in = elements_begin();
 #endif
@@ -897,7 +897,7 @@ bool UnstructuredMesh::contract ()
 	if (elem->subactive())
 	  {
 	    // Huh?  no level-0 element should be subactive
-	    assert (elem->level() != 0);
+	    libmesh_assert (elem->level() != 0);
 
 	    // Delete the element
 	    // This just sets a pointer to NULL, and doesn't
@@ -913,7 +913,7 @@ bool UnstructuredMesh::contract ()
 	    if (elem->active())
 	      elem->contract();
 	    else
-	      assert (elem->ancestor());
+	      libmesh_assert (elem->ancestor());
 	  }
       }
 

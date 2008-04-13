@@ -142,7 +142,7 @@ void EquationSystems::read (const std::string& name,
   // This will unzip a file with .bz2 as the extension, otherwise it
   // simply returns the name if the file need not be unzipped.
   Xdr io ((libMesh::processor_id() == 0) ? name : "", mode);
-  assert (io.reading());
+  libmesh_assert (io.reading());
 	  
   {
     // 1.)
@@ -355,7 +355,7 @@ void EquationSystems::write(const std::string& name,
   // New scope so that io will close before we try to zip the file
   {
     Xdr io((libMesh::processor_id()==0) ? name : "", mode);    
-    assert (io.writing());
+    libmesh_assert (io.writing());
     
     START_LOG("write()","EquationSystems");
 

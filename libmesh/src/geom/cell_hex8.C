@@ -79,7 +79,7 @@ bool Hex8::is_face(const unsigned int) const
 bool Hex8::is_node_on_side(const unsigned int n,
 			   const unsigned int s) const
 {
-  assert(s < n_sides());
+  libmesh_assert(s < n_sides());
   for (unsigned int i = 0; i != 4; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -89,7 +89,7 @@ bool Hex8::is_node_on_side(const unsigned int n,
 bool Hex8::is_node_on_edge(const unsigned int n,
 			   const unsigned int e) const
 {
-  assert(e < n_edges());
+  libmesh_assert(e < n_edges());
   for (unsigned int i = 0; i != 2; ++i)
     if (edge_nodes_map[e][i] == n)
       return true;
@@ -119,7 +119,7 @@ bool Hex8::has_affine_map() const
 AutoPtr<Elem> Hex8::build_side (const unsigned int i,
 				bool proxy) const
 {
-  assert (i < this->n_sides());
+  libmesh_assert (i < this->n_sides());
 
   if (proxy)
     {
@@ -205,7 +205,7 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
 
 AutoPtr<Elem> Hex8::build_edge (const unsigned int i) const
 {
-  assert (i < this->n_edges());
+  libmesh_assert (i < this->n_edges());
 
   AutoPtr<Elem> ap(new SideEdge<Edge2,Hex8>(this,i));
   return ap;
@@ -217,9 +217,9 @@ void Hex8::connectivity(const unsigned int sc,
 			const IOPackage iop,
 			std::vector<unsigned int>& conn) const
 {
-  assert (_nodes != NULL);
-  assert (sc < this->n_sub_elem());
-  assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert (_nodes != NULL);
+  libmesh_assert (sc < this->n_sub_elem());
+  libmesh_assert (iop != INVALID_IO_PACKAGE);
 
   conn.resize(8);
 
@@ -414,7 +414,7 @@ Real Hex8::volume () const
       // Compute pyramid volume
       Real sub_vol = (1./6.)*(a*(b.cross(c))) + (1./12.)*(c*(d.cross(e)));
 
-      assert (sub_vol>0.);
+      libmesh_assert (sub_vol>0.);
 
       vol += sub_vol;
     }

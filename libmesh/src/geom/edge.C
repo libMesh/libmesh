@@ -26,7 +26,7 @@
 
 AutoPtr<DofObject> Edge::side (const unsigned int i) const
 {
-  assert(i < 2);
+  libmesh_assert(i < 2);
   const Elem* parent = this;
   Elem *nodeelem = new NodeElem(const_cast<Elem*>(parent));
   nodeelem->set_node(0) = this->get_node(i);
@@ -36,7 +36,7 @@ AutoPtr<DofObject> Edge::side (const unsigned int i) const
 
 AutoPtr<Elem> Edge::build_side (const unsigned int i, bool) const
 {
-  assert(i < 2);
+  libmesh_assert(i < 2);
   const Elem* parent = this;
   Elem *nodeelem = new NodeElem(const_cast<Elem*>(parent));
   nodeelem->set_node(0) = this->get_node(i);
@@ -47,8 +47,8 @@ AutoPtr<Elem> Edge::build_side (const unsigned int i, bool) const
 bool Edge::is_child_on_side(const unsigned int c,
                             const unsigned int s) const
 {
-  assert (c < this->n_children());
-  assert (s < this->n_sides());
+  libmesh_assert (c < this->n_children());
+  libmesh_assert (s < this->n_sides());
 
   return (c == s);
 }

@@ -28,7 +28,7 @@ AdaptiveTimeSolver::~AdaptiveTimeSolver ()
 
 void AdaptiveTimeSolver::init()
 {
-  assert(core_time_solver.get());
+  libmesh_assert(core_time_solver.get());
 
   // We override this because our core_time_solver is the one that
   // needs to handle new vectors, diff_solver->init(), etc
@@ -39,7 +39,7 @@ void AdaptiveTimeSolver::init()
 
 void AdaptiveTimeSolver::reinit()
 {
-  assert(core_time_solver.get());
+  libmesh_assert(core_time_solver.get());
 
   // We override this because our core_time_solver is the one that
   // needs to handle new vectors, diff_solver->reinit(), etc
@@ -50,7 +50,7 @@ void AdaptiveTimeSolver::reinit()
 
 void AdaptiveTimeSolver::solve()
 {
-  assert(core_time_solver.get());
+  libmesh_assert(core_time_solver.get());
 
   // The core_time_solver will handle any first_solve actions
   first_solve = false;
@@ -267,7 +267,7 @@ void AdaptiveTimeSolver::advance_timestep ()
 
 Real AdaptiveTimeSolver::error_order () const
 {
-  assert(core_time_solver.get());
+  libmesh_assert(core_time_solver.get());
 
   return core_time_solver->error_order();
 }
@@ -276,7 +276,7 @@ Real AdaptiveTimeSolver::error_order () const
 
 bool AdaptiveTimeSolver::element_residual (bool request_jacobian)
 {
-  assert(core_time_solver.get());
+  libmesh_assert(core_time_solver.get());
 
   return core_time_solver->element_residual(request_jacobian);
 }
@@ -285,7 +285,7 @@ bool AdaptiveTimeSolver::element_residual (bool request_jacobian)
 
 bool AdaptiveTimeSolver::side_residual (bool request_jacobian)
 {
-  assert(core_time_solver.get());
+  libmesh_assert(core_time_solver.get());
 
   return core_time_solver->side_residual(request_jacobian);
 }

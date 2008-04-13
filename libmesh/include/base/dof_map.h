@@ -339,13 +339,13 @@ public:
    * Returns the number of degrees of freedom on subdomain \p proc.
    */
   unsigned int n_dofs_on_processor(const unsigned int proc) const
-  { assert(proc < _first_df.size()); return (_end_df[proc] - _first_df[proc]); }
+  { libmesh_assert(proc < _first_df.size()); return (_end_df[proc] - _first_df[proc]); }
 
   /**
    * Returns the first dof index that is local to subdomain \p proc.
    */
   unsigned int first_dof(const unsigned int proc = libMesh::processor_id()) const
-  { assert(proc < _first_df.size()); return _first_df[proc]; }
+  { libmesh_assert(proc < _first_df.size()); return _first_df[proc]; }
   
   /**
    * Returns the last dof index that is local to subdomain \p proc.
@@ -353,14 +353,14 @@ public:
    * case where \p proc has no local dof indices.  Use end_dof() instead.
    */
   unsigned int last_dof(const unsigned int proc = libMesh::processor_id()) const
-  { assert(proc < _end_df.size()); return (_end_df[proc] - 1); }  
+  { libmesh_assert(proc < _end_df.size()); return (_end_df[proc] - 1); }  
 
   /**
    * Returns the first dof index that is after all indices local to subdomain \p proc.
    * Analogous to the end() member function of STL containers.
    */
   unsigned int end_dof(const unsigned int proc = libMesh::processor_id()) const
-  { assert(proc < _end_df.size()); return _end_df[proc]; }  
+  { libmesh_assert(proc < _end_df.size()); return _end_df[proc]; }  
   
   /**
    * Fills the vector \p di with the global degree of freedom indices
@@ -842,10 +842,10 @@ void SparsityPattern::sort_row (const BidirectionalIterator begin,
 {
   if ((begin == middle) || (middle == end)) return;
 
-  assert (std::distance (begin,  middle) > 0);
-  assert (std::distance (middle, end)    > 0);
-  assert (std::unique (begin,  middle) == middle);
-  assert (std::unique (middle, end)    == end);
+  libmesh_assert (std::distance (begin,  middle) > 0);
+  libmesh_assert (std::distance (middle, end)    > 0);
+  libmesh_assert (std::unique (begin,  middle) == middle);
+  libmesh_assert (std::unique (middle, end)    == end);
   
   while (middle != end)
     {
@@ -877,7 +877,7 @@ void SparsityPattern::sort_row (const BidirectionalIterator begin,
 #ifdef DEBUG
   {
     // SGI STL extension!
-    // assert (std::is_sorted(begin,end));
+    // libmesh_assert (std::is_sorted(begin,end));
     
     BidirectionalIterator
       prev  = begin,
@@ -885,12 +885,12 @@ void SparsityPattern::sort_row (const BidirectionalIterator begin,
 
     for (++first; first != end; prev=first, ++first)
       if (*first < *prev)
-	assert(false);
+	libmesh_assert(false);
   }  
 #endif
 
   // Make sure the two ranges did not contain any common elements
-  assert (std::unique (begin, end) == end);
+  libmesh_assert (std::unique (begin, end) == end);
 }
 
 

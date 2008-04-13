@@ -51,8 +51,8 @@
 void MetisPartitioner::_do_partition (MeshBase& mesh,
 				      const unsigned int n_pieces)
 {
-  assert (n_pieces > 0);
-  assert (mesh.is_serial());
+  libmesh_assert (n_pieces > 0);
+  libmesh_assert (mesh.is_serial());
 
   // Check for an easy return
   if (n_pieces == 1)
@@ -114,16 +114,16 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
     MeshCommunication().find_global_indices (MeshTools::bounding_box(mesh),
 					     it, end, global_index);
     
-    assert (global_index.size() == n_active_elem);    
+    libmesh_assert (global_index.size() == n_active_elem);    
     
     for (unsigned int cnt=0; it != end; ++it)
       {
 	const Elem *elem = *it;
-	assert (!global_index_map.count(elem));
+	libmesh_assert (!global_index_map.count(elem));
 	
 	global_index_map[elem]  = global_index[cnt++];
       }
-    assert (global_index_map.size() == n_active_elem);    
+    libmesh_assert (global_index_map.size() == n_active_elem);    
   }
   
   
@@ -146,13 +146,13 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
       {
 	const Elem* elem = *elem_it;
 	
-	assert (global_index_map.count(elem));
+	libmesh_assert (global_index_map.count(elem));
 	
 	const unsigned int elem_global_index = 
 	  global_index_map[elem];
 	
-	assert (elem_global_index < vwgt.size());
-	assert (elem_global_index < graph.size());
+	libmesh_assert (elem_global_index < vwgt.size());
+	libmesh_assert (elem_global_index < graph.size());
 
 	// maybe there is a better weight?
 	// The weight is used to define what a balanced graph is
@@ -170,7 +170,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 		// as a connection
 		if (neighbor->active())
 		  {
-		    assert (global_index_map.count(neighbor));
+		    libmesh_assert (global_index_map.count(neighbor));
 		    
 		    const unsigned int neighbor_global_index = 
 		      global_index_map[neighbor];
@@ -190,7 +190,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 		    // we are connected
 		    const unsigned int ns =
 		      neighbor->which_neighbor_am_i (elem);
-                    assert (ns < neighbor->n_neighbors());
+                    libmesh_assert (ns < neighbor->n_neighbors());
 		    
 		    // Get all the active children (& grandchildren, etc...)
 		    // of the neighbor.
@@ -209,8 +209,8 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 			// coincident with the parent then this is a sufficient test.
 			if (child->neighbor(ns) == elem)
 			  {
-			    assert (child->active());
-			    assert (global_index_map.count(child));
+			    libmesh_assert (child->active());
+			    libmesh_assert (global_index_map.count(child));
 
 			    const unsigned int child_global_index =
 			      global_index_map[child];
@@ -244,8 +244,8 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
     // The end of the adjacency array for the last elem
     xadj.push_back(adjncy.size());
     
-    assert (adjncy.size() == graph_size);
-    assert (xadj.size() == n_active_elem+1);    
+    libmesh_assert (adjncy.size() == graph_size);
+    libmesh_assert (xadj.size() == n_active_elem+1);    
   } // done building the graph
   
   
@@ -278,12 +278,12 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
       {
 	Elem* elem = *it;
 	
-	assert (global_index_map.count(elem));
+	libmesh_assert (global_index_map.count(elem));
 	
 	const unsigned int elem_global_index = 
 	  global_index_map[elem];
 	
-	assert (elem_global_index < part.size());
+	libmesh_assert (elem_global_index < part.size());
 	const unsigned int elem_procid =  static_cast<short int>(part[elem_global_index]);
     
         elem->processor_id() = elem_procid;

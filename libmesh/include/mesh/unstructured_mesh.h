@@ -148,7 +148,7 @@ class UnstructuredMesh : public MeshBase
   /**
    * A function for testing neighbor connectivity
    */
-  void assert_valid_neighbors () const;
+  void libmesh_assert_valid_neighbors () const;
 
 #ifdef ENABLE_AMR
   /**

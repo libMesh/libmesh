@@ -75,9 +75,9 @@ extern "C"
   {
     int ierr=0;
 
-    assert (x   != NULL);
-    assert (r   != NULL);
-    assert (ctx != NULL);
+    libmesh_assert (x   != NULL);
+    libmesh_assert (r   != NULL);
+    libmesh_assert (ctx != NULL);
     
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
@@ -106,7 +106,7 @@ extern "C"
   {
     int ierr=0;
     
-    assert (ctx != NULL);
+    libmesh_assert (ctx != NULL);
     
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
@@ -210,9 +210,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
   // We cast to pointers so we can be sure that they succeeded
   // by comparing the result against NULL.
-  assert(jac != NULL); assert(jac->mat() != NULL);
-  assert(x   != NULL); assert(x->vec()   != NULL);
-  assert(r   != NULL); assert(r->vec()   != NULL);
+  libmesh_assert(jac != NULL); libmesh_assert(jac->mat() != NULL);
+  libmesh_assert(x   != NULL); libmesh_assert(x->vec()   != NULL);
+  libmesh_assert(r   != NULL); libmesh_assert(r->vec()   != NULL);
   
   int ierr=0;
   int n_iterations =0;

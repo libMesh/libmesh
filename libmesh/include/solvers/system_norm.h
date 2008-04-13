@@ -153,7 +153,7 @@ SystemNorm::SystemNorm(const SystemNorm &s) :
 inline
 bool SystemNorm::is_discrete() const
 {
-  assert (!_norms.empty());
+  libmesh_assert (!_norms.empty());
 
   if (_norms[0] == DISCRETE_L1 ||
       _norms[0] == DISCRETE_L2 ||
@@ -167,7 +167,7 @@ bool SystemNorm::is_discrete() const
 inline
 FEMNormType SystemNorm::type(unsigned int var) const
 {
-  assert (!_norms.empty());
+  libmesh_assert (!_norms.empty());
 
   unsigned int i = (var < _norms.size()) ? var : _norms.size() - 1;
 
@@ -178,7 +178,7 @@ FEMNormType SystemNorm::type(unsigned int var) const
 inline
 Real SystemNorm::weight(unsigned int var) const
 {
-  assert (!_weights.empty());
+  libmesh_assert (!_weights.empty());
   
   unsigned int i = (var < _weights.size()) ? var : _weights.size() - 1;
 

@@ -60,8 +60,8 @@ Real FE<1,XYZ>::shape(const Elem* elem,
 		      const unsigned int i,
 		      const Point& p)
 {
-  assert (elem != NULL);
-  assert (i <= order + elem->p_level());
+  libmesh_assert (elem != NULL);
+  libmesh_assert (i <= order + elem->p_level());
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -133,12 +133,12 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
 			    const unsigned int j,
 			    const Point& p)
 {
-  assert (elem != NULL);
-  assert (i <= order + elem->p_level());
+  libmesh_assert (elem != NULL);
+  libmesh_assert (i <= order + elem->p_level());
   
   // only d()/dxi in 1D!
   
-  assert (j == 0);
+  libmesh_assert (j == 0);
 	
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -209,12 +209,12 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem* elem,
 			           const unsigned int j,
 			           const Point& p)
 {
-  assert (elem != NULL);
-  assert (i <= order + elem->p_level());
+  libmesh_assert (elem != NULL);
+  libmesh_assert (i <= order + elem->p_level());
   
   // only d2()/dxi2 in 1D!
   
-  assert (j == 0);
+  libmesh_assert (j == 0);
 	
   // Only recompute the centroid if the element
   // has changed from the last one we computed.

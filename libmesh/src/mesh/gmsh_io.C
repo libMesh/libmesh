@@ -321,9 +321,9 @@ void GmshIO::read_mesh(std::istream& in)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  assert(libMesh::processor_id() == 0);
+  libmesh_assert(libMesh::processor_id() == 0);
 
-  assert(in.good());
+  libmesh_assert(in.good());
 
   // initialize the map with element types
   init_eletypes();
@@ -611,7 +611,7 @@ void GmshIO::write_nodal_data (const std::string& fname,
 void GmshIO::write_mesh (std::ostream& out)
 {
   // Be sure that the stream is valid.
-  assert (out.good());
+  libmesh_assert (out.good());
   
   // initialize the map with element types
   init_eletypes();
@@ -656,14 +656,14 @@ void GmshIO::write_mesh (std::ostream& out)
 
 	// Make sure we have a valid entry for
 	// the current element type.
-	assert (eletypes_exp.count(elem->type()));
+	libmesh_assert (eletypes_exp.count(elem->type()));
 
         // consult the export element table 
         const elementDefinition& eletype = eletypes_exp[elem->type()];
 
 	// The element mapper better not require any more nodes
 	// than are present in the current element!
-        assert (eletype.nodes.size() <= elem->n_nodes());
+        libmesh_assert (eletype.nodes.size() <= elem->n_nodes());
 	
         // elements ids are 1 based in Gmsh
         out << elem->id()+1 << " ";
@@ -699,7 +699,7 @@ void GmshIO::write_post (const std::string& fname,
 {
 
   // Should only do this on processor 0!
-  assert (libMesh::processor_id() == 0);
+  libmesh_assert (libMesh::processor_id() == 0);
   
   // Create an output stream
   std::ofstream out(fname.c_str());
@@ -732,7 +732,7 @@ void GmshIO::write_post (const std::string& fname,
                   << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
                   << "\n";
       
-      assert (v->size() == mesh.n_nodes()*n_vars);
+      libmesh_assert (v->size() == mesh.n_nodes()*n_vars);
 
       // write the header
       out << "$PostFormat\n";

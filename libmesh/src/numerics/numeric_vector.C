@@ -77,10 +77,10 @@ template <>
 int NumericVector<float>::compare (const NumericVector<float> &other_vector,
 				   const Real threshold) const
 {
-  assert (this->initialized());
-  assert (other_vector.initialized());
-  assert (this->first_local_index() == other_vector.first_local_index());
-  assert (this->last_local_index()  == other_vector.last_local_index());
+  libmesh_assert (this->initialized());
+  libmesh_assert (other_vector.initialized());
+  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
+  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
 
   int rvalue     = -1;
   unsigned int i = first_local_index();
@@ -102,10 +102,10 @@ template <>
 int NumericVector<double>::compare (const NumericVector<double> &other_vector,
 				    const Real threshold) const
 {
-  assert (this->initialized());
-  assert (other_vector.initialized());
-  assert (this->first_local_index() == other_vector.first_local_index());
-  assert (this->last_local_index()  == other_vector.last_local_index());
+  libmesh_assert (this->initialized());
+  libmesh_assert (other_vector.initialized());
+  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
+  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
 
   int rvalue     = -1;
   unsigned int i = first_local_index();
@@ -128,10 +128,10 @@ template <>
 int NumericVector<long double>::compare (const NumericVector<long double> &other_vector,
 				         const Real threshold) const
 {
-  assert (this->initialized());
-  assert (other_vector.initialized());
-  assert (this->first_local_index() == other_vector.first_local_index());
-  assert (this->last_local_index()  == other_vector.last_local_index());
+  libmesh_assert (this->initialized());
+  libmesh_assert (other_vector.initialized());
+  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
+  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
 
   int rvalue     = -1;
   unsigned int i = first_local_index();
@@ -155,10 +155,10 @@ template <>
 int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
 				     const Real threshold) const
 {
-  assert (this->initialized());
-  assert (other_vector.initialized());
-  assert (this->first_local_index() == other_vector.first_local_index());
-  assert (this->last_local_index()  == other_vector.last_local_index());
+  libmesh_assert (this->initialized());
+  libmesh_assert (other_vector.initialized());
+  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
+  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
 
   int rvalue     = -1;
   unsigned int i = first_local_index();

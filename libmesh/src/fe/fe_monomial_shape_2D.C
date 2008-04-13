@@ -35,7 +35,7 @@ Real FE<2,MONOMIAL>::shape(const ElemType,
 {
 #if DIM > 1
   
-  assert (i < (static_cast<unsigned int>(order)+1)*
+  libmesh_assert (i < (static_cast<unsigned int>(order)+1)*
                (static_cast<unsigned int>(order)+2)/2);
 
   const Real xi  = p(0);
@@ -120,7 +120,7 @@ Real FE<2,MONOMIAL>::shape(const Elem* elem,
 			   const unsigned int i,
 			   const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   // by default call the orientation-independent shape functions
   return FE<2,MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
@@ -138,9 +138,9 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
 #if DIM > 1
 
   
-  assert (j<2);
+  libmesh_assert (j<2);
 
-  assert (i < (static_cast<unsigned int>(order)+1)*
+  libmesh_assert (i < (static_cast<unsigned int>(order)+1)*
                (static_cast<unsigned int>(order)+2)/2);
 
   const Real xi  = p(0);
@@ -305,7 +305,7 @@ Real FE<2,MONOMIAL>::shape_deriv(const Elem* elem,
 				 const unsigned int j,
 				 const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   // by default call the orientation-independent shape functions
   return FE<2,MONOMIAL>::shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p); 
@@ -323,9 +323,9 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
 #if DIM > 1
 
   
-  assert (j<=2);
+  libmesh_assert (j<=2);
 
-  assert (i < (static_cast<unsigned int>(order)+1)*
+  libmesh_assert (i < (static_cast<unsigned int>(order)+1)*
                (static_cast<unsigned int>(order)+2)/2);
 
   const Real xi  = p(0);
@@ -537,7 +537,7 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const Elem* elem,
 				        const unsigned int j,
 				        const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   // by default call the orientation-independent shape functions
   return FE<2,MONOMIAL>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p); 

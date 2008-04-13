@@ -407,7 +407,7 @@ public:
    * not required in user-level code. Just don't do anything crazy like
    * calling VecDestroy()!
    */
-  Epetra_Vector & vec () { assert (_vec != NULL); return _vec; }
+  Epetra_Vector & vec () { libmesh_assert (_vec != NULL); return _vec; }
 
 
   
@@ -517,7 +517,7 @@ template <typename T>
 inline
 void EpetraVector<T>::close ()
 {
-  assert (this->initialized());  
+  libmesh_assert (this->initialized());  
 
   this->_is_closed = true;
 }
@@ -540,7 +540,7 @@ template <typename T>
 inline
 void EpetraVector<T>::zero ()
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   _vec->PutScalar(0.0);
 }
@@ -564,7 +564,7 @@ template <typename T>
 inline
 unsigned int EpetraVector<T>::size () const
 {
-  assert (this->initialized());  
+  libmesh_assert (this->initialized());  
 
   return _vec->GlobalLength();
 }
@@ -575,7 +575,7 @@ template <typename T>
 inline
 unsigned int EpetraVector<T>::local_size () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   return _vec->MyLength();
 }
@@ -584,7 +584,7 @@ template <typename T>
 inline
 unsigned int EpetraVector<T>::first_local_index () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   return _map->MinLID();
 }
@@ -595,7 +595,7 @@ template <typename T>
 inline
 unsigned int EpetraVector<T>::last_local_index () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   return _map->MaxLID();
 }
@@ -605,8 +605,8 @@ template <typename T>
 inline
 T EpetraVector<T>::operator() (const unsigned int i) const
 {
-  assert (this->initialized());
-  assert ( ((i >= this->first_local_index()) &&
+  libmesh_assert (this->initialized());
+  libmesh_assert ( ((i >= this->first_local_index()) &&
 	    (i <  this->last_local_index())) );
 
   return (*_vec)[i];
@@ -618,7 +618,7 @@ template <typename T>
 inline
 Real EpetraVector<T>::min () const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   T value;
 
@@ -633,7 +633,7 @@ template <typename T>
 inline
 Real EpetraVector<T>::max() const
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
 
   T value;
 

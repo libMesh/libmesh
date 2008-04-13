@@ -296,7 +296,7 @@ typedef std::ostringstream OStringStream;
 			   const Real r,
 			   const char c)
  {
-   assert (w < 30);
+   libmesh_assert (w < 30);
    char buf[30];  
    char format[8];
    // form the format for r
@@ -315,7 +315,7 @@ typedef std::ostringstream OStringStream;
  void OStringStream::left (const sizetype w,
 			   const int n)
  {
-   assert (w < 30);
+   libmesh_assert (w < 30);
    char buf[30];  
    // form string as desired
    sprintf (buf, "%d", n);
@@ -341,7 +341,7 @@ typedef std::ostringstream OStringStream;
 			    const Real r,
 			    const char c)
  {
-   assert (w < 30);
+   libmesh_assert (w < 30);
    char buf[30];  
    char format[8];
    // form the format for r
@@ -359,7 +359,7 @@ typedef std::ostringstream OStringStream;
  void OStringStream::scientific (const sizetype w,
 				 const Real r)
  {
-   assert (w < 30);
+   libmesh_assert (w < 30);
    char buf[30];  
    char format[8];
    // form the format for r

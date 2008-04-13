@@ -225,7 +225,7 @@ public:
    * on the element.
    */    
   const std::vector<std::vector<Real> >& get_phi() const
-  { assert(!calculations_started || calculate_phi);
+  { libmesh_assert(!calculations_started || calculate_phi);
     calculate_phi = true; return phi; }
   
   /**
@@ -240,7 +240,7 @@ public:
    * points.
    */
   const std::vector<std::vector<RealGradient> >& get_dphi() const
-  { assert(!calculations_started || calculate_dphi); 
+  { libmesh_assert(!calculations_started || calculate_dphi); 
     calculate_dphi = true; return dphi; }
   
   /**
@@ -248,7 +248,7 @@ public:
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphidx() const
-  { assert(!calculations_started || calculate_dphi); 
+  { libmesh_assert(!calculations_started || calculate_dphi); 
     calculate_dphi = true; return dphidx; }
   
   /**
@@ -256,7 +256,7 @@ public:
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphidy() const
-  { assert(!calculations_started || calculate_dphi); 
+  { libmesh_assert(!calculations_started || calculate_dphi); 
     calculate_dphi = true; return dphidy; }
   
   /**
@@ -264,7 +264,7 @@ public:
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphidz() const
-  { assert(!calculations_started || calculate_dphi);
+  { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidz; }
 
 #ifdef ENABLE_SECOND_DERIVATIVES
@@ -274,7 +274,7 @@ public:
    * points.
    */
   const std::vector<std::vector<RealTensor> >& get_d2phi() const
-  { assert(!calculations_started || calculate_d2phi); 
+  { libmesh_assert(!calculations_started || calculate_d2phi); 
     calculate_d2phi = true; return d2phi; }
   
   /**
@@ -282,7 +282,7 @@ public:
    * points.
    */
   const std::vector<std::vector<Real> >& get_d2phidx2() const
-  { assert(!calculations_started || calculate_d2phi);
+  { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidx2; }
   
   /**
@@ -290,7 +290,7 @@ public:
    * points.
    */
   const std::vector<std::vector<Real> >& get_d2phidxdy() const
-  { assert(!calculations_started || calculate_d2phi);
+  { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidxdy; }
   
   /**
@@ -298,7 +298,7 @@ public:
    * points.
    */
   const std::vector<std::vector<Real> >& get_d2phidxdz() const
-  { assert(!calculations_started || calculate_d2phi);
+  { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidxdz; }
   
   /**
@@ -306,7 +306,7 @@ public:
    * points.
    */
   const std::vector<std::vector<Real> >& get_d2phidy2() const
-  { assert(!calculations_started || calculate_d2phi);
+  { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidy2; }
   
   /**
@@ -314,7 +314,7 @@ public:
    * points.
    */
   const std::vector<std::vector<Real> >& get_d2phidydz() const
-  { assert(!calculations_started || calculate_d2phi);
+  { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidydz; }
   
   /**
@@ -322,7 +322,7 @@ public:
    * points.
    */
   const std::vector<std::vector<Real> >& get_d2phidz2() const
-  { assert(!calculations_started || calculate_d2phi);
+  { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidz2; }
 
 #endif

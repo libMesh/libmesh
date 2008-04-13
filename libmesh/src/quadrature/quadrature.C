@@ -82,14 +82,14 @@ void QBase::scale(std::pair<Real, Real> old_range,
 		  std::pair<Real, Real> new_range)
 {
   // Make sure we are in 1D
-  assert(_dim == 1);
+  libmesh_assert(_dim == 1);
   
   // Make sure that we have sane ranges 
-  assert(new_range.second > new_range.first);
-  assert(old_range.second > old_range.first);
+  libmesh_assert(new_range.second > new_range.first);
+  libmesh_assert(old_range.second > old_range.first);
 
   // Make sure there are some points
-  assert(_points.size() > 0);
+  libmesh_assert(_points.size() > 0);
 
   // We're mapping from old_range -> new_range 
   for (unsigned int i=0; i<_points.size(); i++)
@@ -142,14 +142,14 @@ void QBase::tensor_product_tri(const QBase& gauss1D, const QBase& jac1D)
 {
   
   // Both rules should be of the same order
-  assert(gauss1D.n_points() == jac1D.n_points());
+  libmesh_assert(gauss1D.n_points() == jac1D.n_points());
 
   // Save the number of points as a convenient variable
   const unsigned int n_points = gauss1D.n_points();
   
   // Both rules should be between x=0 and x=1
-  assert(gauss1D.qp(0)(0) >= 0.0); assert(gauss1D.qp(n_points-1)(0) <= 1.0);
-  assert(jac1D.qp(0)(0)   >= 0.0); assert(jac1D.qp(n_points-1)(0) <= 1.0);
+  libmesh_assert(gauss1D.qp(0)(0) >= 0.0); libmesh_assert(gauss1D.qp(n_points-1)(0) <= 1.0);
+  libmesh_assert(jac1D.qp(0)(0)   >= 0.0); libmesh_assert(jac1D.qp(n_points-1)(0) <= 1.0);
 
   // Resize the points and weights vectors
   _points.resize(n_points * n_points);
@@ -227,16 +227,16 @@ void QBase::tensor_product_prism(const QBase& q1D, const QBase& q2D)
 void QBase::tensor_product_tet(const QBase& gauss1D, const QBase& jacA1D, const QBase& jacB1D)
 {
   // All rules should be of the same order
-  assert(gauss1D.n_points() == jacA1D.n_points());
-  assert(jacA1D.n_points()  == jacB1D.n_points());
+  libmesh_assert(gauss1D.n_points() == jacA1D.n_points());
+  libmesh_assert(jacA1D.n_points()  == jacB1D.n_points());
   
   // Save the number of points as a convenient variable
   const unsigned int n_points = gauss1D.n_points();
   
   // All rules should be between x=0 and x=1
-  assert(gauss1D.qp(0)(0) >= 0.0); assert(gauss1D.qp(n_points-1)(0) <= 1.0);
-  assert(jacA1D.qp(0)(0)  >= 0.0); assert(jacA1D.qp(n_points-1)(0)  <= 1.0);
-  assert(jacB1D.qp(0)(0)  >= 0.0); assert(jacB1D.qp(n_points-1)(0)  <= 1.0);
+  libmesh_assert(gauss1D.qp(0)(0) >= 0.0); libmesh_assert(gauss1D.qp(n_points-1)(0) <= 1.0);
+  libmesh_assert(jacA1D.qp(0)(0)  >= 0.0); libmesh_assert(jacA1D.qp(n_points-1)(0)  <= 1.0);
+  libmesh_assert(jacB1D.qp(0)(0)  >= 0.0); libmesh_assert(jacB1D.qp(n_points-1)(0)  <= 1.0);
 
   // Resize the points and weights vectors
   _points.resize(n_points * n_points * n_points);

@@ -39,8 +39,8 @@
 
 void Elem::refine (MeshRefinement& mesh_refinement)
 {
-  assert (this->refinement_flag() == Elem::REFINE);
-  assert (this->active());
+  libmesh_assert (this->refinement_flag() == Elem::REFINE);
+  libmesh_assert (this->active());
   
   // Create my children if necessary
   if (!_children)
@@ -124,7 +124,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
       for (unsigned int c=0; c<this->n_children(); c++)
         {	
           Elem *child = this->child(c);
-          assert(child->subactive());
+          libmesh_assert(child->subactive());
           child->set_refinement_flag(Elem::JUST_REFINED);
           child->set_p_level(parent_p_level);
           child->set_p_refinement_flag(this->p_refinement_flag());
@@ -137,10 +137,10 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 
   for (unsigned int c=0; c<this->n_children(); c++)
     {	
-      assert(this->child(c)->parent() == this);
-      assert(this->child(c)->active());
+      libmesh_assert(this->child(c)->parent() == this);
+      libmesh_assert(this->child(c)->active());
     }
-  assert (this->ancestor());
+  libmesh_assert (this->ancestor());
 }
 
 
@@ -183,8 +183,8 @@ unsigned int Elem::_cast_node_address_to_unsigned_int(const unsigned int n)
 
 void Elem::coarsen()
 {
-  assert (this->refinement_flag() == Elem::COARSEN_INACTIVE);
-  assert (!this->active());
+  libmesh_assert (this->refinement_flag() == Elem::COARSEN_INACTIVE);
+  libmesh_assert (!this->active());
 
   // We no longer delete children until MeshRefinement::contract()
   // delete [] _children;
@@ -233,7 +233,7 @@ void Elem::coarsen()
       Elem *mychild = this->child(c);
       if (mychild == remote_elem)
         continue;
-      assert (mychild->refinement_flag() == Elem::COARSEN);
+      libmesh_assert (mychild->refinement_flag() == Elem::COARSEN);
       mychild->set_refinement_flag(Elem::INACTIVE);
       if (mychild->p_level() > parent_p_level)
         parent_p_level = mychild->p_level();
@@ -242,7 +242,7 @@ void Elem::coarsen()
   this->set_refinement_flag(Elem::JUST_COARSENED);
   this->set_p_level(parent_p_level);
 
-  assert (this->active());
+  libmesh_assert (this->active());
 }
 
 
@@ -250,7 +250,7 @@ void Elem::coarsen()
 void Elem::contract()
 {
   // Subactive elements get deleted entirely, not contracted
-  assert (this->active());
+  libmesh_assert (this->active());
 
   // Active contracted elements no longer can have children
   if (_children)

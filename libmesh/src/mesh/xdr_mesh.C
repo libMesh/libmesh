@@ -60,7 +60,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 
     case (XdrMGF::R_ASCII):
       {
-	assert (mp_in.good());
+	libmesh_assert (mp_in.good());
 	
 	mp_in >> hd->m_numel    ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_numNodes ; mp_in.getline(comment, comm_len);
@@ -68,7 +68,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 	mp_in >> hd->m_numBCs   ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_strSize  ; mp_in.getline(comment, comm_len);
 
-	assert(mp_in.good());
+	libmesh_assert(mp_in.good());
 
 	break;
       }
@@ -102,7 +102,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 	    // The number of blocks (i.e. the number of element types)
 	    // for any mesh must always
 	    // be at least 1.
-	    assert(hd->get_n_blocks() != 0);
+	    libmesh_assert(hd->get_n_blocks() != 0);
 	    break;
 	  }
 
@@ -116,7 +116,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 
 	case (XdrMGF::R_ASCII):
 	  {
-	    assert (mp_in.good());
+	    libmesh_assert (mp_in.good());
 	    unsigned int temp_n_blocks=0;
 	    mp_in >> temp_n_blocks;
 	    hd->set_n_blocks(temp_n_blocks);
@@ -168,7 +168,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 
 	case (XdrMGF::R_ASCII):
 	  {
-	    assert (mp_in.good());
+	    libmesh_assert (mp_in.good());
 	
 	    for (unsigned int i=0; i<hd->get_n_blocks(); i++)
 	      {
@@ -275,7 +275,7 @@ int XdrMESH::header(XdrMHEAD *hd)
               }
               
 	    // Be sure you have the right number of entries in neeb
-	    assert (neeb.size() == (hd->get_n_blocks() * (this->get_num_levels()+1)));
+	    libmesh_assert (neeb.size() == (hd->get_n_blocks() * (this->get_num_levels()+1)));
 
 	    break;
 	  }
@@ -334,12 +334,12 @@ int XdrMESH::header(XdrMHEAD *hd)
 
     case (XdrMGF::R_ASCII):
       {
-	assert (mp_in.good());
+	libmesh_assert (mp_in.good());
 	
 	mp_in.getline(comment, comm_len);
 	hd->setId(comment);
 
-	assert (mp_in.good());
+	libmesh_assert (mp_in.good());
 	
 	mp_in.getline(comment, comm_len);
 	hd->setTitle(comment);

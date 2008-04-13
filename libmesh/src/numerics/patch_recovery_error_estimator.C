@@ -114,9 +114,9 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
   START_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
 
 #ifdef ENABLE_SECOND_DERIVATIVES
-  assert (_sobolev_order == 1 || _sobolev_order == 2);
+  libmesh_assert (_sobolev_order == 1 || _sobolev_order == 2);
 #else
-  assert (_sobolev_order == 1);
+  libmesh_assert (_sobolev_order == 1);
 #endif
 
   // The current mesh
@@ -172,9 +172,9 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange &range) const
 {
 #ifdef ENABLE_SECOND_DERIVATIVES
-  assert (error_estimator._sobolev_order == 1 || error_estimator._sobolev_order == 2);
+  libmesh_assert (error_estimator._sobolev_order == 1 || error_estimator._sobolev_order == 2);
 #else
-  assert (error_estimator._sobolev_order == 1);
+  libmesh_assert (error_estimator._sobolev_order == 1);
 #endif
 
   // The current mesh
@@ -288,7 +288,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	      // Get the global DOF indices for the current variable
 	      // in the current element
 	      dof_map.dof_indices (e_p, dof_indices, var);
-	      assert (dof_indices.size() == phi.size());
+	      libmesh_assert (dof_indices.size() == phi.size());
 
 	      const unsigned int n_dofs = dof_indices.size();
 	      const unsigned int n_qp   = qrule->n_points();

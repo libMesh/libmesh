@@ -128,7 +128,7 @@ void Xdr::open (const std::string& name)
 #ifdef HAVE_XDR
 
 	fp = fopen(name.c_str(), (mode == ENCODE) ? "w" : "r");
-	assert (fp);
+	libmesh_assert (fp);
 	xdrs = new XDR;
 	xdrstdio_create (xdrs, fp, (mode == ENCODE) ? XDR_ENCODE : XDR_DECODE);
 #else
@@ -155,7 +155,7 @@ void Xdr::open (const std::string& name)
 	  {
 #ifdef HAVE_GZSTREAM
 	    igzstream *inf = new igzstream;
-	    assert (inf != NULL);
+	    libmesh_assert (inf != NULL);
 	    in.reset(inf);
 	    inf->open(name.c_str(), std::ios::in);
 #else
@@ -167,7 +167,7 @@ void Xdr::open (const std::string& name)
 	else
 	  {
 	    std::ifstream *inf = new std::ifstream;
-	    assert (inf != NULL);
+	    libmesh_assert (inf != NULL);
 	    in.reset(inf);
 	    
 	    std::string new_name(bzipped_file ? unzip_file(name) : name);
@@ -175,7 +175,7 @@ void Xdr::open (const std::string& name)
 	    inf->open(new_name.c_str(), std::ios::in);
 	  }
 
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	return;
       }
 
@@ -188,7 +188,7 @@ void Xdr::open (const std::string& name)
 	  {
 #ifdef HAVE_GZSTREAM
 	    ogzstream *outf = new ogzstream;
-	    assert (outf != NULL);
+	    libmesh_assert (outf != NULL);
 	    out.reset(outf);
 	    outf->open(name.c_str(), std::ios::out);
 #else
@@ -200,7 +200,7 @@ void Xdr::open (const std::string& name)
 	else
 	  {
 	    std::ofstream *outf = new std::ofstream;
-	    assert (outf != NULL);
+	    libmesh_assert (outf != NULL);
 	    out.reset(outf);
 
 	    std::string new_name = name;
@@ -211,7 +211,7 @@ void Xdr::open (const std::string& name)
 	    outf->open(new_name.c_str(), std::ios::out);
 	  }
 	
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	return;
       }
       
@@ -355,7 +355,7 @@ void Xdr::data (int& a, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	xdr_int(xdrs, &a);
 
@@ -375,7 +375,7 @@ void Xdr::data (int& a, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	
 	*in >> a; in->getline(comm, comm_len);
 
@@ -384,7 +384,7 @@ void Xdr::data (int& a, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	
 	*out << a << "\t " << comment << '\n';
 
@@ -407,7 +407,7 @@ void Xdr::data (unsigned int& a, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (this->is_open());
+	libmesh_assert (this->is_open());
 
 	xdr_u_int(xdrs, &a);
 
@@ -427,7 +427,7 @@ void Xdr::data (unsigned int& a, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	
 	*in >> a; in->getline(comm, comm_len);
 
@@ -436,7 +436,7 @@ void Xdr::data (unsigned int& a, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	*out << a << "\t " << comment << '\n';
 	
@@ -459,7 +459,7 @@ void Xdr::data (short int& a, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	xdr_short(xdrs, &a);
 
@@ -479,7 +479,7 @@ void Xdr::data (short int& a, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	
 	*in >> a; in->getline(comm, comm_len);
 
@@ -488,7 +488,7 @@ void Xdr::data (short int& a, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	*out << a << "\t " << comment << '\n';
 	
@@ -511,7 +511,7 @@ void Xdr::data (unsigned short int& a, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	xdr_u_short(xdrs, &a);
 
@@ -531,7 +531,7 @@ void Xdr::data (unsigned short int& a, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	
 	*in >> a; in->getline(comm, comm_len);
 
@@ -540,7 +540,7 @@ void Xdr::data (unsigned short int& a, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	*out << a << "\t " << comment << '\n';
 	
@@ -563,7 +563,7 @@ void Xdr::data (float& a, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	xdr_float(xdrs, &a);
 
@@ -583,7 +583,7 @@ void Xdr::data (float& a, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	
 	*in >> a; in->getline(comm, comm_len);
 
@@ -592,7 +592,7 @@ void Xdr::data (float& a, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	*out << a << "\t " << comment << '\n';
 	
@@ -615,7 +615,7 @@ void Xdr::data (double& a, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	xdr_double(xdrs, &a);
 
@@ -635,7 +635,7 @@ void Xdr::data (double& a, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	
 	*in >> a; in->getline(comm, comm_len);
 
@@ -644,7 +644,7 @@ void Xdr::data (double& a, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	*out << a << "\t " << comment << '\n';
 	
@@ -669,7 +669,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 	double
 	  _r=a.real(),
 	  _i=a.imag();
@@ -693,7 +693,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	
 	double _r, _i;
 	*in >> _r;
@@ -706,7 +706,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	*out << a.real() << "\t " 
 	    << a.imag() << "\t "
@@ -732,7 +732,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	unsigned int length = v.size();
 
@@ -762,7 +762,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	unsigned int length=0;
 
@@ -792,7 +792,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 
 	unsigned int length=0;
 
@@ -802,7 +802,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (in.get() != NULL); assert (in->good());
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	    *in >> v[i];
 	  }
 
@@ -813,7 +813,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	unsigned int length=v.size();
 
@@ -821,7 +821,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (out.get() != NULL); assert (out->good());
+	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	    *out << v[i] << " ";
 	  }
 
@@ -845,7 +845,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	unsigned int length = v.size();
 
@@ -875,7 +875,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	unsigned int length=0;
 
@@ -905,7 +905,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 
 	unsigned int length=0;
 
@@ -915,7 +915,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (in.get() != NULL); assert (in->good());
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	    *in >> v[i];
 	  }
 
@@ -926,7 +926,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	unsigned int length=v.size();
 
@@ -934,7 +934,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (out.get() != NULL); assert (out->good());
+	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	    *out << v[i] << " ";
 	  }
 
@@ -958,7 +958,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	unsigned int length = v.size();
 
@@ -988,7 +988,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	unsigned int length=0;
 
@@ -1018,7 +1018,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 
 	unsigned int length=0;
 
@@ -1028,7 +1028,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (in.get() != NULL); assert (in->good());
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	    *in >> v[i];
 	  }
 
@@ -1039,7 +1039,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	unsigned int length=v.size();
 
@@ -1047,7 +1047,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (out.get() != NULL); assert (out->good());
+	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	    *out << v[i] << " ";
 	  }
 
@@ -1071,7 +1071,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	unsigned int length = v.size();
 
@@ -1101,7 +1101,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	unsigned int length=0;
 
@@ -1131,7 +1131,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 
 	unsigned int length=0;
 
@@ -1141,7 +1141,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (in.get() != NULL); assert (in->good());
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	    *in >> v[i];
 	  }
 
@@ -1152,7 +1152,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	unsigned int length=v.size();
 
@@ -1160,7 +1160,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (out.get() != NULL); assert (out->good());
+	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	    *out << v[i] << " ";
 	  }
 
@@ -1184,7 +1184,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	unsigned int length = v.size();
 
@@ -1214,7 +1214,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	unsigned int length=0;
 
@@ -1244,7 +1244,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 
 	unsigned int length=0;
 
@@ -1254,7 +1254,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (in.get() != NULL); assert (in->good());
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	    *in >> v[i];
 	  }
 
@@ -1265,7 +1265,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	unsigned int length=v.size();
 
@@ -1273,7 +1273,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (out.get() != NULL); assert (out->good());
+	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	    OFSRealscientific(*out,17,v[i]) << " ";
  	  }
 
@@ -1297,7 +1297,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (this->is_open());
+	libmesh_assert (this->is_open());
 
 	unsigned int length = v.size();
 
@@ -1327,7 +1327,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (this->is_open());
+	libmesh_assert (this->is_open());
 
 	unsigned int length=0;
 
@@ -1360,7 +1360,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 
 	unsigned int length=0;
 
@@ -1368,13 +1368,13 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 	
 	// If you were expecting to read in a vector at this
 	// point, it's not going to happen if length == 0!
-	// assert (length != 0);
+	// libmesh_assert (length != 0);
 	
 	v.resize(length);
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (in.get() != NULL); assert (in->good());
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	    *in >> v[i];
 	  }
 
@@ -1385,7 +1385,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	unsigned int length=v.size();
 
@@ -1393,7 +1393,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (out.get() != NULL); assert (out->good());
+	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	    OFSRealscientific(*out,17,v[i]) << " ";
  	  }
 
@@ -1422,7 +1422,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	unsigned int length = v.size();
 
@@ -1451,7 +1451,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	unsigned int length=0;
 
@@ -1480,7 +1480,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 
 	unsigned int length=0;
 
@@ -1490,7 +1490,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
 	for (unsigned int i=0; i<v.size(); i++)
 	  {
-	    assert (in.get() != NULL); assert (in->good());
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	
 	    double _r, _i;
 	    *in >> _r;
@@ -1505,7 +1505,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	unsigned int length=v.size();
 
@@ -1513,7 +1513,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
  	for (unsigned int i=0; i<v.size(); i++)
  	  {
- 	    assert (out.get() != NULL); assert (out->good());
+ 	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	    OFSNumberscientific(*out,17,v[i]) << " ";
  	  }
 
@@ -1540,7 +1540,7 @@ void Xdr::data (std::string& s, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	{
 	  char* sptr = new char[s.size()+1];
@@ -1575,7 +1575,7 @@ void Xdr::data (std::string& s, const char* comment)
       {
 #ifdef HAVE_XDR
 
-	assert (is_open());
+	libmesh_assert (is_open());
 
 	{
 	  char* sptr = new char[xdr_MAX_STRING_LENGTH];
@@ -1608,7 +1608,7 @@ void Xdr::data (std::string& s, const char* comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 
 	in->getline(comm, comm_len);
 
@@ -1631,7 +1631,7 @@ void Xdr::data (std::string& s, const char* comment)
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	*out << s << "\t " << comment << '\n';
 
@@ -1654,7 +1654,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
       {
 #ifdef HAVE_XDR
 
-	assert (this->is_open());
+	libmesh_assert (this->is_open());
 
 
 	xdr_vector(xdrs, 
@@ -1681,7 +1681,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
       {
 #ifdef HAVE_XDR
 
-	assert (this->is_open());
+	libmesh_assert (this->is_open());
 
 	if (len > 0)
 	  xdr_vector(xdrs, 
@@ -1706,11 +1706,11 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 
 	for (unsigned int i=0; i<len; i++)
 	  {
-	    assert (in.get() != NULL); assert (in->good());
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	    *in >> val[i];
 	  }
 
@@ -1719,12 +1719,12 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	if (line_break == libMesh::invalid_uint)
 	  for (unsigned int i=0; i<len; i++)
 	    {
-	      assert (out.get() != NULL); assert (out->good());
+	      libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	      *out << val[i] << " ";
 	    }
 	else
@@ -1734,10 +1734,10 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 	      {
 		for (unsigned int i=0; i<std::min(line_break,len); i++)
 		  {
-		    assert (out.get() != NULL); assert (out->good());
+		    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 		    *out << val[cnt++] << " ";
 		  }
-		assert (out.get() != NULL); assert (out->good());
+		libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 		*out << '\n';
 	      }
 	  }
@@ -1762,7 +1762,7 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
       {
 #ifdef HAVE_XDR
 
-	assert (this->is_open());
+	libmesh_assert (this->is_open());
 
 	if (len > 0)
 	  xdr_vector(xdrs, 
@@ -1787,11 +1787,11 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 
 	for (unsigned int i=0; i<len; i++)
 	  {
-	    assert (in.get() != NULL); assert (in->good());
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	    *in >> val[i];
 	  }
 
@@ -1800,12 +1800,12 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	if (line_break == libMesh::invalid_uint)
 	  for (unsigned int i=0; i<len; i++)
 	    {
-	      assert (out.get() != NULL); assert (out->good());
+	      libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	      OFSRealscientific(*out,17,val[i]) << " ";
 	    }
 	else
@@ -1815,10 +1815,10 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 	      {
 		for (unsigned int i=0; i<std::min(line_break,len); i++)
 		  {
-		    assert (out.get() != NULL); assert (out->good());
+		    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 		    OFSRealscientific(*out,17,val[cnt++]) << " ";
 		  }
-		assert (out.get() != NULL); assert (out->good());
+		libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 		*out << '\n';
 	      }
 	  }
@@ -1843,7 +1843,7 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
       {
 #ifdef HAVE_XDR
 
-	assert (this->is_open());
+	libmesh_assert (this->is_open());
 
 
 	if (len > 0)
@@ -1888,11 +1888,11 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 
 	for (unsigned int i=0; i<len; i++)
 	  {
-	    assert (in.get() != NULL); assert (in->good());
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	    *in >> val[i].real() >> val[i].imag();
 	  }
 
@@ -1901,12 +1901,12 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 
 	if (line_break == libMesh::invalid_uint)
 	  for (unsigned int i=0; i<len; i++)
 	    {
-	      assert (out.get() != NULL); assert (out->good());
+	      libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	      OFSRealscientific(*out,17,val[i].real()) << " ";
 	      OFSRealscientific(*out,17,val[i].imag()) << " ";
 	    }
@@ -1917,12 +1917,12 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 	      {
 		for (unsigned int i=0; i<std::min(line_break,len); i++)
 		  {
-		    assert (out.get() != NULL); assert (out->good());
+		    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 		    OFSRealscientific(*out,17,val[cnt].real()) << " ";
 		    OFSRealscientific(*out,17,val[cnt].imag()) << " ";
 		    cnt++;
 		  }
-		assert (out.get() != NULL); assert (out->good());
+		libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 		*out << '\n';
 	      }
 	  }
@@ -1948,14 +1948,14 @@ void Xdr::comment (std::string &comment)
 
     case READ:
       {
-	assert (in.get() != NULL); assert (in->good());
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	in->getline(comm, comm_len);
 	return;	
       }
 
     case WRITE:
       {
-	assert (out.get() != NULL); assert (out->good());
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	*out << "\t " << comment << '\n';
 	return;	
       }

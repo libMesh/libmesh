@@ -100,7 +100,7 @@ public:
    * false otherwise.
    */
   bool bounds_node (const Node* nd) const
-  { assert (nd != NULL); return bounds_point(*nd); }
+  { libmesh_assert (nd != NULL); return bounds_point(*nd); }
 
   /**
    * @returns true if this TreeNode (or its children) contain point p,
@@ -218,9 +218,9 @@ TreeNode<N>::TreeNode (const MeshBase& m,
   parent         (p),
   contains_ifems (false)
 {
-  // assert our children are empty, thus we are active.
-  assert (children.empty());
-  assert (this->active());
+  // libmesh_assert our children are empty, thus we are active.
+  libmesh_assert (children.empty());
+  libmesh_assert (this->active());
   
   // Reserve space for the nodes & elements
   nodes.reserve    (tgt_bin_size);

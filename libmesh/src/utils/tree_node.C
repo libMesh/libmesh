@@ -33,8 +33,8 @@
 template <unsigned int N>
 void TreeNode<N>::insert (const Node* nd)
 {
-  assert (nd != NULL);
-  assert (nd->id() < mesh.n_nodes());
+  libmesh_assert (nd != NULL);
+  libmesh_assert (nd->id() < mesh.n_nodes());
 
   // Return if we don't bound the node
   if (!this->bounds_node(nd))
@@ -54,7 +54,7 @@ void TreeNode<N>::insert (const Node* nd)
   // our children
   else
     {
-      assert (children.size() == N);
+      libmesh_assert (children.size() == N);
       
       for (unsigned int c=0; c<N; c++)
 	children[c]->insert (nd);
@@ -66,7 +66,7 @@ void TreeNode<N>::insert (const Node* nd)
 template <unsigned int N>
 void TreeNode<N>::insert (const Elem* elem)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   /* We first want to find the corners of the cuboid surrounding the
      cell.  */
@@ -124,7 +124,7 @@ void TreeNode<N>::insert (const Elem* elem)
   // our children
   else
     {
-      assert (children.size() == N);
+      libmesh_assert (children.size() == N);
       
       for (unsigned int c=0; c<N; c++)
 	children[c]->insert (elem);
@@ -137,8 +137,8 @@ template <unsigned int N>
 void TreeNode<N>::refine ()
 {
   // Huh?  better be active...
-  assert (this->active());
-  assert (children.empty());
+  libmesh_assert (this->active());
+  libmesh_assert (children.empty());
   
   // A TreeNode<N> has by definition N children
   children.resize(N);
@@ -166,8 +166,8 @@ void TreeNode<N>::refine ()
   std::vector<const Node*>().swap(nodes);
   std::vector<const Elem*>().swap(elements);
 
-  assert (nodes.capacity()    == 0);
-  assert (elements.capacity() == 0);
+  libmesh_assert (nodes.capacity()    == 0);
+  libmesh_assert (elements.capacity() == 0);
 }
 
 
@@ -434,8 +434,8 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
 	  // with the connected elements
 	  const unsigned int node_number = nodes[n]->id();
 
-	  assert (node_number < mesh.n_nodes());
-	  assert (node_number < nodes_to_elem.size());
+	  libmesh_assert (node_number < mesh.n_nodes());
+	  libmesh_assert (node_number < nodes_to_elem.size());
 	  
 	  for (unsigned int e=0; e<nodes_to_elem[node_number].size(); e++)
 	    elements_set.insert(nodes_to_elem[node_number][e]);
@@ -530,7 +530,7 @@ const Elem* TreeNode<N>::find_element(const Point& p) const
 template <unsigned int N>
 const Elem* TreeNode<N>::find_element_in_children(const Point& p) const
 {
-  assert (!this->active());
+  libmesh_assert (!this->active());
 
   unsigned int excluded_child = libMesh::invalid_uint;
   

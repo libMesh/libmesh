@@ -107,7 +107,7 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
   // all of the current mesh nodes will not end up in the the boundary
   // mesh.  These nodes can be trimmed later via a call to prepare_for_use().
   {
-    assert (boundary_mesh.n_nodes() == 0);
+    libmesh_assert (boundary_mesh.n_nodes() == 0);
     boundary_mesh.reserve_nodes(_mesh.n_nodes());
     
     MeshBase::const_node_iterator it  = _mesh.nodes_begin();
@@ -182,7 +182,7 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 		Node* new_node = boundary_mesh.node_ptr(new_elem->node(nn));
 		
 		// sanity check: be sure that the new Nodes global id really matches
-		assert (new_node->id() == new_elem->node(nn));
+		libmesh_assert (new_node->id() == new_elem->node(nn));
 
 		// Assign the new node pointer
 		new_elem->set_node(nn) = new_node;
@@ -246,10 +246,10 @@ void BoundaryInfo::add_side(const Elem* elem,
 			    const unsigned short int side,
 			    const short int id)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   // Only add BCs for level-0 elements.
-  assert (elem->level() == 0);
+  libmesh_assert (elem->level() == 0);
   
   if (id == invalid_id)
     {
@@ -288,7 +288,7 @@ short int BoundaryInfo::boundary_id(const Node* node) const
 short int BoundaryInfo::boundary_id(const Elem* const elem,
 				    const unsigned short int side) const
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.

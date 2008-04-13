@@ -183,8 +183,8 @@ typename boostcopy::enable_if_c<
 DenseMatrixBase<T>::add (const T2 factor,
 			 const DenseMatrixBase<T3>& mat)
 {
-  assert (this->m() == mat.m());
-  assert (this->n() == mat.n());
+  libmesh_assert (this->m() == mat.m());
+  libmesh_assert (this->n() == mat.n());
 
   for (unsigned int j=0; j<this->n(); j++)
     for (unsigned int i=0; i<this->m(); i++)

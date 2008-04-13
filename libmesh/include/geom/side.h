@@ -62,10 +62,10 @@ class Side : public SideType
     SideType(0,0,const_cast<Elem*>(parent)), // Allocate no storage for nodes or neighbors!
     _side_number(side)
   {
-    assert (parent != NULL);
+    libmesh_assert (parent != NULL);
     // may not be true when building infinite element sides
-    // assert (_side_number < this->parent()->n_sides());
-    assert ((this->dim()+1) == this->parent()->dim());
+    // libmesh_assert (_side_number < this->parent()->n_sides());
+    libmesh_assert ((this->dim()+1) == this->parent()->dim());
   }
 
   /**
@@ -73,7 +73,7 @@ class Side : public SideType
    */
   virtual const Point & point (const unsigned int i) const
   {
-    assert (i < this->n_nodes());    
+    libmesh_assert (i < this->n_nodes());    
     return this->parent()->point (ParentType::side_nodes_map[_side_number][i]);
   }
  
@@ -83,7 +83,7 @@ class Side : public SideType
    */
   virtual Point & point (const unsigned int i)
   {
-    assert (i < this->n_nodes());
+    libmesh_assert (i < this->n_nodes());
     return this->parent()->point (ParentType::side_nodes_map[_side_number][i]);
   }
   
@@ -92,7 +92,7 @@ class Side : public SideType
    */
   virtual unsigned int node (const unsigned int i) const
   {
-    assert (i < this->n_nodes());
+    libmesh_assert (i < this->n_nodes());
     return this->parent()->node (ParentType::side_nodes_map[_side_number][i]);  
   }
 
@@ -101,7 +101,7 @@ class Side : public SideType
    */
   virtual Node* get_node (const unsigned int i) const
   {
-    assert (i < this->n_nodes());    
+    libmesh_assert (i < this->n_nodes());    
     return this->parent()->get_node (ParentType::side_nodes_map[_side_number][i]);
   }
 
@@ -110,7 +110,7 @@ class Side : public SideType
    */
   virtual Node* & set_node (const unsigned int i)
   {
-    assert (i < this->n_nodes());    
+    libmesh_assert (i < this->n_nodes());    
     return this->parent()->set_node (ParentType::side_nodes_map[_side_number][i]);
   }
 
@@ -164,9 +164,9 @@ class SideEdge : public EdgeType
     EdgeType(0,0,const_cast<Elem*>(parent)), // Allocate no storage for nodes or neighbors!
     _edge_number(edge)
   {
-    assert (parent != NULL);
-    assert (_edge_number < this->parent()->n_edges());
-    assert (this->dim() == 1);
+    libmesh_assert (parent != NULL);
+    libmesh_assert (_edge_number < this->parent()->n_edges());
+    libmesh_assert (this->dim() == 1);
   }
 
   /**
@@ -174,7 +174,7 @@ class SideEdge : public EdgeType
    */
   virtual const Point & point (const unsigned int i) const
   {
-    assert (i < this->n_nodes());    
+    libmesh_assert (i < this->n_nodes());    
     return this->parent()->point (ParentType::edge_nodes_map[_edge_number][i]);
   }
  
@@ -184,7 +184,7 @@ class SideEdge : public EdgeType
    */
   virtual Point & point (const unsigned int i)
   {
-    assert (i < this->n_nodes());
+    libmesh_assert (i < this->n_nodes());
     return this->parent()->point (ParentType::edge_nodes_map[_edge_number][i]);
   }
   
@@ -193,7 +193,7 @@ class SideEdge : public EdgeType
    */
   virtual unsigned int node (const unsigned int i) const
   {
-    assert (i < this->n_nodes());
+    libmesh_assert (i < this->n_nodes());
     return this->parent()->node (ParentType::edge_nodes_map[_edge_number][i]);  
   }
 
@@ -202,7 +202,7 @@ class SideEdge : public EdgeType
    */
   virtual Node* get_node (const unsigned int i) const
   {
-    assert (i < this->n_nodes());    
+    libmesh_assert (i < this->n_nodes());    
     return this->parent()->get_node (ParentType::edge_nodes_map[_edge_number][i]);
   }
 
@@ -211,7 +211,7 @@ class SideEdge : public EdgeType
    */
   virtual Node* & set_node (const unsigned int i)
   {
-    assert (i < this->n_nodes());    
+    libmesh_assert (i < this->n_nodes());    
     return this->parent()->set_node (ParentType::edge_nodes_map[_edge_number][i]);
   }
 

@@ -62,7 +62,7 @@ Real FE<2,XYZ>::shape(const Elem* elem,
 {
 #if DIM > 1
 
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -82,7 +82,7 @@ Real FE<2,XYZ>::shape(const Elem* elem,
   const Real dy = y - yc;
 
   const unsigned int totalorder = order + elem->p_level();
-  assert (i < (totalorder+1)*(totalorder+2)/2);
+  libmesh_assert (i < (totalorder+1)*(totalorder+2)/2);
 
   
   // monomials. since they are hierarchic we only need one case block.
@@ -185,8 +185,8 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
 #if DIM > 1
 
   
-  assert (j<2);
-  assert (elem != NULL);
+  libmesh_assert (j<2);
+  libmesh_assert (elem != NULL);
   
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -206,7 +206,7 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
   const Real dy = y - yc;
 
   const unsigned int totalorder = order + elem->p_level();
-  assert (i < (totalorder+1)*(totalorder+2)/2);
+  libmesh_assert (i < (totalorder+1)*(totalorder+2)/2);
   
   // monomials. since they are hierarchic we only need one case block.
 
@@ -388,8 +388,8 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 {
 #if DIM > 1
 
-  assert (j<=2);
-  assert (elem != NULL);
+  libmesh_assert (j<=2);
+  libmesh_assert (elem != NULL);
   
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -409,7 +409,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
   const Real dy = y - yc;
 
   const unsigned int totalorder = order + elem->p_level();
-  assert (i < (totalorder+1)*(totalorder+2)/2);
+  libmesh_assert (i < (totalorder+1)*(totalorder+2)/2);
   
   // monomials. since they are hierarchic we only need one case block.
 

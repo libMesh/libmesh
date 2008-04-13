@@ -49,14 +49,14 @@ ErrorVectorReal ErrorVector::minimum() const
   for (unsigned int i=0; i<n; i++)
     {
       // Only positive (or zero) values in the error vector
-      assert((*this)[i] >= 0.);
+      libmesh_assert((*this)[i] >= 0.);
       if (this->is_active_elem(i))
         min = std::min (min, (*this)[i]);
     }
   STOP_LOG ("minimum()", "ErrorVector");
 
   // ErrorVectors are for positive values
-  assert (min >= 0.);
+  libmesh_assert (min >= 0.);
   
   return min;
 }
@@ -201,11 +201,11 @@ std::vector<unsigned int> ErrorVector::cut_above(Real cut) const
 
 bool ErrorVector::is_active_elem (unsigned int i) const
 {
-  assert (i < this->size());
+  libmesh_assert (i < this->size());
 
   if (_mesh)
     {
-      assert(_mesh->elem(i));
+      libmesh_assert(_mesh->elem(i));
       return _mesh->elem(i)->active();
     }
   else
@@ -244,9 +244,9 @@ void ErrorVector::plot_error(const std::string& filename,
     //0 for the monomial basis
     const unsigned int solution_index = dof_indices[0];
     // std::cout << "elem_number=" << elem_number << std::endl;
-    assert (elem_id < (*this).size());
+    libmesh_assert (elem_id < (*this).size());
 //  We may have zero error values in special circumstances
-//    assert ((*this)[elem_id] > 0.);
+//    libmesh_assert ((*this)[elem_id] > 0.);
     error_system.solution->set(solution_index, (*this)[elem_id]);
   }
 

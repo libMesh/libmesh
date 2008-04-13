@@ -187,7 +187,7 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
 				    unsigned int n_bins)
 {
   // Must have at least 1 bin
-  assert (n_bins>0);
+  libmesh_assert (n_bins>0);
 
   const unsigned int n   = this->size();
   

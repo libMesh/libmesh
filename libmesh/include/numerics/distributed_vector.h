@@ -446,7 +446,7 @@ void DistributedVector<T>::init (const unsigned int n,
   // This function must be run on all processors at once
   parallel_only();
 
-  assert (n_local <= n);
+  libmesh_assert (n_local <= n);
 
   // Clear the data structures if already initialized
   if (this->initialized())
@@ -486,7 +486,7 @@ void DistributedVector<T>::init (const unsigned int n,
   for (int p=0; p<n_proc; p++)
     sum += local_sizes[p];
 
-  assert (sum == static_cast<int>(n));
+  libmesh_assert (sum == static_cast<int>(n));
   
 #  endif
   
@@ -528,7 +528,7 @@ template <typename T>
 inline
 void DistributedVector<T>::close ()
 {
-  assert (this->initialized());
+  libmesh_assert (this->initialized());
   
   this->_is_closed = true;
 }
@@ -556,9 +556,9 @@ template <typename T>
 inline
 void DistributedVector<T>::zero ()
 {
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert (this->initialized());
+  libmesh_assert (_values.size() == _local_size);
+  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
   
   std::fill (_values.begin(),
 	     _values.end(),
@@ -584,9 +584,9 @@ template <typename T>
 inline
 unsigned int DistributedVector<T>::size () const
 {
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert (this->initialized());
+  libmesh_assert (_values.size() == _local_size);
+  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
   return _global_size;
 }
@@ -597,9 +597,9 @@ template <typename T>
 inline
 unsigned int DistributedVector<T>::local_size () const
 {
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert (this->initialized());
+  libmesh_assert (_values.size() == _local_size);
+  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
   return _local_size;
 }
@@ -610,9 +610,9 @@ template <typename T>
 inline
 unsigned int DistributedVector<T>::first_local_index () const
 {
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert (this->initialized());
+  libmesh_assert (_values.size() == _local_size);
+  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
   return _first_local_index;
 }
@@ -623,9 +623,9 @@ template <typename T>
 inline
 unsigned int DistributedVector<T>::last_local_index () const
 {
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert (this->initialized());
+  libmesh_assert (_values.size() == _local_size);
+  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
   return _last_local_index;
 }
@@ -636,10 +636,10 @@ template <typename T>
 inline
 T DistributedVector<T>::operator() (const unsigned int i) const
 {
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
-  assert ( ((i >= first_local_index()) &&
+  libmesh_assert (this->initialized());
+  libmesh_assert (_values.size() == _local_size);
+  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert ( ((i >= first_local_index()) &&
 	    (i <  last_local_index())) );
 
   return _values[i - _first_local_index];
@@ -651,11 +651,11 @@ template <typename T>
 inline
 void DistributedVector<T>::set (const unsigned int i, const T value)
 {
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
-  assert (i<size());
-  assert (i-first_local_index() < local_size());
+  libmesh_assert (this->initialized());
+  libmesh_assert (_values.size() == _local_size);
+  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert (i<size());
+  libmesh_assert (i-first_local_index() < local_size());
   
   _values[i - _first_local_index] = value;
 }
@@ -666,11 +666,11 @@ template <typename T>
 inline
 void DistributedVector<T>::add (const unsigned int i, const T value)
 {
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
-  assert (i<size());
-  assert (i-first_local_index() < local_size());
+  libmesh_assert (this->initialized());
+  libmesh_assert (_values.size() == _local_size);
+  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert (i<size());
+  libmesh_assert (i-first_local_index() < local_size());
   
   _values[i - _first_local_index] += value;
 }
@@ -684,9 +684,9 @@ Real DistributedVector<T>::min () const
   // This function must be run on all processors at once
   parallel_only();
 
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert (this->initialized());
+  libmesh_assert (_values.size() == _local_size);
+  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
   Real local_min = _values.size() ? 
     libmesh_real(_values[0]) : std::numeric_limits<Real>::max();
@@ -707,9 +707,9 @@ Real DistributedVector<T>::max() const
   // This function must be run on all processors at once
   parallel_only();
 
-  assert (this->initialized());
-  assert (_values.size() == _local_size);
-  assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert (this->initialized());
+  libmesh_assert (_values.size() == _local_size);
+  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
   Real local_max = _values.size() ? 
     libmesh_real(_values[0]) : -std::numeric_limits<Real>::max();

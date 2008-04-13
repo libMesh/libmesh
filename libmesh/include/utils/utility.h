@@ -72,7 +72,7 @@ namespace Utility
    */
   template <int N>
   inline
-  Real pow(const Real x) { assert(N>0); return x * pow<N-1>(x); }
+  Real pow(const Real x) { libmesh_assert(N>0); return x * pow<N-1>(x); }
 
   /**
    * You have to also provide a full specialization for

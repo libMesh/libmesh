@@ -67,7 +67,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 			 const unsigned int i,
 			 const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   
   const ElemType type = elem->type();
 
@@ -93,7 +93,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      const Real l2 = p(0);
 	      const Real l3 = p(1);	      
 	      
-	      assert (i<6);
+	      libmesh_assert (i<6);
 	      
 	      switch (i)
 		{
@@ -119,7 +119,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 	      
-	      assert (i < 9);
+	      libmesh_assert (i < 9);
 	      
 	      //                                0  1  2  3  4  5  6  7  8
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
@@ -152,7 +152,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      
 	      Real f=1;
 	      
-	      assert (i<10);
+	      libmesh_assert (i<10);
 
 
 	      if (i==4 && (elem->point(0) > elem->point(1)))f=-1;
@@ -194,7 +194,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 	      
-	      assert (i < 16);
+	      libmesh_assert (i < 16);
 
 	      //                                0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 	      static const unsigned int i0[] = {0,  1,  1,  0,  2,  3,  1,  1,  2,  3,  0,  0,  2,  3,  2,  3};
@@ -248,7 +248,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      
 	      Real f=1;
 	      
-	      assert (i<15);
+	      libmesh_assert (i<15);
 	      
 	      
 	      if (i== 4 && (elem->point(0) > elem->point(1)))f=-1;
@@ -296,7 +296,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 	      
-	      assert (i < 25);
+	      libmesh_assert (i < 25);
 	      
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4};
@@ -349,7 +349,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      
 	      Real f=1;	      
 	      
-	      assert (i<21);      	      
+	      libmesh_assert (i<21);      	      
 	      
 
 	      if ((i== 4||i== 6) && (elem->point(0) > elem->point(1)))f=-1;
@@ -403,7 +403,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 	      
-	      assert (i < 36);
+	      libmesh_assert (i < 36);
 	      
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
@@ -460,7 +460,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      
 	      Real f=1;
 
-	      assert (i<28);
+	      libmesh_assert (i<28);
 	      
 	      
 	      if ((i== 4||i== 6) && (elem->point(0) > elem->point(1)))f=-1;
@@ -524,7 +524,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 	      
-	      assert (i < 49);
+	      libmesh_assert (i < 49);
 	      
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6};
@@ -583,7 +583,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 
 	      Real f=1;
 
-	      assert (i<36);
+	      libmesh_assert (i<36);
 	      
 	      
 	      if ((i>= 4&&i<= 8) && (elem->point(0) > elem->point(1)))f=-1;
@@ -657,7 +657,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 	      
-	      assert (i < 64);
+	      libmesh_assert (i < 64);
 	      
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7};
@@ -741,7 +741,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 			       const unsigned int j,
 			       const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   const ElemType type = elem->type();
 
@@ -763,8 +763,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      // Here we use finite differences to compute the derivatives!
 	      const Real eps = 1.e-6;
 	      
-	      assert (i < 6);
-	      assert (j < 2);
+	      libmesh_assert (i < 6);
+	      libmesh_assert (j < 2);
 	      
 	      switch (j)
 		{
@@ -804,7 +804,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 	      
-	      assert (i < 9);
+	      libmesh_assert (i < 9);
 	      
 	      //                                0  1  2  3  4  5  6  7  8
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
@@ -845,8 +845,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      // Here we use finite differences to compute the derivatives!
 	      const Real eps = 1.e-6;
 	      
-	      assert (i < 10);
-	      assert (j < 2);
+	      libmesh_assert (i < 10);
+	      libmesh_assert (j < 2);
 	      
 	      switch (j)
 		{
@@ -885,7 +885,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 	      
-	      assert (i < 16);
+	      libmesh_assert (i < 16);
 
 	      //                                0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 	      static const unsigned int i0[] = {0,  1,  1,  0,  2,  3,  1,  1,  2,  3,  0,  0,  2,  3,  2,  3};
@@ -947,8 +947,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      // Here we use finite differences to compute the derivatives!
 	      const Real eps = 1.e-6;
 	      
-	      assert (i < 15);
-	      assert (j < 2);
+	      libmesh_assert (i < 15);
+	      libmesh_assert (j < 2);
 	      
 	      switch (j)
 		{
@@ -988,7 +988,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 	      
-	      assert (i < 25);
+	      libmesh_assert (i < 25);
 
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4};
@@ -1051,8 +1051,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      // Here we use finite differences to compute the derivatives!
 	      const Real eps = 1.e-6;
 	      
-	      assert (i < 21);
-	      assert (j < 2);
+	      libmesh_assert (i < 21);
+	      libmesh_assert (j < 2);
 	      
 	      switch (j)
 		{
@@ -1091,7 +1091,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 	      
-	      assert (i < 36);
+	      libmesh_assert (i < 36);
 
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
@@ -1156,8 +1156,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      // Here we use finite differences to compute the derivatives!
 	      const Real eps = 1.e-6;
 	      
-	      assert (i < 28);
-	      assert (j < 2);
+	      libmesh_assert (i < 28);
+	      libmesh_assert (j < 2);
 	      
 	      switch (j)
 		{
@@ -1196,7 +1196,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 	      
-	      assert (i < 49);
+	      libmesh_assert (i < 49);
 
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6};
@@ -1261,8 +1261,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      // Here we use finite differences to compute the derivatives!
 	      const Real eps = 1.e-6;
 	      
-	      assert (i < 36);
-	      assert (j < 2);
+	      libmesh_assert (i < 36);
+	      libmesh_assert (j < 2);
 	      
 	      switch (j)
 		{
@@ -1301,7 +1301,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 	      
-	      assert (i < 64);
+	      libmesh_assert (i < 64);
 
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7};

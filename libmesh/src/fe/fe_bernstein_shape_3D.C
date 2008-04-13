@@ -56,7 +56,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
   
 #if DIM == 3
   
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order + elem->p_level());
@@ -74,7 +74,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	  case TET4:
 	  case TET10:
 	    {
-	      assert(i<4);
+	      libmesh_assert(i<4);
 	      
 	      // Area coordinates
 	      const Real zeta1 = p(0);
@@ -98,7 +98,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	  case HEX20:
 	  case HEX27:
 	    {
-	      assert (i<8);
+	      libmesh_assert (i<8);
 	      
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
@@ -135,7 +135,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	    // Bernstein shape functions on the tetrahedron.
 	  case TET10:
 	    {
-	      assert(i<10);
+	      libmesh_assert(i<10);
 	
 	      // Area coordinates
 	      const Real zeta1 = p(0);
@@ -164,7 +164,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	    // Bernstein shape functions on the 20-noded hexahedral.
 	  case HEX20:
 	    {
-	      assert (i<20);
+	      libmesh_assert (i<20);
 	      
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
@@ -227,7 +227,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	    // Bernstein shape functions on the hexahedral.
 	  case HEX27:
 	    {
-	      assert (i<27);
+	      libmesh_assert (i<27);
 	      
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
@@ -265,7 +265,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 // 	    // Bernstein shape functions on the tetrahedron.
 // 	  case TET10:
 // 	    {
-// 	      assert(i<20);
+// 	      libmesh_assert(i<20);
 	      
 // 	      // Area coordinates
 // 	      const Real zeta1 = p(0);
@@ -330,7 +330,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	    // Bernstein shape functions on the hexahedral.
 	  case HEX27:
 	    {
-	      assert (i<64);
+	      libmesh_assert (i<64);
 	      
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi    = p(0);
@@ -843,7 +843,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	    // Bernstein shape functions on the hexahedral.
 	  case HEX27:
 	    {
-	      assert (i<125);
+	      libmesh_assert (i<125);
 	      
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi    = p(0);
@@ -1387,12 +1387,12 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 {
 
 #if DIM == 3
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order + elem->p_level());
   
-  assert (j < 3);
+  libmesh_assert (j < 3);
   
   switch (totalorder)
     {
@@ -1411,8 +1411,8 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	      // to compute the derivatives!
 	      const Real eps = 1.e-6;
 	      
-	      assert (i < 4);
-	      assert (j < 3);
+	      libmesh_assert (i < 4);
+	      libmesh_assert (j < 3);
 	      
 	      
 	      switch (j)
@@ -1458,7 +1458,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	  case HEX20:
 	  case HEX27:
 	    {
-	      assert (i<8);
+	      libmesh_assert (i<8);
 	
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
@@ -1518,8 +1518,8 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	      // to compute the derivatives!
 	      const Real eps = 1.e-6;
 	      
-	      assert (i <10);
-	      assert (j < 3);
+	      libmesh_assert (i <10);
+	      libmesh_assert (j < 3);
 
 
 		switch (j)
@@ -1561,7 +1561,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 		// Bernstein shape functions on the hexahedral.
 	  case HEX20:
 	    {
-	      assert (i<20);
+	      libmesh_assert (i<20);
 	
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
@@ -1695,7 +1695,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	    // Bernstein shape functions on the hexahedral.
 	  case HEX27:
 	    {
-	      assert (i<27);
+	      libmesh_assert (i<27);
 	
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
@@ -1756,8 +1756,8 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      // to compute the derivatives!
 // 	      const Real eps = 1.e-6;
 	      
-// 	      assert (i < 20);
-// 	      assert (j < 3);    
+// 	      libmesh_assert (i < 20);
+// 	      libmesh_assert (j < 3);    
  
 // 		switch (j)
 // 		{
@@ -1804,8 +1804,8 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	      // to compute the derivatives!
 	      const Real eps = 1.e-6;
 	      
-	      assert (i < 64);
-	      assert (j < 3);    
+	      libmesh_assert (i < 64);
+	      libmesh_assert (j < 3);    
 	      
 	      switch (j)
 		{
@@ -2335,7 +2335,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  
 	      
 
-// 	      assert (j < 3);
+// 	      libmesh_assert (j < 3);
 
 // 	      switch (j)
 // 		{
@@ -2379,8 +2379,8 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	    {
 	      const Real eps = 1.e-6;
 	      
-	      assert (i < 125);
-	      assert (j < 3);    
+	      libmesh_assert (i < 125);
+	      libmesh_assert (j < 3);    
 	      
 	      switch (j)
 		{
@@ -2909,7 +2909,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  
 	      
 
-// 	      assert (j < 3);
+// 	      libmesh_assert (j < 3);
 
 // 	      switch (j)
 // 		{

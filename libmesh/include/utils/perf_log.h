@@ -349,11 +349,11 @@ void PerfLog::pop (const std::string &label,
 {
   if (this->log_events)
     {
-      assert (!log_stack.empty());
+      libmesh_assert (!log_stack.empty());
 
 #ifndef NDEBUG
       PerfData *perf_data = &(log[std::make_pair(header,label)]);
-      assert (perf_data == log_stack.top());
+      libmesh_assert (perf_data == log_stack.top());
 #endif
 
       total_time += log_stack.top()->stopit();

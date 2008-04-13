@@ -71,7 +71,7 @@ namespace Predicates
 	{
 	  const predicate<T>* pred = _predicates[i];
 
-	  assert (pred != NULL);
+	  libmesh_assert (pred != NULL);
 	  
 	  if ( ! (*pred)(it) )
 	    return false;

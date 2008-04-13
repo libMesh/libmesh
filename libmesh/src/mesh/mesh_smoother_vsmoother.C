@@ -128,7 +128,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
   free(mcells);
   free(hnodes);
   //fclose(sout);
-  assert(_dist_norm > 0);
+  libmesh_assert(_dist_norm > 0);
 
   return _dist_norm;
 }
@@ -149,7 +149,7 @@ int VariationalMeshSmoother::writegr(int, int, LPLPDOUBLE R, LPINT, int, LPLPINT
     MeshBase::const_node_iterator       it  = _mesh.nodes_begin();
     const MeshBase::const_node_iterator end = _mesh.nodes_end();
 
-    assert(_dist_norm == 0.0);
+    libmesh_assert(_dist_norm == 0.0);
     _dist_norm=0;
     i=0;
     for (; it != end; ++it)
@@ -167,7 +167,7 @@ int VariationalMeshSmoother::writegr(int, int, LPLPDOUBLE R, LPINT, int, LPLPINT
 	(*(*it))(j)=(*(*it))(j)+(distance*_percent_to_move);
       }
 
-      assert(total_dist >= 0.0);
+      libmesh_assert(total_dist >= 0.0);
 
       //Add the distance this node moved to the global distance
       _dist_norm+=total_dist;
@@ -377,7 +377,7 @@ int VariationalMeshSmoother::readgr(int n, int, LPLPDOUBLE R, LPINT mask, int, L
 	    num=4;
 	    break;
 	  default:
-	    assert(false);
+	    libmesh_assert(false);
 	}
       }
       else
@@ -402,7 +402,7 @@ int VariationalMeshSmoother::readgr(int n, int, LPLPDOUBLE R, LPINT mask, int, L
 	    cells[i][7]=(*it)->node(6);
 	    num=8;
 	  default:
-	    assert(false);
+	    libmesh_assert(false);
 	}
       }
 
@@ -481,12 +481,12 @@ float VariationalMeshSmoother::adapt_minimum() const
   for (unsigned int i=0; i<n; i++)
   {
       // Only positive (or zero) values in the error vector
-    assert(adapt_data[i] >= 0.);
+    libmesh_assert(adapt_data[i] >= 0.);
     min = std::min (min, adapt_data[i]);
   }
 
   // ErrorVectors are for positive values
-  assert (min >= 0.);
+  libmesh_assert (min >= 0.);
 
   return min;
 }
@@ -820,7 +820,7 @@ void VariationalMeshSmoother::full_smooth(int n, int N, LPLPDOUBLE R, LPINT mask
 
   while(((qmin<=0)||(counter<iter[0])||(fabs(emax-Enm1)>1e-3))&&(ii<iter[1])&&(counter<iter[1]))
   {
-    assert(counter<iter[1]);
+    libmesh_assert(counter<iter[1]);
 
     Enm1=emax;
 

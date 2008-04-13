@@ -48,7 +48,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	  case HEX20:
 	  case HEX27:
 	    {
-	      assert (i<8);
+	      libmesh_assert (i<8);
 	
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
@@ -69,7 +69,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	  case TET4:
 	  case TET10:
 	    {
-	      assert(i<4);
+	      libmesh_assert(i<4);
 	
 	      // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
 	      const Real zeta1 = p(0);
@@ -101,7 +101,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	  case PRISM15:
 	  case PRISM18:
 	    {
-	      assert (i<6);
+	      libmesh_assert (i<6);
 	
 	      // Compute prism shape functions as a tensor-product
 	      // of a triangle and an edge
@@ -120,7 +120,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	    // linear pyramid shape functions
 	  case PYRAMID5:
 	    {
-	      assert (i<5);
+	      libmesh_assert (i<5);
 	
 	      const Real xi   = p(0);
 	      const Real eta  = p(1);
@@ -169,7 +169,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	    // serendipity hexahedral quadratic shape functions
 	  case HEX20:
 	    {
-	      assert (i<20);
+	      libmesh_assert (i<20);
 	
 	      const Real xi   = p(0);
 	      const Real eta  = p(1);
@@ -251,7 +251,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	    // triquadraic hexahedral shape funcions	    
 	  case HEX27:
 	    {
- 	      assert (i<27);
+ 	      libmesh_assert (i<27);
 	
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
@@ -274,7 +274,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	    // quadratic tetrahedral shape functions	    
 	  case TET10:
 	    {
-	      assert (i<10);
+	      libmesh_assert (i<10);
 	
 	      // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
 	      const Real zeta1 = p(0);
@@ -322,7 +322,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	    // quadradic prism shape functions	    
 	  case PRISM18:
 	    {
-	      assert (i<18);
+	      libmesh_assert (i<18);
 	
 	      // Compute prism shape functions as a tensor-product
 	      // of a triangle and an edge
@@ -372,7 +372,7 @@ Real FE<3,LAGRANGE>::shape(const Elem* elem,
 			   const unsigned int i,
 			   const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
       
   // call the orientation-independent shape functions
   return FE<3,LAGRANGE>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
@@ -390,7 +390,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 {
 #if DIM == 3
   
-  assert (j<3);
+  libmesh_assert (j<3);
   
   switch (order)
     {
@@ -404,7 +404,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	  case HEX20:
 	  case HEX27:
 	    {
-	      assert (i<8);
+	      libmesh_assert (i<8);
 	
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
@@ -443,7 +443,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	  case TET4:
 	  case TET10:
 	    {
-	      assert (i<4);
+	      libmesh_assert (i<4);
 	
 	      // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
 	      const Real dzeta0dxi = -1.;
@@ -536,7 +536,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	  case PRISM15:
 	  case PRISM18:
 	    {
-	      assert (i<6);
+	      libmesh_assert (i<6);
 	
 	      // Compute prism shape functions as a tensor-product
 	      // of a triangle and an edge
@@ -570,7 +570,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	    // linear pyramid shape functions
 	  case PYRAMID5:
 	    {
-	      assert (i<5);
+	      libmesh_assert (i<5);
 	      	
 	      const Real xi   = p(0);
 	      const Real eta  = p(1);
@@ -707,7 +707,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	    // serendipity hexahedral quadratic shape functions
 	  case HEX20:
 	    {
-	      assert (i<20);
+	      libmesh_assert (i<20);
 	
 	      const Real xi   = p(0);
 	      const Real eta  = p(1);
@@ -960,7 +960,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	    // triquadraic hexahedral shape funcions	    
 	  case HEX27:
 	    {
-	      assert (i<27);
+	      libmesh_assert (i<27);
 	
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
@@ -1002,7 +1002,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	    // quadratic tetrahedral shape functions	    
 	  case TET10:
 	    {
-	      assert (i<10);
+	      libmesh_assert (i<10);
 	
 	      // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
 	      const Real zeta1 = p(0);
@@ -1157,7 +1157,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	    // quadradic prism shape functions	    
 	  case PRISM18:
 	    {
-	      assert (i<18);
+	      libmesh_assert (i<18);
 	
 	      // Compute prism shape functions as a tensor-product
 	      // of a triangle and an edge
@@ -1224,7 +1224,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const Elem* elem,
 				 const unsigned int j,
 				 const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
       
   // call the orientation-independent shape function derivatives
   return FE<3,LAGRANGE>::shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
@@ -1241,7 +1241,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
 {
 #if DIM == 3
   
-  assert (j<6);
+  libmesh_assert (j<6);
   
   switch (order)
     {
@@ -1272,7 +1272,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
 	    // triquadraic hexahedral shape funcions	    
 	  case HEX27:
 	    {
-	      assert (i<27);
+	      libmesh_assert (i<27);
 	
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
@@ -1407,7 +1407,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
 	    // quadradic prism shape functions	    
 	  case PRISM18:
 	    {
-	      assert (i<18);
+	      libmesh_assert (i<18);
 	
 	      // Compute prism shape functions as a tensor-product
 	      // of a triangle and an edge
@@ -1489,7 +1489,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const Elem* elem,
 				 const unsigned int j,
 				 const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
       
   // call the orientation-independent shape function derivatives
   return FE<3,LAGRANGE>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);

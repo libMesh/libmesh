@@ -89,7 +89,7 @@ bool Hex27::is_face(const unsigned int i) const
 bool Hex27::is_node_on_side(const unsigned int n,
 			    const unsigned int s) const
 {
-  assert(s < n_sides());
+  libmesh_assert(s < n_sides());
   for (unsigned int i = 0; i != 9; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -99,7 +99,7 @@ bool Hex27::is_node_on_side(const unsigned int n,
 bool Hex27::is_node_on_edge(const unsigned int n,
 			    const unsigned int e) const
 {
-  assert(e < n_edges());
+  libmesh_assert(e < n_edges());
   for (unsigned int i = 0; i != 3; ++i)
     if (edge_nodes_map[e][i] == n)
       return true;
@@ -156,7 +156,7 @@ bool Hex27::has_affine_map() const
 
 unsigned int Hex27::key (const unsigned int s) const
 {
- assert (s < this->n_sides());
+ libmesh_assert (s < this->n_sides());
 
   // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
   switch (s)
@@ -202,7 +202,7 @@ unsigned int Hex27::key (const unsigned int s) const
 AutoPtr<Elem> Hex27::build_side (const unsigned int i,
 				 bool proxy) const
 {
-  assert (i < this->n_sides());
+  libmesh_assert (i < this->n_sides());
 
   if (proxy)
     {
@@ -318,7 +318,7 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i,
 
 AutoPtr<Elem> Hex27::build_edge (const unsigned int i) const
 {
-  assert (i < this->n_edges());
+  libmesh_assert (i < this->n_edges());
 
   return AutoPtr<Elem>(new SideEdge<Edge3,Hex27>(this,i));
 }
@@ -329,9 +329,9 @@ void Hex27::connectivity(const unsigned int sc,
 			 const IOPackage iop,
 			 std::vector<unsigned int>& conn) const
 {
-  assert (_nodes != NULL);
-  assert (sc < this->n_sub_elem());
-  assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert (_nodes != NULL);
+  libmesh_assert (sc < this->n_sub_elem());
+  libmesh_assert (iop != INVALID_IO_PACKAGE);
 
   conn.resize(8);
 
@@ -616,8 +616,8 @@ unsigned int Hex27::n_second_order_adjacent_vertices (const unsigned int n) cons
 unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
 							const unsigned int v) const
 { 
-  assert (n >= this->n_vertices());
-  assert (n <  this->n_nodes());
+  libmesh_assert (n >= this->n_vertices());
+  libmesh_assert (n <  this->n_nodes());
 
   switch (n)
     {
@@ -632,7 +632,7 @@ unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
       case 24:
       case 25:
       {
-	assert (v < 4);
+	libmesh_assert (v < 4);
         return _remaining_second_order_adjacent_vertices[n-20][v]; 
       }
 
@@ -645,7 +645,7 @@ unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
        */
       case 26:
       {
-	assert (v < 8);
+	libmesh_assert (v < 8);
 	return static_cast<unsigned short int>(v);
       }
 
@@ -657,7 +657,7 @@ unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
        */
       default:
       {
-	assert (v < 2);
+	libmesh_assert (v < 2);
         return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
       }
     }
@@ -680,8 +680,8 @@ const unsigned short int Hex27::_remaining_second_order_adjacent_vertices[6][4] 
 std::pair<unsigned short int, unsigned short int>
 Hex27::second_order_child_vertex (const unsigned int n) const
 {
-  assert (n >= this->n_vertices());
-  assert (n < this->n_nodes());
+  libmesh_assert (n >= this->n_vertices());
+  libmesh_assert (n < this->n_nodes());
   /*
    * the _second_order_vertex_child_* vectors are
    * stored in cell_hex.C, since they are identical

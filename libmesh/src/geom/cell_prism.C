@@ -31,7 +31,7 @@
 // Prism class member functions
 unsigned int Prism::key (const unsigned int s) const
 {
-  assert (s < this->n_sides());
+  libmesh_assert (s < this->n_sides());
 
   switch (s)
     {
@@ -82,7 +82,7 @@ unsigned int Prism::key (const unsigned int s) const
 
 AutoPtr<DofObject> Prism::side (const unsigned int i) const
 {
-  assert (i < this->n_sides());
+  libmesh_assert (i < this->n_sides());
 
   switch (i)
     {
@@ -165,8 +165,8 @@ AutoPtr<DofObject> Prism::side (const unsigned int i) const
 bool Prism::is_child_on_side(const unsigned int c,
                              const unsigned int s) const
 {
-  assert (c < this->n_children());
-  assert (s < this->n_sides());
+  libmesh_assert (c < this->n_children());
+  libmesh_assert (s < this->n_sides());
 
   for (unsigned int i = 0; i != 4; ++i)
     if (Prism6::side_nodes_map[s][i] == c)

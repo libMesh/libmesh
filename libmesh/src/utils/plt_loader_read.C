@@ -64,7 +64,7 @@ void PltLoader::read (const std::string& name)
 
 void PltLoader::read_header (std::istream& in)
 {
-  assert (in.good());
+  libmesh_assert (in.good());
   
   //----------------------------------------------------
   // Read the TECPLOT header
@@ -109,7 +109,7 @@ void PltLoader::read_header (std::istream& in)
 
 	    // Make sure one reversed is one
 	    Utility::ReverseBytes rb(this->is_foreign());
-	    assert (rb(one) == 1);
+	    libmesh_assert (rb(one) == 1);
 	  }
       }
 
@@ -316,7 +316,7 @@ void PltLoader::read_header (std::istream& in)
 
 	    // Make sure one reversed is one
 	    Utility::ReverseBytes rb(this->is_foreign());
-	    assert (rb(one) == 1);
+	    libmesh_assert (rb(one) == 1);
 	  }
       }
 
@@ -476,7 +476,7 @@ void PltLoader::read_header (std::istream& in)
 			in.read (buf, SIZEOF_INT);
 			std::memcpy  (&vl, buf, SIZEOF_INT);
 			rb(vl);
-			assert (vl == 0); // Only know about node-based data
+			libmesh_assert (vl == 0); // Only know about node-based data
 			                  // right now
 		      }
 		    
@@ -619,7 +619,7 @@ void PltLoader::read_header (std::istream& in)
 
 void PltLoader::read_data (std::istream& in)
 {
-  assert (in.good());
+  libmesh_assert (in.good());
 
   // A byte-reverser in case the data is foreign
   Utility::ReverseBytes rb(this->is_foreign());
@@ -822,7 +822,7 @@ void PltLoader::read_data (std::istream& in)
 	    std::memcpy  (&sc, buf, SIZEOF_INT);
 	    rb(sc);
 	    
-	    assert (sc == -1);
+	    libmesh_assert (sc == -1);
 	  }
 
       
@@ -875,7 +875,7 @@ void PltLoader::read_data (std::istream& in)
 
 void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
 {
-  assert (in.good());
+  libmesh_assert (in.good());
 
   
   // A byte-reverser in case the data is foreign
@@ -944,7 +944,7 @@ void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
 
 void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
 {
-  assert (in.good());
+  libmesh_assert (in.good());
 
   // A byte-reverser in case the data is foreign
   Utility::ReverseBytes rb(this->is_foreign());
@@ -969,7 +969,7 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
 	    {
 	      float f = 0.;
 	      
-	      assert (in.good());
+	      libmesh_assert (in.good());
 	      
 	      in.read (buf, SIZEOF_FLOAT);
 	      std::memcpy  (&f, buf, SIZEOF_FLOAT);
@@ -981,7 +981,7 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
 	    {
 	      double d = 0.;
 	      
-	      assert (in.good());
+	      libmesh_assert (in.good());
 	      
 	      in.read (buf, SIZEOF_DOUBLE);
 	      std::memcpy  (&d, buf, SIZEOF_DOUBLE);
@@ -1002,7 +1002,7 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
 
 void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
 {
-  assert (in.good());
+  libmesh_assert (in.good());
 
   // A byte-reverser in case the data is foreign
   Utility::ReverseBytes rb(this->is_foreign());
@@ -1074,8 +1074,8 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
     // Read the connectivity
     else
       {
-	assert (zone < _conn.size());
-	assert (this->kmax(zone) < 4);
+	libmesh_assert (zone < _conn.size());
+	libmesh_assert (this->kmax(zone) < 4);
 	
 	_conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
 	
@@ -1091,7 +1091,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
 
 void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
 {
-  assert (in.good());
+  libmesh_assert (in.good());
 
   // A byte-reverser in case the data is foreign
   Utility::ReverseBytes rb(this->is_foreign());
@@ -1112,7 +1112,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
 	{
 	  float f = 0.;
 	  
-	  assert (in.good());
+	  libmesh_assert (in.good());
 	  
 	  in.read (buf, SIZEOF_FLOAT);
 	  std::memcpy  (&f, buf, SIZEOF_FLOAT);
@@ -1124,7 +1124,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
 	{
 	  double d = 0.;
 	  
-	  assert (in.good());
+	  libmesh_assert (in.good());
 	  
 	  in.read (buf, SIZEOF_DOUBLE);
 	  std::memcpy  (&d, buf, SIZEOF_DOUBLE);
@@ -1158,8 +1158,8 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
     // Read the connectivity
     else
       {
-	assert (zone < _conn.size());
-	assert (this->kmax(zone) < 4);
+	libmesh_assert (zone < _conn.size());
+	libmesh_assert (this->kmax(zone) < 4);
 	
 	_conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
 	

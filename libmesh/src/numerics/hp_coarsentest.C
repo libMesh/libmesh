@@ -49,7 +49,7 @@ void HPCoarsenTest::add_projection(const System &system,
   // If we have children, we need to add their projections instead
   if (!elem->active())
     {
-      assert(!elem->subactive());
+      libmesh_assert(!elem->subactive());
       for (unsigned int c = 0; c != elem->n_children(); ++c)
         this->add_projection(system, elem->child(c), var);
       return;
@@ -81,7 +81,7 @@ void HPCoarsenTest::add_projection(const System &system,
       Uc.resize(phi_coarse->size());
       Uc.zero();
     }
-  assert(Uc.size() == phi_coarse->size());
+  libmesh_assert(Uc.size() == phi_coarse->size());
 
   // Loop over the quadrature points
   for (unsigned int qp=0; qp<qrule->n_points(); qp++)
@@ -202,7 +202,7 @@ void HPCoarsenTest::select_refinement (System &system)
       unsigned int cached_coarse_p_level = 0;
 
       const FEContinuity cont = fe->get_continuity();
-      assert (cont == DISCONTINUOUS || cont == C_ZERO || 
+      libmesh_assert (cont == DISCONTINUOUS || cont == C_ZERO || 
 	      cont == C_ONE);
 
       // Build an appropriate quadrature rule

@@ -112,7 +112,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
 
     case (XdrMGF::R_ASCII):
       {
-	assert (mp_in.good());
+	libmesh_assert (mp_in.good());
 	
 	mp_in >> hd->m_numNodes ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_wrtVar   ; mp_in.getline(comment, comm_len);

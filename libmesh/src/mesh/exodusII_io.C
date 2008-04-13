@@ -1281,7 +1281,7 @@ void ExodusII_IO::read (const std::string& fname)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  assert(libMesh::processor_id() == 0);
+  libmesh_assert(libMesh::processor_id() == 0);
 
 #ifndef HAVE_EXODUS_API
 
@@ -1298,7 +1298,7 @@ void ExodusII_IO::read (const std::string& fname)
   // Clear any existing mesh data
   mesh.clear();
   
-  assert(mesh.mesh_dimension() != 1); // No support for 1D ExodusII meshes
+  libmesh_assert(mesh.mesh_dimension() != 1); // No support for 1D ExodusII meshes
   
 #ifdef DEBUG
     this->verbose() = true;
@@ -1313,7 +1313,7 @@ void ExodusII_IO::read (const std::string& fname)
   ex.read_header();             // Get header information from exodus file
   ex.print_header();            // Print header information
 
-  assert(static_cast<unsigned int>(ex.get_num_dim()) == mesh.mesh_dimension()); // Be sure number of dimensions
+  libmesh_assert(static_cast<unsigned int>(ex.get_num_dim()) == mesh.mesh_dimension()); // Be sure number of dimensions
                                                                                 // is equal to the number of 
                                                                                 // dimensions in the mesh supplied.
   
@@ -1326,7 +1326,7 @@ void ExodusII_IO::read (const std::string& fname)
 			  ex.get_y(i),
 			  ex.get_z(i)), i);
   
-  assert (static_cast<unsigned int>(ex.get_num_nodes()) == mesh.n_nodes());
+  libmesh_assert (static_cast<unsigned int>(ex.get_num_nodes()) == mesh.n_nodes());
 
   ex.read_block_info();                 // Get information about all the blocks
   mesh.reserve_elem(ex.get_num_elem()); // Reserve space for the elements
@@ -1350,7 +1350,7 @@ void ExodusII_IO::read (const std::string& fname)
       for (int j=nelem_last_block; j<jmax; j++)
 	{
 	  Elem* elem = Elem::build (conv.get_canonical_type()).release();
-	  assert (elem);
+	  libmesh_assert (elem);
           elem->set_id(j);
 	  mesh.add_elem (elem);
 	    
@@ -1369,7 +1369,7 @@ void ExodusII_IO::read (const std::string& fname)
       // (should equal total number of elements in the end)
       nelem_last_block += ex.get_num_elem_this_blk();
     }
-  assert (static_cast<unsigned int>(nelem_last_block) == mesh.n_elem());
+  libmesh_assert (static_cast<unsigned int>(nelem_last_block) == mesh.n_elem());
   
   // Read in sideset information -- this is useful for applying boundary conditions
   {

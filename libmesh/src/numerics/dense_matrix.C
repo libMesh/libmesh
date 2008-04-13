@@ -90,9 +90,9 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
   
       this->resize (A.n(), B.n());
       
-      assert (A.m() == B.m());
-      assert (this->m() == A.n());
-      assert (this->n() == B.n());
+      libmesh_assert (A.m() == B.m());
+      libmesh_assert (this->m() == A.n());
+      libmesh_assert (this->n() == B.n());
       
       const unsigned int m_s = A.n();
       const unsigned int p_s = A.m(); 
@@ -174,9 +174,9 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
   
       this->resize (A.m(), B.m());
       
-      assert (A.n() == B.n());
-      assert (this->m() == A.m());
-      assert (this->n() == B.m());
+      libmesh_assert (A.n() == B.n());
+      libmesh_assert (this->m() == A.m());
+      libmesh_assert (this->n() == B.m());
       
       const unsigned int m_s = A.m();
       const unsigned int p_s = A.n(); 
@@ -239,8 +239,8 @@ void DenseMatrix<T>::_lu_back_substitute (DenseVector<T>& b,
     m = this->m(),
     n = this->n();
 
-  assert (m == n);
-  assert (b.size() == m);
+  libmesh_assert (m == n);
+  libmesh_assert (b.size() == m);
   
   x.resize (n);
 
@@ -253,7 +253,7 @@ void DenseMatrix<T>::_lu_back_substitute (DenseVector<T>& b,
       // Get the diagonal entry and take its inverse
       const T diag = A(i,i);
       
-      assert (diag != libMesh::zero);
+      libmesh_assert (diag != libMesh::zero);
   
       const T diag_inv = 1./diag;
 
@@ -276,7 +276,7 @@ void DenseMatrix<T>::_lu_back_substitute (DenseVector<T>& b,
 	// Get the diagonal and take its inverse
 	const T diag = A(ib,ib);
 
-	assert (diag != libMesh::zero);
+	libmesh_assert (diag != libMesh::zero);
 
 	const T diag_inv = 1./diag;
 	
@@ -295,14 +295,14 @@ void DenseMatrix<T>::_lu_decompose (const bool partial_pivot)
 {
   // If this function was called, there better not be any
   // previous decomposition of the matrix.
-  assert(this->_decomposition_type == NONE);
+  libmesh_assert(this->_decomposition_type == NONE);
   
   // Get the matrix size and make sure it is square
   const unsigned int
     m = this->m(),
     n = this->n();
 
-  assert (m == n);
+  libmesh_assert (m == n);
 
   // A convenient reference to *this
   DenseMatrix<T>& A = *this;
@@ -317,7 +317,7 @@ void DenseMatrix<T>::_lu_decompose (const bool partial_pivot)
 	  // Get the diagonal entry and take its inverse
 	  const T diag = A(i,i);
 
-	  assert (diag != libMesh::zero);
+	  libmesh_assert (diag != libMesh::zero);
 
 	  const T diag_inv = 1./diag;
 	  
@@ -426,7 +426,7 @@ void DenseMatrix<T>::_cholesky_decompose ()
 {
   // If we called this function, there better not be any
   // previous decomposition of the matrix.
-  assert(this->_decomposition_type == NONE);
+  libmesh_assert(this->_decomposition_type == NONE);
   
   // Shorthand notation for number of rows and columns.
   const unsigned int
@@ -434,7 +434,7 @@ void DenseMatrix<T>::_cholesky_decompose ()
     n = this->n();
 
   // Just to be really sure...
-  assert(m==n);
+  libmesh_assert(m==n);
 
   // A convenient reference to *this
   DenseMatrix<T>& A = *this;
@@ -482,7 +482,7 @@ void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T2>& b,
     n = this->n();
 
   // Just to be really sure...
-  assert(m==n);
+  libmesh_assert(m==n);
 
   // A convenient reference to *this
   const DenseMatrix<T>& A = *this;

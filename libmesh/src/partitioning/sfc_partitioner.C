@@ -45,7 +45,7 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 				    const unsigned int n)
 {
   
-  assert (n > 0);
+  libmesh_assert (n > 0);
 
   // Check for an easy return
   if (n == 1)
@@ -103,14 +103,14 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 
     for (; elem_it != elem_end; ++elem_it)
       {
-	assert ((*elem_it)->id() < forward_map.size());
-	assert (el_num           < reverse_map.size());
+	libmesh_assert ((*elem_it)->id() < forward_map.size());
+	libmesh_assert (el_num           < reverse_map.size());
 	
 	forward_map[(*elem_it)->id()] = el_num;
 	reverse_map[el_num]           = *elem_it;
 	el_num++;
       }
-    assert (el_num == n_active_elem);
+    libmesh_assert (el_num == n_active_elem);
   }
   
 
@@ -126,7 +126,7 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
       {
 	const Elem* elem = *elem_it;
 	
-	assert (elem->id() < forward_map.size());
+	libmesh_assert (elem->id() < forward_map.size());
 	
 	const Point p = elem->centroid();
 
@@ -174,7 +174,7 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 
     for (unsigned int i=0; i<n_active_elem; i++)
       {
-	assert (static_cast<unsigned int>(table[i]-1) < reverse_map.size());
+	libmesh_assert (static_cast<unsigned int>(table[i]-1) < reverse_map.size());
 	  
 	Elem* elem = reverse_map[table[i]-1];
 

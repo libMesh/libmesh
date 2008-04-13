@@ -123,7 +123,7 @@ void  MeshData::slim (const bool node_id_map,
       if (node_id_map)
         {
 	  // dumb check
-	  assert (_node_id_map_closed);
+	  libmesh_assert (_node_id_map_closed);
 
 	  _node_id_map_closed = false;
 	  _node_id.clear();
@@ -133,7 +133,7 @@ void  MeshData::slim (const bool node_id_map,
       if (elem_id_map)
         {
 	  // dumb check
-	  assert (_elem_id_map_closed);
+	  libmesh_assert (_elem_id_map_closed);
 
 	  _elem_id_map_closed = false;
 	  _elem_id.clear();
@@ -156,7 +156,7 @@ void MeshData::translate (const MeshBase& out_mesh,
 			  std::vector<Number>& values,
 			  std::vector<std::string>& names) const
 {
-  assert (_active || _compatibility_mode);
+  libmesh_assert (_active || _compatibility_mode);
 
   START_LOG("translate()", "MeshData");
 
@@ -195,7 +195,7 @@ void MeshData::translate (const MeshBase& out_mesh,
     
     // this naming scheme only works up to n_comp=100
     // (at least for gmv-accepted variable names)
-    assert(n_comp < 100);
+    libmesh_assert(n_comp < 100);
 
     for (unsigned int n=0; n<n_comp; n++)
       {
@@ -215,10 +215,10 @@ void MeshData::close_foreign_id_maps ()
 {
   if (_active)
     {
-      assert (!_elem_id.empty());
-      assert (!_id_elem.empty());
-      assert (!_node_id.empty());
-      assert (!_id_node.empty());
+      libmesh_assert (!_elem_id.empty());
+      libmesh_assert (!_id_elem.empty());
+      libmesh_assert (!_node_id.empty());
+      libmesh_assert (!_id_node.empty());
 
       _elem_id_map_closed = true;
       _node_id_map_closed = true;
@@ -233,11 +233,11 @@ void MeshData::read (const std::string& name)
 {
   START_LOG("read()", "MeshData");
 
-  assert (_active || _compatibility_mode);
+  libmesh_assert (_active || _compatibility_mode);
 
   // the id maps have to be closed before reading
   // (note that in compatibility mode these are also true)
-  assert (_elem_id_map_closed && _node_id_map_closed);
+  libmesh_assert (_elem_id_map_closed && _node_id_map_closed);
 
 #ifdef DEBUG
   if (this->compatibility_mode())
@@ -287,11 +287,11 @@ void MeshData::write (const std::string& name)
 {
   START_LOG("write()", "MeshData");
 
-  assert (_active || _compatibility_mode);
+  libmesh_assert (_active || _compatibility_mode);
 
   // the id maps have to be closed before writing
   // (note that in compatibility mode these are also true)
-  assert (_elem_id_map_closed && _node_id_map_closed);
+  libmesh_assert (_elem_id_map_closed && _node_id_map_closed);
   
 #ifdef DEBUG
   if (this->compatibility_mode())
@@ -381,7 +381,7 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
   if (_active)
     {
       // when active, use our _id_node map
-      assert (_node_id_map_closed);
+      libmesh_assert (_node_id_map_closed);
 
       std::map<unsigned int,
 	       const Node*>::const_iterator pos = _id_node.find(fid);
@@ -414,12 +414,12 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
 
 unsigned int MeshData::node_to_foreign_id (const Node* n) const
 {
-  assert (n != NULL);
+  libmesh_assert (n != NULL);
 
   if (_active)
     {
       // when active, use our _node_id map
-      assert (_node_id_map_closed);
+      libmesh_assert (_node_id_map_closed);
 
       // look it up in the map
       std::map<const Node*,
@@ -459,7 +459,7 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
   if (_active)
     {
       // when active, use our _id_elem map
-      assert (_elem_id_map_closed);
+      libmesh_assert (_elem_id_map_closed);
       
       std::map<unsigned int,
 	       const Elem*>::const_iterator pos = _id_elem.find(fid);
@@ -491,12 +491,12 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
 
 unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
 {
-  assert (e != NULL);
+  libmesh_assert (e != NULL);
 
   if (_active)
     {
       // when active, use our _id_elem map
-      assert (_elem_id_map_closed);
+      libmesh_assert (_elem_id_map_closed);
 
              // look it up in the map
              std::map<const Elem*,
@@ -534,9 +534,9 @@ void MeshData::insert_node_data (std::map<const Node*,
 				 std::vector<Number> >& nd,
 				 const bool close_elem_data)
 {
-  assert (this->_active || this->_compatibility_mode);
+  libmesh_assert (this->_active || this->_compatibility_mode);
   // these are also true in compatibility mode
-  assert (this->_node_id_map_closed);
+  libmesh_assert (this->_node_id_map_closed);
 
   if (this->_node_data_closed)
     {
@@ -545,7 +545,7 @@ void MeshData::insert_node_data (std::map<const Node*,
       libmesh_error();
     }
 
-  assert (this->_node_data.empty());
+  libmesh_assert (this->_node_data.empty());
 
 #ifdef DEBUG
   std::map<const Node*, 
@@ -558,7 +558,7 @@ void MeshData::insert_node_data (std::map<const Node*,
   // For this, simply take the length of the 0th
   // entry as reference length, and compare this
   // with the length of the 1st, 2nd...
-  assert (nd_pos != nd_end);
+  libmesh_assert (nd_pos != nd_end);
   const unsigned int reference_length = (*nd_pos).second.size();
 
   // advance, so that we compare with the 1st
@@ -585,7 +585,7 @@ void MeshData::insert_node_data (std::map<const Node*,
   // if user wants to, then close elem data, too
   if (close_elem_data)
     {
-      assert((this->_elem_id_map_closed));
+      libmesh_assert((this->_elem_id_map_closed));
       this->_elem_data_closed = true;
     }
 }
@@ -598,9 +598,9 @@ void MeshData::insert_elem_data (std::map<const Elem*,
 				 std::vector<Number> >& ed,
 				 const bool close_node_data)
 {
-  assert (this->_active || this->_compatibility_mode);
+  libmesh_assert (this->_active || this->_compatibility_mode);
   // these are also true in compatibility mode
-  assert (this->_elem_id_map_closed);
+  libmesh_assert (this->_elem_id_map_closed);
 
   if (this->_elem_data_closed)
     {
@@ -609,7 +609,7 @@ void MeshData::insert_elem_data (std::map<const Elem*,
       libmesh_error();
     }
 
-  assert (this->_elem_data.empty());
+  libmesh_assert (this->_elem_data.empty());
 
 #ifdef DEBUG
   std::map<const Elem*, 
@@ -643,7 +643,7 @@ void MeshData::insert_elem_data (std::map<const Elem*,
   // if user wants to, then close node data, too
   if (close_node_data)
     {
-      assert((this->_node_id_map_closed));
+      libmesh_assert((this->_node_id_map_closed));
       this->_node_data_closed = true;
     }
 }
@@ -654,14 +654,14 @@ void MeshData::insert_elem_data (std::map<const Elem*,
 
 unsigned int MeshData::n_val_per_node () const
 {
-  assert (this->_active || this->_compatibility_mode);
-  assert (this->_node_data_closed);
+  libmesh_assert (this->_active || this->_compatibility_mode);
+  libmesh_assert (this->_node_data_closed);
 
   if (!this->_node_data.empty())
     {
       std::map<const Node*, 
 	       std::vector<Number> >::const_iterator pos = _node_data.begin();
-      assert (pos != _node_data.end());
+      libmesh_assert (pos != _node_data.end());
       return (pos->second.size());
     }
   else
@@ -673,8 +673,8 @@ unsigned int MeshData::n_val_per_node () const
 
 unsigned int MeshData::n_node_data () const
 {
-  assert (this->_active || this->_compatibility_mode);
-  assert (this->_node_data_closed);
+  libmesh_assert (this->_active || this->_compatibility_mode);
+  libmesh_assert (this->_node_data_closed);
 
   return this->_node_data.size();
 }
@@ -684,14 +684,14 @@ unsigned int MeshData::n_node_data () const
 
 unsigned int MeshData::n_val_per_elem () const
 {
-  assert (this->_active || this->_compatibility_mode);
-  assert (this->_elem_data_closed);
+  libmesh_assert (this->_active || this->_compatibility_mode);
+  libmesh_assert (this->_elem_data_closed);
 
   if (!_elem_data.empty())
     {
       std::map<const Elem*, 
 	       std::vector<Number> >::const_iterator pos = _elem_data.begin();
-      assert (pos != _elem_data.end());
+      libmesh_assert (pos != _elem_data.end());
       return (pos->second.size());
     }
   else
@@ -703,8 +703,8 @@ unsigned int MeshData::n_val_per_elem () const
 
 unsigned int MeshData::n_elem_data () const
 {
-  assert (this->_active || this->_compatibility_mode);
-  assert (this->_elem_data_closed);
+  libmesh_assert (this->_active || this->_compatibility_mode);
+  libmesh_assert (this->_elem_data_closed);
 
   return _elem_data.size();
 }
@@ -719,7 +719,7 @@ void MeshData::assign (const MeshData& omd)
   this->_node_data_closed   = omd._node_data_closed;
 
   // we have to be able to modify our elem id maps
-  assert (!this->_elem_id_map_closed);
+  libmesh_assert (!this->_elem_id_map_closed);
 
   this->_elem_data_closed   = omd._elem_data_closed;
   this->_active             = omd._active;

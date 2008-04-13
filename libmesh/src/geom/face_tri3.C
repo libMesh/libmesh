@@ -98,7 +98,7 @@ bool Tri3::is_face(const unsigned int) const
 bool Tri3::is_node_on_side(const unsigned int n,
 			   const unsigned int s) const
 {
-  assert(s < n_sides());
+  libmesh_assert(s < n_sides());
   for (unsigned int i = 0; i != 2; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -108,7 +108,7 @@ bool Tri3::is_node_on_side(const unsigned int n,
 AutoPtr<Elem> Tri3::build_side (const unsigned int i,
 				bool proxy) const
 {
-  assert (i < this->n_sides());
+  libmesh_assert (i < this->n_sides());
 
   if (proxy)
     {
@@ -160,8 +160,8 @@ void Tri3::connectivity(const unsigned int sf,
 			const IOPackage iop,
 			std::vector<unsigned int>& conn) const
 {
-  assert (sf <this->n_sub_elem());
-  assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert (sf <this->n_sub_elem());
+  libmesh_assert (iop != INVALID_IO_PACKAGE);
   
   switch (iop)
     {
@@ -226,9 +226,9 @@ std::pair<Real, Real> Tri3::min_and_max_angle() const
     theta2=libMesh::pi - theta0 - theta1
     ;
 
-  assert(theta0 > 0.);
-  assert(theta1 > 0.);
-  assert(theta2 > 0.);
+  libmesh_assert(theta0 > 0.);
+  libmesh_assert(theta1 > 0.);
+  libmesh_assert(theta2 > 0.);
   
   return std::make_pair(std::min(theta0, std::min(theta1,theta2)),
 			std::max(theta0, std::max(theta1,theta2)));

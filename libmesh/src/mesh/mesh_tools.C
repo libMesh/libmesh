@@ -103,7 +103,7 @@ namespace {
       for (ConstNodeRange::const_iterator it = range.begin(); it != range.end(); ++it)
 	{
           const Node *node = *it;
-	  assert (node != NULL);
+	  libmesh_assert (node != NULL);
 	  
 	  for (unsigned int i=0; i<3; i++)
 	    {
@@ -118,7 +118,7 @@ namespace {
       for (ConstElemRange::const_iterator it = range.begin(); it != range.end(); ++it)
 	{
           const Elem *elem = *it;
-	  assert (elem != NULL);
+	  libmesh_assert (elem != NULL);
 
 	  for (unsigned int n=0; n<elem->n_nodes(); n++)
 	    for (unsigned int i=0; i<3; i++)
@@ -204,8 +204,8 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
   for (; el != end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
       {
-	assert ((*el)->node(n) < nodes_to_elem_map.size());
-	assert ((*el)->id()    < mesh.n_elem());
+	libmesh_assert ((*el)->node(n) < nodes_to_elem_map.size());
+	libmesh_assert ((*el)->id()    < mesh.n_elem());
 	
 	nodes_to_elem_map[(*el)->node(n)].push_back((*el)->id());
       }
@@ -224,7 +224,7 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
   for (; el != end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
       {
-	assert ((*el)->node(n) < nodes_to_elem_map.size());
+	libmesh_assert ((*el)->node(n) < nodes_to_elem_map.size());
 	
 	nodes_to_elem_map[(*el)->node(n)].push_back(*el);
       }
@@ -302,7 +302,7 @@ MeshTools::BoundingBox
 MeshTools::processor_bounding_box (const MeshBase& mesh,
 				   const unsigned int pid)
 {
-  assert (pid < libMesh::n_processors());
+  libmesh_assert (pid < libMesh::n_processors());
 
   FindBBox find_bbox;
   
@@ -333,7 +333,7 @@ MeshTools::BoundingBox
 MeshTools::subdomain_bounding_box (const MeshBase& mesh,
 				   const unsigned int sid)
 {
-  assert (mesh.n_nodes() != 0);
+  libmesh_assert (mesh.n_nodes() != 0);
 
   Point min( 1.e30,  1.e30,  1.e30);
   Point max(-1.e30, -1.e30, -1.e30);
@@ -643,7 +643,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<un
     const Elem* elem = (*it);
     
     //Right now this only works for quad4's
-    //assert(elem->type() == libMeshEnums::QUAD4);
+    //libmesh_assert(elem->type() == libMeshEnums::QUAD4);
     if(elem->type() == libMeshEnums::QUAD4)
     {
       //Loop over the sides looking for sides that have hanging nodes
@@ -663,7 +663,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<un
             while (neigh->level() < ancestor->level())
               ancestor = ancestor->parent();
             unsigned int s_neigh = neigh->which_neighbor_am_i(ancestor);
-            assert (s_neigh < neigh->n_neighbors());
+            libmesh_assert (s_neigh < neigh->n_neighbors());
             
             //Couple of helper uints...
             unsigned int node1=0;

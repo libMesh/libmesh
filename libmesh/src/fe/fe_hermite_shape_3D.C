@@ -97,17 +97,17 @@ void hermite_compute_coefs(const Elem* elem)
         }
 
       // No singular elements!
-      assert(dxdxi[0][p]);
-      assert(dxdxi[1][p]);
-      assert(dxdxi[2][p]);
+      libmesh_assert(dxdxi[0][p]);
+      libmesh_assert(dxdxi[1][p]);
+      libmesh_assert(dxdxi[2][p]);
       // No non-rectilinear or non-axis-aligned elements!
 #ifdef DEBUG
-      assert(std::abs(dydxi[p]) < TOLERANCE);
-      assert(std::abs(dzdeta[p]) < TOLERANCE);
-      assert(std::abs(dxdzeta[p]) < TOLERANCE);
-      assert(std::abs(dzdxi[p]) < TOLERANCE);
-      assert(std::abs(dxdeta[p]) < TOLERANCE);
-      assert(std::abs(dydzeta[p]) < TOLERANCE);
+      libmesh_assert(std::abs(dydxi[p]) < TOLERANCE);
+      libmesh_assert(std::abs(dzdeta[p]) < TOLERANCE);
+      libmesh_assert(std::abs(dxdzeta[p]) < TOLERANCE);
+      libmesh_assert(std::abs(dzdxi[p]) < TOLERANCE);
+      libmesh_assert(std::abs(dxdeta[p]) < TOLERANCE);
+      libmesh_assert(std::abs(dydzeta[p]) < TOLERANCE);
 #endif
     }
 }
@@ -366,7 +366,7 @@ Real hermite_bases_3D
     }
 
   // No singular elements
-  assert(coef);
+  libmesh_assert(coef);
   return coef;
 }
 
@@ -397,7 +397,7 @@ Real FE<3,HERMITE>::shape(const Elem* elem,
 			  const unsigned int i,
 			  const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   hermite_compute_coefs(elem);
 
@@ -416,7 +416,7 @@ Real FE<3,HERMITE>::shape(const Elem* elem,
 	  case HEX20:
 	  case HEX27:
 	    {
-	      assert (i<64);
+	      libmesh_assert (i<64);
 
               std::vector<unsigned int> bases1D;
 
@@ -468,8 +468,8 @@ Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
 				const unsigned int j,
 				const Point& p)
 {
-  assert (elem != NULL);
-  assert (j == 0 || j == 1 || j == 2);
+  libmesh_assert (elem != NULL);
+  libmesh_assert (j == 0 || j == 1 || j == 2);
 
   hermite_compute_coefs(elem);
 
@@ -488,7 +488,7 @@ Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
 	  case HEX20:
 	  case HEX27:
 	    {
-	      assert (i<64);
+	      libmesh_assert (i<64);
 
               std::vector<unsigned int> bases1D;
 
@@ -541,7 +541,7 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
                                       const unsigned int j,
                                       const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   hermite_compute_coefs(elem);
 
@@ -560,7 +560,7 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
 	  case HEX20:
 	  case HEX27:
 	    {
-	      assert (i<64);
+	      libmesh_assert (i<64);
 
               std::vector<unsigned int> bases1D;
 

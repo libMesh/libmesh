@@ -47,7 +47,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
       // Constant shape functions
     case CONSTANT:
       {
-	assert (elem_soln.size() == 1);
+	libmesh_assert (elem_soln.size() == 1);
 	
 	const Number val = elem_soln[0];
 	
@@ -71,7 +71,7 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 	    const Point mapped_point = FE<Dim,T>::inverse_map(elem,
 							      elem->point(n));
 
-	    assert (elem_soln.size() == n_sf);
+	    libmesh_assert (elem_soln.size() == n_sf);
 
 	    // Zero before summation
 	    nodal_soln[n] = 0;
@@ -94,21 +94,21 @@ void FE<Dim,T>::nodal_soln(const Elem* elem,
 template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 {
-  assert (o > 0);
+  libmesh_assert (o > 0);
   switch (t)
     {
     case EDGE2:
     case EDGE3:
       return (o+1);
     case QUAD4:
-      assert(o < 2);
+      libmesh_assert(o < 2);
     case QUAD8:
     case QUAD9:
       return ((o+1)*(o+1));
     case HEX8:
-      assert(o < 2);
+      libmesh_assert(o < 2);
     case HEX20:
-      assert(o < 2);
+      libmesh_assert(o < 2);
     case HEX27:
       return ((o+1)*(o+1)*(o+1));
     case TRI6:
@@ -128,7 +128,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 				       const Order o,
 				       const unsigned int n)
 {
-  assert (o > 0);
+  libmesh_assert (o > 0);
   switch (t)
     {
     case EDGE2:
@@ -162,8 +162,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  libmesh_error();
 	}
     case QUAD4:
-      assert (n < 4);
-      assert (o < 2);
+      libmesh_assert (n < 4);
+      libmesh_assert (o < 2);
     case QUAD8:
     case QUAD9:
       switch (n)
@@ -188,11 +188,11 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  libmesh_error();
 	}
     case HEX8:
-      assert (n < 8);
-      assert (o < 2);
+      libmesh_assert (n < 8);
+      libmesh_assert (o < 2);
     case HEX20:
-      assert (n < 20);
-      assert (o < 2);
+      libmesh_assert (n < 20);
+      libmesh_assert (o < 2);
     case HEX27:
       switch (n)
 	{
@@ -253,7 +253,7 @@ template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 					const Order o)
 {
-  assert (o > 0);
+  libmesh_assert (o > 0);
   switch (t)
     {
     case EDGE2:
@@ -269,7 +269,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       return ((o-1)*(o-1));
     case HEX8:
     case HEX20:
-      assert(o < 2);
+      libmesh_assert(o < 2);
       return 0;
     case HEX27:
       return ((o-1)*(o-1)*(o-1));

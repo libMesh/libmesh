@@ -244,7 +244,7 @@ Parameters::Value* Parameters::Parameter<T>::clone () const
   Parameter<T>
     *copy = new Parameter<T>;
 
-  assert (copy != NULL);
+  libmesh_assert (copy != NULL);
   
   copy->_value = _value;
 
@@ -364,9 +364,9 @@ const T& Parameters::get (const std::string& name) const
 
   Parameters::const_iterator it = _values.find(name);
 
-  assert (it != _values.end());
-  assert (it->second != NULL);
-  assert (dynamic_cast<const Parameter<T>*>(it->second) != NULL);
+  libmesh_assert (it != _values.end());
+  libmesh_assert (it->second != NULL);
+  libmesh_assert (dynamic_cast<const Parameter<T>*>(it->second) != NULL);
   
   return dynamic_cast<Parameter<T>*>(it->second)->get();
 }
@@ -384,7 +384,7 @@ T& Parameters::set (const std::string& name)
 
   param = dynamic_cast<Parameter<T>*>(_values[name]);
 
-  assert (param != NULL);
+  libmesh_assert (param != NULL);
   
   return param->set();
 }

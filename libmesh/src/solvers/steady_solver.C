@@ -24,13 +24,13 @@ bool SteadySolver::element_residual(bool request_jacobian)
     _system.element_time_derivative(request_jacobian);
 
   // The user shouldn't compute a jacobian unless requested
-  assert(request_jacobian || !jacobian_computed);
+  libmesh_assert(request_jacobian || !jacobian_computed);
 
   bool jacobian_computed2 =
     _system.element_constraint(jacobian_computed);
 
   // The user shouldn't compute a jacobian unless requested
-  assert (jacobian_computed || !jacobian_computed2);
+  libmesh_assert (jacobian_computed || !jacobian_computed2);
 
   return jacobian_computed && jacobian_computed2;
 }
@@ -51,13 +51,13 @@ bool SteadySolver::side_residual(bool request_jacobian)
     _system.side_time_derivative(request_jacobian);
 
   // The user shouldn't compute a jacobian unless requested
-  assert (request_jacobian || !jacobian_computed);
+  libmesh_assert (request_jacobian || !jacobian_computed);
 
   bool jacobian_computed2 =
     _system.side_constraint(jacobian_computed);
 
   // The user shouldn't compute a jacobian unless requested
-  assert (jacobian_computed || !jacobian_computed2);
+  libmesh_assert (jacobian_computed || !jacobian_computed2);
   
   return jacobian_computed && jacobian_computed2;
 }

@@ -364,7 +364,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 	  //     mesh, we can just copy coefficients directly
 	  if (elem->refinement_flag() == Elem::JUST_REFINED)
 	    {
-	      assert (parent != NULL);
+	      libmesh_assert (parent != NULL);
               old_parent_level = parent->p_level();
 
               // We may have done p refinement or coarsening as well;
@@ -372,7 +372,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
               // so we can get the right DoFs from it
               if (elem->p_refinement_flag() == Elem::JUST_REFINED)
                 {
-                  assert(elem->p_level() > 0);
+                  libmesh_assert(elem->p_level() > 0);
                   (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() - 1);
                 }
               else if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
@@ -387,9 +387,9 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 	      dof_map.old_dof_indices (elem, old_dof_indices, var);
 
               if (elem->p_refinement_flag() == Elem::DO_NOTHING)
-	        assert (old_dof_indices.size() == new_n_dofs);
+	        libmesh_assert (old_dof_indices.size() == new_n_dofs);
               if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
-	        assert (elem->has_children());
+	        libmesh_assert (elem->has_children());
 	    }
 
 	  unsigned int old_n_dofs = old_dof_indices.size();
@@ -473,10 +473,10 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
                 // the DofMap interface... - RHS
                 if (elem->p_refinement_flag() == Elem::JUST_REFINED)
                   {
-                    assert (elem->p_level() > 0);
+                    libmesh_assert (elem->p_level() > 0);
                     // P refinement of non-hierarchic bases will
                     // require a whole separate code path
-                    assert (fe->is_hierarchic());
+                    libmesh_assert (fe->is_hierarchic());
                     temp_fe_type = fe_type;
                     temp_fe_type.order =
                       static_cast<Order>(temp_fe_type.order - 1);
@@ -501,7 +501,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
                   {
                     // P coarsening of non-hierarchic bases will
                     // require a whole separate code path
-                    assert (fe->is_hierarchic());
+                    libmesh_assert (fe->is_hierarchic());
                     temp_fe_type = fe_type;
                     temp_fe_type.order =
                       static_cast<Order>(temp_fe_type.order + 1);
@@ -609,7 +609,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 void System::ProjectSolution::operator()(const ConstElemRange &range) const
 {
   // We need data to project
-  assert(fptr);
+  libmesh_assert(fptr);
 
   /**
    * This method projects an analytic solution to the current
@@ -662,7 +662,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
       if (cont == C_ONE)
         {
           // We'll need gradient data for a C1 projection
-          assert(gptr);
+          libmesh_assert(gptr);
 
           const std::vector<std::vector<RealGradient> >&
             ref_dphi = fe->get_dphi();
@@ -730,13 +730,13 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                 }
               if (cont == DISCONTINUOUS)
                 {
-                  assert(nc == 0);
+                  libmesh_assert(nc == 0);
                 }
               // Assume that C_ZERO elements have a single nodal
               // value shape function
               else if (cont == C_ZERO)
                 {
-                  assert(nc == 1);
+                  libmesh_assert(nc == 1);
 		  Ue(current_dof) = fptr(elem->point(n),
                                          parameters,
                                          system.name(),
@@ -861,7 +861,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
               // shape functions
               else if (cont == C_ONE)
                 {
-                  assert(nc == 1 + dim);
+                  libmesh_assert(nc == 1 + dim);
 		  Ue(current_dof) = fptr(elem->point(n),
                                          parameters,
                                          system.name(),
@@ -972,7 +972,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 		for (unsigned int i=0; i != free_dofs; ++i)
                   {
                     Number &ui = Ue(side_dofs[free_dof[i]]);
-                    assert(std::abs(ui) < TOLERANCE ||
+                    libmesh_assert(std::abs(ui) < TOLERANCE ||
                            std::abs(ui - Uedge(i)) < TOLERANCE);
                     ui = Uedge(i);
                     dof_is_fixed[side_dofs[free_dof[i]]] = true;
@@ -1068,7 +1068,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 		for (unsigned int i=0; i != free_dofs; ++i)
                   {
                     Number &ui = Ue(side_dofs[free_dof[i]]);
-                    assert(std::abs(ui) < TOLERANCE ||
+                    libmesh_assert(std::abs(ui) < TOLERANCE ||
                            std::abs(ui - Uside(i)) < TOLERANCE);
                     ui = Uside(i);
                     dof_is_fixed[side_dofs[free_dof[i]]] = true;
@@ -1153,7 +1153,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 	  for (unsigned int i=0; i != free_dofs; ++i)
             {
               Number &ui = Ue(free_dof[i]);
-              assert(std::abs(ui) < TOLERANCE ||
+              libmesh_assert(std::abs(ui) < TOLERANCE ||
                      std::abs(ui - Uint(i)) < TOLERANCE);
               ui = Uint(i);
               dof_is_fixed[free_dof[i]] = true;
@@ -1163,7 +1163,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 
           // Make sure every DoF got reached!
 	  for (unsigned int i=0; i != n_dofs; ++i)
-            assert(dof_is_fixed[i]);
+            libmesh_assert(dof_is_fixed[i]);
 
 	  const unsigned int
 	    first = new_vector.first_local_index(),

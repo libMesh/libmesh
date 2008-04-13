@@ -83,12 +83,12 @@ void hermite_compute_coefs(const Elem* elem)
 #endif
         }
       // No singular elements!
-      assert(dxdxi[0][p]);
-      assert(dxdxi[1][p]);
+      libmesh_assert(dxdxi[0][p]);
+      libmesh_assert(dxdxi[1][p]);
       // No non-rectilinear or non-axis-aligned elements!
 #ifdef DEBUG
-      assert(std::abs(dxdeta[p]) < 1e-9);
-      assert(std::abs(dydxi[p]) < 1e-9);
+      libmesh_assert(std::abs(dxdeta[p]) < 1e-9);
+      libmesh_assert(std::abs(dydxi[p]) < 1e-9);
 #endif
     }
 }
@@ -188,7 +188,7 @@ Real hermite_bases_2D
     }
 
   // No singular elements
-  assert(coef);
+  libmesh_assert(coef);
   return coef;
 }
 
@@ -218,7 +218,7 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 			  const unsigned int i,
 			  const Point& p)
 {
-  assert (elem != NULL);
+  libmesh_assert (elem != NULL);
 
   hermite_compute_coefs(elem);
 
@@ -229,11 +229,11 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
   switch (type)
     {
     case QUAD4:
-      assert (totalorder < 4);
+      libmesh_assert (totalorder < 4);
     case QUAD8:
     case QUAD9:
       {
-        assert (i<(totalorder+1u)*(totalorder+1u));
+        libmesh_assert (i<(totalorder+1u)*(totalorder+1u));
 
         std::vector<unsigned int> bases1D;
 
@@ -277,8 +277,8 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
 				const unsigned int j,
 				const Point& p)
 {
-  assert (elem != NULL);
-  assert (j == 0 || j == 1);
+  libmesh_assert (elem != NULL);
+  libmesh_assert (j == 0 || j == 1);
 
   hermite_compute_coefs(elem);
 
@@ -289,11 +289,11 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
   switch (type)
     {
     case QUAD4:
-      assert (totalorder < 4);
+      libmesh_assert (totalorder < 4);
     case QUAD8:
     case QUAD9:
       {
-        assert (i<(totalorder+1u)*(totalorder+1u));
+        libmesh_assert (i<(totalorder+1u)*(totalorder+1u));
 
         std::vector<unsigned int> bases1D;
 
@@ -331,8 +331,8 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
                                        const unsigned int j,
                                        const Point& p)
 {
-  assert (elem != NULL);
-  assert (j == 0 || j == 1 || j == 2);
+  libmesh_assert (elem != NULL);
+  libmesh_assert (j == 0 || j == 1 || j == 2);
 
   hermite_compute_coefs(elem);
 
@@ -343,11 +343,11 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
   switch (type)
     {
     case QUAD4:
-      assert (totalorder < 4);
+      libmesh_assert (totalorder < 4);
     case QUAD8:
     case QUAD9:
       {
-        assert (i<(totalorder+1u)*(totalorder+1u));
+        libmesh_assert (i<(totalorder+1u)*(totalorder+1u));
 
         std::vector<unsigned int> bases1D;
 

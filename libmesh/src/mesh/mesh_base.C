@@ -49,9 +49,9 @@ MeshBase::MeshBase (unsigned int d) :
   _is_prepared   (false),
   _point_locator (NULL)
 {
-  assert (DIM <= 3);
-  assert (DIM >= _dim);
-  assert (libMesh::initialized());
+  libmesh_assert (DIM <= 3);
+  libmesh_assert (DIM >= _dim);
+  libmesh_assert (libMesh::initialized());
 }
 
 
@@ -73,7 +73,7 @@ MeshBase::~MeshBase()
 {
   this->clear();
 
-  assert (!libMesh::closed());
+  libmesh_assert (!libMesh::closed());
 }
 
 
@@ -144,7 +144,7 @@ unsigned int MeshBase::n_nodes_on_proc (const unsigned int proc_id) const
 {
   // We're either counting a processor's nodes or unpartitioned
   // nodes
-  assert (proc_id < libMesh::n_processors() ||
+  libmesh_assert (proc_id < libMesh::n_processors() ||
 	  proc_id == DofObject::invalid_processor_id);
   
   return static_cast<unsigned int>(std::distance (this->pid_nodes_begin(proc_id),
@@ -157,7 +157,7 @@ unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
 {
   // We're either counting a processor's elements or unpartitioned
   // elements
-  assert (proc_id < libMesh::n_processors() ||
+  libmesh_assert (proc_id < libMesh::n_processors() ||
 	  proc_id == DofObject::invalid_processor_id);
   
   return static_cast<unsigned int>(std::distance (this->pid_elements_begin(proc_id),
@@ -168,7 +168,7 @@ unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
 
 unsigned int MeshBase::n_active_elem_on_proc (const unsigned int proc_id) const
 {
-  assert (proc_id < libMesh::n_processors());
+  libmesh_assert (proc_id < libMesh::n_processors());
   return static_cast<unsigned int>(std::distance (this->active_pid_elements_begin(proc_id),
 						  this->active_pid_elements_end  (proc_id)));
 }

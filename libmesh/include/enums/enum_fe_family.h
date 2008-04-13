@@ -58,7 +58,7 @@ namespace libMeshEnums {
 
   /**
    * \enum libMeshEnums::FEContinuity defines an \p enum for finite element
-   * types to assert a certain level (or type? Hcurl?) of continuity.  
+   * types to libmesh_assert a certain level (or type? Hcurl?) of continuity.  
    */
   enum FEContinuity {DISCONTINUOUS,
                      C_ZERO,

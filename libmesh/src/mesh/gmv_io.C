@@ -270,7 +270,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
   // Open the output file stream
   std::ofstream out (fname.c_str());
   
-  assert (out.good());
+  libmesh_assert (out.good());
 
   // Get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
@@ -315,13 +315,13 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 
 	// Make sure we have a valid entry for
 	// the current element type.
-	assert (eletypes.count(elem->type()));
+	libmesh_assert (eletypes.count(elem->type()));
 
         const elementDefinition& ele = eletypes[elem->type()];
 
 	// The element mapper better not require any more nodes
 	// than are present in the current element!
-	assert (ele.nodes.size() <= elem->n_nodes());
+	libmesh_assert (ele.nodes.size() <= elem->n_nodes());
 	
         out << ele.label << "\n";
         for (unsigned int i=0; i < ele.nodes.size(); i++)
@@ -401,7 +401,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 
 	  // The element mapper better not require any more nodes
 	  // than are present in the current element!
-	  assert (ele.nodes.size() <= elem->n_nodes());
+	  libmesh_assert (ele.nodes.size() <= elem->n_nodes());
 
           for (unsigned int i=0; i < ele.nodes.size(); i++)
             out << elem->p_level() << " ";
@@ -434,7 +434,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 	      const Elem* e = *elem_it;
 	      
 	      // Use the element's ID to find the value.
-	      assert (e->id() < the_array->size());
+	      libmesh_assert (e->id() < the_array->size());
 	      const Real the_value = the_array->operator[](e->id());
 	      
 	      if (this->subdivide_second_order())
@@ -461,7 +461,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
                   << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
                   << "\n";
       
-      assert (v->size() == mesh.n_nodes()*n_vars);
+      libmesh_assert (v->size() == mesh.n_nodes()*n_vars);
 
       for (unsigned int c=0; c<n_vars; c++)
         {
@@ -532,14 +532,14 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   // Open the output file stream
   std::ofstream out (fname.c_str());
   
-  assert (out.good());
+  libmesh_assert (out.good());
 
   // Get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
   // Make sure our nodes are contiguous and serialized
-  assert (mesh.n_nodes() == mesh.max_node_id());
-  assert (mesh.is_serial());
+  libmesh_assert (mesh.n_nodes() == mesh.max_node_id());
+  libmesh_assert (mesh.is_serial());
 
   unsigned int mesh_max_p_level = 0;
   
@@ -998,7 +998,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 	      const Elem* e = *elem_it;
 	      
 	      // Use the element's ID to find the value...
-	      assert (e->id() < the_array->size());
+	      libmesh_assert (e->id() < the_array->size());
 	      const Real the_value = the_array->operator[](e->id());
 	      
 	      if (this->subdivide_second_order())
@@ -1028,7 +1028,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 		  << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
 		  << std::endl;
       
-      assert (v->size() == mesh.n_nodes()*n_vars);
+      libmesh_assert (v->size() == mesh.n_nodes()*n_vars);
 
       for (unsigned int c=0; c<n_vars; c++)
 	{
@@ -1098,7 +1098,7 @@ void GMVIO::write_binary (const std::string& fname,
 {
   std::ofstream out (fname.c_str());
   
-  assert (out.good());
+  libmesh_assert (out.good());
 
   // get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
@@ -1502,7 +1502,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
   
   std::ofstream out(name.c_str());
   
-  assert (out.good());
+  libmesh_assert (out.good());
 
   // Begin interfacing with the GMV data file
   {
@@ -1739,7 +1739,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
   {
     const unsigned int n_vars = solution_names.size();
       
-    //    assert (v.size() == tw*n_vars);
+    //    libmesh_assert (v.size() == tw*n_vars);
 
     out << "variable" << std::endl;
 
@@ -1824,11 +1824,11 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 void GMVIO::add_cell_centered_data (const std::string&       cell_centered_data_name,
 				    const std::vector<Real>* cell_centered_data_vals)
 {
-  assert (cell_centered_data_vals != NULL);
+  libmesh_assert (cell_centered_data_vals != NULL);
 
   // Make sure there are *at least* enough entries for all the active elements.
   // There can also be entries for inactive elements, they will be ignored.
-  assert (cell_centered_data_vals->size() >=
+  libmesh_assert (cell_centered_data_vals->size() >=
 	  MeshOutput<MeshBase>::mesh().n_active_elem());
   this->_cell_centered_data[cell_centered_data_name] = cell_centered_data_vals;
 }
@@ -1843,7 +1843,7 @@ void GMVIO::read (const std::string& name)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  assert(libMesh::processor_id() == 0);
+  libmesh_assert(libMesh::processor_id() == 0);
 
   _next_elem_id = 0;
 
@@ -1997,7 +1997,7 @@ void GMVIO::_read_materials()
 #ifdef HAVE_GMV
   
   // LibMesh assigns materials on a per-cell basis
-  assert (GMV::gmv_data.datatype == CELL);
+  libmesh_assert (GMV::gmv_data.datatype == CELL);
 
   //   // Material names: LibMesh has no use for these currently...
   //   std::cout << "Number of material names="
@@ -2044,7 +2044,7 @@ void GMVIO::_read_nodes()
   // 	    << std::endl;
 
   // LibMesh writes UNSTRUCT=100 node data 
-  assert (GMV::gmv_data.datatype == UNSTRUCT);
+  libmesh_assert (GMV::gmv_data.datatype == UNSTRUCT);
 
   // The nodal data is stored in gmv_data.doubledata{1,2,3}
   // and is nnodes long
@@ -2085,7 +2085,7 @@ void GMVIO::_read_one_cell()
       (GMV::gmv_data.datatype==REGULAR) ||
       (GMV::gmv_data.datatype==ENDKEYWORD);
     
-    assert (recognized);
+    libmesh_assert (recognized);
   }
 
   if (GMV::gmv_data.datatype == REGULAR)
@@ -2221,7 +2221,7 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
     }
 
   // Be sure there is at least one system
-  assert (es.n_systems());
+  libmesh_assert (es.n_systems());
 
   // Keep track of variable names which have been found and
   // copied already.  This could be used to prevent us from
@@ -2254,7 +2254,7 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
 	    {
 	      // Check if there are as many nodes in the mesh as there are entries
 	      // in the stored nodal data vector
-	      assert ( (*it).second.size() == MeshInput<MeshBase>::mesh().n_nodes() );
+	      libmesh_assert ( (*it).second.size() == MeshInput<MeshBase>::mesh().n_nodes() );
 	      
 	      const unsigned int var_num = system.variable_number(var_name);
 	      

@@ -223,7 +223,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
 	  std::unique (inner_boundary_node_numbers.begin(), inner_boundary_node_numbers.end());
 
       const int unique_size = std::distance(inner_boundary_node_numbers.begin(), unique_end);
-      assert (unique_size <= static_cast<int>(ibn_size_before));
+      libmesh_assert (unique_size <= static_cast<int>(ibn_size_before));
 
       // Finally, create const Node* in the inner_boundary_nodes
       // vector.  Reserve, not resize (otherwise, the push_back
@@ -281,7 +281,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 				    unsigned int> >* inner_faces)
 {
   // This isn't parallelized yet
-  assert (_mesh.is_serial());
+  libmesh_assert (_mesh.is_serial());
 
   if (be_verbose)
     {

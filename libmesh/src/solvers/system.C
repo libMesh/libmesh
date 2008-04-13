@@ -77,7 +77,7 @@ System::~System ()
   // Clear data
   this->clear ();
 
-  assert (!libMesh::closed());
+  libmesh_assert (!libMesh::closed());
 }
 
 
@@ -120,8 +120,8 @@ unsigned int System::n_local_dofs() const
 Number System::current_solution (const unsigned int global_dof_number) const
 {
   // Check the sizes
-  assert (global_dof_number < _dof_map->n_dofs());
-  assert (global_dof_number < current_local_solution->size());
+  libmesh_assert (global_dof_number < _dof_map->n_dofs());
+  libmesh_assert (global_dof_number < current_local_solution->size());
    
   return (*current_local_solution)(global_dof_number);
 }
@@ -266,8 +266,8 @@ void System::reinit ()
   // current_local_solution.
   solution->init (this->n_dofs(), this->n_local_dofs());
 	
-  assert (solution->size() == current_local_solution->size());
-  assert (solution->size() == current_local_solution->local_size());
+  libmesh_assert (solution->size() == current_local_solution->size());
+  libmesh_assert (solution->size() == current_local_solution->local_size());
 
   const unsigned int first_local_dof = solution->first_local_index();
   const unsigned int local_size      = solution->local_size();
@@ -285,10 +285,10 @@ void System::update ()
   const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
 
   // Check sizes
-  assert (current_local_solution->local_size() == solution->size());
+  libmesh_assert (current_local_solution->local_size() == solution->size());
 // More processors than elements => empty send_list
-//  assert (!send_list.empty());
-  assert (send_list.size() <= solution->size());
+//  libmesh_assert (!send_list.empty());
+  libmesh_assert (send_list.size() <= solution->size());
 
   // Create current_local_solution from solution.  This will
   // put a local copy of solution into current_local_solution.
@@ -308,10 +308,10 @@ void System::re_update ()
   Utility::iota (send_list.begin(), send_list.end(), 0);
   
   // Check sizes
-  assert (current_local_solution->local_size() == solution->size());
-  assert (current_local_solution->size()       == solution->size());
-  assert (!send_list.empty());
-  assert (send_list.size() <= solution->size());
+  libmesh_assert (current_local_solution->local_size() == solution->size());
+  libmesh_assert (current_local_solution->size()       == solution->size());
+  libmesh_assert (!send_list.empty());
+  libmesh_assert (send_list.size() <= solution->size());
 
   // Create current_local_solution from solution.  This will
   // put a local copy of solution into current_local_solution.
@@ -339,8 +339,8 @@ bool System::compare (const System& other_system,
 		      const bool verbose) const
 {
   // we do not care for matrices, but for vectors
-  assert (!_can_add_vectors);
-  assert (!other_system._can_add_vectors);
+  libmesh_assert (!_can_add_vectors);
+  libmesh_assert (!other_system._can_add_vectors);
 
   if (verbose)
     {
@@ -830,7 +830,7 @@ std::string System::get_info() const
 void System::attach_init_function (void fptr(EquationSystems& es,
 					     const std::string& name))
 {
-  assert (fptr != NULL);
+  libmesh_assert (fptr != NULL);
   
   _init_system = fptr;
 }
@@ -840,7 +840,7 @@ void System::attach_init_function (void fptr(EquationSystems& es,
 void System::attach_assemble_function (void fptr(EquationSystems& es,
 						 const std::string& name))
 {
-  assert (fptr != NULL);
+  libmesh_assert (fptr != NULL);
   
   _assemble_system = fptr;  
 }
@@ -850,7 +850,7 @@ void System::attach_assemble_function (void fptr(EquationSystems& es,
 void System::attach_constraint_function(void fptr(EquationSystems& es,
 						  const std::string& name))
 {
-  assert (fptr != NULL);
+  libmesh_assert (fptr != NULL);
   
   _constrain_system = fptr;  
 }

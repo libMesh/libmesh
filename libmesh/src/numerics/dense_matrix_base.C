@@ -33,9 +33,9 @@ void DenseMatrixBase<T>::multiply (DenseMatrixBase<T>& M1,
 {
   // Assertions to make sure we have been
   // passed matrices of the correct dimension.
-  assert (M1.m() == M2.m());
-  assert (M1.n() == M3.n());
-  assert (M2.n() == M3.m());
+  libmesh_assert (M1.m() == M2.m());
+  libmesh_assert (M1.n() == M3.n());
+  libmesh_assert (M2.n() == M3.m());
 	  
   const unsigned int m_s = M2.m();
   const unsigned int p_s = M2.n(); 
@@ -59,8 +59,8 @@ void DenseMatrixBase<T>::condense(const unsigned int iv,
 				  const T val,
 				  DenseVectorBase<T>& rhs)
 {
-  assert (this->_m == rhs.size());
-  assert (iv == jv);
+  libmesh_assert (this->_m == rhs.size());
+  libmesh_assert (iv == jv);
 
 
   // move the known value into the RHS

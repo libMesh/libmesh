@@ -220,7 +220,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * This function checks for consistent neighbor links at this
    * element.
    */
-  void assert_valid_neighbors() const;
+  void libmesh_assert_valid_neighbors() const;
 
   /**
    * Resets this element's neighbors' appropriate neighbor pointers
@@ -1078,9 +1078,9 @@ Elem::~Elem()
 inline
 const Point & Elem::point (const unsigned int i) const
 {
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);
+  libmesh_assert (i < this->n_nodes());
+  libmesh_assert (_nodes[i] != NULL);
+  libmesh_assert (_nodes[i]->id() != Node::invalid_id);
 
   return *_nodes[i];
 }
@@ -1090,7 +1090,7 @@ const Point & Elem::point (const unsigned int i) const
 inline
 Point & Elem::point (const unsigned int i)
 {
-  assert (i < this->n_nodes());
+  libmesh_assert (i < this->n_nodes());
 
   return *_nodes[i];
 }
@@ -1100,9 +1100,9 @@ Point & Elem::point (const unsigned int i)
 inline
 unsigned int Elem::node (const unsigned int i) const
 {
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
-  assert (_nodes[i]->id() != Node::invalid_id);
+  libmesh_assert (i < this->n_nodes());
+  libmesh_assert (_nodes[i] != NULL);
+  libmesh_assert (_nodes[i]->id() != Node::invalid_id);
 
   return _nodes[i]->id();
 }
@@ -1112,8 +1112,8 @@ unsigned int Elem::node (const unsigned int i) const
 inline
 Node* Elem::get_node (const unsigned int i) const
 {
-  assert (i < this->n_nodes());
-  assert (_nodes[i] != NULL);
+  libmesh_assert (i < this->n_nodes());
+  libmesh_assert (_nodes[i] != NULL);
 
   return _nodes[i];
 }
@@ -1123,7 +1123,7 @@ Node* Elem::get_node (const unsigned int i) const
 inline
 Node* & Elem::set_node (const unsigned int i)
 {
-  assert (i < this->n_nodes());
+  libmesh_assert (i < this->n_nodes());
 
   return _nodes[i];
 }
@@ -1149,7 +1149,7 @@ unsigned char & Elem::subdomain_id ()
 inline
 Elem* Elem::neighbor (const unsigned int i) const
 {
-  assert (i < this->n_neighbors());
+  libmesh_assert (i < this->n_neighbors());
 
   return _neighbors[i];
 }
@@ -1159,7 +1159,7 @@ Elem* Elem::neighbor (const unsigned int i) const
 inline
 void Elem::set_neighbor (const unsigned int i, Elem* n)
 {
-  assert (i < this->n_neighbors());
+  libmesh_assert (i < this->n_neighbors());
   
   _neighbors[i] = n;
 }
@@ -1217,14 +1217,14 @@ bool Elem::on_boundary () const
 inline
 unsigned int Elem::which_neighbor_am_i (const Elem* e) const
 {
-  assert (e != NULL);
+  libmesh_assert (e != NULL);
 
   const Elem* eparent = e;
 
   while (eparent->level() > this->level())
     {
       eparent = eparent->parent();
-      assert(eparent);
+      libmesh_assert(eparent);
     }
   
   for (unsigned int s=0; s<this->n_neighbors(); s++)
@@ -1334,8 +1334,8 @@ const Elem* Elem::top_parent () const
   while (tp->parent() != NULL)
     tp = tp->parent();
   
-  assert (tp != NULL);
-  assert (tp->level() == 0);
+  libmesh_assert (tp != NULL);
+  libmesh_assert (tp->level() == 0);
 
   return tp;  
 }
@@ -1386,8 +1386,8 @@ unsigned int Elem::p_level() const
 inline
 Elem* Elem::child (const unsigned int i) const
 {
-  assert (_children    != NULL);
-  assert (_children[i] != NULL);
+  libmesh_assert (_children    != NULL);
+  libmesh_assert (_children[i] != NULL);
   
   return _children[i];
 }
@@ -1397,8 +1397,8 @@ Elem* Elem::child (const unsigned int i) const
 inline
 unsigned int Elem::which_child_am_i (const Elem* e) const
 {
-  assert (e != NULL);
-  assert (this->has_children());
+  libmesh_assert (e != NULL);
+  libmesh_assert (this->has_children());
 
   for (unsigned int c=0; c<this->n_children(); c++)
     if (this->child(c) == e)
@@ -1473,7 +1473,7 @@ unsigned int Elem::max_descendant_p_level () const
 {
   // This is undefined for subactive elements,
   // which have no active descendants
-  assert (!this->subactive());
+  libmesh_assert (!this->subactive());
   if (this->active())
     return this->p_level();
   
@@ -1597,7 +1597,7 @@ unsigned int Elem::compute_key (unsigned int n0,
   // Step 3
   if (n0 > n1) std::swap (n0, n1);
 
-  assert ((n0 < n1) && (n1 < n2));
+  libmesh_assert ((n0 < n1) && (n1 < n2));
 
   
   return (n0%bp + (n1<<5)%bp + (n2<<10)%bp);
@@ -1629,7 +1629,7 @@ unsigned int Elem::compute_key (unsigned int n0,
   // Finally step 5
   if (n1 > n2) std::swap (n1, n2);
 
-  assert ((n0 < n1) && (n1 < n2) && (n2 < n3));
+  libmesh_assert ((n0 < n1) && (n1 < n2) && (n2 < n3));
   
   return (n0%bp + (n1<<5)%bp + (n2<<10)%bp + (n3<<15)%bp);
 }

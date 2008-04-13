@@ -44,7 +44,7 @@ void OFFIO::read_stream(std::istream& in)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  assert(libMesh::processor_id() == 0);
+  libmesh_assert(libMesh::processor_id() == 0);
 
   // Get a reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -53,10 +53,10 @@ void OFFIO::read_stream(std::istream& in)
   mesh.clear();
   
   // STL only works in 2D
-  assert (mesh.mesh_dimension() == 2);
+  libmesh_assert (mesh.mesh_dimension() == 2);
 
   // Check the input buffer
-  assert (in.good());
+  libmesh_assert (in.good());
 
   unsigned int nn, ne, nf;
 
@@ -65,7 +65,7 @@ void OFFIO::read_stream(std::istream& in)
   // Read the first string.  It should say "OFF"
   in >> label;
 
-  assert (label == "OFF");
+  libmesh_assert (label == "OFF");
 
   // read the number of nodes, faces, and edges
   in >> nn >> nf >> ne;
@@ -80,7 +80,7 @@ void OFFIO::read_stream(std::istream& in)
   // Read the nodes
   for (unsigned int n=0; n<nn; n++)
     {
-      assert (in.good());
+      libmesh_assert (in.good());
 
       in >> x
 	 >> y
@@ -94,7 +94,7 @@ void OFFIO::read_stream(std::istream& in)
   // Read the triangles
   for (unsigned int e=0; e<nf; e++)
     {
-      assert (in.good());
+      libmesh_assert (in.good());
       
       // _elements[e] = new Tri3;
       // _elements[e]->set_id (e);
@@ -105,7 +105,7 @@ void OFFIO::read_stream(std::istream& in)
       // The number of nodes in the object
       in >> dummy;
 
-      assert (dummy == 3);
+      libmesh_assert (dummy == 3);
 
       in >> n0
 	 >> n1

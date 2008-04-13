@@ -391,7 +391,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
       // always an integer value
 #ifdef DEBUG
       for (unsigned int i=0; i<n_flux_faces.size(); ++i)
-	assert (n_flux_faces[i] == static_cast<float>(static_cast<unsigned int>(n_flux_faces[i])) );
+	libmesh_assert (n_flux_faces[i] == static_cast<float>(static_cast<unsigned int>(n_flux_faces[i])) );
 #endif
   
       // Scale the error by the number of flux faces for each element

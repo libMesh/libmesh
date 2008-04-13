@@ -49,7 +49,7 @@
 template <typename T>
 T PetscVector<T>::sum () const
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
   
   int ierr=0;
   PetscScalar value=0.;
@@ -64,7 +64,7 @@ T PetscVector<T>::sum () const
 template <typename T>
 Real PetscVector<T>::l1_norm () const
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
   
   int ierr=0;
   PetscReal value=0.;
@@ -80,7 +80,7 @@ Real PetscVector<T>::l1_norm () const
 template <typename T>
 Real PetscVector<T>::l2_norm () const
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
   
   int ierr=0;
   PetscReal value=0.;
@@ -97,7 +97,7 @@ Real PetscVector<T>::l2_norm () const
 template <typename T>
 Real PetscVector<T>::linfty_norm () const
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
   
   int ierr=0;
   PetscReal value=0.;
@@ -115,7 +115,7 @@ template <typename T>
 NumericVector<T>&
 PetscVector<T>::operator += (const NumericVector<T>& v)
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
   
   this->add(1., v);
   
@@ -128,7 +128,7 @@ template <typename T>
 NumericVector<T>&
 PetscVector<T>::operator -= (const NumericVector<T>& v)
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
   
   this->add(-1., v);
   
@@ -140,7 +140,7 @@ PetscVector<T>::operator -= (const NumericVector<T>& v)
 template <typename T>
 void PetscVector<T>::set (const unsigned int i, const T value)
 {
-  assert(i<size());
+  libmesh_assert(i<size());
   
   int ierr=0;
   int i_val = static_cast<int>(i);
@@ -157,7 +157,7 @@ void PetscVector<T>::set (const unsigned int i, const T value)
 template <typename T>
 void PetscVector<T>::add (const unsigned int i, const T value)
 {
-  assert(i<size());
+  libmesh_assert(i<size());
   
   int ierr=0;
   int i_val = static_cast<int>(i);
@@ -175,7 +175,7 @@ template <typename T>
 void PetscVector<T>::add_vector (const std::vector<T>& v,
 				 const std::vector<unsigned int>& dof_indices)
 {
-  assert (v.size() == dof_indices.size());
+  libmesh_assert (v.size() == dof_indices.size());
 
   for (unsigned int i=0; i<v.size(); i++)
     this->add (dof_indices[i], v[i]);
@@ -187,7 +187,7 @@ template <typename T>
 void PetscVector<T>::add_vector (const NumericVector<T>& V,
 				 const std::vector<unsigned int>& dof_indices)
 {
-  assert (V.size() == dof_indices.size());
+  libmesh_assert (V.size() == dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->add (dof_indices[i], V(i));
@@ -202,8 +202,8 @@ void PetscVector<T>::add_vector (const NumericVector<T>& V_in,
   const PetscVector<T>* V = dynamic_cast<const PetscVector<T>*>(&V_in);
   const PetscMatrix<T>* A = dynamic_cast<const PetscMatrix<T>*>(&A_in);
 
-  assert (V != NULL);
-  assert (A != NULL);
+  libmesh_assert (V != NULL);
+  libmesh_assert (A != NULL);
   
   int ierr=0;
 
@@ -221,7 +221,7 @@ template <typename T>
 void PetscVector<T>::add_vector (const DenseVector<T>& V,
 				 const std::vector<unsigned int>& dof_indices)
 {
-  assert (V.size() == dof_indices.size());
+  libmesh_assert (V.size() == dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->add (dof_indices[i], V(i));
@@ -275,8 +275,8 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
 
   const PetscVector<T>* v = dynamic_cast<const PetscVector<T>*>(&v_in);
 
-  assert (v != NULL);
-  assert(this->size() == v->size());
+  libmesh_assert (v != NULL);
+  libmesh_assert(this->size() == v->size());
   
 
 #if PETSC_VERSION_LESS_THAN(2,3,0)
@@ -300,7 +300,7 @@ template <typename T>
 void PetscVector<T>::insert (const std::vector<T>& v,
 			     const std::vector<unsigned int>& dof_indices)
 {
-  assert (v.size() == dof_indices.size());
+  libmesh_assert (v.size() == dof_indices.size());
 
   for (unsigned int i=0; i<v.size(); i++)
     this->set (dof_indices[i], v[i]);
@@ -312,7 +312,7 @@ template <typename T>
 void PetscVector<T>::insert (const NumericVector<T>& V,
 			     const std::vector<unsigned int>& dof_indices)
 {
-  assert (V.size() == dof_indices.size());
+  libmesh_assert (V.size() == dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
@@ -324,7 +324,7 @@ template <typename T>
 void PetscVector<T>::insert (const DenseVector<T>& V,
 			     const std::vector<unsigned int>& dof_indices)
 {
-  assert (V.size() == dof_indices.size());
+  libmesh_assert (V.size() == dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
@@ -367,7 +367,7 @@ T PetscVector<T>::dot (const NumericVector<T>& V) const
   
   // Make sure the NumericVector passed in is really a PetscVector
   const PetscVector<T>* v = dynamic_cast<const PetscVector<T>*>(&V);
-  assert (v != NULL);
+  libmesh_assert (v != NULL);
 
   // 2.3.x (at least) style.  Untested for previous versions.
   ierr = VecDot(this->_vec, v->_vec, &value);
@@ -383,7 +383,7 @@ template <typename T>
 NumericVector<T>& 
 PetscVector<T>::operator = (const T s_in)
 {
-  assert(this->closed());
+  libmesh_assert(this->closed());
 
   int ierr = 0;
   PetscScalar s = static_cast<PetscScalar>(s_in);
@@ -416,7 +416,7 @@ PetscVector<T>::operator = (const NumericVector<T>& v_in)
 {
   const PetscVector<T>* v = dynamic_cast<const PetscVector<T>*>(&v_in);
 
-  assert (v != NULL);
+  libmesh_assert (v != NULL);
   
   *this = *v;
   
@@ -480,7 +480,7 @@ PetscVector<T>::operator = (const std::vector<T>& v)
    */
   else
     {
-      assert (this->local_size() == v.size());
+      libmesh_assert (this->local_size() == v.size());
 
       ierr = VecGetArray (_vec, &values);
 	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -502,8 +502,8 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
 {
   PetscVector<T>* v_local = dynamic_cast<PetscVector<T>*>(&v_local_in);
 
-  assert (v_local != NULL);
-  assert (v_local->local_size() == this->size());
+  libmesh_assert (v_local != NULL);
+  libmesh_assert (v_local->local_size() == this->size());
 
   int ierr = 0;
   const int n = this->size();
@@ -560,9 +560,9 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
 {
   PetscVector<T>* v_local = dynamic_cast<PetscVector<T>*>(&v_local_in);
 
-  assert (v_local != NULL);
-  assert (v_local->local_size() == this->size());
-  assert (send_list.size()     <= v_local->size());
+  libmesh_assert (v_local != NULL);
+  libmesh_assert (v_local->local_size() == this->size());
+  libmesh_assert (send_list.size()     <= v_local->size());
   
   int ierr=0;
   const int n_sl = send_list.size();
@@ -628,10 +628,10 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
 			       const std::vector<unsigned int>& send_list)
 {
   // Only good for serial vectors.
-  assert (this->size() == this->local_size());
-  assert (last_local_idx > first_local_idx);
-  assert (send_list.size() <= this->size());
-  assert (last_local_idx < this->size());
+  libmesh_assert (this->size() == this->local_size());
+  libmesh_assert (last_local_idx > first_local_idx);
+  libmesh_assert (send_list.size() <= this->size());
+  libmesh_assert (last_local_idx < this->size());
   
   const unsigned int size       = this->size();
   const unsigned int local_size = (last_local_idx - first_local_idx + 1);
@@ -881,8 +881,8 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
 template <typename T>
 void PetscVector<T>::print_matlab (const std::string name) const
 {
-  assert (this->initialized());
-  assert (this->closed());
+  libmesh_assert (this->initialized());
+  libmesh_assert (this->closed());
   
   int ierr=0; 
   PetscViewer petsc_viewer;
@@ -947,7 +947,7 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
   
   // Make sure the passed int subvector is really a PetscVector
   PetscVector<T>* petsc_subvector = dynamic_cast<PetscVector<T>*>(&subvector);
-  assert(petsc_subvector != NULL);
+  libmesh_assert(petsc_subvector != NULL);
   
   // If the petsc_subvector is already initialized, we assume that the
   // user has already allocated the *correct* amount of space for it.
