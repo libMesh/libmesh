@@ -648,7 +648,7 @@ private:
    * degrees of freedom at a node/element are in contiguous 
    * blocks.  Note in particular that the degrees of freedom
    * for a given variable are not in contiguous blocks, as 
-   * in the case of \p distribute_dofs_var_major.
+   * in the case of \p distribute_local_dofs_var_major.
    * Starts at index next_free_dof, and increments it to
    * the post-final index.
    * If build_send_list is true, builds the send list.  If
