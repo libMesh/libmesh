@@ -33,12 +33,12 @@
 #include "fe_type.h"
 #include "libmesh_logging.h"
 #include "mesh_base.h"
+#include "mesh_tools.h"
 #include "numeric_vector.h"
 #include "parallel.h"
 #include "sparse_matrix.h"
 #include "string_to_enum.h"
 #include "threads_allocators.h"
-
 
 
 // ------------------------------------------------------------
@@ -615,7 +615,7 @@ void DofMap::distribute_dofs (MeshBase& mesh)
   START_LOG("distribute_dofs()", "DofMap");
 
   libmesh_assert (mesh.is_prepared());
-  
+
   const unsigned int proc_id = libMesh::processor_id();
   const unsigned int n_proc  = libMesh::n_processors();
   const unsigned int n_vars  = this->n_variables();
@@ -675,15 +675,16 @@ void DofMap::distribute_dofs (MeshBase& mesh)
   // incorrect values on non-local DofObjects.  Let's request the
   // correct values from each other processor.
 
-  this->set_nonlocal_dof_objects(mesh.nodes_begin(),
-                                 mesh.nodes_end(),
-                                 mesh,
-                                 &DofMap::node_ptr);
+  if (libMesh::n_processors() > 1)
+    {
+      this->set_nonlocal_dof_objects(mesh.nodes_begin(),
+                                     mesh.nodes_end(),
+                                     mesh, &DofMap::node_ptr);
 
-  this->set_nonlocal_dof_objects(mesh.elements_begin(),
-                                 mesh.elements_end(),
-                                 mesh,
-                                 &DofMap::elem_ptr);
+      this->set_nonlocal_dof_objects(mesh.elements_begin(),
+                                     mesh.elements_end(),
+                                     mesh, &DofMap::elem_ptr);
+    }
   
   // Set the total number of degrees of freedom
 #ifdef ENABLE_AMR
@@ -786,25 +787,32 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
           }
     }
 
-// Make sure we didn't miss any nodes
 #ifdef DEBUG
-  MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
-  const MeshBase::node_iterator node_end = mesh.local_nodes_end();
-  for (; node_it != node_end; ++node_it)
+// Make sure we didn't miss any nodes
+// unless we've got subactive elements
+  if(MeshTools::n_elem(mesh.subactive_elements_begin(),
+                       mesh.subactive_elements_end()) == 0)
     {
-      DofObject *obj = *node_it;
-      libmesh_assert(obj);
-      unsigned int n_variables = obj->n_vars(this->sys_number());
-      for (unsigned int v=0; v != n_variables; ++v)
+      MeshTools::libmesh_assert_valid_node_procids(mesh);
+
+      MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
+      const MeshBase::node_iterator node_end = mesh.local_nodes_end();
+      for (; node_it != node_end; ++node_it)
         {
-          unsigned int n_comp =
-            obj->n_comp(this->sys_number(), v);
-          unsigned int first_dof = n_comp ?
-            obj->dof_number(this->sys_number(), v, 0) : 0;
-          libmesh_assert(first_dof != DofObject::invalid_id);
+          Node *obj = *node_it;
+          libmesh_assert(obj);
+          unsigned int n_variables = obj->n_vars(this->sys_number());
+          for (unsigned int v=0; v != n_variables; ++v)
+            {
+              unsigned int n_comp =
+                obj->n_comp(this->sys_number(), v);
+              unsigned int first_dof = n_comp ?
+                obj->dof_number(this->sys_number(), v, 0) : 0;
+              libmesh_assert(first_dof != DofObject::invalid_id);
+            }
         }
     }
-#endif
+#endif // DEBUG
 
   if (!build_send_list)
     {
@@ -897,25 +905,32 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
         }
     }
 
-// Make sure we didn't miss any nodes
 #ifdef DEBUG
-  MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
-  const MeshBase::node_iterator node_end = mesh.local_nodes_end();
-  for (; node_it != node_end; ++node_it)
+// Make sure we didn't miss any nodes
+// unless we've got subactive elements
+  if(MeshTools::n_elem(mesh.subactive_elements_begin(),
+                       mesh.subactive_elements_end()) == 0)
     {
-      DofObject *obj = *node_it;
-      libmesh_assert(obj);
-      unsigned int n_variables = obj->n_vars(this->sys_number());
-      for (unsigned int v=0; v != n_variables; ++v)
+      MeshTools::libmesh_assert_valid_node_procids(mesh);
+
+      MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
+      const MeshBase::node_iterator node_end = mesh.local_nodes_end();
+      for (; node_it != node_end; ++node_it)
         {
-          unsigned int n_comp =
-            obj->n_comp(this->sys_number(), v);
-          unsigned int first_dof = n_comp ?
-            obj->dof_number(this->sys_number(), v, 0) : 0;
-          libmesh_assert(first_dof != DofObject::invalid_id);
+          Node *obj = *node_it;
+          libmesh_assert(obj);
+          unsigned int n_variables = obj->n_vars(this->sys_number());
+          for (unsigned int v=0; v != n_variables; ++v)
+            {
+              unsigned int n_comp =
+                obj->n_comp(this->sys_number(), v);
+              unsigned int first_dof = n_comp ?
+                obj->dof_number(this->sys_number(), v, 0) : 0;
+              libmesh_assert(first_dof != DofObject::invalid_id);
+            }
         }
     }
-#endif
+#endif // DEBUG
 
   if (!build_send_list)
     {
