@@ -347,7 +347,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
       libmesh_error();
       
     }
-  STOP_LOG("compute_face_values()", "FE");
+  STOP_LOG("compute_face_values()", "FEXYZ");
 }
 
 
