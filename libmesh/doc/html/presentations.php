@@ -30,6 +30,7 @@
   <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/seminar/talk.pdf">Finite Elements - Introduction and Applications</a> (April 2004 NASA/JSC technical seminar)</li>
   <li> <a href="http://ntrs.nasa.gov/search.jsp?N=4294668673">SUPG Finite Element Simulations of Compressible Flows for Aerothermodynamic Applications</a>, February 2007</li>
   <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/defense.pdf">Benjamin S. Kirk's PhD Dissertation Defense</a>, March 2007</li>
+  <li> <a href="http://cfdlab.ae.utexas.edu/~peterson/defense/defense.pdf">John W. Peterson's PhD Dissertation Defense</a>, April 2008</li>
 </ul>
 
 <h2>Applications which use libMesh</h2>
