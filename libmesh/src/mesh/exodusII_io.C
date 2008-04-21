@@ -587,6 +587,13 @@ namespace exII {
        */
       static const int prism6_node_map[6]; 
 
+      /**
+       * The Pyramid5 node map.
+       * Use this map for linear
+       * pyramid elements in 3D.
+       */
+      static const int pyramid5_node_map[5]; 
+
 
       /**
        * 3D face maps
@@ -615,6 +622,12 @@ namespace exII {
        * Useful for reading sideset information.
        */
       static const int prism_face_map[5];
+      
+      /**
+       * Maps the Exodus face numbering for general pyramids.
+       * Useful for reading sideset information.
+       */
+      static const int pyramid_face_map[5];
       
 
       /**
@@ -731,13 +744,15 @@ namespace exII {
   const int ExodusII::ElementMaps::tet4_node_map[4]   = {0, 1, 2, 3};
   const int ExodusII::ElementMaps::tet10_node_map[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-  const int ExodusII::ElementMaps::prism6_node_map[6] = {0, 1, 2, 3, 4, 5};
+  const int ExodusII::ElementMaps::prism6_node_map[6]   = {0, 1, 2, 3, 4, 5};
+  const int ExodusII::ElementMaps::pyramid5_node_map[5] = {0, 1, 2, 3, 4};
   
   // 3D face map definitions
-  const int ExodusII::ElementMaps::tet_face_map[4] =   {1, 2, 3, 0};
-  const int ExodusII::ElementMaps::hex_face_map[6] =   {1, 2, 3, 4, 0, 5};
-  const int ExodusII::ElementMaps::hex27_face_map[6] = {1, 0, 3, 5, 4, 2};
-  const int ExodusII::ElementMaps::prism_face_map[5] = {-1,-1,-1,-1,-1}; // Not Implemented!
+  const int ExodusII::ElementMaps::tet_face_map[4]     = {1, 2, 3, 0};
+  const int ExodusII::ElementMaps::hex_face_map[6]     = {1, 2, 3, 4, 0, 5};
+  const int ExodusII::ElementMaps::hex27_face_map[6]   = {1, 0, 3, 5, 4, 2};
+  const int ExodusII::ElementMaps::prism_face_map[5]   = {-1,-1,-1,-1,-1}; // Not Implemented!
+  const int ExodusII::ElementMaps::pyramid_face_map[5] = {-1,-1,-1,-1,-1}; // Not Implemented!
 
 
   // ------------------------------------------------------------
@@ -1171,6 +1186,9 @@ namespace exII {
     else if (type == "WEDGE")
       return assign_conversion(PRISM6);
 
+    else if (type == "PYRAMID" || type == "PYRAMID5")
+      return assign_conversion(PYRAMID5);
+
     else
       {
 	std::cerr << "ERROR! Unrecognized element type: " << type << std::endl;
@@ -1253,6 +1271,12 @@ namespace exII {
       case PRISM6:
 	{
 	  const Conversion conv(prism6_node_map, prism_face_map, PRISM6, "WEDGE");
+	  return conv;
+	}
+
+      case PYRAMID5:
+	{
+	  const Conversion conv(pyramid5_node_map, pyramid_face_map, PYRAMID5, "PYRAMID5");
 	  return conv;
 	}
 	
