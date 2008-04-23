@@ -74,7 +74,33 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
 
 // We use cached values for these so they can be called
 // from one processor without bothering the rest, but
-// we may want to verify our cache in debug mode
+// we may need to update those caches before doing a full
+// renumbering
+void ParallelMesh::update_parallel_id_counts()
+{
+  // This function must be run on all processors at once
+  parallel_only();
+
+  _n_elem = this->n_local_elem();
+  Parallel::sum(_n_elem);
+  _n_elem += this->n_unpartitioned_elem();
+
+  _max_elem_id = _elements.empty() ?
+    0 : _elements.rbegin()->first + 1;
+  Parallel::max(_max_elem_id);
+
+  _n_nodes = this->n_local_nodes();
+  Parallel::sum(_n_nodes);
+  _n_nodes += this->n_unpartitioned_nodes();
+
+  _max_node_id = _nodes.empty() ?
+    0 : _nodes.rbegin()->first + 1;
+  Parallel::max(_max_node_id);
+}
+
+
+// Or in debug mode we may want to test the uncached values without
+// changing the cache
 unsigned int ParallelMesh::parallel_n_elem() const
 {
   // This function must be run on all processors at once
@@ -840,6 +866,9 @@ void ParallelMesh::renumber_nodes_and_elements ()
 // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
+
+// And make sure we've made our numbering monotonic
+  MeshTools::libmesh_assert_valid_elem_ids(*this);
 #endif
 
   STOP_LOG("renumber_nodes_and_elements()", "ParallelMesh");
@@ -873,6 +902,9 @@ void ParallelMesh::delete_remote_elements()
 // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
+
+// And make sure our numbering is still monotonic
+  MeshTools::libmesh_assert_valid_elem_ids(*this);
 #endif
 }
 
