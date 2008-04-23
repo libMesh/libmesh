@@ -101,6 +101,9 @@ class SerialMesh : public UnstructuredMesh
   virtual unsigned int max_elem_id ()  const { return _elements.size(); }
   virtual void reserve_elem (const unsigned int ne) { _elements.reserve (ne); }
 
+  // SerialMesh has no caches to update
+  virtual void update_parallel_id_counts () {}
+
   /**
    * For meshes that don't store points/elems, these functions may be an issue!
    */

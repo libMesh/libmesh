@@ -202,6 +202,12 @@ public:
   virtual void reserve_elem (const unsigned int ne) = 0; 
 
   /**
+   * Updates parallel caches so that methods like n_elem() 
+   * accurately reflect changes on other processors
+   */
+  virtual void update_parallel_id_counts () = 0;
+
+  /**
    * Returns the number of active elements in the mesh.  Implemented
    * in terms of active_element_iterators.
    */

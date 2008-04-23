@@ -148,6 +148,7 @@ class ParallelMesh : public UnstructuredMesh
    */
   virtual void delete_remote_elements();
 
+  // Cached methods that can be called in serial
   virtual unsigned int n_nodes () const { return _n_nodes; }
   virtual unsigned int max_node_id () const { return _max_node_id; }
   virtual void reserve_nodes (const unsigned int) { }
@@ -155,11 +156,14 @@ class ParallelMesh : public UnstructuredMesh
   virtual unsigned int max_elem_id () const { return _max_elem_id; }
   virtual void reserve_elem (const unsigned int) { }
 
-  // Uncached methods to be called in parallel only
-  virtual unsigned int parallel_n_nodes () const;
-  virtual unsigned int parallel_max_node_id () const;
-  virtual unsigned int parallel_n_elem () const;
-  virtual unsigned int parallel_max_elem_id () const;
+  // Parallel only method to update the caches
+  virtual void update_parallel_id_counts ();
+
+  // And more parallel only methods to test non-cached values
+  unsigned int parallel_n_nodes () const;
+  unsigned int parallel_max_node_id () const;
+  unsigned int parallel_n_elem () const;
+  unsigned int parallel_max_elem_id () const;
 
   /**
    * For meshes that don't store points/elems, these functions may be an issue!
