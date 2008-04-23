@@ -735,9 +735,42 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<un
 
 
 #ifdef DEBUG
+void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
+{
+  unsigned int lastprocid = 0;
+  unsigned int lastelemid = 0;
+
+  const MeshBase::const_element_iterator el_end =
+    mesh.active_elements_end();
+  for (MeshBase::const_element_iterator el = 
+       mesh.active_elements_begin(); el != el_end; ++el)
+    {
+      const Elem* elem = *el;
+      libmesh_assert (elem);
+      unsigned int elemprocid = elem->processor_id();
+      unsigned int elemid = elem->id();
+
+      libmesh_assert(elemid >= lastelemid);
+      libmesh_assert(elemprocid >= lastprocid);
+
+      lastelemid = elemid;
+      lastprocid = elemprocid;
+    }
+}
+
+
+
 void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
 {
-  std::vector<bool> node_is_touched(mesh.max_node_id(), false);
+  parallel_only();
+  if (libMesh::n_processors() == 1)
+    return;
+
+  // Wasting space on <char> instead of <bool> to make it
+  // easier for Parallel::max().  Besides, we're in debug
+  // mode; forget efficiency!
+  libmesh_assert(Parallel::verify(mesh.max_node_id()));
+  std::vector<char> node_touched_by_me(mesh.max_node_id(), false);
 
   const MeshBase::const_element_iterator el_end =
     mesh.active_local_elements_end();
@@ -753,10 +786,11 @@ void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
           const Node *node = elem->get_node(i);
           unsigned int nodeid = node->id();
           unsigned int nodeprocid = node->processor_id();
-          if (nodeprocid == elemprocid)
-            node_is_touched[nodeid] = true;
+          node_touched_by_me[nodeid] = true;
         }
     }
+  std::vector<char> node_touched_by_anyone(node_touched_by_me);
+  Parallel::max(node_touched_by_anyone);
 
   const MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
   for (MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
@@ -766,7 +800,49 @@ void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
       libmesh_assert(node);
 
       unsigned int nodeid = node->id();
-      libmesh_assert(node_is_touched[nodeid]);
+      libmesh_assert(!node_touched_by_anyone[nodeid] ||
+                     node_touched_by_me[nodeid]);
+    }
+}
+
+
+
+void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
+{
+  parallel_only();
+  if (libMesh::n_processors() == 1)
+    return;
+
+  std::vector<unsigned char> my_elem_h_state(mesh.max_elem_id(), 255);
+  std::vector<unsigned char> my_elem_p_state(mesh.max_elem_id(), 255);
+
+  const MeshBase::const_element_iterator el_end =
+    mesh.elements_end();
+  for (MeshBase::const_element_iterator el = 
+       mesh.elements_begin(); el != el_end; ++el)
+    {
+      const Elem* elem = *el;
+      libmesh_assert (elem);
+      unsigned int elemid = elem->id();
+
+      my_elem_h_state[elemid] =
+        static_cast<unsigned char>(elem->refinement_flag());
+
+      my_elem_p_state[elemid] =
+        static_cast<unsigned char>(elem->p_refinement_flag());
+    }
+  std::vector<unsigned char> min_elem_h_state(my_elem_h_state);
+  Parallel::min(min_elem_h_state);
+
+  std::vector<unsigned char> min_elem_p_state(my_elem_p_state);
+  Parallel::min(min_elem_p_state);
+
+  for (unsigned int i=0; i!= mesh.max_elem_id(); ++i)
+    {
+      libmesh_assert(my_elem_h_state[i] == 255 ||
+                     my_elem_h_state[i] == min_elem_h_state[i]);
+      libmesh_assert(my_elem_p_state[i] == 255 ||
+                     my_elem_p_state[i] == min_elem_p_state[i]);
     }
 }
 

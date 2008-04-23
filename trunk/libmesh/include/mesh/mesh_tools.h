@@ -270,12 +270,26 @@ namespace MeshTools
 
 #ifdef DEBUG
   /**
-   * A function for verifying correct processor assignment of nodes
+   * A function for verifying that ids and processor assignment of elements
+   * are correctly sorted (monotone increasing)
+   */
+  void libmesh_assert_valid_elem_ids (const MeshBase &mesh);
+
+  /**
+   * A function for verifying that processor assignment of nodes
+   * is correct (each node part of an active element on its processor)
    */
   void libmesh_assert_valid_node_procids (const MeshBase &mesh);
 
   /**
-   * A function for verifying symmetry of neighbor connectivity
+   * A function for verifying that refinement flags on elements
+   * are consistent between processors
+   */
+  void libmesh_assert_valid_refinement_flags (const MeshBase &mesh);
+
+  /**
+   * A function for verifying that neighbor connectivity is correct (each
+   * element is a neighbor of or descendant of a neighbor of its neighbors)
    */
   void libmesh_assert_valid_neighbors (const MeshBase &mesh);
 #endif
