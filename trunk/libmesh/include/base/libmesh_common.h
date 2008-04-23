@@ -192,7 +192,7 @@ namespace libMesh
 // If you want to make sure you are accessing a section of code just
 // stick a here(); in it, for example
 #undef here
-#define here()     do { std::cout << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; } while (0)
+#define here()     do { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; } while (0)
 
 // the stop() macro will stop the code until a SIGCONT signal is recieved.  This is useful, for example, when
 // determining the memory used by a given operation.  A stop() could be instered before and after a questionable
