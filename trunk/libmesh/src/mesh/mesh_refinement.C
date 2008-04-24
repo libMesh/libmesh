@@ -37,6 +37,11 @@
 #include "parallel.h"
 #include "remote_elem.h"
 
+#ifdef DEBUG
+// Some extra validation for ParallelMesh
+#include "mesh_tools.h"
+#include "parallel_mesh.h"
+#endif // DEBUG
 
 
 //-----------------------------------------------------------------
@@ -556,6 +561,11 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   // Finally, the new mesh needs to be prepared for use
   if (coarsening_changed_mesh || refining_changed_mesh)
     {
+#ifdef DEBUG
+      ParallelMesh *pmesh = dynamic_cast<ParallelMesh *>(&_mesh);
+      if (pmesh)
+        pmesh->libmesh_assert_valid_parallel_ids();
+#endif
       _mesh.prepare_for_use ();
       
       return true;
@@ -849,7 +859,8 @@ bool MeshRefinement::make_flags_parallel_consistent()
 #endif
       }
 
-  for (MeshBase::element_iterator it = _mesh.elements_begin();
+  const MeshBase::element_iterator nl_end = _mesh.not_local_elements_end();
+  for (MeshBase::element_iterator it = _mesh.not_local_elements_begin();
        it != end; ++it)
     {
       Elem *elem = *it;
@@ -899,16 +910,6 @@ bool MeshRefinement::make_flags_parallel_consistent()
             static_cast<Elem::RefinementState>(foreign_rflags[i]),
                                 fpflag = 
             static_cast<Elem::RefinementState>(foreign_pflags[i]);
-
-          // Make sure all our flags are for new operations
-          libmesh_assert (frflag != Elem::JUST_REFINED);
-          libmesh_assert (frflag != Elem::JUST_COARSENED);
-          libmesh_assert (rflags[i] != Elem::JUST_REFINED);
-          libmesh_assert (rflags[i] != Elem::JUST_COARSENED);
-          libmesh_assert (fpflag != Elem::JUST_REFINED);
-          libmesh_assert (fpflag != Elem::JUST_COARSENED);
-          libmesh_assert (pflags[i] != Elem::JUST_REFINED);
-          libmesh_assert (pflags[i] != Elem::JUST_COARSENED);
 
           // Make sure none of the foreign flags are more
           // conservative than our own
@@ -1564,15 +1565,32 @@ bool MeshRefinement::_coarsen_elements ()
 
   // If the mesh changed on any processor, it changed globally
   Parallel::max(mesh_changed);
+  // And we may need to update ParallelMesh values reflecting the changes
+  if (mesh_changed)
+    _mesh.update_parallel_id_counts();
+
+  // Node processor ids may need to change if an element of that id
+  // was coarsened away
+  if (mesh_changed && !_mesh.is_serial())
+    {
+      // Update the _new_nodes_map so that processors can
+      // find requested nodes
+      this->update_nodes_map ();
+
+      this->make_nodes_parallel_consistent();
+
+      // Clear the _new_nodes_map
+      this->clear();
   
+#ifdef DEBUG
+      MeshTools::libmesh_assert_valid_node_procids(_mesh);
+#endif
+    }
+
   STOP_LOG ("_coarsen_elements()", "MeshRefinement");
 
   return mesh_changed;
 }
-
-
-
-
 
 
 
@@ -1587,24 +1605,29 @@ bool MeshRefinement::_refine_elements ()
 
   START_LOG ("_refine_elements()", "MeshRefinement");
 
-  // Flag indicating if this call actually changes the mesh
-  bool mesh_changed = false;
+  // Iterate over the elements, counting the elements
+  // flagged for h refinement.
+  unsigned int n_elems_flagged = 0;
 
-  // Get the original number of elements.
-  const unsigned int orig_n_elem = _mesh.n_elem();
+  MeshBase::element_iterator       it  = _mesh.elements_begin();
+  const MeshBase::element_iterator end = _mesh.elements_end();
+
+  for (; it != end; ++it)
+    {
+      Elem* elem = *it;
+      if (elem->refinement_flag() == Elem::REFINE)
+	n_elems_flagged++;
+    }
 
   // Construct a local vector of Elem* which have been
   // previously marked for refinement.  We reserve enough
   // space to allow for every element to be refined.
   std::vector<Elem*> local_copy_of_elements;
-  local_copy_of_elements.reserve(orig_n_elem);
+  local_copy_of_elements.reserve(n_elems_flagged);
 
   // Iterate over the elements, looking for elements
   // flagged for refinement.
-  MeshBase::element_iterator       it  = _mesh.elements_begin();
-  const MeshBase::element_iterator end = _mesh.elements_end();
-
-  for (; it != end; ++it)
+  for (it = _mesh.elements_begin(); it != end; ++it)
     {
       Elem* elem = *it;
       if (elem->refinement_flag() == Elem::REFINE)
@@ -1614,46 +1637,39 @@ bool MeshRefinement::_refine_elements ()
         {
 	  elem->set_p_level(elem->p_level()+1);
 	  elem->set_p_refinement_flag(Elem::JUST_REFINED);
-          mesh_changed = true;
         }
     }
 
-  // The mesh will change if there are elements to refine
-  if(!(local_copy_of_elements.empty()))
-    mesh_changed = true;
-  
-  // Now iterate over the local copy and refine each one.
+  // Now iterate over the local copies and refine each one.
   // This may resize the mesh's internal container and invalidate
   // any existing iterators.
-  // To ensure that the new local nodes we add are given correct
-  // processor ids, with ParallelMesh we'd better be adding elements
-  // in increasing processor id order.  The default element sorting
-  // should get that right.
-#ifdef DEBUG
-  unsigned int proc_id = 0;
-#endif
-  for (unsigned int e=0; e<local_copy_of_elements.size(); ++e)
-    {
-#ifdef DEBUG
-      unsigned int next_proc_id =
-        local_copy_of_elements[e]->processor_id();
-      libmesh_assert (_mesh.is_serial() || next_proc_id >= proc_id);
-      proc_id = next_proc_id;
-#endif
-      local_copy_of_elements[e]->refine(*this);
-    }
+  
+  for (unsigned int e = 0; e != local_copy_of_elements.size(); ++e)
+    local_copy_of_elements[e]->refine(*this);
 
-  if (!_mesh.is_serial())
+  // The mesh changed if there were elements h refined
+  bool mesh_changed = !local_copy_of_elements.empty();
+
+  // If the mesh changed on any processor, it changed globally
+  Parallel::max(mesh_changed);
+
+  // And we may need to update ParallelMesh values reflecting the changes
+  if (mesh_changed)
+    _mesh.update_parallel_id_counts();
+
+  if (mesh_changed && !_mesh.is_serial())
     {
-      this->make_nodes_parallel_consistent();
       this->make_elems_parallel_consistent();
+      this->make_nodes_parallel_consistent();
+#ifdef DEBUG
+      ParallelMesh *pmesh = dynamic_cast<ParallelMesh *>(&_mesh);
+      if (pmesh)
+        pmesh->libmesh_assert_valid_parallel_ids();
+#endif
     }
   
   // Clear the _new_nodes_map and _unused_elements data structures.
   this->clear();
-  
-  // If the mesh changed on any processor, it changed globally
-  Parallel::max(mesh_changed);
   
   STOP_LOG ("_refine_elements()", "MeshRefinement");
 
@@ -1666,6 +1682,46 @@ void MeshRefinement::make_nodes_parallel_consistent()
 {
   // This function must be run on all processors at once
   parallel_only();
+
+  // And we'll need the new_nodes_map to answer other processors'
+  // requests.  It should never be empty unless we don't have any
+  // nodes.
+  libmesh_assert(_mesh.nodes_begin() == _mesh.nodes_end() ||
+                 ~_new_nodes_map.empty());
+
+  // First, correct semilocal nodes' processor ids.  Coarsening may
+  // have left us with nodes which are no longer touched by any
+  // elements of the same processor id, and for DofMap to work
+  // we need to fix that.
+
+  // In the first pass, invalidate processor ids for nodes on active
+  // elements.  We avoid touching subactive-only nodes.
+  MeshBase::element_iterator       e_it  = _mesh.active_elements_begin();
+  const MeshBase::element_iterator e_end = _mesh.active_elements_end();
+  for (; e_it != e_end; ++e_it)
+    {
+      Elem *elem = *e_it;
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        {
+          Node *node = elem->get_node(n);
+          node->invalidate_processor_id();
+        }
+    }
+
+  // In the second pass, find the lowest processor ids on active
+  // elements touching each node, and set the node processor id.
+  for (e_it = _mesh.active_elements_begin(); e_it != e_end; ++e_it)
+    {
+      Elem *elem = *e_it;
+      unsigned int proc_id = elem->processor_id();
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        {
+          Node *node = elem->get_node(n);
+          if (node->processor_id() == DofObject::invalid_processor_id ||
+              node->processor_id() > proc_id)
+            node->processor_id() = proc_id;
+        }
+    }
 
   // Local nodes in the _new_nodes_map have authoritative ids
   // and correct processor ids, nodes touching local elements
