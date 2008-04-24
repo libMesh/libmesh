@@ -30,10 +30,11 @@
 #include <algorithm> // for std::sort
 
 // Local includes
+#include "elem.h"
 #include "error_vector.h"
 #include "mesh_refinement.h"
 #include "mesh_base.h"
-#include "elem.h"
+#include "parallel.h"
 
 
 
@@ -89,17 +90,21 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
   }
 
   // We need to loop over all active elements to find the minimum 
-  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
+  MeshBase::element_iterator       el_it  =
+    _mesh.active_local_elements_begin();
+  const MeshBase::element_iterator el_end =
+    _mesh.active_local_elements_end(); 
 
-  for (; elem_it != elem_end; ++elem_it)
+  for (; el_it != el_end; ++el_it)
   {
-    const unsigned int id  = (*elem_it)->id();
+    const unsigned int id  = (*el_it)->id();
     libmesh_assert (id < error_per_cell.size());
 
     error_max = std::max (error_max, error_per_cell[id]);
     error_min = std::min (error_min, error_per_cell[id]);
   }
+  Parallel::max(error_max);
+  Parallel::min(error_min);
   
   // Compute the cutoff values for coarsening and refinement
   const Real error_delta = (error_max - error_min);
@@ -123,11 +128,13 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
   // Loop over the elements and flag them for coarsening or
   // refinement based on the element error
 
-  elem_it  = _mesh.active_elements_begin();
-
-  for (; elem_it != elem_end; ++elem_it)
+  MeshBase::element_iterator       e_it  =
+    _mesh.active_elements_begin();
+  const MeshBase::element_iterator e_end =
+    _mesh.active_elements_end(); 
+  for (; e_it != e_end; ++e_it)
   {
-    Elem* elem             = *elem_it;
+    Elem* elem             = *e_it;
     const unsigned int id  = elem->id();
 
     libmesh_assert (id < error_per_cell.size());
@@ -260,6 +267,15 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   std::vector<std::pair<float, unsigned int> > sorted_error;
 
   sorted_error.reserve (n_active_elem);
+
+  // FIXME - this won't work on a non-serialized mesh yet
+  if (!_mesh.is_serial())
+    {
+      if (libMesh::processor_id() == 0)
+        std::cerr << "flag_elements_by_nelem_target does not yet "
+                  << "work on a parallel mesh." << std::endl;
+      error();
+    }
 
   MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
@@ -395,6 +411,15 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
 						     const Real coarsen_frac,
 						     const unsigned int max_l)
 {
+  // FIXME - this won't work on a non-serialized mesh yet
+  if (!_mesh.is_serial())
+    {
+      if (libMesh::processor_id() == 0)
+        std::cerr << "flag_elements_by_elem_fraction does not yet "
+                  << "work on a parallel mesh." << std::endl;
+      error();
+    }
+
   // The function arguments are currently just there for
   // backwards_compatibility
   if (!_use_member_parameters)
@@ -528,6 +553,15 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
 						   const Real coarsen_frac,
 						   const unsigned int max_l)
 {
+  // FIXME - this won't work on a non-serialized mesh yet
+  if (!_mesh.is_serial())
+    {
+      if (libMesh::processor_id() == 0)
+        std::cerr << "flag_elements_by_mean_stddev does not yet "
+                  << "work on a parallel mesh." << std::endl;
+      error();
+    }
+
   // The function arguments are currently just there for
   // backwards_compatibility
   if (!_use_member_parameters)
