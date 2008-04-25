@@ -393,6 +393,14 @@ public:
    */
   unsigned char& node_level_mismatch_limit();
 
+  /**
+   * Copy processor_ids and ids on ghost nodes from their
+   * local processors.  This is an internal function of MeshRefinement
+   * which turns out to be useful for other code which wants to add
+   * nodes to a distributed mesh.
+   */
+  void make_nodes_parallel_consistent ();
+
 private:
 
   /**
@@ -596,12 +604,6 @@ private:
    */
   bool make_flags_parallel_consistent ();
   
-  /**
-   * Copy processor_ids and ids on ghost nodes from their
-   * local processors.
-   */
-  void make_nodes_parallel_consistent ();
-
   /**
    * Copy ids on ghost elements from their local processors.
    */
