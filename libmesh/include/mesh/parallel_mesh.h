@@ -144,7 +144,6 @@ class ParallelMesh : public UnstructuredMesh
    * Deletes all nonlocal elements of the mesh
    * except for "ghosts" which touch a local element, and deletes
    * all nodes which are not part of a local or ghost element
-   *
    */
   virtual void delete_remote_elements();
 
