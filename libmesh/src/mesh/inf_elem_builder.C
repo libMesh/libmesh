@@ -36,6 +36,9 @@
 #include "cell_inf_hex18.h"
 #include "mesh_base.h"
 
+#ifdef DEBUG
+#include "parallel_mesh.h"
+#endif
 
 const Point InfElemBuilder::build_inf_elem(bool be_verbose)
 {
@@ -280,9 +283,6 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 				    std::set< std::pair<unsigned int,
 				    unsigned int> >* inner_faces)
 {
-  // This isn't parallelized yet
-  libmesh_assert (_mesh.is_serial());
-
   if (be_verbose)
     {
 #ifdef DEBUG
@@ -492,15 +492,30 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
   // outer_nodes maps onodes to their duplicates
   std::map<unsigned int, Node *> outer_nodes;
 
+  // We may need to pick our own object ids in parallel
+  unsigned int old_max_node_id = _mesh.max_node_id();
+  unsigned int old_max_elem_id = _mesh.max_elem_id();
 
   // for each boundary node, add an outer_node with 
   // double distance from origin.
-  unsigned int node_id = _mesh.max_node_id();
   std::set<unsigned int>::iterator on_it = onodes.begin();
   for( ; on_it != onodes.end(); ++on_it)
     {
       Point p = (Point(this->_mesh.point(*on_it)) * 2.) - origin;
-      outer_nodes[*on_it]=this->_mesh.add_point(p, node_id++);
+      if (_mesh.is_serial())
+        {
+          // Add with a default id in serial
+          outer_nodes[*on_it]=this->_mesh.add_point(p);
+        }
+      else
+        {
+          // Pick a unique id in parallel
+          Node &bnode = _mesh.node(*on_it);
+          unsigned int new_id = bnode.id() + old_max_node_id;
+          outer_nodes[*on_it] = 
+            this->_mesh.add_point(p, new_id,
+                                  bnode.processor_id());
+        }
     }
 
 
@@ -577,6 +592,14 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 	    continue;
 	}
 
+        // In parallel, assign unique ids to the new element
+        if (!_mesh.is_serial())
+          {
+            Elem *belem = _mesh.elem(p.first);
+            el->processor_id() = belem->processor_id();
+            // We'd better not have elements with more than 6 sides
+            el->set_id (belem->id() * 6 + p.second + old_max_elem_id);
+          }
 
 	// assign vertices to the new infinite element
 	const unsigned int n_base_vertices = side->n_vertices();
@@ -612,6 +635,10 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 
 
 #ifdef DEBUG
+  ParallelMesh *pmesh = dynamic_cast<ParallelMesh *>(&this->_mesh);
+  if (pmesh)
+    pmesh->libmesh_assert_valid_parallel_ids();
+
   if (be_verbose)
     std::cout << "  added "
 	      << this->_mesh.n_elem() - n_conventional_elem
