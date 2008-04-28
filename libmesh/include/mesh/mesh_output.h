@@ -148,9 +148,13 @@ MeshOutput<MT>::MeshOutput (const MT& obj, const bool is_parallel_format) :
 {
   if (!_is_parallel_format && !this->mesh().is_serial())
     {
-      std::cerr << "ERROR:  This I/O operation is only supported for meshes which have been serialized!"
-		<< std::endl;
-      libmesh_error();
+      if (libMesh::processor_id() == 0)
+	{
+          std::cerr << "WARNING:  This I/O operation may only be supported for meshes which have been serialized!"
+		    << std::endl;
+          here();
+        }
+//      libmesh_error();
     }
 }
 
