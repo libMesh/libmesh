@@ -539,7 +539,14 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 
   // Make sure our nodes are contiguous and serialized
   libmesh_assert (mesh.n_nodes() == mesh.max_node_id());
-  libmesh_assert (mesh.is_serial());
+  // libmesh_assert (mesh.is_serial());
+  if (!mesh.is_serial())
+    {
+      if (libMesh::processor_id() == 0)
+        std::cerr << "Error: GMVIO cannot yet write a ParallelMesh solution"
+                  << std::endl;
+      return;
+    }
 
   unsigned int mesh_max_p_level = 0;
   
