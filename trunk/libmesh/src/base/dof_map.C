@@ -616,10 +616,6 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
   libmesh_assert (mesh.is_prepared());
 
-#ifdef DEBUG
-  MeshTools::libmesh_assert_valid_refinement_flags(mesh);
-#endif
-
   const unsigned int proc_id = libMesh::processor_id();
   const unsigned int n_proc  = libMesh::n_processors();
   const unsigned int n_vars  = this->n_variables();
