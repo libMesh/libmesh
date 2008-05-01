@@ -25,14 +25,16 @@
 #include <map>
 
 // Local includes
-#include "mesh_tools.h"
-#include "mesh_modification.h"
-#include "unstructured_mesh.h"
+#include "boundary_info.h"
 #include "face_tri3.h"
 #include "face_tri6.h"
 #include "libmesh_logging.h"
-#include "boundary_info.h"
+#include "mesh_modification.h"
+#include "mesh_refinement.h"
+#include "mesh_tools.h"
+#include "parallel.h"
 #include "string_to_enum.h"
+#include "unstructured_mesh.h"
 
 
 // ------------------------------------------------------------
@@ -325,6 +327,9 @@ void UnstructuredMesh::all_first_order ()
 
 void UnstructuredMesh::all_second_order (const bool full_ordered)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   /*
    * when the mesh is not prepared,
    * at least renumber the nodes and 
@@ -335,15 +340,26 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
     this->renumber_nodes_and_elements ();
 
   /*
-   * If the mesh is empty or already second order
+   * If the mesh is empty
    * then we have nothing to do
    */
-  if (!this->n_elem() ||
-      (*(this->elements_begin()))->default_order() != FIRST)
+  if (!this->n_elem())
     return;
-
-  // does this work also in parallel?
-  // libmesh_assert (this->n_processors() == 1);
+ 
+  /*
+   * If the mesh is already second order
+   * then we have nothing to do.
+   * We have to test for this in a round-about way to avoid
+   * a bug on distributed parallel meshes with more processors
+   * than elements.
+   */
+  bool already_second_order = false;
+  if (this->elements_begin() != this->elements_end() &&
+      (*(this->elements_begin()))->default_order() != FIRST)
+    already_second_order = true;
+  Parallel::max(already_second_order);
+  if (already_second_order)
+    return;
 
   START_LOG("all_second_order()", "Mesh");
 
@@ -411,7 +427,6 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    * create and destroy the vector.
    */
   std::vector<unsigned int> adjacent_vertices_ids;
-
 
   /**
    * Loop over the low-ordered elements in the _elements vector.
@@ -516,8 +531,12 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
 	      new_location /= static_cast<Real>(n_adjacent_vertices);
 	      
-	      // add the new point to the mesh
-	      Node* so_node = this->add_point (new_location);
+	      /* Add the new point to the mesh, giving it a globally
+               * well-defined processor id.
+	       */
+	      Node* so_node = this->add_point
+                (new_location, DofObject::invalid_id,
+                this->node(adjacent_vertices_ids[0]).processor_id());
 
 	      /* 
 	       * insert the new node with its defining vertex
@@ -564,15 +583,24 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * the first-order element.
        */
       so_elem->set_id(lo_elem->id());
+      so_elem->processor_id() = lo_elem->processor_id();
       this->insert_elem(so_elem);
     }
-
 
   // we can clear the map
   adj_vertices_to_so_nodes.clear();
 
 
   STOP_LOG("all_second_order()", "Mesh");
+
+  // In a ParallelMesh our ghost node processor ids may be bad and
+  // the ids of nodes touching remote elements may be inconsistent.
+  // Fix them.
+  if (!this->is_serial())
+    {
+      MeshRefinement mesh_refinement(*this);
+      mesh_refinement.make_nodes_parallel_consistent();
+    }
 
   // renumber nodes, elements etc
   this->prepare_for_use();
