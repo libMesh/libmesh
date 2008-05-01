@@ -29,8 +29,9 @@
 #include "face_tri3.h"
 #include "face_tri6.h"
 #include "libmesh_logging.h"
+#include "location_maps.h"
+#include "mesh_communication.h"
 #include "mesh_modification.h"
-#include "mesh_refinement.h"
 #include "mesh_tools.h"
 #include "parallel.h"
 #include "string_to_enum.h"
@@ -598,8 +599,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   // Fix them.
   if (!this->is_serial())
     {
-      MeshRefinement mesh_refinement(*this);
-      mesh_refinement.make_nodes_parallel_consistent();
+      LocationMap<Node> loc_map;
+      MeshCommunication().make_nodes_parallel_consistent
+        (*this, loc_map);
     }
 
   // renumber nodes, elements etc

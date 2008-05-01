@@ -39,6 +39,7 @@ class SerialMesh;
 class ParallelMesh;
 class Sphere;
 class Elem;
+template <typename T> class LocationMap;
 
 /**
  * Utility functions for operations on a \p Mesh object.  Here is where
@@ -267,6 +268,19 @@ namespace MeshTools
     * the side the hanging node is on.
     */
    void find_hanging_nodes_and_parents(const MeshBase &mesh, std::map<unsigned int, std::vector<unsigned int> > &hanging_nodes);
+
+  /**
+   * Changes the processor ids on each node so be the same as the id of the
+   * lowest element touching that node.
+   *
+   * This corrects "orphaned" processor ids that may occur from element
+   * coarsening.
+   *
+   * On a distributed mesh, this function must be called in parallel
+   * to sync everyone's corrected processor ids on ghost nodes.
+   */
+  void correct_node_proc_ids(MeshBase &, LocationMap<Node> &);
+
 
 #ifdef DEBUG
   /**

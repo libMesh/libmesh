@@ -380,40 +380,6 @@ public:
    */
   unsigned char& node_level_mismatch_limit();
 
-  /**
-   * Assuming all ids on local nodes are globally unique, and
-   * assuming all processor ids are parallel consistent, this function makes
-   * all other ids parallel consistent.
-   */
-  void make_node_ids_parallel_consistent ();
-
-  /**
-   * Changes the processor ids on each node so be the same as the id of the
-   * lowest element touching that node.
-   *
-   * This corrects "orphaned" processor ids that may occur from element
-   * coarsening.
-   *
-   * On a distributed mesh, this function must be called in parallel
-   * to sync everyone's corrected processor ids on ghost nodes.
-   */
-  void correct_node_proc_ids();
-
-  /**
-   * Assuming all processor ids on nodes touching local elements
-   * are parallel consistent, this function makes all other processor ids
-   * parallel consistent as well.
-   */
-  void make_node_proc_ids_parallel_consistent ();
-
-  /**
-   * Copy processor_ids and ids on ghost nodes from their
-   * local processors.  This is an internal function of MeshRefinement
-   * which turns out to be useful for other code which wants to add
-   * nodes to a distributed mesh.
-   */
-  void make_nodes_parallel_consistent ();
-
 private:
 
   /**
@@ -617,11 +583,6 @@ private:
    */
   bool make_flags_parallel_consistent ();
   
-  /**
-   * Copy ids on ghost elements from their local processors.
-   */
-  void make_elems_parallel_consistent ();
-
   /**
    * Data structure that holds the new nodes information.
    */

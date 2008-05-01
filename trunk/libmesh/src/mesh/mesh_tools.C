@@ -25,15 +25,16 @@
 
 // Local includes
 #include "elem.h"
-#include "mesh_tools.h"
-#include "mesh_base.h"
-#include "parallel.h"
-#include "sphere.h"
-#include "serial_mesh.h"
-#include "parallel_mesh.h"
-#include "mesh_communication.h"
 #include "elem_range.h"
+#include "location_maps.h"
+#include "mesh_base.h"
+#include "mesh_communication.h"
+#include "mesh_tools.h"
 #include "node_range.h"
+#include "parallel.h"
+#include "parallel_mesh.h"
+#include "serial_mesh.h"
+#include "sphere.h"
 #include "threads.h"
 
 
@@ -734,6 +735,61 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<un
 
 
 
+void MeshTools::correct_node_proc_ids
+  (MeshBase &mesh,
+   LocationMap<Node> &loc_map)
+{
+  // This function must be run on all processors at once
+  parallel_only();
+
+  // We'll need the new_nodes_map to answer other processors'
+  // requests.  It should never be empty unless we don't have any
+  // nodes.
+  libmesh_assert(mesh.nodes_begin() == mesh.nodes_end() ||
+                 !loc_map.empty());
+
+  // Fix all nodes' processor ids.  Coarsening may have left us with
+  // nodes which are no longer touched by any elements of the same
+  // processor id, and for DofMap to work we need to fix that.
+
+  // In the first pass, invalidate processor ids for nodes on active
+  // elements.  We avoid touching subactive-only nodes.
+  MeshBase::element_iterator       e_it  = mesh.active_elements_begin();
+  const MeshBase::element_iterator e_end = mesh.active_elements_end();
+  for (; e_it != e_end; ++e_it)
+    {
+      Elem *elem = *e_it;
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        {
+          Node *node = elem->get_node(n);
+          node->invalidate_processor_id();
+        }
+    }
+
+  // In the second pass, find the lowest processor ids on active
+  // elements touching each node, and set the node processor id.
+  for (e_it = mesh.active_elements_begin(); e_it != e_end; ++e_it)
+    {
+      Elem *elem = *e_it;
+      unsigned int proc_id = elem->processor_id();
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        {
+          Node *node = elem->get_node(n);
+          if (node->processor_id() == DofObject::invalid_processor_id ||
+              node->processor_id() > proc_id)
+            node->processor_id() = proc_id;
+        }
+    }
+
+  // Those two passes will correct every node that touches a local
+  // element, but we can't be sure about nodes touching remote
+  // elements.  Fix those now.
+  MeshCommunication().make_node_proc_ids_parallel_consistent
+    (mesh, loc_map);
+}
+
+
+
 #ifdef DEBUG
 void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
 {
@@ -805,6 +861,7 @@ void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
 
 
 
+#ifdef ENABLE_AMR
 void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
 {
   parallel_only();
@@ -843,6 +900,11 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
                      my_elem_p_state[i] == min_elem_p_state[i]);
     }
 }
+#else
+void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &)
+{
+}
+#endif // ENABLE_AMR
 
 
 

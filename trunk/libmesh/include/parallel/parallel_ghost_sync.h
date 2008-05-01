@@ -306,6 +306,9 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
                                     const Iterator& range_end,
                                     SyncFunctor&    sync)
 {
+  // If there's no refined elements, there's nothing to sync
+#ifdef ENABLE_AMR
+
   // This function must be run on all processors at once
   parallel_only();
 
@@ -399,6 +402,7 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
       // Let the user process the results
       sync.act_on_data(requested_objs_id[procup], received_data);
     }
+#endif // ENABLE_AMR
 }
 
 

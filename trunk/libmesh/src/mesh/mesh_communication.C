@@ -22,16 +22,18 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
+#include "boundary_info.h"
+#include "elem.h"
 #include "libmesh_config.h"
 #include "libmesh_common.h"
 #include "libmesh_logging.h"
+#include "location_maps.h"
 #include "mesh_base.h"
-#include "parallel_mesh.h"
-#include "mesh_tools.h"
-#include "boundary_info.h"
 #include "mesh_communication.h"
+#include "mesh_tools.h"
 #include "parallel.h"
-#include "elem.h"
+#include "parallel_mesh.h"
+#include "parallel_ghost_sync.h"
 
 
 
@@ -1672,7 +1674,202 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
 
   STOP_LOG  ("allgather_bcs()","MeshCommunication");
 }
+
+
 #endif // HAVE_MPI
+
+
+
+// Functor for make_elems_parallel_consistent and
+// make_node_ids_parallel_consistent
+namespace {
+
+struct SyncIds
+{
+typedef unsigned int datum;
+typedef void (MeshBase::*renumber_obj)(unsigned int, unsigned int);
+
+SyncIds(MeshBase &_mesh, renumber_obj _renumberer) :
+  mesh(_mesh),
+  renumber(_renumberer) {}
+
+MeshBase &mesh;
+renumber_obj renumber;
+// renumber_obj &renumber;
+
+// Find the id of each requested DofObject -
+// sync_dofobject_data_by_xyz already did the work for us
+void gather_data (const std::vector<unsigned int>& ids,
+                  std::vector<datum>& ids_out)
+{
+  ids_out = ids;
+}
+
+void act_on_data (const std::vector<unsigned int>& old_ids,
+                  std::vector<datum>& new_ids)
+{
+  for (unsigned int i=0; i != old_ids.size(); ++i)
+    if (old_ids[i] != new_ids[i])
+      (mesh.*renumber)(old_ids[i], new_ids[i]);
+}
+};
+}
+
+
+
+void MeshCommunication::make_node_ids_parallel_consistent
+  (MeshBase &mesh,
+   LocationMap<Node> &loc_map)
+{
+  // This function must be run on all processors at once
+  parallel_only();
+
+  START_LOG ("make_node_ids_parallel_consistent()", "MeshCommunication");
+
+  SyncIds syncids(mesh, &MeshBase::renumber_node);
+  Parallel::sync_dofobject_data_by_xyz
+    (mesh.nodes_begin(), mesh.nodes_end(),
+     loc_map, syncids);
+
+  STOP_LOG ("make_node_ids_parallel_consistent()", "MeshCommunication");
+}
+
+
+
+void MeshCommunication::make_elems_parallel_consistent(MeshBase &mesh)
+{
+  // This function must be run on all processors at once
+  parallel_only();
+
+  START_LOG ("make_elems_parallel_consistent()", "MeshCommunication");
+
+  SyncIds syncids(mesh, &MeshBase::renumber_elem);
+  Parallel::sync_element_data_by_parent_id
+    (mesh, mesh.active_elements_begin(),
+     mesh.active_elements_end(), syncids);
+
+  STOP_LOG ("make_elems_parallel_consistent()", "MeshCommunication");
+}
+
+
+
+// Functors for make_node_proc_ids_parallel_consistent
+namespace {
+
+struct SyncProcIds
+{
+typedef unsigned int datum;
+
+SyncProcIds(MeshBase &_mesh) : mesh(_mesh) {}
+
+MeshBase &mesh;
+
+void gather_data (const std::vector<unsigned int>& ids,
+                  std::vector<datum>& data)
+{
+  // Find the processor id of each requested node
+  data.resize(ids.size());
+
+  for (unsigned int i=0; i != ids.size(); ++i)
+    {
+      // Look for this point in the mesh
+      Node *node = mesh.node_ptr(ids[i]);
+
+      // We'd better find every node we're asked for
+      libmesh_assert (node);
+
+      // Return the node's correct processor id,
+      data[i] = node->processor_id();
+    }
+}
+
+void act_on_data (const std::vector<unsigned int>& ids,
+                  std::vector<datum> proc_ids)
+{
+  // Set the ghost node processor ids we've now been informed of
+  for (unsigned int i=0; i != ids.size(); ++i)
+    {
+      Node *node = mesh.node_ptr(ids[i]);
+      node->processor_id() = proc_ids[i];
+    }
+}
+};
+}
+
+
+
+void MeshCommunication::make_node_proc_ids_parallel_consistent
+  (MeshBase& mesh,
+   LocationMap<Node>& loc_map)
+{
+  // This function must be run on all processors at once
+  parallel_only();
+
+  // When this function is called, each section of a parallelized mesh
+  // should be in the following state:
+  //
+  // All nodes should have the exact same physical location on every
+  // processor where they exist.
+  //
+  // Local nodes should have unique authoritative ids,
+  // and processor ids consistent with all processors which own
+  // an element touching them.
+  //
+  // Ghost nodes touching local elements should have processor ids
+  // consistent with all processors which own an element touching
+  // them.
+  
+  SyncProcIds sync(mesh);
+  Parallel::sync_dofobject_data_by_xyz
+    (mesh.nodes_begin(), mesh.nodes_end(), loc_map, sync);
+}
+
+
+
+void MeshCommunication::make_nodes_parallel_consistent
+  (MeshBase &mesh,
+   LocationMap<Node> &loc_map)
+{
+  // This function must be run on all processors at once
+  parallel_only();
+
+  // Create the loc_map if it hasn't been done already
+  bool need_map_update = (mesh.nodes_begin() != mesh.nodes_end() && 
+                          loc_map.empty());
+  Parallel::max(need_map_update);
+
+  if (need_map_update)
+    loc_map.init(mesh);
+
+  // When this function is called, each section of a parallelized mesh
+  // should be in the following state:
+  //
+  // All nodes should have the exact same physical location on every
+  // processor where they exist.
+  //
+  // Local nodes should have unique authoritative ids,
+  // and processor ids consistent with all processors which own
+  // an element touching them.
+  //
+  // Ghost nodes touching local elements should have processor ids
+  // consistent with all processors which own an element touching
+  // them.
+  //
+  // Ghost nodes should have ids which are either already correct
+  // or which are in the "unpartitioned" id space.
+
+  // First, let's sync up processor ids.  Some of these processor ids
+  // may be "wrong" from coarsening, but they're right in the sense
+  // that they'll tell us who has the authoritative dofobject ids for
+  // each node.
+  this->make_node_proc_ids_parallel_consistent(mesh, loc_map);
+
+  // Second, sync up dofobject ids.
+  this->make_node_ids_parallel_consistent(mesh, loc_map);
+
+  // Finally, correct the processor ids to make DofMap happy
+  MeshTools::correct_node_proc_ids(mesh, loc_map);
+}
 
 
 
