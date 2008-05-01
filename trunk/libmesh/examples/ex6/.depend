@@ -7,7 +7,10 @@ ex6.$(obj-suffix):\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
     ../../include/base/libmesh_config.h\
+    ../../include/base/libmesh_exceptions.h\
+    ../../include/base/libmesh_logging.h\
     ../../include/base/multi_predicates.h\
+    ../../include/base/print_trace.h\
     ../../include/base/reference_counted_object.h\
     ../../include/base/reference_counter.h\
     ../../include/base/single_predicates.h\
@@ -17,6 +20,7 @@ ex6.$(obj-suffix):\
     ../../include/enums/enum_fe_family.h\
     ../../include/enums/enum_inf_map_type.h\
     ../../include/enums/enum_io_package.h\
+    ../../include/enums/enum_norm_type.h\
     ../../include/enums/enum_order.h\
     ../../include/enums/enum_quadrature_type.h\
     ../../include/enums/enum_solver_package.h\
@@ -26,9 +30,11 @@ ex6.$(obj-suffix):\
     ../../include/fe/fe_type.h\
     ../../include/fe/inf_fe.h\
     ../../include/geom/elem.h\
+    ../../include/geom/elem_range.h\
     ../../include/geom/elem_type.h\
     ../../include/geom/node.h\
     ../../include/geom/point.h\
+    ../../include/geom/stored_range.h\
     ../../include/mesh/gmv_io.h\
     ../../include/mesh/inf_elem_builder.h\
     ../../include/mesh/mesh.h\
@@ -49,6 +55,8 @@ ex6.$(obj-suffix):\
     ../../include/numerics/type_tensor.h\
     ../../include/numerics/type_vector.h\
     ../../include/numerics/vector_value.h\
+    ../../include/parallel/threads.h\
+    ../../include/parallel/threads_allocators.h\
     ../../include/quadrature/quadrature.h\
     ../../include/quadrature/quadrature_gauss.h\
     ../../include/solvers/equation_systems.h\
@@ -59,7 +67,9 @@ ex6.$(obj-suffix):\
     ../../include/solvers/newmark_system.h\
     ../../include/solvers/steady_system.h\
     ../../include/solvers/system.h\
+    ../../include/solvers/system_norm.h\
     ../../include/solvers/transient_system.h\
+    ../../include/utils/compare_types.h\
     ../../include/utils/mapvector.h\
     ../../include/utils/o_string_stream.h\
     ../../include/utils/parameters.h\

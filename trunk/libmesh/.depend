@@ -30,6 +30,7 @@ src/base/dof_map.$(obj-suffix):\
     include/geom/point.h\
     include/geom/stored_range.h\
     include/mesh/mesh_base.h\
+    include/mesh/mesh_tools.h\
     include/numerics/coupling_matrix.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
@@ -3163,6 +3164,7 @@ src/geom/elem_refinement.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
+    include/utils/location_maps.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/geom/elem_type.$(obj-suffix):\
@@ -3986,9 +3988,12 @@ src/mesh/inf_elem_builder.$(obj-suffix):\
     include/mesh/inf_elem_builder.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_tools.h\
+    include/mesh/parallel_mesh.h\
+    include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
+    include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/legacy_xdr_io.$(obj-suffix):\
@@ -4368,6 +4373,7 @@ src/mesh/mesh_generation.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
+    include/utils/location_maps.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/mesh_modification.$(obj-suffix):\
@@ -4401,11 +4407,14 @@ src/mesh/mesh_modification.$(obj-suffix):\
     include/mesh/boundary_info.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_modification.h\
+    include/mesh/mesh_refinement.h\
     include/mesh/mesh_tools.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
+    include/parallel/parallel.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
+    include/utils/location_maps.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/string_to_enum.h
@@ -4487,11 +4496,17 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     include/mesh/boundary_info.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_refinement.h\
+    include/mesh/mesh_tools.h\
+    include/mesh/parallel_mesh.h\
+    include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
+    include/parallel/parallel_ghost_sync.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
     include/utils/error_vector.h\
+    include/utils/location_maps.h\
+    include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/statistics.h
@@ -4522,9 +4537,11 @@ src/mesh/mesh_refinement_flagging.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_refinement.h\
     include/numerics/type_vector.h\
+    include/parallel/parallel.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
     include/utils/error_vector.h\
+    include/utils/location_maps.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/statistics.h
@@ -4559,6 +4576,7 @@ src/mesh/mesh_refinement_smoothing.$(obj-suffix):\
     include/parallel/parallel.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
+    include/utils/location_maps.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/mesh/mesh_smoother.$(obj-suffix):\
@@ -6514,6 +6532,7 @@ src/numerics/uniform_refinement_estimator.$(obj-suffix):\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
     include/utils/error_vector.h\
+    include/utils/location_maps.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
@@ -7626,6 +7645,7 @@ src/solvers/equation_systems.$(obj-suffix):\
     include/solvers/system_norm.h\
     include/solvers/transient_system.h\
     include/utils/compare_types.h\
+    include/utils/location_maps.h\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
     include/utils/perf_log.h
@@ -8804,6 +8824,38 @@ src/utils/error_vector.$(obj-suffix):\
     include/utils/parameters.h\
     include/utils/perf_log.h\
     include/utils/statistics.h
+src/utils/location_maps.$(obj-suffix):\
+    src/utils/location_maps.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/geom/elem.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/mesh/mesh_base.h\
+    include/numerics/type_vector.h\
+    include/parallel/parallel.h\
+    include/parallel/threads.h\
+    include/utils/compare_types.h\
+    include/utils/location_maps.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/utils/number_lookups.$(obj-suffix):\
     src/utils/number_lookups.C\
     include/utils/number_lookups.h

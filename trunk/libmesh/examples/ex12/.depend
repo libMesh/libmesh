@@ -6,7 +6,10 @@ ex12.$(obj-suffix):\
     ../../include/base/libmesh_base.h\
     ../../include/base/libmesh_common.h\
     ../../include/base/libmesh_config.h\
+    ../../include/base/libmesh_exceptions.h\
+    ../../include/base/libmesh_logging.h\
     ../../include/base/multi_predicates.h\
+    ../../include/base/print_trace.h\
     ../../include/base/reference_counted_object.h\
     ../../include/base/reference_counter.h\
     ../../include/base/single_predicates.h\
@@ -33,6 +36,8 @@ ex12.$(obj-suffix):\
     ../../include/mesh/unstructured_mesh.h\
     ../../include/mesh/unv_io.h\
     ../../include/numerics/type_vector.h\
+    ../../include/parallel/threads.h\
+    ../../include/utils/compare_types.h\
     ../../include/utils/mapvector.h\
     ../../include/utils/o_string_stream.h\
     ../../include/utils/perf_log.h
