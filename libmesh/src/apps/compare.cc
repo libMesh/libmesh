@@ -31,7 +31,7 @@ void usage(char *progName)
   std::string baseName;
   static std::string helpList =
     "usage:\n"
-    "	%s [options] ...\n"
+    "        %s [options] ...\n"
     "\n"
     "options:\n"
     "    -d <dim>                      <dim>-dimensional mesh\n"
@@ -78,12 +78,12 @@ void usage(char *progName)
 
 
 void process_cmd_line(int argc, char **argv,
-		      std::vector<std::string>& names,
-		      unsigned int& dim,
-		      double& threshold,
-		      libMeshEnums::XdrMODE& format,
-		      bool& verbose,
-		      bool& quiet)
+                      std::vector<std::string>& names,
+                      unsigned int& dim,
+                      double& threshold,
+                      libMeshEnums::XdrMODE& format,
+                      bool& verbose,
+                      bool& quiet)
 {
   char optionStr[] =
     "d:m:l:r:t:abvq?h";
@@ -100,142 +100,142 @@ void process_cmd_line(int argc, char **argv,
   while ((opt = getopt(argc, argv, optionStr)) != -1)
     {
       switch (opt)
-	{
-	  
-	  /**
-	   * Get mesh file name
-	   */
-	case 'm':
-	  {
-	    if (names.empty())
-	      names.push_back(optarg);
-	    else
-	      {
-		std::cout << "ERROR: Mesh file name must preceed left file name!"
-			  << std::endl;
-		exit(1);
-	      }
-	    break;
-	  }
+        {
+          
+          /**
+           * Get mesh file name
+           */
+        case 'm':
+          {
+            if (names.empty())
+              names.push_back(optarg);
+            else
+              {
+                std::cout << "ERROR: Mesh file name must preceed left file name!"
+                          << std::endl;
+                exit(1);
+              }
+            break;
+          }
 
-	  /**
-	   * Get the mesh dimension
-	   */
-	case 'd':
-	  {
-	    dim = atoi(optarg);
-	    break;
-	  }
-	  
-	  /**
-	   * Get left file name
-	   */
-	case 'l':
-	  {
-	    if (!left_name_set)
-	      {
-	        names.push_back(optarg);
-		left_name_set = true;
-	      }
-	    else
-	      {
-		std::cout << "ERROR: Mesh file name must preceed right file name!"
-			  << std::endl;
-		exit(1);
-	      }
-	    break;
-	  }
-	  
-	  /**
-	   * Get right file name
-	   */
-	case 'r':
-	  {
-	    if ((!names.empty()) && (left_name_set))
-	      names.push_back(optarg);
-	    else
-	      {
-		std::cout << "ERROR: Mesh file name and left file name must preceed "
-			  << "right file name!"
-			  << std::endl;
-		exit(1);
-	      }
-	    break;
-	  }
+          /**
+           * Get the mesh dimension
+           */
+        case 'd':
+          {
+            dim = atoi(optarg);
+            break;
+          }
+          
+          /**
+           * Get left file name
+           */
+        case 'l':
+          {
+            if (!left_name_set)
+              {
+                names.push_back(optarg);
+                left_name_set = true;
+              }
+            else
+              {
+                std::cout << "ERROR: Mesh file name must preceed right file name!"
+                          << std::endl;
+                exit(1);
+              }
+            break;
+          }
+          
+          /**
+           * Get right file name
+           */
+        case 'r':
+          {
+            if ((!names.empty()) && (left_name_set))
+              names.push_back(optarg);
+            else
+              {
+                std::cout << "ERROR: Mesh file name and left file name must preceed "
+                          << "right file name!"
+                          << std::endl;
+                exit(1);
+              }
+            break;
+          }
 
-	  /**
-	   * Get the comparison threshold
-	   */
-	case 't':
-	  {
-	    threshold = atof(optarg);
-	    break;
-	  }
+          /**
+           * Get the comparison threshold
+           */
+        case 't':
+          {
+            threshold = atof(optarg);
+            break;
+          }
 
-	  /**
-	   * Use ascii format
-	   */
-	case 'a':
-	  {
-	    if (format_set)
-	      {
-		std::cout << "ERROR: Equation system file format already set!"
-			  << std::endl;
-		exit(1);
-	      }
-	    else
-	      {
-		format = libMeshEnums::READ;
-		format_set = true;
-	      }
-	    break;
-	  }
-	  
-	  /**
-	   * Use binary format
-	   */
-	case 'b':
-	  {
-	    if (format_set)
-	      {
-		std::cout << "ERROR: Equation system file format already set!"
-			  << std::endl;
-		exit(1);
-	      }
-	    else
-	      {
-	        format = libMeshEnums::DECODE;
-		format_set = true;
-	      }
-	    break;
-	  }
-	  
-	  	  
-	  /**
-	   * Be verbose
-	   */
-	case 'v':
-	  {
-	    verbose = true;
-	    break;
-	  }
-	  
-	  /**
-	   * Be totally quiet, no matter what -v says
-	   */
-	case 'q':
-	  {
-	    quiet = true;
-	    break;
-	  }
-	  
-	case 'h':
-	case '?':
-	  usage(argv[0]);
-	  
-	default:
-	  return;
-	}
+          /**
+           * Use ascii format
+           */
+        case 'a':
+          {
+            if (format_set)
+              {
+                std::cout << "ERROR: Equation system file format already set!"
+                          << std::endl;
+                exit(1);
+              }
+            else
+              {
+                format = libMeshEnums::READ;
+                format_set = true;
+              }
+            break;
+          }
+          
+          /**
+           * Use binary format
+           */
+        case 'b':
+          {
+            if (format_set)
+              {
+                std::cout << "ERROR: Equation system file format already set!"
+                          << std::endl;
+                exit(1);
+              }
+            else
+              {
+                format = libMeshEnums::DECODE;
+                format_set = true;
+              }
+            break;
+          }
+          
+                    
+          /**
+           * Be verbose
+           */
+        case 'v':
+          {
+            verbose = true;
+            break;
+          }
+          
+          /**
+           * Be totally quiet, no matter what -v says
+           */
+        case 'q':
+          {
+            quiet = true;
+            break;
+          }
+          
+        case 'h':
+        case '?':
+          usage(argv[0]);
+          
+        default:
+          return;
+        }
     }
 
 }
@@ -250,19 +250,19 @@ void process_cmd_line(int argc, char **argv,
  * can go in this do_compare().
  */
 bool do_compare (EquationSystems& les,
-		 EquationSystems& res,
-		 double threshold,
-		 bool verbose)
+                 EquationSystems& res,
+                 double threshold,
+                 bool verbose)
 {
 
   if (verbose)
     {
-      std::cout	<< "*********   LEFT SYSTEM    *********" << std::endl;
+      std::cout        << "*********   LEFT SYSTEM    *********" << std::endl;
       les.print_info  ();
       std::cout << "*********   RIGHT SYSTEM   *********" << std::endl;
       res.print_info ();
       std::cout << "********* COMPARISON PHASE *********" << std::endl
-		<< std::endl;
+                << std::endl;
     }
  
   /**
@@ -271,7 +271,7 @@ bool do_compare (EquationSystems& les,
   bool result = les.compare(res, threshold, verbose);
   if (verbose)
     {
-      std::cout	<< "*********     FINISHED     *********" << std::endl;
+      std::cout        << "*********     FINISHED     *********" << std::endl;
     }
   return result;
 }
@@ -287,99 +287,96 @@ bool do_compare (EquationSystems& les,
 
 int main (int argc, char** argv)
 {
-  libMesh::init (argc, argv);
+  LibMeshInit init(argc, argv);
   
   // these should better be not contained in the following braces
   bool quiet = false;
   bool are_equal;
 
-  {
-    PerfMon perfmon(argv[0]);
-    
-    // default values
-    std::vector<std::string> names;
-    unsigned int dim                = static_cast<unsigned int>(-1);
-    double threshold                = TOLERANCE;
-    libMeshEnums::XdrMODE format    = libMeshEnums::READ;
-    bool verbose                    = false;
- 
-    // get commands
-    process_cmd_line(argc, argv, 
-		     names,
-		     dim,
-		     threshold,
-		     format,
-		     verbose,
-		     quiet);
+  PerfMon perfmon(argv[0]);
+  
+  // default values
+  std::vector<std::string> names;
+  unsigned int dim                = static_cast<unsigned int>(-1);
+  double threshold                = TOLERANCE;
+  libMeshEnums::XdrMODE format    = libMeshEnums::READ;
+  bool verbose                    = false;
+
+  // get commands
+  process_cmd_line(argc, argv, 
+                   names,
+                   dim,
+                   threshold,
+                   format,
+                   verbose,
+                   quiet);
 
 
-    if (dim == static_cast<unsigned int>(-1))
-      {
-	std::cout << "ERROR:  you must specify the dimension on "
-		  << "the command line!\n\n"
-		  << argv[0] << " -d 3 ... for example\n\n";
-	libmesh_error();
-      }
+  if (dim == static_cast<unsigned int>(-1))
+    {
+      std::cout << "ERROR:  you must specify the dimension on "
+                << "the command line!\n\n"
+                << argv[0] << " -d 3 ... for example\n\n";
+      libmesh_error();
+    }
 
-    if (quiet)
-      verbose = false;
+  if (quiet)
+    verbose = false;
 
-    if (verbose)
-      {
-	  std::cout << "Settings:" << std::endl
-		    << " dimensionality = " << dim << std::endl
-		    << " mesh           = " << names[0] << std::endl
-		    << " left system    = " << names[1] << std::endl
-		    << " right system   = " << names[2] << std::endl
-		    << " threshold      = " << threshold << std::endl
-		    << " read format    = " << format << std::endl 
-		    << std::endl;
-      }	  
-
-
-    /**
-     * build the left and right mesh for left, inut them
-     */
-    Mesh left_mesh  (dim);
-    Mesh right_mesh (dim);
+  if (verbose)
+    {
+        std::cout << "Settings:" << std::endl
+                  << " dimensionality = " << dim << std::endl
+                  << " mesh           = " << names[0] << std::endl
+                  << " left system    = " << names[1] << std::endl
+                  << " right system   = " << names[2] << std::endl
+                  << " threshold      = " << threshold << std::endl
+                  << " read format    = " << format << std::endl 
+                  << std::endl;
+    }          
 
 
-    if (!names.empty())
-      {
-	left_mesh.read  (names[0]);
-	right_mesh.read (names[0]);
-
-	if (verbose)
-	  left_mesh.print_info();
-      }
-    
-    else
-      {
-	std::cout << "No input specified." << std::endl;
-	return 1;
-      }
+  /**
+   * build the left and right mesh for left, inut them
+   */
+  Mesh left_mesh  (dim);
+  Mesh right_mesh (dim);
 
 
-    /**
-     * build EquationSystems objects, read them
-     */
-    EquationSystems left_system  (left_mesh);
-    EquationSystems right_system (right_mesh);
+  if (!names.empty())
+    {
+      left_mesh.read  (names[0]);
+      right_mesh.read (names[0]);
 
-    if (names.size() == 3)
-      {
-	left_system.read  (names[1], format);
-	right_system.read (names[2], format);	  
-      }    
-    else
-      {
-	std::cout << "Bad input specified." << std::endl;
-	libmesh_error();
-      }
+      if (verbose)
+        left_mesh.print_info();
+    }
+  else
+    {
+      std::cout << "No input specified." << std::endl;
+      return 1;
+    }
 
-    are_equal = do_compare (left_system, right_system, threshold, verbose);
 
-  }
+  /**
+   * build EquationSystems objects, read them
+   */
+  EquationSystems left_system  (left_mesh);
+  EquationSystems right_system (right_mesh);
+
+  if (names.size() == 3)
+    {
+      left_system.read  (names[1], format);
+      right_system.read (names[2], format);          
+    }    
+  else
+    {
+      std::cout << "Bad input specified." << std::endl;
+      libmesh_error();
+    }
+
+  are_equal = do_compare (left_system, right_system, threshold, verbose);
+
 
   /**
    * let's see what do_compare found out
@@ -389,21 +386,21 @@ int main (int argc, char** argv)
   if (are_equal)
     {
       if (!quiet)
-	  std::cout << std::endl
-		    << " Congrat's, up to the defined threshold, the two"  
-		    << std::endl
-		    << " are identical." 
-		    << std::endl;
+          std::cout << std::endl
+                    << " Congrat's, up to the defined threshold, the two"  
+                    << std::endl
+                    << " are identical." 
+                    << std::endl;
       our_result=0;
     }
   else
     {
       if (!quiet)
-	  std::cout << std::endl
-		    << " Oops, differences occured!"  
-		    << std::endl
-		    << " Use -v to obtain more information where differences occured."
-		    << std::endl;
+          std::cout << std::endl
+                    << " Oops, differences occured!"  
+                    << std::endl
+                    << " Use -v to obtain more information where differences occured."
+                    << std::endl;
       our_result=1;
     }
 
