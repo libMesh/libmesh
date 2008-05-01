@@ -33,6 +33,7 @@
 #include "error_vector.h"
 #include "libmesh_logging.h"
 #include "mesh_base.h"
+#include "mesh_communication.h"
 #include "mesh_refinement.h"
 #include "parallel.h"
 #include "parallel_ghost_sync.h"
@@ -1433,7 +1434,8 @@ bool MeshRefinement::_coarsen_elements ()
       // find requested nodes
       this->update_nodes_map ();
 
-      this->make_nodes_parallel_consistent();
+      MeshCommunication().make_nodes_parallel_consistent
+        (_mesh, _new_nodes_map);
 
       // Clear the _new_nodes_map
       this->clear();
@@ -1515,8 +1517,9 @@ bool MeshRefinement::_refine_elements ()
 
   if (mesh_changed && !_mesh.is_serial())
     {
-      this->make_elems_parallel_consistent();
-      this->make_nodes_parallel_consistent();
+      MeshCommunication().make_elems_parallel_consistent (_mesh);
+      MeshCommunication().make_nodes_parallel_consistent
+        (_mesh, _new_nodes_map);
 #ifdef DEBUG
       ParallelMesh *pmesh = dynamic_cast<ParallelMesh *>(&_mesh);
       if (pmesh)
@@ -1530,243 +1533,6 @@ bool MeshRefinement::_refine_elements ()
   STOP_LOG ("_refine_elements()", "MeshRefinement");
 
   return mesh_changed;
-}
-
-
-
-// Functor for make_elems_parallel_consistent and
-// make_nodes_parallel_consistent
-namespace {
-
-struct SyncIds
-{
-typedef unsigned int datum;
-typedef void (MeshBase::*renumber_obj)(unsigned int, unsigned int);
-
-SyncIds(MeshBase &_mesh, renumber_obj _renumberer) :
-  mesh(_mesh),
-  renumber(_renumberer) {}
-
-MeshBase &mesh;
-renumber_obj renumber;
-// renumber_obj &renumber;
-
-// Find the id of each requested DofObject -
-// sync_dofobject_data_by_xyz already did the work for us
-void gather_data (const std::vector<unsigned int>& ids,
-                  std::vector<datum>& ids_out)
-{
-  ids_out = ids;
-}
-
-void act_on_data (const std::vector<unsigned int>& old_ids,
-                  std::vector<datum>& new_ids)
-{
-  for (unsigned int i=0; i != old_ids.size(); ++i)
-    if (old_ids[i] != new_ids[i])
-      (mesh.*renumber)(old_ids[i], new_ids[i]);
-}
-};
-}
-
-
-void MeshRefinement::make_elems_parallel_consistent()
-{
-  // This function must be run on all processors at once
-  parallel_only();
-
-  START_LOG ("make_elems_parallel_consistent()", "MeshRefinement");
-
-  SyncIds syncids(_mesh, &MeshBase::renumber_elem);
-  Parallel::sync_element_data_by_parent_id
-    (_mesh, _mesh.active_elements_begin(),
-     _mesh.active_elements_end(), syncids);
-
-  STOP_LOG ("make_elems_parallel_consistent()", "MeshRefinement");
-}
-
-
-
-void MeshRefinement::make_node_ids_parallel_consistent()
-{
-  // This function must be run on all processors at once
-  parallel_only();
-
-  START_LOG ("make_node_ids_parallel_consistent()", "MeshRefinement");
-
-  SyncIds syncids(_mesh, &MeshBase::renumber_node);
-  Parallel::sync_dofobject_data_by_xyz
-    (_mesh.nodes_begin(), _mesh.nodes_end(),
-     _new_nodes_map, syncids);
-
-  STOP_LOG ("make_node_ids_parallel_consistent()", "MeshRefinement");
-}
-
-
-
-void MeshRefinement::correct_node_proc_ids()
-{
-  // This function must be run on all processors at once
-  parallel_only();
-
-  // We'll need the new_nodes_map to answer other processors'
-  // requests.  It should never be empty unless we don't have any
-  // nodes.
-  libmesh_assert(_mesh.nodes_begin() == _mesh.nodes_end() ||
-                 ~_new_nodes_map.empty());
-
-  // Fix all nodes' processor ids.  Coarsening may have left us with
-  // nodes which are no longer touched by any elements of the same
-  // processor id, and for DofMap to work we need to fix that.
-
-  // In the first pass, invalidate processor ids for nodes on active
-  // elements.  We avoid touching subactive-only nodes.
-  MeshBase::element_iterator       e_it  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator e_end = _mesh.active_elements_end();
-  for (; e_it != e_end; ++e_it)
-    {
-      Elem *elem = *e_it;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        {
-          Node *node = elem->get_node(n);
-          node->invalidate_processor_id();
-        }
-    }
-
-  // In the second pass, find the lowest processor ids on active
-  // elements touching each node, and set the node processor id.
-  for (e_it = _mesh.active_elements_begin(); e_it != e_end; ++e_it)
-    {
-      Elem *elem = *e_it;
-      unsigned int proc_id = elem->processor_id();
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        {
-          Node *node = elem->get_node(n);
-          if (node->processor_id() == DofObject::invalid_processor_id ||
-              node->processor_id() > proc_id)
-            node->processor_id() = proc_id;
-        }
-    }
-
-  // Those two passes will correct every node that touches a local
-  // element, but we can't be sure about nodes touching remote
-  // elements.  Fix those now.
-  this->make_node_proc_ids_parallel_consistent();
-}
-
-
-// Functors for make_node_proc_ids_parallel_consistent
-namespace {
-
-struct SyncProcIds
-{
-typedef unsigned int datum;
-
-SyncProcIds(MeshBase &_mesh) : mesh(_mesh) {}
-
-MeshBase &mesh;
-
-void gather_data (const std::vector<unsigned int>& ids,
-                  std::vector<datum>& data)
-{
-  // Find the processor id of each requested node
-  data.resize(ids.size());
-
-  for (unsigned int i=0; i != ids.size(); ++i)
-    {
-      // Look for this point in the mesh
-      Node *node = mesh.node_ptr(ids[i]);
-
-      // We'd better find every node we're asked for
-      libmesh_assert (node);
-
-      // Return the node's correct processor id,
-      data[i] = node->processor_id();
-    }
-}
-
-void act_on_data (const std::vector<unsigned int>& ids,
-                  std::vector<datum> proc_ids)
-{
-  // Set the ghost node processor ids we've now been informed of
-  for (unsigned int i=0; i != ids.size(); ++i)
-    {
-      Node *node = mesh.node_ptr(ids[i]);
-      node->processor_id() = proc_ids[i];
-    }
-}
-};
-}
-
-
-
-void MeshRefinement::make_node_proc_ids_parallel_consistent()
-{
-  // This function must be run on all processors at once
-  parallel_only();
-
-  // When this function is called, each section of a parallelized mesh
-  // should be in the following state:
-  //
-  // All nodes should have the exact same physical location on every
-  // processor where they exist.
-  //
-  // Local nodes should have unique authoritative ids,
-  // and processor ids consistent with all processors which own
-  // an element touching them.
-  //
-  // Ghost nodes touching local elements should have processor ids
-  // consistent with all processors which own an element touching
-  // them.
-  
-  SyncProcIds sync(_mesh);
-  Parallel::sync_dofobject_data_by_xyz
-    (_mesh.nodes_begin(), _mesh.nodes_end(), _new_nodes_map, sync);
-}
-
-
-
-void MeshRefinement::make_nodes_parallel_consistent()
-{
-  // This function must be run on all processors at once
-  parallel_only();
-
-  // Create the new_nodes_map if it hasn't been done already
-  bool need_map_update = (_mesh.nodes_begin() != _mesh.nodes_end() && 
-                          _new_nodes_map.empty());
-  Parallel::max(need_map_update);
-
-  if (need_map_update)
-    this->update_nodes_map();
-
-  // When this function is called, each section of a parallelized mesh
-  // should be in the following state:
-  //
-  // All nodes should have the exact same physical location on every
-  // processor where they exist.
-  //
-  // Local nodes should have unique authoritative ids,
-  // and processor ids consistent with all processors which own
-  // an element touching them.
-  //
-  // Ghost nodes touching local elements should have processor ids
-  // consistent with all processors which own an element touching
-  // them.
-  //
-  // Ghost nodes should have ids which are either already correct
-  // or which are in the "unpartitioned" id space.
-
-  // First, let's sync up processor ids.  Some of these processor ids
-  // may be "wrong" from coarsening, but they're right in the sense
-  // that they'll tell us who has the authoritative dofobject ids for
-  // each node.
-  this->make_node_proc_ids_parallel_consistent();
-
-  // Second, sync up dofobject ids.
-  this->make_node_ids_parallel_consistent();
-
-  // Finally, correct the processor ids to make DofMap happy
-  this->correct_node_proc_ids();
 }
 
 
