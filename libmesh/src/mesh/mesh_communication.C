@@ -1683,6 +1683,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
 
   START_LOG("delete_remote_elements()", "MeshCommunication");
 
+  // FIXME - should these be "unsorted_set"s?  O(N) is O(N)...
   std::vector<bool> local_nodes(mesh.max_node_id(), false);
   std::vector<bool> semilocal_elems(mesh.max_elem_id(), false);
 
