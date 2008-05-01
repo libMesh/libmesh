@@ -779,13 +779,11 @@ void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
     {
       const Elem* elem = *el;
       libmesh_assert (elem);
-      unsigned int elemprocid = elem->processor_id();
 
       for (unsigned int i=0; i != elem->n_nodes(); ++i)
         {
           const Node *node = elem->get_node(i);
           unsigned int nodeid = node->id();
-          unsigned int nodeprocid = node->processor_id();
           node_touched_by_me[nodeid] = true;
         }
     }
