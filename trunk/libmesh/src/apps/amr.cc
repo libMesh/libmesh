@@ -23,82 +23,86 @@ void assemble(EquationSystems& es,
 
 
 
+#ifdef ENABLE_AMR
 int main (int argc, char** argv)
 {
-  libMesh::init (argc, argv);
+  libMeshInit init(argc, argv);
 
-  {
-    if (argc < 4)
-      std::cout << "Usage: ./prog -d DIM filename" << std::endl;
-    
-    // Variables to get us started
-    const unsigned int dim = atoi(argv[2]);
-    
-    std::string meshname  (argv[3]);
-
-    // declare a mesh...
-    Mesh mesh(dim);
+  if (argc < 4)
+    std::cout << "Usage: ./prog -d DIM filename" << std::endl;
   
-    // Read a mesh
-    mesh.read(meshname);
-
-    GMVIO(mesh).write ("out_0.gmv");
-    
-    mesh.elem(0)->set_refinement_flag (Elem::REFINE);
-
-    MeshRefinement mesh_refinement (mesh);
-    
-    mesh_refinement.refine_and_coarsen_elements ();    
-    mesh_refinement.uniformly_refine (2);
-    
-    mesh.print_info();
-
-    
-    // Set up the equation system(s)
-    EquationSystems es (mesh);
-
-    LinearImplicitSystem& primary =
-      es.add_system<LinearImplicitSystem>("primary");
-
-    primary.add_variable ("U", FIRST);
-    primary.add_variable ("V", FIRST);
-
-    primary.get_dof_map()._dof_coupling->resize(2);      
-    (*primary.get_dof_map()._dof_coupling)(0,0) = 1;
-    (*primary.get_dof_map()._dof_coupling)(1,1) = 1;
-    
-    primary.attach_assemble_function(assemble);
-    
-    es.init ();
-        
-    es.print_info ();
-    primary.get_dof_map().print_dof_constraints ();
-
-    // call the solver.
-    primary.solve ();
-    
-    GMVIO(mesh).write_equation_systems ("out_1.gmv",
-					es);
-
-
-
-    // Refine uniformly
-    mesh_refinement.uniformly_refine (1);
-    es.reinit ();
-
-    // Write out the projected solution
-    GMVIO(mesh).write_equation_systems ("out_2.gmv",
-					es);
-
-    // Solve again. Output the refined solution
-    primary.solve ();
-    GMVIO(mesh).write_equation_systems ("out_3.gmv",
-					es);
-
-  }
+  // Variables to get us started
+  const unsigned int dim = atoi(argv[2]);
   
-  return libMesh::close();
+  std::string meshname  (argv[3]);
+
+  // declare a mesh...
+  Mesh mesh(dim);
+
+  // Read a mesh
+  mesh.read(meshname);
+
+  GMVIO(mesh).write ("out_0.gmv");
+  
+  mesh.elem(0)->set_refinement_flag (Elem::REFINE);
+
+  MeshRefinement mesh_refinement (mesh);
+    
+  mesh_refinement.refine_and_coarsen_elements ();    
+  mesh_refinement.uniformly_refine (2);
+  
+  mesh.print_info();
+
+  
+  // Set up the equation system(s)
+  EquationSystems es (mesh);
+
+  LinearImplicitSystem& primary =
+    es.add_system<LinearImplicitSystem>("primary");
+
+  primary.add_variable ("U", FIRST);
+  primary.add_variable ("V", FIRST);
+
+  primary.get_dof_map()._dof_coupling->resize(2);      
+  (*primary.get_dof_map()._dof_coupling)(0,0) = 1;
+  (*primary.get_dof_map()._dof_coupling)(1,1) = 1;
+  
+  primary.attach_assemble_function(assemble);
+  
+  es.init ();
+      
+  es.print_info ();
+  primary.get_dof_map().print_dof_constraints ();
+
+  // call the solver.
+  primary.solve ();
+  
+  GMVIO(mesh).write_equation_systems ("out_1.gmv",
+                                      es);
+
+
+
+  // Refine uniformly
+  mesh_refinement.uniformly_refine (1);
+  es.reinit ();
+
+  // Write out the projected solution
+  GMVIO(mesh).write_equation_systems ("out_2.gmv",
+                                      es);
+
+  // Solve again. Output the refined solution
+  primary.solve ();
+  GMVIO(mesh).write_equation_systems ("out_3.gmv",
+                                      es);
+
+  return 0;
 }
+#else
+int main (int, char**)
+{
+  return 1;
+}
+#endif // ENABLE_AMR
 
 
 
