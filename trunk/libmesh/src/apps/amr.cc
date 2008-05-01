@@ -26,7 +26,7 @@ void assemble(EquationSystems& es,
 #ifdef ENABLE_AMR
 int main (int argc, char** argv)
 {
-  libMeshInit init(argc, argv);
+  LibMeshInit init(argc, argv);
 
   if (argc < 4)
     std::cout << "Usage: ./prog -d DIM filename" << std::endl;
