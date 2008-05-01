@@ -4180,8 +4180,10 @@ src/mesh/mesh_communication.$(obj-suffix):\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
+    include/parallel/parallel_ghost_sync.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
+    include/utils/location_maps.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -4406,8 +4408,8 @@ src/mesh/mesh_modification.$(obj-suffix):\
     include/geom/point.h\
     include/mesh/boundary_info.h\
     include/mesh/mesh_base.h\
+    include/mesh/mesh_communication.h\
     include/mesh/mesh_modification.h\
-    include/mesh/mesh_refinement.h\
     include/mesh/mesh_tools.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/type_vector.h\
@@ -4495,6 +4497,7 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     include/geom/remote_elem.h\
     include/mesh/boundary_info.h\
     include/mesh/mesh_base.h\
+    include/mesh/mesh_communication.h\
     include/mesh/mesh_refinement.h\
     include/mesh/mesh_tools.h\
     include/mesh/parallel_mesh.h\
@@ -4727,6 +4730,7 @@ src/mesh/mesh_tools.$(obj-suffix):\
     include/parallel/parallel.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
+    include/utils/location_maps.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
