@@ -35,6 +35,7 @@
 #include "mesh_base.h"
 #include "mesh_refinement.h"
 #include "parallel.h"
+#include "parallel_ghost_sync.h"
 #include "remote_elem.h"
 
 #ifdef DEBUG
@@ -84,40 +85,19 @@ Node* MeshRefinement::add_point (const Point& p,
 {
   START_LOG("add_point()", "MeshRefinement");
 
-  const unsigned int key = this->point_key(p);
-
-  // Look for the key in the multimap  
-  std::pair<map_type::iterator, map_type::iterator>
-    pos = _new_nodes_map.equal_range(key);
-  
+  // Return the node if it already exists
+  Node *node = _new_nodes_map.find(p, tol);
+  if (node)
+    return node;
       
-  while (pos.first != pos.second) 
-    if (p.absolute_fuzzy_equals(*(pos.first->second), tol))
-    {
-      STOP_LOG("add_point()", "MeshRefinement");
-      return pos.first->second;      
-    }
-    else      
-      ++pos.first;
-    
-  // If we get here pos.first == pos.second.
-  libmesh_assert (pos.first == pos.second); // still not found
-                                    // so we better add it
-
   // Add the node, with a default id and the requested
   // processor_id
-  Node* node = _mesh.add_point (p, DofObject::invalid_id,
-                                processor_id);
+  node = _mesh.add_point (p, DofObject::invalid_id, processor_id);
 
   libmesh_assert (node != NULL);
 
-  // Add the node to the map.  In the case of the
-  // std::multimap use pos.first as a hint for where to put it
-#if defined(HAVE_UNORDERED_MAP) ||  defined(HAVE_HASH_MAP) || defined(HAVE_EXT_HASH_MAP)
-  _new_nodes_map.insert(std::make_pair(key, node));
-#else
-  _new_nodes_map.insert(pos.first, std::make_pair(key, node));
-#endif			    
+  // Add the node to the map.
+  _new_nodes_map.insert(*node);
 
   // Return the address of the new node
   STOP_LOG("add_point()", "MeshRefinement");
@@ -289,63 +269,7 @@ void MeshRefinement::create_parent_error_vector
 
 void MeshRefinement::update_nodes_map ()
 {
-  // This function must be run on all processors at once
-  // for non-serial meshes
-  if (!_mesh.is_serial())
-    parallel_only();
-
-  START_LOG("update_nodes_map()", "MeshRefinement");
-
-  // Clear the old map
-  _new_nodes_map.clear();
-
-  // Cache a bounding box
-  _lower_bound.clear();
-  _lower_bound.resize(3, std::numeric_limits<Real>::max());
-  _upper_bound.clear();
-  _upper_bound.resize(3, -std::numeric_limits<Real>::max());
-
-  MeshBase::node_iterator       it  = _mesh.nodes_begin();
-  const MeshBase::node_iterator end = _mesh.nodes_end();
-
-  for (; it != end; ++it)
-    {
-      Node* node = *it;
-
-      // Expand the bounding box if necessary
-      _lower_bound[0] = std::min(_lower_bound[0],
-                                 (*node)(0));
-      _lower_bound[1] = std::min(_lower_bound[1],
-                                 (*node)(1));
-      _lower_bound[2] = std::min(_lower_bound[2],
-                                 (*node)(2));
-      _upper_bound[0] = std::max(_upper_bound[0],
-                                 (*node)(0));
-      _upper_bound[1] = std::max(_upper_bound[1],
-                                 (*node)(1));
-      _upper_bound[2] = std::max(_upper_bound[2],
-                                 (*node)(2));
-    }
-
-  // On a parallel mesh we might not yet have a full bounding box
-  if (!_mesh.is_serial())
-    {
-      Parallel::min(_lower_bound);
-      Parallel::max(_upper_bound);
-    }
-
-  // Populate the nodes map
-  it  = _mesh.nodes_begin();
-
-  for (; it != end; ++it)
-    {
-      Node* node = *it;
-
-      // Add the node to the map.
-      _new_nodes_map.insert(std::make_pair(this->point_key(*node), node));
-    }
-
-  STOP_LOG("update_nodes_map()", "MeshRefinement");
+  this->_new_nodes_map.init(_mesh);
 } 
 
 
@@ -803,7 +727,74 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
 }
 
 
+// Functor for make_flags_parallel_consistent
+namespace {
 
+struct SyncRefinementFlags
+{
+typedef unsigned char datum;
+typedef Elem::RefinementState (Elem::*get_a_flag)() const;
+typedef void (Elem::*set_a_flag)(const Elem::RefinementState);
+
+SyncRefinementFlags(MeshBase &_mesh,
+                    get_a_flag _getter,
+                    set_a_flag _setter) :
+  mesh(_mesh), parallel_consistent(true),
+  get_flag(_getter), set_flag(_setter) {}
+
+MeshBase &mesh;
+bool parallel_consistent;
+get_a_flag get_flag;
+set_a_flag set_flag;
+// References to pointers to member functions segfault?
+// get_a_flag& get_flag;
+// set_a_flag& set_flag;
+
+// Find the refinement flag on each requested element
+void gather_data (const std::vector<unsigned int>& ids,
+                  std::vector<datum>& flags)
+{
+  flags.resize(ids.size());
+
+  for (unsigned int i=0; i != ids.size(); ++i)
+    {
+      // Look for this element in the mesh
+      Elem *elem = mesh.elem(ids[i]);
+
+      // We'd better find every element we're asked for
+      libmesh_assert (elem);
+
+      // Return the element's refinement flag
+      flags[i] = (elem->*get_flag)();
+    }
+}
+
+void act_on_data (const std::vector<unsigned int>& ids,
+                  std::vector<datum>& flags)
+{
+  for (unsigned int i=0; i != ids.size(); ++i)
+    {
+      Elem *elem = mesh.elem(ids[i]);
+
+      libmesh_assert(elem);
+
+      datum old_flag = (elem->*get_flag)();
+      datum &new_flag = flags[i];
+
+      if (old_flag != new_flag)
+        {
+          // Make sure the foreign flags aren't more
+          // conservative than our own
+          libmesh_assert (!(new_flag != Elem::REFINE && 
+                            old_flag == Elem::REFINE));
+          (elem->*set_flag)
+            (static_cast<Elem::RefinementState>(new_flag));
+          parallel_consistent = false;
+        }
+    }
+}
+};
+}
 
 
 
@@ -813,156 +804,21 @@ bool MeshRefinement::make_flags_parallel_consistent()
   parallel_only();
 
   START_LOG ("make_flags_parallel_consistent()", "MeshRefinement");
-  // We're consistent until we discover otherwise
-  bool parallel_consistent = true;
 
-  // Count the number of ghost elements we'll need to inquire about
-  // from each other processor
-  std::vector<unsigned int>
-    ghost_elems_from_proc(libMesh::n_processors(), 0);
+  SyncRefinementFlags hsync(_mesh, &Elem::refinement_flag,
+                            &Elem::set_refinement_flag);
+  Parallel::sync_dofobject_data_by_id
+    (_mesh.elements_begin(), _mesh.elements_end(), hsync);
 
-  const MeshBase::element_iterator end = _mesh.elements_end();
+  SyncRefinementFlags psync(_mesh, &Elem::p_refinement_flag,
+                            &Elem::set_p_refinement_flag);
+  Parallel::sync_dofobject_data_by_id
+    (_mesh.elements_begin(), _mesh.elements_end(), psync);
 
-  for (MeshBase::element_iterator it = _mesh.elements_begin();
-       it != end; ++it)
-    {
-      Elem *elem = *it;
-      libmesh_assert (elem);
-      unsigned int elem_procid = elem->processor_id();
-
-      // Assume we're partitioned before we try any AMR
-      libmesh_assert(elem_procid != DofObject::invalid_processor_id);
-
-      ghost_elems_from_proc[elem_procid]++;
-    }
-
-  // Request sets to send to each processor
-  std::vector<std::vector<unsigned int> >
-    requested_ids(libMesh::n_processors());
-  // Double check that my flags are sufficiently
-  // conservative
-#ifdef DEBUG
-  std::vector<std::vector<unsigned char> >
-    current_rflags(libMesh::n_processors()),
-    current_pflags(libMesh::n_processors());
-#endif
-
-  // We know how many ghost elements live on each processor, so reserve()
-  // space for each.
-  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
-    if (p != libMesh::processor_id())
-      {
-        requested_ids[p].reserve(ghost_elems_from_proc[p]);
-#ifdef DEBUG
-        current_rflags[p].reserve(ghost_elems_from_proc[p]);
-        current_pflags[p].reserve(ghost_elems_from_proc[p]);
-#endif
-      }
-
-  const MeshBase::element_iterator nl_end = _mesh.not_local_elements_end();
-  for (MeshBase::element_iterator it = _mesh.not_local_elements_begin();
-       it != end; ++it)
-    {
-      Elem *elem = *it;
-      unsigned int elem_procid = elem->processor_id();
-
-      requested_ids[elem_procid].push_back(elem->id());
-#ifdef DEBUG
-      current_rflags[elem_procid].push_back(elem->refinement_flag());
-      current_pflags[elem_procid].push_back(elem->p_refinement_flag());
-#endif
-    }
-
-  // Set refinement flags from other processors
-  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
-    {
-      // Trade my requests with processor procup and procdown
-      unsigned int procup = (libMesh::processor_id() + p) %
-                             libMesh::n_processors();
-      unsigned int procdown = (libMesh::n_processors() +
-                               libMesh::processor_id() - p) %
-                               libMesh::n_processors();
-      std::vector<unsigned int>  request_to_fill;
-      Parallel::send_receive(procup, requested_ids[procup],
-                             procdown, request_to_fill);
-#ifdef DEBUG
-      std::vector<unsigned char> foreign_rflags,
-                                 foreign_pflags;
-      Parallel::send_receive(procup, current_rflags[procup],
-                             procdown, foreign_rflags);
-      Parallel::send_receive(procup, current_pflags[procup],
-                             procdown, foreign_pflags);
-      libmesh_assert (request_to_fill.size() == foreign_rflags.size());
-      libmesh_assert (request_to_fill.size() == foreign_pflags.size());
-#endif
-
-      // Fill those requests.
-      std::vector<unsigned char> rflags(request_to_fill.size()),
-                                 pflags(request_to_fill.size());
-      for (unsigned int i=0; i != request_to_fill.size(); ++i)
-        {
-          Elem *elem = _mesh.elem(request_to_fill[i]);
-
-          rflags[i] = elem->refinement_flag();
-          pflags[i] = elem->p_refinement_flag();
-#ifdef DEBUG
-          Elem::RefinementState frflag = 
-            static_cast<Elem::RefinementState>(foreign_rflags[i]),
-                                fpflag = 
-            static_cast<Elem::RefinementState>(foreign_pflags[i]);
-
-          // Make sure none of the foreign flags are more
-          // conservative than our own
-          libmesh_assert (!(rflags[i] != Elem::REFINE &&
-                    frflag == Elem::REFINE));
-          libmesh_assert (!(pflags[i] != Elem::REFINE &&
-                    fpflag == Elem::REFINE));
-/*
-          libmesh_assert (!(rflags[i] == Elem::COARSEN &&
-                    frflag != Elem::COARSEN));
-          libmesh_assert (!(pflags[i] == Elem::COARSEN &&
-                    fpflag != Elem::COARSEN));
-          libmesh_assert (!(rflags[i] == Elem::COARSEN_INACTIVE &&
-                    frflag != Elem::COARSEN_INACTIVE));
-          libmesh_assert (!(pflags[i] == Elem::COARSEN_INACTIVE &&
-                    fpflag != Elem::COARSEN_INACTIVE));
-*/
-#endif
-        }
-
-      // Trade back the results
-      std::vector<unsigned char> ghost_rflags, ghost_pflags;
-      Parallel::send_receive(procdown, rflags,
-                             procup, ghost_rflags);
-      Parallel::send_receive(procdown, pflags,
-                             procup, ghost_pflags);
-      libmesh_assert (ghost_rflags.size() == requested_ids[procup].size());
-      libmesh_assert (ghost_pflags.size() == requested_ids[procup].size());
-
-      // And see if we need to change any flags
-      for (unsigned int i=0; i != requested_ids[procup].size(); ++i)
-        {
-          Elem *elem = _mesh.elem(requested_ids[procup][i]);
-          unsigned char old_r_flag = elem->refinement_flag();
-          unsigned char old_p_flag = elem->p_refinement_flag();
-          if (old_r_flag != ghost_rflags[i])
-            {
-
-              elem->set_refinement_flag
-                (static_cast<Elem::RefinementState>(ghost_rflags[i]));
-              parallel_consistent = false;
-            }
-          if (old_p_flag != ghost_pflags[i])
-            {
-              elem->set_p_refinement_flag
-                (static_cast<Elem::RefinementState>(ghost_pflags[i]));
-              parallel_consistent = false;
-            }
-        }
-    }
-
-  // If we weren't consistent on any processor then we weren't
-  // globally consistent
+  // If we weren't consistent in both h and p on every processor then
+  // we weren't globally consistent
+  bool parallel_consistent = hsync.parallel_consistent &&
+                             psync.parallel_consistent;
   Parallel::min(parallel_consistent);
 
   STOP_LOG ("make_flags_parallel_consistent()", "MeshRefinement");
@@ -1678,21 +1534,90 @@ bool MeshRefinement::_refine_elements ()
 
 
 
-void MeshRefinement::make_nodes_parallel_consistent()
+// Functor for make_elems_parallel_consistent and
+// make_nodes_parallel_consistent
+namespace {
+
+struct SyncIds
+{
+typedef unsigned int datum;
+typedef void (MeshBase::*renumber_obj)(unsigned int, unsigned int);
+
+SyncIds(MeshBase &_mesh, renumber_obj _renumberer) :
+  mesh(_mesh),
+  renumber(_renumberer) {}
+
+MeshBase &mesh;
+renumber_obj renumber;
+// renumber_obj &renumber;
+
+// Find the id of each requested DofObject -
+// sync_dofobject_data_by_xyz already did the work for us
+void gather_data (const std::vector<unsigned int>& ids,
+                  std::vector<datum>& ids_out)
+{
+  ids_out = ids;
+}
+
+void act_on_data (const std::vector<unsigned int>& old_ids,
+                  std::vector<datum>& new_ids)
+{
+  for (unsigned int i=0; i != old_ids.size(); ++i)
+    if (old_ids[i] != new_ids[i])
+      (mesh.*renumber)(old_ids[i], new_ids[i]);
+}
+};
+}
+
+
+void MeshRefinement::make_elems_parallel_consistent()
 {
   // This function must be run on all processors at once
   parallel_only();
 
-  // And we'll need the new_nodes_map to answer other processors'
+  START_LOG ("make_elems_parallel_consistent()", "MeshRefinement");
+
+  SyncIds syncids(_mesh, &MeshBase::renumber_elem);
+  Parallel::sync_element_data_by_parent_id
+    (_mesh, _mesh.active_elements_begin(),
+     _mesh.active_elements_end(), syncids);
+
+  STOP_LOG ("make_elems_parallel_consistent()", "MeshRefinement");
+}
+
+
+
+void MeshRefinement::make_node_ids_parallel_consistent()
+{
+  // This function must be run on all processors at once
+  parallel_only();
+
+  START_LOG ("make_node_ids_parallel_consistent()", "MeshRefinement");
+
+  SyncIds syncids(_mesh, &MeshBase::renumber_node);
+  Parallel::sync_dofobject_data_by_xyz
+    (_mesh.nodes_begin(), _mesh.nodes_end(),
+     _new_nodes_map, syncids);
+
+  STOP_LOG ("make_node_ids_parallel_consistent()", "MeshRefinement");
+}
+
+
+
+void MeshRefinement::correct_node_proc_ids()
+{
+  // This function must be run on all processors at once
+  parallel_only();
+
+  // We'll need the new_nodes_map to answer other processors'
   // requests.  It should never be empty unless we don't have any
   // nodes.
   libmesh_assert(_mesh.nodes_begin() == _mesh.nodes_end() ||
                  ~_new_nodes_map.empty());
 
-  // First, correct semilocal nodes' processor ids.  Coarsening may
-  // have left us with nodes which are no longer touched by any
-  // elements of the same processor id, and for DofMap to work
-  // we need to fix that.
+  // Fix all nodes' processor ids.  Coarsening may have left us with
+  // nodes which are no longer touched by any elements of the same
+  // processor id, and for DofMap to work we need to fix that.
 
   // In the first pass, invalidate processor ids for nodes on active
   // elements.  We avoid touching subactive-only nodes.
@@ -1723,403 +1648,125 @@ void MeshRefinement::make_nodes_parallel_consistent()
         }
     }
 
-  // Local nodes in the _new_nodes_map have authoritative ids
-  // and correct processor ids, nodes touching local elements
-  // have correct processor ids but need to have their ids
-  // corrected, and ghost nodes not touching local elements
-  // may need to have both ids and processor ids corrected.
-
-  // First correct the processor ids, so we'll ask the 
-  // right processor when correcting ids later
-
-  // Count the nodes to ask each processor about
-  std::vector<unsigned int>
-    ghost_objects_from_proc(libMesh::n_processors(), 0);
-
-  const MeshBase::node_iterator end = _mesh.nodes_end();
-
-  for (MeshBase::node_iterator it  = _mesh.nodes_begin();
-       it != end; ++it)
-    {
-      Node *node = *it;
-      libmesh_assert (node);
-      unsigned int node_procid = node->processor_id();
-      libmesh_assert (node_procid != DofObject::invalid_processor_id);
-
-      ghost_objects_from_proc[node_procid]++;
-    }
-
-  // Request sets to send to each processor on the first pass
-  std::vector<std::vector<Real> >
-    requested_nodes_x(libMesh::n_processors()),
-    requested_nodes_y(libMesh::n_processors()),
-    requested_nodes_z(libMesh::n_processors());
-  // Corresponding temporary ids to keep track of
-  std::vector<std::vector<unsigned int> >
-    requested_nodes_id(libMesh::n_processors());
-  // And (hopefully much smaller) sets for the second pass
-  std::vector<std::vector<Real> >
-    rerequested_nodes_x(libMesh::n_processors()),
-    rerequested_nodes_y(libMesh::n_processors()),
-    rerequested_nodes_z(libMesh::n_processors());
-  std::vector<std::vector<unsigned int> >
-    rerequested_nodes_id(libMesh::n_processors());
-
-  // We know how many objects live on each processor, so reserve()
-  // space for each.
-  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
-    if (p != libMesh::processor_id())
-      {
-        requested_nodes_x[p].reserve(ghost_objects_from_proc[p]);
-        requested_nodes_y[p].reserve(ghost_objects_from_proc[p]);
-        requested_nodes_z[p].reserve(ghost_objects_from_proc[p]);
-        requested_nodes_id[p].reserve(ghost_objects_from_proc[p]);
-      }
-
-  for (MeshBase::node_iterator it  = _mesh.nodes_begin();
-       it != end; ++it)
-    {
-      Node *node = *it;
-      unsigned int node_procid = node->processor_id();
-
-      requested_nodes_x[node_procid].push_back((*node)(0));
-      requested_nodes_y[node_procid].push_back((*node)(1));
-      requested_nodes_z[node_procid].push_back((*node)(2));
-      requested_nodes_id[node_procid].push_back(node->id());
-    }
-
-  // Trade requests with other processors
-  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
-    {
-      // Trade my requests with processor procup and procdown
-      unsigned int procup = (libMesh::processor_id() + p) %
-                             libMesh::n_processors();
-      unsigned int procdown = (libMesh::n_processors() +
-                               libMesh::processor_id() - p) %
-                               libMesh::n_processors();
-      std::vector<Real> request_to_fill_x,
-                        request_to_fill_y,
-                        request_to_fill_z;
-      Parallel::send_receive(procup, requested_nodes_x[procup],
-                             procdown, request_to_fill_x);
-      Parallel::send_receive(procup, requested_nodes_y[procup],
-                             procdown, request_to_fill_y);
-      Parallel::send_receive(procup, requested_nodes_z[procup],
-                             procdown, request_to_fill_z);
-      libmesh_assert (request_to_fill_x.size() == request_to_fill_y.size());
-      libmesh_assert (request_to_fill_x.size() == request_to_fill_z.size());
-
-      // Find the processor id (and if it's local, the id)
-      // of each requested node
-      std::vector<unsigned int> node_proc_ids(request_to_fill_x.size()),
-                                node_ids(request_to_fill_x.size());
-      for (unsigned int i=0; i != request_to_fill_x.size(); ++i)
-        {
-          Point p(request_to_fill_x[i],
-                  request_to_fill_y[i],
-                  request_to_fill_z[i]);
-          unsigned int key = this->point_key(p);
-
-          // Look for this point in the multimap
-          std::pair<map_type::iterator, map_type::iterator>
-            pos = _new_nodes_map.equal_range(key);
-
-          // We'd better find every node we're asked for
-          libmesh_assert (pos.first != pos.second);
-
-          Node *node = NULL;
-          // FIXME - what tolerance should we use?
-          for (; pos.first != pos.second; ++pos.first)
-            if (p.absolute_fuzzy_equals(*(pos.first->second), TOLERANCE))
-              {
-                node = pos.first->second;
-                break;
-              }
-            else
-              {
-                // Make sure this map conflict isn't a key bug
-                libmesh_assert (this->point_key(*(pos.first->second)) == 
-                        this->point_key(p));
-              }
-
-          // We'd better have found every node we're asked for
-          libmesh_assert (node);
-
-          // Return the node's correct processor id,
-          // and our (correct if it's local) id for it.
-          node_proc_ids[i] = node->processor_id();
-          node_ids[i] = node->id();
-        }
-      
-      // Trade back the results
-      std::vector<unsigned int> filled_node_proc_ids, filled_node_ids;
-      Parallel::send_receive(procdown, node_proc_ids,
-                             procup, filled_node_proc_ids);
-      Parallel::send_receive(procdown, node_ids,
-                             procup, filled_node_ids);
-      libmesh_assert (requested_nodes_x[procup].size() == filled_node_proc_ids.size());
-      libmesh_assert (requested_nodes_x[procup].size() == filled_node_ids.size());
-
-      // Set the ghost node processor ids and ids we've now been
-      // informed of, and build request sets for ids we need to
-      // request from a different processor
-      for (unsigned int i=0; i != filled_node_ids.size(); ++i)
-        {
-          Node *node = _mesh.node_ptr(requested_nodes_id[procup][i]);
-          const unsigned int new_procid = filled_node_proc_ids[i];
-
-          // Set ids of and move nodes where we asked their local processor
-          libmesh_assert (node->processor_id() == procup);
-          if (procup == new_procid)
-            {
-              const unsigned int old_id = requested_nodes_id[procup][i],
-                                 new_id = filled_node_ids[i];
-              if (old_id != new_id)
-                _mesh.renumber_node(old_id, new_id);
-            }
-
-          // Rerequest ids of nodes where we should have asked another
-          // processor
-          else
-            {
-              node->processor_id() = new_procid;
-              // We need to rerequest this node's id, from the
-              // correct processor this time.
-
-              // There's no obvious way to reserve() this vector,
-              // so let's hope our STL amortizes resize() properly.
-              // O(N) overhead on small vectors shouldn't be bad.
-              rerequested_nodes_x[new_procid].push_back((*node)(0));
-              rerequested_nodes_y[new_procid].push_back((*node)(1));
-              rerequested_nodes_z[new_procid].push_back((*node)(2));
-              rerequested_nodes_id[new_procid].push_back(node->id());
-            }
-        }
-    }
-
-  // We're done with the first set of requests
-  requested_nodes_x.clear();
-  requested_nodes_y.clear();
-  requested_nodes_z.clear();
-  requested_nodes_id.clear();
-
-  // Trade rerequests with other processors
-  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
-    {
-      // Trade my rerequests with processor procup and procdown
-      unsigned int procup = (libMesh::processor_id() + p) %
-                             libMesh::n_processors();
-      unsigned int procdown = (libMesh::n_processors() +
-                               libMesh::processor_id() - p) %
-                               libMesh::n_processors();
-      std::vector<Real> rerequest_to_fill_x,
-                        rerequest_to_fill_y,
-                        rerequest_to_fill_z;
-      Parallel::send_receive(procup, rerequested_nodes_x[procup],
-                             procdown, rerequest_to_fill_x);
-      Parallel::send_receive(procup, rerequested_nodes_y[procup],
-                             procdown, rerequest_to_fill_y);
-      Parallel::send_receive(procup, rerequested_nodes_z[procup],
-                             procdown, rerequest_to_fill_z);
-      libmesh_assert (rerequest_to_fill_x.size() == rerequest_to_fill_y.size());
-      libmesh_assert (rerequest_to_fill_x.size() == rerequest_to_fill_z.size());
-
-      // Find the id of each rerequested node
-      std::vector<unsigned int> node_ids(rerequest_to_fill_x.size());
-      for (unsigned int i=0; i != rerequest_to_fill_x.size(); ++i)
-        {
-          Point p(rerequest_to_fill_x[i],
-                  rerequest_to_fill_y[i],
-                  rerequest_to_fill_z[i]);
-          unsigned int key = this->point_key(p);
-
-          // Look for this point in the multimap
-          std::pair<map_type::iterator, map_type::iterator>
-            pos = _new_nodes_map.equal_range(key);
-
-          // We'd better find every node we're asked for
-          libmesh_assert (pos.first != pos.second);
-
-          Node *node = NULL;
-          // FIXME - what tolerance should we use?
-          for (; pos.first != pos.second; ++pos.first)
-            if (p.absolute_fuzzy_equals(*(pos.first->second), TOLERANCE))
-              {
-                node = pos.first->second;
-                break;
-              }
-
-          // We'd better have found every node we're asked for
-          libmesh_assert (node);
-
-          // Return the node's correct id
-          node_ids[i] = node->id();
-        }
-      
-      // Trade back the results
-      std::vector<unsigned int> filled_node_ids;
-      Parallel::send_receive(procdown, node_ids,
-                             procup, filled_node_ids);
-      libmesh_assert (rerequested_nodes_x[procup].size() == filled_node_ids.size());
-
-      // Set the ghost node ids we've now been informed of
-      for (unsigned int i=0; i != filled_node_ids.size(); ++i)
-        {
-          const unsigned int old_id = rerequested_nodes_id[procup][i],
-                             new_id = filled_node_ids[i];
-          if (old_id != new_id)
-            _mesh.renumber_node(old_id, new_id);
-        }
-    }
+  // Those two passes will correct every node that touches a local
+  // element, but we can't be sure about nodes touching remote
+  // elements.  Fix those now.
+  this->make_node_proc_ids_parallel_consistent();
 }
 
 
-void MeshRefinement::make_elems_parallel_consistent()
+// Functors for make_node_proc_ids_parallel_consistent
+namespace {
+
+struct SyncProcIds
+{
+typedef unsigned int datum;
+
+SyncProcIds(MeshBase &_mesh) : mesh(_mesh) {}
+
+MeshBase &mesh;
+
+void gather_data (const std::vector<unsigned int>& ids,
+                  std::vector<datum>& data)
+{
+  // Find the processor id of each requested node
+  data.resize(ids.size());
+
+  for (unsigned int i=0; i != ids.size(); ++i)
+    {
+      // Look for this point in the mesh
+      Node *node = mesh.node_ptr(ids[i]);
+
+      // We'd better find every node we're asked for
+      libmesh_assert (node);
+
+      // Return the node's correct processor id,
+      data[i] = node->processor_id();
+    }
+}
+
+void act_on_data (const std::vector<unsigned int>& ids,
+                  std::vector<datum> proc_ids)
+{
+  // Set the ghost node processor ids we've now been informed of
+  for (unsigned int i=0; i != ids.size(); ++i)
+    {
+      Node *node = mesh.node_ptr(ids[i]);
+      node->processor_id() = proc_ids[i];
+    }
+}
+};
+}
+
+
+
+void MeshRefinement::make_node_proc_ids_parallel_consistent()
 {
   // This function must be run on all processors at once
   parallel_only();
 
-  // Newly added local elements have authoritative ids
-  // and correct processor ids, ghost elements have correct
-  // processor ids but need to have their ids corrected.
-
-  // Count the elements to ask each processor about
-  std::vector<unsigned int>
-    ghost_objects_from_proc(libMesh::n_processors(), 0);
-
-  const MeshBase::element_iterator end = _mesh.elements_end();
-
-  for (MeshBase::element_iterator it  = _mesh.elements_begin();
-       it != end; ++it)
-    {
-      Elem *elem = *it;
-      unsigned int elem_procid = elem->processor_id();
-
-      // We only have to worry about new ghost child elements
-      if (!elem->parent() || !elem->active() ||
-          elem_procid == libMesh::processor_id())
-        continue;
-
-      libmesh_assert (elem_procid != DofObject::invalid_processor_id);
-
-      ghost_objects_from_proc[elem_procid]++;
-    }
-
-  // Request sets to send to each processor on the first pass
-  std::vector<std::vector<unsigned int> >
-    requested_parent_ids(libMesh::n_processors()),
-    requested_child_nums(libMesh::n_processors());
-
-  // We know how many objects live on each processor, so reserve()
-  // space for each.
-  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
-    if (p != libMesh::processor_id())
-      {
-        requested_parent_ids[p].reserve(ghost_objects_from_proc[p]);
-        requested_child_nums[p].reserve(ghost_objects_from_proc[p]);
-      }
-
-  for (MeshBase::element_iterator it  = _mesh.elements_begin();
-       it != end; ++it)
-    {
-      Elem *elem = *it;
-      unsigned int elem_procid = elem->processor_id();
-      const Elem *parent = elem->parent();
-
-      // We only have to worry about new ghost child elements
-      if (!parent || !elem->active() ||
-          elem_procid == libMesh::processor_id())
-        continue;
-
-      requested_parent_ids[elem_procid].push_back(parent->id());
-      requested_child_nums[elem_procid].push_back
-        (parent->which_child_am_i(elem));
-    }
-#ifdef DEBUG
-  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
-    if (p != libMesh::processor_id())
-      {
-        libmesh_assert(requested_parent_ids[p].size() == ghost_objects_from_proc[p]);
-        libmesh_assert(requested_child_nums[p].size() == ghost_objects_from_proc[p]);
-      }
-#endif
-
-  // Trade requests with other processors
-  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
-    {
-      // Trade my requests with processor procup and procdown
-      unsigned int procup = (libMesh::processor_id() + p) %
-                             libMesh::n_processors();
-      unsigned int procdown = (libMesh::n_processors() +
-                               libMesh::processor_id() - p) %
-                               libMesh::n_processors();
-      std::vector<unsigned int> request_to_fill_parent_ids,
-                                request_to_fill_child_nums;
-      Parallel::send_receive(procup, requested_parent_ids[procup],
-                             procdown, request_to_fill_parent_ids);
-      Parallel::send_receive(procup, requested_child_nums[procup],
-                             procdown, request_to_fill_child_nums);
-      libmesh_assert (request_to_fill_parent_ids.size() ==
-              request_to_fill_child_nums.size());
-
-      // Find the id of each requested element
-      std::vector<unsigned int> elem_ids(request_to_fill_parent_ids.size());
-      for (unsigned int i=0; i != request_to_fill_parent_ids.size(); ++i)
-        {
-          Elem *parent = _mesh.elem(request_to_fill_parent_ids[i]);
-          libmesh_assert (parent);
-          libmesh_assert (parent->has_children());
-          Elem *child = parent->child(request_to_fill_child_nums[i]);
-          libmesh_assert (child);
-          libmesh_assert (child->active());
-
-          // Return the child element's correct id
-          elem_ids[i] = child->id();
-        }
-      
-      // Trade back the results
-      std::vector<unsigned int> filled_elem_ids;
-      Parallel::send_receive(procdown, elem_ids,
-                             procup, filled_elem_ids);
-      libmesh_assert (requested_parent_ids[procup].size() == filled_elem_ids.size());
-
-      // Set those ghost element ids
-      for (unsigned int i=0; i != filled_elem_ids.size(); ++i)
-        {
-          Elem *parent = _mesh.elem(requested_parent_ids[procup][i]);
-          libmesh_assert (parent);
-          libmesh_assert (parent->has_children());
-          Elem *child = parent->child(requested_child_nums[procup][i]);
-          libmesh_assert (child);
-          libmesh_assert (child->active());
-          const unsigned int old_id = child->id(),
-                             new_id = filled_elem_ids[i];
-          if (old_id != new_id)
-            _mesh.renumber_elem(old_id, new_id);
-        }
-    }
+  // When this function is called, each section of a parallelized mesh
+  // should be in the following state:
+  //
+  // All nodes should have the exact same physical location on every
+  // processor where they exist.
+  //
+  // Local nodes should have unique authoritative ids,
+  // and processor ids consistent with all processors which own
+  // an element touching them.
+  //
+  // Ghost nodes touching local elements should have processor ids
+  // consistent with all processors which own an element touching
+  // them.
+  
+  SyncProcIds sync(_mesh);
+  Parallel::sync_dofobject_data_by_xyz
+    (_mesh.nodes_begin(), _mesh.nodes_end(), _new_nodes_map, sync);
 }
 
 
 
-unsigned int MeshRefinement::point_key (const Point &p) const
+void MeshRefinement::make_nodes_parallel_consistent()
 {
-  Real xscaled = (p(0) - _lower_bound[0])/
-                 (_upper_bound[0] - _lower_bound[0]),
-       yscaled = (p(1) - _lower_bound[1])/
-                 (_upper_bound[1] - _lower_bound[1]),
-       zscaled = (p(2) - _lower_bound[2])/
-                 (_upper_bound[2] - _lower_bound[2]);
+  // This function must be run on all processors at once
+  parallel_only();
 
-  // 10 bits per coordinate, to work with 32+ bit machines
-  unsigned chunkmax = 1024;
-  Real chunkfloat = 1024.0;
+  // Create the new_nodes_map if it hasn't been done already
+  bool need_map_update = (_mesh.nodes_begin() != _mesh.nodes_end() && 
+                          _new_nodes_map.empty());
+  Parallel::max(need_map_update);
 
-  unsigned int n0 = static_cast<unsigned int> (chunkfloat * xscaled),
-               n1 = static_cast<unsigned int> (chunkfloat * yscaled),
-               n2 = static_cast<unsigned int> (chunkfloat * zscaled);
+  if (need_map_update)
+    this->update_nodes_map();
 
-  return chunkmax*chunkmax*n0 + chunkmax*n1 + n2;
+  // When this function is called, each section of a parallelized mesh
+  // should be in the following state:
+  //
+  // All nodes should have the exact same physical location on every
+  // processor where they exist.
+  //
+  // Local nodes should have unique authoritative ids,
+  // and processor ids consistent with all processors which own
+  // an element touching them.
+  //
+  // Ghost nodes touching local elements should have processor ids
+  // consistent with all processors which own an element touching
+  // them.
+  //
+  // Ghost nodes should have ids which are either already correct
+  // or which are in the "unpartitioned" id space.
+
+  // First, let's sync up processor ids.  Some of these processor ids
+  // may be "wrong" from coarsening, but they're right in the sense
+  // that they'll tell us who has the authoritative dofobject ids for
+  // each node.
+  this->make_node_proc_ids_parallel_consistent();
+
+  // Second, sync up dofobject ids.
+  this->make_node_ids_parallel_consistent();
+
+  // Finally, correct the processor ids to make DofMap happy
+  this->correct_node_proc_ids();
 }
 
 

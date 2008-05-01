@@ -30,26 +30,13 @@
 
 // C++ Includes   -----------------------------------
 #include <vector>
-#include <list>
-
-#if   defined(HAVE_TR1_UNORDERED_MAP)
-# include <tr1/unordered_map>
-#elif defined(HAVE_UNORDERED_MAP)
-# include <unordered_map>
-#elif defined(HAVE_HASH_MAP)
-# include <hash_map>
-#elif defined(HAVE_EXT_HASH_MAP)
-# include <ext/hash_map>
-#else
-# include <map>
-#endif
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 #include "libmesh.h" // libMesh::invalid_uint
+#include "location_maps.h"
 
-//#include "node.h" // remove this when debugging is done, only need forward dec.
-
+// Forward Declarations -----------------------------
 class MeshBase;
 class Point;
 class Node;
@@ -394,6 +381,32 @@ public:
   unsigned char& node_level_mismatch_limit();
 
   /**
+   * Assuming all ids on local nodes are globally unique, and
+   * assuming all processor ids are parallel consistent, this function makes
+   * all other ids parallel consistent.
+   */
+  void make_node_ids_parallel_consistent ();
+
+  /**
+   * Changes the processor ids on each node so be the same as the id of the
+   * lowest element touching that node.
+   *
+   * This corrects "orphaned" processor ids that may occur from element
+   * coarsening.
+   *
+   * On a distributed mesh, this function must be called in parallel
+   * to sync everyone's corrected processor ids on ghost nodes.
+   */
+  void correct_node_proc_ids();
+
+  /**
+   * Assuming all processor ids on nodes touching local elements
+   * are parallel consistent, this function makes all other processor ids
+   * parallel consistent as well.
+   */
+  void make_node_proc_ids_parallel_consistent ();
+
+  /**
    * Copy processor_ids and ids on ghost nodes from their
    * local processors.  This is an internal function of MeshRefinement
    * which turns out to be useful for other code which wants to add
@@ -610,47 +623,15 @@ private:
   void make_elems_parallel_consistent ();
 
   /**
-   * Returns a hash of a point location.
-   */
-  unsigned int point_key (const Point &p) const;
-  
-  /**
    * Data structure that holds the new nodes information.
-   * The key is a hash of the Node location.
-   * For efficiency we will use a hashed multimap if it is
-   * available, otherwise a regular multimap.
    */
-#if   defined(HAVE_UNORDERED_MAP)
-    typedef std::unordered_multimap<unsigned int, Node*> map_type;
-#elif defined(HAVE_TR1_UNORDERED_MAP)
-    typedef std::tr1::unordered_multimap<unsigned int, Node*> map_type;
-#elif defined(HAVE_HASH_MAP)    
-    typedef std::hash_multimap<unsigned int, Node*> map_type;    
-#elif defined(HAVE_EXT_HASH_MAP)
-# if   (__GNUC__ == 3) && (__GNUC_MINOR__ == 0) // gcc 3.0   
-    typedef std::hash_multimap<unsigned int, Node*> map_type;
-# elif (__GNUC__ >= 3)                          // gcc 3.1 & newer
-    typedef __gnu_cxx::hash_multimap<unsigned int, Node*> map_type;
-# else
-// XLC and who knows what other compilers get here.
-// Try the most standard thing we can:
-    typedef std::multimap<unsigned int, Node*> map_type;
-# endif
-#else
-    typedef std::multimap<unsigned int, Node*> map_type;
-#endif
   
-  map_type _new_nodes_map;
+  LocationMap<Node> _new_nodes_map;
 
   /**
    * Reference to the mesh.
    */
   MeshBase& _mesh;
-
-  /**
-   * A cached bounding box for the mesh
-   */
-  std::vector<Real> _lower_bound, _upper_bound;
 
   /**
    * For backwards compatibility, we initialize this
