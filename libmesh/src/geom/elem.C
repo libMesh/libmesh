@@ -724,9 +724,6 @@ Real Elem::quality (const ElemQuality q) const
 }
 
 
-#ifdef ENABLE_AMR
-
-
 
 bool Elem::ancestor() const
 {
@@ -747,6 +744,8 @@ if (!this->has_children())
 }
 
 
+
+#ifdef ENABLE_AMR
 
 void Elem::add_child (Elem* elem)
 {
