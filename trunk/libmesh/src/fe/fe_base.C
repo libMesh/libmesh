@@ -1133,8 +1133,6 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
     {
       // FIXME: this should go through the DofMap,
       // not duplicate dof_indices code badly!
-      // We're also assuming here that child n shares
-      // node n
       const unsigned int my_nc =
         FEInterface::n_dofs_at_node (dim, fe_type,
                                      elem_type, n);
@@ -1145,12 +1143,19 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
         }
 
       temp_fe_type = base_fe_type;
+      // We're assuming here that child n shares vertex n,
+      // which is wrong on non-simplices right now
+      // ... but this code isn't necessary except on elements
+      // where p refinement creates more vertex dofs; we have
+      // no such elements yet.
+/*
       if (elem->child(n)->p_level() < elem->p_level())
         {
           temp_fe_type.order = 
             static_cast<Order>(temp_fe_type.order +
                                elem->child(n)->p_level());
         }
+*/
       const unsigned int nc =
         FEInterface::n_dofs_at_node (dim, temp_fe_type,
                                      elem_type, n);
