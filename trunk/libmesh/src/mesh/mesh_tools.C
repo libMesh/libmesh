@@ -37,6 +37,10 @@
 #include "sphere.h"
 #include "threads.h"
 
+#ifdef DEBUG
+#  include "remote_elem.h"
+#endif
+
 
 
 // ------------------------------------------------------------
@@ -791,6 +795,25 @@ void MeshTools::correct_node_proc_ids
 
 
 #ifdef DEBUG
+void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase &mesh)
+{
+  const MeshBase::const_element_iterator el_end =
+    mesh.active_local_elements_end();
+  for (MeshBase::const_element_iterator el = 
+       mesh.active_local_elements_begin(); el != el_end; ++el)
+    {
+      const Elem* elem = *el;
+      libmesh_assert (elem);
+      for (unsigned int s=0; s != elem->n_neighbors(); ++s)
+        {
+          const Elem* neigh = elem->neighbor(s);
+          libmesh_assert (neigh != remote_elem);
+        }
+    }
+}
+
+
+
 void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
 {
   unsigned int lastprocid = 0;
