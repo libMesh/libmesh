@@ -496,6 +496,8 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
 
 
 
+#ifdef DEBUG
+
 void Elem::libmesh_assert_valid_neighbors() const
 {
   for (unsigned int s=0; s<this->n_neighbors(); s++)
@@ -548,6 +550,8 @@ void Elem::libmesh_assert_valid_neighbors() const
         }
     }
 }
+
+#endif // DEBUG
 
 
 
