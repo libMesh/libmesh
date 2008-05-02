@@ -43,9 +43,9 @@ const unsigned int Partitioner::communication_blocksize = 1000000;
 void Partitioner::partition (MeshBase& mesh,
 			     const unsigned int n)
 {
-  // For now we don't repartition in parallel
-  if (!mesh.is_serial())
-    return;
+  // Uncomment this to not repartition in parallel
+  // if (!mesh.is_serial())
+  //   return;
 
   // we cannot partition into more pieces than we have
   // active elements!
