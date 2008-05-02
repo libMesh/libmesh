@@ -4717,6 +4717,7 @@ src/mesh/mesh_tools.$(obj-suffix):\
     include/geom/node.h\
     include/geom/node_range.h\
     include/geom/point.h\
+    include/geom/remote_elem.h\
     include/geom/sphere.h\
     include/geom/stored_range.h\
     include/geom/surface.h\
