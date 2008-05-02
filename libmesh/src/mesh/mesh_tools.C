@@ -798,17 +798,32 @@ void MeshTools::correct_node_proc_ids
 void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase &mesh)
 {
   const MeshBase::const_element_iterator el_end =
-    mesh.active_local_elements_end();
+    mesh.local_elements_end();
   for (MeshBase::const_element_iterator el = 
-       mesh.active_local_elements_begin(); el != el_end; ++el)
+       mesh.local_elements_begin(); el != el_end; ++el)
     {
       const Elem* elem = *el;
       libmesh_assert (elem);
-      for (unsigned int s=0; s != elem->n_neighbors(); ++s)
+      if (elem->active())
+        for (unsigned int s=0; s != elem->n_neighbors(); ++s)
+          {
+            const Elem* neigh = elem->neighbor(s);
+            libmesh_assert (neigh != remote_elem);
+          }
+      else if (elem->ancestor())
         {
-          const Elem* neigh = elem->neighbor(s);
-          libmesh_assert (neigh != remote_elem);
+          bool has_active_child = false;
+          bool has_remote_child = false;
+          for (unsigned int c=0; c != elem->n_children(); ++c)
+            {
+              if (elem->child(c) == remote_elem)
+                has_remote_child = true;
+              if (elem->child(c)->active())
+                has_active_child = true;
+            }
+          libmesh_assert(!has_remote_child || !has_active_child);
         }
+        
     }
 }
 
