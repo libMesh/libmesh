@@ -284,6 +284,12 @@ namespace MeshTools
 
 #ifdef DEBUG
   /**
+   * A function for verifying that active local elements' neighbors
+   * are never remote elements
+   */
+  void libmesh_assert_valid_remote_elems (const MeshBase &mesh);
+
+  /**
    * A function for verifying that ids and processor assignment of elements
    * are correctly sorted (monotone increasing)
    */
