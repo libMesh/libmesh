@@ -29,6 +29,7 @@
 
 // Local includes
 #include "libmesh_common.h"
+#include "mesh_base.h"
 
 // Forward declares
 class EquationSystems;
