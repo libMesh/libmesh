@@ -89,7 +89,10 @@ Node* MeshRefinement::add_point (const Point& p,
   // Return the node if it already exists
   Node *node = _new_nodes_map.find(p, tol);
   if (node)
-    return node;
+    {
+      STOP_LOG("add_point()", "MeshRefinement");
+      return node;
+    }
       
   // Add the node, with a default id and the requested
   // processor_id
