@@ -190,9 +190,6 @@ int main (int argc, char** argv)
   // Solve the system "Wave".
   equation_systems.get_system("Wave").solve();
   
-  // We currently have to serialize for I/O.
-  equation_systems.allgather();
-
   // Write the whole EquationSystems object to file.
   // For infinite elements, the concept of nodal_soln()
   // is not applicable. Therefore, writing the mesh in
@@ -202,8 +199,6 @@ int main (int argc, char** argv)
   // determine physically correct results within an
   // infinite element.
   equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
-
-  mesh.delete_remote_elements();
   
   // All done.  
   return 0;

@@ -119,14 +119,9 @@ int main (int argc, char** argv)
   // then write the solution.
   equation_systems.get_system("Stokes").solve();
 
-  // We currently have to serialize for I/O.
-  equation_systems.allgather();
-
   GMVIO(mesh).write_equation_systems ("out.gmv",
                                       equation_systems);
 
-  mesh.delete_remote_elements();
-  
   // All done.  
   return 0;
 }

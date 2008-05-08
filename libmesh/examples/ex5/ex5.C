@@ -180,13 +180,8 @@ int main (int argc, char** argv)
   std::ostringstream f_name;
   f_name << "out_" << quad_type << ".gmv";
 
-  // We currently have to serialize for I/O.
-  equation_systems.allgather();
-
   GMVIO(mesh).write_equation_systems (f_name.str(),
                                       equation_systems);
-
-  mesh.delete_remote_elements();
 
   // All done.
   return 0;

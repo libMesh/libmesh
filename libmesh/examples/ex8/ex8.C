@@ -305,13 +305,8 @@ int main (int argc, char** argv)
           char buf[14];
           sprintf (buf, "out.%03d.gmv", time_step);
 
-          // We currently have to serialize for I/O.
-          equation_systems.allgather();
-
           GMVIO(mesh).write_equation_systems (buf,
                                               equation_systems);
-
-          mesh.delete_remote_elements();
         }
 
       // Update the p, v and a.
