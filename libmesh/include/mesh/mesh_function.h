@@ -59,6 +59,10 @@ public:
   /**
    * Constructor for mesh based functions with vectors
    * as return value.  Optionally takes a master function.
+   * If the MeshFunction is to be evaluated outside of the
+   * local partition of the mesh, then both the mesh in
+   * \p eqn_systems and the coefficient vector \p vec
+   * should be serialized.
    */
   MeshFunction (const EquationSystems& eqn_systems,
 		const NumericVector<Number>& vec,
@@ -69,6 +73,10 @@ public:
   /**
    * Constructor for mesh based functions with a number
    * as return value.  Optionally takes a master function.
+   * If the MeshFunction is to be evaluated outside of the
+   * local partition of the mesh, then both the mesh in
+   * \p eqn_systems and the coefficient vector \p vec
+   * should be serialized.
    */
   MeshFunction (const EquationSystems& eqn_systems,
 		const NumericVector<Number>& vec,
