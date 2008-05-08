@@ -860,11 +860,8 @@ void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
   if (libMesh::n_processors() == 1)
     return;
 
-  // Wasting space on <char> instead of <bool> to make it
-  // easier for Parallel::max().  Besides, we're in debug
-  // mode; forget efficiency!
   libmesh_assert(Parallel::verify(mesh.max_node_id()));
-  std::vector<char> node_touched_by_me(mesh.max_node_id(), false);
+  std::vector<bool> node_touched_by_me(mesh.max_node_id(), false);
 
   const MeshBase::const_element_iterator el_end =
     mesh.active_local_elements_end();
@@ -881,7 +878,7 @@ void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
           node_touched_by_me[nodeid] = true;
         }
     }
-  std::vector<char> node_touched_by_anyone(node_touched_by_me);
+  std::vector<bool> node_touched_by_anyone(node_touched_by_me);
   Parallel::max(node_touched_by_anyone);
 
   const MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
