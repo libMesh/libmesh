@@ -74,14 +74,7 @@ int main (int argc, char** argv)
   // Write the output mesh if the user specified an
   // output file name.
   if (argc == 5)
-    {
-      // We currently have to serialize for I/O.
-      mesh.allgather();
-
-      mesh.write (argv[4]);
-
-      mesh.delete_remote_elements();
-    }
+    mesh.write (argv[4]);
 
   // All done.  libMesh objects are destroyed here.  Because the
   // LibMeshInit object was created first, its destruction occurs

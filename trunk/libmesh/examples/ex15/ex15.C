@@ -350,16 +350,11 @@ int main(int argc, char** argv)
         }
     }            
   
-  // We currently have to serialize for I/O.
-  equation_systems.allgather();
-
   // Write out the solution
   // After solving the system write the solution
   // to a GMV-formatted plot file.
   GMVIO (mesh).write_equation_systems (gmv_file,
                                            equation_systems);
-
-  mesh.delete_remote_elements();
 
   // Close up the output file.
   out << "];\n"

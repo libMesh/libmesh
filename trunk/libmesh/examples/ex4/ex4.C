@@ -229,10 +229,6 @@ int main (int argc, char** argv)
 
   // Solve the system "Poisson", just like example 2.
   equation_systems.get_system("Poisson").solve();
-  equation_systems.allgather();
-
-  // We currently have to serialize for I/O.
-  equation_systems.allgather();
 
   // After solving the system write the solution
   // to a GMV-formatted plot file.
@@ -246,8 +242,6 @@ int main (int argc, char** argv)
     GMVIO (mesh).write_equation_systems ((dim == 3) ? 
       "out_3.gmv" : "out_2.gmv",equation_systems);
   }
-
-  mesh.delete_remote_elements();
   
   // All done.  
   return 0;

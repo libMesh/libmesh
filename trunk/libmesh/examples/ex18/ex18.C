@@ -270,13 +270,8 @@ int main (int argc, char** argv)
           file_name << "out.gmv.";
           OSSRealzeroright(file_name,3,0, t_step + 1);
 
-          // We currently have to serialize for I/O.
-          equation_systems.allgather();
-
           GMVIO(mesh).write_equation_systems (file_name.str(),
                                               equation_systems);
-
-          mesh.delete_remote_elements();
         }
     }
 #endif // #ifndef ENABLE_AMR

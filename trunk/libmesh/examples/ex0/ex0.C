@@ -139,9 +139,6 @@ int main(int argc, char** argv)
         }
     }
 
-  // We currently have to serialize for I/O.
-  equation_systems.allgather();
-
   // Construct gnuplot plotting object, pass in mesh, title of plot
   // and boolean to indicate use of grid in plot. The grid is used to
   // show the edges of each element in the mesh.
@@ -150,8 +147,6 @@ int main(int argc, char** argv)
   // Write out script to be called from within gnuplot:
   // Load gnuplot, then type "call 'gnuplot_script'" from gnuplot prompt
   plot.write_equation_systems("gnuplot_script",equation_systems);
-
-  mesh.delete_remote_elements();
 #endif // #ifndef ENABLE_AMR
   
   // All done.  libMesh objects are destroyed here.  Because the
