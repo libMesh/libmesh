@@ -376,6 +376,45 @@ namespace Parallel
   //-----------------------------------------------------------------------
   // Parallel members
 
+  // Internal helper function to create vector<something_useable> from
+  // vector<bool> for compatibility with MPI bitwise operations
+  template <typename T>
+  inline void pack_vector_bool(const std::vector<bool> &in,
+			       std::vector<T> &out)
+  {
+    unsigned int data_bits = 8*sizeof(T);
+    unsigned int in_size = in.size();
+    unsigned int out_size = in_size/data_bits + (in_size%data_bits?1:0);
+    out.clear();
+    out.resize(out_size);
+    for (unsigned int i=0; i != in_size; ++i)
+      {
+        unsigned int index = i/data_bits;
+        unsigned int offset = i%data_bits;
+        out[index] += (in[i]?1:0) << offset;
+      }
+  }
+
+  // Internal helper function to create vector<something_useable> from
+  // vector<bool> for compatibility with MPI byte operations
+  template <typename T>
+  inline void unpack_vector_bool(const std::vector<T> &in,
+				 std::vector<bool> &out)
+  {
+    unsigned int data_bits = 8*sizeof(T);
+    // We need the output vector to already be properly sized
+    unsigned int in_size = in.size();
+    unsigned int out_size = out.size();
+    libmesh_assert(out_size/data_bits + (out_size%data_bits?1:0) == in_size);
+
+    for (unsigned int i=0; i != out_size; ++i)
+      {
+        unsigned int index = i/data_bits;
+        unsigned int offset = i%data_bits;
+        out[i] = in[index] << (data_bits-1-offset) >> (data_bits-1);
+      }
+  }
+
 #ifdef HAVE_MPI
  template<>
  inline MPI_Datatype datatype<char>() { return MPI_CHAR; }
@@ -495,6 +534,25 @@ namespace Parallel
   }
 
 
+  template <>
+  inline void min(std::vector<bool> &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+        std::vector<unsigned int> rchar;
+        pack_vector_bool(r, rchar);
+	std::vector<unsigned int> temp(rchar.size());
+	MPI_Allreduce (&rchar[0],
+		       &temp[0],
+		       rchar.size(),
+		       datatype<unsigned int>(),
+		       MPI_BAND,
+		       libMesh::COMM_WORLD);
+        unpack_vector_bool(temp, r);
+      }
+  }
+
+
   template <typename T>
   inline void max(T &r)
   {
@@ -543,6 +601,25 @@ namespace Parallel
 		       MPI_MAX,
 		       libMesh::COMM_WORLD);
 	r = temp;
+      }
+  }
+
+
+  template <>
+  inline void max(std::vector<bool> &r)
+  {
+    if (libMesh::n_processors() > 1)
+      {
+        std::vector<unsigned int> rchar;
+        pack_vector_bool(r, rchar);
+	std::vector<unsigned int> temp(rchar.size());
+	MPI_Allreduce (&rchar[0],
+		       &temp[0],
+		       rchar.size(),
+		       datatype<unsigned int>(),
+		       MPI_BOR,
+		       libMesh::COMM_WORLD);
+        unpack_vector_bool(temp, r);
       }
   }
 
