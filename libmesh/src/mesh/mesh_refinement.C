@@ -787,10 +787,15 @@ void act_on_data (const std::vector<unsigned int>& ids,
 
       if (old_flag != new_flag)
         {
-          // Make sure the foreign flags aren't more
-          // conservative than our own
-          libmesh_assert (!(new_flag != Elem::REFINE && 
-                            old_flag == Elem::REFINE));
+	  // It's possible for foreign flags to be (temporarily) more
+	  // conservative than our own, such as when a refinement in
+	  // one of the foreign processor's elements is mandated by a
+	  // refinement in one of our neighboring elements it can see
+	  // which was mandated by a refinement in one of our
+	  // neighboring elements it can't see
+          // libmesh_assert (!(new_flag != Elem::REFINE && 
+          //                   old_flag == Elem::REFINE));
+	  //
           (elem->*set_flag)
             (static_cast<Elem::RefinementState>(new_flag));
           parallel_consistent = false;
@@ -995,7 +1000,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                                Elem *subneighbor = neighbor->child(c);
                                if (subneighbor != remote_elem &&
                                    subneighbor->active() &&
-                                   subneighbor->is_neighbor(elem))
+                                   subneighbor->has_neighbor(elem))
                                  if ((subneighbor->p_level() > my_p_level &&
                                      subneighbor->p_refinement_flag() != Elem::COARSEN)
                                      || (subneighbor->p_level() == my_p_level &&
@@ -1301,7 +1306,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
                                if (subneighbor == remote_elem)
                                  continue;
                                if (subneighbor->active() &&
-                                   subneighbor->is_neighbor(elem))
+                                   subneighbor->has_neighbor(elem))
                                  if (subneighbor->p_level() < my_p_level &&
                                      subneighbor->p_refinement_flag() != Elem::REFINE)
 			           {
