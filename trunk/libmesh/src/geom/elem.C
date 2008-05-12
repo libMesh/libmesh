@@ -498,6 +498,18 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
 
 #ifdef DEBUG
 
+void Elem::libmesh_assert_valid_node_pointers() const
+{
+  libmesh_assert(this->valid_id());
+  for (unsigned int n=0; n != this->n_nodes(); ++n)
+    {
+      libmesh_assert(this->get_node(n));
+      libmesh_assert(this->get_node(n)->valid_id());
+    }
+}
+
+
+
 void Elem::libmesh_assert_valid_neighbors() const
 {
   for (unsigned int s=0; s<this->n_neighbors(); s++)
@@ -560,7 +572,7 @@ void Elem::make_links_to_me_remote()
   libmesh_assert (this != remote_elem);
 
   // We need to have handled any children first
-#ifdef ENABLE_AMR
+#if defined(ENABLE_AMR) && defined(DEBUG)
   if (this->has_children())
     for (unsigned int c = 0; c != this->n_children(); ++c)
       {
@@ -570,41 +582,88 @@ void Elem::make_links_to_me_remote()
 #endif
 
   // Remotify any neighbor links
-  if (!this->subactive())
-    for (unsigned int s = 0; s != this->n_sides(); ++s)
-      {
-        Elem *neigh = this->neighbor(s);
-        if (neigh && neigh != remote_elem &&
-            this->level() == neigh->level())
-          {
-            libmesh_assert (neigh->is_neighbor(this));
-            unsigned int my_s = neigh->which_neighbor_am_i(this);
-            libmesh_assert (my_s < neigh->n_neighbors());
-
+  for (unsigned int s = 0; s != this->n_sides(); ++s)
+    {
+      Elem *neigh = this->neighbor(s);
+      if (neigh && neigh != remote_elem)
+        {
+	  // My neighbor should never be more refined than me; my real
+	  // neighbor would have been its parent in that case.
+	  libmesh_assert(this->level() >= neigh->level());
+	  
+          if (this->level() == neigh->level() &&
+              neigh->has_neighbor(this))
+            {
 #ifdef ENABLE_AMR
-	    // My neighbor may have descendants which also consider me a
-	    // neighbor
-            std::vector<const Elem*> family;
-            neigh->family_tree_by_neighbor (family, this);
+	      // My neighbor may have descendants which also consider me a
+	      // neighbor
+              std::vector<const Elem*> family;
+              neigh->family_tree_by_neighbor (family, this);
 
-            // FIXME - There's a lot of ugly const_casts here; we
-            // may want to make remote_elem non-const and create
-            // non-const versions of the family_tree methods
-            for (unsigned int i=0; i != family.size(); ++i)
-              {
-                Elem *n = const_cast<Elem*>(family[i]);
-                libmesh_assert (n);
-                if (n == remote_elem)
-                  continue;
-                libmesh_assert (n->neighbor(my_s) == this);
-                n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
-              }
+              // FIXME - There's a lot of ugly const_casts here; we
+              // may want to make remote_elem non-const and create
+              // non-const versions of the family_tree methods
+              for (unsigned int i=0; i != family.size(); ++i)
+                {
+                  Elem *n = const_cast<Elem*>(family[i]);
+                  libmesh_assert (n);
+                  if (n == remote_elem)
+                    continue;
+                  unsigned int my_s = n->which_neighbor_am_i(this);
+                  libmesh_assert (my_s < n->n_neighbors());
+                  libmesh_assert (n->neighbor(my_s) == this);
+                  n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
+                }
 #else
-            libmesh_assert (neigh->neighbor(my_s) == this);
-            neigh->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
+              unsigned int my_s = neigh->which_neighbor_am_i(this);
+              libmesh_assert (my_s < neigh->n_neighbors());
+              libmesh_assert (neigh->neighbor(my_s) == this);
+              neigh->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
 #endif
-          }
-      }
+            }
+#ifdef ENABLE_AMR
+          // Even if my neighbor doesn't link back to me, it might
+	  // have subactive descendants which do
+	  else if (neigh->has_children())
+            {
+              // If my neighbor at the same level doesn't have me as a
+	      // neighbor, I must be subactive
+	      libmesh_assert(this->level() > neigh->level() ||
+			     this->subactive());
+
+              // My neighbor must have some ancestor of mine as a
+	      // neighbor
+	      Elem *ancestor = this->parent();
+	      libmesh_assert(ancestor);
+              while (!neigh->has_neighbor(ancestor))
+                {
+                  ancestor = ancestor->parent();
+	          libmesh_assert(ancestor);
+                }
+
+	      // My neighbor may have descendants which consider me a
+	      // neighbor
+              std::vector<const Elem*> family;
+              neigh->family_tree_by_subneighbor (family, ancestor, this);
+
+              // FIXME - There's a lot of ugly const_casts here; we
+              // may want to make remote_elem non-const and create
+              // non-const versions of the family_tree methods
+              for (unsigned int i=0; i != family.size(); ++i)
+                {
+                  Elem *n = const_cast<Elem*>(family[i]);
+                  libmesh_assert (n);
+                  if (n == remote_elem)
+                    continue;
+                  unsigned int my_s = n->which_neighbor_am_i(this);
+                  libmesh_assert (my_s < n->n_neighbors());
+                  libmesh_assert (n->neighbor(my_s) == this);
+                  n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
+                }
+            }
+#endif
+        }
+    }
 
 #ifdef ENABLE_AMR
   // Remotify parent's child link
@@ -614,7 +673,6 @@ void Elem::make_links_to_me_remote()
       unsigned int me = parent->which_child_am_i(this);
       libmesh_assert (parent->_children[me] == this);
       parent->_children[me] = const_cast<RemoteElem*>(remote_elem);
-      this->set_parent(const_cast<RemoteElem*>(remote_elem));
     }
 #endif
 }
@@ -862,19 +920,64 @@ void Elem::family_tree_by_neighbor (std::vector<const Elem*>& family,
     family.clear();
 
   // This only makes sense if we're already a neighbor
-  libmesh_assert (this->is_neighbor(neighbor));
+  libmesh_assert (this->has_neighbor(neighbor));
 
   // Add this element to the family tree.
   family.push_back(this);
 
   // Recurse into the elements children, if it has them.
   // Do not clear the vector any more.
-  if (!this->active())
+  if (this->has_children())
     for (unsigned int c=0; c<this->n_children(); c++)
       {
         Elem *child = this->child(c);
-        if (child != remote_elem && child->is_neighbor(neighbor))
+        if (child != remote_elem && child->has_neighbor(neighbor))
           child->family_tree_by_neighbor (family, neighbor, false);
+      }
+}
+
+
+
+void Elem::family_tree_by_subneighbor (std::vector<const Elem*>& family,
+                                       const Elem* neighbor,
+                                       const Elem* subneighbor,
+			               const bool reset) const
+{
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    family.clear();
+
+  // To simplifly this function we need an existing neighbor
+  libmesh_assert (neighbor);
+  libmesh_assert (neighbor != remote_elem);
+  libmesh_assert (this->has_neighbor(neighbor));
+
+  // This only makes sense if subneighbor descends from neighbor
+  libmesh_assert (subneighbor);
+  libmesh_assert (subneighbor != remote_elem);
+  libmesh_assert (neighbor->is_ancestor_of(subneighbor));
+
+  // Add this element to the family tree if applicable.
+  if (neighbor == subneighbor)
+    family.push_back(this);
+
+  // Recurse into the elements children, if it has them.
+  // Do not clear the vector any more.
+  if (this->has_children())
+    for (unsigned int c=0; c != this->n_children(); ++c)
+      {
+        Elem *child = this->child(c);
+        if (child != remote_elem)
+          for (unsigned int s=0; s != child->n_sides(); ++s)
+            {
+	      Elem *child_neigh = child->neighbor(s);
+              if (child_neigh &&
+		  (child_neigh == neighbor ||
+		   (child_neigh->parent() == neighbor &&
+		    child_neigh->is_ancestor_of(subneighbor))))
+                child->family_tree_by_subneighbor (family, child_neigh,
+                                                   subneighbor, false);
+            }
       }
 }
 
@@ -890,7 +993,7 @@ void Elem::active_family_tree_by_neighbor (std::vector<const Elem*>& family,
 
   // This only makes sense if we're already a neighbor
   if (this->level() >= neighbor->level())
-    libmesh_assert (this->is_neighbor(neighbor));
+    libmesh_assert (this->has_neighbor(neighbor));
 
   // Add an active element to the family tree.
   if (this->active())
@@ -898,11 +1001,11 @@ void Elem::active_family_tree_by_neighbor (std::vector<const Elem*>& family,
 
   // Or recurse into an ancestor element's children.
   // Do not clear the vector any more.
-  else
+  else if (this->has_children())
     for (unsigned int c=0; c<this->n_children(); c++)
       {
         Elem *child = this->child(c);
-        if (child != remote_elem && child->is_neighbor(neighbor))
+        if (child != remote_elem && child->has_neighbor(neighbor))
           child->active_family_tree_by_neighbor (family, neighbor, false);
       }
 }
@@ -919,7 +1022,7 @@ unsigned int Elem::min_p_level_by_neighbor(const Elem* neighbor,
   if (this->active())
     return std::min(current_min, this->p_level());
 
-  libmesh_assert(is_neighbor(neighbor));
+  libmesh_assert(has_neighbor(neighbor));
 
   // The p_level() of an ancestor element is already the minimum
   // p_level() of its children - so if that's high enough, we don't
@@ -932,7 +1035,7 @@ unsigned int Elem::min_p_level_by_neighbor(const Elem* neighbor,
   for (unsigned int c=0; c<this->n_children(); c++)
     {
       const Elem* const child = this->child(c);
-      if (child != remote_elem && child->is_neighbor(neighbor))
+      if (child != remote_elem && child->has_neighbor(neighbor))
         min_p_level =
 	  child->min_p_level_by_neighbor(neighbor,
                                          min_p_level);
@@ -962,7 +1065,7 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
       return std::min(current_min, new_p_level);
     }
 
-  libmesh_assert(is_neighbor(neighbor));
+  libmesh_assert(has_neighbor(neighbor));
 
   unsigned int min_p_level = current_min;
 
@@ -970,7 +1073,7 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
     {
       const Elem* const child = this->child(c);
       if (child && child != remote_elem)
-        if (child->is_neighbor(neighbor))
+        if (child->has_neighbor(neighbor))
           min_p_level =
 	    child->min_new_p_level_by_neighbor(neighbor,
                                                min_p_level);

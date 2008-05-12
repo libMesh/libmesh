@@ -174,7 +174,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns \p true if the element \p elem in question is a neighbor
    * of this element, \p false otherwise.
    */
-  bool is_neighbor (const Elem* elem) const;
+  bool has_neighbor (const Elem* elem) const;
   
   /**
    * If the element \p elem in question is a neighbor
@@ -499,6 +499,13 @@ class Elem : public ReferenceCountedObject<Elem>,
   bool has_ancestor_children () const;
 
   /**
+   * @returns \p true if \p descendant is a child of \p this, or a
+   * child of a child of \p this, etc.
+   * Always returns \p false if AMR is disabled. 
+   */
+  bool is_ancestor_of(const Elem *descendant) const;
+
+  /**
    * @returns a const pointer to the element's parent.  Returns \p NULL if
    * the element was not created via refinement, i.e. was read from file.
    */
@@ -687,6 +694,17 @@ class Elem : public ReferenceCountedObject<Elem>,
 		                const bool reset=true) const;
 
   /**
+   * Same as the \p family_tree() member, but only adds elements
+   * which are next to \p subneighbor.  Only applicable when
+   * \p this->has_neighbor(neighbor) and
+   * \p neighbor->is_ancestor(subneighbor)
+   */
+  void family_tree_by_subneighbor (std::vector<const Elem*>& family,
+		                   const Elem *neighbor,
+		                   const Elem *subneighbor,
+		                   const bool reset=true) const;
+
+  /**
    * Same as the \p active_family_tree() member, but only adds elements
    * which are next to \p neighbor.
    */
@@ -777,6 +795,12 @@ class Elem : public ReferenceCountedObject<Elem>,
    * element.
    */
   void libmesh_assert_valid_neighbors() const;
+
+  /**
+   * This function checks for a valid id and for pointers to nodes
+   * with valid ids at this element.
+   */
+  void libmesh_assert_valid_node_pointers() const;
 #endif // DEBUG
 
 protected:
@@ -1168,7 +1192,7 @@ void Elem::set_neighbor (const unsigned int i, Elem* n)
 
 
 inline
-bool Elem::is_neighbor (const Elem* elem) const
+bool Elem::has_neighbor (const Elem* elem) const
 {
   for (unsigned int n=0; n<this->n_neighbors(); n++)
     if (this->neighbor(n) == elem)
@@ -1210,7 +1234,7 @@ bool Elem::on_boundary () const
 {
   // By convention, the element is on the boundary
   // if it has a NULL neighbor.
-  return this->is_neighbor(NULL);
+  return this->has_neighbor(NULL);
 }
 
 
@@ -1295,6 +1319,23 @@ bool Elem::has_ancestor_children() const
     for (unsigned int c=0; c != this->n_children(); c++)
       if (this->child(c)->has_children())
 	return true;
+#endif
+  return false;
+}
+
+
+
+inline
+bool Elem::is_ancestor_of(const Elem *descendant) const
+{
+#ifdef ENABLE_AMR
+  const Elem *e = descendant;
+  while (e)
+    {
+      if (this == e)
+        return true;
+      e = e->parent();
+    }
 #endif
   return false;
 }
