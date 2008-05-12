@@ -795,6 +795,30 @@ void MeshTools::correct_node_proc_ids
 
 
 #ifdef DEBUG
+void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase &mesh)
+{
+  const MeshBase::const_element_iterator el_end =
+    mesh.elements_end();
+  for (MeshBase::const_element_iterator el = 
+       mesh.elements_begin(); el != el_end; ++el)
+    {
+      const Elem* elem = *el;
+      libmesh_assert (elem);
+      while (elem)
+	{
+	  elem->libmesh_assert_valid_node_pointers();
+          for (unsigned int n=0; n != elem->n_neighbors(); ++n)
+            if (elem->neighbor(n) &&
+                elem->neighbor(n) != remote_elem)
+	      elem->neighbor(n)->libmesh_assert_valid_node_pointers();
+	    
+          libmesh_assert (elem->parent() != remote_elem);
+	  elem = elem->parent();
+	}
+    }
+}
+
+
 void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase &mesh)
 {
   const MeshBase::const_element_iterator el_end =
@@ -804,26 +828,35 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase &mesh)
     {
       const Elem* elem = *el;
       libmesh_assert (elem);
-      if (elem->active())
-        for (unsigned int s=0; s != elem->n_neighbors(); ++s)
-          {
-            const Elem* neigh = elem->neighbor(s);
-            libmesh_assert (neigh != remote_elem);
-          }
-      else if (elem->ancestor())
-        {
-          bool has_active_child = false;
-          bool has_remote_child = false;
+      for (unsigned int n=0; n != elem->n_neighbors(); ++n)
+	libmesh_assert (elem->neighbor(n) != remote_elem);
+      const Elem* parent = elem->parent();
+      if (parent)
+	{
+          libmesh_assert (parent != remote_elem);
           for (unsigned int c=0; c != elem->n_children(); ++c)
-            {
-              if (elem->child(c) == remote_elem)
-                has_remote_child = true;
-              if (elem->child(c)->active())
-                has_active_child = true;
-            }
-          libmesh_assert(!has_remote_child || !has_active_child);
-        }
-        
+	    libmesh_assert (parent->child(c) != remote_elem);
+	}
+    }
+}
+
+
+void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase &mesh,
+                                                const Elem *bad_elem)
+{
+  const MeshBase::const_element_iterator el_end =
+    mesh.elements_end();
+  for (MeshBase::const_element_iterator el = 
+       mesh.elements_begin(); el != el_end; ++el)
+    {
+      const Elem* elem = *el;
+      libmesh_assert (elem);
+      libmesh_assert (elem->parent() != bad_elem);
+      for (unsigned int n=0; n != elem->n_neighbors(); ++n)
+	libmesh_assert(elem->neighbor(n) != bad_elem);
+      if (elem->has_children())
+        for (unsigned int c=0; c != elem->n_children(); ++c)
+	  libmesh_assert(elem->child(c) != bad_elem);
     }
 }
 
