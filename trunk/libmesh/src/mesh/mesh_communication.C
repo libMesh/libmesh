@@ -1189,6 +1189,8 @@ void MeshCommunication::broadcast_bcs (const MeshBase&,
 
 void MeshCommunication::allgather (ParallelMesh& mesh) const
 {
+  START_LOG("allgather()","MeshCommunication");
+
   // The mesh should know it's about to be serialized
   libmesh_assert (mesh.is_serial());
 
@@ -1198,6 +1200,8 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
   // Inform new elements of their neighbors,
   // while resetting all remote_elem links
   mesh.find_neighbors(true);
+
+  STOP_LOG("allgather()","MeshCommunication");
 }
 
 #ifndef HAVE_MPI
@@ -1802,6 +1806,8 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent
   (MeshBase& mesh,
    LocationMap<Node>& loc_map)
 {
+  START_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
+
   // This function must be run on all processors at once
   parallel_only();
 
@@ -1822,6 +1828,8 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent
   SyncProcIds sync(mesh);
   Parallel::sync_dofobject_data_by_xyz
     (mesh.nodes_begin(), mesh.nodes_end(), loc_map, sync);
+
+  STOP_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
 }
 
 
@@ -1893,11 +1901,10 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
       const Elem *elem = *l_elem_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         local_nodes[elem->node(n)] = true;
-      const Elem *a = elem;
-      while (a)
+      while (elem)
         {
-          semilocal_elems[a->id()] = true;
-          a = a->parent();
+          semilocal_elems[elem->id()] = true;
+          elem = elem->parent();
         }
     }
 
@@ -1912,11 +1919,10 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
       const Elem *elem = *u_elem_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         local_nodes[elem->node(n)] = true;
-      const Elem *a = elem;
-      while (a)
+      while (elem)
         {
-          semilocal_elems[a->id()] = true;
-          a = a->parent();
+          semilocal_elems[elem->id()] = true;
+          elem = elem->parent();
         }
     }
 
@@ -1926,15 +1932,14 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
                              nl_end     = mesh.not_local_elements_end();
   for (; nl_elem_it != nl_end; ++nl_elem_it)
     {
-      Elem *elem = *nl_elem_it;
+      const Elem *elem = *nl_elem_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         if (local_nodes[elem->node(n)])
           {
-            const Elem *a = elem;
-            while (a)
+            while (elem)
               {
-                semilocal_elems[a->id()] = true;
-                a = a->parent();
+                semilocal_elems[elem->id()] = true;
+                elem = elem->parent();
               }
             break;
           }
