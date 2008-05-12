@@ -284,6 +284,19 @@ namespace MeshTools
 
 #ifdef DEBUG
   /**
+   * A function for verifying that an element has been cut off
+   * from the rest of the mesh
+   */
+  void libmesh_assert_no_links_to_elem(const MeshBase &mesh,
+                                       const Elem *bad_elem);
+
+  /**
+   * A function for walking across the mesh to try and ferret out
+   * invalidated or misassigned pointers
+   */
+  void libmesh_assert_valid_node_pointers (const MeshBase &mesh);
+
+  /**
    * A function for verifying that active local elements' neighbors
    * are never remote elements
    */
