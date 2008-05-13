@@ -22,6 +22,7 @@
 
 
 // C++ Includes -----------------------------------
+#include <limits>
 #include <utility>
 
 // Local Includes -----------------------------------
