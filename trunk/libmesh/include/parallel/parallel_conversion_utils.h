@@ -23,7 +23,10 @@
 #define __parallel_conversion_utils_h__
 
 #include "libmesh_common.h"
+
+#ifdef HAVE_LIBHILBERT
 #include "hilbert.h"
+#endif
 
 
 
