@@ -40,18 +40,17 @@ vol. 22, no. 3--4, pp. 237--254, 2006. 	 (<a href="http://cfdlab.ae.utexas.edu/~
 
 <ul>
 
+<li> John W. Peterson, 
+<i>Parallel Adaptive Finite Element Methods for Problems in Natural Convection.</i>
+<a href="http://www.cfdlab.ae.utexas.edu/~peterson/diss.pdf">PhD Dissertation</a>, 
+The University of Texas at Austin, May 2008. 
+</li>
 
+<br>
 <li> Benjamin S. Kirk, 
 <i>Adaptive Finite Element Simulation of Flow and Transport Applications on Parallel Computers.</i>
 <a href="http://www.cfdlab.ae.utexas.edu/~benkirk/dissertation.pdf">PhD Dissertation</a>, 
 The University of Texas at Austin, May 2007. 
-</li>
-
-<br>
-<li> John W. Peterson,
-<i>A Numerical Investigation of Benard Convection in Small Aspect Ratio Containers.</i>
-<a href="http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf">Masters Report</a>, 
-The University of Texas at Austin, August 2004. 
 </li>
 
 <br>
@@ -87,31 +86,10 @@ J.W. Peterson, G.F. Carey, D.J. Knezevic, and B.T. Murray, <i>Adaptive
 </li>
 
 <br>
-
-
-
-<li>
-G. F. Carey, W. Barth, B. Kirk, and J. W. Peterson,
-<i>Parallel CFD for Flow and Transport Applications Including Unstructured and Adaptive Grids.</i>
-  In <a href="http://ceani.ulpgc.es/pcfd04/">
-  Proceedings of Parallel CFD 2004: Multidisciplinary Applications</a>,
-  G. Winter, A. Ecer, J. Periaux, N. Satofuka and P. Fox (Eds), (Amsterdam,
-  The Netherlands), Elsevier Science B.V., Oct 2005. ISBN: 0444520244.
-</li>
-
-<br>
 <li>
 R. H. Stogner and G. F. Carey,
 <i>C<sup>1</sup> macroelements in adaptive finite element methods.</i>
 <a href="http://doi.wiley.com/10.1002/nme.1912">IJNME</a> vol 70, issue 9, Pages 1076 - 1095, 2006.
-</li>
-
-<br>
-<li>
-Carey GF, Anderson M, Carnes B, and Kirk B, <i>Some aspects of adaptive grid
-  technology related to boundary and interior layers.</i>
-  <a href="http://dx.doi.org/10.1016/j.cam.2003.09.036"> J. Comput. Appl. Math.</a>
-    166(1):55--86, ISSN 0377-0427, 2004.
 </li>
 
 <br>
@@ -133,6 +111,31 @@ acoustics.</i>
 <a href="http://dx.doi.org/10.1016/j.cma.2006.01.008">
 CMAME</a>
 Volume 195, Issues 44-47, Pages 6463-6478, 2006.
+</li>
+
+<br>
+<li>
+G. F. Carey, W. Barth, B. Kirk, and J. W. Peterson,
+<i>Parallel CFD for Flow and Transport Applications Including Unstructured and Adaptive Grids.</i>
+  In <a href="http://ceani.ulpgc.es/pcfd04/">
+  Proceedings of Parallel CFD 2004: Multidisciplinary Applications</a>,
+  G. Winter, A. Ecer, J. Periaux, N. Satofuka and P. Fox (Eds), (Amsterdam,
+  The Netherlands), Elsevier Science B.V., Oct 2005. ISBN: 0444520244.
+</li>
+
+<br>
+<li>
+Carey GF, Anderson M, Carnes B, and Kirk B, <i>Some aspects of adaptive grid
+  technology related to boundary and interior layers.</i>
+  <a href="http://dx.doi.org/10.1016/j.cam.2003.09.036"> J. Comput. Appl. Math.</a>
+    166(1):55--86, ISSN 0377-0427, 2004.
+</li>
+
+<br>
+<li> John W. Peterson,
+<i>A Numerical Investigation of Benard Convection in Small Aspect Ratio Containers.</i>
+<a href="http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf">Masters Report</a>, 
+The University of Texas at Austin, August 2004. 
 </li>
         
 </ul>

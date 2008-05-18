@@ -48,10 +48,10 @@ dev_table_entry("images/spetersen.jpg",
 
 <?php
 dev_table_entry("images/jwpeterson.jpg",
-                "John W. Peterson",
+                "Dr. John W. Peterson",
                 "http://www.cfdlab.ae.utexas.edu/~peterson",
                 "<a href=\"http://www.cfdlab.ae.utexas.edu/~peterson/resume.pdf\">(curriculum vitae)</a>",
-		"PhD Student, Developer",
+		"Developer",
 		"<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>");
 ?>
 
