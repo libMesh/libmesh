@@ -46,7 +46,7 @@ AC_ARG_WITH([cxx],
                            [C++ compiler to use]),
 	    [CXX="$withval"],
 	    [])
-AC_PROG_CXX
+AC_PROG_CXX(mpicxx mpiCC pgCC icc g++ c++)
 
 dnl Determine a C compiler to use.  If CC is not already set, checks for
 dnl gcc, cc, and other C compilers.  Then sets the CC variable to the result.
@@ -55,7 +55,7 @@ AC_ARG_WITH([cc],
                            [C compiler to use]),
 	    [CC="$withval"],
 	    [])
-AC_PROG_CC
+AC_PROG_CC(mpicc pgcc icc gcc cc)
 
 
 dnl --------------------------------------------------------------
