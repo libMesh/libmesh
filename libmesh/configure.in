@@ -233,6 +233,24 @@ dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
+dnl Variational smoother -- enabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(vsmoother,
+              AC_HELP_STRING([--enable-vsmoother],
+                             [build with variational smoother suppport]),
+              enablevsmoother=$enableval,
+              enablevsmoother=yes)
+
+if test "$enablevsmoother" != no ; then
+  AC_DEFINE(ENABLE_VSMOOTHER, 1,
+           [Flag indicating if the library should be built with variational smoother support])
+  AC_MSG_RESULT(<<< Configuring library with variational smoother support >>>)
+fi
+dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
 dnl Periodic BCs -- enabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(periodic,

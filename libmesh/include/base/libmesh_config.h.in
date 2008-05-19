@@ -15,6 +15,10 @@
 /* Flag indicating if the library should be built with infinite elements */
 #undef ENABLE_INFINITE_ELEMENTS
 
+/* Flag indicating if the library should be built with a variational
+ * smoother */
+#undef ENABLE_VSMOOTHER
+
 /* Flag indicating if the library should use the experimental ParallelMesh as
    its default Mesh type */
 #undef ENABLE_PARMESH
