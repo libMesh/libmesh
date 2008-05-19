@@ -22,6 +22,7 @@
 #ifndef __mesh_smoother_vsmoother_h__
 #define __mesh_smoother_vsmoother_h__
 
+#include "libmesh_config.h"
 #ifdef ENABLE_VSMOOTHER
 
 // C++ Includes   -----------------------------------
