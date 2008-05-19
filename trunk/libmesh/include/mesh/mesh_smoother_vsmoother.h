@@ -22,6 +22,8 @@
 #ifndef __mesh_smoother_vsmoother_h__
 #define __mesh_smoother_vsmoother_h__
 
+#ifdef ENABLE_VSMOOTHER
+
 // C++ Includes   -----------------------------------
 #include <vector>
 #include <map>
@@ -308,5 +310,6 @@ private:
               int adp, LPDOUBLE afun, FILE *sout);
 };
 
+#endif // ENABLE_VSMOOTHER
 
 #endif
