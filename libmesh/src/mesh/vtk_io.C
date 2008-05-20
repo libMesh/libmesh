@@ -310,7 +310,7 @@ void VTKIO::read (const std::string& name)
   libmesh_error();
 
 #else
-  //std::cout<<"read "<<name <<std::endl;  
+//  std::cout<<"read "<<name <<std::endl;  
   vtkXMLUnstructuredGridReader *reader = vtkXMLUnstructuredGridReader::New();
   reader->SetFileName( name.c_str() );
   //std::cout<<"force read"<<std::endl;  
@@ -327,16 +327,14 @@ void VTKIO::read (const std::string& name)
 
   // Clear out any pre-existing data from the Mesh
   mesh.clear();
-  
-  // read in the nodes
-  vtkPoints *points = _vtk_grid->GetPoints();
 	
   // always numbered nicely??, so we can loop like this
-  for (unsigned int i=0; i < static_cast<unsigned int>(points->GetNumberOfPoints()); ++i)
+  // I'm pretty sure it is numbered nicely
+  for (unsigned int i=0; i < static_cast<unsigned int>(_vtk_grid->GetNumberOfPoints()); ++i)
     {
       // add to the id map
       // and add the actual point
-      double * pnt = points->GetPoint(i);
+      double * pnt = _vtk_grid->GetPoint(static_cast<vtkIdType>(i));
       Point xyz(pnt[0],pnt[1],pnt[2]);
       Node* newnode = mesh.add_point(xyz,i);
 
@@ -374,6 +372,7 @@ void VTKIO::read (const std::string& name)
 	  std::cerr << "element type not implemented in vtkinterface " << cell->GetCellType() << std::endl;
 	  libmesh_error();
 	}
+
   // get the straightforward numbering from the VTK cells
   for(unsigned int j=0;j<elem->n_nodes();++j){
 	  elem->set_node(j) = mesh.node_ptr(cell->GetPointId(j));
