@@ -628,10 +628,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 
 
 		  // d/dzeta
-		case 2:
-		  here();
-		  std::cout << "Better double-check these... BSK" << std::endl;
-	    
+		case 2:	    
 		  switch(i)
 		    {
 		    case 0:
@@ -640,7 +637,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 			const Real b=1.;
 		  
 			return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
-				     (1. - xi)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
+				     (1. - zeta)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
 				    ((1. - zeta)*(1. - zeta) + eps));
 		      }
 		
@@ -650,7 +647,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 			const Real b=1.;
 		  
 			return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
-				     (1. - xi)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
+				     (1. - zeta)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
 				    ((1. - zeta)*(1. - zeta) + eps));
 		      }
 		
@@ -660,7 +657,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 			const Real b=-1.;
 		  
 			return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
-				     (1. - xi)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
+				     (1. - zeta)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
 				    ((1. - zeta)*(1. - zeta) + eps));
 		      }
 		
@@ -670,7 +667,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 			const Real b=-1.;
 		  
 			return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
-				     (1. - xi)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
+				     (1. - zeta)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
 				    ((1. - zeta)*(1. - zeta) + eps));
 		      }
 		
