@@ -31,6 +31,7 @@
 #include "elem.h"
 #include "fe_interface.h"
 #include "fe_type.h"
+#include "fe_base.h" // FEBase::build() for continuity test
 #include "libmesh_logging.h"
 #include "mesh_base.h"
 #include "mesh_tools.h"
@@ -1066,8 +1067,15 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   const unsigned int proc_id           = mesh.processor_id();
   const unsigned int n_dofs_on_proc    = this->n_dofs_on_processor(proc_id);
 
-  static const bool implicit_neighbor_dofs = 
+  bool implicit_neighbor_dofs = 
     libMesh::on_command_line ("--implicit_neighbor_dofs");
+
+  // look at all the variables in this system.  If any are discontinuous then
+  // force implicit_neighbor_dofs=true
+  for (unsigned int var=0; var<this->n_variables(); var++)
+    if (FEBase::build (mesh.mesh_dimension(),
+		       this->variable_type(var))->get_continuity() ==  DISCONTINUOUS)
+      implicit_neighbor_dofs = true;
 
   
   // We can be more efficient in the threaded sparsity pattern assembly
