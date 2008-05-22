@@ -1072,11 +1072,17 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 
   // look at all the variables in this system.  If any are discontinuous then
   // force implicit_neighbor_dofs=true
-  for (unsigned int var=0; var<this->n_variables(); var++)
-    if (FEBase::build (mesh.mesh_dimension(),
-		       this->variable_type(var))->get_continuity() ==  DISCONTINUOUS)
-      implicit_neighbor_dofs = true;
+  {
+    bool all_discontinuous_dofs = true;
+    
+    for (unsigned int var=0; var<this->n_variables(); var++)
+      if (FEBase::build (mesh.mesh_dimension(),
+			 this->variable_type(var))->get_continuity() !=  DISCONTINUOUS)
+	all_discontinuous_dofs = false;
 
+    if (all_discontinuous_dofs)
+      implicit_neighbor_dofs = true;
+  }
   
   // We can be more efficient in the threaded sparsity pattern assembly
   // if we don't need the exact pattern.  For some sparse matrix formats
