@@ -119,10 +119,13 @@ template <typename T>
 T* LocationMap<T>::find(const Point& p,
                      const Real tol)
 {
-  // Look for the key in the multimap
+  // Look for a likely key in the multimap
+  unsigned int pointkey = this->key(p);
+
+  // Look for the exact key first
   std::pair<typename map_type::iterator,
             typename map_type::iterator>
-    pos = _map.equal_range(this->key(p));
+    pos = _map.equal_range(pointkey);
 
   while (pos.first != pos.second)
     if (p.absolute_fuzzy_equals
@@ -130,6 +133,30 @@ T* LocationMap<T>::find(const Point& p,
       return pos.first->second;
     else
       ++pos.first;
+
+  // Look for neighboring bins' keys next
+  const unsigned int chunkmax = 1024;
+  for (int xoffset = -1; xoffset != 2; ++xoffset)
+    {
+      for (int yoffset = -1; yoffset != 2; ++yoffset)
+        {
+          for (int zoffset = -1; zoffset != 2; ++zoffset)
+            {
+              std::pair<typename map_type::iterator,
+                        typename map_type::iterator>
+                pos = _map.equal_range(pointkey +
+				       xoffset*chunkmax*chunkmax +
+				       yoffset*chunkmax +
+				       zoffset);
+              while (pos.first != pos.second)
+                if (p.absolute_fuzzy_equals
+                     (this->point_of(*(pos.first->second)), tol))
+                  return pos.first->second;
+                else
+                  ++pos.first;
+            }
+        }
+    }
 
   return NULL;
 }
@@ -147,8 +174,8 @@ unsigned int LocationMap<T>::key(const Point& p)
                  (_upper_bound[2] - _lower_bound[2]);
 
   // 10 bits per coordinate, to work with 32+ bit machines
-  unsigned chunkmax = 1024;
-  Real chunkfloat = 1024.0;
+  const unsigned int chunkmax = 1024;
+  const Real chunkfloat = 1024.0;
 
   unsigned int n0 = static_cast<unsigned int> (chunkfloat * xscaled),
                n1 = static_cast<unsigned int> (chunkfloat * yscaled),
