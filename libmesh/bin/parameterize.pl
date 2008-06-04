@@ -206,9 +206,9 @@ sub parameterizeonevariable {
 				die "Can't open output file $fixedsubdir$configbasename : $!\n";
 
 			while (<INPUTFILE>) {
-				if (m/[ \t]*([^# \t]*)[ \t]*= *paramrange *\((.*),(.*),(.*)\)(.*)/ or 
-				    m/[ \t]*([^# \t]*)[ \t]*= *paramlist *\((.*?)\)(.*)/ or
-				    m/[ \t]*([^# \t]*)[ \t]*= *paramvalue *\((.*?)\)(.*)/) {
+		                if (m/^[ \t]*([^# \t]*)[ \t]*=(.*?)paramrange *\((.*?),(.*?),(.*?)\)(.*)/ or
+				    m/^[ \t]*([^# \t]*)[ \t]*=(.*?)paramlist *\((.*?)\)(.*)/ or
+				    m/^[ \t]*([^# \t]*)[ \t]*=(.*?)paramvalue *\((.*?)\)(.*)/) {
 					my $varname = $1;
 					if ($varname ne $$fixednamesref[$index]) {
 						print "Expected $varname eq $$fixednamesref[$index] at index $index\n";
