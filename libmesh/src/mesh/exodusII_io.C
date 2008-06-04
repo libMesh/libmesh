@@ -1474,31 +1474,34 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
     
   #else
 
-  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-  
-  ExodusII out_ex = new ExodusII(this->verbose());
-  out_ex.create(fname);
-  out_ex.initialize(fname,mesh);
-  out_ex.write_nodal_coordinates(mesh);
-  out_ex.write_elements(mesh);
-
-  int num_vars = names.size();
-  int num_nodes = mesh.n_nodes();
-  
-  out_ex.initialize_nodal_variables(names);
-
-  for(int c=0; c<num_vars; c++)
+  if (libMesh::processor_id() == 0)
   {
-    std::vector<Number> cur_soln(num_nodes);
-
-    //Copy out this variable's solution
-    for(int i=0; i<num_nodes; i++)
-      cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
-    
-    out_ex.write_nodal_values(c+1,cur_soln,1);
-  }  
+    const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   
-  out_ex.close();
+    ExodusII out_ex = new ExodusII(this->verbose());
+    out_ex.create(fname);
+    out_ex.initialize(fname,mesh);
+    out_ex.write_nodal_coordinates(mesh);
+    out_ex.write_elements(mesh);
+
+    int num_vars = names.size();
+    int num_nodes = mesh.n_nodes();
+  
+    out_ex.initialize_nodal_variables(names);
+
+    for(int c=0; c<num_vars; c++)
+      {
+	std::vector<Number> cur_soln(num_nodes);
+
+	//Copy out this variable's solution
+	for(int i=0; i<num_nodes; i++)
+	  cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+    
+	out_ex.write_nodal_values(c+1,cur_soln,1);
+      }  
+  
+    out_ex.close();
+  }
   
   #endif
 }
