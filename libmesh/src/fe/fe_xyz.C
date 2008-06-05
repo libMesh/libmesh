@@ -84,13 +84,13 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
         this->dphidx.resize  (n_approx_shape_functions);
         this->dphidy.resize  (n_approx_shape_functions);
         this->dphidz.resize  (n_approx_shape_functions);
-          
-        if (Dim > 1)
-          this->dphideta_map.resize  (n_mapping_shape_functions);
-    
-        if (Dim == 3)
-          this->dphidzeta_map.resize (n_mapping_shape_functions);
       }
+          
+      if (Dim > 1)
+        this->dphideta_map.resize  (n_mapping_shape_functions);
+    
+      if (Dim == 3)
+        this->dphidzeta_map.resize (n_mapping_shape_functions);
 #ifdef ENABLE_SECOND_DERIVATIVES
     if (this->calculate_d2phi)
       {
@@ -102,18 +102,18 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
         this->d2phidydz.resize (n_approx_shape_functions);
         this->d2phidz2.resize  (n_approx_shape_functions);
         this->d2phidxi2.resize (n_approx_shape_functions);
-        if (Dim > 1)
-          {
-            this->d2phidxideta_map.resize (n_approx_shape_functions);
-            this->d2phideta2_map.resize   (n_approx_shape_functions);
-          }
-        if (Dim > 2)
-          {
-            this->d2phidxidzeta_map.resize  (n_approx_shape_functions);
-            this->d2phidetadzeta_map.resize (n_approx_shape_functions);
-            this->d2phidzeta2_map.resize    (n_approx_shape_functions);
-          }
       }
+      if (Dim > 1)
+        {
+          this->d2phidxideta_map.resize (n_mapping_shape_functions);
+          this->d2phideta2_map.resize   (n_mapping_shape_functions);
+        }
+      if (Dim > 2)
+        {
+          this->d2phidxidzeta_map.resize  (n_mapping_shape_functions);
+          this->d2phidetadzeta_map.resize (n_mapping_shape_functions);
+          this->d2phidzeta2_map.resize    (n_mapping_shape_functions);
+        }
 #endif // ifdef ENABLE_SECOND_DERIVATIVES
     
     this->phi_map.resize         (n_mapping_shape_functions);
@@ -152,7 +152,7 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
 	this->dphidxi_map[i].resize     (n_qp);
 #ifdef ENABLE_SECOND_DERIVATIVES
 	this->d2phidxi2_map[i].resize   (n_qp);
-	if (Dim > 1)
+        if (Dim > 1)
           {
 	    this->d2phidxideta_map[i].resize   (n_qp);
 	    this->d2phideta2_map[i].resize     (n_qp);
