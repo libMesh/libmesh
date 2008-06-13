@@ -246,22 +246,24 @@ void EquationSystems::read (const std::string& name,
       
       // Undo the temporary numbering.
       if (!read_legacy_format)
-	if (dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh)))
-	  {
-	    ParallelMesh *mesh = dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh));    
-	    MeshTools::Private::fix_broken_node_and_element_numbering(*mesh);
-	  }
-	else if (dynamic_cast<SerialMesh*>(const_cast<MeshBase*>(&_mesh)))
-	  {
-	    SerialMesh *mesh = dynamic_cast<SerialMesh*>(const_cast<MeshBase*>(&_mesh));    
-	    MeshTools::Private::fix_broken_node_and_element_numbering(*mesh);
-	  }
-	else
-	  {
-	    std::cerr << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
-		      << std::endl;
-	    libmesh_error();
-	  }	  
+	{
+	  if (dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh)))
+	    {
+	      ParallelMesh *mesh = dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh));    
+	      MeshTools::Private::fix_broken_node_and_element_numbering(*mesh);
+	    }
+	  else if (dynamic_cast<SerialMesh*>(const_cast<MeshBase*>(&_mesh)))
+	    {
+	      SerialMesh *mesh = dynamic_cast<SerialMesh*>(const_cast<MeshBase*>(&_mesh));    
+	      MeshTools::Private::fix_broken_node_and_element_numbering(*mesh);
+	    }
+	  else
+	    {
+	      std::cerr << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
+			<< std::endl;
+	      libmesh_error();
+	    }	  
+	}
     }  
 
   STOP_LOG("read()","EquationSystems");

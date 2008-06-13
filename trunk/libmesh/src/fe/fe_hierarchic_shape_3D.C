@@ -275,18 +275,20 @@ namespace
 	    }
 
 	else if (elem->point(1) == min_point)
-	  if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
-	    {
-	      // Case 7
-	      xi  = eta_saved;
-	      eta = -xi_saved;
-	    }
-	  else
-	    {
-	      // Case 8
-	      xi  = -xi_saved;
-	      eta = eta_saved;
-	    }
+	  {
+	    if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
+	      {
+		// Case 7
+		xi  = eta_saved;
+		eta = -xi_saved;
+	      }
+	    else
+	      {
+		// Case 8
+		xi  = -xi_saved;
+		eta = eta_saved;
+	      }
+	  }
       }
     // Face 1
     else if (i < 8 + 12*e + 2*e*e)
@@ -340,18 +342,20 @@ namespace
 	    }
 
 	else if (elem->point(4) == min_point)
-	  if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
-	    {
-	      // Case 7
-	      xi   = -xi_saved;
-	      zeta = zeta_saved;
-	    }
-	  else
-	    {
-	      // Case 8
-	      xi   = xi_saved;
-	      zeta = -zeta_saved;
-	    }
+	  {
+	    if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
+	      {
+		// Case 7
+		xi   = -xi_saved;
+		zeta = zeta_saved;
+	      }
+	    else
+	      {
+		// Case 8
+		xi   = xi_saved;
+		zeta = -zeta_saved;
+	      }
+	  }
       }
     // Face 2
     else if (i < 8 + 12*e + 3*e*e)
@@ -405,18 +409,20 @@ namespace
 	    }
 
 	else if (elem->point(5) == min_point)
-	  if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
-	    {
-	      // Case 7
-	      eta  = -zeta_saved;
-	      zeta = eta_saved;
-	    }
-	  else
-	    {
-	      // Case 8
-	      eta   = eta_saved;
-	      zeta = -zeta_saved;
-	    }
+	  {
+	    if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
+	      {
+		// Case 7
+		eta  = -zeta_saved;
+		zeta = eta_saved;
+	      }
+	    else
+	      {
+		// Case 8
+		eta   = eta_saved;
+		zeta = -zeta_saved;
+	      }
+	  }
       }
     // Face 3
     else if (i < 8 + 12*e + 4*e*e)
@@ -470,18 +476,20 @@ namespace
 	    }
 
 	else if (elem->point(2) == min_point)
-	  if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
-	    {
-	      // Case 7
-	      xi   = zeta_saved;
-	      zeta = -xi_saved;
-	    }
-	  else
-	    {
-	      // Case 8
-	      xi   = -xi_saved;
+	  {
+	    if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
+	      {
+		// Case 7
+		xi   = zeta_saved;
+		zeta = -xi_saved;
+	      }
+	    else
+	      {
+		// Case 8
+		xi   = -xi_saved;
 	      zeta = zeta_saved;
-	    }
+	      }
+	  }
       }
     // Face 4
     else if (i < 8 + 12*e + 5*e*e)
@@ -535,18 +543,20 @@ namespace
 	    }
 
 	else if (elem->point(3) == min_point)
-	  if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
-	    {
-	      // Case 7
-	      eta   = zeta_saved;
-	      zeta = -eta_saved;
-	    }
-	  else
-	    {
-	      // Case 8
-	      eta  = -eta_saved;
-	      zeta = zeta_saved;
-	    }
+	  {
+	    if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
+	      {
+		// Case 7
+		eta   = zeta_saved;
+		zeta = -eta_saved;
+	      }
+	    else
+	      {
+		// Case 8
+		eta  = -eta_saved;
+		zeta = zeta_saved;
+	      }
+	  }
       }
     // Face 5
     else if (i < 8 + 12*e + 6*e*e)
@@ -600,18 +610,20 @@ namespace
 	    }
 
 	else if (elem->point(7) == min_point)
-	  if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
-	    {
-	      // Case 7
-	      xi  = -eta_saved;
-	      eta = xi_saved;
-	    }
-	  else
-	    {
-	      // Case 8
-	      xi  = xi_saved;
-	      eta = eta_saved;
-	    }
+	  {
+	    if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
+	      {
+		// Case 7
+		xi  = -eta_saved;
+		eta = xi_saved;
+	      }
+	    else
+	      {
+		// Case 8
+		xi  = xi_saved;
+		eta = eta_saved;
+	      }
+	  }
       }
 
     // Internal DoFs
