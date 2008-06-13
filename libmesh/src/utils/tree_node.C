@@ -571,20 +571,22 @@ const Elem* TreeNode<N>::find_element_in_children(const Point& p) const
   // but exclude the one we have already searched.
   for (unsigned int c=0; c<children.size(); c++)
     if (c != excluded_child)    
-      if (children[c]->active())
-	{
-	  const Elem* e = children[c]->find_element(p);
-	  
-	  if (e != NULL)
-	    return e;	  
-	}
-      else
-	{
-	  const Elem* e = children[c]->find_element_in_children(p);
-	  
-	  if (e != NULL)
-	    return e;
-	}
+      {
+	if (children[c]->active())
+	  {
+	    const Elem* e = children[c]->find_element(p);
+	    
+	    if (e != NULL)
+	      return e;	  
+	  }
+	else
+	  {
+	    const Elem* e = children[c]->find_element_in_children(p);
+	    
+	    if (e != NULL)
+	      return e;
+	  }
+      }
 
   // If we get here we have searched all our children.
   // Since this process was started at the root node then

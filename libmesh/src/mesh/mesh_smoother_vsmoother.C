@@ -1680,40 +1680,40 @@ for(i=0;i<ncells;i++) G[i]=alloc_d_n1(6);
 		  switch(nvert)
 		  {case 3: //tri
 		  if(i==cells[l][0]){
-			  if(mask[cells[l][1]]>0) if(ind==0) {j=cells[l][1]; ind++;} else {k=cells[l][1]; ind++;}
-			  if(mask[cells[l][2]]>0) if(ind==0) {j=cells[l][2]; ind++;} else {k=cells[l][2]; ind++;}
+			  if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][1]; ind++;} else {k=cells[l][1]; ind++;}}
+			  if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][2]; ind++;} else {k=cells[l][2]; ind++;}}
 		  }
 		  if(i==cells[l][1]){
-			  if(mask[cells[l][0]]>0) if(ind==0) {j=cells[l][0]; ind++;} else {k=cells[l][0]; ind++;}
-			  if(mask[cells[l][2]]>0) if(ind==0) {j=cells[l][2]; ind++;} else {k=cells[l][2]; ind++;}
+			  if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][0]; ind++;} else {k=cells[l][0]; ind++;}}
+			  if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][2]; ind++;} else {k=cells[l][2]; ind++;}}
 		  }
 		  if(i==cells[l][2]){
-			  if(mask[cells[l][1]]>0) if(ind==0) {j=cells[l][1]; ind++;} else {k=cells[l][1]; ind++;}
-			  if(mask[cells[l][0]]>0) if(ind==0) {j=cells[l][0]; ind++;} else {k=cells[l][0]; ind++;}
+			  if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][1]; ind++;} else {k=cells[l][1]; ind++;}}
+			  if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][0]; ind++;} else {k=cells[l][0]; ind++;}}
 		  }
 		  break;
 		  case 4: //quad
 		  if((i==cells[l][0])||(i==cells[l][3])){
-			  if(mask[cells[l][1]]>0) if(ind==0) {j=cells[l][1]; ind++;} else {k=cells[l][1]; ind++;}
-			  if(mask[cells[l][2]]>0) if(ind==0) {j=cells[l][2]; ind++;} else {k=cells[l][2]; ind++;}
+			  if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][1]; ind++;} else {k=cells[l][1]; ind++;}}
+			  if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][2]; ind++;} else {k=cells[l][2]; ind++;}}
 		  }
 		  if((i==cells[l][1])||(i==cells[l][2])){
-			  if(mask[cells[l][0]]>0) if(ind==0) {j=cells[l][0]; ind++;} else {k=cells[l][0]; ind++;}
-			  if(mask[cells[l][3]]>0) if(ind==0) {j=cells[l][3]; ind++;} else {k=cells[l][3]; ind++;}
+			  if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][0]; ind++;} else {k=cells[l][0]; ind++;}}
+			  if(mask[cells[l][3]]>0) {if(ind==0) {j=cells[l][3]; ind++;} else {k=cells[l][3]; ind++;}}
 		  }
 		  break;
 		  case 6: //quad tri
 		  if(i==cells[l][0]){
-			  if(mask[cells[l][1]]>0) if(ind==0) {j=cells[l][5]; ind++;} else {k=cells[l][5]; ind++;}
-			  if(mask[cells[l][2]]>0) if(ind==0) {j=cells[l][4]; ind++;} else {k=cells[l][4]; ind++;}
+			  if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][5]; ind++;} else {k=cells[l][5]; ind++;}}
+			  if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][4]; ind++;} else {k=cells[l][4]; ind++;}}
 		  }
 		  if(i==cells[l][1]){
-			  if(mask[cells[l][0]]>0) if(ind==0) {j=cells[l][5]; ind++;} else {k=cells[l][5]; ind++;}
-			  if(mask[cells[l][2]]>0) if(ind==0) {j=cells[l][3]; ind++;} else {k=cells[l][3]; ind++;}
+			  if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][5]; ind++;} else {k=cells[l][5]; ind++;}}
+			  if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][3]; ind++;} else {k=cells[l][3]; ind++;}}
 		  }
 		  if(i==cells[l][2]){
-			  if(mask[cells[l][1]]>0) if(ind==0) {j=cells[l][3]; ind++;} else {k=cells[l][3]; ind++;}
-			  if(mask[cells[l][0]]>0) if(ind==0) {j=cells[l][4]; ind++;} else {k=cells[l][4]; ind++;}
+			  if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][3]; ind++;} else {k=cells[l][3]; ind++;}}
+			  if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][4]; ind++;} else {k=cells[l][4]; ind++;}}
 		  }
 		  if(i==cells[l][3]){j=cells[l][1]; k=cells[l][2];}
 	  if(i==cells[l][4]){j=cells[l][2]; k=cells[l][0];}

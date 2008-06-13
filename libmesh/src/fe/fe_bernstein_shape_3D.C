@@ -480,18 +480,20 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			}
 		    
 		    else if (elem->point(1) == min_point)
-		      if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
-			{
-			  // Case 7
-			  xi_mapped  = eta;
-			  eta_mapped = -xi;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped  = -xi;
-			  eta_mapped = eta;
-			}
+		      {
+			if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
+			  {
+			    // Case 7
+			    xi_mapped  = eta;
+			    eta_mapped = -xi;
+			  }
+			else
+			  {
+			    // Case 8
+			    xi_mapped  = -xi;
+			    eta_mapped = eta;
+			  }
+		      }
 		  }
 		
 		
@@ -545,18 +547,20 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			}
 		    
 		    else if (elem->point(4) == min_point)
-		      if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
-			{
-			  // Case 7
-			  xi_mapped   = -xi;
-			  zeta_mapped = zeta;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped   = xi;
-			  zeta_mapped = -zeta;
-			}
+		      {
+			if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
+			  {
+			    // Case 7
+			    xi_mapped   = -xi;
+			    zeta_mapped = zeta;
+			  }
+			else
+			  {
+			    // Case 8
+			    xi_mapped   = xi;
+			    zeta_mapped = -zeta;
+			  }
+		      }
 		  }
 		
 		
@@ -610,18 +614,20 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			}
 
 		    else if (elem->point(5) == min_point)
-		      if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
-			{
-			  // Case 7
-			  eta_mapped  = -zeta;
-			  zeta_mapped = eta;
-			}
-		      else
-			{
-			  // Case 8
-			  eta_mapped   = eta;
-			  zeta_mapped = -zeta;
-			}
+		      {
+			if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
+			  {
+			    // Case 7
+			    eta_mapped  = -zeta;
+			    zeta_mapped = eta;
+			  }
+			else
+			  {
+			    // Case 8
+			    eta_mapped   = eta;
+			    zeta_mapped = -zeta;
+			  }
+		      }
 		  }
 
 		
@@ -675,18 +681,20 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			}
 
 		    else if (elem->point(2) == min_point)
-		      if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
-			{
-			  // Case 7
-			  xi_mapped   = zeta;
-			  zeta_mapped = -xi;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped   = -xi;
-			  zeta_mapped = zeta;
-			}
+		      {
+			if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
+			  {
+			    // Case 7
+			    xi_mapped   = zeta;
+			    zeta_mapped = -xi;
+			  }
+			else
+			  {
+			    // Case 8
+			    xi_mapped   = -xi;
+			    zeta_mapped = zeta;
+			  }
+		      }
 		  }
 		
 		
@@ -740,18 +748,20 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			}
 
 		    else if (elem->point(3) == min_point)
-		      if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
-			{
-			  // Case 7
-			  eta_mapped   = zeta;
-			  zeta_mapped = -eta;
-			}
-		      else
-			{
-			  // Case 8
-			  eta_mapped  = -eta;
-			  zeta_mapped = zeta;
-			}
+		      {
+			if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
+			  {
+			    // Case 7
+			    eta_mapped   = zeta;
+			    zeta_mapped = -eta;
+			  }
+			else
+			  {
+			    // Case 8
+			    eta_mapped  = -eta;
+			    zeta_mapped = zeta;
+			  }
+		      }
 		  }
 		
 		
@@ -805,18 +815,20 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			}
 		    
 		    else if (elem->point(7) == min_point)
-		      if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
-			{
-			  // Case 7
-			  xi_mapped  = -eta;
-			  eta_mapped = xi;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped  = xi;
-			  eta_mapped = eta;
-			}
+		      {
+			if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
+			  {
+			    // Case 7
+			    xi_mapped  = -eta;
+			    eta_mapped = xi;
+			  }
+			else
+			  {
+			    // Case 8
+			    xi_mapped  = xi;
+			    eta_mapped = eta;
+			  }
+		      }
 		  }
 	      }
 	      
@@ -993,18 +1005,20 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			}
 
 		    else if (elem->point(1) == min_point)
-		      if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
-			{
-			  // Case 7
-			  xi_mapped  = eta;
-			  eta_mapped = -xi;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped  = -xi;
-			  eta_mapped = eta;
-			}
+		      {
+			if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
+			  {
+			    // Case 7
+			    xi_mapped  = eta;
+			    eta_mapped = -xi;
+			  }
+			else
+			  {
+			    // Case 8
+			    xi_mapped  = -xi;
+			    eta_mapped = eta;
+			  }
+		      }
 		  }
 
 		
@@ -1058,18 +1072,20 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			}
 
 		    else if (elem->point(4) == min_point)
-		      if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
-			{
-			  // Case 7
-			  xi_mapped   = -xi;
-			  zeta_mapped = zeta;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped   = xi;
-			  zeta_mapped = -zeta;
-			}
+		      {
+			if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
+			  {
+			    // Case 7
+			    xi_mapped   = -xi;
+			    zeta_mapped = zeta;
+			  }
+			else
+			  {
+			    // Case 8
+			    xi_mapped   = xi;
+			    zeta_mapped = -zeta;
+			  }
+		      }
 		  }
 
 		
@@ -1123,18 +1139,20 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			}
 
 		    else if (elem->point(5) == min_point)
-		      if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
-			{
-			  // Case 7
-			  eta_mapped  = -zeta;
-			  zeta_mapped = eta;
-			}
-		      else
-			{
-			  // Case 8
-			  eta_mapped   = eta;
-			  zeta_mapped = -zeta;
-			}
+		      {
+			if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
+			  {
+			    // Case 7
+			    eta_mapped  = -zeta;
+			    zeta_mapped = eta;
+			  }
+			else
+			  {
+			    // Case 8
+			    eta_mapped   = eta;
+			    zeta_mapped = -zeta;
+			  }
+		      }
 		  }
 
 		
@@ -1188,18 +1206,20 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			}
 
 		    else if (elem->point(2) == min_point)
-		      if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
-			{
-			  // Case 7
-			  xi_mapped   = zeta;
-			  zeta_mapped = -xi;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped   = -xi;
-			  zeta_mapped = zeta;
-			}
+		      {
+			if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
+			  {
+			    // Case 7
+			    xi_mapped   = zeta;
+			    zeta_mapped = -xi;
+			  }
+			else
+			  {
+			    // Case 8
+			    xi_mapped   = -xi;
+			    zeta_mapped = zeta;
+			  }
+		      }
 		  }
 
 		
@@ -1253,18 +1273,20 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			}
 
 		    else if (elem->point(3) == min_point)
-		      if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
-			{
-			  // Case 7
-			  eta_mapped   = zeta;
-			  zeta_mapped = -eta;
-			}
-		      else
-			{
-			  // Case 8
-			  eta_mapped  = -eta;
-			  zeta_mapped = zeta;
-			}
+		      {
+			if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
+			  {
+			    // Case 7
+			    eta_mapped   = zeta;
+			    zeta_mapped = -eta;
+			  }
+			else
+			  {
+			    // Case 8
+			    eta_mapped  = -eta;
+			    zeta_mapped = zeta;
+			  }
+		      }
 		  }
 
 		
@@ -1318,18 +1340,20 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			}
 
 		    else if (elem->point(7) == min_point)
-		      if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
-			{
-			  // Case 7
-			  xi_mapped  = -eta;
-			  eta_mapped = xi;
-			}
-		      else
-			{
-			  // Case 8
-			  xi_mapped  = xi;
-			  eta_mapped = eta;
-			}
+		      {
+			if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
+			  {
+			    // Case 7
+			    xi_mapped  = -eta;
+			    eta_mapped = xi;
+			  }
+			else
+			  {
+			    // Case 8
+			    xi_mapped  = xi;
+			    eta_mapped = eta;
+			  }
+		      }
 		  }
 
 		
