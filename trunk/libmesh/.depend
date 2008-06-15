@@ -6492,6 +6492,25 @@ src/numerics/sparse_matrix.$(obj-suffix):\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/numerics/trilinos_aztec_linear_solver.$(obj-suffix):\
+    src/numerics/trilinos_aztec_linear_solver.C\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_preconditioner_type.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
+    include/numerics/linear_solver.h\
+    include/numerics/trilinos_aztec_linear_solver.h\
+    include/parallel/threads.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/numerics/trilinos_epetra_vector.$(obj-suffix):\
     src/numerics/trilinos_epetra_vector.C\
     include/base/auto_ptr.h\
