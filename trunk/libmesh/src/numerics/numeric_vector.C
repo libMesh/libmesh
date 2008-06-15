@@ -27,6 +27,7 @@
 #include "distributed_vector.h"
 #include "laspack_vector.h"
 #include "petsc_vector.h"
+#include "trilinos_epetra_vector.h"
 
 
 
@@ -59,6 +60,16 @@ NumericVector<T>::build(const SolverPackage solver_package)
 	return ap;
       }
 #endif
+
+
+#ifdef HAVE_TRILINOS
+    case TRILINOS_SOLVERS:
+      {
+	AutoPtr<NumericVector<T> > ap(new EpetraVector<T>);
+	return ap;
+      }
+#endif
+
 
     default:
       AutoPtr<NumericVector<T> > ap(new DistributedVector<T>);
