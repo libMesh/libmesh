@@ -26,6 +26,7 @@
 #include "linear_solver.h"
 #include "laspack_linear_solver.h"
 #include "petsc_linear_solver.h"
+#include "trilinos_aztec_linear_solver.h"
 #include "auto_ptr.h"
 
 
@@ -58,6 +59,13 @@ LinearSolver<T>::build(const SolverPackage solver_package)
 #endif
 
 
+#ifdef HAVE_TRILINOS
+    case TRILINOS_SOLVERS:
+      {
+	AutoPtr<LinearSolver<T> > ap(new AztecLinearSolver<T>);
+	return ap;
+      }
+#endif
 
     default:
       std::cerr << "ERROR:  Unrecognized solver package: "
