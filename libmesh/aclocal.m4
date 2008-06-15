@@ -287,19 +287,19 @@ dnl -------------------------------------------------------------
 AC_DEFUN(SET_CXX_FLAGS, dnl
 [
   dnl Flag for creating shared objects; can be modified at a later stage
-  if test $HOSTTYPE = "powerpc" ; then
+  if test "x$target_os" = "xdarwin9.3.0" ; then
     CXXFLAGS_OPT="-fno-common"
     CXXFLAGS_DVL="-fno-common"
     CXXFLAGS_DBG="-fno-common"
-    CXXSHAREDFLAG="-dynamiclib -undefined dynamic_lookup -single_module"
-    CSHAREDFLAG="-dynamiclib -undefined dynamic_lookup -single_module"
-    RPATHFLAG="-L"
+    CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup"
+    CSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup"
   else
     CXXSHAREDFLAG="-shared"
-    dnl Flag to add directories to the dynamic library search path; can
-    dnl be changed at a later stage
-    RPATHFLAG="-Wl,-rpath,"
   fi
+
+  dnl Flag to add directories to the dynamic library search path; can
+  dnl be changed at a later stage
+  RPATHFLAG="-Wl,-rpath,"
 
   dnl Flag for profiling mode; can me modified at a later stage
   PROFILING_FLAGS="-pg"
