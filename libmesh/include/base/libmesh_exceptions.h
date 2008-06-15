@@ -30,14 +30,26 @@
 
 namespace libMesh {
 
-// A class to represent the internal "this should never happen"
-// errors to be thrown by "libmesh_error();"
-class LogicError : public std::logic_error
-{
-public:
-    LogicError() : std::logic_error( "Error in libMesh internal logic" ) {}
-};
-  
+  /**
+   * A class to represent the internal "this should never happen"
+   * errors to be thrown by "libmesh_error();"
+   */
+  class LogicError : public std::logic_error
+    {
+    public:
+      LogicError() : std::logic_error( "Error in libMesh internal logic" ) {}
+    };
+
+
+  /**
+   *
+   */
+  class NotImplemented : public std::logic_error
+    {
+    public:
+      NotImplemented() : std::logic_error( "Error: not implemented!" ) {}
+    };
+
 }
 
 #define LIBMESH_THROW(e) { throw e; }

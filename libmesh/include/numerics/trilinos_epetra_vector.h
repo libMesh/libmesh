@@ -34,8 +34,9 @@
 #include "numeric_vector.h"
 
 // Trilinos includes
-#include<Epetra_Vector.h>
-#include<Epetra_Map.h>
+#include <Epetra_Vector.h>
+#include <Epetra_Map.h>
+#include <Epetra_MpiComm.h>
 
 // forward declarations
 template <typename T> class SparseMatrix;
@@ -402,14 +403,6 @@ public:
    */
   void swap (EpetraVector<T> &v);
 
-  /**
-   * Returns the raw Epetra vector context pointer.  Note this is generally
-   * not required in user-level code. Just don't do anything crazy like
-   * calling VecDestroy()!
-   */
-  Epetra_Vector & vec () { libmesh_assert (_vec != NULL); return _vec; }
-
-
   
 private:
 
@@ -417,12 +410,12 @@ private:
    * Actual Epetra vector datatype
    * to hold vector entries
    */
-  Epetra_Vector * _vec;
+  AutoPtr<Epetra_Vector> _vec;
 
   /**
    * Holds the distributed Map
    */
-  Epetra_Map * _map;
+  AutoPtr<Epetra_Map> _map;
 
   /**
    * This boolean value should only be set to false
@@ -491,12 +484,13 @@ void EpetraVector<T>::init (const unsigned int n,
 			   const unsigned int n_local,
 			   const bool fast)
 {
-  _map = new Epetra_Map(n, 
-			n_local, 
-			0, 
-			Epetra_Comm (libMesh::COMM_WORLD));
-  
-  _vec = new Epetra_Vector(*_map);
+  _map.reset (new Epetra_Map(n, 
+			     n_local, 
+			     0, 
+			     Epetra_MpiComm (libMesh::COMM_WORLD))
+	      );
+	      
+  _vec.reset(new Epetra_Vector(*_map));
   
   this->_is_initialized = true;
   
@@ -532,7 +526,7 @@ inline
 void EpetraVector<T>::clear ()
 {
   if ((this->initialized()) && (this->_destroy_vec_on_exit))
-    delete _vec;
+    _vec.reset();
 
   this->_is_closed = this->_is_initialized = false;
 }
