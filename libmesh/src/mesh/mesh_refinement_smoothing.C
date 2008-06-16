@@ -169,6 +169,12 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 		unsigned int node0 = pedge->node(0);
 		unsigned int node1 = pedge->node(1);
 
+		// If elem does not share this edge with its ancestor
+		// p, refinement levels of elements sharing p's edge
+		// are not restricted by refinement levels of elem.
+		// Furthermore, elem will not share this edge with any
+		// of p's ancestors, so we can safely break out of the
+		// for loop early.
 		if (node0 != childnode0 && node0 != childnode1
 		    && node1 != childnode0 && node1 != childnode1)
 		  break;
@@ -317,16 +323,30 @@ bool MeshRefinement::eliminate_unrefined_patches ()
               p_flag_me = false;
               break;
             }
-	  // if the neighbor will be equally or less refined
-	  // than we are, then we do not need to h refine ourselves.
-	  if (h_flag_me && 
-              (neighbor->level() < my_level) ||
-	      ((neighbor->active()) &&
-	       (neighbor->refinement_flag() != Elem::REFINE))
-              || (neighbor->refinement_flag() ==
-                  Elem::COARSEN_INACTIVE))
+          // if the neighbor will be equally or less refined than
+	  // we are, then we will not become an unrefined island.
+          // So if we are still considering h refinement:
+          if (h_flag_me &&
+            // If our neighbor is already at a lower level,
+            // it can't end up at a higher level even if it
+            // is flagged for refinement once
+             ((neighbor->level < my_level) ||
+            // If our neighbor is at the same level but isn't
+            // flagged for refinement, it won't end up at a
+            // higher level
+             ((neighbor->active()) &&
+              (neighbor->refinement_flag() != Elem::REFINE)) ||
+            // If our neighbor is currently more refined but is
+            // a parent flagged for coarsening, it will end up
+            // at the same level.
+             (neighbor->refinement_flag() == Elem::COARSEN_INACTIVE)))
             {
+              // We've proven we won't become an unrefined island,
+              // so don't h refine to avoid that.
 	      h_flag_me = false;
+
+              // If we've also proven we don't need to p refine,
+              // we don't need to check more neighbors
               if (!p_flag_me)
                 break;
             }
