@@ -37,9 +37,11 @@
 #else
 # include <map>
 #endif
+#include <vector>
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
+#include "point.h"
 
 // Forward Declarations -----------------------------
 class Elem;
