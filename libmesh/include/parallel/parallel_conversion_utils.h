@@ -22,6 +22,8 @@
 #ifndef __parallel_conversion_utils_h__
 #define __parallel_conversion_utils_h__
 
+#include <vector>
+
 #include "libmesh_common.h"
 
 #ifdef HAVE_LIBHILBERT
