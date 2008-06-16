@@ -512,66 +512,30 @@ T EpetraMatrix<T>::operator () (const unsigned int i,
 				const unsigned int j) const
 {
   libmesh_assert (this->initialized());
+  libmesh_assert (this->_mat.get() != NULL);
+  libmesh_assert (this->_mat->MyGlobalRow(i));
+  libmesh_assert (i >= this->row_start());
+  libmesh_assert (i < this->row_stop());
 
-  LIBMESH_THROW(libMesh::NotImplemented());
 
-// #if PETSC_VERSION_LESS_THAN(2,2,1)
+  int row_length, *row_indices;
+  double *values;
 
-//   // PETSc 2.2.0 & older
-//   PetscScalar *petsc_row;
-//   int* petsc_cols;
+  _mat->ExtractMyRowView (i-this->row_start(),
+			  row_length,
+			  values,
+			  row_indices);
+
+  //std::cout << "row_length=" << row_length << std::endl;
+
+  int *index = std::lower_bound (row_indices, row_indices+row_length, j);
+
+  libmesh_assert (*index < row_length);
+  libmesh_assert (row_indices[*index] == j);
+
+  //std::cout << "val=" << values[*index] << std::endl;
   
-// #else
-  
-//   // PETSc 2.2.1 & newer
-//   const PetscScalar *petsc_row;
-//   const PetscInt    *petsc_cols;
-
-// #endif
-    
-//   T value=0.;  
-  
-//   int
-//     ierr=0,
-//     ncols=0,
-//     i_val=static_cast<int>(i),
-//     j_val=static_cast<int>(j);
-  
-
-//   // the matrix needs to be closed for this to work
-//   this->close();
-
-//   ierr = MatGetRow(_mat, i_val, &ncols, &petsc_cols, &petsc_row);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
-//   // Perform a binary search to find the contiguous index in
-//   // petsc_cols (resp. petsc_row) corresponding to global index j_val
-//   std::pair<const int*, const int*> p =
-//     std::equal_range (&petsc_cols[0], &petsc_cols[0] + ncols, j_val);
-
-//   // Found an entry for j_val
-//   if (p.first != p.second)
-//     {
-//       // The entry in the contiguous row corresponding
-//       // to the j_val column of interest
-//       const int j = std::distance (const_cast<int*>(&petsc_cols[0]),
-// 				   const_cast<int*>(p.first));
-      
-//       libmesh_assert (j < ncols);
-//       libmesh_assert (petsc_cols[j] == j_val);
-      
-//       value = static_cast<T> (petsc_row[j]);
-      
-//       ierr  = MatRestoreRow(_mat, i_val,
-// 			    &ncols, &petsc_cols, &petsc_row);
-//               CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  
-//       return value;
-//     }
-  
-  // Otherwise the entry is not in the sparse matrix,
-  // i.e. it is 0.  
-  return 0.;
+  return values[*index];
 }
 
 
@@ -582,16 +546,9 @@ inline
 bool EpetraMatrix<T>::closed() const
 {
   libmesh_assert (this->initialized());
+  libmesh_assert (this->_mat.get() != NULL);
   
-  LIBMESH_THROW(libMesh::NotImplemented());
-
-//   int ierr=0;
-//   PetscTruth assembled;
-
-//   ierr = MatAssembled(_mat, &assembled);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-  return false /* (assembled == PETSC_TRUE) */;
+  return this->_mat->Filled();
 }
 
 

@@ -604,7 +604,7 @@ T EpetraVector<T>::operator() (const unsigned int i) const
 {
   libmesh_assert (this->initialized());
   libmesh_assert ( ((i >= this->first_local_index()) &&
-	    (i <  this->last_local_index())) );
+		    (i <  this->last_local_index())) );
 
   return (*_vec)[i];
 }
