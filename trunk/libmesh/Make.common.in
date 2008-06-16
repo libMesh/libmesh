@@ -232,6 +232,7 @@ libmesh_LIBS += $(mesh_library)
 # The include directories for libMesh
 libmesh_INCLUDE += -I$(libmesh_dir)/include/base \
                    -I$(libmesh_dir)/include/enums \
+                   -I$(libmesh_dir)/include/error_estimation \
                    -I$(libmesh_dir)/include/fe \
                    -I$(libmesh_dir)/include/geom \
                    -I$(libmesh_dir)/include/mesh \
