@@ -39,7 +39,7 @@ all:: $(target)
 # Production rules:  how to make the target - depends on library configuration
 %-$(METHOD): $(patsubst %.C, %.$(obj-suffix), %.C)
 	@echo "Linking "$@"..."
-	$(libmesh_CXX) $(libmesh_CXXFLAGS) $< -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS)
+	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $< -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS)
 
 
 
