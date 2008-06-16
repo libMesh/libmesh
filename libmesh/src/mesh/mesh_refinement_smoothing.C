@@ -330,7 +330,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
             // If our neighbor is already at a lower level,
             // it can't end up at a higher level even if it
             // is flagged for refinement once
-             ((neighbor->level < my_level) ||
+             ((neighbor->level() < my_level) ||
             // If our neighbor is at the same level but isn't
             // flagged for refinement, it won't end up at a
             // higher level
