@@ -693,6 +693,13 @@ PWD
 enablexdr
 enablecomplex
 enableoptional
+MPI
+MPI_IMPL
+MPI_LIBS
+MPI_LIBS_PATH
+MPI_LIBS_PATHS
+MPI_INCLUDES_PATH
+MPI_INCLUDES_PATHS
 F77
 FFLAGS
 ac_ct_F77
@@ -701,13 +708,6 @@ PETSC_ARCH
 PETSC_DIR
 petscversion
 petscmajorminor
-MPI_IMPL
-MPI
-MPI_LIBS
-MPI_LIBS_PATH
-MPI_LIBS_PATHS
-MPI_INCLUDES_PATH
-MPI_INCLUDES_PATHS
 enablepetsc
 SLEPC_DIR
 slepcversion
@@ -1396,9 +1396,9 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-cxx=CXX          C++ compiler to use
   --with-cc=CC            C compiler to use
-  --with-f77=F77          Fortran compiler to use
   --with-mpi=PATH         Prefix where MPI is installed (MPIHOME)
   --with-gm=PATH          Prefix where GM is installed (GMHOME)
+  --with-f77=F77          Fortran compiler to use
   --with-trilinos=PATH    Specify the path to Trilinos installation
   --with-tbb=PATH         Specify the path where Threading Building Blocks is
                           installed
@@ -2017,8 +2017,6 @@ test -n "$target_alias" &&
   test "$program_prefix$program_suffix$program_transform_name" = \
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
-
-echo "target_os="$target_os
 
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -9588,6 +9586,710 @@ fi
     { echo "$as_me:$LINENO: result: <<< PETSc disabled.  Please set your \"\$PETSC_ARCH\" environment variable correctly. >>>" >&5
 echo "${ECHO_T}<<< PETSc disabled.  Please set your \"\$PETSC_ARCH\" environment variable correctly. >>>" >&6; }
 
+
+# if MPIHOME is empty, set it to /usr
+if (test "x$MPIHOME" = x) ; then
+  MPIHOME="/usr"
+fi
+
+
+# Check whether --with-mpi was given.
+if test "${with_mpi+set}" = set; then
+  withval=$with_mpi; MPI="$withval"
+else
+
+              echo "note: MPI library path not given... trying prefix=$MPIHOME"
+	      MPI=$MPIHOME
+
+fi
+
+
+if test -z "$MPI"; then
+	MPI="/usr"
+fi
+
+
+
+MPI_LIBS_PATH="$MPI/lib"
+MPI_INCLUDES_PATH="$MPI/include"
+
+# Check that the compiler uses the library we specified...
+
+# look for LAM or other MPI implementation
+if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
+	echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
+
+
+	# Ensure the comiler finds the library...
+	tmpLIBS=$LIBS
+
+	ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+	LIBS="-L$MPI_LIBS_PATH $LIBS"
+
+	# look for lam_version_show in liblam.(a/so)
+	# (this is needed in addition to libmpi.(a/so) for
+        # LAM MPI
+	{ echo "$as_me:$LINENO: checking for lam_show_version in -llam" >&5
+echo $ECHO_N "checking for lam_show_version in -llam... $ECHO_C" >&6; }
+if test "${ac_cv_lib_lam_lam_show_version+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-llam  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char lam_show_version ();
+int
+main ()
+{
+return lam_show_version ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_lam_lam_show_version=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_lam_lam_show_version=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_lam_lam_show_version" >&5
+echo "${ECHO_T}$ac_cv_lib_lam_lam_show_version" >&6; }
+if test $ac_cv_lib_lam_lam_show_version = yes; then
+
+                       LIBS="-llam $LIBS"
+                       MPI_LIBS="-llam $MPI_LIBS"
+
+fi
+
+
+	# Quadricss MPI requires the elan library to be included too
+	if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
+	  echo "note: MPI found to use Quadrics switch, looking for elan library"
+		 { echo "$as_me:$LINENO: checking for elan_init in -lelan" >&5
+echo $ECHO_N "checking for elan_init in -lelan... $ECHO_C" >&6; }
+if test "${ac_cv_lib_elan_elan_init+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lelan  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char elan_init ();
+int
+main ()
+{
+return elan_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_elan_elan_init=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_elan_elan_init=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_elan_elan_init" >&5
+echo "${ECHO_T}$ac_cv_lib_elan_elan_init" >&6; }
+if test $ac_cv_lib_elan_elan_init = yes; then
+
+                                LIBS="-lelan $LIBS"
+                                MPI_LIBS="-lelan $MPI_LIBS"
+
+else
+  { { echo "$as_me:$LINENO: error: Could not find elan library... exiting " >&5
+echo "$as_me: error: Could not find elan library... exiting " >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+	fi
+
+	{ echo "$as_me:$LINENO: checking for MPI_Init in -lmpi" >&5
+echo $ECHO_N "checking for MPI_Init in -lmpi... $ECHO_C" >&6; }
+if test "${ac_cv_lib_mpi_MPI_Init+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmpi  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char MPI_Init ();
+int
+main ()
+{
+return MPI_Init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_mpi_MPI_Init=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_mpi_MPI_Init=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_mpi_MPI_Init" >&5
+echo "${ECHO_T}$ac_cv_lib_mpi_MPI_Init" >&6; }
+if test $ac_cv_lib_mpi_MPI_Init = yes; then
+
+		       MPI_LIBS="-lmpi $MPI_LIBS"
+	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+	               MPI_IMPL="mpi"
+                       { echo "$as_me:$LINENO: result: Found valid MPI installlaion..." >&5
+echo "${ECHO_T}Found valid MPI installlaion..." >&6; }
+
+else
+  { echo "$as_me:$LINENO: result: Could not link in the MPI library..." >&5
+echo "${ECHO_T}Could not link in the MPI library..." >&6; }; enablempi=no
+fi
+
+
+	ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+	LIBS=$tmpLIBS
+fi
+
+if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
+	echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
+
+	# Ensure the comiler finds the library...
+	tmpLIBS=$LIBS
+
+	ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+	LIBS="-L$MPI_LIBS_PATH $LIBS"
+
+	# Myricomm MPICH requires the gm library to be included too
+	if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
+	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
+
+          if (test "x$GMHOME" = x) ; then
+            GMHOME="/usr"
+          fi
+
+# Check whether --with-gm was given.
+if test "${with_gm+set}" = set; then
+  withval=$with_gm; GM="$withval"
+else
+
+                        echo "note: GM library path not given... trying prefix=$MPIHOME"
+	                GM=$GMHOME
+
+fi
+
+
+          LIBS="-L$GM/lib $LIBS"
+          MPI_LIBS="-L$GM/lib $MPI_LIBS"
+
+          { echo "$as_me:$LINENO: checking for gm_open in -lgm" >&5
+echo $ECHO_N "checking for gm_open in -lgm... $ECHO_C" >&6; }
+if test "${ac_cv_lib_gm_gm_open+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgm  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gm_open ();
+int
+main ()
+{
+return gm_open ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_gm_gm_open=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_gm_gm_open=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_gm_gm_open" >&5
+echo "${ECHO_T}$ac_cv_lib_gm_gm_open" >&6; }
+if test $ac_cv_lib_gm_gm_open = yes; then
+
+                         LIBS="$LIBS -lgm"
+                         MPI_LIBS="$MPI_LIBS -lgm"
+
+else
+  { { echo "$as_me:$LINENO: error: Could not find gm library... exiting " >&5
+echo "$as_me: error: Could not find gm library... exiting " >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+	fi
+
+	# look for MPI_Init in libmpich.(a/so)
+	{ echo "$as_me:$LINENO: checking for MPI_Init in -lmpich" >&5
+echo $ECHO_N "checking for MPI_Init in -lmpich... $ECHO_C" >&6; }
+if test "${ac_cv_lib_mpich_MPI_Init+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmpich  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char MPI_Init ();
+int
+main ()
+{
+return MPI_Init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_mpich_MPI_Init=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_mpich_MPI_Init=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_mpich_MPI_Init" >&5
+echo "${ECHO_T}$ac_cv_lib_mpich_MPI_Init" >&6; }
+if test $ac_cv_lib_mpich_MPI_Init = yes; then
+
+		       MPI_LIBS="-lmpich $MPI_LIBS"
+		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+	               MPI_IMPL="mpich"
+                       { echo "$as_me:$LINENO: result: Found valid MPICH installation..." >&5
+echo "${ECHO_T}Found valid MPICH installation..." >&6; }
+
+else
+  { echo "$as_me:$LINENO: result: Could not link in the MPI library..." >&5
+echo "${ECHO_T}Could not link in the MPI library..." >&6; }; enablempi=no
+fi
+
+
+	ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+	LIBS=$tmpLIBS
+fi
+
+if (test "x$MPI_IMPL" != x) ; then
+
+	# Ensure the comiler finds the header file...
+	if test -e $MPI_INCLUDES_PATH/mpi.h; then
+		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+		tmpCPPFLAGS=$CPPFLAGS
+
+		ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+		if test "${ac_cv_header_mpi_h+set}" = set; then
+  { echo "$as_me:$LINENO: checking for mpi.h" >&5
+echo $ECHO_N "checking for mpi.h... $ECHO_C" >&6; }
+if test "${ac_cv_header_mpi_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_header_mpi_h" >&5
+echo "${ECHO_T}$ac_cv_header_mpi_h" >&6; }
+else
+  # Is the header compilable?
+{ echo "$as_me:$LINENO: checking mpi.h usability" >&5
+echo $ECHO_N "checking mpi.h usability... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <mpi.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ echo "$as_me:$LINENO: checking mpi.h presence" >&5
+echo $ECHO_N "checking mpi.h presence... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <mpi.h>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_cxx_preproc_warn_flag$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: mpi.h: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: mpi.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: mpi.h: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: mpi.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: mpi.h: present but cannot be compiled" >&5
+echo "$as_me: WARNING: mpi.h: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: mpi.h:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: mpi.h:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: mpi.h: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: mpi.h: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: mpi.h:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: mpi.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: mpi.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: mpi.h: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: mpi.h: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: mpi.h: in the future, the compiler will take precedence" >&2;}
+
+    ;;
+esac
+{ echo "$as_me:$LINENO: checking for mpi.h" >&5
+echo $ECHO_N "checking for mpi.h... $ECHO_C" >&6; }
+if test "${ac_cv_header_mpi_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_header_mpi_h=$ac_header_preproc
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_header_mpi_h" >&5
+echo "${ECHO_T}$ac_cv_header_mpi_h" >&6; }
+
+fi
+if test $ac_cv_header_mpi_h = yes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_MPI 1
+_ACEOF
+
+else
+  { echo "$as_me:$LINENO: result: Could not compile in the MPI headers..." >&5
+echo "${ECHO_T}Could not compile in the MPI headers..." >&6; }; enablempi=no
+fi
+
+
+		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+		ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+		CPPFLAGS=$tmpCPPFLAGS
+	else
+		{ echo "$as_me:$LINENO: result: Could not find MPI header <mpi.h>..." >&5
+echo "${ECHO_T}Could not find MPI header <mpi.h>..." >&6; }
+                enablempi=no
+	fi
+else
+
+	# no MPI install found, see if the compiler supports it
+      	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+
+	                 MPI_IMPL="built-in"
+                         { echo "$as_me:$LINENO: result: $CXX Compiler Supports MPI " >&5
+echo "${ECHO_T}$CXX Compiler Supports MPI " >&6; }
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_MPI 1
+_ACEOF
+
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	{ echo "$as_me:$LINENO: result: $CXX Compiler Does NOT Support MPI..." >&5
+echo "${ECHO_T}$CXX Compiler Does NOT Support MPI..." >&6; }; enablempi=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+
+# Save variables...
+
+
+
+
+
+
+
+
+
   else
     if (test -r $PETSC_DIR/include/petsc.h) ; then
 
@@ -10851,7 +11553,6 @@ echo "${ECHO_T}Could not find MPI header <mpi.h>..." >&6; }
 else
 
 	# no MPI install found, see if the compiler supports it
-
       	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -11562,7 +12263,6 @@ echo "${ECHO_T}Could not find MPI header <mpi.h>..." >&6; }
 else
 
 	# no MPI install found, see if the compiler supports it
-
       	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -13841,6 +14541,13 @@ PWD!$PWD$ac_delim
 enablexdr!$enablexdr$ac_delim
 enablecomplex!$enablecomplex$ac_delim
 enableoptional!$enableoptional$ac_delim
+MPI!$MPI$ac_delim
+MPI_IMPL!$MPI_IMPL$ac_delim
+MPI_LIBS!$MPI_LIBS$ac_delim
+MPI_LIBS_PATH!$MPI_LIBS_PATH$ac_delim
+MPI_LIBS_PATHS!$MPI_LIBS_PATHS$ac_delim
+MPI_INCLUDES_PATH!$MPI_INCLUDES_PATH$ac_delim
+MPI_INCLUDES_PATHS!$MPI_INCLUDES_PATHS$ac_delim
 F77!$F77$ac_delim
 FFLAGS!$FFLAGS$ac_delim
 ac_ct_F77!$ac_ct_F77$ac_delim
@@ -13849,13 +14556,6 @@ PETSC_ARCH!$PETSC_ARCH$ac_delim
 PETSC_DIR!$PETSC_DIR$ac_delim
 petscversion!$petscversion$ac_delim
 petscmajorminor!$petscmajorminor$ac_delim
-MPI_IMPL!$MPI_IMPL$ac_delim
-MPI!$MPI$ac_delim
-MPI_LIBS!$MPI_LIBS$ac_delim
-MPI_LIBS_PATH!$MPI_LIBS_PATH$ac_delim
-MPI_LIBS_PATHS!$MPI_LIBS_PATHS$ac_delim
-MPI_INCLUDES_PATH!$MPI_INCLUDES_PATH$ac_delim
-MPI_INCLUDES_PATHS!$MPI_INCLUDES_PATHS$ac_delim
 enablepetsc!$enablepetsc$ac_delim
 SLEPC_DIR!$SLEPC_DIR$ac_delim
 _ACEOF
