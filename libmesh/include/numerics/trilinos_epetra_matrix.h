@@ -430,8 +430,11 @@ void EpetraMatrix<T>::set (const unsigned int i,
     epetra_j = static_cast<int>(j);
 
   T epetra_value = value;
-  
-  _mat->InsertGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
+
+  if (_mat->Filled())    
+    _mat->ReplaceGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
+  else    
+    _mat->InsertGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
 }
 
 

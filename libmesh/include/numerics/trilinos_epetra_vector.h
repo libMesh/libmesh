@@ -389,14 +389,14 @@ public:
    * matrix to the file named \p name.  If \p name
    * is not specified it is dumped to the screen.
    */
-  void print_matlab(const std::string name="NULL") const;
+  void print_matlab (const std::string name="NULL") const;
 
   /**
    * Creates a "subvector" from this vector using the rows indices
    * of the "rows" array.
    */
-  virtual void create_subvector(NumericVector<T>& subvector,
-				const std::vector<unsigned int>& rows) const;
+  virtual void create_subvector (NumericVector<T>& subvector,
+				 const std::vector<unsigned int>& rows) const;
 
   /**
    * Swaps the raw Epetra vector context pointers.
@@ -450,7 +450,7 @@ EpetraVector<T>::EpetraVector (const unsigned int n)
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const unsigned int n,
-			     const unsigned int n_local)
+			       const unsigned int n_local)
   : _destroy_vec_on_exit(true)
 {
   this->init(n, n_local, false);
@@ -481,8 +481,8 @@ EpetraVector<T>::~EpetraVector ()
 template <typename T>
 inline
 void EpetraVector<T>::init (const unsigned int n,
-			   const unsigned int n_local,
-			   const bool fast)
+			    const unsigned int n_local,
+			    const bool fast)
 {
   _map.reset (new Epetra_Map(n, 
 			     n_local, 
@@ -503,7 +503,7 @@ void EpetraVector<T>::init (const unsigned int n,
 template <typename T>
 inline
 void EpetraVector<T>::init (const unsigned int n,
-			   const bool fast)
+			    const bool fast)
 {
   this->init(n,n,fast);
 }
@@ -638,6 +638,8 @@ Real EpetraVector<T>::max() const
 
   return value;
 }
+
+
 
 template <typename T>
 inline
