@@ -22,6 +22,7 @@
 #define __threads_allocators_h__
 
 // System includes
+#include <memory> // for std::allocator
 
 // Local includes
 #include "libmesh_config.h"
