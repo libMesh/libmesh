@@ -138,25 +138,25 @@ echo:
 # Print the name of the C++ compiler, padded with whitespace
 #
 echo_cxx:
-	@echo -n " " $(libmesh_CXX) " "
+	@echo  " " $(libmesh_CXX) " "
 
 #
 # Print the flags used for C++ compilation, padded with whitespace
 #
 echo_cxxflags:
-	@echo -n " " $(libmesh_CXXFLAGS) " "
+	@echo " " $(libmesh_CXXFLAGS) " "
 
 #
 # Print C++ compiler include path, padded with whitespace
 #
 echo_include:
-	@echo -n " " $(libmesh_INCLUDE) " "
+	@echo " " $(libmesh_INCLUDE) " "
 
 #
 # Print the flags used to link, padded with whitespace
 #
 echo_ldflags:
-	@echo -n " " $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS) " "
+	@echo " " $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS) " "
 
 #	
 # Remove object files for the current mode

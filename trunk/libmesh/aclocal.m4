@@ -818,6 +818,8 @@ AC_DEFUN(CONFIGURE_PETSC,
   if test "x$PETSC_ARCH" = x ; then
     enablepetsc=no
     AC_MSG_RESULT(<<< PETSc disabled.  Please set your "\$PETSC_ARCH" environment variable correctly. >>>)
+    dnl PETSc config failed.  Try MPI.
+    ACX_MPI
 
   else
     if (test -r $PETSC_DIR/include/petsc.h) ; then
@@ -1995,7 +1997,6 @@ if (test "x$MPI_IMPL" != x) ; then
 else
    
 	# no MPI install found, see if the compiler supports it
-
       	AC_TRY_COMPILE([#include <mpi.h>],
 	  	       [int np; MPI_Comm_size (MPI_COMM_WORLD, &np);],
                        [

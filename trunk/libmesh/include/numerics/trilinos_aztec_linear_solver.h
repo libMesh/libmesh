@@ -147,8 +147,6 @@ template <typename T>
 inline
 AztecLinearSolver<T>::AztecLinearSolver ()
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
-
   if (libMesh::n_processors() == 1)
     this->_preconditioner_type = ILU_PRECOND;
   else

@@ -25,7 +25,7 @@
 #include "sparse_matrix.h"
 #include "laspack_matrix.h"
 #include "petsc_matrix.h"
-
+#include "trilinos_epetra_matrix.h"
 
 
 //------------------------------------------------------------------
@@ -57,6 +57,16 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
 	return ap;
       }
 #endif
+
+
+#ifdef HAVE_TRILINOS
+    case TRILINOS_SOLVERS:
+      {
+	AutoPtr<SparseMatrix<T> > ap(new EpetraMatrix<T>);
+	return ap;
+      }
+#endif
+
 
     default:
       std::cerr << "ERROR:  Unrecognized solver package: "

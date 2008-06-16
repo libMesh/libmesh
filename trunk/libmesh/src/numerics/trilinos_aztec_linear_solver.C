@@ -55,6 +55,8 @@ void AztecLinearSolver<T>::clear ()
 template <typename T>
 void AztecLinearSolver<T>::init ()
 {
+  LIBMESH_THROW(libMesh::NotImplemented());
+
 //   // Initialize the data structures if not done so already.
 //   if (!this->initialized())
 //     {
@@ -157,6 +159,8 @@ AztecLinearSolver<T>::solve (SparseMatrix<T>&  /* matrix_in */,
 {
   START_LOG("solve()", "AztecLinearSolver");
   
+  LIBMESH_THROW(libMesh::NotImplemented());
+
 //   PetscMatrix<T>* matrix   = dynamic_cast<PetscMatrix<T>*>(&matrix_in);
 //   PetscMatrix<T>* precond  = dynamic_cast<PetscMatrix<T>*>(&precond_in);
 //   PetscVector<T>* solution = dynamic_cast<PetscVector<T>*>(&solution_in);
@@ -296,6 +300,8 @@ AztecLinearSolver<T>::solve (SparseMatrix<T>&  /* matrix_in */,
 template <typename T>
 void AztecLinearSolver<T>::get_residual_history(std::vector<double>& /* hist */)
 {
+  LIBMESH_THROW(libMesh::NotImplemented());
+
 //   int ierr = 0;
 //   int its  = 0;
 
@@ -329,6 +335,8 @@ void AztecLinearSolver<T>::get_residual_history(std::vector<double>& /* hist */)
 template <typename T>
 Real AztecLinearSolver<T>::get_initial_residual()
 {
+  LIBMESH_THROW(libMesh::NotImplemented());
+
 //   int ierr = 0;
 //   int its  = 0;
 
@@ -360,6 +368,8 @@ Real AztecLinearSolver<T>::get_initial_residual()
 template <typename T>
 void AztecLinearSolver<T>::print_converged_reason()
 {
+  LIBMESH_THROW(libMesh::NotImplemented());
+
 // #if PETSC_VERSION_LESS_THAN(2,3,1)
 //   std::cout << "This method is currently not supported "
 // 	    << "(but may work!) for Petsc 2.3.0 and earlier." << std::endl;
