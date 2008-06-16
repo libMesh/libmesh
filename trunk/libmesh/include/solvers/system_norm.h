@@ -23,6 +23,7 @@
 #define __system_norm_h__
 
 // C++ includes
+#include <vector>
 
 // Local includes
 #include "libmesh_common.h" // for Real
