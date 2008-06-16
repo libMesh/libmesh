@@ -26,6 +26,7 @@
 
 // Local Includes -----------------------------------
 #include "auto_ptr.h"
+#include "elem.h"
 #include "location_maps.h"
 #include "mesh_base.h"
 #include "parallel.h"
