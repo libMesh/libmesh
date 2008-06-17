@@ -606,7 +606,7 @@ T EpetraVector<T>::operator() (const unsigned int i) const
   libmesh_assert ( ((i >= this->first_local_index()) &&
 		    (i <  this->last_local_index())) );
 
-  return (*_vec)[0][i];
+  return (*_vec)[0][i-this->first_local_index()];
 }
 
 

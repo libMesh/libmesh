@@ -254,14 +254,13 @@ void EpetraVector<T>::insert (const std::vector<T>& v,
   _vec->ReplaceGlobalValues (v.size(),
 			     (int*) &dof_indices[0],
 			     const_cast<T*>(&v[0]));
-
 }
 
 
 
 template <typename T>
 void EpetraVector<T>::insert (const NumericVector<T>& V,
-			     const std::vector<unsigned int>& dof_indices)
+			      const std::vector<unsigned int>& dof_indices)
 {
   libmesh_assert (V.size() == dof_indices.size());
 
@@ -273,16 +272,16 @@ void EpetraVector<T>::insert (const NumericVector<T>& V,
 
 
 template <typename T>
-void EpetraVector<T>::insert (const DenseVector<T>& /* V_in */,
-			      const std::vector<unsigned int>& /* dof_indices */)
+void EpetraVector<T>::insert (const DenseVector<T>& v,
+			      const std::vector<unsigned int>& dof_indices)
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
-
-//   libmesh_assert (V_in.size() == dof_indices.size());
-
-//   const EpetraVector<T>* V = dynamic_cast<const EpetraVector<T>*>(&V_in);
-
-//   this->insert(V->_vec->getValues(), dof_indices);
+  libmesh_assert (v.size() == dof_indices.size());
+  
+  std::vector<T> &vals = const_cast<DenseVector<T>&>(v).get_values();
+  
+  _vec->ReplaceGlobalValues (v.size(),
+			     (int*) &dof_indices[0],
+			     &vals[0]);
 }
 
 
@@ -403,76 +402,23 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in) const
 
 template <typename T>
 void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
-				const std::vector<unsigned int>& send_list) const
+				const std::vector<unsigned int>& /* send_list */) const
 {
-  EpetraVector<T>* v_local =
-  dynamic_cast<EpetraVector<T>*>(&v_local_in);
-
-  libmesh_assert (v_local != NULL);
-  libmesh_assert (this->_map.get() != NULL);
-  libmesh_assert (v_local->_map.get() != NULL);
-  libmesh_assert (v_local->local_size() == this->size());
-  libmesh_assert (send_list.size() <= v_local->size());
-
-  Epetra_Import importer (*v_local->_map, *this->_map);
+  // TODO: optimize to sync only the send list values
+  this->localize(v_local_in);
   
-  v_local->_vec->Import (*this->_vec, importer, Insert);
- 
-//   int ierr=0;
-//   const int n_sl = send_list.size();
+//   EpetraVector<T>* v_local =
+//   dynamic_cast<EpetraVector<T>*>(&v_local_in);
 
-//   IS is;
-//   VecScatter scatter;
+//   libmesh_assert (v_local != NULL);
+//   libmesh_assert (this->_map.get() != NULL);
+//   libmesh_assert (v_local->_map.get() != NULL);
+//   libmesh_assert (v_local->local_size() == this->size());
+//   libmesh_assert (send_list.size() <= v_local->size());
 
-//   std::vector<int> idx(n_sl);
+//   Epetra_Import importer (*v_local->_map, *this->_map);
   
-//   for (unsigned int i=0; i<n_sl; i++)
-//     idx[i] = static_cast<int>(send_list[i]);
-  
-//   // Create the index set & scatter object
-//   if (idx.empty())
-//     ierr = ISCreateGeneral(libMesh::COMM_WORLD, n_sl, EPETRA_NULL, &is);
-//   else
-//     ierr = ISCreateGeneral(libMesh::COMM_WORLD, n_sl, &idx[0], &is);
-//            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   ierr = VecScatterCreate(_vec,          is,
-// 			  v_local->_vec, is,
-// 			  &scatter);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-  
-//   // Perform the scatter
-// #if EPETRA_VERSION_LESS_THAN(2,3,3)
-	 
-//   ierr = VecScatterBegin(_vec, v_local->_vec, INSERT_VALUES,
-// 			 SCATTER_FORWARD, scatter);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-//   ierr = VecScatterEnd  (_vec, v_local->_vec, INSERT_VALUES,
-// 			 SCATTER_FORWARD, scatter);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// #else
-	 
-//   // API argument order change in Epetra 2.3.3
-//   ierr = VecScatterBegin(scatter, _vec, v_local->_vec,
-//                          INSERT_VALUES, SCATTER_FORWARD);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-//   ierr = VecScatterEnd  (scatter, _vec, v_local->_vec,
-//                          INSERT_VALUES, SCATTER_FORWARD);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// #endif
-	 
-
-//   // Clean up
-//   ierr = ISDestroy (is);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-//   ierr = VecScatterDestroy(scatter);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+//   v_local->_vec->Import (*this->_vec, importer, Insert);
 }
 
 
@@ -565,86 +511,50 @@ void EpetraVector<T>::localize (const unsigned int /* first_local_idx */,
 
 
 template <typename T>
-void EpetraVector<T>::localize (std::vector<T>& /* v_local */) const
+void EpetraVector<T>::localize (std::vector<T>& v_local) const
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
+  // This function must be run on all processors at once
+  parallel_only();
 
-//   // This function must be run on all processors at once
-//   parallel_only();
+  const unsigned int n  = this->size();
+  const unsigned int nl = this->local_size();
 
-//   int ierr=0;
-//   const int n = this->size();
-//   const int nl = this->local_size();
-//   EpetraScalar *values;
+  libmesh_assert (this->_vec.get() != NULL);
 
-//   v_local.clear();
-//   v_local.resize(n, 0.);
+  v_local.clear();
+  v_local.reserve(n);
 
-//   ierr = VecGetArray (_vec, &values);
-// 	 CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  // build up my local part
+  for (unsigned int i=0; i<nl; i++)
+    v_local.push_back((*this->_vec)[0][i]);
 
-//   unsigned int ioff = first_local_index();
-
-//   for (unsigned int i=0; i<nl; i++)
-//     v_local[i+ioff] = static_cast<T>(values[i]);
-
-//   ierr = VecRestoreArray (_vec, &values);
-// 	 CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   Parallel::sum(v_local);
+  Parallel::allgather (v_local);
 }
 
 
 
 template <typename T>
-void EpetraVector<T>::localize_to_one (std::vector<T>& /* v_local */,
-				       const unsigned int /* pid */) const
+void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
+				       const unsigned int  pid) const
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
+  // This function must be run on all processors at once
+  parallel_only();
 
-//   int ierr=0;
-//   const int n  = size();
-//   const int nl = local_size();
-//   EpetraScalar *values;
+  const unsigned int n  = this->size();
+  const unsigned int nl = this->local_size();
 
+  libmesh_assert (pid < libMesh::n_processors());
+  libmesh_assert (this->_vec.get() != NULL);
   
-//   v_local.resize(n);
-
+  v_local.clear();
+  v_local.reserve(n);
   
-//   // only one processor
-//   if (n == nl)
-//     {      
-//       ierr = VecGetArray (_vec, &values);
-// 	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  
+  // build up my local part
+  for (unsigned int i=0; i<nl; i++)
+    v_local.push_back((*this->_vec)[0][i]);
 
-//       for (unsigned int i=0; i<n; i++)
-// 	v_local[i] = static_cast<Real>(values[i]);
-
-//       ierr = VecRestoreArray (_vec, &values);
-// 	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
-
-//   // otherwise multiple processors
-//   else
-//     {
-//       unsigned int ioff = this->first_local_index();
-//       std::vector<Real> local_values (n, 0.);
-      
-//       {
-// 	ierr = VecGetArray (_vec, &values);
-// 	       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	
-// 	for (unsigned int i=0; i<nl; i++)
-// 	  local_values[i+ioff] = static_cast<Real>(values[i]);
-	
-// 	ierr = VecRestoreArray (_vec, &values);
-// 	       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//       }
-      
-
-//       MPI_Reduce (&local_values[0], &v_local[0], n, MPI_REAL, MPI_SUM,
-// 		  pid, libMesh::COMM_WORLD);
-//     }
+  Parallel::gather (pid, v_local);
 }
 
 
