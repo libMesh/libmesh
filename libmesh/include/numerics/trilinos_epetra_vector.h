@@ -34,7 +34,7 @@
 #include "numeric_vector.h"
 
 // Trilinos includes
-#include <Epetra_Vector.h>
+#include <Epetra_FEVector.h>
 #include <Epetra_Map.h>
 #include <Epetra_MpiComm.h>
 
@@ -77,7 +77,7 @@ public:
    * This allows ownership of v to remain with the original creator,
    * and to simply provide additional functionality with the EpetraVector.
    */
-  EpetraVector(Epetra_Vector v);
+  EpetraVector(Epetra_FEVector v);
   
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -410,7 +410,7 @@ private:
    * Actual Epetra vector datatype
    * to hold vector entries
    */
-  AutoPtr<Epetra_Vector> _vec;
+  AutoPtr<Epetra_FEVector> _vec;
 
   /**
    * Holds the distributed Map
@@ -461,7 +461,7 @@ EpetraVector<T>::EpetraVector (const unsigned int n,
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector (Epetra_Vector v)
+EpetraVector<T>::EpetraVector (Epetra_FEVector v)
   : _destroy_vec_on_exit(false)
 {
   (*_vec) = v;
@@ -490,7 +490,7 @@ void EpetraVector<T>::init (const unsigned int n,
 			     Epetra_MpiComm (libMesh::COMM_WORLD))
 	      );
 	      
-  _vec.reset(new Epetra_Vector(*_map));
+  _vec.reset(new Epetra_FEVector(*_map));
   
   this->_is_initialized = true;
   
@@ -606,7 +606,7 @@ T EpetraVector<T>::operator() (const unsigned int i) const
   libmesh_assert ( ((i >= this->first_local_index()) &&
 		    (i <  this->last_local_index())) );
 
-  return (*_vec)[i];
+  return (*_vec)[0][i];
 }
 
 
