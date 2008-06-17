@@ -222,8 +222,8 @@ void QGauss::init_3D(const ElemType _type,
 	    }
 	  case FIFTH:
 	    {
-	      _points.resize(17);
-	      _weights.resize(17);
+	      _points.resize(15);
+	      _weights.resize(15);
 		    
 	      _points[0](0) = 0.25;
 	      _points[0](1) = 0.25;
