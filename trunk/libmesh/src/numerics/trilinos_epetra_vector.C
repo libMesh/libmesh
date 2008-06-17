@@ -123,7 +123,7 @@ void EpetraVector<T>::set (const unsigned int i_in, const T value_in)
 
   libmesh_assert(i_in<this->size());
 
-  _vec->ReplaceGlobalValues(1,&value, &i);
+  _vec->ReplaceGlobalValues(1, &i, &value);
 
   this->_is_closed = false;
 }
@@ -138,7 +138,7 @@ void EpetraVector<T>::add (const unsigned int i_in, const T value_in)
 
   libmesh_assert(i_in<this->size());
   
-  _vec->SumIntoGlobalValues(1,&value,&i);
+  _vec->SumIntoGlobalValues(1, &i, &value);
 
   this->_is_closed = false;
 }
@@ -151,9 +151,10 @@ void EpetraVector<T>::add_vector (const std::vector<T>& v,
 {
   libmesh_assert (v.size() == dof_indices.size());
 
-  _vec->SumIntoGlobalValues(v.size(),
-			    const_cast<T*>(&v[0]),
-			    (int*) &dof_indices[0]);
+  _vec->SumIntoGlobalValues (v.size(),
+			     (int*) &dof_indices[0],
+			     const_cast<T*>(&v[0]));
+
 }
 
 
@@ -250,9 +251,10 @@ void EpetraVector<T>::insert (const std::vector<T>& v,
 {
   libmesh_assert (v.size() == dof_indices.size());
 
-  _vec->ReplaceGlobalValues(v.size(),
-			    const_cast<T*>(&v[0]),
-			    (int*) &dof_indices[0]);
+  _vec->ReplaceGlobalValues (v.size(),
+			     (int*) &dof_indices[0],
+			     const_cast<T*>(&v[0]));
+
 }
 
 
@@ -400,18 +402,22 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in) const
 
 
 template <typename T>
-void EpetraVector<T>::localize (NumericVector<T>& /* v_local_in */,
-				const std::vector<unsigned int>& /* send_list */) const
+void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
+				const std::vector<unsigned int>& send_list) const
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
+  EpetraVector<T>* v_local =
+  dynamic_cast<EpetraVector<T>*>(&v_local_in);
 
-//   EpetraVector<T>* v_local =
-//   dynamic_cast<EpetraVector<T>*>(&v_local_in);
+  libmesh_assert (v_local != NULL);
+  libmesh_assert (this->_map.get() != NULL);
+  libmesh_assert (v_local->_map.get() != NULL);
+  libmesh_assert (v_local->local_size() == this->size());
+  libmesh_assert (send_list.size() <= v_local->size());
 
-//   libmesh_assert (v_local != NULL);
-//   libmesh_assert (v_local->local_size() == this->size());
-//   libmesh_assert (send_list.size()     <= v_local->size());
+  Epetra_Import importer (*v_local->_map, *this->_map);
   
+  v_local->_vec->Import (*this->_vec, importer, Insert);
+ 
 //   int ierr=0;
 //   const int n_sl = send_list.size();
 
@@ -590,12 +596,9 @@ void EpetraVector<T>::localize (std::vector<T>& /* v_local */) const
 
 
 
-// Full specialization for Real datatypes
-#ifdef USE_REAL_NUMBERS
-
-template <>
-void EpetraVector<Real>::localize_to_one (std::vector<Real>& /* v_local */,
-					  const unsigned int /* pid */) const
+template <typename T>
+void EpetraVector<T>::localize_to_one (std::vector<T>& /* v_local */,
+				       const unsigned int /* pid */) const
 {
   LIBMESH_THROW(libMesh::NotImplemented());
 
@@ -643,94 +646,6 @@ void EpetraVector<Real>::localize_to_one (std::vector<Real>& /* v_local */,
 // 		  pid, libMesh::COMM_WORLD);
 //     }
 }
-
-#endif
-
-
-// Full specialization for Complex datatypes
-#ifdef USE_COMPLEX_NUMBERS
-
-template <>
-void EpetraVector<Complex>::localize_to_one (std::vector<Complex>& /* v_local */,
-					     const unsigned int /* pid */) const
-{
-  LIBMESH_THROW(libMesh::NotImplemented());
-
-//   int ierr=0;
-//   const int n  = size();
-//   const int nl = local_size();
-//   EpetraScalar *values;
-
-  
-//   v_local.resize(n);
-
-  
-//   for (unsigned int i=0; i<n; i++)
-//     v_local[i] = 0.;
-  
-//   // only one processor
-//   if (n == nl)
-//     {      
-//       ierr = VecGetArray (_vec, &values);
-// 	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       for (int i=0; i<n; i++)
-// 	v_local[i] = static_cast<Complex>(values[i]);
-
-//       ierr = VecRestoreArray (_vec, &values);
-// 	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
-
-//   // otherwise multiple processors
-//   else
-//     {
-//       unsigned int ioff = this->first_local_index();
-
-//       /* in here the local values are stored, acting as send buffer for MPI
-//        * initialize to zero, since we collect using MPI_SUM
-//        */
-//       std::vector<Real> real_local_values(n, 0.);
-//       std::vector<Real> imag_local_values(n, 0.);
-
-//       {
-// 	ierr = VecGetArray (_vec, &values);
-// 	       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	
-// 	// provide my local share to the real and imag buffers
-// 	for (int i=0; i<nl; i++)
-// 	  {
-// 	    real_local_values[i+ioff] = static_cast<Complex>(values[i]).real();
-// 	    imag_local_values[i+ioff] = static_cast<Complex>(values[i]).imag();
-// 	  }
-
-// 	ierr = VecRestoreArray (_vec, &values);
-// 	       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//       }
-   
-//       /* have buffers of the real and imaginary part of v_local.
-//        * Once MPI_Reduce() collected all the real and imaginary
-//        * parts in these std::vector<double>, the values can be 
-//        * copied to v_local
-//        */
-//       std::vector<Real> real_v_local(n);
-//       std::vector<Real> imag_v_local(n);
-
-//       // collect entries from other proc's in real_v_local, imag_v_local
-//       MPI_Reduce (&real_local_values[0], &real_v_local[0], n, 
-// 		  MPI_DOUBLE, MPI_SUM,
-// 		  pid, libMesh::COMM_WORLD);	
-
-//       MPI_Reduce (&imag_local_values[0], &imag_v_local[0], n, 
-// 		  MPI_DOUBLE, MPI_SUM,
-// 		  pid, libMesh::COMM_WORLD);	
-
-//       // copy real_v_local and imag_v_local to v_local
-//       for (int i=0; i<n; i++)
-// 	v_local[i] = Complex(real_v_local[i], imag_v_local[i]);
-//     }  
-}
-
-#endif
 
 
 
