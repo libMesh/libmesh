@@ -35,9 +35,9 @@
 
 #undef parallel_only
 #ifndef NDEBUG
-  #define parallel_only() { libmesh_assert(Parallel::verify(std::string(__FILE__))); libmesh_assert(Parallel::verify(__LINE__)); }
+  #define parallel_only() do { libmesh_assert(Parallel::verify(std::string(__FILE__))); libmesh_assert(Parallel::verify(__LINE__)); } while (0)
 #else
-  #define parallel_only() { }
+  #define parallel_only()
 #endif
 
 /**
