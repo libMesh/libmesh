@@ -52,11 +52,11 @@ namespace libMesh {
 
 }
 
-#define LIBMESH_THROW(e) { throw e; }
+#define LIBMESH_THROW(e) do { throw e; } while (0)
 
 #else
 
-#define LIBMESH_THROW(e) { std::abort(); }
+#define LIBMESH_THROW(e) do { std::abort(); } while (0)
 
 #endif // ENABLE_EXCEPTIONS
 
