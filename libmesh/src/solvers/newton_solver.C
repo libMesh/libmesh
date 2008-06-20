@@ -244,15 +244,15 @@ unsigned int NewtonSolver::solve()
 
   AutoPtr<NumericVector<Number> > linear_solution_ptr = newton_iterate.clone();
   NumericVector<Number> &linear_solution = *linear_solution_ptr;
+  NumericVector<Number> &rhs = *(_system.rhs);
 
   newton_iterate.close();
   linear_solution.close();
+  rhs.close();
 
 #ifdef ENABLE_AMR
   _system.get_dof_map().enforce_constraints_exactly(_system);
 #endif
-
-  NumericVector<Number> &rhs = *(_system.rhs);
 
   SparseMatrix<Number> &matrix = *(_system.matrix);
 
