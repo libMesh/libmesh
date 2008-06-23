@@ -24,6 +24,9 @@ ex18.$(obj-suffix):\
     ../../include/enums/enum_order.h\
     ../../include/enums/enum_solver_package.h\
     ../../include/enums/enum_xdr_mode.h\
+    ../../include/error_estimation/error_estimator.h\
+    ../../include/error_estimation/jump_error_estimator.h\
+    ../../include/error_estimation/kelly_error_estimator.h\
     ../../include/fe/fe_base.h\
     ../../include/fe/fe_type.h\
     ../../include/geom/elem.h\
@@ -48,9 +51,6 @@ ex18.$(obj-suffix):\
     ../../include/numerics/dense_subvector.h\
     ../../include/numerics/dense_vector.h\
     ../../include/numerics/dense_vector_base.h\
-    ../../include/numerics/error_estimator.h\
-    ../../include/numerics/jump_error_estimator.h\
-    ../../include/numerics/kelly_error_estimator.h\
     ../../include/numerics/numeric_vector.h\
     ../../include/numerics/tensor_value.h\
     ../../include/numerics/type_tensor.h\
