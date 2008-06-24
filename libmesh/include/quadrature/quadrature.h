@@ -158,10 +158,27 @@ public:
   void print_info(std::ostream& os=std::cout) const;
 
   /**
-   * Same as above, but allows you to use ethe stream syntax.
+   * Same as above, but allows you to use the stream syntax.
    */
   friend std::ostream& operator << (std::ostream& os, const QBase& q);
 
+  /**
+   * Flag (default true) controlling the use of quadrature rules with negative
+   * weights.  Set this to false to ONLY use (potentially) safer but more expensive
+   * rules with all positive weights.
+   *
+   * Negative weights typically appear in Gaussian quadrature rules
+   * over three-dimensional elements.  Rules with negative weights can
+   * be unsuitable for some problems.  For example, it is possible for
+   * a rule with negative weights to obtain a negative result when
+   * integrating a positive function.
+   *
+   * A particular example: if rules with negative weights are not allowed,
+   * a request for TET,THIRD (5 points) will return the TET,FIFTH (14 points)
+   * rule instead, nearly tripling the computational effort required!
+   */
+  bool allow_rules_with_negative_weights;
+  
 protected:
 
   
@@ -325,6 +342,7 @@ protected:
 inline
 QBase::QBase(const unsigned int d,
 	     const Order o) :
+  allow_rules_with_negative_weights(true),
   _dim(d),
   _order(o),
   _type(INVALID_ELEM),
