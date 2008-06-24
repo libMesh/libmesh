@@ -77,14 +77,24 @@ void QGauss::init_2D(const ElemType _type,
 	      _points.resize(3);
 	      _weights.resize(3);
 
-	      _points[0](0) = .5;
-	      _points[0](1) = .5;
+	      // Alternate rule with points on ref. elt. boundaries.
+	      // Not ideal for problems with material coefficient discontinuities
+	      // aligned along element boundaries.
+	      // _points[0](0) = .5;
+	      // _points[0](1) = .5;
+	      // _points[1](0) = 0.;
+	      // _points[1](1) = .5;
+	      // _points[2](0) = .5;
+	      // _points[2](1) = .0;
+	      
+	      _points[0](0) = 2./3.;
+	      _points[0](1) = 1./6.;
 
-	      _points[1](0) = 0.;
-	      _points[1](1) = .5;
+	      _points[1](0) = 1./6.;
+	      _points[1](1) = 2./3.;
 
-	      _points[2](0) = .5;
-	      _points[2](1) = .0;
+	      _points[2](0) = 1./6.;
+	      _points[2](1) = 1./6.;
 
 
 	      _weights[0] = 1./6.;
@@ -95,29 +105,33 @@ void QGauss::init_2D(const ElemType _type,
 	    }
 	  case THIRD:
 	    {
-	      // Exact for cubics
-	      _points.resize(4);
-	      _weights.resize(4);
+	      if (allow_rules_with_negative_weights)
+		{
+		  // Exact for cubics
+		  _points.resize(4);
+		  _weights.resize(4);
 		  
-	      _points[0](0) = .33333333333333333333333333333333;
-	      _points[0](1) = .33333333333333333333333333333333;
+		  _points[0](0) = .33333333333333333333333333333333;
+		  _points[0](1) = .33333333333333333333333333333333;
 
-	      _points[1](0) = .2;
-	      _points[1](1) = .6;
+		  _points[1](0) = .2;
+		  _points[1](1) = .6;
 
-	      _points[2](0) = .2;
-	      _points[2](1) = .2;
+		  _points[2](0) = .2;
+		  _points[2](1) = .2;
 
-	      _points[3](0) = .6;
-	      _points[3](1) = .2;
+		  _points[3](0) = .6;
+		  _points[3](1) = .2;
 
 
-	      _weights[0] = -27./96.;
-	      _weights[1] =  25./96.;
-	      _weights[2] =  25./96.;
-	      _weights[3] =  25./96.;
+		  _weights[0] = -27./96.;
+		  _weights[1] =  25./96.;
+		  _weights[2] =  25./96.;
+		  _weights[3] =  25./96.;
 
-	      return;
+		  return;
+		} // end if (allow_rules_with_negative_weights)
+	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
 	    }
 	  case FOURTH:
 	  case FIFTH:
@@ -235,13 +249,194 @@ void QGauss::init_2D(const ElemType _type,
 
 	      return;
 	    }
+
+	    
+	    // This rule, which is originally due to:
+	    // Dunavant, "High degree efficient symmetrical Gaussian quadrature rules for
+	    // the triangle", IJNME 21 p. 1129--1148, 1985.
+	    //
+	    // It was copied 23rd June 2008 from:
+	    // http://people.scs.fsu.edu/~burkardt/f_src/dunavant/dunavant.f90
+	    //
+	    // This rule contains a negative weight and will fall through to EIGHTH if you have
+	    // chosen to disallow such rules.
 	  case SEVENTH:
+	    {
+	      if (allow_rules_with_negative_weights)
+		{
+		  _points.resize(13);
+		  _weights.resize(13);
+
+		  // The raw data for the quadrature rule.
+		  const Real p[4][4] = {
+		    {                1./3.,                    0.,                    0., -0.149570044467682e+00 / 2.0}, // 1-perm
+		    {0.479308067841920e+00, 0.260345966079040e+00,                    0., 0.175615257433208e+00  / 2.0}, // 3-perm
+		    {0.869739794195568e+00, 0.065130102902216e+00,                    0., 0.053347235608838e+00  / 2.0}, // 3-perm
+		    {0.048690315425316e+00, 0.312865496004874e+00, 0.638444188569810e+00, 0.077113760890257e+00  / 2.0}  // 6-perm
+		  };
+
+	      
+		  // Now call the dunavant routine to generate _points and _weights
+		  dunavant_rule(p, 4);
+		  
+ 		  return;
+		} // end if (allow_rules_with_negative_weights)
+	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
+	    }
+
+
+
+	    
+	    // Another Dunavant rule.  This one has all positive weights.  This rule has
+	    // 16 points while a comparable conical product rule would have 5*5=25.
+	    //
+	    // It was copied 23rd June 2008 from:
+	    // http://people.scs.fsu.edu/~burkardt/f_src/dunavant/dunavant.f90
 	  case EIGHTH:
-	  case NINTH:     
-	  case TENTH:        
+	    {
+	      _points.resize(16);
+	      _weights.resize(16);
+
+	      // The raw data for the quadrature rule.
+	      const Real p[5][4] = {
+		{                1./3.,                    0.,                    0., 0.144315607677787e+00 / 2.0}, // 1-perm
+		{0.081414823414554e+00, 0.459292588292723e+00,                    0., 0.095091634267285e+00 / 2.0}, // 3-perm
+		{0.658861384496480e+00, 0.170569307751760e+00,                    0., 0.103217370534718e+00 / 2.0}, // 3-perm
+		{0.898905543365938e+00, 0.050547228317031e+00,                    0., 0.032458497623198e+00 / 2.0}, // 3-perm
+		{0.008394777409958e+00, 0.263112829634638e+00, 0.728492392955404e+00, 0.027230314174435e+00 / 2.0}  // 6-perm
+	      };
+
+	      
+	      // Now call the dunavant routine to generate _points and _weights
+	      dunavant_rule(p, 5);
+
+	      return;
+	    }
+
+
+	    
+	    // Another Dunavant rule.  This one has all positive weights.  This rule has 19
+	    // points. The comparable conical product rule would have 25.
+	    // It was copied 23rd June 2008 from:
+	    // http://people.scs.fsu.edu/~burkardt/f_src/dunavant/dunavant.f90
+	  case NINTH:
+	    {
+	      _points.resize(19);
+	      _weights.resize(19);
+
+
+	      // The raw data for the quadrature rule.
+	      const Real p[6][4] = {
+		{                1./3.,                    0.,                    0., 0.097135796282799e+00 / 2.0}, // 1-perm
+		{0.020634961602525e+00, 0.489682519198738e+00,                    0., 0.031334700227139e+00 / 2.0}, // 3-perm
+		{0.125820817014127e+00, 0.437089591492937e+00,                    0., 0.077827541004774e+00 / 2.0}, // 3-perm
+		{0.623592928761935e+00, 0.188203535619033e+00,                    0., 0.079647738927210e+00 / 2.0}, // 3-perm
+		{0.910540973211095e+00, 0.044729513394453e+00,                    0., 0.025577675658698e+00 / 2.0}, // 3-perm 
+		{0.036838412054736e+00, 0.221962989160766e+00, 0.741198598784498e+00, 0.043283539377289e+00 / 2.0}  // 6-perm
+	      };
+
+	      
+	      // Now call the dunavant routine to generate _points and _weights
+	      dunavant_rule(p, 6);
+
+	      return;
+	    }
+
+	    
+	    // Another Dunavant rule with all positive weights.  This rule has 25
+	    // points. The comparable conical product rule would have 36.
+	    // It was copied 23rd June 2008 from:
+	    // http://people.scs.fsu.edu/~burkardt/f_src/dunavant/dunavant.f90
+	  case TENTH:
+	    {
+	      _points.resize (25);
+	      _weights.resize(25);
+
+	      // The raw data for the quadrature rule.
+	      const Real p[6][4] = {
+		{                1./3.,                    0.,                    0., 0.090817990382754e+00 / 2.0}, // 1-perm
+		{0.028844733232685e+00, 0.485577633383657e+00,                    0., 0.036725957756467e+00 / 2.0}, // 3-perm
+		{0.781036849029926e+00, 0.109481575485037e+00,                    0., 0.045321059435528e+00 / 2.0}, // 3-perm
+		{0.141707219414880e+00, 0.307939838764121e+00, 0.550352941820999e+00, 0.072757916845420e+00 / 2.0}, // 6-perm
+		{0.025003534762686e+00, 0.246672560639903e+00, 0.728323904597411e+00, 0.028327242531057e+00 / 2.0}, // 6-perm 
+		{0.009540815400299e+00, 0.066803251012200e+00, 0.923655933587500e+00, 0.009421666963733e+00 / 2.0}  // 6-perm
+	      };
+
+	      
+	      // Now call the dunavant routine to generate _points and _weights
+	      dunavant_rule(p, 6);
+
+	      return;
+	    }
+
+
+	    
+	    // Another Dunavant rule with all positive weights.  This rule has 33
+	    // points. The comparable conical product rule would have 36 (ELEVENTH) or 49 (TWELFTH).
+	    //
+	    // Dunavant's 11th-order rule contains points outside the region of
+	    // integration, and is thus unacceptable for our FEM calculations.
+	    // 
+	    // It was copied 23rd June 2008 from:
+	    // http://people.scs.fsu.edu/~burkardt/f_src/dunavant/dunavant.f90
 	  case ELEVENTH:     
-	  case TWELFTH:      
-	  case THIRTEENTH:   
+	  case TWELFTH:
+	    {
+	      _points.resize (33);
+	      _weights.resize(33);
+
+	      // The raw data for the quadrature rule.
+	      const Real p[8][4] = {
+		{0.023565220452390e+00, 0.488217389773805e+00,                    0., 0.025731066440455e+00 / 2.0 }, // 3-perm
+		{0.120551215411079e+00, 0.439724392294460e+00,                    0., 0.043692544538038e+00 / 2.0 }, // 3-perm
+		{0.457579229975768e+00, 0.271210385012116e+00,                    0., 0.062858224217885e+00 / 2.0 }, // 3-perm
+		{0.744847708916828e+00, 0.127576145541586e+00,                    0., 0.034796112930709e+00 / 2.0 }, // 3-perm
+		{0.957365299093579e+00, 0.021317350453210e+00,                    0., 0.006166261051559e+00 / 2.0 }, // 3-perm
+		{0.115343494534698e+00, 0.275713269685514e+00, 0.608943235779788e+00, 0.040371557766381e+00 / 2.0 }, // 6-perm
+		{0.022838332222257e+00, 0.281325580989940e+00, 0.695836086787803e+00, 0.022356773202303e+00 / 2.0 }, // 6-perm 
+		{0.025734050548330e+00, 0.116251915907597e+00, 0.858014033544073e+00, 0.017316231108659e+00 / 2.0 }  // 6-perm
+	      };
+
+	      
+	      // Now call the dunavant routine to generate _points and _weights
+	      dunavant_rule(p, 8);
+
+	      return;
+	    }
+
+	    
+	    // Another Dunavant rule with all positive weights.  This rule has 37
+	    // points. The comparable conical product rule would have 49 points.
+	    //
+	    // It was copied 23rd June 2008 from:
+	    // http://people.scs.fsu.edu/~burkardt/f_src/dunavant/dunavant.f90
+	  case THIRTEENTH:
+	    {
+	      _points.resize (37);
+	      _weights.resize(37);
+
+	      // The raw data for the quadrature rule.
+	      const Real p[10][4] = {
+		{                1./3.,                    0.,                    0., 0.052520923400802e+00 / 2.0}, // 1-perm
+		{0.009903630120591e+00, 0.495048184939705e+00,                    0., 0.011280145209330e+00 / 2.0}, // 3-perm
+		{0.062566729780852e+00, 0.468716635109574e+00,                    0., 0.031423518362454e+00 / 2.0}, // 3-perm
+		{0.170957326397447e+00, 0.414521336801277e+00,                    0., 0.047072502504194e+00 / 2.0}, // 3-perm
+		{0.541200855914337e+00, 0.229399572042831e+00,                    0., 0.047363586536355e+00 / 2.0}, // 3-perm
+		{0.771151009607340e+00, 0.114424495196330e+00,                    0., 0.031167529045794e+00 / 2.0}, // 3-perm
+		{0.950377217273082e+00, 0.024811391363459e+00,                    0., 0.007975771465074e+00 / 2.0}, // 3-perm
+		{0.094853828379579e+00, 0.268794997058761e+00, 0.636351174561660e+00, 0.036848402728732e+00 / 2.0}, // 6-perm
+		{0.018100773278807e+00, 0.291730066734288e+00, 0.690169159986905e+00, 0.017401463303822e+00 / 2.0}, // 6-perm 
+		{0.022233076674090e+00, 0.126357385491669e+00, 0.851409537834241e+00, 0.015521786839045e+00 / 2.0}  // 6-perm
+	      };
+
+	      
+	      // Now call the dunavant routine to generate _points and _weights
+	      dunavant_rule(p, 10);
+
+	      return;
+	    }
+
+	    
 	  case FOURTEENTH:   
 	  case FIFTEENTH:    
 	  case SIXTEENTH:    

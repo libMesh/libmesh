@@ -114,206 +114,295 @@ void QGauss::init_3D(const ElemType _type,
 	    }
 	  case THIRD:
 	    {
-	      // Exact for cubics
-	      _points.resize(5);
-	      _weights.resize(5);
+	      if (allow_rules_with_negative_weights)
+		{
+		  // Can be found in the class notes
+		  // http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps
+		  // by Flaherty.
+		  // Caution: this rule has a negative weight and may be
+		  // unsuitable for some problems.
+		  // Exact for cubics
+		  _points.resize(5);
+		  _weights.resize(5);
 		    
 		    
-	      _points[0](0) = .25;
-	      _points[0](1) = .25;
-	      _points[0](2) = .25;
+		  _points[0](0) = .25;
+		  _points[0](1) = .25;
+		  _points[0](2) = .25;
 		    
-	      _points[1](0) = .5;
-	      _points[1](1) = .16666666666666666666666666666666666666666667;
-	      _points[1](2) = .16666666666666666666666666666666666666666667;
+		  _points[1](0) = .5;
+		  _points[1](1) = .16666666666666666666666666666666666666666667;
+		  _points[1](2) = .16666666666666666666666666666666666666666667;
 		    
-	      _points[2](0) = .16666666666666666666666666666666666666666667;
-	      _points[2](1) = .5;
-	      _points[2](2) = .16666666666666666666666666666666666666666667;
+		  _points[2](0) = .16666666666666666666666666666666666666666667;
+		  _points[2](1) = .5;
+		  _points[2](2) = .16666666666666666666666666666666666666666667;
 		    
-	      _points[3](0) = .16666666666666666666666666666666666666666667;
-	      _points[3](1) = .16666666666666666666666666666666666666666667;
-	      _points[3](2) = .5;
+		  _points[3](0) = .16666666666666666666666666666666666666666667;
+		  _points[3](1) = .16666666666666666666666666666666666666666667;
+		  _points[3](2) = .5;
 		    
-	      _points[4](0) = .16666666666666666666666666666666666666666667;
-	      _points[4](1) = .16666666666666666666666666666666666666666667;
-	      _points[4](2) = .16666666666666666666666666666666666666666667;
+		  _points[4](0) = .16666666666666666666666666666666666666666667;
+		  _points[4](1) = .16666666666666666666666666666666666666666667;
+		  _points[4](2) = .16666666666666666666666666666666666666666667;
 		    
 		    
-	      _weights[0] = -.133333333333333333333333333333333333333333333;
-	      _weights[1] = .075;
-	      _weights[2] = _weights[1];
-	      _weights[3] = _weights[1];
-	      _weights[4] = _weights[1];
+		  _weights[0] = -.133333333333333333333333333333333333333333333;
+		  _weights[1] = .075;
+		  _weights[2] = _weights[1];
+		  _weights[3] = _weights[1];
+		  _weights[4] = _weights[1];
 		    
-	      return;
+		  return;
+		} // end if (allow_rules_with_negative_weights)
+	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
 	    }	    
 	  case FOURTH:
 	    {
-	      _points.resize(11);
-	      _weights.resize(11);
+	      if (allow_rules_with_negative_weights)
+		{
+		  // Can be found in the class notes
+		  // http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps
+		  // by Flaherty.
+		  // Caution: this rule has a negative weight and may be
+		  // unsuitable for some problems.
+		  _points.resize(11);
+		  _weights.resize(11);
 		    
-	      _points[0](0) = 0.25;
-	      _points[0](1) = 0.25;
-	      _points[0](2) = 0.25;
+		  _points[0](0) = 0.25;
+		  _points[0](1) = 0.25;
+		  _points[0](2) = 0.25;
 
-	      {
-		const Real a = 0.785714285714286;
-		const Real b = 0.071428571428571;
+		  {
+		    const Real a = 0.785714285714286;
+		    const Real b = 0.071428571428571;
 		
-		_points[1](0) = a;
-		_points[1](1) = b;
-		_points[1](2) = b;
+		    _points[1](0) = a;
+		    _points[1](1) = b;
+		    _points[1](2) = b;
 		
-		_points[2](0) = b;
-		_points[2](1) = a;
-		_points[2](2) = b;
+		    _points[2](0) = b;
+		    _points[2](1) = a;
+		    _points[2](2) = b;
 		
-		_points[3](0) = b;
-		_points[3](1) = b;
-		_points[3](2) = a;
+		    _points[3](0) = b;
+		    _points[3](1) = b;
+		    _points[3](2) = a;
 		
-		_points[4](0) = b;
-		_points[4](1) = b;
-		_points[4](2) = b;
-	      }
-	      {
-		const Real a = 0.399403576166799;
-		const Real b = 0.100596423833201;
+		    _points[4](0) = b;
+		    _points[4](1) = b;
+		    _points[4](2) = b;
+		  }
+		  {
+		    const Real a = 0.399403576166799;
+		    const Real b = 0.100596423833201;
 		
-		_points[5](0) = b;
-		_points[5](1) = a;
-		_points[5](2) = a;
+		    _points[5](0) = b;
+		    _points[5](1) = a;
+		    _points[5](2) = a;
 		
-		_points[6](0) = a;
-		_points[6](1) = a;
-		_points[6](2) = b;
+		    _points[6](0) = a;
+		    _points[6](1) = a;
+		    _points[6](2) = b;
 		
-		_points[7](0) = a;
-		_points[7](1) = b;
-		_points[7](2) = b;
+		    _points[7](0) = a;
+		    _points[7](1) = b;
+		    _points[7](2) = b;
 		
-		_points[8](0) = b;
-		_points[8](1) = a;
-		_points[8](2) = b;
+		    _points[8](0) = b;
+		    _points[8](1) = a;
+		    _points[8](2) = b;
 		
-		_points[9](0) = b;
-		_points[9](1) = b;
-		_points[9](2) = a;
+		    _points[9](0) = b;
+		    _points[9](1) = b;
+		    _points[9](2) = a;
 		
-		_points[10](0) = a;
-		_points[10](1) = b;
-		_points[10](2) = a;
-	      }
+		    _points[10](0) = a;
+		    _points[10](1) = b;
+		    _points[10](2) = a;
+		  }
 	      
-	      _weights[0]  = -0.013155555555555555555555555555555555555555555555555555555555555555555556;
-	      _weights[1]  =  0.007622222222222222222222222222222222222222222222222222222222222222222222;
-	      _weights[2]  = _weights[1];
-	      _weights[3]  = _weights[1];
-	      _weights[4]  = _weights[1];
-	      _weights[5]  =  0.024888888888888888888888888888888888888888888888888888888888888888888889;
-	      _weights[6]  = _weights[5];
-	      _weights[7]  = _weights[5];
-	      _weights[8]  = _weights[5];
-	      _weights[9]  = _weights[5];
-	      _weights[10] = _weights[5];
+		  _weights[0]  = -0.013155555555555555555555555555555555555555555555555555555555555555555556;
+		  _weights[1]  =  0.007622222222222222222222222222222222222222222222222222222222222222222222;
+		  _weights[2]  = _weights[1];
+		  _weights[3]  = _weights[1];
+		  _weights[4]  = _weights[1];
+		  _weights[5]  =  0.024888888888888888888888888888888888888888888888888888888888888888888889;
+		  _weights[6]  = _weights[5];
+		  _weights[7]  = _weights[5];
+		  _weights[8]  = _weights[5];
+		  _weights[9]  = _weights[5];
+		  _weights[10] = _weights[5];
 		    
-	      return;
+		  return;
+		} // end if (allow_rules_with_negative_weights)
+	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
 	    }
 	  case FIFTH:
 	    {
-	      _points.resize(15);
-	      _weights.resize(15);
-		    
-	      _points[0](0) = 0.25;
-	      _points[0](1) = 0.25;
-	      _points[0](2) = 0.25;
+	      // By default, we are now using Walkington's 14 point, 5th-order rule since it has
+	      // one fewer point than the previous 5th-order rule.
+	      const bool walkington=true;
 
-	      {
-		const Real a = 0.;
-		const Real b = 0.333333333333333333333333333333333333333;
-		
-		_points[1](0) = a;
-		_points[1](1) = b;
-		_points[1](2) = b;
-		
-		_points[2](0) = b;
-		_points[2](1) = a;
-		_points[2](2) = b;
-		
-		_points[3](0) = b;
-		_points[3](1) = b;
-		_points[3](2) = a;
-		
-		_points[4](0) = b;
-		_points[4](1) = b;
-		_points[4](2) = b;
-	      }
-	      {
-		const Real a = 0.7272727272727272727272727272727272727272727272727272727;
-		const Real b = 0.0909090909090909090909090909090909090909090909090909091;
-		
-		_points[5](0) = a;
-		_points[5](1) = b;
-		_points[5](2) = b;
-		
-		_points[6](0) = b;
-		_points[6](1) = a;
-		_points[6](2) = b;
-		
-		_points[7](0) = b;
-		_points[7](1) = b;
-		_points[7](2) = a;
-		
-		_points[8](0) = b;
-		_points[8](1) = b;
-		_points[8](2) = b;
-	      }
-	      {
-		const Real a = 0.066550153573664;
-		const Real b = 0.433449846426336;
-		
-		_points[9](0) = b;
-		_points[9](1) = a;
-		_points[9](2) = a;
-		
-		_points[10](0) = a;
-		_points[10](1) = a;
-		_points[10](2) = b;
-		
-		_points[11](0) = a;
-		_points[11](1) = b;
-		_points[11](2) = b;
-		
-		_points[12](0) = b;
-		_points[12](1) = a;
-		_points[12](2) = b;
-		
-		_points[13](0) = b;
-		_points[13](1) = b;
-		_points[13](2) = a;
-		
-		_points[14](0) = a;
-		_points[14](1) = b;
-		_points[14](2) = a;		
-	      }
-	      
-	      _weights[0]  = 0.030283678097089;
-	      _weights[1]  = 0.006026785714286;
-	      _weights[2]  = _weights[1];
-	      _weights[3]  = _weights[1];
-	      _weights[4]  = _weights[1];
-	      _weights[5]  = 0.011645249086029;
-	      _weights[6]  = _weights[5];
-	      _weights[7]  = _weights[5];
-	      _weights[8]  = _weights[5];
-	      _weights[9]  = 0.010949141561386;
-	      _weights[10] = _weights[9];
-	      _weights[11] = _weights[9];
-	      _weights[12] = _weights[9];
-	      _weights[13] = _weights[9];
-	      _weights[14] = _weights[9];
+	      if (walkington)
+		{
+		  // Walkington's fifth-order 14-point rule from
+		  // "Quadrature on Simplices of Arbitrary Dimension"
+		  _points.resize(14);
+		  _weights.resize(14);
+
+		  // permutations of these points and suitably-modified versions of
+		  // these points are the quadrature point locations
+		  const Real a[3] = {0.31088591926330060980,    // a1 from the paper
+				     0.092735250310891226402,   // a2 from the paper
+				     0.045503704125649649492};  // a3 from the paper
+
+		  // weights.  a[] and w[] are the only floating-point inputs required
+		  // for this rule.
+		  const Real w[3] = {0.018781320953002641800,    // w1 from the paper
+				     0.012248840519393658257,    // w2 from the paper
+				     0.0070910034628469110730};  // w3 from the paper
+
+		  // The first two sets of 4 points are formed in a similar manner
+		  for (unsigned int i=0; i<2; ++i)
+		    {
+		      // Where we will insert values into _points and _weights
+		      const unsigned int offset=4*i;
+
+		      // Stuff points and weights values into their arrays
+		      const Real b = 1. - 3.*a[i];
+
+		      // Here are the permutations.  Order of these is not important,
+		      // all have the same weight
+		      _points[offset + 0] = Point(a[i], a[i], a[i]);
+		      _points[offset + 1] = Point(a[i],    b, a[i]);
+		      _points[offset + 2] = Point(   b, a[i], a[i]);
+		      _points[offset + 3] = Point(a[i], a[i],    b);
+		      			    
+		      // These 4 points all have the same weights 
+		      for (unsigned int j=0; j<4; ++j)
+			_weights[offset + j] = w[i];
+		    } // end for
+
+
+		  {
+		    // The third set contains 6 points and is formed a little differently
+		    const unsigned int offset = 8;
+		    const Real b = 0.5*(1. - 2.*a[2]);
+
+		    // Here are the permutations.  Order of these is not important,
+		    // all have the same weight
+		    _points[offset + 0] = Point(b   ,    b, a[2]);
+		    _points[offset + 1] = Point(b   , a[2], a[2]);
+		    _points[offset + 2] = Point(a[2], a[2],    b);
+		    _points[offset + 3] = Point(a[2],    b, a[2]);
+		    _points[offset + 4] = Point(   b, a[2],    b);
+		    _points[offset + 5] = Point(a[2],    b,    b);
+		  
+		    // These 6 points all have the same weights 
+		    for (unsigned int j=0; j<6; ++j)
+		      _weights[offset + j] = w[2];
+		  }
+		  
+		} // end if (walkington)
+
+	      else
+		{
+		  // Taken from http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps
+		  // by Flaherty
+		  _points.resize(15);
+		  _weights.resize(15);
 		    
+		  _points[0](0) = 0.25;
+		  _points[0](1) = 0.25;
+		  _points[0](2) = 0.25;
+
+		  {
+		    const Real a = 0.;
+		    const Real b = 0.333333333333333333333333333333333333333;
+		
+		    _points[1](0) = a;
+		    _points[1](1) = b;
+		    _points[1](2) = b;
+		
+		    _points[2](0) = b;
+		    _points[2](1) = a;
+		    _points[2](2) = b;
+		
+		    _points[3](0) = b;
+		    _points[3](1) = b;
+		    _points[3](2) = a;
+		
+		    _points[4](0) = b;
+		    _points[4](1) = b;
+		    _points[4](2) = b;
+		  }
+		  {
+		    const Real a = 0.7272727272727272727272727272727272727272727272727272727;
+		    const Real b = 0.0909090909090909090909090909090909090909090909090909091;
+		
+		    _points[5](0) = a;
+		    _points[5](1) = b;
+		    _points[5](2) = b;
+		
+		    _points[6](0) = b;
+		    _points[6](1) = a;
+		    _points[6](2) = b;
+		
+		    _points[7](0) = b;
+		    _points[7](1) = b;
+		    _points[7](2) = a;
+		
+		    _points[8](0) = b;
+		    _points[8](1) = b;
+		    _points[8](2) = b;
+		  }
+		  {
+		    const Real a = 0.066550153573664;
+		    const Real b = 0.433449846426336;
+		
+		    _points[9](0) = b;
+		    _points[9](1) = a;
+		    _points[9](2) = a;
+		
+		    _points[10](0) = a;
+		    _points[10](1) = a;
+		    _points[10](2) = b;
+		
+		    _points[11](0) = a;
+		    _points[11](1) = b;
+		    _points[11](2) = b;
+		
+		    _points[12](0) = b;
+		    _points[12](1) = a;
+		    _points[12](2) = b;
+		
+		    _points[13](0) = b;
+		    _points[13](1) = b;
+		    _points[13](2) = a;
+		
+		    _points[14](0) = a;
+		    _points[14](1) = b;
+		    _points[14](2) = a;		
+		  }
+	      
+		  _weights[0]  = 0.030283678097089;
+		  _weights[1]  = 0.006026785714286;
+		  _weights[2]  = _weights[1];
+		  _weights[3]  = _weights[1];
+		  _weights[4]  = _weights[1];
+		  _weights[5]  = 0.011645249086029;
+		  _weights[6]  = _weights[5];
+		  _weights[7]  = _weights[5];
+		  _weights[8]  = _weights[5];
+		  _weights[9]  = 0.010949141561386;
+		  _weights[10] = _weights[9];
+		  _weights[11] = _weights[9];
+		  _weights[12] = _weights[9];
+		  _weights[13] = _weights[9];
+		  _weights[14] = _weights[9];
+		} // end else
+	      
 	      return;
 	    }
 
