@@ -112,16 +112,24 @@ void QGauss::init_3D(const ElemType _type,
 		    
 	      return;
 	    }
+
+
+	    
+	    // Can be found in the class notes
+	    // http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps
+	    // by Flaherty.
+	    //
+	    // Caution: this rule has a negative weight and may be
+	    // unsuitable for some problems.
+	    // Exact for cubics.
+	    //
+	    // Note: Keast (see ref. elsewhere in this file) also gives
+	    // a third-order rule with positive weights, but it contains points
+	    // on the ref. elt. boundary, making it less suitable for FEM calculations.
 	  case THIRD:
 	    {
 	      if (allow_rules_with_negative_weights)
 		{
-		  // Can be found in the class notes
-		  // http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps
-		  // by Flaherty.
-		  // Caution: this rule has a negative weight and may be
-		  // unsuitable for some problems.
-		  // Exact for cubics
 		  _points.resize(5);
 		  _weights.resize(5);
 		    
@@ -156,259 +164,334 @@ void QGauss::init_3D(const ElemType _type,
 		  return;
 		} // end if (allow_rules_with_negative_weights)
 	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
-	    }	    
+	    }
+
+	    
+
+	    // Originally a Keast rule,
+	    //    Patrick Keast,
+	    //    Moderate Degree Tetrahedral Quadrature Formulas,
+	    //    Computer Methods in Applied Mechanics and Engineering,
+	    //    Volume 55, Number 3, May 1986, pages 339-348.
+	    //
+	    // Can also be found the class notes
+	    // http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps
+	    // by Flaherty.
+	    //
+	    // Caution: this rule has a negative weight and may be
+	    // unsuitable for some problems.
 	  case FOURTH:
 	    {
 	      if (allow_rules_with_negative_weights)
 		{
-		  // Can be found in the class notes
-		  // http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps
-		  // by Flaherty.
-		  // Caution: this rule has a negative weight and may be
-		  // unsuitable for some problems.
 		  _points.resize(11);
 		  _weights.resize(11);
 		    
-		  _points[0](0) = 0.25;
-		  _points[0](1) = 0.25;
-		  _points[0](2) = 0.25;
+		  // The raw data for the quadrature rule.
+		  const Real p[3][4] = {
+		    {0.250000000000000000e+00,                         0.,                            0.,  -0.131555555555555556e-01},  // 1
+		    {0.785714285714285714e+00,   0.714285714285714285e-01,                            0.,   0.762222222222222222e-02},  // 4
+		    {0.399403576166799219e+00,                         0.,      0.100596423833200785e+00,   0.248888888888888889e-01}   // 6
+		  };
 
-		  {
-		    const Real a = 0.785714285714286;
-		    const Real b = 0.071428571428571;
-		
-		    _points[1](0) = a;
-		    _points[1](1) = b;
-		    _points[1](2) = b;
-		
-		    _points[2](0) = b;
-		    _points[2](1) = a;
-		    _points[2](2) = b;
-		
-		    _points[3](0) = b;
-		    _points[3](1) = b;
-		    _points[3](2) = a;
-		
-		    _points[4](0) = b;
-		    _points[4](1) = b;
-		    _points[4](2) = b;
-		  }
-		  {
-		    const Real a = 0.399403576166799;
-		    const Real b = 0.100596423833201;
-		
-		    _points[5](0) = b;
-		    _points[5](1) = a;
-		    _points[5](2) = a;
-		
-		    _points[6](0) = a;
-		    _points[6](1) = a;
-		    _points[6](2) = b;
-		
-		    _points[7](0) = a;
-		    _points[7](1) = b;
-		    _points[7](2) = b;
-		
-		    _points[8](0) = b;
-		    _points[8](1) = a;
-		    _points[8](2) = b;
-		
-		    _points[9](0) = b;
-		    _points[9](1) = b;
-		    _points[9](2) = a;
-		
-		    _points[10](0) = a;
-		    _points[10](1) = b;
-		    _points[10](2) = a;
-		  }
 	      
-		  _weights[0]  = -0.013155555555555555555555555555555555555555555555555555555555555555555556;
-		  _weights[1]  =  0.007622222222222222222222222222222222222222222222222222222222222222222222;
-		  _weights[2]  = _weights[1];
-		  _weights[3]  = _weights[1];
-		  _weights[4]  = _weights[1];
-		  _weights[5]  =  0.024888888888888888888888888888888888888888888888888888888888888888888889;
-		  _weights[6]  = _weights[5];
-		  _weights[7]  = _weights[5];
-		  _weights[8]  = _weights[5];
-		  _weights[9]  = _weights[5];
-		  _weights[10] = _weights[5];
-		    
+		  // Now call the keast routine to generate _points and _weights
+		  keast_rule(p, 3);
+
 		  return;
 		} // end if (allow_rules_with_negative_weights)
 	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
 	    }
+
+
+
+	    
+	    // Walkington's fifth-order 14-point rule from
+	    // "Quadrature on Simplices of Arbitrary Dimension"
+	    //
+	    // We originally had a Keast rule here, but this rule had
+	    // more points than an equivalent rule by Walkington and
+	    // also contained points on the boundary of the ref. elt,
+	    // making it less suitable for FEM calculations.
 	  case FIFTH:
 	    {
-	      // By default, we are now using Walkington's 14 point, 5th-order rule since it has
-	      // one fewer point than the previous 5th-order rule.
-	      const bool walkington=true;
+	      _points.resize(14);
+	      _weights.resize(14);
 
-	      if (walkington)
+	      // permutations of these points and suitably-modified versions of
+	      // these points are the quadrature point locations
+	      const Real a[3] = {0.31088591926330060980,    // a1 from the paper
+				 0.092735250310891226402,   // a2 from the paper
+				 0.045503704125649649492};  // a3 from the paper
+
+	      // weights.  a[] and w[] are the only floating-point inputs required
+	      // for this rule.
+	      const Real w[3] = {0.018781320953002641800,    // w1 from the paper
+				 0.012248840519393658257,    // w2 from the paper
+				 0.0070910034628469110730};  // w3 from the paper
+
+	      // The first two sets of 4 points are formed in a similar manner
+	      for (unsigned int i=0; i<2; ++i)
 		{
-		  // Walkington's fifth-order 14-point rule from
-		  // "Quadrature on Simplices of Arbitrary Dimension"
-		  _points.resize(14);
-		  _weights.resize(14);
+		  // Where we will insert values into _points and _weights
+		  const unsigned int offset=4*i;
 
-		  // permutations of these points and suitably-modified versions of
-		  // these points are the quadrature point locations
-		  const Real a[3] = {0.31088591926330060980,    // a1 from the paper
-				     0.092735250310891226402,   // a2 from the paper
-				     0.045503704125649649492};  // a3 from the paper
+		  // Stuff points and weights values into their arrays
+		  const Real b = 1. - 3.*a[i];
 
-		  // weights.  a[] and w[] are the only floating-point inputs required
-		  // for this rule.
-		  const Real w[3] = {0.018781320953002641800,    // w1 from the paper
-				     0.012248840519393658257,    // w2 from the paper
-				     0.0070910034628469110730};  // w3 from the paper
-
-		  // The first two sets of 4 points are formed in a similar manner
-		  for (unsigned int i=0; i<2; ++i)
-		    {
-		      // Where we will insert values into _points and _weights
-		      const unsigned int offset=4*i;
-
-		      // Stuff points and weights values into their arrays
-		      const Real b = 1. - 3.*a[i];
-
-		      // Here are the permutations.  Order of these is not important,
-		      // all have the same weight
-		      _points[offset + 0] = Point(a[i], a[i], a[i]);
-		      _points[offset + 1] = Point(a[i],    b, a[i]);
-		      _points[offset + 2] = Point(   b, a[i], a[i]);
-		      _points[offset + 3] = Point(a[i], a[i],    b);
+		  // Here are the permutations.  Order of these is not important,
+		  // all have the same weight
+		  _points[offset + 0] = Point(a[i], a[i], a[i]);
+		  _points[offset + 1] = Point(a[i],    b, a[i]);
+		  _points[offset + 2] = Point(   b, a[i], a[i]);
+		  _points[offset + 3] = Point(a[i], a[i],    b);
 		      			    
-		      // These 4 points all have the same weights 
-		      for (unsigned int j=0; j<4; ++j)
-			_weights[offset + j] = w[i];
-		    } // end for
+		  // These 4 points all have the same weights 
+		  for (unsigned int j=0; j<4; ++j)
+		    _weights[offset + j] = w[i];
+		} // end for
 
 
-		  {
-		    // The third set contains 6 points and is formed a little differently
-		    const unsigned int offset = 8;
-		    const Real b = 0.5*(1. - 2.*a[2]);
+	      {
+		// The third set contains 6 points and is formed a little differently
+		const unsigned int offset = 8;
+		const Real b = 0.5*(1. - 2.*a[2]);
 
-		    // Here are the permutations.  Order of these is not important,
-		    // all have the same weight
-		    _points[offset + 0] = Point(b   ,    b, a[2]);
-		    _points[offset + 1] = Point(b   , a[2], a[2]);
-		    _points[offset + 2] = Point(a[2], a[2],    b);
-		    _points[offset + 3] = Point(a[2],    b, a[2]);
-		    _points[offset + 4] = Point(   b, a[2],    b);
-		    _points[offset + 5] = Point(a[2],    b,    b);
+		// Here are the permutations.  Order of these is not important,
+		// all have the same weight
+		_points[offset + 0] = Point(b   ,    b, a[2]);
+		_points[offset + 1] = Point(b   , a[2], a[2]);
+		_points[offset + 2] = Point(a[2], a[2],    b);
+		_points[offset + 3] = Point(a[2],    b, a[2]);
+		_points[offset + 4] = Point(   b, a[2],    b);
+		_points[offset + 5] = Point(a[2],    b,    b);
 		  
-		    // These 6 points all have the same weights 
-		    for (unsigned int j=0; j<6; ++j)
-		      _weights[offset + j] = w[2];
-		  }
-		  
-		} // end if (walkington)
+		// These 6 points all have the same weights 
+		for (unsigned int j=0; j<6; ++j)
+		  _weights[offset + j] = w[2];
+	      }
 
-	      else
-		{
-		  // Taken from http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps
-		  // by Flaherty
-		  _points.resize(15);
-		  _weights.resize(15);
-		    
-		  _points[0](0) = 0.25;
-		  _points[0](1) = 0.25;
-		  _points[0](2) = 0.25;
-
-		  {
-		    const Real a = 0.;
-		    const Real b = 0.333333333333333333333333333333333333333;
-		
-		    _points[1](0) = a;
-		    _points[1](1) = b;
-		    _points[1](2) = b;
-		
-		    _points[2](0) = b;
-		    _points[2](1) = a;
-		    _points[2](2) = b;
-		
-		    _points[3](0) = b;
-		    _points[3](1) = b;
-		    _points[3](2) = a;
-		
-		    _points[4](0) = b;
-		    _points[4](1) = b;
-		    _points[4](2) = b;
-		  }
-		  {
-		    const Real a = 0.7272727272727272727272727272727272727272727272727272727;
-		    const Real b = 0.0909090909090909090909090909090909090909090909090909091;
-		
-		    _points[5](0) = a;
-		    _points[5](1) = b;
-		    _points[5](2) = b;
-		
-		    _points[6](0) = b;
-		    _points[6](1) = a;
-		    _points[6](2) = b;
-		
-		    _points[7](0) = b;
-		    _points[7](1) = b;
-		    _points[7](2) = a;
-		
-		    _points[8](0) = b;
-		    _points[8](1) = b;
-		    _points[8](2) = b;
-		  }
-		  {
-		    const Real a = 0.066550153573664;
-		    const Real b = 0.433449846426336;
-		
-		    _points[9](0) = b;
-		    _points[9](1) = a;
-		    _points[9](2) = a;
-		
-		    _points[10](0) = a;
-		    _points[10](1) = a;
-		    _points[10](2) = b;
-		
-		    _points[11](0) = a;
-		    _points[11](1) = b;
-		    _points[11](2) = b;
-		
-		    _points[12](0) = b;
-		    _points[12](1) = a;
-		    _points[12](2) = b;
-		
-		    _points[13](0) = b;
-		    _points[13](1) = b;
-		    _points[13](2) = a;
-		
-		    _points[14](0) = a;
-		    _points[14](1) = b;
-		    _points[14](2) = a;		
-		  }
 	      
-		  _weights[0]  = 0.030283678097089;
-		  _weights[1]  = 0.006026785714286;
-		  _weights[2]  = _weights[1];
-		  _weights[3]  = _weights[1];
-		  _weights[4]  = _weights[1];
-		  _weights[5]  = 0.011645249086029;
-		  _weights[6]  = _weights[5];
-		  _weights[7]  = _weights[5];
-		  _weights[8]  = _weights[5];
-		  _weights[9]  = 0.010949141561386;
-		  _weights[10] = _weights[9];
-		  _weights[11] = _weights[9];
-		  _weights[12] = _weights[9];
-		  _weights[13] = _weights[9];
-		  _weights[14] = _weights[9];
-		} // end else
+	      // Original rule by Keast, unsuitable because it has points on the
+	      // reference element boundary!
+	      // 	      _points.resize(15);
+	      // 	      _weights.resize(15);
+		    
+	      // 	      _points[0](0) = 0.25;
+	      // 	      _points[0](1) = 0.25;
+	      // 	      _points[0](2) = 0.25;
+
+	      // 	      {
+	      // 		const Real a = 0.;
+	      // 		const Real b = 0.333333333333333333333333333333333333333;
+		
+	      // 		_points[1](0) = a;
+	      // 		_points[1](1) = b;
+	      // 		_points[1](2) = b;
+		
+	      // 		_points[2](0) = b;
+	      // 		_points[2](1) = a;
+	      // 		_points[2](2) = b;
+		
+	      // 		_points[3](0) = b;
+	      // 		_points[3](1) = b;
+	      // 		_points[3](2) = a;
+		
+	      // 		_points[4](0) = b;
+	      // 		_points[4](1) = b;
+	      // 		_points[4](2) = b;
+	      // 	      }
+	      // 	      {
+	      // 		const Real a = 0.7272727272727272727272727272727272727272727272727272727;
+	      // 		const Real b = 0.0909090909090909090909090909090909090909090909090909091;
+		
+	      // 		_points[5](0) = a;
+	      // 		_points[5](1) = b;
+	      // 		_points[5](2) = b;
+		
+	      // 		_points[6](0) = b;
+	      // 		_points[6](1) = a;
+	      // 		_points[6](2) = b;
+		
+	      // 		_points[7](0) = b;
+	      // 		_points[7](1) = b;
+	      // 		_points[7](2) = a;
+		
+	      // 		_points[8](0) = b;
+	      // 		_points[8](1) = b;
+	      // 		_points[8](2) = b;
+	      // 	      }
+	      // 	      {
+	      // 		const Real a = 0.066550153573664;
+	      // 		const Real b = 0.433449846426336;
+		
+	      // 		_points[9](0) = b;
+	      // 		_points[9](1) = a;
+	      // 		_points[9](2) = a;
+		
+	      // 		_points[10](0) = a;
+	      // 		_points[10](1) = a;
+	      // 		_points[10](2) = b;
+		
+	      // 		_points[11](0) = a;
+	      // 		_points[11](1) = b;
+	      // 		_points[11](2) = b;
+		
+	      // 		_points[12](0) = b;
+	      // 		_points[12](1) = a;
+	      // 		_points[12](2) = b;
+		
+	      // 		_points[13](0) = b;
+	      // 		_points[13](1) = b;
+	      // 		_points[13](2) = a;
+		
+	      // 		_points[14](0) = a;
+	      // 		_points[14](1) = b;
+	      // 		_points[14](2) = a;		
+	      // 	      }
+	      
+	      // 	      _weights[0]  = 0.030283678097089;
+	      // 	      _weights[1]  = 0.006026785714286;
+	      // 	      _weights[2]  = _weights[1];
+	      // 	      _weights[3]  = _weights[1];
+	      // 	      _weights[4]  = _weights[1];
+	      // 	      _weights[5]  = 0.011645249086029;
+	      // 	      _weights[6]  = _weights[5];
+	      // 	      _weights[7]  = _weights[5];
+	      // 	      _weights[8]  = _weights[5];
+	      // 	      _weights[9]  = 0.010949141561386;
+	      // 	      _weights[10] = _weights[9];
+	      // 	      _weights[11] = _weights[9];
+	      // 	      _weights[12] = _weights[9];
+	      // 	      _weights[13] = _weights[9];
+	      // 	      _weights[14] = _weights[9];
 	      
 	      return;
 	    }
 
+
+
+	    
+	    // This rule is originally from Keast:
+	    //    Patrick Keast,
+	    //    Moderate Degree Tetrahedral Quadrature Formulas,
+	    //    Computer Methods in Applied Mechanics and Engineering,
+	    //    Volume 55, Number 3, May 1986, pages 339-348.
+	    //
+	    // It is accurate on 6th-degree polynomials and has 24 points
+	    // vs. 64 for the comparable conical product rule.
+	    //
+	    // Values copied 24th June 2008 from:
+	    // http://people.scs.fsu.edu/~burkardt/f_src/keast/keast.f90
 	  case SIXTH:
+	    {
+	      _points.resize (24);
+	      _weights.resize(24);
+
+	      // The raw data for the quadrature rule.
+	      const Real p[4][4] = {
+		{0.356191386222544953e+00 , 0.214602871259151684e+00 ,                       0., 0.00665379170969464506e+00}, // 4
+		{0.877978124396165982e+00 , 0.0406739585346113397e+00,                       0., 0.00167953517588677620e+00}, // 4
+		{0.0329863295731730594e+00, 0.322337890142275646e+00 ,                       0., 0.00922619692394239843e+00}, // 4
+		{0.0636610018750175299e+00, 0.269672331458315867e+00 , 0.603005664791649076e+00, 0.00803571428571428248e+00}  // 12    
+	      };
+
+	      
+	      // Now call the keast routine to generate _points and _weights
+	      keast_rule(p, 4);
+
+	      return;
+	    }
+
+
+	    // A seventh-order with 35 points rule due to Walkington.  
+	    //
+	    // Keast's 31 point, 7th-order rule contains points on the reference
+	    // element boundary, so we've decided not to include it here.
+	    //
+	    // Warning: this rule contains negative weights and therefore may
+	    // be unsuitable for some applications.
+	    //
+	    // Also, despite staring at this for a while, there appears to be
+	    // some problem with this rule, so I've commented it out for now [JWP].
 	  case SEVENTH:
+// 	    {
+// 	      if (allow_rules_with_negative_weights)
+// 		{
+// 		  _points.resize (35);
+// 		  _weights.resize(35);
+
+// 		  // The weights in the form as given by Walkington
+// 		  const Real w[4] = {
+// 		    -8./945.,    // w0, used once
+// 		    243./4480.,  // w1, used once
+// 		    -256./2835., // w2, used 2 times
+// 		    3125./72576. // w3, used 3 times
+// 		  };
+
+// 		  // The points as defined by Walkington
+// 		  const Real a[4] = {
+// 		    1./4., // a0
+// 		    1./6., // a1
+// 		    1./8., // a2
+// 		    1./10. // a3
+// 		  };
+		  
+// 		  // The raw data for the quadrature rule.  We've re-arranged Walkington's notation a bit in order to
+// 		  // reuse the keast_rule() function
+// 		  const Real p[7][4] = {
+// 		    {a[0],                    0.,                      0.,    w[0]},  // 1
+// 		    {a[1],            1.-3.*a[1],                      0.,    w[1]},  // 4
+// 		    {a[2],            1.-3.*a[2],                      0.,    w[2]},  // 4
+// 		    {a[2],                    0.,         (1.-2.*a[2])/2.,    w[2]},  // 6
+// 		    {a[3],            1.-3.*a[3],                      0.,    w[3]},  // 4
+// 		    {a[3],          (1.-a[3])/3.,         2.*(1.-a[3])/3.,    w[3]},  // 12
+// 		    {(1.-a[3])/3.,          a[3],                      0.,    w[3]}   // 4* different than the other 2 4-point forms
+// 		  };
+
+	      
+// 		  // Not really a Keast rule, but we've rearranged the data from Walkington's rule and
+// 		  // can now call the Keast routine to generate _points and _weights.
+// 		  keast_rule(p, 7);
+
+// 		  return;
+// 		} // end if (allow_rules_with_negative_weights)
+// 	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
+// 	    }
+
+	    
+	    // Another Keast rule, 45 points.  
+	    // Keast's 8th-order rule has a negative weight, so if
+	    // you've explicitly disallowed such rules you will fall
+	    // through to the conical product rules below.
 	  case EIGHTH:
+	    {
+	      if (allow_rules_with_negative_weights)
+		{
+		  _points.resize (45);
+		  _weights.resize(45);
+
+		  // The raw data for the quadrature rule.
+		  const Real p[7][4] = {
+		    {0.250000000000000000e+00,                        0.,                        0.,   -0.393270066412926145e-01},  // 1
+		    {0.617587190300082967e+00,  0.127470936566639015e+00,                        0.,    0.408131605934270525e-02},  // 4
+		    {0.903763508822103123e+00,  0.320788303926322960e-01,                        0.,    0.658086773304341943e-03},  // 4
+		    {0.497770956432810185e-01,                        0.,  0.450222904356718978e+00,    0.438425882512284693e-02},  // 6
+		    {0.183730447398549945e+00,                        0.,  0.316269552601450060e+00,    0.138300638425098166e-01},  // 6
+		    {0.231901089397150906e+00,  0.229177878448171174e-01,  0.513280033360881072e+00,    0.424043742468372453e-02},  // 12
+		    {0.379700484718286102e-01,  0.730313427807538396e+00,  0.193746475248804382e+00,    0.223873973961420164e-02}   // 12
+		  };
+
+	      
+		  // Now call the keast routine to generate _points and _weights
+		  keast_rule(p, 7);
+
+		  return;
+		} // end if (allow_rules_with_negative_weights)
+	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
+	    }
+
+	    
 	  case NINTH:     
 	  case TENTH:        
 	  case ELEVENTH:     

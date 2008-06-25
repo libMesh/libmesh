@@ -69,10 +69,22 @@ class QGauss : public QBase
 
 
   /**
-   * Dunavant rule with array input
+   * The Dunavant rule is for triangles.  It takes permutation points and
+   * weights in a specific format as input and fills the pre-sized _points and _weights
+   * vectors.  This function is only used internally by the TRI geometric
+   * elements.
    */
   void dunavant_rule(const Real rule_data[][4],
 		     const unsigned int n_pts);
+
+  /**
+   * The Keast rule is for tets.  It takes permutation points and weights
+   * in a specific format as input and fills the pre-sized _points and _weights
+   * vectors.  This function is only used internally by the TET geometric
+   * elements.
+   */
+  void keast_rule(const Real rule_data[][4],
+		  const unsigned int n_pts);
 };
 
 
