@@ -54,9 +54,14 @@ class PetscNonlinearSolver : public NonlinearSolver<T>
 {
 public:
   /**
+   * The type of system
+   */
+  typedef NonlinearImplicitSystem sys_type;
+
+  /**
    *  Constructor. Initializes Petsc data structures
    */
-  PetscNonlinearSolver ();
+  PetscNonlinearSolver (sys_type& system);
     
   /**
    * Destructor.
@@ -97,7 +102,8 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-PetscNonlinearSolver<T>::PetscNonlinearSolver ()
+PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type& system) :
+  NonlinearSolver<T>(system)
 {
 }
 

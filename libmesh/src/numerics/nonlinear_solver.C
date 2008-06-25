@@ -31,7 +31,7 @@
 // NonlinearSolver members
 template <typename T>
 AutoPtr<NonlinearSolver<T> >
-NonlinearSolver<T>::build(const SolverPackage solver_package)
+NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
 {
   // Build the appropriate solver
   switch (solver_package)
@@ -40,7 +40,7 @@ NonlinearSolver<T>::build(const SolverPackage solver_package)
 #ifdef HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<NonlinearSolver<T> > ap(new PetscNonlinearSolver<T>);
+	AutoPtr<NonlinearSolver<T> > ap(new PetscNonlinearSolver<T>(s));
 	return ap;
       }
 #endif

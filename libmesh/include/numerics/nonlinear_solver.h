@@ -35,6 +35,7 @@
 template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
+class NonlinearImplicitSystem;
 
 
 
@@ -52,11 +53,15 @@ template <typename T>
 class NonlinearSolver : public ReferenceCountedObject<NonlinearSolver<T> >
 {
 public:
-  
+  /**
+   * The type of system
+   */
+  typedef NonlinearImplicitSystem sys_type;
+
   /**
    *  Constructor. Initializes Solver data structures
    */
-  NonlinearSolver ();
+  NonlinearSolver (sys_type& s);
     
   /**
    * Destructor.
@@ -67,7 +72,7 @@ public:
    * Builds a \p NonlinearSolver using the nonlinear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<NonlinearSolver<T> > build(const SolverPackage solver_package =
+  static AutoPtr<NonlinearSolver<T> > build(sys_type& s, const SolverPackage solver_package =
 					    libMesh::default_solver_package());
   
   /**
@@ -118,9 +123,22 @@ public:
   void (* matvec) (const NumericVector<Number>& X,
 		   NumericVector<Number>* R,
 		   SparseMatrix<Number>*  J);
+
+  /**
+   * @returns a constant reference to the system we are solving.
+   */
+  const sys_type & system () const { return _system; }
+
+  /**
+   * @returns a writeable reference to the system we are solving.
+   */
+  sys_type & system () { return _system; }
   
 protected:
-
+  /**
+   * A reference to the system we are solving.
+   */
+  sys_type& _system;
   
   /**
    * Flag indicating if the data structures have been initialized.
@@ -134,10 +152,11 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-NonlinearSolver<T>::NonlinearSolver () :
+NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
   residual        (NULL),
   jacobian        (NULL),
   matvec          (NULL),
+  _system(s),
   _is_initialized (false)
 {
 }
