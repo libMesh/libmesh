@@ -35,11 +35,10 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems& es,
 						  const unsigned int number) :
   
   Parent                    (es, name, number),
-  nonlinear_solver          (NonlinearSolver<Number>::build()),
+  nonlinear_solver          (NonlinearSolver<Number>::build(*this)),
   _n_nonlinear_iterations   (0),
   _final_nonlinear_residual (1.e20)
-{
-}
+{}
 
 
 

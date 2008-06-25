@@ -27,10 +27,11 @@
 // C++ includes
 
 // Local Includes
+#include "nonlinear_implicit_system.h"
 #include "petsc_nonlinear_solver.h"
 #include "petsc_vector.h"
 #include "petsc_matrix.h"
-
+#include "system.h"
 
 
 //--------------------------------------------------------------------
@@ -82,17 +83,24 @@ extern "C"
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
     
-    PetscVector<Number> X_global(x), R(r);
-    PetscVector<Number> X_local(X_global.size());
+    NonlinearImplicitSystem &sys = solver->system();
 
-    X_global.localize (X_local);
+    PetscVector<Number> X_global(x), R(r);
+    PetscVector<Number>& X_sys = *dynamic_cast<PetscVector<Number>*>(sys.solution.get());
+
+    // Use the systems update() to get a good local version of the parallel solution
+    X_global.swap(X_sys);
+    sys.update();
+    X_global.swap(X_sys);
   
     R.zero();
 
-    if      (solver->residual != NULL) solver->residual (X_local, R);
-    else if (solver->matvec   != NULL) solver->matvec   (X_local, &R, NULL);
+    if      (solver->residual != NULL) solver->residual (*sys.current_local_solution.get(), R);
+    else if (solver->matvec   != NULL) solver->matvec   (*sys.current_local_solution.get(), &R, NULL);
+
 
     R.close();
+
     
     return ierr;
   }
@@ -110,17 +118,23 @@ extern "C"
     
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
+
+    NonlinearImplicitSystem &sys = solver->system();
     
     PetscMatrix<Number> PC(*pc);
     PetscMatrix<Number> Jac(*jac);
     PetscVector<Number> X_global(x);
-    PetscVector<Number> X_local (X_global.size());
+    PetscVector<Number>& X_sys = *dynamic_cast<PetscVector<Number>*>(sys.solution.get());
 
-    X_global.localize (X_local);
+    // Use the systems update() to get a good local version of the parallel solution
+    X_global.swap(X_sys);
+    sys.update();
+    X_global.swap(X_sys);
+
     PC.zero();
 
-    if      (solver->jacobian != NULL) solver->jacobian (X_local, PC);
-    else if (solver->matvec   != NULL) solver->matvec   (X_local, NULL, &PC);
+    if      (solver->jacobian != NULL) solver->jacobian (*sys.current_local_solution.get(), PC);
+    else if (solver->matvec   != NULL) solver->matvec   (*sys.current_local_solution.get(), NULL, &PC);
     
     PC.close();
     Jac.close();
