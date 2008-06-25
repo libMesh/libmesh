@@ -580,6 +580,7 @@ void UnstructuredMesh::read (const std::string& name,
 			<< "     *.gmv  -- LANL's General Mesh Viewer format\n"
 			<< "     *.off  -- OOGL OFF surface format\n"
 			<< "     *.exd  -- Sandia's ExodusII format\n"
+			<< "     *.e    -- Sandia's ExodusII format\n"
 			<< "     *.xda  -- Internal ASCII format\n"
 			<< "     *.xdr  -- Internal binary format,\n"
 			<< "               compatible with XdrMGF\n"
