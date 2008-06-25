@@ -40,7 +40,7 @@ class ExodusII;
  * licensing restrictions the external libraries required to
  * read such files cannot be redistributed with \p libMesh.
  * However, if you have these libraries, this class will allow
- * you to use the API to read ExodusII, or \p .exd, files.
+ * you to use the API to read ExodusII, or \p .exd/.e, files.
  *
  * @author Benjamin Kirk, John Peterson, 2004.
  */
