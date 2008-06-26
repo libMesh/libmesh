@@ -43,9 +43,10 @@ const unsigned int Partitioner::communication_blocksize = 1000000;
 void Partitioner::partition (MeshBase& mesh,
 			     const unsigned int n)
 {
+  // BSK - temporary fix while redistribution is integrated 6/26/2008
   // Uncomment this to not repartition in parallel
-  // if (!mesh.is_serial())
-  //   return;
+   if (!mesh.is_serial())
+     return;
 
   // we cannot partition into more pieces than we have
   // active elements!
