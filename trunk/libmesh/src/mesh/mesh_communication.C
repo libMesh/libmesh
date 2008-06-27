@@ -47,77 +47,6 @@ namespace {
   const unsigned int packed_elem_header_size = 4;
 #endif
 
-
-#ifdef HAVE_MPI
-  /**
-   * Convenient way to communicate nodes.
-   */
-  struct PackedNode
-  {
-    unsigned int id;
-    unsigned int pid;
-    Real x;
-    Real y;
-    Real z;
-
-    PackedNode () :
-      id(0),
-      x(0.),
-      y(0.),
-      z(0.)
-    {}
-
-    PackedNode (const Node &node) :
-      id(node.id()),
-      pid(node.processor_id()),
-      x(node(0)),
-      y(node(1)),
-      z(node(2))
-    {}
-
-    AutoPtr<Node> build_node () const
-    {
-      AutoPtr<Node> node(new Node(x,y,z,id));
-      node->processor_id() = pid;
-      return node;
-    }
-
-    Point build_point () const
-    {
-      return Point(x,y,z);
-    }
-    
-    static MPI_Datatype create_mpi_datatype ();
-    
-  };
-  
-  MPI_Datatype PackedNode::create_mpi_datatype ()
-  {
-    MPI_Datatype packed_node_type;
-    MPI_Datatype types[] = { MPI_UNSIGNED, MPI_REAL };
-    int blocklengths[] = { 2, 3 };
-    MPI_Aint displs[2];
-    
-    // create a Packed node and get the addresses of the elements.
-    // this will properly handle id/pid getting padded, for example,
-    // in which case id and x may not be 2*sizeof(unsigned int) apart.
-    PackedNode pn;
-
-    MPI_Address (&pn.id, &displs[0]);
-    MPI_Address (&pn.x,  &displs[1]);
-    displs[1] -= displs[0];
-    displs[0] = 0;
-
-#if MPI_VERSION > 1
-      MPI_Type_create_struct (2, blocklengths, displs, types, &packed_node_type);
-#else
-      MPI_Type_struct (2, blocklengths, displs, types, &packed_node_type);
-#endif
-
-      return packed_node_type;
-    }
-#endif
-
   /**
    * Specific weak ordering for Elem*'s to be used in a set.
    * We use the id, but first sort by level.  This guarantees 
@@ -252,12 +181,12 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   parallel_only();
   libmesh_assert (!mesh.is_serial());
   libmesh_assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
-			    mesh.unpartitioned_elements_end()) == 0);
-
+				    mesh.unpartitioned_elements_end()) == 0);
+  
   START_LOG("redistribute()","MeshCommunication");
 
   // register a derived datatype to use in shipping nodes  
-  MPI_Datatype packed_node_datatype = PackedNode::create_mpi_datatype();
+  MPI_Datatype packed_node_datatype = Node::PackedNode::create_mpi_datatype();
   MPI_Type_commit (&packed_node_datatype);
 
   // Figure out how many nodes and elements we have which are assigned to each
@@ -272,7 +201,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   //  send_n_nodes_and_elem_per_proc[5*pid+4] = element bc buffer size
   std::vector<unsigned int> send_n_nodes_and_elem_per_proc(5*libMesh::n_processors(), 0);
   
-  std::vector<std::vector<PackedNode> >
+  std::vector<std::vector<Node::PackedNode> >
     nodes_sent(libMesh::n_processors());
 
   std::vector<std::vector<int> > 
@@ -370,7 +299,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    for (std::set<const Node*>::const_iterator node_it = connected_nodes.begin();
 		 node_it != connected_nodes.end(); ++node_it)
 	      {
-		nodes_sent[pid].push_back(PackedNode(**node_it));
+		nodes_sent[pid].push_back(Node::PackedNode(**node_it));
 
 		// add the node if it has BCs
 		if (mesh.boundary_info->boundary_id(*node_it) !=
@@ -465,11 +394,11 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
     recv_node_pair(libMesh::n_processors(),false), recv_elem_pair(libMesh::n_processors(),false);
   
   unsigned int
-    n_send_node_pairs=0,    n_send_elem_pairs=0,
-    n_send_node_bc_pairs=0, n_send_elem_bc_pairs=0, 
-    n_recv_node_pairs=0,    n_recv_elem_pairs=0,
-    n_recv_node_bc_pairs=0, n_recv_elem_bc_pairs=0, 
-    max_n_nodes_received=0, max_conn_size_received=0,
+    n_send_node_pairs=0,     n_send_elem_pairs=0,
+    n_send_node_bc_pairs=0,  n_send_elem_bc_pairs=0, 
+    n_recv_node_pairs=0,     n_recv_elem_pairs=0,
+    n_recv_node_bc_pairs=0,  n_recv_elem_bc_pairs=0, 
+    max_n_nodes_received=0,  max_conn_size_received=0,
     max_node_bcs_received=0, max_elem_bcs_received=0;
 
   for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
@@ -529,7 +458,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 
   // Receive nodes.  Size this array for the largest message.
   {
-    std::vector<PackedNode> received_nodes(max_n_nodes_received);
+    std::vector<Node::PackedNode> received_nodes(max_n_nodes_received);
 
     // We now know how many processors will be sending us nodes.
     for (unsigned int node_comm_step=0; node_comm_step<n_recv_node_pairs; node_comm_step++)

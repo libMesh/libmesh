@@ -43,3 +43,33 @@ bool Node::operator==(const DofObject& rhs) const
   // Explicitly calling the operator== defined in Point
   return this->Point::operator==(*rhs_node);
 }
+
+
+
+#ifdef HAVE_MPI
+MPI_Datatype Node::PackedNode::create_mpi_datatype ()
+{
+  MPI_Datatype packed_node_type;
+  MPI_Datatype types[] = { MPI_UNSIGNED, MPI_REAL };
+  int blocklengths[] = { 2, 3 };
+  MPI_Aint displs[2];
+  
+  // create a Packed node and get the addresses of the elements.
+  // this will properly handle id/pid getting padded, for example,
+  // in which case id and x may not be 2*sizeof(unsigned int) apart.
+  Node::PackedNode pn;
+  
+  MPI_Address (&pn.id, &displs[0]);
+  MPI_Address (&pn.x,  &displs[1]);
+  displs[1] -= displs[0];
+  displs[0] = 0;
+  
+#if MPI_VERSION > 1
+  MPI_Type_create_struct (2, blocklengths, displs, types, &packed_node_type);
+#else
+  MPI_Type_struct (2, blocklengths, displs, types, &packed_node_type);
+#endif // #if MPI_VERSION > 1
+
+  return packed_node_type;
+}
+#endif // #ifdef HAVE_MPI
