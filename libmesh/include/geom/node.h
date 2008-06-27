@@ -122,6 +122,56 @@ public:
    * not a Node. If rhs is not a Node, then we return false of course.
    */
   virtual bool operator==(const DofObject& rhs) const;
+
+
+#ifdef HAVE_MPI
+  /**
+   * Convenient way to communicate nodes.  This struct defines a
+   * packed up node which can be easily communicated through a
+   * derived MPI datatype.
+   *
+   * \author Benjamin S. Kirk
+   * \date 2008
+   */
+  struct PackedNode
+  {
+    unsigned int id;
+    unsigned int pid;
+    Real x;
+    Real y;
+    Real z;
+
+    PackedNode () :
+      id(0),
+      x(0.),
+      y(0.),
+      z(0.)
+    {}
+
+    PackedNode (const Node &node) :
+      id(node.id()),
+      pid(node.processor_id()),
+      x(node(0)),
+      y(node(1)),
+      z(node(2))
+    {}
+
+    AutoPtr<Node> build_node () const
+    {
+      AutoPtr<Node> node(new Node(x,y,z,id));
+      node->processor_id() = pid;
+      return node;
+    }
+
+    Point build_point () const
+    {
+      return Point(x,y,z);
+    }
+    
+    static MPI_Datatype create_mpi_datatype ();
+    
+  };
+#endif // #ifdef HAVE_MPI
   
 private:
 
