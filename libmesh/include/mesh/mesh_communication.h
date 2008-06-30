@@ -182,12 +182,12 @@ private:
   void allgather_mesh (ParallelMesh& ) const;
   void allgather_bcs  (const ParallelMesh&, BoundaryInfo&) const;
 
-  /**
-   * Packs the element \p elem at the end of vector \p conn.
-   * This includes all the information needed to rebuild the element
-   * on a remote processor, including refinement state.
-   */
-  void pack_element (std::vector<int> &conn, const Elem* elem) const;
+//   /**
+//    * Packs the element \p elem at the end of vector \p conn.
+//    * This includes all the information needed to rebuild the element
+//    * on a remote processor, including refinement state.
+//    */
+//   void pack_element (std::vector<int> &conn, const Elem* elem) const;
 
 //   /**
 //    * The processors who neighbor the current

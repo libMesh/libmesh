@@ -55,6 +55,7 @@
 #include "fe_base.h"
 #include "quadrature_gauss.h"
 #include "remote_elem.h"
+#include "mesh_base.h"
 
 // Initialize static member variables
 const unsigned int Elem::_bp1 = 65449;
@@ -99,6 +100,7 @@ const unsigned int Elem::type_to_n_nodes_map [] =
 
     1,  // NODEELEM
   };
+
 
 
 // ------------------------------------------------------------
@@ -1360,4 +1362,95 @@ Real Elem::volume () const
   
   return vol;
   
+}
+
+
+// ------------------------------------------------------------
+// Elem::PackedElem static data
+const unsigned int Elem::PackedElem::header_size = 10;
+
+
+// Elem::PackedElem member funcions
+void Elem::PackedElem::pack (std::vector<int> &conn, const Elem* elem)
+{
+  libmesh_assert (elem != NULL);
+  
+  // we can do at least this good. note that hopefully in general
+  // the user will already have reserved the full space, which will render
+  // this redundant
+  conn.reserve (conn.size() + Elem::PackedElem::header_size + elem->n_nodes());
+
+#ifdef ENABLE_AMR
+  conn.push_back (static_cast<int>(elem->level()));
+  conn.push_back (static_cast<int>(elem->p_level()));
+  conn.push_back (static_cast<int>(elem->refinement_flag()));
+  conn.push_back (static_cast<int>(elem->p_refinement_flag()));
+#else
+  conn.push_back (0);
+  conn.push_back (0);
+  conn.push_back (0);
+  conn.push_back (0);
+#endif
+  conn.push_back (static_cast<int>(elem->type()));
+  conn.push_back (static_cast<int>(elem->processor_id()));
+  conn.push_back (static_cast<int>(elem->subdomain_id()));
+  conn.push_back (elem->id());
+		
+#ifdef ENABLE_AMR
+  // use parent_ID of -1 to indicate a level 0 element
+  if (elem->level() == 0)
+    {
+      conn.push_back(-1);
+      conn.push_back(-1);
+    }
+  else
+    {
+      conn.push_back(elem->parent()->id());
+      conn.push_back(elem->parent()->which_child_am_i(elem));
+    }
+#else
+  conn.push_back (-1);
+  conn.push_back (-1);
+#endif
+  
+  for (unsigned int n=0; n<elem->n_nodes(); n++)
+    conn.push_back (elem->node(n));		
+}
+
+
+
+Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
+{  
+  
+  Elem *elem = Elem::build(this->type(),parent).release();
+  libmesh_assert (elem);
+
+#ifdef ENABLE_AMR
+  if (this->level() != 0) 
+    {
+      libmesh_assert (parent != NULL);
+      parent->add_child(elem, this->which_child_am_i());
+      libmesh_assert (parent->type() == elem->type());
+      libmesh_assert (parent->child(this->which_child_am_i()) == elem);
+    }
+#endif
+
+  // Assign the IDs
+#ifdef ENABLE_AMR
+  elem->set_p_level(this->p_level());
+  elem->set_refinement_flag(this->refinement_flag());
+  elem->set_p_refinement_flag(this->p_refinement_flag());
+  libmesh_assert (elem->level() == this->level());
+#endif
+  elem->subdomain_id() = this->subdomain_id();
+  elem->processor_id() = this->processor_id();
+  elem->set_id()       = this->id();
+  
+  // Assign the connectivity
+  libmesh_assert (elem->n_nodes() == this->n_nodes());
+
+  for (unsigned int n=0; n<elem->n_nodes(); n++)
+    elem->set_node(n) = mesh.node_ptr (this->node(n));
+  
+  return elem;
 }
