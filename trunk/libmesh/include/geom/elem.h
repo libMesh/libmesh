@@ -41,6 +41,7 @@
 #include "variant_filter_iterator.h"
 
 // Forward declarations
+class MeshBase;
 class MeshRefinement;
 class Elem;
 
@@ -635,14 +636,14 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   unsigned int which_child_am_i(const Elem *e) const; 
 
-  /*
+  /**
    * @returns true iff the specified child is on the
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
 			        const unsigned int s) const = 0;
   
-  /*
+  /**
    * @returns true iff the specified child is on the
    * specified edge
    */
@@ -804,6 +805,7 @@ class Elem : public ReferenceCountedObject<Elem>,
 #endif // DEBUG
 
 protected:
+
   /**
    * The protected nested SideIter class is used to iterate over the
    * sides of this Elem.  It is a specially designed class since
@@ -888,6 +890,17 @@ public:
 
 #endif
   
+
+  //--------------------------------------------------------
+  /**
+   * Convenient way to communicate elements.  This struct 
+   * packes up an element so that it can easily be communicated through
+   * an MPI array.
+   *
+   * \author Benjamin S. Kirk
+   * \date 2008
+   */
+  class PackedElem;
 
 
  protected:
@@ -1677,6 +1690,152 @@ unsigned int Elem::compute_key (unsigned int n0,
 }
 
 
+
+//-----------------------------------------------------------------
+/**
+ * Convenient way to communicate elements.  This class
+ * packes up an element so that it can easily be communicated through
+ * an MPI array.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2008
+ */
+class Elem::PackedElem
+{
+private:
+    
+  /**
+   * Iterator pointing to the beginning of this packed element's index buffer.
+   */
+  const std::vector<int>::const_iterator _buf_begin;
+
+public:
+
+  /**
+   * Constructor.  Takes an input iterator pointing to the 
+   * beginning of the connectivity block for this element.
+   */
+  PackedElem (const std::vector<int>::const_iterator _buf_in) :
+    _buf_begin(_buf_in)
+  {}
+    
+  /**
+   * An \p Elem can be packed into an integer array which is 
+   * \p header_size + elem->n_nodes() in length.
+   */
+  static const unsigned int header_size; /* = 10 with AMR, 4 without */
+    
+  /**
+   * For each element it is of the form
+   * [ level p_level r_flag p_r_flag etype processor_id subdomain_id 
+   *  self_ID parent_ID which_child node_0 node_1 ... node_n]
+   * We cannot use unsigned int because parent_ID can be negative
+   */
+  static void pack (std::vector<int> &conn, const Elem* elem);    
+
+  /**
+   * Unpacks this packed element.  Returns a pointer to the new element.
+   * Takes a pointer to the parent, which is required unless this packed
+   * element is at level 0.
+   */
+  Elem * unpack (MeshBase &mesh, Elem *parent = NULL) const;
+
+  /**
+   * \p return the level of this packed element.
+   */
+  unsigned int level () const
+  {
+    return static_cast<unsigned int>(*_buf_begin);
+  }
+
+  /**
+   * \p return the p-level of this packed element.
+   */
+  unsigned int p_level () const
+  {
+    return static_cast<unsigned int>(*(_buf_begin+1));
+  }
+
+  /**
+   * \p return the refinement state of this packed element.
+   */
+  Elem::RefinementState refinement_flag () const
+  {
+    return static_cast<Elem::RefinementState>(*(_buf_begin+2));
+  }
+
+  /**
+   * \p return the p-refinement state of this packed element.
+   */
+  Elem::RefinementState p_refinement_flag () const
+  {
+    return static_cast<Elem::RefinementState>(*(_buf_begin+3));
+  }
+
+  /**
+   * \p return the element type of this packed element.
+   */
+  ElemType type () const
+  {
+    return static_cast<ElemType>(*(_buf_begin+4));
+  }
+
+  /**
+   * \p return the processor id of this packed element.
+   */
+  unsigned int processor_id () const
+  {
+    return static_cast<unsigned int>(*(_buf_begin+5));
+  }
+
+  /**
+   * \p return the subdomain id of this packed element.
+   */
+  unsigned int subdomain_id () const
+  {
+    return static_cast<unsigned int>(*(_buf_begin+6));
+  }
+
+  /**
+   * \p return the id of this packed element.
+   */
+  unsigned int id () const
+  {
+    return static_cast<unsigned int>(*(_buf_begin+7));
+  }
+
+  /**
+   * \p return the parent id of this packed element.
+   */
+  int parent_id () const
+  {
+    return *(_buf_begin+8);
+  }
+
+  /**
+   * \p return which child this packed element is.
+   */
+  unsigned int which_child_am_i () const
+  {
+    return static_cast<unsigned int>(*(_buf_begin+9));
+  }
+    
+  /**
+   * \p return the number of nodes in this packed element
+   */
+  unsigned int n_nodes () const
+  {
+    return Elem::type_to_n_nodes_map[this->type()];
+  }
+
+  /**
+   * \p return the global index of the packed element's nth node.
+   */
+  unsigned int node (const unsigned int n) const
+  {
+    return static_cast<unsigned int>(*(_buf_begin+10+n));
+  }    
+}; // end class PackedElem
 
 
 /**
