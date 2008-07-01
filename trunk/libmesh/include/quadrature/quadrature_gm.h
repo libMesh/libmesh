@@ -1,4 +1,4 @@
-// $Id: quadrature_clough.h 2501 2007-11-20 02:33:29Z benkirk $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
