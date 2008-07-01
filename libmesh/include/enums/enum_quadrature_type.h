@@ -29,18 +29,19 @@ namespace libMeshEnums {
   /**
    * Defines an \p enum for currently available quadrature rules.
    */
-  enum QuadratureType {QGAUSS      = 0,
+  enum QuadratureType {QGAUSS            = 0,
+				         
+		       QJACOBI_1_0       = 1,
+		       QJACOBI_2_0       = 2,
+				         
+		       QSIMPSON          = 3,
+		       QTRAP             = 4,
+		       QGRID             = 5,
+		       QGRUNDMANN_MOLLER = 6,
 
-		       QJACOBI_1_0 = 1,
-		       QJACOBI_2_0 = 2,
+		       QCLOUGH           = 21,
 
-		       QSIMPSON    = 3,
-		       QTRAP       = 4,
-		       QGRID       = 5,
-
-		       QCLOUGH     = 21,
-
-		       INVALID_Q_RULE = 127};
+		       INVALID_Q_RULE    = 127};
 }
 
 using namespace libMeshEnums;
