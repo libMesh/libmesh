@@ -1,0 +1,149 @@
+// $Id: quadrature_gauss_3D.C 2892 2008-06-25 21:57:54Z jwpeterson $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+// Local includes
+#include "quadrature_gm.h"
+
+
+
+void QGrundmann_Moller::init_3D(const ElemType _type,
+				unsigned int p)
+{
+  // Nearly all GM rules contain negative weights, so if you are not
+  // allowing rules with negative weights, we cannot continue!
+  if (!allow_rules_with_negative_weights)
+    {
+      std::cerr << "You requested a Grundmann-Moller rule but\n"
+		<< "are not allowing rules with negative weights!\n"
+		<< "Either select a different quadrature class or\n"
+		<< "set allow_rules_with_negative_weights==true." 
+		<< std::endl;
+      
+      libmesh_error();
+    }
+  
+  switch (_type)
+    {
+    case TET4:
+    case TET10:
+      {
+	gm_rule( (_order + 2*p)/2 );
+	return;
+	
+// 	switch(_order + 2*p)
+// 	  {
+// 	  case CONSTANT:
+// 	  case FIRST:
+// 	    {
+// 	      gm_rule(0);
+// 	      return;
+// 	    }
+// 	  case SECOND:
+// 	  case THIRD:
+// 	    {
+// 	      gm_rule(1);
+// 	      return;
+// 	    }
+// 	  case FOURTH:
+// 	  case FIFTH:
+// 	    {
+// 	      gm_rule(2);
+// 	      return;
+// 	    }
+// 	  case SIXTH:
+// 	  case SEVENTH:
+// 	    {
+// 	      gm_rule(3);
+// 	      return;
+// 	    }
+// 	  case EIGHTH:
+// 	  case NINTH:
+// 	    {
+// 	      gm_rule(4);
+// 	      return;
+// 	    }
+// 	  case TENTH:        
+// 	  case ELEVENTH:
+// 	    {
+// 	      gm_rule(5);
+// 	      return;
+// 	    }
+// 	  case TWELFTH:      
+// 	  case THIRTEENTH:   
+// 	    {
+// 	      gm_rule(6);
+// 	      return;
+// 	    }
+// 	  case FOURTEENTH:   
+// 	  case FIFTEENTH:    
+// 	    {
+// 	      gm_rule(7);
+// 	      return;
+// 	    }
+// 	  case SIXTEENTH:    
+// 	  case SEVENTEENTH:  
+// 	    {
+// 	      gm_rule(8);
+// 	      return;
+// 	    }
+// 	  case EIGHTTEENTH:  
+// 	  case NINTEENTH:    
+// 	    {
+// 	      gm_rule(9);
+// 	      return;
+// 	    }
+// 	  case TWENTIETH:    
+// 	  case TWENTYFIRST:  
+// 	    {
+// 	      gm_rule(10);
+// 	      return;
+// 	    }
+// 	  case TWENTYSECOND: 
+// 	  case TWENTYTHIRD:
+// 	    {
+// 	      gm_rule(11);
+// 	      return;
+// 	    }
+// 	  default:
+// 	    {
+// 	      std::cout << "Quadrature rule not supported!" << std::endl;
+		    
+// 	      libmesh_error();
+// 	    }
+//	  }
+      } // end case TET4, TET10
+
+
+      
+      //---------------------------------------------
+      // Unsupported element type
+    default:
+      {
+	std::cerr << "ERROR: Unsupported element type: " << _type << std::endl;
+	libmesh_error();
+      }
+    } // end switch (_type)
+
+  // We must have returned or errored-out by this point.  If not,
+  // throw an error now.
+  libmesh_error();
+  return;
+}

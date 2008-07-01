@@ -404,66 +404,14 @@ void QGauss::init_3D(const ElemType _type,
 	    }
 
 
-	    // A seventh-order with 35 points rule due to Walkington.  
-	    //
 	    // Keast's 31 point, 7th-order rule contains points on the reference
 	    // element boundary, so we've decided not to include it here.
 	    //
-	    // Warning: this rule contains negative weights and therefore may
-	    // be unsuitable for some applications.
-	    //
-	    // Also, despite staring at this for a while, there appears to be
-	    // some problem with this rule, so I've commented it out for now [JWP].
+	    // Keast's 8th-order rule has 45 points.  and a negative
+	    // weight, so if you've explicitly disallowed such rules
+	    // you will fall through to the conical product rules
+	    // below.
 	  case SEVENTH:
-// 	    {
-// 	      if (allow_rules_with_negative_weights)
-// 		{
-// 		  _points.resize (35);
-// 		  _weights.resize(35);
-
-// 		  // The weights in the form as given by Walkington
-// 		  const Real w[4] = {
-// 		    -8./945.,    // w0, used once
-// 		    243./4480.,  // w1, used once
-// 		    -256./2835., // w2, used 2 times
-// 		    3125./72576. // w3, used 3 times
-// 		  };
-
-// 		  // The points as defined by Walkington
-// 		  const Real a[4] = {
-// 		    1./4., // a0
-// 		    1./6., // a1
-// 		    1./8., // a2
-// 		    1./10. // a3
-// 		  };
-		  
-// 		  // The raw data for the quadrature rule.  We've re-arranged Walkington's notation a bit in order to
-// 		  // reuse the keast_rule() function
-// 		  const Real p[7][4] = {
-// 		    {a[0],                    0.,                      0.,    w[0]},  // 1
-// 		    {a[1],            1.-3.*a[1],                      0.,    w[1]},  // 4
-// 		    {a[2],            1.-3.*a[2],                      0.,    w[2]},  // 4
-// 		    {a[2],                    0.,         (1.-2.*a[2])/2.,    w[2]},  // 6
-// 		    {a[3],            1.-3.*a[3],                      0.,    w[3]},  // 4
-// 		    {a[3],          (1.-a[3])/3.,         2.*(1.-a[3])/3.,    w[3]},  // 12
-// 		    {(1.-a[3])/3.,          a[3],                      0.,    w[3]}   // 4* different than the other 2 4-point forms
-// 		  };
-
-	      
-// 		  // Not really a Keast rule, but we've rearranged the data from Walkington's rule and
-// 		  // can now call the Keast routine to generate _points and _weights.
-// 		  keast_rule(p, 7);
-
-// 		  return;
-// 		} // end if (allow_rules_with_negative_weights)
-// 	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
-// 	    }
-
-	    
-	    // Another Keast rule, 45 points.  
-	    // Keast's 8th-order rule has a negative weight, so if
-	    // you've explicitly disallowed such rules you will fall
-	    // through to the conical product rules below.
 	  case EIGHTH:
 	    {
 	      if (allow_rules_with_negative_weights)
@@ -492,9 +440,9 @@ void QGauss::init_3D(const ElemType _type,
 	    }
 
 	    
-	  case NINTH:     
+	  case NINTH:
 	  case TENTH:        
-	  case ELEVENTH:     
+	  case ELEVENTH:
 	  case TWELFTH:      
 	  case THIRTEENTH:   
 	  case FOURTEENTH:   
@@ -517,39 +465,6 @@ void QGauss::init_3D(const ElemType _type,
 	      // using a 1D Gauss rule on [0,1] and two 
 	      // 1D Jacobi-Gauss rules on [0,1].
 
-	      // Points (1D)            // Weights
-	      // std::vector<Real> r(4);   std::vector<Real> A(4);
-// 	      std::vector<Real> s(4);   std::vector<Real> B(4);
-// 	      std::vector<Real> t(4);   std::vector<Real> C(4);
-
-// 	      // Fill in the interval points
-// 	      r[0] = 0.0694318422; s[0] = 0.0571041961; t[0] = 0.0485005494;
-// 	      r[1] = 0.3300094782; s[1] = 0.2768430136; t[1] = 0.2386007376;
-// 	      r[2] = 0.6699905218; s[2] = 0.5835904324; t[2] = 0.5170472951;
-// 	      r[3] = 0.9305681558; s[3] = 0.8602401357; t[3] = 0.7958514179;
-
-// 	      // Fill in the weights
-// 	      A[0] = 0.1739274226; B[0] = 0.1355069134; C[0] = 0.1108884156;
-// 	      A[1] = 0.3260725774; B[1] = 0.2034645680; C[1] = 0.1434587898;
-// 	      A[2] = 0.3260725774; B[2] = 0.1298475476; C[2] = 0.0686338872;
-// 	      A[3] = 0.1739274226; B[3] = 0.0311809709; C[3] = 0.0103522407;
-
-// 	      // Make room for the points and weights
-// 	      _points.resize(64);
-// 	      _weights.resize(64);
-
-// 	      // Compute the conical products
-// 	      unsigned int gp = 0;
-// 	      for (unsigned int i=0; i<4; i++)
-// 		for (unsigned int j=0; j<4; j++)
-// 		  for (unsigned int k=0; k<4; k++)
-// 		    {
-// 		      _points[gp](0) = t[k];
-// 		      _points[gp](1) = s[j]*(1.-t[k]);
-// 		      _points[gp](2) = r[i]*(1.-s[j])*(1.-t[k]);
-// 		      _weights[gp]   = A[i]*B[j]*C[k];
-// 		      gp++;
-// 		    }
 	      
 	      // Define the quadrature rules...
 	      QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
