@@ -45,90 +45,10 @@ void QGrundmann_Moller::init_3D(const ElemType _type,
     case TET4:
     case TET10:
       {
+	// Untested above _order=23 but should work...
 	gm_rule( (_order + 2*p)/2 );
 	return;
 	
-// 	switch(_order + 2*p)
-// 	  {
-// 	  case CONSTANT:
-// 	  case FIRST:
-// 	    {
-// 	      gm_rule(0);
-// 	      return;
-// 	    }
-// 	  case SECOND:
-// 	  case THIRD:
-// 	    {
-// 	      gm_rule(1);
-// 	      return;
-// 	    }
-// 	  case FOURTH:
-// 	  case FIFTH:
-// 	    {
-// 	      gm_rule(2);
-// 	      return;
-// 	    }
-// 	  case SIXTH:
-// 	  case SEVENTH:
-// 	    {
-// 	      gm_rule(3);
-// 	      return;
-// 	    }
-// 	  case EIGHTH:
-// 	  case NINTH:
-// 	    {
-// 	      gm_rule(4);
-// 	      return;
-// 	    }
-// 	  case TENTH:        
-// 	  case ELEVENTH:
-// 	    {
-// 	      gm_rule(5);
-// 	      return;
-// 	    }
-// 	  case TWELFTH:      
-// 	  case THIRTEENTH:   
-// 	    {
-// 	      gm_rule(6);
-// 	      return;
-// 	    }
-// 	  case FOURTEENTH:   
-// 	  case FIFTEENTH:    
-// 	    {
-// 	      gm_rule(7);
-// 	      return;
-// 	    }
-// 	  case SIXTEENTH:    
-// 	  case SEVENTEENTH:  
-// 	    {
-// 	      gm_rule(8);
-// 	      return;
-// 	    }
-// 	  case EIGHTTEENTH:  
-// 	  case NINTEENTH:    
-// 	    {
-// 	      gm_rule(9);
-// 	      return;
-// 	    }
-// 	  case TWENTIETH:    
-// 	  case TWENTYFIRST:  
-// 	    {
-// 	      gm_rule(10);
-// 	      return;
-// 	    }
-// 	  case TWENTYSECOND: 
-// 	  case TWENTYTHIRD:
-// 	    {
-// 	      gm_rule(11);
-// 	      return;
-// 	    }
-// 	  default:
-// 	    {
-// 	      std::cout << "Quadrature rule not supported!" << std::endl;
-		    
-// 	      libmesh_error();
-// 	    }
-//	  }
       } // end case TET4, TET10
 
 
