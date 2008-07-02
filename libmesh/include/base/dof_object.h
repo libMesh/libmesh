@@ -242,7 +242,7 @@ public:
    * @returns true if any system has variables which have been assigned,
    * false otherwise
    */
-  bool has_dofs() const;
+  bool has_dofs(const unsigned int s=libMesh::invalid_uint) const;
   
   /**
    * Implemented in Elem and Node.
@@ -286,20 +286,16 @@ private:
    * The number of systems.
    */
   unsigned char _n_systems;
-  
-  /**
-   * The number of variables associated with this
-   * \p DofObject.  This is stored as an unsigned char
-   * for storage efficiency.
-   */
-  unsigned char *_n_vars;
 
   /**
-   * The number of components for each variable of each system
+   * The number of variables and components for each variable of each system
    * associated with this \p DofObject.  This is stored as an
    * unsigned char for storage efficiency.
+   *
+   * _n_v_comp[s][0]   = # of variables in system s
+   * _n_v_comp[s][v+1] = # of components for variable v in system s.
    */
-  unsigned char **_n_comp;
+  unsigned char **_n_v_comp;
 
   /**
    * The first global degree of freedom number
@@ -320,8 +316,7 @@ DofObject::DofObject () :
   _id (invalid_id),
   _processor_id (invalid_processor_id),
   _n_systems  (0),
-  _n_vars (NULL),
-  _n_comp (NULL),
+  _n_v_comp (NULL),
   _dof_ids (NULL)
 {
   this->invalidate();
@@ -349,8 +344,8 @@ void DofObject::invalidate_dofs (const unsigned int sys_num)
   // If the user does not specify the system number...
   if (sys_num >= this->n_systems()) 
     {
-      for (unsigned int s=0; s<n_systems(); s++)
-        for (unsigned int v=0; v<n_vars(s); v++)
+      for (unsigned int s=0; s<this->n_systems(); s++)
+        for (unsigned int v=0; v<this->n_vars(s); v++)
 	  if (this->n_comp(s,v))
 	    this->set_dof_number(s,v,0,invalid_id);
     }
@@ -396,22 +391,26 @@ void DofObject::clear_dofs ()
   if (this->n_systems() != 0)
     {
       for (unsigned int s=0; s<this->n_systems(); s++)
-	if (this->n_vars(s) != 0) // This has only been allocated if 
-	  {                       // variables were declared
-	    libmesh_assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
-	    libmesh_assert (_n_comp[s]  != NULL); delete [] _n_comp[s];  _n_comp[s]  = NULL;
-	  }
+	{
+	  if (_n_v_comp[s] != NULL) // it is possible the number of variables is 0,
+	    {                       // but this was allocated (_n_v_comp[s][0] == 0)
+	      delete [] _n_v_comp[s]; _n_v_comp[s] = NULL;
+	    }
+	  
+	  if (this->n_vars(s) != 0) // This has only been allocated if 
+	    {                       // variables were declared
+	      libmesh_assert (_dof_ids[s]  != NULL); delete [] _dof_ids[s];   _dof_ids[s] = NULL;
+	    }
+	}
       
-      libmesh_assert (_n_vars  != NULL); delete [] _n_vars;  _n_vars  = NULL; 
-      libmesh_assert (_n_comp  != NULL); delete [] _n_comp;  _n_comp  = NULL;
-      libmesh_assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
+      libmesh_assert (_n_v_comp != NULL); delete [] _n_v_comp; _n_v_comp = NULL;
+      libmesh_assert (_dof_ids  != NULL); delete [] _dof_ids;  _dof_ids  = NULL;
     }
   
   // Make sure we cleaned up
   // (or there was nothing there)
-  libmesh_assert (_n_vars  == NULL);
-  libmesh_assert (_n_comp  == NULL);
-  libmesh_assert (_dof_ids == NULL);
+  libmesh_assert (_n_v_comp == NULL);
+  libmesh_assert (_dof_ids  == NULL);
   
   // No systems now.
   _n_systems = 0;
@@ -493,7 +492,7 @@ void DofObject::processor_id (const unsigned int id)
       std::cerr << "ERROR: id too large for unsigned short int!" << std::endl
 		<< "Recompile with DofObject::_processor_id larger!" << std::endl;
       
-     libmesh_error();
+      libmesh_error();
     }
 
 #endif
@@ -523,9 +522,10 @@ inline
 unsigned int DofObject::n_vars(const unsigned int s) const
 {
   libmesh_assert (s < this->n_systems());
-  libmesh_assert (_n_vars != NULL);
-  
-  return static_cast<unsigned int>(_n_vars[s]);
+  libmesh_assert (_n_v_comp != NULL);
+  if (_n_v_comp[s] == NULL)
+    return 0;
+  return static_cast<unsigned int>(_n_v_comp[s][0]);
 }
 
 
@@ -538,8 +538,8 @@ unsigned int DofObject::n_comp(const unsigned int s,
   libmesh_assert (s < this->n_systems());
   libmesh_assert (_dof_ids != NULL);
   libmesh_assert (_dof_ids[s] != NULL);
-  libmesh_assert (_n_comp != NULL);
-  libmesh_assert (_n_comp[s] != NULL);
+  libmesh_assert (_n_v_comp != NULL);
+  libmesh_assert (_n_v_comp[s] != NULL);
 
 # ifdef DEBUG
   // Does this ever happen?  I doubt it... 3/7/2003 (BSK)
@@ -554,7 +554,7 @@ unsigned int DofObject::n_comp(const unsigned int s,
     }
 # endif
   
-  return static_cast<unsigned int>(_n_comp[s][var]);
+  return static_cast<unsigned int>(_n_v_comp[s][var+1]);
 }
 
 
@@ -579,12 +579,23 @@ unsigned int DofObject::dof_number(const unsigned int s,
 
 
 inline
-bool DofObject::has_dofs () const
+bool DofObject::has_dofs (const unsigned int sys) const
 {
-  for (unsigned int s=0; s<this->n_systems(); s++)
-    if (this->n_vars(s))
-      return true;
+  if (sys == libMesh::invalid_uint)
+    {
+      for (unsigned int s=0; s<this->n_systems(); s++)
+	if (this->n_vars(s))
+	  return true;
+    }
+  
+  else
+    {
+      libmesh_assert (sys < this->n_systems());
 
+      if (this->n_vars(sys))
+	return true;
+    }
+  
   return false;
 }
   
