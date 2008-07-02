@@ -45,38 +45,44 @@ DofObject::DofObject (const DofObject& dof_obj) :
   _id            (dof_obj._id),
   _processor_id  (dof_obj._processor_id),
   _n_systems     (dof_obj._n_systems),
-  _n_vars        (NULL),
-  _n_comp        (NULL),
+  _n_v_comp      (NULL),
   _dof_ids       (NULL)
 {
 
   // Allocate storage for the dof numbers and copy
   // the values. 
   // IT IS UNDEFINED BEHAVIOR TO ALLOCATE AN ARRAY WITH ZERO ENTRIES,
-  // IF n_systems==0, leave _n_vars, _n_comp, and _dof_ids NULL.
+  // IF n_systems==0, leave _n_v_comp, and _dof_ids NULL.
   if (this->n_systems() > 0)
-  {
-    _n_vars  = new unsigned char  [this->n_systems()];
-    _n_comp  = new unsigned char* [this->n_systems()];
-    _dof_ids = new unsigned int*  [this->n_systems()];
-  }
+    {
+      _n_v_comp = new unsigned char* [this->n_systems()];
+      _dof_ids  = new unsigned int*  [this->n_systems()];
+
+      // gotta specifically NULL these - we rely later that
+      // _n_v_comp[s] == NULL is synonymous with no variables in the system.
+      for (unsigned int s=0; s<this->n_systems(); s++)
+	{
+	  _n_v_comp[s] = NULL;
+	  _dof_ids[s]  = NULL;
+	}      
+    }
 
   // If n_systems==0, we don't enter this for loop.
   for (unsigned int s=0; s<this->n_systems(); s++)
-    {      
-      _n_vars[s]  = dof_obj.n_vars(s);
-
+    {
       // In case you have a system with no variables, it is undefined
       // behavior (UB) to allocate a zero-length array here.
-      if (this->n_vars(s) > 0)
+      if (dof_obj.n_vars(s) > 0)
 	{
-	  _n_comp[s]  = new unsigned char [this->n_vars(s)]; 
-	  _dof_ids[s] = new unsigned int  [this->n_vars(s)];
+	  _n_v_comp[s] = new unsigned char [dof_obj.n_vars(s)+1]; 
+	  _dof_ids[s]  = new unsigned int  [dof_obj.n_vars(s)];
+	  
+	  _n_v_comp[s][0] = dof_obj.n_vars(s);
+
 	}
-      
       for (unsigned int v=0; v<this->n_vars(s); v++)
 	{
-	  _n_comp[s][v]  = dof_obj.n_comp(s,v);
+	  _n_v_comp[s][v+1]  = dof_obj.n_comp(s,v);
 
 	  if (this->n_comp(s,v) > 0)
 	    _dof_ids[s][v] = dof_obj.dof_number(s,v,0);
@@ -166,16 +172,14 @@ void DofObject::set_n_systems (const unsigned int ns)
   _n_systems = static_cast<unsigned char>(ns);
   
   // Allocate storage for the systems
-  _n_vars    = new unsigned char  [this->n_systems()];
-  _n_comp    = new unsigned char* [this->n_systems()];
-  _dof_ids   = new unsigned int*  [this->n_systems()];
+  _n_v_comp = new unsigned char* [this->n_systems()];
+  _dof_ids  = new unsigned int*  [this->n_systems()];
 
   // No variables have been declared yet.
   for (unsigned int s=0; s<this->n_systems(); s++)
     {
-      _n_vars[s]  = 0;
-      _n_comp[s]  = NULL;
-      _dof_ids[s] = NULL;
+      _n_v_comp[s] = NULL;
+      _dof_ids[s]  = NULL;
     }
 }
 
@@ -186,56 +190,47 @@ void DofObject::add_system()
   if (this->n_systems() > 0)
     {
       // Copy the old systems to temporary storage
-      unsigned char  *old_n_vars  = new unsigned char  [this->n_systems()];
-      unsigned char **old_n_comp  = new unsigned char* [this->n_systems()];
-      unsigned int  **old_dof_ids = new unsigned int*  [this->n_systems()]; 
+      unsigned char **old_n_v_comp = new unsigned char* [this->n_systems()];
+      unsigned int  **old_dof_ids  = new unsigned int*  [this->n_systems()]; 
       
       for (unsigned int s=0; s<this->n_systems(); s++)
 	{
-	  old_n_vars[s]  = _n_vars[s];
-	  old_n_comp[s]  = _n_comp[s];
-	  old_dof_ids[s] = _dof_ids[s];
+	  old_n_v_comp[s] = _n_v_comp[s];
+	  old_dof_ids[s]  = _dof_ids[s];
 	}
-  
+      
       // Delete old storage
-      libmesh_assert (_n_vars  != NULL); delete [] _n_vars;  _n_vars  = NULL;
-      libmesh_assert (_n_comp  != NULL); delete [] _n_comp;  _n_comp  = NULL;
-      libmesh_assert (_dof_ids != NULL); delete [] _dof_ids; _dof_ids = NULL;
+      libmesh_assert (_n_v_comp != NULL); delete [] _n_v_comp; _n_v_comp = NULL;
+      libmesh_assert (_dof_ids  != NULL); delete [] _dof_ids;  _dof_ids  = NULL;
   
       // Allocate space for new system
-      _n_vars  = new unsigned char  [this->n_systems()+1];
-      _n_comp  = new unsigned char* [this->n_systems()+1];
+      _n_v_comp= new unsigned char* [this->n_systems()+1];
       _dof_ids = new unsigned int*  [this->n_systems()+1];
       
       // Copy the other systems
       for (unsigned int s=0; s<this->n_systems(); s++)
 	{
-	  _n_vars[s]  = old_n_vars[s];
-	  _n_comp[s]  = old_n_comp[s];
-	  _dof_ids[s] = old_dof_ids[s];
+	  _n_v_comp[s] = old_n_v_comp[s];
+	  _dof_ids[s]  = old_dof_ids[s];
 	}
-      
+	       
       // Delete temporary storage
-      libmesh_assert (old_n_vars  != NULL); delete [] old_n_vars;  old_n_vars  = NULL;
-      libmesh_assert (old_n_comp  != NULL); delete [] old_n_comp;  old_n_comp  = NULL;
-      libmesh_assert (old_dof_ids != NULL); delete [] old_dof_ids; old_dof_ids = NULL;
+      libmesh_assert (old_n_v_comp != NULL); delete [] old_n_v_comp; old_n_v_comp = NULL;
+      libmesh_assert (old_dof_ids  != NULL); delete [] old_dof_ids;  old_dof_ids  = NULL;
     }
   else
     {
-      libmesh_assert (_n_vars  == NULL);
-      libmesh_assert (_n_comp  == NULL);
-      libmesh_assert (_dof_ids == NULL);
+      libmesh_assert (_n_v_comp == NULL);
+      libmesh_assert (_dof_ids  == NULL);
       
       // Allocate space for new system
-      _n_vars  = new unsigned char  [this->n_systems()+1];
-      _n_comp  = new unsigned char* [this->n_systems()+1];
-      _dof_ids = new unsigned int*  [this->n_systems()+1];      
+      _n_v_comp = new unsigned char* [this->n_systems()+1];
+      _dof_ids  = new unsigned int*  [this->n_systems()+1];      
     }
   
   // Initialize the new system
-  _n_vars[this->n_systems()]  = 0;
-  _n_comp[this->n_systems()]  = NULL;
-  _dof_ids[this->n_systems()] = NULL;
+  _n_v_comp[this->n_systems()] = NULL;
+  _dof_ids[this->n_systems()]  = NULL;
   
   // Done. Don't forget to increment the number of systems!
   _n_systems++;
@@ -247,7 +242,7 @@ void DofObject::set_n_vars(const unsigned int s,
 			   const unsigned int nvars)
 {
   libmesh_assert (s < this->n_systems());
-  libmesh_assert (_n_vars != NULL);
+  libmesh_assert (_n_v_comp != NULL);
 
 #ifdef DEBUG
 
@@ -267,25 +262,27 @@ void DofObject::set_n_vars(const unsigned int s,
   // If we already have memory allocated clear it.
   if (this->n_vars(s) != 0)
     {
-      libmesh_assert (_n_comp[s]  != NULL); delete [] _n_comp[s];  _n_comp[s]  = NULL;
-      libmesh_assert (_dof_ids    != NULL);
-      libmesh_assert (_dof_ids[s] != NULL); delete [] _dof_ids[s]; _dof_ids[s] = NULL;
+      libmesh_assert (_n_v_comp[s] != NULL); delete [] _n_v_comp[s]; _n_v_comp[s] = NULL;
+      libmesh_assert (_dof_ids     != NULL);
+      libmesh_assert (_dof_ids[s]  != NULL); delete [] _dof_ids[s];  _dof_ids[s]  = NULL;
     }
 
   // Reset the number of variables in the system  
-  _n_vars[s] = static_cast<unsigned char>(nvars);
-
-  if (this->n_vars(s) > 0)
+  if (nvars > 0)
     {
-      _n_comp[s]  = new unsigned char [this->n_vars(s)];
-      _dof_ids[s] = new unsigned int  [this->n_vars(s)];
+      _n_v_comp[s] = new unsigned char [nvars+1];
+      _dof_ids[s]  = new unsigned int  [nvars];
+      
+      _n_v_comp[s][0] = static_cast<unsigned char>(nvars);
       
       for (unsigned int v=0; v<this->n_vars(s); v++)
 	{
-	  _n_comp[s][v]  = 0;
-	  _dof_ids[s][v] = invalid_id - 1;
+	  _n_v_comp[s][v+1] = 0;
+	  _dof_ids[s][v]    = invalid_id - 1;
 	}
     }
+  else // (nvars == 0)
+    _n_v_comp[s] = NULL;
 }
 
 
@@ -307,7 +304,7 @@ void DofObject::set_n_comp(const unsigned int s,
   if (ncomp != static_cast<unsigned int>(static_cast<unsigned char>(ncomp)))
     {
       std::cerr << "Unsigned char not big enough to hold ncomp!" << std::endl
-		<< "Recompile with _n_comp set to a bigger type!"
+		<< "Recompile with _n_v_comp set to a bigger type!"
 		<< std::endl;
       
       libmesh_error();
@@ -322,10 +319,10 @@ void DofObject::set_n_comp(const unsigned int s,
       _dof_ids[s][var] = (invalid_id - 1);
     }
   
-  libmesh_assert (_n_comp != NULL);
-  libmesh_assert (_n_comp[s] != NULL);
+  libmesh_assert (_n_v_comp    != NULL);
+  libmesh_assert (_n_v_comp[s] != NULL);
     
-  _n_comp[s][var]  = static_cast<unsigned char>(ncomp);
+  _n_v_comp[s][var+1]  = static_cast<unsigned char>(ncomp);
 }
 
 
@@ -344,7 +341,7 @@ void DofObject::set_dof_number(const unsigned int s,
   //We intend to change all dof numbers together or not at all
   if (comp)
     libmesh_assert ((dn == invalid_id && _dof_ids[s][var] == invalid_id) || 
-            (dn == _dof_ids[s][var] + comp));
+		    (dn == _dof_ids[s][var] + comp));
   else
     _dof_ids[s][var] = dn;
 
