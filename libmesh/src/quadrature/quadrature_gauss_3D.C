@@ -22,7 +22,7 @@
 // Local includes
 #include "quadrature_gauss.h"
 #include "quadrature_jacobi.h"
-
+#include "quadrature_gm.h"
 
 void QGauss::init_3D(const ElemType _type,
                      unsigned int p)
@@ -456,30 +456,50 @@ void QGauss::init_3D(const ElemType _type,
 	  case TWENTYSECOND: 
 	  case TWENTYTHIRD:
 	    {
-	      // The following quadrature rules are
-	      // generated as conical products.  These
-	      // tend to be non-optimal (use too many
-	      // points, cluster points in certain
-	      // regions of the domain) but they are
-	      // quite easy to automatically generate
-	      // using a 1D Gauss rule on [0,1] and two 
-	      // 1D Jacobi-Gauss rules on [0,1].
+	      if (allow_rules_with_negative_weights)
+		{
+		  // The Grundmann-Moller rules are defined to arbitrary order and
+		  // have significantly fewer evaluation points than concial product
+		  // rules.  If you allow rules with negative weights, the GM rules
+		  // will be more efficient in general, but may be more susceptible
+		  // to round-off error.  Safest is to disallow rules with negative
+		  // weights, but this decision should be made on a case-by-case basis.
+		  QGrundmann_Moller gm_rule(3, _order);
+		  gm_rule.init(_type, p);
 
+		  // Swap points and weights with the about-to-be destroyed rule.
+		  _points.swap (gm_rule.get_points() );
+		  _weights.swap(gm_rule.get_weights());
+
+		  return;
+		}
+
+	      else
+		{
+		  // The following quadrature rules are
+		  // generated as conical products.  These
+		  // tend to be non-optimal (use too many
+		  // points, cluster points in certain
+		  // regions of the domain) but they are
+		  // quite easy to automatically generate
+		  // using a 1D Gauss rule on [0,1] and two 
+		  // 1D Jacobi-Gauss rules on [0,1].
 	      
-	      // Define the quadrature rules...
-	      QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
-	      QJacobi jacA1D(1,static_cast<Order>(_order+2*p),1,0);
-	      QJacobi jacB1D(1,static_cast<Order>(_order+2*p),2,0);
+		  // Define the quadrature rules...
+		  QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
+		  QJacobi jacA1D(1,static_cast<Order>(_order+2*p),1,0);
+		  QJacobi jacB1D(1,static_cast<Order>(_order+2*p),2,0);
 
-	      // The Gauss rule needs to be scaled to [0,1]
-	      std::pair<Real, Real> old_range(-1,1);
-	      std::pair<Real, Real> new_range(0,1);
-	      gauss1D.scale(old_range,
-			    new_range);
+		  // The Gauss rule needs to be scaled to [0,1]
+		  std::pair<Real, Real> old_range(-1,1);
+		  std::pair<Real, Real> new_range(0,1);
+		  gauss1D.scale(old_range,
+				new_range);
 
-	      // Compute the tensor product
-	      tensor_product_tet(gauss1D, jacA1D, jacB1D);
-	      return;
+		  // Compute the tensor product
+		  tensor_product_tet(gauss1D, jacA1D, jacB1D);
+		  return;
+		}
 	    }
 	  default:
 	    {
