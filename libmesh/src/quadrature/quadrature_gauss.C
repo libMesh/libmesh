@@ -48,10 +48,10 @@ void QGauss::keast_rule(const Real rule_data[][4],
     {
 
       // There must always be a non-zero entry to start the row
-      libmesh_assert(rule_data[p][0] != 0.0);
+      libmesh_assert(rule_data[p][0] != static_cast<Real>(0.0));
       
       // A zero weight may imply you did not set up the raw data correctly
-      libmesh_assert(rule_data[p][3] != 0.0);
+      libmesh_assert(rule_data[p][3] != static_cast<Real>(0.0));
 
       // What kind of point is this?
       // One non-zero entry in first 3 cols   ? 1-perm (centroid) point = 1
@@ -59,9 +59,9 @@ void QGauss::keast_rule(const Real rule_data[][4],
       // Three non-zero entries               ? 6-perm point            = 6
       unsigned int pointtype=1;
 
-      if (rule_data[p][1]!=0.0)      
+      if (rule_data[p][1] != static_cast<Real>(0.0))      
 	{
-	  if (rule_data[p][2]!=0.0)
+	  if (rule_data[p][2] != static_cast<Real>(0.0))
 	    pointtype = 12;
 	  else
 	    pointtype = 4;
@@ -69,7 +69,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
       else
 	{
 	  // The second entry is zero.  What about the third?
-	  if (rule_data[p][2]!=0.0)
+	  if (rule_data[p][2] != static_cast<Real>(0.0))
 	    pointtype = 6;
 	}
 
@@ -198,10 +198,10 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
     {
 
       // There must always be a non-zero entry to start the row
-      libmesh_assert(rule_data[p][0] != 0.0);
+      libmesh_assert( rule_data[p][0] != static_cast<Real>(0.0) );
       
       // A zero weight may imply you did not set up the raw data correctly
-      libmesh_assert(rule_data[p][3] != 0.0);
+      libmesh_assert( rule_data[p][3] != static_cast<Real>(0.0) );
 
       // What kind of point is this?
       // One non-zero entry in first 3 cols   ? 1-perm (centroid) point = 1
@@ -209,9 +209,9 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
       // Three non-zero entries               ? 6-perm point            = 6
       unsigned int pointtype=1;
       
-      if (rule_data[p][1]!=0.0)      
+      if (rule_data[p][1] != static_cast<Real>(0.0))      
 	{
-	  if (rule_data[p][2]!=0.0)
+	  if (rule_data[p][2] != static_cast<Real>(0.0))
 	    pointtype = 6;
 	  else
 	    pointtype = 3;
@@ -292,7 +292,7 @@ void QGauss::wissmann_rule(const Real rule_data[][3],
 
       // This may be an (x1,x2) -> (-x1,x2) point, in which case
       // we will also generate the mirror point using the same weight.
-      if (rule_data[i][0] != 0.0)
+      if (rule_data[i][0] != static_cast<Real>(0.0))
 	{
 	  _points[c]  = Point( -rule_data[i][0], rule_data[i][1] );
 	  _weights[c++] = rule_data[i][2];
