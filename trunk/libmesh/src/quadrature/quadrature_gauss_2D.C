@@ -784,6 +784,10 @@ void QGauss::init_2D(const ElemType _type,
 	    //
 	    // Copied on 3rd July 2008 from:
 	    // http://people.scs.fsu.edu/~burkardt/f_src/wandzura/wandzura.f90
+	    // case TWENTYFIRST: // fall through to 121 point conical product rule below
+	  case TWENTYSECOND:  
+	  case TWENTYTHIRD:   
+	  case TWENTYFOURTH:  	    
 	  case TWENTYFIFTH:
 	    {
 	      // The equivalent concial product rule would have 169 points
@@ -841,6 +845,10 @@ void QGauss::init_2D(const ElemType _type,
 	    //
 	    // Copied on 3rd July 2008 from:
 	    // http://people.scs.fsu.edu/~burkardt/f_src/wandzura/wandzura.f90
+	  case TWENTYSIXTH:   
+	  case TWENTYSEVENTH: 
+	  case TWENTYEIGHTH:  
+	  case TWENTYNINTH:   	    
 	  case THIRTIETH:
 	    {
 	      // The equivalent concial product rule would have 256 points
