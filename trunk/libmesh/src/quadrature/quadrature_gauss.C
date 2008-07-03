@@ -280,3 +280,22 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
 	}
     }
 }
+
+
+void QGauss::wissmann_rule(const Real rule_data[][3],
+			   const unsigned int n_pts)
+{
+  for (unsigned int i=0, c=0; i<n_pts; ++i)
+    {
+      _points[c]  = Point( rule_data[i][0], rule_data[i][1] );
+      _weights[c++] = rule_data[i][2];
+
+      // This may be an (x1,x2) -> (-x1,x2) point, in which case
+      // we will also generate the mirror point using the same weight.
+      if (rule_data[i][0] != 0.0)
+	{
+	  _points[c]  = Point( -rule_data[i][0], rule_data[i][1] );
+	  _weights[c++] = rule_data[i][2];
+	}
+    }
+}
