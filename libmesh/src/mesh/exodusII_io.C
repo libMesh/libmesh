@@ -379,6 +379,11 @@ namespace exII {
     void initialize_nodal_variables(std::vector<std::string> names);
 
     /**
+     * Writes the time for the timestep
+     */
+    void write_timestep(int timestep, double time);
+
+    /**
      * Writes the vector of values to a nodal variable.
      */
     void write_nodal_values(int var_id, const std::vector<Number> & values, int timestep);
@@ -1142,12 +1147,17 @@ namespace exII {
     check_err(ex_err, "Error setting nodal variable names.");
   }
 
+  void ExodusII::write_timestep(int timestep, double time)
+  {
+    ex_err = exII::ex_put_time(ex_id, timestep, &time);
+    check_err(ex_err, "Error writing timestep.");
+  }
+
   void ExodusII::write_nodal_values(int var_id, const std::vector<Number> & values, int timestep)
   {
     ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &values[0]);
     check_err(ex_err, "Error writing nodal values.");
-  }
-  
+  }  
 
   // ------------------------------------------------------------
   // ExodusII::Conversion class members
@@ -1300,6 +1310,21 @@ namespace exII {
 
 // ------------------------------------------------------------
 // ExodusII_IO class members
+ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
+  MeshInput<MeshBase> (mesh),
+  MeshOutput<MeshBase> (mesh),
+  _verbose (false),
+  ex_ptr (NULL),
+  _timestep(1)
+{
+}
+
+ExodusII_IO::~ExodusII_IO ()
+{
+  if(ex_ptr)
+    ex_ptr->close();
+}
+
 void ExodusII_IO::read (const std::string& fname)
 {
   // This is a serial-only process for now;
@@ -1477,32 +1502,45 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   if (libMesh::processor_id() == 0)
   {
     const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-  
-    ExodusII out_ex = new ExodusII(this->verbose());
-    out_ex.create(fname);
-    out_ex.initialize(fname,mesh);
-    out_ex.write_nodal_coordinates(mesh);
-    out_ex.write_elements(mesh);
 
     int num_vars = names.size();
     int num_nodes = mesh.n_nodes();
   
-    out_ex.initialize_nodal_variables(names);
+    if(!ex_ptr)
+    {
+      ex_ptr = new ExodusII(this->verbose());
+      ex_ptr->create(fname);
+      ex_ptr->initialize(fname,mesh);
+      ex_ptr->write_nodal_coordinates(mesh);
+      ex_ptr->write_elements(mesh);
+      ex_ptr->initialize_nodal_variables(names);
+    }
 
     for(int c=0; c<num_vars; c++)
-      {
-	std::vector<Number> cur_soln(num_nodes);
+    {
+      std::vector<Number> cur_soln(num_nodes);
 
-	//Copy out this variable's solution
-	for(int i=0; i<num_nodes; i++)
-	  cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+      //Copy out this variable's solution
+      for(int i=0; i<num_nodes; i++)
+	cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
     
-	out_ex.write_nodal_values(c+1,cur_soln,1);
-      }  
-  
-    out_ex.close();
+      ex_ptr->write_nodal_values(c+1,cur_soln,_timestep);
+    }  
   }
   
   #endif
 }
+
+void ExodusII_IO::write_timestep (const std::string& fname,
+				  const EquationSystems& es,
+				  const int timestep,
+				  const double time)
+{
+  _timestep=timestep; 
+  write_equation_systems(fname,es);
+
+  if (libMesh::processor_id() == 0)
+    ex_ptr->write_timestep(timestep, time);
+}
+
 
