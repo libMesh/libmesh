@@ -96,9 +96,19 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   void write_nodal_data (const std::string&,
 			 const std::vector<Number>&,
 			 const std::vector<std::string>&);
+
+  /**
+   * Writes out the solution at a specific timestep.
+   * @param timestep The timestep to write out, should be _1_ indexed.
+   */
+  void ExodusII_IO::write_timestep (const std::string& fname,
+				    const EquationSystems& es,
+				    const int timestep,
+				    const double time);
   
  private:
   ExodusII * ex_ptr;
+  double _timestep;
 
 //-------------------------------------------------------------
   // local data
@@ -109,33 +119,11 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   bool _verbose;
 };
 
-
-
-// ------------------------------------------------------------
-// MeshIO inline members
-inline
-ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase> (mesh),
-  _verbose (false)
-{
-}
-
-
-
-inline
-ExodusII_IO::~ExodusII_IO ()
-{
-}
-
-
-
 inline
 bool & ExodusII_IO::verbose ()
 {
   return _verbose;
 }
-
 
 
 #endif // #define __exodusII_io_h__
