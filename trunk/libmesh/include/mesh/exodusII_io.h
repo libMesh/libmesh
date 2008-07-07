@@ -108,7 +108,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   
  private:
   ExodusII * ex_ptr;
-  double _timestep;
+  int _timestep;
 
 //-------------------------------------------------------------
   // local data
