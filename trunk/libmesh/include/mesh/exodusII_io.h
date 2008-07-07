@@ -101,10 +101,10 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * Writes out the solution at a specific timestep.
    * @param timestep The timestep to write out, should be _1_ indexed.
    */
-  void ExodusII_IO::write_timestep (const std::string& fname,
-				    const EquationSystems& es,
-				    const int timestep,
-				    const double time);
+  void write_timestep (const std::string& fname,
+		       const EquationSystems& es,
+		       const int timestep,
+		       const double time);
   
  private:
   ExodusII * ex_ptr;
