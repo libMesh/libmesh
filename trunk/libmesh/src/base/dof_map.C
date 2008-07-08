@@ -619,9 +619,8 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
   const unsigned int proc_id = libMesh::processor_id();
   const unsigned int n_proc  = libMesh::n_processors();
-  const unsigned int n_vars  = this->n_variables();
   
-  libmesh_assert (n_vars > 0);
+  libmesh_assert (this->n_variables() > 0);
   libmesh_assert (proc_id < n_proc);
   
   // re-init in case the mesh has changed
@@ -1064,8 +1063,6 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   // fed into a PetscMatrix to allocate exacly the number of nonzeros
   // necessary to store the matrix.  This algorithm should be linear
   // in the (# of elements)*(# nodes per element)
-  const unsigned int proc_id           = mesh.processor_id();
-  const unsigned int n_dofs_on_proc    = this->n_dofs_on_processor(proc_id);
 
   bool implicit_neighbor_dofs = 
     libMesh::on_command_line ("--implicit_neighbor_dofs");
@@ -1112,7 +1109,12 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   
   Threads::parallel_reduce (ConstElemRange (mesh.active_elements_begin(),
 					    mesh.active_elements_end()), sp);
-  
+
+#ifndef NDEBUG
+  // Avoid declaring these variables unless asserts are enabled.
+  const unsigned int proc_id        = mesh.processor_id();
+  const unsigned int n_dofs_on_proc = this->n_dofs_on_processor(proc_id);
+#endif
   libmesh_assert (sp.sparsity_pattern.size() == n_dofs_on_proc);
 
   // steal the n_nz and n_oz arrays from sp -- it won't need them any more,
