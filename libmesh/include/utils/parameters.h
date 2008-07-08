@@ -118,7 +118,6 @@ public:
    * Prints the contents to the specified stream.
    */
   void print (std::ostream& os=std::cout) const;
-
   
 private:
 
@@ -153,6 +152,7 @@ private:
     virtual Value* clone () const = 0;
   };
 
+public:
 
   /**
    * Concrete definition of a parameter value
@@ -197,11 +197,6 @@ private:
   };
 
   /**
-   * Data structure to map names with values.
-   */
-  std::map<std::string, Value*> _values;
-
-  /**
    * Parameter map iterator.
    */
   typedef std::map<std::string, Value*>::iterator iterator;
@@ -210,6 +205,34 @@ private:
    * Constant parameter map iterator.
    */
   typedef std::map<std::string, Value*>::const_iterator const_iterator;
+
+  /**
+   * Iterator pointing to the beginning of the set of parameters.
+   */
+  iterator begin();
+
+  /**
+   * Iterator pointing to the beginning of the set of parameters.
+   */
+  const_iterator begin() const;
+
+  /**
+   * Iterator pointing to the end of the set of parameters
+   */
+  iterator end();
+
+  /**
+   * Iterator pointing to the end of the set of parameters
+   */
+  const_iterator end() const;
+
+private:
+
+  /**
+   * Data structure to map names with values.
+   */
+  std::map<std::string, Value*> _values;
+
 };
 
 
@@ -421,6 +444,30 @@ unsigned int Parameters::n_parameters () const
       cnt++;
 
   return cnt;	 
+}
+
+inline
+Parameters::iterator Parameters::begin()
+{
+  return _values.begin();
+}
+
+inline
+Parameters::const_iterator Parameters::begin() const
+{
+  return _values.begin();
+}
+
+inline
+Parameters::iterator Parameters::end()
+{
+  return _values.end();
+}
+
+inline
+Parameters::const_iterator Parameters::end() const
+{
+  return _values.end();
 }
 
 #endif // #define __parameters_h__
