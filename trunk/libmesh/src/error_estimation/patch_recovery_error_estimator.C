@@ -231,7 +231,12 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	  // Get Jacobian values, etc..
 	  const std::vector<Real>&                       JxW     = fe->get_JxW();
 	  const std::vector<Point>&                      q_point = fe->get_xyz();
+#ifndef NDEBUG
+	  // We only use phi below to assert that the dof_indices
+	  // vector has the correct size.  So we avoid declaring it
+	  // here unless asserts are active.
 	  const std::vector<std::vector<Real> >&         phi     = fe->get_phi();
+#endif
 	  const std::vector<std::vector<RealGradient> > *dphi = NULL;
           if (error_estimator._sobolev_order == 1)
             dphi = &(fe->get_dphi());
