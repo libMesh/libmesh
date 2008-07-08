@@ -2087,13 +2087,13 @@ void GMVIO::_read_one_cell()
 
   // This is either a REGULAR=111 cell or
   // the ENDKEYWORD=207 of the cells
-  {
+#ifndef NDEBUG
     bool recognized =
       (GMV::gmv_data.datatype==REGULAR) ||
       (GMV::gmv_data.datatype==ENDKEYWORD);
-    
+#endif
     libmesh_assert (recognized);
-  }
+
 
   if (GMV::gmv_data.datatype == REGULAR)
     {
