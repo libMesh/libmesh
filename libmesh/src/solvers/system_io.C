@@ -712,11 +712,15 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int var
 	    const unsigned int local_idx = (*it)->id()-first_object;
 	    libmesh_assert (local_idx < std::min(io_blksize,n_objects));
 
+#ifndef NDEBUG
+	    // We only need to check the pid when asserts are active
 	    const unsigned int pid       = idx_map[3*local_idx+0];
+#endif
+	    libmesh_assert (pid == libMesh::processor_id());
+	    
 	    const unsigned int n_comp    = idx_map[3*local_idx+1];
 	    const unsigned int start_pos = idx_map[3*local_idx+2];
 	    
-	    libmesh_assert (pid == libMesh::processor_id());
 	    libmesh_assert (n_comp == (*it)->n_comp(sys_num, var));
 	    
 	    for (unsigned int comp=0; comp<n_comp; comp++)
