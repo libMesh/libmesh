@@ -695,7 +695,10 @@ namespace Parallel
   {
     START_LOG("send()", "Parallel");
     
-    const int ierr =	  
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
+    const int ierr =
+#endif
       MPI_Send (buf.empty() ? NULL : &buf[0],
 		buf.size(),
 		datatype<T>(),
@@ -737,7 +740,10 @@ namespace Parallel
   {
     START_LOG("isend()", "Parallel");
     
-    const int ierr =	  
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
+    const int ierr =
+#endif
       MPI_Isend (buf.empty() ? NULL : &buf[0],
 		 buf.size(),
 		 datatype<T>(),
@@ -783,7 +789,10 @@ namespace Parallel
   {
     START_LOG("isend()", "Parallel");
     
-    const int ierr =	  
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
+    const int ierr =
+#endif
       MPI_Isend (buf.empty() ? NULL : &buf[0],
 		 buf.size(),
 		 type,
@@ -807,7 +816,10 @@ namespace Parallel
 
     MPI_Status status;
     
-    const int ierr =	  
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
+    const int ierr =
+#endif
       MPI_Recv (buf.empty() ? NULL : &buf[0],
 		buf.size(),
 		datatype<T>(),
@@ -834,7 +846,10 @@ namespace Parallel
 
     MPI_Status status;
     
-    const int ierr =	  
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
+    const int ierr =
+#endif
       MPI_Recv (buf.empty() ? NULL : &buf[0],
 		buf.size(),
 		type,
@@ -884,7 +899,10 @@ namespace Parallel
   {
     START_LOG("irecv()", "Parallel");
     
-    const int ierr =	  
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
+    const int ierr =
+#endif
       MPI_Irecv (buf.empty() ? NULL : &buf[0],
 		 buf.size(),
 		 datatype<T>(),
@@ -1323,7 +1341,10 @@ namespace Parallel
       r.resize(globalsize);
 
     // and get the data from the remote processors
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
     const int ierr =
+#endif
       MPI_Gatherv (r_src.empty() ? NULL : &r_src[0], mysize, datatype<T>(),
 		   r.empty() ? NULL :  &r[0], &sendlengths[0],
 		   &displacements[0], datatype<T>(),
@@ -1503,7 +1524,10 @@ namespace Parallel
 
     // and get the data from the remote processors.
     // Pass NULL if our vector is empty.
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
     const int ierr =
+#endif
       MPI_Allgatherv (r_src.empty() ? NULL : &r_src[0], mysize, datatype<T>(),
 		      r.empty()     ? NULL : &r[0],     &sendlengths[0],
 		      &displacements[0], datatype<T>(), libMesh::COMM_WORLD);
@@ -1589,7 +1613,10 @@ namespace Parallel
 
     std::vector<T> tmp(buf);
     
-    const int ierr = 
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
+    const int ierr =
+#endif
       MPI_Alltoall (tmp.empty() ? NULL : &tmp[0],
 		    size_per_proc,
 		    datatype<T>(),
