@@ -81,7 +81,11 @@ Real FE<2,XYZ>::shape(const Elem* elem,
   const Real dx = x - xc;
   const Real dy = y - yc;
 
+#ifndef NDEBUG
+  // totalorder is only used in the assertion below, so
+  // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = order + elem->p_level();
+#endif
   libmesh_assert (i < (totalorder+1)*(totalorder+2)/2);
 
   
@@ -205,7 +209,11 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
   const Real dx = x - xc;
   const Real dy = y - yc;
 
+#ifndef NDEBUG
+  // totalorder is only used in the assertion below, so
+  // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = order + elem->p_level();
+#endif
   libmesh_assert (i < (totalorder+1)*(totalorder+2)/2);
   
   // monomials. since they are hierarchic we only need one case block.
@@ -408,7 +416,11 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
   const Real dx = x - xc;
   const Real dy = y - yc;
 
+#ifndef NDEBUG
+  // totalorder is only used in the assertion below, so
+  // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = order + elem->p_level();
+#endif
   libmesh_assert (i < (totalorder+1)*(totalorder+2)/2);
   
   // monomials. since they are hierarchic we only need one case block.
