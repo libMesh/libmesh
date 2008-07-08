@@ -1313,9 +1313,9 @@ namespace exII {
 ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase> (mesh),
-  _verbose (false),
   ex_ptr (NULL),
-  _timestep(1)
+  _timestep(1),
+  _verbose (false)
 {
 }
 
