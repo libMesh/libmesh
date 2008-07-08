@@ -403,9 +403,8 @@ namespace Parallel
   {
     unsigned int data_bits = 8*sizeof(T);
     // We need the output vector to already be properly sized
-    unsigned int in_size = in.size();
     unsigned int out_size = out.size();
-    libmesh_assert(out_size/data_bits + (out_size%data_bits?1:0) == in_size);
+    libmesh_assert(out_size/data_bits + (out_size%data_bits?1:0) == in.size());
 
     for (unsigned int i=0; i != out_size; ++i)
       {
@@ -1617,7 +1616,10 @@ namespace Parallel
     START_LOG("broadcast()", "Parallel");
 
     // Spread data to remote processors.
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
     const int ierr =
+#endif
       MPI_Bcast (&data, 1, datatype<T>(), root_id, libMesh::COMM_WORLD);
 
     libmesh_assert (ierr == MPI_SUCCESS);
@@ -1691,7 +1693,10 @@ namespace Parallel
 
     // and get the data from the remote processors.
     // Pass NULL if our vector is empty.
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
     const int ierr =
+#endif
       MPI_Bcast (data.empty() ? NULL : &data[0], data.size(), datatype<T>(),
 		 root_id, libMesh::COMM_WORLD);
 
