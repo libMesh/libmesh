@@ -84,7 +84,11 @@ Real FE<3,XYZ>::shape(const Elem* elem,
   const Real dy = y - yc;
   const Real dz = z - zc;
 
+#ifndef NDEBUG
+  // totalorder is only used in the assertion below, so
+  // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = order + elem->p_level();
+#endif
   libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
               (static_cast<unsigned int>(totalorder)+2)/6);
@@ -277,7 +281,11 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   const Real dy = y - yc;
   const Real dz = z - zc;
 
+#ifndef NDEBUG
+  // totalorder is only used in the assertion below, so
+  // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = static_cast<Order>(order + elem->p_level());
+#endif
   libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
               (static_cast<unsigned int>(totalorder)+2)/6);
@@ -750,7 +758,11 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   const Real dy = y - yc;
   const Real dz = z - zc;
 
+#ifndef NDEBUG
+  // totalorder is only used in the assertion below, so
+  // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = static_cast<Order>(order + elem->p_level());
+#endif
   libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
               (static_cast<unsigned int>(totalorder)+2)/6);
