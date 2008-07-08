@@ -236,11 +236,10 @@ void DenseMatrix<T>::_lu_back_substitute (DenseVector<T>& b,
 					  const bool ) const
 {
   const unsigned int
-    m = this->m(),
     n = this->n();
 
-  libmesh_assert (m == n);
-  libmesh_assert (b.size() == m);
+  libmesh_assert (this->m() == n);
+  libmesh_assert (this->m() == b.size());
   
   x.resize (n);
 
@@ -299,10 +298,9 @@ void DenseMatrix<T>::_lu_decompose (const bool partial_pivot)
   
   // Get the matrix size and make sure it is square
   const unsigned int
-    m = this->m(),
-    n = this->n();
+    m = this->m();
 
-  libmesh_assert (m == n);
+  libmesh_assert (m == this->n());
 
   // A convenient reference to *this
   DenseMatrix<T>& A = *this;
