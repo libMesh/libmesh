@@ -239,8 +239,12 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   // Find the number of coarse mesh elements, to make it possible
   // to find correct coarse elem ids later
   const unsigned int max_coarse_elem_id = mesh.max_elem_id();
+#ifndef NDEBUG
+  // n_coarse_elem is only used in an assertion later so
+  // avoid declaring it unless asserts are active.
   const unsigned int n_coarse_elem = mesh.n_elem();
-
+#endif
+  
   // Uniformly refine the mesh
   MeshRefinement mesh_refinement(mesh);
 

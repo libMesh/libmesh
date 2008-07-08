@@ -120,9 +120,7 @@ void EquationSystems::init ()
 
 void EquationSystems::reinit ()
 {
-  const unsigned int n_sys = this->n_systems();
-
-  libmesh_assert (n_sys != 0);
+  libmesh_assert (this->n_systems() != 0);
   
 #ifdef DEBUG
   // Make sure all the \p DofObject entities know how many systems

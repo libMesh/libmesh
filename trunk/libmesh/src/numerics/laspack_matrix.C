@@ -159,18 +159,26 @@ void LaspackMatrix<T>::init ()
     this->clear();
 
   const unsigned int m   = this->_dof_map->n_dofs();
+#ifndef NDEBUG
+  // The following variables are only used for assertions,
+  // so avoid declaring them when asserts are inactive.
   const unsigned int n   = m;
   const unsigned int n_l = this->_dof_map->n_dofs_on_processor(0); 
   const unsigned int m_l = n_l;
-
+#endif
+  
   // Laspack Matrices only work for uniprocessor cases
   libmesh_assert (m   == n);
   libmesh_assert (m_l == m);
   libmesh_assert (n_l == n);
 
+#ifndef NDEBUG
+  // The following variables are only used for assertions,
+  // so avoid declaring them when asserts are inactive.
   const std::vector<unsigned int>& n_nz = this->_dof_map->get_n_nz();
   const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
-
+#endif
+  
   // Make sure the sparsity pattern isn't empty
   libmesh_assert (n_nz.size() == n_l);
   libmesh_assert (n_oz.size() == n_l);
