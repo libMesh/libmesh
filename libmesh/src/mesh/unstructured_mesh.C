@@ -362,8 +362,7 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
         {
           Elem* elem = *el;
           libmesh_assert(elem);
-          Elem* parent = elem->parent();
-          libmesh_assert(parent);
+          libmesh_assert(elem->parent());
 
           for (unsigned int s=0; s < elem->n_neighbors(); s++)
             if (elem->neighbor(s) == NULL)
