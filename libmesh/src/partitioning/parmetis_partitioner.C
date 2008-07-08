@@ -561,7 +561,6 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
 void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 {
   const unsigned int 
-    n_active_local_elem = mesh.n_active_local_elem(),
     first_local_elem = _vtxdist[libMesh::processor_id()];
     
   std::vector<std::vector<unsigned int> > 
@@ -610,7 +609,7 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 	    global_index_by_pid - first_local_elem;
 	    
 	  libmesh_assert (local_index < _part.size());
-	  libmesh_assert (local_index < n_active_local_elem);
+	  libmesh_assert (local_index < mesh.n_active_local_elem());
 	  
 	  const unsigned int elem_procid =
 	    static_cast<unsigned int>(_part[local_index]);
