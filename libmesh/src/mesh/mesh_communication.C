@@ -490,8 +490,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	  Parallel::recv (Parallel::any_source,
 			  received_node_bcs,
 			  /* tag = */ 2);
-	const unsigned int source_pid = status.source();
-	libmesh_assert (status.size() == recv_n_nodes_and_elem_per_proc[5*source_pid+3]);
+
+	libmesh_assert (status.size() == recv_n_nodes_and_elem_per_proc[5*status.source()+3]);
 
 	const unsigned int buffer_size = status.size();
 	unsigned int cnt=0;
@@ -521,9 +521,13 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	  Parallel::recv (Parallel::any_source,
 			  received_elements,
 			  /* tag = */ 1);
+
+#ifndef NDEBUG
+	// Avoid declaring these variables unless asserts are enabled.
 	const unsigned int source_pid = status.source();
 	const unsigned int n_elem_received = 
 	  recv_n_nodes_and_elem_per_proc[5*source_pid+1];
+#endif
 	libmesh_assert (recv_elem_pair[source_pid]);
 	libmesh_assert (recv_n_nodes_and_elem_per_proc[5*source_pid+2] 
 		<= received_elements.size());
@@ -619,8 +623,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	  Parallel::recv (Parallel::any_source,
 			  received_element_bcs,
 			  /* tag = */ 3);
-	const unsigned int source_pid = status.source();
-	libmesh_assert (status.size() == recv_n_nodes_and_elem_per_proc[5*source_pid+4]);
+
+	libmesh_assert (status.size() == recv_n_nodes_and_elem_per_proc[5*status.source()+4]);
 
 	const unsigned int buffer_size = status.size();
 	unsigned int cnt=0;
@@ -1270,9 +1274,13 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
           {                               // own local elements!
 	    unsigned int cnt = conn_offset[p]; // counter into the conn[] array.
 	    
+#ifndef NDEBUG
+	    // The first and last global indices are only used for error-checking.
+	    // Avoid declaring them unless asserts are enabled.
 	    const unsigned int
 	      first_global_idx = elem_offsets[p],
 	      last_global_idx  = first_global_idx + n_elem[p];
+#endif
 	    
 	    // Process each element for processor p.
 	    // Note this must work in the case when conn_size[p] == 0.
@@ -1300,8 +1308,10 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
                      mesh.elem(packed_elem.id())))     // ghost elements
 		  {
                     // No need to construct a dummy element of this type
+#ifndef NDEBUG
+		    // The elem information need not be extracted unless asserts are enabled.
 		    const Elem* elem = mesh.elem(packed_elem.id());
-
+#endif
                     libmesh_assert (elem);
 #ifdef ENABLE_AMR
 		    libmesh_assert (!elem->parent() ||
