@@ -47,6 +47,40 @@ void QGauss::init_2D(const ElemType _type,
 	// rules are used.
 	switch(_order + 2*p)
 	  {
+
+	    
+	  case SECOND:
+	    {
+	      // A degree=2 rule for the QUAD with 3 points.
+	      // A tensor product degree-2 Gauss would have 4 points.
+	      // This rule (or a variation on it) is probably available in
+	      //
+	      // A.H. Stroud, Approximate calculation of multiple integrals,
+	      // Prentice-Hall, Englewood Cliffs, N.J., 1971.
+	      //
+	      // though I have never actually seen a reference for it.
+	      // Luckily it's fairly easy to derive, which is what I've done
+	      // here [JWP].
+	      const Real
+		s=std::sqrt(1./3.),
+		t=std::sqrt(2./3.);
+	      
+	      const Real data[2][3] =
+		{
+		  {0.0,  s,  2.0},
+		  {  t, -s,  1.0}
+		};
+
+	      _points.resize(3);
+	      _weights.resize(3);
+
+	      wissmann_rule(data, 2);
+	      
+	      return;
+	    } // end case SECOND
+
+
+	    
 	  case FOURTH:
 	    {
 	      // A pair of degree=4 rules for the QUAD "C2" due to
