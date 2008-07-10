@@ -131,14 +131,14 @@ void EquationSystems::reinit ()
     const MeshBase::node_iterator node_end = _mesh.nodes_end();
 
     for ( ; node_it != node_end; ++node_it)
-      libmesh_assert((*node_it)->n_systems() == n_sys);
+      libmesh_assert((*node_it)->n_systems() == this->n_systems());
     
     // All the elements
     MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
     const MeshBase::element_iterator elem_end = _mesh.elements_end();
     
     for ( ; elem_it != elem_end; ++elem_it)
-      libmesh_assert((*elem_it)->n_systems() == n_sys);
+      libmesh_assert((*elem_it)->n_systems() == this->n_systems());
   }
 #endif
 
