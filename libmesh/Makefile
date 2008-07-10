@@ -210,13 +210,22 @@ doc:
 	@rm -rf doc/html/doxygen/formula.repository
 
 #
-# Upload the web page to sourceforge
+# Upload the web page to sourceforge.  We need a way to specify usernames
+# other than $USER when connecting to sourceforge servers... Please set the
+# environment variable: $LIBMESH_SVN_USER if your sourceforge username
+# is different than whatever $USER is.
 #
+ifeq (x$(LIBMESH_SVN_USER),x) #unset
+  upload_name=$(USER)@
+else
+  upload_name=$(LIBMESH_SVN_USER)@
+endif
+
 upload:
 	chmod -R g+w ./doc/html/* ./doc/latex/*/*
-	rsync -rltzve ssh ./doc/html/ libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
-	rsync -rltzve ssh ./doc/latex/howto libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
-	rsync -rltzve ssh ./doc/latex/xda_format libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+	rsync -rltzve ssh --exclude '.svn' ./doc/html/ $(upload_name)libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
+	rsync -rltzve ssh --exclude '.svn' ./doc/latex/howto $(upload_name)libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+	rsync -rltzve ssh --exclude '.svn' ./doc/latex/xda_format $(upload_name)libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
 	chmod -R g-w ./doc/html/* ./doc/latex/*/*
 
 
@@ -226,10 +235,11 @@ upload:
 #
 upload_test:
 	chmod -R g+w ./doc/html/* ./doc/latex/*/*
-	rsync -nrltzve ssh ./doc/html/ $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
-	rsync -nrltzve ssh ./doc/latex/howto $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
-	rsync -nrltzve ssh ./doc/latex/xda_format $(shell cat CVS/Root | cut -d"@" -f1 | cut -d":" -f3)@libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+	rsync -nrltzve ssh --exclude '.svn' ./doc/html/ $(upload_name)libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
+	rsync -nrltzve ssh --exclude '.svn' ./doc/latex/howto $(upload_name)libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+	rsync -nrltzve ssh --exclude '.svn' ./doc/latex/xda_format $(upload_name)libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
 	chmod -R g-w ./doc/html/* ./doc/latex/*/*
+
 
 #
 # Build and upload the documentation to sourceforge
