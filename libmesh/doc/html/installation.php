@@ -142,7 +142,7 @@ is configured simply type <code>make</code> to build the library. Typing
 The Makefiles distributed with the library look at the shell environment variable
 <code>METHOD</code> to determine what mode the library should be built in. Valid 
 values for <code>METHOD</code> are <code>opt</code> (optimized mode, the default 
-if <code>METHOD</code> is empty), <code>debug</code> (build with debug symbols), 
+if <code>METHOD</code> is empty), <code>dbg</code> (build with debug symbols), 
 and <code>pro</code> (build with profiling support for use with <code>gprof)</code>. 
 Once the library is configured you can build it simply by typing
 
