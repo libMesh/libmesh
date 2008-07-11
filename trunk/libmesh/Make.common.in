@@ -84,6 +84,7 @@ enable-gmv           = @enablegmv@
 enable-vtk           = @enablevtk@
 enable-exodus	     = @enableexodus@
 enable-netcdf	     = @enablenetcdf@
+enable-nemesis	     = @enablenemesis@
 enable-libhilbert    = @enablelibhilbert@
 
 #
@@ -335,6 +336,13 @@ ifeq ($(enable-optional),yes)
   ifeq ($(enable-netcdf),yes)
     libmesh_LIBS    += @NETCDF_LIBRARY@
     libmesh_INCLUDE += @NETCDF_INCLUDE@
+  endif
+
+  # if Nemesis is used we need the header path
+  # and the lib
+  ifeq ($(enable-nemesis),yes)
+    libmesh_LIBS    += @NEMESIS_LIBRARY@
+    libmesh_INCLUDE += @NEMESIS_INCLUDE@
   endif
 
   # if libHilbert is used we need the header path

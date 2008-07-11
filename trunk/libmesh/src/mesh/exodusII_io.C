@@ -822,7 +822,7 @@ namespace exII {
 
     check_err(ex_err, "Error retrieving header info.");
 
-    num_time_steps = inquire(EX_INQ_TIME, "Error retrieving time steps");
+    num_time_steps = inquire(exII::EX_INQ_TIME, "Error retrieving time steps");
 
     exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
 
@@ -928,7 +928,7 @@ namespace exII {
 	num_sides_per_set.resize(num_side_sets);
 	num_df_per_set.resize(num_side_sets);
   
-	req_info = EX_INQ_SS_ELEM_LEN; // Inquire about the length of the
+	req_info = exII::EX_INQ_SS_ELEM_LEN; // Inquire about the length of the
 	// concatenated side sets element list
 	ex_err = exII::ex_inquire(ex_id,
 				  req_info,

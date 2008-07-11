@@ -757,6 +757,9 @@ enablenetcdf
 EXODUS_INCLUDE
 EXODUS_LIBRARY
 enableexodus
+NEMESIS_INCLUDE
+NEMESIS_LIBRARY
+enablenemesis
 LIBHILBERT_INCLUDE
 LIBHILBERT_LIBRARY
 enablelibhilbert
@@ -1389,6 +1392,7 @@ Optional Features:
   --enable-vtk            build with VTK file I/O support
   --enable-netcdf         build with netCDF binary I/O
   --enable-exodus         build with ExodusII API support
+  --enable-nemesis        build with Nemesis API support
   --enable-libHilbert     build with Chris Hamilton's libHilbert
 
 Optional Packages:
@@ -13813,6 +13817,39 @@ echo "${ECHO_T}<<< Configuring library with Exodus API support >>>" >&6; }
 
 
 
+
+                         # Check whether --enable-nemesis was given.
+if test "${enable_nemesis+set}" = set; then
+  enableval=$enable_nemesis; enablenemesis=$enableval
+else
+  enablenemesis=yes
+fi
+
+
+     if (test "$enableexodus" != no -a "$have_netcdf" = yes -a "$enablenemesis" != no ) ; then
+
+
+  if (test $enablenetcdf = yes -a $enableexodus = yes -a $enablenemesis = yes); then
+     NEMESIS_INCLUDE="-I$PWD/contrib/nemesis/Lib"
+     NEMESIS_LIBRARY="\$(EXTERNAL_LIBDIR)/libnemesis\$(libext)"
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_NEMESIS_API 1
+_ACEOF
+
+     { echo "$as_me:$LINENO: result: <<< Configuring library with Nemesis API support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with Nemesis API support >>>" >&6; }
+  else
+     NEMESIS_INCLUDE=""
+     NEMESIS_LIBRARY=""
+     enablenemesis=no
+  fi
+
+
+
+
+
+     fi
    fi
    fi
 
@@ -14646,6 +14683,9 @@ enablenetcdf!$enablenetcdf$ac_delim
 EXODUS_INCLUDE!$EXODUS_INCLUDE$ac_delim
 EXODUS_LIBRARY!$EXODUS_LIBRARY$ac_delim
 enableexodus!$enableexodus$ac_delim
+NEMESIS_INCLUDE!$NEMESIS_INCLUDE$ac_delim
+NEMESIS_LIBRARY!$NEMESIS_LIBRARY$ac_delim
+enablenemesis!$enablenemesis$ac_delim
 LIBHILBERT_INCLUDE!$LIBHILBERT_INCLUDE$ac_delim
 LIBHILBERT_LIBRARY!$LIBHILBERT_LIBRARY$ac_delim
 enablelibhilbert!$enablelibhilbert$ac_delim
@@ -14654,7 +14694,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 53; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 56; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

@@ -53,19 +53,22 @@
 
 /*!
  * defines the number of attributes.
+ * \param   exoid           exodus file id
+ * \param   obj_type        block/set type (node, edge, face, elem)
+ * \param   obj_id          block/set id (ignored for NODAL)       
+ * \param   num_attrs       number of attributes
  */
 
 int ex_put_attr_param (int   exoid,
-		       int   obj_type,
+		       ex_entity_type obj_type,
 		       int   obj_id,
 		       int   num_attrs)
 {
+  int status;
   int dims[2];
-  int strdim;
+  int strdim, varid;
   
   char errmsg[MAX_ERR_LENGTH];
-  const char *tname;
-  const char *vobjids;
   const char *dnumobjent;
   const char *dnumobjatt;
   const char *vobjatt;
@@ -74,63 +77,23 @@ int ex_put_attr_param (int   exoid,
   int obj_id_ndx;
   int numattrdim;
   
-  switch (obj_type) {
-  case EX_NODE_SET:
-    tname = "node set";
-    vobjids = VAR_NS_IDS;
-    break;
-  case EX_EDGE_SET:
-    tname = "edge set";
-    vobjids = VAR_ES_IDS;
-    break;
-  case EX_FACE_SET:
-    tname = "face set";
-    vobjids = VAR_FS_IDS;
-    break;
-  case EX_ELEM_SET:
-    tname = "element set";
-    vobjids = VAR_ELS_IDS;
-    break;
-  case EX_NODAL:
-    tname = "node block";
-    break;
-  case EX_EDGE_BLOCK:
-    tname = "edge block";
-    vobjids = VAR_ID_ED_BLK;
-    break;
-  case EX_FACE_BLOCK:
-    tname = "face block";
-    vobjids = VAR_ID_FA_BLK;
-    break;
-  case EX_ELEM_BLOCK:
-    tname = "element block";
-    vobjids = VAR_ID_EL_BLK;
-    break;
-  default:
-    exerrval = EX_BADPARAM;
-    sprintf( errmsg, "Error: Invalid object type (%d) specified for file id %d",
-	     obj_type, exoid );
-    ex_err( "ex_put_attr_param", errmsg, exerrval );
-    return (EX_FATAL);
-  }
-
-  /* Determine index of obj_id in vobjids array */
+  /* Determine index of obj_id in obj_type id array */
   if (obj_type == EX_NODAL)
     obj_id_ndx = 0;
   else {
-    obj_id_ndx = ex_id_lkup(exoid,vobjids,obj_id);
+    obj_id_ndx = ex_id_lkup(exoid,obj_type,obj_id);
     
     if (exerrval != 0) {
       if (exerrval == EX_NULLENTITY) {
 	sprintf(errmsg,
 		"Warning: no attributes found for NULL %s %d in file id %d",
-		tname,obj_id,exoid);
+		ex_name_of_object(obj_type),obj_id,exoid);
 	ex_err("ex_put_attr_param",errmsg,EX_MSG);
 	return (EX_WARN);              /* no attributes for this object */
       } else {
 	sprintf(errmsg,
-		"Warning: failed to locate %s id %d in %s array in file id %d",
-		tname,obj_id,vobjids, exoid);
+		"Warning: failed to locate %s id %d in id array in file id %d",
+		ex_name_of_object(obj_type),obj_id, exoid);
 	ex_err("ex_put_attr_param",errmsg,exerrval);
 	return (EX_WARN);
       }
@@ -138,6 +101,12 @@ int ex_put_attr_param (int   exoid,
   }
 
   switch (obj_type) {
+  case EX_SIDE_SET:
+    dnumobjent = DIM_NUM_SIDE_SS(obj_id_ndx);
+    dnumobjatt = DIM_NUM_ATT_IN_SS(obj_id_ndx);
+    vobjatt = VAR_SSATTRIB(obj_id_ndx);
+    vattnam = VAR_NAME_SSATTRIB(obj_id_ndx);
+    break;
   case EX_NODE_SET:
     dnumobjent = DIM_NUM_NOD_NS(obj_id_ndx);
     dnumobjatt = DIM_NUM_ATT_IN_NS(obj_id_ndx);
@@ -196,28 +165,28 @@ int ex_put_attr_param (int   exoid,
 
   exerrval = 0; /* clear error code */
 
-  if ((numobjentdim = ncdimid (exoid, dnumobjent)) == -1) {
-    exerrval = ncerr;
+  if ((status = nc_inq_dimid(exoid, dnumobjent, &numobjentdim)) != NC_NOERR) {
+    exerrval = status;
     sprintf(errmsg,
 	    "Error: failed to locate number of entries for %s %d in file id %d",
-	    tname, obj_id, exoid);
+	    ex_name_of_object(obj_type), obj_id, exoid);
     ex_err("ex_put_attr_param",errmsg,exerrval);
     return (EX_FATAL);
   }
 
   /* put netcdf file into define mode  */
-  if (ncredef (exoid) == -1) {
-    exerrval = ncerr;
+  if ((status = nc_redef (exoid)) != NC_NOERR) {
+    exerrval = status;
     sprintf(errmsg,"Error: failed to place file id %d into define mode",exoid);
     ex_err("ex_put_attr_param",errmsg,exerrval);
     return (EX_FATAL);
   }
   
-  if ((numattrdim = ncdimdef (exoid, dnumobjatt, (long)num_attrs)) == -1) {
-    exerrval = ncerr;
+  if ((status = nc_def_dim(exoid, dnumobjatt, num_attrs, &numattrdim)) != NC_NOERR) {
+    exerrval = status;
     sprintf(errmsg,
 	    "Error: failed to define number of attributes in %s %d in file id %d",
-	    tname, obj_id,exoid);
+	    ex_name_of_object(obj_type), obj_id,exoid);
     ex_err("ex_put_attr_param",errmsg,exerrval);
     goto error_ret;         /* exit define mode and return */
   }
@@ -225,18 +194,18 @@ int ex_put_attr_param (int   exoid,
   dims[0] = numobjentdim;
   dims[1] = numattrdim;
   
-  if ((ncvardef (exoid, vobjatt, nc_flt_code(exoid), 2, dims)) == -1) {
-    exerrval = ncerr;
+  if ((status = nc_def_var(exoid, vobjatt, nc_flt_code(exoid), 2, dims, &varid)) != NC_NOERR) {
+    exerrval = status;
     sprintf(errmsg,
 	    "Error:  failed to define attributes for %s %d in file id %d",
-	    tname, obj_id,exoid);
+	    ex_name_of_object(obj_type), obj_id,exoid);
     ex_err("ex_put_attr_param",errmsg,exerrval);
     goto error_ret;         /* exit define mode and return */
   }
   
   /* inquire previously defined dimensions  */
-  if ((strdim = ncdimid (exoid, DIM_STR)) < 0) {
-    exerrval = ncerr;
+  if ((status = nc_inq_dimid(exoid, DIM_STR, &strdim)) != NC_NOERR) {
+    exerrval = status;
     sprintf(errmsg,
 	    "Error: failed to get string length in file id %d",exoid);
     ex_err("ex_put_attr_param",errmsg,exerrval);
@@ -247,21 +216,21 @@ int ex_put_attr_param (int   exoid,
   dims[0] = numattrdim;
   dims[1] = strdim;
 
-  if (ncvardef (exoid, vattnam, NC_CHAR, 2, dims) == -1) {
-    exerrval = ncerr;
+  if ((status = nc_def_var(exoid, vattnam, NC_CHAR, 2, dims, &varid)) != NC_NOERR) {
+    exerrval = status;
     sprintf(errmsg,
 	    "Error: failed to define %s attribute name array in file id %d",
-	    tname, exoid);
+	    ex_name_of_object(obj_type), exoid);
     ex_err("ex_put_attr_param",errmsg,exerrval);
     goto error_ret;         /* exit define mode and return */
   }
 
   /* leave define mode  */
-  if (ncendef (exoid) == -1) {
-    exerrval = ncerr;
+  if ((status = nc_enddef(exoid)) != NC_NOERR) {
+    exerrval = status;
     sprintf(errmsg,
 	    "Error: failed to complete %s attribute parameter definition in file id %d",
-	    tname, exoid);
+	    ex_name_of_object(obj_type), exoid);
     ex_err("ex_put_attr_param",errmsg,exerrval);
     return (EX_FATAL);
   }
@@ -270,7 +239,7 @@ int ex_put_attr_param (int   exoid,
 
   /* Fatal error: exit definition mode and return */
  error_ret:
-  if (ncendef (exoid) == -1) {     /* exit define mode */       
+  if (nc_enddef (exoid) != NC_NOERR) {     /* exit define mode */       
     sprintf(errmsg,
 	    "Error: failed to complete definition for file id %d",
 	    exoid);

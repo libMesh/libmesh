@@ -55,6 +55,10 @@
 
 /*!
  * writes the distribution factors for a single side set
+ * \param       exoid                   exodus file id
+ * \param       side_set_id             side set id
+ * \param      *side_set_dist_fact      array of dist factors for side set
+ * \deprecated Use ex_put_set_dist_fact()(exoid, EX_SIDE_SET, side_set_id, side_set_dist_fact)
  */
 
 int ex_put_side_set_dist_fact (int   exoid,

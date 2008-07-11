@@ -57,6 +57,7 @@
 
 /*!
  * reads the side set element list and side set side list for a single side set
+ * \deprecated Use ex_get_set()(exoid, EX_SIDE_SET, side_set_id, side_set_elem_list, side_set_side_list)
  */
 
 int ex_get_side_set (int   exoid,

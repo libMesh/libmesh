@@ -60,9 +60,18 @@
 #include "exodusII_int.h"
 #include <string.h>
 
-/*
+/*!
  * reads the initialization parameters from an opened EXODUS II file
- */
+ * \param exoid exodus file id
+ * \param[out] title             Title of the mesh, String length may be up to #MAX_LINE_LENGTH characters.
+ * \param[out] num_dim           Dimensionality of the database. This is the number of coordinates per node.
+ * \param[out] num_nodes         Number of nodes
+ * \param[out] num_elem          Number of elements
+ * \param[out] num_elem_blk      Number of element blocks
+ * \param[out] num_node_sets     Number of node sets
+ * \param[out] num_side_sets     Number of side sets
+ * \sa ex_get_init_ext()
+  */
 
 int ex_get_init (int   exoid,
                  char *title,

@@ -51,8 +51,9 @@
 #include "exodusII.h"
 #include "exodusII_int.h"
 
-/*
+/*!
  * reads the attribute names for an element block
+ * \deprecated Use ex_get_attr_names()(exoid, EX_ELEM_BLOCK, elem_blk_id, names) instead
  */
 int ex_get_elem_attr_names (int   exoid,
                             int   elem_blk_id,

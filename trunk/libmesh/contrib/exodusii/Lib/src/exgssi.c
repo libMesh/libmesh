@@ -49,12 +49,12 @@
 *
 *****************************************************************************/
 
-#include <stdlib.h>
 #include "exodusII.h"
 #include "exodusII_int.h"
 
 /*!
  *  reads the side set ids from the database
+ * \deprecated Use ex_get_ids()(exoid, EX_SIDE_SET, ids)
  */
 
 int ex_get_side_set_ids (int  exoid,

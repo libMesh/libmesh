@@ -53,15 +53,16 @@
 #include "exodusII.h"
 #include "exodusII_int.h"
 
-/*
+/*!
  *  reads the element order map from the database
+ * \deprecated Use ex_get_num_map() instead.
  */
 
 int ex_get_map (int  exoid,
                 int *elem_map)
 {
-   int numelemdim, mapid, i, iresult;
-   long num_elem,  start[1], count[1]; 
+   int numelemdim, mapid, i, status;
+   size_t num_elem;
    char errmsg[MAX_ERR_LENGTH];
 
    exerrval = 0; /* clear error code */
@@ -69,14 +70,12 @@ int ex_get_map (int  exoid,
 /* inquire id's of previously defined dimensions and variables  */
 
    /* See if file contains any elements...*/
-   if ((numelemdim = ncdimid (exoid, DIM_NUM_ELEM)) == -1)
-   {
+   if ((status = nc_inq_dimid (exoid, DIM_NUM_ELEM, &numelemdim)) != NC_NOERR) {
      return (EX_NOERR);
    }
 
-   if (ncdiminq (exoid, numelemdim, (char *) 0, &num_elem) == -1)
-   {
-     exerrval = ncerr;
+   if ((status = nc_inq_dimlen(exoid, numelemdim, &num_elem)) != NC_NOERR) {
+     exerrval = status;
      sprintf(errmsg,
             "Error: failed to get number of elements in file id %d",
              exoid);
@@ -85,8 +84,7 @@ int ex_get_map (int  exoid,
    }
 
 
-   if ((mapid = ncvarid (exoid, VAR_MAP)) == -1)
-   {
+   if (nc_inq_varid(exoid, VAR_MAP, &mapid) != NC_NOERR) {
      /* generate default map of 1..n, where n is num_elem */
      for (i=0; i<num_elem; i++)
        elem_map[i] = i+1;
@@ -95,13 +93,10 @@ int ex_get_map (int  exoid,
    }
 
    /* read in the element order map  */
-   start[0] = 0;
-   count[0] = num_elem;
+   status = nc_get_var_int(exoid, mapid, elem_map);
 
-   iresult = ncvarget (exoid, mapid, start, count, elem_map);
-   if (iresult == -1)
-   {
-     exerrval = ncerr;
+   if (status != NC_NOERR) {
+     exerrval = status;
      sprintf(errmsg,
             "Error: failed to get element order map in file id %d",
              exoid);

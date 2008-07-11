@@ -50,8 +50,9 @@
 #include "exodusII.h"
 #include "exodusII_int.h"
 
-/*
+/*!
  * reads the element map with specified ID
+ * \deprecated Use ex_get_num_map()(exoid, EX_ELEM_MAP, map_id, elem_map) instead
  */
 
 int ex_get_elem_map (int   exoid,

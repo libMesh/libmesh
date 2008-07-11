@@ -46,6 +46,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "exodusII.h"
 #include "exodusII_int.h"
 
@@ -79,6 +80,7 @@ struct obj_stats*  exoII_nm = 0;
 static char ret_string[10*(MAX_VAR_NAME_LENGTH+1)];
 static char* cur_string = &ret_string[0];
 
+/** ex_catstr  - concatenate  string/number (where number is converted to ASCII) */
 char *ex_catstr (const char *string,
                  int   num)
 {
@@ -90,6 +92,7 @@ char *ex_catstr (const char *string,
 }
 
 
+/** ex_catstr2 - concatenate  string1num1string2num2   */
 char *ex_catstr2 (const char *string1,
                   int   num1,
                   const char *string2,
@@ -102,10 +105,118 @@ char *ex_catstr2 (const char *string1,
   return (tmp_string);
 }
 
-char* ex_dim_num_entries_in_object( int obj_type,
+char* ex_name_of_object(ex_entity_type obj_type)
+{
+  switch (obj_type) {
+  case EX_NODAL:
+    return "nodal";
+  case EX_EDGE_BLOCK:
+    return "edge block";
+  case EX_FACE_BLOCK:
+    return "face block";
+  case EX_ELEM_BLOCK:
+    return "element block";
+  case EX_NODE_SET:
+    return "node set";
+  case EX_EDGE_SET:
+    return "edge set";
+  case EX_FACE_SET:
+    return "face set";
+  case EX_SIDE_SET:
+    return "side set";
+  case EX_ELEM_SET:
+    return "element set";
+  case EX_ELEM_MAP:
+    return "element map";
+  case EX_NODE_MAP:
+    return "node map";
+  case EX_EDGE_MAP:
+    return "edge map";
+  case EX_FACE_MAP:
+    return "face map";
+  case EX_GLOBAL:
+    return "global";
+  default:
+    return "invalid type";
+  }
+}
+
+ex_entity_type ex_var_type_to_ex_entity_type(char var_type)
+{
+  char var_lower = tolower(var_type);
+  if (var_lower == 'n')
+    return EX_NODAL;
+  else if (var_lower == 'l')
+    return EX_EDGE_BLOCK;
+  else if (var_lower == 'f')
+    return EX_FACE_BLOCK;
+  else if (var_lower == 'e')
+    return EX_ELEM_BLOCK;
+  else if (var_lower == 'm')
+    return EX_NODE_SET;
+  else if (var_lower == 'd')
+    return EX_EDGE_SET;
+  else if (var_lower == 'a')
+    return EX_FACE_SET;
+  else if (var_lower == 's')
+    return EX_SIDE_SET;
+  else if (var_lower == 't')
+    return EX_ELEM_SET;
+  else if (var_lower == 'g')
+    return EX_GLOBAL;
+  else
+    return EX_INVALID;
+}
+
+char* ex_dim_num_objects(ex_entity_type obj_type)
+{
+   exerrval = 0; /* clear error code */
+   switch (obj_type)
+   {
+     case EX_NODAL:
+       return DIM_NUM_NODES;
+     case EX_ELEM_BLOCK:
+       return DIM_NUM_EL_BLK;
+     case EX_EDGE_BLOCK:
+       return DIM_NUM_ED_BLK;
+     case EX_FACE_BLOCK:
+       return DIM_NUM_FA_BLK;
+     case EX_NODE_SET:
+       return DIM_NUM_NS;
+     case EX_EDGE_SET:
+       return DIM_NUM_ES;
+     case EX_FACE_SET:
+       return DIM_NUM_FS;
+     case EX_ELEM_SET:
+       return DIM_NUM_ELS;
+     case EX_SIDE_SET:
+       return DIM_NUM_SS;
+     case EX_ELEM_MAP:
+       return DIM_NUM_EM;
+     case EX_FACE_MAP:
+       return DIM_NUM_FAM;
+     case EX_EDGE_MAP:
+       return DIM_NUM_EDM;
+     case EX_NODE_MAP:
+       return DIM_NUM_NM;
+     default:
+       {
+	 char errmsg[MAX_ERR_LENGTH];
+	 exerrval = EX_BADPARAM;
+	 sprintf(errmsg, "Error: object type %d not supported in call to ex_dim_num_objects",
+		 obj_type);
+	 ex_err("ex_dim_num_objects",errmsg,exerrval);
+	 return (NULL);
+       }
+   }
+}
+
+char* ex_dim_num_entries_in_object( ex_entity_type obj_type,
                                     int idx )
 {
   switch (obj_type) {
+  case EX_NODAL:
+    return DIM_NUM_NODES;
   case EX_EDGE_BLOCK:
     return DIM_NUM_ED_IN_EBLK(idx);
   case EX_FACE_BLOCK:
@@ -127,9 +238,8 @@ char* ex_dim_num_entries_in_object( int obj_type,
   }
 }
 
-char* ex_name_var_of_object( int obj_type,
-                             int i,
-                             int j )
+char* ex_name_var_of_object(ex_entity_type obj_type,
+			    int i, int j)
 {
   switch (obj_type) {
   case EX_EDGE_BLOCK:
@@ -153,7 +263,7 @@ char* ex_name_var_of_object( int obj_type,
   }
 }
 
-char* ex_name_of_map( int map_type, int map_index )
+char* ex_name_of_map(ex_entity_type map_type, int map_index)
 {
   switch (map_type) {
   case EX_NODE_MAP:
@@ -175,8 +285,8 @@ char* ex_name_of_map( int map_type, int map_index )
 *
 * entry conditions - 
 *   input parameters:
-*       int     exoid                   exodus file id
-*       char*   id_type                 id type name:
+*       int            exoid             exodus file id
+*       ex_entity_type id_type           id type name:
 *                                         elem_ss
 *                                         node_ns
 *                                         side_ss
@@ -191,117 +301,106 @@ char* ex_name_of_map( int map_type, int map_index )
 *****************************************************************************/
 
 int ex_id_lkup( int exoid,
-                const char *id_type,
+                ex_entity_type id_type,
                 int num)
 {
 
   char id_table[MAX_VAR_NAME_LENGTH+1];
   char id_dim[MAX_VAR_NAME_LENGTH+1];
   char stat_table[MAX_VAR_NAME_LENGTH+1];
-  char idtyp[MAX_VAR_NAME_LENGTH+1];
   int varid, dimid, i;
-  long dim_len, start[2], count[2];
+  size_t dim_len;
   int *id_vals=NULL, *stat_vals=NULL;
 
   static int filled=FALSE;
   struct obj_stats *tmp_stats;
-
-   char errmsg[MAX_ERR_LENGTH];
+  int status;
+  char errmsg[MAX_ERR_LENGTH];
 
   exerrval  = 0; /* clear error code */
 
-  strcpy(idtyp,id_type);
-
-  if (strcmp(idtyp,VAR_ID_EL_BLK) == 0)
-  {
+  switch(id_type) {
+  case EX_NODAL:
+    return 0;
+  case EX_GLOBAL:
+    return 0;
+  case EX_ELEM_BLOCK:
     strcpy(id_table, VAR_ID_EL_BLK);            /* id array name */
     strcpy(id_dim, DIM_NUM_EL_BLK);             /* id array dimension name*/
     strcpy(stat_table, VAR_STAT_EL_BLK);        /* id status array name */
-    tmp_stats = get_stat_ptr (exoid, &exoII_eb);
-  }
-  else if (strcmp(idtyp,VAR_NS_IDS) == 0)
-  {
+    tmp_stats = ex_get_stat_ptr (exoid, &exoII_eb);
+    break;
+  case EX_NODE_SET:
     strcpy(id_table, VAR_NS_IDS);
     strcpy(id_dim, DIM_NUM_NS);
     strcpy(stat_table, VAR_NS_STAT);
-    tmp_stats = get_stat_ptr (exoid, &exoII_ns);
-  }
-  else if (strcmp(idtyp,VAR_SS_IDS) == 0)
-  {
+    tmp_stats = ex_get_stat_ptr (exoid, &exoII_ns);
+    break;
+  case EX_SIDE_SET:
     strcpy(id_table, VAR_SS_IDS);
     strcpy(id_dim, DIM_NUM_SS);
     strcpy(stat_table, VAR_SS_STAT);
-    tmp_stats = get_stat_ptr (exoid, &exoII_ss);
-  }
-  else if (strcmp(idtyp,VAR_EM_PROP(1)) == 0)
-  {
+    tmp_stats = ex_get_stat_ptr (exoid, &exoII_ss);
+    break;
+  case EX_ELEM_MAP:
     strcpy(id_table, VAR_EM_PROP(1));
     strcpy(id_dim, DIM_NUM_EM);
     strcpy(stat_table, "");
-    tmp_stats = get_stat_ptr (exoid, &exoII_em);
-  }
-  else if (strcmp(idtyp,VAR_NM_PROP(1)) == 0)
-  {
+    tmp_stats = ex_get_stat_ptr (exoid, &exoII_em);
+    break;
+  case EX_NODE_MAP:
     strcpy(id_table, VAR_NM_PROP(1));
     strcpy(id_dim, DIM_NUM_NM);
     strcpy(stat_table, "");
-    tmp_stats = get_stat_ptr (exoid, &exoII_nm);
-  }
-  else if (strcmp(idtyp,VAR_ID_ED_BLK) == 0)
-  {
+    tmp_stats = ex_get_stat_ptr (exoid, &exoII_nm);
+    break;
+  case EX_EDGE_BLOCK:
     strcpy(id_table, VAR_ID_ED_BLK);
     strcpy(id_dim, DIM_NUM_ED_BLK);
     strcpy(stat_table, VAR_STAT_ED_BLK);
-    tmp_stats = get_stat_ptr (exoid, &exoII_ed);
-  }
-  else if (strcmp(idtyp,VAR_ID_FA_BLK) == 0)
-  {
+    tmp_stats = ex_get_stat_ptr (exoid, &exoII_ed);
+    break;
+  case EX_FACE_BLOCK:
     strcpy(id_table, VAR_ID_FA_BLK);
     strcpy(id_dim, DIM_NUM_FA_BLK);
     strcpy(stat_table, VAR_STAT_FA_BLK);
-    tmp_stats = get_stat_ptr (exoid, &exoII_fa);
-  }
-  else if (strcmp(idtyp,VAR_ES_IDS) == 0)
-  {
+    tmp_stats = ex_get_stat_ptr (exoid, &exoII_fa);
+    break;
+  case EX_EDGE_SET:
     strcpy(id_table, VAR_ES_IDS);
     strcpy(id_dim, DIM_NUM_ES);
     strcpy(stat_table, VAR_ES_STAT);
-    tmp_stats = get_stat_ptr (exoid, &exoII_es);
-  }
-  else if (strcmp(idtyp,VAR_FS_IDS) == 0)
-  {
+    tmp_stats = ex_get_stat_ptr (exoid, &exoII_es);
+    break;
+  case EX_FACE_SET:
     strcpy(id_table, VAR_FS_IDS);
     strcpy(id_dim, DIM_NUM_FS);
     strcpy(stat_table, VAR_FS_STAT);
-    tmp_stats = get_stat_ptr (exoid, &exoII_fs);
-  }
-  else if (strcmp(idtyp,VAR_ELS_IDS) == 0)
-  {
+    tmp_stats = ex_get_stat_ptr (exoid, &exoII_fs);
+    break;
+  case EX_ELEM_SET:
     strcpy(id_table, VAR_ELS_IDS);
     strcpy(id_dim, DIM_NUM_ELS);
     strcpy(stat_table, VAR_ELS_STAT);
-    tmp_stats = get_stat_ptr (exoid, &exoII_els);
-  }
-  else if (strcmp(idtyp,VAR_EDM_PROP(1)) == 0)
-  {
+    tmp_stats = ex_get_stat_ptr (exoid, &exoII_els);
+    break;
+  case EX_EDGE_MAP:
     strcpy(id_table, VAR_EDM_PROP(1));
     strcpy(id_dim, DIM_NUM_EDM);
     strcpy(stat_table, "");
-    tmp_stats = get_stat_ptr (exoid, &exoII_edm);
-  }
-  else if (strcmp(idtyp,VAR_FAM_PROP(1)) == 0)
-  {
+    tmp_stats = ex_get_stat_ptr (exoid, &exoII_edm);
+    break;
+  case EX_FACE_MAP:
     strcpy(id_table, VAR_FAM_PROP(1));
     strcpy(id_dim, DIM_NUM_FAM);
     strcpy(stat_table, "");
-    tmp_stats = get_stat_ptr (exoid, &exoII_fam);
-  }
-  else
-  {
+    tmp_stats = ex_get_stat_ptr (exoid, &exoII_fam);
+    break;
+  default:
     exerrval = EX_BADPARAM;
     sprintf(errmsg,
-           "Error: unsupported id array type %s for file id %d",
-            idtyp, exoid);
+           "Error: unsupported id array type %d for file id %d",
+            id_type, exoid);
     ex_err("ex_id_lkup",errmsg,exerrval);
     return (EX_FATAL);
   }
@@ -313,9 +412,8 @@ int ex_id_lkup( int exoid,
     /* get size of id array */
 
     /* First get dimension id of id array */
-    if ((dimid = ncdimid(exoid,id_dim)) == -1)
-    {
-      exerrval = ncerr;
+    if ((status = nc_inq_dimid(exoid,id_dim,&dimid)) != NC_NOERR) {
+      exerrval = status;
       sprintf(errmsg,
            "Error: failed to locate id array dimension in file id %d",
             exoid);
@@ -325,9 +423,8 @@ int ex_id_lkup( int exoid,
 
 
     /* Next get value of dimension */ 
-    if (ncdiminq (exoid,dimid,(char *) 0,&dim_len) == -1)
-    {
-      exerrval = ncerr;
+    if ((status = nc_inq_dimlen(exoid,dimid,&dim_len)) != NC_NOERR) {
+      exerrval = status;
       sprintf(errmsg,
            "Error: failed to locate %s array length in file id %d",
             id_table,exoid);
@@ -336,9 +433,8 @@ int ex_id_lkup( int exoid,
     }
 
     /* get variable id of id array */
-    if ((varid = ncvarid (exoid, id_table)) == -1)
-    {
-      exerrval = ncerr;
+    if ((status = nc_inq_varid (exoid, id_table, &varid)) != NC_NOERR) {
+      exerrval = status;
       sprintf(errmsg,
              "Error: failed to locate %s array in file id %d",
               id_table, exoid);
@@ -347,8 +443,7 @@ int ex_id_lkup( int exoid,
     }
 
     /* allocate space for id array */
-    if (!(id_vals = malloc((int)dim_len*sizeof(int))))
-    {
+    if (!(id_vals = malloc((int)dim_len*sizeof(int)))) {
       exerrval = EX_MEMFAIL;
       sprintf(errmsg,
              "Error: failed to allocate memory for %s array for file id %d",
@@ -357,15 +452,8 @@ int ex_id_lkup( int exoid,
       return (EX_FATAL);
     }
 
-    start[0] = 0;
-    start[1] = 0;
-    count[0] = dim_len;
-    count[1] = 0;
-
-
-    if (ncvarget (exoid, varid, start, count, (void *)id_vals) == -1)
-    {
-      exerrval = ncerr;
+    if ((status = nc_get_var_int (exoid, varid, id_vals)) != NC_NOERR) {
+      exerrval = status;
       sprintf(errmsg,
              "Error: failed to get %s array from file id %d",
               id_table,exoid);
@@ -376,8 +464,7 @@ int ex_id_lkup( int exoid,
 
     /* check if values in stored arrays are filled with non-zeroes */
     filled = TRUE;
-    for (i=0;i<dim_len;i++)
-    {
+    for (i=0;i<dim_len;i++) {
       if (id_vals[i] == 0 || id_vals[i] == NC_FILL_INT) {
         filled = FALSE;
         break; /* id array hasn't been completely filled with valid ids yet */
@@ -398,8 +485,7 @@ int ex_id_lkup( int exoid,
   /* Do a linear search through the id array to find the array value
      corresponding to the passed index number */
 
-  for (i=0;i<dim_len;i++)
-  {
+  for (i=0;i<dim_len;i++) {
     if (id_vals[i] == num)
       break; /* found the id requested */
   }
@@ -415,8 +501,7 @@ int ex_id_lkup( int exoid,
   /* Now check status array to see if object is null */
 
   /* get variable id of status array */
-  if ((varid = ncvarid (exoid, stat_table)) != -1)
-  {
+  if (nc_inq_varid (exoid, stat_table, &varid) == NC_NOERR) {
     /* if status array exists, use it, otherwise assume object exists 
        to be backward compatible */
 
@@ -425,8 +510,7 @@ int ex_id_lkup( int exoid,
 
       /* allocate space for new status array */
 
-      if (!(stat_vals = malloc((int)dim_len*sizeof(int))))
-      {
+      if (!(stat_vals = malloc((int)dim_len*sizeof(int)))) {
         exerrval = EX_MEMFAIL;
         sprintf(errmsg,
                  "Error: failed to allocate memory for %s array for file id %d",
@@ -435,14 +519,8 @@ int ex_id_lkup( int exoid,
         return (EX_FATAL);
       }
 
-      start[0] = 0;
-      start[1] = 0;
-      count[0] = dim_len;
-      count[1] = 0;
-
-      if (ncvarget (exoid, varid, start, count, (void *)stat_vals) == -1)
-      {
-        exerrval = ncerr;
+      if ((status = nc_get_var_int (exoid, varid, stat_vals)) != NC_NOERR) {
+        exerrval = status;
         free(stat_vals);
         sprintf(errmsg,
                "Error: failed to get %s array from file id %d",
@@ -461,8 +539,7 @@ int ex_id_lkup( int exoid,
       stat_vals = tmp_stats->stat_vals;
     }
 
-    if (stat_vals[i] == 0) /* is this object null? */
-    {
+    if (stat_vals[i] == 0) /* is this object null? */ {
       exerrval =  EX_NULLENTITY;
       if ( !(tmp_stats->valid_stat) ) {
         free (stat_vals);
@@ -482,19 +559,19 @@ int ex_id_lkup( int exoid,
 
 /******************************************************************************
 *
-* get_stat_ptr - returns a pointer to a structure of object ids
+* ex_get_stat_ptr - returns a pointer to a structure of object ids
 *
 * revision history - 
 *
 *
 *****************************************************************************/
 
-/* this routine returns a pointer to a structure containing the ids of 
+/*! this routine returns a pointer to a structure containing the ids of 
  * element blocks, node sets, or side sets according to exoid;  if there
  * is not a structure that matches the exoid, one is created
  */
 
-struct obj_stats *get_stat_ptr (int exoid, struct obj_stats **obj_ptr)
+struct obj_stats *ex_get_stat_ptr (int exoid, struct obj_stats **obj_ptr)
 
 {
   struct obj_stats *tmp_ptr;
@@ -525,20 +602,20 @@ struct obj_stats *get_stat_ptr (int exoid, struct obj_stats **obj_ptr)
 
 /******************************************************************************
 *
-* rm_stat_ptr - removes a pointer to a structure of object ids
+* ex_rm_stat_ptr - removes a pointer to a structure of object ids
 *
 * revision history - 
 *
 *
 *****************************************************************************/
 
-/* this routine removes a pointer to a structure containing the ids of 
+/*! this routine removes a pointer to a structure containing the ids of 
  * element blocks, node sets, or side sets according to exoid;  this
  * is necessary to clean up because netCDF reuses file ids;  should be
  * called from ex_close
  */
 
-void rm_stat_ptr (int exoid, struct obj_stats **obj_ptr)
+void ex_rm_stat_ptr (int exoid, struct obj_stats **obj_ptr)
 
 {
   struct obj_stats *last_head_list_ptr, *tmp_ptr;
@@ -565,6 +642,55 @@ void rm_stat_ptr (int exoid, struct obj_stats **obj_ptr)
     tmp_ptr = tmp_ptr->next;            /* Loop back if not */
   }
 }
+
+/* structures to hold number of blocks of that type for each file id */ 
+static struct list_item*  ed_ctr_list = 0; /* edge blocks */
+static struct list_item*  fa_ctr_list = 0; /* face blocks */
+static struct list_item*  eb_ctr_list = 0; /* element blocks */
+/* structures to hold number of sets of that type for each file id */ 
+static struct list_item*  ns_ctr_list = 0; /* node sets */
+static struct list_item*  es_ctr_list = 0; /* edge sets */
+static struct list_item*  fs_ctr_list = 0; /* face sets */
+static struct list_item*  ss_ctr_list = 0; /* side sets */
+static struct list_item* els_ctr_list = 0; /* element sets */
+/* structures to hold number of maps of that type for each file id */ 
+static struct list_item*  nm_ctr_list = 0; /* node maps */
+static struct list_item* edm_ctr_list = 0; /* edge maps */
+static struct list_item* fam_ctr_list = 0; /* face maps */
+static struct list_item*  em_ctr_list = 0; /* element maps */
+
+struct list_item** ex_get_counter_list(ex_entity_type obj_type)
+{
+  switch(obj_type) {
+  case EX_ELEM_BLOCK:
+    return &eb_ctr_list;
+  case EX_NODE_SET:
+    return &ns_ctr_list;
+  case EX_SIDE_SET:
+    return &ss_ctr_list;
+  case EX_ELEM_MAP:
+    return &em_ctr_list;
+  case EX_NODE_MAP:
+    return &nm_ctr_list;
+  case EX_EDGE_BLOCK:
+    return &ed_ctr_list;
+  case EX_FACE_BLOCK:
+    return &fa_ctr_list;
+  case EX_EDGE_SET:
+    return &es_ctr_list;
+  case EX_FACE_SET:
+    return &fs_ctr_list;
+  case EX_ELEM_SET:
+    return &els_ctr_list;
+  case EX_EDGE_MAP:
+    return &edm_ctr_list;
+  case EX_FACE_MAP:
+    return &fam_ctr_list;
+  default:
+    return (NULL);
+  }
+}
+
 /******************************************************************************
 *
 * ex_inc_file_item - increment file item
@@ -572,7 +698,7 @@ void rm_stat_ptr (int exoid, struct obj_stats **obj_ptr)
 *****************************************************************************/
 
 
-/* this routine sets up a structure to track and increment a counter for
+/*! this routine sets up a structure to track and increment a counter for
  * each open exodus file.  it is designed to be used by the routines
  * ex_put_elem_block() and ex_put_set_param(),
  * to keep track of the number of element blocks, and each type of set,
@@ -634,7 +760,7 @@ int ex_inc_file_item( int exoid,                /* file id */
 *****************************************************************************/
 
 
-/* this routine accesses a structure to track and increment a counter for
+/*! this routine accesses a structure to track and increment a counter for
  * each open exodus file.  it is designed to be used by the routines
  * ex_put_elem_block(), and ex_put_set_param(),
  * to get the number of element blocks, or a type of set,
@@ -690,7 +816,7 @@ int ex_get_file_item( int exoid,                /* file id */
 *****************************************************************************/
 
 
-/* this routine removes a structure to track and increment a counter for
+/*! this routine removes a structure to track and increment a counter for
  * each open exodus file.
  *
  * The list structure is used as follows:
@@ -751,70 +877,74 @@ void ex_rm_file_item( int exoid,                /* file id */
 *
 *
 *****************************************************************************/
-int ex_get_num_props (int exoid, int obj_type)
+int ex_get_num_props (int exoid, ex_entity_type obj_type)
 {
-   int cntr;
-   char var_name[MAX_VAR_NAME_LENGTH+1];
-   char  errmsg[MAX_ERR_LENGTH];
+  int cntr, varid;
+  char var_name[MAX_VAR_NAME_LENGTH+1];
+  char  errmsg[MAX_ERR_LENGTH];
 
-   cntr = 0;
+  cntr = 0;
 
-/* loop until there is not a property variable defined; the name of */
-/* the variables begin with an increment of 1 ("xx_prop1") so use cntr+1 */
+  /* loop until there is not a property variable defined; the name of */
+  /* the variables begin with an increment of 1 ("xx_prop1") so use cntr+1 */
 
-   while (TRUE)
-   {
-     switch (obj_type)
-     {
-       case EX_ELEM_BLOCK:
-         strcpy (var_name, VAR_EB_PROP(cntr+1));
-         break;
-       case EX_EDGE_BLOCK:
-         strcpy (var_name, VAR_ED_PROP(cntr+1));
-         break;
-       case EX_FACE_BLOCK:
-         strcpy (var_name, VAR_FA_PROP(cntr+1));
-         break;
-       case EX_NODE_SET:
-         strcpy (var_name, VAR_NS_PROP(cntr+1));
-         break;
-       case EX_EDGE_SET:
-         strcpy (var_name, VAR_ES_PROP(cntr+1));
-         break;
-       case EX_FACE_SET:
-         strcpy (var_name, VAR_FS_PROP(cntr+1));
-         break;
-       case EX_SIDE_SET:
-         strcpy (var_name, VAR_SS_PROP(cntr+1));
-         break;
-       case EX_ELEM_SET:
-         strcpy (var_name, VAR_ELS_PROP(cntr+1));
-         break;
-       case EX_ELEM_MAP:
-         strcpy (var_name, VAR_EM_PROP(cntr+1));
-         break;
-       case EX_NODE_MAP:
-         strcpy (var_name, VAR_NM_PROP(cntr+1));
-         break;
-       default:
-         exerrval = EX_BADPARAM;
-         sprintf(errmsg, "Error: object type %d not supported; file id %d",
-           obj_type, exoid);
-         ex_err("ex_get_prop_names",errmsg,exerrval);
-         return(EX_FATAL);
-     }
+  while (TRUE)
+    {
+      switch (obj_type)
+	{
+	case EX_ELEM_BLOCK:
+	  strcpy (var_name, VAR_EB_PROP(cntr+1));
+	  break;
+	case EX_EDGE_BLOCK:
+	  strcpy (var_name, VAR_ED_PROP(cntr+1));
+	  break;
+	case EX_FACE_BLOCK:
+	  strcpy (var_name, VAR_FA_PROP(cntr+1));
+	  break;
+	case EX_NODE_SET:
+	  strcpy (var_name, VAR_NS_PROP(cntr+1));
+	  break;
+	case EX_EDGE_SET:
+	  strcpy (var_name, VAR_ES_PROP(cntr+1));
+	  break;
+	case EX_FACE_SET:
+	  strcpy (var_name, VAR_FS_PROP(cntr+1));
+	  break;
+	case EX_SIDE_SET:
+	  strcpy (var_name, VAR_SS_PROP(cntr+1));
+	  break;
+	case EX_ELEM_SET:
+	  strcpy (var_name, VAR_ELS_PROP(cntr+1));
+	  break;
+	case EX_ELEM_MAP:
+	  strcpy (var_name, VAR_EM_PROP(cntr+1));
+	  break;
+	case EX_FACE_MAP:
+	  strcpy (var_name, VAR_FAM_PROP(cntr+1));
+	  break;
+	case EX_EDGE_MAP:
+	  strcpy (var_name, VAR_EDM_PROP(cntr+1));
+	  break;
+	case EX_NODE_MAP:
+	  strcpy (var_name, VAR_NM_PROP(cntr+1));
+	  break;
+	default:
+	  exerrval = EX_BADPARAM;
+	  sprintf(errmsg, "Error: object type %d not supported; file id %d",
+		  obj_type, exoid);
+	  ex_err("ex_get_prop_names",errmsg,exerrval);
+	  return(EX_FATAL);
+	}
 
-     if ((ncvarid (exoid, var_name)) == -1)
-     {
-
-/*   no variable with this name; return cntr which is now the number of */
-/*   properties for this type of entity */
-
-       return (cntr);
-     }
-     cntr++;
-   }
+      if (nc_inq_varid (exoid, var_name, &varid) != NC_NOERR) {
+	/*   no variable with this name; return cntr which is now the number of */
+	/*   properties for this type of entity */
+	return (cntr);
+      }
+      cntr++;
+    }
 }
+
 int ex_get_cpu_ws(void)
 {
   return(sizeof(float));
@@ -822,7 +952,7 @@ int ex_get_cpu_ws(void)
 
 
 /* swap - interchange v[i] and v[j] */
-void ex_swap (int v[], int i, int j)
+static void ex_swap (int v[], int i, int j)
 {
   int temp;
 
@@ -831,7 +961,7 @@ void ex_swap (int v[], int i, int j)
   v[j] = temp;
 }
 
-/*
+/*!
  * The following 'indexed qsort' routine is modified from Sedgewicks
  * algorithm It selects the pivot based on the median of the left,
  * right, and center values to try to avoid degenerate cases ocurring
@@ -847,7 +977,7 @@ void ex_swap (int v[], int i, int j)
 
 #define EX_QSORT_CUTOFF 12
 
-int ex_int_median3(int v[], int iv[], int left, int right)
+static int ex_int_median3(int v[], int iv[], int left, int right)
 {
   int center;
   center = (left + right) / 2;
@@ -863,7 +993,7 @@ int ex_int_median3(int v[], int iv[], int left, int right)
   return iv[right-1];
 }
 
-void ex_int_iqsort(int v[], int iv[], int left, int right)
+static void ex_int_iqsort(int v[], int iv[], int left, int right)
 {
   int pivot;
   int i, j;
@@ -889,7 +1019,7 @@ void ex_int_iqsort(int v[], int iv[], int left, int right)
   }
 }
 
-void ex_int_iisort(int v[], int iv[], int N)
+static void ex_int_iisort(int v[], int iv[], int N)
 {
   int i,j;
   int ndx = 0;
@@ -929,7 +1059,7 @@ void ex_iqsort(int v[], int iv[], int N)
 #endif
 }
 
-/*
+/*!
  * Determine whether the new large model storage is being used in this
  * file, or old method. Basically, the difference is whether the
  * coordinates and nodal variables are stored in a blob (xyz
@@ -969,35 +1099,36 @@ int ex_large_model(int exoid)
 }
   
 int ex_get_dimension(int exoid, const char* DIMENSION, const char *label,
-                     long *count, const char *routine)
+                     size_t *count, int *dimid, const char *routine)
 {
   char errmsg[MAX_ERR_LENGTH];
-  long dimid;
-
+  int status;
+  
   *count = 0;
-  if ((dimid = ncdimid (exoid, DIMENSION)) == -1) {
+  *dimid = -1;
+  
+  if ((status = nc_inq_dimid(exoid, DIMENSION, dimid)) != NC_NOERR) {
+    exerrval = status;
     if (routine != NULL) {
-      if (ncerr == NC_EBADDIM) {
-        exerrval = ncerr;
+      if (status == NC_EBADDIM) {
         sprintf(errmsg,
                 "Warning: no %s defined in file id %d",
                 label, exoid);
         ex_err(routine, errmsg,exerrval);
         
       } else {
-        exerrval = ncerr;
         sprintf(errmsg,
                 "Error: failed to locate number of %s in file id %d",
                 label, exoid);
         ex_err(routine,errmsg,exerrval);
       }
     }
-    return dimid;
+    return status;
   }
 
-  if (ncdiminq (exoid, dimid, (char *) 0, count) == -1) {
+  if ((status = nc_inq_dimlen (exoid, *dimid, count)) != NC_NOERR) {
+    exerrval = status;
     if (routine != NULL) {
-      exerrval = ncerr;
       sprintf(errmsg,
               "Error: failed to get number of %s in file id %d",
               label, exoid);
@@ -1005,26 +1136,27 @@ int ex_get_dimension(int exoid, const char* DIMENSION, const char *label,
       return -1;
     }
   }
-  return dimid;
+  return status;
 }
 
+/*! Calculate the number of words of storage required to store the
+ * header information.  Total bytes can be obtained by multiplying
+ * words by 4.  Size is slightly underestimated since it only
+ * considers the bulk data storage...
+ */
 size_t ex_header_size(int exoid)
 {
-  /* Calculate the number of words of storage required to store the
-   * header information.  Total bytes can be obtained by multiplying
-   * words by 4.  Size is slightly underestimated since it only
-   * considers the bulk data storage...
-   */
   const char *routine = NULL;
   int iows = 0;
-  long ndim = 0;
-  long num_nodes = 0;
-  long num_elem = 0;
-  long num_eblk = 0;
-  long num_map  = 0;
-  long num_nset = 0;
-  long num_sset = 0;
+  size_t ndim = 0;
+  size_t num_nodes = 0;
+  size_t num_elem = 0;
+  size_t num_eblk = 0;
+  size_t num_map  = 0;
+  size_t num_nset = 0;
+  size_t num_sset = 0;
   int mapid;
+  int temp;
   
   size_t size = 0;
   /* Get word size (2 = 8-byte reals, 1 = 4-byte reals */
@@ -1035,36 +1167,33 @@ size_t ex_header_size(int exoid)
     iows = 1;
   
   /* coordinates = (ndim * numnp)*iows + maps  */
-  ex_get_dimension(exoid, DIM_NUM_DIM,   "dimension", &ndim,      routine);
-  ex_get_dimension(exoid, DIM_NUM_NODES, "nodes",     &num_nodes, routine);
+  ex_get_dimension(exoid, DIM_NUM_DIM,   "dimension", &ndim,      &temp, routine);
+  ex_get_dimension(exoid, DIM_NUM_NODES, "nodes",     &num_nodes, &temp, routine);
   size += iows * ndim * num_nodes;
 
   /* node maps */
-  mapid = ncvarid(exoid, VAR_NODE_NUM_MAP);
-  if (mapid != -1)
+  if (nc_inq_varid(exoid, VAR_NODE_NUM_MAP, &mapid) != -1)
     size += num_nodes;
 
-  ex_get_dimension(exoid, DIM_NUM_NM,   "node maps", &num_map, routine);
+  ex_get_dimension(exoid, DIM_NUM_NM,   "node maps", &num_map, &temp, routine);
   size += num_map * num_nodes;
 
   /* Element Data */
-  ex_get_dimension(exoid, DIM_NUM_ELEM, "elements",  &num_elem, routine);
+  ex_get_dimension(exoid, DIM_NUM_ELEM, "elements",  &num_elem, &temp, routine);
   
   /* Element order map */
-  mapid = ncvarid (exoid, VAR_MAP);
-  if (mapid != -1)
+  if (nc_inq_varid (exoid, VAR_MAP, &mapid) != -1)
     size += num_elem;
    
-  mapid = ncvarid (exoid, VAR_ELEM_NUM_MAP);
-  if (mapid != -1)
+  if (nc_inq_varid (exoid, VAR_ELEM_NUM_MAP, &mapid) != -1)
     size += num_elem;
 
   /* Element map(s) */
-  ex_get_dimension(exoid, DIM_NUM_EM,     "element maps",   &num_map, routine);
+  ex_get_dimension(exoid, DIM_NUM_EM,     "element maps",   &num_map, &temp, routine);
   size += num_map * num_elem;
 
   /* Element Blocks... */
-  ex_get_dimension(exoid, DIM_NUM_EL_BLK, "element blocks", &num_eblk, routine);
+  ex_get_dimension(exoid, DIM_NUM_EL_BLK, "element blocks", &num_eblk, &temp, routine);
   if (num_eblk > 0) {
     /* Allocate storage for element block parameters... */
     int *ids = malloc(num_eblk * sizeof(int));
@@ -1087,7 +1216,7 @@ size_t ex_header_size(int exoid)
   }
   
   /* Nodesets */
-  ex_get_dimension(exoid, DIM_NUM_NS, "nodesets", &num_nset, routine);
+  ex_get_dimension(exoid, DIM_NUM_NS, "nodesets", &num_nset, &temp, routine);
   if (num_nset > 0) {
     /* Allocate storage for nodeset parameters... */
     int *ids = malloc(num_nset * sizeof(int));
@@ -1106,7 +1235,7 @@ size_t ex_header_size(int exoid)
   }
 
   /* Sidesets */
-  ex_get_dimension(exoid, DIM_NUM_SS, "sidesets", &num_sset, routine);
+  ex_get_dimension(exoid, DIM_NUM_SS, "sidesets", &num_sset, &temp, routine);
   if (num_sset > 0) {
     /* Allocate storage for sideset parameters... */
     int *ids = malloc(num_sset * sizeof(int));

@@ -59,52 +59,5 @@
 int ex_get_node_num_map (int  exoid,
                 int *node_map)
 {
-   int numnodedim, mapid, i, iresult;
-   long num_nodes,  start[1], count[1]; 
-   char errmsg[MAX_ERR_LENGTH];
-
-   exerrval = 0; /* clear error code */
-
-/* inquire id's of previously defined dimensions and variables  */
-   if ((numnodedim = ncdimid (exoid, DIM_NUM_NODES)) == -1)
-   {
-     return (EX_NOERR);
-   }
-
-   if (ncdiminq (exoid, numnodedim, (char *) 0, &num_nodes) == -1)
-   {
-     exerrval = ncerr;
-     sprintf(errmsg,
-            "Error: failed to get number of nodes in file id %d",
-             exoid);
-     ex_err("ex_get_node_num_map",errmsg,exerrval);
-     return (EX_FATAL);
-   }
-
-
-   if ((mapid = ncvarid (exoid, VAR_NODE_NUM_MAP)) == -1)
-   {
-     /* generate default map of 1..n, where n is num_nodes */
-     for (i=0; i<num_nodes; i++)
-        node_map[i] = i+1;
-
-     return (EX_NOERR);
-   }
-
-   /* read in the node numbering map  */
-   start[0] = 0;
-   count[0] = num_nodes;
-
-   iresult = ncvarget (exoid, mapid, start, count, node_map);
-
-   if (iresult == -1) {
-     exerrval = ncerr;
-     sprintf(errmsg,
-	     "Error: failed to get node numbering map in file id %d",
-             exoid);
-     ex_err("ex_get_node_num_map",errmsg,exerrval);
-     return (EX_FATAL);
-   }
-   
-   return(EX_NOERR);
+  return ex_get_id_map(exoid, EX_NODE_MAP, node_map);
 }

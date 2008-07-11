@@ -53,8 +53,9 @@
 #include "exodusII.h"
 #include "exodusII_int.h"
 
-/*
+/*!
  *  reads the element block ids from the database
+ * \deprecated Use ex_get_ids()(exoid, EX_ELEM_BLOCK, ids) instead
  */
 
 int ex_get_elem_blk_ids (int  exoid,

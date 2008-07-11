@@ -54,8 +54,9 @@
 #include "exodusII.h"
 #include "exodusII_int.h"
 
-/*
+/*!
  * reads the node list for a single node set
+ * \deprecated Use ex_get_set()(exoid, EX_NODE_SET, node_set_id, node_set_node_list, NULL)
  */
 
 int ex_get_node_set (int   exoid,
