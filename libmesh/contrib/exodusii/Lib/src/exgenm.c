@@ -57,58 +57,7 @@
  */
 
 int ex_get_elem_num_map (int  exoid,
-                int *elem_map)
+			 int *elem_map)
 {
-   int numelemdim, mapid, i, iresult;
-   long num_elem,  start[1], count[1]; 
-   char errmsg[MAX_ERR_LENGTH];
-
-   exerrval = 0; /* clear error code */
-
-/* inquire id's of previously defined dimensions and variables  */
-
-   /* See if file contains any elements...*/
-   if ((numelemdim = ncdimid (exoid, DIM_NUM_ELEM)) == -1)
-   {
-     return(EX_NOERR);
-   }
-
-   if (ncdiminq (exoid, numelemdim, (char *) 0, &num_elem) == -1)
-   {
-     exerrval = ncerr;
-     sprintf(errmsg,
-            "Error: failed to get number of elements in file id %d",
-             exoid);
-     ex_err("ex_get_elem_num_map",errmsg,exerrval);
-     return (EX_FATAL);
-   }
-
-
-   if ((mapid = ncvarid (exoid, VAR_ELEM_NUM_MAP)) == -1)
-   {
-     /* generate default map of 1..n, where n is num_elem */
-     for (i=0; i<num_elem; i++)
-       elem_map[i] = i+1;
-     
-     return (EX_NOERR);
-   }
-
-
-   /* read in the element numbering map  */
-   start[0] = 0;
-   count[0] = num_elem;
-
-   iresult = ncvarget (exoid, mapid, start, count, elem_map);
-
-   if (iresult == -1)
-   {
-     exerrval = ncerr;
-     sprintf(errmsg,
-            "Error: failed to get element number map in file id %d",
-             exoid);
-     ex_err("ex_get_elem_num_map",errmsg,exerrval);
-     return (EX_FATAL);
-   }
-   return(EX_NOERR);
-
+  return ex_get_id_map(exoid, EX_ELEM_MAP, elem_map);
 }

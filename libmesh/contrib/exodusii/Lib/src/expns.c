@@ -55,6 +55,10 @@
 
 /*!
  * writes the node list for a single node set
+ * \param   exoid                   exodus file id
+ * \param   node_set_id             node set id
+ * \param   node_set_node_list      node list array for the node set
+ * \deprecated Use ex_put_set()(exoid, EX_NODE_SET, node_set_id, node_set_node_list, NULL)
  */
 
 int ex_put_node_set (int   exoid,

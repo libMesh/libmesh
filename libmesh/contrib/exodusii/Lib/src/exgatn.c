@@ -58,76 +58,35 @@
  * reads the attribute names for an element block
  */
 int ex_get_attr_names( int   exoid,
-                       int   obj_type,
+                       ex_entity_type obj_type,
                        int   obj_id,
                        char **names)
 {
+  int status;
   int varid, numattrdim, obj_id_ndx;
-  long num_attr, start[2];
+  size_t num_attr, start[2];
   char *ptr;
   char errmsg[MAX_ERR_LENGTH];
   int i, j;
-  const char* tname;
-  const char* vobjids;
   const char* dnumobjatt;
   const char* vattrbname;
 
-  switch (obj_type) {
-  case EX_NODE_SET:
-    tname = "node set";
-    vobjids = VAR_NS_IDS;
-    break;
-  case EX_EDGE_SET:
-    tname = "edge set";
-    vobjids = VAR_ES_IDS;
-    break;
-  case EX_FACE_SET:
-    tname = "face set";
-    vobjids = VAR_FS_IDS;
-    break;
-  case EX_ELEM_SET:
-    tname = "element set";
-    vobjids = VAR_ELS_IDS;
-    break;
-  case EX_NODAL:
-    tname = "node block";
-    break;
-  case EX_EDGE_BLOCK:
-    tname = "edge block";
-    vobjids = VAR_ID_ED_BLK;
-    break;
-  case EX_FACE_BLOCK:
-    tname = "face block";
-    vobjids = VAR_ID_FA_BLK;
-    break;
-  case EX_ELEM_BLOCK:
-    tname = "element block";
-    vobjids = VAR_ID_EL_BLK;
-    break;
-  default:
-    exerrval = EX_BADPARAM;
-    sprintf( errmsg, "Error: Invalid object type (%d) specified for file id %d",
-	     obj_type, exoid );
-    ex_err( "ex_get_attr_names", errmsg, exerrval );
-    return (EX_FATAL);
-  }
- 
   exerrval = 0; /* clear error code */
 
   /* Determine index of obj_id in vobjids array */
   if (obj_type != EX_NODAL) {
-    obj_id_ndx = ex_id_lkup(exoid,vobjids,obj_id);
+    obj_id_ndx = ex_id_lkup(exoid,obj_type,obj_id);
     if (exerrval != 0) {
       if (exerrval == EX_NULLENTITY) {
 	sprintf(errmsg,
 		"Warning: no attributes found for NULL %s %d in file id %d",
-		tname, obj_id, exoid);
+		ex_name_of_object(obj_type), obj_id, exoid);
 	ex_err("ex_get_attr_names",errmsg,EX_MSG);
 	return (EX_WARN);              /* no attributes for this object */
       } else {
 	sprintf(errmsg,
-		"Warning: failed to locate %s id %d in %s array in file id %d",
-		tname, obj_id,vobjids, exoid);
+		"Warning: failed to locate %s id %d in id array in file id %d",
+		ex_name_of_object(obj_type), obj_id, exoid);
 	ex_err("ex_get_attr_names",errmsg,exerrval);
 	return (EX_WARN);
       }
@@ -138,6 +97,10 @@ int ex_get_attr_names( int   exoid,
   case EX_NODE_SET:
     dnumobjatt = DIM_NUM_ATT_IN_NS(obj_id_ndx);
     vattrbname = VAR_NAME_NSATTRIB(obj_id_ndx);
+    break;
+  case EX_SIDE_SET:
+    dnumobjatt = DIM_NUM_ATT_IN_SS(obj_id_ndx);
+    vattrbname = VAR_NAME_SSATTRIB(obj_id_ndx);
     break;
   case EX_EDGE_SET:
     dnumobjatt = DIM_NUM_ATT_IN_ES(obj_id_ndx);
@@ -170,34 +133,32 @@ int ex_get_attr_names( int   exoid,
   }
   /* inquire id's of previously defined dimensions  */
 
-  if ((numattrdim = ncdimid(exoid, dnumobjatt)) == -1)
-    {
-      exerrval = ncerr;
-      sprintf(errmsg,
-	      "Warning: no attributes found for %s %d in file id %d",
-	      tname,obj_id,exoid);
-      ex_err("ex_get_attr_names",errmsg,EX_MSG);
-      return (EX_WARN);              /* no attributes for this object */
-    }
+  if ((status = nc_inq_dimid(exoid, dnumobjatt, &numattrdim)) != NC_NOERR) {
+    exerrval = status;
+    sprintf(errmsg,
+	    "Warning: no attributes found for %s %d in file id %d",
+	    ex_name_of_object(obj_type),obj_id,exoid);
+    ex_err("ex_get_attr_names",errmsg,EX_MSG);
+    return (EX_WARN);              /* no attributes for this object */
+  }
 
-  if (ncdiminq (exoid, numattrdim, (char *) 0, &num_attr) == -1)
-    {
-      exerrval = ncerr;
-      sprintf(errmsg,
-	      "Error: failed to get number of attributes for %s %d in file id %d",
-	      tname,obj_id,exoid);
-      ex_err("ex_get_attr_names",errmsg,exerrval);
-      return (EX_FATAL);
-    }
+  if ((status = nc_inq_dimlen(exoid, numattrdim, &num_attr)) != NC_NOERR) {
+    exerrval = status;
+    sprintf(errmsg,
+	    "Error: failed to get number of attributes for %s %d in file id %d",
+	    ex_name_of_object(obj_type),obj_id,exoid);
+    ex_err("ex_get_attr_names",errmsg,exerrval);
+    return (EX_FATAL);
+  }
 
   /* It is OK if we don't find the attribute names since they were
      added at version 4.26; earlier databases won't have the names.
   */
-  varid = ncvarid (exoid, vattrbname);
+  status = nc_inq_varid(exoid, vattrbname, &varid);
 
   /* read in the attributes */
 
-  if (varid != -1) {
+  if (status == NC_NOERR) {
     /* read the names */
     for (i=0; i < num_attr; i++) {
       start[0] = i;
@@ -206,22 +167,22 @@ int ex_get_attr_names( int   exoid,
       j = 0;
       ptr = names[i];
       
-      if (ncvarget1 (exoid, varid, start, ptr) == -1) {
-        exerrval = ncerr;
+      if ((status = nc_get_var1_text (exoid, varid, start, ptr)) != NC_NOERR) {
+        exerrval = status;
         sprintf(errmsg,
                 "Error: failed to get names for %s %d in file id %d",
-                tname, obj_id, exoid);
+                ex_name_of_object(obj_type), obj_id, exoid);
         ex_err("ex_get_attr_names",errmsg,exerrval);
         return (EX_FATAL);
       }
       
       while ((*ptr++ != '\0') && (j < MAX_STR_LENGTH)) {
         start[1] = ++j;
-        if (ncvarget1 (exoid, varid, start, ptr) == -1) {
-          exerrval = ncerr;
+        if ((status = nc_get_var1_text(exoid, varid, start, ptr)) != NC_NOERR) {
+          exerrval = status;
           sprintf(errmsg,
                   "Error: failed to get names for %s %d in file id %d",
-                  tname, obj_id, exoid);
+                  ex_name_of_object(obj_type), obj_id, exoid);
           ex_err("ex_get_attr_names",errmsg,exerrval);
           return (EX_FATAL);
         }

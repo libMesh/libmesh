@@ -46,78 +46,51 @@
  */
 
 int ex_get_ids (int  exoid,
-		int obj_type, 
+		ex_entity_type obj_type, 
 		int *ids)
 {
-  int dimid, varid, iresult;
-  long numobj, start[1], count[1]; 
+  int varid, status;
   char errmsg[MAX_ERR_LENGTH];
 
-  const char* dimnumobj;
   const char* varidobj;
-  const char* tname;
 
   exerrval = 0; /* clear error code */
 
   switch (obj_type) {
   case EX_EDGE_BLOCK:
-    tname = "edge block";
-    dimnumobj = DIM_NUM_ED_BLK;
     varidobj = VAR_ID_ED_BLK;
     break;
   case EX_FACE_BLOCK:
-    tname = "face block";
-    dimnumobj = DIM_NUM_FA_BLK;
     varidobj = VAR_ID_FA_BLK;
     break;
   case EX_ELEM_BLOCK:
-    tname = "element block";
-    dimnumobj = DIM_NUM_EL_BLK;
     varidobj = VAR_ID_EL_BLK;
     break;
   case EX_NODE_SET:
-    tname = "node set";
-    dimnumobj = DIM_NUM_NS;
     varidobj = VAR_NS_IDS;
     break;
   case EX_EDGE_SET:
-    tname = "edge set";
-    dimnumobj = DIM_NUM_ES;
     varidobj = VAR_ES_IDS;
     break;
   case EX_FACE_SET:
-    tname = "face set";
-    dimnumobj = DIM_NUM_FS;
     varidobj = VAR_FS_IDS;
     break;
   case EX_SIDE_SET:
-    tname = "side set";
-    dimnumobj = DIM_NUM_SS;
     varidobj = VAR_SS_IDS;
     break;
   case EX_ELEM_SET:
-    tname = "element set";
-    dimnumobj = DIM_NUM_ELS;
     varidobj = VAR_ELS_IDS;
     break;
   case EX_NODE_MAP:
-    tname = "node map";
-    dimnumobj = DIM_NUM_NM;
     varidobj = VAR_NM_PROP(1);
     break;
   case EX_EDGE_MAP:
-    tname = "edge map";
-    dimnumobj = DIM_NUM_EDM;
     varidobj = VAR_EDM_PROP(1);
     break;
   case EX_FACE_MAP:
-    tname = "face map";
-    dimnumobj = DIM_NUM_FAM;
     varidobj = VAR_FAM_PROP(1);
     break;
   case EX_ELEM_MAP:
-    tname = "element map";
-    dimnumobj = DIM_NUM_EM;
     varidobj = VAR_EM_PROP(1);
     break;
   default:/* invalid variable type */
@@ -128,52 +101,25 @@ int ex_get_ids (int  exoid,
   }
 
   /* inquire id's of previously defined dimensions and variables  */
-
-  if ((dimid = ncdimid (exoid, dimnumobj)) == -1)
-    {
-    exerrval = ncerr;
+  if ((status = nc_inq_varid(exoid, varidobj, &varid)) != NC_NOERR) {
+    exerrval = status;
     sprintf(errmsg,
-      "Error: failed to locate dimension %s in file id %d",
-      dimnumobj,exoid);
+	    "Error: failed to locate %s ids variable in file id %d",
+	    ex_name_of_object(obj_type),exoid);
     ex_err("ex_get_ids",errmsg,exerrval);
     return (EX_FATAL);
-    }
-
-  if (ncdiminq (exoid, dimid, (char*)0, &numobj) == -1)
-    {
-    exerrval = ncerr;
-    sprintf(errmsg,
-      "Error: failed to return number of %ss in file id %d",
-      tname,exoid);
-    ex_err("ex_get_ids",errmsg,exerrval);
-    return (EX_FATAL);
-    }
-
-
-  if ((varid = ncvarid (exoid, varidobj)) == -1)
-    {
-    exerrval = ncerr;
-    sprintf(errmsg,
-      "Error: failed to locate %s ids variable in file id %d",
-      tname,exoid);
-    ex_err("ex_get_ids",errmsg,exerrval);
-    return (EX_FATAL);
-    }
-
+  }
+  
   /* read in the element block ids  */
-  start[0] = 0;
-  count[0] = numobj;
-
-  iresult = ncvarget (exoid, varid, start, count, ids);
-
-  if (iresult == -1)
-   {
-     exerrval = ncerr;
-     sprintf(errmsg,
-       "Error: failed to return %s ids in file id %d",
-             tname,exoid);
-     ex_err("ex_get_ids",errmsg,exerrval);
-     return (EX_FATAL);
-   }
-   return(EX_NOERR);
+  status = nc_get_var_int(exoid, varid, ids);
+  
+  if (status != NC_NOERR) {
+    exerrval = status;
+    sprintf(errmsg,
+	    "Error: failed to return %s ids in file id %d",
+	    ex_name_of_object(obj_type),exoid);
+    ex_err("ex_get_ids",errmsg,exerrval);
+    return (EX_FATAL);
+  }
+  return(EX_NOERR);
 }

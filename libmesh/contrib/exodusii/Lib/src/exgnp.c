@@ -54,8 +54,9 @@
 #include "exodusII.h"
 #include "exodusII_int.h"
 
-/*
+/*!
  * reads the information which describe a single node set
+ * \deprecated Use ex_get_set_param()(exoid, EX_NODE_SET, node_set_id, num_nodes_in_set, num_df_in_set)
  */
 
 int ex_get_node_set_param (int  exoid,

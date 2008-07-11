@@ -73,29 +73,24 @@
 
 #include <stdio.h>
 
-/* these should be defined in ANSI C and C++, but just in case ... */
-#ifndef EXIT_SUCCESS
-#define EXIT_SUCCESS 0
-#endif
-#ifndef EXIT_FAILURE
-#define EXIT_FAILURE 1
-#endif
+#define MAX_VAR_NAME_LENGTH     20   /**< Internal use only */
+
+  /*   for netCDF 3.4, we estimate the size of the header; 
+   *   if estimate is larger than this max, set the estimate to this max;
+   */
+#define MAX_HEADER_SIZE         30000
+
+
+/* this should be defined in ANSI C and C++, but just in case ... */
 #ifndef NULL
 #define NULL 0
 #endif
-
-/* EXODUS II version number */
-
-/* ExodusII access library version */
-#define EX_API_VERS 4.61
-#define EX_API_VERS_NODOT 461
-#define EX_VERS EX_API_VERS
 
 /* Default "filesize" for newly created files.
  * Set to 0 for normal filesize setting.
  * Set to 1 for EXODUS_LARGE_MODEL setting to be the default
  */
-#define EXODUS_DEFAULT_SIZE 0
+#define EXODUS_DEFAULT_SIZE 1
 
 /* Exodus error return codes - function return values:                      */
 #define EX_FATAL        -1      /* fatal error flag def                     */
@@ -190,7 +185,7 @@
 #define DIM_NUM_ATT_IN_EBLK(num) ex_catstr("num_att_in_eblk",num)
                                                 /* # of attributes in edge   */
                                                 /*   block num               */
-#define DIM_NUM_FA_IN_FBLK(num)  ex_catstr("num_fa_in_fblk",num)
+#define DIM_NUM_FA_IN_FBLK(num)  ex_catstr("num_fa_in_blk",num)
                                                 /* # of faces in face        */
                                                 /*   block num               */
 #define DIM_NUM_NOD_PER_FA(num)  ex_catstr("num_nod_per_fa",num)
@@ -236,6 +231,10 @@
 #define VAR_NAME_NSATTRIB(num)   ex_catstr("nsattrib_name",num)
 #define DIM_NUM_ATT_IN_NS(num)   ex_catstr("num_att_in_ns",num)
 
+#define VAR_SSATTRIB(num)        ex_catstr("ssattrb",num)
+#define VAR_NAME_SSATTRIB(num)   ex_catstr("ssattrib_name",num)
+#define DIM_NUM_ATT_IN_SS(num)   ex_catstr("num_att_in_ss",num)
+
 #define VAR_ESATTRIB(num)        ex_catstr("esattrb",num)
 #define VAR_NAME_ESATTRIB(num)   ex_catstr("esattrib_name",num)
 #define DIM_NUM_ATT_IN_ES(num)   ex_catstr("num_att_in_es",num)
@@ -248,7 +247,7 @@
 #define VAR_NAME_ELSATTRIB(num)  ex_catstr("elsattrib_name",num)
 #define DIM_NUM_ATT_IN_ELS(num)  ex_catstr("num_att_in_els",num)
 
-#define VAR_ED_PROP(num)         ex_catstr("edgprop",num)
+#define VAR_ED_PROP(num)         ex_catstr("ed_prop",num)
                                                 /* list of the numth property*/
                                                 /*   for all edge blocks     */
 #define VAR_FCONN(num)            ex_catstr("facconn",num)
@@ -263,7 +262,7 @@
 #define VAR_NAME_FATTRIB(num)    ex_catstr("fattrib_name",num)
                                                 /* list of attribute names   */
                                                 /* for face block num        */
-#define VAR_FA_PROP(num)         ex_catstr("facprop",num)
+#define VAR_FA_PROP(num)         ex_catstr("fa_prop",num)
                                                 /* list of the numth property*/
                                                 /*   for all face blocks     */
 #define ATT_PROP_NAME           "name"          /* name attached to element  */
@@ -465,6 +464,12 @@
 #define VAR_ELEM_NUM_MAP        "elem_num_map"  /* element numbering map     */
                                                 /* obsolete, replaced by     */
                                                 /* VAR_ELEM_MAP(num)         */
+#define VAR_FACE_NUM_MAP        "face_num_map"  /* face numbering map     */
+                                                /* obsolete, replaced by     */
+                                                /* VAR_FACE_MAP(num)         */
+#define VAR_EDGE_NUM_MAP        "edge_num_map"  /* edge numbering map     */
+                                                /* obsolete, replaced by     */
+                                                /* VAR_EDGE_MAP(num)         */
 #define VAR_NODE_NUM_MAP        "node_num_map"  /* node numbering map        */
                                                 /* obsolete, replaced by     */
                                                 /* VAR_NODE_MAP(num)         */
@@ -500,20 +505,38 @@
 #define FRAME_TAGS   "frame_tags"
 
 
-#define UNK                     -1              /* unknown entity */
-#define TRIANGLE                1               /* Triangle entity */
-#define QUAD                    2               /* Quad entity */
-#define HEX                     3               /* Hex entity */
-#define WEDGE                   4               /* Wedge entity */
-#define TETRA                   5               /* Tetra entity */
-#define TRUSS                   6               /* Truss entity */
-#define BEAM                    7               /* Beam entity */
-#define SHELL                   8               /* Shell entity */
-#define SPHERE                  9               /* Sphere entity */
-#define CIRCLE                 10               /* Circle entity */
-#define TRISHELL               11               /* Triangular Shell entity */
-#define PYRAMID                12               /* Pyramid entity */
+enum ex_element_type {
+  UNK         =  -1,     /**< unknown entity */
+  NULL_ELEMENT=   0,     
+  TRIANGLE    =   1,     /**< Triangle entity */
+  QUAD        =   2,     /**< Quad entity */
+  HEX         =   3,     /**< Hex entity */
+  WEDGE       =   4,     /**< Wedge entity */
+  TETRA       =   5,     /**< Tetra entity */
+  TRUSS       =   6,     /**< Truss entity */
+  BEAM        =   7,     /**< Beam entity */
+  SHELL       =   8,     /**< Shell entity */
+  SPHERE      =   9,     /**< Sphere entity */
+  CIRCLE      =  10,     /**< Circle entity */
+  TRISHELL    =  11,     /**< Triangular Shell entity */
+  PYRAMID     =  12      /**< Pyramid entity */
+}; 
+typedef enum ex_element_type ex_element_type;
+
 /* Internal structure declarations */
+
+struct elem_blk_parm
+{
+  char elem_type[33];
+  int elem_blk_id;
+  int num_elem_in_blk;
+  int num_nodes_per_elem;
+  int num_sides;
+  int num_nodes_per_side[6];
+  int num_attr;
+  int elem_ctr;
+  ex_element_type elem_type_val;
+};
 
 struct list_item {              /* for use with ex_get_file_item */
 
@@ -532,14 +555,13 @@ struct obj_stats {
   struct obj_stats *next;
 };
 
-
-void ex_iqsort    (int v[], int iv[], int count );
-char *ex_catstr  (const char*, int);
-char *ex_catstr2  (const char*, int, const char*, int);
-char* ex_dim_num_entries_in_object( int, int );
-char* ex_name_var_of_object( int, int, int );
-char* ex_name_of_map( int, int );
-
+void  ex_iqsort(int v[], int iv[], int count );
+char* ex_catstr(const char*, int);
+char* ex_catstr2(const char*, int, const char*, int);
+char* ex_dim_num_entries_in_object(ex_entity_type, int);
+char* ex_dim_num_objects(ex_entity_type obj_type);
+char* ex_name_var_of_object( ex_entity_type, int, int );
+char* ex_name_of_map( ex_entity_type, int );
 
 enum convert_task { RTN_ADDRESS, 
                     READ_CONVERT, 
@@ -554,25 +576,9 @@ int ex_comp_ws  (int);
 void* ex_conv_array  (int, int, const void*, size_t);
 int ex_get_cpu_ws(void);
 
-void ex_rm_file_item_eb  (int);
-void ex_rm_file_item_ns  (int);
-void ex_rm_file_item_ss  (int);
-
-extern struct list_item* eb_ctr_list;
-extern struct list_item* ed_ctr_list;
-extern struct list_item* fa_ctr_list;
-extern struct list_item* ns_ctr_list;
-extern struct list_item* es_ctr_list;
-extern struct list_item* fs_ctr_list;
-extern struct list_item* ss_ctr_list;
-extern struct list_item* els_ctr_list;
-extern struct list_item* em_ctr_list;
-extern struct list_item* edm_ctr_list;
-extern struct list_item* fam_ctr_list;
-extern struct list_item* nm_ctr_list;
-
-int ex_get_file_item  ( int, struct list_item**);
-int ex_inc_file_item  ( int,  struct list_item**);
+struct list_item** ex_get_counter_list(ex_entity_type obj_type);
+int ex_get_file_item  (int, struct list_item**);
+int ex_inc_file_item  (int, struct list_item**);
 void ex_rm_file_item  (int, struct list_item**);
 
 extern struct obj_stats* exoII_eb;
@@ -588,18 +594,12 @@ extern struct obj_stats* exoII_edm;
 extern struct obj_stats* exoII_fam;
 extern struct obj_stats* exoII_nm;
 
-extern int cpy_att    (int, int, int, int);
-extern int cpy_var_def(int, int, int, char*);
-extern int cpy_var_val(int, int, char*);
-extern int cpy_coord_def(int in_id,int out_id,int rec_dim_id,
-			 char *var_nm, int in_large, int out_large);
-extern int cpy_coord_val(int in_id,int out_id,char *var_nm,
-			 int in_large, int out_large);
 
 int ex_get_side_set_node_list_len  (int, int, int*);
-struct obj_stats *get_stat_ptr  ( int, struct obj_stats**);
-void rm_stat_ptr  (int, struct obj_stats**);
+struct obj_stats *ex_get_stat_ptr  ( int, struct obj_stats**);
+void ex_rm_stat_ptr  (int, struct obj_stats**);
 
-int ex_id_lkup  ( int exoid, const char *id_type, int num);
-int ex_get_dimension(int exoid, const char *dimtype, const char *label, long *count, const char *routine);
+int ex_id_lkup  (int exoid, ex_entity_type id_type, int num);
+int ex_get_dimension(int exoid, const char *dimtype, const char *label,
+		     size_t *count, int *dimid, const char *routine);
 #endif

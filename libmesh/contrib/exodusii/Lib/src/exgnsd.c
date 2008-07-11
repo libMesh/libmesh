@@ -53,8 +53,9 @@
 #include "exodusII.h"
 #include "exodusII_int.h"
 
-/*
+/*!
  * reads the distribution factors for a single node set
+ * \deprecated Use ex_get_set_dist_fact()(exoid, EX_NODE_SET, node_set_id, node_set_dist_fact)
  */
 
 int ex_get_node_set_dist_fact  (int   exoid,

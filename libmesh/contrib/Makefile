@@ -36,6 +36,9 @@ all:
 	@echo "--- Building ExodusII ---------------------"
 	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
 	@echo ""
+	@echo "--- Building Nemesis ---------------------"
+	@$(MAKE) -C nemesis/Lib $(MAKECMDGOALS)
+	@echo ""
 	@echo "--- Building libHilbert ---------------------"
 	@$(MAKE) -C libHilbert $(MAKECMDGOALS)
 	@echo ""
@@ -60,6 +63,7 @@ clean:
 	@$(MAKE) -C gmv          $(MAKECMDGOALS)
 	@$(MAKE) -C netcdf/Lib   $(MAKECMDGOALS)
 	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
+	@$(MAKE) -C nemesis/Lib  $(MAKECMDGOALS)
 	@$(MAKE) -C libHilbert   $(MAKECMDGOALS)
 
 #
@@ -77,6 +81,7 @@ clobber:
 	@$(MAKE) -C gmv          $(MAKECMDGOALS)
 	@$(MAKE) -C netcdf/Lib   $(MAKECMDGOALS)
 	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
+	@$(MAKE) -C nemesis/Lib   $(MAKECMDGOALS)
 	@$(MAKE) -C libHilbert   $(MAKECMDGOALS)
 
 #
@@ -94,5 +99,6 @@ distclean:
 	@$(MAKE) -C gmv          $(MAKECMDGOALS)
 	@$(MAKE) -C netcdf/Lib   $(MAKECMDGOALS)
 	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
+	@$(MAKE) -C nemesis/Lib   $(MAKECMDGOALS)
 	@$(MAKE) -C libHilbert   $(MAKECMDGOALS)
 	@rm -rf lib/*_dbg lib/*_opt lib/*_pro lib/*_devel

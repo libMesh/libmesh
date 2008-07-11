@@ -65,21 +65,19 @@ int ex_get_partial_elem_map (int   exoid,
 			     int ent_count, 
 			     int  *elem_map)
 {
-   int dimid, var_id, id_ndx, iresult;
-   long num_elem, start[1], count[1]; 
+   int dimid, var_id, id_ndx, status;
+   size_t num_elem, start[1], count[1]; 
    char errmsg[MAX_ERR_LENGTH];
 
    exerrval = 0; /* clear error code */
 
    /* See if file contains any elements...*/
-   if ((dimid = ncdimid (exoid, DIM_NUM_ELEM)) == -1)
-   {
+   if (nc_inq_dimid (exoid, DIM_NUM_ELEM, &dimid) != NC_NOERR) {
      return (EX_NOERR);
    }
 
-   if (ncdiminq (exoid, dimid, (char *) 0, &num_elem) == -1)
-   {
-     exerrval = ncerr;
+   if ((status = nc_inq_dimlen(exoid, dimid, &num_elem)) != NC_NOERR) {
+     exerrval = status;
      sprintf(errmsg,
             "Error: failed to get number of elements in file id %d", exoid);
      ex_err("ex_get_partial_elem_map",errmsg,exerrval);
@@ -95,6 +93,7 @@ int ex_get_partial_elem_map (int   exoid,
     ex_err("ex_get_partial_elem_map",errmsg,exerrval);
     return (EX_FATAL);
   }
+
   if (ent_count < 0) {
     exerrval = EX_FATAL;
     sprintf(errmsg,
@@ -103,6 +102,7 @@ int ex_get_partial_elem_map (int   exoid,
     ex_err("ex_get_partial_elem_map",errmsg,exerrval);
     return (EX_FATAL);
   }
+
   if (ent_start+ent_count-1 > num_elem) {
     exerrval = EX_FATAL;
     sprintf(errmsg,
@@ -112,11 +112,9 @@ int ex_get_partial_elem_map (int   exoid,
     return (EX_FATAL);
   }
 
-/* first check if any element maps have been defined */
-
-   if ((dimid = ncdimid (exoid, DIM_NUM_EM))  == -1)
-   {
-     exerrval = ncerr;
+  /* first check if any element maps have been defined */
+  if ((status = nc_inq_dimid (exoid, DIM_NUM_EM, &dimid)) != NC_NOERR) {
+     exerrval = status;
      sprintf(errmsg,
             "Warning: no element maps defined in file id %d",
              exoid);
@@ -124,12 +122,9 @@ int ex_get_partial_elem_map (int   exoid,
      return (EX_WARN);
    }
 
-/* Lookup index of element map id property array */
-
-   id_ndx = ex_id_lkup(exoid,VAR_EM_PROP(1),map_id);
-   if (exerrval != 0) 
-   {
-
+  /* Lookup index of element map id property array */
+   id_ndx = ex_id_lkup(exoid,EX_ELEM_MAP,map_id);
+   if (exerrval != 0) {
       sprintf(errmsg,
               "Error: failed to locate element map id %d in %s in file id %d",
                map_id,VAR_EM_PROP(1),exoid);
@@ -137,11 +132,9 @@ int ex_get_partial_elem_map (int   exoid,
       return (EX_FATAL);
    }
 
-/* inquire id's of previously defined dimensions and variables */
-
-   if ((var_id = ncvarid (exoid, VAR_ELEM_MAP(id_ndx))) == -1)
-   {
-     exerrval = ncerr;
+   /* inquire id's of previously defined dimensions and variables */
+   if ((status = nc_inq_varid(exoid, VAR_ELEM_MAP(id_ndx), &var_id)) != NC_NOERR) {
+     exerrval = status;
      sprintf(errmsg,
             "Error: failed to locate element map %d in file id %d",
              map_id,exoid);
@@ -149,16 +142,14 @@ int ex_get_partial_elem_map (int   exoid,
      return (EX_FATAL);
    }
 
-
    /* read in the element map */
    start[0] = ent_start-1;
    count[0] = ent_count;
 
-   iresult = ncvarget (exoid, var_id, start, count, elem_map);
+   status = nc_get_vara_int(exoid, var_id, start, count, elem_map);
 
-   if (iresult == -1)
-   {
-     exerrval = ncerr;
+   if (status == -1) {
+     exerrval = status;
      sprintf(errmsg,
             "Error: failed to get element map in file id %d",
              exoid);

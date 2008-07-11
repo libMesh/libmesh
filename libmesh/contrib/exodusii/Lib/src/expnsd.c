@@ -55,6 +55,10 @@
 
 /*!
  * writes the node set distribution factors for a single node set
+ * \param       exoid                   exodus file id
+ * \param       node_set_id             node set id
+ * \param       node_set_dist_fact      node distribution factors for node set
+ * \deprecated Use ex_put_set_dist_fact()(exoid, EX_NODE_SET, node_set_id, node_set_dist_fact)
  */
 
 int ex_put_node_set_dist_fact  (int   exoid,

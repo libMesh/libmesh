@@ -782,6 +782,20 @@ if (test "$enablenetcdf" != no) ; then
    
    if (test "$enableexodus" != no -a "$have_netcdf" = yes) ; then
      CONFIGURE_EXODUS
+
+     dnl -------------------------------------------------------------
+     dnl Nemesis -- enabled by default (it is distributed in contrib)
+     dnl (note that Nemesis requires netCDF and exodus)
+     dnl -------------------------------------------------------------
+     AC_ARG_ENABLE(nemesis,
+	           AC_HELP_STRING([--enable-nemesis],
+        	   [build with Nemesis API support]),
+                   enablenemesis=$enableval,
+                   enablenemesis=yes)
+
+     if (test "$enableexodus" != no -a "$have_netcdf" = yes -a "$enablenemesis" != no ) ; then
+       CONFIGURE_NEMESIS
+     fi
    fi
    dnl -------------------------------------------------------------
 fi

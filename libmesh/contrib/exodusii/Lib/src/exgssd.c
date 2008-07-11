@@ -55,6 +55,7 @@
 
 /*!
  * reads the distribution factors for a single side set
+ * \deprecated Use ex_get_set_dist_fact()(exoid, EX_SIDE_SET, side_set_id, side_set_dist_fact)
  */
 
 int ex_get_side_set_dist_fact (int   exoid,

@@ -56,12 +56,12 @@
 #include "exodusII.h"
 #include "exodusII_int.h"
 
-/*
+/*!
  * This routine is designed to read the Exodus II V 2.0 side set side 
  * definition  and return the length of a ExodusI style side set node list.
-
-
-
+ * \param           exoid                   exodus file id
+ * \param           side_set_id             side set id
+ * \param[out]     *side_set_node_list_len length of node list
  */
 
 int ex_get_side_set_node_list_len(int exoid,
@@ -79,17 +79,7 @@ int ex_get_side_set_node_list_len(int exoid,
   float fdum;
   char *cdum, elem_type[MAX_STR_LENGTH+1];
 
-  struct elem_blk_parm
-  {
-    char elem_type[MAX_STR_LENGTH+1];
-    int elem_blk_id;
-    int num_elem_in_blk;
-    int num_nodes_per_elem;
-    int num_nodes_per_side;
-    int num_attr;
-    int elem_ctr;
-    int elem_type_val;
-  } *elem_blk_parms;
+  struct elem_blk_parm  *elem_blk_parms;
 
   char errmsg[MAX_ERR_LENGTH];
 
@@ -283,32 +273,31 @@ int ex_get_side_set_node_list_len(int exoid,
     elem_blk_parms[i].elem_blk_id = elem_blk_ids[i];
 
     for (m=0; m < strlen(elem_type); m++)
-      elem_blk_parms[i].elem_type[m] = 
-              toupper((int)elem_type[m]);
-    elem_blk_parms[i].elem_type[m] = '\0';
+      elem_blk_parms[i].elem_type[m] = toupper(elem_type[m]);
+    elem_blk_parms[i].elem_type[m] = NULL_ELEMENT;
 
     if (strncmp(elem_blk_parms[i].elem_type,"CIRCLE",3) == 0)
     {
       elem_blk_parms[i].elem_type_val = CIRCLE;
       /* set side set node stride */
-        elem_blk_parms[i].num_nodes_per_side = 1;
+        elem_blk_parms[i].num_nodes_per_side[0] = 1;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"SPHERE",3) == 0)
     {
       elem_blk_parms[i].elem_type_val = SPHERE;
       /* set side set node stride */
-        elem_blk_parms[i].num_nodes_per_side = 1;
+        elem_blk_parms[i].num_nodes_per_side[0] = 1;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"QUAD",3) == 0)
     {
       elem_blk_parms[i].elem_type_val = QUAD;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 4)
-        elem_blk_parms[i].num_nodes_per_side = 2;
+        elem_blk_parms[i].num_nodes_per_side[0] = 2;
       else if (elem_blk_parms[i].num_nodes_per_elem == 5)
-        elem_blk_parms[i].num_nodes_per_side = 2;
+        elem_blk_parms[i].num_nodes_per_side[0] = 2;
       else 
-        elem_blk_parms[i].num_nodes_per_side = 3;
+        elem_blk_parms[i].num_nodes_per_side[0] = 3;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"TRIANGLE",3) == 0)
     {
@@ -317,16 +306,16 @@ int ex_get_side_set_node_list_len(int exoid,
       if (ndim == 2) /* 2d TRIs */
       {
         if (elem_blk_parms[i].num_nodes_per_elem == 3)
-          elem_blk_parms[i].num_nodes_per_side = 2;
+          elem_blk_parms[i].num_nodes_per_side[0] = 2;
         else 
-          elem_blk_parms[i].num_nodes_per_side = 3;
+          elem_blk_parms[i].num_nodes_per_side[0] = 3;
       }
       else if (ndim == 3)  /* 3d TRIs */
       {   /* set the default number of nodes per side; catch exceptions later */
         if (elem_blk_parms[i].num_nodes_per_elem == 3)
-          elem_blk_parms[i].num_nodes_per_side = 3;
+          elem_blk_parms[i].num_nodes_per_side[0] = 3;
         else 
-          elem_blk_parms[i].num_nodes_per_side = 6;
+          elem_blk_parms[i].num_nodes_per_side[0] = 6;
       }
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"SHELL",3) == 0)
@@ -334,64 +323,64 @@ int ex_get_side_set_node_list_len(int exoid,
       elem_blk_parms[i].elem_type_val = SHELL;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 2) /* KLUDGE for 2D Shells*/
-        elem_blk_parms[i].num_nodes_per_side = 2;
+        elem_blk_parms[i].num_nodes_per_side[0] = 2;
       else if (elem_blk_parms[i].num_nodes_per_elem == 4)
-        elem_blk_parms[i].num_nodes_per_side = 4;
+        elem_blk_parms[i].num_nodes_per_side[0] = 4;
       else
-        elem_blk_parms[i].num_nodes_per_side = 8;
+        elem_blk_parms[i].num_nodes_per_side[0] = 8;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"HEX",3) == 0)
     {
       elem_blk_parms[i].elem_type_val = HEX;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 8)
-        elem_blk_parms[i].num_nodes_per_side = 4;
+        elem_blk_parms[i].num_nodes_per_side[0] = 4;
       else if (elem_blk_parms[i].num_nodes_per_elem == 9)
-        elem_blk_parms[i].num_nodes_per_side = 4;
+        elem_blk_parms[i].num_nodes_per_side[0] = 4;
       else if (elem_blk_parms[i].num_nodes_per_elem == 12) /* HEXSHELL */
-        elem_blk_parms[i].num_nodes_per_side = 4;
+        elem_blk_parms[i].num_nodes_per_side[0] = 4;
       else if (elem_blk_parms[i].num_nodes_per_elem == 27)
-        elem_blk_parms[i].num_nodes_per_side = 9;
+        elem_blk_parms[i].num_nodes_per_side[0] = 9;
       else
-        elem_blk_parms[i].num_nodes_per_side = 8;
+        elem_blk_parms[i].num_nodes_per_side[0] = 8;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"TETRA",3) == 0)
     {
       elem_blk_parms[i].elem_type_val = TETRA;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 4)
-        elem_blk_parms[i].num_nodes_per_side = 3;
+        elem_blk_parms[i].num_nodes_per_side[0] = 3;
       else if (elem_blk_parms[i].num_nodes_per_elem == 8)
-        elem_blk_parms[i].num_nodes_per_side = 4;
+        elem_blk_parms[i].num_nodes_per_side[0] = 4;
       else
-        elem_blk_parms[i].num_nodes_per_side = 6;
+        elem_blk_parms[i].num_nodes_per_side[0] = 6;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"WEDGE",3) == 0)
     {
       elem_blk_parms[i].elem_type_val = WEDGE;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 6)
-        elem_blk_parms[i].num_nodes_per_side = 4;
+        elem_blk_parms[i].num_nodes_per_side[0] = 4;
       else
-        elem_blk_parms[i].num_nodes_per_side = 8;
+        elem_blk_parms[i].num_nodes_per_side[0] = 8;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"PYRAMID",3) == 0)
     {
       elem_blk_parms[i].elem_type_val = PYRAMID;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 5)
-        elem_blk_parms[i].num_nodes_per_side = 4;
+        elem_blk_parms[i].num_nodes_per_side[0] = 4;
       else
-        elem_blk_parms[i].num_nodes_per_side = 8;
+        elem_blk_parms[i].num_nodes_per_side[0] = 8;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"BEAM",3) == 0)
     {
       elem_blk_parms[i].elem_type_val = BEAM;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 2)
-        elem_blk_parms[i].num_nodes_per_side = 2;
+        elem_blk_parms[i].num_nodes_per_side[0] = 2;
       else 
-        elem_blk_parms[i].num_nodes_per_side = 3;
+        elem_blk_parms[i].num_nodes_per_side[0] = 3;
     }
     else if ( (strncmp(elem_blk_parms[i].elem_type,"TRUSS",3) == 0) ||
               (strncmp(elem_blk_parms[i].elem_type,"BAR",3) == 0)  ||
@@ -400,21 +389,21 @@ int ex_get_side_set_node_list_len(int exoid,
       elem_blk_parms[i].elem_type_val = TRUSS;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 2)
-        elem_blk_parms[i].num_nodes_per_side = 2;
+        elem_blk_parms[i].num_nodes_per_side[0] = 2;
       else 
-        elem_blk_parms[i].num_nodes_per_side = 3;
+        elem_blk_parms[i].num_nodes_per_side[0] = 3;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"NULL",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = '\0';
-      elem_blk_parms[i].num_nodes_per_side = 0;
+      elem_blk_parms[i].elem_type_val = NULL_ELEMENT;
+      elem_blk_parms[i].num_nodes_per_side[0] = 0;
       elem_blk_parms[i].num_elem_in_blk = 0;
     }
     else
     { /* unsupported element type; no problem if no sides specified for
          this element block */
       elem_blk_parms[i].elem_type_val = UNK;
-      elem_blk_parms[i].num_nodes_per_side = 0;
+      elem_blk_parms[i].num_nodes_per_side[0] = 0;
     }
 
     elem_ctr += elem_blk_parms[i].num_elem_in_blk;
@@ -428,7 +417,7 @@ int ex_get_side_set_node_list_len(int exoid,
   {
     for (j=0; j<num_elem_blks; j++)
     {
-      if (elem_blk_parms[j].elem_type_val != '\0')
+      if (elem_blk_parms[j].elem_type_val != NULL_ELEMENT)
         if (side_set_elem_list[i] <= elem_blk_parms[j].elem_ctr)
           break; /* stop because we found the parameters for this element */
     }
@@ -501,7 +490,7 @@ int ex_get_side_set_node_list_len(int exoid,
       return (EX_FATAL);
     }
     else /* all other element types */
-      *side_set_node_list_len += elem_blk_parms[j].num_nodes_per_side;
+      *side_set_node_list_len += elem_blk_parms[j].num_nodes_per_side[0];
   }
 
   /* All done: release element block ids array,
