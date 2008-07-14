@@ -529,6 +529,76 @@ src/error_estimation/patch_recovery_error_estimator.$(obj-suffix):\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/statistics.h
+src/error_estimation/uniform_refinement_estimator.$(obj-suffix):\
+    src/error_estimation/uniform_refinement_estimator.C\
+    include/base/auto_ptr.h\
+    include/base/dof_map.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/error_estimation/error_estimator.h\
+    include/error_estimation/uniform_refinement_estimator.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_interface.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/elem_range.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/geom/stored_range.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_refinement.h\
+    include/mesh/parallel_mesh.h\
+    include/mesh/serial_mesh.h\
+    include/mesh/unstructured_mesh.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/parallel/threads.h\
+    include/parallel/threads_allocators.h\
+    include/quadrature/quadrature.h\
+    include/solvers/equation_systems.h\
+    include/solvers/explicit_system.h\
+    include/solvers/frequency_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/linear_implicit_system.h\
+    include/solvers/newmark_system.h\
+    include/solvers/steady_system.h\
+    include/solvers/system.h\
+    include/solvers/system_norm.h\
+    include/solvers/transient_system.h\
+    include/utils/compare_types.h\
+    include/utils/error_vector.h\
+    include/utils/location_maps.h\
+    include/utils/mapvector.h\
+    include/utils/o_string_stream.h\
+    include/utils/parameters.h\
+    include/utils/perf_log.h\
+    include/utils/statistics.h
 src/fe/fe.$(obj-suffix):\
     src/fe/fe.C\
     include/base/auto_ptr.h\
@@ -6624,76 +6694,6 @@ src/numerics/type_vector.$(obj-suffix):\
     include/base/print_trace.h\
     include/numerics/type_vector.h\
     include/utils/compare_types.h
-src/numerics/uniform_refinement_estimator.$(obj-suffix):\
-    src/numerics/uniform_refinement_estimator.C\
-    include/base/auto_ptr.h\
-    include/base/dof_map.h\
-    include/base/dof_object.h\
-    include/base/libmesh.h\
-    include/base/libmesh_base.h\
-    include/base/libmesh_common.h\
-    include/base/libmesh_config.h\
-    include/base/libmesh_exceptions.h\
-    include/base/libmesh_logging.h\
-    include/base/multi_predicates.h\
-    include/base/print_trace.h\
-    include/base/reference_counted_object.h\
-    include/base/reference_counter.h\
-    include/base/single_predicates.h\
-    include/base/variant_filter_iterator.h\
-    include/enums/enum_elem_quality.h\
-    include/enums/enum_elem_type.h\
-    include/enums/enum_fe_family.h\
-    include/enums/enum_inf_map_type.h\
-    include/enums/enum_io_package.h\
-    include/enums/enum_norm_type.h\
-    include/enums/enum_order.h\
-    include/enums/enum_quadrature_type.h\
-    include/enums/enum_solver_package.h\
-    include/enums/enum_xdr_mode.h\
-    include/error_estimation/error_estimator.h\
-    include/fe/fe.h\
-    include/fe/fe_base.h\
-    include/fe/fe_interface.h\
-    include/fe/fe_type.h\
-    include/geom/elem.h\
-    include/geom/elem_range.h\
-    include/geom/node.h\
-    include/geom/point.h\
-    include/geom/stored_range.h\
-    include/mesh/mesh.h\
-    include/mesh/mesh_base.h\
-    include/mesh/mesh_refinement.h\
-    include/mesh/parallel_mesh.h\
-    include/mesh/serial_mesh.h\
-    include/mesh/unstructured_mesh.h\
-    include/numerics/numeric_vector.h\
-    include/numerics/tensor_value.h\
-    include/numerics/type_tensor.h\
-    include/numerics/type_vector.h\
-    include/numerics/uniform_refinement_estimator.h\
-    include/numerics/vector_value.h\
-    include/parallel/threads.h\
-    include/parallel/threads_allocators.h\
-    include/quadrature/quadrature.h\
-    include/solvers/equation_systems.h\
-    include/solvers/explicit_system.h\
-    include/solvers/frequency_system.h\
-    include/solvers/implicit_system.h\
-    include/solvers/linear_implicit_system.h\
-    include/solvers/newmark_system.h\
-    include/solvers/steady_system.h\
-    include/solvers/system.h\
-    include/solvers/system_norm.h\
-    include/solvers/transient_system.h\
-    include/utils/compare_types.h\
-    include/utils/error_vector.h\
-    include/utils/location_maps.h\
-    include/utils/mapvector.h\
-    include/utils/o_string_stream.h\
-    include/utils/parameters.h\
-    include/utils/perf_log.h\
-    include/utils/statistics.h
 src/parallel/parallel_bin_sorter.$(obj-suffix):\
     src/parallel/parallel_bin_sorter.C\
     include/base/libmesh.h\
@@ -7200,6 +7200,7 @@ src/quadrature/quadrature_gauss_3D.$(obj-suffix):\
     include/parallel/threads.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
+    include/quadrature/quadrature_gm.h\
     include/quadrature/quadrature_jacobi.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
@@ -7349,6 +7350,80 @@ src/quadrature/quadrature_jacobi_1D.$(obj-suffix):\
     include/parallel/threads.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_jacobi.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/quadrature/quadrature_monomial.$(obj-suffix):\
+    src/quadrature/quadrature_monomial.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/parallel/threads.h\
+    include/quadrature/quadrature.h\
+    include/quadrature/quadrature_monomial.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/quadrature/quadrature_monomial_2D.$(obj-suffix):\
+    src/quadrature/quadrature_monomial_2D.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/parallel/threads.h\
+    include/quadrature/quadrature.h\
+    include/quadrature/quadrature_gauss.h\
+    include/quadrature/quadrature_monomial.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/quadrature/quadrature_monomial_3D.$(obj-suffix):\
+    src/quadrature/quadrature_monomial_3D.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/parallel/threads.h\
+    include/quadrature/quadrature.h\
+    include/quadrature/quadrature_gauss.h\
+    include/quadrature/quadrature_monomial.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
