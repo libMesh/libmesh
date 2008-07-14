@@ -103,7 +103,7 @@ class QGrundmann_Moller : public QBase
   ~QGrundmann_Moller();
 
   /**
-   * @returns \p QCLOUGH
+   * @returns \p QGRUNDMANN_MOLLER
    */
   QuadratureType type() const { return QGRUNDMANN_MOLLER; }
 
@@ -113,7 +113,7 @@ class QGrundmann_Moller : public QBase
   void init_1D (const ElemType,
 		unsigned int =0)
   {
-    // See about makeing this non-pure virtual in the base class
+    // See about making this non-pure virtual in the base class
     libmesh_error();
   }
 
