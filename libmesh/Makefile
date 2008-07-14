@@ -54,7 +54,7 @@ target := $(mesh_library)
 ifeq ($(syn-mode),on)
   all:: $(objects)
 else
-  all:: $(target) # $(appbinfiles)
+  all:: $(target) $(appbinfiles)
 endif
 ###############################################################################
 
