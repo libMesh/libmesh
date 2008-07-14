@@ -18,37 +18,42 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include "quadrature_monomial.h"
 
-#ifndef __enum_quadrature_type_h__
-#define __enum_quadrature_type_h__
 
-// ------------------------------------------------------------
-// enum QuadratureType definition
-namespace libMeshEnums {
-  
-  /**
-   * Defines an \p enum for currently available quadrature rules.
-   */
-  enum QuadratureType {QGAUSS            = 0,
-				         
-		       QJACOBI_1_0       = 1,
-		       QJACOBI_2_0       = 2,
-				         
-		       QSIMPSON          = 3,
-		       QTRAP             = 4,
-		       QGRID             = 5,
-		       QGRUNDMANN_MOLLER = 6,
-		       QMONOMIAL         = 7,
+// See the files:
 
-		       QCLOUGH           = 21,
+// quadrature_monomial_2D.C
+// quadrature_monomial_3D.C
 
-		       INVALID_Q_RULE    = 127};
+// for implementation of specific element types.
+
+// Constructor
+QMonomial::QMonomial(const unsigned int d,
+		     const Order o) : QBase(d,o)
+{
 }
 
-using namespace libMeshEnums;
 
-#endif // #define __enum_quadrature_type_h__
+// Destructor
+QMonomial::~QMonomial()
+{
+}
 
+void QMonomial::wissmann_rule(const Real rule_data[][3],
+			      const unsigned int n_pts)
+{
+  for (unsigned int i=0, c=0; i<n_pts; ++i)
+    {
+      _points[c]  = Point( rule_data[i][0], rule_data[i][1] );
+      _weights[c++] = rule_data[i][2];
 
-
-
+      // This may be an (x1,x2) -> (-x1,x2) point, in which case
+      // we will also generate the mirror point using the same weight.
+      if (rule_data[i][0] != static_cast<Real>(0.0))
+	{
+	  _points[c]  = Point( -rule_data[i][0], rule_data[i][1] );
+	  _weights[c++] = rule_data[i][2];
+	}
+    }
+}

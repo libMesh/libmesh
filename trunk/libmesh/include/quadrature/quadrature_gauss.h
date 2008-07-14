@@ -86,19 +86,6 @@ class QGauss : public QBase
   void keast_rule(const Real rule_data[][4],
 		  const unsigned int n_pts);
 
-  /**
-   * Wissmann published three interesting "partially symmetric" rules
-   * for integrating degree 4, 6, and 8 polynomials exactly on QUADs.
-   * These rules have all positive weights, all points inside the
-   * reference element, and have fewer points than tensor-product
-   * rules of the same order, making them superior to those rules.
-   * 
-   * J. W. Wissman and T. Becker, Partially symmetric cubature 
-   * formulas for even degrees of exactness, SIAM J. Numer. Anal.  23
-   * (1986), 676--685.
-  */
-  void wissmann_rule(const Real rule_data[][3],
-		     const unsigned int n_pts);
 };
 
 
