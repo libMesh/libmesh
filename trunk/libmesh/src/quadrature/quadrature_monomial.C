@@ -57,3 +57,153 @@ void QMonomial::wissmann_rule(const Real rule_data[][3],
 	}
     }
 }
+
+
+
+void QMonomial::stroud_rule(const Real rule_data[][3],
+			    const unsigned int* rule_symmetry,
+			    const unsigned int n_pts)
+{
+  for (unsigned int i=0, c=0; i<n_pts; ++i)
+    {
+      const Real
+	x=rule_data[i][0],
+	y=rule_data[i][1],
+	w=rule_data[i][2];
+
+      switch(rule_symmetry[i])
+	{
+	case 0: // Single point (no symmetry)
+	  {
+	    _points[c]  = Point( x, y);
+	    _weights[c++] = w;
+	    
+	    break;
+	  }
+	case 1: // Fully-symmetric (x,y)
+	  {
+	    _points[c]    = Point( x, y);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(-x, y);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point( x,-y);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(-x,-y);
+	    _weights[c++] = w;
+	    
+	    _points[c]    = Point( y, x);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(-y, x);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point( y,-x);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(-y,-x);
+	    _weights[c++] = w;
+	    
+	    break;
+	  }
+	case 2: // Fully-symmetric (x,x)
+	  {
+	    _points[c]    = Point( x, x);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(-x, x);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point( x,-x);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(-x,-x);
+	    _weights[c++] = w;
+
+	    break;
+	  }
+	case 3: // Fully-symmetric (x,0)
+	  {
+	    libmesh_assert(y==0.0);
+
+	    _points[c]    = Point( x,0.);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(-x,0.);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(0., x);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(0.,-x);
+	    _weights[c++] = w;
+
+	    break;
+	  }
+	case 4: // Rotational invariant
+	  {
+	    _points[c]    = Point( x, y);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(-x,-y);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(-y, x);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point( y,-x);
+	    _weights[c++] = w;
+
+	    break;
+	  }
+	case 5: // Partial symmetry (Wissman's rules)
+	  {
+	    libmesh_assert (x != 0.0);
+	    
+	    _points[c]    = Point( x, y);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(-x, y);
+	    _weights[c++] = w;
+
+	    break;
+	  }
+	case 6: // Rectangular symmetry
+	  {
+	    _points[c]    = Point( x, y);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(-x, y);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(-x,-y);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point( x,-y);
+	    _weights[c++] = w;
+
+	    break;
+	  }
+	case 7: // Central symmetry
+	  {
+	    libmesh_assert (x == 0.0);
+	    libmesh_assert (y != 0.0);
+	    
+	    _points[c]    = Point(0., y);
+	    _weights[c++] = w;
+
+	    _points[c]    = Point(0.,-y);
+	    _weights[c++] = w;
+
+	    break;
+	  }
+	default:
+	  {
+	    std::cerr << "Unknown symmetry!" << std::endl;
+	    libmesh_error();
+	  }
+	} // end switch(rule_symmetry[i])
+    }
+}

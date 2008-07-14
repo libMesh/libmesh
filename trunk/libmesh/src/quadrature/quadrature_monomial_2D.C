@@ -107,6 +107,39 @@ void QMonomial::init_2D(const ElemType _type,
 
 
 	    
+	  case FIFTH:
+	    {
+	      // A degree 5, 7-point rule due to Stroud.  
+	      //
+	      // A.H. Stroud, Approximate calculation of multiple integrals,
+	      // Prentice-Hall, Englewood Cliffs, N.J., 1971.
+	      //
+	      // This rule is provably minimal in the number of points.
+	      // A tensor-product rule accurate for "bi-quintic" polynomials would have 9 points.
+	      const Real data[3][3] =
+		{
+		  {0.0000000000000000e+00, 0.0000000000000000e+00, 1.1428571428571428e+00}, // 1
+		  {0.0000000000000000e+00, 9.6609178307929590e-01, 3.1746031746031746e-01}, // 2
+		  {7.7459666924148337e-01, 5.7735026918962576e-01, 5.5555555555555555e-01}  // 4
+		};
+
+	      const unsigned int symmetry[3] = {
+		0, // Origin
+		7, // Central Symmetry
+		6  // Rectangular
+	      };
+	      
+	      _points.resize (7);
+	      _weights.resize(7);
+
+	      stroud_rule(data, symmetry, 3);
+	      
+	      return;
+	    } // end case FIFTH
+
+
+
+	    
 	  case SIXTH:
 	    {
 	      // A pair of degree=6 rules for the QUAD "C2" due to
@@ -145,6 +178,42 @@ void QMonomial::init_2D(const ElemType _type,
 	      return; 
 	    } // end case SIXTH
 
+
+
+	    
+	  case SEVENTH:
+	    {
+	      // A degree 7, 12-point rule due to Stroud.  
+	      //
+	      // A.H. Stroud, Approximate calculation of multiple integrals,
+	      // Prentice-Hall, Englewood Cliffs, N.J., 1971.
+	      //
+	      // This rule is fully-symmetric and provably minimal in the number of points.
+	      // A tensor-product rule accurate for "bi-septic" polynomials would have 16 points.
+	      const Real data[3][3] =
+		{
+		  {9.2582009977255146e-01, 0.0000000000000000e+00, 2.4197530864197530e-01}, // 4
+		  {3.8055443320831565e-01, 0.0000000000000000e+00, 5.2059291666739445e-01}, // 4
+		  {8.0597978291859874e-01, 0.0000000000000000e+00, 2.3743177469063023e-01}  // 4
+		};
+
+	      const unsigned int symmetry[3] = {
+		3, // Full Symmetry, (x,0)
+		2, // Full Symmetry, (x,x)
+		2  // Full Symmetry, (x,x)
+	      };
+	      
+	      _points.resize (12);
+	      _weights.resize(12);
+
+	      stroud_rule(data, symmetry, 3);
+
+	      return;
+	    } // end case SEVENTH
+
+
+
+	    
 	  case EIGHTH:
 	    {
 	      // A pair of degree=8 rules for the QUAD "C2" due to
@@ -190,6 +259,188 @@ void QMonomial::init_2D(const ElemType _type,
 	      return; 
 	    } // end case EIGHTH
 
+
+
+
+	  case NINTH:
+	    {
+	      // A degree 9, 17-point rule due to Moller.  
+	      //
+	      // H.M. Moller,  Kubaturformeln mit minimaler Knotenzahl,
+	      // Numer. Math.  25 (1976), 185--200.
+	      //
+	      // This rule is provably minimal in the number of points.
+	      // A tensor-product rule accurate for "bi-ninth" degree polynomials would have 25 points.
+	      const Real data[5][3] =
+		{
+		  {0.0000000000000000e+00, 0.0000000000000000e+00, 5.2674897119341563e-01}, // 1
+		  {6.3068011973166885e-01, 9.6884996636197772e-01, 8.8879378170198706e-02}, // 4
+		  {9.2796164595956966e-01, 7.5027709997890053e-01, 1.1209960212959648e-01}, // 4
+		  {4.5333982113564719e-01, 5.2373582021442933e-01, 3.9828243926207009e-01}, // 4
+		  {8.5261572933366230e-01, 7.6208328192617173e-02, 2.6905133763978080e-01}  // 4
+		};
+
+	      const unsigned int symmetry[5] = {
+		0, // Single point
+		4, // Rotational Invariant
+		4, // Rotational Invariant
+		4, // Rotational Invariant
+		4  // Rotational Invariant
+	      };
+	      
+	      _points.resize (17);
+	      _weights.resize(17);
+
+	      stroud_rule(data, symmetry, 5);
+
+	      return;
+	    } // end case NINTH
+
+
+
+
+	  case TENTH:
+	  case ELEVENTH:
+	    {
+	      // A degree 11, 24-point rule due to Cools and Haegemans.  
+	      //
+	      // R. Cools and A. Haegemans, Another step forward in searching for
+	      // cubature formulae with a minimal number of knots for the square,
+	      // Computing 40 (1988), 139--146.
+	      // 
+	      // P. Verlinden and R. Cools, The algebraic construction of a minimal
+	      // cubature formula of degree 11 for the square, Cubature Formulas
+	      // and their Applications (Russian) (Krasnoyarsk) (M.V. Noskov, ed.),
+	      // 1994, pp. 13--23.
+	      //
+	      // This rule is provably minimal in the number of points.
+	      // A tensor-product rule accurate for "bi-tenth" or "bi-eleventh" degree polynomials would have 36 points.
+	      const Real data[6][3] =
+		{
+		  {6.9807610454956756e-01, 9.8263922354085547e-01, 4.8020763350723814e-02}, // 4
+		  {9.3948638281673690e-01, 8.2577583590296393e-01, 6.6071329164550595e-02}, // 4
+		  {9.5353952820153201e-01, 1.8858613871864195e-01, 9.7386777358668164e-02}, // 4
+		  {3.1562343291525419e-01, 8.1252054830481310e-01, 2.1173634999894860e-01}, // 4
+		  {7.1200191307533630e-01, 5.2532025036454776e-01, 2.2562606172886338e-01}, // 4
+		  {4.2484724884866925e-01, 4.1658071912022368e-02, 3.5115871839824543e-01}  // 4
+		};
+
+	      const unsigned int symmetry[6] = {
+		4, // Rotational Invariant
+		4, // Rotational Invariant
+		4, // Rotational Invariant
+		4, // Rotational Invariant
+		4, // Rotational Invariant
+		4  // Rotational Invariant
+	      };
+	      
+	      _points.resize (24);
+	      _weights.resize(24);
+
+	      stroud_rule(data, symmetry, 6);
+
+	      return;
+	    } // end case TENTH,ELEVENTH
+
+
+
+
+	  case TWELFTH:
+	  case THIRTEENTH:
+	    {
+	      // A degree 13, 33-point rule due to Cools and Haegemans.  
+	      //
+	      // R. Cools and A. Haegemans, Another step forward in searching for
+	      // cubature formulae with a minimal number of knots for the square,
+	      // Computing 40 (1988), 139--146.
+	      // 
+	      // A tensor-product rule accurate for "bi-12" or "bi-13" degree polynomials would have 49 points.
+	      const Real data[9][3] =
+		{
+		  {0.0000000000000000e+00, 0.0000000000000000e+00, 3.0038211543122536e-01}, // 1
+		  {9.8348668243987226e-01, 7.7880971155441942e-01, 2.9991838864499131e-02}, // 4
+		  {8.5955600564163892e-01, 9.5729769978630736e-01, 3.8174421317083669e-02}, // 4
+		  {9.5892517028753485e-01, 1.3818345986246535e-01, 6.0424923817749980e-02}, // 4
+		  {3.9073621612946100e-01, 9.4132722587292523e-01, 7.7492738533105339e-02}, // 4
+		  {8.5007667369974857e-01, 4.7580862521827590e-01, 1.1884466730059560e-01}, // 4
+		  {6.4782163718701073e-01, 7.5580535657208143e-01, 1.2976355037000271e-01}, // 4
+		  {7.0741508996444936e-02, 6.9625007849174941e-01, 2.1334158145718938e-01}, // 4
+		  {4.0930456169403884e-01, 3.4271655604040678e-01, 2.5687074948196783e-01}  // 4
+		};
+
+	      const unsigned int symmetry[9] = {
+		0, // Single point
+		4, // Rotational Invariant
+		4, // Rotational Invariant
+		4, // Rotational Invariant
+		4, // Rotational Invariant
+		4, // Rotational Invariant
+		4, // Rotational Invariant
+		4, // Rotational Invariant
+		4  // Rotational Invariant
+	      };
+	      
+	      _points.resize (33);
+	      _weights.resize(33);
+
+	      stroud_rule(data, symmetry, 9);
+
+	      return;
+	    } // end case TWELFTH,THIRTEENTH
+
+
+
+
+	  case FOURTEENTH:
+	  case FIFTEENTH:
+	  case SIXTEENTH:
+	  case SEVENTEENTH:
+	    {
+	      // A degree 17, 60-point rule due to Cools and Haegemans.  
+	      //
+	      // R. Cools and A. Haegemans, Another step forward in searching for
+	      // cubature formulae with a minimal number of knots for the square,
+	      // Computing 40 (1988), 139--146.
+	      // 
+	      // A tensor-product rule accurate for "bi-14" or "bi-15" degree polynomials would have 64 points.
+	      // A tensor-product rule accurate for "bi-16" or "bi-17" degree polynomials would have 81 points.
+	      const Real data[10][3] =
+		{
+		  {9.8935307451260049e-01, 0.0000000000000000e+00, 2.0614915919990959e-02}, // 4
+		  {3.7628520715797329e-01, 0.0000000000000000e+00, 1.2802571617990983e-01}, // 4
+		  {9.7884827926223311e-01, 0.0000000000000000e+00, 5.5117395340318905e-03}, // 4
+		  {8.8579472916411612e-01, 0.0000000000000000e+00, 3.9207712457141880e-02}, // 4
+		  {1.7175612383834817e-01, 0.0000000000000000e+00, 7.6396945079863302e-02}, // 4
+		  {5.9049927380600241e-01, 3.1950503663457394e-01, 1.4151372994997245e-01}, // 8
+		  {7.9907913191686325e-01, 5.9797245192945738e-01, 8.3903279363797602e-02}, // 8
+		  {8.0374396295874471e-01, 5.8344481776550529e-02, 6.0394163649684546e-02}, // 8
+		  {9.3650627612749478e-01, 3.4738631616620267e-01, 5.7387752969212695e-02}, // 8
+		  {9.8132117980545229e-01, 7.0600028779864611e-01, 2.1922559481863763e-02}, // 8
+		};
+
+	      const unsigned int symmetry[10] = {
+		3, // Fully symmetric (x,0)
+		3, // Fully symmetric (x,0)
+		2, // Fully symmetric (x,x)
+		2, // Fully symmetric (x,x)
+		2, // Fully symmetric (x,x)
+		1, // Fully symmetric (x,y) 
+		1, // Fully symmetric (x,y)
+		1, // Fully symmetric (x,y)
+		1, // Fully symmetric (x,y)
+		1  // Fully symmetric (x,y)
+	      };
+	      
+	      _points.resize (60);
+	      _weights.resize(60);
+
+	      stroud_rule(data, symmetry, 10);
+
+	      return;
+	    } // end case FOURTEENTH through SEVENTEENTH
+	    
+	    
+	    
 	    // By default: construct and use a Gauss quadrature rule
 	  default:
 	    {

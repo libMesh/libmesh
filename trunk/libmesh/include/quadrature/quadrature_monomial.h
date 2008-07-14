@@ -43,6 +43,18 @@
  * more efficient than tensor product rules when they are available,
  * and fall back on Gaussian quadrature rules when necessary.
  *
+ * A number of these rules have been helpfully collected in electronic form by:
+ *
+ * Prof. Ronald Cools
+ * Katholieke Universiteit Leuven,
+ * Dept. Computerwetenschappen
+ * http://www.cs.kuleuven.ac.be/~nines/research/ecf/ecf.html
+ *
+ * (A username and password to access the tables is available by request.)
+ *
+ * We also provide the original reference for each rule, as available,
+ * in the source code file.
+ *
  * @author John W. Peterson, 2008
  */
 
@@ -105,6 +117,31 @@ class QMonomial : public QBase
   */
   void wissmann_rule(const Real rule_data[][3],
 		     const unsigned int n_pts);
+
+  /**
+   * Stroud's rules for QUADs and HEXes can have one of several
+   * different types of symmetry.  The rule_symmetry array describes
+   * how the different lines of the rule_data array are to be
+   * applied.  The different rule_symmetry possibilities are:
+   * 0)  Origin or single-point: (x,y)
+   * Fully-symmetric, 3 cases:
+   *   1) (x,y) -> (x,y), (-x,y), (x,-y), (-x,-y)
+   *               (y,x), (-y,x), (y,-x), (-y,-x)
+   *   2) (x,x) -> (x,x), (-x,x), (x,-x), (-x,-x)
+   *   3) (x,0) -> (x,0), (-x,0), (0, x), ( 0,-x)
+   * 4) Rotational Invariant, (x,y) -> (x,y), (-x,-y), (-y, x), (y,-x)
+   * 5) Partial Symmetry,     (x,y) -> (x,y), (-x, y) [x!=0]
+   * 6) Rectangular Symmetry, (x,y) -> (x,y), (-x, y), (-x,-y), (x,-y)
+   * 7) Central Symmetry,     (0,y) -> (0,y), ( 0,-y)
+   *
+   * Not all rules with these symmetries are due to Stroud, however,
+   * his book is probably the most frequently-cited compendium of
+   * quadrature rules and later authors certainly built upon his work.
+   */
+  void stroud_rule(const Real rule_data[][3],
+		   const unsigned int* rule_symmetry,
+		   const unsigned int n_pts);
+		   
 
 };
 
