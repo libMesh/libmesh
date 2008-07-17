@@ -146,7 +146,38 @@ void QGauss::init_2D(const ElemType _type,
 		} // end if (allow_rules_with_negative_weights)
 	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
 	    }
+
+
+	    
 	  case FOURTH:
+	    {
+	      // A degree 4 rule with six points.  This rule can be found in many places
+	      // including:
+	      //
+	      // J.N. Lyness and D. Jespersen, Moderate degree symmetric
+	      // quadrature rules for the triangle, J. Inst. Math. Appl.  15 (1975),
+	      // 19--32.
+
+	      _points.resize(6);
+	      _weights.resize(6);
+	      
+	      // The points are arranged symmetrically in two sets ('a' and 'b') of three.
+	      const Real a = 9.1576213509770743e-02;  const Real wa = 5.4975871827660933e-02;
+	      const Real b = 4.4594849091596488e-01;  const Real wb = 1.1169079483900573e-01;
+
+	      _points[0] = Point(a      ,       a); _weights[0] = wa;
+	      _points[1] = Point(a      , 1.-2.*a); _weights[1] = wa;
+	      _points[2] = Point(1.-2.*a,       a); _weights[2] = wa;
+
+	      _points[3] = Point(b      ,      b); _weights[3] = wb;
+	      _points[4] = Point(b      ,1.-2.*b); _weights[4] = wb;
+	      _points[5] = Point(1.-2.*b,      b); _weights[5] = wb;
+	      
+	      return;
+	    }
+
+
+	    
 	  case FIFTH:
 	    {
 	      // Exact for quintics
