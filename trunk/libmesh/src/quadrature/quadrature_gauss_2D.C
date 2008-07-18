@@ -224,108 +224,96 @@ void QGauss::init_2D(const ElemType _type,
 	      return;
 	    }
 
-	  case SIXTH:
-	    {
-	      // Exact for sixth degree polynomials
-	      // Taken from http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps
-	      // by Flaherty
-	      _points.resize(12);
-	      _weights.resize(12);
-	      const Real w1 = 0.050844906370207 / 2.0;
-	      const Real w2 = 0.116786275726379 / 2.0;
-	      const Real w3 = 0.082851075618374 / 2.0;
-	      const Real a1 = 0.873821971016996;
-	      const Real a2 = 0.063089014491502;
-	      const Real b1 = 0.501426509658179;
-	      const Real b2 = 0.249286745170910;
-	      const Real c1 = 0.636502499121399;
-	      const Real c2 = 0.310352451033785;
-	      const Real c3 = 0.053145049844816;
 
-	      _points[0](0) = a1;
-	      _points[0](1) = a2;
 
-	      _points[1](0) = a2;
-	      _points[1](1) = a1;
-
-	      _points[2](0) = a2;
-	      _points[2](1) = a2;
-
-	      _points[3](0) = b1;
-	      _points[3](1) = b2;
-
-	      _points[4](0) = b2;
-	      _points[4](1) = b1;
-
-	      _points[5](0) = b2;
-	      _points[5](1) = b2;
-
-	      _points[6](0) = c1;
-	      _points[6](1) = c2;
-
-	      _points[7](0) = c1;
-	      _points[7](1) = c3;
-
-	      _points[8](0) = c2;
-	      _points[8](1) = c1;
-
-	      _points[9](0) = c2;
-	      _points[9](1) = c3;
-
-	      _points[10](0) = c3;
-	      _points[10](1) = c1;
-
-	      _points[11](0) = c3;
-	      _points[11](1) = c2;
-
-	      _weights[0] = w1;
-	      _weights[1] = w1;
-	      _weights[2] = w1;
-	      _weights[3] = w2;
-	      _weights[4] = w2;
-	      _weights[5] = w2;
-	      _weights[6] = w3;
-	      _weights[7] = w3;
-	      _weights[8] = w3;
-	      _weights[9] = w3;
-	      _weights[10] = w3;
-	      _weights[11] = w3;
-
-	      return;
-	    }
 
 	    
-	    // This rule, which is originally due to:
-	    // Dunavant, "High degree efficient symmetrical Gaussian quadrature rules for
-	    // the triangle", IJNME 21 p. 1129--1148, 1985.
+	    // A degree 7 rule with 12 points.  This rule can be found in:
 	    //
-	    // It was copied 23rd June 2008 from:
-	    // http://people.scs.fsu.edu/~burkardt/f_src/dunavant/dunavant.f90
+	    // K. Gatermann, The construction of symmetric cubature
+	    // formulas for the square and the triangle, Computing 40
+	    // (1988), 229--240.
 	    //
-	    // This rule contains a negative weight and will fall through to EIGHTH if you have
-	    // chosen to disallow such rules.
+	    // This rule, which is provably minimal in the number of
+	    // integration points, is said to be 'Ro3 invariant' which
+	    // means that a given set of barycentric coordinates
+	    // (z1,z2,z3) implies the quadrature points (z1,z2),
+	    // (z3,z1), (z2,z3) which are formed by taking the first
+	    // two entries in cyclic permutations of the barycentric
+	    // point.  Barycentric coordinates are related in the
+	    // sense that: z3 = 1 - z1 - z2.
+	    //
+	    // The 12-point sixth-order rule for triangles given in
+	    // Flaherty's (http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps)
+	    // lecture notes has been removed in favor of this rule
+	    // which is higher-order (for the same number of
+	    // quadrature points points) and has a few more digits of
+	    // precision in the points and weights.  Some 10-point
+	    // degree 6 rules exist for the triangle but they have
+	    // quadrature points outside the region of integration.
+	  case SIXTH:
 	  case SEVENTH:
 	    {
-	      if (allow_rules_with_negative_weights)
-		{
-		  _points.resize(13);
-		  _weights.resize(13);
-
-		  // The raw data for the quadrature rule.
-		  const Real p[4][4] = {
-		    {                1./3.,                    0.,                    0., -0.149570044467682e+00 / 2.0}, // 1-perm
-		    {0.479308067841920e+00, 0.260345966079040e+00,                    0., 0.175615257433208e+00  / 2.0}, // 3-perm
-		    {0.869739794195568e+00, 0.065130102902216e+00,                    0., 0.053347235608838e+00  / 2.0}, // 3-perm
-		    {0.048690315425316e+00, 0.312865496004874e+00, 0.638444188569810e+00, 0.077113760890257e+00  / 2.0}  // 6-perm
-		  };
-
+	      _points.resize (12);
+	      _weights.resize(12);
 	      
-		  // Now call the dunavant routine to generate _points and _weights
-		  dunavant_rule(p, 4);
-		  
- 		  return;
-		} // end if (allow_rules_with_negative_weights)
-	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
+	      const unsigned int nrows=4;
+	      
+	      // In each of the rows below, the first two entries are (z1, z2) which imply
+	      // z3.  The third entry is the weight for each of the points in the cyclic permutation.
+	      const Real p[nrows][3] = {
+		{6.2382265094402118e-02, 6.7517867073916085e-02, 2.6517028157436251e-02}, // group A
+		{5.5225456656926611e-02, 3.2150249385198182e-01, 4.3881408714446055e-02}, // group B
+		{3.4324302945097146e-02, 6.6094919618673565e-01, 2.8775042784981585e-02}, // group C
+		{5.1584233435359177e-01, 2.7771616697639178e-01, 6.7493187009802774e-02}  // group D
+	      };
+
+	      for (unsigned int i=0, offset=0; i<nrows; ++i)
+		{
+		  _points[offset + 0] = Point(p[i][0],            p[i][1]); // (z1,z2)
+		  _points[offset + 1] = Point(1.-p[i][0]-p[i][1], p[i][0]); // (z3,z1)
+		  _points[offset + 2] = Point(p[i][1], 1.-p[i][0]-p[i][1]); // (z2,z3)
+
+		  // All these points get the same weight
+		  _weights[offset + 0] = p[i][2];
+		  _weights[offset + 1] = p[i][2];
+		  _weights[offset + 2] = p[i][2];
+
+		  // Increment offset
+		  offset += 3;
+		}
+
+	      return;
+	      
+	      // // This rule, which is originally due to:
+	      // // Dunavant, "High degree efficient symmetrical Gaussian quadrature rules for
+	      // // the triangle", IJNME 21 p. 1129--1148, 1985.
+	      // //
+	      // // It was copied 23rd June 2008 from:
+	      // // http://people.scs.fsu.edu/~burkardt/f_src/dunavant/dunavant.f90
+	      // //
+	      // // This rule contains a negative weight and will fall through to the next case if you have
+	      // // chosen to disallow such rules.
+	      // if (allow_rules_with_negative_weights)
+	      // 	{
+	      // 	  _points.resize(13);
+	      // 	  _weights.resize(13);
+	      // 
+	      // 	  // The raw data for the quadrature rule.
+	      // 	  const Real p[4][4] = {
+	      // 	    {                1./3.,                    0.,                    0., -0.149570044467682e+00 / 2.0}, // 1-perm
+	      // 	    {0.479308067841920e+00, 0.260345966079040e+00,                    0., 0.175615257433208e+00  / 2.0}, // 3-perm
+	      // 	    {0.869739794195568e+00, 0.065130102902216e+00,                    0., 0.053347235608838e+00  / 2.0}, // 3-perm
+	      // 	    {0.048690315425316e+00, 0.312865496004874e+00, 0.638444188569810e+00, 0.077113760890257e+00  / 2.0}  // 6-perm
+	      // 	  };
+	      // 
+	      // 
+	      // 	  // Now call the dunavant routine to generate _points and _weights
+	      // 	  dunavant_rule(p, 4);
+	      // 	  
+ 	      // 	  return;
+	      // 	} // end if (allow_rules_with_negative_weights)
+	      // // Note: if !allow_rules_with_negative_weights, fall through to next case.
 	    }
 
 
