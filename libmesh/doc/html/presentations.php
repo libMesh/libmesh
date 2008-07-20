@@ -22,7 +22,7 @@
   <li> <a href="http://cfdlab.ae.utexas.edu/~roystgnr/sandia_libmesh.pdf">libMesh Finite Element Library</a> (August 2007 seminar, Sandia National Laboratories)</li>
 </ul>
 
-<h2>User Applications</h2>
+<h2>Developer Applications</h2>
 <ul>
 <!--   <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/adv_flows_project.pdf">Advanced Flows Class Project</a> (natural convection, 2002)</li> -->
 <!--   <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/siam_geo.pdf">SIAM Geosciences 2003</a></li> -->
