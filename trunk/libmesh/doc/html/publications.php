@@ -212,14 +212,18 @@ M.P. Luthi,
 <br>
 <li>
 M. Auf der Maur, M. Povolotskyi, F. Sacconia and A. Di Carlo,
-"TiberCAD: A new multiscale simulator for electronic and optoelectronic devices." <a href="http://dx.doi.org/doi:10.1016/j.spmi.2007.03.011">Superlattices and Microstructures</a>, Volume 41, Issues 5-6, May-June 2007, Pages 381-385.
+<i>TiberCAD: A new multiscale simulator for electronic and optoelectronic devices</i>. <a href="http://dx.doi.org/doi:10.1016/j.spmi.2007.03.011">Superlattices and Microstructures</a>, Volume 41, Issues 5-6, May-June 2007, Pages 381-385.
 </li>
 
 <br>
 <li>
-Hyung Taek Ahn, Mikhail Shashkov, Mark A. Christon,
-"The moment-of-fluid method in action."
-<a href="http://dx.doi.org/10.1002/cnm.1135">Communications in Numerical Methods in Engineering</a> July 2008.
+Fabio Galbusera, Margherita Cioffi, and Manuela T. Raimondi, <i>An in silico bioreactor for simulating laboratory experiments in tissue engineering</i>. <a href="http://dx.doi.org/10.1007/s10544-008-9164-9">Biomedical Microdevices</a>, Volume 10, Number 4, Pages 547-554, August, 2008.	
+</li>
+
+
+<br>
+<li>
+Hyung Taek Ahn, Mikhail Shashkov, Mark A. Christon, <i>The moment-of-fluid method in action</i>. <a href="http://dx.doi.org/10.1002/cnm.1135">Communications in Numerical Methods in Engineering</a> July 2008.
 </Li>
 
 </ul>
