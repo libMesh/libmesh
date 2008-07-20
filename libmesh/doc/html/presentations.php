@@ -91,6 +91,10 @@
       low Mach number.</i>
     <a href="http://www.ufrmeca.univ-lyon1.fr/~buffat/PUBLI_HTML/LowMach04.pdf">
       Low Mach Conference</a>, June 2004.
+  </li>
+
+  <li>
+    M.A. Sbai, <a href="http://cfdlab.ae.utexas.edu/~benkirk/Sbai_Stuttgart_CO2_presentation.pdf">A Process Oriented Toolbox for Numerical Analysis of CO2 Disposal in Aquifers</a>, Workshop on Numerical Models for Carbon Dioxide Storage in Geological Formations, Stuttgart, Germany, April 2008.
   </li>  
 </ul>
 
