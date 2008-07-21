@@ -22,7 +22,45 @@ menu on the left to navigate the examples.
 
 
 <ul>
-<li><L1><a href="ex0.php">Example 0</a> - Solving 1D PDE Using Adaptive Mesh Refinement</L1></li>
+
+<li><L1><a href="ex1.php">Creation of a Mesh Object</a></L1></li>
+<!-- This is the first example program.  It simply demonstrates -->
+<!-- how to create a mesh object.  A mesh is read from file, -->
+<!-- information is printed to the screen, and the mesh is then -->
+<!-- written. -->
+
+
+
+
+<li><L1><a href="ex2.php">Defining a Simple System</a></L1></li>
+<!-- The second example program demonstrates how to -->
+<!-- create an equation system for a simple scalar system.  This -->
+<!-- example will also introduce some of the issues involved with using Petsc -->
+<!-- in your application. -->
+
+
+
+
+<li><L1><a href="ex3.php">Solving a 2D Poisson Problem</a></L1></li>
+<!-- This is the third example program.  It builds on -->
+<!-- the second example program by showing how to solve a simple -->
+<!-- Poisson system.  This example also introduces the notion -->
+<!-- of customized matrix assembly functions, working with an -->
+<!-- exact solution, and using element iterators. -->
+<!-- We will not comment on things that -->
+<!-- were already explained in the second example. -->
+
+
+
+
+<li><L1><a href="ex4.php">Solving a 2D or 3D Poisson Problem in Parallel</a></L1></li>
+<!-- This is the fourth example program.  It builds on -->
+<!-- the third example program by showing how to formulate -->
+<!-- the code in a dimension-independent way.  Very minor -->
+<!-- changes allow rhe example will allow the problem to be -->
+<!-- solved in two or three dimensions and in parallel.  -->
+
+<li><L1><a href="ex0.php">Solving 1D PDE Using Adaptive Mesh Refinement</a></L1></li>
 <!-- This example demonstrates how to solve a simple 1D problem using -->
 <!-- adaptive mesh refinement. The PDE that is solved is: -epsilon*u''(x) + -->
 <!-- u(x) = 1, on the domain [0,1] with boundary conditions u(0) = u(1) = 0 -->
@@ -36,56 +74,14 @@ menu on the left to navigate the examples.
 <!-- subsequent examples. -->
 
 
-
-
-<li><L1><a href="ex1.php">Example 1</a> - Creation of a Mesh Object</L1></li>
-<!-- This is the first example program.  It simply demonstrates -->
-<!-- how to create a mesh object.  A mesh is read from file, -->
-<!-- information is printed to the screen, and the mesh is then -->
-<!-- written. -->
-
-
-
-
-<li><L1><a href="ex2.php">Example 2</a> - Defining a Simple System</L1></li>
-<!-- The second example program demonstrates how to -->
-<!-- create an equation system for a simple scalar system.  This -->
-<!-- example will also introduce some of the issues involved with using Petsc -->
-<!-- in your application. -->
-
-
-
-
-<li><L1><a href="ex3.php">Example 3</a> - Solving a 2D Poisson Problem</L1></li>
-<!-- This is the third example program.  It builds on -->
-<!-- the second example program by showing how to solve a simple -->
-<!-- Poisson system.  This example also introduces the notion -->
-<!-- of customized matrix assembly functions, working with an -->
-<!-- exact solution, and using element iterators. -->
-<!-- We will not comment on things that -->
-<!-- were already explained in the second example. -->
-
-
-
-
-<li><L1><a href="ex4.php">Example 4</a> - Solving a 2D or 3D Poisson Problem in Parallel</L1></li>
-<!-- This is the fourth example program.  It builds on -->
-<!-- the third example program by showing how to formulate -->
-<!-- the code in a dimension-independent way.  Very minor -->
-<!-- changes allow rhe example will allow the problem to be -->
-<!-- solved in two or three dimensions and in parallel.  -->
-
-
-
-
-<li><L1><a href="ex5.php">Example 5</a> - Run-time Selection of Quadrature Rules</L1></li>
+<li><L1><a href="ex5.php">Run-time Selection of Quadrature Rules</a></L1></li>
 <!-- This example changes the previous example by enabling -->
 <!-- run-time selection of quadrature rules.  -->
 
 
 
 
-<li><L1><a href="ex6.php">Example 6</a> - Infinite Elements for the Wave Equation</L1></li>
+<li><L1><a href="ex6.php">Infinite Elements for the Wave Equation</a></L1></li>
 <!-- This example introduces "infinite elements" which may be used for -->
 <!-- certain classes of applications.  The wave equation is solved in this -->
 <!-- example.  -->
@@ -95,7 +91,7 @@ library with the --enable-ifem option</i>
 
 
 
-<li><L1><a href="ex7.php">Example 7</a> - Introduction to Complex Numbers and the "FrequencySystem"</L1></li>
+<li><L1><a href="ex7.php">Introduction to Complex Numbers and the "FrequencySystem"</a></L1></li>
 <!-- This is the seventh example program.  It builds on -->
 <!-- the previous example programs, introduces complex -->
 <!-- numbers and the FrequencySystem class to solve a  -->
@@ -111,7 +107,7 @@ library with the --enable-ifem option</i>
 
 
 
-<li><L1><a href="ex8.php">Example 8</a> - The Newmark System and the Wave Equation</L1></li>
+<li><L1><a href="ex8.php">The Newmark System and the Wave Equation</a></L1></li>
 <!-- This example solves the wave equation in a hybrid-mesh pipe.  The mesh -->
 <!-- consists of <code>HEX8</code> and <code>PRISM6</code> element types. -->
 <!-- The pressure at a point in the pipe is extracted and can be plotted as -->
@@ -120,7 +116,7 @@ library with the --enable-ifem option</i>
 
 
 
-<li><L1><a href="ex9.php">Example 9</a> - Solving a Transient Linear System in Parallel</L1></li>
+<li><L1><a href="ex9.php">Solving a Transient Linear System in Parallel</a></L1></li>
 <!-- This example shows how a simple, linear transient -->
 <!-- system can be solved in parallel.  The system is simple -->
 <!-- scalar convection-diffusion with a specified external -->
@@ -131,7 +127,7 @@ library with the --enable-ifem option</i>
 
 
 
-<li><L1><a href="ex10.php">Example 10</a> - Solving a Transient System with Adaptive Mesh Refinement</L1></li>
+<li><L1><a href="ex10.php">Solving a Transient System with Adaptive Mesh Refinement</a></L1></li>
 <!-- This example shows how a simple, linear transient -->
 <!-- system can be solved in parallel.  The system is simple -->
 <!-- scalar convection-diffusion with a specified external -->
@@ -144,7 +140,7 @@ library with the --enable-ifem option</i>
 
 
 
-<li><L1><a href="ex11.php">Example 11</a> - Solving a System of Equations</L1></li>
+<li><L1><a href="ex11.php">Solving a System of Equations</a></L1></li>
 <!-- This example shows how to solve a simple, linear system of equations.  The -->
 <!-- familiar Stokes equations for incompressible fluid flow are solved.  To satisfy -->
 <!-- the LBB criterion different approximation spaces are used for the velocity and -->
@@ -153,13 +149,13 @@ library with the --enable-ifem option</i>
 
 
 
-<li><L1><a href="ex12.php">Example 12</a> - Using the <code>MeshData</code> class</L1></li>
+<li><L1><a href="ex12.php">Using the <code>MeshData</code> class</a></L1></li>
 <!-- This example describes the use of the <code>MeshData</code> class. -->
 <!-- More on this later. -->
 
 
 
-<li><L1><a href="ex13.php">Example 13</a> - Unsteady Navier-Stokes Equations - Unsteady Nonlinear System</L1></li>
+<li><L1><a href="ex13.php">Unsteady Navier-Stokes Equations - Unsteady Nonlinear System</a></L1></li>
 <!-- This example shows how a simple, unsteady, nonlinear system of equations -->
 <!-- can be solved in parallel.  The system of equations are the familiar -->
 <!-- Navier-Stokes equations for low-speed incompressible fluid flow.  This -->
@@ -174,7 +170,7 @@ library with the --enable-ifem option</i>
 <!-- a more detailed time history, or compute more timesteps, that is certainly -->
 <!-- possible by changing the n_timesteps and dt variables below. -->
 
-<li><L1><a href="ex14.php">Example 14</a> - Laplace's Equation in an L-Shaped Domain</L1></li>
+<li><L1><a href="ex14.php">Laplace's Equation in an L-Shaped Domain</a></L1></li>
 <!-- This example solves the Laplace equation on the classic "L-shaped" -->
 <!-- domain with adaptive mesh refinement.  In this case, the exact -->
 <!-- solution is u(r,\theta) = r^{2/3} * \sin ( (2/3) * \theta), but -->
@@ -214,7 +210,7 @@ library with the --enable-ifem option</i>
 <!-- "max_r_steps" controls the number of refinement steps, and -->
 <!-- "max_r_level" controls the maximum element refinement level. -->
 
-<li><L1><a href="ex16.php">Example 16</a> - Solving an Eigen Problem</L1></li>
+<li><L1><a href="ex16.php">Solving an Eigen Problem</a></L1></li>
 <!-- This example introduces the EigenSystem and shows how libMesh can be -->
 <!-- used for eigenvalue analysis.  For solving eigen problems, libMesh -->
 <!-- interfaces SLEPc -->
@@ -225,7 +221,7 @@ library with the --enable-ifem option</i>
 <!-- A*x=lambda*x are computed, where the matrix A is assembled according -->
 <!-- to a mass matrix. -->
 
-<li><L1><a href="ex17.php">Example 17</a> - Solving a generalized Eigen Problem</L1></li>
+<li><L1><a href="ex17.php">Solving a generalized Eigen Problem</a></L1></li>
 <!-- This example shows how the previous EigenSolver example -->
 <!-- can be adapted to solve generailzed eigenvalue problems. -->
 <!-- For solving eigen problems, libMesh interfaces -->
@@ -240,7 +236,7 @@ library with the --enable-ifem option</i>
 <!-- matrices A and B are assembled according to stiffness and -->
 <!-- mass matrix, respectively. -->
  
-<li><L1><a href="ex18.php">Example 18</a> - Unsteady Navier-Stokes Equations with DiffSystem</L1></li>
+<li><L1><a href="ex18.php">Unsteady Navier-Stokes Equations with DiffSystem</a></L1></li>
 <!-- This example shows how the transient nonlinear problem from -->
 <!-- example 13 can be solved using the DiffSystem class framework to -->
 <!-- simplify the user-implemented equations. -->
