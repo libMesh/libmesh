@@ -109,14 +109,14 @@ private:
 // SystemNorm inline methods
 
 inline
-SystemNorm::SystemNorm::SystemNorm() :
+SystemNorm::SystemNorm() :
     _norms(1, DISCRETE_L2), _weights(1, 1.0)
 { 
 }
 
 
 inline
-SystemNorm::SystemNorm::SystemNorm(const FEMNormType &t) :
+SystemNorm::SystemNorm(const FEMNormType &t) :
     _norms(1, t), _weights(1, 1.0)
 { 
 }
