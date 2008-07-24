@@ -236,7 +236,7 @@ namespace Parallel
    * Blocking-receive vector from one processor.
    */
   template <typename T>
-  inline Status recv (const unsigned int src_processor_id,
+  inline Status recv (const int src_processor_id,
 		      std::vector<T> &buf,
 		      const int tag=any_tag);
 
@@ -245,7 +245,7 @@ namespace Parallel
    * Blocking-receive vector from one processor with user-defined type
    */
   template <typename T>
-  inline Status recv (const unsigned int src_processor_id,
+  inline Status recv (const int src_processor_id,
 		      std::vector<T> &buf,
 		      data_type &type,
 		      const int tag=any_tag);
@@ -255,7 +255,7 @@ namespace Parallel
    * Nonblocking-receive vector from one processor.
    */
   template <typename T>
-  inline void irecv (const unsigned int src_processor_id,
+  inline void irecv (const int src_processor_id,
 		     std::vector<T> &buf,
 		     request &r,
 		     const int tag=any_tag);
@@ -808,7 +808,7 @@ namespace Parallel
 
 
   template <typename T>
-  inline Status recv (const unsigned int src_processor_id,
+  inline Status recv (const int src_processor_id,
 		      std::vector<T> &buf,
 		      const int tag)
   {
@@ -837,7 +837,7 @@ namespace Parallel
 
 
   template <typename T>
-  inline Status recv (const unsigned int src_processor_id,
+  inline Status recv (const int src_processor_id,
 		      std::vector<T> &buf,
 		      MPI_Datatype &type,
 		      const int tag)
@@ -866,7 +866,7 @@ namespace Parallel
 
 
   template <typename T>
-  inline Status recv (const unsigned int src_processor_id,
+  inline Status recv (const int src_processor_id,
 		      std::vector<std::complex<T> > &buf,
 		      const int tag)
   {
@@ -892,7 +892,7 @@ namespace Parallel
 
 
   template <typename T>
-  inline void irecv (const unsigned int src_processor_id,
+  inline void irecv (const int src_processor_id,
 		     std::vector<T> &buf,
 		     request &r,
 		     const int tag)
@@ -917,7 +917,7 @@ namespace Parallel
 
  
   template <typename T>
-  inline void irecv (const unsigned int src_processor_id,
+  inline void irecv (const int src_processor_id,
 		     std::vector<std::complex<T> > &buf,
 		     request &r,
 		     const int tag)
@@ -1417,7 +1417,7 @@ namespace Parallel
 			std::vector<T> &recv)
   {
     START_LOG ("allgather()","Parallel");
-    //libmesh_assert(recv.size() == libMesh::n_processors());
+    
     recv.resize(libMesh::n_processors());
     
     if (libMesh::n_processors() > 1)
@@ -1443,7 +1443,7 @@ namespace Parallel
 			std::vector<std::complex<T> > &recv)
   {
     START_LOG ("allgather()","Parallel");
-    //libmesh_assert(recv.size() == libMesh::n_processors());
+
     recv.resize(libMesh::n_processors());
 
     if (libMesh::n_processors() > 1)
@@ -1793,12 +1793,12 @@ namespace Parallel
 
   // Blocking receives don't make sense on one processor
   template <typename T>
-  inline Status recv (const unsigned int,
+  inline Status recv (const int,
 		      std::vector<T> &,
 		      const int) { libmesh_error(); return Status(); }
 
   template <typename T>
-  inline void irecv (const unsigned int,
+  inline void irecv (const int,
 		     std::vector<T> &,
 		     request &,
 		     const int) {}
@@ -1808,10 +1808,10 @@ namespace Parallel
   inline void wait (std::vector<request> &) {}
   
   template <typename T>
-  inline void send_receive(const unsigned int send_tgt,
-                           T &send,
-			   const unsigned int recv_source,
-                           T &recv)
+  inline void send_receive (const unsigned int send_tgt,
+			    T &send,
+			    const unsigned int recv_source,
+			    T &recv)
   {
     libmesh_assert (send_tgt == recv_source);
     recv = send;
