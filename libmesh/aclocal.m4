@@ -454,8 +454,28 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
         dnl Specific flags for specific versions
         case "$GXX_VERSION" in
 
-          dnl Intel ICC >= 10.0	          
-          intel_icc_v10.0| intel_icc_v10.1)		
+          dnl Intel ICC >= v10.1
+          intel_icc_v10.1)
+              dnl Disable some warning messages:
+              dnl #266: 'function declared implicitly'
+              dnl       Metis function "GKfree" caused this error
+              dnl       in almost every file.
+              dnl #1476: 'field uses tail padding of a base class'
+              dnl #1505: 'size of class is affected by tail padding'
+              dnl        simply warns of a possible incompatibility with
+              dnl        the g++ ABI for this case
+              dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
+              dnl        Well, duh, when the tested value is computed...  OK when it
+              dnl        was from an assignment.
+              CXXFLAGS_DBG="-w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
+              CXXFLAGS_OPT="-O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
+              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
+              CFLAGS_OPT="-O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
+              CFLAGS_DVL="$CFLAGS_DBG"
+              ;;
+                    dnl Intel ICC >= 10.0	          
+          intel_icc_v10.0)		
               dnl Disable some warning messages:
               dnl #266: 'function declared implicitly'
               dnl       Metis function "GKfree" caused this error
