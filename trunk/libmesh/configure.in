@@ -134,8 +134,17 @@ AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(csignal)
 AC_CXX_HAVE_LOCALE
 AC_CXX_HAVE_SSTREAM
-AC_CHECK_HEADERS(unordered_map,[],[AC_CHECK_HEADERS(tr1/unordered_map,[],[AC_CHECK_HEADERS(hash_map, [], [AC_CHECK_HEADERS(ext/hash_map)])])])
-AC_CHECK_HEADERS(unordered_set,[],[AC_CHECK_HEADERS(tr1/unordered_set,[],[AC_CHECK_HEADERS(hash_set, [], [AC_CHECK_HEADERS(ext/hash_set)])])])
+
+AC_ARG_ENABLE(unordered-containers,
+              AC_HELP_STRING([--enable-unordered-containers],
+                             [Use unordered_map/unordered_set if available]),
+              enableunorderedcontainers=$enableval,
+              enableunorderedcontainers=yes)
+
+  if test "$enableunorderedcontainers" != no ; then
+    AC_CHECK_HEADERS(unordered_map,[],[AC_CHECK_HEADERS(tr1/unordered_map,[],[AC_CHECK_HEADERS(hash_map, [], [AC_CHECK_HEADERS(ext/hash_map)])])])
+    AC_CHECK_HEADERS(unordered_set,[],[AC_CHECK_HEADERS(tr1/unordered_set,[],[AC_CHECK_HEADERS(hash_set, [], [AC_CHECK_HEADERS(ext/hash_set)])])])
+  fi
 
 AC_CHECK_HEADERS(dlfcn.h)
 AX_CXX_GCC_ABI_DEMANGLE

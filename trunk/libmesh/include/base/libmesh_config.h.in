@@ -9,15 +9,15 @@
 /* Flag indicating if the library should be built with AMR support */
 #undef ENABLE_AMR
 
+/* Flag indicating if the library should be built to throw C++ exceptions on
+   unexpected errors */
+#undef ENABLE_EXCEPTIONS
+
 /* Flag indicating if the library should offer higher order p-FEM shapes */
 #undef ENABLE_HIGHER_ORDER_SHAPES
 
 /* Flag indicating if the library should be built with infinite elements */
 #undef ENABLE_INFINITE_ELEMENTS
-
-/* Flag indicating if the library should be built with a variational
- * smoother */
-#undef ENABLE_VSMOOTHER
 
 /* Flag indicating if the library should use the experimental ParallelMesh as
    its default Mesh type */
@@ -26,14 +26,6 @@
 /* Flag indicating if the library should be built with performance logging
    support */
 #undef ENABLE_PERFORMANCE_LOGGING
-
-/* Flag indicating if the library should be built to throw C++ exceptions
-   on unexpected errors */
-#undef ENABLE_EXCEPTIONS
-
-/* Flag indicating if the library should be built to output stack
- * trace files on unexpected errors */
-#undef ENABLE_TRACEFILES
 
 /* Flag indicating if the library should be built with periodic boundary
    condition support */
@@ -46,6 +38,14 @@
 /* Flag indicating if the library should be built with second derivatives */
 #undef ENABLE_SECOND_DERIVATIVES
 
+/* Flag indicating if the library should be built to write stack trace files
+   on unexpected errors */
+#undef ENABLE_TRACEFILES
+
+/* Flag indicating if the library should be built with variational smoother
+   support */
+#undef ENABLE_VSMOOTHER
+
 /* Flag indicating bzip2/bunzip2 are available for handlingcompressed files */
 #undef HAVE_BZIP
 
@@ -57,6 +57,12 @@
 
 /* Flag indicating whether the library will be compiled with Exodus support */
 #undef HAVE_EXODUS_API
+
+/* Define to 1 if you have the <ext/hash_map> header file. */
+#undef HAVE_EXT_HASH_MAP
+
+/* Define to 1 if you have the <ext/hash_set> header file. */
+#undef HAVE_EXT_HASH_SET
 
 /* define if the compiler supports GCC C++ ABI name demangling */
 #undef HAVE_GCC_ABI_DEMANGLE
@@ -72,6 +78,12 @@
 
 /* Flag indicating whether or not gzstreams are available */
 #undef HAVE_GZSTREAM
+
+/* Define to 1 if you have the <hash_map> header file. */
+#undef HAVE_HASH_MAP
+
+/* Define to 1 if you have the <hash_set> header file. */
+#undef HAVE_HASH_SET
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
@@ -97,6 +109,10 @@
 
 /* define if the compiler implements namespaces */
 #undef HAVE_NAMESPACES
+
+/* Flag indicating whether the library will be compiled with Nemesis support
+   */
+#undef HAVE_NEMESIS_API
 
 /* Flag indicating whether the library will be compiled with Netcdf support */
 #undef HAVE_NETCDF
@@ -154,6 +170,12 @@
 /* Flag indicating whether the library will be compiled with TetGen support */
 #undef HAVE_TETGEN
 
+/* Define to 1 if you have the <tr1/unordered_map> header file. */
+#undef HAVE_TR1_UNORDERED_MAP
+
+/* Define to 1 if you have the <tr1/unordered_set> header file. */
+#undef HAVE_TR1_UNORDERED_SET
+
 /* Flag indicating whether the library will be compiled with Triangle support
    */
 #undef HAVE_TRIANGLE
@@ -168,26 +190,8 @@
 /* Define to 1 if you have the <unordered_map> header file. */
 #undef HAVE_UNORDERED_MAP
 
-/* Define to 1 if you have the <tr1/unordered_map> header file. */
-#undef HAVE_TR1_UNORDERED_MAP
-
-/* Define to 1 if you have the <hash_map> header file. */
-#undef HAVE_HASH_MAP
-
-/* Define to 1 if you have the <ext/hash_map> header file. */
-#undef HAVE_EXT_HASH_MAP
-
 /* Define to 1 if you have the <unordered_set> header file. */
 #undef HAVE_UNORDERED_SET
-
-/* Define to 1 if you have the <tr1/unordered_set> header file. */
-#undef HAVE_TR1_UNORDERED_SET
-
-/* Define to 1 if you have the <hash_set> header file. */
-#undef HAVE_HASH_SET
-
-/* Define to 1 if you have the <ext/hash_set> header file. */
-#undef HAVE_EXT_HASH_SET
 
 /* Flag indicating whether the library will be compiled with VTK support */
 #undef HAVE_VTK
