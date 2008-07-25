@@ -31,6 +31,7 @@ ex14.$(obj-suffix):\
     ../../include/error_estimation/jump_error_estimator.h\
     ../../include/error_estimation/kelly_error_estimator.h\
     ../../include/error_estimation/patch_recovery_error_estimator.h\
+    ../../include/error_estimation/uniform_refinement_estimator.h\
     ../../include/fe/fe.h\
     ../../include/fe/fe_base.h\
     ../../include/fe/fe_type.h\
@@ -65,7 +66,6 @@ ex14.$(obj-suffix):\
     ../../include/numerics/tensor_value.h\
     ../../include/numerics/type_tensor.h\
     ../../include/numerics/type_vector.h\
-    ../../include/numerics/uniform_refinement_estimator.h\
     ../../include/numerics/vector_value.h\
     ../../include/parallel/threads.h\
     ../../include/parallel/threads_allocators.h\
