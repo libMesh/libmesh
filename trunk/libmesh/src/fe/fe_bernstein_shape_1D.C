@@ -171,13 +171,13 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
 	switch(i)
 	  {
 	  case 0:
-	    return binomial_p_i * std::pow((1.-xi)/2.,static_cast<double>(p_order));
+	    return binomial_p_i * std::pow((1.-xi)/2.,static_cast<Real>(p_order));
 	  case 1:
-	    return binomial_p_i * std::pow((1.+xi)/2.,static_cast<double>(p_order));
+	    return binomial_p_i * std::pow((1.+xi)/2.,static_cast<Real>(p_order));
 	  default:
 	    {
-	      return binomial_p_i * std::pow((1.+xi)/2.,static_cast<double>(n))
-		                  * std::pow((1.-xi)/2.,static_cast<double>(m));
+	      return binomial_p_i * std::pow((1.+xi)/2.,static_cast<Real>(n))
+		                  * std::pow((1.-xi)/2.,static_cast<Real>(m));
 	    }
 	  }
 
@@ -352,14 +352,14 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
 	switch(i)
 	  {
 	  case 0:
-	    return binomial_p_i * (-1./2.) * p_order * std::pow((1.-xi)/2.,static_cast<double>(p_order-1));
+	    return binomial_p_i * (-1./2.) * p_order * std::pow((1.-xi)/2.,static_cast<Real>(p_order-1));
 	  case 1:
-	    return binomial_p_i * ( 1./2.) * p_order * std::pow((1.+xi)/2.,static_cast<double>(p_order-1));
+	    return binomial_p_i * ( 1./2.) * p_order * std::pow((1.+xi)/2.,static_cast<Real>(p_order-1));
 	    
 	  default:
 	    {
-	      return binomial_p_i * (1./2. * n * std::pow((1.+xi)/2.,static_cast<double>(n-1)) * std::pow((1.-xi)/2.,static_cast<double>(m))
-				   - 1./2. * m * std::pow((1.+xi)/2.,static_cast<double>(n))   * std::pow((1.-xi)/2.,static_cast<double>(m-1)));
+	      return binomial_p_i * (1./2. * n * std::pow((1.+xi)/2.,static_cast<Real>(n-1)) * std::pow((1.-xi)/2.,static_cast<Real>(m))
+				   - 1./2. * m * std::pow((1.+xi)/2.,static_cast<Real>(n))   * std::pow((1.-xi)/2.,static_cast<Real>(m-1)));
 	    }
 	  }
 	

@@ -70,9 +70,9 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	      for (int yexp=poly_deg-xexp; yexp >= 0; yexp--)
                 {
                   int zexp = poly_deg - xexp - yexp;
-		  psi.push_back(std::pow(x,static_cast<double>(xexp))*
-				std::pow(y,static_cast<double>(yexp))*
-				std::pow(z,static_cast<double>(zexp)));
+		  psi.push_back(std::pow(x,static_cast<Real>(xexp))*
+				std::pow(y,static_cast<Real>(yexp))*
+				std::pow(z,static_cast<Real>(zexp)));
                 }
 	    break;
 	  }
@@ -83,8 +83,8 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	    for (int xexp=poly_deg; xexp >= 0; xexp--) // use an int for xexp since we -- it
               {
                 int yexp = poly_deg - xexp;
-		psi.push_back(std::pow(x,static_cast<double>(xexp))*
-			      std::pow(y,static_cast<double>(yexp)));
+		psi.push_back(std::pow(x,static_cast<Real>(xexp))*
+			      std::pow(y,static_cast<Real>(yexp)));
               }
 	    break;
 	  }
@@ -93,7 +93,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	case 1:
 	  {
             int xexp = poly_deg;
-	    psi.push_back(std::pow(x,static_cast<double>(xexp)));
+	    psi.push_back(std::pow(x,static_cast<Real>(xexp)));
 	    break;
 	  }
 	  

@@ -1832,6 +1832,96 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 }
 
 
+template <>
+void Xdr::data_stream (long double *val, const unsigned int len, const unsigned int line_break)
+{
+  switch (mode)
+    {
+    case ENCODE:
+    case DECODE:
+      {
+#ifdef HAVE_XDR
+
+	libmesh_assert (this->is_open());
+
+	// FIXME[JWP]: How to implement this for long double?  Mac OS
+	// X defines 'xdr_quadruple' but AFAICT, it does not exist for
+	// Linux... for now, reading/writing XDR files with long
+	// doubles is disabled, but you can still write long double
+	// ASCII files of course.
+	// if (len > 0)
+	//   xdr_vector(xdrs, 
+	// 	     (char*) val,
+	// 	     len,
+	// 	     sizeof(double),
+	// 	     (xdrproc_t) xdr_quadruple);
+
+	std::cerr << "Writing binary XDR files with long double's is not\n"
+		  << "currently supported on all platforms." << std::endl;
+
+	libmesh_error();
+	
+#else
+	
+	std::cerr << "ERROR: Functionality is not available." << std::endl
+		  << "Make sure HAVE_XDR is defined at build time" 
+		  << std::endl
+		  << "The XDR interface is not available in this installation"
+		  << std::endl;
+
+	libmesh_error();
+
+#endif
+	return;
+      }
+
+    case READ:
+      {
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
+
+	for (unsigned int i=0; i<len; i++)
+	  {
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
+	    *in >> val[i];
+	  }
+
+	return;	
+      }
+
+    case WRITE:
+      {
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+
+	if (line_break == libMesh::invalid_uint)
+	  for (unsigned int i=0; i<len; i++)
+	    {
+	      libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+	      OFSRealscientific(*out,17,val[i]) << " ";
+	    }
+	else
+	  {
+	    unsigned int cnt=0;
+	    while (cnt < len)
+	      {
+		for (unsigned int i=0; i<std::min(line_break,len); i++)
+		  {
+		    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+		    OFSRealscientific(*out,17,val[cnt++]) << " ";
+		  }
+		libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+		*out << '\n';
+	      }
+	  }
+
+	return;	
+      }
+
+    default:
+      libmesh_error();
+    }
+}
+
+
 #ifdef USE_COMPLEX_NUMBERS
 template <>
 void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const unsigned int line_break)
@@ -1972,3 +2062,4 @@ void Xdr::comment (std::string &comment)
 //
 template void Xdr::data_stream<int>          (int *val,          const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned int> (unsigned int *val, const unsigned int len, const unsigned int line_break);
+template void Xdr::data_stream<long double>  (long double  *val, const unsigned int len, const unsigned int line_break);
