@@ -92,6 +92,7 @@ class GetPot {
   inline bool         operator()(const char* VarName, bool        Default) const;
   inline int          operator()(const char* VarName, int         Default) const;
   inline double       operator()(const char* VarName, double      Default) const;
+  inline long double  operator()(const char* VarName, long double Default) const;
   inline const char*  operator()(const char* VarName, const char* Default) const;
   inline std::string  operator()(const char* VarName, const std::string& Default) const;
   //     -- vectors
@@ -240,6 +241,7 @@ class GetPot {
   //        * type conversion if possible     
   inline int      __convert_to_type(const std::string& String, int Default) const;
   inline double   __convert_to_type(const std::string& String, double Default) const;
+  inline long double   __convert_to_type(const std::string& String, long double Default) const;
   inline bool     __convert_to_type(const std::string& String, bool Default) const;
 
   //        * prefix extraction
@@ -698,6 +700,17 @@ GetPot::__convert_to_type(const std::string& String, double Default) const
 {
   double tmp;
   if( std::sscanf(String.c_str(),"%lf", &tmp) != 1 ) return Default;
+  return tmp;
+}
+
+
+
+// convert string to LONG DOUBLE, if not possible return Default
+inline long double   
+GetPot::__convert_to_type(const std::string& String, long double Default) const
+{
+  long double tmp;
+  if( std::sscanf(String.c_str(),"%Lf", &tmp) != 1 ) return Default;
   return tmp;
 }
 
@@ -1216,6 +1229,16 @@ GetPot::operator()(const char* VarName, int Default) const
 
 inline double
 GetPot::operator()(const char* VarName, double Default) const
+{
+  const variable*  sv = __find_variable(VarName);
+  if( sv == 0 ) return Default;
+  return __convert_to_type(sv->original, Default);
+}
+
+
+
+inline long double
+GetPot::operator()(const char* VarName, long double Default) const
 {
   const variable*  sv = __find_variable(VarName);
   if( sv == 0 ) return Default;
