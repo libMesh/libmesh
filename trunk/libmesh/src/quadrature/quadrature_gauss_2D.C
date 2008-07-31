@@ -77,10 +77,10 @@ void QGauss::init_2D(const ElemType _type,
 	      _points.resize(1);
 	      _weights.resize(1);
 		  
-	      _points[0](0) = .33333333333333333333333333333333;
-	      _points[0](1) = .33333333333333333333333333333333;
+	      _points[0](0) = 1.0L/3.0L;
+	      _points[0](1) = 1.0L/3.0L;
 
-	      _weights[0] = .5;
+	      _weights[0] = 0.5;
 
 	      return;
 	    }
@@ -100,50 +100,81 @@ void QGauss::init_2D(const ElemType _type,
 	      // _points[2](0) = .5;
 	      // _points[2](1) = .0;
 	      
-	      _points[0](0) = 2./3.;
-	      _points[0](1) = 1./6.;
+	      _points[0](0) = 2.0L/3.0L;
+	      _points[0](1) = 1.0L/6.0L;
 
-	      _points[1](0) = 1./6.;
-	      _points[1](1) = 2./3.;
+	      _points[1](0) = 1.0L/6.0L;
+	      _points[1](1) = 2.0L/3.0L;
 
-	      _points[2](0) = 1./6.;
-	      _points[2](1) = 1./6.;
+	      _points[2](0) = 1.0L/6.0L;
+	      _points[2](1) = 1.0L/6.0L;
 
 
-	      _weights[0] = 1./6.;
-	      _weights[1] = 1./6.;
-	      _weights[2] = 1./6.;
+	      _weights[0] = 1.0L/6.0L;
+	      _weights[1] = 1.0L/6.0L;
+	      _weights[2] = 1.0L/6.0L;
 
 	      return;
 	    }
 	  case THIRD:
 	    {
-	      if (allow_rules_with_negative_weights)
-		{
-		  // Exact for cubics
-		  _points.resize(4);
-		  _weights.resize(4);
-		  
-		  _points[0](0) = .33333333333333333333333333333333;
-		  _points[0](1) = .33333333333333333333333333333333;
+	      // Exact for cubics
+	      _points.resize(4);
+	      _weights.resize(4);
 
-		  _points[1](0) = .2;
-		  _points[1](1) = .6;
+	      // This rule is formed from a tensor product of appropriately-scaled
+	      // Gauss and Jacobi rules.  (See also: the tensor_product_tri() and tensor_product_tet()
+	      // routines in quadrature.C  For high orders these rules generally
+	      // have too many points, but at extremely low order they are competitive
+	      // and have the additional benefit of having all positive weights.
+	      _points[0](0)=1.5505102572168219018027159252941e-01L;
+	      _points[0](1)=1.7855872826361642311703513337422e-01L;
+	      _points[1](0)=6.4494897427831780981972840747059e-01L;
+	      _points[1](1)=7.5031110222608118177475598324603e-02L;
+	      _points[2](0)=1.5505102572168219018027159252941e-01L;
+	      _points[2](1)=6.6639024601470138670269327409637e-01L;
+	      _points[3](0)=6.4494897427831780981972840747059e-01L;
+	      _points[3](1)=2.8001991549907407200279599420481e-01L;
 
-		  _points[2](0) = .2;
-		  _points[2](1) = .2;
+	      _weights[0]=1.5902069087198858469718450103758e-01L;
+	      _weights[1]=9.0979309128011415302815498962418e-02L;
+	      _weights[2]=1.5902069087198858469718450103758e-01L;
+	      _weights[3]=9.0979309128011415302815498962418e-02L;
 
-		  _points[3](0) = .6;
-		  _points[3](1) = .2;
+	      return;
 
-
-		  _weights[0] = -27./96.;
-		  _weights[1] =  25./96.;
-		  _weights[2] =  25./96.;
-		  _weights[3] =  25./96.;
-
-		  return;
-		} // end if (allow_rules_with_negative_weights)
+	      
+	      // The following third-order rule is quite commonly cited
+	      // in the literature and most likely works fine.  However,
+	      // we generally prefer a rule with all positive weights
+	      // and an equal number of points, when available.
+	      //
+	      //  (allow_rules_with_negative_weights)
+	      // {
+	      //   // Exact for cubics
+	      //   _points.resize(4);
+	      //   _weights.resize(4);
+	      //   
+	      //   _points[0](0) = .33333333333333333333333333333333;
+	      //   _points[0](1) = .33333333333333333333333333333333;
+	      // 
+	      //   _points[1](0) = .2;
+	      //   _points[1](1) = .6;
+	      // 
+	      //   _points[2](0) = .2;
+	      //   _points[2](1) = .2;
+	      // 
+	      //   _points[3](0) = .6;
+	      //   _points[3](1) = .2;
+	      // 
+	      // 
+	      //   _weights[0] = -27./96.;
+	      //   _weights[1] =  25./96.;
+	      //   _weights[2] =  25./96.;
+	      //   _weights[3] =  25./96.;
+	      // 
+	      //   return;
+	      // } // end if (allow_rules_with_negative_weights)
 	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
 	    }
 
@@ -162,16 +193,16 @@ void QGauss::init_2D(const ElemType _type,
 	      _weights.resize(6);
 	      
 	      // The points are arranged symmetrically in two sets ('a' and 'b') of three.
-	      const Real a = 9.1576213509770743e-02;  const Real wa = 5.4975871827660933e-02;
-	      const Real b = 4.4594849091596488e-01;  const Real wb = 1.1169079483900573e-01;
+	      const Real a = 9.1576213509770743e-02L;  const Real wa = 5.4975871827660933e-02L;
+	      const Real b = 4.4594849091596488e-01L;  const Real wb = 1.1169079483900573e-01L;
 
-	      _points[0] = Point(a      ,       a); _weights[0] = wa;
-	      _points[1] = Point(a      , 1.-2.*a); _weights[1] = wa;
-	      _points[2] = Point(1.-2.*a,       a); _weights[2] = wa;
+	      _points[0] = Point(a      ,           a); _weights[0] = wa;
+	      _points[1] = Point(a      , 1.0L-2.0L*a); _weights[1] = wa;
+	      _points[2] = Point(1.0L-2.0L*a,       a); _weights[2] = wa;
 
-	      _points[3] = Point(b      ,      b); _weights[3] = wb;
-	      _points[4] = Point(b      ,1.-2.*b); _weights[4] = wb;
-	      _points[5] = Point(1.-2.*b,      b); _weights[5] = wb;
+	      _points[3] = Point(b      ,          b); _weights[3] = wb;
+	      _points[4] = Point(b      ,1.0L-2.0L*b); _weights[4] = wb;
+	      _points[5] = Point(1.0L-2.0L*b,      b); _weights[5] = wb;
 	      
 	      return;
 	    }
@@ -186,13 +217,13 @@ void QGauss::init_2D(const ElemType _type,
 	      _points.resize(7);
 	      _weights.resize(7);
 		  
-	      const Real b1 = 2./7. + std::sqrt(15.)/21.;
-	      const Real a1 = 1. - 2.*b1;
-	      const Real b2 = 2./7. - std::sqrt(15.)/21.;
-	      const Real a2 = 1. - 2.*b2;
+	      const Real b1 = 2.0L/7.0L + std::sqrt(15.0L)/21.0L;
+	      const Real a1 = 1.0L - 2.0L*b1;
+	      const Real b2 = 2.0L/7.0L - std::sqrt(15.0L)/21.0L;
+	      const Real a2 = 1.0L - 2.0L*b2;
 		  
-	      _points[0](0) = 1./3.;
-	      _points[0](1) = 1./3.;
+	      _points[0](0) = 1.0L/3.0L;
+	      _points[0](1) = 1.0L/3.0L;
 
 	      _points[1](0) = a1;
 	      _points[1](1) = b1;
@@ -213,11 +244,11 @@ void QGauss::init_2D(const ElemType _type,
 	      _points[6](1) = b2;
 
 
-	      _weights[0] = 9./80.;
-	      _weights[1] = 31./480. + std::sqrt(15.)/2400.;
+	      _weights[0] = 9.0L/80.0L;
+	      _weights[1] = 31.0L/480.0L + std::sqrt(15.0L)/2400.0L;
 	      _weights[2] = _weights[1];
 	      _weights[3] = _weights[1];
-	      _weights[4] = 31./480. - std::sqrt(15.)/2400.;
+	      _weights[4] = 31.0L/480.0L - std::sqrt(15.0L)/2400.0L;
 	      _weights[5] = _weights[4];
 	      _weights[6] = _weights[4];
 
@@ -247,7 +278,7 @@ void QGauss::init_2D(const ElemType _type,
 	    // Flaherty's (http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps)
 	    // lecture notes has been removed in favor of this rule
 	    // which is higher-order (for the same number of
-	    // quadrature points points) and has a few more digits of
+	    // quadrature points) and has a few more digits of
 	    // precision in the points and weights.  Some 10-point
 	    // degree 6 rules exist for the triangle but they have
 	    // quadrature points outside the region of integration.
