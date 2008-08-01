@@ -723,6 +723,9 @@ template void FE<2,SZABAB>::edge_reinit(Elem const*, unsigned int, Real);
 template void FE<2,XYZ>::reinit(Elem const*, unsigned int, Real);
 template void FE<2,XYZ>::edge_reinit(Elem const*, unsigned int, Real);
 
+// Intel 9.1 complained it needed this in devel mode.
+template void FE<2,XYZ>::init_face_shape_functions(const std::vector<Point>&, const Elem*);
+
 template void FE<3,LAGRANGE>::reinit(Elem const*, unsigned int, Real);
 template void FE<3,LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real);
 template void FE<3,HIERARCHIC>::reinit(Elem const*, unsigned int, Real);
@@ -741,3 +744,6 @@ template void FE<3,SZABAB>::edge_reinit(Elem const*, unsigned int, Real);
 #endif
 template void FE<3,XYZ>::reinit(Elem const*, unsigned int, Real);
 template void FE<3,XYZ>::edge_reinit(Elem const*, unsigned int, Real);
+
+// Intel 9.1 complained it needed this in devel mode.
+template void FE<3,XYZ>::init_face_shape_functions(const std::vector<Point>&, const Elem*);
