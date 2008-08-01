@@ -790,7 +790,9 @@ void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
 						   io,
 						   vec);
     } // end variable loop
+#ifdef DEBUG
   Parallel::sum (n_assigned_vals);
+#endif
   libmesh_assert (n_assigned_vals == vector_length);
 }
 
