@@ -58,10 +58,10 @@
 /* Flag indicating whether the library will be compiled with Exodus support */
 #undef HAVE_EXODUS_API
 
-/* Define to 1 if you have the <ext/hash_map> header file. */
+/* define if the compiler supports __gnu_cxx::hash_map */
 #undef HAVE_EXT_HASH_MAP
 
-/* Define to 1 if you have the <ext/hash_set> header file. */
+/* define if the compiler supports __gnu_cxx::hash_set */
 #undef HAVE_EXT_HASH_SET
 
 /* define if the compiler supports GCC C++ ABI name demangling */
@@ -79,10 +79,10 @@
 /* Flag indicating whether or not gzstreams are available */
 #undef HAVE_GZSTREAM
 
-/* Define to 1 if you have the <hash_map> header file. */
+/* define if the compiler supports std::hash_map */
 #undef HAVE_HASH_MAP
 
-/* Define to 1 if you have the <hash_set> header file. */
+/* define if the compiler supports std::hash_set */
 #undef HAVE_HASH_SET
 
 /* Define to 1 if you have the <inttypes.h> header file. */
@@ -170,10 +170,10 @@
 /* Flag indicating whether the library will be compiled with TetGen support */
 #undef HAVE_TETGEN
 
-/* Define to 1 if you have the <tr1/unordered_map> header file. */
+/* define if the compiler supports std::tr1::unordered_map */
 #undef HAVE_TR1_UNORDERED_MAP
 
-/* Define to 1 if you have the <tr1/unordered_set> header file. */
+/* define if the compiler supports std::tr1::unordered_set */
 #undef HAVE_TR1_UNORDERED_SET
 
 /* Flag indicating whether the library will be compiled with Triangle support
@@ -187,10 +187,10 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Define to 1 if you have the <unordered_map> header file. */
+/* define if the compiler supports std::unordered_map */
 #undef HAVE_UNORDERED_MAP
 
-/* Define to 1 if you have the <unordered_set> header file. */
+/* define if the compiler supports std::unordered_set */
 #undef HAVE_UNORDERED_SET
 
 /* Flag indicating whether the library will be compiled with VTK support */
