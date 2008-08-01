@@ -217,7 +217,8 @@ void System::read_header (Xdr& io,
 	{
 	  // sanity checks
 	  libmesh_assert(this->_can_add_vectors);
-	  libmesh_assert(this->_vectors.count(vec_name) == 0);
+	  // Some systems may have added their own vectors already
+//	  libmesh_assert(this->_vectors.count(vec_name) == 0);
 
 	  this->add_vector(vec_name);
 	}
