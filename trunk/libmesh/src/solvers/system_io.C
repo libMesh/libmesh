@@ -790,6 +790,9 @@ void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
 						   io,
 						   vec);
     } // end variable loop
+
+  vec.close();
+
 #ifdef DEBUG
   Parallel::sum (n_assigned_vals);
 #endif
