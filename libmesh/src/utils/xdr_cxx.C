@@ -2062,4 +2062,3 @@ void Xdr::comment (std::string &comment)
 //
 template void Xdr::data_stream<int>          (int *val,          const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned int> (unsigned int *val, const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<long double>  (long double  *val, const unsigned int len, const unsigned int line_break);
