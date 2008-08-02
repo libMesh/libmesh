@@ -175,7 +175,7 @@ void ContinuationSystem::initialize_tangent()
 //       std::cout << "norm_previous_u=" << norm_previous_u << std::endl;
 //       //std::cout << "norm_delta_u=" << norm_delta_u << std::endl;
 //       std::cout << "norm_delta_u/max(|u|,|u_old|)=" << norm_delta_u << std::endl;
-//       std::cout << "|norm_u-norm_previous_u|=" << fabs(norm_u - norm_previous_u) << std::endl;
+//       std::cout << "|norm_u-norm_previous_u|=" << std::abs(norm_u - norm_previous_u) << std::endl;
 //     }
   
 //   const Real dlambda = *continuation_parameter-old_continuation_parameter;
@@ -314,7 +314,7 @@ void ContinuationSystem::initialize_tangent()
 
   // The value of Theta_LOCA which makes dlambda_ds = 1/sqrt(2),
   // assuming our Theta = ||du||^2.
-  // Theta_LOCA = fabs(dlambda);
+  // Theta_LOCA = std::abs(dlambda);
 
   // Assuming general Theta
   Theta_LOCA = std::sqrt(1./Theta/ynorm/ynorm);
@@ -885,7 +885,7 @@ void ContinuationSystem::continuation_solve()
 	  // It doesn't make sense to converge a solution whose size is ~ 10^5 to
 	  // a tolerance of 1.e-6.  Oh, and we should also probably check the
 	  // (relative) size of the residual as well, instead of just the step.
-	  if ((fabs(delta_lambda) < continuation_parameter_tolerance) &&
+	  if ((std::abs(delta_lambda) < continuation_parameter_tolerance) &&
 	      //(norm_delta_u       < solution_tolerance)               && // This is a *very* strict criterion we can probably skip
 	      (norm_residual      < solution_tolerance))
 	    {
@@ -1096,7 +1096,7 @@ void ContinuationSystem::set_Theta()
   Theta=1.;
 
   // 3.) Use a formula which attempts to make the "solution triangle" isosceles.
-//   libmesh_assert (fabs(dlambda_ds) < 1.);
+//   libmesh_assert (std::abs(dlambda_ds) < 1.);
 
 //   *delta_u = *solution;
 //   delta_u->add(-1, *previous_u);
@@ -1152,18 +1152,18 @@ void ContinuationSystem::set_Theta_LOCA()
   //   std::cout << "(Theta_LOCA) dlambda_ds=" << dlambda_ds << std::endl;
 
   // Formula makes no sense if |dlambda_ds| > 1
-  libmesh_assert (fabs(dlambda_ds) < 1.);
+  libmesh_assert (std::abs(dlambda_ds) < 1.);
   
   // 1.) Attempt to implement the method in LOCA paper
 //   const Real g = 1./std::sqrt(2.); // "desired" dlambda_ds
 
 //   // According to the LOCA people, we only renormalize for
 //   // when |dlambda_ds| exceeds some pre-selected maximum (which they take to be zero, btw).
-//   if (fabs(dlambda_ds) > .9)
+//   if (std::abs(dlambda_ds) > .9)
 //     {
 //       // Note the *= ... This is updating the previous value of Theta_LOCA
 //       // Note: The LOCA people actually use Theta_LOCA^2 to normalize their arclength constraint.
-//       Theta_LOCA *= fabs( (dlambda_ds/g)*std::sqrt( (1.-g*g) / (1.-dlambda_ds*dlambda_ds) ) );
+//       Theta_LOCA *= std::abs( (dlambda_ds/g)*std::sqrt( (1.-g*g) / (1.-dlambda_ds*dlambda_ds) ) );
   
 //       // Suggested max-allowable value for Theta_LOCA
 //       if (Theta_LOCA > 1.e8)
@@ -1180,7 +1180,7 @@ void ContinuationSystem::set_Theta_LOCA()
   // 2.) FIXME: Should we do *= or just =?  This function is of dlambda_ds is
   //  < 1,  |dlambda_ds| < 1/sqrt(2) ~~ .7071
   //  > 1,  |dlambda_ds| > 1/sqrt(2) ~~ .7071
-  Theta_LOCA *= fabs( dlambda_ds / std::sqrt( (1.-dlambda_ds*dlambda_ds) ) );
+  Theta_LOCA *= std::abs( dlambda_ds / std::sqrt( (1.-dlambda_ds*dlambda_ds) ) );
 
   // Suggested max-allowable value for Theta_LOCA.  I've never come close
   // to this value in my code.
@@ -1238,7 +1238,7 @@ void ContinuationSystem::update_solution()
   // // 1.) Cosine method (for some reason this always predicts the angle is ~0)
   // // Don't try divinding by zero
   // if ((yoldnorm > 1.e-12) && (ynorm > 1.e-12))
-  //   tau = fabs(yoldy) / yoldnorm  / ynorm;
+  //   tau = std::abs(yoldy) / yoldnorm  / ynorm;
   // else
   //   tau = 1.;
 

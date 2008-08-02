@@ -21,6 +21,11 @@
 #include "xdr_soln.h"
 #include "xdr_shead.h"
 
+// System includes
+#include <string.h>
+
+
+
 // ------------------------------------------------------------
 // XdrSOLN members
 int XdrSOLN::header(XdrSHEAD *hd)

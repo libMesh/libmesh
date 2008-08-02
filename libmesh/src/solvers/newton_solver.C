@@ -106,7 +106,7 @@ Real NewtonSolver::line_search(Real tol,
   const unsigned int max_i = 20;
 
   // for golden ratio steps
-  const Real golden_ratio = 1.-(sqrt(5.)-1.)/2.;
+  const Real golden_ratio = 1.-(std::sqrt(5.)-1.)/2.;
 
   for (unsigned int i=1; i <= max_i; i++)
     {
