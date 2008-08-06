@@ -1321,8 +1321,18 @@ ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
 
 ExodusII_IO::~ExodusII_IO ()
 {
+#ifndef HAVE_EXODUS_API
+
+  std::cerr <<  "ERROR, ExodusII API is not defined.\n"
+	    << std::endl;
+  libmesh_error();
+    
+#else
+
   if(ex_ptr)
     ex_ptr->close();
+
+#endif
 }
 
 void ExodusII_IO::read (const std::string& fname)
@@ -1536,11 +1546,21 @@ void ExodusII_IO::write_timestep (const std::string& fname,
 				  const int timestep,
 				  const double time)
 {
+#ifndef HAVE_EXODUS_API
+
+  std::cerr <<  "ERROR, ExodusII API is not defined.\n"
+	    << std::endl;
+  libmesh_error();
+    
+#else
+
   _timestep=timestep; 
   write_equation_systems(fname,es);
 
   if (libMesh::processor_id() == 0)
     ex_ptr->write_timestep(timestep, time);
+
+#endif
 }
 
 
