@@ -33,6 +33,7 @@
 #include "cell_hex8.h"
 #include "cell_hex20.h"
 #include "numeric_vector.h"
+#include "system.h"
 //#include "cell_inf.h"
 //#include "cell_inf_prism12.h"
 //#include "cell_prism6.h"
@@ -86,7 +87,9 @@
 #include "vtkBiQuadraticQuad.h"
 */
 #include "vtkFloatArray.h"
+#include "vtkDoubleArray.h"
 #include "vtkPointData.h"
+#include "vtkPoints.h"
 #endif //HAVE_VTK
 
 //static unsigned int vtk_tet4_mapping[4]= {0,1,2,3};
@@ -95,186 +98,321 @@
 //static unsigned int vtk_hex8_mapping[8]= {0,1,2,3,4,5,6,7};
 
 #ifdef HAVE_VTK // private functions
-void VTKIO::nodes_to_vtk(const MeshBase& mesh, vtkUnstructuredGrid*& grid){
-  vtkPoints* points = vtkPoints::New();
-// FIXME change to local iterators when I've figured out how to write in parallel
-//  MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
-//  MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
-  MeshBase::const_node_iterator nd = mesh.active_nodes_begin();
-  MeshBase::const_node_iterator nd_end = mesh.active_nodes_end();
-  // write out nodal data
-  for (;nd!=nd_end;++nd)
-  {
-	  float tuple[3]; //, dsp[3];
-	  Node* node = (*nd);
+vtkPoints* VTKIO::nodes_to_vtk(const MeshBase& mesh){
+	if (libMesh::processor_id() == 0)
+		{
 
-	  for(unsigned int i=0;i<3;++i)
-	  {
-		  tuple[i] = (*node)(i);
-	  }
-	  points->InsertPoint(node->id(),tuple);
-  }
-  grid->SetPoints(points);
+			vtkPoints* points = vtkPoints::New();
+			vtkDoubleArray* pcoords = vtkDoubleArray::New();
+			pcoords->SetNumberOfComponents(3);
+			pcoords->SetNumberOfTuples(mesh.n_nodes());
+
+			// FIXME change to local iterators when I've figured out how to write in parallel
+			//  MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
+			//  MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
+			//  points->SetNumberOfPoints(mesh.n_local_nodes()); // it seems that it needs this to prevent a segfault
+			MeshBase::const_node_iterator nd = mesh.nodes_begin();
+			MeshBase::const_node_iterator nd_end = mesh.nodes_end();
+			// write out nodal data
+			for (;nd!=nd_end;++nd)
+			{
+				Node* node = (*nd);
+				float* pnt = new float[3];
+				for(unsigned int i=0;i<3;++i){
+					pnt[i] = (*node)(i);
+				} 
+				//     pcoords->InsertNextTuple(pnt);
+				pcoords->SetTuple(node->id(),pnt);
+				//     std::cout<<"pnt "<<pnt[0]<<" "<<pnt[1]<<" "<<pcoords-><<std::endl;  
+				//     points->InsertPoint(node->id(),pnt);
+				//     std::cout<<"point "<<node->id()<<" "<<(*node)(0)<<" "<<(*node)(1)<<std::endl;  
+			}
+			points->SetData(pcoords);
+			return points;
+	}
+	return NULL;
 }
 
-void VTKIO::cells_to_vtk(const MeshBase& mesh, vtkUnstructuredGrid*& grid){
-//  MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
-//  const MeshBase::const_element_iterator end = mesh.active_local_elements_end(); 
-  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
-  for ( ; it != end; ++it)
-  {
-    Elem *elem  = (*it);
-    vtkIdType celltype = VTK_EMPTY_CELL; // initialize to something to avoid compiler warning
+vtkCellArray* VTKIO::cells_to_vtk(const MeshBase& mesh, int*& types){
+	//, vtkUnstructuredGrid*& grid){
+	//  MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
+	//  const MeshBase::const_element_iterator end = mesh.active_local_elements_end(); 
+	if (libMesh::processor_id() == 0)
+	{
 
-    switch(elem->type())
-    {
-	case EDGE2:				
-	  celltype = VTK_LINE;
-	  break;
-	case EDGE3:      
-	  celltype = VTK_QUADRATIC_EDGE;
-	  break;// 1
-	case TRI3:       
-	  celltype = VTK_TRIANGLE;
-	  break;// 3
-	case TRI6:       
-	  celltype = VTK_QUADRATIC_TRIANGLE;
-	  break;// 4
-	case QUAD4:      
-	  celltype = VTK_QUAD;
-	  break;// 5
-	case QUAD8:      
-	  celltype = VTK_QUADRATIC_QUAD;
-	  break;// 6
-	case TET4:      
-	  celltype = VTK_TETRA;
-	  break;// 8
-	case TET10:      
-	  celltype = VTK_QUADRATIC_TETRA;
-	  break;// 9
-	case HEX8:    
-	  celltype = VTK_HEXAHEDRON;
-	  break;// 10
-	case HEX20:      
-	  celltype = VTK_QUADRATIC_HEXAHEDRON;
-	  break;// 12
-	case PRISM6:     
-	  celltype = VTK_WEDGE;
-	  break;// 13
-	case PRISM15:   
-	  celltype = VTK_HIGHER_ORDER_WEDGE;
-	  break;// 14
-	case PRISM18:    
-	  break;// 15
-	case PYRAMID5:
-	  celltype = VTK_PYRAMID;
-	  break;// 16
+		vtkCellArray* cells = vtkCellArray::New();
+		//     cells->Allocate(100000);
+		vtkIdList *pts = vtkIdList::New();
+
+		// for some reason the iterator variant of this code throws an error
+		//     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+		//     MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+		//     for ( ; it != end; ++it)
+		//     {
+		for(unsigned int el_nr =0; el_nr< mesh.n_active_elem(); ++el_nr){
+			Elem *elem  = mesh.elem(el_nr);
+			//         if(elem->active()){ 
+			//       std::cout<<"sub elem "<<elem->has_children()<<std::endl;  
+			//       (*it);
+			vtkIdType celltype = VTK_EMPTY_CELL; // initialize to something to avoid compiler warning
+
+			switch(elem->type())
+			{
+				case EDGE2:				
+					celltype = VTK_LINE;
+					break;
+				case EDGE3:      
+					celltype = VTK_QUADRATIC_EDGE;
+					break;// 1
+				case TRI3:       
+					celltype = VTK_TRIANGLE;
+					break;// 3
+				case TRI6:       
+					celltype = VTK_QUADRATIC_TRIANGLE;
+					break;// 4
+				case QUAD4:      
+					celltype = VTK_QUAD;
+					break;// 5
+				case QUAD8:      
+					celltype = VTK_QUADRATIC_QUAD;
+					break;// 6
+				case TET4:      
+					celltype = VTK_TETRA;
+					break;// 8
+				case TET10:      
+					celltype = VTK_QUADRATIC_TETRA;
+					break;// 9
+				case HEX8:    
+					celltype = VTK_HEXAHEDRON;
+					break;// 10
+				case HEX20:      
+					celltype = VTK_QUADRATIC_HEXAHEDRON;
+					break;// 12
+				case PRISM6:     
+					celltype = VTK_WEDGE;
+					break;// 13
+				case PRISM15:   
+					celltype = VTK_HIGHER_ORDER_WEDGE;
+					break;// 14
+				case PRISM18:    
+					break;// 15
+				case PYRAMID5:
+					celltype = VTK_PYRAMID;
+					break;// 16
 #if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
-	case QUAD9:      
-	  celltype = VTK_BIQUADRATIC_QUAD;
-	  break;
+				case QUAD9:      
+					celltype = VTK_BIQUADRATIC_QUAD;
+					break;
 #else
-	case QUAD9:
+				case QUAD9:
 #endif 
-	case EDGE4:      
-	case HEX27:      
-	case INFEDGE2:   
-	case INFQUAD4:   
-	case INFQUAD6:   
-	case INFHEX8:    
-	case INFHEX16:   
-	case INFHEX18:   
-	case INFPRISM6:  
-	case INFPRISM12: 
-	case NODEELEM:   
-	case INVALID_ELEM:
-	default:
-	  {
-		  std::cerr<<"element type "<<elem->type()<<" not implemented"<<std::endl;
-		  libmesh_error();
-	  }
-	}
+				case EDGE4:      
+				case HEX27:      
+				case INFEDGE2:   
+				case INFQUAD4:   
+				case INFQUAD6:   
+				case INFHEX8:    
+				case INFHEX16:   
+				case INFHEX18:   
+				case INFPRISM6:  
+				case INFPRISM12: 
+				case NODEELEM:   
+				case INVALID_ELEM:
+				default:
+					{
+						std::cerr<<"element type "<<elem->type()<<" not implemented"<<std::endl;
+						libmesh_error();
+					}
+			}
+			//        std::cout<<"elem "<<elem->n_nodes()<<" "<<elem->n_sub_elem()<<std::endl;  
+			//        std::cout<<"type "<<celltype<<" "<<VTK_BIQUADRATIC_QUAD<<std::endl;  
+			types[elem->id()] = celltype;
+			pts->SetNumberOfIds(elem->n_nodes());
+			// get the connectivity for this element
+			std::vector<unsigned int> conn;
+			elem->connectivity(0,VTK,conn);
+			//        std::cout<<"conn size "<<conn.size()<<std::endl;  
+			for(unsigned int i=0;i<conn.size();++i)
+			{
+				//           std::cout<<" sz "<<pts->GetNumberOfIds()<<std::endl;  
+				pts->InsertId(i,conn[i]);
+			} 
+			//        std::cout<<"set cell"<<std::endl;  
+			cells->InsertNextCell(pts);
+			//         }
+			//         std::cout<<"finish set cell"<<std::endl;  
+		} // end loop over active elements
+		pts->Delete();
 
-	  vtkIdList *pts = vtkIdList::New();
-	  pts->SetNumberOfIds(elem->n_nodes());
-	  // get the connectivity for this element
-	  std::vector<unsigned int> conn;
-	  elem->connectivity(0,VTK,conn);
-	  for(unsigned int i=0;i<conn.size();++i)
-	  {
-		  pts->SetId(i,conn[i]);
-	  } 
-	  grid->InsertNextCell(celltype,pts);
-	} // end loop over active elements
+		return cells;
+	}
+	return NULL;
 }
 
 /*
  * single processor implementation, this can be done in parallel, but requires a
  * bit more thinking on how to deal with overlapping local solution vectors
  */
+/*
 void VTKIO::solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid){
-	const MeshBase& mesh = (MeshBase&)es.get_mesh();
-	const unsigned int n_nodes = es.get_mesh().n_nodes();
-	const unsigned int n_vars = es.n_vars();
-	std::vector<Number> soln;
-	es.build_solution_vector(soln);
+//   if (libMesh::processor_id() == 0)
+//      {
+//   std::vector<Number> soln;
+//   std::cout<<"build"<<std::endl;  
+//   es.build_solution_vector(soln);
+//   std::cout<<"add solution "<<soln.size()<<std::endl;  
 
-//   if(libMesh::processor_id()==0){
-		// write the solutions belonging to the system
-		for(unsigned int i=0;i<es.n_systems();++i){ // for all systems, regardless of whether they are active or not
-			for(unsigned int j=0;j<n_vars;++j){
-				const System& sys = es.get_system(i);
-				const std::string& varname = sys.variable_name(j); 
-				vtkFloatArray *data = vtkFloatArray::New(); 
-				data->SetName(varname.c_str());
-				data->SetNumberOfValues(n_nodes);
-				MeshBase::const_node_iterator it = mesh.nodes_begin();
-				const MeshBase::const_node_iterator n_end = mesh.nodes_end();
-				for(;it!=n_end;++it){
-					if((*it)->n_comp(i,j)>0){
-						const unsigned int nd_id = (*it)->id();
-//                  const unsigned int dof_nr = (*it)->dof_number(i,j,0);
-//                  data->InsertValue((*it)->id(),sys.current_solution(count++));
-						data->InsertValue(nd_id,libmesh_real(soln[nd_id*n_vars+j]));
-//               data->InsertValue((*it)->id(),sys.current_solution(dof_nr));
-					}else{
-						data->InsertValue((*it)->id(),0);
-					}
+	if(libMesh::processor_id()==0){
+		const MeshBase& mesh = (MeshBase&)es.get_mesh();
+		const unsigned int n_nodes = es.get_mesh().n_nodes();
+		const unsigned int n_vars = es.n_vars();
+			// write the solutions belonging to the system
+			for(unsigned int i=0;i<es.n_systems();++i){ // for all systems, regardless of whether they are active or not
+				for(unsigned int j=0;j<n_vars;++j){
+					const System& sys = es.get_system(i);
+					const std::string& varname = sys.variable_name(j); 
+					vtkFloatArray *data = vtkFloatArray::New(); 
+					data->SetName(varname.c_str());
+					data->SetNumberOfValues(n_nodes);
+					MeshBase::const_node_iterator it = mesh.nodes_begin();
+					const MeshBase::const_node_iterator n_end = mesh.nodes_end();
+					for(;it!=n_end;++it){
+						if((*it)->n_comp(i,j)>0){
+							const unsigned int nd_id = (*it)->id();
+	//                  const unsigned int dof_nr = (*it)->dof_number(i,j,0);
+	//                  data->InsertValue((*it)->id(),sys.current_solution(count++));
+							data->InsertValue(nd_id,libmesh_real(13.0));
+//                     soln[nd_id*n_vars+j]));
+	//               data->InsertValue((*it)->id(),sys.current_solution(dof_nr));
+						}else{
+							data->InsertValue((*it)->id(),0);
+						}
+					} 
+					grid->GetPointData()->AddArray(data);
 				} 
-				grid->GetPointData()->AddArray(data);
 			} 
-		} 
-//   }
+   }
+}*/
+
+void VTKIO::solution_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& grid){
+	// write only single processor
+	if(libMesh::processor_id()==0){
+
+		const MeshBase& mesh = (MeshBase&)es.get_mesh();
+
+		const unsigned int n_nodes = es.get_mesh().n_nodes();
+		// loop over the systems
+		for(unsigned int i=0;i<es.n_systems();++i){ // for all systems, regardless of whether they are active or not
+			
+			const System& sys = es.get_system(i);
+
+			const unsigned int n_vars = sys.n_vars();
+			// loop over variables
+			for(unsigned int j=0;j<n_vars;++j){
+
+				std::string name = sys.variable_name(j);
+
+				vtkFloatArray *data = vtkFloatArray::New(); 
+
+				data->SetName(name.c_str());
+
+				data->SetNumberOfValues(sys.solution->size());
+
+				for(unsigned int k=0;k<n_nodes;++k){
+
+					const unsigned int dof_nr = mesh.node(k).dof_number(i,j,0);
+
+					data->SetValue(k,sys.current_solution(dof_nr));
+
+				} 
+				grid->GetPointData()->AddArray(data);				
+			} 
+		}
+	}
 }
+
 /*
  * FIXME now this is known to write nonsense on AMR meshes
  * and it strips the imaginary parts of complex Numbers
  */
 void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid){
-	// write out the vectors added to the systems
-	const MeshBase& mesh = (MeshBase&)es.get_mesh();
-	const unsigned int n_nodes = mesh.n_nodes();
-	for(unsigned int i=0;i<es.n_systems();++i){ // for all systems, regardless of whether they are active or not
-		const System& sys = es.get_system(i);
-		System::const_vectors_iterator v_end = sys.vectors_end();
-		System::const_vectors_iterator it = sys.vectors_begin();
-		for(;it!= v_end;++it){ // for all vectors on this system
+	if (libMesh::processor_id() == 0){
+
+		std::map<std::string,std::vector<Number> > vecs; 
+		for(unsigned int i=0;i<es.n_systems();++i){
+			const System& sys = es.get_system(i);
+			System::const_vectors_iterator v_end = sys.vectors_end();
+			System::const_vectors_iterator it = sys.vectors_begin();
+			for(;it!= v_end;++it){ // for all vectors on this system
+				std::vector<Number> values; 	
+				std::cout<<"it "<<it->first<<std::endl;  
+
+				it->second->localize_to_one(values,0);
+				std::cout<<"finish localize"<<std::endl;  
+				vecs[it->first] = values;
+			}
+		}
+
+
+		std::map<std::string,std::vector<Number> >::iterator it = vecs.begin(); 
+
+		for(;it!=vecs.end();++it){
+
 			vtkFloatArray *data = vtkFloatArray::New(); 
+
 			data->SetName(it->first.c_str());
-			std::vector<Number> values; 	
-			it->second->localize(values);
-			data->SetNumberOfValues(n_nodes);
-//         MeshBase::const_node_iterator it = mesh.active_nodes_begin();
-//         const MeshBase::const_node_iterator n_end = mesh.nodes_end();
-//         for(unsigned int count=0;it!=n_end;++it,++count){			
-			for(unsigned int j=0;j<values.size();++j){
-				data->InsertValue(j,libmesh_real(values[j]));
-//            it++;
-			} 
-			grid->GetPointData()->AddArray(data);		
+
+			libmesh_assert(it->second.size()==es.get_mesh().n_nodes());
+
+			data->SetNumberOfValues(it->second.size());
+
+			for(unsigned int i=0;i<it->second.size();++i){
+
+				data->SetValue(i,it->second[i]);
+
+			}
+
+			grid->GetPointData()->AddArray(data);
+
 		} 
-	} 
+
+	}
+
+/*
+	// write out the vectors added to the systems
+	if (libMesh::processor_id() == 0)
+		{
+			std::cout<<"write system vectors"<<std::endl;  
+		const MeshBase& mesh = (MeshBase&)es.get_mesh();
+		const unsigned int n_nodes = mesh.n_nodes();
+		for(unsigned int i=0;i<es.n_systems();++i){ // for all systems, regardless of whether they are active or not
+			const System& sys = es.get_system(i);
+			std::cout<<"i "<<i<<std::endl;  
+			System::const_vectors_iterator v_end = sys.vectors_end();
+			System::const_vectors_iterator it = sys.vectors_begin();
+			for(;it!= v_end;++it){ // for all vectors on this system
+				std::cout<<"it- "<<it->second->size()<<" "<<n_nodes<<" "<<it->first<<std::endl;  
+				vtkFloatArray *data = vtkFloatArray::New(); 
+				data->SetName(it->first.c_str());
+				std::vector<Number> values; 	
+				it->second->localize(values);
+				data->SetNumberOfValues(n_nodes);
+
+
+	//         MeshBase::const_node_iterator it = mesh.active_nodes_begin();
+	//         const MeshBase::const_node_iterator n_end = mesh.nodes_end();
+	//         for(unsigned int count=0;it!=n_end;++it,++count){			
+				for(unsigned int j=0;j<n_nodes;++j){
+					std::cout<<"j "<<j<<" "<<(*it->second).size()<<std::endl;  
+//               const unsigned int dof_nr = mesh.node(j).dof_number(i,0,0);
+					data->SetValue(j,values[j]);
+	//            it++;
+				} 
+				grid->GetPointData()->AddArray(data);		
+			} 
+		} 
+	}*/
 }
 
 /*
@@ -396,6 +534,10 @@ void VTKIO::read (const std::string& name)
  * FIXME this operates on the mesh it "gets" from the ES only, this would
  * prevent passing in a mesh that doesn't belong to the ES
  */
+/**
+ * This method writes out the equationsystems to a .pvtu file (VTK parallel
+ * unstructured grid). 
+ */
 void VTKIO::write_equation_systems(const std::string& fname, const EquationSystems& es)
 {
 #ifndef HAVE_VTK
@@ -409,39 +551,53 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
   libmesh_error();
   
 #else
-  
-  /*
-   * we only use Unstructured grids
-   */
-  _vtk_grid = vtkUnstructuredGrid::New();
-  vtkXMLPUnstructuredGridWriter* writer= vtkXMLPUnstructuredGridWriter::New();
-  nodes_to_vtk((const MeshBase&)es.get_mesh(), _vtk_grid);
-  cells_to_vtk((const MeshBase&)es.get_mesh(), _vtk_grid);
-  
-  // I'd like to write out meshdata, but this requires some coding, in
-  // particular, non_const meshdata iterators
-  //   const MeshData& md = es.get_mesh_data();
-  //   if(es.has_mesh_data())
-  //      meshdata_to_vtk(md,_vtk_grid);
-  //   libmesh_assert (soln.size() ==mesh.n_nodes()*names.size());
-  solution_to_vtk(es,_vtk_grid);
+  if (libMesh::processor_id() == 0)
+		{
 
-#ifdef DEBUG
-  if(true) // add some condition here, although maybe it is more sensible to give each vector a flag on whether it is to be written out or not
-    system_vectors_to_vtk(es,_vtk_grid);
-#endif
-  //   writer->SetNumberOfPieces(libMesh::n_processors());
-  //   writer->SetInput(libMesh::processor_id(),_vtk_grid);
-  writer->SetInput(_vtk_grid);
-  writer->SetFileName(fname.c_str());
-  writer->Write();
+	  // check if the filename extension is pvtu
+	  libmesh_assert(fname.substr(fname.rfind("."),fname.size())==".pvtu");
+	  /*
+		* we only use Unstructured grids
+		*/
+	  _vtk_grid = vtkUnstructuredGrid::New();
+	  vtkXMLPUnstructuredGridWriter* writer= vtkXMLPUnstructuredGridWriter::New();
+	  std::cout<<"get points "<<std::endl;  
+	  vtkPoints* pnts = nodes_to_vtk((const MeshBase&)es.get_mesh());
+	  _vtk_grid->SetPoints(pnts);
+	  int * types = new int[es.get_mesh().n_active_elem()];
+	  std::cout<<"get cells"<<std::endl;  
+	  vtkCellArray* cells = cells_to_vtk((const MeshBase&)es.get_mesh(), types);
+
+	  std::cout<<"set cells"<<std::endl;  
+	  _vtk_grid->SetCells(types,cells);
+	  
+	  // I'd like to write out meshdata, but this requires some coding, in
+	  // particular, non_const meshdata iterators
+	  //   const MeshData& md = es.get_mesh_data();
+	  //   if(es.has_mesh_data())
+	  //      meshdata_to_vtk(md,_vtk_grid);
+	  //   libmesh_assert (soln.size() ==mesh.n_nodes()*names.size());
+	  std::cout<<"write solution"<<std::endl;  
+	  solution_to_vtk(es,_vtk_grid);
+
+//#ifdef DEBUG
+//     if(true) // add some condition here, although maybe it is more sensible to give each vector a flag on whether it is to be written out or not
+//       system_vectors_to_vtk(es,_vtk_grid);
+//#endif
+	  writer->SetInput(_vtk_grid);
+	  writer->SetFileName(fname.c_str());
+	  writer->SetDataModeToAscii();
+	  writer->Write();
+
+	  _vtk_grid->Delete();
+	  writer->Delete();
+	}
 #endif
 }
 
 /**
  * This method implements writing to a .vtu (VTK Unstructured Grid) file. 
- * This is one of the new style XML dataformats, binary output is used to keep
- * the file size down. 
+ * This is one of the new style XML dataformats. 
  */
 void VTKIO::write (const std::string& name)
 {	
@@ -452,14 +608,26 @@ void VTKIO::write (const std::string& name)
   libmesh_error();
 
 #else
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
-  _vtk_grid = vtkUnstructuredGrid::New();
-  vtkXMLUnstructuredGridWriter* writer = vtkXMLUnstructuredGridWriter::New();
-  nodes_to_vtk(mesh, _vtk_grid);
-  cells_to_vtk(mesh, _vtk_grid);
-  writer->SetInput(_vtk_grid);
-  writer->SetFileName(name.c_str());
-  writer->Write();
+  if (libMesh::processor_id() == 0)
+  {
+
+	  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+	  _vtk_grid = vtkUnstructuredGrid::New();
+	  vtkXMLUnstructuredGridWriter* writer = vtkXMLUnstructuredGridWriter::New();
+	  std::cout<<"write nodes "<<std::endl;  
+	  vtkPoints* pnts = nodes_to_vtk(mesh);
+	  _vtk_grid->SetPoints(pnts);
+
+	  std::cout<<"write elements "<<std::endl;  
+	  int * types = new int[mesh.n_active_elem()];
+	  vtkCellArray* cells = cells_to_vtk(mesh,types);
+	  _vtk_grid->SetCells(types,cells);
+	  //  , _vtk_grid);
+	  writer->SetInput(_vtk_grid);
+	  writer->SetDataModeToAscii();
+	  writer->SetFileName(name.c_str());
+	  writer->Write();
+  }
 #endif // HAVE_VTK
 }
 

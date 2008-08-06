@@ -35,8 +35,8 @@ class MeshBase;
 class MeshData;
 
 class vtkUnstructuredGrid;
-
-
+class vtkPoints;
+class vtkCellArray;
 
 /**
  * This class implements reading and writing meshes in the VTK format.
@@ -105,12 +105,14 @@ private:
   /**
    * write the nodes from the mesh into a vtkUnstructuredGrid
    */
-  void nodes_to_vtk(const MeshBase& mesh, vtkUnstructuredGrid*& grid);
+  vtkPoints* nodes_to_vtk(const MeshBase& mesh);
+//  , vtkUnstructuredGrid*& grid);
 
   /** 
    * write the cells from the mesh into a vtkUnstructuredGrid
    */
-  void cells_to_vtk(const MeshBase& mesh, vtkUnstructuredGrid*& grid);
+  vtkCellArray* cells_to_vtk(const MeshBase& mesh, int*& types);
+//  , vtkUnstructuredGrid*& grid);
 
   /**
    * write the solution to a vtkUnstructuredGrid
