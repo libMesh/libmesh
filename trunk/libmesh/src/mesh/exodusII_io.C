@@ -285,6 +285,12 @@ namespace exII {
     void read_block_info();
 
     /**
+     * Get's the block number
+     * for the given block.
+     */
+    int get_block_id(int block);
+
+    /**
      * Reads all of the element
      * connectivity for
      * block \p block in the
@@ -887,7 +893,12 @@ namespace exII {
     message("All block IDs retrieved successfully."); 
   }
 
-
+  int ExodusII::get_block_id(int block)
+  {
+    libmesh_assert(block < block_ids.size());
+    
+    return block_ids[block];
+  }
 
   void ExodusII::read_elem_in_block(int block)
   {
@@ -1399,7 +1410,8 @@ void ExodusII_IO::read (const std::string& fname)
     {
       // Read the information for block i
       ex.read_elem_in_block (i);
-      
+      int subdomain_id = ex.get_block_id(i);
+
       // Set any relevant node/edge maps for this element
       const std::string type (ex.get_elem_type());
       const ExodusII::Conversion conv = em.assign_conversion(type); 
@@ -1410,6 +1422,7 @@ void ExodusII_IO::read (const std::string& fname)
 	{
 	  Elem* elem = Elem::build (conv.get_canonical_type()).release();
 	  libmesh_assert (elem);
+          elem->subdomain_id() = subdomain_id;
           elem->set_id(j);
 	  mesh.add_elem (elem);
 	    
