@@ -750,8 +750,21 @@ namespace exII {
   const int ExodusII::ElementMaps::hex8_node_map[8]   = {0, 1, 2, 3, 4, 5, 6, 7};
   const int ExodusII::ElementMaps::hex20_node_map[20] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,
 							  10, 11, 12, 13, 14, 15, 16, 17, 18, 19};  
-  const int ExodusII::ElementMaps::hex27_node_map[27] = { 1,  5,  6,  2,  0,  4,  7,  3, 13, 17, 14,  9,  8, 16,
-							  18, 10, 12, 19, 15, 11, 24, 25, 22, 26, 21, 23, 20};  
+
+// Perhaps an older Hex27 node numbering?  This no longer works.
+//const int ExodusII::ElementMaps::hex27_node_map[27] = { 1,  5,  6,  2,  0,  4,  7,  3, 13, 17, 14,  9,  8, 16,
+//							  18, 10, 12, 19, 15, 11, 24, 25, 22, 26, 21, 23, 20};
+
+// After trial-and-error, we find a nearly identical mapping with Exodus,
+// only 20 and 26 are transposed.
+const int ExodusII::ElementMaps::hex27_node_map[27] = {
+  // Vertex and mid-edge nodes
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+  // Mid-face nodes and centroid
+  26, 21, 22, 23, 24, 25, 20};
+//20  21  22  23  24  25  26 // LibMesh indices
+
+
   const int ExodusII::ElementMaps::tet4_node_map[4]   = {0, 1, 2, 3};
   const int ExodusII::ElementMaps::tet10_node_map[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
@@ -895,7 +908,7 @@ namespace exII {
 
   int ExodusII::get_block_id(int block)
   {
-    libmesh_assert(block < block_ids.size());
+    libmesh_assert(static_cast<unsigned int>(block) < block_ids.size());
     
     return block_ids[block];
   }
@@ -1022,17 +1035,18 @@ namespace exII {
     char *var_names[100];
     
     nodal_var_names.resize(num_nodal_vars);
-    for(int i=0;i<num_nodal_vars;i++)
-    {
+    for (int i=0;i<num_nodal_vars;i++)
       var_names[i]=new char[MAX_STR_LENGTH+1];
-    }
 
     exII::ex_get_var_names(ex_id, "n", num_nodal_vars, var_names);
 
-    for(int i=0;i<num_nodal_vars;i++)
-    {
-      nodal_var_names[i]=var_names[i];
-    }
+    // Copy the char buffers into strings.  Then delete
+    // the dynamically allocated char buffers.
+    for (int i=0;i<num_nodal_vars;i++)
+      {
+	nodal_var_names[i]=var_names[i];
+	delete [] var_names[i];
+      }
 
     return nodal_var_names;
   }
@@ -1130,13 +1144,22 @@ namespace exII {
 
     connect.resize(num_elem*num_nodes_per_elem);
 
-    for(int i=0;i<num_elem;i++)
-    {
-      Elem * elem = mesh.elem(i);
+    for (int i=0;i<num_elem;i++)
+      {
+	Elem * elem = mesh.elem(i);
 
-      for(int j=0; j<num_nodes_per_elem; j++)
-	connect[(i*num_nodes_per_elem)+j] = elem->node(conv.get_node_map(j))+1;
-    }
+	for(int j=0; j<num_nodes_per_elem; j++)
+	  {
+	    const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
+	    const unsigned int elem_node_index = conv.get_node_map(j);
+	    if (verbose)
+	      {
+		std::cout << "Exodus node index: " << j
+			  << "=LibMesh node index " << elem_node_index << std::endl;
+	      }
+	    connect[connect_index] = elem->node(elem_node_index)+1;
+	  }
+      }
 
     ex_err = exII::ex_put_elem_conn(ex_id, 1, &connect[0]);
     check_err(ex_err, "Error writing element connectivities");
@@ -1149,13 +1172,20 @@ namespace exII {
     ex_err = exII::ex_put_var_param(ex_id, "n", num_nodal_vars);
     check_err(ex_err, "Error setting number of nodal vars.");
 
-    const char ** var_names = new const char*[num_nodal_vars];
+    // Dynamically allocate an array of char*.  FIXME: Is there a "C++" way
+    // to pass a char** to a C routine?
+    const char** var_names = new const char*[num_nodal_vars];
 
+    // Set pointers in the var_names array to point to the entries of names
     for(int i=0;i<num_nodal_vars;i++)
       var_names[i]=names[i].c_str();
 
-    ex_err = exII::ex_put_var_names(ex_id, "n", num_nodal_vars, const_cast <char**>(var_names));
+    ex_err = exII::ex_put_var_names(ex_id, "n", num_nodal_vars,
+				    const_cast <char**>(var_names));
     check_err(ex_err, "Error setting nodal variable names.");
+
+    // Clean up allocated memory
+    delete [] var_names;
   }
 
   void ExodusII::write_timestep(int timestep, double time)
@@ -1373,8 +1403,9 @@ void ExodusII_IO::read (const std::string& fname)
 #ifdef DEBUG
     this->verbose() = true;
 #endif
-  
-  ex_ptr = new ExodusII(this->verbose()); // Instantiate ExodusII interface
+
+    // FIXME[JWP]: Why do we create ex_ptr on the heap?
+  this->ex_ptr = new ExodusII(this->verbose()); // Instantiate ExodusII interface
   ExodusII & ex = *ex_ptr;
   
   ExodusII::ElementMaps em;     // Instantiate the ElementMaps interface
