@@ -83,7 +83,7 @@ void print_trace(std::ostream &out)
 
 #else
 
-void print_trace(void) {}
+void print_trace(std::ostream &) {}
 
 #endif
 
