@@ -35,6 +35,8 @@
 #include <string>
 #include <execinfo.h> 
 #include <cxxabi.h>
+#include <cstdlib>
+
 
 std::string abi_demangle(const char *name)
 {
@@ -78,7 +80,7 @@ void print_trace(std::ostream &out)
 //      out << abi_demangle(strings[i]) << std::endl;
       out << i << ": " << abi_demangle(strings[i]) << std::endl;
     }
-  free(strings);
+  std::free(strings);
 }
 
 #else
