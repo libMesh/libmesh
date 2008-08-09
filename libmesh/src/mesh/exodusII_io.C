@@ -1172,19 +1172,25 @@ const int ExodusII::ElementMaps::hex27_node_map[27] = {
     ex_err = exII::ex_put_var_param(ex_id, "n", num_nodal_vars);
     check_err(ex_err, "Error setting number of nodal vars.");
 
-    // Dynamically allocate an array of char*.  FIXME: Is there a "C++" way
-    // to pass a char** to a C routine?
-    const char** var_names = new const char*[num_nodal_vars];
+    // Dynamically allocate an array of char*.  FIXME: Is there a way
+    // to do this without dynamic memory allocation?
+    char** var_names = new char*[num_nodal_vars];    
 
-    // Set pointers in the var_names array to point to the entries of names
-    for(int i=0;i<num_nodal_vars;i++)
-      var_names[i]=names[i].c_str();
+    // For each char* in var_names, allocate enough space and copy from
+    // the C++ string into it for passing to the C interface.
+    for (int i=0;i<num_nodal_vars;i++)
+      {
+	var_names[i] = new char[names[i].size()+1];
+	std::strcpy(var_names[i], names[i].c_str());
+      }
 
-    ex_err = exII::ex_put_var_names(ex_id, "n", num_nodal_vars,
-				    const_cast <char**>(var_names));
+    ex_err = exII::ex_put_var_names(ex_id, "n", num_nodal_vars, var_names);
     check_err(ex_err, "Error setting nodal variable names.");
 
     // Clean up allocated memory
+    for (int i=0;i<num_nodal_vars;i++)
+      delete [] var_names[i];
+    
     delete [] var_names;
   }
 
