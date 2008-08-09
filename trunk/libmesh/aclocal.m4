@@ -2292,7 +2292,6 @@ char* c_name = 0;
 c_name = abi::__cxa_demangle(typeid(instance).name(), 0, 0, &status);
 
 std::string name(c_name);
-free(c_name);
 
 return name == "A<int>";
 ],
