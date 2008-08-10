@@ -76,7 +76,11 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string& ){}
+  virtual void write (const std::string& )
+  {
+    std::cerr << "The ExodusII_IO::write() method is not yet implemented." << std::endl;
+    libmesh_error();
+  }
 
 
   /**
