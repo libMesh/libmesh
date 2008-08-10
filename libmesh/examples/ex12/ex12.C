@@ -345,8 +345,6 @@ int main (int argc, char** argv)
     MeshData mesh_data(mesh);
     
     // Read the input mesh, but with deactivated <code>MeshData</code>.
-    UNVIO unvio (mesh, mesh_data);
-    unvio.read (mesh_file);
     mesh.read(mesh_file, &mesh_data);
     
     // Print information about the mesh and the data

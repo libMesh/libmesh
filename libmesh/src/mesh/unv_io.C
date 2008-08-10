@@ -26,6 +26,7 @@
 
 // Local includes
 #include "libmesh_config.h"
+#include "libmesh_logging.h"
 #include "unv_io.h"
 #include "mesh_data.h"
 #include "mesh_base.h"
@@ -352,6 +353,8 @@ void UNVIO::write_implementation (std::ostream& out_file)
 
 void UNVIO::count_nodes (std::istream& in_file)
 {
+  START_LOG("count_nodes()","UNVIO");
+
   // if this->_n_nodes is not 0 the dataset 
   // has already been scanned
   if (this->_n_nodes != 0)
@@ -451,6 +454,8 @@ void UNVIO::count_nodes (std::istream& in_file)
 
   if (this->verbose())
     std::cout << "  Nodes   : " << this->_n_nodes << std::endl;
+
+  STOP_LOG("count_nodes()","UNVIO");
 }
 
 
@@ -460,6 +465,8 @@ void UNVIO::count_nodes (std::istream& in_file)
 
 void UNVIO::count_elements (std::istream& in_file)
 {
+  START_LOG("count_elements()","UNVIO");
+
   if (this->_n_elements != 0)
     {
       std::cerr << "Error: Trying to scan elements twice!" 
@@ -519,12 +526,16 @@ void UNVIO::count_elements (std::istream& in_file)
 
   if (this->verbose())
     std::cout << "  Elements: " << this->_n_elements << std::endl;
+
+  STOP_LOG("count_elements()","UNVIO");
 }
 
 
 
 void UNVIO::node_in (std::istream& in_file)
 {
+  START_LOG("node_in()","UNVIO");
+
   if (this->verbose())
     std::cout << "  Reading nodes" << std::endl;
 
@@ -620,6 +631,8 @@ void UNVIO::node_in (std::istream& in_file)
   // search it efficiently like a map
   std::sort (this->_assign_nodes.begin(),
 	     this->_assign_nodes.end());
+
+  STOP_LOG("node_in()","UNVIO");
 }
 
 
@@ -628,6 +641,8 @@ void UNVIO::node_in (std::istream& in_file)
 
 void UNVIO::element_in (std::istream& in_file)
 {
+  START_LOG("element_in()","UNVIO");
+
   if (this->verbose())
     std::cout << "  Reading elements" << std::endl;
 
@@ -925,6 +940,8 @@ void UNVIO::element_in (std::istream& in_file)
       elem->set_id(i);
       this->_mesh_data.add_foreign_elem_id (mesh.add_elem(elem), element_lab);
     }
+
+  STOP_LOG("element_in()","UNVIO");
 }
 
 
