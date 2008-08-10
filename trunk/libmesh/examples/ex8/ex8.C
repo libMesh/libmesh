@@ -43,6 +43,7 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "gmv_io.h"
+#include "vtk_io.h"
 #include "newmark_system.h"
 #include "equation_systems.h"
 
@@ -303,10 +304,19 @@ int main (int argc, char** argv)
           time_step == 90 || time_step == 120 )
         {
           char buf[14];
-          sprintf (buf, "out.%03d.gmv", time_step);
 
-          GMVIO(mesh).write_equation_systems (buf,
-                                              equation_systems);
+		  if (!libMesh::on_command_line("--vtk")){
+			  sprintf (buf, "out.%03d.gmv", time_step);
+
+	          GMVIO(mesh).write_equation_systems (buf,equation_systems);
+
+		  }else{
+			  // VTK viewers are generally not happy with two dots in a filename
+			  sprintf (buf, "out_%03d.pvtu", time_step);
+
+	          VTKIO(mesh).write_equation_systems (buf,equation_systems);
+
+		  }
         }
 
       // Update the p, v and a.
