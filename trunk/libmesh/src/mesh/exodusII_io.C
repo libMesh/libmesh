@@ -20,6 +20,7 @@
 
 // C++ includes
 #include <fstream>
+#include <cstring>
 
 // Local includes
 #include "exodusII_io.h"
