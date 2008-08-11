@@ -1976,14 +1976,15 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
 	  // otherwise add their DOFs to mine, resort, and re-unique the row
 	  else if (!their_row.empty()) // do nothing for the trivial case where 
 	    {                          // their row is empty
-	      const unsigned int my_old_size = my_row.size();
-	      
 	      my_row.insert (my_row.end(),
 			     their_row.begin(),
 			     their_row.end());
-	  
-	      SparsityPattern::sort_row (my_row.begin(), my_row.begin()+my_old_size, my_row.end());
-	      
+
+	      // We cannot use SparsityPattern::sort_row() here because it expects
+	      // the [begin,middle) [middle,end) to be non-overlapping.  This is not
+	      // necessarily the case here, so use std::sort()
+	      std::sort (my_row.begin(), my_row.end());
+	 
 	      my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
 	    }
 
