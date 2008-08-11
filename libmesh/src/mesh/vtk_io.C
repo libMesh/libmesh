@@ -323,7 +323,11 @@ void VTKIO::solution_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& gri
 
 					const unsigned int dof_nr = mesh.node(k).dof_number(i,j,0);
 
+#ifdef USE_COMPLEX_NUMBERS
+					data->SetValue(k,sys.current_solution(dof_nr).real());
+#else
 					data->SetValue(k,sys.current_solution(dof_nr));
+#endif
 
 				} 
 				grid->GetPointData()->AddArray(data);				
@@ -369,7 +373,11 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*
 
 			for(unsigned int i=0;i<it->second.size();++i){
 
+#ifdef USE_COMPLEX_NUMBERS
+				data->SetValue(i,it->second[i].real());
+#else
 				data->SetValue(i,it->second[i]);
+#endif
 
 			}
 
