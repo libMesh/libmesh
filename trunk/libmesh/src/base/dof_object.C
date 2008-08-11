@@ -243,6 +243,7 @@ void DofObject::set_n_vars(const unsigned int s,
 {
   libmesh_assert (s < this->n_systems());
   libmesh_assert (_n_v_comp != NULL);
+  libmesh_assert (_dof_ids  != NULL);
 
 #ifdef DEBUG
 
@@ -263,17 +264,21 @@ void DofObject::set_n_vars(const unsigned int s,
   if (this->n_vars(s) != 0)
     {
       libmesh_assert (_n_v_comp[s] != NULL); delete [] _n_v_comp[s]; _n_v_comp[s] = NULL;
-      libmesh_assert (_dof_ids     != NULL);
       libmesh_assert (_dof_ids[s]  != NULL); delete [] _dof_ids[s];  _dof_ids[s]  = NULL;
     }
 
   // Reset the number of variables in the system  
   if (nvars > 0)
     {
+      libmesh_assert (_n_v_comp[s] == NULL);
+      libmesh_assert (_dof_ids[s]  == NULL);
+      
       _n_v_comp[s] = new unsigned char [nvars+1];
       _dof_ids[s]  = new unsigned int  [nvars];
       
       _n_v_comp[s][0] = static_cast<unsigned char>(nvars);
+
+      libmesh_assert (nvars == this->n_vars(s));
       
       for (unsigned int v=0; v<this->n_vars(s); v++)
 	{
@@ -282,7 +287,11 @@ void DofObject::set_n_vars(const unsigned int s,
 	}
     }
   else // (nvars == 0)
-    _n_v_comp[s] = NULL;
+    {
+      libmesh_assert (_n_v_comp[s] == NULL);
+      libmesh_assert (_dof_ids[s]  == NULL);
+      _n_v_comp[s] = NULL;
+    }
 }
 
 

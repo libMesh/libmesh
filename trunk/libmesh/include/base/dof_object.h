@@ -390,21 +390,24 @@ void DofObject::clear_dofs ()
   // Only clear if there is data
   if (this->n_systems() != 0)
     {
+      libmesh_assert (_n_v_comp != NULL);
+      libmesh_assert (_dof_ids  != NULL);
+      
       for (unsigned int s=0; s<this->n_systems(); s++)
 	{
+	  if (_dof_ids[s] != NULL) // This has only been allocated if 
+	    {                      // variables were declared
+	      delete [] _dof_ids[s]; _dof_ids[s] = NULL;
+	    }
+	  
 	  if (_n_v_comp[s] != NULL) // it is possible the number of variables is 0,
 	    {                       // but this was allocated (_n_v_comp[s][0] == 0)
 	      delete [] _n_v_comp[s]; _n_v_comp[s] = NULL;
 	    }
-	  
-	  if (this->n_vars(s) != 0) // This has only been allocated if 
-	    {                       // variables were declared
-	      libmesh_assert (_dof_ids[s]  != NULL); delete [] _dof_ids[s];   _dof_ids[s] = NULL;
-	    }
 	}
       
-      libmesh_assert (_n_v_comp != NULL); delete [] _n_v_comp; _n_v_comp = NULL;
-      libmesh_assert (_dof_ids  != NULL); delete [] _dof_ids;  _dof_ids  = NULL;
+      delete [] _n_v_comp; _n_v_comp = NULL;
+      delete [] _dof_ids;  _dof_ids  = NULL;
     }
   
   // Make sure we cleaned up
