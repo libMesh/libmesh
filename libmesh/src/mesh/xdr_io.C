@@ -893,7 +893,10 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	  const unsigned int parent_id    = *it; ++it;
 	  const unsigned int processor_id = *it; ++it;
 	  const unsigned int subdomain_id = *it; ++it;
-	  const unsigned int p_level      = *it; ++it;
+#ifdef ENABLE_AMR
+	  const unsigned int p_level      = *it;
+#endif
+	  ++it;
 
 	  Elem *parent = (parent_id == libMesh::invalid_uint) ? NULL : mesh.elem(parent_id);
 
