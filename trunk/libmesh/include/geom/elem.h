@@ -1338,10 +1338,10 @@ bool Elem::has_ancestor_children() const
 
 
 
+#ifdef ENABLE_AMR
 inline
 bool Elem::is_ancestor_of(const Elem *descendant) const
 {
-#ifdef ENABLE_AMR
   const Elem *e = descendant;
   while (e)
     {
@@ -1349,6 +1349,10 @@ bool Elem::is_ancestor_of(const Elem *descendant) const
         return true;
       e = e->parent();
     }
+#else
+inline
+bool Elem::is_ancestor_of(const Elem *) const
+{
 #endif
   return false;
 }
@@ -1756,6 +1760,7 @@ public:
     return static_cast<unsigned int>(*(_buf_begin+1));
   }
 
+#ifdef ENABLE_AMR
   /**
    * \p return the refinement state of this packed element.
    */
@@ -1771,6 +1776,7 @@ public:
   {
     return static_cast<Elem::RefinementState>(*(_buf_begin+3));
   }
+#endif // ENABLE_AMR
 
   /**
    * \p return the element type of this packed element.

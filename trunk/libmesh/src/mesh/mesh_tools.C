@@ -830,6 +830,7 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase &mesh)
       libmesh_assert (elem);
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
 	libmesh_assert (elem->neighbor(n) != remote_elem);
+#ifdef ENABLE_AMR
       const Elem* parent = elem->parent();
       if (parent)
 	{
@@ -837,6 +838,7 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase &mesh)
           for (unsigned int c=0; c != elem->n_children(); ++c)
 	    libmesh_assert (parent->child(c) != remote_elem);
 	}
+#endif
     }
 }
 
@@ -854,9 +856,11 @@ void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase &mesh,
       libmesh_assert (elem->parent() != bad_elem);
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
 	libmesh_assert(elem->neighbor(n) != bad_elem);
+#ifdef ENABLE_AMR
       if (elem->has_children())
         for (unsigned int c=0; c != elem->n_children(); ++c)
 	  libmesh_assert(elem->child(c) != bad_elem);
+#endif
     }
 }
 
