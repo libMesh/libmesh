@@ -486,6 +486,8 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
+	START_LOG("min()", "Parallel");
+    
 	T temp;
 	MPI_Allreduce (&r,
 		       &temp,
@@ -503,6 +505,8 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
+	START_LOG("min()", "Parallel");
+    
 	unsigned int tempsend = r;
 	unsigned int temp;
 	MPI_Allreduce (&tempsend,
@@ -521,6 +525,8 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
+	START_LOG("min()", "Parallel");
+    
 	std::vector<T> temp(r.size());
 	MPI_Allreduce (&r[0],
 		       &temp[0],
@@ -538,6 +544,8 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
+	START_LOG("min()", "Parallel");
+    
         std::vector<unsigned int> rchar;
         pack_vector_bool(r, rchar);
 	std::vector<unsigned int> temp(rchar.size());
@@ -557,6 +565,8 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
+	START_LOG("max()", "Parallel");
+    
 	T temp;
 	MPI_Allreduce (&r,
 		       &temp,
@@ -574,6 +584,8 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
+	START_LOG("max()", "Parallel");
+    
 	unsigned int tempsend = r;
 	unsigned int temp;
 	MPI_Allreduce (&tempsend,
@@ -592,6 +604,8 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
+	START_LOG("max()", "Parallel");
+    
 	std::vector<T> temp(r.size());
 	MPI_Allreduce (&r[0],
 		       &temp[0],
@@ -609,6 +623,8 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
+	START_LOG("max()", "Parallel");
+    
         std::vector<unsigned int> rchar;
         pack_vector_bool(r, rchar);
 	std::vector<unsigned int> temp(rchar.size());
@@ -628,6 +644,8 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
+	START_LOG("sum()", "Parallel");
+    
 	T temp = r;
 	MPI_Allreduce (&temp,
 		       &r,
@@ -644,6 +662,8 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1 && !r.empty())
       {
+	START_LOG("sum()", "Parallel");
+    
 	std::vector<T> temp(r);
 	MPI_Allreduce (&temp[0],
 		       &r[0],
@@ -660,6 +680,8 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1)
       {
+	START_LOG("sum()", "Parallel");
+    
 	std::complex<T> temp(r);
 	MPI_Allreduce (&temp,
 		       &r,
@@ -676,6 +698,8 @@ namespace Parallel
   {
     if (libMesh::n_processors() > 1 && !r.empty())
       {
+	START_LOG("sum()", "Parallel");
+    
 	std::vector<std::complex<T> > temp(r);
 	MPI_Allreduce (&temp[0],
 		       &r[0],
