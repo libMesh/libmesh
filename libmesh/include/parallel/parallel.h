@@ -1281,6 +1281,8 @@ namespace Parallel
     
     if (libMesh::n_processors() > 1)
       {
+        START_LOG("gather()", "Parallel");
+
 	MPI_Gather(&send,
 		   1,
 		   datatype<T>(),
@@ -1289,6 +1291,8 @@ namespace Parallel
 		   datatype<T>(),
 		   root_id,
 		   libMesh::COMM_WORLD);
+
+        STOP_LOG("gather()", "Parallel");
       }
     else
       recv[0] = send;
@@ -1308,6 +1312,8 @@ namespace Parallel
     
     if (libMesh::n_processors() > 1)
       {
+        START_LOG("gather()", "Parallel");
+
 	MPI_Gather(&send,
 		   2,
 		   datatype<T>(),
@@ -1316,6 +1322,8 @@ namespace Parallel
 		   datatype<T>(),
 		   root_id,
 		   libMesh::COMM_WORLD);
+
+        STOP_LOG("gather()", "Parallel");
       }
     else
       recv[0] = send;
@@ -1733,6 +1741,8 @@ namespace Parallel
 	return;
       }
 
+    START_LOG("broadcast()", "Parallel");
+
     unsigned int data_size = data.size();
     Parallel::broadcast(data_size, root_id);
     
@@ -1751,6 +1761,8 @@ namespace Parallel
     
     if (libMesh::processor_id() == root_id)
       libmesh_assert(data == orig);
+
+    STOP_LOG("broadcast()", "Parallel");
   }
 
 
