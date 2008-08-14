@@ -496,6 +496,8 @@ namespace Parallel
 		       MPI_MIN,
 		       libMesh::COMM_WORLD);
 	r = temp;
+
+	STOP_LOG("min()", "Parallel");
       }
   }
 
@@ -516,6 +518,8 @@ namespace Parallel
 		       MPI_MIN,
 		       libMesh::COMM_WORLD);
 	r = temp;
+
+	STOP_LOG("min()", "Parallel");
       }
   }
 
@@ -535,6 +539,8 @@ namespace Parallel
 		       MPI_MIN,
 		       libMesh::COMM_WORLD);
 	r = temp;
+
+	STOP_LOG("min()", "Parallel");
       }
   }
 
@@ -556,6 +562,8 @@ namespace Parallel
 		       MPI_BAND,
 		       libMesh::COMM_WORLD);
         unpack_vector_bool(temp, r);
+
+	STOP_LOG("min()", "Parallel");
       }
   }
 
@@ -575,6 +583,8 @@ namespace Parallel
 		       MPI_MAX,
 		       libMesh::COMM_WORLD);
 	r = temp;
+
+	STOP_LOG("max()", "Parallel");
       }
   }
 
@@ -595,6 +605,8 @@ namespace Parallel
 		       MPI_MAX,
 		       libMesh::COMM_WORLD);
 	r = temp;
+
+	STOP_LOG("max()", "Parallel");
       }
   }
 
@@ -614,6 +626,8 @@ namespace Parallel
 		       MPI_MAX,
 		       libMesh::COMM_WORLD);
 	r = temp;
+
+	STOP_LOG("max()", "Parallel");
       }
   }
 
@@ -635,6 +649,8 @@ namespace Parallel
 		       MPI_BOR,
 		       libMesh::COMM_WORLD);
         unpack_vector_bool(temp, r);
+
+	STOP_LOG("max()", "Parallel");
       }
   }
 
@@ -653,6 +669,8 @@ namespace Parallel
 		       datatype<T>(),
 		       MPI_SUM,
 		       libMesh::COMM_WORLD);
+
+	STOP_LOG("sum()", "Parallel");
       }
   }
 
@@ -671,6 +689,8 @@ namespace Parallel
 		       datatype<T>(),
 		       MPI_SUM,
 		       libMesh::COMM_WORLD);
+
+	STOP_LOG("sum()", "Parallel");
       }
   }
 
@@ -689,6 +709,8 @@ namespace Parallel
 		       datatype<T>(),
 		       MPI_SUM,
 		       libMesh::COMM_WORLD);
+
+	STOP_LOG("sum()", "Parallel");
       }
   }
 
@@ -707,6 +729,8 @@ namespace Parallel
 		       datatype<T>(),
 		       MPI_SUM,
 		       libMesh::COMM_WORLD);
+
+	STOP_LOG("sum()", "Parallel");
       }
   }
 
