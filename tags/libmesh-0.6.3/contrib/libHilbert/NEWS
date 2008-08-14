@@ -1,0 +1,8 @@
+Newsworthy changes in 0.2.0
+---------------------------
+* Now using autoconf/automake/libtool for build process.
+
+Newsworthy changes in 0.1.0
+---------------------------
+* Moved from being a header only library to having compiled linkable code
+  for the backend integer types and algorithms.
