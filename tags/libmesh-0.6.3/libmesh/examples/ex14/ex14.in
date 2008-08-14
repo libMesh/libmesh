@@ -1,0 +1,57 @@
+# Maximum number of refinement steps
+max_r_steps = 10
+
+# Maximum h refinement level for an element.
+max_r_level = 15
+
+# Percentage of elements to refine at each step
+refine_percentage = 0.7
+
+# Percentage of elements to (attempt to) coarsen at each step
+coarsen_percentage = 0.0
+
+# Option to uniformly or adaptively refine.
+# If uniform_refine == 1, uniform refinement is done.
+# If uniform_refine == 0, adaptive refinement is done.
+uniform_refine = 0
+
+# Basis function type (as named in enum_fe_family.h)
+approx_type = LAGRANGE
+
+# minimum approximation order
+# Use approx_order = 1 or 2 for LAGRANGE elements
+# Use approx_order = 2 or 3 for CLOUGH elements
+# Use approx_order = 3 or higher for HERMITE elements
+# Use approx_order = 1 or higher for other elements
+approx_order = 2
+
+# Use what type of error indicator?
+# exact => comparison with analytic solution
+# kelly => inter-element normal derivative jumps
+# patch => patch gradient recovery
+# uniform => uniform refinement
+indicator_type = kelly
+
+# Mesh refinement type: h, p, matchedhp, or hp
+# Use HIERARCHIC or HERMITE functions with p/matchedhp/hp,
+# Use an exact indicator with matchedhp/hp.
+# matchedhp refinement stupidly does both h and p or neither
+# on every element; hp refinement tries to do one or the other
+refinement_type = h
+
+# Mesh dimensionality
+# We generate 1D meshes on [-1, 0].
+# We load lshaped.xda for 2 dimensional problems, lshaped3D.xda for 3
+dimension = 2
+
+# Element type - tensor or simplex
+# simplex is currently only supported in 2D
+# Use element_type = tensor for HERMITE elements
+# Use element_type = simplex for CLOUGH elements
+element_type = tensor
+
+# Use higher quadrature order when computing errors?
+extra_error_quadrature = 0
+
+# Solve a singular or non-singular problem?
+singularity = true
