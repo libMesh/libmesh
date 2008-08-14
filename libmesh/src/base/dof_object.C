@@ -290,7 +290,6 @@ void DofObject::set_n_vars(const unsigned int s,
     {
       libmesh_assert (_n_v_comp[s] == NULL);
       libmesh_assert (_dof_ids[s]  == NULL);
-      _n_v_comp[s] = NULL;
     }
 }
 
