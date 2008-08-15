@@ -39,6 +39,29 @@ dnl Do compilation tests using the compiler, preprocessor, and file extensions
 dnl of C++.  This uses the .C extension for test programs.
 AC_LANG_CPLUSPLUS
 
+dnl -------------------------------------------------------------
+dnl MPI (on its own or via PETSc) may require mpicc/mpicxx compilers
+dnl -------------------------------------------------------------
+
+dnl -------------------------------------------------------------
+dnl MPI -- enabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(mpi,
+              AC_HELP_STRING([--enable-mpi],
+                             [build with MPI message passing support]),
+              enablempi=$enableval,
+              enablempi=yes)
+
+
+dnl -------------------------------------------------------------
+dnl Petsc -- enabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(petsc,
+              AC_HELP_STRING([--enable-petsc],
+                             [build with PETSc iterative solver suppport]),
+              enablepetsc=$enableval,
+              enablepetsc=yes)
+
 dnl Determines a C++ compiler to use.  First checks if the variable CXX is
 dnl already set.  If not, then searches under g++, c++, and other names.
 AC_ARG_WITH([cxx],
@@ -46,7 +69,12 @@ AC_ARG_WITH([cxx],
                            [C++ compiler to use]),
 	    [CXX="$withval"],
 	    [])
-AC_PROG_CXX(mpicxx mpiCC pgCC icc g++ c++)
+
+if test "$enablempi" != no ; then
+  AC_PROG_CXX(mpicxx mpiCC pgCC icc g++ c++)
+else
+  AC_PROG_CXX(pgCC icc g++ c++)
+fi
 
 dnl Determine a C compiler to use.  If CC is not already set, checks for
 dnl gcc, cc, and other C compilers.  Then sets the CC variable to the result.
@@ -55,7 +83,12 @@ AC_ARG_WITH([cc],
                            [C compiler to use]),
 	    [CC="$withval"],
 	    [])
-AC_PROG_CC(mpicc pgcc icc gcc cc)
+
+if test "$enablempi" != no ; then
+  AC_PROG_CC(mpicc pgcc icc gcc cc)
+else
+  AC_PROG_CC(pgcc icc gcc cc)
+fi
 
 
 dnl --------------------------------------------------------------
@@ -501,26 +534,6 @@ if test "$enableoptional" != no ; then
    AC_MSG_RESULT(---------------------------------------------)
 
 
-
-
-dnl -------------------------------------------------------------
-dnl MPI -- enabled by default
-dnl -------------------------------------------------------------
-AC_ARG_ENABLE(mpi,
-              AC_HELP_STRING([--enable-mpi],
-                             [build with MPI message passing support]),
-              enablempi=$enableval,
-              enablempi=yes)
-
-
-dnl -------------------------------------------------------------
-dnl Petsc -- enabled by default
-dnl -------------------------------------------------------------
-AC_ARG_ENABLE(petsc,
-              AC_HELP_STRING([--enable-petsc],
-                             [build with PETSc iterative solver suppport]),
-              enablepetsc=$enableval,
-              enablepetsc=yes)
 
 dnl -------------------------------------------------------------
 dnl configure MPI only if PETSc fails
