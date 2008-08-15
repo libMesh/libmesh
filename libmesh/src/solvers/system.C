@@ -677,7 +677,11 @@ Real System::calculate_norm(NumericVector<Number>& v,
       fe->attach_quadrature_rule (qrule.get());
 
       const std::vector<Real>&               JxW = fe->get_JxW();
-      const std::vector<std::vector<Real> >& phi = fe->get_phi();
+      const std::vector<std::vector<Real> >* phi;
+      if (norm.type(var) == H1 ||
+          norm.type(var) == H2 ||
+          norm.type(var) == L2)
+        phi = &(fe->get_phi());
 
       const std::vector<std::vector<RealGradient> >* dphi = NULL;
       if (norm.type(var) == H1 ||
@@ -714,11 +718,17 @@ Real System::calculate_norm(NumericVector<Number>& v,
           // Begin the loop over the Quadrature points.
           for (unsigned int qp=0; qp<n_qp; qp++)
             {
-              Number u_h = 0.;
-              for (unsigned int i=0; i != n_sf; ++i)
-                u_h += phi[i][qp] * (*local_v)(dof_indices[i]);
-	      v_norm += norm.weight(var) * norm.weight(var) *
-                        JxW[qp] * libmesh_norm(u_h);
+              if (norm.type(var) == H1 ||
+                  norm.type(var) == H2 ||
+                  norm.type(var) == L2)
+                {
+                  Number u_h = 0.;
+                  for (unsigned int i=0; i != n_sf; ++i)
+                    u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
+	          v_norm += norm.weight(var) * norm.weight(var) *
+                            JxW[qp] * libmesh_norm(u_h);
+                }
+
               if (norm.type(var) == H1 ||
                   norm.type(var) == H2 ||
                   norm.type(var) == H1_SEMINORM)
