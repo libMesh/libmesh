@@ -1,0 +1,600 @@
+
+#include "cmath" // For isnan(), when it's defined
+
+#include "diff_system.h"
+#include "equation_systems.h"
+#include "libmesh_logging.h"
+#include "linear_solver.h"
+#include "newton_solver.h"
+#include "numeric_vector.h"
+#include "sparse_matrix.h"
+#include "dof_map.h"
+
+// SIGN from Numerical Recipes
+template <typename T>
+inline
+T SIGN(T a, T b)
+{
+  return b >= 0 ? std::abs(a) : -std::abs(a);
+}
+
+Real NewtonSolver::line_search(Real tol,
+                               Real last_residual,
+                               Real current_residual,
+                               NumericVector<Number> &newton_iterate,
+                               const NumericVector<Number> &linear_solution)
+{
+  // Take a full step if we got a residual reduction or if we
+  // aren't substepping
+  if (current_residual < last_residual ||
+      !require_residual_reduction)
+    return 1.;
+
+  // The residual vector
+  NumericVector<Number> &rhs = *(_system.rhs);
+
+  Real ax = 0.;  // First abscissa, don't take negative steps
+  Real cx = 1.;  // Second abscissa, don't extrapolate steps
+
+  // Find bx, a step length that gives lower residual than ax or cx
+  Real bx = 1.;
+  while (current_residual > last_residual)
+    {
+      // Reduce step size to 1/2, 1/4, etc.
+      Real substepdivision;
+      if (brent_line_search)
+        {
+          substepdivision = std::min(0.5, last_residual/current_residual);
+          substepdivision = std::max(substepdivision, tol*2.);
+        }
+      else
+        substepdivision = 0.5;
+
+      newton_iterate.add (bx * (1.-substepdivision),
+                          linear_solution);
+      newton_iterate.close();
+      bx *= substepdivision;
+      if (!quiet)
+        std::cout << "  Shrinking Newton step to "
+                  << bx << std::endl;
+
+      // Check residual with fractional Newton step
+      _system.assembly (true, false);
+
+      rhs.close();
+      current_residual = rhs.l2_norm();
+      if (!quiet)
+        std::cout << "  Current Residual: "
+                  << current_residual << std::endl;
+
+      if (bx/2. < minsteplength && 
+          current_residual > last_residual)
+        {
+          std::cout << "Inexact Newton step FAILED at step "
+                    << _outer_iterations << std::endl;
+
+          if (!continue_after_backtrack_failure)
+            {
+              libmesh_error();
+            }
+          else
+            {
+              std::cout << "Continuing anyway ..." << std::endl;
+              _solve_result = DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
+              return bx;
+            }
+        }
+    } // end while (current_residual > last_residual)
+
+  // Now return that reduced-residual step, or  use Brent's method to
+  // find a more optimal step.
+
+  if (!brent_line_search)
+    return bx;
+
+  // Brent's method adapted from Numerical Recipes in C, ch. 10.2
+  Real e = 0.;
+
+  Real x = bx, w = bx, v = bx;
+
+  // Residuals at bx
+  Real fx = current_residual,
+       fw = current_residual,
+       fv = current_residual;
+
+  // Max iterations for Brent's method loop
+  const unsigned int max_i = 20;
+
+  // for golden ratio steps
+  const Real golden_ratio = 1.-(std::sqrt(5.)-1.)/2.;
+
+  for (unsigned int i=1; i <= max_i; i++)
+    {
+      Real xm = (ax+cx)*0.5;
+      Real tol1 = tol * std::abs(x) + tol*tol;
+      Real tol2 = 2.0 * tol1;
+
+      // Test if we're done
+      if (std::abs(x-xm) <= (tol2 - 0.5 * (cx - ax)))
+        return x;
+
+      Real d;
+
+      // Construct a parabolic fit
+      if (std::abs(e) > tol1)
+        {
+          Real r = (x-w)*(fx-fv);
+          Real q = (x-v)*(fx-fw);
+          Real p = (x-v)*q-(x-w)*r;
+          q = 2. * (q-r);
+          if (q > 0.)
+            p = -p;
+          else
+            q = std::abs(q);
+          if (std::abs(p) >= std::abs(0.5*q*e) ||
+              p <= q * (ax-x) ||
+              p >= q * (cx-x))
+            {
+              // Take a golden section step
+              e = x >= xm ? ax-x : cx-x;
+              d = golden_ratio * e;
+            }
+          else
+            {
+              // Take a parabolic fit step
+              d = p/q;
+              if (x+d-ax < tol2 || cx-(x+d) < tol2)
+                d = SIGN(tol1, xm - x);
+            }
+        }
+      else
+        {
+          // Take a golden section step
+          e = x >= xm ? ax-x : cx-x;
+          d = golden_ratio * e;
+        }
+
+      Real u = std::abs(d) >= tol1 ? x+d : x + SIGN(tol1,d);
+
+      // Assemble the residual at the new steplength u
+      newton_iterate.add (bx - u, linear_solution);
+      newton_iterate.close();
+      bx = u;
+      if (!quiet)
+        std::cout << "  Shrinking Newton step to "
+                  << bx << std::endl;
+
+      _system.assembly (true, false);
+
+      rhs.close();
+      Real fu = rhs.l2_norm();
+      if (!quiet)
+        std::cout << "  Current Residual: "
+                  << fu << std::endl;
+
+      if (fu <= fx)
+        {
+          if (u >= x)
+            ax = x;
+          else
+            cx = x;
+          v = w;   w = x;   x = u;
+          fv = fw; fw = fx; fx = fu;
+        }
+      else
+        {
+          if (u < x)
+            ax = u;
+          else
+            cx = u;
+          if (fu <= fw || w == x)
+            {
+              v = w;   w = u;
+              fv = fw; fw = fu;
+            }
+          else if (fu <= fv || v == x || v == w)
+            {
+              v = u;
+              fv = fu;
+            }
+        }
+    }
+
+  std::cout << "Warning!  Too many iterations used in Brent line search!"
+            << std::endl;
+  return bx;
+}
+
+
+NewtonSolver::NewtonSolver (sys_type& s)
+  : Parent(s),
+    require_residual_reduction(true),
+    brent_line_search(true),
+    minsteplength(1e-5),
+    linear_tolerance_multiplier(1e-3),
+    linear_solver(LinearSolver<Number>::build())
+{
+}
+
+
+
+NewtonSolver::~NewtonSolver ()
+{
+}
+
+
+
+void NewtonSolver::reinit()
+{
+  Parent::reinit();
+
+  linear_solver->clear();
+}
+
+
+
+unsigned int NewtonSolver::solve()
+{
+  START_LOG("solve()", "NewtonSolver");
+
+  // Reset any prior solve result
+  _solve_result = INVALID_SOLVE_RESULT;
+  
+  NumericVector<Number> &newton_iterate = *(_system.solution);
+
+  AutoPtr<NumericVector<Number> > linear_solution_ptr = newton_iterate.clone();
+  NumericVector<Number> &linear_solution = *linear_solution_ptr;
+  NumericVector<Number> &rhs = *(_system.rhs);
+
+  newton_iterate.close();
+  linear_solution.close();
+  rhs.close();
+
+#ifdef ENABLE_AMR
+  _system.get_dof_map().enforce_constraints_exactly(_system);
+#endif
+
+  SparseMatrix<Number> &matrix = *(_system.matrix);
+
+  // Prepare to take incomplete steps
+  Real last_residual=0.;
+
+  // Set starting linear tolerance
+  Real current_linear_tolerance = initial_linear_tolerance;
+
+  // Start counting our linear solver steps
+  _inner_iterations = 0;
+
+  // Now we begin the nonlinear loop
+  for (_outer_iterations=0; _outer_iterations<max_nonlinear_iterations;
+       ++_outer_iterations)
+    {
+      if (!quiet)
+        std::cout << "Assembling System" << std::endl;
+
+      _system.assembly(true, true);
+      rhs.close();
+      Real current_residual = rhs.l2_norm();
+      last_residual = current_residual;
+
+// isnan() isn't standard C++ yet
+#ifdef isnan
+      if (isnan(current_residual))
+        {
+          std::cout << "  Nonlinear solver DIVERGED at step " << last_residual
+                    << " with norm Not-a-Number"
+                    << std::endl;
+          libmesh_error();
+          continue;
+        }
+#endif // isnan
+
+      max_residual_norm = std::max (current_residual,
+                                    max_residual_norm);
+ 
+      // Compute the l2 norm of the whole solution
+      Real norm_total = newton_iterate.l2_norm();
+
+      max_solution_norm = std::max(max_solution_norm, norm_total);
+
+      if (!quiet)
+        std::cout << "Nonlinear Residual: "
+                  << current_residual << std::endl;
+
+      // Make sure our linear tolerance is low enough
+      current_linear_tolerance = std::min (current_linear_tolerance,
+        current_residual * linear_tolerance_multiplier);
+
+      // But don't let it be too small
+      if (current_linear_tolerance < minimum_linear_tolerance)
+        {
+          current_linear_tolerance = minimum_linear_tolerance;
+        }
+
+      // At this point newton_iterate is the current guess, and
+      // linear_solution is now about to become the NEGATIVE of the next
+      // Newton step.
+
+      // Our best initial guess for the linear_solution is zero!
+      linear_solution.zero();
+
+      if (!quiet)
+        std::cout << "Linear solve starting, tolerance " 
+                  << current_linear_tolerance << std::endl;
+
+      // Solve the linear system.  Two cases:
+      const std::pair<unsigned int, Real> rval =
+        (_system.have_matrix("Preconditioner")) ?
+      // 1.) User-supplied preconditioner
+        linear_solver->solve (matrix, _system.get_matrix("Preconditioner"),
+                              linear_solution, rhs, current_linear_tolerance,
+                              max_linear_iterations) :
+      // 2.) Use system matrix for the preconditioner
+        linear_solver->solve (matrix, linear_solution, rhs,
+                              current_linear_tolerance, 
+                              max_linear_iterations);
+      // We may need to localize a parallel solution
+      _system.update ();
+      // The linear solver may not have fit our constraints exactly
+#ifdef ENABLE_AMR
+      _system.get_dof_map().enforce_constraints_exactly(_system, &linear_solution);
+#endif
+
+      const unsigned int linear_steps = rval.first;
+      libmesh_assert(linear_steps <= max_linear_iterations);
+      _inner_iterations += linear_steps;
+
+      const bool linear_solve_finished = 
+        !(linear_steps == max_linear_iterations);
+
+      if (!quiet)
+        std::cout << "Linear solve finished, step " << linear_steps
+                  << ", residual " << rval.second
+                  << std::endl;
+
+      // Compute the l2 norm of the nonlinear update
+      Real norm_delta = linear_solution.l2_norm();
+
+      if (!quiet)
+        std::cout << "Trying full Newton step" << std::endl;
+      // Take a full Newton step
+      newton_iterate.add (-1., linear_solution);
+      newton_iterate.close();
+
+      // Check residual with full Newton step
+      _system.assembly(true, false);
+
+      rhs.close();
+      current_residual = rhs.l2_norm();
+      if (!quiet)
+        std::cout << "  Current Residual: "
+                  << current_residual << std::endl;
+
+// A potential method for avoiding oversolving?
+/*
+      Real predicted_absolute_error =
+        current_residual * norm_delta / last_residual;
+
+      Real predicted_relative_error =
+        predicted_absolute_error / max_solution_norm;
+
+      std::cout << "Predicted absolute error = " <<
+        predicted_absolute_error << std::endl;
+
+      std::cout << "Predicted relative error = " <<
+        predicted_relative_error << std::endl;
+*/
+
+      // don't fiddle around if we've already converged
+      if (test_convergence(current_residual, norm_delta,
+                           linear_solve_finished))
+        {
+          if (!quiet)
+            print_convergence(_outer_iterations, current_residual,
+                              norm_delta, linear_solve_finished);
+          _outer_iterations++;
+          break; // out of _outer_iterations for loop
+        }
+
+      // otherwise, backtrack if necessary
+      Real steplength =
+        this->line_search(std::sqrt(TOLERANCE),
+                          last_residual, current_residual,
+                          newton_iterate, linear_solution);
+      norm_delta *= steplength;
+
+      // Check to see if backtracking failed,
+      // and break out of the nonlinear loop if so...
+      if (_solve_result == DiffSolver::DIVERGED_BACKTRACKING_FAILURE)
+        {
+          _outer_iterations++;
+	  break; // out of _outer_iterations for loop
+        }
+
+      // Compute the l2 norm of the whole solution
+      norm_total = newton_iterate.l2_norm();
+
+      max_solution_norm = std::max(max_solution_norm, norm_total);
+
+      // Print out information for the 
+      // nonlinear iterations.
+      if (!quiet)
+        std::cout << "  Nonlinear step: |du|/|u| = "
+                  << norm_delta / norm_total
+                  << ", |du| = " << norm_delta
+                  << std::endl;
+
+      // Terminate the solution iteration if the difference between
+      // this iteration and the last is sufficiently small.
+      if (!quiet)
+        print_convergence(_outer_iterations, current_residual,
+                          norm_delta / steplength,
+                          linear_solve_finished);
+      if (test_convergence(current_residual, norm_delta / steplength,
+                           linear_solve_finished))
+        {
+          _outer_iterations++;
+	  break; // out of _outer_iterations for loop
+        }
+
+      if (_outer_iterations >= max_nonlinear_iterations - 1)
+        {
+          std::cout << "  Nonlinear solver FAILED TO CONVERGE by step "
+                    << _outer_iterations << " with norm "
+                    << norm_total << std::endl;
+          if (continue_after_max_iterations)
+	    {
+	      _solve_result = DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
+	      std::cout << "  Continuing anyway..." << std::endl;
+	    }
+          else
+	    {
+	      libmesh_error();
+	    }
+          continue;
+        }
+    } // end nonlinear loop
+
+  // The linear solver may not have fit our constraints exactly
+#ifdef ENABLE_AMR
+  _system.get_dof_map().enforce_constraints_exactly(_system);
+#endif
+
+  // We may need to localize a parallel solution
+  _system.update ();
+
+  STOP_LOG("solve()", "NewtonSolver");
+
+  // Make sure we are returning something sensible as the
+  // _solve_result.
+  libmesh_assert (_solve_result != DiffSolver::INVALID_SOLVE_RESULT);
+  
+  return _solve_result;
+}
+
+
+
+bool NewtonSolver::test_convergence(Real current_residual,
+                                    Real step_norm,
+                                    bool linear_solve_finished)
+{
+  // We haven't converged unless we pass a convergence test
+  bool has_converged = false;
+
+  // Is our absolute residual low enough?
+  if (current_residual < absolute_residual_tolerance)
+    {
+      _solve_result |= CONVERGED_ABSOLUTE_RESIDUAL;
+      has_converged = true;
+    }
+  
+  // Is our relative residual low enough?
+  if ((current_residual / max_residual_norm) <
+      relative_residual_tolerance)
+    {
+      _solve_result |= CONVERGED_RELATIVE_RESIDUAL;
+      has_converged = true;
+    }
+  
+  // For incomplete linear solves, it's not safe to test step sizes
+  if (!linear_solve_finished)
+    {
+      return has_converged;
+    }
+  
+  // Is our absolute Newton step size small enough?
+  if (step_norm < absolute_step_tolerance)
+    {
+      _solve_result |= CONVERGED_ABSOLUTE_STEP;
+      has_converged = true;
+    }
+  
+  // Is our relative Newton step size small enough?
+  if (step_norm / max_solution_norm <
+      relative_step_tolerance)
+    {
+      _solve_result |= CONVERGED_RELATIVE_STEP;
+      has_converged = true;
+    }
+  
+  return has_converged;
+}
+
+
+void NewtonSolver::print_convergence(unsigned int step_num,
+                                     Real current_residual,
+                                     Real step_norm,
+                                     bool linear_solve_finished)
+{
+  // Is our absolute residual low enough?
+  if (current_residual < absolute_residual_tolerance)
+    {
+      std::cout << "  Nonlinear solver converged, step " << step_num
+                << ", residual " << current_residual
+                << std::endl;
+    }
+  else if (absolute_residual_tolerance)
+    {
+      std::cout << "  Nonlinear solver current_residual "
+                << current_residual << " > "
+                << (absolute_residual_tolerance) << std::endl;
+    }
+
+  // Is our relative residual low enough?
+  if ((current_residual / max_residual_norm) <
+      relative_residual_tolerance)
+    {
+      std::cout << "  Nonlinear solver converged, step " << step_num
+                << ", residual reduction "
+                << current_residual / max_residual_norm
+                << " < " << relative_residual_tolerance
+                << std::endl;
+    }
+  else if (relative_residual_tolerance)
+    {
+      if (!quiet)
+        std::cout << "  Nonlinear solver relative residual "
+                  << (current_residual / max_residual_norm)
+                  << " > " << relative_residual_tolerance
+                  << std::endl;
+    }
+
+  // For incomplete linear solves, it's not safe to test step sizes
+  if (!linear_solve_finished)
+    return;
+
+  // Is our absolute Newton step size small enough?
+  if (step_norm < absolute_step_tolerance)
+    {
+      std::cout << "  Nonlinear solver converged, step " << step_num
+                << ", absolute step size "
+                << step_norm
+                << " < " << absolute_step_tolerance
+                << std::endl;
+    }
+  else if (absolute_step_tolerance)
+    {
+      std::cout << "  Nonlinear solver absolute step size "
+                << step_norm
+                << " > " << absolute_step_tolerance
+                << std::endl;
+    }
+
+  // Is our relative Newton step size small enough?
+  if (step_norm / max_solution_norm <
+      relative_step_tolerance)
+    {
+      std::cout << "  Nonlinear solver converged, step " << step_num
+                << ", relative step size "
+                << (step_norm / max_solution_norm)
+                << " < " << relative_step_tolerance
+                << std::endl;
+    }
+  else if (relative_step_tolerance)
+    {
+      std::cout << "  Nonlinear solver relative step size "
+                << (step_norm / max_solution_norm)
+                << " > " << relative_step_tolerance
+                << std::endl;
+    }
+}

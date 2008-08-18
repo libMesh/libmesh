@@ -1,0 +1,7 @@
+2007-10-31 Chris Hamilton <chamilton@cs.dal.ca>
+
+	* Ported to automake/autoconf/libtool build system.
+
+2007-09-18 Chris Hamilton <chamilton@cs.dal.ca>
+
+	* Moved from being header only to having a compiled linkable library.
