@@ -28,11 +28,11 @@
 // Local includes
 #include "mesh_input.h"
 #include "mesh_output.h"
+#include "exodusII_io_helper.h"
 
 // Forward declarations
 class MeshBase;
 class System;
-class ExodusII;
 
 /**
  * The \p ExodusII_IO class implements reading meshes in the
@@ -76,17 +76,17 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string& )
-  {
-    std::cerr << "The ExodusII_IO::write() method is not yet implemented." << std::endl;
-    libmesh_error();
-  }
+  virtual void write (const std::string& fname);
+  //{
+  //  std::cerr << "The ExodusII_IO::write() method is not yet implemented." << std::endl;
+  //  libmesh_error();
+  //}
 
 
   /**
    * Set the flag indicationg if we should be verbose.
    */
-  bool & verbose ();
+  void verbose (bool set_verbosity);
 
   /**
    * If we read in a nodal solution while reading in a mesh, we can attempt
@@ -111,11 +111,19 @@ class ExodusII_IO : public MeshInput<MeshBase>,
 		       const double time);
   
  private:
-  ExodusII * ex_ptr;
-  int _timestep;
+  /**
+   * Only attempt to instantiate an ExodusII helper class
+   * if the Exodus API is defined.  This class will have no
+   * functionality when HAVE_EXODUS_API is not defined.
+   */
+#ifdef HAVE_EXODUS_API
+  ExodusII_IO_Helper exio_helper;
+#endif
 
-//-------------------------------------------------------------
-  // local data
+  /**
+   *
+   */
+  int _timestep;
 
   /**
    * should be be verbose?
@@ -123,11 +131,6 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   bool _verbose;
 };
 
-inline
-bool & ExodusII_IO::verbose ()
-{
-  return _verbose;
-}
 
 
 #endif // #define __exodusII_io_h__

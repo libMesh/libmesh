@@ -4219,9 +4219,52 @@ src/mesh/exodusII_io.$(obj-suffix):\
     include/geom/stored_range.h\
     include/mesh/boundary_info.h\
     include/mesh/exodusII_io.h\
+    include/mesh/exodusII_io_helper.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/type_vector.h\
+    include/parallel/threads.h\
+    include/solvers/system.h\
+    include/solvers/system_norm.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/mesh/exodusII_io_helper.$(obj-suffix):\
+    src/mesh/exodusII_io_helper.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/elem_range.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/geom/stored_range.h\
+    include/mesh/boundary_info.h\
+    include/mesh/exodusII_io_helper.h\
+    include/mesh/mesh_base.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
@@ -5551,6 +5594,7 @@ src/mesh/unstructured_mesh.$(obj-suffix):\
     include/mesh/boundary_info.h\
     include/mesh/diva_io.h\
     include/mesh/exodusII_io.h\
+    include/mesh/exodusII_io_helper.h\
     include/mesh/fro_io.h\
     include/mesh/gmsh_io.h\
     include/mesh/gmv_io.h\
