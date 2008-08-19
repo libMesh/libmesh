@@ -31,6 +31,10 @@
 #include "system.h"
 #include "numeric_vector.h"
 
+#ifdef DEBUG
+#include "mesh_tools.h"  // for elem_types warning
+#endif
+
 // ------------------------------------------------------------
 // ExodusII_IO_Helper::ElementMaps static data
 
@@ -483,7 +487,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 {
 #ifdef DEBUG
   std::vector<ElemType> et;
-  MeshTools::Generation::elem_types(mesh, et);
+  MeshTools::elem_types(mesh, et);
 
   if (et.size() > 1)
     {
