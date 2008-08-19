@@ -32,19 +32,6 @@
 #include "numeric_vector.h"
 #include "exodusII_io_helper.h"
 
-// Wrap all the helper classes in an #ifdef to avoid excessive compilation
-// time in the case of no ExodusII support
-
-// #ifdef HAVE_EXODUS_API
-
-// namespace exII {
-//   extern "C" {
-// #include "exodusII.h" // defines MAX_LINE_LENGTH, MAX_STR_LENGTH used later
-//   }
-// }
-
-
-// #endif // #ifdef HAVE_EXODUS_API
 
 
 
@@ -54,7 +41,6 @@
 ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase> (mesh),
-  //  ex_ptr (NULL),
   _timestep(1),
   _verbose (false)
 {
@@ -157,8 +143,10 @@ void ExodusII_IO::read (const std::string& fname)
       int subdomain_id = exio_helper.get_block_id(i);
 
       // Set any relevant node/edge maps for this element
-      const std::string type (exio_helper.get_elem_type());
-      const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(type); 
+      const std::string type_str (exio_helper.get_elem_type());
+      const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(type_str); 
+      //if (_verbose)
+      //std::cout << "Reading a block of " << type_str << " elements." << std::endl;
       
       // Loop over all the faces in this block
       int jmax = nelem_last_block+exio_helper.get_num_elem_this_blk();
@@ -212,8 +200,6 @@ void ExodusII_IO::read (const std::string& fname)
 				      id_list[e]);
       }
   }
-
-//  ex.close();            // Close the exodus file, if possible
 #endif
 }
 
@@ -370,6 +356,8 @@ void ExodusII_IO::write (const std::string& fname)
       exio_helper.initialize(fname,mesh);
       exio_helper.write_nodal_coordinates(mesh);
       exio_helper.write_elements(mesh);
+
+      // Note: the file is closed automatically by the ExodusII_IO destructor.
     }
 }
 
