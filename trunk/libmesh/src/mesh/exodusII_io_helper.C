@@ -72,6 +72,10 @@ const int ExodusII_IO_Helper::ElementMaps::tet4_node_map[4]   = {0, 1, 2, 3};
 const int ExodusII_IO_Helper::ElementMaps::tet10_node_map[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 const int ExodusII_IO_Helper::ElementMaps::prism6_node_map[6]   = {0, 1, 2, 3, 4, 5};
+const int ExodusII_IO_Helper::ElementMaps::prism15_node_map[15]   = {0, 1, 2, 3, 4, 5, 6,  7,  8,  9,
+								     10, 11, 12, 13, 14};
+const int ExodusII_IO_Helper::ElementMaps::prism18_node_map[18]   = {0, 1, 2, 3, 4, 5, 6,  7,  8,  9,
+								     10, 11, 12, 13, 14, 15, 16, 17};
 const int ExodusII_IO_Helper::ElementMaps::pyramid5_node_map[5] = {0, 1, 2, 3, 4};
   
 // 3D face map definitions
@@ -86,8 +90,6 @@ const int ExodusII_IO_Helper::ElementMaps::pyramid_face_map[5] = {-1,-1,-1,-1,-1
 // ExodusII_IO_Helper class members
 ExodusII_IO_Helper::~ExodusII_IO_Helper()
 {
-  //delete [] title;
-  //delete [] elem_type;
 }
 
 void ExodusII_IO_Helper::verbose (bool set_verbosity)
@@ -233,6 +235,12 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
 				   &num_elem_this_blk,
 				   &num_nodes_per_elem,
 				   &num_attr);
+  if (_verbose)
+    std::cout << "Reading a block of " << num_elem_this_blk
+	      << " " << &elem_type[0] << "(s)"
+	      << " having " << num_nodes_per_elem
+	      << " nodes per element." << std::endl;
+      
   check_err(ex_err, "Error getting block info.");
   message("Info retrieved successfully for block: ", block); 
   
@@ -597,47 +605,69 @@ bool ExodusII_IO_Helper::created()
 
 // ------------------------------------------------------------
 // ExodusII_IO_Helper::Conversion class members
-ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversion(const std::string type)
+ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversion(const std::string type_str)
 {
-  if ((type == "QUAD4") || (type == "QUAD"))
+  // ExodusII defines the following types in contrib/exodusii/Lib/include/exodusII_int.h
+  // UNK         =  -1     
+  // NULL_ELEMENT=   0     
+  // TRIANGLE    =   1     
+  // QUAD        =   2     
+  // HEX         =   3     
+  // WEDGE       =   4     
+  // TETRA       =   5     
+  // TRUSS       =   6     
+  // BEAM        =   7     
+  // SHELL       =   8     
+  // SPHERE      =   9     
+  // CIRCLE      =  10     
+  // TRISHELL    =  11     
+  // PYRAMID     =  12      
+  
+  if ((type_str == "QUAD4") || (type_str == "QUAD"))
     return assign_conversion(QUAD4);
 
-  else if (type == "QUAD8")
+  else if (type_str == "QUAD8")
     return assign_conversion(QUAD8);
 
-  else if (type == "QUAD9")
+  else if (type_str == "QUAD9")
     return assign_conversion(QUAD9);
 
-  else if ((type == "TRI3") || (type == "TRIANGLE"))
+  else if ((type_str == "TRI3") || (type_str == "TRIANGLE"))
     return assign_conversion(TRI3);
 
-  else if (type == "TRI6")
+  else if (type_str == "TRI6")
     return assign_conversion(TRI6);
 
-  else if ((type == "HEX8") || (type == "HEX") || (type=="hex8")) 
+  else if ((type_str == "HEX8") || (type_str == "HEX") || (type_str=="hex8")) 
     return assign_conversion(HEX8);
 
-  else if (type == "HEX20")
+  else if (type_str == "HEX20")
     return assign_conversion(HEX20);
 
-  else if (type == "HEX27")
+  else if (type_str == "HEX27")
     return assign_conversion(HEX27);
 
-  else if ((type == "TETRA4") || (type == "TETRA"))
+  else if ((type_str == "TETRA4") || (type_str == "TETRA"))
     return assign_conversion(TET4);
 
-  else if (type == "TETRA10")
+  else if (type_str == "TETRA10")
     return assign_conversion(TET10);
 
-  else if (type == "WEDGE")
+  else if (type_str == "WEDGE")
     return assign_conversion(PRISM6);
 
-  else if (type == "PYRAMID" || type == "PYRAMID5")
+  else if (type_str == "WEDGE15")
+    return assign_conversion(PRISM15);
+
+  else if (type_str == "WEDGE18")
+    return assign_conversion(PRISM18);
+
+  else if (type_str == "PYRAMID" || type_str == "PYRAMID5")
     return assign_conversion(PYRAMID5);
 
   else
     {
-      std::cerr << "ERROR! Unrecognized element type: " << type << std::endl;
+      std::cerr << "ERROR! Unrecognized element type_str: " << type_str << std::endl;
       libmesh_error();
     }
 
@@ -717,6 +747,18 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case PRISM6:
       {
 	const Conversion conv(prism6_node_map, prism_face_map, PRISM6, "WEDGE");
+	return conv;
+      }
+
+    case PRISM15:
+      {
+	const Conversion conv(prism15_node_map, prism_face_map, PRISM15, "WEDGE15");
+	return conv;
+      }
+
+    case PRISM18:
+      {
+	const Conversion conv(prism18_node_map, prism_face_map, PRISM18, "WEDGE18");
 	return conv;
       }
 

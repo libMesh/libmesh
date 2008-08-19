@@ -689,10 +689,19 @@ public:
 
   /**
    * The Prism6 node map.
-   * Use this map for quadratic
-   * tetrahedral elements in 3D.
    */
   static const int prism6_node_map[6]; 
+
+  /**
+   * The Prism15 node map.
+   * Use this map for "serendipity" prisms in 3D.
+   */
+  static const int prism15_node_map[15]; 
+
+  /**
+   * The Prism18 node map.
+   */
+  static const int prism18_node_map[18]; 
 
   /**
    * The Pyramid5 node map.
@@ -703,7 +712,7 @@ public:
 
 
   /**
-   * 3D face maps
+   * 3D face maps.  Are these ever used for anything?
    */
       
   /**
@@ -740,7 +749,7 @@ public:
   /**
    * @returns a conversion object given an element type name.
    */
-  ExodusII_IO_Helper::Conversion assign_conversion(const std::string type);
+  ExodusII_IO_Helper::Conversion assign_conversion(const std::string type_str);
       
   /**
    * @returns a conversion object given an element type.
