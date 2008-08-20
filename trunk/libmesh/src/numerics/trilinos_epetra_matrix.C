@@ -294,7 +294,7 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 				 const std::vector<unsigned int>& cols)
 {
   libmesh_assert (this->initialized());
-  
+
   LIBMESH_THROW(libMesh::NotImplemented());
 
 //   const unsigned int m = dm.m();
