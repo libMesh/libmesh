@@ -677,7 +677,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
       fe->attach_quadrature_rule (qrule.get());
 
       const std::vector<Real>&               JxW = fe->get_JxW();
-      const std::vector<std::vector<Real> >* phi;
+      const std::vector<std::vector<Real> >* phi = NULL;
       if (norm.type(var) == H1 ||
           norm.type(var) == H2 ||
           norm.type(var) == L2)
