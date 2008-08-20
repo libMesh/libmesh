@@ -40,6 +40,12 @@ vol. 22, no. 3--4, pp. 237--254, 2006. 	 (<a href="http://cfdlab.ae.utexas.edu/~
 
 <ul>
 
+<li> Roy H. Stogner,
+<i>Parallel Adaptive C1 Macro-Elements for Nonlinear Thin Film and Non-Newtonian Flow Problems.</i>
+<a href="http://www.cfdlab.ae.utexas.edu/~roystgnr/dissertation/dissertation-stogner.pdf">PhD Dissertation</a>, 
+The University of Texas at Austin, August 2008. 
+</li>
+
 <li> John W. Peterson, 
 <i>Parallel Adaptive Finite Element Methods for Problems in Natural Convection.</i>
 <a href="http://www.cfdlab.ae.utexas.edu/~peterson/diss.pdf">PhD Dissertation</a>, 

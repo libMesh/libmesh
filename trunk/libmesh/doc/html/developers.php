@@ -57,7 +57,7 @@ dev_table_entry("images/jwpeterson.jpg",
 
 <?php
 dev_table_entry("images/roystgnr.jpg",
-                "Roy Stogner",
+                "Dr. Roy Stogner",
                 "http://www.cfdlab.ae.utexas.edu/~roystgnr",
 		"",
 		"PhD Student, Chief Software Architect",
