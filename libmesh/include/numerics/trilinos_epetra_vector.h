@@ -645,7 +645,12 @@ template <typename T>
 inline
 void EpetraVector<T>::swap (EpetraVector<T> &v)
 {
-  std::swap(_vec, v._vec);
+  //std::swap has trouble with swapping
+  //AutoPtr<Epetra_FEVector>'s for some reason.
+  AutoPtr<Epetra_FEVector> tmp = v._vec;
+  v._vec = _vec;
+  _vec = tmp;
+  
   std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
 }
 
