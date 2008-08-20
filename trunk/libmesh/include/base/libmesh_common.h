@@ -213,11 +213,16 @@ namespace libMesh
 #define libmesh_assert(asserted)  do { if (!(asserted)) { std::cerr << "Assertion `" #asserted "' failed." << std::endl; libmesh_error(); } } while(0)
 #endif
 
-// The libmesh_error() macro prints a message and throws a generic exception
+// The libmesh_error() macro prints a message and throws a LogicError
+// exception
+// The libmesh_not_implemented() macro prints a message and throws a
+// NotImplemented exception
 #ifdef ENABLE_TRACEFILES
 #define libmesh_error()    do { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); print_trace(traceout); std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::LogicError()); } while(0)
+#define libmesh_not_implemented()    do { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); print_trace(traceout); std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
 #else
 #define libmesh_error()    do { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::LogicError()); } while(0)
+#define libmesh_not_implemented()    do { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
 #endif
 
 // The error() macro prints a message and throws a generic exception
