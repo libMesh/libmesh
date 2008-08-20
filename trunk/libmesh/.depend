@@ -4265,6 +4265,7 @@ src/mesh/exodusII_io_helper.$(obj-suffix):\
     include/mesh/boundary_info.h\
     include/mesh/exodusII_io_helper.h\
     include/mesh/mesh_base.h\
+    include/mesh/mesh_tools.h\
     include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
@@ -7150,6 +7151,80 @@ src/quadrature/quadrature_clough_3D.$(obj-suffix):\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/quadrature/quadrature_conical.$(obj-suffix):\
+    src/quadrature/quadrature_conical.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/parallel/threads.h\
+    include/quadrature/quadrature.h\
+    include/quadrature/quadrature_conical.h\
+    include/quadrature/quadrature_gauss.h\
+    include/quadrature/quadrature_jacobi.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/quadrature/quadrature_conical_2D.$(obj-suffix):\
+    src/quadrature/quadrature_conical_2D.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/parallel/threads.h\
+    include/quadrature/quadrature.h\
+    include/quadrature/quadrature_conical.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/quadrature/quadrature_conical_3D.$(obj-suffix):\
+    src/quadrature/quadrature_conical_3D.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/geom/point.h\
+    include/numerics/type_vector.h\
+    include/parallel/threads.h\
+    include/quadrature/quadrature.h\
+    include/quadrature/quadrature_conical.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/quadrature/quadrature_gauss.$(obj-suffix):\
     src/quadrature/quadrature_gauss.C\
     include/base/auto_ptr.h\
@@ -7218,8 +7293,8 @@ src/quadrature/quadrature_gauss_2D.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/quadrature/quadrature.h\
+    include/quadrature/quadrature_conical.h\
     include/quadrature/quadrature_gauss.h\
-    include/quadrature/quadrature_jacobi.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -7243,9 +7318,9 @@ src/quadrature/quadrature_gauss_3D.$(obj-suffix):\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/quadrature/quadrature.h\
+    include/quadrature/quadrature_conical.h\
     include/quadrature/quadrature_gauss.h\
     include/quadrature/quadrature_gm.h\
-    include/quadrature/quadrature_jacobi.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
