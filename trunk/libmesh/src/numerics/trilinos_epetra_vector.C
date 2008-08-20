@@ -176,7 +176,7 @@ template <typename T>
 void EpetraVector<T>::add_vector (const NumericVector<T>& /* V_in */,
 				  const SparseMatrix<T>& /* A_in */)
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 //   const EpetraVector<T>* V = dynamic_cast<const EpetraVector<T>*>(&V_in);
 //   const EpetraMatrix<T>* A = dynamic_cast<const EpetraMatrix<T>*>(&A_in);
@@ -200,7 +200,7 @@ template <typename T>
 void EpetraVector<T>::add_vector (const DenseVector<T>& /* V_in */,
 				  const std::vector<unsigned int>& /* dof_indices */)
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 //   libmesh_assert (V_in.size() == dof_indices.size());
 
@@ -427,7 +427,7 @@ void EpetraVector<T>::localize (const unsigned int /* first_local_idx */,
 				const unsigned int /* last_local_idx */,
 				const std::vector<unsigned int>& /* send_list */)
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 //   // Only good for serial vectors.
 //   libmesh_assert (this->size() == this->local_size());
@@ -562,7 +562,7 @@ void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
 template <typename T>
 void EpetraVector<T>::print_matlab (const std::string /* name */) const
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 //   libmesh_assert (this->initialized());
 //   libmesh_assert (this->closed());
@@ -623,7 +623,7 @@ template <typename T>
 void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
 				       const std::vector<unsigned int>& /* rows */) const
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 //   // Epetra data structures
 //   IS parent_is, subvector_is;

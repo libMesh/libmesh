@@ -105,7 +105,7 @@ void EpetraMatrix<T>::init ()
   }
 
   
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 //   int proc_id = 0;
 
@@ -179,7 +179,7 @@ void EpetraMatrix<T>::zero ()
 {
   libmesh_assert (this->initialized());
   
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 //   int ierr=0;
 
@@ -235,7 +235,7 @@ void EpetraMatrix<T>::print_matlab (const std::string name) const
   // libmesh_assert (this->closed());
   this->close();
   
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 //   int ierr=0; 
 //   PetscViewer petsc_viewer;
@@ -295,7 +295,7 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 {
   libmesh_assert (this->initialized());
 
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 //   const unsigned int m = dm.m();
 //   const unsigned int n = dm.n();
@@ -327,7 +327,7 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 //   // Can only extract submatrices from closed matrices
 //   this->close();
   
-//   LIBMESH_THROW(libMesh::NotImplemented());
+//   libmesh_not_implemented();
 
 // //   // Attempt to cast the input matrix to a EpetraMatrix*
 // //   EpetraMatrix<T>* petsc_submatrix = dynamic_cast<EpetraMatrix<T>*>(&submatrix);
