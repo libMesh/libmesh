@@ -944,9 +944,11 @@ AC_DEFUN(CONFIGURE_TRILINOS,
               withtrilinosdir=$TRILINOS_DIR)
 
   if test "$withtrilinosdir" != no ; then
-    AC_CHECK_FILE($withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo,
-                      AZTECOO_MAKEFILE_EXPORT=$withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo,
-		      enabletrilinos=no)
+    AC_CHECK_FILE($withtrilinosdir/include/Makefile.export.aztecoo,
+                  AZTECOO_MAKEFILE_EXPORT=$withtrilinosdir/include/Makefile.export.aztecoo,
+                  AC_CHECK_FILE($withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo,
+                                AZTECOO_MAKEFILE_EXPORT=$withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo,
+	 	                enabletrilinos=no))
 
     if test "$enabletrilinos" != no ; then
        AC_DEFINE(HAVE_TRILINOS, 1,
