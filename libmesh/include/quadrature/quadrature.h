@@ -158,6 +158,15 @@ public:
   void print_info(std::ostream& os=std::cout) const;
 
   /**
+   * Maps the points of a 1D interval quadrature rule (typically [-1,1])
+   * to any other 1D interval (typically [0,1]) and scales the weights
+   * accordingly.  The quadrature rule will be mapped from the
+   * entries of old_range to the entries of new_range.
+   */
+  void scale(std::pair<Real, Real> old_range,
+	     std::pair<Real, Real> new_range);
+
+  /**
    * Same as above, but allows you to use the stream syntax.
    */
   friend std::ostream& operator << (std::ostream& os, const QBase& q);
@@ -240,14 +249,6 @@ protected:
   }
 #endif
   
-  /**
-   * Maps the points of a 1D interval quadrature rule (typically [-1,1])
-   * to any other 1D interval (typically [0,1]) and scales the weights
-   * accordingly.  The quadrature rule will be mapped from the
-   * entries of old_range to the entries of new_range.
-   */
-  void scale(std::pair<Real, Real> old_range,
-	     std::pair<Real, Real> new_range);
   
   /**
    * Computes the tensor product of
@@ -257,17 +258,6 @@ protected:
    */
   void tensor_product_quad (const QBase& q1D);
 
-  /**
-   * Computes the conical product of
-   * two 1D rules to generate a (sub-optimal)
-   * 2D rule for triangles.  Note that:
-   * gauss1D = 1D Gauss rule
-   * jacA1D  = 1D Jacobi-Gauss rule with (1-x) wt. funtion
-   * Method can be found in:
-   * Approximate Calculation of Multiple Integrals, Stroud, A. H.
-   */
-  void tensor_product_tri (const QBase& gauss1D, const QBase& jacA1D);
-  
   /**
    * Computes the tensor product quadrature rule
    * [q1D x q1D x q1D] from the 1D rule q1D.
@@ -285,17 +275,6 @@ protected:
    */
   void tensor_product_prism (const QBase& q1D, const QBase& q2D);
 
-  /**
-   * Computes the conical product of
-   * three 1D rules to generate a (sub-optimal)
-   * 3D rule for tets.  Note that:
-   * gauss1D = 1D Gauss rule
-   * jacA1D  = 1D Jacobi-Gauss rule with (1-x) wt. funtion
-   * jacB1D  = 1D Jacobi-Gauss rule with (1-x)^2 wt. function 
-   * Method can be found in:
-   * Approximate Calculation of Multiple Integrals, Stroud, A. H.
-   */
-  void tensor_product_tet (const QBase& gauss1D, const QBase& jacA1D, const QBase& jacB1D);
 
   
   /**

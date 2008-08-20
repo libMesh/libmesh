@@ -21,7 +21,7 @@
 
 // Local includes
 #include "quadrature_gauss.h"
-#include "quadrature_jacobi.h"
+#include "quadrature_conical.h"
 #include "quadrature_gm.h"
 
 void QGauss::init_3D(const ElemType _type,
@@ -56,11 +56,10 @@ void QGauss::init_3D(const ElemType _type,
     case TET4:
     case TET10:
       {
-	// Taken from pg. 222 of "The finite element method," vol. 1
-	// ed. 5 by Zienkiewicz & Taylor
-	      
 	switch(_order + 2*p)
 	  {
+	    // Taken from pg. 222 of "The finite element method," vol. 1
+	    // ed. 5 by Zienkiewicz & Taylor
 	  case CONSTANT:
 	  case FIRST:
 	    {
@@ -73,7 +72,7 @@ void QGauss::init_3D(const ElemType _type,
 	      _points[0](1) = .25;
 	      _points[0](2) = .25;
 		    
-	      _weights[0] = .1666666666666666666666666666666666666666666667;
+	      _weights[0] = .1666666666666666666666666666666666666666666667L;
 		    
 	      return;
 	    }
@@ -163,6 +162,20 @@ void QGauss::init_3D(const ElemType _type,
 		    
 		  return;
 		} // end if (allow_rules_with_negative_weights)
+	      else
+		{
+		  // If a rule with postive weights is required, the 2x2x2 conical
+		  // product rule is third-order accurate and has less points than
+		  // the next-available positive-weight rule at FIFTH order. 
+		  QConical conical_rule(3, _order);
+		  conical_rule.init(_type, p);
+
+		  // Swap points and weights with the about-to-be destroyed rule.
+		  _points.swap (conical_rule.get_points() );
+		  _weights.swap(conical_rule.get_weights());
+
+		  return;
+		}
 	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
 	    }
 
@@ -439,29 +452,16 @@ void QGauss::init_3D(const ElemType _type,
 	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
 	    }
 
-	    
-	  case NINTH:
-	  case TENTH:        
-	  case ELEVENTH:
-	  case TWELFTH:      
-	  case THIRTEENTH:   
-	  case FOURTEENTH:   
-	  case FIFTEENTH:    
-	  case SIXTEENTH:    
-	  case SEVENTEENTH:  
-	  case EIGHTTEENTH:  
-	  case NINTEENTH:    
-	  case TWENTIETH:    
-	  case TWENTYFIRST:  
-	  case TWENTYSECOND: 
-	  case TWENTYTHIRD:
+	    // Fall back on Grundmann-Moller or Conical Product rules at high orders.
+	  default:
 	    {
-	      if (allow_rules_with_negative_weights)
+	      if ((allow_rules_with_negative_weights) && (_order + 2*p < 34))
 		{
 		  // The Grundmann-Moller rules are defined to arbitrary order and
-		  // have significantly fewer evaluation points than concial product
+		  // can have significantly fewer evaluation points than concial product
 		  // rules.  If you allow rules with negative weights, the GM rules
-		  // will be more efficient in general, but may be more susceptible
+		  // will be more efficient for degree up to 33 (for degree 34 and
+		  // higher, CP is more efficient!) but may be more susceptible
 		  // to round-off error.  Safest is to disallow rules with negative
 		  // weights, but this decision should be made on a case-by-case basis.
 		  QGrundmann_Moller gm_rule(3, _order);
@@ -476,39 +476,24 @@ void QGauss::init_3D(const ElemType _type,
 
 	      else
 		{
-		  // The following quadrature rules are
-		  // generated as conical products.  These
-		  // tend to be non-optimal (use too many
-		  // points, cluster points in certain
-		  // regions of the domain) but they are
-		  // quite easy to automatically generate
-		  // using a 1D Gauss rule on [0,1] and two 
-		  // 1D Jacobi-Gauss rules on [0,1].
-	      
-		  // Define the quadrature rules...
-		  QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
-		  QJacobi jacA1D(1,static_cast<Order>(_order+2*p),1,0);
-		  QJacobi jacB1D(1,static_cast<Order>(_order+2*p),2,0);
+		  // The following quadrature rules are generated as
+		  // conical products.  These tend to be non-optimal
+		  // (use too many points, cluster points in certain
+		  // regions of the domain) but they are quite easy to
+		  // automatically generate using a 1D Gauss rule on
+		  // [0,1] and two 1D Jacobi-Gauss rules on [0,1].
+		  QConical conical_rule(3, _order);
+		  conical_rule.init(_type, p);
 
-		  // The Gauss rule needs to be scaled to [0,1]
-		  std::pair<Real, Real> old_range(-1,1);
-		  std::pair<Real, Real> new_range(0,1);
-		  gauss1D.scale(old_range,
-				new_range);
-
-		  // Compute the tensor product
-		  tensor_product_tet(gauss1D, jacA1D, jacB1D);
+		  // Swap points and weights with the about-to-be destroyed rule.
+		  _points.swap (conical_rule.get_points() );
+		  _weights.swap(conical_rule.get_weights());
+		  
 		  return;
 		}
 	    }
-	  default:
-	    {
-	      std::cout << "Quadrature rule not supported!" << std::endl;
-		    
-	      libmesh_error();
-	    }
 	  }
-      }
+      } // end case TET4,TET10
 
       
 	    
