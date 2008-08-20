@@ -18,38 +18,37 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+// Local includes
+#include "quadrature_conical.h"
 
-#ifndef __enum_quadrature_type_h__
-#define __enum_quadrature_type_h__
 
-// ------------------------------------------------------------
-// enum QuadratureType definition
-namespace libMeshEnums {
-  
-  /**
-   * Defines an \p enum for currently available quadrature rules.
-   */
-  enum QuadratureType {QGAUSS            = 0,
-				         
-		       QJACOBI_1_0       = 1,
-		       QJACOBI_2_0       = 2,
-				         
-		       QSIMPSON          = 3,
-		       QTRAP             = 4,
-		       QGRID             = 5,
-		       QGRUNDMANN_MOLLER = 6,
-		       QMONOMIAL         = 7,
-		       QCONICAL          = 8,
 
-		       QCLOUGH           = 21,
+void QConical::init_2D(const ElemType _type,
+		       unsigned int p)
+{
+  switch (_type)
+    {
+    case TRI3:
+    case TRI6:
+      {
+	this->conical_product_2D(p);
+	return;
+	
+      } // end case TRI3, TRI6
 
-		       INVALID_Q_RULE    = 127};
+
+      
+      //---------------------------------------------
+      // Unsupported element type
+    default:
+      {
+	std::cerr << "ERROR: Unsupported element type: " << _type << std::endl;
+	libmesh_error();
+      }
+    } // end switch (_type)
+
+  // We must have returned or errored-out by this point.  If not,
+  // throw an error now.
+  libmesh_error();
+  return;
 }
-
-using namespace libMeshEnums;
-
-#endif // #define __enum_quadrature_type_h__
-
-
-
-

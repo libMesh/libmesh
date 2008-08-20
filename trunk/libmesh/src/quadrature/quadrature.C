@@ -138,37 +138,6 @@ void QBase::tensor_product_quad(const QBase& q1D)
 
 
 
-void QBase::tensor_product_tri(const QBase& gauss1D, const QBase& jac1D)
-{
-  
-  // Both rules should be of the same order
-  libmesh_assert(gauss1D.n_points() == jac1D.n_points());
-
-  // Save the number of points as a convenient variable
-  const unsigned int n_points = gauss1D.n_points();
-  
-  // Both rules should be between x=0 and x=1
-  libmesh_assert(gauss1D.qp(0)(0) >= 0.0); libmesh_assert(gauss1D.qp(n_points-1)(0) <= 1.0);
-  libmesh_assert(jac1D.qp(0)(0)   >= 0.0); libmesh_assert(jac1D.qp(n_points-1)(0) <= 1.0);
-
-  // Resize the points and weights vectors
-  _points.resize(n_points * n_points);
-  _weights.resize(n_points * n_points);
-
-  // Compute the conical product
-  unsigned int gp = 0;
-  for (unsigned int i=0; i<n_points; i++)
-    for (unsigned int j=0; j<n_points; j++)
-      {
-	_points[gp](0) = jac1D.qp(j)(0);                          //s[j];
-	_points[gp](1) = gauss1D.qp(i)(0) * (1.-jac1D.qp(j)(0)); //r[i]*(1.-s[j]);
-	_weights[gp]   = gauss1D.w(i) * jac1D.w(j);              //A[i]*B[j];
-	gp++;
-      }
-}
-
-
-
 
 void QBase::tensor_product_hex(const QBase& q1D)
 {
@@ -219,41 +188,6 @@ void QBase::tensor_product_prism(const QBase& q1D, const QBase& q2D)
 	qp++;
       }
   
-}
-
-
-
-
-void QBase::tensor_product_tet(const QBase& gauss1D, const QBase& jacA1D, const QBase& jacB1D)
-{
-  // All rules should be of the same order
-  libmesh_assert(gauss1D.n_points() == jacA1D.n_points());
-  libmesh_assert(jacA1D.n_points()  == jacB1D.n_points());
-  
-  // Save the number of points as a convenient variable
-  const unsigned int n_points = gauss1D.n_points();
-  
-  // All rules should be between x=0 and x=1
-  libmesh_assert(gauss1D.qp(0)(0) >= 0.0); libmesh_assert(gauss1D.qp(n_points-1)(0) <= 1.0);
-  libmesh_assert(jacA1D.qp(0)(0)  >= 0.0); libmesh_assert(jacA1D.qp(n_points-1)(0)  <= 1.0);
-  libmesh_assert(jacB1D.qp(0)(0)  >= 0.0); libmesh_assert(jacB1D.qp(n_points-1)(0)  <= 1.0);
-
-  // Resize the points and weights vectors
-  _points.resize(n_points * n_points * n_points);
-  _weights.resize(n_points * n_points * n_points);
-
-  // Compute the conical product
-  unsigned int gp = 0;
-  for (unsigned int i=0; i<n_points; i++)
-    for (unsigned int j=0; j<n_points; j++)
-      for (unsigned int k=0; k<n_points; k++)
-      {
-	_points[gp](0) = jacB1D.qp(k)(0);                                                  //t[k];
-	_points[gp](1) = jacA1D.qp(j)(0)  * (1.-jacB1D.qp(k)(0));                         //s[j]*(1.-t[k]);
-	_points[gp](2) = gauss1D.qp(i)(0) * (1.-jacA1D.qp(j)(0)) * (1.-jacB1D.qp(k)(0)); //r[i]*(1.-s[j])*(1.-t[k]);
-	_weights[gp]   = gauss1D.w(i)     * jacA1D.w(j)          * jacB1D.w(k);          //A[i]*B[j]*C[k];
-	gp++;
-      }
 }
 
 

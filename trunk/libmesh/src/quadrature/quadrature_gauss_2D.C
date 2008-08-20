@@ -21,7 +21,7 @@
 
 // Local includes
 #include "quadrature_gauss.h"
-#include "quadrature_jacobi.h"
+#include "quadrature_conical.h"
 
 
 void QGauss::init_2D(const ElemType _type,
@@ -122,11 +122,14 @@ void QGauss::init_2D(const ElemType _type,
 	      _points.resize(4);
 	      _weights.resize(4);
 
-	      // This rule is formed from a tensor product of appropriately-scaled
-	      // Gauss and Jacobi rules.  (See also: the tensor_product_tri() and tensor_product_tet()
-	      // routines in quadrature.C  For high orders these rules generally
-	      // have too many points, but at extremely low order they are competitive
-	      // and have the additional benefit of having all positive weights.
+	      // This rule is formed from a tensor product of
+	      // appropriately-scaled Gauss and Jacobi rules.  (See
+	      // also the QConical quadrature class, this is a
+	      // hard-coded version of one of those rules.)  For high
+	      // orders these rules generally have too many points,
+	      // but at extremely low order they are competitive and
+	      // have the additional benefit of having all positive
+	      // weights.
 	      _points[0](0)=1.5505102572168219018027159252941e-01L;
 	      _points[0](1)=1.7855872826361642311703513337422e-01L;
 	      _points[1](0)=6.4494897427831780981972840747059e-01L;
@@ -842,31 +845,21 @@ void QGauss::init_2D(const ElemType _type,
 	    // rules, an error will be thrown from the respective 1D code.
 	  default:
 	    {
-	      // The following quadrature rules are
-	      // generated as conical products.  These
-	      // tend to be non-optimal (use too many
-	      // points, cluster points in certain
-	      // regions of the domain) but they are
-	      // quite easy to automatically generate
-	      // using a 1D Gauss rule on [0,1] and a
-	      // 1D Jacobi-Gauss rule on [0,1].
+	      // The following quadrature rules are generated as
+	      // conical products.  These tend to be non-optimal
+	      // (use too many points, cluster points in certain
+	      // regions of the domain) but they are quite easy to
+	      // automatically generate using a 1D Gauss rule on
+	      // [0,1] and two 1D Jacobi-Gauss rules on [0,1].
+	      QConical conical_rule(2, _order);
+	      conical_rule.init(_type, p);
 
-	      // Define the quadrature rules...
-              // FIXME - why can't we init() these explicitly? [RHS]
-	      QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
-	      QJacobi jac1D(1,static_cast<Order>(_order+2*p),1,0);
-	      
-	      // The Gauss rule needs to be scaled to [0,1]
-	      std::pair<Real, Real> old_range(-1,1);
-	      std::pair<Real, Real> new_range(0,1);
-	      gauss1D.scale(old_range,
-			    new_range);
-
-	      // Compute the tensor product
-	      tensor_product_tri(gauss1D, jac1D);
+	      // Swap points and weights with the about-to-be destroyed rule.
+	      _points.swap (conical_rule.get_points() );
+	      _weights.swap(conical_rule.get_weights());
+		  
 	      return;
 	    }
-	    
 	  }
       }
 
