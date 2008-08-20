@@ -33,6 +33,94 @@
 
 //-----------------------------------------------------------------------
 // EpetraMatrix members
+template <typename T> 
+void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sparsity_pattern)
+{
+  // clear data, start over
+  this->clear ();    
+
+  // big trouble if this fails!
+  libmesh_assert (this->_dof_map != NULL);
+  
+  const unsigned int n_rows = sparsity_pattern.size();
+
+//   // Initialize the _row_start data structure,
+//   // allocate storage for the _csr array
+//   {
+//     unsigned int size = 0;
+ 
+//     for (unsigned int row=0; row<n_rows; row++)
+//       size += sparsity_pattern[row].size();
+    
+//     _csr.resize       (size);
+//     _row_start.reserve(n_rows + 1);
+//   }
+
+
+//   // Initize the _csr data structure.
+//   {
+//     std::vector<unsigned int>::iterator pos = _csr.begin();
+    
+//     _row_start.push_back (pos);
+    
+//     for (unsigned int row=0; row<n_rows; row++)
+//       {
+// 	// insert the row indices
+// 	for (SparsityPattern::Row::const_iterator col = sparsity_pattern[row].begin();
+// 	     col != sparsity_pattern[row].end(); ++col)
+// 	  {
+// 	    libmesh_assert (pos != _csr.end());
+// 	    *pos = *col;
+// 	    ++pos;
+// 	  }
+	
+// 	_row_start.push_back (pos);
+//       }
+//   }
+
+
+//   // Initialize the matrix
+//   libmesh_assert (!this->initialized());
+//   this->init ();
+//   libmesh_assert (this->initialized());
+//   //std::cout << "n_rows=" << n_rows << std::endl;
+//   //std::cout << "m()=" << m() << std::endl;
+//   libmesh_assert (n_rows == this->m());
+
+//   // Tell the matrix about its structure.  Initialize it
+//   // to zero.
+//   for (unsigned int i=0; i<n_rows; i++)
+//     {
+//       const std::vector<unsigned int>::const_iterator
+// 	rs = _row_start[i];
+      
+//       const unsigned int length = _row_start[i+1] - rs;
+      
+//       Q_SetLen (&_QMat, i+1, length);
+
+//       for (unsigned int l=0; l<length; l++)
+// 	{
+// 	  const unsigned int j = *(rs+l);
+
+// 	  // sanity check
+// 	  //std::cout << "m()=" << m() << std::endl;
+// 	  //std::cout << "(i,j,l) = (" << i
+// 	  //	    << "," << j
+// 	  //	    << "," << l
+// 	  // 	    << ")" << std::endl;
+// 	  //std::cout << "pos(i,j)=" << pos(i,j)
+// 	  //          << std::endl;	  
+// 	  libmesh_assert (this->pos(i,j) == l);
+// 	  Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
+// 	}
+//     }
+  
+//   // That's it!
+//   //here();
+}
+
+
+
 template <typename T>
 void EpetraMatrix<T>::init (const unsigned int m,
 			    const unsigned int n,
