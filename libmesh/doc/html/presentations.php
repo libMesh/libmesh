@@ -31,6 +31,9 @@
   <li> <a href="http://ntrs.nasa.gov/search.jsp?N=4294668673">SUPG Finite Element Simulations of Compressible Flows for Aerothermodynamic Applications</a>, February 2007</li>
   <li> <a href="http://cfdlab.ae.utexas.edu/~benkirk/defense.pdf">Benjamin S. Kirk's PhD Dissertation Defense</a>, March 2007</li>
   <li> <a href="http://cfdlab.ae.utexas.edu/~peterson/defense/defense.pdf">John W. Peterson's PhD Dissertation Defense</a>, April 2008</li>
+  <li> <a href="http://www.cfdlab.ae.utexas.edu/~roystgnr/dissertation/defense-slides.pdf">Roy H. Stogner's PhD Dissertation Defense</a>, August 2008</li>
+
+
 </ul>
 
 <h2>Applications which use libMesh</h2>
