@@ -87,18 +87,18 @@ public:
    */
   ~EpetraMatrix ();
  
-  /**
-   * The \p EpetraMatrix needs the full sparsity pattern.
-   */ 
-  bool need_full_sparsity_pattern () const 
-  { return true; }
+//   /**
+//    * The \p EpetraMatrix needs the full sparsity pattern.
+//    */ 
+//   bool need_full_sparsity_pattern () const 
+//   { return true; }
 
-  /**
-   * Updates the matrix sparsity pattern.  This will
-   * tell the underlying matrix storage scheme how
-   * to map the \f$ (i,j) \f$ elements.
-   */
-  void update_sparsity_pattern (const SparsityPattern::Graph &);
+//   /**
+//    * Updates the matrix sparsity pattern.  This will
+//    * tell the underlying matrix storage scheme how
+//    * to map the \f$ (i,j) \f$ elements.
+//    */
+//   void update_sparsity_pattern (const SparsityPattern::Graph &);
 
   /**
    * Initialize a Petsc matrix that is of global

@@ -33,91 +33,91 @@
 
 //-----------------------------------------------------------------------
 // EpetraMatrix members
-template <typename T> 
-void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sparsity_pattern)
-{
-  // clear data, start over
-  this->clear ();    
+// template <typename T> 
+// void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sparsity_pattern)
+// {
+//   // clear data, start over
+//   this->clear ();    
 
-  // big trouble if this fails!
-  libmesh_assert (this->_dof_map != NULL);
+//   // big trouble if this fails!
+//   libmesh_assert (this->_dof_map != NULL);
   
-  const unsigned int n_rows = sparsity_pattern.size();
+//   const unsigned int n_rows = sparsity_pattern.size();
 
-//   // Initialize the _row_start data structure,
-//   // allocate storage for the _csr array
-//   {
-//     unsigned int size = 0;
+// //   // Initialize the _row_start data structure,
+// //   // allocate storage for the _csr array
+// //   {
+// //     unsigned int size = 0;
  
-//     for (unsigned int row=0; row<n_rows; row++)
-//       size += sparsity_pattern[row].size();
+// //     for (unsigned int row=0; row<n_rows; row++)
+// //       size += sparsity_pattern[row].size();
     
-//     _csr.resize       (size);
-//     _row_start.reserve(n_rows + 1);
-//   }
+// //     _csr.resize       (size);
+// //     _row_start.reserve(n_rows + 1);
+// //   }
 
 
-//   // Initize the _csr data structure.
-//   {
-//     std::vector<unsigned int>::iterator pos = _csr.begin();
+// //   // Initize the _csr data structure.
+// //   {
+// //     std::vector<unsigned int>::iterator pos = _csr.begin();
     
-//     _row_start.push_back (pos);
+// //     _row_start.push_back (pos);
     
-//     for (unsigned int row=0; row<n_rows; row++)
-//       {
-// 	// insert the row indices
-// 	for (SparsityPattern::Row::const_iterator col = sparsity_pattern[row].begin();
-// 	     col != sparsity_pattern[row].end(); ++col)
-// 	  {
-// 	    libmesh_assert (pos != _csr.end());
-// 	    *pos = *col;
-// 	    ++pos;
-// 	  }
+// //     for (unsigned int row=0; row<n_rows; row++)
+// //       {
+// // 	// insert the row indices
+// // 	for (SparsityPattern::Row::const_iterator col = sparsity_pattern[row].begin();
+// // 	     col != sparsity_pattern[row].end(); ++col)
+// // 	  {
+// // 	    libmesh_assert (pos != _csr.end());
+// // 	    *pos = *col;
+// // 	    ++pos;
+// // 	  }
 	
-// 	_row_start.push_back (pos);
-//       }
-//   }
+// // 	_row_start.push_back (pos);
+// //       }
+// //   }
 
 
-//   // Initialize the matrix
-//   libmesh_assert (!this->initialized());
-//   this->init ();
-//   libmesh_assert (this->initialized());
-//   //std::cout << "n_rows=" << n_rows << std::endl;
-//   //std::cout << "m()=" << m() << std::endl;
-//   libmesh_assert (n_rows == this->m());
+// //   // Initialize the matrix
+// //   libmesh_assert (!this->initialized());
+// //   this->init ();
+// //   libmesh_assert (this->initialized());
+// //   //std::cout << "n_rows=" << n_rows << std::endl;
+// //   //std::cout << "m()=" << m() << std::endl;
+// //   libmesh_assert (n_rows == this->m());
 
-//   // Tell the matrix about its structure.  Initialize it
-//   // to zero.
-//   for (unsigned int i=0; i<n_rows; i++)
-//     {
-//       const std::vector<unsigned int>::const_iterator
-// 	rs = _row_start[i];
+// //   // Tell the matrix about its structure.  Initialize it
+// //   // to zero.
+// //   for (unsigned int i=0; i<n_rows; i++)
+// //     {
+// //       const std::vector<unsigned int>::const_iterator
+// // 	rs = _row_start[i];
       
-//       const unsigned int length = _row_start[i+1] - rs;
+// //       const unsigned int length = _row_start[i+1] - rs;
       
-//       Q_SetLen (&_QMat, i+1, length);
+// //       Q_SetLen (&_QMat, i+1, length);
 
-//       for (unsigned int l=0; l<length; l++)
-// 	{
-// 	  const unsigned int j = *(rs+l);
+// //       for (unsigned int l=0; l<length; l++)
+// // 	{
+// // 	  const unsigned int j = *(rs+l);
 
-// 	  // sanity check
-// 	  //std::cout << "m()=" << m() << std::endl;
-// 	  //std::cout << "(i,j,l) = (" << i
-// 	  //	    << "," << j
-// 	  //	    << "," << l
-// 	  // 	    << ")" << std::endl;
-// 	  //std::cout << "pos(i,j)=" << pos(i,j)
-// 	  //          << std::endl;	  
-// 	  libmesh_assert (this->pos(i,j) == l);
-// 	  Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
-// 	}
-//     }
+// // 	  // sanity check
+// // 	  //std::cout << "m()=" << m() << std::endl;
+// // 	  //std::cout << "(i,j,l) = (" << i
+// // 	  //	    << "," << j
+// // 	  //	    << "," << l
+// // 	  // 	    << ")" << std::endl;
+// // 	  //std::cout << "pos(i,j)=" << pos(i,j)
+// // 	  //          << std::endl;	  
+// // 	  libmesh_assert (this->pos(i,j) == l);
+// // 	  Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
+// // 	}
+// //     }
   
-//   // That's it!
-//   //here();
-}
+// //   // That's it!
+// //   //here();
+// }
 
 
 
@@ -191,71 +191,58 @@ void EpetraMatrix<T>::init ()
 
     this->_is_initialized = true;
   }
-
   
-  libmesh_not_implemented();
+  const unsigned int m   = this->_dof_map->n_dofs();
+  const unsigned int n   = m;
+  const unsigned int n_l = this->_dof_map->n_dofs_on_processor(libMesh::processor_id()); 
+  const unsigned int m_l = n_l;
 
-//   int proc_id = 0;
+  // error checking
+#ifndef NDEBUG
+  {
+    libmesh_assert (n == m);
+    libmesh_assert (n_l == m_l);
 
-//   MPI_Comm_rank (libMesh::COMM_WORLD, &proc_id);
+    unsigned int 
+      summed_m_l = m_l,
+      summed_n_l = n_l;
+
+    Parallel::sum (summed_m_l);
+    Parallel::sum (summed_n_l);
+
+    libmesh_assert (m == summed_m_l);
+    libmesh_assert (n == summed_n_l);
+  }
+#endif
   
-//   const unsigned int m   = this->_dof_map->n_dofs();
-//   const unsigned int n   = m;
-//   const unsigned int n_l = this->_dof_map->n_dofs_on_processor(proc_id); 
-//   const unsigned int m_l = n_l;
-
-
-//   const std::vector<unsigned int>& n_nz = this->_dof_map->get_n_nz();
-//   const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
-
-//   // Make sure the sparsity pattern isn't empty
-//   libmesh_assert (n_nz.size() == n_l);
-//   libmesh_assert (n_oz.size() == n_l);
+  // build a map defining the data distribution
+  _map.reset (new Epetra_Map (m, 
+			      m_l,
+			      0,
+			      Epetra_MpiComm (libMesh::COMM_WORLD))
+	      );
   
-//   if (m==0)
-//     return;
+  libmesh_assert (_map->NumGlobalPoints() == m);
+  libmesh_assert (_map->MaxAllGID()+1 == m);
   
-//   int ierr     = 0;
-//   int m_global = static_cast<int>(m);
-//   int n_global = static_cast<int>(n);
-//   int m_local  = static_cast<int>(m_l);
-//   int n_local  = static_cast<int>(n_l);
-
-
-//   // create a sequential matrix on one processor
-//   if ((m_l == m) && (n_l == n))
-//     {
-//       if (n_nz.empty())
-//         ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, n_global, n_global,
-// 			        PETSC_NULL, (int*) PETSC_NULL, &_mat);
-//       else
-//         ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, n_global, n_global,
-// 			        PETSC_NULL, (int*) &n_nz[0], &_mat);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  const std::vector<unsigned int>& n_nz = this->_dof_map->get_n_nz();
+  const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
   
-//       ierr = MatSetFromOptions (_mat);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
+   // Make sure the sparsity pattern isn't empty
+  libmesh_assert (n_nz.size() == n_l);
+  libmesh_assert (n_oz.size() == n_l);
 
-//   else
-//     {
-//       if (n_nz.empty())
-//         ierr = MatCreateMPIAIJ (libMesh::COMM_WORLD,
-// 			        m_local, n_local,
-// 			        m_global, n_global,
-// 			        PETSC_NULL, (int*) PETSC_NULL,
-// 			        PETSC_NULL, (int*) PETSC_NULL, &_mat);
-//       else
-//         ierr = MatCreateMPIAIJ (libMesh::COMM_WORLD,
-// 			        m_local, n_local,
-// 			        m_global, n_global,
-// 			        PETSC_NULL, (int*) &n_nz[0],
-// 			        PETSC_NULL, (int*) &n_oz[0], &_mat);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  // Epetra wants the total number of nonzeros, both local and remote.
+  std::vector<int> n_nz_tot; /**/ n_nz_tot.reserve(n_nz.size());
   
-//       ierr = MatSetFromOptions (_mat);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
+  for (unsigned int i=0; i<n_nz.size(); i++)    
+    n_nz_tot.push_back(std::min(n_nz[i] + n_oz[i], n));
+  
+  if (m==0)
+    return;
+
+  _mat.reset (new Epetra_FECrsMatrix (Copy, *_map, &n_nz_tot[0]));
+
 
 //   this->zero();
 }
