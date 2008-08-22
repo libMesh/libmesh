@@ -29,7 +29,8 @@
 // Local Includes
 #include "libmesh_logging.h"
 #include "trilinos_aztec_linear_solver.h"
-
+#include "trilinos_epetra_matrix.h"
+#include "trilinos_epetra_vector.h"
 
 
 /*----------------------- functions ----------------------------------*/
@@ -37,17 +38,17 @@ template <typename T>
 void AztecLinearSolver<T>::clear ()
 {
   if (this->initialized())
-    {
-      this->_is_initialized = false;
+  {
+    this->_is_initialized = false;
 	     
-      // Mimic PETSc default solver and preconditioner
-      this->_solver_type           = GMRES;
+    // Mimic PETSc default solver and preconditioner
+    this->_solver_type           = GMRES;
 
-      if (libMesh::n_processors() == 1)
-	this->_preconditioner_type = ILU_PRECOND;
-      else
-	this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
-    }
+    if (libMesh::n_processors() == 1)
+      this->_preconditioner_type = ILU_PRECOND;
+    else
+      this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
+  }
 }
 
 
@@ -55,14 +56,16 @@ void AztecLinearSolver<T>::clear ()
 template <typename T>
 void AztecLinearSolver<T>::init ()
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
 
-//   // Initialize the data structures if not done so already.
-//   if (!this->initialized())
-//     {
-//       this->_is_initialized = true;
-      
-//       int ierr=0;
+  // Initialize the data structures if not done so already.
+  if (!this->initialized())
+  {
+    this->_is_initialized = true;
+ 
+    _linear_solver = new AztecOO();
+  }
+  
+
   
 // // 2.1.x & earlier style      
 // #if PETSC_VERSION_LESS_THAN(2,2,0)
@@ -150,149 +153,48 @@ void AztecLinearSolver<T>::init ()
 
 template <typename T>
 std::pair<unsigned int, Real> 
-AztecLinearSolver<T>::solve (SparseMatrix<T>&  /* matrix_in */,
-			     SparseMatrix<T>&  /* precond_in */,
-			     NumericVector<T>& /* solution_in */,
-			     NumericVector<T>& /* rhs_in */,
-			     const double /* tol */,
-			     const unsigned int /* m_its */)
+AztecLinearSolver<T>::solve (SparseMatrix<T>& matrix_in,
+			     SparseMatrix<T>& precond_in,
+			     NumericVector<T>& solution_in,
+			     NumericVector<T>& rhs_in,
+			     const double tol,
+			     const unsigned int m_its)
 {
-  START_LOG("solve()", "AztecLinearSolver");
+  START_LOG("solve()", "AztecLinearSolver");  
+
+  EpetraMatrix<T>* matrix   = dynamic_cast<EpetraMatrix<T>*>(&matrix_in);
+  EpetraMatrix<T>* precond  = dynamic_cast<EpetraMatrix<T>*>(&precond_in);
+  EpetraVector<T>* solution = dynamic_cast<EpetraVector<T>*>(&solution_in);
+  EpetraVector<T>* rhs      = dynamic_cast<EpetraVector<T>*>(&rhs_in);
+
+  // We cast to pointers so we can be sure that they succeeded
+  // by comparing the result against NULL.
+  libmesh_assert(matrix != NULL);
+  libmesh_assert(precond != NULL);
+  libmesh_assert(solution != NULL);
+  libmesh_assert(rhs != NULL);
   
-  LIBMESH_THROW(libMesh::NotImplemented());
+  this->init();
 
-//   PetscMatrix<T>* matrix   = dynamic_cast<PetscMatrix<T>*>(&matrix_in);
-//   PetscMatrix<T>* precond  = dynamic_cast<PetscMatrix<T>*>(&precond_in);
-//   PetscVector<T>* solution = dynamic_cast<PetscVector<T>*>(&solution_in);
-//   PetscVector<T>* rhs      = dynamic_cast<PetscVector<T>*>(&rhs_in);
-
-//   // We cast to pointers so we can be sure that they succeeded
-//   // by comparing the result against NULL.
-//   libmesh_assert(matrix   != NULL);
-//   libmesh_assert(precond  != NULL);
-//   libmesh_assert(solution != NULL);
-//   libmesh_assert(rhs      != NULL);
+  // Close the matrices and vectors in case this wasn't already done.
+  matrix->close ();
+  precond->close ();
+  solution->close ();
+  rhs->close ();
   
-//   this->init (matrix);
+  _linear_solver->SetAztecOption(AZ_max_iter,m_its);
+  _linear_solver->SetAztecParam(AZ_tol,tol);
 
-//   int ierr=0;
-//   int its=0, max_its = static_cast<int>(m_its);
-//   PetscReal final_resid=0.;
+  Epetra_FECrsMatrix * emat = matrix->mat();
+  Epetra_FEVector * esol = solution->vec();
+  Epetra_FEVector * erhs = rhs->vec();
 
-//   // Close the matrices and vectors in case this wasn't already done.
-//   matrix->close ();
-//   precond->close ();
-//   solution->close ();
-//   rhs->close ();
-
-// //   // If matrix != precond, then this means we have specified a
-// //   // special preconditioner, so reset preconditioner type to PCMAT.
-// //   if (matrix != precond)
-// //     {
-// //       this->_preconditioner_type = USER_PRECOND;
-// //       this->set_petsc_preconditioner_type ();
-// //     }
-  
-// // 2.1.x & earlier style      
-// #if PETSC_VERSION_LESS_THAN(2,2,0)
-      
-//   // Set operators. The input matrix works as the preconditioning matrix
-//   ierr = SLESSetOperators(_sles, matrix->mat(), precond->mat(),
-// 			  SAME_NONZERO_PATTERN);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-
-//   // Set the tolerances for the iterative solver.  Use the user-supplied
-//   // tolerance for the relative residual & leave the others at default values.
-//   ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
-//  			   PETSC_DEFAULT, max_its);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-
-//   // Solve the linear system
-//   ierr = SLESSolve (_sles, rhs->vec(), solution->vec(), &its);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-
-//   // Get the norm of the final residual to return to the user.
-//   ierr = KSPGetResidualNorm (_ksp, &final_resid);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// // 2.2.0
-// #elif PETSC_VERSION_LESS_THAN(2,2,1)
-      
-//   // Set operators. The input matrix works as the preconditioning matrix
-//   //ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
-// 	 //			 SAME_NONZERO_PATTERN);
-// 	 //       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-
-//   // Set the tolerances for the iterative solver.  Use the user-supplied
-//   // tolerance for the relative residual & leave the others at default values.
-//   // Convergence is detected at iteration k if
-//   // ||r_k||_2 < max(rtol*||b||_2 , abstol)
-//   // where r_k is the residual vector and b is the right-hand side.  Note that
-//   // it is the *maximum* of the two values, the larger of which will almost
-//   // always be rtol*||b||_2. 
-//   ierr = KSPSetTolerances (_ksp,
-// 			   tol,           // rtol   = relative decrease in residual  (1.e-5)
-// 			   PETSC_DEFAULT, // abstol = absolute convergence tolerance (1.e-50)
-//  			   PETSC_DEFAULT, // dtol   = divergence tolerance           (1.e+5)
-// 			   max_its);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-
-//   // Set the solution vector to use
-//   ierr = KSPSetSolution (_ksp, solution->vec());
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
-//   // Set the RHS vector to use
-//   ierr = KSPSetRhs (_ksp, rhs->vec());
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-   
-//   // Solve the linear system
-//   ierr = KSPSolve (_ksp);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
-//   // Get the number of iterations required for convergence
-//   ierr = KSPGetIterationNumber (_ksp, &its);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
-//   // Get the norm of the final residual to return to the user.
-//   ierr = KSPGetResidualNorm (_ksp, &final_resid);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
-// // 2.2.1 & newer style
-// #else
-      
-//   // Set operators. The input matrix works as the preconditioning matrix
-//   ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
-// 			 SAME_NONZERO_PATTERN);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   // Set the tolerances for the iterative solver.  Use the user-supplied
-//   // tolerance for the relative residual & leave the others at default values.
-//   ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
-//  			   PETSC_DEFAULT, max_its);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   // Solve the linear system
-//   ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
-//   // Get the number of iterations required for convergence
-//   ierr = KSPGetIterationNumber (_ksp, &its);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
-//   // Get the norm of the final residual to return to the user.
-//   ierr = KSPGetResidualNorm (_ksp, &final_resid);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
-// #endif
+  _linear_solver->Iterate(emat, esol, erhs, m_its, tol);
 
   STOP_LOG("solve()", "AztecLinearSolver");
+  
   // return the # of its. and the final residual norm.
-  return std::make_pair(/* its */ 0, /* final_resid) */ 0);
+  return std::make_pair(_linear_solver->NumIters(), _linear_solver->TrueResidual());
 }
 
 
@@ -300,7 +202,7 @@ AztecLinearSolver<T>::solve (SparseMatrix<T>&  /* matrix_in */,
 template <typename T>
 void AztecLinearSolver<T>::get_residual_history(std::vector<double>& /* hist */)
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 //   int ierr = 0;
 //   int its  = 0;
@@ -335,32 +237,7 @@ void AztecLinearSolver<T>::get_residual_history(std::vector<double>& /* hist */)
 template <typename T>
 Real AztecLinearSolver<T>::get_initial_residual()
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
-
-//   int ierr = 0;
-//   int its  = 0;
-
-//   // Fill the residual history vector with the residual norms
-//   // Note that GetResidualHistory() does not copy any values, it
-//   // simply sets the pointer p.  Note that for some Krylov subspace
-//   // methods, the number of residuals returned in the history
-//   // vector may be different from what you are expecting.  For
-//   // example, TFQMR returns two residual values per iteration step.
-//   PetscReal* p;
-//   ierr = KSPGetResidualHistory(_ksp, &p, &its);
-//   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   // Check no residual history
-//   if (its == 0)
-//     {
-//       std::cerr << "No iterations have been performed, returning 0." << std::endl;
-//       return 0.;
-//     }
-
-//   // Otherwise, return the value pointed to by p.
-//   return *p;
-
-  return 0;
+  return _linear_solver->TrueResidual();
 }
 
 
@@ -368,7 +245,7 @@ Real AztecLinearSolver<T>::get_initial_residual()
 template <typename T>
 void AztecLinearSolver<T>::print_converged_reason()
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 // #if PETSC_VERSION_LESS_THAN(2,3,1)
 //   std::cout << "This method is currently not supported "

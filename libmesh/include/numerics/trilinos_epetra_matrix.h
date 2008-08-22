@@ -294,12 +294,12 @@ public:
    */
   void swap (EpetraMatrix<T> &);
 
-//   /**
-//    * Returns the raw PETSc matrix context pointer.  Note this is generally
-//    * not required in user-level code. Just don't do anything crazy like
-//    * calling MatDestroy()!
-//    */
-//   Mat mat () { libmesh_assert (_mat != NULL); return _mat; }
+  /**
+   * Returns the raw PETSc matrix context pointer.  Note this is generally
+   * not required in user-level code. Just don't do anything crazy like
+   * calling MatDestroy()!
+   */
+  Epetra_FECrsMatrix * mat () { libmesh_assert (_mat != NULL); return _mat; }
 
   
 protected:
@@ -324,12 +324,12 @@ private:
    * Actual Epetra datatype
    * to hold matrix entries
    */
-  AutoPtr<Epetra_FECrsMatrix> _mat;
+  Epetra_FECrsMatrix * _mat;
 
   /**
    * Holds the distributed Map
    */
-  AutoPtr<Epetra_Map> _map;
+  Epetra_Map * _map;
 
   /**
    * This boolean value should only be set to false
@@ -377,9 +377,9 @@ template <typename T>
 inline
 void EpetraMatrix<T>::close () const
 {
-  libmesh_assert (_mat.get() != NULL);
+  libmesh_assert (_mat != NULL);
   
-  _mat->FillComplete();
+  _mat->GlobalAssemble();
 }
 
 
@@ -411,7 +411,7 @@ inline
 unsigned int EpetraMatrix<T>::row_start () const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_map.get() != NULL);
+  libmesh_assert (_map != NULL);
 
   return static_cast<unsigned int>(_map->MinMyGID());
 }
@@ -423,7 +423,7 @@ inline
 unsigned int EpetraMatrix<T>::row_stop () const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_map.get() != NULL);
+  libmesh_assert (_map != NULL);
 
   return static_cast<unsigned int>(_map->MaxMyGID())+1;
 }
@@ -528,7 +528,7 @@ T EpetraMatrix<T>::operator () (const unsigned int i,
 				const unsigned int j) const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (this->_mat.get() != NULL);
+  libmesh_assert (this->_mat != NULL);
   libmesh_assert (this->_mat->MyGlobalRow(i));
   libmesh_assert (i >= this->row_start());
   libmesh_assert (i < this->row_stop());
@@ -562,7 +562,7 @@ inline
 bool EpetraMatrix<T>::closed() const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (this->_mat.get() != NULL);
+  libmesh_assert (this->_mat != NULL);
   
   return this->_mat->Filled();
 }
@@ -587,7 +587,7 @@ inline
 void EpetraMatrix<T>::print_personal(std::ostream& os) const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_mat.get() != NULL);
+  libmesh_assert (_mat != NULL);
 
   os << *_mat;
 }

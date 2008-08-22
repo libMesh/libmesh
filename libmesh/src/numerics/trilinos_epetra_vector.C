@@ -197,16 +197,14 @@ void EpetraVector<T>::add_vector (const NumericVector<T>& /* V_in */,
 
 
 template <typename T>
-void EpetraVector<T>::add_vector (const DenseVector<T>& /* V_in */,
-				  const std::vector<unsigned int>& /* dof_indices */)
+void EpetraVector<T>::add_vector (const DenseVector<T>& V_in,
+				  const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_not_implemented();
+  libmesh_assert (V_in.size() == dof_indices.size());
 
-//   libmesh_assert (V_in.size() == dof_indices.size());
-
-//   const EpetraVector<T>* V = dynamic_cast<const EpetraVector<T>*>(&V_in);
-
-//   this->add_vector(V->_vec->get_values[0], dof_indices);
+  _vec->SumIntoGlobalValues(dof_indices.size(),
+                            (int *)&dof_indices[0],
+                            &const_cast<DenseVector<T> *>(&V_in)->get_values()[0]);
 }
 
 
@@ -519,7 +517,7 @@ void EpetraVector<T>::localize (std::vector<T>& v_local) const
   const unsigned int n  = this->size();
   const unsigned int nl = this->local_size();
 
-  libmesh_assert (this->_vec.get() != NULL);
+  libmesh_assert (this->_vec != NULL);
 
   v_local.clear();
   v_local.reserve(n);
@@ -544,7 +542,7 @@ void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
   const unsigned int nl = this->local_size();
 
   libmesh_assert (pid < libMesh::n_processors());
-  libmesh_assert (this->_vec.get() != NULL);
+  libmesh_assert (this->_vec != NULL);
   
   v_local.clear();
   v_local.reserve(n);
