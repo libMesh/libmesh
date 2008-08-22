@@ -137,8 +137,8 @@ void EpetraMatrix<T>::init (const unsigned int m,
     if (this->initialized())
       this->clear();
 
-    libmesh_assert (this->_mat.get() == NULL);
-    libmesh_assert (this->_map.get() == NULL);
+    libmesh_assert (this->_mat == NULL);
+    libmesh_assert (this->_map == NULL);
 
     this->_is_initialized = true;
   }
@@ -162,18 +162,15 @@ void EpetraMatrix<T>::init (const unsigned int m,
 #endif
 
   // build a map defining the data distribution
-  _map.reset (new Epetra_Map (m, 
-			      m_l,
-			      0,
-			      Epetra_MpiComm (libMesh::COMM_WORLD))
-	      );
+  _map = new Epetra_Map (m, 
+                         m_l,
+                         0,
+                         Epetra_MpiComm (libMesh::COMM_WORLD));
   
   libmesh_assert (_map->NumGlobalPoints() == m);
   libmesh_assert (_map->MaxAllGID()+1 == m);
 
-  _mat.reset (new Epetra_FECrsMatrix (Copy, *_map, nnz + noz));
-
-//   this->zero ();
+  _mat = new Epetra_FECrsMatrix (Copy, *_map, nnz + noz);
 }
 
 
@@ -216,11 +213,10 @@ void EpetraMatrix<T>::init ()
 #endif
   
   // build a map defining the data distribution
-  _map.reset (new Epetra_Map (m, 
-			      m_l,
-			      0,
-			      Epetra_MpiComm (libMesh::COMM_WORLD))
-	      );
+  _map = new Epetra_Map (m, 
+                         m_l,
+                         0,
+                         Epetra_MpiComm (libMesh::COMM_WORLD));
   
   libmesh_assert (_map->NumGlobalPoints() == m);
   libmesh_assert (_map->MaxAllGID()+1 == m);
@@ -241,10 +237,7 @@ void EpetraMatrix<T>::init ()
   if (m==0)
     return;
 
-  _mat.reset (new Epetra_FECrsMatrix (Copy, *_map, &n_nz_tot[0]));
-
-
-//   this->zero();
+  _mat = new Epetra_FECrsMatrix (Copy, *_map, &n_nz_tot[0]);
 }
 
 
@@ -262,8 +255,8 @@ void EpetraMatrix<T>::zero ()
 template <typename T>
 void EpetraMatrix<T>::clear ()
 {
-  this->_mat.reset();
-  this->_map.reset();
+//  delete _mat;
+//  delete _map;
 
   this->_is_initialized = false;
   
@@ -277,7 +270,7 @@ Real EpetraMatrix<T>::l1_norm () const
 {
   libmesh_assert (this->initialized());
   
-  libmesh_assert (_mat.get() != NULL);
+  libmesh_assert (_mat != NULL);
 
   return static_cast<Real>(_mat->NormOne());
 }
@@ -290,7 +283,7 @@ Real EpetraMatrix<T>::linfty_norm () const
   libmesh_assert (this->initialized());
   
   
-  libmesh_assert (_mat.get() != NULL);
+  libmesh_assert (_mat != NULL);
 
   return static_cast<Real>(_mat->NormInf());
 }
@@ -365,23 +358,13 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 {
   libmesh_assert (this->initialized());
 
-  libmesh_not_implemented();
+  const unsigned int m = dm.m();
+  const unsigned int n = dm.n();
 
-//   const unsigned int m = dm.m();
-//   const unsigned int n = dm.n();
+  libmesh_assert (rows.size() == m);
+  libmesh_assert (cols.size() == n);
 
-//   libmesh_assert (rows.size() == m);
-//   libmesh_assert (cols.size() == n);
-  
-//   int ierr=0;
-
-//   // These casts are required for PETSc <= 2.1.5
-//   ierr = MatSetValues(_mat,
-// 		      m, (int*) &rows[0],
-// 		      n, (int*) &cols[0],
-// 		      (PetscScalar*) &dm.get_values()[0],
-// 		      ADD_VALUES);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  _mat->SumIntoGlobalValues(m, (int *)&rows[0], n, (int *)&cols[0], &dm.get_values()[0]);
 }
 
 

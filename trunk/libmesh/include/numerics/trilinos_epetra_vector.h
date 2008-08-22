@@ -403,19 +403,25 @@ public:
    */
   void swap (EpetraVector<T> &v);
 
-  
+  /**
+   * Returns the raw PETSc vector context pointer.  Note this is generally
+   * not required in user-level code. Just don't do anything crazy like
+   * calling VecDestroy()!
+   */
+  Epetra_FEVector * vec () { libmesh_assert (_vec != NULL); return _vec; }
+
 private:
 
   /**
    * Actual Epetra vector datatype
    * to hold vector entries
    */
-  AutoPtr<Epetra_FEVector> _vec;
+  Epetra_FEVector * _vec;
 
   /**
    * Holds the distributed Map
    */
-  AutoPtr<Epetra_Map> _map;
+  Epetra_Map * _map;
 
   /**
    * This boolean value should only be set to false
@@ -484,13 +490,12 @@ void EpetraVector<T>::init (const unsigned int n,
 			    const unsigned int n_local,
 			    const bool fast)
 {
-  _map.reset (new Epetra_Map(n, 
-			     n_local, 
-			     0, 
-			     Epetra_MpiComm (libMesh::COMM_WORLD))
-	      );
+  _map = new Epetra_Map(n, 
+                        n_local, 
+                        0, 
+                        Epetra_MpiComm (libMesh::COMM_WORLD));
 	      
-  _vec.reset(new Epetra_FEVector(*_map));
+  _vec = new Epetra_FEVector(*_map);
   
   this->_is_initialized = true;
   
@@ -526,7 +531,7 @@ inline
 void EpetraVector<T>::clear ()
 {
   if ((this->initialized()) && (this->_destroy_vec_on_exit))
-    _vec.reset();
+    delete _vec;
 
   this->_is_closed = this->_is_initialized = false;
 }
@@ -645,12 +650,7 @@ template <typename T>
 inline
 void EpetraVector<T>::swap (EpetraVector<T> &v)
 {
-  //std::swap has trouble with swapping
-  //AutoPtr<Epetra_FEVector>'s for some reason.
-  AutoPtr<Epetra_FEVector> tmp = v._vec;
-  v._vec = _vec;
-  _vec = tmp;
-  
+  std::swap(_vec, v._vec);
   std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
 }
 

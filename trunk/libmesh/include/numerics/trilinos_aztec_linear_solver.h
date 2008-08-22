@@ -25,6 +25,7 @@
 
 
 // Local includes
+#include "libmesh_common.h"
 #include "linear_solver.h"
 
 /**
@@ -50,7 +51,7 @@ class AztecLinearSolver : public LinearSolver<T>
 {
 public:
   /**
-   *  Constructor. Initializes Petsc data structures
+   *  Constructor. Initializes Aztec data structures
    */
   AztecLinearSolver ();
     
@@ -70,7 +71,7 @@ public:
   void init ();
 
   /**
-   * Call the Petsc solver.  It calls the method below, using the
+   * Call the Aztec solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
    */    
   std::pair<unsigned int, Real> 
@@ -89,7 +90,7 @@ public:
    * that the linear solver will not compute a preconditioner in this
    * case, and will instead premultiply by the matrix you provide.
    *
-   * In PETSc, this is accomplished by calling
+   * In Aztec, this is accomplished by calling
    *
    * PCSetType(_pc, PCMAT);
    *
@@ -131,14 +132,12 @@ private:
   /**
    * The Epetra linear problem object.
    */
-  Epetra_LinearProblem _linear_problem;
+  Epetra_LinearProblem * _linear_problem;
 
   /**
    * The AztecOO solver object
    */
-  AztecOO _linear_solver;
-  
-
+  AztecOO * _linear_solver;
 };
 
 
