@@ -90,15 +90,15 @@ public:
 //   /**
 //    * The \p EpetraMatrix needs the full sparsity pattern.
 //    */ 
-//   bool need_full_sparsity_pattern () const 
-//   { return true; }
+  bool need_full_sparsity_pattern () const 
+  { return true; }
 
 //   /**
 //    * Updates the matrix sparsity pattern.  This will
 //    * tell the underlying matrix storage scheme how
 //    * to map the \f$ (i,j) \f$ elements.
 //    */
-//   void update_sparsity_pattern (const SparsityPattern::Graph &);
+  void update_sparsity_pattern (const SparsityPattern::Graph &);
 
   /**
    * Initialize a Petsc matrix that is of global
@@ -330,6 +330,11 @@ private:
    * Holds the distributed Map
    */
   Epetra_Map * _map;
+
+  /**
+   * Holds the sparsity pattern
+   */
+  Epetra_CrsGraph * _graph;
 
   /**
    * This boolean value should only be set to false
