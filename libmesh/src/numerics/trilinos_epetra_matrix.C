@@ -254,12 +254,7 @@ void EpetraMatrix<T>::zero ()
 {
   libmesh_assert (this->initialized());
   
-  libmesh_not_implemented();
-
-//   int ierr=0;
-
-//   ierr = MatZeroEntries(_mat);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  _mat->Scale(0.0);
 }
 
 
