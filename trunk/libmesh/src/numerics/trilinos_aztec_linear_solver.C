@@ -56,96 +56,25 @@ void AztecLinearSolver<T>::clear ()
 template <typename T>
 void AztecLinearSolver<T>::init ()
 {
-
   // Initialize the data structures if not done so already.
   if (!this->initialized())
   {
     this->_is_initialized = true;
  
     _linear_solver = new AztecOO();
+
+    switch(this->_preconditioner_type)
+    {
+    case ILU_PRECOND:
+      _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+      break;
+    case BLOCK_JACOBI_PRECOND:
+      _linear_solver->SetAztecOption(AZ_precond,AZ_Jacobi);
+      break;
+    default:
+      _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+    }
   }
-  
-
-  
-// // 2.1.x & earlier style      
-// #if PETSC_VERSION_LESS_THAN(2,2,0)
-      
-//       // Create the linear solver context
-//       ierr = SLESCreate (libMesh::COMM_WORLD, &_sles);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
-//       // Create the Krylov subspace & preconditioner contexts
-//       ierr = SLESGetKSP       (_sles, &_ksp);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//       ierr = SLESGetPC        (_sles, &_pc);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
-//       // Have the Krylov subspace method use our good initial guess rather than 0
-//       ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
-//       // Set user-specified  solver and preconditioner types
-//       this->set_petsc_solver_type();
-//       this->set_petsc_preconditioner_type();
-      
-//       // Set the options from user-input
-//       // Set runtime options, e.g.,
-//       //      -ksp_type <type> -pc_type <type> -ksp_monitor -ksp_rtol <rtol>
-//       //  These options will override those specified above as long as
-//       //  SLESSetFromOptions() is called _after_ any other customization
-//       //  routines.
-      
-//       ierr = SLESSetFromOptions (_sles);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// // 2.2.0 & newer style
-// #else
-      
-//       // Create the linear solver context
-//       ierr = KSPCreate (libMesh::COMM_WORLD, &_ksp);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
-//       // Create the preconditioner context
-//       ierr = KSPGetPC        (_ksp, &_pc);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       // Have the Krylov subspace method use our good initial guess rather than 0
-//       ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
-//       // Set user-specified  solver and preconditioner types
-//       this->set_petsc_solver_type();
-//       this->set_petsc_preconditioner_type();
-      
-//       // Set the options from user-input
-//       // Set runtime options, e.g.,
-//       //      -ksp_type <type> -pc_type <type> -ksp_monitor -ksp_rtol <rtol>
-//       //  These options will override those specified above as long as
-//       //  KSPSetFromOptions() is called _after_ any other customization
-//       //  routines.
-      
-//       ierr = KSPSetFromOptions (_ksp);
-//       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       // Not sure if this is necessary, or if it is already handled by KSPSetFromOptions?
-//       // NOT NECESSARY!!!!
-//       //ierr = PCSetFromOptions (_pc);
-//       //CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-	       
-// #endif
-	     
-//       // Notify PETSc of location to store residual history.
-//       // This needs to be called before any solves, since
-//       // it sets the residual history length to zero.  The default
-//       // behavior is for PETSc to allocate (internally) an array
-//       // of size 1000 to hold the residual norm history.
-//       ierr = KSPSetResidualHistory(_ksp,
-// 				   PETSC_NULL,   // pointer to the array which holds the history
-// 				   PETSC_DECIDE, // size of the array holding the history
-// 				   PETSC_TRUE);  // Whether or not to reset the history for each solve. 
-//       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
 }
 
 
