@@ -36,7 +36,7 @@
 
 template <typename T> 
 void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sparsity_pattern)
-{
+{  
   // clear data, start over
   this->clear ();    
 
@@ -73,7 +73,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
                          m_l,
                          0,
                          Epetra_MpiComm (libMesh::COMM_WORLD));
-  
+
   libmesh_assert (_map->NumGlobalPoints() == m);
   libmesh_assert (_map->MaxAllGID()+1 == m);
   
@@ -98,7 +98,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
   // Tell the matrix about its structure.  Initialize it
   // to zero.
   for (unsigned int i=0; i<n_rows; i++)
-    _graph->InsertGlobalIndices(i,
+    _graph->InsertGlobalIndices(_graph->GRID(i),
                                 sparsity_pattern[i].size(),
                                 const_cast<int *>((const int *)&sparsity_pattern[i][0]));
 

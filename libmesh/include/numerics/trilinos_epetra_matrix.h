@@ -273,11 +273,7 @@ public:
   bool closed() const;
   
   /**
-   * Print the contents of the matrix to the screen
-   * with the PETSc viewer.  This function only allows
-   * printing to standard out, this is because we have
-   * limited ourselves to one PETSc implementation for
-   * writing.
+   * Print the contents of the matrix to the screen.
    */
   void print_personal(std::ostream& os=std::cout) const;
 
