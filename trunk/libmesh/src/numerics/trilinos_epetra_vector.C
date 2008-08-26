@@ -389,10 +389,10 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in) const
 
   libmesh_assert(v_local);
 
-  Epetra_Map rootMap = Epetra_Util::Create_Root_Map( *_map, libMesh::processor_id() );
-  Epetra_Import importer(rootMap, *_map);
+  Epetra_Map rootMap = Epetra_Util::Create_Root_Map( *_map, -1);
   v_local->_vec->ReplaceMap(rootMap);
-  
+
+  Epetra_Import importer(v_local->_vec->Map(), *_map);
   v_local->_vec->Import(*_vec, importer, Insert);
 }
 
