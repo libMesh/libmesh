@@ -35,7 +35,7 @@
 #include "tensor_value.h"
 #include "vector_value.h"
 
-ExactSolution::ExactSolution(EquationSystems& es) :
+ExactSolution::ExactSolution(const EquationSystems& es) :
   _exact_value (NULL),
   _exact_deriv (NULL),
   _exact_hessian (NULL),
@@ -68,7 +68,7 @@ ExactSolution::ExactSolution(EquationSystems& es) :
 }
 
 
-void ExactSolution::attach_reference_solution (EquationSystems* es_fine)
+void ExactSolution::attach_reference_solution (const EquationSystems* es_fine)
 {
   libmesh_assert (es_fine != NULL);
   _equation_systems_fine = es_fine;
@@ -206,6 +206,10 @@ Number ExactSolution::error_norm(const std::string& sys_name,
       return std::sqrt(error_vals[1]);
     case H2_SEMINORM:
       return std::sqrt(error_vals[2]);
+    case L1:
+      return error_vals[3];
+    case L_INF:
+      return error_vals[4];
     // Currently only Sobolev norms/seminorms are supported
     default:
       libmesh_error();
@@ -230,6 +234,46 @@ Number ExactSolution::l2_error(const std::string& sys_name,
   // Return the square root of the first component of the
   // computed error.
   return std::sqrt(error_vals[0]);
+}
+
+
+
+
+
+
+
+Number ExactSolution::l1_error(const std::string& sys_name,
+			       const std::string& unknown_name)
+{
+  
+  // Check the inputs for validity, and get a reference
+  // to the proper location to store the error
+  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
+							unknown_name);
+  
+  // Return the square root of the first component of the
+  // computed error.
+  return error_vals[3];
+}
+
+
+
+
+
+
+
+Number ExactSolution::l_inf_error(const std::string& sys_name,
+			       const std::string& unknown_name)
+{
+  
+  // Check the inputs for validity, and get a reference
+  // to the proper location to store the error
+  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
+							unknown_name);
+  
+  // Return the square root of the first component of the
+  // computed error.
+  return error_vals[4];
 }
 
 
@@ -347,7 +391,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   const MeshBase& _mesh = computed_system.get_mesh();
 
   // Zero the error before summation
-  error_vals = std::vector<Number>(3, 0.);
+  error_vals = std::vector<Number>(5, 0.);
 
   // get the EquationSystems parameters for use with _exact_value
   const Parameters& parameters = this->_equation_systems.parameters;
@@ -463,7 +507,9 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
 	  // Add the squares of the error to each contribution
 	  error_vals[0] += JxW[qp]*libmesh_norm(val_error);
-
+	  Real norm = sqrt(libmesh_norm(val_error));
+	  error_vals[3] += JxW[qp]*norm;
+	  if(error_vals[4]<norm) { error_vals[4] = norm; }
 
 	  // Compute the value of the error in the gradient at this
 	  // quadrature point
@@ -497,6 +543,10 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	} // end qp loop
     } // end element loop
 
-  // Add up the error values on all processors
+  // Add up the error values on all processors, except for the L-infty
+  // norm, for which the maximum is computed.
+  Number l_infty_norm = error_vals[4];
+  Parallel::max(l_infty_norm);
   Parallel::sum(error_vals);
+  error_vals[4] = l_infty_norm;
 }

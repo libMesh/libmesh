@@ -35,6 +35,9 @@ namespace libMeshEnums {
 		    H1             = 1,
 		    H2             = 2,
 
+		    L1             = 5,
+                    L_INF          = 6,
+
 		    H1_SEMINORM    = 10,
 		    H2_SEMINORM    = 11,
 
