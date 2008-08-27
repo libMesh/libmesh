@@ -68,7 +68,7 @@ public:
    * must be initialized with an EquationSystems
    * object.
    */
-  ExactSolution (EquationSystems& es);
+  ExactSolution (const EquationSystems& es);
 
   /**
    * Destructor.
@@ -81,7 +81,7 @@ public:
    * allows the user to attach a second EquationSystems
    * object with a reference fine grid solution.
    */
-  void attach_reference_solution (EquationSystems* es_fine);
+  void attach_reference_solution (const EquationSystems* es_fine);
 
   /**
    * Attach function similar to system.h which
@@ -139,7 +139,27 @@ public:
    * are actually performed, you must call compute_error() for that.
    */
   Number l2_error(const std::string& sys_name,
-		const std::string& unknown_name);
+		  const std::string& unknown_name);
+  
+  /**
+   * This function returns the integrated L1 error for the system
+   * sys_name for the unknown unknown_name.  Note that no error computations
+   * are actually performed, you must call compute_error() for that.
+   */
+  Number l1_error(const std::string& sys_name,
+		  const std::string& unknown_name);
+  
+  /**
+   * This function returns the L_INF error for the system sys_name for
+   * the unknown unknown_name.  Note that no error computations are
+   * actually performed, you must call compute_error() for that.  Note
+   * also that the result (as for the other norms as well) is not
+   * exact, but an approximation based on the chosen quadrature rule:
+   * to compute it, we take the max of the absolute value of the error
+   * over all the quadrature points.
+   */
+  Number l_inf_error(const std::string& sys_name,
+		     const std::string& unknown_name);
   
   /**
    * This function computes and returns the H1 error for the system
@@ -147,7 +167,7 @@ public:
    * are actually performed, you must call compute_error() for that.
    */
   Number h1_error(const std::string& sys_name,
-		const std::string& unknown_name);
+		  const std::string& unknown_name);
   
   /**
    * This function computes and returns the H2 error for the system
@@ -155,12 +175,14 @@ public:
    * are actually performed, you must call compute_error() for that.
    */
   Number h2_error(const std::string& sys_name,
-		const std::string& unknown_name);
+		  const std::string& unknown_name);
   
   /**
    * This function returns the error in the requested norm for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
+   * Note also that the result is not exact, but an approximation
+   * based on the chosen quadrature rule.
    */
   Number error_norm(const std::string& sys_name,
 	            const std::string& unknown_name,
@@ -234,13 +256,13 @@ private:
    * Constant reference to the \p EquationSystems object
    * used for the simulation.
    */
-  EquationSystems& _equation_systems;
+  const EquationSystems& _equation_systems;
 
   /**
    * Constant pointer to the \p EquationSystems object
    * containing the fine grid solution.
    */
-  EquationSystems* _equation_systems_fine;
+  const EquationSystems* _equation_systems_fine;
 
   /**
    * Extra order to use for quadrature rule
