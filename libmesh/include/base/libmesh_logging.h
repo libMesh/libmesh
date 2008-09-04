@@ -37,7 +37,7 @@
 #  define START_LOG(a,b)   { libMesh::perflog.push(a,b); }
 #  define STOP_LOG(a,b)    { libMesh::perflog.pop(a,b); }
 #  define PAUSE_LOG(a,b)   { deprecated(); }
-#  define RESTART_LOG(a,b) { deprecated{}; }
+#  define RESTART_LOG(a,b) { deprecated(); }
 
 #else
 
