@@ -105,6 +105,11 @@ public:
   unsigned int total_inner_iterations() { return _inner_iterations; }
 
   /**
+   * @returns the value of the SolveResult from the last solve.
+   */
+  unsigned int solve_result() { return _solve_result; }
+
+  /**
    * @returns a constant reference to the system we are solving.
    */
   const sys_type & system () const { return _system; }
