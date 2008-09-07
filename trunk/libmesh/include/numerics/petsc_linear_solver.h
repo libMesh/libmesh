@@ -22,6 +22,10 @@
 #ifndef __petsc_linear_solver_h__
 #define __petsc_linear_solver_h__
 
+#include "libmesh_config.h"
+
+#ifdef HAVE_PETSC
+
 // C++ includes
 
 // Local includes
@@ -33,23 +37,14 @@
 /**
  * Petsc include files.
  */
-#ifdef HAVE_PETSC
 
-#ifndef USE_COMPLEX_NUMBERS
-extern "C" {
-# if PETSC_VERSION_LESS_THAN(2,2,0)
-#   include <petscsles.h>
-# else
-#   include <petscksp.h>
-# endif
-}
+EXTERN_C_FOR_PETSC_BEGIN
+#if PETSC_VERSION_LESS_THAN(2,2,0)
+#  include <petscsles.h>
 #else
-# if PETSC_VERSION_LESS_THAN(2,2,0)
-#   include <petscsles.h>
-# else
-#   include <petscksp.h>
-# endif
+#  include <petscksp.h>
 #endif
+EXTERN_C_FOR_PETSC_END
 
 
 

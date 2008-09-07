@@ -40,13 +40,9 @@ template <typename T> class DenseMatrix;
 /**
  * Petsc include files.
  */
-#ifndef USE_COMPLEX_NUMBERS
-extern "C" {
+EXTERN_C_FOR_PETSC_BEGIN
 # include <petscmat.h>
-}
-#else
-# include <petscmat.h>
-#endif
+EXTERN_C_FOR_PETSC_END
 
 
 
