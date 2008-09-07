@@ -25,19 +25,18 @@
 // C++ includes
 
 // Local includes
-#include "nonlinear_solver.h"
+#include "libmesh_config.h"
 
 
 // Petsc include files.
 #ifdef HAVE_PETSC
 
-#ifndef USE_COMPLEX_NUMBERS
-extern "C" {
+#include "nonlinear_solver.h"
+#include "petsc_macro.h"
+
+EXTERN_C_FOR_PETSC_BEGIN
 # include <petscsnes.h>
-}
-#else
-# include <petscsnes.h>
-#endif
+EXTERN_C_FOR_PETSC_END
 
 
 

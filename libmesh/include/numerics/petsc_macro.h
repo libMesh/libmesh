@@ -25,19 +25,21 @@
 
 #ifdef HAVE_PETSC
 
-// Petsc include files
-//#include <petscversion.h> 
-
-// Can't include petscversion unless petsc.h is also included
-#ifndef USE_COMPLEX_NUMBERS
-extern "C" {
-#include <petsc.h>
-#include <petscversion.h>
-}
+// Make up for missing extern "C" in old PETSc versions
+#if !defined(USE_COMPLEX_NUMBERS) && PETSC_VERSION_LESS_THAN(2,3,0)
+#  define EXTERN_C_FOR_PETSC_BEGIN extern "C" {
 #else
+#  define EXTERN_C_FOR_PETSC_BEGIN {
+#endif
+
+#define EXTERN_C_FOR_PETSC_END }
+
+// Petsc include files
+EXTERN_C_FOR_PETSC_BEGIN
 #include <petsc.h>
 #include <petscversion.h>
-#endif
+EXTERN_C_FOR_PETSC_END
+
 
 // A convenient macro for comparing PETSc versions.
 // Returns 1 if the current PETSc version is < major.minor.subminor

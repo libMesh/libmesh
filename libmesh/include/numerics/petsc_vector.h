@@ -24,12 +24,10 @@
 #define __petsc_vector_h__
 
 
-#include "libmesh_common.h"
+#include "libmesh_config.h"
 
 
 #ifdef HAVE_PETSC
-
-
 
 // C++ includes
 #include <vector>
@@ -41,13 +39,9 @@
 /**
  * Petsc include files.
  */
-#ifndef USE_COMPLEX_NUMBERS
-extern "C" {
+EXTERN_C_FOR_PETSC_BEGIN
 # include <petscvec.h>
-}
-#else
-# include <petscvec.h>
-#endif
+EXTERN_C_FOR_PETSC_END
 
 
 

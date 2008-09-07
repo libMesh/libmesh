@@ -35,25 +35,15 @@
 #if defined(HAVE_MPI)
 # include <mpi.h>
 # if defined(HAVE_PETSC)
-#  ifndef USE_COMPLEX_NUMBERS
-extern "C" {
+EXTERN_C_FOR_PETSC_BEGIN
 #   include <petsc.h>
 #   include <petscerror.h>
-}
-#  else
-#   include <petsc.h>
-#   include <petscerror.h>
-#  endif
+EXTERN_C_FOR_PETSC_END
 # endif // #if defined(HAVE_PETSC)
 # if defined(HAVE_SLEPC)
-#  ifndef USE_COMPLEX_NUMBERS
-extern "C" 
-{
+EXTERN_C_FOR_PETSC_BEGIN
 #   include <slepc.h>
-}
-#  else
-#   include <slepc.h>
-#  endif
+EXTERN_C_FOR_PETSC_END
 # endif // #if defined(HAVE_SLEPC)
 #endif // #if defined(HAVE_MPI)
 
