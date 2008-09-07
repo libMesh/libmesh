@@ -34,6 +34,7 @@
 
 #if defined(HAVE_MPI)
 # include <mpi.h>
+# include "petsc_macro.h"
 # if defined(HAVE_PETSC)
 EXTERN_C_FOR_PETSC_BEGIN
 #   include <petsc.h>
