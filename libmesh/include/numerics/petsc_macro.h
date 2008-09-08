@@ -36,6 +36,7 @@
 
 
 // Make up for missing extern "C" in old PETSc versions
+#include <petscversion.h>
 #if !defined(USE_COMPLEX_NUMBERS) && PETSC_VERSION_LESS_THAN(2,3,0)
 #  define EXTERN_C_FOR_PETSC_BEGIN extern "C" {
 #  define EXTERN_C_FOR_PETSC_END }
@@ -48,7 +49,6 @@
 // Petsc include files
 EXTERN_C_FOR_PETSC_BEGIN
 #include <petsc.h>
-#include <petscversion.h>
 EXTERN_C_FOR_PETSC_END
 
 
