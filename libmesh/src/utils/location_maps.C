@@ -35,7 +35,16 @@
 
 
 //--------------------------------------------------------------------------
+namespace
+{
+  // 10 bits per coordinate, to work with 32+ bit machines
+  const unsigned int chunkmax = 1024;
+  const Real chunkfloat = 1024.0;
+}
 
+
+
+//--------------------------------------------------------------------------
 template <typename T>
 void LocationMap<T>::init(MeshBase& mesh)
 {
@@ -119,6 +128,8 @@ template <typename T>
 T* LocationMap<T>::find(const Point& p,
                      const Real tol)
 {
+  START_LOG("find()","LocationMap");
+  
   // Look for a likely key in the multimap
   unsigned int pointkey = this->key(p);
 
@@ -130,12 +141,14 @@ T* LocationMap<T>::find(const Point& p,
   while (pos.first != pos.second)
     if (p.absolute_fuzzy_equals
          (this->point_of(*(pos.first->second)), tol))
-      return pos.first->second;
+      {
+	STOP_LOG("find()","LocationMap");
+	return pos.first->second;
+      }
     else
       ++pos.first;
 
   // Look for neighboring bins' keys next
-  const unsigned int chunkmax = 1024;
   for (int xoffset = -1; xoffset != 2; ++xoffset)
     {
       for (int yoffset = -1; yoffset != 2; ++yoffset)
@@ -151,13 +164,17 @@ T* LocationMap<T>::find(const Point& p,
               while (pos.first != pos.second)
                 if (p.absolute_fuzzy_equals
                      (this->point_of(*(pos.first->second)), tol))
-                  return pos.first->second;
+		  {
+		    STOP_LOG("find()","LocationMap");
+		    return pos.first->second;
+		  }
                 else
                   ++pos.first;
             }
         }
     }
-
+  
+  STOP_LOG("find()","LocationMap");
   return NULL;
 }
 
@@ -172,10 +189,6 @@ unsigned int LocationMap<T>::key(const Point& p)
                  (_upper_bound[1] - _lower_bound[1]),
        zscaled = (p(2) - _lower_bound[2])/
                  (_upper_bound[2] - _lower_bound[2]);
-
-  // 10 bits per coordinate, to work with 32+ bit machines
-  const unsigned int chunkmax = 1024;
-  const Real chunkfloat = 1024.0;
 
   unsigned int n0 = static_cast<unsigned int> (chunkfloat * xscaled),
                n1 = static_cast<unsigned int> (chunkfloat * yscaled),
