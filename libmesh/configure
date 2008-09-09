@@ -11251,6 +11251,24 @@ echo "${ECHO_T}<<< Configuring library with PETSc version $petscversion support 
 
 
 
+
+cat >>confdefs.h <<_ACEOF
+#define LIBMESH_DETECTED_PETSC_VERSION_MAJOR $petscmajor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define LIBMESH_DETECTED_PETSC_VERSION_MINOR $petscminor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR $petscsubminor
+_ACEOF
+
+
       else
 
             enablepetsc=no
