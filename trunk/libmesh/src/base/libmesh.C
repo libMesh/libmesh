@@ -21,6 +21,7 @@
 
 // C++ includes
 #include <iostream>
+#include <fstream>
 
 // Local includes
 #include "libmesh.h"
@@ -53,6 +54,7 @@ EXTERN_C_FOR_PETSC_END
 // Local anonymous namespace to hold miscelaneous variables
 namespace {
   AutoPtr<GetPot> command_line (NULL);
+  AutoPtr<std::ofstream> _ofstream (NULL);
   AutoPtr<Threads::task_scheduler_init> task_scheduler (NULL);
 #if defined(HAVE_MPI)
   bool libmesh_initialized_mpi = false;
@@ -214,7 +216,6 @@ void _init (int &argc, char** & argv,
   if (libMesh::processor_id() != 0)
     if (!libMesh::on_command_line ("--keep-cout"))
       std::cout.rdbuf (NULL);
-
   
   // The library is now ready for use
   libMeshPrivateData::_is_initialized = true;
@@ -355,6 +356,20 @@ LibMeshInit::LibMeshInit (int &argc, char** & argv,
 		          MPI_Comm COMM_WORLD_IN)
 {
   libMesh::_init(argc, argv, COMM_WORLD_IN);
+
+  // Honor the --redirect-stdout command-line option.
+  // When this is specified each processor sends
+  // std::cout/std::cerr messages to
+  // stdout.processor.####
+  if (libMesh::on_command_line ("--redirect-stdout"))
+    {
+      char filechar[80];
+      sprintf (filechar, "stdout.processor.%04d",
+	       libMesh::processor_id());
+      _ofstream.reset (new std::ofstream (filechar));
+      std::cout.rdbuf (_ofstream->rdbuf());
+      std::cerr.rdbuf (_ofstream->rdbuf());
+    }
 }
 #endif
 
