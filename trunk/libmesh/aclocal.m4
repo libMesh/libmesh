@@ -876,6 +876,15 @@ dnl      AC_SUBST(PETSCINCLUDEDIRS)
       AC_SUBST(petscversion)
       AC_SUBST(petscmajorminor)
       AC_SUBST(MPI_IMPL)
+
+      AC_DEFINE_UNQUOTED(LIBMESH_DETECTED_PETSC_VERSION_MAJOR, [$petscmajor],
+  	      [PETSc's major version number, as detected by LibMesh])
+	      
+      AC_DEFINE_UNQUOTED(LIBMESH_DETECTED_PETSC_VERSION_MINOR, [$petscminor],
+  	      [PETSc's minor version number, as detected by LibMesh])
+	      
+      AC_DEFINE_UNQUOTED(LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR, [$petscsubminor],
+  	      [PETSc's subminor version number, as detected by LibMesh])
   
       else
   
