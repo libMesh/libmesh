@@ -737,7 +737,7 @@ private:
   /**
    * This class implements projecting a vector from 
    * an old mesh to the newly refined mesh.  This
-   * may be exectued in parallel on multiple threads.
+   * may be executed in parallel on multiple threads.
    */
   class ProjectVector 
   {
@@ -757,6 +757,37 @@ private:
     
     void operator()(const ConstElemRange &range) const;
   };
+
+
+  /**
+   * This class builds the send_list of old dof indices
+   * whose coefficients are needed to perform a projection.
+   * This may be executed in parallel on multiple threads.
+   * The end result is a \p send_list vector which is 
+   * unsorted and may contain duplicate elements.
+   * The \p unique() method can be used to sort and
+   * create a unique list.
+   */
+  class BuildProjectionList
+  {
+  private:
+    const System              &system;
+
+  public:
+    BuildProjectionList (const System &system_in) :
+    system(system_in)
+    {}
+
+    BuildProjectionList (BuildProjectionList &other, Threads::split) :
+     system(other.system)
+    {}
+    
+    void unique();
+    void operator()(const ConstElemRange &range);
+    void join (const BuildProjectionList &other);
+    std::vector<unsigned int> send_list;
+  };
+
 
 
   /**
