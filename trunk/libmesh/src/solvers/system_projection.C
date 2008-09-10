@@ -70,12 +70,18 @@ void System::project_vector (const NumericVector<Number>& old_v,
    */
   new_v.clear();
 
+#ifdef ENABLE_AMR 
+
   // Resize the new vector and get a serial version.
   NumericVector<Number> *new_vector_ptr;
   AutoPtr<NumericVector<Number> > new_vector_built;
   NumericVector<Number> *local_old_vector;
   AutoPtr<NumericVector<Number> > local_old_vector_built;
   const NumericVector<Number> *old_vector_ptr;
+
+  ConstElemRange active_local_elem_range 
+    (this->get_mesh().active_local_elements_begin(),
+     this->get_mesh().active_local_elements_end());
 
   // If the old vector was uniprocessor, make the new
   // vector uniprocessor
@@ -91,6 +97,14 @@ void System::project_vector (const NumericVector<Number>& old_v,
   // we need to localize.
   else
     {
+      // Build a send list for efficient localization
+      BuildProjectionList projection_list(*this);
+      Threads::parallel_reduce (active_local_elem_range, 
+				projection_list);
+
+      // Create a sorted, unique send_list
+      projection_list.unique();
+
       new_v.init (this->n_dofs(),
 		  this->n_local_dofs());
       new_vector_built = NumericVector<Number>::build();
@@ -99,7 +113,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
       local_old_vector = local_old_vector_built.get();
       new_vector_ptr->init(this->n_dofs(), this->n_dofs());
       local_old_vector->init(old_v.size(), old_v.size());
-      old_v.localize(*local_old_vector);
+      old_v.localize(*local_old_vector, projection_list.send_list);
       local_old_vector->close();
       old_vector_ptr = local_old_vector;
     }
@@ -108,11 +122,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
   NumericVector<Number> &new_vector = *new_vector_ptr;
   const NumericVector<Number> &old_vector = *old_vector_ptr;
     
-#ifdef ENABLE_AMR 
-
-  Threads::parallel_for (ConstElemRange (this->get_mesh().active_local_elements_begin(),
-					 this->get_mesh().active_local_elements_end(),
-					 1000),
+  Threads::parallel_for (active_local_elem_range,
 			 ProjectVector(*this,
 				       old_vector,
 				       new_vector)
@@ -122,6 +132,9 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
   // If the old vector was serial, we probably need to send our values
   // to other processors
+  //
+  // FIXME: I'm not sure how to make a NumericVector do that without
+  // creating a temporary parallel vector to use localize! - RHS
   if (old_v.size() == old_v.local_size())
     {
       AutoPtr<NumericVector<Number> > dist_v = NumericVector<Number>::build();
@@ -134,7 +147,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
       dist_v->close();
 
-      dist_v->localize (new_v);
+      dist_v->localize (new_v, this->get_dof_map().get_send_list());
       new_v.close();
     }
   // If the old vector was parallel, we need to update it
@@ -155,7 +168,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
 #else
 
   // AMR is disabled: simply copy the vector
-  new_vector = old_vector;
+  new_v = old_v;
   
 #endif // #ifdef ENABLE_AMR
 
@@ -230,6 +243,8 @@ void System::ProjectVector::operator()(const ConstElemRange &) const
 #else
 void System::ProjectVector::operator()(const ConstElemRange &range) const
 {
+  START_LOG ("operator()","ProjectVector");
+
   // A vector for Lagrange element interpolation, indicating if we
   // have visited a DOF yet.  Note that this is thread-local storage,
   // hence shared DOFS that live on thread boundaries may be doubly
@@ -600,10 +615,94 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 	  }
         }  // end elem loop
     } // end variables loop
+
+  STOP_LOG ("operator()","ProjectVector");
+
 #endif // ENABLE_AMR
 }
 
 
+
+void System::BuildProjectionList::unique()
+{
+  // Sort the send list.  After this duplicated
+  // elements will be adjacent in the vector
+  std::sort(this->send_list.begin(), 
+	    this->send_list.end());
+  
+  // Now use std::unique to remove duplicate entries
+  std::vector<unsigned int>::iterator new_end =
+    std::unique (this->send_list.begin(), 
+		 this->send_list.end());
+  
+  // Remove the end of the send_list.  Use the "swap trick"
+  // from Effective STL
+  std::vector<unsigned int> 
+    (this->send_list.begin(), new_end).swap (this->send_list);
+}
+
+
+
+#ifndef ENABLE_AMR
+void System::BuildProjectionList::operator()(const ConstElemRange &)
+{
+  libmesh_error();
+#else
+void System::BuildProjectionList::operator()(const ConstElemRange &range)
+{
+  // The DofMap for this system
+  const DofMap& dof_map = system.get_dof_map();
+
+  // We can handle all the variables at once.
+  // The old global DOF indices
+  std::vector<unsigned int> di;
+   
+  // Iterate over the elements in the range
+  for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
+    {
+      const Elem* elem = *elem_it;
+      const Elem* parent = elem->parent();
+      
+      if (elem->refinement_flag() == Elem::JUST_REFINED)
+	{
+	  libmesh_assert (parent != NULL);
+	  unsigned int old_parent_level = parent->p_level();
+	  
+	  if (elem->p_refinement_flag() == Elem::JUST_REFINED)
+	    {
+	      // We may have done p refinement or coarsening as well;
+	      // if so then we need to reset the parent's p level
+	      // so we can get the right DoFs from it
+	      libmesh_assert(elem->p_level() > 0);
+	      (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() - 1);
+	    }
+	  else if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
+	    {
+	      (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() + 1);
+	    }
+
+	  dof_map.old_dof_indices (parent, di);
+	  
+	  // Fix up the parent's p level in case we changed it
+	  (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
+	}
+      else
+	dof_map.old_dof_indices (elem, di);
+      
+      this->send_list.insert(send_list.end(), di.begin(), di.end());
+    }  // end elem loop
+#endif // ENABLE_AMR
+}
+
+
+
+void System::BuildProjectionList::join(const BuildProjectionList &other)
+{
+  // Joining simply requires I add the dof indices from the other object
+  this->send_list.insert(this->send_list.end(),
+			 other.send_list.begin(),
+			 other.send_list.end());
+}
 
 
 void System::ProjectSolution::operator()(const ConstElemRange &range) const
