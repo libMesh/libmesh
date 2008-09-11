@@ -55,6 +55,12 @@ EXTERN_C_FOR_PETSC_END
 namespace {
   AutoPtr<GetPot> command_line (NULL);
   AutoPtr<std::ofstream> _ofstream (NULL);
+  // If std::cout and std::cerr are redirected, we need to
+  // be a little careful and save the original streambuf objects,
+  // replacing them in the destructor before program termination.
+  std::streambuf* cout_buf (NULL);
+  std::streambuf* cerr_buf (NULL);
+  
   AutoPtr<Threads::task_scheduler_init> task_scheduler (NULL);
 #if defined(HAVE_MPI)
   bool libmesh_initialized_mpi = false;
@@ -308,8 +314,14 @@ int _close ()
   
   // Set the initialized() flag to false
   libMeshPrivateData::_is_initialized = false;
-  
 
+  // If stdout/stderr were redirected to files, reset them now.
+  if (libMesh::on_command_line ("--redirect-stdout"))
+    {
+      std::cout.rdbuf (cout_buf);
+      std::cerr.rdbuf (cerr_buf);
+    }
+  
   // Return the number of outstanding objects.
   // This is equivalent to return 0 if all of
   // the reference counted objects have been
@@ -367,8 +379,9 @@ LibMeshInit::LibMeshInit (int &argc, char** & argv,
       sprintf (filechar, "stdout.processor.%04d",
 	       libMesh::processor_id());
       _ofstream.reset (new std::ofstream (filechar));
-      std::cout.rdbuf (_ofstream->rdbuf());
-      std::cerr.rdbuf (_ofstream->rdbuf());
+      // Redirect, saving the original streambufs!
+      cout_buf = std::cout.rdbuf (_ofstream->rdbuf());
+      cerr_buf = std::cerr.rdbuf (_ofstream->rdbuf());
     }
 }
 #endif
