@@ -429,7 +429,13 @@ std::string PerfLog::get_log() const
 void PerfLog::print_log() const
 {
   if (log_events)
-    std::cout << get_log() << std::endl;
+    {
+      // Check to see if the log_string is empty, and if so,
+      // avoid printing an unnecessary newline.
+      std::string log_string = this->get_log();
+      if (log_string.size() > 0)
+	std::cout << log_string << std::endl;
+    }
 }
 
 
