@@ -377,7 +377,7 @@ public:
    * currently be specified on the command line or inferred from
    * the use of all discontinuous variables.
    */
-  bool use_coupled_neighbor_dofs(const MeshBase& mesh);
+  bool use_coupled_neighbor_dofs(const MeshBase& mesh) const;
 
   /**
    * Builds the local element vector \p Ue from the global vector \p Ug,
