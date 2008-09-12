@@ -372,6 +372,14 @@ public:
 		    const unsigned int vn = libMesh::invalid_uint) const;
 
   /**
+   * Tells other library functions whether or not this problem
+   * includes coupling between dofs in neighboring cells, as can
+   * currently be specified on the command line or inferred from
+   * the use of all discontinuous variables.
+   */
+  bool use_coupled_neighbor_dofs(const MeshBase& mesh);
+
+  /**
    * Builds the local element vector \p Ue from the global vector \p Ug,
    * accounting for any constrained degrees of freedom.  For an element
    * without constrained degrees of freedom this is the trivial mapping
