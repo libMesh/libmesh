@@ -1052,23 +1052,16 @@ void DofMap::sort_send_list ()
 
 
 
-void DofMap::compute_sparsity(const MeshBase& mesh)
+bool DofMap::use_coupled_neighbor_dofs(const MeshBase& mesh)
 {
-  libmesh_assert (mesh.is_prepared());
-  libmesh_assert (this->n_variables());
-
-  START_LOG("compute_sparsity()", "DofMap");
-
-  // Compute the sparsity structure of the global matrix.  This can be
-  // fed into a PetscMatrix to allocate exacly the number of nonzeros
-  // necessary to store the matrix.  This algorithm should be linear
-  // in the (# of elements)*(# nodes per element)
-
+  // If we were asked on the command line, then we need to
+  // include sensitivities between neighbor degrees of freedom
   bool implicit_neighbor_dofs = 
     libMesh::on_command_line ("--implicit_neighbor_dofs");
 
-  // look at all the variables in this system.  If any are discontinuous then
-  // force implicit_neighbor_dofs=true
+  // look at all the variables in this system.  If every one is
+  // discontinuous then the user must be doing DG/FVM, so be nice
+  // and  force implicit_neighbor_dofs=true
   {
     bool all_discontinuous_dofs = true;
     
@@ -1081,6 +1074,23 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
       implicit_neighbor_dofs = true;
   }
   
+  return implicit_neighbor_dofs;
+}
+
+
+
+void DofMap::compute_sparsity(const MeshBase& mesh)
+{
+  libmesh_assert (mesh.is_prepared());
+  libmesh_assert (this->n_variables());
+
+  START_LOG("compute_sparsity()", "DofMap");
+
+  // Compute the sparsity structure of the global matrix.  This can be
+  // fed into a PetscMatrix to allocate exacly the number of nonzeros
+  // necessary to store the matrix.  This algorithm should be linear
+  // in the (# of elements)*(# nodes per element)
+
   // We can be more efficient in the threaded sparsity pattern assembly
   // if we don't need the exact pattern.  For some sparse matrix formats
   // a good upper bound will suffice.
@@ -1092,6 +1102,10 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   for (; pos != end; ++pos)
     if ((*pos)->need_full_sparsity_pattern())
       need_full_sparsity_pattern = true;
+
+  // See if we need to include sparsity pattern entries for coupling
+  // between neighbor dofs
+  bool implicit_neighbor_dofs = this->use_coupled_neighbor_dofs(mesh);
   
   // We can compute the sparsity pattern in parallel on multiple
   // threads.  The goal is for each thread to compute the full sparsity
