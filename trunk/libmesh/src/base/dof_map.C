@@ -1052,7 +1052,7 @@ void DofMap::sort_send_list ()
 
 
 
-bool DofMap::use_coupled_neighbor_dofs(const MeshBase& mesh)
+bool DofMap::use_coupled_neighbor_dofs(const MeshBase& mesh) const
 {
   // If we were asked on the command line, then we need to
   // include sensitivities between neighbor degrees of freedom
