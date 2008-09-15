@@ -34,9 +34,13 @@
 #include "numeric_vector.h"
 
 // Trilinos includes
-#include <Epetra_FEVector.h>
+#include <Epetra_CombineMode.h>
 #include <Epetra_Map.h>
+#include <Epetra_MultiVector.h>
+#include <Epetra_Vector.h>
 #include <Epetra_MpiComm.h>
+class Epetra_IntSerialDenseVector;
+class Epetra_SerialDenseVector;
 
 // forward declarations
 template <typename T> class SparseMatrix;
@@ -77,7 +81,7 @@ public:
    * This allows ownership of v to remain with the original creator,
    * and to simply provide additional functionality with the EpetraVector.
    */
-  EpetraVector(Epetra_FEVector v);
+  EpetraVector(Epetra_Vector v);
   
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -408,7 +412,7 @@ public:
    * not required in user-level code. Just don't do anything crazy like
    * calling VecDestroy()!
    */
-  Epetra_FEVector * vec () { libmesh_assert (_vec != NULL); return _vec; }
+  Epetra_Vector * vec () { libmesh_assert (_vec != NULL); return _vec; }
 
 private:
 
@@ -416,7 +420,7 @@ private:
    * Actual Epetra vector datatype
    * to hold vector entries
    */
-  Epetra_FEVector * _vec;
+  Epetra_Vector * _vec;
 
   /**
    * Holds the distributed Map
@@ -428,6 +432,102 @@ private:
    * for the constructor which takes a Epetra Vec object. 
    */
   bool _destroy_vec_on_exit;
+
+
+  
+  /*********************************************************************
+   * The following were copied (and slightly modified) from
+   * Epetra_FEVector.h in order to allow us to use a standard
+   * Epetra_Vector... which is more compatible with other Trilinos
+   * packages such as NOX.  All of this code is originally under LGPL
+   *********************************************************************/
+
+  /** Accumulate values into the vector, adding them to any values that
+      already exist for the specified indices.
+  */
+  int SumIntoGlobalValues(int numIDs, const int* GIDs, const double* values);
+
+  /** Accumulate values into the vector, adding them to any values that
+      already exist for the specified GIDs.
+
+      @param GIDs List of global ids. Must be the same length as the
+      accompanying list of values.
+
+      @param values List of coefficient values. Must be the same length as
+      the accompanying list of GIDs.
+  */
+  int SumIntoGlobalValues(const Epetra_IntSerialDenseVector& GIDs,
+                          const Epetra_SerialDenseVector& values);
+
+  /** Copy values into the vector overwriting any values that already exist
+      for the specified indices.
+  */
+  int ReplaceGlobalValues(int numIDs, const int* GIDs, const double* values);
+
+  /** Copy values into the vector, replacing any values that
+      already exist for the specified GIDs.
+
+      @param GIDs List of global ids. Must be the same length as the
+      accompanying list of values.
+
+      @param values List of coefficient values. Must be the same length as
+      the accompanying list of GIDs.
+  */
+  int ReplaceGlobalValues(const Epetra_IntSerialDenseVector& GIDs,
+                          const Epetra_SerialDenseVector& values);
+
+  int SumIntoGlobalValues(int numIDs, const int* GIDs,
+                          const int* numValuesPerID,
+                          const double* values);
+
+  int ReplaceGlobalValues(int numIDs, const int* GIDs,
+                          const int* numValuesPerID,
+                          const double* values);
+
+  /** Gather any overlapping/shared data into the non-overlapping partitioning
+      defined by the Map that was passed to this vector at construction time.
+      Data imported from other processors is stored on the owning processor
+      with a "sumInto" or accumulate operation.
+      This is a collective method -- every processor must enter it before any
+      will complete it.
+  */
+  int GlobalAssemble(Epetra_CombineMode mode = Add);
+
+  /** Set whether or not non-local data values should be ignored.
+   */
+  void setIgnoreNonLocalEntries(bool flag) {
+    ignoreNonLocalEntries_ = flag;
+  }
+
+  void FEoperatorequals(const EpetraVector& source);
+
+  int inputValues(int numIDs,
+                  const int* GIDs, const double* values,
+                  bool accumulate);
+
+  int inputValues(int numIDs,
+                  const int* GIDs, const int* numValuesPerID,
+		  const double* values,
+                  bool accumulate);
+
+  int inputNonlocalValue(int GID, double value, bool accumulate);
+
+  int inputNonlocalValues(int GID, int numValues, const double* values,
+			  bool accumulate);
+
+  void destroyNonlocalData();
+
+  int myFirstID_;
+  int myNumIDs_;
+  double* myCoefs_;
+
+  int* nonlocalIDs_;
+  int* nonlocalElementSize_;
+  int numNonlocalIDs_;
+  int allocatedNonlocalLength_;
+  double** nonlocalCoefs_;
+
+  bool ignoreNonLocalEntries_;
 };
 
 
@@ -467,7 +567,7 @@ EpetraVector<T>::EpetraVector (const unsigned int n,
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector (Epetra_FEVector v)
+EpetraVector<T>::EpetraVector(Epetra_Vector v)
   : _destroy_vec_on_exit(false)
 {
   (*_vec) = v;
@@ -495,7 +595,7 @@ void EpetraVector<T>::init (const unsigned int n,
                         0, 
                         Epetra_MpiComm (libMesh::COMM_WORLD));
 	      
-  _vec = new Epetra_FEVector(*_map);
+  _vec = new Epetra_Vector(*_map);
   
   this->_is_initialized = true;
   
@@ -611,7 +711,7 @@ T EpetraVector<T>::operator() (const unsigned int i) const
   libmesh_assert ( ((i >= this->first_local_index()) &&
 		    (i <  this->last_local_index())) );
 
-  return (*_vec)[0][i-this->first_local_index()];
+  return (*_vec)[i-this->first_local_index()];
 }
 
 
