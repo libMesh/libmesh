@@ -672,6 +672,10 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
         }
       libmesh_assert(sub_dofs == n_dofs);
 
+      // Moving the mesh may be necessary
+      if (_mesh_sys != libMesh::invalid_uint)
+        elem_position_set(1.);
+      // Reinitializing the FE objects is definitely necessary
       this->elem_fe_reinit();
 
       bool jacobian_computed = time_solver->element_residual(get_jacobian);
@@ -735,6 +739,9 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
           if (!compute_internal_sides && elem->neighbor(side) != NULL)
             continue;
 
+          // Any mesh movement has already been done (and restored,
+          // if the TimeSolver isn't broken), but
+          // reinitializing the side FE objects is still necessary
           this->elem_side_fe_reinit();
 
           DenseMatrix<Number> old_jacobian;
