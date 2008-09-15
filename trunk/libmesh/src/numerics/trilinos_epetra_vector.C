@@ -30,9 +30,16 @@
 #include "parallel.h"
 
 // Trilinos Includes
+#include <Epetra_LocalMap.h>
+#include <Epetra_Comm.h>
+#include <Epetra_Map.h>
+#include <Epetra_BlockMap.h>
 #include <Epetra_Import.h>
-
-
+#include <Epetra_Export.h>
+#include <Epetra_Util.h>
+#include <Epetra_IntSerialDenseVector.h>
+#include <Epetra_SerialDenseVector.h>
+#include <Epetra_Vector.h>
 
 template <typename T>
 T EpetraVector<T>::sum () const
@@ -123,7 +130,7 @@ void EpetraVector<T>::set (const unsigned int i_in, const T value_in)
 
   libmesh_assert(i_in<this->size());
 
-  _vec->ReplaceGlobalValues(1, &i, &value);
+  ReplaceGlobalValues(1, &i, &value);
 
   this->_is_closed = false;
 }
@@ -138,7 +145,7 @@ void EpetraVector<T>::add (const unsigned int i_in, const T value_in)
 
   libmesh_assert(i_in<this->size());
   
-  _vec->SumIntoGlobalValues(1, &i, &value);
+  SumIntoGlobalValues(1, &i, &value);
 
   this->_is_closed = false;
 }
@@ -151,10 +158,9 @@ void EpetraVector<T>::add_vector (const std::vector<T>& v,
 {
   libmesh_assert (v.size() == dof_indices.size());
 
-  _vec->SumIntoGlobalValues (v.size(),
-			     (int*) &dof_indices[0],
-			     const_cast<T*>(&v[0]));
-
+  SumIntoGlobalValues (v.size(),
+                       (int*) &dof_indices[0],
+                       const_cast<T*>(&v[0]));
 }
 
 
@@ -202,9 +208,9 @@ void EpetraVector<T>::add_vector (const DenseVector<T>& V_in,
 {
   libmesh_assert (V_in.size() == dof_indices.size());
 
-  _vec->SumIntoGlobalValues(dof_indices.size(),
-                            (int *)&dof_indices[0],
-                            &const_cast<DenseVector<T> *>(&V_in)->get_values()[0]);
+  SumIntoGlobalValues(dof_indices.size(),
+                      (int *)&dof_indices[0],
+                      &const_cast<DenseVector<T> *>(&V_in)->get_values()[0]);
 }
 
 
@@ -249,9 +255,9 @@ void EpetraVector<T>::insert (const std::vector<T>& v,
 {
   libmesh_assert (v.size() == dof_indices.size());
 
-  _vec->ReplaceGlobalValues (v.size(),
-			     (int*) &dof_indices[0],
-			     const_cast<T*>(&v[0]));
+  ReplaceGlobalValues (v.size(),
+                       (int*) &dof_indices[0],
+                       const_cast<T*>(&v[0]));
 }
 
 
@@ -277,9 +283,9 @@ void EpetraVector<T>::insert (const DenseVector<T>& v,
   
   std::vector<T> &vals = const_cast<DenseVector<T>&>(v).get_values();
   
-  _vec->ReplaceGlobalValues (v.size(),
-			     (int*) &dof_indices[0],
-			     &vals[0]);
+  ReplaceGlobalValues (v.size(),
+                       (int*) &dof_indices[0],
+                       &vals[0]);
 }
 
 
@@ -524,7 +530,7 @@ void EpetraVector<T>::localize (std::vector<T>& v_local) const
 
   // build up my local part
   for (unsigned int i=0; i<nl; i++)
-    v_local.push_back((*this->_vec)[0][i]);
+    v_local.push_back((*this->_vec)[i]);
 
   Parallel::allgather (v_local);
 }
@@ -550,7 +556,7 @@ void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
   
   // build up my local part
   for (unsigned int i=0; i<nl; i++)
-    v_local.push_back((*this->_vec)[0][i]);
+    v_local.push_back((*this->_vec)[i]);
 
   Parallel::gather (pid, v_local);
 }
@@ -711,6 +717,324 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
 }
 
 
+/*********************************************************************
+ * The following were copied (and slightly modified) from
+ * Epetra_FEVector.h in order to allow us to use a standard
+ * Epetra_Vector... which is more compatible with other Trilinos
+ * packages such as NOX.  All of this code is originally under LGPL
+ *********************************************************************/
+
+//----------------------------------------------------------------------------
+template <typename T>
+int EpetraVector<T>::SumIntoGlobalValues(int numIDs, const int* GIDs,
+			                 const double* values)
+{
+  return( inputValues( numIDs, GIDs, values, true) );
+}
+
+//----------------------------------------------------------------------------
+template <typename T>
+int EpetraVector<T>::SumIntoGlobalValues(const Epetra_IntSerialDenseVector& GIDs,
+			                 const Epetra_SerialDenseVector& values)
+{
+  if (GIDs.Length() != values.Length()) {
+    return(-1);
+  }
+
+  return( inputValues( GIDs.Length(), GIDs.Values(), values.Values(), true) );
+}
+
+//----------------------------------------------------------------------------
+template <typename T>
+int EpetraVector<T>::SumIntoGlobalValues(int numIDs, const int* GIDs,
+					 const int* numValuesPerID,
+			                 const double* values)
+{
+  return( inputValues( numIDs, GIDs, numValuesPerID, values, true) );
+}
+
+//----------------------------------------------------------------------------
+template <typename T>
+int EpetraVector<T>::ReplaceGlobalValues(int numIDs, const int* GIDs,
+			                 const double* values)
+{
+  return( inputValues( numIDs, GIDs, values, false) );
+}
+
+//----------------------------------------------------------------------------
+template <typename T>
+int EpetraVector<T>::ReplaceGlobalValues(const Epetra_IntSerialDenseVector& GIDs,
+			                 const Epetra_SerialDenseVector& values)
+{
+  if (GIDs.Length() != values.Length()) {
+    return(-1);
+  }
+
+  return( inputValues( GIDs.Length(), GIDs.Values(), values.Values(), false) );
+}
+
+//----------------------------------------------------------------------------
+template <typename T>
+int EpetraVector<T>::ReplaceGlobalValues(int numIDs, const int* GIDs,
+					 const int* numValuesPerID,
+			                 const double* values)
+{
+  return( inputValues( numIDs, GIDs, numValuesPerID, values, false) );
+}
+
+//----------------------------------------------------------------------------
+template <typename T>
+int EpetraVector<T>::inputValues(int numIDs,
+                                 const int* GIDs,
+                                 const double* values,
+                                 bool accumulate)
+{
+ //Important note!! This method assumes that there is only 1 point
+ //associated with each element.
+
+  for(int i=0; i<numIDs; ++i) {
+    if (_vec->Map().MyGID(GIDs[i])) {
+      if (accumulate) {
+        _vec->SumIntoGlobalValue(GIDs[i], 0, 0, values[i]);
+      }
+      else {
+        _vec->ReplaceGlobalValue(GIDs[i], 0, 0, values[i]);
+      }
+    }
+    else {
+      if (!ignoreNonLocalEntries_) {
+	EPETRA_CHK_ERR( inputNonlocalValue(GIDs[i], values[i], accumulate) );
+      }
+    }
+  }
+
+  return(0);
+}
+
+//----------------------------------------------------------------------------
+template <typename T>
+int EpetraVector<T>::inputValues(int numIDs,
+                                 const int* GIDs,
+				 const int* numValuesPerID,
+                                 const double* values,
+                                 bool accumulate)
+{
+  int offset=0;
+  for(int i=0; i<numIDs; ++i) {
+    int numValues = numValuesPerID[i];
+    if (_vec->Map().MyGID(GIDs[i])) {
+      if (accumulate) {
+	for(int j=0; j<numValues; ++j) {
+	  _vec->SumIntoGlobalValue(GIDs[i], j, 0, values[offset+j]);
+	}
+      }
+      else {
+	for(int j=0; j<numValues; ++j) {
+	  _vec->ReplaceGlobalValue(GIDs[i], j, 0, values[offset+j]);
+	}
+      }
+    }
+    else {
+      if (!ignoreNonLocalEntries_) {
+	EPETRA_CHK_ERR( inputNonlocalValues(GIDs[i], numValues,
+					    &(values[offset]), accumulate) );
+      }
+    }
+    offset += numValues;
+  }
+
+  return(0);
+}
+
+//----------------------------------------------------------------------------
+template <typename T>
+int EpetraVector<T>::inputNonlocalValue(int GID, double value, bool accumulate)
+{
+  int insertPoint = -1;
+
+  //find offset of GID in nonlocalIDs_
+  int offset = Epetra_Util_binary_search(GID, nonlocalIDs_, numNonlocalIDs_,
+					 insertPoint);
+  if (offset >= 0) {
+    //if offset >= 0
+    //  put value in nonlocalCoefs_[offset][0]
+
+    if (accumulate) {
+      nonlocalCoefs_[offset][0] += value;
+    }
+    else {
+      nonlocalCoefs_[offset][0] = value;
+    }
+  }
+  else {
+    //else
+    //  insert GID in nonlocalIDs_
+    //  insert 1   in nonlocalElementSize_
+    //  insert value in nonlocalCoefs_
+
+    int tmp1 = numNonlocalIDs_;
+    int tmp2 = allocatedNonlocalLength_;
+    int tmp3 = allocatedNonlocalLength_;
+    EPETRA_CHK_ERR( Epetra_Util_insert(GID, insertPoint, nonlocalIDs_,
+				       tmp1, tmp2) );
+    --tmp1;
+    EPETRA_CHK_ERR( Epetra_Util_insert(1, insertPoint, nonlocalElementSize_,
+				       tmp1, tmp3) );
+    double* values = new double[1];
+    values[0] = value;
+    EPETRA_CHK_ERR( Epetra_Util_insert(values, insertPoint, nonlocalCoefs_,
+				       numNonlocalIDs_, allocatedNonlocalLength_) );
+  }
+
+  return(0);
+}
+
+//----------------------------------------------------------------------------
+template <typename T>
+int EpetraVector<T>::inputNonlocalValues(int GID, int numValues,
+					 const double* values, bool accumulate)
+{
+  int insertPoint = -1;
+
+  //find offset of GID in nonlocalIDs_
+  int offset = Epetra_Util_binary_search(GID, nonlocalIDs_, numNonlocalIDs_,
+					 insertPoint);
+  if (offset >= 0) {
+    //if offset >= 0
+    //  put value in nonlocalCoefs_[offset][0]
+
+    if (numValues != nonlocalElementSize_[offset]) {
+      cerr << "Epetra_FEVector ERROR: block-size for GID " << GID << " is "
+	   << numValues<<" which doesn't match previously set block-size of "
+	   << nonlocalElementSize_[offset] << endl;
+      return(-1);
+    }
+
+    if (accumulate) {
+      for(int j=0; j<numValues; ++j) {
+	nonlocalCoefs_[offset][j] += values[j];
+      }
+    }
+    else {
+      for(int j=0; j<numValues; ++j) {
+	nonlocalCoefs_[offset][j] = values[j];
+      }
+    }
+  }
+  else {
+    //else
+    //  insert GID in nonlocalIDs_
+    //  insert numValues   in nonlocalElementSize_
+    //  insert values in nonlocalCoefs_
+
+    int tmp1 = numNonlocalIDs_;
+    int tmp2 = allocatedNonlocalLength_;
+    int tmp3 = allocatedNonlocalLength_;
+    EPETRA_CHK_ERR( Epetra_Util_insert(GID, insertPoint, nonlocalIDs_,
+				       tmp1, tmp2) );
+    --tmp1;
+    EPETRA_CHK_ERR( Epetra_Util_insert(numValues, insertPoint, nonlocalElementSize_,
+				       tmp1, tmp3) );
+    double* newvalues = new double[numValues];
+    for(int j=0; j<numValues; ++j) {
+      newvalues[j] = values[j];
+    }
+    EPETRA_CHK_ERR( Epetra_Util_insert(newvalues, insertPoint, nonlocalCoefs_,
+				       numNonlocalIDs_, allocatedNonlocalLength_) );
+  }
+
+  return(0);
+}
+
+//----------------------------------------------------------------------------
+template <typename T>
+int EpetraVector<T>::GlobalAssemble(Epetra_CombineMode mode)
+{
+  //In this method we need to gather all the non-local (overlapping) data
+  //that's been input on each processor, into the (probably) non-overlapping
+  //distribution defined by the map that 'this' vector was constructed with.
+
+  //We don't need to do anything if there's only one processor or if
+  //ignoreNonLocalEntries_ is true.
+  if (_vec->Map().Comm().NumProc() < 2 || ignoreNonLocalEntries_) {
+    return(0);
+  }
+
+  //First build a map that describes the data in nonlocalIDs_/nonlocalCoefs_.
+  //We'll use the arbitrary distribution constructor of Map.
+
+  Epetra_BlockMap sourceMap(-1, numNonlocalIDs_,
+                            nonlocalIDs_, nonlocalElementSize_,
+			    _vec->Map().IndexBase(), _vec->Map().Comm());
+
+  //Now build a vector to hold our nonlocalCoefs_, and to act as the source-
+  //vector for our import operation.
+  Epetra_MultiVector nonlocalVector(sourceMap, 1);
+
+  int i,j;
+  for(i=0; i<numNonlocalIDs_; ++i) {
+    for(j=0; j<nonlocalElementSize_[i]; ++j) {
+      nonlocalVector.ReplaceGlobalValue(nonlocalIDs_[i], j, 0,
+					nonlocalCoefs_[i][j]);
+    }
+  }
+
+  Epetra_Export exporter(sourceMap, _vec->Map());
+
+  EPETRA_CHK_ERR( _vec->Export(nonlocalVector, exporter, mode) );
+
+  destroyNonlocalData();
+
+  return(0);
+}
+
+
+//----------------------------------------------------------------------------
+template <typename T>
+void EpetraVector<T>::FEoperatorequals(const EpetraVector& source)
+{
+  (*_vec) = *(source._vec);
+
+  destroyNonlocalData();
+
+  if (source.allocatedNonlocalLength_ > 0) {
+    allocatedNonlocalLength_ = source.allocatedNonlocalLength_;
+    numNonlocalIDs_ = source.numNonlocalIDs_;
+    nonlocalIDs_ = new int[allocatedNonlocalLength_];
+    nonlocalElementSize_ = new int[allocatedNonlocalLength_];
+    nonlocalCoefs_ = new double*[allocatedNonlocalLength_];
+    for(int i=0; i<numNonlocalIDs_; ++i) {
+      int elemSize = source.nonlocalElementSize_[i];
+      nonlocalCoefs_[i] = new double[elemSize];
+      nonlocalIDs_[i] = source.nonlocalIDs_[i];
+      nonlocalElementSize_[i] = elemSize;
+      for(int j=0; j<elemSize; ++j) {
+	nonlocalCoefs_[i][j] = source.nonlocalCoefs_[i][j];
+      }
+    }
+  }
+}
+
+
+//----------------------------------------------------------------------------
+template <typename T>
+void EpetraVector<T>::destroyNonlocalData()
+{
+  if (allocatedNonlocalLength_ > 0) {
+    delete [] nonlocalIDs_;
+    delete [] nonlocalElementSize_;
+    nonlocalIDs_ = NULL;
+    nonlocalElementSize_ = NULL;
+    for(int i=0; i<numNonlocalIDs_; ++i) {
+      delete [] nonlocalCoefs_[i];
+    }
+    delete [] nonlocalCoefs_;
+    nonlocalCoefs_ = NULL;
+    numNonlocalIDs_ = 0;
+    allocatedNonlocalLength_ = 0;
+  }
+  return;
+}
 
 
 //------------------------------------------------------------------
