@@ -193,11 +193,13 @@ bool EigenTimeSolver::side_residual(bool request_jacobian)
   
     }
 
-  // There is no "side" equivalent for the mass matrix
+  // There is now a "side" equivalent for the mass matrix
   else if (now_assembling == Matrix_B)
     {
-      return false;//?
-      //return true;
+      bool mass_jacobian_computed =
+	_system.side_mass_residual(request_jacobian);
+
+      return mass_jacobian_computed;
     }
 
   else

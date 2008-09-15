@@ -181,10 +181,45 @@ bool EulerSolver::side_residual (bool request_jacobian)
   if (jacobian_computed)
     _system.elem_jacobian *= (theta * _system.deltat);
 
+  // If a fixed solution is requested, we'll use theta_solution
+  if (_system.use_fixed_solution)
+    {
+// The fixed_solution_derivative is always theta,
+// and now we're done scaling jacobians
+      _system.fixed_solution_derivative = theta;
+    }
+
+  // Add the mass term for the old solution
+  _system.elem_solution.swap(old_elem_solution);
+
+  if (_system.use_fixed_solution)
+    {
+      _system.elem_solution_derivative = 0.0;
+      jacobian_computed = _system.side_mass_residual(jacobian_computed) &&
+        jacobian_computed;
+      _system.elem_solution_derivative = 1.0;
+    }
+  else
+    {
+      // FIXME - we should detect if mass_residual() edits
+      // elem_jacobian and lies about it!
+      _system.side_mass_residual(false);
+    }
+
   // Restore the elem_solution
   _system.elem_solution.swap(theta_solution);
 
-  // Add the constraint term (we shouldn't need a mass term on sides)
+  // Subtract the mass term for the new solution
+  if (jacobian_computed)
+    _system.elem_jacobian *= -1.0;
+  _system.elem_residual *= -1.0;
+  jacobian_computed = _system.side_mass_residual(jacobian_computed) &&
+    jacobian_computed;
+  if (jacobian_computed)
+    _system.elem_jacobian *= -1.0;
+  _system.elem_residual *= -1.0;
+
+  // Add the constraint term
   jacobian_computed = _system.side_constraint(jacobian_computed) &&
     jacobian_computed;
 
