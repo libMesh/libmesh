@@ -228,6 +228,22 @@ public:
   }
 
   /**
+   * Adds a mass vector contribution on \p side of \p elem to
+   * elem_residual.
+   * If this method receives request_jacobian = true, then it
+   * should compute elem_jacobian and return true if possible.  If
+   * elem_jacobian has not been computed then the method should
+   * return false.
+   *
+   * For most problems, the default implementation of "do nothing" 
+   * is correct; users with boundary conditions including time
+   * derivatives may need to reimplement this themselves.
+   */
+  virtual bool side_mass_residual (bool request_jacobian) {
+    return request_jacobian;
+  }
+
+  /**
    * Invokes the solver associated with the system.  For steady state
    * solvers, this will find a root x where F(x) = 0.  For transient
    * solvers, this will integrate dx/dt = F(x).

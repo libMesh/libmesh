@@ -219,10 +219,35 @@ bool Euler2Solver::side_residual (bool request_jacobian)
       _system.elem_residual.zero();
     }
 
+  // Add the mass term for the old solution
+  if (_system.use_fixed_solution)
+    {
+      _system.elem_solution_derivative = 0.0;
+      jacobian_computed = _system.side_mass_residual(jacobian_computed) &&
+        jacobian_computed;
+      _system.elem_solution_derivative = 1.0;
+    }
+  else
+    {
+      // FIXME - we should detect if side_mass_residual() edits
+      // elem_jacobian and lies about it!
+      _system.side_mass_residual(false);
+    }
+
   // Restore the elem_solution
   _system.elem_solution.swap(old_elem_solution);
 
-  // Add the constraint term (we shouldn't need a mass term on sides)
+  // Subtract the mass term for the new solution
+  if (jacobian_computed)
+    _system.elem_jacobian *= -1.0;
+  _system.elem_residual *= -1.0;
+  jacobian_computed = _system.side_mass_residual(jacobian_computed) &&
+    jacobian_computed;
+  if (jacobian_computed)
+    _system.elem_jacobian *= -1.0;
+  _system.elem_residual *= -1.0;
+
+  // Add the constraint term
   jacobian_computed = _system.side_constraint(jacobian_computed) &&
     jacobian_computed;
 
