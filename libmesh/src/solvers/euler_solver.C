@@ -57,6 +57,9 @@ bool EulerSolver::element_residual (bool request_jacobian)
   // Temporarily replace elem_solution with theta_solution
   _system.elem_solution.swap(theta_solution);
 
+  // Move the mesh into place first if necessary
+  _system.elem_reinit(theta);
+
   // We're going to compute just the change in elem_residual
   // (and possibly elem_jacobian), then add back the old values
   DenseVector<Number> old_elem_residual(_system.elem_residual);
@@ -87,6 +90,9 @@ bool EulerSolver::element_residual (bool request_jacobian)
   // Add the mass term for the old solution
   _system.elem_solution.swap(old_elem_solution);
 
+  // Move the mesh into place first if necessary
+  _system.elem_reinit(0.);
+
   if (_system.use_fixed_solution)
     {
       _system.elem_solution_derivative = 0.0;
@@ -103,6 +109,9 @@ bool EulerSolver::element_residual (bool request_jacobian)
 
   // Restore the elem_solution
   _system.elem_solution.swap(theta_solution);
+
+  // Restore the elem position if necessary
+  _system.elem_reinit(1.);
 
   // Subtract the mass term for the new solution
   if (jacobian_computed)
@@ -162,6 +171,9 @@ bool EulerSolver::side_residual (bool request_jacobian)
   // Temporarily replace elem_solution with theta_solution
   _system.elem_solution.swap(theta_solution);
 
+  // Move the mesh into place first if necessary
+  _system.elem_side_reinit(theta);
+
   // We're going to compute just the change in elem_residual,
   // then add back the old elem_residual.
   DenseVector<Number> old_elem_residual(_system.elem_residual);
@@ -192,6 +204,9 @@ bool EulerSolver::side_residual (bool request_jacobian)
   // Add the mass term for the old solution
   _system.elem_solution.swap(old_elem_solution);
 
+  // Move the mesh into place first if necessary
+  _system.elem_side_reinit(0.);
+
   if (_system.use_fixed_solution)
     {
       _system.elem_solution_derivative = 0.0;
@@ -208,6 +223,9 @@ bool EulerSolver::side_residual (bool request_jacobian)
 
   // Restore the elem_solution
   _system.elem_solution.swap(theta_solution);
+
+  // Restore the elem position if necessary
+  _system.elem_side_reinit(1.);
 
   // Subtract the mass term for the new solution
   if (jacobian_computed)

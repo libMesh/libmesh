@@ -97,7 +97,7 @@ public:
   virtual void assembly (bool get_residual, bool get_jacobian);
 
   /**
-   * Tells the FEMSystem that variable var is evolving with
+   * Tells the FEMSystem that variable \p var is evolving with
    * respect to time.  In general, the user's init() function
    * should call time_evolving() for any variables which
    * behave like du/dt = F(u), and should not call time_evolving()
@@ -108,6 +108,34 @@ public:
    * time_evolving() to prepare data structures.
    */
   virtual void time_evolving (unsigned int var);
+
+  /**
+   * Tells the FEMSystem that variable \p var from system number \p sysnum
+   * should be used to update the x coordinate of mesh nodes, in problems where
+   * the mesh itself is expected to move in time.
+   *
+   * The system with mesh coordinate data (which may be this system itself, for
+   * fully coupled moving mesh problems) is currently assumed to have new (end
+   * of time step) mesh coordinates stored in solution, old (beginning of time
+   * step) mesh coordinates stored in _old_nonlinear_solution, and constant
+   * velocity motion during each time step.
+   *
+   * Activating this function ensures that local (but not neighbor!) element
+   * geometry is correctly repositioned when evaluating element residuals.
+   */
+  virtual void mesh_x_position(unsigned int sysnum, unsigned int var);
+
+  /**
+   * Tells the FEMSystem that variable \p var from system number \p sysnum
+   * should be used to update the y coordinate of mesh nodes.
+   */
+  virtual void mesh_y_position(unsigned int sysnum, unsigned int var);
+
+  /**
+   * Tells the FEMSystem that variable \p var from system number \p sysnum
+   * should be used to update the z coordinate of mesh nodes.
+   */
+  virtual void mesh_z_position(unsigned int sysnum, unsigned int var);
 
   /**
    * Adds a mass vector contribution on \p elem to elem_residual.
@@ -267,6 +295,20 @@ public:
    */
   Real verify_analytic_jacobians;
 
+  /**
+   * Reinitialize Elem and FE objects if necessary for integration at a new
+   * point in time: specifically, handle moving elements in moving mesh
+   * schemes.
+   */
+  virtual void elem_reinit(Real theta);
+
+  /**
+   * Reinitialize Elem and side FE objects if necessary for integration at a
+   * new point in time: specifically, handle moving elements in moving mesh
+   * schemes.
+   */
+  virtual void elem_side_reinit(Real theta);
+
 protected:
 
   /**
@@ -279,6 +321,23 @@ protected:
    * Clear data pointers associated with this system.
    */
   void clear_fem_ptrs ();
+
+  /**
+   * Uses the coordinate data specified by mesh_*_position configuration
+   * to set the geometry of \p elem to the value it would take after a fraction
+   * \p theta of a timestep.
+   */
+  void elem_position_set(Real theta);
+
+  /**
+   * Reinitializes interior FE objects on the current geometric element
+   */
+  void elem_fe_reinit();
+
+  /**
+   * Reinitializes side FE objects on the current geometric element
+   */
+  void elem_side_fe_reinit();
 
   /**
    * Uses the results of multiple element_residual() calls
@@ -324,6 +383,11 @@ protected:
    * Current element for side_* to examine
    */
   unsigned int side;
+
+  /**
+   * System and variables from which to acquire moving mesh information
+   */
+  unsigned int _mesh_sys, _mesh_x_var, _mesh_y_var, _mesh_z_var;
 };
 
 

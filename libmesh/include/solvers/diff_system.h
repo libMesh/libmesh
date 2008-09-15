@@ -244,6 +244,19 @@ public:
   }
 
   /**
+   * Gives derived classes the opportunity to reinitialize data (FE objects in
+   * FEMSystem, for example) needed for an interior integration at a new point
+   * within a timestep
+   */
+  virtual void elem_reinit(Real) {}
+
+  /**
+   * Gives derived classes the opportunity to reinitialize data needed for a
+   * side integration at a new point within a timestep
+   */
+  virtual void elem_side_reinit(Real) {}
+
+  /**
    * Invokes the solver associated with the system.  For steady state
    * solvers, this will find a root x where F(x) = 0.  For transient
    * solvers, this will integrate dx/dt = F(x).
