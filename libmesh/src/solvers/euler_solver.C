@@ -148,9 +148,6 @@ bool EulerSolver::side_residual (bool request_jacobian)
   theta_solution *= theta;
   theta_solution.add(1. - theta, old_elem_solution);
 
-  // Temporarily replace elem_solution with theta_solution
-  _system.elem_solution.swap(theta_solution);
-
   // If a fixed solution is requested, we'll use theta_solution
   if (_system.use_fixed_solution)
     {
@@ -161,6 +158,9 @@ bool EulerSolver::side_residual (bool request_jacobian)
 //      _system.fixed_solution_derivative = theta;
       _system.fixed_solution_derivative = 1.0;
     }
+
+  // Temporarily replace elem_solution with theta_solution
+  _system.elem_solution.swap(theta_solution);
 
   // We're going to compute just the change in elem_residual,
   // then add back the old elem_residual.
