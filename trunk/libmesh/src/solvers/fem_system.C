@@ -1009,13 +1009,42 @@ void FEMSystem::numerical_elem_jacobian ()
 
   for (unsigned int j = 0; j != dof_indices.size(); ++j)
     {
+      // Take the "minus" side of a central differenced first derivative
       Number original_solution = elem_solution(j);
       elem_solution(j) -= numerical_jacobian_h;
+
+      // Make sure to catch any moving mesh terms
+      // FIXME - this could be less ugly
+      Real *coord = NULL;
+      if (_mesh_sys == this->number())
+        {
+          if (_mesh_x_var != libMesh::invalid_uint)
+            for (unsigned int k = 0;
+                 k != dof_indices_var[_mesh_x_var].size(); ++k)
+              if (dof_indices_var[_mesh_x_var][k] == dof_indices[j])
+                coord = &(elem->point(k)(0));
+          if (_mesh_y_var != libMesh::invalid_uint)
+            for (unsigned int k = 0;
+                 k != dof_indices_var[_mesh_y_var].size(); ++k)
+              if (dof_indices_var[_mesh_y_var][k] == dof_indices[j])
+                coord = &(elem->point(k)(1));
+          if (_mesh_z_var != libMesh::invalid_uint)
+            for (unsigned int k = 0;
+                 k != dof_indices_var[_mesh_z_var].size(); ++k)
+              if (dof_indices_var[_mesh_z_var][k] == dof_indices[j])
+                coord = &(elem->point(k)(2));
+        }
+      if (coord)
+        *coord = elem_solution(j);
+
       elem_residual.zero();
       time_solver->element_residual(false);
-
       backwards_residual = elem_residual;
+
+      // Take the "plus" side of a central differenced first derivative
       elem_solution(j) = original_solution + numerical_jacobian_h;
+      if (coord)
+        *coord = elem_solution(j);
       elem_residual.zero();
       time_solver->element_residual(false);
 
@@ -1026,6 +1055,8 @@ void FEMSystem::numerical_elem_jacobian ()
             2. / numerical_jacobian_h;
         }
       elem_solution(j) = original_solution;
+      if (coord)
+        *coord = elem_solution(j);
     }
 
   elem_residual = original_residual;
@@ -1045,13 +1076,43 @@ void FEMSystem::numerical_side_jacobian ()
 
   for (unsigned int j = 0; j != dof_indices.size(); ++j)
     {
+      // Take the "minus" side of a central differenced first derivative
       Number original_solution = elem_solution(j);
       elem_solution(j) -= numerical_jacobian_h;
+
+      // Make sure to catch any moving mesh terms
+      // FIXME - this could be less ugly
+      Real *coord = NULL;
+      if (_mesh_sys == this->number())
+        {
+          if (_mesh_x_var != libMesh::invalid_uint)
+            for (unsigned int k = 0;
+                 k != dof_indices_var[_mesh_x_var].size(); ++k)
+              if (dof_indices_var[_mesh_x_var][k] == dof_indices[j])
+                coord = &(elem->point(k)(0));
+          if (_mesh_y_var != libMesh::invalid_uint)
+            for (unsigned int k = 0;
+                 k != dof_indices_var[_mesh_y_var].size(); ++k)
+              if (dof_indices_var[_mesh_y_var][k] == dof_indices[j])
+                coord = &(elem->point(k)(1));
+          if (_mesh_z_var != libMesh::invalid_uint)
+            for (unsigned int k = 0;
+                 k != dof_indices_var[_mesh_z_var].size(); ++k)
+              if (dof_indices_var[_mesh_z_var][k] == dof_indices[j])
+                coord = &(elem->point(k)(2));
+        }
+      if (coord)
+        *coord = elem_solution(j);
+
       elem_residual.zero();
       time_solver->side_residual(false);
-
       backwards_residual = elem_residual;
+
+      // Take the "plus" side of a central differenced first derivative
       elem_solution(j) = original_solution + numerical_jacobian_h;
+      if (coord)
+        *coord = elem_solution(j);
+
       elem_residual.zero();
       time_solver->side_residual(false);
 
@@ -1062,6 +1123,8 @@ void FEMSystem::numerical_side_jacobian ()
             / 2. / numerical_jacobian_h;
         }
       elem_solution(j) = original_solution;
+      if (coord)
+        *coord = elem_solution(j);
     }
 
   elem_residual = original_residual;
