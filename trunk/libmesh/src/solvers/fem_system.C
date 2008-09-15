@@ -21,7 +21,11 @@ FEMSystem::FEMSystem (EquationSystems& es,
     extra_quadrature_order(0),
     numerical_jacobian_h(1.e-6),
     verify_analytic_jacobians(0.0),
-    element_qrule(NULL), side_qrule(NULL), elem(NULL)
+    element_qrule(NULL), side_qrule(NULL), elem(NULL),
+    _mesh_sys(libMesh::invalid_uint),
+    _mesh_x_var(libMesh::invalid_uint),
+    _mesh_y_var(libMesh::invalid_uint),
+    _mesh_z_var(libMesh::invalid_uint)
 {
 }
 
@@ -496,6 +500,53 @@ void FEMSystem::init_data ()
 }
 
 
+void FEMSystem::elem_reinit(Real theta)
+{
+  // Handle a moving element if necessary
+  if (_mesh_sys != libMesh::invalid_uint)
+    {
+      elem_position_set(theta);
+      elem_fe_reinit();
+    }
+}
+
+
+void FEMSystem::elem_side_reinit(Real theta)
+{
+  // Handle a moving element if necessary
+  if (_mesh_sys != libMesh::invalid_uint)
+    {
+      elem_position_set(theta);
+      elem_side_fe_reinit();
+    }
+}
+
+
+void FEMSystem::elem_fe_reinit ()
+{
+  // Initialize all the interior FE objects on elem.
+  // Logging of FE::reinit is done in the FE functions
+  std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
+  for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
+       i != fe_end; ++i)
+    {
+      i->second->reinit(elem);
+    }
+}
+
+
+void FEMSystem::elem_side_fe_reinit ()
+{
+  // Initialize all the interior FE objects on elem/side.
+  // Logging of FE::reinit is done in the FE functions
+  std::map<FEType, FEBase *>::iterator fe_end = side_fe.end();
+  for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
+       i != fe_end; ++i)
+    {
+      i->second->reinit(elem, side);
+    }
+}
+
 
 void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 {
@@ -621,15 +672,8 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
         }
       libmesh_assert(sub_dofs == n_dofs);
 
-      // Initialize all the interior FE objects on elem.
-      // Logging of FE::reinit is done in the FE functions
-      std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
-      for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
-           i != fe_end; ++i)
-        {
-          i->second->reinit(elem);
-        }
-      
+      this->elem_fe_reinit();
+
       bool jacobian_computed = time_solver->element_residual(get_jacobian);
 
       // Compute a numeric jacobian if we have to
@@ -691,14 +735,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
           if (!compute_internal_sides && elem->neighbor(side) != NULL)
             continue;
 
-          // Initialize all the interior FE objects on elem/side.
-          // Logging of FE::reinit is done in the FE functions
-          fe_end = side_fe.end();
-          for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
-               i != fe_end; ++i)
-            {
-              i->second->reinit(elem, side);
-            }
+          this->elem_side_fe_reinit();
 
           DenseMatrix<Number> old_jacobian;
           // If we're in DEBUG mode, we should always verify that the
@@ -1035,6 +1072,90 @@ void FEMSystem::time_evolving (unsigned int var)
   // Then make sure we're prepared to do mass integration
   element_fe_var[var]->get_JxW();
   element_fe_var[var]->get_phi();
+}
+
+
+
+void FEMSystem::mesh_x_position (unsigned int sysnum, unsigned int var)
+{
+  if (_mesh_sys != libMesh::invalid_uint && _mesh_sys != sysnum)
+    libmesh_error();
+  if (_mesh_sys != this->number())
+    libmesh_not_implemented();
+  _mesh_sys = sysnum;
+  _mesh_x_var = var;
+}
+
+
+
+void FEMSystem::mesh_y_position (unsigned int sysnum, unsigned int var)
+{
+  if (_mesh_sys != libMesh::invalid_uint && _mesh_sys != sysnum)
+    libmesh_error();
+  if (_mesh_sys != this->number())
+    libmesh_not_implemented();
+  _mesh_sys = sysnum;
+  _mesh_y_var = var;
+}
+
+
+
+void FEMSystem::mesh_z_position (unsigned int sysnum, unsigned int var)
+{
+  if (_mesh_sys != libMesh::invalid_uint && _mesh_sys != sysnum)
+    libmesh_error();
+  if (_mesh_sys != this->number())
+    libmesh_not_implemented();
+  _mesh_sys = sysnum;
+  _mesh_z_var = var;
+}
+
+
+
+void FEMSystem::elem_position_set(Real)
+{
+  // This is too expensive to call unless we've been asked to move the mesh
+  libmesh_assert (_mesh_sys != libMesh::invalid_uint);
+
+  // If the coordinate data is in our own system, it's already
+  // been set up for us, and we can ignore our input parameter theta
+  if (_mesh_sys == this->number())
+    {
+      unsigned int n_nodes = elem->n_nodes();
+      // For simplicity we demand that mesh coordinates be stored
+      // in a format that allows a direct copy
+      libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
+                     (element_fe_var[_mesh_x_var]->get_fe_type().family
+                      == LAGRANGE &&
+                      elem_subsolutions[_mesh_x_var]->size() == n_nodes));
+      libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
+                     (element_fe_var[_mesh_y_var]->get_fe_type().family
+                      == LAGRANGE &&
+                      elem_subsolutions[_mesh_y_var]->size() == n_nodes));
+      libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
+                     (element_fe_var[_mesh_y_var]->get_fe_type().family
+                      == LAGRANGE &&
+                      elem_subsolutions[_mesh_y_var]->size() == n_nodes));
+
+      // Set the new point coordinates
+      if (_mesh_x_var != libMesh::invalid_uint)
+        for (unsigned int i=0; i != n_nodes; ++i)
+          elem->point(i)(0) = (*elem_subsolutions[_mesh_x_var])(i);
+
+      if (_mesh_y_var != libMesh::invalid_uint)
+        for (unsigned int i=0; i != n_nodes; ++i)
+          elem->point(i)(1) = (*elem_subsolutions[_mesh_y_var])(i);
+
+      if (_mesh_z_var != libMesh::invalid_uint)
+        for (unsigned int i=0; i != n_nodes; ++i)
+          elem->point(i)(2) = (*elem_subsolutions[_mesh_z_var])(i);
+    }
+  // FIXME - If the coordinate data is not in our own system, someone
+  // had better get around to implementing that... - RHS
+  else
+    {
+      libmesh_not_implemented();
+    }
 }
 
 

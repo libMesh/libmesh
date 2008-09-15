@@ -58,6 +58,9 @@ bool Euler2Solver::element_residual (bool request_jacobian)
     }
   _system.elem_residual.zero();
 
+  // First, evaluate time derivative at the new timestep.
+  // The element should already be in the proper place
+  // even for a moving mesh problem.
   bool jacobian_computed =
     _system.element_time_derivative(request_jacobian);
 
@@ -72,8 +75,13 @@ bool Euler2Solver::element_residual (bool request_jacobian)
       _system.elem_jacobian.zero();
     }
 
-  // Add the time-dependent term for the old solution
+  // We'll add the time-dependent term for the old solution next
   _system.elem_solution.swap(old_elem_solution);
+
+  // Move the mesh into place first if necessary
+  _system.elem_reinit(0.);
+
+  // Add the time-dependent term for the old solution
   if (_system.use_fixed_solution)
     {
       _system.elem_solution_derivative = 0.0;
@@ -117,6 +125,9 @@ bool Euler2Solver::element_residual (bool request_jacobian)
 
   // Restore the elem_solution
   _system.elem_solution.swap(old_elem_solution);
+
+  // Restore the elem position if necessary
+  _system.elem_reinit(1.);
 
   // Subtract the mass term for the new solution
   if (jacobian_computed)
@@ -177,6 +188,9 @@ bool Euler2Solver::side_residual (bool request_jacobian)
     }
   _system.elem_residual.zero();
 
+  // First, evaluate time derivative at the new timestep.
+  // The element should already be in the proper place
+  // even for a moving mesh problem.
   bool jacobian_computed =
     _system.side_time_derivative(request_jacobian);
 
@@ -193,6 +207,10 @@ bool Euler2Solver::side_residual (bool request_jacobian)
 
   // Add the time-dependent term for the old solution
   _system.elem_solution.swap(old_elem_solution);
+
+  // Move the mesh into place first if necessary
+  _system.elem_side_reinit(0.);
+
   if (_system.use_fixed_solution)
     {
       _system.elem_solution_derivative = 0.0;
@@ -236,6 +254,9 @@ bool Euler2Solver::side_residual (bool request_jacobian)
 
   // Restore the elem_solution
   _system.elem_solution.swap(old_elem_solution);
+
+  // Restore the elem position if necessary
+  _system.elem_side_reinit(1.);
 
   // Subtract the mass term for the new solution
   if (jacobian_computed)
