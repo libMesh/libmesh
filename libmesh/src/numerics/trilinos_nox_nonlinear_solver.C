@@ -95,9 +95,6 @@ Problem_Interface::~Problem_Interface()
 bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
                        NOX::Epetra::Interface::Required::FillType fillType)
 {
-  libmesh_assert(xfe != NULL);
-  libmesh_assert(rfe != NULL);
-  
   NonlinearImplicitSystem &sys = _solver->system();
 
   EpetraVector<Number> X_global(x), R(r);
