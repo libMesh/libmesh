@@ -138,6 +138,22 @@ public:
   virtual void mesh_z_position(unsigned int sysnum, unsigned int var);
 
   /**
+   * Adds a pseudo-convection contribution on \p elem to
+   * elem_residual, if the nodes of \p elem are being translated by a
+   * moving mesh.
+   *
+   * This function assumes that the user's time derivative equations
+   * (except for any equations involving unknown mesh xyz coordinates
+   * themselves) are expressed in an Eulerian frame of reference, and
+   * that the user is satisfied with an unstabilized convection term.
+   * Lagrangian equations will probably require overriding
+   * eulerian_residual() with a blank function; ALE or stabilized
+   * formulations will require reimplementing eulerian_residual()
+   * entirely.
+   */
+  virtual bool eulerian_residual (bool request_jacobian);
+
+  /**
    * Adds a mass vector contribution on \p elem to elem_residual.
    * If this method receives request_jacobian = true, then it
    * should compute elem_jacobian and return true if possible.  If
