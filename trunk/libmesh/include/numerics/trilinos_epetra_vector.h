@@ -17,7 +17,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 #ifndef __trilinos_epetra_vector_h__
 #define __trilinos_epetra_vector_h__
 
@@ -132,7 +131,7 @@ public:
    */
   void init (const unsigned int N,
 	     const bool         fast=false);
-    
+
   //   /**
   //    * Change the dimension to that of the
   //    * vector \p V. The same applies as for
@@ -538,7 +537,16 @@ private:
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector ()
-  : _destroy_vec_on_exit(true)
+: _destroy_vec_on_exit(true),
+  myFirstID_(0),
+  myNumIDs_(0),
+  myCoefs_(NULL),
+  nonlocalIDs_(NULL),
+  nonlocalElementSize_(NULL),
+  numNonlocalIDs_(0),
+  allocatedNonlocalLength_(0),
+  nonlocalCoefs_(NULL),
+  ignoreNonLocalEntries_(false)
 {}
 
 
@@ -546,7 +554,17 @@ EpetraVector<T>::EpetraVector ()
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const unsigned int n)
-  : _destroy_vec_on_exit(true)
+: _destroy_vec_on_exit(true),
+  myFirstID_(0),
+  myNumIDs_(0),
+  myCoefs_(NULL),
+  nonlocalIDs_(NULL),
+  nonlocalElementSize_(NULL),
+  numNonlocalIDs_(0),
+  allocatedNonlocalLength_(0),
+  nonlocalCoefs_(NULL),
+  ignoreNonLocalEntries_(false)
+
 {
   this->init(n, n, false);
 }
@@ -557,7 +575,16 @@ template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const unsigned int n,
 			       const unsigned int n_local)
-  : _destroy_vec_on_exit(true)
+: _destroy_vec_on_exit(true),
+  myFirstID_(0),
+  myNumIDs_(0),
+  myCoefs_(NULL),
+  nonlocalIDs_(NULL),
+  nonlocalElementSize_(NULL),
+  numNonlocalIDs_(0),
+  allocatedNonlocalLength_(0),
+  nonlocalCoefs_(NULL),
+  ignoreNonLocalEntries_(false)
 {
   this->init(n, n_local, false);
 }
@@ -568,7 +595,16 @@ EpetraVector<T>::EpetraVector (const unsigned int n,
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector(Epetra_Vector v)
-  : _destroy_vec_on_exit(false)
+: _destroy_vec_on_exit(false),
+  myFirstID_(0),
+  myNumIDs_(0),
+  myCoefs_(NULL),
+  nonlocalIDs_(NULL),
+  nonlocalElementSize_(NULL),
+  numNonlocalIDs_(0),
+  allocatedNonlocalLength_(0),
+  nonlocalCoefs_(NULL),
+  ignoreNonLocalEntries_(false)
 {
   (*_vec) = v;
   this->_is_initialized = true;
@@ -596,6 +632,14 @@ void EpetraVector<T>::init (const unsigned int n,
                         Epetra_MpiComm (libMesh::COMM_WORLD));
 	      
   _vec = new Epetra_Vector(*_map);
+
+  myFirstID_ = _vec->Map().MinMyGID();
+  myNumIDs_ = _vec->Map().NumMyElements();
+
+  //Currently we impose the restriction that NumVectors==1, so we won't
+  //need the LDA argument when calling ExtractView. Hence the "dummy" arg.
+  int dummy;
+  _vec->ExtractView(&myCoefs_, &dummy);
   
   this->_is_initialized = true;
   
@@ -619,7 +663,11 @@ template <typename T>
 inline
 void EpetraVector<T>::close ()
 {
-  libmesh_assert (this->initialized());  
+  libmesh_assert (this->initialized());
+
+  this->GlobalAssemble();
+
+  this->print(std::cout);
 
   this->_is_closed = true;
 }

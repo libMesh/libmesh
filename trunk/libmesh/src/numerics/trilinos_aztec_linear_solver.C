@@ -115,8 +115,8 @@ AztecLinearSolver<T>::solve (SparseMatrix<T>& matrix_in,
   _linear_solver->SetAztecParam(AZ_tol,tol);
 
   Epetra_FECrsMatrix * emat = matrix->mat();
-  Epetra_FEVector * esol = solution->vec();
-  Epetra_FEVector * erhs = rhs->vec();
+  Epetra_Vector * esol = solution->vec();
+  Epetra_Vector * erhs = rhs->vec();
 
   _linear_solver->Iterate(emat, esol, erhs, m_its, tol);
 
