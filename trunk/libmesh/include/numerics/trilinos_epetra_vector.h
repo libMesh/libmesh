@@ -676,8 +676,6 @@ void EpetraVector<T>::close ()
 
   this->GlobalAssemble();
 
-  this->print(std::cout);
-
   this->_is_closed = true;
 }
 
