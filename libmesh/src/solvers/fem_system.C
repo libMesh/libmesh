@@ -1035,7 +1035,7 @@ void FEMSystem::numerical_elem_jacobian ()
                 coord = &(elem->point(k)(2));
         }
       if (coord)
-        *coord = elem_solution(j);
+        *coord = libmesh_real(elem_solution(j));
 
       elem_residual.zero();
       time_solver->element_residual(false);
@@ -1044,7 +1044,7 @@ void FEMSystem::numerical_elem_jacobian ()
       // Take the "plus" side of a central differenced first derivative
       elem_solution(j) = original_solution + numerical_jacobian_h;
       if (coord)
-        *coord = elem_solution(j);
+        *coord = libmesh_real(elem_solution(j));
       elem_residual.zero();
       time_solver->element_residual(false);
 
@@ -1056,7 +1056,7 @@ void FEMSystem::numerical_elem_jacobian ()
         }
       elem_solution(j) = original_solution;
       if (coord)
-        *coord = elem_solution(j);
+        *coord = libmesh_real(elem_solution(j));
     }
 
   elem_residual = original_residual;
@@ -1102,7 +1102,7 @@ void FEMSystem::numerical_side_jacobian ()
                 coord = &(elem->point(k)(2));
         }
       if (coord)
-        *coord = elem_solution(j);
+        *coord = libmesh_real(elem_solution(j));
 
       elem_residual.zero();
       time_solver->side_residual(false);
@@ -1111,7 +1111,7 @@ void FEMSystem::numerical_side_jacobian ()
       // Take the "plus" side of a central differenced first derivative
       elem_solution(j) = original_solution + numerical_jacobian_h;
       if (coord)
-        *coord = elem_solution(j);
+        *coord = libmesh_real(elem_solution(j));
 
       elem_residual.zero();
       time_solver->side_residual(false);
@@ -1124,7 +1124,7 @@ void FEMSystem::numerical_side_jacobian ()
         }
       elem_solution(j) = original_solution;
       if (coord)
-        *coord = elem_solution(j);
+        *coord = libmesh_real(elem_solution(j));
     }
 
   elem_residual = original_residual;
@@ -1210,15 +1210,18 @@ void FEMSystem::elem_position_set(Real)
       // Set the new point coordinates
       if (_mesh_x_var != libMesh::invalid_uint)
         for (unsigned int i=0; i != n_nodes; ++i)
-          elem->point(i)(0) = (*elem_subsolutions[_mesh_x_var])(i);
+          elem->point(i)(0) =
+            libmesh_real((*elem_subsolutions[_mesh_x_var])(i));
 
       if (_mesh_y_var != libMesh::invalid_uint)
         for (unsigned int i=0; i != n_nodes; ++i)
-          elem->point(i)(1) = (*elem_subsolutions[_mesh_y_var])(i);
+          elem->point(i)(1) =
+            libmesh_real((*elem_subsolutions[_mesh_y_var])(i));
 
       if (_mesh_z_var != libMesh::invalid_uint)
         for (unsigned int i=0; i != n_nodes; ++i)
-          elem->point(i)(2) = (*elem_subsolutions[_mesh_z_var])(i);
+          elem->point(i)(2) =
+            libmesh_real((*elem_subsolutions[_mesh_z_var])(i));
     }
   // FIXME - If the coordinate data is not in our own system, someone
   // had better get around to implementing that... - RHS
