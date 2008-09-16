@@ -328,7 +328,7 @@ public:
   void close();
 
   /**
-   * Generic inquiry, returs the value
+   * Generic inquiry, returns the value
    */
   int inquire(int req_info, std::string error_msg="");
 
@@ -414,7 +414,7 @@ public:
   class ElementMaps;
 
   
-private:
+  //private:
 
   
   /**
