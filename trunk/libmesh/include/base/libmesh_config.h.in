@@ -184,6 +184,10 @@
    solver collection */
 #undef HAVE_TRILINOS
 
+/* Flag indicating whether the library shall be compiled to use the Nox
+   solver collection */
+#undef HAVE_NOX
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 

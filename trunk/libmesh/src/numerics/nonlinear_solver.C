@@ -24,6 +24,7 @@
 // Local Includes
 #include "nonlinear_solver.h"
 #include "petsc_nonlinear_solver.h"
+#include "trilinos_nox_nonlinear_solver.h"
 #include "auto_ptr.h"
 
 
@@ -41,6 +42,14 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
     case PETSC_SOLVERS:
       {
 	AutoPtr<NonlinearSolver<T> > ap(new PetscNonlinearSolver<T>(s));
+	return ap;
+      }
+#endif
+      
+#ifdef HAVE_NOX
+    case TRILINOS_SOLVERS:
+      {
+	AutoPtr<NonlinearSolver<T> > ap(new NoxNonlinearSolver<T>(s));
 	return ap;
       }
 #endif

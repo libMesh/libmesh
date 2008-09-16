@@ -607,6 +607,15 @@ EpetraVector<T>::EpetraVector(Epetra_Vector v)
   ignoreNonLocalEntries_(false)
 {
   (*_vec) = v;
+
+  myFirstID_ = _vec->Map().MinMyGID();
+  myNumIDs_ = _vec->Map().NumMyElements();
+
+  //Currently we impose the restriction that NumVectors==1, so we won't
+  //need the LDA argument when calling ExtractView. Hence the "dummy" arg.
+  int dummy;
+  _vec->ExtractView(&myCoefs_, &dummy);
+
   this->_is_initialized = true;
 }
 
