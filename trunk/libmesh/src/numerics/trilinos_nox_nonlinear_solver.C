@@ -43,6 +43,7 @@
 #include "NOX_Epetra_MatrixFree.H"
 #include "NOX_Epetra_LinearSystem_AztecOO.H"
 #include "NOX_Epetra_Group.H"	// class definition
+#include "NOX_Epetra_Vector.H"
 
 class Problem_Interface : public NOX::Epetra::Interface::Required,
 			  public NOX::Epetra::Interface::Jacobian,
@@ -82,7 +83,7 @@ bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
 {
   NonlinearImplicitSystem &sys = _solver->system();
 
-  EpetraVector<Number> X_global(x), R(r);
+  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x)), R(r);
   EpetraVector<Number>& X_sys = *dynamic_cast<EpetraVector<Number>*>(sys.solution.get());
 
   // Use the systems update() to get a good local version of the parallel solution
@@ -173,6 +174,16 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
 
   //print params	
   Teuchos::ParameterList& printParams = nlParams.sublist("Printing");
+  printParams.set("Output Precision", 3);
+  printParams.set("Output Processor", 0);
+  printParams.set("Output Information",
+                  NOX::Utils::OuterIteration +
+                  NOX::Utils::OuterIterationStatusTest +
+                  NOX::Utils::InnerIteration +
+                  NOX::Utils::LinearSolverDetails +
+                  NOX::Utils::Parameters +
+                  NOX::Utils::Details +
+                  NOX::Utils::Warning);
   
   //create linear system
   Teuchos::RCP<NOX::Epetra::Interface::Required> iReq(_interface);	
@@ -189,7 +200,7 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
   Teuchos::ParameterList& lsParams = newtonParams.sublist("Linear Solver");
   lsParams.set("Aztec Solver", "GMRES"); 
   lsParams.set("Max Iterations", 800); 
-  lsParams.set("Tolerance", 1e-4);
+  lsParams.set("Tolerance", 1e-3);
   lsParams.set("Output Frequency", 100);	 
 //  lsParams.set("Preconditioner", "AztecOO");
   
@@ -205,13 +216,32 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
 					x,
 					linSys)); 
   NOX::Epetra::Group& grp = *(grpPtr.get());
+
+  Teuchos::RCP<NOX::StatusTest::NormF> absresid =
+    Teuchos::rcp(new NOX::StatusTest::NormF(1.0e-12, NOX::StatusTest::NormF::Unscaled));
+  Teuchos::RCP<NOX::StatusTest::MaxIters> maxiters =
+    Teuchos::rcp(new NOX::StatusTest::MaxIters(25));
+  Teuchos::RCP<NOX::StatusTest::FiniteValue> finiteval =
+    Teuchos::rcp(new NOX::StatusTest::FiniteValue());
   Teuchos::RCP<NOX::StatusTest::Combo> combo =
     Teuchos::rcp(new NOX::StatusTest::Combo(NOX::StatusTest::Combo::OR));
+  combo->addStatusTest(absresid);
+  combo->addStatusTest(maxiters);
+  combo->addStatusTest(finiteval);
+
+  
   Teuchos::RCP<NOX::Solver::Generic> solver =
     NOX::Solver::buildSolver(grpPtr, combo, nlParamsPtr);
   NOX::StatusTest::StatusType status = NOX::StatusTest::Unconverged;
-  status = solver->solve(); 
+  status = solver->solve();
+  
+  const NOX::Epetra::Group& finalGroup =
+    dynamic_cast<const NOX::Epetra::Group&>(solver->getSolutionGroup());
+  const NOX::Abstract::Vector& finalSolution = finalGroup.getX();
+//  const Epetra_Vector& finalSolution =
+//    (dynamic_cast<const NOX::Epetra::Vector&>(finalGroup.getX())).getEpetraVector();
 
+  x = finalSolution;
 
   return std::make_pair(1, 0.);
 }
