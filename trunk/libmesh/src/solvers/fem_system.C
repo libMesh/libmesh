@@ -10,6 +10,7 @@
 #include "quadrature.h"
 #include "sparse_matrix.h"
 #include "time_solver.h"
+#include "unsteady_solver.h" // For euler_residual
 
 
 
@@ -1233,6 +1234,161 @@ void FEMSystem::elem_position_set(Real)
 
 
 
+bool FEMSystem::eulerian_residual (bool request_jacobian)
+{
+  // Only calculate a mesh movement residual if it's necessary
+  if (!_mesh_sys)
+    return request_jacobian;
+
+  // This function only supports fully coupled mesh motion for now
+  libmesh_assert(_mesh_sys == this->number());
+
+  unsigned int n_qpoints = element_qrule->n_points();
+
+  const unsigned int n_x_dofs = (_mesh_x_var == libMesh::invalid_uint) ?
+                                0 : dof_indices_var[_mesh_x_var].size();
+  const unsigned int n_y_dofs = (_mesh_y_var == libMesh::invalid_uint) ?
+                                0 : dof_indices_var[_mesh_y_var].size();
+  const unsigned int n_z_dofs = (_mesh_z_var == libMesh::invalid_uint) ?
+                                0 : dof_indices_var[_mesh_z_var].size();
+
+  const unsigned int mesh_xyz_var = n_x_dofs ? _mesh_x_var :
+                                   (n_y_dofs ? _mesh_y_var :
+                                   (n_z_dofs ? _mesh_z_var :
+                                    libMesh::invalid_uint));
+
+  // If we're our own _mesh_sys, we'd better be in charge of
+  // at least one coordinate, and we'd better have the same
+  // FE type for all coordinates we are in charge of
+  libmesh_assert(mesh_xyz_var != libMesh::invalid_uint);
+  libmesh_assert(!n_x_dofs || element_fe_var[_mesh_x_var] ==
+                              element_fe_var[mesh_xyz_var]);
+  libmesh_assert(!n_y_dofs || element_fe_var[_mesh_y_var] ==
+                              element_fe_var[mesh_xyz_var]);
+  libmesh_assert(!n_z_dofs || element_fe_var[_mesh_z_var] ==
+                              element_fe_var[mesh_xyz_var]);
+
+  const std::vector<std::vector<Real> >     &psi =
+    element_fe_var[mesh_xyz_var]->get_phi();
+
+  for (unsigned int var = 0; var != this->n_vars(); ++var)
+    {
+      // Mesh motion only affects time-evolving variables
+      if (!_time_evolving[var])
+        continue;
+
+      // The mesh coordinate variables themselves are Lagrangian,
+      // not Eulerian, and no convective term is desired.
+      if (_mesh_sys == this->number() &&
+          (var == _mesh_x_var ||
+           var == _mesh_y_var ||
+           var == _mesh_z_var))
+        continue;
+
+      // Some of this code currently relies on the assumption that
+      // we can pull mesh coordinate data from our own system
+      if (_mesh_sys != this->number())
+        libmesh_not_implemented();
+
+      // This residual should only be called by unsteady solvers:
+      // if the mesh is steady, there's no mesh convection term!
+      UnsteadySolver *unsteady =
+        dynamic_cast<UnsteadySolver *>(this->time_solver.get());
+      if (!unsteady)
+        return request_jacobian;
+
+      const std::vector<Real> &JxW = 
+        element_fe_var[var]->get_JxW();
+
+      const std::vector<std::vector<Real> >     &phi =
+        element_fe_var[var]->get_phi();
+
+      const std::vector<std::vector<RealGradient> > &dphi =
+        element_fe_var[var]->get_dphi();
+
+      const unsigned int n_u_dofs = dof_indices_var[var].size();
+
+      DenseSubVector<Number> &Fu = *elem_subresiduals[var];
+      DenseSubMatrix<Number> &Kuu = *elem_subjacobians[var][var];
+
+      DenseSubMatrix<Number> *Kux = n_x_dofs ?
+        elem_subjacobians[var][_mesh_x_var] : NULL;
+      DenseSubMatrix<Number> *Kuy = n_y_dofs ?
+        elem_subjacobians[var][_mesh_y_var] : NULL;
+      DenseSubMatrix<Number> *Kuz = n_z_dofs ?
+        elem_subjacobians[var][_mesh_z_var] : NULL;
+
+      std::vector<Real> delta_x(n_x_dofs, 0.);
+      std::vector<Real> delta_y(n_y_dofs, 0.);
+      std::vector<Real> delta_z(n_z_dofs, 0.);
+
+      for (unsigned int i = 0; i != n_x_dofs; ++i)
+        {
+          unsigned int j = dof_indices_var[_mesh_x_var][i];
+          delta_x[i] = libmesh_real(this->current_solution(j)) -
+                       libmesh_real(unsteady->old_nonlinear_solution(j));
+        }
+
+      for (unsigned int i = 0; i != n_y_dofs; ++i)
+        {
+          unsigned int j = dof_indices_var[_mesh_y_var][i];
+          delta_y[i] = libmesh_real(this->current_solution(j)) -
+                       libmesh_real(unsteady->old_nonlinear_solution(j));
+        }
+
+      for (unsigned int i = 0; i != n_z_dofs; ++i)
+        {
+          unsigned int j = dof_indices_var[_mesh_z_var][i];
+          delta_z[i] = libmesh_real(this->current_solution(j)) -
+                       libmesh_real(unsteady->old_nonlinear_solution(j));
+        }
+
+      for (unsigned int qp = 0; qp != n_qpoints; ++qp)
+        {
+          Gradient grad_u = interior_gradient(var, qp);
+          RealGradient convection(0.);
+
+          libmesh_error();
+          for (unsigned int i = 0; i != n_x_dofs; ++i)
+	    convection(0) += delta_x[i] * phi[i][qp];
+          for (unsigned int i = 0; i != n_y_dofs; ++i)
+	    convection(1) += delta_y[i] * phi[i][qp];
+          for (unsigned int i = 0; i != n_z_dofs; ++i)
+	    convection(2) += delta_z[i] * phi[i][qp];
+
+          for (unsigned int i = 0; i != n_u_dofs; ++i)
+            {
+              Number JxWxPhiI = JxW[qp] * phi[i][qp];
+              Fu(i) += (convection * grad_u) * JxWxPhiI;
+              if (request_jacobian)
+                {
+                  Number JxWxPhiI = JxW[qp] * phi[i][qp];
+                  for (unsigned int j = 0; j != n_u_dofs; ++j)
+                    Kuu(i,j) += JxWxPhiI * (convection * dphi[j][qp]);
+
+                  Number JxWxPhiIoverDT = JxWxPhiI/this->deltat;
+
+                  Number JxWxPhiIxDUDXoverDT = JxWxPhiIoverDT * grad_u(0);
+                  for (unsigned int j = 0; j != n_x_dofs; ++j)
+                    (*Kux)(i,j) += JxWxPhiIxDUDXoverDT * psi[j][qp];
+
+                  Number JxWxPhiIxDUDYoverDT = JxWxPhiIoverDT * grad_u(1);
+                  for (unsigned int j = 0; j != n_y_dofs; ++j)
+                    (*Kuy)(i,j) += JxWxPhiIxDUDYoverDT * psi[j][qp];
+
+                  Number JxWxPhiIxDUDZoverDT = JxWxPhiIoverDT * grad_u(2);
+                  for (unsigned int j = 0; j != n_z_dofs; ++j)
+                    (*Kuz)(i,j) += JxWxPhiIxDUDZoverDT * psi[j][qp];
+                }
+            }
+        }
+    }
+
+  return request_jacobian;
+}
+
+      
+
 bool FEMSystem::mass_residual (bool request_jacobian)
 {
   unsigned int n_qpoints = element_qrule->n_points();
@@ -1266,7 +1422,7 @@ bool FEMSystem::mass_residual (bool request_jacobian)
 
                   Number JxWxPhiI = JxW[qp] * phi[i][qp];
                   Kuu(i,i) += JxWxPhiI * phi[i][qp];
-                  for (unsigned int j = i+1; j != n_dofs; ++j)
+                  for (unsigned int j = i+1; j < n_dofs; ++j)
                     {
                       Number Kij = JxWxPhiI * phi[j][qp];
                       Kuu(i,j) += Kij;
