@@ -80,7 +80,7 @@ public:
    * This allows ownership of v to remain with the original creator,
    * and to simply provide additional functionality with the EpetraVector.
    */
-  EpetraVector(Epetra_Vector v);
+  EpetraVector(Epetra_Vector & v);
   
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -594,7 +594,7 @@ EpetraVector<T>::EpetraVector (const unsigned int n,
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector(Epetra_Vector v)
+EpetraVector<T>::EpetraVector(Epetra_Vector & v)
 : _destroy_vec_on_exit(false),
   myFirstID_(0),
   myNumIDs_(0),
@@ -606,7 +606,7 @@ EpetraVector<T>::EpetraVector(Epetra_Vector v)
   nonlocalCoefs_(NULL),
   ignoreNonLocalEntries_(false)
 {
-  (*_vec) = v;
+  _vec = &v;
 
   myFirstID_ = _vec->Map().MinMyGID();
   myNumIDs_ = _vec->Map().NumMyElements();
