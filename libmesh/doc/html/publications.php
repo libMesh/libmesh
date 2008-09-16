@@ -46,6 +46,7 @@ vol. 22, no. 3--4, pp. 237--254, 2006. 	 (<a href="http://cfdlab.ae.utexas.edu/~
 The University of Texas at Austin, August 2008. 
 </li>
 
+<br>
 <li> John W. Peterson, 
 <i>Parallel Adaptive Finite Element Methods for Problems in Natural Convection.</i>
 <a href="http://www.cfdlab.ae.utexas.edu/~peterson/diss.pdf">PhD Dissertation</a>, 
