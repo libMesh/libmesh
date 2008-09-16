@@ -147,6 +147,7 @@ src/base/libmesh.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/geom/remote_elem.h\
+    include/numerics/petsc_macro.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
@@ -6419,7 +6420,9 @@ src/numerics/nonlinear_solver.$(obj-suffix):\
     include/base/reference_counter.h\
     include/enums/enum_solver_package.h\
     include/numerics/nonlinear_solver.h\
+    include/numerics/petsc_macro.h\
     include/numerics/petsc_nonlinear_solver.h\
+    include/numerics/trilinos_nox_nonlinear_solver.h\
     include/parallel/threads.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -6725,6 +6728,52 @@ src/numerics/trilinos_epetra_vector.$(obj-suffix):\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/utility.h
+src/numerics/trilinos_nox_nonlinear_solver.$(obj-suffix):\
+    src/numerics/trilinos_nox_nonlinear_solver.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/elem_range.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/geom/stored_range.h\
+    include/mesh/mesh_base.h\
+    include/numerics/nonlinear_solver.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/trilinos_epetra_vector.h\
+    include/numerics/trilinos_nox_nonlinear_solver.h\
+    include/numerics/type_vector.h\
+    include/parallel/threads.h\
+    include/solvers/explicit_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/nonlinear_implicit_system.h\
+    include/solvers/system.h\
+    include/solvers/system_norm.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/numerics/type_tensor.$(obj-suffix):\
     src/numerics/type_tensor.C\
     include/base/libmesh_base.h\

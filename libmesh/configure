@@ -714,6 +714,8 @@ slepcversion
 enableslepc
 AZTECOO_MAKEFILE_EXPORT
 enabletrilinos
+NOX_MAKEFILE_EXPORT
+enablenox
 TBB_LIBRARY
 TBB_INCLUDE
 LASPACK_INCLUDE
@@ -1378,6 +1380,7 @@ Optional Features:
   --enable-optional       en/disable optional external libraries
   --enable-slepc          build with SLEPc eigen solver support
   --enable-trilinos       build with Trilinos suppport
+  --enable-nox            build with Nox suppport
   --enable-tbb            build with threading support via Threading Building
                           Blocks
   --enable-laspack        build with LASPACK iterative solver suppport
@@ -1406,6 +1409,7 @@ Optional Packages:
   --with-gm=PATH          Prefix where GM is installed (GMHOME)
   --with-f77=F77          Fortran compiler to use
   --with-trilinos=PATH    Specify the path to Trilinos installation
+  --with-nox=PATH         Specify the path to Nox installation
   --with-tbb=PATH         Specify the path where Threading Building Blocks is
                           installed
   --with-tbb-lib=PATH     Specify the path to Threading Building Blocks
@@ -12858,6 +12862,101 @@ fi
 
 
 
+# Check whether --enable-nox was given.
+if test "${enable_nox+set}" = set; then
+  enableval=$enable_nox; enablenox=$enableval
+else
+  enablenox=yes
+fi
+
+if test "$enablenox" != no ; then
+
+  if test "x$TRILINOS_DIR" = "x"; then
+    TRILINOS_DIR=no
+  fi
+
+
+# Check whether --with-nox was given.
+if test "${with_nox+set}" = set; then
+  withval=$with_nox; withnoxdir=$withval
+else
+  withnoxdir=$TRILINOS_DIR
+fi
+
+
+  if test "$withnoxdir" != no ; then
+    as_ac_File=`echo "ac_cv_file_$withnoxdir/include/Makefile.export.nox" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for $withnoxdir/include/Makefile.export.nox" >&5
+echo $ECHO_N "checking for $withnoxdir/include/Makefile.export.nox... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$withnoxdir/include/Makefile.export.nox"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  NOX_MAKEFILE_EXPORT=$withnoxdir/include/Makefile.export.nox
+else
+  as_ac_File=`echo "ac_cv_file_$withnoxdir/packages/nox/Makefile.export.nox" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for $withnoxdir/packages/nox/Makefile.export.nox" >&5
+echo $ECHO_N "checking for $withnoxdir/packages/nox/Makefile.export.nox... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$withnoxdir/packages/nox/Makefile.export.nox"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  NOX_MAKEFILE_EXPORT=$withnoxdir/packages/nox/Makefile.export.nox
+else
+  enablenox=no
+fi
+
+fi
+
+
+    if test "$enablenox" != no ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_NOX 1
+_ACEOF
+
+       { echo "$as_me:$LINENO: result: <<< Configuring library with Nox support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with Nox support >>>" >&6; }
+    fi
+  else
+    enablenox=no
+  fi
+
+
+
+
+
+fi
+
+
+
+
 # Check whether --enable-tbb was given.
 if test "${enable_tbb+set}" = set; then
   enableval=$enable_tbb; enabletbb=$enableval
@@ -15021,6 +15120,8 @@ slepcversion!$slepcversion$ac_delim
 enableslepc!$enableslepc$ac_delim
 AZTECOO_MAKEFILE_EXPORT!$AZTECOO_MAKEFILE_EXPORT$ac_delim
 enabletrilinos!$enabletrilinos$ac_delim
+NOX_MAKEFILE_EXPORT!$NOX_MAKEFILE_EXPORT$ac_delim
+enablenox!$enablenox$ac_delim
 TBB_LIBRARY!$TBB_LIBRARY$ac_delim
 TBB_INCLUDE!$TBB_INCLUDE$ac_delim
 LASPACK_INCLUDE!$LASPACK_INCLUDE$ac_delim
@@ -15075,7 +15176,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 56; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 58; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

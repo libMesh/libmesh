@@ -1,0 +1,126 @@
+// $Id: trilinos_nox_nonlinear_solver.h 2891 2008-06-25 15:25:47Z friedmud $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+#ifndef __trilinos_nox_nonlinear_solver_h__
+#define __trilinos_nox_nonlinear_solver_h__
+
+#ifdef HAVE_NOX
+
+// C++ includes
+
+// Local includes
+#include "nonlinear_solver.h"
+
+//trilinos includes
+#include "Epetra_Vector.h"
+#include "Epetra_Operator.h"
+#include "Epetra_RowMatrix.h"
+#include "NOX_Epetra_Interface_Required.H" // base class
+#include "NOX_Epetra_Interface_Jacobian.H" // base class
+#include "NOX_Epetra_Interface_Preconditioner.H" // base class	
+#include "NOX.H"
+
+// Forward declarations
+class Problem_Interface;
+
+
+/**
+ * This class provides an interface to nox
+ * iterative solvers that is compatible with the \p libMesh
+ * \p NonlinearSolver<>
+ *
+ * @author Chris Newman, 2008
+ */
+
+template <typename T>
+class NoxNonlinearSolver : public NonlinearSolver<T>
+{
+public:
+  /**
+   * The type of system
+   */
+  typedef NonlinearImplicitSystem sys_type;
+
+  /**
+   *  Constructor. Initializes Nox data structures
+   */
+  NoxNonlinearSolver (sys_type& system);
+    
+  /**
+   * Destructor.
+   */
+  ~NoxNonlinearSolver ();
+  
+  /**
+   * Release all memory and clear data structures.
+   */
+  virtual void clear ();
+
+  /**
+   * Initialize data structures if not done so already.
+   */
+  virtual void init ();
+  
+  /**
+   * Call the Nox solver.  It calls the method below, using the
+   * same matrix for the system and preconditioner matrices.
+   */
+  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,    // System Jacobian Matrix
+					       NumericVector<T>&,   // Solution vector
+					       NumericVector<T>&,   // Residual vector
+					       const double,        // Stopping tolerance
+					       const unsigned int); // N. Iterations
+private:
+
+  /**
+   * Nonlinear solver context
+   */
+  NOX::Solver::Generic * _solver;
+  
+  /**
+   * Solver interface
+   */
+  Problem_Interface * _interface;
+  
+};
+
+
+/*----------------------- functions ----------------------------------*/
+template <typename T>
+inline
+NoxNonlinearSolver<T>::NoxNonlinearSolver (sys_type& system) :
+  NonlinearSolver<T>(system)
+{
+}
+
+
+
+template <typename T>
+inline
+NoxNonlinearSolver<T>::~NoxNonlinearSolver ()
+{
+  this->clear ();
+}
+
+
+
+#endif // #ifdef HAVE_NOX
+#endif // #ifdef __trilinos_nox_nonlinear_solver_h__
