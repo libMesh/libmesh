@@ -64,6 +64,10 @@ bool Euler2Solver::element_residual (bool request_jacobian)
   bool jacobian_computed =
     _system.element_time_derivative(request_jacobian);
 
+  // For a moving mesh problem we may need the pseudoconvection term too
+  jacobian_computed =
+    _system.eulerian_residual(jacobian_computed) && jacobian_computed;
+
   // Scale the new time-dependent residual and jacobian correctly
   _system.elem_residual *= (theta * _system.deltat);
   old_elem_residual += _system.elem_residual;
@@ -85,7 +89,9 @@ bool Euler2Solver::element_residual (bool request_jacobian)
   if (_system.use_fixed_solution)
     {
       _system.elem_solution_derivative = 0.0;
-      jacobian_computed = _system.element_time_derivative(jacobian_computed) &&
+      jacobian_computed =_system.element_time_derivative(jacobian_computed) &&
+        jacobian_computed;
+      jacobian_computed = _system.eulerian_residual(jacobian_computed) &&
         jacobian_computed;
       _system.elem_solution_derivative = 1.0;
       _system.elem_residual *= ((1. - theta) * _system.deltat);
@@ -103,6 +109,7 @@ bool Euler2Solver::element_residual (bool request_jacobian)
       // FIXME - we should detect if element_time_derivative() edits
       // elem_jacobian and lies about it!
       _system.element_time_derivative(false);
+      _system.eulerian_residual(false);
       _system.elem_residual *= ((1. - theta) * _system.deltat);
       old_elem_residual += _system.elem_residual;
       _system.elem_residual.zero();

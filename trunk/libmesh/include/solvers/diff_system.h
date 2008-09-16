@@ -213,6 +213,18 @@ public:
   }
 
   /**
+   * Adds a pseudo-convection contribution on \p elem to
+   * elem_residual, if the nodes of \p elem are being translated by a
+   * moving mesh.
+   *
+   * The library provides a basic implementation in
+   * FEMSystem::eulerian_residual()
+   */
+  virtual bool eulerian_residual (bool request_jacobian) {
+    return request_jacobian;
+  }
+
+  /**
    * Adds a mass vector contribution on \p elem to elem_residual.
    * If this method receives request_jacobian = true, then it
    * should compute elem_jacobian and return true if possible.  If

@@ -74,6 +74,10 @@ bool EulerSolver::element_residual (bool request_jacobian)
   bool jacobian_computed =
     _system.element_time_derivative(request_jacobian);
 
+  // For a moving mesh problem we may need the pseudoconvection term too
+  jacobian_computed =
+    _system.eulerian_residual(jacobian_computed) && jacobian_computed;
+
   // Scale the time-dependent residual and jacobian correctly
   _system.elem_residual *= _system.deltat;
   if (jacobian_computed)
