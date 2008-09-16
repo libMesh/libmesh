@@ -60,7 +60,7 @@ ExactSolution::ExactSolution(const EquationSystems& es) :
 	{
 	  // The name of this variable
 	  const std::string& var_name = system.variable_name(var);
-	  sem[var_name] = std::vector<Number>(3, 0.);
+	  sem[var_name] = std::vector<Real>(5, 0.);
 	}
       
       _errors[sys_name] = sem;
@@ -121,8 +121,8 @@ void ExactSolution::attach_exact_hessian (Tensor fptr(const Point& p,
 
 
 
-std::vector<Number>& ExactSolution::_check_inputs(const std::string& sys_name,
-						  const std::string& unknown_name)
+std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
+                                                const std::string& unknown_name)
 {
   // If no exact solution function or fine grid solution has been
   // attached, we now just compute the solution norm (i.e. the
@@ -174,8 +174,8 @@ void ExactSolution::compute_error(const std::string& sys_name,
 {
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
-							unknown_name);
+  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
+                                                      unknown_name);
   this->_compute_error(sys_name,
 		       unknown_name,
 		       error_vals);
@@ -185,14 +185,14 @@ void ExactSolution::compute_error(const std::string& sys_name,
 
 
 
-Number ExactSolution::error_norm(const std::string& sys_name,
-			         const std::string& unknown_name,
-                                 const FEMNormType& norm)
+Real ExactSolution::error_norm(const std::string& sys_name,
+                               const std::string& unknown_name,
+                               const FEMNormType& norm)
 {
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
-							unknown_name);
+  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
+                                                      unknown_name);
   
   switch (norm)
     {
@@ -222,14 +222,14 @@ Number ExactSolution::error_norm(const std::string& sys_name,
 
 
 
-Number ExactSolution::l2_error(const std::string& sys_name,
-			       const std::string& unknown_name)
+Real ExactSolution::l2_error(const std::string& sys_name,
+                             const std::string& unknown_name)
 {
   
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
-							unknown_name);
+  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
+						      unknown_name);
   
   // Return the square root of the first component of the
   // computed error.
@@ -242,14 +242,14 @@ Number ExactSolution::l2_error(const std::string& sys_name,
 
 
 
-Number ExactSolution::l1_error(const std::string& sys_name,
-			       const std::string& unknown_name)
+Real ExactSolution::l1_error(const std::string& sys_name,
+                             const std::string& unknown_name)
 {
   
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
-							unknown_name);
+  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
+                                                      unknown_name);
   
   // Return the square root of the first component of the
   // computed error.
@@ -262,14 +262,14 @@ Number ExactSolution::l1_error(const std::string& sys_name,
 
 
 
-Number ExactSolution::l_inf_error(const std::string& sys_name,
-			       const std::string& unknown_name)
+Real ExactSolution::l_inf_error(const std::string& sys_name,
+                                const std::string& unknown_name)
 {
   
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
-							unknown_name);
+  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
+                                                      unknown_name);
   
   // Return the square root of the first component of the
   // computed error.
@@ -282,8 +282,8 @@ Number ExactSolution::l_inf_error(const std::string& sys_name,
 
 
 
-Number ExactSolution::h1_error(const std::string& sys_name,
-			       const std::string& unknown_name)
+Real ExactSolution::h1_error(const std::string& sys_name,
+                             const std::string& unknown_name)
 {
   // If the user has supplied no exact derivative function, we
   // just integrate the H1 norm of the solution; i.e. its
@@ -300,8 +300,8 @@ Number ExactSolution::h1_error(const std::string& sys_name,
   
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
-							unknown_name);
+  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
+                                                      unknown_name);
   
   // Return the square root of the sum of the computed errors.
   return std::sqrt(error_vals[0] + error_vals[1]);
@@ -313,8 +313,8 @@ Number ExactSolution::h1_error(const std::string& sys_name,
 
 
 
-Number ExactSolution::h2_error(const std::string& sys_name,
-			       const std::string& unknown_name)
+Real ExactSolution::h2_error(const std::string& sys_name,
+                             const std::string& unknown_name)
 {
   // If the user has supplied no exact derivative functions, we
   // just integrate the H1 norm of the solution; i.e. its
@@ -332,7 +332,7 @@ Number ExactSolution::h2_error(const std::string& sys_name,
   
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Number>& error_vals = this->_check_inputs(sys_name,
+  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
 						      unknown_name);
   
   // Return the square root of the sum of the computed errors.
@@ -348,7 +348,7 @@ Number ExactSolution::h2_error(const std::string& sys_name,
 
 void ExactSolution::_compute_error(const std::string& sys_name,
 				   const std::string& unknown_name,
-				   std::vector<Number>& error_vals)
+				   std::vector<Real>& error_vals)
 {
   // This function must be run on all processors at once
   parallel_only();
@@ -391,7 +391,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   const MeshBase& _mesh = computed_system.get_mesh();
 
   // Zero the error before summation
-  error_vals = std::vector<Number>(5, 0.);
+  error_vals = std::vector<Real>(5, 0.);
 
   // get the EquationSystems parameters for use with _exact_value
   const Parameters& parameters = this->_equation_systems.parameters;
@@ -545,7 +545,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
   // Add up the error values on all processors, except for the L-infty
   // norm, for which the maximum is computed.
-  Number l_infty_norm = error_vals[4];
+  Real l_infty_norm = error_vals[4];
   Parallel::max(l_infty_norm);
   Parallel::sum(error_vals);
   error_vals[4] = l_infty_norm;

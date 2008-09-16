@@ -138,16 +138,16 @@ public:
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Number l2_error(const std::string& sys_name,
-		  const std::string& unknown_name);
+  Real l2_error(const std::string& sys_name,
+                const std::string& unknown_name);
   
   /**
    * This function returns the integrated L1 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Number l1_error(const std::string& sys_name,
-		  const std::string& unknown_name);
+  Real l1_error(const std::string& sys_name,
+                const std::string& unknown_name);
   
   /**
    * This function returns the L_INF error for the system sys_name for
@@ -158,24 +158,24 @@ public:
    * to compute it, we take the max of the absolute value of the error
    * over all the quadrature points.
    */
-  Number l_inf_error(const std::string& sys_name,
-		     const std::string& unknown_name);
+  Real l_inf_error(const std::string& sys_name,
+                   const std::string& unknown_name);
   
   /**
    * This function computes and returns the H1 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Number h1_error(const std::string& sys_name,
-		  const std::string& unknown_name);
+  Real h1_error(const std::string& sys_name,
+                const std::string& unknown_name);
   
   /**
    * This function computes and returns the H2 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Number h2_error(const std::string& sys_name,
-		  const std::string& unknown_name);
+  Real h2_error(const std::string& sys_name,
+                const std::string& unknown_name);
   
   /**
    * This function returns the error in the requested norm for the system
@@ -184,9 +184,9 @@ public:
    * Note also that the result is not exact, but an approximation
    * based on the chosen quadrature rule.
    */
-  Number error_norm(const std::string& sys_name,
-	            const std::string& unknown_name,
-	            const FEMNormType& norm);
+  Real error_norm(const std::string& sys_name,
+	          const std::string& unknown_name,
+	          const FEMNormType& norm);
 private:
   
   /**
@@ -197,15 +197,15 @@ private:
    */
   void _compute_error(const std::string& sys_name,
 		      const std::string& unknown_name,
-		      std::vector<Number>& error_vals);
+		      std::vector<Real>& error_vals);
 
   /**
    * This function is responsible for checking the validity of
    * the sys_name and unknown_name inputs, and returning a
    * reference to the proper vector for storing the values.
    */
-  std::vector<Number>& _check_inputs(const std::string& sys_name,
-				     const std::string& unknown_name);
+  std::vector<Real>& _check_inputs(const std::string& sys_name,
+                                   const std::string& unknown_name);
   
   /**
    * Function pointer to user-provided function which
@@ -242,7 +242,7 @@ private:
    * The name of the unknown is
    * the key for the map.
    */
-  typedef std::map<std::string, std::vector<Number> > SystemErrorMap;
+  typedef std::map<std::string, std::vector<Real> > SystemErrorMap;
 
   /**
    * A map of SystemErrorMaps, which contains entries
