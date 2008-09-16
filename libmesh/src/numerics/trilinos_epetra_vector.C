@@ -960,6 +960,8 @@ int EpetraVector<T>::GlobalAssemble(Epetra_CombineMode mode)
     return(0);
   }
 
+
+  
   //First build a map that describes the data in nonlocalIDs_/nonlocalCoefs_.
   //We'll use the arbitrary distribution constructor of Map.
 
