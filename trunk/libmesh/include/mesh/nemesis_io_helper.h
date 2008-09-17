@@ -51,12 +51,17 @@ public:
   /**
    * Constructor.
    */
-  Nemesis_IO_Helper(bool verbose);
+  Nemesis_IO_Helper(bool verbose=false);
 
   /**
    * Destructor.
    */
   ~Nemesis_IO_Helper();
+
+  /**
+   * Set the flag indicationg if we should be verbose.
+   */
+  void verbose (bool set_verbosity);
   
   // Member functions.  These just allocate memory for you and call the Nemesis
   // routines of the same name.  They also handle error checking for the Nemesis

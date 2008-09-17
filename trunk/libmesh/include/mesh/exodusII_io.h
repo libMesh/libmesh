@@ -36,11 +36,9 @@ class System;
 
 /**
  * The \p ExodusII_IO class implements reading meshes in the
- * \p ExodusII file format from Sandia National Labs.  Due to
- * licensing restrictions the external libraries required to
- * read such files cannot be redistributed with \p libMesh.
- * However, if you have these libraries, this class will allow
- * you to use the API to read ExodusII, or \p .exd/.e, files.
+ * \p ExodusII file format from Sandia National Labs.  By
+ * default, LibMesh expects ExodusII files to have a ".exd"
+ * or ".e" file extension.
  *
  * @author Benjamin Kirk, John Peterson, 2004.
  */
@@ -77,10 +75,6 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * This method implements writing a mesh to a specified file.
    */
   virtual void write (const std::string& fname);
-  //{
-  //  std::cerr << "The ExodusII_IO::write() method is not yet implemented." << std::endl;
-  //  libmesh_error();
-  //}
 
 
   /**
@@ -126,7 +120,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   int _timestep;
 
   /**
-   * should be be verbose?
+   * should we be verbose?
    */
   bool _verbose;
 };
