@@ -136,6 +136,13 @@ public:
   { return static_cast<unsigned int>(_dim); }
   
   /**
+   * Resets the logical dimension of the mesh.
+   * Should only be called on an empty mesh.
+   */
+  unsigned int set_mesh_dimension (unsigned int d)
+  { libmesh_assert(!this->n_elem()); _dim = d; }
+  
+  /**
    * Returns the spatial dimension of the mesh.  Note that this is
    * defined at compile time in the header \p libmesh_common.h.
    */
@@ -690,7 +697,7 @@ protected:
   /**
    * The logical dimension of the mesh.
    */     
-  const unsigned int _dim;
+  unsigned int _dim;
 
   /**
    * Flag indicating if the mesh has been prepared for use.

@@ -71,6 +71,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
   
   // Clear the mesh and start from scratch
   mesh.clear();
+
+  if (nz != 0)
+    mesh.set_mesh_dimension(3);
+  else if (ny != 0)
+    mesh.set_mesh_dimension(2);
+  else
+    mesh.set_mesh_dimension(1);
   
   switch (mesh.mesh_dimension())
     {
@@ -81,6 +88,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
     case 1:      
       {
 	libmesh_assert (nx != 0);
+	libmesh_assert (ny == 0);
+	libmesh_assert (nz == 0);
 
         // Reserve elements
         switch (type)
@@ -329,6 +338,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
       {
 	libmesh_assert (nx != 0);
 	libmesh_assert (ny != 0);
+	libmesh_assert (nz == 0);
 
 	// Reserve elements.  The TRI3 and TRI6 meshes
 	// have twice as many elements...
@@ -1253,7 +1263,8 @@ void MeshTools::Generation::build_line (UnstructuredMesh& mesh,
                                         const bool gauss_lobatto_grid)
 {
     // This method only makes sense in 1D!
-    libmesh_assert(mesh.mesh_dimension() == 1);
+    // But we now just turn a non-1D mesh into a 1D mesh
+    //libmesh_assert(mesh.mesh_dimension() == 1);
 
     build_cube(mesh,
                nx, 0, 0,
@@ -1275,7 +1286,8 @@ void MeshTools::Generation::build_square (UnstructuredMesh& mesh,
 					  const bool gauss_lobatto_grid)
 {
   // This method only makes sense in 2D!
-  libmesh_assert (mesh.mesh_dimension() == 2);
+  // But we now just turn a non-2D mesh into a 2D mesh
+  //libmesh_assert (mesh.mesh_dimension() == 2);
 
   // Call the build_cube() member to actually do the work for us.
   build_cube (mesh,
