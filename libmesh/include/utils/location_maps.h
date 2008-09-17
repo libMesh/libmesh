@@ -1,8 +1,8 @@
 
-// $Id: location_maps.h 2501 2007-11-20 02:33:29Z benkirk $
+// $Id$
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
