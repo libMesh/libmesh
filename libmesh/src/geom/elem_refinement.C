@@ -153,13 +153,13 @@ unsigned int Elem::_cast_node_address_to_unsigned_int(const unsigned int n)
   // Node's address.  (We also can't use the x,y,z
   // location of the node since that can change too!)
 
-#if SIZEOF_INT == SIZEOF_VOID_P
+#if LIBMESH_SIZEOF_INT == LIBMESH_SIZEOF_VOID_P
 
   // 32-bit machines
   const unsigned int n_id =
     reinterpret_cast<unsigned int>(this->get_node(n));
 
-#elif SIZEOF_LONG_INT == SIZEOF_VOID_P
+#elif LIBMESH_SIZEOF_LONG_INT == LIBMESH_SIZEOF_VOID_P
 
   // 64-bit machines 
   // Another big prime number less than max_unsigned_int
