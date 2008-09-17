@@ -39,8 +39,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 						  const ElemType type,
 						  const std::vector<TriangleInterface::Hole*>* holes)
 {
-  // Check for existing nodes and compatible dimension.
-  libmesh_assert (mesh.mesh_dimension() == 2);
+  // Check for reasonable size
   libmesh_assert (nx >= 1); // need at least 1 element in x-direction
   libmesh_assert (ny >= 1); // need at least 1 element in y-direction
   libmesh_assert (xmin < xmax);
@@ -48,6 +47,9 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 
   // Clear out any data which may have been in the Mesh
   mesh.clear();
+
+  // Make sure the new Mesh will be 2D
+  mesh.set_mesh_dimension(2);
   
   // The x and y spacing between boundary points
   const Real delta_x = (xmax-xmin) / static_cast<Real>(nx);
