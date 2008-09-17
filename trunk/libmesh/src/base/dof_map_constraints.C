@@ -50,14 +50,14 @@ namespace {
   public:
     ComputeConstraints (DofConstraints &constraints,
 			DofMap &dof_map,
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
 			PeriodicBoundaries &periodic_boundaries,
 #endif
 			const MeshBase &mesh,
 			const unsigned int variable_number) :
       _constraints(constraints),
       _dof_map(dof_map),
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
       _periodic_boundaries(periodic_boundaries),
 #endif
       _mesh(mesh),
@@ -68,13 +68,13 @@ namespace {
     {
       for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
         {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 	  FEInterface::compute_constraints (_constraints,
 					    _dof_map,
 					    _variable_number,
 					    *it);
 #endif
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
           // FIXME: periodic constraints won't work on a non-serial
           // mesh unless it's kept ghost elements from opposing
           // boundaries!
@@ -91,7 +91,7 @@ namespace {
   private:
     DofConstraints &_constraints;
     DofMap &_dof_map;
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
     PeriodicBoundaries &_periodic_boundaries;
 #endif
     const MeshBase &_mesh;
@@ -104,7 +104,7 @@ namespace {
 // ------------------------------------------------------------
 // DofMap member functions
 
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 
 void DofMap::create_dof_constraints(const MeshBase& mesh)
 {
@@ -158,7 +158,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
     Threads::parallel_for (range,
 			   ComputeConstraints (_dof_constraints,
 					       *this,
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
 					       _periodic_boundaries,
 #endif
 					       mesh,
@@ -1115,10 +1115,10 @@ void DofMap::process_recursive_constraints ()
       }
 }
 
-#endif // ENABLE_AMR || ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 void DofMap::constrain_p_dofs (unsigned int var,
                                const Elem *elem,
@@ -1177,10 +1177,10 @@ void DofMap::constrain_p_dofs (unsigned int var,
       }
 }
 
-#endif // ENABLE_AMR
+#endif // LIBMESH_ENABLE_AMR
 
 
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
 
 void DofMap::add_periodic_boundary (const PeriodicBoundary& periodic_boundary)
 {

@@ -22,7 +22,7 @@
 // Local includes
 #include "libmesh_config.h"
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 #include "fe_interface.h"
 #include "inf_fe.h"
@@ -986,5 +986,5 @@ void FEInterface::ifem_compute_data(const unsigned int dim,
   return;
 }
 
-#endif // ifdef ENABLE_INFINITE_ELEMENTS
+#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

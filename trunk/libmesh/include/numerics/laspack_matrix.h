@@ -24,7 +24,7 @@
 
 #include "libmesh_config.h"
 
-#ifdef HAVE_LASPACK 
+#ifdef LIBMESH_HAVE_LASPACK 
 
 // C++ includes
 #include <algorithm>
@@ -577,5 +577,5 @@ unsigned int LaspackMatrix<T>::pos (const unsigned int i,
 }
 
 
-#endif // #ifdef HAVE_LASPACK
+#endif // #ifdef LIBMESH_HAVE_LASPACK
 #endif // #ifdef __laspack_matrix_h__

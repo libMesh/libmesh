@@ -33,7 +33,7 @@
 #include <map>
 #include <sys/time.h>
 
-#ifdef HAVE_LOCALE
+#ifdef LIBMESH_HAVE_LOCALE
 #include <locale>
 #endif
 
@@ -366,7 +366,7 @@ void PerfLog::pop (const std::string &label,
 }
 
 // Typedefs we might need
-#ifdef HAVE_LOCALE
+#ifdef LIBMESH_HAVE_LOCALE
 typedef std::ostreambuf_iterator<char, std::char_traits<char> > TimeIter;
 typedef std::time_put<char, TimeIter> TimePut;
 #endif

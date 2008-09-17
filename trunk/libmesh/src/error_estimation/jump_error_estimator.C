@@ -194,7 +194,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 	  const Elem* e = *elem_it;
 	  const unsigned int e_id = e->id();
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
           // See if the parent of element e has been examined yet;
           // if not, we may want to compute the estimator on it
           const Elem* parent = e->parent();
@@ -276,7 +276,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
                     } 
 		}
 	    }
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
           // If we do any more flux integration, e will be the fine element
           fine_elem = e;

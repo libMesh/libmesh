@@ -96,7 +96,7 @@ std::string PerfLog::get_info_header() const
   if (log_events)
     {
 
-#ifdef HAVE_LOCALE
+#ifdef LIBMESH_HAVE_LOCALE
       OStringStream  dateStr;
       time_t tm         = time(NULL);
       struct tm* tmb    = localtime(&tm);
@@ -151,7 +151,7 @@ std::string PerfLog::get_info_header() const
 	  nprocs_stream  << "| Num Processors: " << libMesh::n_processors();
 	}
       
-#ifdef HAVE_LOCALE						       
+#ifdef LIBMESH_HAVE_LOCALE						       
       time_stream    << "| Time:           " << dateStr.str()          ; 
 #endif								       
       

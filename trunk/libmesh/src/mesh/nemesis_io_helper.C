@@ -20,7 +20,7 @@
 
 #include "nemesis_io_helper.h"
 
-#if defined(HAVE_NEMESIS_API) && defined(HAVE_EXODUS_API)
+#if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
 
 // Initialize the various integer members to zero.  We can check
@@ -416,4 +416,4 @@ void Nemesis_IO_Helper::get_elem_cmap()
     }
 }
 
-#endif // #if defined(HAVE_NEMESIS_API) && defined(HAVE_EXODUS_API)
+#endif // #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)

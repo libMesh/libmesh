@@ -85,7 +85,7 @@ std::string ElementTypes::basic_name (const ElemType t)
 
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
     // infinite elements
     case INFEDGE2:
@@ -232,7 +232,7 @@ std::string ElementTypes::name(const ElemType t)
 
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
     case INFEDGE2:
       {

@@ -142,14 +142,14 @@ class RemoteElem : public Elem
   virtual Order default_order () const
   { libmesh_error(); return FIRST; }
   
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   virtual bool infinite () const
   { libmesh_error(); return false; }
 
 #endif
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   
   /**
    * Matrix that transforms the parents nodes into the children's

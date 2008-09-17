@@ -40,16 +40,16 @@ TypeVector<T> TypeVector<T>::unit() const
   
   libmesh_assert (length != static_cast<Real>(0.));
   
-#if DIM == 1
+#if LIBMESH_DIM == 1
   return TypeVector<T>(_coords[0]/length);
 #endif
   
-#if DIM == 2 
+#if LIBMESH_DIM == 2 
   return TypeVector<T>(_coords[0]/length,
 		       _coords[1]/length);
 #endif
   
-#if DIM == 3
+#if LIBMESH_DIM == 3
   return TypeVector<T>(_coords[0]/length,
 		       _coords[1]/length, 
 		       _coords[2]/length);
@@ -62,12 +62,12 @@ TypeVector<T> TypeVector<T>::unit() const
 template <typename T>
 void TypeVector<T>::print(std::ostream& os) const
 {
-#if DIM == 1
+#if LIBMESH_DIM == 1
   
   os << "x=" << (*this)(0) << '\n';
   
 #endif
-#if DIM == 2
+#if LIBMESH_DIM == 2
   
   os << "(x,y)=("
      << std::setw(8) << (*this)(0) << ", "
@@ -75,7 +75,7 @@ void TypeVector<T>::print(std::ostream& os) const
      << '\n';
 
 #endif
-#if DIM == 3
+#if LIBMESH_DIM == 3
   
   os <<  "(x,y,z)=("
      << std::setw(8) << (*this)(0) << ", "
@@ -109,7 +109,7 @@ void TypeVector<T>::write_unformatted (std::ostream &out,
 template <typename T>
 bool TypeVector<T>::operator < (const TypeVector<T>& rhs) const
 {
-  for (unsigned int i=0; i<DIM; i++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
     {
       if ((*this)(i) < rhs(i))
         return true;
@@ -124,7 +124,7 @@ bool TypeVector<T>::operator < (const TypeVector<T>& rhs) const
 template <typename T>
 bool TypeVector<T>::operator > (const TypeVector<T>& rhs) const
 {
-  for (unsigned int i=0; i<DIM; i++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
     {
       if ((*this)(i) > rhs(i))
         return true;
@@ -136,11 +136,11 @@ bool TypeVector<T>::operator > (const TypeVector<T>& rhs) const
 
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template <>
 bool TypeVector<Complex>::operator < (const TypeVector<Complex>& rhs) const
 {
-  for (unsigned int i=0; i<DIM; i++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
     {
       if ((*this)(i).real() < rhs(i).real())
         return true;
@@ -159,7 +159,7 @@ bool TypeVector<Complex>::operator < (const TypeVector<Complex>& rhs) const
 template <>
 bool TypeVector<Complex>::operator > (const TypeVector<Complex>& rhs) const
 {
-  for (unsigned int i=0; i<DIM; i++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
     {
       if ((*this)(i).real() > rhs(i).real())
         return true;
@@ -180,6 +180,6 @@ bool TypeVector<Complex>::operator > (const TypeVector<Complex>& rhs) const
 // Explicit instantiations
 template class TypeVector<Real>;
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class TypeVector<Complex>;
 #endif

@@ -30,7 +30,7 @@
 #include "elem.h"
 #include "mesh_communication.h"
 
-#ifdef HAVE_METIS
+#ifdef LIBMESH_HAVE_METIS
 // MIPSPro 7.4.2 gets confused about these nested namespaces
 # ifdef __sgi
 #  include <cstdarg>
@@ -62,7 +62,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
     }
   
 // What to do if the Metis library IS NOT present
-#ifndef HAVE_METIS
+#ifndef LIBMESH_HAVE_METIS
 
   here();
   std::cerr << "ERROR: The library has been built without"    << std::endl
@@ -179,7 +179,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 		    graph_size++;
 		  }
   
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 		
 		// Otherwise we need to find all of the
 		// neighbor's children that are connected to
@@ -221,7 +221,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 		      }
 		  }
 
-#endif /* ifdef ENABLE_AMR */
+#endif /* ifdef LIBMESH_ENABLE_AMR */
 
 	      }
 	  }

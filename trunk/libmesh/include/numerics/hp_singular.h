@@ -33,7 +33,7 @@
 #include "quadrature.h" //  delete AutoPtrs<> upon destruction
 #include "libmesh_common.h"
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 // Forward Declarations
 class Point;
@@ -82,7 +82,7 @@ public:
   std::list<Point> singular_points;
 };
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 #endif
 

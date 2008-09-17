@@ -26,7 +26,7 @@
 void QClough::init_3D(const ElemType _type,
                       unsigned int)
 {
-#if DIM == 3
+#if LIBMESH_DIM == 3
   
   //-----------------------------------------------------------------------
   // 3D quadrature rules

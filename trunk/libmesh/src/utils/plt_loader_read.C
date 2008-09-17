@@ -97,8 +97,8 @@ void PltLoader::read_header (std::istream& in)
       // Read the value of 1 to determine byte ordering
       {
 	int one = 0;	
-	in.read (buf, SIZEOF_INT);
-	std::memcpy  (&one, buf, SIZEOF_INT);
+	in.read (buf, LIBMESH_SIZEOF_INT);
+	std::memcpy  (&one, buf, LIBMESH_SIZEOF_INT);
 	
 	if (one != 1)
 	  {
@@ -125,8 +125,8 @@ void PltLoader::read_header (std::istream& in)
 	
 	do
 	  {
-	    in.read (buf, SIZEOF_INT);
-	    std::memcpy  (&i, buf, SIZEOF_INT);
+	    in.read (buf, LIBMESH_SIZEOF_INT);
+	    std::memcpy  (&i, buf, LIBMESH_SIZEOF_INT);
 	    rb(i);
 
 	    // Don't add trailing \0
@@ -139,8 +139,8 @@ void PltLoader::read_header (std::istream& in)
       // Read the number of variables in the data set
       {
 	int nv;
-	in.read (buf, SIZEOF_INT);
-	std::memcpy  (&nv, buf, SIZEOF_INT);
+	in.read (buf, LIBMESH_SIZEOF_INT);
+	std::memcpy  (&nv, buf, LIBMESH_SIZEOF_INT);
 	rb(nv);
 	
 	this->set_n_vars (nv);
@@ -156,8 +156,8 @@ void PltLoader::read_header (std::istream& in)
       
 	  do
 	    {
-	      in.read (buf, SIZEOF_INT);
-	      std::memcpy  (&i, buf, SIZEOF_INT);
+	      in.read (buf, LIBMESH_SIZEOF_INT);
+	      std::memcpy  (&i, buf, LIBMESH_SIZEOF_INT);
 	      rb(i);
 	      
 	      // Don't add trailing \0
@@ -185,8 +185,8 @@ void PltLoader::read_header (std::istream& in)
 	    do
 	      {
 		f = 0.;
-		in.read (buf, SIZEOF_FLOAT);
-		std::memcpy  (&f, buf, SIZEOF_FLOAT);
+		in.read (buf, LIBMESH_SIZEOF_FLOAT);
+		std::memcpy  (&f, buf, LIBMESH_SIZEOF_FLOAT);
 		rb(f);
 	      }
 	    while ((f != 299.) &&
@@ -215,8 +215,8 @@ void PltLoader::read_header (std::istream& in)
 	    
 		  do
 		    {
-		      in.read (buf, SIZEOF_INT);
-		      std::memcpy  (&i, buf, SIZEOF_INT);
+		      in.read (buf, LIBMESH_SIZEOF_INT);
+		      std::memcpy  (&i, buf, LIBMESH_SIZEOF_INT);
 		      rb(i);
 		      
 		      // Don't add trailing \0
@@ -231,8 +231,8 @@ void PltLoader::read_header (std::istream& in)
 		// Read the zone format
 		{
 		  int zt;
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy  (&zt, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy  (&zt, buf, LIBMESH_SIZEOF_INT);
 		  rb(zt);
 		  
 		  ztype.push_back(zt);
@@ -243,8 +243,8 @@ void PltLoader::read_header (std::istream& in)
 		{
 		  int zc=0;
 	    
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy  (&zc, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy  (&zc, buf, LIBMESH_SIZEOF_INT);
 		  rb(zc);
 		  
 		  //std::cout << "zone color=" << zc << std::endl;
@@ -257,16 +257,16 @@ void PltLoader::read_header (std::istream& in)
 		    jmax=0,
 		    kmax=0;
 	    
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy  (&imax, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy  (&imax, buf, LIBMESH_SIZEOF_INT);
 		  rb(imax);
 		  
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy  (&jmax, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy  (&jmax, buf, LIBMESH_SIZEOF_INT);
 		  rb(jmax);
 		  
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy  (&kmax, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy  (&kmax, buf, LIBMESH_SIZEOF_INT);
 		  rb(kmax);
 		  
 		  zimax.push_back (imax);
@@ -304,8 +304,8 @@ void PltLoader::read_header (std::istream& in)
       {
 	int one = 0;
 	
-	in.read (buf, SIZEOF_INT);
-	std::memcpy  (&one, buf, SIZEOF_INT);
+	in.read (buf, LIBMESH_SIZEOF_INT);
+	std::memcpy  (&one, buf, LIBMESH_SIZEOF_INT);
 	
 	if (one != 1)
 	  {
@@ -331,8 +331,8 @@ void PltLoader::read_header (std::istream& in)
 	this->title().erase();
 	do
 	  {
-	    in.read (buf, SIZEOF_INT);
-	    std::memcpy  (&i, buf, SIZEOF_INT);
+	    in.read (buf, LIBMESH_SIZEOF_INT);
+	    std::memcpy  (&i, buf, LIBMESH_SIZEOF_INT);
 	    rb(i);
 	    
 	    // Don't add trailing \0
@@ -345,8 +345,8 @@ void PltLoader::read_header (std::istream& in)
       // Read the number of variables in the data set
       {
 	int nv;
-	in.read (buf, SIZEOF_INT);
-	std::memcpy  (&nv, buf, SIZEOF_INT);
+	in.read (buf, LIBMESH_SIZEOF_INT);
+	std::memcpy  (&nv, buf, LIBMESH_SIZEOF_INT);
 	rb(nv);
 	
 	this->set_n_vars (nv);
@@ -362,8 +362,8 @@ void PltLoader::read_header (std::istream& in)
       
 	  do
 	    {
-	      in.read (buf, SIZEOF_INT);
-	      std::memcpy  (&i, buf, SIZEOF_INT);
+	      in.read (buf, LIBMESH_SIZEOF_INT);
+	      std::memcpy  (&i, buf, LIBMESH_SIZEOF_INT);
 	      rb(i);
 	      
 	      // Don't add trailing \0
@@ -391,8 +391,8 @@ void PltLoader::read_header (std::istream& in)
 	    do
 	      {
 		f = 0.;
-		in.read (buf, SIZEOF_FLOAT);
-		std::memcpy  (&f, buf, SIZEOF_FLOAT);
+		in.read (buf, LIBMESH_SIZEOF_FLOAT);
+		std::memcpy  (&f, buf, LIBMESH_SIZEOF_FLOAT);
 		rb(f);
 	      }
 	    while ((f != 299.) &&
@@ -421,8 +421,8 @@ void PltLoader::read_header (std::istream& in)
 	    
 		  do
 		    {
-		      in.read (buf, SIZEOF_INT);
-		      std::memcpy  (&i, buf, SIZEOF_INT);
+		      in.read (buf, LIBMESH_SIZEOF_INT);
+		      std::memcpy  (&i, buf, LIBMESH_SIZEOF_INT);
 		      rb(i);
 		  
 		      // Don't add trailing \0
@@ -437,16 +437,16 @@ void PltLoader::read_header (std::istream& in)
 		// Read the zone color
 		{
 		  int zc=0;	    
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy  (&zc, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy  (&zc, buf, LIBMESH_SIZEOF_INT);
 		  rb(zc);
 		}
 	      
 		// Read the zone format
 		{
 		  int zt;
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy  (&zt, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy  (&zt, buf, LIBMESH_SIZEOF_INT);
 		  rb(zt);
 		  
 		  ztype.push_back(zt);
@@ -455,8 +455,8 @@ void PltLoader::read_header (std::istream& in)
 		// Read the data packing flag
 		{
 		  int dp=0;
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy (&dp, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy (&dp, buf, LIBMESH_SIZEOF_INT);
 		  rb(dp);
 
 		  zpack.push_back (dp);
@@ -466,15 +466,15 @@ void PltLoader::read_header (std::istream& in)
 		{
 		  int svl=0;
 		  int  vl=0;
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy  (&svl, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy  (&svl, buf, LIBMESH_SIZEOF_INT);
 		  rb(svl);
 		  
 		  if (svl)
 		    for (unsigned int v=0; v<this->n_vars(); v++)
 		      {
-			in.read (buf, SIZEOF_INT);
-			std::memcpy  (&vl, buf, SIZEOF_INT);
+			in.read (buf, LIBMESH_SIZEOF_INT);
+			std::memcpy  (&vl, buf, LIBMESH_SIZEOF_INT);
 			rb(vl);
 			libmesh_assert (vl == 0); // Only know about node-based data
 			                  // right now
@@ -485,8 +485,8 @@ void PltLoader::read_header (std::istream& in)
 		// Get the number of user-defined face-neighbors
 		{
 		  int fn=0;
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy  (&fn, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy  (&fn, buf, LIBMESH_SIZEOF_INT);
 		  rb(fn);
 		}
 	  
@@ -496,12 +496,12 @@ void PltLoader::read_header (std::istream& in)
 		    {
 		      int np=0, ne=0;
 
-		      in.read (buf, SIZEOF_INT);
-		      std::memcpy  (&np, buf, SIZEOF_INT);
+		      in.read (buf, LIBMESH_SIZEOF_INT);
+		      std::memcpy  (&np, buf, LIBMESH_SIZEOF_INT);
 		      rb(np);
 
-		      in.read (buf, SIZEOF_INT);
-		      std::memcpy  (&ne, buf, SIZEOF_INT);
+		      in.read (buf, LIBMESH_SIZEOF_INT);
+		      std::memcpy  (&ne, buf, LIBMESH_SIZEOF_INT);
 		      rb(ne);
 
 		      zimax.push_back (np);
@@ -514,16 +514,16 @@ void PltLoader::read_header (std::istream& in)
 		    jmax=0,
 		    kmax=0;
 		  
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy  (&imax, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy  (&imax, buf, LIBMESH_SIZEOF_INT);
 		  rb(imax);
 		  
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy  (&jmax, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy  (&jmax, buf, LIBMESH_SIZEOF_INT);
 		  rb(jmax);
 		  
-		  in.read (buf, SIZEOF_INT);
-		  std::memcpy  (&kmax, buf, SIZEOF_INT);
+		  in.read (buf, LIBMESH_SIZEOF_INT);
+		  std::memcpy  (&kmax, buf, LIBMESH_SIZEOF_INT);
 		  rb(kmax);
 
 		  // These are only useful for orderd data.  Otherwise
@@ -652,8 +652,8 @@ void PltLoader::read_data (std::istream& in)
 	  do
 	    {
 	      f = 0.;
-	      in.read (buf, SIZEOF_FLOAT);
-	      std::memcpy  (&f, buf, SIZEOF_FLOAT);
+	      in.read (buf, LIBMESH_SIZEOF_FLOAT);
+	      std::memcpy  (&f, buf, LIBMESH_SIZEOF_FLOAT);
 	      rb(f);
 	    }
 	  while ((f != 299.) && in.good());
@@ -671,8 +671,8 @@ void PltLoader::read_data (std::istream& in)
 	  std::vector<int> rep_vars;
 	
 	  {	
-	    in.read (buf, SIZEOF_INT);
-	    std::memcpy  (&n_rep_vars, buf, SIZEOF_INT);
+	    in.read (buf, LIBMESH_SIZEOF_INT);
+	    std::memcpy  (&n_rep_vars, buf, LIBMESH_SIZEOF_INT);
 	    rb(n_rep_vars);
 
 	    rep_vars.resize (n_rep_vars);
@@ -684,8 +684,8 @@ void PltLoader::read_data (std::istream& in)
 			  << std::endl;
 		libmesh_error();
 	    
-		in.read (buf, SIZEOF_INT);
-		std::memcpy  (&rep_vars[v], buf, SIZEOF_INT);
+		in.read (buf, LIBMESH_SIZEOF_INT);
+		std::memcpy  (&rep_vars[v], buf, LIBMESH_SIZEOF_INT);
 		rb(rep_vars[v]);
 	      }	
 	  }
@@ -694,8 +694,8 @@ void PltLoader::read_data (std::istream& in)
 	  //std::cout << "var_types=";
 	  for (unsigned int v=0; v<this->n_vars(); v++)
 	    {
-	      in.read (buf, SIZEOF_INT);
-	      std::memcpy  (&this->var_type(v), buf, SIZEOF_INT);
+	      in.read (buf, LIBMESH_SIZEOF_INT);
+	      std::memcpy  (&this->var_type(v), buf, LIBMESH_SIZEOF_INT);
 	      rb(this->var_type(v));
 
 	      //std::cout << this->var_type(v) << " ";
@@ -764,8 +764,8 @@ void PltLoader::read_data (std::istream& in)
 	  do
 	    {
 	      f = 0.;
-	      in.read (buf, SIZEOF_FLOAT);
-	      std::memcpy  (&f, buf, SIZEOF_FLOAT);
+	      in.read (buf, LIBMESH_SIZEOF_FLOAT);
+	      std::memcpy  (&f, buf, LIBMESH_SIZEOF_FLOAT);
 	      rb(f);
 	    }
 	  while ((f != 299.) && in.good());
@@ -781,8 +781,8 @@ void PltLoader::read_data (std::istream& in)
 	  // Get the variable data type
 	  for (unsigned int v=0; v<this->n_vars(); v++)
 	    {
-	      in.read (buf, SIZEOF_INT);
-	      std::memcpy  (&this->var_type(v), buf, SIZEOF_INT);
+	      in.read (buf, LIBMESH_SIZEOF_INT);
+	      std::memcpy  (&this->var_type(v), buf, LIBMESH_SIZEOF_INT);
 	      rb(this->var_type(v));
 
 	      //std::cout << this->var_type(v) << " ";
@@ -793,16 +793,16 @@ void PltLoader::read_data (std::istream& in)
 	    int vs=0;
 	    int sv=0;
 
-	    in.read (buf, SIZEOF_INT);
-	    std::memcpy  (&vs, buf, SIZEOF_INT);
+	    in.read (buf, LIBMESH_SIZEOF_INT);
+	    std::memcpy  (&vs, buf, LIBMESH_SIZEOF_INT);
 	    rb(vs);
 
 	    if (vs)
 	      {
 		for (unsigned int v=0; v<this->n_vars(); v++)
 		  {
-		    in.read (buf, SIZEOF_INT);
-		    std::memcpy  (&sv, buf, SIZEOF_INT);
+		    in.read (buf, LIBMESH_SIZEOF_INT);
+		    std::memcpy  (&sv, buf, LIBMESH_SIZEOF_INT);
 		    rb(sv);
 		    
 		    if (sv != -1)
@@ -818,8 +818,8 @@ void PltLoader::read_data (std::istream& in)
 	  // Get zone to share connectivity with
 	  {
 	    int sc=0;
-	    in.read (buf, SIZEOF_INT);
-	    std::memcpy  (&sc, buf, SIZEOF_INT);
+	    in.read (buf, LIBMESH_SIZEOF_INT);
+	    std::memcpy  (&sc, buf, LIBMESH_SIZEOF_INT);
 	    rb(sc);
 	    
 	    libmesh_assert (sc == -1);
@@ -898,7 +898,7 @@ void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
 			 this->jmax(zone)*
 			 this->kmax(zone));
 	    
-	    in.read ((char*) &data[0], SIZEOF_FLOAT*data.size());
+	    in.read ((char*) &data[0], LIBMESH_SIZEOF_FLOAT*data.size());
 
 	    for (unsigned int i=0; i<data.size(); i++)
 	      rb(data[i]);
@@ -921,7 +921,7 @@ void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
 			  this->jmax(zone)*
 			  this->kmax(zone));
 	    
-	    in.read ((char*) &ddata[0], SIZEOF_DOUBLE*ddata.size());
+	    in.read ((char*) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
 
 	    for (unsigned int i=0; i<data.size(); i++)
 	      data[i] = rb(ddata[i]);
@@ -971,8 +971,8 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
 	      
 	      libmesh_assert (in.good());
 	      
-	      in.read (buf, SIZEOF_FLOAT);
-	      std::memcpy  (&f, buf, SIZEOF_FLOAT);
+	      in.read (buf, LIBMESH_SIZEOF_FLOAT);
+	      std::memcpy  (&f, buf, LIBMESH_SIZEOF_FLOAT);
 	      rb(f);
 		    
 	      _data[zone][var].push_back(f);			
@@ -983,8 +983,8 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
 	      
 	      libmesh_assert (in.good());
 	      
-	      in.read (buf, SIZEOF_DOUBLE);
-	      std::memcpy  (&d, buf, SIZEOF_DOUBLE);
+	      in.read (buf, LIBMESH_SIZEOF_DOUBLE);
+	      std::memcpy  (&d, buf, LIBMESH_SIZEOF_DOUBLE);
 	      rb(d);
 	      
 	      _data[zone][var].push_back(d);			
@@ -1021,7 +1021,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
 	    data.clear();
 	    data.resize (this->imax(zone));
 	    
-	    in.read ((char*) &data[0], SIZEOF_FLOAT*data.size());
+	    in.read ((char*) &data[0], LIBMESH_SIZEOF_FLOAT*data.size());
 
 	    for (unsigned int i=0; i<data.size(); i++)
 	      rb(data[i]);
@@ -1039,7 +1039,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
 	    data.resize (this->imax(zone));
 	    ddata.resize (this->imax(zone));
 	    
-	    in.read ((char*) &ddata[0], SIZEOF_DOUBLE*ddata.size());
+	    in.read ((char*) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
 
 	    for (unsigned int i=0; i<data.size(); i++)
 	      data[i] = rb(ddata[i]);
@@ -1061,7 +1061,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
   {
     // Get the connectivity repetition flag
     int rep=0;
-    in.read ((char*) &rep, SIZEOF_INT);
+    in.read ((char*) &rep, LIBMESH_SIZEOF_INT);
     rb(rep);
 
     if (rep == 1 && this->n_zones() > 1)
@@ -1079,7 +1079,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
 	
 	_conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
 	
-	in.read ((char*) &_conn[zone][0], SIZEOF_INT*_conn[zone].size());
+	in.read ((char*) &_conn[zone][0], LIBMESH_SIZEOF_INT*_conn[zone].size());
 
 	for (unsigned int i=0; i<_conn[zone].size(); i++)
 	  rb(_conn[zone][i]);
@@ -1114,8 +1114,8 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
 	  
 	  libmesh_assert (in.good());
 	  
-	  in.read (buf, SIZEOF_FLOAT);
-	  std::memcpy  (&f, buf, SIZEOF_FLOAT);
+	  in.read (buf, LIBMESH_SIZEOF_FLOAT);
+	  std::memcpy  (&f, buf, LIBMESH_SIZEOF_FLOAT);
 	  rb(f);
 	  
 	  _data[zone][var].push_back(f);			
@@ -1126,8 +1126,8 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
 	  
 	  libmesh_assert (in.good());
 	  
-	  in.read (buf, SIZEOF_DOUBLE);
-	  std::memcpy  (&d, buf, SIZEOF_DOUBLE);
+	  in.read (buf, LIBMESH_SIZEOF_DOUBLE);
+	  std::memcpy  (&d, buf, LIBMESH_SIZEOF_DOUBLE);
 	  rb(d);
 	  
 	  _data[zone][var].push_back(d);			
@@ -1145,7 +1145,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
     // Get the connectivity repetition flag
     int rep=0;
 
-    in.read ((char*) &rep, SIZEOF_INT);
+    in.read ((char*) &rep, LIBMESH_SIZEOF_INT);
     rb(rep);
 
     if (rep == 1)
@@ -1163,7 +1163,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
 	
 	_conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
 	
-	in.read ((char*) &_conn[zone][0], SIZEOF_INT*_conn[zone].size());
+	in.read ((char*) &_conn[zone][0], LIBMESH_SIZEOF_INT*_conn[zone].size());
 
 	for (unsigned int i=0; i<_conn[zone].size(); i++)
 	  rb(_conn[zone][i]);

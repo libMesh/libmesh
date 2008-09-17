@@ -95,7 +95,7 @@ protected:
   void increment_destructor_count (const std::string& name);
 
 
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
   
   /**
    * Data structure to log the information.  The log is
@@ -144,7 +144,7 @@ inline ReferenceCounter::~ReferenceCounter()
 
 
 
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 inline
 void ReferenceCounter::increment_constructor_count (const std::string& name)
 {
@@ -162,7 +162,7 @@ void ReferenceCounter::increment_constructor_count (const std::string&)
 
 
 
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 inline
 void ReferenceCounter::increment_destructor_count (const std::string& name)
 {

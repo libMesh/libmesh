@@ -29,7 +29,7 @@
 #include "diff_system.h"
 #include "elem.h"
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 #include "tensor_value.h"
 #endif
 
@@ -223,7 +223,7 @@ public:
    */
   Gradient side_gradient(unsigned int var, unsigned int qp);
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the solution variable \p var at the quadrature
    * point \p qp on the current element interior
@@ -236,7 +236,7 @@ public:
    */
   Tensor side_hessian(unsigned int var, unsigned int qp);
 
-#endif // ENABLE_SECOND_DERIVATIVES
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
    * Returns the value of the fixed_solution variable \p var at the quadrature
@@ -268,7 +268,7 @@ public:
    */
   Gradient fixed_side_gradient(unsigned int var, unsigned int qp);
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element interior
@@ -281,7 +281,7 @@ public:
    */
   Tensor fixed_side_hessian(unsigned int var, unsigned int qp);
 
-#endif // ENABLE_SECOND_DERIVATIVES
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
    * @returns \p "General".  Helps in identifying

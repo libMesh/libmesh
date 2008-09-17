@@ -35,7 +35,7 @@
 #include "fe.h"         // MipsPro requires fe.h and quadrature.h in order to
 #include "quadrature.h" //  delete AutoPtrs<> upon destruction
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 // Forward Declarations
 class Elem;
@@ -152,7 +152,7 @@ protected:
   DenseVector<Number> Up;
 };
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 #endif
 

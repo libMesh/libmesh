@@ -37,12 +37,12 @@
 template <typename T>
 void TypeTensor<T>::print(std::ostream& os) const
 {
-#if DIM == 1
+#if LIBMESH_DIM == 1
   
   os << "x=" << (*this)(0) << std::endl;
   
 #endif
-#if DIM == 2
+#if LIBMESH_DIM == 2
   
   os << "(xx,xy)=("
      << std::setw(8) << (*this)(0,0) << ", "
@@ -54,7 +54,7 @@ void TypeTensor<T>::print(std::ostream& os) const
      << std::endl;
 
 #endif
-#if DIM == 3
+#if LIBMESH_DIM == 3
   
   os <<  "(xx,xy,xz)=("
      << std::setw(8) << (*this)(0,0) << ", "
@@ -111,8 +111,8 @@ void TypeTensor<T>::write_unformatted (std::ostream &out,
 template <>
 bool TypeTensor<Real>::operator < (const TypeTensor<Real>& rhs) const
 {
-  for (unsigned int i=0; i<DIM; i++)
-    for (unsigned int j=0; j<DIM; j++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    for (unsigned int j=0; j<LIBMESH_DIM; j++)
       {
         if ((*this)(i,j) < rhs(i,j))
           return true;
@@ -127,8 +127,8 @@ bool TypeTensor<Real>::operator < (const TypeTensor<Real>& rhs) const
 template <>
 bool TypeTensor<Real>::operator > (const TypeTensor<Real>& rhs) const
 {
-  for (unsigned int i=0; i<DIM; i++)
-    for (unsigned int j=0; j<DIM; j++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    for (unsigned int j=0; j<LIBMESH_DIM; j++)
       {
         if ((*this)(i,j) > rhs(i,j))
           return true;
@@ -140,12 +140,12 @@ bool TypeTensor<Real>::operator > (const TypeTensor<Real>& rhs) const
 
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template <>
 bool TypeTensor<Complex>::operator < (const TypeTensor<Complex>& rhs) const
 {
-  for (unsigned int i=0; i<DIM; i++)
-    for (unsigned int j=0; j<DIM; j++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    for (unsigned int j=0; j<LIBMESH_DIM; j++)
       {
         if ((*this)(i,j).real() < rhs(i,j).real())
           return true;
@@ -164,8 +164,8 @@ bool TypeTensor<Complex>::operator < (const TypeTensor<Complex>& rhs) const
 template <>
 bool TypeTensor<Complex>::operator > (const TypeTensor<Complex>& rhs) const
 {
-  for (unsigned int i=0; i<DIM; i++)
-    for (unsigned int j=0; j<DIM; j++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    for (unsigned int j=0; j<LIBMESH_DIM; j++)
       {
         if ((*this)(i,j).real() > rhs(i,j).real())
           return true;
@@ -189,6 +189,6 @@ bool TypeTensor<Complex>::operator > (const TypeTensor<Complex>& rhs) const
 // Explicit instantiations
 template class TypeTensor<Real>;
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class TypeTensor<Complex>;
 #endif

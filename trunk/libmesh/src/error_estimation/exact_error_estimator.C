@@ -183,7 +183,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
       fe->get_JxW();
       fe->get_phi();
       fe->get_dphi();
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       fe->get_d2phi();
 #endif
       fe->get_xyz();
@@ -201,7 +201,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 	  const Elem* elem = *elem_it;
 	  const unsigned int e_id = elem->id();
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
           // See if the parent of element e has been examined yet;
           // if not, we may want to compute the estimator on it
           const Elem* parent = elem->parent();
@@ -299,7 +299,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
   const std::vector<std::vector<Real> >&         phi_values   = fe->get_phi();
   const std::vector<std::vector<RealGradient> >& dphi_values  = fe->get_dphi();
   const std::vector<Point>&                      q_point      = fe->get_xyz();
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   const std::vector<std::vector<RealTensor> >&   d2phi_values = fe->get_d2phi();
 #endif
 
@@ -321,7 +321,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
       Number u_h = 0.;
 
       Gradient grad_u_h;
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       Tensor grad2_u_h;
 #endif
 
@@ -334,7 +334,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
           // Values from current solution.
           u_h      += phi_values[i][qp]*Uelem(i);
           grad_u_h += dphi_values[i][qp]*Uelem(i);
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           grad2_u_h += d2phi_values[i][qp]*Uelem(i);
 #endif
         }
@@ -363,7 +363,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
         }
 
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       // Compute the value of the error in the hessian at this
       // quadrature point
       if ((_exact_hessian || _equation_systems_fine) && _sobolev_order > 1)

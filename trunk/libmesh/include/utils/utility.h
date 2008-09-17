@@ -110,7 +110,7 @@ namespace Utility
   //-------------------------------------------------------------------
   // Utility functions useful when dealing with complex numbers.
  
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
   /**
    * @returns for \p r_o_c = 0 the filename for output of the real part
@@ -127,7 +127,7 @@ namespace Utility
 			     std::vector<Real>& real_part,
 			     std::vector<Real>& imag_part);
 
-#endif // #ifdef USE_COMPLEX_NUMBERS
+#endif // #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 
   

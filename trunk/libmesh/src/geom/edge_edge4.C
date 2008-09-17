@@ -22,7 +22,7 @@
 // Local includes
 #include "edge_edge4.h"
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float Edge4::_embedding_matrix[2][4][4] =
 {

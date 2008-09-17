@@ -21,7 +21,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 #include "fe.h"
 #include "fe_macro.h"
@@ -1170,4 +1170,4 @@ INSTANTIATE_MBRF(1,SZABAB);
 INSTANTIATE_MBRF(2,SZABAB);
 INSTANTIATE_MBRF(3,SZABAB);
 
-#endif //ENABLE_HIGHER_ORDER_SHAPES
+#endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES

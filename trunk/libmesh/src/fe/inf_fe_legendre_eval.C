@@ -20,7 +20,7 @@
 
 // Local Includes
 #include "libmesh_config.h"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
 #include "inf_fe_macro.h"
 
@@ -206,5 +206,5 @@ template Real InfFE<3,LEGENDRE,CARTESIAN>::eval(const Real,const Order,const uns
 template Real InfFE<3,LEGENDRE,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
 
 
-#endif //ifdef ENABLE_INFINITE_ELEMENTS
+#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

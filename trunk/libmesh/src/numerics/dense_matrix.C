@@ -446,7 +446,7 @@ void DenseMatrix<T>::_cholesky_decompose ()
 
 	  if (i == j)
 	    {
-#ifndef USE_COMPLEX_NUMBERS
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
 	      if (A(i,j) <= 0.0)
 		{
 		  std::cerr << "Error! Can only use Cholesky decomposition "
@@ -561,7 +561,7 @@ template class DenseMatrix<Real>;
 template void DenseMatrix<Real>::cholesky_solve(DenseVector<Real>&, DenseVector<Real>&);
 template void DenseMatrix<Real>::_cholesky_back_substitute(DenseVector<Real>&, DenseVector<Real>&) const;
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseMatrix<Complex>;
 template void DenseMatrix<Complex>::cholesky_solve(DenseVector<Complex>&,DenseVector<Complex>&);
 template void DenseMatrix<Complex>::_cholesky_back_substitute(DenseVector<Complex>&, DenseVector<Complex>&) const;

@@ -30,20 +30,20 @@
 // to add performance monitors to the code without
 // impacting performance when performance logging
 // is disabled.
-#ifdef ENABLE_PERFORMANCE_LOGGING
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
 
 // Note the log is in libMesh, so we need to include it.
 #  include "libmesh.h"
 #  define START_LOG(a,b)   { libMesh::perflog.push(a,b); }
 #  define STOP_LOG(a,b)    { libMesh::perflog.pop(a,b); }
-#  define PAUSE_LOG(a,b)   { deprecated(); }
+#  define PALIBMESH_USE_LOG(a,b)   { deprecated(); }
 #  define RESTART_LOG(a,b) { deprecated(); }
 
 #else
 
 #  define START_LOG(a,b)   {}
 #  define STOP_LOG(a,b)    {}
-#  define PAUSE_LOG(a,b)   {}
+#  define PALIBMESH_USE_LOG(a,b)   {}
 #  define RESTART_LOG(a,b) {}
 
 #endif

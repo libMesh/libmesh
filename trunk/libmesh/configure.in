@@ -20,7 +20,10 @@ AC_CONFIG_FILES(contrib/bin/xda2mgf,                [chmod +x contrib/bin/xda2mg
 AC_CONFIG_FILES(contrib/bin/create_libmesh_release, [chmod +x contrib/bin/create_libmesh_release])
 AC_CONFIG_FILES(doc/dot,                            [chmod +x doc/dot])
 AC_CONFIG_FILES(include/base/libmesh_contrib_config.h)
-AC_CONFIG_HEADER(include/base/libmesh_config.h:include/base/libmesh_config.h.in)
+dnl Create a temporary file with e.g. HAVE_MPI
+AC_CONFIG_HEADER(include/base/libmesh_config.h.tmp:include/base/libmesh_config.h.in)
+dnl Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
+AX_PREFIX_CONFIG_H(include/base/libmesh_config.h,LIBMESH,include/base/libmesh_config.h.tmp)
 
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(----------- Configuring libMesh -------------)
@@ -29,7 +32,7 @@ AC_MSG_RESULT(---------------------------------------------)
 
 dnl Print configuration info to the header file
 
-AC_DEFINE_UNQUOTED(LIBMESH_CONFIGURE_INFO, ["$0 run on `date`"], [Configuration information.])	
+AC_DEFINE_UNQUOTED(CONFIGURE_INFO, ["$0 run on `date`"], [Configuration information.])	
 
 dnl Compute the canonical target system type variable "target", and its
 dnl three individual parts: "target_cpu", "target_vendor", and "target_os"
@@ -897,7 +900,7 @@ AC_OUTPUT
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(--------- Done Configuring libMesh ----------)
 AC_MSG_RESULT(---------------------------------------------)
-rm -f conftest* config.cache
+rm -f conftest* config.cache include/base/libmesh_config.h.tmp
 
 
 dnl Local Variables:

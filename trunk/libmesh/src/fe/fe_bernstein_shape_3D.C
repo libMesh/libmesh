@@ -23,7 +23,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 #include "fe.h"
 #include "elem.h"
@@ -54,7 +54,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			    const Point& p)
 {
   
-#if DIM == 3
+#if LIBMESH_DIM == 3
   
   libmesh_assert (elem != NULL);
   const ElemType type = elem->type();
@@ -1410,7 +1410,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 				  const Point& p)
 {
 
-#if DIM == 3
+#if LIBMESH_DIM == 3
   libmesh_assert (elem != NULL);
   const ElemType type = elem->type();
 
@@ -3019,4 +3019,4 @@ Real FE<3,BERNSTEIN>::shape_second_deriv(const Elem*,
 
 
 
-#endif //ENABLE_HIGHER_ORDER_SHAPES
+#endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES

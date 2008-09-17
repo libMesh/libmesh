@@ -21,7 +21,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
 #include "fe.h"
 #include "elem.h"
@@ -677,5 +677,5 @@ INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,inverse_map(const Elem*,const std::vect
 
 
 
-#endif //ifdef ENABLE_INFINITE_ELEMENTS
+#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

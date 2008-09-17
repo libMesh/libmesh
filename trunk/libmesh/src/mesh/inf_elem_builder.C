@@ -19,7 +19,7 @@
 
 #include "libmesh_config.h"
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // C++ includes
 
@@ -655,4 +655,4 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 
 
 
-#endif // ENABLE_INFINITE_ELEMENTS
+#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS

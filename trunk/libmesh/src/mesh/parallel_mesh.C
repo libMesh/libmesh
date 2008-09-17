@@ -559,7 +559,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_ids () const
 
 void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   // This function must be run on all processors at once
   parallel_only();
 
@@ -583,7 +583,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
       // All processors with this element should agree on flag
       libmesh_assert (!elem || min_pflag == p_refinement_flag);
     }
-#endif // ENABLE_AMR
+#endif // LIBMESH_ENABLE_AMR
 }
 #endif // DEBUG
 

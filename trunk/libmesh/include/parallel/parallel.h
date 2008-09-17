@@ -49,7 +49,7 @@
  */
 namespace Parallel
 {
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
   //-------------------------------------------------------------------
   /**
    * Data types for communication
@@ -85,7 +85,7 @@ namespace Parallel
 
   const int any_tag=-1;
   const int any_source=0;
-#endif // HAVE_MPI
+#endif // LIBMESH_HAVE_MPI
 
 
 
@@ -99,7 +99,7 @@ namespace Parallel
   public:
     Status () {}
     
-#ifndef HAVE_MPI
+#ifndef LIBMESH_HAVE_MPI
     
     int source () const
     { return 0; }
@@ -140,7 +140,7 @@ namespace Parallel
    */
   inline void barrier ()
   {
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
     MPI_Barrier (libMesh::COMM_WORLD);
 #endif
     return;
@@ -414,7 +414,7 @@ namespace Parallel
       }
   }
 
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
  template<>
  inline MPI_Datatype datatype<char>() { return MPI_CHAR; }
 
@@ -1816,7 +1816,7 @@ namespace Parallel
   }
 
 
-#else // HAVE_MPI
+#else // LIBMESH_HAVE_MPI
 
   template <typename T>
   inline bool verify(const T &) { return true; }
@@ -1910,7 +1910,7 @@ namespace Parallel
   template <typename T>
     inline void broadcast (std::vector<T> &, const unsigned int =0) {}
 
-#endif // HAVE_MPI
+#endif // LIBMESH_HAVE_MPI
 
 
 }

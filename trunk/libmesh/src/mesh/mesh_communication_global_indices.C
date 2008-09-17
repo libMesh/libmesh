@@ -33,11 +33,11 @@
 #include "elem.h"
 #include "elem_range.h"
 #include "node_range.h"
-#ifdef HAVE_LIBHILBERT
+#ifdef LIBMESH_HAVE_LIBHILBERT
 #  include "hilbert.h"
 #endif
  
-#ifdef HAVE_LIBHILBERT 
+#ifdef LIBMESH_HAVE_LIBHILBERT 
 namespace { // anonymous namespace for helper functions
 
   // Utility function to map (x,y,z) in [bbox.min, bbox.max]^3 into
@@ -168,7 +168,7 @@ namespace { // anonymous namespace for helper functions
 
 // ------------------------------------------------------------
 // MeshCommunication class members
-#if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
+#if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 {
   START_LOG ("assign_global_indices()", "MeshCommunication");
@@ -511,15 +511,15 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
   STOP_LOG ("assign_global_indices()", "MeshCommunication");
 }
-#else // HAVE_LIBHILBERT, HAVE_MPI
+#else // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
 void MeshCommunication::assign_global_indices (MeshBase&) const
 {
 }
-#endif // HAVE_LIBHILBERT, HAVE_MPI
+#endif // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
 
 
 
-#if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
+#if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 template <typename ForwardIterator>
 void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 					     const ForwardIterator &begin,
@@ -720,7 +720,7 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 
   STOP_LOG ("find_global_indices()", "MeshCommunication");
 }
-#else // HAVE_LIBHILBERT, HAVE_MPI
+#else // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
 template <typename ForwardIterator>
 void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &,
 					     const ForwardIterator &,
@@ -728,7 +728,7 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &,
 					     std::vector<unsigned int> &) const
 {
 }
-#endif // HAVE_LIBHILBERT, HAVE_MPI
+#endif // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
 
 
 

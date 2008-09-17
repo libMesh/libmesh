@@ -144,7 +144,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	// Compute the tangent & normal at the quadrature point
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    this->tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
+	    this->tangents[p].resize(LIBMESH_DIM-1); // 1 Tangent in 2D, 2 in 3D
 	    this->xyz[p].zero();
 	    this->dxyzdxi_map[p].zero();
 	    this->d2xyzdxi2_map[p].zero();
@@ -170,7 +170,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	    
 	    this->normals[p]     = n.unit();
 	    this->tangents[p][0] = this->dxyzdxi_map[p].unit();
-#if DIM == 3  // Only good in 3D space
+#if LIBMESH_DIM == 3  // Only good in 3D space
 	    this->tangents[p][1] = this->dxyzdxi_map[p].cross(n).unit();
 #endif
 	    // The curvature is computed via the familiar Frenet formula:
@@ -211,8 +211,8 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	      this->dphi[i][p](1) =
 		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, this->xyz[p]);
 	      
-#if DIM == 3  
-	      this->dphi[i][p](2) = // can only assign to the Z component if DIM==3
+#if LIBMESH_DIM == 3  
+	      this->dphi[i][p](2) = // can only assign to the Z component if LIBMESH_DIM==3
 #endif
 		this->dphidz[i][p] = 0.;
 	    }
@@ -244,7 +244,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 	// Clear the entities that will be summed
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    this->tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
+	    this->tangents[p].resize(LIBMESH_DIM-1); // 1 Tangent in 2D, 2 in 3D
 	    this->xyz[p].zero();
 	    this->dxyzdxi_map[p].zero();
 	    this->dxyzdeta_map[p].zero();

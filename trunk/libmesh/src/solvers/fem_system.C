@@ -90,7 +90,7 @@ Gradient FEMSystem::interior_gradient(unsigned int var, unsigned int qp)
 
 
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 Tensor FEMSystem::interior_hessian(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
@@ -114,7 +114,7 @@ Tensor FEMSystem::interior_hessian(unsigned int var, unsigned int qp)
 
   return d2u;
 }
-#endif // ifdef ENABLE_SECOND_DERIVATIVES
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
 
@@ -170,7 +170,7 @@ Gradient FEMSystem::side_gradient(unsigned int var, unsigned int qp)
 
 
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 Tensor FEMSystem::side_hessian(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
@@ -194,7 +194,7 @@ Tensor FEMSystem::side_hessian(unsigned int var, unsigned int qp)
 
   return d2u;
 }
-#endif // ifdef ENABLE_SECOND_DERIVATIVES
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
 
@@ -277,7 +277,7 @@ Gradient FEMSystem::fixed_interior_gradient(unsigned int var, unsigned int qp)
 
 
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 Tensor FEMSystem::fixed_interior_hessian(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
@@ -301,7 +301,7 @@ Tensor FEMSystem::fixed_interior_hessian(unsigned int var, unsigned int qp)
 
   return d2u;
 }
-#endif // ifdef ENABLE_SECOND_DERIVATIVES
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
 
@@ -357,7 +357,7 @@ Gradient FEMSystem::fixed_side_gradient(unsigned int var, unsigned int qp)
 
 
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 Tensor FEMSystem::fixed_side_hessian(unsigned int var, unsigned int qp)
 {
   // Get local-to-global dof index lookup
@@ -381,7 +381,7 @@ Tensor FEMSystem::fixed_side_hessian(unsigned int var, unsigned int qp)
 
   return d2u;
 }
-#endif // ifdef ENABLE_SECOND_DERIVATIVES
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
 
@@ -840,7 +840,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 #endif // ifdef DEBUG
         }
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
       // We turn off the asymmetric constraint application;
       // enforce_constraints_exactly() should be called in the solver
       if (get_residual && get_jacobian)
@@ -852,7 +852,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
       else if (get_jacobian)
         this->get_dof_map().constrain_element_matrix
           (elem_jacobian, dof_indices, false);
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
       if (get_jacobian && print_element_jacobians)
         {

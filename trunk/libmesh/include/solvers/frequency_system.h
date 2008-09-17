@@ -25,7 +25,7 @@
 #include "libmesh_config.h"
 
 // Frequency domain solutions only possible with complex arithmetic
-#if defined(USE_COMPLEX_NUMBERS)
+#if defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
 // C++ includes
 #include <string>
@@ -285,6 +285,6 @@ std::pair<unsigned int, Real> FrequencySystem::get_rval (unsigned int n) const
 }
 
 
-#endif // if defined(USE_COMPLEX_NUMBERS)
+#endif // if defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
 #endif // ifndef __frequency_system_h__

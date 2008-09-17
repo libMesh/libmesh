@@ -509,7 +509,7 @@ const unsigned short int Tet10::_second_order_adjacent_vertices[6][2] =
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float Tet10::_embedding_matrix[8][10][10] =
 {
@@ -680,4 +680,4 @@ float Tet10::embedding_matrix (const unsigned int i,
   return this->_embedding_matrix[i][jp][kp];
 }
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR

@@ -260,7 +260,7 @@ void Hex8::connectivity(const unsigned int sc,
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float Hex8::_embedding_matrix[8][8][8] =
 {

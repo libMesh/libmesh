@@ -21,7 +21,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
 // Local includes cont'd
@@ -75,7 +75,7 @@ bool InfQuad6::is_node_on_side(const unsigned int n,
   return false;
 }
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float InfQuad6::_embedding_matrix[2][6][6] =
 {
@@ -264,4 +264,4 @@ InfQuad6::second_order_child_vertex (const unsigned int n) const
 
 
 
-#endif // ifdef ENABLE_INFINITE_ELEMENTS
+#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

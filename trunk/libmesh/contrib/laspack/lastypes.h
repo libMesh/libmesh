@@ -24,7 +24,7 @@ extern "C" {
   
 #include "copyrght.h"
 
-#if defined(_LP_USE_COMPLEX_NUMBERS)
+#if defined(_LP_LIBMESH_USE_COMPLEX_NUMBERS)
    /* complex arithmetic, use bool for internal boolean */
    typedef bool    _LPBoolean;
 #  ifndef _LP_DEFINED_BOOLEAN
@@ -41,7 +41,7 @@ extern "C" {
              _LPTrue  = 1
          } _LPBoolean; /* boolean type */
 #  endif /* _LP_DEFINED_BOOLEAN */
-#endif /* _LP_USE_COMPLEX_NUMBERS */
+#endif /* _LP_LIBMESH_USE_COMPLEX_NUMBERS */
 
 typedef enum {
     Rowws,

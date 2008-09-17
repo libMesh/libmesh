@@ -20,7 +20,7 @@
 // Local includes
 #include "libmesh_config.h"
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // C++ includes
 
@@ -249,7 +249,7 @@ void InfHex8::connectivity(const unsigned int sc,
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float InfHex8::_embedding_matrix[4][8][8] =
 {
@@ -310,4 +310,4 @@ const float InfHex8::_embedding_matrix[4][8][8] =
 
 #endif
 
-#endif // ifdef ENABLE_INFINITE_ELEMENTS
+#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

@@ -26,7 +26,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 #include "cell_inf_hex.h"
 
@@ -174,7 +174,7 @@ public:
 protected:
   
   
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   /**
    * Matrix used to create the elements children.
@@ -205,6 +205,6 @@ InfHex8::InfHex8(Elem* p) :
 }
 
 
-#endif  // ifdef ENABLE_INFINITE_ELEMENTS
+#endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 #endif

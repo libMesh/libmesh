@@ -84,7 +84,7 @@ void MeshCommunication::clear ()
 }
 
 
-// #ifdef HAVE_MPI
+// #ifdef LIBMESH_HAVE_MPI
 // void MeshCommunication::find_neighboring_processors (const MeshBase& mesh)
 // {
 //   // Don't need to do anything if there is
@@ -147,7 +147,7 @@ void MeshCommunication::clear ()
 
 
 
-#ifndef HAVE_MPI // avoid spurious gcc warnings
+#ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
 void MeshCommunication::redistribute (ParallelMesh &) const
 {
   // no MPI, no redistribution
@@ -232,7 +232,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	      // in the set its entire family tree is already in the set.
 	      if (!elements_to_send.count(top_parent))
 		{
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 		  top_parent->family_tree(family_tree);
 #else
 		  family_tree.clear();
@@ -257,7 +257,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		      
 		      if (!elements_to_send.count(top_parent))
 			{
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 			  top_parent->family_tree(family_tree);
 #else
 			  family_tree.clear();
@@ -556,7 +556,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		libmesh_assert (elem->processor_id()      == packed_elem.processor_id());
 		libmesh_assert (elem->subdomain_id()      == packed_elem.subdomain_id());
 		libmesh_assert (elem->type()              == packed_elem.type());
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 		libmesh_assert (elem->p_level()           == packed_elem.p_level());
 		libmesh_assert (elem->refinement_flag()   == packed_elem.refinement_flag());
 		libmesh_assert (elem->p_refinement_flag() == packed_elem.p_refinement_flag());
@@ -572,7 +572,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    else
 	      {
 		// We need to add the element.
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 		// maybe find the parent
 		if (packed_elem.level() > 0)
 		  {
@@ -593,9 +593,9 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		else
 		  {
 		    libmesh_assert (packed_elem.parent_id() == -1);
-#endif // ENABLE_AMR
+#endif // LIBMESH_ENABLE_AMR
 		    elem = packed_elem.unpack (mesh);
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 		  }
 #endif		
 		// Good to go.  Add to the mesh.
@@ -652,7 +652,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   
   STOP_LOG("redistribute()","MeshCommunication");  
 }
-#endif // HAVE_MPI
+#endif // LIBMESH_HAVE_MPI
 
 
 
@@ -670,7 +670,7 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
 
 
 
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
 void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
 #else // avoid spurious gcc warnings
 void MeshCommunication::broadcast_mesh (MeshBase&) const
@@ -681,7 +681,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
   if (libMesh::n_processors() == 1)
     return;
   
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
 
   // This function must be run on all processors at once
   parallel_only();
@@ -838,7 +838,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
             Elem* elem = NULL;
 
 // 	    // Unpack the element header
-// #ifdef ENABLE_AMR
+// #ifdef LIBMESH_ENABLE_AMR
 // 	    const int level             = conn[cnt++];
 // 	    const int p_level           = conn[cnt++];
 // 	    const Elem::RefinementState refinement_flag =
@@ -850,11 +850,11 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 // 	    const unsigned int elem_PID = conn[cnt++];
 // 	    const int subdomain_ID      = conn[cnt++];
 //             const int self_ID           = conn[cnt++];
-// #ifdef ENABLE_AMR
+// #ifdef LIBMESH_ENABLE_AMR
 //             const int parent_ID         = conn[cnt++];
 //             const int which_child       = conn[cnt++];
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
             if (packed_elem.parent_id() != -1) // Do a log(n) search for the parent
 	      {
@@ -879,7 +879,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 		libmesh_assert (packed_elem.level() == 0);
 #endif 		
 		elem = packed_elem.unpack (mesh);
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 	      }
 #endif	    
             // Add elem to the map of parents, since it may have
@@ -921,7 +921,7 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 
 
 
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
 void MeshCommunication::broadcast_bcs (const MeshBase& mesh,
 				       BoundaryInfo& boundary_info) const
 #else // avoid spurious gcc warnings
@@ -935,7 +935,7 @@ void MeshCommunication::broadcast_bcs (const MeshBase&,
     return;
   
   
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
 
   // This function must be run on all processors at once
   parallel_only();
@@ -1078,7 +1078,7 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
   STOP_LOG("allgather()","MeshCommunication");
 }
 
-#ifndef HAVE_MPI
+#ifndef LIBMESH_HAVE_MPI
   
 void MeshCommunication::allgather_mesh (ParallelMesh&) const
 {
@@ -1294,7 +1294,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
  		libmesh_assert (packed_elem.id() >= first_global_idx);
  		libmesh_assert (packed_elem.id()  < last_global_idx);
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 		libmesh_assert ((packed_elem.level() == 0) || (packed_elem.parent_id() != -1));
   
 		// Ignore elements not matching the current level.
@@ -1313,7 +1313,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 		    const Elem* elem = mesh.elem(packed_elem.id());
 #endif
                     libmesh_assert (elem);
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 		    libmesh_assert (!elem->parent() ||
 				    elem->parent()->id() ==
 				    static_cast<unsigned int>(packed_elem.parent_id()));
@@ -1335,7 +1335,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 		    // Declare the element we will add
 		    Elem* elem = NULL;
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 		    // Maybe find its parent
 		    if (level > 0)
 		      {
@@ -1355,9 +1355,9 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 		    else
                       {
                         libmesh_assert (packed_elem.parent_id() == -1);
-#endif // ENABLE_AMR
+#endif // LIBMESH_ENABLE_AMR
 		        elem = packed_elem.unpack (mesh);
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
                       }
 #endif
 
@@ -1529,7 +1529,7 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
 }
 
 
-#endif // HAVE_MPI
+#endif // LIBMESH_HAVE_MPI
 
 
 
@@ -1838,7 +1838,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
 // {
 //   libmesh_assert (elem != NULL);
 
-// #ifdef ENABLE_AMR
+// #ifdef LIBMESH_ENABLE_AMR
 //   conn.push_back (static_cast<int>(elem->level()));
 //   conn.push_back (static_cast<int>(elem->p_level()));
 //   conn.push_back (static_cast<int>(elem->refinement_flag()));
@@ -1849,7 +1849,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
 //   conn.push_back (static_cast<int>(elem->subdomain_id()));
 //   conn.push_back (elem->id());
 		
-// #ifdef ENABLE_AMR
+// #ifdef LIBMESH_ENABLE_AMR
 //   // use parent_ID of -1 to indicate a level 0 element
 //   if (elem->level() == 0)
 //     {

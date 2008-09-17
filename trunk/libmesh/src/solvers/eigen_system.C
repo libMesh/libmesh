@@ -22,7 +22,7 @@
 
 // Currently, the EigenSystem should only be available
 // if SLEPc support is enabled. 
-#if defined(HAVE_SLEPC)
+#if defined(LIBMESH_HAVE_SLEPC)
 
 // C++ includes
 
@@ -236,4 +236,4 @@ std::pair<Real, Real> EigenSystem::get_eigenpair (unsigned int i)
   return eigen_solver->get_eigenpair (i, *solution);
 }
 
-#endif // HAVE_SLEPC
+#endif // LIBMESH_HAVE_SLEPC

@@ -250,7 +250,7 @@ unsigned int NewtonSolver::solve()
   linear_solution.close();
   rhs.close();
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   _system.get_dof_map().enforce_constraints_exactly(_system);
 #endif
 
@@ -336,7 +336,7 @@ unsigned int NewtonSolver::solve()
       // We may need to localize a parallel solution
       _system.update ();
       // The linear solver may not have fit our constraints exactly
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
       _system.get_dof_map().enforce_constraints_exactly(_system, &linear_solution);
 #endif
 
@@ -456,7 +456,7 @@ unsigned int NewtonSolver::solve()
     } // end nonlinear loop
 
   // The linear solver may not have fit our constraints exactly
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   _system.get_dof_map().enforce_constraints_exactly(_system);
 #endif
 

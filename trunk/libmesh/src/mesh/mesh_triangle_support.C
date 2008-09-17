@@ -28,7 +28,7 @@
 #include "boundary_info.h"
 
 
-#ifdef HAVE_TRIANGLE
+#ifdef LIBMESH_HAVE_TRIANGLE
 
 // Triangulates a 2D rectangular region with or without holes
 void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
@@ -564,7 +564,7 @@ flags << "zBPQq";
 
 
 
-#endif // HAVE_TRIANGLE
+#endif // LIBMESH_HAVE_TRIANGLE
 
 
 

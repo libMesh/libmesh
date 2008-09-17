@@ -20,7 +20,7 @@
 // Local includes
 #include "libmesh_config.h"
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // C++ includes
 
@@ -356,7 +356,7 @@ const unsigned short int InfPrism12::_second_order_vertex_child_index[12] =
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float InfPrism12::_embedding_matrix[4][12][12] =
 {
@@ -435,4 +435,4 @@ const float InfPrism12::_embedding_matrix[4][12][12] =
 
 #endif
 
-#endif // ifdef ENABLE_INFINITE_ELEMENTS
+#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

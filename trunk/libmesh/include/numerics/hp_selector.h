@@ -28,7 +28,7 @@
 // Local Includes
 #include "libmesh_common.h"
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 // Forward Declarations
 class System;
@@ -76,7 +76,7 @@ public:
   std::vector<float> component_scale;
 };
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 #endif
 

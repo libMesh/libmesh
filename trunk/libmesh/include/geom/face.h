@@ -76,7 +76,7 @@ public:
 //    */
 //   unsigned int n_children_per_side(const unsigned int) const { return 2; }
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * @returns \p false.  All classes derived from \p Face

@@ -23,14 +23,14 @@
 // Local includes
 #include "libmesh_config.h"
 
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
 
 // A convenient macro for comparing PETSc versions.  Returns 1 if the
 // current PETSc version is < major.minor.subminor and zero otherwise.
 //
 // This macro does not require petscversion.h to be included for it to work correctly.
 // It instead relies on the PETSc version numbers detected during configure.  Note that if
-// HAVE_PETSC is not defined, none of the LIBMESH_DETECTED_PETSC_VERSION_* variables will
+// LIBMESH_HAVE_PETSC is not defined, none of the LIBMESH_DETECTED_PETSC_VERSION_* variables will
 // be defined either.
 #define PETSC_VERSION_LESS_THAN(major,minor,subminor)			                                            \
   ((LIBMESH_DETECTED_PETSC_VERSION_MAJOR < (major) ||						                    \
@@ -69,7 +69,7 @@
 // #endif
 
 // Make up for missing extern "C" in old PETSc versions
-#if !defined(USE_COMPLEX_NUMBERS) && PETSC_VERSION_LESS_THAN(2,3,0)
+#if !defined(LIBMESH_USE_COMPLEX_NUMBERS) && PETSC_VERSION_LESS_THAN(2,3,0)
 #  define EXTERN_C_FOR_PETSC_BEGIN extern "C" {
 #  define EXTERN_C_FOR_PETSC_END }
 #else
@@ -84,6 +84,6 @@ EXTERN_C_FOR_PETSC_BEGIN
 EXTERN_C_FOR_PETSC_END
 
 
-#endif // HAVE_PETSC
+#endif // LIBMESH_HAVE_PETSC
 
 #endif // __petsc_macro_h__

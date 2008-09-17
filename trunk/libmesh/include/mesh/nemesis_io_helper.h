@@ -22,7 +22,7 @@
 
 #include "libmesh_config.h"
 
-#if defined(HAVE_NEMESIS_API) && defined(HAVE_EXODUS_API)
+#if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
 #include <vector>
 #include "exodusII_io_helper.h"
@@ -283,5 +283,5 @@ private:
   
 };
 
-#endif // #if defined(HAVE_NEMESIS_API) && defined(HAVE_EXODUS_API)
+#endif // #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 #endif // #ifndef __nemesis_io_helper_h__

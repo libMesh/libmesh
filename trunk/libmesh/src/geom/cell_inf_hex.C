@@ -20,7 +20,7 @@
 // Local includes
 #include "libmesh_config.h"
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
 // C++ includes
@@ -440,4 +440,4 @@ const unsigned short int InfHex::_second_order_vertex_child_index[18] =
 
 
 
-#endif // ifdef ENABLE_INFINITE_ELEMENTS
+#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

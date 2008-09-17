@@ -28,7 +28,7 @@
 #include "libmesh_common.h"
 #include "diff_solver.h"
 
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
 
 #include "petsc_macro.h"
 
@@ -86,6 +86,6 @@ protected:
   SNES _snes;
 };
 
-#endif // #ifdef HAVE_PETSC
+#endif // #ifdef LIBMESH_HAVE_PETSC
 
 #endif // #define __petsc_diff_solver_h__

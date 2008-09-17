@@ -140,7 +140,7 @@ class Edge : public Elem
  protected:
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   
   /**
    * Matrix that allows children to inherit boundary conditions.

@@ -200,7 +200,7 @@ public:
 protected:
   
   
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   /**
    * Matrix used to create the elements children.

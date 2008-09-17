@@ -22,7 +22,7 @@
 #ifndef __trilinos_nox_nonlinear_solver_h__
 #define __trilinos_nox_nonlinear_solver_h__
 
-#ifdef HAVE_NOX
+#ifdef LIBMESH_HAVE_NOX
 
 // C++ includes
 
@@ -122,5 +122,5 @@ NoxNonlinearSolver<T>::~NoxNonlinearSolver ()
 
 
 
-#endif // #ifdef HAVE_NOX
+#endif // #ifdef LIBMESH_HAVE_NOX
 #endif // #ifdef __trilinos_nox_nonlinear_solver_h__

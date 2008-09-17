@@ -258,7 +258,7 @@ void UnstructuredMesh::all_first_order ()
         (Elem::first_order_equivalent_type
           (so_elem->type()), newparent).release();
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
       /*
        * Add this element to it's parent if it has one
        */
@@ -1058,7 +1058,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                           }
                       } // element neighbor loop
                   } 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
                 else   // refinement_level > 0
                   {
                     /*
@@ -1104,7 +1104,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                           } // if parent->child == elem
                       } // for parent->n_children
                   } // if element refinement_level
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
               } // element loop
           
@@ -1155,7 +1155,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 void MeshTools::Modification::flatten(MeshBase& mesh)
 {
   // Algorithm:
@@ -1253,4 +1253,4 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
   // Trim unused and renumber nodes and elements
   mesh.prepare_for_use();
 }
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR

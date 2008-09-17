@@ -24,7 +24,7 @@
 
 #include "libmesh_common.h"
 
-#ifdef HAVE_TRILINOS
+#ifdef LIBMESH_HAVE_TRILINOS
 
 // Trilinos includes
 #include <Epetra_FECrsMatrix.h>
@@ -593,5 +593,5 @@ void EpetraMatrix<T>::print_personal(std::ostream& os) const
   os << *_mat;
 }
 
-#endif // #ifdef HAVE_TRILINOS
+#endif // #ifdef LIBMESH_HAVE_TRILINOS
 #endif // #ifdef __trilinos_epetra_matrix_h__

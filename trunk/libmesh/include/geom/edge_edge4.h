@@ -128,7 +128,7 @@ class Edge4 : public Edge
       { libmesh_error(); return 0; }
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * @returns \p false.  This is a finite element. 
@@ -141,7 +141,7 @@ class Edge4 : public Edge
 protected:
 
   
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   /**
    * Matrix used to create the elements children.

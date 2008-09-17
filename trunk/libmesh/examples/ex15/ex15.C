@@ -111,7 +111,7 @@ int main(int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
-#ifndef ENABLE_AMR
+#ifndef LIBMESH_ENABLE_AMR
   if (libMesh::processor_id() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
               << "compiled with AMR support!"
@@ -119,7 +119,7 @@ int main(int argc, char** argv)
   return 0;
 #else
 
-#ifndef ENABLE_SECOND_DERIVATIVES
+#ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
   if (libMesh::processor_id() == 0)
     std::cerr << "ERROR: This example requires the library to be "
               << "compiled with second derivatives support!"
@@ -369,8 +369,8 @@ int main(int argc, char** argv)
   
   // All done.  
   return 0;
-#endif // #ifndef ENABLE_SECOND_DERIVATIVES
-#endif // #ifndef ENABLE_AMR
+#endif // #ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#endif // #ifndef LIBMESH_ENABLE_AMR
 }
 
 
@@ -539,8 +539,8 @@ Number forcing_function_3D(const Point& p)
 void assemble_biharmonic(EquationSystems& es,
                       const std::string& system_name)
 {
-#ifdef ENABLE_AMR
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   // It is a good idea to make sure we are assembling
   // the proper system.
@@ -825,6 +825,6 @@ void assemble_biharmonic(EquationSystems& es,
 
 #else
 
-#endif // #ifdef ENABLE_SECOND_DERIVATIVES
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#endif // #ifdef LIBMESH_ENABLE_AMR
 }

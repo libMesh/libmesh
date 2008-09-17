@@ -72,7 +72,7 @@ public:
    */ 
   virtual ~DofObject ();
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   
   /**
    * This object on the last mesh.  Useful for projecting
@@ -310,7 +310,7 @@ private:
 // Inline functions
 inline
 DofObject::DofObject () :
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   old_dof_object(NULL),
 #endif
   _id (invalid_id),
@@ -330,7 +330,7 @@ inline
 DofObject::~DofObject ()
 {
   // Free all memory.
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   this->clear_old_dof_object ();
 #endif
   this->clear_dofs ();

@@ -21,7 +21,7 @@
 
 #include "libmesh_common.h"
 
-#if defined(HAVE_LASPACK)
+#if defined(LIBMESH_HAVE_LASPACK)
 
 
 // C++ includes
@@ -30,7 +30,7 @@
 #include "laspack_linear_solver.h"
 #include "libmesh_logging.h"
 
-// #ifndef USE_COMPLEX_NUMBERS
+// #ifndef LIBMESH_USE_COMPLEX_NUMBERS
 // extern "C"
 // {
 // #endif
@@ -69,7 +69,7 @@
 //     //fclose(out);
 //   }
 
-// #ifndef USE_COMPLEX_NUMBERS
+// #ifndef LIBMESH_USE_COMPLEX_NUMBERS
 // }
 // #endif  
 
@@ -326,4 +326,4 @@ void LaspackLinearSolver<T>::print_converged_reason()
 template class LaspackLinearSolver<Number>;
  
 
-#endif // #ifdef HAVE_LASPACK
+#endif // #ifdef LIBMESH_HAVE_LASPACK

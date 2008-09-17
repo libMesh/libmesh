@@ -264,7 +264,7 @@ public:
   virtual void add (const unsigned int i, const T value) = 0;
     
   /**
-   * \f$U(0-DIM)+=s\f$.
+   * \f$U(0-LIBMESH_DIM)+=s\f$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */

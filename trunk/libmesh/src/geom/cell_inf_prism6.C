@@ -20,7 +20,7 @@
 // Local includes
 #include "libmesh_config.h"
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // C++ includes
 
@@ -248,7 +248,7 @@ void InfPrism6::connectivity(const unsigned int sc,
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float InfPrism6::_embedding_matrix[4][6][6] =
 {
@@ -301,4 +301,4 @@ const float InfPrism6::_embedding_matrix[4][6][6] =
 
 #endif
 
-#endif  // ifdef ENABLE_INFINITE_ELEMENTS
+#endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

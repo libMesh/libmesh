@@ -26,7 +26,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 #include "fe_base.h"
 
@@ -851,7 +851,7 @@ Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
 
 
 
-#endif //ifdef ENABLE_INFINITE_ELEMENTS
+#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
 #endif

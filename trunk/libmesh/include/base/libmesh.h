@@ -57,7 +57,7 @@ class PerfLog;
 class LibMeshInit
 {
 public:
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
   /**
    * Initialize the library for use, with the command line options
    * provided.  This will e.g. call PetscInitialize if PETSC is
@@ -84,7 +84,7 @@ public:
  */
 namespace libMesh {
 
-#ifndef HAVE_MPI
+#ifndef LIBMESH_HAVE_MPI
   
   /**
    * Initialize the library for use.  This will call
@@ -164,7 +164,7 @@ namespace libMesh {
   /**
    * The imaginary unit, \f$ \sqrt{-1} \f$.
    */
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
   extern const Number imaginary;
 #endif
 

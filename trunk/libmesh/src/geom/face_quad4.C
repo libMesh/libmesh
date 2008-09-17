@@ -38,7 +38,7 @@ const unsigned int Quad4::side_nodes_map[4][2] =
 };
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float Quad4::_embedding_matrix[4][4][4] =
 {

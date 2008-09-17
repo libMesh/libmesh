@@ -44,7 +44,7 @@ NumericVector<T>::build(const SolverPackage solver_package)
     {
 
 
-#ifdef HAVE_LASPACK
+#ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
 	AutoPtr<NumericVector<T> > ap(new LaspackVector<T>);
@@ -53,7 +53,7 @@ NumericVector<T>::build(const SolverPackage solver_package)
 #endif
 
 
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
 	AutoPtr<NumericVector<T> > ap(new PetscVector<T>);
@@ -62,7 +62,7 @@ NumericVector<T>::build(const SolverPackage solver_package)
 #endif
 
 
-#ifdef HAVE_TRILINOS
+#ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
       {
 	AutoPtr<NumericVector<T> > ap(new EpetraVector<T>);

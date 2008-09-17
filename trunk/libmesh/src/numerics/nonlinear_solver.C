@@ -38,7 +38,7 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
   switch (solver_package)
     {
 
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
 	AutoPtr<NonlinearSolver<T> > ap(new PetscNonlinearSolver<T>(s));
@@ -46,7 +46,7 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
       }
 #endif
       
-#ifdef HAVE_NOX
+#ifdef LIBMESH_HAVE_NOX
     case TRILINOS_SOLVERS:
       {
 	AutoPtr<NonlinearSolver<T> > ap(new NoxNonlinearSolver<T>(s));

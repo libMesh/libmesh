@@ -21,7 +21,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
 // Local includes cont'd
@@ -45,7 +45,7 @@ const unsigned int InfQuad4::side_nodes_map[3][2] =
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float InfQuad4::_embedding_matrix[2][4][4] =
 {
@@ -236,6 +236,6 @@ void InfQuad4::connectivity(const unsigned int sf,
 }
 
 
-#endif // ifdef ENABLE_INFINITE_ELEMENTS
+#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 

@@ -29,12 +29,12 @@
 
 // Local includes
 #include "legacy_xdr_io.h"          // for LegacyXdrIO::FileFormat
-#include "libmesh_config.h"  // for HAVE_XDR
+#include "libmesh_config.h"  // for LIBMESH_HAVE_XDR
 #include "o_f_stream.h"      // for OFStream
 
 // Forward Declarations
 
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 #  include <rpc/rpc.h>
 #  ifndef SINGLE_PRECISION
 #    ifdef TRIPLE_PRECISION
@@ -107,7 +107,7 @@ public:
    * is a struct defined in the
    * standard C header \p rpc/rpc.h.
    */
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
   XdrMGF() : _num_levels(0), m_type(UNKNOWN), mp_xdr_handle(0), orig_flag(LegacyXdrIO::LIBM), mp_fp(0) {}
 #else
   XdrMGF() : _num_levels(0), m_type(UNKNOWN), orig_flag(LegacyXdrIO::LIBM), mp_fp(0) {}
@@ -205,7 +205,7 @@ protected:
    */
   XdrIO_TYPE m_type;
 
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
   
   /**
    * Pointer to the standard \p{xdr}

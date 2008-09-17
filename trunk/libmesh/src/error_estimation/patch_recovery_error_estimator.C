@@ -113,7 +113,7 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 {
   START_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   libmesh_assert (_sobolev_order == 1 || _sobolev_order == 2);
 #else
   libmesh_assert (_sobolev_order == 1);
@@ -171,7 +171,7 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 
 void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange &range) const
 {
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   libmesh_assert (error_estimator._sobolev_order == 1 || error_estimator._sobolev_order == 2);
 #else
   libmesh_assert (error_estimator._sobolev_order == 1);
@@ -240,7 +240,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	  const std::vector<std::vector<RealGradient> > *dphi = NULL;
           if (error_estimator._sobolev_order == 1)
             dphi = &(fe->get_dphi());
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	  const std::vector<std::vector<RealTensor> >  *d2phi = NULL;
           if (error_estimator._sobolev_order == 2)
             d2phi = &(fe->get_d2phi());
@@ -330,7 +330,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
                     }
                   else if (error_estimator._sobolev_order == 2)
                     {
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 		      // Compute the hessian on the current patch element
 		      // at the quadrature point
                       Tensor hess_u_h;
@@ -426,7 +426,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
                 }
               else if (error_estimator._sobolev_order == 2)
                 {
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	          // Compute the Hessian at the current sample point
 	          Tensor hess_u_h;
 	  

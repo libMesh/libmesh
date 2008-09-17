@@ -24,7 +24,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
 #include "inf_fe_macro.h"
 #include "quadrature.h"
@@ -282,5 +282,5 @@ INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,init_face_shape_functions(const std::ve
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
 
-#endif //ifdef ENABLE_INFINITE_ELEMENTS
+#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

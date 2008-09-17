@@ -42,7 +42,7 @@ namespace ElementTypes
    * You might have to update this
    * if you add a new one!
    */
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   const unsigned int num_types = 24;
 #else
   const unsigned int num_types = 16;  

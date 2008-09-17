@@ -31,7 +31,7 @@
  * instantiate at the end for the desired dimension.
  */
 
-#ifndef ENABLE_HIGHER_ORDER_SHAPES
+#ifndef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 #define INSTANTIATE_FE(_dim)   template class FE< (_dim), CLOUGH>; \
                                template class FE< (_dim), HERMITE>;    \
@@ -48,7 +48,7 @@
   template void FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void FE<_dim,XYZ>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool)
  
-#else //ENABLE_HIGHER_ORDER_SHAPES
+#else //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 #define INSTANTIATE_FE(_dim)   template class FE< (_dim), CLOUGH>; \
                                template class FE< (_dim), HERMITE>;    \
@@ -69,7 +69,7 @@
   template void  FE<_dim,SZABAB>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,XYZ>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool)
 
-#endif //ENABLE_HIGHER_ORDER_SHAPES
+#endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 #define INSTANTIATE_MBRF(_dim,_t) \
   template unsigned int FE<_dim,_t>::n_dofs_at_node(ElemType,Order,unsigned int); \

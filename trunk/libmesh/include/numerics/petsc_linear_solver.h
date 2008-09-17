@@ -24,7 +24,7 @@
 
 #include "libmesh_config.h"
 
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
 
 // C++ includes
 
@@ -213,5 +213,5 @@ PetscLinearSolver<T>::~PetscLinearSolver ()
 
 
 
-#endif // #ifdef HAVE_PETSC
+#endif // #ifdef LIBMESH_HAVE_PETSC
 #endif // #ifdef __petsc_linear_solver_h__

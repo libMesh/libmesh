@@ -21,7 +21,7 @@
 
 #include "libmesh_common.h"
 
-#ifdef HAVE_TRILINOS
+#ifdef LIBMESH_HAVE_TRILINOS
 
 
 // C++ includes
@@ -241,4 +241,4 @@ template class AztecLinearSolver<Number>;
  
 
 
-#endif // #ifdef HAVE_TRILINOS
+#endif // #ifdef LIBMESH_HAVE_TRILINOS

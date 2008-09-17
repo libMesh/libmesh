@@ -662,7 +662,7 @@ Real FE<3,HIERARCHIC>::shape(const Elem* elem,
                              const unsigned int i,
                              const Point& p)
 {
-#if DIM == 3
+#if LIBMESH_DIM == 3
   
   libmesh_assert (elem != NULL);
   const ElemType type = elem->type();
@@ -729,7 +729,7 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem* elem,
                                    const unsigned int j,
                                    const Point& p)
 {
-#if DIM == 3
+#if LIBMESH_DIM == 3
   libmesh_assert (elem != NULL);
 
   libmesh_assert (j < 3);

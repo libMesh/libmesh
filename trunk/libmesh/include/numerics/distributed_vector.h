@@ -236,7 +236,7 @@ public:
   void add (const unsigned int i, const T value);
     
   /**
-   * \f$U(0-DIM)+=s\f$.
+   * \f$U(0-LIBMESH_DIM)+=s\f$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
@@ -459,7 +459,7 @@ void DistributedVector<T>::init (const unsigned int n,
 
   _first_local_index = 0;
   
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
 
   int n_proc=0, proc_id=0;
   

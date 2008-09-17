@@ -50,7 +50,7 @@ class MeshData;
 /**
  * This is the \p MeshBase class. This class provides all the data necessary
  * to describe a geometric entity.  It allows for the description of a
- * \p dim dimensional object that lives in \p DIM-dimensional space.
+ * \p dim dimensional object that lives in \p LIBMESH_DIM-dimensional space.
  * \par
  * A mesh is made of nodes and elements, and this class provides data
  * structures to store and access both.  A mesh may be partitioned into a
@@ -140,7 +140,7 @@ public:
    * defined at compile time in the header \p libmesh_common.h.
    */
   unsigned int spatial_dimension () const
-  { return static_cast<unsigned int>(DIM); }
+  { return static_cast<unsigned int>(LIBMESH_DIM); }
   
   /**
    * Returns the number of nodes in the mesh. This function and others must
@@ -366,7 +366,7 @@ public:
    */
   virtual void renumber_nodes_and_elements () = 0;    
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * Delete subactive (i.e. children of coarsened) elements.
    * This removes all elements descended from currently active

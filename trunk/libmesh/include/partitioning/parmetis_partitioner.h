@@ -70,7 +70,7 @@ private:
 
 // These methods & data only need to be available if the
 // ParMETIS library is available.
-#ifdef HAVE_PARMETIS
+#ifdef LIBMESH_HAVE_PARMETIS
 
   /**
    * Initialize data structures.

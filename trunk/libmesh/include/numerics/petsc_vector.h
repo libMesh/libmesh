@@ -27,7 +27,7 @@
 #include "libmesh_config.h"
 
 
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
 
 // C++ includes
 #include <vector>
@@ -262,7 +262,7 @@ public:
   void add (const unsigned int i, const T value);
     
   /**
-   * \f$U(0-DIM)+=s\f$.
+   * \f$U(0-LIBMESH_DIM)+=s\f$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
@@ -760,7 +760,7 @@ void PetscVector<T>::swap (PetscVector<T> &v)
 }
 
 
-#endif // #ifdef HAVE_PETSC
+#endif // #ifdef LIBMESH_HAVE_PETSC
 #endif // #ifdef __petsc_vector_h__
 
 

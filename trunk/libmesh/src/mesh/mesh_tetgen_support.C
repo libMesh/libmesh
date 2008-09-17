@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "libmesh_config.h"
-#ifdef HAVE_TETGEN
+#ifdef LIBMESH_HAVE_TETGEN
 
 
 // C++ includes
@@ -579,4 +579,4 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
 }
 
 
-#endif // #ifdef HAVE_TETGEN
+#endif // #ifdef LIBMESH_HAVE_TETGEN

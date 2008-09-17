@@ -27,7 +27,7 @@
 #include "parallel.h"
 #include "parallel_sort.h"
 #include "parallel_bin_sorter.h"
-#ifdef HAVE_LIBHILBERT
+#ifdef LIBMESH_HAVE_LIBHILBERT
 #  include "hilbert.h"
 #endif
 
@@ -117,7 +117,7 @@ void Sort<KeyType>::binsort()
 
 
 
-#if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
+#if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 // Full specialization for HilbertIndices, there is a fair amount of
 // code duplication here that could potentially be consolidated with the 
 // above method
@@ -179,13 +179,13 @@ void Sort<Hilbert::HilbertIndices>::binsort()
     _local_bin_sizes[i] = bs.sizeof_bin(i);
 }
 
-#endif // #ifdef HAVE_LIBHILBERT
+#endif // #ifdef LIBMESH_HAVE_LIBHILBERT
 
 
 template <typename KeyType>
 void Sort<KeyType>::communicate_bins()
 {
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
   // Create storage for the global bin sizes.  This
   // is the number of keys which will be held in
   // each bin over all processors.
@@ -245,12 +245,12 @@ void Sort<KeyType>::communicate_bins()
       // Increment the local offset counter
       local_offset += _local_bin_sizes[i];
     } 
-#endif // HAVE_MPI
+#endif // LIBMESH_HAVE_MPI
 }
 
 
 
-#if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
+#if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 // Full specialization for HilbertIndices, there is a fair amount of
 // code duplication here that could potentially be consolidated with the 
 // above method
@@ -342,7 +342,7 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
   MPI_Type_free (&hilbert_type);  
 }
 
-#endif // #if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
+#endif // #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 
 
 
@@ -372,6 +372,6 @@ const std::vector<KeyType>& Sort<KeyType>::bin()
 // Explicitly instantiate for int, double
 template class Parallel::Sort<int>;
 template class Parallel::Sort<double>;
-#if defined(HAVE_LIBHILBERT) && defined(HAVE_MPI)
+#if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 template class Parallel::Sort<Hilbert::HilbertIndices>;
 #endif

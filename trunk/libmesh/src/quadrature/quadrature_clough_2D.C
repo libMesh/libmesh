@@ -27,7 +27,7 @@
 void QClough::init_2D(const ElemType _type,
                       unsigned int p)
 {
-#if DIM > 1
+#if LIBMESH_DIM > 1
   QGauss gauss_rule(2, _order);
   gauss_rule.init(TRI6, p);
   

@@ -31,7 +31,7 @@
 
 
 /**
- * This class defines a tensor in DIM dimensional Real or Complex
+ * This class defines a tensor in LIBMESH_DIM dimensional Real or Complex
  * space.  The typedef RealTensorValue always defines a real-valued tensor,
  * and NumberTensorValue defines a real or complex-valued tensor depending
  * on how the library was configured.
@@ -69,7 +69,7 @@ public:
   TensorValue (const TypeTensor<T2>& p);
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
   /**
    * Constructor that takes two \p TypeTensor<Real>
    * representing the real and imaginary part as
@@ -136,7 +136,7 @@ TensorValue<T>::TensorValue (const TypeTensor<T2>& p) :
 }
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template <typename T>
 inline
 TensorValue<T>::TensorValue (const TypeTensor<Real>& p_re,

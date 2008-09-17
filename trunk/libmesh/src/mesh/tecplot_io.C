@@ -28,7 +28,7 @@
 #include "mesh_base.h"
 #include "elem.h"
 
-#ifdef HAVE_TECPLOT_API
+#ifdef LIBMESH_HAVE_TECPLOT_API
 extern "C" {
 # include <TECIO.h>
 }
@@ -39,7 +39,7 @@ extern "C" {
 //--------------------------------------------------------
 // Macros for handling Tecplot API data
 
-#ifdef HAVE_TECPLOT_API
+#ifdef LIBMESH_HAVE_TECPLOT_API
 
 namespace
 {
@@ -167,7 +167,7 @@ void TecplotIO::write_ascii (const std::string& fname,
     if (solution_names != NULL)
       for (unsigned int n=0; n<solution_names->size(); n++)
 	{
-#ifdef USE_REAL_NUMBERS
+#ifdef LIBMESH_USE_REAL_NUMBERS
 	  
 	  // Write variable names for real variables
 	  out << "," << (*solution_names)[n];
@@ -215,7 +215,7 @@ void TecplotIO::write_ascii (const std::string& fname,
 
 	  for (unsigned int c=0; c<n_vars; c++)
 	    {
-#ifdef USE_REAL_NUMBERS	      
+#ifdef LIBMESH_USE_REAL_NUMBERS	      
 	      // Write real data
 	      out << (*v)[i*n_vars + c] << " ";
 
@@ -251,7 +251,7 @@ void TecplotIO::write_binary (const std::string& fname,
 {
   // Call the ASCII output function if configure did not detect
   // the Tecplot binary API
-#ifndef HAVE_TECPLOT_API
+#ifndef LIBMESH_HAVE_TECPLOT_API
   
     std::cerr << "WARNING: Tecplot Binary files require the Tecplot API." << std::endl
 	      << "Continuing with ASCII output."
@@ -288,7 +288,7 @@ void TecplotIO::write_binary (const std::string& fname,
       {
 	for (unsigned int name=0; name<solution_names->size(); name++)
 	  {
-#ifdef USE_REAL_NUMBERS
+#ifdef LIBMESH_USE_REAL_NUMBERS
 
 	    tecplot_variable_names += ", ";
 	    tecplot_variable_names += (*solution_names)[name];
@@ -315,7 +315,7 @@ void TecplotIO::write_binary (const std::string& fname,
 
   
   TecplotMacros tm(mesh.n_nodes(),
-#ifdef USE_REAL_NUMBERS		   
+#ifdef LIBMESH_USE_REAL_NUMBERS		   
 		   (3 + ((solution_names == NULL) ? 0 : solution_names->size())),
 #else
 		   (3 + 3*((solution_names == NULL) ? 0 : solution_names->size())),
@@ -341,7 +341,7 @@ void TecplotIO::write_binary (const std::string& fname,
 
 	  for (unsigned int c=0; c<n_vars; c++)
 	    {
-#ifdef USE_REAL_NUMBERS
+#ifdef LIBMESH_USE_REAL_NUMBERS
 	      
 	      tm.nd((3+c),v)     = static_cast<float>((*vec)[v*n_vars + c]);
 #else
@@ -407,7 +407,7 @@ void TecplotIO::write_binary (const std::string& fname,
 
     
     int total =
-#ifdef USE_REAL_NUMBERS
+#ifdef LIBMESH_USE_REAL_NUMBERS
       ((3 + ((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
 #else  
       ((3 + 3*((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);

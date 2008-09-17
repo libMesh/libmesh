@@ -49,8 +49,8 @@ MeshBase::MeshBase (unsigned int d) :
   _is_prepared   (false),
   _point_locator (NULL)
 {
-  libmesh_assert (DIM <= 3);
-  libmesh_assert (DIM >= _dim);
+  libmesh_assert (LIBMESH_DIM <= 3);
+  libmesh_assert (LIBMESH_DIM >= _dim);
   libmesh_assert (libMesh::initialized());
 }
 
@@ -219,7 +219,7 @@ std::string MeshBase::get_info() const
       << "    n_local_nodes()="   << this->n_local_nodes()     << '\n'
       << "  n_elem()="            << this->n_elem()            << '\n'
       << "    n_local_elem()="    << this->n_local_elem()      << '\n'
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
       << "    n_active_elem()="   << this->n_active_elem()     << '\n'
 #endif
       << "  n_subdomains()="      << this->n_subdomains()      << '\n'

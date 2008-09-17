@@ -21,7 +21,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 #include "fe.h"
 #include "elem.h"
@@ -430,4 +430,4 @@ Real FE<1,BERNSTEIN>::shape_second_deriv(const Elem*,
 }
 
 
-#endif //ENABLE_HIGHER_ORDER_SHAPES
+#endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES

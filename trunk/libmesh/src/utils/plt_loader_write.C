@@ -498,7 +498,7 @@ void PltLoader::write_dat (const std::string& name,
 		    {
 		      // GCC 2.95.3 has scientific in the ios class instead
 		      // of in namespace std::
-#ifndef BROKEN_IOSTREAM
+#ifndef LIBMESH_BROKEN_IOSTREAM
 		      out << std::scientific
 			  << _data[z][v][l++] << " ";
 #else
@@ -547,7 +547,7 @@ void PltLoader::write_dat (const std::string& name,
 
 		      // GCC 2.95.3 has scientific in the ios class instead
 		      // of in namespace std::
-#ifndef BROKEN_IOSTREAM
+#ifndef LIBMESH_BROKEN_IOSTREAM
 		      out << std::scientific
 			  << _data[z][v][l] << " ";
 #else

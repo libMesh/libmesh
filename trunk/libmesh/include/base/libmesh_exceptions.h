@@ -24,7 +24,7 @@
 
 #include "libmesh_config.h"
 
-#ifdef ENABLE_EXCEPTIONS
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
 #include <stdexcept>
 
 
@@ -58,6 +58,6 @@ namespace libMesh {
 
 #define LIBMESH_THROW(e) do { std::abort(); } while (0)
 
-#endif // ENABLE_EXCEPTIONS
+#endif // LIBMESH_ENABLE_EXCEPTIONS
 
 #endif // #define __libmesh_exceptions_h__

@@ -24,7 +24,7 @@
 // Local includes
 #include "libmesh_config.h"
 
-#ifdef HAVE_LASPACK
+#ifdef LIBMESH_HAVE_LASPACK
 
 #include "laspack_matrix.h"
 #include "dof_map.h"
@@ -199,4 +199,4 @@ void LaspackMatrix<T>::init ()
 template class LaspackMatrix<Number>;
  
 
-#endif // #ifdef HAVE_LASPACK
+#endif // #ifdef LIBMESH_HAVE_LASPACK

@@ -575,7 +575,7 @@ bool FE<Dim,T>::is_hierarchic() const
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::compute_constraints (DofConstraints &,
 				     DofMap &,
@@ -585,7 +585,7 @@ void FE<Dim,T>::compute_constraints (DofConstraints &,
   // Monomials are discontinuous...  No constraints.
   return;
 }
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 
 
@@ -603,11 +603,11 @@ INSTANTIATE_MBRF(1,MONOMIAL);
 INSTANTIATE_MBRF(2,MONOMIAL);
 INSTANTIATE_MBRF(3,MONOMIAL);
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 template void FE<2,MONOMIAL>::compute_constraints(DofConstraints&, DofMap&, 
 						  const unsigned int,
 						  const Elem*);
 template void FE<3,MONOMIAL>::compute_constraints(DofConstraints&, DofMap&, 
 						  const unsigned int,
 						  const Elem*);
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR

@@ -643,7 +643,7 @@ _LPDouble InnerProd_VV(QVector *V1, QVector *V2)
 {
 
 /* S = V1 * V2 for real numbers*/
-#ifndef _LP_USE_COMPLEX_NUMBERS
+#ifndef _LP_LIBMESH_USE_COMPLEX_NUMBERS
     return (Mul_VV(V1, V2));
 #else
 
@@ -677,7 +677,7 @@ _LPDouble InnerProd_VV(QVector *V1, QVector *V2)
 
     return(SRes);
 
-#endif /* ifdef _LP_USE_COMPLEX_NUMBERS */
+#endif /* ifdef _LP_LIBMESH_USE_COMPLEX_NUMBERS */
 }
 
 QVector *Mul_MV(Matrix *M, QVector *V)
@@ -1271,7 +1271,7 @@ QVector *MulInv_QV(QMatrix *Q, QVector *V)
 Matrix *Transp_M(Matrix *M)
 /* MRes = M^T, returns transposed matrix M */
 {
-#if defined(_LP_USE_COMPLEX_NUMBERS)
+#if defined(_LP_LIBMESH_USE_COMPLEX_NUMBERS)
     printf("ERROR: Transpose of a complex matrix not implemented.\n");
     abort();
 
@@ -1554,7 +1554,7 @@ QMatrix *Lower_Q(QMatrix *Q)
 _LPReal l1Norm_V(QVector *V)
 /* SRes = l1-Norm of the vector V */
 {
-#if defined(_LP_USE_COMPLEX_NUMBERS)
+#if defined(_LP_LIBMESH_USE_COMPLEX_NUMBERS)
     _LPReal SRes, Sum;
 
     _LPNumber Multipl;
@@ -1608,7 +1608,7 @@ _LPReal l1Norm_V(QVector *V)
 _LPReal l2Norm_V(QVector *V)
 /* SRes = l2-Norm of the vector V */
 {
-#if defined(_LP_USE_COMPLEX_NUMBERS)
+#if defined(_LP_LIBMESH_USE_COMPLEX_NUMBERS)
     _LPReal SRes, Sum;
     _LPNumber Cmp, Multipl;
     size_t Dim, Ind;
@@ -1664,7 +1664,7 @@ _LPReal l2Norm_V(QVector *V)
 _LPReal MaxNorm_V(QVector *V)
 /* SRes = max-Norm of the vector V */
 {
-#if defined(_LP_USE_COMPLEX_NUMBERS)
+#if defined(_LP_LIBMESH_USE_COMPLEX_NUMBERS)
     _LPReal SRes;
 
     _LPNumber MaxCmp, Cmp, Multipl;

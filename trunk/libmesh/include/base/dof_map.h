@@ -154,7 +154,7 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
 // ------------------------------------------------------------
 // AMR constraint matrix types
 
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 /**
  * A row of the Dof constraint matrix.
  */
@@ -174,13 +174,13 @@ class DofConstraints : public std::map<unsigned int,
                                        Threads::scalable_allocator<std::pair<const unsigned int, DofConstraintRow> > >
 {
 };
-#endif // ENABLE_AMR || ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
   
 // ------------------------------------------------------------
 // Periodic boundary conditions information
 
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
 /**
  * The definition of a periodic boundary.
  */
@@ -222,7 +222,7 @@ public:
 
 private:
 };
-#endif // ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_PERIODIC
 
 
   
@@ -394,7 +394,7 @@ public:
 			     DenseVectorBase<Number>& Ue) const;
 
 
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 
   //--------------------------------------------------------------------
   // Constraint-specific methods
@@ -509,10 +509,10 @@ public:
   std::pair<Real, Real> max_constraint_error(const System &system,
 				    NumericVector<Number> *v = NULL) const;
 
-#endif // ENABLE_AMR || ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
 
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
 
   //--------------------------------------------------------------------
   // PeriodicBoundary-specific methods
@@ -528,10 +528,10 @@ public:
    */
   bool is_periodic_boundary (const unsigned int boundaryid) const;
 
-#endif // ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_PERIODIC
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   //--------------------------------------------------------------------
   // AMR-specific methods
@@ -571,7 +571,7 @@ public:
 			 unsigned int s,
 			 unsigned int p);
   
-#endif // ENABLE_AMR
+#endif // LIBMESH_ENABLE_AMR
 
   /**
    * Reinitialize the underlying data strucures conformal to the current mesh.
@@ -680,7 +680,7 @@ private:
   void sort_send_list ();
 
   
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 
   /**
    * Build the constraint matrix C associated with the element
@@ -755,7 +755,7 @@ private:
    */
   unsigned int _n_dfs;
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   /**
    * Total number of degrees of freedom on old dof objects
@@ -764,7 +764,7 @@ private:
 
 #endif
 
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 
   /**
    * Data structure containing DOF constraints.  The ith
@@ -775,7 +775,7 @@ private:
 #endif
 
 
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
   /**
    * Data structure containing periodic boundaries.  The ith
    * entry is the constraint matrix row for boundaryid i.
@@ -796,7 +796,7 @@ DofMap::DofMap(const unsigned int number) :
   _sys_number(number),
 //  _matrix(NULL),
   _n_dfs(0) 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   , _n_old_dfs(0)
 #endif
 {
@@ -804,7 +804,7 @@ DofMap::DofMap(const unsigned int number) :
 }
 
 
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 
 inline
 bool DofMap::is_constrained_dof (const unsigned int dof) const
@@ -818,7 +818,7 @@ bool DofMap::is_constrained_dof (const unsigned int dof) const
 #endif
 
 
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
 
 inline
 bool DofMap::is_periodic_boundary (const unsigned int boundaryid) const
@@ -904,7 +904,7 @@ void SparsityPattern::sort_row (const BidirectionalIterator begin,
 
 // ------------------------------------------------------------
 // PeriodicBoundary inline member functions
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
 
 inline
 PeriodicBoundary *PeriodicBoundaries::boundary(unsigned int id)
@@ -915,7 +915,7 @@ PeriodicBoundary *PeriodicBoundaries::boundary(unsigned int id)
   return &i->second;
 }
 
-#endif // ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_PERIODIC
 
 
 #endif // __dof_map_h__

@@ -35,12 +35,12 @@ class TypeTensor;
 
 
 /**
- * This class defines a vector in \p DIM dimensional space of type T.
+ * This class defines a vector in \p LIBMESH_DIM dimensional space of type T.
  * T may either be Real or Complex.  The default constructor for
  * this class is protected, suggesting that you should not instantiate
  * one of these directly.  Instead use one of the derived types: \p Point
- * for a real-valued point in DIM-space, or \p SpaceVector for a real
- * or complex-valued vector in DIM-space.
+ * for a real-valued point in LIBMESH_DIM-space, or \p SpaceVector for a real
+ * or complex-valued vector in LIBMESH_DIM-space.
  *
  * \author Benjamin S. Kirk, 2003. 
  */
@@ -57,7 +57,7 @@ protected:
 
   /**
    * Constructor.  By default sets all entries to 0.  Gives the vector 0 in
-   * \p DIM dimensions.
+   * \p LIBMESH_DIM dimensions.
    */
   TypeVector  (const T x=0.,
 	       const T y=0.,
@@ -283,7 +283,7 @@ public:
   /**
    * The coordinates of the \p TypeVector
    */
-  T _coords[DIM];
+  T _coords[LIBMESH_DIM];
 };
 
 
@@ -298,11 +298,11 @@ TypeVector<T>::TypeVector (const T x,
 {
   _coords[0] = x;
 
-  if (DIM > 1)
+  if (LIBMESH_DIM > 1)
     {
       _coords[1] = y;
 
-      if (DIM == 3)
+      if (LIBMESH_DIM == 3)
 	_coords[2] = z;
     }
 }
@@ -315,7 +315,7 @@ inline
 TypeVector<T>::TypeVector (const TypeVector<T2> &p)
 {
   // copy the nodes from vector p to me
-  for (unsigned int i=0; i<DIM; i++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
     _coords[i] = p._coords[i];
 }
 
@@ -334,7 +334,7 @@ template <typename T2>
 inline
 void TypeVector<T>::assign (const TypeVector<T2> &p)
 {
-  for (unsigned int i=0; i<DIM; i++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
     _coords[i] = p._coords[i];
 }
 
@@ -346,9 +346,9 @@ T TypeVector<T>::operator () (const unsigned int i) const
 {
   libmesh_assert (i<3);
 
-#if DIM < 3
+#if LIBMESH_DIM < 3
   
-  if (i > (DIM-1))
+  if (i > (LIBMESH_DIM-1))
     return 0.;
   
 #endif
@@ -362,20 +362,20 @@ template <typename T>
 inline
 T & TypeVector<T>::operator () (const unsigned int i)
 {
-#if DIM < 3
+#if LIBMESH_DIM < 3
 
-  if (i >= DIM)
+  if (i >= LIBMESH_DIM)
     {
 //       std::cerr << "ERROR:  You are assigning to a vector component" << std::endl
-// 		<< "that is out of range for the compiled DIM!"      << std::endl
-// 		<< " DIM=" << DIM << " , i=" << i
+// 		<< "that is out of range for the compiled LIBMESH_DIM!"      << std::endl
+// 		<< " LIBMESH_DIM=" << LIBMESH_DIM << " , i=" << i
 // 		<< std::endl;
       libmesh_error();
     }
   
 #endif
   
-  libmesh_assert (i<DIM);
+  libmesh_assert (i<LIBMESH_DIM);
   
   return _coords[i];
 }
@@ -389,16 +389,16 @@ TypeVector<typename CompareTypes<T, T2>::supertype>
 TypeVector<T>::operator + (const TypeVector<T2> &p) const
 {
   typedef typename CompareTypes<T, T2>::supertype TS;
-#if DIM == 1
+#if LIBMESH_DIM == 1
   return TypeVector<TS> (_coords[0] + p._coords[0]);
 #endif
 
-#if DIM == 2 
+#if LIBMESH_DIM == 2 
   return TypeVector<TS> (_coords[0] + p._coords[0],
                          _coords[1] + p._coords[1]);
 #endif
 
-#if DIM == 3
+#if LIBMESH_DIM == 3
   return TypeVector<TS> (_coords[0] + p._coords[0],
                          _coords[1] + p._coords[1],
                          _coords[2] + p._coords[2]);
@@ -425,16 +425,16 @@ template <typename T2>
 inline
 void TypeVector<T>::add (const TypeVector<T2> &p)
 {
-#if DIM == 1
+#if LIBMESH_DIM == 1
   _coords[0] += p._coords[0];
 #endif
   
-#if DIM == 2
+#if LIBMESH_DIM == 2
   _coords[0] += p._coords[0];
   _coords[1] += p._coords[1];
 #endif
   
-#if DIM == 3
+#if LIBMESH_DIM == 3
   _coords[0] += p._coords[0];
   _coords[1] += p._coords[1];
   _coords[2] += p._coords[2];
@@ -449,16 +449,16 @@ template <typename T2>
 inline
 void TypeVector<T>::add_scaled (const TypeVector<T2> &p, const T factor)
 {
-#if DIM == 1
+#if LIBMESH_DIM == 1
   _coords[0] += factor*p(0);
 #endif
   
-#if DIM == 2
+#if LIBMESH_DIM == 2
   _coords[0] += factor*p(0);
   _coords[1] += factor*p(1);
 #endif
   
-#if DIM == 3
+#if LIBMESH_DIM == 3
   _coords[0] += factor*p(0);
   _coords[1] += factor*p(1);
   _coords[2] += factor*p(2);
@@ -476,16 +476,16 @@ TypeVector<T>::operator - (const TypeVector<T2> &p) const
 {
   typedef typename CompareTypes<T, T2>::supertype TS;
 
-#if DIM == 1
+#if LIBMESH_DIM == 1
   return TypeVector<TS>(_coords[0] - p._coords[0]);
 #endif
 
-#if DIM == 2 
+#if LIBMESH_DIM == 2 
   return TypeVector<TS>(_coords[0] - p._coords[0],
 		        _coords[1] - p._coords[1]);
 #endif
 
-#if DIM == 3
+#if LIBMESH_DIM == 3
   return TypeVector<TS>(_coords[0] - p._coords[0],
 		        _coords[1] - p._coords[1],
 		        _coords[2] - p._coords[2]);
@@ -512,7 +512,7 @@ template <typename T2>
 inline
 void TypeVector<T>::subtract (const TypeVector<T2>& p)
 {
-  for (unsigned int i=0; i<DIM; i++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
     _coords[i] -= p._coords[i];
 }
 
@@ -523,7 +523,7 @@ template <typename T2>
 inline
 void TypeVector<T>::subtract_scaled (const TypeVector<T2> &p, const T factor)
 {
-  for (unsigned int i=0; i<DIM; i++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
     _coords[i] -= factor*p(i);
 }
 
@@ -534,16 +534,16 @@ inline
 TypeVector<T> TypeVector<T>::operator - () const
 {
   
-#if DIM == 1
+#if LIBMESH_DIM == 1
   return TypeVector(-_coords[0]);
 #endif
 
-#if DIM == 2 
+#if LIBMESH_DIM == 2 
   return TypeVector(-_coords[0],
 		    -_coords[1]);
 #endif
 
-#if DIM == 3
+#if LIBMESH_DIM == 3
   return TypeVector(-_coords[0],
 		    -_coords[1], 
 		    -_coords[2]);
@@ -563,16 +563,16 @@ TypeVector<T>::operator * (const Scalar factor) const
 {
   typedef typename CompareTypes<T, Scalar>::supertype TS;
 
-#if DIM == 1
+#if LIBMESH_DIM == 1
   return TypeVector<TS>(_coords[0]*factor);
 #endif
   
-#if DIM == 2 
+#if LIBMESH_DIM == 2 
   return TypeVector<TS>(_coords[0]*factor,
 		        _coords[1]*factor);
 #endif
   
-#if DIM == 3
+#if LIBMESH_DIM == 3
   return TypeVector<TS>(_coords[0]*factor,
 		        _coords[1]*factor, 
 		        _coords[2]*factor);
@@ -598,16 +598,16 @@ template <typename T>
 inline
 const TypeVector<T> & TypeVector<T>::operator *= (const T factor)
 {
-#if DIM == 1
+#if LIBMESH_DIM == 1
   _coords[0] *= factor;
 #endif
   
-#if DIM == 2
+#if LIBMESH_DIM == 2
   _coords[0] *= factor;
   _coords[1] *= factor;
 #endif
   
-#if DIM == 3
+#if LIBMESH_DIM == 3
   _coords[0] *= factor;
   _coords[1] *= factor;
   _coords[2] *= factor;
@@ -630,16 +630,16 @@ TypeVector<T>::operator / (const Scalar factor) const
 
   typedef typename CompareTypes<T, Scalar>::supertype TS;
   
-#if DIM == 1
+#if LIBMESH_DIM == 1
   return TypeVector<TS>(_coords[0]/factor);
 #endif
   
-#if DIM == 2 
+#if LIBMESH_DIM == 2 
   return TypeVector<TS>(_coords[0]/factor,
 		        _coords[1]/factor);
 #endif
   
-#if DIM == 3
+#if LIBMESH_DIM == 3
   return TypeVector<TS>(_coords[0]/factor,
 		        _coords[1]/factor, 
 		        _coords[2]/factor);
@@ -657,7 +657,7 @@ TypeVector<T>::operator /= (const T factor)
 {
   libmesh_assert (factor != static_cast<T>(0.));
   
-  for (unsigned int i=0; i<DIM; i++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
     _coords[i] /= factor;
 
   return *this;
@@ -672,16 +672,16 @@ inline
 typename CompareTypes<T, T2>::supertype
 TypeVector<T>::operator * (const TypeVector<T2> &p) const
 {
-#if DIM == 1
+#if LIBMESH_DIM == 1
   return _coords[0]*p._coords[0];
 #endif
   
-#if DIM == 2
+#if LIBMESH_DIM == 2
   return (_coords[0]*p._coords[0] +
 	  _coords[1]*p._coords[1]);
 #endif
   
-#if DIM == 3
+#if LIBMESH_DIM == 3
   return (_coords[0]*p(0) +
 	  _coords[1]*p(1) +
 	  _coords[2]*p(2));
@@ -696,7 +696,7 @@ TypeVector<typename CompareTypes<T, T2>::supertype>
 TypeVector<T>::cross(const TypeVector<T2>& p) const
 {
   typedef typename CompareTypes<T, T2>::supertype TS;
-  libmesh_assert (DIM == 3);
+  libmesh_assert (LIBMESH_DIM == 3);
 
   // |     i          j          k    |
   // |(*this)(0) (*this)(1) (*this)(2)|
@@ -722,7 +722,7 @@ template <typename T>
 inline
 void TypeVector<T>::zero()
 {
-  for (unsigned int i=0; i<DIM; i++)
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
     _coords[i] = 0.;
 }
 
@@ -732,16 +732,16 @@ template <typename T>
 inline
 Real TypeVector<T>::size_sq() const
 {
-#if DIM == 1
+#if LIBMESH_DIM == 1
   return (libmesh_norm(_coords[0]));
 #endif
   
-#if DIM == 2
+#if LIBMESH_DIM == 2
   return (libmesh_norm(_coords[0]) +
 	  libmesh_norm(_coords[1]));
 #endif
   
-#if DIM == 3
+#if LIBMESH_DIM == 3
   return (libmesh_norm(_coords[0]) +
 	  libmesh_norm(_coords[1]) + 
 	  libmesh_norm(_coords[2]));
@@ -754,18 +754,18 @@ template <typename T>
 inline
 bool TypeVector<T>::absolute_fuzzy_equals(const TypeVector<T>& rhs, Real tol) const
 {
-#if DIM == 1
+#if LIBMESH_DIM == 1
   return (std::abs(_coords[0] - rhs._coords[0])
 	  <= tol);
 #endif
 
-#if DIM == 2
+#if LIBMESH_DIM == 2
   return (std::abs(_coords[0] - rhs._coords[0]) +
 	  std::abs(_coords[1] - rhs._coords[1])
 	  <= tol);
 #endif
 
-#if DIM == 3
+#if LIBMESH_DIM == 3
   return (std::abs(_coords[0] - rhs._coords[0]) +
 	  std::abs(_coords[1] - rhs._coords[1]) +
 	  std::abs(_coords[2] - rhs._coords[2])
@@ -779,18 +779,18 @@ template <typename T>
 inline
 bool TypeVector<T>::relative_fuzzy_equals(const TypeVector<T>& rhs, Real tol) const
 {
-#if DIM == 1
+#if LIBMESH_DIM == 1
   return this->absolute_fuzzy_equals(rhs, tol *
 				     (std::abs(_coords[0]) + std::abs(rhs._coords[0])));
 #endif
 
-#if DIM == 2
+#if LIBMESH_DIM == 2
   return this->absolute_fuzzy_equals(rhs, tol * 
 				     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
 				      std::abs(_coords[1]) + std::abs(rhs._coords[1])));
 #endif
 
-#if DIM == 3
+#if LIBMESH_DIM == 3
   return this->absolute_fuzzy_equals(rhs, tol *
 				     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
 				      std::abs(_coords[1]) + std::abs(rhs._coords[1]) +
@@ -804,16 +804,16 @@ template <typename T>
 inline
 bool TypeVector<T>::operator == (const TypeVector<T>& rhs) const
 {
-#if DIM == 1
+#if LIBMESH_DIM == 1
   return (_coords[0] == rhs._coords[0]);
 #endif
 
-#if DIM == 2
+#if LIBMESH_DIM == 2
   return (_coords[0] == rhs._coords[0] &&
 	  _coords[1] == rhs._coords[1]);
 #endif
 
-#if DIM == 3
+#if LIBMESH_DIM == 3
   return (_coords[0] == rhs._coords[0] &&
 	  _coords[1] == rhs._coords[1] &&
 	  _coords[2] == rhs._coords[2]);

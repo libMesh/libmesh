@@ -38,7 +38,7 @@
 
 
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 void
 LaplacianErrorEstimator::initialize(const System&,
@@ -107,7 +107,7 @@ LaplacianErrorEstimator::internal_side_integration ()
     error * coarse_elem->hmax() * component_scale[var];
 }
 
-#else // defined (ENABLE_SECOND_DERIVATIVES)
+#else // defined (LIBMESH_ENABLE_SECOND_DERIVATIVES)
 
 void
 LaplacianErrorEstimator::initialize(const System&,
@@ -130,6 +130,6 @@ LaplacianErrorEstimator::internal_side_integration ()
   libmesh_error();
 }
 
-#endif // defined (ENABLE_SECOND_DERIVATIVES)
+#endif // defined (LIBMESH_ENABLE_SECOND_DERIVATIVES)
 
 

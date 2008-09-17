@@ -66,6 +66,6 @@ void DenseSubMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
 // Explicit instantiations
 template class DenseSubMatrix<Real>;
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseSubMatrix<Complex>;
 #endif

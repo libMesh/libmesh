@@ -19,7 +19,7 @@
 
 
 #include "libmesh_config.h"
-#ifdef HAVE_SLEPC
+#ifdef LIBMESH_HAVE_SLEPC
 
 // C++ includes
 
@@ -41,7 +41,7 @@ EigenSolver<T>::build(const SolverPackage solver_package)
 
 
 
-#ifdef HAVE_SLEPC
+#ifdef LIBMESH_HAVE_SLEPC
 	case SLEPC_SOLVERS:
       {
 	AutoPtr<EigenSolver<T> > ap(new SlepcEigenSolver<T>);
@@ -68,4 +68,4 @@ EigenSolver<T>::build(const SolverPackage solver_package)
 template class EigenSolver<Number>;
 
 
-#endif // HAVE_SLEPC
+#endif // LIBMESH_HAVE_SLEPC

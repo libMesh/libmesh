@@ -123,7 +123,7 @@ public:
   Gradient gradient (const Point& p, 
 		     const Real time=0.);
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * @returns the second derivatives of variable 0 at point
    * \p p and for \p time, which defaults to zero.

@@ -35,7 +35,7 @@ void NodeElem::connectivity(const unsigned int,
   libmesh_error();
 }
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float NodeElem::_embedding_matrix[1][1][1] =
 {

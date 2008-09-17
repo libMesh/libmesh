@@ -122,14 +122,14 @@ void MeshData::read_xdr (const std::string& name,
   {
     std::string vtype="";
     io.data (vtype);
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
     if (vtype != "COMPLEX")
       {
 	std::cerr << "ERROR: File does not contain complex-valued data!"
 		  << std::endl;
 	libmesh_error();
       }
-#elif USE_REAL_NUMBERS
+#elif LIBMESH_USE_REAL_NUMBERS
     if (vtype != "REAL")
       {
 	std::cerr << "ERROR: File does not contain real-valued data!"
@@ -362,9 +362,9 @@ void MeshData::write_xdr (const std::string& name,
    * Write: either real or complex
    */
   {
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
     std::string desc = "COMPLEX";
-#elif USE_REAL_NUMBERS
+#elif LIBMESH_USE_REAL_NUMBERS
     std::string desc = "REAL";
 #else
 better_you_choke_this...

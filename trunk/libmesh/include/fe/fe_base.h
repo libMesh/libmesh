@@ -33,7 +33,7 @@
 #include "fe_type.h"
 #include "auto_ptr.h"
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 #include "tensor_value.h"
 #endif
 
@@ -50,7 +50,7 @@ class PeriodicBoundaries;
 template <typename T> class NumericVector;
 class QBase;
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 class InfFE;
@@ -112,7 +112,7 @@ public:
   static AutoPtr<FEBase> build (const unsigned int dim,
 				const FEType& type); 
   
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * Builds a specific infinite element type.  A \p AutoPtr<FEBase> is
@@ -170,7 +170,7 @@ public:
 				   const ElemType t,
 				   const Real eps = TOLERANCE);
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   /**
    * Computes the constraint matrix contributions (for
@@ -195,9 +195,9 @@ public:
 			           const unsigned int var,
 			           const bool use_old_dof_indices = false);
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
 
   /**
    * Computes the constraint matrix contributions (for
@@ -211,7 +211,7 @@ public:
                                             const unsigned int variable_number,
                                             const Elem* elem);
 
-#endif // ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_PERIODIC
 
   /**
    * @returns the \p xyz spatial locations of the quadrature
@@ -267,7 +267,7 @@ public:
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidz; }
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
    * @returns the shape function second derivatives at the quadrature
@@ -360,7 +360,7 @@ public:
   const std::vector<RealGradient>& get_d2xyzdeta2() const
   { return d2xyzdeta2_map; }
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   
   /**
    * @returns the second partial derivatives in zeta.
@@ -376,7 +376,7 @@ public:
   const std::vector<RealGradient>& get_d2xyzdxideta() const
   { return d2xyzdxideta_map; }
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   
   /**
    * @returns the second partial derivatives in xi-zeta.
@@ -455,7 +455,7 @@ public:
   const std::vector<Real>& get_dzetadz() const
   { return dzetadz_map; }
   
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * @returns the global first derivative of the phase term 
@@ -589,7 +589,7 @@ public:
    */ 
   void print_dphi(std::ostream& os) const;
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
    * Prints the value of each shape function's second derivatives
@@ -620,7 +620,7 @@ protected:
 
 
     
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * Initialize the data fields for the base of an
@@ -802,7 +802,7 @@ protected:
    */
   std::vector<RealGradient> d2xyzdeta2_map;
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
    * Vector of second partial derivatives in xi-zeta:
@@ -947,7 +947,7 @@ protected:
   std::vector<std::vector<Real> >   dphidz;
 
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   
   /**
    * Shape function second derivative values.
@@ -1039,7 +1039,7 @@ protected:
    */
   std::vector<std::vector<Real> >   dphidzeta_map;
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
    * Map for the second derivative, d^2(phi)/d(xi)^2.
@@ -1116,7 +1116,7 @@ protected:
   std::vector<std::vector<Real> > d2psideta2_map;
 
   
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   //--------------------------------------------------------------
   /* protected members for infinite elements, which are accessed 
@@ -1213,7 +1213,7 @@ private:
   virtual bool shapes_need_reinit() const = 0;
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * Make all \p InfFE<Dim,T_radial,T_map> classes friends

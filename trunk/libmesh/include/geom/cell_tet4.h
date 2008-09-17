@@ -163,7 +163,7 @@ public:
 protected:
 
   
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   
   /**
    * Matrix used to create the elements children.
@@ -239,7 +239,7 @@ protected:
 inline
 Tet4::Tet4(Elem* p) :
   Tet(Tet4::n_nodes(), p)
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   , _diagonal_selection(INVALID_DIAG)
 #endif
 {

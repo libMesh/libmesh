@@ -22,7 +22,7 @@
 #define __mesh_tetgen_support_h__
 
 #include "libmesh_config.h"
-#ifdef HAVE_TETGEN
+#ifdef LIBMESH_HAVE_TETGEN
 
 
 // C++ includes
@@ -278,6 +278,6 @@ protected:
 
 };
 
-#endif // HAVE_TETGEN
+#endif // LIBMESH_HAVE_TETGEN
 
 #endif 

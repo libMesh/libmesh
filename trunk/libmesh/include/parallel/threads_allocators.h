@@ -29,7 +29,7 @@
 #include "threads.h"
 
 // Threading building blocks includes
-#ifdef HAVE_TBB_API
+#ifdef LIBMESH_HAVE_TBB_API
 #  include "tbb/scalable_allocator.h"
 #endif
 
@@ -40,7 +40,7 @@
  */
 namespace Threads
 {
-#ifdef HAVE_TBB_API
+#ifdef LIBMESH_HAVE_TBB_API
  
  //-------------------------------------------------------------------
   /**
@@ -79,7 +79,7 @@ namespace Threads
 
   
 
-#else //HAVE_TBB_API
+#else //LIBMESH_HAVE_TBB_API
 
 
  
@@ -117,7 +117,7 @@ namespace Threads
   };
   
 
-#endif // #ifdef HAVE_TBB_API
+#endif // #ifdef LIBMESH_HAVE_TBB_API
 
 } // namespace Threads
 

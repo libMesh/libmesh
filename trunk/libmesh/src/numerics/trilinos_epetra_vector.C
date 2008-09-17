@@ -22,7 +22,7 @@
 // Local Includes
 #include "trilinos_epetra_vector.h"
 
-#ifdef HAVE_TRILINOS
+#ifdef LIBMESH_HAVE_TRILINOS
 
 #include "parallel.h"
 #include "utility.h"

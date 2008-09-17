@@ -27,7 +27,7 @@
 #include "libmesh_config.h"
 
 // Threading building blocks includes
-#ifdef HAVE_TBB_API
+#ifdef LIBMESH_HAVE_TBB_API
 #  include "libmesh_logging.h" // only mess with the perflog if we are really multithreaded
 #  include "tbb/tbb_stddef.h"
 #  include "tbb/blocked_range.h"
@@ -47,7 +47,7 @@
 namespace Threads
 {
 
-#ifdef HAVE_TBB_API
+#ifdef LIBMESH_HAVE_TBB_API
   //-------------------------------------------------------------------
   /**
    * Scheduler to manage threads.
@@ -74,14 +74,14 @@ namespace Threads
   inline
   void parallel_for (const Range &range, const Body &body)
   {
-#ifdef ENABLE_PERFORMANCE_LOGGING
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
 #endif   
 
     tbb::parallel_for (range, body, tbb::auto_partitioner()); 
 
-#ifdef ENABLE_PERFORMANCE_LOGGING
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
       libMesh::perflog.enable_logging();
 #endif
@@ -98,14 +98,14 @@ namespace Threads
   inline
   void parallel_for (const Range &range, const Body &body, const Partitioner &partitioner)
   { 
-#ifdef ENABLE_PERFORMANCE_LOGGING
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
 #endif   
 
     tbb::parallel_for (range, body, partitioner); 
 
-#ifdef ENABLE_PERFORMANCE_LOGGING
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
       libMesh::perflog.enable_logging();
 #endif
@@ -122,14 +122,14 @@ namespace Threads
   inline
   void parallel_reduce (const Range &range, Body &body)
   { 
-#ifdef ENABLE_PERFORMANCE_LOGGING
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
 #endif   
 
     tbb::parallel_reduce (range, body, tbb::auto_partitioner()); 
 
-#ifdef ENABLE_PERFORMANCE_LOGGING
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
       libMesh::perflog.enable_logging();
 #endif
@@ -146,14 +146,14 @@ namespace Threads
   inline
   void parallel_reduce (const Range &range, Body &body, const Partitioner &partitioner)
   { 
-#ifdef ENABLE_PERFORMANCE_LOGGING
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
 #endif   
 
     tbb::parallel_reduce (range, body); 
 
-#ifdef ENABLE_PERFORMANCE_LOGGING
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
       libMesh::perflog.enable_logging();
 #endif
@@ -179,7 +179,7 @@ namespace Threads
 
   
 
-#else //HAVE_TBB_API
+#else //LIBMESH_HAVE_TBB_API
 
   //-------------------------------------------------------------------
   /**
@@ -277,7 +277,7 @@ namespace Threads
   };
   
 
-#endif // #ifdef HAVE_TBB_API
+#endif // #ifdef LIBMESH_HAVE_TBB_API
 
 
 

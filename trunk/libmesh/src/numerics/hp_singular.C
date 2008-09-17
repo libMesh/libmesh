@@ -26,7 +26,7 @@
 #include "mesh.h"
 #include "system.h"
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 //-----------------------------------------------------------------
 // HPSingularity implementations
@@ -72,4 +72,4 @@ void HPSingularity::select_refinement (System &system)
   STOP_LOG("select_refinement()", "HPSingularity");
 }
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR

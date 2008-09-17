@@ -24,7 +24,7 @@
 #include "libmesh_common.h"
 
 
-#ifdef HAVE_TRILINOS
+#ifdef LIBMESH_HAVE_TRILINOS
 
 // C++ includes
 #include <vector>
@@ -258,7 +258,7 @@ public:
   void add (const unsigned int i, const T value);
     
   /**
-   * \f$U(0-DIM)+=s\f$.
+   * \f$U(0-LIBMESH_DIM)+=s\f$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */

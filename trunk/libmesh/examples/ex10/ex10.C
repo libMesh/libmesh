@@ -116,7 +116,7 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
-#ifndef ENABLE_AMR
+#ifndef LIBMESH_ENABLE_AMR
   if (libMesh::processor_id() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
               << "compiled with AMR support!"
@@ -405,7 +405,7 @@ int main (int argc, char** argv)
       mesh.write("saved_mesh.xda");
       equation_systems.write("saved_solution.xda", libMeshEnums::WRITE);
     }
-#endif // #ifndef ENABLE_AMR
+#endif // #ifndef LIBMESH_ENABLE_AMR
   
   return 0;
 }
@@ -440,7 +440,7 @@ void init_cd (EquationSystems& es,
 void assemble_cd (EquationSystems& es,
                   const std::string& system_name)
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert (system_name == "Convection-Diffusion");
@@ -670,5 +670,5 @@ void assemble_cd (EquationSystems& es,
       
     }
   // Finished computing the sytem matrix and right-hand side.
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 }

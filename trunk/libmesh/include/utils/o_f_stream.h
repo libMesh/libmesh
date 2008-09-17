@@ -39,7 +39,7 @@
  * Therefore, resort to preprocessor definitions. 
  */
 
-#ifndef BROKEN_IOSTREAM
+#ifndef LIBMESH_BROKEN_IOSTREAM
  /*
   * ---------------------------------------------------------------------------------
   * Everything for a clean iostream
@@ -58,7 +58,7 @@
   * may be either real or complex) with width
   * \p v in scientific format to stream \p o.
   */
-# if defined(USE_COMPLEX_NUMBERS) 
+# if defined(LIBMESH_USE_COMPLEX_NUMBERS) 
 #  define OFSNumberscientific(o,v,d)    (o) << std::setprecision(v) << std::scientific << (d).real() << " " \
                                             << std::setprecision(v) << std::scientific << (d).imag()
 # else
@@ -142,7 +142,7 @@
  // OFStream inline methods
  
 
-#endif // ifndef ... else ... BROKEN_IOSTREAM
+#endif // ifndef ... else ... LIBMESH_BROKEN_IOSTREAM
 
 
 

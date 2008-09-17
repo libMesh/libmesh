@@ -22,7 +22,7 @@
 #include "operats.h"
 #include "rtc.h"
 #include "copyrght.h"
-#ifndef _LP_USE_COMPLEX_NUMBERS
+#ifndef _LP_LIBMESH_USE_COMPLEX_NUMBERS
 
 typedef struct {
     _LPDouble MinEigenval;
@@ -383,5 +383,5 @@ _LPDouble GetMaxEigenval(QMatrix * /* Q */,
     abort();
 }
 
-#endif /* _LP_USE_COMPLEX_NUMBERS */
+#endif /* _LP_LIBMESH_USE_COMPLEX_NUMBERS */
 

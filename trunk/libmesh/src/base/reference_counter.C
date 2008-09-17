@@ -30,7 +30,7 @@
 
 // ------------------------------------------------------------
 // ReferenceCounter class static member initializations
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
 ReferenceCounter::Counts ReferenceCounter::_counts;
 
@@ -44,7 +44,7 @@ Threads::spin_mutex  ReferenceCounter::_mutex;
 // ReferenceCounter class members
 std::string ReferenceCounter::get_info ()
 {
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
   std::ostringstream out;
   
@@ -82,7 +82,7 @@ std::string ReferenceCounter::get_info ()
 
 void ReferenceCounter::print_info ()
 {
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
   
   std::cout << ReferenceCounter::get_info();
   

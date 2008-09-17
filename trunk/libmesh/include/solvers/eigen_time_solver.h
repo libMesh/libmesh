@@ -23,7 +23,7 @@
 #define __eigen_time_solver_h__
 
 #include "libmesh_config.h"
-#ifdef HAVE_SLEPC
+#ifdef LIBMESH_HAVE_SLEPC
 
 // C++ includes
 
@@ -206,5 +206,5 @@ private:
 };
 
 
-#endif // HAVE_SLEPC
+#endif // LIBMESH_HAVE_SLEPC
 #endif // #define __eigen_time_solver_h__

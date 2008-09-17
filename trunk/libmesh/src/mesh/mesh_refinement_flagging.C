@@ -24,7 +24,7 @@
 #include "libmesh_config.h"
 
 // only compile these functions if the user requests AMR support
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 // C++ includes
 #include <algorithm> // for std::sort

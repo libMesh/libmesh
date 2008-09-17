@@ -59,7 +59,7 @@ int main(int argc, char** argv)
   // finalized.
   LibMeshInit init (argc, argv);
 
-#ifndef ENABLE_AMR
+#ifndef LIBMESH_ENABLE_AMR
   if (libMesh::processor_id() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
               << "compiled with AMR support!"
@@ -147,7 +147,7 @@ int main(int argc, char** argv)
   // Write out script to be called from within gnuplot:
   // Load gnuplot, then type "call 'gnuplot_script'" from gnuplot prompt
   plot.write_equation_systems("gnuplot_script",equation_systems);
-#endif // #ifndef ENABLE_AMR
+#endif // #ifndef LIBMESH_ENABLE_AMR
   
   // All done.  libMesh objects are destroyed here.  Because the
   // LibMeshInit object was created first, its destruction occurs
@@ -163,7 +163,7 @@ int main(int argc, char** argv)
 void assemble_1D(EquationSystems& es, const std::string& system_name)
 {
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   // It is a good idea to check we are solving the correct system
   libmesh_assert(system_name == "1D");
@@ -300,5 +300,5 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
     system.matrix->add_matrix(Ke, dof_indices);
     system.rhs->add_vector(Fe, dof_indices);
   }
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 }

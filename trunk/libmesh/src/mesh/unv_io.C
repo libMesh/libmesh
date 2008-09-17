@@ -41,7 +41,7 @@
 #include "cell_tet10.h"
 #include "cell_prism6.h"
 
-#ifdef HAVE_GZSTREAM
+#ifdef LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h" // For reading/writing compressed streams
 #endif
 
@@ -79,7 +79,7 @@ void UNVIO::read (const std::string& file_name)
 {
   if (file_name.rfind(".gz") < file_name.size())
     {
-#ifdef HAVE_GZSTREAM
+#ifdef LIBMESH_HAVE_GZSTREAM
       
       igzstream in_stream (file_name.c_str());
       this->read_implementation (in_stream);
@@ -276,7 +276,7 @@ void UNVIO::write (const std::string& file_name)
 {
   if (file_name.rfind(".gz") < file_name.size())
     {
-#ifdef HAVE_GZSTREAM
+#ifdef LIBMESH_HAVE_GZSTREAM
       
       ogzstream out_stream(file_name.c_str());
       this->write_implementation (out_stream);

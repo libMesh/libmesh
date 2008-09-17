@@ -43,7 +43,7 @@ class FEType
 {
 public:
 
-#ifndef ENABLE_INFINITE_ELEMENTS
+#ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
   
   /**
    * Constructor.  Optionally takes the approximation \p Order
@@ -123,7 +123,7 @@ public:
    */
   InfMapType inf_map;
   
-#endif // ifndef ENABLE_INFINITE_ELEMENTS
+#endif // ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * @tests equality
@@ -132,11 +132,11 @@ public:
   {
     return (order == f2.order
 	    && family == f2.family
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 	    && radial_order == f2.radial_order
 	    && radial_family == f2.radial_family
 	    && inf_map == f2.inf_map
-#endif // ifdef ENABLE_INFINITE_ELEMENTS
+#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 	    );
   }
 
@@ -150,14 +150,14 @@ public:
     if (family != f2.family)
       return (family < f2.family);
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     if (radial_order != f2.radial_order)
       return (radial_order < f2.radial_order);
     if (radial_family != f2.radial_family)
       return (radial_family < f2.radial_family);
     if (inf_map != f2.inf_map)
       return (inf_map < f2.inf_map);
-#endif // ifdef ENABLE_INFINITE_ELEMENTS
+#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     return false;
   }
 

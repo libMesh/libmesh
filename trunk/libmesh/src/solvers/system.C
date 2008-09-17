@@ -92,7 +92,7 @@ unsigned int System::n_dofs() const
 
 unsigned int System::n_constrained_dofs() const
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   return _dof_map->n_constrained_dofs();
 
@@ -178,7 +178,7 @@ void System::init_data ()
   // Distribute the degrees of freedom on the mesh
   _dof_map->distribute_dofs (this->get_mesh());
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   // Recreate any hanging node constraints
   _dof_map->create_dof_constraints(this->get_mesh());
@@ -209,7 +209,7 @@ void System::init_data ()
 
 void System::restrict_vectors ()
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   // Restrict the _vectors on the coarsened cells
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
     {
@@ -242,7 +242,7 @@ void System::restrict_vectors ()
 
 void System::prolong_vectors ()
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   // Currently project_vector handles both restriction and prolongation
   this->restrict_vectors();
 #endif
@@ -252,7 +252,7 @@ void System::prolong_vectors ()
 
 void System::reinit ()
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   // Recreate any hanging node constraints
 //  _dof_map->create_dof_constraints(this->get_mesh());
 
@@ -688,7 +688,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
           norm.type(var) == H2 ||
           norm.type(var) == H1_SEMINORM)
         dphi = &(fe->get_dphi());
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       const std::vector<std::vector<RealTensor> >*   d2phi = NULL;
       if (norm.type(var) == H2 ||
           norm.type(var) == H2_SEMINORM)
@@ -740,7 +740,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
                             JxW[qp] * grad_u_h.size_sq();
                 }
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               if (norm.type(var) == H2 ||
                   norm.type(var) == H2_SEMINORM)
                 {
@@ -781,7 +781,7 @@ std::string System::get_info() const
   out << '\n';
 
   out << "    Finite Element Types=";
-#ifndef ENABLE_INFINITE_ELEMENTS
+#ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
     out << "\""
 	<< Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_type(vn).family)
@@ -808,7 +808,7 @@ std::string System::get_info() const
   out << "    Approximation Orders=";
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
     {
-#ifndef ENABLE_INFINITE_ELEMENTS
+#ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
       out << "\""
 	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_type(vn).order)
 	  << "\" ";
@@ -825,7 +825,7 @@ std::string System::get_info() const
       
   out << "    n_dofs()="             << this->n_dofs()             << '\n';
   out << "    n_local_dofs()="       << this->n_local_dofs()       << '\n';
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   out << "    n_constrained_dofs()=" << this->n_constrained_dofs() << '\n';
 #endif
 

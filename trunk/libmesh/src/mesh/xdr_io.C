@@ -313,7 +313,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
       for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 	{
 	  recv_conn.resize(xfer_buf_sizes[pid]);
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
 	  Parallel::recv (pid, recv_conn);	
 #else
 	  libmesh_assert (libMesh::n_processors() == 1);
@@ -340,7 +340,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 	      if (write_subdomain_id)
 		output_buffer.push_back(*it); /* subdomain id */ ++it;
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 	      if (write_p_level)
 		output_buffer.push_back(*it); /* p level      */ ++it;
 #endif
@@ -353,7 +353,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
     }
   Parallel::wait (request_handle);
 
-#ifdef ENABLE_AMR  
+#ifdef LIBMESH_ENABLE_AMR  
   //--------------------------------------------------------------------
   // Next write the remaining elements indirectly through their parents.
   // This will insure that the children are written in the proper order
@@ -415,7 +415,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 	    {
 	      recv_conn.resize(xfer_buf_sizes[pid]);
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
 	      Parallel::recv (pid, recv_conn);	
 #else
 	      libmesh_assert (libMesh::n_processors() == 1);
@@ -520,7 +520,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 	parent_id_map.swap(child_id_map); /**/ child_id_map.clear();
       }
     }
-#endif // ENABLE_AMR
+#endif // LIBMESH_ENABLE_AMR
   if (libMesh::processor_id() == 0)
     libmesh_assert (next_global_elem == n_elem);
   
@@ -588,7 +588,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
         id_request_handles(libMesh::n_processors()),
         coord_request_handles(libMesh::n_processors());
 
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
       const unsigned int id_tag=0, coord_tag=1;
       
       // Post the receives -- do this on processor 0 only.
@@ -715,7 +715,7 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
       for (unsigned int pid=0, elem_offset=0; pid<libMesh::n_processors(); pid++)
 	{
 	  recv_bcs.resize(bc_sizes[pid]);
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
 	  Parallel::recv (pid, recv_bcs);
 #else
 	  libmesh_assert (libMesh::n_processors() == 1);
@@ -893,7 +893,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	  const unsigned int parent_id    = *it; ++it;
 	  const unsigned int processor_id = *it; ++it;
 	  const unsigned int subdomain_id = *it; ++it;
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 	  const unsigned int p_level      = *it;
 #endif
 	  ++it;
@@ -904,7 +904,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	  elem->set_id() = e;
 	  elem->processor_id() = processor_id;
 	  elem->subdomain_id() = subdomain_id;
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 	  elem->hack_p_level(p_level);
 
 	  if (parent)
@@ -1096,7 +1096,7 @@ void XdrIO::pack_element (std::vector<unsigned int> &conn, const Elem *elem,
   conn.push_back (elem->processor_id());
   conn.push_back (elem->subdomain_id());
   
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   conn.push_back (elem->p_level());
 #endif
   

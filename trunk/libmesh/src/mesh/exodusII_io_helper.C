@@ -21,7 +21,7 @@
 #include "exodusII_io_helper.h"
 
 
-#ifdef HAVE_EXODUS_API
+#ifdef LIBMESH_HAVE_EXODUS_API
 
 #include <cstring>
 
@@ -780,4 +780,4 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
 
 
-#endif // #ifdef HAVE_EXODUS_API
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API

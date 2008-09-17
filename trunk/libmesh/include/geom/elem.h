@@ -609,7 +609,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   unsigned int p_level () const;
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   /**
    * Useful ENUM describing the refinement state of
@@ -847,7 +847,7 @@ private:
   
 public:
   
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * @returns \p true if the element is an infinite element,
@@ -878,7 +878,7 @@ public:
   static AutoPtr<Elem> build (const ElemType type,
 			      Elem* p=NULL);
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   
   /**
    * Matrix that transforms the parents nodes into the children's
@@ -960,7 +960,7 @@ public:
    */
   Elem* _parent;
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   
   /**
    * Pointers to this element's children.
@@ -1034,7 +1034,7 @@ Elem::Elem(const unsigned int nn,
 	   const unsigned int ns,
 	   Elem* p) :
   _parent(p)
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   , _p_level(0)
 #endif
 {
@@ -1070,7 +1070,7 @@ Elem::Elem(const unsigned int nn,
       this->processor_id() = this->parent()->processor_id();
     }  
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   
   _children = NULL;
 
@@ -1101,7 +1101,7 @@ Elem::~Elem()
     delete [] _neighbors;
   _neighbors = NULL;
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   // Delete my children's storage
   if (_children != NULL)
@@ -1277,7 +1277,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
 inline
 bool Elem::active() const
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   if ((this->refinement_flag() == INACTIVE) ||
       (this->refinement_flag() == COARSEN_INACTIVE))
     return false;
@@ -1295,7 +1295,7 @@ bool Elem::active() const
 inline
 bool Elem::subactive() const
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   if (this->active())
     return false;
   if (!this->has_children())
@@ -1311,7 +1311,7 @@ bool Elem::subactive() const
 inline
 bool Elem::has_children() const
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   if (_children == NULL)
     return false;
   else
@@ -1325,7 +1325,7 @@ bool Elem::has_children() const
 inline
 bool Elem::has_ancestor_children() const
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   if (_children == NULL)
     return false;
   else
@@ -1338,7 +1338,7 @@ bool Elem::has_ancestor_children() const
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 inline
 bool Elem::is_ancestor_of(const Elem *descendant) const
 {
@@ -1404,7 +1404,7 @@ const Elem* Elem::top_parent () const
 inline
 unsigned int Elem::level() const
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   // if I don't have a parent I was
   // created directly from file
@@ -1431,7 +1431,7 @@ unsigned int Elem::level() const
 inline
 unsigned int Elem::p_level() const
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   return _p_level;
 #else
   return 0;
@@ -1440,7 +1440,7 @@ unsigned int Elem::p_level() const
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 inline
 Elem* Elem::child (const unsigned int i) const
@@ -1599,7 +1599,7 @@ void Elem::hack_p_level(unsigned int p)
 
 
 
-#endif /* ifdef ENABLE_AMR */
+#endif /* ifdef LIBMESH_ENABLE_AMR */
 
 
 inline
@@ -1760,7 +1760,7 @@ public:
     return static_cast<unsigned int>(*(_buf_begin+1));
   }
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * \p return the refinement state of this packed element.
    */
@@ -1776,7 +1776,7 @@ public:
   {
     return static_cast<Elem::RefinementState>(*(_buf_begin+3));
   }
-#endif // ENABLE_AMR
+#endif // LIBMESH_ENABLE_AMR
 
   /**
    * \p return the element type of this packed element.

@@ -27,7 +27,7 @@
 #include "libmesh_common.h"
 #include "parallel_bin_sorter.h"
 #include "parallel_histogram.h"
-#ifdef HAVE_LIBHILBERT
+#ifdef LIBMESH_HAVE_LIBHILBERT
 #  include "hilbert.h"
 #endif
 #include "parallel.h"
@@ -142,7 +142,7 @@ void BinSorter<KeyType>::binsort (const unsigned int nbins,
 // Explicitly instantiate for int, double
 template class Parallel::BinSorter<int>;
 template class Parallel::BinSorter<double>;
-#ifdef HAVE_LIBHILBERT
+#ifdef LIBMESH_HAVE_LIBHILBERT
 template class Parallel::BinSorter<Hilbert::HilbertIndices>;
 #endif
 

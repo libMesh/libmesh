@@ -27,7 +27,7 @@
 void QSimpson::init_2D(const ElemType _type,
                        unsigned int)
 {
-#if DIM > 1
+#if LIBMESH_DIM > 1
   
   //-----------------------------------------------------------------------
   // 2D quadrature rules

@@ -21,7 +21,7 @@
 
 #include "libmesh_common.h"
 
-#if defined(HAVE_SLEPC) && defined(HAVE_PETSC)
+#if defined(LIBMESH_HAVE_SLEPC) && defined(LIBMESH_HAVE_PETSC)
 
 
 // C++ includes
@@ -201,7 +201,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
       ierr = EPSComputeRelativeError(_eps, i, &error);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
       re = PetscRealPart(kr);
       im = PetscImaginaryPart(kr);
 #else
@@ -335,7 +335,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
       ierr = EPSComputeRelativeError(_eps, i, &error);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
       re = PetscRealPart(kr);
       im = PetscImaginaryPart(kr);
 #else
@@ -483,7 +483,7 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
   ierr = EPSGetEigenpair(_eps, i, &kr, &ki, solution->vec(), PETSC_NULL);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
   re = PetscRealPart(kr);
   im = PetscImaginaryPart(kr);
 #else
@@ -516,4 +516,4 @@ template class SlepcEigenSolver<Number>;
  
 
 
-#endif // #ifdef HAVE_SLEPC
+#endif // #ifdef LIBMESH_HAVE_SLEPC

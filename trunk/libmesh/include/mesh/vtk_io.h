@@ -44,7 +44,7 @@ class vtkCellArray;
  * cf. <a href="http://www.vtk.org/">VTK home page</a>.
  *
  * This class will not have any functionality unless VTK is detected
- * during configure and hence HAVE_VTK is defined.
+ * during configure and hence LIBMESH_HAVE_VTK is defined.
  *
  * @author Wout Ruijter, 2007
  * (Checked in to LibMesh by J.W. Peterson)

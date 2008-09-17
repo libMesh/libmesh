@@ -26,7 +26,7 @@
 #include "libmesh_logging.h"
 #include "parallel.h"
 #include "o_f_stream.h"
-#ifdef HAVE_GZSTREAM
+#ifdef LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h"
 #endif
 
@@ -37,7 +37,7 @@ namespace {
   // Nasty hacks for reading/writing zipped files
   void zip_file (const std::string &unzipped_name)
   {
-#ifdef HAVE_BZIP
+#ifdef LIBMESH_HAVE_BZIP
     START_LOG("system(bzip2)", "XdrIO");
 
     std::string system_string = "bzip2 -f ";
@@ -58,7 +58,7 @@ namespace {
     if (name.size() - name.rfind(".bz2") == 4)
       {
 	new_name.erase(new_name.end() - 4, new_name.end());
-#ifdef HAVE_BZIP
+#ifdef LIBMESH_HAVE_BZIP
 	START_LOG("system(bunzip2)", "XdrIO");
 	std::string system_string = "bunzip2 -f -k ";
 	system_string += name;
@@ -91,7 +91,7 @@ namespace {
 Xdr::Xdr (const std::string& name, const XdrMODE m) :
   mode(m),
   file_name(name),
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
   xdrs(NULL),
   fp(NULL),
 #endif
@@ -125,7 +125,7 @@ void Xdr::open (const std::string& name)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	fp = fopen(name.c_str(), (mode == ENCODE) ? "w" : "r");
 	libmesh_assert (fp);
@@ -134,7 +134,7 @@ void Xdr::open (const std::string& name)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -153,7 +153,7 @@ void Xdr::open (const std::string& name)
 
 	if (gzipped_file)
 	  {
-#ifdef HAVE_GZSTREAM
+#ifdef LIBMESH_HAVE_GZSTREAM
 	    igzstream *inf = new igzstream;
 	    libmesh_assert (inf != NULL);
 	    in.reset(inf);
@@ -186,7 +186,7 @@ void Xdr::open (const std::string& name)
 
 	if (gzipped_file)
 	  {
-#ifdef HAVE_GZSTREAM
+#ifdef LIBMESH_HAVE_GZSTREAM
 	    ogzstream *outf = new ogzstream;
 	    libmesh_assert (outf != NULL);
 	    out.reset(outf);
@@ -229,7 +229,7 @@ void Xdr::close ()
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	if (xdrs)
 	  {
@@ -247,7 +247,7 @@ void Xdr::close ()
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -299,7 +299,7 @@ bool Xdr::is_open() const
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	if (fp)
 	  if (xdrs)
@@ -310,7 +310,7 @@ bool Xdr::is_open() const
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -353,7 +353,7 @@ void Xdr::data (int& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -362,7 +362,7 @@ void Xdr::data (int& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -405,7 +405,7 @@ void Xdr::data (unsigned int& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (this->is_open());
 
@@ -414,7 +414,7 @@ void Xdr::data (unsigned int& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -457,7 +457,7 @@ void Xdr::data (short int& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -466,7 +466,7 @@ void Xdr::data (short int& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -509,7 +509,7 @@ void Xdr::data (unsigned short int& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -518,7 +518,7 @@ void Xdr::data (unsigned short int& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -561,7 +561,7 @@ void Xdr::data (float& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -570,7 +570,7 @@ void Xdr::data (float& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -613,7 +613,7 @@ void Xdr::data (double& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -622,7 +622,7 @@ void Xdr::data (double& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -658,7 +658,7 @@ void Xdr::data (double& a, const char* comment)
 
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 void Xdr::data (std::complex<double>& a, const char* comment)
 {
@@ -667,7 +667,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 	double
@@ -680,7 +680,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -720,7 +720,7 @@ void Xdr::data (std::complex<double>& a, const char* comment)
     }
 }
 
-#endif // USE_COMPLEX_NUMBERS
+#endif // LIBMESH_USE_COMPLEX_NUMBERS
 
 
 
@@ -730,7 +730,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -747,7 +747,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -760,7 +760,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -779,7 +779,7 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -843,7 +843,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -860,7 +860,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -873,7 +873,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -892,7 +892,7 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -956,7 +956,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -973,7 +973,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -986,7 +986,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -1005,7 +1005,7 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1069,7 +1069,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -1086,7 +1086,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1099,7 +1099,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -1118,7 +1118,7 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1182,7 +1182,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -1199,7 +1199,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1212,7 +1212,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -1231,7 +1231,7 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1295,7 +1295,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (this->is_open());
 
@@ -1312,7 +1312,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1325,7 +1325,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (this->is_open());
 
@@ -1347,7 +1347,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1412,7 +1412,7 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 {
@@ -1420,7 +1420,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -1436,7 +1436,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1449,7 +1449,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -1467,7 +1467,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1527,7 +1527,7 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
     }
 }
 
-#endif // ifdef USE_COMPLEX_NUMBERS
+#endif // ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 
 
@@ -1538,7 +1538,7 @@ void Xdr::data (std::string& s, const char* comment)
     {
     case ENCODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -1560,7 +1560,7 @@ void Xdr::data (std::string& s, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1573,7 +1573,7 @@ void Xdr::data (std::string& s, const char* comment)
 
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (is_open());
 
@@ -1595,7 +1595,7 @@ void Xdr::data (std::string& s, const char* comment)
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1612,7 +1612,7 @@ void Xdr::data (std::string& s, const char* comment)
 
 	in->getline(comm, comm_len);
 
-//#ifndef BROKEN_IOSTREAM
+//#ifndef LIBMESH_BROKEN_IOSTREAM
 //	s.clear();
 //#else
 	s = "";
@@ -1652,7 +1652,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
     {
     case ENCODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (this->is_open());
 
@@ -1666,7 +1666,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1679,7 +1679,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (this->is_open());
 
@@ -1693,7 +1693,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1760,7 +1760,7 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (this->is_open());
 
@@ -1774,7 +1774,7 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1840,7 +1840,7 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (this->is_open());
 
@@ -1864,7 +1864,7 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -1922,7 +1922,7 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 }
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template <>
 void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const unsigned int line_break)
 {
@@ -1931,7 +1931,7 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
     case ENCODE:
     case DECODE:
       {
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 
 	libmesh_assert (this->is_open());
 
@@ -1965,7 +1965,7 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 #else
 	
 	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure HAVE_XDR is defined at build time" 
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
 		  << std::endl
 		  << "The XDR interface is not available in this installation"
 		  << std::endl;
@@ -2024,7 +2024,7 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
       libmesh_error();
     }
 }
-#endif // # USE_COMPLEX_NUMBERS
+#endif // # LIBMESH_USE_COMPLEX_NUMBERS
 
 void Xdr::comment (std::string &comment)
 {

@@ -830,7 +830,7 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase &mesh)
       libmesh_assert (elem);
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
 	libmesh_assert (elem->neighbor(n) != remote_elem);
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
       const Elem* parent = elem->parent();
       if (parent)
 	{
@@ -856,7 +856,7 @@ void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase &mesh,
       libmesh_assert (elem->parent() != bad_elem);
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
 	libmesh_assert(elem->neighbor(n) != bad_elem);
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
       if (elem->has_children())
         for (unsigned int c=0; c != elem->n_children(); ++c)
 	  libmesh_assert(elem->child(c) != bad_elem);
@@ -933,7 +933,7 @@ void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
 {
   parallel_only();
@@ -976,7 +976,7 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
 void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &)
 {
 }
-#endif // ENABLE_AMR
+#endif // LIBMESH_ENABLE_AMR
 
 
 

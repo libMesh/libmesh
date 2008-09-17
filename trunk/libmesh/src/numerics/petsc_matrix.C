@@ -21,7 +21,7 @@
 // C++ includes
 #include "libmesh_config.h"
 
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
 
 // Local includes
 #include "petsc_matrix.h"
@@ -382,4 +382,4 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
 template class PetscMatrix<Number>;
 
 
-#endif // #ifdef HAVE_PETSC
+#endif // #ifdef LIBMESH_HAVE_PETSC

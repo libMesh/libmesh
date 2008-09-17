@@ -31,7 +31,7 @@
 
 
 /**
- * This class defines a vector in DIM dimensional Real or Complex
+ * This class defines a vector in LIBMESH_DIM dimensional Real or Complex
  * space.  The typedef RealVectorValue always defines a real-valued vector,
  * and NumberVectorValue defines a real or complex-valued vector depending
  * on how the library was configured.
@@ -45,7 +45,7 @@ public:
 
   /**
    * Constructor.  By default sets all entries to 0.
-   * Gives the vector  0 in \p DIM dimensional T space.
+   * Gives the vector  0 in \p LIBMESH_DIM dimensional T space.
    */
   VectorValue  (const T x=0.,
 		const T y=0.,
@@ -64,7 +64,7 @@ public:
   VectorValue (const TypeVector<T2>& p);
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
   /**
    * Constructor that takes two \p TypeVecor<Real>
    * representing the real and imaginary part as
@@ -125,7 +125,7 @@ VectorValue<T>::VectorValue (const TypeVector<T2>& p) :
 }
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template <typename T>
 inline
 VectorValue<T>::VectorValue (const TypeVector<Real>& p_re,

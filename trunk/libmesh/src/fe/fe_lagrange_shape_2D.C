@@ -33,7 +33,7 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 			   const unsigned int i,
 			   const Point& p)
 {
-#if DIM > 1
+#if LIBMESH_DIM > 1
   
   switch (order)
     {
@@ -238,7 +238,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 				 const unsigned int j,
 				 const Point& p)
 {
-#if DIM > 1
+#if LIBMESH_DIM > 1
 
   
   libmesh_assert (j<2);
@@ -597,7 +597,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 					const unsigned int j,
 					const Point& p)
 {
-#if DIM > 1
+#if LIBMESH_DIM > 1
 
   // j = 0 ==> d^2 phi / dxi^2
   // j = 1 ==> d^2 phi / dxi deta
@@ -974,7 +974,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
   
   libmesh_error();
   return 0.;
-#endif // DIM > 1
+#endif // LIBMESH_DIM > 1
 }
 
 

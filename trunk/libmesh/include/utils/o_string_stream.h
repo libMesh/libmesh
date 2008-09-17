@@ -29,7 +29,7 @@
 
 
 
-#ifdef HAVE_SSTREAM
+#ifdef LIBMESH_HAVE_SSTREAM
 
 // C++ includes
 #include <sstream>
@@ -48,7 +48,7 @@
  * Therefore, resort to preprocessor definitions. 
  */
 
-#ifndef BROKEN_IOSTREAM
+#ifndef LIBMESH_BROKEN_IOSTREAM
  /*
   * ---------------------------------------------------------------------------------
   * Everything for a clean iostream
@@ -379,12 +379,12 @@ typedef std::ostringstream OStringStream;
  }
 
 
-#endif // ifndef ... else ... BROKEN_IOSTREAM
+#endif // ifndef ... else ... LIBMESH_BROKEN_IOSTREAM
 
 
 
 
-#endif // ifdef HAVE_SSTREAM
+#endif // ifdef LIBMESH_HAVE_SSTREAM
 
 #endif // ifndef __o_string_stream_h__
 

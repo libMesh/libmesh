@@ -76,7 +76,7 @@ protected:
    */
   ReferenceCountedObject ()
   {
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
     
     increment_constructor_count(typeid(T).name());
 
@@ -90,7 +90,7 @@ public:
    */
   virtual ~ReferenceCountedObject ()
   {
-#if defined(ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
     
     increment_destructor_count(typeid(T).name());
 
