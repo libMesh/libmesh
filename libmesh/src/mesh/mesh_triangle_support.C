@@ -226,6 +226,9 @@ void Triangle::copy_tri_to_mesh(const triangulateio& triangle_data_input,
   // Transfer the information into the LibMesh mesh.
   mesh_output.clear();
   
+  // Make sure the new Mesh will be 2D
+  mesh_output.set_mesh_dimension(2);
+  
   // Node information
   for (int i=0, c=0; c<triangle_data_input.numberofpoints; i+=2, ++c)
     {
@@ -314,6 +317,9 @@ void TriangleInterface::triangulate()
       // Clear out the mesh
       _mesh.clear();
       
+      // Make sure the new Mesh will be 2D
+      _mesh.set_mesh_dimension(2);
+  
       // Insert a new point on each PSLG at some random location
       // np=index into new points vector
       // n =index into original points vector
