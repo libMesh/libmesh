@@ -20,7 +20,7 @@
 
 
 #ifndef __exodusII_io_h__
-#define __exodusiI_io_h__
+#define __exodusII_io_h__
 
 
 // C++ inludes
