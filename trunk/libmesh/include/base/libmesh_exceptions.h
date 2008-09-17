@@ -1,7 +1,7 @@
-// $Id: libmesh_base.h 2672 2008-02-17 00:31:13Z benkirk $
+// $Id$
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2007  Benjamin S. Kirk, John W. Peterson
+// Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
   
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
