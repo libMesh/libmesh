@@ -44,7 +44,6 @@ void MeshTools::Modification::distort (MeshBase& mesh,
 				       const Real factor,
 				       const bool perturb_boundary)
 {
-  libmesh_assert (mesh.mesh_dimension() != 1);
   libmesh_assert (mesh.n_nodes());
   libmesh_assert (mesh.n_elem());
   libmesh_assert ((factor >= 0.) && (factor <= 1.));
@@ -92,21 +91,25 @@ void MeshTools::Modification::distort (MeshBase& mesh,
 	  // the direction, random but unit normalized
 	  
 	  Point dir( static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX),
-		     static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX),
+		     (mesh.mesh_dimension() > 1) ?
+		     static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX)
+		     : 0.,
 		     ((mesh.mesh_dimension() == 3) ?
-		      static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX) :
-		      0.)
+		      static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX)
+		      : 0.)
 		     );
 	  
 	  dir(0) = (dir(0)-.5)*2.;
-	  dir(1) = (dir(1)-.5)*2.;
+	  if (mesh.mesh_dimension() > 1)
+	    dir(1) = (dir(1)-.5)*2.;
 	  if (mesh.mesh_dimension() == 3)
 	    dir(2) = (dir(2)-.5)*2.;
 	  
 	  dir = dir.unit();
 
           mesh.node(n)(0) += dir(0)*factor*hmin[n];
-          mesh.node(n)(1) += dir(1)*factor*hmin[n];
+	  if (mesh.mesh_dimension() > 1)
+            mesh.node(n)(1) += dir(1)*factor*hmin[n];
           if (mesh.mesh_dimension() == 3)
             mesh.node(n)(2) += dir(2)*factor*hmin[n];
 	}
