@@ -356,20 +356,23 @@ ifeq ($(enable-optional),yes)
     libmesh_INCLUDE += @LIBHILBERT_INCLUDE@
   endif
 
-  # Trilinos
+  # Trilinos - at a minimum, we support the 
+  # AztecOO linear solvers and requisite Epetra
+  # data structures
   ifeq ($(enable-trilinos),yes)
       include @AZTECOO_MAKEFILE_EXPORT@
       libmesh_LIBS    += $(AZTECOO_LIBS)
       libmesh_INCLUDE += $(AZTECOO_INCLUDES)
+
+      # Nox, an additional option if AztecOO is present
+      ifeq ($(enable-nox),yes)
+          include @NOX_MAKEFILE_EXPORT@
+          libmesh_LIBS    += $(NOX_LIBS)
+          libmesh_INCLUDE += $(NOX_INCLUDES)
+          libmesh_CXXFLAGS     += -DHAVE_CONFIG_H
+      endif	
   endif	
 
-  # Nox
-  ifeq ($(enable-nox),yes)
-      include @NOX_MAKEFILE_EXPORT@
-      libmesh_LIBS    += $(NOX_LIBS)
-      libmesh_INCLUDE += $(NOX_INCLUDES)
-      libmesh_CXXFLAGS     += -DHAVE_CONFIG_H
-  endif	
 
 
   #############################################################################
