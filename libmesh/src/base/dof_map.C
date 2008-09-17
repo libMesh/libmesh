@@ -252,7 +252,6 @@ void DofMap::reinit(MeshBase& mesh)
   //this->clear();
 
   const unsigned int n_var = this->n_variables();
-  const unsigned int dim   = mesh.mesh_dimension();
 
 #ifdef LIBMESH_ENABLE_AMR
   
@@ -354,6 +353,7 @@ void DofMap::reinit(MeshBase& mesh)
 	{
 	  Elem*    elem       = *elem_it;
 	  const ElemType type = elem->type();
+          const unsigned int dim   = elem->dim();
 
           FEType fe_type = base_fe_type;
 
@@ -428,6 +428,7 @@ void DofMap::reinit(MeshBase& mesh)
 	{
 	  Elem*    elem       = *elem_it;
 	  const ElemType type = elem->type();
+          const unsigned int dim   = elem->dim();
 	     
           FEType fe_type = base_fe_type;
           fe_type.order = static_cast<Order>(fe_type.order +
