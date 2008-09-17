@@ -139,7 +139,7 @@ public:
    * Resets the logical dimension of the mesh.
    * Should only be called on an empty mesh.
    */
-  unsigned int set_mesh_dimension (unsigned int d)
+  void set_mesh_dimension (unsigned int d)
   { libmesh_assert(!this->n_elem()); _dim = d; }
   
   /**
