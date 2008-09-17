@@ -100,7 +100,8 @@ void ExodusII_IO::read (const std::string& fname)
   // Clear any existing mesh data
   mesh.clear();
   
-  libmesh_assert(mesh.mesh_dimension() != 1); // No support for 1D ExodusII meshes
+  if (mesh.mesh_dimension() == 1) // No support for 1D ExodusII meshes
+    libmesh_not_implemented();
   
 #ifdef DEBUG
   this->verbose(true);
