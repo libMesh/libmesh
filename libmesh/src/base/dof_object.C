@@ -39,7 +39,7 @@ const unsigned short int DofObject::invalid_processor_id = static_cast<unsigned 
 // Copy Constructor
 DofObject::DofObject (const DofObject& dof_obj) :
   ReferenceCountedObject<DofObject>(),
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   old_dof_object (NULL),
 #endif
   _id            (dof_obj._id),
@@ -115,7 +115,7 @@ DofObject::DofObject (const DofObject& dof_obj) :
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 void  DofObject::clear_old_dof_object ()
 {

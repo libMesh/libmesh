@@ -20,7 +20,7 @@
 // Local includes
 #include "libmesh_config.h"
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // C++ includes
 
@@ -309,7 +309,7 @@ InfHex16::second_order_child_vertex (const unsigned int n) const
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float InfHex16::_embedding_matrix[4][16][16] =
 {
@@ -402,4 +402,4 @@ const float InfHex16::_embedding_matrix[4][16][16] =
 
 #endif
 
-#endif  // ifdef ENABLE_INFINITE_ELEMENTS
+#endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

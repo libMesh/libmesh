@@ -70,7 +70,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
    */
   new_v.clear();
 
-#ifdef ENABLE_AMR 
+#ifdef LIBMESH_ENABLE_AMR 
 
   // Resize the new vector and get a serial version.
   NumericVector<Number> *new_vector_ptr;
@@ -170,7 +170,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
   // AMR is disabled: simply copy the vector
   new_v = old_v;
   
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
   STOP_LOG("project_vector()", "System");
 }
@@ -228,7 +228,7 @@ void System::project_vector (Number fptr(const Point& p,
 
   new_vector.close();
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
 #endif
 
@@ -236,7 +236,7 @@ void System::project_vector (Number fptr(const Point& p,
 }
 
 
-#ifndef ENABLE_AMR
+#ifndef LIBMESH_ENABLE_AMR
 void System::ProjectVector::operator()(const ConstElemRange &) const
 {
   libmesh_error();
@@ -618,7 +618,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 
   STOP_LOG ("operator()","ProjectVector");
 
-#endif // ENABLE_AMR
+#endif // LIBMESH_ENABLE_AMR
 }
 
 
@@ -643,7 +643,7 @@ void System::BuildProjectionList::unique()
 
 
 
-#ifndef ENABLE_AMR
+#ifndef LIBMESH_ENABLE_AMR
 void System::BuildProjectionList::operator()(const ConstElemRange &)
 {
   libmesh_error();
@@ -691,7 +691,7 @@ void System::BuildProjectionList::operator()(const ConstElemRange &range)
       
       this->send_list.insert(send_list.end(), di.begin(), di.end());
     }  // end elem loop
-#endif // ENABLE_AMR
+#endif // LIBMESH_ENABLE_AMR
 }
 
 

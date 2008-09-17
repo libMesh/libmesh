@@ -114,7 +114,7 @@ namespace MeshTools
      */ 
     void smooth(MeshBase&, unsigned int, Real);
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
     /**
      * Removes all the refinement tree structure of Mesh, leaving
      * only the highest-level (most-refined) elements.  This is useful
@@ -125,7 +125,7 @@ namespace MeshTools
      * refined.
      */
     void flatten(MeshBase& mesh);
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
     
   } // end namespace Meshtools::Modification
 } // end namespace MeshTools

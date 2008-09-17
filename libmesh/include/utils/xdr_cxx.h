@@ -29,14 +29,14 @@
 #include "auto_ptr.h"
 
 // C++ includes
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 #  include <rpc/rpc.h>
 #endif
 
 #include <iosfwd>
 #include <vector>
 #include <string>
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 # include <complex>
 #endif
 
@@ -221,7 +221,7 @@ public:
   Xdr& operator >> (long double& a) { libmesh_assert (reading()); data(a); return *this; }
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
   /**
    * Inputs or outputs a single complex<double>.
@@ -374,7 +374,7 @@ public:
   Xdr& operator >> (std::vector<long double>& v) { libmesh_assert (reading()); data(v); return *this; }
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
   /**
    * Inputs or outputs a vector of complex<double>.
@@ -434,7 +434,7 @@ private:
    */
   std::string file_name;
 
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
   
   /**
    * Pointer to the standard @p xdr

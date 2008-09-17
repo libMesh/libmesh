@@ -20,7 +20,7 @@
 
 // Local Includes
 #include "libmesh_config.h"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
 
 
@@ -204,5 +204,5 @@ template Real InfFE<2,JACOBI_30_00,CARTESIAN>::eval_deriv(const Real,const Order
 template Real InfFE<3,JACOBI_30_00,CARTESIAN>::eval(const Real,const Order,const unsigned int);
 template Real InfFE<3,JACOBI_30_00,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
 
-#endif //ifdef ENABLE_INFINITE_ELEMENTS
+#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

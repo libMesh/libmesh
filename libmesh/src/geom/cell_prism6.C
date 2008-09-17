@@ -262,7 +262,7 @@ void Prism6::connectivity(const unsigned int sc,
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float Prism6::_embedding_matrix[8][6][6] =
 {

@@ -29,7 +29,7 @@
  * included at the _end_ of an implementation file, so that 
  * the proper variations of the InfFE class are instantiated.
  */
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
 

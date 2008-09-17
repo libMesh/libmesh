@@ -22,7 +22,7 @@
 // Local includes
 #include "libmesh_config.h"
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 #include "fe.h"
 
@@ -106,5 +106,5 @@ Real FE<3,SZABAB>::shape_second_deriv(const Elem*,
   return 0.;
 }
 
-#endif //ENABLE_HIGHER_ORDER_SHAPES
+#endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 

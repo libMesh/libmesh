@@ -24,8 +24,8 @@
 
 #include "libmesh_common.h"
 
-#if defined(HAVE_LASPACK)
-//#if defined(HAVE_LASPACK) && !defined(USE_COMPLEX_NUMBERS)
+#if defined(LIBMESH_HAVE_LASPACK)
+//#if defined(LIBMESH_HAVE_LASPACK) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
 
 // C++ includes
@@ -152,5 +152,5 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T>&,
   return p;
 }
 
-#endif // #ifdef HAVE_LASPACK
+#endif // #ifdef LIBMESH_HAVE_LASPACK
 #endif // #ifndef __laspack_linear_solver_h__

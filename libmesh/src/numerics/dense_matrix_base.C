@@ -84,7 +84,7 @@ void DenseMatrixBase<T>::condense(const unsigned int iv,
 template<typename T>
 void DenseMatrixBase<T>::print_scientific (std::ostream& os) const
 {
-#ifndef BROKEN_IOSTREAM
+#ifndef LIBMESH_BROKEN_IOSTREAM
   
   // save the initial format flags
   std::ios_base::fmtflags os_flags = os.flags();
@@ -150,6 +150,6 @@ void DenseMatrixBase<T>::print (std::ostream& os) const
 // Explicit instantiations
 template class DenseMatrixBase<Real>;
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseMatrixBase<Complex>;
 #endif

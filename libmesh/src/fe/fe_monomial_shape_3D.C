@@ -33,7 +33,7 @@ Real FE<3,MONOMIAL>::shape(const ElemType,
 			   const unsigned int i,
 			   const Point& p)
 {
-#if DIM == 3
+#if LIBMESH_DIM == 3
     
   const Real xi   = p(0);
   const Real eta  = p(1);
@@ -203,7 +203,7 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
 				 const unsigned int j,
 				 const Point& p)
 {
-#if DIM == 3
+#if LIBMESH_DIM == 3
   
   libmesh_assert (j<3);
   
@@ -654,7 +654,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
 				        const unsigned int j,
 				        const Point& p)
 {
-#if DIM == 3
+#if LIBMESH_DIM == 3
   
   libmesh_assert (j<6);
   

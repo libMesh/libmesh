@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "libmesh_config.h"
-#ifdef ENABLE_VSMOOTHER
+#ifdef LIBMESH_ENABLE_VSMOOTHER
 
 // C++ includes
 #include <algorithm> // for std::copy, std::sort
@@ -2967,4 +2967,4 @@ void VariationalMeshSmoother::metr_data_gen(char grid[], char metr[], int n, int
 return;
 }
 
-#endif // ENABLE_VSMOOTHER
+#endif // LIBMESH_ENABLE_VSMOOTHER

@@ -151,29 +151,29 @@ std::string Quality::describe (const ElemQuality q)
       break;
       
     case SHEAR:
-      desc << "DIM / K(Js)\n"
+      desc << "LIBMESH_DIM / K(Js)\n"
 	   << '\n'
-	   << "DIM   = element dimension.\n"
+	   << "LIBMESH_DIM   = element dimension.\n"
 	   << "K(Js) = Condition number of \n"
 	   << "        Jacobian skew matrix.\n"
 	   << '\n'
 	   << "Suggested ranges:\n"
-	   << "Hexes(DIM=3): (0.3 -> 1)\n"
-	   << "Quads(DIM=2): (0.3 -> 1)";
+	   << "Hexes(LIBMESH_DIM=3): (0.3 -> 1)\n"
+	   << "Quads(LIBMESH_DIM=2): (0.3 -> 1)";
       break;
       
     case SHAPE:
-      desc << "DIM / K(Jw)\n"
+      desc << "LIBMESH_DIM / K(Jw)\n"
 	   << '\n'
-	   << "DIM   = element dimension.\n"
+	   << "LIBMESH_DIM   = element dimension.\n"
 	   << "K(Jw) = Condition number of \n"
 	   << "        weighted Jacobian\n"
 	   << "        matrix.\n"
 	   << '\n'
 	   << "Suggested ranges:\n"
-	   << "Hexes(DIM=3): (0.3 -> 1)\n"
-	   << "Tets(DIM=3): (0.2 -> 1)\n"
-	   << "Quads(DIM=2): (0.3 -> 1).";
+	   << "Hexes(LIBMESH_DIM=3): (0.3 -> 1)\n"
+	   << "Tets(LIBMESH_DIM=3): (0.2 -> 1)\n"
+	   << "Quads(LIBMESH_DIM=2): (0.3 -> 1).";
       break;
       
     case MAX_ANGLE:
@@ -292,10 +292,10 @@ std::string Quality::describe (const ElemQuality q)
       
     case JACOBIAN:
       desc << "Minimum Jacobian divided by\n"
-	   << "the lengths of the DIM\n"
+	   << "the lengths of the LIBMESH_DIM\n"
 	   << "largest edge vectors.\n"
 	   << '\n'
-	   << "DIM = element dimension.\n"
+	   << "LIBMESH_DIM = element dimension.\n"
 	   << '\n'
 	   << "Suggested ranges:\n"
 	   << "Quads: (0.5 -> 1)\n" 
@@ -414,7 +414,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
 
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
     case INFEDGE2:
       {

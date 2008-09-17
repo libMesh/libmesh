@@ -20,7 +20,7 @@
 
 
 #include "libmesh_config.h"
-#ifdef HAVE_SLEPC
+#ifdef LIBMESH_HAVE_SLEPC
 
 #include "diff_solver.h"
 #include "diff_system.h"
@@ -209,4 +209,4 @@ bool EigenTimeSolver::side_residual(bool request_jacobian)
     }
 }
 
-#endif // HAVE_SLEPC
+#endif // LIBMESH_HAVE_SLEPC

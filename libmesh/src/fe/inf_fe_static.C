@@ -20,7 +20,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
 #include "inf_fe_macro.h"
 #include "fe.h"
@@ -301,7 +301,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
   // assumption on time-harmonic behavior
   const short int sign (-1);
@@ -990,5 +990,5 @@ INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,co
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,const std::vector<Number>&,std::vector<Number>&));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,const std::vector<Number>&,std::vector<Number>&));
 					   
-#endif //ifdef ENABLE_INFINITE_ELEMENTS
+#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

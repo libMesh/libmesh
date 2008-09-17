@@ -43,7 +43,7 @@ QVector *SSORIter(QMatrix *A, QVector *x, QVector *b, int NoIter,
             PrecondProcType Dummy, _LPDouble Omega);
 
 /* semi-iterative methods */
-#ifndef _LP_USE_COMPLEX_NUMBERS 
+#ifndef _LP_LIBMESH_USE_COMPLEX_NUMBERS 
 QVector *ChebyshevIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
             PrecondProcType PrecondProc, _LPDouble OmegaPrecond);
 #endif

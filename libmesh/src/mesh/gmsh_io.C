@@ -906,7 +906,7 @@ void GmshIO::write_post (const std::string& fname,
               for (unsigned int i=0; i < elem->n_vertices(); i++)   // loop over vertices
                 if (this->binary())
                   {
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 		    std::cout << "WARNING: Gmsh::write_post does not fully support "
 			      << "complex numbers. Will only write the real part of "
 			      << "variable " << varname << std::endl;
@@ -917,7 +917,7 @@ void GmshIO::write_post (const std::string& fname,
                   }
                 else
 		  {
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 		    std::cout << "WARNING: Gmsh::write_post does not fully support "
 			      << "complex numbers. Will only write the real part of "
 			      << "variable " << varname << std::endl;

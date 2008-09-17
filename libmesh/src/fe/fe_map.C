@@ -47,7 +47,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	// Clear the entities that will be summed
 	xyz[p].zero();
 	dxyzdxi_map[p].zero();
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	d2xyzdxi2_map[p].zero();
 #endif
 	
@@ -60,7 +60,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	    
 	    xyz[p].add_scaled          (elem_point, phi_map[i][p]    );
 	    dxyzdxi_map[p].add_scaled  (elem_point, dphidxi_map[i][p]);
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	    d2xyzdxi2_map[p].add_scaled(elem_point, d2phidxi2_map[i][p]);
 #endif
 	  }
@@ -121,7 +121,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 
 	dxyzdxi_map[p].zero();
 	dxyzdeta_map[p].zero();
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	d2xyzdxi2_map[p].zero();
 	d2xyzdxideta_map[p].zero();
 	d2xyzdeta2_map[p].zero();
@@ -139,7 +139,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 
 	    dxyzdxi_map[p].add_scaled      (elem_point, dphidxi_map[i][p] );
 	    dxyzdeta_map[p].add_scaled     (elem_point, dphideta_map[i][p]);
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	    d2xyzdxi2_map[p].add_scaled    (elem_point, d2phidxi2_map[i][p]);
 	    d2xyzdxideta_map[p].add_scaled (elem_point, d2phidxideta_map[i][p]);
 	    d2xyzdeta2_map[p].add_scaled   (elem_point, d2phideta2_map[i][p]);
@@ -151,7 +151,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	           dy_dxi = dydxi_map(p), dy_deta = dydeta_map(p),
 	           dz_dxi = dzdxi_map(p), dz_deta = dzdeta_map(p);
 
-#if DIM == 2
+#if LIBMESH_DIM == 2
 	// Compute the Jacobian.  This assumes the 2D face
 	// lives in 2D space
 	//
@@ -271,7 +271,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	dxyzdxi_map[p].zero   ();
 	dxyzdeta_map[p].zero  ();
 	dxyzdzeta_map[p].zero ();
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	d2xyzdxi2_map[p].zero();
 	d2xyzdxideta_map[p].zero();
 	d2xyzdxidzeta_map[p].zero();
@@ -295,7 +295,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	    dxyzdxi_map[p].add_scaled   (elem_point, dphidxi_map[i][p]  );
 	    dxyzdeta_map[p].add_scaled  (elem_point, dphideta_map[i][p] );
 	    dxyzdzeta_map[p].add_scaled (elem_point, dphidzeta_map[i][p]);
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	    d2xyzdxi2_map[p].add_scaled      (elem_point,
 					       d2phidxi2_map[i][p]);
 	    d2xyzdxideta_map[p].add_scaled   (elem_point,
@@ -377,7 +377,7 @@ void FEBase::resize_map_vectors(unsigned int n_qp)
   dxidx_map.resize(n_qp);
   dxidy_map.resize(n_qp); // 1D element may live in 2D ...
   dxidz_map.resize(n_qp); // ... or 3D
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   d2xyzdxi2_map.resize(n_qp);
 #endif
   if (this->dim > 1)
@@ -386,7 +386,7 @@ void FEBase::resize_map_vectors(unsigned int n_qp)
       detadx_map.resize(n_qp);
       detady_map.resize(n_qp);
       detadz_map.resize(n_qp);
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       d2xyzdxideta_map.resize(n_qp);
       d2xyzdeta2_map.resize(n_qp);
 #endif
@@ -396,7 +396,7 @@ void FEBase::resize_map_vectors(unsigned int n_qp)
           dzetadx_map.resize   (n_qp);
           dzetady_map.resize   (n_qp);
           dzetadz_map.resize   (n_qp);
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           d2xyzdxidzeta_map.resize(n_qp);
           d2xyzdetadzeta_map.resize(n_qp);
           d2xyzdzeta2_map.resize(n_qp);
@@ -438,7 +438,7 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
       dxidx_map[p] = dxidx_map[0];
       dxidy_map[p] = dxidy_map[0];
       dxidz_map[p] = dxidz_map[0];
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       // The map should be affine, so second derivatives are zero
       d2xyzdxi2_map[p] = 0.;
 #endif
@@ -448,7 +448,7 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
           detadx_map[p] = detadx_map[0];
           detady_map[p] = detady_map[0];
           detadz_map[p] = detadz_map[0];
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           d2xyzdxideta_map[p] = 0.;
           d2xyzdeta2_map[p] = 0.;
 #endif
@@ -458,7 +458,7 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
               dzetadx_map[p] = dzetadx_map[0];
               dzetady_map[p] = dzetady_map[0];
               dzetadz_map[p] = dzetadz_map[0];
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               d2xyzdxidzeta_map[p] = 0.;
               d2xyzdetadzeta_map[p] = 0.;
               d2xyzdzeta2_map[p] = 0.;
@@ -482,7 +482,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
       return;
     }
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   static bool curvy_second_derivative_warning = false;
   if (calculate_d2phi && !curvy_second_derivative_warning)
     {

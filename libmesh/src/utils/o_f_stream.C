@@ -28,7 +28,7 @@
 /*
  * This class is only alive when iostream is broken
  */
-#ifdef BROKEN_IOSTREAM
+#ifdef LIBMESH_BROKEN_IOSTREAM
 
 
 
@@ -51,7 +51,7 @@ OFStream& OFStream::scientific (const sizetype w,
 
 
 // full specialization in case of complex numbers
-#if defined(USE_COMPLEX_NUMBERS) 
+#if defined(LIBMESH_USE_COMPLEX_NUMBERS) 
 
 template <>
 OFStream& OFStream::scientific (const sizetype w,
@@ -68,7 +68,7 @@ OFStream& OFStream::scientific (const sizetype w,
   return *this;
 }
 
-#endif // if defined(USE_COMPLEX_NUMBERS) 
+#endif // if defined(LIBMESH_USE_COMPLEX_NUMBERS) 
 
 
 
@@ -82,4 +82,4 @@ template OFStream& OFStream::scientific (const sizetype w,
 
 
 
-#endif // ifdef BROKEN_IOSTREAM
+#endif // ifdef LIBMESH_BROKEN_IOSTREAM

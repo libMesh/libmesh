@@ -24,7 +24,7 @@
 
 
 #include "libmesh_config.h"
-#ifdef HAVE_SLEPC
+#ifdef LIBMESH_HAVE_SLEPC
 
 // C++ includes
 
@@ -202,6 +202,6 @@ EigenSolver<T>::~EigenSolver ()
   this->clear ();
 }
 
-#endif // HAVE_SLEPC
+#endif // LIBMESH_HAVE_SLEPC
 
 #endif // #ifdef __eigen_solver_h__

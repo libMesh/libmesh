@@ -29,7 +29,7 @@
 
 
 // Petsc include files.
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
 
 #include "nonlinear_solver.h"
 #include "petsc_macro.h"
@@ -117,5 +117,5 @@ PetscNonlinearSolver<T>::~PetscNonlinearSolver ()
 
 
 
-#endif // #ifdef HAVE_PETSC
+#endif // #ifdef LIBMESH_HAVE_PETSC
 #endif // #ifdef __petsc_nonlinear_solver_h__

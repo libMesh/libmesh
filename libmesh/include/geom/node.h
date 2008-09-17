@@ -57,7 +57,7 @@ public:
   
   /**
    * Constructor.  By default sets all entries to 0.  Gives the point 0 in
-   * \p DIM dimensions with an \p id of \p Node::invalid_id
+   * \p LIBMESH_DIM dimensions with an \p id of \p Node::invalid_id
    */
   Node  (const Real x,
 	 const Real y,
@@ -124,7 +124,7 @@ public:
   virtual bool operator==(const DofObject& rhs) const;
 
 
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
   /**
    * Convenient way to communicate nodes.  This struct defines a
    * packed up node which can be easily communicated through a
@@ -171,7 +171,7 @@ public:
     static MPI_Datatype create_mpi_datatype ();
     
   };
-#endif // #ifdef HAVE_MPI
+#endif // #ifdef LIBMESH_HAVE_MPI
   
 private:
 

@@ -28,7 +28,7 @@
 #include "laspack_matrix.h"
 
 
-#ifdef HAVE_LASPACK
+#ifdef LIBMESH_HAVE_LASPACK
 
 template <typename T>
 T LaspackVector<T>::sum () const
@@ -429,4 +429,4 @@ Real LaspackVector<T>::min () const
 template class LaspackVector<Number>;
  
 
-#endif // #ifdef HAVE_LASPACK
+#endif // #ifdef LIBMESH_HAVE_LASPACK

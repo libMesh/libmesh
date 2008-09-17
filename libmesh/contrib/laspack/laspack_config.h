@@ -18,8 +18,8 @@
 
 #include "libmesh_config.h"
 
-#if defined(USE_REAL_NUMBERS)
-#  undef _LP_USE_COMPLEX_NUMBERS
+#if defined(LIBMESH_USE_REAL_NUMBERS)
+#  undef _LP_LIBMESH_USE_COMPLEX_NUMBERS
 
 #  ifdef __cplusplus
       /* someone included us from C++ */
@@ -29,12 +29,12 @@
 #     undef _LP_INCLUDED_FROM_CPLUSPLUS
 #  endif /* __cplusplus */
 
-#elif defined(USE_COMPLEX_NUMBERS)
+#elif defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
    /* either way, whether someone included us or LASPACK
     * is compiled, this is a C++ compiler which does not
     * want the extern "C" */
-#  define _LP_USE_COMPLEX_NUMBERS 1
+#  define _LP_LIBMESH_USE_COMPLEX_NUMBERS 1
 #  undef _LP_INCLUDED_FROM_CPLUSPLUS
 
 #else

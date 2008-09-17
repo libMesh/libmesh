@@ -26,7 +26,7 @@
 #include "libmesh_config.h"
 
 // only compile these functions if the user requests AMR support
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 #include "boundary_info.h"
 #include "elem.h"

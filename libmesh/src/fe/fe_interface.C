@@ -43,7 +43,7 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 					    const ElemType t)
 {
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   /*
    * Since the FEType, stored in DofMap/(some System child), has to
    * be the _same_ for InfFE and FE, we have to catch calls
@@ -79,7 +79,7 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_shape_functions(t, o);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<1,BERNSTEIN>::n_shape_functions(t, o);
@@ -119,7 +119,7 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_shape_functions(t, o);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<2,BERNSTEIN>::n_shape_functions(t, o);
@@ -155,7 +155,7 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_shape_functions(t, o);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<3,BERNSTEIN>::n_shape_functions(t, o);
@@ -191,7 +191,7 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 				 const FEType& fe_t,
 				 const ElemType t)
 {
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if ( is_InfFE_elem(t) )
     return ifem_n_dofs(dim, fe_t, t);
@@ -222,7 +222,7 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_dofs(t, o);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<1,BERNSTEIN>::n_dofs(t, o);
@@ -261,7 +261,7 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_dofs(t, o);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<2,BERNSTEIN>::n_dofs(t, o);
@@ -297,7 +297,7 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_dofs(t, o);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<3,BERNSTEIN>::n_dofs(t, o);
@@ -333,7 +333,7 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 					 const ElemType t,
 					 const unsigned int n)
 {
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if ( is_InfFE_elem(t) )
     return ifem_n_dofs_at_node(dim, fe_t, t, n);
@@ -364,7 +364,7 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_dofs_at_node(t, o, n);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<1,BERNSTEIN>::n_dofs_at_node(t, o, n);
@@ -403,7 +403,7 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_dofs_at_node(t, o, n);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<2,BERNSTEIN>::n_dofs_at_node(t, o, n);
@@ -439,7 +439,7 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_dofs_at_node(t, o, n);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<3,BERNSTEIN>::n_dofs_at_node(t, o, n);
@@ -475,7 +475,7 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 					  const FEType& fe_t,
 					  const ElemType t)
 {
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if ( is_InfFE_elem(t) )
     return ifem_n_dofs_per_elem(dim, fe_t, t);
@@ -506,7 +506,7 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_dofs_per_elem(t, o);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<1,BERNSTEIN>::n_dofs_per_elem(t, o);
@@ -545,7 +545,7 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_dofs_per_elem(t, o);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<2,BERNSTEIN>::n_dofs_per_elem(t, o);
@@ -581,7 +581,7 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_dofs_per_elem(t, o);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<3,BERNSTEIN>::n_dofs_per_elem(t, o);
@@ -647,7 +647,7 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 	    FE<1,MONOMIAL>::dofs_on_side(elem, o, s, di);
             return;
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    FE<1,BERNSTEIN>::dofs_on_side(elem, o, s, di);
@@ -694,7 +694,7 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 	    FE<2,MONOMIAL>::dofs_on_side(elem, o, s, di);
             return;
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    FE<2,BERNSTEIN>::dofs_on_side(elem, o, s, di);
@@ -737,7 +737,7 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 	    FE<3,MONOMIAL>::dofs_on_side(elem, o, s, di);
             return;
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    FE<3,BERNSTEIN>::dofs_on_side(elem, o, s, di);
@@ -803,7 +803,7 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 	    FE<1,MONOMIAL>::dofs_on_edge(elem, o, e, di);
             return;
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    FE<1,BERNSTEIN>::dofs_on_edge(elem, o, e, di);
@@ -850,7 +850,7 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 	    FE<2,MONOMIAL>::dofs_on_edge(elem, o, e, di);
             return;
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    FE<2,BERNSTEIN>::dofs_on_edge(elem, o, e, di);
@@ -893,7 +893,7 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 	    FE<3,MONOMIAL>::dofs_on_edge(elem, o, e, di);
             return;
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    FE<3,BERNSTEIN>::dofs_on_edge(elem, o, e, di);
@@ -931,7 +931,7 @@ void FEInterface::nodal_soln(const unsigned int dim,
 			     const std::vector<Number>& elem_soln,
 			     std::vector<Number>&       nodal_soln)
 {
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if ( is_InfFE_elem(elem->type()) )
   {
@@ -975,7 +975,7 @@ void FEInterface::nodal_soln(const unsigned int dim,
 				       elem_soln, nodal_soln);
 	    return;
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    FE<1,BERNSTEIN>::nodal_soln(elem, order,
@@ -1030,7 +1030,7 @@ void FEInterface::nodal_soln(const unsigned int dim,
 				       elem_soln, nodal_soln);
 	    return;
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    FE<2,BERNSTEIN>::nodal_soln(elem, order,
@@ -1080,7 +1080,7 @@ void FEInterface::nodal_soln(const unsigned int dim,
 				       elem_soln, nodal_soln);
 	    return;
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    FE<3,BERNSTEIN>::nodal_soln(elem, order,
@@ -1120,7 +1120,7 @@ Point FEInterface::inverse_map (const unsigned int dim,
 				const Real tolerance,
 				const bool secure)
 {
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if ( is_InfFE_elem(elem->type()) )
     return ifem_inverse_map(dim, fe_t, elem, p,tolerance, secure);
@@ -1149,7 +1149,7 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<1,BERNSTEIN>::inverse_map(elem, p, tolerance, secure);
@@ -1188,7 +1188,7 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<2,BERNSTEIN>::inverse_map(elem, p, tolerance, secure);
@@ -1223,7 +1223,7 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<3,BERNSTEIN>::inverse_map(elem, p, tolerance, secure);
@@ -1279,7 +1279,7 @@ void FEInterface::inverse_map (const unsigned int dim,
 
 
   
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if ( is_InfFE_elem(elem->type()) )
     {
@@ -1320,7 +1320,7 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    FE<1,MONOMIAL>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    FE<1,BERNSTEIN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
@@ -1367,7 +1367,7 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    FE<2,MONOMIAL>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    FE<2,BERNSTEIN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
@@ -1410,7 +1410,7 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    FE<3,MONOMIAL>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    FE<3,BERNSTEIN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
@@ -1459,7 +1459,7 @@ Real FEInterface::shape(const unsigned int dim,
 			const unsigned int i,
 			const Point& p)
 {
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if ( is_InfFE_elem(t) )
     return ifem_shape(dim, fe_t, t, i, p);
@@ -1490,7 +1490,7 @@ Real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::shape(t,o,i,p);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<1,BERNSTEIN>::shape(t,o,i,p);
@@ -1529,7 +1529,7 @@ Real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::shape(t,o,i,p);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<2,BERNSTEIN>::shape(t,o,i,p);
@@ -1565,7 +1565,7 @@ Real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::shape(t,o,i,p);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<3,BERNSTEIN>::shape(t,o,i,p);
@@ -1602,7 +1602,7 @@ Real FEInterface::shape(const unsigned int dim,
 			const unsigned int i,
 			const Point& p)
 {
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if ( is_InfFE_elem(elem->type()) )
     return ifem_shape(dim, fe_t, elem, i, p);
@@ -1633,7 +1633,7 @@ Real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::shape(elem,o,i,p);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<1,BERNSTEIN>::shape(elem,o,i,p);
@@ -1672,7 +1672,7 @@ Real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::shape(elem,o,i,p);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<2,BERNSTEIN>::shape(elem,o,i,p);
@@ -1708,7 +1708,7 @@ Real FEInterface::shape(const unsigned int dim,
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::shape(elem,o,i,p);
 
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 	  case BERNSTEIN:
 	    return FE<3,BERNSTEIN>::shape(elem,o,i,p);
@@ -1744,7 +1744,7 @@ void FEInterface::compute_data(const unsigned int dim,
 			       const Elem* elem,
 			       FEComputeData& data)
 {
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if ( is_InfFE_elem(elem->type()) )
     {
@@ -1773,7 +1773,7 @@ void FEInterface::compute_data(const unsigned int dim,
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 void FEInterface::compute_constraints (DofConstraints &constraints,
 				       DofMap &dof_map,
@@ -1859,11 +1859,11 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
     }
 }
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 
 
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
 
 void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
 				                DofMap &dof_map,
@@ -1881,7 +1881,7 @@ void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
 				        elem);
 }
 
-#endif // #ifdef ENABLE_PERIODIC
+#endif // #ifdef LIBMESH_ENABLE_PERIODIC
   
 
 
@@ -1961,7 +1961,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	      return unknown;
 	  }
 	break;
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
       case BERNSTEIN:
 	switch (el_t)
 	  {
@@ -2160,7 +2160,7 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
     {
       case LAGRANGE:
       case MONOMIAL:
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
       case BERNSTEIN:
       case SZABAB:
 #endif

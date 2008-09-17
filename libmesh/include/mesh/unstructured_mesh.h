@@ -145,14 +145,14 @@ class UnstructuredMesh : public MeshBase
    */
   virtual void find_neighbors (bool reset_remote_elements = false);
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * Delete subactive (i.e. children of coarsened) elements.
    * This removes all elements descended from currently active
    * elements in the mesh.
    */
   virtual bool contract ();
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 };
 

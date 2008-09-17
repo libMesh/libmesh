@@ -46,7 +46,7 @@ bool Node::operator==(const DofObject& rhs) const
 
 
 
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
 MPI_Datatype Node::PackedNode::create_mpi_datatype ()
 {
   MPI_Datatype packed_node_type;
@@ -72,4 +72,4 @@ MPI_Datatype Node::PackedNode::create_mpi_datatype ()
 
   return packed_node_type;
 }
-#endif // #ifdef HAVE_MPI
+#endif // #ifdef LIBMESH_HAVE_MPI

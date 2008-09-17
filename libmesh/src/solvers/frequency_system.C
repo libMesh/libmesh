@@ -25,7 +25,7 @@
 /*
  * Require complex arithmetic
  */
-#if defined(USE_COMPLEX_NUMBERS)
+#if defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
 
 // C++ includes
@@ -437,4 +437,4 @@ std::string FrequencySystem::form_solu_vec_name(const unsigned int n) const
 }
 
 
-#endif // if defined(USE_COMPLEX_NUMBERS)
+#endif // if defined(LIBMESH_USE_COMPLEX_NUMBERS)

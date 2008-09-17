@@ -27,7 +27,7 @@
 
 #include "libmesh_common.h"
 
-#ifdef HAVE_LASPACK
+#ifdef LIBMESH_HAVE_LASPACK
 
 
 
@@ -244,7 +244,7 @@ class LaspackVector : public NumericVector<T>
   void add (const unsigned int i, const T value);
     
   /**
-   * \f$U(0-DIM)+=s\f$.
+   * \f$U(0-LIBMESH_DIM)+=s\f$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
@@ -596,5 +596,5 @@ T LaspackVector<T>::operator() (const unsigned int i) const
 }
 
 
-#endif // #ifdef HAVE_LASPACK
+#endif // #ifdef LIBMESH_HAVE_LASPACK
 #endif // #ifdef __laspack_vector_h__

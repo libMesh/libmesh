@@ -254,7 +254,7 @@ void DofMap::reinit(MeshBase& mesh)
   const unsigned int n_var = this->n_variables();
   const unsigned int dim   = mesh.mesh_dimension();
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   
   //------------------------------------------------------------
   // Clear the old_dof_objects for all the nodes
@@ -311,7 +311,7 @@ void DofMap::reinit(MeshBase& mesh)
       }
   }
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
   
   //------------------------------------------------------------
@@ -357,7 +357,7 @@ void DofMap::reinit(MeshBase& mesh)
 
           FEType fe_type = base_fe_type;
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
           // Make sure we haven't done more p refinement than we can
           // handle
           if (elem->p_level() + base_fe_type.order >
@@ -593,7 +593,7 @@ void DofMap::clear()
   _n_oz.clear();
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   _dof_constraints.clear();
   _n_old_dfs = 0;
@@ -687,7 +687,7 @@ void DofMap::distribute_dofs (MeshBase& mesh)
     }
   
   // Set the total number of degrees of freedom
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   _n_old_dfs = _n_dfs;
 #endif
   _n_dfs = _end_df[n_proc-1];
@@ -967,7 +967,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 	    family.clear();
 	    
             // Find all the active elements that neighbor elem
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
             if (!elem->neighbor(s)->active())
               elem->neighbor(s)->active_family_tree_by_neighbor(family, elem);
             else
@@ -1155,7 +1155,7 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 				   const std::vector<unsigned int>& dof_indices,
 				   DenseVectorBase<Number>& Ue) const
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   // Trivial mapping
   libmesh_assert (dof_indices.size() == Ue.size());
@@ -1353,7 +1353,7 @@ void DofMap::dof_indices (const Elem* const elem,
  
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 void DofMap::old_dof_indices (const Elem* const elem,
 			      std::vector<unsigned int>& di,
@@ -1559,10 +1559,10 @@ void DofMap::augment_send_list_for_projection(const MeshBase& mesh)
   if (needs_sorting) this->sort_send_list ();
 }
 
-#endif // ENABLE_AMR
+#endif // LIBMESH_ENABLE_AMR
 
 
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 
 void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 {
@@ -1628,7 +1628,7 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
     } // end if (!done)
 }
 
-#endif // ENABLE_AMR || ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
 
 
@@ -1674,7 +1674,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 
 	  // Get the global indices of the DOFs with support on this element
 	  dof_map.dof_indices (elem, element_dofs);
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 	  dof_map.find_connected_dofs (element_dofs);
 #endif
 
@@ -1761,7 +1761,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		      if (elem->neighbor(s) != NULL)
 			{
 			  const Elem* const neighbor_0 = elem->neighbor(s);
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 			  neighbor_0->active_family_tree_by_neighbor(active_neighbors,elem);
 #else
 			  active_neighbors.clear();
@@ -1773,7 +1773,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 			      const Elem *neighbor = active_neighbors[a];
 			      
 			      dof_map.dof_indices (neighbor, neighbor_dofs);
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 			      dof_map.find_connected_dofs (neighbor_dofs);
 #endif			      
 			      const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
@@ -1823,7 +1823,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 	    
 	    // Find element dofs for variable vi
 	    dof_map.dof_indices (elem, element_dofs_i, vi);
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 	    dof_map.find_connected_dofs (element_dofs_i);
 #endif
 
@@ -1840,7 +1840,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		  if (vi != vj)
 		    {
 		      dof_map.dof_indices (elem, element_dofs_j, vj);
-#if defined(ENABLE_AMR) || defined(ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 		      dof_map.find_connected_dofs (element_dofs_j);
 #endif
 

@@ -427,7 +427,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // The value of the shape function gradients at the quadrature points
   const std::vector<std::vector<RealGradient> >& dphi_values = fe->get_dphi();
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   // The value of the shape function second derivatives at the quadrature points
   const std::vector<std::vector<RealTensor> >& d2phi_values = fe->get_d2phi();
 #endif
@@ -476,7 +476,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  Number u_h = 0.;
 
 	  Gradient grad_u_h;
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	  Tensor grad2_u_h;
 #endif
   
@@ -490,7 +490,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	      // Values from current solution.
 	      u_h      += phi_values[i][qp]*computed_system.current_solution  (dof_indices[i]);
 	      grad_u_h += dphi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	      grad2_u_h += d2phi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
 #endif
 	    }
@@ -525,7 +525,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  error_vals[1] += JxW[qp]*grad_error.size_sq();
 
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	  // Compute the value of the error in the hessian at this
 	  // quadrature point
           Tensor exact_hess;

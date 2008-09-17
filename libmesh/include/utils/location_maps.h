@@ -26,13 +26,13 @@
 #include "libmesh_config.h"
 
 // C++ Includes   -----------------------------------
-#if   defined(HAVE_UNORDERED_MAP)
+#if   defined(LIBMESH_HAVE_UNORDERED_MAP)
 # include <unordered_map>
-#elif defined(HAVE_TR1_UNORDERED_MAP)
+#elif defined(LIBMESH_HAVE_TR1_UNORDERED_MAP)
 # include <tr1/unordered_map>
-#elif defined(HAVE_HASH_MAP)
+#elif defined(LIBMESH_HAVE_HASH_MAP)
 # include <hash_map>
-#elif defined(HAVE_EXT_HASH_MAP)
+#elif defined(LIBMESH_HAVE_EXT_HASH_MAP)
 # include <ext/hash_map>
 #else
 # include <map>
@@ -58,13 +58,13 @@ class Node;
 template <typename T>
 class LocationMap
 {
-#if   defined(HAVE_UNORDERED_MAP)
+#if   defined(LIBMESH_HAVE_UNORDERED_MAP)
   typedef std::unordered_multimap<unsigned int, T*> map_type;
-#elif defined(HAVE_TR1_UNORDERED_MAP)
+#elif defined(LIBMESH_HAVE_TR1_UNORDERED_MAP)
   typedef std::tr1::unordered_multimap<unsigned int, T*> map_type;
-#elif defined(HAVE_HASH_MAP)
+#elif defined(LIBMESH_HAVE_HASH_MAP)
   typedef std::hash_multimap<unsigned int, T*> map_type;
-#elif defined(HAVE_EXT_HASH_MAP)
+#elif defined(LIBMESH_HAVE_EXT_HASH_MAP)
 # if   (__GNUC__ == 3) && (__GNUC_MINOR__ == 0) // gcc 3.0
   typedef std::hash_multimap<unsigned int, T*> map_type;
 # elif (__GNUC__ >= 3)                          // gcc 3.1 & newer

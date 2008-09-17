@@ -50,15 +50,15 @@ Factory<Partitioner>::factory_map()
 // them in an anonymous namespace to prevent name clashes
 namespace {
 
-#ifdef HAVE_METIS
+#ifdef LIBMESH_HAVE_METIS
   FactoryImp<MetisPartitioner,      Partitioner> metis    ("Metis");
 #endif
   
-#ifdef HAVE_PARMETIS
+#ifdef LIBMESH_HAVE_PARMETIS
   FactoryImp<ParmetisPartitioner,   Partitioner> parmetis ("Parmetis");
 #endif
 
-#ifdef HAVE_SFCURVES
+#ifdef LIBMESH_HAVE_SFCURVES
   FactoryImp<SFCPartitioner,        Partitioner> sfc      ("SFCurves");
   FactoryImp<HilbertSFCPartitioner, Partitioner> hilbert  ("Hilbert");
   FactoryImp<MortonSFCPartitioner,  Partitioner> morton   ("Morton");

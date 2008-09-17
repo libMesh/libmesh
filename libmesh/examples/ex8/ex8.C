@@ -102,7 +102,7 @@ int main (int argc, char** argv)
   // Initialize Petsc, like in example 2.
   LibMeshInit init (argc, argv);
 
-#ifdef ENABLE_PARMESH
+#ifdef LIBMESH_ENABLE_PARMESH
   if (libMesh::processor_id() == 0)
     std::cerr << "ERROR: This example directly references\n"
               << "all mesh nodes and is incompatible with"
@@ -135,7 +135,7 @@ int main (int argc, char** argv)
   // LasPack solvers don't work so well for this example
   // (not sure why).  Print a warning to the user if PETSc
   // is not available, or if they are using LasPack solvers.
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
   if ((libMesh::on_command_line("--use-laspack")) ||
       (libMesh::on_command_line("--disable-petsc")))
 #endif

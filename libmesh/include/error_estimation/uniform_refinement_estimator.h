@@ -29,7 +29,7 @@
 #include "error_estimator.h"
 #include "libmesh.h"
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 /**
  * This class implements a ``brute force'' error estimator
@@ -137,7 +137,7 @@ private:
 
 };
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 #endif
 

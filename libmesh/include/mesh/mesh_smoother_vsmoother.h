@@ -23,7 +23,7 @@
 #define __mesh_smoother_vsmoother_h__
 
 #include "libmesh_config.h"
-#ifdef ENABLE_VSMOOTHER
+#ifdef LIBMESH_ENABLE_VSMOOTHER
 
 // C++ Includes   -----------------------------------
 #include <vector>
@@ -311,6 +311,6 @@ private:
               int adp, LPDOUBLE afun, FILE *sout);
 };
 
-#endif // ENABLE_VSMOOTHER
+#endif // LIBMESH_ENABLE_VSMOOTHER
 
 #endif

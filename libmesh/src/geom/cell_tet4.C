@@ -201,7 +201,7 @@ void Tet4::connectivity(const unsigned int sc,
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float Tet4::_embedding_matrix[8][4][4] =
   {
@@ -278,7 +278,7 @@ const float Tet4::_embedding_matrix[8][4][4] =
     }
   };
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 
 
@@ -327,7 +327,7 @@ std::pair<Real, Real> Tet4::min_and_max_angle() const
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 float Tet4::embedding_matrix (const unsigned int i,
 			      const unsigned int j,
 			      const unsigned int k) const
@@ -502,4 +502,4 @@ void Tet4::reselect_optimal_diagonal (const Diagonal exclude_this)
 
   reselect_diagonal (use_this);  
 } 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR

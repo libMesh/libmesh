@@ -146,7 +146,7 @@ void EquationSystems::reinit ()
   for (unsigned int i=0; i != this->n_systems(); ++i)
     this->get_system(i).re_update();
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   bool dof_constraints_created = false;
   bool mesh_changed = false;
@@ -221,7 +221,7 @@ void EquationSystems::reinit ()
       for (unsigned int i=0; i != this->n_systems(); ++i)
         this->get_system(i).reinit();
     }
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 }
 
 
@@ -310,7 +310,7 @@ System & EquationSystems::add_system (const std::string& sys_type,
   else if (sys_type == "LinearImplicit")
     this->add_system<LinearImplicitSystem> (name);
 
-#if defined(USE_COMPLEX_NUMBERS)
+#if defined(LIBMESH_USE_COMPLEX_NUMBERS)
   // build a frequency system
   else if (sys_type == "Frequency")
     this->add_system<FrequencySystem> (name);
@@ -556,7 +556,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 				       elem_soln,
 				       nodal_soln);
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 	      // infinite elements should be skipped...
 	      if (!elem->infinite())
 #endif
@@ -658,7 +658,7 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 					   elem_soln,
 					   nodal_soln);
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 		  // infinite elements should be skipped...
 		  if (!elem->infinite())
 #endif

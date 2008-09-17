@@ -83,7 +83,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      return ap;
 	    }
 	    
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 	  case SZABAB:
 	    {
 	      AutoPtr<FEBase> ap(new FE<1,SZABAB>(fet));
@@ -145,7 +145,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      return ap;
 	    }
 	    
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 	  case SZABAB:
 	    {
 	      AutoPtr<FEBase> ap(new FE<2,SZABAB>(fet));
@@ -208,7 +208,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      return ap;
 	    }
 	    
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 	  case SZABAB:
 	    {
 	      AutoPtr<FEBase> ap(new FE<3,SZABAB>(fet));
@@ -249,7 +249,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
 AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
@@ -533,7 +533,7 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 
 
 
-#endif // ifdef ENABLE_INFINITE_ELEMENTS
+#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
 
@@ -559,13 +559,13 @@ void FEBase::compute_shape_functions (const Elem*)
 
   // If the user forgot to request anything, we'll be safe and
   // calculate everything:
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   if (!calculate_phi && !calculate_dphi && !calculate_d2phi)
     calculate_phi = calculate_dphi = calculate_d2phi = true;
 #else
   if (!calculate_phi && !calculate_dphi)
     calculate_phi = calculate_dphi = true;
-#endif // ENABLE_SECOND_DERIVATIVES
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   // Compute the value of the derivative shape function i at quadrature point p
   switch (dim)
@@ -584,18 +584,18 @@ void FEBase::compute_shape_functions (const Elem*)
 	        dphi[i][p](1) = dphidy[i][p] = 0.;
 	        dphi[i][p](2) = dphidz[i][p] = 0.;
 	      }
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	if (calculate_d2phi)
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
 	      {
 	        d2phi[i][p](0,0) = d2phidx2[i][p] = 
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p];
-#if DIM>1
+#if LIBMESH_DIM>1
 	        d2phi[i][p](0,1) = d2phidxdy[i][p] = 
 		  d2phi[i][p](1,0) = 0.;
 	        d2phi[i][p](1,1) = d2phidy2[i][p] = 0.;
-#if DIM>2
+#if LIBMESH_DIM>2
 	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
 		  d2phi[i][p](2,0) = 0.;
 	        d2phi[i][p](1,2) = d2phidydz[i][p] = 
@@ -627,14 +627,14 @@ void FEBase::compute_shape_functions (const Elem*)
 				  dphideta[i][p]*detady_map[p]);
 	      
 	        // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz)
-#if DIM == 3  
-	        dphi[i][p](2) = // can only assign to the Z component if DIM==3
+#if LIBMESH_DIM == 3  
+	        dphi[i][p](2) = // can only assign to the Z component if LIBMESH_DIM==3
 #endif
 		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
 				dphideta[i][p]*detadz_map[p]);
 	      }
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	if (calculate_d2phi)
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
@@ -653,7 +653,7 @@ void FEBase::compute_shape_functions (const Elem*)
 		  d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +
 		  2*d2phidxideta[i][p]*dxidy_map[p]*detady_map[p] +
 		  d2phideta2[i][p]*detady_map[p]*detady_map[p];
-#if DIM == 3  
+#if LIBMESH_DIM == 3  
 	        d2phi[i][p](0,2) = d2phidxdz[i][p] = 
 		  d2phi[i][p](2,0) = 
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
@@ -703,7 +703,7 @@ void FEBase::compute_shape_functions (const Elem*)
 				  dphidzeta[i][p]*dzetadz_map[p]);	      
 	      }
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	if (calculate_d2phi)
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
@@ -905,7 +905,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	return false;
       }
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     case INFHEX8:
       {      
 	// The reference infhex8 is a [-1,1]^3.
@@ -979,7 +979,7 @@ void FEBase::print_dphi(std::ostream& os) const
 
 
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
 void FEBase::print_d2phi(std::ostream& os) const
@@ -1029,7 +1029,7 @@ std::ostream& operator << (std::ostream& os, const FEBase& fe)
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
                                   const DofMap &dof_map,
@@ -1807,11 +1807,11 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
       }
 }
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 
 
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
 
 void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 				           DofMap &dof_map,
@@ -1901,7 +1901,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
                 mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
               libmesh_assert(s_neigh != libMesh::invalid_uint);
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
               // Find the minimum p level; we build the h constraint
               // matrix with this and then constrain away all higher p
               // DoFs.
@@ -1920,7 +1920,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
               const unsigned int old_neigh_level = neigh->p_level();
               if (old_neigh_level != min_p_level)
                 (const_cast<Elem *>(neigh))->hack_p_level(min_p_level);
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 	      my_fe->reinit(elem, s);
 
@@ -1949,12 +1949,12 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 
               // We're done with functions that examine Elem::p_level(),
               // so let's unhack those levels
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
               if (elem->p_level() != old_elem_level)
                 (const_cast<Elem *>(elem))->hack_p_level(old_elem_level);
               if (neigh->p_level() != old_neigh_level)
                 (const_cast<Elem *>(neigh))->hack_p_level(old_neigh_level);
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 	      const unsigned int n_side_dofs = my_side_dofs.size();
 	      libmesh_assert(n_side_dofs == neigh_side_dofs.size());
@@ -2080,7 +2080,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
           // constrain dofs shared between
           // active elements and neighbors with
           // lower polynomial degrees
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
           const unsigned int min_p_level =
             neigh->min_p_level_by_neighbor(elem, elem->p_level());
           if (min_p_level < elem->p_level())
@@ -2091,10 +2091,10 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
               dof_map.constrain_p_dofs(variable_number, elem,
                                        s, min_p_level);
             }
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
         }
     }
 }
 
-#endif // ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_PERIODIC
 

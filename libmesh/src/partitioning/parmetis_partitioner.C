@@ -32,7 +32,7 @@
 #include "libmesh_logging.h"
 #include "elem.h"
 
-#ifdef HAVE_PARMETIS
+#ifdef LIBMESH_HAVE_PARMETIS
 
 // Include the MPI header files, which must be accessible for
 // ParMETIS to work properly.
@@ -45,7 +45,7 @@ namespace Parmetis {
   }
 }
 
-#endif // #ifdef HAVE_PARMETIS ... else ...
+#endif // #ifdef LIBMESH_HAVE_PARMETIS ... else ...
 
 
 
@@ -69,7 +69,7 @@ void ParmetisPartitioner::_do_partition (MeshBase& mesh,
 //   parallel_only();
 
 // // What to do if the Parmetis library IS NOT present
-// #ifndef HAVE_PARMETIS
+// #ifndef LIBMESH_HAVE_PARMETIS
 
 //   here();
 //   std::cerr << "ERROR: The library has been built without"  << std::endl
@@ -108,7 +108,7 @@ void ParmetisPartitioner::_do_partition (MeshBase& mesh,
 
 //   STOP_LOG ("partition()", "ParmetisPartitioner");
   
-// #endif // #ifndef HAVE_PARMETIS ... else ...
+// #endif // #ifndef LIBMESH_HAVE_PARMETIS ... else ...
   
 }
 
@@ -130,7 +130,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
   parallel_only();
 
 // What to do if the Parmetis library IS NOT present
-#ifndef HAVE_PARMETIS
+#ifndef LIBMESH_HAVE_PARMETIS
 
   here();
   std::cerr << "ERROR: The library has been built without"  << std::endl
@@ -216,14 +216,14 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
 
   STOP_LOG ("repartition()", "ParmetisPartitioner");
   
-#endif // #ifndef HAVE_PARMETIS ... else ...
+#endif // #ifndef LIBMESH_HAVE_PARMETIS ... else ...
   
 }
 
 
 
 // Only need to compile these methods if ParMETIS is present
-#ifdef HAVE_PARMETIS
+#ifdef LIBMESH_HAVE_PARMETIS
 
 void ParmetisPartitioner::initialize (const MeshBase& mesh,
 				      const unsigned int n_sbdmns)
@@ -485,7 +485,7 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
 		  graph_size++;
 		}
   
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 	      
 	      // Otherwise we need to find all of the
 	      // neighbor's children that are connected to
@@ -526,7 +526,7 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
 		    }
 		}
 
-#endif /* ifdef ENABLE_AMR */
+#endif /* ifdef LIBMESH_ENABLE_AMR */
 
 
 	    }
@@ -648,4 +648,4 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
      }
 }
 
-#endif // #ifdef HAVE_PARMETIS
+#endif // #ifdef LIBMESH_HAVE_PARMETIS

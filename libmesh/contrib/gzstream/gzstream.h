@@ -29,7 +29,7 @@
 
 
 #include "libmesh_config.h"
-#ifdef HAVE_ZLIB_H
+#ifdef LIBMESH_HAVE_ZLIB_H
 
 #ifndef GZSTREAM_H
 #define GZSTREAM_H 1
@@ -139,4 +139,4 @@ public:
 // ============================================================================
 // EOF //
 
-#endif // HAVE_ZLIB_H
+#endif // LIBMESH_HAVE_ZLIB_H

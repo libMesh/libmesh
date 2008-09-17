@@ -24,7 +24,7 @@
 #include "libmesh_config.h"
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // C++ includes
 #include <vector>
@@ -41,7 +41,7 @@ class Node;
 /**
  * This class is used to build infinite elements on
  * top of an existing mesh.  It only makes sense to
- * use this if ENABLE_INFINITE_ELEMENTS is true.
+ * use this if LIBMESH_ENABLE_INFINITE_ELEMENTS is true.
  *
  * @author original code by Daniel Dreyer, converted
  * to InfElemBuilder class by John W. Peterson, 2004.
@@ -123,5 +123,5 @@ private:
 };
 
 
-#endif // ENABLE_INFINITE_ELEMENTS
+#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
 #endif

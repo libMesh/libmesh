@@ -136,7 +136,7 @@ void System::read_header (Xdr& io,
 	if (libMesh::processor_id() == 0) io.data (order);
 	Parallel::broadcast(order);
 	
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 	
 	// do the same for radial_order
 	int rad_order=0;	  
@@ -171,7 +171,7 @@ void System::read_header (Xdr& io,
 			<< std::endl;
 	    }
 			
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 	
 	// Read additional information for infinite elements	
 	int radial_fam=0;
@@ -894,7 +894,7 @@ void System::write_header (Xdr& io,
       }
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       
       // do the same for radial_order
       {
@@ -926,7 +926,7 @@ void System::write_header (Xdr& io,
 	int fam = static_cast<int>(type.family);	      
 	io.data (fam, comment.c_str());
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 	
 	comment = "#     Radial FE Family, Variable \"";
 	std::sprintf(buf, "%s", this->variable_name(var).c_str());
@@ -1487,7 +1487,7 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
 	id_request_handles(libMesh::n_processors()),
 	val_request_handles(libMesh::n_processors());
       
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
       const unsigned int id_tag=0, val_tag=1;
       
       // Post the receives -- do this on processor 0 only.

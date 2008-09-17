@@ -21,7 +21,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
 #include "inf_fe_macro.h"
 #include "fe.h"
@@ -162,5 +162,5 @@ INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const O
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const Order,const unsigned int));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const Order,const unsigned int));
 								
-#endif //ifdef ENABLE_INFINITE_ELEMENTS
+#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

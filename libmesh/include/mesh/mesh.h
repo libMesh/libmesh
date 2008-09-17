@@ -3,7 +3,7 @@
 
 #include "libmesh_config.h"
 
-#ifdef ENABLE_PARMESH
+#ifdef LIBMESH_ENABLE_PARMESH
 #include "parallel_mesh.h"
   typedef ParallelMesh DefaultMesh;
 #else

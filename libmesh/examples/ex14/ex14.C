@@ -110,7 +110,7 @@ int main(int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
-#ifndef ENABLE_AMR
+#ifndef LIBMESH_ENABLE_AMR
   if (libMesh::processor_id() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
               << "compiled with AMR support!"
@@ -414,7 +414,7 @@ int main(int argc, char** argv)
   //     out << "polyfit(log10(e(:,1)), log10(e(:,2)), 1)" << std::endl;
   //     out << "disp('H1-error linear fit');" << std::endl;
   //     out << "polyfit(log10(e(:,1)), log10(e(:,3)), 1)" << std::endl;
-#endif // #ifndef ENABLE_AMR
+#endif // #ifndef LIBMESH_ENABLE_AMR
   
   // All done.  
   return 0;
@@ -535,7 +535,7 @@ Gradient exact_derivative(const Point& p,
 void assemble_laplace(EquationSystems& es,
                       const std::string& system_name)
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert (system_name == "Laplace");
@@ -765,5 +765,5 @@ void assemble_laplace(EquationSystems& es,
   // That's it.  We don't need to do anything else to the
   // PerfLog.  When it goes out of scope (at this function return)
   // it will print its log to the screen. Pretty easy, huh?
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 }

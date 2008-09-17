@@ -27,7 +27,7 @@
 #include <unistd.h>
 #include <sys/utsname.h>
 
-#ifdef HAVE_LOCALE
+#ifdef LIBMESH_HAVE_LOCALE
 # include <locale>
 #endif
 
@@ -49,7 +49,7 @@ std::string Utility::system_info()
 {
   OStringStream out;
   
-#ifdef HAVE_LOCALE
+#ifdef LIBMESH_HAVE_LOCALE
     
   typedef std::ostreambuf_iterator<char, std::char_traits<char> > TimeIter;
   typedef std::time_put<char, TimeIter>                           TimePut;
@@ -90,7 +90,7 @@ std::string Utility::system_info()
 
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 std::string Utility::complex_filename (const std::string& basename,
 				       const unsigned int r_o_c)
@@ -124,4 +124,4 @@ void Utility::prepare_complex_data(const std::vector<Complex>& source,
     }
 }
 
-#endif // #ifdef USE_COMPLEX_NUMBERS
+#endif // #ifdef LIBMESH_USE_COMPLEX_NUMBERS

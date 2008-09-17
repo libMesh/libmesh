@@ -1295,7 +1295,7 @@ void MeshTools::Generation::build_square (UnstructuredMesh& mesh,
 
 
 
-#ifndef ENABLE_AMR
+#ifndef LIBMESH_ENABLE_AMR
 void MeshTools::Generation::build_sphere (UnstructuredMesh&,
 					  const Real,
 					  const unsigned int,
@@ -1641,5 +1641,5 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
   mesh.prepare_for_use();
 }
 
-#endif // #ifndef ENABLE_AMR
+#endif // #ifndef LIBMESH_ENABLE_AMR
 

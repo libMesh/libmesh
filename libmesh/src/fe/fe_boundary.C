@@ -50,7 +50,7 @@ REINIT_ERROR(0, HIERARCHIC, reinit)
 REINIT_ERROR(0, LAGRANGE, reinit)
 REINIT_ERROR(0, MONOMIAL, reinit)
 REINIT_ERROR(0, XYZ, reinit)
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 REINIT_ERROR(0, BERNSTEIN, reinit)
 REINIT_ERROR(0, SZABAB, reinit)
 #endif
@@ -61,7 +61,7 @@ REINIT_ERROR(1, HIERARCHIC, edge_reinit)
 REINIT_ERROR(1, LAGRANGE, edge_reinit)
 REINIT_ERROR(1, XYZ, edge_reinit)
 REINIT_ERROR(1, MONOMIAL, edge_reinit)
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 REINIT_ERROR(1, BERNSTEIN, edge_reinit)
 REINIT_ERROR(1, SZABAB, edge_reinit)
 #endif
@@ -411,7 +411,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	// Compute the tangent & normal at the quadrature point
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
+	    tangents[p].resize(LIBMESH_DIM-1); // 1 Tangent in 2D, 2 in 3D
 	    xyz[p].zero();
 	    dxyzdxi_map[p].zero();
 	    d2xyzdxi2_map[p].zero();
@@ -436,12 +436,12 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	    // The first tangent comes from just the edge's Jacobian
 	    tangents[p][0] = dxyzdxi_map[p].unit();
 	    
-#if DIM == 2
+#if LIBMESH_DIM == 2
 	    // For a 2D element living in 2D, the normal is given directly
 	    // from the entries in the edge Jacobian.
 	    normals[p] = (Point(dxyzdxi_map[p](1), -dxyzdxi_map[p](0), 0.)).unit();
 	    
-#elif DIM == 3
+#elif LIBMESH_DIM == 3
 	    // For a 2D element living in 3D, there is a second tangent.
 	    // For the second tangent, we need to refer to the full
 	    // element's (not just the edge's) Jacobian.
@@ -516,7 +516,7 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 	// Clear the entities that will be summed
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    tangents[p].resize(DIM-1); // 1 Tangent in 2D, 2 in 3D
+	    tangents[p].resize(LIBMESH_DIM-1); // 1 Tangent in 2D, 2 in 3D
 	    xyz[p].zero();
 	    dxyzdxi_map[p].zero();
 	    dxyzdeta_map[p].zero();
@@ -698,7 +698,7 @@ template void FE<1,HIERARCHIC>::reinit(Elem const*, unsigned int, Real);
 template void FE<1,CLOUGH>::reinit(Elem const*, unsigned int, Real);
 template void FE<1,HERMITE>::reinit(Elem const*, unsigned int, Real);
 template void FE<1,MONOMIAL>::reinit(Elem const*, unsigned int, Real);
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 template void FE<1,BERNSTEIN>::reinit(Elem const*, unsigned int, Real);
 template void FE<1,SZABAB>::reinit(Elem const*, unsigned int, Real);
 #endif
@@ -714,7 +714,7 @@ template void FE<2,HERMITE>::reinit(Elem const*, unsigned int, Real);
 template void FE<2,HERMITE>::edge_reinit(Elem const*, unsigned int, Real);
 template void FE<2,MONOMIAL>::reinit(Elem const*, unsigned int, Real);
 template void FE<2,MONOMIAL>::edge_reinit(Elem const*, unsigned int, Real);
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 template void FE<2,BERNSTEIN>::reinit(Elem const*, unsigned int, Real);
 template void FE<2,BERNSTEIN>::edge_reinit(Elem const*, unsigned int, Real);
 template void FE<2,SZABAB>::reinit(Elem const*, unsigned int, Real);
@@ -736,7 +736,7 @@ template void FE<3,HERMITE>::reinit(Elem const*, unsigned int, Real);
 template void FE<3,HERMITE>::edge_reinit(Elem const*, unsigned int, Real);
 template void FE<3,MONOMIAL>::reinit(Elem const*, unsigned int, Real);
 template void FE<3,MONOMIAL>::edge_reinit(Elem const*, unsigned int, Real);
-#ifdef ENABLE_HIGHER_ORDER_SHAPES
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 template void FE<3,BERNSTEIN>::reinit(Elem const*, unsigned int, Real);
 template void FE<3,BERNSTEIN>::edge_reinit(Elem const*, unsigned int, Real);
 template void FE<3,SZABAB>::reinit(Elem const*, unsigned int, Real);

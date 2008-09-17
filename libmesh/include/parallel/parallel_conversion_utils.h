@@ -26,7 +26,7 @@
 
 #include "libmesh_common.h"
 
-#ifdef HAVE_LIBHILBERT
+#ifdef LIBMESH_HAVE_LIBHILBERT
 #include "hilbert.h"
 #endif
 
@@ -80,7 +80,7 @@ namespace Parallel {
 	return static_cast<KeyType>(f);
       }
 
-#ifdef HAVE_LIBHILBERT
+#ifdef LIBMESH_HAVE_LIBHILBERT
 
     template <>
       inline
@@ -102,7 +102,7 @@ namespace Parallel {
 
 	return bvt;
       }
-#endif // HAVE_LIBHILBERT
+#endif // LIBMESH_HAVE_LIBHILBERT
   }
 }
 

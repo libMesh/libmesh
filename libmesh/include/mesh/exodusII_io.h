@@ -114,9 +114,9 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   /**
    * Only attempt to instantiate an ExodusII helper class
    * if the Exodus API is defined.  This class will have no
-   * functionality when HAVE_EXODUS_API is not defined.
+   * functionality when LIBMESH_HAVE_EXODUS_API is not defined.
    */
-#ifdef HAVE_EXODUS_API
+#ifdef LIBMESH_HAVE_EXODUS_API
   ExodusII_IO_Helper exio_helper;
 #endif
 

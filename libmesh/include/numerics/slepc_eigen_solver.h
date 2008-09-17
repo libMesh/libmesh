@@ -34,9 +34,9 @@
  * SLEPc include files. SLEPs can only be used
  * together with PETSc.
  */
-#if defined(HAVE_SLEPC) && defined(HAVE_PETSC)
+#if defined(LIBMESH_HAVE_SLEPC) && defined(LIBMESH_HAVE_PETSC)
 
-#ifndef USE_COMPLEX_NUMBERS
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
 extern "C"
 {
 # include <slepceps.h>
@@ -206,5 +206,5 @@ SlepcEigenSolver<T>::~SlepcEigenSolver ()
 }
 
 
-#endif // #ifdef HAVE_SLEPC
+#endif // #ifdef LIBMESH_HAVE_SLEPC
 #endif // #ifdef __slepc_linear_solver_h__

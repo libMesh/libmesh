@@ -25,7 +25,7 @@
 #include "petsc_vector.h"
 #include "petsc_matrix.h"
 
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
 
 #include "parallel.h"
 #include "utility.h"
@@ -739,7 +739,7 @@ void PetscVector<T>::localize (std::vector<T>& v_local) const
 
 
 // Full specialization for Real datatypes
-#ifdef USE_REAL_NUMBERS
+#ifdef LIBMESH_USE_REAL_NUMBERS
 
 template <>
 void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
@@ -794,7 +794,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
 
 
 // Full specialization for Complex datatypes
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 template <>
 void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
@@ -1037,4 +1037,4 @@ template class PetscVector<Number>;
 
 
 
-#endif // #ifdef HAVE_PETSC
+#endif // #ifdef LIBMESH_HAVE_PETSC

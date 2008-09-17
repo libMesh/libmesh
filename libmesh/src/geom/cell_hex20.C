@@ -372,7 +372,7 @@ Hex20::second_order_child_vertex (const unsigned int n) const
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float Hex20::_embedding_matrix[8][20][20] =
 {

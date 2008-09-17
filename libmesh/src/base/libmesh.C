@@ -33,21 +33,21 @@
 
 
 
-#if defined(HAVE_MPI)
+#if defined(LIBMESH_HAVE_MPI)
 # include <mpi.h>
 # include "petsc_macro.h"
-# if defined(HAVE_PETSC)
+# if defined(LIBMESH_HAVE_PETSC)
 EXTERN_C_FOR_PETSC_BEGIN
 #   include <petsc.h>
 #   include <petscerror.h>
 EXTERN_C_FOR_PETSC_END
-# endif // #if defined(HAVE_PETSC)
-# if defined(HAVE_SLEPC)
+# endif // #if defined(LIBMESH_HAVE_PETSC)
+# if defined(LIBMESH_HAVE_SLEPC)
 EXTERN_C_FOR_PETSC_BEGIN
 #   include <slepc.h>
 EXTERN_C_FOR_PETSC_END
-# endif // #if defined(HAVE_SLEPC)
-#endif // #if defined(HAVE_MPI)
+# endif // #if defined(LIBMESH_HAVE_SLEPC)
+#endif // #if defined(LIBMESH_HAVE_MPI)
 
 
 // --------------------------------------------------------
@@ -62,7 +62,7 @@ namespace {
   std::streambuf* cerr_buf (NULL);
   
   AutoPtr<Threads::task_scheduler_init> task_scheduler (NULL);
-#if defined(HAVE_MPI)
+#if defined(LIBMESH_HAVE_MPI)
   bool libmesh_initialized_mpi = false;
 #endif
 }
@@ -71,12 +71,12 @@ namespace {
 
 // ------------------------------------------------------------
 // libMeshdata initialization
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
 MPI_Comm           libMesh::COMM_WORLD = MPI_COMM_NULL;
 #endif
 
 PerfLog            libMesh::perflog ("libMesh",
-#ifdef ENABLE_PERFORMANCE_LOGGING
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
 				     true
 #else
 				     false
@@ -86,7 +86,7 @@ PerfLog            libMesh::perflog ("libMesh",
 
 const Real         libMesh::pi = 3.1415926535897932384626433832795029L;
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 const Number       libMesh::imaginary (0., 1.);
 const Number       libMesh::zero      (0., 0.);
 #else
@@ -104,11 +104,11 @@ int           libMesh::libMeshPrivateData::_processor_id = 0;
 int           libMesh::libMeshPrivateData::_n_threads = 1; /* Threads::task_scheduler_init::automatic; */
 bool          libMesh::libMeshPrivateData::_is_initialized = false;
 SolverPackage libMesh::libMeshPrivateData::_solver_package =
-#if   defined(HAVE_PETSC)    // PETSc is the default
+#if   defined(LIBMESH_HAVE_PETSC)    // PETSc is the default
                                                        PETSC_SOLVERS;
-#elif defined(HAVE_TRILINOS) // Use Trilinos if PETSc isn't there
+#elif defined(LIBMESH_HAVE_TRILINOS) // Use Trilinos if PETSc isn't there
                                                        TRILINOS_SOLVERS;
-#elif defined(HAVE_LASPACK)  // Use LASPACK if neither are there
+#elif defined(LIBMESH_HAVE_LASPACK)  // Use LASPACK if neither are there
                                                        LASPACK_SOLVERS;
 #else                        // No valid linear solver package at compile time
                                                        INVALID_SOLVER_PACKAGE;
@@ -119,7 +119,7 @@ SolverPackage libMesh::libMeshPrivateData::_solver_package =
 // ------------------------------------------------------------
 // libMesh functions
 namespace libMesh {
-#ifndef HAVE_MPI
+#ifndef LIBMESH_HAVE_MPI
 void _init (int &argc, char** & argv)
 #else
 void _init (int &argc, char** & argv,
@@ -150,7 +150,7 @@ void _init (int &argc, char** & argv,
   // RemoteElem depends on static reference counting data
   remote_elem = new RemoteElem();
 
-#if defined(HAVE_MPI)
+#if defined(LIBMESH_HAVE_MPI)
 
   // Allow the user to bypass PETSc initialization
   if (!libMesh::on_command_line ("--disable-mpi"))
@@ -172,7 +172,7 @@ void _init (int &argc, char** & argv,
       MPI_Comm_rank (libMesh::COMM_WORLD, &libMeshPrivateData::_processor_id);
       MPI_Comm_size (libMesh::COMM_WORLD, &libMeshPrivateData::_n_processors);
       
-# if defined(HAVE_PETSC)
+# if defined(LIBMESH_HAVE_PETSC)
       
       if (!libMesh::on_command_line ("--disable-petsc"))
 	{
@@ -180,7 +180,7 @@ void _init (int &argc, char** & argv,
 	  
 	  PETSC_COMM_WORLD = libMesh::COMM_WORLD;
 
-#  if defined(HAVE_SLEPC)
+#  if defined(LIBMESH_HAVE_SLEPC)
 	  ierr = SlepcInitialize  (&argc, &argv, NULL, NULL);
 	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #  else
@@ -244,7 +244,7 @@ int _close ()
   // Clear the thread task manager we started
   task_scheduler.reset();
 
-#if defined(HAVE_MPI)
+#if defined(LIBMESH_HAVE_MPI)
   // Allow the user to bypass MPI finalization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
@@ -261,12 +261,12 @@ int _close ()
           std::cerr << "Uncaught exception - aborting" << std::endl;
           MPI_Abort(libMesh::COMM_WORLD,1);
         }
-# if defined(HAVE_PETSC) 
+# if defined(LIBMESH_HAVE_PETSC) 
 
       // Allow the user to bypass PETSc finalization
       if (!libMesh::on_command_line ("--disable-petsc"))
 	{
-#  if defined(HAVE_SLEPC)
+#  if defined(LIBMESH_HAVE_SLEPC)
 	  SlepcFinalize();
 #  else
 	  PetscFinalize();
@@ -295,7 +295,7 @@ int _close ()
       std::cerr << "Memory leak detected!"
 		<< std::endl;
       
-#if !defined(ENABLE_REFERENCE_COUNTING) || defined(NDEBUG)
+#if !defined(LIBMESH_ENABLE_REFERENCE_COUNTING) || defined(NDEBUG)
 
       std::cerr << "Compile in DEBUG mode with --enable-reference-counting"
 		<< std::endl
@@ -340,7 +340,7 @@ int _close ()
 
 
 
-#ifndef HAVE_MPI
+#ifndef LIBMESH_HAVE_MPI
 void libMesh::init (int &argc, char** & argv)
 {
   deprecated();  // Use LibMeshInit instead
@@ -366,7 +366,7 @@ int libMesh::close ()
 
 
 
-#ifndef HAVE_MPI
+#ifndef LIBMESH_HAVE_MPI
 LibMeshInit::LibMeshInit (int &argc, char** & argv)
 {
   libMesh::_init(argc, argv);
@@ -438,18 +438,18 @@ SolverPackage libMesh::default_solver_package ()
     {
       called = true;
 
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
       if (libMesh::on_command_line ("--use-petsc"))
 	libMeshPrivateData::_solver_package = PETSC_SOLVERS;
 #endif
 
-#ifdef HAVE_TRILINOS
+#ifdef LIBMESH_HAVE_TRILINOS
       if (libMesh::on_command_line ("--use-trilinos") ||
 	  libMesh::on_command_line ("--disable-petsc"))
 	libMeshPrivateData::_solver_package = TRILINOS_SOLVERS;
 #endif
       
-#ifdef HAVE_LASPACK
+#ifdef LIBMESH_HAVE_LASPACK
       if (libMesh::on_command_line ("--use-laspack"  ) ||
 	  libMesh::on_command_line ("--disable-petsc"))
 	libMeshPrivateData::_solver_package = LASPACK_SOLVERS;

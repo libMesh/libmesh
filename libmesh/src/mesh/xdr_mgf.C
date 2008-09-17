@@ -33,7 +33,7 @@ XdrMGF::~XdrMGF()
 void XdrMGF::fini()
 {
   
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
   
   if (mp_xdr_handle)
     {
@@ -75,7 +75,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
   switch (m_type)
     {
       
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
       
     case (XdrMGF::ENCODE):
     case (XdrMGF::DECODE):
@@ -155,7 +155,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
   switch (m_type)
     {
       
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
       
     case (XdrMGF::ENCODE):
       {
@@ -291,7 +291,7 @@ int XdrMGF::dataBlk(int* array, int numvar, int size)
   switch (m_type)
     {
 
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
       
     case (XdrMGF::DECODE):
     case (XdrMGF::ENCODE):
@@ -360,7 +360,7 @@ int XdrMGF::dataBlk(Real* array, int numvar, int size)
   switch (m_type)
     {
       
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
       
     case (XdrMGF::DECODE):
     case (XdrMGF::ENCODE):

@@ -225,7 +225,7 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
       
       for ( ; it!=end; ++it)
 	{
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 	  Elem *child  = *it;
 	  Elem *parent = child->parent();
 
@@ -290,7 +290,7 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 	  
 	  for ( ; not_it != not_end; ++not_it)
 	    {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 	      Elem *parent = *not_it;
 
 	      const unsigned int parent_idx = parent->id();

@@ -21,7 +21,7 @@
 
 // Local includes
 #include "libmesh_config.h"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
 #include "quadrature_gauss.h"
 #include "elem.h"
@@ -523,7 +523,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     dphidy.resize  (n_total_approx_shape_functions);
     dphidz.resize  (n_total_approx_shape_functions);
     dphidxi.resize (n_total_approx_shape_functions);
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     static bool warning_given = false;
     if (!warning_given)
       std::cerr << "Second derivatives for Infinite elements"
@@ -551,7 +551,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
         d2phidxidzeta.resize  (n_total_approx_shape_functions);
         d2phidzeta2.resize    (n_total_approx_shape_functions);
       }
-#endif // ifdef ENABLE_SECOND_DERIVATIVES
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     
     if (Dim > 1)
       dphideta.resize      (n_total_approx_shape_functions);
@@ -562,7 +562,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     
     phi_map.resize         (n_total_mapping_shape_functions);
     dphidxi_map.resize     (n_total_mapping_shape_functions);
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     d2phidxi2_map.resize   (n_total_mapping_shape_functions);
 
     if (Dim > 1)
@@ -577,7 +577,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
         d2phidetadzeta_map.resize (n_total_mapping_shape_functions);
         d2phidzeta2_map.resize    (n_total_mapping_shape_functions);
       }
-#endif // ifdef ENABLE_SECOND_DERIVATIVES
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     
     if (Dim > 1)
       dphideta_map.resize  (n_total_mapping_shape_functions);
@@ -600,7 +600,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 	dphidy[i].resize      (n_total_qp);
 	dphidz[i].resize      (n_total_qp);
 	dphidxi[i].resize     (n_total_qp);
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	d2phi[i].resize       (n_total_qp);
 	d2phidx2[i].resize    (n_total_qp);
 	d2phidxdy[i].resize   (n_total_qp);
@@ -621,7 +621,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 	    d2phidetadzeta[i].resize (n_total_qp);
 	    d2phidzeta2[i].resize    (n_total_qp);
 	  }
-#endif // ifdef ENABLE_SECOND_DERIVATIVES
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	   
 	if (Dim > 1)
 	  dphideta[i].resize  (n_total_qp);
@@ -635,7 +635,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
       {
 	phi_map[i].resize         (n_total_qp);
 	dphidxi_map[i].resize     (n_total_qp);
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	d2phidxi2_map[i].resize   (n_total_qp);
 	if (Dim > 1)
 	  {
@@ -649,7 +649,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 	    d2phidetadzeta_map[i].resize (n_total_qp);
 	    d2phidzeta2_map[i].resize    (n_total_qp);
 	  }
-#endif // ifdef ENABLE_SECOND_DERIVATIVES
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	   
 	if (Dim > 1)
 	  dphideta_map[i].resize  (n_total_qp);
@@ -984,5 +984,5 @@ bool InfFE<Dim,T_radial,T_map>::shapes_need_reinit() const
 
 
 
-#endif //ifdef ENABLE_INFINITE_ELEMENTS
+#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

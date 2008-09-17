@@ -41,7 +41,7 @@
 
 // Wrap everything in a GMV namespace and
 // use extern "C" to avoid name mangling.
-#ifdef HAVE_GMV
+#ifdef LIBMESH_HAVE_GMV
 namespace GMV
 {
   extern "C"
@@ -257,7 +257,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 				  const std::vector<Number>* v,
 				  const std::vector<std::string>* solution_names)
 {
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   std::cerr << "WARNING:  GMVIO::write_ascii_new_impl() not infinite-element aware!"
 	    << std::endl;
@@ -466,7 +466,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
       for (unsigned int c=0; c<n_vars; c++)
         {
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
           // in case of complex data, write _three_ data sets
           // for each component
@@ -654,7 +654,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 			                            // four surrounding triangles (though they will be written
 			                            // to GMV as QUAD4s).  
 		        ((*it)->type() == QUAD9)
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 		        || ((*it)->type() == INFQUAD4)
 		        || ((*it)->type() == INFQUAD6)
 #endif
@@ -682,7 +682,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
                 {
 		  // Quad elements
 		  if (((*it)->type() == QUAD4)
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 		      || ((*it)->type() == INFQUAD4)
 #endif
 		      )
@@ -694,7 +694,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 		    }
 		  else if (((*it)->type() == QUAD8) ||
 		           ((*it)->type() == QUAD9)
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 		           || ((*it)->type() == INFQUAD6)
 #endif
 		          )
@@ -749,7 +749,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 	        for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 	          {
 
-#ifndef  ENABLE_INFINITE_ELEMENTS
+#ifndef  LIBMESH_ENABLE_INFINITE_ELEMENTS
 		    if (((*it)->type() == HEX8)   ||    
 		        ((*it)->type() == HEX27))
 		      {
@@ -813,7 +813,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 			    << conn[1] << " "
 			    << conn[4] << " ";
 		      }
-#ifndef  ENABLE_INFINITE_ELEMENTS
+#ifndef  LIBMESH_ENABLE_INFINITE_ELEMENTS
 		    else if (((*it)->type() == PRISM6)  ||
 			     ((*it)->type() == PRISM15) ||
 			     ((*it)->type() == PRISM18))
@@ -854,7 +854,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
                   for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
                     lo_elem->set_node(i) = (*it)->get_node(i);
 		  if ((lo_elem->type() == HEX8)
-#ifdef  ENABLE_INFINITE_ELEMENTS
+#ifdef  LIBMESH_ENABLE_INFINITE_ELEMENTS
                       || (lo_elem->type() == HEX27)
 #endif
                      )
@@ -875,7 +875,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 			  << conn[4] << " ";
 		    }
 		  else if ((lo_elem->type() == PRISM6)
-#ifdef  ENABLE_INFINITE_ELEMENTS
+#ifdef  LIBMESH_ENABLE_INFINITE_ELEMENTS
                            || (lo_elem->type() == INFPRISM6)
 #endif
 			   )
@@ -1040,7 +1040,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
       for (unsigned int c=0; c<n_vars; c++)
 	{
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 	  // in case of complex data, write _tree_ data sets
 	  // for each component
@@ -1399,7 +1399,7 @@ void GMVIO::write_binary (const std::string& fname,
       for (unsigned int c=0; c<n_vars; c++)
         {
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
           // for complex data, write three datasets
 
 
@@ -1593,7 +1593,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 		if (((*it)->type() == EDGE2) ||
 		    ((*it)->type() == EDGE3) ||
 		    ((*it)->type() == EDGE4)
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 		    || ((*it)->type() == INFEDGE2)
 #endif
 		    )
@@ -1624,7 +1624,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 			                        // four surrounding triangles (though they will be written
 			                        // to GMV as QUAD4s).  
 		    ((*it)->type() == QUAD9)
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 		    || ((*it)->type() == INFQUAD4)
 		    || ((*it)->type() == INFQUAD6)
 #endif
@@ -1663,7 +1663,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 		if (((*it)->type() == HEX8) ||
 		    ((*it)->type() == HEX20) ||
 		    ((*it)->type() == HEX27)
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 		    || ((*it)->type() == INFHEX8)
 		    || ((*it)->type() == INFHEX16)
 		    || ((*it)->type() == INFHEX18)
@@ -1677,7 +1677,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
                 else if (((*it)->type() == PRISM6) ||
                          ((*it)->type() == PRISM15) ||
                          ((*it)->type() == PRISM18)
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 		         || ((*it)->type() == INFPRISM6)
 		         || ((*it)->type() == INFPRISM12)
 #endif
@@ -1754,7 +1754,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
     for (unsigned int c=0; c<n_vars; c++)
       {
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
         // in case of complex data, write _tree_ data sets
         // for each component
@@ -1856,7 +1856,7 @@ void GMVIO::read (const std::string& name)
 
   untested();
   
-#ifndef HAVE_GMV
+#ifndef LIBMESH_HAVE_GMV
 
   std::cerr << "Cannot read a GMV file without the GMV API." << std::endl;
   libmesh_error();
@@ -1989,7 +1989,7 @@ void GMVIO::read (const std::string& name)
 
 void GMVIO::_read_var()
 {
-#ifdef HAVE_GMV
+#ifdef LIBMESH_HAVE_GMV
   
   // Copy all the variable's values into a local storage vector.
   _nodal_data.insert ( std::make_pair(std::string(GMV::gmv_data.name1),
@@ -2001,7 +2001,7 @@ void GMVIO::_read_var()
 
 void GMVIO::_read_materials()
 {
-#ifdef HAVE_GMV
+#ifdef LIBMESH_HAVE_GMV
   
   // LibMesh assigns materials on a per-cell basis
   libmesh_assert (GMV::gmv_data.datatype == CELL);
@@ -2044,7 +2044,7 @@ void GMVIO::_read_materials()
 
 void GMVIO::_read_nodes()
 {
-#ifdef HAVE_GMV
+#ifdef LIBMESH_HAVE_GMV
   //   // Debug Info 
   //   std::cout << "gmv_data.datatype="
   // 	    <<  GMV::gmv_data.datatype
@@ -2079,7 +2079,7 @@ void GMVIO::_read_nodes()
 
 void GMVIO::_read_one_cell()
 {
-#ifdef HAVE_GMV
+#ifdef LIBMESH_HAVE_GMV
   //   // Debug Info 
   //   std::cout << "gmv_data.datatype="
   // 	    <<  GMV::gmv_data.datatype

@@ -23,7 +23,7 @@
 #include "edge_edge2.h"
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float Edge2::_embedding_matrix[2][2][2] =
 {

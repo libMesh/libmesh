@@ -21,7 +21,7 @@
 
 #include "libmesh_common.h"
 
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
 
 
 // C++ includes
@@ -282,4 +282,4 @@ template class PetscNonlinearSolver<Number>;
  
 
 
-#endif // #ifdef HAVE_PETSC
+#endif // #ifdef LIBMESH_HAVE_PETSC

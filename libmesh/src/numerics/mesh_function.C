@@ -195,7 +195,7 @@ Gradient MeshFunction::gradient (const Point& p,
 
 
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 Tensor MeshFunction::hessian (const Point& p, 
 			      const Real time)
 {
@@ -397,7 +397,7 @@ void MeshFunction::gradient (const Point& p,
 
 
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 void MeshFunction::hessian (const Point& p,
 			    const Real,
 			    std::vector<Tensor>& output)

@@ -27,7 +27,7 @@
 #include "libmesh_config.h"
 
 // Include the MPI definition
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
 # include <mpi.h>
 #endif
 
@@ -37,7 +37,7 @@
 #include <unistd.h>  // needed for getpid()
 #include <complex>
 // #include <cassert>  // Use libmesh_assert() now
-#ifdef HAVE_STDLIB_H
+#ifdef LIBMESH_HAVE_STDLIB_H
 # include <cstdlib>
 #endif
 
@@ -45,7 +45,7 @@
 #include "libmesh_base.h"
 #include "libmesh_exceptions.h"
 
-#ifdef ENABLE_TRACEFILES
+#ifdef LIBMESH_ENABLE_TRACEFILES
 #  include "print_trace.h"
 #endif
 
@@ -148,7 +148,7 @@ typedef std::complex<double> COMPLEX;
 
 
 // Helper functions for complex/real numbers
-// to clean up #ifdef USE_COMPLEX_NUMBERS elsewhere
+// to clean up #ifdef LIBMESH_USE_COMPLEX_NUMBERS elsewhere
 template<typename T> inline T libmesh_real(T a) { return a; }
 template<typename T> inline T libmesh_norm(T a) { return a*a; }
 
@@ -162,9 +162,9 @@ inline T libmesh_norm(std::complex<T> a) { return std::norm(a); }
 // Define the value type for unknowns in simulations.
 // This is either Real or Complex, depending on how
 // the library was configures
-#if   defined (USE_REAL_NUMBERS)
+#if   defined (LIBMESH_USE_REAL_NUMBERS)
   typedef Real Number;
-#elif defined (USE_COMPLEX_NUMBERS)
+#elif defined (LIBMESH_USE_COMPLEX_NUMBERS)
   typedef Complex Number;
 #else
   DIE A HORRIBLE DEATH HERE...
@@ -178,7 +178,7 @@ typedef float ErrorVectorReal;
 #define MPI_ERRORVECTORREAL MPI_FLOAT
 
 
-#ifdef HAVE_MPI
+#ifdef LIBMESH_HAVE_MPI
 namespace libMesh
 {
   /**
@@ -198,7 +198,7 @@ namespace libMesh
 // determining the memory used by a given operation.  A stop() could be instered before and after a questionable
 // operation and the delta memory can be obtained from a ps or top.  This macro only works for serial cases.
 #undef stop
-#ifdef HAVE_CSIGNAL
+#ifdef LIBMESH_HAVE_CSIGNAL
 #  include <csignal>
 #  define stop()     do { if (libMesh::n_processors() == 1) { here(); std::cout << "Stopping process " << getpid() << "..." << std::endl; std::raise(SIGSTOP); std::cout << "Continuing process " << getpid() << "..." << std::endl; } } while(0)
 #else
@@ -217,7 +217,7 @@ namespace libMesh
 // exception
 // The libmesh_not_implemented() macro prints a message and throws a
 // NotImplemented exception
-#ifdef ENABLE_TRACEFILES
+#ifdef LIBMESH_ENABLE_TRACEFILES
 #define libmesh_error()    do { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); print_trace(traceout); std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::LogicError()); } while(0)
 #define libmesh_not_implemented()    do { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); print_trace(traceout); std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
 #else
@@ -246,8 +246,8 @@ std::cout << "error() is deprecated; use libmesh_error() instead!" \
 
 
 // 3D spatial dimension unless otherwise specified
-#ifndef DIM
-#  define DIM 3
+#ifndef LIBMESH_DIM
+#  define LIBMESH_DIM 3
 #endif
 
 

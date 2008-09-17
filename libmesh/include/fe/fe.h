@@ -32,7 +32,7 @@
 class DofConstraints;
 class DofMap;
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 template <unsigned int friend_Dim, FEFamily friend_T_radial, InfMapType friend_T_map>
 class InfFE;
@@ -331,7 +331,7 @@ public:
    */
   virtual unsigned int n_quadrature_points () const;
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * Computes the constraint matrix contributions (for
    * non-conforming adapted meshes) corresponding to 
@@ -342,9 +342,9 @@ public:
 				   DofMap &dof_map,
 				   const unsigned int variable_number,
 				   const Elem* elem);
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
   
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * Initialize the data fields for the base of an
@@ -415,7 +415,7 @@ public:
   static Point map_zeta (const Elem* elem,
 			 const Point& reference_point);
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   /**
    * make InfFE classes friends, so that these may access
    * the private \p map, map_xyz methods

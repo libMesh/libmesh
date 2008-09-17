@@ -39,7 +39,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
   switch (m_type)
     {
       
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
       
     case (XdrMGF::ENCODE):
     case (XdrMGF::DECODE):

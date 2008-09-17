@@ -26,7 +26,7 @@
 // Local includes
 #include "libmesh_common.h"
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 #include "edge.h"
 
@@ -125,7 +125,7 @@ class InfEdge2 : public Edge
 //   { return 3; }
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * @returns \p true.  This is an infinite element. 
@@ -143,7 +143,7 @@ class InfEdge2 : public Edge
 protected:
 
   
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   /**
    * Matrix used to create the elements children.

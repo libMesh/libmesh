@@ -21,7 +21,7 @@
 // C++ includes
 #include "libmesh_config.h"
 
-#ifdef HAVE_TRILINOS
+#ifdef LIBMESH_HAVE_TRILINOS
 
 // Local includes
 #include "trilinos_epetra_matrix.h"
@@ -349,7 +349,7 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 // // 			 isrow,
 // // 			 iscol,
 // // 			 PETSC_DECIDE,
-// // 			 (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
+// // 			 (reuse_submatrix ? MAT_RELIBMESH_USE_MATRIX : MAT_INITIAL_MATRIX),
 // // 			 &(petsc_submatrix->_mat));  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 // //   // Specify that the new submatrix is initialized and close it.
@@ -372,4 +372,4 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 template class EpetraMatrix<Number>;
 
 
-#endif // #ifdef HAVE_TRILINOS
+#endif // #ifdef LIBMESH_HAVE_TRILINOS

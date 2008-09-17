@@ -63,7 +63,7 @@
 
 #include "mesh_data.h"
 
-#ifdef HAVE_VTK
+#ifdef LIBMESH_HAVE_VTK
 
 #include "vtkXMLUnstructuredGridReader.h"
 #include "vtkXMLUnstructuredGridWriter.h"
@@ -90,14 +90,14 @@
 #include "vtkDoubleArray.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
-#endif //HAVE_VTK
+#endif //LIBMESH_HAVE_VTK
 
 //static unsigned int vtk_tet4_mapping[4]= {0,1,2,3};
 //static unsigned int vtk_pyramid5_mapping[5]= {0,3,2,1,4};
 //static unsigned int vtk_wedge6_mapping[6]= {0,2,1,3,5,4};
 //static unsigned int vtk_hex8_mapping[8]= {0,1,2,3,4,5,6,7};
 
-#ifdef HAVE_VTK // private functions
+#ifdef LIBMESH_HAVE_VTK // private functions
 vtkPoints* VTKIO::nodes_to_vtk(const MeshBase& mesh){
 	if (libMesh::processor_id() == 0)
 		{
@@ -323,7 +323,7 @@ void VTKIO::solution_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& gri
 
 					const unsigned int dof_nr = mesh.node(k).dof_number(i,j,0);
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 					data->SetValue(k,sys.current_solution(dof_nr).real());
 #else
 					data->SetValue(k,sys.current_solution(dof_nr));
@@ -373,7 +373,7 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*
 
 			for(unsigned int i=0;i<it->second.size();++i){
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 				data->SetValue(i,it->second[i].real());
 #else
 				data->SetValue(i,it->second[i]);
@@ -449,7 +449,7 @@ void VTKIO::read (const std::string& name)
   // broadcast later
   libmesh_assert(libMesh::processor_id() == 0);
 
-#ifndef HAVE_VTK
+#ifndef LIBMESH_HAVE_VTK
   std::cerr << "Cannot read VTK file: " << name
 	    << "\nYou must have VTK installed and correctly configured to read VTK meshes."
 	    << std::endl;
@@ -535,7 +535,7 @@ void VTKIO::read (const std::string& name)
   mesh.add_elem(elem);
   } // end loop over VTK cells
   
-#endif // HAVE_VTK
+#endif // LIBMESH_HAVE_VTK
 }
 
 /*
@@ -548,7 +548,7 @@ void VTKIO::read (const std::string& name)
  */
 void VTKIO::write_equation_systems(const std::string& fname, const EquationSystems& es)
 {
-#ifndef HAVE_VTK
+#ifndef LIBMESH_HAVE_VTK
 
   // Do something with the es to avoid a compiler warning.
   es.n_systems();
@@ -609,7 +609,7 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
  */
 void VTKIO::write (const std::string& name)
 {	
-#ifndef HAVE_VTK
+#ifndef LIBMESH_HAVE_VTK
   std::cerr << "Cannot write VTK file: " << name
 	    << "\nYou must have VTK installed and correctly configured to write VTK meshes."
 	    << std::endl;
@@ -636,7 +636,7 @@ void VTKIO::write (const std::string& name)
 	  writer->SetFileName(name.c_str());
 	  writer->Write();
   }
-#endif // HAVE_VTK
+#endif // LIBMESH_HAVE_VTK
 }
 
 //  vim: sw=3 ts=3  

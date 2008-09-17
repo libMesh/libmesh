@@ -35,7 +35,7 @@
  * AMR is enabled and thus are not present
  * otherwise.
  */ 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 void Elem::refine (MeshRefinement& mesh_refinement)
 {
@@ -219,7 +219,7 @@ void Elem::coarsen()
       if(calculated_new_pos)
       {	
 	//Move the existing node back into it's original location
-	for(unsigned int i=0; i<DIM; i++)
+	for(unsigned int i=0; i<LIBMESH_DIM; i++)
 	{
 	  Point & child_node = *(mychild->get_node(nc));
 	  child_node(i)=new_pos(i);
@@ -262,6 +262,6 @@ void Elem::contract()
     this->set_refinement_flag(Elem::DO_NOTHING);
 }
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 

@@ -25,7 +25,7 @@
 
 // Local includes
 #include "parallel_histogram.h"
-#ifdef HAVE_LIBHILBERT
+#ifdef LIBMESH_HAVE_LIBHILBERT
 #  include "hilbert.h"
 #endif
 #include "parallel.h"
@@ -109,7 +109,7 @@ void Histogram<KeyType>::build_histogram ()
 // Explicitly instantiate for int, double
 template class Parallel::Histogram<int>;
 template class Parallel::Histogram<double>;
-#ifdef HAVE_LIBHILBERT
+#ifdef LIBMESH_HAVE_LIBHILBERT
 template class Parallel::Histogram<Hilbert::HilbertIndices>;
 #endif
 

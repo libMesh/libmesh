@@ -433,7 +433,7 @@ void DistributedVector<T>::localize (NumericVector<T>& v_local_in) const
   // prevent code duplication
   localize (v_local->_values);    
   
-#ifndef HAVE_MPI
+#ifndef LIBMESH_HAVE_MPI
 
   libmesh_assert (local_size() == size());
   
@@ -506,7 +506,7 @@ void DistributedVector<T>::localize (std::vector<T>& v_local) const
 
   Parallel::allgather (v_local);
 
-#ifndef HAVE_MPI
+#ifndef LIBMESH_HAVE_MPI
   libmesh_assert (local_size() == size());
 #endif  
 }
@@ -528,7 +528,7 @@ void DistributedVector<T>::localize_to_one (std::vector<T>& v_local,
 
   Parallel::gather (pid, v_local);
 
-#ifndef HAVE_MPI
+#ifndef LIBMESH_HAVE_MPI
   libmesh_assert (local_size() == size());
 #endif  
 }

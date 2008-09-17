@@ -24,7 +24,7 @@
 
 #include "libmesh_common.h"
 
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
 
 // C++ includes
 #include <algorithm>
@@ -645,5 +645,5 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
-#endif // #ifdef HAVE_PETSC
+#endif // #ifdef LIBMESH_HAVE_PETSC
 #endif // #ifdef __petsc_matrix_h__

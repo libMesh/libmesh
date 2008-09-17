@@ -6,7 +6,7 @@
 #include "petsc_matrix.h"
 #include "petsc_vector.h"
 
-#ifdef HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
 
 //--------------------------------------------------------------------
 // Functions with C linkage to pass to PETSc.  PETSc will call these
@@ -198,7 +198,7 @@ unsigned int PetscDiffSolver::solve()
   r.close();
   jac.close();
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   _system.get_dof_map().enforce_constraints_exactly(_system);
 #endif
 
@@ -238,4 +238,4 @@ unsigned int PetscDiffSolver::solve()
   return DiffSolver::CONVERGED_RELATIVE_RESIDUAL;
 }
 
-#endif // HAVE_PETSC
+#endif // LIBMESH_HAVE_PETSC

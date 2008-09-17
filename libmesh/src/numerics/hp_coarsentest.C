@@ -37,7 +37,7 @@
 #include "system.h"
 #include "tensor_value.h"
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 //-----------------------------------------------------------------
 // HPCoarsenTest implementations
@@ -228,14 +228,14 @@ void HPCoarsenTest::select_refinement (System &system)
 	  dphi_coarse = &(fe_coarse->get_dphi());
 	}
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       // The shape function second derivatives
       if (cont == C_ONE)
 	{
 	  d2phi = &(fe->get_d2phi());
 	  d2phi_coarse = &(fe_coarse->get_d2phi());
 	}
-#endif // defined (ENABLE_SECOND_DERIVATIVES)
+#endif // defined (LIBMESH_ENABLE_SECOND_DERIVATIVES)
 
       // Iterate over all the active elements in the mesh
       // that live on this processor.
@@ -573,4 +573,4 @@ std::cerr << "Cell " << e_id << ": h = " << elem->hmax()
   STOP_LOG("select_refinement()", "HPCoarsenTest");
 }
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR

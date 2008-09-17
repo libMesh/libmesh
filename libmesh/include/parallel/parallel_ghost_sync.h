@@ -301,7 +301,7 @@ void sync_dofobject_data_by_id(const Iterator& range_begin,
 
 
   // If there's no refined elements, there's nothing to sync
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 template <typename Iterator,
           typename SyncFunctor>
 void sync_element_data_by_parent_id(MeshBase&       mesh,
@@ -412,7 +412,7 @@ void sync_element_data_by_parent_id(MeshBase&,
                                     SyncFunctor&)
 {
 }
-#endif // ENABLE_AMR
+#endif // LIBMESH_ENABLE_AMR
 
 
 

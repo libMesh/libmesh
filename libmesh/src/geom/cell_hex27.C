@@ -698,7 +698,7 @@ Hex27::second_order_child_vertex (const unsigned int n) const
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float Hex27::_embedding_matrix[8][27][27] =
   {

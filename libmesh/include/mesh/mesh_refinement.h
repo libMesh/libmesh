@@ -26,7 +26,7 @@
 
 #include "libmesh_config.h"
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 // C++ Includes   -----------------------------------
 #include <vector>
@@ -685,5 +685,5 @@ inline unsigned char& MeshRefinement::node_level_mismatch_limit()
   return _node_level_mismatch_limit;
 }
 
-#endif // end #ifdef ENABLE_AMR
+#endif // end #ifdef LIBMESH_ENABLE_AMR
 #endif // end #ifndef __mesh_refinement_h__ 

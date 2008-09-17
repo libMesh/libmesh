@@ -28,7 +28,7 @@
 #include "mesh_data.h"
 #include "auto_ptr.h"
 
-#ifdef  HAVE_GZSTREAM
+#ifdef  LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h" // For reading/writing compressed streams
 #endif
 
@@ -59,7 +59,7 @@ void MeshData::read_unv (const std::string& file_name)
    */
   if (file_name.rfind(".gz") < file_name.size())
     {
-#ifdef HAVE_GZSTREAM
+#ifdef LIBMESH_HAVE_GZSTREAM
       igzstream in_stream(file_name.c_str());
       this->read_unv_implementation (in_stream);
 #else
@@ -313,7 +313,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 		      std::string buf;
 		      in_file >> buf;
 		      MeshDataUnvHeader::need_D_to_e(buf);
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 		      values[data_cnt] = Complex(std::atof(buf.c_str()), 0.);
 #else
 		      values[data_cnt] = std::atof(buf.c_str());
@@ -323,7 +323,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 		  else if(data_type == 5 || data_type == 6)
 
 		    {
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 		      Real re_val, im_val;
 
 		      std::string buf;
@@ -416,7 +416,7 @@ void MeshData::write_unv (const std::string& file_name)
 
   if (file_name.rfind(".gz") < file_name.size())
     {
-#ifdef HAVE_GZSTREAM
+#ifdef LIBMESH_HAVE_GZSTREAM
       ogzstream out_stream(file_name.c_str());
       this->write_unv_implementation (out_stream);
 #else
@@ -509,7 +509,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
        * and the correct data type.  By default
        * only distinguish complex or real data.
        */
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
       my_header.data_type = 5;
 #else
       my_header.data_type = 2;
@@ -543,7 +543,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
        * other header in order to convert complex
        * to real...
        */
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
       const unsigned int my_data_type = 5;
 #else
       const unsigned int my_data_type = 2;
@@ -586,7 +586,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
 
       for (unsigned int v_cnt=0; v_cnt<values.size(); v_cnt++)
 	{
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 	  std::sprintf(buf, "%13.5E%13.5E", values[v_cnt].real(),
 		                            values[v_cnt].imag());
 	  out_file << buf;
@@ -622,7 +622,7 @@ MeshDataUnvHeader::MeshDataUnvHeader() :
   analysis_type          (0),
   data_characteristic    (0),
   result_type            (0),
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
   data_type              (5),  // default to single precision complex
 #else
   data_type              (2),  // default to single precision real
@@ -857,7 +857,7 @@ void MeshDataUnvHeader::operator = (const MeshDataUnvHeader& omduh)
   this->data_characteristic    = omduh.data_characteristic;
   this->result_type            = omduh.result_type;
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
   /*
    * in complex mode allow only
    * values 5 or 6 (complex) for data_type

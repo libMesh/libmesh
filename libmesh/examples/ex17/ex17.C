@@ -62,7 +62,7 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
   // This example is designed for the SLEPc eigen solver interface.
-#ifndef HAVE_SLEPC
+#ifndef LIBMESH_HAVE_SLEPC
   if (libMesh::processor_id() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
               << "compiled with SLEPc eigen solvers support!"
@@ -182,7 +182,7 @@ int main (int argc, char** argv)
       std::cout << "WARNING: Solver did not converge!\n" << nconv << std::endl;
     }
 
-#endif // HAVE_SLEPC
+#endif // LIBMESH_HAVE_SLEPC
 
   // All done.  
   return 0;
@@ -198,7 +198,7 @@ void assemble_mass(EquationSystems& es,
   // the proper system.
   libmesh_assert (system_name == "Eigensystem");
 
-#ifdef HAVE_SLEPC
+#ifdef LIBMESH_HAVE_SLEPC
 
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
@@ -310,7 +310,7 @@ void assemble_mass(EquationSystems& es,
     } // end of element loop
 
 
-#endif // HAVE_SLEPC
+#endif // LIBMESH_HAVE_SLEPC
 
   /**
    * All done!

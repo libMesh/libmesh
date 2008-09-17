@@ -25,7 +25,7 @@
 
 // Currently, the EigenSystem should only be available
 // if SLEPc support is enabled. 
-#if defined(HAVE_SLEPC)
+#if defined(LIBMESH_HAVE_SLEPC)
 
 // C++ includes
 
@@ -201,6 +201,6 @@ private:
 // EigenSystem inline methods
 
 
-#endif // HAVE_SLEPC
+#endif // LIBMESH_HAVE_SLEPC
 
 #endif

@@ -618,7 +618,7 @@ Prism18::second_order_child_vertex (const unsigned int n) const
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float Prism18::_embedding_matrix[8][18][18] =
 {

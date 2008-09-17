@@ -33,7 +33,7 @@ int XdrMESH::header(XdrMHEAD *hd)
   switch (m_type)
     {
       
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
       
     case (XdrMGF::DECODE):
     case (XdrMGF::ENCODE): 
@@ -89,7 +89,7 @@ int XdrMESH::header(XdrMHEAD *hd)
       switch (m_type)
 	{
 	  
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 	  
 	case (XdrMGF::ENCODE):
 	case (XdrMGF::DECODE):
@@ -142,7 +142,7 @@ int XdrMESH::header(XdrMHEAD *hd)
       switch (m_type)
 	{
 	  
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 	  
 	case (XdrMGF::ENCODE):
 	case (XdrMGF::DECODE):
@@ -207,7 +207,7 @@ int XdrMESH::header(XdrMHEAD *hd)
       switch (m_type)
 	{
 	  
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
 	  
 	case (XdrMGF::ENCODE):
 	case (XdrMGF::DECODE):
@@ -305,7 +305,7 @@ int XdrMESH::header(XdrMHEAD *hd)
   switch (m_type)
     {
 
-#ifdef HAVE_XDR
+#ifdef LIBMESH_HAVE_XDR
       
     case (XdrMGF::ENCODE):
     case (XdrMGF::DECODE):

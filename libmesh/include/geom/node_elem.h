@@ -175,7 +175,7 @@ class NodeElem : public Elem
 			    std::vector<unsigned int>& conn) const;
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * @returns \p false.
@@ -188,7 +188,7 @@ class NodeElem : public Elem
 protected:
 
   
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   /**
    * Matrix used to create the elements children.

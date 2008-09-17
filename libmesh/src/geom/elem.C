@@ -208,7 +208,7 @@ AutoPtr<Elem> Elem::build(const ElemType type,
 
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
       // 1D infinite elements
     case INFEDGE2:
@@ -470,7 +470,7 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
                           || neighbor->contains_vertex_of(this))  
                         neighbor_set.insert (neighbor);  // ... then add it
                     }
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
                   else                                 // ... the neighbor is *not* active,
                     {                                  // ... so add *all* neighboring
                                                        // active children
@@ -488,7 +488,7 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
                             (*child_it)->contains_vertex_of(this))
                           neighbor_set.insert (*child_it);
                     }
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
                 }
             }
         }
@@ -574,7 +574,7 @@ void Elem::make_links_to_me_remote()
   libmesh_assert (this != remote_elem);
 
   // We need to have handled any children first
-#if defined(ENABLE_AMR) && defined(DEBUG)
+#if defined(LIBMESH_ENABLE_AMR) && defined(DEBUG)
   if (this->has_children())
     for (unsigned int c = 0; c != this->n_children(); ++c)
       {
@@ -596,7 +596,7 @@ void Elem::make_links_to_me_remote()
           if (this->level() == neigh->level() &&
               neigh->has_neighbor(this))
             {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 	      // My neighbor may have descendants which also consider me a
 	      // neighbor
               std::vector<const Elem*> family;
@@ -623,7 +623,7 @@ void Elem::make_links_to_me_remote()
               neigh->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
 #endif
             }
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
           // Even if my neighbor doesn't link back to me, it might
 	  // have subactive descendants which do
 	  else if (neigh->has_children())
@@ -667,7 +667,7 @@ void Elem::make_links_to_me_remote()
         }
     }
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   // Remotify parent's child link
   Elem *parent = this->parent();
   if (parent && parent != remote_elem)
@@ -791,7 +791,7 @@ Real Elem::quality (const ElemQuality q) const
 
 bool Elem::ancestor() const
 {
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   if (this->active())
     return false;
@@ -809,7 +809,7 @@ if (!this->has_children())
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 void Elem::add_child (Elem* elem)
 {
@@ -1084,7 +1084,7 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
   return min_p_level;
 }
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 
 
@@ -1185,7 +1185,7 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
     case PRISM18:
       return PRISM6;
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
     case INFQUAD4:
     case INFQUAD6:
@@ -1269,7 +1269,7 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
 
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
     // infinite elements
     case INFEDGE2:
@@ -1380,7 +1380,7 @@ void Elem::PackedElem::pack (std::vector<int> &conn, const Elem* elem)
   // this redundant
   conn.reserve (conn.size() + Elem::PackedElem::header_size + elem->n_nodes());
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   conn.push_back (static_cast<int>(elem->level()));
   conn.push_back (static_cast<int>(elem->p_level()));
   conn.push_back (static_cast<int>(elem->refinement_flag()));
@@ -1396,7 +1396,7 @@ void Elem::PackedElem::pack (std::vector<int> &conn, const Elem* elem)
   conn.push_back (static_cast<int>(elem->subdomain_id()));
   conn.push_back (elem->id());
 		
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   // use parent_ID of -1 to indicate a level 0 element
   if (elem->level() == 0)
     {
@@ -1425,7 +1425,7 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
   Elem *elem = Elem::build(this->type(),parent).release();
   libmesh_assert (elem);
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   if (this->level() != 0) 
     {
       libmesh_assert (parent != NULL);
@@ -1436,7 +1436,7 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
 #endif
 
   // Assign the IDs
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   elem->set_p_level(this->p_level());
   elem->set_refinement_flag(this->refinement_flag());
   elem->set_p_refinement_flag(this->p_refinement_flag());

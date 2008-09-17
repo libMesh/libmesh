@@ -106,7 +106,7 @@ void TreeNode<N>::insert (const Elem* elem)
     {
       elements.push_back (elem);
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
       // flag indicating this node contains
       // infinite elements
@@ -455,7 +455,7 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
 	{
 	  elements.push_back(*pos);
 	  
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 	  // flag indicating this node contains
 	  // infinite elements

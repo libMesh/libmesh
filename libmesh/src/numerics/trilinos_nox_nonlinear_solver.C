@@ -21,7 +21,7 @@
 
 #include "libmesh_common.h"
 
-#ifdef HAVE_NOX
+#ifdef LIBMESH_HAVE_NOX
 
 
 // C++ includes
@@ -255,4 +255,4 @@ template class NoxNonlinearSolver<Number>;
  
 
 
-#endif // #ifdef HAVE_NOX
+#endif // #ifdef LIBMESH_HAVE_NOX

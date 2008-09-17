@@ -27,7 +27,7 @@
 void QGauss::init_2D(const ElemType _type,
                      unsigned int p)
 {
-#if DIM > 1
+#if LIBMESH_DIM > 1
   
   //-----------------------------------------------------------------------
   // 2D quadrature rules

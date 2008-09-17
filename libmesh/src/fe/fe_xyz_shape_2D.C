@@ -60,7 +60,7 @@ Real FE<2,XYZ>::shape(const Elem* elem,
 		      const unsigned int i,
 		      const Point& p)
 {
-#if DIM > 1
+#if LIBMESH_DIM > 1
 
   libmesh_assert (elem != NULL);
 
@@ -186,7 +186,7 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
 			    const unsigned int j,
 			    const Point& p)
 {
-#if DIM > 1
+#if LIBMESH_DIM > 1
 
   
   libmesh_assert (j<2);
@@ -394,7 +394,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 			           const unsigned int j,
 			           const Point& p)
 {
-#if DIM > 1
+#if LIBMESH_DIM > 1
 
   libmesh_assert (j<=2);
   libmesh_assert (elem != NULL);

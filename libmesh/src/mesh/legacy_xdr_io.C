@@ -41,7 +41,7 @@
 #include "xdr_soln.h"
 #include "xdr_shead.h"
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 #include "utility.h"
 #endif
 
@@ -148,7 +148,7 @@ void LegacyXdrIO::read_mgf_soln (const std::string& name,
   std::cerr << "WARNING: this method is deprecated and will disappear soon!"
 	    << std::endl;
   
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
   
   // buffer for writing separately
   std::vector<Real> real_soln;
@@ -181,7 +181,7 @@ void LegacyXdrIO::write_mgf_soln (const std::string& name,
   std::cerr << "WARNING: this method is deprecated and will disappear soon!"
 	    << std::endl;
   
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
   
   // buffer for writing separately
   std::vector<Real> real_soln;
@@ -222,7 +222,7 @@ void LegacyXdrIO::read_ascii (const std::string& name, const LegacyXdrIO::FileFo
 
 void LegacyXdrIO::read_binary (const std::string& name, const LegacyXdrIO::FileFormat originator)
 {
-#ifndef HAVE_XDR
+#ifndef LIBMESH_HAVE_XDR
 
   std::cerr << "WARNING: Compiled without XDR binary support.\n"
 	    << "Will try ASCII instead" << std::endl << std::endl;
@@ -254,7 +254,7 @@ void LegacyXdrIO::write_ascii (const std::string& name, const LegacyXdrIO::FileF
 
 void LegacyXdrIO::write_binary (const std::string& name, const LegacyXdrIO::FileFormat originator)
 {
-#ifndef HAVE_XDR
+#ifndef LIBMESH_HAVE_XDR
 
   std::cerr << "WARNING: Compiled without XDR binary support.\n"
 	    << "Will try ASCII instead" << std::endl << std::endl;
@@ -469,7 +469,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
             {
               unsigned int self_ID   = conn[lastConnIndex + temp_elem->n_nodes()];
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
               unsigned int parent_ID = conn[lastConnIndex + temp_elem->n_nodes()+1];
 
               if (level > 0)
@@ -511,7 +511,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
 
               // Add level-0 elements to the mesh 
               else
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
               {
                 elem = Elem::build(etypes[idx]).release();
               }

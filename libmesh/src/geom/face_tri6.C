@@ -37,7 +37,7 @@ const unsigned int Tri6::side_nodes_map[3][3] =
 };
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 const float Tri6::_embedding_matrix[4][6][6] =
 {

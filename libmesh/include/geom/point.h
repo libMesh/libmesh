@@ -32,7 +32,7 @@
 
 
 /**
- * A \p Point defines a location in DIM dimensional Real space.  Points
+ * A \p Point defines a location in LIBMESH_DIM dimensional Real space.  Points
  * are always real-valued, even if the library is configured with
  * \p --enable-complex.
  *
@@ -45,7 +45,7 @@ class Point : public TypeVector<Real>
 
   /**
    * Constructor.  By default sets all entries to 0.  Gives the point 0 in
-   * \p DIM dimensions.
+   * \p LIBMESH_DIM dimensions.
    */
   Point  (const Real x=0.,
 	  const Real y=0.,

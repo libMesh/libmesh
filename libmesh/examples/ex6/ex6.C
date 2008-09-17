@@ -84,7 +84,7 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
   
   // This example requires Infinite Elements   
-#ifndef ENABLE_INFINITE_ELEMENTS
+#ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (libMesh::processor_id() == 0)
     std::cerr << "ERROR: This example requires the library to be" << std::endl
               << "compiled with Infinite Element support!" << std::endl;
@@ -203,7 +203,7 @@ int main (int argc, char** argv)
   // All done.  
   return 0;
 
-#endif // else part of ifndef ENABLE_INFINITE_ELEMENTS
+#endif // else part of ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
 }
 
 // This function assembles the system matrix and right-hand-side
@@ -216,7 +216,7 @@ void assemble_wave(EquationSystems& es,
   libmesh_assert (system_name == "Wave");
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
@@ -489,7 +489,7 @@ void assemble_wave(EquationSystems& es,
   // dummy assert 
   libmesh_assert(es.get_mesh().mesh_dimension() != 1);
 
-#endif //ifdef ENABLE_INFINITE_ELEMENTS
+#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   
   // All done!   
   return;

@@ -38,7 +38,7 @@
 #include "system.h"
 #include "uniform_refinement_estimator.h"
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
@@ -337,7 +337,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
           const std::vector<std::vector<Real> >& phi = fe->get_phi();
           const std::vector<std::vector<RealGradient> >& dphi =
             fe->get_dphi();
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           const std::vector<std::vector<RealTensor> >& d2phi =
             fe->get_d2phi();
 #endif
@@ -388,7 +388,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                   Number u_fine = 0., u_coarse = 0.;
 
                   Gradient grad_u_fine, grad_u_coarse;
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                   Tensor grad2_u_fine, grad2_u_coarse;
 #endif
 
@@ -402,7 +402,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                       u_coarse          += phi[i][qp]*(*projected_solution) (dof_indices[i]);
                       grad_u_fine       += dphi[i][qp]*system.current_solution (dof_indices[i]);
                       grad_u_coarse     += dphi[i][qp]*(*projected_solution) (dof_indices[i]);
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                       grad2_u_fine      += d2phi[i][qp]*system.current_solution (dof_indices[i]);
                       grad2_u_coarse    += d2phi[i][qp]*(*projected_solution) (dof_indices[i]);
 #endif
@@ -428,7 +428,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                       libmesh_assert (H1seminormsq >= 0.);
                     }
 
-#ifdef ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                   // Compute the value of the error in the hessian at this
                   // quadrature point
                   if (_sobolev_order > 1)
@@ -544,4 +544,4 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
     delete component_scales;
 }
 
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR

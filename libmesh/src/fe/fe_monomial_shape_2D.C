@@ -33,7 +33,7 @@ Real FE<2,MONOMIAL>::shape(const ElemType,
 			   const unsigned int i,
 			   const Point& p)
 {
-#if DIM > 1
+#if LIBMESH_DIM > 1
   
   libmesh_assert (i < (static_cast<unsigned int>(order)+1)*
                (static_cast<unsigned int>(order)+2)/2);
@@ -135,7 +135,7 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
 				 const unsigned int j,
 				 const Point& p)
 {
-#if DIM > 1
+#if LIBMESH_DIM > 1
 
   
   libmesh_assert (j<2);
@@ -320,7 +320,7 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
 				        const unsigned int j,
 				        const Point& p)
 {
-#if DIM > 1
+#if LIBMESH_DIM > 1
 
   
   libmesh_assert (j<=2);

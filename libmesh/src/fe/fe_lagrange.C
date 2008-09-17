@@ -663,7 +663,7 @@ bool FE<Dim,T>::is_hierarchic() const
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 				     DofMap &dof_map,
@@ -775,7 +775,7 @@ void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
 	    }
 	}
 }
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 
 
@@ -794,11 +794,11 @@ INSTANTIATE_MBRF(1,LAGRANGE);
 INSTANTIATE_MBRF(2,LAGRANGE);
 INSTANTIATE_MBRF(3,LAGRANGE);
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 template void FE<2,LAGRANGE>::compute_constraints(DofConstraints&, DofMap&, 
 						  const unsigned int,
 						  const Elem*);
 template void FE<3,LAGRANGE>::compute_constraints(DofConstraints&, DofMap&, 
 						  const unsigned int,
 						  const Elem*);
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR

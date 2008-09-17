@@ -51,13 +51,13 @@
 #include "legacy_xdr_io.h"
 #include "vtk_io.h"
 
-#if   defined(HAVE_TR1_UNORDERED_MAP)
+#if   defined(LIBMESH_HAVE_TR1_UNORDERED_MAP)
 # include <tr1/unordered_map>
-#elif defined(HAVE_UNORDERED_MAP)
+#elif defined(LIBMESH_HAVE_UNORDERED_MAP)
 # include <unordered_map>
-#elif defined(HAVE_HASH_MAP)
+#elif defined(LIBMESH_HAVE_HASH_MAP)
 # include <hash_map>
-#elif defined(HAVE_EXT_HASH_MAP)
+#elif defined(LIBMESH_HAVE_EXT_HASH_MAP)
 # include <ext/hash_map>
 #else
 # include <map>
@@ -131,7 +131,7 @@ void UnstructuredMesh::copy_nodes_and_elements
       AutoPtr<Elem> ap = Elem::build(old->type(), newparent);
       Elem * elem = ap.release();
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
       //Create the parent's child pointers if necessary
       if (newparent)
         {
@@ -146,7 +146,7 @@ void UnstructuredMesh::copy_nodes_and_elements
       // Copy the refinement flags
       elem->set_refinement_flag(old->refinement_flag());
       elem->set_p_refinement_flag(old->p_refinement_flag());
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
       //Assign all the nodes
       for(unsigned int i=0;i<elem->n_nodes();i++)
@@ -203,13 +203,13 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
     typedef std::pair<Elem*, unsigned char> val_type;
     typedef std::pair<key_type, val_type>   key_val_pair;
     
-#if   defined(HAVE_UNORDERED_MAP)
+#if   defined(LIBMESH_HAVE_UNORDERED_MAP)
     typedef std::unordered_multimap<key_type, val_type> map_type;    
-#elif defined(HAVE_TR1_UNORDERED_MAP)
+#elif defined(LIBMESH_HAVE_TR1_UNORDERED_MAP)
     typedef std::tr1::unordered_multimap<key_type, val_type> map_type;    
-#elif defined(HAVE_HASH_MAP)    
+#elif defined(LIBMESH_HAVE_HASH_MAP)    
     typedef std::hash_multimap<key_type, val_type> map_type;    
-#elif defined(HAVE_EXT_HASH_MAP)
+#elif defined(LIBMESH_HAVE_EXT_HASH_MAP)
 # if    (__GNUC__ == 3) && (__GNUC_MINOR__ == 0) // gcc 3.0   
     typedef std::hash_multimap<key_type, val_type> map_type;
 # elif (__GNUC__ >= 3)                          // gcc 3.1 & newer
@@ -321,7 +321,7 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
 		
 		// use the lower bound as a hint for
 		// where to put it.
-#if defined(HAVE_UNORDERED_MAP) || defined(HAVE_TR1_UNORDERED_MAP) || defined(HAVE_HASH_MAP) || defined(HAVE_EXT_HASH_MAP)
+#if defined(LIBMESH_HAVE_UNORDERED_MAP) || defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) || defined(LIBMESH_HAVE_HASH_MAP) || defined(LIBMESH_HAVE_EXT_HASH_MAP)
 		side_to_elem_map.insert (kvp);
 #else
 		side_to_elem_map.insert (bounds.first,kvp);
@@ -333,7 +333,7 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
 
   
   
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 
   /**
    * Here we look at all of the child elements.
@@ -900,7 +900,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 bool UnstructuredMesh::contract ()
 {
   START_LOG ("contract()", "Mesh");
@@ -959,7 +959,7 @@ bool UnstructuredMesh::contract ()
   
   return mesh_changed;
 }
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 
 

@@ -50,7 +50,7 @@ ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
 
 ExodusII_IO::~ExodusII_IO ()
 {
-#ifndef HAVE_EXODUS_API
+#ifndef LIBMESH_HAVE_EXODUS_API
 
   std::cerr <<  "ERROR, ExodusII API is not defined.\n"
 	    << std::endl;
@@ -69,7 +69,7 @@ void ExodusII_IO::verbose (bool set_verbosity)
 {
   _verbose = set_verbosity;
 
-#ifdef HAVE_EXODUS_API
+#ifdef LIBMESH_HAVE_EXODUS_API
   // Set the verbose flag in the helper object
   // as well.
   exio_helper.verbose(_verbose);
@@ -85,7 +85,7 @@ void ExodusII_IO::read (const std::string& fname)
   // broadcast later
   libmesh_assert(libMesh::processor_id() == 0);
 
-#ifndef HAVE_EXODUS_API
+#ifndef LIBMESH_HAVE_EXODUS_API
 
   std::cerr <<  "ERROR, ExodusII API is not defined.\n"
 	    << "Input file " << fname << " cannot be read"
@@ -205,7 +205,7 @@ void ExodusII_IO::read (const std::string& fname)
 
 
 
-#ifndef HAVE_EXODUS_API
+#ifndef LIBMESH_HAVE_EXODUS_API
 
 void ExodusII_IO::copy_nodal_solution(System& , std::string)
 {
@@ -248,7 +248,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
 
 
 
-#ifndef HAVE_EXODUS_API
+#ifndef LIBMESH_HAVE_EXODUS_API
 
 void ExodusII_IO::write_nodal_data (const std::string& ,
 				    const std::vector<Number>& ,
@@ -300,7 +300,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 
 
 
-#ifndef HAVE_EXODUS_API
+#ifndef LIBMESH_HAVE_EXODUS_API
 
 void ExodusII_IO::write_timestep (const std::string& ,
 				  const EquationSystems& ,
@@ -331,7 +331,7 @@ void ExodusII_IO::write_timestep (const std::string& fname,
 
 
 
-#ifndef HAVE_EXODUS_API
+#ifndef LIBMESH_HAVE_EXODUS_API
 
 void ExodusII_IO::write (const std::string& )
 {

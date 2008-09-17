@@ -245,7 +245,7 @@ public:
 			   const Elem* elem,
 			   FEComputeData& data);
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * Computes the constraint matrix contributions (for
    * non-conforming adapted meshes) corresponding to 
@@ -255,9 +255,9 @@ public:
 				   DofMap &dof_map,
 				   const unsigned int variable_number,
 				   const Elem* elem);
-#endif // #ifdef ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
-#ifdef ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
   /**
    * Computes the constraint matrix contributions (for
    * periodic boundary conditions) corresponding to 
@@ -269,7 +269,7 @@ public:
 					    const MeshBase &mesh,
 				            const unsigned int variable_number,
 				            const Elem* elem);
-#endif // #ifdef ENABLE_PERIODIC
+#endif // #ifdef LIBMESH_ENABLE_PERIODIC
 
   /**
    * Returns the maximum polynomial degree that the given finite
@@ -296,7 +296,7 @@ private:
   static bool is_InfFE_elem(const ElemType et);
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   // ------------------------------------------------------------
   /*
@@ -376,7 +376,7 @@ private:
 
 // ------------------------------------------------------------
 // FEInterface class inline members
-#ifndef ENABLE_INFINITE_ELEMENTS 
+#ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS 
 
 inline bool FEInterface::is_InfFE_elem(const ElemType)
 {
@@ -409,7 +409,7 @@ inline bool FEInterface::is_InfFE_elem(const ElemType et)
     }
 }
 
-#endif //ifndef ENABLE_INFINITE_ELEMENTS 
+#endif //ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS 
 
 
 
