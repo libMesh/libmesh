@@ -83,6 +83,10 @@ void Nemesis_IO_Helper::get_ss_param_global()
 {
   if (num_side_sets_global > 0)
     {
+      global_sideset_ids.resize(num_side_sets_global);
+      num_global_side_counts.resize(num_side_sets_global);
+      num_global_side_df_counts.resize(num_side_sets_global);
+      
       nemesis_err_flag =
 	Nemesis::ne_get_ss_param_global(ex2helper.ex_id,
 					&global_sideset_ids[0],
@@ -112,6 +116,10 @@ void Nemesis_IO_Helper::get_ns_param_global()
 {
   if (num_node_sets_global > 0)
     {
+      global_nodeset_ids.resize(num_node_sets_global);
+      num_global_node_counts.resize(num_node_sets_global);
+      num_global_node_df_counts.resize(num_node_sets_global);
+      
       nemesis_err_flag =
 	Nemesis::ne_get_ns_param_global(ex2helper.ex_id,
 					&global_nodeset_ids[0],
@@ -138,6 +146,9 @@ void Nemesis_IO_Helper::get_ns_param_global()
 
 void Nemesis_IO_Helper::get_eb_info_global()
 {
+  global_elem_blk_ids.resize(num_elem_blks_global);
+  global_elem_blk_cnts.resize(num_elem_blks_global);
+  
   nemesis_err_flag =
     Nemesis::ne_get_eb_info_global(ex2helper.ex_id,
 				   &global_elem_blk_ids[0],
@@ -210,6 +221,9 @@ void Nemesis_IO_Helper::get_loadbal_param()
 
 void Nemesis_IO_Helper::get_elem_map()
 {
+  elem_mapi.resize(num_internal_elems);
+  elem_mapb.resize(num_border_elems);
+  
   nemesis_err_flag =
     Nemesis::ne_get_elem_map(ex2helper.ex_id,
 			     &elem_mapi[0],
@@ -243,6 +257,10 @@ void Nemesis_IO_Helper::get_elem_map()
 
 void Nemesis_IO_Helper::get_node_map()
 {
+  node_mapi.resize(num_internal_nodes);
+  node_mapb.resize(num_border_nodes);
+  node_mape.resize(num_external_nodes);
+  
   nemesis_err_flag =
     Nemesis::ne_get_node_map(ex2helper.ex_id,
 			     &node_mapi[0],
@@ -274,6 +292,11 @@ void Nemesis_IO_Helper::get_node_map()
 
 void Nemesis_IO_Helper::get_cmap_params()
 {
+  node_cmap_ids.resize(num_node_cmaps);
+  node_cmap_node_cnts.resize(num_node_cmaps);
+  elem_cmap_ids.resize(num_elem_cmaps);
+  elem_cmap_elem_cnts.resize(num_elem_cmaps);
+  
   nemesis_err_flag =
     Nemesis::ne_get_cmap_params(ex2helper.ex_id,
 				&node_cmap_ids[0],
@@ -312,6 +335,9 @@ void Nemesis_IO_Helper::get_cmap_params()
 
 void Nemesis_IO_Helper::get_node_cmap()
 {
+  node_cmap_node_ids.resize(num_node_cmaps);
+  node_cmap_proc_ids.resize(num_node_cmaps);
+  
   for (unsigned int i=0; i<node_cmap_node_ids.size(); ++i)
     {
       node_cmap_node_ids[i].resize(node_cmap_node_cnts[i]);
@@ -346,6 +372,10 @@ void Nemesis_IO_Helper::get_node_cmap()
 
 void Nemesis_IO_Helper::get_elem_cmap()
 {
+  elem_cmap_elem_ids.resize(num_elem_cmaps);
+  elem_cmap_side_ids.resize(num_elem_cmaps);
+  elem_cmap_proc_ids.resize(num_elem_cmaps);
+	  
   for (unsigned int i=0; i<elem_cmap_elem_ids.size(); ++i)
     {
       elem_cmap_elem_ids[i].resize(elem_cmap_elem_cnts[i]);

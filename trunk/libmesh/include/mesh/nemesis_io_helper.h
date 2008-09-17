@@ -77,8 +77,10 @@ public:
   // Member data
 
   /**
-   * Instance of the Exodus IO Helper.  We call
-   * the Exodus API through this object.
+   * Instance of the Exodus IO Helper.  We call the Exodus API through
+   * this object.  Instead of creating forwarding functions for
+   * everything in the ExodusII_IO_Helper class, just call them
+   * directly through this object!
    */
   ExodusII_IO_Helper ex2helper;
 
