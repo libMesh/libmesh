@@ -154,7 +154,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 
       // Build an appropriate Gaussian quadrature rule
       AutoPtr<QBase> qrule =
-        fe_type.default_quadrature_rule (mesh.mesh_dimension(),
+        fe_type.default_quadrature_rule (dim,
                                          _extra_order);
 
       fe->attach_quadrature_rule (qrule.get());
