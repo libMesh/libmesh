@@ -25,7 +25,7 @@
 
 // Initialize the various integer members to zero.  We can check
 // these later to see if they've been properly initialized...
-Nemesis_IO_Helper::Nemesis_IO_Helper(bool verbose=false) :
+Nemesis_IO_Helper::Nemesis_IO_Helper(bool verbose) :
   ex2helper(verbose),
   nemesis_err_flag(0),
   num_nodes_global(0),
@@ -52,6 +52,16 @@ Nemesis_IO_Helper::Nemesis_IO_Helper(bool verbose=false) :
 
 Nemesis_IO_Helper::~Nemesis_IO_Helper()
 {
+}
+
+
+
+void Nemesis_IO_Helper::verbose (bool set_verbosity)
+{
+  _verbose = set_verbosity;
+
+  // Also set verbosity in the exodus helper object
+  ex2helper.verbose(_verbose);
 }
 
 
