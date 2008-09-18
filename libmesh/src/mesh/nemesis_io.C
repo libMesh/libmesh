@@ -19,7 +19,7 @@
 
 
 // C++ includes
-
+#include <numeric> // std::accumulate
 
 // LibMesh includes
 #include "nemesis_io.h"
@@ -170,6 +170,71 @@ void Nemesis_IO::read (const std::string& base_filename)
       // Get a reference to the ParallelMesh.  
       ParallelMesh& mesh = this->mesh();
 
+
+      // The get_cmap_params() function reads in the:
+      //
+      // node_cmap_ids[],
+      // node_cmap_node_cnts[],
+      // elem_cmap_ids[],
+      // elem_cmap_elem_cnts[],
+      nemhelper.get_cmap_params();
+
+      // Each processor is responsible for numbering all its internal nodes and the border nodes
+      // for all adjoining processors with higher IDs.  
+      unsigned int nodes_i_must_number = nemhelper.num_internal_nodes;
+      for (unsigned int i=0; i<nemhelper.node_cmap_ids.size(); ++i)
+	{
+	  // If I have a cmap entry for a processor with a higher ID than mine...
+	  if (static_cast<unsigned int>(nemhelper.node_cmap_ids[i]) > libMesh::processor_id())
+	    {
+	      // ... then I am responsible for numbering those nodes.
+	      nodes_i_must_number += nemhelper.node_cmap_node_cnts[i];
+	    }
+	}
+
+      if (_verbose)
+	{
+	  std::cout << "[" << libMesh::processor_id() << "] ";
+	  std::cout << "nodes_i_must_number=" << nodes_i_must_number << std::endl;
+	}
+      
+      // Communicate the nodes_i_must_number information to all processors.  This
+      // determines a global node numbering offset.  FIXME: This should be allgathered
+      // with other data for better communication efficiency.
+      std::vector<unsigned int> all_nodal_offsets(libMesh::n_processors());
+      Parallel::allgather(nodes_i_must_number, all_nodal_offsets);      
+
+      // The sum of all the entries in this vector should sum to the number of global nodes
+      libmesh_assert(std::accumulate(all_nodal_offsets.begin(),
+				     all_nodal_offsets.end(),
+				     0) == nemhelper.num_nodes_global);
+
+      // Compute my_node_offset, the amount by which to offset the local node numbering
+      // on my processor.
+      unsigned int my_node_offset = 0;
+      for (unsigned int i=0; i<libMesh::processor_id(); ++i)
+	my_node_offset += all_nodal_offsets[i];
+
+      if (_verbose)
+	{
+	  std::cout << "[" << libMesh::processor_id() << "] ";
+	  std::cout << "my_node_offset=" << my_node_offset << std::endl;
+	}
+
+      
+      // Read the IDs of the interior, boundary, and external nodes.  This function
+      // fills the vectors:
+      // node_mapi[],
+      // node_mapb[],
+      // node_mape[]
+      nemhelper.get_node_map();
+
+      // Read each node communication map for this processor.  This function
+      // fills the vectors of vectors named:
+      // node_cmap_node_ids[][]
+      // node_cmap_proc_ids[][]
+      nemhelper.get_node_cmap();
+
       // Local information: Read the standard Exodus header
       ex2helper.read_header();
       ex2helper.print_header();
@@ -179,6 +244,170 @@ void Nemesis_IO::read (const std::string& base_filename)
 
       // Read nodes from the exodus file: this fills the ex2helper.x,y,z arrays.
       ex2helper.read_nodes();
+
+      // Add internal nodes the ParallelMesh, using the node ID offset we computed and the current
+      // processor's ID.
+      for (int i=0; i<nemhelper.num_internal_nodes; ++i)
+	{
+	  const Real x = ex2helper.x[ nemhelper.node_mapi[i] ];
+	  const Real y = ex2helper.y[ nemhelper.node_mapi[i] ];
+	  const Real z = ex2helper.z[ nemhelper.node_mapi[i] ];
+	  mesh.add_point (Point(x,y,z), my_node_offset+i, libMesh::processor_id());
+	}
+
+      // How many nodes are now in the mesh?
+      // Forces mesh.n_nodes() to return the correct value.
+      // mesh.update_parallel_id_counts(); 
+
+      if (_verbose)
+	{
+	  // Report the number of nodes which have been added locally
+	  std::cout << "[" << libMesh::processor_id() << "] ";
+	  std::cout << "mesh.n_nodes()=" << mesh.n_nodes() << std::endl;
+
+	  // Reports the number of nodes that have been added in total.
+	  std::cout << "[" << libMesh::processor_id() << "] ";
+	  std::cout << "mesh.parallel_n_nodes()=" << mesh.parallel_n_nodes() << std::endl;
+	}
+      
+      /*
+      // Let's check if our hypothesis about the node_cmap_node_ids is valid.  Print the
+      // x,y,z location of the entries in node_cmap_node_ids.  This is hard-coded to print
+      // entries in the zeroth node cmap on processors 0 and 1, since I happen to
+      // know they share a boundary....
+      if ((libMesh::processor_id()==0) || (libMesh::processor_id()==1))
+	{
+	  
+// 	  // Print index and x,y,z location of [0][0] element 
+// 	  unsigned int test_index = nemhelper.node_cmap_node_ids[0][0];
+// 	  std::cout << "[" << libMesh::processor_id() << "] ";
+// 	  std::cout << "nemhelper.node_cmap_node_ids[0][0]="
+// 		    << test_index
+// 		    << std::endl;
+
+	  // Print about 10 entries to see if they match
+	  for (unsigned int i=0; i<std::min(static_cast<unsigned int>(10),
+					    nemhelper.node_cmap_node_ids[0].size()); ++i)
+	    {
+	      unsigned int test_index =
+		nemhelper.node_cmap_node_ids[0][i];
+	      
+	      std::cout << "[" << libMesh::processor_id() << "] ";
+	      std::cout << "Node " << test_index
+			<< " = ("
+			<< ex2helper.x[ test_index ]
+			<< ", "
+			<< ex2helper.y[ test_index ]
+			<< ", "
+			<< ex2helper.z[ test_index ]
+			<< ")" << std::endl;
+	    }
+	}
+      */
+
+
+      // Create a symmetric container for storing node_cmap_node_ids.  This is necessary
+      // in order to add identical nodes with the correct global ID, which is determined by
+      // a lower-numbered processor.
+      std::vector<std::vector<int> > symm_node_cmap_node_ids( nemhelper.node_cmap_node_ids.size() );
+
+      // Loop over the existing node_cmap_ids, allocate space where we will need to receive data.
+      for (unsigned int i=0; i<nemhelper.node_cmap_node_ids.size(); ++i)
+	{
+	  unsigned int other_proc = nemhelper.node_cmap_ids[i];
+	  if (other_proc < libMesh::processor_id())
+	    {
+	      // We will need to pull data from the lower-ID processor.  Let's allocate
+	      // space.
+	      symm_node_cmap_node_ids[i].resize( nemhelper.node_cmap_node_ids[i].size() );
+
+	      if (_verbose)
+		{
+		  std::cout << "[" << libMesh::processor_id() << "] ";
+		  std::cout << "Allocating space for " 
+			    << nemhelper.node_cmap_node_ids[i].size()
+			    << " entries in symm_node_cmap_node_ids["<<i<<"]."
+			    << " Values will come from processor "
+			    << other_proc
+			    << "."
+			    << std::endl;
+		}
+	    }
+	}
+
+      // Loop again, this time initiate the communication.  We are gonna try posting
+      // all the non-blocking receives followed by all the non-blocking sends later,
+      // on the recommendation of Bill and Robert...
+      std::vector<Parallel::request> isend_requests, irecv_requests;
+      
+      for (unsigned int i=0; i<nemhelper.node_cmap_node_ids.size(); ++i)
+	{
+	  unsigned int other_proc = nemhelper.node_cmap_ids[i];
+	  if (other_proc < libMesh::processor_id())
+	    {
+
+	      // A symmetric hash of other_proc and libMesh::processor_id.  See also, elem.h.
+	      unsigned int tag =
+		(std::min(other_proc, libMesh::processor_id())     ) % 65449 +
+		(std::max(other_proc, libMesh::processor_id()) << 5) % 65449;
+	      
+	      if (_verbose)
+		std::cout << "[" << libMesh::processor_id() << "] Receiving, tag=" << tag << std::endl;
+	      
+	      // We need to receive data from other_proc
+	      irecv_requests.push_back(Parallel::request());
+	      Parallel::irecv(other_proc,                 // sending proc id
+			      symm_node_cmap_node_ids[i], // recv buffer
+			      irecv_requests.back(),      // request
+			      tag                         // tag
+			      );
+	    }
+	}
+
+
+      for (unsigned int i=0; i<nemhelper.node_cmap_node_ids.size(); ++i)
+	{
+	  unsigned int other_proc = nemhelper.node_cmap_ids[i];
+	  if (other_proc > libMesh::processor_id())
+	    {
+	      // A symmetric hash of other_proc and libMesh::processor_id.  See also, elem.h.
+	      unsigned int tag =
+		(std::min(other_proc, libMesh::processor_id())     ) % 65449 +
+		(std::max(other_proc, libMesh::processor_id()) << 5) % 65449;
+
+	      if (_verbose)
+		std::cout << "[" << libMesh::processor_id() << "] Sending, tag=" << tag << std::endl;
+		
+	      // We need to send our data to other_proc
+	      isend_requests.push_back(Parallel::request());
+	      Parallel::isend(other_proc,                      // destination proc id
+			      nemhelper.node_cmap_node_ids[i], // send buffer
+			      isend_requests.back(),           // request
+			      tag                              // tag
+			      );
+	    }
+	}
+
+      // Wait for sends and receives to complete
+      Parallel::wait (isend_requests);
+      Parallel::wait (irecv_requests);
+      
+      // Well, did anything happen?
+      if (_verbose)
+	{
+	  for (unsigned int i=0; i<symm_node_cmap_node_ids.size(); ++i)
+	    {
+	      if (symm_node_cmap_node_ids[i].size())
+		{
+		  std::cout << "[" << libMesh::processor_id() << "] symm_node_cmap_node_ids["<<i<<"]=";
+		  for (unsigned int j=0; j<symm_node_cmap_node_ids[i].size(); ++j)
+		    std::cout << symm_node_cmap_node_ids[i][j] << " ";
+		  std::cout << std::endl;
+		}
+	    }
+	}
+      
+      
     } // end if ( libMesh::n_processors() > 1 )
 
   else
