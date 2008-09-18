@@ -241,7 +241,22 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
    KSP ksp;	 
    ierr = SNESGetKSP (_snes, &ksp);
           CHKERRABORT(libMesh::COMM_WORLD,ierr);
-		      
+
+  // Set the tolerances for the iterative solver.  Use the user-supplied
+  // tolerance for the relative residual & leave the others at default values
+  ierr = KSPSetTolerances (ksp, this->initial_linear_tolerance, PETSC_DEFAULT,
+                           PETSC_DEFAULT, this->max_linear_iterations);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Set the tolerances for the non-linear solver.
+  ierr = SNESSetTolerances(_snes, this->absolute_residual_tolerance, this->relative_residual_tolerance,
+                           this->absolute_step_tolerance, this->max_nonlinear_iterations, this->max_function_evaluations);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  //Pull in command-line options       
+  KSPSetFromOptions(ksp);
+  SNESSetFromOptions(_snes);       
+
 //    ierr = KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
 //           CHKERRABORT(libMesh::COMM_WORLD,ierr);
       	 

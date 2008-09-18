@@ -133,7 +133,62 @@ public:
    * @returns a writeable reference to the system we are solving.
    */
   sys_type & system () { return _system; }
+
+
+  /**
+   * Maximum number of non-linear iterations.
+   */
+  unsigned int max_nonlinear_iterations;
+
+  /**
+   * Maximum number of function evaluations.
+   */
+  unsigned int max_function_evaluations;
   
+  /**
+   * The NonlinearSolver should exit after the residual is
+   * reduced to either less than absolute_residual_tolerance
+   * or less than relative_residual_tolerance times the
+   * initial residual.
+   *
+   * Users should increase any of these tolerances that they want to use for a
+   * stopping condition.
+   *
+   */
+  Real absolute_residual_tolerance;
+  Real relative_residual_tolerance;
+
+  /**
+   * The NonlinearSolver should exit after the full nonlinear step norm is
+   * reduced to either less than absolute_step_tolerance
+   * or less than relative_step_tolerance times the largest
+   * nonlinear solution which has been seen so far.
+   *
+   * Users should increase any of these tolerances that they want to use for a
+   * stopping condition.
+   *
+   * Note that not all NonlinearSolvers support relative_step_tolerance!
+   */
+  Real absolute_step_tolerance;
+  Real relative_step_tolerance;
+
+  /**
+   * Each linear solver step should exit after \p max_linear_iterations
+   * is exceeded.
+   */
+  unsigned int max_linear_iterations;
+
+  /**
+   * Any required linear solves will at first be done with this tolerance;
+   * the NonlinearSolver may tighten the tolerance for later solves.
+   */
+  Real initial_linear_tolerance;
+
+  /**
+   * The tolerance for linear solves is kept above this minimum
+   */
+  Real minimum_linear_tolerance;
+
 protected:
   /**
    * A reference to the system we are solving.
@@ -157,7 +212,16 @@ NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
   jacobian        (NULL),
   matvec          (NULL),
   _system(s),
-  _is_initialized (false)
+  _is_initialized (false),
+  max_nonlinear_iterations(0),
+  max_function_evaluations(0),
+  absolute_residual_tolerance(0),
+  relative_residual_tolerance(0),
+  absolute_step_tolerance(0),
+  relative_step_tolerance(0),
+  max_linear_iterations(0),
+  initial_linear_tolerance(0),
+  minimum_linear_tolerance(0)
 {
 }
 
