@@ -1203,10 +1203,10 @@ void FEMSystem::elem_position_set(Real)
                      (element_fe_var[_mesh_y_var]->get_fe_type().family
                       == LAGRANGE &&
                       elem_subsolutions[_mesh_y_var]->size() == n_nodes));
-      libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
-                     (element_fe_var[_mesh_y_var]->get_fe_type().family
+      libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
+                     (element_fe_var[_mesh_z_var]->get_fe_type().family
                       == LAGRANGE &&
-                      elem_subsolutions[_mesh_y_var]->size() == n_nodes));
+                      elem_subsolutions[_mesh_z_var]->size() == n_nodes));
 
       // Set the new point coordinates
       if (_mesh_x_var != libMesh::invalid_uint)
