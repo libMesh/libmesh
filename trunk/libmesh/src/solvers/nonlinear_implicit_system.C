@@ -38,7 +38,21 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems& es,
   nonlinear_solver          (NonlinearSolver<Number>::build(*this)),
   _n_nonlinear_iterations   (0),
   _final_nonlinear_residual (1.e20)
-{}
+{
+  // Set default parameters
+  // These were chosen to match the Petsc defaults
+  es.parameters.set<Real>        ("linear solver tolerance") = 1e-5;
+  es.parameters.set<Real>        ("linear solver minimum tolerance") = 1e-5;
+  es.parameters.set<unsigned int>("linear solver maximum iterations") = 10000;
+  
+  es.parameters.set<unsigned int>("nonlinear solver maximum iterations") = 50;
+  es.parameters.set<unsigned int>("nonlinear solver maximum function evaluations") = 10000;
+
+  es.parameters.set<Real>("nonlinear solver absolute residual tolerance") = 1e-50;
+  es.parameters.set<Real>("nonlinear solver relative residual tolerance") = 1e-8;
+  es.parameters.set<Real>("nonlinear solver absolute step tolerance") = 1e-8;
+  es.parameters.set<Real>("nonlinear solver relative step tolerance") = 1e-8;
+}
 
 
 
@@ -85,17 +99,49 @@ void NonlinearImplicitSystem::solve ()
   const EquationSystems& es =
     this->get_equation_systems();  
   
-  // Get the user-specifiied nonlinear solver tolerance
-  const Real tol            =
-    es.parameters.get<Real>("nonlinear solver tolerance");
-
-  // Get the user-specified maximum # of nonlinear solver iterations
+  // Get the user-specifiied nonlinear solver tolerances
   const unsigned int maxits =
     es.parameters.get<unsigned int>("nonlinear solver maximum iterations");
 
+  const unsigned int maxfuncs =
+    es.parameters.get<unsigned int>("nonlinear solver maximum function evaluations");
+
+  const Real abs_resid_tol =
+    es.parameters.get<Real>("nonlinear solver absolute residual tolerance");
+
+  const Real rel_resid_tol =
+    es.parameters.get<Real>("nonlinear solver relative residual tolerance");
+
+  const Real abs_step_tol =
+    es.parameters.get<Real>("nonlinear solver absolute step tolerance");
+
+  const Real rel_step_tol =
+    es.parameters.get<Real>("nonlinear solver relative step tolerance");
+
+  // Get the user-specified linear solver toleranaces
+  const unsigned int maxlinearits =
+    es.parameters.get<unsigned int>("linear solver maximum iterations");
+
+  const Real linear_tol =
+    es.parameters.get<Real>("linear solver tolerance");
+
+  const Real linear_min_tol =
+    es.parameters.get<Real>("linear solver minimum tolerance");
+
+  // Set all the parameters on the NonlinearSolver
+  nonlinear_solver->max_nonlinear_iterations = maxits;
+  nonlinear_solver->max_function_evaluations = maxfuncs;
+  nonlinear_solver->absolute_residual_tolerance = abs_resid_tol;
+  nonlinear_solver->relative_residual_tolerance = rel_resid_tol;
+  nonlinear_solver->absolute_step_tolerance = abs_step_tol;
+  nonlinear_solver->relative_step_tolerance = rel_step_tol;
+  nonlinear_solver->max_linear_iterations = maxlinearits;
+  nonlinear_solver->initial_linear_tolerance = linear_tol;
+  nonlinear_solver->minimum_linear_tolerance = linear_min_tol;
+
   // Solve the nonlinear system.  Two cases:
   const std::pair<unsigned int, Real> rval =
-    nonlinear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
+    nonlinear_solver->solve (*matrix, *solution, *rhs, rel_resid_tol, maxits);
 
   // Store the number of nonlinear iterations required to
   // solve and the final residual.

@@ -53,7 +53,7 @@ EquationSystems::EquationSystems (MeshBase& m, MeshData* mesh_data) :
 {
   // Set default parameters
   this->parameters.set<Real>        ("linear solver tolerance") = TOLERANCE * TOLERANCE;
-  this->parameters.set<unsigned int>("linear solver maximum iterations") = 5000;
+  this->parameters.set<unsigned int>("linear solver maximum iterations") = 5000;  
 }
 
 
