@@ -1151,7 +1151,7 @@ void FEMSystem::mesh_x_position (unsigned int sysnum, unsigned int var)
 {
   if (_mesh_sys != libMesh::invalid_uint && _mesh_sys != sysnum)
     libmesh_error();
-  if (_mesh_sys != this->number())
+  if (sysnum != this->number())
     libmesh_not_implemented();
   _mesh_sys = sysnum;
   _mesh_x_var = var;
@@ -1163,7 +1163,7 @@ void FEMSystem::mesh_y_position (unsigned int sysnum, unsigned int var)
 {
   if (_mesh_sys != libMesh::invalid_uint && _mesh_sys != sysnum)
     libmesh_error();
-  if (_mesh_sys != this->number())
+  if (sysnum != this->number())
     libmesh_not_implemented();
   _mesh_sys = sysnum;
   _mesh_y_var = var;
@@ -1175,7 +1175,7 @@ void FEMSystem::mesh_z_position (unsigned int sysnum, unsigned int var)
 {
   if (_mesh_sys != libMesh::invalid_uint && _mesh_sys != sysnum)
     libmesh_error();
-  if (_mesh_sys != this->number())
+  if (sysnum != this->number())
     libmesh_not_implemented();
   _mesh_sys = sysnum;
   _mesh_z_var = var;
