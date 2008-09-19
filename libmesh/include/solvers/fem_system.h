@@ -138,6 +138,12 @@ public:
   virtual void mesh_z_position(unsigned int sysnum, unsigned int var);
 
   /**
+   * Tells the FEMSystem to set the degree of freedom coefficients
+   * which should correspond to mesh nodal coordinates.
+   */
+  void initialize_mesh_variables();
+
+  /**
    * Adds a pseudo-convection contribution on \p elem to
    * elem_residual, if the nodes of \p elem are being translated by a
    * moving mesh.
@@ -344,6 +350,12 @@ protected:
    * \p theta of a timestep.
    */
   void elem_position_set(Real theta);
+
+  /**
+   * Uses the geometry of \p elem to set the coordinate data specified
+   * by mesh_*_position configuration.
+   */
+  void elem_position_get();
 
   /**
    * Reinitializes interior FE objects on the current geometric element
