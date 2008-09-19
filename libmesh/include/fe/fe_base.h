@@ -267,6 +267,30 @@ public:
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidz; }
 
+  /**
+   * @returns the shape function xi-derivative at the quadrature
+   * points.
+   */
+  const std::vector<std::vector<Real> >& get_dphidxi() const
+  { libmesh_assert(!calculations_started || calculate_dphi); 
+    calculate_dphi = true; return dphidxi; }
+  
+  /**
+   * @returns the shape function eta-derivative at the quadrature
+   * points.
+   */
+  const std::vector<std::vector<Real> >& get_dphideta() const
+  { libmesh_assert(!calculations_started || calculate_dphi); 
+    calculate_dphi = true; return dphideta; }
+  
+  /**
+   * @returns the shape function zeta-derivative at the quadrature
+   * points.
+   */
+  const std::vector<std::vector<Real> >& get_dphidzeta() const
+  { libmesh_assert(!calculations_started || calculate_dphi);
+    calculate_dphi = true; return dphidzeta; }
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
