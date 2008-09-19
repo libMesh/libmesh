@@ -26,6 +26,7 @@
 #include "nemesis_io_helper.h"
 #include "parallel_mesh.h"
 #include "parallel.h"
+#include "utility.h" // is_sorted
 
 // ------------------------------------------------------------
 // Nemesis_IO class members
@@ -209,16 +210,19 @@ void Nemesis_IO::read (const std::string& base_filename)
 				     all_nodal_offsets.end(),
 				     0) == nemhelper.num_nodes_global);
 
-      // Compute my_node_offset, the amount by which to offset the local node numbering
+      // Compute the global_node_offsets, the amount by which to offset the local node numbering
       // on my processor.
-      unsigned int my_node_offset = 0;
-      for (unsigned int i=0; i<libMesh::processor_id(); ++i)
-	my_node_offset += all_nodal_offsets[i];
+      std::vector<unsigned int> global_node_offsets (libMesh::n_processors());
+      for (unsigned int i=1; i<global_node_offsets.size(); ++i)
+	global_node_offsets[i] = global_node_offsets[i-1]+all_nodal_offsets[i];
 
+      const unsigned int my_node_offset = global_node_offsets[libMesh::processor_id()];
       if (_verbose)
 	{
 	  std::cout << "[" << libMesh::processor_id() << "] ";
-	  std::cout << "my_node_offset=" << my_node_offset << std::endl;
+	  std::cout << "my_node_offset="
+		    << my_node_offset
+		    << std::endl;
 	}
 
       
@@ -406,7 +410,121 @@ void Nemesis_IO::read (const std::string& base_filename)
 		}
 	    }
 	}
-      
+
+
+      // Let's now add the border nodes to the Mesh using either our numbering scheme or a lower-ID
+      // processor's numbering scheme if that's applicable.
+      // eg. Processor zero always numbers his own border nodes.
+
+      // We shall assume that the nemhelper.node_cmap_node_ids arrays are sorted.  This was the
+      // case for our test problem, but I'm not sure it will always be the case...
+#ifndef NDEBUG
+      for (int i=0; i<nemhelper.num_node_cmaps; ++i)
+	{
+	  if (!Utility::is_sorted(nemhelper.node_cmap_node_ids[i].begin(),
+				  nemhelper.node_cmap_node_ids[i].end()))
+	    {
+	      std::cerr << "Nemesis_IO: The border node communication map IDs are not sorted.\n"
+			<< "Nemesis_IO::read() currently assumes this and can't continue."
+			<< std::endl;
+	      libmesh_error();
+	    }
+	}
+#endif
+
+
+      for (int i=0; i<nemhelper.num_border_nodes; ++i)
+	{
+	  int local_border_node_index_i = nemhelper.node_mapb[i];
+
+	  // Find the first occurrence of local_border_node_index_i in the
+	  // node_cmap_node_ids arrays.  We can use a binary search
+	  // because we assumed the arrays were sorted...  We only need the
+	  // first such occurrence because it will be the lowest-ID CPU which
+	  // matches.
+	  int
+	    cmap_proc_id_index_match=-1,
+	    cmap_node_id_index_match=-1;
+	  for (int j=0; j<nemhelper.num_node_cmaps; ++j)
+	    {
+	      std::vector<int>::iterator it =
+		std::lower_bound(nemhelper.node_cmap_node_ids[j].begin(),
+				 nemhelper.node_cmap_node_ids[j].end(),
+				 local_border_node_index_i);
+
+	      // Will lower_bound ever return end()?
+	      libmesh_assert (it != nemhelper.node_cmap_node_ids[j].end());
+
+	      // Did it really find the right value?  std::lower_bound
+	      // returns an iterator to where the value *could be inserted*
+	      // if it doesn't find the value itself...
+	      if (*it == local_border_node_index_i)
+		{
+		  cmap_proc_id_index_match = j;
+		  cmap_node_id_index_match = std::distance(nemhelper.node_cmap_node_ids[j].begin(), it);
+		  break; // out of for loop
+		}
+	    }
+
+	  // If a shared processor was not found...
+	  if (cmap_proc_id_index_match == -1)
+	    {
+	      std::cerr << "A matching entry in a node communication"
+			<< " map was not found for local border node "
+			<< local_border_node_index_i << std::endl; 
+	      libmesh_error();
+	    }
+
+	  // If the shared processor has a higher ID, we use our offset...
+	  unsigned int this_node_global_id = my_node_offset + local_border_node_index_i;
+	  
+	  // ... Otherwise, we use the shared processor's offset and numbering.
+	  if (nemhelper.node_cmap_ids[cmap_proc_id_index_match] <
+	      static_cast<int>(libMesh::processor_id()))
+	    {
+	      this_node_global_id =
+		global_node_offsets[cmap_proc_id_index_match]+
+		symm_node_cmap_node_ids[cmap_proc_id_index_match][cmap_node_id_index_match];
+	      
+	      if (_verbose)
+		{
+		  std::cout << "[" << libMesh::processor_id() << "] ";
+		  std::cout << "Adding border node "
+			    << local_border_node_index_i
+			    << " with global node index "
+			    << global_node_offsets[cmap_proc_id_index_match]
+			    << "+"
+			    << symm_node_cmap_node_ids[cmap_proc_id_index_match][cmap_node_id_index_match]
+			    << "="
+			    << this_node_global_id
+			    << "." << std::endl;
+		}
+	    }
+
+	  else
+	    {
+	      if (_verbose)
+		{
+		  std::cout << "[" << libMesh::processor_id() << "] ";
+		  std::cout << "Adding border node "
+			    << local_border_node_index_i
+			    << " with global node index "
+			    << my_node_offset
+			    << "+"
+			    << local_border_node_index_i
+			    << "="
+			    << this_node_global_id
+			    << "." << std::endl;
+		}
+	    }
+
+
+	  // const Real x = ex2helper.x[ local_border_node_index_i ];
+	  // const Real y = ex2helper.y[ local_border_node_index_i ];
+	  // const Real z = ex2helper.z[ local_border_node_index_i ];
+	  // mesh.add_point (Point(x,y,z), this_node_global_id, libMesh::processor_id());
+	} // end for (int i=0; i<nemhelper.num_border_nodes; ++i)
+
       
     } // end if ( libMesh::n_processors() > 1 )
 
