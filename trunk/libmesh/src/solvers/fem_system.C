@@ -957,16 +957,8 @@ void FEMSystem::postprocess ()
       libmesh_assert(sub_dofs == n_dofs);
 
       // Optionally initialize all the interior FE objects on elem.
-      // Logging of FE::reinit is done in the FE functions
       if (fe_reinit_during_postprocess)
-        {
-          std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
-          for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
-               i != fe_end; ++i)
-            {
-              i->second->reinit(elem);
-            }
-        }
+        this->elem_fe_reinit();
       
       this->element_postprocess();
 
@@ -1179,6 +1171,94 @@ void FEMSystem::mesh_z_position (unsigned int sysnum, unsigned int var)
     libmesh_not_implemented();
   _mesh_sys = sysnum;
   _mesh_z_var = var;
+}
+
+
+
+void FEMSystem::initialize_mesh_variables ()
+{
+  // This function makes no sense unless we've already picked out some
+  // variable(s) to reflect mesh position coordinates
+  if (_mesh_sys == libMesh::invalid_uint)
+    libmesh_error();
+
+  // We currently assume mesh variables are in our own system
+  if (_mesh_sys != this->number())
+    libmesh_not_implemented();
+
+  // Loop over every active mesh element on this processor
+  const MeshBase& mesh = this->get_mesh();
+
+  const DofMap& dof_map = this->get_dof_map();
+
+  MeshBase::const_element_iterator el =
+    mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el =
+    mesh.active_local_elements_end();
+
+  for ( ; el != end_el; ++el)
+    {
+      elem = *el;
+
+      // Initialize the per-variable data for elem.
+      for (unsigned int i=0; i != this->n_vars(); ++i)
+        {
+          dof_map.dof_indices (elem, dof_indices_var[i], i);
+        }
+
+      this->elem_position_get();
+    }
+}
+
+
+
+void FEMSystem::elem_position_get()
+{
+  // This is too expensive to call unless we've been asked to move the mesh
+  libmesh_assert (_mesh_sys != libMesh::invalid_uint);
+
+  // If the coordinate data is in our own system, it's already
+  // been set up for us
+  if (_mesh_sys == this->number())
+    {
+      unsigned int n_nodes = elem->n_nodes();
+      // For simplicity we demand that mesh coordinates be stored
+      // in a format that allows a direct copy
+      libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
+                     (element_fe_var[_mesh_x_var]->get_fe_type().family
+                      == LAGRANGE &&
+                      elem_subsolutions[_mesh_x_var]->size() == n_nodes));
+      libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
+                     (element_fe_var[_mesh_y_var]->get_fe_type().family
+                      == LAGRANGE &&
+                      elem_subsolutions[_mesh_y_var]->size() == n_nodes));
+      libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
+                     (element_fe_var[_mesh_z_var]->get_fe_type().family
+                      == LAGRANGE &&
+                      elem_subsolutions[_mesh_z_var]->size() == n_nodes));
+
+      // Get degree of freedom coefficients from point coordinates
+      if (_mesh_x_var != libMesh::invalid_uint)
+        for (unsigned int i=0; i != n_nodes; ++i)
+          this->solution->set(dof_indices_var[_mesh_x_var][i],
+                              elem->point(i)(0));
+
+      if (_mesh_y_var != libMesh::invalid_uint)
+        for (unsigned int i=0; i != n_nodes; ++i)
+          this->solution->set(dof_indices_var[_mesh_y_var][i],
+                             elem->point(i)(1));
+
+      if (_mesh_z_var != libMesh::invalid_uint)
+        for (unsigned int i=0; i != n_nodes; ++i)
+          this->solution->set(dof_indices_var[_mesh_z_var][i],
+                              elem->point(i)(2));
+    }
+  // FIXME - If the coordinate data is not in our own system, someone
+  // had better get around to implementing that... - RHS
+  else
+    {
+      libmesh_not_implemented();
+    }
 }
 
 
