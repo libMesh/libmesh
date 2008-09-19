@@ -1196,6 +1196,7 @@ void FEMSystem::initialize_mesh_variables ()
   const MeshBase::const_element_iterator end_el =
     mesh.active_local_elements_end();
 
+  // Get the solution's mesh variables from every element
   for ( ; el != end_el; ++el)
     {
       elem = *el;
@@ -1208,6 +1209,9 @@ void FEMSystem::initialize_mesh_variables ()
 
       this->elem_position_get();
     }
+
+  // And make sure the current_local_solution is up to date too
+  this->update();
 }
 
 
@@ -1227,15 +1231,18 @@ void FEMSystem::elem_position_get()
       libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
                      (element_fe_var[_mesh_x_var]->get_fe_type().family
                       == LAGRANGE &&
-                      elem_subsolutions[_mesh_x_var]->size() == n_nodes));
+                      element_fe_var[_mesh_x_var]->get_fe_type().order
+                      == elem->default_order()));
       libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
                      (element_fe_var[_mesh_y_var]->get_fe_type().family
                       == LAGRANGE &&
-                      elem_subsolutions[_mesh_y_var]->size() == n_nodes));
+                      element_fe_var[_mesh_y_var]->get_fe_type().order
+                      == elem->default_order()));
       libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
                      (element_fe_var[_mesh_z_var]->get_fe_type().family
                       == LAGRANGE &&
-                      elem_subsolutions[_mesh_z_var]->size() == n_nodes));
+                      element_fe_var[_mesh_z_var]->get_fe_type().order
+                      == elem->default_order()));
 
       // Get degree of freedom coefficients from point coordinates
       if (_mesh_x_var != libMesh::invalid_uint)
