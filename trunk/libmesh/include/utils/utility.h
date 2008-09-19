@@ -64,7 +64,61 @@ namespace Utility
   }
 
 
-  
+  /**
+   * Utility::is_sorted mimics the behavior of the SGI STL extension
+   * std::is_sorted.  Checks to see if the range [first,last) is
+   * sorted in non-decreasing order, ie. for each "i" in
+   * [first,last) *i <= *(i+1).
+   */
+  template< class InputIterator >
+  bool is_sorted(InputIterator first, InputIterator last)
+  {
+    if ( first == last )
+      return true;
+
+    // "prev" always points to the entry just to the left of "first"
+    //  [-    -    -    -    -    -]
+    //   ^    ^
+    // prev first
+    //
+    //  [-    -    -    -    -    -]
+    //        ^    ^
+    //      prev first
+    //
+    //  [-    -    -    -    -    -]
+    //             ^    ^
+    //           prev first
+    InputIterator prev( first );
+    for ( ++first; first != last; ++prev, ++first ) 
+      if ( *prev > *first )
+	return false;
+
+    // If we haven't returned yet, it's sorted!
+    return true;
+    
+    
+    // A one-liner version using adjacent_find.  This doesn't work for
+    // C-style arrays, since their pointers do not have a value_type.
+    //
+    // Works by checking to see if adjacent entries satisfy *i >
+    // *(i+1) and returns the first one which does.  If "last" is
+    // returned, no such pair was found, and therefore the range must
+    // be in non-decreasing order.
+    //
+    // return (last ==
+    // std::adjacent_find(first, last,
+    // std::greater< typename InputIterator::value_type >()));
+    
+    // A second one-linear attempt.  This one checks for a **strictly
+    // increasing** (no duplicate entries) range.  Also doesn't work
+    // with C-style arrays.
+    //
+    // return (last ==
+    // std::adjacent_find(first, last,
+    // std::not2(std::less<typename InputIterator::value_type>())));
+  }
+
+      
   //-------------------------------------------------------------------
   /**
    * An efficient template instantiation for raising
