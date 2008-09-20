@@ -523,6 +523,8 @@ void DofMap::enforce_constraints_exactly (const System &system,
   Parallel::max(local_constraints);
   if (!local_constraints)
     return;
+  
+  START_LOG("enforce_constraints_exactly()","DofMap");
 
   if (!v)
     v = system.solution.get();
@@ -612,6 +614,8 @@ void DofMap::enforce_constraints_exactly (const System &system,
       v_global->localize (*v);
     }
   v->close();
+
+  STOP_LOG("enforce_constraints_exactly()","DofMap");
 }
 
 
