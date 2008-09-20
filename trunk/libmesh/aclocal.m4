@@ -1020,12 +1020,12 @@ AC_DEFUN(CONFIGURE_TBB,
   AC_ARG_WITH(tbb,
               AC_HELP_STRING([--with-tbb=PATH],[Specify the path where Threading Building Blocks is installed]),
               withtbb=$withval,
-              withtbb=no)
+              withtbb=$TBB_DIR)
 
   AC_ARG_WITH(tbb-lib,
               AC_HELP_STRING([--with-tbb-lib=PATH],[Specify the path to Threading Building Blocks libraries]),
               withtbblib=$withval,
-              withtbblib=no)
+              withtbblib="-L$TBB_LIB_PATH -ltbb -ltbbmalloc")
 
   if test "$withtbb" != no ; then
     AC_CHECK_FILE($withtbb/include/tbb/task_scheduler_init.h,
