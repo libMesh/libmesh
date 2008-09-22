@@ -1324,7 +1324,7 @@ void FEMSystem::elem_position_set(Real)
 bool FEMSystem::eulerian_residual (bool request_jacobian)
 {
   // Only calculate a mesh movement residual if it's necessary
-  if (!_mesh_sys)
+  if (_mesh_sys == libMesh::invalid_uint)
     return request_jacobian;
 
   // This function only supports fully coupled mesh motion for now
