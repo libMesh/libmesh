@@ -172,6 +172,10 @@ int main (int argc, char** argv)
   // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
   // elements in 3D.  Building these higher-order elements allows
   // us to use higher-order approximation, as in example 3.
+
+  Real halfwidth = dim > 1 ? 1. : 0.;
+  Real halfheight = dim > 2 ? 1. : 0.;
+
   if ((family == "LAGRANGE") && (order == "FIRST"))
     {
       // No reason to use high-order geometric elements if we are
@@ -179,8 +183,8 @@ int main (int argc, char** argv)
       MeshTools::Generation::build_cube (mesh,
                                          ps, ps, ps,
                                          -1., 1.,
-                                         -1., 1.,
-                                         -1., 1.,
+                                         -halfwidth, halfwidth,
+                                         -halfheight, halfheight,
                                          (dim==1)    ? EDGE2 : 
                                          ((dim == 2) ? QUAD4 : HEX8));
     }
@@ -190,8 +194,8 @@ int main (int argc, char** argv)
       MeshTools::Generation::build_cube (mesh,
                                          ps, ps, ps,
                                          -1., 1.,
-                                         -1., 1.,
-                                         -1., 1.,
+                                         -halfwidth, halfwidth,
+                                         -halfheight, halfheight,
                                          (dim==1)    ? EDGE3 : 
                                          ((dim == 2) ? QUAD9 : HEX27));
     }
