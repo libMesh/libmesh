@@ -282,6 +282,8 @@ void Nemesis_IO_Helper::get_node_map()
 
   if (_verbose)
     {
+      // Remark: The Exodus/Nemesis node numbring is always (?) 1-based!  This means the first interior node id will
+      // always be == 1.
       std::cout << "[" << libMesh::processor_id() << "] " << "first interior node id=" << node_mapi[0] << std::endl;
       std::cout << "[" << libMesh::processor_id() << "] " << "last interior node id=" << node_mapi.back() << std::endl;
 
