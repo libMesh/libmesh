@@ -181,7 +181,9 @@ int main (int argc, char** argv)
       // No reason to use high-order geometric elements if we are
       // solving with low-order finite elements.
       MeshTools::Generation::build_cube (mesh,
-                                         ps, ps, ps,
+                                         ps,
+					 (dim>1) ? ps : 0,
+					 (dim>2) ? ps : 0,
                                          -1., 1.,
                                          -halfwidth, halfwidth,
                                          -halfheight, halfheight,
@@ -192,7 +194,9 @@ int main (int argc, char** argv)
   else
     {
       MeshTools::Generation::build_cube (mesh,
-                                         ps, ps, ps,
+					 ps,
+					 (dim>1) ? ps : 0,
+					 (dim>2) ? ps : 0,
                                          -1., 1.,
                                          -halfwidth, halfwidth,
                                          -halfheight, halfheight,
