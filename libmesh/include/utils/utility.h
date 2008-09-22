@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <algorithm> // for std::lower_bound
 
 // Local includes
 #include "libmesh_common.h" // for Real
@@ -90,8 +91,8 @@ namespace Utility
     //           prev first
     InputIterator prev( first );
     for ( ++first; first != last; ++prev, ++first ) 
-      if ( *prev > *first )
-	return false;
+      if ( *first < *prev  )    // Note: this is the same as *prev > *first,
+	   return false;        // but we only require op< to be defined.
 
     // If we haven't returned yet, it's sorted!
     return true;
@@ -118,6 +119,20 @@ namespace Utility
     // std::not2(std::less<typename InputIterator::value_type>())));
   }
 
+
+  /**
+   * The STL provides binary_search() which returns true/false depending
+   * on whether the searched-for value is found.  Utility::binary_find() uses a
+   * binary search on a sorted range to return an iterator to the searched-for
+   * element, or "last" if the element is not found.
+   */
+  template<class ForwardIterator, class T>
+  ForwardIterator binary_find(ForwardIterator first, ForwardIterator last, const T& value)
+  {
+    ForwardIterator it = std::lower_bound(first, last, value);
+    return (it == last || value < *it) ? last : it;
+  }
+    
       
   //-------------------------------------------------------------------
   /**
