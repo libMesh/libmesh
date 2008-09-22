@@ -202,19 +202,20 @@ void Nemesis_IO::read (const std::string& base_filename)
       // Communicate the nodes_i_must_number information to all processors.  This
       // determines a global node numbering offset.  FIXME: This should be allgathered
       // with other data for better communication efficiency.
-      std::vector<unsigned int> all_nodal_offsets(libMesh::n_processors());
-      Parallel::allgather(nodes_i_must_number, all_nodal_offsets);      
+      std::vector<unsigned int> all_nodes_i_must_number(libMesh::n_processors());
+      Parallel::allgather(nodes_i_must_number, all_nodes_i_must_number);      
 
       // The sum of all the entries in this vector should sum to the number of global nodes
-      libmesh_assert(std::accumulate(all_nodal_offsets.begin(),
-				     all_nodal_offsets.end(),
+      libmesh_assert(std::accumulate(all_nodes_i_must_number.begin(),
+				     all_nodes_i_must_number.end(),
 				     0) == nemhelper.num_nodes_global);
 
       // Compute the global_node_offsets, the amount by which to offset the local node numbering
-      // on my processor.
+      // on my processor.  The offset is determined by summing all counts of smaller-ID'd processors'
+      // nodes they must number.
       std::vector<unsigned int> global_node_offsets (libMesh::n_processors());
       for (unsigned int i=1; i<global_node_offsets.size(); ++i)
-	global_node_offsets[i] = global_node_offsets[i-1]+all_nodal_offsets[i];
+	global_node_offsets[i] = global_node_offsets[i-1]+all_nodes_i_must_number[i-1]; 
 
       const unsigned int my_node_offset = global_node_offsets[libMesh::processor_id()];
       if (_verbose)
@@ -351,6 +352,9 @@ void Nemesis_IO::read (const std::string& base_filename)
 	    {
 
 	      // A symmetric hash of other_proc and libMesh::processor_id.  See also, elem.h.
+	      // Unless there is a very large number of processors (~2045) this hash
+	      // basically boils down to n0 + 32*n1, where n0 (resp. n1) is the min (resp. max)
+	      // of "other_proc" and libMesh::processor_id().
 	      unsigned int tag =
 		(std::min(other_proc, libMesh::processor_id())     ) % 65449 +
 		(std::max(other_proc, libMesh::processor_id()) << 5) % 65449;
@@ -416,9 +420,10 @@ void Nemesis_IO::read (const std::string& base_filename)
       // processor's numbering scheme if that's applicable.
       // eg. Processor zero always numbers his own border nodes.
 
-      // We shall assume that the nemhelper.node_cmap_node_ids arrays are sorted.  This was the
-      // case for our test problem, but I'm not sure it will always be the case...
 #ifndef NDEBUG
+      // We shall assume that the nemhelper.node_cmap_node_ids arrays are sorted.  This was the
+      // case for our test problem, but I'm not sure it will always be the case...  This test
+      // will fail in non-optimized runs if the arrays are not sorted.
       for (int i=0; i<nemhelper.num_node_cmaps; ++i)
 	{
 	  if (!Utility::is_sorted(nemhelper.node_cmap_node_ids[i].begin(),
@@ -435,6 +440,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 
       for (int i=0; i<nemhelper.num_border_nodes; ++i)
 	{
+	  // Caution! Exodus/Nemesis' node numbering is 1-based, so this local index is 1-based!!
 	  int local_border_node_index_i = nemhelper.node_mapb[i];
 
 	  // Find the first occurrence of local_border_node_index_i in the
@@ -497,11 +503,11 @@ void Nemesis_IO::read (const std::string& base_filename)
 			    << symm_node_cmap_node_ids[cmap_proc_id_index_match][cmap_node_id_index_match]
 			    << "="
 			    << this_node_global_id
-			    << "." << std::endl;
+			    << " (1-based)." << std::endl;
 		}
 	    }
 
-	  else
+	  else // Print statement only for case where we use our own numbering.
 	    {
 	      if (_verbose)
 		{
@@ -514,17 +520,36 @@ void Nemesis_IO::read (const std::string& base_filename)
 			    << local_border_node_index_i
 			    << "="
 			    << this_node_global_id
-			    << "." << std::endl;
+			    << " (1-based)." << std::endl;
 		}
 	    }
 
 
-	  // const Real x = ex2helper.x[ local_border_node_index_i ];
-	  // const Real y = ex2helper.y[ local_border_node_index_i ];
-	  // const Real z = ex2helper.z[ local_border_node_index_i ];
-	  // mesh.add_point (Point(x,y,z), this_node_global_id, libMesh::processor_id());
+	  // Extract x,y,z values using the local 1-based indexing.
+	  const Real x = ex2helper.x[ local_border_node_index_i ];
+	  const Real y = ex2helper.y[ local_border_node_index_i ];
+	  const Real z = ex2helper.z[ local_border_node_index_i ];
+
+	  // If this_node_global_id==0, the Exodus/Nemesis numbering scheme was
+	  // not 1-based!
+	  libmesh_assert(this_node_global_id > 0);
+	  
+	  // Finally, add the border node to the Mesh.  Don't forget: use a zero-based numbering scheme!!
+	  mesh.add_point (Point(x,y,z), this_node_global_id-1, libMesh::processor_id());
 	} // end for (int i=0; i<nemhelper.num_border_nodes; ++i)
 
+
+      // See what the node count is up to now.
+      if (_verbose)
+	{
+	  // Report the number of nodes which have been added locally
+	  std::cout << "[" << libMesh::processor_id() << "] ";
+	  std::cout << "mesh.n_nodes()=" << mesh.n_nodes() << std::endl;
+
+	  // Reports the number of nodes that have been added in total.
+	  std::cout << "[" << libMesh::processor_id() << "] ";
+	  std::cout << "mesh.parallel_n_nodes()=" << mesh.parallel_n_nodes() << std::endl;
+	}
       
     } // end if ( libMesh::n_processors() > 1 )
 
