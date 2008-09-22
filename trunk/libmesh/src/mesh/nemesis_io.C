@@ -60,6 +60,9 @@ void Nemesis_IO::verbose (bool set_verbosity)
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 void Nemesis_IO::read (const std::string& base_filename)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+  
   if (_verbose)
     {
       std::cout << "[" << libMesh::processor_id() << "] ";
@@ -137,36 +140,6 @@ void Nemesis_IO::read (const std::string& base_filename)
 	}
 
       
-      // Assertion: The sum of the border and internal elements on all processors
-      // should equal nemhelper.num_elems_global
-#ifndef NDEBUG
-      int sum_internal_elems=0, sum_border_elems=0;
-      for (unsigned int j=3,c=0; c<libMesh::n_processors(); j+=7,++c)
-	sum_internal_elems += all_loadbal_data[j];
-
-      for (unsigned int j=4,c=0; c<libMesh::n_processors(); j+=7,++c)
-	sum_border_elems += all_loadbal_data[j];
-
-      if (_verbose)
-	{
-	  std::cout << "[" << libMesh::processor_id() << "] ";
-	  std::cout << "sum_internal_elems=" << sum_internal_elems << std::endl;
-
-	  std::cout << "[" << libMesh::processor_id() << "] ";
-	  std::cout << "sum_border_elems=" << sum_border_elems << std::endl;
-	}
-
-      libmesh_assert(sum_internal_elems+sum_border_elems == nemhelper.num_elems_global);
-#endif
-
-      // Compute my_elem_offset, the amount by which to offset the local elem numbering
-      // on my processor.
-      unsigned int my_elem_offset = 0;
-      for (unsigned int i=0; i<libMesh::processor_id(); ++i)
-	my_elem_offset += (all_loadbal_data[7*i + 3]+  // num_internal_elems, proc i
-			   all_loadbal_data[7*i + 4]); // num_border_elems, proc i
-      std::cout << "[" << libMesh::processor_id() << "] ";
-      std::cout << "my_elem_offset=" << my_elem_offset << std::endl;
       
       // Get a reference to the ParallelMesh.  
       ParallelMesh& mesh = this->mesh();
@@ -240,7 +213,14 @@ void Nemesis_IO::read (const std::string& base_filename)
       // node_cmap_proc_ids[][]
       nemhelper.get_node_cmap();
 
-      // Local information: Read the standard Exodus header
+      // Local information: Read the following information from the standard Exodus header
+      // title[0]
+      // num_dim
+      // num_nodes
+      // num_elem
+      // num_elem_blk
+      // num_node_sets
+      // num_side_sets
       ex2helper.read_header();
       ex2helper.print_header();
 
@@ -250,7 +230,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       // Read nodes from the exodus file: this fills the ex2helper.x,y,z arrays.
       ex2helper.read_nodes();
 
-      // Add internal nodes the ParallelMesh, using the node ID offset we computed and the current
+      // Add internal nodes to the ParallelMesh, using the node ID offset we computed and the current
       // processor's ID.
       for (int i=0; i<nemhelper.num_internal_nodes; ++i)
 	{
@@ -454,17 +434,15 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  for (int j=0; j<nemhelper.num_node_cmaps; ++j)
 	    {
 	      std::vector<int>::iterator it =
-		std::lower_bound(nemhelper.node_cmap_node_ids[j].begin(),
-				 nemhelper.node_cmap_node_ids[j].end(),
-				 local_border_node_index_i);
+		Utility::binary_find(nemhelper.node_cmap_node_ids[j].begin(),
+				     nemhelper.node_cmap_node_ids[j].end(),
+				     local_border_node_index_i);
+// 		std::lower_bound(nemhelper.node_cmap_node_ids[j].begin(),
+// 				 nemhelper.node_cmap_node_ids[j].end(),
+// 				 local_border_node_index_i);
 
-	      // Will lower_bound ever return end()?
-	      libmesh_assert (it != nemhelper.node_cmap_node_ids[j].end());
-
-	      // Did it really find the right value?  std::lower_bound
-	      // returns an iterator to where the value *could be inserted*
-	      // if it doesn't find the value itself...
-	      if (*it == local_border_node_index_i)
+	      // If binary_find() returns a non-end iterator, the value was found.
+	      if (it != nemhelper.node_cmap_node_ids[j].end())
 		{
 		  cmap_proc_id_index_match = j;
 		  cmap_node_id_index_match = std::distance(nemhelper.node_cmap_node_ids[j].begin(), it);
@@ -494,16 +472,16 @@ void Nemesis_IO::read (const std::string& base_filename)
 	      
 	      if (_verbose)
 		{
-		  std::cout << "[" << libMesh::processor_id() << "] ";
-		  std::cout << "Adding border node "
-			    << local_border_node_index_i
-			    << " with global node index "
-			    << global_node_offsets[cmap_proc_id_index_match]
-			    << "+"
-			    << symm_node_cmap_node_ids[cmap_proc_id_index_match][cmap_node_id_index_match]
-			    << "="
-			    << this_node_global_id
-			    << " (1-based)." << std::endl;
+// 		  std::cout << "[" << libMesh::processor_id() << "] ";
+// 		  std::cout << "Adding border node "
+// 			    << local_border_node_index_i
+// 			    << " with global node index "
+// 			    << global_node_offsets[cmap_proc_id_index_match]
+// 			    << "+"
+// 			    << symm_node_cmap_node_ids[cmap_proc_id_index_match][cmap_node_id_index_match]
+// 			    << "="
+// 			    << this_node_global_id
+// 			    << " (1-based)." << std::endl;
 		}
 	    }
 
@@ -511,16 +489,16 @@ void Nemesis_IO::read (const std::string& base_filename)
 	    {
 	      if (_verbose)
 		{
-		  std::cout << "[" << libMesh::processor_id() << "] ";
-		  std::cout << "Adding border node "
-			    << local_border_node_index_i
-			    << " with global node index "
-			    << my_node_offset
-			    << "+"
-			    << local_border_node_index_i
-			    << "="
-			    << this_node_global_id
-			    << " (1-based)." << std::endl;
+// 		  std::cout << "[" << libMesh::processor_id() << "] ";
+// 		  std::cout << "Adding border node "
+// 			    << local_border_node_index_i
+// 			    << " with global node index "
+// 			    << my_node_offset
+// 			    << "+"
+// 			    << local_border_node_index_i
+// 			    << "="
+// 			    << this_node_global_id
+// 			    << " (1-based)." << std::endl;
 		}
 	    }
 
@@ -550,6 +528,293 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  std::cout << "[" << libMesh::processor_id() << "] ";
 	  std::cout << "mesh.parallel_n_nodes()=" << mesh.parallel_n_nodes() << std::endl;
 	}
+
+
+
+      // --------------------------------------------------------------------------------
+      // --------------------------------------------------------------------------------
+      // --------------------------------------------------------------------------------
+
+      
+      // We can now read in the elements...Exodus stores them in blocks in which all
+      // elements have the same geometric type.  This code is adapted directly from exodusII_io.C
+
+      // Assertion: The sum of the border and internal elements on all processors
+      // should equal nemhelper.num_elems_global
+#ifndef NDEBUG
+      int sum_internal_elems=0, sum_border_elems=0;
+      for (unsigned int j=3,c=0; c<libMesh::n_processors(); j+=7,++c)
+	sum_internal_elems += all_loadbal_data[j];
+
+      for (unsigned int j=4,c=0; c<libMesh::n_processors(); j+=7,++c)
+	sum_border_elems += all_loadbal_data[j];
+
+      if (_verbose)
+	{
+	  std::cout << "[" << libMesh::processor_id() << "] ";
+	  std::cout << "sum_internal_elems=" << sum_internal_elems << std::endl;
+
+	  std::cout << "[" << libMesh::processor_id() << "] ";
+	  std::cout << "sum_border_elems=" << sum_border_elems << std::endl;
+	}
+
+      libmesh_assert(sum_internal_elems+sum_border_elems == nemhelper.num_elems_global);
+#endif
+
+      // Compute my_elem_offset, the amount by which to offset the local elem numbering
+      // on my processor.
+      unsigned int my_elem_offset = 0;
+      for (unsigned int i=0; i<libMesh::processor_id(); ++i)
+	my_elem_offset += (all_loadbal_data[7*i + 3]+  // num_internal_elems, proc i
+			   all_loadbal_data[7*i + 4]); // num_border_elems, proc i
+      std::cout << "[" << libMesh::processor_id() << "] ";
+      std::cout << "my_elem_offset=" << my_elem_offset << std::endl;
+
+
+      // Fills in the: 
+      // global_elem_blk_ids[] and
+      // global_elem_blk_cnts[] arrays.
+      nemhelper.get_eb_info_global();
+
+      // Fills in the vectors
+      // elem_mapi[num_internal_elems]
+      // elem_mapb[num_border_elems  ]
+      // These tell which of the (locally-numbered) elements are internal and which are border elements.
+      // In our test example these arrays are sorted (but non-contiguous), which makes it possible to
+      // binary search for each element ID... however I don't think we need to distinguish between the
+      // two types, since either can have nodes the boundary!
+      nemhelper.get_elem_map();
+      
+      // Fills in the vectors of vectors:
+      // elem_cmap_elem_ids[][]
+      // elem_cmap_side_ids[][]
+      // elem_cmap_proc_ids[][]
+      // These arrays are of size num_elem_cmaps * elem_cmap_elem_cnts[i], i = 0..num_elem_cmaps
+      nemhelper.get_elem_cmap();
+      
+      // Get information about the element blocks:
+      // (read in the array ex2helper.block_ids[])
+      ex2helper.read_block_info();
+
+      // Local indexing offset maps block element indices to local numbering scheme. 
+      int nelem_last_block = 0;
+
+      // Instantiate the ElementMaps interface.  This is what translates LibMesh's
+      // element numbering scheme to Exodus's.
+      ExodusII_IO_Helper::ElementMaps em;
+      
+
+      // Read in the element connectivity for each block by
+      // looping over all the blocks.
+      for (int i=0; i<ex2helper.num_elem_blk; i++)
+	{
+	  // Read the information for block i:  For ex2helper.block_ids[i], reads
+	  // elem_type
+	  // num_elem_this_blk
+	  // num_nodes_per_elem
+	  // num_attr
+	  // connect <-- the nodal connectivity array for each element in the block.
+	  ex2helper.read_elem_in_block(i);
+
+	  // Set subdomain ID based on the block ID.
+	  int subdomain_id = ex2helper.block_ids[i];
+
+	  // Create a type string (this uses the null-terminated string ctor).
+	  const std::string type_str ( &(ex2helper.elem_type[0]) ); 
+
+	  // Set any relevant node/edge maps for this element
+	  const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(type_str); 
+
+	  if (_verbose)
+	    std::cout << "Reading a block of " << type_str << " elements." << std::endl;
+      
+	  // Loop over all the elements in this block
+	  int jmax = nelem_last_block + ex2helper.num_elem_this_blk;
+	  for (int j=nelem_last_block; j<jmax; j++)
+	    {
+	      Elem* elem = Elem::build (conv.get_canonical_type()).release();
+	      libmesh_assert (elem);
+
+	      // Assign subdomain and processor ID to the newly-created Elem.
+	      // Assigning the processor ID beforehand ensures that the Elem is
+	      // not added as an "unpartitioned" element.  Note that the element
+	      // numbering in Exodus is also 1-based.
+	      elem->subdomain_id() = subdomain_id;
+	      elem->processor_id() = libMesh::processor_id();
+	      elem->set_id()       = my_elem_offset + j;
+		
+// 	      if (_verbose)
+// 		{
+// 		  std::cout << "[" << libMesh::processor_id() << "] ";
+// 		  std::cout << "Before mesh.add_elem(), elem->id()==" << elem->id() << std::endl;
+// 		}
+	      
+	      // Add the created Elem to the Mesh, catch the Elem
+	      // pointer that the Mesh throws back.
+	      elem = mesh.add_elem (elem); 
+
+// 	      if (_verbose)
+// 		{
+// 		  std::cout << "[" << libMesh::processor_id() << "] ";
+// 		  std::cout << "After mesh.add_elem(), elem->id()==" << elem->id() << std::endl;
+// 		}
+	      
+	      // Set all the nodes for this element
+	      if (_verbose)
+		{
+		  std::cout << "[" << libMesh::processor_id() << "] ";
+		  // std::cout << "Setting " << ex2helper.num_nodes_per_elem << " nodes per element." << std::endl;
+		  std::cout << "Setting nodes for Elem " << elem->id() << std::endl;
+		}
+	      
+	      for (int k=0; k<ex2helper.num_nodes_per_elem; k++)
+		{
+		  // global index
+		  int gi = (j-nelem_last_block)*ex2helper.num_nodes_per_elem + conv.get_node_map(k); 
+
+		  // Exodus (local) node number (1-based)
+		  int node_number = ex2helper.connect[gi];
+
+		  // Is this an internal or boundary node?  Try to find in node_mapi[] first...
+		  bool node_found = false;
+		  std::vector<int>::iterator it =
+		    Utility::binary_find(nemhelper.node_mapi.begin(),
+					 nemhelper.node_mapi.end(),
+					 node_number);
+// 		    std::lower_bound(nemhelper.node_mapi.begin(),
+// 				     nemhelper.node_mapi.end(),
+// 				     node_number);
+
+		  // If binary_find returns a non-end iterator, the value was found!
+		  if (it != nemhelper.node_mapi.end())
+		    {
+		      // Node found was an internal node, use the Exodus number plus
+		      // the current processor's node offset.
+		      node_number += my_node_offset;
+
+		      if (_verbose)
+			{
+			  std::cout << "[" << libMesh::processor_id() << "] ";
+			  std::cout << "Elem " << elem->id() << ": setting internal node k=" << k
+				    << " to " << node_number << std::endl;
+			}
+
+		      // We can stop searching
+		      node_found = true;
+		    }
+
+		  if (!node_found)
+		    {
+		      // Keep looking for the node ID in the boundary node list.
+// 		      it = lower_bound(nemhelper.node_mapb.begin(),
+// 				       nemhelper.node_mapb.end(),
+// 				       node_number);
+		      it = Utility::binary_find(nemhelper.node_mapb.begin(),
+						nemhelper.node_mapb.end(),
+						node_number);
+
+		      // If binary_find() returns a non-end iterator, the value was found!
+		      if (it != nemhelper.node_mapb.end())
+			{
+			  node_found = true;
+			      
+			  // Node found was a boundary node.  Determine its offset into
+			  // the node_cmap_node_ids vectors and then determine if we will
+			  // number it or if we will get its ID from another processor.
+			  // Note: this code is copied from above and should be pulled out as
+			  // a subroutine...
+			  int
+			    cmap_proc_id_index_match=-1,
+			    cmap_node_id_index_match=-1;
+			  for (int m=0; m<nemhelper.num_node_cmaps; ++m)
+			    {
+			      std::vector<int>::iterator it2 =
+				Utility::binary_find(nemhelper.node_cmap_node_ids[m].begin(),
+						     nemhelper.node_cmap_node_ids[m].end(),
+						     node_number);
+// 				std::lower_bound(nemhelper.node_cmap_node_ids[m].begin(),
+// 						 nemhelper.node_cmap_node_ids[m].end(),
+// 						 node_number);
+
+			      // If binary_find() returns a non-end iterator, the value was found!
+			      if (it2 != nemhelper.node_cmap_node_ids[m].end())
+				{
+				  cmap_proc_id_index_match = m;
+				  cmap_node_id_index_match = std::distance(nemhelper.node_cmap_node_ids[m].begin(), it2);
+				  break; // out of for (m) loop
+				}
+			    } // end for (int m=0; m<nemhelper.num_node_cmaps; ++m)
+
+			      // If a shared processor was not found...
+			  if (cmap_proc_id_index_match == -1)
+			    {
+			      std::cerr << "A matching entry in a node communication"
+					<< " map was not found for local border node "
+					<< node_number << std::endl; 
+			      libmesh_error();
+			    }
+
+			      
+			  // If the shared processor has a lower ID, it numbers the node...
+			  if (nemhelper.node_cmap_ids[cmap_proc_id_index_match] <
+			      static_cast<int>(libMesh::processor_id()))
+			    {
+			      node_number =
+				global_node_offsets[cmap_proc_id_index_match]+
+				symm_node_cmap_node_ids[cmap_proc_id_index_match][cmap_node_id_index_match];
+			    }
+
+			  // ... Otherwise, we use our own offset.
+			  else
+			    {
+			      node_number += my_node_offset;
+			    }
+
+			  if (_verbose)
+			    {
+			      std::cout << "[" << libMesh::processor_id() << "] ";
+			      std::cout << "Elem " << elem->id() << ": setting boundary node k=" << k
+					<< " to " << node_number << std::endl;
+			    }
+			  
+			} // end if (it != nemhelper.node_mapb.end())
+		    } // end if (!node_found)
+		  
+		  // If the node ID was not found in either the internal or boundary node ID
+		  // lists, we can't continue!
+		  if (!node_found)
+		    {
+		      std::cerr << "Could not correctly set node k=" << k << " for element " << elem->id() << std::endl;
+		      libmesh_error();
+		    }
+		  
+		  
+		  // Set node number, subtract 1 since exodus is internally 1-based
+		  elem->set_node(k) = mesh.node_ptr((node_number-1)); 
+		}
+	    }
+      
+	  // Maintain running sum of # of elements per block.
+	  // Should equal total number of elements (for this processor) in the end.
+	  nelem_last_block += ex2helper.num_elem_this_blk;
+	} // end for (int i=0; i<ex2helper.num_elem_blk; i++)
+
+
+      // See what the elem count is up to now.
+      if (_verbose)
+	{
+	  // Report the number of elements which have been added locally
+	  std::cout << "[" << libMesh::processor_id() << "] ";
+	  std::cout << "mesh.n_elem()=" << mesh.n_elem() << std::endl;
+
+	  // Reports the number of elements that have been added in total.
+	  std::cout << "[" << libMesh::processor_id() << "] ";
+	  std::cout << "mesh.parallel_n_elem()=" << mesh.parallel_n_elem() << std::endl;
+	}
+
+      // For ParallelMesh, it seems that _is_serial is true by default.  A hack to
+      // make the Mesh think it's parallel might be to call:
+      mesh.delete_remote_elements();
       
     } // end if ( libMesh::n_processors() > 1 )
 
