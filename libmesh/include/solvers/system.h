@@ -349,19 +349,19 @@ public:
   
   /**
    * Adds the variable \p var to the list of variables
-   * for this system.
+   * for this system.  Returns the index number for the new variable.
    */
-  void add_variable (const std::string& var,
-		     const FEType& type);
+  unsigned int add_variable (const std::string& var,
+		             const FEType& type);
 
   /**
    * Adds the variable \p var to the list of variables
    * for this system.  Same as before, but assumes \p LAGRANGE
    * as default value for \p FEType.family.
    */
-  void add_variable (const std::string& var,
-		     const Order order = FIRST,
-		     const FEFamily = LAGRANGE);
+  unsigned int add_variable (const std::string& var,
+		             const Order order = FIRST,
+		             const FEFamily = LAGRANGE);
 
   /**
    * @returns true if a variable named \p var exists in this System
