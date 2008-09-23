@@ -551,15 +551,15 @@ NumericVector<Number> & System::get_vector (const std::string& vec_name)
 
 
 
-void System::add_variable (const std::string& var,
-			   const FEType& type)
+unsigned int System::add_variable (const std::string& var,
+			           const FEType& type)
 {  
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   if (_var_num.count(var))
     {
       if (_var_type[var] == type)
-        return;
+        return _var_num[var];
 
       std::cerr << "ERROR: incompatible variable "
 		<< var
@@ -575,17 +575,20 @@ void System::add_variable (const std::string& var,
 
   // Add the variable to the _dof_map
   _dof_map->add_variable (type);
+
+  // Return the number of the new variable
+  return (this->n_vars()-1);
 }
 
 
 
-void System::add_variable (const std::string& var,
-			       const Order order,
-			       const FEFamily family)
+unsigned int System::add_variable (const std::string& var,
+			           const Order order,
+			           const FEFamily family)
 {
   FEType fe_type(order, family);
   
-  this->add_variable(var, fe_type);
+  return this->add_variable(var, fe_type);
 }
 
 
