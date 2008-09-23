@@ -1435,13 +1435,12 @@ bool FEMSystem::eulerian_residual (bool request_jacobian)
           Gradient grad_u = interior_gradient(var, qp);
           RealGradient convection(0.);
 
-          libmesh_error();
           for (unsigned int i = 0; i != n_x_dofs; ++i)
-	    convection(0) += delta_x[i] * phi[i][qp];
+	    convection(0) += delta_x[i] * psi[i][qp];
           for (unsigned int i = 0; i != n_y_dofs; ++i)
-	    convection(1) += delta_y[i] * phi[i][qp];
+	    convection(1) += delta_y[i] * psi[i][qp];
           for (unsigned int i = 0; i != n_z_dofs; ++i)
-	    convection(2) += delta_z[i] * phi[i][qp];
+	    convection(2) += delta_z[i] * psi[i][qp];
 
           for (unsigned int i = 0; i != n_u_dofs; ++i)
             {
