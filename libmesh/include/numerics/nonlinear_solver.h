@@ -211,8 +211,6 @@ NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
   residual        (NULL),
   jacobian        (NULL),
   matvec          (NULL),
-  _system(s),
-  _is_initialized (false),
   max_nonlinear_iterations(0),
   max_function_evaluations(0),
   absolute_residual_tolerance(0),
@@ -221,7 +219,9 @@ NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
   relative_step_tolerance(0),
   max_linear_iterations(0),
   initial_linear_tolerance(0),
-  minimum_linear_tolerance(0)
+  minimum_linear_tolerance(0),
+  _system(s),
+  _is_initialized (false)
 {
 }
 
