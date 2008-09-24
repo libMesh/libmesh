@@ -32,7 +32,7 @@
 #include "petsc_vector.h"
 #include "petsc_matrix.h"
 #include "system.h"
-
+#include "dof_map.h"
 
 //--------------------------------------------------------------------
 // Functions with C linkage to pass to PETSc.  PETSc will call these
@@ -87,20 +87,27 @@ extern "C"
 
     PetscVector<Number> X_global(x), R(r);
     PetscVector<Number>& X_sys = *dynamic_cast<PetscVector<Number>*>(sys.solution.get());
+    PetscVector<Number>& R_sys = *dynamic_cast<PetscVector<Number>*>(sys.rhs);
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
+    R.swap(R_sys);
+
+    sys.get_dof_map().enforce_constraints_exactly(sys);
+    
     sys.update();
+
+    //Swap back
     X_global.swap(X_sys);
-  
+    R.swap(R_sys);
+
     R.zero();
 
     if      (solver->residual != NULL) solver->residual (*sys.current_local_solution.get(), R);
     else if (solver->matvec   != NULL) solver->matvec   (*sys.current_local_solution.get(), &R, NULL);
-
-
+    
     R.close();
-
+    X_global.close();
     
     return ierr;
   }
@@ -125,11 +132,17 @@ extern "C"
     PetscMatrix<Number> Jac(*jac);
     PetscVector<Number> X_global(x);
     PetscVector<Number>& X_sys = *dynamic_cast<PetscVector<Number>*>(sys.solution.get());
+    PetscMatrix<Number>& Jac_sys = *dynamic_cast<PetscMatrix<Number>*>(sys.matrix);
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
+    Jac.swap(Jac_sys);
+
+    sys.get_dof_map().enforce_constraints_exactly(sys);
     sys.update();
+
     X_global.swap(X_sys);
+    Jac.swap(Jac_sys);
 
     PC.zero();
 
@@ -138,6 +151,7 @@ extern "C"
     
     PC.close();
     Jac.close();
+    X_global.close();
     
     *msflag = SAME_NONZERO_PATTERN;
     
