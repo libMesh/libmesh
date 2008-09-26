@@ -146,6 +146,12 @@ public:
   DenseVector<T>& operator+= (const DenseVector<T2> &vec);
   
   /**
+   * Subtracts \p vec from this vector.
+   */
+  template <typename T2>
+  DenseVector<T>& operator-= (const DenseVector<T2> &vec);
+  
+  /**
    * @returns the minimum element in the vector.
    * In case of complex numbers, this returns the minimum
    * Real part.
@@ -341,6 +347,21 @@ DenseVector<T>& DenseVector<T>::operator+= (const DenseVector<T2>& vec)
 
   for (unsigned int i=0; i<this->size(); i++)
     (*this)(i) += vec(i);
+
+  return *this;
+}
+
+
+
+template<typename T>
+template<typename T2>
+inline
+DenseVector<T>& DenseVector<T>::operator-= (const DenseVector<T2>& vec)
+{
+  libmesh_assert (this->size() == vec.size());
+
+  for (unsigned int i=0; i<this->size(); i++)
+    (*this)(i) -= vec(i);
 
   return *this;
 }
