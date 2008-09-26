@@ -145,6 +145,11 @@ public:
   DenseMatrix<T>& operator+= (const DenseMatrix<T> &mat);
 
   /**
+   * Subtracts \p mat from this matrix.
+   */
+  DenseMatrix<T>& operator-= (const DenseMatrix<T> &mat);
+
+  /**
    * @returns the minimum element in the matrix.
    * In case of complex numbers, this returns the minimum
    * Real part.
@@ -509,6 +514,18 @@ DenseMatrix<T>& DenseMatrix<T>::operator += (const DenseMatrix<T> &mat)
 {
   for (unsigned int i=0; i<_val.size(); i++)
     _val[i] += mat._val[i];
+
+  return *this;
+}
+
+
+
+template<typename T>
+inline
+DenseMatrix<T>& DenseMatrix<T>::operator -= (const DenseMatrix<T> &mat)
+{
+  for (unsigned int i=0; i<_val.size(); i++)
+    _val[i] -= mat._val[i];
 
   return *this;
 }
