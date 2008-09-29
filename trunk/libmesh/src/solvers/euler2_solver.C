@@ -38,17 +38,24 @@ bool Euler2Solver::element_residual (bool request_jacobian)
     old_elem_solution(i) =
       old_nonlinear_solution(_system.dof_indices[i]);
 
+  // We evaluate mass_residual with the change in solution
+  // to get the mass matrix, reusing old_elem_solution to hold that
+  // delta_solution.
+  DenseVector<Number> delta_elem_solution(_system.elem_solution);
+  delta_elem_solution -= old_elem_solution;
+
+  // Our first evaluations are at the true elem_solution
+  _system.elem_solution_derivative = 1.0;
+
   // If a fixed solution is requested, we'll use the elem_solution
   // at the new timestep
   if (_system.use_fixed_solution)
-    {
-      _system.elem_fixed_solution = _system.elem_solution;
+    _system.elem_fixed_solution = _system.elem_solution;
 
-      _system.fixed_solution_derivative = 1.0;
-    }
+  _system.fixed_solution_derivative = 1.0;
 
-  // We're going to store old values, since the new changes in
-  // elem_residual and elem_jacobian need to be scaled.
+  // We're going to compute just the change in elem_residual
+  // (and possibly elem_jacobian), then add back the old values
   DenseVector<Number> old_elem_residual(_system.elem_residual);
   DenseMatrix<Number> old_elem_jacobian;
   if (request_jacobian)
@@ -72,6 +79,7 @@ bool Euler2Solver::element_residual (bool request_jacobian)
   _system.elem_residual *= (theta * _system.deltat);
   old_elem_residual += _system.elem_residual;
   _system.elem_residual.zero();
+
   if (jacobian_computed)
     {
       _system.elem_jacobian *= (theta * _system.deltat);
@@ -79,13 +87,41 @@ bool Euler2Solver::element_residual (bool request_jacobian)
       _system.elem_jacobian.zero();
     }
 
-  // We'll add the time-dependent term for the old solution next
+  // Next, evaluate the mass residual at the new timestep,
+  // with the delta_solution.
+  // Evaluating the mass residual at both old and new timesteps will be
+  // redundant in most problems but may be necessary for time accuracy
+  // or stability in moving mesh problems or problems with user-overridden
+  // mass_residual functions
+
+  // Move elem_->delta_, delta_->elem_
+  _system.elem_solution.swap(delta_elem_solution);
+
+  jacobian_computed = _system.mass_residual(jacobian_computed) &&
+    jacobian_computed;
+
+  _system.elem_residual *= -theta;
+  old_elem_residual += _system.elem_residual;
+  _system.elem_residual.zero();
+
+  if (jacobian_computed)
+    {
+      // The minus sign trick here is to avoid using a non-1
+      // elem_solution_derivative:
+      _system.elem_jacobian *= -theta;
+      old_elem_jacobian += _system.elem_jacobian;
+      _system.elem_jacobian.zero();
+    }
+
+  // Add the time-dependent term for the old solution
+
+  // Make sure elem_solution is set up for elem_reinit to use
+  // Move delta_->old_, old_->elem_
   _system.elem_solution.swap(old_elem_solution);
 
   // Move the mesh into place first if necessary
   _system.elem_reinit(0.);
 
-  // Add the time-dependent term for the old solution
   if (_system.use_fixed_solution)
     {
       _system.elem_solution_derivative = 0.0;
@@ -96,7 +132,6 @@ bool Euler2Solver::element_residual (bool request_jacobian)
       _system.elem_solution_derivative = 1.0;
       _system.elem_residual *= ((1. - theta) * _system.deltat);
       old_elem_residual += _system.elem_residual;
-      _system.elem_residual.zero();
       if (jacobian_computed)
         {
           _system.elem_jacobian *= ((1. - theta) * _system.deltat);
@@ -112,45 +147,43 @@ bool Euler2Solver::element_residual (bool request_jacobian)
       _system.eulerian_residual(false);
       _system.elem_residual *= ((1. - theta) * _system.deltat);
       old_elem_residual += _system.elem_residual;
-      _system.elem_residual.zero();
     }
 
-  // Add the mass term for the old solution
-  if (_system.use_fixed_solution)
+  _system.elem_residual.zero();
+
+  // Add the mass residual term for the old solution
+
+  // Move old_->old_, delta_->elem_
+  _system.elem_solution.swap(old_elem_solution);
+
+  jacobian_computed = _system.mass_residual(jacobian_computed) &&
+    jacobian_computed;
+
+  _system.elem_residual *= -(1. - theta);
+  old_elem_residual += _system.elem_residual;
+  _system.elem_residual.zero();
+
+  if (jacobian_computed)
     {
-      _system.elem_solution_derivative = 0.0;
-      jacobian_computed = _system.mass_residual(jacobian_computed) &&
-        jacobian_computed;
-      _system.elem_solution_derivative = 1.0;
-    }
-  else
-    {
-      // FIXME - we should detect if mass_residual() edits
-      // elem_jacobian and lies about it!
-      _system.mass_residual(false);
+      // The minus sign trick here is to avoid using a non-1
+      // *_solution_derivative:
+      _system.elem_jacobian *= -(1. - theta);
+      old_elem_jacobian += _system.elem_jacobian;
+      _system.elem_jacobian.zero();
     }
 
   // Restore the elem_solution
-  _system.elem_solution.swap(old_elem_solution);
+  // Move elem_->elem_, delta_->delta_
+  _system.elem_solution.swap(delta_elem_solution);
 
   // Restore the elem position if necessary
   _system.elem_reinit(1.);
-
-  // Subtract the mass term for the new solution
-  if (jacobian_computed)
-    _system.elem_jacobian *= -1.0;
-  _system.elem_residual *= -1.0;
-  jacobian_computed = _system.mass_residual(jacobian_computed) &&
-    jacobian_computed;
-  if (jacobian_computed)
-    _system.elem_jacobian *= -1.0;
-  _system.elem_residual *= -1.0;
 
   // Add the constraint term
   jacobian_computed = _system.element_constraint(jacobian_computed) &&
     jacobian_computed;
 
-  // Add back the old residual and jacobian
+  // Add back the previously accumulated residual and jacobian
   _system.elem_residual += old_elem_residual;
   if (request_jacobian)
     {
@@ -175,17 +208,24 @@ bool Euler2Solver::side_residual (bool request_jacobian)
     old_elem_solution(i) =
       old_nonlinear_solution(_system.dof_indices[i]);
 
+  // We evaluate mass_residual with the change in solution
+  // to get the mass matrix, reusing old_elem_solution to hold that
+  // delta_solution.
+  DenseVector<Number> delta_elem_solution(_system.elem_solution);
+  delta_elem_solution -= old_elem_solution;
+
+  // Our first evaluations are at the true elem_solution
+  _system.elem_solution_derivative = 1.0;
+
   // If a fixed solution is requested, we'll use the elem_solution
   // at the new timestep
   if (_system.use_fixed_solution)
-    {
-      _system.elem_fixed_solution = _system.elem_solution;
+    _system.elem_fixed_solution = _system.elem_solution;
 
-      _system.fixed_solution_derivative = 1.0;
-    }
+  _system.fixed_solution_derivative = 1.0;
 
-  // We're going to store old values, since the new changes in
-  // elem_residual and elem_jacobian need to be scaled.
+  // We're going to compute just the change in elem_residual
+  // (and possibly elem_jacobian), then add back the old values
   DenseVector<Number> old_elem_residual(_system.elem_residual);
   DenseMatrix<Number> old_elem_jacobian;
   if (request_jacobian)
@@ -205,6 +245,7 @@ bool Euler2Solver::side_residual (bool request_jacobian)
   _system.elem_residual *= (theta * _system.deltat);
   old_elem_residual += _system.elem_residual;
   _system.elem_residual.zero();
+
   if (jacobian_computed)
     {
       _system.elem_jacobian *= (theta * _system.deltat);
@@ -212,7 +253,36 @@ bool Euler2Solver::side_residual (bool request_jacobian)
       _system.elem_jacobian.zero();
     }
 
+  // Next, evaluate the mass residual at the new timestep,
+  // with the delta_solution.
+  // Evaluating the mass residual at both old and new timesteps will be
+  // redundant in most problems but may be necessary for time accuracy
+  // or stability in moving mesh problems or problems with user-overridden
+  // mass_residual functions
+
+  // Move elem_->delta_, delta_->elem_
+  _system.elem_solution.swap(delta_elem_solution);
+
+  jacobian_computed = _system.side_mass_residual(jacobian_computed) &&
+    jacobian_computed;
+
+  _system.elem_residual *= -theta;
+  old_elem_residual += _system.elem_residual;
+  _system.elem_residual.zero();
+
+  if (jacobian_computed)
+    {
+      // The minus sign trick here is to avoid using a non-1
+      // elem_solution_derivative:
+      _system.elem_jacobian *= -theta;
+      old_elem_jacobian += _system.elem_jacobian;
+      _system.elem_jacobian.zero();
+    }
+
   // Add the time-dependent term for the old solution
+
+  // Make sure elem_solution is set up for elem_reinit to use
+  // Move delta_->old_, old_->elem_
   _system.elem_solution.swap(old_elem_solution);
 
   // Move the mesh into place first if necessary
@@ -226,7 +296,6 @@ bool Euler2Solver::side_residual (bool request_jacobian)
       _system.elem_solution_derivative = 1.0;
       _system.elem_residual *= ((1. - theta) * _system.deltat);
       old_elem_residual += _system.elem_residual;
-      _system.elem_residual.zero();
       if (jacobian_computed)
         {
           _system.elem_jacobian *= ((1. - theta) * _system.deltat);
@@ -241,52 +310,50 @@ bool Euler2Solver::side_residual (bool request_jacobian)
       _system.side_time_derivative(false);
       _system.elem_residual *= ((1. - theta) * _system.deltat);
       old_elem_residual += _system.elem_residual;
-      _system.elem_residual.zero();
     }
 
-  // Add the mass term for the old solution
-  if (_system.use_fixed_solution)
+  _system.elem_residual.zero();
+
+  // Add the mass residual term for the old solution
+
+  // Move old_->old_, delta_->elem_
+  _system.elem_solution.swap(old_elem_solution);
+
+  jacobian_computed = _system.side_mass_residual(jacobian_computed) &&
+    jacobian_computed;
+
+  _system.elem_residual *= -(1. - theta);
+  old_elem_residual += _system.elem_residual;
+  _system.elem_residual.zero();
+
+  if (jacobian_computed)
     {
-      _system.elem_solution_derivative = 0.0;
-      jacobian_computed = _system.side_mass_residual(jacobian_computed) &&
-        jacobian_computed;
-      _system.elem_solution_derivative = 1.0;
-    }
-  else
-    {
-      // FIXME - we should detect if side_mass_residual() edits
-      // elem_jacobian and lies about it!
-      _system.side_mass_residual(false);
+      // The minus sign trick here is to avoid using a non-1
+      // *_solution_derivative:
+      _system.elem_jacobian *= -(1. - theta);
+      old_elem_jacobian += _system.elem_jacobian;
+      _system.elem_jacobian.zero();
     }
 
   // Restore the elem_solution
-  _system.elem_solution.swap(old_elem_solution);
+  // Move elem_->elem_, delta_->delta_
+  _system.elem_solution.swap(delta_elem_solution);
 
   // Restore the elem position if necessary
   _system.elem_side_reinit(1.);
-
-  // Subtract the mass term for the new solution
-  if (jacobian_computed)
-    _system.elem_jacobian *= -1.0;
-  _system.elem_residual *= -1.0;
-  jacobian_computed = _system.side_mass_residual(jacobian_computed) &&
-    jacobian_computed;
-  if (jacobian_computed)
-    _system.elem_jacobian *= -1.0;
-  _system.elem_residual *= -1.0;
 
   // Add the constraint term
   jacobian_computed = _system.side_constraint(jacobian_computed) &&
     jacobian_computed;
 
-  // Add back the old residual and jacobian
+  // Add back the previously accumulated residual and jacobian
   _system.elem_residual += old_elem_residual;
   if (request_jacobian)
     {
       if (jacobian_computed)
         _system.elem_jacobian += old_elem_jacobian;
       else
-        _system.elem_jacobian.swap(old_elem_jacobian);
+        _system.elem_jacobian.zero();
     }
 
   return jacobian_computed;
