@@ -140,6 +140,18 @@ public:
        const DenseVector<T3>& vec);
 
   /**
+   * Tests if \p vec is exactly equal to this vector.
+   */
+  template <typename T2>
+  bool operator== (const DenseVector<T2> &vec) const;
+  
+  /**
+   * Tests if \p vec is not exactly equal to this vector.
+   */
+  template <typename T2>
+  bool operator!= (const DenseVector<T2> &vec) const;
+  
+  /**
    * Adds \p vec to this vector.
    */
   template <typename T2>
@@ -334,6 +346,38 @@ DenseVector<T>::add (const T2 factor,
 
   for (unsigned int i=0; i<this->size(); i++)
     (*this)(i) += factor*vec(i);
+}
+
+
+
+template<typename T>
+template<typename T2>
+inline
+bool DenseVector<T>::operator== (const DenseVector<T2>& vec) const
+{
+  libmesh_assert (this->size() == vec.size());
+
+  for (unsigned int i=0; i<this->size(); i++)
+    if ((*this)(i) != vec(i))
+      return false;
+
+  return true;
+}
+
+
+
+template<typename T>
+template<typename T2>
+inline
+bool DenseVector<T>::operator!= (const DenseVector<T2>& vec) const
+{
+  libmesh_assert (this->size() == vec.size());
+
+  for (unsigned int i=0; i<this->size(); i++)
+    if ((*this)(i) != vec(i))
+      return true;
+
+  return false;
 }
 
 

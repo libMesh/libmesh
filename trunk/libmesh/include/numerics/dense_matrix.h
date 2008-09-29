@@ -140,6 +140,16 @@ public:
             const DenseMatrix<T>& mat);
 
   /**
+   * Tests if \p mat is exactly equal to this matrix.
+   */
+  bool operator== (const DenseMatrix<T> &mat) const;
+
+  /**
+   * Tests if \p mat is not exactly equal to this matrix.
+   */
+  bool operator!= (const DenseMatrix<T> &mat) const;
+
+  /**
    * Adds \p mat to this matrix.
    */
   DenseMatrix<T>& operator+= (const DenseMatrix<T> &mat);
@@ -504,6 +514,32 @@ void DenseMatrix<T>::add (const T factor, const DenseMatrix<T>& mat)
 {
   for (unsigned int i=0; i<_val.size(); i++)
     _val[i] += factor * mat._val[i];
+}
+
+
+
+template<typename T>
+inline
+bool DenseMatrix<T>::operator == (const DenseMatrix<T> &mat) const
+{
+  for (unsigned int i=0; i<_val.size(); i++)
+    if (_val[i] != mat._val[i])
+      return false;
+
+  return true;
+}
+
+
+
+template<typename T>
+inline
+bool DenseMatrix<T>::operator != (const DenseMatrix<T> &mat) const
+{
+  for (unsigned int i=0; i<_val.size(); i++)
+    if (_val[i] != mat._val[i])
+      return true;
+
+  return false;
 }
 
 
