@@ -43,18 +43,21 @@ bool EulerSolver::element_residual (bool request_jacobian)
   theta_solution *= theta;
   theta_solution.add(1. - theta, old_elem_solution);
 
-  // If a fixed solution is requested, we'll use theta_solution
-  if (_system.use_fixed_solution)
-    {
-      _system.elem_fixed_solution = theta_solution;
+  // Technically the elem_solution_derivative is either theta
+  // or -1.0 in this implementation, but we scale the former part
+  // ourselves
+  _system.elem_solution_derivative = 1.0;
 
 // Technically the fixed_solution_derivative is always theta,
-// but we're scaling a whole jacobian by theta later
-//      _system.fixed_solution_derivative = theta;
-      _system.fixed_solution_derivative = 1.0;
-    }
+// but we're scaling a whole jacobian by theta after these first
+// evaluations
+  _system.fixed_solution_derivative = 1.0;
 
-  // Temporarily replace elem_solution with theta_solution
+  // If a fixed solution is requested, we'll use theta_solution
+  if (_system.use_fixed_solution)
+    _system.elem_fixed_solution = theta_solution;
+
+  // Move theta_->elem_, elem_->theta_
   _system.elem_solution.swap(theta_solution);
 
   // Move the mesh into place first if necessary
@@ -71,6 +74,7 @@ bool EulerSolver::element_residual (bool request_jacobian)
     }
   _system.elem_residual.zero();
 
+  // Get the time derivative at t_theta
   bool jacobian_computed =
     _system.element_time_derivative(request_jacobian);
 
@@ -83,49 +87,32 @@ bool EulerSolver::element_residual (bool request_jacobian)
   if (jacobian_computed)
     _system.elem_jacobian *= (theta * _system.deltat);
 
-  // If a fixed solution is requested, we'll use theta_solution
-  if (_system.use_fixed_solution)
-    {
-// The fixed_solution_derivative is always theta,
-// and now we're done scaling jacobians
-      _system.fixed_solution_derivative = theta;
-    }
+  // The fixed_solution_derivative is always theta,
+  // and now we're done scaling jacobians
+  _system.fixed_solution_derivative = theta;
 
-  // Add the mass term for the old solution
+  // We evaluate mass_residual with the change in solution
+  // to get the mass matrix, reusing old_elem_solution to hold that
+  // delta_solution.  We're solving dt*F(u) - du = 0, so our
+  // delta_solution is old_solution - new_solution.
+  // We're still keeping elem_solution in theta_solution for now
+  old_elem_solution -= theta_solution;
+
+  // Move old_->elem_, theta_->old_
   _system.elem_solution.swap(old_elem_solution);
 
-  // Move the mesh into place first if necessary
-  _system.elem_reinit(0.);
+  // We do a trick here to avoid using a non-1
+  // elem_solution_derivative:
+  _system.elem_jacobian *= -1.0;
+  jacobian_computed = _system.mass_residual(jacobian_computed) &&
+    jacobian_computed;
+  _system.elem_jacobian *= -1.0;
 
-  if (_system.use_fixed_solution)
-    {
-      _system.elem_solution_derivative = 0.0;
-      jacobian_computed = _system.mass_residual(jacobian_computed) &&
-        jacobian_computed;
-      _system.elem_solution_derivative = 1.0;
-    }
-  else
-    {
-      // FIXME - we should detect if mass_residual() edits
-      // elem_jacobian and lies about it!
-      _system.mass_residual(false);
-    }
-
-  // Restore the elem_solution
+  // Move elem_->elem_, old_->theta_
   _system.elem_solution.swap(theta_solution);
 
   // Restore the elem position if necessary
   _system.elem_reinit(1.);
-
-  // Subtract the mass term for the new solution
-  if (jacobian_computed)
-    _system.elem_jacobian *= -1.0;
-  _system.elem_residual *= -1.0;
-  jacobian_computed = _system.mass_residual(jacobian_computed) &&
-    jacobian_computed;
-  if (jacobian_computed)
-    _system.elem_jacobian *= -1.0;
-  _system.elem_residual *= -1.0;
 
   // Add the constraint term
   jacobian_computed = _system.element_constraint(jacobian_computed) &&
@@ -161,25 +148,28 @@ bool EulerSolver::side_residual (bool request_jacobian)
   theta_solution *= theta;
   theta_solution.add(1. - theta, old_elem_solution);
 
-  // If a fixed solution is requested, we'll use theta_solution
-  if (_system.use_fixed_solution)
-    {
-      _system.elem_fixed_solution = theta_solution;
+  // Technically the elem_solution_derivative is either theta
+  // or 1.0 in this implementation, but we scale the former part
+  // ourselves
+  _system.elem_solution_derivative = 1.0;
 
 // Technically the fixed_solution_derivative is always theta,
-// but we're scaling a whole jacobian by theta later
-//      _system.fixed_solution_derivative = theta;
-      _system.fixed_solution_derivative = 1.0;
-    }
+// but we're scaling a whole jacobian by theta after these first
+// evaluations
+  _system.fixed_solution_derivative = 1.0;
 
-  // Temporarily replace elem_solution with theta_solution
+  // If a fixed solution is requested, we'll use theta_solution
+  if (_system.use_fixed_solution)
+    _system.elem_fixed_solution = theta_solution;
+
+  // Move theta_->elem_, elem_->theta_
   _system.elem_solution.swap(theta_solution);
 
   // Move the mesh into place first if necessary
   _system.elem_side_reinit(theta);
 
-  // We're going to compute just the change in elem_residual,
-  // then add back the old elem_residual.
+  // We're going to compute just the change in elem_residual
+  // (and possibly elem_jacobian), then add back the old values
   DenseVector<Number> old_elem_residual(_system.elem_residual);
   DenseMatrix<Number> old_elem_jacobian;
   if (request_jacobian)
@@ -189,6 +179,7 @@ bool EulerSolver::side_residual (bool request_jacobian)
     }
   _system.elem_residual.zero();
 
+  // Get the time derivative at t_theta
   bool jacobian_computed =
     _system.side_time_derivative(request_jacobian);
 
@@ -197,49 +188,32 @@ bool EulerSolver::side_residual (bool request_jacobian)
   if (jacobian_computed)
     _system.elem_jacobian *= (theta * _system.deltat);
 
-  // If a fixed solution is requested, we'll use theta_solution
-  if (_system.use_fixed_solution)
-    {
-// The fixed_solution_derivative is always theta,
-// and now we're done scaling jacobians
-      _system.fixed_solution_derivative = theta;
-    }
+  // The fixed_solution_derivative is always theta,
+  // and now we're done scaling jacobians
+  _system.fixed_solution_derivative = theta;
 
-  // Add the mass term for the old solution
+  // We evaluate side_mass_residual with the change in solution
+  // to get the mass matrix, reusing old_elem_solution to hold that
+  // delta_solution.  We're solving dt*F(u) - du = 0, so our
+  // delta_solution is old_solution - new_solution.
+  // We're still keeping elem_solution in theta_solution for now
+  old_elem_solution -= theta_solution;
+
+  // Move old_->elem_, theta_->old_
   _system.elem_solution.swap(old_elem_solution);
 
-  // Move the mesh into place first if necessary
-  _system.elem_side_reinit(0.);
+  // We do a trick here to avoid using a non-1
+  // elem_solution_derivative:
+  _system.elem_jacobian *= -1.0;
+  jacobian_computed = _system.side_mass_residual(jacobian_computed) &&
+    jacobian_computed;
+  _system.elem_jacobian *= -1.0;
 
-  if (_system.use_fixed_solution)
-    {
-      _system.elem_solution_derivative = 0.0;
-      jacobian_computed = _system.side_mass_residual(jacobian_computed) &&
-        jacobian_computed;
-      _system.elem_solution_derivative = 1.0;
-    }
-  else
-    {
-      // FIXME - we should detect if mass_residual() edits
-      // elem_jacobian and lies about it!
-      _system.side_mass_residual(false);
-    }
-
-  // Restore the elem_solution
+  // Move elem_->elem_, old_->theta_
   _system.elem_solution.swap(theta_solution);
 
   // Restore the elem position if necessary
   _system.elem_side_reinit(1.);
-
-  // Subtract the mass term for the new solution
-  if (jacobian_computed)
-    _system.elem_jacobian *= -1.0;
-  _system.elem_residual *= -1.0;
-  jacobian_computed = _system.side_mass_residual(jacobian_computed) &&
-    jacobian_computed;
-  if (jacobian_computed)
-    _system.elem_jacobian *= -1.0;
-  _system.elem_residual *= -1.0;
 
   // Add the constraint term
   jacobian_computed = _system.side_constraint(jacobian_computed) &&
