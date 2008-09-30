@@ -76,6 +76,11 @@ public:
    * Initialize data structures if not done so already.
    */
   virtual void init ();
+
+  /**
+   * Returns the raw PETSc snes context pointer.
+   */
+  SNES snes() { this->init(); return _snes; }
   
   /**
    * Call the Petsc solver.  It calls the method below, using the
