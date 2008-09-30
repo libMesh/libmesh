@@ -761,12 +761,6 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
             }
           jacobian_computed = time_solver->side_residual(get_jacobian);
 
-          // Make sure nothing edited our jacobian and then lied about it
-#ifndef DEBUG
-          if (verify_analytic_jacobians != 0.0 && get_jacobian)
-#endif // ifndef DEBUG
-            libmesh_assert(jacobian_computed || (old_jacobian == elem_jacobian));
-
           // Compute a numeric jacobian if we have to
           if (get_jacobian && !jacobian_computed)
             {
