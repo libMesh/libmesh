@@ -56,11 +56,12 @@ bool Euler2Solver::element_residual (bool request_jacobian)
 
   // We're going to compute just the change in elem_residual
   // (and possibly elem_jacobian), then add back the old values
-  DenseVector<Number> old_elem_residual(_system.elem_residual);
-  DenseMatrix<Number> old_elem_jacobian;
+  DenseVector<Number> total_elem_residual(_system.elem_residual);
+  DenseMatrix<Number> old_elem_jacobian, total_elem_jacobian;
   if (request_jacobian)
     {
       old_elem_jacobian = _system.elem_jacobian;
+      total_elem_jacobian = _system.elem_jacobian;
       _system.elem_jacobian.zero();
     }
   _system.elem_residual.zero();
@@ -77,13 +78,13 @@ bool Euler2Solver::element_residual (bool request_jacobian)
 
   // Scale the new time-dependent residual and jacobian correctly
   _system.elem_residual *= (theta * _system.deltat);
-  old_elem_residual += _system.elem_residual;
+  total_elem_residual += _system.elem_residual;
   _system.elem_residual.zero();
 
   if (jacobian_computed)
     {
       _system.elem_jacobian *= (theta * _system.deltat);
-      old_elem_jacobian += _system.elem_jacobian;
+      total_elem_jacobian += _system.elem_jacobian;
       _system.elem_jacobian.zero();
     }
 
@@ -101,7 +102,7 @@ bool Euler2Solver::element_residual (bool request_jacobian)
     jacobian_computed;
 
   _system.elem_residual *= -theta;
-  old_elem_residual += _system.elem_residual;
+  total_elem_residual += _system.elem_residual;
   _system.elem_residual.zero();
 
   if (jacobian_computed)
@@ -109,7 +110,7 @@ bool Euler2Solver::element_residual (bool request_jacobian)
       // The minus sign trick here is to avoid using a non-1
       // elem_solution_derivative:
       _system.elem_jacobian *= -theta;
-      old_elem_jacobian += _system.elem_jacobian;
+      total_elem_jacobian += _system.elem_jacobian;
       _system.elem_jacobian.zero();
     }
 
@@ -131,11 +132,11 @@ bool Euler2Solver::element_residual (bool request_jacobian)
         jacobian_computed;
       _system.elem_solution_derivative = 1.0;
       _system.elem_residual *= ((1. - theta) * _system.deltat);
-      old_elem_residual += _system.elem_residual;
+      total_elem_residual += _system.elem_residual;
       if (jacobian_computed)
         {
           _system.elem_jacobian *= ((1. - theta) * _system.deltat);
-          old_elem_jacobian += _system.elem_jacobian;
+          total_elem_jacobian += _system.elem_jacobian;
           _system.elem_jacobian.zero();
         }
     }
@@ -146,7 +147,7 @@ bool Euler2Solver::element_residual (bool request_jacobian)
       _system.element_time_derivative(false);
       _system.eulerian_residual(false);
       _system.elem_residual *= ((1. - theta) * _system.deltat);
-      old_elem_residual += _system.elem_residual;
+      total_elem_residual += _system.elem_residual;
     }
 
   _system.elem_residual.zero();
@@ -160,7 +161,7 @@ bool Euler2Solver::element_residual (bool request_jacobian)
     jacobian_computed;
 
   _system.elem_residual *= -(1. - theta);
-  old_elem_residual += _system.elem_residual;
+  total_elem_residual += _system.elem_residual;
   _system.elem_residual.zero();
 
   if (jacobian_computed)
@@ -168,7 +169,7 @@ bool Euler2Solver::element_residual (bool request_jacobian)
       // The minus sign trick here is to avoid using a non-1
       // *_solution_derivative:
       _system.elem_jacobian *= -(1. - theta);
-      old_elem_jacobian += _system.elem_jacobian;
+      total_elem_jacobian += _system.elem_jacobian;
       _system.elem_jacobian.zero();
     }
 
@@ -184,11 +185,11 @@ bool Euler2Solver::element_residual (bool request_jacobian)
     jacobian_computed;
 
   // Add back the previously accumulated residual and jacobian
-  _system.elem_residual += old_elem_residual;
+  _system.elem_residual += total_elem_residual;
   if (request_jacobian)
     {
       if (jacobian_computed)
-        _system.elem_jacobian += old_elem_jacobian;
+        _system.elem_jacobian += total_elem_jacobian;
       else
         _system.elem_jacobian.swap(old_elem_jacobian);
     }
@@ -226,11 +227,12 @@ bool Euler2Solver::side_residual (bool request_jacobian)
 
   // We're going to compute just the change in elem_residual
   // (and possibly elem_jacobian), then add back the old values
-  DenseVector<Number> old_elem_residual(_system.elem_residual);
-  DenseMatrix<Number> old_elem_jacobian;
+  DenseVector<Number> total_elem_residual(_system.elem_residual);
+  DenseMatrix<Number> old_elem_jacobian, total_elem_jacobian;
   if (request_jacobian)
     {
       old_elem_jacobian = _system.elem_jacobian;
+      total_elem_jacobian = _system.elem_jacobian;
       _system.elem_jacobian.zero();
     }
   _system.elem_residual.zero();
@@ -243,13 +245,13 @@ bool Euler2Solver::side_residual (bool request_jacobian)
 
   // Scale the time-dependent residual and jacobian correctly
   _system.elem_residual *= (theta * _system.deltat);
-  old_elem_residual += _system.elem_residual;
+  total_elem_residual += _system.elem_residual;
   _system.elem_residual.zero();
 
   if (jacobian_computed)
     {
       _system.elem_jacobian *= (theta * _system.deltat);
-      old_elem_jacobian += _system.elem_jacobian;
+      total_elem_jacobian += _system.elem_jacobian;
       _system.elem_jacobian.zero();
     }
 
@@ -267,7 +269,7 @@ bool Euler2Solver::side_residual (bool request_jacobian)
     jacobian_computed;
 
   _system.elem_residual *= -theta;
-  old_elem_residual += _system.elem_residual;
+  total_elem_residual += _system.elem_residual;
   _system.elem_residual.zero();
 
   if (jacobian_computed)
@@ -275,7 +277,7 @@ bool Euler2Solver::side_residual (bool request_jacobian)
       // The minus sign trick here is to avoid using a non-1
       // elem_solution_derivative:
       _system.elem_jacobian *= -theta;
-      old_elem_jacobian += _system.elem_jacobian;
+      total_elem_jacobian += _system.elem_jacobian;
       _system.elem_jacobian.zero();
     }
 
@@ -295,11 +297,11 @@ bool Euler2Solver::side_residual (bool request_jacobian)
         jacobian_computed;
       _system.elem_solution_derivative = 1.0;
       _system.elem_residual *= ((1. - theta) * _system.deltat);
-      old_elem_residual += _system.elem_residual;
+      total_elem_residual += _system.elem_residual;
       if (jacobian_computed)
         {
           _system.elem_jacobian *= ((1. - theta) * _system.deltat);
-          old_elem_jacobian += _system.elem_jacobian;
+          total_elem_jacobian += _system.elem_jacobian;
           _system.elem_jacobian.zero();
         }
     }
@@ -309,7 +311,7 @@ bool Euler2Solver::side_residual (bool request_jacobian)
       // elem_jacobian and lies about it!
       _system.side_time_derivative(false);
       _system.elem_residual *= ((1. - theta) * _system.deltat);
-      old_elem_residual += _system.elem_residual;
+      total_elem_residual += _system.elem_residual;
     }
 
   _system.elem_residual.zero();
@@ -323,7 +325,7 @@ bool Euler2Solver::side_residual (bool request_jacobian)
     jacobian_computed;
 
   _system.elem_residual *= -(1. - theta);
-  old_elem_residual += _system.elem_residual;
+  total_elem_residual += _system.elem_residual;
   _system.elem_residual.zero();
 
   if (jacobian_computed)
@@ -331,7 +333,7 @@ bool Euler2Solver::side_residual (bool request_jacobian)
       // The minus sign trick here is to avoid using a non-1
       // *_solution_derivative:
       _system.elem_jacobian *= -(1. - theta);
-      old_elem_jacobian += _system.elem_jacobian;
+      total_elem_jacobian += _system.elem_jacobian;
       _system.elem_jacobian.zero();
     }
 
@@ -347,13 +349,13 @@ bool Euler2Solver::side_residual (bool request_jacobian)
     jacobian_computed;
 
   // Add back the previously accumulated residual and jacobian
-  _system.elem_residual += old_elem_residual;
+  _system.elem_residual += total_elem_residual;
   if (request_jacobian)
     {
       if (jacobian_computed)
-        _system.elem_jacobian += old_elem_jacobian;
+        _system.elem_jacobian += total_elem_jacobian;
       else
-        _system.elem_jacobian.zero();
+        _system.elem_jacobian.swap(old_elem_jacobian);
     }
 
   return jacobian_computed;
