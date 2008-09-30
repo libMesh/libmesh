@@ -761,6 +761,12 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
             }
           jacobian_computed = time_solver->side_residual(get_jacobian);
 
+          // Make sure nothing edited our jacobian and then lied about it
+#ifndef DEBUG
+          if (verify_analytic_jacobians != 0.0 && get_jacobian)
+#endif // ifndef DEBUG
+            libmesh_assert(jacobian_computed || (old_jacobian == elem_jacobian));
+
           // Compute a numeric jacobian if we have to
           if (get_jacobian && !jacobian_computed)
             {
@@ -999,6 +1005,9 @@ void FEMSystem::numerical_elem_jacobian ()
   DenseVector<Number> original_residual(elem_residual);
   DenseVector<Number> backwards_residual(elem_residual);
   DenseMatrix<Number> numerical_jacobian(elem_jacobian);
+#ifdef DEBUG
+  DenseMatrix<Number> old_jacobian(elem_jacobian);
+#endif
 
   for (unsigned int j = 0; j != dof_indices.size(); ++j)
     {
@@ -1032,6 +1041,9 @@ void FEMSystem::numerical_elem_jacobian ()
 
       elem_residual.zero();
       time_solver->element_residual(false);
+#ifdef DEBUG
+      libmesh_assert(old_jacobian == elem_jacobian);
+#endif
       backwards_residual = elem_residual;
 
       // Take the "plus" side of a central differenced first derivative
@@ -1040,6 +1052,9 @@ void FEMSystem::numerical_elem_jacobian ()
         *coord = libmesh_real(elem_solution(j));
       elem_residual.zero();
       time_solver->element_residual(false);
+#ifdef DEBUG
+      libmesh_assert(old_jacobian == elem_jacobian);
+#endif
 
       for (unsigned int i = 0; i != dof_indices.size(); ++i)
         {
@@ -1066,6 +1081,9 @@ void FEMSystem::numerical_side_jacobian ()
   DenseVector<Number> original_residual(elem_residual);
   DenseVector<Number> backwards_residual(elem_residual);
   DenseMatrix<Number> numerical_jacobian(elem_jacobian);
+#ifdef DEBUG
+  DenseMatrix<Number> old_jacobian(elem_jacobian);
+#endif
 
   for (unsigned int j = 0; j != dof_indices.size(); ++j)
     {
@@ -1099,6 +1117,9 @@ void FEMSystem::numerical_side_jacobian ()
 
       elem_residual.zero();
       time_solver->side_residual(false);
+#ifdef DEBUG
+      libmesh_assert(old_jacobian == elem_jacobian);
+#endif
       backwards_residual = elem_residual;
 
       // Take the "plus" side of a central differenced first derivative
@@ -1108,6 +1129,9 @@ void FEMSystem::numerical_side_jacobian ()
 
       elem_residual.zero();
       time_solver->side_residual(false);
+#ifdef DEBUG
+      libmesh_assert(old_jacobian == elem_jacobian);
+#endif
 
       for (unsigned int i = 0; i != dof_indices.size(); ++i)
         {
