@@ -72,9 +72,6 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
   /**
    * Re-create the boundary mesh.
    */
-  
-  std::map<unsigned int, unsigned int> new_node_numbers;
-  
   boundary_mesh.set_n_subdomains() = this->n_boundary_ids();
 
 
