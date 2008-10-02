@@ -69,7 +69,7 @@ public:
 
   virtual void reinit();
 
-  virtual void solve();
+  virtual void solve() = 0;
 
   virtual void advance_timestep();
 
@@ -179,9 +179,9 @@ protected:
   /**
    * A helper function to calculate error norms
    */
-  Real calculate_norm(System &, NumericVector<Number> &);
+  virtual Real calculate_norm(System &, NumericVector<Number> &);
 };
 
 
 
-#endif // #define __adaptive_time_solver_h__
+#endif // #define __adaptive_time_solver_
