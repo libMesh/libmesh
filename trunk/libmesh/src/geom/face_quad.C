@@ -122,7 +122,10 @@ bool Quad::is_child_on_side(const unsigned int c,
   libmesh_assert (c < this->n_children());
   libmesh_assert (s < this->n_sides());
 
-  return (c == s || c == (s+1)%4);
+  // A quad's children and nodes don't share the same ordering:
+  // child 2 and 3 are swapped;
+  unsigned int n = (c < 2) ? c : 5-c;
+  return (n == s || n == (s+1)%4);
 }
 
 
