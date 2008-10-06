@@ -15,8 +15,8 @@ AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type& s)
    max_growth(0.),
    global_tolerance(true)
 {
-  // We start with a reasonable time solver: implicit Eulerthe child class must populate core_time_solver
-  // with whatever actual time solver is to be used
+  // the child class must populate core_time_solver
+  // with whatever default time solver is to be used
 }
 
 
