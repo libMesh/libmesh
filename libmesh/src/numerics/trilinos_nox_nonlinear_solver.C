@@ -200,8 +200,8 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
   Teuchos::ParameterList& lsParams = newtonParams.sublist("Linear Solver");
   lsParams.set("Aztec Solver", "GMRES"); 
   lsParams.set("Max Iterations", 800); 
-  lsParams.set("Tolerance", 1e-3);
-  lsParams.set("Output Frequency", 100);	 
+  lsParams.set("Tolerance", 1e-10);
+  lsParams.set("Output Frequency", 1);	 
 //  lsParams.set("Preconditioner", "AztecOO");
   
   Teuchos::RCP<NOX::Epetra::Interface::Jacobian> iJac = MF;
