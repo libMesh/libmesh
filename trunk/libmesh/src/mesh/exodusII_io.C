@@ -57,8 +57,9 @@ ExodusII_IO::~ExodusII_IO ()
   libmesh_error();
     
 #else
-
-  exio_helper.close();
+  
+  if(libMesh::processor_id() == 0)
+    exio_helper.close();
   
 #endif
 }
@@ -275,6 +276,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
       int num_nodes = mesh.n_nodes();
   
       // FIXME: Will we ever _not_ need to do this?
+      // DRG: Yes... when writing multiple timesteps to the same file.
       if (!exio_helper.created())
 	{
 	  exio_helper.create(fname);
