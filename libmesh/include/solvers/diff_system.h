@@ -354,6 +354,9 @@ public:
   /**
    * A boolean to be set to true by systems using elem_fixed_solution,
    * so that the library code will create it.
+   * False by default.
+   * Warning: if this variable is set to true, it must be before init_data() is
+   * called.
    */
   bool use_fixed_solution;
 
