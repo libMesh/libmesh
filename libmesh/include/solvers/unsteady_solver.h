@@ -100,6 +100,11 @@ public:
   Number old_nonlinear_solution (const unsigned int global_dof_number) const;
 
   /**
+   * Serial vector of _system.get_vector("_old_nonlinear_solution")
+   */
+  AutoPtr<NumericVector<Number> > old_local_nonlinear_solution;
+
+  /**
    * Computes the size of ||u^{n+1} - u^{n}|| in some norm.
    * 
    * Note that, while you can always call this function, its
@@ -117,11 +122,6 @@ protected:
    * and false thereafter
    */
   bool first_solve;
-
-  /**
-   * Serial vector of _system.get_vector("_old_nonlinear_solution")
-   */
-  AutoPtr<NumericVector<Number> > old_local_nonlinear_solution;
 };
 
 
