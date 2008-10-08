@@ -160,6 +160,13 @@ AC_CHECK_SIZEOF(long int)
 AC_CHECK_SIZEOF(float)
 AC_CHECK_SIZEOF(double)
 AC_CHECK_SIZEOF(void *)
+dnl Check the size of a function pointer.  This is the same
+dnl as a void* on most systems which matter (POSIX).
+dnl It turns out that AC_CHECK_SIZEOF can't do this
+dnl automatically... so we use a kind of hack with the 3rd
+dnl argument to do it.
+AC_CHECK_SIZEOF([function_pointer], [], [typedef void (*function_pointer)();])
+dnl AC_CHECK_SIZEOF([void(*)(void)]) <-- Does not work! 
 
 
 
