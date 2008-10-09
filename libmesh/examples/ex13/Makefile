@@ -2,12 +2,12 @@
 
 
 # The location of the mesh library
-meshdir := ../..
+LIBMESH_DIR ?= ../..
 
 # include the library options determined by configure.  This will
 # set the variables INCLUDE and LIBS that we will need to build and
 # link with the library.
-include $(meshdir)/Make.common
+include $(LIBMESH_DIR)/Make.common
 
 
 ###############################################################################
@@ -76,7 +76,7 @@ include .depend
 # Dependencies
 #
 .depend:
-	@$(perl) $(meshdir)/contrib/bin/make_dependencies.pl -I. $(foreach i, $(wildcard $(meshdir)/include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
+	@$(perl) $(LIBMESH_DIR)/contrib/bin/make_dependencies.pl -I. $(foreach i, $(wildcard $(LIBMESH_DIR)/include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
 	@echo "Updated .depend"
 
 ###############################################################################
