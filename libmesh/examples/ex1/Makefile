@@ -55,13 +55,13 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESHRUN) $(target) -d 3 $(LIBMESH_DIR)/reference_elements/3D/one_hex27.xda $(LIBMESHOPTIONS)
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) -d 3 $(LIBMESH_DIR)/reference_elements/3D/one_hex27.xda $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESHRUN) $(target) -d 3 $(LIBMESH_DIR)/reference_elements/3D/one_hex27.xda $(LIBMESHOPTIONS)
+	@$(LIBMESH_RUN) $(target) -d 3 $(LIBMESH_DIR)/reference_elements/3D/one_hex27.xda $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESHRUN) $(target) -d 3 $(LIBMESH_DIR)/reference_elements/3D/one_hex27.xda $(LIBMESHOPTIONS)
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) -d 3 $(LIBMESH_DIR)/reference_elements/3D/one_hex27.xda $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 
 

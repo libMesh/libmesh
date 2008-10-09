@@ -56,15 +56,15 @@ distclean:
 # Warning, the 3D problem may be extremely slow if you are running in debug mode.
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESHRUN) $(target) -d 1 -n 20 $(LIBMESHOPTIONS)
-	@$(LIBMESHRUN) $(target) -d 2 -n 15 $(LIBMESHOPTIONS)
-	@$(LIBMESHRUN) $(target) -d 3 -n 6 $(LIBMESHOPTIONS)
+	@$(LIBMESH_RUN) $(target) -d 1 -n 20 $(LIBMESH_OPTIONS)
+	@$(LIBMESH_RUN) $(target) -d 2 -n 15 $(LIBMESH_OPTIONS)
+	@$(LIBMESH_RUN) $(target) -d 3 -n 6 $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 
 

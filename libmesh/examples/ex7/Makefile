@@ -60,13 +60,13 @@ distclean:
 ifeq ($(enable-complex),yes)
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESHRUN) $(target) -f .5 $(LIBMESHOPTIONS)
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) -f .5 $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESHRUN) $(target) -f .5 $(LIBMESHOPTIONS)
+	@$(LIBMESH_RUN) $(target) -f .5 $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESHRUN) $(target) -f .5 $(LIBMESHOPTIONS)
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) -f .5 $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 else
 run: $(target)

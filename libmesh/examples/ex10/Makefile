@@ -57,20 +57,20 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESHRUN) $(target) \[-read_solution\] -n_timesteps $(n_timesteps) -init_timestep \[0\|$(n_timesteps)\] $(LIBMESHOPTIONS)
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) \[-read_solution\] -n_timesteps $(n_timesteps) -init_timestep \[0\|$(n_timesteps)\] $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESHRUN) $(target) -n_timesteps $(n_timesteps) \
-                   -init_timestep 0 $(LIBMESHOPTIONS)
+	@$(LIBMESH_RUN) $(target) -n_timesteps $(n_timesteps) \
+                   -init_timestep 0 $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***** Finished first" $(n_timesteps) "steps, now read in" \
 	       "saved solution and continue *****"
 	@echo " "
-	@$(LIBMESHRUN) $(target) -read_solution -n_timesteps $(n_timesteps) \
-                   -init_timestep $(n_timesteps) $(LIBMESHOPTIONS)
+	@$(LIBMESH_RUN) $(target) -read_solution -n_timesteps $(n_timesteps) \
+                   -init_timestep $(n_timesteps) $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESHRUN) $(target) \[-read_solution\] -n_timesteps $(n_timesteps) -init_timestep \[0\|$(n_timesteps)\] $(LIBMESHOPTIONS)
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) \[-read_solution\] -n_timesteps $(n_timesteps) -init_timestep \[0\|$(n_timesteps)\] $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 
 
