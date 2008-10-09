@@ -57,14 +57,14 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@$(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@#./ex13_nonlinear -snes_ls cubic -snes_max_it 10 -ksp_rtol 1.e-3 -ksp_max_it 50 -ksp_xmonitor -ksp_gmres_restart 25 -snes_mf_operator -snes_view 
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 
 

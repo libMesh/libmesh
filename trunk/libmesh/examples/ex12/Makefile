@@ -55,13 +55,13 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESHRUN) $(target) -d 3 $(LIBMESH_DIR)/examples/ex8/pipe-mesh.unv $(LIBMESHOPTIONS)
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) -d 3 $(LIBMESH_DIR)/examples/ex8/pipe-mesh.unv $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESHRUN) $(target) -d 3 $(LIBMESH_DIR)/examples/ex8/pipe-mesh.unv $(LIBMESHOPTIONS)
+	@$(LIBMESH_RUN) $(target) -d 3 $(LIBMESH_DIR)/examples/ex8/pipe-mesh.unv $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 
 

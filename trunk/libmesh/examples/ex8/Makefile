@@ -59,13 +59,13 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESHRUN) $(target) pipe-mesh.unv $(LIBMESHOPTIONS)
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) pipe-mesh.unv $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESHRUN) $(target) pipe-mesh.unv $(LIBMESHOPTIONS)
+	@$(LIBMESH_RUN) $(target) pipe-mesh.unv $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESHRUN) $(target) pipe-mesh.unv $(LIBMESHOPTIONS)
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) pipe-mesh.unv $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 
 
