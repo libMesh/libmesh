@@ -940,28 +940,30 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 		  for (unsigned int n=0; n<elem->n_neighbors(); n++)
 		    if (elem->neighbor(n) != NULL &&      // I have a
 		        elem->neighbor(n) != remote_elem) // neighbor here
-		      if (elem->neighbor(n)->active()) // and it is active
-			{
-			  const Elem* neighbor = elem->neighbor(n);
+                      {
+		        if (elem->neighbor(n)->active()) // and it is active
+			  {
+			    const Elem* neighbor = elem->neighbor(n);
 			  
-			  if ((neighbor->level() == my_level) &&
-			      (neighbor->refinement_flag() == Elem::REFINE)) // the neighbor is at my level
-	        	                                                     // and wants to be refined
-			    {
-			      elem->set_refinement_flag(Elem::DO_NOTHING);
-                              my_flag_changed = true;
-                              break;
-			    }
-			}
-		      else // I have a neighbor and it is not active. That means it has children.
-			{  // While it _may_ be possible to coarsen us if all the children of
-			   // that element want to be coarsened, it is impossible to know at this
-			   // stage.  Forget about it for the moment...  This can be handled in
-			   // two steps.
-			  elem->set_refinement_flag(Elem::DO_NOTHING);
-			  my_flag_changed = true;
-                          break;
-			}
+			    if ((neighbor->level() == my_level) &&
+			        (neighbor->refinement_flag() == Elem::REFINE)) // the neighbor is at my level
+	        	                                                       // and wants to be refined
+			      {
+			        elem->set_refinement_flag(Elem::DO_NOTHING);
+                                my_flag_changed = true;
+                                break;
+			      }
+			  }
+		        else // I have a neighbor and it is not active. That means it has children.
+			  {  // While it _may_ be possible to coarsen us if all the children of
+			     // that element want to be coarsened, it is impossible to know at this
+			     // stage.  Forget about it for the moment...  This can be handled in
+			     // two steps.
+			    elem->set_refinement_flag(Elem::DO_NOTHING);
+			    my_flag_changed = true;
+                            break;
+			  }
+                      }
 		}
 	      if (elem->p_refinement_flag() == Elem::COARSEN) // If
                 // the element is active and the order reduction flag is set
@@ -971,49 +973,51 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 		  for (unsigned int n=0; n<elem->n_neighbors(); n++)
 		    if (elem->neighbor(n) != NULL &&      // I have a
 		        elem->neighbor(n) != remote_elem) // neighbor here
-		      if (elem->neighbor(n)->active()) // and it is active
-			{
-			  const Elem* neighbor = elem->neighbor(n);
+		      {
+		        if (elem->neighbor(n)->active()) // and it is active
+			  {
+			    const Elem* neighbor = elem->neighbor(n);
 
-                          if ((neighbor->p_level() > my_p_level &&
-                               neighbor->p_refinement_flag() != Elem::COARSEN)
-                              || (neighbor->p_level() == my_p_level &&
-                               neighbor->p_refinement_flag() == Elem::REFINE))
-			    {
-			      elem->set_p_refinement_flag(Elem::DO_NOTHING);
-			      my_flag_changed = true;
-                              break;
-			    }
-			}
-		      else // I have a neighbor and it is not active.
-			{  // We need to find which of its children
-                           // have me as a neighbor, and maintain
-                           // level one p compatibility with them.
-                           // Because we currently have level one h
-                           // compatibility, we don't need to check
-                           // grandchildren
-			  const Elem* neighbor = elem->neighbor(n);
+                            if ((neighbor->p_level() > my_p_level &&
+                                 neighbor->p_refinement_flag() != Elem::COARSEN)
+                                || (neighbor->p_level() == my_p_level &&
+                                 neighbor->p_refinement_flag() == Elem::REFINE))
+			      {
+			        elem->set_p_refinement_flag(Elem::DO_NOTHING);
+			        my_flag_changed = true;
+                                break;
+			      }
+			  }
+		        else // I have a neighbor and it is not active.
+			  {  // We need to find which of its children
+                             // have me as a neighbor, and maintain
+                             // level one p compatibility with them.
+                             // Because we currently have level one h
+                             // compatibility, we don't need to check
+                             // grandchildren
+			    const Elem* neighbor = elem->neighbor(n);
 
-                           libmesh_assert(neighbor->has_children());
-	                   for (unsigned int c=0; c!=neighbor->n_children(); c++)
-                             {
-                               Elem *subneighbor = neighbor->child(c);
-                               if (subneighbor != remote_elem &&
-                                   subneighbor->active() &&
-                                   subneighbor->has_neighbor(elem))
-                                 if ((subneighbor->p_level() > my_p_level &&
-                                     subneighbor->p_refinement_flag() != Elem::COARSEN)
-                                     || (subneighbor->p_level() == my_p_level &&
-                                     subneighbor->p_refinement_flag() == Elem::REFINE))
-			           {
-			             elem->set_p_refinement_flag(Elem::DO_NOTHING);
-			             my_flag_changed = true;
-                                     break;
-			           }
-                             }
-                           if (my_flag_changed)
-                             break;
-			}
+                             libmesh_assert(neighbor->has_children());
+	                     for (unsigned int c=0; c!=neighbor->n_children(); c++)
+                               {
+                                 Elem *subneighbor = neighbor->child(c);
+                                 if (subneighbor != remote_elem &&
+                                     subneighbor->active() &&
+                                     subneighbor->has_neighbor(elem))
+                                   if ((subneighbor->p_level() > my_p_level &&
+                                       subneighbor->p_refinement_flag() != Elem::COARSEN)
+                                       || (subneighbor->p_level() == my_p_level &&
+                                       subneighbor->p_refinement_flag() == Elem::REFINE))
+			             {
+			               elem->set_p_refinement_flag(Elem::DO_NOTHING);
+			               my_flag_changed = true;
+                                       break;
+			             }
+                               }
+                             if (my_flag_changed)
+                               break;
+			  }
+		      }
 		}
 		  
 	      // If the current element's flag changed, we hadn't
@@ -1280,53 +1284,57 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
                     Elem *neighbor = elem->neighbor(side);
 		    if (neighbor != NULL &&      // I have a
 		        neighbor != remote_elem) // neighbor here
-		      if (neighbor->active()) // and it is active
-		        {
-                          if (neighbor->p_level() < my_p_level &&
-                               neighbor->p_refinement_flag() != Elem::REFINE)
-			    {
-			      neighbor->set_p_refinement_flag(Elem::REFINE);
-			      level_one_satisfied = false;
-			      compatible_with_coarsening = false;
-			    }
-                           if (neighbor->p_level() == my_p_level &&
-                              neighbor->p_refinement_flag() == Elem::COARSEN)
-			    {
-			      neighbor->set_p_refinement_flag(Elem::DO_NOTHING);
-			      level_one_satisfied = false;
-			      compatible_with_coarsening = false;
-			    }
-		        } 
-		      else // I have an inactive neighbor
-		        {
-                           libmesh_assert(neighbor->has_children());
-	                   for (unsigned int c=0; c!=neighbor->n_children(); c++)
-                             {
-                               Elem *subneighbor = neighbor->child(c);
-                               if (subneighbor == remote_elem)
-                                 continue;
-                               if (subneighbor->active() &&
-                                   subneighbor->has_neighbor(elem))
-                                 if (subneighbor->p_level() < my_p_level &&
-                                     subneighbor->p_refinement_flag() != Elem::REFINE)
-			           {
-                                     // We should already be level one
-                                     // compatible
-                                     libmesh_assert(subneighbor->p_level() + 2u > 
-                                            my_p_level);
-			             subneighbor->set_p_refinement_flag(Elem::REFINE);
-			             level_one_satisfied = false;
-			             compatible_with_coarsening = false;
-			           }
-                                 if (subneighbor->p_level() == my_p_level &&
-                                     subneighbor->p_refinement_flag() == Elem::COARSEN)
-			           {
-			             subneighbor->set_p_refinement_flag(Elem::DO_NOTHING);
-			             level_one_satisfied = false;
-			             compatible_with_coarsening = false;
-			           }
-                             }
-		        } 
+		      {
+		        if (neighbor->active()) // and it is active
+		          {
+                            if (neighbor->p_level() < my_p_level &&
+                                neighbor->p_refinement_flag() != Elem::REFINE)
+			      {
+			        neighbor->set_p_refinement_flag(Elem::REFINE);
+			        level_one_satisfied = false;
+			        compatible_with_coarsening = false;
+			      }
+                            if (neighbor->p_level() == my_p_level &&
+                                neighbor->p_refinement_flag() == Elem::COARSEN)
+			      {
+			        neighbor->set_p_refinement_flag(Elem::DO_NOTHING);
+			        level_one_satisfied = false;
+			        compatible_with_coarsening = false;
+			      }
+		          } 
+		        else // I have an inactive neighbor
+		          {
+                            libmesh_assert(neighbor->has_children());
+	                    for (unsigned int c=0; c!=neighbor->n_children(); c++)
+                              {
+                                Elem *subneighbor = neighbor->child(c);
+                                if (subneighbor == remote_elem)
+                                  continue;
+                                if (subneighbor->active() &&
+                                    subneighbor->has_neighbor(elem))
+                                  {
+                                    if (subneighbor->p_level() < my_p_level &&
+                                        subneighbor->p_refinement_flag() != Elem::REFINE)
+			              {
+                                        // We should already be level one
+                                        // compatible
+                                        libmesh_assert(subneighbor->p_level() + 2u > 
+                                                       my_p_level);
+			                subneighbor->set_p_refinement_flag(Elem::REFINE);
+			                level_one_satisfied = false;
+			                compatible_with_coarsening = false;
+			              }
+                                    if (subneighbor->p_level() == my_p_level &&
+                                        subneighbor->p_refinement_flag() == Elem::COARSEN)
+			              {
+			                subneighbor->set_p_refinement_flag(Elem::DO_NOTHING);
+			                level_one_satisfied = false;
+			                compatible_with_coarsening = false;
+			              }
+                                  }
+                              }
+		          } 
+		      }
                   }
 	      }
             }
