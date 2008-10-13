@@ -875,6 +875,9 @@ bool Elem::is_child_on_edge(const unsigned int c,
 void Elem::family_tree (std::vector<const Elem*>& family,
 			const bool reset) const
 {
+  // The "family tree" doesn't include subactive elements
+  libmesh_assert(!this->subactive());
+
   // Clear the vector if the flag reset tells us to.
   if (reset)
     family.clear();
@@ -895,6 +898,9 @@ void Elem::family_tree (std::vector<const Elem*>& family,
 void Elem::active_family_tree (std::vector<const Elem*>& active_family,
 			       const bool reset) const
 {
+  // The "family tree" doesn't include subactive elements
+  libmesh_assert(!this->subactive());
+
   // Clear the vector if the flag reset tells us to.
   if (reset)
     active_family.clear();
@@ -913,10 +919,67 @@ void Elem::active_family_tree (std::vector<const Elem*>& active_family,
 
 
 
+void Elem::family_tree_by_side (std::vector<const Elem*>& family,
+                                const unsigned int s,
+                                const bool reset)  const
+{
+  // The "family tree" doesn't include subactive elements
+  libmesh_assert(!this->subactive());
+
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    family.clear();
+
+  libmesh_assert(s < this->n_sides());
+
+  // Add this element to the family tree.
+  family.push_back(this);
+
+  // Recurse into the elements children, if it has them.
+  // Do not clear the vector any more.
+  if (!this->active())
+    for (unsigned int c=0; c<this->n_children(); c++)
+      if (this->child(c)->is_child_on_side(c, s))
+        this->child(c)->family_tree_by_side (family, s, false);
+
+}
+
+
+
+void Elem::active_family_tree_by_side (std::vector<const Elem*>& family,
+                                       const unsigned int s,
+                                       const bool reset) const
+{
+  // The "family tree" doesn't include subactive elements
+  libmesh_assert(!this->subactive());
+
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    family.clear();
+
+  libmesh_assert(s < this->n_sides());
+
+  // Add an active element to the family tree.
+  if (this->active())
+    family.push_back(this);
+
+  // Or recurse into an ancestor element's children.
+  // Do not clear the vector any more.
+  else
+    for (unsigned int c=0; c<this->n_children(); c++)
+      if (this->child(c)->is_child_on_side(c, s))
+        this->child(c)->active_family_tree_by_side (family, s, false);
+}
+
+
+
 void Elem::family_tree_by_neighbor (std::vector<const Elem*>& family,
                                     const Elem* neighbor,
 			            const bool reset) const
 {
+  // The "family tree" doesn't include subactive elements
+  libmesh_assert(!this->subactive());
+
   // Clear the vector if the flag reset tells us to.
   if (reset)
     family.clear();
@@ -927,9 +990,9 @@ void Elem::family_tree_by_neighbor (std::vector<const Elem*>& family,
   // Add this element to the family tree.
   family.push_back(this);
 
-  // Recurse into the elements children, if it has them.
+  // Recurse into the elements children, if it's not active.
   // Do not clear the vector any more.
-  if (this->has_children())
+  if (!this->active())
     for (unsigned int c=0; c<this->n_children(); c++)
       {
         Elem *child = this->child(c);
@@ -945,6 +1008,9 @@ void Elem::family_tree_by_subneighbor (std::vector<const Elem*>& family,
                                        const Elem* subneighbor,
 			               const bool reset) const
 {
+  // The "family tree" doesn't include subactive elements
+  libmesh_assert(!this->subactive());
+
   // Clear the vector if the flag reset tells us to.
   if (reset)
     family.clear();
@@ -963,9 +1029,9 @@ void Elem::family_tree_by_subneighbor (std::vector<const Elem*>& family,
   if (neighbor == subneighbor)
     family.push_back(this);
 
-  // Recurse into the elements children, if it has them.
+  // Recurse into the elements children, if it's not active.
   // Do not clear the vector any more.
-  if (this->has_children())
+  if (!this->active())
     for (unsigned int c=0; c != this->n_children(); ++c)
       {
         Elem *child = this->child(c);
@@ -989,6 +1055,9 @@ void Elem::active_family_tree_by_neighbor (std::vector<const Elem*>& family,
                                            const Elem* neighbor,
 			                   const bool reset) const
 {
+  // The "family tree" doesn't include subactive elements
+  libmesh_assert(!this->subactive());
+
   // Clear the vector if the flag reset tells us to.
   if (reset)
     family.clear();
@@ -1003,7 +1072,7 @@ void Elem::active_family_tree_by_neighbor (std::vector<const Elem*>& family,
 
   // Or recurse into an ancestor element's children.
   // Do not clear the vector any more.
-  else if (this->has_children())
+  else if (!this->active())
     for (unsigned int c=0; c<this->n_children(); c++)
       {
         Elem *child = this->child(c);
