@@ -1454,7 +1454,7 @@ namespace Parallel
     // now resize r to hold the global data
     // on the receiving processor
     if (root_id == libMesh::processor_id())
-      r.resize(globalsize);
+      r.resize(globalsize/2);
 
     // and get the data from the remote processors
     const int ierr =
