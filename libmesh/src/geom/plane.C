@@ -155,7 +155,9 @@ bool Plane::on_surface (const Point& p) const
   // If the projection of that vector onto the
   // plane's normal is 0 then the point is in
   // the plane.
-  if (w.size_sq() < 1.e-12)
+  const Real proj = w * this->normal();
+
+  if (std::abs(proj) < 1.e-10)
     return true;
 
   return false;
