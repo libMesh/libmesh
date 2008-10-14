@@ -64,7 +64,21 @@ protected:
 	       const T zx=0.,
 	       const T zy=0.,
 	       const T zz=0.);
+
+  /**
+   * Constructor.  Assigns each vector to a different row of the
+   * tensor.  We're in LIBMESH_DIM space dimensions and so LIBMESH_DIM
+   * many vectors are needed.
+   */
+  template<typename T2>
+  TypeTensor(const TypeVector<T2>& vx);
   
+  template<typename T2>
+  TypeTensor(const TypeVector<T2>& vx, const TypeVector<T2> &vy);
+
+  template<typename T2>
+  TypeTensor(const TypeVector<T2>& vx, const TypeVector<T2> &vy, const TypeVector<T2> &vz);
+
 public:
 
   /**
@@ -222,6 +236,13 @@ public:
   Real size_sq() const;
 
   /**
+   * Returns the determinant of the tensor.  Because these are 3x3
+   * tensors at most, we don't do an LU decomposition like DenseMatrix
+   * does.
+   */
+  T det() const;
+
+  /**
    * Zero the tensor in any dimension.
    */
   void zero();
@@ -321,6 +342,43 @@ TypeTensor<T>::TypeTensor (const TypeTensor <T2> &p)
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
     _coords[i] = p._coords[i];
 }
+
+
+template <typename T>
+template <typename T2>
+TypeTensor<T>::TypeTensor(const TypeVector<T2>& vx)
+{
+  libmesh_assert(LIBMESH_DIM == 1);
+  _coords[0] = vx(0);
+}
+  
+template <typename T>
+template <typename T2>
+TypeTensor<T>::TypeTensor(const TypeVector<T2>& vx, const TypeVector<T2> &vy)
+{
+  libmesh_assert(LIBMESH_DIM == 2);
+  _coords[0] = vx(0);
+  _coords[1] = vx(1);
+  _coords[2] = vy(0);
+  _coords[3] = vy(1);
+}
+
+template <typename T>
+template <typename T2>
+TypeTensor<T>::TypeTensor(const TypeVector<T2>& vx, const TypeVector<T2> &vy, const TypeVector<T2> &vz)
+{
+  libmesh_assert(LIBMESH_DIM == 3);
+  _coords[0] = vx(0);
+  _coords[1] = vx(1);
+  _coords[2] = vx(2);
+  _coords[3] = vy(0);
+  _coords[4] = vy(1);
+  _coords[5] = vy(2);
+  _coords[6] = vz(0);
+  _coords[7] = vz(1);
+  _coords[8] = vz(2);
+}
+
 
 
 
@@ -760,6 +818,31 @@ inline
 Real TypeTensor<T>::size() const
 {
   return std::sqrt(this->size_sq());  
+}
+
+
+
+template <typename T>
+inline
+T TypeTensor<T>::det() const
+{
+#if LIBMESH_DIM == 1
+  return _coords[0];
+#endif
+
+#if LIBMESH_DIM == 2
+  return (_coords[0] * _coords[3]
+	  - _coords[1] * _coords[2]);
+#endif
+
+#if LIBMESH_DIM == 3
+  return (_coords[0] * _coords[4] * _coords[8]
+	  + _coords[1] * _coords[5] * _coords[6]
+	  + _coords[2] * _coords[3] * _coords[7]
+	  - _coords[0] * _coords[5] * _coords[7]
+	  - _coords[1] * _coords[3] * _coords[8]
+	  - _coords[2] * _coords[4] * _coords[6]);
+#endif
 }
 
 
