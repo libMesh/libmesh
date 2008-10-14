@@ -55,6 +55,25 @@ public:
 		const T zx=0.,
 		const T zy=0.,
 		const T zz=0.);
+
+  /**
+   * Constructor.  Takes 1 row vector for LIBMESH_DIM=1
+   */
+  template <typename T2>
+  TensorValue (const TypeVector<T2>& vx);
+
+  /**
+   * Constructor.  Takes 2 row vectors for LIBMESH_DIM=2
+   */
+  template <typename T2>
+  TensorValue (const TypeVector<T2>& vx, const TypeVector<T2>& vy);
+
+  /**
+   * Constructor.  Takes 3 row vectors for LIBMESH_DIM=3
+   */
+  template <typename T2>
+  TensorValue (const TypeVector<T2>& vx, const TypeVector<T2>& vy, const TypeVector<T2>& vz);
+
   
   /**
    * Copy-constructor.
@@ -122,6 +141,39 @@ template <typename T2>
 inline
 TensorValue<T>::TensorValue (const TensorValue<T2>& p) :
   TypeTensor<T> (p)
+{
+}
+
+
+
+template <typename T>
+template <typename T2>
+inline
+TensorValue<T>::TensorValue (const TypeVector<T2>& vx) :
+  TypeTensor<T> (vx)
+{
+}
+
+
+
+template <typename T>
+template <typename T2>
+inline
+TensorValue<T>::TensorValue (const TypeVector<T2>& vx,
+			     const TypeVector<T2>& vy) :
+  TypeTensor<T> (vx, vy)
+{
+}
+
+
+
+template <typename T>
+template <typename T2>
+inline
+TensorValue<T>::TensorValue (const TypeVector<T2>& vx,
+			     const TypeVector<T2>& vy,
+			     const TypeVector<T2>& vz) :
+  TypeTensor<T> (vx, vy, vz)
 {
 }
 
