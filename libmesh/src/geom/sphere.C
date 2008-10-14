@@ -24,6 +24,7 @@
 
 
 // Local includes
+#include "tensor_value.h"
 #include "sphere.h"
 
 
@@ -52,6 +53,49 @@ Sphere::Sphere (const Sphere& other_sphere) :
 {
   this->create_from_center_radius (other_sphere.center(),
 				   other_sphere.radius());
+}
+
+
+
+Sphere::Sphere(const Point& pa,
+	       const Point& pb,
+	       const Point& pc,
+	       const Point& pd)
+{
+  Point pad = pa - pd;
+  Point pbd = pb - pd;
+  Point pcd = pc - pd;
+
+  TensorValue<Real> T(pad,pbd,pcd);
+
+  Real D = T.det();
+
+  // The points had better not be coplanar
+  libmesh_assert (std::abs(D) > 1e-12);
+
+  Real e = 0.5*(pa.size_sq() - pd.size_sq());
+  Real f = 0.5*(pb.size_sq() - pd.size_sq());
+  Real g = 0.5*(pc.size_sq() - pd.size_sq());
+
+  TensorValue<Real> T1(e,pad(1),pad(2),
+		       f,pbd(1),pbd(2),
+		       g,pcd(1),pcd(2));
+  Real sx = T1.det()/D;
+
+  TensorValue<Real> T2(pad(0),e,pad(2),
+		       pbd(0),f,pbd(2),
+		       pcd(0),g,pcd(2));
+  Real sy = T2.det()/D;
+
+  TensorValue<Real> T3(pad(0),pad(1),e,
+		       pbd(0),pbd(1),f,
+		       pcd(0),pcd(1),g);
+  Real sz = T3.det()/D;
+
+  Point c(sx,sy,sz);
+  Real r = (c-pa).size();
+
+  this->create_from_center_radius(c,r);
 }
 
 
