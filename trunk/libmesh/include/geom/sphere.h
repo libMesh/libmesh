@@ -86,6 +86,11 @@ public:
   Sphere (const Point& c, const Real r);
 
   /**
+   * Constructs a sphere connecting four points
+   */
+  Sphere (const Point&, const Point&, const Point&, const Point&);
+
+  /**
    * Copy-constructor.
    */
   Sphere (const Sphere& other_sphere);
