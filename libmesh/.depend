@@ -4065,6 +4065,8 @@ src/geom/sphere.$(obj-suffix):\
     include/geom/point.h\
     include/geom/sphere.h\
     include/geom/surface.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
@@ -5445,6 +5447,39 @@ src/mesh/patch.$(obj-suffix):\
     include/geom/node.h\
     include/geom/point.h\
     include/mesh/patch.h\
+    include/numerics/type_vector.h\
+    include/parallel/threads.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/mesh/postscript_io.$(obj-suffix):\
+    src/mesh/postscript_io.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/geom/elem.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_output.h\
+    include/mesh/mesh_tools.h\
+    include/mesh/postscript_io.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/utils/compare_types.h\
