@@ -9,8 +9,8 @@
 
 UnsteadySolver::UnsteadySolver (sys_type& s)
   : TimeSolver(s),
-    first_solve                  (true),
-    old_local_nonlinear_solution (NumericVector<Number>::build())
+    old_local_nonlinear_solution (NumericVector<Number>::build()),
+    first_solve                  (true)
 {
 }
 
