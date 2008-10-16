@@ -956,6 +956,8 @@ void FEMSystem::mesh_position_set()
 
           elem_subsolutions[i]->reposition
             (sub_dofs, dof_indices_var[i].size());
+
+          sub_dofs += dof_indices_var[i].size();
         }
 
       this->elem_position_set(0.);
