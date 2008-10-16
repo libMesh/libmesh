@@ -293,7 +293,7 @@ double PerfData::pause ()
 {
   // save the start times, reuse the structure we have rather than create
   // a new one.
-  const double
+  const time_t
     tstart_tv_sec  = this->tstart.tv_sec,
     tstart_tv_usec = this->tstart.tv_usec;
   
