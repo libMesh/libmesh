@@ -903,6 +903,67 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
 
 
+void FEMSystem::solve()
+{
+  Parent::solve();
+
+  this->mesh_position_set();
+}
+
+
+
+void FEMSystem::mesh_position_set()
+{
+  // If we don't need to move the mesh, we're done
+  if (_mesh_sys != this->number())
+    return;
+
+  const MeshBase& mesh = this->get_mesh();
+
+  const DofMap& dof_map = this->get_dof_map();
+
+  // This code won't work on a parallelized mesh yet -
+  // it won't get ancestor elements right.
+  libmesh_assert(mesh.is_serial());
+  
+  // Move every mesh element we can
+  MeshBase::const_element_iterator el =
+    mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end_el =
+    mesh.active_elements_end();
+
+  for ( ; el != end_el; ++el)
+    {
+      elem = *el;
+
+      // This code won't handle moving subactive elements
+      libmesh_assert(!elem->has_children());
+
+      // Initialize the per-element data for elem.
+      dof_map.dof_indices (elem, dof_indices);
+      unsigned int n_dofs = dof_indices.size();
+
+      elem_solution.resize(n_dofs);
+
+      for (unsigned int i=0; i != n_dofs; ++i)
+        elem_solution(i) = current_solution(dof_indices[i]);
+
+      // Initialize the per-variable data for elem.
+      unsigned int sub_dofs = 0;
+      for (unsigned int i=0; i != this->n_vars(); ++i)
+        {
+          dof_map.dof_indices (elem, dof_indices_var[i], i);
+
+          elem_subsolutions[i]->reposition
+            (sub_dofs, dof_indices_var[i].size());
+        }
+
+      this->elem_position_set(0.);
+    }
+}
+
+
+
 void FEMSystem::postprocess ()
 {
   START_LOG("postprocess()", "FEMSystem");
@@ -1159,7 +1220,7 @@ void FEMSystem::mesh_z_position (unsigned int sysnum, unsigned int var)
 
 
 
-void FEMSystem::initialize_mesh_variables ()
+void FEMSystem::mesh_position_get()
 {
   // This function makes no sense unless we've already picked out some
   // variable(s) to reflect mesh position coordinates
