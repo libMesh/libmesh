@@ -59,7 +59,15 @@ class PostscriptIO : public MeshOutput<MeshBase>
    */
   virtual void write (const std::string& );
   
-  
+  /**
+   * Controls greyscale shading of cells.  By default this value
+   * is 0.0 (which actually corresponds to black) and this indicates
+   * "no shading" i.e. only mesh lines will be drawn.  Any other
+   * value in (0,1] will cause the cells to be grey-shaded to some
+   * degree, with higher values being lighter.  A value of 0.75
+   * gives decent results.
+   */
+  Real shade_value;
 };
 
 #endif // #ifndef __postscript_io_h__

@@ -26,8 +26,11 @@
 #include "elem.h"
 
 PostscriptIO::PostscriptIO (const MeshBase& mesh)
-  : MeshOutput<MeshBase> (mesh)
+  : MeshOutput<MeshBase> (mesh),
+    shade_value(0.0)
 {
+  // This code is still undergoing some development.
+  untested();
 }
 
 
@@ -140,6 +143,11 @@ void PostscriptIO::write (const std::string& fname)
       // use this temporary Point object.
       Point current_point;
 
+      // Shading-independent data for drawing a single cell.  This can be
+      // used to draw each cell twice, once for a filled cell and once for
+      // black edges.
+      std::ostringstream cell_string;
+	
       // Loop over the active elements, draw lines for the edges.  We
       // draw even quadratic elements with straight sides, i.e. a straight
       // line sits between each pair of vertices.  Also we draw every edge
@@ -150,33 +158,42 @@ void PostscriptIO::write (const std::string& fname)
       for ( ; el != end_el; ++el)
 	{
 	  const Elem* elem = *el;
+
+	  // Clear the string contents.  Yes, this really is how you do that...
+	  cell_string.str("");
 	  
 	  // The general strategy is:
 	  // 1.) Use m  := {moveto} to go to vertex 0.
 	  // 2.) Use l  := {lineto} commands to draw lines to vertex 1, 2, ... N-1.
-	  // 3.) Use lx := {lineto closepath stroke} command on vertex N to draw the last line.
+	  // 3a.) Use lx := {lineto closepath stroke} command at  vertex N to draw the last line.
+	  // 3b.)     lf := {lineto closepath fill} command to shade the cell just drawn 
 	  // All of our 2D elements' vertices are numbered in counterclockwise order,
 	  // so we can just draw them in the same order.
-	  
+
 	  // 1.)
 	  current_point = (elem->point(0) - offset) * scale;
-	  out << "0 sg ";
-	  out << current_point(0) << " " << current_point(1) << " "; // write x y 
-	  out << "m ";
+	  cell_string << current_point(0) << " " << current_point(1) << " "; // write x y 
+	  cell_string << "m ";
 
 	  // 2.)
 	  const unsigned int nv=elem->n_vertices();
 	  for (unsigned int v=1; v<nv-1; ++v)
 	    {
 	      current_point = (elem->point(v) - offset) * scale;
-	      out << current_point(0) << " " << current_point(1) << " "; // write x y 
-	      out << "l ";
+	      cell_string << current_point(0) << " " << current_point(1) << " "; // write x y 
+	      cell_string << "l ";
 	    }
 	  
 	  // 3.)
 	  current_point = (elem->point(nv-1) - offset) * scale;
-	  out << current_point(0) << " " << current_point(1) << " "; // write x y 
-	  out << "lx\n";
+	  cell_string << current_point(0) << " " << current_point(1) << " "; // write x y 
+
+	  // We draw the shaded (interior) parts first, if applicable.
+	  if (shade_value > 0.0)
+	    out << shade_value << " sg " << cell_string.str() << "lf\n";
+	  
+	  // Draw the black lines (I guess we will always do this)
+	  out << "0 sg " << cell_string.str() << "lx\n";
 	}
       
       // Issue the showpage command, and we're done.
