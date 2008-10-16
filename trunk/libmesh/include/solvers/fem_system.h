@@ -97,6 +97,16 @@ public:
   virtual void assembly (bool get_residual, bool get_jacobian);
 
   /**
+   * Invokes the solver associated with the system.  For steady state
+   * solvers, this will find a root x where F(x) = 0.  For transient
+   * solvers, this will integrate dx/dt = F(x).
+   *
+   * For moving mesh systems, this also translates the mesh to the
+   * solution position.
+   */
+  virtual void solve ();
+
+  /**
    * Tells the FEMSystem that variable \p var is evolving with
    * respect to time.  In general, the user's init() function
    * should call time_evolving() for any variables which
@@ -141,7 +151,13 @@ public:
    * Tells the FEMSystem to set the degree of freedom coefficients
    * which should correspond to mesh nodal coordinates.
    */
-  void initialize_mesh_variables();
+  void mesh_position_get();
+
+  /**
+   * Tells the FEMSystem to set the mesh nodal coordinates
+   * which should correspond to degree of freedom coefficients.
+   */
+  void mesh_position_set();
 
   /**
    * Adds a pseudo-convection contribution on \p elem to
