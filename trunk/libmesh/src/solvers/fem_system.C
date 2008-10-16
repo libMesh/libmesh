@@ -14,6 +14,8 @@
 
 
 
+
+
 FEMSystem::FEMSystem (EquationSystems& es,
                       const std::string& name,
                       const unsigned int number)
@@ -992,9 +994,10 @@ void FEMSystem::postprocess ()
 
 
 
-void FEMSystem::numerical_elem_jacobian ()
+void FEMSystem::numerical_jacobian (TimeSolverResPtr res)
 {
-  START_LOG("numerical_elem_jacobian()", "FEMSystem");
+  // Logging is done by numerical_elem_jacobian
+  // or numerical_side_jacobian
 
   DenseVector<Number> original_residual(elem_residual);
   DenseVector<Number> backwards_residual(elem_residual);
@@ -1002,6 +1005,10 @@ void FEMSystem::numerical_elem_jacobian ()
 #ifdef DEBUG
   DenseMatrix<Number> old_jacobian(elem_jacobian);
 #endif
+
+  Real numerical_point_h;
+  if (_mesh_sys == this->number())
+    numerical_point_h = numerical_jacobian_h * elem->hmin();
 
   for (unsigned int j = 0; j != dof_indices.size(); ++j)
     {
@@ -1031,10 +1038,15 @@ void FEMSystem::numerical_elem_jacobian ()
                 coord = &(elem->point(k)(2));
         }
       if (coord)
-        *coord = libmesh_real(elem_solution(j));
+        {
+          // We have enough information to scale the perturbations
+          // here appropriately
+          elem_solution(j) = original_solution - numerical_point_h;
+          *coord = libmesh_real(elem_solution(j));
+        }
 
       elem_residual.zero();
-      time_solver->element_residual(false);
+      ((*time_solver).*(res))(false);
 #ifdef DEBUG
       libmesh_assert(old_jacobian == elem_jacobian);
 #endif
@@ -1043,26 +1055,48 @@ void FEMSystem::numerical_elem_jacobian ()
       // Take the "plus" side of a central differenced first derivative
       elem_solution(j) = original_solution + numerical_jacobian_h;
       if (coord)
-        *coord = libmesh_real(elem_solution(j));
+        {
+          elem_solution(j) = original_solution + numerical_point_h;
+          *coord = libmesh_real(elem_solution(j));
+        }
       elem_residual.zero();
-      time_solver->element_residual(false);
+      ((*time_solver).*(res))(false);
 #ifdef DEBUG
       libmesh_assert(old_jacobian == elem_jacobian);
 #endif
 
-      for (unsigned int i = 0; i != dof_indices.size(); ++i)
-        {
-          numerical_jacobian(i,j) =
-            (elem_residual(i) - backwards_residual(i)) /
-            2. / numerical_jacobian_h;
-        }
       elem_solution(j) = original_solution;
       if (coord)
-        *coord = libmesh_real(elem_solution(j));
+        {
+          *coord = libmesh_real(elem_solution(j));
+          for (unsigned int i = 0; i != dof_indices.size(); ++i)
+            {
+              numerical_jacobian(i,j) =
+                (elem_residual(i) - backwards_residual(i)) /
+                2. / numerical_point_h;
+            }
+        }
+      else
+        {
+          for (unsigned int i = 0; i != dof_indices.size(); ++i)
+            {
+              numerical_jacobian(i,j) =
+                (elem_residual(i) - backwards_residual(i)) /
+                2. / numerical_jacobian_h;
+            }
+        }
     }
 
   elem_residual = original_residual;
   elem_jacobian = numerical_jacobian;
+}
+
+
+
+void FEMSystem::numerical_elem_jacobian ()
+{
+  START_LOG("numerical_elem_jacobian()", "FEMSystem");
+  this->numerical_jacobian(&TimeSolver::element_residual);
   STOP_LOG("numerical_elem_jacobian()", "FEMSystem");
 }
 
@@ -1071,75 +1105,7 @@ void FEMSystem::numerical_elem_jacobian ()
 void FEMSystem::numerical_side_jacobian ()
 {
   START_LOG("numerical_side_jacobian()", "FEMSystem");
-
-  DenseVector<Number> original_residual(elem_residual);
-  DenseVector<Number> backwards_residual(elem_residual);
-  DenseMatrix<Number> numerical_jacobian(elem_jacobian);
-#ifdef DEBUG
-  DenseMatrix<Number> old_jacobian(elem_jacobian);
-#endif
-
-  for (unsigned int j = 0; j != dof_indices.size(); ++j)
-    {
-      // Take the "minus" side of a central differenced first derivative
-      Number original_solution = elem_solution(j);
-      elem_solution(j) -= numerical_jacobian_h;
-
-      // Make sure to catch any moving mesh terms
-      // FIXME - this could be less ugly
-      Real *coord = NULL;
-      if (_mesh_sys == this->number())
-        {
-          if (_mesh_x_var != libMesh::invalid_uint)
-            for (unsigned int k = 0;
-                 k != dof_indices_var[_mesh_x_var].size(); ++k)
-              if (dof_indices_var[_mesh_x_var][k] == dof_indices[j])
-                coord = &(elem->point(k)(0));
-          if (_mesh_y_var != libMesh::invalid_uint)
-            for (unsigned int k = 0;
-                 k != dof_indices_var[_mesh_y_var].size(); ++k)
-              if (dof_indices_var[_mesh_y_var][k] == dof_indices[j])
-                coord = &(elem->point(k)(1));
-          if (_mesh_z_var != libMesh::invalid_uint)
-            for (unsigned int k = 0;
-                 k != dof_indices_var[_mesh_z_var].size(); ++k)
-              if (dof_indices_var[_mesh_z_var][k] == dof_indices[j])
-                coord = &(elem->point(k)(2));
-        }
-      if (coord)
-        *coord = libmesh_real(elem_solution(j));
-
-      elem_residual.zero();
-      time_solver->side_residual(false);
-#ifdef DEBUG
-      libmesh_assert(old_jacobian == elem_jacobian);
-#endif
-      backwards_residual = elem_residual;
-
-      // Take the "plus" side of a central differenced first derivative
-      elem_solution(j) = original_solution + numerical_jacobian_h;
-      if (coord)
-        *coord = libmesh_real(elem_solution(j));
-
-      elem_residual.zero();
-      time_solver->side_residual(false);
-#ifdef DEBUG
-      libmesh_assert(old_jacobian == elem_jacobian);
-#endif
-
-      for (unsigned int i = 0; i != dof_indices.size(); ++i)
-        {
-          numerical_jacobian(i,j) +=
-            (elem_residual(i) - backwards_residual(i))
-            / 2. / numerical_jacobian_h;
-        }
-      elem_solution(j) = original_solution;
-      if (coord)
-        *coord = libmesh_real(elem_solution(j));
-    }
-
-  elem_residual = original_residual;
-  elem_jacobian = numerical_jacobian;
+  this->numerical_jacobian(&TimeSolver::side_residual);
   STOP_LOG("numerical_side_jacobian()", "FEMSystem");
 }
 

@@ -367,6 +367,18 @@ protected:
    */
   void elem_side_fe_reinit();
 
+  
+  /**
+   * Syntax sugar to make numerical_jacobian() declaration easier.
+   */
+  typedef bool (TimeSolver::*TimeSolverResPtr)(bool);
+
+  /**
+   * Uses the results of multiple \p res calls
+   * to numerically differentiate the corresponding jacobian.
+   */
+  void numerical_jacobian (TimeSolverResPtr res);
+
   /**
    * Uses the results of multiple element_residual() calls
    * to numerically differentiate the corresponding jacobian
