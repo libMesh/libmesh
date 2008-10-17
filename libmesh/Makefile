@@ -216,16 +216,16 @@ doc:
 # is different than whatever $USER is.
 #
 ifeq (x$(LIBMESH_SVN_USER),x) #unset
-  upload_name=$(USER)@
+  upload_name=$(USER),libmesh@
 else
-  upload_name=$(LIBMESH_SVN_USER)@
+  upload_name=$(LIBMESH_SVN_USER),libmesh@
 endif
 
 upload:
 	chmod -R g+w ./doc/html/* ./doc/latex/*/*
-	rsync -rltzve ssh --exclude '.svn' ./doc/html/ $(upload_name)libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs
-	rsync -rltzve ssh --exclude '.svn' ./doc/latex/howto $(upload_name)libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
-	rsync -rltzve ssh --exclude '.svn' ./doc/latex/xda_format $(upload_name)libmesh.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+	rsync -rltzve ssh --exclude '.svn' ./doc/html/ $(upload_name)web.sourceforge.net:/home/groups/l/li/libmesh/htdocs
+	rsync -rltzve ssh --exclude '.svn' ./doc/latex/howto $(upload_name)web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+	rsync -rltzve ssh --exclude '.svn' ./doc/latex/xda_format $(upload_name)web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
 	chmod -R g-w ./doc/html/* ./doc/latex/*/*
 
 
