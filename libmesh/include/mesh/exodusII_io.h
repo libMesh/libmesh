@@ -86,7 +86,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * If we read in a nodal solution while reading in a mesh, we can attempt
    * to copy that nodal solution into an EquationSystems object.
    */
-  void copy_nodal_solution(System& es, std::string nodal_var_name);
+  void copy_nodal_solution(System& es, std::string nodal_var_name, unsigned int timestep=1);
 
   /**
    * Write out a nodal solution.
