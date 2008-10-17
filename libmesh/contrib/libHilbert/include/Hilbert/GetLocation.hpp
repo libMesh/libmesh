@@ -42,21 +42,21 @@ namespace Hilbert
 		l = 0;
     switch ( jn )
     {
-#define GETLOC_CASE(i)		case (i+1): if (p[jo+i].racks()[ir]&im) l|=(FBV1<<i)
+#define GETLOC_CASE(i)		case ((i)+1): if (p[jo+(i)].racks()[ir]&im) l|=(FBV1<<(i))
 #define GETLOC_CASE2(i) \
-			GETLOC_CASE(i+1); \
+			GETLOC_CASE((i)+1); \
 			GETLOC_CASE(i)
 #define GETLOC_CASE4(i) \
-			GETLOC_CASE2(i+2); \
+			GETLOC_CASE2((i)+2); \
 			GETLOC_CASE2(i)
 #define GETLOC_CASE8(i) \
-			GETLOC_CASE4(i+4); \
+			GETLOC_CASE4((i)+4); \
 			GETLOC_CASE4(i)
 #define GETLOC_CASE16(i) \
-			GETLOC_CASE8(i+8); \
+			GETLOC_CASE8((i)+8); \
 			GETLOC_CASE8(i)
 #define GETLOC_CASE32(i) \
-			GETLOC_CASE16(i+16); \
+			GETLOC_CASE16((i)+16); \
 			GETLOC_CASE16(i)
 #if FBV_BITS == 64
 			GETLOC_CASE32(32);
