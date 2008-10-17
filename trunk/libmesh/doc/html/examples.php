@@ -241,6 +241,8 @@ library with the --enable-ifem option</i>
 <!-- example 13 can be solved using the DiffSystem class framework to -->
 <!-- simplify the user-implemented equations. -->
 
+<li><L1><a href="ex19.php">Solving the 2D Young Laplace Problem using nonlinear solvers</a></L1></li>
+
 </ul>
 
 </div>
