@@ -32,6 +32,10 @@
  // for the Newton iterations. Here, we just approximate 
  // the true Jacobian by K(x).
  //
+ // You can turn on preconditining of the matrix free system using the
+ // jacobian by passing "-pre" on the command line.  Currently this only
+ // work with Petsc so this isn't used by using "make run"
+ //
  // This example also runs with the experimental Trilinos NOX solvers by specifying 
  // the --use-trilinos command line argument.
  
@@ -62,6 +66,10 @@
 #include "nonlinear_solver.h"
 #include "nonlinear_implicit_system.h"
 
+// Necessary for programmatically setting petsc options
+#ifdef LIBMESH_HAVE_PETSC
+#include <petsc.h>
+#endif
 
 // A reference to our equation system
 EquationSystems *_equation_system = NULL;
@@ -434,6 +442,19 @@ int main (int argc, char** argv)
 	std::cout << "ex19 currently requires a C^0 (or higher) FE basis." << std::endl;
 	error();
       }
+
+    if ( command_line.search(1, "-pre") )
+      {
+#ifdef LIBMESH_HAVE_PETSC
+        //Use the jacobian for preconditioning.
+        PetscOptionsSetValue("-snes_mf_operator",PETSC_NULL);
+#else
+        std::cerr<<"Must be using PetsC to use jacobian based preconditioning"<<std::endl;
+
+        //returning zero so that "make run" won't fail if we ever enable this capability there.
+        return 0;
+#endif //LIBMESH_HAVE_PETSC
+      }  
       
     // Create a mesh with user-defined dimension.
     Mesh mesh (dim);    
