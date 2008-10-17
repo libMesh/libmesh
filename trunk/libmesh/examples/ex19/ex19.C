@@ -1,0 +1,496 @@
+/* $Id: ex4.C 2501 2007-11-20 02:33:29Z benkirk $ */
+
+/* The Next Great Finite Element Library. */
+/* Copyright (C) 2003  Benjamin S. Kirk */
+
+/* This library is free software; you can redistribute it and/or */
+/* modify it under the terms of the GNU Lesser General Public */
+/* License as published by the Free Software Foundation; either */
+/* version 2.1 of the License, or (at your option) any later version. */
+
+/* This library is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
+/* Lesser General Public License for more details. */
+
+/* You should have received a copy of the GNU Lesser General Public */
+/* License along with this library; if not, write to the Free Software */
+/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+
+
+
+ // <h1>Example 19 - Solving the 2D Young Laplace Problem using nonlinear solvers</h1>
+ //
+ // This example shows how to use the NonlinearImplicitSystem class
+ // to efficiently solve nonlinear problems in parallel.
+ //
+ // In nonlinear systems, we aim at finding x that satisfy R(x) = 0. 
+ // In nonlinear finite element analysis, the residual is typically 
+ // of the form R(x) = K(x)*x - f, with K(x) the system matrix and f 
+ // the "right-hand-side". The NonlinearImplicitSystem class expects  
+ // two callback functions to compute the residual R and its Jacobian 
+ // for the Newton iterations. Here, we just approximate 
+ // the true Jacobian by K(x).
+ //
+ // This example also runs with the experimental Trilinos NOX solvers by specifying 
+ // the --use-trilinos command line argument.
+ 
+
+// C++ include files that we need
+#include <iostream>
+#include <algorithm>
+#include <cmath>
+
+// Various include files needed for the mesh & solver functionality.
+#include "libmesh.h"
+#include "mesh.h"
+#include "mesh_refinement.h"
+#include "gmv_io.h"
+#include "equation_systems.h"
+#include "fe.h"
+#include "quadrature_gauss.h"
+#include "dof_map.h"
+#include "sparse_matrix.h"
+#include "numeric_vector.h"
+#include "dense_matrix.h"
+#include "dense_vector.h"
+#include "elem.h"
+#include "string_to_enum.h"
+#include "getpot.h"
+
+// The nonlinear solver and system we will be using
+#include "nonlinear_solver.h"
+#include "nonlinear_implicit_system.h"
+
+
+// A reference to our equation system
+EquationSystems *_equation_system = NULL;
+
+// Let-s define the physical parameters of the equation
+const Real kappa = 1.;
+const Real sigma = 0.2;
+
+
+// This function computes the Jacobian K(x)
+void compute_jacobian (const NumericVector<Number>& soln,
+		       SparseMatrix<Number>&  jacobian)
+{
+  // Get a reference to the equation system.
+  EquationSystems &es = *_equation_system;
+
+  // Get a constant reference to the mesh object.
+  const MeshBase& mesh = es.get_mesh();
+
+  // The dimension that we are running
+  const unsigned int dim = mesh.mesh_dimension();
+
+  // Get a reference to the NonlinearImplicitSystem we are solving
+  NonlinearImplicitSystem& system = 
+    es.get_system<NonlinearImplicitSystem>("Laplace-Young");
+  
+  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // object handles the index translation from node and element numbers
+  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // in future examples.
+  const DofMap& dof_map = system.get_dof_map();
+
+  // Get a constant reference to the Finite Element type
+  // for the first (and only) variable in the system.
+  FEType fe_type = dof_map.variable_type(0);
+
+  // Build a Finite Element object of the specified type.  Since the
+  // \p FEBase::build() member dynamically creates memory we will
+  // store the object as an \p AutoPtr<FEBase>.  This can be thought
+  // of as a pointer that will clean up after itself.
+  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+  
+  // A 5th order Gauss quadrature rule for numerical integration.
+  QGauss qrule (dim, FIFTH);
+
+  // Tell the finite element object to use our quadrature rule.
+  fe->attach_quadrature_rule (&qrule);
+
+  // Here we define some references to cell-specific data that
+  // will be used to assemble the linear system.
+  // We begin with the element Jacobian * quadrature weight at each
+  // integration point.   
+  const std::vector<Real>& JxW = fe->get_JxW();
+
+  // The element shape functions evaluated at the quadrature points.
+  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  
+  // The element shape function gradients evaluated at the quadrature
+  // points.
+  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+
+  // Define data structures to contain the Jacobian element matrix.
+  // Following basic finite element terminology we will denote these
+  // "Ke". More detail is in example 3.
+  DenseMatrix<Number> Ke;
+
+  // This vector will hold the degree of freedom indices for
+  // the element.  These define where in the global system
+  // the element degrees of freedom get mapped.
+  std::vector<unsigned int> dof_indices;
+
+  // Now we will loop over all the elements in the mesh.
+  // We will compute the element Jacobian contribution.
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+  for ( ; el != end_el; ++el)
+    {
+      // Store a pointer to the element we are currently
+      // working on.  This allows for nicer syntax later.
+      const Elem* elem = *el;
+
+      // Get the degree of freedom indices for the
+      // current element.  These define where in the global
+      // matrix and right-hand-side this element will
+      // contribute to.
+      dof_map.dof_indices (elem, dof_indices);
+
+      // Compute the element-specific data for the current
+      // element.  This involves computing the location of the
+      // quadrature points (q_point) and the shape functions
+      // (phi, dphi) for the current element.
+      fe->reinit (elem);
+
+      // Zero the element Jacobian before
+      // summing them.  We use the resize member here because
+      // the number of degrees of freedom might have changed from
+      // the last element.  Note that this will be the case if the
+      // element type is different (i.e. the last element was a
+      // triangle, now we are on a quadrilateral).
+      Ke.resize (dof_indices.size(),
+		 dof_indices.size());
+           
+      // Now we will build the element Jacobian.  This involves
+      // a double loop to integrate the test funcions (i) against
+      // the trial functions (j). Note that the Jacobian depends
+      // on the current solution x, which we access using the soln
+      // vector.
+      //
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+	{
+	  RealGradient grad_u = 0;
+    
+	  for (unsigned int i=0; i<phi.size(); i++)
+	    grad_u += dphi[i][qp]*soln(dof_indices[i]);
+	  
+	  const Real K = 1./std::sqrt(1. + grad_u*grad_u);
+	  
+	  for (unsigned int i=0; i<phi.size(); i++)
+	    for (unsigned int j=0; j<phi.size(); j++)
+	      Ke(i,j) += JxW[qp]*(
+				  K*(dphi[i][qp]*dphi[j][qp]) +
+				  kappa*phi[i][qp]*phi[j][qp]
+				  );
+	}
+      
+      dof_map.constrain_element_matrix (Ke, dof_indices);
+      
+      // Add the element matrix to the system Jacobian.
+      jacobian.add_matrix (Ke, dof_indices);
+    }
+
+  // That's it.
+}
+
+
+// Here we compute the residual R(x) = K(x)*x - f. The current solution
+// x is passed in the soln vector
+void compute_residual (const NumericVector<Number>& soln,
+		       NumericVector<Number>& residual)
+{
+  EquationSystems &es = *_equation_system;
+
+  // Get a constant reference to the mesh object.
+  const MeshBase& mesh = es.get_mesh();
+
+  // The dimension that we are running
+  const unsigned int dim = mesh.mesh_dimension();
+  libmesh_assert (dim == 2);
+
+  // Get a reference to the NonlinearImplicitSystem we are solving
+  NonlinearImplicitSystem& system = 
+    es.get_system<NonlinearImplicitSystem>("Laplace-Young");
+  
+  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // object handles the index translation from node and element numbers
+  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // in future examples.
+  const DofMap& dof_map = system.get_dof_map();
+
+  // Get a constant reference to the Finite Element type
+  // for the first (and only) variable in the system.
+  FEType fe_type = dof_map.variable_type(0);
+
+  // Build a Finite Element object of the specified type.  Since the
+  // \p FEBase::build() member dynamically creates memory we will
+  // store the object as an \p AutoPtr<FEBase>.  This can be thought
+  // of as a pointer that will clean up after itself.
+  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+  
+  // A 5th order Gauss quadrature rule for numerical integration.
+  QGauss qrule (dim, FIFTH);
+
+  // Tell the finite element object to use our quadrature rule.
+  fe->attach_quadrature_rule (&qrule);
+
+  // Declare a special finite element object for
+  // boundary integration.
+  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+	      
+  // Boundary integration requires one quadraure rule,
+  // with dimensionality one less than the dimensionality
+  // of the element.
+  QGauss qface(dim-1, FIFTH);
+  
+  // Tell the finte element object to use our
+  // quadrature rule.
+  fe_face->attach_quadrature_rule (&qface);
+
+  // Here we define some references to cell-specific data that
+  // will be used to assemble the linear system.
+  // We begin with the element Jacobian * quadrature weight at each
+  // integration point.   
+  const std::vector<Real>& JxW = fe->get_JxW();
+
+  // The element shape functions evaluated at the quadrature points.
+  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  
+  // The element shape function gradients evaluated at the quadrature
+  // points.
+  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+
+  // Define data structures to contain the resdual contributions
+  DenseVector<Number> Re;
+
+  // This vector will hold the degree of freedom indices for
+  // the element.  These define where in the global system
+  // the element degrees of freedom get mapped.
+  std::vector<unsigned int> dof_indices;
+
+  // Now we will loop over all the elements in the mesh.
+  // We will compute the element residual.
+  residual.zero();
+
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+  for ( ; el != end_el; ++el)
+    {
+      // Store a pointer to the element we are currently
+      // working on.  This allows for nicer syntax later.
+      const Elem* elem = *el;
+
+      // Get the degree of freedom indices for the
+      // current element.  These define where in the global
+      // matrix and right-hand-side this element will
+      // contribute to.
+      dof_map.dof_indices (elem, dof_indices);
+
+      // Compute the element-specific data for the current
+      // element.  This involves computing the location of the
+      // quadrature points (q_point) and the shape functions
+      // (phi, dphi) for the current element.
+      fe->reinit (elem);
+
+      // We use the resize member here because
+      // the number of degrees of freedom might have changed from
+      // the last element.  Note that this will be the case if the
+      // element type is different (i.e. the last element was a
+      // triangle, now we are on a quadrilateral).
+      Re.resize (dof_indices.size());
+      
+      // Now we will build the residual. This involves
+      // the construction of the matrix K and multiplication of it
+      // with the current solution x. We rearrange this into two loops: 
+      // In the first, we calculate only the contribution of  
+      // K_ij*x_j which is independent of the row i. In the second loops,
+      // we multiply with the row-dependent part and add it to the element
+      // residual.
+
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+	{
+	  Real u = 0;
+	  RealGradient grad_u = 0;
+	  
+	  for (unsigned int j=0; j<phi.size(); j++)
+	    {
+	      u      += phi[j][qp]*soln(dof_indices[j]);
+	      grad_u += dphi[j][qp]*soln(dof_indices[j]);
+	    }
+	  
+	  const Real K = 1./std::sqrt(1. + grad_u*grad_u);
+	  
+	  for (unsigned int i=0; i<phi.size(); i++)
+	    Re(i) += JxW[qp]*(
+			      K*(dphi[i][qp]*grad_u) +
+			      kappa*phi[i][qp]*u
+			      );
+	}
+
+      // At this point the interior element integration has
+      // been completed.  However, we have not yet addressed
+      // boundary conditions.
+      
+      // The following loops over the sides of the element.
+      // If the element has no neighbor on a side then that
+      // side MUST live on a boundary of the domain.
+      for (unsigned int side=0; side<elem->n_sides(); side++)
+	if (elem->neighbor(side) == NULL)
+	  {
+	    // The value of the shape functions at the quadrature
+	    // points.
+	    const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+
+	    // The Jacobian * Quadrature Weight at the quadrature
+	    // points on the face.
+	    const std::vector<Real>& JxW_face = fe_face->get_JxW();
+
+	    // Compute the shape function values on the element face.
+	    fe_face->reinit(elem, side);
+
+	    // Loop over the face quadrature points for integration.
+	    for (unsigned int qp=0; qp<qface.n_points(); qp++)
+	      {
+		// This is the right-hand-side contribution (f),
+                // which has to be subtracted from the current residual
+		for (unsigned int i=0; i<phi_face.size(); i++)
+		  Re(i) -= JxW_face[qp]*sigma*phi_face[i][qp];
+	      } 
+	  }
+      
+      dof_map.constrain_element_vector (Re, dof_indices);
+      residual.add_vector (Re, dof_indices);
+    }
+
+  // That's it.  
+}
+
+
+
+// Begin the main program.
+int main (int argc, char** argv)
+{
+  // Initialize libMesh and any dependent libaries, like in example 2.
+  LibMeshInit init (argc, argv);
+ 
+  // Braces are used to force object scope, like in example 2
+  {
+    // Create a GetPot object to parse the command line
+    GetPot command_line (argc, argv);
+    
+    // Check for proper calling arguments.
+    if (argc < 3)
+      {
+        if (libMesh::processor_id() == 0)
+	  std::cerr << "Usage:\n"
+		    <<"\t " << argv[0] << " -r 2"
+		    << std::endl;
+
+	// This handy function will print the file name, line number,
+	// and then abort.  Currrently the library does not use C++
+	// exception handling.
+	error();
+      }
+    
+    // Brief message to the user regarding the program name
+    // and command line arguments.
+    else 
+      {
+	std::cout << "Running " << argv[0];
+	
+	for (int i=1; i<argc; i++)
+	  std::cout << " " << argv[i];
+	
+	std::cout << std::endl << std::endl;
+      }
+    
+
+    // The dimension of our problem 
+    const unsigned int dim = 2;
+    
+    // Read number of refinements 
+    int nr = 2;
+    if ( command_line.search(1, "-r") )
+      nr = command_line.next(nr);
+    
+    // Read FE order from command line
+    std::string order = "FIRST"; 
+    if ( command_line.search(2, "-Order", "-o") )
+      order = command_line.next(order);
+
+    // Read FE Family from command line
+    std::string family = "LAGRANGE"; 
+    if ( command_line.search(2, "-FEFamily", "-f") )
+      family = command_line.next(family);
+    
+    // Cannot use dicontinuous basis.
+    if ((family == "MONOMIAL") || (family == "XYZ"))
+      {
+	std::cout << "ex19 currently requires a C^0 (or higher) FE basis." << std::endl;
+	error();
+      }
+      
+    // Create a mesh with user-defined dimension.
+    Mesh mesh (dim);    
+    mesh.read ("lshaped.xda");
+
+    if (order != "FIRST")
+      mesh.all_second_order();
+
+    MeshRefinement(mesh).uniformly_refine(nr);
+
+    // Print information about the mesh to the screen.
+    mesh.print_info();    
+    
+    // Create an equation systems object.
+    EquationSystems equation_systems (mesh);
+    _equation_system = &equation_systems;
+    
+    // Declare the system and its variables.
+    {
+      // Creates a system named "Laplace-Young"
+      NonlinearImplicitSystem& system =
+	equation_systems.add_system<NonlinearImplicitSystem> ("Laplace-Young");
+
+
+      // Here we specify the tolerance for the nonlinear solver and 
+      // the maximum of nonlinear iterations. 
+      equation_systems.parameters.set<Real>         ("nonlinear solver tolerance")          = 1.e-12;
+      equation_systems.parameters.set<unsigned int> ("nonlinear solver maximum iterations") = 50;
+
+      
+      // Adds the variable "u" to "Laplace-Young".  "u"
+      // will be approximated using second-order approximation.
+      system.add_variable("u",
+			  Utility::string_to_enum<Order>   (order),
+			  Utility::string_to_enum<FEFamily>(family));
+
+      // Give the system a pointer to the functions that update 
+      // the residual and Jacobian.
+      
+      system.nonlinear_solver->residual = compute_residual;
+      system.nonlinear_solver->jacobian = compute_jacobian;
+
+      // Initialize the data structures for the equation system.
+      equation_systems.init();
+
+      // Prints information about the system to the screen.
+      equation_systems.print_info();
+    }
+    
+    // Solve the system "Laplace-Young"
+    equation_systems.get_system("Laplace-Young").solve();
+
+    // After solving the system write the solution
+    GMVIO (mesh).write_equation_systems ("out.gmv", 
+					 equation_systems);
+  }
+  
+  // All done. 
+  return 0; 
+}
