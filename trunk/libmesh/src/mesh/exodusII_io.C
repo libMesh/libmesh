@@ -226,7 +226,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
   exio_helper.get_time_steps();
 
   //For now just read the first timestep (1)
-  const std::vector<double> & nodal_values = exio_helper.get_nodal_var_values(nodal_var_name,1);
+  const std::vector<double> & nodal_values = exio_helper.get_nodal_var_values(nodal_var_name,2);
 
 
   //const DofMap & dof_map = system.get_dof_map();
@@ -283,6 +283,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 	  exio_helper.initialize(fname,mesh);
 	  exio_helper.write_nodal_coordinates(mesh);
 	  exio_helper.write_elements(mesh);
+          exio_helper.write_sidesets(mesh);
 	  exio_helper.initialize_nodal_variables(names);
 	}
     
@@ -359,6 +360,7 @@ void ExodusII_IO::write (const std::string& fname)
       exio_helper.initialize(fname,mesh);
       exio_helper.write_nodal_coordinates(mesh);
       exio_helper.write_elements(mesh);
+      exio_helper.write_sidesets(mesh);
 
       // Note: the file is closed automatically by the ExodusII_IO destructor.
     }

@@ -382,6 +382,11 @@ public:
   void write_elements(const MeshBase & mesh);
 
   /**
+   * Writes the sidesets contained in "mesh"
+   */
+  void write_sidesets(const MeshBase & mesh);
+
+  /**
    * Sets up the nodal variables
    */
   void initialize_nodal_variables(std::vector<std::string> names);
@@ -516,9 +521,10 @@ public:
    * Constructor.  Initializes the const private member
    * variables.
    */
-  Conversion(const int* nm, const int* sm, const ElemType ct, std::string ex_type) 
+  Conversion(const int* nm, const int* sm, const int* ism, const ElemType ct, std::string ex_type) 
     : node_map(nm),       // Node map for this element
       side_map(sm),
+      inverse_side_map(ism),
       canonical_type(ct),    // Element type name in this code
       exodus_type(ex_type)   // Element type in Exodus
   {}
@@ -536,6 +542,13 @@ public:
    * format to this library's format.
    */
   int get_side_map(int i)          const { return side_map[i]; }
+
+  /**
+   * Returns the ith component of the side map for this
+   * element.  The side map maps the libMesh side numbering
+   * format to this exodus's format.
+   */
+  int get_inverse_side_map(int i)          const { return inverse_side_map[i]; }
 
   /**
    * Returns the canonical element type for this
@@ -560,6 +573,11 @@ private:
    * Pointer to the side map for this element.
    */
   const int* side_map;
+
+  /**
+   * Pointer to the inverse side map for this element.
+   */
+  const int* inverse_side_map;
 
   /**
    * The canonical (i.e. standard for this library)
@@ -644,7 +662,17 @@ public:
    */
   static const int quad_edge_map[4]; 
 
-      
+  /**
+   * Maps the Exodus edge numbering for triangles.
+   * Useful for writing sideset information.
+   */ 
+  static const int tri_inverse_edge_map[3]; 
+
+  /**
+   * Maps the Exodus edge numbering for quadrilaterals.
+   * Useful for writing sideset information.
+   */
+  static const int quad_inverse_edge_map[4];
       
   /**
    * 3D maps.  These define
@@ -744,7 +772,37 @@ public:
    * Useful for reading sideset information.
    */
   static const int pyramid_face_map[5];
+
+    /**
+   * Maps the Exodus face numbering for general hexahedrals.
+   * Useful for writing sideset information.
+   */
+  static const int hex_inverse_face_map[6];
       
+  /**
+   * Maps the Exodus face numbering for 27-noded hexahedrals.
+   * Useful for writing sideset information.
+   */
+  static const int hex27_inverse_face_map[6];
+      
+  /**
+   * Maps the Exodus face numbering for general tetrahedrals.
+   * Useful for writing sideset information.
+   */
+  static const int tet_inverse_face_map[4];
+      
+  /**
+   * Maps the Exodus face numbering for general prisms.
+   * Useful for writing sideset information.
+   */
+  static const int prism_inverse_face_map[5];
+      
+  /**
+   * Maps the Exodus face numbering for general pyramids.
+   * Useful for writing sideset information.
+   */
+  static const int pyramid_inverse_face_map[5];
+
 
   /**
    * @returns a conversion object given an element type name.
