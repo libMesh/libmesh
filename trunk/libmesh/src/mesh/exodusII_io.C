@@ -219,15 +219,13 @@ void ExodusII_IO::copy_nodal_solution(System& , std::string)
 
 #else
 
-void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name)
+void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name, unsigned int timestep)
 {
   // FIXME: Do we need to call get_time_steps() at all?
   /*const std::vector<double>& time_steps = */
   exio_helper.get_time_steps();
 
-  //For now just read the first timestep (1)
-  const std::vector<double> & nodal_values = exio_helper.get_nodal_var_values(nodal_var_name,2);
-
+  const std::vector<double> & nodal_values = exio_helper.get_nodal_var_values(nodal_var_name,timestep);
 
   //const DofMap & dof_map = system.get_dof_map();
 
