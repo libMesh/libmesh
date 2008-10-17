@@ -659,7 +659,9 @@ void UnstructuredMesh::write (const std::string& name,
 	
 	else if (new_name.rfind(".ugrid") < new_name.size())
 	  DivaIO(*this).write(new_name);
-    
+        else if (new_name.rfind(".exd") < new_name.size() ||
+                 new_name.rfind(".e") < new_name.size())
+          ExodusII_IO(*this).write(new_name);
 	else if (new_name.rfind(".mgf")  < new_name.size())
 	  LegacyXdrIO(*this,true).write_mgf(new_name);
 	
@@ -699,6 +701,8 @@ void UnstructuredMesh::write (const std::string& name,
 		      << "     *.ucd   -- AVS's ASCII UCD format\n"
 		      << "     *.ugrid -- Kelly's DIVA ASCII format\n"
 		      << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
+                      << "     *.exd   -- Sandia's ExodusII format\n"
+                      << "     *.e     -- Sandia's ExodusII format\n"
 		      << "     *.xda   -- Internal ASCII format\n"
 		      << "     *.xdr   -- Internal binary format,\n"
 		      << "                compatible with XdrMGF\n"
