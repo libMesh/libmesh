@@ -96,6 +96,8 @@ bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
   if( _solver->residual == NULL )
     return false;
   _solver->residual (*sys.current_local_solution.get(), R);
+  R.close();
+  X_global.close();
   return true;
 }
 
