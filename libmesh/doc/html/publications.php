@@ -40,10 +40,24 @@ vol. 22, no. 3--4, pp. 237--254, 2006. 	 (<a href="http://cfdlab.ae.utexas.edu/~
 
 <ul>
 
+<li>
+Benjamin S. Kirk,
+<i>A Multidimensional Thermal Analysis to Assess Modeling Error in High-Speed Wind Tunnel Heat Transfer Data Reduction Schemes.</i>
+<a href="http://www.aiaa.org/content.cfm?pageid=322&lupubid=26">AIAA Journal of Thermophysics and Heat Transfer</a>,
+accepted, October 2008.
+</li>
+
+<br>
 <li> Roy H. Stogner,
 <i>Parallel Adaptive C1 Macro-Elements for Nonlinear Thin Film and Non-Newtonian Flow Problems.</i>
 <a href="http://www.cfdlab.ae.utexas.edu/~roystgnr/dissertation/dissertation-stogner.pdf">PhD Dissertation</a>, 
 The University of Texas at Austin, August 2008. 
+</li>
+
+<br>
+<li>
+  Benjamin S. Kirk, Graham F. Carey, 
+  <i>A Parallel, Adaptive Finite Element Scheme for Modeling Chemotactic Biological Systems.</i>,  <a href="http://dx.doi.org/10.1002/cnm.1173">CNME</a>, accepted. (<a href="http://cfdlab.ae.utexas.edu/~benkirk/2008_chemotaxis_CNME.pdf">preprint</a>)
 </li>
 
 <br>
@@ -58,12 +72,6 @@ The University of Texas at Austin, May 2008.
 <i>Adaptive Finite Element Simulation of Flow and Transport Applications on Parallel Computers.</i>
 <a href="http://www.cfdlab.ae.utexas.edu/~benkirk/dissertation.pdf">PhD Dissertation</a>, 
 The University of Texas at Austin, May 2007. 
-</li>
-
-<br>
-<li>
-  Benjamin S. Kirk, Graham F. Carey, 
-  <i>A Parallel, Adaptive Finite Element Scheme for Modeling Chemotactic Biological Systems</i>, submitted. (<a href="http://cfdlab.ae.utexas.edu/~benkirk/2008_chemotaxis_CNME.pdf">preprint</a>)
 </li>
 
 <br>
