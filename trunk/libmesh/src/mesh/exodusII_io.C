@@ -137,6 +137,8 @@ void ExodusII_IO::read (const std::string& fname)
   // Read in the element connectivity for each block.
   int nelem_last_block = 0;
 
+  std::map<int, unsigned int> exodus_id_to_mesh_id;
+
   // Loop over all the blocks
   for (int i=0; i<exio_helper.get_num_elem_blk(); i++)
     {
@@ -159,6 +161,8 @@ void ExodusII_IO::read (const std::string& fname)
           elem->subdomain_id() = subdomain_id;
           //elem->set_id(j);// Don't try to second guess the Element ID setting scheme!
 	  elem = mesh.add_elem (elem); // Catch the Elem pointer that the Mesh throws back
+
+          exodus_id_to_mesh_id[j+1] = elem->id();
 	    
 	  // Set all the nodes for this element
 	  for (int k=0; k<exio_helper.get_num_nodes_per_elem(); k++)
@@ -176,7 +180,7 @@ void ExodusII_IO::read (const std::string& fname)
       nelem_last_block += exio_helper.get_num_elem_this_blk();
     }
   libmesh_assert (static_cast<unsigned int>(nelem_last_block) == mesh.n_elem());
-  
+
   // Read in sideset information -- this is useful for applying boundary conditions
   {
     exio_helper.read_sideset_info(); // Get basic information about ALL sidesets
@@ -194,10 +198,13 @@ void ExodusII_IO::read (const std::string& fname)
     for (unsigned int e=0; e<elem_list.size(); e++)
       {
 	// Set any relevant node/edge maps for this element
+
+        Elem * elem = mesh.elem(exodus_id_to_mesh_id[elem_list[e]]);
+        
 	const ExodusII_IO_Helper::Conversion conv =
-	  em.assign_conversion(mesh.elem(elem_list[e]-1)->type());
+	  em.assign_conversion(elem->type());
 	
-	mesh.boundary_info->add_side (elem_list[e]-1,
+	mesh.boundary_info->add_side (exodus_id_to_mesh_id[elem_list[e]],
 				      conv.get_side_map(side_list[e]-1),
 				      id_list[e]);
       }
