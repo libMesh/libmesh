@@ -194,15 +194,17 @@ namespace libMesh
 #undef here
 #define here()     do { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; } while (0)
 
-// the stop() macro will stop the code until a SIGCONT signal is recieved.  This is useful, for example, when
-// determining the memory used by a given operation.  A stop() could be instered before and after a questionable
-// operation and the delta memory can be obtained from a ps or top.  This macro only works for serial cases.
-#undef stop
+// the libmesh_stop() macro will stop the code until a SIGCONT signal
+// is recieved.  This is useful, for example, when determining the
+// memory used by a given operation.  A libmesh_stop() could be
+// instered before and after a questionable operation and the delta
+// memory can be obtained from a ps or top.  This macro only works for
+// serial cases.
 #ifdef LIBMESH_HAVE_CSIGNAL
 #  include <csignal>
-#  define stop()     do { if (libMesh::n_processors() == 1) { here(); std::cout << "Stopping process " << getpid() << "..." << std::endl; std::raise(SIGSTOP); std::cout << "Continuing process " << getpid() << "..." << std::endl; } } while(0)
+#  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { here(); std::cout << "Stopping process " << getpid() << "..." << std::endl; std::raise(SIGSTOP); std::cout << "Continuing process " << getpid() << "..." << std::endl; } } while(0)
 #else
-#  define stop()     do { if (libMesh::n_processors() == 1) { here(); std::cerr << "WARNING:  stop() does not work without the <csignal> header file!" << std::endl; } } while(0)
+#  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { here(); std::cerr << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl; } } while(0)
 #endif
 
 // The libmesh_assert() macro acts like C's assert(), but throws a 
