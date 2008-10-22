@@ -743,7 +743,7 @@ unsigned int EpetraVector<T>::first_local_index () const
 {
   libmesh_assert (this->initialized());
   
-  return _map->MinMyGID();
+  return _vec->Map().MinMyGID();
 }
 
 
@@ -754,7 +754,7 @@ unsigned int EpetraVector<T>::last_local_index () const
 {
   libmesh_assert (this->initialized());
   
-  return _map->MaxMyGID()+1;
+  return _vec->Map().MaxMyGID()+1;
 }
 
 
