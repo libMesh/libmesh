@@ -1069,7 +1069,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res)
   DenseMatrix<Number> old_jacobian(elem_jacobian);
 #endif
 
-  Real numerical_point_h;
+  Real numerical_point_h = 0.;
   if (_mesh_sys == this->number())
     numerical_point_h = numerical_jacobian_h * elem->hmin();
 
