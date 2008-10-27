@@ -264,7 +264,13 @@ void Hex8::connectivity(const unsigned int sc,
 
 const float Hex8::_embedding_matrix[8][8][8] =
 {
-  // embedding matrix for child 0
+  // The 8 children of the Hex-type elements can be thought of as being
+  // associated with the 8 vertices of the Hex.  Some of the children are
+  // numbered the same as their corresponding vertex, while some are
+  // not.  The children which are numbered differently have been marked
+  // with ** in the comments below.
+  
+  // embedding matrix for child 0 (child 0 is associated with vertex 0)
   {
     //  0     1     2     3     4     5     6     7
     { 1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 0
@@ -277,7 +283,7 @@ const float Hex8::_embedding_matrix[8][8][8] =
     { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}  // 7
   },
 
-  // embedding matrix for child 1
+  // embedding matrix for child 1 (child 1 is associated with vertex 1)
   {
     //  0     1     2     3     4     5     6     7
     { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 0
@@ -290,7 +296,7 @@ const float Hex8::_embedding_matrix[8][8][8] =
     {.125, .125, .125, .125, .125, .125, .125, .125}  // 7
   },
 
-  // embedding matrix for child 2
+  // embedding matrix for child 2 (child 2 is associated with vertex 3**)
   {
     //  0      1    2     3     4     5     6     7
     { 0.5,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0}, // 0
@@ -303,7 +309,7 @@ const float Hex8::_embedding_matrix[8][8][8] =
     { 0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5}  // 7
   },
 
-  // embedding matrix for child 3
+  // embedding matrix for child 3 (child 3 is associated with vertex 2**)
   {
     //  0      1    2     3     4     5     6     7
     { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 0
@@ -316,7 +322,7 @@ const float Hex8::_embedding_matrix[8][8][8] =
     { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}  // 7
   },
 
-  // embedding matrix for child 4
+  // embedding matrix for child 4 (child 4 is associated with vertex 4)
   {
     //  0      1    2     3     4     5     6     7
     { 0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0}, // 0
@@ -329,7 +335,7 @@ const float Hex8::_embedding_matrix[8][8][8] =
     { 0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.5}  // 7
   },
 
-  // embedding matrix for child 5
+  // embedding matrix for child 5 (child 5 is associated with vertex 5)
   {
     //  0      1    2     3     4     5     6     7
     { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 0
@@ -342,7 +348,7 @@ const float Hex8::_embedding_matrix[8][8][8] =
     { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}  // 7
   },
 
-  // embedding matrix for child 6
+  // embedding matrix for child 6 (child 6 is associated with vertex 7**)
   {
     //  0      1    2     3     4     5     6     7
     { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 0
@@ -355,7 +361,7 @@ const float Hex8::_embedding_matrix[8][8][8] =
     { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1.0}  // 7
   },
 
-  // embedding matrix for child 7
+  // embedding matrix for child 7 (child 7 is associated with vertex 6**)
   {
     //  0      1    2     3     4     5     6     7
     {.125, .125, .125, .125, .125, .125, .125, .125}, // 0
