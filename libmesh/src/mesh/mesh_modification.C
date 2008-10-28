@@ -171,6 +171,10 @@ void MeshTools::Modification::rotate (MeshBase& mesh,
   const Real st = std::sin(t), ct = std::cos(t);
   const Real ss = std::sin(s), cs = std::cos(s);
 
+  // We follow the convention described at http://mathworld.wolfram.com/EulerAngles.html
+  // (equations 6-14 give the entries of the composite transformation matrix).
+  // The rotations are performed sequentially about the z, x, and z axes, in that order.
+  // A positive angle yields a counter-clockwise rotation about the axis in question.
   for (unsigned int n=0; n<mesh.n_nodes(); n++)
     {
       const Point p = mesh.node(n);
@@ -178,7 +182,7 @@ void MeshTools::Modification::rotate (MeshBase& mesh,
       const Real  y = p(1);
       const Real  z = p(2);
       mesh.node(n) = Point(( cp*cs-sp*ct*ss)*x + ( sp*cs+cp*ct*ss)*y + (st*ss)*z,
-                           (-cp*ss-sp*ct*cs)*x + (-sp*st+cp*ct*cs)*y + (st*cs)*z,
+                           (-cp*ss-sp*ct*cs)*x + (-sp*ss+cp*ct*cs)*y + (st*cs)*z,
                            ( sp*st)*x          + (-cp*st)*y          + (ct)*z   );
     }
 }
