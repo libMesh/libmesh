@@ -816,11 +816,13 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 #ifndef  LIBMESH_ENABLE_INFINITE_ELEMENTS
 		    else if (((*it)->type() == PRISM6)  ||
 			     ((*it)->type() == PRISM15) ||
-			     ((*it)->type() == PRISM18))
+			     ((*it)->type() == PRISM18) ||
+			     ((*it)->type() == PYRAMID5))
 #else
 		    else if (((*it)->type() == PRISM6)     ||
 			     ((*it)->type() == PRISM15)    ||
 			     ((*it)->type() == PRISM18)    ||
+			     ((*it)->type() == PYRAMID5)   ||
 			     ((*it)->type() == INFPRISM6)  ||
 			     ((*it)->type() == INFPRISM12))
 #endif
