@@ -460,10 +460,10 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	// but we don't necessarily want to impose an ordering, so
 	// just grab whatever message is available next.
 	Parallel::Status status =
-	  Parallel::recv (Parallel::any_source,
-			  received_nodes,
-			  packed_node_datatype,
-			  /* tag = */ 0);
+	  Parallel::receive (Parallel::any_source,
+			     received_nodes,
+			     packed_node_datatype,
+			     /* tag = */ 0);
 	const unsigned int source_pid = status.source();
 	const unsigned int n_nodes_received =
 	  recv_n_nodes_and_elem_per_proc[5*source_pid+0];
@@ -487,9 +487,9 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
     for (unsigned int node_comm_step=0; node_comm_step<n_recv_node_bc_pairs; node_comm_step++)
       {
 	Parallel::Status status =
-	  Parallel::recv (Parallel::any_source,
-			  received_node_bcs,
-			  /* tag = */ 2);
+	  Parallel::receive (Parallel::any_source,
+			     received_node_bcs,
+			     /* tag = */ 2);
 
 	libmesh_assert (status.size() == recv_n_nodes_and_elem_per_proc[5*status.source()+3]);
 
@@ -518,9 +518,9 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
     for (unsigned int elem_comm_step=0; elem_comm_step<n_recv_elem_pairs; elem_comm_step++)
       {
 	Parallel::Status status =
-	  Parallel::recv (Parallel::any_source,
-			  received_elements,
-			  /* tag = */ 1);
+	  Parallel::receive (Parallel::any_source,
+			     received_elements,
+			     /* tag = */ 1);
 
 #ifndef NDEBUG
 	// Avoid declaring these variables unless asserts are enabled.
@@ -620,9 +620,9 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
     for (unsigned int elem_comm_step=0; elem_comm_step<n_recv_elem_bc_pairs; elem_comm_step++)
       {
 	Parallel::Status status =
-	  Parallel::recv (Parallel::any_source,
-			  received_element_bcs,
-			  /* tag = */ 3);
+	  Parallel::receive (Parallel::any_source,
+			     received_element_bcs,
+			     /* tag = */ 3);
 
 	libmesh_assert (status.size() == recv_n_nodes_and_elem_per_proc[5*status.source()+4]);
 
