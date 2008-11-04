@@ -1497,8 +1497,12 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
 	    recv_ids[pid].resize(ids_size[pid]);
 	    recv_vals[pid].resize(vals_size[pid]);
 	    
-	    Parallel::irecv (pid, recv_ids[pid],  id_request_handles[pid],  id_tag);
-	    Parallel::irecv (pid, recv_vals[pid], val_request_handles[pid], val_tag);
+	    Parallel::nonblocking_receive (pid, recv_ids[pid],
+					   id_request_handles[pid],
+                                           id_tag);
+	    Parallel::nonblocking_receive (pid, recv_vals[pid],
+					   val_request_handles[pid],
+                                           val_tag);
 	  }
       
       // Send -- do this on all processors.

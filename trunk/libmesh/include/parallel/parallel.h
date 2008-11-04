@@ -236,29 +236,29 @@ namespace Parallel
    * Blocking-receive vector from one processor.
    */
   template <typename T>
-  inline Status recv (const int src_processor_id,
-		      std::vector<T> &buf,
-		      const int tag=any_tag);
+  inline Status receive (const int src_processor_id,
+		         std::vector<T> &buf,
+		         const int tag=any_tag);
 
   //-------------------------------------------------------------------
   /**
    * Blocking-receive vector from one processor with user-defined type
    */
   template <typename T>
-  inline Status recv (const int src_processor_id,
-		      std::vector<T> &buf,
-		      data_type &type,
-		      const int tag=any_tag);
+  inline Status receive (const int src_processor_id,
+		         std::vector<T> &buf,
+		         data_type &type,
+		         const int tag=any_tag);
 
   //-------------------------------------------------------------------
   /**
    * Nonblocking-receive vector from one processor.
    */
   template <typename T>
-  inline void irecv (const int src_processor_id,
-		     std::vector<T> &buf,
-		     request &r,
-		     const int tag=any_tag);
+  inline void nonblocking_receive (const int src_processor_id,
+		                   std::vector<T> &buf,
+		                   request &r,
+		                   const int tag=any_tag);
   
   //-------------------------------------------------------------------
   /**
@@ -274,8 +274,8 @@ namespace Parallel
   
   //-------------------------------------------------------------------
   /**
-   * Send vector send to one processor while simultaneously receiving
-   * another vector recv from a (potentially different) processor.
+   * Send vector \p send to one processor while simultaneously receiving
+   * another vector \p recv from a (potentially different) processor.
    */
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
@@ -285,8 +285,8 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
-   * Send vector send to one processor while simultaneously receiving
-   * another vector recv from a (potentially different) processor using
+   * Send vector \p send to one processor while simultaneously receiving
+   * another vector \p recv from a (potentially different) processor using
    * a user-specified MPI Dataype.
    */
   template <typename T>
@@ -317,8 +317,8 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
-   * Take a vector of length n_processors, and fill in recv[processor_id] = the
-   * value of send on that processor
+   * Take a vector of length n_processors, and fill in 
+   * \p recv[processor_id] = the value of \p send on that processor
    */
   template <typename T>
   inline void allgather(T send,
@@ -856,11 +856,11 @@ namespace Parallel
 
 
   template <typename T>
-  inline Status recv (const int src_processor_id,
-		      std::vector<T> &buf,
-		      const int tag)
+  inline Status receive (const int src_processor_id,
+		         std::vector<T> &buf,
+		         const int tag)
   {
-    START_LOG("recv()", "Parallel");
+    START_LOG("receive()", "Parallel");
 
     MPI_Status status;
     
@@ -877,7 +877,7 @@ namespace Parallel
 		&status);
     libmesh_assert (ierr == MPI_SUCCESS);
     
-    STOP_LOG("recv()", "Parallel");
+    STOP_LOG("receive()", "Parallel");
 
     return Status(status, datatype<T>());
   }
@@ -885,12 +885,12 @@ namespace Parallel
 
 
   template <typename T>
-  inline Status recv (const int src_processor_id,
-		      std::vector<T> &buf,
-		      MPI_Datatype &type,
-		      const int tag)
+  inline Status receive (const int src_processor_id,
+		         std::vector<T> &buf,
+		         MPI_Datatype &type,
+		         const int tag)
   {
-    START_LOG("recv()", "Parallel");
+    START_LOG("receive()", "Parallel");
 
     MPI_Status status;
     
@@ -907,18 +907,18 @@ namespace Parallel
 		&status);
     libmesh_assert (ierr == MPI_SUCCESS);
     
-    STOP_LOG("recv()", "Parallel");
+    STOP_LOG("receive()", "Parallel");
 
     return Status(status, type);
   }
 
 
   template <typename T>
-  inline Status recv (const int src_processor_id,
-		      std::vector<std::complex<T> > &buf,
-		      const int tag)
+  inline Status receive (const int src_processor_id,
+		         std::vector<std::complex<T> > &buf,
+		         const int tag)
   {
-    START_LOG("recv()", "Parallel");
+    START_LOG("receive()", "Parallel");
 
     MPI_Status status;
     
@@ -932,7 +932,7 @@ namespace Parallel
 		&status);
     libmesh_assert (ierr == MPI_SUCCESS);
     
-    STOP_LOG("recv()", "Parallel");
+    STOP_LOG("receive()", "Parallel");
 
     return Status(status, datatype<T>());
   }
@@ -940,12 +940,12 @@ namespace Parallel
 
 
   template <typename T>
-  inline void irecv (const int src_processor_id,
-		     std::vector<T> &buf,
-		     request &r,
-		     const int tag)
+  inline void nonblocking_receive (const int src_processor_id,
+		                   std::vector<T> &buf,
+		                   request &r,
+		                   const int tag)
   {
-    START_LOG("irecv()", "Parallel");
+    START_LOG("nonblocking_receive()", "Parallel");
     
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
@@ -960,17 +960,17 @@ namespace Parallel
 		 &r);    
     libmesh_assert (ierr == MPI_SUCCESS);
     
-    STOP_LOG("irecv()", "Parallel");
+    STOP_LOG("nonblocking_receive()", "Parallel");
   }
 
  
   template <typename T>
-  inline void irecv (const int src_processor_id,
-		     std::vector<std::complex<T> > &buf,
-		     request &r,
-		     const int tag)
+  inline void nonblocking_recieve (const int src_processor_id,
+		                   std::vector<std::complex<T> > &buf,
+		                   request &r,
+		                   const int tag)
   {
-    START_LOG("irecv()", "Parallel");
+    START_LOG("nonblocking_receive()", "Parallel");
     
     const int ierr =	  
       MPI_Irecv (buf.empty() ? NULL : &buf[0],
@@ -982,7 +982,7 @@ namespace Parallel
 		 &r);    
     libmesh_assert (ierr == MPI_SUCCESS);
     
-    STOP_LOG("irecv()", "Parallel");
+    STOP_LOG("nonblocking_receive()", "Parallel");
   }
 
   
@@ -1853,15 +1853,15 @@ namespace Parallel
 
   // Blocking receives don't make sense on one processor
   template <typename T>
-  inline Status recv (const int,
-		      std::vector<T> &,
-		      const int) { libmesh_error(); return Status(); }
+  inline Status receive (const int,
+		         std::vector<T> &,
+		         const int) { libmesh_error(); return Status(); }
 
   template <typename T>
-  inline void irecv (const int,
-		     std::vector<T> &,
-		     request &,
-		     const int) {}
+  inline void nonblocking_receive (const int,
+		                   std::vector<T> &,
+		                   request &,
+		                   const int) {}
   
   inline void wait (request &) {}
   

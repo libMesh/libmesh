@@ -344,11 +344,11 @@ void Nemesis_IO::read (const std::string& base_filename)
 	      
 	      // We need to receive data from other_proc
 	      irecv_requests.push_back(Parallel::request());
-	      Parallel::irecv(other_proc,                 // sending proc id
-			      symm_node_cmap_node_ids[i], // recv buffer
-			      irecv_requests.back(),      // request
-			      tag                         // tag
-			      );
+	      Parallel::nonblocking_receive
+                (other_proc,                 // sending proc id
+		 symm_node_cmap_node_ids[i], // recv buffer
+		 irecv_requests.back(),      // request
+		 tag);                       // tag
 	    }
 	}
 
