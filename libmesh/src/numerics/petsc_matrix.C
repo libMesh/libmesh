@@ -74,6 +74,8 @@ void PetscMatrix<T>::init (const unsigned int m,
 
   else
     {
+      parallel_only();
+
       ierr = MatCreateMPIAIJ (libMesh::COMM_WORLD, m_local, n_local, m_global, n_global,
 			      n_nz, PETSC_NULL, n_oz, PETSC_NULL, &_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -146,6 +148,8 @@ void PetscMatrix<T>::init ()
 
   else
     {
+      parallel_only();
+
       if (n_nz.empty())
         ierr = MatCreateMPIAIJ (libMesh::COMM_WORLD,
 			        m_local, n_local,
@@ -173,6 +177,8 @@ template <typename T>
 void PetscMatrix<T>::zero ()
 {
   libmesh_assert (this->initialized());
+
+  semiparallel_only();
   
   int ierr=0;
 
@@ -189,6 +195,8 @@ void PetscMatrix<T>::clear ()
   
   if ((this->initialized()) && (this->_destroy_mat_on_exit))
     {
+      semiparallel_only();
+  
       ierr = MatDestroy (_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
@@ -203,6 +211,8 @@ Real PetscMatrix<T>::l1_norm () const
 {
   libmesh_assert (this->initialized());
   
+  semiparallel_only();
+
   int ierr=0;
   PetscReal petsc_value;
   Real value;
@@ -224,6 +234,8 @@ Real PetscMatrix<T>::linfty_norm () const
 {
   libmesh_assert (this->initialized());
   
+  semiparallel_only();
+
   int ierr=0;
   PetscReal petsc_value;
   Real value;
@@ -244,6 +256,8 @@ template <typename T>
 void PetscMatrix<T>::print_matlab (const std::string name) const
 {
   libmesh_assert (this->initialized());
+
+  semiparallel_only();
 
   // libmesh_assert (this->closed());
   this->close();

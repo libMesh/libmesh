@@ -31,7 +31,25 @@
 
 // Local includes
 #include "sparse_matrix.h"
+#include "parallel.h"
 #include "petsc_macro.h"
+
+// Macro to identify and debug functions which should be called in
+// parallel on parallel matrices but which may be called in serial on
+// serial matrices.  This macro will only be valid inside non-static
+// PetscMatrix methods
+#undef semiparallel_only
+#ifndef NDEBUG
+  #include <cstring>
+
+  #define semiparallel_only() do { if (this->initialized()) { const char *mytype; \
+    MatGetType(_mat,&mytype); \
+    if (!strcmp(mytype, MATSEQAIJ)) \
+      parallel_only(); } } while (0)
+#else
+  #define semiparallel_only()
+#endif
+
 
 // Forward Declarations
 template <typename T> class DenseMatrix;
@@ -362,6 +380,8 @@ template <typename T>
 inline
 void PetscMatrix<T>::close () const
 {
+  parallel_only();
+
   // BSK - 1/19/2004
   // strictly this check should be OK, but it seems to
   // fail on matrix-free matrices.  Do they falsely
@@ -510,7 +530,10 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   int ierr=0;
 
   // the matrix from which we copy the values has to be assembled/closed
-  X->close ();
+  // X->close ();
+  libmesh_assert(X->closed());
+
+  semiparallel_only();
 
 // 2.2.x & earlier style
 #if PETSC_VERSION_LESS_THAN(2,3,0)  
@@ -552,6 +575,7 @@ T PetscMatrix<T>::operator () (const unsigned int i,
 #endif
   
   
+  // If the entry is not in the sparse matrix, it is 0.  
   T value=0.;  
   
   int
@@ -562,7 +586,10 @@ T PetscMatrix<T>::operator () (const unsigned int i,
   
 
   // the matrix needs to be closed for this to work
-  this->close();
+  // this->close();
+  // but closing it is a semiparallel operation; we want operator()
+  // to run on one processor.
+  libmesh_assert(this->closed());
 
   ierr = MatGetRow(_mat, i_val, &ncols, &petsc_cols, &petsc_row);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -584,17 +611,13 @@ T PetscMatrix<T>::operator () (const unsigned int i,
       libmesh_assert (petsc_cols[j] == j_val);
       
       value = static_cast<T> (petsc_row[j]);
-      
-      ierr  = MatRestoreRow(_mat, i_val,
-			    &ncols, &petsc_cols, &petsc_row);
-              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  
-      return value;
     }
-  
-  // Otherwise the entry is not in the sparse matrix,
-  // i.e. it is 0.  
-  return 0.;
+      
+  ierr  = MatRestoreRow(_mat, i_val,
+			&ncols, &petsc_cols, &petsc_row);
+          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  
+  return value;
 }
 
 
