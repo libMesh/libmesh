@@ -310,20 +310,20 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    // send the nodes off to the destination processor
 	    node_send_requests.push_back(Parallel::request());
 	  
-	    Parallel::isend (pid,
-			     nodes_sent[pid],
-			     packed_node_datatype,
-			     node_send_requests.back(),
-			     /* tag = */ 0);
+	    Parallel::nonblocking_send (pid,
+			                nodes_sent[pid],
+			                packed_node_datatype,
+			                node_send_requests.back(),
+			                /* tag = */ 0);
 
 	    if (!node_bcs_sent[pid].empty())
 	      {
 		node_bc_requests.push_back(Parallel::request());
 
-		Parallel::isend (pid,
-				 node_bcs_sent[pid],
-				 node_bc_requests.back(),
-				 /* tag = */ 2);
+		Parallel::nonblocking_send (pid,
+				            node_bcs_sent[pid],
+				            node_bc_requests.back(),
+				            /* tag = */ 2);
 	      }
 	  }
 	
@@ -356,10 +356,10 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    // send the elements off to the destination processor
 	    element_send_requests.push_back(Parallel::request());
 	  
-	    Parallel::isend (pid,
-			     elements_sent[pid],
-			     element_send_requests.back(),
-			     /* tag = */ 1);
+	    Parallel::nonblocking_send (pid,
+			                elements_sent[pid],
+			                element_send_requests.back(),
+			                /* tag = */ 1);
 
 	    // the size of the element bc buffer we will ship to pid
 	    send_n_nodes_and_elem_per_proc[5*pid+4] = element_bcs_sent[pid].size();
@@ -368,10 +368,10 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	      {
 		element_bc_requests.push_back(Parallel::request());
 
-		Parallel::isend (pid,
-				 element_bcs_sent[pid],
-				 element_bc_requests.back(),
-				 /* tag = */ 3);
+		Parallel::nonblocking_send (pid,
+				            element_bcs_sent[pid],
+				            element_bc_requests.back(),
+				            /* tag = */ 3);
 	      }
 	  }
       }

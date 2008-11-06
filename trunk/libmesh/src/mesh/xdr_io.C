@@ -291,7 +291,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 
   // All processors send their xfer buffers to processor 0.
   Parallel::request request_handle;
-  Parallel::isend (0, xfer_conn, request_handle);
+  Parallel::nonblocking_send (0, xfer_conn, request_handle);
   
   // Processor 0 will receive the data and write out the elements. 
   if (libMesh::processor_id() == 0)
@@ -390,7 +390,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
       xfer_conn.push_back(my_n_elem_written_at_level);
       my_size = xfer_conn.size();
       Parallel::gather (0, my_size,   xfer_buf_sizes);
-      Parallel::isend  (0, xfer_conn, request_handle);
+      Parallel::nonblocking_send  (0, xfer_conn, request_handle);
       
       // Processor 0 will receive the data and write the elements.
       if (libMesh::processor_id() == 0)
@@ -711,7 +711,7 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
   
   // All processors send their xfer buffers to processor 0
   Parallel::request request_handle;
-  Parallel::isend (0, xfer_bcs, request_handle);
+  Parallel::nonblocking_send (0, xfer_bcs, request_handle);
   
   // Processor 0 will receive all buffers and write out the bcs
   if (libMesh::processor_id() == 0)
