@@ -306,9 +306,13 @@ System & EquationSystems::add_system (const std::string& sys_type,
   else if (sys_type == "TransientExplicit")
     this->add_system<TransientExplicitSystem> (name);
 
-  // build a linear implicit sytsem
+  // build a linear implicit system
   else if (sys_type == "LinearImplicit")
     this->add_system<LinearImplicitSystem> (name);
+
+  // build a nonlinear implicit system
+  else if (sys_type == "NonlinearImplicit")
+    this->add_system<NonlinearImplicitSystem> (name);
 
 #if defined(LIBMESH_USE_COMPLEX_NUMBERS)
   // build a frequency system
