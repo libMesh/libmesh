@@ -525,51 +525,18 @@ void QGauss::init_3D(const ElemType _type,
       // Pyramid
     case PYRAMID5:
       {
-	// We compute the Pyramid rule as a conical
-	// product of the interval [0,1] and the
-	// reference square [-1,1] x [-1,1] as per
-	// Stroud, A.H. "Approximate Calculation of
-	// Multiple Integrals."
-	// This should be exact for quadratics, (Stroud, 32)
+	// We compute the Pyramid rule as a conical product of a
+	// Jacobi rule with alpha==2 on the interval [0,1] two 1D
+	// Gauss rules with suitably modified points.  The idea comes
+	// from: Stroud, A.H. "Approximate Calculation of Multiple
+	// Integrals."
+	QConical conical_rule(3, _order);
+	conical_rule.init(_type, p);
 
-	// Get a rule for the reference quad
-	QGauss q2D(2,_order); 
-	q2D.init(QUAD4,p);
+	// Swap points and weights with the about-to-be destroyed rule.
+	_points.swap (conical_rule.get_points() );
+	_weights.swap(conical_rule.get_weights());
 	
-	// Get a rule for the interval [-1,1] 
-	QGauss q1D(1,_order);
-	q1D.init(EDGE2,p);
-
-	// Storage for our temporary rule
-	std::vector<Real> pts(q1D.n_points());
-	std::vector<Real> wts(q1D.n_points());
-
-	// Modify the 1D rule to fit in [0,1] instead
-	for (unsigned int i=0; i<q1D.n_points(); i++)
-	  {
-	    pts[i] = 0.5*q1D.qp(i)(0) + 0.5;
-	    wts[i] = 0.5*q1D.w(i); 
-	  }
-
-	// Allocate space for the new rule
-	_points.resize(q1D.n_points() * q2D.n_points());
-	_weights.resize(q1D.n_points() * q2D.n_points());
-	      
-	// Compute the conical product of the 1D and 2D rules
-	unsigned int qp = 0;
-	for (unsigned int i=0; i<q1D.n_points(); i++)
-	  for (unsigned int j=0; j<q2D.n_points(); j++)
-	    {
-	      _points[qp](0) = q2D.qp(j)(0)*(1.0-pts[i]);
-	      _points[qp](1) = q2D.qp(j)(1)*(1.0-pts[i]);
-	      _points[qp](2) = pts[i];
-
-	      _weights[qp] = 0.33333333333333 * // Scale factor!
-		wts[i] * q2D.w(j);
-		    
-	      qp++;
-	    }
-
 	return;
 
       }

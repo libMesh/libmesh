@@ -31,7 +31,7 @@ void QConical::init_2D(const ElemType _type,
     case TRI3:
     case TRI6:
       {
-	this->conical_product_2D(p);
+	this->conical_product_tri(p);
 	return;
 	
       } // end case TRI3, TRI6

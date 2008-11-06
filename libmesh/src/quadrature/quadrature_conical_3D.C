@@ -31,11 +31,17 @@ void QConical::init_3D(const ElemType _type,
     case TET4:
     case TET10:
       {
-	this->conical_product_3D(p);
+	this->conical_product_tet(p);
 	return;
 	
       } // end case TET4, TET10
 
+    case PYRAMID5:
+      {
+	this->conical_product_pyramid(p);
+	return;
+	
+      } // end case PYRAMID5
 
       
       //---------------------------------------------
