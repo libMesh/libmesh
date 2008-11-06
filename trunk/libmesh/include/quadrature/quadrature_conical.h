@@ -78,16 +78,22 @@ class QConical : public QBase
 		unsigned int p_level=0);
 
   /**
-   * Implementation of conical product rule in 2D of
+   * Implementation of conical product rule for a Tri in 2D of
    * order = _order+2*p.
    */
-  void conical_product_2D(unsigned int p);
+  void conical_product_tri(unsigned int p);
 
   /**
-   * Implementation of conical product rule in 3D of
+   * Implementation of conical product rule for a Tet in 3D of
    * order = _order+2*p.
    */
-  void conical_product_3D(unsigned int p);
+  void conical_product_tet(unsigned int p);
+
+  /**
+   * Implementation of conical product rule for a Pyramid in 3D of
+   * order = _order+2*p.
+   */
+  void conical_product_pyramid(unsigned int p);
 };
 
 
