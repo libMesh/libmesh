@@ -215,21 +215,21 @@ namespace Parallel
    * Nonblocking-send vector to one processor.
    */
   template <typename T>
-  inline void isend (const unsigned int dest_processor_id,
-		     std::vector<T> &buf,
-		     request &r,
-		     const int tag=0);
+  inline void nonblocking_send (const unsigned int dest_processor_id,
+		                std::vector<T> &buf,
+		                request &r,
+		                const int tag=0);
 
   //-------------------------------------------------------------------
   /**
    * Nonblocking-send vector to one processor with user-defined type.
    */
   template <typename T>
-  inline void isend (const unsigned int dest_processor_id,
-		     std::vector<T> &buf,
-		     data_type &type,
-		     request &r,
-		     const int tag=0);
+  inline void nonblocking_send (const unsigned int dest_processor_id,
+		                std::vector<T> &buf,
+		                data_type &type,
+		                request &r,
+		                const int tag=0);
 
   //-------------------------------------------------------------------
   /**
@@ -781,12 +781,12 @@ namespace Parallel
 
 
   template <typename T>
-  inline void isend (const unsigned int dest_processor_id,
-		     std::vector<T> &buf,
-		     request &r,
-		     const int tag)
+  inline void nonblocking_send (const unsigned int dest_processor_id,
+		                std::vector<T> &buf,
+		                request &r,
+		                const int tag)
   {
-    START_LOG("isend()", "Parallel");
+    START_LOG("nonblocking_send()", "Parallel");
     
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
@@ -801,17 +801,17 @@ namespace Parallel
 		 &r);    
     libmesh_assert (ierr == MPI_SUCCESS);
     
-    STOP_LOG("isend()", "Parallel");
+    STOP_LOG("nonblocking_send()", "Parallel");
   }
 
 
   template <typename T>
-  inline void isend (const unsigned int dest_processor_id,
-		     std::vector<std::complex<T> > &buf,
-		     request &r,
-		     const int tag)
+  inline void nonblocking_send (const unsigned int dest_processor_id,
+		                std::vector<std::complex<T> > &buf,
+		                request &r,
+		                const int tag)
   {
-    START_LOG("isend()", "Parallel");
+    START_LOG("nonblocking_send()", "Parallel");
     
     const int ierr =	  
       MPI_Isend (buf.empty() ? NULL : &buf[0],
@@ -823,19 +823,19 @@ namespace Parallel
 		 &r);    
     libmesh_assert (ierr == MPI_SUCCESS);
     
-    STOP_LOG("isend()", "Parallel");
+    STOP_LOG("nonblocking_send()", "Parallel");
   }
 
 
 
   template <typename T>
-  inline void isend (const unsigned int dest_processor_id,
-		     std::vector<T> &buf,
-		     MPI_Datatype &type,
-		     request &r,
-		     const int tag)
+  inline void nonblocking_send (const unsigned int dest_processor_id,
+		                std::vector<T> &buf,
+		                MPI_Datatype &type,
+		                request &r,
+		                const int tag)
   {
-    START_LOG("isend()", "Parallel");
+    START_LOG("nonblocking_send()", "Parallel");
     
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
@@ -850,7 +850,7 @@ namespace Parallel
 		 &r);    
     libmesh_assert (ierr == MPI_SUCCESS);
     
-    STOP_LOG("isend()", "Parallel");
+    STOP_LOG("nonblocking_send()", "Parallel");
   }
 
 
@@ -1846,10 +1846,10 @@ namespace Parallel
 		    const unsigned int) { libmesh_error(); }
 
   template <typename T>
-  inline void isend (const unsigned int,
-		     std::vector<T> &,
-		     request &,
-		     const int) {}
+  inline void nonblocking_send (const unsigned int,
+		                std::vector<T> &,
+		                request &,
+		                const int) {}
 
   // Blocking receives don't make sense on one processor
   template <typename T>

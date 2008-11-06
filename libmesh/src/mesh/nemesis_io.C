@@ -368,11 +368,11 @@ void Nemesis_IO::read (const std::string& base_filename)
 		
 	      // We need to send our data to other_proc
 	      isend_requests.push_back(Parallel::request());
-	      Parallel::isend(other_proc,                      // destination proc id
-			      nemhelper.node_cmap_node_ids[i], // send buffer
-			      isend_requests.back(),           // request
-			      tag                              // tag
-			      );
+	      Parallel::nonblocking_send(other_proc,                      // destination proc id
+			                 nemhelper.node_cmap_node_ids[i], // send buffer
+			                 isend_requests.back(),           // request
+			                 tag                              // tag
+			                 );
 	    }
 	}
 
