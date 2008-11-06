@@ -917,6 +917,6 @@ int main (int argc, char** argv)
     ;
   */
 
-  return libMesh::close();
+  return 0;
 }
   
