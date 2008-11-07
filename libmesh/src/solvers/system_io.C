@@ -793,10 +793,10 @@ void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
 
   vec.close();
 
-#ifdef DEBUG
+#ifndef NDEBUG
   Parallel::sum (n_assigned_vals);
-#endif
   libmesh_assert (n_assigned_vals == vector_length);
+#endif
 }
 
 
