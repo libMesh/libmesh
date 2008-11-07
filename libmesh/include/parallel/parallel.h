@@ -106,24 +106,52 @@ namespace Parallel
 
 #else
     
-    Status (const MPI_Status &mpi_status,
-	    const MPI_Datatype &data_type) :
-      _status(mpi_status),
-      _datatype(data_type)           
+    Status (const MPI_Datatype &type) :
+    _datatype(type)           
     {}
 
+    Status (const MPI_Status   &status,
+	    const MPI_Datatype &type) :
+      _status(status),
+      _datatype(type)           
+    {}
+
+    Status (const Status &status) :
+      _status(status._status),
+      _datatype(status._datatype)
+    {}
+
+    Status (const Status       &status,
+	    const MPI_Datatype &type) :
+      _status(status._status),
+      _datatype(type)
+    {}
+    
+    operator MPI_Status * () 
+    { return &_status; }
+
+    operator MPI_Status const * () const
+    { return &_status; }
+
     int source () const
-    { 
-      return _status.MPI_SOURCE; 
-    }    
+    { return _status.MPI_SOURCE; }    
+
+    MPI_Datatype& datatype () 
+    { return _datatype; }
+
+    const MPI_Datatype& datatype () const
+    { return _datatype; }
   
-    unsigned int size () const
+    unsigned int size (const MPI_Datatype &type) const
     {
       int msg_size;
-      MPI_Get_count (const_cast<MPI_Status*>(&_status), _datatype, &msg_size);
+      MPI_Get_count (const_cast<MPI_Status*>(&_status), type, &msg_size);
       libmesh_assert (msg_size >= 0);
       return msg_size;
     }
+
+    unsigned int size () const
+    { return this->size (this->datatype()); }
 
   private:
 
@@ -200,6 +228,24 @@ namespace Parallel
    */
   template <typename T>
   inline void sum(std::vector<T> &r);
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking message probe.  Allows information about a message to be 
+   * examined before the message is actually received.
+   */
+  inline Status probe (const int src_processor_id,
+		       const int tag=any_tag);
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking message probe with specified data type. 
+   * Allows information about a message to be 
+   * examined before the message is actually received.
+   */
+  inline Status probe (const int src_processor_id,
+		       const MPI_Datatype &type,
+		       const int tag=any_tag);
 
   //-------------------------------------------------------------------
   /**
@@ -734,7 +780,40 @@ namespace Parallel
       }
   }
 
+  inline Status probe (const int src_processor_id,
+		       const int tag)
+  {
+    START_LOG("probe()", "Parallel");
 
+    Status status;
+
+    MPI_Probe (src_processor_id, 
+	       tag, 
+	       libMesh::COMM_WORLD, 
+	       status);
+
+    STOP_LOG("probe()", "Parallel");
+
+    return status;
+  }  
+
+  inline Status probe (const int src_processor_id,
+		       const MPI_Datatype &type,
+		       const int tag)
+  {
+    START_LOG("probe()", "Parallel");
+
+    Status status(type);
+
+    MPI_Probe (src_processor_id, 
+	       tag, 
+	       libMesh::COMM_WORLD, 
+	       status);
+
+    STOP_LOG("probe()", "Parallel");
+
+    return status;
+  }  
 
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
@@ -862,12 +941,11 @@ namespace Parallel
   {
     START_LOG("receive()", "Parallel");
 
-    MPI_Status status;
+    // Get the status of the message, explicitly provide the
+    // datatype so we can later query the size
+    Status status(Parallel::probe(src_processor_id, datatype<T>(), tag));
 
-    MPI_Probe (src_processor_id, tag, libMesh::COMM_WORLD, &status);
-    int msg_size;
-    MPI_Get_count(&status, datatype<T>(), &msg_size);
-    buf.resize(msg_size);
+    buf.resize(status.size());
     
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
@@ -879,12 +957,12 @@ namespace Parallel
 		src_processor_id,
 		tag,
 		libMesh::COMM_WORLD,
-		&status);
+		status);
     libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("receive()", "Parallel");
 
-    return Status(status, datatype<T>());
+    return status;
   }
 
 
@@ -897,12 +975,11 @@ namespace Parallel
   {
     START_LOG("receive()", "Parallel");
 
-    MPI_Status status;
-    
-    MPI_Probe (src_processor_id, tag, libMesh::COMM_WORLD, &status);
-    int msg_size;
-    MPI_Get_count(&status, type, &msg_size);
-    buf.resize(msg_size);
+    // Get the status of the message, explicitly provide the
+    // datatype so we can later query the size
+    Status status(Parallel::probe(src_processor_id, tag), type);
+
+    buf.resize(status.size());
     
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
@@ -914,12 +991,12 @@ namespace Parallel
 		src_processor_id,
 		tag,
 		libMesh::COMM_WORLD,
-		&status);
+		status);
     libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("receive()", "Parallel");
 
-    return Status(status, type);
+    return status;
   }
 
 
@@ -930,13 +1007,12 @@ namespace Parallel
   {
     START_LOG("receive()", "Parallel");
 
-    MPI_Status status;
-    
-    MPI_Probe (src_processor_id, tag, libMesh::COMM_WORLD, &status);
-    int msg_size;
-    MPI_Get_count(&status, datatype<T>(), &msg_size);
-    libmesh_assert(!(msg_size%2));
-    buf.resize(msg_size/2);
+    // Get the status of the message, explicitly provide the
+    // datatype so we can later query the size
+    Status status(Parallel::probe(src_processor_id, datatype<T>(), tag));
+
+    libmesh_assert(!(status.size()%2));
+    buf.resize(status.size()/2);
     
     const int ierr =	  
       MPI_Recv (buf.empty() ? NULL : &buf[0],
@@ -945,12 +1021,12 @@ namespace Parallel
 		src_processor_id,
 		tag,
 		libMesh::COMM_WORLD,
-		&status);
+		status);
     libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("receive()", "Parallel");
 
-    return Status(status, datatype<T>());
+    return status;
   }
 
 
@@ -1041,13 +1117,12 @@ namespace Parallel
 	return;
       }
 
-    MPI_Status status;
     MPI_Sendrecv(&send, 1, datatype<T>(),
 		 dest_processor_id, 0,
 		 &recv, 1, datatype<T>(),
 		 source_processor_id, 0,
 		 libMesh::COMM_WORLD,
-		 &status);
+		 MPI_STATUS_IGNORE);
 
     STOP_LOG("send_receive()", "Parallel");
   }
@@ -1069,13 +1144,12 @@ namespace Parallel
 	return;
       }
 
-    MPI_Status status;
     MPI_Sendrecv(&send, 2, datatype<T>(),
 		 dest_processor_id, 0,
 		 &recv, 2, datatype<T>(),
 		 source_processor_id, 0,
 		 libMesh::COMM_WORLD,
-		 &status);
+		 MPI_STATUS_IGNORE);
 
     STOP_LOG("send_receive()", "Parallel");
   }
@@ -1100,13 +1174,12 @@ namespace Parallel
 
     // Trade buffer sizes first
     unsigned int sendsize = send.size(), recvsize;
-    MPI_Status status;
     MPI_Sendrecv(&sendsize, 1, datatype<unsigned int>(),
 		 dest_processor_id, 0,
 		 &recvsize, 1, datatype<unsigned int>(),
 		 source_processor_id, 0,
 		 libMesh::COMM_WORLD,
-		 &status);
+		 MPI_STATUS_IGNORE);
 
     recv.resize(recvsize);
 
@@ -1115,7 +1188,7 @@ namespace Parallel
 		 recvsize ? &recv[0] : NULL, recvsize, datatype<T>(),
 		 source_processor_id, 0,
 		 libMesh::COMM_WORLD,
-		 &status);
+		 MPI_STATUS_IGNORE);
     
     STOP_LOG("send_receive()", "Parallel");
   }
@@ -1139,13 +1212,12 @@ namespace Parallel
 
     // Trade buffer sizes first
     unsigned int sendsize = send.size(), recvsize;
-    MPI_Status status;
     MPI_Sendrecv(&sendsize, 1, datatype<unsigned int>(),
 		 dest_processor_id, 0,
 		 &recvsize, 1, datatype<unsigned int>(),
 		 source_processor_id, 0,
 		 libMesh::COMM_WORLD,
-		 &status);
+		 MPI_STATUS_IGNORE);
 
     recv.resize(recvsize);
 
@@ -1154,7 +1226,7 @@ namespace Parallel
 		 recvsize ? &recv[0] : NULL, recvsize * 2, datatype<T>(),
 		 source_processor_id, 0,
 		 libMesh::COMM_WORLD,
-		 &status);
+		 MPI_STATUS_IGNORE);
     
     STOP_LOG("send_receive()", "Parallel");
   }
@@ -1180,13 +1252,12 @@ namespace Parallel
 
     // Trade buffer sizes first
     unsigned int sendsize = send.size(), recvsize;
-    MPI_Status status;
     MPI_Sendrecv(&sendsize, 1, datatype<unsigned int>(),
 		 dest_processor_id, 0,
 		 &recvsize, 1, datatype<unsigned int>(),
 		 source_processor_id, 0,
 		 libMesh::COMM_WORLD,
-		 &status);
+		 MPI_STATUS_IGNORE);
 
     recv.resize(recvsize);
 
@@ -1195,7 +1266,7 @@ namespace Parallel
 		 recvsize ? &recv[0] : NULL, recvsize, type,
 		 source_processor_id, 0,
 		 libMesh::COMM_WORLD,
-		 &status);
+		 MPI_STATUS_IGNORE);
     
     STOP_LOG("send_receive()", "Parallel");
   }
@@ -1220,13 +1291,12 @@ namespace Parallel
 
     // Trade outer buffer sizes first
     unsigned int sendsize = send.size(), recvsize;
-    MPI_Status status;
     MPI_Sendrecv(&sendsize, 1, datatype<unsigned int>(),
 		 dest_processor_id, 0,
 		 &recvsize, 1, datatype<unsigned int>(),
 		 source_processor_id, 0,
 		 libMesh::COMM_WORLD,
-		 &status);
+		 MPI_STATUS_IGNORE);
 
     recv.resize(recvsize);
 
@@ -1244,7 +1314,7 @@ namespace Parallel
 		 recvsize ? &recvsizes[0] : NULL, recvsize, 
 		 datatype<unsigned int>(), source_processor_id, 0,
 		 libMesh::COMM_WORLD,
-		 &status);
+		 MPI_STATUS_IGNORE);
 
     for (unsigned int i = 0; i != recvsize; ++i)
       {
@@ -1270,7 +1340,7 @@ namespace Parallel
 		 recvsizesum ? &recvdata[0] : NULL, recvsizesum,
 		 datatype<T>(), source_processor_id, 0,
 		 libMesh::COMM_WORLD,
-		 &status);
+		 MPI_STATUS_IGNORE);
 
     // Empty the temporary recv buffer
     typename std::vector<T>::iterator in = recvdata.begin();
@@ -1854,6 +1924,19 @@ namespace Parallel
 
   template <typename T>
   inline void sum(std::vector<T> &) {}
+
+  // on one processor a blocking probe can only be used to 
+  // test a nonblocking send, which we don't really support
+  inline Status probe (const int,
+		       const int = any_tag)
+  { libmesh_error(); return Status(); }
+
+  // on one processor a blocking probe can only be used to 
+  // test a nonblocking send, which we don't really support
+  inline Status probe (const int,
+		       const MPI_Datatype &,
+		       const int = any_tag)
+  { libmesh_error(); return Status(); }
 
   // Blocking sends don't make sense on one processor
   template <typename T>
