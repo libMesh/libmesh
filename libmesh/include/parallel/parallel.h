@@ -863,6 +863,11 @@ namespace Parallel
     START_LOG("receive()", "Parallel");
 
     MPI_Status status;
+
+    MPI_Probe (src_processor_id, tag, libMesh::COMM_WORLD, &status);
+    int msg_size;
+    MPI_Get_count(&status, datatype<T>(), &msg_size);
+    buf.resize(msg_size);
     
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
@@ -894,6 +899,11 @@ namespace Parallel
 
     MPI_Status status;
     
+    MPI_Probe (src_processor_id, tag, libMesh::COMM_WORLD, &status);
+    int msg_size;
+    MPI_Get_count(&status, type, &msg_size);
+    buf.resize(msg_size);
+    
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
     const int ierr =
@@ -921,6 +931,12 @@ namespace Parallel
     START_LOG("receive()", "Parallel");
 
     MPI_Status status;
+    
+    MPI_Probe (src_processor_id, tag, libMesh::COMM_WORLD, &status);
+    int msg_size;
+    MPI_Get_count(&status, datatype<T>(), &msg_size);
+    libmesh_assert(!(msg_size%2));
+    buf.resize(msg_size/2);
     
     const int ierr =	  
       MPI_Recv (buf.empty() ? NULL : &buf[0],
