@@ -391,20 +391,6 @@ SparseMatrix<T>::~SparseMatrix ()
 
 
 
-template <typename T>
-inline
-void SparseMatrix<T>::print(std::ostream& os) const
-{
-  libmesh_assert (this->initialized());
-
-  for (unsigned int i=0; i<this->m(); i++)
-    {
-      for (unsigned int j=0; j<this->n(); j++)
-	os << std::setw(8) << (*this)(i,j) << " ";
-      os << std::endl;
-    }
-}
-
 
 
 // Full specialization for Complex datatypes
