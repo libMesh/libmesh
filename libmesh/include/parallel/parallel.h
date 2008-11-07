@@ -977,7 +977,7 @@ namespace Parallel
 
     // Get the status of the message, explicitly provide the
     // datatype so we can later query the size
-    Status status(Parallel::probe(src_processor_id, tag), type);
+    Status status(Parallel::probe(src_processor_id, type, tag));
 
     buf.resize(status.size());
     
