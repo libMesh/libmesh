@@ -363,6 +363,27 @@ public:
   { libmesh_assert(proc < _end_df.size()); return _end_df[proc]; }  
   
   /**
+   * Returns the first local degree of freedom index for variable \p var.
+   */
+  unsigned int variable_first_local_dof (const unsigned int var) const
+  { 
+    libmesh_assert ((var+1) < _var_first_local_df.size());
+    libmesh_assert (_var_first_local_df[var] != DofObject::invalid_id);
+    return _var_first_local_df[var];
+  }
+
+  /**
+   * Returns (one past) the last local degree of freedom index for variable \p var.
+   * Analogous to the end() member function of STL containers.
+   */
+  unsigned int variable_last_local_dof (const unsigned int var) const
+  { 
+    libmesh_assert ((var+1) < _var_first_local_df.size());
+    libmesh_assert (_var_first_local_df[var+1] != DofObject::invalid_id);
+    return _var_first_local_df[var+1];
+  }
+
+  /**
    * Fills the vector \p di with the global degree of freedom indices
    * for the element. If no variable number is specified then all
    * variables are returned.
@@ -732,6 +753,11 @@ private:
    */
   std::vector<unsigned int> _end_df;
 
+  /**
+   * The first local DOF index for each variable in the \p System.
+   */
+  std::vector<unsigned int> _var_first_local_df;
+  
   /**
    * A list containing all the global DOF indicies that affect the
    * solution on my subdomain.

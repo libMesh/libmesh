@@ -589,6 +589,7 @@ void DofMap::clear()
   _variable_types.clear();  
   _first_df.clear();
   _end_df.clear();
+  _var_first_local_df.clear();
   _send_list.clear();
   _n_nz.clear();
   _n_oz.clear();
@@ -714,12 +715,18 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
 
   // Number of elements to add to send_list
   unsigned int send_list_size = 0;
+
+  // _var_first_local_df does not work with node_major dofs
+  _var_first_local_df.resize(n_vars+1);
+  std::fill (_var_first_local_df.begin(),
+	     _var_first_local_df.end(),
+	     DofObject::invalid_id);
   
   //-------------------------------------------------------------------------
   // First count and assign temporary numbers to local dofs
   MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
-  const MeshBase::element_iterator elem_end = mesh.active_local_elements_end();
-
+  const MeshBase::element_iterator elem_end = mesh.active_local_elements_end();  
+  
   for ( ; elem_it != elem_end; ++elem_it)
     {
       // Only number dofs connected to active
@@ -828,11 +835,16 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
 
   // Number of elements to add to send_list
   unsigned int send_list_size = 0;
+
+  // We will cache the first local index for each variable
+  _var_first_local_df.clear();
   
   //-------------------------------------------------------------------------
   // First count and assign temporary numbers to local dofs
   for (unsigned var=0; var<n_vars; var++)
     {
+      _var_first_local_df.push_back(next_free_dof);
+      
       MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
       const MeshBase::element_iterator elem_end = mesh.active_local_elements_end();
 
@@ -898,11 +910,12 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
               else
                 send_list_size += elem->n_comp(sys_num,var);
             }
-        }
-    }
+        } // end loop on elements
+      _var_first_local_df.push_back(next_free_dof);
+    } // end loop on variables
 
 #ifdef DEBUG
-// Make sure we didn't miss any nodes
+  // Make sure we didn't miss any nodes
   MeshTools::libmesh_assert_valid_node_procids(mesh);
 
   MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
