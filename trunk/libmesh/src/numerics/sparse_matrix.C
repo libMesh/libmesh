@@ -22,9 +22,11 @@
 // C++ includes
 
 // Local Includes
-#include "sparse_matrix.h"
+#include "dof_map.h"
 #include "laspack_matrix.h"
+#include "parallel.h"
 #include "petsc_matrix.h"
+#include "sparse_matrix.h"
 #include "trilinos_epetra_matrix.h"
 
 
@@ -77,6 +79,96 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
 
   AutoPtr<SparseMatrix<T> > ap(NULL);
   return ap;    
+}
+
+
+template <typename T>
+inline
+void SparseMatrix<T>::print(std::ostream& os) const
+{
+  parallel_only();
+
+  libmesh_assert (this->initialized());
+
+  // We'll print the matrix from processor 0 to make sure
+  // it's serialized properly
+  if (libMesh::processor_id() == 0)
+    {
+      libmesh_assert(this->_dof_map->first_dof() == 0);
+      for (unsigned int i=this->_dof_map->first_dof();
+           i!=this->_dof_map->end_dof(); ++i)
+        {
+          for (unsigned int j=0; j<this->n(); j++)
+	    os << (*this)(i,j) << " ";
+          os << std::endl;
+        }
+
+      std::vector<unsigned int> ibuf, jbuf;
+      std::vector<T> cbuf;
+      unsigned int currenti = this->_dof_map->end_dof();
+      for (unsigned int p=1; p < libMesh::n_processors(); ++p)
+        {
+          Parallel::receive(p, ibuf);
+          Parallel::receive(p, jbuf);
+          Parallel::receive(p, cbuf);
+          libmesh_assert(ibuf.size() == jbuf.size());
+          libmesh_assert(ibuf.size() == cbuf.size());
+
+          if (ibuf.empty())
+            continue;
+          libmesh_assert(ibuf.front() >= currenti);
+          libmesh_assert(ibuf.back() >= ibuf.front());
+
+          unsigned int currentb = 0;
+          for (;currenti <= ibuf.back(); ++currenti)
+            {
+              for (unsigned int j=0; j<this->n(); j++)
+                {
+                  if (currentb < ibuf.size() &&
+                      ibuf[currentb] == currenti &&
+                      jbuf[currentb] == j)
+                    {
+	              os << cbuf[currentb] << " ";
+	              currentb++;
+                    }
+                  else
+	            os << static_cast<T>(0.0) << " ";
+                }
+              os << std::endl;
+            }
+        }
+      for (; currenti != this->m(); ++currenti)
+        {
+          for (unsigned int j=0; j<this->n(); j++)
+	    os << static_cast<T>(0.0) << " ";
+          os << std::endl;
+        }
+    }
+  else
+    {
+      std::vector<unsigned int> ibuf, jbuf;
+      std::vector<T> cbuf;
+
+      // We'll assume each processor has access to entire
+      // matrix rows, so (*this)(i,j) is valid if i is a local index.
+      for (unsigned int i=this->_dof_map->first_dof();
+           i!=this->_dof_map->end_dof(); ++i)
+        {
+          for (unsigned int j=0; j<this->n(); j++)
+	    {
+              T c = (*this)(i,j);
+              if (c != static_cast<T>(0.0))
+                {
+                  ibuf.push_back(i);
+                  jbuf.push_back(j);
+                  cbuf.push_back(c);
+                }
+	    }
+        }
+      Parallel::send(0,ibuf);
+      Parallel::send(0,jbuf);
+      Parallel::send(0,cbuf);
+    }
 }
 
 
