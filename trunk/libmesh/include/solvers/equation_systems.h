@@ -72,7 +72,8 @@ public:
   enum ReadFlags { READ_HEADER           = 1,
                    READ_DATA             = 2,
                    READ_ADDITIONAL_DATA  = 4,
-                   READ_LEGACY_FORMAT    = 8 };
+                   READ_LEGACY_FORMAT    = 8,
+                   TRY_READ_IFEMS        = 16 };
 
   /**
    * Define enumeration to set properties in EquationSystems::write()
@@ -385,6 +386,15 @@ protected:
   typedef std::map<std::string, System*>::const_iterator const_system_iterator;
 
 private:
+    
+  /**
+   * Actual read implementation.  This can be called repeatedly
+   * inside a try-catch block in an attempt to read broken files.
+   */
+  void _read_impl (const std::string& name,
+		   const libMeshEnums::XdrMODE,
+		   const unsigned int read_flags);
+
   /**
    * This function is used in the implementation of add_system,
    * it loops over the nodes and elements of the Mesh, adding the
