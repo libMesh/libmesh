@@ -69,6 +69,61 @@ void EquationSystems::read (const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
                             const unsigned int read_flags)
 {
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+
+  // If we have exceptions enabled we can be considerate and try
+  // to read old restart files which contain infinite element
+  // information but do not have the " with infinite elements"
+  // string in the version information.
+  
+  // First try the read the user requested
+  try
+    {
+      this->_read_impl (name, mode, read_flags);
+    }
+
+  // If that fails, try it again but explicitly request we look for infinite element info      
+  catch (...)
+    {
+      std::cout << "\n*********************************************************************\n"
+		<< "READING THE FILE \"" << name << "\" FAILED.\n"
+		<< "It is possible this file contains infinite element information,\n"
+		<< "but the version string does not contain \" with infinite elements\"\n"
+		<< "Let's try this again, but looking for infinite element information...\n"
+		<< "*********************************************************************\n"
+		<< std::endl;
+
+      try
+	{
+	  this->_read_impl (name, mode, read_flags | EquationSystems::TRY_READ_IFEMS);
+	}
+
+      // If all that failed, we are out of ideas here...
+      catch (...)
+	{
+	  std::cout << "\n*********************************************************************\n"
+		    << "Well, at least we tried!\n"
+		    << "Good Luck!!\n"
+		    << "*********************************************************************\n"
+		    << std::endl;
+	  throw;
+	}
+    }
+
+#else
+
+  // no exceptions - cross your fingers...
+  this->_read_impl (name, mode, read_flags);
+  
+#endif // #ifdef LIBMESH_ENABLE_EXCEPTIONS
+}
+
+
+
+void EquationSystems::_read_impl (const std::string& name,
+				  const libMeshEnums::XdrMODE mode,
+				  const unsigned int read_flags)
+{
   /**
    * This program implements the output of an 
    * EquationSystems object.  This warrants some 
@@ -137,8 +192,9 @@ void EquationSystems::read (const std::string& name,
    const bool read_data            = read_flags & EquationSystems::READ_DATA;
    const bool read_additional_data = read_flags & EquationSystems::READ_ADDITIONAL_DATA;
    const bool read_legacy_format   = read_flags & EquationSystems::READ_LEGACY_FORMAT;
+   const bool try_read_ifems       = read_flags & EquationSystems::TRY_READ_IFEMS;
          bool read_parallel_files  = false;
-
+	 
   // This will unzip a file with .bz2 as the extension, otherwise it
   // simply returns the name if the file need not be unzipped.
   Xdr io ((libMesh::processor_id() == 0) ? name : "", mode);
@@ -166,6 +222,15 @@ void EquationSystems::read (const std::string& name,
 	  }
 
 	read_parallel_files = (version.rfind(" parallel") < version.size());
+
+	// If requested that we try to read infinite element information,
+	// and the string " with infinite elements" is not in the version,
+	// then tack it on.  This is for compatibility reading ifem
+	// files written prior to 11/10/2008 - BSK
+	if (try_read_ifems)
+	  if (!(version.rfind(" with infinite elements") < version.size()))
+	    version += " with infinite elements";
+	
       }
     else
       deprecated();
@@ -199,6 +264,7 @@ void EquationSystems::read (const std::string& name,
 	// Let System::read_header() do the job
 	System& new_system = this->get_system(sys_name);	  
 	new_system.read_header (io,
+				version,
 				read_header,
 				read_additional_data,
 				read_legacy_format);
@@ -378,6 +444,10 @@ void EquationSystems::write(const std::string& name,
 	// Write the version header
 	std::string version = "libMesh-0.7.0+";
 	if (write_parallel_files) version += " parallel";
+	
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+	version += " with infinite elements";
+#endif
 	io.data (version, "# File Format Identifier");
 	
 	// 2.)  
@@ -414,7 +484,7 @@ void EquationSystems::write(const std::string& name,
 	
 	    // 5.) - 9.)
 	    // Let System::write_header() do the job
-	    pos->second->write_header (io, write_additional_data);
+	    pos->second->write_header (io, version, write_additional_data);
 	    
 	    ++pos;
 	  }

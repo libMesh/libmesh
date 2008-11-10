@@ -76,6 +76,7 @@ namespace {
 // ------------------------------------------------------------
 // System class implementation
 void System::read_header (Xdr& io,
+			  const std::string &version,
 			  const bool read_header,
 			  const bool read_additional_data,
 			  const bool read_legacy_format)
@@ -114,6 +115,13 @@ void System::read_header (Xdr& io,
   // Possibly clear data structures and start from scratch.
   if (read_header)
     this->clear ();
+
+  // Figure out if we need to read infinite element information.
+  // This will be true if the version string contains " with infinite elements"
+  const bool read_ifem_info =
+    (version.rfind(" with infinite elements") < version.size()) ||
+    libMesh::on_command_line ("--read_ifem_systems");
+  
   
   {
     // 5.) 
@@ -136,14 +144,15 @@ void System::read_header (Xdr& io,
 	if (libMesh::processor_id() == 0) io.data (order);
 	Parallel::broadcast(order);
 	
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 	
-	// do the same for radial_order
-	int rad_order=0;	  
-	if (libMesh::processor_id() == 0) io.data(rad_order);
-	Parallel::broadcast(rad_order);
+	// do the same for infinite element radial_order 
+	int rad_order=0;
+	if (read_ifem_info)
+	  {
+	    if (libMesh::processor_id() == 0) io.data(rad_order);
+	    Parallel::broadcast(rad_order);
+	  }
 
-#endif
 
 	// Read the finite element type of the var-th variable 
 	int fam=0;
@@ -171,16 +180,18 @@ void System::read_header (Xdr& io,
 			<< std::endl;
 	    }
 			
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-	
 	// Read additional information for infinite elements	
 	int radial_fam=0;
 	int i_map=0;
+	if (read_ifem_info)
+	  {
+	    if (libMesh::processor_id() == 0) io.data (radial_fam);
+	    Parallel::broadcast(radial_fam);
+	    if (libMesh::processor_id() == 0) io.data (i_map);
+	    Parallel::broadcast(i_map);
+	  }
 	
-	if (libMesh::processor_id() == 0) io.data (radial_fam);
-	Parallel::broadcast(radial_fam);
-	if (libMesh::processor_id() == 0) io.data (i_map);
-	Parallel::broadcast(i_map);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 	
 	type.radial_order  = static_cast<Order>(rad_order);
 	type.radial_family = static_cast<FEFamily>(radial_fam);
@@ -802,6 +813,7 @@ void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
 
 
 void System::write_header (Xdr& io,
+			   const std::string & /* version is currently unused */,
 			   const bool write_additional_data) const
 {
   /**

@@ -407,7 +407,8 @@ public:
   /**
    * Reads the basic data header for this System.
    */
-  void read_header (Xdr& io, 
+  void read_header (Xdr& io,
+		    const std::string &version,
 		    const bool read_header=true,
 		    const bool read_additional_data=true,
 		    const bool read_legacy_format=false);
@@ -437,6 +438,7 @@ public:
    * Writes the basic data header for this System.
    */
   void write_header (Xdr& io,
+		     const std::string &version,
 		     const bool write_additional_data) const;
 
   /**
