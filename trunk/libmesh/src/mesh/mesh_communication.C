@@ -180,8 +180,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   START_LOG("redistribute()","MeshCommunication");
 
   // register a derived datatype to use in shipping nodes  
-  MPI_Datatype packed_node_datatype = Node::PackedNode::create_mpi_datatype();
-  MPI_Type_commit (&packed_node_datatype);
+  Parallel::DataType packed_node_datatype = Node::PackedNode::create_mpi_datatype();
+  packed_node_datatype.commit();
 
   // Figure out how many nodes and elements we have which are assigned to each
   // processor.  send_n_nodes_and_elem_per_proc contains the number of nodes/elements
@@ -452,13 +452,16 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 
   // Receive nodes.  Size this array for the largest message.
   {
-    std::vector<Node::PackedNode> received_nodes(max_n_nodes_received);
+    std::vector<Node::PackedNode> received_nodes; /**/
+    received_nodes.reserve(max_n_nodes_received);
 
     // We now know how many processors will be sending us nodes.
     for (unsigned int node_comm_step=0; node_comm_step<n_recv_node_pairs; node_comm_step++)
       {
 	// but we don't necessarily want to impose an ordering, so
-	// just grab whatever message is available next.
+	// just grab whatever message is available next.  note that
+	// the blocking receive should resize the vector to fit the
+	// incoming message
 	Parallel::Status status =
 	  Parallel::receive (Parallel::any_source,
 			     received_nodes,
@@ -467,7 +470,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	const unsigned int source_pid = status.source();
 	const unsigned int n_nodes_received =
 	  recv_n_nodes_and_elem_per_proc[5*source_pid+0];
-	libmesh_assert (n_nodes_received <= received_nodes.size());
+	libmesh_assert (n_nodes_received == received_nodes.size());
 	libmesh_assert (status.size() == n_nodes_received);
 	libmesh_assert (recv_node_pair[source_pid]);
 	
@@ -648,7 +651,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   Parallel::wait (element_bc_requests);
   
   // unregister MPI datatypes
-  MPI_Type_free (&packed_node_datatype);
+  packed_node_datatype.free();
   
   STOP_LOG("redistribute()","MeshCommunication");  
 }

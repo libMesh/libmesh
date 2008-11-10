@@ -49,12 +49,30 @@
  */
 namespace Parallel
 {
+  //-------------------------------------------------------------------
+  /**
+   * Forward declarations of classes we will define later.
+   */
+  class DataType;
+  class Request;
+  class Status;
+
 #ifdef LIBMESH_HAVE_MPI
   //-------------------------------------------------------------------
   /**
    * Data types for communication
    */
   typedef MPI_Datatype data_type;
+
+  /**
+   * Request object for non-blocking I/O
+   */
+  typedef MPI_Request request;
+
+  /**
+   * Status object for querying messages
+   */
+  typedef MPI_Status status;
  
   /**
    * Templated function to return the appropriate MPI datatype
@@ -62,11 +80,6 @@ namespace Parallel
    */
   template <typename T>
   inline data_type datatype();
-
-  /**
-   * Request object for non-blocking I/O
-   */
-  typedef MPI_Request request;
 
   /**
    * Default message tag id
@@ -82,10 +95,67 @@ namespace Parallel
   // These shouldn't be needed
   typedef unsigned int data_type;
   typedef unsigned int request;
+  typedef unsigned int status;
 
   const int any_tag=-1;
   const int any_source=0;
 #endif // LIBMESH_HAVE_MPI
+
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Encapsulates the MPI_Datatype.
+   */
+  class DataType
+  {
+  public:
+    DataType () {}
+
+    DataType (const DataType &other) :
+      _datatype(other._datatype)
+    {}
+
+    DataType (const data_type &type) :
+      _datatype(type)
+    {}
+
+    DataType & operator = (const DataType &other) 
+    { _datatype = other._datatype; return *this; }
+
+    DataType & operator = (const data_type &type)
+    { _datatype = type; return *this; }
+
+    operator const data_type & () const
+    { return _datatype; }
+
+    operator data_type & ()
+    { return _datatype; }
+    
+//     operator data_type const * () const
+//     { return &_datatype; }
+
+//     operator data_type * ()
+//     { return &_datatype; }
+
+    void commit ()
+    {
+#ifdef LIBMESH_HAVE_MPI
+      MPI_Type_commit (&_datatype);
+#endif
+    }
+
+    void free ()
+    {
+#ifdef LIBMESH_HAVE_MPI
+      MPI_Type_free (&_datatype);
+#endif
+    }
+    
+  private:
+
+    data_type _datatype;    
+  };
 
 
 
@@ -99,19 +169,16 @@ namespace Parallel
   public:
     Status () {}
     
-#ifndef LIBMESH_HAVE_MPI
-    
-    int source () const
-    { return 0; }
-
-#else
-    
-    Status (const MPI_Datatype &type) :
+    Status (const data_type &type) :
     _datatype(type)           
     {}
 
-    Status (const MPI_Status   &status,
-	    const MPI_Datatype &type) :
+    Status (const status &status) :
+      _status(status)
+    {}
+
+    Status (const status    &status,
+	    const data_type &type) :
       _status(status),
       _datatype(type)           
     {}
@@ -121,33 +188,60 @@ namespace Parallel
       _datatype(status._datatype)
     {}
 
-    Status (const Status       &status,
-	    const MPI_Datatype &type) :
+    Status (const Status    &status,
+	    const data_type &type) :
       _status(status._status),
       _datatype(type)
     {}
     
-    operator MPI_Status * () 
+    operator status * () 
     { return &_status; }
 
-    operator MPI_Status const * () const
+    operator status const * () const
     { return &_status; }
+    
+//     operator status & ()
+//     { return _status; }
+
+//     operator const status & () const
+//     { return _status; }
 
     int source () const
-    { return _status.MPI_SOURCE; }    
+    {
+#ifdef LIBMESH_HAVE_MPI 
+      return _status.MPI_SOURCE; 
+#else
+      return 0;
+#endif
+    }    
 
-    MPI_Datatype& datatype () 
+    int tag () const
+    {
+#ifdef LIBMESH_HAVE_MPI 
+      return _status.MPI_TAG; 
+#else
+      libmesh_error();
+      return 0;
+#endif
+    }
+
+    data_type& datatype () 
     { return _datatype; }
 
-    const MPI_Datatype& datatype () const
+    const data_type& datatype () const
     { return _datatype; }
   
-    unsigned int size (const MPI_Datatype &type) const
+    unsigned int size (const data_type &type) const
     {
+#ifdef LIBMESH_HAVE_MPI
       int msg_size;
       MPI_Get_count (const_cast<MPI_Status*>(&_status), type, &msg_size);
       libmesh_assert (msg_size >= 0);
       return msg_size;
+#else
+      libmesh_error();
+      return 0;
+#endif
     }
 
     unsigned int size () const
@@ -155,11 +249,55 @@ namespace Parallel
 
   private:
 
-    MPI_Status   _status;
-    MPI_Datatype _datatype;
-#endif
-      
+    status    _status;
+    data_type _datatype;
   };
+
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Encapsulates the MPI_Request
+   */
+  class Request
+  {
+  public:
+    Request () {}
+
+//     Request (const Request &other) :
+//       _request(other._request)
+//     {}
+
+    Request (const request &r) :
+      _request(r)
+    {}
+
+    Request & operator = (const Request &other) 
+    { _request = other._request; return *this; }
+
+    Request & operator = (const request &r)
+    { _request = r; return *this; }
+
+    operator const request & () const
+    { return _request; }
+
+    operator request & () 
+    { return _request; }
+
+    status wait ()
+    {
+      status status;
+#ifdef LIBMESH_HAVE_MPI
+      MPI_Wait (&_request, &status);
+#endif
+      return status;
+    }
+
+  private:
+
+    request _request;    
+  };
+
 
   
   //-------------------------------------------------------------------
@@ -171,7 +309,6 @@ namespace Parallel
 #ifdef LIBMESH_HAVE_MPI
     MPI_Barrier (libMesh::COMM_WORLD);
 #endif
-    return;
   }    
   
   //-------------------------------------------------------------------
@@ -234,27 +371,82 @@ namespace Parallel
    * Blocking message probe.  Allows information about a message to be 
    * examined before the message is actually received.
    */
-  inline Status probe (const int src_processor_id,
+  inline status probe (const int src_processor_id,
 		       const int tag=any_tag);
 
   //-------------------------------------------------------------------
   /**
-   * Blocking message probe with specified data type. 
-   * Allows information about a message to be 
-   * examined before the message is actually received.
-   */
-  inline Status probe (const int src_processor_id,
-		       const MPI_Datatype &type,
-		       const int tag=any_tag);
-
-  //-------------------------------------------------------------------
-  /**
-   * Blocking-send vector to one processor.
+   * Blocking-send vector to one processor with user-defined type.
    */
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
+		    const DataType &type,
 		    const int tag=0);
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-send vector to one processor with user-defined type.
+   */
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::vector<T> &buf,
+		    const DataType &type,
+		    request &req,
+		    const int tag=0);
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-send vector to one processor where the communication type 
+   * is inferred from the template argument.
+   */
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::vector<T> &buf,
+		    const int tag=0)
+  {
+    send (dest_processor_id,
+	  buf,
+	  datatype<T>(),
+	  tag);
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-send vector to one processor where the communication type 
+   * is inferred from the template argument.
+   */
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::vector<T> &buf,
+		    request &req,
+		    const int tag=0)
+  {
+    send (dest_processor_id,
+	  buf,
+	  datatype<T>(),
+	  req,
+	  tag);
+  }
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-send vector to one processor with user-defined type.
+   */
+  template <typename T>
+  inline void nonblocking_send (const unsigned int dest_processor_id,
+		                std::vector<T> &buf,
+		                const DataType &type,
+		                request &r,
+		                const int tag=0)
+  {
+    send (dest_processor_id,
+	  buf,
+	  type,
+	  r,
+	  tag);
+  }
 
   //-------------------------------------------------------------------
   /**
@@ -264,37 +456,87 @@ namespace Parallel
   inline void nonblocking_send (const unsigned int dest_processor_id,
 		                std::vector<T> &buf,
 		                request &r,
-		                const int tag=0);
+		                const int tag=0)
+  {
+    send (dest_processor_id,
+	  buf,
+	  datatype<T>(),
+	  r,
+	  tag);
+  }
 
   //-------------------------------------------------------------------
   /**
-   * Nonblocking-send vector to one processor with user-defined type.
-   */
-  template <typename T>
-  inline void nonblocking_send (const unsigned int dest_processor_id,
-		                std::vector<T> &buf,
-		                data_type &type,
-		                request &r,
-		                const int tag=0);
-
-  //-------------------------------------------------------------------
-  /**
-   * Blocking-receive vector from one processor.
+   * Blocking-receive vector from one processor with user-defined type.
    */
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::vector<T> &buf,
+		         const DataType &type,
 		         const int tag=any_tag);
 
   //-------------------------------------------------------------------
   /**
-   * Blocking-receive vector from one processor with user-defined type
+   * Nonblocking-receive vector from one processor with user-defined type.
+   */
+  template <typename T>
+  inline void receive (const int src_processor_id,
+		       std::vector<T> &buf,
+		       const DataType &type,
+		       request &req,
+		       const int tag=any_tag);
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-receive vector from one processor where the communication type 
+   * is inferred from the template argument.
    */
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::vector<T> &buf,
-		         data_type &type,
-		         const int tag=any_tag);
+		         const int tag=any_tag)
+  {
+    return receive (src_processor_id,
+		    buf,
+		    datatype<T>(),
+		    tag);
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-receive vector from one processor where the communication type 
+   * is inferred from the template argument.
+   */
+  template <typename T>
+  inline void receive (const int src_processor_id,
+		       std::vector<T> &buf,
+		       request &req,
+		       const int tag=any_tag)
+  {
+    receive (src_processor_id,
+	     buf,
+	     datatype<T>(),
+	     req,
+	     tag);
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-receive vector from one processor with user-defined type
+   */
+  template <typename T>
+  inline void nonblocking_receive (const int src_processor_id,
+		                   std::vector<T> &buf,
+				   const DataType &type,
+		                   request &r,
+		                   const int tag=any_tag)
+  {
+    receive (src_processor_id,
+	     buf,
+	     type,
+	     r,
+	     tag);
+  }
 
   //-------------------------------------------------------------------
   /**
@@ -304,13 +546,21 @@ namespace Parallel
   inline void nonblocking_receive (const int src_processor_id,
 		                   std::vector<T> &buf,
 		                   request &r,
-		                   const int tag=any_tag);
+		                   const int tag=any_tag)
+  {
+    receive (src_processor_id,
+	     buf,
+	     datatype<T>(),
+	     r,
+	     tag);
+  }
+
   
   //-------------------------------------------------------------------
   /**
    * Wait for a non-blocking send or receive to finish
    */
-  inline void wait (request &r);
+  inline status wait (request &r);
   
   //-------------------------------------------------------------------
   /**
@@ -340,7 +590,7 @@ namespace Parallel
                            T &send,
 			   const unsigned int source_processor_id,
                            T &recv,
-			   data_type &type);
+			   const DataType &type);
 
   //-------------------------------------------------------------------
   /**
@@ -462,37 +712,37 @@ namespace Parallel
 
 #ifdef LIBMESH_HAVE_MPI
  template<>
- inline MPI_Datatype datatype<char>() { return MPI_CHAR; }
+ inline data_type datatype<char>() { return MPI_CHAR; }
 
  template<>
- inline MPI_Datatype datatype<unsigned char>() { return MPI_UNSIGNED_CHAR; }
+ inline data_type datatype<unsigned char>() { return MPI_UNSIGNED_CHAR; }
 
   template<>
-  inline MPI_Datatype datatype<short int>() { return MPI_SHORT; }
+  inline data_type datatype<short int>() { return MPI_SHORT; }
 
   template<>
-  inline MPI_Datatype datatype<unsigned short int>() { return MPI_UNSIGNED_SHORT; }
+  inline data_type datatype<unsigned short int>() { return MPI_UNSIGNED_SHORT; }
 
   template<>
-  inline MPI_Datatype datatype<int>() { return MPI_INT; }
+  inline data_type datatype<int>() { return MPI_INT; }
 
   template<>
-  inline MPI_Datatype datatype<unsigned int>() { return MPI_UNSIGNED; }
+  inline data_type datatype<unsigned int>() { return MPI_UNSIGNED; }
 
   template<>
-  inline MPI_Datatype datatype<long>() { return MPI_LONG; }
+  inline data_type datatype<long>() { return MPI_LONG; }
 
   template<>
-  inline MPI_Datatype datatype<unsigned long>() { return MPI_UNSIGNED_LONG; }
+  inline data_type datatype<unsigned long>() { return MPI_UNSIGNED_LONG; }
 
   template<>
-  inline MPI_Datatype datatype<float>() { return MPI_FLOAT; }
+  inline data_type datatype<float>() { return MPI_FLOAT; }
 
   template<>
-  inline MPI_Datatype datatype<double>() { return MPI_DOUBLE; }
+  inline data_type datatype<double>() { return MPI_DOUBLE; }
 
   template<>
-  inline MPI_Datatype datatype<long double>() { return MPI_LONG_DOUBLE; }
+  inline data_type datatype<long double>() { return MPI_LONG_DOUBLE; }
 
   template <typename T>
   inline bool verify(const T &r)
@@ -534,14 +784,13 @@ namespace Parallel
       {
 	START_LOG("min()", "Parallel");
     
-	T temp;
-	MPI_Allreduce (&r,
-		       &temp,
+	T temp = r;
+	MPI_Allreduce (&temp,
+		       &r,
 		       1,
 		       datatype<T>(),
 		       MPI_MIN,
 		       libMesh::COMM_WORLD);
-	r = temp;
 
 	STOP_LOG("min()", "Parallel");
       }
@@ -577,14 +826,13 @@ namespace Parallel
       {
 	START_LOG("min()", "Parallel");
     
-	std::vector<T> temp(r.size());
-	MPI_Allreduce (&r[0],
-		       &temp[0],
+	std::vector<T> temp(r);
+	MPI_Allreduce (&temp[0],
+		       &r[0],
 		       r.size(),
 		       datatype<T>(),
 		       MPI_MIN,
 		       libMesh::COMM_WORLD);
-	r = temp;
 
 	STOP_LOG("min()", "Parallel");
       }
@@ -598,12 +846,12 @@ namespace Parallel
       {
 	START_LOG("min()", "Parallel");
     
-        std::vector<unsigned int> rchar;
-        pack_vector_bool(r, rchar);
-	std::vector<unsigned int> temp(rchar.size());
-	MPI_Allreduce (&rchar[0],
+        std::vector<unsigned int> ruint;
+        pack_vector_bool(r, ruint);
+	std::vector<unsigned int> temp(ruint.size());
+	MPI_Allreduce (&ruint[0],
 		       &temp[0],
-		       rchar.size(),
+		       ruint.size(),
 		       datatype<unsigned int>(),
 		       MPI_BAND,
 		       libMesh::COMM_WORLD);
@@ -664,14 +912,13 @@ namespace Parallel
       {
 	START_LOG("max()", "Parallel");
     
-	std::vector<T> temp(r.size());
-	MPI_Allreduce (&r[0],
-		       &temp[0],
+	std::vector<T> temp(r);
+	MPI_Allreduce (&temp[0],
+		       &r[0],
 		       r.size(),
 		       datatype<T>(),
 		       MPI_MAX,
 		       libMesh::COMM_WORLD);
-	r = temp;
 
 	STOP_LOG("max()", "Parallel");
       }
@@ -685,12 +932,12 @@ namespace Parallel
       {
 	START_LOG("max()", "Parallel");
     
-        std::vector<unsigned int> rchar;
-        pack_vector_bool(r, rchar);
-	std::vector<unsigned int> temp(rchar.size());
-	MPI_Allreduce (&rchar[0],
+        std::vector<unsigned int> ruint;
+        pack_vector_bool(r, ruint);
+	std::vector<unsigned int> temp(ruint.size());
+	MPI_Allreduce (&ruint[0],
 		       &temp[0],
-		       rchar.size(),
+		       ruint.size(),
 		       datatype<unsigned int>(),
 		       MPI_BOR,
 		       libMesh::COMM_WORLD);
@@ -741,6 +988,7 @@ namespace Parallel
   }
 
 
+
   template <typename T>
   inline void sum(std::complex<T> &r)
   {
@@ -780,142 +1028,62 @@ namespace Parallel
       }
   }
 
-  inline Status probe (const int src_processor_id,
+
+
+  inline status probe (const int src_processor_id,
 		       const int tag)
   {
     START_LOG("probe()", "Parallel");
 
-    Status status;
+    status status;
 
     MPI_Probe (src_processor_id, 
 	       tag, 
 	       libMesh::COMM_WORLD, 
-	       status);
+	       &status);
 
     STOP_LOG("probe()", "Parallel");
 
     return status;
   }  
 
-  inline Status probe (const int src_processor_id,
-		       const MPI_Datatype &type,
-		       const int tag)
-  {
-    START_LOG("probe()", "Parallel");
 
-    Status status(type);
-
-    MPI_Probe (src_processor_id, 
-	       tag, 
-	       libMesh::COMM_WORLD, 
-	       status);
-
-    STOP_LOG("probe()", "Parallel");
-
-    return status;
-  }  
 
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
+		    const DataType &type,
 		    const int tag)
-  {
+  {    
     START_LOG("send()", "Parallel");
-    
+
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
     const int ierr =
 #endif
       MPI_Send (buf.empty() ? NULL : &buf[0],
 		buf.size(),
-		datatype<T>(),
+		type,
 		dest_processor_id,
 		tag,
-		libMesh::COMM_WORLD);    
-    libmesh_assert (ierr == MPI_SUCCESS);
+		libMesh::COMM_WORLD);
+
+    libmesh_assert (ierr == MPI_SUCCESS);    
     
     STOP_LOG("send()", "Parallel");
   }
+
 
 
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
-		    std::vector<std::complex<T> > &buf,
+		    std::vector<T> &buf,
+		    const DataType &type,
+		    request &req,
 		    const int tag)
-  {
+  {    
     START_LOG("send()", "Parallel");
-    
-    const int ierr =	  
-      MPI_Send (buf.empty() ? NULL : &buf[0],
-		buf.size() * 2,
-		datatype<T>(),
-		dest_processor_id,
-		tag,
-		libMesh::COMM_WORLD);    
-    libmesh_assert (ierr == MPI_SUCCESS);
-    
-    STOP_LOG("send()", "Parallel");
-  }
 
-
-
-  template <typename T>
-  inline void nonblocking_send (const unsigned int dest_processor_id,
-		                std::vector<T> &buf,
-		                request &r,
-		                const int tag)
-  {
-    START_LOG("nonblocking_send()", "Parallel");
-    
-#ifndef NDEBUG
-    // Only catch the return value when asserts are active.
-    const int ierr =
-#endif
-      MPI_Isend (buf.empty() ? NULL : &buf[0],
-		 buf.size(),
-		 datatype<T>(),
-		 dest_processor_id,
-		 tag,
-		 libMesh::COMM_WORLD,
-		 &r);    
-    libmesh_assert (ierr == MPI_SUCCESS);
-    
-    STOP_LOG("nonblocking_send()", "Parallel");
-  }
-
-
-  template <typename T>
-  inline void nonblocking_send (const unsigned int dest_processor_id,
-		                std::vector<std::complex<T> > &buf,
-		                request &r,
-		                const int tag)
-  {
-    START_LOG("nonblocking_send()", "Parallel");
-    
-    const int ierr =	  
-      MPI_Isend (buf.empty() ? NULL : &buf[0],
-		 buf.size() * 2,
-		 datatype<T>(),
-		 dest_processor_id,
-		 tag,
-		 libMesh::COMM_WORLD,
-		 &r);    
-    libmesh_assert (ierr == MPI_SUCCESS);
-    
-    STOP_LOG("nonblocking_send()", "Parallel");
-  }
-
-
-
-  template <typename T>
-  inline void nonblocking_send (const unsigned int dest_processor_id,
-		                std::vector<T> &buf,
-		                MPI_Datatype &type,
-		                request &r,
-		                const int tag)
-  {
-    START_LOG("nonblocking_send()", "Parallel");
-    
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
     const int ierr =
@@ -926,43 +1094,53 @@ namespace Parallel
 		 dest_processor_id,
 		 tag,
 		 libMesh::COMM_WORLD,
-		 &r);    
-    libmesh_assert (ierr == MPI_SUCCESS);
-    
-    STOP_LOG("nonblocking_send()", "Parallel");
+		 &req);    
+    libmesh_assert (ierr == MPI_SUCCESS);    
+
+    STOP_LOG("send()", "Parallel");
   }
 
 
 
   template <typename T>
-  inline Status receive (const int src_processor_id,
-		         std::vector<T> &buf,
-		         const int tag)
+  inline void send (const unsigned int dest_processor_id,
+		    std::vector<std::complex<T> > &buf,
+		    const int tag)
   {
-    START_LOG("receive()", "Parallel");
+    START_LOG("send()", "Parallel");
 
-    // Get the status of the message, explicitly provide the
-    // datatype so we can later query the size
-    Status status(Parallel::probe(src_processor_id, datatype<T>(), tag));
-
-    buf.resize(status.size());
-    
-#ifndef NDEBUG
-    // Only catch the return value when asserts are active.
-    const int ierr =
-#endif
-      MPI_Recv (buf.empty() ? NULL : &buf[0],
-		buf.size(),
+    const int ierr =	  
+      MPI_Send (buf.empty() ? NULL : &buf[0],
+		buf.size() * 2,
 		datatype<T>(),
-		src_processor_id,
+		dest_processor_id,
 		tag,
-		libMesh::COMM_WORLD,
-		status);
-    libmesh_assert (ierr == MPI_SUCCESS);
-    
-    STOP_LOG("receive()", "Parallel");
+		libMesh::COMM_WORLD);    
 
-    return status;
+    libmesh_assert (ierr == MPI_SUCCESS);
+
+    STOP_LOG("send()", "Parallel");
+  }
+
+
+
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::vector<std::complex<T> > &buf,
+		    request &req,
+		    const int tag)
+  {    
+    START_LOG("send()", "Parallel");
+
+    MPI_Isend (buf.empty() ? NULL : &buf[0],
+	       buf.size() * 2,
+	       datatype<T>(),
+	       dest_processor_id,
+	       tag,
+	       libMesh::COMM_WORLD,
+	       &req);    
+
+    STOP_LOG("send()", "Parallel");
   }
 
 
@@ -970,14 +1148,14 @@ namespace Parallel
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::vector<T> &buf,
-		         MPI_Datatype &type,
+		         const DataType &type,
 		         const int tag)
   {
     START_LOG("receive()", "Parallel");
 
     // Get the status of the message, explicitly provide the
     // datatype so we can later query the size
-    Status status(Parallel::probe(src_processor_id, type, tag));
+    Status status(Parallel::probe(src_processor_id, tag), type);
 
     buf.resize(status.size());
     
@@ -993,11 +1171,12 @@ namespace Parallel
 		libMesh::COMM_WORLD,
 		status);
     libmesh_assert (ierr == MPI_SUCCESS);
-    
+
     STOP_LOG("receive()", "Parallel");
 
     return status;
   }
+
 
 
   template <typename T>
@@ -1009,7 +1188,7 @@ namespace Parallel
 
     // Get the status of the message, explicitly provide the
     // datatype so we can later query the size
-    Status status(Parallel::probe(src_processor_id, datatype<T>(), tag));
+    Status status(Parallel::probe(src_processor_id, tag), datatype<T>());
 
     libmesh_assert(!(status.size()%2));
     buf.resize(status.size()/2);
@@ -1032,60 +1211,69 @@ namespace Parallel
 
 
   template <typename T>
-  inline void nonblocking_receive (const int src_processor_id,
-		                   std::vector<T> &buf,
-		                   request &r,
-		                   const int tag)
+  inline void receive (const int src_processor_id,
+		       std::vector<T> &buf,
+		       const DataType &type,
+		       request &req,
+		       const int tag)
   {
-    START_LOG("nonblocking_receive()", "Parallel");
-    
+    START_LOG("receive()", "Parallel");
+
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
     const int ierr =
 #endif
       MPI_Irecv (buf.empty() ? NULL : &buf[0],
 		 buf.size(),
-		 datatype<T>(),
+		 type,
 		 src_processor_id,
 		 tag,
 		 libMesh::COMM_WORLD,
-		 &r);    
-    libmesh_assert (ierr == MPI_SUCCESS);
-    
-    STOP_LOG("nonblocking_receive()", "Parallel");
+		 &req);    
+    libmesh_assert (ierr == MPI_SUCCESS);    
+
+    STOP_LOG("receive()", "Parallel");
   }
 
- 
+
+
   template <typename T>
-  inline void nonblocking_recieve (const int src_processor_id,
-		                   std::vector<std::complex<T> > &buf,
-		                   request &r,
-		                   const int tag)
+  inline void receive (const int src_processor_id,
+		       std::vector<std::complex<T> > &buf,
+		       request &req,
+		       const int tag)
   {
-    START_LOG("nonblocking_receive()", "Parallel");
-    
+    START_LOG("receive()", "Parallel");
+
     const int ierr =	  
       MPI_Irecv (buf.empty() ? NULL : &buf[0],
-		 buf.size() * 2,
-		 datatype<T>(),
-		 src_processor_id,
-		 tag,
-		 libMesh::COMM_WORLD,
-		 &r);    
+		buf.size() * 2,
+		datatype<T>(),
+		src_processor_id,
+		tag,
+		libMesh::COMM_WORLD,
+		&req);
+
     libmesh_assert (ierr == MPI_SUCCESS);
     
-    STOP_LOG("nonblocking_receive()", "Parallel");
+    STOP_LOG("receive()", "Parallel");
+
+    return;
   }
 
   
 
-  inline void wait (request &r)
+  inline status wait (request &r)
   {
     START_LOG("wait()", "Parallel");
-    
-    MPI_Wait (&r, MPI_STATUS_IGNORE);
+
+    status status;
+
+    MPI_Wait (&r, &status);
 
     STOP_LOG("wait()", "Parallel");
+
+    return status;
   }
 
   
@@ -1097,6 +1285,43 @@ namespace Parallel
     MPI_Waitall (r.size(), r.empty() ? NULL : &r[0], MPI_STATUSES_IGNORE);
 
     STOP_LOG("wait()", "Parallel");
+  }
+
+
+
+  template <typename T>
+  inline void send_receive(const unsigned int dest_processor_id,
+			   std::vector<T> &send,
+			   const unsigned int source_processor_id,
+			   std::vector<T> &recv,
+			   const DataType &type)
+  {
+    START_LOG("send_receive()", "Parallel");
+
+    if (dest_processor_id   == libMesh::processor_id() &&
+	source_processor_id == libMesh::processor_id())
+      {
+	recv = send;
+	STOP_LOG("send_receive()", "Parallel");
+	return;
+      }
+
+    Parallel::request request;
+    
+    Parallel::nonblocking_send (dest_processor_id,
+				send,
+				type,
+				request,
+				/* tag = */ 321);
+    
+    Parallel::receive (source_processor_id,
+		       recv,
+		       type,
+		       /* tag = */ 321);
+    
+    Parallel::wait (request);
+    
+    STOP_LOG("send_receive()", "Parallel");
   }
   
 
@@ -1126,6 +1351,7 @@ namespace Parallel
 
     STOP_LOG("send_receive()", "Parallel");
   }
+
 
 
   template <typename T>
@@ -1162,43 +1388,22 @@ namespace Parallel
 			   const unsigned int source_processor_id,
 			   std::vector<T> &recv)
   {
-    START_LOG("send_receive()", "Parallel");
-
-    if (dest_processor_id   == libMesh::processor_id() &&
-	source_processor_id == libMesh::processor_id())
-      {
-	recv = send;
-	STOP_LOG("send_receive()", "Parallel");
-	return;
-      }
-
-    // Trade buffer sizes first
-    unsigned int sendsize = send.size(), recvsize;
-    MPI_Sendrecv(&sendsize, 1, datatype<unsigned int>(),
-		 dest_processor_id, 0,
-		 &recvsize, 1, datatype<unsigned int>(),
-		 source_processor_id, 0,
-		 libMesh::COMM_WORLD,
-		 MPI_STATUS_IGNORE);
-
-    recv.resize(recvsize);
-
-    MPI_Sendrecv(sendsize ? &send[0] : NULL, sendsize, datatype<T>(),
-		 dest_processor_id, 0,
-		 recvsize ? &recv[0] : NULL, recvsize, datatype<T>(),
-		 source_processor_id, 0,
-		 libMesh::COMM_WORLD,
-		 MPI_STATUS_IGNORE);
-    
-    STOP_LOG("send_receive()", "Parallel");
+    // Call the user-defined type version with automatic 
+    // type conversion based on template argument:    
+    send_receive (dest_processor_id,
+		  send,
+		  source_processor_id,
+		  recv,
+		  datatype<T>());
   }
+
 
 
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
-			   std::vector<std::complex<T> > &send,
+			   std::vector<std::vector<T> > &send,
 			   const unsigned int source_processor_id,
-			   std::vector<std::complex<T> > &recv)
+			   std::vector<std::vector<T> > &recv)
   {
     START_LOG("send_receive()", "Parallel");
 
@@ -1209,147 +1414,107 @@ namespace Parallel
 	STOP_LOG("send_receive()", "Parallel");
 	return;
       }
-
-    // Trade buffer sizes first
-    unsigned int sendsize = send.size(), recvsize;
-    MPI_Sendrecv(&sendsize, 1, datatype<unsigned int>(),
-		 dest_processor_id, 0,
-		 &recvsize, 1, datatype<unsigned int>(),
-		 source_processor_id, 0,
-		 libMesh::COMM_WORLD,
-		 MPI_STATUS_IGNORE);
-
-    recv.resize(recvsize);
-
-    MPI_Sendrecv(sendsize ? &send[0] : NULL, sendsize * 2, datatype<T>(),
-		 dest_processor_id, 0,
-		 recvsize ? &recv[0] : NULL, recvsize * 2, datatype<T>(),
-		 source_processor_id, 0,
-		 libMesh::COMM_WORLD,
-		 MPI_STATUS_IGNORE);
     
-    STOP_LOG("send_receive()", "Parallel");
-  }
+    // temporary buffers - these will be sized in bytes
+    // and manipulated with MPI_Pack and friends
+    std::vector<char> sendbuf, recvbuf;
 
+    // figure out how many bytes we need to pack all the data
+    int packedsize=0, sendsize=0;
 
+    // The outer buffer size
+    MPI_Pack_size (1,           
+		   datatype<unsigned int>(),
+		   libMesh::COMM_WORLD,
+		   &packedsize);
+    sendsize += packedsize;
 
-  template <typename T>
-  inline void send_receive(const unsigned int dest_processor_id,
-			   std::vector<T> &send,
-			   const unsigned int source_processor_id,
-			   std::vector<T> &recv,
-			   MPI_Datatype &type)
-  {
-    START_LOG("send_receive()", "Parallel");
-
-    if (dest_processor_id   == libMesh::processor_id() &&
-	source_processor_id == libMesh::processor_id())
+    for (unsigned int i=0; i<send.size(); i++)
       {
-	recv = send;
-	STOP_LOG("send_receive()", "Parallel");
-	return;
+	// The size of the ith inner buffer
+	MPI_Pack_size (1,           
+		       datatype<unsigned int>(),
+		       libMesh::COMM_WORLD,
+		       &packedsize);
+	sendsize += packedsize;
+
+	// The data for each inner buffer
+	MPI_Pack_size (send[i].size(),
+		       datatype<T>(),
+		       libMesh::COMM_WORLD,
+		       &packedsize);
+	sendsize += packedsize;
       }
-
-    // Trade buffer sizes first
-    unsigned int sendsize = send.size(), recvsize;
-    MPI_Sendrecv(&sendsize, 1, datatype<unsigned int>(),
-		 dest_processor_id, 0,
-		 &recvsize, 1, datatype<unsigned int>(),
-		 source_processor_id, 0,
-		 libMesh::COMM_WORLD,
-		 MPI_STATUS_IGNORE);
-
-    recv.resize(recvsize);
-
-    MPI_Sendrecv(sendsize ? &send[0] : NULL, sendsize, type,
-		 dest_processor_id, 0,
-		 recvsize ? &recv[0] : NULL, recvsize, type,
-		 source_processor_id, 0,
-		 libMesh::COMM_WORLD,
-		 MPI_STATUS_IGNORE);
     
-    STOP_LOG("send_receive()", "Parallel");
-  }
+    libmesh_assert (sendsize /* should at least be 1! */);
+    sendbuf.resize (sendsize);
 
+    // Pack the send buffer
+    int pos=0;
 
-
-  template <typename T>
-  inline void send_receive(const unsigned int dest_processor_id,
-			     std::vector<std::vector<T> > &send,
-			     const unsigned int source_processor_id,
-			     std::vector<std::vector<T> > &recv)
-  {
-    START_LOG("send_receive()", "Parallel");
-
-    if (dest_processor_id   == libMesh::processor_id() &&
-	source_processor_id == libMesh::processor_id())
-      {
-	recv = send;
-	STOP_LOG("send_receive()", "Parallel");
-	return;
-      }
-
-    // Trade outer buffer sizes first
-    unsigned int sendsize = send.size(), recvsize;
-    MPI_Sendrecv(&sendsize, 1, datatype<unsigned int>(),
-		 dest_processor_id, 0,
-		 &recvsize, 1, datatype<unsigned int>(),
-		 source_processor_id, 0,
-		 libMesh::COMM_WORLD,
-		 MPI_STATUS_IGNORE);
-
-    recv.resize(recvsize);
-
-    // Trade inner buffer sizes next
-    std::vector<unsigned int> sendsizes(sendsize), recvsizes(recvsize);
-    unsigned int sendsizesum = 0, recvsizesum = 0;
-    for (unsigned int i = 0; i != sendsize; ++i)
-      {
-        sendsizes[i] = send[i].size();
-	sendsizesum += sendsizes[i];
-      }
-
-    MPI_Sendrecv(sendsize ? &sendsizes[0] : NULL, sendsize, 
-		 datatype<unsigned int>(), dest_processor_id, 0,
-		 recvsize ? &recvsizes[0] : NULL, recvsize, 
-		 datatype<unsigned int>(), source_processor_id, 0,
-		 libMesh::COMM_WORLD,
-		 MPI_STATUS_IGNORE);
-
-    for (unsigned int i = 0; i != recvsize; ++i)
-      {
-	recvsizesum += recvsizes[i];
-	recv[i].resize(recvsizes[i]);
-      }
-
-    // Build temporary buffers third
-    // We can't do multiple Sendrecv calls instead because send.size() may
-    // differ on different processors
-    std::vector<T> senddata(sendsizesum), recvdata(recvsizesum);
-
-    // Fill the temporary send buffer
-    typename std::vector<T>::iterator out = senddata.begin();
-    for (unsigned int i = 0; i != sendsize; ++i)
-      {
-	out = std::copy(send[i].begin(), send[i].end(), out);
-      }
-    libmesh_assert(out == senddata.end());
+    // ... the size of the outer buffer
+    sendsize = send.size();
+    MPI_Pack (&sendsize, 1, datatype<unsigned int>(),
+	      &sendbuf[0], sendbuf.size(), &pos,
+	      libMesh::COMM_WORLD);
     
-    MPI_Sendrecv(sendsizesum ? &senddata[0] : NULL, sendsizesum,
-		 datatype<T>(), dest_processor_id, 0,
-		 recvsizesum ? &recvdata[0] : NULL, recvsizesum,
-		 datatype<T>(), source_processor_id, 0,
-		 libMesh::COMM_WORLD,
-		 MPI_STATUS_IGNORE);
-
-    // Empty the temporary recv buffer
-    typename std::vector<T>::iterator in = recvdata.begin();
-    for (unsigned int i = 0; i != recvsize; ++i)
+    for (unsigned int i=0; i<send.size(); i++)
       {
-	std::copy(in, in + recvsizes[i], recv[i].begin());
-	in += recvsizes[i];
+	// ... the size of the ith inner buffer
+	sendsize = send[i].size();
+	MPI_Pack (&sendsize, 1, datatype<unsigned int>(),
+		  &sendbuf[0], sendbuf.size(), &pos,
+		  libMesh::COMM_WORLD);
+	
+	// ... the contents of the ith inner buffer
+	if (!send[i].empty())
+	  MPI_Pack (&send[i][0], send[i].size(), datatype<T>(),
+		    &sendbuf[0], sendbuf.size(), &pos,
+		    libMesh::COMM_WORLD);
       }
-    libmesh_assert(in == recvdata.end());
+
+    libmesh_assert (static_cast<unsigned int>(pos) == sendbuf.size());
+
+    Parallel::request request;
+
+    Parallel::nonblocking_send (dest_processor_id,
+				sendbuf,
+				MPI_PACKED,
+				request,
+				/* tag = */ 123);
+
+    Parallel::receive (source_processor_id,
+		       recvbuf,
+		       MPI_PACKED,
+		       /* tag = */ 123);
+
+    // Unpack the received buffer
+    libmesh_assert (!recvbuf.empty());
+    pos=0;
+    MPI_Unpack (&recvbuf[0], recvbuf.size(), &pos,
+		&sendsize, 1, datatype<unsigned int>(),
+		libMesh::COMM_WORLD);
+    
+    // ... size the outer buffer
+    recv.resize (sendsize);
+
+    for (unsigned int i=0; i<recv.size(); i++)
+      {
+	MPI_Unpack (&recvbuf[0], recvbuf.size(), &pos,
+		    &sendsize, 1, datatype<unsigned int>(),
+		    libMesh::COMM_WORLD);
+    
+	// ... size the inner buffer
+	recv[i].resize (sendsize);
+
+	// ... unpack the inner buffer if it is not empty
+	if (!recv[i].empty())
+	  MPI_Unpack (&recvbuf[0], recvbuf.size(), &pos,
+		      &recv[i][0], recv[i].size(), datatype<T>(),
+		      libMesh::COMM_WORLD);
+      }
+
+    Parallel::wait (request);
 
     STOP_LOG("send_receive()", "Parallel");
   }
@@ -1927,16 +2092,10 @@ namespace Parallel
 
   // on one processor a blocking probe can only be used to 
   // test a nonblocking send, which we don't really support
-  inline Status probe (const int,
-		       const int = any_tag)
-  { libmesh_error(); return Status(); }
+  inline status probe (const int,
+		       const int)
+  { libmesh_error(); status status; return status; }
 
-  // on one processor a blocking probe can only be used to 
-  // test a nonblocking send, which we don't really support
-  inline Status probe (const int,
-		       const MPI_Datatype &,
-		       const int = any_tag)
-  { libmesh_error(); return Status(); }
 
   // Blocking sends don't make sense on one processor
   template <typename T>
@@ -1962,7 +2121,7 @@ namespace Parallel
 		                   request &,
 		                   const int) {}
   
-  inline void wait (request &) {}
+  inline status wait (request &) { status status; return status; }
   
   inline void wait (std::vector<request> &) {}
   
