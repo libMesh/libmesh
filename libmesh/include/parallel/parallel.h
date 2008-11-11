@@ -93,9 +93,12 @@ namespace Parallel
   
 #else
   // These shouldn't be needed
-  typedef unsigned int data_type;
+  typedef int data_type;
   typedef unsigned int request;
   typedef unsigned int status;
+
+  template <typename T>
+  inline data_type datatype() { return 0; }
 
   const int any_tag=-1;
   const int any_source=0;
@@ -231,18 +234,21 @@ namespace Parallel
     const data_type& datatype () const
     { return _datatype; }
   
+#ifdef LIBMESH_HAVE_MPI
     unsigned int size (const data_type &type) const
     {
-#ifdef LIBMESH_HAVE_MPI
       int msg_size;
       MPI_Get_count (const_cast<MPI_Status*>(&_status), type, &msg_size);
       libmesh_assert (msg_size >= 0);
       return msg_size;
+    }
 #else
+    unsigned int size (const data_type &) const
+    {
       libmesh_error();
       return 0;
-#endif
     }
+#endif
 
     unsigned int size () const
     { return this->size (this->datatype()); }
@@ -2090,36 +2096,102 @@ namespace Parallel
   template <typename T>
   inline void sum(std::vector<T> &) {}
 
-  // on one processor a blocking probe can only be used to 
-  // test a nonblocking send, which we don't really support
+ //-------------------------------------------------------------------
+  /**
+   * Blocking message probe.  Allows information about a message to be 
+   * examined before the message is actually received.
+   *
+   * we do not currently support this operationon one processor without MPI.
+   */
   inline status probe (const int,
 		       const int)
   { libmesh_error(); status status; return status; }
 
-
-  // Blocking sends don't make sense on one processor
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-send vector to one processor with user-defined type.
+   *
+   * we do not currently support this operationon one processor without MPI.
+   */
   template <typename T>
   inline void send (const unsigned int,
 		    std::vector<T> &,
-		    const unsigned int) { libmesh_error(); }
+		    const DataType &,
+		    const int)
+  { libmesh_error(); }
 
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-send vector to one processor with user-defined type.
+   *
+   * we do not currently support this operationon one processor without MPI.
+   */
   template <typename T>
-  inline void nonblocking_send (const unsigned int,
-		                std::vector<T> &,
-		                request &,
-		                const int) {}
+  inline void send (const unsigned int,
+		    std::vector<T> &,
+		    const DataType &,
+		    request &,
+		    const int)
+  { libmesh_error(); }
 
-  // Blocking receives don't make sense on one processor
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-receive vector from one processor with user-defined type.
+   *
+   * we do not currently support this operationon one processor without MPI.
+   */
   template <typename T>
   inline Status receive (const int,
 		         std::vector<T> &,
-		         const int) { libmesh_error(); return Status(); }
+		         const DataType &,
+		         const int)
+  { libmesh_error(); return Status(); }
 
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-receive vector from one processor with user-defined type.
+   *
+   * we do not currently support this operationon one processor without MPI.
+   */
   template <typename T>
-  inline void nonblocking_receive (const int,
-		                   std::vector<T> &,
-		                   request &,
-		                   const int) {}
+  inline void receive (const int,
+		       std::vector<T> &,
+		       const DataType &,
+		       request &,
+		       const int)
+  { libmesh_error(); }
+
+
+//   // on one processor a blocking probe can only be used to 
+//   // test a nonblocking send, which we don't really support
+//   inline status probe (const int,
+// 		       const int)
+//   { libmesh_error(); status status; return status; }
+
+
+//   // Blocking sends don't make sense on one processor
+//   template <typename T>
+//   inline void send (const unsigned int,
+// 		    std::vector<T> &,
+// 		    const unsigned int) { libmesh_error(); }
+
+//   template <typename T>
+//   inline void nonblocking_send (const unsigned int,
+// 		                std::vector<T> &,
+// 		                request &,
+// 		                const int) {}
+
+//   // Blocking receives don't make sense on one processor
+//   template <typename T>
+//   inline Status receive (const int,
+// 		         std::vector<T> &,
+// 		         const int) { libmesh_error(); return Status(); }
+
+//   template <typename T>
+//   inline void nonblocking_receive (const int,
+// 		                   std::vector<T> &,
+// 		                   request &,
+// 		                   const int) {}
   
   inline status wait (request &) { status status; return status; }
   
