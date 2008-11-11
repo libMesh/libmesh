@@ -216,7 +216,7 @@ void ExodusII_IO::read (const std::string& fname)
 
 #ifndef LIBMESH_HAVE_EXODUS_API
 
-void ExodusII_IO::copy_nodal_solution(System& , std::string)
+void ExodusII_IO::copy_nodal_solution(System& , std::string, unsigned int)
 {
 
   std::cerr <<  "ERROR, ExodusII API is not defined.\n"

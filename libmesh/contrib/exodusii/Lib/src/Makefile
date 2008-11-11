@@ -24,7 +24,7 @@ ifeq ($(enable-shared),yes)
 endif
 
 
-ifeq ($(enable-netcdf),no)
+ifeq ($(enable-exodus),no)
   all::
 	@echo "<<< $(pkgname) is disabled, not building >>>"
 else
