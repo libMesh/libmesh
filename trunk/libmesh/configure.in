@@ -30,25 +30,27 @@ AC_MSG_RESULT(----------- Configuring libMesh -------------)
 AC_MSG_RESULT(---------------------------------------------)
 
 
+dnl --------------------------------------------------------------
 dnl Print configuration info to the header file
-
+dnl --------------------------------------------------------------
 AC_DEFINE_UNQUOTED(CONFIGURE_INFO, ["$0 run on `date`"], [Configuration information.])	
 
+dnl --------------------------------------------------------------
 dnl Compute the canonical target system type variable "target", and its
 dnl three individual parts: "target_cpu", "target_vendor", and "target_os"
+dnl --------------------------------------------------------------
 AC_CANONICAL_TARGET
 
+dnl --------------------------------------------------------------
 dnl Do compilation tests using the compiler, preprocessor, and file extensions
 dnl of C++.  This uses the .C extension for test programs.
+dnl --------------------------------------------------------------
 AC_LANG_CPLUSPLUS
 
-dnl -------------------------------------------------------------
-dnl MPI (on its own or via PETSc) may require mpicc/mpicxx compilers
-dnl -------------------------------------------------------------
-
-dnl -------------------------------------------------------------
-dnl MPI -- enabled by default
-dnl -------------------------------------------------------------
+dnl -------------------------------------------------------------------
+dnl MPI -- enabled by default.  Check for it now so we can be somewhat
+dnl                             smart about which compilers to look for
+dnl -------------------------------------------------------------------
 AC_ARG_ENABLE(mpi,
               AC_HELP_STRING([--enable-mpi],
                              [build with MPI message passing support]),
@@ -56,42 +58,37 @@ AC_ARG_ENABLE(mpi,
               enablempi=yes)
 
 
-dnl -------------------------------------------------------------
-dnl Petsc -- enabled by default
-dnl -------------------------------------------------------------
-AC_ARG_ENABLE(petsc,
-              AC_HELP_STRING([--enable-petsc],
-                             [build with PETSc iterative solver suppport]),
-              enablepetsc=$enableval,
-              enablepetsc=yes)
+CXX_TRY_LIST="g++ icc pgCC c++"
+CC_TRY_LIST="gcc icc pgcc cc"
 
-dnl Determines a C++ compiler to use.  First checks if the variable CXX is
-dnl already set.  If not, then searches under g++, c++, and other names.
+if  (test "$enablempi" != no) ; then
+  CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
+  CC_TRY_LIST="mpicc $CC_TRY_LIST"
+fi
+
 AC_ARG_WITH([cxx],
 	    AC_HELP_STRING([--with-cxx=CXX],
                            [C++ compiler to use]),
 	    [CXX="$withval"],
 	    [])
 
-if test "$enablempi" != no ; then
-  AC_PROG_CXX(mpicxx mpiCC pgCC icc g++ c++)
-else
-  AC_PROG_CXX(pgCC icc g++ c++)
-fi
-
-dnl Determine a C compiler to use.  If CC is not already set, checks for
-dnl gcc, cc, and other C compilers.  Then sets the CC variable to the result.
 AC_ARG_WITH([cc],
 	    AC_HELP_STRING([--with-cc=CC],
                            [C compiler to use]),
 	    [CC="$withval"],
 	    [])
 
-if test "$enablempi" != no ; then
-  AC_PROG_CC(mpicc pgcc icc gcc cc)
-else
-  AC_PROG_CC(pgcc icc gcc cc)
-fi
+dnl --------------------------------------------------------------
+dnl Determines a C++ compiler to use.  First checks if the variable CXX is
+dnl already set.  If not, then searches under g++, c++, and other names.
+dnl --------------------------------------------------------------
+AC_PROG_CXX([$CXX_TRY_LIST])
+
+dnl --------------------------------------------------------------
+dnl Determine a C compiler to use.  If CC is not already set, checks for
+dnl gcc, cc, and other C compilers.  Then sets the CC variable to the result.
+dnl --------------------------------------------------------------
+AC_PROG_CC([$CC_TRY_LIST])
 
 
 dnl --------------------------------------------------------------
@@ -121,20 +118,26 @@ if test "$enableexceptions" != no ; then
 fi
 dnl --------------------------------------------------------------
 
+dnl --------------------------------------------------------------
 dnl See aclocal.m4 for the definition of this function.  It can
 dnl figure out which version of a particular compiler, e.g. GCC 4.0,
 dnl you are using.
+dnl --------------------------------------------------------------
 DETERMINE_CXX_BRAND
 
+dnl --------------------------------------------------------------
 dnl See aclocal.m4 for the definition of this as well.  It uses the
 dnl output of DETERMINE_CXX_BRAND to set special flags for idiosyncratic
 dnl compilers.  For example, newer versions of GCC have additional C++ debugging
 dnl flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
+dnl --------------------------------------------------------------
 SET_CXX_FLAGS
 
+dnl --------------------------------------------------------------
 dnl The AC_SUBST(foo) command creates an output variable from a shell variable.
 dnl This command also causes AC_OUTPUT to replace all instances of @VAR@ with
 dnl the value of the shell variable VAR in the output files (e.g. one or more Makefiles).
+dnl --------------------------------------------------------------
 AC_SUBST(host)
 AC_SUBST(GXX_VERSION)
 AC_SUBST(CXXFLAGS_OPT)
@@ -390,7 +393,7 @@ dnl dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
-dnl higher order shapes -- disabled by default
+dnl higher order shapes -- enabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(pfem,
               AC_HELP_STRING([--enable-pfem],
@@ -543,6 +546,16 @@ if test "$enableoptional" != no ; then
    AC_MSG_RESULT(----- Configuring for optional packages -----)
    AC_MSG_RESULT(---------------------------------------------)
 
+
+
+dnl -------------------------------------------------------------
+dnl Petsc -- enabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(petsc,
+              AC_HELP_STRING([--enable-petsc],
+                             [build with PETSc iterative solver suppport]),
+              enablepetsc=$enableval,
+              enablepetsc=yes)
 
 
 dnl -------------------------------------------------------------
@@ -876,19 +889,36 @@ dnl end of --disable-optional test
    AC_MSG_RESULT(--- Done configuring for optional packages ---)
    AC_MSG_RESULT(----------------------------------------------)
 else
-  dnl --disable-optional, so don't build any optional packages!
+   dnl --disable-optional, so don't build any optional packages!
+   enablepetsc=no
    enablelaspack=no
    enablemetis=no
    enableparmetis=no
    enablesfc=no
    enablegz=no
    enabletetgen=no
+   enabletriangle=no
+   enablegmv=no
+   enablevtk=no
+   enableexodus=no
+   enablenetcdf=no
+   enablenemesis=no
+   enablelibhilbert=no
+   dnl -----------------
+   AC_SUBST(enablepetsc)
    AC_SUBST(enablelaspack)
    AC_SUBST(enablemetis)
    AC_SUBST(enableparmetis)
    AC_SUBST(enablesfc)
    AC_SUBST(enablegz)
    AC_SUBST(enabletetgen)
+   AC_SUBST(enabletriangle)
+   AC_SUBST(enablegmv)
+   AC_SUBST(enablevtk)
+   AC_SUBST(enableexodus)
+   AC_SUBST(enablenetcdf)
+   AC_SUBST(enablenemesis)
+   AC_SUBST(enablelibhilbert)
 fi
 dnl end of --disable-optional test 
 
