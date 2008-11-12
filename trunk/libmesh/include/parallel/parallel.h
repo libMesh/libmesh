@@ -92,13 +92,16 @@ namespace Parallel
   const int any_source=MPI_ANY_SOURCE;
   
 #else
-  // These shouldn't be needed
-  typedef int data_type;
-  typedef unsigned int request;
-  typedef unsigned int status;
+
+  // These shouldn't actually be needed, but must be 
+  // unique types for function overloading to work 
+  // properly.
+  struct data_type { /* unsigned int t; */ };
+  struct request   { /* unsigned int r; */ };
+  struct status    { /* unsigned int s; */ };
 
   template <typename T>
-  inline data_type datatype() { return 0; }
+  inline data_type datatype() { return data_type(); }
 
   const int any_tag=-1;
   const int any_source=0;
