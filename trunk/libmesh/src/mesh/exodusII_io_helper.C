@@ -152,7 +152,7 @@ void ExodusII_IO_Helper::open(const char* filename)
 void ExodusII_IO_Helper::read_header()
 {
   ex_err = exII::ex_get_init(ex_id,
-			     &title[0],
+			     title.empty() ? NULL : &title[0],
 			     &num_dim,
 			     &num_nodes,
 			     &num_elem,
@@ -493,7 +493,10 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
       z[i]=(*mesh.node_ptr(i))(2);
     }
 
-  ex_err = exII::ex_put_coord(ex_id, &x[0], &y[0], &z[0]);
+  ex_err = exII::ex_put_coord(ex_id,
+			      x.empty() ? NULL : &x[0],
+			      y.empty() ? NULL : &y[0],
+			      z.empty() ? NULL : &z[0]);
 
   check_err(ex_err, "Error writing coordinates to Exodus file.");
 }
