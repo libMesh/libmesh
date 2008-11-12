@@ -99,9 +99,9 @@ void Nemesis_IO_Helper::get_ss_param_global()
       
       nemesis_err_flag =
 	Nemesis::ne_get_ss_param_global(ex2helper.ex_id,
-					&global_sideset_ids[0],
-					&num_global_side_counts[0],
-					&num_global_side_df_counts[0]);
+					global_sideset_ids.empty()        ? NULL : &global_sideset_ids[0],
+					num_global_side_counts.empty()    ? NULL : &num_global_side_counts[0],
+					num_global_side_df_counts.empty() ? NULL : &num_global_side_df_counts[0]);
       ex2helper.check_err(nemesis_err_flag, "Error reading global sideset parameters!");
 
       if (_verbose)
@@ -132,9 +132,9 @@ void Nemesis_IO_Helper::get_ns_param_global()
       
       nemesis_err_flag =
 	Nemesis::ne_get_ns_param_global(ex2helper.ex_id,
-					&global_nodeset_ids[0],
-					&num_global_node_counts[0],
-					&num_global_node_df_counts[0]);
+					global_nodeset_ids.empty()        ? NULL : &global_nodeset_ids[0],
+					num_global_node_counts.empty()    ? NULL : &num_global_node_counts[0],
+					num_global_node_df_counts.empty() ? NULL : &num_global_node_df_counts[0]);
       ex2helper.check_err(nemesis_err_flag, "Error reading global nodeset parameters!");
 
       if (_verbose)
@@ -161,8 +161,8 @@ void Nemesis_IO_Helper::get_eb_info_global()
   
   nemesis_err_flag =
     Nemesis::ne_get_eb_info_global(ex2helper.ex_id,
-				   &global_elem_blk_ids[0],
-				   &global_elem_blk_cnts[0]);			  
+				   global_elem_blk_ids.empty()  ? NULL : &global_elem_blk_ids[0],
+				   global_elem_blk_cnts.empty() ? NULL : &global_elem_blk_cnts[0]);			  
   ex2helper.check_err(nemesis_err_flag, "Error reading global element block info!");
 
   if (_verbose)
@@ -236,8 +236,8 @@ void Nemesis_IO_Helper::get_elem_map()
   
   nemesis_err_flag =
     Nemesis::ne_get_elem_map(ex2helper.ex_id,
-			     &elem_mapi[0],
-			     &elem_mapb[0],
+			     elem_mapi.empty() ? NULL : &elem_mapi[0],
+			     elem_mapb.empty() ? NULL : &elem_mapb[0],
 			     libMesh::processor_id()
 			     );
   ex2helper.check_err(nemesis_err_flag, "Error reading element maps!");
@@ -273,9 +273,9 @@ void Nemesis_IO_Helper::get_node_map()
   
   nemesis_err_flag =
     Nemesis::ne_get_node_map(ex2helper.ex_id,
-			     &node_mapi[0],
-			     &node_mapb[0],
-			     &node_mape[0], 
+			     node_mapi.empty() ? NULL : &node_mapi[0],
+			     node_mapb.empty() ? NULL : &node_mapb[0],
+			     node_mape.empty() ? NULL : &node_mape[0], 
 			     libMesh::processor_id()
 			     );
   ex2helper.check_err(nemesis_err_flag, "Error reading node maps!");
@@ -311,10 +311,10 @@ void Nemesis_IO_Helper::get_cmap_params()
   
   nemesis_err_flag =
     Nemesis::ne_get_cmap_params(ex2helper.ex_id,
-				&node_cmap_ids[0],
-				&node_cmap_node_cnts[0],
-				&elem_cmap_ids[0],
-				&elem_cmap_elem_cnts[0],
+				node_cmap_ids.empty()       ? NULL : &node_cmap_ids[0],
+				node_cmap_node_cnts.empty() ? NULL : &node_cmap_node_cnts[0],
+				elem_cmap_ids.empty()       ? NULL : &elem_cmap_ids[0],
+				elem_cmap_elem_cnts.empty() ? NULL : &elem_cmap_elem_cnts[0],
 				libMesh::processor_id());
   ex2helper.check_err(nemesis_err_flag, "Error reading cmap parameters!");
 
@@ -357,9 +357,9 @@ void Nemesis_IO_Helper::get_node_cmap()
 
       nemesis_err_flag =
 	Nemesis::ne_get_node_cmap(ex2helper.ex_id,
-				  node_cmap_ids[i],
-				  &node_cmap_node_ids[i][0],
-				  &node_cmap_proc_ids[i][0],
+				  node_cmap_ids.empty()         ? NULL : node_cmap_ids[i],
+				  node_cmap_node_ids[i].empty() ? NULL : &node_cmap_node_ids[i][0],
+				  node_cmap_proc_ids[i].empty() ? NULL : &node_cmap_proc_ids[i][0],
 				  libMesh::processor_id());
       ex2helper.check_err(nemesis_err_flag, "Error reading node cmap node and processor ids!");
 
@@ -396,10 +396,10 @@ void Nemesis_IO_Helper::get_elem_cmap()
 
       nemesis_err_flag =
 	Nemesis::ne_get_elem_cmap(ex2helper.ex_id,
-				  elem_cmap_ids[i],
-				  &elem_cmap_elem_ids[i][0],
-				  &elem_cmap_side_ids[i][0],
-				  &elem_cmap_proc_ids[i][0],
+				  elem_cmap_ids.empty()         ? NULL : elem_cmap_ids[i],
+				  elem_cmap_elem_ids[i].empty() ? NULL : &elem_cmap_elem_ids[i][0],
+				  elem_cmap_side_ids[i].empty() ? NULL : &elem_cmap_side_ids[i][0],
+				  elem_cmap_proc_ids[i].empty() ? NULL : &elem_cmap_proc_ids[i][0],
 				  libMesh::processor_id());
       ex2helper.check_err(nemesis_err_flag, "Error reading elem cmap elem, side, and processor ids!");
 
