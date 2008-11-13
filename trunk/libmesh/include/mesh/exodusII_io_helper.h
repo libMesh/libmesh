@@ -273,6 +273,12 @@ public:
   void read_nodes();
 
   /**
+   * Reads the optional \p node_num_map
+   * from the \p ExodusII mesh file.
+   */
+  void read_node_num_map();
+  
+  /**
    * Prints the nodal information
    * to \p std::cout.
    */
@@ -290,7 +296,7 @@ public:
    * for the given block.
    */
   int get_block_id(int block);
-
+  
   /**
    * Reads all of the element
    * connectivity for
@@ -298,6 +304,12 @@ public:
    * \p ExodusII mesh file.
    */
   void read_elem_in_block(int block);
+ 
+  /**
+   * Reads the optional \p node_num_map
+   * from the \p ExodusII mesh file.
+   */
+  void read_elem_num_map();
 
   /**
    * Reads information about
@@ -479,6 +491,8 @@ public:
   std::vector<int> elem_list;          // List of element numbers in all sidesets
   std::vector<int> side_list;          // Side (face/edge) number actually on the boundary 
   std::vector<int> id_list;            // Side (face/edge) id number
+  std::vector<int> node_num_map;       // Optional mapping from internal [0,num_nodes) to arbitrary indices
+  std::vector<int> elem_num_map;       // Optional mapping from internal [0,num_elem) to arbitrary indices
   float ex_version;                    // Version of Exodus you are using
   float ret_float;                     // Generic float returned by ex_inquire
   std::vector<double> x;               // x locations of node points

@@ -230,13 +230,17 @@ void Nemesis_IO::read (const std::string& base_filename)
       // Read nodes from the exodus file: this fills the ex2helper.x,y,z arrays.
       ex2helper.read_nodes();
 
+      // Reads the ex2helper.node_num_map array, node_num_map[i] is the global node number for
+      // local node number i.
+      ex2helper.read_node_num_map();
+      
       // Add internal nodes to the ParallelMesh, using the node ID offset we computed and the current
       // processor's ID.
       for (int i=0; i<nemhelper.num_internal_nodes; ++i)
 	{
-	  const Real x = ex2helper.x[ nemhelper.node_mapi[i] ];
-	  const Real y = ex2helper.y[ nemhelper.node_mapi[i] ];
-	  const Real z = ex2helper.z[ nemhelper.node_mapi[i] ];
+	  const Real x = ex2helper.x[ nemhelper.node_mapi[i]-1 ];
+	  const Real y = ex2helper.y[ nemhelper.node_mapi[i]-1 ];
+	  const Real z = ex2helper.z[ nemhelper.node_mapi[i]-1 ];
 	  mesh.add_point (Point(x,y,z), my_node_offset+i, libMesh::processor_id());
 	}
 
@@ -504,16 +508,16 @@ void Nemesis_IO::read (const std::string& base_filename)
 
 
 	  // Extract x,y,z values using the local 1-based indexing.
-	  const Real x = ex2helper.x[ local_border_node_index_i ];
-	  const Real y = ex2helper.y[ local_border_node_index_i ];
-	  const Real z = ex2helper.z[ local_border_node_index_i ];
+	  const Real x = ex2helper.x[ local_border_node_index_i-1 ];
+	  const Real y = ex2helper.y[ local_border_node_index_i-1 ];
+	  const Real z = ex2helper.z[ local_border_node_index_i-1 ];
 
 	  // If this_node_global_id==0, the Exodus/Nemesis numbering scheme was
 	  // not 1-based!
 	  libmesh_assert(this_node_global_id > 0);
 	  
 	  // Finally, add the border node to the Mesh.  Don't forget: use a zero-based numbering scheme!!
-	  mesh.add_point (Point(x,y,z), this_node_global_id-1, libMesh::processor_id());
+	  mesh.add_point (Point(x,y,z), this_node_global_id-1, std::min(libMesh::processor_id(),(unsigned int)nemhelper.node_cmap_ids[cmap_proc_id_index_match] ));
 	} // end for (int i=0; i<nemhelper.num_border_nodes; ++i)
 
 
@@ -596,6 +600,11 @@ void Nemesis_IO::read (const std::string& base_filename)
       // (read in the array ex2helper.block_ids[])
       ex2helper.read_block_info();
 
+
+      // Reads the ex2helper.elem_num_map array, elem_num_map[i] is the global element number for
+      // local element number i.
+      ex2helper.read_elem_num_map();
+      
       // Local indexing offset maps block element indices to local numbering scheme. 
       int nelem_last_block = 0;
 

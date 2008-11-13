@@ -203,6 +203,18 @@ void ExodusII_IO_Helper::read_nodes()
 
 
 
+void ExodusII_IO_Helper::read_node_num_map ()
+{
+  node_num_map.resize(num_nodes);
+
+  ex_err = exII::ex_get_node_num_map (ex_id,
+				      node_num_map.empty() ? NULL : &node_num_map[0]);
+				      
+  check_err(ex_err, "Error retrieving nodal number map.");
+  message("Nodal numbering map retrieved successfully."); 
+}
+
+
 void ExodusII_IO_Helper::print_nodes()
 {
   for (int i=0; i<num_nodes; i++)
@@ -265,6 +277,19 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   
   check_err(ex_err, "Error reading block connectivity.");
   message("Connectivity retrieved successfully for block: ", block); 
+}
+
+
+
+void ExodusII_IO_Helper::read_elem_num_map () 
+{
+  elem_num_map.resize(num_elem);
+
+  ex_err = exII::ex_get_elem_num_map (ex_id,
+				      elem_num_map.empty() ? NULL : &elem_num_map[0]);
+				      
+  check_err(ex_err, "Error retrieving element number map.");
+  message("Element numbering map retrieved successfully."); 
 }
 
 
