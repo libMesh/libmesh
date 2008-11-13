@@ -240,9 +240,6 @@ public:
   virtual Real subset_linfty_norm (const std::set<unsigned int> & indices);
 
   /**
-   * @returns the norm of the 
-
-  /**
    * @returns dimension of the vector. This
    * function was formerly called \p n(), but
    * was renamed to get the \p NumericVector<T> class
