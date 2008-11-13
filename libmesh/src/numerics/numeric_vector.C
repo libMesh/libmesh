@@ -188,6 +188,65 @@ int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
 }
 
 
+template <class T>
+Real NumericVector<T>::subset_l1_norm (const std::set<unsigned int> & indices)
+{
+  NumericVector<T> & v = *this;
+  
+  std::set<unsigned int>::iterator it = indices.begin();
+  const std::set<unsigned int>::iterator it_end = indices.end();
+
+  Real norm = 0;
+  
+  for(; it!=it_end; ++it)
+    norm += std::abs(v(*it));
+
+  Parallel::sum(norm);
+
+  return norm;
+}
+
+template <class T>
+Real NumericVector<T>::subset_l2_norm (const std::set<unsigned int> & indices)
+{
+  NumericVector<T> & v = *this;
+
+  std::set<unsigned int>::iterator it = indices.begin();
+  const std::set<unsigned int>::iterator it_end = indices.end();
+
+  Real norm = 0;
+  
+  for(; it!=it_end; ++it)
+    norm += v(*it) * v(*it);
+
+  Parallel::sum(norm);
+
+  return std::sqrt(norm);
+}
+
+template <class T>
+Real NumericVector<T>::subset_linfty_norm (const std::set<unsigned int> & indices)
+{
+  NumericVector<T> & v = *this;
+
+  std::set<unsigned int>::iterator it = indices.begin();
+  const std::set<unsigned int>::iterator it_end = indices.end();
+
+  Real norm = 0;
+  
+  for(; it!=it_end; ++it)
+    {
+      Real value = std::abs(v(*it));
+      if(value > norm)
+        norm = value;
+    }
+
+  Parallel::max(norm);
+
+  return norm;
+}
+
+
 
 //------------------------------------------------------------------
 // Explicit instantiations

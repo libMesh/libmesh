@@ -25,6 +25,7 @@
 
 // C++ includes
 #include <vector>
+#include <set>
 
 // Local includes
 #include "libmesh_common.h"
@@ -206,6 +207,40 @@ public:
    * \f$l_\infty\f$-norm of a vector.
    */
   virtual Real linfty_norm () const = 0;
+
+  /**
+   * @returns the \f$l_1\f$-norm of the vector, i.e.
+   * the sum of the absolute values for the specified
+   * entries in the vector.
+   *
+   * Note that the indices must necessary live on this
+   * processor.
+   */
+  virtual Real subset_l1_norm (const std::set<unsigned int> & indices);
+
+  /**
+   * @returns the \f$l_2\f$-norm of the vector, i.e.
+   * the square root of the sum of the
+   * squares of the elements for the specified entries
+   * in the vector.
+   *
+   * Note that the indices must necessary live on this
+   * processor.
+   */
+  virtual Real subset_l2_norm (const std::set<unsigned int> & indices);
+
+  /**
+   * @returns the maximum absolute value of the
+   * specified entries of this vector, which is the
+   * \f$l_\infty\f$-norm of a vector.
+   *
+   * Note that the indices must necessary live on this
+   * processor.
+   */
+  virtual Real subset_linfty_norm (const std::set<unsigned int> & indices);
+
+  /**
+   * @returns the norm of the 
 
   /**
    * @returns dimension of the vector. This

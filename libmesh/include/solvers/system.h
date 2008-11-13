@@ -591,7 +591,21 @@ protected:
   
 private:
 
-  
+  /**
+   * Fills the std::set with the degrees of freedom on the local
+   * processor corresponding the the variable number passed in.
+   */
+  void local_dof_indices (const unsigned int var,
+                          std::set<unsigned int> & var_indices) const;
+
+
+  /**
+   * Finds the discrete norm for the entries in the vector
+   * corresponding to Dofs associated with var.
+   */
+  Real discrete_var_norm(NumericVector<Number>& v,
+                         unsigned int var,
+                         FEMNormType norm_type) const;
 
   /**
    * Reads an input vector from the stream \p io and assigns
