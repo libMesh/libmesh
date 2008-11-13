@@ -262,13 +262,6 @@ Real Pyramid5::volume () const
   // The pyramid with a bilinear base has volume given by the
   // formula in: "Calculation of the Volume of a General Hexahedron
   // for Flow Predictions", AIAA Journal v.23, no.6, 1984, p.954-
-  //
-  // Note: the volume returned by summing the Jacobian times the
-  // quadrature weights over all the quadrature points for the
-  // pyramid element does *not* give the correct volume (the formula
-  // in this function gives the correct volume).  This implies there
-  // is something wrong with the first-order Lagrange shape functions
-  // or the quadrature rules for the Pyramid5.
   Node* node0 = this->get_node(0);
   Node* node1 = this->get_node(1); 
   Node* node2 = this->get_node(2);

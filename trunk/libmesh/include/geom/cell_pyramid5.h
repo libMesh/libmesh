@@ -32,19 +32,20 @@
 
 /**
  * The \p Pyramid5 is an element in 3D composed of 5 nodes.
- * It is numbered like this:
+ * It is numbered with a counter-clockwise base like this:
    \verbatim
    PYRAMID5:
-           4 
-           o
-          / \
-         /   \
-        /     \
-     3 o-------o 2 
-       |       |
-       |       |
-       o-------o
-       0       1
+             o 4
+           //|\
+          // | \
+         //  |  \
+      3 o/...|...o 2         
+       ./    |  /            
+      ./     | /             
+     ./      |/              
+    o--------o               
+    0        1               
+       
    \endverbatim
  */
 
