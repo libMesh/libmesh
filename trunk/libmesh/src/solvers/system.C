@@ -705,6 +705,27 @@ Real System::calculate_norm(NumericVector<Number>& v,
   if (norm.is_discrete())
     {
       STOP_LOG ("calculate_norm()", "System");
+      //Check to see if all weights are 1.0
+      unsigned int check_var = 0;
+      for (; check_var != this->n_vars(); ++check_var)
+        if(norm.weight(check_var) != 1.0)
+          break;
+
+      //All weights were 1.0 so just do the full vector discrete norm
+      if(check_var == this->n_vars())
+        {
+          FEMNormType norm_type = norm.type(0);
+          
+          if(norm_type == DISCRETE_L1)
+            return v.l1_norm();
+          if(norm_type == DISCRETE_L2)
+            return v.l2_norm();
+          if(norm_type == DISCRETE_L_INF)
+            return v.linfty_norm();
+          else
+            libmesh_error();
+        }
+
       for (unsigned int var=0; var != this->n_vars(); ++var)
         {
           // Skip any variables we don't need to integrate
