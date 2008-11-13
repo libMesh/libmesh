@@ -621,11 +621,66 @@ unsigned short int System::variable_number (const std::string& var) const
 }
 
 
+void System::local_dof_indices(const unsigned int var, std::set<unsigned int> & var_indices) const
+{
+  //Make sure the set is clear
+  var_indices.clear();
+
+  std::vector<unsigned int> dof_indices;
+  
+  // Begin the loop over the elements
+  MeshBase::const_element_iterator       el     =
+    this->get_mesh().active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el =
+    this->get_mesh().active_local_elements_end();
+
+  unsigned int first_local = this->get_dof_map().first_dof();
+  unsigned int end_local = this->get_dof_map().end_dof();
+
+  for ( ; el != end_el; ++el)
+    {
+      const Elem* elem = *el;      
+      this->get_dof_map().dof_indices (elem, dof_indices, var);
+
+      for(unsigned int i=0; i<dof_indices.size(); i++)
+        {
+          unsigned int dof = dof_indices[i];
+
+          //If the dof is owned by the local processor
+          if(first_local <= dof && dof < end_local)
+            var_indices.insert(dof_indices[i]);
+        }
+    }
+}
+
+Real System::discrete_var_norm(NumericVector<Number>& v,
+                               unsigned int var,
+                               FEMNormType norm_type) const
+{
+  std::set<unsigned int> var_indices;
+  local_dof_indices(var, var_indices);
+
+  if(norm_type == DISCRETE_L1)
+    return v.subset_l1_norm(var_indices);
+  if(norm_type == DISCRETE_L2)
+    return v.subset_l2_norm(var_indices);
+  if(norm_type == DISCRETE_L_INF)
+    return v.subset_linfty_norm(var_indices);
+  else
+    libmesh_error();
+}
 
 Real System::calculate_norm(NumericVector<Number>& v,
                             unsigned int var,
                             FEMNormType norm_type) const
 {
+  //short circuit to save time
+  if(norm_type == DISCRETE_L1 ||
+     norm_type == DISCRETE_L2 ||
+     norm_type == DISCRETE_L_INF)
+    return discrete_var_norm(v,var,norm_type);
+
+  // Not a discrete norm
   std::vector<FEMNormType> norms(this->n_vars(), L2);
   std::vector<Real> weights(this->n_vars(), 0.0);
   norms[var] = norm_type;
@@ -644,19 +699,23 @@ Real System::calculate_norm(NumericVector<Number>& v,
 
   START_LOG ("calculate_norm()", "System");
 
+  // Zero the norm before summation
+  Real v_norm = 0.;
+
   if (norm.is_discrete())
     {
       STOP_LOG ("calculate_norm()", "System");
-      if (norm.type(0) == DISCRETE_L1)
-        return v.l1_norm();
-      if (norm.type(0) == DISCRETE_L2)
-        return v.l2_norm();
-      if (norm.type(0) == DISCRETE_L_INF)
-        return v.linfty_norm();
-    }
+      for (unsigned int var=0; var != this->n_vars(); ++var)
+        {
+          // Skip any variables we don't need to integrate
+          if (norm.weight(var) == 0.0)
+            continue;
 
-  // Zero the norm before summation
-  Real v_norm = 0.;
+          v_norm += norm.weight(var) * discrete_var_norm(v, var, norm.type(var));
+        }
+
+      return v_norm;
+    }
 
   // Localize the potentially parallel vector
   AutoPtr<NumericVector<Number> > local_v = NumericVector<Number>::build();
