@@ -126,11 +126,15 @@ namespace {
 	  libmesh_assert (elem != NULL);
 
 	  for (unsigned int n=0; n<elem->n_nodes(); n++)
-	    for (unsigned int i=0; i<3; i++)
-	      {
-		_vmin[i] = std::min(_vmin[i], elem->point(n)(i));
-		_vmax[i] = std::max(_vmax[i], elem->point(n)(i));
-	      }      
+	    {
+	      const Point &point = elem->point(n);
+
+	      for (unsigned int i=0; i<3; i++)
+		{
+		  _vmin[i] = std::min(_vmin[i], point(i));
+		  _vmax[i] = std::max(_vmax[i], point(i));
+		}     
+	    } 
         }
     }
 
@@ -352,9 +356,7 @@ MeshTools::subdomain_bounding_box (const MeshBase& mesh,
 	    max(i) = std::max(max(i), mesh.point(mesh.elem(e)->node(n))(i));
 	  }      
   
-  const BoundingBox ret_val(min, max);
-  
-  return ret_val;  
+  return BoundingBox (min, max);
 }
 
 

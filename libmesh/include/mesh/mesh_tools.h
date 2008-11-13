@@ -61,7 +61,44 @@ namespace MeshTools
    * Defines a Cartesian bounding box by the two
    * corner extremum.
    */
-  typedef std::pair<Point, Point> BoundingBox;
+  class BoundingBox : public std::pair<Point, Point>
+  {
+  public:
+    
+    BoundingBox (const Point &min, const Point &max) :
+      std::pair<Point, Point>(min, max)
+    {}
+
+    BoundingBox (const std::pair<Point, Point> &bbox) :
+      std::pair<Point, Point> (bbox)
+    {}
+
+//     BoundingBox & operator = (const std::pair<Point, Point> &bbox) 
+//     { this->first = bbox.first; this->second = bbox.second; return *this; }
+
+    const Point & min() const
+    { return this->first; }
+
+    Point & min()
+    { return this->first; }
+
+    const Point & max() const
+    { return this->second; }
+
+    Point & max()
+    { return this->second; }
+
+    BoundingBox & expand()
+    { return *this; }
+
+    bool intersect (const BoundingBox &) const
+    { return false; }
+
+    bool operator && (const BoundingBox& other) const
+    { return this->intersect(other); }
+
+  private:
+  };
   
   /**
    * This function returns the sum over all the elemenents of the number
@@ -142,7 +179,7 @@ namespace MeshTools
    * @returns two points defining a Cartesian box that bounds the
    * elements belonging to subdomain sid.
    */
-  std::pair<Point, Point> 
+  BoundingBox
   subdomain_bounding_box (const MeshBase &mesh,
 			  const unsigned int sid);
 
