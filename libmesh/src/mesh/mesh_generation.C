@@ -43,6 +43,7 @@
 #include "cell_prism15.h"
 #include "cell_prism18.h"
 #include "cell_tet4.h"
+#include "cell_pyramid5.h"
 #include "libmesh_logging.h"
 #include "boundary_info.h"
 #include "sphere.h"
@@ -701,6 +702,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  case HEX27:
 	  case TET4:  // TET4's are created from an initial HEX27 discretization
 	  case TET10: // TET10's are created from an initial HEX27 discretization
+	  case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
 	    {
 	      mesh.reserve_elem(nx*ny*nz);
 	      break;
@@ -740,6 +742,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  case HEX27:
 	  case TET4: // TET4's are created from an initial HEX27 discretization
 	  case TET10: // TET10's are created from an initial HEX27 discretization
+	  case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
 	  case PRISM15:
 	  case PRISM18:
 	    {
@@ -791,6 +794,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  case HEX27:
 	  case TET4: // TET4's are created from an initial HEX27 discretization
 	  case TET10: // TET10's are created from an initial HEX27 discretization
+	  case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
 	  case PRISM15:
 	  case PRISM18:
 	    {
@@ -975,6 +979,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  case HEX27:
 	  case TET4: // TET4's are created from an initial HEX27 discretization
 	  case TET10: // TET10's are created from an initial HEX27 discretization
+	  case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
 	    {
 	      for (unsigned int k=0; k<(2*nz); k += 2)
 		for (unsigned int j=0; j<(2*ny); j += 2)
@@ -1004,7 +1009,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		      elem->set_node(17) = mesh.node_ptr(idx(type,nx,ny,i+2,j+1,k+2));
 		      elem->set_node(18) = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k+2));
 		      elem->set_node(19) = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k+2));
-		      if ((type == HEX27) || (type == TET4) || (type == TET10))
+		      if ((type == HEX27) || (type == TET4) || (type == TET10) || (type == PYRAMID5))
 			{
 			  elem->set_node(20) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k)  );
 			  elem->set_node(21) = mesh.node_ptr(idx(type,nx,ny,i+1,j,  k+1));
@@ -1159,18 +1164,26 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
 
-	// Additional work for TET4 and TET10: we take the existing HEX27 discretization
-	// and split each element into 24 sub tets.  This isn't the minimum-possible
-	// number of tets, but it obviates any concerns about the edge orientations
-	// between the various elements.
-	if ((type == TET4) || (type == TET10)) 
+	// Additional work for tets and pyramids: we take the existing
+	// HEX27 discretization and split each element into 24
+	// sub-tets or 6 sub-pyramids.
+	//
+	// 24 isn't the minimum-possible number of tets, but it
+	// obviates any concerns about the edge orientations between
+	// the various elements.
+	if ((type == TET4) ||
+	    (type == TET10) ||
+	    (type == PYRAMID5)) 
 	  {
-	    // Temporary storage for new elements. (24 per hex)
+	    // Temporary storage for new elements. (24 tets per hex, 6 pyramids)
 	    std::vector<Elem*> new_elements;
-	    new_elements.reserve(24*mesh.n_elem());
-
-     
-	    // Create tetrahedra
+	    
+	    if ((type == TET4) || (type == TET10))
+	      new_elements.reserve(24*mesh.n_elem());
+	    else
+	      new_elements.reserve(6*mesh.n_elem());
+	      
+	    // Create tetrahedra or pyramids
 	    {
 	      MeshBase::element_iterator       el     = mesh.elements_begin();
 	      const MeshBase::element_iterator end_el = mesh.elements_end();
@@ -1190,22 +1203,49 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		      
 		      // Need to build the full-ordered side!
 		      AutoPtr<Elem> side = base_hex->build_side(s);
-	     
-		      for (unsigned int sub_tet=0; sub_tet<4; ++sub_tet)
-			{
-			  new_elements.push_back( new Tet4 );
-			  Elem* sub_elem = new_elements.back();
-			  sub_elem->set_node(0) = side->get_node(sub_tet);
-			  sub_elem->set_node(1) = side->get_node(8);                           // centroid of the face
-			  sub_elem->set_node(2) = side->get_node(sub_tet==3 ? 0 : sub_tet+1 ); // wrap-around
-			  sub_elem->set_node(3) = apex_node;                                   // apex node always used!
 
-			  // If the original hex was a boundary hex, add the new sub_tet's side
-			  // 0 with the same b_id.  Note: the tets are all aligned so that their
-			  // side 0 is on the boundary.
+		      if ((type == TET4) || (type == TET10))
+			{
+			  // Build 4 sub-tets per side
+			  for (unsigned int sub_tet=0; sub_tet<4; ++sub_tet)
+			    {
+			      new_elements.push_back( new Tet4 );
+			      Elem* sub_elem = new_elements.back();
+			      sub_elem->set_node(0) = side->get_node(sub_tet);
+			      sub_elem->set_node(1) = side->get_node(8);                           // centroid of the face
+			      sub_elem->set_node(2) = side->get_node(sub_tet==3 ? 0 : sub_tet+1 ); // wrap-around
+			      sub_elem->set_node(3) = apex_node;                                   // apex node always used!
+
+			      // If the original hex was a boundary hex, add the new sub_tet's side
+			      // 0 with the same b_id.  Note: the tets are all aligned so that their
+			      // side 0 is on the boundary.
+			      if (b_id != BoundaryInfo::invalid_id)
+				mesh.boundary_info->add_side(sub_elem, 0, b_id);
+			    }
+			} // end if ((type == TET4) || (type == TET10))
+
+		      else // type==PYRAMID5
+			{
+			  // Build 1 sub-pyramid per side.
+			  new_elements.push_back(new Pyramid5);
+			  Elem* sub_elem = new_elements.back();
+			      
+			  // Set the base.  Note that since the apex is *inside* the base_hex,
+			  // and the pyramid uses a counter-clockwise base numbering, we need to
+			  // reverse the [1] and [3] node indices.
+			  sub_elem->set_node(0) = side->get_node(0);
+			  sub_elem->set_node(1) = side->get_node(3);
+			  sub_elem->set_node(2) = side->get_node(2);
+			  sub_elem->set_node(3) = side->get_node(1);
+			      
+			  // Set the apex
+			  sub_elem->set_node(4) = apex_node;
+			      
+			  // If the original hex was a boundary hex, add the new sub_pyr's side
+			  // 4 (the square base) with the same b_id.  
 			  if (b_id != BoundaryInfo::invalid_id)
-			    mesh.boundary_info->add_side(sub_elem, 0, b_id);
-			}
+			    mesh.boundary_info->add_side(sub_elem, 4, b_id);
+			} // end else type==PYRAMID5
 		    }
 		}
 	    }
@@ -1227,7 +1267,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	    for (unsigned int i=0; i<new_elements.size(); ++i)
 	      mesh.add_elem(new_elements[i]);
 	    
-	  } // end if (type == TET4) || (type == TET10)
+	  } // end if (type == TET4,TET10,PYRAMID5
 
 
 	// Use all_second_order to convert the TET4's to TET10's

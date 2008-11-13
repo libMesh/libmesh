@@ -164,6 +164,7 @@ namespace MeshTools
 	  case HEX27:
 	  case TET4:  // TET4's are created from an initial HEX27 discretization
 	  case TET10: // TET10's are created from an initial HEX27 discretization
+	  case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
 	  case PRISM15:
 	  case PRISM18:
 	    {
