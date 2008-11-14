@@ -287,7 +287,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(SET_CXX_FLAGS, dnl
 [
   dnl Flag for creating shared objects; can be modified at a later stage
-  if test "x$target_os" = "xdarwin9.3.0" ; then
+  if test "x$target_os" = "xdarwin9.5.0" ; then
     CXXFLAGS_OPT="-fno-common"
     CXXFLAGS_DVL="-fno-common"
     CXXFLAGS_DBG="-fno-common"
