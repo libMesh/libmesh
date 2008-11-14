@@ -212,6 +212,14 @@ void ExodusII_IO_Helper::read_node_num_map ()
 				      
   check_err(ex_err, "Error retrieving nodal number map.");
   message("Nodal numbering map retrieved successfully."); 
+
+  if (_verbose)
+    {
+      std::cout << "[" << libMesh::processor_id() << "] node_num_map[i] = ";
+      for (unsigned int i=0; i< static_cast<unsigned int>(std::min(10, num_nodes-1)); ++i)
+        std::cout << node_num_map[i] << ", ";
+      std::cout << "... " << node_num_map.back() << std::endl;
+    }
 }
 
 
@@ -228,8 +236,9 @@ void ExodusII_IO_Helper::print_nodes()
 void ExodusII_IO_Helper::read_block_info()
 {
   block_ids.resize(num_elem_blk);
+  // Get all element block IDs.
   ex_err = exII::ex_get_elem_blk_ids(ex_id,
-				     &block_ids[0]); // Get all element block IDs.
+				     block_ids.empty() ? NULL : &block_ids[0]);
   // Usually, there is only one
   // block since there is only
   // one type of element.
@@ -243,7 +252,7 @@ void ExodusII_IO_Helper::read_block_info()
 
 int ExodusII_IO_Helper::get_block_id(int block)
 {
-  libmesh_assert(static_cast<unsigned int>(block) < block_ids.size());
+  libmesh_assert (static_cast<unsigned int>(block) < block_ids.size());
     
   return block_ids[block];
 }
@@ -252,6 +261,8 @@ int ExodusII_IO_Helper::get_block_id(int block)
 
 void ExodusII_IO_Helper::read_elem_in_block(int block)
 {
+  libmesh_assert (static_cast<unsigned int>(block) < block_ids.size());
+  
   ex_err = exII::ex_get_elem_block(ex_id,
 				   block_ids[block],
 				   &elem_type[0],
@@ -269,14 +280,20 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   
   
   
-  // Read in the connectivity of the elements of this block
+  // Read in the connectivity of the elements of this block,
+  // watching out for the case where we actually have no
+  // elements in this block (possible with parallel files)
   connect.resize(num_nodes_per_elem*num_elem_this_blk);
-  ex_err = exII::ex_get_elem_conn(ex_id,
-				  block_ids[block],
-				  &connect[0]);
+
+  if (!connect.empty())
+    {
+      ex_err = exII::ex_get_elem_conn(ex_id,
+				      block_ids[block],
+				      &connect[0]);
   
-  check_err(ex_err, "Error reading block connectivity.");
-  message("Connectivity retrieved successfully for block: ", block); 
+      check_err(ex_err, "Error reading block connectivity.");
+      message("Connectivity retrieved successfully for block: ", block);
+    }
 }
 
 
@@ -290,6 +307,15 @@ void ExodusII_IO_Helper::read_elem_num_map ()
 				      
   check_err(ex_err, "Error retrieving element number map.");
   message("Element numbering map retrieved successfully."); 
+
+
+  if (_verbose)
+    {
+      std::cout << "[" << libMesh::processor_id() << "] elem_num_map[i] = ";
+      for (unsigned int i=0; i< static_cast<unsigned int>(std::min(10, num_elem-1)); ++i)
+        std::cout << elem_num_map[i] << ", ";
+      std::cout << "... " << elem_num_map.back() << std::endl;
+    }
 }
 
 
@@ -329,6 +355,12 @@ void ExodusII_IO_Helper::read_sideset_info()
 
 void ExodusII_IO_Helper::read_sideset(int id, int offset)
 {
+  libmesh_assert (static_cast<unsigned int>(id) < ss_ids.size());
+  libmesh_assert (static_cast<unsigned int>(id) < num_sides_per_set.size());
+  libmesh_assert (static_cast<unsigned int>(id) < num_df_per_set.size());
+  libmesh_assert (static_cast<unsigned int>(offset) < elem_list.size());
+  libmesh_assert (static_cast<unsigned int>(offset) < side_list.size());
+  
   ex_err = exII::ex_get_side_set_param(ex_id,
 				       ss_ids[id],
 				       &num_sides_per_set[id],
@@ -382,7 +414,7 @@ int ExodusII_IO_Helper::inquire(int req_info, std::string error_msg)
 const std::vector<double>& ExodusII_IO_Helper::get_time_steps()
 {
   time_steps.resize(num_time_steps);
-  exII::ex_get_all_times(ex_id, &time_steps[0]);
+  exII::ex_get_all_times(ex_id, time_steps.empty() ? NULL : &time_steps[0]);
   return time_steps;
 }
 
@@ -698,7 +730,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
   // TRISHELL    =  11     
   // PYRAMID     =  12      
   
-  if ((type_str == "QUAD4") || (type_str == "QUAD"))
+  if ((type_str == "QUAD4") || (type_str == "QUAD") || (type_str == "quad"))
     return assign_conversion(QUAD4);
 
   else if (type_str == "QUAD8")
@@ -707,7 +739,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
   else if (type_str == "QUAD9")
     return assign_conversion(QUAD9);
 
-  else if ((type_str == "TRI3") || (type_str == "TRIANGLE") || (type_str == "TRI"))
+  else if ((type_str == "TRI3") || (type_str == "TRIANGLE") || (type_str == "TRI") || (type_str == "tri"))
     return assign_conversion(TRI3);
 
   else if (type_str == "TRI6")
