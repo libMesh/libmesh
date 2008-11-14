@@ -73,9 +73,6 @@ namespace MeshTools
       std::pair<Point, Point> (bbox)
     {}
 
-//     BoundingBox & operator = (const std::pair<Point, Point> &bbox) 
-//     { this->first = bbox.first; this->second = bbox.second; return *this; }
-
     const Point & min() const
     { return this->first; }
 
@@ -93,9 +90,6 @@ namespace MeshTools
 
     bool intersect (const BoundingBox &) const
     { return false; }
-
-    bool operator && (const BoundingBox& other) const
-    { return this->intersect(other); }
 
   private:
   };
