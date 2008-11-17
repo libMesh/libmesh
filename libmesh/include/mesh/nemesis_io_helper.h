@@ -45,7 +45,7 @@ namespace Nemesis {
  *
  * @author Johw W. Peterson, 2008.
  */
-class Nemesis_IO_Helper
+class Nemesis_IO_Helper : public ExodusII_IO_Helper
 {
 public:
   /**
@@ -58,10 +58,10 @@ public:
    */
   ~Nemesis_IO_Helper();
 
-  /**
-   * Set the flag indicationg if we should be verbose.
-   */
-  void verbose (bool set_verbosity);
+//   /**
+//    * Set the flag indicationg if we should be verbose.
+//    */
+//   void verbose (bool set_verbosity);
   
   // Member functions.  These just allocate memory for you and call the Nemesis
   // routines of the same name.  They also handle error checking for the Nemesis
@@ -81,13 +81,13 @@ public:
   
   // Member data
 
-  /**
-   * Instance of the Exodus IO Helper.  We call the Exodus API through
-   * this object.  Instead of creating forwarding functions for
-   * everything in the ExodusII_IO_Helper class, just call them
-   * directly through this object!
-   */
-  ExodusII_IO_Helper ex2helper;
+//   /**
+//    * Instance of the Exodus IO Helper.  We call the Exodus API through
+//    * this object.  Instead of creating forwarding functions for
+//    * everything in the ExodusII_IO_Helper class, just call them
+//    * directly through this object!
+//    */
+//   ExodusII_IO_Helper ex2helper;
 
   /**
    * All (?) Nemesis functions return an int.  If it's negative that signals an error!
@@ -284,7 +284,7 @@ public:
 
 
 private:
-  bool _verbose;
+  //  bool _verbose;
   
 };
 
