@@ -172,7 +172,8 @@ UnstructuredMesh::~UnstructuredMesh ()
 
 
 
-void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
+void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
+				       const bool reset_current_list)
 {
   libmesh_assert(this->n_nodes() != 0);
   libmesh_assert(this->n_elem()  != 0);
@@ -183,16 +184,18 @@ void UnstructuredMesh::find_neighbors(bool reset_remote_elements)
   START_LOG("find_neighbors()", "Mesh");
   
   
-  //TODO:[BSK] This should be removed later?!
   const element_iterator el_end = this->elements_end();
-  for (element_iterator el = this->elements_begin(); el != el_end; ++el)
-    {
-      Elem* elem = *el;
-      for (unsigned int s=0; s<elem->n_neighbors(); s++)
-        if (elem->neighbor(s) != remote_elem ||
-            reset_remote_elements)
-          elem->set_neighbor(s,NULL);
-    }
+      
+  //TODO:[BSK] This should be removed later?!
+  if (reset_current_list)
+    for (element_iterator el = this->elements_begin(); el != el_end; ++el)
+      {
+	Elem* elem = *el;
+	for (unsigned int s=0; s<elem->n_neighbors(); s++)
+	  if (elem->neighbor(s) != remote_elem ||
+	      reset_remote_elements)
+	    elem->set_neighbor(s,NULL);
+      }
   
   // Find neighboring elements by first finding elements
   // with identical side keys and then check to see if they

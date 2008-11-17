@@ -76,7 +76,7 @@ public:
 //    * well.  This method computes bounding boxes for the
 //    * elements on each processor and checks for overlaps.
 //    */
-//   void find_neighboring_processors(const MeshBase& );
+//   void find_neighboring_processors(const MeshBase &);
 
   /**
    * This method takes a mesh (which is assumed to reside on
@@ -84,8 +84,8 @@ public:
    * It also broadcasts any boundary information the mesh has
    * associated with it.
    */
-  void broadcast (MeshBase& ) const;
-  
+  void broadcast (MeshBase &) const;
+
   /**
    * This method takes a parallel distributed mesh and redistributes 
    * the elements.  Specifically, any elements stored on a given 
@@ -97,8 +97,13 @@ public:
    * to satisfy data dependencies. This method can be invoked after a 
    * partitioning step to affect the new partitioning.   
    */
-  void redistribute (ParallelMesh& ) const;
+  void redistribute (ParallelMesh &) const;
 
+  /**
+   *
+   */
+  void gather_neighboring_elements (ParallelMesh &) const;
+  
   /**
    * This method takes an input \p ParallelMesh which may be
    * distributed among all the processors.  Each processor then
@@ -107,7 +112,7 @@ public:
    * will be serialized on each processor.  Since this method is
    * collective it must be called by all processors.
    */
-  void allgather (ParallelMesh& ) const;
+  void allgather (ParallelMesh &) const;
 
   /**
    * This method takes an input \p ParallelMesh which may be
@@ -119,7 +124,7 @@ public:
    * will be distributed between processors.  Since this method is
    * collective it must be called by all processors.
    */
-  void delete_remote_elements (ParallelMesh& ) const;
+  void delete_remote_elements (ParallelMesh &) const;
 
   /**
    * This method assigns globally unique, partition-agnostic
@@ -131,7 +136,7 @@ public:
    * method can also be useful for identifying duplicate nodes 
    * which may occur during parallel refinement.
    */
-  void assign_global_indices (MeshBase& ) const;
+  void assign_global_indices (MeshBase &) const;
 
 
   /**
@@ -145,7 +150,7 @@ public:
 			    std::vector<unsigned int> &) const;
 
   /**
-   * Copy ids on ghost elements from their local processors.
+   * Copy ids of ghost elements from their local processors.
    */
   void make_elems_parallel_consistent (MeshBase &);
 
@@ -176,11 +181,11 @@ public:
 
 private:
 
-  void broadcast_mesh (MeshBase& ) const;
-  void broadcast_bcs  (const MeshBase&, BoundaryInfo&) const;
+  void broadcast_mesh (MeshBase &) const;
+  void broadcast_bcs  (const MeshBase &, BoundaryInfo &) const;
 
-  void allgather_mesh (ParallelMesh& ) const;
-  void allgather_bcs  (const ParallelMesh&, BoundaryInfo&) const;
+  void allgather_mesh (ParallelMesh &) const;
+  void allgather_bcs  (const ParallelMesh &, BoundaryInfo &) const;
 
 //   /**
 //    * Packs the element \p elem at the end of vector \p conn.
