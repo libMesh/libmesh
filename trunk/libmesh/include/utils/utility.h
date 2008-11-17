@@ -141,15 +141,64 @@ namespace Utility
    */
   template <int N>
   inline
-  Real pow(const Real x) { libmesh_assert(N>0); return x * pow<N-1>(x); }
+  Real pow(const Real x) 
+  { 
+    libmesh_assert(N>1); 
+    
+    if (N%2) // odd exponent
+      return x * pow<N-1>(x); 
+    
+    const Real xNover2 = pow<N/2>(x);
 
-  /**
-   * You have to also provide a full specialization for
-   * raising to the zero power which returns 1.  Otherwise,
-   * the function above will simply expand to the maximum
-   * template depth on your machine and cause a compilation
-   * error.
-   */
+    return xNover2*xNover2;
+  }
+
+  template <>
+  inline
+  Real pow<8>(const Real x) 
+  {
+    const Real 
+      x2 = x*x,
+      x4 = x2*x2,
+      x8 = x4*x4;
+
+    return x8; 
+  }
+
+  template <>
+  inline
+  Real pow<6>(const Real x) 
+  {
+    const Real 
+      x2 = x*x,
+      x4 = x2*x2,
+      x6 = x4*x2;
+
+    return x6; 
+  }
+
+  template <>
+  inline
+  Real pow<4>(const Real x) 
+  {
+    const Real 
+      x2 = x*x,
+      x4 = x2*x2;
+    return x4; 
+  }
+
+  template <>
+  inline
+  Real pow<3>(const Real x) { return x*x*x; }
+
+  template <>
+  inline
+  Real pow<2>(const Real x) { return x*x; }
+
+  template <>
+  inline
+  Real pow<1>(const Real x) { return x; }
+
   template <>
   inline
   Real pow<0>(const Real) { return 1.; }
@@ -175,7 +224,17 @@ namespace Utility
     }
 
   
-  
+  //-------------------------------------------------------------------
+  /**
+   * A convenient method to truly empty a vector using the "swap trick"
+   */
+  template <typename T>
+  void deallocate (std::vector<T> &vec)
+  { 
+    vec.swap (std::vector<T>()); 
+  }
+
+
   //-------------------------------------------------------------------
   // Utility functions useful when dealing with complex numbers.
  
