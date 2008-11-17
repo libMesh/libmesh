@@ -26,7 +26,7 @@
 // Initialize the various integer members to zero.  We can check
 // these later to see if they've been properly initialized...
 Nemesis_IO_Helper::Nemesis_IO_Helper(bool verbose) :
-  ex2helper(verbose),
+  ExodusII_IO_Helper(verbose),
   nemesis_err_flag(0),
   num_nodes_global(0),
   num_elems_global(0),
@@ -42,8 +42,7 @@ Nemesis_IO_Helper::Nemesis_IO_Helper(bool verbose) :
   num_internal_elems(0),
   num_border_elems(0),
   num_node_cmaps(0),
-  num_elem_cmaps(0),
-  _verbose(verbose)
+  num_elem_cmaps(0)
 {
   // Warn about using untested code!
   untested();
@@ -56,26 +55,26 @@ Nemesis_IO_Helper::~Nemesis_IO_Helper()
 
 
 
-void Nemesis_IO_Helper::verbose (bool set_verbosity)
-{
-  _verbose = set_verbosity;
+// void Nemesis_IO_Helper::verbose (bool set_verbosity)
+// {
+//   _verbose = set_verbosity;
 
-  // Also set verbosity in the exodus helper object
-  ex2helper.verbose(_verbose);
-}
+//   // Also set verbosity in the exodus helper object
+//   ex2helper.verbose(_verbose);
+// }
 
 
 
 void Nemesis_IO_Helper::get_init_global()
 {
   nemesis_err_flag =
-    Nemesis::ne_get_init_global(ex2helper.ex_id,
+    Nemesis::ne_get_init_global(ex_id,
 				&num_nodes_global,
 				&num_elems_global,
 				&num_elem_blks_global,
 				&num_node_sets_global,
 				&num_side_sets_global);
-  ex2helper.check_err(nemesis_err_flag, "Error reading initial global data!");
+  this->check_err(nemesis_err_flag, "Error reading initial global data!");
 
   if (_verbose)
     {
@@ -98,11 +97,11 @@ void Nemesis_IO_Helper::get_ss_param_global()
       num_global_side_df_counts.resize(num_side_sets_global);
       
       nemesis_err_flag =
-	Nemesis::ne_get_ss_param_global(ex2helper.ex_id,
+	Nemesis::ne_get_ss_param_global(ex_id,
 					global_sideset_ids.empty()        ? NULL : &global_sideset_ids[0],
 					num_global_side_counts.empty()    ? NULL : &num_global_side_counts[0],
 					num_global_side_df_counts.empty() ? NULL : &num_global_side_df_counts[0]);
-      ex2helper.check_err(nemesis_err_flag, "Error reading global sideset parameters!");
+      this->check_err(nemesis_err_flag, "Error reading global sideset parameters!");
 
       if (_verbose)
 	{
@@ -131,11 +130,11 @@ void Nemesis_IO_Helper::get_ns_param_global()
       num_global_node_df_counts.resize(num_node_sets_global);
       
       nemesis_err_flag =
-	Nemesis::ne_get_ns_param_global(ex2helper.ex_id,
+	Nemesis::ne_get_ns_param_global(ex_id,
 					global_nodeset_ids.empty()        ? NULL : &global_nodeset_ids[0],
 					num_global_node_counts.empty()    ? NULL : &num_global_node_counts[0],
 					num_global_node_df_counts.empty() ? NULL : &num_global_node_df_counts[0]);
-      ex2helper.check_err(nemesis_err_flag, "Error reading global nodeset parameters!");
+      this->check_err(nemesis_err_flag, "Error reading global nodeset parameters!");
 
       if (_verbose)
 	{
@@ -160,10 +159,10 @@ void Nemesis_IO_Helper::get_eb_info_global()
   global_elem_blk_cnts.resize(num_elem_blks_global);
   
   nemesis_err_flag =
-    Nemesis::ne_get_eb_info_global(ex2helper.ex_id,
+    Nemesis::ne_get_eb_info_global(ex_id,
 				   global_elem_blk_ids.empty()  ? NULL : &global_elem_blk_ids[0],
 				   global_elem_blk_cnts.empty() ? NULL : &global_elem_blk_cnts[0]);			  
-  ex2helper.check_err(nemesis_err_flag, "Error reading global element block info!");
+  this->check_err(nemesis_err_flag, "Error reading global element block info!");
 
   if (_verbose)
     {
@@ -183,11 +182,11 @@ void Nemesis_IO_Helper::get_eb_info_global()
 void Nemesis_IO_Helper::get_init_info()
 {
   nemesis_err_flag =
-    Nemesis::ne_get_init_info(ex2helper.ex_id,
+    Nemesis::ne_get_init_info(ex_id,
 			      &num_proc,
 			      &num_proc_in_file,
 			      &ftype);
-  ex2helper.check_err(nemesis_err_flag, "Error reading initial info!");
+  this->check_err(nemesis_err_flag, "Error reading initial info!");
 
   if (_verbose)
     {
@@ -202,7 +201,7 @@ void Nemesis_IO_Helper::get_init_info()
 void Nemesis_IO_Helper::get_loadbal_param()
 {
   nemesis_err_flag =
-    Nemesis::ne_get_loadbal_param(ex2helper.ex_id,
+    Nemesis::ne_get_loadbal_param(ex_id,
 				  &num_internal_nodes,
 				  &num_border_nodes,
 				  &num_external_nodes,
@@ -212,7 +211,7 @@ void Nemesis_IO_Helper::get_loadbal_param()
 				  &num_elem_cmaps,
 				  libMesh::processor_id() // The ID of the processor for which info is to be read
 				  );
-  ex2helper.check_err(nemesis_err_flag, "Error reading load balance parameters!");
+  this->check_err(nemesis_err_flag, "Error reading load balance parameters!");
 	
 
   if (_verbose)
@@ -235,12 +234,12 @@ void Nemesis_IO_Helper::get_elem_map()
   elem_mapb.resize(num_border_elems);
   
   nemesis_err_flag =
-    Nemesis::ne_get_elem_map(ex2helper.ex_id,
+    Nemesis::ne_get_elem_map(ex_id,
 			     elem_mapi.empty() ? NULL : &elem_mapi[0],
 			     elem_mapb.empty() ? NULL : &elem_mapb[0],
 			     libMesh::processor_id()
 			     );
-  ex2helper.check_err(nemesis_err_flag, "Error reading element maps!");
+  this->check_err(nemesis_err_flag, "Error reading element maps!");
 
 
   if (_verbose)
@@ -251,12 +250,12 @@ void Nemesis_IO_Helper::get_elem_map()
       //std::cout << "[" << libMesh::processor_id() << "] " << "first boundary elem id=" << elem_mapb[0] << std::endl;
       //std::cout << "[" << libMesh::processor_id() << "] " << "last boundary elem id=" << elem_mapb.back() << std::endl;
       std::cout << "[" << libMesh::processor_id() << "] elem_mapi[i] = ";
-      for (unsigned int i=0; i< static_cast<unsigned int>(std::min(10, num_internal_elems-1)); ++i)
+      for (unsigned int i=0; i< static_cast<unsigned int>(num_internal_elems-1); ++i)
 	std::cout << elem_mapi[i] << ", ";
       std::cout << "... " << elem_mapi.back() << std::endl;
 
       std::cout << "[" << libMesh::processor_id() << "] elem_mapb[i] = ";
-      for (unsigned int i=0; i< static_cast<unsigned int>(std::min(10, num_internal_elems-1)); ++i)
+      for (unsigned int i=0; i< static_cast<unsigned int>(std::min(10, num_border_elems-1)); ++i)
 	std::cout << elem_mapb[i] << ", ";
       std::cout << "... " << elem_mapb.back() << std::endl;
     }
@@ -272,13 +271,13 @@ void Nemesis_IO_Helper::get_node_map()
   node_mape.resize(num_external_nodes);
   
   nemesis_err_flag =
-    Nemesis::ne_get_node_map(ex2helper.ex_id,
+    Nemesis::ne_get_node_map(ex_id,
 			     node_mapi.empty() ? NULL : &node_mapi[0],
 			     node_mapb.empty() ? NULL : &node_mapb[0],
 			     node_mape.empty() ? NULL : &node_mape[0], 
 			     libMesh::processor_id()
 			     );
-  ex2helper.check_err(nemesis_err_flag, "Error reading node maps!");
+  this->check_err(nemesis_err_flag, "Error reading node maps!");
 
   if (_verbose)
     {
@@ -310,13 +309,13 @@ void Nemesis_IO_Helper::get_cmap_params()
   elem_cmap_elem_cnts.resize(num_elem_cmaps);
   
   nemesis_err_flag =
-    Nemesis::ne_get_cmap_params(ex2helper.ex_id,
+    Nemesis::ne_get_cmap_params(ex_id,
 				node_cmap_ids.empty()       ? NULL : &node_cmap_ids[0],
 				node_cmap_node_cnts.empty() ? NULL : &node_cmap_node_cnts[0],
 				elem_cmap_ids.empty()       ? NULL : &elem_cmap_ids[0],
 				elem_cmap_elem_cnts.empty() ? NULL : &elem_cmap_elem_cnts[0],
 				libMesh::processor_id());
-  ex2helper.check_err(nemesis_err_flag, "Error reading cmap parameters!");
+  this->check_err(nemesis_err_flag, "Error reading cmap parameters!");
 
 
   if (_verbose)
@@ -356,12 +355,12 @@ void Nemesis_IO_Helper::get_node_cmap()
       node_cmap_proc_ids[i].resize(node_cmap_node_cnts[i]);
 
       nemesis_err_flag =
-	Nemesis::ne_get_node_cmap(ex2helper.ex_id,
+	Nemesis::ne_get_node_cmap(ex_id,
 				  node_cmap_ids.empty()         ? NULL : node_cmap_ids[i],
 				  node_cmap_node_ids[i].empty() ? NULL : &node_cmap_node_ids[i][0],
 				  node_cmap_proc_ids[i].empty() ? NULL : &node_cmap_proc_ids[i][0],
 				  libMesh::processor_id());
-      ex2helper.check_err(nemesis_err_flag, "Error reading node cmap node and processor ids!");
+      this->check_err(nemesis_err_flag, "Error reading node cmap node and processor ids!");
 
       if (_verbose)
 	{
@@ -395,13 +394,13 @@ void Nemesis_IO_Helper::get_elem_cmap()
       elem_cmap_proc_ids[i].resize(elem_cmap_elem_cnts[i]);
 
       nemesis_err_flag =
-	Nemesis::ne_get_elem_cmap(ex2helper.ex_id,
+	Nemesis::ne_get_elem_cmap(ex_id,
 				  elem_cmap_ids.empty()         ? NULL : elem_cmap_ids[i],
 				  elem_cmap_elem_ids[i].empty() ? NULL : &elem_cmap_elem_ids[i][0],
 				  elem_cmap_side_ids[i].empty() ? NULL : &elem_cmap_side_ids[i][0],
 				  elem_cmap_proc_ids[i].empty() ? NULL : &elem_cmap_proc_ids[i][0],
 				  libMesh::processor_id());
-      ex2helper.check_err(nemesis_err_flag, "Error reading elem cmap elem, side, and processor ids!");
+      this->check_err(nemesis_err_flag, "Error reading elem cmap elem, side, and processor ids!");
 
 
       if (_verbose)

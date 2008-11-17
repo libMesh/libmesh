@@ -52,28 +52,30 @@ public:
    * the class.  Also allows you to set the verbosity level to v=1
    * (on) or v=0 (off).
    */
-  ExodusII_IO_Helper(bool v=false) : _verbose(v),
-				     comp_ws(sizeof(double)),
-				     io_ws(0),
-				     ex_id(0),
-				     ex_err(0),
-				     num_dim(0),
-				     num_nodes(0),
-				     num_elem(0),
-				     num_elem_blk(0),
-				     num_node_sets(0),
-				     num_side_sets(0),
-				     num_elem_this_blk(0),
-				     num_nodes_per_elem(0),
-				     num_attr(0),
-				     req_info(0),
-				     ret_int(0),
-				     num_elem_all_sidesets(0),
-				     ex_version(0.0),
-				     ret_float(0.0),
-				     ret_char(0),
-				     num_time_steps(0),
-				     _created(false)
+  ExodusII_IO_Helper(bool v=false) : 
+    comp_ws(sizeof(double)),
+    io_ws(0),
+    ex_id(0),
+    ex_err(0),
+    num_dim(0),
+    num_nodes(0),
+    num_elem(0),
+    num_elem_blk(0),
+    num_node_sets(0),
+    num_side_sets(0),
+    num_elem_this_blk(0),
+    num_nodes_per_elem(0),
+    num_attr(0),
+    req_info(0),
+    ret_int(0),
+    num_elem_all_sidesets(0),
+    ex_version(0.0),
+    ret_float(0.0),
+    ret_char(0),
+    num_time_steps(0),
+    _created(false),
+    _verbose(v)
+
   {
     title.resize(MAX_LINE_LENGTH);
     elem_type.resize(MAX_STR_LENGTH);
@@ -466,7 +468,6 @@ public:
    */
   void message(const std::string msg, int i);
 
-  bool  _verbose;                 // On/Off message flag
   int   comp_ws;                       // ?
   int   io_ws;                         // ?
   int   ex_id;                         // File identification flag
@@ -516,8 +517,9 @@ public:
   std::vector<std::vector<char> > vvc;
   std::vector<char*> strings; // vector of pointers into vvc
 
-  // This flag gets set after the the create() function has been successfully called.
-  bool _created;
+ protected:
+  bool _created; // This flag gets set after the the create() function has been successfully called.
+  bool _verbose; // On/Off message flag
 };
 
 
