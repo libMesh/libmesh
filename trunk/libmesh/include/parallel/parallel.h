@@ -271,11 +271,12 @@ namespace Parallel
   class Request
   {
   public:
-    Request () {}
-
-//     Request (const Request &other) :
-//       _request(other._request)
-//     {}
+    Request () 
+    {
+#ifdef LIBMESH_HAVE_MPI
+      _request = MPI_REQUEST_NULL;
+#endif
+    }
 
     Request (const request &r) :
       _request(r)
@@ -286,6 +287,17 @@ namespace Parallel
 
     Request & operator = (const request &r)
     { _request = r; return *this; }
+
+    ~Request ()
+    {
+#ifdef LIBMESH_HAVE_MPI
+      // explicitly free this request if not 
+      // done so already, otherwise this would
+      // be a memory leak!
+      if (_request != MPI_REQUEST_NULL)
+	MPI_Request_free (&_request);
+#endif
+    }
 
     operator const request & () const
     { return _request; }
@@ -301,6 +313,42 @@ namespace Parallel
 #endif
       return status;
     }
+
+    bool test ()
+    {
+#ifdef LIBMESH_HAVE_MPI
+      int val=0;
+
+      MPI_Test (&_request,
+		&val,
+		MPI_STATUS_IGNORE);
+      if (val)
+	{
+	  libmesh_assert (_request == MPI_REQUEST_NULL);
+	  libmesh_assert (val == 1);
+	}
+
+      return val;
+#else
+      return true;
+#endif
+    }
+
+    bool test (status &status)
+    {
+#ifdef LIBMESH_HAVE_MPI
+      int val=0;
+
+      MPI_Test (&_request,
+		&val,
+		&status);
+
+      return val;
+#else
+      return true;
+#endif
+    }
+
 
   private:
 
@@ -579,6 +627,13 @@ namespace Parallel
   
   //-------------------------------------------------------------------
   /**
+   * Wait for a non-blocking send or receive to finish
+   */
+  inline void wait (std::vector<Request> &r)
+  { for (unsigned int i=0; i<r.size(); i++) r[i].wait(); }
+  
+  //-------------------------------------------------------------------
+  /**
    * Send vector \p send to one processor while simultaneously receiving
    * another vector \p recv from a (potentially different) processor.
    */
@@ -633,10 +688,14 @@ namespace Parallel
   //-------------------------------------------------------------------
   /**
    * Take a vector of local variables and expand it to include 
-   * values from all processors
+   * values from all processors. By default, each processor is 
+   * allowed to have its own unique input buffer length. If 
+   * it is known that all processors have the same input sizes
+   * additional communication can be avoided.
    */
   template <typename T>
-  inline void allgather(std::vector<T> &r);
+  inline void allgather(std::vector<T> &r,
+			const bool identical_buffer_sizes = false);
 
 
 
@@ -1802,12 +1861,28 @@ namespace Parallel
    * must be called by all processors.
    */
   template <typename T>
-  inline void allgather(std::vector<T> &r)
+  inline void allgather(std::vector<T> &r,
+			const bool identical_buffer_sizes)
   {
     if (libMesh::n_processors() == 1)
       return;
 
     START_LOG("allgather()", "Parallel");
+
+    if (identical_buffer_sizes)
+      {
+	std::vector<T> r_src(r.size()*libMesh::n_processors());
+	r_src.swap(r);
+	MPI_Allgather (r_src.empty() ? NULL : &r_src[0],
+		       r_src.size(),
+		       datatype<T>(),
+		       r.empty() ? NULL : &r[0],
+		       r_src.size(), 
+		       datatype<T>(),
+		       libMesh::COMM_WORLD);
+	STOP_LOG("allgather()", "Parallel");
+	return;
+      }
 
     std::vector<int>
       sendlengths  (libMesh::n_processors(), 0),
@@ -1833,10 +1908,8 @@ namespace Parallel
       }
 
     // copy the input buffer
-    std::vector<T> r_src(r);
-
-    // now resize it to hold the global data
-    r.resize(globalsize);
+    std::vector<T> r_src(globalsize);
+    r_src.swap(r);
 
     // and get the data from the remote processors.
     // Pass NULL if our vector is empty.
@@ -1855,12 +1928,28 @@ namespace Parallel
 
 
   template <typename T>
-  inline void allgather(std::vector<std::complex<T> > &r)
+  inline void allgather(std::vector<std::complex<T> > &r,
+			const bool identical_buffer_sizes)
   {
     if (libMesh::n_processors() == 1)
       return;
 
     START_LOG("allgather()", "Parallel");
+
+    if (identical_buffer_sizes)
+      {
+	std::vector<std::complex<T> > r_src(r.size()*libMesh::n_processors());
+	r_src.swap(r);
+	MPI_Allgather (r_src.empty() ? NULL : &r_src[0],
+		       2*r_src.size(),
+		       datatype<T>(),
+		       r.empty() ? NULL : &r[0],
+		       2*r_src.size(), 
+		       datatype<T>(),
+		       libMesh::COMM_WORLD);
+	STOP_LOG("allgather()", "Parallel");
+	return;
+      }
 
     std::vector<int>
       sendlengths  (libMesh::n_processors(), 0),
@@ -1886,10 +1975,8 @@ namespace Parallel
       }
 
     // copy the input buffer
-    std::vector<std::complex<T> > r_src(r);
-
-    // now resize it to hold the global data
-    r.resize(globalsize);
+    std::vector<std::complex<T> > r_src(globalsize);
+    r_src.swap(r);
 
     // and get the data from the remote processors.
     // Pass NULL if our vector is empty.
@@ -2232,7 +2319,7 @@ namespace Parallel
   }
 
   template <typename T>
-  inline void allgather(std::vector<T> &) {}
+  inline void allgather(std::vector<T> &, const bool = false) {}
 
   template <typename T>
   inline void alltoall(std::vector<T> &) {}
