@@ -122,6 +122,29 @@ public:
 	 const unsigned int m_its);
 
   /**
+   * This function solves a system whose matrix is a shell matrix.
+   */
+  std::pair<unsigned int, Real>
+    solve (const ShellMatrix<T>& shell_matrix,
+	   NumericVector<T>& solution_in,
+	   NumericVector<T>& rhs_in,
+	   const double tol,
+	   const unsigned int m_its);
+  
+  /**
+   * This function solves a system whose matrix is a shell matrix, but
+   * a sparse matrix is used as preconditioning matrix, this allowing
+   * other preconditioners than JACOBI.
+   */
+  virtual std::pair<unsigned int, Real>
+    solve (const ShellMatrix<T>& shell_matrix,
+	   const SparseMatrix<T>& precond_matrix,
+	   NumericVector<T>& solution_in,
+	   NumericVector<T>& rhs_in,
+	   const double tol,
+	   const unsigned int m_its);
+  
+  /**
    * Returns the raw PETSc preconditioner context pointer.  This allows
    * you to specify the PCShellSetApply() and PCShellSetSetUp() functions
    * if you desire.  Just don't do anything crazy like calling PCDestroy()!
@@ -168,6 +191,16 @@ private:
    * \p _preconditioner_type
    */
   void set_petsc_preconditioner_type ();
+
+  /**
+   * Internal function if shell matrix mode is used.
+   */
+  static PetscErrorCode _petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest);
+
+  /**
+   * Internal function if shell matrix mode is used.
+   */
+  static PetscErrorCode _petsc_shell_matrix_get_diagonal(Mat mat, Vec dest);
 
   // SLES removed from >= PETSc 2.2.0
 #if PETSC_VERSION_LESS_THAN(2,2,0)

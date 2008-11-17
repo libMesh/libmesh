@@ -391,6 +391,13 @@ public:
 			const unsigned int proc_id=0) const;
   
   /**
+   * Computes the pointwise (i.e. component-wise) product of \p vec1
+   * and \p vec2 and stores the result in \p *this.
+   */
+  virtual void pointwise_mult (const NumericVector<T>& vec1,
+			       const NumericVector<T>& vec2);
+
+  /**
    * Print the contents of the vector in Matlab
    * format. Optionally prints the
    * matrix to the file named \p name.  If \p name

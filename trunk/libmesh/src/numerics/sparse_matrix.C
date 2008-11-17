@@ -28,6 +28,7 @@
 #include "petsc_matrix.h"
 #include "sparse_matrix.h"
 #include "trilinos_epetra_matrix.h"
+#include "numeric_vector.h"
 
 
 //------------------------------------------------------------------
@@ -80,6 +81,27 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
   AutoPtr<SparseMatrix<T> > ap(NULL);
   return ap;    
 }
+
+
+template <typename T>
+void SparseMatrix<T>::vector_mult (NumericVector<T>& dest,
+				   const NumericVector<T>& arg) const
+{
+  dest.zero();
+  this->vector_mult_add(dest,arg);
+}
+
+
+
+template <typename T>
+void SparseMatrix<T>::vector_mult_add (NumericVector<T>& dest,
+				       const NumericVector<T>& arg) const
+{
+  /* This functionality is actually implemented in the \p
+     NumericVector class.  */
+  dest.add_vector(arg,*this);
+}
+
 
 
 template <typename T>

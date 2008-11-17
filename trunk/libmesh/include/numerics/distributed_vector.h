@@ -365,6 +365,13 @@ public:
   void localize_to_one (std::vector<T>& v_local,
 			const unsigned int proc_id=0) const;
     
+  /**
+   * Computes the pointwise (i.e. component-wise) product of \p vec1
+   * and \p vec2 and stores the result in \p *this.
+   */
+  virtual void pointwise_mult (const NumericVector<T>& vec1,
+			       const NumericVector<T>& vec2);
+
 private:
 
   /**

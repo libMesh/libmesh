@@ -284,6 +284,35 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
 
 
 template <typename T>
+std::pair<unsigned int, Real> 
+LaspackLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
+			       NumericVector<T>& /*solution_in*/,
+			       NumericVector<T>& /*rhs_in*/,
+			       const double /*tol*/,
+			       const unsigned int /*m_its*/)
+{
+  libmesh_not_implemented();
+  return std::make_pair(0,0.0);
+}
+
+
+
+template <typename T>
+std::pair<unsigned int, Real> 
+LaspackLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
+			       const SparseMatrix<T>& /*precond_matrix*/,
+			       NumericVector<T>& /*solution_in*/,
+			       NumericVector<T>& /*rhs_in*/,
+			       const double /*tol*/,
+			       const unsigned int /*m_its*/)
+{
+  libmesh_not_implemented();
+  return std::make_pair(0,0.0);
+}
+
+
+
+template <typename T>
 void LaspackLinearSolver<T>::set_laspack_preconditioner_type ()
 {
   switch (this->_preconditioner_type)

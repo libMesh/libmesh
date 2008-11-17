@@ -27,6 +27,7 @@
 #include "petsc_matrix.h"
 #include "dof_map.h"
 #include "dense_matrix.h"
+#include "petsc_vector.h"
 
 
 
@@ -387,7 +388,32 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
 
 
 
+template <typename T>
+void PetscMatrix<T>::get_diagonal (NumericVector<T>& dest) const
+{
+  // Convert vector to PetscVector.
+  PetscVector<T>* petsc_dest = dynamic_cast<PetscVector<T>*>(&dest);
+  libmesh_assert(petsc_dest != NULL);
 
+  // Call PETSc function.
+
+#if PETSC_VERSION_LESS_THAN(2,3,1)
+
+  std::cout << "This method has been developed with PETSc 2.3.1.  "
+	    << "No one has made it backwards compatible with older "
+	    << "versions of PETSc so far; however, it might work "
+	    << "without any change with some older version." << std::endl;
+  libmesh_error();
+
+#else
+
+  // Needs a const_cast since PETSc does not work with const.
+  int ierr =
+    MatGetDiagonal(const_cast<PetscMatrix<T>*>(this)->mat(),petsc_dest->vec()); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#endif
+
+}
 
 
 

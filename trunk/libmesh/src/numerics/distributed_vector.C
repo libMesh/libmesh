@@ -534,6 +534,16 @@ void DistributedVector<T>::localize_to_one (std::vector<T>& v_local,
 }
 
 
+
+template <typename T>
+void DistributedVector<T>::pointwise_mult (const NumericVector<T>& vec1,
+					   const NumericVector<T>& vec2)
+{
+  libmesh_not_implemented();
+}
+
+
+
 //--------------------------------------------------------------
 // Explicit instantiations
 template class DistributedVector<Number>;

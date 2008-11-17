@@ -299,6 +299,11 @@ public:
   void print_matlab(const std::string name="NULL") const;
 
   /**
+   * Copies the diagonal part of the matrix into \p dest.
+   */
+  virtual void get_diagonal (NumericVector<T>& dest) const;
+
+  /**
    * Swaps the raw PETSc matrix context pointers.
    */
   void swap (PetscMatrix<T> &);
@@ -310,7 +315,6 @@ public:
    */
   Mat mat () { libmesh_assert (_mat != NULL); return _mat; }
 
-  
 protected:
 
   /**

@@ -194,6 +194,15 @@ void LaspackMatrix<T>::init ()
 }
 
 
+
+template <typename T>
+void LaspackMatrix<T>::get_diagonal (NumericVector<T>& /*dest*/) const
+{
+  libmesh_not_implemented();
+}
+
+
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LaspackMatrix<Number>;

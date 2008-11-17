@@ -502,7 +502,20 @@ public:
 					    DenseVector<Number>& rhs,
 					    std::vector<unsigned int>& elem_dofs,
 					    bool asymmetric_constraint_rows = true) const;
-  
+
+  /**
+   * Constrains a dyadic element matrix B = v w'.  This method
+   * requires the element matrix to be square, in which case the
+   * elem_dofs correspond to the global DOF indices of both the rows
+   * and columns of the element matrix.  For this case the rows and
+   * columns of the matrix necessarily correspond to variables of the
+   * same approximation order.
+   */
+  void constrain_element_dyad_matrix (DenseVector<Number>& v,
+				      DenseVector<Number>& w,
+				      std::vector<unsigned int>& row_dofs,
+				      bool asymmetric_constraint_rows = true) const;
+
   /**
    * Constrains the numeric vector \p v, which represents a solution defined on
    * the mesh.  This may need to be used after a linear solve, if your linear

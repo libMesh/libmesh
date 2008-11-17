@@ -879,6 +879,41 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
 
 
 template <typename T>
+void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
+				     const NumericVector<T>& vec2)
+{
+  int ierr = 0;
+
+  // Convert arguments to PetscVector*.
+  const PetscVector<T>* vec1_petsc = dynamic_cast<const PetscVector<T>*>(&vec1);
+  const PetscVector<T>* vec2_petsc = dynamic_cast<const PetscVector<T>*>(&vec2);
+  libmesh_assert (vec1_petsc != NULL);
+  libmesh_assert (vec2_petsc != NULL);
+
+  // Call PETSc function.
+
+#if PETSC_VERSION_LESS_THAN(2,3,1)
+
+  std::cout << "This method has been developed with PETSc 2.3.1.  "
+	    << "No one has made it backwards compatible with older "
+	    << "versions of PETSc so far; however, it might work "
+	    << "without any change with some older version." << std::endl;
+  libmesh_error();
+
+#else
+
+  ierr = VecPointwiseMult(this->vec(),
+			  const_cast<PetscVector<T>*>(vec1_petsc)->vec(),
+			  const_cast<PetscVector<T>*>(vec2_petsc)->vec());
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#endif
+
+}
+
+
+
+template <typename T>
 void PetscVector<T>::print_matlab (const std::string name) const
 {
   libmesh_assert (this->initialized());

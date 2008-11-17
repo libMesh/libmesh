@@ -39,6 +39,7 @@ template <typename T> class DenseMatrix;
 template <typename T> inline std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
 class DofMap;
 namespace SparsityPattern { class Graph; }
+template <typename T> class NumericVector;
 
 
 /**
@@ -303,7 +304,7 @@ public:
    * sparse matrix format. Optionally prints the
    * matrix to the file named \p name.  If \p name
    * is not specified it is dumped to the screen.
-   */
+x   */
   virtual void print_matlab(const std::string name="NULL") const
   {
     std::cerr << "ERROR: Not Implemented in base class yet!" << std::endl;
@@ -342,6 +343,24 @@ public:
 			 true); // true means REUSE submatrix
   }
   
+  /**
+   * Multiplies the matrix with \p arg and stores the result in \p
+   * dest.
+   */
+  void vector_mult (NumericVector<T>& dest,
+		    const NumericVector<T>& arg) const;
+
+  /**
+   * Multiplies the matrix with \p arg and adds the result to \p dest.
+   */
+  void vector_mult_add (NumericVector<T>& dest,
+			const NumericVector<T>& arg) const;
+
+  /**
+   * Copies the diagonal part of the matrix into \p dest.
+   */
+  virtual void get_diagonal (NumericVector<T>& dest) const = 0;
+
 protected:
 
   /**
