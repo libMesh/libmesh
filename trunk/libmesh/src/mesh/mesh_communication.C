@@ -57,16 +57,8 @@ namespace {
       libmesh_assert (b);
       
       if (a->level() == b->level())
-	{
-// 	  // order siblings sequentially
-// 	  if (a->parent() && b->parent())   // a & b have parents
-// 	    if (a->parent() == b->parent()) // which are the same
-// 	      return (a->parent()->which_child_am_i(a) <
-// 		      b->parent()->which_child_am_i(b));
-
-	  // otherwise order by id
-	  return a->id() < b->id();
-	}
+	// order by id
+	return a->id() < b->id();	
 
       // otherwise order by level
       return a->level() < b->level();
@@ -148,12 +140,14 @@ void MeshCommunication::clear ()
 
 
 #ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
+// ------------------------------------------------------------
 void MeshCommunication::redistribute (ParallelMesh &) const
 {
-  // no MPI, no redistribution
+  // no MPI == one processor, no redistribution
   return;
 }
 #else
+// ------------------------------------------------------------
 void MeshCommunication::redistribute (ParallelMesh &mesh) const
 {
   // This method will be called after a new partitioning has been 
@@ -310,20 +304,20 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    // send the nodes off to the destination processor
 	    node_send_requests.push_back(Parallel::request());
 	  
-	    Parallel::nonblocking_send (pid,
-			                nodes_sent[pid],
-			                packed_node_datatype,
-			                node_send_requests.back(),
-			                /* tag = */ 0);
+	    Parallel::send (pid,
+			    nodes_sent[pid],
+			    packed_node_datatype,
+			    node_send_requests.back(),
+			    /* tag = */ 0);
 
 	    if (!node_bcs_sent[pid].empty())
 	      {
 		node_bc_requests.push_back(Parallel::request());
 
-		Parallel::nonblocking_send (pid,
-				            node_bcs_sent[pid],
-				            node_bc_requests.back(),
-				            /* tag = */ 2);
+		Parallel::send (pid,
+				node_bcs_sent[pid],
+				node_bc_requests.back(),
+				/* tag = */ 2);
 	      }
 	  }
 	
@@ -356,10 +350,10 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    // send the elements off to the destination processor
 	    element_send_requests.push_back(Parallel::request());
 	  
-	    Parallel::nonblocking_send (pid,
-			                elements_sent[pid],
-			                element_send_requests.back(),
-			                /* tag = */ 1);
+	    Parallel::send (pid,
+			    elements_sent[pid],
+			    element_send_requests.back(),
+			    /* tag = */ 1);
 
 	    // the size of the element bc buffer we will ship to pid
 	    send_n_nodes_and_elem_per_proc[5*pid+4] = element_bcs_sent[pid].size();
@@ -368,10 +362,10 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	      {
 		element_bc_requests.push_back(Parallel::request());
 
-		Parallel::nonblocking_send (pid,
-				            element_bcs_sent[pid],
-				            element_bc_requests.back(),
-				            /* tag = */ 3);
+		Parallel::send (pid,
+				element_bcs_sent[pid],
+				element_bc_requests.back(),
+				/* tag = */ 3);
 	      }
 	  }
       }
@@ -659,7 +653,113 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 
 
 
+#ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
+// ------------------------------------------------------------
+void MeshCommunication::gather_neighboring_elements (ParallelMesh &) const
+{
+  // no MPI == one processor, no need for this method...
+  return;
+}
+#else
+// ------------------------------------------------------------
+void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
+{
+  // Don't need to do anything if there is
+  // only one processor.
+  if (libMesh::n_processors() == 1)
+    return;  
 
+  // This function must be run on all processors at once
+  parallel_only();
+  
+  START_LOG("gather_neighboring_elements()","MeshCommunication");
+
+  //------------------------------------------------------------------
+  // The purpose of this function is to provide neighbor data structure
+  // consistency for a parallel, distributed mesh.  In libMesh we require
+  // that each local element have access to a full set of valid face
+  // neighbors.  In some cases this requires us to store "ghost elements" -
+  // elements that belong to other processors but we store to provide
+  // data structure consistency.  Also, it is assumed that any element
+  // with a NULL neighbor resides on a physical domain boundary.  So,
+  // even our "ghost elements" must have non-NULL neighbors.  To handle
+  // this the concept of "RemoteElem" is used - a special construct which
+  // is used to denote that an element has a face neighbor, but we do
+  // not actually store detailed information about that neighbor.  This
+  // is required to prevent data structure explosion.
+  //
+  // So when this method is called we should have only local elements.
+  // These local elements will then find neighbors among the local
+  // element set.  After this is completed, any element with a NULL
+  // neighbor has either (i) a face on the physical boundary of the mesh,
+  // or (ii) a neighboring element which lives on a remote processor.
+  // To handle case (ii), we communicate the global node indices connected
+  // to all such faces to our neighboring processors.  They then send us
+  // all their elements with a NULL neighbor that are connected to any
+  // of the nodes in our list.
+  //------------------------------------------------------------------
+
+  // Let's begin with finding consistent neighbor data information
+  // for all the elements we currently have.  We'll use a clean
+  // slate here - clear any existing information, including RemoteElem's.
+  mesh.find_neighbors (/* reset_remote_elements = */ true,
+		       /* reset_current_list    = */ true);    
+  
+  // Now any element with a NULL neighbor either
+  // (i) lives on the physical domain boundary, or
+  // (ii) lives on an inter-processor boundary.
+  // We will now gather all the elements from adjacent processors
+  // which are of the same state, which should address all the type (ii)
+  // elements.
+  
+  // Let's build a list of all nodes which live on NULL-neighbor sides.
+  // For simplicity, we will use a set to build the list, then transfer
+  // it to a vector for communication.
+  std::vector<unsigned int> my_interface_node_list;
+  {
+    std::set<unsigned int> my_interface_node_set;
+
+    // since parent nodes are a subset of children nodes, this should be sufficient
+    MeshBase::const_element_iterator       it     = mesh.active_local_elements_begin();
+    const MeshBase::const_element_iterator it_end = mesh.active_local_elements_end();
+
+    for (; it != it_end; ++it)
+      {
+	const Elem *elem = *it;
+	libmesh_assert (elem != NULL);
+
+	for (unsigned int s=0; s<elem->n_sides(); s++)
+	  if (elem->neighbor(s) == NULL)
+	    {
+	      AutoPtr<Elem> side(elem->build_side(s));
+
+	      for (unsigned int n=0; n<side->n_nodes(); n++)
+		my_interface_node_set.insert (side->node(n));						  
+	    }
+      }
+
+    my_interface_node_list.reserve (my_interface_node_set.size());
+    my_interface_node_list.insert  (my_interface_node_list.end(),
+				    my_interface_node_set.begin(),
+				    my_interface_node_set.end());
+  }
+
+  if (true)
+    std::cout << "[" << libMesh::processor_id() << "] "
+	      << "mesh.n_nodes()=" << mesh.n_nodes() << ", "
+	      << "my_interface_node_list.size()=" << my_interface_node_list.size()
+	      << std::endl;
+
+
+
+  
+  STOP_LOG("gather_neighboring_elements()","MeshCommunication");  
+}
+#endif // LIBMESH_HAVE_MPI
+
+
+
+// ------------------------------------------------------------
 void MeshCommunication::broadcast (MeshBase& mesh) const
 {
   // Don't need to do anything if there is
@@ -673,18 +773,21 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
 
 
 
-#ifdef LIBMESH_HAVE_MPI
+#ifndef LIBMESH_HAVE_MPI
+// ------------------------------------------------------------
+void MeshCommunication::broadcast_mesh (MeshBase&) const // avoid spurious gcc warnings
+{
+  // no MPI, no need for this method...
+  return;
+}
+#else 
+// ------------------------------------------------------------
 void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
-#else // avoid spurious gcc warnings
-void MeshCommunication::broadcast_mesh (MeshBase&) const
-#endif
 {
   // Don't need to do anything if there is
   // only one processor.
   if (libMesh::n_processors() == 1)
-    return;
-  
-#ifdef LIBMESH_HAVE_MPI
+    return;  
 
   // This function must be run on all processors at once
   parallel_only();
@@ -914,32 +1017,27 @@ void MeshCommunication::broadcast_mesh (MeshBase&) const
 
   STOP_LOG("broadcast_mesh()","MeshCommunication");
   
-#else
-
-  // no MPI but multiple processors? Huh??
-  libmesh_error();
-  
 #endif
 }
 
 
 
-#ifdef LIBMESH_HAVE_MPI
+#ifndef LIBMESH_HAVE_MPI
+// ------------------------------------------------------------
+void MeshCommunication::broadcast_bcs (const MeshBase&,
+				       BoundaryInfo&) const // avoid spurious gcc warnings
+{
+}
+#else
+// ------------------------------------------------------------
 void MeshCommunication::broadcast_bcs (const MeshBase& mesh,
 				       BoundaryInfo& boundary_info) const
-#else // avoid spurious gcc warnings
-void MeshCommunication::broadcast_bcs (const MeshBase&,
-				       BoundaryInfo&) const
-#endif
 {
   // Don't need to do anything if there is
   // only one processor.
   if (libMesh::n_processors() == 1)
     return;
   
-  
-#ifdef LIBMESH_HAVE_MPI
-
   // This function must be run on all processors at once
   parallel_only();
 
@@ -1053,17 +1151,13 @@ void MeshCommunication::broadcast_bcs (const MeshBase&,
   }
 
   STOP_LOG("broadcast_bcs()","MeshCommunication");
-          
-#else
-
-  // no MPI but multiple processors? Huh??
-  libmesh_error();
 
 #endif  
 }
 
 
 
+// ------------------------------------------------------------
 void MeshCommunication::allgather (ParallelMesh& mesh) const
 {
   START_LOG("allgather()","MeshCommunication");
@@ -1083,12 +1177,14 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
 
 #ifndef LIBMESH_HAVE_MPI
   
+// ------------------------------------------------------------
 void MeshCommunication::allgather_mesh (ParallelMesh&) const
 {
   // NO MPI == one processor, no need for this method
   return;
 }
   
+// ------------------------------------------------------------
 void MeshCommunication::allgather_bcs (const ParallelMesh&,
 				       BoundaryInfo&) const
 {
@@ -1098,6 +1194,7 @@ void MeshCommunication::allgather_bcs (const ParallelMesh&,
 
 #else
 
+// ------------------------------------------------------------
 void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 {
   // Check for quick return
@@ -1387,6 +1484,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 
 
 
+// ------------------------------------------------------------
 void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
 				       BoundaryInfo& boundary_info) const
 {
@@ -1573,6 +1671,7 @@ void act_on_data (const std::vector<unsigned int>& old_ids,
 
 
 
+// ------------------------------------------------------------
 void MeshCommunication::make_node_ids_parallel_consistent
   (MeshBase &mesh,
    LocationMap<Node> &loc_map)
@@ -1592,6 +1691,7 @@ void MeshCommunication::make_node_ids_parallel_consistent
 
 
 
+// ------------------------------------------------------------
 void MeshCommunication::make_elems_parallel_consistent(MeshBase &mesh)
 {
   // This function must be run on all processors at once
@@ -1620,6 +1720,7 @@ SyncProcIds(MeshBase &_mesh) : mesh(_mesh) {}
 
 MeshBase &mesh;
 
+// ------------------------------------------------------------
 void gather_data (const std::vector<unsigned int>& ids,
                   std::vector<datum>& data)
 {
@@ -1639,6 +1740,7 @@ void gather_data (const std::vector<unsigned int>& ids,
     }
 }
 
+// ------------------------------------------------------------
 void act_on_data (const std::vector<unsigned int>& ids,
                   std::vector<datum> proc_ids)
 {
@@ -1654,6 +1756,7 @@ void act_on_data (const std::vector<unsigned int>& ids,
 
 
 
+// ------------------------------------------------------------
 void MeshCommunication::make_node_proc_ids_parallel_consistent
   (MeshBase& mesh,
    LocationMap<Node>& loc_map)
@@ -1686,6 +1789,7 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent
 
 
 
+// ------------------------------------------------------------
 void MeshCommunication::make_nodes_parallel_consistent
   (MeshBase &mesh,
    LocationMap<Node> &loc_map)
@@ -1733,6 +1837,7 @@ void MeshCommunication::make_nodes_parallel_consistent
 
 
 
+// ------------------------------------------------------------
 void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
 {
   // The mesh should know it's about to be parallelized

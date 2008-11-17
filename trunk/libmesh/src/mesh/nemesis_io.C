@@ -677,8 +677,10 @@ void Nemesis_IO::read (const std::string& base_filename)
     my_next_elem += (all_loadbal_data[8*pid + 3]+  // num_internal_elems, proc pid
 		     all_loadbal_data[8*pid + 4]); // num_border_elems, proc pid
   const unsigned int my_elem_offset = my_next_elem;
-  std::cout << "[" << libMesh::processor_id() << "] ";
-  std::cout << "my_elem_offset=" << my_elem_offset << std::endl;
+
+  if (_verbose)
+    std::cout << "[" << libMesh::processor_id() << "] "
+	      << "my_elem_offset=" << my_elem_offset << std::endl;
 
 
   // Fills in the: 
