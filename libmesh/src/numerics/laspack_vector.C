@@ -387,6 +387,15 @@ void LaspackVector<T>::localize_to_one (std::vector<T>& v_local,
 
 
 
+template <typename T>
+void LaspackVector<T>::pointwise_mult (const NumericVector<T>& /*vec1*/,
+				       const NumericVector<T>& /*vec2*/)
+{
+  libmesh_not_implemented();
+}
+
+
+
 template <typename T> 
 Real LaspackVector<T>::max() const
 {

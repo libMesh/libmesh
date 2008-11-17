@@ -29,6 +29,7 @@
 // Local Includes
 #include "libmesh_logging.h"
 #include "petsc_linear_solver.h"
+#include "shell_matrix.h"
 
 
 
@@ -413,6 +414,204 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 
 
 template <typename T>
+std::pair<unsigned int, Real> 
+PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
+			     NumericVector<T>& solution_in,
+			     NumericVector<T>& rhs_in,
+			     const double tol,
+			     const unsigned int m_its)
+{
+
+#if PETSC_VERSION_LESS_THAN(2,3,1)
+  // FIXME[JWP]: There will be a bunch of unused variable warnings
+  // for older PETScs here.
+  std::cout << "This method has been developed with PETSc 2.3.1.  "
+	    << "No one has made it backwards compatible with older "
+	    << "versions of PETSc so far; however, it might work "
+	    << "without any change with some older version." << std::endl;
+  libmesh_error();
+  return std::make_pair(0,0.0);
+
+#else
+
+  START_LOG("solve()", "PetscLinearSolver");
+
+  PetscVector<T>* solution = dynamic_cast<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* rhs      = dynamic_cast<PetscVector<T>*>(&rhs_in);
+
+  // We cast to pointers so we can be sure that they succeeded
+  // by comparing the result against NULL.
+  libmesh_assert(solution != NULL);
+  libmesh_assert(rhs      != NULL);
+  
+  this->init ();
+
+  int ierr=0;
+  int its=0, max_its = static_cast<int>(m_its);
+  PetscReal final_resid=0.;
+
+  // Close the matrices and vectors in case this wasn't already done.
+  solution->close ();
+  rhs->close ();
+
+  // Prepare the matrix.
+  Mat mat;
+  ierr = MatCreateShell(libMesh::COMM_WORLD,
+			rhs_in.local_size(),
+			solution_in.local_size(),
+			rhs_in.size(),
+			solution_in.size(),
+			const_cast<void*>(static_cast<const void*>(&shell_matrix)),
+			&mat);
+  /* Note that the const_cast above is only necessary because PETSc
+     does not accept a const void*.  Inside the member function
+     _petsc_shell_matrix() below, the pointer is casted back to a
+     const ShellMatrix<T>*.  */
+
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatShellSetOperation(mat,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  ierr = MatShellSetOperation(mat,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Set operators. The input matrix works as the preconditioning matrix
+  ierr = KSPSetOperators(_ksp, mat, mat,
+			 SAME_NONZERO_PATTERN);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Set the tolerances for the iterative solver.  Use the user-supplied
+  // tolerance for the relative residual & leave the others at default values.
+  ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
+ 			   PETSC_DEFAULT, max_its);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Solve the linear system
+  ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	 
+  // Get the number of iterations required for convergence
+  ierr = KSPGetIterationNumber (_ksp, &its);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	 
+  // Get the norm of the final residual to return to the user.
+  ierr = KSPGetResidualNorm (_ksp, &final_resid);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Destroy the matrix.
+  ierr = MatDestroy(mat);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	 
+  STOP_LOG("solve()", "PetscLinearSolver");
+  // return the # of its. and the final residual norm.
+  return std::make_pair(its, final_resid);
+
+#endif
+
+}
+
+
+
+template <typename T>
+std::pair<unsigned int, Real> 
+PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
+			     const SparseMatrix<T>& precond_matrix,
+			     NumericVector<T> &solution_in,
+			     NumericVector<T> &rhs_in,
+			     const double tol,
+			     const unsigned int m_its)
+{
+
+#if PETSC_VERSION_LESS_THAN(2,3,1)
+  // FIXME[JWP]: There will be a bunch of unused variable warnings
+  // for older PETScs here.
+  std::cout << "This method has been developed with PETSc 2.3.1.  "
+	    << "No one has made it backwards compatible with older "
+	    << "versions of PETSc so far; however, it might work "
+	    << "without any change with some older version." << std::endl;
+  libmesh_error();
+  return std::make_pair(0,0.0);
+
+#else
+
+  START_LOG("solve()", "PetscLinearSolver");
+
+  const PetscMatrix<T>* precond  = dynamic_cast<const PetscMatrix<T>*>(&precond_matrix);
+  libmesh_assert(precond!=NULL);
+  
+  PetscVector<T>* solution = dynamic_cast<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* rhs      = dynamic_cast<PetscVector<T>*>(&rhs_in);
+
+  // We cast to pointers so we can be sure that they succeeded
+  // by comparing the result against NULL.
+  libmesh_assert(solution != NULL);
+  libmesh_assert(rhs      != NULL);
+  
+  this->init ();
+
+  int ierr=0;
+  int its=0, max_its = static_cast<int>(m_its);
+  PetscReal final_resid=0.;
+
+  // Close the matrices and vectors in case this wasn't already done.
+  solution->close ();
+  rhs->close ();
+
+  // Prepare the matrix.
+  Mat mat;
+  ierr = MatCreateShell(libMesh::COMM_WORLD,
+			rhs_in.local_size(),
+			solution_in.local_size(),
+			rhs_in.size(),
+			solution_in.size(),
+			const_cast<void*>(static_cast<const void*>(&shell_matrix)),
+			&mat);
+  /* Note that the const_cast above is only necessary because PETSc
+     does not accept a const void*.  Inside the member function
+     _petsc_shell_matrix() below, the pointer is casted back to a
+     const ShellMatrix<T>*.  */
+
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatShellSetOperation(mat,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  ierr = MatShellSetOperation(mat,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Set operators. The input matrix works as the preconditioning matrix
+  ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T>*>(precond)->mat(),
+			 DIFFERENT_NONZERO_PATTERN);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Set the tolerances for the iterative solver.  Use the user-supplied
+  // tolerance for the relative residual & leave the others at default values.
+  ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
+ 			   PETSC_DEFAULT, max_its);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Solve the linear system
+  ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	 
+  // Get the number of iterations required for convergence
+  ierr = KSPGetIterationNumber (_ksp, &its);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	 
+  // Get the norm of the final residual to return to the user.
+  ierr = KSPGetResidualNorm (_ksp, &final_resid);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Destroy the matrix.
+  ierr = MatDestroy(mat);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	 
+  STOP_LOG("solve()", "PetscLinearSolver");
+  // return the # of its. and the final residual norm.
+  return std::make_pair(its, final_resid);
+
+#endif
+
+}
+
+
+
+template <typename T>
 void PetscLinearSolver<T>::get_residual_history(std::vector<double>& hist)
 {
   int ierr = 0;
@@ -646,6 +845,54 @@ void PetscLinearSolver<T>::print_converged_reason()
     }
 #endif
 }
+
+
+
+template <typename T>
+PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest)
+{
+  /* Get the matrix context.  */
+  int ierr=0;
+  void* ctx;
+  ierr = MatShellGetContext(mat,&ctx);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  /* Get user shell matrix object.  */
+  const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
+
+  /* Make \p NumericVector instances around the vectors.  */
+  PetscVector<T> arg_global(arg);
+  PetscVector<T> dest_global(dest);
+
+  /* Call the user function.  */
+  shell_matrix.vector_mult(dest_global,arg_global);
+
+  return ierr;
+}
+
+
+
+template <typename T>
+PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Vec dest)
+{
+  /* Get the matrix context.  */
+  int ierr=0;
+  void* ctx;
+  ierr = MatShellGetContext(mat,&ctx);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  /* Get user shell matrix object.  */
+  const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
+
+  /* Make \p NumericVector instances around the vector.  */
+  PetscVector<T> dest_global(dest);
+
+  /* Call the user function.  */
+  shell_matrix.get_diagonal(dest_global);
+
+  return ierr;
+}
+
 
 
 //------------------------------------------------------------------

@@ -37,6 +37,7 @@
 template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
+template <typename T> class ShellMatrix;
 
 
 
@@ -140,6 +141,33 @@ public:
 					       const double,      // Stopping tolerance
 					       const unsigned int) = 0; // N. Iterations
   
+
+
+  /**
+   * This function solves a system whose matrix is a shell matrix.
+   */
+  virtual std::pair<unsigned int, Real> solve (const ShellMatrix<T>& shell_matrix,
+					       NumericVector<T>&, // Solution vector
+					       NumericVector<T>&, // RHS vector
+					       const double,      // Stopping tolerance
+					       const unsigned int) = 0; // N. Iterations
+  
+
+
+  /**
+   * This function solves a system whose matrix is a shell matrix, but
+   * a sparse matrix is used as preconditioning matrix, this allowing
+   * other preconditioners than JACOBI.
+   */
+  virtual std::pair<unsigned int, Real> solve (const ShellMatrix<T>& shell_matrix,
+					       const SparseMatrix<T>& precond_matrix,
+					       NumericVector<T>&, // Solution vector
+					       NumericVector<T>&, // RHS vector
+					       const double,      // Stopping tolerance
+					       const unsigned int) = 0; // N. Iterations
+  
+
+
   /**
    * Prints a useful message about why the latest linear solve
    * con(di)verged.

@@ -28,6 +28,7 @@
 #include "laspack_vector.h"
 #include "petsc_vector.h"
 #include "trilinos_epetra_vector.h"
+#include "shell_matrix.h"
 
 
 
@@ -244,6 +245,15 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<unsigned int> & indice
   Parallel::max(norm);
 
   return norm;
+}
+
+
+
+template <typename T>
+void NumericVector<T>::add_vector (const NumericVector<T>& v,
+				   const ShellMatrix<T>& a)
+{
+  a.vector_mult_add(*this,v);
 }
 
 

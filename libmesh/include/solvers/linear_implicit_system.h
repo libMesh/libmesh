@@ -30,6 +30,7 @@
 
 // Forward Declarations
 template <typename T> class LinearSolver;
+template <typename T> class ShellMatrix;
 
 
 /**
@@ -125,6 +126,22 @@ public:
    */
   Real final_linear_residual() const { return _final_linear_residual; }
   
+  /**
+   * This function enables the user to provide a shell matrix, i.e. a
+   * matrix that is not stored element-wise, but as a function.  When
+   * you register your shell matrix using this function, calling \p
+   * solve() will no longer use the \p matrix member but the
+   * registered shell matrix instead.  You can reset this behaviour to
+   * its original state by supplying a \p NULL pointer to this
+   * function.
+   */
+  void attach_shell_matrix (ShellMatrix<Number>* shell_matrix);
+  
+  /**
+   * Detaches a shell matrix.  Same as \p attach_shell_matrix(NULL).
+   */
+  void detach_shell_matrix (void) { attach_shell_matrix(NULL); }
+  
 protected:
   
   /**
@@ -137,6 +154,12 @@ protected:
    * The final residual for the linear system Ax=b.
    */
   Real _final_linear_residual;
+
+  /**
+   * User supplies shell matrix or \p NULL if no shell matrix is used.
+   */
+  ShellMatrix<Number>* _shell_matrix;
+
 };
 
 

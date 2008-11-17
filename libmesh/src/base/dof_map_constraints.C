@@ -514,6 +514,63 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
 
 
 
+void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
+					    DenseVector<Number>& w,
+					    std::vector<unsigned int>& row_dofs,
+					    bool) const
+{
+  libmesh_assert (v.size() == row_dofs.size());
+  libmesh_assert (w.size() == row_dofs.size());
+
+  // check for easy return
+  if (this->n_constrained_dofs() == 0)
+    return;
+  
+  // The constrained RHS is built up as R^T F.  
+  DenseMatrix<Number> R;
+
+  this->build_constraint_matrix (R, row_dofs);
+
+  START_LOG("constrain_elem_vector()", "DofMap");
+    
+  // It is possible that the vector is not constrained at all.
+  if ((R.m() == v.size()) &&
+      (R.n() == row_dofs.size())) // if the RHS is constrained
+    {
+      // Compute the matrix-vector products
+      DenseVector<Number> old_v(v);
+      DenseVector<Number> old_w(w);
+
+      // resize RHS & zero before summation
+      v.resize(row_dofs.size());
+      w.resize(row_dofs.size());
+
+      // compute matrix/vector product
+      for (unsigned int i=0; i<row_dofs.size(); i++)
+	for (unsigned int j=0; j<old_v.size(); j++)
+	  {
+	    v(i) += R.transpose(i,j)*old_v(j);
+	    w(i) += R.transpose(i,j)*old_w(j);
+	  }
+      
+      libmesh_assert (row_dofs.size() == v.size());
+      libmesh_assert (row_dofs.size() == w.size());
+
+      /* Constrain only v, not w.  */
+
+      for (unsigned int i=0; i<row_dofs.size(); i++)
+	if (this->is_constrained_dof(row_dofs[i]))
+	  {	
+	    // If the DOF is constrained
+	    v(i) = 0.;
+	  }
+    } // end if the RHS is constrained.
+  
+  STOP_LOG("constrain_elem_vector()", "DofMap");  
+}
+
+
+
 void DofMap::enforce_constraints_exactly (const System &system,
                                           NumericVector<Number> *v) const
 {

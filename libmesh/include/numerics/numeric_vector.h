@@ -39,6 +39,7 @@
 template <typename T> class NumericVector;
 template <typename T> class DenseVector;
 template <typename T> class SparseMatrix;
+template <typename T> class ShellMatrix;
 
 
 /**
@@ -341,6 +342,13 @@ public:
 			   const SparseMatrix<T>&) = 0;
       
   /**
+   * \f$U+=A*V\f$, add the product of a \p ShellMatrix \p A
+   * and a \p NumericVector \p V to \p this, where \p this=U.
+   */
+  void add_vector (const NumericVector<T>& v,
+		   const ShellMatrix<T>& a);
+      
+  /**
    * \f$ U+=V \f$ where U and V are type 
    * DenseVector<T> and you
    * want to specify WHERE to add
@@ -432,6 +440,13 @@ public:
    */
   virtual int compare (const NumericVector<T> &other_vector,
 		       const Real threshold = TOLERANCE) const;
+
+  /**
+   * Computes the pointwise (i.e. component-wise) product of \p vec1
+   * and \p vec2 and stores the result in \p *this.
+   */
+  virtual void pointwise_mult (const NumericVector<T>& vec1,
+			       const NumericVector<T>& vec2) = 0;
 
   /**
    * Prints the local contents of the vector to the screen.

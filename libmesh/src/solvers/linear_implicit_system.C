@@ -37,7 +37,8 @@ LinearImplicitSystem::LinearImplicitSystem (EquationSystems& es,
   Parent                 (es, name, number),
   linear_solver          (LinearSolver<Number>::build()),
   _n_linear_iterations   (0),
-  _final_linear_residual (1.e20)
+  _final_linear_residual (1.e20),
+  _shell_matrix(NULL)
 {
 }
 
@@ -95,13 +96,34 @@ void LinearImplicitSystem::solve ()
   const unsigned int maxits =
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
-  // Solve the linear system.  Two cases:
-  const std::pair<unsigned int, Real> rval =
-    (this->have_matrix("Preconditioner")) ?
-    // 1.) User-supplied preconditioner
-    linear_solver->solve (*matrix, this->get_matrix("Preconditioner"), *solution, *rhs, tol, maxits) :
-    // 2.) Use system matrix for the preconditioner
-    linear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
+  // Solve the linear system.  Several cases:
+  std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
+  if(_shell_matrix!=NULL)
+    {
+      if(this->have_matrix("Preconditioner"))
+	{
+	  // 1.) Shell matrix plus user-supplied preconditioner.
+	  rval = linear_solver->solve(*_shell_matrix, this->get_matrix("Preconditioner"), *solution, *rhs, tol, maxits);
+	}
+      else
+	{
+	  // 2.) Shell matrix without user-supplied preconditioner.
+	  rval = linear_solver->solve(*_shell_matrix, *solution, *rhs, tol, maxits);
+	}
+    }
+  else
+    {
+      if(this->have_matrix("Preconditioner"))
+	{
+	  // 3.) No shell matrix, but with user-supplied preconditioner
+	  rval = linear_solver->solve (*matrix, this->get_matrix("Preconditioner"), *solution, *rhs, tol, maxits);
+	}
+      else
+	{
+	  // 4.) No shell matrix, and use system matrix for the preconditioner
+	  rval = linear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
+	}
+    }
 
   // Store the number of linear iterations required to
   // solve and the final residual.
@@ -115,3 +137,13 @@ void LinearImplicitSystem::solve ()
   // Update the system after the solve
   this->update();  
 }
+
+
+
+void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matrix)
+{
+  _shell_matrix = shell_matrix;
+}
+
+
+

@@ -272,7 +272,11 @@ public:
    */
   void print_personal(std::ostream& os=std::cout) const { this->print(os); }
 
-  
+  /**
+   * Copies the diagonal part of the matrix into \p dest.
+   */
+  virtual void get_diagonal (NumericVector<T>& dest) const;
+
 private:
 
   /**

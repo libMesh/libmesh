@@ -6573,6 +6573,7 @@ src/numerics/petsc_linear_solver.$(obj-suffix):\
     include/numerics/petsc_macro.h\
     include/numerics/petsc_matrix.h\
     include/numerics/petsc_vector.h\
+    include/numerics/shell_matrix.h\
     include/numerics/sparse_matrix.h\
     include/parallel/parallel.h\
     include/parallel/threads.h\
@@ -6608,8 +6609,10 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
+    include/numerics/numeric_vector.h\
     include/numerics/petsc_macro.h\
     include/numerics/petsc_matrix.h\
+    include/numerics/petsc_vector.h\
     include/numerics/sparse_matrix.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
@@ -6764,6 +6767,57 @@ src/numerics/sparse_matrix.$(obj-suffix):\
     include/parallel/threads.h\
     include/parallel/threads_allocators.h\
     include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/numerics/sparse_shell_matrix.$(obj-suffix):\
+    src/numerics/sparse_shell_matrix.C\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_solver_package.h\
+    include/numerics/shell_matrix.h\
+    include/numerics/sparse_shell_matrix.h\
+    include/parallel/threads.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/numerics/sum_shell_matrix.$(obj-suffix):\
+    src/numerics/sum_shell_matrix.C\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_solver_package.h\
+    include/numerics/shell_matrix.h\
+    include/numerics/sum_shell_matrix.h\
+    include/parallel/threads.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/numerics/tensor_shell_matrix.$(obj-suffix):\
+    src/numerics/tensor_shell_matrix.C\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_solver_package.h\
+    include/numerics/shell_matrix.h\
+    include/numerics/tensor_shell_matrix.h\
+    include/parallel/threads.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/numerics/trilinos_aztec_linear_solver.$(obj-suffix):\
