@@ -87,7 +87,7 @@ public:
    * \p elem_type.  This memory
    * is freed in the destructor.
    */
-  ~ExodusII_IO_Helper();
+  virtual ~ExodusII_IO_Helper();
 
   /**
    * Returns true once create() has been successfully called, and
