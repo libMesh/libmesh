@@ -230,8 +230,8 @@ namespace Utility
    */
   template <typename T>
   void deallocate (std::vector<T> &vec)
-  { 
-    vec.swap (std::vector<T>()); 
+  {
+    std::vector<T>().swap(vec);
   }
 
 
