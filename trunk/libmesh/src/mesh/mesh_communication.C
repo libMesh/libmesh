@@ -34,6 +34,7 @@
 #include "parallel.h"
 #include "parallel_mesh.h"
 #include "parallel_ghost_sync.h"
+#include "utility.h"
 
 
 
@@ -45,8 +46,7 @@ namespace {
    * Specific weak ordering for Elem*'s to be used in a set.
    * We use the id, but first sort by level.  This guarantees 
    * when traversing the set from beginning to end the lower 
-   * level (parent) elements are encountered first. Additionally,
-   * order siblings so that child(0) is added before child(1).
+   * level (parent) elements are encountered first.
    */
   struct CompareElemIdsByLevel
   {
@@ -55,13 +55,11 @@ namespace {
     {
       libmesh_assert (a);
       libmesh_assert (b);
-      
-      if (a->level() == b->level())
-	// order by id
-	return a->id() < b->id();	
+      const unsigned int
+	al = a->level(), bl = b->level(),
+	aid = a->id(),   bid = b->id();
 
-      // otherwise order by level
-      return a->level() < b->level();
+      return (al == bl) ? aid < bid : al < bl;
     }
   };    
 }
@@ -705,6 +703,10 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   mesh.find_neighbors (/* reset_remote_elements = */ true,
 		       /* reset_current_list    = */ true);    
   
+  // register a derived datatype to use in shipping nodes  
+  Parallel::DataType packed_node_datatype = Node::PackedNode::create_mpi_datatype();
+  packed_node_datatype.commit();
+
   // Now any element with a NULL neighbor either
   // (i) lives on the physical domain boundary, or
   // (ii) lives on an inter-processor boundary.
@@ -712,10 +714,21 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   // which are of the same state, which should address all the type (ii)
   // elements.
   
+  // A list of all the processors which *may* contain neighboring elements.
+  // (for development simplicity, just make this the identity map)
+  std::vector<unsigned int> adjacent_processors;
+  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+    if (pid != libMesh::processor_id())
+      adjacent_processors.push_back (pid);
+
+  const unsigned int n_adjacent_processors = adjacent_processors.size();
+  
+  //-------------------------------------------------------------------------
   // Let's build a list of all nodes which live on NULL-neighbor sides.
   // For simplicity, we will use a set to build the list, then transfer
   // it to a vector for communication.
   std::vector<unsigned int> my_interface_node_list;
+  std::vector<const Elem*>  my_interface_elements;
   {
     std::set<unsigned int> my_interface_node_set;
 
@@ -725,17 +738,22 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 
     for (; it != it_end; ++it)
       {
-	const Elem *elem = *it;
+	const Elem * const elem = *it;
 	libmesh_assert (elem != NULL);
 
-	for (unsigned int s=0; s<elem->n_sides(); s++)
-	  if (elem->neighbor(s) == NULL)
-	    {
-	      AutoPtr<Elem> side(elem->build_side(s));
-
-	      for (unsigned int n=0; n<side->n_nodes(); n++)
-		my_interface_node_set.insert (side->node(n));						  
-	    }
+	if (elem->on_boundary()) // denotes *any* side has a NULL neighbor
+	  {
+	    my_interface_elements.push_back(elem); // add the element, but only once, even
+	                                           // if there are multiple NULL neighbors
+	    for (unsigned int s=0; s<elem->n_sides(); s++)
+	      if (elem->neighbor(s) == NULL)
+		{
+		  AutoPtr<Elem> side(elem->build_side(s));
+		  
+		  for (unsigned int n=0; n<side->n_vertices(); n++)
+		    my_interface_node_set.insert (side->node(n));   
+		}
+	  }
       }
 
     my_interface_node_list.reserve (my_interface_node_set.size());
@@ -743,15 +761,442 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 				    my_interface_node_set.begin(),
 				    my_interface_node_set.end());
   }
-
+  
   if (true)
     std::cout << "[" << libMesh::processor_id() << "] "
 	      << "mesh.n_nodes()=" << mesh.n_nodes() << ", "
 	      << "my_interface_node_list.size()=" << my_interface_node_list.size()
 	      << std::endl;
+  
+  // we will now send my_interface_node_list to all of the adjacent processors.
+  // note that for the time being we will copy the list to a unique buffer for 
+  // each processor so that we can use a nonblocking send and not access the
+  // buffer again until the send completes.  it is my understanding that the
+  // MPI 2.1 standard seeks to remove this restriction as unnecessary, so in
+  // the future we should change this to send the same buffer to each of the
+  // adjacent processors. - BSK 11/17/2008
+  std::vector<std::vector<unsigned int> > 
+    my_interface_node_xfer_buffers (n_adjacent_processors, my_interface_node_list);
+  std::vector<Parallel::Request> my_interface_node_list_requests (n_adjacent_processors);
+
+  for (unsigned int comm_step=0; comm_step<n_adjacent_processors; comm_step++)
+    Parallel::send (adjacent_processors[comm_step],
+		    my_interface_node_xfer_buffers[comm_step],
+		    my_interface_node_list_requests[comm_step],
+		    /* tag = */ 314159);
+
+  //-------------------------------------------------------------------------
+  // processor pairings are symmetric - I expect to receive an interface node
+  // list from each processor in adjacent_processors as well!
+  // now we will catch an incoming node list for each of our adjacent processors.
+  std::vector<unsigned int> common_interface_node_list;
+
+  // send buffers.  we will fill these with data from the elements we own 
+  // which share nodes with an adjacent processor.  we will slightly abuse 
+  // the node_bcs_sent and element_bcs_sent buffers - we'll fill them and then tack
+  // them on to the end of the elements_sent buffer to reduce the message count.
+  std::vector<std::vector<Node::PackedNode> > nodes_sent(n_adjacent_processors);  
+  std::vector<std::vector<int> > elements_sent(n_adjacent_processors);
+  std::vector<int> node_bcs_sent, &element_bcs_sent(node_bcs_sent);
+
+  std::vector<Parallel::Request>
+    node_send_requests(n_adjacent_processors), element_send_requests(n_adjacent_processors);
+    
+  // receive buffers
+  std::vector<Node::PackedNode> nodes_received;
+  std::vector<int> elements_received;
+
+  // we expect two classess of messages - 
+  // (1) incoming interface node lists, to which we will reply with our elements 
+  //     touching nodes in the list, and
+  // (2) replies from the requests we sent off previously.  
+  // so we expect 2 communications from each adjacent processor.
+  unsigned int n_replies_sent=0, n_replies_received=0;
+
+  for (unsigned int comm_step=0; comm_step<2*n_adjacent_processors; comm_step++)
+    {
+      Parallel::Status
+	status(Parallel::probe (Parallel::any_source,
+				Parallel::any_tag));
+      const unsigned int
+	status_tag     = status.tag(),
+	source_pid_idx = status.source(),
+	dest_pid_idx   = source_pid_idx;
+      
+      //------------------------------------------------------------------
+      // catch tag = ~100,000pi - these are incoming requests
+      if (status_tag == 314159)
+	{
+	  Parallel::receive (source_pid_idx,
+			     common_interface_node_list,
+			     /* tag = */ 314159);      
+	  const unsigned int	
+	    their_interface_node_list_size = common_interface_node_list.size();
+	  
+	  // we now have the interface node list from processor source_pid_idx.
+	  // now we can find all of our elements which touch any of these nodes
+	  // and send copies back to this processor.  however, we can make our
+	  // search more efficient by first excluding all the nodes in
+	  // their list which are not also contained in
+	  // my_interface_node_list.  we can do this in place as a set
+	  // intersection.
+	  common_interface_node_list.erase
+	    (std::set_intersection (my_interface_node_list.begin(),
+				    my_interface_node_list.end(),
+				    common_interface_node_list.begin(),
+				    common_interface_node_list.end(),
+				    common_interface_node_list.begin()),
+	     common_interface_node_list.end());
+
+	  if (true)
+	    std::cout << "[" << libMesh::processor_id() << "] "
+		      << "my_interface_node_list.size()="       << my_interface_node_list.size()
+		      << ", [" << source_pid_idx << "] "
+		      << "their_interface_node_list.size()="    << their_interface_node_list_size
+		      << ", common_interface_node_list.size()=" << common_interface_node_list.size()
+		      << std::endl;
+	  
+	  // Check for quick return?
+	  if (common_interface_node_list.empty())
+	    {
+	      nodes_sent[n_replies_sent].clear(); // should already be empty!
+	      Parallel::send (dest_pid_idx,
+			      nodes_sent[n_replies_sent],
+			      packed_node_datatype,
+			      node_send_requests[n_replies_sent],
+			      /* tag = */ 314159*2);
+	      n_replies_sent++;
+	      continue;
+	    }
+
+	  // Now we need to see which of our elements touch the nodes in the list.
+	  // We built a reduced element list above, and we know the pointers are
+	  // not NULL.
+	  // We will certainly send all the active elements which intersect source_pid_idx,
+	  // but we will also ship off the other elements in the same family tree
+	  // as the active ones for data structure consistency.  We also
+	  // ship any nodes connected to these elements.  Note some of these nodes
+	  // and elements may be replicated from other processors, but that is OK.
+	  std::set<const Elem*, CompareElemIdsByLevel> elements_to_send;
+	  std::set<const Node*> connected_nodes;
+	  std::vector<const Elem*> family_tree;
+	
+	  for (unsigned int e=0, n_shared_nodes=0; e<my_interface_elements.size(); e++, n_shared_nodes=0)
+	    {
+	      const Elem * elem = my_interface_elements[e];
+	    
+	      for (unsigned int n=0; n<elem->n_vertices(); n++)
+		if (std::binary_search (common_interface_node_list.begin(),
+					common_interface_node_list.end(),
+					elem->node(n)))
+		  { 
+		    n_shared_nodes++;
+
+		    // TBD - how many nodes do we need to share 
+		    // before we care?  certainly 2, but 1?  not 
+		    // sure, so let's play it safe...
+		    if (n_shared_nodes > 0) break;
+		  }
+	  
+	      if (n_shared_nodes) // share at least one node?
+		{
+		  elem = elem->top_parent();
+	      
+		  // avoid a lot of duplicated effort -- if we already have elem
+		  // in the set its entire family tree is already in the set.
+		  if (!elements_to_send.count(elem))
+		    {
+#ifdef LIBMESH_ENABLE_AMR
+		      elem->family_tree(family_tree);
+#else
+		      family_tree.clear();
+		      family_tree.push_back(elem);
+#endif
+		      for (unsigned int leaf=0; leaf<family_tree.size(); leaf++)
+			{
+			  elem = family_tree[leaf];
+			  elements_to_send.insert (elem);
+		      
+			  for (unsigned int n=0; n<elem->n_nodes(); n++)
+			    connected_nodes.insert (elem->get_node(n));		  
+			}		    
+		    }
+		}
+	    }
+
+	  // The elements_to_send and connected_nodes sets now contain all
+	  // the elements and nodes we need to send to this processor.
+	  // All that remains is to pack up the objects (along with
+	  // any boundary conditions) and send the messages off.
+	  {
+	    if (elements_to_send.empty()) libmesh_assert (connected_nodes.empty());
+	    if (connected_nodes.empty())  libmesh_assert (elements_to_send.empty());
+
+	    const unsigned int n_nodes_sent = connected_nodes.size();
+	    nodes_sent[n_replies_sent].reserve (n_nodes_sent);
+	    node_bcs_sent.clear();
+	
+	    for (std::set<const Node*>::const_iterator node_it = connected_nodes.begin();
+		 node_it != connected_nodes.end(); ++node_it)
+	      {
+		nodes_sent[n_replies_sent].push_back (Node::PackedNode(**node_it));
+	      
+		// add the node if it has BCs
+		if (mesh.boundary_info->boundary_id(*node_it) !=
+		    mesh.boundary_info->invalid_id)
+		  {
+		    node_bcs_sent.push_back ((*node_it)->id());
+		    node_bcs_sent.push_back (mesh.boundary_info->boundary_id(*node_it));
+		  }
+	      }
+	    connected_nodes.clear();
+	  
+	    // send the nodes off to the destination processor
+	    Parallel::send (dest_pid_idx,
+			    nodes_sent[n_replies_sent],
+			    packed_node_datatype,
+			    node_send_requests[n_replies_sent],
+			    /* tag = */ 314159*2);
+	  
+	    // let's pack the node bc data in the front of the element
+	    // connectivity buffer
+	    const unsigned int
+	      n_node_bcs_sent = node_bcs_sent.size() / 2;
+	
+	    elements_sent[n_replies_sent].clear();
+	    elements_sent[n_replies_sent].insert (elements_sent[n_replies_sent].end(),
+						  node_bcs_sent.begin(),
+						  node_bcs_sent.end());
+      
+	    // this is really just a reference to node_bcs_sent,
+	    // so be careful not to clear it before packing the
+	    // node_bcs_sent into the elements_sent buffer!!
+	    const unsigned int n_elements_sent = elements_to_send.size();
+	    element_bcs_sent.clear(); 
+
+	    for (std::set<const Elem*, CompareElemIdsByLevel>::const_iterator 
+		   elem_it = elements_to_send.begin(); elem_it != elements_to_send.end(); ++elem_it)
+	      {
+		Elem::PackedElem::pack (elements_sent[n_replies_sent], *elem_it);
+	    
+		// if this is a level-0 element look for boundary conditions
+		if ((*elem_it)->level() == 0)
+		  for (unsigned int s=0; s<(*elem_it)->n_sides(); s++)
+		    if ((*elem_it)->neighbor(s) == NULL)
+		      if (mesh.boundary_info->boundary_id (*elem_it, s) !=
+			  mesh.boundary_info->invalid_id)
+			{
+			  element_bcs_sent.push_back ((*elem_it)->id());
+			  element_bcs_sent.push_back (s);
+			  element_bcs_sent.push_back (mesh.boundary_info->boundary_id (*elem_it, s));
+			}
+	      }
+	    elements_to_send.clear();
+	  
+	    // let's pack the node bc data in the front of the element
+	    // connectivity buffer
+	    const unsigned int
+	      n_elem_bcs_sent = element_bcs_sent.size() / 3;
+	  
+	    elements_sent[n_replies_sent].insert (elements_sent[n_replies_sent].end(),
+						  element_bcs_sent.begin(),
+						  element_bcs_sent.end());
+
+	    // only send the message if it is not empty!
+	    if (!elements_sent[n_replies_sent].empty())
+	      {
+		// let's tack four ints on to
+		// the end of the elements_sent
+		// buffer for use on the receiving end
+		elements_sent[n_replies_sent].push_back (n_elements_sent);
+		elements_sent[n_replies_sent].push_back (n_elem_bcs_sent);
+		elements_sent[n_replies_sent].push_back (n_nodes_sent);
+		elements_sent[n_replies_sent].push_back (n_node_bcs_sent);
+
+		// send the elements off to the destination processor
+		Parallel::send (dest_pid_idx,
+				elements_sent[n_replies_sent],
+				element_send_requests[n_replies_sent],
+				/* tag = */ 314159*3);
+	      }
+	    else
+	      libmesh_assert (nodes_sent[n_replies_sent].empty());
+
+	    n_replies_sent++;
+	  } // done sending information.     	
+	} // if (status_tag == 314159) ...
+
+      
+      
+      //------------------------------------------------------------------
+      // catch tag = ~200000pi - these are incoming node replies,
+      //             ~300000pi - "    " elements & bcs 
+      else if (status_tag == 314159*2)
+	{
+	  // catch the nodes
+	  Parallel::receive (source_pid_idx,
+			     nodes_received,
+			     packed_node_datatype,
+			     /* tag = */ 314159*2);
+
+	  // Check for quick return?
+	  if (nodes_received.empty())
+	    {
+	      // if the node list is empty there 
+	      // is no incoming element list either.
+	      n_replies_received++;
+	      continue;
+	    }
+
+	  // add the nodes we just received
+	  for (unsigned int n=0; n<nodes_received.size(); n++)
+	    mesh.insert_node (nodes_received[n].build_node().release());
+	  
+	  // catch the elements & bcs
+	  Parallel::receive (source_pid_idx,
+			     elements_received,
+			     /* tag = */ 314159*3);
+	  libmesh_assert (elements_received.size() > 4);
+
+	  ////////////////////////////////////////////////////////////////////////////////
+	  // remember: elements_sent = 
+	  //          { [node bd data] [element conntectivity] [element bc data] # # # # }
+	  ////////////////////////////////////////////////////////////////////////////////
+	  const unsigned int n_node_bcs_received = elements_received.back(); elements_received.pop_back();
+	  const unsigned int n_nodes_received    = elements_received.back(); elements_received.pop_back();
+	  const unsigned int n_elem_bcs_received = elements_received.back(); elements_received.pop_back();
+	  const unsigned int n_elements_received = elements_received.back(); elements_received.pop_back();
+
+	  libmesh_assert (n_nodes_received == nodes_received.size());
+
+	  // counter into the bc/element connectivty buffer
+	  unsigned int cnt=0;
+
+	  // add any node bcs
+	  while (cnt < 2*n_node_bcs_received)
+	    {
+	      const unsigned int node_id = elements_received[cnt++];
+	      const int bc_id            = elements_received[cnt++];
+
+	      libmesh_assert (mesh.node_ptr(node_id));
+	      mesh.boundary_info->add_node (mesh.node_ptr(node_id), bc_id);
+	    }
+
+	  // add the elements we just received
+	  for (unsigned int e=0; e<n_elements_received; e++)
+	    {
+	      // Unpack the element 
+	      Elem::PackedElem packed_elem (elements_received.begin()+cnt);
+	    
+	      // The ParallelMesh::elem(i) member will return NULL if the element
+	      // is not in the mesh.  We rely on that here, so it better not change!
+	      Elem *elem = mesh.elem(packed_elem.id());
+	    
+	      // if we already have this element, make sure its properties match
+	      // but then go on
+	      if (elem)
+		{
+		  libmesh_assert (elem->level()             == packed_elem.level());
+		  libmesh_assert (elem->id()                == packed_elem.id());
+		  libmesh_assert (elem->processor_id()      == packed_elem.processor_id());
+		  libmesh_assert (elem->subdomain_id()      == packed_elem.subdomain_id());
+		  libmesh_assert (elem->type()              == packed_elem.type());
+#ifdef LIBMESH_ENABLE_AMR
+		  libmesh_assert (elem->p_level()           == packed_elem.p_level());
+		  libmesh_assert (elem->refinement_flag()   == packed_elem.refinement_flag());
+		  libmesh_assert (elem->p_refinement_flag() == packed_elem.p_refinement_flag());
+		
+		  if (elem->level() > 0)
+		    {
+		      libmesh_assert (elem->parent()->id() == static_cast<unsigned int>(packed_elem.parent_id()));
+		      libmesh_assert (elem->parent()->child(packed_elem.which_child_am_i()) == elem);
+		    }	      
+#endif
+		  libmesh_assert (elem->n_nodes() == packed_elem.n_nodes());
+		}
+	      else
+		{
+		  // We need to add the element.
+#ifdef LIBMESH_ENABLE_AMR
+		  // maybe find the parent
+		  if (packed_elem.level() > 0)
+		    {
+		      Elem *parent = mesh.elem(packed_elem.parent_id());
+		      
+		      // Note that we were very careful to construct the send connectivity
+		      // so that parents are encountered before children.  So if we get here
+		      // and can't find the parent that is a fatal error.
+		      if (parent == NULL)
+			{
+			  std::cerr << "Parent element with ID " << packed_elem.parent_id()
+				    << " not found." << std::endl; 
+			  libmesh_error();
+			}
+		    
+		      elem = packed_elem.unpack (mesh, parent);
+		    }
+		  else
+		    {
+		      libmesh_assert (packed_elem.parent_id() == -1);
+		      elem = packed_elem.unpack (mesh);
+		    }
+#else // !defined(LIBMESH_ENABLE_AMR)
+		  elem = packed_elem.unpack (mesh);
+#endif		
+		  // Good to go.  Add to the mesh.
+		  libmesh_assert (elem);
+		  libmesh_assert (elem->n_nodes() == packed_elem.n_nodes());
+		  mesh.insert_elem(elem);
+		}
+	    
+	      // properly position cnt for the next element 
+	      cnt += Elem::PackedElem::header_size + packed_elem.n_nodes();	      
+	    } // done adding elements
+	  
+	  // add any element bcs
+	  unsigned int n_elem_bcs=0;
+	  while (cnt < elements_received.size())
+	    {
+	      n_elem_bcs++;
+	      const unsigned int elem_id = elements_received[cnt++];
+	      const unsigned int side    = elements_received[cnt++];
+	      const int bc_id            = elements_received[cnt++];
+	      
+	      libmesh_assert (mesh.elem(elem_id));
+	      mesh.boundary_info->add_side (mesh.elem(elem_id), side, bc_id);
+	    }
+	  libmesh_assert (n_elem_bcs_received == n_elem_bcs);
+	  
+	  n_replies_received++;
+	} // if (status_tag == 314159*2)
 
 
 
+      //------------------------------------------------------------------
+      else
+	{
+	  std::cerr << "ERROR:  unexpected message tag: "
+		    << status_tag
+		    << std::endl;
+	  libmesh_error();
+	}
+    } // for (comm_step...)
+  
+  libmesh_assert (n_replies_sent     == n_adjacent_processors);
+  libmesh_assert (n_replies_received == n_adjacent_processors);
+
+  // Update neighbor information with the new elements,
+  // but don't throw away old information.
+  mesh.find_neighbors (/* reset_remote_elements = */ true,
+		       /* reset_current_list    = */ false);    
+  
+  // allow any pending requests to complete
+  Parallel::wait (my_interface_node_list_requests);
+  Parallel::wait (node_send_requests);
+  Parallel::wait (element_send_requests);
+    
+  // unregister MPI datatypes
+  packed_node_datatype.free();
   
   STOP_LOG("gather_neighboring_elements()","MeshCommunication");  
 }
@@ -1215,7 +1660,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
     n_objects[0] = mesh.n_local_nodes();
     n_objects[1] = mesh.n_local_elem();
 
-    Parallel::allgather(n_objects);
+    Parallel::allgather(n_objects, /* identical_buffer_sizes = */ true);
     
     for (unsigned int p=0, idx=0; p<libMesh::n_processors(); p++)
       {
@@ -1578,12 +2023,10 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
   boundary_info.clear();
   
   // Get the boundary condition information from adacent processors
-  Parallel::allgather (xfer_elem_bcs);
-  Parallel::allgather (xfer_node_bcs);
-
-
   // Insert the elements
   {
+    Parallel::allgather (xfer_elem_bcs);
+
     const unsigned int n_bcs = xfer_elem_bcs.size()/3;
 
     for (unsigned int bc=0, cnt=0; bc<n_bcs; bc++)
@@ -1596,12 +2039,14 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
       }
 
     // no need for this any more
-    xfer_elem_bcs.resize(0);
+    Utility::deallocate (xfer_elem_bcs);
   }
 
   
   // Insert the nodes
   {
+    Parallel::allgather (xfer_node_bcs);
+
     const unsigned int n_bcs = xfer_node_bcs.size()/2;
 
     for (unsigned int bc=0, cnt=0; bc<n_bcs; bc++)
@@ -1611,6 +2056,9 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
 
 	boundary_info.add_node (node, bc_id);
       }
+ 
+    // no need for this any more
+    Utility::deallocate (xfer_node_bcs);
   }
 
  
