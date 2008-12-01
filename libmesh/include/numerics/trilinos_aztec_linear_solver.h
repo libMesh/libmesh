@@ -97,7 +97,30 @@ public:
 	 NumericVector<T> &rhs,
 	 const double tol,
 	 const unsigned int m_its);
-  
+
+  /**
+   * This function solves a system whose matrix is a shell matrix.
+   */
+  std::pair<unsigned int, Real>
+  solve (const ShellMatrix<T>& shell_matrix,
+         NumericVector<T>& solution_in,
+         NumericVector<T>& rhs_in,
+         const double tol,
+         const unsigned int m_its);
+
+  /**
+   * This function solves a system whose matrix is a shell matrix, but
+   * a sparse matrix is used as preconditioning matrix, this allowing
+   * other preconditioners than JACOBI.
+   */
+  virtual std::pair<unsigned int, Real>
+    solve (const ShellMatrix<T>& shell_matrix,
+           const SparseMatrix<T>& precond_matrix,
+           NumericVector<T>& solution_in,
+           NumericVector<T>& rhs_in,
+           const double tol,
+           const unsigned int m_its);
+
   /**
    * Fills the input vector with the sequence of residual norms
    * from the latest iterative solve.

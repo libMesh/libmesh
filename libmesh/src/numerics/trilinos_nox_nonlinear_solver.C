@@ -79,7 +79,9 @@ Problem_Interface::~Problem_Interface()
 { }
 
 bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
-                       NOX::Epetra::Interface::Required::FillType fillType)
+                       NOX::Epetra::Interface::Required::FillType)
+//bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
+//                       NOX::Epetra::Interface::Required::FillType fillType)
 {
   NonlinearImplicitSystem &sys = _solver->system();
 
@@ -101,8 +103,10 @@ bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
   return true;
 }
 
-bool Problem_Interface::computeJacobian(const Epetra_Vector& x,
-                                        Epetra_Operator& Jac)
+bool Problem_Interface::computeJacobian(const Epetra_Vector&,
+                                        Epetra_Operator&)
+//bool Problem_Interface::computeJacobian(const Epetra_Vector& x,
+//                                        Epetra_Operator& Jac)
 {
   throw 1;
   
@@ -115,9 +119,12 @@ bool Problem_Interface::computePrecMatrix(const Epetra_Vector& x, Epetra_RowMatr
    throw 1;
 }
 
-bool Problem_Interface::computePreconditioner(const Epetra_Vector& x,
-                                              Epetra_Operator& Prec,
-                                              Teuchos::ParameterList* p)
+bool Problem_Interface::computePreconditioner(const Epetra_Vector&,
+                                              Epetra_Operator&,
+                                              Teuchos::ParameterList*)
+//bool Problem_Interface::computePreconditioner(const Epetra_Vector& x,
+//                                              Epetra_Operator& Prec,
+//                                              Teuchos::ParameterList* p)
 {
 //   cout << "ERROR: Problem_Interface::preconditionVector() - Use Explicit Jacobian only for this test problem!" << endl;
    throw 1;
