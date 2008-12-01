@@ -113,7 +113,8 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector&,
   // return problem.evaluate(NOX::Epetra::Interface::Required::Jac, &x, 0, 0);
 }
 
-bool Problem_Interface::computePrecMatrix(const Epetra_Vector& x, Epetra_RowMatrix& M)
+bool Problem_Interface::computePrecMatrix(const Epetra_Vector&, Epetra_RowMatrix&)
+//bool Problem_Interface::computePrecMatrix(const Epetra_Vector& x, Epetra_RowMatrix& M)
 {
 //   cout << "ERROR: Problem_Interface::preconditionVector() - Use Explicit Jacobian only for this test problem!" << endl;
    throw 1;
