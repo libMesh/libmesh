@@ -314,6 +314,20 @@ T EpetraVector<T>::dot (const NumericVector<T>& V_in) const
 
 
 template <typename T>
+void EpetraVector<T>::pointwise_mult (const NumericVector<T>& vec1,
+                                      const NumericVector<T>& vec2)
+{
+  const EpetraVector<T>* V1 = dynamic_cast<const EpetraVector<T>*>(&vec1);
+  const EpetraVector<T>* V2 = dynamic_cast<const EpetraVector<T>*>(&vec2);
+
+  libmesh_assert(V1);
+  libmesh_assert(V2);
+  
+  _vec->Multiply(1.0, *V1->_vec, *V2->_vec, 0.0);
+}
+
+
+template <typename T>
 NumericVector<T>& 
 EpetraVector<T>::operator = (const T s_in)
 {

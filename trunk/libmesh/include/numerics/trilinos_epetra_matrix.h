@@ -286,6 +286,11 @@ public:
   void print_matlab(const std::string name="NULL") const;
 
   /**
+   * Copies the diagonal part of the matrix into \p dest.
+   */
+  void get_diagonal (NumericVector<T>& dest) const;
+
+  /**
    * Swaps the raw PETSc matrix context pointers.
    */
   void swap (EpetraMatrix<T> &);
@@ -484,7 +489,7 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 template <typename T>
 inline
-void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
+void EpetraMatrix<T>::add (const T, SparseMatrix<T> &X_in)
 {
   libmesh_assert (this->initialized());
 
@@ -493,7 +498,7 @@ void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   libmesh_assert (this->m() == X_in.m());
   libmesh_assert (this->n() == X_in.n());
 
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 //   PetscScalar     a = static_cast<PetscScalar>      (a_in);
 //   EpetraMatrix<T>* X = dynamic_cast<EpetraMatrix<T>*> (&X_in);
@@ -548,7 +553,7 @@ T EpetraMatrix<T>::operator () (const unsigned int i,
   int *index = std::lower_bound (row_indices, row_indices+row_length, j);
 
   libmesh_assert (*index < row_length);
-  libmesh_assert (row_indices[*index] == j);
+  libmesh_assert (static_cast<unsigned int>(row_indices[*index]) == j);
 
   //std::cout << "val=" << values[*index] << std::endl;
   
@@ -571,9 +576,10 @@ bool EpetraMatrix<T>::closed() const
 
 template <typename T>
 inline
-void EpetraMatrix<T>::swap(EpetraMatrix<T> &m) 
+//void EpetraMatrix<T>::swap(EpetraMatrix<T> &m) 
+void EpetraMatrix<T>::swap(EpetraMatrix<T> &) 
 {
-  LIBMESH_THROW(libMesh::NotImplemented());
+  libmesh_not_implemented();
 
 //   std::swap(_mat, m._mat);
 //   std::swap(_destroy_mat_on_exit, m._destroy_mat_on_exit);

@@ -129,6 +129,44 @@ AztecLinearSolver<T>::solve (SparseMatrix<T>& matrix_in,
 
 
 template <typename T>
+std::pair<unsigned int, Real> 
+AztecLinearSolver<T>::solve (const ShellMatrix<T>&,
+			     NumericVector<T>&,
+			     NumericVector<T>&,
+			     const double,
+			     const unsigned int)
+//AztecLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
+//			     NumericVector<T>& solution_in,
+//			     NumericVector<T>& rhs_in,
+//			     const double tol,
+//			     const unsigned int m_its)
+{
+  libmesh_not_implemented();
+}
+
+
+
+template <typename T>
+std::pair<unsigned int, Real> 
+AztecLinearSolver<T>::solve (const ShellMatrix<T>&,
+			     const SparseMatrix<T>&,
+			     NumericVector<T> &,
+			     NumericVector<T> &,
+			     const double,
+			     const unsigned int)
+//AztecLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
+//			     const SparseMatrix<T>& precond_matrix,
+//			     NumericVector<T> &solution_in,
+//			     NumericVector<T> &rhs_in,
+//			     const double tol,
+//			     const unsigned int m_its)
+{
+  libmesh_not_implemented();
+}
+
+
+
+template <typename T>
 void AztecLinearSolver<T>::get_residual_history(std::vector<double>& /* hist */)
 {
   libmesh_not_implemented();

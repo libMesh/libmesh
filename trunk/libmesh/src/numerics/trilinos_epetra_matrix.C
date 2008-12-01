@@ -25,6 +25,7 @@
 
 // Local includes
 #include "trilinos_epetra_matrix.h"
+#include "trilinos_epetra_vector.h"
 #include "dof_map.h"
 #include "dense_matrix.h"
 #include "parallel.h"
@@ -74,8 +75,8 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
                          0,
                          Epetra_MpiComm (libMesh::COMM_WORLD));
 
-  libmesh_assert (_map->NumGlobalPoints() == m);
-  libmesh_assert (_map->MaxAllGID()+1 == m);
+  libmesh_assert (static_cast<unsigned int>(_map->NumGlobalPoints()) == m);
+  libmesh_assert (static_cast<unsigned int>(_map->MaxAllGID()+1) == m);
   
   const std::vector<unsigned int>& n_nz = this->_dof_map->get_n_nz();
   const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
@@ -158,8 +159,8 @@ void EpetraMatrix<T>::init (const unsigned int m,
                          0,
                          Epetra_MpiComm (libMesh::COMM_WORLD));
   
-  libmesh_assert (_map->NumGlobalPoints() == m);
-  libmesh_assert (_map->MaxAllGID()+1 == m);
+  libmesh_assert (static_cast<unsigned int>(_map->NumGlobalPoints()) == m);
+  libmesh_assert (static_cast<unsigned int>(_map->MaxAllGID()+1) == m);
 
   _mat = new Epetra_FECrsMatrix (Copy, *_map, nnz + noz);
 }
@@ -235,7 +236,8 @@ Real EpetraMatrix<T>::linfty_norm () const
 
 
 template <typename T>
-void EpetraMatrix<T>::print_matlab (const std::string name) const
+//void EpetraMatrix<T>::print_matlab (const std::string name) const
+void EpetraMatrix<T>::print_matlab (const std::string) const
 {
   libmesh_assert (this->initialized());
 
@@ -361,6 +363,15 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 // //   ierr = ISDestroy(iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 // }
 
+template <typename T>
+void EpetraMatrix<T>::get_diagonal (NumericVector<T>& dest) const
+{
+  // Convert vector to EpetraVector.
+  EpetraVector<T>* epetra_dest = dynamic_cast<EpetraVector<T>*>(&dest);
+
+  // Call Epetra function.
+  _mat->ExtractDiagonalCopy(*(epetra_dest->vec()));
+}
 
 
 
