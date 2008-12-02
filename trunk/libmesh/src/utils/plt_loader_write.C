@@ -514,7 +514,7 @@ void PltLoader::write_dat (const std::string& name,
 	      if (l%5 != 0)
 		out << '\n';
 	    }
-	}
+	} // end if (this->zone_type(z) == BLOCK)
 
       // Write POINT data for this zone
       else if (this->zone_type(z) == POINT)
@@ -559,6 +559,14 @@ void PltLoader::write_dat (const std::string& name,
 		    l++;
 		  }
 	  }
+	} // end else if (this->zone_type(z) == POINT)
+
+      // Otherwise, unrecognized zone type
+      else
+	{
+	  std::cerr << "Unrecognized zone type: ";
+	  std::cerr << "this->zone_type(z)==" << this->zone_type(z) << std::endl;
+	  libmesh_error();
 	}
     }
 }
