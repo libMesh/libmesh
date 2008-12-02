@@ -746,6 +746,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  case PRISM15:
 	  case PRISM18:
 	    {
+	      // FYI: The resulting TET4 mesh will have exactly
+	      // 5*(nx*ny*nz) + 2*(nx*ny + nx*nz + ny*nz) + (nx+ny+nz) + 1
+	      // nodes once the additional mid-edge nodes for the HEX27 discretization
+	      // have been deleted.
 	      mesh.reserve_nodes( (2*nx+1)*(2*ny+1)*(2*nz+1) );
 	      break;
 	    }
