@@ -96,6 +96,11 @@ public:
    * conditions.
    */
   AutoPtr<BoundaryInfo> boundary_info;
+
+  /**
+   * A partitioner to use at each prepare_for_use()
+   */
+  virtual AutoPtr<Partitioner> &partitioner() { return _partitioner; }
   
   /**
    * Deletes all the data that are currently stored.
@@ -717,6 +722,14 @@ protected:
    */
   mutable AutoPtr<PointLocatorBase> _point_locator;
 
+  /**
+   * A partitioner to use at each prepare_for_use().
+   *
+   * This will be built in the constructor of each derived class, but
+   * can be replaced by the user through the partitioner() accessor.
+   */
+  AutoPtr<Partitioner> _partitioner;
+  
   /**
    * The partitioner class is a friend so that it can set
    * the number of partitions.
