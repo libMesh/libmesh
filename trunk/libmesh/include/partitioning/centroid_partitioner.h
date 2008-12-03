@@ -70,6 +70,15 @@ public:
    */
   CentroidPartitioner (const CentroidSortMethod sm=X) : _sort_method(sm) {}
 
+  /**
+   * Creates a new partitioner of this type and returns it in 
+   * an \p AutoPtr.
+   */
+  virtual AutoPtr<Partitioner> clone () const {
+    AutoPtr<Partitioner> cloned_partitioner
+      (new CentroidPartitioner(sort_method()));
+    return cloned_partitioner;
+  }
 
   /**
    * Specifies how the elements will be sorted.

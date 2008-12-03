@@ -26,6 +26,7 @@
 
 // Local Includes -----------------------------------
 #include "libmesh.h"
+#include "auto_ptr.h"
 
 // Forward Declarations
 class MeshBase;
@@ -54,6 +55,15 @@ class Partitioner
    * Destructor. Virtual so that we can derive from this class.
    */
   virtual ~Partitioner() {}
+
+  /**
+   * Creates a new partitioner of this type and returns it in 
+   * an \p AutoPtr.
+   * This is used when copying meshes, and must be overloaded in the
+   * derived classes.
+   */
+  virtual AutoPtr<Partitioner> clone () const = 0;
+
 
   /**
    * Partition the \p MeshBase into \p n parts.  If the

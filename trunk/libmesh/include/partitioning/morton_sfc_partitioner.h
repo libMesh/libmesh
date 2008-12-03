@@ -48,6 +48,16 @@ class MortonSFCPartitioner : public SFCPartitioner
     this->set_sfc_type ("Morton");
   }
 
+  /**
+   * Creates a new partitioner of this type and returns it in 
+   * an \p AutoPtr.
+   */
+  virtual AutoPtr<Partitioner> clone () const {
+    AutoPtr<Partitioner> cloned_partitioner
+      (new MortonSFCPartitioner());
+    return cloned_partitioner;
+  }
+
 protected:
   /**
    * Partition the \p MeshBase into \p n subdomains.

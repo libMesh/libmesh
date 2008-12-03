@@ -48,6 +48,16 @@ class ParmetisPartitioner : public Partitioner
    */
   ParmetisPartitioner () {}
 
+  /**
+   * Creates a new partitioner of this type and returns it in 
+   * an \p AutoPtr.
+   */
+  virtual AutoPtr<Partitioner> clone () const {
+    AutoPtr<Partitioner> cloned_partitioner
+      (new ParmetisPartitioner());
+    return cloned_partitioner;
+  }
+
 
 protected:
 
