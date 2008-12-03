@@ -23,6 +23,7 @@
 #include "boundary_info.h"
 #include "elem.h"
 #include "libmesh_logging.h"
+#include "metis_partitioner.h"
 #include "serial_mesh.h"
 
 // ------------------------------------------------------------
@@ -30,6 +31,7 @@
 SerialMesh::SerialMesh (unsigned int d) :
   UnstructuredMesh (d)
 {
+  _partitioner = AutoPtr<Partitioner>(new MetisPartitioner());
 }
 
 

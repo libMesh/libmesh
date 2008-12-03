@@ -24,18 +24,17 @@
 
 // C++ includes
 #include <algorithm> // for std::min
-#include <sstream>   // for std::ostringstream
 #include <map>       // for std::multimap
+#include <sstream>   // for std::ostringstream
 
 
 // Local includes
-#include "mesh_base.h"
-#include "parmetis_partitioner.h" // for default partitioning
-#include "metis_partitioner.h"    // for default partitioning
-#include "elem.h"
 #include "boundary_info.h"
-#include "point_locator_base.h"
+#include "elem.h"
+#include "mesh_base.h"
 #include "mesh_tools.h"
+#include "partitioner.h"
+#include "point_locator_base.h"
 
 
 
@@ -47,7 +46,8 @@ MeshBase::MeshBase (unsigned int d) :
   _n_parts       (1),
   _dim           (d),
   _is_prepared   (false),
-  _point_locator (NULL)
+  _point_locator (NULL),
+  _partitioner   (NULL)
 {
   libmesh_assert (LIBMESH_DIM <= 3);
   libmesh_assert (LIBMESH_DIM >= _dim);
@@ -62,8 +62,8 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _n_parts       (other_mesh._n_parts),
   _dim           (other_mesh._dim),
   _is_prepared   (other_mesh._is_prepared),
-  _point_locator (NULL)
-
+  _point_locator (NULL),
+  _partitioner   (NULL)
 {
 }
 
@@ -248,16 +248,7 @@ std::ostream& operator << (std::ostream& os, const MeshBase& m)
 
 void MeshBase::partition (const unsigned int n_parts)
 {
-  if (this->is_serial())
-    {
-      MetisPartitioner partitioner;
-      partitioner.partition (*this, n_parts);
-    }
-  else
-    {
-      ParmetisPartitioner partitioner;
-      partitioner.partition (*this, n_parts);
-    }
+  partitioner()->partition (*this, n_parts);
 }
 
 

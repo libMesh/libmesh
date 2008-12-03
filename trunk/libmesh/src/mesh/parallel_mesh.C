@@ -26,6 +26,7 @@
 #include "mesh_communication.h"
 #include "parallel_mesh.h"
 #include "parallel.h"
+#include "parmetis_partitioner.h"
 
 // ------------------------------------------------------------
 // ParallelMesh class member functions
@@ -37,6 +38,7 @@ ParallelMesh::ParallelMesh (unsigned int d) :
   _next_free_unpartitioned_node_id(libMesh::n_processors()),
   _next_free_unpartitioned_elem_id(libMesh::n_processors())
 {
+  _partitioner = AutoPtr<Partitioner>(new ParmetisPartitioner());
 }
 
 
