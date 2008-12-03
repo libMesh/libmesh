@@ -584,8 +584,12 @@ void UnstructuredMesh::read (const std::string& name,
 			<< "     *.off  -- OOGL OFF surface format\n"
 			<< "     *.ucd  -- AVS's ASCII UCD format\n"
 			<< "     *.unv  -- I-deas Universal format\n"
+			<< "     *.vtu  -- Paraview VTK format\n"
 			<< "     *.xda  -- libMesh ASCII format\n"
-			<< "     *.xdr  -- libMesh binary format,\n"
+			<< "     *.xdr  -- libMesh binary format\n"
+			<< "     *.gz   -- any above format gzipped\n"
+			<< "     *.bz2  -- any above format bzip2'ed\n"
+
 			<< std::endl;
 	      libmesh_error();	  
 	    }    
@@ -704,6 +708,7 @@ void UnstructuredMesh::write (const std::string& name,
 		      << "     *.fro   -- ACDL's surface triangulation file\n"
 		      << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
 		      << "     *.mesh  -- MEdit mesh format\n"
+		      << "     *.mgf   -- MGF binary mesh format\n"
 		      << "     *.msh   -- GMSH ASCII file\n"
 		      << "     *.plt   -- Tecplot binary file\n"
 		      << "     *.poly  -- TetGen ASCII file\n"
