@@ -45,6 +45,16 @@ class MetisPartitioner : public Partitioner
    */
   MetisPartitioner () {}
 
+  /**
+   * Creates a new partitioner of this type and returns it in 
+   * an \p AutoPtr.
+   */
+  virtual AutoPtr<Partitioner> clone () const {
+    AutoPtr<Partitioner> cloned_partitioner
+      (new MetisPartitioner());
+    return cloned_partitioner;
+  }
+
 protected:
   /**
    * Partition the \p MeshBase into \p n subdomains.

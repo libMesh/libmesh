@@ -47,6 +47,16 @@ class LinearPartitioner : public Partitioner
    */
   LinearPartitioner () {}
 
+  /**
+   * Creates a new partitioner of this type and returns it in 
+   * an \p AutoPtr.
+   */
+  virtual AutoPtr<Partitioner> clone () const {
+    AutoPtr<Partitioner> cloned_partitioner
+      (new LinearPartitioner());
+    return cloned_partitioner;
+  }
+
 protected:
   /**
    * Partition the \p MeshBase into \p n subdomains.

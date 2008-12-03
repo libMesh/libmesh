@@ -50,6 +50,16 @@ class SFCPartitioner : public Partitioner
   {}
 
   /**
+   * Creates a new partitioner of this type and returns it in 
+   * an \p AutoPtr.
+   */
+  virtual AutoPtr<Partitioner> clone () const {
+    AutoPtr<Partitioner> cloned_partitioner
+      (new SFCPartitioner());
+    return cloned_partitioner;
+  }
+
+  /**
    * Sets the type of space-filling curve to use.  Valid types are
    * "Hilbert" (the default) and "Morton"
    */
