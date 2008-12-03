@@ -1,39 +1,39 @@
 #include "libmesh_config.h"
 
 // C++ includes
-#include <iostream>
-#include <vector>
-#include <string>
-#include <unistd.h>
+#include <algorithm>
+#include <fstream>
 #ifdef HAVE_GETOPT_H
 // GCC 2.95.3 (and maybe others) do not include
 // getopt.h in unistd.h...  Hower IBM xlC has no
 // getopt.h!  This works around that.
 #include <getopt.h>
 #endif
+#include <iostream>
 #include <math.h>
-#include <string.h>
 #include <stdio.h>
-#include <fstream>
-#include <algorithm>
+#include <string.h>
+#include <string>
+#include <unistd.h>
+#include <vector>
 
 // Local Includes
-#include "libmesh.h"
-#include "elem.h"
-#include "mesh.h"
-#include "mesh_modification.h"
+#include "boundary_info.h"
 #include "boundary_mesh.h"
-#include "mesh_refinement.h"
 #include "dof_map.h"
-#include "perfmon.h"
-#include "point.h"
+#include "elem.h"
 #include "elem_quality.h"
 #include "gmv_io.h"
-#include "legacy_xdr_io.h"
-#include "statistics.h"
 #include "inf_elem_builder.h"
+#include "legacy_xdr_io.h"
+#include "libmesh.h"
+#include "mesh.h"
 #include "mesh_data.h"
-#include "boundary_info.h"
+#include "mesh_modification.h"
+#include "mesh_refinement.h"
+#include "perfmon.h"
+#include "point.h"
+#include "statistics.h"
 
 
 
@@ -52,20 +52,22 @@ void usage(char *progName)
     "        %s [options] ...\n"
     "\n"
     "options:\n"
+    "    -d <dim>                      <dim>-dimensional mesh\n"
     "    -i <string>                   Input file name\n"
     "    -o <string>                   Output file name\n"
     "    -s <string>                   Solution file name\n"
-    "    -d <dim>                      <dim>-dimensional mesh\n"
-  "\n    -D <factor>                   Randomly move interior nodes by D*hmin\n"
+  "\n    -b                            Write the boundary conditions\n"
+    "    -B                            Like -b, but with activated MeshData\n"
+    "    -D <factor>                   Randomly move interior nodes by D*hmin\n"
+    "    -h                            Print help menu\n"
+    "    -p <count>                    Partition into <count> subdomains\n"
 #ifdef ENABLE_AMR
     "    -r <count>                    Globally refine <count> times\n"
 #endif
-    "    -p <count>                    Partition into <count> subdomains\n"
     "    -t (-d 2 only)                Convert to triangles first\n"
-    "    -b                            Write the boundary conditions\n"
-    "    -B                            Like -b, but with activated MeshData\n"
     "                                  (allows to write .unv file of the\n"
     "                                  boundary with the correct node ids)\n"
+    "    -v                            Verbose\n"
     "    -2                            Converts a mesh of linear elements\n"
     "                                  to their second-order counterparts:\n"
     "                                  Quad4 -> Quad8, Tet4 -> Tet10 etc\n"
@@ -83,8 +85,6 @@ void usage(char *progName)
 #endif
 /*  "\n    -l                            Build the L connectivity matrix \n"         */
 /*    "    -L                            Build the script L connectivity matrix \n"  */
-    "    -v                            Verbose\n"
-    "    -h                            Print help menu\n"
     "\n"
     "\n"
     " This program is used to convert and partions from/to a variety of\n"
@@ -121,22 +121,22 @@ void usage(char *progName)
     " Currently this program supports the following formats:\n"
     "\n"
     "INPUT:\n"
-    "     .ucd -- AVS unstructured ASCII grid format\n"
     "     .exd -- Sandia's ExodusII binary grid format\n"
-    "     .unv -- SDRC I-Deas Universal File ASCII format\n"
-    "     .xdr -- Internal binary mesh format\n"
-    "     .xda -- Same format, but ASCII and human-readable\n"
     "     .mgf -- MGF binary mesh format\n"
+    "     .ucd -- AVS unstructured ASCII grid format\n"
+    "     .unv -- SDRC I-Deas Universal File ASCII format\n"
+    "     .xda -- libMesh human-readable ASCII format\n"
+    "     .xdr -- libMesh binary format\n"
     "\n"
     "OUTPUT:\n"
-    "     .plt   -- Tecplot binary format\n"
     "     .dat   -- Tecplot ASCII format\n"
-    "     .gmv   -- LANL's General Mesh Viewer (~benkirk/work/GMV/linuxogl)\n"
-    "     .ugrid -- Kelly's DIVA ASCII format (3D only)\n"
-    "     .xdr   -- Internal binary mesh format\n"
-    "     .xda   -- Same format, but ASCII and human-readable\n"
-    "     .mgf   -- MGF binary mesh format\n"
     "     .fro   -- ACDL's .fro format\n"
+    "     .gmv   -- LANL's General Mesh Viewer (~benkirk/work/GMV/linuxogl)\n"
+    "     .mgf   -- MGF binary mesh format\n"
+    "     .plt   -- Tecplot binary format\n"
+    "     .ugrid -- Kelly's DIVA ASCII format (3D only)\n"
+    "     .xda   -- libMesh ASCII format\n"
+    "     .xdr   -- libMesh binary format\n"
     "\n"
     " Direct questions to:\n"
     " benkirk@cfdlab.ae.utexas.edu\n";
