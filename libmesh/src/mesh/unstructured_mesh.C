@@ -577,16 +577,15 @@ void UnstructuredMesh::read (const std::string& name,
 	    {
 	      std::cerr << " ERROR: Unrecognized file extension: " << name
 			<< "\n   I understand the following:\n\n"
-			<< "     *.mat  -- Matlab triangular ASCII file\n"
-			<< "     *.ucd  -- AVS's ASCII UCD format\n"
-			<< "     *.gmv  -- LANL's General Mesh Viewer format\n"
-			<< "     *.off  -- OOGL OFF surface format\n"
-			<< "     *.exd  -- Sandia's ExodusII format\n"
 			<< "     *.e    -- Sandia's ExodusII format\n"
-			<< "     *.xda  -- Internal ASCII format\n"
-			<< "     *.xdr  -- Internal binary format,\n"
-			<< "               compatible with XdrMGF\n"
+			<< "     *.exd  -- Sandia's ExodusII format\n"
+			<< "     *.gmv  -- LANL's General Mesh Viewer format\n"
+			<< "     *.mat  -- Matlab triangular ASCII file\n"
+			<< "     *.off  -- OOGL OFF surface format\n"
+			<< "     *.ucd  -- AVS's ASCII UCD format\n"
 			<< "     *.unv  -- I-deas Universal format\n"
+			<< "     *.xda  -- libMesh ASCII format\n"
+			<< "     *.xdr  -- libMesh binary format,\n"
 			<< std::endl;
 	      libmesh_error();	  
 	    }    
@@ -700,20 +699,19 @@ void UnstructuredMesh::write (const std::string& name,
 	    std::cerr << " ERROR: Unrecognized file extension: " << name
 		      << "\n   I understand the following:\n\n"
 		      << "     *.dat   -- Tecplot ASCII file\n"
+                      << "     *.e     -- Sandia's ExodusII format\n"
+                      << "     *.exd   -- Sandia's ExodusII format\n"
+		      << "     *.fro   -- ACDL's surface triangulation file\n"
+		      << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
+		      << "     *.mesh  -- MEdit mesh format\n"
+		      << "     *.msh   -- GMSH ASCII file\n"
 		      << "     *.plt   -- Tecplot binary file\n"
+		      << "     *.poly  -- TetGen ASCII file\n"
 		      << "     *.ucd   -- AVS's ASCII UCD format\n"
 		      << "     *.ugrid -- Kelly's DIVA ASCII format\n"
-		      << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
-                      << "     *.exd   -- Sandia's ExodusII format\n"
-                      << "     *.e     -- Sandia's ExodusII format\n"
-		      << "     *.xda   -- Internal ASCII format\n"
-		      << "     *.xdr   -- Internal binary format,\n"
-		      << "                compatible with XdrMGF\n"
 		      << "     *.unv   -- I-deas Universal format\n"
-		      << "     *.mesh  -- MEdit mesh format\n"
-		      << "     *.poly  -- TetGen ASCII file\n"
-		      << "     *.msh   -- GMSH ASCII file\n"
-		      << "     *.fro   -- ACDL's surface triangulation file\n"
+		      << "     *.xda   -- libMesh ASCII format\n"
+		      << "     *.xdr   -- libMesh binary format,\n"
 		      << std::endl
 		      << "\n Exiting without writing output\n";
 	  }    
@@ -772,9 +770,9 @@ void UnstructuredMesh::write (const std::string& name,
       std::cerr << " ERROR: Unrecognized file extension: " << name
 		<< "\n   I understand the following:\n\n"
 		<< "     *.dat  -- Tecplot ASCII file\n"
+		<< "     *.gmv  -- LANL's GMV (General Mesh Viewer) format\n"
 		<< "     *.plt  -- Tecplot binary file\n"
 		<< "     *.pvtu -- Paraview VTK file\n"
-		<< "     *.gmv  -- LANL's GMV (General Mesh Viewer) format\n"
 		<< "\n Exiting without writing output\n";
     }
 
