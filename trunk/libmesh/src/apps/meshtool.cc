@@ -130,13 +130,23 @@ void usage(char *progName)
     "\n"
     "OUTPUT:\n"
     "     .dat   -- Tecplot ASCII format\n"
+    "     .e     -- Sandia's ExodusII format\n"
+    "     .exd   -- Sandia's ExodusII format\n"
     "     .fro   -- ACDL's .fro format\n"
-    "     .gmv   -- LANL's General Mesh Viewer (~benkirk/work/GMV/linuxogl)\n"
+    "     .gmv   -- LANL's General Mesh Viewer format\n"
+    "     .mesh  -- MEdit mesh format\n"
     "     .mgf   -- MGF binary mesh format\n"
+    "     .msh   -- GMSH ASCII file\n"
     "     .plt   -- Tecplot binary format\n"
+    "     .poly  -- TetGen ASCII file\n"
+    "     .pvtu  -- Paraview VTK format\n"
+    "     .ucd   -- AVS's ASCII UCD format\n"
     "     .ugrid -- Kelly's DIVA ASCII format (3D only)\n"
+    "     .unv   -- I-deas Universal format\n"
     "     .xda   -- libMesh ASCII format\n"
     "     .xdr   -- libMesh binary format\n"
+    "     .gz    -- any above format gzipped\n"
+    "     .bz2   -- any above format bzip2'ed\n"
     "\n"
     " Direct questions to:\n"
     " benkirk@cfdlab.ae.utexas.edu\n";
@@ -903,10 +913,9 @@ int main (int argc, char** argv)
               libmesh_error();
             
             if (names.size() == 2)
-              GMVIO(boundary_mesh).write(boundary_name);
+              boundary_mesh.write(boundary_name);
             else if (names.size() == 3)
-              GMVIO(boundary_mesh).write_nodal_data(boundary_name,
-                                                    soln, var_names);
+              boundary_mesh.write(boundary_name, soln, var_names);
           }
       }
   };
