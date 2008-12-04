@@ -248,7 +248,8 @@ std::ostream& operator << (std::ostream& os, const MeshBase& m)
 
 void MeshBase::partition (const unsigned int n_parts)
 {
-  partitioner()->partition (*this, n_parts);
+  if (partitioner().get()) // "NULL" means don't partition
+    partitioner()->partition (*this, n_parts);
 }
 
 
