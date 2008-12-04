@@ -31,7 +31,6 @@
 class Elem;
 class Node;
 class Point;
-class Partitioner;
 class BoundaryInfo;
 class PointLocatorBase;
 class MeshData;
@@ -42,6 +41,7 @@ class MeshData;
 #include "enum_elem_type.h"
 #include "libmesh_common.h"
 #include "multi_predicates.h"
+#include "partitioner.h"
 #include "variant_filter_iterator.h"
 
 
