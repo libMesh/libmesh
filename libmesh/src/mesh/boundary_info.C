@@ -73,6 +73,7 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
    * Re-create the boundary mesh.
    */
   boundary_mesh.set_n_subdomains() = this->n_boundary_ids();
+  boundary_mesh.set_n_partitions() = this->n_boundary_ids();
 
 
   // Add sides to the structure.
@@ -193,6 +194,10 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
   // to the boundary_mesh
   if ((boundary_mesh_data != NULL) && (this_mesh_data != NULL))
     boundary_mesh_data->assign(*this_mesh_data);
+
+  // Don't repartition this mesh; we're using the processor_id values
+  // as a hack to display bcids for now.
+  boundary_mesh.partitioner().reset(NULL);
 
   // Trim any un-used nodes from the Mesh
   boundary_mesh.prepare_for_use();
