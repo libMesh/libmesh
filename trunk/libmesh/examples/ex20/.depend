@@ -51,7 +51,11 @@ ex20.$(obj-suffix):\
     $(LIBMESH_DIR)/include/numerics/dense_vector.h\
     $(LIBMESH_DIR)/include/numerics/dense_vector_base.h\
     $(LIBMESH_DIR)/include/numerics/numeric_vector.h\
+    $(LIBMESH_DIR)/include/numerics/shell_matrix.h\
     $(LIBMESH_DIR)/include/numerics/sparse_matrix.h\
+    $(LIBMESH_DIR)/include/numerics/sparse_shell_matrix.h\
+    $(LIBMESH_DIR)/include/numerics/sum_shell_matrix.h\
+    $(LIBMESH_DIR)/include/numerics/tensor_shell_matrix.h\
     $(LIBMESH_DIR)/include/numerics/tensor_value.h\
     $(LIBMESH_DIR)/include/numerics/type_tensor.h\
     $(LIBMESH_DIR)/include/numerics/type_vector.h\
