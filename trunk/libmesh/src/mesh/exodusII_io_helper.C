@@ -518,7 +518,7 @@ void ExodusII_IO_Helper::create(std::string filename)
 
 void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh)
 {
-  num_dim = mesh.mesh_dimension();
+  num_dim = mesh.spatial_dimension();
   num_nodes = mesh.n_nodes();
   num_elem = mesh.n_elem();
   num_elem_blk = 1;
