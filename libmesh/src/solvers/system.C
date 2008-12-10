@@ -493,20 +493,16 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
       return *(_vectors[vec_name]);
     }
 
-  // We can only add new vectors before initializing...
-  if (!_can_add_vectors)
-    {
-      std::cerr << "ERROR: Too late.  Cannot add vectors to the system after initialization"
-		<< std::endl
-		<< " any more.  You should have done this earlier."
-		<< std::endl;
-      libmesh_error();
-    }
-
-  // Otherwise build the vector and return it.
+  // Otherwise build the vector
   NumericVector<Number>* buf = NumericVector<Number>::build().release();
   _vectors.insert (std::make_pair (vec_name, buf));
   _vector_projections.insert (std::make_pair (vec_name, projections));
+
+  // Initialize it if necessary
+  if (!_can_add_vectors)
+    {
+      buf->init (this->n_dofs(), this->n_local_dofs());
+    }
 
   return *buf;
 }
