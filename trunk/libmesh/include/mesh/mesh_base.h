@@ -411,10 +411,11 @@ public:
   void partition (const unsigned int n_parts=libMesh::n_processors());
   
   /**
-   * Returns the number of subdomains in the global mesh. Note that it is
-   * convenient to have one subdomain on each processor on parallel machines,
-   * however this is not required. Multiple subdomains can exist on the same
-   * processor.
+   * Returns the number of subdomains in the global mesh. Subdomains correspond
+   * to separate subsets of the mesh which could correspond e.g. to different 
+   * materials in a solid mechanics application, or regions where different
+   * physical processes are important.  The subdomain mapping is independent
+   * from the parallel decomposition.
    */
   unsigned int n_subdomains () const
   { return _n_sbd; }
