@@ -58,6 +58,7 @@ ex18.$(obj-suffix):\
     $(LIBMESH_DIR)/include/numerics/type_vector.h\
     $(LIBMESH_DIR)/include/numerics/vector_value.h\
     $(LIBMESH_DIR)/include/parallel/threads.h\
+    $(LIBMESH_DIR)/include/partitioning/partitioner.h\
     $(LIBMESH_DIR)/include/solvers/diff_solver.h\
     $(LIBMESH_DIR)/include/solvers/diff_system.h\
     $(LIBMESH_DIR)/include/solvers/equation_systems.h\
@@ -136,6 +137,7 @@ naviersystem.$(obj-suffix):\
     $(LIBMESH_DIR)/include/numerics/type_vector.h\
     $(LIBMESH_DIR)/include/numerics/vector_value.h\
     $(LIBMESH_DIR)/include/parallel/threads.h\
+    $(LIBMESH_DIR)/include/partitioning/partitioner.h\
     $(LIBMESH_DIR)/include/quadrature/quadrature.h\
     $(LIBMESH_DIR)/include/solvers/diff_system.h\
     $(LIBMESH_DIR)/include/solvers/explicit_system.h\

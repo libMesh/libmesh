@@ -62,6 +62,7 @@ ex20.$(obj-suffix):\
     $(LIBMESH_DIR)/include/numerics/vector_value.h\
     $(LIBMESH_DIR)/include/parallel/threads.h\
     $(LIBMESH_DIR)/include/parallel/threads_allocators.h\
+    $(LIBMESH_DIR)/include/partitioning/partitioner.h\
     $(LIBMESH_DIR)/include/quadrature/quadrature.h\
     $(LIBMESH_DIR)/include/quadrature/quadrature_gauss.h\
     $(LIBMESH_DIR)/include/solvers/equation_systems.h\

@@ -37,6 +37,7 @@ ex2.$(obj-suffix):\
     $(LIBMESH_DIR)/include/mesh/unstructured_mesh.h\
     $(LIBMESH_DIR)/include/numerics/type_vector.h\
     $(LIBMESH_DIR)/include/parallel/threads.h\
+    $(LIBMESH_DIR)/include/partitioning/partitioner.h\
     $(LIBMESH_DIR)/include/solvers/equation_systems.h\
     $(LIBMESH_DIR)/include/solvers/explicit_system.h\
     $(LIBMESH_DIR)/include/solvers/frequency_system.h\
