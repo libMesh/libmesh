@@ -29,6 +29,7 @@ ex1.$(obj-suffix):\
     $(LIBMESH_DIR)/include/mesh/unstructured_mesh.h\
     $(LIBMESH_DIR)/include/numerics/type_vector.h\
     $(LIBMESH_DIR)/include/parallel/threads.h\
+    $(LIBMESH_DIR)/include/partitioning/partitioner.h\
     $(LIBMESH_DIR)/include/utils/compare_types.h\
     $(LIBMESH_DIR)/include/utils/mapvector.h\
     $(LIBMESH_DIR)/include/utils/o_string_stream.h\
