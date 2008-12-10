@@ -11,6 +11,14 @@
 include Make.common
 
 
+bin-suffix := -$(METHOD)
+# If the user is using METHOD=opt,
+# the utility programs get no suffix
+
+ifeq (x$(METHOD),xopt)
+  bin-suffix := 
+endif
+
 ###############################################################################
 # File management.  This is where the source, header, and object files are
 # defined
@@ -33,7 +41,7 @@ appsrcfiles	:= $(wildcard src/apps/*.cc)
 
 #
 # apps binary files
-appbinfiles	:= $(patsubst %.cc, %, $(addprefix bin/, $(notdir $(appsrcfiles))))
+appbinfiles	:= $(patsubst %.cc, %$(bin-suffix), $(addprefix bin/, $(notdir $(appsrcfiles))))
 
 #
 # object files
@@ -265,7 +273,7 @@ cvsweb:
 # can be compiled with this rule.  For example, if ./src/apps/foo.cc contains a main()
 # and is a standalone program, then make bin/foo will work.
 #
-bin/% : src/apps/%.cc $(mesh_library)
+bin/%$(bin-suffix) : src/apps/%.cc $(mesh_library)
 	@echo "Building $@"
 	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) $< -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS)
 
