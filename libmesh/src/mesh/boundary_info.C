@@ -263,6 +263,17 @@ void BoundaryInfo::add_side(const Elem* elem,
       libmesh_error();
     }
   
+  // A convenient typedef
+  typedef std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator Iter;
+	      
+  // Don't add the same ID twice
+  std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(elem);
+
+  for (;pos.first != pos.second; ++pos.first)
+    if (pos.first->second.first == side &&
+        pos.first->second.second == id)
+      return;
+
   std::pair<unsigned short int, short int> p(side,id);
   std::pair<const Elem*, std::pair<unsigned short int, short int> >
     kv (elem, p);
