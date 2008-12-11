@@ -138,6 +138,13 @@ public:
   void remove (const Elem* elem);
 
   /**
+   * Removes the boundary conditions associated with element \p elem,
+   * if any exist.
+   */
+  void remove_side (const Elem* elem,
+                    const unsigned short int side);
+
+  /**
    * Returns the number of user-specified boundary ids.
    */
   unsigned int n_boundary_ids () const { return _boundary_ids.size(); }
@@ -329,6 +336,5 @@ void BoundaryInfo::remove (const Elem* elem)
   // Erase everything associated with elem
   _boundary_side_id.erase (elem);
 }
-
 
 #endif
