@@ -72,11 +72,8 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
   /**
    * Re-create the boundary mesh.
    */
-  boundary_mesh.set_n_subdomains() = this->n_boundary_ids();
-  boundary_mesh.set_n_partitions() = this->n_boundary_ids();
 
-
-  // Add sides to the structure.
+  // Map boundary ids to side subdomain/partition ids
   std::map<short int, unsigned int> id_map;
 
   // Original Code
@@ -95,9 +92,8 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 		_boundary_ids.end(),
 		Fill(id_map));
     
-    
-
   boundary_mesh.set_n_subdomains() = id_map.size();
+  boundary_mesh.set_n_partitions() = id_map.size();
 
 
   // Make individual copies of all the nodes in the current mesh
@@ -152,9 +148,6 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 		  {
 		    side->subdomain_id() =
 		      id_map[pos.first->second.second];
-		    
-		    side->processor_id() =
-		      side->subdomain_id();
 		    break;
 		  }
 		
@@ -167,6 +160,9 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 	      {
 		side->subdomain_id() = id_map[invalid_id];
 	      }
+
+	    side->processor_id() =
+	      side->subdomain_id();
 	    
 	    // Add the side
 	    Elem* new_elem = boundary_mesh.add_elem(side.release());
