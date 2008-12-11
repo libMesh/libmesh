@@ -332,7 +332,6 @@ short int BoundaryInfo::boundary_id(const Elem* const elem,
 }
 
 
-inline
 void BoundaryInfo::remove_side (const Elem* elem,
                                 const unsigned short int side)
 {
