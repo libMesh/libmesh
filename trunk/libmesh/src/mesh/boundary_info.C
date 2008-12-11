@@ -339,7 +339,7 @@ void BoundaryInfo::remove_side (const Elem* elem,
 
   // The user shouldn't be trying to remove only one child's boundary
   // id
-  libmesh_assert (elem->level() != 0);
+  libmesh_assert (elem->level() == 0);
   
   std::pair<std::multimap<const Elem*,
                           std::pair<unsigned short int, short int> >::iterator,
