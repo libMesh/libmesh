@@ -27,6 +27,7 @@ hostos                = @host_os@
 
 libmesh_CXX           = @CXX@
 libmesh_CC            = @CC@
+libmesh_F77           = @F77@
 libmesh_LDFLAGS       = @LDFLAGS@
 libmesh_DLFLAGS       =
 libmesh_LIBS          = @LIBS@
@@ -568,6 +569,14 @@ else
 
   endif
 endif
+
+##################################
+# Fortran rules                  #
+##################################
+
+%.$(obj-suffix) : %.f
+	@echo "Compiling Fortan (in "$(mode)" mode) "$<"..."
+	@$(libmesh_F77) $(libmesh_INCLUDE) $(libmesh_FLIBS) -c $< -o $@
 
 ###############################################################################
 
