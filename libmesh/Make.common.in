@@ -32,6 +32,7 @@ libmesh_LDFLAGS       = @LDFLAGS@
 libmesh_DLFLAGS       =
 libmesh_LIBS          = @LIBS@
 libmesh_FLIBS         = @FLIBS@
+libmesh_FFLAGS        = @FFLAGS@
 GXX-VERSION           = @GXX_VERSION@
 libmesh_CXXSHAREDFLAG = @CXXSHAREDFLAG@
 libmesh_CSHAREDFLAG   = @CXXSHAREDFLAG@
@@ -576,7 +577,7 @@ endif
 
 %.$(obj-suffix) : %.f
 	@echo "Compiling Fortan (in "$(mode)" mode) "$<"..."
-	@$(libmesh_F77) $(libmesh_INCLUDE) $(libmesh_FLIBS) -c $< -o $@
+	@$(libmesh_F77) $(libmesh_FFLAGS) $(libmesh_INCLUDE) $(libmesh_FLIBS) -c $< -o $@
 
 ###############################################################################
 
