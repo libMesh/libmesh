@@ -310,6 +310,20 @@ Make.common:
 	@echo -e "You must run ./configure first!"
 	exit 1
 
+
+#
+# Special rules for building some source files.  Must be *after* the 'all' target.
+#
+
+# This rule suppresses deprecated header warnings when compiling files with
+# VTK headers.
+src/mesh/vtk_io.$(obj-suffix) : src/mesh/vtk_io.C
+	@echo "Compiling using special rule for vtk_io.C (in "$(mode)" mode) "$<"..."
+	@$(libmesh_CXX) -Wno-deprecated $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+
+
+
+
 ###############################################################################
 include .depend
 
