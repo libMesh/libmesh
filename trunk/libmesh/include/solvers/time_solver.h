@@ -124,12 +124,6 @@ public:
   virtual void before_timestep () {}
 
   /**
-   * @returns the old nonlinear solution for the specified global
-   * DOF.
-   */
-  Number old_nonlinear_solution (const unsigned int global_dof_number) const;
-
-  /**
    * @returns a constant reference to the system we are solving.
    */
   const sys_type & system () const { return _system; }
