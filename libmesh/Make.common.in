@@ -392,10 +392,14 @@ ifeq ($(enable-optional),yes)
     libmesh_INCLUDE += -I$(SLEPC_DIR)/include
 
     # Depending on petsc version, libs live in different locations
-    ifneq (,$(findstring 2.3.x, $(petsc-major-minor))) # 2.3.x & newer does not use BOPT
-      SLEPC_LIB = $(SLEPC_DIR)/lib/$(PETSC_ARCH)
+    ifeq ($(petsc-major-minor),2.3.x) # 2.3.x & newer does not use BOPT, has lib/ARCH/...
+      PETSC_LIB = $(PETSC_DIR)/lib/$(PETSC_ARCH)
     else
-      SLEPC_LIB = $(SLEPC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
+      ifeq ($(petsc-major-minor),3.0.x) # 3.0.x & newer does not use BOPT, has ARCH/lib/...
+        PETSC_LIB = $(PETSC_DIR)/$(PETSC_ARCH)/lib
+      else
+        PETSC_LIB = $(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
+      endif
     endif
 
     libs-SLEPC = -L$(SLEPC_LIB) \
@@ -435,10 +439,12 @@ ifeq ($(enable-optional),yes)
       C_CLINKER_SLFLAG = $(libmesh_RPATHFLAG)# necessary for PETSc >= 2.1.6
       ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x & newer style
         include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/petscconf # 2.3.0 or later style
-
       else
-        include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/packages  # 2.1.1 or later style
-
+        ifeq ($(petsc-major-minor),3.0.x)  # 3.0.x & newer style
+          include $(PETSC_DIR)/$(PETSC_ARCH)/conf/petscvariables # 3.0.0 or later style
+	else
+          include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/packages  # 2.1.1 or later style
+        endif      
       endif      
     endif
 
@@ -447,15 +453,19 @@ ifeq ($(enable-optional),yes)
 #     LIBS    += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getlinklibs`
 #     INCLUDE += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getincludedirs`
 
-
-    libmesh_INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) \
+    #                    (needed by all petsc)  (needed by versions <= 2.3.3)      (needed by versions >= 3.0.0)
+    libmesh_INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) -I$(PETSC_DIR)/$(PETSC_ARCH)/include \
                          $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE)
 
     # Depending on petsc version, libs live in different locations
-    ifneq (,$(findstring 2.3.x, $(petsc-major-minor))) # 2.3.x & newer does not use BOPT
+    ifeq ($(petsc-major-minor),2.3.x) # 2.3.x & newer does not use BOPT, has lib/ARCH/...
       PETSC_LIB = $(PETSC_DIR)/lib/$(PETSC_ARCH)
     else
-      PETSC_LIB = $(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
+      ifeq ($(petsc-major-minor),3.0.x) # 3.0.x & newer does not use BOPT, has ARCH/lib/...
+        PETSC_LIB = $(PETSC_DIR)/$(PETSC_ARCH)/lib
+      else # old-schol lib/lib$BOPT/ARCH format
+        PETSC_LIB = $(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
+      endif
     endif
 
     ifeq ($(enable-shared),yes)

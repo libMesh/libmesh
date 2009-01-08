@@ -1828,6 +1828,7 @@ namespace Parallel
 		       datatype<T>(),
 		       &recv[0],
 		       2, 
+		       datatype<T>(),
 		       libMesh::COMM_WORLD);
       }
     else
