@@ -1576,9 +1576,8 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
 
 
   STOP_LOG("broadcast_mesh()","MeshCommunication");
-  
-#endif
 }
+#endif
 
 
 
@@ -1711,9 +1710,8 @@ void MeshCommunication::broadcast_bcs (const MeshBase& mesh,
   }
 
   STOP_LOG("broadcast_bcs()","MeshCommunication");
-
-#endif  
 }
+#endif  
 
 
 
