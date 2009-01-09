@@ -334,9 +334,9 @@ namespace Parallel
 #endif
     }
 
+#ifdef LIBMESH_HAVE_MPI
     bool test (status &status)
     {
-#ifdef LIBMESH_HAVE_MPI
       int val=0;
 
       MPI_Test (&_request,
@@ -345,6 +345,8 @@ namespace Parallel
 
       return val;
 #else
+    bool test (status &)
+    {
       return true;
 #endif
     }
