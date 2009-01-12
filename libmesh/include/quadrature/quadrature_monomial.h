@@ -141,8 +141,47 @@ class QMonomial : public QBase
   void stroud_rule(const Real rule_data[][3],
 		   const unsigned int* rule_symmetry,
 		   const unsigned int n_pts);
-		   
 
+  /**
+   * Rules from Kim and Song, Comm. Korean Math. Soc vol. 13, no. 4, 1998, pp. 913-931.
+   * The rules are obtained by considering the group G^{rot} of rotations of the reference
+   * hex, and the invariant polynomials of this group.
+   *
+   * In Kim and Song's rules, quadrauture points are described by the following points
+   * and their unique permutations under the G^{rot} group:
+   *
+   * 0.) (0,0,0) ( 1 perm ) -> [0, 0, 0]
+   * 1.) (x,0,0) ( 6 perms) -> [x, 0, 0], [0, -x, 0], [-x, 0, 0], [0, x, 0], [0, 0, -x], [0, 0, x]
+   * 2.) (x,x,0) (12 perms) -> [x, x, 0], [x, -x, 0], [-x, -x, 0], [-x, x, 0], [x, 0, -x], [x, 0, x],
+   *                           [0, x, -x], [0, x, x], [0, -x, -x], [-x, 0, -x], [0, -x, x], [-x, 0, x]
+   * 3.) (x,y,0) (24 perms) -> [x, y, 0], [y, -x, 0], [-x, -y, 0], [-y, x, 0], [x, 0, -y], [x, -y, 0],
+   *                           [x, 0, y], [0, y, -x], [-x, y, 0],
+   *                           [0, y, x], [y, 0, -x], [0, -y, -x], [-y, 0, -x], [y, x, 0], [-y, -x, 0],
+   *                           [y, 0, x], [0, -y, x], [-y, 0, x],
+   *                           [-x, 0, y], [0, -x, -y], [0, -x, y], [-x, 0, -y], [0, x, y], [0, x, -y]
+   * 4.) (x,x,x) ( 8 perms) -> [x, x, x], [x, -x, x], [-x, -x, x], [-x, x, x], [x, x, -x], [x, -x, -x],
+   *                           [-x, x, -x], [-x, -x, -x]
+   * 5.) (x,x,z) (24 perms) -> [x, x, z], [x, -x, z], [-x, -x, z], [-x, x, z], [x, z, -x], [x, -x, -z],
+   *                           [x, -z, x], [z, x, -x], [-x, x, -z],
+   *                           [-z, x, x], [x, -z, -x], [-z, -x, -x], [-x, z, -x], [x, x, -z],
+   *                           [-x, -x, -z], [x, z, x], [z, -x, x],
+   *                           [-x, -z, x], [-x, z, x], [z, -x, -x], [-z, -x, x], [-x, -z, -x],
+   *                           [z, x, x], [-z, x, -x]
+   * 6.) (x,y,z) (24 perms) -> [x, y, z], [y, -x, z], [-x, -y, z], [-y, x, z], [x, z, -y], [x, -y, -z],
+   *                           [x, -z, y], [z, y, -x], [-x, y, -z],
+   *                           [-z, y, x], [y, -z, -x], [-z, -y, -x], [-y, z, -x], [y, x, -z], [-y, -x, -z],
+   *                           [y, z, x], [z, -y, x], [-y, -z, x], [-x, z, y], [z, -x, -y],
+   *                           [-z, -x, y], [-x, -z, -y], [z, x, y], [-z, x, -y]
+   *
+   * Only two of Kim and Song's rules are particularly useful for FEM calculations: the degree 7,
+   * 38-point rule and their degree 8, 47-point rule.  The others either contain negative weights or points
+   * outside the reference interval.  The points and weights, to 32 digits, were obtained from:
+   * Ronald Cools' website (http://www.cs.kuleuven.ac.be/~nines/research/ecf/ecf.html) and
+   * the unique permutations of G^{rot} were computed by me [JWP] using Maple.
+   */
+  void kim_rule(const Real rule_data[][4],
+		const unsigned int* rule_id,
+		const unsigned int n_pts);
 };
 
 
