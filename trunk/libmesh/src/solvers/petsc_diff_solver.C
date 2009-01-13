@@ -70,9 +70,9 @@ __libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void *ctx)
 
   PetscVector<Number> X_input(x), R_input(r);
   PetscVector<Number>& X_system =
-    *dynamic_cast<PetscVector<Number>*>(sys.solution.get());
+    *libmesh_assert_cast<PetscVector<Number>*>(sys.solution.get());
   PetscVector<Number>& R_system =
-    *dynamic_cast<PetscVector<Number>*>(sys.rhs);
+    *libmesh_assert_cast<PetscVector<Number>*>(sys.rhs);
 
   // DiffSystem assembles from the solution and into the rhs, so swap
   // those with our input vectors before assembling.  They'll probably
@@ -115,11 +115,11 @@ __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *j, Mat *pc,
 
   PetscVector<Number> X_input(x);
   PetscVector<Number>& X_system =
-    *dynamic_cast<PetscVector<Number>*>(sys.solution.get());
+    *libmesh_assert_cast<PetscVector<Number>*>(sys.solution.get());
 
   PetscMatrix<Number> J_input(*pc);
   PetscMatrix<Number>& J_system =
-    *dynamic_cast<PetscMatrix<Number>*>(sys.matrix);
+    *libmesh_assert_cast<PetscMatrix<Number>*>(sys.matrix);
 
   // DiffSystem assembles from the solution and into the jacobian, so
   // swap those with our input vectors before assembling.  They'll
@@ -207,11 +207,11 @@ unsigned int PetscDiffSolver::solve()
   START_LOG("solve()", "PetscDiffSolver");
 
   PetscVector<Number> &x =
-    *(dynamic_cast<PetscVector<Number>*>(_system.solution.get()));
+    *(libmesh_assert_cast<PetscVector<Number>*>(_system.solution.get()));
   PetscMatrix<Number> &jac =
-    *(dynamic_cast<PetscMatrix<Number>*>(_system.matrix));
+    *(libmesh_assert_cast<PetscMatrix<Number>*>(_system.matrix));
   PetscVector<Number> &r =
-    *(dynamic_cast<PetscVector<Number>*>(_system.rhs));
+    *(libmesh_assert_cast<PetscVector<Number>*>(_system.rhs));
 
   x.close();
   r.close();
