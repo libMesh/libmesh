@@ -227,6 +227,43 @@ namespace libMesh
 #define libmesh_not_implemented()    do { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
 #endif
 
+
+// The libmesh_assert_cast function does a dynamic cast and asserts
+// the result, if we're in debug or development modes, but just does
+// a faster static cast if we're in optimized mode.  Use this cast
+// when you're certain that a cast will succeed in correct code but
+// you want to be able to double-check.
+template <typename Tnew, typename Told>
+inline Tnew libmesh_assert_cast(Told& oldvar)
+{
+#ifndef NDEBUG
+  try
+    {
+      Tnew newvar = dynamic_cast<Tnew>(oldvar);
+      return newvar;
+    }
+  catch (std::bad_cast)
+    {
+      libmesh_assert (false);
+    }
+#else
+  return(static_cast<Tnew>(oldvar));
+#endif
+}
+
+template <typename Tnew, typename Told>
+inline Tnew libmesh_assert_cast(Told* oldvar)
+{
+#ifndef NDEBUG
+  Tnew newvar = dynamic_cast<Tnew>(oldvar);
+  libmesh_assert (newvar);
+  return newvar;
+#else
+  return(static_cast<Tnew>(oldvar));
+#endif
+}
+
+ 
 // The error() macro prints a message and throws a generic exception
 // Use libmesh_error() instead; error() is deprecated to avoid namespace
 // conflicts
