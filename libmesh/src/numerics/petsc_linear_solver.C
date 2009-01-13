@@ -277,18 +277,12 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 {
   START_LOG("solve()", "PetscLinearSolver");
   
-  PetscMatrix<T>* matrix   = dynamic_cast<PetscMatrix<T>*>(&matrix_in);
-  PetscMatrix<T>* precond  = dynamic_cast<PetscMatrix<T>*>(&precond_in);
-  PetscVector<T>* solution = dynamic_cast<PetscVector<T>*>(&solution_in);
-  PetscVector<T>* rhs      = dynamic_cast<PetscVector<T>*>(&rhs_in);
+  // Make sure the data passed in are really of Petsc types
+  PetscMatrix<T>* matrix   = libmesh_assert_cast<PetscMatrix<T>*>(&matrix_in);
+  PetscMatrix<T>* precond  = libmesh_assert_cast<PetscMatrix<T>*>(&precond_in);
+  PetscVector<T>* solution = libmesh_assert_cast<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* rhs      = libmesh_assert_cast<PetscVector<T>*>(&rhs_in);
 
-  // We cast to pointers so we can be sure that they succeeded
-  // by comparing the result against NULL.
-  libmesh_assert(matrix   != NULL);
-  libmesh_assert(precond  != NULL);
-  libmesh_assert(solution != NULL);
-  libmesh_assert(rhs      != NULL);
-  
   this->init (matrix);
 
   int ierr=0;
@@ -436,14 +430,10 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
   START_LOG("solve()", "PetscLinearSolver");
 
-  PetscVector<T>* solution = dynamic_cast<PetscVector<T>*>(&solution_in);
-  PetscVector<T>* rhs      = dynamic_cast<PetscVector<T>*>(&rhs_in);
+  // Make sure the data passed in are really of Petsc types
+  PetscVector<T>* solution = libmesh_assert_cast<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* rhs      = libmesh_assert_cast<PetscVector<T>*>(&rhs_in);
 
-  // We cast to pointers so we can be sure that they succeeded
-  // by comparing the result against NULL.
-  libmesh_assert(solution != NULL);
-  libmesh_assert(rhs      != NULL);
-  
   this->init ();
 
   int ierr=0;
@@ -534,17 +524,11 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
   START_LOG("solve()", "PetscLinearSolver");
 
-  const PetscMatrix<T>* precond  = dynamic_cast<const PetscMatrix<T>*>(&precond_matrix);
-  libmesh_assert(precond!=NULL);
-  
-  PetscVector<T>* solution = dynamic_cast<PetscVector<T>*>(&solution_in);
-  PetscVector<T>* rhs      = dynamic_cast<PetscVector<T>*>(&rhs_in);
+  // Make sure the data passed in are really of Petsc types
+  const PetscMatrix<T>* precond  = libmesh_assert_cast<const PetscMatrix<T>*>(&precond_matrix);
+  PetscVector<T>* solution = libmesh_assert_cast<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* rhs      = libmesh_assert_cast<PetscVector<T>*>(&rhs_in);
 
-  // We cast to pointers so we can be sure that they succeeded
-  // by comparing the result against NULL.
-  libmesh_assert(solution != NULL);
-  libmesh_assert(rhs      != NULL);
-  
   this->init ();
 
   int ierr=0;

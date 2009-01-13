@@ -184,12 +184,9 @@ void EpetraVector<T>::add_vector (const NumericVector<T>& /* V_in */,
 {
   libmesh_not_implemented();
 
-//   const EpetraVector<T>* V = dynamic_cast<const EpetraVector<T>*>(&V_in);
-//   const EpetraMatrix<T>* A = dynamic_cast<const EpetraMatrix<T>*>(&A_in);
+//   const EpetraVector<T>* V = libmesh_assert_cast<const EpetraVector<T>*>(&V_in);
+//   const EpetraMatrix<T>* A = libmesh_assert_cast<const EpetraMatrix<T>*>(&A_in);
 
-//   libmesh_assert (V != NULL);
-//   libmesh_assert (A != NULL);
-  
 //   int ierr=0;
 
 //   A->close();
@@ -239,9 +236,8 @@ void EpetraVector<T>::add (const NumericVector<T>& v)
 template <typename T>
 void EpetraVector<T>::add (const T a_in, const NumericVector<T>& v_in)
 {
-  const EpetraVector<T>* v = dynamic_cast<const EpetraVector<T>*>(&v_in);
+  const EpetraVector<T>* v = libmesh_assert_cast<const EpetraVector<T>*>(&v_in);
 
-  libmesh_assert (v != NULL);
   libmesh_assert(this->size() == v->size());
 
   _vec->Update(a_in,*v->_vec, 1.);
@@ -301,10 +297,8 @@ void EpetraVector<T>::scale (const T factor_in)
 template <typename T>
 T EpetraVector<T>::dot (const NumericVector<T>& V_in) const
 {
-  const EpetraVector<T>* V = dynamic_cast<const EpetraVector<T>*>(&V_in);
+  const EpetraVector<T>* V = libmesh_assert_cast<const EpetraVector<T>*>(&V_in);
 
-  libmesh_assert(V);
-  
   T result=0.0;
 
   _vec->Dot(*V->_vec, &result);
@@ -317,12 +311,9 @@ template <typename T>
 void EpetraVector<T>::pointwise_mult (const NumericVector<T>& vec1,
                                       const NumericVector<T>& vec2)
 {
-  const EpetraVector<T>* V1 = dynamic_cast<const EpetraVector<T>*>(&vec1);
-  const EpetraVector<T>* V2 = dynamic_cast<const EpetraVector<T>*>(&vec2);
+  const EpetraVector<T>* V1 = libmesh_assert_cast<const EpetraVector<T>*>(&vec1);
+  const EpetraVector<T>* V2 = libmesh_assert_cast<const EpetraVector<T>*>(&vec2);
 
-  libmesh_assert(V1);
-  libmesh_assert(V2);
-  
   _vec->Multiply(1.0, *V1->_vec, *V2->_vec, 0.0);
 }
 
@@ -342,10 +333,8 @@ template <typename T>
 NumericVector<T>&
 EpetraVector<T>::operator = (const NumericVector<T>& v_in)
 {
-  const EpetraVector<T>* v = dynamic_cast<const EpetraVector<T>*>(&v_in);
+  const EpetraVector<T>* v = libmesh_assert_cast<const EpetraVector<T>*>(&v_in);
 
-  libmesh_assert (v != NULL);
-  
   *this = *v;
   
   return *this;
@@ -405,9 +394,7 @@ EpetraVector<T>::operator = (const std::vector<T>& v)
 template <typename T>
 void EpetraVector<T>::localize (NumericVector<T>& v_local_in) const
 {
-  EpetraVector<T>* v_local = dynamic_cast<EpetraVector<T>*>(&v_local_in);
-
-  libmesh_assert(v_local);
+  EpetraVector<T>* v_local = libmesh_assert_cast<EpetraVector<T>*>(&v_local_in);
 
   Epetra_Map rootMap = Epetra_Util::Create_Root_Map( *_map, -1);
   v_local->_vec->ReplaceMap(rootMap);
@@ -426,9 +413,8 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
   this->localize(v_local_in);
   
 //   EpetraVector<T>* v_local =
-//   dynamic_cast<EpetraVector<T>*>(&v_local_in);
+//   libmesh_assert_cast<EpetraVector<T>*>(&v_local_in);
 
-//   libmesh_assert (v_local != NULL);
 //   libmesh_assert (this->_map.get() != NULL);
 //   libmesh_assert (v_local->_map.get() != NULL);
 //   libmesh_assert (v_local->local_size() == this->size());
@@ -649,7 +635,7 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
 //   int ierr = 0;
   
 //   // Make sure the passed int subvector is really a EpetraVector
-//   EpetraVector<T>* epetra_subvector = dynamic_cast<EpetraVector<T>*>(&subvector);
+//   EpetraVector<T>* epetra_subvector = libmesh_assert_cast<EpetraVector<T>*>(&subvector);
 //   libmesh_assert(epetra_subvector != NULL);
   
 //   // If the epetra_subvector is already initialized, we assume that the

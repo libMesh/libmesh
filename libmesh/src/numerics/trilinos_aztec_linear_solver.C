@@ -91,18 +91,12 @@ AztecLinearSolver<T>::solve (SparseMatrix<T>& matrix_in,
 {
   START_LOG("solve()", "AztecLinearSolver");  
 
-  EpetraMatrix<T>* matrix   = dynamic_cast<EpetraMatrix<T>*>(&matrix_in);
-  EpetraMatrix<T>* precond  = dynamic_cast<EpetraMatrix<T>*>(&precond_in);
-  EpetraVector<T>* solution = dynamic_cast<EpetraVector<T>*>(&solution_in);
-  EpetraVector<T>* rhs      = dynamic_cast<EpetraVector<T>*>(&rhs_in);
+  // Make sure the data passed in are really of Epetra types
+  EpetraMatrix<T>* matrix   = libmesh_assert_cast<EpetraMatrix<T>*>(&matrix_in);
+  EpetraMatrix<T>* precond  = libmesh_assert_cast<EpetraMatrix<T>*>(&precond_in);
+  EpetraVector<T>* solution = libmesh_assert_cast<EpetraVector<T>*>(&solution_in);
+  EpetraVector<T>* rhs      = libmesh_assert_cast<EpetraVector<T>*>(&rhs_in);
 
-  // We cast to pointers so we can be sure that they succeeded
-  // by comparing the result against NULL.
-  libmesh_assert(matrix != NULL);
-  libmesh_assert(precond != NULL);
-  libmesh_assert(solution != NULL);
-  libmesh_assert(rhs != NULL);
-  
   this->init();
 
   // Close the matrices and vectors in case this wasn't already done.

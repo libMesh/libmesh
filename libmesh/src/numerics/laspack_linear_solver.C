@@ -113,16 +113,11 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
   START_LOG("solve()", "LaspackLinearSolver");
   this->init ();
 
-  LaspackMatrix<T>* matrix   = dynamic_cast<LaspackMatrix<T>*>(&matrix_in);
-  LaspackVector<T>* solution = dynamic_cast<LaspackVector<T>*>(&solution_in);
-  LaspackVector<T>* rhs      = dynamic_cast<LaspackVector<T>*>(&rhs_in);
+  // Make sure the data passed in are really in Laspack types
+  LaspackMatrix<T>* matrix   = libmesh_assert_cast<LaspackMatrix<T>*>(&matrix_in);
+  LaspackVector<T>* solution = libmesh_assert_cast<LaspackVector<T>*>(&solution_in);
+  LaspackVector<T>* rhs      = libmesh_assert_cast<LaspackVector<T>*>(&rhs_in);
 
-  // We cast to pointers so we can be sure that they succeeded
-  // by comparing the result against NULL.
-  libmesh_assert(matrix   != NULL);
-  libmesh_assert(solution != NULL);
-  libmesh_assert(rhs      != NULL);
-  
   // Zero-out the solution to prevent the solver from exiting in 0
   // iterations (?)
   //TODO:[BSK] Why does Laspack do this?  Comment out this and try ex13...

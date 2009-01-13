@@ -126,7 +126,7 @@ void PointLocatorList::init ()
 	  // (this should also beware of a bad master pointer?).
 	  // And make sure the master @e has a list!
 	  const PointLocatorList* my_master =
-	    dynamic_cast<const PointLocatorList*>(this->_master);
+	    libmesh_assert_cast<const PointLocatorList*>(this->_master);
 
 	  if (my_master->initialized())
 	    this->_list = my_master->_list;

@@ -113,7 +113,7 @@ void MeshFunction::init (const Trees::BuildType point_locator_build_type)
     {
       // we aren't the master
       const MeshFunction* master =
-	dynamic_cast<const MeshFunction*>(this->_master);
+	libmesh_assert_cast<const MeshFunction*>(this->_master);
       
       if (master->_point_locator == NULL)
         {
@@ -226,7 +226,7 @@ void MeshFunction::operator() (const Point& p,
   if (this->_master != NULL)
     {
       const MeshFunction* master =
-	dynamic_cast<const MeshFunction*>(this->_master);
+	libmesh_assert_cast<const MeshFunction*>(this->_master);
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
 	{
 	  std::cerr << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
@@ -324,7 +324,7 @@ void MeshFunction::gradient (const Point& p,
   if (this->_master != NULL)
     {
       const MeshFunction* master =
-	dynamic_cast<const MeshFunction*>(this->_master);
+	libmesh_assert_cast<const MeshFunction*>(this->_master);
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
 	{
 	  std::cerr << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
@@ -413,7 +413,7 @@ void MeshFunction::hessian (const Point& p,
   if (this->_master != NULL)
     {
       const MeshFunction* master =
-	dynamic_cast<const MeshFunction*>(this->_master);
+	libmesh_assert_cast<const MeshFunction*>(this->_master);
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
 	{
 	  std::cerr << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
