@@ -430,7 +430,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                     << (neigh->subactive()?"subactive":"ancestor")
                     << " neighbor at level " << neigh->level()
                     << std::endl;
-                  GMVIO(*dynamic_cast<UnstructuredMesh*>(this)).write ("bad_mesh.gmv");
+                  GMVIO(*this).write ("bad_mesh.gmv");
                   libmesh_error();
                 }
 #endif // DEBUG
