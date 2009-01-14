@@ -39,32 +39,204 @@ void QMonomial::init_3D(const ElemType _type,
 	switch(_order + 2*p)
 	  {
 
-	  case SEVENTH:
+	    // The CONSTANT/FIRST rule is the 1-point Gauss "product" rule...we fall
+	    // through to the default case for this rule.
+	    
+	  case SECOND:
+	  case THIRD:
 	    {
-	      // A degree 7, 38-point, "rotationally-symmetric" rule by
+	      // A degree 3, 6-point, "rotationally-symmetric" rule by
 	      // Kim and Song, Comm. Korean Math. Soc vol. 13, no. 4, 1998, pp. 913-931.
 	      //
-	      // A SEVENTH-order Gauss product rule (which integrates tri-7th order polynomials)
-	      // would have 4^3=64 points.
-	      const Real data[3][4] =
+	      // Warning: this rule contains points on the boundary of the reference
+	      // element, and therefore may be unsuitable for some problems.
+	      const Real data[1][4] =
 		{
-		  {9.01687807821291289082811566285950e-01L, 0.00000000000000000000000000000000e+00L, 0.00000000000000000000000000000000e+00L, 2.95189738262622903181631100062774e-01L}, 
-		  {4.08372221499474674069588900002128e-01L, 4.08372221499474674069588900002128e-01L, 4.08372221499474674069588900002128e-01L, 4.04055417266200582425904380777126e-01L}, 
-		  {8.59523090201054193116477875786220e-01L, 8.59523090201054193116477875786220e-01L, 4.14735913727987720499709244748633e-01L, 1.24850759678944080062624098058597e-01L}  
+		  {1.0L, 0.0L, 0.0L, 4.0L/3.0L}  
 		};
 
-	      const unsigned int rule_id[3] = {
-		1, // (x,0,0) -> 6 permutations
-		4, // (x,x,x) -> 8 permutations
-		5  // (x,x,z) -> 24 permutations
+	      const unsigned int rule_id[1] = {
+		1 // (x,0,0) -> 6 permutations
 	      };
 
-	      _points.resize(38);
-	      _weights.resize(38);
+	      _points.resize(6);
+	      _weights.resize(6);
 
-	      kim_rule(data, rule_id, 3);
+	      kim_rule(data, rule_id, 1);
 	      return;
-	    } // end case SEVENTH
+	    } // end case SECOND,THIRD
+
+	  case FOURTH:
+	  case FIFTH:
+	    {
+	      // A degree 5, 13-point rule by Stroud,
+	      // AH Stroud, "Some Fifth Degree Integration Formulas for Symmetric Regions II.",
+	      // Numerische Mathematik 9, pp. 460-468 (1967).
+	      // This rule is provably minimal in the number of points.
+	      const Real eta=0.0;
+	      
+	      const Real lambda=0.88030430;
+	      const Real xi=-0.49584802;
+	      
+	      const Real mu=0.79562143;
+	      const Real gamma=0.025293237;
+
+	      const Real A=0.21052632 * 8.0;
+	      const Real B=0.068123420 * 8.0;
+	      const Real C=0.063455527 * 8.0;
+	      
+ 	      _points.resize(13);
+ 	      _weights.resize(13);
+
+	      unsigned int c=0;
+
+	      // Point with weight A (origin)
+	      _points[c] = Point(eta, eta, eta);
+	      _weights[c++] = A;
+
+	      // Points with weight B
+	      _points[c] = Point(lambda, xi, xi);  
+	      _weights[c++] = B;
+	      _points[c] = -_points[c-1];	      
+	      _weights[c++] = B;
+	      
+	      _points[c] = Point(xi, lambda, xi);  
+	      _weights[c++] = B;
+	      _points[c] = -_points[c-1];	      
+	      _weights[c++] = B;
+
+	      _points[c] = Point(xi, xi, lambda);  
+	      _weights[c++] = B;
+	      _points[c] = -_points[c-1];	      
+	      _weights[c++] = B;
+
+	      // Points with weight C
+	      _points[c] = Point(mu, mu, gamma);  
+	      _weights[c++] = C;
+	      _points[c] = -_points[c-1];	      
+	      _weights[c++] = C;
+	      
+	      _points[c] = Point(mu, gamma, mu);  
+	      _weights[c++] = C;
+	      _points[c] = -_points[c-1];	      
+	      _weights[c++] = C;
+
+	      _points[c] = Point(gamma, mu, mu);  
+	      _weights[c++] = C;
+	      _points[c] = -_points[c-1];	      
+	      _weights[c++] = C;
+	      
+	      return;
+
+	      
+// 	      // A degree 5, 14-point, "rotationally-symmetric" rule by
+// 	      // Kim and Song, Comm. Korean Math. Soc vol. 13, no. 4, 1998, pp. 913-931.
+// 	      // Was also reported in Stroud's 1971 book.
+// 	      const Real data[2][4] =
+// 		{
+// 		  {7.95822425754221463264548820476135e-01L, 0.00000000000000000000000000000000e+00L, 0.00000000000000000000000000000000e+00L, 8.86426592797783933518005540166204e-01L}, 
+// 		  {7.58786910639328146269034278112267e-01L, 7.58786910639328146269034278112267e-01L, 7.58786910639328146269034278112267e-01L, 3.35180055401662049861495844875346e-01L}  
+// 		};
+
+// 	      const unsigned int rule_id[2] = {
+// 		1, // (x,0,0) -> 6 permutations
+// 		4  // (x,x,x) -> 8 permutations
+// 	      };
+
+// 	      _points.resize(14);
+// 	      _weights.resize(14);
+
+// 	      kim_rule(data, rule_id, 2);
+// 	      return;
+	    } // end case FOURTH,FIFTH
+
+	  case SIXTH:
+	  case SEVENTH:
+	    {
+	      if (allow_rules_with_negative_weights)
+		{
+		  // A degree 7, 31-point, "rotationally-symmetric" rule by
+		  // Kim and Song, Comm. Korean Math. Soc vol. 13, no. 4, 1998, pp. 913-931.
+		  // This rule contains a negative weight, so only use it if such type of
+		  // rules are allowed.
+		  const Real data[3][4] =
+		    {
+		      {0.00000000000000000000000000000000e+00L, 0.00000000000000000000000000000000e+00L, 0.00000000000000000000000000000000e+00L, -1.27536231884057971014492753623188e+00L}, 
+		      {5.85540043769119907612630781744060e-01L, 0.00000000000000000000000000000000e+00L, 0.00000000000000000000000000000000e+00L,  8.71111111111111111111111111111111e-01L}, 
+		      {6.94470135991704766602025803883310e-01L, 9.37161638568208038511047377665396e-01L, 4.15659267604065126239606672567031e-01L,  1.68695652173913043478260869565217e-01L}  
+		    };
+		  
+		  const unsigned int rule_id[3] = {
+		    0, // (0,0,0) -> 1 permutation
+		    1, // (x,0,0) -> 6 permutations
+		    6  // (x,y,z) -> 24 permutations
+		  };
+
+		  _points.resize(31);
+		  _weights.resize(31);
+
+		  kim_rule(data, rule_id, 3);
+		  return;
+		} // end if (allow_rules_with_negative_weights)
+
+	      
+	      // A degree 7, 34-point, "fully-symmetric" rule, first published in
+	      // P.C. Hammer and A.H. Stroud, "Numerical Evaluation of Multiple Integrals II",
+	      // Mathmatical Tables and Other Aids to Computation, vol 12., no 64, 1958, pp. 272-280
+	      //
+	      // This rule happens to fall under the same general
+	      // construction as the Kim rules, so we've re-used
+	      // that code here.  Stroud gives 16 digits for his rule,
+	      // and this is the most accurate version I've found.
+	      //
+	      // For comparison, a SEVENTH-order Gauss product rule
+	      // (which integrates tri-7th order polynomials) would
+	      // have 4^3=64 points.
+	      const Real data[4][4] =
+		{
+		  {9.258200997725515e-01L, 0.000000000000000e+00L, 0.000000000000000e+00L, 2.957475994513032e-01L}, 
+		  {9.258200997725515e-01L, 9.258200997725515e-01L, 0.000000000000000e+00L, 9.41015089163237e-02L }, 
+		  {7.341125287521153e-01L, 7.341125287521153e-01L, 7.341125287521153e-01L, 2.247031747656014e-01L}, 
+		  {4.067031864267161e-01L, 4.067031864267161e-01L, 4.067031864267161e-01L, 4.123338622714356e-01L}  
+		};
+		  
+	      const unsigned int rule_id[4] = {
+		1, // (x,0,0) -> 6 permutations
+		2, // (x,x,0) -> 12 permutations
+		4, // (x,x,x) -> 8 permutations
+		4  // (x,x,x) -> 8 permutations
+		  };
+
+	      _points.resize(34);
+	      _weights.resize(34);
+
+	      kim_rule(data, rule_id, 4);
+	      return;
+
+
+//	      // A degree 7, 38-point, "rotationally-symmetric" rule by
+//	      // Kim and Song, Comm. Korean Math. Soc vol. 13, no. 4, 1998, pp. 913-931.
+//	      //
+//	      // This rule is obviously inferior to the 34-point rule above...
+//	      const Real data[3][4] =
+//		{
+//		  {9.01687807821291289082811566285950e-01L, 0.00000000000000000000000000000000e+00L, 0.00000000000000000000000000000000e+00L, 2.95189738262622903181631100062774e-01L}, 
+//		  {4.08372221499474674069588900002128e-01L, 4.08372221499474674069588900002128e-01L, 4.08372221499474674069588900002128e-01L, 4.04055417266200582425904380777126e-01L}, 
+//		  {8.59523090201054193116477875786220e-01L, 8.59523090201054193116477875786220e-01L, 4.14735913727987720499709244748633e-01L, 1.24850759678944080062624098058597e-01L}  
+//		};
+//
+//	      const unsigned int rule_id[3] = {
+//		1, // (x,0,0) -> 6 permutations
+//		4, // (x,x,x) -> 8 permutations
+//		5  // (x,x,z) -> 24 permutations
+//	      };
+//
+//	      _points.resize(38);
+//	      _weights.resize(38);
+//
+//	      kim_rule(data, rule_id, 3);
+//	      return;
+	    } // end case SIXTH,SEVENTH
 
 	  case EIGHTH:
 	    {
