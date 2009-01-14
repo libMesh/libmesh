@@ -40,6 +40,7 @@
 #ifdef LIBMESH_HAVE_STDLIB_H
 # include <cstdlib>
 #endif
+#include <typeinfo> // std::bad_cast
 
 // _basic_ library functionality
 #include "libmesh_base.h"
