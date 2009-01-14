@@ -70,6 +70,11 @@ void QMonomial::init_2D(const ElemType _type,
 
 
 	    
+	  // For third-order, fall through to default case, use 2x2 Gauss product rule.
+	  // case THIRD:
+	  //   {
+	  //   }  // end case THIRD
+	    
 	  case FOURTH:
 	    {
 	      // A pair of degree=4 rules for the QUAD "C2" due to
