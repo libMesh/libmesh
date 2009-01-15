@@ -24,9 +24,9 @@
 
 
 DiffSolver::DiffSolver (sys_type& s)
-    : quiet(true),
-      max_linear_iterations(1000),
+    : max_linear_iterations(1000),
       max_nonlinear_iterations(100),
+      quiet(true),
       continue_after_max_iterations(true),
       continue_after_backtrack_failure(false),
       absolute_residual_tolerance(0.),
