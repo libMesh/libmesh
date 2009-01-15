@@ -290,9 +290,6 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
     processor_offsets[pid] = processor_offsets[pid-1] + n_elem_on_proc[pid-1];
 
   // All processors send their xfer buffers to processor 0.
-  Parallel::request request_handle;
-  Parallel::nonblocking_send (0, xfer_conn, request_handle);
-  
   // Processor 0 will receive the data and write out the elements. 
   if (libMesh::processor_id() == 0)
     {
@@ -313,13 +310,11 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
       for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 	{
 	  recv_conn.resize(xfer_buf_sizes[pid]);
-#ifdef LIBMESH_HAVE_MPI
-	  Parallel::receive (pid, recv_conn);	
-#else
-	  libmesh_assert (libMesh::n_processors() == 1);
-	  libmesh_assert (libMesh::processor_id() == pid);
-	  recv_conn = xfer_conn;
-#endif
+          if (pid == 0)
+	    recv_conn = xfer_conn;
+          else
+	    Parallel::receive (pid, recv_conn);	
+
 	  // at a minimum, the buffer should contain the number of elements,
 	  // which could be 0.
 	  libmesh_assert (!recv_conn.empty());
@@ -351,7 +346,8 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 	    }       	
 	}
     }
-  Parallel::wait (request_handle);
+  else
+    Parallel::send (0, xfer_conn);
 
 #ifdef LIBMESH_ENABLE_AMR  
   //--------------------------------------------------------------------
@@ -390,7 +386,6 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
       xfer_conn.push_back(my_n_elem_written_at_level);
       my_size = xfer_conn.size();
       Parallel::gather (0, my_size,   xfer_buf_sizes);
-      Parallel::nonblocking_send  (0, xfer_conn, request_handle);
       
       // Processor 0 will receive the data and write the elements.
       if (libMesh::processor_id() == 0)
@@ -415,13 +410,11 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 	    {
 	      recv_conn.resize(xfer_buf_sizes[pid]);
-#ifdef LIBMESH_HAVE_MPI
-	      Parallel::receive (pid, recv_conn);	
-#else
-	      libmesh_assert (libMesh::n_processors() == 1);
-	      libmesh_assert (libMesh::processor_id() == pid);
-	      recv_conn = xfer_conn;
-#endif
+              if (pid == 0)
+	        recv_conn = xfer_conn;
+              else
+	        Parallel::receive (pid, recv_conn);	
+
 	      // at a minimum, the buffer should contain the number of elements,
 	      // which could be 0.
 	      libmesh_assert (!recv_conn.empty());
@@ -456,7 +449,8 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) c
 		}       		    
 	    }
 	}  
-      Parallel::wait (request_handle);
+      else
+        Parallel::send  (0, xfer_conn);
   
       // update the processor_offsets
       processor_offsets[0] = processor_offsets.back() + n_elem_on_proc.back();	  
@@ -582,38 +576,44 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
 	    coords_size.push_back(3*ids_size[p]);
 	}			  
 
-      // Note that we will actually send/receive to ourself if we are
+      // We will have lots of simultaneous receives if we are
       // processor 0, so let's use nonblocking receives.
       std::vector<Parallel::request>
-        id_request_handles(libMesh::n_processors()),
-        coord_request_handles(libMesh::n_processors());
+        id_request_handles(libMesh::n_processors()-1),
+        coord_request_handles(libMesh::n_processors()-1);
 
-#ifdef LIBMESH_HAVE_MPI
       const unsigned int id_tag=0, coord_tag=1;
       
       // Post the receives -- do this on processor 0 only.
       if (libMesh::processor_id() == 0)
-        for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
-          {
-            recv_ids[pid].resize(ids_size[pid]);
-            recv_coords[pid].resize(coords_size[pid]);
+        {
+          for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+            {
+              recv_ids[pid].resize(ids_size[pid]);
+              recv_coords[pid].resize(coords_size[pid]);
             
-	    Parallel::nonblocking_receive (pid, recv_ids[pid],
-					   id_request_handles[pid],
-                                           id_tag);
-	    Parallel::nonblocking_receive (pid, recv_coords[pid],
-					   coord_request_handles[pid],
-                                           coord_tag);
-          }
-      
-      // Send -- do this on all processors.
-      Parallel::send(0, xfer_ids,    id_tag);
-      Parallel::send(0, xfer_coords, coord_tag);
-#else
-      // On one processor there's nothing to send
-      recv_ids[0]    = xfer_ids;
-      recv_coords[0] = xfer_coords;
-#endif
+              if (pid == 0)
+                {
+                  recv_ids[0] = xfer_ids;
+                  recv_coords[0] = xfer_coords;
+                }
+              else
+                {
+	          Parallel::nonblocking_receive (pid, recv_ids[pid],
+					         id_request_handles[pid-1],
+                                                 id_tag);
+	          Parallel::nonblocking_receive (pid, recv_coords[pid],
+					         coord_request_handles[pid-1],
+                                                 coord_tag);
+                }
+            }
+        }
+      else
+        {
+          // Send -- do this on all other processors.
+          Parallel::send(0, xfer_ids,    id_tag);
+          Parallel::send(0, xfer_coords, coord_tag);
+        }
 
       // -------------------------------------------------------
       // Receive the messages and write the output on processor 0.
@@ -710,22 +710,17 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
   Parallel::gather (0, my_size, bc_sizes);
   
   // All processors send their xfer buffers to processor 0
-  Parallel::request request_handle;
-  Parallel::nonblocking_send (0, xfer_bcs, request_handle);
-  
   // Processor 0 will receive all buffers and write out the bcs
   if (libMesh::processor_id() == 0)
     {
       for (unsigned int pid=0, elem_offset=0; pid<libMesh::n_processors(); pid++)
 	{
 	  recv_bcs.resize(bc_sizes[pid]);
-#ifdef LIBMESH_HAVE_MPI
-	  Parallel::receive (pid, recv_bcs);
-#else
-	  libmesh_assert (libMesh::n_processors() == 1);
-	  libmesh_assert (libMesh::processor_id() == pid);
-	  recv_bcs = xfer_bcs;
-#endif
+          if (pid == 0)
+	    recv_bcs = xfer_bcs;
+          else
+	    Parallel::receive (pid, recv_bcs);
+
 	  const unsigned int n_local_level_0_elem 
 	    = recv_bcs.back(); recv_bcs.pop_back();
 	  
@@ -737,7 +732,8 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
 	}    
       libmesh_assert (n_bcs == n_bcs_out);
     }
-  Parallel::wait (request_handle);
+  else
+    Parallel::send (0, xfer_bcs);
 } 
 
 
