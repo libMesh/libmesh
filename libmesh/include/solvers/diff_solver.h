@@ -120,12 +120,6 @@ public:
   sys_type & system () { return _system; }
   
   /**
-   * The DiffSolver should not print anything to std::cout
-   * unless quiet is set to false
-   */
-  bool quiet;
-
-  /**
    * Each linear solver step should exit after \p max_linear_iterations
    * is exceeded.
    */
@@ -138,6 +132,12 @@ public:
    * continue_after_max_iterations is true.
    */
   unsigned int max_nonlinear_iterations;
+
+  /**
+   * The DiffSolver should not print anything to std::cout
+   * unless quiet is set to false
+   */
+  bool quiet;
 
   /**
    * Defaults to true, telling the DiffSolver to continue rather than exit when
