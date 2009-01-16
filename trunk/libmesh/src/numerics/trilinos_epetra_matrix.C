@@ -329,7 +329,7 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 //   libmesh_not_implemented();
 
 // //   // Attempt to cast the input matrix to a EpetraMatrix*
-// //   EpetraMatrix<T>* petsc_submatrix = libmesh_assert_cast<EpetraMatrix<T>*>(&submatrix);
+// //   EpetraMatrix<T>* petsc_submatrix = libmesh_cast_ptr<EpetraMatrix<T>*>(&submatrix);
 
 // //   // Construct row and column index sets.
 // //   int ierr=0;
@@ -366,7 +366,7 @@ template <typename T>
 void EpetraMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 {
   // Convert vector to EpetraVector.
-  EpetraVector<T>* epetra_dest = libmesh_assert_cast<EpetraVector<T>*>(&dest);
+  EpetraVector<T>* epetra_dest = libmesh_cast_ptr<EpetraVector<T>*>(&dest);
 
   // Call Epetra function.
   _mat->ExtractDiagonalCopy(*(epetra_dest->vec()));

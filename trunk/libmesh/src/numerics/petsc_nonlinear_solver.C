@@ -86,8 +86,8 @@ extern "C"
     NonlinearImplicitSystem &sys = solver->system();
 
     PetscVector<Number> X_global(x), R(r);
-    PetscVector<Number>& X_sys = *libmesh_assert_cast<PetscVector<Number>*>(sys.solution.get());
-    PetscVector<Number>& R_sys = *libmesh_assert_cast<PetscVector<Number>*>(sys.rhs);
+    PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
+    PetscVector<Number>& R_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.rhs);
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
@@ -131,8 +131,8 @@ extern "C"
     PetscMatrix<Number> PC(*pc);
     PetscMatrix<Number> Jac(*jac);
     PetscVector<Number> X_global(x);
-    PetscVector<Number>& X_sys = *libmesh_assert_cast<PetscVector<Number>*>(sys.solution.get());
-    PetscMatrix<Number>& Jac_sys = *libmesh_assert_cast<PetscMatrix<Number>*>(sys.matrix);
+    PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
+    PetscMatrix<Number>& Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
@@ -233,9 +233,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   this->init ();
   
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T>* jac = libmesh_assert_cast<PetscMatrix<T>*>(&jac_in);
-  PetscVector<T>* x   = libmesh_assert_cast<PetscVector<T>*>(&x_in);
-  PetscVector<T>* r   = libmesh_assert_cast<PetscVector<T>*>(&r_in);
+  PetscMatrix<T>* jac = libmesh_cast_ptr<PetscMatrix<T>*>(&jac_in);
+  PetscVector<T>* x   = libmesh_cast_ptr<PetscVector<T>*>(&x_in);
+  PetscVector<T>* r   = libmesh_cast_ptr<PetscVector<T>*>(&r_in);
 
   int ierr=0;
   int n_iterations =0;

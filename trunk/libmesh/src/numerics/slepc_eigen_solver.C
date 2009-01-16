@@ -120,7 +120,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
   this->init ();
   
   // Make sure the SparseMatrix passed in is really a PetscMatrix
-  PetscMatrix<T>* matrix_A   = libmesh_assert_cast<PetscMatrix<T>*>(&matrix_A_in);
+  PetscMatrix<T>* matrix_A   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
 
   int ierr=0;
 
@@ -252,8 +252,8 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
   this->init ();
   
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T>* matrix_A   = libmesh_assert_cast<PetscMatrix<T>*>(&matrix_A_in);
-  PetscMatrix<T>* matrix_B   = libmesh_assert_cast<PetscMatrix<T>*>(&matrix_B_in);
+  PetscMatrix<T>* matrix_A   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
+  PetscMatrix<T>* matrix_B   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_B_in);
 
   int ierr=0;
 
@@ -476,7 +476,7 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
   PetscReal re, im;
 
   // Make sure the NumericVector passed in is really a PetscVector
-  PetscVector<T>* solution = libmesh_assert_cast<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* solution = libmesh_cast_ptr<PetscVector<T>*>(&solution_in);
 
   // real and imaginary part of the ith eigenvalue.
   PetscScalar kr, ki;

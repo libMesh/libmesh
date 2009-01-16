@@ -352,7 +352,7 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
   this->close();
   
   // Make sure the SparseMatrix passed in is really a PetscMatrix
-  PetscMatrix<T>* petsc_submatrix = libmesh_assert_cast<PetscMatrix<T>*>(&submatrix);
+  PetscMatrix<T>* petsc_submatrix = libmesh_cast_ptr<PetscMatrix<T>*>(&submatrix);
 
   // Construct row and column index sets.
   int ierr=0;
@@ -391,7 +391,7 @@ template <typename T>
 void PetscMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 {
   // Make sure the NumericVector passed in is really a PetscVector
-  PetscVector<T>* petsc_dest = libmesh_assert_cast<PetscVector<T>*>(&dest);
+  PetscVector<T>* petsc_dest = libmesh_cast_ptr<PetscVector<T>*>(&dest);
   libmesh_assert(petsc_dest != NULL);
 
   // Call PETSc function.
