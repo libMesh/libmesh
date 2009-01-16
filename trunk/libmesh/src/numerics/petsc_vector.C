@@ -27,10 +27,11 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-#include "parallel.h"
-#include "utility.h"
+#include "dense_subvector.h"
 #include "dense_vector.h"
+#include "parallel.h"
 #include "petsc_macro.h"
+#include "utility.h"
 
 
 
@@ -320,6 +321,18 @@ void PetscVector<T>::insert (const NumericVector<T>& V,
 
 template <typename T>
 void PetscVector<T>::insert (const DenseVector<T>& V,
+			     const std::vector<unsigned int>& dof_indices)
+{
+  libmesh_assert (V.size() == dof_indices.size());
+
+  for (unsigned int i=0; i<V.size(); i++)
+    this->set (dof_indices[i], V(i));
+}
+
+
+
+template <typename T>
+void PetscVector<T>::insert (const DenseSubVector<T>& V,
 			     const std::vector<unsigned int>& dof_indices)
 {
   libmesh_assert (V.size() == dof_indices.size());

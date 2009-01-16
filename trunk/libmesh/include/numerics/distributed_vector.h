@@ -309,12 +309,19 @@ public:
 		       const std::vector<unsigned int>& dof_indices);
       
   /**
-   * \f$ U+=V \f$ where U and V are type 
+   * \f$ U=V \f$ where V is type 
    * DenseVector<T> and you
-   * want to specify WHERE to insert
-   * the DenseVector<T> V 
+   * want to specify WHERE to insert it
    */
   virtual void insert (const DenseVector<T>& V,
+		       const std::vector<unsigned int>& dof_indices);
+    
+  /**
+   * \f$ U=V \f$ where V is type 
+   * DenseSubVector<T> and you
+   * want to specify WHERE to insert it
+   */
+  virtual void insert (const DenseSubVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices);
     
   /**

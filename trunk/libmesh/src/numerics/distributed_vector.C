@@ -27,6 +27,7 @@
 // Local Includes
 #include "distributed_vector.h"
 #include "dense_vector.h"
+#include "dense_subvector.h"
 #include "parallel.h"
 
 
@@ -271,6 +272,21 @@ void DistributedVector<T>::insert (const NumericVector<T>& V,
 
 template <typename T>
 void DistributedVector<T>::insert (const DenseVector<T>& V,
+				   const std::vector<unsigned int>& dof_indices)
+{
+  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert (this->initialized());
+  libmesh_assert (_values.size() == _local_size);
+  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+
+  for (unsigned int i=0; i<V.size(); i++)
+    this->set (dof_indices[i], V(i));
+}
+
+
+
+template <typename T>
+void DistributedVector<T>::insert (const DenseSubVector<T>& V,
 				   const std::vector<unsigned int>& dof_indices)
 {
   libmesh_assert (V.size() == dof_indices.size());
