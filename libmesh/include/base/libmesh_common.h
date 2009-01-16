@@ -229,13 +229,13 @@ namespace libMesh
 #endif
 
 
-// The libmesh_assert_cast function does a dynamic cast and asserts
-// the result, if we're in debug or development modes, but just does
-// a faster static cast if we're in optimized mode.  Use this cast
-// when you're certain that a cast will succeed in correct code but
-// you want to be able to double-check.
+// The libmesh_cast functions do a dynamic cast and assert the result,
+// if we're in debug or development modes, but just do a faster static
+// cast if we're in optimized mode.  Use these casts when you're
+// certain that a cast will succeed in correct code but you want to be
+// able to double-check.
 template <typename Tnew, typename Told>
-inline Tnew libmesh_assert_cast(Told& oldvar)
+inline Tnew libmesh_cast_ref(Told& oldvar)
 {
 #ifndef NDEBUG
   try
@@ -252,8 +252,10 @@ inline Tnew libmesh_assert_cast(Told& oldvar)
 #endif
 }
 
+// We use two different function names to avoid an odd overloading
+// ambiguity bug with icc 10.1.008
 template <typename Tnew, typename Told>
-inline Tnew libmesh_assert_cast(Told* oldvar)
+inline Tnew libmesh_cast_ptr (Told* oldvar)
 {
 #ifndef NDEBUG
   Tnew newvar = dynamic_cast<Tnew>(oldvar);

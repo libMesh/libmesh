@@ -114,9 +114,9 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
   this->init ();
 
   // Make sure the data passed in are really in Laspack types
-  LaspackMatrix<T>* matrix   = libmesh_assert_cast<LaspackMatrix<T>*>(&matrix_in);
-  LaspackVector<T>* solution = libmesh_assert_cast<LaspackVector<T>*>(&solution_in);
-  LaspackVector<T>* rhs      = libmesh_assert_cast<LaspackVector<T>*>(&rhs_in);
+  LaspackMatrix<T>* matrix   = libmesh_cast_ptr<LaspackMatrix<T>*>(&matrix_in);
+  LaspackVector<T>* solution = libmesh_cast_ptr<LaspackVector<T>*>(&solution_in);
+  LaspackVector<T>* rhs      = libmesh_cast_ptr<LaspackVector<T>*>(&rhs_in);
 
   // Zero-out the solution to prevent the solver from exiting in 0
   // iterations (?)

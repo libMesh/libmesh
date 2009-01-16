@@ -86,7 +86,7 @@ bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
   NonlinearImplicitSystem &sys = _solver->system();
 
   EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x)), R(r);
-  EpetraVector<Number>& X_sys = *libmesh_assert_cast<EpetraVector<Number>*>(sys.solution.get());
+  EpetraVector<Number>& X_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.solution.get());
 
   // Use the systems update() to get a good local version of the parallel solution
   X_global.swap(X_sys);
@@ -165,8 +165,8 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
 {
   this->init ();
 
-  EpetraVector<T> * x_epetra = libmesh_assert_cast<EpetraVector<T>*>(&x_in);
-  EpetraVector<T> * r_epetra = libmesh_assert_cast<EpetraVector<T>*>(&r_in);
+  EpetraVector<T> * x_epetra = libmesh_cast_ptr<EpetraVector<T>*>(&x_in);
+  EpetraVector<T> * r_epetra = libmesh_cast_ptr<EpetraVector<T>*>(&r_in);
 
   Teuchos::RCP<Epetra_Vector> x_t(x_epetra->vec());
   Teuchos::RCP<Epetra_Vector> r_t(r_epetra->vec());
