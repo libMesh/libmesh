@@ -292,11 +292,8 @@ void EpetraVector<T>::insert (const DenseSubVector<T>& v,
 {
   libmesh_assert (v.size() == dof_indices.size());
   
-  std::vector<T> &vals = const_cast<DenseSubVector<T>&>(v).get_values();
-  
-  ReplaceGlobalValues (v.size(),
-                       (int*) &dof_indices[0],
-                       &vals[0]);
+  for (unsigned int i=0; i < v.size(); ++i)
+    this->set (dof_indices[i], v(i));
 }
 
 
