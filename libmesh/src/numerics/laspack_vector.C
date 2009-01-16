@@ -24,6 +24,8 @@
 #include <limits>
 
 // Local Includes
+#include "dense_subvector.h"
+#include "dense_vector.h"
 #include "laspack_vector.h"
 #include "laspack_matrix.h"
 
@@ -201,6 +203,18 @@ void LaspackVector<T>::insert (const NumericVector<T>& V,
 
 template <typename T> 
 void LaspackVector<T>::insert (const DenseVector<T>& V,
+			       const std::vector<unsigned int>& dof_indices)
+{
+  libmesh_assert (V.size() == dof_indices.size());
+
+  for (unsigned int i=0; i<V.size(); i++)
+    this->set (dof_indices[i], V(i));
+}
+
+
+
+template <typename T> 
+void LaspackVector<T>::insert (const DenseSubVector<T>& V,
 			       const std::vector<unsigned int>& dof_indices)
 {
   libmesh_assert (V.size() == dof_indices.size());

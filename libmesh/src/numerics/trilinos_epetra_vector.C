@@ -24,10 +24,10 @@
 
 #ifdef LIBMESH_HAVE_TRILINOS
 
-#include "parallel.h"
-#include "utility.h"
+#include "dense_subvector.h"
 #include "dense_vector.h"
 #include "parallel.h"
+#include "utility.h"
 
 // Trilinos Includes
 #include <Epetra_LocalMap.h>
@@ -278,6 +278,21 @@ void EpetraVector<T>::insert (const DenseVector<T>& v,
   libmesh_assert (v.size() == dof_indices.size());
   
   std::vector<T> &vals = const_cast<DenseVector<T>&>(v).get_values();
+  
+  ReplaceGlobalValues (v.size(),
+                       (int*) &dof_indices[0],
+                       &vals[0]);
+}
+
+
+
+template <typename T>
+void EpetraVector<T>::insert (const DenseSubVector<T>& v,
+			      const std::vector<unsigned int>& dof_indices)
+{
+  libmesh_assert (v.size() == dof_indices.size());
+  
+  std::vector<T> &vals = const_cast<DenseSubVector<T>&>(v).get_values();
   
   ReplaceGlobalValues (v.size(),
                        (int*) &dof_indices[0],

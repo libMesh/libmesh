@@ -38,6 +38,7 @@
 // forward declarations
 template <typename T> class NumericVector;
 template <typename T> class DenseVector;
+template <typename T> class DenseSubVector;
 template <typename T> class SparseMatrix;
 template <typename T> class ShellMatrix;
 
@@ -358,7 +359,7 @@ public:
 			   const std::vector<unsigned int>& dof_indices) = 0;
 
   /**
-   * \f$ U=v \f$ where v is a DenseVector<T> 
+   * \f$ U=v \f$ where v is a std::vector<T> 
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
@@ -374,12 +375,20 @@ public:
 		       const std::vector<unsigned int>& dof_indices) = 0;
       
   /**
-   * \f$ U+=V \f$ where U and V are type 
+   * \f$ U=V \f$ where U and V are type 
    * DenseVector<T> and you
    * want to specify WHERE to insert
    * the DenseVector<T> V 
    */
   virtual void insert (const DenseVector<T>& V,
+		       const std::vector<unsigned int>& dof_indices) = 0;
+
+  /**
+   * \f$ U=V \f$ where V is a
+   * DenseSubVector<T> and you
+   * want to specify WHERE to insert it
+   */
+  virtual void insert (const DenseSubVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices) = 0;
     
   /**
