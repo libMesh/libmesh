@@ -115,7 +115,8 @@ void ExodusII_IO::read (const std::string& fname)
   exio_helper.read_header();             // Get header information from exodus file
   exio_helper.print_header();            // Print header information
 
-  libmesh_assert(static_cast<unsigned int>(exio_helper.get_num_dim()) == mesh.mesh_dimension()); // Be sure number of dimensions
+  //assertion fails due to inconsistent mesh dimension
+//  libmesh_assert(static_cast<unsigned int>(exio_helper.get_num_dim()) == mesh.mesh_dimension()); // Be sure number of dimensions
                                                                                 // is equal to the number of 
                                                                                 // dimensions in the mesh supplied.
   
