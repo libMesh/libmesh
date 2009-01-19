@@ -81,12 +81,14 @@ public:
   /**
    * This method is passed on to the core_time_solver
    */
-  virtual bool element_residual (bool get_jacobian);
+  virtual bool element_residual (bool get_jacobian,
+                                 DiffContext&);
 
   /**
    * This method is passed on to the core_time_solver
    */
-  virtual bool side_residual (bool get_jacobian);
+  virtual bool side_residual (bool get_jacobian,
+                              DiffContext&);
 
   /**
    * An implicit linear or nonlinear solver to use at each timestep.

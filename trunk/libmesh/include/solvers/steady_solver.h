@@ -29,8 +29,9 @@
 #include "time_solver.h"
 
 // Forward Declarations
-class TimeSolver;
+class DiffContext;
 class DifferentiableSystem;
+class TimeSolver;
 
 /**
  * This class implements a TimeSolver which does a single
@@ -80,14 +81,16 @@ public:
    * element_time_derivative() and element_constraint()
    * to build a full residual/jacobian on an element.
    */
-  virtual bool element_residual (bool get_jacobian);
+  virtual bool element_residual (bool request_jacobian,
+                                 DiffContext &);
 
   /**
    * This method uses the DifferentiableSystem's
    * side_time_derivative() and side_constraint()
    * to build a full residual/jacobian on an element's side.
    */
-  virtual bool side_residual (bool get_jacobian);
+  virtual bool side_residual (bool request_jacobian,
+                              DiffContext &);
 
   /**
    * Nominally computes the size of the difference between

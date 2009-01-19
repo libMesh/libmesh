@@ -30,6 +30,7 @@
 #include "dense_submatrix.h"
 #include "dense_subvector.h"
 #include "dense_vector.h"
+#include "diff_context.h"
 #include "linear_implicit_system.h"
 #include "transient_system.h"
 
@@ -115,7 +116,8 @@ public:
    * examine u = elem_solution and add (F(u), phi_i) to 
    * elem_residual.
    */
-  virtual bool element_time_derivative (bool request_jacobian) {
+  virtual bool element_time_derivative (bool request_jacobian,
+                                        DiffContext &) {
     return request_jacobian;
   }
 
@@ -131,7 +133,8 @@ public:
    * examine u = elem_solution and add (G(u), phi_i) to 
    * elem_residual.
    */
-  virtual bool element_constraint (bool request_jacobian) {
+  virtual bool element_constraint (bool request_jacobian,
+                                   DiffContext &) {
     return request_jacobian;
   }
 
@@ -154,7 +157,8 @@ public:
    * Users may need to reimplement this for their particular PDE
    * depending on the boundary conditions.
    */
-  virtual bool side_time_derivative (bool request_jacobian) {
+  virtual bool side_time_derivative (bool request_jacobian,
+                                     DiffContext &) {
     return request_jacobian;
   }
 
@@ -169,7 +173,8 @@ public:
    * Users may need to reimplement this for their particular PDE
    * depending on the boundary conditions.
    */
-  virtual bool side_constraint (bool request_jacobian) {
+  virtual bool side_constraint (bool request_jacobian,
+                                DiffContext &) {
     return request_jacobian;
   }
 
@@ -188,13 +193,13 @@ public:
   /**
    * Does any work that needs to be done on \p elem in a postprocessing loop.
    */
-  virtual void element_postprocess () {}
+  virtual void element_postprocess (DiffContext &) {}
  
   /**
    * Does any work that needs to be done on \p side of \p elem in a
    * postprocessing loop.
    */
-  virtual void side_postprocess () {}
+  virtual void side_postprocess (DiffContext &) {}
  
   /**
    * Tells the DiffSystem that variable var is evolving with
@@ -220,7 +225,8 @@ public:
    * The library provides a basic implementation in
    * FEMSystem::eulerian_residual()
    */
-  virtual bool eulerian_residual (bool request_jacobian) {
+  virtual bool eulerian_residual (bool request_jacobian,
+                                  DiffContext &) {
     return request_jacobian;
   }
 
@@ -235,7 +241,8 @@ public:
    * FEMSystem::mass_residual; few users will need to reimplement
    * this themselves.
    */
-  virtual bool mass_residual (bool request_jacobian) {
+  virtual bool mass_residual (bool request_jacobian,
+                              DiffContext &) {
     return request_jacobian;
   }
 
@@ -251,23 +258,29 @@ public:
    * is correct; users with boundary conditions including time
    * derivatives may need to reimplement this themselves.
    */
-  virtual bool side_mass_residual (bool request_jacobian) {
+  virtual bool side_mass_residual (bool request_jacobian,
+                                   DiffContext &) {
     return request_jacobian;
   }
 
   /**
-   * Gives derived classes the opportunity to reinitialize data (FE objects in
-   * FEMSystem, for example) needed for an interior integration at a new point
-   * within a timestep
+   * Builds a DiffContext object with enough information to do
+   * evaluations on each element.
+   *
+   * For most problems, the default "Let FEMSystem build an FEMContext
+   * reimplementation is correct; users who subclass FEMContext will need to
+   * also reimplement this method to build it.
    */
-  virtual void elem_reinit(Real) {}
+  virtual AutoPtr<DiffContext> build_context();
 
-  /**
-   * Gives derived classes the opportunity to reinitialize data needed for a
-   * side integration at a new point within a timestep
+  /*
+   * Prepares the result of a build_context() call for use.
+   * 
+   * Most FEMSystem-based problems will need to reimplement this in order to
+   * call FE::get_*() as their particular physics requires.
    */
-  virtual void elem_side_reinit(Real) {}
-
+  virtual void init_context(DiffContext &) {}
+ 
   /**
    * Invokes the solver associated with the system.  For steady state
    * solvers, this will find a root x where F(x) = 0.  For transient
@@ -276,20 +289,16 @@ public:
   virtual void solve ();
  
   /**
-   * @returns \p "Differentiable".  Helps in identifying
-   * the system type in an equation system file.
-   */
-//  virtual std::string system_type () const { return "Differentiable"; }
-
-  /**
    * A pointer to the solver object we're going to use.
    * This must be instantiated by the user before solving!
    */
   AutoPtr<TimeSolver> time_solver;
 
   /**
-   * For time-dependent problems, this is the time t for which the current
-   * nonlinear_solution is defined.
+   * For time-dependent problems, this is the time t at the beginning of
+   * the current timestep.  But do *not* access this time during an
+   * assembly!  Use the DiffContext::time value instead to get correct
+   * results.
    */
   Real time;
 
@@ -337,21 +346,6 @@ public:
   bool print_element_jacobians;
 
   /**
-   * Element by element components of nonlinear_solution
-   * as adjusted by a time_solver
-   */
-  DenseVector<Number> elem_solution;
-  std::vector<DenseSubVector<Number> *> elem_subsolutions;
-
-  /**
-   * Element by element components of nonlinear_solution
-   * at a fixed point in a timestep, for optional use by e.g.
-   * stabilized methods
-   */
-  DenseVector<Number> elem_fixed_solution;
-  std::vector<DenseSubVector<Number> *> elem_fixed_subsolutions;
-
-  /**
    * A boolean to be set to true by systems using elem_fixed_solution,
    * so that the library code will create it.
    * False by default.
@@ -359,43 +353,6 @@ public:
    * called.
    */
   bool use_fixed_solution;
-
-  /**
-   * The derivative of elem_solution with respect to the nonlinear solution,
-   * for use by systems constructing jacobians with elem_fixed_solution
-   * based methods
-   */
-  Real elem_solution_derivative;
-
-  /**
-   * The derivative of elem_fixed_solution with respect to the nonlinear
-   * solution, for use by systems constructing jacobians with
-   * elem_fixed_solution based methods
-   */
-  Real fixed_solution_derivative;
-
-  /**
-   * Element residual vector
-   */
-  DenseVector<Number> elem_residual;
-
-  /**
-   * Element jacobian: derivatives of elem_residual with respect to
-   * elem_solution
-   */
-  DenseMatrix<Number> elem_jacobian;
-
-  /**
-   * Element residual subvectors and Jacobian submatrices
-   */
-  std::vector<DenseSubVector<Number> *> elem_subresiduals;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > elem_subjacobians;
-
-  /** 
-   * Global Degree of freedom index lists
-   */
-  std::vector<unsigned int> dof_indices;
-  std::vector<std::vector<unsigned int> > dof_indices_var;
 
 protected:
   /**
@@ -409,11 +366,6 @@ protected:
    * in time and which are just constraints
    */
   std::vector<bool> _time_evolving;
-
-  /**
-   * Clear data pointers associated with this system.
-   */
-  void clear_diff_ptrs ();
 };
 
 

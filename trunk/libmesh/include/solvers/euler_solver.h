@@ -71,7 +71,8 @@ public:
    * to build a full residual on an element.  What combination
    * it uses will depend on theta.
    */
-  virtual bool element_residual (bool get_jacobian);
+  virtual bool element_residual (bool request_jacobian,
+                                 DiffContext&);
 
   /**
    * This method uses the DifferentiableSystem's
@@ -79,7 +80,8 @@ public:
    * to build a full residual on an element's side.
    * What combination it uses will depend on theta.
    */
-  virtual bool side_residual (bool get_jacobian);
+  virtual bool side_residual (bool request_jacobian,
+                              DiffContext&);
 
   /**
    * The value for the theta method to employ: 1.0 corresponds
