@@ -521,9 +521,20 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   num_dim = mesh.spatial_dimension();
   num_nodes = mesh.n_nodes();
   num_elem = mesh.n_elem();
-  num_elem_blk = 1;
   num_node_sets = 0;
   num_side_sets = mesh.boundary_info->get_boundary_ids().size();
+
+  
+  //loop through element and map between block and element vector
+  std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
+  for(int i=0;i<num_elem;i++)
+    {
+      Elem * elem = mesh.elem(i);
+      unsigned int cur_subdomain = elem->subdomain_id();
+     
+      subdomain_map[cur_subdomain].push_back(elem->id());
+    }
+  num_elem_blk = subdomain_map.size();
 
   ex_err = exII::ex_put_init(ex_id,
 			     str_title.c_str(),
@@ -564,48 +575,57 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 // a mesh having only a single type of element.
 void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 {
-#ifdef DEBUG
-  std::vector<ElemType> et;
-  MeshTools::elem_types(mesh, et);
-
-  if (et.size() > 1)
-    {
-      std::cerr << "Warning! write_elements() currently assumes\n";
-      std::cerr << "a Mesh with a single element type!\n";
-      std::cerr << "It will probably fail spectacularly and\n";
-      std::cerr << "unpredictably on hybrid meshes!" << std::endl;
-    }
-#endif
+  std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
   
-  ExodusII_IO_Helper::ElementMaps em;
-  const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(0)->type());
-
-  num_nodes_per_elem = mesh.elem(0)->n_nodes();
-      
-  ex_err = exII::ex_put_elem_block(ex_id, 1, conv.exodus_elem_type().c_str(), num_elem,num_nodes_per_elem, 0);
-  check_err(ex_err, "Error writing element block.");
-
-  connect.resize(num_elem*num_nodes_per_elem);
-
-  for (int i=0; i<num_elem; i++)
+  //loop through element and map between block and element vector
+  for(unsigned int i=0;i<num_elem;i++)
     {
       Elem * elem = mesh.elem(i);
-
-      for (int j=0; j<num_nodes_per_elem; j++)
-	{
-	  const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
-	  const unsigned int elem_node_index = conv.get_node_map(j);
-	  if (_verbose)
-	    {
-	      std::cout << "Exodus node index: " << j
-			<< "=LibMesh node index " << elem_node_index << std::endl;
-	    }
-	  connect[connect_index] = elem->node(elem_node_index)+1;
-	}
+      unsigned int cur_subdomain = elem->subdomain_id();
+     
+      subdomain_map[cur_subdomain].push_back(elem->id());
     }
 
-  ex_err = exII::ex_put_elem_conn(ex_id, 1, &connect[0]);
-  check_err(ex_err, "Error writing element connectivities");
+  std::map<unsigned int, std::vector<unsigned int>  >::iterator it;
+  
+  for(it = subdomain_map.begin() ; it != subdomain_map.end(); it++)
+    {
+      std::vector<unsigned int> & tmp_vec = (*it).second;
+
+      ExodusII_IO_Helper::ElementMaps em;
+
+      //Use the first element in this block to get representative information.
+      //Note that Exodus assumes all elements in a block are of the same type!
+      //We are using that same assumption here!
+      const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(tmp_vec[0])->type());
+      num_nodes_per_elem = mesh.elem(tmp_vec[0])->n_nodes();
+    
+      ex_err = exII::ex_put_elem_block(ex_id, (*it).first, conv.exodus_elem_type().c_str(), tmp_vec.size(),num_nodes_per_elem,0);
+    
+      check_err(ex_err, "Error writing element block.");
+  
+      connect.resize(tmp_vec.size()*num_nodes_per_elem);
+
+      for (unsigned int i=0; i<tmp_vec.size(); i++)
+        {
+          unsigned int elem_id = tmp_vec[i];
+          Elem * elem = mesh.elem(elem_id);
+          
+          for (unsigned int j=0; j<num_nodes_per_elem; j++)
+            {  
+              const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
+              const unsigned int elem_node_index = conv.get_node_map(j);
+              if (_verbose)
+                {
+                  std::cout << "Exodus node index: " << j
+                            << "=LibMesh node index " << elem_node_index << std::endl;
+                }
+              connect[connect_index] = elem->node(elem_node_index)+1;
+            }
+        }
+    ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
+    check_err(ex_err, "Error writing element connectivities");
+  }
 }
 
 void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
