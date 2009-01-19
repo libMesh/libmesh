@@ -49,6 +49,7 @@ namespace libMesh {
    * pain to use, thus discouraging errors.
    */
   namespace libMeshPrivateData {
+#ifdef LIBMESH_HAVE_MPI
     /**
      * Total number of processors used.
      */
@@ -58,6 +59,7 @@ namespace libMesh {
      * The local processor id.
      */
     extern int _processor_id;
+#endif
     
     /**
      * Total number of threads possible.
@@ -73,7 +75,11 @@ namespace libMesh {
 inline
 unsigned int libMesh::n_processors()
 {
+#ifdef LIBMESH_HAVE_MPI
   return static_cast<unsigned int>(libMeshPrivateData::_n_processors);
+#else
+  return 1;
+#endif
 }
 
 
@@ -81,7 +87,11 @@ unsigned int libMesh::n_processors()
 inline
 unsigned int libMesh::processor_id()
 {
+#ifdef LIBMESH_HAVE_MPI
   return static_cast<unsigned int>(libMeshPrivateData::_processor_id);
+#else
+  return 0;
+#endif
 }
 
 

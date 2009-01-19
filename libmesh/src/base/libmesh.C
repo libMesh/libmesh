@@ -99,8 +99,10 @@ const unsigned int libMesh::invalid_uint = static_cast<unsigned int>(-1);
 
 // ------------------------------------------------------------
 // libMesh::libMeshPrivateData data initialization
+#ifdef LIBMESH_HAVE_MPI
 int           libMesh::libMeshPrivateData::_n_processors = 1;
 int           libMesh::libMeshPrivateData::_processor_id = 0;
+#endif
 int           libMesh::libMeshPrivateData::_n_threads = 1; /* Threads::task_scheduler_init::automatic; */
 bool          libMesh::libMeshPrivateData::_is_initialized = false;
 SolverPackage libMesh::libMeshPrivateData::_solver_package =
@@ -190,18 +192,19 @@ void _init (int &argc, char** & argv,
 	}
 # endif
     }
-#else
 
-  // No MPI, can only be uniprocessor
-  libmesh_assert (libMeshPrivateData::_n_processors == 1);
-  libmesh_assert (libMeshPrivateData::_processor_id == 0);
-  
-#endif
-  
   // Could we have gotten bad values from the above calls?
   libmesh_assert (libMeshPrivateData::_n_processors >  0);
   libmesh_assert (libMeshPrivateData::_processor_id >= 0);
 
+#else
+
+  // No MPI, can only be uniprocessor
+  // libmesh_assert (libMeshPrivateData::_n_processors == 1);
+  // libmesh_assert (libMeshPrivateData::_processor_id == 0);
+  
+#endif
+  
   // Re-parse the command-line arguments.  Note that PETSc and MPI
   // initialization above may have removed command line arguments
   // that are not relevant to this application in the above calls.
