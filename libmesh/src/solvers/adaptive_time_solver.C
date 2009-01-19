@@ -108,20 +108,22 @@ Real AdaptiveTimeSolver::error_order () const
 
 
 
-bool AdaptiveTimeSolver::element_residual (bool request_jacobian)
+bool AdaptiveTimeSolver::element_residual (bool request_jacobian,
+                                           DiffContext &context)
 {
   libmesh_assert(core_time_solver.get());
 
-  return core_time_solver->element_residual(request_jacobian);
+  return core_time_solver->element_residual(request_jacobian, context);
 }
 
 
 
-bool AdaptiveTimeSolver::side_residual (bool request_jacobian)
+bool AdaptiveTimeSolver::side_residual (bool request_jacobian,
+                                        DiffContext &context)
 {
   libmesh_assert(core_time_solver.get());
 
-  return core_time_solver->side_residual(request_jacobian);
+  return core_time_solver->side_residual(request_jacobian, context);
 }
 
 

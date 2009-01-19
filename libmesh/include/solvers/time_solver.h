@@ -32,6 +32,7 @@
 #include "reference_counted_object.h"
 
 // Forward Declarations
+class DiffContext;
 class DiffSolver;
 class TimeSolver;
 class DifferentiableSystem;
@@ -106,7 +107,8 @@ public:
    * it uses will depend on the type of solver.  See
    * the subclasses for more details.
    */
-  virtual bool element_residual (bool get_jacobian) = 0;
+  virtual bool element_residual (bool request_jacobian,
+                                 DiffContext &) = 0;
 
   /**
    * This method uses the DifferentiableSystem's
@@ -115,7 +117,8 @@ public:
    * What combination it uses will depend on the type
    * of solver.  See the subclasses for more details.
    */
-  virtual bool side_residual (bool get_jacobian) = 0;
+  virtual bool side_residual (bool request_jacobian,
+                              DiffContext &) = 0;
 
   /**
    * This method is for subclasses or users to override

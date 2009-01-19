@@ -45,7 +45,6 @@ FEMSystem::FEMSystem (EquationSystems& es,
     extra_quadrature_order(0),
     numerical_jacobian_h(1.e-6),
     verify_analytic_jacobians(0.0),
-    element_qrule(NULL), side_qrule(NULL), elem(NULL),
     _mesh_sys(libMesh::invalid_uint),
     _mesh_x_var(libMesh::invalid_uint),
     _mesh_y_var(libMesh::invalid_uint),
@@ -61,514 +60,17 @@ FEMSystem::~FEMSystem ()
 
 
 
-Number FEMSystem::interior_value(unsigned int var, unsigned int qp)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
-
-  // Get shape function values at quadrature point
-  const std::vector<std::vector<Real> > &phi =
-    element_fe_var[var]->get_phi();
-
-  // Accumulate solution value
-  Number u = 0.;
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    u += phi[l][qp] * coef(l);
-
-  return u;
-}
-
-
-
-Gradient FEMSystem::interior_gradient(unsigned int var, unsigned int qp)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
-
-  // Get shape function values at quadrature point
-  const std::vector<std::vector<RealGradient> > &dphi =
-    element_fe_var[var]->get_dphi();
-
-  // Accumulate solution derivatives
-  Gradient du;
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    du.add_scaled(dphi[l][qp], coef(l));
-
-  return du;
-}
-
-
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor FEMSystem::interior_hessian(unsigned int var, unsigned int qp)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
-
-  // Get shape function values at quadrature point
-  const std::vector<std::vector<RealTensor> > &d2phi =
-    element_fe_var[var]->get_d2phi();
-
-  // Accumulate solution second derivatives
-  Tensor d2u;
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    d2u.add_scaled(d2phi[l][qp], coef(l));
-
-  return d2u;
-}
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-
-
-Number FEMSystem::side_value(unsigned int var, unsigned int qp)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
-
-  // Get shape function values at quadrature point
-  const std::vector<std::vector<Real> > &phi =
-    side_fe_var[var]->get_phi();
-
-  // Accumulate solution value
-  Number u = 0.;
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    u += phi[l][qp] * coef(l);
-
-  return u;
-}
-
-
-
-Gradient FEMSystem::side_gradient(unsigned int var, unsigned int qp)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
-
-  // Get shape function values at quadrature point
-  const std::vector<std::vector<RealGradient> > &dphi =
-    side_fe_var[var]->get_dphi();
-
-  // Accumulate solution derivatives
-  Gradient du;
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    du.add_scaled(dphi[l][qp], coef(l));
-
-  return du;
-}
-
-
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor FEMSystem::side_hessian(unsigned int var, unsigned int qp)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
-
-  // Get shape function values at quadrature point
-  const std::vector<std::vector<RealTensor> > &d2phi =
-    side_fe_var[var]->get_d2phi();
-
-  // Accumulate solution second derivatives
-  Tensor d2u;
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    d2u.add_scaled(d2phi[l][qp], coef(l));
-
-  return d2u;
-}
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-
-
-Number FEMSystem::point_value(unsigned int var, Point &p)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  
-  // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
-
-  Number u = 0.;
-
-  unsigned int dim = get_mesh().mesh_dimension();
-  FEType fe_type = element_fe_var[var]->get_fe_type();
-  Point p_master = FEInterface::inverse_map(dim, fe_type, elem, p);
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    u += FEInterface::shape(dim, fe_type, elem, l, p_master)
-         * coef(l);
-
-  return u;
-}
-
-
-
-Number FEMSystem::fixed_interior_value(unsigned int var, unsigned int qp)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
-
-  // Get shape function values at quadrature point
-  const std::vector<std::vector<Real> > &phi =
-    element_fe_var[var]->get_phi();
-
-  // Accumulate solution value
-  Number u = 0.;
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    u += phi[l][qp] * coef(l);
-
-  return u;
-}
-
-
-
-Gradient FEMSystem::fixed_interior_gradient(unsigned int var, unsigned int qp)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
-
-  // Get shape function values at quadrature point
-  const std::vector<std::vector<RealGradient> > &dphi =
-    element_fe_var[var]->get_dphi();
-
-  // Accumulate solution derivatives
-  Gradient du;
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    du.add_scaled(dphi[l][qp], coef(l));
-
-  return du;
-}
-
-
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor FEMSystem::fixed_interior_hessian(unsigned int var, unsigned int qp)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
-
-  // Get shape function values at quadrature point
-  const std::vector<std::vector<RealTensor> > &d2phi =
-    element_fe_var[var]->get_d2phi();
-
-  // Accumulate solution second derivatives
-  Tensor d2u;
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    d2u.add_scaled(d2phi[l][qp], coef(l));
-
-  return d2u;
-}
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-
-
-Number FEMSystem::fixed_side_value(unsigned int var, unsigned int qp)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
-
-  // Get shape function values at quadrature point
-  const std::vector<std::vector<Real> > &phi =
-    side_fe_var[var]->get_phi();
-
-  // Accumulate solution value
-  Number u = 0.;
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    u += phi[l][qp] * coef(l);
-
-  return u;
-}
-
-
-
-Gradient FEMSystem::fixed_side_gradient(unsigned int var, unsigned int qp)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
-
-  // Get shape function values at quadrature point
-  const std::vector<std::vector<RealGradient> > &dphi =
-    side_fe_var[var]->get_dphi();
-
-  // Accumulate solution derivatives
-  Gradient du;
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    du.add_scaled(dphi[l][qp], coef(l));
-
-  return du;
-}
-
-
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor FEMSystem::fixed_side_hessian(unsigned int var, unsigned int qp)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
-
-  // Get shape function values at quadrature point
-  const std::vector<std::vector<RealTensor> > &d2phi =
-    side_fe_var[var]->get_d2phi();
-
-  // Accumulate solution second derivatives
-  Tensor d2u;
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    d2u.add_scaled(d2phi[l][qp], coef(l));
-
-  return d2u;
-}
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-
-
-Number FEMSystem::fixed_point_value(unsigned int var, Point &p)
-{
-  // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
-
-  
-  // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
-
-  Number u = 0.;
-
-  unsigned int dim = get_mesh().mesh_dimension();
-  FEType fe_type = element_fe_var[var]->get_fe_type();
-  Point p_master = FEInterface::inverse_map(dim, fe_type, elem, p);
-
-  for (unsigned int l=0; l != n_dofs; l++)
-    u += FEInterface::shape(dim, fe_type, elem, l, p_master)
-         * coef(l);
-
-  return u;
-}
-
-
-
 void FEMSystem::clear()
 {
-  this->clear_fem_ptrs();
-
   Parent::clear();
-}
-
-
-
-void FEMSystem::clear_fem_ptrs()
-{
-  // We don't want to store AutoPtrs in STL containers, but we don't
-  // want to leak memory either
-  for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
-       i != element_fe.end(); ++i)
-    delete i->second;
-  element_fe.clear();
-
-  for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
-       i != side_fe.end(); ++i)
-    delete i->second;
-  side_fe.clear();
-
-  delete element_qrule;
-  element_qrule = NULL;
-
-  delete side_qrule;
-  side_qrule = NULL;
 }
 
 
 
 void FEMSystem::init_data ()
 {
-  // We may have already been initialized once
-  this->clear_fem_ptrs();
-
   // First initialize LinearImplicitSystem data
   Parent::init_data();
-
-  const MeshBase &mesh = this->get_mesh();
-
-  unsigned int dim = mesh.mesh_dimension();
-
-  // We need to know which of our variables has the hardest
-  // shape functions to numerically integrate.
-
-  unsigned int n_vars = this->n_vars();
-
-  libmesh_assert (n_vars);
-  FEType hardest_fe_type = this->variable_type(0);
-
-  for (unsigned int i=0; i != n_vars; ++i)
-    {
-      FEType fe_type = this->variable_type(i);
-
-      // FIXME - we don't yet handle mixed finite elements from
-      // different families which require different quadrature rules
-      // libmesh_assert (fe_type.family == hardest_fe_type.family);
-
-      if (fe_type.order > hardest_fe_type.order)
-        hardest_fe_type = fe_type;
-    }
-
-  // Create an adequate quadrature rule
-  element_qrule = hardest_fe_type.default_quadrature_rule
-    (dim, extra_quadrature_order).release();
-  side_qrule = hardest_fe_type.default_quadrature_rule
-    (dim-1, extra_quadrature_order).release();
-
-  // Next, create finite element objects
-  element_fe_var.resize(n_vars);
-  side_fe_var.resize(n_vars);
-  for (unsigned int i=0; i != n_vars; ++i)
-    {
-      FEType fe_type = this->variable_type(i);
-      if (element_fe[fe_type] == NULL)
-        {
-          element_fe[fe_type] = FEBase::build(dim, fe_type).release();
-          element_fe[fe_type]->attach_quadrature_rule(element_qrule);
-          side_fe[fe_type] = FEBase::build(dim, fe_type).release();
-          side_fe[fe_type]->attach_quadrature_rule(side_qrule);
-        }
-      element_fe_var[i] = element_fe[fe_type];
-      side_fe_var[i] = side_fe[fe_type];
-    }
-}
-
-
-void FEMSystem::elem_reinit(Real theta)
-{
-  // Handle a moving element if necessary
-  if (_mesh_sys != libMesh::invalid_uint)
-    {
-      elem_position_set(theta);
-      elem_fe_reinit();
-    }
-}
-
-
-void FEMSystem::elem_side_reinit(Real theta)
-{
-  // Handle a moving element if necessary
-  if (_mesh_sys != libMesh::invalid_uint)
-    {
-      elem_position_set(theta);
-      elem_side_fe_reinit();
-    }
-}
-
-
-void FEMSystem::elem_fe_reinit ()
-{
-  // Initialize all the interior FE objects on elem.
-  // Logging of FE::reinit is done in the FE functions
-  std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
-  for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
-       i != fe_end; ++i)
-    {
-      i->second->reinit(elem);
-    }
-}
-
-
-void FEMSystem::elem_side_fe_reinit ()
-{
-  // Initialize all the interior FE objects on elem/side.
-  // Logging of FE::reinit is done in the FE functions
-  std::map<FEType, FEBase *>::iterator fe_end = side_fe.end();
-  for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
-       i != fe_end; ++i)
-    {
-      i->second->reinit(elem, side);
-    }
 }
 
 
@@ -586,8 +88,6 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
   START_LOG(log_name, "FEMSystem");
 
   const MeshBase& mesh = this->get_mesh();
-
-  const DofMap& dof_map = this->get_dof_map();
 
 //  this->get_vector("_nonlinear_solution").localize
 //    (*current_local_nonlinear_solution,
@@ -634,6 +134,9 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
   // we're using
   libmesh_assert (time_solver.get() != NULL);
 
+  AutoPtr<DiffContext> con = this->build_context();
+  FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+
   // Build the residual and jacobian contributions on every active
   // mesh element on this processor
   MeshBase::const_element_iterator el =
@@ -643,74 +146,18 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
   for ( ; el != end_el; ++el)
     {
-      elem = *el;
+      _femcontext.reinit(*this, *el);
 
-      // Initialize the per-element data for elem.
-      dof_map.dof_indices (elem, dof_indices);
-      unsigned int n_dofs = dof_indices.size();
-
-      elem_solution.resize(n_dofs);
-      if (use_fixed_solution)
-        elem_fixed_solution.resize(n_dofs);
-
-      for (unsigned int i=0; i != n_dofs; ++i)
-//        elem_solution(i) = current_nonlinear_solution(dof_indices[i]);
-        elem_solution(i) = current_solution(dof_indices[i]);
-
-      // These resize calls also zero out the residual and jacobian
-      elem_residual.resize(n_dofs);
-      elem_jacobian.resize(n_dofs, n_dofs);
-
-      // Initialize the per-variable data for elem.
-      unsigned int sub_dofs = 0;
-      for (unsigned int i=0; i != this->n_vars(); ++i)
-        {
-          dof_map.dof_indices (elem, dof_indices_var[i], i);
-
-          elem_subsolutions[i]->reposition
-            (sub_dofs, dof_indices_var[i].size());
-
-          if (use_fixed_solution)
-            elem_fixed_subsolutions[i]->reposition
-              (sub_dofs, dof_indices_var[i].size());
-
-          elem_subresiduals[i]->reposition
-            (sub_dofs, dof_indices_var[i].size());
-
-          for (unsigned int j=0; j != i; ++j)
-            {
-              elem_subjacobians[i][j]->reposition
-                (sub_dofs, elem_subresiduals[j]->i_off(),
-                 dof_indices_var[i].size(),
-                 dof_indices_var[j].size());
-              elem_subjacobians[j][i]->reposition
-                (elem_subresiduals[j]->i_off(), sub_dofs,
-                 dof_indices_var[j].size(),
-                 dof_indices_var[i].size());
-            }
-          elem_subjacobians[i][i]->reposition
-            (sub_dofs, sub_dofs,
-             dof_indices_var[i].size(),
-             dof_indices_var[i].size());
-          sub_dofs += dof_indices_var[i].size();
-        }
-      libmesh_assert(sub_dofs == n_dofs);
-
-      // Moving the mesh may be necessary
-      if (_mesh_sys != libMesh::invalid_uint)
-        elem_position_set(1.);
-      // Reinitializing the FE objects is definitely necessary
-      this->elem_fe_reinit();
-
-      bool jacobian_computed = time_solver->element_residual(get_jacobian);
+      bool jacobian_computed =
+	time_solver->element_residual(get_jacobian, _femcontext);
 
       // Compute a numeric jacobian if we have to
       if (get_jacobian && !jacobian_computed)
         {
           // Make sure we didn't compute a jacobian and lie about it
-          libmesh_assert(elem_jacobian.l1_norm() == 0.0);
+          libmesh_assert(_femcontext.elem_jacobian.l1_norm() == 0.0);
           // Logging of numerical jacobians is done separately
-          this->numerical_elem_jacobian();
+          this->numerical_elem_jacobian(_femcontext);
         }
 
       // Compute a numeric jacobian if we're asked to verify the
@@ -718,20 +165,20 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
       if (get_jacobian && jacobian_computed &&
           verify_analytic_jacobians != 0.0)
         {
-          DenseMatrix<Number> analytic_jacobian(elem_jacobian);
+          DenseMatrix<Number> analytic_jacobian(_femcontext.elem_jacobian);
 
-          elem_jacobian.zero();
+          _femcontext.elem_jacobian.zero();
           // Logging of numerical jacobians is done separately
-          this->numerical_elem_jacobian();
+          this->numerical_elem_jacobian(_femcontext);
 
           Real analytic_norm = analytic_jacobian.l1_norm();
-          Real numerical_norm = elem_jacobian.l1_norm();
+          Real numerical_norm = _femcontext.elem_jacobian.l1_norm();
 
           // If we can continue, we'll probably prefer the analytic jacobian
-          analytic_jacobian.swap(elem_jacobian);
+          analytic_jacobian.swap(_femcontext.elem_jacobian);
 
           // The matrix "analytic_jacobian" will now hold the error matrix
-          analytic_jacobian.add(-1.0, elem_jacobian);
+          analytic_jacobian.add(-1.0, _femcontext.elem_jacobian);
           Real error_norm = analytic_jacobian.l1_norm();
 
           Real relative_error = error_norm /
@@ -741,14 +188,14 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
             {
               std::cerr << "Relative error " << relative_error
                         << " detected in analytic jacobian on element "
-                        << elem->id() << '!' << std::endl;
+                        << _femcontext.elem->id() << '!' << std::endl;
 
               unsigned int old_precision = std::cout.precision();
               std::cout.precision(16);
-	      std::cout << "J_analytic " << elem->id() << " = "
-                        << elem_jacobian << std::endl;
-              analytic_jacobian.add(1.0, elem_jacobian);
-	      std::cout << "J_numeric " << elem->id() << " = "
+	      std::cout << "J_analytic " << _femcontext.elem->id() << " = "
+                        << _femcontext.elem_jacobian << std::endl;
+              analytic_jacobian.add(1.0, _femcontext.elem_jacobian);
+	      std::cout << "J_numeric " << _femcontext.elem->id() << " = "
                         << analytic_jacobian << std::endl;
 
               std::cout.precision(old_precision);
@@ -757,16 +204,19 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
             }
         }
 
-      for (side = 0; side != elem->n_sides(); ++side)
+      for (_femcontext.side = 0;
+           _femcontext.side != _femcontext.elem->n_sides();
+           ++_femcontext.side)
         {
           // Don't compute on non-boundary sides unless requested
-          if (!compute_internal_sides && elem->neighbor(side) != NULL)
+          if (!compute_internal_sides && 
+	      _femcontext.elem->neighbor(_femcontext.side) != NULL)
             continue;
 
           // Any mesh movement has already been done (and restored,
           // if the TimeSolver isn't broken), but
           // reinitializing the side FE objects is still necessary
-          this->elem_side_fe_reinit();
+          _femcontext.elem_side_fe_reinit();
 
           DenseMatrix<Number> old_jacobian;
           // If we're in DEBUG mode, we should always verify that the
@@ -779,10 +229,11 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
           if (verify_analytic_jacobians != 0.0 && get_jacobian)
 #endif // ifndef DEBUG
             {
-              old_jacobian = elem_jacobian;
-              elem_jacobian.zero();
+              old_jacobian = _femcontext.elem_jacobian;
+              _femcontext.elem_jacobian.zero();
             }
-          jacobian_computed = time_solver->side_residual(get_jacobian);
+	  jacobian_computed =
+            time_solver->side_residual(get_jacobian, _femcontext);
 
           // Compute a numeric jacobian if we have to
           if (get_jacobian && !jacobian_computed)
@@ -791,10 +242,10 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 	      // so we can make sure side_residual didn't compute a
               // jacobian and lie about it
 #ifdef DEBUG
-              libmesh_assert(elem_jacobian.l1_norm() == 0.0);
+              libmesh_assert(_femcontext.elem_jacobian.l1_norm() == 0.0);
 #endif
               // Logging of numerical jacobians is done separately
-              this->numerical_side_jacobian();
+              this->numerical_side_jacobian(_femcontext);
 
               // If we're in DEBUG mode or if
 	      // verify_analytic_jacobians is on, we've moved
@@ -803,7 +254,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 #ifndef DEBUG
               if (verify_analytic_jacobians != 0.0)
 #endif // ifndef DEBUG
-                elem_jacobian += old_jacobian;
+                _femcontext.elem_jacobian += old_jacobian;
             }
 
           // Compute a numeric jacobian if we're asked to verify the
@@ -811,20 +262,20 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 	  if (get_jacobian && jacobian_computed &&
               verify_analytic_jacobians != 0.0)
             {
-              DenseMatrix<Number> analytic_jacobian(elem_jacobian);
+	      DenseMatrix<Number> analytic_jacobian(_femcontext.elem_jacobian);
 
-              elem_jacobian.zero();
+              _femcontext.elem_jacobian.zero();
               // Logging of numerical jacobians is done separately
-              this->numerical_side_jacobian();
+              this->numerical_side_jacobian(_femcontext);
 
               Real analytic_norm = analytic_jacobian.l1_norm();
-              Real numerical_norm = elem_jacobian.l1_norm();
+              Real numerical_norm = _femcontext.elem_jacobian.l1_norm();
 
               // If we can continue, we'll probably prefer the analytic jacobian
-              analytic_jacobian.swap(elem_jacobian);
+              analytic_jacobian.swap(_femcontext.elem_jacobian);
 
               // The matrix "analytic_jacobian" will now hold the error matrix
-              analytic_jacobian.add(-1.0, elem_jacobian);
+              analytic_jacobian.add(-1.0, _femcontext.elem_jacobian);
               Real error_norm = analytic_jacobian.l1_norm();
 
               Real relative_error = error_norm /
@@ -834,15 +285,16 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                 {
                   std::cerr << "Relative error " << relative_error
                             << " detected in analytic jacobian on element "
-                            << elem->id()
-			    << ", side " << side << '!' << std::endl;
+                            << _femcontext.elem->id()
+			    << ", side "
+                            << _femcontext.side << '!' << std::endl;
 
                   unsigned int old_precision = std::cout.precision();
                   std::cout.precision(16);
-	          std::cout << "J_analytic " << elem->id() << " = "
-                            << elem_jacobian << std::endl;
-                  analytic_jacobian.add(1.0, elem_jacobian);
-	          std::cout << "J_numeric " << elem->id() << " = "
+	          std::cout << "J_analytic " << _femcontext.elem->id() << " = "
+                            << _femcontext.elem_jacobian << std::endl;
+                  analytic_jacobian.add(1.0, _femcontext.elem_jacobian);
+	          std::cout << "J_numeric " << _femcontext.elem->id() << " = "
                             << analytic_jacobian << std::endl;
                   std::cout.precision(old_precision);
 
@@ -850,7 +302,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                 }
               // Once we've verified a side, we'll want to add back the
               // rest of the accumulated jacobian
-              elem_jacobian += old_jacobian;
+              _femcontext.elem_jacobian += old_jacobian;
             }
 	  // In DEBUG mode, we've set elem_jacobian == 0, and we
           // may still need to add the old jacobian back
@@ -858,7 +310,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 	  if (get_jacobian && jacobian_computed &&
               verify_analytic_jacobians == 0.0)
             {
-              elem_jacobian += old_jacobian;
+              _femcontext.elem_jacobian += old_jacobian;
             }
 #endif // ifdef DEBUG
         }
@@ -868,28 +320,31 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
       // enforce_constraints_exactly() should be called in the solver
       if (get_residual && get_jacobian)
         this->get_dof_map().constrain_element_matrix_and_vector
-          (elem_jacobian, elem_residual, dof_indices, false);
+          (_femcontext.elem_jacobian, _femcontext.elem_residual,
+           _femcontext.dof_indices, false);
       else if (get_residual)
         this->get_dof_map().constrain_element_vector
-          (elem_residual, dof_indices, false);
+          (_femcontext.elem_residual, _femcontext.dof_indices, false);
       else if (get_jacobian)
         this->get_dof_map().constrain_element_matrix
-          (elem_jacobian, dof_indices, false);
+          (_femcontext.elem_jacobian, _femcontext.dof_indices, false);
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
       if (get_jacobian && print_element_jacobians)
         {
           unsigned int old_precision = std::cout.precision();
           std::cout.precision(16);
-	  std::cout << "J_elem " << elem->id() << " = "
-                    << elem_jacobian << std::endl;
+	  std::cout << "J_elem " << _femcontext.elem->id() << " = "
+                    << _femcontext.elem_jacobian << std::endl;
           std::cout.precision(old_precision);
         }
 
       if (get_jacobian)
-        this->matrix->add_matrix (elem_jacobian, dof_indices);
+        this->matrix->add_matrix (_femcontext.elem_jacobian,
+                                  _femcontext.dof_indices);
       if (get_residual)
-        this->rhs->add_vector (elem_residual, dof_indices);
+        this->rhs->add_vector (_femcontext.elem_residual,
+                               _femcontext.dof_indices);
     }
 
 
@@ -941,12 +396,13 @@ void FEMSystem::mesh_position_set()
 
   const MeshBase& mesh = this->get_mesh();
 
-  const DofMap& dof_map = this->get_dof_map();
-
   // This code won't work on a parallelized mesh yet -
   // it won't get ancestor elements right.
   libmesh_assert(mesh.is_serial());
   
+  AutoPtr<DiffContext> con = this->build_context();
+  FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+
   // Move every mesh element we can
   MeshBase::const_element_iterator el =
     mesh.active_elements_begin();
@@ -955,33 +411,12 @@ void FEMSystem::mesh_position_set()
 
   for ( ; el != end_el; ++el)
     {
-      elem = *el;
+      _femcontext.reinit(*this, *el);
 
       // This code won't handle moving subactive elements
-      libmesh_assert(!elem->has_children());
+      libmesh_assert(!_femcontext.elem->has_children());
 
-      // Initialize the per-element data for elem.
-      dof_map.dof_indices (elem, dof_indices);
-      unsigned int n_dofs = dof_indices.size();
-
-      elem_solution.resize(n_dofs);
-
-      for (unsigned int i=0; i != n_dofs; ++i)
-        elem_solution(i) = current_solution(dof_indices[i]);
-
-      // Initialize the per-variable data for elem.
-      unsigned int sub_dofs = 0;
-      for (unsigned int i=0; i != this->n_vars(); ++i)
-        {
-          dof_map.dof_indices (elem, dof_indices_var[i], i);
-
-          elem_subsolutions[i]->reposition
-            (sub_dofs, dof_indices_var[i].size());
-
-          sub_dofs += dof_indices_var[i].size();
-        }
-
-      this->elem_position_set(0.);
+      _femcontext.elem_position_set(0.);
     }
 }
 
@@ -993,12 +428,10 @@ void FEMSystem::postprocess ()
 
   const MeshBase& mesh = this->get_mesh();
 
-  const DofMap& dof_map = this->get_dof_map();
-
-//  this->get_vector("_nonlinear_solution").localize
-//    (*current_local_nonlinear_solution,
-//     dof_map.get_send_list());
   this->update();
+
+  AutoPtr<DiffContext> con = this->build_context();
+  FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
 
   // Loop over every active mesh element on this processor
   MeshBase::const_element_iterator el =
@@ -1008,68 +441,40 @@ void FEMSystem::postprocess ()
 
   for ( ; el != end_el; ++el)
     {
-      elem = *el;
-
-      // Initialize the per-element data for elem.
-      dof_map.dof_indices (elem, dof_indices);
-      unsigned int n_dofs = dof_indices.size();
-
-      elem_solution.resize(n_dofs);
-      // This resize call also zeros out the residual
-      elem_residual.resize(n_dofs);
-
-      for (unsigned int i=0; i != n_dofs; ++i)
-//        elem_solution(i) = current_nonlinear_solution(dof_indices[i]);
-        elem_solution(i) = current_solution(dof_indices[i]);
-
-      // Initialize the per-variable data for elem.
-      unsigned int sub_dofs = 0;
-      for (unsigned int i=0; i != this->n_vars(); ++i)
-        {
-          dof_map.dof_indices (elem, dof_indices_var[i], i);
-
-          elem_subsolutions[i]->reposition
-            (sub_dofs, dof_indices_var[i].size());
-
-          if (use_fixed_solution)
-            elem_fixed_subsolutions[i]->reposition
-              (sub_dofs, dof_indices_var[i].size());
-
-          elem_subresiduals[i]->reposition
-            (sub_dofs, dof_indices_var[i].size());
-
-          sub_dofs += dof_indices_var[i].size();
-        }
-      libmesh_assert(sub_dofs == n_dofs);
+      _femcontext.reinit(*this, *el);
 
       // Optionally initialize all the interior FE objects on elem.
-      if (fe_reinit_during_postprocess)
-        this->elem_fe_reinit();
+      // if (fe_reinit_during_postprocess)
+      // _femcontext.elem_fe_reinit();
       
-      this->element_postprocess();
+      this->element_postprocess(_femcontext);
 
-      for (side = 0; side != elem->n_sides(); ++side)
+      for (_femcontext.side = 0;
+           _femcontext.side != _femcontext.elem->n_sides();
+           ++_femcontext.side)
         {
           // Don't compute on non-boundary sides unless requested
           if (!postprocess_sides ||
               (!compute_internal_sides &&
-               elem->neighbor(side) != NULL))
+               _femcontext.elem->neighbor(_femcontext.side) != NULL))
             continue;
 
           // Optionally initialize all the interior FE objects on elem/side.
           // Logging of FE::reinit is done in the FE functions
           if (fe_reinit_during_postprocess)
             {
-              std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
-              fe_end = side_fe.end();
-              for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
+              std::map<FEType, FEBase *>::iterator fe_end =
+                _femcontext.element_fe.end();
+              fe_end = _femcontext.side_fe.end();
+              for (std::map<FEType, FEBase *>::iterator i =
+                _femcontext.side_fe.begin();
                    i != fe_end; ++i)
                 {
-                  i->second->reinit(elem, side);
+		  i->second->reinit(_femcontext.elem, _femcontext.side);
                 }
             }
 
-          this->side_postprocess();
+          this->side_postprocess(_femcontext);
         }
     }
 
@@ -1078,27 +483,28 @@ void FEMSystem::postprocess ()
 
 
 
-void FEMSystem::numerical_jacobian (TimeSolverResPtr res)
+void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
+                                    FEMContext &context)
 {
   // Logging is done by numerical_elem_jacobian
   // or numerical_side_jacobian
 
-  DenseVector<Number> original_residual(elem_residual);
-  DenseVector<Number> backwards_residual(elem_residual);
-  DenseMatrix<Number> numerical_jacobian(elem_jacobian);
+  DenseVector<Number> original_residual(context.elem_residual);
+  DenseVector<Number> backwards_residual(context.elem_residual);
+  DenseMatrix<Number> numerical_jacobian(context.elem_jacobian);
 #ifdef DEBUG
-  DenseMatrix<Number> old_jacobian(elem_jacobian);
+  DenseMatrix<Number> old_jacobian(context.elem_jacobian);
 #endif
 
   Real numerical_point_h = 0.;
   if (_mesh_sys == this->number())
-    numerical_point_h = numerical_jacobian_h * elem->hmin();
+    numerical_point_h = numerical_jacobian_h * context.elem->hmin();
 
-  for (unsigned int j = 0; j != dof_indices.size(); ++j)
+  for (unsigned int j = 0; j != context.dof_indices.size(); ++j)
     {
       // Take the "minus" side of a central differenced first derivative
-      Number original_solution = elem_solution(j);
-      elem_solution(j) -= numerical_jacobian_h;
+      Number original_solution = context.elem_solution(j);
+      context.elem_solution(j) -= numerical_jacobian_h;
 
       // Make sure to catch any moving mesh terms
       // FIXME - this could be less ugly
@@ -1107,90 +513,117 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res)
         {
           if (_mesh_x_var != libMesh::invalid_uint)
             for (unsigned int k = 0;
-                 k != dof_indices_var[_mesh_x_var].size(); ++k)
-              if (dof_indices_var[_mesh_x_var][k] == dof_indices[j])
-                coord = &(elem->point(k)(0));
+                 k != context.dof_indices_var[_mesh_x_var].size(); ++k)
+              if (context.dof_indices_var[_mesh_x_var][k] ==
+                  context.dof_indices[j])
+                coord = &(context.elem->point(k)(0));
           if (_mesh_y_var != libMesh::invalid_uint)
             for (unsigned int k = 0;
-                 k != dof_indices_var[_mesh_y_var].size(); ++k)
-              if (dof_indices_var[_mesh_y_var][k] == dof_indices[j])
-                coord = &(elem->point(k)(1));
+                 k != context.dof_indices_var[_mesh_y_var].size(); ++k)
+              if (context.dof_indices_var[_mesh_y_var][k] == 
+                  context.dof_indices[j])
+                coord = &(context.elem->point(k)(1));
           if (_mesh_z_var != libMesh::invalid_uint)
             for (unsigned int k = 0;
-                 k != dof_indices_var[_mesh_z_var].size(); ++k)
-              if (dof_indices_var[_mesh_z_var][k] == dof_indices[j])
-                coord = &(elem->point(k)(2));
+                 k != context.dof_indices_var[_mesh_z_var].size(); ++k)
+	      if (context.dof_indices_var[_mesh_z_var][k] ==
+                  context.dof_indices[j])
+                coord = &(context.elem->point(k)(2));
         }
       if (coord)
         {
           // We have enough information to scale the perturbations
           // here appropriately
-          elem_solution(j) = original_solution - numerical_point_h;
-          *coord = libmesh_real(elem_solution(j));
+          context.elem_solution(j) = original_solution - numerical_point_h;
+          *coord = libmesh_real(context.elem_solution(j));
         }
 
-      elem_residual.zero();
-      ((*time_solver).*(res))(false);
+      context.elem_residual.zero();
+      ((*time_solver).*(res))(false, context);
 #ifdef DEBUG
-      libmesh_assert(old_jacobian == elem_jacobian);
+      libmesh_assert(old_jacobian == context.elem_jacobian);
 #endif
-      backwards_residual = elem_residual;
+      backwards_residual = context.elem_residual;
 
       // Take the "plus" side of a central differenced first derivative
-      elem_solution(j) = original_solution + numerical_jacobian_h;
+      context.elem_solution(j) = original_solution + numerical_jacobian_h;
       if (coord)
         {
-          elem_solution(j) = original_solution + numerical_point_h;
-          *coord = libmesh_real(elem_solution(j));
+          context.elem_solution(j) = original_solution + numerical_point_h;
+          *coord = libmesh_real(context.elem_solution(j));
         }
-      elem_residual.zero();
-      ((*time_solver).*(res))(false);
+      context.elem_residual.zero();
+      ((*time_solver).*(res))(false, context);
 #ifdef DEBUG
-      libmesh_assert(old_jacobian == elem_jacobian);
+      libmesh_assert(old_jacobian == context.elem_jacobian);
 #endif
 
-      elem_solution(j) = original_solution;
+      context.elem_solution(j) = original_solution;
       if (coord)
         {
-          *coord = libmesh_real(elem_solution(j));
-          for (unsigned int i = 0; i != dof_indices.size(); ++i)
+          *coord = libmesh_real(context.elem_solution(j));
+	  for (unsigned int i = 0; i != context.dof_indices.size(); ++i)
             {
               numerical_jacobian(i,j) =
-                (elem_residual(i) - backwards_residual(i)) /
+                (context.elem_residual(i) - backwards_residual(i)) /
                 2. / numerical_point_h;
             }
         }
       else
         {
-          for (unsigned int i = 0; i != dof_indices.size(); ++i)
+          for (unsigned int i = 0; i != context.dof_indices.size(); ++i)
             {
               numerical_jacobian(i,j) =
-                (elem_residual(i) - backwards_residual(i)) /
+                (context.elem_residual(i) - backwards_residual(i)) /
                 2. / numerical_jacobian_h;
             }
         }
     }
 
-  elem_residual = original_residual;
-  elem_jacobian = numerical_jacobian;
+  context.elem_residual = original_residual;
+  context.elem_jacobian = numerical_jacobian;
 }
 
 
 
-void FEMSystem::numerical_elem_jacobian ()
+void FEMSystem::numerical_elem_jacobian (FEMContext &context)
 {
   START_LOG("numerical_elem_jacobian()", "FEMSystem");
-  this->numerical_jacobian(&TimeSolver::element_residual);
+  this->numerical_jacobian(&TimeSolver::element_residual, context);
   STOP_LOG("numerical_elem_jacobian()", "FEMSystem");
 }
 
 
 
-void FEMSystem::numerical_side_jacobian ()
+void FEMSystem::numerical_side_jacobian (FEMContext &context)
 {
   START_LOG("numerical_side_jacobian()", "FEMSystem");
-  this->numerical_jacobian(&TimeSolver::side_residual);
+  this->numerical_jacobian(&TimeSolver::side_residual, context);
   STOP_LOG("numerical_side_jacobian()", "FEMSystem");
+}
+
+
+
+AutoPtr<DiffContext> FEMSystem::build_context ()
+{
+  return AutoPtr<DiffContext>(new FEMContext(*this));
+}
+
+
+
+void FEMSystem::init_context(DiffContext &c)
+{
+  Parent::init_context(c);
+
+  FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
+
+  // Make sure we're prepared to do mass integration
+  for (unsigned int var = 0; var != this->n_vars(); ++var)
+    if (_time_evolving[var])
+      {
+        context.element_fe_var[var]->get_JxW();
+        context.element_fe_var[var]->get_phi();
+      }
 }
 
 
@@ -1199,10 +632,6 @@ void FEMSystem::time_evolving (unsigned int var)
 {
   // Call the parent function
   Parent::time_evolving(var);
-
-  // Then make sure we're prepared to do mass integration
-  element_fe_var[var]->get_JxW();
-  element_fe_var[var]->get_phi();
 }
 
 
@@ -1264,18 +693,32 @@ void FEMSystem::mesh_position_get()
   const MeshBase::const_element_iterator end_el =
     mesh.active_local_elements_end();
 
+  AutoPtr<DiffContext> con = this->build_context();
+  FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+  this->init_context(_femcontext);
+
   // Get the solution's mesh variables from every element
   for ( ; el != end_el; ++el)
     {
-      elem = *el;
+      _femcontext.elem = *el;
 
       // Initialize the per-variable data for elem.
       for (unsigned int i=0; i != this->n_vars(); ++i)
         {
-          dof_map.dof_indices (elem, dof_indices_var[i], i);
+          dof_map.dof_indices (_femcontext.elem,
+                               _femcontext.dof_indices_var[i], i);
         }
 
-      this->elem_position_get();
+      _femcontext.elem_position_get();
+      if (_mesh_x_var != libMesh::invalid_uint)
+        this->solution->insert(*_femcontext.elem_subsolutions[_mesh_x_var],
+                               _femcontext.dof_indices_var[_mesh_x_var]);
+      if (_mesh_y_var != libMesh::invalid_uint)
+        this->solution->insert(*_femcontext.elem_subsolutions[_mesh_y_var],
+                               _femcontext.dof_indices_var[_mesh_y_var]);
+      if (_mesh_z_var != libMesh::invalid_uint)
+        this->solution->insert(*_femcontext.elem_subsolutions[_mesh_z_var],
+                               _femcontext.dof_indices_var[_mesh_z_var]);
     }
 
   // And make sure the current_local_solution is up to date too
@@ -1283,129 +726,26 @@ void FEMSystem::mesh_position_get()
 }
 
 
-
-void FEMSystem::elem_position_get()
-{
-  // This is too expensive to call unless we've been asked to move the mesh
-  libmesh_assert (_mesh_sys != libMesh::invalid_uint);
-
-  // If the coordinate data is in our own system, it's already
-  // been set up for us
-  if (_mesh_sys == this->number())
-    {
-      unsigned int n_nodes = elem->n_nodes();
-      // For simplicity we demand that mesh coordinates be stored
-      // in a format that allows a direct copy
-      libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
-                     (element_fe_var[_mesh_x_var]->get_fe_type().family
-                      == LAGRANGE &&
-                      element_fe_var[_mesh_x_var]->get_fe_type().order
-                      == elem->default_order()));
-      libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
-                     (element_fe_var[_mesh_y_var]->get_fe_type().family
-                      == LAGRANGE &&
-                      element_fe_var[_mesh_y_var]->get_fe_type().order
-                      == elem->default_order()));
-      libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
-                     (element_fe_var[_mesh_z_var]->get_fe_type().family
-                      == LAGRANGE &&
-                      element_fe_var[_mesh_z_var]->get_fe_type().order
-                      == elem->default_order()));
-
-      // Get degree of freedom coefficients from point coordinates
-      if (_mesh_x_var != libMesh::invalid_uint)
-        for (unsigned int i=0; i != n_nodes; ++i)
-          this->solution->set(dof_indices_var[_mesh_x_var][i],
-                              elem->point(i)(0));
-
-      if (_mesh_y_var != libMesh::invalid_uint)
-        for (unsigned int i=0; i != n_nodes; ++i)
-          this->solution->set(dof_indices_var[_mesh_y_var][i],
-                             elem->point(i)(1));
-
-      if (_mesh_z_var != libMesh::invalid_uint)
-        for (unsigned int i=0; i != n_nodes; ++i)
-          this->solution->set(dof_indices_var[_mesh_z_var][i],
-                              elem->point(i)(2));
-    }
-  // FIXME - If the coordinate data is not in our own system, someone
-  // had better get around to implementing that... - RHS
-  else
-    {
-      libmesh_not_implemented();
-    }
-}
-
-
-
-void FEMSystem::elem_position_set(Real)
-{
-  // This is too expensive to call unless we've been asked to move the mesh
-  libmesh_assert (_mesh_sys != libMesh::invalid_uint);
-
-  // If the coordinate data is in our own system, it's already
-  // been set up for us, and we can ignore our input parameter theta
-  if (_mesh_sys == this->number())
-    {
-      unsigned int n_nodes = elem->n_nodes();
-      // For simplicity we demand that mesh coordinates be stored
-      // in a format that allows a direct copy
-      libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
-                     (element_fe_var[_mesh_x_var]->get_fe_type().family
-                      == LAGRANGE &&
-                      elem_subsolutions[_mesh_x_var]->size() == n_nodes));
-      libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
-                     (element_fe_var[_mesh_y_var]->get_fe_type().family
-                      == LAGRANGE &&
-                      elem_subsolutions[_mesh_y_var]->size() == n_nodes));
-      libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
-                     (element_fe_var[_mesh_z_var]->get_fe_type().family
-                      == LAGRANGE &&
-                      elem_subsolutions[_mesh_z_var]->size() == n_nodes));
-
-      // Set the new point coordinates
-      if (_mesh_x_var != libMesh::invalid_uint)
-        for (unsigned int i=0; i != n_nodes; ++i)
-          elem->point(i)(0) =
-            libmesh_real((*elem_subsolutions[_mesh_x_var])(i));
-
-      if (_mesh_y_var != libMesh::invalid_uint)
-        for (unsigned int i=0; i != n_nodes; ++i)
-          elem->point(i)(1) =
-            libmesh_real((*elem_subsolutions[_mesh_y_var])(i));
-
-      if (_mesh_z_var != libMesh::invalid_uint)
-        for (unsigned int i=0; i != n_nodes; ++i)
-          elem->point(i)(2) =
-            libmesh_real((*elem_subsolutions[_mesh_z_var])(i));
-    }
-  // FIXME - If the coordinate data is not in our own system, someone
-  // had better get around to implementing that... - RHS
-  else
-    {
-      libmesh_not_implemented();
-    }
-}
-
-
-
-bool FEMSystem::eulerian_residual (bool request_jacobian)
+bool FEMSystem::eulerian_residual (bool request_jacobian,
+                                   DiffContext &c)
 {
   // Only calculate a mesh movement residual if it's necessary
   if (_mesh_sys == libMesh::invalid_uint)
     return request_jacobian;
 
+  FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
+
   // This function only supports fully coupled mesh motion for now
   libmesh_assert(_mesh_sys == this->number());
 
-  unsigned int n_qpoints = element_qrule->n_points();
+  unsigned int n_qpoints = context.element_qrule->n_points();
 
   const unsigned int n_x_dofs = (_mesh_x_var == libMesh::invalid_uint) ?
-                                0 : dof_indices_var[_mesh_x_var].size();
+                                0 : context.dof_indices_var[_mesh_x_var].size();
   const unsigned int n_y_dofs = (_mesh_y_var == libMesh::invalid_uint) ?
-                                0 : dof_indices_var[_mesh_y_var].size();
+                                0 : context.dof_indices_var[_mesh_y_var].size();
   const unsigned int n_z_dofs = (_mesh_z_var == libMesh::invalid_uint) ?
-                                0 : dof_indices_var[_mesh_z_var].size();
+                                0 : context.dof_indices_var[_mesh_z_var].size();
 
   const unsigned int mesh_xyz_var = n_x_dofs ? _mesh_x_var :
                                    (n_y_dofs ? _mesh_y_var :
@@ -1416,15 +756,15 @@ bool FEMSystem::eulerian_residual (bool request_jacobian)
   // at least one coordinate, and we'd better have the same
   // FE type for all coordinates we are in charge of
   libmesh_assert(mesh_xyz_var != libMesh::invalid_uint);
-  libmesh_assert(!n_x_dofs || element_fe_var[_mesh_x_var] ==
-                              element_fe_var[mesh_xyz_var]);
-  libmesh_assert(!n_y_dofs || element_fe_var[_mesh_y_var] ==
-                              element_fe_var[mesh_xyz_var]);
-  libmesh_assert(!n_z_dofs || element_fe_var[_mesh_z_var] ==
-                              element_fe_var[mesh_xyz_var]);
+  libmesh_assert(!n_x_dofs || context.element_fe_var[_mesh_x_var] ==
+                              context.element_fe_var[mesh_xyz_var]);
+  libmesh_assert(!n_y_dofs || context.element_fe_var[_mesh_y_var] ==
+                              context.element_fe_var[mesh_xyz_var]);
+  libmesh_assert(!n_z_dofs || context.element_fe_var[_mesh_z_var] ==
+                              context.element_fe_var[mesh_xyz_var]);
 
   const std::vector<std::vector<Real> >     &psi =
-    element_fe_var[mesh_xyz_var]->get_phi();
+    context.element_fe_var[mesh_xyz_var]->get_phi();
 
   for (unsigned int var = 0; var != this->n_vars(); ++var)
     {
@@ -1453,25 +793,25 @@ bool FEMSystem::eulerian_residual (bool request_jacobian)
         return request_jacobian;
 
       const std::vector<Real> &JxW = 
-        element_fe_var[var]->get_JxW();
+        context.element_fe_var[var]->get_JxW();
 
       const std::vector<std::vector<Real> >     &phi =
-        element_fe_var[var]->get_phi();
+        context.element_fe_var[var]->get_phi();
 
       const std::vector<std::vector<RealGradient> > &dphi =
-        element_fe_var[var]->get_dphi();
+        context.element_fe_var[var]->get_dphi();
 
-      const unsigned int n_u_dofs = dof_indices_var[var].size();
+      const unsigned int n_u_dofs = context.dof_indices_var[var].size();
 
-      DenseSubVector<Number> &Fu = *elem_subresiduals[var];
-      DenseSubMatrix<Number> &Kuu = *elem_subjacobians[var][var];
+      DenseSubVector<Number> &Fu = *context.elem_subresiduals[var];
+      DenseSubMatrix<Number> &Kuu = *context.elem_subjacobians[var][var];
 
       DenseSubMatrix<Number> *Kux = n_x_dofs ?
-        elem_subjacobians[var][_mesh_x_var] : NULL;
+        context.elem_subjacobians[var][_mesh_x_var] : NULL;
       DenseSubMatrix<Number> *Kuy = n_y_dofs ?
-        elem_subjacobians[var][_mesh_y_var] : NULL;
+        context.elem_subjacobians[var][_mesh_y_var] : NULL;
       DenseSubMatrix<Number> *Kuz = n_z_dofs ?
-        elem_subjacobians[var][_mesh_z_var] : NULL;
+        context.elem_subjacobians[var][_mesh_z_var] : NULL;
 
       std::vector<Real> delta_x(n_x_dofs, 0.);
       std::vector<Real> delta_y(n_y_dofs, 0.);
@@ -1479,28 +819,28 @@ bool FEMSystem::eulerian_residual (bool request_jacobian)
 
       for (unsigned int i = 0; i != n_x_dofs; ++i)
         {
-          unsigned int j = dof_indices_var[_mesh_x_var][i];
+          unsigned int j = context.dof_indices_var[_mesh_x_var][i];
           delta_x[i] = libmesh_real(this->current_solution(j)) -
                        libmesh_real(unsteady->old_nonlinear_solution(j));
         }
 
       for (unsigned int i = 0; i != n_y_dofs; ++i)
         {
-          unsigned int j = dof_indices_var[_mesh_y_var][i];
+          unsigned int j = context.dof_indices_var[_mesh_y_var][i];
           delta_y[i] = libmesh_real(this->current_solution(j)) -
                        libmesh_real(unsteady->old_nonlinear_solution(j));
         }
 
       for (unsigned int i = 0; i != n_z_dofs; ++i)
         {
-          unsigned int j = dof_indices_var[_mesh_z_var][i];
+          unsigned int j = context.dof_indices_var[_mesh_z_var][i];
           delta_z[i] = libmesh_real(this->current_solution(j)) -
                        libmesh_real(unsteady->old_nonlinear_solution(j));
         }
 
       for (unsigned int qp = 0; qp != n_qpoints; ++qp)
         {
-          Gradient grad_u = interior_gradient(var, qp);
+          Gradient grad_u = context.interior_gradient(var, qp);
           RealGradient convection(0.);
 
           for (unsigned int i = 0; i != n_x_dofs; ++i)
@@ -1543,9 +883,12 @@ bool FEMSystem::eulerian_residual (bool request_jacobian)
 
       
 
-bool FEMSystem::mass_residual (bool request_jacobian)
+bool FEMSystem::mass_residual (bool request_jacobian,
+                               DiffContext &c)
 {
-  unsigned int n_qpoints = element_qrule->n_points();
+  FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
+
+  unsigned int n_qpoints = context.element_qrule->n_points();
 
   for (unsigned int var = 0; var != this->n_vars(); ++var)
     {
@@ -1553,26 +896,26 @@ bool FEMSystem::mass_residual (bool request_jacobian)
         continue;
 
       const std::vector<Real> &JxW = 
-        element_fe_var[var]->get_JxW();
+        context.element_fe_var[var]->get_JxW();
 
       const std::vector<std::vector<Real> > &phi =
-        element_fe_var[var]->get_phi();
+        context.element_fe_var[var]->get_phi();
 
-      const unsigned int n_dofs = dof_indices_var[var].size();
+      const unsigned int n_dofs = context.dof_indices_var[var].size();
 
-      DenseSubVector<Number> &Fu = *elem_subresiduals[var];
-      DenseSubMatrix<Number> &Kuu = *elem_subjacobians[var][var];
+      DenseSubVector<Number> &Fu = *context.elem_subresiduals[var];
+      DenseSubMatrix<Number> &Kuu = *context.elem_subjacobians[var][var];
 
       for (unsigned int qp = 0; qp != n_qpoints; ++qp)
         {
-          Number u = interior_value(var, qp);
+          Number u = context.interior_value(var, qp);
           Number JxWxU = JxW[qp] * u;
           for (unsigned int i = 0; i != n_dofs; ++i)
             {
               Fu(i) += JxWxU * phi[i][qp];
-              if (request_jacobian && elem_solution_derivative)
+              if (request_jacobian && context.elem_solution_derivative)
                 {
-                  libmesh_assert (elem_solution_derivative == 1.0);
+                  libmesh_assert (context.elem_solution_derivative == 1.0);
 
                   Number JxWxPhiI = JxW[qp] * phi[i][qp];
                   Kuu(i,i) += JxWxPhiI * phi[i][qp];

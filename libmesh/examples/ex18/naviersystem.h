@@ -35,25 +35,26 @@ public:
   // System initialization
   virtual void init_data ();
 
+  // Context initialization
+  virtual void init_context(DiffContext &context);
+
   // Element residual and jacobian calculations
   // Time dependent parts
-  virtual bool element_time_derivative (bool request_jacobian);
+  virtual bool element_time_derivative (bool request_jacobian,
+                                        DiffContext& context);
 
   // Constraint parts
-  virtual bool element_constraint (bool request_jacobian);
-  virtual bool side_constraint (bool request_jacobian);
+  virtual bool element_constraint (bool request_jacobian,
+                                   DiffContext& context);
+  virtual bool side_constraint (bool request_jacobian,
+                                DiffContext& context);
 
   // Mass matrix part
-  virtual bool mass_residual (bool request_jacobian);
+  virtual bool mass_residual (bool request_jacobian,
+                              DiffContext& context);
 
   // Indices for each variable;
   unsigned int p_var, u_var, v_var, w_var;
-
-  // Finite elements for the velocity and pressure on element interiors
-  FEBase *fe_velocity, *fe_pressure;
-
-  // Finite element for the velocity on element sides
-  FEBase *fe_side_vel;
 
   // The Reynolds number to solve for
   Real Reynolds;

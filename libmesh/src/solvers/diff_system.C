@@ -42,9 +42,7 @@ DifferentiableSystem::DifferentiableSystem
   print_jacobian_norms(false),
   print_jacobians(false),
   print_element_jacobians(false),
-  use_fixed_solution(false),
-  elem_solution_derivative(1.),
-  fixed_solution_derivative(0.)
+  use_fixed_solution(false)
 {
   untested();
 }
@@ -60,36 +58,9 @@ DifferentiableSystem::~DifferentiableSystem ()
 
 void DifferentiableSystem::clear ()
 {
-  this->clear_diff_ptrs();
-
   _time_evolving.resize(0);
 
   use_fixed_solution = false;
-}
-
-
-
-void DifferentiableSystem::clear_diff_ptrs ()
-{
-  for (unsigned int i=0; i != elem_subsolutions.size(); ++i)
-    {
-      delete elem_subsolutions[i];
-      delete elem_subresiduals[i];
-
-      if (use_fixed_solution)
-        {
-          delete elem_fixed_subsolutions[i];
-        }
-
-      for (unsigned int j=0; j != elem_subjacobians[i].size(); ++j)
-        delete elem_subjacobians[i][j];
-    }
-  elem_subsolutions.resize(0);
-  elem_subresiduals.resize(0);
-  elem_subjacobians.resize(0);
-
-  if (use_fixed_solution)
-    elem_fixed_subsolutions.resize(0);
 }
 
 
@@ -105,19 +76,7 @@ void DifferentiableSystem::reinit ()
 
 void DifferentiableSystem::init_data ()
 {
-  // First, allocate a vector for the iterate in our quasi_Newton
-  // solver
-
-  // Update - we now just use the System
-  // solution vector if the solver doesn't need an extra vector
-
-  // We don't want to project more solutions than we have to
-//  this->add_vector("_nonlinear_solution", false);
-//  this->add_vector("_nonlinear_solution");
-//  this->project_solution_on_reinit() = false;
-
-  // Next, give us flags for every variable that might be time
-  // evolving
+  // give us flags for every variable that might be time evolving
   _time_evolving.resize(this->n_vars(), false);
 
   // Do any initialization our solvers need
@@ -126,43 +85,13 @@ void DifferentiableSystem::init_data ()
 
   // Next initialize ImplicitSystem data
   Parent::init_data();
+}
 
-  // Finally initialize solution/residual/jacobian data structures
-  unsigned int n_vars = this->n_vars();
 
-  dof_indices_var.resize(n_vars);
 
-  // We may have already been initialized
-  this->clear_diff_ptrs();
-
-  elem_subsolutions.reserve(n_vars);
-  elem_subresiduals.reserve(n_vars);
-  elem_subjacobians.resize(n_vars);
-
-  if (use_fixed_solution)
-    elem_fixed_subsolutions.reserve(n_vars);
-
-  for (unsigned int i=0; i != n_vars; ++i)
-    {
-      elem_subsolutions.push_back(new DenseSubVector<Number>(elem_solution));
-      elem_subresiduals.push_back(new DenseSubVector<Number>(elem_residual));
-      elem_subjacobians[i].clear();
-      elem_subjacobians[i].reserve(n_vars);
-
-      if (use_fixed_solution)
-        {
-          elem_fixed_subsolutions.push_back
-	    (new DenseSubVector<Number>(elem_fixed_solution));
-        }
-      for (unsigned int j=0; j != n_vars; ++j)
-        {
-          elem_subjacobians[i].push_back
-            (new DenseSubMatrix<Number>(elem_jacobian));
-        }
-    }
-
-  // Resize the serial nonlinear solution for the current mesh
-  // current_local_nonlinear_solution->init (this->n_dofs());
+AutoPtr<DiffContext> DifferentiableSystem::build_context ()
+{
+  return AutoPtr<DiffContext>(new DiffContext(*this));
 }
 
 

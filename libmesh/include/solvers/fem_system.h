@@ -27,17 +27,10 @@
 
 // Local Includes
 #include "diff_system.h"
-#include "elem.h"
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-#include "tensor_value.h"
-#endif
+#include "fem_context.h"
 
 // Forward Declarations
 
-class FEBase;
-class QBase;
-template <typename T> class NumericVector;
 
 /**
  * This class provides a specific system class.  It aims
@@ -173,7 +166,8 @@ public:
    * formulations will require reimplementing eulerian_residual()
    * entirely.
    */
-  virtual bool eulerian_residual (bool request_jacobian);
+  virtual bool eulerian_residual (bool request_jacobian,
+                                  DiffContext &context);
 
   /**
    * Adds a mass vector contribution on \p elem to elem_residual.
@@ -188,8 +182,27 @@ public:
    * mass matrix (e.g. for divergence-free elements or mass lumping)
    * requires reimplementing mass_residual().
    */
-  virtual bool mass_residual (bool request_jacobian);
+  virtual bool mass_residual (bool request_jacobian,
+                              DiffContext &context);
 
+  /**
+   * Builds a FEMContext object with enough information to do
+   * evaluations on each element.
+   *
+   * For most problems, the default FEMSystem implementation is correct; users
+   * who subclass FEMContext will need to also reimplement this method to build
+   * it.
+   */
+  virtual AutoPtr<DiffContext> build_context();
+
+  /*
+   * Prepares the result of a build_context() call for use.
+   * 
+   * Most FEMSystem-based problems will need to reimplement this in order to
+   * call FE::get_*() as their particular physics requires.
+   */
+  virtual void init_context(DiffContext &);
+ 
   /**
    * Runs a postprocessing loop over all elements, and if
    * \p postprocess_sides is true over all sides.
@@ -216,102 +229,6 @@ public:
   int extra_quadrature_order;
 
   /**
-   * Returns the value of the solution variable \p var at the quadrature
-   * point \p qp on the current element interior
-   */
-  Number interior_value(unsigned int var, unsigned int qp);
-
-  /**
-   * Returns the value of the solution variable \p var at the quadrature
-   * point \p qp on the current element side
-   */
-  Number side_value(unsigned int var, unsigned int qp);
-
-  /**
-   * Returns the value of the solution variable \p var at the physical
-   * point \p p on the current element
-   */
-  Number point_value(unsigned int var, Point &p);
-
-  /**
-   * Returns the gradient of the solution variable \p var at the quadrature
-   * point \p qp on the current element interior
-   */
-  Gradient interior_gradient(unsigned int var, unsigned int qp);
-
-  /**
-   * Returns the gradient of the solution variable \p var at the quadrature
-   * point \p qp on the current element side
-   */
-  Gradient side_gradient(unsigned int var, unsigned int qp);
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  /**
-   * Returns the hessian of the solution variable \p var at the quadrature
-   * point \p qp on the current element interior
-   */
-  Tensor interior_hessian(unsigned int var, unsigned int qp);
-
-  /**
-   * Returns the hessian of the solution variable \p var at the quadrature
-   * point \p qp on the current element side
-   */
-  Tensor side_hessian(unsigned int var, unsigned int qp);
-
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-  /**
-   * Returns the value of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element interior
-   */
-  Number fixed_interior_value(unsigned int var, unsigned int qp);
-
-  /**
-   * Returns the value of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element side
-   */
-  Number fixed_side_value(unsigned int var, unsigned int qp);
-
-  /**
-   * Returns the value of the fixed_solution variable \p var at the physical
-   * point \p p on the current element
-   */
-  Number fixed_point_value(unsigned int var, Point &p);
-
-  /**
-   * Returns the gradient of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element interior
-   */
-  Gradient fixed_interior_gradient(unsigned int var, unsigned int qp);
-
-  /**
-   * Returns the gradient of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element side
-   */
-  Gradient fixed_side_gradient(unsigned int var, unsigned int qp);
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  /**
-   * Returns the hessian of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element interior
-   */
-  Tensor fixed_interior_hessian(unsigned int var, unsigned int qp);
-
-  /**
-   * Returns the hessian of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element side
-   */
-  Tensor fixed_side_hessian(unsigned int var, unsigned int qp);
-
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-  /**
-   * @returns \p "General".  Helps in identifying
-   * the system type in an equation system file.
-   */
-//  virtual std::string system_type () const { return "PDE"; }
-
-  /**
    * If calculating numeric jacobians is required, the FEMSystem
    * will perturb each solution vector entry by numerical_jacobian_h
    * when calculating finite differences.
@@ -333,22 +250,7 @@ public:
    */
   Real verify_analytic_jacobians;
 
-  /**
-   * Reinitialize Elem and FE objects if necessary for integration at a new
-   * point in time: specifically, handle moving elements in moving mesh
-   * schemes.
-   */
-  virtual void elem_reinit(Real theta);
-
-  /**
-   * Reinitialize Elem and side FE objects if necessary for integration at a
-   * new point in time: specifically, handle moving elements in moving mesh
-   * schemes.
-   */
-  virtual void elem_side_reinit(Real theta);
-
 protected:
-
   /**
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
@@ -356,89 +258,30 @@ protected:
   virtual void init_data ();
 
   /**
-   * Clear data pointers associated with this system.
-   */
-  void clear_fem_ptrs ();
-
-  /**
-   * Uses the coordinate data specified by mesh_*_position configuration
-   * to set the geometry of \p elem to the value it would take after a fraction
-   * \p theta of a timestep.
-   */
-  void elem_position_set(Real theta);
-
-  /**
-   * Uses the geometry of \p elem to set the coordinate data specified
-   * by mesh_*_position configuration.
-   */
-  void elem_position_get();
-
-  /**
-   * Reinitializes interior FE objects on the current geometric element
-   */
-  void elem_fe_reinit();
-
-  /**
-   * Reinitializes side FE objects on the current geometric element
-   */
-  void elem_side_fe_reinit();
-
-  
-  /**
    * Syntax sugar to make numerical_jacobian() declaration easier.
    */
-  typedef bool (TimeSolver::*TimeSolverResPtr)(bool);
+  typedef bool (TimeSolver::*TimeSolverResPtr)(bool, DiffContext&);
 
   /**
    * Uses the results of multiple \p res calls
    * to numerically differentiate the corresponding jacobian.
    */
-  void numerical_jacobian (TimeSolverResPtr res);
+  void numerical_jacobian (TimeSolverResPtr res,
+                           FEMContext &context);
 
   /**
    * Uses the results of multiple element_residual() calls
    * to numerically differentiate the corresponding jacobian
    * on an element.
    */
-  void numerical_elem_jacobian ();
+  void numerical_elem_jacobian (FEMContext &context);
 
   /**
    * Uses the results of multiple side_residual() calls
    * to numerically differentiate the corresponding jacobian
    * on an element's side.
    */
-  void numerical_side_jacobian ();
-
-  /**
-   * Finite element objects for each variable's interior and sides.
-   */
-  std::map<FEType, FEBase *> element_fe;
-  std::map<FEType, FEBase *> side_fe;
-
-  /**
-   * Pointers to the same finite element objects, but indexed
-   * by variable number
-   */
-  std::vector<FEBase *> element_fe_var;
-  std::vector<FEBase *> side_fe_var;
-
-  /**
-   * Quadrature rules for element interior and sides.
-   * The FEM system will try to find a quadrature rule that
-   * correctly integrates all variables
-   */
-  QBase *element_qrule;
-  QBase *side_qrule;
-
-  /**
-   * Current element for element_* to examine
-   */
-  Elem *elem;
-
-  /**
-   * Current element for side_* to examine
-   */
-  unsigned int side;
+  void numerical_side_jacobian (FEMContext &context);
 
   /**
    * System and variables from which to acquire moving mesh information
