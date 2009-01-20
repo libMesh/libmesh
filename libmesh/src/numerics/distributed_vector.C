@@ -462,7 +462,7 @@ void DistributedVector<T>::localize (NumericVector<T>& v_local_in,
   libmesh_assert (_values.size() == _local_size);
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
-  // We don't support the send list.  Call the less efficient localize(v_local_in)
+  // TODO: We don't yet support the send list; this is inefficient:
   localize (v_local_in);
 }
 
