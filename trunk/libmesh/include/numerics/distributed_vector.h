@@ -560,7 +560,7 @@ template <typename T>
 inline
 void DistributedVector<T>::init (const unsigned int n,
 			         const unsigned int n_local,
-		                 const std::vector<unsigned int>& ghost,
+		                 const std::vector<unsigned int>& /*ghost*/,
 			         const bool fast)
 {
   // TODO: we shouldn't ignore the ghost sparsity pattern
