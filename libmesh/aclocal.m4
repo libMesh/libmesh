@@ -166,36 +166,40 @@ AC_DEFUN(DETERMINE_CXX_BRAND, dnl
           if test "x$is_intel_icc" != "x" ; then
             GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
             case "$GXX_VERSION_STRING" in
+              *11.*)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 11 >>>)
+  	        GXX_VERSION=intel_icc_v11.x
+                ;;
               *10.1*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel ICC 10.1 >>>)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 10.1 >>>)
   	        GXX_VERSION=intel_icc_v10.1
                 ;;
               *10.0*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel ICC 10.0 >>>)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 10.0 >>>)
   	        GXX_VERSION=intel_icc_v10.0
                 ;;
               *9.1*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel ICC 9.1 >>>)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 9.1 >>>)
   	        GXX_VERSION=intel_icc_v9.1
                 ;;
               *9.0*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel ICC 9.0 >>>)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 9.0 >>>)
   	        GXX_VERSION=intel_icc_v9.0
                 ;;
               *8.1*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel ICC 8.1 >>>)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 8.1 >>>)
   	        GXX_VERSION=intel_icc_v8.1
                 ;;
               *8.0*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel ICC 8.0 >>>)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 8.0 >>>)
   	        GXX_VERSION=intel_icc_v8.0
                 ;;
               *7.1*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel ICC 7.1 >>>)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 7.1 >>>)
   	        GXX_VERSION=intel_icc_v7.1
                 ;;
               *7.0*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel ICC 7.0 >>>)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 7.0 >>>)
   	        GXX_VERSION=intel_icc_v7.0
                 ;;
             esac
@@ -457,7 +461,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
         case "$GXX_VERSION" in
 
           dnl Intel ICC >= v10.1
-          intel_icc_v10.1)
+          intel_icc_v10.1 | intel_icc_v11.x)
               dnl Disable some warning messages:
               dnl #266: 'function declared implicitly'
               dnl       Metis function "GKfree" caused this error
@@ -469,14 +473,14 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
               dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
               dnl        Well, duh, when the tested value is computed...  OK when it
               dnl        was from an assignment.
-              CXXFLAGS_DBG="-w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
+              CXXFLAGS_DBG="-w1 -g -wd1476 -wd1505 -wd1572"
               CXXFLAGS_OPT="-O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CXXFLAGS_DVL="$CXXFLAGS_DBG"
-              CFLAGS_DBG="-w1 -inline_debug_info -wd266 -wd1572"
+              CFLAGS_DBG="-w1 -wd266 -wd1572"
               CFLAGS_OPT="-O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CFLAGS_DVL="$CFLAGS_DBG"
               ;;
-                    dnl Intel ICC >= 10.0	          
+          dnl Intel ICC >= 10.0	          
           intel_icc_v10.0)		
               dnl Disable some warning messages:
               dnl #266: 'function declared implicitly'
@@ -609,7 +613,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           case "$GXX_VERSION" in
 
             dnl Intel ICC >= 10.0	
-            intel_*_v10.*)	
+            intel_*_v1?.*)
               CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
               CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
               CXXFLAGS_DVL="$CXXFLAGS_DVL -fPIC"
