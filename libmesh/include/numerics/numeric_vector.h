@@ -71,6 +71,15 @@ public:
    */
   NumericVector (const unsigned n,
 		 const unsigned int n_local);
+
+  /**
+   * Constructor. Set local dimension to \p n_local, the global
+   * dimension to \p n, but additionally reserve memory for the
+   * indices specified by the \p ghost argument.
+   */
+  NumericVector (const unsigned int N,
+		 const unsigned int n_local,
+		 const std::vector<unsigned int>& ghost);
     
 public:
 
@@ -143,6 +152,15 @@ public:
    */
   virtual void init (const unsigned int,
 		     const bool = false) {}
+    
+  /**
+   * Create a vector that holds tha local indices plus those specified
+   * in the \p ghost argument.
+   */
+  virtual void init (const unsigned int /*N*/,
+		     const unsigned int /*n_local*/,
+		     const std::vector<unsigned int>& /*ghost*/,
+		     const bool /*fast*/ = false) {}
     
   //   /**
   //    * Change the dimension to that of the
@@ -252,7 +270,8 @@ public:
 
   /**
    * @returns the local size of the vector
-   * (index_stop-index_start)
+   * (index_stop-index_start).
+   * In ghost cell mode, this does *not* include the ghost cells.
    */
   virtual unsigned int local_size() const = 0;
 
@@ -550,6 +569,19 @@ NumericVector<T>::NumericVector (const unsigned int n,
   _is_initialized(false)
 {
   init(n, n_local, false);
+}
+
+
+
+template <typename T>
+inline
+NumericVector<T>::NumericVector (const unsigned int n,
+				 const unsigned int n_local,
+				 const std::vector<unsigned int>& ghost) :
+  _is_closed(false),
+  _is_initialized(false)
+{
+  init(n, n_local, ghost, false);
 }
 
 

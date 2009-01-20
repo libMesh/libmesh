@@ -74,6 +74,15 @@ public:
 	       const unsigned int n_local);
 
   /**
+   * Constructor. Set local dimension to \p n_local, the global
+   * dimension to \p n, but additionally reserve memory for the
+   * indices specified by the \p ghost argument.
+   */
+  EpetraVector (const unsigned int N,
+		const unsigned int n_local,
+		const std::vector<unsigned int>& ghost);
+
+  /**
    * Constructor.  Creates a EpetraVector assuming you already have a
    * valid Epetra Vec object.  In this case, v is NOT destroyed by the
    * EpetraVector constructor when this object goes out of scope.
@@ -131,6 +140,15 @@ public:
    */
   void init (const unsigned int N,
 	     const bool         fast=false);
+
+  /**
+   * Create a vector that holds the local indices plus those specified
+   * in the \p ghost argument.
+   */
+  void init (const unsigned int /*N*/,
+	     const unsigned int /*n_local*/,
+	     const std::vector<unsigned int>& /*ghost*/,
+	     const bool /*fast*/ = false);
 
   //   /**
   //    * Change the dimension to that of the
@@ -634,6 +652,26 @@ EpetraVector<T>::EpetraVector(Epetra_Vector & v)
 
 
 
+template <typename T>
+inline
+EpetraVector<T>::EpetraVector (const unsigned int n,
+			       const unsigned int n_local,
+		               const std::vector<unsigned int>& ghost)
+: _destroy_vec_on_exit(true),
+  myFirstID_(0),
+  myNumIDs_(0),
+  myCoefs_(NULL),
+  nonlocalIDs_(NULL),
+  nonlocalElementSize_(NULL),
+  numNonlocalIDs_(0),
+  allocatedNonlocalLength_(0),
+  nonlocalCoefs_(NULL),
+  ignoreNonLocalEntries_(false)
+{
+  this->init(n, n_local, ghost, false);
+}
+
+
 
 template <typename T>
 inline
@@ -641,6 +679,8 @@ EpetraVector<T>::~EpetraVector ()
 {
   this->clear ();
 }
+
+
 
 template <typename T>
 inline
@@ -667,6 +707,18 @@ void EpetraVector<T>::init (const unsigned int n,
   
   if (fast == false)
     this->zero ();
+}
+
+
+template <typename T>
+inline
+void EpetraVector<T>::init (const unsigned int n,
+			    const unsigned int n_local,
+		            const std::vector<unsigned int>& ghost,
+			    const bool fast)
+{
+  // FIXME: ignoring ghost sparsity pattern for now
+  this->init(n, n_local, fast);
 }
 
 
