@@ -35,6 +35,7 @@
 #include "reference_counted_object.h"
 #include "libmesh.h" // libMesh::invalid_uint
 #include "vector_value.h" // RealVectorValue
+#include "system.h" // System::Variable
 #include "threads.h"
 #include "threads_allocators.h"
 #include "elem_range.h"
@@ -48,7 +49,6 @@ class MeshBase;
 class Mesh;
 class FEType;
 class CouplingMatrix;
-class System;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
@@ -227,7 +227,7 @@ private:
 
   
 // ------------------------------------------------------------
-// Dof Map class definition
+// DofMap class definition
 
 /**
  * This class handles the numbering of degrees of freedom on a mesh.
@@ -303,8 +303,13 @@ public:
    * Add an unknown of order \p order and finite element type
    * \p type to the system of equations.
    */
-  void add_variable (const FEType& type);
+  void add_variable (const System::Variable &var);
   
+  /**
+   * @returns the variable description object for variable \p c.
+   */
+  const System::Variable& variable (const unsigned int c) const;
+
   /**
    * @returns the approximation order for variable \p c.
    */
@@ -313,8 +318,7 @@ public:
   /**
    * @returns the finite element type for variable \p c.
    */
-  const FEType& variable_type (const unsigned int c) const
-  { return *_variable_types[c]; }
+  const FEType& variable_type (const unsigned int c) const;
   
   /**
    * Returns the number of variables in the global solution vector. Defaults
@@ -322,7 +326,7 @@ public:
    * Stokes (u,v,p), etc...
    */  
   unsigned int n_variables() const
-  { return _variable_types.size(); }
+  { return _variables.size(); }
   
   /**
    * @returns the total number of degrees of freedom in the problem.
@@ -541,7 +545,7 @@ public:
    * If \p v == NULL, the system solution vector is tested.
    */
   std::pair<Real, Real> max_constraint_error(const System &system,
-				    NumericVector<Number> *v = NULL) const;
+					     NumericVector<Number> *v = NULL) const;
 
 #endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
@@ -742,7 +746,7 @@ private:
   /**
    * The finite element type for each variable.
    */
-  std::vector<FEType*> _variable_types;
+  std::vector<System::Variable> _variables;
 
   /**
    * The number of the system we manage DOFs for.

@@ -82,7 +82,6 @@ System::~System ()
 
 
 
-
 unsigned int System::n_dofs() const
 {
   return _dof_map->n_dofs();
@@ -105,15 +104,10 @@ unsigned int System::n_constrained_dofs() const
 
 
 
-
-
 unsigned int System::n_local_dofs() const
 {
   return _dof_map->n_dofs_on_processor (libMesh::processor_id());
 }
-
-
-
 
 
 
@@ -128,16 +122,12 @@ Number System::current_solution (const unsigned int global_dof_number) const
 
 
 
-
-
 void System::clear ()
 {
-  _var_names.clear ();
+  _variables.clear();
+  
+  _variable_numbers.clear();
 
-  _var_type.clear ();
-  
-  _var_num.clear ();
-  
   _dof_map->clear ();
   
   solution->clear ();
@@ -489,9 +479,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
 {
   // Return the vector if it is already there.
   if (this->have_vector(vec_name))
-    {
-      return *(_vectors[vec_name]);
-    }
+    return *(_vectors[vec_name]);
 
   // Otherwise build the vector
   NumericVector<Number>* buf = NumericVector<Number>::build().release();
@@ -500,9 +488,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
 
   // Initialize it if necessary
   if (!_can_add_vectors)
-    {
-      buf->init (this->n_dofs(), this->n_local_dofs());
-    }
+    buf->init (this->n_dofs(), this->n_local_dofs());
 
   return *buf;
 }
@@ -548,52 +534,59 @@ NumericVector<Number> & System::get_vector (const std::string& vec_name)
 
 
 unsigned int System::add_variable (const std::string& var,
-			           const FEType& type)
+			           const FEType& type,
+				   const std::set<unsigned char> * const active_subdomains)
 {  
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
-  if (_var_num.count(var))
-    {
-      if (_var_type[var] == type)
-        return _var_num[var];
+  for (unsigned int v=0; v<this->n_vars(); v++)
+    if (this->variable_name(v) == var)
+      {
+	if (this->variable_type(v) == type)
+	  return _variables[v].number();
 
-      std::cerr << "ERROR: incompatible variable "
-		<< var
-		<< " has already been added for this system!"
-		<< std::endl;
-      libmesh_error();
-    }
-  
+	std::cerr << "ERROR: incompatible variable "
+		  << var
+		  << " has already been added for this system!"
+		  << std::endl;
+	libmesh_error();
+      }
+
+  const unsigned int curr_n_vars = this->n_vars();						
+
   // Add the variable to the list
-  _var_names.push_back (var);
-  _var_type[var]  = type;
-  _var_num[var]   = (this->n_vars()-1);
+  _variables.push_back((active_subdomains == NULL) ?
+		       Variable(var, curr_n_vars, type) :
+		       Variable(var, curr_n_vars, type, *active_subdomains));
+
+  libmesh_assert ((curr_n_vars+1) == this->n_vars());
+
+  _variable_numbers[var] = curr_n_vars;
 
   // Add the variable to the _dof_map
-  _dof_map->add_variable (type);
+  _dof_map->add_variable (_variables.back());
 
   // Return the number of the new variable
-  return (this->n_vars()-1);
+  return curr_n_vars;
 }
 
 
 
 unsigned int System::add_variable (const std::string& var,
 			           const Order order,
-			           const FEFamily family)
+			           const FEFamily family,
+				   const std::set<unsigned char> * const active_subdomains)
 {
-  FEType fe_type(order, family);
-  
-  return this->add_variable(var, fe_type);
+  return this->add_variable(var, 
+			    FEType(order, family), 
+			    active_subdomains);
 }
 
 
 
 bool System::has_variable (const std::string& var) const
 {
-  if (_var_num.find(var) == _var_num.end())
-    return false;
-  return true;
+  return _variable_numbers.count(var);
 }
 
 
@@ -602,9 +595,9 @@ unsigned short int System::variable_number (const std::string& var) const
 {
   // Make sure the variable exists
   std::map<std::string, unsigned short int>::const_iterator
-    pos = _var_num.find(var);
+    pos = _variable_numbers.find(var);
   
-  if (pos == _var_num.end())
+  if (pos == _variable_numbers.end())
     {
       std::cerr << "ERROR: variable "
 		<< var
@@ -612,14 +605,15 @@ unsigned short int System::variable_number (const std::string& var) const
 		<< std::endl;      
       libmesh_error();
     }
-  
+  libmesh_assert (_variables[pos->second].name() == var);
+
   return pos->second;
 }
 
 
 void System::local_dof_indices(const unsigned int var, std::set<unsigned int> & var_indices) const
 {
-  //Make sure the set is clear
+  // Make sure the set is clear
   var_indices.clear();
 
   std::vector<unsigned int> dof_indices;
@@ -630,8 +624,9 @@ void System::local_dof_indices(const unsigned int var, std::set<unsigned int> & 
   const MeshBase::const_element_iterator end_el =
     this->get_mesh().active_local_elements_end();
 
-  unsigned int first_local = this->get_dof_map().first_dof();
-  unsigned int end_local = this->get_dof_map().end_dof();
+  const unsigned int 
+    first_local = this->get_dof_map().first_dof(),
+    end_local   = this->get_dof_map().end_dof();
 
   for ( ; el != end_el; ++el)
     {
