@@ -163,25 +163,27 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
             if (childnode1 < childnode0)
               std::swap(childnode0, childnode1);
 
-	    for (const Elem *p = elem; p != NULL; p = elem->parent())
+	    for (const Elem *p = elem; p != NULL; p = p->parent())
 	      {
                 AutoPtr<Elem> pedge = p->build_edge(n);
 		unsigned int node0 = pedge->node(0);
 		unsigned int node1 = pedge->node(1);
 
+                if (node1 < node0)
+                  std::swap(node0, node1);
+		
 		// If elem does not share this edge with its ancestor
 		// p, refinement levels of elements sharing p's edge
 		// are not restricted by refinement levels of elem.
 		// Furthermore, elem will not share this edge with any
 		// of p's ancestors, so we can safely break out of the
 		// for loop early.
-		if (node0 != childnode0 && node0 != childnode1
-		    && node1 != childnode0 && node1 != childnode1)
+		if (node0 != childnode0 && node1 != childnode1)
 		  break;
 
-                if (node1 < node0)
-                  std::swap(node0, node1);
-		
+                childnode0 = node0;
+                childnode1 = node1;
+
                 std::pair<unsigned int, unsigned int> edge_key =
                   std::make_pair(node0, node1);
 
