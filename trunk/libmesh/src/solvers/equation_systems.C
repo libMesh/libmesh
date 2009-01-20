@@ -481,6 +481,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   const unsigned int dim = _mesh.mesh_dimension();
   const unsigned int nn  = _mesh.n_nodes();
   const unsigned int nv  = this->n_vars();
+  const unsigned short int one = 1;
 
   // We'd better have a contiguous node numbering
   libmesh_assert (nn == _mesh.max_node_id());
@@ -488,20 +489,18 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   // allocate storage to hold
   // (number_of_nodes)*(number_of_variables) entries.
   soln.resize(nn*nv);
+  
+  // Zero out the soln vector
+  std::fill (soln.begin(), soln.end(), libMesh::zero);
 
-  std::vector<Number>             sys_soln;
+  std::vector<Number>  sys_soln;
 
   // (Note that we use an unsigned short int here even though an
   // unsigned char would be more that sufficient.  The MPI 1.1
   // standard does not require that MPI_SUM, MPI_PROD etc... be
   // implemented for char data types. 12/23/2003 - BSK)  
-  std::vector<unsigned short int> node_conn(nn);
+  std::vector<unsigned short int> node_conn(nn), repeat_count(nn);
 
-  
-  // Zero out the soln vector
-  std::fill (soln.begin(),       soln.end(),       libMesh::zero);
-
-  
   // Get the number of elements that share each node.  We will
   // compute the average value at each node.  This is particularly
   // useful for plotting discontinuous data.
@@ -513,7 +512,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
       node_conn[(*e_it)->node(n)]++;
 
   // Gather the distributed node_conn arrays in the case of
-  // multiple processors
+  // multiple processors.
   Parallel::sum(node_conn);
 
   unsigned int var_num=0;
@@ -525,7 +524,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   // into the vector passed to build_solution_vector.
   const_system_iterator       pos = _systems.begin();
   const const_system_iterator end = _systems.end();
-
+  
   for (; pos != end; ++pos)
     {  
       const System& system  = *(pos->second);
@@ -539,46 +538,66 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
       
       for (unsigned int var=0; var<nv_sys; var++)
 	{
-	  const FEType& fe_type    = system.variable_type(var);
-	  
+	  const FEType& fe_type                   = system.variable_type(var);
+	  const System::Variable &var_description = system.variable(var);
+	  const DofMap &dof_map                   = system.get_dof_map();
+
+	  std::fill (repeat_count.begin(), repeat_count.end(), 0);
+
 	  MeshBase::element_iterator       it  = _mesh.active_local_elements_begin();
 	  const MeshBase::element_iterator end = _mesh.active_local_elements_end(); 
 
 	  for ( ; it != end; ++it)
-	    {
-	      const Elem* elem = *it;
-	      system.get_dof_map().dof_indices (elem, dof_indices, var);
+	    if (var_description.active_on_subdomain((*it)->subdomain_id()))
+	      {
+		const Elem* elem = *it;	     
+
+		dof_map.dof_indices (elem, dof_indices, var);
 	      
-	      elem_soln.resize(dof_indices.size());
+		elem_soln.resize(dof_indices.size());
 	      
-	      for (unsigned int i=0; i<dof_indices.size(); i++)
-		elem_soln[i] = sys_soln[dof_indices[i]];
+		for (unsigned int i=0; i<dof_indices.size(); i++)
+		  elem_soln[i] = sys_soln[dof_indices[i]];
 		  
-	      FEInterface::nodal_soln (dim,
-				       fe_type,
-				       elem,
-				       elem_soln,
-				       nodal_soln);
+		FEInterface::nodal_soln (dim,
+					 fe_type,
+					 elem,
+					 elem_soln,
+					 nodal_soln);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-	      // infinite elements should be skipped...
-	      if (!elem->infinite())
+		// infinite elements should be skipped...
+		if (!elem->infinite())
 #endif
-		{ 
-		  libmesh_assert (nodal_soln.size() == elem->n_nodes());
+		  { 
+		    libmesh_assert (nodal_soln.size() == elem->n_nodes());
 		  
-		  for (unsigned int n=0; n<elem->n_nodes(); n++)
-		    {
-		      libmesh_assert (node_conn[elem->node(n)] != 0);
-		      soln[nv*(elem->node(n)) + (var + var_num)] +=
-			nodal_soln[n]/static_cast<Real>(node_conn[elem->node(n)]);
-		    }
-		}
-	    }	 
-	}
+		    for (unsigned int n=0; n<elem->n_nodes(); n++)
+		      {
+			repeat_count[elem->node(n)]++;
+			soln[nv*(elem->node(n)) + (var + var_num)] += nodal_soln[n];
+		      }
+		  }
+	      } // end loop over elements	 
 
+	  // when a variable is active everywhere the repeat_count
+	  // and node_conn arrays should be identical, so let's
+	  // use that information to avoid unnecessary communication
+	  if (var_description.implicitly_active())
+	    repeat_count = node_conn;
+	    
+	  else
+	    Parallel::sum (repeat_count);
+
+	  for (unsigned int n=0; n<nn; n++)
+	    soln[nv*n + (var + var_num)] /= 
+	      static_cast<Real>(std::max (repeat_count[n], one));
+	  
+      
+	} // end loop on variables in this system
+  
       var_num += nv_sys;
-    }
+    } // end loop over systems
 
   // Now each processor has computed contriburions to the
   // soln vector.  Gather them all up.

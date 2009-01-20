@@ -66,28 +66,31 @@ namespace {
 
     void operator()(const ConstElemRange &range) const
     {
+      const System::Variable &var_description = _dof_map.variable(_variable_number);
+
       for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
-        {
+	if (var_description.active_on_subdomain((*it)->subdomain_id()))
+	  {
 #ifdef LIBMESH_ENABLE_AMR
-	  FEInterface::compute_constraints (_constraints,
-					    _dof_map,
-					    _variable_number,
-					    *it);
+	    FEInterface::compute_constraints (_constraints,
+					      _dof_map,
+					      _variable_number,
+					      *it);
 #endif
 #ifdef LIBMESH_ENABLE_PERIODIC
-          // FIXME: periodic constraints won't work on a non-serial
-          // mesh unless it's kept ghost elements from opposing
-          // boundaries!
-	  FEInterface::compute_periodic_constraints (_constraints,
-					             _dof_map,
-                                                     _periodic_boundaries,
-						     _mesh,
-					             _variable_number,
-					             *it);
+	    // FIXME: periodic constraints won't work on a non-serial
+	    // mesh unless it's kept ghost elements from opposing
+	    // boundaries!
+	    FEInterface::compute_periodic_constraints (_constraints,
+						       _dof_map,
+						       _periodic_boundaries,
+						       _mesh,
+						       _variable_number,
+						       *it);
 #endif
-        }
+	  }
     }
-
+    
   private:
     DofConstraints &_constraints;
     DofMap &_dof_map;
