@@ -578,7 +578,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
   
   //loop through element and map between block and element vector
-  for(unsigned int i=0;i<num_elem;i++)
+  for(unsigned int i=0; i<static_cast<unsigned int>(num_elem); i++)
     {
       Elem * elem = mesh.elem(i);
       unsigned int cur_subdomain = elem->subdomain_id();
@@ -611,7 +611,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
           unsigned int elem_id = tmp_vec[i];
           Elem * elem = mesh.elem(elem_id);
           
-          for (unsigned int j=0; j<num_nodes_per_elem; j++)
+          for (unsigned int j=0; j < static_cast<unsigned int>(num_nodes_per_elem); j++)
             {  
               const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
               const unsigned int elem_node_index = conv.get_node_map(j);
