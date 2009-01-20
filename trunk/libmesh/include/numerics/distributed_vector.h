@@ -74,6 +74,15 @@ public:
 		     const unsigned int n_local);
     
   /**
+   * Constructor. Set local dimension to \p n_local, the global
+   * dimension to \p n, but additionally reserve memory for the
+   * indices specified by the \p ghost argument.
+   */
+  DistributedVector (const unsigned int N,
+		     const unsigned int n_local,
+		     const std::vector<unsigned int>& ghost);
+    
+  /**
    * Destructor, deallocates memory. Made virtual to allow
    * for derived classes to behave properly.
    */
@@ -121,6 +130,15 @@ public:
    */
   void init (const unsigned int N,
 	     const bool         fast=false);
+    
+  /**
+   * Create a vector that holds tha local indices plus those specified
+   * in the \p ghost argument.
+   */
+  virtual void init (const unsigned int /*N*/,
+		     const unsigned int /*n_local*/,
+		     const std::vector<unsigned int>& /*ghost*/,
+		     const bool /*fast*/ = false);
     
   /**
    * \f$U(0-N) = s\f$: fill all components.
@@ -444,6 +462,17 @@ DistributedVector<T>::DistributedVector (const unsigned int n,
 
 template <typename T>
 inline
+DistributedVector<T>::DistributedVector (const unsigned int n,
+					 const unsigned int n_local,
+		                         const std::vector<unsigned int>& ghost)
+{
+  this->init(n, n_local, ghost, false);
+}
+
+
+
+template <typename T>
+inline
 DistributedVector<T>::~DistributedVector ()
 {
   this->clear ();
@@ -524,6 +553,18 @@ void DistributedVector<T>::init (const unsigned int n,
   // Zero the components unless directed otherwise
   if (!fast)
     this->zero();
+}
+
+
+template <typename T>
+inline
+void DistributedVector<T>::init (const unsigned int n,
+			         const unsigned int n_local,
+		                 const std::vector<unsigned int>& ghost,
+			         const bool fast)
+{
+  // FIXME: ignoring ghost sparsity pattern for now
+  this->init(n, n_local, fast);
 }
 
 

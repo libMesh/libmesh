@@ -244,7 +244,7 @@ void PetscVector<T>::add (const T v_in)
       
       int ig = fli + i;      
       
-      PetscScalar value = (values[ig] + v);
+      PetscScalar value = (values[i] + v);
       
       ierr = VecRestoreArray (_vec, &values);
   	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -441,6 +441,7 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
   if (v.initialized())
     {
       this->init (v.size(), v.local_size());
+      this->_global_to_local_map = v._global_to_local_map;
       this->_is_closed      = v._is_closed;
       this->_is_initialized = v._is_initialized;
   

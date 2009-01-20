@@ -78,6 +78,15 @@ public:
 	       const unsigned int n_local);
 
   /**
+   * Constructor. Set local dimension to \p n_local, the global
+   * dimension to \p n, but additionally reserve memory for the
+   * indices specified by the \p ghost argument.
+   */
+  PetscVector (const unsigned int N,
+	       const unsigned int n_local,
+	       const std::vector<unsigned int>& ghost);
+  
+  /**
    * Constructor.  Creates a PetscVector assuming you already have a
    * valid PETSc Vec object.  In this case, v is NOT destroyed by the
    * PetscVector constructor when this object goes out of scope.
@@ -135,6 +144,15 @@ public:
    */
   void init (const unsigned int N,
 	     const bool         fast=false);
+    
+  /**
+   * Create a vector that holds tha local indices plus those specified
+   * in the \p ghost argument.
+   */
+  virtual void init (const unsigned int /*N*/,
+		     const unsigned int /*n_local*/,
+		     const std::vector<unsigned int>& /*ghost*/,
+		     const bool /*fast*/ = false);
     
   //   /**
   //    * Change the dimension to that of the
@@ -233,6 +251,14 @@ public:
    * actually stored on this processor
    */
   unsigned int last_local_index() const;
+
+  /**
+   * Maps the global index \p i to the corresponding global index. If
+   * the index is not a ghost cell, this is done by subtraction the
+   * number of the first local index.  If it is a ghost cell, it has
+   * to be looked up in the map.
+   */
+  unsigned int map_global_to_local_index(const unsigned int i) const;
     
   /**
    * Access components, returns \p U(i).
@@ -441,6 +467,18 @@ private:
    */
   Vec _vec;
 
+
+  /**
+   * Type for map that maps global to local ghost cells.
+   */
+  typedef std::map<unsigned int,unsigned int> GlobalToLocalMap;
+
+  /**
+   * Map that maps global to local ghost cells (will be empty if not
+   * in ghost cell mode).
+   */
+  GlobalToLocalMap _global_to_local_map;
+
   /**
    * This boolean value should only be set to false
    * for the constructor which takes a PETSc Vec object. 
@@ -456,7 +494,8 @@ private:
 template <typename T>
 inline
 PetscVector<T>::PetscVector ()
-  : _destroy_vec_on_exit(true)
+  : _destroy_vec_on_exit(true),
+    _global_to_local_map()
 {}
 
 
@@ -464,7 +503,8 @@ PetscVector<T>::PetscVector ()
 template <typename T>
 inline
 PetscVector<T>::PetscVector (const unsigned int n)
-  : _destroy_vec_on_exit(true)
+  : _destroy_vec_on_exit(true),
+    _global_to_local_map()
 {
   this->init(n, n, false);
 }
@@ -475,9 +515,23 @@ template <typename T>
 inline
 PetscVector<T>::PetscVector (const unsigned int n,
 			     const unsigned int n_local)
-  : _destroy_vec_on_exit(true)
+  : _destroy_vec_on_exit(true),
+    _global_to_local_map()
 {
   this->init(n, n_local, false);
+}
+
+
+
+template <typename T>
+inline
+PetscVector<T>::PetscVector (const unsigned int n,
+			     const unsigned int n_local,
+			     const std::vector<unsigned int>& ghost)
+  : _destroy_vec_on_exit(true),
+    _global_to_local_map()
+{
+  this->init(n, n_local, ghost, false);
 }
 
 
@@ -487,10 +541,37 @@ PetscVector<T>::PetscVector (const unsigned int n,
 template <typename T>
 inline
 PetscVector<T>::PetscVector (Vec v)
-  : _destroy_vec_on_exit(false)
+  : _destroy_vec_on_exit(false),
+    _global_to_local_map()
 {
   this->_vec = v;
   this->_is_initialized = true;
+
+  /* We need to ask PETSc about the (local to global) ghost value
+     mapping and create the inverse mapping out of it.  */
+  int ierr=0, petsc_size=0, petsc_local_size=0;
+  ierr = VecGetSize(_vec, &petsc_size);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = VecGetLocalSize(_vec, &petsc_local_size);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  /* \p petsc_local_size is the number of non-ghost values.  If it
+     equals the global size, then we are a serial vector, and there
+     are no ghost values.  */
+  if(petsc_size!=petsc_local_size)
+    {
+      ISLocalToGlobalMapping mapping = _vec->mapping;
+
+      // If is a sparsely stored vector, set up our new mapping
+      if (mapping)
+        {
+          const unsigned int local_size = static_cast<unsigned int>(petsc_local_size);
+          const unsigned int ghost_begin = static_cast<unsigned int>(petsc_local_size);
+          const unsigned int ghost_end = static_cast<unsigned int>(mapping->n);
+          for(unsigned int i=ghost_begin; i<ghost_end; i++)
+	    _global_to_local_map[mapping->indices[i]] = i-local_size;
+	}
+    }
 }
 
 
@@ -564,6 +645,46 @@ void PetscVector<T>::init (const unsigned int n,
 
 template <typename T>
 inline
+void PetscVector<T>::init (const unsigned int n,
+			   const unsigned int n_local,
+			   const std::vector<unsigned int>& ghost,
+			   const bool fast)
+{
+  int ierr=0;
+  int petsc_n=static_cast<int>(n);
+  int petsc_n_local=static_cast<int>(n_local);
+  int petsc_n_ghost=static_cast<int>(ghost.size());
+  int* petsc_ghost = const_cast<int*>(reinterpret_cast<const int*>(&ghost[0]));
+
+  // Clear initialized vectors 
+  if (this->initialized())
+    this->clear();
+
+  /* Make the global-to-local ghost cell map.  */
+  for(unsigned int i=0; i<ghost.size(); i++)
+    {
+      _global_to_local_map[ghost[i]] = i;
+    }
+
+  /* Create vector.  */
+  ierr = VecCreateGhost (libMesh::COMM_WORLD, petsc_n_local, petsc_n,
+			 petsc_n_ghost, petsc_ghost,
+			 &_vec);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  
+  ierr = VecSetFromOptions (_vec);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  
+  this->_is_initialized = true;
+  
+  if (fast == false)
+    this->zero ();
+}
+
+
+
+template <typename T>
+inline
 void PetscVector<T>::close ()
 {
   libmesh_assert (this->initialized());
@@ -571,9 +692,17 @@ void PetscVector<T>::close ()
   int ierr=0;
   
   ierr = VecAssemblyBegin(_vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = VecAssemblyEnd(_vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  if(_global_to_local_map.size()!=0)
+    {
+      ierr = VecGhostUpdateBegin(_vec,ADD_VALUES,SCATTER_REVERSE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecGhostUpdateEnd(_vec,ADD_VALUES,SCATTER_REVERSE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 
   this->_is_closed = true;
 }
@@ -593,6 +722,8 @@ void PetscVector<T>::clear ()
     }
 
   this->_is_closed = this->_is_initialized = false;
+
+  _global_to_local_map.clear();
 }
 
 
@@ -706,23 +837,60 @@ unsigned int PetscVector<T>::last_local_index () const
 
 template <typename T>
 inline
-T PetscVector<T>::operator() (const unsigned int i) const
+unsigned int PetscVector<T>::map_global_to_local_index (const unsigned int i) const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert ( ((i >= this->first_local_index()) &&
-	    (i <  this->last_local_index())) );
+
+  const unsigned int first = this->first_local_index();
+  const unsigned int last = this->last_local_index();
+
+  if((i>=first) && (i<last))
+    {
+      return i-first;
+    }
+
+  GlobalToLocalMap::const_iterator it = _global_to_local_map.find(i);
+  libmesh_assert (it!=_global_to_local_map.end());
+  return it->second+last-first;
+}
+
+
+
+template <typename T>
+inline
+T PetscVector<T>::operator() (const unsigned int i) const
+{
+  const unsigned int local_index = this->map_global_to_local_index(i);
+  libmesh_assert (this->initialized());
 
   int ierr=0;
-  PetscScalar *values, value=0.;
-  
+  PetscScalar value=0.;
 
-  ierr = VecGetArray(_vec, &values);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
-  value = values[i - this->first_local_index()];
-  
-  ierr = VecRestoreArray (_vec, &values);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if(_global_to_local_map.empty())
+    {
+      PetscScalar *values;
+      ierr = VecGetArray(_vec, &values);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      value = values[local_index];
+      ierr = VecRestoreArray (_vec, &values);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+  else
+    {
+      /* Vectors that include ghost values require a special
+	 handling.  */
+      Vec loc_vec;
+      PetscScalar *values;
+      ierr = VecGhostGetLocalForm (_vec,&loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecGetArray(loc_vec, &values);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      value = values[local_index];
+      ierr = VecRestoreArray (loc_vec, &values);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
   
   return static_cast<T>(value);
 }
@@ -771,6 +939,7 @@ void PetscVector<T>::swap (PetscVector<T> &v)
 {
   std::swap(_vec, v._vec);
   std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
+  std::swap(_global_to_local_map, v._global_to_local_map);
 }
 
 
