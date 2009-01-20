@@ -494,8 +494,8 @@ private:
 template <typename T>
 inline
 PetscVector<T>::PetscVector ()
-  : _destroy_vec_on_exit(true),
-    _global_to_local_map()
+  : _global_to_local_map(),
+    _destroy_vec_on_exit(true)    
 {}
 
 
@@ -503,8 +503,8 @@ PetscVector<T>::PetscVector ()
 template <typename T>
 inline
 PetscVector<T>::PetscVector (const unsigned int n)
-  : _destroy_vec_on_exit(true),
-    _global_to_local_map()
+  : _global_to_local_map(),
+    _destroy_vec_on_exit(true)
 {
   this->init(n, n, false);
 }
@@ -515,8 +515,8 @@ template <typename T>
 inline
 PetscVector<T>::PetscVector (const unsigned int n,
 			     const unsigned int n_local)
-  : _destroy_vec_on_exit(true),
-    _global_to_local_map()
+  : _global_to_local_map(),
+    _destroy_vec_on_exit(true)
 {
   this->init(n, n_local, false);
 }
@@ -528,8 +528,8 @@ inline
 PetscVector<T>::PetscVector (const unsigned int n,
 			     const unsigned int n_local,
 			     const std::vector<unsigned int>& ghost)
-  : _destroy_vec_on_exit(true),
-    _global_to_local_map()
+  : _global_to_local_map(),
+    _destroy_vec_on_exit(true)
 {
   this->init(n, n_local, ghost, false);
 }
@@ -541,8 +541,8 @@ PetscVector<T>::PetscVector (const unsigned int n,
 template <typename T>
 inline
 PetscVector<T>::PetscVector (Vec v)
-  : _destroy_vec_on_exit(false),
-    _global_to_local_map()
+  : _global_to_local_map(),
+    _destroy_vec_on_exit(true)
 {
   this->_vec = v;
   this->_is_initialized = true;
