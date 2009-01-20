@@ -400,9 +400,8 @@ int main (int argc, char** argv)
 		    << std::endl;
 
 	// This handy function will print the file name, line number,
-	// and then abort.  Currrently the library does not use C++
-	// exception handling.
-	error();
+	// and then abort.
+	libmesh_error();
       }
     
     // Brief message to the user regarding the program name
@@ -440,7 +439,7 @@ int main (int argc, char** argv)
     if ((family == "MONOMIAL") || (family == "XYZ"))
       {
 	std::cout << "ex19 currently requires a C^0 (or higher) FE basis." << std::endl;
-	error();
+	libmesh_error();
       }
 
     if ( command_line.search(1, "-pre") )
