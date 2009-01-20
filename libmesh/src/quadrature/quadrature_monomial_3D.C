@@ -72,18 +72,28 @@ void QMonomial::init_3D(const ElemType _type,
 	      // A degree 5, 13-point rule by Stroud,
 	      // AH Stroud, "Some Fifth Degree Integration Formulas for Symmetric Regions II.",
 	      // Numerische Mathematik 9, pp. 460-468 (1967).
-	      // This rule is provably minimal in the number of points.
-	      const Real eta=0.0;
-	      
-	      const Real lambda=0.88030430;
-	      const Real xi=-0.49584802;
-	      
-	      const Real mu=0.79562143;
-	      const Real gamma=0.025293237;
+	      //
+	      // This rule is provably minimal in the number of points.  The equations given for
+	      // the n-cube on pg. 466 of the paper for mu/gamma and gamma are wrong, at least for
+	      // the n=3 case.  I'm also unsure of the equations given on pg. 464 of the paper, but
+	      // if you code up Eqn. (7) of the paper for n=3, you can get the right answer.  That's
+	      // what I've done here, in Maple, using 32 decimal digits of precision in the calculation.
 
-	      const Real A=0.21052632 * 8.0;
-	      const Real B=0.068123420 * 8.0;
-	      const Real C=0.063455527 * 8.0;
+	      // Point data for permutations.
+	      const Real eta    =  0.00000000000000000000000000000000e+00L;
+	      
+	      const Real lambda =  8.8030440669930978047737818209860e-01L; // Stroud: 0.88030430;
+	      const Real xi     = -4.9584817142571115281421242364290e-01L; // Stroud: -0.49584802;
+	      
+	      const Real mu     =  7.9562142216409541542982482567580e-01L; // Stroud: 0.79562143;
+	      const Real gamma  =  2.5293711744842581347389255929324e-02L; // Stroud: 0.025293237;
+
+	      // Weights: the centroid weight is given analytically.  Weight B (resp C) goes
+	      // with the {lambda,xi} (resp {mu, gamma}) permutation.  The single-precision
+	      // results reported by Stroud are given for reference.
+	      const Real A      = 32.0L / 19.0L;                          // Stroud: 0.21052632  * 8.0 = 1.684210560;
+	      const Real B      = 5.4498735127757671684690782180890e-01L; // Stroud: 0.068123420 * 8.0 = 0.544987360;
+	      const Real C      = 5.0764422766979170420572375713840e-01L; // Stroud: 0.063455527 * 8.0 = 0.507644216;
 	      
  	      _points.resize(13);
  	      _weights.resize(13);
