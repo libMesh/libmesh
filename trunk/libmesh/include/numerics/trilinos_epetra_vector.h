@@ -717,7 +717,7 @@ void EpetraVector<T>::init (const unsigned int n,
 		            const std::vector<unsigned int>& ghost,
 			    const bool fast)
 {
-  // FIXME: ignoring ghost sparsity pattern for now
+  // TODO: we shouldn't ignore the ghost sparsity pattern
   this->init(n, n_local, fast);
 }
 
