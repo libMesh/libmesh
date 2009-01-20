@@ -188,6 +188,10 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   // And we'll need to temporarily change solution projection settings
   std::vector<bool> old_projection_settings(system_list.size());
 
+  // And it'll be best to avoid any repartitioning
+  AutoPtr<Partitioner> old_partitioner = mesh.partitioner();
+  mesh.partitioner().reset(NULL);
+
   for (unsigned int i=0; i != system_list.size(); ++i)
     {
       System &system = *system_list[i];
@@ -539,6 +543,9 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
           delete coarse_vectors[i][var_name];
         }
     }
+
+  // Restore old partitioner settings
+  mesh.partitioner() = old_partitioner;
 
   if (!_component_scales)
     delete component_scales;
