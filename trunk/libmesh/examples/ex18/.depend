@@ -59,11 +59,13 @@ ex18.$(obj-suffix):\
     $(LIBMESH_DIR)/include/numerics/vector_value.h\
     $(LIBMESH_DIR)/include/parallel/threads.h\
     $(LIBMESH_DIR)/include/partitioning/partitioner.h\
+    $(LIBMESH_DIR)/include/solvers/diff_context.h\
     $(LIBMESH_DIR)/include/solvers/diff_solver.h\
     $(LIBMESH_DIR)/include/solvers/diff_system.h\
     $(LIBMESH_DIR)/include/solvers/equation_systems.h\
     $(LIBMESH_DIR)/include/solvers/euler_solver.h\
     $(LIBMESH_DIR)/include/solvers/explicit_system.h\
+    $(LIBMESH_DIR)/include/solvers/fem_context.h\
     $(LIBMESH_DIR)/include/solvers/fem_system.h\
     $(LIBMESH_DIR)/include/solvers/frequency_system.h\
     $(LIBMESH_DIR)/include/solvers/implicit_system.h\
@@ -139,8 +141,10 @@ naviersystem.$(obj-suffix):\
     $(LIBMESH_DIR)/include/parallel/threads.h\
     $(LIBMESH_DIR)/include/partitioning/partitioner.h\
     $(LIBMESH_DIR)/include/quadrature/quadrature.h\
+    $(LIBMESH_DIR)/include/solvers/diff_context.h\
     $(LIBMESH_DIR)/include/solvers/diff_system.h\
     $(LIBMESH_DIR)/include/solvers/explicit_system.h\
+    $(LIBMESH_DIR)/include/solvers/fem_context.h\
     $(LIBMESH_DIR)/include/solvers/fem_system.h\
     $(LIBMESH_DIR)/include/solvers/implicit_system.h\
     $(LIBMESH_DIR)/include/solvers/linear_implicit_system.h\
