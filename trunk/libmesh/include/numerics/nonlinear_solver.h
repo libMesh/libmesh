@@ -189,6 +189,12 @@ public:
    */
   Real minimum_linear_tolerance;
 
+  /**
+   * After a call to solve this will reflect whether or not the nonlinear
+   * solve was successful.
+   */
+  bool converged;
+  
 protected:
   /**
    * A reference to the system we are solving.
