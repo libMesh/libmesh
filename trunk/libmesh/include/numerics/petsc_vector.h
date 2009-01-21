@@ -654,7 +654,8 @@ void PetscVector<T>::init (const unsigned int n,
   int petsc_n=static_cast<int>(n);
   int petsc_n_local=static_cast<int>(n_local);
   int petsc_n_ghost=static_cast<int>(ghost.size());
-  int* petsc_ghost = const_cast<int*>(reinterpret_cast<const int*>(&ghost[0]));
+  int* petsc_ghost = ghost.empty() ? PETSC_NULL :
+    const_cast<int*>(reinterpret_cast<const int*>(&ghost[0]));
 
   // Clear initialized vectors 
   if (this->initialized())
