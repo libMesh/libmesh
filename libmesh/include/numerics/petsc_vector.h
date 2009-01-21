@@ -542,7 +542,7 @@ template <typename T>
 inline
 PetscVector<T>::PetscVector (Vec v)
   : _global_to_local_map(),
-    _destroy_vec_on_exit(true)
+    _destroy_vec_on_exit(false)
 {
   this->_vec = v;
   this->_is_initialized = true;
