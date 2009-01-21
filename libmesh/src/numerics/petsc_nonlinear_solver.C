@@ -290,6 +290,12 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 	  	
 #endif
 
+  SNESConvergedReason reason;
+  SNESGetConvergedReason(_snes,&reason);
+
+  //Based on Petsc 2.3.3 documentation all diverged reasons are negative
+  this->converged = reason >= 0;
+
   this->clear();
 		 
   // return the # of its. and the final residual norm.  Note that
