@@ -58,39 +58,50 @@ namespace {
   {
     if (elem_type_to_enum.empty())
       {
+	elem_type_to_enum["EDGE"      ]=EDGE2;
 	elem_type_to_enum["EDGE2"     ]=EDGE2;
 	elem_type_to_enum["EDGE3"     ]=EDGE3;
 	elem_type_to_enum["EDGE4"     ]=EDGE4;
 	
+	elem_type_to_enum["TRI"       ]=TRI3;
 	elem_type_to_enum["TRI3"      ]=TRI3;
 	elem_type_to_enum["TRI6"      ]=TRI6;
 	
+	elem_type_to_enum["QUAD"      ]=QUAD4;
 	elem_type_to_enum["QUAD4"     ]=QUAD4;
 	elem_type_to_enum["QUAD8"     ]=QUAD8;
 	elem_type_to_enum["QUAD9"     ]=QUAD9;
 	
+	elem_type_to_enum["TET"       ]=TET4;
 	elem_type_to_enum["TET4"      ]=TET4;
 	elem_type_to_enum["TET10"     ]=TET10;
 	
+	elem_type_to_enum["HEX"       ]=HEX8;
 	elem_type_to_enum["HEX8"      ]=HEX8;
 	elem_type_to_enum["HEX20"     ]=HEX20;
 	elem_type_to_enum["HEX27"     ]=HEX27;
 	
+	elem_type_to_enum["PRISM"     ]=PRISM6;
 	elem_type_to_enum["PRISM6"    ]=PRISM6;
 	elem_type_to_enum["PRISM15"   ]=PRISM15;
 	elem_type_to_enum["PRISM18"   ]=PRISM18;
 	
+	elem_type_to_enum["PYRAMID"   ]=PYRAMID5;
 	elem_type_to_enum["PYRAMID5"  ]=PYRAMID5;
 	
+	elem_type_to_enum["INFEDGE"   ]=INFEDGE2;
 	elem_type_to_enum["INFEDGE2"  ]=INFEDGE2;
 	
+	elem_type_to_enum["INFQUAD"   ]=INFQUAD4;
 	elem_type_to_enum["INFQUAD4"  ]=INFQUAD4;
 	elem_type_to_enum["INFQUAD6"  ]=INFQUAD6;
 	
+	elem_type_to_enum["INFHEX"    ]=INFHEX8;
 	elem_type_to_enum["INFHEX8"   ]=INFHEX8;
 	elem_type_to_enum["INFHEX16"  ]=INFHEX16;
 	elem_type_to_enum["INFHEX18"  ]=INFHEX18;
 	
+	elem_type_to_enum["INFPRISM"  ]=INFPRISM6;
 	elem_type_to_enum["INFPRISM6" ]=INFPRISM6;
 	elem_type_to_enum["INFPRISM12"]=INFPRISM12;
       }
@@ -217,7 +228,7 @@ namespace {
 	fefamily_to_enum["JACOBI_30_00"]=JACOBI_30_00;
 	fefamily_to_enum["LEGENDRE"    ]=LEGENDRE;
 	fefamily_to_enum["CLOUGH"      ]=CLOUGH;
-	fefamily_to_enum["HERMITE"      ]=HERMITE;
+	fefamily_to_enum["HERMITE"     ]=HERMITE;
       }
     
   }
@@ -326,11 +337,14 @@ namespace Utility {
   ElemType string_to_enum<ElemType> (const std::string& s)
   {
     init_elem_type_to_enum();
+
+    std::string upper(s);
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
     
-    if (!elem_type_to_enum.count(s))
+    if (!elem_type_to_enum.count(upper))
       libmesh_error();
     
-    return elem_type_to_enum[s];
+    return elem_type_to_enum[upper];
   }
 
 
@@ -355,10 +369,13 @@ namespace Utility {
   {
     init_order_to_enum();
     
-    if (!order_to_enum.count(s))
+    std::string upper(s);
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+    
+    if (!order_to_enum.count(upper))
       libmesh_error();
     
-    return order_to_enum[s];
+    return order_to_enum[upper];
   }
 
 
@@ -383,10 +400,13 @@ namespace Utility {
   {
     init_fefamily_to_enum();
     
-    if (!fefamily_to_enum.count(s))
+    std::string upper(s);
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+    
+    if (!fefamily_to_enum.count(upper))
       libmesh_error();
     
-    return fefamily_to_enum[s];
+    return fefamily_to_enum[upper];
   }
 
 
@@ -411,10 +431,13 @@ namespace Utility {
   {
     init_inf_map_type_to_enum();
     
-    if (!inf_map_type_to_enum.count(s))
+    std::string upper(s);
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+    
+    if (!inf_map_type_to_enum.count(upper))
       libmesh_error();
     
-    return inf_map_type_to_enum[s];
+    return inf_map_type_to_enum[upper];
   }
 
 
@@ -439,10 +462,13 @@ namespace Utility {
   {
     init_quadrature_type_to_enum();
     
-    if (!quadrature_type_to_enum.count(s))
+    std::string upper(s);
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+    
+    if (!quadrature_type_to_enum.count(upper))
       libmesh_error();
     
-    return quadrature_type_to_enum[s];
+    return quadrature_type_to_enum[upper];
   }
 
 
