@@ -24,6 +24,7 @@
 #include <set>
 
 // Local includes
+#include "boundary_info.h"
 #include "elem.h"
 #include "elem_range.h"
 #include "location_maps.h"
@@ -265,6 +266,29 @@ void MeshTools::find_boundary_nodes (const MeshBase& mesh,
 	    on_boundary[side->node(n)] = true;
 	}
 }
+
+
+
+void MeshTools::change_boundary_id (MeshBase& mesh,
+                                    const unsigned int old_id,
+                                    const unsigned int new_id)
+{
+  // Only level-0 elements store BCs.  Loop over them.
+  MeshBase::element_iterator           el = mesh.level_elements_begin(0);
+  const MeshBase::element_iterator end_el = mesh.level_elements_end(0);
+  for (; el != end_el; ++el)
+    {
+      Elem *elem = *el;
+      unsigned int n_sides = elem->n_sides();
+      for (unsigned int s=0; s != n_sides; ++s)
+        if (mesh.boundary_info->boundary_id(elem, s) == old_id)
+          {
+            mesh.boundary_info->remove_side(elem, s, old_id);
+            mesh.boundary_info->add_side(elem, s, new_id);
+          }
+    }
+}
+
 
 
 
