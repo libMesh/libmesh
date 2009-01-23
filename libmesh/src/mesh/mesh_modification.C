@@ -1261,3 +1261,29 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
   mesh.prepare_for_use();
 }
 #endif // #ifdef LIBMESH_ENABLE_AMR
+
+
+
+void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
+                                                  const unsigned int old_id,
+                                                  const unsigned int new_id)
+{
+  // Only level-0 elements store BCs.  Loop over them.
+  MeshBase::element_iterator           el = mesh.level_elements_begin(0);
+  const MeshBase::element_iterator end_el = mesh.level_elements_end(0);
+  for (; el != end_el; ++el)
+    {
+      Elem *elem = *el;
+      unsigned int n_sides = elem->n_sides();
+      for (unsigned int s=0; s != n_sides; ++s)
+        if (mesh.boundary_info->boundary_id(elem, s) == old_id)
+          {
+            mesh.boundary_info->remove_side(elem, s, old_id);
+            mesh.boundary_info->add_side(elem, s, new_id);
+          }
+    }
+}
+
+
+
+

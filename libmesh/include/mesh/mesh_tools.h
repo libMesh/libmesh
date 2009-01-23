@@ -141,14 +141,6 @@ namespace MeshTools
 			    std::vector<bool> &on_boundary);
 
   /**
-   * @finds any boundary ids that are currently old_id,
-   * changes them to new_id
-   */
-  void change_boundary_id (MeshBase &mesh,
-			   const unsigned int old_id,
-			   const unsigned int new_id);
-
-  /**
    * @returns two points defining a cartesian box that bounds the
    * mesh.  The first entry in the pair is the mininum, the second 
    * is the maximim.
