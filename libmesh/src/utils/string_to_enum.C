@@ -20,6 +20,7 @@
 
 
 // C++ includes
+#include <algorithm>
 #include <map>
 
 // Local includes
