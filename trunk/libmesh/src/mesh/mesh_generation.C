@@ -280,6 +280,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   Elem* elem = mesh.add_elem (new Edge2);
                   elem->set_node(0) = mesh.node_ptr(i);
                   elem->set_node(1) = mesh.node_ptr(i+1);
+
+                  if (i == 0)
+                    mesh.boundary_info->add_side(elem, 0, 0);
+
+                  if (i == (nx-1))
+                    mesh.boundary_info->add_side(elem, 1, 1);
                 }
               break;
               }
@@ -292,6 +298,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   elem->set_node(0) = mesh.node_ptr(2*i);
                   elem->set_node(2) = mesh.node_ptr(2*i+1);
                   elem->set_node(1) = mesh.node_ptr(2*i+2);
+
+                  if (i == 0)
+                    mesh.boundary_info->add_side(elem, 0, 0);
+
+                  if (i == (nx-1))
+                    mesh.boundary_info->add_side(elem, 1, 1);
                 }
               break;
               }
@@ -305,6 +317,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   elem->set_node(2) = mesh.node_ptr(3*i+1);
                   elem->set_node(3) = mesh.node_ptr(3*i+2);
                   elem->set_node(1) = mesh.node_ptr(3*i+3);
+
+                  if (i == 0)
+                    mesh.boundary_info->add_side(elem, 0, 0);
+
+                  if (i == (nx-1))
+                    mesh.boundary_info->add_side(elem, 1, 1);
                 }
               break;
               }
@@ -315,7 +333,6 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                 libmesh_error();                
               }
           }
-
 
 	// Scale the nodal positions
 	for (unsigned int p=0; p<mesh.n_nodes(); p++)
