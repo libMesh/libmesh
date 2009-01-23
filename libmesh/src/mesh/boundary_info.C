@@ -364,6 +364,40 @@ void BoundaryInfo::remove_side (const Elem* elem,
 
 
 
+void BoundaryInfo::remove_side (const Elem* elem,
+                                const unsigned short int side,
+                                const unsigned short int id)
+{
+  libmesh_assert (elem != NULL);
+
+  // The user shouldn't be trying to remove only one child's boundary
+  // id
+  libmesh_assert (elem->level() == 0);
+  
+  std::pair<std::multimap<const Elem*,
+                          std::pair<unsigned short int, short int> >::iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, short int> >::iterator > 
+    e = _boundary_side_id.equal_range(elem);
+
+  // elem may be there, maybe multiple occurances
+  while (e.first != e.second)
+    {
+      // if this is true we found the requested side
+      // of the element and want to erase the requested id
+      if (e.first->second.first == side &&
+          e.first->second.second == id)
+	{
+	  // (postfix++ - increment the iterator before it's invalid)
+          _boundary_side_id.erase(e.first++);
+        }
+      else
+        ++e.first;
+    }
+}
+
+
+
 unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
                                                  const unsigned short int boundary_id) const
 {

@@ -138,11 +138,19 @@ public:
   void remove (const Elem* elem);
 
   /**
-   * Removes the boundary conditions associated with element \p elem,
-   * if any exist.
+   * Removes all boundary conditions associated with side \p side of
+   * element \p elem, if any exist.
    */
   void remove_side (const Elem* elem,
                     const unsigned short int side);
+
+  /**
+   * Removes the boundary id \p id from side \p side of element \p
+   * elem, if it exists.
+   */
+  void remove_side (const Elem* elem,
+                    const unsigned short int side,
+                    const unsigned short int id);
 
   /**
    * Returns the number of user-specified boundary ids.
