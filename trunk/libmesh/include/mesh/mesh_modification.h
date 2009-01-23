@@ -127,6 +127,14 @@ namespace MeshTools
     void flatten(MeshBase& mesh);
 #endif // #ifdef LIBMESH_ENABLE_AMR
     
+    /**
+     * @finds any boundary ids that are currently old_id,
+     * changes them to new_id
+     */
+    void change_boundary_id (MeshBase &mesh,
+			     const unsigned int old_id,
+			     const unsigned int new_id);
+
   } // end namespace Meshtools::Modification
 } // end namespace MeshTools
 
