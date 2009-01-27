@@ -1265,8 +1265,8 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 
 
 void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
-                                                  const unsigned int old_id,
-                                                  const unsigned int new_id)
+                                                  const short int old_id,
+                                                  const short int new_id)
 {
   // Only level-0 elements store BCs.  Loop over them.
   MeshBase::element_iterator           el = mesh.level_elements_begin(0);
