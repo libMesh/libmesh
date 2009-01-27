@@ -132,8 +132,8 @@ namespace MeshTools
      * changes them to new_id
      */
     void change_boundary_id (MeshBase &mesh,
-			     const unsigned int old_id,
-			     const unsigned int new_id);
+			     const short int old_id,
+			     const short int new_id);
 
   } // end namespace Meshtools::Modification
 } // end namespace MeshTools

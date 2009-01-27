@@ -150,7 +150,7 @@ public:
    */
   void remove_side (const Elem* elem,
                     const unsigned short int side,
-                    const unsigned short int id);
+                    const short int id);
 
   /**
    * Returns the number of user-specified boundary ids.

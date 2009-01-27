@@ -366,7 +366,7 @@ void BoundaryInfo::remove_side (const Elem* elem,
 
 void BoundaryInfo::remove_side (const Elem* elem,
                                 const unsigned short int side,
-                                const unsigned short int id)
+                                const short int id)
 {
   libmesh_assert (elem != NULL);
 
