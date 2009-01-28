@@ -95,6 +95,7 @@ void NavierSystem::init_context(DiffContext &context)
 
   c.side_fe_var[u_var]->get_JxW();
   c.side_fe_var[u_var]->get_phi();
+  c.side_fe_var[u_var]->get_xyz();
 }
 
 
@@ -356,6 +357,9 @@ bool NavierSystem::side_constraint (bool request_jacobian,
   const std::vector<std::vector<Real> >& phi_side =
     c.side_fe_var[u_var]->get_phi();
 
+  // Physical location of the quadrature points on the side
+  const std::vector<Point>& qpoint = c.side_fe_var[u_var]->get_xyz();
+
   // The number of local degrees of freedom in u and v
   const unsigned int n_u_dofs = c.dof_indices_var[u_var].size(); 
 
@@ -391,16 +395,27 @@ bool NavierSystem::side_constraint (bool request_jacobian,
       libmesh_assert (boundary_id != BoundaryInfo::invalid_id);
       const short int top_id = (dim==3) ? 5 : 2;
 
-      Real u_value = 0.;
+      // Boundary data coming from true solution
+      Real
+	u_value = 0.,
+	v_value = 0.,
+	w_value = 0.;
 
       // For lid-driven cavity, set u=1 on the lid.
       if ((application == 0) && (boundary_id == top_id))
 	u_value = 1.;
-              
-      // Set v, w = 0 everywhere
-      const Real v_value = 0.;
-      const Real w_value = 0.;
 
+      if (application == 2)
+	{
+	  //libmesh_assert(Reynolds==1.0); // Don't accidentally solve Stokes flow in application 2!
+	  const Real x=qpoint[qp](0);
+	  const Real y=qpoint[qp](1);
+	  const Real z=qpoint[qp](2);
+	  u_value=(Reynolds+1)*(y*y + z*z);
+	  v_value=(Reynolds+1)*(x*x + z*z);
+	  w_value=(Reynolds+1)*(x*x + y*y);
+	}
+      
       for (unsigned int i=0; i != n_u_dofs; i++)
         {
           Fu(i) += JxW_side[qp] * penalty *
@@ -589,6 +604,20 @@ Point NavierSystem::forcing(const Point& p)
 	  }
 
 	return f;
+      }
+
+      // 3D test case with quadratic velocity and linear pressure field
+    case 2:
+      {
+	libmesh_assert(3 == this->get_mesh().mesh_dimension());
+	const Real x=p(0), y=p(1), z=p(2);
+	const Real
+	  u=(Reynolds+1)*(y*y + z*z),
+	  v=(Reynolds+1)*(x*x + z*z),
+	  w=(Reynolds+1)*(x*x + y*y);
+	return 2.*Reynolds*(Reynolds+1.)*Point(v*y + w*z,
+					       u*x + w*z,
+					       u*x + v*y);
       }
 
     default:

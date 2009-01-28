@@ -10,4 +10,8 @@ print_element_jacobians = false
 # forcing functions are applied.  Current options are:
 # 0 - discontinuous lid velociy driven cavity
 # 1 - homogeneous Dirichlet BC with smooth forcing
+# 2 - a 3D, non-transient solution in the space of the Taylor-Hood elements.
+#     Note: for this application be sure to set 'transient=false' and
+#     'n_timesteps=1' in the input file, ex18.in.  Finally, there is no
+#     1D version of this application available.
 application = 0
