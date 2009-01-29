@@ -96,6 +96,22 @@ public:
 	     MeshData* this_mesh_data=NULL);
   
   /**
+   * Close the data structures and prepare for use.
+   * Synchronizes the \p boundary_mesh
+   * data structures with the \p mesh data structures.
+   * Allows the \p boundary_mesh to be used like any other mesh.
+   * Before this is called the \p boundary_mesh data structure is
+   * empty.  Only boundary elements with the specified ids are
+   * extracted.
+   *
+   * If you are using a MeshData class with this Mesh, you can
+   * pass a pointer to both the boundary_mesh's MeshData object,
+   * and the MeshData object used for this mesh.
+   */
+  void sync (const std::set<short int> &requested_boundary_ids,
+	     BoundaryMesh& boundary_mesh);
+  
+  /**
    * Add \p Node \p node with boundary id \p id to the boundary
    * information data structures.
    */ 

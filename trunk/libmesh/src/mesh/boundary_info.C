@@ -63,9 +63,9 @@ void BoundaryInfo::clear()
 
 
 
-void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
-			MeshData*     boundary_mesh_data,
-			MeshData*     this_mesh_data)
+void BoundaryInfo::sync (BoundaryMesh& boundary_mesh,
+			 MeshData*     boundary_mesh_data,
+			 MeshData*     this_mesh_data)
 {
   boundary_mesh.clear();
 
@@ -161,12 +161,11 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 		side->subdomain_id() = id_map[invalid_id];
 	      }
 
-	    side->processor_id() =
-	      side->subdomain_id();
+	    side->processor_id() = side->subdomain_id(); //elem->processor_id();
 	    
 	    // Add the side
 	    Elem* new_elem = boundary_mesh.add_elem(side.release());
-	    
+
 	    // This side's Node pointers still point to the nodes of the  original mesh.
 	    // We need to re-point them to the boundary mesh's nodes!  Since we copied *ALL* of
 	    // the original mesh's nodes over, we should be guaranteed to have the same ordering.
@@ -200,6 +199,115 @@ void BoundaryInfo::sync(BoundaryMesh& boundary_mesh,
 }
 
 
+			 
+
+void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
+			 BoundaryMesh& boundary_mesh)
+{
+  // Re-create the boundary mesh.
+  boundary_mesh.clear();
+    
+  boundary_mesh.set_n_subdomains() = _mesh.n_subdomains();
+  boundary_mesh.set_n_partitions() = _mesh.n_partitions();
+
+  // Make individual copies of all the nodes in the current mesh
+  // and add them to the boundary mesh.  Yes, this is overkill because
+  // all of the current mesh nodes will not end up in the the boundary
+  // mesh.  These nodes can be trimmed later via a call to prepare_for_use().
+  {
+    libmesh_assert (boundary_mesh.n_nodes() == 0);
+    boundary_mesh.reserve_nodes(_mesh.n_nodes());
+    
+    MeshBase::const_node_iterator it  = _mesh.nodes_begin();
+    MeshBase::const_node_iterator end = _mesh.nodes_end();
+    
+    for(; it != end; ++it)
+      {
+	const Node* node = *it;
+	boundary_mesh.add_point(*node); // calls Node::build(Point, id)
+      }
+  }
+
+  // Add additional sides that aren't flagged with boundary conditions
+  MeshBase::const_element_iterator       el     = _mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end_el = _mesh.active_elements_end(); 
+
+  for ( ; el != end_el; ++el)
+    {
+      const Elem* elem = *el;
+      
+      for (unsigned int s=0; s<elem->n_sides(); s++)
+	if (elem->neighbor(s) == NULL) // on the boundary
+	  {
+	    // Get the top-level parent for this element
+	    const Elem* top_parent = elem->top_parent();
+
+	    // A convenient typedef
+	    typedef
+	      std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator
+	      Iter;
+	      
+	    // Find all the bcs asociated with top_parent
+	    std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(top_parent);
+
+	    // look for a bcid which is (i) in the user-requested set, and
+	    // (ii) matches the current side #s
+	    while (pos.first != pos.second)
+	      {
+		// if this side is flagged with a boundary condition
+		// and the user wants this id
+		if ((pos.first->second.first == s) &&
+		    (requested_boundary_ids.count(pos.first->second.second)))
+		  {
+		    // Build the side - do not use a "proxy" element here:
+		    // This will be going into the BoundaryMesh and needs to
+		    // stand on its own.
+		    AutoPtr<Elem> side (elem->build_side(s, false));
+		    
+		    // inherit processor_id and subdomain_id from parent
+		    side->subdomain_id() = elem->subdomain_id();
+		    side->processor_id() = elem->processor_id();
+
+		    // Add the side
+		    Elem* new_elem = boundary_mesh.add_elem(side.release());
+
+		    // and set the parent
+		    new_elem->set_parent (const_cast<Elem*>(elem));
+
+		    // This side's Node pointers still point to the nodes of the  original mesh.
+		    // We need to re-point them to the boundary mesh's nodes!  Since we copied *ALL* of
+		    // the original mesh's nodes over, we should be guaranteed to have the same ordering.
+		    for (unsigned int nn=0; nn<new_elem->n_nodes(); ++nn)
+		      {
+			// Get the correct node pointer, based on the id()
+			Node* new_node = boundary_mesh.node_ptr(new_elem->node(nn));
+			
+			// sanity check: be sure that the new Nodes global id really matches
+			libmesh_assert (new_node->id() == new_elem->node(nn));
+
+			// Assign the new node pointer
+			new_elem->set_node(nn) = new_node;
+		      }
+
+		    // go on to the next side
+		    break;
+		  }
+		
+		++pos.first;
+	      } // end loop over bcs matching top_parent
+	    
+	  } // end if neighbor is NULL
+    } // end loop over active elements
+
+  // Don't repartition this mesh; but rather inherit the partitioning
+  boundary_mesh.partitioner().reset(NULL);
+  
+  // Trim any un-used nodes from the Mesh
+  boundary_mesh.prepare_for_use();
+
+  // and finally distribute element partitioning to the nodes
+  Partitioner::set_node_processor_ids(boundary_mesh);
+}
 
 
 

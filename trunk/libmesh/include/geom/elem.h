@@ -519,7 +519,7 @@ class Elem : public ReferenceCountedObject<Elem>,
   Elem* parent ();
 
   /**
-   * @sets the pointer to the element's parent.
+   * @Sets the pointer to the element's parent.
    * Dangerous to use in high-level code.
    */
   void set_parent (Elem *p);
@@ -532,6 +532,16 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   const Elem* top_parent () const;
   
+  /** 
+   * In some cases it is desireable to extract the boundary (or a subset thereof)
+   * of a D-dimensional mesh as a (D-1)-dimensional manifold.  In this case
+   * we may want to know the 'parent' element from which the manifold elements
+   * were extracted.  We can easily do that for the level-0 manifold elements
+   * by storing the D-dimensional parent.  This method provides access to that
+   * element.
+   */
+  const Elem* interior_parent () const;
+
   /**
    * @returns the magnitude of the distance between nodes n1 and n2.
    * Useful for computing the lengths of the sides of elements.
@@ -1418,6 +1428,27 @@ const Elem* Elem::top_parent () const
 
 
 inline
+const Elem* Elem::interior_parent () const
+{
+  // interior parents make no sense for 3D elements.
+  libmesh_assert (this->dim() != 3);
+
+  // and they are only good for level-0 elements
+  if (this->level() != 0)
+    return this->parent()->interior_parent();
+  
+  // if we are at level-0 and our parent is not NULL
+  // then it better be the higher-dimensional 
+  // interior element we are looking for.
+  if (_parent)
+    libmesh_assert (_parent->dim() == (this->dim()+1));
+
+  return _parent;
+}
+
+
+
+inline
 unsigned int Elem::level() const
 {
 #ifdef LIBMESH_ENABLE_AMR
@@ -1428,6 +1459,13 @@ unsigned int Elem::level() const
   // level-0 element
   if (this->parent() == NULL)
     return 0;
+
+  // if the parent and this element are of different
+  // dimensionality we are at the same level as 
+  // the parent (e.g. we are the 2D side of a 
+  // 3D element)
+  if (this->dim() != this->parent()->dim())
+    return this->parent()->level();
 
   // otherwise we are at a level one
   // higher than our parent
