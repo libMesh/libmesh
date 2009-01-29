@@ -37,6 +37,9 @@ namespace {
   // Nasty hacks for reading/writing zipped files
   void zip_file (const std::string &unzipped_name)
   {
+    // There's no parallel bzip2 for us to call
+    libmesh_assert(libMesh::processor_id() == 0);
+
 #ifdef LIBMESH_HAVE_BZIP
     START_LOG("system(bzip2)", "XdrIO");
 
@@ -54,6 +57,9 @@ namespace {
 
   std::string unzip_file (const std::string &name)
   {
+    // There's no parallel bunzip2 for us to call
+    libmesh_assert(libMesh::processor_id() == 0);
+
     std::string new_name = name;
     if (name.size() - name.rfind(".bz2") == 4)
       {
