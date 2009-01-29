@@ -146,7 +146,9 @@ int main (int argc, char** argv)
     infile("relative_step_tolerance", 1.e-3);
   solver.relative_residual_tolerance =
     infile("relative_residual_tolerance", 0.0);
-
+  solver.absolute_residual_tolerance =
+    infile("absolute_residual_tolerance", 0.0);
+    
   // And the linear solver options
   solver.max_linear_iterations =
     infile("max_linear_iterations", 50000);
@@ -161,7 +163,7 @@ int main (int argc, char** argv)
   for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
     {
       // A pretty update message
-      std::cout << " Solving time step " << t_step << ", time = "
+      std::cout << "\n\nSolving time step " << t_step << ", time = "
                 << system.time << std::endl;
 
       // Adaptively solve the timestep

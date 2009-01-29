@@ -407,7 +407,6 @@ bool NavierSystem::side_constraint (bool request_jacobian,
 
       if (application == 2)
 	{
-	  //libmesh_assert(Reynolds==1.0); // Don't accidentally solve Stokes flow in application 2!
 	  const Real x=qpoint[qp](0);
 	  const Real y=qpoint[qp](1);
 	  const Real z=qpoint[qp](2);
@@ -609,15 +608,21 @@ Point NavierSystem::forcing(const Point& p)
       // 3D test case with quadratic velocity and linear pressure field
     case 2:
       {
-	libmesh_assert(3 == this->get_mesh().mesh_dimension());
+	// This problem doesn't make sense in 1D...
+	libmesh_assert(1 != this->get_mesh().mesh_dimension());
 	const Real x=p(0), y=p(1), z=p(2);
 	const Real
 	  u=(Reynolds+1)*(y*y + z*z),
 	  v=(Reynolds+1)*(x*x + z*z),
 	  w=(Reynolds+1)*(x*x + y*y);
-	return 2.*Reynolds*(Reynolds+1.)*Point(v*y + w*z,
-					       u*x + w*z,
-					       u*x + v*y);
+
+	if (this->get_mesh().mesh_dimension() == 2)
+	  return 2.*Reynolds*(Reynolds+1.)*Point(v*y,
+						 u*x);
+	else
+	  return 2.*Reynolds*(Reynolds+1.)*Point(v*y + w*z,
+						 u*x + w*z,
+						 u*x + v*y);
       }
 
     default:
