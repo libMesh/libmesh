@@ -400,6 +400,8 @@ void DofMap::reinit(MeshBase& mesh)
                     << FEInterface::max_order(base_fe_type,type)
                     << ", not fe_type.order = " << base_fe_type.order
                     << std::endl;
+
+                  libmesh_error();
                 }
 
               std::cerr << "WARNING: Finite element "
