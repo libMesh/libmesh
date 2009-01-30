@@ -62,8 +62,10 @@ void PetscMatrix<T>::init (const unsigned int m,
   int n_oz     = static_cast<int>(noz);
   
   // create a sequential matrix on one processor
-  if ((m_l == m) && (n_l == n))
+  if (libMesh::n_processors() == 1)
     {
+      libmesh_assert ((m_l == m) && (n_l == n));
+
       // Create matrix.  Revisit later to do preallocation and make more efficient
       ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, n_global, n_global,
 			      n_nz, PETSC_NULL, &_mat);
