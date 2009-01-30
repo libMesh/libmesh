@@ -892,7 +892,7 @@ namespace Parallel
   template <typename T>
   inline void min(std::vector<T> &r)
   {
-    if (libMesh::n_processors() > 1)
+    if (libMesh::n_processors() > 1 && !r.empty())
       {
 	START_LOG("min()", "Parallel");
     
@@ -912,7 +912,7 @@ namespace Parallel
   template <>
   inline void min(std::vector<bool> &r)
   {
-    if (libMesh::n_processors() > 1)
+    if (libMesh::n_processors() > 1 && !r.empty())
       {
 	START_LOG("min()", "Parallel");
     
@@ -978,7 +978,7 @@ namespace Parallel
   template <typename T>
   inline void max(std::vector<T> &r)
   {
-    if (libMesh::n_processors() > 1)
+    if (libMesh::n_processors() > 1 && !r.empty())
       {
 	START_LOG("max()", "Parallel");
     
@@ -998,7 +998,7 @@ namespace Parallel
   template <>
   inline void max(std::vector<bool> &r)
   {
-    if (libMesh::n_processors() > 1)
+    if (libMesh::n_processors() > 1 && !r.empty())
       {
 	START_LOG("max()", "Parallel");
     
