@@ -141,12 +141,9 @@ void TecplotIO::write_ascii (const std::string& fname,
   // Create an output stream
   std::ofstream out(fname.c_str());
 
+  // Make sure it opened correctly
   if (!out.good())
-    {
-      std::cerr << "ERROR: opening output file " << fname
-		<< std::endl;
-      libmesh_error();
-    }
+    libmesh_file_error(fname.c_str());
 
   // Get a constant reference to the mesh.
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();

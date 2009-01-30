@@ -32,7 +32,12 @@
 // DivaIO class members
 void DivaIO::write (const std::string& fname)
 {
+  // Open the output file stream
   std::ofstream out(fname.c_str());
+
+  // Make sure it opened correctly
+  if (!out.good())
+    libmesh_file_error(fname.c_str());
 
   this->write_stream (out);
 }

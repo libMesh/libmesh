@@ -54,12 +54,9 @@ void PostscriptIO::write (const std::string& fname)
       // Create output file stream
       std::ofstream out(fname.c_str());
 
+      // Make sure it opened correctly
       if (!out.good())
-	{
-	  std::cerr << "ERROR: opening output file " << fname
-		    << std::endl;
-	  libmesh_error();
-	}
+        libmesh_file_error(fname.c_str());
 
       // The mesh bounding box gives us info about what the
       // Postscript bounding box should be.

@@ -107,15 +107,9 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
       {
 	mp_in.open(fn, std::ios::in);
 
-	// Make sure the file is ready for use
-	if (!mp_in.good())
-	  {
-	    std::cerr << "XDR Error: Accessing file: "
-		      << fn
-		      << " failed."
-		      << std::endl;
-	    libmesh_error();
-	  }
+        // Make sure it opened correctly
+        if (!mp_in.good())
+          libmesh_file_error(fn);
 
 	break;
       }
@@ -124,15 +118,9 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
       {
 	mp_out.open(fn, std::ios::out);
 
-	// Make sure the file is ready for use
-	if (!mp_out.good())
-	  {
-	    std::cerr << "XDR Error: Accessing file: "
-		      << fn
-		      << " failed."
-		      << std::endl;
-	    libmesh_error();
-	  }
+        // Make sure it opened correctly
+        if (!mp_out.good())
+          libmesh_file_error(fn);
 
 	break;
       }

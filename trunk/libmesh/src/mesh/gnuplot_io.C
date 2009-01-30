@@ -79,12 +79,9 @@ void GnuPlotIO::write_solution(const std::string& fname,
   // Create an output stream for script file
   std::ofstream out(fname.c_str());
 
+  // Make sure it opened correctly
   if (!out.good())
-    {
-      std::cerr << "ERROR: opening output file " << fname
-		<< std::endl;
-      libmesh_error();
-    }
+    libmesh_file_error(fname.c_str());
 
   // The number of variables in the equation system
   const unsigned int n_vars = names->size();

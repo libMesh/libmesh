@@ -264,7 +264,9 @@ void TetGenIO::write (const std::string& fname)
   // Open the output file stream
   std::ofstream out (fname.c_str());
   
-  libmesh_assert (out.good());
+  // Make sure it opened correctly
+  if (!out.good())
+    libmesh_file_error(fname.c_str());
 
   // Get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
