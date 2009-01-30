@@ -175,8 +175,10 @@ UnstructuredMesh::~UnstructuredMesh ()
 void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 				       const bool reset_current_list)
 {
-  libmesh_assert(this->n_nodes() != 0);
-  libmesh_assert(this->n_elem()  != 0);
+  // We might actually want to run this on an empty mesh
+  // (e.g. the boundary mesh for a nonexistant bcid!)
+  // libmesh_assert(this->n_nodes() != 0);
+  // libmesh_assert(this->n_elem()  != 0);
 
   // This function must be run on all processors at once
   parallel_only();
