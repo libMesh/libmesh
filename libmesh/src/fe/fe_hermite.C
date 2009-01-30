@@ -74,6 +74,8 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
   // Piecewise (bi/tri)cubic C1 Hermite splines
   switch (t)
     {
+    case NODEELEM:
+      return 1;
     case EDGE2:
       libmesh_assert (o < 4);
     case EDGE3:
@@ -117,6 +119,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
   // Piecewise (bi/tri)cubic C1 Hermite splines
   switch (t)
     {
+    case NODEELEM:
+      return 1;
     case EDGE2:
     case EDGE3:
       {
@@ -240,6 +244,8 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 
   switch (t)
     {
+    case NODEELEM:
+      return 0;
     case EDGE2:
     case EDGE3:
       return (o-3);
@@ -310,6 +316,7 @@ bool FE<Dim,T>::shapes_need_reinit() const
 
 //--------------------------------------------------------------
 // Explicit instantiation of member functions
+INSTANTIATE_MBRF(0,HERMITE);
 INSTANTIATE_MBRF(1,HERMITE);
 INSTANTIATE_MBRF(2,HERMITE);
 INSTANTIATE_MBRF(3,HERMITE);

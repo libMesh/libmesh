@@ -35,13 +35,26 @@
 
 
 //-------------------------------------------------------
+// Full specialization for 0D when this is a useless method
+template <>
+void FEXYZ<0>::reinit(const Elem*,
+		      const unsigned int,
+		      const Real)
+{
+  std::cerr << "ERROR: This method only makes sense for 2D/3D elements!"
+	    << std::endl;
+  libmesh_error();
+}
+
+
+//-------------------------------------------------------
 // Full specialization for 1D when this is a useless method
 template <>
 void FEXYZ<1>::reinit(const Elem*,
 		      const unsigned int,
 		      const Real)
 {
-  std::cerr << "ERROR: This method only makes sense for 2D elements!"
+  std::cerr << "ERROR: This method only makes sense for 2D/3D elements!"
 	    << std::endl;
   libmesh_error();
 }

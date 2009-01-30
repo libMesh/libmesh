@@ -679,6 +679,8 @@ void FE<Dim,T>::init_base_shape_functions(const std::vector<Point>& qp,
 //--------------------------------------------------------------
 // Explicit instantiations using macro from fe_macro.h
 
+INSTANTIATE_FE(0);
+
 INSTANTIATE_FE(1);
 
 INSTANTIATE_FE(2);

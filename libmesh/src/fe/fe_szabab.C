@@ -122,6 +122,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	    return 2;
@@ -144,6 +147,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	    return 3;
@@ -167,6 +173,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	    return 4;
@@ -189,6 +198,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	    return 5;
@@ -211,6 +223,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	    return 6;
@@ -233,6 +248,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	    return 7;
@@ -254,6 +272,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	    return 8;
@@ -295,6 +316,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	    // The 1D Szabo-Babuska defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
@@ -376,6 +400,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	    // The 1D Szabo-Babuska defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
@@ -457,6 +484,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	    // The 1D Szabo-Babuska defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
@@ -538,6 +568,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	    // The 1D Szabo-Babuska defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
@@ -619,6 +652,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	    // The 1D Szabo-Babuska defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
@@ -700,6 +736,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	    // The 1D Szabo-Babuska defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
@@ -780,6 +819,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	    // The 1D Szabo-Babuska defined on a three-noded edge
 	  case EDGE2:
 	  case EDGE3:
@@ -879,6 +921,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 0;
+
 	    // The 1D Szabo-Babuska defined on a two-noded edge
 	  case EDGE2:
 	    return 0;
@@ -916,6 +961,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 0;
+
 	    // The 1D Szabo-Babuska defined on a two-noded edge
 	  case EDGE2:
 	    return 1;
@@ -952,6 +1000,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 0;
+
 	    // The 1D Szabo-Babuska defined on a two-noded edge
 	  case EDGE2:
 	    return 2;
@@ -988,6 +1039,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 0;
+
 	    // The 1D Szabo-Babuska defined on a two-noded edge
 	  case EDGE2:
 	    return 3;
@@ -1024,6 +1078,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 0;
+
 	    // The 1D Szabo-Babuska defined on a two-noded edge
 	  case EDGE2:
 	    return 4;
@@ -1059,6 +1116,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 0;
+
 	    // The 1D Szabo-Babuska defined on a two-noded edge
 	  case EDGE2:
 	    return 5;
@@ -1094,6 +1154,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 0;
+
 	    // The 1D Szabo-Babuska defined on a two-noded edge
 	  case EDGE2:
 	    return 6;
@@ -1166,6 +1229,7 @@ bool FE<Dim,T>::shapes_need_reinit() const
 
 //--------------------------------------------------------------
 // Explicit instantiation of member functions
+INSTANTIATE_MBRF(0,SZABAB);
 INSTANTIATE_MBRF(1,SZABAB);
 INSTANTIATE_MBRF(2,SZABAB);
 INSTANTIATE_MBRF(3,SZABAB);

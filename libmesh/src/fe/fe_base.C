@@ -48,6 +48,66 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 
   switch (dim)
     {
+      // 0D
+    case 0:
+      {
+	switch (fet.family)
+	  {
+	  case CLOUGH:
+	    {
+	      AutoPtr<FEBase> ap(new FE<0,CLOUGH>(fet));
+	      return ap;
+	    }
+	    
+	  case HERMITE:
+	    {
+	      AutoPtr<FEBase> ap(new FE<0,HERMITE>(fet));
+	      return ap;
+	    }
+	    
+	  case LAGRANGE:
+	    {
+	      AutoPtr<FEBase> ap(new FE<0,LAGRANGE>(fet));
+	      return ap;
+	    }
+		   
+	  case HIERARCHIC:
+	    {
+	      AutoPtr<FEBase> ap(new FE<0,HIERARCHIC>(fet));
+	      return ap;
+	    }
+	    
+	  case MONOMIAL:
+	    {
+	      AutoPtr<FEBase> ap(new FE<0,MONOMIAL>(fet));
+	      return ap;
+	    }
+	    
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+	  case SZABAB:
+	    {
+	      AutoPtr<FEBase> ap(new FE<0,SZABAB>(fet));
+	      return ap;
+	    }
+
+	  case BERNSTEIN:
+	    {
+	      AutoPtr<FEBase> ap(new FE<0,BERNSTEIN>(fet));
+	      return ap;
+	    }
+#endif
+
+	  case XYZ:
+	    {
+	      AutoPtr<FEBase> ap(new FEXYZ<0>(fet));
+	      return ap;
+	    }
+
+	  default:
+	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	    libmesh_error();
+	  }
+      }
       // 1D
     case 1:
       {

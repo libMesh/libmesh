@@ -110,6 +110,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	  case EDGE4:
@@ -152,6 +155,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	  case EDGE4:
@@ -194,6 +200,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	  case EDGE4:
@@ -236,6 +245,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	    return 5;
@@ -276,6 +288,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
         const unsigned int order = static_cast<unsigned int>(o);
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	    return (order+1);
@@ -347,6 +362,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	    // 1D linears have 2 DOFs per element
 	  case EDGE2:
 	  case EDGE3:
@@ -392,6 +410,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	    // 1D quadratics have 3 DOFs per element
 	  case EDGE2:
 	  case EDGE3:
@@ -437,6 +458,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	  case EDGE4:
@@ -479,6 +503,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       {
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	  case EDGE4:
@@ -519,6 +546,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
         const unsigned int order = static_cast<unsigned int>(o);
 	switch (t)
 	  {
+	  case NODEELEM:
+	    return 1;
+
 	  case EDGE2:
 	  case EDGE3:
 	    return (order+1);
@@ -599,6 +629,7 @@ bool FE<Dim,T>::shapes_need_reinit() const
 
 //--------------------------------------------------------------
 // Explicit instantiation of member functions
+INSTANTIATE_MBRF(0,MONOMIAL);
 INSTANTIATE_MBRF(1,MONOMIAL);
 INSTANTIATE_MBRF(2,MONOMIAL);
 INSTANTIATE_MBRF(3,MONOMIAL);
