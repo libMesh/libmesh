@@ -97,6 +97,8 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
   libmesh_assert (o > 0);
   switch (t)
     {
+    case NODEELEM:
+      return 1;
     case EDGE2:
     case EDGE3:
       return (o+1);
@@ -131,6 +133,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
   libmesh_assert (o > 0);
   switch (t)
     {
+    case NODEELEM:
+      return 1;
     case EDGE2:
     case EDGE3:
       switch (n)
@@ -256,6 +260,8 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
   libmesh_assert (o > 0);
   switch (t)
     {
+    case NODEELEM:
+      return 0;
     case EDGE2:
     case EDGE3:
       return (o-1);
@@ -326,6 +332,7 @@ bool FE<Dim,T>::shapes_need_reinit() const
 
 //--------------------------------------------------------------
 // Explicit instantiation of member functions
+INSTANTIATE_MBRF(0,HIERARCHIC);
 INSTANTIATE_MBRF(1,HIERARCHIC);
 INSTANTIATE_MBRF(2,HIERARCHIC);
 INSTANTIATE_MBRF(3,HIERARCHIC);

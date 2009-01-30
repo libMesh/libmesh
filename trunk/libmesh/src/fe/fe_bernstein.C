@@ -119,6 +119,8 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 
   switch (t)
     {
+    case NODEELEM:
+      return 1;
     case EDGE2:
     case EDGE3:
       return (o+1);
@@ -356,6 +358,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 {
   switch (t)
     {
+    case NODEELEM:
+      return 1;
 
     case EDGE2:
     case EDGE3:
@@ -1284,6 +1288,7 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 {
   switch (t)
     {
+    case NODEELEM:
     case EDGE2:
     case EDGE3:
       return 0;
@@ -1636,6 +1641,7 @@ bool FE<Dim,T>::shapes_need_reinit() const
 
 //--------------------------------------------------------------
 // Explicit instantiations for member functions
+INSTANTIATE_MBRF(0,BERNSTEIN);
 INSTANTIATE_MBRF(1,BERNSTEIN);
 INSTANTIATE_MBRF(2,BERNSTEIN);
 INSTANTIATE_MBRF(3,BERNSTEIN);

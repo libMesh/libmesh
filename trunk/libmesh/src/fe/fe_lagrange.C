@@ -790,6 +790,7 @@ bool FE<Dim,T>::shapes_need_reinit() const
 
 //--------------------------------------------------------------
 // Explicit instantiation of member functions
+INSTANTIATE_MBRF(0,LAGRANGE);
 INSTANTIATE_MBRF(1,LAGRANGE);
 INSTANTIATE_MBRF(2,LAGRANGE);
 INSTANTIATE_MBRF(3,LAGRANGE);

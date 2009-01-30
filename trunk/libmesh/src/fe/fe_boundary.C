@@ -45,14 +45,22 @@ void FE<_dim,_type>::_func(const Elem*,        \
 }
 
 REINIT_ERROR(0, CLOUGH, reinit)
+REINIT_ERROR(0, CLOUGH, edge_reinit)
 REINIT_ERROR(0, HERMITE, reinit)
+REINIT_ERROR(0, HERMITE, edge_reinit)
 REINIT_ERROR(0, HIERARCHIC, reinit)
+REINIT_ERROR(0, HIERARCHIC, edge_reinit)
 REINIT_ERROR(0, LAGRANGE, reinit)
+REINIT_ERROR(0, LAGRANGE, edge_reinit)
 REINIT_ERROR(0, MONOMIAL, reinit)
+REINIT_ERROR(0, MONOMIAL, edge_reinit)
 REINIT_ERROR(0, XYZ, reinit)
+REINIT_ERROR(0, XYZ, edge_reinit)
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 REINIT_ERROR(0, BERNSTEIN, reinit)
+REINIT_ERROR(0, BERNSTEIN, edge_reinit)
 REINIT_ERROR(0, SZABAB, reinit)
+REINIT_ERROR(0, SZABAB, edge_reinit)
 #endif
 
 REINIT_ERROR(1, CLOUGH, edge_reinit)
