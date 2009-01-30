@@ -592,7 +592,13 @@ void GmshIO::write (const std::string& name)
 {
   if (libMesh::processor_id() == 0)
     {
+      // Open the output file stream
       std::ofstream out (name.c_str());
+
+      // Make sure it opened correctly
+      if (!out.good())
+        libmesh_file_error(name.c_str());
+
       this->write_mesh (out);
     }
 }
@@ -704,15 +710,12 @@ void GmshIO::write_post (const std::string& fname,
   // Create an output stream
   std::ofstream out(fname.c_str());
 
+  // Make sure it opened correctly
+  if (!out.good())
+    libmesh_file_error(fname.c_str());
+
   // initialize the map with element types
   init_eletypes();
-
-  if (!out.good())
-    {
-      std::cerr << "ERROR: opening output file " << fname
-		<< std::endl;
-      libmesh_error();
-    }
 
   // create a character buffer
   char buf[80];

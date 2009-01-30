@@ -68,7 +68,9 @@ void MEDITIO::write_ascii (const std::string& fname,
   // Open the output file stream
   std::ofstream out (fname.c_str());
   
-  libmesh_assert (out.good());
+  // Make sure it opened correctly
+  if (!out.good())
+    libmesh_file_error(fname.c_str());
 
   // Get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
@@ -205,7 +207,10 @@ void MEDITIO::write_ascii (const std::string& fname,
       std::string bbname = fname.substr(0,idx) + ".bb";
       
       std::ofstream bbout (bbname.c_str());
-      libmesh_assert (bbout.good());      
+
+      // Make sure it opened correctly
+      if (!out.good())
+        libmesh_file_error(bbname.c_str());
 
       // Header: 3: 3D mesh, 1: scalar output, 2: node-indexed 
       const unsigned int n_vars = solution_names->size();

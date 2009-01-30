@@ -32,7 +32,7 @@ namespace libMesh {
 
   /**
    * A class to represent the internal "this should never happen"
-   * errors to be thrown by "libmesh_error();"
+   * errors; to be thrown by "libmesh_error();"
    */
   class LogicError : public std::logic_error
     {
@@ -42,12 +42,28 @@ namespace libMesh {
 
 
   /**
-   *
+   * A class to stub for features that should be in libMesh, but
+   * haven't been written yet; to be thrown by
+   * "libmesh_not_implemented();"
    */
   class NotImplemented : public std::logic_error
     {
     public:
       NotImplemented() : std::logic_error( "Error: not implemented!" ) {}
+    };
+
+
+  /**
+   * A class representing a failed attempt by the library to open a
+   * file (or construct an fstream, etc); to be thrown by
+   * "libmesh_file_error(filename);" For ease of debugging, "filename"
+   * should include any (absolute or relative or implicit) pathname
+   * that was part of the failed open.
+   */
+  class FileError : public std::runtime_error
+    {
+    public:
+      FileError(const std::string& filename) : std::runtime_error( "Error accessing file: " + filename ) {}
     };
 
 }

@@ -191,9 +191,14 @@ namespace libMesh
 
 // These are useful macros that behave like functions in the code.
 // If you want to make sure you are accessing a section of code just
-// stick a here(); in it, for example
+// stick a libmesh_here(); in it, for example
+
+#define libmesh_here()     do { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; } while (0)
+
 #undef here
-#define here()     do { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; } while (0)
+#define here()    do { \
+std::cout << "here() is deprecated; use libmesh_here() instead!" \
+          << std::endl; libmesh_here(); } while(0)
 
 // the libmesh_stop() macro will stop the code until a SIGCONT signal
 // is recieved.  This is useful, for example, when determining the
@@ -203,9 +208,9 @@ namespace libMesh
 // serial cases.
 #ifdef LIBMESH_HAVE_CSIGNAL
 #  include <csignal>
-#  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { here(); std::cout << "Stopping process " << getpid() << "..." << std::endl; std::raise(SIGSTOP); std::cout << "Continuing process " << getpid() << "..." << std::endl; } } while(0)
+#  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { libmesh_here(); std::cout << "Stopping process " << getpid() << "..." << std::endl; std::raise(SIGSTOP); std::cout << "Continuing process " << getpid() << "..." << std::endl; } } while(0)
 #else
-#  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { here(); std::cerr << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl; } } while(0)
+#  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { libmesh_here(); std::cerr << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl; } } while(0)
 #endif
 
 // The libmesh_assert() macro acts like C's assert(), but throws a 
@@ -216,18 +221,25 @@ namespace libMesh
 #define libmesh_assert(asserted)  do { if (!(asserted)) { std::cerr << "Assertion `" #asserted "' failed." << std::endl; libmesh_error(); } } while(0)
 #endif
 
-// The libmesh_error() macro prints a message and throws a LogicError
-// exception
-// The libmesh_not_implemented() macro prints a message and throws a
-// NotImplemented exception
+// The libmesh_write_traceout() macro writes stack trace files, if
+// that feature has been configured.
 #ifdef LIBMESH_ENABLE_TRACEFILES
-#define libmesh_error()    do { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); print_trace(traceout); std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::LogicError()); } while(0)
-#define libmesh_not_implemented()    do { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); print_trace(traceout); std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
+  #define libmesh_write_traceout()   do { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); print_trace(traceout); } while(0)
 #else
-#define libmesh_error()    do { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::LogicError()); } while(0)
-#define libmesh_not_implemented()    do { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
+  #define libmesh_write_traceout()   do { } while (0)
 #endif
 
+// The libmesh_error() macro prints a message and throws a LogicError
+// exception
+//
+// The libmesh_not_implemented() macro prints a message and throws a
+// NotImplemented exception
+//
+// The libmesh_file_error(const std::string& filename) macro prints a message
+// and throws a FileError exception
+#define libmesh_error()    do { libmesh_write_traceout(); libmesh_here(); LIBMESH_THROW(libMesh::LogicError()); } while(0)
+#define libmesh_not_implemented()    do { libmesh_write_traceout(); libmesh_here(); LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
+#define libmesh_file_error(filename)    do { libmesh_write_traceout(); libmesh_here(); LIBMESH_THROW(libMesh::FileError(filename)); } while(0)
 
 // The libmesh_cast functions do a dynamic cast and assert the result,
 // if we're in debug or development modes, but just do a faster static
@@ -272,7 +284,7 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
 // conflicts
 #undef error
 #define error()    do { \
-std::cout << "error() is deprecated; use libmesh_error() instead!" \
+std::cout << "*** error() is deprecated; use libmesh_error() instead!" \
           << std::endl; libmesh_error(); } while(0)
 
 // The untested macro warns that you are using untested code
