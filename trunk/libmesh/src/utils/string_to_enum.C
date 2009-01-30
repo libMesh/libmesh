@@ -47,7 +47,18 @@ namespace {
     reverse.clear();
     
     for (; it != end; ++it)
-      reverse.insert (std::make_pair(it->second, it->first));
+      {
+	// If the forward map is not invertible, we might already have
+	// found a preimage of it->second.  Choose the "largest"
+	// preimage according to operator<; for std::string this will
+	// give us the longest, hopefully most specific name
+	// corresponding to an enum.
+	typename MapType::iterator preimage = reverse.find(it->second);
+        if (preimage == reverse.end())
+          reverse.insert (std::make_pair(it->second, it->first));
+        else if (preimage->second < it->first)
+          preimage->second = it->first;
+      }
   }
 
 
