@@ -41,16 +41,15 @@ void PetscMatrix<T>::init (const unsigned int m,
 			   const unsigned int nnz,
 			   const unsigned int noz)
 {
-  if ((m==0) || (n==0))
-    return;
+  // We allow 0x0 matrices now
+  //if ((m==0) || (n==0))
+  //  return;
 
-  {
-    // Clear initialized matrices
-    if (this->initialized())
-      this->clear();
+  // Clear initialized matrices
+  if (this->initialized())
+    this->clear();
 
-    this->_is_initialized = true;
-  }
+  this->_is_initialized = true;
 
   
   int ierr     = 0;
@@ -98,13 +97,11 @@ void PetscMatrix<T>::init ()
 {
   libmesh_assert (this->_dof_map != NULL);
   
-  {
-    // Clear initialized matrices
-    if (this->initialized())
-      this->clear();
+  // Clear initialized matrices
+  if (this->initialized())
+    this->clear();
 
-    this->_is_initialized = true;
-  }
+  this->_is_initialized = true;
 
   
   int proc_id = 0;
@@ -120,12 +117,13 @@ void PetscMatrix<T>::init ()
   const std::vector<unsigned int>& n_nz = this->_dof_map->get_n_nz();
   const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
 
-  // Make sure the sparsity pattern isn't empty
+  // Make sure the sparsity pattern isn't empty unless the matrix is 0x0
   libmesh_assert (n_nz.size() == n_l);
   libmesh_assert (n_oz.size() == n_l);
   
-  if (m==0)
-    return;
+  // We allow 0x0 matrices now
+  //if (m==0)
+  //  return;
   
   int ierr     = 0;
   int m_global = static_cast<int>(m);
