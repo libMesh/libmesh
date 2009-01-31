@@ -133,8 +133,9 @@ void PetscMatrix<T>::init ()
 
 
   // create a sequential matrix on one processor
-  if ((m_l == m) && (n_l == n))
+  if (libMesh::n_processors() == 1)
     {
+      libmesh_assert ((m_l == m) && (n_l == n));
       if (n_nz.empty())
         ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, n_global, n_global,
 			        PETSC_NULL, (int*) PETSC_NULL, &_mat);
