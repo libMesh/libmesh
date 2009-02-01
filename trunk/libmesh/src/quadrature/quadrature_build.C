@@ -28,6 +28,19 @@
 #include "quadrature_jacobi.h"
 #include "quadrature_simpson.h"
 #include "quadrature_trap.h"
+#include "string_to_enum.h"
+
+
+
+//---------------------------------------------------------------
+AutoPtr<QBase> QBase::build (const std::string &type,
+			     const unsigned int _dim,
+			     const Order _order)
+{
+  return QBase::build (Utility::string_to_enum<QuadratureType> (type),
+		       _dim,
+		       _order);
+}
 
 
 

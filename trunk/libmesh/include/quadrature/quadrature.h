@@ -24,6 +24,7 @@
 
 // C++ includes
 #include <vector>
+#include <string>
 #include <utility>
 
 // Local includes
@@ -74,14 +75,27 @@ public:
 
   /**
    * Builds a specific quadrature rule, identified through the
+   * \p name string.  An \p AutoPtr<QBase> is returned
+   * to prevent a memory leak. This way the user need not
+   * remember to delete the object.  Enables run-time decision of
+   * the quadrature rule.  The input parameter \p name
+   * must be mappable through the \p Utility::string_to_enum<>() 
+   * function.
+   */
+  static AutoPtr<QBase> build (const std::string &name,
+			       const unsigned int _dim,
+			       const Order _order=INVALID_ORDER);
+
+  /**
+   * Builds a specific quadrature rule, identified through the
    * \p QuadratureType.  An \p AutoPtr<QBase> is returned
    * to prevent a memory leak. This way the user need not
    * remember to delete the object.  Enables run-time decision of
    * the quadrature rule.
    */
-  static AutoPtr<QBase> build(const QuadratureType _qt,
-			      const unsigned int _dim,
-			      const Order _order=INVALID_ORDER);
+  static AutoPtr<QBase> build (const QuadratureType _qt,
+			       const unsigned int _dim,
+			       const Order _order=INVALID_ORDER);
 
   /**
    * @returns the current element type we're set up for
