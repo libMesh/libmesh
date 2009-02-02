@@ -438,20 +438,23 @@ template <typename T>
 PetscVector<T>&
 PetscVector<T>::operator = (const PetscVector<T>& v)
 {
-  if (v.initialized())
+  libmesh_assert (this->initialized());
+  libmesh_assert (v.initialized());
+  libmesh_assert (this->_type == v._type);
+  libmesh_assert (this->size() == v.size());
+  libmesh_assert (this->local_size() == v.local_size());
+
+//  this->init (v.size(), v.local_size());
+//  this->_global_to_local_map = v._global_to_local_map;
+//  this->_is_closed      = v._is_closed;
+//  this->_is_initialized = v._is_initialized;
+
+  if (v.size() != 0)
     {
-      this->init (v.size(), v.local_size());
-      this->_global_to_local_map = v._global_to_local_map;
-      this->_is_closed      = v._is_closed;
-      this->_is_initialized = v._is_initialized;
-  
-      if (v.size() != 0)
-	{
 	  int ierr = 0;
 
 	  ierr = VecCopy (v._vec, this->_vec);
        	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	}
     }
   
   return *this;
@@ -659,7 +662,7 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
   // parts of (*this)
   PetscVector<T> parallel_vec;
 
-  parallel_vec.init (size, local_size);
+  parallel_vec.init (size, local_size, true, PARALLEL);
 
 
   // Copy part of *this into the parallel_vec

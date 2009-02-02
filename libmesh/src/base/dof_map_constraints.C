@@ -592,10 +592,10 @@ void DofMap::enforce_constraints_exactly (const System &system,
   NumericVector<Number> *v_local;
   NumericVector<Number> *v_global;
   AutoPtr<NumericVector<Number> > v_built;
-  if (v->size() == v->local_size())
+  if (v->type() == SERIAL)
     {
       v_built = NumericVector<Number>::build();
-      v_built->init(this->n_dofs(), this->n_local_dofs());
+      v_built->init(this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
       v_built->close();
 
       for (unsigned int i=v_built->first_local_index();
@@ -610,7 +610,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
   else
     {
       v_built = NumericVector<Number>::build();
-      v_built->init (v->size(), v->size());
+      v_built->init (v->size(), v->size(), true, SERIAL);
       v->localize(*v_built);
       v_built->close();
       v_local = v_built.get();
@@ -669,7 +669,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
 
   // If the old vector was serial, we probably need to send our values
   // to other processors
-  if (v->size() == v->local_size())
+  if (v->type() == SERIAL)
     {
       v_global->localize (*v);
     }

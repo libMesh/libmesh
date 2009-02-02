@@ -98,8 +98,8 @@ void TransientSystem<Base>::init_data ()
   Base::init_data();
 
   // Initialize the old & older solutions
-  old_local_solution->init   (this->n_dofs());
-  older_local_solution->init (this->n_dofs());
+  old_local_solution->init   (this->n_dofs(), false, SERIAL);
+  older_local_solution->init (this->n_dofs(), false, SERIAL);
 }
 
 

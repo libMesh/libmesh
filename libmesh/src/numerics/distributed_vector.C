@@ -492,7 +492,7 @@ void DistributedVector<T>::localize (const unsigned int first_local_idx,
   // parts of (*this)
   DistributedVector<T> parallel_vec;
 
-  parallel_vec.init (size, local_size);
+  parallel_vec.init (size, local_size, true, PARALLEL);
 
   // Copy part of *this into the parallel_vec
   for (unsigned int i=first_local_idx; i<=last_local_idx; i++)

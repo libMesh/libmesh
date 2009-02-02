@@ -301,12 +301,8 @@ template <typename T>
 LaspackVector<T>&
 LaspackVector<T>::operator = (const LaspackVector<T>& v)
 {
-  if (!this->initialized())
-    this->init (v.size());
-
-  if (this->size() != v.size())
-    this->init (v.size());
-  
+  libmesh_assert (this->initialized());
+  libmesh_assert (this->size() == v.size());
 
   this->_is_closed = v._is_closed;
 

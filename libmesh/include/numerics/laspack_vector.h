@@ -65,11 +65,13 @@ class LaspackVector : public NumericVector<T>
   /**
    *  Dummy-Constructor. Dimension=0
    */
+  explicit
   LaspackVector (const ParallelType = AUTOMATIC);
   
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
+  explicit
   LaspackVector (const unsigned int n,
                  const ParallelType = AUTOMATIC);
     
@@ -577,6 +579,8 @@ inline
 AutoPtr<NumericVector<T> > LaspackVector<T>::clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector (new LaspackVector<T>);
+
+  cloned_vector->init(*this, true);
 
   *cloned_vector = *this;
 

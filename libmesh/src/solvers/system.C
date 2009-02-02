@@ -182,17 +182,17 @@ void System::init_data ()
 #endif
   
   // Resize the solution conformal to the current mesh
-  solution->init (this->n_dofs(), this->n_local_dofs());
+  solution->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   // Resize the current_local_solution for the current mesh
-  current_local_solution->init (this->n_dofs());
+  current_local_solution->init (this->n_dofs(), false, SERIAL);
 
   // from now on, no chance to add additional vectors
   _can_add_vectors = false;
 
   // initialize & zero other vectors, if necessary
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
-      pos->second->init (this->n_dofs(), this->n_local_dofs());
+      pos->second->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 }
 
 
@@ -208,7 +208,7 @@ void System::restrict_vectors ()
       if (_vector_projections[pos->first])
 	this->project_vector (*v);
       else
-        v->init (this->n_dofs(), this->n_local_dofs());
+        v->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
     }
 
   // Restrict the solution on the coarsened cells
@@ -254,7 +254,7 @@ void System::reinit ()
 
   // Update the solution based on the projected
   // current_local_solution.
-  solution->init (this->n_dofs(), this->n_local_dofs());
+  solution->init (this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
 	
   libmesh_assert (solution->size() == current_local_solution->size());
   libmesh_assert (solution->size() == current_local_solution->local_size());
@@ -488,7 +488,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
 
   // Initialize it if necessary
   if (!_can_add_vectors)
-    buf->init (this->n_dofs(), this->n_local_dofs());
+    buf->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   return *buf;
 }
@@ -731,7 +731,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
 
   // Localize the potentially parallel vector
   AutoPtr<NumericVector<Number> > local_v = NumericVector<Number>::build();
-  local_v->init(v.size(), v.size());
+  local_v->init(v.size(), true, SERIAL);
   v.localize (*local_v, _dof_map->get_send_list()); 
 
   unsigned int dim = this->get_mesh().mesh_dimension();

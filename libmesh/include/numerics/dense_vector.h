@@ -53,6 +53,7 @@ public:
   /**
    * Constructor.  Creates a dense vector of dimension \p n.
    */
+  explicit
   DenseVector(const unsigned int n=0);
 
   /**

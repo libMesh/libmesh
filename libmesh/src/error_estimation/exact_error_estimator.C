@@ -168,7 +168,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 
 	std::vector<Number> global_soln;
 	fine_system.update_global_solution(global_soln);
-	fine_soln->init(fine_system.solution->size(),fine_system.solution->size());
+	fine_soln->init (fine_system.solution->size(), true, SERIAL);
 	(*fine_soln) = global_soln;
 
 	fine_values = AutoPtr<MeshFunction>

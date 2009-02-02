@@ -762,7 +762,7 @@ void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
   // In parallel we better be reading a parallel vector -- if not
   // we will not set all of its components below!!
   if (libMesh::n_processors() > 1)
-    libmesh_assert (vec.size() != vec.local_size());
+    libmesh_assert (vec.type() == PARALLEL);
    
   // If this is not the same on all processors we're in trouble!
   Parallel::verify(io_blksize);

@@ -59,11 +59,13 @@ public:
   /**
    *  Dummy-Constructor. Dimension=0
    */
+  explicit
   DistributedVector (const ParallelType = AUTOMATIC);
   
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
+  explicit
   DistributedVector (const unsigned int n,
                      const ParallelType type = AUTOMATIC);
     
@@ -653,6 +655,8 @@ inline
 AutoPtr<NumericVector<T> > DistributedVector<T>::clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector (new DistributedVector<T>);
+
+  cloned_vector->init(*this, true);
 
   *cloned_vector = *this;
 

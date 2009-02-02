@@ -85,10 +85,9 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
   // If the old vector was uniprocessor, make the new
   // vector uniprocessor
-  if (old_v.size() == old_v.local_size())
+  if (old_v.type() == SERIAL)
     {
-      new_v.init (this->n_dofs(),
-		  this->n_dofs());
+      new_v.init (this->n_dofs(), false, SERIAL);
       new_vector_ptr = &new_v;
       old_vector_ptr = &old_v;
     }
@@ -105,14 +104,13 @@ void System::project_vector (const NumericVector<Number>& old_v,
       // Create a sorted, unique send_list
       projection_list.unique();
 
-      new_v.init (this->n_dofs(),
-		  this->n_local_dofs());
+      new_v.init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       new_vector_built = NumericVector<Number>::build();
       local_old_vector_built = NumericVector<Number>::build();
       new_vector_ptr = new_vector_built.get();
       local_old_vector = local_old_vector_built.get();
-      new_vector_ptr->init(this->n_dofs(), this->n_dofs());
-      local_old_vector->init(old_v.size(), old_v.size());
+      new_vector_ptr->init(this->n_dofs(), false, SERIAL);
+      local_old_vector->init(old_v.size(), false, SERIAL);
       old_v.localize(*local_old_vector, projection_list.send_list);
       local_old_vector->close();
       old_vector_ptr = local_old_vector;
@@ -135,10 +133,10 @@ void System::project_vector (const NumericVector<Number>& old_v,
   //
   // FIXME: I'm not sure how to make a NumericVector do that without
   // creating a temporary parallel vector to use localize! - RHS
-  if (old_v.size() == old_v.local_size())
+  if (old_v.type() == SERIAL)
     {
       AutoPtr<NumericVector<Number> > dist_v = NumericVector<Number>::build();
-      dist_v->init(this->n_dofs(), this->n_local_dofs());
+      dist_v->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       dist_v->close();
     
       for (unsigned int i=0; i!=dist_v->size(); i++)
