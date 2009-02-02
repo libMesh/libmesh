@@ -63,19 +63,21 @@ public:
   /**
    *  Dummy-Constructor. Dimension=0
    */
-  PetscVector ();
+  PetscVector (const ParallelType type = AUTOMATIC);
   
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
-  PetscVector (const unsigned int n);
+  PetscVector (const unsigned int n,
+               const ParallelType type = AUTOMATIC);
     
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
   PetscVector (const unsigned int n,
-	       const unsigned int n_local);
+	       const unsigned int n_local,
+               const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -84,7 +86,8 @@ public:
    */
   PetscVector (const unsigned int N,
 	       const unsigned int n_local,
-	       const std::vector<unsigned int>& ghost);
+	       const std::vector<unsigned int>& ghost,
+               const ParallelType type = AUTOMATIC);
   
   /**
    * Constructor.  Creates a PetscVector assuming you already have a
@@ -137,13 +140,15 @@ public:
     
   void init (const unsigned int N,
 	     const unsigned int n_local,
-	     const bool         fast=false);
+	     const bool         fast=false,
+	     const ParallelType type=AUTOMATIC);
     
   /**
    * call init with n_local = N,
    */
   void init (const unsigned int N,
-	     const bool         fast=false);
+	     const bool         fast=false,
+	     const ParallelType type=AUTOMATIC);
     
   /**
    * Create a vector that holds tha local indices plus those specified
@@ -152,7 +157,8 @@ public:
   virtual void init (const unsigned int /*N*/,
 		     const unsigned int /*n_local*/,
 		     const std::vector<unsigned int>& /*ghost*/,
-		     const bool /*fast*/ = false);
+		     const bool /*fast*/ = false,
+		     const ParallelType = AUTOMATIC);
     
   //   /**
   //    * Change the dimension to that of the
@@ -493,20 +499,11 @@ private:
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector ()
-  : _global_to_local_map(),
-    _destroy_vec_on_exit(true)    
-{}
-
-
-
-template <typename T>
-inline
-PetscVector<T>::PetscVector (const unsigned int n)
+PetscVector<T>::PetscVector (const ParallelType type)
   : _global_to_local_map(),
     _destroy_vec_on_exit(true)
 {
-  this->init(n, n, false);
+  this->_type = type;
 }
 
 
@@ -514,11 +511,11 @@ PetscVector<T>::PetscVector (const unsigned int n)
 template <typename T>
 inline
 PetscVector<T>::PetscVector (const unsigned int n,
-			     const unsigned int n_local)
+                             const ParallelType type)
   : _global_to_local_map(),
     _destroy_vec_on_exit(true)
 {
-  this->init(n, n_local, false);
+  this->init(n, n, false, type);
 }
 
 
@@ -527,11 +524,25 @@ template <typename T>
 inline
 PetscVector<T>::PetscVector (const unsigned int n,
 			     const unsigned int n_local,
-			     const std::vector<unsigned int>& ghost)
+                             const ParallelType type)
   : _global_to_local_map(),
     _destroy_vec_on_exit(true)
 {
-  this->init(n, n_local, ghost, false);
+  this->init(n, n_local, false, type);
+}
+
+
+
+template <typename T>
+inline
+PetscVector<T>::PetscVector (const unsigned int n,
+			     const unsigned int n_local,
+			     const std::vector<unsigned int>& ghost,
+                             const ParallelType type)
+  : _global_to_local_map(),
+    _destroy_vec_on_exit(true)
+{
+  this->init(n, n_local, ghost, false, type);
 }
 
 
@@ -590,7 +601,8 @@ template <typename T>
 inline
 void PetscVector<T>::init (const unsigned int n,
 			   const unsigned int n_local,
-			   const bool fast)
+			   const bool fast,
+                           const ParallelType type)
 {
   int ierr=0;
   int petsc_n=static_cast<int>(n);
@@ -601,9 +613,21 @@ void PetscVector<T>::init (const unsigned int n,
   if (this->initialized())
     this->clear();
 
+  if (type == AUTOMATIC)
+    {
+      if (n == n_local)
+        this->_type = SERIAL;
+      else
+        this->_type = PARALLEL;
+    }
+  else
+    this->_type = type;
+
+  libmesh_assert ((this->_type==SERIAL && n==n_local) ||
+                  this->_type==PARALLEL);
   
   // create a sequential vector if on only 1 processor 
-  if (n_local == n)
+  if (this->_type == SERIAL)
     {
       ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
              CHKERRABORT(PETSC_COMM_SELF,ierr);
@@ -612,7 +636,7 @@ void PetscVector<T>::init (const unsigned int n,
              CHKERRABORT(PETSC_COMM_SELF,ierr);
     }
   // otherwise create an MPI-enabled vector
-  else
+  else if (this->_type == PARALLEL)
     {
       libmesh_assert (n_local < n);
       
@@ -623,6 +647,8 @@ void PetscVector<T>::init (const unsigned int n,
       ierr = VecSetFromOptions (_vec);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }  
+  else
+    libmesh_error();
   
   this->_is_initialized = true;
   
@@ -636,9 +662,10 @@ void PetscVector<T>::init (const unsigned int n,
 template <typename T>
 inline
 void PetscVector<T>::init (const unsigned int n,
-			   const bool fast)
+			   const bool fast,
+                           const ParallelType type)
 {
-  this->init(n,n,fast);
+  this->init(n,n,fast,type);
 }
 
 
@@ -648,7 +675,8 @@ inline
 void PetscVector<T>::init (const unsigned int n,
 			   const unsigned int n_local,
 			   const std::vector<unsigned int>& ghost,
-			   const bool fast)
+			   const bool fast,
+                           const ParallelType type)
 {
   int ierr=0;
   int petsc_n=static_cast<int>(n);
@@ -660,6 +688,9 @@ void PetscVector<T>::init (const unsigned int n,
   // Clear initialized vectors 
   if (this->initialized())
     this->clear();
+
+  libmesh_assert(type == AUTOMATIC || type == GHOSTED);
+  this->_type = GHOSTED;
 
   /* Make the global-to-local ghost cell map.  */
   for(unsigned int i=0; i<ghost.size(); i++)

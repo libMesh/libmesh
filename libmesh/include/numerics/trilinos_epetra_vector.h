@@ -59,19 +59,21 @@ public:
   /**
    *  Dummy-Constructor. Dimension=0
    */
-  EpetraVector ();
+  EpetraVector (const ParallelType type = AUTOMATIC);
   
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
-  EpetraVector (const unsigned int n);
+  EpetraVector (const unsigned int n,
+                const ParallelType type = AUTOMATIC);
     
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
   EpetraVector (const unsigned int n,
-	       const unsigned int n_local);
+	        const unsigned int n_local,
+                const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -80,7 +82,8 @@ public:
    */
   EpetraVector (const unsigned int N,
 		const unsigned int n_local,
-		const std::vector<unsigned int>& ghost);
+		const std::vector<unsigned int>& ghost,
+                const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor.  Creates a EpetraVector assuming you already have a
@@ -133,13 +136,15 @@ public:
     
   void init (const unsigned int N,
 	     const unsigned int n_local,
-	     const bool         fast=false);
+	     const bool         fast=false,
+	     const ParallelType type=AUTOMATIC);
     
   /**
    * call init with n_local = N,
    */
   void init (const unsigned int N,
-	     const bool         fast=false);
+	     const bool         fast=false,
+	     const ParallelType type=AUTOMATIC);
 
   /**
    * Create a vector that holds the local indices plus those specified
@@ -148,7 +153,8 @@ public:
   void init (const unsigned int /*N*/,
 	     const unsigned int /*n_local*/,
 	     const std::vector<unsigned int>& /*ghost*/,
-	     const bool /*fast*/ = false);
+	     const bool /*fast*/ = false,
+	     const ParallelType = AUTOMATIC);
 
   //   /**
   //    * Change the dimension to that of the
@@ -567,7 +573,7 @@ private:
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector ()
+EpetraVector<T>::EpetraVector (const ParallelType type)
 : _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
@@ -578,26 +584,8 @@ EpetraVector<T>::EpetraVector ()
   allocatedNonlocalLength_(0),
   nonlocalCoefs_(NULL),
   ignoreNonLocalEntries_(false)
-{}
-
-
-
-template <typename T>
-inline
-EpetraVector<T>::EpetraVector (const unsigned int n)
-: _destroy_vec_on_exit(true),
-  myFirstID_(0),
-  myNumIDs_(0),
-  myCoefs_(NULL),
-  nonlocalIDs_(NULL),
-  nonlocalElementSize_(NULL),
-  numNonlocalIDs_(0),
-  allocatedNonlocalLength_(0),
-  nonlocalCoefs_(NULL),
-  ignoreNonLocalEntries_(false)
-
 {
-  this->init(n, n, false);
+  this->_type = type;
 }
 
 
@@ -605,7 +593,29 @@ EpetraVector<T>::EpetraVector (const unsigned int n)
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const unsigned int n,
-			       const unsigned int n_local)
+                               const ParallelType type)
+: _destroy_vec_on_exit(true),
+  myFirstID_(0),
+  myNumIDs_(0),
+  myCoefs_(NULL),
+  nonlocalIDs_(NULL),
+  nonlocalElementSize_(NULL),
+  numNonlocalIDs_(0),
+  allocatedNonlocalLength_(0),
+  nonlocalCoefs_(NULL),
+  ignoreNonLocalEntries_(false)
+
+{
+  this->init(n, n, false, type);
+}
+
+
+
+template <typename T>
+inline
+EpetraVector<T>::EpetraVector (const unsigned int n,
+			       const unsigned int n_local,
+                               const ParallelType type)
 : _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
@@ -617,7 +627,7 @@ EpetraVector<T>::EpetraVector (const unsigned int n,
   nonlocalCoefs_(NULL),
   ignoreNonLocalEntries_(false)
 {
-  this->init(n, n_local, false);
+  this->init(n, n_local, false, type);
 }
 
 
@@ -639,6 +649,8 @@ EpetraVector<T>::EpetraVector(Epetra_Vector & v)
 {
   _vec = &v;
 
+  this->_type = PARALLEL; // FIXME - need to determine this from v!
+
   myFirstID_ = _vec->Map().MinMyGID();
   myNumIDs_ = _vec->Map().NumMyElements();
 
@@ -656,7 +668,8 @@ template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const unsigned int n,
 			       const unsigned int n_local,
-		               const std::vector<unsigned int>& ghost)
+		               const std::vector<unsigned int>& ghost,
+                               const ParallelType type)
 : _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
@@ -668,7 +681,7 @@ EpetraVector<T>::EpetraVector (const unsigned int n,
   nonlocalCoefs_(NULL),
   ignoreNonLocalEntries_(false)
 {
-  this->init(n, n_local, ghost, false);
+  this->init(n, n_local, ghost, false, type);
 }
 
 
@@ -686,8 +699,22 @@ template <typename T>
 inline
 void EpetraVector<T>::init (const unsigned int n,
 			    const unsigned int n_local,
-			    const bool fast)
+			    const bool fast,
+                            const ParallelType type)
 {
+  if (type == AUTOMATIC)
+    {
+      if (n == n_local)
+        this->_type = SERIAL;
+      else
+        this->_type = PARALLEL;
+    }
+  else
+    this->_type = type;
+
+  libmesh_assert ((this->_type==SERIAL && n==n_local) ||
+                  this->_type==PARALLEL);
+
   _map = new Epetra_Map(n, 
                         n_local, 
                         0, 
@@ -714,11 +741,12 @@ template <typename T>
 inline
 void EpetraVector<T>::init (const unsigned int n,
 			    const unsigned int n_local,
-		            const std::vector<unsigned int>& ghost,
-			    const bool fast)
+		            const std::vector<unsigned int>& /*ghost*/,
+			    const bool fast,
+                            const ParallelType type)
 {
   // TODO: we shouldn't ignore the ghost sparsity pattern
-  this->init(n, n_local, fast);
+  this->init(n, n_local, fast, type);
 }
 
 
@@ -726,9 +754,10 @@ void EpetraVector<T>::init (const unsigned int n,
 template <typename T>
 inline
 void EpetraVector<T>::init (const unsigned int n,
-			    const bool fast)
+			    const bool fast,
+                            const ParallelType type)
 {
-  this->init(n,n,fast);
+  this->init(n,n,fast,type);
 }
 
 

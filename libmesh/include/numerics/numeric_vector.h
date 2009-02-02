@@ -30,6 +30,7 @@
 // Local includes
 #include "libmesh_common.h"
 #include "auto_ptr.h"
+#include "enum_parallel_type.h"
 #include "enum_solver_package.h"
 #include "reference_counted_object.h"
 #include "libmesh.h"
@@ -58,19 +59,21 @@ public:
   /**
    *  Dummy-Constructor. Dimension=0
    */
-  NumericVector ();
+  NumericVector (const ParallelType type = AUTOMATIC);
     
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
-  NumericVector (const unsigned int n);
+  NumericVector (const unsigned int n,
+                 const ParallelType type = AUTOMATIC);
     
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
   NumericVector (const unsigned n,
-		 const unsigned int n_local);
+		 const unsigned int n_local,
+                 const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -79,7 +82,8 @@ public:
    */
   NumericVector (const unsigned int N,
 		 const unsigned int n_local,
-		 const std::vector<unsigned int>& ghost);
+		 const std::vector<unsigned int>& ghost,
+                 const ParallelType type = AUTOMATIC);
     
 public:
 
@@ -145,13 +149,15 @@ public:
     
   virtual void init (const unsigned int,
 		     const unsigned int,
-		     const bool = false) {}
+		     const bool = false,
+                     const ParallelType = AUTOMATIC) = 0;
   
   /**
    * call init with n_local = N,
    */
   virtual void init (const unsigned int,
-		     const bool = false) {}
+		     const bool = false,
+                     const ParallelType = AUTOMATIC) = 0;
     
   /**
    * Create a vector that holds tha local indices plus those specified
@@ -160,7 +166,8 @@ public:
   virtual void init (const unsigned int /*N*/,
 		     const unsigned int /*n_local*/,
 		     const std::vector<unsigned int>& /*ghost*/,
-		     const bool /*fast*/ = false) {}
+		     const bool /*fast*/ = false,
+                     const ParallelType = AUTOMATIC) = 0;
     
   //   /**
   //    * Change the dimension to that of the
@@ -534,6 +541,11 @@ protected:
    * has been called yet
    */
   bool _is_initialized;
+
+  /**
+   * Type of vector
+   */
+  ParallelType _type;
 };
 
 
@@ -543,45 +555,56 @@ protected:
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector () :
+NumericVector<T>::NumericVector (const ParallelType type) :
   _is_closed(false),
-  _is_initialized(false)
-{}
-
-
-
-template <typename T>
-inline
-NumericVector<T>::NumericVector (const unsigned int n) :
-  _is_closed(false),
-  _is_initialized(false)
+  _is_initialized(false),
+  _type(type)
 {
-  init(n, n, false);
 }
 
 
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const unsigned int n,
-				 const unsigned int n_local) :
+NumericVector<T>::NumericVector (const unsigned int /*n*/,
+                                 const ParallelType type) :
   _is_closed(false),
-  _is_initialized(false)
+  _is_initialized(false),
+  _type(type)
 {
-  init(n, n_local, false);
+  libmesh_error(); // Abstract base class!
+  // init(n, n, false, type);
 }
 
 
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const unsigned int n,
-				 const unsigned int n_local,
-				 const std::vector<unsigned int>& ghost) :
+NumericVector<T>::NumericVector (const unsigned int /*n*/,
+				 const unsigned int /*n_local*/,
+                                 const ParallelType type) :
   _is_closed(false),
-  _is_initialized(false)
+  _is_initialized(false),
+  _type(type)
 {
-  init(n, n_local, ghost, false);
+  libmesh_error(); // Abstract base class!
+  // init(n, n_local, false, type);
+}
+
+
+
+template <typename T>
+inline
+NumericVector<T>::NumericVector (const unsigned int /*n*/,
+				 const unsigned int /*n_local*/,
+				 const std::vector<unsigned int>& /*ghost*/,
+                                 const ParallelType type) :
+  _is_closed(false),
+  _is_initialized(false),
+  _type(type)
+{
+  libmesh_error(); // Abstract base class!
+  // init(n, n_local, ghost, false, type);
 }
 
 
