@@ -373,8 +373,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
       std::vector<Number> global_soln;
       comparison_system.update_global_solution(global_soln);
-      comparison_soln->init(comparison_system.solution->size(),
-                            comparison_system.solution->size());
+      comparison_soln->init(comparison_system.solution->size(), true, SERIAL);
       (*comparison_soln) = global_soln;
 
       coarse_values = AutoPtr<MeshFunction>

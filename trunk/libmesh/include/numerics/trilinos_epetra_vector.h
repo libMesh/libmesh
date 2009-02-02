@@ -59,11 +59,13 @@ public:
   /**
    *  Dummy-Constructor. Dimension=0
    */
+  explicit
   EpetraVector (const ParallelType type = AUTOMATIC);
   
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
+  explicit
   EpetraVector (const unsigned int n,
                 const ParallelType type = AUTOMATIC);
     
@@ -803,6 +805,8 @@ inline
 AutoPtr<NumericVector<T> > EpetraVector<T>::clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector (new EpetraVector<T>);
+
+  cloned_vector->init(*this, true);
 
   *cloned_vector = *this;
 

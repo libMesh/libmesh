@@ -63,11 +63,13 @@ public:
   /**
    *  Dummy-Constructor. Dimension=0
    */
+  explicit
   PetscVector (const ParallelType type = AUTOMATIC);
   
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
+  explicit
   PetscVector (const unsigned int n,
                const ParallelType type = AUTOMATIC);
     
@@ -159,7 +161,14 @@ public:
 		     const std::vector<unsigned int>& /*ghost*/,
 		     const bool /*fast*/ = false,
 		     const ParallelType = AUTOMATIC);
-    
+
+  /**
+   * Creates a vector that has the same dimension and storage type as
+   * \p other, including ghost dofs.
+   */
+  virtual void init (const NumericVector<T>& other,
+                     const bool fast = false);
+
   //   /**
   //    * Change the dimension to that of the
   //    * vector \p V. The same applies as for
@@ -556,6 +565,7 @@ PetscVector<T>::PetscVector (Vec v)
     _destroy_vec_on_exit(false)
 {
   this->_vec = v;
+//  this->_is_closed = true;
   this->_is_initialized = true;
 
   /* We need to ask PETSc about the (local to global) ghost value
@@ -638,7 +648,7 @@ void PetscVector<T>::init (const unsigned int n,
   // otherwise create an MPI-enabled vector
   else if (this->_type == PARALLEL)
     {
-      libmesh_assert (n_local < n);
+      libmesh_assert (n_local <= n);
       
       ierr = VecCreateMPI (libMesh::COMM_WORLD, petsc_n_local, petsc_n,
 			   &_vec);
@@ -651,6 +661,7 @@ void PetscVector<T>::init (const unsigned int n,
     libmesh_error();
   
   this->_is_initialized = true;
+//  this->_is_closed = true;
   
   
   if (fast == false)
@@ -708,6 +719,33 @@ void PetscVector<T>::init (const unsigned int n,
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
   this->_is_initialized = true;
+//  this->_is_closed = true;
+  
+  if (fast == false)
+    this->zero ();
+}
+
+
+
+template <typename T>
+inline
+void PetscVector<T>::init (const NumericVector<T>& other,
+                           const bool fast)
+{
+  const PetscVector<T>& v = libmesh_cast_ref<const PetscVector<T>&>(other);
+
+  this->_global_to_local_map = v._global_to_local_map;
+  this->_is_closed      = v._is_closed;
+  this->_is_initialized = v._is_initialized;
+  this->_type = v._type;
+
+  if (v.size() != 0)
+    {
+      int ierr = 0;
+
+      ierr = VecDuplicate (v._vec, &this->_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
   
   if (fast == false)
     this->zero ();
@@ -792,6 +830,8 @@ inline
 AutoPtr<NumericVector<T> > PetscVector<T>::clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector (new PetscVector<T>);
+
+  cloned_vector->init(*this, true);
 
   *cloned_vector = *this;
 

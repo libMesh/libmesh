@@ -58,7 +58,7 @@ void UnsteadySolver::solve ()
       first_solve = false;
     }
 
-  old_local_nonlinear_solution->init (_system.n_dofs());
+  old_local_nonlinear_solution->init (_system.n_dofs(), false, SERIAL);
 
   _system.get_vector("_old_nonlinear_solution").localize
     (*old_local_nonlinear_solution,

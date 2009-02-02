@@ -59,11 +59,13 @@ public:
   /**
    *  Dummy-Constructor. Dimension=0
    */
+  explicit
   NumericVector (const ParallelType type = AUTOMATIC);
     
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
+  explicit
   NumericVector (const unsigned int n,
                  const ParallelType type = AUTOMATIC);
     
@@ -105,6 +107,11 @@ public:
    * false otherwise.
    */
   virtual bool initialized() const { return _is_initialized; }
+
+  /**
+   * @returns the type (SERIAL, PARALLEL, GHOSTED) of the vector.
+   */
+  ParallelType type() const { return _type; }
 
   /**
    * @returns true if the vector is closed and ready for
@@ -168,19 +175,14 @@ public:
 		     const std::vector<unsigned int>& /*ghost*/,
 		     const bool /*fast*/ = false,
                      const ParallelType = AUTOMATIC) = 0;
-    
-  //   /**
-  //    * Change the dimension to that of the
-  //    * vector \p V. The same applies as for
-  //    * the other \p init function.
-  //    *
-  //    * The elements of \p V are not copied, i.e.
-  //    * this function is the same as calling
-  //    * \p init(V.size(),fast).
-  //    */
-  //   virtual void init (const NumericVector<T>&,
-  // 		     const bool = false) {}
 
+  /**
+   * Creates a vector that has the same dimension and storage type as
+   * \p other, including ghost dofs.
+   */
+  virtual void init (const NumericVector<T>& other,
+                     const bool fast = false);
+    
   /**
    * \f$U(0-N) = s\f$: fill all components.
    */

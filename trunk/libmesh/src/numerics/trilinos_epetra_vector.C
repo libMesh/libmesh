@@ -465,7 +465,7 @@ void EpetraVector<T>::localize (const unsigned int /* first_local_idx */,
 //   // parts of (*this)
 //   EpetraVector<T> parallel_vec;
 
-//   parallel_vec.init (size, local_size);
+//   parallel_vec.init (size, local_size, true, PARALLEL);
 
 
 //   // Copy part of *this into the parallel_vec
