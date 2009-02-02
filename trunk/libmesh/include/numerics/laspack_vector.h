@@ -65,19 +65,21 @@ class LaspackVector : public NumericVector<T>
   /**
    *  Dummy-Constructor. Dimension=0
    */
-  LaspackVector ();
+  LaspackVector (const ParallelType = AUTOMATIC);
   
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
-  LaspackVector (const unsigned int n);
+  LaspackVector (const unsigned int n,
+                 const ParallelType = AUTOMATIC);
     
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
   LaspackVector (const unsigned int n,
-		 const unsigned int n_local);
+		 const unsigned int n_local,
+                 const ParallelType = AUTOMATIC);
   
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -86,7 +88,8 @@ class LaspackVector : public NumericVector<T>
    */
   LaspackVector (const unsigned int N,
 		 const unsigned int n_local,
-		 const std::vector<unsigned int>& ghost);
+		 const std::vector<unsigned int>& ghost,
+                 const ParallelType = AUTOMATIC);
     
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -130,13 +133,15 @@ class LaspackVector : public NumericVector<T>
     
   void init (const unsigned int N,
 	     const unsigned int n_local,
-	     const bool         fast=false);
+	     const bool         fast=false,
+             const ParallelType type=AUTOMATIC);
     
   /**
    * call init with n_local = N,
    */
   void init (const unsigned int N,
-	     const bool         fast=false);
+	     const bool         fast=false,
+             const ParallelType type=AUTOMATIC);
     
   /**
    * Create a vector that holds tha local indices plus those specified
@@ -145,7 +150,8 @@ class LaspackVector : public NumericVector<T>
   void init (const unsigned int /*N*/,
 	     const unsigned int /*n_local*/,
 	     const std::vector<unsigned int>& /*ghost*/,
-	     const bool /*fast*/ = false);
+	     const bool /*fast*/ = false,
+             const ParallelType = AUTOMATIC);
 
   /**
    * \f$U(0-N) = s\f$: fill all components.
@@ -422,17 +428,9 @@ class LaspackVector : public NumericVector<T>
 // LaspackVector inline methods
 template <typename T>
 inline
-LaspackVector<T>::LaspackVector ()
+LaspackVector<T>::LaspackVector (const ParallelType type)
 {
-}
-
-
-
-template <typename T> 
-inline
-LaspackVector<T>::LaspackVector (const unsigned int n)
-{
-  this->init(n, n, false);
+  this->_type = type;
 }
 
 
@@ -440,9 +438,20 @@ LaspackVector<T>::LaspackVector (const unsigned int n)
 template <typename T> 
 inline
 LaspackVector<T>::LaspackVector (const unsigned int n,
-				 const unsigned int n_local)
+                                 const ParallelType type)
 {
-  this->init(n, n_local, false);
+  this->init(n, n, false, type);
+}
+
+
+
+template <typename T> 
+inline
+LaspackVector<T>::LaspackVector (const unsigned int n,
+				 const unsigned int n_local,
+                                 const ParallelType type)
+{
+  this->init(n, n_local, false, type);
 }
 
 
@@ -451,9 +460,10 @@ template <typename T>
 inline
 LaspackVector<T>::LaspackVector (const unsigned int N,
 	                         const unsigned int n_local,
-	                         const std::vector<unsigned int>& ghost)
+	                         const std::vector<unsigned int>& ghost,
+                                 const ParallelType type)
 {
-  this->init(N, n_local, ghost, false);
+  this->init(N, n_local, ghost, false, type);
 }
 
 
@@ -471,10 +481,14 @@ template <typename T>
 inline
 void LaspackVector<T>::init (const unsigned int n,
 			     const unsigned int n_local,
-			     const bool fast)
+			     const bool fast,
+                             const ParallelType type)
 {
   // Laspack vectors only for serial cases.
   libmesh_assert (n == n_local);
+  libmesh_assert (type == AUTOMATIC || type == SERIAL);
+
+  this->_type = SERIAL;
 
   // Clear initialized vectors
   if (this->initialized())
@@ -502,9 +516,10 @@ void LaspackVector<T>::init (const unsigned int n,
 template <typename T> 
 inline
 void LaspackVector<T>::init (const unsigned int n,
-			     const bool fast)
+			     const bool fast,
+                             const ParallelType type)
 {
-  this->init(n,n,fast);
+  this->init(n,n,fast,type);
 }
 
 
@@ -513,10 +528,11 @@ inline
 void LaspackVector<T>::init (const unsigned int n,
 			     const unsigned int n_local,
 	                     const std::vector<unsigned int>& ghost,
-			     const bool fast)
+			     const bool fast,
+                             const ParallelType type)
 {
   libmesh_assert(ghost.empty());
-  this->init(n,n_local,fast);
+  this->init(n,n_local,fast,type);
 }
 
 

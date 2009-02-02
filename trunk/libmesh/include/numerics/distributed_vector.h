@@ -59,19 +59,21 @@ public:
   /**
    *  Dummy-Constructor. Dimension=0
    */
-  DistributedVector ();
+  DistributedVector (const ParallelType = AUTOMATIC);
   
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
-  DistributedVector (const unsigned int n);
+  DistributedVector (const unsigned int n,
+                     const ParallelType type = AUTOMATIC);
     
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
   DistributedVector (const unsigned int n,
-		     const unsigned int n_local);
+		     const unsigned int n_local,
+                     const ParallelType type = AUTOMATIC);
     
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -80,7 +82,8 @@ public:
    */
   DistributedVector (const unsigned int N,
 		     const unsigned int n_local,
-		     const std::vector<unsigned int>& ghost);
+		     const std::vector<unsigned int>& ghost,
+                     const ParallelType type = AUTOMATIC);
     
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -123,13 +126,15 @@ public:
    */    
   void init (const unsigned int N,
 	     const unsigned int n_local,
-	     const bool         fast=false);
+	     const bool         fast=false,
+	     const ParallelType type=AUTOMATIC);
     
   /**
    * call init with n_local = N,
    */
   void init (const unsigned int N,
-	     const bool         fast=false);
+	     const bool         fast=false,
+	     const ParallelType type=AUTOMATIC);
     
   /**
    * Create a vector that holds tha local indices plus those specified
@@ -138,7 +143,8 @@ public:
   virtual void init (const unsigned int /*N*/,
 		     const unsigned int /*n_local*/,
 		     const std::vector<unsigned int>& /*ghost*/,
-		     const bool /*fast*/ = false);
+		     const bool /*fast*/ = false,
+		     const ParallelType = AUTOMATIC);
     
   /**
    * \f$U(0-N) = s\f$: fill all components.
@@ -431,21 +437,13 @@ private:
 // DistributedVector inline methods
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector () :
+DistributedVector<T>::DistributedVector (const ParallelType type) :
   _global_size      (0),
   _local_size       (0),
   _first_local_index(0),
   _last_local_index (0)
 {
-}
-
-
-
-template <typename T>
-inline
-DistributedVector<T>::DistributedVector (const unsigned int n)
-{
-  this->init(n, n, false);
+  this->_type = type;
 }
 
 
@@ -453,9 +451,9 @@ DistributedVector<T>::DistributedVector (const unsigned int n)
 template <typename T>
 inline
 DistributedVector<T>::DistributedVector (const unsigned int n,
-					 const unsigned int n_local)
+                                         const ParallelType type)
 {
-  this->init(n, n_local, false);
+  this->init(n, n, false, type);
 }
 
 
@@ -464,9 +462,21 @@ template <typename T>
 inline
 DistributedVector<T>::DistributedVector (const unsigned int n,
 					 const unsigned int n_local,
-		                         const std::vector<unsigned int>& ghost)
+                                         const ParallelType type)
 {
-  this->init(n, n_local, ghost, false);
+  this->init(n, n_local, false, type);
+}
+
+
+
+template <typename T>
+inline
+DistributedVector<T>::DistributedVector (const unsigned int n,
+					 const unsigned int n_local,
+		                         const std::vector<unsigned int>& ghost,
+                                         const ParallelType type)
+{
+  this->init(n, n_local, ghost, false, type);
 }
 
 
@@ -484,12 +494,26 @@ template <typename T>
 inline
 void DistributedVector<T>::init (const unsigned int n,
 				 const unsigned int n_local,
-				 const bool fast)
+				 const bool fast,
+                                 const ParallelType type)
 {
   // This function must be run on all processors at once
   parallel_only();
 
   libmesh_assert (n_local <= n);
+
+  if (type == AUTOMATIC)
+    {
+      if (n == n_local)
+        this->_type = SERIAL;
+      else
+        this->_type = PARALLEL;
+    }
+  else
+    this->_type = type;
+
+  libmesh_assert ((this->_type==SERIAL && n==n_local) || 
+                  this->_type==PARALLEL);
 
   // Clear the data structures if already initialized
   if (this->initialized())
@@ -561,10 +585,11 @@ inline
 void DistributedVector<T>::init (const unsigned int n,
 			         const unsigned int n_local,
 		                 const std::vector<unsigned int>& /*ghost*/,
-			         const bool fast)
+			         const bool fast,
+                                 const ParallelType type)
 {
   // TODO: we shouldn't ignore the ghost sparsity pattern
-  this->init(n, n_local, fast);
+  this->init(n, n_local, fast, type);
 }
 
 
@@ -572,9 +597,10 @@ void DistributedVector<T>::init (const unsigned int n,
 template <typename T>
 inline
 void DistributedVector<T>::init (const unsigned int n,
-				 const bool fast)
+				 const bool fast,
+                                 const ParallelType type)
 {
-  this->init(n,n,fast);
+  this->init(n,n,fast,type);
 }
 
 
