@@ -2,12 +2,12 @@
 
 
 # The location of the mesh library
-meshdir := ../..
+LIBMESH_DIR ?= ../..
 
 # include the library options determined by configure.  This will
 # set the variables INCLUDE and LIBS that we will need to build and
 # link with the library.
-include $(meshdir)/Make.common
+include $(LIBMESH_DIR)/Make.common
 
 
 ###############################################################################
@@ -56,13 +56,13 @@ distclean:
 # Warning, the 3D problem may be extremely slow if you are running in debug mode.
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESHRUN) $(target) -r 3 -o FIRST $(LIBMESHOPTIONS)
+	@$(LIBMESH_RUN) $(target) -r 3 -o FIRST $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 
 
