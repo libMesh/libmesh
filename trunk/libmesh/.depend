@@ -20,8 +20,11 @@ src/base/dof_map.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
     include/fe/fe_base.h\
     include/fe/fe_interface.h\
     include/fe/fe_type.h\
@@ -46,6 +49,8 @@ src/base/dof_map.$(obj-suffix):\
     include/parallel/threads.h\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
+    include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
@@ -74,6 +79,7 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_point_locator_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -252,6 +258,7 @@ src/error_estimation/exact_error_estimator.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -562,6 +569,7 @@ src/error_estimation/uniform_refinement_estimator.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -671,9 +679,12 @@ src/fe/fe_base.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
     include/fe/fe.h\
     include/fe/fe_base.h\
     include/fe/fe_interface.h\
@@ -700,6 +711,8 @@ src/fe/fe_base.$(obj-suffix):\
     include/partitioning/partitioner.h\
     include/quadrature/quadrature.h\
     include/quadrature/quadrature_gauss.h\
+    include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -729,6 +742,43 @@ src/fe/fe_bernstein.$(obj-suffix):\
     include/fe/fe.h\
     include/fe/fe_base.h\
     include/fe/fe_macro.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/parallel/threads.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/fe/fe_bernstein_shape_0D.$(obj-suffix):\
+    src/fe/fe_bernstein_shape_0D.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/node.h\
@@ -921,6 +971,43 @@ src/fe/fe_clough.$(obj-suffix):\
     include/fe/fe.h\
     include/fe/fe_base.h\
     include/fe/fe_macro.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/parallel/threads.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/fe/fe_clough_shape_0D.$(obj-suffix):\
+    src/fe/fe_clough_shape_0D.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/node.h\
@@ -1132,6 +1219,43 @@ src/fe/fe_hermite.$(obj-suffix):\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/fe/fe_hermite_shape_0D.$(obj-suffix):\
+    src/fe/fe_hermite_shape_0D.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/parallel/threads.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/fe/fe_hermite_shape_1D.$(obj-suffix):\
     src/fe/fe_hermite_shape_1D.C\
     include/base/auto_ptr.h\
@@ -1284,6 +1408,43 @@ src/fe/fe_hierarchic.$(obj-suffix):\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/fe/fe_hierarchic_shape_0D.$(obj-suffix):\
+    src/fe/fe_hierarchic_shape_0D.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/parallel/threads.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/fe/fe_hierarchic_shape_1D.$(obj-suffix):\
     src/fe/fe_hierarchic_shape_1D.C\
     include/base/auto_ptr.h\
@@ -1421,8 +1582,10 @@ src/fe/fe_interface.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
     include/fe/fe.h\
     include/fe/fe_base.h\
     include/fe/fe_compute_data.h\
@@ -1441,6 +1604,8 @@ src/fe/fe_interface.$(obj-suffix):\
     include/parallel/threads.h\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
+    include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -1496,8 +1661,10 @@ src/fe/fe_lagrange.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
     include/fe/fe.h\
     include/fe/fe_base.h\
     include/fe/fe_interface.h\
@@ -1516,6 +1683,8 @@ src/fe/fe_lagrange.$(obj-suffix):\
     include/parallel/threads.h\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
+    include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -1743,6 +1912,43 @@ src/fe/fe_monomial.$(obj-suffix):\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/fe/fe_monomial_shape_0D.$(obj-suffix):\
+    src/fe/fe_monomial_shape_0D.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/parallel/threads.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/fe/fe_monomial_shape_1D.$(obj-suffix):\
     src/fe/fe_monomial_shape_1D.C\
     include/base/auto_ptr.h\
@@ -1880,6 +2086,43 @@ src/fe/fe_szabab.$(obj-suffix):\
     include/fe/fe.h\
     include/fe/fe_base.h\
     include/fe/fe_macro.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/parallel/threads.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/fe/fe_szabab_shape_0D.$(obj-suffix):\
+    src/fe/fe_szabab_shape_0D.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/node.h\
@@ -2099,6 +2342,43 @@ src/fe/fe_xyz_boundary.$(obj-suffix):\
     include/numerics/vector_value.h\
     include/parallel/threads.h\
     include/quadrature/quadrature.h\
+    include/utils/compare_types.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
+src/fe/fe_xyz_shape_0D.$(obj-suffix):\
+    src/fe/fe_xyz_shape_0D.C\
+    include/base/auto_ptr.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/parallel/threads.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -4206,6 +4486,66 @@ src/mesh/diva_io.$(obj-suffix):\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/mesh/ensight_io.$(obj-suffix):\
+    src/mesh/ensight_io.C\
+    include/base/auto_ptr.h\
+    include/base/dof_map.h\
+    include/base/dof_object.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_interface.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/elem_range.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/geom/stored_range.h\
+    include/mesh/ensight_io.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_output.h\
+    include/mesh/parallel_mesh.h\
+    include/mesh/serial_mesh.h\
+    include/mesh/unstructured_mesh.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/parallel/threads.h\
+    include/parallel/threads_allocators.h\
+    include/partitioning/partitioner.h\
+    include/solvers/equation_systems.h\
+    include/solvers/explicit_system.h\
+    include/solvers/frequency_system.h\
+    include/solvers/implicit_system.h\
+    include/solvers/linear_implicit_system.h\
+    include/solvers/newmark_system.h\
+    include/solvers/steady_system.h\
+    include/solvers/system.h\
+    include/solvers/system_norm.h\
+    include/solvers/transient_system.h\
+    include/utils/compare_types.h\
+    include/utils/mapvector.h\
+    include/utils/o_string_stream.h\
+    include/utils/parameters.h\
+    include/utils/perf_log.h
 src/mesh/exodusII_io.$(obj-suffix):\
     src/mesh/exodusII_io.C\
     include/base/auto_ptr.h\
@@ -4229,6 +4569,7 @@ src/mesh/exodusII_io.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -4275,6 +4616,7 @@ src/mesh/exodusII_io_helper.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -4388,6 +4730,7 @@ src/mesh/gmv_io.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -5241,6 +5584,7 @@ src/mesh/mesh_tools.$(obj-suffix):\
     include/geom/sphere.h\
     include/geom/stored_range.h\
     include/geom/surface.h\
+    include/mesh/boundary_info.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_communication.h\
     include/mesh/mesh_tools.h\
@@ -5855,6 +6199,7 @@ src/mesh/vtk_io.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -6205,6 +6550,7 @@ src/numerics/distributed_vector.$(obj-suffix):\
     include/base/print_trace.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/numerics/dense_subvector.h\
     include/numerics/dense_vector.h\
@@ -6229,6 +6575,7 @@ src/numerics/eigen_solver.$(obj-suffix):\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
     include/enums/enum_eigen_solver_type.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/numerics/eigen_solver.h\
     include/numerics/numeric_vector.h\
@@ -6389,6 +6736,7 @@ src/numerics/laspack_linear_solver.$(obj-suffix):\
     include/base/print_trace.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_solver_type.h\
@@ -6423,9 +6771,14 @@ src/numerics/laspack_matrix.$(obj-suffix):\
     include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/elem_range.h\
     include/geom/node.h\
@@ -6441,6 +6794,8 @@ src/numerics/laspack_matrix.$(obj-suffix):\
     include/parallel/threads.h\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
+    include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -6456,6 +6811,7 @@ src/numerics/laspack_vector.$(obj-suffix):\
     include/base/print_trace.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/numerics/dense_matrix.h\
     include/numerics/dense_matrix_base.h\
@@ -6483,6 +6839,7 @@ src/numerics/linear_solver.$(obj-suffix):\
     include/base/print_trace.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_solver_type.h\
@@ -6528,6 +6885,7 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_point_locator_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -6607,6 +6965,7 @@ src/numerics/numeric_vector.$(obj-suffix):\
     include/base/print_trace.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/numerics/distributed_vector.h\
     include/numerics/laspack_vector.h\
@@ -6631,6 +6990,7 @@ src/numerics/petsc_linear_solver.$(obj-suffix):\
     include/base/print_trace.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_solver_type.h\
@@ -6665,9 +7025,15 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/elem_range.h\
     include/geom/node.h\
@@ -6687,6 +7053,8 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/parallel/threads.h\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
+    include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -6714,6 +7082,7 @@ src/numerics/petsc_nonlinear_solver.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -6756,6 +7125,7 @@ src/numerics/petsc_vector.$(obj-suffix):\
     include/base/print_trace.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/numerics/dense_subvector.h\
     include/numerics/dense_vector.h\
@@ -6784,6 +7154,7 @@ src/numerics/slepc_eigen_solver.$(obj-suffix):\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
     include/enums/enum_eigen_solver_type.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/numerics/eigen_solver.h\
     include/numerics/numeric_vector.h\
@@ -6815,9 +7186,15 @@ src/numerics/sparse_matrix.$(obj-suffix):\
     include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/elem_range.h\
     include/geom/node.h\
@@ -6838,6 +7215,8 @@ src/numerics/sparse_matrix.$(obj-suffix):\
     include/parallel/threads.h\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
+    include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -6872,6 +7251,7 @@ src/numerics/sum_shell_matrix.$(obj-suffix):\
     include/base/print_trace.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/numerics/numeric_vector.h\
     include/numerics/shell_matrix.h\
@@ -6891,6 +7271,7 @@ src/numerics/tensor_shell_matrix.$(obj-suffix):\
     include/base/print_trace.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/numerics/numeric_vector.h\
     include/numerics/shell_matrix.h\
@@ -6910,6 +7291,7 @@ src/numerics/trilinos_aztec_linear_solver.$(obj-suffix):\
     include/base/print_trace.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_solver_type.h\
@@ -6941,9 +7323,15 @@ src/numerics/trilinos_epetra_matrix.$(obj-suffix):\
     include/base/variant_filter_iterator.h\
     include/enums/enum_elem_quality.h\
     include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
     include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/elem_range.h\
     include/geom/node.h\
@@ -6962,6 +7350,8 @@ src/numerics/trilinos_epetra_matrix.$(obj-suffix):\
     include/parallel/threads.h\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
+    include/solvers/system.h\
+    include/solvers/system_norm.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -6977,6 +7367,7 @@ src/numerics/trilinos_epetra_vector.$(obj-suffix):\
     include/base/print_trace.h\
     include/base/reference_counted_object.h\
     include/base/reference_counter.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/numerics/dense_subvector.h\
     include/numerics/dense_vector.h\
@@ -7012,6 +7403,7 @@ src/numerics/trilinos_nox_nonlinear_solver.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -7390,7 +7782,8 @@ src/quadrature/quadrature_build.$(obj-suffix):\
     include/quadrature/quadrature_trap.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
-    include/utils/perf_log.h
+    include/utils/perf_log.h\
+    include/utils/string_to_enum.h
 src/quadrature/quadrature_clough.$(obj-suffix):\
     src/quadrature/quadrature_clough.C
 src/quadrature/quadrature_clough_1D.$(obj-suffix):\
@@ -8042,6 +8435,7 @@ src/solvers/adaptive_time_solver.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -8099,6 +8493,7 @@ src/solvers/continuation_system.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_solver_type.h\
@@ -8238,6 +8633,7 @@ src/solvers/diff_system.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -8356,6 +8752,7 @@ src/solvers/eigen_time_solver.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -8527,6 +8924,7 @@ src/solvers/euler2_solver.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -8583,6 +8981,7 @@ src/solvers/euler_solver.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -8640,6 +9039,7 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -8753,6 +9153,7 @@ src/solvers/fem_context.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -8830,6 +9231,7 @@ src/solvers/fem_system.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -8906,6 +9308,7 @@ src/solvers/frequency_system.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_solver_type.h\
@@ -8960,6 +9363,7 @@ src/solvers/implicit_system.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -9063,6 +9467,7 @@ src/solvers/newmark_system.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -9115,6 +9520,7 @@ src/solvers/newton_solver.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_solver_type.h\
@@ -9233,6 +9639,7 @@ src/solvers/petsc_diff_solver.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -9295,6 +9702,7 @@ src/solvers/steady_solver.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -9354,6 +9762,7 @@ src/solvers/system.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -9414,6 +9823,7 @@ src/solvers/system_io.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -9464,6 +9874,7 @@ src/solvers/system_projection.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
@@ -9524,6 +9935,7 @@ src/solvers/time_solver.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -9582,6 +9994,7 @@ src/solvers/transient_system.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -9631,6 +10044,7 @@ src/solvers/twostep_time_solver.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -9690,6 +10104,7 @@ src/solvers/unsteady_solver.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -9749,6 +10164,7 @@ src/utils/error_vector.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
