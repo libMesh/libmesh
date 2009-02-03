@@ -23,6 +23,7 @@ ex16.$(obj-suffix):\
     $(LIBMESH_DIR)/include/enums/enum_io_package.h\
     $(LIBMESH_DIR)/include/enums/enum_norm_type.h\
     $(LIBMESH_DIR)/include/enums/enum_order.h\
+    $(LIBMESH_DIR)/include/enums/enum_parallel_type.h\
     $(LIBMESH_DIR)/include/enums/enum_quadrature_type.h\
     $(LIBMESH_DIR)/include/enums/enum_solver_package.h\
     $(LIBMESH_DIR)/include/enums/enum_xdr_mode.h\
