@@ -94,7 +94,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
   // Otherwise it is a parallel, distributed vector, which
   // we need to localize.
-  else
+  else if (old_v.type() == PARALLEL)
     {
       // Build a send list for efficient localization
       BuildProjectionList projection_list(*this);
@@ -111,6 +111,28 @@ void System::project_vector (const NumericVector<Number>& old_v,
       local_old_vector = local_old_vector_built.get();
       new_vector_ptr->init(this->n_dofs(), false, SERIAL);
       local_old_vector->init(old_v.size(), false, SERIAL);
+      old_v.localize(*local_old_vector, projection_list.send_list);
+      local_old_vector->close();
+      old_vector_ptr = local_old_vector;
+    }
+  else if (old_v.type() == GHOSTED)
+    {
+      // Build a send list for efficient localization
+      BuildProjectionList projection_list(*this);
+      Threads::parallel_reduce (active_local_elem_range, 
+				projection_list);
+
+      // Create a sorted, unique send_list
+      projection_list.unique();
+
+      new_v.init (this->n_dofs(), this->n_local_dofs(),
+                  this->get_dof_map().get_send_list(), false, GHOSTED);
+
+      local_old_vector_built = NumericVector<Number>::build();
+      new_vector_ptr = &new_v;
+      local_old_vector = local_old_vector_built.get();
+      local_old_vector->init(old_v.size(), old_v.local_size(),
+                             projection_list.send_list, false, SERIAL);
       old_v.localize(*local_old_vector, projection_list.send_list);
       local_old_vector->close();
       old_vector_ptr = local_old_vector;
@@ -150,7 +172,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
     }
   // If the old vector was parallel, we need to update it
   // and free the localized copies
-  else
+  else if (old_v.type() == PARALLEL)
     {
       // We may have to set dof values that this processor doesn't
       // own in certain special cases, like LAGRANGE FIRST or
