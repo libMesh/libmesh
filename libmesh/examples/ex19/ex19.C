@@ -81,7 +81,7 @@ const Real sigma = 0.2;
 
 // This function computes the Jacobian K(x)
 void compute_jacobian (const NumericVector<Number>& soln,
-		       SparseMatrix<Number>&  jacobian)
+                       SparseMatrix<Number>&  jacobian)
 {
   // Get a reference to the equation system.
   EquationSystems &es = *_equation_system;
@@ -171,7 +171,7 @@ void compute_jacobian (const NumericVector<Number>& soln,
       // element type is different (i.e. the last element was a
       // triangle, now we are on a quadrilateral).
       Ke.resize (dof_indices.size(),
-		 dof_indices.size());
+                 dof_indices.size());
            
       // Now we will build the element Jacobian.  This involves
       // a double loop to integrate the test funcions (i) against
@@ -180,21 +180,21 @@ void compute_jacobian (const NumericVector<Number>& soln,
       // vector.
       //
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	{
-	  RealGradient grad_u = 0;
+        {
+          RealGradient grad_u = 0;
     
-	  for (unsigned int i=0; i<phi.size(); i++)
-	    grad_u += dphi[i][qp]*soln(dof_indices[i]);
-	  
-	  const Real K = 1./std::sqrt(1. + grad_u*grad_u);
-	  
-	  for (unsigned int i=0; i<phi.size(); i++)
-	    for (unsigned int j=0; j<phi.size(); j++)
-	      Ke(i,j) += JxW[qp]*(
-				  K*(dphi[i][qp]*dphi[j][qp]) +
-				  kappa*phi[i][qp]*phi[j][qp]
-				  );
-	}
+          for (unsigned int i=0; i<phi.size(); i++)
+            grad_u += dphi[i][qp]*soln(dof_indices[i]);
+          
+          const Real K = 1./std::sqrt(1. + grad_u*grad_u);
+          
+          for (unsigned int i=0; i<phi.size(); i++)
+            for (unsigned int j=0; j<phi.size(); j++)
+              Ke(i,j) += JxW[qp]*(
+                                  K*(dphi[i][qp]*dphi[j][qp]) +
+                                  kappa*phi[i][qp]*phi[j][qp]
+                                  );
+        }
       
       dof_map.constrain_element_matrix (Ke, dof_indices);
       
@@ -209,7 +209,7 @@ void compute_jacobian (const NumericVector<Number>& soln,
 // Here we compute the residual R(x) = K(x)*x - f. The current solution
 // x is passed in the soln vector
 void compute_residual (const NumericVector<Number>& soln,
-		       NumericVector<Number>& residual)
+                       NumericVector<Number>& residual)
 {
   EquationSystems &es = *_equation_system;
 
@@ -249,7 +249,7 @@ void compute_residual (const NumericVector<Number>& soln,
   // Declare a special finite element object for
   // boundary integration.
   AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-	      
+              
   // Boundary integration requires one quadraure rule,
   // with dimensionality one less than the dimensionality
   // of the element.
@@ -321,24 +321,24 @@ void compute_residual (const NumericVector<Number>& soln,
       // residual.
 
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	{
-	  Real u = 0;
-	  RealGradient grad_u = 0;
-	  
-	  for (unsigned int j=0; j<phi.size(); j++)
-	    {
-	      u      += phi[j][qp]*soln(dof_indices[j]);
-	      grad_u += dphi[j][qp]*soln(dof_indices[j]);
-	    }
-	  
-	  const Real K = 1./std::sqrt(1. + grad_u*grad_u);
-	  
-	  for (unsigned int i=0; i<phi.size(); i++)
-	    Re(i) += JxW[qp]*(
-			      K*(dphi[i][qp]*grad_u) +
-			      kappa*phi[i][qp]*u
-			      );
-	}
+        {
+          Real u = 0;
+          RealGradient grad_u = 0;
+          
+          for (unsigned int j=0; j<phi.size(); j++)
+            {
+              u      += phi[j][qp]*soln(dof_indices[j]);
+              grad_u += dphi[j][qp]*soln(dof_indices[j]);
+            }
+          
+          const Real K = 1./std::sqrt(1. + grad_u*grad_u);
+          
+          for (unsigned int i=0; i<phi.size(); i++)
+            Re(i) += JxW[qp]*(
+                              K*(dphi[i][qp]*grad_u) +
+                              kappa*phi[i][qp]*u
+                              );
+        }
 
       // At this point the interior element integration has
       // been completed.  However, we have not yet addressed
@@ -348,28 +348,28 @@ void compute_residual (const NumericVector<Number>& soln,
       // If the element has no neighbor on a side then that
       // side MUST live on a boundary of the domain.
       for (unsigned int side=0; side<elem->n_sides(); side++)
-	if (elem->neighbor(side) == NULL)
-	  {
-	    // The value of the shape functions at the quadrature
-	    // points.
-	    const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+        if (elem->neighbor(side) == NULL)
+          {
+            // The value of the shape functions at the quadrature
+            // points.
+            const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
 
-	    // The Jacobian * Quadrature Weight at the quadrature
-	    // points on the face.
-	    const std::vector<Real>& JxW_face = fe_face->get_JxW();
+            // The Jacobian * Quadrature Weight at the quadrature
+            // points on the face.
+            const std::vector<Real>& JxW_face = fe_face->get_JxW();
 
-	    // Compute the shape function values on the element face.
-	    fe_face->reinit(elem, side);
+            // Compute the shape function values on the element face.
+            fe_face->reinit(elem, side);
 
-	    // Loop over the face quadrature points for integration.
-	    for (unsigned int qp=0; qp<qface.n_points(); qp++)
-	      {
-		// This is the right-hand-side contribution (f),
+            // Loop over the face quadrature points for integration.
+            for (unsigned int qp=0; qp<qface.n_points(); qp++)
+              {
+                // This is the right-hand-side contribution (f),
                 // which has to be subtracted from the current residual
-		for (unsigned int i=0; i<phi_face.size(); i++)
-		  Re(i) -= JxW_face[qp]*sigma*phi_face[i][qp];
-	      } 
-	  }
+                for (unsigned int i=0; i<phi_face.size(); i++)
+                  Re(i) -= JxW_face[qp]*sigma*phi_face[i][qp];
+              } 
+          }
       
       dof_map.constrain_element_vector (Re, dof_indices);
       residual.add_vector (Re, dof_indices);
@@ -385,132 +385,137 @@ int main (int argc, char** argv)
 {
   // Initialize libMesh and any dependent libaries, like in example 2.
   LibMeshInit init (argc, argv);
- 
-  // Braces are used to force object scope, like in example 2
-  {
-    // Create a GetPot object to parse the command line
-    GetPot command_line (argc, argv);
-    
-    // Check for proper calling arguments.
-    if (argc < 3)
-      {
-        if (libMesh::processor_id() == 0)
-	  std::cerr << "Usage:\n"
-		    <<"\t " << argv[0] << " -r 2"
-		    << std::endl;
 
-	// This handy function will print the file name, line number,
-	// and then abort.
-	libmesh_error();
-      }
-    
-    // Brief message to the user regarding the program name
-    // and command line arguments.
-    else 
-      {
-	std::cout << "Running " << argv[0];
-	
-	for (int i=1; i<argc; i++)
-	  std::cout << " " << argv[i];
-	
-	std::cout << std::endl << std::endl;
-      }
-    
+#if !defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_HAVE_TRILINOS)
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example requires libMesh to be\n"
+              << "compiled with nonlinear solver support from\n"
+              << "PETSc or Trilinos!"
+              << std::endl;
+  return 0;
+#endif
 
-    // The dimension of our problem 
-    const unsigned int dim = 2;
-    
-    // Read number of refinements 
-    int nr = 2;
-    if ( command_line.search(1, "-r") )
-      nr = command_line.next(nr);
-    
-    // Read FE order from command line
-    std::string order = "FIRST"; 
-    if ( command_line.search(2, "-Order", "-o") )
-      order = command_line.next(order);
-
-    // Read FE Family from command line
-    std::string family = "LAGRANGE"; 
-    if ( command_line.search(2, "-FEFamily", "-f") )
-      family = command_line.next(family);
-    
-    // Cannot use dicontinuous basis.
-    if ((family == "MONOMIAL") || (family == "XYZ"))
-      {
-	std::cout << "ex19 currently requires a C^0 (or higher) FE basis." << std::endl;
-	libmesh_error();
-      }
-
-    if ( command_line.search(1, "-pre") )
-      {
-#ifdef LIBMESH_HAVE_PETSC
-        //Use the jacobian for preconditioning.
-        PetscOptionsSetValue("-snes_mf_operator",PETSC_NULL);
-#else
-        std::cerr<<"Must be using PetsC to use jacobian based preconditioning"<<std::endl;
-
-        //returning zero so that "make run" won't fail if we ever enable this capability there.
-        return 0;
-#endif //LIBMESH_HAVE_PETSC
-      }  
-      
-    // Create a mesh with user-defined dimension.
-    Mesh mesh (dim);    
-    mesh.read ("lshaped.xda");
-
-    if (order != "FIRST")
-      mesh.all_second_order();
-
-    MeshRefinement(mesh).uniformly_refine(nr);
-
-    // Print information about the mesh to the screen.
-    mesh.print_info();    
-    
-    // Create an equation systems object.
-    EquationSystems equation_systems (mesh);
-    _equation_system = &equation_systems;
-    
-    // Declare the system and its variables.
+  // Create a GetPot object to parse the command line
+  GetPot command_line (argc, argv);
+  
+  // Check for proper calling arguments.
+  if (argc < 3)
     {
-      // Creates a system named "Laplace-Young"
-      NonlinearImplicitSystem& system =
-	equation_systems.add_system<NonlinearImplicitSystem> ("Laplace-Young");
+      if (libMesh::processor_id() == 0)
+        std::cerr << "Usage:\n"
+                  <<"\t " << argv[0] << " -r 2"
+                  << std::endl;
 
-
-      // Here we specify the tolerance for the nonlinear solver and 
-      // the maximum of nonlinear iterations. 
-      equation_systems.parameters.set<Real>         ("nonlinear solver tolerance")          = 1.e-12;
-      equation_systems.parameters.set<unsigned int> ("nonlinear solver maximum iterations") = 50;
-
-      
-      // Adds the variable "u" to "Laplace-Young".  "u"
-      // will be approximated using second-order approximation.
-      system.add_variable("u",
-			  Utility::string_to_enum<Order>   (order),
-			  Utility::string_to_enum<FEFamily>(family));
-
-      // Give the system a pointer to the functions that update 
-      // the residual and Jacobian.
-      
-      system.nonlinear_solver->residual = compute_residual;
-      system.nonlinear_solver->jacobian = compute_jacobian;
-
-      // Initialize the data structures for the equation system.
-      equation_systems.init();
-
-      // Prints information about the system to the screen.
-      equation_systems.print_info();
+      // This handy function will print the file name, line number,
+      // and then abort.
+      libmesh_error();
     }
-    
-    // Solve the system "Laplace-Young"
-    equation_systems.get_system("Laplace-Young").solve();
+  
+  // Brief message to the user regarding the program name
+  // and command line arguments.
+  else 
+    {
+      std::cout << "Running " << argv[0];
+      
+      for (int i=1; i<argc; i++)
+        std::cout << " " << argv[i];
+      
+      std::cout << std::endl << std::endl;
+    }
+  
 
-    // After solving the system write the solution
-    GMVIO (mesh).write_equation_systems ("out.gmv", 
-					 equation_systems);
+  // The dimension of our problem 
+  const unsigned int dim = 2;
+  
+  // Read number of refinements 
+  int nr = 2;
+  if ( command_line.search(1, "-r") )
+    nr = command_line.next(nr);
+  
+  // Read FE order from command line
+  std::string order = "FIRST"; 
+  if ( command_line.search(2, "-Order", "-o") )
+    order = command_line.next(order);
+
+  // Read FE Family from command line
+  std::string family = "LAGRANGE"; 
+  if ( command_line.search(2, "-FEFamily", "-f") )
+    family = command_line.next(family);
+  
+  // Cannot use dicontinuous basis.
+  if ((family == "MONOMIAL") || (family == "XYZ"))
+    {
+      std::cout << "ex19 currently requires a C^0 (or higher) FE basis." << std::endl;
+      libmesh_error();
+    }
+
+  if ( command_line.search(1, "-pre") )
+    {
+#ifdef LIBMESH_HAVE_PETSC
+      //Use the jacobian for preconditioning.
+      PetscOptionsSetValue("-snes_mf_operator",PETSC_NULL);
+#else
+      std::cerr<<"Must be using PetsC to use jacobian based preconditioning"<<std::endl;
+
+      //returning zero so that "make run" won't fail if we ever enable this capability there.
+      return 0;
+#endif //LIBMESH_HAVE_PETSC
+    }  
+    
+  // Create a mesh with user-defined dimension.
+  Mesh mesh (dim);    
+  mesh.read ("lshaped.xda");
+
+  if (order != "FIRST")
+    mesh.all_second_order();
+
+  MeshRefinement(mesh).uniformly_refine(nr);
+
+  // Print information about the mesh to the screen.
+  mesh.print_info();    
+  
+  // Create an equation systems object.
+  EquationSystems equation_systems (mesh);
+  _equation_system = &equation_systems;
+  
+  // Declare the system and its variables.
+  {
+    // Creates a system named "Laplace-Young"
+    NonlinearImplicitSystem& system =
+      equation_systems.add_system<NonlinearImplicitSystem> ("Laplace-Young");
+
+
+    // Here we specify the tolerance for the nonlinear solver and 
+    // the maximum of nonlinear iterations. 
+    equation_systems.parameters.set<Real>         ("nonlinear solver tolerance")          = 1.e-12;
+    equation_systems.parameters.set<unsigned int> ("nonlinear solver maximum iterations") = 50;
+
+    
+    // Adds the variable "u" to "Laplace-Young".  "u"
+    // will be approximated using second-order approximation.
+    system.add_variable("u",
+                        Utility::string_to_enum<Order>   (order),
+                        Utility::string_to_enum<FEFamily>(family));
+
+    // Give the system a pointer to the functions that update 
+    // the residual and Jacobian.
+    
+    system.nonlinear_solver->residual = compute_residual;
+    system.nonlinear_solver->jacobian = compute_jacobian;
+
+    // Initialize the data structures for the equation system.
+    equation_systems.init();
+
+    // Prints information about the system to the screen.
+    equation_systems.print_info();
   }
   
+  // Solve the system "Laplace-Young"
+  equation_systems.get_system("Laplace-Young").solve();
+
+  // After solving the system write the solution
+  GMVIO (mesh).write_equation_systems ("out.gmv", 
+                                       equation_systems);
   // All done. 
   return 0; 
 }
