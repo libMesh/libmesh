@@ -90,10 +90,16 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
-#ifndef LIBMESH_ENABLE_AMR
+#if !defined(LIBMESH_ENABLE_AMR)
   if (libMesh::processor_id() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
               << "compiled with AMR support!"
+              << std::endl;
+  return 0;
+#elif !defined(LIBMESH_ENABLE_PETSC)
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example requires libMesh to be\n"
+              << "compiled with PETSc support!"
               << std::endl;
   return 0;
 #else
