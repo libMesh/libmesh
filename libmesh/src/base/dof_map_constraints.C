@@ -607,7 +607,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
       v_local = v;
       libmesh_assert (v_local->closed());
     }
-  else
+  else if (v->type() == PARALLEL)
     {
       v_built = NumericVector<Number>::build();
       v_built->init (v->size(), v->size(), true, SERIAL);
@@ -615,6 +615,11 @@ void DofMap::enforce_constraints_exactly (const System &system,
       v_built->close();
       v_local = v_built.get();
 
+      v_global = v;
+    }
+  else if (v->type() == GHOSTED)
+    {
+      v_local = v;
       v_global = v;
     }
 
