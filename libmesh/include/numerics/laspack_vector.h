@@ -484,11 +484,11 @@ inline
 void LaspackVector<T>::init (const unsigned int n,
 			     const unsigned int n_local,
 			     const bool fast,
-                             const ParallelType type)
+                             const ParallelType)
 {
-  // Laspack vectors only for serial cases.
+  // Laspack vectors only for serial cases,
+  // but can provide a "parallel" vector on one processor.
   libmesh_assert (n == n_local);
-  libmesh_assert (type == AUTOMATIC || type == SERIAL);
 
   this->_type = SERIAL;
 
