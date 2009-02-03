@@ -693,6 +693,13 @@ void PetscVector<T>::init (const unsigned int n,
   int petsc_n=static_cast<int>(n);
   int petsc_n_local=static_cast<int>(n_local);
   int petsc_n_ghost=static_cast<int>(ghost.size());
+
+  // If the mesh is disjoint, the following assertion will fail.
+  // If the mesh is not disjoint, every processor will either have
+  // all the dofs, none of the dofs, or some non-zero dofs at the
+  // boundary between processors.
+  libmesh_assert(n_local == 0 || n_local == n || !ghost.empty());
+
   int* petsc_ghost = ghost.empty() ? PETSC_NULL :
     const_cast<int*>(reinterpret_cast<const int*>(&ghost[0]));
 
@@ -766,7 +773,7 @@ void PetscVector<T>::close ()
   ierr = VecAssemblyEnd(_vec);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  if(_global_to_local_map.size()!=0)
+  if(this->type() == GHOSTED)
     {
       ierr = VecGhostUpdateBegin(_vec,ADD_VALUES,SCATTER_REVERSE);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -938,7 +945,7 @@ T PetscVector<T>::operator() (const unsigned int i) const
   int ierr=0;
   PetscScalar value=0.;
 
-  if(_global_to_local_map.empty())
+  if(this->type() != GHOSTED)
     {
       PetscScalar *values;
       ierr = VecGetArray(_vec, &values);
