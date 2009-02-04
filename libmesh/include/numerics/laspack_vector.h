@@ -156,6 +156,13 @@ class LaspackVector : public NumericVector<T>
              const ParallelType = AUTOMATIC);
 
   /**
+   * Creates a vector that has the same dimension and storage type as
+   * \p other, including ghost dofs.
+   */
+  virtual void init (const NumericVector<T>& other,
+                     const bool fast = false);
+    
+  /**
    * \f$U(0-N) = s\f$: fill all components.
    */
   NumericVector<T> & operator= (const T s);
@@ -535,6 +542,17 @@ void LaspackVector<T>::init (const unsigned int n,
 {
   libmesh_assert(ghost.empty());
   this->init(n,n_local,fast,type);
+}
+
+
+
+/* Default implementation for solver packages for which ghosted
+   vectors are not yet implemented.  */
+template <class T>
+void LaspackVector<T>::init (const NumericVector<T>& other,
+                             const bool fast)
+{
+  this->init(other.size(),other.local_size(),fast,other.type());
 }
 
 

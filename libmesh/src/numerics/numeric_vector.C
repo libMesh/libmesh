@@ -83,17 +83,6 @@ NumericVector<T>::build(const SolverPackage solver_package)
 
 
 
-/* Default implementation for solver packages for which ghosted
-   vectors are not yet implemented.  */
-template <class T>
-void NumericVector<T>::init (const NumericVector<T>& other,
-                             const bool fast)
-{
-  this->init(other.size(),other.local_size(),fast,other.type());
-}
-
-
-
 // Full specialization for float datatypes (DistributedVector wants this)
 
 template <>

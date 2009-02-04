@@ -181,7 +181,7 @@ public:
    * \p other, including ghost dofs.
    */
   virtual void init (const NumericVector<T>& other,
-                     const bool fast = false);
+                     const bool fast = false) = 0;
     
   /**
    * \f$U(0-N) = s\f$: fill all components.
