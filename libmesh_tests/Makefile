@@ -1,6 +1,8 @@
-CC=$(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --cxx)
-CFLAGS=-c -Wall $(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --cxxflags --include$) -I${CPP_UNIT}/include
-LDFLAGS=-L${CPP_UNIT}/lib -lcppunit $(shell ${LIBMESH_ROOT}/contrib/bin/libmesh-config --ldflags)
+LIBMESH_DIR ?= ..
+
+CC=$(shell ${LIBMESH_DIR}/contrib/bin/libmesh-config --cxx)
+CFLAGS=-c -Wall $(shell ${LIBMESH_DIR}/contrib/bin/libmesh-config --cxxflags --include$) -I${CPP_UNIT}/include
+LDFLAGS=-L${CPP_UNIT}/lib -lcppunit $(shell ${LIBMESH_DIR}/contrib/bin/libmesh-config --ldflags)
 SOURCES=$(shell find ./ -name "*.C")
 OBJECTS=$(SOURCES:.C=.o)
 EXECUTABLE=run_tests
