@@ -158,6 +158,13 @@ public:
 	     const bool /*fast*/ = false,
 	     const ParallelType = AUTOMATIC);
 
+  /**
+   * Creates a vector that has the same dimension and storage type as
+   * \p other, including ghost dofs.
+   */
+  virtual void init (const NumericVector<T>& other,
+                     const bool fast = false);
+
   //   /**
   //    * Change the dimension to that of the
   //    * vector \p V. The same applies as for
@@ -684,6 +691,17 @@ EpetraVector<T>::EpetraVector (const unsigned int n,
   ignoreNonLocalEntries_(false)
 {
   this->init(n, n_local, ghost, false, type);
+}
+
+
+
+/* Default implementation for solver packages for which ghosted
+   vectors are not yet implemented.  */
+template <class T>
+void EpetraVector<T>::init (const NumericVector<T>& other,
+                            const bool fast)
+{
+  this->init(other.size(),other.local_size(),fast,other.type());
 }
 
 
