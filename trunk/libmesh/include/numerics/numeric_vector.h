@@ -304,6 +304,11 @@ public:
   virtual T operator() (const unsigned int i) const = 0;
     
   /**
+   * @returns the element \p U(i)
+   */
+  virtual T el(const unsigned int i) const { return (*this)(i); }
+
+  /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
