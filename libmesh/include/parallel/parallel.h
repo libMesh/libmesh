@@ -2194,7 +2194,7 @@ namespace Parallel
    * Blocking message probe.  Allows information about a message to be 
    * examined before the message is actually received.
    *
-   * we do not currently support this operationon one processor without MPI.
+   * we do not currently support this operation on one processor without MPI.
    */
   inline status probe (const int,
 		       const int)
@@ -2204,7 +2204,7 @@ namespace Parallel
   /**
    * Blocking-send vector to one processor with user-defined type.
    *
-   * we do not currently support this operationon one processor without MPI.
+   * we do not currently support this operation on one processor without MPI.
    */
   template <typename T>
   inline void send (const unsigned int,
@@ -2217,7 +2217,7 @@ namespace Parallel
   /**
    * Nonblocking-send vector to one processor with user-defined type.
    *
-   * we do not currently support this operationon one processor without MPI.
+   * we do not currently support this operation on one processor without MPI.
    */
   template <typename T>
   inline void send (const unsigned int,
@@ -2231,7 +2231,7 @@ namespace Parallel
   /**
    * Blocking-receive vector from one processor with user-defined type.
    *
-   * we do not currently support this operationon one processor without MPI.
+   * we do not currently support this operation on one processor without MPI.
    */
   template <typename T>
   inline Status receive (const int,
@@ -2244,7 +2244,7 @@ namespace Parallel
   /**
    * Nonblocking-receive vector from one processor with user-defined type.
    *
-   * we do not currently support this operationon one processor without MPI.
+   * we do not currently support this operation on one processor without MPI.
    */
   template <typename T>
   inline void receive (const int,
