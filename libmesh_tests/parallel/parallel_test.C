@@ -115,19 +115,23 @@ public:
     src_val[2] = 2;
 
     Parallel::request request;
-    Parallel::isend (procup,
-		     src_val,
-		     request);
 
-    Parallel::recv (procdown,
-		    recv_val);
+    if (libMesh::n_processors() > 1)
+      {
+        Parallel::send (procup,
+		        src_val,
+		        request);
 
-    Parallel::wait (request);
+        Parallel::receive (procdown,
+		           recv_val);
+
+        Parallel::wait (request);
     
-    CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
+        CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
 
-    for (unsigned int i=0; i<src_val.size(); i++)
-      CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
+        for (unsigned int i=0; i<src_val.size(); i++)
+          CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
+      }
   }
 
 
@@ -147,19 +151,23 @@ public:
     src_val[2] = 2;
 
     Parallel::request request;
-    Parallel::irecv (procdown,
-		     recv_val,
-		     request);
 
-    Parallel::send (procup,
-		    src_val);
+    if (libMesh::n_processors() > 1)
+      {
+        Parallel::receive (procdown,
+		           recv_val,
+		           request);
 
-    Parallel::wait (request);
+        Parallel::send (procup,
+		        src_val);
+
+        Parallel::wait (request);
     
-    CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
+        CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
 
-    for (unsigned int i=0; i<src_val.size(); i++)
-      CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
+        for (unsigned int i=0; i<src_val.size(); i++)
+          CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
+      }
   }
 };
 
