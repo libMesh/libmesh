@@ -641,6 +641,10 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   
   ierr = VecScatterDestroy(scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Make sure ghost dofs are up to date
+  if (v_local->type() == GHOSTED)
+    v_local->close();
 }
 
 
