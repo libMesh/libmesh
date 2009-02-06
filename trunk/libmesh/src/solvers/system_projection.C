@@ -132,7 +132,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
       new_vector_ptr = &new_v;
       local_old_vector = local_old_vector_built.get();
       local_old_vector->init(old_v.size(), old_v.local_size(),
-                             projection_list.send_list, false, SERIAL);
+                             projection_list.send_list, false, GHOSTED);
       old_v.localize(*local_old_vector, projection_list.send_list);
       local_old_vector->close();
       old_vector_ptr = local_old_vector;
