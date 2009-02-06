@@ -202,12 +202,21 @@ void QMonomial::init_3D(const ElemType _type,
 	      // For comparison, a SEVENTH-order Gauss product rule
 	      // (which integrates tri-7th order polynomials) would
 	      // have 4^3=64 points.
+	      const Real
+		r  = std::sqrt(6.L/7.L),
+		s  = std::sqrt((960.L - 3.L*std::sqrt(28798.L)) / 2726.L),
+		t  = std::sqrt((960.L + 3.L*std::sqrt(28798.L)) / 2726.L),
+		B1 = 8624.L / 29160.L,
+		B2 = 2744.L / 29160.L,
+		B3 = 8.L*(774.L*t*t - 230.L)/(9720.L*(t*t-s*s)),
+		B4 = 8.L*(230.L - 774.L*s*s)/(9720.L*(t*t-s*s));
+		
 	      const Real data[4][4] =
 		{
-		  {9.258200997725515e-01L, 0.000000000000000e+00L, 0.000000000000000e+00L, 2.957475994513032e-01L}, 
-		  {9.258200997725515e-01L, 9.258200997725515e-01L, 0.000000000000000e+00L, 9.41015089163237e-02L }, 
-		  {7.341125287521153e-01L, 7.341125287521153e-01L, 7.341125287521153e-01L, 2.247031747656014e-01L}, 
-		  {4.067031864267161e-01L, 4.067031864267161e-01L, 4.067031864267161e-01L, 4.123338622714356e-01L}  
+		  {r, 0.L, 0.L, B1}, 
+		  {r,   r, 0.L, B2}, 
+		  {s,   s,   s, B3}, 
+		  {t,   t,   t, B4}  
 		};
 		  
 	      const unsigned int rule_id[4] = {
