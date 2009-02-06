@@ -123,9 +123,9 @@ void QMonomial::init_2D(const ElemType _type,
 	      // A tensor-product rule accurate for "bi-quintic" polynomials would have 9 points.
 	      const Real data[3][3] =
 		{
-		  {0.0000000000000000e+00, 0.0000000000000000e+00, 1.1428571428571428e+00}, // 1
-		  {0.0000000000000000e+00, 9.6609178307929590e-01, 3.1746031746031746e-01}, // 2
-		  {7.7459666924148337e-01, 5.7735026918962576e-01, 5.5555555555555555e-01}  // 4
+		  {               0.L,                  0.L, 8.L  /  7.L}, // 1
+		  {               0.L, std::sqrt(14.L/15.L), 20.L / 63.L}, // 2
+		  {std::sqrt(3.L/5.L),   std::sqrt(1.L/3.L), 20.L / 36.L}  // 4
 		};
 
 	      const unsigned int symmetry[3] = {
