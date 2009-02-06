@@ -230,6 +230,14 @@ SerialMesh::unpartitioned_elements_begin ()
 
 
 
+// subdomain elements begin() accessor
+SerialMesh::element_iterator
+SerialMesh::active_local_subdomain_elements_begin (const unsigned int subdomain_id)
+{
+  Predicates::ActiveLocalSubdomain<elem_iterator_imp> p(subdomain_id);
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
 
 
 
@@ -435,6 +443,14 @@ SerialMesh::unpartitioned_elements_begin () const
 
 
 
+// subdomain elements begin() accessor
+SerialMesh::const_element_iterator
+SerialMesh::active_local_subdomain_elements_begin (const unsigned int subdomain_id) const
+{
+  Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(subdomain_id);
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
 
 
 
@@ -638,6 +654,15 @@ SerialMesh::unpartitioned_elements_end ()
   return this->pid_elements_end(DofObject::invalid_processor_id);
 }
 
+
+
+// subdomain elements end() accessor
+SerialMesh::element_iterator
+SerialMesh::active_local_subdomain_elements_end (const unsigned int subdomain_id)
+{
+  Predicates::ActiveLocalSubdomain<elem_iterator_imp> p(subdomain_id);
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
 
 
 
@@ -848,6 +873,13 @@ SerialMesh::unpartitioned_elements_end () const
 
 
 
+// subdomain elements end() accessor
+SerialMesh::const_element_iterator
+SerialMesh::active_local_subdomain_elements_end (const unsigned int subdomain_id) const
+{
+  Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(subdomain_id);
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
 
 
 
