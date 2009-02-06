@@ -443,18 +443,13 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
   libmesh_assert (this->_type == v._type);
   libmesh_assert (this->size() == v.size());
   libmesh_assert (this->local_size() == v.local_size());
-
-//  this->init (v.size(), v.local_size());
-//  this->_global_to_local_map = v._global_to_local_map;
-//  this->_is_closed      = v._is_closed;
-//  this->_is_initialized = v._is_initialized;
+  libmesh_assert (this->_global_to_local_map ==
+                  v._global_to_local_map);
 
   if (v.size() != 0)
     {
-	  int ierr = 0;
-
-	  ierr = VecCopy (v._vec, this->_vec);
-       	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      int ierr = VecCopy (v._vec, this->_vec);
+      	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
   
   return *this;
@@ -505,6 +500,10 @@ PetscVector<T>::operator = (const std::vector<T>& v)
 	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 
+  // Make sure ghost dofs are up to date
+  if (this->type() == GHOSTED)
+    this->close();
+
   return *this;
 }
 
@@ -517,7 +516,7 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
   PetscVector<T>* v_local = libmesh_cast_ptr<PetscVector<T>*>(&v_local_in);
 
   libmesh_assert (v_local != NULL);
-  libmesh_assert (v_local->local_size() == this->size());
+  libmesh_assert (v_local->size() == this->size());
 
   int ierr = 0;
   const int n = this->size();
@@ -564,6 +563,10 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
   
   ierr = VecScatterDestroy(scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Make sure ghost dofs are up to date
+  if (v_local->type() == GHOSTED)
+    v_local->close();
 }
 
 
@@ -576,25 +579,29 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   PetscVector<T>* v_local = libmesh_cast_ptr<PetscVector<T>*>(&v_local_in);
 
   libmesh_assert (v_local != NULL);
-  libmesh_assert (v_local->local_size() == this->size());
+  libmesh_assert (v_local->size() == this->size());
   libmesh_assert (send_list.size()     <= v_local->size());
   
   int ierr=0;
-  const int n_sl = send_list.size();
+  const unsigned int n_sl = send_list.size();
 
   IS is;
   VecScatter scatter;
 
-  std::vector<int> idx(n_sl);
+  std::vector<int> idx(n_sl + this->local_size());
   
-  for (int i=0; i<n_sl; i++)
+  for (unsigned int i=0; i<n_sl; i++)
     idx[i] = static_cast<int>(send_list[i]);
+  for (unsigned int i = 0; i != this->local_size(); ++i)
+    idx[n_sl+i] = i + this->first_local_index();
   
   // Create the index set & scatter object
   if (idx.empty())
-    ierr = ISCreateGeneral(libMesh::COMM_WORLD, n_sl, PETSC_NULL, &is);
+    ierr = ISCreateGeneral(libMesh::COMM_WORLD,
+                           n_sl+this->local_size(), PETSC_NULL, &is);
   else
-    ierr = ISCreateGeneral(libMesh::COMM_WORLD, n_sl, &idx[0], &is);
+    ierr = ISCreateGeneral(libMesh::COMM_WORLD,
+			   n_sl+this->local_size(), &idx[0], &is);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   ierr = VecScatterCreate(_vec,          is,
@@ -643,7 +650,7 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
 			       const std::vector<unsigned int>& send_list)
 {
   // Only good for serial vectors.
-  libmesh_assert (this->size() == this->local_size());
+  // libmesh_assert (this->size() == this->local_size());
   libmesh_assert (last_local_idx > first_local_idx);
   libmesh_assert (send_list.size() <= this->size());
   libmesh_assert (last_local_idx < this->size());
