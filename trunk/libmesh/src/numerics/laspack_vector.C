@@ -358,7 +358,7 @@ void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
     libmesh_cast_ptr<LaspackVector<T>*>(&v_local_in);
 
   libmesh_assert (v_local != NULL);
-  libmesh_assert (send_list.size() == v_local->size());
+  libmesh_assert (send_list.size() <= v_local->size());
 
   *v_local = *this;
 }
@@ -373,7 +373,7 @@ void LaspackVector<T>::localize (const unsigned int first_local_idx,
   libmesh_assert (first_local_idx  == 0);
   libmesh_assert (last_local_idx+1 == this->size());
   
-  libmesh_assert (send_list.size() == this->size());
+  libmesh_assert (send_list.size() <= this->size());
 }
 
 
