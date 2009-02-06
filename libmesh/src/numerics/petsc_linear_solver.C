@@ -30,7 +30,7 @@
 #include "libmesh_logging.h"
 #include "petsc_linear_solver.h"
 #include "shell_matrix.h"
-
+#include "petsc_preconditioner.h"
 
 
 /*----------------------- functions ----------------------------------*/
@@ -99,7 +99,7 @@ void PetscLinearSolver<T>::init ()
       
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
-      this->set_petsc_preconditioner_type();
+      PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
       
       // Set the options from user-input
       // Set runtime options, e.g.,
@@ -128,7 +128,7 @@ void PetscLinearSolver<T>::init ()
       
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
-      this->set_petsc_preconditioner_type();
+      PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
       
       // Set the options from user-input
       // Set runtime options, e.g.,
@@ -191,7 +191,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
-      this->set_petsc_preconditioner_type();
+      PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
       
       // Set the options from user-input
       // Set runtime options, e.g.,
@@ -228,7 +228,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
-      this->set_petsc_preconditioner_type();
+      PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
       
       // Set the options from user-input
       // Set runtime options, e.g.,
@@ -705,66 +705,6 @@ void PetscLinearSolver<T>::set_petsc_solver_type()
     default:
       std::cerr << "ERROR:  Unsupported PETSC Solver: "
 		<< this->_solver_type               << std::endl
-		<< "Continuing with PETSC defaults" << std::endl;
-    }
-}
-
-
-
-
-
-
-
-
-template <typename T>
-void PetscLinearSolver<T>::set_petsc_preconditioner_type()
-{
-  int ierr = 0;
- 
-  switch (this->_preconditioner_type)
-    {
-    case IDENTITY_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCNONE);      CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-	
-    case CHOLESKY_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCCHOLESKY);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-
-    case ICC_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCICC);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-
-    case ILU_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCILU);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-
-    case LU_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCLU);        CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-      
-    case ASM_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCASM);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-
-    case JACOBI_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCJACOBI);    CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-
-    case BLOCK_JACOBI_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCBJACOBI);   CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-
-    case SOR_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCSOR);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-
-    case EISENSTAT_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCEISENSTAT); CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-
-#if !(PETSC_VERSION_LESS_THAN(2,1,2))
-    // Only available for PETSC >= 2.1.2      
-    case USER_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCMAT);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-#endif
-
-    case SHELL_PRECOND:
-      ierr = PCSetType (_pc, (char*) PCSHELL);     CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-
-    default:
-      std::cerr << "ERROR:  Unsupported PETSC Preconditioner: "
-		<< this->_preconditioner_type       << std::endl
 		<< "Continuing with PETSC defaults" << std::endl;
     }
 }

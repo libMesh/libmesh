@@ -7113,6 +7113,33 @@ src/numerics/petsc_nonlinear_solver.$(obj-suffix):\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/numerics/petsc_preconditioner.$(obj-suffix):\
+    src/numerics/petsc_preconditioner.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_preconditioner_type.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/petsc_macro.h\
+    include/numerics/petsc_matrix.h\
+    include/numerics/petsc_preconditioner.h\
+    include/numerics/petsc_vector.h\
+    include/numerics/preconditioner.h\
+    include/numerics/sparse_matrix.h\
+    include/parallel/parallel.h\
+    include/parallel/threads.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/numerics/petsc_vector.$(obj-suffix):\
     src/numerics/petsc_vector.C\
     include/base/auto_ptr.h\
@@ -7141,6 +7168,26 @@ src/numerics/petsc_vector.$(obj-suffix):\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h\
     include/utils/utility.h
+src/numerics/preconditioner.$(obj-suffix):\
+    src/numerics/preconditioner.C\
+    include/base/auto_ptr.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/enums/enum_preconditioner_type.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
+    include/numerics/petsc_preconditioner.h\
+    include/numerics/preconditioner.h\
+    include/parallel/threads.h\
+    include/utils/o_string_stream.h\
+    include/utils/perf_log.h
 src/numerics/slepc_eigen_solver.$(obj-suffix):\
     src/numerics/slepc_eigen_solver.C\
     include/base/auto_ptr.h\

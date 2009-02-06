@@ -47,6 +47,7 @@ namespace libMeshEnums {
 			   LU_PRECOND,
 			   USER_PRECOND,
 			   SHELL_PRECOND,
+                           AMG_PRECOND,
 			   
 			   INVALID_PRECONDITIONER};
 }

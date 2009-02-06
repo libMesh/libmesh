@@ -187,12 +187,6 @@ private:
   void set_petsc_solver_type ();
 
   /**
-   * Tells PETSC to use the user-specified preconditioner stored in
-   * \p _preconditioner_type
-   */
-  void set_petsc_preconditioner_type ();
-
-  /**
    * Internal function if shell matrix mode is used.
    */
   static PetscErrorCode _petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest);
