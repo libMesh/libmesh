@@ -582,7 +582,7 @@ public:
    * when projecting the solution onto the refined mesh, hence the parent's
    * DOF indices need to be included in the \p _send_list.
    */
-  void augment_send_list_for_projection(const MeshBase &);
+  // void augment_send_list_for_projection(const MeshBase &);
 
   /**
    * Fills the vector di with the global degree of freedom indices
@@ -681,12 +681,9 @@ private:
    * variable in the system.
    * Starts at index next_free_dof, and increments it to
    * the post-final index.
-   * If build_send_list is true, builds the send list.  If
-   * false, clears and reserves the send list
    */  
   void distribute_local_dofs_var_major (unsigned int& next_free_dof,
-				        MeshBase& mesh,
-				        const bool build_send_list);
+				        MeshBase& mesh);
   
   /**
    * Distributes the global degrees of freedom, for dofs on
@@ -701,8 +698,7 @@ private:
    * false, clears and reserves the send list
    */  
   void distribute_local_dofs_node_major (unsigned int& next_free_dof,
-				         MeshBase& mesh,
-				         const bool build_send_list);
+				         MeshBase& mesh);
     
   /**
    * Adds entries to the \p _send_list vector corresponding to DoFs

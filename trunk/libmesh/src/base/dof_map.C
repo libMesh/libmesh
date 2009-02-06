@@ -668,9 +668,9 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
   // Set temporary DOF indices on this processor
   if (node_major_dofs)
-    this->distribute_local_dofs_node_major (next_free_dof, mesh, false);
+    this->distribute_local_dofs_node_major (next_free_dof, mesh);
   else
-    this->distribute_local_dofs_var_major (next_free_dof, mesh, false);
+    this->distribute_local_dofs_var_major (next_free_dof, mesh);
 
   // Get DOF counts on all processors
   std::vector<unsigned int> dofs_on_proc(n_proc, 0);
@@ -694,9 +694,9 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
   // Set permanent DOF indices on this processor
   if (node_major_dofs)
-    this->distribute_local_dofs_node_major (next_free_dof, mesh, true);
+    this->distribute_local_dofs_node_major (next_free_dof, mesh);
   else
-    this->distribute_local_dofs_var_major (next_free_dof, mesh, true);
+    this->distribute_local_dofs_var_major (next_free_dof, mesh);
 
   libmesh_assert(next_free_dof == _end_df[proc_id]);
 
@@ -725,6 +725,8 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
   STOP_LOG("distribute_dofs()", "DofMap");
 
+  _send_list.clear();
+
   // Note that in the add_neighbors_to_send_list nodes on processor
   // boundaries that are shared by multiple elements are added for
   // each element.
@@ -736,14 +738,13 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
 
 void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
-                                              MeshBase& mesh,
-                                              const bool build_send_list)
+                                              MeshBase& mesh)
 {
   const unsigned int sys_num = this->sys_number();
   const unsigned int n_vars  = this->n_variables();
 
-  // Number of elements to add to send_list
-  unsigned int send_list_size = 0;
+  // We now only add remote dofs to the _send_list
+  // unsigned int send_list_size = 0;
 
   // _var_first_local_df does not work with node_major dofs
   _var_first_local_df.resize(n_vars+1);
@@ -783,17 +784,6 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
 					 0,
 					 next_free_dof);
 		    next_free_dof += node->n_comp(sys_num,var);
-
-		    // If we've been requested to, add local dofs to the
-		    // _send_list
-		    if (build_send_list)
-		      for (unsigned int index=0; index<node->n_comp(sys_num,var);
-			   index++)
-			_send_list.push_back(node->dof_number(sys_num,
-							      var,
-							      index));
-		    else
-		      send_list_size += node->n_comp(sys_num,var);
 		  }
 	      }
         }
@@ -812,17 +802,6 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
 				   next_free_dof);
 
 	      next_free_dof += elem->n_comp(sys_num,var);
-              
-	      // If we've been requested to, add local dofs to the
-	      // _send_list
-	      if (build_send_list)
-		for (unsigned int index=0; index<elem->n_comp(sys_num,var);
-		     index++)
-		  _send_list.push_back(elem->dof_number(sys_num,
-							var,
-							index));
-	      else
-		send_list_size += elem->n_comp(sys_num,var);
 	    }
     } // done looping over elements
 
@@ -847,25 +826,18 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
         }
     }
 #endif // DEBUG
-
-  if (!build_send_list)
-    {
-      _send_list.clear();
-      _send_list.reserve(send_list_size);
-    }
 }
 
 
 
 void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
-                                             MeshBase& mesh,
-                                             const bool build_send_list)
+                                             MeshBase& mesh)
 {
   const unsigned int sys_num = this->sys_number();
   const unsigned int n_vars  = this->n_variables();
 
-  // Number of elements to add to send_list
-  unsigned int send_list_size = 0;
+  // We now only add remote dofs to the _send_list
+  // unsigned int send_list_size = 0;
 
   // We will cache the first local index for each variable
   _var_first_local_df.clear();
@@ -911,17 +883,6 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
                                        0,
                                        next_free_dof);
                   next_free_dof += node->n_comp(sys_num,var);
-
-		  // If we've been requested to, add local dofs to the
-		  // _send_list
-                  if (build_send_list)
-                    for (unsigned int index=0; index<node->n_comp(sys_num,var);
-                         index++)
-                      _send_list.push_back(node->dof_number(sys_num,
-                                                            var,
-                                                            index));
-                  else
-                    send_list_size += node->n_comp(sys_num,var);
                 }
             }
                   
@@ -937,17 +898,6 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
                                    next_free_dof);
 
               next_free_dof += elem->n_comp(sys_num,var);
-              
-	      // If we've been requested to, add local dofs to the
-	      // _send_list
-              if (build_send_list)
-                for (unsigned int index=0; index<elem->n_comp(sys_num,var);
-                     index++)
-                  _send_list.push_back(elem->dof_number(sys_num,
-                                                      var,
-                                                      index));
-              else
-                send_list_size += elem->n_comp(sys_num,var);
             }
         } // end loop on elements
       _var_first_local_df.push_back(next_free_dof);
@@ -974,12 +924,6 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
         }
     }
 #endif // DEBUG
-
-  if (!build_send_list)
-    {
-      _send_list.clear();
-      _send_list.reserve(send_list_size);
-    }
 }
 
 
@@ -989,7 +933,6 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
   START_LOG("add_neighbors_to_send_list()", "DofMap");
   
   //-------------------------------------------------------------------------
-  // The _send_list now only contains entries from the local processor.
   // We need to add the DOFs from elements that live on neighboring processors
   // that are neighbors of the elements on the local processor
   //-------------------------------------------------------------------------
@@ -1034,10 +977,12 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 		  // Get the DOF indices for this neighboring element
 		  this->dof_indices (family[i], di);
 
-		  // Insert the DOF indices into the send list
-		  _send_list.insert (_send_list.end(),
-				     di.begin(), di.end());
-		}
+	          // Insert the remote DOF indices into the send list
+                  for (unsigned int j=0; j != di.size(); ++j)
+                    if (di[j] < this->first_dof() ||
+                        di[j] >= this->end_dof())
+	              _send_list.push_back(di[j]);
+	        }
 	  }
     }
 
@@ -1072,9 +1017,11 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 	  // Get the DOF indices for this neighboring element
 	  this->dof_indices (elem, di);
 
-	  // Insert the DOF indices into the send list
-	  _send_list.insert (_send_list.end(),
-			     di.begin(), di.end());
+	  // Insert the remote DOF indices into the send list
+            for (unsigned int j=0; j != di.size(); ++j)
+              if (di[j] < this->first_dof() ||
+                  di[j] >= this->end_dof())
+	        _send_list.push_back(di[j]);
 	}
     }
   
@@ -1561,6 +1508,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
 
 
 
+/*
 void DofMap::augment_send_list_for_projection(const MeshBase& mesh)
 {
   // Loop over the active local elements in the mesh.
@@ -1612,6 +1560,7 @@ void DofMap::augment_send_list_for_projection(const MeshBase& mesh)
   // The send-list might need to be sorted again.
   if (needs_sorting) this->sort_send_list ();
 }
+*/
 
 #endif // LIBMESH_ENABLE_AMR
 
