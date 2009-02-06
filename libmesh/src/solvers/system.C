@@ -257,7 +257,8 @@ void System::reinit ()
   solution->init (this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
 	
   libmesh_assert (solution->size() == current_local_solution->size());
-  libmesh_assert (solution->size() == current_local_solution->local_size());
+  // Not true with ghosted vectors
+  // libmesh_assert (solution->size() == current_local_solution->local_size());
 
   const unsigned int first_local_dof = solution->first_local_index();
   const unsigned int local_size      = solution->local_size();
@@ -275,7 +276,7 @@ void System::update ()
   const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
 
   // Check sizes
-  libmesh_assert (current_local_solution->local_size() == solution->size());
+  libmesh_assert (current_local_solution->size() == solution->size());
 // More processors than elements => empty send_list
 //  libmesh_assert (!send_list.empty());
   libmesh_assert (send_list.size() <= solution->size());
@@ -298,8 +299,9 @@ void System::re_update ()
   Utility::iota (send_list.begin(), send_list.end(), 0);
   
   // Check sizes
-  libmesh_assert (current_local_solution->local_size() == solution->size());
   libmesh_assert (current_local_solution->size()       == solution->size());
+  // Not true with ghosted vectors
+  // libmesh_assert (current_local_solution->local_size() == solution->size());
   libmesh_assert (!send_list.empty());
   libmesh_assert (send_list.size() <= solution->size());
 
