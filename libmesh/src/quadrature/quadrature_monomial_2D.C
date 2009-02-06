@@ -406,6 +406,50 @@ void QMonomial::init_2D(const ElemType _type,
 
 	  case FOURTEENTH:
 	  case FIFTEENTH:
+	    {
+	      // A degree-15, 48 point rule originally due to Rabinowitz and Richter,
+	      // can be found in Cools' 1971 book.
+	      //
+	      // A.H. Stroud, Approximate calculation of multiple integrals,
+	      // Prentice-Hall, Englewood Cliffs, N.J., 1971.
+	      //
+	      // The product Gauss rule for this order has 8^2=64 points.
+	      const Real data[9][3] =
+		{
+		  {9.915377816777667e-01L, 0.0000000000000000e+00,  3.01245207981210e-02L}, // 4
+		  {8.020163879230440e-01L, 0.0000000000000000e+00,  8.71146840209092e-02L}, // 4
+		  {5.648674875232742e-01L, 0.0000000000000000e+00, 1.250080294351494e-01L}, // 4
+		  {9.354392392539896e-01L, 0.0000000000000000e+00,  2.67651407861666e-02L}, // 4
+		  {7.624563338825799e-01L, 0.0000000000000000e+00,  9.59651863624437e-02L}, // 4
+		  {2.156164241427213e-01L, 0.0000000000000000e+00, 1.750832998343375e-01L}, // 4
+		  {9.769662659711761e-01L, 6.684480048977932e-01L,  2.83136372033274e-02L}, // 4
+		  {8.937128379503403e-01L, 3.735205277617582e-01L,  8.66414716025093e-02L}, // 4
+		  {6.122485619312083e-01L, 4.078983303613935e-01L, 1.150144605755996e-01L}  // 4
+		};
+
+	      const unsigned int symmetry[9] = {
+		3, // Full Symmetry, (x,0)
+		3, // Full Symmetry, (x,0)
+		3, // Full Symmetry, (x,0)
+		2, // Full Symmetry, (x,x)
+		2, // Full Symmetry, (x,x)
+		2, // Full Symmetry, (x,x)
+		1, // Full Symmetry, (x,y)
+		1, // Full Symmetry, (x,y)
+		1, // Full Symmetry, (x,y)
+	      };
+	      
+	      _points.resize (48);
+	      _weights.resize(48);
+
+	      stroud_rule(data, symmetry, 9);
+
+	      return;
+	    } // 	  case FOURTEENTH, FIFTEENTH:
+
+
+
+	    
 	  case SIXTEENTH:
 	  case SEVENTEENTH:
 	    {
