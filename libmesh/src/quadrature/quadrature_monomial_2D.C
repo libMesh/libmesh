@@ -188,18 +188,26 @@ void QMonomial::init_2D(const ElemType _type,
 	    
 	  case SEVENTH:
 	    {
-	      // A degree 7, 12-point rule due to Stroud.  
+	      // A degree 7, 12-point rule due to Tyler, can be found in Stroud's book  
 	      //
 	      // A.H. Stroud, Approximate calculation of multiple integrals,
 	      // Prentice-Hall, Englewood Cliffs, N.J., 1971.
 	      //
 	      // This rule is fully-symmetric and provably minimal in the number of points.
 	      // A tensor-product rule accurate for "bi-septic" polynomials would have 16 points.
+	      const Real
+		r  = std::sqrt(6.L/7.L),
+		s  = std::sqrt( (114.L - 3.L*std::sqrt(583.L)) / 287.L ),
+		t  = std::sqrt( (114.L + 3.L*std::sqrt(583.L)) / 287.L ),
+		B1 = 196.L / 810.L,
+		B2 = 4.L * (178981.L + 2769.L*std::sqrt(583.L)) / 1888920.L,
+		B3 = 4.L * (178981.L - 2769.L*std::sqrt(583.L)) / 1888920.L;
+	      
 	      const Real data[3][3] =
 		{
-		  {9.2582009977255146e-01, 0.0000000000000000e+00, 2.4197530864197530e-01}, // 4
-		  {3.8055443320831565e-01, 0.0000000000000000e+00, 5.2059291666739445e-01}, // 4
-		  {8.0597978291859874e-01, 0.0000000000000000e+00, 2.3743177469063023e-01}  // 4
+		  {r, 0.0, B1}, // 4
+		  {s, 0.0, B2}, // 4
+		  {t, 0.0, B3}  // 4
 		};
 
 	      const unsigned int symmetry[3] = {
