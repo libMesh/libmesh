@@ -177,7 +177,7 @@ void XdrIO::write (const std::string& name)
   
   // If there are more than one subdomains and the user has not specified an 
   // external file then write the subdomain mapping to the default file "."  
-  if ((mesh.n_subdomains() > 1) && 
+  if ((mesh.n_subdomains() > 0) && 
       (this->subdomain_map_file_name() == "n/a"))
     this->subdomain_map_file_name() = ".";
 

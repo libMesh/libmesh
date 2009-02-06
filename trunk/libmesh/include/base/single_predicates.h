@@ -266,6 +266,24 @@ namespace Predicates
   protected:
     virtual predicate<T>* clone() const { return new boundary_side<T>(*this); }
   };
+
+  // The subdomain predicate returns true if the pointers
+  // subdimain id matches a given subdomain id.
+  template <typename T>
+  struct subdomain : predicate<T>
+  {
+    // Constructor
+    subdomain(const unsigned int sid) : _subdomain(sid) {}
+    virtual ~subdomain() {}
+
+    // op()
+    virtual bool operator()(const T& it) const { return (*it)->subdomain_id() == _subdomain; }
+    
+  protected:
+    virtual predicate<T>* clone() const { return new subdomain<T>(*this); }
+    const unsigned int _subdomain;
+  };
+
 }
 
 

@@ -434,6 +434,21 @@ namespace Predicates
       this->_predicates.push_back(new boundary_side<T>);
     }
   };
+
+  
+
+  // Instantiation for the ActiveLocalSubdomain abstract_multi_predicate
+  template <typename T>
+  struct ActiveLocalSubdomain : abstract_multi_predicate<T>
+  {
+    ActiveLocalSubdomain(const unsigned int subdomain_id)
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new active<T>);
+      this->_predicates.push_back(new pid<T>(libMesh::processor_id()));
+      this->_predicates.push_back(new subdomain<T>(subdomain_id));
+    }
+  };
   
 }
 

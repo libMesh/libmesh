@@ -230,6 +230,15 @@ ParallelMesh::unpartitioned_elements_begin ()
 
 
 
+// subdomain elements begin() accessor
+ParallelMesh::element_iterator
+ParallelMesh::active_local_subdomain_elements_begin (const unsigned int subdomain_id)
+{
+  Predicates::ActiveLocalSubdomain<elem_iterator_imp> p(subdomain_id);
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
 
 
 
@@ -434,6 +443,14 @@ ParallelMesh::unpartitioned_elements_begin () const
 }
 
 
+
+// subdomain elements begin() accessor
+ParallelMesh::const_element_iterator
+ParallelMesh::active_local_subdomain_elements_begin (const unsigned int subdomain_id) const
+{
+  Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(subdomain_id);
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
 
 
 
@@ -640,6 +657,13 @@ ParallelMesh::unpartitioned_elements_end ()
 
 
 
+// subdomain elements end() accessor
+ParallelMesh::element_iterator
+ParallelMesh::active_local_subdomain_elements_end (const unsigned int subdomain_id)
+{
+  Predicates::ActiveLocalSubdomain<elem_iterator_imp> p(subdomain_id);
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
 
 
 
@@ -846,6 +870,14 @@ ParallelMesh::unpartitioned_elements_end () const
 }
 
 
+
+// subdomain elements end() accessor
+ParallelMesh::const_element_iterator
+ParallelMesh::active_local_subdomain_elements_end (const unsigned int subdomain_id) const
+{
+  Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(subdomain_id);
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
 
 
 

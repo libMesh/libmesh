@@ -584,6 +584,9 @@ public:
   virtual element_iterator active_pid_elements_end          (const unsigned int proc_id) = 0;
   virtual element_iterator unpartitioned_elements_begin     () = 0;
   virtual element_iterator unpartitioned_elements_end       () = 0;
+  virtual element_iterator active_local_subdomain_elements_begin         (const unsigned int subdomain_id) = 0;
+  virtual element_iterator active_local_subdomain_elements_end           (const unsigned int subdomain_id) = 0;
+  
 
   
   
@@ -630,6 +633,8 @@ public:
   virtual const_element_iterator active_pid_elements_end          (const unsigned int proc_id) const = 0;
   virtual const_element_iterator unpartitioned_elements_begin     () const = 0;
   virtual const_element_iterator unpartitioned_elements_end       () const = 0;
+  virtual const_element_iterator active_local_subdomain_elements_begin (const unsigned int subdomain_id) const = 0;
+  virtual const_element_iterator active_local_subdomain_elements_end   (const unsigned int subdomain_id) const = 0;
 
   
   /**
@@ -659,10 +664,11 @@ public:
 
 
   
-
-  
-  
-
+  /**
+   * Returns a writeable reference to the number of subdomains.
+   */
+  unsigned int& set_n_subdomains ()
+  { return _n_sbd; }
   
   
 protected:
@@ -671,11 +677,6 @@ protected:
 
   
   
-  /**
-   * Returns a writeable reference to the number of subdomains.
-   */
-  unsigned int& set_n_subdomains ()
-  { return _n_sbd; }
 
   /**
    * Returns a writeable reference to the number of partitions.
