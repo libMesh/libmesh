@@ -775,9 +775,9 @@ void PetscVector<T>::close ()
 
   if(this->type() == GHOSTED)
     {
-      ierr = VecGhostUpdateBegin(_vec,ADD_VALUES,SCATTER_FORWARD);
+      ierr = VecGhostUpdateBegin(_vec,INSERT_VALUES,SCATTER_FORWARD);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = VecGhostUpdateEnd(_vec,ADD_VALUES,SCATTER_FORWARD);
+      ierr = VecGhostUpdateEnd(_vec,INSERT_VALUES,SCATTER_FORWARD);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 
