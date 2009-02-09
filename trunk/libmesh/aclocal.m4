@@ -474,10 +474,10 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
               dnl        Well, duh, when the tested value is computed...  OK when it
               dnl        was from an assignment.
               CXXFLAGS_DBG="-w1 -g -wd1476 -wd1505 -wd1572"
-              CXXFLAGS_OPT="-O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
+              CXXFLAGS_OPT="-O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CXXFLAGS_DVL="$CXXFLAGS_DBG"
               CFLAGS_DBG="-w1 -wd266 -wd1572"
-              CFLAGS_OPT="-O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
+              CFLAGS_OPT="-O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CFLAGS_DVL="$CFLAGS_DBG"
               ;;
           dnl Intel ICC >= 10.0	          
