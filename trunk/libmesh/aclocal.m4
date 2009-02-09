@@ -862,7 +862,7 @@ AC_DEFUN(CONFIGURE_PETSC,
   	      [Flag indicating whether or not Petsc is available])
       AC_DEFINE(HAVE_MPI, 1,
   	      [Flag indicating whether or not MPI is available])
-      MPI_IMPL="petsc_snooped"
+      MPI_IMPL="petsc_snooped"      
   
       dnl Some tricks to discover the version of petsc.
       dnl You have to have grep and sed for this to work.
@@ -891,6 +891,13 @@ dnl      AC_SUBST(PETSCINCLUDEDIRS)
 	      
       AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_SUBMINOR, [$petscsubminor],
   	      [PETSc's subminor version number, as detected by LibMesh])
+
+      dnl Check for Hypre
+      HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
+      if test "x$HYPRE_LIB" != x ; then
+        AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not Petsc was compiled with Hypre support])
+	AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)
+      fi
   
       else
   
