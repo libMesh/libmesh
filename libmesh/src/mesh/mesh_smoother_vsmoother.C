@@ -31,6 +31,12 @@
 #include "unstructured_mesh.h"
 #include "utility.h"
 
+// Optimization at -O2 or greater seem to break Intel's icc. So if we are
+// being compiled with icc let's dumb-down the optimizations for this file
+#ifdef __INTEL_COMPILER
+#  pragma optimize ( "", off )
+#endif
+
 // Member functions for the Variational Smoother
 double VariationalMeshSmoother::smooth(unsigned int)
 {
