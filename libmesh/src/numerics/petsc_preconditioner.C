@@ -69,8 +69,10 @@ PetscPreconditioner<T>::init ()
   //Set the PCType
   set_petsc_preconditioner_type(this->_preconditioner_type, _pc);
 
+  #ifdef LIBMESH_HAVE_PETSC_HYPRE
   if(this->_preconditioner_type == AMG_PRECOND)
     PCHYPRESetType(this->_pc, "boomeramg");
+  #endif
 
   PetscMatrix<T> * pmatrix = libmesh_cast_ptr<PetscMatrix<T>*, SparseMatrix<T> >(this->_matrix);
 

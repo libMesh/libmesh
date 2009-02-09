@@ -139,6 +139,9 @@
 /* Flag indicating whether or not Petsc is available */
 #undef HAVE_PETSC
 
+/* Flag indicating whether or not Petsc was compiled with Hypre support */
+#undef HAVE_PETSC_HYPRE
+
 /* Define to 1 if you have the <rpc/rpc.h> header file. */
 #undef HAVE_RPC_RPC_H
 
