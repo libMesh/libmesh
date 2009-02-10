@@ -74,8 +74,8 @@ public:
    * Builds a \p Preconditioner using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<Preconditioner<T> > build(const SolverPackage solver_package =
-						  libMesh::default_solver_package());
+  static Preconditioner<T> * build(const SolverPackage solver_package =
+                                   libMesh::default_solver_package());
   
   /**
    * @returns true if the data structures are
@@ -97,7 +97,7 @@ public:
   /**
    * Initialize data structures if not done so already.
    */
-  virtual void init () = 0;
+  virtual void init () {};
 
   /**
    * Sets the matrix P to be preconditioned.
@@ -107,13 +107,13 @@ public:
   /**
    * Returns the type of preconditioner to use.
    */
-  PreconditionerType preconditioner_type () const
+  PreconditionerType type () const
   { return _preconditioner_type; }
 
   /**
    * Sets the type of preconditioner to use.
    */
-  void set_preconditioner_type (const PreconditionerType pct);
+  void set_type (const PreconditionerType pct);
   
 protected:
 
@@ -167,7 +167,7 @@ Preconditioner<T>::set_matrix(SparseMatrix<Number> & mat)
 
 template <typename T>
 void
-Preconditioner<T>::set_preconditioner_type (const PreconditionerType pct)
+Preconditioner<T>::set_type (const PreconditionerType pct)
 {
   //If the preconditioner type changes we (probably) need to reinitialize.
   _is_initialized = false;

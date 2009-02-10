@@ -29,10 +29,12 @@
 // Local Includes
 #include "nonlinear_implicit_system.h"
 #include "petsc_nonlinear_solver.h"
+#include "petsc_linear_solver.h"
 #include "petsc_vector.h"
 #include "petsc_matrix.h"
 #include "system.h"
 #include "dof_map.h"
+#include "preconditioner.h"
 
 //--------------------------------------------------------------------
 // Functions with C linkage to pass to PETSc.  PETSc will call these
@@ -217,6 +219,23 @@ void PetscNonlinearSolver<T>::init ()
 	     
       ierr = SNESSetFromOptions(_snes);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      if(this->_preconditioner)
+      {
+        KSP ksp;	 
+        ierr = SNESGetKSP (_snes, &ksp);
+               CHKERRABORT(libMesh::COMM_WORLD,ierr);
+        PC pc;
+        ierr = KSPGetPC(ksp,&pc);
+               CHKERRABORT(libMesh::COMM_WORLD,ierr);
+               
+        PCSetType(pc, PCSHELL);
+        PCShellSetContext(pc,(void*)this->_preconditioner);
+
+        //Re-Use the shell functions from petsc_linear_solver
+        PCShellSetSetUp(pc,__libmesh_petsc_preconditioner_setup);
+        PCShellSetApply(pc,__libmesh_petsc_preconditioner_apply);
+      }
     }
 }
 
@@ -264,7 +283,11 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
   //Pull in command-line options       
   KSPSetFromOptions(ksp);
-  SNESSetFromOptions(_snes);       
+  SNESSetFromOptions(_snes);
+
+  //Set the preconditioning matrix
+  if(this->_preconditioner)
+    this->_preconditioner->set_matrix(jac_in);
 
 //    ierr = KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
 //           CHKERRABORT(libMesh::COMM_WORLD,ierr);

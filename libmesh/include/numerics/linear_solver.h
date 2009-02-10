@@ -38,9 +38,7 @@ template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
-
-
-
+template <typename T> class Preconditioner;
 
 
 /**
@@ -103,16 +101,17 @@ public:
   /**
    * Returns the type of preconditioner to use.
    */
-  PreconditionerType preconditioner_type () const
-  { return _preconditioner_type; }
+  PreconditionerType preconditioner_type () const;
 
   /**
    * Sets the type of preconditioner to use.
    */
-  void set_preconditioner_type (const PreconditionerType pct)
-  { _preconditioner_type = pct; }
-  
+  void set_preconditioner_type (const PreconditionerType pct);
 
+  /**
+   * Attaches a Preconditioner object to be used
+   */
+  void attach_preconditioner(Preconditioner<T> * preconditioner);
 
   /**
    * This function calls the solver
@@ -191,6 +190,11 @@ protected:
    * Flag indicating if the data structures have been initialized.
    */
   bool _is_initialized;
+
+  /**
+   * Holds the Preconditioner object to be used for the linear solves.
+   */
+  Preconditioner<T> * _preconditioner;
 };
 
 
@@ -203,7 +207,8 @@ LinearSolver<T>::LinearSolver () :
   
   _solver_type         (GMRES),
   _preconditioner_type (ILU_PRECOND),
-  _is_initialized      (false)
+  _is_initialized      (false),
+  _preconditioner      (NULL)
 {
 }
 
@@ -215,7 +220,5 @@ LinearSolver<T>::~LinearSolver ()
 {
   this->clear ();
 }
-
-
 
 #endif // #ifdef __solver_h__

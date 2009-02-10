@@ -46,6 +46,34 @@ EXTERN_C_FOR_PETSC_BEGIN
 #endif
 EXTERN_C_FOR_PETSC_END
 
+//--------------------------------------------------------------------
+// Functions with C linkage to pass to PETSc.  PETSc will call these
+// methods as needed for preconditioning
+// 
+// Since they must have C linkage they have no knowledge of a namespace.
+// Give them an obscure name to avoid namespace pollution.
+extern "C"
+{
+  // Older versions of PETSc do not have the different int typedefs.
+  // On 64-bit machines, PetscInt may actually be a long long int.
+  // This change occurred in Petsc-2.2.1.
+#if PETSC_VERSION_LESS_THAN(2,2,1)
+  typedef int PetscErrorCode;
+  typedef int PetscInt;
+#endif
+
+  /**
+   * This function is called by PETSc to initialize the preconditioner.
+   * ctx will hold the Preconditioner.
+   */
+  PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx);
+
+  /**
+   * This function is called by PETSc to acctually apply the preconditioner.
+   * ctx will hold the Preconditioner.
+   */
+  PetscErrorCode __libmesh_petsc_preconditioner_apply(void *ctx, Vec x, Vec y);
+} // end extern "C"
 
 
 /**

@@ -65,6 +65,18 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
   return ap;    
 }
 
+template <typename T>
+void
+NonlinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
+{
+  if(this->_is_initialized)
+  {
+    std::cerr<<"Preconditioner must be attached before the solver is initialized!"<<std::endl;
+    libmesh_error();
+  }
+  
+  _preconditioner = preconditioner;
+}
 
 
 //------------------------------------------------------------------

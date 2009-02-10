@@ -29,7 +29,7 @@
 //------------------------------------------------------------------
 // Preconditioner members
 template <typename T>
-AutoPtr<Preconditioner<T> >
+Preconditioner<T> *
 Preconditioner<T>::build(const SolverPackage solver_package)
 {
   // Build the appropriate solver
@@ -49,8 +49,7 @@ Preconditioner<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<Preconditioner<T> > ap(new PetscPreconditioner<T>);
-	return ap;
+	return new PetscPreconditioner<T>();
       }
 #endif
 
@@ -70,8 +69,7 @@ Preconditioner<T>::build(const SolverPackage solver_package)
       libmesh_error();
     }
     
-  AutoPtr<Preconditioner<T> > ap(NULL);
-  return ap;    
+  return NULL;    
 }
 
 
