@@ -37,8 +37,8 @@ template <typename T>
 void
 PetscPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> & y)
 {
-  PetscVector<T> & x_pvec = libmesh_cast_ref<PetscVector<T>&, NumericVector<T> >(const_cast<NumericVector<T>&>(x));
-  PetscVector<T> & y_pvec = libmesh_cast_ref<PetscVector<T>&, NumericVector<T> >(const_cast<NumericVector<T>&>(y));
+  PetscVector<T> & x_pvec = libmesh_cast_ref<PetscVector<T>&>(const_cast<NumericVector<T>&>(x));
+  PetscVector<T> & y_pvec = libmesh_cast_ref<PetscVector<T>&>(const_cast<NumericVector<T>&>(y));
 
   Vec x_vec = x_pvec.vec();
   Vec y_vec = y_pvec.vec();
@@ -50,9 +50,6 @@ template <typename T>
 void
 PetscPreconditioner<T>::init ()
 {
-  if(this->_preconditioner_type == IDENTITY_PRECOND)
-    return;
-  
   if(!this->_matrix)
   {
     std::cerr << "ERROR: No matrix set for PetscPreconditioner, but init() called" << std::endl;

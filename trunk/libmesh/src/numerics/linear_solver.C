@@ -28,7 +28,7 @@
 #include "petsc_linear_solver.h"
 #include "trilinos_aztec_linear_solver.h"
 #include "auto_ptr.h"
-
+#include "preconditioner.h"
 
 //------------------------------------------------------------------
 // LinearSolver members
@@ -78,6 +78,39 @@ LinearSolver<T>::build(const SolverPackage solver_package)
   return ap;    
 }
 
+template <typename T>
+PreconditionerType
+LinearSolver<T>::preconditioner_type () const
+{
+  if(_preconditioner)
+    return _preconditioner->type();
+    
+  return _preconditioner_type;
+}
+
+template <typename T>
+void
+LinearSolver<T>::set_preconditioner_type (const PreconditionerType pct)
+{
+  if(_preconditioner)
+    _preconditioner->set_type(pct);
+  else
+    _preconditioner_type = pct;
+}
+
+template <typename T>
+void
+LinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
+{
+  if(this->_is_initialized)
+  {
+    std::cerr<<"Preconditioner must be attached before the solver is initialized!"<<std::endl;
+    libmesh_error();
+  }
+  
+  _preconditioner_type = SHELL_PRECOND;
+  _preconditioner = preconditioner;
+}
 
 
 //------------------------------------------------------------------

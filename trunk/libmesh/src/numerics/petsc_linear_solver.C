@@ -17,8 +17,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
-
 #include "libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_PETSC
@@ -32,6 +30,35 @@
 #include "shell_matrix.h"
 #include "petsc_preconditioner.h"
 
+extern "C"
+{
+#if PETSC_VERSION_LESS_THAN(2,2,1)
+  typedef int PetscErrorCode;
+  typedef int PetscInt;
+#endif
+
+  PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx)
+  {
+    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
+    preconditioner->init();
+
+    return 0;
+  }
+  
+
+  PetscErrorCode __libmesh_petsc_preconditioner_apply(void *ctx, Vec x, Vec y)
+  {
+    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
+
+    PetscVector<Number> x_vec(x);
+    PetscVector<Number> y_vec(y);
+
+    preconditioner->apply(x_vec,y_vec);
+
+    return 0;
+  }
+  
+} // end extern "C"
 
 /*----------------------- functions ----------------------------------*/
 template <typename T>
@@ -61,10 +88,13 @@ void PetscLinearSolver<T>::clear ()
       // Mimic PETSc default solver and preconditioner
       this->_solver_type           = GMRES;
 
-      if (libMesh::n_processors() == 1)
-	this->_preconditioner_type = ILU_PRECOND;
-      else
-	this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
+      if(!this->_preconditioner)
+      {
+        if (libMesh::n_processors() == 1)
+          this->_preconditioner_type = ILU_PRECOND;
+        else
+          this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
+      }
     }
 }
 
@@ -99,7 +129,6 @@ void PetscLinearSolver<T>::init ()
       
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
-      PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
       
       // Set the options from user-input
       // Set runtime options, e.g.,
@@ -128,8 +157,7 @@ void PetscLinearSolver<T>::init ()
       
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
-      PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
-      
+
       // Set the options from user-input
       // Set runtime options, e.g.,
       //      -ksp_type <type> -pc_type <type> -ksp_monitor -ksp_rtol <rtol>
@@ -158,6 +186,16 @@ void PetscLinearSolver<T>::init ()
 				   PETSC_DECIDE, // size of the array holding the history
 				   PETSC_TRUE);  // Whether or not to reset the history for each solve. 
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
+
+      //If there is a preconditioner object we need to set the internal setup and apply routines
+      if(this->_preconditioner)
+      {
+        PCShellSetContext(_pc,(void*)this->_preconditioner);
+        PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
+        PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
+      }
     }
 }
 
@@ -191,7 +229,6 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
-      PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
       
       // Set the options from user-input
       // Set runtime options, e.g.,
@@ -220,7 +257,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       
       // Set operators. The input matrix works as the preconditioning matrix
       ierr = KSPSetOperators(_ksp, matrix->mat(), matrix->mat(),SAME_NONZERO_PATTERN);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);       
 
       // Have the Krylov subspace method use our good initial guess rather than 0
       ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
@@ -228,8 +265,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
-      PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
-      
+
       // Set the options from user-input
       // Set runtime options, e.g.,
       //      -ksp_type <type> -pc_type <type> -ksp_monitor -ksp_rtol <rtol>
@@ -258,6 +294,15 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
 				   PETSC_DECIDE, // size of the array holding the history
 				   PETSC_TRUE);  // Whether or not to reset the history for each solve. 
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);      
+      if(this->_preconditioner)
+      {
+        this->_preconditioner->set_matrix(*matrix);
+        PCShellSetContext(_pc,(void*)this->_preconditioner);
+        PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
+        PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
+      }
     }
 }
 
@@ -302,6 +347,10 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 //       this->_preconditioner_type = USER_PRECOND;
 //       this->set_petsc_preconditioner_type ();
 //     }
+
+  if(this->_preconditioner)
+    this->_preconditioner->set_matrix(matrix_in);
+
   
 // 2.1.x & earlier style      
 #if PETSC_VERSION_LESS_THAN(2,2,0)
@@ -310,7 +359,6 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
   ierr = SLESSetOperators(_sles, matrix->mat(), precond->mat(),
 			  SAME_NONZERO_PATTERN);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
@@ -562,6 +610,9 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T>*>(precond)->mat(),
 			 DIFFERENT_NONZERO_PATTERN);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  if(this->_preconditioner)
+    this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number>&>(precond_matrix));
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.

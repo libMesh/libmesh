@@ -45,7 +45,6 @@ template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
 
-
 /**
  * This class provides an interface to the suite of preconditioners available
  * from Petsc.

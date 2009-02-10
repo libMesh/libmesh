@@ -35,6 +35,7 @@
 template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
+template <typename T> class Preconditioner;
 class NonlinearImplicitSystem;
 
 
@@ -134,6 +135,10 @@ public:
    */
   sys_type & system () { return _system; }
 
+  /**
+   * Attaches a Preconditioner object to be used during the linear solves.
+   */
+  void attach_preconditioner(Preconditioner<T> * preconditioner);
 
   /**
    * Maximum number of non-linear iterations.
@@ -205,6 +210,11 @@ protected:
    * Flag indicating if the data structures have been initialized.
    */
   bool _is_initialized;
+
+  /**
+   * Holds the Preconditioner object to be used for the linear solves.
+   */
+  Preconditioner<T> * _preconditioner;
 };
 
 
@@ -227,7 +237,8 @@ NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
   initial_linear_tolerance(0),
   minimum_linear_tolerance(0),
   _system(s),
-  _is_initialized (false)
+  _is_initialized (false),
+  _preconditioner (NULL)
 {
 }
 
