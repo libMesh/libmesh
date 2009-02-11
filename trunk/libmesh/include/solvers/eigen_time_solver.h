@@ -126,7 +126,7 @@ public:
   /**
    * Forms the jacobian of the boundary terms.
    */
-  virtual bool side_residual (bool get_jacobian);
+  virtual bool side_residual (bool get_jacobian,
                               DiffContext&);
 
   /**
