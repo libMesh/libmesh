@@ -120,12 +120,14 @@ public:
    * Forms either the spatial (Jacobian) or mass matrix part of the
    * operator, depending on which is requested.
    */
-  virtual bool element_residual (bool get_jacobian);
+  virtual bool element_residual (bool get_jacobian,
+                                 DiffContext&);
 
   /**
    * Forms the jacobian of the boundary terms.
    */
   virtual bool side_residual (bool get_jacobian);
+                              DiffContext&);
 
   /**
    * Nominally computes the size of the difference between

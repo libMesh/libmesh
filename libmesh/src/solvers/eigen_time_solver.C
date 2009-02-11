@@ -124,7 +124,8 @@ void EigenTimeSolver::solve ()
 
 
 
-bool EigenTimeSolver::element_residual(bool request_jacobian)
+bool EigenTimeSolver::element_residual(bool request_jacobian,
+                                       DiffContext &context)
 {
   // The EigenTimeSolver always computes jacobians!
   libmesh_assert (request_jacobian);
@@ -133,13 +134,13 @@ bool EigenTimeSolver::element_residual(bool request_jacobian)
   if (now_assembling == Matrix_A)
     {
       bool jacobian_computed =
-	_system.element_time_derivative(request_jacobian);
+	_system.element_time_derivative(request_jacobian, context);
 
       // The user shouldn't compute a jacobian unless requested
       libmesh_assert(request_jacobian || !jacobian_computed);
 
       bool jacobian_computed2 =
-	_system.element_constraint(jacobian_computed);
+	_system.element_constraint(jacobian_computed, context);
 
       // The user shouldn't compute a jacobian unless requested
       libmesh_assert (jacobian_computed || !jacobian_computed2);
@@ -152,10 +153,10 @@ bool EigenTimeSolver::element_residual(bool request_jacobian)
   else if (now_assembling == Matrix_B)
     {
       bool mass_jacobian_computed =
-	_system.mass_residual(request_jacobian);
+	_system.mass_residual(request_jacobian, context);
 
       // Scale Jacobian by -1?
-      //_system.elem_jacobian *= -1.0;
+      //context.elem_jacobian *= -1.0;
 
       return mass_jacobian_computed;
     }
@@ -169,7 +170,8 @@ bool EigenTimeSolver::element_residual(bool request_jacobian)
 
 
 
-bool EigenTimeSolver::side_residual(bool request_jacobian)
+bool EigenTimeSolver::side_residual(bool request_jacobian,
+                                    DiffContext &context)
 {
   // The EigenTimeSolver always requests jacobians?
   //libmesh_assert (request_jacobian);
@@ -178,13 +180,13 @@ bool EigenTimeSolver::side_residual(bool request_jacobian)
   if (now_assembling == Matrix_A)
     {
       bool jacobian_computed =
-	_system.side_time_derivative(request_jacobian);
+	_system.side_time_derivative(request_jacobian, context);
 
       // The user shouldn't compute a jacobian unless requested
       libmesh_assert (request_jacobian || !jacobian_computed);
 
       bool jacobian_computed2 =
-	_system.side_constraint(jacobian_computed);
+	_system.side_constraint(jacobian_computed, context);
 
       // The user shouldn't compute a jacobian unless requested
       libmesh_assert (jacobian_computed || !jacobian_computed2);
@@ -197,7 +199,7 @@ bool EigenTimeSolver::side_residual(bool request_jacobian)
   else if (now_assembling == Matrix_B)
     {
       bool mass_jacobian_computed =
-	_system.side_mass_residual(request_jacobian);
+	_system.side_mass_residual(request_jacobian, context);
 
       return mass_jacobian_computed;
     }
