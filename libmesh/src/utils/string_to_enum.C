@@ -31,7 +31,7 @@
 #include "enum_fe_family.h"
 #include "enum_inf_map_type.h"
 #include "enum_quadrature_type.h"
-
+#include "enum_preconditioner_type.h"
 
 
 // ------------------------------------------------------------
@@ -334,6 +334,68 @@ namespace {
 			   enum_to_quadrature_type);
       }
   }
+
+
+  //---------------------------------------------------  
+  std::map<std::string, PreconditionerType> preconditioner_type_to_enum;
+
+  // Initialize preconditioner_type_to_enum on first call
+  void init_preconditioner_type_to_enum ()
+  {
+    if (preconditioner_type_to_enum.empty())
+      {
+	preconditioner_type_to_enum["IDENTITY_PRECOND"      ]=IDENTITY_PRECOND;
+	preconditioner_type_to_enum["JACOBI_PRECOND"	    ]=JACOBI_PRECOND;
+	preconditioner_type_to_enum["BLOCK_JACOBI_PRECOND"  ]=BLOCK_JACOBI_PRECOND;
+	preconditioner_type_to_enum["SOR_PRECOND"           ]=SOR_PRECOND;
+	preconditioner_type_to_enum["SSOR_PRECOND"          ]=SSOR_PRECOND;
+	preconditioner_type_to_enum["EISENSTAT_PRECOND"	    ]=EISENSTAT_PRECOND;
+	preconditioner_type_to_enum["ASM_PRECOND"	    ]=ASM_PRECOND;
+	preconditioner_type_to_enum["CHOLESKY_PRECOND"	    ]=CHOLESKY_PRECOND;	 
+	preconditioner_type_to_enum["ICC_PRECOND"	    ]=ICC_PRECOND;		 
+	preconditioner_type_to_enum["ILU_PRECOND"           ]=ILU_PRECOND;		 
+	preconditioner_type_to_enum["LU_PRECOND"            ]=LU_PRECOND;		 
+	preconditioner_type_to_enum["USER_PRECOND"          ]=USER_PRECOND;	 
+	preconditioner_type_to_enum["SHELL_PRECOND"         ]=SHELL_PRECOND;	 
+	preconditioner_type_to_enum["AMG_PRECOND"           ]=AMG_PRECOND;		 
+	preconditioner_type_to_enum["INVALID_PRECONDITIONER"]=INVALID_PRECONDITIONER;
+
+        //shorter
+      	preconditioner_type_to_enum["IDENTITY"    ]=IDENTITY_PRECOND;
+	preconditioner_type_to_enum["JACOBI"	  ]=JACOBI_PRECOND;
+	preconditioner_type_to_enum["BLOCK_JACOBI"]=BLOCK_JACOBI_PRECOND;
+	preconditioner_type_to_enum["SOR"         ]=SOR_PRECOND;
+	preconditioner_type_to_enum["SSOR"        ]=SSOR_PRECOND;
+	preconditioner_type_to_enum["EISENSTAT"	  ]=EISENSTAT_PRECOND;
+	preconditioner_type_to_enum["ASM"	  ]=ASM_PRECOND;
+	preconditioner_type_to_enum["CHOLESKY"	  ]=CHOLESKY_PRECOND;	 
+	preconditioner_type_to_enum["ICC"	  ]=ICC_PRECOND;		 
+	preconditioner_type_to_enum["ILU"         ]=ILU_PRECOND;		 
+	preconditioner_type_to_enum["LU"          ]=LU_PRECOND;		 
+	preconditioner_type_to_enum["USER"        ]=USER_PRECOND;	 
+	preconditioner_type_to_enum["SHELL"       ]=SHELL_PRECOND;	 
+	preconditioner_type_to_enum["AMG"         ]=AMG_PRECOND;		 
+	preconditioner_type_to_enum["INVALID"     ]=INVALID_PRECONDITIONER;
+      }    
+  }
+
+
+  std::map<PreconditionerType, std::string> enum_to_preconditioner_type;
+  
+  // Initialize the enum_to_preconditioner_type on first call
+  void init_enum_to_preconditioner_type ()
+  {
+    // Build reverse map
+    if (enum_to_preconditioner_type.empty())
+      {
+	// Initialize inf_map_type_to_enum on first call
+	init_preconditioner_type_to_enum();
+
+	build_reverse_map (preconditioner_type_to_enum.begin(),
+			   preconditioner_type_to_enum.end(),
+			   enum_to_preconditioner_type);
+      }
+  }
 } // end anonymous namespace
 
 
@@ -495,6 +557,37 @@ namespace Utility {
 
     return enum_to_quadrature_type[i];
   }
+
+
+  //------------------------------------------------------
+  // PreconditionerType specialization
+  template <>
+  PreconditionerType string_to_enum<PreconditionerType> (const std::string& s)
+  {
+    init_preconditioner_type_to_enum();
+    
+    std::string upper(s);
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+    
+    if (!preconditioner_type_to_enum.count(upper))
+      libmesh_error();
+    
+    return preconditioner_type_to_enum[upper];
+  }
+
+
+  
+  template <>
+  std::string enum_to_string<PreconditionerType> (const PreconditionerType i)
+  {
+    init_enum_to_preconditioner_type();
+
+    if (!enum_to_preconditioner_type.count(i))
+      libmesh_error();
+
+    return enum_to_preconditioner_type[i];
+  }
+  
 }
 
 
