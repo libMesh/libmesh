@@ -894,6 +894,10 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
 	  new_elem->set_node(n) = new_mesh.node_ptr (new_node_numbers[old_elem->node(n)]);
 	}
 
+      // Copy ids for this element
+      new_elem->subdomain_id() = old_elem->subdomain_id();
+      new_elem->processor_id() = old_elem->processor_id();
+      
       // Maybe add boundary conditions for this element
       for (unsigned int s=0; s<old_elem->n_sides(); s++)
 	if (old_elem->neighbor(s) == NULL)
