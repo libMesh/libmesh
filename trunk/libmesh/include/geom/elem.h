@@ -30,6 +30,7 @@
 // Local includes
 #include "libmesh_common.h"
 #include "dof_object.h"
+#include "id_types.h"
 #include "reference_counted_object.h"
 #include "node.h"
 #include "enum_elem_type.h"
@@ -44,8 +45,6 @@
 class MeshBase;
 class MeshRefinement;
 class Elem;
-
-
 
 /**
  * This is the base class from which all geometric entities
@@ -134,13 +133,13 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns the subdomain that this element belongs to.
    * To conserve space this is stored as an unsigned char.
    */
-  unsigned char subdomain_id () const;
+  subdomain_id_type subdomain_id () const;
   
   /**
    * @returns the subdomain that this element belongs to as a
    * writeable reference.
    */
-  unsigned char & subdomain_id ();
+  subdomain_id_type & subdomain_id ();
 
   /**
    * @returns an id associated with the \p s side of this element.
@@ -1022,7 +1021,7 @@ public:
   /**
    * The subdomain to which this element belongs.
    */
-  unsigned char _sbd_id;
+  subdomain_id_type _sbd_id;
 
   /**
    * Make the classes that need to access our build
@@ -1195,7 +1194,7 @@ Node* & Elem::set_node (const unsigned int i)
 
 
 inline
-unsigned char Elem::subdomain_id () const
+subdomain_id_type Elem::subdomain_id () const
 {
   return _sbd_id;
 }
@@ -1203,7 +1202,7 @@ unsigned char Elem::subdomain_id () const
 
 
 inline
-unsigned char & Elem::subdomain_id ()
+subdomain_id_type & Elem::subdomain_id ()
 {
   return _sbd_id;
 }
@@ -1851,9 +1850,9 @@ public:
   /**
    * \p return the subdomain id of this packed element.
    */
-  unsigned int subdomain_id () const
+  subdomain_id_type subdomain_id () const
   {
-    return static_cast<unsigned int>(*(_buf_begin+6));
+    return static_cast<subdomain_id_type>(*(_buf_begin+6));
   }
 
   /**

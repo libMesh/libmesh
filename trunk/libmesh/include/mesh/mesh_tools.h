@@ -31,6 +31,7 @@
 // Local Includes -----------------------------------
 #include "libmesh.h"
 #include "enum_elem_type.h"
+#include "id_types.h"
 #include "mesh_base.h"
 #include "point.h" // some compilers want the full definition - I think so they can do 
                    // return-value-optimization for BoundingBox'es - BSK
@@ -175,14 +176,14 @@ namespace MeshTools
    */
   BoundingBox
   subdomain_bounding_box (const MeshBase &mesh,
-			  const unsigned int sid);
+			  const subdomain_id_type sid);
 
   /**
    * Same, but returns a sphere instead of a box.
    */
   Sphere 
   subdomain_bounding_sphere (const MeshBase &mesh,
-			     const unsigned int pid);
+			     const subdomain_id_type sid);
 
 
   /**

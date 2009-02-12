@@ -4,6 +4,7 @@ ex14.$(obj-suffix):\
     $(LIBMESH_DIR)/include/base/dof_map.h\
     $(LIBMESH_DIR)/include/base/dof_object.h\
     $(LIBMESH_DIR)/include/base/getpot.h\
+    $(LIBMESH_DIR)/include/base/id_types.h\
     $(LIBMESH_DIR)/include/base/libmesh.h\
     $(LIBMESH_DIR)/include/base/libmesh_base.h\
     $(LIBMESH_DIR)/include/base/libmesh_common.h\
