@@ -537,7 +537,7 @@ NumericVector<Number> & System::get_vector (const std::string& vec_name)
 
 unsigned int System::add_variable (const std::string& var,
 			           const FEType& type,
-				   const std::set<unsigned char> * const active_subdomains)
+				   const std::set<subdomain_id_type> * const active_subdomains)
 {  
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
@@ -577,7 +577,7 @@ unsigned int System::add_variable (const std::string& var,
 unsigned int System::add_variable (const std::string& var,
 			           const Order order,
 			           const FEFamily family,
-				   const std::set<unsigned char> * const active_subdomains)
+				   const std::set<subdomain_id_type> * const active_subdomains)
 {
   return this->add_variable(var, 
 			    FEType(order, family), 

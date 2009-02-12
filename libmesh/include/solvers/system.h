@@ -380,7 +380,7 @@ public:
     Variable (const std::string &var_name,
 	      const unsigned int var_number,
 	      const FEType &var_type,
-	      const std::set<unsigned char> &var_active_subdomains) :
+	      const std::set<subdomain_id_type> &var_active_subdomains) :
       _name(var_name),
       _number(var_number),
       _type(var_type),
@@ -411,7 +411,7 @@ public:
      * empty \p _active_subdomains container as active everywhere, i.e. 
      * for all subdomains.
      */
-    bool active_on_subdomain (const unsigned char sid) const
+    bool active_on_subdomain (const subdomain_id_type sid) const
     { return (_active_subdomains.empty() || _active_subdomains.count(sid));  }
 
     /**
@@ -426,7 +426,7 @@ public:
     std::string             _name; 
     unsigned int            _number;
     FEType                  _type;
-    std::set<unsigned char> _active_subdomains;
+    std::set<subdomain_id_type> _active_subdomains;
   };
 
   /**
@@ -435,7 +435,7 @@ public:
    */
   unsigned int add_variable (const std::string& var,
 		             const FEType& type,
-			     const std::set<unsigned char> * const active_subdomains = NULL);
+			     const std::set<subdomain_id_type> * const active_subdomains = NULL);
 
   /**
    * Adds the variable \p var to the list of variables
@@ -445,7 +445,7 @@ public:
   unsigned int add_variable (const std::string& var,
 		             const Order order = FIRST,
 		             const FEFamily = LAGRANGE,
-			     const std::set<unsigned char> * const active_subdomains = NULL);
+			     const std::set<subdomain_id_type> * const active_subdomains = NULL);
 
   /** 
    * Return a constant reference to \p Variable \p var.

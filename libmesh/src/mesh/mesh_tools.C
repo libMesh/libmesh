@@ -341,7 +341,7 @@ MeshTools::processor_bounding_sphere (const MeshBase& mesh,
 
 MeshTools::BoundingBox
 MeshTools::subdomain_bounding_box (const MeshBase& mesh,
-				   const unsigned int sid)
+				   const subdomain_id_type sid)
 {
   libmesh_assert (mesh.n_nodes() != 0);
 
@@ -364,7 +364,7 @@ MeshTools::subdomain_bounding_box (const MeshBase& mesh,
 
 Sphere
 MeshTools::subdomain_bounding_sphere (const MeshBase& mesh,
-				      const unsigned int sid)
+				      const subdomain_id_type sid)
 {
   BoundingBox bbox = subdomain_bounding_box(mesh,sid);
 

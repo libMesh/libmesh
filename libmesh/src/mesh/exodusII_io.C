@@ -159,7 +159,7 @@ void ExodusII_IO::read (const std::string& fname)
 	{
 	  Elem* elem = Elem::build (conv.get_canonical_type()).release();
 	  libmesh_assert (elem);
-          elem->subdomain_id() = subdomain_id;
+          elem->subdomain_id() = static_cast<subdomain_id_type>(subdomain_id) ;
           //elem->set_id(j);// Don't try to second guess the Element ID setting scheme!
 	  elem = mesh.add_elem (elem); // Catch the Elem pointer that the Mesh throws back
 

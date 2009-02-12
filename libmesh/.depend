@@ -3,6 +3,7 @@ src/base/dof_map.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -60,6 +61,7 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -134,6 +136,7 @@ src/base/libmesh.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
     include/base/getpot.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -185,6 +188,7 @@ src/error_estimation/error_estimator.$(obj-suffix):\
     src/error_estimation/error_estimator.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -239,6 +243,7 @@ src/error_estimation/exact_error_estimator.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -313,6 +318,7 @@ src/error_estimation/fourth_error_estimators.$(obj-suffix):\
     src/error_estimation/fourth_error_estimators.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -367,6 +373,7 @@ src/error_estimation/jump_error_estimator.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -428,6 +435,7 @@ src/error_estimation/kelly_error_estimator.$(obj-suffix):\
     src/error_estimation/kelly_error_estimator.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -485,6 +493,7 @@ src/error_estimation/patch_recovery_error_estimator.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -550,6 +559,7 @@ src/error_estimation/uniform_refinement_estimator.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -621,6 +631,7 @@ src/fe/fe.$(obj-suffix):\
     src/fe/fe.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -662,6 +673,7 @@ src/fe/fe_base.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -720,6 +732,7 @@ src/fe/fe_bernstein.$(obj-suffix):\
     src/fe/fe_bernstein.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -758,6 +771,7 @@ src/fe/fe_bernstein_shape_0D.$(obj-suffix):\
     src/fe/fe_bernstein_shape_0D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -795,6 +809,7 @@ src/fe/fe_bernstein_shape_1D.$(obj-suffix):\
     src/fe/fe_bernstein_shape_1D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -833,6 +848,7 @@ src/fe/fe_bernstein_shape_2D.$(obj-suffix):\
     src/fe/fe_bernstein_shape_2D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -872,6 +888,7 @@ src/fe/fe_bernstein_shape_3D.$(obj-suffix):\
     src/fe/fe_bernstein_shape_3D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -909,6 +926,7 @@ src/fe/fe_boundary.$(obj-suffix):\
     src/fe/fe_boundary.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -949,6 +967,7 @@ src/fe/fe_clough.$(obj-suffix):\
     src/fe/fe_clough.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -987,6 +1006,7 @@ src/fe/fe_clough_shape_0D.$(obj-suffix):\
     src/fe/fe_clough_shape_0D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1024,6 +1044,7 @@ src/fe/fe_clough_shape_1D.$(obj-suffix):\
     src/fe/fe_clough_shape_1D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1061,6 +1082,7 @@ src/fe/fe_clough_shape_2D.$(obj-suffix):\
     src/fe/fe_clough_shape_2D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1098,6 +1120,7 @@ src/fe/fe_clough_shape_3D.$(obj-suffix):\
     src/fe/fe_clough_shape_3D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1135,6 +1158,7 @@ src/fe/fe_compute_data.$(obj-suffix):\
     src/fe/fe_compute_data.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1185,6 +1209,7 @@ src/fe/fe_hermite.$(obj-suffix):\
     src/fe/fe_hermite.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1223,6 +1248,7 @@ src/fe/fe_hermite_shape_0D.$(obj-suffix):\
     src/fe/fe_hermite_shape_0D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1260,6 +1286,7 @@ src/fe/fe_hermite_shape_1D.$(obj-suffix):\
     src/fe/fe_hermite_shape_1D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1298,6 +1325,7 @@ src/fe/fe_hermite_shape_2D.$(obj-suffix):\
     src/fe/fe_hermite_shape_2D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1336,6 +1364,7 @@ src/fe/fe_hermite_shape_3D.$(obj-suffix):\
     src/fe/fe_hermite_shape_3D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1374,6 +1403,7 @@ src/fe/fe_hierarchic.$(obj-suffix):\
     src/fe/fe_hierarchic.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1412,6 +1442,7 @@ src/fe/fe_hierarchic_shape_0D.$(obj-suffix):\
     src/fe/fe_hierarchic_shape_0D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1449,6 +1480,7 @@ src/fe/fe_hierarchic_shape_1D.$(obj-suffix):\
     src/fe/fe_hierarchic_shape_1D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1487,6 +1519,7 @@ src/fe/fe_hierarchic_shape_2D.$(obj-suffix):\
     src/fe/fe_hierarchic_shape_2D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1526,6 +1559,7 @@ src/fe/fe_hierarchic_shape_3D.$(obj-suffix):\
     src/fe/fe_hierarchic_shape_3D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1565,6 +1599,7 @@ src/fe/fe_interface.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1644,6 +1679,7 @@ src/fe/fe_lagrange.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1692,6 +1728,7 @@ src/fe/fe_lagrange_shape_0D.$(obj-suffix):\
     src/fe/fe_lagrange_shape_0D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1729,6 +1766,7 @@ src/fe/fe_lagrange_shape_1D.$(obj-suffix):\
     src/fe/fe_lagrange_shape_1D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1766,6 +1804,7 @@ src/fe/fe_lagrange_shape_2D.$(obj-suffix):\
     src/fe/fe_lagrange_shape_2D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1803,6 +1842,7 @@ src/fe/fe_lagrange_shape_3D.$(obj-suffix):\
     src/fe/fe_lagrange_shape_3D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1840,6 +1880,7 @@ src/fe/fe_map.$(obj-suffix):\
     src/fe/fe_map.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1878,6 +1919,7 @@ src/fe/fe_monomial.$(obj-suffix):\
     src/fe/fe_monomial.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1916,6 +1958,7 @@ src/fe/fe_monomial_shape_0D.$(obj-suffix):\
     src/fe/fe_monomial_shape_0D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1953,6 +1996,7 @@ src/fe/fe_monomial_shape_1D.$(obj-suffix):\
     src/fe/fe_monomial_shape_1D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -1990,6 +2034,7 @@ src/fe/fe_monomial_shape_2D.$(obj-suffix):\
     src/fe/fe_monomial_shape_2D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2027,6 +2072,7 @@ src/fe/fe_monomial_shape_3D.$(obj-suffix):\
     src/fe/fe_monomial_shape_3D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2064,6 +2110,7 @@ src/fe/fe_szabab.$(obj-suffix):\
     src/fe/fe_szabab.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2102,6 +2149,7 @@ src/fe/fe_szabab_shape_0D.$(obj-suffix):\
     src/fe/fe_szabab_shape_0D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2139,6 +2187,7 @@ src/fe/fe_szabab_shape_1D.$(obj-suffix):\
     src/fe/fe_szabab_shape_1D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2176,6 +2225,7 @@ src/fe/fe_szabab_shape_2D.$(obj-suffix):\
     src/fe/fe_szabab_shape_2D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2271,6 +2321,7 @@ src/fe/fe_xyz.$(obj-suffix):\
     src/fe/fe_xyz.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2309,6 +2360,7 @@ src/fe/fe_xyz_boundary.$(obj-suffix):\
     src/fe/fe_xyz_boundary.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2349,6 +2401,7 @@ src/fe/fe_xyz_shape_0D.$(obj-suffix):\
     src/fe/fe_xyz_shape_0D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2386,6 +2439,7 @@ src/fe/fe_xyz_shape_1D.$(obj-suffix):\
     src/fe/fe_xyz_shape_1D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2423,6 +2477,7 @@ src/fe/fe_xyz_shape_2D.$(obj-suffix):\
     src/fe/fe_xyz_shape_2D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2460,6 +2515,7 @@ src/fe/fe_xyz_shape_3D.$(obj-suffix):\
     src/fe/fe_xyz_shape_3D.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2497,6 +2553,7 @@ src/fe/inf_fe.$(obj-suffix):\
     src/fe/inf_fe.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2541,6 +2598,7 @@ src/fe/inf_fe_base_radial.$(obj-suffix):\
     src/fe/inf_fe_base_radial.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2580,6 +2638,7 @@ src/fe/inf_fe_boundary.$(obj-suffix):\
     src/fe/inf_fe_boundary.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2737,6 +2796,7 @@ src/fe/inf_fe_map.$(obj-suffix):\
     src/fe/inf_fe_map.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2805,6 +2865,7 @@ src/fe/inf_fe_static.$(obj-suffix):\
     src/fe/inf_fe_static.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2848,6 +2909,7 @@ src/geom/cell_hex.$(obj-suffix):\
     src/geom/cell_hex.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2882,6 +2944,7 @@ src/geom/cell_hex20.$(obj-suffix):\
     src/geom/cell_hex20.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2919,6 +2982,7 @@ src/geom/cell_hex27.$(obj-suffix):\
     src/geom/cell_hex27.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2956,6 +3020,7 @@ src/geom/cell_hex8.$(obj-suffix):\
     src/geom/cell_hex8.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -2995,6 +3060,7 @@ src/geom/cell_inf_hex.$(obj-suffix):\
     src/geom/cell_inf_hex.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3030,6 +3096,7 @@ src/geom/cell_inf_hex16.$(obj-suffix):\
     src/geom/cell_inf_hex16.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3070,6 +3137,7 @@ src/geom/cell_inf_hex18.$(obj-suffix):\
     src/geom/cell_inf_hex18.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3110,6 +3178,7 @@ src/geom/cell_inf_hex8.$(obj-suffix):\
     src/geom/cell_inf_hex8.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3154,6 +3223,7 @@ src/geom/cell_inf_prism.$(obj-suffix):\
     src/geom/cell_inf_prism.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3190,6 +3260,7 @@ src/geom/cell_inf_prism12.$(obj-suffix):\
     src/geom/cell_inf_prism12.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3231,6 +3302,7 @@ src/geom/cell_inf_prism6.$(obj-suffix):\
     src/geom/cell_inf_prism6.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3276,6 +3348,7 @@ src/geom/cell_prism.$(obj-suffix):\
     src/geom/cell_prism.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3313,6 +3386,7 @@ src/geom/cell_prism15.$(obj-suffix):\
     src/geom/cell_prism15.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3353,6 +3427,7 @@ src/geom/cell_prism18.$(obj-suffix):\
     src/geom/cell_prism18.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3393,6 +3468,7 @@ src/geom/cell_prism6.$(obj-suffix):\
     src/geom/cell_prism6.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3433,6 +3509,7 @@ src/geom/cell_pyramid.$(obj-suffix):\
     src/geom/cell_pyramid.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3470,6 +3547,7 @@ src/geom/cell_pyramid5.$(obj-suffix):\
     src/geom/cell_pyramid5.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3510,6 +3588,7 @@ src/geom/cell_tet.$(obj-suffix):\
     src/geom/cell_tet.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3545,6 +3624,7 @@ src/geom/cell_tet10.$(obj-suffix):\
     src/geom/cell_tet10.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3583,6 +3663,7 @@ src/geom/cell_tet4.$(obj-suffix):\
     src/geom/cell_tet4.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3621,6 +3702,7 @@ src/geom/edge.$(obj-suffix):\
     src/geom/edge.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3652,6 +3734,7 @@ src/geom/edge_edge2.$(obj-suffix):\
     src/geom/edge_edge2.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3683,6 +3766,7 @@ src/geom/edge_edge3.$(obj-suffix):\
     src/geom/edge_edge3.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3714,6 +3798,7 @@ src/geom/edge_edge4.$(obj-suffix):\
     src/geom/edge_edge4.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3745,6 +3830,7 @@ src/geom/edge_inf_edge2.$(obj-suffix):\
     src/geom/edge_inf_edge2.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3776,6 +3862,7 @@ src/geom/elem.$(obj-suffix):\
     src/geom/elem.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3865,6 +3952,7 @@ src/geom/elem_refinement.$(obj-suffix):\
     src/geom/elem_refinement.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3908,6 +3996,7 @@ src/geom/face_inf_quad.$(obj-suffix):\
     src/geom/face_inf_quad.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3941,6 +4030,7 @@ src/geom/face_inf_quad4.$(obj-suffix):\
     src/geom/face_inf_quad4.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -3980,6 +4070,7 @@ src/geom/face_inf_quad6.$(obj-suffix):\
     src/geom/face_inf_quad6.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4015,6 +4106,7 @@ src/geom/face_quad.$(obj-suffix):\
     src/geom/face_quad.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4048,6 +4140,7 @@ src/geom/face_quad4.$(obj-suffix):\
     src/geom/face_quad4.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4083,6 +4176,7 @@ src/geom/face_quad8.$(obj-suffix):\
     src/geom/face_quad8.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4118,6 +4212,7 @@ src/geom/face_quad9.$(obj-suffix):\
     src/geom/face_quad9.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4153,6 +4248,7 @@ src/geom/face_tri.$(obj-suffix):\
     src/geom/face_tri.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4186,6 +4282,7 @@ src/geom/face_tri3.$(obj-suffix):\
     src/geom/face_tri3.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4221,6 +4318,7 @@ src/geom/face_tri6.$(obj-suffix):\
     src/geom/face_tri6.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4277,6 +4375,7 @@ src/geom/node_elem.$(obj-suffix):\
     src/geom/node_elem.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4321,6 +4420,7 @@ src/geom/remote_elem.$(obj-suffix):\
     src/geom/remote_elem.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4371,6 +4471,7 @@ src/mesh/boundary_info.$(obj-suffix):\
     src/mesh/boundary_info.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4412,6 +4513,7 @@ src/mesh/boundary_mesh.$(obj-suffix):\
     src/mesh/boundary_mesh.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4449,6 +4551,7 @@ src/mesh/diva_io.$(obj-suffix):\
     src/mesh/diva_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4491,6 +4594,7 @@ src/mesh/ensight_io.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4550,6 +4654,7 @@ src/mesh/exodusII_io.$(obj-suffix):\
     src/mesh/exodusII_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4597,6 +4702,7 @@ src/mesh/exodusII_io_helper.$(obj-suffix):\
     src/mesh/exodusII_io_helper.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4642,6 +4748,7 @@ src/mesh/fro_io.$(obj-suffix):\
     src/mesh/fro_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4676,6 +4783,7 @@ src/mesh/gmsh_io.$(obj-suffix):\
     src/mesh/gmsh_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4711,6 +4819,7 @@ src/mesh/gmv_io.$(obj-suffix):\
     src/mesh/gmv_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4766,6 +4875,7 @@ src/mesh/gnuplot_io.$(obj-suffix):\
     src/mesh/gnuplot_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4799,6 +4909,7 @@ src/mesh/inf_elem_builder.$(obj-suffix):\
     src/mesh/inf_elem_builder.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4845,6 +4956,7 @@ src/mesh/legacy_xdr_io.$(obj-suffix):\
     src/mesh/legacy_xdr_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4894,6 +5006,7 @@ src/mesh/matlab_io.$(obj-suffix):\
     src/mesh/matlab_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4930,6 +5043,7 @@ src/mesh/medit_io.$(obj-suffix):\
     src/mesh/medit_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4963,6 +5077,7 @@ src/mesh/mesh_base.$(obj-suffix):\
     src/mesh/mesh_base.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -4998,6 +5113,7 @@ src/mesh/mesh_communication.$(obj-suffix):\
     src/mesh/mesh_communication.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5040,6 +5156,7 @@ src/mesh/mesh_communication_global_indices.$(obj-suffix):\
     src/mesh/mesh_communication_global_indices.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5078,6 +5195,7 @@ src/mesh/mesh_data.$(obj-suffix):\
     src/mesh/mesh_data.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5138,6 +5256,7 @@ src/mesh/mesh_data_xdr_support.$(obj-suffix):\
     src/mesh/mesh_data_xdr_support.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5172,6 +5291,7 @@ src/mesh/mesh_generation.$(obj-suffix):\
     src/mesh/mesh_generation.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5237,6 +5357,7 @@ src/mesh/mesh_modification.$(obj-suffix):\
     src/mesh/mesh_modification.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5280,6 +5401,7 @@ src/mesh/mesh_output.$(obj-suffix):\
     src/mesh/mesh_output.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5331,6 +5453,7 @@ src/mesh/mesh_refinement.$(obj-suffix):\
     src/mesh/mesh_refinement.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5375,6 +5498,7 @@ src/mesh/mesh_refinement_flagging.$(obj-suffix):\
     src/mesh/mesh_refinement_flagging.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5411,6 +5535,7 @@ src/mesh/mesh_refinement_smoothing.$(obj-suffix):\
     src/mesh/mesh_refinement_smoothing.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5448,6 +5573,7 @@ src/mesh/mesh_smoother_laplace.$(obj-suffix):\
     src/mesh/mesh_smoother_laplace.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5483,6 +5609,7 @@ src/mesh/mesh_smoother_vsmoother.$(obj-suffix):\
     src/mesh/mesh_smoother_vsmoother.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5519,6 +5646,7 @@ src/mesh/mesh_tetgen_support.$(obj-suffix):\
     src/mesh/mesh_tetgen_support.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5558,6 +5686,7 @@ src/mesh/mesh_tools.$(obj-suffix):\
     src/mesh/mesh_tools.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5604,6 +5733,7 @@ src/mesh/mesh_triangle_support.$(obj-suffix):\
     src/mesh/mesh_triangle_support.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5646,6 +5776,7 @@ src/mesh/nemesis_io.$(obj-suffix):\
     src/mesh/nemesis_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5688,6 +5819,7 @@ src/mesh/nemesis_io_helper.$(obj-suffix):\
     src/mesh/nemesis_io_helper.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5713,6 +5845,7 @@ src/mesh/off_io.$(obj-suffix):\
     src/mesh/off_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5749,6 +5882,7 @@ src/mesh/parallel_mesh.$(obj-suffix):\
     src/mesh/parallel_mesh.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5788,6 +5922,7 @@ src/mesh/parallel_mesh_iterators.$(obj-suffix):\
     src/mesh/parallel_mesh_iterators.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5822,6 +5957,7 @@ src/mesh/patch.$(obj-suffix):\
     src/mesh/patch.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5852,6 +5988,7 @@ src/mesh/postscript_io.$(obj-suffix):\
     src/mesh/postscript_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5886,6 +6023,7 @@ src/mesh/serial_mesh.$(obj-suffix):\
     src/mesh/serial_mesh.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5921,6 +6059,7 @@ src/mesh/serial_mesh_iterators.$(obj-suffix):\
     src/mesh/serial_mesh_iterators.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5954,6 +6093,7 @@ src/mesh/tecplot_io.$(obj-suffix):\
     src/mesh/tecplot_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -5987,6 +6127,7 @@ src/mesh/tetgen_io.$(obj-suffix):\
     src/mesh/tetgen_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6027,6 +6168,7 @@ src/mesh/ucd_io.$(obj-suffix):\
     src/mesh/ucd_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6072,6 +6214,7 @@ src/mesh/unstructured_mesh.$(obj-suffix):\
     src/mesh/unstructured_mesh.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6128,6 +6271,7 @@ src/mesh/unv_io.$(obj-suffix):\
     src/mesh/unv_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6180,6 +6324,7 @@ src/mesh/vtk_io.$(obj-suffix):\
     src/mesh/vtk_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6250,6 +6395,7 @@ src/mesh/xdr_head.$(obj-suffix):\
     src/mesh/xdr_head.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6279,6 +6425,7 @@ src/mesh/xdr_io.$(obj-suffix):\
     src/mesh/xdr_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6319,6 +6466,7 @@ src/mesh/xdr_mesh.$(obj-suffix):\
     src/mesh/xdr_mesh.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6350,6 +6498,7 @@ src/mesh/xdr_mgf.$(obj-suffix):\
     src/mesh/xdr_mgf.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6378,6 +6527,7 @@ src/mesh/xdr_soln.$(obj-suffix):\
     src/mesh/xdr_soln.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6489,6 +6639,7 @@ src/numerics/discontinuity_measure.$(obj-suffix):\
     src/numerics/discontinuity_measure.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6601,6 +6752,7 @@ src/numerics/hp_coarsentest.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6671,6 +6823,7 @@ src/numerics/hp_singular.$(obj-suffix):\
     src/numerics/hp_singular.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6757,6 +6910,7 @@ src/numerics/laspack_matrix.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -6867,6 +7021,7 @@ src/numerics/mesh_function.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -7014,6 +7169,7 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -7066,6 +7222,7 @@ src/numerics/petsc_nonlinear_solver.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -7229,6 +7386,7 @@ src/numerics/sparse_matrix.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -7366,6 +7524,7 @@ src/numerics/trilinos_epetra_matrix.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -7441,6 +7600,7 @@ src/numerics/trilinos_nox_nonlinear_solver.$(obj-suffix):\
     src/numerics/trilinos_nox_nonlinear_solver.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -7567,6 +7727,7 @@ src/partitioning/centroid_partitioner.$(obj-suffix):\
     src/partitioning/centroid_partitioner.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -7599,6 +7760,7 @@ src/partitioning/linear_partitioner.$(obj-suffix):\
     src/partitioning/linear_partitioner.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -7631,6 +7793,7 @@ src/partitioning/metis_partitioner.$(obj-suffix):\
     src/partitioning/metis_partitioner.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -7666,6 +7829,7 @@ src/partitioning/parmetis_partitioner.$(obj-suffix):\
     src/partitioning/parmetis_partitioner.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -7702,6 +7866,7 @@ src/partitioning/partitioner.$(obj-suffix):\
     src/partitioning/partitioner.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -7760,6 +7925,7 @@ src/partitioning/sfc_partitioner.$(obj-suffix):\
     src/partitioning/sfc_partitioner.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -8473,6 +8639,7 @@ src/solvers/adaptive_time_solver.$(obj-suffix):\
     src/solvers/adaptive_time_solver.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -8531,6 +8698,7 @@ src/solvers/continuation_system.$(obj-suffix):\
     src/solvers/continuation_system.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -8597,6 +8765,7 @@ src/solvers/diff_context.$(obj-suffix):\
     src/solvers/diff_context.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -8671,6 +8840,7 @@ src/solvers/diff_system.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -8729,6 +8899,7 @@ src/solvers/eigen_system.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -8789,6 +8960,7 @@ src/solvers/eigen_time_solver.$(obj-suffix):\
     src/solvers/eigen_time_solver.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -8850,6 +9022,7 @@ src/solvers/equation_systems.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -8906,6 +9079,7 @@ src/solvers/equation_systems_io.$(obj-suffix):\
     src/solvers/equation_systems_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -8962,6 +9136,7 @@ src/solvers/euler2_solver.$(obj-suffix):\
     src/solvers/euler2_solver.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9019,6 +9194,7 @@ src/solvers/euler_solver.$(obj-suffix):\
     src/solvers/euler_solver.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9077,6 +9253,7 @@ src/solvers/exact_solution.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9149,6 +9326,7 @@ src/solvers/explicit_system.$(obj-suffix):\
     src/solvers/explicit_system.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9191,6 +9369,7 @@ src/solvers/fem_context.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9269,6 +9448,7 @@ src/solvers/fem_system.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9346,6 +9526,7 @@ src/solvers/frequency_system.$(obj-suffix):\
     src/solvers/frequency_system.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9401,6 +9582,7 @@ src/solvers/implicit_system.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9453,6 +9635,7 @@ src/solvers/linear_implicit_system.$(obj-suffix):\
     src/solvers/linear_implicit_system.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9505,6 +9688,7 @@ src/solvers/newmark_system.$(obj-suffix):\
     src/solvers/newmark_system.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9558,6 +9742,7 @@ src/solvers/newton_solver.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9625,6 +9810,7 @@ src/solvers/nonlinear_implicit_system.$(obj-suffix):\
     src/solvers/nonlinear_implicit_system.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9677,6 +9863,7 @@ src/solvers/petsc_diff_solver.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9740,6 +9927,7 @@ src/solvers/steady_solver.$(obj-suffix):\
     src/solvers/steady_solver.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9800,6 +9988,7 @@ src/solvers/system.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9861,6 +10050,7 @@ src/solvers/system_io.$(obj-suffix):\
     src/solvers/system_io.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9912,6 +10102,7 @@ src/solvers/system_projection.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -9973,6 +10164,7 @@ src/solvers/time_solver.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -10032,6 +10224,7 @@ src/solvers/transient_system.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -10082,6 +10275,7 @@ src/solvers/twostep_time_solver.$(obj-suffix):\
     src/solvers/twostep_time_solver.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -10142,6 +10336,7 @@ src/solvers/unsteady_solver.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -10202,6 +10397,7 @@ src/utils/error_vector.$(obj-suffix):\
     include/base/auto_ptr.h\
     include/base/dof_map.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -10267,6 +10463,7 @@ src/utils/location_maps.$(obj-suffix):\
     src/utils/location_maps.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -10366,6 +10563,7 @@ src/utils/point_locator_list.$(obj-suffix):\
     src/utils/point_locator_list.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -10400,6 +10598,7 @@ src/utils/point_locator_tree.$(obj-suffix):\
     src/utils/point_locator_tree.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -10464,6 +10663,7 @@ src/utils/tree.$(obj-suffix):\
     src/utils/tree.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\
@@ -10494,6 +10694,7 @@ src/utils/tree_node.$(obj-suffix):\
     src/utils/tree_node.C\
     include/base/auto_ptr.h\
     include/base/dof_object.h\
+    include/base/id_types.h\
     include/base/libmesh.h\
     include/base/libmesh_base.h\
     include/base/libmesh_common.h\

@@ -526,11 +526,11 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 
   
   //loop through element and map between block and element vector
-  std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
+  std::map<subdomain_id_type, std::vector<unsigned int>  > subdomain_map;
   for(int i=0;i<num_elem;i++)
     {
       Elem * elem = mesh.elem(i);
-      unsigned int cur_subdomain = elem->subdomain_id();
+      subdomain_id_type cur_subdomain = elem->subdomain_id();
      
       subdomain_map[cur_subdomain].push_back(elem->id());
     }

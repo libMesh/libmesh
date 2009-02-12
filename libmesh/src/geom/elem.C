@@ -1461,8 +1461,8 @@ void Elem::PackedElem::pack (std::vector<int> &conn, const Elem* elem)
   conn.push_back (0);
 #endif
   conn.push_back (static_cast<int>(elem->type()));
-  conn.push_back (static_cast<int>(elem->processor_id()));
-  conn.push_back (static_cast<int>(elem->subdomain_id()));
+  conn.push_back (elem->processor_id());
+  conn.push_back (elem->subdomain_id());
   conn.push_back (elem->id());
 		
 #ifdef LIBMESH_ENABLE_AMR

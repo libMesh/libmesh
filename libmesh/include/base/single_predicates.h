@@ -22,6 +22,7 @@
 
 #include <vector>
 #include "enum_elem_type.h"
+#include "id_types.h"
 
 /**
  * This file declares several predicates in the Predicates namespace.  They
@@ -281,7 +282,7 @@ namespace Predicates
     
   protected:
     virtual predicate<T>* clone() const { return new subdomain<T>(*this); }
-    const unsigned int _subdomain;
+    const subdomain_id_type _subdomain;
   };
 
 }
