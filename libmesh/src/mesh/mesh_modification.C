@@ -322,6 +322,8 @@ void UnstructuredMesh::all_first_order ()
        * the second-order element.
        */
       lo_elem->set_id(so_elem->id());
+      lo_elem->processor_id() = so_elem->processor_id();
+      lo_elem->subdomain_id() = so_elem->subdomain_id();
       this->insert_elem(lo_elem);
     }
 
@@ -592,6 +594,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        */
       so_elem->set_id(lo_elem->id());
       so_elem->processor_id() = lo_elem->processor_id();
+      so_elem->subdomain_id() = lo_elem->subdomain_id();
       this->insert_elem(so_elem);
     }
 
@@ -822,8 +825,13 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
 	if (split_elem)
 	  {
-	    // If this mesh has boundary data, be sure the correct
-	    // ID's are also set for tri0 and tri1.
+	    // Be sure the correct ID's are also set for tri0 and
+	    // tri1.
+            tri0->processor_id() = (*el)->processor_id();
+            tri0->subdomain_id() = (*el)->subdomain_id();
+            tri1->processor_id() = (*el)->processor_id();
+            tri1->subdomain_id() = (*el)->subdomain_id();
+	   
 	    if (mesh_has_boundary_data)
 	      {
 		for (unsigned int sn=0; sn<(*el)->n_sides(); ++sn)
@@ -1202,6 +1210,10 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 	// The copy's element ID will be set upon adding it to the mesh
 	for(unsigned int n=0; n<elem->n_nodes(); n++)
 	  copy->set_node(n) = elem->get_node(n);
+
+	// Copy over ids
+        copy->processor_id() = elem->processor_id();
+        copy->subdomain_id() = elem->subdomain_id();
 
 	// This element could have boundary info as well.  We need
 	// to save the (elem, side, bc_id) triples
