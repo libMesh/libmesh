@@ -170,8 +170,8 @@ echo_ldflags:
 # Remove object files for the current mode
 #
 clean:
-	@$(MAKE) -C contrib $(MAKECMDGOALS)
-	@$(MAKE) -C examples $(MAKECMDGOALS)
+	@test ! -d contrib || $(MAKE) -C contrib $(MAKECMDGOALS)
+	@test ! -d examples || $(MAKE) -C examples $(MAKECMDGOALS)
 	@rm -f *~ include/*~ include/*/*~ src/*/*~ src/*/*.$(obj-suffix) doc/html/*~
 
 #
@@ -179,8 +179,8 @@ clean:
 #
 clobber:
 	@$(MAKE) clean
-	@$(MAKE) -C contrib $(MAKECMDGOALS)
-	@$(MAKE) -C examples $(MAKECMDGOALS)
+	@test ! -d contrib || $(MAKE) -C contrib $(MAKECMDGOALS)
+	@test ! -d examples || $(MAKE) -C examples $(MAKECMDGOALS)
 	@rm -rf config.status $(targ_dir) $(appbinfiles)
 
 #
@@ -189,8 +189,8 @@ clobber:
 # have added
 distclean:
 	@$(MAKE) clobber
-	@$(MAKE) -C contrib $(MAKECMDGOALS)
-	@$(MAKE) -C examples $(MAKECMDGOALS)
+	@test ! -d contrib || $(MAKE) -C contrib $(MAKECMDGOALS)
+	@test ! -d examples || $(MAKE) -C examples $(MAKECMDGOALS)
 	@rm -rf doc/man/man3
 	@rm -rf doc/html/doxygen/*.html # split these up, otherwise command line gets too long
 	@rm -rf doc/html/doxygen/*.php
