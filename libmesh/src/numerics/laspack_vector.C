@@ -251,6 +251,16 @@ void LaspackVector<T>::scale (const T factor)
   Mul_SV (factor, &_vec);
 }
 
+template <typename T>
+void LaspackVector<T>::abs()
+{
+  libmesh_assert (this->initialized());
+
+  const unsigned int n = this->size();
+  
+  for (unsigned int i=0; i!=n; ++i)
+    this->set(i,fabs((*this)(i)));
+}
 
 template <typename T>
 T LaspackVector<T>::dot (const NumericVector<T>& V) const

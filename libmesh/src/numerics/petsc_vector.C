@@ -364,8 +364,13 @@ void PetscVector<T>::scale (const T factor_in)
 #endif
 }
 
-
-
+template <typename T>
+void PetscVector<T>::abs()
+{
+  int ierr = 0;
+  ierr = VecAbs(_vec);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);  
+}
 
 template <typename T>
 T PetscVector<T>::dot (const NumericVector<T>& V) const

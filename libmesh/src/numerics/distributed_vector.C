@@ -311,6 +311,18 @@ void DistributedVector<T>::scale (const T factor)
     _values[i] *= factor;  
 }
 
+template <typename T>
+void DistributedVector<T>::abs()
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+
+  for (unsigned int i=0; i<local_size(); i++)
+    this->set(i,fabs(_values[i]));
+}
+
+
+
 
 
 template <typename T>
