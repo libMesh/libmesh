@@ -364,6 +364,12 @@ public:
   void scale (const T factor);
 
   /**
+   * v = abs(v)... that is, each entry in v is replaced
+   * by its absolute value.
+   */
+  virtual void abs();
+  
+  /**
    * Computes the dot product, p = U.V
    */
   virtual T dot(const NumericVector<T>& V) const;

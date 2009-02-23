@@ -304,6 +304,11 @@ void EpetraVector<T>::scale (const T factor_in)
   _vec->Scale(factor_in);
 }
 
+template <typename T>
+void EpetraVector<T>::abs()
+{
+  _vec->Abs(*_vec);
+}
 
 
 template <typename T>
