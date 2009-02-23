@@ -77,7 +77,7 @@ public:
     _verbose(v)
 
   {
-    title.resize(MAX_LINE_LENGTH);
+    title.resize(MAX_LINE_LENGTH+1);
     elem_type.resize(MAX_STR_LENGTH);
   }
 
