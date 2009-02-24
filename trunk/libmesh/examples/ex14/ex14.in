@@ -55,3 +55,6 @@ extra_error_quadrature = 0
 
 # Solve a singular or non-singular problem?
 singularity = true
+
+# Output intermediate solves?
+output_intermediate = false

@@ -133,6 +133,7 @@ int main(int argc, char** argv)
   const std::string element_type    = input_file("element_type", "tensor");
   const int extra_error_quadrature  = input_file("extra_error_quadrature", 0);
   const int max_linear_iterations   = input_file("max_linear_iterations", 5000);
+  const bool output_intermediate    = input_file("output_intermediate", false);
   dim = input_file("dimension", 2);
   const std::string indicator_type = input_file("indicator_type", "kelly");
   singularity = input_file("singularity", true);
@@ -248,6 +249,16 @@ int main(int argc, char** argv)
                 << system.final_linear_residual()
                 << std::endl;
       
+      // After solving the system write the solution
+      // to a GMV-formatted plot file.
+      if (output_intermediate)
+        {
+          OStringStream outfile;
+          outfile << "lshaped.gmv." << r_step;
+          GMVIO (mesh).write_equation_systems (outfile.str(),
+                                               equation_systems);
+        }
+
       // Compute the error.
       exact_sol.compute_error("Laplace", "u");
 
