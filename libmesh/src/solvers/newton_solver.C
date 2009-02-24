@@ -39,7 +39,7 @@ T SIGN(T a, T b)
 
 Real NewtonSolver::line_search(Real tol,
                                Real last_residual,
-                               Real current_residual,
+                               Real &current_residual,
                                NumericVector<Number> &newton_iterate,
                                const NumericVector<Number> &linear_solution)
 {
@@ -186,7 +186,7 @@ Real NewtonSolver::line_search(Real tol,
       _system.assembly (true, false);
 
       rhs.close();
-      Real fu = rhs.l2_norm();
+      Real fu = current_residual = rhs.l2_norm();
       if (!quiet)
         std::cout << "  Current Residual: "
                   << fu << std::endl;
