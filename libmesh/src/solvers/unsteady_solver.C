@@ -58,7 +58,13 @@ void UnsteadySolver::solve ()
       first_solve = false;
     }
 
+#ifdef LIBMESH_ENABLE_GHOSTED
+  old_local_nonlinear_solution->init (_system.n_dofs(), _system.n_local_dofs(),
+                                      _system.get_dof_map().get_send_list(),
+                                      GHOSTED);
+#else
   old_local_nonlinear_solution->init (_system.n_dofs(), false, SERIAL);
+#endif
 
   _system.get_vector("_old_nonlinear_solution").localize
     (*old_local_nonlinear_solution,
