@@ -87,6 +87,7 @@ namespace {
   // For some reason SunStudio does not seem to accept the above
   // comparison functions for use in
   // std::equal_range (ElemBCData::iterator, ElemBCData::iterator, unsigned int);
+#if defined(__SUNPRO_CC) || defined(__PGI)
   struct CompareIntElemBCData
   {
     bool operator()(const unsigned int &other_elem_id,
@@ -101,6 +102,7 @@ namespace {
       return elem_bc.elem_id < other_elem_id;
     }
   };
+#endif
 }
 
 
