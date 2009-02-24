@@ -125,7 +125,7 @@ protected:
    * newton_iterate is moved to the end of the quasiNewton step, and
    * the return value is the substep size.
    */
-  Real line_search(Real tol, Real last_residual, Real current_residual,
+  Real line_search(Real tol, Real last_residual, Real& current_residual,
 		   NumericVector<Number> &newton_iterate,
 		   const NumericVector<Number> &linear_solution);
 
