@@ -10657,6 +10657,7 @@ src/utils/string_to_enum.$(obj-suffix):\
     include/enums/enum_fe_family.h\
     include/enums/enum_inf_map_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_quadrature_type.h\
     include/utils/string_to_enum.h
 src/utils/tree.$(obj-suffix):\
