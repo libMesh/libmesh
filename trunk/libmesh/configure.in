@@ -356,6 +356,25 @@ dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
+dnl Ghosted instead of Serial local vectors -- disabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(ghosted,
+              AC_HELP_STRING([--enable-ghosted],
+                             [Use experimental ghosted local vectors]),
+              enableghosted=$enableval,
+              enableghosted=no)
+
+if test "$enableghosted" != no ; then
+  AC_DEFINE(ENABLE_GHOSTED, 1,
+	   [Flag indicating if the library should use the experimental
+ghosted local vectors])
+  AC_MSG_RESULT(<<< Configuring library to use ghosted local vectors >>>)
+fi
+dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
 dnl 2D only -- disabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(2D-only,

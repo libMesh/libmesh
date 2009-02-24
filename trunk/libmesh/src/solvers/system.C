@@ -185,7 +185,13 @@ void System::init_data ()
   solution->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   // Resize the current_local_solution for the current mesh
+#ifdef LIBMESH_ENABLE_GHOSTED
+  current_local_solution->init (this->n_dofs(), this->n_local_dofs(),
+                                _dof_map->get_send_list(),
+                                GHOSTED);
+#else
   current_local_solution->init (this->n_dofs(), false, SERIAL);
+#endif
 
   // from now on, no chance to add additional vectors
   _can_add_vectors = false;
@@ -211,21 +217,24 @@ void System::restrict_vectors ()
         v->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
     }
 
+  const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
+
   // Restrict the solution on the coarsened cells
   if (_solution_projection)
-    {
-      this->project_vector (*solution);
-      current_local_solution->clear();
-      current_local_solution->init(this->n_dofs());
-      const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
-      solution->localize (*current_local_solution, send_list); 
-    }
-  else
-    {
-      current_local_solution->clear();
-      current_local_solution->init(this->n_dofs());
-    }
+    this->project_vector (*solution);
+
+#ifdef LIBMESH_ENABLE_GHOSTED
+  current_local_solution->init(this->n_dofs(),
+			       this->n_local_dofs(), send_list, 
+                               true, GHOSTED);
+#else
+  current_local_solution->init(this->n_dofs());
 #endif
+
+  if (_solution_projection)
+    solution->localize (*current_local_solution, send_list); 
+
+#endif // LIBMESH_ENABLE_AMR
 }
 
 

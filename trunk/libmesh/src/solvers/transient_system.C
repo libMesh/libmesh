@@ -98,8 +98,18 @@ void TransientSystem<Base>::init_data ()
   Base::init_data();
 
   // Initialize the old & older solutions
+  // Using new ghosted vectors if enabled
+#ifdef LIBMESH_ENABLE_GHOSTED
+  old_local_solution->init   (this->n_dofs(), this->n_local_dofs(),
+                              this->get_dof_map().get_send_list(),
+                              GHOSTED);
+  older_local_solution->init (this->n_dofs(), this->n_local_dofs(),
+                              this->get_dof_map().get_send_list(),
+                              GHOSTED);
+#else
   old_local_solution->init   (this->n_dofs(), false, SERIAL);
   older_local_solution->init (this->n_dofs(), false, SERIAL);
+#endif
 }
 
 
