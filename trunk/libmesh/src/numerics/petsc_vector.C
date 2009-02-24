@@ -457,6 +457,10 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
       	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
   
+  // Make sure ghost dofs are copied
+  if (this->type() == GHOSTED)
+    this->close();
+
   return *this;
 }
 
