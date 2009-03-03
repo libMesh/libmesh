@@ -900,8 +900,10 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
               next_free_dof += elem->n_comp(sys_num,var);
             }
         } // end loop on elements
-      _var_first_local_df.push_back(next_free_dof);
     } // end loop on variables
+
+  // Cache the last local dof number too
+  _var_first_local_df.push_back(next_free_dof);
 
 #ifdef DEBUG
   // Make sure we didn't miss any nodes
