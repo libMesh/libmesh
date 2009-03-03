@@ -25,12 +25,35 @@
 #include "mesh_tools.h"
 #include "elem.h"
 
+
+// Transformation map between monomial (physical space) and Bezier bases.
+const float PostscriptIO::_bezier_transform[3][3] =
+{
+  {-1./6., 1./6.,    1.}, 
+  {-1./6.,   0.5, 1./6.}, 
+  {    0.,    1.,    0.} 
+};
+
+
 PostscriptIO::PostscriptIO (const MeshBase& mesh)
   : MeshOutput<MeshBase> (mesh),
-    shade_value(0.0)
+    shade_value(0.0),
+    line_width(0.5),
+    //_M(3,3),
+    _offset(0., 0.),
+    _scale(1.0),
+    _current_point(0., 0.)
 {
   // This code is still undergoing some development.
   untested();
+
+  // Entries of transformation matrix from physical to Bezier coords.
+  // _M(0,0) = -1./6.;    _M(0,1) = 1./6.;    _M(0,2) = 1.; 
+  // _M(1,0) = -1./6.;    _M(1,1) = 0.5  ;    _M(1,2) = 1./6.; 
+  // _M(2,0) = 0.    ;    _M(2,1) = 1.   ;    _M(2,2) = 0.;
+
+  // Make sure there is enough room to store Bezier coefficients.
+  _bezier_coeffs.resize(3);
 }
 
 
@@ -50,12 +73,13 @@ void PostscriptIO::write (const std::string& fname)
 
       // Only works in 2D
       libmesh_assert(mesh.mesh_dimension() == 2);
-      
-      // Create output file stream
-      std::ofstream out(fname.c_str());
 
+      // Create output file stream.
+      // _out is now a private member of the class.
+      _out.open(fname.c_str());
+      
       // Make sure it opened correctly
-      if (!out.good())
+      if (!_out.good())
         libmesh_file_error(fname.c_str());
 
       // The mesh bounding box gives us info about what the
@@ -77,13 +101,14 @@ void PostscriptIO::write (const std::string& fname)
       // This usually is given by the strange unit 1/72 inch. 
       // A width of 300 represents a size of roughly 10 cm.
       const Real width = 300;
-      const Real scale = width / (x_max-x_min);
-      const Point offset(x_min, y_min);
+      _scale = width / (x_max-x_min);
+      _offset(0) = x_min;
+      _offset(1) = y_min;
       
       // Header writing stuff stolen from Deal.II
       std::time_t  time1= std::time (0);
       std::tm     *time = std::localtime(&time1);
-      out << "%!PS-Adobe-2.0 EPSF-1.2" << '\n'
+      _out << "%!PS-Adobe-2.0 EPSF-1.2" << '\n'
 	//<< "%!PS-Adobe-1.0" << '\n' // Lars' PS version
 	  << "%%Filename: " << fname << '\n'
 	  << "%%Title: LibMesh Output" << '\n'
@@ -99,9 +124,9 @@ void PostscriptIO::write (const std::string& fname)
 	// lower left corner
 	  << "0 0 "
 	// upper right corner
-	  << static_cast<unsigned int>( rint((x_max-x_min) * scale ))
+	  << static_cast<unsigned int>( rint((x_max-x_min) * _scale ))
 	  << ' '
-	  << static_cast<unsigned int>( rint((y_max-y_min) * scale ))
+	  << static_cast<unsigned int>( rint((y_max-y_min) * _scale ))
 	  << '\n';
 
       // define some abbreviations to keep
@@ -112,39 +137,29 @@ void PostscriptIO::write (const std::string& fname)
       // sg=set gray value
       // lx=close the line and plot the line
       // lf=close the line and fill the interior
-      out << "/m {moveto} bind def"      << '\n'
+      _out << "/m {moveto} bind def"      << '\n'
 	  << "/l {lineto} bind def"      << '\n'
 	  << "/s {setrgbcolor} bind def" << '\n'
 	  << "/sg {setgray} bind def"    << '\n'
+	  << "/cs {curveto stroke} bind def" << '\n'
 	  << "/lx {lineto closepath stroke} bind def" << '\n'
 	  << "/lf {lineto closepath fill} bind def"   << '\n';
 
-      out << "%%EndProlog" << '\n';
+      _out << "%%EndProlog" << '\n';
       //	  << '\n';
       
-      // set line width.  0.5 is a reasonable default for printed images
-      const Real line_width = 0.5;
-      out << line_width << " setlinewidth" << '\n';
+      // Set line width in the postscript file.  
+      _out << line_width << " setlinewidth" << '\n';
 
       // Set line cap and join options
-      out << "1 setlinecap" << '\n';
-      out << "1 setlinejoin" << '\n';
+      _out << "1 setlinecap" << '\n';
+      _out << "1 setlinejoin" << '\n';
   
       // allow only five digits for output (instead of the default
       // six); this should suffice even for fine grids, but reduces
       // the file size significantly
-      out << std::setprecision (5);
+      _out << std::setprecision (5);
 
-      // By default, our "stream <<" function for points generates formatted output
-      // for x, y, and z.  Here we just want to print x and y so we'll
-      // use this temporary Point object.
-      Point current_point;
-
-      // Shading-independent data for drawing a single cell.  This can be
-      // used to draw each cell twice, once for a filled cell and once for
-      // black edges.
-      std::ostringstream cell_string;
-	
       // Loop over the active elements, draw lines for the edges.  We
       // draw even quadratic elements with straight sides, i.e. a straight
       // line sits between each pair of vertices.  Also we draw every edge
@@ -154,47 +169,125 @@ void PostscriptIO::write (const std::string& fname)
       const MeshBase::const_element_iterator end_el = mesh.active_elements_end(); 
       for ( ; el != end_el; ++el)
 	{
-	  const Elem* elem = *el;
+	  //const Elem* elem = *el;
 
-	  // Clear the string contents.  Yes, this really is how you do that...
-	  cell_string.str("");
-	  
-	  // The general strategy is:
-	  // 1.) Use m  := {moveto} to go to vertex 0.
-	  // 2.) Use l  := {lineto} commands to draw lines to vertex 1, 2, ... N-1.
-	  // 3a.) Use lx := {lineto closepath stroke} command at  vertex N to draw the last line.
-	  // 3b.)     lf := {lineto closepath fill} command to shade the cell just drawn 
-	  // All of our 2D elements' vertices are numbered in counterclockwise order,
-	  // so we can just draw them in the same order.
-
-	  // 1.)
-	  current_point = (elem->point(0) - offset) * scale;
-	  cell_string << current_point(0) << " " << current_point(1) << " "; // write x y 
-	  cell_string << "m ";
-
-	  // 2.)
-	  const unsigned int nv=elem->n_vertices();
-	  for (unsigned int v=1; v<nv-1; ++v)
-	    {
-	      current_point = (elem->point(v) - offset) * scale;
-	      cell_string << current_point(0) << " " << current_point(1) << " "; // write x y 
-	      cell_string << "l ";
-	    }
-	  
-	  // 3.)
-	  current_point = (elem->point(nv-1) - offset) * scale;
-	  cell_string << current_point(0) << " " << current_point(1) << " "; // write x y 
-
-	  // We draw the shaded (interior) parts first, if applicable.
-	  if (shade_value > 0.0)
-	    out << shade_value << " sg " << cell_string.str() << "lf\n";
-	  
-	  // Draw the black lines (I guess we will always do this)
-	  out << "0 sg " << cell_string.str() << "lx\n";
+	  this->plot_linear_elem(*el);
+	  //this->plot_quadratic_elem(*el); // Experimental
 	}
       
       // Issue the showpage command, and we're done.
-      out << "showpage" << std::endl;
+      _out << "showpage" << std::endl;
       
     } // end if (libMesh::processor_id() == 0)
+}
+
+
+
+
+
+
+void PostscriptIO::plot_linear_elem(const Elem* elem)
+{
+  // Clear the string contents.  Yes, this really is how you do that...
+  _cell_string.str("");
+	  
+  // The general strategy is:
+  // 1.) Use m  := {moveto} to go to vertex 0.
+  // 2.) Use l  := {lineto} commands to draw lines to vertex 1, 2, ... N-1.
+  // 3a.) Use lx := {lineto closepath stroke} command at  vertex N to draw the last line.
+  // 3b.)     lf := {lineto closepath fill} command to shade the cell just drawn 
+  // All of our 2D elements' vertices are numbered in counterclockwise order,
+  // so we can just draw them in the same order.
+
+  // 1.)
+  _current_point = (elem->point(0) - _offset) * _scale;
+  _cell_string << _current_point(0) << " " << _current_point(1) << " "; // write x y 
+  _cell_string << "m ";
+
+  // 2.)
+  const unsigned int nv=elem->n_vertices();
+  for (unsigned int v=1; v<nv-1; ++v)
+    {
+      _current_point = (elem->point(v) - _offset) * _scale;
+      _cell_string << _current_point(0) << " " << _current_point(1) << " "; // write x y 
+      _cell_string << "l ";
+    }
+	  
+  // 3.)
+  _current_point = (elem->point(nv-1) - _offset) * _scale;
+  _cell_string << _current_point(0) << " " << _current_point(1) << " "; // write x y 
+
+  // We draw the shaded (interior) parts first, if applicable.
+  if (shade_value > 0.0)
+    _out << shade_value << " sg " << _cell_string.str() << "lf\n";
+	  
+  // Draw the black lines (I guess we will always do this)
+  _out << "0 sg " << _cell_string.str() << "lx\n";
+}
+
+
+
+
+void PostscriptIO::plot_quadratic_elem(const Elem* elem)
+{
+  for (unsigned int ns=0; ns<elem->n_sides(); ++ns)
+    {
+      // Build the quadratic side
+      AutoPtr<Elem> side = elem->build_side(ns);
+
+      // Be sure it's quadratic (Edge2).  Eventually we could
+      // handle cubic elements as well...
+      libmesh_assert( side->type() == EDGE3 );
+
+      _out << "0 sg ";
+
+      // Move to the first point on this side.
+      _current_point = (side->point(0) - _offset) * _scale;
+      _out << _current_point(0) << " " << _current_point(1) << " "; // write x y 
+      _out << "m ";
+      
+      // Compute _bezier_coeffs for this edge.  This fills up
+      // the _bezier_coeffs vector.
+      this->_compute_edge_bezier_coeffs(side.get());
+      
+      // Print curveto path to file
+      for (unsigned int i=0; i<_bezier_coeffs.size(); ++i)
+	_out << _bezier_coeffs[i](0) << " " << _bezier_coeffs[i](1) << " ";
+      _out << " cs\n";
+    }
+}
+
+
+
+
+void PostscriptIO::_compute_edge_bezier_coeffs(const Elem* elem)
+{
+  // I only know how to do this for an Edge3!
+  libmesh_assert (elem->type() == EDGE3);
+
+  // Get x-coordinates into an array, transform them,
+  // and repeat for y.
+  float
+    phys_coords[3] = {0., 0., 0.},
+    bez_coords[3]  = {0., 0., 0.};
+  
+  for (unsigned int i=0; i<2; ++i)
+    {
+      // Initialize vectors.  Physical coordinates are initialized
+      // by their postscript-scaled values. 
+      for (unsigned int j=0; j<3; ++j)
+	{
+	  phys_coords[j] = (elem->point(j)(i) - _offset(i)) * _scale;
+	  bez_coords[j] = 0.; // zero out result vector
+	}
+
+      // Multiply matrix times vector
+      for (unsigned int j=0; j<3; ++j)
+	for (unsigned int k=0; k<3; ++k)
+	  bez_coords[j] += _bezier_transform[j][k]*phys_coords[k];
+
+      // Store result in _bezier_coeffs
+      for (unsigned int j=0; j<3; ++j)
+	_bezier_coeffs[j](i) = phys_coords[j];
+    }
 }
