@@ -22,13 +22,18 @@
 #ifndef __postscript_io_h__
 #define __postscript_io_h__
 
+// C++ includes
+#include <vector>
+
 // Local includes
 #include "libmesh_common.h"
 #include "mesh_output.h"
+#include "dense_matrix.h"
+#include "point.h"
 
 // Forward declarations
 class MeshBase;
-
+class Elem;
 
 /**
  * This class implements writing 2D meshes in Postscript.  It borrows
@@ -68,6 +73,73 @@ class PostscriptIO : public MeshOutput<MeshBase>
    * gives decent results.
    */
   Real shade_value;
+
+  /**
+   * Control the thickness of the lines used.  0.5 is a reasonable default
+   * for printed images, but you may need to decrease this value (or
+   * choose it adaptively) when there are very slim cells present in
+   * the mesh.
+   */
+  Real line_width;
+  
+  /**
+   * Draws an element with Bezier curves
+   */
+  void plot_quadratic_elem(const Elem* elem);
+
+  /**
+   * Draws an element with straight lines
+   */
+  void plot_linear_elem(const Elem* elem);
+  
+private:
+  /**
+   * Given a quadratic edge Elem which lies in the x-y plane,
+   * computes the Bezier coefficients.  These may be passed to
+   * the Postscript routine "curveto".
+   */
+  void _compute_edge_bezier_coeffs(const Elem* elem);
+
+  /**
+   * Coefficients of the transformation from physical-space
+   * edge coordinates to Bezier basis coefficients.  Transforms
+   * x and y separately.
+   */
+  //DenseMatrix<float> _M;
+  static const float _bezier_transform[3][3];
+  
+  /**
+   * Vector containing 3 points corresponding to Bezier coefficients,
+   * as computed by _compute_edge_bezier_coeffs.
+   */
+  std::vector<Point> _bezier_coeffs;
+
+  /**
+   * Amount to add to every (x,y) point to place it in Postscript coordinates.
+   */
+  Point _offset;
+
+  /**
+   * Amount by which to stretch each point to place it in Postscript coordinates.
+   */
+  Real _scale;
+
+  /**
+   * A point object used for temporary calculations
+   */
+  Point _current_point;
+
+  /**
+   * Drawing style-independent data for a single cell.  This can be
+   * used as a temporary buffer for storing data which may be sent to
+   * the output stream multiple times.
+   */
+  std::ostringstream _cell_string;
+
+  /**
+   * Output file stream which will be opened when the file name is known
+   */ 
+  std::ofstream _out;
 };
 
 #endif // #ifndef __postscript_io_h__
