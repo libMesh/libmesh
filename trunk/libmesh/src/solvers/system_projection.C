@@ -73,11 +73,11 @@ void System::project_vector (const NumericVector<Number>& old_v,
 #ifdef LIBMESH_ENABLE_AMR 
 
   // Resize the new vector and get a serial version.
-  NumericVector<Number> *new_vector_ptr;
+  NumericVector<Number> *new_vector_ptr = NULL;
   AutoPtr<NumericVector<Number> > new_vector_built;
   NumericVector<Number> *local_old_vector;
   AutoPtr<NumericVector<Number> > local_old_vector_built;
-  const NumericVector<Number> *old_vector_ptr;
+  const NumericVector<Number> *old_vector_ptr = NULL;
 
   ConstElemRange active_local_elem_range 
     (this->get_mesh().active_local_elements_begin(),
@@ -137,7 +137,18 @@ void System::project_vector (const NumericVector<Number>& old_v,
       local_old_vector->close();
       old_vector_ptr = local_old_vector;
     }
-  // Note that the above will have zeroed the new_vector
+  else // unknown old_v.type()
+    {
+      std::cerr << "ERROR: Unknown old_v.type() == " << old_v.type() 
+		<< std::endl;
+      libmesh_error();
+    }
+  
+  // Note that the above will have zeroed the new_vector.
+  // Just to be sure, assert that new_vector_ptr and old_vector_ptr
+  // were successfully set before trying to deref them.
+  libmesh_assert(new_vector_ptr);
+  libmesh_assert(old_vector_ptr);
 
   NumericVector<Number> &new_vector = *new_vector_ptr;
   const NumericVector<Number> &old_vector = *old_vector_ptr;

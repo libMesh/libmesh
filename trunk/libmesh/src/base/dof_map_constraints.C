@@ -589,8 +589,8 @@ void DofMap::enforce_constraints_exactly (const System &system,
   if (!v)
     v = system.solution.get();
 
-  NumericVector<Number> *v_local;
-  NumericVector<Number> *v_global;
+  NumericVector<Number> *v_local  = NULL; // will be initialized below
+  NumericVector<Number> *v_global = NULL; // will be initialized below
   AutoPtr<NumericVector<Number> > v_built;
   if (v->type() == SERIAL)
     {
@@ -622,6 +622,18 @@ void DofMap::enforce_constraints_exactly (const System &system,
       v_local = v;
       v_global = v;
     }
+  else // unknown v->type()
+    {
+      std::cerr << "ERROR: Unknown v->type() == " << v->type() 
+		<< std::endl;
+      libmesh_error();
+    }
+
+  // We should never hit these asserts because we should error-out in
+  // else clause above.  Just to be sure we don't try to use v_local
+  // and v_global uninitialized...
+  libmesh_assert(v_local);
+  libmesh_assert(v_global);
 
   const MeshBase &mesh = system.get_mesh();
 
