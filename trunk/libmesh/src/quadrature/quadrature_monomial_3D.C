@@ -49,7 +49,8 @@ void QMonomial::init_3D(const ElemType _type,
 	      // Kim and Song, Comm. Korean Math. Soc vol. 13, no. 4, 1998, pp. 913-931.
 	      //
 	      // Warning: this rule contains points on the boundary of the reference
-	      // element, and therefore may be unsuitable for some problems.
+	      // element, and therefore may be unsuitable for some problems.  The alternative
+	      // would be a 2x2x2 Gauss product rule.
 	      const Real data[1][4] =
 		{
 		  {1.0L, 0.0L, 0.0L, 4.0L/3.0L}  
@@ -75,25 +76,39 @@ void QMonomial::init_3D(const ElemType _type,
 	      //
 	      // This rule is provably minimal in the number of points.  The equations given for
 	      // the n-cube on pg. 466 of the paper for mu/gamma and gamma are wrong, at least for
-	      // the n=3 case.  I'm also unsure of the equations given on pg. 464 of the paper, but
-	      // if you code up Eqn. (7) of the paper for n=3, you can get the right answer.  That's
-	      // what I've done here, in Maple, using 32 decimal digits of precision in the calculation.
+	      // the n=3 case.  The analytical values given here were computed by me [JWP] in Maple.
 
+	      // Convenient intermediate values.
+	      const Real sqrt19 = std::sqrt(19.L);
+	      const Real tp     = std::sqrt(71440.L + 6802.L*sqrt19);
+	      
 	      // Point data for permutations.
 	      const Real eta    =  0.00000000000000000000000000000000e+00L;
 	      
-	      const Real lambda =  8.8030440669930978047737818209860e-01L; // Stroud: 0.88030430;
-	      const Real xi     = -4.9584817142571115281421242364290e-01L; // Stroud: -0.49584802;
+	      const Real lambda =  std::sqrt(1919.L/3285.L - 148.L*sqrt19/3285.L + 4.L*tp/3285.L);
+	      // 8.8030440669930978047737818209860e-01L; 
 	      
-	      const Real mu     =  7.9562142216409541542982482567580e-01L; // Stroud: 0.79562143;
-	      const Real gamma  =  2.5293711744842581347389255929324e-02L; // Stroud: 0.025293237;
-
+	      const Real xi     = -std::sqrt(1121.L/3285.L +  74.L*sqrt19/3285.L - 2.L*tp/3285.L);
+	      // -4.9584817142571115281421242364290e-01L; 
+	      
+	      const Real mu     =  std::sqrt(1121.L/3285.L +  74.L*sqrt19/3285.L + 2.L*tp/3285.L);
+	      // 7.9562142216409541542982482567580e-01L;
+	      
+	      const Real gamma  =  std::sqrt(1919.L/3285.L - 148.L*sqrt19/3285.L - 4.L*tp/3285.L);
+	      // 2.5293711744842581347389255929324e-02L; 
+	      
 	      // Weights: the centroid weight is given analytically.  Weight B (resp C) goes
-	      // with the {lambda,xi} (resp {mu, gamma}) permutation.  The single-precision
+	      // with the {lambda,xi} (resp {gamma,mu}) permutation.  The single-precision
 	      // results reported by Stroud are given for reference.
-	      const Real A      = 32.0L / 19.0L;                          // Stroud: 0.21052632  * 8.0 = 1.684210560;
-	      const Real B      = 5.4498735127757671684690782180890e-01L; // Stroud: 0.068123420 * 8.0 = 0.544987360;
-	      const Real C      = 5.0764422766979170420572375713840e-01L; // Stroud: 0.063455527 * 8.0 = 0.507644216;
+
+	      const Real A      = 32.0L / 19.0L;
+	      // Stroud: 0.21052632  * 8.0 = 1.684210560;
+
+	      const Real B      = 1.L / ( 260072.L/133225.L  - 1520*sqrt19/133225.L + (133.L - 37.L*sqrt19)*tp/133225.L );
+	      // 5.4498735127757671684690782180890e-01L; // Stroud: 0.068123420 * 8.0 = 0.544987360;
+	      
+	      const Real C      = 1.L / ( 260072.L/133225.L  - 1520*sqrt19/133225.L - (133.L - 37.L*sqrt19)*tp/133225.L );
+	      // 5.0764422766979170420572375713840e-01L; // Stroud: 0.063455527 * 8.0 = 0.507644216;
 	      
  	      _points.resize(13);
  	      _weights.resize(13);
