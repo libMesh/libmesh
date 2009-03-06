@@ -234,23 +234,56 @@ void PetscVector<T>::add (const T v_in)
   int ierr=0;
   PetscScalar* values;
   const PetscScalar v = static_cast<PetscScalar>(v_in);  
-  const int n   = static_cast<int>(this->local_size());
-  const int fli = static_cast<int>(this->first_local_index());
-  
-  for (int i=0; i<n; i++)
+
+  if(this->type() != GHOSTED)
     {
-      ierr = VecGetArray (_vec, &values);
-  	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      const int n   = static_cast<int>(this->local_size());
+      const int fli = static_cast<int>(this->first_local_index());
       
-      int ig = fli + i;      
+      for (int i=0; i<n; i++)
+	{
+	  ierr = VecGetArray (_vec, &values);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  
+	  int ig = fli + i;      
+	  
+	  PetscScalar value = (values[i] + v);
+	  
+	  ierr = VecRestoreArray (_vec, &values);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  
+	  ierr = VecSetValues (_vec, 1, &ig, &value, INSERT_VALUES);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+	}
+    }
+  else
+    {
+      /* Vectors that include ghost values require a special
+	 handling.  */
+      Vec loc_vec;
+      ierr = VecGhostGetLocalForm (_vec,&loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      int n=0;
+      ierr = VecGetSize(loc_vec, &n);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
-      PetscScalar value = (values[i] + v);
-      
-      ierr = VecRestoreArray (_vec, &values);
-  	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
-      ierr = VecSetValues (_vec, 1, &ig, &value, INSERT_VALUES);
- 	     CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+      for (int i=0; i<n; i++)
+	{
+	  ierr = VecGetArray (loc_vec, &values);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  
+	  PetscScalar value = (values[i] + v);
+	  
+	  ierr = VecRestoreArray (loc_vec, &values);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  
+	  ierr = VecSetValues (loc_vec, 1, &i, &value, INSERT_VALUES);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+	}
+
+      ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 
   this->_is_closed = false;
@@ -277,20 +310,42 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
 
   libmesh_assert(this->size() == v->size());
   
+  if(this->type() != GHOSTED)
+    {
+#if PETSC_VERSION_LESS_THAN(2,3,0)
+      // 2.2.x & earlier style
+      ierr = VecAXPY(&a, v->_vec, _vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#else
+      // 2.3.x & later style
+      ierr = VecAXPY(_vec, a, v->_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+    }
+  else
+    {
+      Vec loc_vec;
+      Vec v_loc_vec;
+      ierr = VecGhostGetLocalForm (_vec,&loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecGhostGetLocalForm (v->_vec,&v_loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 #if PETSC_VERSION_LESS_THAN(2,3,0)
-	 
-  // 2.2.x & earlier style
-  ierr = VecAXPY(&a, v->_vec, _vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
+      // 2.2.x & earlier style
+      ierr = VecAXPY(&a, v_loc_vec, loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
-	 
-  // 2.3.x & later style
-  ierr = VecAXPY(_vec, a, v->_vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
+      // 2.3.x & later style
+      ierr = VecAXPY(loc_vec, a, v_loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
+
+      ierr = VecGhostRestoreLocalForm (v->_vec,&v_loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 }
 
 
@@ -349,27 +404,61 @@ void PetscVector<T>::scale (const T factor_in)
   int ierr = 0;
   PetscScalar factor = static_cast<PetscScalar>(factor_in);
   
+  if(this->type() != GHOSTED)
+    {
 #if PETSC_VERSION_LESS_THAN(2,3,0)
-
-  // 2.2.x & earlier style
-  ierr = VecScale(&factor, _vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
+      // 2.2.x & earlier style
+      ierr = VecScale(&factor, _vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
-  
-  // 2.3.x & later style	 
-  ierr = VecScale(_vec, factor);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
+      // 2.3.x & later style	 
+      ierr = VecScale(_vec, factor);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
+    }
+  else
+    {
+      Vec loc_vec;
+      ierr = VecGhostGetLocalForm (_vec,&loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#if PETSC_VERSION_LESS_THAN(2,3,0)
+      // 2.2.x & earlier style
+      ierr = VecScale(&factor, loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#else
+      // 2.3.x & later style	 
+      ierr = VecScale(loc_vec, factor);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+
+      ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 }
 
 template <typename T>
 void PetscVector<T>::abs()
 {
   int ierr = 0;
-  ierr = VecAbs(_vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);  
+
+  if(this->type() != GHOSTED)
+    {
+      ierr = VecAbs(_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);  
+    }
+  else
+    {
+      Vec loc_vec;
+      ierr = VecGhostGetLocalForm (_vec,&loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecAbs(loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);  
+
+      ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 }
 
 template <typename T>
@@ -405,19 +494,37 @@ PetscVector<T>::operator = (const T s_in)
 
   if (this->size() != 0)
     {
+      if(this->type() != GHOSTED)
+	{
 #if PETSC_VERSION_LESS_THAN(2,3,0)
-      
-  // 2.2.x & earlier style
-  ierr = VecSet(&s, _vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	     
+	  // 2.2.x & earlier style
+	  ierr = VecSet(&s, _vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
-
-  // 2.3.x & later style	 
-  ierr = VecSet(_vec, s);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	     
+	  // 2.3.x & later style	 
+	  ierr = VecSet(_vec, s);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
+	}
+      else
+	{
+	  Vec loc_vec;
+	  ierr = VecGhostGetLocalForm (_vec,&loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#if PETSC_VERSION_LESS_THAN(2,3,0)
+	  // 2.2.x & earlier style
+	  ierr = VecSet(&s, loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#else
+	  // 2.3.x & later style	 
+	  ierr = VecSet(loc_vec, s);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+
+	  ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	}
     }
   
   return *this;
@@ -453,14 +560,31 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
 
   if (v.size() != 0)
     {
-      int ierr = VecCopy (v._vec, this->_vec);
-      	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      int ierr = 0;
+      if(this->type() != GHOSTED)
+	{
+	  ierr = VecCopy (v._vec, this->_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	}
+      else
+	{
+	  Vec loc_vec;
+	  Vec v_loc_vec;
+	  ierr = VecGhostGetLocalForm (_vec,&loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecGhostGetLocalForm (v._vec,&v_loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	  ierr = VecCopy (v_loc_vec, loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	  ierr = VecGhostRestoreLocalForm (v._vec,&v_loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	}
     }
   
-  // Make sure ghost dofs are copied
-  if (this->type() == GHOSTED)
-    this->close();
-
   return *this;
 }
 
@@ -934,12 +1058,37 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
   libmesh_error();
 
 #else
+  
+  if(this->type() != GHOSTED)
+    {
+      ierr = VecPointwiseMult(this->vec(),
+			      const_cast<PetscVector<T>*>(vec1_petsc)->vec(),
+			      const_cast<PetscVector<T>*>(vec2_petsc)->vec());
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+  else
+    {
+	  Vec loc_vec;
+	  Vec v1_loc_vec;
+	  Vec v2_loc_vec;
+	  ierr = VecGhostGetLocalForm (_vec,&loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecGhostGetLocalForm (const_cast<PetscVector<T>*>(vec1_petsc)->vec(),&v1_loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecGhostGetLocalForm (const_cast<PetscVector<T>*>(vec2_petsc)->vec(),&v2_loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  ierr = VecPointwiseMult(this->vec(),
-			  const_cast<PetscVector<T>*>(vec1_petsc)->vec(),
-			  const_cast<PetscVector<T>*>(vec2_petsc)->vec());
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecPointwiseMult(loc_vec,v1_loc_vec,v2_loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
+	  ierr = VecGhostRestoreLocalForm (const_cast<PetscVector<T>*>(vec1_petsc)->vec(),&v1_loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecGhostRestoreLocalForm (const_cast<PetscVector<T>*>(vec2_petsc)->vec(),&v2_loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+      
 #endif
 
 }

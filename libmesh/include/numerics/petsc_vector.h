@@ -821,19 +821,37 @@ void PetscVector<T>::zero ()
 
   PetscScalar z=0.;
 
+  if(this->type() != GHOSTED)
+    {
 #if PETSC_VERSION_LESS_THAN(2,3,0)  
-  
-  // 2.2.x & earlier style
-  ierr = VecSet (&z, _vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
+      // 2.2.x & earlier style
+      ierr = VecSet (&z, _vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
-  
-  // 2.3.x & newer
-  ierr = VecSet (_vec, z);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
+      // 2.3.x & newer
+      ierr = VecSet (_vec, z);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
+    }
+  else
+    {
+      /* Vectors that include ghost values require a special
+	 handling.  */
+      Vec loc_vec;
+      ierr = VecGhostGetLocalForm (_vec,&loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#if PETSC_VERSION_LESS_THAN(2,3,0)  
+      // 2.2.x & earlier style
+      ierr = VecSet (&z, loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#else
+      // 2.3.x & newer
+      ierr = VecSet (loc_vec, z);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+      ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 }
 
 
