@@ -44,7 +44,7 @@ vol. 22, no. 3--4, pp. 237--254, 2006. 	 (<a href="http://cfdlab.ae.utexas.edu/~
 Benjamin S. Kirk,
 <i>A Multidimensional Thermal Analysis to Assess Modeling Error in High-Speed Wind Tunnel Heat Transfer Data Reduction Schemes.</i>
 <a href="http://www.aiaa.org/content.cfm?pageid=322&lupubid=26">AIAA Journal of Thermophysics and Heat Transfer</a>,
-accepted, October 2008.
+vol. 23, no. 1, pp 186--191, January, 2009.
 </li>
 
 <br>
