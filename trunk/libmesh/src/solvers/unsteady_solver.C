@@ -60,7 +60,7 @@ void UnsteadySolver::solve ()
 
 #ifdef LIBMESH_ENABLE_GHOSTED
   old_local_nonlinear_solution->init (_system.n_dofs(), _system.n_local_dofs(),
-                                      _system.get_dof_map().get_send_list(),
+                                      _system.get_dof_map().get_send_list(), false,
                                       GHOSTED);
 #else
   old_local_nonlinear_solution->init (_system.n_dofs(), false, SERIAL);
