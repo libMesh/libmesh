@@ -187,7 +187,7 @@ void System::init_data ()
   // Resize the current_local_solution for the current mesh
 #ifdef LIBMESH_ENABLE_GHOSTED
   current_local_solution->init (this->n_dofs(), this->n_local_dofs(),
-                                _dof_map->get_send_list(),
+                                _dof_map->get_send_list(), false,
                                 GHOSTED);
 #else
   current_local_solution->init (this->n_dofs(), false, SERIAL);
@@ -226,7 +226,7 @@ void System::restrict_vectors ()
 #ifdef LIBMESH_ENABLE_GHOSTED
   current_local_solution->init(this->n_dofs(),
 			       this->n_local_dofs(), send_list, 
-                               true, GHOSTED);
+                               false, GHOSTED);
 #else
   current_local_solution->init(this->n_dofs());
 #endif
