@@ -532,7 +532,8 @@ void Elem::libmesh_assert_valid_neighbors() const
 
           // If we're subactive but our neighbor isn't, its
           // return neighbor link will be to our first active
-          // ancestor
+          // ancestor OR to our inactive ancestor of the same
+          // level as neigh, 
           if (this->subactive() && !neigh->subactive())
             {
               for (elem = this; !elem->active();
@@ -545,7 +546,11 @@ void Elem::libmesh_assert_valid_neighbors() const
 
           if (this->subactive() && !neigh->subactive())
             {
-              libmesh_assert (neigh->neighbor(rev) == elem);
+              while (neigh->neighbor(rev) != elem)
+                {
+                  libmesh_assert(elem->parent());
+                  elem = elem->parent();
+                }
             }
           else
             {
