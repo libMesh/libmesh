@@ -947,8 +947,11 @@ bool UnstructuredMesh::contract ()
 	// Delete all the subactive ones
 	if (elem->subactive())
 	  {
-	    // Huh?  no level-0 element should be subactive
-	    libmesh_assert (elem->level() != 0);
+	    // No level-0 element should be subactive.
+	    // Note that we CAN'T test elem->level(), as that 
+	    // touches elem->parent()->dim(), and elem->parent()
+	    // might have already been deleted!
+	    libmesh_assert (elem->parent() != NULL);
 
 	    // Delete the element
 	    // This just sets a pointer to NULL, and doesn't
