@@ -988,6 +988,14 @@ T PetscVector<T>::operator() (const unsigned int i) const
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
       ierr = VecGetArray(loc_vec, &values);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#ifndef NDEBUG
+      int local_size = 0;
+      ierr = VecGetLocalSize(loc_vec, &local_size);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      libmesh_assert(local_index<static_cast<unsigned int>(local_size));
+#endif
+
       value = values[local_index];
       ierr = VecRestoreArray (loc_vec, &values);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
