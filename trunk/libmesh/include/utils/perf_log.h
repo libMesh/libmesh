@@ -211,8 +211,7 @@ class PerfLog
   /**
    * @returns the total time spent on this event.
    */
-  double get_total_time() const
-    {return total_time;}
+  double get_elapsed_time() const;
  
    
  private:
@@ -364,6 +363,22 @@ void PerfLog::pop (const std::string &label,
 	log_stack.top()->restart();
     }
 }
+
+
+
+inline
+double PerfLog::get_elapsed_time () const
+{
+  struct timeval tnow;
+  
+  gettimeofday (&tnow, NULL);
+	  
+  const double elapsed_time = (static_cast<double>(tnow.tv_sec  - tstart.tv_sec) +
+			       static_cast<double>(tnow.tv_usec - tstart.tv_usec)*1.e-6);
+  return elapsed_time;
+}
+
+
 
 // Typedefs we might need
 #ifdef LIBMESH_HAVE_LOCALE
