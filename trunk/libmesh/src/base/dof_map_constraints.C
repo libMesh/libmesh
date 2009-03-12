@@ -1196,6 +1196,53 @@ void DofMap::process_recursive_constraints ()
       }
 }
 
+
+
+void DofMap::add_constraints_to_send_list(MeshBase& mesh)
+{
+  // This function must be run on all processors at once
+  parallel_only();
+
+  // Return immediately if there's nothing to gather
+  if (libMesh::n_processors() == 1)
+    return;
+
+  // We might get to return immediately if none of the processors
+  // found any constraints
+  unsigned int has_constraints = !_dof_constraints.empty();
+  Parallel::max(has_constraints);
+  if (!has_constraints)
+    return;
+
+  for (DofConstraints::iterator i = _dof_constraints.begin();
+	 i != _dof_constraints.end(); ++i)
+    {
+      unsigned int constrained_dof = i->first;
+
+      // We only need the dependencies of our own constrained dofs
+      if (constrained_dof < this->first_dof() || 
+          constrained_dof >= this->end_dof())
+        continue;
+
+      DofConstraintRow& constraint_row = i->second;
+      for (DofConstraintRow::const_iterator
+	   j=constraint_row.begin(); j != constraint_row.end();
+	   ++j)
+        {
+          unsigned int constraint_dependency = j->first;
+
+          // No point in adding one of our own dofs to the send_list
+          if (constraint_dependency >= this->first_dof() && 
+              constraint_dependency < this->end_dof())
+            continue;
+
+          _send_list.push_back(constraint_dependency);
+        }
+    }
+}
+
+
+
 #endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
 

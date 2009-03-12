@@ -732,6 +732,11 @@ void DofMap::distribute_dofs (MeshBase& mesh)
   // each element.
   this->add_neighbors_to_send_list(mesh);
   
+  // Strongly enforcing constraint equations may require us to know
+  // constraint dependency dofs that aren't even on our immediate
+  // neighbor elements
+  this->add_constraints_to_send_list(mesh);
+
   // Here we need to clean up that data structure
   this->sort_send_list ();
 }
