@@ -133,6 +133,11 @@ public:
   virtual void solve () = 0;
   
   /**
+   * Solves the adjoint system.  Must be overloaded in derived systems.
+   */
+  virtual void adjoint_solve () = 0;
+  
+  /**
    * @returns \p true when the other system contains
    * identical data, up to the given threshold.  Outputs
    * some diagnostic info when \p verbose is set.
@@ -572,21 +577,34 @@ public:
 					     const std::string& name));
   
   /**
-   * User-provided initialization function.  Can be overloaded
-   * in derived classes.
+   * Register a user function for evaluating a quantity of interest
+   */
+  void attach_QOI_function (void fptr(EquationSystems& es,
+				      const std::string& name));
+  
+  /**
+   * Calls user's attached initialization function, or is overloaded by
+   * the user in derived classes.
    */
   virtual void user_initialization ();
   
   /**
-   * User-provided  assembly function.  Can be overloaded
-   * in derived classes.
+   * Calls user's attached assembly function, or is overloaded by
+   * the user in derived classes.
    */
   virtual void user_assembly ();
   
   /**
-   * User provided constraint function.
+   * Calls user's attached constraint function, or is overloaded by
+   * the user in derived classes.
    */
   virtual void user_constrain ();
+
+  /**
+   * Calls user's attached quantity of interest function, or is
+   * overloaded by the user in derived classes.
+   */
+  virtual void user_QOI ();
 
   /**
    * Re-update the local values when the mesh has changed.
@@ -748,8 +766,13 @@ private:
    * Function to impose constraints.
    */
   void (* _constrain_system) (EquationSystems& es, 
-			      const std::string& name
-			      );
+			      const std::string& name);
+
+  /**
+   * Function to evaluate quantity of interest
+   */
+  void (* _qoi_evaluate_system) (EquationSystems& es, 
+			         const std::string& name);
 
   /**
    * Data structure describing the relationship between

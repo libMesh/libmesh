@@ -97,9 +97,14 @@ public:
 //   virtual void assemble () { ImplicitSystem::assemble(); }
  
   /**
-   * Assembles & solves the linear system Ax=b. 
+   * Assembles & solves the linear system A*x=b. 
    */
   virtual void solve ();
+ 
+  /**
+   * Assembles & solves the linear adjoint system A^T*x=q. 
+   */
+  virtual void adjoint_solve () { libmesh_not_implemented(); }
  
   /**
    * @returns \p "LinearImplicit".  Helps in identifying

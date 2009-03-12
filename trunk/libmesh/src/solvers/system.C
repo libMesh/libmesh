@@ -952,6 +952,16 @@ void System::attach_constraint_function(void fptr(EquationSystems& es,
 
 
 
+void System::attach_QOI_function(void fptr(EquationSystems& es,
+					   const std::string& name))
+{
+  libmesh_assert (fptr != NULL);
+  
+  _qoi_evaluate_system = fptr;  
+}
+
+
+
 void System::user_initialization ()
 {
   // Call the user-provided intialization function,
@@ -977,5 +987,15 @@ void System::user_constrain ()
   // if it was provided
   if(_constrain_system!= NULL)
     this->_constrain_system(_equation_systems, this->name());
+}
+
+
+
+void System::user_QOI ()
+{
+  // Call the user-provided quantity of interest function, 
+  // if it was provided
+  if(_qoi_evaluate_system!= NULL)
+    this->_qoi_evaluate_system(_equation_systems, this->name());
 }
 
