@@ -154,7 +154,8 @@ void ImplicitSystem::assemble ()
   libmesh_assert (rhs    != NULL);
   libmesh_assert (rhs->initialized());
 
-  // Zero the matrix and RHS
+  // The user assembly gets to expect to accumulate on an initially
+  // empty system
   matrix->zero ();
   rhs->zero ();
 
