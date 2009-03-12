@@ -128,6 +128,12 @@ public:
   virtual void assemble ();
 
   /**
+   * Calls user qoi function.
+   * @e Should be overloaded in derived classes.
+   */
+  virtual void assemble_qoi ();
+ 
+  /**
    * Solves the system.  Must be overloaded in derived systems.
    */
   virtual void solve () = 0;

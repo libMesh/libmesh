@@ -335,6 +335,20 @@ void System::assemble ()
 
 
 
+void System::assemble_qoi ()
+{
+  // Log how long the user's matrix assembly code takes
+  START_LOG("assemble_qoi()", "System");
+  
+  // Call the user-specified quantity of interest function
+  this->user_QOI();
+
+  // Stop logging the user code
+  STOP_LOG("assemble_qoi()", "System");
+}
+
+
+
 bool System::compare (const System& other_system, 
 		      const Real threshold,
 		      const bool verbose) const
