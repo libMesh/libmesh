@@ -392,8 +392,7 @@ template <typename T>
 void PetscMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 {
   // Make sure the NumericVector passed in is really a PetscVector
-  PetscVector<T>* petsc_dest = libmesh_cast_ptr<PetscVector<T>*>(&dest);
-  libmesh_assert(petsc_dest != NULL);
+  PetscVector<T>& petsc_dest = libmesh_cast_ref<PetscVector<T>&>(dest);
 
   // Call PETSc function.
 
@@ -409,10 +408,35 @@ void PetscMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 
   // Needs a const_cast since PETSc does not work with const.
   int ierr =
-    MatGetDiagonal(const_cast<PetscMatrix<T>*>(this)->mat(),petsc_dest->vec()); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    MatGetDiagonal(const_cast<PetscMatrix<T>*>(this)->mat(),petsc_dest.vec()); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 #endif
 
+}
+
+
+
+template <typename T>
+void PetscMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
+{
+  // Make sure the SparseMatrix passed in is really a PetscMatrix
+  PetscMatrix<T>& petsc_dest = libmesh_cast_ref<PetscMatrix<T>&>(dest);
+
+  int ierr;
+#if PETSC_VERSION_LESS_THAN(3,0,0)
+  if (&petsc_dest == this)
+    ierr = MatTranspose(_mat,PETSC_NULL);
+  else
+    ierr = MatTranspose(_mat,&petsc_dest._mat);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#else
+  // FIXME - we can probably use MAT_REUSE_MATRIX in more situations
+  if (&petsc_dest == this)
+    ierr = MatTranspose(_mat,MAT_REUSE_MATRIX,petsc_dest._mat);
+  else
+    ierr = MatTranspose(_mat,MAT_INITIAL_MATRIX,petsc_dest._mat);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
 }
 
 

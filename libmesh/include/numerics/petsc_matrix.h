@@ -304,6 +304,12 @@ public:
   virtual void get_diagonal (NumericVector<T>& dest) const;
 
   /**
+   * Copies the transpose of the matrix into \p dest, which may be
+   * *this.
+   */
+  virtual void get_transpose (SparseMatrix<T>& dest) const;
+
+  /**
    * Swaps the raw PETSc matrix context pointers.
    */
   void swap (PetscMatrix<T> &);
