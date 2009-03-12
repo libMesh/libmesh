@@ -88,10 +88,9 @@ public:
   virtual void reinit ();
    
   /**
-   * Prepares \p matrix and \p _dof_map for matrix assembly.
-   * Does not actually assemble anything.  For matrix assembly,
-   * use the \p assemble() in derived classes.
-   * @e Should be overloaded in derived classes.
+   * Prepares \p matrix and \p rhs for system assembly, then calls
+   * user assembly function.
+   * @e Can be overloaded in derived classes.
    */
   virtual void assemble ();
  
