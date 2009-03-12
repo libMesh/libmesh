@@ -440,6 +440,13 @@ public:
   void allgather_recursive_constraints ();
 
   /**
+   * Adds entries to the \p _send_list vector corresponding to DoFs
+   * which are dependencies for constraint equations on the current
+   * processor.
+   */
+  void add_constraints_to_send_list(MeshBase& mesh);
+
+  /**
    * Postprocesses any constrained degrees of freedom in elem_dofs
    * to be constrained only in terms of unconstrained dofs.
    */
