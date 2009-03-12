@@ -493,6 +493,59 @@ unsigned int NewtonSolver::solve()
 
 
 
+unsigned int NewtonSolver::adjoint_solve()
+{
+  START_LOG("adjoint_solve()", "NewtonSolver");
+
+  // Do DiffSystem assembly
+  _system.assembly(false, true);
+  _system.matrix->close();
+
+  // But take the adjoint
+  _system.matrix->get_transpose(*_system.matrix);
+
+  if (_system.have_matrix("Preconditioner"))
+    {
+      SparseMatrix<Number> &pre = _system.get_matrix("Preconditioner");
+      pre.get_transpose(pre);
+    }
+
+  // And set the right hand side to the quantity of interest
+  _system.assemble_qoi();
+
+  // Solve the linear system.  Two cases:
+  const std::pair<unsigned int, Real> rval =
+    (_system.have_matrix("Preconditioner")) ?
+  // 1.) User-supplied preconditioner
+    linear_solver->solve (*_system.matrix,
+                          _system.get_matrix("Preconditioner"),
+			  *_system.solution, *_system.rhs,
+                          relative_residual_tolerance,
+                          max_linear_iterations) :
+  // 2.) Use system matrix for the preconditioner
+    linear_solver->solve (*_system.matrix,
+                          *_system.solution, *_system.rhs,
+                          relative_residual_tolerance, 
+                          max_linear_iterations);
+
+  // We may need to localize a parallel solution
+  _system.update ();
+
+  // The linear solver may not have fit our constraints exactly
+#ifdef LIBMESH_ENABLE_AMR
+  _system.get_dof_map().enforce_constraints_exactly(_system);
+#endif
+
+
+  STOP_LOG("adjoint_solve()", "NewtonSolver");
+
+  // FIXME - We'll worry about getting the solve result right later...
+  
+  return DiffSolver::CONVERGED_RELATIVE_RESIDUAL;
+}
+
+
+
 bool NewtonSolver::test_convergence(Real current_residual,
                                     Real step_norm,
                                     bool linear_solve_finished)

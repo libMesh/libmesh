@@ -21,6 +21,7 @@
 #include "diff_system.h"
 #include "dof_map.h"
 #include "libmesh_logging.h"
+#include "linear_solver.h"
 #include "petsc_diff_solver.h"
 #include "petsc_matrix.h"
 #include "petsc_vector.h"
@@ -251,6 +252,61 @@ unsigned int PetscDiffSolver::solve()
 #endif
 
   STOP_LOG("solve()", "PetscDiffSolver");
+
+  // FIXME - We'll worry about getting the solve result right later...
+  
+  return DiffSolver::CONVERGED_RELATIVE_RESIDUAL;
+}
+
+
+
+unsigned int PetscDiffSolver::adjoint_solve()
+{
+  START_LOG("adjoint_solve()", "PetscDiffSolver");
+
+  // Do DiffSystem assembly
+  _system.assembly(false, true);
+  _system.matrix->close();
+
+  // But take the adjoint
+  _system.matrix->get_transpose(*_system.matrix);
+
+  if (_system.have_matrix("Preconditioner"))
+    {
+      SparseMatrix<Number> &pre = _system.get_matrix("Preconditioner");
+      pre.get_transpose(pre);
+    }
+
+  // And set the right hand side to the quantity of interest
+  _system.assemble_qoi();
+
+  // Then build something to solve the _linear_ system
+  AutoPtr<LinearSolver<Number> > linear_solver = LinearSolver<Number>::build();
+
+  // Solve the linear system.  Two cases:
+  const std::pair<unsigned int, Real> rval =
+    (_system.have_matrix("Preconditioner")) ?
+  // 1.) User-supplied preconditioner
+    linear_solver->solve (*_system.matrix,
+                          _system.get_matrix("Preconditioner"),
+			  *_system.solution, *_system.rhs,
+                          relative_residual_tolerance,
+                          max_linear_iterations) :
+  // 2.) Use system matrix for the preconditioner
+    linear_solver->solve (*_system.matrix,
+                          *_system.solution, *_system.rhs,
+                          relative_residual_tolerance, 
+                          max_linear_iterations);
+
+  // We may need to localize a parallel solution
+  _system.update ();
+
+  // The linear solver may not have fit our constraints exactly
+#ifdef LIBMESH_ENABLE_AMR
+  _system.get_dof_map().enforce_constraints_exactly(_system);
+#endif
+
+  STOP_LOG("adjoint_solve()", "PetscDiffSolver");
 
   // FIXME - We'll worry about getting the solve result right later...
   

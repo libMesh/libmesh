@@ -67,11 +67,15 @@ public:
   virtual void reinit ();
 
   /**
-   * This method performs a solve.  What occurs in
-   * this method will depend on the type of solver.  See
-   * the subclasses for more details.
+   * This method performs a solve, using an inexact Newton-Krylov
+   * method with line search.
    */
   virtual unsigned int solve ();
+
+  /**
+   * This method performs an adjoint solve, using a Krylov method.
+   */
+  virtual unsigned int adjoint_solve ();
 
   /**
    * If this is set to true, the solver is forced to test the residual

@@ -289,6 +289,15 @@ public:
   virtual void solve ();
  
   /**
+   * Invokes the adjoint solver associated with the system.  For
+   * steady state solvers, this will find x where dF/dx = q.  For
+   * transient solvers, this should integrate -dx/dt = dF/dx - q.
+   *
+   * FIXME - transient adjoint solves not yet implemented.
+   */
+  virtual void adjoint_solve ();
+ 
+  /**
    * A pointer to the solver object we're going to use.
    * This must be instantiated by the user before solving!
    */

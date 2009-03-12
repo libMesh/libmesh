@@ -73,10 +73,17 @@ public:
 
   /**
    * This method performs a solve.  What occurs in
-   * this method will depend on the type of solver.  See
-   * the PETSc documentation for more details.
+   * this method will depend on the PETSc SNES settings.
+   * See the PETSc documentation for more details.
    */
   virtual unsigned int solve ();
+
+  /**
+   * This method performs an adjoint solve.  What occurs in
+   * this method will depend on the PETSc KSP settings.  See
+   * the PETSc documentation for more details.
+   */
+  virtual unsigned int adjoint_solve ();
 
 protected:
 

@@ -27,10 +27,11 @@
 
 
 TimeSolver::TimeSolver (sys_type& s)
-  : quiet(true),
-    reduce_deltat_on_diffsolver_failure(0),
-    _diff_solver                 (NULL),
-    _system                      (s)
+  : quiet (true),
+    reduce_deltat_on_diffsolver_failure (0),
+    _diff_solver (NULL),
+    _adjoint_solver (NULL),
+    _system (s)
 {
 }
 
@@ -45,6 +46,7 @@ TimeSolver::~TimeSolver ()
 void TimeSolver::reinit ()
 {
   _diff_solver->reinit();
+  _adjoint_solver->reinit();
 }
 
 
@@ -55,7 +57,12 @@ void TimeSolver::init ()
   // just build a default solver
   if (_diff_solver.get() == NULL)
     _diff_solver = DiffSolver::build(_system);
+
+  if (_adjoint_solver.get() == NULL)
+    _adjoint_solver = DiffSolver::build(_system);
+
   _diff_solver->init();
+  _adjoint_solver->init();
 }
 
 
@@ -67,13 +74,19 @@ void TimeSolver::solve ()
 
 
 
+void TimeSolver::adjoint_solve ()
+{
+  _adjoint_solver->adjoint_solve();
+}
+
+
+
 void TimeSolver::advance_timestep ()
 {
 }
 
 
 
-AutoPtr<DiffSolver> & TimeSolver::diff_solver()
+void TimeSolver::adjoint_recede_timestep ()
 {
-  return _diff_solver;
 }

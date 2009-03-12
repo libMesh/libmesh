@@ -107,3 +107,10 @@ void DifferentiableSystem::solve ()
 {
   time_solver->solve();
 }
+
+
+
+void DifferentiableSystem::adjoint_solve ()
+{
+  time_solver->adjoint_solve();
+}
