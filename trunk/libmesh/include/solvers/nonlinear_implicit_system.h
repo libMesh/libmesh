@@ -103,7 +103,7 @@ public:
   /**
    * Assembles & solves the linear system (dR/dx)^T*x = q.
    */
-  virtual void adjoint_solve () { libmesh_not_implemented(); }
+  virtual void adjoint_solve ();
  
   /**
    * @returns \p "NonlinearImplicit".  Helps in identifying
@@ -131,6 +131,11 @@ public:
   Real final_nonlinear_residual() const { return _final_nonlinear_residual; }
   
 protected:
+
+  /**
+   * Copies system parameters into nonlinear solver parameters
+   */
+  void set_solver_parameters();
   
   /**
    * The number of nonlinear iterations required to solve the nonlinear

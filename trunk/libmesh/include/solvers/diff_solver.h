@@ -84,13 +84,19 @@ public:
    */
   virtual void reinit ();
 
-
   /**
    * This method performs a solve.  What occurs in
    * this method will depend on the type of solver.  See
    * the subclasses for more details.  
    */
   virtual unsigned int solve () = 0;
+
+  /**
+   * This method performs a solve on the adjoint system.  
+   * What occurs in this method will depend on the type 
+   * of solver.  See the subclasses for more details.  
+   */
+  virtual unsigned int adjoint_solve () = 0;
 
   /**
    * @returns the number of "outer" (e.g. quasi-Newton) iterations

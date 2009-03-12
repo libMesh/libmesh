@@ -25,8 +25,10 @@
 #include "nonlinear_implicit_system.h"
 #include "equation_systems.h"
 #include "libmesh_logging.h"
+#include "linear_solver.h"
 #include "nonlinear_solver.h"
-
+#include "numeric_vector.h"
+#include "sparse_matrix.h"
 
 // ------------------------------------------------------------
 // NonlinearImplicitSystem implementation
@@ -86,15 +88,8 @@ void NonlinearImplicitSystem::reinit ()
 
 
 
-void NonlinearImplicitSystem::solve ()
+void NonlinearImplicitSystem::set_solver_parameters ()
 {
-  if (this->assemble_before_solve)
-    // Assemble the nonlinear system
-    this->assemble (); 
-
-  // Log how long the nonlinear solve takes.
-  START_LOG("solve()", "System");
-  
   // Get a reference to the EquationSystems
   const EquationSystems& es =
     this->get_equation_systems();  
@@ -138,10 +133,22 @@ void NonlinearImplicitSystem::solve ()
   nonlinear_solver->max_linear_iterations = maxlinearits;
   nonlinear_solver->initial_linear_tolerance = linear_tol;
   nonlinear_solver->minimum_linear_tolerance = linear_min_tol;
+}
 
-  // Solve the nonlinear system.  Two cases:
+
+
+void NonlinearImplicitSystem::solve ()
+{
+  // Log how long the nonlinear solve takes.
+  START_LOG("solve()", "System");
+  
+  this->set_solver_parameters();
+
+  // Solve the nonlinear system.
   const std::pair<unsigned int, Real> rval =
-    nonlinear_solver->solve (*matrix, *solution, *rhs, rel_resid_tol, maxits);
+    nonlinear_solver->solve (*matrix, *solution, *rhs, 
+			     nonlinear_solver->relative_residual_tolerance,
+                             nonlinear_solver->max_linear_iterations);
 
   // Store the number of nonlinear iterations required to
   // solve and the final residual.
@@ -150,6 +157,57 @@ void NonlinearImplicitSystem::solve ()
     
   // Stop logging the nonlinear solve
   STOP_LOG("solve()", "System");
+
+  // Update the system after the solve
+  this->update();  
+}
+
+
+
+void NonlinearImplicitSystem::adjoint_solve ()
+{
+  // Log how long the nonlinear solve takes.
+  START_LOG("adjoint_solve()", "System");
+  
+  // The nonlinear system should now already be solved.
+  // Now assemble it's adjoint.
+
+  if (this->assemble_before_solve)
+    {
+      // Build the Jacobian
+      if (nonlinear_solver->jacobian != NULL)
+        nonlinear_solver->jacobian (*current_local_solution.get(), *matrix);
+      else if (nonlinear_solver->matvec != NULL)
+        nonlinear_solver->matvec   (*current_local_solution.get(), NULL, matrix);
+      else libmesh_error();
+
+      // Take the discretization adjoint
+      matrix->get_transpose(*matrix);
+
+      // Reset and build the RHS from the QOI
+      rhs->zero();
+      this->assemble_qoi();
+    }
+
+  // The adjoint problem is linear, so we only use the nonlinear
+  // solver to get tolerances and the current jacobian from it.
+
+  this->set_solver_parameters();
+
+  AutoPtr<LinearSolver<Number> > linear_solver = LinearSolver<Number>::build();
+
+  const std::pair<unsigned int, Real> rval =
+    linear_solver->solve (*matrix, *solution, *rhs,
+			   nonlinear_solver->relative_residual_tolerance,
+                           nonlinear_solver->max_nonlinear_iterations);
+
+  // Store the number of nonlinear iterations required to
+  // solve and the final residual.
+  _n_nonlinear_iterations   = rval.first;
+  _final_nonlinear_residual = rval.second;
+    
+  // Stop logging the nonlinear solve
+  STOP_LOG("adjoint_solve()", "System");
 
   // Update the system after the solve
   this->update();  

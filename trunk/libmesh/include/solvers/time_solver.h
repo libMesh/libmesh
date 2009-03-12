@@ -93,12 +93,27 @@ public:
   virtual void solve ();
 
   /**
+   * This method solves for the adjoint solution at the previous
+   * timestep (or solves a steady adjoint problem).  Usually we will
+   * only need to solve one linear system per timestep, but more
+   * complex subclasses may override this.
+   */
+  virtual void adjoint_solve ();
+
+  /**
    * This method advances the solution to the next timestep, after a
    * solve() has been performed.  Often this will be done after every
    * UnsteadySolver::solve(), but adaptive mesh refinement and/or adaptive
    * time step selection may require some solve() steps to be repeated.
    */
   virtual void advance_timestep ();
+
+  /**
+   * This method advances the adjoint solution to the previous
+   * timestep, after an adjoint_solve() has been performed.  This will
+   * probably be done after every UnsteadySolver::adjoint_solve().
+   */
+  virtual void adjoint_recede_timestep ();
 
   /**
    * This method uses the DifferentiableSystem's
@@ -134,7 +149,12 @@ public:
   /**
    * An implicit linear or nonlinear solver to use at each timestep.
    */
-  virtual AutoPtr<DiffSolver> &diff_solver();
+  virtual AutoPtr<DiffSolver> &diff_solver() { return _diff_solver; }
+
+  /**
+   * An implicit linear solver to use for adjoint problems.
+   */
+  virtual AutoPtr<DiffSolver> &adjoint_solver() { return _adjoint_solver; }
 
   /**
    * Print extra debugging information if quiet ==  false.
@@ -170,6 +190,11 @@ protected:
    * An implicit linear or nonlinear solver to use at each timestep.
    */
   AutoPtr<DiffSolver> _diff_solver;
+
+  /**
+   * An implicit linear solver to use for adjoint problems.
+   */
+  AutoPtr<DiffSolver> _adjoint_solver;
 
   /**
    * @returns a writeable reference to the system we are solving.

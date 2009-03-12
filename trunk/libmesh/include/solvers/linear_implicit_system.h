@@ -104,7 +104,7 @@ public:
   /**
    * Assembles & solves the linear adjoint system A^T*x=q. 
    */
-  virtual void adjoint_solve () { libmesh_not_implemented(); }
+  virtual void adjoint_solve ();
  
   /**
    * @returns \p "LinearImplicit".  Helps in identifying
