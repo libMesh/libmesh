@@ -101,6 +101,11 @@ public:
   virtual void solve ();
  
   /**
+   * Assembles & solves the linear system (dR/dx)^T*x = q.
+   */
+  virtual void adjoint_solve () { libmesh_not_implemented(); }
+ 
+  /**
    * @returns \p "NonlinearImplicit".  Helps in identifying
    * the system type in an equation system file.
    */

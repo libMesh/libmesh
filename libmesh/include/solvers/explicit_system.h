@@ -92,6 +92,12 @@ public:
   virtual void solve ();
  
   /**
+   * Yells at any user who tried to use an adjoint without
+   * providing more than an explicit system assembly.
+   */
+  virtual void adjoint_solve () { libmesh_error(); }
+ 
+  /**
    * @returns \p "Explicit".  Helps in identifying
    * the system type in an equation system file.
    */
