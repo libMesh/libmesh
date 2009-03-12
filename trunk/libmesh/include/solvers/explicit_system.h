@@ -87,6 +87,13 @@ public:
   virtual void reinit ();
   
   /**
+   * Prepares \p rhs for quantity of interest assembly, then calls
+   * user qoi function.
+   * @e Can be overloaded in derived classes.
+   */
+  virtual void assemble_qoi ();
+ 
+  /**
    * Assembles & solves the linear system Ax=b. 
    */
   virtual void solve ();

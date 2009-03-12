@@ -23,6 +23,7 @@
 
 // Local includes
 #include "explicit_system.h"
+#include "numeric_vector.h"
 
 
 // ------------------------------------------------------------
@@ -80,6 +81,20 @@ void ExplicitSystem::reinit ()
   // not necessary, handled by the parent!
   // Resize the RHS conformal to the current mesh
   //rhs->init (this->n_dofs(), this->n_local_dofs());
+}
+
+
+
+void ExplicitSystem::assemble_qoi ()
+{
+  libmesh_assert (rhs    != NULL);
+  libmesh_assert (rhs->initialized());
+
+  // The user quantity of interest assembly gets to expect to
+  // accumulate on an initially empty vector
+  rhs->zero ();
+
+  Parent::assemble_qoi ();
 }
 
 
