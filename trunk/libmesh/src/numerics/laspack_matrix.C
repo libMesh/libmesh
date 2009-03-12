@@ -203,6 +203,14 @@ void LaspackMatrix<T>::get_diagonal (NumericVector<T>& /*dest*/) const
 
 
 
+template <typename T>
+void LaspackMatrix<T>::get_transpose (SparseMatrix<T>& /*dest*/) const
+{
+  libmesh_not_implemented();
+}
+
+
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LaspackMatrix<Number>;
