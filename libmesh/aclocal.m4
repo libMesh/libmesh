@@ -893,7 +893,11 @@ dnl      AC_SUBST(PETSCINCLUDEDIRS)
   	      [PETSc's subminor version number, as detected by LibMesh])
 
       dnl Check for Hypre
-      HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
+      if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           dnl 2.3.x	
+      	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf` 
+      elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then dnl 3.0.x
+      	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
+      fi		 
       if test "x$HYPRE_LIB" != x ; then
         AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not Petsc was compiled with Hypre support])
 	AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)
