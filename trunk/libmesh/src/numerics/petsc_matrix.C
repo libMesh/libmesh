@@ -432,9 +432,9 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
 #else
   // FIXME - we can probably use MAT_REUSE_MATRIX in more situations
   if (&petsc_dest == this)
-    ierr = MatTranspose(_mat,MAT_REUSE_MATRIX,petsc_dest._mat);
+    ierr = MatTranspose(_mat,MAT_REUSE_MATRIX,&petsc_dest._mat);
   else
-    ierr = MatTranspose(_mat,MAT_INITIAL_MATRIX,petsc_dest._mat);
+    ierr = MatTranspose(_mat,MAT_INITIAL_MATRIX,&petsc_dest._mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
 }
