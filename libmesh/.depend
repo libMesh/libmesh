@@ -6013,6 +6013,8 @@ src/mesh/postscript_io.$(obj-suffix):\
     include/mesh/mesh_output.h\
     include/mesh/mesh_tools.h\
     include/mesh/postscript_io.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -9346,6 +9348,7 @@ src/solvers/explicit_system.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
@@ -9355,6 +9358,7 @@ src/solvers/explicit_system.$(obj-suffix):\
     include/geom/point.h\
     include/geom/stored_range.h\
     include/mesh/mesh_base.h\
+    include/numerics/numeric_vector.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -9667,6 +9671,7 @@ src/solvers/linear_implicit_system.$(obj-suffix):\
     include/geom/stored_range.h\
     include/mesh/mesh_base.h\
     include/numerics/linear_solver.h\
+    include/numerics/sparse_matrix.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -9830,7 +9835,10 @@ src/solvers/nonlinear_implicit_system.$(obj-suffix):\
     include/enums/enum_io_package.h\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
@@ -9839,7 +9847,10 @@ src/solvers/nonlinear_implicit_system.$(obj-suffix):\
     include/geom/point.h\
     include/geom/stored_range.h\
     include/mesh/mesh_base.h\
+    include/numerics/linear_solver.h\
     include/numerics/nonlinear_solver.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/sparse_matrix.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -9884,7 +9895,9 @@ src/solvers/petsc_diff_solver.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
@@ -9899,6 +9912,7 @@ src/solvers/petsc_diff_solver.$(obj-suffix):\
     include/numerics/dense_subvector.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
+    include/numerics/linear_solver.h\
     include/numerics/numeric_vector.h\
     include/numerics/petsc_macro.h\
     include/numerics/petsc_matrix.h\
