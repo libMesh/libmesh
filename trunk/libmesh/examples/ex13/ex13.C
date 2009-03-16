@@ -43,6 +43,7 @@
 #include "mesh.h"
 #include "mesh_generation.h"
 #include "gmv_io.h"
+#include "exodusII_io.h"
 #include "equation_systems.h"
 #include "fe.h"
 #include "quadrature_gauss.h"
@@ -258,8 +259,8 @@ int main (int argc, char** argv)
           file_name << "out.gmv.";
           OSSRealzeroright(file_name,3,0, t_step + 1);
           
-          GMVIO(mesh).write_equation_systems (file_name.str(),
-                                              equation_systems);
+          ExodusII_IO(mesh).write_equation_systems (file_name.str(),
+                                                    equation_systems);
         }
     } // end timestep loop.
   
