@@ -275,6 +275,13 @@ public:
   void compute_sparsity (const MeshBase&);
 
   /**
+   * Takes the \p _send_list vector (which may have duplicate entries)
+   * and sorts it.  The duplicate entries are then removed, resulting in
+   * a sorted \p _send_list with unique entries.
+   */
+  void prepare_send_list ();
+  
+  /**
    * Returns a constant reference to the \p _send_list for this processor.  The
    * \p _send_list contains the global indices of all the variables in the
    * global solution vector that influence the current processor.  This
@@ -440,17 +447,13 @@ public:
   void allgather_recursive_constraints ();
 
   /**
-   * Adds entries to the \p _send_list vector corresponding to DoFs
-   * which are dependencies for constraint equations on the current
-   * processor.
-   */
-  void add_constraints_to_send_list(MeshBase& mesh);
-
-  /**
    * Postprocesses any constrained degrees of freedom in elem_dofs
-   * to be constrained only in terms of unconstrained dofs.
+   * to be constrained only in terms of unconstrained dofs, then adds
+   * unconstrained dofs to the send_list and prepares that for use.
+   * This should be run after both system (create_dof_constraints) and
+   * user constraints have all been added.
    */
-  void process_recursive_constraints ();
+  void process_constraints ();
 
   /**
    * Adds a copy of the user-defined row to the constraint matrix.
@@ -713,14 +716,6 @@ private:
    */
   void add_neighbors_to_send_list(MeshBase& mesh);
 
-  /**
-   * Takes the \p _send_list vector (which may have duplicate entries)
-   * and sorts it.  The duplicate entries are then removed, resulting in
-   * a sorted \p _send_list with unique entries.
-   */
-  void sort_send_list ();
-
-  
 #if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 
   /**
@@ -743,6 +738,13 @@ private:
    */
   void find_connected_dofs (std::vector<unsigned int> &elem_dofs) const;
   
+  /**
+   * Adds entries to the \p _send_list vector corresponding to DoFs
+   * which are dependencies for constraint equations on the current
+   * processor.
+   */
+  void add_constraints_to_send_list();
+
 #endif
 
 

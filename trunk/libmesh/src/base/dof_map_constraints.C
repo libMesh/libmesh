@@ -670,7 +670,9 @@ void DofMap::enforce_constraints_exactly (const System &system,
         {
           // Recalculate any constrained dof owned by this processor
           unsigned int global_dof = raw_dof_indices[i];
-          if (this->is_constrained_dof(global_dof))
+          if (global_dof >= this->first_dof() &&
+              global_dof < this->end_dof() &&
+              this->is_constrained_dof(global_dof))
           {
             Number exact_value = 0;
             for (unsigned int j=0; j!=C.n(); ++j)
@@ -1134,7 +1136,7 @@ void DofMap::allgather_recursive_constraints()
 
 
 
-void DofMap::process_recursive_constraints ()
+void DofMap::process_constraints ()
 {
   // Create a set containing the DOFs we already depend on
   typedef std::set<unsigned int> RCSet;
@@ -1194,11 +1196,15 @@ void DofMap::process_recursive_constraints ()
 	else
 	  i++;
       }
+
+  // Now that we have our root constraint dependencies sorted out, add
+  // them to the send_list
+  this->add_constraints_to_send_list();
 }
 
 
 
-void DofMap::add_constraints_to_send_list(MeshBase& mesh)
+void DofMap::add_constraints_to_send_list()
 {
   // This function must be run on all processors at once
   parallel_only();

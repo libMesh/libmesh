@@ -165,19 +165,24 @@ void System::init ()
 
 void System::init_data ()
 {
+  MeshBase &mesh = this->get_mesh();
+
   // Distribute the degrees of freedom on the mesh
-  _dof_map->distribute_dofs (this->get_mesh());
+  _dof_map->distribute_dofs (mesh);
 
 #ifdef LIBMESH_ENABLE_AMR
 
   // Recreate any hanging node constraints
-  _dof_map->create_dof_constraints(this->get_mesh());
+  _dof_map->create_dof_constraints(mesh);
 
   // Apply any user-defined constraints
   this->user_constrain();
 
   // Expand any recursive constraints
-  _dof_map->process_recursive_constraints();
+  _dof_map->process_constraints();
+
+  // And clean up the send_list before we first use it
+  _dof_map->prepare_send_list();
 
 #endif
   
@@ -252,14 +257,8 @@ void System::prolong_vectors ()
 void System::reinit ()
 {
 #ifdef LIBMESH_ENABLE_AMR
-  // Recreate any hanging node constraints
+  // Constraints get handled in EquationSystems::reinit now
 //  _dof_map->create_dof_constraints(this->get_mesh());
-
-  // Apply any user-defined constraints
-  this->user_constrain();
-
-  // Expand any recursive constraints
-  _dof_map->process_recursive_constraints();
 
   // Update the solution based on the projected
   // current_local_solution.

@@ -159,7 +159,19 @@ void EquationSystems::reinit ()
       {
 	System &sys = this->get_system(i);
         sys.get_dof_map().distribute_dofs(_mesh);
+
+        // Recreate any hanging node constraints
         sys.get_dof_map().create_dof_constraints(_mesh);
+
+        // Apply any user-defined constraints
+        sys.user_constrain();
+
+        // Expand any recursive constraints
+        sys.get_dof_map().process_constraints();
+
+        // And clean up the send_list before we use it again
+        sys.get_dof_map().prepare_send_list();
+
         sys.prolong_vectors();
       }
     mesh_changed = true;
@@ -184,6 +196,10 @@ void EquationSystems::reinit ()
             {
               sys.get_dof_map().distribute_dofs(_mesh);
               sys.get_dof_map().create_dof_constraints(_mesh);
+              sys.user_constrain();
+              sys.get_dof_map().process_constraints();
+              sys.get_dof_map().prepare_send_list();
+
             }
           sys.restrict_vectors();
         }
@@ -207,6 +223,10 @@ void EquationSystems::reinit ()
             {
               sys.get_dof_map().distribute_dofs(_mesh);
               sys.get_dof_map().create_dof_constraints(_mesh);
+              sys.user_constrain();
+              sys.get_dof_map().process_constraints();
+              sys.get_dof_map().prepare_send_list();
+
             }
           sys.prolong_vectors();
         }
