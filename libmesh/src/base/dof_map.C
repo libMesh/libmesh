@@ -732,13 +732,10 @@ void DofMap::distribute_dofs (MeshBase& mesh)
   // each element.
   this->add_neighbors_to_send_list(mesh);
   
-  // Strongly enforcing constraint equations may require us to know
-  // constraint dependency dofs that aren't even on our immediate
-  // neighbor elements
-  this->add_constraints_to_send_list(mesh);
-
-  // Here we need to clean up that data structure
-  this->sort_send_list ();
+  // Here we used to clean up that data structure; now System and
+  // EquationSystems call that for us, after we've added constraint
+  // dependencies to the send_list too.
+  // this->sort_send_list ();
 }
 
 
@@ -1037,9 +1034,9 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 
 
 
-void DofMap::sort_send_list ()
+void DofMap::prepare_send_list ()
 {
-  START_LOG("sort_send_list()", "DofMap");
+  START_LOG("prepare_send_list()", "DofMap");
   
   // First sort the send list.  After this
   // duplicated elements will be adjacent in the
@@ -1054,7 +1051,7 @@ void DofMap::sort_send_list ()
   // from Effective STL
   std::vector<unsigned int> (_send_list.begin(), new_end).swap (_send_list);
   
-  STOP_LOG("sort_send_list()", "DofMap");
+  STOP_LOG("prepare_send_list()", "DofMap");
 }
 
 
