@@ -143,6 +143,8 @@ void _init (int &argc, char** & argv,
     libMesh::libMeshPrivateData::_n_threads = 
       libMesh::command_line_value ("--n_threads", 1);
 
+    std::cout<<"Setting n_threads to: "<<libMesh::libMeshPrivateData::_n_threads<<std::endl;
+
     task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
   }
 

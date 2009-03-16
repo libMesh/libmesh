@@ -587,7 +587,7 @@ endif
 
 %.$(obj-suffix) : %.f
 	@echo "Compiling Fortan (in "$(mode)" mode) "$<"..."
-	@$(libmesh_F77) $(libmesh_FFLAGS) $(libmesh_INCLUDE) $(libmesh_FLIBS) -c $< -o $@
+	@$(libmesh_F77) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 ###############################################################################
 
