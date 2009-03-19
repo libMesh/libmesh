@@ -91,6 +91,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	libmesh_assert (nx != 0);
 	libmesh_assert (ny == 0);
 	libmesh_assert (nz == 0);
+	libmesh_assert (xmin < xmax);
 
         // Reserve elements
         switch (type)
@@ -357,6 +358,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	libmesh_assert (nx != 0);
 	libmesh_assert (ny != 0);
 	libmesh_assert (nz == 0);
+	libmesh_assert (xmin < xmax);
+	libmesh_assert (ymin < ymax);
 
 	// Reserve elements.  The TRI3 and TRI6 meshes
 	// have twice as many elements...
@@ -707,6 +710,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	libmesh_assert (nx != 0);
 	libmesh_assert (ny != 0);
 	libmesh_assert (nz != 0);
+	libmesh_assert (xmin < xmax);
+	libmesh_assert (ymin < ymax);
+	libmesh_assert (zmin < zmax);
 
 
 	// Reserve elements.  Meshes with prismatic elements require
