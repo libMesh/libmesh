@@ -586,6 +586,71 @@ void BoundaryInfo::build_node_list (std::vector<unsigned int>& nl,
 }
 
 
+void
+BoundaryInfo::build_node_list_from_side_list(std::vector<short int> apply_order)
+{
+  _boundary_node_id.clear();
+
+  //If they didn't specify an apply order fill one in
+  if(!apply_order.size())
+  {
+    apply_order.reserve(n_boundary_ids());
+    
+    std::set<short int>::iterator set_it = _boundary_ids.begin();
+    const std::set<short int>::iterator set_end = _boundary_ids.end();
+
+    for(; set_it != set_end; ++set_it)
+      apply_order.push_back(*set_it);
+  }
+
+  libmesh_assert(apply_order.size() == this->n_boundary_ids());
+
+  //map of ids to application order
+  std::map<short int, unsigned int> id_order;
+
+  //fill in the map
+  for(unsigned int i=0; i<apply_order.size(); i++)
+    id_order[apply_order[i]] = i;
+
+  std::multimap<const Elem*,
+                std::pair<unsigned short int,
+                          short int> >::const_iterator pos;
+  
+  //Loop over the side list
+  for (pos=_boundary_side_id.begin(); pos != _boundary_side_id.end(); ++pos)
+  {
+    //Need to loop over the sides of any possible children
+    std::vector< const Elem * > family;
+    pos->first->active_family_tree_by_side (family, pos->second.first);
+
+    for(unsigned int elem_it=0; elem_it < family.size(); elem_it++)
+    {
+      const Elem * cur_elem = family[elem_it];
+      
+      AutoPtr<Elem> side = cur_elem->build_side(pos->second.first);
+
+      //Add each node node on the side with the side's boundary id
+      for(unsigned int i=0; i<side->n_nodes(); i++)
+      {
+        Node * node = side->get_node(i);
+        
+        std::map<const Node*, short int>::iterator found = _boundary_node_id.find(node);
+
+        //If we've already assigned this node an id we need to see if this id
+        //comes after that one in the apply order
+        if(found != _boundary_node_id.end())
+        {        
+          short int cur_id_order = id_order[found->second];
+
+          if(cur_id_order < id_order[pos->second.second])
+            this->add_node(node, pos->second.second);
+        }
+        else //This node hasn't been added yet
+          this->add_node(node, pos->second.second);
+      }
+    }
+  }
+}
 
 void BoundaryInfo::build_side_list (std::vector<unsigned int>&       el,
 				    std::vector<unsigned short int>& sl,
