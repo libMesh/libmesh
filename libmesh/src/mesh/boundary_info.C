@@ -589,8 +589,6 @@ void BoundaryInfo::build_node_list (std::vector<unsigned int>& nl,
 void
 BoundaryInfo::build_node_list_from_side_list(std::vector<short int> apply_order)
 {
-  _boundary_node_id.clear();
-
   //If they didn't specify an apply order fill one in
   if(!apply_order.size())
   {
