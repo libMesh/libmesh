@@ -39,6 +39,7 @@ namespace libMeshEnums {
 			SUBSPACE,
 			ARNOLDI,
 			LANCZOS,
+			KRYLOVSCHUR,
 			// SLEPc optional packages
 			// EPSARPACK,
 			// EPSLAPACK,

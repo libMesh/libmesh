@@ -219,7 +219,10 @@ void EigenSystem::solve ()
   
 }
 
-
+void EigenSystem::adjoint_solve() {
+  std::cout<<"EigenSystem::adjoint_solve() not implemented"<<std::endl;
+  libmesh_error();
+}
 
 void EigenSystem::assemble ()
 {
