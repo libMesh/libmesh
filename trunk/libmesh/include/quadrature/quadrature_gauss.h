@@ -77,6 +77,12 @@ class QGauss : public QBase
   void dunavant_rule(const Real rule_data[][4],
 		     const unsigned int n_pts);
 
+  void dunavant_rule2(const Real* wts,
+		      const Real* a,
+		      const Real* b,
+		      const unsigned int* permutation_ids,
+		      const unsigned int n_wts);
+  
   /**
    * The Keast rule is for tets.  It takes permutation points and weights
    * in a specific format as input and fills the pre-sized _points and _weights
