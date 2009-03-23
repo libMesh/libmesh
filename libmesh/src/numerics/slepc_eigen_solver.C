@@ -45,9 +45,10 @@ void SlepcEigenSolver<T>::clear ()
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
       // SLEPc default eigenproblem solver
-#if SLEPC_VERSION_LESS_THAN(3,0,0)
+#if SLEPC_VERSION_LESS_THAN(2,3,2)
     this->_eigen_solver_type = ARNOLDI;
 #else
+    // Krylov-Schur showed up as of Slepc 2.3.2
     this->_eigen_solver_type = KRYLOVSCHUR;
 #endif	     
     }
@@ -375,8 +376,8 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
       ierr = EPSSetType (_eps, (char*) EPSARNOLDI);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
     case LANCZOS:
       ierr = EPSSetType (_eps, (char*) EPSLANCZOS);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-#if !SLEPC_VERSION_LESS_THAN(3,0,0)
-      // EPSKRYLOVSCHUR added in 3.0.0?
+#if !SLEPC_VERSION_LESS_THAN(2,3,2)
+      // EPSKRYLOVSCHUR added in 2.3.2
     case KRYLOVSCHUR:
       ierr = EPSSetType (_eps, (char*) EPSKRYLOVSCHUR);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 #endif

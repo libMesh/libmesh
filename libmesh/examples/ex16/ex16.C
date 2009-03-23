@@ -47,7 +47,6 @@
 #include "sparse_matrix.h"
 #include "numeric_vector.h"
 #include "dof_map.h"
-#include "slepc_eigen_solver.h" // SLEPC_VERSION_LESS_THAN macro
 
 // Function prototype.  This is the function that will assemble
 // the eigen system. Here, we will simply assemble a mass matrix.
@@ -139,14 +138,13 @@ int main (int argc, char** argv)
   equation_systems.parameters.set<unsigned int>("eigenpairs")    = nev;
   equation_systems.parameters.set<unsigned int>("basis vectors") = nev*3;
 
-  // Set the eigen solver type. SLEPc offers various solvers such as
-  // the Arnoldi and subspace method. It
-  // also offers interfaces to other solver packages (e.g. ARPACK).
-#if SLEPC_VERSION_LESS_THAN(3,0,0)
-  eigen_system.eigen_solver->set_eigensolver_type(ARNOLDI);
-#else
-  eigen_system.eigen_solver->set_eigensolver_type(KRYLOVSCHUR);
-#endif	     
+  // You may optionally change the default eigensolver used by SLEPc. 
+  // The Krylov-Schur method is mathematically equivalent to implicitly
+  // restarted Arnoldi, the method of Arpack, so there is currently no
+  // point in using SLEPc with Arpack.
+  // ARNOLDI     = default in SLEPc 2.3.1 and earlier
+  // KRYLOVSCHUR default in SLEPc 2.3.2 and later
+  // eigen_system.eigen_solver->set_eigensolver_type(KRYLOVSCHUR); 
 
   // Set the solver tolerance and the maximum number of iterations. 
   equation_systems.parameters.set<Real>
