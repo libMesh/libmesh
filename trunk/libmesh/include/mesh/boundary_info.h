@@ -213,6 +213,22 @@ public:
 			std::vector<short int>&    il) const;
 
   /**
+   * WARNING: Completely clears Node boundary info!
+   *
+   * Adds nodes with boundary ids based on the side's boundary
+   * ids they are connected to.
+   *
+   * @param apply_order specifies the order to apply the boundary ids.
+   * This means that if there is a collision the boundary id specified later in
+   * the apply_order vector will "win".
+   *
+   * apply_order _must_ have the same size as n_boundary_ids()!
+   * 
+   * If no apply order is specified the order is indeterminate!
+   */
+  void build_node_list_from_side_list(std::vector<short int> apply_order = std::vector<short int>(0));
+
+  /**
    * Creates a list of element numbers, sides, and  and ids for those sides.
    */
   void build_side_list (std::vector<unsigned int>&       el,
