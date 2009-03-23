@@ -178,7 +178,88 @@ void QGauss::keast_rule(const Real rule_data[][4],
 }
 
 
+// A number of different rules for triangles can be described by
+// permutations of the following types of points:
+// I:   "1"-permutation, (1/3,1/3)  (single point only)
+// II:   3-permutation, (a,a,1-2a) 
+// III:  6-permutation, (a,b,1-a-b)
+// The weights for a given set of permutations are all the same.
+void QGauss::dunavant_rule2(const Real* wts,
+			    const Real* a,
+			    const Real* b,
+			    const unsigned int* permutation_ids,
+			    unsigned int n_wts)
+{
+  // Figure out how many total points by summing up the entries
+  // in the permutation_ids array, and resize the _points and _weights
+  // vectors appropriately.
+  unsigned int total_pts = 0;
+  for (unsigned int p=0; p<n_wts; ++p)
+    total_pts += permutation_ids[p];
 
+  // Resize point and weight vectors appropriately.
+  _points.resize(total_pts);
+  _weights.resize(total_pts);
+    
+  // Always insert into the points & weights vector relative to the offset 
+  unsigned int offset=0;
+  
+  for (unsigned int p=0; p<n_wts; ++p)
+    {
+      switch (permutation_ids[p])
+	{
+	case 1:
+	  {
+	    // The point has only a single permutation (the centroid!)
+	    // So we don't even need to look in the a or b arrays.
+	    _points [offset  + 0] = Point(1.0L/3.0L, 1.0L/3.0L);
+	    _weights[offset + 0] = wts[p];
+	    
+	    offset += 1;
+	    break;
+	  }
+
+
+	case 3:
+	  {
+	    // For this type of rule, don't need to look in the b array.
+	    _points[offset + 0] = Point(a[p],         a[p]);         // (a,a)
+	    _points[offset + 1] = Point(a[p],         1.L-2.L*a[p]); // (a,1-2a)
+	    _points[offset + 2] = Point(1.L-2.L*a[p], a[p]);         // (1-2a,a)
+
+	    for (unsigned int j=0; j<3; ++j)
+	      _weights[offset + j] = wts[p];
+	    
+	    offset += 3;
+	    break;
+	  }
+
+	case 6:
+	  {
+	    // This type of point uses all 3 arrays...
+	    _points[offset + 0] = Point(a[p], b[p]);
+	    _points[offset + 1] = Point(b[p], a[p]);
+	    _points[offset + 2] = Point(a[p], 1.L-a[p]-b[p]);
+	    _points[offset + 3] = Point(1.L-a[p]-b[p], a[p]);
+	    _points[offset + 4] = Point(b[p], 1.L-a[p]-b[p]);
+	    _points[offset + 5] = Point(1.L-a[p]-b[p], b[p]);
+
+	    for (unsigned int j=0; j<6; ++j)
+	      _weights[offset + j] = wts[p];
+	    
+	    offset += 6;
+	    break;
+	  }
+	  
+	default:
+	  {
+	    std::cerr << "Unknown permutation id: " << permutation_ids[p] << "!" << std::endl;
+	    libmesh_error();
+	  }
+	}
+    }
+  
+}
 
 
 void QGauss::dunavant_rule(const Real rule_data[][4],
