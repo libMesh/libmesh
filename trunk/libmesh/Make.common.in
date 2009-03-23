@@ -386,10 +386,14 @@ ifeq ($(enable-optional),yes)
     ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x & newer style
       include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/slepcconf
     else
-      include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/packages
-    endif
+        ifeq ($(petsc-major-minor),3.0.x)  # 3.0.x
+	    include ${SLEPC_DIR}/conf/slepc_common_variables
+        else
+            include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/packages	
+        endif
+    endif	
 
-    libmesh_INCLUDE += -I$(SLEPC_DIR)/include
+    libmesh_INCLUDE += "\${SLEPC_INCLUDE}"
 
     # Depending on petsc version, libs live in different locations
     ifeq ($(petsc-major-minor),2.3.x) # 2.3.x & newer does not use BOPT, has lib/ARCH/...

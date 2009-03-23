@@ -44,16 +44,12 @@ void SlepcEigenSolver<T>::clear ()
       ierr = EPSDestroy(_eps);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-     // For SLEPC 2.3.3 and later, also be sure to
-     // destroy the IP context
-#if !(SLEPC_VERSION_LESS_THAN(2,3,3))
-      ierr = IPDestroy(_ip);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-#endif
-	     
       // SLEPc default eigenproblem solver
-      this->_eigen_solver_type = ARNOLDI;
- 
+#if SLEPC_VERSION_LESS_THAN(3,0,0)
+    this->_eigen_solver_type = ARNOLDI;
+#else
+    this->_eigen_solver_type = KRYLOVSCHUR;
+#endif	     
     }
 }
 
@@ -73,32 +69,7 @@ void SlepcEigenSolver<T>::init ()
       // Create the eigenproblem solver context
       ierr = EPSCreate (libMesh::COMM_WORLD, &_eps);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-#if !(SLEPC_VERSION_LESS_THAN(2,3,3))
-      // For SLEPc 2.3.3 and greater, construct the inner product context
-      ierr = IPCreate (libMesh::COMM_WORLD, &_ip);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
-#endif
       
-#if SLEPC_VERSION_LESS_THAN(2,3,3)
-      // Set modified Gram-Schmidt orthogonalization as default
-      // and leave other parameters unchanged
-      EPSOrthogonalizationRefinementType refinement;
-      PetscReal eta;
-      ierr = EPSGetOrthogonalization (_eps, PETSC_NULL, &refinement, &eta);
-      ierr = EPSSetOrthogonalization (_eps, EPS_MGS_ORTH, refinement, eta);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-#else
-     // For 2.3.3 and greater, the Orthogonalization type is set
-     // to modified Graham-Schmidt in the IP object.
-     IPOrthogonalizationRefinementType refinement;
-     PetscReal eta;
-     ierr = IPGetOrthogonalization (_ip, PETSC_NULL,  &refinement, &eta);
-     ierr = IPSetOrthogonalization (_ip, IP_MGS_ORTH, refinement, eta);
-            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-#endif
-
-	     
       // Set user-specified  solver
       set_slepc_solver_type();
       
@@ -156,7 +127,11 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
   set_slepc_position_of_spectrum();
       
   // Set eigenvalues to be computed.
+#if SLEPC_VERSION_LESS_THAN(3,0,0)
   ierr = EPSSetDimensions (_eps, nev, ncv);
+#else
+  ierr = EPSSetDimensions (_eps, nev, ncv, PETSC_DECIDE);
+#endif
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
   // Set the tolerance and maximum iterations.
   ierr = EPSSetTolerances (_eps, tol, m_its);
@@ -290,7 +265,11 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
   set_slepc_position_of_spectrum();
       
   // Set eigenvalues to be computed.
+#if SLEPC_VERSION_LESS_THAN(3,0,0)
   ierr = EPSSetDimensions (_eps, nev, ncv);
+#else
+  ierr = EPSSetDimensions (_eps, nev, ncv, PETSC_DECIDE);
+#endif
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Set the tolerance and maximum iterations.
@@ -396,6 +375,11 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
       ierr = EPSSetType (_eps, (char*) EPSARNOLDI);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
     case LANCZOS:
       ierr = EPSSetType (_eps, (char*) EPSLANCZOS);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+#if !SLEPC_VERSION_LESS_THAN(3,0,0)
+      // EPSKRYLOVSCHUR added in 3.0.0?
+    case KRYLOVSCHUR:
+      ierr = EPSSetType (_eps, (char*) EPSKRYLOVSCHUR);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+#endif
       // case ARPACK:
       // ierr = EPSSetType (_eps, (char*) EPSARPACK);   CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
       

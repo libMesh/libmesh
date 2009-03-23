@@ -99,6 +99,11 @@ public:
   virtual void solve ();
 
   /**
+   * Solves the adjoint eigen system
+   */
+  virtual void adjoint_solve ();
+
+  /**
    * Assembles the system matrix. 
    */
   virtual void assemble ();

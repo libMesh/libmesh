@@ -47,6 +47,7 @@
 #include "sparse_matrix.h"
 #include "numeric_vector.h"
 #include "dof_map.h"
+#include "slepc_eigen_solver.h" // SLEPC_VERSION_LESS_THAN macro
 
 
 // Function prototype.  This is the function that will assemble
@@ -139,7 +140,11 @@ int main (int argc, char** argv)
   // Set the eigen solver type. SLEPc offers various solvers such as
   // the Arnoldi and subspace method. It
   // also offers interfaces to other solver packages (e.g. ARPACK).
+#if SLEPC_VERSION_LESS_THAN(3,0,0)
   eigen_system.eigen_solver->set_eigensolver_type(ARNOLDI);
+#else
+  eigen_system.eigen_solver->set_eigensolver_type(KRYLOVSCHUR);
+#endif	     
 
   // Set the solver tolerance and the maximum number of iterations. 
   equation_systems.parameters.set<Real>("linear solver tolerance") = pow(TOLERANCE, 5./3.);

@@ -173,17 +173,6 @@ private:
    */
   EPS _eps;
 
-  
-#if !(SLEPC_VERSION_LESS_THAN(2,3,3))
-  
-  /**
-   * For version 2.3.3 and higher SLEPc provided a separate "inner
-   * product" context for certain operations.
-   */
-  IP _ip;
-  
-#endif
-  
 };
 
 
