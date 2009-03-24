@@ -171,11 +171,24 @@ protected:
    * the system, so that, e.g., \p assemble() may be used.
    */
   virtual void init_data ();
+
+  /**
+   * Set the _n_converged_eigenpairs member, useful for
+   * subclasses of EigenSystem.
+   */
+  void set_n_converged (unsigned int nconv)
+    { _n_converged_eigenpairs = nconv; }
+
+  /**
+   * Set the _n_iterations member, useful for subclasses of
+   * EigenSystem.
+   */
+  void set_n_iterations (unsigned int its) 
+    { _n_iterations = its;}
+
  
 private:
 
- 
-  
   /**
    * The number of converged eigenpairs.
    */
@@ -187,8 +200,8 @@ private:
   unsigned int _n_iterations;
   
   /**
-   * A bool indecation wheather we are dealing with a generalized
-   * eigenvalue problem.
+   * A boolean flag to indicate whether we are dealing with
+   * a generalized eigenvalue problem.
    */
   bool _is_generalized_eigenproblem;
   
