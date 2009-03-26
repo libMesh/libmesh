@@ -149,6 +149,14 @@ public:
    * Set all entries to 0.
    */
   virtual void zero () = 0;
+
+  /**
+   * Set all row entries to 0 then puts diag_value in the diagonal entry
+   */
+  virtual void zeroRows (std::vector<int> & rows, T diag_value = 0.0)
+  {
+    libmesh_not_implemented();
+  }
   
   /**
    * Call the Sparse assemble routines.
