@@ -188,7 +188,18 @@ void PetscMatrix<T>::zero ()
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
+template <typename T>
+void PetscMatrix<T>::zeroRows (std::vector<int> & rows, T diag_value)
+{
+  libmesh_assert (this->initialized());
 
+  semiparallel_only();
+
+  int ierr=0;
+
+  ierr = MatZeroRows(_mat, rows.size(), &rows[0], diag_value);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+}
 
 template <typename T>
 void PetscMatrix<T>::clear ()
