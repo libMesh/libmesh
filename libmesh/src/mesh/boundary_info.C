@@ -638,7 +638,7 @@ BoundaryInfo::build_node_list_from_side_list(std::vector<short int> apply_order)
         //comes after that one in the apply order
         if(found != _boundary_node_id.end())
         {        
-          short int cur_id_order = id_order[found->second];
+          unsigned int cur_id_order = id_order[found->second];
 
           if(cur_id_order < id_order[pos->second.second])
             this->add_node(node, pos->second.second);
