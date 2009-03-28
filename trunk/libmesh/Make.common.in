@@ -393,7 +393,7 @@ ifeq ($(enable-optional),yes)
         endif
     endif	
 
-    libmesh_INCLUDE += "\${SLEPC_INCLUDE}"
+    libmesh_INCLUDE += -I$(SLEPC_DIR)/include
 
     # Depending on petsc version, libs live in different locations
     ifeq ($(petsc-major-minor),2.3.x) # 2.3.x & newer does not use BOPT, has lib/ARCH/...
