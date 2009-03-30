@@ -153,7 +153,7 @@ public:
   /**
    * Set all row entries to 0 then puts diag_value in the diagonal entry
    */
-  virtual void zeroRows (std::vector<int> & rows, T diag_value = 0.0)
+  virtual void zero_rows (std::vector<int> & rows, T diag_value = 0.0)
   {
     libmesh_not_implemented();
   }
