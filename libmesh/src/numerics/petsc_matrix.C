@@ -189,7 +189,7 @@ void PetscMatrix<T>::zero ()
 }
 
 template <typename T>
-void PetscMatrix<T>::zeroRows (std::vector<int> & rows, T diag_value)
+void PetscMatrix<T>::zero_rows (std::vector<int> & rows, T diag_value)
 {
   libmesh_assert (this->initialized());
 

@@ -146,7 +146,7 @@ public:
   /**
    * Set all row entries to 0 then puts diag_value in the diagonal entry
    */
-  void zeroRows (std::vector<int> & rows, T diag_value = 0.0);
+  void zero_rows (std::vector<int> & rows, T diag_value = 0.0);
   
   /**
    * Call the Petsc assemble routines.
