@@ -105,6 +105,15 @@ void SparseMatrix<T>::vector_mult_add (NumericVector<T>& dest,
 
 
 template <typename T>
+void SparseMatrix<T>::zero_rows (std::vector<int> &, T)
+{
+  /* This functionality isn't implemented or stubbed in every subclass yet */
+  libmesh_not_implemented();
+}
+
+  
+
+template <typename T>
 inline
 void SparseMatrix<T>::print(std::ostream& os) const
 {
