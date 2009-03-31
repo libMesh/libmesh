@@ -557,6 +557,40 @@ public:
   std::pair<Real, Real> max_constraint_error(const System &system,
 					     NumericVector<Number> *v = NULL) const;
 
+#else
+  //--------------------------------------------------------------------
+  // Constraint-specific methods get inlined into nothing if
+  // constraints are disabled, so there's no reason for users not to 
+  // use them.
+
+  inline
+  void constrain_element_matrix (DenseMatrix<Number>&,
+				 std::vector<unsigned int>&,
+				 bool asymmetric_constraint_rows = true) const {}
+  
+  inline
+  void constrain_element_matrix (DenseMatrix<Number>&,
+				 std::vector<unsigned int>&,
+				 std::vector<unsigned int>&,
+				 bool asymmetric_constraint_rows = true) const {}
+  
+  inline
+  void constrain_element_vector (DenseVector<Number>&,
+				 std::vector<unsigned int>&,
+				 bool asymmetric_constraint_rows = true) const {}
+  
+  inline
+  void constrain_element_matrix_and_vector (DenseMatrix<Number>&,
+					    DenseVector<Number>&,
+					    std::vector<unsigned int>&,
+					    bool asymmetric_constraint_rows = true) const {}
+
+  inline
+  void constrain_element_dyad_matrix (DenseVector<Number>&,
+				      DenseVector<Number>&,
+				      std::vector<unsigned int>&,
+				      bool asymmetric_constraint_rows = true) const {}
+
 #endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
 
