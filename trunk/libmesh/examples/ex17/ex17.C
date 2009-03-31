@@ -258,11 +258,14 @@ void assemble_mass(EquationSystems& es,
   std::vector<unsigned int> dof_indices;
 
 
-  // Now we will loop over all the elements in the mesh.
-  // We will compute the element matrix contribution.
-
-  MeshBase::const_element_iterator       el     = mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.elements_end();
+  // Now we will loop over all the elements in the mesh that
+  // live on the local processor. We will compute the element
+  // matrix and right-hand-side contribution.  In case users
+  // later modify this program to include refinement, we will
+  // be safe and will only consider the active elements;
+  // hence we use a variant of the \p active_elem_iterator.
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
  
   for ( ; el != end_el; ++el)
     {
@@ -304,6 +307,18 @@ void assemble_mass(EquationSystems& es,
               Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
               Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
             }
+
+      // On an unrefined mesh, constrain_element_matrix does
+      // nothing.  If this assembly function is ever repurposed to
+      // run on a refined mesh, getting the hanging node constraints
+      // right will be important.  Note that, even with
+      // asymmetric_constraint_rows = false, the constrained dof
+      // diagonals still exist in the matrix, with diagonal entries
+      // that are there to ensure non-singular matrices for linear
+      // solves but which would generate positive non-physical
+      // eigenvalues for eigensolves.
+      // dof_map.constrain_element_matrix(Ke, dof_indices, false);
+      // dof_map.constrain_element_matrix(Me, dof_indices, false);
 
       // Finally, simply add the element contribution to the
       // overall matrices A and B.

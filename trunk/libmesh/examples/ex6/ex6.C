@@ -282,11 +282,8 @@ void assemble_wave(EquationSystems& es,
   // Now we will loop over all the elements in the mesh.
   // We will compute the element matrix and right-hand-side
   // contribution.
-  //   const_local_elem_iterator           el (mesh.elements_begin());
-  //   const const_local_elem_iterator end_el (mesh.elements_end());
-
-  MeshBase::const_element_iterator           el = mesh.local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
+  MeshBase::const_element_iterator           el = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
   
   for ( ; el != end_el; ++el)
     {      
@@ -455,6 +452,10 @@ void assemble_wave(EquationSystems& es,
       // The \p SparseMatrix::add_matrix() member does this for us.
       Ke.add(1./speed        , Ce);
       Ke.add(1./(speed*speed), Me);
+
+      // If this assembly program were to be used on an adaptive mesh,
+      // we would have to apply any hanging node constraint equations
+      dof_map.constrain_element_matrix(Ke, dof_indices);
 
       system.matrix->add_matrix (Ke, dof_indices);
     } // end of element loop

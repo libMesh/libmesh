@@ -357,14 +357,9 @@ void assemble_poisson(EquationSystems& es,
   // Now we will loop over all the elements in the mesh.
   // We will compute the element matrix and right-hand-side
   // contribution.  See example 3 for a discussion of the
-  // element iterators.  Here we use the \p const_local_elem_iterator
-  // to indicate we only want to loop over elements that are assigned
-  // to the local processor.  This allows each processor to compute
-  // its components of the global matrix.
-  //
-  // "PARALLEL CHANGE"
-  MeshBase::const_element_iterator       el     = mesh.local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
+  // element iterators.
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
   for ( ; el != end_el; ++el)
     {
@@ -555,11 +550,14 @@ void assemble_poisson(EquationSystems& es,
         perf_log.pop ("BCs");
       } 
       
+      // If this assembly program were to be used on an adaptive mesh,
+      // we would have to apply any hanging node constraint equations
+      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The \p PetscMatrix::add_matrix()
-      // and \p PetscVector::add_vector() members do this for us.
+      // right-hand-side vector.  The \p SparseMatrix::add_matrix()
+      // and \p NumericVector::add_vector() members do this for us.
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
       perf_log.push ("matrix insertion");

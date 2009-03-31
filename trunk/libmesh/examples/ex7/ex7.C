@@ -371,8 +371,8 @@ void assemble_helmholtz(EquationSystems& es,
   // We will compute the element matrix and right-hand-side
   // contribution.
 
-  MeshBase::const_element_iterator           el = mesh.local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
+  MeshBase::const_element_iterator           el = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
   
   for ( ; el != end_el; ++el)
     {
@@ -488,6 +488,15 @@ void assemble_helmholtz(EquationSystems& es,
 
             STOP_LOG("damping","assemble_helmholtz");
           }
+
+      // If this assembly program were to be used on an adaptive mesh,
+      // we would have to apply any hanging node constraint equations
+      // by uncommenting the following lines:
+      // std::vector<unsigned int> dof_indicesC = dof_indices;
+      // std::vector<unsigned int> dof_indicesM = dof_indices;
+      // dof_map.constrain_element_matrix (Ke, dof_indices);
+      // dof_map.constrain_element_matrix (Ce, dof_indicesC);
+      // dof_map.constrain_element_matrix (Me, dof_indicesM);
 
      
       // Finally, simply add the contributions to the additional

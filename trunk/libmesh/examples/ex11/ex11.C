@@ -218,11 +218,10 @@ void assemble_stokes (EquationSystems& es,
   
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
-  // matrix and right-hand-side contribution.  Since the mesh
-  // will be refined we want to only consider the ACTIVE elements,
-  // hence we use a variant of the \p active_elem_iterator.
-//   const_active_local_elem_iterator           el (mesh.elements_begin());
-//   const const_active_local_elem_iterator end_el (mesh.elements_end());
+  // matrix and right-hand-side contribution.  In case users later
+  // modify this program to include refinement, we will be safe and
+  // will only consider the active elements; hence we use a variant of
+  // the \p active_elem_iterator.
 
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
@@ -387,10 +386,14 @@ void assemble_stokes (EquationSystems& es,
             } // end if (elem->neighbor(side) == NULL)
       } // end boundary condition section          
       
+      // If this assembly program were to be used on an adaptive mesh,
+      // we would have to apply any hanging node constraint equations.
+      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The \p PetscMatrix::add_matrix()
-      // and \p PetscVector::add_vector() members do this for us.
+      // right-hand-side vector.  The \p NumericMatrix::add_matrix()
+      // and \p NumericVector::add_vector() members do this for us.
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     } // end of element loop
