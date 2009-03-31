@@ -332,8 +332,20 @@ void BoundaryInfo::add_node(const Node* node,
 
       libmesh_error();
     }
+
+  // A convenient typedef
+  typedef std::multimap<const Node*, short int>::const_iterator Iter;
+	      
+  // Don't add the same ID twice
+  std::pair<Iter, Iter> pos = _boundary_node_id.equal_range(node);
+
+  for (;pos.first != pos.second; ++pos.first)
+    if (pos.first->second == id)
+      return;
+
+  std::pair<const Node*, short int> kv (node, id);
   
-  _boundary_node_id[node] = id;
+  _boundary_node_id.insert(kv);
   _boundary_ids.insert(id);
 }
 
@@ -388,16 +400,20 @@ void BoundaryInfo::add_side(const Elem* elem,
 
 
 
-short int BoundaryInfo::boundary_id(const Node* node) const
-{ 
-  std::map<const Node*, short int>::const_iterator
-    n = _boundary_node_id.find(node);
+std::vector<short int> BoundaryInfo::boundary_ids(const Node* node) const
+{
+  std::vector<short int> ids;
+  
+  // A convenient typedef
+  typedef std::multimap<const Node*, short int>::const_iterator Iter;
+	      
+  // Don't add the same ID twice
+  std::pair<Iter, Iter> pos = _boundary_node_id.equal_range(node);
 
-  // node not in the data structure
-  if (n == _boundary_node_id.end())
-    return invalid_id;
+  for (;pos.first != pos.second; ++pos.first)
+    ids.push_back(pos.first->second);
 
-  return n->second;
+  return ids;
 }
 
 

@@ -300,11 +300,14 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		nodes_sent[pid].push_back(Node::PackedNode(**node_it));
 
 		// add the node if it has BCs
-		if (mesh.boundary_info->boundary_id(*node_it) !=
-		    mesh.boundary_info->invalid_id)
+                std::vector<short int> bcs = mesh.boundary_info->boundary_ids(*node_it);
+                
+		if (!bcs.empty())
 		  {
 		    node_bcs_sent[pid].push_back((*node_it)->id());
-		    node_bcs_sent[pid].push_back(mesh.boundary_info->boundary_id(*node_it));
+		    node_bcs_sent[pid].push_back(bcs.size());
+                    for(unsigned int bc_it=0; bc_it < bcs.size(); bc_it++)
+                      node_bcs_sent[pid].push_back(bcs[bc_it]);
 		  }
 	      }
 
@@ -506,10 +509,12 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	while (cnt < buffer_size)
 	  {
 	    const unsigned int node_id = received_node_bcs[cnt++];
-	    const int bc_id            = received_node_bcs[cnt++];
+	    const unsigned int num_bcs = received_node_bcs[cnt++];
 
-	    libmesh_assert (mesh.node_ptr(node_id));
-	    mesh.boundary_info->add_node (mesh.node_ptr(node_id), bc_id);
+            libmesh_assert (mesh.node_ptr(node_id));
+            
+            for(unsigned int bc_it; bc_it < num_bcs; bc_it++)
+              mesh.boundary_info->add_node (mesh.node_ptr(node_id), received_node_bcs[cnt++]);
 	  }	
       }
   }
@@ -1000,11 +1005,14 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 		nodes_sent[n_node_replies_sent].push_back (Node::PackedNode(**node_it));
 		
 		// add the node if it has BCs
-		if (mesh.boundary_info->boundary_id(*node_it) !=
-		    mesh.boundary_info->invalid_id)
+                std::vector<short int> bcs = mesh.boundary_info->boundary_ids(*node_it);
+                
+		if (!bcs.empty())
 		  {
-		    node_bcs_sent.push_back ((*node_it)->id());
-		    node_bcs_sent.push_back (mesh.boundary_info->boundary_id(*node_it));
+		    node_bcs_sent.push_back((*node_it)->id());
+		    node_bcs_sent.push_back(bcs.size());
+                    for(unsigned int bc_it=0; bc_it < bcs.size(); bc_it++)
+                      node_bcs_sent.push_back(bcs[bc_it]);
 		  }
 	      }
 	    connected_nodes.clear();
@@ -1020,7 +1028,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	    // let's pack the node bc data in the front of the element
 	    // connectivity buffer
 	    const unsigned int
-	      n_node_bcs_sent = node_bcs_sent.size() / 2;
+	      n_node_bcs_sent = node_bcs_sent.size();
 	    
 	    elements_sent[n_elem_replies_sent].clear();
 	    elements_sent[n_elem_replies_sent].insert (elements_sent[n_elem_replies_sent].end(),
@@ -1139,13 +1147,15 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	  unsigned int cnt=0;
 	  
 	  // add any node bcs
-	  while (cnt < 2*n_node_bcs_received)
+	  while (cnt < n_node_bcs_received)
 	    {
-	      const unsigned int node_id = elements_received[cnt++];
-	      const int bc_id            = elements_received[cnt++];
-	  
-	      libmesh_assert (mesh.node_ptr(node_id));
-	      mesh.boundary_info->add_node (mesh.node_ptr(node_id), bc_id);
+              const unsigned int node_id = elements_received[cnt++];
+              const unsigned int num_bcs = elements_received[cnt++];
+
+              libmesh_assert (mesh.node_ptr(node_id));
+            
+              for(unsigned int bc_it; bc_it < num_bcs; bc_it++)
+                mesh.boundary_info->add_node (mesh.node_ptr(node_id), elements_received[cnt++]);
 	    }
       
 	  // add the elements we just received

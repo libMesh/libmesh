@@ -174,11 +174,9 @@ public:
   unsigned int n_boundary_ids () const { return _boundary_ids.size(); }
 
   /**
-   * Returns the boundary id associated with \p Node \p node.
-   * Returns \p invalid_id if the node is not found, so \p invalid_id
-   * can be thought of as a "default" boundary id.
+   * Returns the boundary ids associated with \p Node \p node.
    */
-  short int boundary_id (const Node* node) const;
+  std::vector<short int> boundary_ids (const Node* node) const;
 
   /**
    * Returns the boundary id associated with the \p side side of
@@ -263,8 +261,8 @@ public:
    * Data structure that maps nodes in the mesh
    * to boundary ids.
    */  
-  std::map<const Node*,
-	   short int> _boundary_node_id;
+  std::multimap<const Node*,
+                short int> _boundary_node_id;
 
   /**
    * Data structure that maps sides of elements
