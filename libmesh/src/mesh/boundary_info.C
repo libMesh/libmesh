@@ -591,7 +591,7 @@ void BoundaryInfo::build_node_list (std::vector<unsigned int>& nl,
   nl.reserve (_boundary_node_id.size());
   il.reserve (_boundary_node_id.size());
   
-  std::map<const Node*, short int>::const_iterator pos
+  std::multimap<const Node*, short int>::const_iterator pos
     = _boundary_node_id.begin();
 
   for (; pos != _boundary_node_id.end(); ++pos)
@@ -648,19 +648,7 @@ BoundaryInfo::build_node_list_from_side_list(std::vector<short int> apply_order)
       {
         Node * node = side->get_node(i);
         
-        std::map<const Node*, short int>::iterator found = _boundary_node_id.find(node);
-
-        //If we've already assigned this node an id we need to see if this id
-        //comes after that one in the apply order
-        if(found != _boundary_node_id.end())
-        {        
-          unsigned int cur_id_order = id_order[found->second];
-
-          if(cur_id_order < id_order[pos->second.second])
-            this->add_node(node, pos->second.second);
-        }
-        else //This node hasn't been added yet
-          this->add_node(node, pos->second.second);
+        this->add_node(node, pos->second.second);
       }
     }
   }
@@ -703,8 +691,8 @@ void BoundaryInfo::print_info() const
 // 		    _boundary_node_id.end(),
 // 		    PrintNodeInfo());
 
-      std::map<const Node*, short int>::const_iterator it        = _boundary_node_id.begin();
-      const std::map<const Node*, short int>::const_iterator end = _boundary_node_id.end();
+      std::multimap<const Node*, short int>::const_iterator it        = _boundary_node_id.begin();
+      const std::multimap<const Node*, short int>::const_iterator end = _boundary_node_id.end();
 
       for (; it != end; ++it)
 	std::cout << "  (" << (*it).first->id()
