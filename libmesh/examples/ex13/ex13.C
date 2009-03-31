@@ -576,7 +576,7 @@ void assemble_stokes (EquationSystems& es,
       // the matrix resulting from the L2 projection penalty
       // approach introduced in example 3.
       {
-        // The penalty value.  \f$ \frac{1}{\epsilon \f$
+        // The penalty value.  \f$ \frac{1}{\epsilon} \f$
         const Real penalty = 1.e10;
                   
         // The following loops over the sides of the element.
@@ -643,6 +643,10 @@ void assemble_stokes (EquationSystems& es,
           }
       } // end boundary condition section          
       
+      // If this assembly program were to be used on an adaptive mesh,
+      // we would have to apply any hanging node constraint equations
+      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The \p PetscMatrix::add_matrix()

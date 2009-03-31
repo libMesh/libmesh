@@ -291,11 +291,8 @@ void assemble_poisson(EquationSystems& es,
   
   // Now we will loop over all the elements in the mesh.
   // See example 3 for details.
-//   const_elem_iterator           el (mesh.elements_begin());
-//   const const_elem_iterator end_el (mesh.elements_end());
-
-  MeshBase::const_element_iterator       el     = mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.elements_end();
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
   
   for ( ; el != end_el; ++el)
     {
@@ -414,14 +411,14 @@ void assemble_poisson(EquationSystems& es,
             } // end if (elem->neighbor(side) == NULL)
       } // end boundary condition section          
       
-      
-      
-      
+      // If this assembly program were to be used on an adaptive mesh,
+      // we would have to apply any hanging node constraint equations
+      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
       
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The \p PetscMatrix::add_matrix()
-      // and \p PetscVector::add_vector() members do this for us.
+      // right-hand-side vector.  The \p SparseMatrix::add_matrix()
+      // and \p NumericVector::add_vector() members do this for us.
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
       

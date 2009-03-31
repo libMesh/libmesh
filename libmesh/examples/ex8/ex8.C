@@ -430,11 +430,8 @@ void assemble_wave(EquationSystems& es,
   // Now we will loop over all the elements in the mesh.
   // We will compute the element matrix and right-hand-side
   // contribution.
-//   const_elem_iterator           el (mesh.elements_begin());
-//   const const_elem_iterator end_el (mesh.elements_end());
-
-  MeshBase::const_element_iterator       el     = mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.elements_end();
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
   
   for ( ; el != end_el; ++el)
     {
@@ -546,6 +543,15 @@ void assemble_wave(EquationSystems& es,
         // system is assembled.
         
       } // end boundary condition section          
+
+      // If this assembly program were to be used on an adaptive mesh,
+      // we would have to apply any hanging node constraint equations
+      // by uncommenting the following lines:
+      // std::vector<unsigned int> dof_indicesC = dof_indices;
+      // std::vector<unsigned int> dof_indicesM = dof_indices;
+      // dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+      // dof_map.constrain_element_matrix (Ce, dof_indicesC);
+      // dof_map.constrain_element_matrix (Me, dof_indicesM);
 
       // Finally, simply add the contributions to the additional
       // matrices and vector.

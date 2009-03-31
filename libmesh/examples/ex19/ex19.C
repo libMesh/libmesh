@@ -141,7 +141,8 @@ void compute_jacobian (const NumericVector<Number>& soln,
   // the element degrees of freedom get mapped.
   std::vector<unsigned int> dof_indices;
 
-  // Now we will loop over all the elements in the mesh.
+  // Now we will loop over all the active elements in the mesh which
+  // are local to this processor.
   // We will compute the element Jacobian contribution.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
@@ -280,7 +281,8 @@ void compute_residual (const NumericVector<Number>& soln,
   // the element degrees of freedom get mapped.
   std::vector<unsigned int> dof_indices;
 
-  // Now we will loop over all the elements in the mesh.
+  // Now we will loop over all the active elements in the mesh which
+  // are local to this processor.
   // We will compute the element residual.
   residual.zero();
 
