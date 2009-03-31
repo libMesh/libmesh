@@ -513,7 +513,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 
             libmesh_assert (mesh.node_ptr(node_id));
             
-            for(unsigned int bc_it; bc_it < num_bcs; bc_it++)
+            for(unsigned int bc_it=0; bc_it < num_bcs; bc_it++)
               mesh.boundary_info->add_node (mesh.node_ptr(node_id), received_node_bcs[cnt++]);
 	  }	
       }
@@ -1154,7 +1154,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 
               libmesh_assert (mesh.node_ptr(node_id));
             
-              for(unsigned int bc_it; bc_it < num_bcs; bc_it++)
+              for(unsigned int bc_it=0; bc_it < num_bcs; bc_it++)
                 mesh.boundary_info->add_node (mesh.node_ptr(node_id), elements_received[cnt++]);
 	    }
       
