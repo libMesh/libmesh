@@ -651,7 +651,7 @@ void DofMap::distribute_dofs (MeshBase& mesh)
   const unsigned int proc_id = libMesh::processor_id();
   const unsigned int n_proc  = libMesh::n_processors();
   
-  libmesh_assert (this->n_variables() > 0);
+//  libmesh_assert (this->n_variables() > 0);
   libmesh_assert (proc_id < n_proc);
   
   // re-init in case the mesh has changed
