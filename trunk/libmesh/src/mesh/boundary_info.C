@@ -614,7 +614,11 @@ BoundaryInfo::build_node_list_from_side_list()
   {
     //Need to loop over the sides of any possible children
     std::vector< const Elem * > family;
+#ifdef LIBMESH_ENABLE_AMR
     pos->first->active_family_tree_by_side (family, pos->second.first);
+#else
+    family.push_back(pos->first);
+#endif
 
     for(unsigned int elem_it=0; elem_it < family.size(); elem_it++)
     {
