@@ -470,6 +470,31 @@ public:
   bool is_constrained_dof (const unsigned int dof) const;
   
   /**
+   * Prints the \p _dof_constraints data structure.
+   */
+  void print_dof_constraints(std::ostream& os=std::cout) const;
+
+  /**
+   * Tests the constrained degrees of freedom on the numeric vector \p v, which
+   * represents a solution defined on the mesh, returning a pair whose first
+   * entry is the maximum absolute error on a constrained DoF and whose second
+   * entry is the maximum relative error.  Useful for debugging purposes.
+   *
+   * If \p v == NULL, the system solution vector is tested.
+   */
+  std::pair<Real, Real> max_constraint_error(const System &system,
+					     NumericVector<Number> *v = NULL) const;
+
+#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
+
+  //--------------------------------------------------------------------
+  // Constraint-specific methods
+  // Some of these methods are enabled (but inlined away to nothing)
+  // when constraints are disabled at configure-time.  This is to
+  // increase API compatibility of user code with different library
+  // builds.
+
+  /**
    * Constrains the element matrix.  This method requires the
    * element matrix to be square, in which case the elem_dofs
    * correspond to the global DOF indices of both the rows and
@@ -541,58 +566,6 @@ public:
   void enforce_constraints_exactly (const System &system,
 				    NumericVector<Number> *v = NULL) const;
   
-  /**
-   * Prints the \p _dof_constraints data structure.
-   */
-  void print_dof_constraints(std::ostream& os=std::cout) const;
-
-  /**
-   * Tests the constrained degrees of freedom on the numeric vector \p v, which
-   * represents a solution defined on the mesh, returning a pair whose first
-   * entry is the maximum absolute error on a constrained DoF and whose second
-   * entry is the maximum relative error.  Useful for debugging purposes.
-   *
-   * If \p v == NULL, the system solution vector is tested.
-   */
-  std::pair<Real, Real> max_constraint_error(const System &system,
-					     NumericVector<Number> *v = NULL) const;
-
-#else
-  //--------------------------------------------------------------------
-  // Constraint-specific methods get inlined into nothing if
-  // constraints are disabled, so there's no reason for users not to 
-  // use them.
-
-  inline
-  void constrain_element_matrix (DenseMatrix<Number>&,
-				 std::vector<unsigned int>&,
-				 bool asymmetric_constraint_rows = true) const {}
-  
-  inline
-  void constrain_element_matrix (DenseMatrix<Number>&,
-				 std::vector<unsigned int>&,
-				 std::vector<unsigned int>&,
-				 bool asymmetric_constraint_rows = true) const {}
-  
-  inline
-  void constrain_element_vector (DenseVector<Number>&,
-				 std::vector<unsigned int>&,
-				 bool asymmetric_constraint_rows = true) const {}
-  
-  inline
-  void constrain_element_matrix_and_vector (DenseMatrix<Number>&,
-					    DenseVector<Number>&,
-					    std::vector<unsigned int>&,
-					    bool asymmetric_constraint_rows = true) const {}
-
-  inline
-  void constrain_element_dyad_matrix (DenseVector<Number>&,
-				      DenseVector<Number>&,
-				      std::vector<unsigned int>&,
-				      bool asymmetric_constraint_rows = true) const {}
-
-#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
-
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
@@ -999,5 +972,38 @@ PeriodicBoundary *PeriodicBoundaries::boundary(unsigned int id)
 
 #endif // LIBMESH_ENABLE_PERIODIC
 
+#if !defined(LIBMESH_ENABLE_AMR) && !defined(LIBMESH_ENABLE_PERIODIC)
+  //--------------------------------------------------------------------
+  // Constraint-specific methods get inlined into nothing if
+  // constraints are disabled, so there's no reason for users not to 
+  // use them.
+
+inline void DofMap::constrain_element_matrix (DenseMatrix<Number>&,
+				              std::vector<unsigned int>&,
+				              bool) const {}
+  
+inline void DofMap::constrain_element_matrix (DenseMatrix<Number>&,
+				              std::vector<unsigned int>&,
+				              std::vector<unsigned int>&,
+				              bool) const {}
+  
+inline void DofMap::constrain_element_vector (DenseVector<Number>&,
+				              std::vector<unsigned int>&,
+				              bool) const {}
+  
+inline void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>&,
+					                 DenseVector<Number>&,
+					                 std::vector<unsigned int>&,
+					                 bool) const {}
+
+inline void DofMap::constrain_element_dyad_matrix (DenseVector<Number>&,
+				                   DenseVector<Number>&,
+				                   std::vector<unsigned int>&,
+				                   bool) const {}
+
+inline void DofMap::enforce_constraints_exactly (const System &,
+				                 NumericVector<Number> *) const {}
+
+#endif // !defined(LIBMESH_ENABLE_AMR) && !defined(LIBMESH_ENABLE_PERIODIC)
 
 #endif // __dof_map_h__
