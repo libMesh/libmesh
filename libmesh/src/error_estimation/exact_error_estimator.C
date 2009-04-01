@@ -92,9 +92,15 @@ void ExactErrorEstimator::attach_reference_solution (EquationSystems* es_fine)
   _exact_hessian = NULL;
 }
 
+#ifdef LIBMESH_ENABLE_AMR
 void ExactErrorEstimator::estimate_error (const System& system,
 					  ErrorVector& error_per_cell,
 					  bool estimate_parent_error)
+#else
+void ExactErrorEstimator::estimate_error (const System& system,
+					  ErrorVector& error_per_cell,
+					  bool /* estimate_parent_error */ )
+#endif
 {
   // The current mesh
   const MeshBase& mesh = system.get_mesh();
