@@ -603,29 +603,8 @@ void BoundaryInfo::build_node_list (std::vector<unsigned int>& nl,
 
 
 void
-BoundaryInfo::build_node_list_from_side_list(std::vector<short int> apply_order)
+BoundaryInfo::build_node_list_from_side_list()
 {
-  //If they didn't specify an apply order fill one in
-  if(!apply_order.size())
-  {
-    apply_order.reserve(n_boundary_ids());
-    
-    std::set<short int>::iterator set_it = _boundary_ids.begin();
-    const std::set<short int>::iterator set_end = _boundary_ids.end();
-
-    for(; set_it != set_end; ++set_it)
-      apply_order.push_back(*set_it);
-  }
-
-  libmesh_assert(apply_order.size() == this->n_boundary_ids());
-
-  //map of ids to application order
-  std::map<short int, unsigned int> id_order;
-
-  //fill in the map
-  for(unsigned int i=0; i<apply_order.size(); i++)
-    id_order[apply_order[i]] = i;
-
   std::multimap<const Elem*,
                 std::pair<unsigned short int,
                           short int> >::const_iterator pos;
