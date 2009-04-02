@@ -249,8 +249,53 @@ void QGauss::init_2D(const ElemType _type,
 	    }
 
 
+	    
+	    // A degree 6 rule with 12 points.  This rule can be found in many places
+	    // including:
+	    //
+	    // J.N. Lyness and D. Jespersen, Moderate degree symmetric
+	    // quadrature rules for the triangle, J. Inst. Math. Appl.  15 (1975),
+	    // 19--32.
+	    //
+	    // We used the code in: 
+	    // L. Zhang, T. Cui, and H. Liu. "A set of symmetric quadrature rules
+	    // on triangles and tetrahedra"  Journal of Computational Mathematics,
+	    // v. 27, no. 1, 2009, pp. 89-96.
+	    // to generate additional precision.
+	    //
+	    // Note that the following 7th-order Ro3-invariant rule also has only 12 points,
+	    // which technically makes it the superior rule.  This one is here for completeness.
+	  case SIXTH:
+	    {
+	      const unsigned int n_wts = 3;
+	      const Real wts[n_wts] =
+		{
+		  5.8393137863189683012644805692789721e-02L,
+		  2.5422453185103408460468404553434492e-02L,
+		  4.1425537809186787596776728210221227e-02L
+		};
 
+	      const Real a[n_wts] =
+		{
+		  2.4928674517091042129163855310701908e-01L,
+		  6.3089014491502228340331602870819157e-02L,
+		  3.1035245103378440541660773395655215e-01L
+		};
 
+	      const Real b[n_wts] =
+		{
+		  0.,
+		  0.,
+		  6.3650249912139864723014259441204970e-01L		  
+		};
+	      
+	      const unsigned int permutation_ids[n_wts] = {3, 3, 6}; // 12 total points
+
+	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
+
+	      return;
+	    }
+	    
 	    
 	    // A degree 7 rule with 12 points.  This rule can be found in:
 	    //
@@ -275,7 +320,6 @@ void QGauss::init_2D(const ElemType _type,
 	    // precision in the points and weights.  Some 10-point
 	    // degree 6 rules exist for the triangle but they have
 	    // quadrature points outside the region of integration.
-	  case SIXTH:
 	  case SEVENTH:
 	    {
 	      _points.resize (12);
@@ -308,6 +352,38 @@ void QGauss::init_2D(const ElemType _type,
 		}
 
 	      return;
+
+	      
+// 	      // The following is an inferior 7th-order Lyness-style rule with 15 points.
+// 	      // It's here only for completeness and the Ro3-invariant rule above should
+// 	      // be used instead!
+// 	      const unsigned int n_wts = 3;
+// 	      const Real wts[n_wts] =
+// 		{
+// 		  2.6538900895116205835977487499847719e-02L,
+// 		  3.5426541846066783659206291623201826e-02L,
+// 		  3.4637341039708446756138297960207647e-02L
+// 		};
+// 
+// 	      const Real a[n_wts] =
+// 		{
+// 		  6.4930513159164863078379776030396538e-02L,
+// 		  2.8457558424917033519741605734978046e-01L,
+// 		  3.1355918438493150795585190219862865e-01L
+// 		};
+// 
+// 	      const Real b[n_wts] =
+// 		{
+// 		  0.,
+// 		  1.9838447668150671917987659863332941e-01L,
+// 		  4.3863471792372471511798695971295936e-02L		  
+// 		};
+// 	      
+// 	      const unsigned int permutation_ids[n_wts] = {3, 6, 6}; // 15 total points
+// 
+// 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
+// 
+// 	      return;
 	    }
 
 
