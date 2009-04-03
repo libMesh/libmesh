@@ -455,7 +455,7 @@ AC_ARG_ENABLE(second,
               AC_HELP_STRING([--enable-second],
                              [build with second derivatives]),
               enablesecond=$enableval,
-              enablesecond=$enableeverything)
+              enablesecond=yes)
 
 if test "$enablesecond" != no ; then
   AC_DEFINE(ENABLE_SECOND_DERIVATIVES, 1,
