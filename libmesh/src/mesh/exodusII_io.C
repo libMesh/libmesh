@@ -84,7 +84,7 @@ void ExodusII_IO::read (const std::string& fname)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  libmesh_assert(libMesh::processor_id() == 0);
+//  libmesh_assert(libMesh::processor_id() == 0);
 
 #ifndef LIBMESH_HAVE_EXODUS_API
 

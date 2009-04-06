@@ -153,10 +153,15 @@ void System::clear ()
 
 
 void System::init ()
-{
+{ 
   // First initialize any required data
   this->init_data();
-
+  
+  //If no variables have been added to this system
+  //don't do anything
+  if(!this->n_vars())
+    return;
+ 
   // Then call the user-provided intialization function
   this->user_initialization();
 }
@@ -257,6 +262,11 @@ void System::prolong_vectors ()
 void System::reinit ()
 {
 #ifdef LIBMESH_ENABLE_AMR
+  //If no variables have been added to this system
+  //don't do anything
+  if(!this->n_vars())
+    return;
+
   // Constraints get handled in EquationSystems::reinit now
 //  _dof_map->create_dof_constraints(this->get_mesh());
 
