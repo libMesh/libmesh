@@ -101,4 +101,4 @@ distclean:
 	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
 	@$(MAKE) -C nemesis/Lib   $(MAKECMDGOALS)
 	@$(MAKE) -C libHilbert   $(MAKECMDGOALS)
-	@rm -rf lib/*_dbg lib/*_opt lib/*_pro lib/*_devel
+	@rm -rf lib/*_dbg lib/*_opt lib/*_prof lib/*_oprof lib/*_devel
