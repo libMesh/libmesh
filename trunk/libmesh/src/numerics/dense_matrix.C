@@ -560,11 +560,11 @@ void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T2>& b,
 template class DenseMatrix<Real>;
 template void DenseMatrix<Real>::cholesky_solve(DenseVector<Real>&, DenseVector<Real>&);
 template void DenseMatrix<Real>::_cholesky_back_substitute(DenseVector<Real>&, DenseVector<Real>&) const;
+template void DenseMatrix<Real>::cholesky_solve(DenseVector<Complex>&, DenseVector<Complex>&);
+template void DenseMatrix<Real>::_cholesky_back_substitute(DenseVector<Complex>&, DenseVector<Complex>&) const;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseMatrix<Complex>;
 template void DenseMatrix<Complex>::cholesky_solve(DenseVector<Complex>&,DenseVector<Complex>&);
 template void DenseMatrix<Complex>::_cholesky_back_substitute(DenseVector<Complex>&, DenseVector<Complex>&) const;
-template void DenseMatrix<Real>::cholesky_solve(DenseVector<Complex>&, DenseVector<Complex>&);
-template void DenseMatrix<Real>::_cholesky_back_substitute(DenseVector<Complex>&, DenseVector<Complex>&) const;
 #endif
