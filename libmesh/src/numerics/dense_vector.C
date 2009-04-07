@@ -27,6 +27,6 @@
 // Explicit instantiations
 template class DenseVector<Real>;
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+//#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseVector<Complex>;
-#endif
+//#endif
