@@ -203,7 +203,7 @@ distclean:
 	@rm -rf doc/latex/doxygen
 	@rm -rf doc/latex/*/*.aux doc/latex/*/*~ doc/latex/*/*.log doc/latex/*/*.out
 	@rm -rf src/*/*.o
-	@rm -rf lib/*_opt lib/*_dbg lib/*_pro lib/*_devel
+	@rm -rf lib/*_opt lib/*_dbg lib/*_pro lib/*_devel lib/*_oprof
 
 
 
