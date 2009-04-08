@@ -76,7 +76,7 @@ void DivaIO::write_stream (std::ostream& out)
   
   // Can't use a constant mesh reference since we have to
   // sync the boundary info.
-  here();
+  libmesh_here();
   std::cerr << "WARNING...  Sure you want to do this?"
 	    << std::endl;
   MeshBase& mesh = const_cast<MeshBase&>

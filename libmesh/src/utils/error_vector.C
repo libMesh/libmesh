@@ -266,7 +266,7 @@ void ErrorVector::plot_error(const std::string& filename,
     }
   else
     {
-      here();
+      libmesh_here();
       std::cerr << "Warning: ErrorVector::plot_error currently only"
                 << " supports .gmv and .plt output;" << std::endl;
       std::cerr << "Could not recognize filename: " << filename

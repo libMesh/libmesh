@@ -774,7 +774,7 @@ Real Elem::quality (const ElemQuality q) const
        */
     default:
       {
-	here();
+	libmesh_here();
 
 	std::cerr << "ERROR:  unknown quality metric: "
 		  << q 

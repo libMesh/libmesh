@@ -133,7 +133,7 @@ MeshInput<MT>::MeshInput (MT& obj, const bool is_parallel_format) :
 	{
           std::cerr << "Warning:  This I/O operation may only be supported for meshes which have been serialized!"
 		    << std::endl;
-          here();
+          libmesh_here();
         }
 //      libmesh_error();
     }

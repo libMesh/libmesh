@@ -57,7 +57,7 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 // What to do if the sfcurves library IS NOT present
 #ifndef LIBMESH_HAVE_SFCURVES
 
-  here();
+  libmesh_here();
   std::cerr << "ERROR: The library has been built without"    << std::endl
 	    << "Space Filling Curve support.  Using a linear" << std::endl
 	    << "partitioner instead!" << std::endl;
@@ -145,7 +145,7 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
   
   else
     {
-      here();
+      libmesh_here();
       std::cerr << "ERROR: Unknown type: " << _sfc_type << std::endl
 		<< " Valid types are"                   << std::endl
 		<< "  \"Hilbert\""                      << std::endl

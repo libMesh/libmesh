@@ -71,7 +71,7 @@ void ParmetisPartitioner::_do_partition (MeshBase& mesh,
 // // What to do if the Parmetis library IS NOT present
 // #ifndef LIBMESH_HAVE_PARMETIS
 
-//   here();
+//   libmesh_here();
 //   std::cerr << "ERROR: The library has been built without"  << std::endl
 // 	    << "Parmetis support.  Using a Metis"           << std::endl
 // 	    << "partitioner instead!"                       << std::endl;
@@ -132,7 +132,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
 // What to do if the Parmetis library IS NOT present
 #ifndef LIBMESH_HAVE_PARMETIS
 
-  here();
+  libmesh_here();
   std::cerr << "ERROR: The library has been built without"  << std::endl
 	    << "Parmetis support.  Using a Metis"           << std::endl
 	    << "partitioner instead!"                       << std::endl;

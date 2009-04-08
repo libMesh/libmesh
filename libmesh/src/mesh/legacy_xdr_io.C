@@ -144,9 +144,7 @@ void LegacyXdrIO::read_mgf_soln (const std::string& name,
 				 std::vector<Number>& soln,
 				 std::vector<std::string>& var_names) const
 {
-  here();
-  std::cerr << "WARNING: this method is deprecated and will disappear soon!"
-	    << std::endl;
+  deprecated();
   
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   
@@ -177,9 +175,7 @@ void LegacyXdrIO::write_mgf_soln (const std::string& name,
 				  std::vector<Number>& soln,
 				  std::vector<std::string>& var_names) const
 {
-  here();
-  std::cerr << "WARNING: this method is deprecated and will disappear soon!"
-	    << std::endl;
+  deprecated();
   
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   

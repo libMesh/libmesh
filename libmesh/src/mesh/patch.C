@@ -196,7 +196,7 @@ void Patch::build_around_element (const Elem* e0,
 //		    << std::endl
 //		    << "Does your target patch size exceed the number of elements in the mesh?"
 //		    << std::endl;
-//	  here();
+//	  libmesh_here();
 	  break;
 	}
     } // end while loop

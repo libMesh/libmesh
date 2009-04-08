@@ -64,7 +64,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 // What to do if the Metis library IS NOT present
 #ifndef LIBMESH_HAVE_METIS
 
-  here();
+  libmesh_here();
   std::cerr << "ERROR: The library has been built without"    << std::endl
 	    << "Metis support.  Using a space-filling curve"  << std::endl
 	    << "partitioner instead!"                         << std::endl;

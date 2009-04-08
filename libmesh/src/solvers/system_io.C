@@ -172,7 +172,7 @@ void System::read_header (Xdr& io,
 	      ((type.order > 2 && this->get_mesh().mesh_dimension() == 2) ||
 	       (type.order > 1 && this->get_mesh().mesh_dimension() == 3)))
 	    {
-	      here();
+	      libmesh_here();
 	      std::cout << "*****************************************************************\n"
 			<< "* WARNING: reading a potentially incompatible restart file!!!   *\n"
 			<< "*  contact libmesh-users@lists.sourceforge.net for more details *\n"
