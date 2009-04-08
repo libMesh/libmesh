@@ -261,7 +261,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 
   std::cerr << "WARNING:  GMVIO::write_ascii_new_impl() not infinite-element aware!"
 	    << std::endl;
-  here();
+  libmesh_here();
 
   this->write_ascii_old_impl (fname, v, solution_names);
 

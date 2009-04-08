@@ -886,7 +886,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	  //  shouldn't happen
 	  if (secure)
 	    {
-	      here();
+	      libmesh_here();
 	      std::cerr << "WARNING: Newton scheme has not converged in "
 			<< cnt << " iterations:" << std::endl
 			<< "   physical_point="
@@ -941,7 +941,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       
       if (diff.size() > tolerance)
 	{
-	  here();
+	  libmesh_here();
 	  std::cerr << "WARNING:  diff is "
 		    << diff.size()
 		    << std::endl

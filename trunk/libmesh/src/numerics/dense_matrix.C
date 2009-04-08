@@ -58,7 +58,7 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
   //Check to see if we are doing (A^T)*A
   if (this == &A)
     {
-      //here();
+      //libmesh_here();
       DenseMatrix<T> B(*this);
       
       // Simple but inefficient way
@@ -142,7 +142,7 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
   //Check to see if we are doing B*(B^T)
   if (this == &B)
     {
-      //here();
+      //libmesh_here();
       DenseMatrix<T> A(*this);
       
       // Simple but inefficient way

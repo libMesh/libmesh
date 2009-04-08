@@ -1271,7 +1271,7 @@ void FEInterface::inverse_map (const unsigned int dim,
     {
       std::cerr << "WARNING: empty vector physical_points!"
 		<< std::endl;
-      here();
+      libmesh_here();
       return;
     }
   

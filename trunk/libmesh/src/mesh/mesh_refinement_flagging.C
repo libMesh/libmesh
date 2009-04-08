@@ -274,7 +274,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
       if (libMesh::processor_id() == 0)
         std::cerr << "flag_elements_by_nelem_target does not yet "
                   << "work on a parallel mesh." << std::endl;
-      error();
+      libmesh_error();
     }
 
   MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
@@ -417,7 +417,7 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
       if (libMesh::processor_id() == 0)
         std::cerr << "flag_elements_by_elem_fraction does not yet "
                   << "work on a parallel mesh." << std::endl;
-      error();
+      libmesh_error();
     }
 
   // The function arguments are currently just there for
@@ -559,7 +559,7 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
       if (libMesh::processor_id() == 0)
         std::cerr << "flag_elements_by_mean_stddev does not yet "
                   << "work on a parallel mesh." << std::endl;
-      error();
+      libmesh_error();
     }
 
   // The function arguments are currently just there for

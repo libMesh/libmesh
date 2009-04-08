@@ -548,12 +548,10 @@ unsigned int DofObject::n_comp(const unsigned int s,
   // Does this ever happen?  I doubt it... 3/7/2003 (BSK)
   if (var >= this->n_vars(s))
     {
-      here();
       std::cout << "s=" << s << ", var=" << var << std::endl
 		<< "this->n_vars(s)=" << this->n_vars(s) << std::endl
 		<< "this->n_systems()=" << this->n_systems() << std::endl;
-	
-      return 0;
+      libmesh_error();
     }
 # endif
   
