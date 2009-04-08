@@ -223,7 +223,7 @@ public:
    * Returns the number of active elements in the mesh.  Implemented
    * in terms of active_element_iterators.
    */
-  unsigned int n_active_elem () const;
+  virtual unsigned int n_active_elem () const = 0;
 
   /**
    * Returns the number of elements on processor \p proc.

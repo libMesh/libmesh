@@ -484,3 +484,11 @@ void SerialMesh::renumber_nodes_and_elements ()
   
   STOP_LOG("renumber_nodes_and_elem()", "Mesh");
 }
+
+
+
+unsigned int SerialMesh::n_active_elem () const
+{
+  return static_cast<unsigned int>(std::distance (this->active_elements_begin(),
+						  this->active_elements_end()));
+}
