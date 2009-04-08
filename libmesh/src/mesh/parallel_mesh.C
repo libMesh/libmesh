@@ -882,11 +882,19 @@ unsigned int ParallelMesh::n_active_elem () const
 {
   parallel_only();
 
-  unsigned int local_active_elements =
+  // Get local active elements first
+  unsigned int active_elements =
     static_cast<unsigned int>(std::distance (this->active_local_elements_begin(),
 					     this->active_local_elements_end()));
-  Parallel::sum(local_active_elements);
-  return local_active_elements;
+  Parallel::sum(active_elements);
+
+  // Then add unpartitioned active elements, which should exist on
+  // every processor
+  active_elements +=
+    static_cast<unsigned int>(std::distance
+      (this->active_pid_elements_begin(DofObject::invalid_processor_id),
+       this->active_pid_elements_end(DofObject::invalid_processor_id)));
+  return active_elements;
 }
 
 
