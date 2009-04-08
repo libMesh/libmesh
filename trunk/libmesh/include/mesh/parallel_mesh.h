@@ -152,6 +152,7 @@ class ParallelMesh : public UnstructuredMesh
   virtual unsigned int max_node_id () const { return _max_node_id; }
   virtual void reserve_nodes (const unsigned int) { }
   virtual unsigned int n_elem () const { return _n_elem; }
+  virtual unsigned int n_active_elem () const;
   virtual unsigned int max_elem_id () const { return _max_elem_id; }
   virtual void reserve_elem (const unsigned int) { }
 

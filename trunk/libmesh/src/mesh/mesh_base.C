@@ -114,14 +114,6 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 
 
 
-unsigned int MeshBase::n_active_elem () const
-{
-  return static_cast<unsigned int>(std::distance (this->active_elements_begin(),
-						  this->active_elements_end()));
-}
-
- 
-
 void MeshBase::clear ()
 {
   

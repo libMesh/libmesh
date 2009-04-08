@@ -878,6 +878,19 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
 
 
+unsigned int ParallelMesh::n_active_elem () const
+{
+  parallel_only();
+
+  unsigned int local_active_elements =
+    static_cast<unsigned int>(std::distance (this->active_local_elements_begin(),
+					     this->active_local_elements_end()));
+  Parallel::sum(local_active_elements);
+  return local_active_elements;
+}
+
+
+
 void ParallelMesh::delete_remote_elements()
 {
 #ifdef DEBUG
