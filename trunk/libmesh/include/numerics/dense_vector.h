@@ -268,8 +268,16 @@ template<typename T2>
 inline
 DenseVector<T>& DenseVector<T>::operator = (const DenseVector<T2>& other_vector)
 {
-  _val = other_vector._val;
-  
+  //  _val = other_vector._val;
+
+  const std::vector<T2> &other_vals = other_vector.get_values();
+
+  _val.clear();
+  _val.reserve(other_vals.size());
+
+  for (unsigned int i=0; i<other_vals.size(); i++)
+    _val.push_back(other_vals[i]);
+
   return *this;
 }
 
