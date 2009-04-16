@@ -68,7 +68,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
   // in the "Private" part of our current namespace.  If this doesn't
   // work in GCC 2.95.3 we can either remove it or stop supporting
   // 2.95.3 altogether.
-  using MeshTools::Generation::Private::idx;
+  // Changing this to import the whole namespace... just importing idx
+  // causes an internal compiler error for Intel Compiler 11.0 on Linux
+  // in debug mode.
+  using namespace MeshTools::Generation::Private;
   
   // Clear the mesh and start from scratch
   mesh.clear();
