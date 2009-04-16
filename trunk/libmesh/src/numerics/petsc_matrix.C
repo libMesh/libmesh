@@ -197,8 +197,12 @@ void PetscMatrix<T>::zero_rows (std::vector<int> & rows, T diag_value)
 
   int ierr=0;
 
-  ierr = MatZeroRows(_mat, rows.size(), &rows[0], diag_value);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if(!rows.empty())
+    ierr = MatZeroRows(_mat, rows.size(), &rows[0], diag_value);
+  else
+    ierr = MatZeroRows(_mat, 0, PETSC_NULL, diag_value);
+
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 template <typename T>
