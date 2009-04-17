@@ -243,6 +243,11 @@ public:
   T det() const;
 
   /**
+   * Returns the trace of the tensor.
+   */
+  T tr() const;
+
+  /**
    * Zero the tensor in any dimension.
    */
   void zero();
@@ -845,7 +850,22 @@ T TypeTensor<T>::det() const
 #endif
 }
 
+template <typename T>
+inline
+T TypeTensor<T>::tr() const
+{
+#if LIBMESH_DIM == 1
+  return _coords[0];
+#endif
 
+#if LIBMESH_DIM == 2
+  return _coords[0] + _coords[3];
+#endif
+
+#if LIBMESH_DIM == 3
+  return _coords[0] + _coords[4] + _coords[8];
+#endif
+}
 
 template <typename T>
 inline
