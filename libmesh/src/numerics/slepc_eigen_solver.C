@@ -29,6 +29,7 @@
 // Local Includes
 #include "libmesh_logging.h"
 #include "slepc_eigen_solver.h"
+#include "shell_matrix.h"
 
 
 /*----------------------- functions ----------------------------------*/
@@ -50,7 +51,7 @@ void SlepcEigenSolver<T>::clear ()
 #else
     // Krylov-Schur showed up as of Slepc 2.3.2
     this->_eigen_solver_type = KRYLOVSCHUR;
-#endif	     
+#endif
     }
 }
 
@@ -87,12 +88,74 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
 				     const double tol,         // solver tolerance
 				     const unsigned int m_its) // maximum number of iterations
 {
-  START_LOG("solve_standard()", "SlepcEigenSolver");
+//   START_LOG("solve_standard()", "SlepcEigenSolver");
 
   this->init ();
   
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T>* matrix_A   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
+
+  // Close the matrix and vectors in case this wasn't already done.
+  matrix_A->close ();
+
+  // just for debugging, remove this 
+//   char mat_file[] = "matA.petsc";
+//   PetscViewer petsc_viewer;
+//   ierr = PetscViewerBinaryOpen(libMesh::COMM_WORLD, mat_file, PETSC_FILE_CREATE, &petsc_viewer);
+//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+//   ierr = MatView(matrix_A->mat(),petsc_viewer);
+//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  return _solve_standard_helper(matrix_A->mat(), nev, ncv, tol, m_its);
+}
+
+
+template <typename T>
+std::pair<unsigned int, unsigned int> 
+SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
+				     int nev,                  // number of requested eigenpairs
+				     int ncv,                  // number of basis vectors
+				     const double tol,         // solver tolerance
+				     const unsigned int m_its) // maximum number of iterations
+{
+  this->init ();
+
+  int ierr=0;
+
+  // Prepare the matrix.
+  Mat mat;
+  ierr = MatCreateShell(libMesh::COMM_WORLD,
+            shell_matrix.m(), // Specify the number of local rows
+            shell_matrix.n(), // Specify the number of local columns
+            PETSC_DETERMINE,
+            PETSC_DETERMINE,
+            const_cast<void*>(static_cast<const void*>(&shell_matrix)),
+            &mat);
+
+  /* Note that the const_cast above is only necessary because PETSc
+     does not accept a const void*.  Inside the member function
+     _petsc_shell_matrix() below, the pointer is casted back to a
+     const ShellMatrix<T>*.  */
+
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatShellSetOperation(mat,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  ierr = MatShellSetOperation(mat,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+
+  return _solve_standard_helper(mat, nev, ncv, tol, m_its);
+}
+
+template <typename T>
+std::pair<unsigned int, unsigned int> 
+SlepcEigenSolver<T>::_solve_standard_helper
+				    (Mat mat,
+				     int nev,                  // number of requested eigenpairs
+				     int ncv,                  // number of basis vectors
+				     const double tol,         // solver tolerance
+				     const unsigned int m_its) // maximum number of iterations
+{
+  START_LOG("solve_standard()", "SlepcEigenSolver");
 
   int ierr=0;
 
@@ -108,19 +171,8 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
   PetscScalar kr, ki;
 #endif
 
-  // Close the matrix and vectors in case this wasn't already done.
-  matrix_A->close ();
-
-  // just for debugging, remove this 
-//   char mat_file[] = "matA.petsc";
-//   PetscViewer petsc_viewer;
-//   ierr = PetscViewerBinaryOpen(libMesh::COMM_WORLD, mat_file, PETSC_FILE_CREATE, &petsc_viewer);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//   ierr = MatView(matrix_A->mat(),petsc_viewer);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
   // Set operators.
-  ierr = EPSSetOperators (_eps, matrix_A->mat(), PETSC_NULL);
+  ierr = EPSSetOperators (_eps, mat, PETSC_NULL);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   //set the problem type and the position of the spectrum
@@ -202,6 +254,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif // DEBUG
 
+
   STOP_LOG("solve_standard()", "SlepcEigenSolver");
 
   // return the number of converged eigenpairs
@@ -223,13 +276,165 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 					const double tol,         // solver tolerance
 					const unsigned int m_its) // maximum number of iterations
 {
-  START_LOG("solve_generalized()", "SlepcEigenSolver");
-
   this->init ();
-  
+
   // Make sure the data passed in are really of Petsc types
   PetscMatrix<T>* matrix_A   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
   PetscMatrix<T>* matrix_B   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_B_in);
+
+  // Close the matrix and vectors in case this wasn't already done.
+  matrix_A->close ();
+  matrix_B->close ();
+
+
+  return _solve_generalized_helper (matrix_A->mat(), matrix_B->mat(), nev, ncv, tol, m_its);
+}
+
+template <typename T>
+std::pair<unsigned int, unsigned int> 
+SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
+					SparseMatrix<T> &matrix_B_in,
+					int nev,                  // number of requested eigenpairs
+					int ncv,                  // number of basis vectors
+					const double tol,         // solver tolerance
+					const unsigned int m_its) // maximum number of iterations
+{
+  this->init ();
+
+  int ierr=0;
+
+  // Prepare the matrix.
+  Mat mat_A;
+  ierr = MatCreateShell(libMesh::COMM_WORLD,
+            shell_matrix_A.m(), // Specify the number of local rows
+            shell_matrix_A.n(), // Specify the number of local columns
+            PETSC_DETERMINE,
+            PETSC_DETERMINE,
+            const_cast<void*>(static_cast<const void*>(&shell_matrix_A)),
+            &mat_A);
+
+  PetscMatrix<T>* matrix_B   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_B_in);
+
+  // Close the matrix and vectors in case this wasn't already done.
+  matrix_B->close ();
+
+  /* Note that the const_cast above is only necessary because PETSc
+     does not accept a const void*.  Inside the member function
+     _petsc_shell_matrix() below, the pointer is casted back to a
+     const ShellMatrix<T>*.  */
+
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatShellSetOperation(mat_A,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  ierr = MatShellSetOperation(mat_A,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  return _solve_generalized_helper (mat_A, matrix_B->mat(), nev, ncv, tol, m_its);
+}
+
+template <typename T>
+std::pair<unsigned int, unsigned int> 
+SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
+					ShellMatrix<T> &shell_matrix_B,
+					int nev,                  // number of requested eigenpairs
+					int ncv,                  // number of basis vectors
+					const double tol,         // solver tolerance
+					const unsigned int m_its) // maximum number of iterations
+{
+  this->init ();
+
+  int ierr=0;
+
+  PetscMatrix<T>* matrix_A = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
+
+  // Close the matrix and vectors in case this wasn't already done.
+  matrix_A->close ();
+
+  // Prepare the matrix.
+  Mat mat_B;
+  ierr = MatCreateShell(libMesh::COMM_WORLD,
+            shell_matrix_B.m(), // Specify the number of local rows
+            shell_matrix_B.n(), // Specify the number of local columns
+            PETSC_DETERMINE,
+            PETSC_DETERMINE,
+            const_cast<void*>(static_cast<const void*>(&shell_matrix_B)),
+            &mat_B);
+
+
+  /* Note that the const_cast above is only necessary because PETSc
+     does not accept a const void*.  Inside the member function
+     _petsc_shell_matrix() below, the pointer is casted back to a
+     const ShellMatrix<T>*.  */
+
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatShellSetOperation(mat_B,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  ierr = MatShellSetOperation(mat_B,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  return _solve_generalized_helper (matrix_A->mat(), mat_B, nev, ncv, tol, m_its);
+}
+
+template <typename T>
+std::pair<unsigned int, unsigned int> 
+SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
+					ShellMatrix<T> &shell_matrix_B,
+					int nev,                  // number of requested eigenpairs
+					int ncv,                  // number of basis vectors
+					const double tol,         // solver tolerance
+					const unsigned int m_its) // maximum number of iterations
+{
+  this->init ();
+
+  int ierr=0;
+
+  // Prepare the matrix.
+  Mat mat_A;
+  ierr = MatCreateShell(libMesh::COMM_WORLD,
+            shell_matrix_A.m(), // Specify the number of local rows
+            shell_matrix_A.n(), // Specify the number of local columns
+            PETSC_DETERMINE,
+            PETSC_DETERMINE,
+            const_cast<void*>(static_cast<const void*>(&shell_matrix_A)),
+            &mat_A);
+
+  Mat mat_B;
+  ierr = MatCreateShell(libMesh::COMM_WORLD,
+            shell_matrix_B.m(), // Specify the number of local rows
+            shell_matrix_B.n(), // Specify the number of local columns
+            PETSC_DETERMINE,
+            PETSC_DETERMINE,
+            const_cast<void*>(static_cast<const void*>(&shell_matrix_B)),
+            &mat_B);
+
+  /* Note that the const_cast above is only necessary because PETSc
+     does not accept a const void*.  Inside the member function
+     _petsc_shell_matrix() below, the pointer is casted back to a
+     const ShellMatrix<T>*.  */
+
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatShellSetOperation(mat_A,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  ierr = MatShellSetOperation(mat_A,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatShellSetOperation(mat_B,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  ierr = MatShellSetOperation(mat_B,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  return _solve_generalized_helper (mat_A, mat_B, nev, ncv, tol, m_its);
+}
+
+
+
+template <typename T>
+std::pair<unsigned int, unsigned int> 
+SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
+					        Mat mat_B,
+					        int nev,                  // number of requested eigenpairs
+					        int ncv,                  // number of basis vectors
+					        const double tol,         // solver tolerance
+					        const unsigned int m_its) // maximum number of iterations
+{
+  START_LOG("solve_generalized()", "SlepcEigenSolver");
 
   int ierr=0;
 
@@ -237,7 +442,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
   int nconv=0;
   int its=0;
 
-#ifdef DEBUG
+#ifdef  DEBUG
   // The relative error.
   PetscReal error, re, im;
 
@@ -245,20 +450,8 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
   PetscScalar kr, ki;
 #endif
 
-  // Close the matrix and vectors in case this wasn't already done.
-  matrix_A->close ();
-  matrix_B->close ();
-
-  // just for debugging, remove this 
-//   char mat_file[] = "matA.petsc";
-//   PetscViewer petsc_viewer;
-//   ierr = PetscViewerBinaryOpen(libMesh::COMM_WORLD, mat_file, PETSC_FILE_CREATE, &petsc_viewer);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//   ierr = MatView(matrix_A->mat(),petsc_viewer);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
   // Set operators.
-  ierr = EPSSetOperators (_eps, matrix_A->mat(),matrix_B->mat());
+  ierr = EPSSetOperators (_eps, mat_A, mat_B);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   //set the problem type and the position of the spectrum
@@ -495,8 +688,48 @@ Real SlepcEigenSolver<T>::get_relative_error(unsigned int i)
   return error;
 }
 
+template <typename T>
+PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest)
+{
+  /* Get the matrix context.  */
+  int ierr=0;
+  void* ctx;
+  ierr = MatShellGetContext(mat,&ctx);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
+  /* Get user shell matrix object.  */
+  const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
 
+  /* Make \p NumericVector instances around the vectors.  */
+  PetscVector<T> arg_global(arg);
+  PetscVector<T> dest_global(dest);
+
+  /* Call the user function.  */
+  shell_matrix.vector_mult(dest_global,arg_global);
+
+  return ierr;
+}
+
+template <typename T>
+PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Vec dest)
+{
+  /* Get the matrix context.  */
+  int ierr=0;
+  void* ctx;
+  ierr = MatShellGetContext(mat,&ctx);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  /* Get user shell matrix object.  */
+  const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
+
+  /* Make \p NumericVector instances around the vector.  */
+  PetscVector<T> dest_global(dest);
+
+  /* Call the user function.  */
+  shell_matrix.get_diagonal(dest_global);
+
+  return ierr;
+}
 
 //------------------------------------------------------------------
 // Explicit instantiations
