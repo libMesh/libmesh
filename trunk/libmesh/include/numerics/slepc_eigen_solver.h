@@ -96,7 +96,7 @@ public:
        
   /**
    * This function calls the SLEPc solver to compute
-   * the eigenpairs of matrix matrix_A. \p nev is
+   * the eigenpairs of the SparseMatrix matrix_A. \p nev is
    * the number of eigenpairs to be computed and
    * \p ncv is the number of basis vectors to be
    * used in the solution procedure. Return values
@@ -109,25 +109,81 @@ public:
 							 int ncv,
 							 const double tol,
 							 const unsigned int m_its);
+
+  /**
+   * Same as above except that matrix_A is a ShellMatrix
+   * in this case.
+   */
+  std::pair<unsigned int, unsigned int>  solve_standard (ShellMatrix<T> &shell_matrix,
+							 int nev,
+							 int ncv,
+							 const double tol,
+							 const unsigned int m_its);
   
 
-/**
+ /**
    * This function calls the SLEPc solver to compute
-   * the eigenpairs of matrix matrix_A provided the matrix B.
-   * in case of a generalized eigenproblem \p nev is
-   * the number of eigenpairs to be computed and
-   * \p ncv is the number of basis vectors to be
+   * the eigenpairs for the generalized eigenproblem
+   * defined by the matrix_A and matrix_B,
+   * which are of type SparseMatrix. The argument 
+   * \p nev is the number of eigenpairs to be computed
+   * and \p ncv is the number of basis vectors to be
    * used in the solution procedure. Return values
    * are the number of converged eigen values and the
    * number of the iterations carried out by the eigen
    * solver.
-   */    
+   */
   std::pair<unsigned int, unsigned int>  solve_generalized(SparseMatrix<T> &matrix_A,
 							   SparseMatrix<T> &matrix_B,
 							   int nev,
 							   int ncv,
 							   const double tol,
 							   const unsigned int m_its);
+
+  /**
+   * Solve generalized eigenproblem when matrix_A is of
+   * type ShellMatrix, matrix_B is of type SparseMatrix.
+   */
+    std::pair<unsigned int, unsigned int>  solve_generalized(ShellMatrix<T> &matrix_A,
+  							   SparseMatrix<T> &matrix_B,
+  							   int nev,
+  							   int ncv,
+  							   const double tol,
+  							   const unsigned int m_its);
+
+  /**
+   * Solve generalized eigenproblem when matrix_A is of
+   * type SparseMatrix, matrix_B is of type ShellMatrix.
+   * When using this function, one should use the
+   * command line options:
+   * -st_ksp_type gmres -st_pc_type none
+   * or
+   * -st_ksp_type gmres -st_pc_type jacobi
+   * or similar.
+   */
+    std::pair<unsigned int, unsigned int>  solve_generalized(SparseMatrix<T> &matrix_A,
+  							   ShellMatrix<T> &matrix_B,
+  							   int nev,
+  							   int ncv,
+  							   const double tol,
+  							   const unsigned int m_its);
+
+  /**
+   * Solve generalized eigenproblem when both matrix_A and
+   * matrix_B are of type ShellMatrix.
+   * When using this function, one should use the
+   * command line options:
+   * -st_ksp_type gmres -st_pc_type none
+   * or
+   * -st_ksp_type gmres -st_pc_type jacobi
+   * or similar.
+   */
+    std::pair<unsigned int, unsigned int>  solve_generalized(ShellMatrix<T> &matrix_A,
+  							   ShellMatrix<T> &matrix_B,
+  							   int nev,
+  							   int ncv,
+  							   const double tol,
+  							   const unsigned int m_its);
 
  
  
@@ -150,6 +206,25 @@ public:
 private:
 
   /**
+   * Helper function that actually performs the standard eigensolve.
+   */
+  std::pair<unsigned int, unsigned int>  _solve_standard_helper (Mat mat,
+							 int nev,
+							 int ncv,
+							 const double tol,
+							 const unsigned int m_its);
+
+  /**
+   * Helper function that actually performs the generalized eigensolve.
+   */
+  std::pair<unsigned int, unsigned int>  _solve_generalized_helper (Mat mat_A,
+							         Mat mat_B,
+							         int nev,
+							         int ncv,
+							         const double tol,
+							         const unsigned int m_its);
+
+  /**
    * Tells Slepc to use the user-specified solver stored in
    * \p _eigen_solver_type
    */
@@ -166,12 +241,26 @@ private:
    * stored in \p _position_of_spectrum
    */
   void set_slepc_position_of_spectrum();
-  
-  
+
+  /**
+   * Internal function if shell matrix mode is used, this just
+   * calls the shell matrix's matrix multiplication function.
+   * See PetscLinearSolver for a similar implementation.
+   */
+  static PetscErrorCode _petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest);
+
+  /**
+   * Internal function if shell matrix mode is used, this just
+   * calls the shell matrix's get_diagonal function.
+   * Required in order to use Jacobi preconditioning.
+   */
+  static PetscErrorCode _petsc_shell_matrix_get_diagonal(Mat mat, Vec dest);
+
   /**
    * Eigenproblem solver context
    */
   EPS _eps;
+
 
 };
 
