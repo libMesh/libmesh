@@ -38,6 +38,7 @@
 // forward declarations
 template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
+template <typename T> class ShellMatrix;
 template <typename T> class NumericVector;
 
 
@@ -62,7 +63,7 @@ public:
   virtual ~EigenSolver ();
   
   /**
-   * Builds a \p EigenSolver using the linear solver package specified by
+   * Builds an \p EigenSolver using the linear solver package specified by
    * \p solver_package
    */
   static AutoPtr<EigenSolver<T> > build(const SolverPackage solver_package =
@@ -120,9 +121,9 @@ public:
     {_position_of_spectrum= pos;}
 
   /**
-   * Solves the standard eigen problem and returns the
-   * number of converged eigenpairs and the number
-   * of iterations.
+   * Solves the standard eigen problem when matrix_A is a
+   * \p SparseMatrix, and returns the number of converged 
+   * eigenpairs and the number of iterations.
    */
   virtual std::pair<unsigned int, unsigned int> solve_standard (SparseMatrix<T> &matrix_A,  
 								int nev,
@@ -130,10 +131,21 @@ public:
 								const double tol,
 								const unsigned int m_its) = 0;
 
+  /**
+   * Solves the standard eigen problem when matrix_A is a
+   * \p ShellMatrix, and returns the number of converged 
+   * eigenpairs and the number of iterations.
+   */
+  virtual std::pair<unsigned int, unsigned int> solve_standard (ShellMatrix<T> &matrix_A,  
+								int nev,
+								int ncv,
+								const double tol,
+								const unsigned int m_its) = 0;
 
   
   /**
-   * Solves the generalized eigen problem and returns the
+   * Solves the generalized eigen problem when both matrix_A
+   * and matrix_B are of type \p SparseMatrix and returns the
    * number of converged eigenpairs and the number
    * of iterations.
    */
@@ -144,6 +156,38 @@ public:
 								   const double tol,
 								   const unsigned int m_its) = 0;
 
+  /**
+   * Solves the generalized eigen problem when matrix_A is
+   * a ShellMatrix and matrix_B is a SparseMatrix.
+   */
+   virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> &matrix_A, 
+ 								   SparseMatrix<T> &matrix_B,  
+ 								   int nev,
+ 								   int ncv,
+ 								   const double tol,
+ 								   const unsigned int m_its) = 0;
+
+  /**
+   * Solves the generalized eigen problem when matrix_A is
+   * a SparseMatrix and matrix_B is a ShellMatrix.
+   */
+   virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> &matrix_A, 
+ 								   ShellMatrix<T> &matrix_B,  
+ 								   int nev,
+ 								   int ncv,
+ 								   const double tol,
+ 								   const unsigned int m_its) = 0;
+
+  /**
+   * Solves the generalized eigen problem when both matrix_A
+   * and matrix_B are of type ShellMatrix.
+   */
+   virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> &matrix_A, 
+ 								   ShellMatrix<T> &matrix_B,  
+ 								   int nev,
+ 								   int ncv,
+ 								   const double tol,
+ 								   const unsigned int m_its) = 0;
 
 
   /**
