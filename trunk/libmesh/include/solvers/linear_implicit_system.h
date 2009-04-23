@@ -146,6 +146,12 @@ public:
    * Detaches a shell matrix.  Same as \p attach_shell_matrix(NULL).
    */
   void detach_shell_matrix (void) { attach_shell_matrix(NULL); }
+
+  /**
+   * Returns a pointer to the currently attached shell matrix, if any,
+   * or \p NULL else.
+   */
+  ShellMatrix<Number>* get_shell_matrix(void) { return _shell_matrix; }
   
 protected:
   
