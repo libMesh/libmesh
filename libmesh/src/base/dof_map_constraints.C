@@ -534,7 +534,7 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
 
   this->build_constraint_matrix (R, row_dofs);
 
-  START_LOG("constrain_elem_vector()", "DofMap");
+  START_LOG("cnstrn_elem_dyad_mat_vec()", "DofMap");
     
   // It is possible that the vector is not constrained at all.
   if ((R.m() == v.size()) &&
@@ -569,7 +569,7 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
 	  }
     } // end if the RHS is constrained.
   
-  STOP_LOG("constrain_elem_vector()", "DofMap");  
+  STOP_LOG("cnstrn_elem_dyad_mat_vec()", "DofMap");
 }
 
 
