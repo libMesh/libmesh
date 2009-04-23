@@ -574,6 +574,20 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
 
 
 
+void DofMap::constrain_nothing (std::vector<unsigned int>& dofs) const
+{
+  // check for easy return
+  if (this->n_constrained_dofs() == 0)
+    return;
+
+  // All the work is done by \p build_constraint_matrix.  We just need
+  // a dummy matrix.
+  DenseMatrix<Number> R;
+  this->build_constraint_matrix (R, dofs);
+}
+
+
+
 void DofMap::enforce_constraints_exactly (const System &system,
                                           NumericVector<Number> *v) const
 {

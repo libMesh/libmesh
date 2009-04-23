@@ -556,6 +556,14 @@ public:
 				      bool asymmetric_constraint_rows = true) const;
 
   /**
+   * Does not actually constrain anything, but modifies \p dofs in the
+   * same way as any of the constrain functions would do, i.e. adds
+   * those dofs in terms of which any of the existing dofs is
+   * constrained.
+   */
+  void constrain_nothing (std::vector<unsigned int>& dofs) const;
+  
+  /**
    * Constrains the numeric vector \p v, which represents a solution defined on
    * the mesh.  This may need to be used after a linear solve, if your linear
    * solver's solutions do not satisfy your DoF constraints to a tight enough
