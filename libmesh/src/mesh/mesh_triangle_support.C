@@ -289,11 +289,6 @@ void TriangleInterface::triangulate()
   // Will the triangulation have holes?
   const bool have_holes = ((_holes != NULL) && (!_holes->empty()));
   
-  // Currently, we don't support specifying user-defined segments
-  // *and* having holes
-  if (have_holes)
-    libmesh_assert (this->segments.empty());
-  
   // If the initial PSLG is really simple, e.g. an L-shaped domain or
   // a square/rectangle, the resulting triangulation may be very
   // "structured" looking.  Sometimes this is a problem if your
