@@ -528,6 +528,12 @@ void FEMSystem::assemble_qoi()
 
           this->side_qoi(_femcontext);
         }
+
+      this->get_dof_map().constrain_element_vector
+        (_femcontext.elem_residual, _femcontext.dof_indices, false);
+
+      this->rhs->add_vector (_femcontext.elem_residual,
+                             _femcontext.dof_indices);
     }
 
   STOP_LOG("assemble_qoi()", "FEMSystem");
