@@ -210,6 +210,12 @@ public:
   virtual void postprocess ();
 
   /**
+   * Runs a qoi assembly loop over all elements, and if
+   * \p assemble_qoi_sides is true over all sides.
+   */
+  virtual void assemble_qoi ();
+
+  /**
    * If fe_reinit_during_postprocess is true (it is true by default), FE
    * objects will be reinit()ed with their default quadrature rules.  If false,
    * FE objects will need to be reinit()ed by the user or will be in an

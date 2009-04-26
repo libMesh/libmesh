@@ -185,10 +185,18 @@ public:
   virtual void postprocess () = 0;
 
   /**
-   * If \p postprocess_sides is true (it is false by default), the postprocessing
-   * loop will loop over all sides as well as all elements.
+   * If \p postprocess_sides is true (it is false by default), the
+   * postprocessing loop will loop over all sides as well as all
+   * elements.
    */
   bool postprocess_sides;
+
+  /**
+   * If \p assemble_qoi_sides is true (it is false by default), the
+   * quantity of interest assembly loop will loop over all sides as
+   * well as all elements.
+   */
+  bool assemble_qoi_sides;
 
   /**
    * Does any work that needs to be done on \p elem in a postprocessing loop.
@@ -200,6 +208,18 @@ public:
    * postprocessing loop.
    */
   virtual void side_postprocess (DiffContext &) {}
+ 
+  /**
+   * Does any work that needs to be done on \p elem in a quantity of
+   * interest assembly loop.
+   */
+  virtual void element_qoi (DiffContext &) {}
+ 
+  /**
+   * Does any work that needs to be done on \p side of \p elem in a
+   * quantity of interest assembly loop.
+   */
+  virtual void side_qoi (DiffContext &) {}
  
   /**
    * Tells the DiffSystem that variable var is evolving with
