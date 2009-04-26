@@ -483,6 +483,58 @@ void FEMSystem::postprocess ()
 
 
 
+void FEMSystem::assemble_qoi()
+{
+  START_LOG("assemble_qoi()", "FEMSystem");
+
+  const MeshBase& mesh = this->get_mesh();
+
+  this->update();
+
+  AutoPtr<DiffContext> con = this->build_context();
+  FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+
+  // Loop over every active mesh element on this processor
+  MeshBase::const_element_iterator el =
+    mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el =
+    mesh.active_local_elements_end();
+
+  for ( ; el != end_el; ++el)
+    {
+      _femcontext.reinit(*this, *el);
+
+      this->element_qoi(_femcontext);
+
+      for (_femcontext.side = 0;
+           _femcontext.side != _femcontext.elem->n_sides();
+           ++_femcontext.side)
+        {
+          // Don't compute on non-boundary sides unless requested
+          if (!assemble_qoi_sides ||
+              (!compute_internal_sides &&
+               _femcontext.elem->neighbor(_femcontext.side) != NULL))
+            continue;
+
+          std::map<FEType, FEBase *>::iterator fe_end =
+            _femcontext.element_fe.end();
+          fe_end = _femcontext.side_fe.end();
+          for (std::map<FEType, FEBase *>::iterator i =
+            _femcontext.side_fe.begin();
+               i != fe_end; ++i)
+            {
+              i->second->reinit(_femcontext.elem, _femcontext.side);
+            }
+
+          this->side_qoi(_femcontext);
+        }
+    }
+
+  STOP_LOG("assemble_qoi()", "FEMSystem");
+}
+
+
+
 void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
                                     FEMContext &context)
 {
