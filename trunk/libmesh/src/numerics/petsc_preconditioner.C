@@ -89,52 +89,55 @@ PetscPreconditioner<T>::set_petsc_preconditioner_type (const PreconditionerType 
   switch (preconditioner_type)
   {
   case IDENTITY_PRECOND:
-    ierr = PCSetType (pc, (char*) PCNONE);      CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCNONE);      CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 	
   case CHOLESKY_PRECOND:
-    ierr = PCSetType (pc, (char*) PCCHOLESKY);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCCHOLESKY);  CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 
   case ICC_PRECOND:
-    ierr = PCSetType (pc, (char*) PCICC);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCICC);       CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 
   case ILU_PRECOND:
-    ierr = PCSetType (pc, (char*) PCILU);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCILU);       CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 
   case LU_PRECOND:
-    ierr = PCSetType (pc, (char*) PCLU);        CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCLU);        CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
       
   case ASM_PRECOND:
-    ierr = PCSetType (pc, (char*) PCASM);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCASM);       CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 
   case JACOBI_PRECOND:
-    ierr = PCSetType (pc, (char*) PCJACOBI);    CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCJACOBI);    CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 
   case BLOCK_JACOBI_PRECOND:
-    ierr = PCSetType (pc, (char*) PCBJACOBI);   CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCBJACOBI);   CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 
   case SOR_PRECOND:
-    ierr = PCSetType (pc, (char*) PCSOR);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCSOR);       CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 
   case EISENSTAT_PRECOND:
-    ierr = PCSetType (pc, (char*) PCEISENSTAT); CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCEISENSTAT); CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 
   case AMG_PRECOND:
-    ierr = PCSetType (pc, (char*) PCHYPRE);     CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCHYPRE);     CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 
 #if !(PETSC_VERSION_LESS_THAN(2,1,2))
     // Only available for PETSC >= 2.1.2      
   case USER_PRECOND:
-    ierr = PCSetType (pc, (char*) PCMAT);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCMAT);       CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 #endif
 
   case SHELL_PRECOND:
-    ierr = PCSetType (pc, (char*) PCSHELL);     CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+    ierr = PCSetType (pc, (char*) PCSHELL);     CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 
   default:
     std::cerr << "ERROR:  Unsupported PETSC Preconditioner: "
               << preconditioner_type       << std::endl
               << "Continuing with PETSC defaults" << std::endl;
   }
+
+  //Let the commandline override stuff
+  PCSetFromOptions(pc);
 }
 
 //------------------------------------------------------------------
