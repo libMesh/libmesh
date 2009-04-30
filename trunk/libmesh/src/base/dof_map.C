@@ -349,7 +349,10 @@ void DofMap::reinit(MeshBase& mesh)
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->set_n_vars(this->sys_number(),n_var);
   }
-  
+
+
+  // Zero _n_SCALAR_dofs, it will be updated below.
+  this->_n_SCALAR_dofs = 0;
 
   //------------------------------------------------------------
   // Next allocate space for the DOF indices
@@ -357,7 +360,18 @@ void DofMap::reinit(MeshBase& mesh)
     {
       const System::Variable &var_description =	this->variable(var);
       const FEType& base_fe_type              = this->variable_type(var);
-	     
+
+      // Skip dof counting for a SCALAR variable
+      if(base_fe_type.family == SCALAR)
+      {
+        // TODO: This only works in serial at the moment
+        if(libMesh::n_processors() > 1)
+          libmesh_not_implemented();
+
+        this->_n_SCALAR_dofs += base_fe_type.order;
+        continue;
+      }
+
       // This should be constant even on p-refined elements
       const bool extra_hanging_dofs =
 	FEInterface::extra_hanging_dofs(base_fe_type);
@@ -753,6 +767,21 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
   std::fill (_var_first_local_df.begin(),
 	     _var_first_local_df.end(),
 	     DofObject::invalid_id);
+
+  // Set _n_SCALAR_dofs
+  this->_n_SCALAR_dofs = 0;
+  for (unsigned var=0; var<n_vars; var++)
+  {
+    if( this->variable(var).type().family != SCALAR )
+    {
+      // TODO: This only works in serial at the moment
+      if(libMesh::n_processors() > 1)
+        libmesh_not_implemented();
+
+      this->_n_SCALAR_dofs += this->variable(var).type().order;
+      continue;
+    }
+  }
   
   //-------------------------------------------------------------------------
   // First count and assign temporary numbers to local dofs
@@ -770,9 +799,11 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
       for (unsigned int n=0; n<n_nodes; n++)
         {
           Node* node = elem->get_node(n);
-              
+
           for (unsigned var=0; var<n_vars; var++)
-	    if (this->variable(var).active_on_subdomain(elem->subdomain_id()))
+          {
+	      if( (this->variable(var).type().family != SCALAR) &&
+                  (this->variable(var).active_on_subdomain(elem->subdomain_id())) )
 	      {
 		// assign dof numbers (all at once) if this is
 		// our node and if they aren't already there
@@ -788,11 +819,13 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
 		    next_free_dof += node->n_comp(sys_num,var);
 		  }
 	      }
+          }
         }
-                  
+
       // Now number the element DOFS
       for (unsigned var=0; var<n_vars; var++)
-	if (this->variable(var).active_on_subdomain(elem->subdomain_id()))
+	if ( (this->variable(var).type().family != SCALAR) &&
+             (this->variable(var).active_on_subdomain(elem->subdomain_id())) )
 	  if (elem->n_comp(sys_num,var) > 0)
 	    {
 	      libmesh_assert (elem->dof_number(sys_num,var,0) ==
@@ -843,14 +876,28 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
 
   // We will cache the first local index for each variable
   _var_first_local_df.clear();
-  
+
+  // Zero _n_SCALAR_dofs, we will set it below
+  this->_n_SCALAR_dofs = 0;
+
   //-------------------------------------------------------------------------
   // First count and assign temporary numbers to local dofs
   for (unsigned var=0; var<n_vars; var++)
     {
       _var_first_local_df.push_back(next_free_dof);
-      
+
       const System::Variable var_description = this->variable(var);
+
+      // Skip dof counting for a SCALAR variable
+      if(var_description.type().family == SCALAR)
+      {
+        // TODO: This only works in serial at the moment
+        if(libMesh::n_processors() > 1)
+          libmesh_not_implemented();
+
+        this->_n_SCALAR_dofs += var_description.type().order;
+        continue;
+      }
 
       MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
       const MeshBase::element_iterator elem_end = mesh.active_local_elements_end();
@@ -1249,9 +1296,32 @@ void DofMap::dof_indices (const Elem* const elem,
   unsigned int tot_size = 0;
 #endif
 
+  // Create a vector to store the variable numbers
+  // of SCALAR variables that we've requested
+  std::vector<unsigned int> SCALAR_var_numbers;
+  SCALAR_var_numbers.clear();
+
   // Get the dof numbers
   for (unsigned int v=0; v<n_vars; v++)
     if ((v == vn) || (vn == libMesh::invalid_uint))
+    {
+      if(this->variable(v).type().family == SCALAR)
+      {
+        // TODO: This only works in serial at the moment
+        if(libMesh::n_processors() > 1)
+          libmesh_not_implemented();
+
+        // We asked for this variable, so add it to the vector.
+        SCALAR_var_numbers.push_back(v);
+
+#ifdef DEBUG
+	FEType fe_type = this->variable_type(v);
+	tot_size += FEInterface::n_dofs(dim,
+					  fe_type,
+					  type);
+#endif
+      }
+      else
       if (this->variable(v).active_on_subdomain(elem->subdomain_id()))
 	{ // Do this for all the variables if one was not specified
 	  // or just for the specified variable
@@ -1346,7 +1416,50 @@ void DofMap::dof_indices (const Elem* const elem,
 		  di.resize(di.size() + nc, DofObject::invalid_id);
 		}
 	    }
-	} // end loop over variables
+	}
+      } // end loop over variables
+
+  // Finally append any SCALAR dofs that we asked for.
+  // First we need to find out the first dof index for each
+  // SCALAR.
+  unsigned int first_SCALAR_dof_index = n_dofs() - n_SCALAR_dofs();
+  std::map<unsigned int, unsigned int> SCALAR_first_dof_index;
+  SCALAR_first_dof_index.clear();
+
+  // iterate over _all_ of the SCALARs and store each one's first dof index
+  for (unsigned int v=0; v<n_vars; v++)
+    if(this->variable(v).type().family == SCALAR)
+    {
+      unsigned int current_n_SCALAR_dofs = this->variable(v).type().order;
+      SCALAR_first_dof_index.insert(
+        std::pair<unsigned int, unsigned int>(v,first_SCALAR_dof_index) );
+      first_SCALAR_dof_index += current_n_SCALAR_dofs;
+    }
+
+  for(unsigned int i=0; i<SCALAR_var_numbers.size(); i++)
+  {
+    unsigned int var_number = SCALAR_var_numbers[i];
+
+    // Now use current_SCALAR_var_number to index into
+    // SCALAR_first_dof_index and _n_dofs_per_SCALAR_var
+    std::map<unsigned int, unsigned int>::const_iterator iter =
+      SCALAR_first_dof_index.find(var_number);
+
+#ifdef DEBUG
+    libmesh_assert(iter != SCALAR_first_dof_index.end());
+#endif
+
+    unsigned int current_first_SCALAR_dof_index = iter->second;
+
+    // Also, get the number of SCALAR dofs from the variable order
+    unsigned int current_n_SCALAR_dofs = this->variable(var_number).type().order;
+
+    for(unsigned int j=0; j<current_n_SCALAR_dofs; j++)
+    {
+      unsigned int index = current_first_SCALAR_dof_index+j;
+      di.push_back(index);
+    }
+  }
 
 #ifdef DEBUG
   libmesh_assert (tot_size == di.size());
@@ -1382,10 +1495,33 @@ void DofMap::old_dof_indices (const Elem* const elem,
   // Check that sizes match
   unsigned int tot_size = 0;
 #endif
+
+  // Create a vector to store the variable numbers
+  // of SCALAR variables that we've requested
+  std::vector<unsigned int> SCALAR_var_numbers;
+  SCALAR_var_numbers.clear();
   
   // Get the dof numbers
   for (unsigned int v=0; v<n_vars; v++)
     if ((v == vn) || (vn == libMesh::invalid_uint))
+    {
+      if(this->variable(v).type().family == SCALAR)
+        {
+          // TODO: This only works in serial at the moment
+          if(libMesh::n_processors() > 1)
+            libmesh_not_implemented();
+
+          // We asked for this variable, so add it to the vector.
+          SCALAR_var_numbers.push_back(v);
+
+#ifdef DEBUG
+	  FEType fe_type = this->variable_type(v);
+	  tot_size += FEInterface::n_dofs(dim,
+					  fe_type,
+					  type);
+#endif
+        }
+      else
       if (this->variable(v).active_on_subdomain(elem->subdomain_id()))
 	{ // Do this for all the variables if one was not specified
 	  // or just for the specified variable
@@ -1501,7 +1637,50 @@ void DofMap::old_dof_indices (const Elem* const elem,
 		  di.resize(di.size() + nc, DofObject::invalid_id);
 		}
 	    }
-	} // end loop over variables
+	}
+    } // end loop over variables
+
+  // Finally append any SCALAR dofs that we asked for.
+  // First we need to find out the first dof index for each
+  // SCALAR.
+  unsigned int first_SCALAR_dof_index = n_old_dofs() - n_SCALAR_dofs();
+  std::map<unsigned int, unsigned int> SCALAR_first_dof_index;
+  SCALAR_first_dof_index.clear();
+
+  // iterate over _all_ of the SCALARs and store each one's first dof index
+  for (unsigned int v=0; v<n_vars; v++)
+    if(this->variable(v).type().family == SCALAR)
+    {
+      unsigned int current_n_SCALAR_dofs = this->variable(v).type().order;
+      SCALAR_first_dof_index.insert(
+        std::pair<unsigned int, unsigned int>(v,first_SCALAR_dof_index) );
+      first_SCALAR_dof_index += current_n_SCALAR_dofs;
+    }
+
+  for(unsigned int i=0; i<SCALAR_var_numbers.size(); i++)
+  {
+    unsigned int var_number = SCALAR_var_numbers[i];
+
+    // Now use current_SCALAR_var_number to index into
+    // SCALAR_first_dof_index and _n_dofs_per_SCALAR_var
+    std::map<unsigned int, unsigned int>::const_iterator iter =
+      SCALAR_first_dof_index.find(var_number);
+
+#ifdef DEBUG
+    libmesh_assert(iter != SCALAR_first_dof_index.end());
+#endif
+
+    unsigned int current_first_SCALAR_dof_index = iter->second;
+
+    // Also, get the number of SCALAR dofs from the variable order
+    unsigned int current_n_SCALAR_dofs = this->variable(var_number).type().order;
+
+    for(unsigned int j=0; j<current_n_SCALAR_dofs; j++)
+    {
+      unsigned int index = current_first_SCALAR_dof_index+j;
+      di.push_back(index);
+    }
+  }
   
 #ifdef DEBUG
   libmesh_assert (tot_size == di.size());

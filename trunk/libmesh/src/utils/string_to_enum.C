@@ -232,6 +232,7 @@ namespace {
 	fefamily_to_enum["LAGRANGE"    ]=LAGRANGE;
 	fefamily_to_enum["HIERARCHIC"  ]=HIERARCHIC;
 	fefamily_to_enum["MONOMIAL"    ]=MONOMIAL;
+	fefamily_to_enum["SCALAR"      ]=SCALAR;
 	fefamily_to_enum["XYZ"         ]=XYZ;
 	fefamily_to_enum["BERNSTEIN"   ]=BERNSTEIN;
 	fefamily_to_enum["SZABAB"      ]=SZABAB;

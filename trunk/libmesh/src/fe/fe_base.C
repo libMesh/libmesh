@@ -103,6 +103,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      return ap;
 	    }
 
+          case SCALAR:
+          {
+	      AutoPtr<FEBase> ap(new FEScalar<0>(fet));
+	      return ap;
+          }
+
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    libmesh_error();
@@ -162,6 +168,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      AutoPtr<FEBase> ap(new FEXYZ<1>(fet));
 	      return ap;
 	    }
+
+          case SCALAR:
+          {
+	      AutoPtr<FEBase> ap(new FEScalar<1>(fet));
+	      return ap;
+          }
 
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
@@ -225,6 +237,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      return ap;
 	    }
 
+          case SCALAR:
+          {
+	      AutoPtr<FEBase> ap(new FEScalar<2>(fet));
+	      return ap;
+          }
+
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    libmesh_error();
@@ -287,6 +305,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      AutoPtr<FEBase> ap(new FEXYZ<3>(fet));
 	      return ap;
 	    }
+
+          case SCALAR:
+          {
+	      AutoPtr<FEBase> ap(new FEScalar<3>(fet));
+	      return ap;
+          }
 
 	  default:
 	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;

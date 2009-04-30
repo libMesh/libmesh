@@ -38,6 +38,7 @@
                                template class FE< (_dim), HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
+                               template class FE< (_dim), SCALAR>;   \
                                template class FE< (_dim), XYZ>
 
 #define INSTANTIATE_IMAP(_dim) \
@@ -46,6 +47,7 @@
   template void FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
+  template void FE<_dim,SCALAR>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void FE<_dim,XYZ>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool)
  
 #else //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
@@ -55,6 +57,7 @@
                                template class FE< (_dim), HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
+                               template class FE< (_dim), SCALAR>;   \
                                template class FE< (_dim), BERNSTEIN>;     \
                                template class FE< (_dim), SZABAB>;     \
                                template class FE< (_dim), XYZ>
@@ -65,6 +68,7 @@
   template void  FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
+  template void  FE<_dim,SCALAR>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,BERNSTEIN>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,SZABAB>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,XYZ>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool)

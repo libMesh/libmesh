@@ -70,7 +70,13 @@ void System::project_vector (const NumericVector<Number>& old_v,
    */
   new_v.clear();
 
-#ifdef LIBMESH_ENABLE_AMR 
+#ifdef LIBMESH_ENABLE_AMR
+
+  // First make sure we don't have any SCALAR variables, since
+  // vector projection is not yet implemented for SCALARs
+  for(unsigned int v=0; v<this->n_vars(); v++)
+    if(this->variable(v).type().family == SCALAR)
+      libmesh_not_implemented();
 
   // Resize the new vector and get a serial version.
   NumericVector<Number> *new_vector_ptr = NULL;

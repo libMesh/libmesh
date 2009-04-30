@@ -573,6 +573,22 @@ public:
 };
 
 
+//-------------------------------------------------------------
+// FEScalar class definition
+template <unsigned int Dim>
+class FEScalar : public FE<Dim,SCALAR>
+{
+public:
+
+  /**
+   * Constructor. Creates a SCALAR finite element
+   * which simply represents one or more
+   * extra DOFs coupled to all other DOFs in
+   * the system.
+   */
+  FEScalar(const FEType& fet);
+};
+
 
 /**
  * XYZ finite elements.  These require specialization
@@ -647,6 +663,7 @@ protected:
 
 
 
+
 /**
  * Provide Typedefs for various element types.
  */
@@ -715,6 +732,7 @@ namespace FiniteElements
    * Monomial finite element.
    */
   typedef FE<3,MONOMIAL> FEMonomial3D;
+
 }
 
 
@@ -794,7 +812,7 @@ FEMonomial<Dim>::FEMonomial (const FEType& fet) :
 
 
 // ------------------------------------------------------------
-// FELagrange class inline members
+// FEXYZ class inline members
 template <unsigned int Dim>
 inline
 FEXYZ<Dim>::FEXYZ (const FEType& fet) :
@@ -802,5 +820,13 @@ FEXYZ<Dim>::FEXYZ (const FEType& fet) :
 {
 }
 
+// ------------------------------------------------------------
+// FEScalar class inline members
+template <unsigned int Dim>
+inline
+FEScalar<Dim>::FEScalar (const FEType& fet) :
+  FE<Dim,SCALAR> (fet)
+{
+}
 
 #endif

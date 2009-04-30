@@ -53,6 +53,10 @@ namespace libMeshEnums {
 		 // C1 elements
 		 CLOUGH       = 21,
 		 HERMITE      = 22,
+
+                 // A scalar variable that couples to 
+                 // all other DOFs in the system
+		 SCALAR       = 31,
 		 
 		 INVALID_FE   = 42};
 
