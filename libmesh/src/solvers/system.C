@@ -678,6 +678,50 @@ void System::local_dof_indices(const unsigned int var, std::set<unsigned int> & 
     }
 }
 
+void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) const
+{
+  /* Make sure the call makes sense.  */
+  libmesh_assert(var_num<this->n_vars());
+
+  /* Get a reference to the mesh.  */
+  const MeshBase& mesh = this->get_mesh();
+
+  /* Check which system we are.  */
+  const unsigned int sys_num = this->number();
+
+  /* Loop over nodes.  */
+  {
+    MeshBase::const_node_iterator it = mesh.local_nodes_begin();
+    const MeshBase::const_node_iterator end_it = mesh.local_nodes_end(); 
+    for ( ; it != end_it; ++it)
+      {    
+	const Node* node = *it;
+	unsigned int n_comp = node->n_comp(sys_num,var_num);
+	for(unsigned int i=0; i<n_comp; i++)
+	  {
+	    const unsigned int index = node->dof_number(sys_num,var_num,i);
+	    v.set(index,0.0);
+	  }
+      }
+  }
+
+  /* Loop over elements.  */
+  {
+    MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
+    const MeshBase::const_element_iterator end_it = mesh.active_local_elements_end(); 
+    for ( ; it != end_it; ++it)
+      {    
+	const Elem* elem = *it;
+	unsigned int n_comp = elem->n_comp(sys_num,var_num);
+	for(unsigned int i=0; i<n_comp; i++)
+	  {
+	    const unsigned int index = elem->dof_number(sys_num,var_num,i);
+	    v.set(index,0.0);
+	  }
+      }
+  }
+}
+
 Real System::discrete_var_norm(NumericVector<Number>& v,
                                unsigned int var,
                                FEMNormType norm_type) const
