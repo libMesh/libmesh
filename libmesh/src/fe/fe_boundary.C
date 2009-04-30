@@ -54,6 +54,8 @@ REINIT_ERROR(0, LAGRANGE, reinit)
 REINIT_ERROR(0, LAGRANGE, edge_reinit)
 REINIT_ERROR(0, MONOMIAL, reinit)
 REINIT_ERROR(0, MONOMIAL, edge_reinit)
+REINIT_ERROR(0, SCALAR, reinit)
+REINIT_ERROR(0, SCALAR, edge_reinit)
 REINIT_ERROR(0, XYZ, reinit)
 REINIT_ERROR(0, XYZ, edge_reinit)
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
@@ -69,6 +71,7 @@ REINIT_ERROR(1, HIERARCHIC, edge_reinit)
 REINIT_ERROR(1, LAGRANGE, edge_reinit)
 REINIT_ERROR(1, XYZ, edge_reinit)
 REINIT_ERROR(1, MONOMIAL, edge_reinit)
+REINIT_ERROR(1, SCALAR, edge_reinit)
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 REINIT_ERROR(1, BERNSTEIN, edge_reinit)
 REINIT_ERROR(1, SZABAB, edge_reinit)
@@ -706,6 +709,7 @@ template void FE<1,HIERARCHIC>::reinit(Elem const*, unsigned int, Real);
 template void FE<1,CLOUGH>::reinit(Elem const*, unsigned int, Real);
 template void FE<1,HERMITE>::reinit(Elem const*, unsigned int, Real);
 template void FE<1,MONOMIAL>::reinit(Elem const*, unsigned int, Real);
+template void FE<1,SCALAR>::reinit(Elem const*, unsigned int, Real);
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 template void FE<1,BERNSTEIN>::reinit(Elem const*, unsigned int, Real);
 template void FE<1,SZABAB>::reinit(Elem const*, unsigned int, Real);
@@ -722,6 +726,8 @@ template void FE<2,HERMITE>::reinit(Elem const*, unsigned int, Real);
 template void FE<2,HERMITE>::edge_reinit(Elem const*, unsigned int, Real);
 template void FE<2,MONOMIAL>::reinit(Elem const*, unsigned int, Real);
 template void FE<2,MONOMIAL>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<2,SCALAR>::reinit(Elem const*, unsigned int, Real);
+template void FE<2,SCALAR>::edge_reinit(Elem const*, unsigned int, Real);
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 template void FE<2,BERNSTEIN>::reinit(Elem const*, unsigned int, Real);
 template void FE<2,BERNSTEIN>::edge_reinit(Elem const*, unsigned int, Real);
@@ -744,6 +750,8 @@ template void FE<3,HERMITE>::reinit(Elem const*, unsigned int, Real);
 template void FE<3,HERMITE>::edge_reinit(Elem const*, unsigned int, Real);
 template void FE<3,MONOMIAL>::reinit(Elem const*, unsigned int, Real);
 template void FE<3,MONOMIAL>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<3,SCALAR>::reinit(Elem const*, unsigned int, Real);
+template void FE<3,SCALAR>::edge_reinit(Elem const*, unsigned int, Real);
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 template void FE<3,BERNSTEIN>::reinit(Elem const*, unsigned int, Real);
 template void FE<3,BERNSTEIN>::edge_reinit(Elem const*, unsigned int, Real);
