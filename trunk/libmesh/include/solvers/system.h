@@ -684,6 +684,12 @@ public:
   void local_dof_indices (const unsigned int var,
                           std::set<unsigned int> & var_indices) const;
 
+  /**
+   * Zeroes all dofs in \p v that correspond to variable number \p
+   * var_num.
+   */
+  void zero_variable (NumericVector<Number>& v, unsigned int var_num) const;
+
 protected:
 
   /**
