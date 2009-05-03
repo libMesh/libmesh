@@ -772,7 +772,7 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
   this->_n_SCALAR_dofs = 0;
   for (unsigned var=0; var<n_vars; var++)
   {
-    if( this->variable(var).type().family != SCALAR )
+    if( this->variable(var).type().family == SCALAR )
     {
       // TODO: This only works in serial at the moment
       if(libMesh::n_processors() > 1)
@@ -1441,7 +1441,7 @@ void DofMap::dof_indices (const Elem* const elem,
     unsigned int var_number = SCALAR_var_numbers[i];
 
     // Now use current_SCALAR_var_number to index into
-    // SCALAR_first_dof_index and _n_dofs_per_SCALAR_var
+    // SCALAR_first_dof_index
     std::map<unsigned int, unsigned int>::const_iterator iter =
       SCALAR_first_dof_index.find(var_number);
 
@@ -1662,7 +1662,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
     unsigned int var_number = SCALAR_var_numbers[i];
 
     // Now use current_SCALAR_var_number to index into
-    // SCALAR_first_dof_index and _n_dofs_per_SCALAR_var
+    // SCALAR_first_dof_index
     std::map<unsigned int, unsigned int>::const_iterator iter =
       SCALAR_first_dof_index.find(var_number);
 
