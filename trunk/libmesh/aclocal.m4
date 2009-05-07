@@ -463,6 +463,9 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
           dnl Intel ICC >= v10.1
           intel_icc_v10.1 | intel_icc_v11.x)
               dnl Disable some warning messages:
+              dnl #175: 'subscript out of range'
+              dnl       FIN-S application code causes many false
+              dnl       positives with this
               dnl #266: 'function declared implicitly'
               dnl       Metis function "GKfree" caused this error
               dnl       in almost every file.
@@ -473,7 +476,7 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
               dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
               dnl        Well, duh, when the tested value is computed...  OK when it
               dnl        was from an assignment.
-              CXXFLAGS_DBG="-w1 -g -wd1476 -wd1505 -wd1572"
+              CXXFLAGS_DBG="-w1 -g -wd175 -wd1476 -wd1505 -wd1572"
               CXXFLAGS_OPT="-O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CXXFLAGS_DVL="$CXXFLAGS_DBG"
               CFLAGS_DBG="-w1 -wd266 -wd1572"
