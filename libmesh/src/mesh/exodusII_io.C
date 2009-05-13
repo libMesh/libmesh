@@ -210,6 +210,24 @@ void ExodusII_IO::read (const std::string& fname)
 				      id_list[e]);
       }
   }
+
+  // Read nodeset info
+  {
+    exio_helper.read_nodeset_info();
+
+    for(unsigned int nodeset=0; nodeset<exio_helper.get_num_node_sets(); nodeset++)
+      {
+        int nodeset_id = exio_helper.get_nodeset_id(nodeset);
+        
+        exio_helper.read_nodeset(nodeset);
+
+        const std::vector<int>& node_list = exio_helper.get_node_list();
+
+        for(unsigned int node=0; node<node_list.size(); node++)
+          mesh.boundary_info->add_node(node_list[node], nodeset_id);
+      }
+  }
+      
 #endif
 }
 
@@ -290,6 +308,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 	  exio_helper.write_nodal_coordinates(mesh);
 	  exio_helper.write_elements(mesh);
           exio_helper.write_sidesets(mesh);
+          exio_helper.write_nodesets(mesh);
 	  exio_helper.initialize_nodal_variables(names);
 	}
     
@@ -367,6 +386,7 @@ void ExodusII_IO::write (const std::string& fname)
       exio_helper.write_nodal_coordinates(mesh);
       exio_helper.write_elements(mesh);
       exio_helper.write_sidesets(mesh);
+      exio_helper.write_nodesets(mesh);
 
       // Note: the file is closed automatically by the ExodusII_IO destructor.
     }

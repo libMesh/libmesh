@@ -200,6 +200,16 @@ public:
 				     const unsigned short int boundary_id) const;
 
   /**
+   * Builds the list of unique node boundary ids.
+   */
+  void build_node_boundary_ids(std::vector<short int> &b_ids);
+
+  /**
+   * Builds the list of unique side boundary ids.
+   */
+  void build_side_boundary_ids(std::vector<short int> &b_ids);
+
+  /**
    * @returns the number of element-based boundary conditions.
    */
   unsigned int n_boundary_conds () const;
