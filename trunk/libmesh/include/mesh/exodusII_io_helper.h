@@ -149,6 +149,13 @@ public:
    */
   int get_num_side_sets()          const { return num_side_sets; }
 
+  /**
+   * @returns the total number
+   * of nodesets in the \p ExodusII
+   * mesh.
+   */
+  int get_num_node_sets()          const { return num_node_sets; }
+
   //     /**
   //      * @returns the number of
   //      * elements in all the sidesets.
@@ -172,6 +179,13 @@ public:
    * elements in the sideset.
    */
   int get_num_sides_per_set(int i) const { return num_sides_per_set[i]; }
+  
+  /**
+   * For a single nodeset,
+   * returns the total number of
+   * nodes in the nodeset.
+   */
+  int get_num_nodes_per_set(int i) const { return num_nodes_per_set[i]; }
 
   //     /**
   //      * @returns the \f$ i^{th} \f$ entry
@@ -201,7 +215,17 @@ public:
    * @return a constant reference to the \p side_list.   
    */
   const std::vector<int>& get_side_list() const { return side_list; }
-  
+
+  /**
+   * @return a constant reference to the \p node_list.   
+   */
+  const std::vector<int>& get_node_list() const { return node_list; }
+
+  /**
+   * @return the nodeset id corresponding to the ith nodeset.
+   */
+  const int get_nodeset_id(unsigned int i) const { return nodeset_ids[i]; }
+
   //     /**
   //      * @returns the \f$ i^{th} \f$ entry in
   //      * the id list.  This is the id
@@ -262,7 +286,8 @@ public:
    * mesh title, the number
    * of nodes, number of
    * elements, mesh dimension,
-   * and number of sidesets.
+   * number of sidesets, and
+   * number of nodesets
    */
   void print_header();
 
@@ -322,6 +347,13 @@ public:
 
   /**
    * Reads information about
+   * all of the nodesets in
+   * the \p ExodusII mesh file.
+   */
+  void read_nodeset_info();
+
+  /**
+   * Reads information about
    * sideset \p id and
    * inserts it into the global
    * sideset array at the
@@ -330,10 +362,25 @@ public:
   void read_sideset(int id, int offset);
 
   /**
+   * Reads information about
+   * nodeset \p id and
+   * inserts it into the global
+   * nodeset array at the
+   * position \p offset.
+   */
+  void read_nodeset(int id);
+
+  /**
    * Prints information
    * about all the sidesets.
    */
   void print_sideset_info();
+
+  /**
+   * Prints information
+   * about all the nodesets.
+   */
+  void print_nodeset_info();
 
   /**
    * Closes the \p ExodusII
@@ -399,6 +446,11 @@ public:
    * Writes the sidesets contained in "mesh"
    */
   void write_sidesets(const MeshBase & mesh);
+
+  /**
+   * Writes the nodesets contained in "mesh"
+   */
+  void write_nodesets(const MeshBase & mesh);
 
   /**
    * Sets up the nodal variables
@@ -487,10 +539,14 @@ public:
   std::vector<int> block_ids;          // Vector of the block identification numbers
   std::vector<int> connect;            // Vector of nodes in an element
   std::vector<int> ss_ids;             // Vector of the sideset IDs
+  std::vector<int> nodeset_ids;        // Vector of the nodeset IDs
   std::vector<int> num_sides_per_set;  // Number of sides (edges/faces) in current set
+  std::vector<int> num_nodes_per_set;  // Number of nodes in current set
   std::vector<int> num_df_per_set;     // Number of distribution factors per set
+  std::vector<int> num_node_df_per_set;// Number of distribution factors per set
   std::vector<int> elem_list;          // List of element numbers in all sidesets
   std::vector<int> side_list;          // Side (face/edge) number actually on the boundary 
+  std::vector<int> node_list;          // Node number actually on the boundary 
   std::vector<int> id_list;            // Side (face/edge) id number
   std::vector<int> node_num_map;       // Optional mapping from internal [0,num_nodes) to arbitrary indices
   std::vector<int> elem_num_map;       // Optional mapping from internal [0,num_elem) to arbitrary indices

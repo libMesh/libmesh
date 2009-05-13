@@ -352,6 +352,22 @@ void ExodusII_IO_Helper::read_sideset_info()
     }
 }
 
+void ExodusII_IO_Helper::read_nodeset_info()
+{
+  nodeset_ids.resize(num_node_sets);
+  if (num_node_sets > 0)
+    {
+      ex_err = exII::ex_get_node_set_ids(ex_id,
+					 &nodeset_ids[0]);
+      check_err(ex_err, "Error retrieving nodeset information.");
+      message("All nodeset information retrieved successfully."); 
+
+      // Resize appropriate data structures -- only do this once outnode the loop
+      num_nodes_per_set.resize(num_node_sets);
+      num_node_df_per_set.resize(num_node_sets);
+    }
+}
+
 
 void ExodusII_IO_Helper::read_sideset(int id, int offset)
 {
@@ -379,6 +395,28 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
     id_list[i+offset] = ss_ids[id];
 }
 
+void ExodusII_IO_Helper::read_nodeset(int id)
+{
+  libmesh_assert (static_cast<unsigned int>(id) < nodeset_ids.size());
+  libmesh_assert (static_cast<unsigned int>(id) < num_nodes_per_set.size());
+  libmesh_assert (static_cast<unsigned int>(id) < num_node_df_per_set.size());
+  
+  ex_err = exII::ex_get_node_set_param(ex_id,
+				       nodeset_ids[id],
+				       &num_nodes_per_set[id],
+				       &num_node_df_per_set[id]);
+  check_err(ex_err, "Error retrieving nodeset parameters.");
+  message("Parameters retrieved successfully for nodeset: ", id);
+
+  node_list.resize(num_nodes_per_set[id]);
+
+  ex_err = exII::ex_get_node_set(ex_id,
+				 nodeset_ids[id],
+				 &node_list[0]);
+  
+  check_err(ex_err, "Error retrieving nodeset data.");
+  message("Data retrieved successfully for nodeset: ", id);
+}
 
 
 void ExodusII_IO_Helper::print_sideset_info()
@@ -521,9 +559,15 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   num_dim = mesh.spatial_dimension();
   num_nodes = mesh.n_nodes();
   num_elem = mesh.n_elem();
-  num_node_sets = 0;
-  num_side_sets = mesh.boundary_info->get_boundary_ids().size();
 
+  std::vector<short int> unique_side_boundaries;
+  std::vector<short int> unique_node_boundaries;
+
+  mesh.boundary_info->build_side_boundary_ids(unique_side_boundaries);
+  mesh.boundary_info->build_node_boundary_ids(unique_node_boundaries);
+
+  num_side_sets = unique_side_boundaries.size();
+  num_node_sets = unique_node_boundaries.size();
   
   //loop through element and map between block and element vector
   std::map<subdomain_id_type, std::vector<unsigned int>  > subdomain_map;
@@ -650,13 +694,13 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     elem[il[i]].push_back(el[i]+1);
     side[il[i]].push_back(conv.get_inverse_side_map(sl[i]));    
   }
-
-  std::set<short int>::iterator it = mesh.boundary_info->get_boundary_ids().begin();
-  const std::set<short int>::iterator end = mesh.boundary_info->get_boundary_ids().end();
-
-  for(; it != end; ++it)
+  
+  std::vector<short int> side_boundary_ids;
+  mesh.boundary_info->build_side_boundary_ids(side_boundary_ids);
+  
+  for(unsigned int i = 0; i < side_boundary_ids.size(); i++)
   {
-    int ss_id = *it;
+    int ss_id = side_boundary_ids[i];
 
     ex_err = exII::ex_put_side_set_param(ex_id, ss_id, elem[ss_id].size(), 4);
     check_err(ex_err, "Error writing sideset parameters");
@@ -665,6 +709,39 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     check_err(ex_err, "Error writing sidesets");
   }
 }
+
+
+void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
+{
+  ExodusII_IO_Helper::ElementMaps em;
+
+  std::vector< unsigned int > nl;
+  std::vector< short int > il;
+      
+  mesh.boundary_info->build_node_list(nl, il);
+
+  //Maps from nodeset id to the nodes
+  std::map<short int, std::vector<int> > node;
+
+  //Accumulate the vectors to pass into ex_put_node_set
+  for(unsigned int i = 0; i < nl.size(); i++)
+    node[il[i]].push_back(nl[i]);    
+  
+  std::vector<short int> node_boundary_ids;
+  mesh.boundary_info->build_node_boundary_ids(node_boundary_ids);
+  
+  for(unsigned int i = 0; i < node_boundary_ids.size(); i++)
+  {
+    int nodeset_id = node_boundary_ids[i];
+
+    ex_err = exII::ex_put_node_set_param(ex_id, nodeset_id, node[nodeset_id].size(), 0);
+    check_err(ex_err, "Error writing nodeset parameters");
+
+    ex_err = exII::ex_put_node_set(ex_id, nodeset_id, &node[nodeset_id][0]);
+    check_err(ex_err, "Error writing nodesets");
+  }
+}
+
 
 void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> names)
 {

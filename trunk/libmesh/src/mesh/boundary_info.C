@@ -555,7 +555,37 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
   return libMesh::invalid_uint;  
 }
 
+void BoundaryInfo::build_node_boundary_ids(std::vector<short int> &b_ids)
+{
+  b_ids.clear();
 
+  std::multimap<const Node*, short int>::const_iterator pos
+    = _boundary_node_id.begin();
+
+  for (; pos != _boundary_node_id.end(); ++pos)
+    {
+      short int id = pos->second;
+      
+      if(std::find(b_ids.begin(),b_ids.end(),id) == b_ids.end())
+        b_ids.push_back(id);
+    }
+}
+
+void BoundaryInfo::build_side_boundary_ids(std::vector<short int> &b_ids)
+{
+  b_ids.clear();
+
+  std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator pos
+    = _boundary_side_id.begin();
+
+  for (; pos != _boundary_side_id.end(); ++pos)
+    {
+      short int id = pos->second.second;
+      
+      if(std::find(b_ids.begin(),b_ids.end(),id) == b_ids.end())
+        b_ids.push_back(id);
+    }
+}
 
 unsigned int BoundaryInfo::n_boundary_conds () const
 {
