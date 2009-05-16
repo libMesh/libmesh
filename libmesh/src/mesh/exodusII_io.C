@@ -215,7 +215,7 @@ void ExodusII_IO::read (const std::string& fname)
   {
     exio_helper.read_nodeset_info();
 
-    for(unsigned int nodeset=0; nodeset<exio_helper.get_num_node_sets(); nodeset++)
+    for (int nodeset=0; nodeset<exio_helper.get_num_node_sets(); nodeset++)
       {
         int nodeset_id = exio_helper.get_nodeset_id(nodeset);
         
