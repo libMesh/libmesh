@@ -224,7 +224,7 @@ public:
   /**
    * @return the nodeset id corresponding to the ith nodeset.
    */
-  const int get_nodeset_id(unsigned int i) const { return nodeset_ids[i]; }
+  int get_nodeset_id(unsigned int i) const { return nodeset_ids[i]; }
 
   //     /**
   //      * @returns the \f$ i^{th} \f$ entry in
