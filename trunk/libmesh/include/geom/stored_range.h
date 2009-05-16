@@ -129,10 +129,13 @@ public:
   }
     
   /**
-   * Resets the \p StoredRange to contain [first,last).
-   */ 
-  void reset (const iterator_type &first,
-	      const iterator_type &last)
+   * Resets the \p StoredRange to contain [first,last).  Returns
+   * a reference to itself for convenience, so functions
+   * expecting a StoredRange<> can be passed e.g. foo.reset(begin,end).
+   */
+  StoredRange<iterator_type, object_type> & 
+  reset (const iterator_type &first,
+	 const iterator_type &last)
   {
     _objs.clear();
 
@@ -144,20 +147,26 @@ public:
 
     _first = 0;
     _last  = _objs.size();
+    
+    return *this;
   }
 
   /**
    * Resets the range to the last specified range.  This method only exists
    * for efficiency -- it is more efficient to set the range to its previous
-   * value without rebuilding the underlying vector.
+   * value without rebuilding the underlying vector.  Returns
+   * a reference to itself for convenience, so functions
+   * expecting a StoredRange<> can be passed e.g. foo.reset().
    */
-  void reset ()
+  StoredRange<iterator_type, object_type> & reset ()
   {
     _begin = _objs.begin();
     _end   = _objs.end();
 
     _first = 0;
     _last  = _objs.size();
+
+    return *this;
   }
   
   /**
@@ -189,7 +198,7 @@ public:
   /**
    * Set the grain size.
    */
-  void  grainsize (const unsigned int &gs) {_grainsize = gs;}
+  void grainsize (const unsigned int &gs) {_grainsize = gs;}
 
   /**
    * \return the size of the range.
