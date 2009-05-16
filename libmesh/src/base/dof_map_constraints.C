@@ -691,7 +691,8 @@ void DofMap::enforce_constraints_exactly (const System &system,
             Number exact_value = 0;
             for (unsigned int j=0; j!=C.n(); ++j)
               {
-                if (local_dof_indices[j] != global_dof)
+                if (local_dof_indices[j] != global_dof &&
+                    C(i,j) != 0.0)
                   exact_value += C(i,j) * 
                     (*v_local)(local_dof_indices[j]);
               }
