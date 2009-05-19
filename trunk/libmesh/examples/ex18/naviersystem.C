@@ -37,24 +37,15 @@ void NavierSystem::init_data ()
   // providing an LBB-stable pressure-velocity pair.
   // Add the velocity components "u" & "v".  They
   // will be approximated using second-order approximation.
-  this->add_variable ("u", SECOND);
-  u_var = 0;
-  this->add_variable ("v", SECOND);
-  v_var = 1;
+  u_var = this->add_variable ("u", SECOND);
+  v_var = this->add_variable ("v", SECOND);
 
   if (dim == 3)
-    {
-      this->add_variable ("w", SECOND);
-      w_var = 2;
-      p_var = 3;
-    }
+    w_var = this->add_variable ("w", SECOND);
   else
-    {
-      w_var = u_var;
-      p_var = 2;
-    }
+    w_var = u_var;
 
-  this->add_variable ("p", FIRST);
+  p_var = this->add_variable ("p", FIRST);
 
   // Do the parent's initialization after variables are defined
   FEMSystem::init_data();
