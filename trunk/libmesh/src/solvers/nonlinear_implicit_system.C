@@ -168,6 +168,10 @@ void NonlinearImplicitSystem::adjoint_solve ()
 {
   // Log how long the nonlinear solve takes.
   START_LOG("adjoint_solve()", "System");
+
+  // Adding an adjoint_solution vector, allocate an adjoint_solution if it doesn't already exist
+  
+  NumericVector<Number> & adjoint_solution = System::add_vector("adjoint_solution");
   
   // The nonlinear system should now already be solved.
   // Now assemble it's adjoint.
@@ -197,9 +201,9 @@ void NonlinearImplicitSystem::adjoint_solve ()
   AutoPtr<LinearSolver<Number> > linear_solver = LinearSolver<Number>::build();
 
   const std::pair<unsigned int, Real> rval =
-    linear_solver->solve (*matrix, *solution, *rhs,
+    linear_solver->solve (*matrix, adjoint_solution, *rhs,
 			   nonlinear_solver->relative_residual_tolerance,
-                           nonlinear_solver->max_nonlinear_iterations);
+                           nonlinear_solver->max_linear_iterations);
 
   // Store the number of nonlinear iterations required to
   // solve and the final residual.
