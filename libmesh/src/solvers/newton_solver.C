@@ -289,7 +289,7 @@ unsigned int NewtonSolver::solve()
        ++_outer_iterations)
     {
       if (!quiet)
-        std::cout << "Assembling System" << std::endl;
+        std::cout << "Assembling the System" << std::endl;
 
       _system.assembly(true, true);
       rhs.close();
@@ -497,6 +497,13 @@ unsigned int NewtonSolver::adjoint_solve()
 {
   START_LOG("adjoint_solve()", "NewtonSolver");
 
+  if (!quiet)
+  std::cout << "Assembling the Adjoint System" << std::endl;
+
+  // Adding an adjoint_solution vector, allocate an adjoint_solution if it doesn't already exist
+
+  NumericVector<Number> & adjoint_solution = _system.add_vector("adjoint_solution");
+  
   // Do DiffSystem assembly
   _system.assembly(false, true);
   _system.matrix->close();
@@ -513,18 +520,22 @@ unsigned int NewtonSolver::adjoint_solve()
   // And set the right hand side to the quantity of interest
   _system.assemble_qoi();
 
+  if (!quiet)
+    std::cout << "Linear solve of Adjoint System starting, tolerance " 
+	      << relative_residual_tolerance << std::endl;
+
   // Solve the linear system.  Two cases:
   const std::pair<unsigned int, Real> rval =
     (_system.have_matrix("Preconditioner")) ?
   // 1.) User-supplied preconditioner
     linear_solver->solve (*_system.matrix,
                           _system.get_matrix("Preconditioner"),
-			  *_system.solution, *_system.rhs,
+			  adjoint_solution, *_system.rhs,
                           relative_residual_tolerance,
                           max_linear_iterations) :
   // 2.) Use system matrix for the preconditioner
     linear_solver->solve (*_system.matrix,
-                          *_system.solution, *_system.rhs,
+                          adjoint_solution, *_system.rhs,
                           relative_residual_tolerance, 
                           max_linear_iterations);
 
@@ -536,6 +547,13 @@ unsigned int NewtonSolver::adjoint_solve()
   _system.get_dof_map().enforce_constraints_exactly(_system);
 #endif
 
+  const unsigned int linear_steps = rval.first;
+  libmesh_assert(linear_steps <= max_linear_iterations);
+
+  if (!quiet)
+    std::cout << "Linear solve of Adjoint System finished, step " << linear_steps
+	      << ", residual " << rval.second
+	      << std::endl;
 
   STOP_LOG("adjoint_solve()", "NewtonSolver");
 

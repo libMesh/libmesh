@@ -149,6 +149,10 @@ void LinearImplicitSystem::adjoint_solve ()
   if(_shell_matrix!=NULL)
     libmesh_not_implemented();
 
+  // Adding an adjoint_solution vector, allocate an adjoint_solution if it doesn't already exist 
+
+  NumericVector<Number> & adjoint_solution = System::add_vector("adjoint_solution");     
+
   if (this->assemble_before_solve)
     {
       // Assemble the linear system
@@ -175,23 +179,23 @@ void LinearImplicitSystem::adjoint_solve ()
   
   // Get the user-specifiied linear solver tolerance
   const Real tol            =
-    es.parameters.get<Real>("linear solver tolerance");
+    es.parameters.get<Real>("adjoint solver tolerance");
 
   // Get the user-specified maximum # of linear solver iterations
   const unsigned int maxits =
-    es.parameters.get<unsigned int>("linear solver maximum iterations");
+    es.parameters.get<unsigned int>("adjoint solver maximum iterations");
 
   // Solve the linear system.  Several cases:
   std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
   if(this->have_matrix("Preconditioner"))
     {
       // 3.) No shell matrix, but with user-supplied preconditioner
-      rval = linear_solver->solve (*matrix, this->get_matrix("Preconditioner"), *solution, *rhs, tol, maxits);
+      rval = linear_solver->solve (*matrix, this->get_matrix("Preconditioner"), adjoint_solution, *rhs, tol, maxits);
     }
   else
     {
       // 4.) No shell matrix, and use system matrix for the preconditioner
-      rval = linear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
+      rval = linear_solver->solve (*matrix, adjoint_solution, *rhs, tol, maxits);
     }
 
   // Store the number of linear iterations required to
