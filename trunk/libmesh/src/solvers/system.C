@@ -566,6 +566,14 @@ NumericVector<Number> & System::get_vector (const std::string& vec_name)
 }
 
 
+NumericVector<Number> & System::get_adjoint_solution ()
+{
+  // Get the adjoint solution using the get_vector function declared above
+  return this->get_vector("adjoint_solution");
+  
+}
+
+
 
 unsigned int System::add_variable (const std::string& var,
 			           const FEType& type,

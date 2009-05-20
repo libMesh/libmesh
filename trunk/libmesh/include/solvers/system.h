@@ -325,6 +325,12 @@ public:
   NumericVector<Number> & get_vector (const std::string& vec_name);
 
   /**
+   * @returns a reference to the system's adjoint solution vector
+   * name adjoint_solution. Adjoint system needs to be solved first.
+   */
+  NumericVector<Number> & get_adjoint_solution();
+
+  /**
    * @returns the number of vectors (in addition to the solution)
    * handled by this system
    * This is the size of the \p _vectors map
