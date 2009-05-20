@@ -541,6 +541,13 @@ public:
     libmesh_error();
   }
     
+  /**
+   * Exchanges the values/sizes of two vectors.  There should be
+   * enough indirection in subclasses to make this an O(1) header-swap
+   * operation.
+   */
+  virtual void swap (NumericVector<T> &v) = 0;
+
 protected:
   
   /**
