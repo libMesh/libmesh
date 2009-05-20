@@ -423,6 +423,11 @@ class LaspackVector : public NumericVector<T>
   virtual void pointwise_mult (const NumericVector<T>& vec1,
 			       const NumericVector<T>& vec2);
 
+  /**
+   * Swaps the raw QVector contents.
+   */
+  virtual void swap (NumericVector<T> &v);
+
  private:
 
   /**
@@ -692,6 +697,30 @@ T LaspackVector<T>::operator() (const unsigned int i) const
   
   return static_cast<T>(V_GetCmp(const_cast<QVector*>(&_vec), i+1));
 }
+
+
+
+template <typename T>
+inline
+void LaspackVector<T>::swap (NumericVector<T> &other)
+{
+  LaspackVector<T>& v = libmesh_cast_ref<LaspackVector<T>&>(other);
+
+  // This is all grossly dependent on Laspack version...
+
+  std::swap(_vec.Name, v._vec.Name);
+  std::swap(_vec.Dim, v._vec.Dim);
+  std::swap(_vec.Instance, v._vec.Instance);
+  std::swap(_vec.LockLevel, v._vec.LockLevel);
+  std::swap(_vec.Multipl, v._vec.Multipl);
+  std::swap(_vec.OwnData, v._vec.OwnData);
+
+  // This should still be O(1), since _vec.Cmp is just a pointer to
+  // data on the heap
+
+  std::swap(_vec.Cmp, v._vec.Cmp);
+}
+
 
 
 #endif // #ifdef LIBMESH_HAVE_LASPACK

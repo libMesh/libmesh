@@ -469,7 +469,7 @@ public:
   /**
    * Swaps the raw PETSc vector context pointers.
    */
-  void swap (PetscVector<T> &v);
+  virtual void swap (NumericVector<T> &v);
 
   /**
    * Returns the raw PETSc vector context pointer.  Note this is generally
@@ -1046,8 +1046,10 @@ Real PetscVector<T>::max() const
 
 template <typename T>
 inline
-void PetscVector<T>::swap (PetscVector<T> &v)
+void PetscVector<T>::swap (NumericVector<T> &other)
 {
+  PetscVector<T>& v = libmesh_cast_ref<PetscVector<T>&>(other);
+
   std::swap(_vec, v._vec);
   std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
   std::swap(_global_to_local_map, v._global_to_local_map);

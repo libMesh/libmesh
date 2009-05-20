@@ -418,6 +418,11 @@ public:
   virtual void pointwise_mult (const NumericVector<T>& vec1,
 			       const NumericVector<T>& vec2);
 
+  /**
+   * Swaps the vector data and metadata
+   */
+  virtual void swap (NumericVector<T> &v);
+
 private:
 
   /**
@@ -829,5 +834,22 @@ Real DistributedVector<T>::max() const
 
   return local_max;
 }
+
+
+template <typename T>
+inline
+void DistributedVector<T>::swap (NumericVector<T> &other)
+{
+  DistributedVector<T>& v = libmesh_cast_ref<DistributedVector<T>&>(other);
+
+  std::swap(_global_size, v._global_size);
+  std::swap(_local_size, v._local_size);
+  std::swap(_first_local_index, v._first_local_index);
+  std::swap(_last_local_index, v._last_local_index);
+
+  // This should be O(1) with any reasonable STL implementation
+  std::swap(_values, v._values);
+}
+
 
 #endif  // #ifdef __distributed_vector_h__
