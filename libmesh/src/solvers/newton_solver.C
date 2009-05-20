@@ -544,7 +544,7 @@ unsigned int NewtonSolver::adjoint_solve()
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_AMR
-  _system.get_dof_map().enforce_constraints_exactly(_system);
+  _system.get_dof_map().enforce_constraints_exactly(_system, &adjoint_solution);
 #endif
 
   const unsigned int linear_steps = rval.first;
