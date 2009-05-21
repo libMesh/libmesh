@@ -63,7 +63,7 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _dim           (other_mesh._dim),
   _is_prepared   (other_mesh._is_prepared),
   _point_locator (NULL),
-  _partitioner   (NULL)
+  _partitioner   (other_mesh._partitioner->clone())
 {
 }
 
