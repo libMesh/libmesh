@@ -63,6 +63,10 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
   // estimate will use the latter
   system.solution->swap(system.get_adjoint_solution());
 
+  // Don't forget to keep the current_local_solution consistent, as
+  // error estimators are likely to use that!
+  system.update();
+
   // Get a separate estimate of the dual problem error
   ErrorVector dual_error_per_cell;
   _dual_error_estimator->estimate_error
@@ -71,6 +75,9 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
   // Swap the system solution and dual solution back to their proper
   // places
   system.solution->swap(system.get_adjoint_solution());
+
+  // Don't forget to fix the current_local_solution
+  system.update();
 
   // Weight the primal error by the dual error
   // FIXME: we ought to thread this
