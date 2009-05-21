@@ -108,7 +108,15 @@ void UnstructuredMesh::copy_nodes_and_elements
     const_node_iterator end = other_mesh.nodes_end();
 
     for (; it != end; ++it)
-      this->add_point(*(*it)); //Add new nodes in old node Point locations
+      {
+        Node *oldn = *it;
+
+        // Add new nodes in old node Point locations
+        Node *newn = this->add_point(*oldn);
+
+        // And start them off in the same subdomain
+        newn->processor_id() = oldn->processor_id();
+      }
   }
   
   //Copy in Elements
@@ -154,6 +162,9 @@ void UnstructuredMesh::copy_nodes_and_elements
       
       //Hold onto it
       this->add_elem(elem);
+
+      // And start it off in the same subdomain
+      elem->processor_id() = old->processor_id();
     }
   }
   
