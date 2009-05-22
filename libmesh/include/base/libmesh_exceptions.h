@@ -32,7 +32,7 @@ namespace libMesh {
 
   /**
    * A class to represent the internal "this should never happen"
-   * errors; to be thrown by "libmesh_error();"
+   * errors, to be thrown by "libmesh_error();"
    */
   class LogicError : public std::logic_error
     {
@@ -43,7 +43,7 @@ namespace libMesh {
 
   /**
    * A class to stub for features that should be in libMesh, but
-   * haven't been written yet; to be thrown by
+   * haven't been written yet, to be thrown by
    * "libmesh_not_implemented();"
    */
   class NotImplemented : public std::logic_error
@@ -55,7 +55,7 @@ namespace libMesh {
 
   /**
    * A class representing a failed attempt by the library to open a
-   * file (or construct an fstream, etc); to be thrown by
+   * file (or construct an fstream, etc), to be thrown by
    * "libmesh_file_error(filename);" For ease of debugging, "filename"
    * should include any (absolute or relative or implicit) pathname
    * that was part of the failed open.
@@ -66,6 +66,19 @@ namespace libMesh {
       FileError(const std::string& filename) : std::runtime_error( "Error accessing file: " + filename ) {}
     };
 
+
+  /**
+   * A class representing a solver's failure to converge, to be thrown
+   * by "libmesh_convergence_failure();"  This should be a last
+   * resort; more often, a solve which has failed should be
+   * reattempted after switching to a smaller timestep, adding
+   * underrelaxation, taking a smaller continuation step, etc.
+   */
+  class ConvergenceFailure : public std::runtime_error
+    {
+    public:
+      ConvergenceFailure() : std::runtime_error( "Unrecoverable failure to converge" ) {}
+    };
 }
 
 #define LIBMESH_THROW(e) do { throw e; } while (0)
