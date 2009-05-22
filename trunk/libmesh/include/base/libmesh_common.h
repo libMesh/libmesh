@@ -237,9 +237,13 @@ std::cout << "here() is deprecated; use libmesh_here() instead!" \
 //
 // The libmesh_file_error(const std::string& filename) macro prints a message
 // and throws a FileError exception
+//
+// The libmesh_convergence_failure() macro prints a message
+// and throws a ConvergenceFailure exception
 #define libmesh_error()    do { libmesh_write_traceout(); libmesh_here(); LIBMESH_THROW(libMesh::LogicError()); } while(0)
 #define libmesh_not_implemented()    do { libmesh_write_traceout(); libmesh_here(); LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
 #define libmesh_file_error(filename)    do { libmesh_write_traceout(); libmesh_here(); LIBMESH_THROW(libMesh::FileError(filename)); } while(0)
+#define libmesh_convergence_failure()    do { libmesh_here(); LIBMESH_THROW(libMesh::ConvergenceFailure()); } while(0)
 
 // The libmesh_cast functions do a dynamic cast and assert the result,
 // if we're in debug or development modes, but just do a faster static

@@ -94,7 +94,7 @@ Real NewtonSolver::line_search(Real tol,
 
           if (!continue_after_backtrack_failure)
             {
-              libmesh_error();
+              libmesh_convergence_failure();
             }
           else
             {
@@ -303,7 +303,7 @@ unsigned int NewtonSolver::solve()
           std::cout << "  Nonlinear solver DIVERGED at step " << last_residual
                     << " with norm Not-a-Number"
                     << std::endl;
-          libmesh_error();
+          libmesh_convergence_failure();
           continue;
         }
 #endif // isnan
@@ -468,7 +468,7 @@ unsigned int NewtonSolver::solve()
 	    }
           else
 	    {
-	      libmesh_error();
+	      libmesh_convergence_failure();
 	    }
           continue;
         }
