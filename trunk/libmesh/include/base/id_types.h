@@ -1,4 +1,4 @@
-// $Id: elem.h 3238 2009-01-29 23:50:05Z benkirk $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner

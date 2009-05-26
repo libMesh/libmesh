@@ -71,7 +71,7 @@ endif
 #
 .PHONY: echo echo_cxxflags echo_include echo_ldflags \
 	clean clobber distclean \
-	doc upload doc_upload log cvsweb TODO
+	doc upload doc_upload log cvsweb TODO svnexpand
 
 #
 # static library
@@ -267,6 +267,9 @@ log: $(loggedfiles)
 # anything.
 cvsweb:
 	./contrib/bin/cvs2html -f -p -o doc/cvshtml/index.html -v -a -b -n 2 -C crono.html
+
+svnexpand:
+        @svn propset svn:keywords "Date Author Revision HeadURL Id" $(srcfiles) $(headerfiles)
 
 #
 # Standalone applications.  Anything in the ./src/apps directory that ends in .cc
