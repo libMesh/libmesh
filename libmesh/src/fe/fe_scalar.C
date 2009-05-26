@@ -1,4 +1,4 @@
-// $Id: fe_lagrange.C 3244 2009-01-30 23:42:03Z roystgnr $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner

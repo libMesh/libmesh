@@ -1,5 +1,5 @@
 
-// $Id: fem_system.h 3103 2008-10-16 21:09:35Z roystgnr $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner

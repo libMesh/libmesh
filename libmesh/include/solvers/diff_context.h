@@ -1,5 +1,5 @@
 
-// $Id: diff_system.h 3086 2008-10-07 20:28:08Z roystgnr $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner

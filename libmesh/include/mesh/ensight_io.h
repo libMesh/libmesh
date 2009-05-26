@@ -1,4 +1,4 @@
-// $Id: tecplot_io.h 3039 2008-09-17 01:26:31Z benkirk $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
