@@ -291,17 +291,20 @@ dnl -------------------------------------------------------------
 AC_DEFUN(SET_CXX_FLAGS, dnl
 [
   dnl Flag for creating shared objects; can be modified at a later stage
-  if test "x$target_os" = "xdarwin9.6.0" ; then
-    if test "$enableshared" = yes ; then
-      CXXFLAGS_OPT="-fno-common"
-      CXXFLAGS_DVL="-fno-common"
-      CXXFLAGS_DBG="-fno-common"
-      CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup"
-      CSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup"
-    fi
-  else
-    CXXSHAREDFLAG="-shared"
-  fi
+  case "$target_os" in
+    *darwin*)
+      if test "$enableshared" = yes ; then
+        CXXFLAGS_OPT="-fno-common"
+        CXXFLAGS_DVL="-fno-common"
+        CXXFLAGS_DBG="-fno-common"
+        CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
+        CSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
+      fi
+      ;;
+    *)  
+      CXXSHAREDFLAG="-shared"
+      ;;
+  esac
 
   dnl Flag to add directories to the dynamic library search path; can
   dnl be changed at a later stage
@@ -1045,20 +1048,20 @@ AC_DEFUN(CONFIGURE_TBB,
   AC_ARG_WITH(tbb-lib,
               AC_HELP_STRING([--with-tbb-lib=PATH],[Specify the path to Threading Building Blocks libraries]),
               withtbblib=$withval,
-              withtbblib="-L$TBB_LIB_PATH -ltbb -ltbbmalloc")
+              withtbblib=$TBB_LIB_PATH)
 
   if test "$withtbb" != no ; then
     AC_CHECK_FILE($withtbb/include/tbb/task_scheduler_init.h,
                       TBB_INCLUDE_PATH=$withtbb/include)
-    if test "$withtbblib" != no ; then
+    if test "x$withtbblib" != "x" ; then
       TBB_LIBS=$withtbblib
     else	
-      TBB_LIBS=""
+      TBB_LIBS=$withtbb/lib
     fi
   fi
 
   if (test -r $TBB_INCLUDE_PATH/tbb/task_scheduler_init.h) ; then
-    TBB_LIBRARY=$TBB_LIBS
+    TBB_LIBRARY="-L$TBB_LIBS -ltbb -ltbbmalloc"
     TBB_INCLUDE=-I$TBB_INCLUDE_PATH
     AC_SUBST(TBB_LIBRARY)
     AC_SUBST(TBB_INCLUDE)
