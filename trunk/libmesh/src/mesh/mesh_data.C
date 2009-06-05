@@ -245,11 +245,13 @@ void MeshData::read (const std::string& name)
 		<< "         stored in file may be totally different from libMesh ids!" << std::endl;
 #endif
 
-  // Read the file based on extension
-  // For now, only processor 0 should read the
-  // mesh data.
-  if (libMesh::processor_id() == 0)
-    {
+  // Read the file based on extension.  We let all processors read the
+  // data because it would be inaccurate to let only one processor
+  // have it and we're too lazy to code up a proper parallel read or
+  // read+broadcast right now.
+
+  //if (libMesh::processor_id() == 0)
+  //  {
       if (name.rfind(".xta") < name.size())
 	this->read_xdr (name, READ);
       
@@ -274,7 +276,7 @@ void MeshData::read (const std::string& name)
 	  libmesh_error();
 	  
 	}    
-    }
+    //}
   STOP_LOG("read()", "MeshData");
 }
 
