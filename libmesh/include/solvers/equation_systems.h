@@ -229,6 +229,16 @@ public:
   virtual void solve ();
   
   /**
+   * Call \p adjoint_solve on all the individual equation systems.
+   *
+   * By default this function solves each equation system once,
+   * in the reverse order from that in which they were added.  For
+   * more sophisticated decoupled problems the user may with to
+   * override this behavior in a derived class.
+   */
+  virtual void adjoint_solve ();
+
+  /**
    * Fill the input vector \p var_names with the names
    * of the variables for each system.
    */

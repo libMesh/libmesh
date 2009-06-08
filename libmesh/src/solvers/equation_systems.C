@@ -384,7 +384,18 @@ void EquationSystems::solve ()
   for (unsigned int i=0; i != this->n_systems(); ++i)
     this->get_system(i).solve();
 }
+
+
  
+void EquationSystems::adjoint_solve ()
+{
+  libmesh_assert (this->n_systems());
+
+  for (unsigned int i=this->n_systems(); i != 0; --i)
+    this->get_system(i-1).adjoint_solve();
+}
+ 
+
  
 void EquationSystems::build_variable_names (std::vector<std::string>& var_names) const
 {
