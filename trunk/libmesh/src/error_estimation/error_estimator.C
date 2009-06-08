@@ -64,7 +64,8 @@ void ErrorEstimator::convert_component_mask_to_scale()
 
 void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
                                      ErrorVector& error_per_cell,
-                                     std::map<const System*, std::vector<float> >& component_scales,
+                                     const std::map<const System*, std::vector<float> >& component_scales,
+				     const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
                                      bool estimate_parent_error)
 {
   // This is a brand-new function; if you're using it you should
@@ -81,9 +82,15 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
       if (component_scales.find(&sys) == component_scales.end())
         this->component_scale = old_component_scale;
       else
-        this->component_scale = component_scales[&sys];
+        this->component_scale = component_scales.find(&sys)->second;
 
-      this->estimate_error(sys, system_error_per_cell, estimate_parent_error);
+      const NumericVector<Number>* solution_vector = NULL;
+      if (solution_vectors &&
+	  solution_vectors->find(&sys) != solution_vectors->end())
+	solution_vector = solution_vectors->find(&sys)->second;
+
+      this->estimate_error(sys, system_error_per_cell,
+			   solution_vector, estimate_parent_error);
 
       if (s)
         {
@@ -107,6 +114,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
  */
 void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
                                      ErrorMap& errors_per_cell,
+				     const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
                                      bool estimate_parent_error)
 {
   // This is a brand-new function; if you're using it you should
@@ -135,9 +143,14 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
 
           this->component_scale[v] = 1.0;
 
+          const NumericVector<Number>* solution_vector = NULL;
+          if (solution_vectors &&
+	      solution_vectors->find(&sys) != solution_vectors->end())
+	    solution_vector = solution_vectors->find(&sys)->second;
+
           this->estimate_error
             (sys, *errors_per_cell[std::make_pair(&sys, v)],
-             estimate_parent_error);
+             solution_vector, estimate_parent_error);
 
           this->component_scale[v] = 0.0;
         }

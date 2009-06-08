@@ -74,6 +74,7 @@ public:
    */
   virtual void estimate_error (const System& system,
 			       ErrorVector& error_per_cell,
+			       const NumericVector<Number>* solution_vector = NULL,
 			       bool estimate_parent_error = false);
 
   /**
@@ -85,7 +86,8 @@ public:
    */
   virtual void estimate_errors (const EquationSystems& equation_systems,
 				ErrorVector& error_per_cell,
-				std::map<const System*, std::vector<float> >& component_scales,
+				const std::map<const System*, std::vector<float> >& component_scales,
+			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
 				bool estimate_parent_error = false);
 
   /**
@@ -98,6 +100,7 @@ public:
    */
   virtual void estimate_errors (const EquationSystems& equation_systems,
 			        ErrorMap& errors_per_cell,
+			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
 			        bool estimate_parent_error = false);
 
   /**
@@ -126,7 +129,8 @@ protected:
                                 const System* system,
 				ErrorVector* error_per_cell,
 			        std::map<std::pair<const System*, unsigned int>, ErrorVector*>* errors_per_cell,
-				std::map<const System*, std::vector<float> >* component_scales,
+				const std::map<const System*, std::vector<float> >* component_scales,
+			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
 				bool estimate_parent_error = false);
 
 private:

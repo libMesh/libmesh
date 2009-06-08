@@ -38,6 +38,7 @@
 #include "quadrature_grid.h"
 #include "system.h"
 #include "mesh.h"
+#include "numeric_vector.h"
 #include "tensor_value.h"
 
 
@@ -109,6 +110,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 
 void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 						  ErrorVector& error_per_cell,
+					          const NumericVector<Number>* solution_vector,
 					          bool)
 {
   START_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
@@ -146,7 +148,17 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 	libmesh_error();
       }
 
-
+  // Prepare current_local_solution to localize a non-standard
+  // solution vector if necessary
+  if (solution_vector && solution_vector != system.solution.get())
+    {
+      NumericVector<Number>* newsol =
+        const_cast<NumericVector<Number>*>(solution_vector);
+      System &sys = const_cast<System&>(system);
+      newsol->swap(*sys.solution);
+      sys.update();
+    }
+  
   //------------------------------------------------------------
   // Iterate over all the active elements in the mesh
   // that live on this processor.
@@ -164,6 +176,17 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
   // for each element, local or remote
   this->reduce_error(error_per_cell);
   
+  // If we used a non-standard solution before, now is the time to fix
+  // the current_local_solution
+  if (solution_vector && solution_vector != system.solution.get())
+    {
+      NumericVector<Number>* newsol =
+        const_cast<NumericVector<Number>*>(solution_vector);
+      System &sys = const_cast<System&>(system);
+      newsol->swap(*sys.solution);
+      sys.update();
+    }
+
   STOP_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
 }
 

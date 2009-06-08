@@ -44,32 +44,38 @@
 // ErrorEstimator implementations
 void UniformRefinementEstimator::estimate_error (const System& _system,
 					         ErrorVector& error_per_cell,
+					         const NumericVector<Number>* solution_vector,
 					         bool estimate_parent_error)
 {
   START_LOG("estimate_error()", "UniformRefinementEstimator");
-  this->_estimate_error
-    (NULL, &_system, &error_per_cell, NULL, NULL, estimate_parent_error);
+  std::map<const System*, const NumericVector<Number>* > solution_vectors;
+  solution_vectors[&_system] = solution_vector;
+  this->_estimate_error (NULL, &_system, &error_per_cell, NULL, NULL,
+			 &solution_vectors, estimate_parent_error);
   STOP_LOG("estimate_error()", "UniformRefinementEstimator");
 }
 
 void UniformRefinementEstimator::estimate_errors (const EquationSystems& _es,
 					         ErrorVector& error_per_cell,
-                                                 std::map<const System*, std::vector<float> >& component_scales,
+                                                 const std::map<const System*, std::vector<float> >& component_scales,
+			                         const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
 					         bool estimate_parent_error)
 {
   START_LOG("estimate_errors()", "UniformRefinementEstimator");
-  this->_estimate_error
-    (&_es, NULL, &error_per_cell, NULL, &component_scales, estimate_parent_error);
+  this->_estimate_error (&_es, NULL, &error_per_cell, NULL,
+			 &component_scales, solution_vectors,
+			 estimate_parent_error);
   STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
 }
 
 void UniformRefinementEstimator::estimate_errors (const EquationSystems& _es,
                                                   ErrorMap& errors_per_cell,
+			                          const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
                                                   bool estimate_parent_error)
 {
   START_LOG("estimate_errors()", "UniformRefinementEstimator");
-  this->_estimate_error
-    (&_es, NULL, NULL, &errors_per_cell, NULL, estimate_parent_error);
+  this->_estimate_error (&_es, NULL, NULL, &errors_per_cell, NULL,
+			 solution_vectors, estimate_parent_error);
   STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
 }
 
@@ -77,13 +83,16 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                                                  const System* _system,
 					         ErrorVector* error_per_cell,
                                                  ErrorMap* errors_per_cell,
-                                                 std::map<const System*, std::vector<float> > *_component_scales,
+                                                 const std::map<const System*, std::vector<float> > *_component_scales,
+			                         const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
 					         bool)
 {
   // Get a vector of the Systems we're going to work on,
   // and set up a component_scales map if necessary
   std::vector<System *> system_list;
-  std::map<const System*, std::vector<float> > *component_scales;
+  AutoPtr<std::map<const System*, std::vector<float> > > component_scales = 
+    AutoPtr<std::map<const System*, std::vector<float> > >
+    (new std::map<const System*, std::vector<float> >);
 
   if (_es)
     {
@@ -102,7 +111,6 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       if (_component_scales)
         {
           libmesh_assert(!errors_per_cell);
-          component_scales = _component_scales;
         }
       else
       // If we're computing many vectors, we just need to know which
@@ -110,7 +118,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
         {
           libmesh_assert (errors_per_cell);
 
-          component_scales = new std::map<const System*, std::vector<float> >;
+          _component_scales = component_scales.get();
+
           for (unsigned int i=0; i!= _es->n_systems(); ++i)
             {
               const System &sys = _es->get_system(i);
@@ -136,8 +145,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       system_list.push_back(const_cast<System *>(_system));
 
       libmesh_assert(!_component_scales);
-      component_scales = new std::map<const System*, std::vector<float> >;
       (*component_scales)[_system] = component_scale;
+      _component_scales = component_scales.get();
     }
 
   // An EquationSystems reference will be convenient.
@@ -196,16 +205,20 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
     {
       System &system = *system_list[i];
 
-
       // Check for valid component_scales
-      if (!(*component_scales)[&system].empty())
+      libmesh_assert (_component_scales->find(&system) !=
+		      _component_scales->end());
+
+      const std::vector<float>& component_scale =
+        _component_scales->find(&system)->second;
+      if (!component_scale.empty())
         {
-          if ((*component_scales)[&system].size() != system.n_vars())
+          if (component_scale.size() != system.n_vars())
 	    {
 	      std::cerr << "ERROR: component_scale is the wrong size:"
 		        << std::endl
 		        << " component_scales[" << i << "].scale()=" 
-                        << (*component_scales)[&system].size()
+                        << component_scale.size()
 		        << std::endl
 		        << " n_vars=" << system.n_vars()
 		        << std::endl;
@@ -214,10 +227,14 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
         }
       else
         {
-          // No specified scaling.  Scale all variables by one.
-          (*component_scales)[&system].resize (system.n_vars());
-          std::fill ((*component_scales)[&system].begin(),
-                     (*component_scales)[&system].end(), 1.0);
+          // // No specified scaling.  Scale all variables by one.
+
+	  // This will be done implicitly later, to avoid modifying
+	  // a const component_scales
+
+          // component_scale.resize (system.n_vars());
+          // std::fill (component_scale.begin(),
+          //            component_scale.end(), 1.0);
         }
   
       // Back up the solution vector
@@ -233,6 +250,18 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
           const std::string& var_name = vec->first;
 
           coarse_vectors[i][var_name] = vec->second->clone().release();
+        }
+
+      // Use a non-standard solution vector if necessary
+      if (solution_vectors && 
+	  solution_vectors->find(&system) != solution_vectors->end() && 
+	  solution_vectors->find(&system)->second != system.solution.get())
+        {
+          NumericVector<Number>* newsol =
+            const_cast<NumericVector<Number>*>
+	    (solution_vectors->find(&system)->second);
+	  newsol->swap(*system.solution);
+	  system.update();
         }
 
       // Make sure the solution is projected when we refine the mesh
@@ -285,9 +314,65 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   // Get the uniformly refined solution.
 
   if (_es)
-    es.solve();
+    {
+      // No specified vectors == forward solve
+      if (!solution_vectors)
+        es.solve();
+      else
+        {
+          libmesh_assert(solution_vectors->size() == es.n_systems());
+	  libmesh_assert(solution_vectors->find(system_list[0]) !=
+			 solution_vectors->end());
+	  bool solve_adjoint =
+	    (solution_vectors->find(system_list[0])->second ==
+	     &system_list[0]->get_adjoint_solution());
+	  libmesh_assert(solve_adjoint ||
+	    (solution_vectors->find(system_list[0])->second ==
+	     system_list[0]->solution.get()));
+			 
+#ifdef DEBUG
+	  for (unsigned int i=0; i != system_list.size(); ++i)
+	    {
+	      libmesh_assert(solution_vectors->find(system_list[i]) !=
+			     solution_vectors->end());
+	      libmesh_assert(!solve_adjoint ||
+			     solution_vectors->find(system_list[i])->second ==
+			     &system_list[i]->get_adjoint_solution());
+	      libmesh_assert(solve_adjoint ||
+			     solution_vectors->find(system_list[i])->second ==
+			     system_list[i]->solution.get());
+	    }
+#endif
+
+          if (solve_adjoint)
+            es.adjoint_solve();
+	  else
+            es.solve();
+	}
+    }
   else
-    system_list[0]->solve();
+    {
+      // No specified vectors == forward solve
+      if (!solution_vectors)
+        system_list[0]->solve();
+      else
+        {
+	  libmesh_assert(solution_vectors->find(system_list[0]) !=
+			 solution_vectors->end());
+
+	  bool solve_adjoint =
+	    (solution_vectors->find(system_list[0])->second ==
+	     &system_list[0]->get_adjoint_solution());
+	  libmesh_assert(solve_adjoint ||
+	    (solution_vectors->find(system_list[0])->second ==
+	     system_list[0]->solution.get()));
+
+          if (solve_adjoint)
+            system_list[0]->adjoint_solve();
+	  else
+            system_list[0]->solve();
+        }
+    }
   
   // Get the error in the uniformly refined solution(s).
 
@@ -299,8 +384,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
       DofMap &dof_map = system.get_dof_map();
 
-      std::vector<float> &_component_scale =
-        (*component_scales)[&system];
+      const std::vector<float> &_component_scale =
+        _component_scales->find(&system)->second;
 
       NumericVector<Number> *projected_solution = projected_solutions[i];
 
@@ -309,7 +394,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
         {
           Real var_scale = 1.0;
 
-          // Possibly skip this variable
+          // Possibly skip or weight this variable
           if (!_component_scale.empty())
             {
 	      if (_component_scale[var] == 0.0)
@@ -546,9 +631,6 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
   // Restore old partitioner settings
   mesh.partitioner() = old_partitioner;
-
-  if (!_component_scales)
-    delete component_scales;
 }
 
 #endif // #ifdef LIBMESH_ENABLE_AMR

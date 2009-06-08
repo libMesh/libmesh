@@ -95,10 +95,12 @@ void ExactErrorEstimator::attach_reference_solution (EquationSystems* es_fine)
 #ifdef LIBMESH_ENABLE_AMR
 void ExactErrorEstimator::estimate_error (const System& system,
 					  ErrorVector& error_per_cell,
+					  const NumericVector<Number>* solution_vector,
 					  bool estimate_parent_error)
 #else
 void ExactErrorEstimator::estimate_error (const System& system,
 					  ErrorVector& error_per_cell,
+					  const NumericVector<Number>* solution_vector,
 					  bool /* estimate_parent_error */ )
 #endif
 {
@@ -143,6 +145,17 @@ void ExactErrorEstimator::estimate_error (const System& system,
       std::fill (component_scale.begin(), component_scale.end(), 1.0);
     }
 
+  // Prepare current_local_solution to localize a non-standard
+  // solution vector if necessary
+  if (solution_vector && solution_vector != system.solution.get())
+    {
+      NumericVector<Number>* newsol =
+        const_cast<NumericVector<Number>*>(solution_vector);
+      System &sys = const_cast<System&>(system);
+      newsol->swap(*sys.solution);
+      sys.update();
+    }
+  
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_vars; var++)
     {
@@ -173,8 +186,11 @@ void ExactErrorEstimator::estimate_error (const System& system,
 	const System& fine_system = _equation_systems_fine->get_system(system.name());
 
 	std::vector<Number> global_soln;
+	// FIXME - we're assuming that the fine system solution gets
+	// used even when a different vector is used for the coarse
+	// system
 	fine_system.update_global_solution(global_soln);
-	fine_soln->init (fine_system.solution->size(), true, SERIAL);
+	fine_soln->init (global_soln.size(), true, SERIAL);
 	(*fine_soln) = global_soln;
 
 	fine_values = AutoPtr<MeshFunction>
@@ -184,7 +200,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 			    fine_system.variable_number(var_name)));
 	fine_values->init();
       }
-      
+
       // Request the data we'll need to compute with
       fe->get_JxW();
       fe->get_phi();
@@ -279,7 +295,16 @@ void ExactErrorEstimator::estimate_error (const System& system,
     }
   STOP_LOG("std::sqrt()", "ExactErrorEstimator");
 
-  //  STOP_LOG("flux_jumps()", "KellyErrorEstimator");
+  // If we used a non-standard solution before, now is the time to fix
+  // the current_local_solution
+  if (solution_vector && solution_vector != system.solution.get())
+    {
+      NumericVector<Number>* newsol =
+        const_cast<NumericVector<Number>*>(solution_vector);
+      System &sys = const_cast<System&>(system);
+      newsol->swap(*sys.solution);
+      sys.update();
+    }
 }
 
 

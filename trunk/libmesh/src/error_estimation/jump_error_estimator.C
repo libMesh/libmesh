@@ -37,6 +37,7 @@
 #include "system.h"
 
 #include "dense_vector.h"
+#include "numeric_vector.h"
 
 //-----------------------------------------------------------------
 // JumpErrorEstimator implementations
@@ -50,6 +51,7 @@ void JumpErrorEstimator::initialize (const System&,
 
 void JumpErrorEstimator::estimate_error (const System& system,
 					 ErrorVector& error_per_cell,
+					 const NumericVector<Number>* solution_vector,
 					 bool estimate_parent_error)
 {
   START_LOG("estimate_error()", "JumpErrorEstimator");
@@ -144,8 +146,18 @@ void JumpErrorEstimator::estimate_error (const System& system,
       component_scale.resize (n_vars);
       std::fill (component_scale.begin(), component_scale.end(), 1.0);
     }
-  
 
+  // Prepare current_local_solution to localize a non-standard
+  // solution vector if necessary
+  if (solution_vector && solution_vector != system.solution.get())
+    {
+      NumericVector<Number>* newsol =
+        const_cast<NumericVector<Number>*>(solution_vector);
+      System &sys = const_cast<System&>(system);
+      newsol->swap(*sys.solution);
+      sys.update();
+    }
+  
   // Loop over all the variables in the system
   for (var=0; var<n_vars; var++)
     {
@@ -405,6 +417,17 @@ void JumpErrorEstimator::estimate_error (const System& system,
 	}
     }
   
+  // If we used a non-standard solution before, now is the time to fix
+  // the current_local_solution
+  if (solution_vector && solution_vector != system.solution.get())
+    {
+      NumericVector<Number>* newsol =
+        const_cast<NumericVector<Number>*>(solution_vector);
+      System &sys = const_cast<System&>(system);
+      newsol->swap(*sys.solution);
+      sys.update();
+    }
+
   STOP_LOG("estimate_error()", "JumpErrorEstimator");
 }
 
