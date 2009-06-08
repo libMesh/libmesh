@@ -43,41 +43,49 @@ AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
 
 void AdjointResidualErrorEstimator::estimate_error (const System& _system,
 						    ErrorVector& error_per_cell,
+						    const NumericVector<Number>* solution_vector,
 					            bool estimate_parent_error)
 {
   START_LOG("estimate_error()", "AdjointResidualErrorEstimator");
 
-  // FIXME - we'll need to change a lot of APIs to make this trick
-  // work with a const System...
-  System&  system = const_cast<System&>(_system);
-
   // Start by estimating the primal problem error
   _primal_error_estimator->estimate_error
-    (system, error_per_cell, estimate_parent_error);
+    (_system, error_per_cell, solution_vector, estimate_parent_error);
 
   // Solve the dual problem if we have to
   if (!adjoint_already_solved)
-    system.adjoint_solve();
+    {
+      // FIXME - we'll need to change a lot of APIs to make this trick
+      // work with a const System...
+      System&  system = const_cast<System&>(_system);
+      system.adjoint_solve();
+    }
 
-  // Swap the system solution and dual solution, so our next error
-  // estimate will use the latter
-  system.solution->swap(system.get_adjoint_solution());
+  // This bookkeeping should now be taken care of in subestimators
+  // when they see a non-default solution_vector
+  //
+  // // Swap the system solution and dual solution, so our next error
+  // // estimate will use the latter
+  // // system.solution->swap(system.get_adjoint_solution());
 
-  // Don't forget to keep the current_local_solution consistent, as
-  // error estimators are likely to use that!
-  system.update();
+  // // Don't forget to keep the current_local_solution consistent, as
+  // // error estimators are likely to use that!
+  // // system.update();
 
   // Get a separate estimate of the dual problem error
   ErrorVector dual_error_per_cell;
   _dual_error_estimator->estimate_error
-    (system, dual_error_per_cell, estimate_parent_error);
+    (_system, dual_error_per_cell, &(_system.get_adjoint_solution()),
+     estimate_parent_error);
 
-  // Swap the system solution and dual solution back to their proper
-  // places
-  system.solution->swap(system.get_adjoint_solution());
+  // More bookkeeping for subestimators to do
+  //
+  // // Swap the system solution and dual solution back to their proper
+  // // places
+  // system.solution->swap(system.get_adjoint_solution());
 
-  // Don't forget to fix the current_local_solution
-  system.update();
+  // // Don't forget to fix the current_local_solution
+  // system.update();
 
   // Weight the primal error by the dual error
   // FIXME: we ought to thread this

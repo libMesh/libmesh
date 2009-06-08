@@ -85,6 +85,7 @@ public:
    */
   void estimate_error (const System& system,
                        ErrorVector& error_per_cell,
+		       const NumericVector<Number>* solution_vector = NULL,
                        bool estimate_parent_error = false);
   
 protected:
