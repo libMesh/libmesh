@@ -37,6 +37,7 @@ extern "C"
   typedef int PetscInt;
 #endif
 
+#if PETSC_VERSION_LESS_THAN(3,0,1) && PETSC_VERSION_RELEASE
   PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx)
   {
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
@@ -57,7 +58,31 @@ extern "C"
 
     return 0;
   }
-  
+#else
+  PetscErrorCode __libmesh_petsc_preconditioner_setup (PC pc)
+  {
+    void *ctx;
+    PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
+    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
+    preconditioner->init();
+
+    return 0;
+  }
+
+  PetscErrorCode __libmesh_petsc_preconditioner_apply(PC pc, Vec x, Vec y)
+  {
+    void *ctx;
+    PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
+    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
+
+    PetscVector<Number> x_vec(x);
+    PetscVector<Number> y_vec(y);
+
+    preconditioner->apply(x_vec,y_vec);
+
+    return 0;
+  }
+#endif
 } // end extern "C"
 
 /*----------------------- functions ----------------------------------*/
