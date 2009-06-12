@@ -158,6 +158,11 @@ void EquationSystems::reinit ()
     for (unsigned int i=0; i != this->n_systems(); ++i)
       {
 	System &sys = this->get_system(i);
+
+        // Don't do anything if the system doesn't have any variables in it
+        if(!sys.n_vars())
+          continue;
+        
         sys.get_dof_map().distribute_dofs(_mesh);
 
         // Recreate any hanging node constraints
