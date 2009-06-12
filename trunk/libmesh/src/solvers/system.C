@@ -312,6 +312,10 @@ void System::re_update ()
 {
   //const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
 
+  // If this system is empty... don't do anything!
+  if(!this->n_vars())
+    return;
+
   // Explicitly build a send_list
   std::vector<unsigned int> send_list(solution->size());
   Utility::iota (send_list.begin(), send_list.end(), 0);
