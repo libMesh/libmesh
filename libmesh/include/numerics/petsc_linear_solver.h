@@ -62,6 +62,7 @@ extern "C"
   typedef int PetscInt;
 #endif
 
+#if PETSC_VERSION_LESS_THAN(3,0,1) && PETSC_VERSION_RELEASE
   /**
    * This function is called by PETSc to initialize the preconditioner.
    * ctx will hold the Preconditioner.
@@ -73,6 +74,10 @@ extern "C"
    * ctx will hold the Preconditioner.
    */
   PetscErrorCode __libmesh_petsc_preconditioner_apply(void *ctx, Vec x, Vec y);
+#else
+  PetscErrorCode __libmesh_petsc_preconditioner_setup (PC);
+  PetscErrorCode __libmesh_petsc_preconditioner_apply(PC, Vec x, Vec y);
+#endif
 } // end extern "C"
 
 
