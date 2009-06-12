@@ -691,6 +691,10 @@ void DofMap::enforce_constraints_exactly (const System &system,
             Number exact_value = 0;
             for (unsigned int j=0; j!=C.n(); ++j)
               {
+		/* If ghosted vectors are enabled, vector components
+		   for which C(i,j) vanishes may sometimes not be
+		   accessible in the vector.  Hence, it is important
+		   to explicitly skip them in the summation.  */
                 if (local_dof_indices[j] != global_dof &&
                     C(i,j) != 0.0)
                   exact_value += C(i,j) * 
