@@ -32,13 +32,20 @@
 // SCALAR-specific implementations
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::nodal_soln(const Elem*,
-			   const Order,
-			   const std::vector<Number>&,
-			   std::vector<Number>&)
+void FE<Dim,T>::nodal_soln(const Elem* elem,
+			   const Order order,
+			   const std::vector<Number>& elem_soln,
+			   std::vector<Number>&       nodal_soln)
 {
-  // Do nothing, not relevant to SCALAR
-  return;
+  const unsigned int n_nodes = elem->n_nodes();
+  nodal_soln.resize(n_nodes);
+
+  // If the SCALAR order is CONSTANT, just set the nodal values
+  // to zero, otherwise, set to the value of the first SCALAR dof
+  for(unsigned int i=0; i<n_nodes; i++)
+  {
+    nodal_soln[i] = (order == CONSTANT) ? 0. : elem_soln[0];
+  }
 }
 
 template <unsigned int Dim, FEFamily T>
