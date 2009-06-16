@@ -57,6 +57,7 @@ class PerfData
    */
   PerfData () :
     tot_time(0.),
+    tot_time_incl_sub(0.),
     count(0),
     open(false),
     called_recursively(0)
@@ -69,10 +70,21 @@ class PerfData
   double tot_time;
 
   /**
+   * Total time spent in this event, including sub-events.
+   */
+  double tot_time_incl_sub;
+
+  /**
    * Structure defining when the event
    * was last started.
    */
   struct timeval tstart;
+
+  /**
+   * Structure defining when the event
+   * was last started, including sub-events.
+   */
+  struct timeval tstart_incl_sub;
 
   /**
    * The number of times this event has
@@ -93,7 +105,9 @@ class PerfData
   double stopit ();
     
   int called_recursively;
-    
+
+ protected:
+  double stop_or_pause(const bool do_stop);
 };
 
 
@@ -275,6 +289,7 @@ void PerfData::start ()
   this->count++;
   this->called_recursively++;
   gettimeofday (&(this->tstart), NULL);
+  this->tstart_incl_sub = this->tstart;
 }
 
 
@@ -290,6 +305,13 @@ void PerfData::restart ()
 inline
 double PerfData::pause ()
 {
+  return this->stop_or_pause(false);
+}
+
+
+inline
+double PerfData::stop_or_pause(const bool do_stop)
+{
   // save the start times, reuse the structure we have rather than create
   // a new one.
   const time_t
@@ -303,18 +325,27 @@ double PerfData::pause ()
   
   this->tot_time += elapsed_time;
 
+  if(do_stop)
+    {
+      const double elapsed_time_incl_sub = (static_cast<double>(this->tstart.tv_sec  - this->tstart_incl_sub.tv_sec) +
+					    static_cast<double>(this->tstart.tv_usec - this->tstart_incl_sub.tv_usec)*1.e-6);      
+
+      this->tot_time_incl_sub += elapsed_time_incl_sub;
+    }
+
   return elapsed_time;
 }
+
 
 
 inline
 double PerfData::stopit ()
 {
-  // stopit is just like pause except decriments the 
+  // stopit is just similar to pause except that it decrements the 
   // recursive call counter
   
   this->called_recursively--;
-  return this->pause();
+  return this->stop_or_pause(true);
 }
 
 
