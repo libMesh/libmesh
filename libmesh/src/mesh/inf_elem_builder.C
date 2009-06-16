@@ -649,6 +649,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 	      << std::endl;
 #endif
 
+  STOP_LOG("build_inf_elem()", "InfElemBuilder");
 }
 
 
