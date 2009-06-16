@@ -214,7 +214,10 @@ std::string PerfLog::get_perf_info() const
       const unsigned int ncalls_col_width     = 10;
       const unsigned int tot_time_col_width   = 12;
       const unsigned int avg_time_col_width   = 12;
-      const unsigned int pct_active_col_width = 13;
+      const unsigned int tot_time_incl_sub_col_width   = 12;
+      const unsigned int avg_time_incl_sub_col_width   = 12;
+      const unsigned int pct_active_col_width = 9;
+      const unsigned int pct_active_incl_sub_col_width = 9;
       
       // Iterator to be used to loop over the map of timed events
       std::map<std::pair<std::string,std::string>, PerfData>::const_iterator pos;
@@ -231,7 +234,10 @@ std::string PerfLog::get_perf_info() const
 	ncalls_col_width    +
 	tot_time_col_width  +
 	avg_time_col_width  +
-	pct_active_col_width+1;
+	tot_time_incl_sub_col_width  +
+	avg_time_incl_sub_col_width  +
+	pct_active_col_width+
+	pct_active_incl_sub_col_width+1;
 
       // Print dashed line
       out << ' ';
@@ -272,16 +278,21 @@ std::string PerfLog::get_perf_info() const
       out << "| ";
       OSSStringleft(out,event_col_width,"Event");      
       OSSStringleft(out,ncalls_col_width,"nCalls");      
-      OSSStringleft(out,tot_time_col_width,"Total");      
-      OSSStringleft(out,avg_time_col_width,"Avg");      
-      OSSStringleft(out,pct_active_col_width,"Percent of");      
+      OSSStringleft(out,tot_time_col_width,"Total Time");
+      OSSStringleft(out,avg_time_col_width,"Avg Time");
+      OSSStringleft(out,tot_time_incl_sub_col_width,"Total Time");
+      OSSStringleft(out,avg_time_incl_sub_col_width,"Avg Time");
+      OSSStringleft(out,pct_active_col_width+pct_active_incl_sub_col_width,"% of Active Time");      
       out << "|\n";      
       out << "| ";
       OSSStringleft(out,event_col_width,"");
       OSSStringleft(out,ncalls_col_width,"");
-      OSSStringleft(out,tot_time_col_width,"Time");
-      OSSStringleft(out,avg_time_col_width,"Time");
-      OSSStringleft(out,pct_active_col_width,"Active Time");
+      OSSStringleft(out,tot_time_col_width,"w/o Sub");
+      OSSStringleft(out,avg_time_col_width,"w/o Sub");
+      OSSStringleft(out,tot_time_incl_sub_col_width,"With Sub");
+      OSSStringleft(out,avg_time_incl_sub_col_width,"With Sub");
+      OSSStringleft(out,pct_active_col_width,"w/o S");
+      OSSStringleft(out,pct_active_incl_sub_col_width,"With S");
       
       out << "|\n|";
       this->_character_line(total_col_width, '-', out);
@@ -305,7 +316,10 @@ std::string PerfLog::get_perf_info() const
 	      const unsigned int perf_count    = perf_data.count;
 	      const double       perf_time     = perf_data.tot_time;
 	      const double       perf_avg_time = perf_time / static_cast<double>(perf_count);
+	      const double       perf_time_incl_sub     = perf_data.tot_time_incl_sub;
+	      const double       perf_avg_time_incl_sub = perf_time_incl_sub / static_cast<double>(perf_count);
 	      const double       perf_percent  = (total_time != 0.) ? perf_time / total_time * 100. : 0.;
+	      const double       perf_percent_incl_sub  = (total_time != 0.) ? perf_time_incl_sub / total_time * 100. : 0.;
 
 	      summed_function_calls += perf_count;
 	      summed_total_time     += perf_time;
@@ -350,8 +364,17 @@ std::string PerfLog::get_perf_info() const
 	      // Print the average time per function call
 	      OSSRealleft(out,avg_time_col_width,6,perf_avg_time);
 
+	      // Print the total time spent in the event incl. sub-events
+	      OSSRealleft(out,tot_time_incl_sub_col_width,4,perf_time_incl_sub);
+
+	      // Print the average time per function call incl. sub-events
+	      OSSRealleft(out,avg_time_incl_sub_col_width,6,perf_avg_time_incl_sub);
+
 	      // Print the percentage of the time spent in the event
 	      OSSRealleft(out,pct_active_col_width,2,perf_percent);
+	      
+	      // Print the percentage of the time spent in the event incl. sub-events
+	      OSSRealleft(out,pct_active_incl_sub_col_width,2,perf_percent_incl_sub);
 	      
 	      out << "|";
 	      out << '\n';
@@ -387,9 +410,18 @@ std::string PerfLog::get_perf_info() const
       out.width(avg_time_col_width);
       out << "";
 
+      // Same for times that include sub-events
+      out.width(tot_time_incl_sub_col_width);
+      out << "";
+      out.width(avg_time_incl_sub_col_width);
+      out << "";
+
       // Print the total percentage
       OSSRealleft(out,pct_active_col_width,2,summed_percentage);
       
+      out.width(pct_active_incl_sub_col_width);
+      out << "";
+
       out << "|\n ";
       this->_character_line(total_col_width, '-', out);
       out << '\n';
