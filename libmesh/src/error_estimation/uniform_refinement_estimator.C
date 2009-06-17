@@ -255,6 +255,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       // Use a non-standard solution vector if necessary
       if (solution_vectors && 
 	  solution_vectors->find(&system) != solution_vectors->end() && 
+	  solution_vectors->find(&system)->second &&
 	  solution_vectors->find(&system)->second != system.solution.get())
         {
           NumericVector<Number>* newsol =
@@ -328,7 +329,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 	     &system_list[0]->get_adjoint_solution());
 	  libmesh_assert(solve_adjoint ||
 	    (solution_vectors->find(system_list[0])->second ==
-	     system_list[0]->solution.get()));
+	     system_list[0]->solution.get()) ||
+	     !solution_vectors->find(system_list[0])->second);
 			 
 #ifdef DEBUG
 	  for (unsigned int i=0; i != system_list.size(); ++i)
@@ -340,7 +342,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 			     &system_list[i]->get_adjoint_solution());
 	      libmesh_assert(solve_adjoint ||
 			     solution_vectors->find(system_list[i])->second ==
-			     system_list[i]->solution.get());
+			     system_list[i]->solution.get() ||
+			     !solution_vectors->find(system_list[i])->second);
 	    }
 #endif
 
@@ -365,7 +368,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 	     &system_list[0]->get_adjoint_solution());
 	  libmesh_assert(solve_adjoint ||
 	    (solution_vectors->find(system_list[0])->second ==
-	     system_list[0]->solution.get()));
+	     system_list[0]->solution.get()) ||
+	    !solution_vectors->find(system_list[0])->second);
 
           if (solve_adjoint)
             system_list[0]->adjoint_solve();
