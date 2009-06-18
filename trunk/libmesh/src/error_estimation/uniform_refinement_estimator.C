@@ -348,7 +348,14 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 #endif
 
           if (solve_adjoint)
-            es.adjoint_solve();
+            {
+              es.adjoint_solve();
+	      for (unsigned int i=0; i != system_list.size(); ++i)
+                {
+	          system_list[i]->get_adjoint_solution().swap(*system_list[i]->solution);
+	          system_list[i]->update();
+                }
+            }
 	  else
             es.solve();
 	}
@@ -372,7 +379,11 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 	    !solution_vectors->find(system_list[0])->second);
 
           if (solve_adjoint)
-            system_list[0]->adjoint_solve();
+            {
+              system_list[0]->adjoint_solve();
+	      system_list[0]->get_adjoint_solution().swap(*system_list[0]->solution);
+	      system_list[0]->update();
+            }
 	  else
             system_list[0]->solve();
         }
