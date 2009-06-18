@@ -80,6 +80,13 @@ public:
   bool adjoint_already_solved;
 
   /**
+   * To aid in investigating error estimator behavior, set this string
+   * to a suffix with which to plot (prefixed by "primal_" or "dual_")
+   * the subestimator results.
+   */
+  std::string error_plot_suffix;
+
+  /**
    * Compute the adjoint-weighted error on each element and place it
    * in the \p error_per_cell vector
    */

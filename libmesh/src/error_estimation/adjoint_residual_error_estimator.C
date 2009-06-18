@@ -34,6 +34,7 @@
 // AdjointResidualErrorEstimator implementations
 AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
   adjoint_already_solved(false),
+  error_plot_suffix(),
   _primal_error_estimator(new KellyErrorEstimator()),
   _dual_error_estimator(new KellyErrorEstimator())
 {
@@ -77,6 +78,17 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
   _dual_error_estimator->estimate_error
     (_system, dual_error_per_cell, &(_system.get_adjoint_solution()),
      estimate_parent_error);
+
+  // Do some debugging plots if requested
+  if (!error_plot_suffix.empty())
+    {
+      std::string primal_out = "primal_";
+      std::string dual_out = "dual_";
+      primal_out += error_plot_suffix;
+      dual_out += error_plot_suffix;
+      error_per_cell.plot_error(primal_out, _system.get_mesh());
+      dual_error_per_cell.plot_error(dual_out, _system.get_mesh());
+    }
 
   // More bookkeeping for subestimators to do
   //
