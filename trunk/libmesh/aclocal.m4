@@ -1411,17 +1411,32 @@ AC_DEFUN(CONFIGURE_VTK,
      fi
 
      if (test $enablevtk = yes); then
-       dnl Also Check for existence of required libraries
-       AC_CHECK_FILE($VTK_LIB/libvtkIO.so, [enablevtk=yes], [enablevtk=no])
-       AC_CHECK_FILE($VTK_LIB/libvtkCommon.so, [enablevtk=yes], [enablevtk=no])
+       dnl Also Check for existence of required libraries.  This is not really
+       dnl right way to do it -- it's not portable to Macs, where .so's are called
+       dnl .dylib's instead.
+       dnl AC_CHECK_FILE($VTK_LIB/libvtkIO.so, [enablevtk=yes], [enablevtk=no])
+       dnl AC_CHECK_FILE($VTK_LIB/libvtkCommon.so, [enablevtk=yes], [enablevtk=no])
+       
+       dnl AC_HAVE_LIBRARY (library, [action-if-found], [action-if-not-found], [other-libraries])
+       dnl Note: Basically tries to compile a function which calls main().  
+
+       dnl Save original value of LIBS, then append $VTK_LIB
+       old_LIBS="$LIBS"
+       LIBS="$old_LIBS -L$VTK_LIB"
+
+       dnl Try to compile test prog to check for existence of VTK libraries
+       dnl AC_HAVE_LIBRARY uses the LIBS variable.
+       AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no])
+       if (test $enablevtk = yes); then
+         AC_HAVE_LIBRARY([vtkCommon], [enablevtk=yes], [enablevtk=no])
+       fi
+
+       dnl Reset $LIBS
+       LIBS="$old_LIBS"
      fi
      
      dnl If both the header file and the required libs were found, continue.
      if (test $enablevtk = yes); then
-       dnl Since VTK headers use deprecated C++ header files and we don't want to see this
-       dnl warning everytime, we can add the -Wno-derecated flag (GCC only?) to disable it.
-       dnl Unfortunately, using -Wno-deprecated in the general CFLAGS generates *another*
-       dnl warning when you are compiling C files.
        VTK_INCLUDE="-I$VTK_INC"
        VTK_LIBRARY="\$(libmesh_RPATHFLAG)$VTK_LIB -L$VTK_LIB -lvtkIO -lvtkCommon"
        AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
