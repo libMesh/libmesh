@@ -13922,66 +13922,151 @@ $as_echo "VTK header files not found!" >&6; }
      fi
 
      if (test $enablevtk = yes); then
-              as_ac_File=`$as_echo "ac_cv_file_$VTK_LIB/libvtkIO.so" | $as_tr_sh`
-{ $as_echo "$as_me:$LINENO: checking for $VTK_LIB/libvtkIO.so" >&5
-$as_echo_n "checking for $VTK_LIB/libvtkIO.so... " >&6; }
-if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+
+
+              old_LIBS="$LIBS"
+       LIBS="$old_LIBS -L$VTK_LIB"
+
+                     { $as_echo "$as_me:$LINENO: checking for main in -lvtkIO" >&5
+$as_echo_n "checking for main in -lvtkIO... " >&6; }
+if test "${ac_cv_lib_vtkIO_main+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
-  test "$cross_compiling" = yes &&
-  { { $as_echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-$as_echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$VTK_LIB/libvtkIO.so"; then
-  eval "$as_ac_File=yes"
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lvtkIO  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  ac_cv_lib_vtkIO_main=yes
 else
-  eval "$as_ac_File=no"
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_vtkIO_main=no
 fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
 fi
-ac_res=`eval 'as_val=${'$as_ac_File'}
-		 $as_echo "$as_val"'`
-	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-as_val=`eval 'as_val=${'$as_ac_File'}
-		 $as_echo "$as_val"'`
-   if test "x$as_val" = x""yes; then
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_vtkIO_main" >&5
+$as_echo "$ac_cv_lib_vtkIO_main" >&6; }
+if test "x$ac_cv_lib_vtkIO_main" = x""yes; then
   enablevtk=yes
 else
   enablevtk=no
 fi
+ac_cv_lib_vtkIO=ac_cv_lib_vtkIO_main
 
-       as_ac_File=`$as_echo "ac_cv_file_$VTK_LIB/libvtkCommon.so" | $as_tr_sh`
-{ $as_echo "$as_me:$LINENO: checking for $VTK_LIB/libvtkCommon.so" >&5
-$as_echo_n "checking for $VTK_LIB/libvtkCommon.so... " >&6; }
-if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+       if (test $enablevtk = yes); then
+         { $as_echo "$as_me:$LINENO: checking for main in -lvtkCommon" >&5
+$as_echo_n "checking for main in -lvtkCommon... " >&6; }
+if test "${ac_cv_lib_vtkCommon_main+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
-  test "$cross_compiling" = yes &&
-  { { $as_echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-$as_echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$VTK_LIB/libvtkCommon.so"; then
-  eval "$as_ac_File=yes"
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lvtkCommon  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  ac_cv_lib_vtkCommon_main=yes
 else
-  eval "$as_ac_File=no"
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_vtkCommon_main=no
 fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
 fi
-ac_res=`eval 'as_val=${'$as_ac_File'}
-		 $as_echo "$as_val"'`
-	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-as_val=`eval 'as_val=${'$as_ac_File'}
-		 $as_echo "$as_val"'`
-   if test "x$as_val" = x""yes; then
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_vtkCommon_main" >&5
+$as_echo "$ac_cv_lib_vtkCommon_main" >&6; }
+if test "x$ac_cv_lib_vtkCommon_main" = x""yes; then
   enablevtk=yes
 else
   enablevtk=no
 fi
+ac_cv_lib_vtkCommon=ac_cv_lib_vtkCommon_main
 
+       fi
+
+              LIBS="$old_LIBS"
      fi
 
           if (test $enablevtk = yes); then
-                                   VTK_INCLUDE="-I$VTK_INC"
+       VTK_INCLUDE="-I$VTK_INC"
        VTK_LIBRARY="\$(libmesh_RPATHFLAG)$VTK_LIB -L$VTK_LIB -lvtkIO -lvtkCommon"
 
 cat >>confdefs.h <<\_ACEOF
