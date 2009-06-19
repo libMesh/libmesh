@@ -126,8 +126,10 @@ vtkPoints* VTKIO::nodes_to_vtk(const MeshBase& mesh){
 				//     std::cout<<"pnt "<<pnt[0]<<" "<<pnt[1]<<" "<<pcoords-><<std::endl;  
 				//     points->InsertPoint(node->id(),pnt);
 				//     std::cout<<"point "<<node->id()<<" "<<(*node)(0)<<" "<<(*node)(1)<<std::endl;  
+				delete [] pnt;
 			}
 			points->SetData(pcoords);
+			pcoords->Delete();
 			return points;
 	}
 	return NULL;
@@ -330,8 +332,10 @@ void VTKIO::solution_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& gri
 #endif
 
 				} 
-				grid->GetPointData()->AddArray(data);				
+				grid->GetPointData()->AddArray(data);
+				data->Delete();
 			} 
+			
 		}
 	}
 }
@@ -382,7 +386,7 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*
 			}
 
 			grid->GetPointData()->AddArray(data);
-
+			data->Delete();
 		} 
 
 	}
@@ -467,6 +471,7 @@ void VTKIO::read (const std::string& name)
 //  vtkUnstructuredGrid *grid = reader->GetOutput();
   _vtk_grid = reader->GetOutput();
   _vtk_grid->Update();
+  reader->Delete();
 
   // Get a reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -534,7 +539,7 @@ void VTKIO::read (const std::string& name)
   elem->set_id(i);
   mesh.add_elem(elem);
   } // end loop over VTK cells
-  
+  _vtk_grid->Delete();
 #endif // LIBMESH_HAVE_VTK
 }
 
@@ -572,6 +577,7 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 	  std::cout<<"get points "<<std::endl;  
 	  vtkPoints* pnts = nodes_to_vtk((const MeshBase&)es.get_mesh());
 	  _vtk_grid->SetPoints(pnts);
+	 
 	  int * types = new int[es.get_mesh().n_active_elem()];
 	  std::cout<<"get cells"<<std::endl;  
 	  vtkCellArray* cells = cells_to_vtk((const MeshBase&)es.get_mesh(), types);
@@ -597,6 +603,9 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 	  writer->SetDataModeToAscii();
 	  writer->Write();
 
+	  delete [] types;
+	  pnts->Delete();
+	  cells->Delete();
 	  _vtk_grid->Delete();
 	  writer->Delete();
 	}
@@ -635,6 +644,8 @@ void VTKIO::write (const std::string& name)
 	  writer->SetDataModeToAscii();
 	  writer->SetFileName(name.c_str());
 	  writer->Write();
+	  writer->Delete();
+	  _vtk_grid->Delete();
   }
 #endif // LIBMESH_HAVE_VTK
 }
