@@ -522,7 +522,8 @@ unsigned int NewtonSolver::adjoint_solve()
 
   if (!quiet)
     std::cout << "Linear solve of Adjoint System starting, tolerance " 
-	      << relative_residual_tolerance << std::endl;
+	      << relative_residual_tolerance << ", max iterations "
+              << max_linear_iterations << std::endl;
 
   // Solve the linear system.  Two cases:
   const std::pair<unsigned int, Real> rval =
