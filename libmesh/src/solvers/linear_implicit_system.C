@@ -169,8 +169,8 @@ void LinearImplicitSystem::adjoint_solve ()
         }
 
       // But now replace the right hand side with the quantity of
-      // interest functional
-      this->assemble_qoi();
+      // interest functional's derivative
+      this->assemble_qoi_derivative();
     }
 
   // Get a reference to the EquationSystems

@@ -28,6 +28,7 @@
 #include "libmesh_logging.h"
 #include "mesh.h"
 #include "numeric_vector.h"
+#include "parallel.h"
 #include "quadrature.h"
 #include "sparse_matrix.h"
 #include "time_solver.h"
@@ -528,6 +529,60 @@ void FEMSystem::assemble_qoi()
 
           this->side_qoi(_femcontext);
         }
+    }
+
+  Parallel::sum(qoi);
+
+  STOP_LOG("assemble_qoi()", "FEMSystem");
+}
+
+
+
+void FEMSystem::assemble_qoi_derivative()
+{
+  START_LOG("assemble_qoi_derivative()", "FEMSystem");
+
+  const MeshBase& mesh = this->get_mesh();
+
+  this->update();
+
+  AutoPtr<DiffContext> con = this->build_context();
+  FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+
+  // Loop over every active mesh element on this processor
+  MeshBase::const_element_iterator el =
+    mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el =
+    mesh.active_local_elements_end();
+
+  for ( ; el != end_el; ++el)
+    {
+      _femcontext.reinit(*this, *el);
+
+      this->element_qoi_derivative(_femcontext);
+
+      for (_femcontext.side = 0;
+           _femcontext.side != _femcontext.elem->n_sides();
+           ++_femcontext.side)
+        {
+          // Don't compute on non-boundary sides unless requested
+          if (!assemble_qoi_sides ||
+              (!compute_internal_sides &&
+               _femcontext.elem->neighbor(_femcontext.side) != NULL))
+            continue;
+
+          std::map<FEType, FEBase *>::iterator fe_end =
+            _femcontext.element_fe.end();
+          fe_end = _femcontext.side_fe.end();
+          for (std::map<FEType, FEBase *>::iterator i =
+            _femcontext.side_fe.begin();
+               i != fe_end; ++i)
+            {
+              i->second->reinit(_femcontext.elem, _femcontext.side);
+            }
+
+          this->side_qoi_derivative(_femcontext);
+        }
 
       this->get_dof_map().constrain_element_vector
         (_femcontext.elem_residual, _femcontext.dof_indices, false);
@@ -536,7 +591,7 @@ void FEMSystem::assemble_qoi()
                              _femcontext.dof_indices);
     }
 
-  STOP_LOG("assemble_qoi()", "FEMSystem");
+  STOP_LOG("assemble_qoi_derivative()", "FEMSystem");
 }
 
 

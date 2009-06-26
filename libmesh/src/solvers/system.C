@@ -362,6 +362,20 @@ void System::assemble_qoi ()
 
 
 
+void System::assemble_qoi_derivative ()
+{
+  // Log how long the user's matrix assembly code takes
+  START_LOG("assemble_qoi_derivative()", "System");
+  
+  // Call the user-specified quantity of interest function
+  this->user_QOI_derivative();
+
+  // Stop logging the user code
+  STOP_LOG("assemble_qoi_derivative()", "System");
+}
+
+
+
 bool System::compare (const System& other_system, 
 		      const Real threshold,
 		      const bool verbose) const
@@ -1043,7 +1057,17 @@ void System::attach_QOI_function(void fptr(EquationSystems& es,
 {
   libmesh_assert (fptr != NULL);
   
-  _qoi_evaluate_system = fptr;  
+  _qoi_evaluate = fptr;  
+}
+
+
+
+void System::attach_QOI_derivative(void fptr(EquationSystems& es,
+					     const std::string& name))
+{
+  libmesh_assert (fptr != NULL);
+  
+  _qoi_evaluate_derivative = fptr;  
 }
 
 
@@ -1081,7 +1105,16 @@ void System::user_QOI ()
 {
   // Call the user-provided quantity of interest function, 
   // if it was provided
-  if(_qoi_evaluate_system!= NULL)
-    this->_qoi_evaluate_system(_equation_systems, this->name());
+  if(_qoi_evaluate != NULL)
+    this->_qoi_evaluate(_equation_systems, this->name());
 }
 
+
+
+void System::user_QOI_derivative ()
+{
+  // Call the user-provided quantity of interest derivative, 
+  // if it was provided
+  if(_qoi_evaluate_derivative != NULL)
+    this->_qoi_evaluate_derivative(_equation_systems, this->name());
+}

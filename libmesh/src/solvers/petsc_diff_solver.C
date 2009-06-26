@@ -278,7 +278,8 @@ unsigned int PetscDiffSolver::adjoint_solve()
     }
 
   // And set the right hand side to the quantity of interest
-  _system.assemble_qoi();
+  // derivative
+  _system.assemble_qoi_derivative();
 
   // Then build something to solve the _linear_ system
   AutoPtr<LinearSolver<Number> > linear_solver = LinearSolver<Number>::build();

@@ -24,6 +24,7 @@
 // Local includes
 #include "explicit_system.h"
 #include "numeric_vector.h"
+#include "parallel.h"
 
 
 // ------------------------------------------------------------
@@ -91,10 +92,24 @@ void ExplicitSystem::assemble_qoi ()
   libmesh_assert (rhs->initialized());
 
   // The user quantity of interest assembly gets to expect to
-  // accumulate on an initially empty vector
-  rhs->zero ();
+  // accumulate on an initially zero value
+  qoi = 0;
 
   Parent::assemble_qoi ();
+}
+
+
+
+void ExplicitSystem::assemble_qoi_derivative ()
+{
+  libmesh_assert (rhs    != NULL);
+  libmesh_assert (rhs->initialized());
+
+  // The user quantity of interest derivative assembly gets to expect
+  // to accumulate on an initially empty vector
+  rhs->zero ();
+
+  Parent::assemble_qoi_derivative ();
 }
 
 
