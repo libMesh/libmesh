@@ -24,7 +24,7 @@
 // Local Includes
 #include "adjoint_residual_error_estimator.h"
 #include "error_vector.h"
-#include "kelly_error_estimator.h"
+#include "patch_recovery_error_estimator.h"
 #include "libmesh_logging.h"
 #include "numeric_vector.h"
 #include "system.h"
@@ -35,8 +35,8 @@
 AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
   adjoint_already_solved(false),
   error_plot_suffix(),
-  _primal_error_estimator(new KellyErrorEstimator()),
-  _dual_error_estimator(new KellyErrorEstimator())
+  _primal_error_estimator(new PatchRecoveryErrorEstimator()),
+  _dual_error_estimator(new PatchRecoveryErrorEstimator())
 {
 }
 
