@@ -517,8 +517,9 @@ unsigned int NewtonSolver::adjoint_solve()
       pre.get_transpose(pre);
     }
 
-  // And set the right hand side to the quantity of interest
-  _system.assemble_qoi();
+  // And set the right hand side to the quantity of interest's
+  // derivative
+  _system.assemble_qoi_derivative();
 
   if (!quiet)
     std::cout << "Linear solve of Adjoint System starting, tolerance " 

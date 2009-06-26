@@ -212,8 +212,20 @@ public:
   /**
    * Runs a qoi assembly loop over all elements, and if
    * \p assemble_qoi_sides is true over all sides.
+   *
+   * Users may have to override this function for quantities of
+   * interest that are not expressible as a sum of element qois.
    */
   virtual void assemble_qoi ();
+
+  /**
+   * Runs a qoi derivative assembly loop over all elements, and if
+   * \p assemble_qoi_sides is true over all sides.
+   *
+   * Users may have to override this function for quantities of
+   * interest that are not expressible as a sum of element qois.
+   */
+  virtual void assemble_qoi_derivative ();
 
   /**
    * If fe_reinit_during_postprocess is true (it is true by default), FE

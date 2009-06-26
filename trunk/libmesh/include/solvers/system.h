@@ -134,6 +134,12 @@ public:
   virtual void assemble_qoi ();
  
   /**
+   * Calls user qoi derivative function.
+   * @e Should be overloaded in derived classes.
+   */
+  virtual void assemble_qoi_derivative ();
+ 
+  /**
    * Solves the system.  Must be overloaded in derived systems.
    */
   virtual void solve () = 0;
@@ -595,10 +601,19 @@ public:
 					     const std::string& name));
   
   /**
-   * Register a user function for evaluating a quantity of interest
+   * Register a user function for evaluating a quantity of interest,
+   * whose value should be placed in \p System::qoi
    */
   void attach_QOI_function (void fptr(EquationSystems& es,
 				      const std::string& name));
+  
+  /**
+   * Register a user function for evaluating derivatives of a quantity
+   * of interest with respect to test functions, whose values should
+   * be placed in \p System::rhs
+   */
+  void attach_QOI_derivative (void fptr(EquationSystems& es,
+				        const std::string& name));
   
   /**
    * Calls user's attached initialization function, or is overloaded by
@@ -623,6 +638,12 @@ public:
    * overloaded by the user in derived classes.
    */
   virtual void user_QOI ();
+
+  /**
+   * Calls user's attached quantity of interest derivative function,
+   * or is overloaded by the user in derived classes.
+   */
+  virtual void user_QOI_derivative ();
 
   /**
    * Re-update the local values when the mesh has changed.
@@ -676,6 +697,11 @@ public:
    * Data structure to hold solution values.
    */
   AutoPtr<NumericVector<Number> > solution;
+
+  /**
+   * Value of the quantity of interest
+   */
+  Number qoi;
 
   /**
    * All the values I need to compute my contribution
@@ -795,8 +821,14 @@ private:
   /**
    * Function to evaluate quantity of interest
    */
-  void (* _qoi_evaluate_system) (EquationSystems& es, 
-			         const std::string& name);
+  void (* _qoi_evaluate) (EquationSystems& es, 
+			  const std::string& name);
+
+  /**
+   * Function to evaluate quantity of interest derivative
+   */
+  void (* _qoi_evaluate_derivative) (EquationSystems& es, 
+			             const std::string& name);
 
   /**
    * Data structure describing the relationship between

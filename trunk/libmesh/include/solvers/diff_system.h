@@ -193,8 +193,8 @@ public:
 
   /**
    * If \p assemble_qoi_sides is true (it is false by default), the
-   * quantity of interest assembly loop will loop over all sides as
-   * well as all elements.
+   * assembly loop for a quantity of interest or its derivatives will
+   * loop over all sides as well as all elements.
    */
   bool assemble_qoi_sides;
 
@@ -211,15 +211,28 @@ public:
  
   /**
    * Does any work that needs to be done on \p elem in a quantity of
-   * interest assembly loop.
+   * interest assembly loop, outputting to element_qoi.
    */
   virtual void element_qoi (DiffContext &) {}
  
   /**
+   * Does any work that needs to be done on \p elem in a quantity of
+   * interest derivative assembly loop, outputting to element_residual.
+   */
+  virtual void element_qoi_derivative (DiffContext &) {}
+ 
+  /**
    * Does any work that needs to be done on \p side of \p elem in a
-   * quantity of interest assembly loop.
+   * quantity of interest assembly loop, outputting to element_qoi.
    */
   virtual void side_qoi (DiffContext &) {}
+ 
+  /**
+   * Does any work that needs to be done on \p side of \p elem in a
+   * quantity of interest derivative assembly loop, outputting to
+   * element_residual.
+   */
+  virtual void side_qoi_derivative (DiffContext &) {}
  
   /**
    * Tells the DiffSystem that variable var is evolving with

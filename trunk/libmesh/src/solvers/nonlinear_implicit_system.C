@@ -188,9 +188,9 @@ void NonlinearImplicitSystem::adjoint_solve ()
       // Take the discretization adjoint
       matrix->get_transpose(*matrix);
 
-      // Reset and build the RHS from the QOI
+      // Reset and build the RHS from the QOI derivative
       rhs->zero();
-      this->assemble_qoi();
+      this->assemble_qoi_derivative();
     }
 
   // The adjoint problem is linear, so we only use the nonlinear
