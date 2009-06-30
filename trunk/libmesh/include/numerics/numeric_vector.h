@@ -321,6 +321,18 @@ public:
   virtual NumericVector<T> & operator -= (const NumericVector<T> &V) = 0;
     
   /**
+   * Multiplication operator.
+   * Equivalent to \p U.scale(a)
+   */
+  NumericVector<T> & operator *= (const T a) { this->scale(a); return *this; }
+
+  /**
+   * Division operator.
+   * Equivalent to \p U.scale(1./a)
+   */
+  NumericVector<T> & operator /= (const T a) { this->scale(1./a); return *this; }
+
+  /**
    * v(i) = value
    */
   virtual void set (const unsigned int i, const T value) = 0;
