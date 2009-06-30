@@ -150,6 +150,15 @@ public:
   virtual void adjoint_solve () = 0;
   
   /**
+   * Solves for the derivative of the attached quantity of interest
+   * with respect to each parameter in \p parameters, placing each
+   * result in the corresponding entry of \p sensitivities.  Must be
+   * overloaded in derived systems.
+   */
+  virtual void qoi_parameter_sensitivity (std::vector<Number *>& parameters, 
+                                          std::vector<Number>& sensitivities) = 0;
+  
+  /**
    * @returns \p true when the other system contains
    * identical data, up to the given threshold.  Outputs
    * some diagnostic info when \p verbose is set.

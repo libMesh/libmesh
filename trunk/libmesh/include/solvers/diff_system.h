@@ -326,9 +326,23 @@ public:
    * steady state solvers, this will find x where dF/dx = q.  For
    * transient solvers, this should integrate -dx/dt = dF/dx - q.
    *
-   * FIXME - transient adjoint solves not yet implemented.
+   * FIXME - transient adjoint solves are not yet implemented.
    */
   virtual void adjoint_solve ();
+
+  /**
+   * Solves for the derivative of the system's quantity of interest q
+   * with respect to each parameter p in \p parameters.  Currently
+   * uses adjoint_solve, along with finite differenced derivatives
+   * (partial q / partial p) and (partial R / partial p).
+   *
+   * FIXME - transient sensitivities are not yet implemented.
+   * TODO - Simultaneous sensitivity calculations for multiple QoIs
+   * are not yet implemented.  Analytic options for partial
+   * derivatives are not yet implemented.
+   */
+  virtual void qoi_parameter_sensitivity (std::vector<Number *>& parameters,
+                                          std::vector<Number>& sensitivities);
  
   /**
    * A pointer to the solver object we're going to use.
