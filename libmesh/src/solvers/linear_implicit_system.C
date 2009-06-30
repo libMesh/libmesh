@@ -26,6 +26,7 @@
 #include "linear_solver.h"
 #include "equation_systems.h"
 #include "libmesh_logging.h"
+#include "numeric_vector.h" // for parameter sensitivity calcs
 #include "sparse_matrix.h" // for get_transpose
 
 
@@ -209,6 +210,100 @@ void LinearImplicitSystem::adjoint_solve ()
 
   // Update the system after the solve
   this->update();  
+}
+
+
+
+void LinearImplicitSystem::qoi_parameter_sensitivity
+  (std::vector<Number *>& parameters,
+   std::vector<Number>&   sensitivities)
+{
+  // Get ready to fill in senstivities:
+  sensitivities.clear();
+  sensitivities.resize(parameters.size(), 0);
+
+  // An introduction to the problem:
+  //
+  // A(p)*u(p) = b(p), where x is determined implicitly.
+  // Residual R(u(p),p) := b(p) - A(p)*u(p)
+  // partial R / partial u = -A
+  //
+  // This implies that:
+  // d/dp(R) = 0
+  // (partial b / partial p) - 
+  // (partial A / partial p) * u -
+  // A * (partial u / partial p) = 0
+  // A * (partial u / partial p) = (partial R / partial p)
+  //   = (partial b / partial p) - (partial A / partial p) * u
+
+  // We first do an adjoint solve:
+  // A^T * z = (partial q / partial u)
+
+  this->adjoint_solve();
+
+  // We use the identities:
+  // dq/dp = (partial q / partial p) + (partial q / partial u) *
+  //         (partial u / partial p)
+  // dq/dp = (partial q / partial p) + (A^T * z) *
+  //         (partial u / partial p)
+  // dq/dp = (partial q / partial p) + z * A *
+  //         (partial u / partial p)
+ 
+  // Leading to our final formula:
+  // dq/dp = (partial q / partial p) - z * (partial R / partial p)
+
+  for (unsigned int i=0; i != parameters.size(); ++i)
+    {
+      // We currently get partial derivatives via central differencing
+      Number delta_p = 1e-6;
+
+      // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
+
+      Number old_parameter = *parameters[i];
+      Number old_qoi = this->qoi;
+
+      *parameters[i] = old_parameter - delta_p;
+      this->assemble_qoi();
+      Number qoi_minus = this->qoi;
+
+      *parameters[i] = old_parameter + delta_p;
+      this->assemble_qoi();
+      Number qoi_plus = this->qoi;
+      Number partialq_partialp = (qoi_plus - qoi_minus) / (2.*delta_p);
+
+      // (partial R / partial p) = (partial b / partial p) - 
+      //                           (partial A / partial p) * u
+      //   ~= (b(p+dp)-A(p+dp)*u-b(p-dp)+A(p-dp)*u)/(2*dp)
+
+      // We're still at p+delta_p, so start with b(p+dp)
+      this->assemble();
+      AutoPtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
+
+      // PETSc doesn't implement SGEMX, so neither does NumericVector,
+      // so here's a hackish workaround for v-=A*u:
+      *partialR_partialp *= -1;
+      partialR_partialp->add_vector(*this->solution, *this->matrix);
+      *partialR_partialp *= -1;
+      
+      *parameters[i] = old_parameter - delta_p;
+      this->assemble();
+      *partialR_partialp -= *this->rhs;
+      partialR_partialp->add_vector(*this->solution, *this->matrix);
+
+      *partialR_partialp /= (2.*delta_p);
+
+      // Don't leave the parameter changed
+      *parameters[i] = old_parameter;
+
+      sensitivities[i] = partialq_partialp -
+			 partialR_partialp->dot(this->get_adjoint_solution());
+    }
+
+  // All parameters have been reset.
+  // Don't leave the qoi or system changed - principle of least
+  // surprise.
+  this->assemble();
+  this->assemble_qoi();
 }
 
 

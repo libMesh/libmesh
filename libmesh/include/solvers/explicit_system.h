@@ -112,6 +112,13 @@ public:
   virtual void adjoint_solve () { libmesh_error(); }
  
   /**
+   * Yells at any user who tried to calculate parameter sensitivities
+   * without providing more than an explicit system assembly.
+   */
+  virtual void qoi_parameter_sensitivity (std::vector<Number *>&, std::vector<Number>&)
+    { libmesh_error(); }
+
+  /**
    * @returns \p "Explicit".  Helps in identifying
    * the system type in an equation system file.
    */

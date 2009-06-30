@@ -100,9 +100,22 @@ public:
 
   /**
    * Solves the adjoint eigen system
+   *
+   * FIXME - eigensystem adjoint solutions are not yet implemented.
    */
   virtual void adjoint_solve ();
 
+  /**
+   * Solves for the derivative of the system's quantity of interest q
+   * with respect to each parameter p in \p parameters.  Currently
+   * uses adjoint_solve, along with finite differenced derivatives
+   * (partial q / partial p) and (partial R / partial p).
+   *
+   * FIXME - eigensystem sensitivities are not yet implemented.
+   */
+  virtual void qoi_parameter_sensitivity (std::vector<Number *>& parameters,
+                                          std::vector<Number>& sensitivities);
+ 
   /**
    * Assembles the system matrix. 
    */

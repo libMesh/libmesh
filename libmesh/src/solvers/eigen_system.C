@@ -219,9 +219,16 @@ void EigenSystem::solve ()
   
 }
 
-void EigenSystem::adjoint_solve() {
-  std::cout<<"EigenSystem::adjoint_solve() not implemented"<<std::endl;
-  libmesh_error();
+void EigenSystem::adjoint_solve() 
+{
+  libmesh_not_implemented();
+}
+
+void EigenSystem::qoi_parameter_sensitivity
+  (std::vector<Number *>& parameters,
+   std::vector<Number>& sensitivities)
+{
+  libmesh_not_implemented();
 }
 
 void EigenSystem::assemble ()

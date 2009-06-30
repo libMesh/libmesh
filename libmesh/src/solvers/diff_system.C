@@ -114,3 +114,81 @@ void DifferentiableSystem::adjoint_solve ()
 {
   time_solver->adjoint_solve();
 }
+
+
+
+void DifferentiableSystem::qoi_parameter_sensitivity
+  (std::vector<Number *>& parameters,
+   std::vector<Number>&   sensitivities)
+{
+  // Get ready to fill in senstivities:
+  sensitivities.clear();
+  sensitivities.resize(parameters.size(), 0);
+
+  // An introduction to the problem:
+  //
+  // Residual R(u(p),p) = 0
+  // partial R / partial u = J = system matrix
+  //
+  // This implies that:
+  // d/dp(R) = 0
+  // (partial R / partial p) + 
+  // (partial R / partial u) * (partial u / partial p) = 0
+
+  // We first do an adjoint solve:
+  // J^T * z = (partial q / partial u)
+
+  this->adjoint_solve();
+
+  // We use the identities:
+  // dq/dp = (partial q / partial p) + (partial q / partial u) *
+  //         (partial u / partial p)
+  // dq/dp = (partial q / partial p) + (J^T * z) *
+  //         (partial u / partial p)
+  // dq/dp = (partial q / partial p) + z * J *
+  //         (partial u / partial p)
+ 
+  // Leading to our final formula:
+  // dq/dp = (partial q / partial p) - z * (partial R / partial p)
+
+  for (unsigned int i=0; i != parameters.size(); ++i)
+    {
+      // We currently get partial derivatives via central differencing
+      Number delta_p = 1e-6;
+
+      // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
+      // (partial R / partial p) ~= (rhs(p+dp) - rhs(p-dp))/(2*dp)
+
+      Number old_parameter = *parameters[i];
+      Number old_qoi = this->qoi;
+
+      *parameters[i] = old_parameter - delta_p;
+      this->assemble_qoi();
+      Number qoi_minus = this->qoi;
+
+      this->assembly(true, false);
+      AutoPtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
+      *partialR_partialp *= -1;
+
+      *parameters[i] = old_parameter + delta_p;
+      this->assemble_qoi();
+      Number qoi_plus = this->qoi;
+      Number partialq_partialp = (qoi_plus - qoi_minus) / (2.*delta_p);
+
+      this->assembly(true, false);
+      *partialR_partialp -= *this->rhs;
+      *partialR_partialp /= (2.*delta_p);
+
+      // Don't leave the parameter changed
+      *parameters[i] = old_parameter;
+
+      sensitivities[i] = partialq_partialp +
+			 partialR_partialp->dot(this->get_adjoint_solution());
+    }
+
+  // All parameters have been reset.
+  // Don't leave the qoi or system changed - principle of least
+  // surprise.
+  this->assembly(true, false);
+  this->assemble_qoi();
+}

@@ -107,6 +107,19 @@ public:
   virtual void adjoint_solve ();
  
   /**
+   * Solves for the derivative of the system's quantity of interest q
+   * with respect to each parameter p in \p parameters.  Currently
+   * uses adjoint_solve, along with finite differenced derivatives
+   * (partial q / partial p) and (partial (b-Ax) / partial p).
+   *
+   * TODO - Simultaneous sensitivity calculations for multiple QoIs
+   * are not yet implemented.  Analytic options for partial
+   * derivatives are not yet implemented.
+   */
+  virtual void qoi_parameter_sensitivity (std::vector<Number *>& parameters,
+                                          std::vector<Number>& sensitivities);
+ 
+  /**
    * @returns \p "LinearImplicit".  Helps in identifying
    * the system type in an equation system file.
    */
