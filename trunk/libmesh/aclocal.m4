@@ -294,9 +294,9 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
   case "$target_os" in
     *darwin*)
       if test "$enableshared" = yes ; then
-        CXXFLAGS_OPT="-fno-common"
-        CXXFLAGS_DVL="-fno-common"
-        CXXFLAGS_DBG="-fno-common"
+        CXXFLAGS_OPT="-fno-common -Wl,-flat_namespace"
+        CXXFLAGS_DVL="-fno-common -Wl,-flat_namespace"
+        CXXFLAGS_DBG="-fno-common -Wl,-flat_namespace"
         CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
         CSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
       fi
@@ -479,9 +479,9 @@ AC_DEFUN(SET_CXX_FLAGS, dnl
               dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
               dnl        Well, duh, when the tested value is computed...  OK when it
               dnl        was from an assignment.
-              CXXFLAGS_DBG="-w1 -g -wd175 -wd1476 -wd1505 -wd1572"
-              CXXFLAGS_OPT="-O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
+              CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
+              CXXFLAGS_DVL="$CXXFLAGS_DVL -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
               CFLAGS_DBG="-w1 -wd266 -wd1572"
               CFLAGS_OPT="-O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CFLAGS_DVL="$CFLAGS_DBG"
