@@ -197,7 +197,11 @@ public:
   virtual std::pair<Real, Real> get_eigenpair (unsigned int i,
 					       NumericVector<T> &solution) = 0;
 
-  
+  /**
+   * Attach a deflation space defined by a single vector.
+   */
+  virtual void attach_deflation_space(NumericVector<T> &deflation_vector) = 0;
+
 protected:
 
   /**

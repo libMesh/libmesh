@@ -202,7 +202,11 @@ public:
    */                
   Real get_relative_error (unsigned int i);
 
-  
+  /**
+   * Attach a deflation space defined by a single vector.
+   */
+  void attach_deflation_space(NumericVector<T>& deflation_vector);
+
 private:
 
   /**
@@ -260,7 +264,6 @@ private:
    * Eigenproblem solver context
    */
   EPS _eps;
-
 
 };
 
