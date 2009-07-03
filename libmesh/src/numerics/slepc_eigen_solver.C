@@ -1,4 +1,4 @@
-// $Id$
+
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
@@ -71,10 +71,9 @@ void SlepcEigenSolver<T>::init ()
       // Create the eigenproblem solver context
       ierr = EPSCreate (libMesh::COMM_WORLD, &_eps);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
+
       // Set user-specified  solver
       set_slepc_solver_type();
-      
     } 
 }    
 
@@ -466,6 +465,7 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 #endif
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
+
   // Set the tolerance and maximum iterations.
   ierr = EPSSetTolerances (_eps, tol, m_its);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -686,6 +686,19 @@ Real SlepcEigenSolver<T>::get_relative_error(unsigned int i)
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   return error;
+}
+
+
+template <typename T>
+void SlepcEigenSolver<T>::attach_deflation_space(NumericVector<T>& deflation_vector_in)
+{
+  this->init();
+
+  int ierr = 0;
+  Vec deflation_vector = (libmesh_cast_ptr<PetscVector<T>*>(&deflation_vector_in))->vec();
+  Vec* deflation_space = &deflation_vector;
+  ierr = EPSAttachDeflationSpace(_eps, 1, deflation_space, PETSC_FALSE);
+    CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 template <typename T>

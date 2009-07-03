@@ -164,9 +164,6 @@ void GnuPlotIO::write_solution(const std::string& fname,
       libmesh_error();
     }
 
-  data << "# This file contains libMesh solution data "
-       << "to be plotted in GNUplot\n\n";
-
   // get ordered nodal data using a map
   typedef std::pair<Real, std::vector<Number> > key_value_pair;
   typedef std::map<Real, std::vector<Number> > map_type;
