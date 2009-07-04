@@ -1370,7 +1370,11 @@ dnl ----------------------------------------------------------------
 AC_DEFUN(CONFIGURE_VTK, 
 [
   dnl Default path to VTK's include and lib files
-  VTK_INC="/usr/include/vtk"
+  if (test -d /usr/include/vtk-5.0); then
+    VTK_INC="/usr/include/vtk-5.0"
+  else
+    VTK_INC="/usr/include/vtk"
+  fi
   VTK_LIB="/usr/lib"
   
   dnl User-specific include path
