@@ -1405,9 +1405,9 @@ AC_DEFUN(CONFIGURE_VTK,
   if (test $enablevtk = yes); then
   
      dnl Check for existence of a header file in the specified location
-     dnl AC_CHECK_FILE([$VTK_INC/vtkCommonInstantiator.h], [vtkincFound="OK"], [vtkincFound="FAIL"])
+     dnl AC_CHECK_FILE([$VTK_INC/vtkConfigure.h], [vtkincFound="OK"], [vtkincFound="FAIL"])
      vtkincFound=no;
-     AC_CHECK_HEADERS($VTK_INC/vtkCommonInstantiator.h, vtkincFound=yes)
+     AC_CHECK_HEADERS($VTK_INC/vtkConfigure.h, vtkincFound=yes)
 
      if (test $vtkincFound = no); then
        AC_MSG_RESULT(VTK header files not found!)
