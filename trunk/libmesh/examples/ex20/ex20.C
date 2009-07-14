@@ -96,7 +96,7 @@ int main (int argc, char** argv)
               << "compiled with AMR support!"
               << std::endl;
   return 0;
-#elif !defined(LIBMESH_ENABLE_PETSC)
+#elif !defined(LIBMESH_HAVE_PETSC)
   if (libMesh::processor_id() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
               << "compiled with PETSc support!"
