@@ -307,11 +307,11 @@ ifeq ($(enable-optional),yes)
   libmesh_LIBS    += @TECPLOT_LIBRARY@
   libmesh_INCLUDE += @TECPLOT_INCLUDE@
 
-  # Link against the GMV APIs to read GMV files
+  # Link against the GMV APIs to read/write GMV files
   libmesh_LIBS    += @GMV_LIBRARY@
   libmesh_INCLUDE += @GMV_INCLUDE@
 
-  # Link against the GMV APIs to read GMV files
+  # Link against the VTK APIs to read/write VTK files
   ifeq ($(enable-vtk),yes)
     libmesh_LIBS    += @VTK_LIBRARY@
     libmesh_INCLUDE += @VTK_INCLUDE@
