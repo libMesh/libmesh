@@ -270,6 +270,7 @@ void NonlinearImplicitSystem::qoi_parameter_sensitivity
 
       this->assemble();
       this->rhs->close();
+      this->matrix->close();
       AutoPtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
       *partialR_partialp *= -1;
 
@@ -280,6 +281,7 @@ void NonlinearImplicitSystem::qoi_parameter_sensitivity
 
       this->assemble();
       this->rhs->close();
+      this->matrix->close();
       *partialR_partialp -= *this->rhs;
       *partialR_partialp /= (2.*delta_p);
 
@@ -295,4 +297,6 @@ void NonlinearImplicitSystem::qoi_parameter_sensitivity
   // surprise.
   this->assemble();
   this->assemble_qoi();
+  this->rhs->close();
+  this->matrix->close();
 }
