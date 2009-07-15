@@ -57,24 +57,24 @@ PetscPreconditioner<T>::init ()
   }
 
   //Clear the preconditioner in case it has been created in the past
-  if(this->_is_initialized)
-    PCDestroy(_pc);
+  if(!this->_is_initialized)
+  {
+    //Create the preconditioning object
+    PCCreate(libMesh::COMM_WORLD,&_pc);
 
-  //Create the preconditioning object
-  PCCreate(libMesh::COMM_WORLD,&_pc);
+    //Set the PCType
+    set_petsc_preconditioner_type(this->_preconditioner_type, _pc);
 
-  //Set the PCType
-  set_petsc_preconditioner_type(this->_preconditioner_type, _pc);
+#ifdef LIBMESH_HAVE_PETSC_HYPRE
+    if(this->_preconditioner_type == AMG_PRECOND)
+      PCHYPRESetType(this->_pc, "boomeramg");
+#endif
 
-  #ifdef LIBMESH_HAVE_PETSC_HYPRE
-  if(this->_preconditioner_type == AMG_PRECOND)
-    PCHYPRESetType(this->_pc, "boomeramg");
-  #endif
-
-  PetscMatrix<T> * pmatrix = libmesh_cast_ptr<PetscMatrix<T>*, SparseMatrix<T> >(this->_matrix);
-
-  _mat = pmatrix->mat();
-
+    PetscMatrix<T> * pmatrix = libmesh_cast_ptr<PetscMatrix<T>*, SparseMatrix<T> >(this->_matrix);
+    
+    _mat = pmatrix->mat();
+  }
+  
   PCSetOperators(_pc,_mat,_mat,SAME_NONZERO_PATTERN);
 
   this->_is_initialized = true;
@@ -137,7 +137,8 @@ PetscPreconditioner<T>::set_petsc_preconditioner_type (const PreconditionerType 
   }
 
   //Let the commandline override stuff
-  PCSetFromOptions(pc);
+  if( preconditioner_type != AMG_PRECOND )
+    PCSetFromOptions(pc);
 }
 
 //------------------------------------------------------------------
