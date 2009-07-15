@@ -167,6 +167,7 @@ void DifferentiableSystem::qoi_parameter_sensitivity
       Number qoi_minus = this->qoi;
 
       this->assembly(true, false);
+      this->rhs->close();
       AutoPtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
       *partialR_partialp *= -1;
 
@@ -176,6 +177,7 @@ void DifferentiableSystem::qoi_parameter_sensitivity
       Number partialq_partialp = (qoi_plus - qoi_minus) / (2.*delta_p);
 
       this->assembly(true, false);
+      this->rhs->close();
       *partialR_partialp -= *this->rhs;
       *partialR_partialp /= (2.*delta_p);
 
