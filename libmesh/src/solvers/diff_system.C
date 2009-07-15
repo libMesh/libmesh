@@ -192,5 +192,6 @@ void DifferentiableSystem::qoi_parameter_sensitivity
   // Don't leave the qoi or system changed - principle of least
   // surprise.
   this->assembly(true, false);
+  this->rhs->close();
   this->assemble_qoi();
 }

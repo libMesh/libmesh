@@ -278,6 +278,7 @@ void LinearImplicitSystem::qoi_parameter_sensitivity
       // We're still at p+delta_p, so start with b(p+dp)
       this->assemble();
       this->rhs->close();
+      this->matrix->close();
       AutoPtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
 
       // PETSc doesn't implement SGEMX, so neither does NumericVector,
@@ -289,6 +290,7 @@ void LinearImplicitSystem::qoi_parameter_sensitivity
       *parameters[i] = old_parameter - delta_p;
       this->assemble();
       this->rhs->close();
+      this->matrix->close();
       *partialR_partialp -= *this->rhs;
       partialR_partialp->add_vector(*this->solution, *this->matrix);
 
@@ -306,6 +308,8 @@ void LinearImplicitSystem::qoi_parameter_sensitivity
   // surprise.
   this->assemble();
   this->assemble_qoi();
+  this->rhs->close();
+  this->matrix->close();
 }
 
 
