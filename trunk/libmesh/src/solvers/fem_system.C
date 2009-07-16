@@ -495,6 +495,10 @@ void FEMSystem::assemble_qoi()
   AutoPtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
 
+  // the quantity of interest is assumed to be a sum of element and
+  // side terms
+  qoi = 0;
+
   // Loop over every active mesh element on this processor
   MeshBase::const_element_iterator el =
     mesh.active_local_elements_begin();
