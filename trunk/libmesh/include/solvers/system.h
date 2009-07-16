@@ -708,11 +708,6 @@ public:
   AutoPtr<NumericVector<Number> > solution;
 
   /**
-   * Value of the quantity of interest
-   */
-  Number qoi;
-
-  /**
    * All the values I need to compute my contribution
    * to the simulation at hand.  Think of this as the
    * current solution with any ghost values needed from
@@ -723,6 +718,11 @@ public:
    * vectors.
    */
   AutoPtr<NumericVector<Number> > current_local_solution;
+
+  /**
+   * Value of the quantity of interest
+   */
+  Number qoi;
 
   /**
    * Fills the std::set with the degrees of freedom on the local
