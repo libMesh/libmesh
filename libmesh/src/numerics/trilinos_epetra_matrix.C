@@ -375,7 +375,7 @@ void EpetraMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 
 
 template <typename T>
-void EpetraMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
+void EpetraMatrix<T>::get_transpose (SparseMatrix<T>&) const
 {
   libmesh_not_implemented();
 }
