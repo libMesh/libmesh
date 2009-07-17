@@ -123,30 +123,6 @@ void JumpErrorEstimator::estimate_error (const System& system,
   // neighbors
   std::vector<float> n_flux_faces (error_per_cell.size());
   
-  // Check for the use of component_mask
-  this->convert_component_mask_to_scale();
-
-  // Check for a valid component_scale
-  if (!component_scale.empty())
-    {
-      if (component_scale.size() != n_vars)
-	{
-	  std::cerr << "ERROR: component_scale is the wrong size:"
-		    << std::endl
-		    << " component_scale.scale()=" << component_scale.size()
-		    << std::endl
-		    << " n_vars=" << n_vars
-		    << std::endl;
-	  libmesh_error();
-	}
-    }
-  else
-    {
-      // No specified scaling.  Scale all variables by one.
-      component_scale.resize (n_vars);
-      std::fill (component_scale.begin(), component_scale.end(), 1.0);
-    }
-
   // Prepare current_local_solution to localize a non-standard
   // solution vector if necessary
   if (solution_vector && solution_vector != system.solution.get())
@@ -162,8 +138,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
   for (var=0; var<n_vars; var++)
     {
       // Possibly skip this variable
-      if (!component_scale.empty())
-	if (component_scale[var] == 0.0) continue;
+      if (error_norm.weight(var) == 0.0) continue;
 
       // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);

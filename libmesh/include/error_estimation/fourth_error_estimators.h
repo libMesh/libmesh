@@ -47,9 +47,10 @@ class LaplacianErrorEstimator : public JumpErrorEstimator
 public:
 
   /**
-   * Constructor.
+   * Constructor.  Defaults to H2 seminorm; changes to error_norm are
+   * ignored.
    */
-  LaplacianErrorEstimator() {}
+  LaplacianErrorEstimator() { error_norm = H2_SEMINORM; }
   
   /**
    * Destructor.  
