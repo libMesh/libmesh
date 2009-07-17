@@ -48,7 +48,7 @@ public:
    */
   UniformRefinementEstimator() : number_h_refinements(1),
                                  number_p_refinements(0)
-  {}
+  { error_norm = H1; }
   
   /**
    * Destructor.  
