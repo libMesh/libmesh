@@ -189,6 +189,9 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
       // elem is necessarily an active element on the local processor
       const Elem* elem = *elem_it;
 
+      // We'll need an index into the error vector
+      const int e_id=elem->id();
+
       // Build a patch containing the current element
       // and its neighbors on the local processor
       Patch patch;
@@ -201,11 +204,26 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
       // Process each variable in the system using the current patch
       for (unsigned int var=0; var<n_vars; var++)
 	{
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ifndef DEBUG
+  #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           libmesh_assert (error_estimator.error_norm.type(var) == H1_SEMINORM ||
-                          error_estimator.error_norm.type(var) == H2_SEMINORM);
-#else
-          libmesh_assert (error_estimator.error_norm.type(var) == H1_SEMINORM);
+                          error_estimator.error_norm.type(var) == H2_SEMINORM ||
+                          error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
+                          error_estimator.error_norm.type(var) == W2_INF_SEMINORM);
+  #else
+          libmesh_assert (error_estimator.error_norm.type(var) == H1_SEMINORM ||
+                          error_estimator.error_norm.type(var) == W1_INF_SEMINORM);
+  #endif
+          if (var > 0)
+            // We can't mix L_inf and L_2 norms
+            libmesh_assert (((error_estimator.error_norm.type(var) == H1_SEMINORM ||
+                              error_estimator.error_norm.type(var) == H2_SEMINORM) &&
+                             (error_estimator.error_norm.type(var-1) == H1_SEMINORM ||
+                              error_estimator.error_norm.type(var-1) == H2_SEMINORM)) ||
+                            ((error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
+                              error_estimator.error_norm.type(var) == W2_INF_SEMINORM) &&
+                             (error_estimator.error_norm.type(var-1) == W1_INF_SEMINORM ||
+                              error_estimator.error_norm.type(var-1) == W2_INF_SEMINORM)));
 #endif
 
 	  // Possibly skip this variable
@@ -236,11 +254,13 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	  const std::vector<std::vector<Real> >&         phi     = fe->get_phi();
 #endif
 	  const std::vector<std::vector<RealGradient> > *dphi = NULL;
-          if (error_estimator.error_norm.type(var) == H1_SEMINORM)
+          if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
+              error_estimator.error_norm.type(var) == W1_INF_SEMINORM)
             dphi = &(fe->get_dphi());
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	  const std::vector<std::vector<RealTensor> >  *d2phi = NULL;
-          if (error_estimator.error_norm.type(var) == H2_SEMINORM)
+          if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
+              error_estimator.error_norm.type(var) == W1_INF_SEMINORM)
             d2phi = &(fe->get_d2phi());
 #endif
       
@@ -267,7 +287,8 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	    Fy(matsize), Pu_y_h(matsize), // Also yy
 	    Fz(matsize), Pu_z_h(matsize); // Also zz
           DenseVector<Number> Fxy, Pu_xy_h, Fxz, Pu_xz_h, Fyz, Pu_yz_h;
-          if (error_estimator.error_norm.type(var) == H2_SEMINORM)
+          if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
+              error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             {
               Fxy.resize(matsize); Pu_xy_h.resize(matsize);
               Fxz.resize(matsize); Pu_xz_h.resize(matsize);
@@ -308,7 +329,8 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		    for (unsigned int j=0; j<Kp.n(); j++)
 		      Kp(i,j) += JxW[qp]*psi[i]*psi[j];
 
-                  if (error_estimator.error_norm.type(var) == H1_SEMINORM)
+                  if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
+                      error_estimator.error_norm.type(var) == W1_INF_SEMINORM)
                     {
 		      // Compute the gradient on the current patch element
 		      // at the quadrature point
@@ -326,7 +348,8 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		          Fz(i) += JxW[qp]*grad_u_h(2)*psi[i];
 		        }
                     }
-                  else if (error_estimator.error_norm.type(var) == H2_SEMINORM)
+                  else if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
+                           error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
                     {
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 		      // Compute the hessian on the current patch element
@@ -365,7 +388,8 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	  Kp.lu_solve (Fx, Pu_x_h);
 	  Kp.lu_solve (Fy, Pu_y_h);
 	  Kp.lu_solve (Fz, Pu_z_h);
-          if (error_estimator.error_norm.type(var) == H2_SEMINORM)
+          if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
+              error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             {
               Kp.lu_solve(Fxy, Pu_xy_h);
               Kp.lu_solve(Fxz, Pu_xz_h);
@@ -402,7 +426,8 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	    {
 	      std::vector<Number> temperr(6,0.0); // x,y,z or xx,yy,zz,xy,xz,yz
 	  
-              if (error_estimator.error_norm.type(var) == H1_SEMINORM)
+              if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
+                  error_estimator.error_norm.type(var) == W1_INF_SEMINORM)
                 {
 	          // Compute the gradient at the current sample point
 	          Gradient grad_u_h;
@@ -422,7 +447,8 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	          temperr[1] -= grad_u_h(1);
 	          temperr[2] -= grad_u_h(2);
                 }
-              else if (error_estimator.error_norm.type(var) == H2_SEMINORM)
+              else if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
+                       error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
                 {
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	          // Compute the Hessian at the current sample point
@@ -454,15 +480,39 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		      libmesh_error();
 #endif
                 }
-              for (unsigned int i=0; i != 6; ++i)
-                element_error = std::max(element_error, std::abs(temperr[i]));
+              if (error_estimator.error_norm.type(var) == W1_INF_SEMINORM)
+                for (unsigned int i=0; i != 3; ++i)
+                  element_error = std::max(element_error, std::abs(temperr[i]));
+              else if (error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
+                for (unsigned int i=0; i != 6; ++i)
+                  element_error = std::max(element_error, std::abs(temperr[i]));
+              else if (error_estimator.error_norm.type(var) == H1_SEMINORM)
+                for (unsigned int i=0; i != 6; ++i)
+                  element_error += libmesh_norm(temperr[i]);
+              else if (error_estimator.error_norm.type(var) == H2_SEMINORM)
+                {
+                  for (unsigned int i=0; i != 3; ++i)
+                    element_error += libmesh_norm(temperr[i]);
+                // Off diagonal terms enter into the Hessian norm twice
+                  for (unsigned int i=3; i != 6; ++i)
+                    element_error += 2*libmesh_norm(temperr[i]);
+                }
 
 	    } // end sample_point_loop
 
 	  // The patch error estimator works element-by-element --
 	  // there is no need to get a mutex on error_per_cell!
-	  const int e_id=elem->id();
-	  error_per_cell[e_id] += element_error;	  
+          if (error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
+              error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
+	    error_per_cell[e_id] += error_estimator.error_norm.weight(var) * element_error;	  
+          else if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
+                   error_estimator.error_norm.type(var) == H2_SEMINORM)
+	    error_per_cell[e_id] += error_estimator.error_norm.weight_sq(var) * element_error;	  
 	} // end variable loop  
+
+      if (error_estimator.error_norm.type(0) == H1_SEMINORM ||
+          error_estimator.error_norm.type(0) == H2_SEMINORM)
+        error_per_cell[e_id] = std::sqrt(error_per_cell[e_id]);
+
     } // end element loop
 }
