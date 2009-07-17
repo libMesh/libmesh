@@ -118,9 +118,6 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
   // The current mesh
   const MeshBase& mesh = system.get_mesh();
   
-  // The number of variables in the system
-  const unsigned int n_vars = system.n_vars();
-
   // Resize the error_per_cell vector to be
   // the number of elements, initialize it to 0.
   error_per_cell.resize (mesh.max_elem_id());
@@ -239,11 +236,11 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	  const std::vector<std::vector<Real> >&         phi     = fe->get_phi();
 #endif
 	  const std::vector<std::vector<RealGradient> > *dphi = NULL;
-          if (error_estimator.error_norm.type(var) == H1_SEMINORM);
+          if (error_estimator.error_norm.type(var) == H1_SEMINORM)
             dphi = &(fe->get_dphi());
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	  const std::vector<std::vector<RealTensor> >  *d2phi = NULL;
-          if (error_estimator.error_norm.type(var) == H2_SEMINORM);
+          if (error_estimator.error_norm.type(var) == H2_SEMINORM)
             d2phi = &(fe->get_d2phi());
 #endif
       
@@ -270,7 +267,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	    Fy(matsize), Pu_y_h(matsize), // Also yy
 	    Fz(matsize), Pu_z_h(matsize); // Also zz
           DenseVector<Number> Fxy, Pu_xy_h, Fxz, Pu_xz_h, Fyz, Pu_yz_h;
-          if (error_estimator.error_norm.type(var) == H2_SEMINORM);
+          if (error_estimator.error_norm.type(var) == H2_SEMINORM)
             {
               Fxy.resize(matsize); Pu_xy_h.resize(matsize);
               Fxz.resize(matsize); Pu_xz_h.resize(matsize);
@@ -368,7 +365,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	  Kp.lu_solve (Fx, Pu_x_h);
 	  Kp.lu_solve (Fy, Pu_y_h);
 	  Kp.lu_solve (Fz, Pu_z_h);
-          if (error_estimator.error_norm.type(var) == H2_SEMINORM);
+          if (error_estimator.error_norm.type(var) == H2_SEMINORM)
             {
               Kp.lu_solve(Fxy, Pu_xy_h);
               Kp.lu_solve(Fxz, Pu_xz_h);
