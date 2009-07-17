@@ -102,9 +102,9 @@ LaplacianErrorEstimator::internal_side_integration ()
 
   // Add the h-weighted jump integral to each error term
   fine_error =
-    error * fine_elem->hmax() * component_scale[var];
+    error * fine_elem->hmax() * error_norm.weight(var);
   coarse_error =
-    error * coarse_elem->hmax() * component_scale[var];
+    error * coarse_elem->hmax() * error_norm.weight(var);
 }
 
 #else // defined (LIBMESH_ENABLE_SECOND_DERIVATIVES)

@@ -115,12 +115,6 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 {
   START_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  libmesh_assert (_sobolev_order == 1 || _sobolev_order == 2);
-#else
-  libmesh_assert (_sobolev_order == 1);
-#endif
-
   // The current mesh
   const MeshBase& mesh = system.get_mesh();
   
@@ -131,22 +125,6 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
   // the number of elements, initialize it to 0.
   error_per_cell.resize (mesh.max_elem_id());
   std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
-
-  // Check for the use of component_mask
-  this->convert_component_mask_to_scale();
-
-  // Check for a valid component_scale
-  if (!component_scale.empty())
-    if (component_scale.size() != n_vars)
-      {
-	std::cerr << "ERROR: component_scale is the wrong size:"
-		  << std::endl
-		  << " component_scale.size()=" << component_scale.size()
-		  << std::endl
-		  << ", n_vars=" << n_vars
-		  << std::endl;
-	libmesh_error();
-      }
 
   // Prepare current_local_solution to localize a non-standard
   // solution vector if necessary
@@ -194,12 +172,6 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 
 void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange &range) const
 {
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  libmesh_assert (error_estimator._sobolev_order == 1 || error_estimator._sobolev_order == 2);
-#else
-  libmesh_assert (error_estimator._sobolev_order == 1);
-#endif
-
   // The current mesh
   const MeshBase& mesh = system.get_mesh();
 
@@ -232,9 +204,15 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
       // Process each variable in the system using the current patch
       for (unsigned int var=0; var<n_vars; var++)
 	{
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+          libmesh_assert (error_estimator.error_norm.type(var) == H1_SEMINORM ||
+                          error_estimator.error_norm.type(var) == H2_SEMINORM);
+#else
+          libmesh_assert (error_estimator.error_norm.type(var) == H1_SEMINORM);
+#endif
+
 	  // Possibly skip this variable
-	  if (!error_estimator.component_scale.empty())
-	    if (error_estimator.component_scale[var] == 0.0) continue;
+	  if (error_estimator.error_norm.weight(var) == 0.0) continue;
 	  
 	  // The type of finite element to use for this variable
 	  const FEType& fe_type = dof_map.variable_type (var);
@@ -261,11 +239,11 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	  const std::vector<std::vector<Real> >&         phi     = fe->get_phi();
 #endif
 	  const std::vector<std::vector<RealGradient> > *dphi = NULL;
-          if (error_estimator._sobolev_order == 1)
+          if (error_estimator.error_norm.type(var) == H1_SEMINORM);
             dphi = &(fe->get_dphi());
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	  const std::vector<std::vector<RealTensor> >  *d2phi = NULL;
-          if (error_estimator._sobolev_order == 2)
+          if (error_estimator.error_norm.type(var) == H2_SEMINORM);
             d2phi = &(fe->get_d2phi());
 #endif
       
@@ -292,7 +270,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	    Fy(matsize), Pu_y_h(matsize), // Also yy
 	    Fz(matsize), Pu_z_h(matsize); // Also zz
           DenseVector<Number> Fxy, Pu_xy_h, Fxz, Pu_xz_h, Fyz, Pu_yz_h;
-          if (error_estimator._sobolev_order == 2)
+          if (error_estimator.error_norm.type(var) == H2_SEMINORM);
             {
               Fxy.resize(matsize); Pu_xy_h.resize(matsize);
               Fxz.resize(matsize); Pu_xz_h.resize(matsize);
@@ -333,7 +311,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		    for (unsigned int j=0; j<Kp.n(); j++)
 		      Kp(i,j) += JxW[qp]*psi[i]*psi[j];
 
-                  if (error_estimator._sobolev_order == 1)
+                  if (error_estimator.error_norm.type(var) == H1_SEMINORM)
                     {
 		      // Compute the gradient on the current patch element
 		      // at the quadrature point
@@ -351,7 +329,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		          Fz(i) += JxW[qp]*grad_u_h(2)*psi[i];
 		        }
                     }
-                  else if (error_estimator._sobolev_order == 2)
+                  else if (error_estimator.error_norm.type(var) == H2_SEMINORM)
                     {
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 		      // Compute the hessian on the current patch element
@@ -390,7 +368,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	  Kp.lu_solve (Fx, Pu_x_h);
 	  Kp.lu_solve (Fy, Pu_y_h);
 	  Kp.lu_solve (Fz, Pu_z_h);
-          if (error_estimator._sobolev_order == 2)
+          if (error_estimator.error_norm.type(var) == H2_SEMINORM);
             {
               Kp.lu_solve(Fxy, Pu_xy_h);
               Kp.lu_solve(Fxz, Pu_xz_h);
@@ -427,7 +405,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	    {
 	      std::vector<Number> temperr(6,0.0); // x,y,z or xx,yy,zz,xy,xz,yz
 	  
-              if (error_estimator._sobolev_order == 1)
+              if (error_estimator.error_norm.type(var) == H1_SEMINORM)
                 {
 	          // Compute the gradient at the current sample point
 	          Gradient grad_u_h;
@@ -447,7 +425,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	          temperr[1] -= grad_u_h(1);
 	          temperr[2] -= grad_u_h(2);
                 }
-              else if (error_estimator._sobolev_order == 2)
+              else if (error_estimator.error_norm.type(var) == H2_SEMINORM)
                 {
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	          // Compute the Hessian at the current sample point

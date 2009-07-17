@@ -47,11 +47,14 @@ class PatchRecoveryErrorEstimator : public ErrorEstimator
 public:
 
   /**
-   * Constructor.
+   * Constructor.  Defaults to H1 seminorm.  All Hilbert norms and
+   * seminorms should be supported now.  W1,p and W2,p norms would
+   * be natural to support if any contributors make the effort.
    */
   PatchRecoveryErrorEstimator() :
     target_patch_size(20),
-    patch_growth_strategy(&Patch::add_local_face_neighbors) {}
+    patch_growth_strategy(&Patch::add_local_face_neighbors) 
+  { error_norm = H1_SEMINORM; }
   
   /**
    * Destructor.  

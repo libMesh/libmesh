@@ -49,9 +49,10 @@ public:
 
   /**
    * Constructor.  Responsible for initializing the _bc_function function
-   * pointer to NULL.
+   * pointer to NULL.  Defaults to L2 norm; changes to system norm are
+   * ignored.
    */
-  DiscontinuityMeasure() : _bc_function(NULL) {}
+  DiscontinuityMeasure() : _bc_function(NULL) { error_norm = L2; }
   
   /**
    * Destructor.  

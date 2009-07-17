@@ -47,8 +47,8 @@ public:
    * Constructor.  Sets the most common default parameter values.
    */
   UniformRefinementEstimator() : number_h_refinements(1),
-                                 number_p_refinements(0),
-                                 _sobolev_order(1) {}
+                                 number_p_refinements(0)
+  {}
   
   /**
    * Destructor.  
@@ -78,15 +78,15 @@ public:
 			       bool estimate_parent_error = false);
 
   /**
-   * Currently this function ignores the component_scale member variable,
-   * and uses the function argument component_scales instead.
+   * Currently this function ignores the error_norm member variable,
+   * and uses the function argument error_norms instead.
    *
    * This function is named estimate_errors instead of estimate_error
    * because otherwise C++ can get confused.
    */
   virtual void estimate_errors (const EquationSystems& equation_systems,
 				ErrorVector& error_per_cell,
-				const std::map<const System*, std::vector<float> >& component_scales,
+			        const std::map<const System*, SystemNorm>& error_norms,
 			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
 				bool estimate_parent_error = false);
 
@@ -102,13 +102,6 @@ public:
 			        ErrorMap& errors_per_cell,
 			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
 			        bool estimate_parent_error = false);
-
-  /**
-   * Returns or allows you to set the Sobolev order for error computations
-   * e.g. 0 for H^0/L_2 error, 1 for H^1, 2 for H^2
-   */
-  unsigned int & sobolev_order (void)
-    { return _sobolev_order; }
 
   /**
    * How many h refinements to perform to get the fine grid
@@ -129,16 +122,9 @@ protected:
                                 const System* system,
 				ErrorVector* error_per_cell,
 			        std::map<std::pair<const System*, unsigned int>, ErrorVector*>* errors_per_cell,
-				const std::map<const System*, std::vector<float> >* component_scales,
+				const std::map<const System*, SystemNorm >* error_norms,
 			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
 				bool estimate_parent_error = false);
-
-private:
-  /**
-   * Sobolev order - e.g. 0 for H^0/L_2 error, 1 for H^1, 2 for H^2
-   */
-  unsigned int _sobolev_order;
-
 };
 
 #endif // #ifdef LIBMESH_ENABLE_AMR

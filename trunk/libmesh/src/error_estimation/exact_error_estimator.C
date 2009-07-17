@@ -121,30 +121,6 @@ void ExactErrorEstimator::estimate_error (const System& system,
   error_per_cell.resize (mesh.max_elem_id());
   std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
 
-  // Check for the use of component_mask
-  this->convert_component_mask_to_scale();
-  
-  // Check for a valid component_scale
-  if (!component_scale.empty())
-    {
-      if (component_scale.size() != n_vars)
-	{
-	  std::cerr << "ERROR: component_scale is the wrong size:"
-		    << std::endl
-		    << " component_scale.scale()=" << component_scale.size()
-		    << std::endl
-		    << " n_vars=" << n_vars
-		    << std::endl;
-	  libmesh_error();
-	}
-    }
-  else
-    {
-      // No specified scaling.  Scale all variables by one.
-      component_scale.resize (n_vars);
-      std::fill (component_scale.begin(), component_scale.end(), 1.0);
-    }
-
   // Prepare current_local_solution to localize a non-standard
   // solution vector if necessary
   if (solution_vector && solution_vector != system.solution.get())
@@ -160,8 +136,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
   for (unsigned int var=0; var<n_vars; var++)
     {
       // Possibly skip this variable
-      if (!component_scale.empty())
-	if (component_scale[var] == 0.0) continue;
+      if (error_norm.weight(var) == 0.0) continue;
 
       // The (string) name of this variable
       const std::string& var_name = system.variable_name(var);
@@ -318,6 +293,8 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 {
   // The (string) name of this system
   const std::string& sys_name = system.name();
+
+  unsigned int var = system.variable_number(var_name);
   
   const Parameters& parameters = system.get_equation_systems().parameters;
 
@@ -340,8 +317,8 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
   // The number of quadrature points
   const unsigned int n_qp = JxW.size();
 
-  double L2normsq = 0., H1seminormsq = 0., H2seminormsq = 0.;
-  
+  Real error_val = 0;
+
   // Begin the loop over the Quadrature points.
   //
   for (unsigned int qp=0; qp<n_qp; qp++)
@@ -371,18 +348,26 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
         }
 
       // Compute the value of the error at this quadrature point
-      Number val_error = 0;
-      if(_exact_value)
-	val_error = u_h - _exact_value(q_point[qp],parameters,sys_name,var_name);
-      else if(_equation_systems_fine)
-	val_error = u_h - (*fine_values)(q_point[qp]);
+      if (error_norm.type(var) == L2 ||
+          error_norm.type(var) == H1 ||
+          error_norm.type(var) == H2)
+        {
+          Number val_error = 0;
+          if(_exact_value)
+	    val_error = u_h - _exact_value(q_point[qp],parameters,sys_name,var_name);
+          else if(_equation_systems_fine)
+	    val_error = u_h - (*fine_values)(q_point[qp]);
 
-      // Add the squares of the error to each contribution
-      L2normsq += JxW[qp]*libmesh_norm(val_error);
+          // Add the squares of the error to each contribution
+          error_val += JxW[qp]*libmesh_norm(val_error);
+        }
 
       // Compute the value of the error in the gradient at this
       // quadrature point
-      if ((_exact_deriv || _equation_systems_fine) && _sobolev_order > 0)
+      if ((_exact_deriv || _equation_systems_fine) && 
+          (error_norm.type(var) == H1 ||
+           error_norm.type(var) == H1_SEMINORM ||
+           error_norm.type(var) == H2))
         {
           Gradient grad_error;
 	  if(_exact_deriv)
@@ -390,14 +375,16 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 	  else if(_equation_systems_fine)
 	    grad_error = grad_u_h - fine_values->gradient(q_point[qp]);
 
-          H1seminormsq += JxW[qp]*grad_error.size_sq();
+          error_val += JxW[qp]*grad_error.size_sq();
         }
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       // Compute the value of the error in the hessian at this
       // quadrature point
-      if ((_exact_hessian || _equation_systems_fine) && _sobolev_order > 1)
+      if ((_exact_hessian || _equation_systems_fine) && 
+          (error_norm.type(var) == H2_SEMINORM ||
+           error_norm.type(var) == H2))
         {
 	  Tensor grad2_error;
 	  if(_exact_hessian)
@@ -405,19 +392,13 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 	  else if (_equation_systems_fine)
 	    grad2_error = grad2_u_h - fine_values->hessian(q_point[qp]);
 
-          H2seminormsq += JxW[qp]*grad2_error.size_sq();
+          error_val += JxW[qp]*grad2_error.size_sq();
         }
 #endif
 
     } // end qp loop
 
-  libmesh_assert (L2normsq     >= 0.);
-  libmesh_assert (H1seminormsq >= 0.);
+  libmesh_assert (error_val >= 0.);
 	  
-  Real error_val = L2normsq;
-  if (_sobolev_order > 0)
-    error_val += H1seminormsq;
-  if (_sobolev_order > 1)
-    error_val += H2seminormsq;
   return error_val;
 }

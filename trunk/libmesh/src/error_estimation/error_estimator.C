@@ -43,46 +43,23 @@ void ErrorEstimator::reduce_error (std::vector<ErrorVectorReal>& error_per_cell)
 
 
 
-void ErrorEstimator::convert_component_mask_to_scale()
-{
-  if (!component_mask.empty())
-    {
-      // component_mask has been replaced by component_scale,
-      // and will be removed in future libMesh versions
-      deprecated();
-
-      component_scale.resize(component_mask.size(),0.0);
-      for (unsigned int i=0; i != component_mask.size(); ++i)
-        {
-          if (component_mask[i])
-            component_scale[i] = 1.0;
-        }
-    }
-}
-
-
-
 void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
                                      ErrorVector& error_per_cell,
-                                     const std::map<const System*, std::vector<float> >& component_scales,
+                                     const std::map<const System*, SystemNorm>& error_norms,
 				     const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
                                      bool estimate_parent_error)
 {
-  // This is a brand-new function; if you're using it you should
-  // already have stopped using component_mask
-  libmesh_assert(component_mask.empty());
-
-  std::vector<float> old_component_scale = this->component_scale;
+  SystemNorm old_error_norm = this->error_norm;
 
   // Sum the error values from each system
   for (unsigned int s = 0; s != equation_systems.n_systems(); ++s)
     {
       ErrorVector system_error_per_cell;
       const System &sys = equation_systems.get_system(s);
-      if (component_scales.find(&sys) == component_scales.end())
-        this->component_scale = old_component_scale;
+      if (error_norms.find(&sys) == error_norms.end())
+        this->error_norm = old_error_norm;
       else
-        this->component_scale = component_scales.find(&sys)->second;
+        this->error_norm = error_norms.find(&sys)->second;
 
       const NumericVector<Number>* solution_vector = NULL;
       if (solution_vectors &&
@@ -103,7 +80,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
     }
 
   // Restore our old state before returning
-  this->component_scale = old_component_scale;
+  this->error_norm = old_error_norm;
 }
 
 
@@ -117,11 +94,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
 				     const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
                                      bool estimate_parent_error)
 {
-  // This is a brand-new function; if you're using it you should
-  // already have stopped using component_mask
-  libmesh_assert(component_mask.empty());
-
-  std::vector<float> old_component_scale = this->component_scale;
+  SystemNorm old_error_norm = this->error_norm;
 
   // Find the requested error values from each system
   for (unsigned int s = 0; s != equation_systems.n_systems(); ++s)
@@ -130,10 +103,6 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
 
       unsigned int n_vars = sys.n_vars();
 
-      // Calculate error in only one variable
-      this->component_scale.clear();
-      this->component_scale.resize(n_vars, 0.0);
-
       for (unsigned int v = 0; v != n_vars; ++v)
         {
           // Only fill in ErrorVectors the user asks for
@@ -141,7 +110,12 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
               errors_per_cell.end())
             continue;
 
-          this->component_scale[v] = 1.0;
+          // Calculate error in only one variable
+          std::vector<Real> weights(n_vars, 0.0);
+          weights[v] = 1.0;
+	  this->error_norm =
+            SystemNorm(std::vector<FEMNormType>(n_vars, old_error_norm.type(0)),
+                       weights);
 
           const NumericVector<Number>* solution_vector = NULL;
           if (solution_vectors &&
@@ -151,11 +125,9 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
           this->estimate_error
             (sys, *errors_per_cell[std::make_pair(&sys, v)],
              solution_vector, estimate_parent_error);
-
-          this->component_scale[v] = 0.0;
         }
     }
 
   // Restore our old state before returning
-  this->component_scale = old_component_scale;
+  this->error_norm = old_error_norm;
 }

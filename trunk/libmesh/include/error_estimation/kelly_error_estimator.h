@@ -61,9 +61,11 @@ public:
 
   /**
    * Constructor.  Responsible for initializing the _bc_function function
-   * pointer to NULL.
+   * pointer to NULL.  Defaults to H1 seminorm; changes to system norm
+   * are ignored.
    */
-  KellyErrorEstimator() : _bc_function(NULL) {}
+  KellyErrorEstimator() : _bc_function(NULL) 
+  { error_norm = H1_SEMINORM; }
   
   /**
    * Destructor.  

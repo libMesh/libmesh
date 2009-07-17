@@ -57,13 +57,13 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
 
 void UniformRefinementEstimator::estimate_errors (const EquationSystems& _es,
 					         ErrorVector& error_per_cell,
-                                                 const std::map<const System*, std::vector<float> >& component_scales,
+                                                 const std::map<const System*, SystemNorm>& error_norms,
 			                         const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
 					         bool estimate_parent_error)
 {
   START_LOG("estimate_errors()", "UniformRefinementEstimator");
   this->_estimate_error (&_es, NULL, &error_per_cell, NULL,
-			 &component_scales, solution_vectors,
+			 &error_norms, solution_vectors,
 			 estimate_parent_error);
   STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
 }
@@ -83,16 +83,16 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                                                  const System* _system,
 					         ErrorVector* error_per_cell,
                                                  ErrorMap* errors_per_cell,
-                                                 const std::map<const System*, std::vector<float> > *_component_scales,
+                                                 const std::map<const System*, SystemNorm > *_error_norms,
 			                         const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
 					         bool)
 {
   // Get a vector of the Systems we're going to work on,
-  // and set up a component_scales map if necessary
+  // and set up a error_norms map if necessary
   std::vector<System *> system_list;
-  AutoPtr<std::map<const System*, std::vector<float> > > component_scales = 
-    AutoPtr<std::map<const System*, std::vector<float> > >
-    (new std::map<const System*, std::vector<float> >);
+  AutoPtr<std::map<const System*, SystemNorm > > error_norms = 
+    AutoPtr<std::map<const System*, SystemNorm > >
+    (new std::map<const System*, SystemNorm>);
 
   if (_es)
     {
@@ -108,7 +108,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
       // If we're computing one vector, we need to know how to scale
       // each variable's contributions to it.
-      if (_component_scales)
+      if (_error_norms)
         {
           libmesh_assert(!errors_per_cell);
         }
@@ -118,23 +118,25 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
         {
           libmesh_assert (errors_per_cell);
 
-          _component_scales = component_scales.get();
+          _error_norms = error_norms.get();
 
           for (unsigned int i=0; i!= _es->n_systems(); ++i)
             {
               const System &sys = _es->get_system(i);
               unsigned int n_vars = sys.n_vars();
 
-              std::vector<float> cs(sys.n_vars(), 0.0);
+              std::vector<Real> weights(n_vars, 0.0);
               for (unsigned int v = 0; v != n_vars; ++v)
                 {
                   if (errors_per_cell->find(std::make_pair(&sys, v)) ==
                       errors_per_cell->end())
                     continue;
 
-                  cs[v] = 1.0;
+                  weights[v] = 1.0;
                 }
-              (*component_scales)[&sys] = cs;
+	      (*error_norms)[&sys] =
+                SystemNorm(std::vector<FEMNormType>(n_vars, error_norm.type(0)),
+                           weights);
             }
         }
     }
@@ -144,9 +146,9 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       // We have to break the rules here, because we can't refine a const System
       system_list.push_back(const_cast<System *>(_system));
 
-      libmesh_assert(!_component_scales);
-      (*component_scales)[_system] = component_scale;
-      _component_scales = component_scales.get();
+      libmesh_assert(!_error_norms);
+      (*error_norms)[_system] = error_norm;
+      _error_norms = error_norms.get();
     }
 
   // An EquationSystems reference will be convenient.
@@ -179,10 +181,6 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
         }
     }
 
-  // component_mask has long since been deprecated
-  if (!component_mask.empty())
-    deprecated();
-
   // We'll want to back up all coarse grid vectors
   std::vector<std::map<std::string, NumericVector<Number> *> >
     coarse_vectors(system_list.size());
@@ -205,38 +203,10 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
     {
       System &system = *system_list[i];
 
-      // Check for valid component_scales
-      libmesh_assert (_component_scales->find(&system) !=
-		      _component_scales->end());
+      // Check for valid error_norms
+      libmesh_assert (_error_norms->find(&system) !=
+		      _error_norms->end());
 
-      const std::vector<float>& component_scale =
-        _component_scales->find(&system)->second;
-      if (!component_scale.empty())
-        {
-          if (component_scale.size() != system.n_vars())
-	    {
-	      std::cerr << "ERROR: component_scale is the wrong size:"
-		        << std::endl
-		        << " component_scales[" << i << "].scale()=" 
-                        << component_scale.size()
-		        << std::endl
-		        << " n_vars=" << system.n_vars()
-		        << std::endl;
-	      libmesh_error();
-	    }
-        }
-      else
-        {
-          // // No specified scaling.  Scale all variables by one.
-
-	  // This will be done implicitly later, to avoid modifying
-	  // a const component_scales
-
-          // component_scale.resize (system.n_vars());
-          // std::fill (component_scale.begin(),
-          //            component_scale.end(), 1.0);
-        }
-  
       // Back up the solution vector
       coarse_solutions[i] = system.solution->clone().release();
       coarse_local_solutions[i] =
@@ -409,25 +379,14 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
       DofMap &dof_map = system.get_dof_map();
 
-      const std::vector<float> &_component_scale =
-        _component_scales->find(&system)->second;
+      const SystemNorm &system_i_norm =
+        _error_norms->find(&system)->second;
 
       NumericVector<Number> *projected_solution = projected_solutions[i];
 
       // Loop over all the variables in the system
       for (unsigned int var=0; var<n_vars; var++)
         {
-          Real var_scale = 1.0;
-
-          // Possibly skip or weight this variable
-          if (!_component_scale.empty())
-            {
-	      if (_component_scale[var] == 0.0)
-                continue;
-              else
-                var_scale = _component_scale[var];
-            }
-
           // Get the error vector to fill for this system and variable
           ErrorVector *err_vec = error_per_cell;
           if (!err_vec)
@@ -526,18 +485,25 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                   const Number val_error = u_fine - u_coarse;
 
                   // Add the squares of the error to each contribution
-		  L2normsq += JxW[qp] * var_scale *
-                    libmesh_norm(val_error);
-                  libmesh_assert (L2normsq     >= 0.);
+                  if (system_i_norm.type(var) == L2 ||
+                      system_i_norm.type(var) == H1 ||
+                      system_i_norm.type(var) == H2)
+                    {
+		      L2normsq += JxW[qp] * system_i_norm.weight(var) *
+                                  libmesh_norm(val_error);
+                      libmesh_assert (L2normsq     >= 0.);
+                    }
 
 
                   // Compute the value of the error in the gradient at this
                   // quadrature point
-                  if (_sobolev_order > 0)
+                  if (system_i_norm.type(var) == H1 ||
+                      system_i_norm.type(var) == H2 ||
+                      system_i_norm.type(var) == H1_SEMINORM)
                     {
                       Gradient grad_error = grad_u_fine - grad_u_coarse;
 
-                      H1seminormsq += JxW[qp] * var_scale *
+                      H1seminormsq += JxW[qp] * system_i_norm.weight(var) *
                         grad_error.size_sq();
                       libmesh_assert (H1seminormsq >= 0.);
                     }
@@ -545,21 +511,29 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                   // Compute the value of the error in the hessian at this
                   // quadrature point
-                  if (_sobolev_order > 1)
+                  if (system_i_norm.type(var) == H2 ||
+                      system_i_norm.type(var) == H2_SEMINORM)
                     {
                       Tensor grad2_error = grad2_u_fine - grad2_u_coarse;
 
-		      H2seminormsq += JxW[qp] * var_scale *
+		      H2seminormsq += JxW[qp] * system_i_norm.weight(var) *
                         grad2_error.size_sq();
                       libmesh_assert (H2seminormsq >= 0.);
                     }
 #endif
                 } // end qp loop
 
-              (*err_vec)[e_id] += L2normsq;
-              if (_sobolev_order > 0)
+              if (system_i_norm.type(var) == L2 ||
+                  system_i_norm.type(var) == H1 ||
+                  system_i_norm.type(var) == H2)
+                (*err_vec)[e_id] += L2normsq;
+              if (system_i_norm.type(var) == H1 ||
+                  system_i_norm.type(var) == H2 ||
+                  system_i_norm.type(var) == H1_SEMINORM)
                 (*err_vec)[e_id] += H1seminormsq;
-              if (_sobolev_order > 1)
+              
+              if (system_i_norm.type(var) == H2 ||
+                  system_i_norm.type(var) == H2_SEMINORM)
                 (*err_vec)[e_id] += H2seminormsq;
             } // End loop over active local elements
         } // End loop over variables
