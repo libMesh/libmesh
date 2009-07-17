@@ -88,19 +88,26 @@ public:
   bool is_discrete() const;
 
   /**
-   * Returns the type of the norm in variable var
+   * Returns the type of the norm in variable \p var
    */
   FEMNormType type(unsigned int var) const;
 
   /**
-   * Returns the weight corresponding to the norm in variable var
+   * Returns the weight corresponding to the norm in variable \p var
    */
   Real weight(unsigned int var) const;
+
+  /**
+   * Returns the squared weight corresponding to the norm in variable
+   * \p var.  We cache that at construction time to save a few flops.
+   */
+  Real weight_sq(unsigned int var) const;
 
 private:
   std::vector<FEMNormType> _norms;
 
   std::vector<Real> _weights;
+  std::vector<Real> _weights_sq;
 };
 
 
@@ -110,21 +117,21 @@ private:
 
 inline
 SystemNorm::SystemNorm() :
-    _norms(1, DISCRETE_L2), _weights(1, 1.0)
+    _norms(1, DISCRETE_L2), _weights(1, 1.0), _weights_sq(1, 1.0)
 { 
 }
 
 
 inline
 SystemNorm::SystemNorm(const FEMNormType &t) :
-    _norms(1, t), _weights(1, 1.0)
+    _norms(1, t), _weights(1, 1.0), _weights_sq(1, 1.0)
 { 
 }
 
 
 inline
 SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms) :
-    _norms(norms), _weights(1, 1.0)
+    _norms(norms), _weights(1, 1.0), _weights_sq(1, 1.0)
 {
   if (_norms.empty())
     _norms.push_back(DISCRETE_L2);
@@ -134,19 +141,25 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms) :
 inline
 SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
 		       std::vector<Real> &weights) :
-    _norms(norms), _weights(weights)
+    _norms(norms), _weights(weights), _weights_sq(_weights.size(), 0.0)
 {
   if (_norms.empty())
     _norms.push_back(DISCRETE_L2);
 
   if (_weights.empty())
-    _weights.push_back(1.0);
+    {
+      _weights.push_back(1.0);
+      _weights_sq.push_back(1.0);
+    }
+  else
+    for (unsigned int i=0; i != _weights.size(); ++i)
+      _weights_sq[i] = _weights[i] * _weights[i];
 }
 
 
 inline
 SystemNorm::SystemNorm(const SystemNorm &s) :
-    _norms(s._norms), _weights(s._weights)
+    _norms(s._norms), _weights(s._weights), _weights_sq(s._weights_sq)
 {
 }
 
@@ -184,6 +197,17 @@ Real SystemNorm::weight(unsigned int var) const
   unsigned int i = (var < _weights.size()) ? var : _weights.size() - 1;
 
   return _weights[i];
+}
+
+
+inline
+Real SystemNorm::weight_sq(unsigned int var) const
+{
+  libmesh_assert (!_weights_sq.empty());
+  
+  unsigned int i = (var < _weights_sq.size()) ? var : _weights_sq.size() - 1;
+
+  return _weights_sq[i];
 }
 
 
