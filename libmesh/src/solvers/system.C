@@ -911,7 +911,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
                   Number u_h = 0.;
                   for (unsigned int i=0; i != n_sf; ++i)
                     u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
-	          v_norm += norm.weight(var) * norm.weight(var) *
+	          v_norm += norm.weight_sq(var) *
                             JxW[qp] * libmesh_norm(u_h);
                 }
 
@@ -922,7 +922,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
                   Gradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm += norm.weight(var) * norm.weight(var) *
+                  v_norm += norm.weight_sq(var) *
                             JxW[qp] * grad_u_h.size_sq();
                 }
 
@@ -933,7 +933,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
                   Tensor hess_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm += norm.weight(var) * norm.weight(var) *
+                  v_norm += norm.weight_sq(var) *
                             JxW[qp] * hess_u_h.size_sq();
                 }
 #endif

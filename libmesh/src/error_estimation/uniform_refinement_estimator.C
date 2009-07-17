@@ -489,7 +489,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                       system_i_norm.type(var) == H1 ||
                       system_i_norm.type(var) == H2)
                     {
-		      L2normsq += JxW[qp] * system_i_norm.weight(var) *
+		      L2normsq += JxW[qp] * system_i_norm.weight_sq(var) *
                                   libmesh_norm(val_error);
                       libmesh_assert (L2normsq     >= 0.);
                     }
@@ -503,7 +503,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                     {
                       Gradient grad_error = grad_u_fine - grad_u_coarse;
 
-                      H1seminormsq += JxW[qp] * system_i_norm.weight(var) *
+                      H1seminormsq += JxW[qp] * system_i_norm.weight_sq(var) *
                         grad_error.size_sq();
                       libmesh_assert (H1seminormsq >= 0.);
                     }
@@ -516,7 +516,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                     {
                       Tensor grad2_error = grad2_u_fine - grad2_u_coarse;
 
-		      H2seminormsq += JxW[qp] * system_i_norm.weight(var) *
+		      H2seminormsq += JxW[qp] * system_i_norm.weight_sq(var) *
                         grad2_error.size_sq();
                       libmesh_assert (H2seminormsq >= 0.);
                     }
