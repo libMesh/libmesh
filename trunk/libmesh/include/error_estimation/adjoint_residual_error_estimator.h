@@ -82,7 +82,9 @@ public:
   /**
    * To aid in investigating error estimator behavior, set this string
    * to a suffix with which to plot (prefixed by "primal_" or "dual_")
-   * the subestimator results.
+   * the subestimator results.  The suffix should end with a file
+   * extension (e.g. ".gmv") that the ErrorVector::plot_error
+   * recognizes.
    */
   std::string error_plot_suffix;
 
