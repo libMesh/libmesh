@@ -188,8 +188,8 @@ int main (int argc, char** argv)
                 new UniformRefinementEstimator;
 
               // The lid-driven cavity problem isn't in H1, so
-              // lets estimate H0 (i.e. L2) error
-              u->sobolev_order() = 0;
+              // lets estimate L2 error
+              u->error_norm = L2;
 
               error_estimator.reset(u);
             }
