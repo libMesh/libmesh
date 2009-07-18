@@ -206,12 +206,15 @@ int main (int argc, char** argv)
               error_estimator.reset(new KellyErrorEstimator);
             }
 
-          // Calculate error based on u and v but not p
-          error_estimator->component_scale.push_back(1.0); // u
-          error_estimator->component_scale.push_back(1.0); // v
+          // Calculate error based on u and v (and w?) but not p
+	  std::vector<Real> weights(2,1.0);  // u, v
           if (dim == 3)
-            error_estimator->component_scale.push_back(1.0); // w
-          error_estimator->component_scale.push_back(0.0); // p
+            weights.push_back(1.0);          // w
+          weights.push_back(0.0);            // p
+	  // Keep the same default norm type.
+	  std::vector<FEMNormType>
+	    norms(1, error_estimator->error_norm.type(0));
+	  error_estimator->error_norm = SystemNorm(norms, weights);
 
           error_estimator->estimate_error(system, error);
 
