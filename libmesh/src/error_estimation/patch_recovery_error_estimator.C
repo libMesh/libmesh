@@ -376,6 +376,8 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		      libmesh_error();
 #endif
                     }
+                  else
+	            libmesh_error();
 		} // end quadrature loop
 	    } // end patch loop
 	  
@@ -399,29 +401,36 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	  //--------------------------------------------------
 	  // Finally, estimate the error in the current variable
 	  // for the current element by computing ||P grad_u_h - grad_u_h||
-          // or ||P hess_u_h - hess_u_h|| in the infinity (max) norm
+	  // or ||P hess_u_h - hess_u_h|| according to the requested
+	  // seminorm
 
-	  fe->reinit(elem);
-	  //reinitialize element
-	  
 	  dof_map.dof_indices (elem, dof_indices, var);
 	  const unsigned int n_dofs = dof_indices.size();
 	  
-	  // For linear elments, grad is a constant, so we need to compute
-	  // grad u_h once on the element.  Also as G_H u_h - gradu_h is linear
-	  // on an element, it assumes its maximum at a vertex of the element
 	  Real element_error = 0;
+
 	  // we approximate the max norm by sampling over a set of points
 	  // in future we may add specialized routines for specific cases
 	  // or use some optimization package
 	  const Order qorder = element_order;
 
 	  // build a "fake" quadrature rule for the element
+	  //
+	  // For linear elements, grad is a constant, so we need
+	  // to compute grad u_h once on the element.  Also as G_H
+	  // u_h - gradu_h is linear on an element, it assumes its
+	  // maximum at a vertex of the element
+
 	  QGrid samprule (dim, qorder);
-	  fe->attach_quadrature_rule (&samprule);
+
+          if (error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
+              error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
+	    fe->attach_quadrature_rule (&samprule);
+
+	  // reinitialize element for integration or sampling
 	  fe->reinit(elem);
 	      
-	  const unsigned int n_sp = samprule.n_points();
+	  const unsigned int n_sp = JxW.size();
 	  for (unsigned int sp=0; sp< n_sp; sp++)
 	    {
 	      std::vector<Number> temperr(6,0.0); // x,y,z or xx,yy,zz,xy,xz,yz
@@ -487,15 +496,15 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
                 for (unsigned int i=0; i != 6; ++i)
                   element_error = std::max(element_error, std::abs(temperr[i]));
               else if (error_estimator.error_norm.type(var) == H1_SEMINORM)
-                for (unsigned int i=0; i != 6; ++i)
-                  element_error += libmesh_norm(temperr[i]);
+                for (unsigned int i=0; i != 3; ++i)
+                  element_error += JxW[sp]*libmesh_norm(temperr[i]);
               else if (error_estimator.error_norm.type(var) == H2_SEMINORM)
                 {
                   for (unsigned int i=0; i != 3; ++i)
-                    element_error += libmesh_norm(temperr[i]);
+                    element_error += JxW[sp]*libmesh_norm(temperr[i]);
                 // Off diagonal terms enter into the Hessian norm twice
                   for (unsigned int i=3; i != 6; ++i)
-                    element_error += 2*libmesh_norm(temperr[i]);
+                    element_error += JxW[sp]*2*libmesh_norm(temperr[i]);
                 }
 
 	    } // end sample_point_loop
@@ -508,6 +517,8 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
           else if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
                    error_estimator.error_norm.type(var) == H2_SEMINORM)
 	    error_per_cell[e_id] += error_estimator.error_norm.weight_sq(var) * element_error;	  
+          else
+	    libmesh_error();
 	} // end variable loop  
 
       if (error_estimator.error_norm.type(0) == H1_SEMINORM ||
