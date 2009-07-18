@@ -305,8 +305,8 @@ int main(int argc, char** argv)
                   error_estimator.attach_exact_value(exact_solution);
                   error_estimator.attach_exact_deriv(exact_derivative);
 
-                  // We optimize in H1 norm
-                  error_estimator.sobolev_order() = 1;
+                  // We optimize in H1 norm, the default
+                  // error_estimator.error_norm = H1;
 
                   // Compute the error for each active element using
                   // the provided indicator.  Note in general you
