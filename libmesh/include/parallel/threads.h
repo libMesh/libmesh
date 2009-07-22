@@ -401,7 +401,7 @@ namespace Threads
     /**
      * Returns true if the range can be subdivided.
      */
-    bool is_divisible() const { return static_cast<int>(this->grainsize()) < (_end - _begin); }
+    bool is_divisible() const { return ((_begin + this->grainsize()) < _end); }
     
   private:
     
