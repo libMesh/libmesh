@@ -77,8 +77,10 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType,
 template <unsigned int Dim, FEFamily T>
 FEContinuity FE<Dim,T>::get_continuity() const
 {
-  // This doesn't really make sense for a SCALAR...
-  return C_ZERO;
+  // This ensures that SCALARs are not constrained
+  // by periodic boundary conditions (they are
+  // necessarily periodic already)
+  return DISCONTINUOUS;
 }
 
 
