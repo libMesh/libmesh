@@ -30,7 +30,6 @@ Real FE<2,SCALAR>::shape(const ElemType,
 			   const unsigned int,
 			   const Point&)
 {
-  libmesh_error();
   return 1.;
 }
 
@@ -40,7 +39,6 @@ Real FE<2,SCALAR>::shape(const Elem*,
 			   const unsigned int,
 			   const Point&)
 {
-  libmesh_error();
   return 1.;
 }
 
@@ -52,7 +50,6 @@ Real FE<2,SCALAR>::shape_deriv(const ElemType,
 				 const unsigned int,
 				 const Point&)
 {
-  libmesh_error();
   return 0.;
 }
 
@@ -63,7 +60,6 @@ Real FE<2,SCALAR>::shape_deriv(const Elem*,
 				 const unsigned int,
 				 const Point&)
 {
-  libmesh_error();
   return 0.;
 }
 
@@ -75,7 +71,6 @@ Real FE<2,SCALAR>::shape_second_deriv(const ElemType,
 					const unsigned int,
 					const Point&)
 {
-  libmesh_error();
   return 0.;
 }
 
@@ -86,6 +81,5 @@ Real FE<2,SCALAR>::shape_second_deriv(const Elem*,
 				        const unsigned int,
 				        const Point&)
 {
-  libmesh_error();
   return 0.;
 }
