@@ -173,6 +173,14 @@ public:
    */
   virtual void print_converged_reason() = 0;
   
+  /**
+   * Boolean flag to indicate whether we want to use an identical
+   * preconditioner to the previous solve. This can save
+   * substantial work in the cases where the system matrix is 
+   * the same for successive solves.
+   */
+  bool same_preconditioner;
+  
 protected:
 
   
@@ -204,7 +212,8 @@ protected:
 template <typename T>
 inline
 LinearSolver<T>::LinearSolver () :
-  
+
+  same_preconditioner  (false),
   _solver_type         (GMRES),
   _preconditioner_type (ILU_PRECOND),
   _is_initialized      (false),
