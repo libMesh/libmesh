@@ -449,9 +449,18 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 #else
       
   // Set operators. The input matrix works as the preconditioning matrix
-  ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
-			 SAME_NONZERO_PATTERN);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if(!this->same_preconditioner)
+  {
+    ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
+	  		   SAME_NONZERO_PATTERN);
+           CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  }
+  else
+  {
+    ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
+               SAME_PRECONDITIONER);
+           CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  }
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
