@@ -282,13 +282,13 @@ void NonlinearImplicitSystem::qoi_parameter_sensitivity
       this->assemble();
       this->rhs->close();
       this->matrix->close();
-      *partialR_partialp -= *this->rhs;
+      *partialR_partialp += *this->rhs;
       *partialR_partialp /= (2.*delta_p);
 
       // Don't leave the parameter changed
       *parameters[i] = old_parameter;
 
-      sensitivities[i] = partialq_partialp +
+      sensitivities[i] = partialq_partialp -
 			 partialR_partialp->dot(this->get_adjoint_solution());
     }
 
