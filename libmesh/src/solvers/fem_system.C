@@ -465,8 +465,7 @@ void FEMSystem::postprocess ()
           if (fe_reinit_during_postprocess)
             {
               std::map<FEType, FEBase *>::iterator fe_end =
-                _femcontext.element_fe.end();
-              fe_end = _femcontext.side_fe.end();
+                _femcontext.side_fe.end();
               for (std::map<FEType, FEBase *>::iterator i =
                 _femcontext.side_fe.begin();
                    i != fe_end; ++i)
@@ -522,8 +521,7 @@ void FEMSystem::assemble_qoi()
             continue;
 
           std::map<FEType, FEBase *>::iterator fe_end =
-            _femcontext.element_fe.end();
-          fe_end = _femcontext.side_fe.end();
+            _femcontext.side_fe.end();
           for (std::map<FEType, FEBase *>::iterator i =
             _femcontext.side_fe.begin();
                i != fe_end; ++i)
@@ -576,8 +574,7 @@ void FEMSystem::assemble_qoi_derivative()
             continue;
 
           std::map<FEType, FEBase *>::iterator fe_end =
-            _femcontext.element_fe.end();
-          fe_end = _femcontext.side_fe.end();
+            _femcontext.side_fe.end();
           for (std::map<FEType, FEBase *>::iterator i =
             _femcontext.side_fe.begin();
                i != fe_end; ++i)
