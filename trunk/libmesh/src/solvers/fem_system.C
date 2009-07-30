@@ -551,6 +551,9 @@ void FEMSystem::assemble_qoi_derivative()
   AutoPtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
 
+  // In case there's already a rhs in use
+  rhs->zero();
+
   // Loop over every active mesh element on this processor
   MeshBase::const_element_iterator el =
     mesh.active_local_elements_begin();
