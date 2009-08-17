@@ -9046,13 +9046,13 @@ fi
 
 # Check whether --enable-parmesh was given.
 if test "${enable_parmesh+set}" = set; then
-  enableval=$enable_parmesh; enableperiodic=$enableval
+  enableval=$enable_parmesh; enableparmesh=$enableval
 else
-  enableperiodic=no
+  enableparmesh=no
 fi
 
 
-if test "$enableperiodic" != no ; then
+if test "$enableparmesh" != no ; then
 
 cat >>confdefs.h <<\_ACEOF
 #define ENABLE_PARMESH 1

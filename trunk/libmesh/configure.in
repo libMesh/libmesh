@@ -342,10 +342,10 @@ dnl -------------------------------------------------------------
 AC_ARG_ENABLE(parmesh,
               AC_HELP_STRING([--enable-parmesh],
                              [Use experimental ParallelMesh as Mesh]),
-              enableperiodic=$enableval,
-              enableperiodic=no)
+              enableparmesh=$enableval,
+              enableparmesh=no)
 
-if test "$enableperiodic" != no ; then
+if test "$enableparmesh" != no ; then
   AC_DEFINE(ENABLE_PARMESH, 1,
 	   [Flag indicating if the library should use the experimental
 ParallelMesh as its default Mesh type])
