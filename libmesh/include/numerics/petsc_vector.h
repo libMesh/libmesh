@@ -281,6 +281,13 @@ public:
   T operator() (const unsigned int i) const;
     
   /**
+   * Access multiple components at once.  Overloaded method that
+   * should be faster (probably much faster) than calling \p
+   * operator() individually for each index.
+   */
+  virtual void get(const std::vector<unsigned int>& index, std::vector<T>& values) const;
+
+  /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
@@ -488,6 +495,46 @@ private:
    */
   Vec _vec;
 
+  /**
+   * If \p true, the actual Petsc array of the values of the vector is
+   * currently accessible.  That means that the members \p _local_form
+   * and \p _values are valid.
+   */
+  mutable bool _array_is_present;
+
+#ifndef NDEBUG
+  /**
+   * Size of the local form, for being used in assertations.  The
+   * contents of this field are only valid if the vector is ghosted
+   * and \p _array_is_present is \p true.
+   */
+  mutable unsigned int _local_size;
+#endif
+
+  /**
+   * Petsc vector datatype to hold the local form of a ghosted vector.
+   * The contents of this field are only valid if the vector is
+   * ghosted and \p _array_is_present is \p true.
+   */
+  mutable Vec _local_form;
+
+  /**
+   * Pointer to the actual Petsc array of the values of the vector.
+   * This pointer is only valid if \p _array_is_present is \p true.
+   */
+  mutable PetscScalar* _values;
+
+  /**
+   * Queries the array (and the local form if the vector is ghosted)
+   * from Petsc.
+   */
+  void _get_array(void) const;
+
+  /**
+   * Restores the array (and the local form if the vector is ghosted)
+   * to Petsc.
+   */
+  void _restore_array(void) const;
 
   /**
    * Type for map that maps global to local ghost cells.
@@ -515,7 +562,10 @@ private:
 template <typename T>
 inline
 PetscVector<T>::PetscVector (const ParallelType type)
-  : _global_to_local_map(),
+  : _array_is_present(false),
+    _local_form(NULL),
+    _values(NULL),
+    _global_to_local_map(),
     _destroy_vec_on_exit(true)
 {
   this->_type = type;
@@ -527,7 +577,10 @@ template <typename T>
 inline
 PetscVector<T>::PetscVector (const unsigned int n,
                              const ParallelType type)
-  : _global_to_local_map(),
+  : _array_is_present(false),
+    _local_form(NULL),
+    _values(NULL),
+    _global_to_local_map(),
     _destroy_vec_on_exit(true)
 {
   this->init(n, n, false, type);
@@ -540,7 +593,10 @@ inline
 PetscVector<T>::PetscVector (const unsigned int n,
 			     const unsigned int n_local,
                              const ParallelType type)
-  : _global_to_local_map(),
+  : _array_is_present(false),
+    _local_form(NULL),
+    _values(NULL),
+    _global_to_local_map(),
     _destroy_vec_on_exit(true)
 {
   this->init(n, n_local, false, type);
@@ -554,7 +610,10 @@ PetscVector<T>::PetscVector (const unsigned int n,
 			     const unsigned int n_local,
 			     const std::vector<unsigned int>& ghost,
                              const ParallelType type)
-  : _global_to_local_map(),
+  : _array_is_present(false),
+    _local_form(NULL),
+    _values(NULL),
+    _global_to_local_map(),
     _destroy_vec_on_exit(true)
 {
   this->init(n, n_local, ghost, false, type);
@@ -567,7 +626,10 @@ PetscVector<T>::PetscVector (const unsigned int n,
 template <typename T>
 inline
 PetscVector<T>::PetscVector (Vec v)
-  : _global_to_local_map(),
+  : _array_is_present(false),
+    _local_form(NULL),
+    _values(NULL),
+    _global_to_local_map(),
     _destroy_vec_on_exit(false)
 {
   this->_vec = v;
@@ -745,7 +807,17 @@ inline
 void PetscVector<T>::init (const NumericVector<T>& other,
                            const bool fast)
 {
+  // Clear initialized vectors 
+  if (this->initialized())
+    this->clear();
+
   const PetscVector<T>& v = libmesh_cast_ref<const PetscVector<T>&>(other);
+
+  // Other vector should restore array.
+  if(v.initialized())
+    {
+      v._restore_array();
+    }
 
   this->_global_to_local_map = v._global_to_local_map;
   this->_is_closed      = v._is_closed;
@@ -770,7 +842,7 @@ template <typename T>
 inline
 void PetscVector<T>::close ()
 {
-  libmesh_assert (this->initialized());
+  this->_restore_array();
   
   int ierr=0;
   
@@ -796,6 +868,9 @@ template <typename T>
 inline
 void PetscVector<T>::clear ()
 {
+  if (this->initialized())
+    this->_restore_array();
+
   if ((this->initialized()) && (this->_destroy_vec_on_exit))
     {
       int ierr=0;
@@ -815,7 +890,7 @@ template <typename T>
 inline
 void PetscVector<T>::zero ()
 {
-  libmesh_assert (this->initialized());
+  this->_restore_array();
   
   int ierr=0;
 
@@ -944,8 +1019,11 @@ unsigned int PetscVector<T>::map_global_to_local_index (const unsigned int i) co
 {
   libmesh_assert (this->initialized());
 
-  const unsigned int first = this->first_local_index();
-  const unsigned int last = this->last_local_index();
+  int ierr=0, petsc_first=0, petsc_last=0;
+  ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  const unsigned int first = static_cast<unsigned int>(petsc_first);
+  const unsigned int last = static_cast<unsigned int>(petsc_last);
 
   if((i>=first) && (i<last))
     {
@@ -963,47 +1041,42 @@ template <typename T>
 inline
 T PetscVector<T>::operator() (const unsigned int i) const
 {
+  this->_get_array();
+
   const unsigned int local_index = this->map_global_to_local_index(i);
-  libmesh_assert (this->initialized());
-
-  int ierr=0;
-  PetscScalar value=0.;
-
-  if(this->type() != GHOSTED)
-    {
-      PetscScalar *values;
-      ierr = VecGetArray(_vec, &values);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      value = values[local_index];
-      ierr = VecRestoreArray (_vec, &values);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
-  else
-    {
-      /* Vectors that include ghost values require a special
-	 handling.  */
-      Vec loc_vec;
-      PetscScalar *values;
-      ierr = VecGhostGetLocalForm (_vec,&loc_vec);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = VecGetArray(loc_vec, &values);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 #ifndef NDEBUG
-      int local_size = 0;
-      ierr = VecGetLocalSize(loc_vec, &local_size);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      libmesh_assert(local_index<static_cast<unsigned int>(local_size));
-#endif
-
-      value = values[local_index];
-      ierr = VecRestoreArray (loc_vec, &values);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if(this->type() == GHOSTED)
+    {
+      libmesh_assert(local_index<_local_size);
     }
+#endif
   
-  return static_cast<T>(value);
+  return static_cast<T>(_values[local_index]);
+}
+
+
+
+template <typename T>
+inline
+void PetscVector<T>::get(const std::vector<unsigned int>& index, std::vector<T>& values) const
+{
+  this->_get_array();
+
+  const unsigned int num = index.size();
+  values.resize(num);
+
+  for(unsigned int i=0; i<num; i++)
+    {
+      const unsigned int local_index = this->map_global_to_local_index(index[i]);
+#ifndef NDEBUG
+      if(this->type() == GHOSTED)
+	{
+	  libmesh_assert(local_index<_local_size);
+	}
+#endif
+      values[i] = static_cast<T>(_values[local_index]);
+    }
 }
 
 
@@ -1012,7 +1085,7 @@ template <typename T>
 inline
 Real PetscVector<T>::min () const
 {
-  libmesh_assert (this->initialized());
+  this->_restore_array();
 
   int index=0, ierr=0;
   PetscReal min=0.;
@@ -1030,7 +1103,7 @@ template <typename T>
 inline
 Real PetscVector<T>::max() const
 {
-  libmesh_assert (this->initialized());
+  this->_restore_array();
 
   int index=0, ierr=0;
   PetscReal max=0.;
@@ -1048,12 +1121,82 @@ template <typename T>
 inline
 void PetscVector<T>::swap (NumericVector<T> &other)
 {
+  NumericVector<T>::swap(other);
+
   PetscVector<T>& v = libmesh_cast_ref<PetscVector<T>&>(other);
 
   std::swap(_vec, v._vec);
   std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
   std::swap(_global_to_local_map, v._global_to_local_map);
+  std::swap(_array_is_present, v._array_is_present);
+  std::swap(_local_form, v._local_form);
+  std::swap(_values, v._values);
 }
+
+
+
+template <typename T>
+inline
+void PetscVector<T>::_get_array(void) const
+{
+  libmesh_assert (this->initialized());
+  if(!_array_is_present)
+    {
+      int ierr=0;
+      if(this->type() != GHOSTED)
+	{
+	  ierr = VecGetArray(_vec, &_values);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	}
+      else
+	{
+	  ierr = VecGhostGetLocalForm (_vec,&_local_form);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecGetArray(_local_form, &_values);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#ifndef NDEBUG
+	  int local_size = 0;
+	  ierr = VecGetLocalSize(_local_form, &local_size);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  _local_size = static_cast<unsigned int>(local_size);
+#endif
+	}
+      _array_is_present = true;
+    }
+}
+
+
+
+template <typename T>
+inline
+void PetscVector<T>::_restore_array(void) const
+{
+  libmesh_assert (this->initialized());
+  if(_array_is_present)
+    {
+      int ierr=0;
+      if(this->type() != GHOSTED)
+	{
+	  ierr = VecRestoreArray (_vec, &_values);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  _values = NULL;
+	}
+      else
+	{
+	  ierr = VecRestoreArray (_local_form, &_values);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  _values = NULL;
+	  ierr = VecGhostRestoreLocalForm (_vec,&_local_form);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  _local_form = NULL;
+#ifndef NDEBUG
+	  _local_size = 0;
+#endif
+	}
+      _array_is_present = false;
+    }
+}
+
 
 
 #endif // #ifdef LIBMESH_HAVE_PETSC
