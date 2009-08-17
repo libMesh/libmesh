@@ -50,6 +50,7 @@
 template <typename T>
 T PetscVector<T>::sum () const
 {
+  this->_restore_array();
   libmesh_assert(this->closed());
   
   int ierr=0;
@@ -65,6 +66,7 @@ T PetscVector<T>::sum () const
 template <typename T>
 Real PetscVector<T>::l1_norm () const
 {
+  this->_restore_array();
   libmesh_assert(this->closed());
   
   int ierr=0;
@@ -81,6 +83,7 @@ Real PetscVector<T>::l1_norm () const
 template <typename T>
 Real PetscVector<T>::l2_norm () const
 {
+  this->_restore_array();
   libmesh_assert(this->closed());
   
   int ierr=0;
@@ -98,6 +101,7 @@ Real PetscVector<T>::l2_norm () const
 template <typename T>
 Real PetscVector<T>::linfty_norm () const
 {
+  this->_restore_array();
   libmesh_assert(this->closed());
   
   int ierr=0;
@@ -116,6 +120,7 @@ template <typename T>
 NumericVector<T>&
 PetscVector<T>::operator += (const NumericVector<T>& v)
 {
+  this->_restore_array();
   libmesh_assert(this->closed());
   
   this->add(1., v);
@@ -129,6 +134,7 @@ template <typename T>
 NumericVector<T>&
 PetscVector<T>::operator -= (const NumericVector<T>& v)
 {
+  this->_restore_array();
   libmesh_assert(this->closed());
   
   this->add(-1., v);
@@ -141,6 +147,7 @@ PetscVector<T>::operator -= (const NumericVector<T>& v)
 template <typename T>
 void PetscVector<T>::set (const unsigned int i, const T value)
 {
+  this->_restore_array();
   libmesh_assert(i<size());
   
   int ierr=0;
@@ -158,6 +165,7 @@ void PetscVector<T>::set (const unsigned int i, const T value)
 template <typename T>
 void PetscVector<T>::add (const unsigned int i, const T value)
 {
+  this->_restore_array();
   libmesh_assert(i<size());
   
   int ierr=0;
@@ -176,6 +184,7 @@ template <typename T>
 void PetscVector<T>::add_vector (const std::vector<T>& v,
 				 const std::vector<unsigned int>& dof_indices)
 {
+  this->_restore_array();
   libmesh_assert (v.size() == dof_indices.size());
 
   for (unsigned int i=0; i<v.size(); i++)
@@ -200,6 +209,7 @@ template <typename T>
 void PetscVector<T>::add_vector (const NumericVector<T>& V_in,
 				 const SparseMatrix<T>& A_in)
 {
+  this->_restore_array();
   // Make sure the data passed in are really of Petsc types
   const PetscVector<T>* V = libmesh_cast_ptr<const PetscVector<T>*>(&V_in);
   const PetscMatrix<T>* A = libmesh_cast_ptr<const PetscMatrix<T>*>(&A_in);
@@ -231,6 +241,8 @@ void PetscVector<T>::add_vector (const DenseVector<T>& V,
 template <typename T>
 void PetscVector<T>::add (const T v_in)
 {
+  this->_restore_array();
+
   int ierr=0;
   PetscScalar* values;
   const PetscScalar v = static_cast<PetscScalar>(v_in);  
@@ -302,11 +314,14 @@ void PetscVector<T>::add (const NumericVector<T>& v)
 template <typename T>
 void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
 {
+  this->_restore_array();
+
   int ierr = 0;
   PetscScalar a = static_cast<PetscScalar>(a_in);
 
   // Make sure the NumericVector passed in is really a PetscVector
   const PetscVector<T>* v = libmesh_cast_ptr<const PetscVector<T>*>(&v_in);
+  v->_restore_array();
 
   libmesh_assert(this->size() == v->size());
   
@@ -401,6 +416,8 @@ void PetscVector<T>::insert (const DenseSubVector<T>& V,
 template <typename T>
 void PetscVector<T>::scale (const T factor_in)
 {
+  this->_restore_array();
+
   int ierr = 0;
   PetscScalar factor = static_cast<PetscScalar>(factor_in);
   
@@ -440,6 +457,8 @@ void PetscVector<T>::scale (const T factor_in)
 template <typename T>
 void PetscVector<T>::abs()
 {
+  this->_restore_array();
+
   int ierr = 0;
 
   if(this->type() != GHOSTED)
@@ -464,6 +483,8 @@ void PetscVector<T>::abs()
 template <typename T>
 T PetscVector<T>::dot (const NumericVector<T>& V) const
 {
+  this->_restore_array();
+
   // Error flag
   int ierr = 0;
   
@@ -487,6 +508,7 @@ template <typename T>
 NumericVector<T>& 
 PetscVector<T>::operator = (const T s_in)
 {
+  this->_restore_array();
   libmesh_assert(this->closed());
 
   int ierr = 0;
@@ -550,8 +572,8 @@ template <typename T>
 PetscVector<T>&
 PetscVector<T>::operator = (const PetscVector<T>& v)
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (v.initialized());
+  this->_restore_array();
+  v._restore_array();
   libmesh_assert (this->_type == v._type);
   libmesh_assert (this->size() == v.size());
   libmesh_assert (this->local_size() == v.local_size());
@@ -594,6 +616,8 @@ template <typename T>
 NumericVector<T>&
 PetscVector<T>::operator = (const std::vector<T>& v)
 {
+  this->_restore_array();
+
   const unsigned int nl   = this->local_size();
   const unsigned int ioff = this->first_local_index();
   int ierr=0;
@@ -645,6 +669,8 @@ PetscVector<T>::operator = (const std::vector<T>& v)
 template <typename T>
 void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
 {
+  this->_restore_array();
+
   // Make sure the NumericVector passed in is really a PetscVector
   PetscVector<T>* v_local = libmesh_cast_ptr<PetscVector<T>*>(&v_local_in);
 
@@ -708,6 +734,8 @@ template <typename T>
 void PetscVector<T>::localize (NumericVector<T>& v_local_in,
 			       const std::vector<unsigned int>& send_list) const
 {
+  this->_restore_array();
+
   // Make sure the NumericVector passed in is really a PetscVector
   PetscVector<T>* v_local = libmesh_cast_ptr<PetscVector<T>*>(&v_local_in);
 
@@ -786,6 +814,8 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
 			       const unsigned int last_local_idx,
 			       const std::vector<unsigned int>& send_list)
 {
+  this->_restore_array();
+
   // Only good for serial vectors.
   // libmesh_assert (this->size() == this->local_size());
   libmesh_assert (last_local_idx > first_local_idx);
@@ -870,6 +900,8 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
 template <typename T>
 void PetscVector<T>::localize (std::vector<T>& v_local) const
 {
+  this->_restore_array();
+
   // This function must be run on all processors at once
   parallel_only();
 
@@ -904,6 +936,8 @@ template <>
 void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
 					 const unsigned int pid) const
 {
+  this->_restore_array();
+
   int ierr=0;
   const int n  = size();
   const int nl = local_size();
@@ -959,6 +993,8 @@ template <>
 void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
 					    const unsigned int pid) const
 {
+  this->_restore_array();
+
   int ierr=0;
   const int n  = size();
   const int nl = local_size();
@@ -1041,6 +1077,8 @@ template <typename T>
 void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
 				     const NumericVector<T>& vec2)
 {
+  this->_restore_array();
+
   int ierr = 0;
 
   // Convert arguments to PetscVector*.
@@ -1098,7 +1136,7 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
 template <typename T>
 void PetscVector<T>::print_matlab (const std::string name) const
 {
-  libmesh_assert (this->initialized());
+  this->_restore_array();
   libmesh_assert (this->closed());
   
   int ierr=0; 
@@ -1157,6 +1195,8 @@ template <typename T>
 void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
 				      const std::vector<unsigned int>& rows) const
 {
+  this->_restore_array();
+
   // PETSc data structures
   IS parent_is, subvector_is;
   VecScatter scatter;
@@ -1185,6 +1225,10 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
 
       // Mark the subvector as initialized
       petsc_subvector->_is_initialized = true;
+    }
+  else
+    {
+      petsc_subvector->_restore_array();
     }
   
   // Use iota to fill an array with entries [0,1,2,3,4,...rows.size()]

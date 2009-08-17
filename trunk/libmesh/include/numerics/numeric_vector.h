@@ -309,6 +309,14 @@ public:
   virtual T el(const unsigned int i) const { return (*this)(i); }
 
   /**
+   * Access multiple components at once.  \p values will be resized,
+   * if necessary, and filled.  The default implementation calls \p
+   * operator() for each index, but some implementations may supply
+   * faster methods here.
+   */
+  virtual void get(const std::vector<unsigned int>& index, std::vector<T>& values) const;
+
+  /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
@@ -558,7 +566,7 @@ public:
    * enough indirection in subclasses to make this an O(1) header-swap
    * operation.
    */
-  virtual void swap (NumericVector<T> &v) = 0;
+  virtual void swap (NumericVector<T> &v);
 
 protected:
   
@@ -693,6 +701,20 @@ void NumericVector<T>::clear ()
   _is_closed      = false;
   _is_initialized = false;
 }
+  
+  
+  
+template <typename T>
+inline
+void NumericVector<T>::get(const std::vector<unsigned int>& index, std::vector<T>& values) const
+{
+  const unsigned int num = index.size();
+  values.resize(num);
+  for(unsigned int i=0; i<num; i++)
+    {
+      values[i] = (*this)(index[i]);
+    }
+}
 
 
 
@@ -771,6 +793,17 @@ void NumericVector<T>::print_global(std::ostream& os) const
   os << "#\tValue" << std::endl;
   for (unsigned int i=0; i!=v.size(); i++)
     os << i << "\t" << v[i] << std::endl;
+}
+
+
+
+template <typename T>
+inline
+void  NumericVector<T>::swap (NumericVector<T> &v)
+{
+  std::swap(_is_closed, v._is_closed);
+  std::swap(_is_initialized, v._is_initialized);
+  std::swap(_type, v._type);
 }
 
 
