@@ -195,11 +195,6 @@ namespace libMesh
 
 #define libmesh_here()     do { std::cerr << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; } while (0)
 
-#undef here
-#define here()    do { \
-std::cout << "here() is deprecated; use libmesh_here() instead!" \
-          << std::endl; libmesh_here(); } while(0)
-
 // the libmesh_stop() macro will stop the code until a SIGCONT signal
 // is recieved.  This is useful, for example, when determining the
 // memory used by a given operation.  A libmesh_stop() could be
@@ -282,14 +277,6 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
 #endif
 }
 
- 
-// The error() macro prints a message and throws a generic exception
-// Use libmesh_error() instead; error() is deprecated to avoid namespace
-// conflicts
-#undef error
-#define error()    do { \
-std::cout << "*** error() is deprecated; use libmesh_error() instead!" \
-          << std::endl; libmesh_error(); } while(0)
 
 // The untested macro warns that you are using untested code
 #undef untested

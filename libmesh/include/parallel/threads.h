@@ -79,7 +79,11 @@ namespace Threads
       libMesh::perflog.disable_logging();
 #endif   
 
-    tbb::parallel_for (range, body, tbb::auto_partitioner()); 
+    if (libMesh::n_threads() > 1)
+      tbb::parallel_for (range, body, tbb::auto_partitioner());
+
+    else 
+      body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
@@ -102,8 +106,12 @@ namespace Threads
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
 #endif   
+    
+    if (libMesh::n_threads() > 1)
+      tbb::parallel_for (range, body, partitioner); 
 
-    tbb::parallel_for (range, body, partitioner); 
+    else
+      body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
@@ -127,7 +135,11 @@ namespace Threads
       libMesh::perflog.disable_logging();
 #endif   
 
-    tbb::parallel_reduce (range, body, tbb::auto_partitioner()); 
+    if (libMesh::n_threads() > 1)
+      tbb::parallel_reduce (range, body, tbb::auto_partitioner()); 
+
+    else
+      body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
@@ -151,7 +163,11 @@ namespace Threads
       libMesh::perflog.disable_logging();
 #endif   
 
-    tbb::parallel_reduce (range, body); 
+       if (libMesh::n_threads() > 1)
+	 tbb::parallel_reduce (range, body); 
+
+       else
+	 body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
