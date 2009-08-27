@@ -1414,6 +1414,17 @@ AC_DEFUN(CONFIGURE_VTK,
        enablevtk=no;
      fi
 
+     dnl Discover the major, minor, and build versions of VTK by looking in
+     dnl vtkConfigure.h.  This may eventually be useful for linking against
+     dnl different subsets of libraries.
+     if (test $enablevtk = yes); then
+       vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_MAJOR_VERSION[ ]*//g"`
+       vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_MINOR_VERSION[ ]*//g"`
+       vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_BUILD_VERSION[ ]*//g"`
+       vtkversion=$vtkmajor.$vtkminor.$vtkbuild
+       AC_MSG_RESULT(<<< Configuring library with VTK version $vtkversion support >>>)
+     fi
+
      if (test $enablevtk = yes); then
        dnl Also Check for existence of required libraries.  This is not really
        dnl right way to do it -- it's not portable to Macs, where .so's are called
@@ -1431,10 +1442,16 @@ AC_DEFUN(CONFIGURE_VTK,
        dnl Try to compile test prog to check for existence of VTK libraries
        dnl AC_HAVE_LIBRARY uses the LIBS variable.
        AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no])
+       
        if (test $enablevtk = yes); then
          AC_HAVE_LIBRARY([vtkCommon], [enablevtk=yes], [enablevtk=no])
        fi
 
+       dnl As of VTK 5.4 it seems we also need vtkFiltering
+       if (test $enablevtk = yes); then
+         AC_HAVE_LIBRARY([vtkFiltering], [enablevtk=yes], [enablevtk=no])
+       fi
+       
        dnl Reset $LIBS
        LIBS="$old_LIBS"
      fi
@@ -1442,7 +1459,7 @@ AC_DEFUN(CONFIGURE_VTK,
      dnl If both the header file and the required libs were found, continue.
      if (test $enablevtk = yes); then
        VTK_INCLUDE="-I$VTK_INC"
-       VTK_LIBRARY="\$(libmesh_RPATHFLAG)$VTK_LIB -L$VTK_LIB -lvtkIO -lvtkCommon"
+       VTK_LIBRARY="\$(libmesh_RPATHFLAG)$VTK_LIB -L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
        AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
        AC_MSG_RESULT(<<< Configuring library with VTK support >>>)
      fi

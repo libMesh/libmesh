@@ -25,8 +25,7 @@
    unexpected errors */
 #undef ENABLE_EXCEPTIONS
 
-/* Flag indicating if the library should use the experimental ghosted local
-   vectors */
+/* Flag indicating if the library should use ghosted local vectors */
 #undef ENABLE_GHOSTED
 
 /* Flag indicating if the library should offer higher order p-FEM shapes */
