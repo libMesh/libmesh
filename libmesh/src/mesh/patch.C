@@ -99,8 +99,6 @@ void Patch::add_local_face_neighbors()
 	  libMesh::processor_id()) // ... if the neighbor belongs to this processor
 	this->insert (neighbor);   // ... then add it to the patch
     }
-
-  this->insert(new_neighbors.begin(), new_neighbors.end());
 }
     
 
