@@ -739,8 +739,6 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
   STOP_LOG("distribute_dofs()", "DofMap");
 
-  _send_list.clear();
-
   // Note that in the add_neighbors_to_send_list nodes on processor
   // boundaries that are shared by multiple elements are added for
   // each element.
