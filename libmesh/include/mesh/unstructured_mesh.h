@@ -73,7 +73,8 @@ class UnstructuredMesh : public MeshBase
    * use with this mesh, since these read methods expect it.
    */
   void read (const std::string& name,
-	     MeshData* mesh_data=NULL);
+	     MeshData* mesh_data=NULL,
+	     bool skip_renumber_nodes_and_elements=false);
   /**
    * Write the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.

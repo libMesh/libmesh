@@ -464,7 +464,8 @@ public:
    * Interfaces for reading/writing a mesh to/from a file.  Must be
    * implemented in derived classes.
    */
-  virtual void read  (const std::string& name, MeshData* mesh_data=NULL) = 0;
+  virtual void read  (const std::string& name, MeshData* mesh_data=NULL,
+		      bool skip_renumber_nodes_and_elements=false) = 0;
   virtual void write (const std::string& name, MeshData* mesh_data=NULL) = 0;
 
   /**

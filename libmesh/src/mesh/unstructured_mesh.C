@@ -463,7 +463,8 @@ MeshTools::libmesh_assert_valid_neighbors(*this);
 
 
 void UnstructuredMesh::read (const std::string& name,
-			     MeshData* mesh_data)
+			     MeshData* mesh_data,
+			     bool skip_renumber_nodes_and_elements)
 {
   // See if the file exists.  Perform this check on all processors
   // so that the code is terminated properly in the case that the
@@ -485,7 +486,10 @@ void UnstructuredMesh::read (const std::string& name,
   // during prepare_for_use() for certain types of mesh files.
   // This is required in cases where there is an associated solution
   // file which expects a certain ordering of the nodes.
-  bool skip_renumber_nodes_and_elements = (name.rfind(".gmv") < name.size());
+  if(name.rfind(".gmv")+4==name.size())
+    {
+      skip_renumber_nodes_and_elements =  true;
+    }
   
   // Look for parallel formats first
   if (is_parallel_file_format(name))
