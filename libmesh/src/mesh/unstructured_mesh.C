@@ -549,10 +549,6 @@ void UnstructuredMesh::read (const std::string& name,
 	  else if (new_name.rfind(".ucd") < new_name.size())
 	    UCDIO(*this).read (new_name);
 	  
-	  else if (new_name.rfind(".exd") < new_name.size() ||
-		   new_name.rfind(".e") < new_name.size())
-	    ExodusII_IO(*this).read (new_name);
-	  
 	  else if ((new_name.rfind(".off")  < new_name.size()) ||
 		   (new_name.rfind(".ogl")  < new_name.size()) ||
 		   (new_name.rfind(".oogl") < new_name.size()))
@@ -577,6 +573,10 @@ void UnstructuredMesh::read (const std::string& name,
 		   (new_name.rfind(".ele")   < new_name.size()))
 	    TetGenIO(*this,mesh_data).read (new_name);
 
+	  else if (new_name.rfind(".exd") < new_name.size() ||
+		   new_name.rfind(".e") < new_name.size())
+	    ExodusII_IO(*this).read (new_name);
+	  
 	  else if (new_name.rfind(".msh") < new_name.size())
 	    GmshIO(*this).read (new_name);
 
