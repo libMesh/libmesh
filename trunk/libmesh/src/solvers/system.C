@@ -586,6 +586,54 @@ NumericVector<Number> & System::get_vector (const std::string& vec_name)
 
 
 
+const NumericVector<Number> & System::get_vector (const unsigned int vec_num) const
+{
+  const_vectors_iterator v = vectors_begin();
+  const_vectors_iterator v_end = vectors_end();
+  unsigned int num = 0;
+  while((num<vec_num) && (v!=v_end))
+    {
+      num++;
+      ++v;
+    }
+  libmesh_assert(v!=v_end);
+  return *(v->second);
+}
+
+
+
+NumericVector<Number> & System::get_vector (const unsigned int vec_num)
+{
+  vectors_iterator v = vectors_begin();
+  vectors_iterator v_end = vectors_end();
+  unsigned int num = 0;
+  while((num<vec_num) && (v!=v_end))
+    {
+      num++;
+      ++v;
+    }
+  libmesh_assert(v!=v_end);
+  return *(v->second);
+}
+
+
+
+const std::string& System::vector_name (const unsigned int vec_num)
+{
+  const_vectors_iterator v = vectors_begin();
+  const_vectors_iterator v_end = vectors_end();
+  unsigned int num = 0;
+  while((num<vec_num) && (v!=v_end))
+    {
+      num++;
+      ++v;
+    }
+  libmesh_assert(v!=v_end);
+  return v->first;
+}
+
+
+
 NumericVector<Number> & System::get_adjoint_solution ()
 {
   // Get the adjoint solution using the get_vector function declared above

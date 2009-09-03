@@ -340,6 +340,26 @@ public:
   NumericVector<Number> & get_vector (const std::string& vec_name);
 
   /**
+   * @returns a const reference to this system's @e additional vector
+   * number \p vec_num (where the vectors are counted starting with
+   * 0).
+   */
+  const NumericVector<Number> & get_vector (const unsigned int vec_num) const;
+
+  /**
+   * @returns a writeable reference to this system's @e additional
+   * vector number \p vec_num (where the vectors are counted starting
+   * with 0).
+   */
+  NumericVector<Number> & get_vector (const unsigned int vec_num);
+
+  /**
+   * @returns the name of this system's @e additional vector number \p
+   * vec_num (where the vectors are counted starting with 0).
+   */
+  const std::string & vector_name (const unsigned int vec_num);
+
+  /**
    * @returns a reference to the system's adjoint solution vector
    * name adjoint_solution. Adjoint system needs to be solved first.
    */
