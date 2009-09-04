@@ -111,7 +111,7 @@ public:
   /**
    * @returns the type (SERIAL, PARALLEL, GHOSTED) of the vector.
    */
-  const ParallelType type() const { return _type; }
+  ParallelType type() const { return _type; }
 
   /**
    * @returns the type (SERIAL, PARALLEL, GHOSTED) of the vector.
