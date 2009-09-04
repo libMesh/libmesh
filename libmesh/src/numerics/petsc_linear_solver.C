@@ -37,6 +37,7 @@ extern "C"
   typedef int PetscInt;
 #endif
 
+
 #if PETSC_VERSION_LESS_THAN(3,0,1) && PETSC_VERSION_RELEASE
   PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx)
   {
@@ -51,8 +52,8 @@ extern "C"
   {
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
 
-    PetscVector<Number> x_vec(x);
-    PetscVector<Number> y_vec(y);
+    PetscVector<Number> x_vec(x, PARALLEL);
+    PetscVector<Number> y_vec(y, PARALLEL);
 
     preconditioner->apply(x_vec,y_vec);
 
@@ -75,8 +76,8 @@ extern "C"
     PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
 
-    PetscVector<Number> x_vec(x);
-    PetscVector<Number> y_vec(y);
+    PetscVector<Number> x_vec(x, PARALLEL);
+    PetscVector<Number> y_vec(y, PARALLEL);
 
     preconditioner->apply(x_vec,y_vec);
 
@@ -870,8 +871,8 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, 
   const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
 
   /* Make \p NumericVector instances around the vectors.  */
-  PetscVector<T> arg_global(arg);
-  PetscVector<T> dest_global(dest);
+  PetscVector<T> arg_global(arg, PARALLEL);
+  PetscVector<T> dest_global(dest, PARALLEL);
 
   /* Call the user function.  */
   shell_matrix.vector_mult(dest_global,arg_global);
@@ -894,7 +895,7 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, V
   const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
 
   /* Make \p NumericVector instances around the vector.  */
-  PetscVector<T> dest_global(dest);
+  PetscVector<T> dest_global(dest, PARALLEL);
 
   /* Call the user function.  */
   shell_matrix.get_diagonal(dest_global);

@@ -88,13 +88,9 @@ extern "C"
     
     NonlinearImplicitSystem &sys = solver->system();
 
-    PetscVector<Number> X_global(x), R(r);
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscVector<Number>& R_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.rhs);
-
-    // Set the paralell type since it can't be inferred from Vec
-    X_global.type() = X_sys.type();
-    R.type() = R_sys.type();
+    PetscVector<Number> X_global(x, X_sys.type()), R(r, R_sys.type());
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
@@ -138,13 +134,10 @@ extern "C"
     
     PetscMatrix<Number> PC(*pc);
     PetscMatrix<Number> Jac(*jac);
-    PetscVector<Number> X_global(x);
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscMatrix<Number>& Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
+    PetscVector<Number> X_global(x, X_sys.type());
 
-    // Set the paralell type since it can't be inferred from Vec
-    X_global.type() = X_sys.type();
-    
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
     Jac.swap(Jac_sys);
