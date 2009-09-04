@@ -111,7 +111,12 @@ public:
   /**
    * @returns the type (SERIAL, PARALLEL, GHOSTED) of the vector.
    */
-  ParallelType type() const { return _type; }
+  const ParallelType type() const { return _type; }
+
+  /**
+   * @returns the type (SERIAL, PARALLEL, GHOSTED) of the vector.
+   */
+  ParallelType & type() { return _type; }
 
   /**
    * @returns true if the vector is closed and ready for
