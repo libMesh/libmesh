@@ -97,13 +97,8 @@ public:
    * PetscVector constructor when this object goes out of scope.
    * This allows ownership of \p v to remain with the original creator,
    * and to simply provide additional functionality with the PetscVector.
-   *
-   * The \p type should not be AUTOMATIC here, as we can't yet
-   * automatically distinguish between being handed a PARALLEL vs.
-   * handed a GHOSTED vector.
    */
-  PetscVector(Vec v,
-              const ParallelType type);
+  PetscVector(Vec v);
   
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -630,8 +625,7 @@ PetscVector<T>::PetscVector (const unsigned int n,
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (Vec v, 
-                             const ParallelType type)
+PetscVector<T>::PetscVector (Vec v)
   : _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
@@ -639,7 +633,6 @@ PetscVector<T>::PetscVector (Vec v,
     _destroy_vec_on_exit(false)
 {
   this->_vec = v;
-  this->_type = type;
 //  this->_is_closed = true;
   this->_is_initialized = true;
 
@@ -666,8 +659,14 @@ PetscVector<T>::PetscVector (Vec v,
           const unsigned int ghost_end = static_cast<unsigned int>(mapping->n);
           for(unsigned int i=ghost_begin; i<ghost_end; i++)
 	    _global_to_local_map[mapping->indices[i]] = i-local_size;
+	  this->_type = GHOSTED;
 	}
+      else
+	this->_type = PARALLEL;
     }
+  else
+    this->_type = SERIAL;
+
 }
 
 

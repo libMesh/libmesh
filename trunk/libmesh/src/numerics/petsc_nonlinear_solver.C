@@ -90,7 +90,7 @@ extern "C"
 
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscVector<Number>& R_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.rhs);
-    PetscVector<Number> X_global(x, X_sys.type()), R(r, R_sys.type());
+    PetscVector<Number> X_global(x), R(r);
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
@@ -136,7 +136,7 @@ extern "C"
     PetscMatrix<Number> Jac(*jac);
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscMatrix<Number>& Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
-    PetscVector<Number> X_global(x, X_sys.type());
+    PetscVector<Number> X_global(x);
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
