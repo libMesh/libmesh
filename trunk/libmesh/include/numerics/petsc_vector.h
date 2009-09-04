@@ -93,12 +93,17 @@ public:
   
   /**
    * Constructor.  Creates a PetscVector assuming you already have a
-   * valid PETSc Vec object.  In this case, v is NOT destroyed by the
+   * valid PETSc Vec object.  In this case, \p v is NOT destroyed by the
    * PetscVector constructor when this object goes out of scope.
-   * This allows ownership of v to remain with the original creator,
+   * This allows ownership of \p v to remain with the original creator,
    * and to simply provide additional functionality with the PetscVector.
+   *
+   * The \p type should not be AUTOMATIC here, as we can't yet
+   * automatically distinguish between being handed a PARALLEL vs.
+   * handed a GHOSTED vector.
    */
-  PetscVector(Vec v);
+  PetscVector(Vec v,
+              const ParallelType type);
   
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -625,7 +630,8 @@ PetscVector<T>::PetscVector (const unsigned int n,
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (Vec v)
+PetscVector<T>::PetscVector (Vec v, 
+                             const ParallelType type)
   : _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
@@ -633,6 +639,7 @@ PetscVector<T>::PetscVector (Vec v)
     _destroy_vec_on_exit(false)
 {
   this->_vec = v;
+  this->_type = type;
 //  this->_is_closed = true;
   this->_is_initialized = true;
 
