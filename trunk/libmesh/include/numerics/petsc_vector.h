@@ -633,7 +633,7 @@ PetscVector<T>::PetscVector (Vec v)
     _destroy_vec_on_exit(false)
 {
   this->_vec = v;
-//  this->_is_closed = true;
+  this->_is_closed = true;
   this->_is_initialized = true;
 
   /* We need to ask PETSc about the (local to global) ghost value
