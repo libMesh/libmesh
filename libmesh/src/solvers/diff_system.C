@@ -160,7 +160,7 @@ void DifferentiableSystem::qoi_parameter_sensitivity
       // (partial R / partial p) ~= (rhs(p+dp) - rhs(p-dp))/(2*dp)
 
       Number old_parameter = *parameters[i];
-      Number old_qoi = this->qoi;
+      // Number old_qoi = this->qoi;
 
       *parameters[i] = old_parameter - delta_p;
       this->assemble_qoi();

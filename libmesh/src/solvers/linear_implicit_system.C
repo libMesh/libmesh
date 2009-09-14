@@ -260,7 +260,7 @@ void LinearImplicitSystem::qoi_parameter_sensitivity
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
 
       Number old_parameter = *parameters[i];
-      Number old_qoi = this->qoi;
+      // Number old_qoi = this->qoi;
 
       *parameters[i] = old_parameter - delta_p;
       this->assemble_qoi();
