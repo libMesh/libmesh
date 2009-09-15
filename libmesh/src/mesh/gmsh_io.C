@@ -485,6 +485,9 @@ void GmshIO::read_mesh(std::istream& in)
                           elem->set_node(i) = mesh.node_ptr(nodetrans[nod]);
                         }
                     }
+
+                    // Finally, set the subdomain ID to physical
+                    elem->subdomain_id() = physical;
                 } // if element.dim == dim
               // if this is a boundary
               else if (eletype.dim == dim-1)

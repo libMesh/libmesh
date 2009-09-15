@@ -141,6 +141,12 @@ public:
        const DenseVector<T3>& vec);
 
   /**
+   * Evaluate dot product with \p vec.
+   */
+  template <typename T2>
+  Number dot (const DenseVector<T2> &vec) const;
+
+  /**
    * Tests if \p vec is exactly equal to this vector.
    */
   template <typename T2>
@@ -370,7 +376,20 @@ DenseVector<T>::add (const T2 factor,
     (*this)(i) += factor*vec(i);
 }
 
+template<typename T>
+template<typename T2>
+inline
+Number DenseVector<T>::dot (const DenseVector<T2>& vec) const
+{
+  libmesh_assert(this->size() == vec.size());
 
+  Number val = 0.;
+
+  for (unsigned int i=0; i<this->size(); i++)
+    val += (*this)(i)*vec(i);
+
+  return val;
+}
 
 template<typename T>
 template<typename T2>

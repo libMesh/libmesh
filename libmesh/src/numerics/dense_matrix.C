@@ -193,6 +193,36 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
     }
 }
 
+template<typename T>
+void DenseMatrix<T>::vector_mult (DenseVector<T>& dest, 
+                                  const DenseVector<T>& arg) const
+{
+  const unsigned int n_rows = this->m();
+  const unsigned int n_cols = this->n();
+
+  // Make sure the sizes are compatible
+  libmesh_assert(n_cols == arg.size());
+  libmesh_assert(n_rows == dest.size());
+
+  dest.zero();
+  DenseMatrix<T> A(*this);
+
+  for(unsigned int i=0; i<n_rows; i++)
+    for(unsigned int j=0; j<n_cols; j++)
+      dest(i) += A(i,j)*arg(j);
+}
+
+template<typename T>
+DenseMatrix<T> DenseMatrix<T>::get_transpose () const
+{
+  DenseMatrix<T> transposed_matrix(this->n(), this->m());
+
+  for (unsigned int i=0; i<transposed_matrix.m(); i++)
+    for (unsigned int j=0; j<transposed_matrix.n(); j++)
+      transposed_matrix(i,j) = (*this)(j,i);
+
+  return transposed_matrix;
+}
 
 
 template<typename T>
