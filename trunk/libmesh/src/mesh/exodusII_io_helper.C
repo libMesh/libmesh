@@ -62,13 +62,13 @@ const int ExodusII_IO_Helper::ElementMaps::hex20_node_map[20] = { 0,  1,  2,  3,
 //const int ExodusII_IO_Helper::ElementMaps::hex27_node_map[27] = { 1,  5,  6,  2,  0,  4,  7,  3, 13, 17, 14,  9,  8, 16,
 //							  18, 10, 12, 19, 15, 11, 24, 25, 22, 26, 21, 23, 20};
 
-// After trial-and-error, we find a nearly identical mapping with Exodus,
-// only 20 and 26 are transposed.
+//DRG: Using the newest exodus documentation available on sourceforge and using Table 2 to see
+// where all of the nodes over 21 are supposed to go... we come up with:
 const int ExodusII_IO_Helper::ElementMaps::hex27_node_map[27] = {
   // Vertex and mid-edge nodes
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
   // Mid-face nodes and centroid
-  26, 21, 22, 23, 24, 25, 20};
+  21, 25, 24, 26, 23, 22, 20};
 //20  21  22  23  24  25  26 // LibMesh indices
 
 
@@ -84,15 +84,18 @@ const int ExodusII_IO_Helper::ElementMaps::pyramid5_node_map[5] = {0, 1, 2, 3, 4
   
 // 3D face map definitions
 const int ExodusII_IO_Helper::ElementMaps::tet_face_map[4]     = {1, 2, 3, 0};
+
 const int ExodusII_IO_Helper::ElementMaps::hex_face_map[6]     = {1, 2, 3, 4, 0, 5};
-const int ExodusII_IO_Helper::ElementMaps::hex27_face_map[6]   = {1, 0, 3, 5, 4, 2};
+const int ExodusII_IO_Helper::ElementMaps::hex27_face_map[6]   = {1, 2, 3, 4, 0, 5};
+//const int ExodusII_IO_Helper::ElementMaps::hex27_face_map[6]   = {1, 0, 3, 5, 4, 2};
 const int ExodusII_IO_Helper::ElementMaps::prism_face_map[5]   = {-1,-1,-1,-1,-1}; // Not Implemented!
 const int ExodusII_IO_Helper::ElementMaps::pyramid_face_map[5] = {-1,-1,-1,-1,-1}; // Not Implemented!
 
 //These take a libMesh ID and turn it into an Exodus ID
 const int ExodusII_IO_Helper::ElementMaps::tet_inverse_face_map[4]     = {4, 1, 2, 3};
 const int ExodusII_IO_Helper::ElementMaps::hex_inverse_face_map[6]     = {5, 1, 2, 3, 4, 6};
-const int ExodusII_IO_Helper::ElementMaps::hex27_inverse_face_map[6]   = {2, 1, 6, 3, 5, 4};
+const int ExodusII_IO_Helper::ElementMaps::hex27_inverse_face_map[6]   = {5, 1, 2, 3, 4, 6};
+//const int ExodusII_IO_Helper::ElementMaps::hex27_inverse_face_map[6]   = {2, 1, 6, 3, 5, 4};
 const int ExodusII_IO_Helper::ElementMaps::prism_inverse_face_map[5]   = {-1,-1,-1,-1,-1}; // Not Implemented!
 const int ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map[5] = {-1,-1,-1,-1,-1}; // Not Implemented!
 
@@ -580,6 +583,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
     }
   num_elem_blk = subdomain_map.size();
 
+  std::cout<<"Num elem block: "<<num_elem_blk<<std::endl;
+
   ex_err = exII::ex_put_init(ex_id,
 			     str_title.c_str(),
 			     num_dim,
@@ -615,8 +620,6 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 
 
 
-// FIXME: This apparently assumes only a single element block, i.e.
-// a mesh having only a single type of element.
 void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 {
   std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
@@ -625,10 +628,17 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   for(unsigned int i=0; i<static_cast<unsigned int>(num_elem); i++)
     {
       Elem * elem = mesh.elem(i);
-      unsigned int cur_subdomain = elem->subdomain_id();
+
+      //Only write out the active elements
+      if(elem->active())
+      {
+        unsigned int cur_subdomain = elem->subdomain_id();
      
-      subdomain_map[cur_subdomain].push_back(elem->id());
+        subdomain_map[cur_subdomain].push_back(elem->id());
+      }
     }
+
+  std::vector<int> elem_num_map;
 
   std::map<unsigned int, std::vector<unsigned int>  >::iterator it;
   
@@ -653,6 +663,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
       for (unsigned int i=0; i<tmp_vec.size(); i++)
         {
           unsigned int elem_id = tmp_vec[i];
+          elem_num_map.push_back(elem_id);
+          libmesh_elem_num_to_exodus[elem_id] = elem_num_map.size();
+          
           Elem * elem = mesh.elem(elem_id);
           
           for (unsigned int j=0; j < static_cast<unsigned int>(num_nodes_per_elem); j++)
@@ -670,6 +683,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
     ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
     check_err(ex_err, "Error writing element connectivities");
   }
+
+//  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map[0]);
+  check_err(ex_err, "Error writing element connectivities");
 }
 
 void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)

@@ -559,6 +559,10 @@ public:
   // Use vectors of char to emulate char*'s
   std::vector<char> title;             //  Problem title
   std::vector<char> elem_type;         // Type of element in a given block
+
+  // Maps libMesh element numbers to Exodus element numbers
+  // gets filled in when write_elements gets called
+  std::map<int, int> libmesh_elem_num_to_exodus;
     
   //Solution Data
   int num_time_steps;
