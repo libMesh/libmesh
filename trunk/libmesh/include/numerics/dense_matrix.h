@@ -105,6 +105,11 @@ public:
    * Right multiplies by the matrix \p M3.
    */
   virtual void right_multiply (const DenseMatrixBase<T>& M3);
+
+  /**
+   * Perform matrix vector multiplication.
+   */
+  void vector_mult(DenseVector<T>& dest, const DenseVector<T>& arg) const;
   
   /**
    * Assignment operator.
@@ -214,6 +219,11 @@ public:
    */
   T transpose (const unsigned int i,
 	       const unsigned int j) const;
+
+  /**
+   * @returns the tranposed matrix.
+   */
+  DenseMatrix<T> get_transpose() const;
  
   /**
    * Access to the values array.  This should be used with
@@ -239,7 +249,6 @@ public:
 		DenseVector<T>& rhs)
   { DenseMatrixBase<T>::condense (i, j, val, rhs); }
 
-  
   /**
    * Solve the system Ax=b given the input vector b.
    */

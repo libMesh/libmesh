@@ -64,7 +64,7 @@ public:
   /**
    * Destructor.
    */
-  ~EigenSystem ();
+  virtual ~EigenSystem ();
  
   /**
    * The type of system.
