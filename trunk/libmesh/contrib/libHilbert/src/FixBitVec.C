@@ -20,16 +20,6 @@
 #include <Hilbert/FixBitVec.hpp>
 
 
-// This must be an unsigned integer that is either
-// 32 or 64 bits.  Otherwise, there are places in the
-// code that simply will not work.
-// For speed, this should be the native word size.
-//typedef uint64_t FBV_UINT;
-//#define FBV_BITS		64
-typedef uint32_t FBV_UINT;
-#define FBV_BITS		32
-
-
 #define COMPILE_TIME_ASSERT(pred) switch(0){case 0:case pred:;}
 
 
