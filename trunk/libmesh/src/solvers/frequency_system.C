@@ -165,7 +165,7 @@ void FrequencySystem::assemble ()
   if (_finished_assemble)  
     {
       std::cerr << "ERROR: Matrices already assembled." << std::endl;
-      error (); 
+      libmesh_error (); 
     }
 
   // Log how long assemble() takes
