@@ -611,7 +611,8 @@ dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
-dnl "Trilinos" -- enabled by default. This looks for the AztecOO
+dnl "Trilinos" -- enabled by default unless we're building with
+dnl               complex numbers. This looks for the AztecOO
 dnl               linear solvers and requisite Epetra parallel 
 dnl               data structures
 dnl -------------------------------------------------------------
@@ -620,20 +621,22 @@ AC_ARG_ENABLE(trilinos,
                              [build with Trilinos suppport]),
               enabletrilinos=$enableval,
               enabletrilinos=yes)
-if test "$enabletrilinos" != no ; then
-   CONFIGURE_TRILINOS
-   dnl ----------------------------------------------------------
-   dnl Nox -- enabled by default, but requires "Trilinos"
-   dnl ----------------------------------------------------------
-   AC_ARG_ENABLE(nox,
-                 AC_HELP_STRING([--enable-nox],
-                                [build with Nox suppport]),
-                 enablenox=$enableval,
-                 enablenox=yes)
-   if test "$enablenox" != no ; then
-      CONFIGURE_NOX
+if test "$enablecomplex" == no ; then
+   if test "$enabletrilinos" != no ; then
+      CONFIGURE_TRILINOS
+      dnl ----------------------------------------------------------
+      dnl Nox -- enabled by default, but requires "Trilinos"
+      dnl ----------------------------------------------------------
+      AC_ARG_ENABLE(nox,
+                    AC_HELP_STRING([--enable-nox],
+                                   [build with Nox suppport]),
+                    enablenox=$enableval,
+                    enablenox=yes)
+      if test "$enablenox" != no ; then
+         CONFIGURE_NOX
+      fi
+      dnl ----------------------------------------------------------
    fi
-   dnl ----------------------------------------------------------
 fi
 dnl -------------------------------------------------------------
 
