@@ -680,6 +680,9 @@ void DofMap::distribute_dofs (MeshBase& mesh)
   // new degrees of freedom
   unsigned int next_free_dof = 0;
 
+  // Clear the send list before we rebuild it
+  _send_list.clear();
+
   // Set temporary DOF indices on this processor
   if (node_major_dofs)
     this->distribute_local_dofs_node_major (next_free_dof, mesh);
