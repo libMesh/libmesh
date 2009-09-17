@@ -470,6 +470,19 @@ namespace Parallel
 	  tag);
   }
 
+  // Function overloading for std::complex<>
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::vector<std::complex<T> > &buf,
+		    const int tag=0)
+  {
+    send (dest_processor_id,
+	  buf,
+	  datatype<T>(),
+	  tag);
+  }
+
+
   //-------------------------------------------------------------------
   /**
    * Nonblocking-send vector to one processor where the communication type 
@@ -478,6 +491,20 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
+		    request &req,
+		    const int tag=0)
+  {
+    send (dest_processor_id,
+	  buf,
+	  datatype<T>(),
+	  req,
+	  tag);
+  }
+
+  // Function overloading for std::complex<>
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::vector<std::complex<T> > &buf,
 		    request &req,
 		    const int tag=0)
   {
@@ -514,6 +541,20 @@ namespace Parallel
   template <typename T>
   inline void nonblocking_send (const unsigned int dest_processor_id,
 		                std::vector<T> &buf,
+		                request &r,
+		                const int tag=0)
+  {
+    send (dest_processor_id,
+	  buf,
+	  datatype<T>(),
+	  r,
+	  tag);
+  }
+
+  // Function overloading for std::complex<>
+  template <typename T>
+  inline void nonblocking_send (const unsigned int dest_processor_id,
+		                std::vector<std::complex<T> > &buf,
 		                request &r,
 		                const int tag=0)
   {
@@ -561,6 +602,18 @@ namespace Parallel
 		    tag);
   }
 
+  // Function overloading for std::complex<>
+  template <typename T>
+  inline Status receive (const int src_processor_id,
+		         std::vector<std::complex<T> > &buf,
+		         const int tag=any_tag)
+  {
+    return receive (src_processor_id,
+		    buf,
+		    datatype<T>(),
+		    tag);
+  }
+
   //-------------------------------------------------------------------
   /**
    * Nonblocking-receive vector from one processor where the communication type 
@@ -569,6 +622,20 @@ namespace Parallel
   template <typename T>
   inline void receive (const int src_processor_id,
 		       std::vector<T> &buf,
+		       request &req,
+		       const int tag=any_tag)
+  {
+    receive (src_processor_id,
+	     buf,
+	     datatype<T>(),
+	     req,
+	     tag);
+  }
+
+  // Function overloading for std::complex<>
+  template <typename T>
+  inline void receive (const int src_processor_id,
+		       std::vector<std::complex<T> > &buf,
 		       request &req,
 		       const int tag=any_tag)
   {
@@ -604,6 +671,20 @@ namespace Parallel
   template <typename T>
   inline void nonblocking_receive (const int src_processor_id,
 		                   std::vector<T> &buf,
+		                   request &r,
+		                   const int tag=any_tag)
+  {
+    receive (src_processor_id,
+	     buf,
+	     datatype<T>(),
+	     r,
+	     tag);
+  }
+
+  // Function overloading for std::complex<>
+  template <typename T>
+  inline void nonblocking_receive (const int src_processor_id,
+		                   std::vector<std::complex<T> > &buf,
 		                   request &r,
 		                   const int tag=any_tag)
   {
@@ -733,10 +814,6 @@ namespace Parallel
   template <typename T>
   inline void broadcast(std::vector<T> &data, const unsigned int root_id=0);
 
-  // gcc appears to need an additional declaration to make sure it
-  // uses the right definition below
-  template <typename T>
-  inline void broadcast(std::vector<std::complex<T> > &data, const unsigned int root_id=0);
 
 
   //-----------------------------------------------------------------------
@@ -1145,6 +1222,34 @@ namespace Parallel
 
 
 
+  // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default argument
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::vector<std::complex<T> > &buf,
+		    const DataType &type,
+		    const int tag=0)
+  {    
+    START_LOG("send()", "Parallel");
+
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
+    const int ierr =
+#endif
+      MPI_Send (buf.empty() ? NULL : &buf[0],
+		buf.size() * 2,
+		type,
+		dest_processor_id,
+		tag,
+		libMesh::COMM_WORLD);
+
+    libmesh_assert (ierr == MPI_SUCCESS);    
+    
+    STOP_LOG("send()", "Parallel");
+  }
+
+
+
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
@@ -1171,44 +1276,29 @@ namespace Parallel
   }
 
 
-
+  // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default argument
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<std::complex<T> > &buf,
-		    const int tag)
+		    const DataType &type,
+		    request &req,
+		    const int tag=0)
   {
     START_LOG("send()", "Parallel");
 
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
     const int ierr =	  
-      MPI_Send (buf.empty() ? NULL : &buf[0],
-		buf.size() * 2,
-		datatype<T>(),
-		dest_processor_id,
-		tag,
-		libMesh::COMM_WORLD);    
-
+#endif
+      MPI_ISend (buf.empty() ? NULL : &buf[0],
+		 buf.size() * 2,
+		 type,
+		 dest_processor_id,
+		 tag,
+		 libMesh::COMM_WORLD,
+                 &req);    
     libmesh_assert (ierr == MPI_SUCCESS);
-
-    STOP_LOG("send()", "Parallel");
-  }
-
-
-
-  template <typename T>
-  inline void send (const unsigned int dest_processor_id,
-		    std::vector<std::complex<T> > &buf,
-		    request &req,
-		    const int tag)
-  {    
-    START_LOG("send()", "Parallel");
-
-    MPI_Isend (buf.empty() ? NULL : &buf[0],
-	       buf.size() * 2,
-	       datatype<T>(),
-	       dest_processor_id,
-	       tag,
-	       libMesh::COMM_WORLD,
-	       &req);    
 
     STOP_LOG("send()", "Parallel");
   }
@@ -1249,10 +1339,13 @@ namespace Parallel
 
 
 
+  // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default argument
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::vector<std::complex<T> > &buf,
-		         const int tag)
+		         const DataType &type,
+		         const int tag=any_tag)
   {
     START_LOG("receive()", "Parallel");
 
@@ -1263,10 +1356,13 @@ namespace Parallel
     libmesh_assert(!(status.size()%2));
     buf.resize(status.size()/2);
     
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
     const int ierr =	  
+#endif
       MPI_Recv (buf.empty() ? NULL : &buf[0],
 		buf.size() * 2,
-		datatype<T>(),
+		type,
 		src_processor_id,
 		tag,
 		libMesh::COMM_WORLD,
@@ -1307,18 +1403,21 @@ namespace Parallel
 
 
 
+  // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default argument
   template <typename T>
   inline void receive (const int src_processor_id,
 		       std::vector<std::complex<T> > &buf,
+		       const DataType &type,
 		       request &req,
-		       const int tag)
+		       const int tag=any_tag)
   {
     START_LOG("receive()", "Parallel");
 
     const int ierr =	  
       MPI_Irecv (buf.empty() ? NULL : &buf[0],
 		buf.size() * 2,
-		datatype<T>(),
+		type,
 		src_processor_id,
 		tag,
 		libMesh::COMM_WORLD,
@@ -1930,9 +2029,11 @@ namespace Parallel
   }
 
 
+  // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default argument
   template <typename T>
   inline void allgather(std::vector<std::complex<T> > &r,
-			const bool identical_buffer_sizes)
+			const bool identical_buffer_sizes = false)
   {
     if (libMesh::n_processors() == 1)
       return;
@@ -2061,8 +2162,10 @@ namespace Parallel
   }
 
 
+  // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default argument
   template <typename T>
-  inline void broadcast (std::complex<T> &data, const unsigned int root_id)
+  inline void broadcast (std::complex<T> &data, const unsigned int root_id=0)
   {
     if (libMesh::n_processors() == 1)
       {
@@ -2143,9 +2246,11 @@ namespace Parallel
   }
 
 
+  // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default argument
   template <typename T>
   inline void broadcast (std::vector<std::complex<T> > &data,
-			 const unsigned int root_id)
+			 const unsigned int root_id=0)
   {
     if (libMesh::n_processors() == 1)
       {
