@@ -12500,7 +12500,8 @@ else
   enabletrilinos=yes
 fi
 
-if test "$enabletrilinos" != no ; then
+if test "$enablecomplex" == no ; then
+   if test "$enabletrilinos" != no ; then
 
   if test "x$TRILINOS_DIR" = "x"; then
     TRILINOS_DIR=no
@@ -12589,14 +12590,14 @@ $as_echo "<<< Configuring library with Trilinos support >>>" >&6; }
 
 
 
-            # Check whether --enable-nox was given.
+                        # Check whether --enable-nox was given.
 if test "${enable_nox+set}" = set; then
   enableval=$enable_nox; enablenox=$enableval
 else
   enablenox=yes
 fi
 
-   if test "$enablenox" != no ; then
+      if test "$enablenox" != no ; then
 
   if test "x$TRILINOS_DIR" = "x"; then
     TRILINOS_DIR=no
@@ -12685,8 +12686,9 @@ $as_echo "<<< Configuring library with Nox support >>>" >&6; }
 
 
 
-   fi
-   fi
+      fi
+         fi
+fi
 
 
 
