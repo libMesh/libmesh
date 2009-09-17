@@ -259,7 +259,7 @@ void LaspackVector<T>::abs()
   const unsigned int n = this->size();
   
   for (unsigned int i=0; i!=n; ++i)
-    this->set(i,fabs((*this)(i)));
+    this->set(i,std::abs((*this)(i)));
 }
 
 template <typename T>
