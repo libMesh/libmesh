@@ -402,9 +402,13 @@ void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &va
 	                                        
     libmesh_assert (nodal_soln.size() == elem->n_nodes());
 	           
+#ifdef LIBMESH_ENABLE_COMPLEX
+    std::cerr << "Complex-valued Ensight output not yet supported" << std::endl;
+    libmesh_not_implemented()
+#endif
                    
     for (unsigned int n=0; n<elem->n_nodes(); n++)
-      local_soln[elem->node(n)] = nodal_soln[n];
+      local_soln[elem->node(n)] = libmesh_real(nodal_soln[n]);
  
   }
 
@@ -497,13 +501,18 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
     libmesh_assert (nodal_soln_u.size() == elem->n_nodes());
     libmesh_assert (nodal_soln_v.size() == elem->n_nodes());
 	          
+#ifdef LIBMESH_ENABLE_COMPLEX
+    std::cerr << "Complex-valued Ensight output not yet supported" << std::endl;
+    libmesh_not_implemented()
+#endif
+                   
     for (unsigned int n=0; n<elem->n_nodes(); n++)
       {
 	std::vector<Real> vec(3);
-	vec[0]= nodal_soln_u[n];
-	vec[1]= nodal_soln_v[n];
+	vec[0]= libmesh_real(nodal_soln_u[n]);
+	vec[1]= libmesh_real(nodal_soln_v[n]);
 	vec[2]=0.0;
-	if(dim==3) vec[2]= nodal_soln_w[n];
+	if(dim==3) vec[2]= libmesh_real(nodal_soln_w[n]);
 	local_soln[elem->node(n)] = vec;    	
       }
 
