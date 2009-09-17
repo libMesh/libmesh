@@ -218,7 +218,7 @@ Real NumericVector<T>::subset_l2_norm (const std::set<unsigned int> & indices)
   Real norm = 0;
   
   for(; it!=it_end; ++it)
-    norm += v(*it) * v(*it);
+    norm += libmesh_norm(v(*it));
 
   Parallel::sum(norm);
 

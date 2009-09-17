@@ -318,7 +318,7 @@ void DistributedVector<T>::abs()
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
   for (unsigned int i=0; i<local_size(); i++)
-    this->set(i,fabs(_values[i]));
+    this->set(i,std::abs(_values[i]));
 }
 
 
