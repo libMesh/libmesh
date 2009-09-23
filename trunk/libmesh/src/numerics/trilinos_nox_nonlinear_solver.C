@@ -206,9 +206,8 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
   
   Teuchos::ParameterList& lsParams = newtonParams.sublist("Linear Solver");
   lsParams.set("Aztec Solver", "GMRES"); 
-  lsParams.set("Max Iterations", 800); 
-  lsParams.set("Tolerance", 1e-10);
-  lsParams.set("Output Frequency", 1);	 
+  lsParams.set("Max Iterations", static_cast<int>(this->max_linear_iterations));
+  lsParams.set("Tolerance", this->initial_linear_tolerance);  lsParams.set("Output Frequency", 1);	 
 //  lsParams.set("Preconditioner", "AztecOO");
   
   Teuchos::RCP<NOX::Epetra::Interface::Jacobian> iJac = MF;
@@ -225,17 +224,22 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
   NOX::Epetra::Group& grp = *(grpPtr.get());
 
   Teuchos::RCP<NOX::StatusTest::NormF> absresid =
-    Teuchos::rcp(new NOX::StatusTest::NormF(1.0e-12, NOX::StatusTest::NormF::Unscaled));
+    Teuchos::rcp(new NOX::StatusTest::NormF(this->absolute_residual_tolerance, NOX::StatusTest::NormF::Unscaled));
+  Teuchos::RCP<NOX::StatusTest::NormF> relresid =
+    Teuchos::rcp(new NOX::StatusTest::NormF(grp, this->relative_residual_tolerance));
   Teuchos::RCP<NOX::StatusTest::MaxIters> maxiters =
-    Teuchos::rcp(new NOX::StatusTest::MaxIters(25));
+    Teuchos::rcp(new NOX::StatusTest::MaxIters(this->max_nonlinear_iterations));
   Teuchos::RCP<NOX::StatusTest::FiniteValue> finiteval =
     Teuchos::rcp(new NOX::StatusTest::FiniteValue());
+  Teuchos::RCP<NOX::StatusTest::NormUpdate> normupdate =
+    Teuchos::rcp(new NOX::StatusTest::NormUpdate(this->absolute_step_tolerance));
   Teuchos::RCP<NOX::StatusTest::Combo> combo =
     Teuchos::rcp(new NOX::StatusTest::Combo(NOX::StatusTest::Combo::OR));
   combo->addStatusTest(absresid);
+  combo->addStatusTest(relresid);
   combo->addStatusTest(maxiters);
   combo->addStatusTest(finiteval);
-
+  combo->addStatusTest(normupdate);
   
   Teuchos::RCP<NOX::Solver::Generic> solver =
     NOX::Solver::buildSolver(grpPtr, combo, nlParamsPtr);
