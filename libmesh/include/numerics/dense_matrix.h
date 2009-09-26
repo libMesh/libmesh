@@ -112,6 +112,12 @@ public:
   void vector_mult(DenseVector<T>& dest, const DenseVector<T>& arg) const;
   
   /**
+   * Perform matrix vector multiplication and add scaled result to \p dest.
+   */
+  void vector_mult_add (DenseVector<T>& dest, 
+                        const T factor,
+                        const DenseVector<T>& arg) const;
+  /**
    * Assignment operator.
    */
   DenseMatrix<T>& operator = (const DenseMatrix<T>& other_matrix);
