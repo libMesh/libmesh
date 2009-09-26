@@ -213,6 +213,16 @@ void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
 }
 
 template<typename T>
+void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest, 
+                                      const T factor,
+                                      const DenseVector<T>& arg) const
+{
+  DenseVector<T> temp(arg.size());
+  this->vector_mult(temp, arg);
+  dest.add(factor, temp);
+}
+
+template<typename T>
 DenseMatrix<T> DenseMatrix<T>::get_transpose () const
 {
   DenseMatrix<T> transposed_matrix(this->n(), this->m());
