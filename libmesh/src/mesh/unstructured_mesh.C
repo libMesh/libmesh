@@ -543,7 +543,8 @@ void UnstructuredMesh::read (const std::string& name,
 	      std::string system_string = "bunzip2 -f -k ";
 	      system_string += name;
 	      START_LOG("system(bunzip2)", "Mesh");
-	      std::system(system_string.c_str());
+	      if (std::system(system_string.c_str()))
+	        libmesh_file_error(system_string);
 	      STOP_LOG("system(bunzip2)", "Mesh");
 	    }
 
@@ -747,7 +748,8 @@ void UnstructuredMesh::write (const std::string& name,
 	    {
 	      std::string system_string = "bzip2 -f ";
 	      system_string += new_name;
-	      std::system(system_string.c_str());
+	      if (std::system(system_string.c_str()))
+		libmesh_file_error(system_string);
 	    }
 	  Parallel::barrier();
 	  STOP_LOG("system(bzip2)", "Mesh");
