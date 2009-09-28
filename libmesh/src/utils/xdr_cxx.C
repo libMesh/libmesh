@@ -45,7 +45,8 @@ namespace {
 
     std::string system_string = "bzip2 -f ";
     system_string += unzipped_name;
-    std::system(system_string.c_str());
+    if (std::system(system_string.c_str()))
+      libmesh_file_error(system_string);
      
     STOP_LOG("system(bzip2)", "XdrIO");
 #else
@@ -68,7 +69,8 @@ namespace {
 	START_LOG("system(bunzip2)", "XdrIO");
 	std::string system_string = "bunzip2 -f -k ";
 	system_string += name;
-	std::system(system_string.c_str());
+	if (std::system(system_string.c_str()))
+          libmesh_file_error(system_string);
 	STOP_LOG("system(bunzip2)", "XdrIO");
 #else
 	std::cerr << "ERROR: need bzip2/bunzip2 to handle .bz2 files!!!"
