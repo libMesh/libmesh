@@ -442,6 +442,11 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T>& petsc_dest = libmesh_cast_ref<PetscMatrix<T>&>(dest);
 
+  // If we aren't reusing the matrix then need to clear dest,
+  // otherwise we get a memory leak
+  if(&petsc_dest != this)
+    dest.clear();
+
   int ierr;
 #if PETSC_VERSION_LESS_THAN(3,0,0)
   if (&petsc_dest == this)
@@ -457,6 +462,10 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
     ierr = MatTranspose(_mat,MAT_INITIAL_MATRIX,&petsc_dest._mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
+
+  // Specify that the transposed matrix is initialized and close it.
+  petsc_dest._is_initialized = true;
+  petsc_dest.close();
 }
 
 
