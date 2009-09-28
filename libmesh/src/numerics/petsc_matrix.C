@@ -366,10 +366,15 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
 {
   // Can only extract submatrices from closed matrices
   this->close();
-  
+
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T>* petsc_submatrix = libmesh_cast_ptr<PetscMatrix<T>*>(&submatrix);
 
+  // If we're not reusing submatrix and submatrix is already initialized
+  // then we need to clear it, otherwise we get a memory leak.
+  if( !reuse_submatrix && submatrix.initialized() )
+    submatrix.clear();
+  
   // Construct row and column index sets.
   int ierr=0;
   IS isrow, iscol;
