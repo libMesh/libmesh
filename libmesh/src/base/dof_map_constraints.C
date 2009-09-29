@@ -648,61 +648,27 @@ void DofMap::enforce_constraints_exactly (const System &system,
   // and v_global uninitialized...
   libmesh_assert(v_local);
   libmesh_assert(v_global);
-
-  const MeshBase &mesh = system.get_mesh();
-
   libmesh_assert (this == &(system.get_dof_map()));
 
-  // indices on each element
-  std::vector<unsigned int> local_dof_indices;
+  DofConstraints::const_iterator c_it = _dof_constraints.begin();
+  const DofConstraints::const_iterator c_end = _dof_constraints.end();
 
-  MeshBase::const_element_iterator       elem_it  =
-    mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end =
-    mesh.active_local_elements_end(); 
-      
-  for ( ; elem_it != elem_end; ++elem_it)
+  for ( ; c_it != c_end; ++c_it)
     {
-      const Elem* elem = *elem_it;
-
-      this->dof_indices(elem, local_dof_indices);
-      std::vector<unsigned int> raw_dof_indices = local_dof_indices;
-
-      // Constraint matrix for each element
-      DenseMatrix<Number> C;
-
-      this->build_constraint_matrix (C, local_dof_indices);
-
-      // Continue if the element is unconstrained
-      if (!C.m())
+      unsigned int constrained_dof = c_it->first;
+      if (constrained_dof < this->first_dof() ||
+          constrained_dof >= this->end_dof())
         continue;
 
-      libmesh_assert(C.m() == raw_dof_indices.size());
-      libmesh_assert(C.n() == local_dof_indices.size());
+      const DofConstraintRow constraint_row = c_it->second;
 
-      for (unsigned int i=0; i!=C.m(); ++i)
-        {
-          // Recalculate any constrained dof owned by this processor
-          unsigned int global_dof = raw_dof_indices[i];
-          if (global_dof >= this->first_dof() &&
-              global_dof < this->end_dof() &&
-              this->is_constrained_dof(global_dof))
-          {
-            Number exact_value = 0;
-            for (unsigned int j=0; j!=C.n(); ++j)
-              {
-		/* If ghosted vectors are enabled, vector components
-		   for which C(i,j) vanishes may sometimes not be
-		   accessible in the vector.  Hence, it is important
-		   to explicitly skip them in the summation.  */
-                if (local_dof_indices[j] != global_dof &&
-                    C(i,j) != 0.0)
-                  exact_value += C(i,j) * 
-                    (*v_local)(local_dof_indices[j]);
-              }
-            v_global->set(global_dof, exact_value);
-          }
-        }
+      Number exact_value = 0;
+      for (DofConstraintRow::const_iterator
+	   j=constraint_row.begin(); j != constraint_row.end();
+	   ++j)
+        exact_value += j->second * (*v_local)(j->first);
+
+      v_global->set(constrained_dof, exact_value);
     }
 
   // If the old vector was serial, we probably need to send our values
