@@ -182,12 +182,12 @@ void compute_jacobian (const NumericVector<Number>& soln,
       //
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
-          RealGradient grad_u = 0;
+          Gradient grad_u = 0;
     
           for (unsigned int i=0; i<phi.size(); i++)
             grad_u += dphi[i][qp]*soln(dof_indices[i]);
           
-          const Real K = 1./std::sqrt(1. + grad_u*grad_u);
+          const Number K = 1./std::sqrt(1. + grad_u*grad_u);
           
           for (unsigned int i=0; i<phi.size(); i++)
             for (unsigned int j=0; j<phi.size(); j++)
@@ -324,8 +324,8 @@ void compute_residual (const NumericVector<Number>& soln,
 
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
-          Real u = 0;
-          RealGradient grad_u = 0;
+          Number u = 0;
+          Gradient grad_u = 0;
           
           for (unsigned int j=0; j<phi.size(); j++)
             {
@@ -333,7 +333,7 @@ void compute_residual (const NumericVector<Number>& soln,
               grad_u += dphi[j][qp]*soln(dof_indices[j]);
             }
           
-          const Real K = 1./std::sqrt(1. + grad_u*grad_u);
+          const Number K = 1./std::sqrt(1. + grad_u*grad_u);
           
           for (unsigned int i=0; i<phi.size(); i++)
             Re(i) += JxW[qp]*(
