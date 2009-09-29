@@ -2427,16 +2427,16 @@ namespace Parallel
   }
 
   template <typename T>
-  inline void allgather(std::vector<T> &, const bool = false) {}
+  inline void allgather(std::vector<T> &, const bool) {}
 
   template <typename T>
   inline void alltoall(std::vector<T> &) {}
 
   template <typename T>
-    inline void broadcast (T &, const unsigned int =0) {}
+    inline void broadcast (T &, const unsigned int) {}
 
   template <typename T>
-    inline void broadcast (std::vector<T> &, const unsigned int =0) {}
+    inline void broadcast (std::vector<T> &, const unsigned int) {}
 
 #endif // LIBMESH_HAVE_MPI
 
