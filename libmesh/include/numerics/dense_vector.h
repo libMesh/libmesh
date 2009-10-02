@@ -205,6 +205,12 @@ public:
   Real linfty_norm () const;
 
   /**
+   * Puts the principal subvector of size \p sub_n
+   * (i.e. first sub_n entries) into \p dest.
+   */
+  void get_principal_subvector (unsigned int sub_n, DenseVector<T>& dest) const;
+
+  /**
    * Access to the values array. This should be used with
    * caution but can  be used to speed up code compilation
    * significantly.
@@ -531,6 +537,17 @@ Real DenseVector<T>::linfty_norm () const
   return sqrt(my_norm);
 }
 
+template<typename T>
+inline
+void DenseVector<T>::get_principal_subvector (unsigned int sub_n,
+                                              DenseVector<T>& dest) const
+{
+  libmesh_assert( sub_n <= this->size() );
+
+  dest.resize(sub_n);
+  for(unsigned int i=0; i<sub_n; i++)
+    dest(i) = (*this)(i);
+}
 
 #endif // #ifndef __dense_vector_h__
 

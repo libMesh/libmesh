@@ -223,15 +223,32 @@ void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest,
 }
 
 template<typename T>
-DenseMatrix<T> DenseMatrix<T>::get_transpose () const
+void DenseMatrix<T>::get_principal_submatrix (unsigned int sub_m,
+                                              unsigned int sub_n,
+                                              DenseMatrix<T>& dest) const
 {
-  DenseMatrix<T> transposed_matrix(this->n(), this->m());
+  libmesh_assert( (sub_m <= this->m()) && (sub_n <= this->n()) );
 
-  for (unsigned int i=0; i<transposed_matrix.m(); i++)
-    for (unsigned int j=0; j<transposed_matrix.n(); j++)
-      transposed_matrix(i,j) = (*this)(j,i);
+  dest.resize(sub_m, sub_n);
+  for(unsigned int i=0; i<sub_m; i++)
+    for(unsigned int j=0; j<sub_n; j++)
+      dest(i,j) = (*this)(i,j);
+}
 
-  return transposed_matrix;
+template<typename T>
+void DenseMatrix<T>::get_principal_submatrix (unsigned int sub_m, DenseMatrix<T>& dest) const
+{
+  get_principal_submatrix(sub_m, sub_m, dest);
+}
+
+template<typename T>
+void DenseMatrix<T>::get_transpose (DenseMatrix<T>& dest) const
+{
+  dest.resize(this->n(), this->m());
+
+  for (unsigned int i=0; i<dest.m(); i++)
+    for (unsigned int j=0; j<dest.n(); j++)
+      dest(i,j) = (*this)(j,i);
 }
 
 

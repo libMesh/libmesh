@@ -117,6 +117,17 @@ public:
   void vector_mult_add (DenseVector<T>& dest, 
                         const T factor,
                         const DenseVector<T>& arg) const;
+
+  /**
+   * Put the \p sub_m x \p sub_n principal submatrix into \p dest.
+   */
+  void get_principal_submatrix (unsigned int sub_m, unsigned int sub_n, DenseMatrix<T>& dest) const;
+
+  /**
+   * Put the \p sub_m x \p sub_m principal submatrix into \p dest.
+   */
+  void get_principal_submatrix (unsigned int sub_m, DenseMatrix<T>& dest) const;
+
   /**
    * Assignment operator.
    */
@@ -227,9 +238,9 @@ public:
 	       const unsigned int j) const;
 
   /**
-   * @returns the tranposed matrix.
+   * Put the tranposed matrix into \p dest.
    */
-  DenseMatrix<T> get_transpose() const;
+  void get_transpose(DenseMatrix<T>& dest) const;
  
   /**
    * Access to the values array.  This should be used with
