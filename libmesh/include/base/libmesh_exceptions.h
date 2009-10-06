@@ -79,6 +79,16 @@ namespace libMesh {
     public:
       ConvergenceFailure() : std::runtime_error( "Unrecoverable failure to converge" ) {}
     };
+
+
+  /**
+   * A class representing that a dynamic cast failed to produce expected output.
+   */
+  class DynamicCastFailure:  public std::runtime_error
+    {
+    public:
+      DynamicCastFailure() : std::runtime_error( "Failed dynamic cast!" ) {}
+    };
 }
 
 #define LIBMESH_THROW(e) do { throw e; } while (0)

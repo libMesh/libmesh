@@ -577,10 +577,7 @@ T_sys & EquationSystems::get_system (const unsigned int num)
   // Check for failure of dynamic cast
   if (ptr == NULL)
     {
-      std::cerr << "ERROR: cannot convert system "
-		<< num << " to requested type!"
-		<< std::endl;
-      libmesh_error();
+      LIBMESH_THROW(libMesh::DynamicCastFailure());
     }
 
   return *ptr; 
@@ -611,10 +608,7 @@ const T_sys & EquationSystems::get_system (const std::string& name) const
   // Check for failure of dynamic cast
   if (ptr == NULL)
     {
-      std::cerr << "ERROR: cannot convert system \""
-		<< name << "\" to requested type!"
-		<< std::endl;
-      libmesh_error();
+      LIBMESH_THROW(libMesh::DynamicCastFailure());
     }
 
   return *ptr; 
