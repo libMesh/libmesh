@@ -361,6 +361,12 @@ private:
    * performed on the matrix.
    */
   DecompositionType _decomposition_type;
+
+  /**
+   * Special implementation of left-multiplication by M2 using
+   * PETSc-provided BLAS.
+   */
+  void _left_multiply_blas (const DenseMatrixBase<T>& M2);
 };
 
 

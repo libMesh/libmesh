@@ -26,19 +26,33 @@
 #include "dense_vector.h"
 #include "libmesh.h"
 
+#define LIBMESH_USE_BLAS 1
 
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS)
+#include "petsc_macro.h"
+
+EXTERN_C_FOR_PETSC_BEGIN
+#include <petscblaslapack.h>
+EXTERN_C_FOR_PETSC_END
+#endif
 
 // ------------------------------------------------------------
 // Dense Matrix member functions
+
+
+
 template<typename T>
 void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
 {
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS)
+  this->_left_multiply_blas(M2);
+#else  
   // (*this) <- M2 * M3
   // Where:
   // (*this) = (m x n),
   // M2      = (m x p),
   // M3      = (p x n)
-
+  
   // M3 is a copy of *this before it gets resize()d
   DenseMatrix<T> M3(*this);
 
@@ -47,6 +61,7 @@ void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
 
   // Call the multiply function in the base class
   this->multiply(*this, M2, M3);
+#endif
 }
 
 
@@ -565,6 +580,125 @@ void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T2>& b,
       x(ib) /= A(ib,ib);
     }
 }
+
+
+
+
+template<typename T>
+void  DenseMatrix<T>::_left_multiply_blas (const DenseMatrixBase<T>& M2)
+{
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS)
+  // Compute:
+  // (*this) <- M2 * (*this)
+  // that is, left-multiply *this by M2.
+  // The matrix operation is (MxK) * (KxN) so that the
+  // result is MxN.
+
+  // Check that the matrices are of the correct size for the
+  // operation to make sense.
+  libmesh_assert(M2.n() == this->m()); // inner dimensions
+  
+  // Call BLAS dgemm through PETSc.  We map the operation above
+  // into the dgemm routine, which computes:
+  // C := alpha * op(A) * op(B) + beta*C,
+  // where:
+  //   op(X) := X when transX="n";
+  //   op(X) := X' when transX="y"
+  int n_rows_this = static_cast<int>( this->m() );
+  int n_cols_this = static_cast<int>( this->n() );
+
+  int n_rows_that = static_cast<int>( M2.m() );
+  int n_cols_that = static_cast<int>( M2.n() );
+  
+  T alpha = 1.;
+  T beta  = 0.;
+  std::vector<T> result (n_rows_that * n_cols_this);
+
+  // For this to work, the passed arg. must actually be a DenseMatrix<T>
+  const DenseMatrix<T>* const_B = dynamic_cast< const DenseMatrix<T>* >(&M2);
+  if (!const_B)
+    {
+      std::cerr << "Unable to cast input matrix to usable type." << std::endl;
+      libmesh_error();
+    }
+
+  // Also, although the B data is logically const in this BLAS routine,
+  // the PETSc BLAS interface does not specify that any of the inputs are
+  // const.  To use it, I must cast away const-ness.
+  DenseMatrix<T>* B = const_cast< DenseMatrix<T>* > (const_B);
+
+  // One final complication: since the BLAS are Fortran-centric, the
+  // input matrices are treated as transposed (column major)
+  // automatically.  Therefore, if one wants to compute B*A, he passes
+  // A, B to Fortran.  Then, Fortran computes A^T * B^T = (B*A)^T, but
+  // in C-world, (B*A)^T is simply B*A, the desired anwser.
+  //
+  // In summary:
+  //   C              F
+  // ---------      ---------
+  // gemm(A,B)  ->  A^T * B^T
+  //                   |
+  //                   v
+  //  B*A       <-  (B * A)^T
+  BLASgemm_("N", // transa
+	    "N", // transb
+	    
+	    // Nominally the number of rows of op(A),
+	    // but since Fortran treats the array as column-major,
+	    // we pass the number of _columns_.
+	    &n_cols_this,
+
+	    // Nominally number of cols of op(B),
+	    // but since Fortran treats the array as column-major,
+	    // we pass the number of _rows_.
+	    &n_rows_that,
+
+	    // The 'inner' dimension: nominally the number of cols
+	    // of op(A) or the number of rows of op(B).  Since
+	    // Fortran treats everything as column-major, we pass the
+	    // number of _rows_ of op(A).
+	    &n_rows_this,
+	    
+	    // scalar multiplying the whole product AB 
+	    &alpha,
+	    
+	    // A, although we are left-multiplying, we pass (*this)
+	    // first, see above.
+	    &(this->_val[0]),
+
+	    // first dimension of A.  This is equal to the number of columns
+	    // unless there is extra padding in the array for some reason.
+	    &n_cols_this,
+
+	    // B, although we left-multiply B, we pass it second.  See above.
+	    &(B->_val[0]),
+
+	    // first dimension of B.  This is equal to the number of columns
+	    // of B, since there is no padding.
+	    &n_cols_that,
+	    
+	    // scalar multiplying C, see above.
+	    &beta,
+	    
+	    // the result, 'C' 
+	    &result[0],
+	    
+	    // first dimension of C */
+	    &n_cols_this
+	    );
+
+  // My number of rows is now equal to M2.m(), number of columns is unchanged.
+  this->_m = M2.m();
+
+  // Swap my data vector with the result
+  this->_val.swap(result);
+#else
+  std::cerr << "No PETSc-provided BLAS available!" << std::endl;
+  libmesh_error();
+#endif
+}
+
+
 
 
 
