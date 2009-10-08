@@ -28,7 +28,7 @@
 
 #define LIBMESH_USE_BLAS 1
 
-#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS)
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS && LIBMESH_USE_REAL_NUMBERS)
 #include "petsc_macro.h"
 
 EXTERN_C_FOR_PETSC_BEGIN
@@ -44,7 +44,7 @@ EXTERN_C_FOR_PETSC_END
 template<typename T>
 void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
 {
-#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS)
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS && LIBMESH_USE_REAL_NUMBERS)
   this->_left_multiply_blas(M2);
 #else  
   // (*this) <- M2 * M3
@@ -584,7 +584,7 @@ void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T2>& b,
 
 
 
-#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS)
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS && LIBMESH_USE_REAL_NUMBERS)
 template<typename T>
 void  DenseMatrix<T>::_left_multiply_blas (const DenseMatrixBase<T>& M2)
 {
