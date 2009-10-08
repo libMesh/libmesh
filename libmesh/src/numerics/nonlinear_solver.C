@@ -30,28 +30,27 @@
 
 //------------------------------------------------------------------
 // NonlinearSolver members
+#if defined(LIBMESH_HAVE_PETSC) || defined(LIBMESH_HAVE_NOX)
 template <typename T>
 AutoPtr<NonlinearSolver<T> >
 NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
 {
+  AutoPtr<NonlinearSolver<T> > ap;
+
   // Build the appropriate solver
   switch (solver_package)
     {
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      {
-	AutoPtr<NonlinearSolver<T> > ap(new PetscNonlinearSolver<T>(s));
-	return ap;
-      }
+      ap.reset(new PetscNonlinearSolver<T>(s));
+      break;
 #endif
       
 #ifdef LIBMESH_HAVE_NOX
     case TRILINOS_SOLVERS:
-      {
-	AutoPtr<NonlinearSolver<T> > ap(new NoxNonlinearSolver<T>(s));
-	return ap;
-      }
+      ap.reset(new NoxNonlinearSolver<T>(s));
+      break;
 #endif
 
     default:
@@ -61,9 +60,19 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
       libmesh_error();
     }
     
-  AutoPtr<NonlinearSolver<T> > ap(NULL);
   return ap;    
 }
+#else // LIBMESH_HAVE_PETSC || LIBMESH_HAVE_NOX
+template <typename T>
+AutoPtr<NonlinearSolver<T> >
+NonlinearSolver<T>::build(sys_type&, const SolverPackage)
+{
+  std::cerr << "ERROR: libMesh was compiled without nonlinear solver support"
+	    << std::endl;
+  libmesh_not_implemented();
+}
+#endif
+
 
 template <typename T>
 void
