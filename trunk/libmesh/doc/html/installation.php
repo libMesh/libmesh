@@ -53,20 +53,20 @@ build the code please let us know. You will also need a decent C compiler
 if you want to build some of the contributed packages that add functionality
 to the library.
 
-<br>
-The library is known to work with the following compilers:
+The library is currently tested with the GNU GCC 4.x and 3.x
+compilers, as well as Intel ICC 10.x and 9.x.
+
+Previous library versions were also tested with:
 <br>
 <ul>
   <li>GNU GCC</li>
     <ul>
-      <li><code>gcc</code> 4.x</li>
-      <li><code>gcc</code> 3.x</li>
       <li><code>gcc</code> 2.95.3</li>
       <li><code>gcc</code> 2.96 (RedHat's compiler in the 7.x series)</li>
     </ul>
   <li>Intel ICC/ECC</li>
     <ul>
-      <li><code>icc/ifort</code> 10.x, 9.x, 8.x</li>
+      <li><code>icc/ifort</code> 8.x</li>
       <li><code>icc/ifc</code> 7.x</li>
       <li><code>icc/ifc</code> 6.0</li>
       <li>Earlier versions (&lt;= 5.0) not supported</li>
