@@ -584,10 +584,10 @@ void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T2>& b,
 
 
 
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS)
 template<typename T>
 void  DenseMatrix<T>::_left_multiply_blas (const DenseMatrixBase<T>& M2)
 {
-#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS)
   // Compute:
   // (*this) <- M2 * (*this)
   // that is, left-multiply *this by M2.
@@ -692,11 +692,15 @@ void  DenseMatrix<T>::_left_multiply_blas (const DenseMatrixBase<T>& M2)
 
   // Swap my data vector with the result
   this->_val.swap(result);
+}
 #else
+template<typename T>
+void  DenseMatrix<T>::_left_multiply_blas (const DenseMatrixBase<T>&)
+{
   std::cerr << "No PETSc-provided BLAS available!" << std::endl;
   libmesh_error();
-#endif
 }
+#endif
 
 
 
