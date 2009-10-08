@@ -55,7 +55,7 @@ to the library.
 
 <p>
 The library is currently tested with the GNU GCC 4.x and 3.x
-compilers, as well as Intel ICC 10.x and 9.x.
+compilers, as well as Intel ICC 11.x, 10.x and 9.x.
 
 <p>
 Previous library versions were also tested with:
