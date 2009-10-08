@@ -53,9 +53,11 @@ build the code please let us know. You will also need a decent C compiler
 if you want to build some of the contributed packages that add functionality
 to the library.
 
+<p>
 The library is currently tested with the GNU GCC 4.x and 3.x
 compilers, as well as Intel ICC 10.x and 9.x.
 
+<p>
 Previous library versions were also tested with:
 <br>
 <ul>
