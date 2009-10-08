@@ -6889,6 +6889,7 @@ src/numerics/dense_matrix.$(obj-suffix):\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
+    include/numerics/petsc_macro.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
