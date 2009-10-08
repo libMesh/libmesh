@@ -278,7 +278,8 @@ svnexpand:
 #
 bin/%$(bin-suffix) : src/apps/%.cc $(mesh_library)
 	@echo "Building $@"
-	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) $< -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS)
+	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $(patsubst %.cc,%.o,$<) 
+	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(patsubst %.cc,%.o,$<) -o $@ $(libmesh_LIBS) $(libmesh_DLFLAGS) $(libmesh_LDFLAGS)
 
 #
 # In the contrib/bin directory, we run the test_headers.sh shell
