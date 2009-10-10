@@ -26,9 +26,8 @@
 #include "dense_vector.h"
 #include "libmesh.h"
 
-#define LIBMESH_USE_BLAS 1
 
-#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS && LIBMESH_USE_REAL_NUMBERS)
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 #include "petsc_macro.h"
 
 EXTERN_C_FOR_PETSC_BEGIN
@@ -44,24 +43,25 @@ EXTERN_C_FOR_PETSC_END
 template<typename T>
 void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
 {
-#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS && LIBMESH_USE_REAL_NUMBERS)
-  this->_left_multiply_blas(M2);
-#else  
-  // (*this) <- M2 * M3
-  // Where:
-  // (*this) = (m x n),
-  // M2      = (m x p),
-  // M3      = (p x n)
+  if (this->use_blas)
+    this->_multiply_blas(M2, LEFT_MULTIPLY);
+  else
+    {
+      // (*this) <- M2 * (*this)
+      // Where:
+      // (*this) = (m x n),
+      // M2      = (m x p),
+      // M3      = (p x n)
   
-  // M3 is a copy of *this before it gets resize()d
-  DenseMatrix<T> M3(*this);
+      // M3 is a copy of *this before it gets resize()d
+      DenseMatrix<T> M3(*this);
 
-  // Resize *this so that the result can fit
-  this->resize (M2.m(), M3.n());
+      // Resize *this so that the result can fit
+      this->resize (M2.m(), M3.n());
 
-  // Call the multiply function in the base class
-  this->multiply(*this, M2, M3);
-#endif
+      // Call the multiply function in the base class
+      this->multiply(*this, M2, M3);
+    }
 }
 
 
@@ -70,59 +70,64 @@ void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
 template<typename T>
 void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
 {
-  //Check to see if we are doing (A^T)*A
-  if (this == &A)
-    {
-      //libmesh_here();
-      DenseMatrix<T> B(*this);
-      
-      // Simple but inefficient way
-      // return this->left_multiply_transpose(B);
-
-      // More efficient, but more code way
-      // If A is mxn, the result will be a square matrix of Size n x n.
-      const unsigned int m = A.m();
-      const unsigned int n = A.n();
-
-      // resize() *this and also zero out all entries.
-      this->resize(n,n);
-
-      // Compute the lower-triangular part
-      for (unsigned int i=0; i<n; ++i)
-	for (unsigned int j=0; j<=i; ++j)
-	  for (unsigned int k=0; k<m; ++k) // inner products are over m
-	    (*this)(i,j) += B(k,i)*B(k,j);
-
-      // Copy lower-triangular part into upper-triangular part
-      for (unsigned int i=0; i<n; ++i)
-	for (unsigned int j=i+1; j<n; ++j)
-	  (*this)(i,j) = (*this)(j,i);
-    }
-
+  if (this->use_blas)
+    this->_multiply_blas(A, LEFT_MULTIPLY_TRANSPOSE);
   else
     {
-      DenseMatrix<T> B(*this);
-  
-      this->resize (A.n(), B.n());
+      //Check to see if we are doing (A^T)*A
+      if (this == &A)
+	{
+	  //libmesh_here();
+	  DenseMatrix<T> B(*this);
       
-      libmesh_assert (A.m() == B.m());
-      libmesh_assert (this->m() == A.n());
-      libmesh_assert (this->n() == B.n());
-      
-      const unsigned int m_s = A.n();
-      const unsigned int p_s = A.m(); 
-      const unsigned int n_s = this->n();
-  
-      // Do it this way because there is a
-      // decent chance (at least for constraint matrices)
-      // that A.transpose(i,k) = 0.
-      for (unsigned int i=0; i<m_s; i++)
-	for (unsigned int k=0; k<p_s; k++)
-	  if (A.transpose(i,k) != 0.)
-	    for (unsigned int j=0; j<n_s; j++)
-	      (*this)(i,j) += A.transpose(i,k)*B(k,j);
-    }
+	  // Simple but inefficient way
+	  // return this->left_multiply_transpose(B);
 
+	  // More efficient, but more code way
+	  // If A is mxn, the result will be a square matrix of Size n x n.
+	  const unsigned int m = A.m();
+	  const unsigned int n = A.n();
+
+	  // resize() *this and also zero out all entries.
+	  this->resize(n,n);
+
+	  // Compute the lower-triangular part
+	  for (unsigned int i=0; i<n; ++i)
+	    for (unsigned int j=0; j<=i; ++j)
+	      for (unsigned int k=0; k<m; ++k) // inner products are over m
+		(*this)(i,j) += B(k,i)*B(k,j);
+
+	  // Copy lower-triangular part into upper-triangular part
+	  for (unsigned int i=0; i<n; ++i)
+	    for (unsigned int j=i+1; j<n; ++j)
+	      (*this)(i,j) = (*this)(j,i);
+	}
+
+      else
+	{
+	  DenseMatrix<T> B(*this);
+  
+	  this->resize (A.n(), B.n());
+      
+	  libmesh_assert (A.m() == B.m());
+	  libmesh_assert (this->m() == A.n());
+	  libmesh_assert (this->n() == B.n());
+      
+	  const unsigned int m_s = A.n();
+	  const unsigned int p_s = A.m(); 
+	  const unsigned int n_s = this->n();
+  
+	  // Do it this way because there is a
+	  // decent chance (at least for constraint matrices)
+	  // that A.transpose(i,k) = 0.
+	  for (unsigned int i=0; i<m_s; i++)
+	    for (unsigned int k=0; k<p_s; k++)
+	      if (A.transpose(i,k) != 0.)
+		for (unsigned int j=0; j<n_s; j++)
+		  (*this)(i,j) += A.transpose(i,k)*B(k,j);
+	}
+    }
+  
 }
 
 
@@ -133,19 +138,24 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
 template<typename T>
 void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
 {
-  // (*this) <- M2 * M3
-  // Where:
-  // (*this) = (m x n),
-  // M2      = (m x p),
-  // M3      = (p x n)
+  if (this->use_blas)
+    this->_multiply_blas(M3, RIGHT_MULTIPLY);
+  else
+    {
+      // (*this) <- M3 * (*this)
+      // Where:
+      // (*this) = (m x n),
+      // M2      = (m x p),
+      // M3      = (p x n)
 
-  // M2 is a copy of *this before it gets resize()d
-  DenseMatrix<T> M2(*this);
+      // M2 is a copy of *this before it gets resize()d
+      DenseMatrix<T> M2(*this);
 
-  // Resize *this so that the result can fit
-  this->resize (M2.m(), M3.n());
+      // Resize *this so that the result can fit
+      this->resize (M2.m(), M3.n());
   
-  this->multiply(*this, M2, M3);
+      this->multiply(*this, M2, M3);
+    }
 }
 
 
@@ -154,57 +164,62 @@ void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
 template<typename T>
 void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
 {
-  //Check to see if we are doing B*(B^T)
-  if (this == &B)
-    {
-      //libmesh_here();
-      DenseMatrix<T> A(*this);
-      
-      // Simple but inefficient way
-      // return this->right_multiply_transpose(A);
-
-      // More efficient, more code
-      // If B is mxn, the result will be a square matrix of Size m x m.
-      const unsigned int m = B.m();
-      const unsigned int n = B.n();
-
-      // resize() *this and also zero out all entries.
-      this->resize(m,m);
-
-      // Compute the lower-triangular part
-      for (unsigned int i=0; i<m; ++i)
-	for (unsigned int j=0; j<=i; ++j)
-	  for (unsigned int k=0; k<n; ++k) // inner products are over n
-	    (*this)(i,j) += A(i,k)*A(j,k);
-
-      // Copy lower-triangular part into upper-triangular part
-      for (unsigned int i=0; i<m; ++i)
-	for (unsigned int j=i+1; j<m; ++j)
-	  (*this)(i,j) = (*this)(j,i);
-    }
-
+  if (this->use_blas)
+    this->_multiply_blas(B, RIGHT_MULTIPLY_TRANSPOSE);
   else
     {
-      DenseMatrix<T> A(*this);
-  
-      this->resize (A.m(), B.m());
+      //Check to see if we are doing B*(B^T)
+      if (this == &B)
+	{
+	  //libmesh_here();
+	  DenseMatrix<T> A(*this);
       
-      libmesh_assert (A.n() == B.n());
-      libmesh_assert (this->m() == A.m());
-      libmesh_assert (this->n() == B.m());
-      
-      const unsigned int m_s = A.m();
-      const unsigned int p_s = A.n(); 
-      const unsigned int n_s = this->n();
+	  // Simple but inefficient way
+	  // return this->right_multiply_transpose(A);
 
-      // Do it this way because there is a
-      // decent chance (at least for constraint matrices)
-      // that B.transpose(k,j) = 0.
-      for (unsigned int j=0; j<n_s; j++)
-	for (unsigned int k=0; k<p_s; k++)
-	  if (B.transpose(k,j) != 0.)
-	    for (unsigned int i=0; i<m_s; i++)
-	      (*this)(i,j) += A(i,k)*B.transpose(k,j);
+	  // More efficient, more code
+	  // If B is mxn, the result will be a square matrix of Size m x m.
+	  const unsigned int m = B.m();
+	  const unsigned int n = B.n();
+
+	  // resize() *this and also zero out all entries.
+	  this->resize(m,m);
+
+	  // Compute the lower-triangular part
+	  for (unsigned int i=0; i<m; ++i)
+	    for (unsigned int j=0; j<=i; ++j)
+	      for (unsigned int k=0; k<n; ++k) // inner products are over n
+		(*this)(i,j) += A(i,k)*A(j,k);
+
+	  // Copy lower-triangular part into upper-triangular part
+	  for (unsigned int i=0; i<m; ++i)
+	    for (unsigned int j=i+1; j<m; ++j)
+	      (*this)(i,j) = (*this)(j,i);
+	}
+
+      else
+	{
+	  DenseMatrix<T> A(*this);
+  
+	  this->resize (A.m(), B.m());
+      
+	  libmesh_assert (A.n() == B.n());
+	  libmesh_assert (this->m() == A.m());
+	  libmesh_assert (this->n() == B.m());
+      
+	  const unsigned int m_s = A.m();
+	  const unsigned int p_s = A.n(); 
+	  const unsigned int n_s = this->n();
+
+	  // Do it this way because there is a
+	  // decent chance (at least for constraint matrices)
+	  // that B.transpose(k,j) = 0.
+	  for (unsigned int j=0; j<n_s; j++)
+	    for (unsigned int k=0; k<p_s; k++)
+	      if (B.transpose(k,j) != 0.)
+		for (unsigned int i=0; i<m_s; i++)
+		  (*this)(i,j) += A(i,k)*B.transpose(k,j);
+	}
     }
 }
 
@@ -584,126 +599,180 @@ void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T2>& b,
 
 
 
-#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_BLAS && LIBMESH_USE_REAL_NUMBERS)
+
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
+
 template<typename T>
-void  DenseMatrix<T>::_left_multiply_blas (const DenseMatrixBase<T>& M2)
+void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
+				    _BLAS_Multiply_Flag flag)
 {
-  // Compute:
-  // (*this) <- M2 * (*this)
-  // that is, left-multiply *this by M2.
-  // The matrix operation is (MxK) * (KxN) so that the
-  // result is MxN.
-
-  // Check that the matrices are of the correct size for the
-  // operation to make sense.
-  libmesh_assert(M2.n() == this->m()); // inner dimensions
+  int result_size = 0;
   
-  // Call BLAS dgemm through PETSc.  We map the operation above
-  // into the dgemm routine, which computes:
-  // C := alpha * op(A) * op(B) + beta*C,
-  // where:
-  //   op(X) := X when transX="n";
-  //   op(X) := X' when transX="y"
-  int n_rows_this = static_cast<int>( this->m() );
-  int n_cols_this = static_cast<int>( this->n() );
-
-  int n_rows_that = static_cast<int>( M2.m() );
-  int n_cols_that = static_cast<int>( M2.n() );
-  
-  T alpha = 1.;
-  T beta  = 0.;
-  std::vector<T> result (n_rows_that * n_cols_this);
+  // For each case, determine the size of the final result make sure
+  // that the inner dimensions match
+  switch (flag)
+    {
+    case LEFT_MULTIPLY:
+      {
+	result_size = other.m() * this->n();
+	if (other.n() == this->m())
+	  break;
+      }
+    case RIGHT_MULTIPLY:
+      {
+	result_size = other.n() * this->m();
+	if (other.m() == this->n())
+	  break;
+      }
+    case LEFT_MULTIPLY_TRANSPOSE:
+      {
+	result_size = other.n() * this->n();
+	if (other.m() == this->m())
+	  break;
+      }
+    case RIGHT_MULTIPLY_TRANSPOSE:
+      {
+	result_size = other.m() * this->m();
+	if (other.n() == this->n())
+	  break;
+      }
+    default:
+      {
+	std::cout << "Unknown flag selected or matrices are ";
+	std::cout << "incompatible for multiplication." << std::endl;
+	libmesh_error();
+      }
+    }
 
   // For this to work, the passed arg. must actually be a DenseMatrix<T>
-  const DenseMatrix<T>* const_B = dynamic_cast< const DenseMatrix<T>* >(&M2);
-  if (!const_B)
+  const DenseMatrix<T>* const_that = dynamic_cast< const DenseMatrix<T>* >(&other);
+  if (!const_that)
     {
       std::cerr << "Unable to cast input matrix to usable type." << std::endl;
       libmesh_error();
     }
 
-  // Also, although the B data is logically const in this BLAS routine,
+  // Also, although 'that' is logically const in this BLAS routine,
   // the PETSc BLAS interface does not specify that any of the inputs are
   // const.  To use it, I must cast away const-ness.
-  DenseMatrix<T>* B = const_cast< DenseMatrix<T>* > (const_B);
+  DenseMatrix<T>* that = const_cast< DenseMatrix<T>* > (const_that);
 
-  // One final complication: since the BLAS are Fortran-centric, the
-  // input matrices are treated as transposed (column major)
-  // automatically.  Therefore, if one wants to compute B*A, he passes
-  // A, B to Fortran.  Then, Fortran computes A^T * B^T = (B*A)^T, but
-  // in C-world, (B*A)^T is simply B*A, the desired anwser.
+  // Initialize A, B pointers for LEFT_MULTIPLY* cases
+  DenseMatrix<T>
+    *A = this,
+    *B = that;
+
+  // For RIGHT_MULTIPLY* cases, swap the meaning of A and B.
+  // Here is a full table of combinations we can pass to BLASgemm, and what the answer is when finished:
+  // pass A B   -> (Fortran) -> A^T B^T -> (C++) -> (A^T B^T)^T -> (identity) -> B A   "lt multiply"
+  // pass B A   -> (Fortran) -> B^T A^T -> (C++) -> (B^T A^T)^T -> (identity) -> A B   "rt multiply"
+  // pass A B^T -> (Fortran) -> A^T B   -> (C++) -> (A^T B)^T   -> (identity) -> B^T A "lt multiply t"
+  // pass B^T A -> (Fortran) -> B A^T   -> (C++) -> (B A^T)^T   -> (identity) -> A B^T "rt multiply t"
+  if (flag==RIGHT_MULTIPLY || flag==RIGHT_MULTIPLY_TRANSPOSE)
+    std::swap(A,B);
+
+  // transa, transb values to pass to blas
+  char
+    transa[] = "n",
+    transb[] = "n";
+
+  // Integer values to pass to BLAS:
   //
-  // In summary:
-  //   C              F
-  // ---------      ---------
-  // gemm(A,B)  ->  A^T * B^T
-  //                   |
-  //                   v
-  //  B*A       <-  (B * A)^T
-  BLASgemm_("N", // transa
-	    "N", // transb
-	    
-	    // Nominally the number of rows of op(A),
-	    // but since Fortran treats the array as column-major,
-	    // we pass the number of _columns_.
-	    &n_cols_this,
+  // M  
+  // In Fortran, the number of rows of op(A),
+  // In the BLAS documentation, typically known as 'M'.
+  //
+  // In C/C++, we set:
+  // M = n_cols(A) if (transa='n')
+  //     n_rows(A) if (transa='t')
+  int M = static_cast<int>( A->n() );
 
-	    // Nominally number of cols of op(B),
-	    // but since Fortran treats the array as column-major,
-	    // we pass the number of _rows_.
-	    &n_rows_that,
+  // N
+  // In Fortran, the number of cols of op(B), and also the number of cols of C.
+  // In the BLAS documentation, typically known as 'N'.
+  //	    
+  // In C/C++, we set:
+  // N = n_rows(B) if (transb='n')
+  //     n_cols(B) if (transb='t')
+  int N = static_cast<int>( B->m() );
 
-	    // The 'inner' dimension: nominally the number of cols
-	    // of op(A) or the number of rows of op(B).  Since
-	    // Fortran treats everything as column-major, we pass the
-	    // number of _rows_ of op(A).
-	    &n_rows_this,
-	    
-	    // scalar multiplying the whole product AB 
-	    &alpha,
-	    
-	    // A, although we are left-multiplying, we pass (*this)
-	    // first, see above.
-	    &(this->_val[0]),
+  // K
+  // In Fortran, the number of cols of op(A), and also
+  // the number of rows of op(B). In the BLAS documentation,
+  // typically known as 'K'.
+  //
+  // In C/C++, we set:
+  // K = n_rows(A) if (transa='n')
+  //     n_cols(A) if (transa='t')
+  int K = static_cast<int>( A->m() );
 
-	    // first dimension of A.  This is equal to the number of columns
-	    // unless there is extra padding in the array for some reason.
-	    &n_cols_this,
+  // LDA (leading dimension of A). In our cases,
+  // LDA is always the number of columns of A.
+  int LDA = static_cast<int>( A->n() );
 
-	    // B, although we left-multiply B, we pass it second.  See above.
-	    &(B->_val[0]),
+  // LDB (leading dimension of B).  In our cases,
+  // LDB is always the number of columns of B.
+  int LDB = static_cast<int>( B->n() );
 
-	    // first dimension of B.  This is equal to the number of columns
-	    // of B, since there is no padding.
-	    &n_cols_that,
-	    
-	    // scalar multiplying C, see above.
-	    &beta,
-	    
-	    // the result, 'C' 
-	    &result[0],
-	    
-	    // first dimension of C */
-	    &n_cols_this
-	    );
+  if (flag == LEFT_MULTIPLY_TRANSPOSE)
+    {
+      transb[0] = 't';
+      N = static_cast<int>( B->n() );
+    }
 
-  // My number of rows is now equal to M2.m(), number of columns is unchanged.
-  this->_m = M2.m();
+  else if (flag == RIGHT_MULTIPLY_TRANSPOSE)
+    {
+      transa[0] = 't';
+      std::swap(M,K);
+    }
 
+  // LDC (leading dimension of C).  LDC is the
+  // number of columns in the solution matrix.
+  int LDC = M;
+  
+  // Scalar values to pass to BLAS
+  //
+  // scalar multiplying the whole product AB 
+  T alpha = 1.;
+  
+  // scalar multiplying C, which is the original matrix.
+  T beta  = 0.;
+
+  // Storage for the result
+  std::vector<T> result (result_size);
+
+  // Finally ready to call the BLAS
+  BLASgemm_(transa, transb, &M, &N, &K, &alpha, &(A->_val[0]), &LDA, &(B->_val[0]), &LDB, &beta, &result[0], &LDC);
+
+  // Update the relevant dimension for this matrix.
+  switch (flag)
+    {
+    case LEFT_MULTIPLY:            { this->_m = other.m(); break; }
+    case RIGHT_MULTIPLY:           { this->_n = other.n(); break; }
+    case LEFT_MULTIPLY_TRANSPOSE:  { this->_m = other.n(); break; }
+    case RIGHT_MULTIPLY_TRANSPOSE: { this->_n = other.m(); break; }
+    default:
+      {
+	std::cout << "Unknown flag selected." << std::endl;
+	libmesh_error();
+      }
+    }
+  
   // Swap my data vector with the result
   this->_val.swap(result);
 }
+
 #else
+
 template<typename T>
-void  DenseMatrix<T>::_left_multiply_blas (const DenseMatrixBase<T>&)
+void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& ,
+				    _BLAS_Multiply_Flag )
 {
   std::cerr << "No PETSc-provided BLAS available!" << std::endl;
   libmesh_error();
 }
+
 #endif
-
-
-
 
 
 // This routine is commented out since it is not really a memory

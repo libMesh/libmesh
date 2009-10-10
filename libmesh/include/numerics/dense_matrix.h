@@ -59,7 +59,7 @@ public:
   /**
    * Copy-constructor.
    */
-  DenseMatrix (const DenseMatrix<T>& other_matrix);
+  //DenseMatrix (const DenseMatrix<T>& other_matrix);
   
   /**
    * Destructor.  Empty.
@@ -305,6 +305,13 @@ public:
    * matrix inv passed in by the user.
    */
   // void inverse();
+
+  /**
+   * Run-time selectable option to turn on/off blas support.
+   * This was primarily used for testing purposes, and could be
+   * removed...
+   */
+  bool use_blas;
   
 private:
 
@@ -363,10 +370,19 @@ private:
   DecompositionType _decomposition_type;
 
   /**
-   * Special implementation of left-multiplication by M2 using
-   * PETSc-provided BLAS.
+   * Computes A <- op(A) * op(B) using BLAS gemm function.
+   * Used in the right_multiply(), left_multiply(), right_multiply_transpose(),
+   * and left_multiply_tranpose() routines.
    */
-  void _left_multiply_blas (const DenseMatrixBase<T>& M2);
+  enum _BLAS_Multiply_Flag {
+    LEFT_MULTIPLY = 0,
+    RIGHT_MULTIPLY,
+    LEFT_MULTIPLY_TRANSPOSE,
+    RIGHT_MULTIPLY_TRANSPOSE,
+  };
+  
+  void _multiply_blas(const DenseMatrixBase<T>& other,
+		      _BLAS_Multiply_Flag flag);
 };
 
 
@@ -414,6 +430,7 @@ inline
 DenseMatrix<T>::DenseMatrix(const unsigned int m,
 			    const unsigned int n)
   : DenseMatrixBase<T>(m,n),
+    use_blas(LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS),
     _decomposition_type(NONE)
 {
   this->resize(m,n);
@@ -421,13 +438,16 @@ DenseMatrix<T>::DenseMatrix(const unsigned int m,
 
 
 
-template<typename T>
-inline
-DenseMatrix<T>::DenseMatrix (const DenseMatrix<T>& other_matrix)
-  : DenseMatrixBase<T>(other_matrix._m, other_matrix._n)
-{
-  _val = other_matrix._val;
-}
+// FIXME[JWP]: This copy ctor has not been maintained along with
+// the rest of the class...
+// Can we just use the compiler-generated copy ctor here?
+// template<typename T>
+// inline
+// DenseMatrix<T>::DenseMatrix (const DenseMatrix<T>& other_matrix)
+//   : DenseMatrixBase<T>(other_matrix._m, other_matrix._n)
+// {
+//   _val = other_matrix._val;
+// }
 
 
 
