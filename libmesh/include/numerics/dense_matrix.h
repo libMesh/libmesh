@@ -378,7 +378,7 @@ private:
     LEFT_MULTIPLY = 0,
     RIGHT_MULTIPLY,
     LEFT_MULTIPLY_TRANSPOSE,
-    RIGHT_MULTIPLY_TRANSPOSE,
+    RIGHT_MULTIPLY_TRANSPOSE
   };
   
   void _multiply_blas(const DenseMatrixBase<T>& other,
