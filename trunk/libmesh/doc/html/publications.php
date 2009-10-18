@@ -204,13 +204,14 @@ Jose Camata, Alvaro Coutinho, and Graham Carey,
 <li>
 Matthew Anderson and Jung-Han Kimn,
 <i>A Numerical Approach to Space-Time Finite Elements for the Wave Equation.</i>
-<a href="http://arxiv.org/pdf/gr-qc/0601099">arXiv.org</a>, 2006.
+Journal of Computational Physics, Volume 226, Issue 1, 10 September
+2007, Pages 466-476, <a href="http://arxiv.org/pdf/gr-qc/0601099">preprint at arXiv.org</a>
 </li>
 
 
 <br>
 <li>
-Stefano Berrone and Endre Suliz,
+Stefano Berrone and Endre Suli,
 <i>Two-sided a posteriori error bounds for incompressible quasi-Newtonian flows.</i>
 Dipartimento di Matematica Politecnico di Torino, <a href="http://calvino.polito.it/ricerca/2006/2006.html">calvino.polito.it/ricerca</a>, 2006. 
 </li>
@@ -238,8 +239,92 @@ Fabio Galbusera, Margherita Cioffi, and Manuela T. Raimondi, <i>An in silico bio
 
 <br>
 <li>
-Hyung Taek Ahn, Mikhail Shashkov, Mark A. Christon, <i>The moment-of-fluid method in action</i>. <a href="http://dx.doi.org/10.1002/cnm.1135">Communications in Numerical Methods in Engineering</a> July 2008.
+Hyung Taek Ahn, Mikhail Shashkov, Mark A. Christon,
+<i>The moment-of-fluid method in action</i>.
+Communications in Numerical Methods in Engineering, Vol. 25, Issue 10, pp. 1009--1018.
+Published <a href="http://dx.doi.org/10.1002/cnm.1135">online</a>, July 2008.
 </Li>
+
+<br>
+<li>
+Marina Piccinelli, Lorenzo Botti, Bogdan Ene-Iordache, Andrea Remuzzi,
+Alessandro Veneziani, Luca Antiga
+<i>Link between vortex structures and voronoi diagram in cerebral aneurysms</i>
+Journal of Biomechanics, Volume 41, Supplement 1, July 2008, Page S12
+</li>
+
+
+<br>
+<li>
+Maik Brinkmeier, Udo Nackenhorst, Steffen Petersen, Otto von Estorff
+<i>A finite element approach for the simulation of tire rolling noise</i>
+Journal of Sound and Vibration, Volume 309, Issues 1-2, 8 January
+2008, Pages 20-39
+</li>
+
+
+<br>
+<li>
+Tim Kroger and Tobias Preusser
+<i>Stability of the 8-tetrahedra shortest-interior-edge partitioning method</i>
+Numerische Mathematik
+Volume 109, Number 3, May 2008, pp. 435-457.
+<a href="10.1007/s00211-008-0148-8">DOI</a>
+</li>
+
+<br>
+<li>
+Koen Van Canneyt, Radoslav Kaminsky, Lorenzo Botti, Luca Antiga, Jan
+Tordoir, Pascal Verdonck, Sunny Eloot
+<i>Can a kinked arterio-venous graft cause instable flow? A
+patient-specific validated computational study</i>
+Journal of Biomechanics, Volume 41, Supplement 1, July 2008, Page S210
+</li>
+
+<br>
+<li>
+Lorenzo Botti, Marina Piccinelli, Bogdan Ene-Iordache, Andrea Remuzzi,
+Luca Antiga
+<i>An open source parallel AMR FE solver for biological flows based on
+the libMesh C++ library</i>
+Journal of Biomechanics, Volume 41, Supplement 1, July 2008, Page S211
+</li>
+
+<br>
+<li>
+Jan Biermann, Otto von Estorff, Steffen Petersen, Christina Wenterodt
+<i>Higher order finite and infinite elements for the solution of Helmholtz problems</i>
+Computer Methods in Applied Mechanics and Engineering, Volume 198,
+Issues 13-14, 1 March 2009, Pages 1171-1188
+</li>
+
+<br>
+<li>
+Matthew F. Barone, Irina Kalashnikova, Daniel J. Segalman, Heidi K. Thornquist,
+<i>Stable Galerkin reduced order models for linearized compressible flow</i>
+Journal of Computational Physics, Volume 228, Issue 6, 1 April 2009,
+Pages 1932-1946
+</Li>
+
+
+<br>
+<li>
+A.M.P. Valli, R.N. Elias, G.F. Carey and A.L.G.A.Coutinho,
+<i>PID Adaptive Control of Incremental and Arclength Continuation in Nonlinear Applications</i>,
+International Journal for Numerical Methods in Fluids,
+Published
+<a href="http://www.inf.ufes.br/~avalli/papers/2009/avalli_ijnmf09.pdf">Online</a>, Jan 20 2009,
+<a href="http://www3.interscience.wiley.com/journal/121638902/abstract">abstract page</a>.
+</li>
+
+
+<br>
+<li>
+Adam C. Powell and Raymundo Arroyave
+<i>Open source software for materials and process modeling</i>
+JOM Journal of the Minerals, Metals and Materials Society,
+Volume 60, Number 5 / May, 2008, <a href="http://www.tms.org/pubs/journals/jom/0805/powell-0805.html">link</a>.
+</li>
 
 </ul>
 
