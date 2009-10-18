@@ -10,16 +10,14 @@
 /*  A Display Program for Meshes and More.                                   */
 /*  (showme.c)                                                               */
 /*                                                                           */
-/*  Version 1.3                                                              */
-/*  July 20, 1996                                                            */
+/*  Version 1.6                                                              */
+/*  July 28, 2005                                                            */
 /*                                                                           */
-/*  Copyright 1996                                                           */
+/*  Copyright 1996, 1998, 2005                                               */
 /*  Jonathan Richard Shewchuk                                                */
-/*  School of Computer Science                                               */
-/*  Carnegie Mellon University                                               */
-/*  5000 Forbes Avenue                                                       */
-/*  Pittsburgh, Pennsylvania  15213-3891                                     */
-/*  jrs@cs.cmu.edu                                                           */
+/*  2360 Woolsey #H                                                          */
+/*  Berkeley, California  94705-1927                                         */
+/*  jrs@cs.berkeley.edu                                                      */
 /*                                                                           */
 /*  This program may be freely redistributed under the condition that the    */
 /*    copyright notices (including this entire header and the copyright      */
@@ -72,12 +70,12 @@
 
 /* Maximum number of characters in a file name (including the null).         */
 
-#define FILENAMESIZE 1024
+#define FILENAMESIZE 2048
 
 /* Maximum number of characters in a line read from a file (including the    */
 /*   null).                                                                  */
 
-#define INPUTLINESIZE 512
+#define INPUTLINESIZE 1024
 
 #define STARTWIDTH 414
 #define STARTHEIGHT 414
@@ -106,20 +104,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
-
-/* The following obscenity seems to be necessary to ensure that this program */
-/* will port to Dec Alphas running OSF/1, because their stdio.h file commits */
-/* the unpardonable sin of including stdlib.h.  Hence, malloc(), free(), and */
-/* exit() may or may not already be defined at this point.  I declare these  */
-/* functions explicitly because some non-ANSI C compilers lack stdlib.h.     */
-
-/* #ifndef _STDLIB_H_ */
-/* extern char *malloc(); */
-/* extern void free(); */
-/* extern void exit(); */
-/* extern double strtod(); */
-/* extern long strtol(); */
-/* #endif */
 
 /* A necessary forward declaration.                                          */
 
@@ -249,7 +233,7 @@ void info()
 {
   printf("Show Me\n");
   printf("A Display Program for Meshes and More.\n");
-  printf("Version 1.3\n\n");
+  printf("Version 1.6\n\n");
   printf(
 "Copyright 1996 Jonathan Richard Shewchuk  (bugs/comments to jrs@cs.cmu.edu)\n"
 );
@@ -422,7 +406,7 @@ void info()
   printf(
 "    documents.  Otherwise, this button is just like the PS button.  (The\n");
   printf(
-"    main difference is that .eps files lack a `showpage' command at the\n");
+"    only difference is that .eps files lack a `showpage' command at the\n");
   printf("    end.)\n\n");
   printf(
 "  There are two nearly-identical rows of buttons that load different images\n"
@@ -1267,7 +1251,7 @@ REAL *ymax;
     return 1;
   }
   if (*dim != 2) {
-    printf("  I only understand two-dimensional meshes.\n");
+    printf("  I only understand two-dimensional .poly files.\n");
     return 1;
   }
   stringptr = findfield(stringptr);
@@ -1763,8 +1747,9 @@ REAL **partshift;
       free(*partition);
       return 1;
     }
-    (*partition)[i] = (int) strtol (stringptr, &stringptr, 0) - firstnumber;
-    if (((*partition)[i] >= *parts) || ((*partition)[i] < 0)) {
+    j = i + 1 - firstnumber;
+    (*partition)[j] = (int) strtol (stringptr, &stringptr, 0) - firstnumber;
+    if (((*partition)[j] >= *parts) || ((*partition)[j] < 0)) {
       printf("  Error:  Triangle %d of %s has an invalid subdomain.\n",
              i, fname);
       free(*partition);
@@ -1793,12 +1778,12 @@ REAL **partshift;
     free(*partshift);
     return 1;
   }
-  index = 3;
   for (i = 0; i <= *parts; i++) {
     partsize[i] = 0;
     (*partcenter)[i << 1] = 0.0;
     (*partcenter)[(i << 1) + 1] = 0.0;
   }
+  index = 3;
   for (i = 1; i <= elems; i++) {
     partsize[(*partition)[i]] += 3;
     for (j = 0; j < 3; j++) {
@@ -2703,13 +2688,18 @@ int eps;
           612 - llcornerx, 792 - llcornery);
   fprintf(*file, "%%%%Creator: Show Me\n");
   fprintf(*file, "%%%%EndComments\n\n");
+  fprintf(*file, "/m {moveto} bind def\n");
+  fprintf(*file, "/l {lineto} bind def\n");
+  fprintf(*file, "/s {setrgbcolor} bind def\n");
+  fprintf(*file, "/g {gsave fill grestore} bind def\n");
+  fprintf(*file, "/k {stroke} bind def\n\n");
   fprintf(*file, "1 setlinecap\n");
   fprintf(*file, "1 setlinejoin\n");
   fprintf(*file, "%d setlinewidth\n", line_width);
-  fprintf(*file, "%d %d moveto\n", llcornerx, llcornery);
-  fprintf(*file, "%d %d lineto\n", 612 - llcornerx, llcornery);
-  fprintf(*file, "%d %d lineto\n", 612 - llcornerx, 792 - llcornery);
-  fprintf(*file, "%d %d lineto\n", llcornerx, 792 - llcornery);
+  fprintf(*file, "%d %d m\n", llcornerx, llcornery);
+  fprintf(*file, "%d %d l\n", 612 - llcornerx, llcornery);
+  fprintf(*file, "%d %d l\n", 612 - llcornerx, 792 - llcornery);
+  fprintf(*file, "%d %d l\n", llcornerx, 792 - llcornery);
   fprintf(*file, "closepath\nclip\nnewpath\n");
   return 0;
 }
@@ -2769,10 +2759,10 @@ REAL yoffset;
   for (i = 1; i <= edges; i++) {
     point1 = &nodeptr[edgeptr[index++] * dim];
     point2 = &nodeptr[edgeptr[index++] * dim];
-    fprintf(polyfile, "%d %d moveto\n",
+    fprintf(polyfile, "%d %d m\n",
             (int) (point1[0] * xscale + xoffset),
             (int) (point1[1] * yscale + yoffset));
-    fprintf(polyfile, "%d %d lineto\nstroke\n",
+    fprintf(polyfile, "%d %d l\nk\n",
             (int) (point2[0] * xscale + xoffset),
             (int) (point2[1] * yscale + yoffset));
   }
@@ -2804,17 +2794,17 @@ int llcornery;
 
   index = 3;
   if ((partition != (int *) NULL) && !bw_ps) {
-    fprintf(elefile, "0 0 0 setrgbcolor\n");
-    fprintf(elefile, "%d %d moveto\n", llcornerx, llcornery);
-    fprintf(elefile, "%d %d lineto\n", 612 - llcornerx, llcornery);
-    fprintf(elefile, "%d %d lineto\n", 612 - llcornerx, 792 - llcornery);
-    fprintf(elefile, "%d %d lineto\n", llcornerx, 792 - llcornery);
+    fprintf(elefile, "0 0 0 s\n");
+    fprintf(elefile, "%d %d m\n", llcornerx, llcornery);
+    fprintf(elefile, "%d %d l\n", 612 - llcornerx, llcornery);
+    fprintf(elefile, "%d %d l\n", 612 - llcornerx, 792 - llcornery);
+    fprintf(elefile, "%d %d l\n", llcornerx, 792 - llcornery);
     fprintf(elefile, "fill\n");
   }
   for (i = 1; i <= elems; i++) {
     if ((partition != (int *) NULL) && !bw_ps) {
       colorindex = partition[i] & 63;
-      fprintf(elefile, "%6.3f %6.3f %6.3f setrgbcolor\n",
+      fprintf(elefile, "%6.3f %6.3f %6.3f s\n",
               (REAL) rgb[colorindex].red / 65535.0,
               (REAL) rgb[colorindex].green / 65535.0,
               (REAL) rgb[colorindex].blue / 65535.0);
@@ -2823,30 +2813,30 @@ int llcornery;
     if ((partition != (int *) NULL) && (explode || bw_ps)) {
       shiftx = shift[partition[i] << 1];
       shifty = shift[(partition[i] << 1) + 1];
-      fprintf(elefile, "%d %d moveto\n",
+      fprintf(elefile, "%d %d m\n",
               (int) ((nowpoint[0] + shiftx) * xscale + xoffset),
               (int) ((nowpoint[1] + shifty) * yscale + yoffset));
       for (j = 0; j < 3; j++) {
         nowpoint = &nodeptr[eleptr[index++] * dim];
-        fprintf(elefile, "%d %d lineto\n",
+        fprintf(elefile, "%d %d l\n",
                 (int) ((nowpoint[0] + shiftx) * xscale + xoffset),
                 (int) ((nowpoint[1] + shifty) * yscale + yoffset));
       }
     } else {
-      fprintf(elefile, "%d %d moveto\n",
+      fprintf(elefile, "%d %d m\n",
               (int) (nowpoint[0] * xscale + xoffset),
               (int) (nowpoint[1] * yscale + yoffset));
       for (j = 0; j < 3; j++) {
         nowpoint = &nodeptr[eleptr[index++] * dim];
-        fprintf(elefile, "%d %d lineto\n",
+        fprintf(elefile, "%d %d l\n",
                 (int) (nowpoint[0] * xscale + xoffset),
                 (int) (nowpoint[1] * yscale + yoffset));
       }
     }
-    if (fillelem && !bw_ps) {
-      fprintf(elefile, "gsave\nfill\ngrestore\n1 1 0 setrgbcolor\n");
+    if (fillelem && (partition != (int *) NULL) && !bw_ps) {
+      fprintf(elefile, "g\n1 1 0 s\n");
     }
-    fprintf(elefile, "stroke\n");
+    fprintf(elefile, "k\n");
   }
 }
 
@@ -2905,19 +2895,19 @@ int llcornery;
         normmult = normmulty;
       }
       if (normmult > 0.0) {
-        fprintf(edgefile, "%d %d moveto\n",
+        fprintf(edgefile, "%d %d m\n",
                 (int) (point1[0] * xscale + xoffset),
                 (int) (point1[1] * yscale + yoffset));
-        fprintf(edgefile, "%d %d lineto\nstroke\n",
+        fprintf(edgefile, "%d %d l\nk\n",
                 (int) ((point1[0] + normmult * normx) * xscale + xoffset),
                 (int) ((point1[1] + normmult * normy) * yscale + yoffset));
       }
     } else {
       point2 = &nodeptr[edgeptr[index++] * dim];
-      fprintf(edgefile, "%d %d moveto\n",
+      fprintf(edgefile, "%d %d m\n",
               (int) (point1[0] * xscale + xoffset),
               (int) (point1[1] * yscale + yoffset));
-      fprintf(edgefile, "%d %d lineto\nstroke\n",
+      fprintf(edgefile, "%d %d l\nk\n",
               (int) (point2[0] * xscale + xoffset),
               (int) (point2[1] * yscale + yoffset));
     }
@@ -2943,23 +2933,23 @@ int llcornery;
   int colorindex;
 
   if (!bw_ps) {
-    fprintf(adjfile, "0 0 0 setrgbcolor\n");
-    fprintf(adjfile, "%d %d moveto\n", llcornerx, llcornery);
-    fprintf(adjfile, "%d %d lineto\n", 612 - llcornerx, llcornery);
-    fprintf(adjfile, "%d %d lineto\n", 612 - llcornerx, 792 - llcornery);
-    fprintf(adjfile, "%d %d lineto\n", llcornerx, 792 - llcornery);
+    fprintf(adjfile, "0 0 0 s\n");
+    fprintf(adjfile, "%d %d m\n", llcornerx, llcornery);
+    fprintf(adjfile, "%d %d l\n", 612 - llcornerx, llcornery);
+    fprintf(adjfile, "%d %d l\n", 612 - llcornerx, 792 - llcornery);
+    fprintf(adjfile, "%d %d l\n", llcornerx, 792 - llcornery);
     fprintf(adjfile, "fill\n");
-    fprintf(adjfile, "1 1 0 setrgbcolor\n");
+    fprintf(adjfile, "1 1 0 s\n");
   }
   for (i = 0; i < subdomains; i++) {
     for (j = i + 1; j < subdomains; j++) {
       if (ptr[i * subdomains + j]) {
         point1 = &center[i * dim];
         point2 = &center[j * dim];
-        fprintf(adjfile, "%d %d moveto\n",
+        fprintf(adjfile, "%d %d m\n",
                 (int) (point1[0] * xscale + xoffset),
                 (int) (point1[1] * yscale + yoffset));
-        fprintf(adjfile, "%d %d lineto\nstroke\n",
+        fprintf(adjfile, "%d %d l\nk\n",
                 (int) (point2[0] * xscale + xoffset),
                 (int) (point2[1] * yscale + yoffset));
       }
@@ -2969,7 +2959,7 @@ int llcornery;
     point1 = &center[i * dim];
     if (!bw_ps) {
       colorindex = i & 63;
-      fprintf(adjfile, "%6.3f %6.3f %6.3f setrgbcolor\n",
+      fprintf(adjfile, "%6.3f %6.3f %6.3f s\n",
               (REAL) rgb[colorindex].red / 65535.0,
               (REAL) rgb[colorindex].green / 65535.0,
               (REAL) rgb[colorindex].blue / 65535.0);

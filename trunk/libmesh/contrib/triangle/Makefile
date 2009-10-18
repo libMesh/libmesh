@@ -4,7 +4,7 @@ INCLUDE = -I.
 
 # Package name and additional flags required for library compilation
 pkgname  := triangle
-libmesh_CFLAGS   += -DTRILIBRARY
+libmesh_CFLAGS   += -DTRILIBRARY -DANSI_DECLARATORS
 
 # (Relative) Path to location of shared libs
 libpath := ../lib

@@ -7,7 +7,7 @@
 #
 # Type "make trilibrary" to compile Triangle as an object file (triangle.o).
 #
-# Type "make distclean" to delete all executable files.
+# Type "make distclean" to delete all object and executable files.
 
 # SRC is the directory in which the C source files are, and BIN is the
 #   directory where you want to put the executable programs.  By default,
@@ -37,7 +37,8 @@ CC = cc
 #   not have enough memory to use double precision.
 #
 # If yours is not a Unix system, use the -DNO_TIMER switch to eliminate the
-#   Unix-specific timer code.
+#   Unix-specific timer code.  Also, don't try to compile Show Me; it only
+#   works with X Windows.
 #
 # To get the exact arithmetic to work right on an Intel processor, use the
 #   -DCPU86 switch with Microsoft C, or the -DLINUX switch with gcc running
@@ -56,10 +57,11 @@ CC = cc
 #   defining the REDUCED symbol eliminates the -i, -F, -s, and -C switches.
 #   The -DCDT_ONLY switch gets rid of all meshing algorithms above and beyond
 #   constrained Delaunay triangulation.  Specifically, defining the CDT_ONLY
-#   symbol eliminates the -r, -q, -a, -u, -S, and -s switches.  The REDUCED and
-#   CDT_ONLY symbols may be particularly attractive when Triangle is called
-#   by another program that does not need all of Triangle's features; in
-#   this case, these switches should appear as part of "TRILIBDEFS" below.
+#   symbol eliminates the -r, -q, -a, -u, -D, -S, and -s switches.  The
+#   REDUCED and CDT_ONLY symbols may be particularly attractive when Triangle
+#   is called by another program that does not need all of Triangle's
+#   features; in this case, these switches should appear as part of
+#   "TRILIBDEFS" below.
 #
 # On some systems, you may need to include -I/usr/local/include and/or
 #   -L/usr/local/lib in the compiler options to ensure that the X include
@@ -88,7 +90,7 @@ TRILIBDEFS = -DTRILIBRARY
 
 # RM should be set to the name of your favorite rm (file deletion program).
 
-RM = /bin/rm -f
+RM = /bin/rm
 
 # The action starts here.
 
@@ -111,4 +113,4 @@ $(BIN)showme: $(SRC)showme.c
 	$(CC) $(CSWITCHES) -o $(BIN)showme $(SRC)showme.c -lX11
 
 distclean:
-	$(RM) $(BIN)triangle $(BIN)triangle.o $(BIN)tricall $(BIN)showme *~
+	$(RM) $(BIN)triangle $(BIN)triangle.o $(BIN)tricall $(BIN)showme

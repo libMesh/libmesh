@@ -4,7 +4,7 @@
 /*                                                                           */
 /*  Example program that demonstrates how to call Triangle.                  */
 /*                                                                           */
-/*  Accompanies Triangle Versions 1.3 and 1.4                                */
+/*  Accompanies Triangle Version 1.6                                         */
 /*  July 19, 1996                                                            */
 /*                                                                           */
 /*  This file is placed in the public domain (but the file that it calls     */
@@ -28,12 +28,8 @@
 #endif /* not SINGLE */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "triangle.h"
-
-#ifndef _STDLIB_H_
-extern void *malloc();
-extern void free();
-#endif /* _STDLIB_H_ */
 
 /*****************************************************************************/
 /*                                                                           */
@@ -247,35 +243,8 @@ int main()
   printf("Refined triangulation:\n\n");
   report(&out, 0, 1, 0, 0, 0, 0);
 
-  /* Write .node file to screen */
-  printf("Writing out.node file to screen:\n");
-  printf("%d 2 0 0\n", out.numberofpoints);
-
-  {
-    unsigned int c=0,i;
-    for (i=0; i<out.numberofpoints; ++i)
-      {
-	printf("%d %f %f\n", i, out.pointlist[c], out.pointlist[c+1]);
-	c += 2;
-      }
-  }
-  
-  /* Write .ele file to screen */
-  printf("Writing out.ele file to screen:\n");
-  printf("%d 3 0 \n", out.numberoftriangles);
-
-  {
-    unsigned int i,j;
-    for (i=0; i<out.numberoftriangles; ++i)
-      {
-        printf("%d ", i);
-        for (j=0; j<out.numberofcorners; ++j) 
-          printf("%d ", out.trianglelist[i * out.numberofcorners + j]);
-	printf("\n");
-      }
-  }
-  
   /* Free all allocated arrays, including those allocated by Triangle. */
+
   free(in.pointlist);
   free(in.pointattributelist);
   free(in.pointmarkerlist);
