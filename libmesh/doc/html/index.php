@@ -78,7 +78,8 @@ focus on the physics they are modeling.
 
 <br>
 <br>
-<code>libMesh</code> currently supports 1D, 2D, and 3D steady and transient finite element simulations.
+<code>libMesh</code> currently supports 1D, 2D, and 3D steady and transient simulations on
+a variety of popular geometric and finite element types.
 The library makes use of high-quality, <a href="externalsoftware.php">existing software</a> whenever possible.
 <a href="http://www-unix.mcs.anl.gov/petsc/petsc-2">PETSc</a> is
 used for the solution of linear systems on both serial and parallel platforms, and

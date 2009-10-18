@@ -98,7 +98,16 @@
 
   <li>
     M.A. Sbai, <a href="http://cfdlab.ae.utexas.edu/~benkirk/Sbai_Stuttgart_CO2_presentation.pdf">A Process Oriented Toolbox for Numerical Analysis of CO2 Disposal in Aquifers</a>, Workshop on Numerical Models for Carbon Dioxide Storage in Geological Formations, Stuttgart, Germany, April 2008.
-  </li>  
+  </li>
+
+  <li>
+  L. Catabriga, J.J. Camata, A.M.P. Valli, A.L.G.A.Coutinho and G.F. Carey,
+  <i>Reordering Effects on Preconditioned Krylov Methods in AMR Solutions
+  of Flow and Transport</i>,
+  7th World Congress on Computational Mechanics, Los Angeles,
+  California, July 16-22, 2006.
+  </li>
+  
 </ul>
 
 
