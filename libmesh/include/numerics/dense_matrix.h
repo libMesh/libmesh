@@ -430,7 +430,11 @@ inline
 DenseMatrix<T>::DenseMatrix(const unsigned int m,
 			    const unsigned int n)
   : DenseMatrixBase<T>(m,n),
-    use_blas(LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS),
+#if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_USE_REAL_NUMBERS)
+    use_blas(true),
+#else
+    use_blas(false),
+#endif
     _decomposition_type(NONE)
 {
   this->resize(m,n);
