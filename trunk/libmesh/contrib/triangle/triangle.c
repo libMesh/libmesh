@@ -5354,7 +5354,7 @@ REAL permanent;
   REAL cxtaa[8], cxtbb[8], cytaa[8], cytbb[8];
   int cxtaalen, cxtbblen, cytaalen, cytbblen;
   REAL axtbc[8], aytbc[8], bxtca[8], bytca[8], cxtab[8], cytab[8];
-  int axtbclen, aytbclen, bxtcalen, bytcalen, cxtablen, cytablen;
+  int axtbclen=0, aytbclen=0, bxtcalen=0, bytcalen=0, cxtablen=0, cytablen=0;
   REAL axtbct[16], aytbct[16], bxtcat[16], bytcat[16], cxtabt[16], cytabt[16];
   int axtbctlen, aytbctlen, bxtcatlen, bytcatlen, cxtabtlen, cytabtlen;
   REAL axtbctt[8], aytbctt[8], bxtcatt[8];
@@ -8241,6 +8241,10 @@ int triflaws;
   triangle ptr;                         /* Temporary variable used by sym(). */
   subseg sptr;         /* Temporary variable used by spivot() and tspivot(). */
 
+  /* Avoid compiler warnings about uninitialized variables */
+  toprcasing.tri = NULL;
+  toprcasing.orient = 0;
+  
   if (b->verbose > 1) {
     printf("  Inserting (%.12g, %.12g).\n", newvertex[0], newvertex[1]);
   }
