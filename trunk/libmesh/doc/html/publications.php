@@ -70,9 +70,9 @@ The University of Texas at Austin, August 2004.
 </ul>
 
 <br>
-<h1>Publications by libMesh Developers</h1>
+<h1>Publications utilizing libMesh</h1>
 
-<ul>
+<ol>
 
 <li>
 Benjamin S. Kirk,
@@ -196,7 +196,7 @@ CMAME</a>
     pages = "3591--3607",
      year = "2006",
      issn = "0045-7825",
-      doi = "DOI: 10.1016/j.cma.2005.01.019",
+     note = {\url{"http://dx.doi.org/10.1016/j.cma.2005.01.019"}}
 }
 </pre>
 </li>
@@ -234,16 +234,16 @@ G. F. Carey, W. Barth, B. Kirk, and J. W. Peterson,
   The Netherlands), Elsevier Science B.V., Oct 2005. ISBN: 0444520244.
 <pre>
 @InProceedings{Carey_2005,
-   author = {G.~F.~Carey and W.~Barth and B.~Kirk and J.~W.~Peterson},
-    title = {{Parallel CFD for Flow and Transport Applications
-              Including Unstructured and Adaptive Grids}},
-booktitle = {Proceedings of Parallel CFD 2004:  Multidisciplinary Applications, G.~Winter,
-             A.~Ecer, J.~Periaux, N.~Satofuka and P.~Fox (Eds)},
-publisher = {Elsevier Science B.V.},
-  address = {Amsterdam, The Netherlands},
-    month = {Oct},
-     year = {2005},
-     note = {ISBN: 0444520244}
+     author = {G.~F.~Carey and W.~Barth and B.~Kirk and J.~W.~Peterson},
+      title = {{Parallel CFD for Flow and Transport Applications
+                Including Unstructured and Adaptive Grids}},
+  booktitle = {Proceedings of Parallel CFD 2004:  Multidisciplinary Applications, G.~Winter,
+               A.~Ecer, J.~Periaux, N.~Satofuka and P.~Fox (Eds)},
+  publisher = {Elsevier Science B.V.},
+    address = {Amsterdam, The Netherlands},
+      month = {Oct},
+       year = {2005},
+       note = {ISBN: 0444520244}
 }
 </pre>
 </li>
@@ -254,14 +254,22 @@ Carey GF, Anderson M, Carnes B, and Kirk B, <i>Some aspects of adaptive grid
   technology related to boundary and interior layers.</i>
   <a href="http://dx.doi.org/10.1016/j.cam.2003.09.036"> J. Comput. Appl. Math.</a>
     166(1):55--86, ISSN 0377-0427, 2004.
+<pre>
+@Article{Carey_2004a,
+    author = {G.~F. Carey and M. Anderson and B. Carnes and B. Kirk},
+     title = {Some aspects of adaptive grid technology related to boundary and interior layers},
+   journal = {J. Comput. Appl. Math.},
+    volume = {166},
+    number = {1},
+      year = {2004},
+      issn = {0377-0427},
+     pages = {55--86},
+      note = {\url{http://dx.doi.org/10.1016/j.cam.2003.09.036}}
+}
+</pre>
 </li>
 
         
-</ul>
-
-<h1>Publications and Preprints Using libMesh</h1>
-
-<ul>
 <li>
 Graham F. Carey, William Barth, Juliette A. Woods, Benjamin S. Kirk, Michael L. Anderson,
 Sum Chow, and Wolfgang Bangerth, 
@@ -308,7 +316,7 @@ Volume 43,  Number 6, Pages 1202--1215, 2006.
 
 <br>
 <li>
-Michael Schindler, Peter Talkner, and Peter Hänggi,
+Michael Schindler, Peter Talkner, and Peter Hanggi,
 <i>Computing stationary free-surface shapes in microfluidics.</i>
 <a href="http://link.aip.org/link/?PHFLE6/18/103303/1">Physics of Fluids</a>, 
 Volume 18, 2006.
@@ -323,7 +331,7 @@ Volume 18, 2006.
    volume = 18,
    number = 10,
     pages = {103303},
-      doi = {10.1063/1.2361291}
+     note = {\url{http://dx.doi.org/10.1063/1.2361291}}
 }
 </pre>
 </li>
@@ -360,7 +368,7 @@ Journal of Computational Physics, Volume 226, Issue 1, 10 September
     month = sep,
    volume = 226,
     pages = {466--476},
-      doi = {10.1016/j.jcp.2007.04.021}
+     note = {\url{http://dx.doi.org/10.1016/j.jcp.2007.04.021}}
 }
 </pre>
 </li>
@@ -381,7 +389,7 @@ Dipartimento di Matematica Politecnico di Torino,
    volume = 28,
    number = 2,
     pages = {382--421},
-    note = {\url{http://dx.doi.org/10.1093/imanum/drm017}}
+     note = {\url{http://dx.doi.org/10.1093/imanum/drm017}}
 }
 </pre>  
 </li>
@@ -410,7 +418,7 @@ M. Auf der Maur, M. Povolotskyi, F. Sacconia and A. Di Carlo,
     month = may,
    volume = 41,
     pages = {381--385},
-      doi = {10.1016/j.spmi.2007.03.011}
+     note = {\url{http://dx.doi.org/10.1016/j.spmi.2007.03.011}}
 }
 </pre>
 </li>
@@ -543,7 +551,7 @@ Journal of Biomechanics, Volume 41, Supplement 1, July 2008, Page S210
     month = jul,
      note = "Abstracts of the 16th Congress, European Society of Biomechanics",
      issn = "0021-9290",
-      doi = "DOI: 10.1016/S0021-9290(08)70210-0"
+     note = {\url{http://dx.doi.org/10.1016/S0021-9290(08)70210-0}}
 }
 </pre>
 </li>
@@ -567,7 +575,7 @@ Journal of Biomechanics, Volume 41, Supplement 1, July 2008, Page S211
     month = jul,
      note = "Abstracts of the 16th Congress, European Society of Biomechanics",
      issn = "0021-9290",
-      doi = "DOI: 10.1016/S0021-9290(08)70211-2"
+     note = {\url{http://dx.doi.org/10.1016/S0021-9290(08)70211-2}}
 }
 </pre>
 </li>
@@ -589,7 +597,7 @@ Issues 13-14, 1 March 2009, Pages 1171-1188
      year = "2009",
      note = "HOFEM07 - International Workshop on High-Order Finite Element Methods, 2007",
      issn = "0045-7825",
-      doi = "DOI: 10.1016/j.cma.2008.11.009"
+     note = {\url{http://dx.doi.org/10.1016/j.cma.2008.11.009}}
 }
 </pre>  
 </li>
@@ -611,7 +619,7 @@ Pages 1932-1946
      year = "2009",
     month = apr,
      issn = "0021-9991",
-      doi = "DOI: 10.1016/j.jcp.2008.11.015"
+     note = {\url{http://dx.doi.org/10.1016/j.jcp.2008.11.015}}
 }
 </pre>
 </li>
@@ -654,12 +662,12 @@ Volume 60, Number 5 / May, 2008, <a href="http://www.tms.org/pubs/journals/jom/0
    volume = 60,
    number = 5,
     pages = {32--39},
-      doi = {10.1007/s11837-008-0057-4}
+     note = {\url{http://dx.doi.org/10.1007/s11837-008-0057-4}}
 }
 </pre>
 </li>
 
-</ul>
+</ol>
 
 
 
