@@ -18,21 +18,55 @@
 <code>libMesh</code><i>: A
   C++ Library for Parallel Adaptive Mesh Refinement/Coarsening Simulations.</i>
 <a href="http://dx.doi.org/10.1007/s00366-006-0049-3">Engineering with Computers</a>,
-vol. 22, no. 3--4, pp. 237--254, 2006. 	 (<a href="http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf">preprint</a>)
+vol. 22, no. 3--4, pp. 237--254, 2006.
+(<a href="http://cfdlab.ae.utexas.edu/~benkirk/libmesh-ewc-preprint.pdf">preprint</a>)
 <pre>
 @Article{libMeshPaper,
-  author = {B.~Kirk and J.~W.~Peterson and R.~H.~Stogner and G.~F.~Carey},
-  title = {{\texttt{libMesh}: A C++ Library for Parallel Adaptive Mesh
-           Refinement/Coarsening Simulations}},
+   author = {B.~Kirk and J.~W.~Peterson and R.~H.~Stogner and G.~F.~Carey},
+    title = {{\texttt{libMesh}: A C++ Library for Parallel Adaptive Mesh
+              Refinement/Coarsening Simulations}},
   journal = {Engineering with Computers},
-  volume = {22},
-  number = {3--4},
-  pages = {237--254},
-  year = {2006},
-  note = {\url{http://dx.doi.org/10.1007/s00366-006-0049-3}}
+   volume = {22},
+   number = {3--4},
+    pages = {237--254},
+     year = {2006},
+     note = {\url{http://dx.doi.org/10.1007/s00366-006-0049-3}}
 }
 </pre>  
 </li>
+</ul>
+
+<br>
+<h1>Dissertations and Theses</h1>
+<ul>
+<br>
+<li> Roy H. Stogner,
+<i>Parallel Adaptive C1 Macro-Elements for Nonlinear Thin Film and Non-Newtonian Flow Problems.</i>
+<a href="http://www.cfdlab.ae.utexas.edu/~roystgnr/dissertation/dissertation-stogner.pdf">PhD Dissertation</a>, 
+The University of Texas at Austin, August 2008. 
+</li>
+
+<br>
+<li> John W. Peterson, 
+<i>Parallel Adaptive Finite Element Methods for Problems in Natural Convection.</i>
+<a href="http://www.cfdlab.ae.utexas.edu/~peterson/diss.pdf">PhD Dissertation</a>, 
+The University of Texas at Austin, May 2008. 
+</li>
+
+<br>
+<li> Benjamin S. Kirk, 
+<i>Adaptive Finite Element Simulation of Flow and Transport Applications on Parallel Computers.</i>
+<a href="http://www.cfdlab.ae.utexas.edu/~benkirk/dissertation.pdf">PhD Dissertation</a>, 
+The University of Texas at Austin, May 2007. 
+</li>
+
+<br>
+<li> John W. Peterson,
+<i>A Numerical Investigation of Benard Convection in Small Aspect Ratio Containers.</i>
+<a href="http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf">Masters Report</a>, 
+The University of Texas at Austin, August 2004. 
+</li>
+
 </ul>
 
 <br>
@@ -62,12 +96,6 @@ vol. 23, no. 1, pp 186--191, January, 2009.
 </pre>
 </li>
 
-<br>
-<li> Roy H. Stogner,
-<i>Parallel Adaptive C1 Macro-Elements for Nonlinear Thin Film and Non-Newtonian Flow Problems.</i>
-<a href="http://www.cfdlab.ae.utexas.edu/~roystgnr/dissertation/dissertation-stogner.pdf">PhD Dissertation</a>, 
-The University of Texas at Austin, August 2008. 
-</li>
 
 <br>
 <li>
@@ -76,20 +104,16 @@ The University of Texas at Austin, August 2008.
     Modeling Chemotactic Biological Systems.</i>,
   <a href="http://dx.doi.org/10.1002/cnm.1173">CNME</a>,
   accepted. (<a href="http://cfdlab.ae.utexas.edu/~benkirk/2008_chemotaxis_CNME.pdf">preprint</a>)
-</li>
-
-<br>
-<li> John W. Peterson, 
-<i>Parallel Adaptive Finite Element Methods for Problems in Natural Convection.</i>
-<a href="http://www.cfdlab.ae.utexas.edu/~peterson/diss.pdf">PhD Dissertation</a>, 
-The University of Texas at Austin, May 2008. 
-</li>
-
-<br>
-<li> Benjamin S. Kirk, 
-<i>Adaptive Finite Element Simulation of Flow and Transport Applications on Parallel Computers.</i>
-<a href="http://www.cfdlab.ae.utexas.edu/~benkirk/dissertation.pdf">PhD Dissertation</a>, 
-The University of Texas at Austin, May 2007. 
+<pre>
+@Article{Kirk_2008b,
+   author = {Benjamin S. Kirk and Graham F. Carey},
+    title = {{A parallel, adaptive finite element scheme for
+              modeling chemotactic biological systems}},
+  journal = {Communications in Numerical Methods in Engineering},
+     year = 2008,
+     note = {\url{http://dx.doi.org/10.1002/cnm.1173}}
+}
+</pre>  
 </li>
 
 <br>
@@ -123,14 +147,14 @@ J.W. Peterson, G.F. Carey, D.J. Knezevic, and B.T. Murray, <i>Adaptive
   IJNME</a>, vol. 69, no. 6, pp. 1212--1238, 2007.
 <pre>
 @Article{Tumor,
-  author = {J.~W.~Peterson and G.~F.~Carey and D.~J.~Knezevic and B.~T.~Murray},
-  title = {{Adaptive finite element methodology for tumor angiogenesis modeling}},
+   author = {J.~W.~Peterson and G.~F.~Carey and D.~J.~Knezevic and B.~T.~Murray},
+    title = {{Adaptive finite element methodology for tumor angiogenesis modeling}},
   journal = {Int.~J.~Numer.~Meth.~Eng.},
-  volume = {69},
+   volume = {69},
   number  = {6},
-  pages = {1212--1238},
-  year = {2007},
-  note = {\url{http://dx.doi.org/10.1002/nme.1802}}
+    pages = {1212--1238},
+     year = {2007},
+     note = {\url{http://dx.doi.org/10.1002/nme.1802}}
 }
 </pre>
 </li>
@@ -188,14 +212,14 @@ CMAME</a>
 Volume 195, Issues 44-47, Pages 6463-6478, 2006.
 <pre>
 @Article{Petersen_2006,
-   author =   {Petersen, S. and Dreyer, D. and {von Estorff}, O.},
-   title =    {Assessment of finite and spectral element shape functions
+    author = {Petersen, S. and Dreyer, D. and {von Estorff}, O.},
+    title  = {Assessment of finite and spectral element shape functions
               for efficient iterative simulations of interior acoustics},
-   journal =  {Computer Methods in Applied Mechanics and Engineering},
-   year =     {2006},
-   volume =   {195},
-   number =   {44--47},
-   pages =    {6463--6478}
+   journal = {Computer Methods in Applied Mechanics and Engineering},
+      year = {2006},
+    volume = {195},
+    number = {44--47},
+     pages = {6463--6478}
 }
 </pre>  
 </li>
@@ -208,6 +232,20 @@ G. F. Carey, W. Barth, B. Kirk, and J. W. Peterson,
   Proceedings of Parallel CFD 2004: Multidisciplinary Applications</a>,
   G. Winter, A. Ecer, J. Periaux, N. Satofuka and P. Fox (Eds), (Amsterdam,
   The Netherlands), Elsevier Science B.V., Oct 2005. ISBN: 0444520244.
+<pre>
+@InProceedings{Carey_2005,
+   author = {G.~F.~Carey and W.~Barth and B.~Kirk and J.~W.~Peterson},
+    title = {{Parallel CFD for Flow and Transport Applications
+              Including Unstructured and Adaptive Grids}},
+booktitle = {Proceedings of Parallel CFD 2004:  Multidisciplinary Applications, G.~Winter,
+             A.~Ecer, J.~Periaux, N.~Satofuka and P.~Fox (Eds)},
+publisher = {Elsevier Science B.V.},
+  address = {Amsterdam, The Netherlands},
+    month = {Oct},
+     year = {2005},
+     note = {ISBN: 0444520244}
+}
+</pre>
 </li>
 
 <br>
@@ -218,12 +256,6 @@ Carey GF, Anderson M, Carnes B, and Kirk B, <i>Some aspects of adaptive grid
     166(1):55--86, ISSN 0377-0427, 2004.
 </li>
 
-<br>
-<li> John W. Peterson,
-<i>A Numerical Investigation of Benard Convection in Small Aspect Ratio Containers.</i>
-<a href="http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf">Masters Report</a>, 
-The University of Texas at Austin, August 2004. 
-</li>
         
 </ul>
 
@@ -266,7 +298,7 @@ Volume 43,  Number 6, Pages 1202--1215, 2006.
   journal = {Journal of Spacecraft and Rockets},
      year = 2006,
    volume = 43,
-    number = 6,
+   number = 6,
     pages = {1202--1215}
 }
 </pre>
@@ -371,8 +403,7 @@ M. Auf der Maur, M. Povolotskyi, F. Sacconia and A. Di Carlo,
   and Microstructures</a>, Volume 41, Issues 5-6, May-June 2007, Pages 381-385.
 <pre>
 @Article{AufderMaur_2007,
-   author = {{Auf der Maur}, M. and {Povolotskyi}, M. and {Sacconi}, F. and 
-	{di Carlo}, A.},
+   author = {{Auf der Maur}, M. and {Povolotskyi}, M. and {Sacconi}, F. and {di Carlo}, A.},
     title = "{TIBERCAD: A new multiscale simulator for electronic and optoelectronic devices}",
   journal = {Superlattices and Microstructures},
      year = 2007,
@@ -454,16 +485,15 @@ Journal of Sound and Vibration, Volume 309, Issues 1-2, 8 January
 2008, Pages 20-39
 <pre>
 @Article{Brinkmeier_2008,
-   author =   {Brinkmeier, M. and Nackenhorst, U. and Petersen, S. and 
-               {von Estorff}, O.},
-   title =    {A Numerical Model for the Simulation of Tire Rolling Noise},
-   journal =  {Journal of Sound and Vibration},
-   year =     {2008},
-   month =    jan,
-   volume =   {309},
-   number =   {1--2},
-   pages =    {20--39},
-   note =     {\url{http://dx.doi.org/10.1016/j.jsv.2006.11.040}}
+    author = {Brinkmeier, M. and Nackenhorst, U. and Petersen, S. and {von Estorff}, O.},
+     title = {A Numerical Model for the Simulation of Tire Rolling Noise},
+   journal = {Journal of Sound and Vibration},
+      year = {2008},
+     month = jan,
+    volume = {309},
+    number = {1--2},
+     pages = {20--39},
+      note = {\url{http://dx.doi.org/10.1016/j.jsv.2006.11.040}}
 }
 </pre>
 </li>
@@ -501,19 +531,19 @@ patient-specific validated computational study</i>
 Journal of Biomechanics, Volume 41, Supplement 1, July 2008, Page S210
 <pre>
 @Article{VanCanneyt_2008,
- author = "Koen Van Canneyt and Radoslav Kaminsky and Lorenzo Botti and
-           Luca Antiga and Jan Tordoir and Pascal Verdonck and Sunny Eloot",
-  title = "CAN A KINKED ARTERIO-VENOUS GRAFT CAUSE INSTABLE FLOW?
-           A PATIENT-SPECIFIC VALIDATED COMPUTATIONAL STUDY",
-journal = "Journal of Biomechanics",
- volume = "41",
- number = "Supplement 1",
-  pages = "S210",
-   year = "2008",
-  month = jul,
-   note = "Abstracts of the 16th Congress, European Society of Biomechanics",
-   issn = "0021-9290",
-    doi = "DOI: 10.1016/S0021-9290(08)70210-0"
+   author = "Koen Van Canneyt and Radoslav Kaminsky and Lorenzo Botti and
+             Luca Antiga and Jan Tordoir and Pascal Verdonck and Sunny Eloot",
+    title = "CAN A KINKED ARTERIO-VENOUS GRAFT CAUSE INSTABLE FLOW?
+             A PATIENT-SPECIFIC VALIDATED COMPUTATIONAL STUDY",
+  journal = "Journal of Biomechanics",
+   volume = "41",
+   number = "Supplement 1",
+    pages = "S210",
+     year = "2008",
+    month = jul,
+     note = "Abstracts of the 16th Congress, European Society of Biomechanics",
+     issn = "0021-9290",
+      doi = "DOI: 10.1016/S0021-9290(08)70210-0"
 }
 </pre>
 </li>
@@ -527,17 +557,17 @@ the libMesh C++ library</i>
 Journal of Biomechanics, Volume 41, Supplement 1, July 2008, Page S211
 <pre>
 @Article{Botti_2008,
- author = "Lorenzo Botti and Marina Piccinelli and Bogdan Ene-Iordache and Andrea Remuzzi and Luca Antiga",
-  title = "AN OPEN SOURCE PARALLEL {AMR} {FE} SOLVER FOR BIOLOGICAL FLOWS BASED ON THE {LibMesh C++} LIBRARY",
-journal = "Journal of Biomechanics",
- volume = "41",
- number = "Supplement 1",
-  pages = "S211",
-   year = "2008",
-  month = jul,
-   note = "Abstracts of the 16th Congress, European Society of Biomechanics",
-   issn = "0021-9290",
-    doi = "DOI: 10.1016/S0021-9290(08)70211-2"
+   author = "Lorenzo Botti and Marina Piccinelli and Bogdan Ene-Iordache and Andrea Remuzzi and Luca Antiga",
+    title = "AN OPEN SOURCE PARALLEL {AMR} {FE} SOLVER FOR BIOLOGICAL FLOWS BASED ON THE {LibMesh C++} LIBRARY",
+  journal = "Journal of Biomechanics",
+   volume = "41",
+   number = "Supplement 1",
+    pages = "S211",
+     year = "2008",
+    month = jul,
+     note = "Abstracts of the 16th Congress, European Society of Biomechanics",
+     issn = "0021-9290",
+      doi = "DOI: 10.1016/S0021-9290(08)70211-2"
 }
 </pre>
 </li>
