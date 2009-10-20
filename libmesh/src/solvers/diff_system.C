@@ -44,7 +44,6 @@ DifferentiableSystem::DifferentiableSystem
   print_element_jacobians(false),
   use_fixed_solution(false)
 {
-  untested();
 }
 
 

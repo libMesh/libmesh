@@ -58,7 +58,7 @@ public:
    */
   HPSingularity()
   {
-    untested();
+    libmesh_experimental();
   }
   
   /**

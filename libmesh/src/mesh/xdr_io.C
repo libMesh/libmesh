@@ -148,7 +148,7 @@ void XdrIO::write (const std::string& name)
 {
   if (this->legacy())
     {
-      deprecated();
+      libmesh_deprecated();
       LegacyXdrIO(MeshOutput<MeshBase>::mesh(), this->binary()).write(name);
       return;
     }

@@ -378,7 +378,7 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   // deprecated
   if (!maintain_level_one)
     {
-      deprecated();
+      libmesh_deprecated();
     }
   else
     _maintain_level_one = _face_level_mismatch_limit;
@@ -523,7 +523,7 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
   // deprecated
   if (!maintain_level_one)
     {
-      deprecated();
+      libmesh_deprecated();
     }
   else
     _maintain_level_one = _face_level_mismatch_limit;
@@ -636,7 +636,7 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
   // deprecated
   if (!maintain_level_one)
     {
-      deprecated();
+      libmesh_deprecated();
     }
   else
     _maintain_level_one = _face_level_mismatch_limit;
@@ -850,7 +850,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   // deprecated
   if (!maintain_level_one)
     {
-      deprecated();
+      libmesh_deprecated();
     }
   else
     _maintain_level_one = _face_level_mismatch_limit;
@@ -1177,7 +1177,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
   // deprecated
   if (!maintain_level_one)
     {
-      deprecated();
+      libmesh_deprecated();
     }
   else
     _maintain_level_one = _face_level_mismatch_limit;

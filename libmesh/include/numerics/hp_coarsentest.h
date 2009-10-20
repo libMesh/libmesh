@@ -71,7 +71,7 @@ public:
    */
   HPCoarsenTest() : p_weight(1.0) 
   {
-    untested();
+    libmesh_experimental();
   }
   
   /**

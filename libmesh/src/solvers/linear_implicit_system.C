@@ -144,6 +144,11 @@ void LinearImplicitSystem::solve ()
 
 void LinearImplicitSystem::adjoint_solve ()
 {
+  // The adjoint_solve API (and all APIs using it) are about to see a
+  // series of non-backwards-compatible changes, primarily to add
+  // multiple-QoI support
+  libmesh_experimental();
+
   // We currently don't support adjoint solves of shell matrices
   // FIXME - we should let shell matrices support
   // vector_transpose_mult so that we can use them here.

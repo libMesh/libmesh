@@ -45,7 +45,7 @@ Nemesis_IO_Helper::Nemesis_IO_Helper(bool verbose) :
   num_elem_cmaps(0)
 {
   // Warn about using untested code!
-  untested();
+  libmesh_experimental();
 }
 
 

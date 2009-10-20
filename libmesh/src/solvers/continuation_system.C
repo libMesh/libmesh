@@ -57,7 +57,7 @@ ContinuationSystem::ContinuationSystem (EquationSystems& es,
     newton_step(0)
 {
   // Warn about using untested code
-  untested();
+  libmesh_experimental();
 }
 
 

@@ -346,14 +346,14 @@ int _close ()
 #ifndef LIBMESH_HAVE_MPI
 void libMesh::init (int &argc, char** & argv)
 {
-  deprecated();  // Use LibMeshInit instead
+  libmesh_deprecated();  // Use LibMeshInit instead
   libMesh::_init(argc, argv);
 }
 #else
 void libMesh::init (int &argc, char** & argv,
 		    MPI_Comm COMM_WORLD_IN)
 {
-  deprecated();  // Use LibMeshInit instead
+  libmesh_deprecated();  // Use LibMeshInit instead
   libMesh::_init(argc, argv, COMM_WORLD_IN);
 }
 #endif
@@ -363,7 +363,7 @@ void libMesh::init (int &argc, char** & argv,
 
 int libMesh::close ()
 {
-  deprecated();  // Use LibMeshInit instead
+  libmesh_deprecated();  // Use LibMeshInit instead
   return libMesh::_close();
 }
 

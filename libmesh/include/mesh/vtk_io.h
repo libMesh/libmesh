@@ -147,7 +147,7 @@ VTKIO::VTKIO (MeshBase& mesh, MeshData* mesh_data) :
 	_mesh_data(mesh_data)
 {
   _vtk_grid = NULL;	
-  untested();
+  libmesh_experimental();
 }
 
 
@@ -158,7 +158,7 @@ VTKIO::VTKIO (const MeshBase& mesh, MeshData* mesh_data) :
 	_mesh_data(mesh_data)
 {
   _vtk_grid = NULL;	
-  untested();
+  libmesh_experimental();
 }
 
 

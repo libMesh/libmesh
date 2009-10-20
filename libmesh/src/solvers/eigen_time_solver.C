@@ -39,7 +39,7 @@ EigenTimeSolver::EigenTimeSolver (sys_type& s)
     n_converged_eigenpairs(0),    
     n_iterations_reqd(0)
 {
-  untested();
+  libmesh_experimental();
   eigen_solver->set_eigenproblem_type(GHEP);//or GNHEP
   eigen_solver->set_position_of_spectrum(LARGEST_MAGNITUDE);
 }

@@ -36,8 +36,8 @@
 #  include "libmesh.h"
 #  define START_LOG(a,b)   { libMesh::perflog.push(a,b); }
 #  define STOP_LOG(a,b)    { libMesh::perflog.pop(a,b); }
-#  define PALIBMESH_USE_LOG(a,b)   { deprecated(); }
-#  define RESTART_LOG(a,b) { deprecated(); }
+#  define PALIBMESH_USE_LOG(a,b)   { libmesh_deprecated(); }
+#  define RESTART_LOG(a,b) { libmesh_deprecated(); }
 
 #else
 
