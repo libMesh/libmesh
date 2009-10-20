@@ -1860,7 +1860,7 @@ void GMVIO::read (const std::string& name)
 
   _next_elem_id = 0;
 
-  untested();
+  libmesh_experimental();
   
 #ifndef LIBMESH_HAVE_GMV
 

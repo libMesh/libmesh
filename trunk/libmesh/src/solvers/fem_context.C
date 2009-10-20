@@ -545,7 +545,7 @@ void FEMContext::elem_position_get()
 
   // This will probably break with threading when two contexts are
   // operating on elements which share a node
-  untested();
+  libmesh_experimental();
 
   // If the coordinate data is in our own system, it's already
   // been set up for us
@@ -600,7 +600,7 @@ void FEMContext::elem_position_set(Real)
 
   // This will probably break with threading when two contexts are
   // operating on elements which share a node
-  untested();
+  libmesh_experimental();
 
   // If the coordinate data is in our own system, it's already
   // been set up for us, and we can ignore our input parameter theta

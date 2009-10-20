@@ -144,7 +144,7 @@ void LegacyXdrIO::read_mgf_soln (const std::string& name,
 				 std::vector<Number>& soln,
 				 std::vector<std::string>& var_names) const
 {
-  deprecated();
+  libmesh_deprecated();
   
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   
@@ -175,7 +175,7 @@ void LegacyXdrIO::write_mgf_soln (const std::string& name,
 				  std::vector<Number>& soln,
 				  std::vector<std::string>& var_names) const
 {
-  deprecated();
+  libmesh_deprecated();
   
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   

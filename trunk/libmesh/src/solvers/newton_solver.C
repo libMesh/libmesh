@@ -495,6 +495,11 @@ unsigned int NewtonSolver::solve()
 
 unsigned int NewtonSolver::adjoint_solve()
 {
+  // The adjoint_solve API (and all APIs using it) are about to see a
+  // series of non-backwards-compatible changes, primarily to add
+  // multiple-QoI support
+  libmesh_experimental();
+
   START_LOG("adjoint_solve()", "NewtonSolver");
 
   if (!quiet)

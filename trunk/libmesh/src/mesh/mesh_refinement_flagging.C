@@ -54,7 +54,7 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
     if (refine_frac != 0.3 ||
 	coarsen_frac != 0.0 ||
 	max_l != libMesh::invalid_uint)
-      deprecated();
+      libmesh_deprecated();
 
     _refine_fraction = refine_frac;
     _coarsen_fraction = coarsen_frac;
@@ -429,7 +429,7 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
     if (refine_frac != 0.3 ||
 	coarsen_frac != 0.0 ||
 	max_l != libMesh::invalid_uint)
-      deprecated();
+      libmesh_deprecated();
 
     _refine_fraction = refine_frac;
     _coarsen_fraction = coarsen_frac;
@@ -571,7 +571,7 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
       if (refine_frac != 0.3 ||
           coarsen_frac != 0.0 ||
           max_l != libMesh::invalid_uint)
-        deprecated();
+        libmesh_deprecated();
 
       _refine_fraction = refine_frac;
       _coarsen_fraction = coarsen_frac;

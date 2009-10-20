@@ -278,14 +278,15 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
 }
 
 
-// The untested macro warns that you are using untested code
-#undef untested
-#define untested() do { std::cout << "*** Warning, This code is untested, experimental, or likely to see future API changes: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; } while (0)
+// The libmesh_experimental macro warns that you are using
+// bleeding-edge code
+#undef libmesh_experimental
+#define libmesh_experimental() do { std::cout << "*** Warning, This code is untested, experimental, or likely to see future API changes: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; } while (0)
 
 
-// The deprecated macro warns that you are using deprecated code
-#undef deprecated
-#define deprecated() do { std::cout << "*** Warning, This Code is Deprecated! " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; } while(0)
+// The libmesh_deprecated macro warns that you are using obsoleted code
+#undef libmesh_deprecated
+#define libmesh_deprecated() do { std::cout << "*** Warning, This code is deprecated, and likely to be removed in future library versions! " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; } while(0)
 
 
 

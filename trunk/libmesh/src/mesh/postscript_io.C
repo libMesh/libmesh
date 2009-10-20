@@ -45,7 +45,7 @@ PostscriptIO::PostscriptIO (const MeshBase& mesh)
     _current_point(0., 0.)
 {
   // This code is still undergoing some development.
-  untested();
+  libmesh_experimental();
 
   // Entries of transformation matrix from physical to Bezier coords.
   // _M(0,0) = -1./6.;    _M(0,1) = 1./6.;    _M(0,2) = 1.; 

@@ -1303,8 +1303,6 @@ void DofMap::constrain_p_dofs (unsigned int var,
 
 void DofMap::add_periodic_boundary (const PeriodicBoundary& periodic_boundary)
 {
-  untested();
-
   PeriodicBoundary boundary = periodic_boundary;
   PeriodicBoundary inverse_boundary;
   inverse_boundary.myboundary = boundary.pairedboundary;

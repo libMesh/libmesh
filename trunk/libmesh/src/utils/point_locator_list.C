@@ -42,7 +42,7 @@ PointLocatorList::PointLocatorList (const MeshBase& mesh,
   // own elements' centroids.  If your mesh is that regular you might
   // as well hand-code an O(1) algorithm for locating points within
   // it. - RHS
-  untested();
+  libmesh_experimental();
 
   this->init();
 }

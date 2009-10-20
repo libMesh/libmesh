@@ -233,7 +233,7 @@ void EquationSystems::_read_impl (const std::string& name,
 	
       }
     else
-      deprecated();
+      libmesh_deprecated();
 
   START_LOG("read()","EquationSystems");
       
@@ -300,7 +300,7 @@ void EquationSystems::_read_impl (const std::string& name,
       for (; pos != _systems.end(); ++pos)
 	if (read_legacy_format)
 	  {
-	    deprecated();
+	    libmesh_deprecated();
 	    pos->second->read_legacy_data (io, read_additional_data);
 	  }
 	else

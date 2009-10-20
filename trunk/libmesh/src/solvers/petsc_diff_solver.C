@@ -262,6 +262,11 @@ unsigned int PetscDiffSolver::solve()
 
 unsigned int PetscDiffSolver::adjoint_solve()
 {
+  // The adjoint_solve API (and all APIs using it) are about to see a
+  // series of non-backwards-compatible changes, primarily to add
+  // multiple-QoI support
+  libmesh_experimental();
+
   START_LOG("adjoint_solve()", "PetscDiffSolver");
 
   // Do DiffSystem assembly

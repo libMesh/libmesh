@@ -374,7 +374,7 @@ public:
    * This _n_SCALAR_dofs hack won't work in parallel, just for testing...
    */
   unsigned int last_dof(const unsigned int proc = libMesh::processor_id()) const
-  { libmesh_assert(proc < _end_df.size()); return (_end_df[proc] - 1 + _n_SCALAR_dofs); }  
+  { libmesh_deprecated(); libmesh_assert(proc < _end_df.size()); return (_end_df[proc] - 1 + _n_SCALAR_dofs); }  
 
   /**
    * Returns the first dof index that is after all indices local to subdomain \p proc.

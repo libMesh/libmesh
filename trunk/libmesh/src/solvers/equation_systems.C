@@ -365,7 +365,7 @@ System & EquationSystems::add_system (const std::string& sys_type,
 
 void EquationSystems::delete_system (const std::string& name)
 {
-  deprecated();
+  libmesh_deprecated();
 
   if (!_systems.count(name))
     {

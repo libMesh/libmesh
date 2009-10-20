@@ -241,7 +241,7 @@ void System::read_header (Xdr& io,
 void System::read_legacy_data (Xdr& io,
 			       const bool read_additional_data)
 {
-  deprecated();
+  libmesh_deprecated();
   
   // This method implements the output of the vectors
   // contained in this System object, embedded in the 
@@ -1007,7 +1007,7 @@ void System::write_header (Xdr& io,
 // {
 //   // This is deprecated -- use write_serialized_data() instead.  This will be kept for reference
 //   // for a little while, then dropped.  There is no need call this method any more.
-//   deprecated();
+//   libmesh_deprecated();
   
 //   /**
 //    * This method implements the output of the vectors
