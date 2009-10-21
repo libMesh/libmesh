@@ -338,8 +338,8 @@ public:
   /**
    * @returns the total number of degrees of freedom in the problem.
    */
-  unsigned int n_dofs() const { return _n_dfs + _n_SCALAR_dofs; }
 
+  unsigned int n_dofs() const { return _n_dfs; }
   /**
    * @returns the number of SCALAR dofs.
    */
@@ -349,16 +349,13 @@ public:
    * @returns the number of degrees of freedom on this processor.
    */
   unsigned int n_local_dofs () const
-  { return this->n_dofs_on_processor (libMesh::processor_id()) + _n_SCALAR_dofs; }
-    
+  { return this->n_dofs_on_processor (libMesh::processor_id()); }
+
   /**
    * Returns the number of degrees of freedom on subdomain \p proc.
-   * 
-   * This _n_SCALAR_dofs hack won't work in parallel, just test it out.
-   * Should store the number of SCALAR dofs on each processor...
    */
   unsigned int n_dofs_on_processor(const unsigned int proc) const
-  { libmesh_assert(proc < _first_df.size()); return (_end_df[proc] - _first_df[proc] + _n_SCALAR_dofs); }
+  { libmesh_assert(proc < _first_df.size()); return (_end_df[proc] - _first_df[proc]); }
 
   /**
    * Returns the first dof index that is local to subdomain \p proc.
@@ -370,20 +367,16 @@ public:
    * Returns the last dof index that is local to subdomain \p proc.
    * This function is now deprecated, because it returns nonsense in the rare
    * case where \p proc has no local dof indices.  Use end_dof() instead.
-   *
-   * This _n_SCALAR_dofs hack won't work in parallel, just for testing...
    */
   unsigned int last_dof(const unsigned int proc = libMesh::processor_id()) const
-  { libmesh_deprecated(); libmesh_assert(proc < _end_df.size()); return (_end_df[proc] - 1 + _n_SCALAR_dofs); }  
+  { libmesh_deprecated(); libmesh_assert(proc < _end_df.size()); return (_end_df[proc] - 1); }  
 
   /**
    * Returns the first dof index that is after all indices local to subdomain \p proc.
    * Analogous to the end() member function of STL containers.
-   *
-   * This _n_SCALAR_dofs hack won't work in parallel, just for testing...
    */
   unsigned int end_dof(const unsigned int proc = libMesh::processor_id()) const
-  { libmesh_assert(proc < _end_df.size()); return _end_df[proc] + _n_SCALAR_dofs; }  
+  { libmesh_assert(proc < _end_df.size()); return _end_df[proc]; }
   
   /**
    * Returns the first local degree of freedom index for variable \p var.
@@ -398,15 +391,12 @@ public:
   /**
    * Returns (one past) the last local degree of freedom index for variable \p var.
    * Analogous to the end() member function of STL containers.
-   * 
-   * This _n_SCALAR_dofs hack won't work in parallel, just test it out.
-   * Should store the number of SCALAR dofs on each processor...
    */
   unsigned int variable_last_local_dof (const unsigned int var) const
   { 
     libmesh_assert ((var+1) < _var_first_local_df.size());
     libmesh_assert (_var_first_local_df[var+1] != DofObject::invalid_id);
-    return _var_first_local_df[var+1] + _n_SCALAR_dofs;
+    return _var_first_local_df[var+1];
   }
 
   /**
@@ -417,6 +407,16 @@ public:
   void dof_indices (const Elem* const elem,
 		    std::vector<unsigned int>& di,
 		    const unsigned int vn = libMesh::invalid_uint) const;
+
+  /**
+   * Fills the vector \p di with the global degree of freedom indices
+   * corresponding to the SCALAR variable vn. If old_dofs=true,
+   * the old SCALAR dof indices are returned. Note that we do not
+   * need to pass in an element since SCALARs are global variables.
+   */
+  void SCALAR_dof_indices (std::vector<unsigned int>& di,
+		           const unsigned int vn,
+		           const bool old_dofs=false) const;
 
   /**
    * Tells other library functions whether or not this problem
