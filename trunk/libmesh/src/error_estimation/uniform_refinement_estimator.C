@@ -294,9 +294,10 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
           libmesh_assert(solution_vectors->size() == es.n_systems());
 	  libmesh_assert(solution_vectors->find(system_list[0]) !=
 			 solution_vectors->end());
-	  bool solve_adjoint =
-	    (solution_vectors->find(system_list[0])->second ==
-	     &system_list[0]->get_adjoint_solution());
+	  const bool solve_adjoint = 
+            (system_list[0]->have_vector("adjoint_solution") &&
+             (solution_vectors->find(system_list[0])->second ==
+	      &system_list[0]->get_adjoint_solution()));
 	  libmesh_assert(solve_adjoint ||
 	    (solution_vectors->find(system_list[0])->second ==
 	     system_list[0]->solution.get()) ||
@@ -345,9 +346,10 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 	  libmesh_assert(solution_vectors->find(system_list[0]) !=
 			 solution_vectors->end());
 
-	  bool solve_adjoint =
-	    (solution_vectors->find(system_list[0])->second ==
-	     &system_list[0]->get_adjoint_solution());
+	  const bool solve_adjoint = 
+            (system_list[0]->have_vector("adjoint_solution") &&
+             (solution_vectors->find(system_list[0])->second ==
+	      &system_list[0]->get_adjoint_solution()));
 	  libmesh_assert(solve_adjoint ||
 	    (solution_vectors->find(system_list[0])->second ==
 	     system_list[0]->solution.get()) ||
