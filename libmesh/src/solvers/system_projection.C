@@ -278,6 +278,34 @@ void System::project_vector (Number fptr(const Point& p,
 					 new_vector)
 			 );
 
+  // Also, load values into the SCALAR dofs
+  // Note: We assume that all SCALAR dofs are on the
+  // processor with highest ID
+  if(libMesh::processor_id() == (libMesh::n_processors()-1))
+  {
+    const DofMap& dof_map = this->get_dof_map();
+    for (unsigned int var=0; var<this->n_vars(); var++)
+      if(this->variable(var).type().family == SCALAR)
+        {
+          std::vector<unsigned int> SCALAR_indices;
+          dof_map.SCALAR_dof_indices (SCALAR_indices, var);
+          const unsigned int n_SCALAR_dofs = SCALAR_indices.size();
+
+          for (unsigned int i=0; i<n_SCALAR_dofs; i++)
+          {
+            const unsigned int index = SCALAR_indices[i];
+
+            // We pass the point (i,0,0) to the fptr to distinguish
+            // the different scalars within the SCALAR variable
+            Point p_i(i,0,0);
+            new_vector.set( index, fptr(p_i,
+                                        parameters,
+                                        this->name(),
+                                        this->variable_name(var))
+                          );
+          }
+        }
+  }
 
   new_vector.close();
 
@@ -795,6 +823,9 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_variables; var++)
     {
+      if (dof_map.variable(var).type().family == SCALAR)
+        continue;
+
       // Get FE objects of the appropriate type
       const FEType& fe_type = dof_map.variable_type(var);     
       AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));      
