@@ -155,6 +155,15 @@ __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *j, Mat *pc,
 PetscDiffSolver::PetscDiffSolver (sys_type& s)
   : Parent(s)
 {
+}
+
+
+void PetscDiffSolver::init ()
+{
+  START_LOG("init()", "PetscDiffSolver");
+
+  Parent::init();
+
   int ierr=0;
 
 #if PETSC_VERSION_LESS_THAN(2,1,2)
@@ -182,16 +191,27 @@ PetscDiffSolver::PetscDiffSolver (sys_type& s)
   ierr = SNESSetFromOptions(_snes);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
+  STOP_LOG("init()", "PetscDiffSolver");
 }
 
 
 
 PetscDiffSolver::~PetscDiffSolver ()
 {
+}
+
+
+
+void PetscDiffSolver::clear()
+{
+  START_LOG("clear()", "PetscDiffSolver");
+
   int ierr=0;
 
   ierr = SNESDestroy(_snes);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  STOP_LOG("clear()", "PetscDiffSolver");
 }
 
 
@@ -205,6 +225,8 @@ void PetscDiffSolver::reinit()
 
 unsigned int PetscDiffSolver::solve()
 {
+  this->init();
+
   START_LOG("solve()", "PetscDiffSolver");
 
   PetscVector<Number> &x =
@@ -252,6 +274,8 @@ unsigned int PetscDiffSolver::solve()
 #endif
 
   STOP_LOG("solve()", "PetscDiffSolver");
+
+  this->clear();
 
   // FIXME - We'll worry about getting the solve result right later...
   

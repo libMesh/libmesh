@@ -72,6 +72,18 @@ public:
   virtual void reinit ();
 
   /**
+   * The initialization function.  solve() calls this to create
+   * a new SNES context.
+   */
+  void init ();
+
+  /**
+   * The clear function.  solve() calls this to destroy
+   * a used SNES context.
+   */
+  void clear ();
+
+  /**
    * This method performs a solve.  What occurs in
    * this method will depend on the PETSc SNES settings.
    * See the PETSc documentation for more details.
