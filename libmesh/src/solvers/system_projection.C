@@ -72,12 +72,6 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
 #ifdef LIBMESH_ENABLE_AMR
 
-  // First make sure we don't have any SCALAR variables, since
-  // vector projection is not yet implemented for SCALARs
-  for(unsigned int v=0; v<this->n_vars(); v++)
-    if(this->variable(v).type().family == SCALAR)
-      libmesh_not_implemented();
-
   // Resize the new vector and get a serial version.
   NumericVector<Number> *new_vector_ptr = NULL;
   AutoPtr<NumericVector<Number> > new_vector_built;
@@ -164,6 +158,28 @@ void System::project_vector (const NumericVector<Number>& old_v,
 				       old_vector,
 				       new_vector)
 			 );
+
+  // Copy the SCALAR dofs from old_vector to new_vector
+  // Note: We assume that all SCALAR dofs are on the
+  // processor with highest ID
+  if(libMesh::processor_id() == (libMesh::n_processors()-1))
+  {
+    const DofMap& dof_map = this->get_dof_map();
+    for (unsigned int var=0; var<this->n_vars(); var++)
+      if(this->variable(var).type().family == SCALAR)
+        {
+          // We can just map SCALAR dofs directly across
+          std::vector<unsigned int> new_SCALAR_indices, old_SCALAR_indices;
+          dof_map.SCALAR_dof_indices (new_SCALAR_indices, var, false);
+          dof_map.SCALAR_dof_indices (old_SCALAR_indices, var, true);
+          const unsigned int new_n_dofs = new_SCALAR_indices.size();
+
+          for (unsigned int i=0; i<new_n_dofs; i++)
+          {
+            new_vector.set( new_SCALAR_indices[i], old_vector(old_SCALAR_indices[i]) );
+          }
+        }
+  }
 
   new_vector.close();
 
@@ -313,6 +329,9 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_variables; var++)
     {
+      if (dof_map.variable(var).type().family == SCALAR)
+        continue;
+
       // Get FE objects of the appropriate type
       const FEType& base_fe_type = dof_map.variable_type(var);     
       AutoPtr<FEBase> fe (FEBase::build(dim, base_fe_type));      
