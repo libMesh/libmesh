@@ -91,6 +91,7 @@ class GetPot {
   //     -- scalar values
   inline bool         operator()(const char* VarName, bool        Default) const;
   inline int          operator()(const char* VarName, int         Default) const;
+  inline unsigned int operator()(const char* VarName, unsigned int Default) const;
   inline double       operator()(const char* VarName, double      Default) const;
   inline long double  operator()(const char* VarName, long double Default) const;
   inline const char*  operator()(const char* VarName, const char* Default) const;
@@ -240,6 +241,7 @@ class GetPot {
   inline bool          __check_flags(const std::string& Str, const char* FlagList) const;
   //        * type conversion if possible     
   inline int      __convert_to_type(const std::string& String, int Default) const;
+  inline unsigned int      __convert_to_type(const std::string& String, unsigned int Default) const;
   inline double   __convert_to_type(const std::string& String, double Default) const;
   inline long double   __convert_to_type(const std::string& String, long double Default) const;
   inline bool     __convert_to_type(const std::string& String, bool Default) const;
@@ -725,7 +727,14 @@ GetPot::__convert_to_type(const std::string& String, int Default) const
   return tmp;    
 }
 
-
+// convert string to UINT, if not possible return Default
+inline unsigned int   
+GetPot::__convert_to_type(const std::string& String, unsigned int Default) const
+{
+  unsigned int tmp;
+  if( std::sscanf(String.c_str(),"%u", &tmp) != 1 ) return Default;
+  return tmp;    
+}
 
 inline bool
 GetPot::__convert_to_type(const std::string& String, bool Default) const
@@ -1225,7 +1234,13 @@ GetPot::operator()(const char* VarName, int Default) const
   return __convert_to_type(sv->original, Default);
 }
 
-
+inline unsigned int 
+GetPot::operator()(const char* VarName, unsigned int Default) const
+{
+  const variable*  sv = __find_variable(VarName);
+  if( sv == 0 ) return Default;
+  return __convert_to_type(sv->original, Default);
+}
 
 inline double
 GetPot::operator()(const char* VarName, double Default) const
