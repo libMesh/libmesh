@@ -1,0 +1,63 @@
+These libraries are copyright AMTEC Engineering.
+http://www.amtec.com
+
+The libraries may be distributed.
+
+-----------------------------------------------
+
+
+
+
+
+
+There should be no problem with you distributing the tecio.a file.
+
+best regards,
+Greg
+ 
+--------------------------------------------
+Greg Tsou
+QA Tester and Tech Support
+AMTEC ENGINEERING, INC.
+E-mail: greg@amtec.com 
+Phone: (425)653-1200x279
+Fax : (425)653-9200
+http://www.amtec.com/tecplot
+-------------------------------------------
+============================================
+Enjoy the View. . . NEW Tecplot 9.2!
+Tecplot Info: http://www.amtec.com/tecplot
+E-newsletter: http://www.amtec.com/contours
+Call: (425) 653-9393
+E-mail: info@amtec.com 
+============================================
+
+
+-----Original Message-----
+From: benkirk@cfdlab.ae.utexas.edu [mailto:benkirk@cfdlab.ae.utexas.edu]
+
+Sent: Monday, January 20, 2003 10:51 AM
+To: .Amtec Support
+Subject: Scope: General
+
+
+--------------------------------------------------
+TECH SUPPORT REQUEST
+1/20/2003 10:51:23 AM
+--------------------------------------------------
+Vendor:  support@amtec.com
+
+Name:  Benjamin Kirk
+Email:  benkirk@cfdlab.ae.utexas.edu
+License No.:  L09745
+
+Product:  Tecplot 8.0
+Platform:  Linux
+Scope:  General
+--------------------------------------------------
+This is really a general TECPLOT licesning question.
+
+Is it possible to distribute the tecio.a library with my GNU LGPL'd
+library?  I would like to be able to generate tecplot binary files with
+the library.
+
