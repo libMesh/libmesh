@@ -232,14 +232,13 @@ void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
 
   // Make sure the sizes are compatible
   libmesh_assert(n_cols == arg.size());
-  libmesh_assert(n_rows == dest.size());
 
-  dest.zero();
-  DenseMatrix<T> A(*this);
+  // Resize and clear dest
+  dest.resize(n_rows);
 
   for(unsigned int i=0; i<n_rows; i++)
     for(unsigned int j=0; j<n_cols; j++)
-      dest(i) += A(i,j)*arg(j);
+      dest(i) += (*this)(i,j)*arg(j);
 }
 
 template<typename T>
