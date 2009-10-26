@@ -93,9 +93,19 @@ public:
   FEMNormType type(unsigned int var) const;
 
   /**
+   * Sets the type of the norm in variable \p var
+   */
+  void set_type(unsigned int var, const FEMNormType& t);
+
+  /**
    * Returns the weight corresponding to the norm in variable \p var
    */
   Real weight(unsigned int var) const;
+
+  /**
+   * Sets the weight corresponding to the norm in variable \p var
+   */
+  void set_weight(unsigned int var, Real w);
 
   /**
    * Returns the squared weight corresponding to the norm in variable
@@ -189,6 +199,19 @@ FEMNormType SystemNorm::type(unsigned int var) const
 }
 
 
+
+inline
+void SystemNorm::set_type(unsigned int var, const FEMNormType &t)
+{
+  libmesh_assert (!_norms.empty());
+  
+  if (var >= _norms.size())
+    _norms.resize(var+1, _norms.back());
+
+  _norms[var] = t;
+}
+
+
 inline
 Real SystemNorm::weight(unsigned int var) const
 {
@@ -197,6 +220,18 @@ Real SystemNorm::weight(unsigned int var) const
   unsigned int i = (var < _weights.size()) ? var : _weights.size() - 1;
 
   return _weights[i];
+}
+
+
+inline
+void SystemNorm::set_weight(unsigned int var, Real w)
+{
+  libmesh_assert (!_weights.empty());
+  
+  if (var >= _weights.size())
+    _weights.resize(var+1, _weights.back());
+
+  _weights[var] = w;
 }
 
 
