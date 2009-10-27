@@ -100,32 +100,12 @@ void LinearImplicitSystem::solve ()
 
   // Solve the linear system.  Several cases:
   std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
-  if(_shell_matrix!=NULL)
-    {
-      if(this->have_matrix("Preconditioner"))
-	{
-	  // 1.) Shell matrix plus user-supplied preconditioner.
-	  rval = linear_solver->solve(*_shell_matrix, this->get_matrix("Preconditioner"), *solution, *rhs, tol, maxits);
-	}
-      else
-	{
-	  // 2.) Shell matrix without user-supplied preconditioner.
-	  rval = linear_solver->solve(*_shell_matrix, *solution, *rhs, tol, maxits);
-	}
-    }
+  if(_shell_matrix)
+    // 1.) Shell matrix with or without user-supplied preconditioner.
+    rval = linear_solver->solve(*_shell_matrix, this->request_matrix("Preconditioner"), *solution, *rhs, tol, maxits);
   else
-    {
-      if(this->have_matrix("Preconditioner"))
-	{
-	  // 3.) No shell matrix, but with user-supplied preconditioner
-	  rval = linear_solver->solve (*matrix, this->get_matrix("Preconditioner"), *solution, *rhs, tol, maxits);
-	}
-      else
-	{
-	  // 4.) No shell matrix, and use system matrix for the preconditioner
-	  rval = linear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
-	}
-    }
+    // 2.) No shell matrix, with or without user-supplied preconditioner
+    rval = linear_solver->solve (*matrix, this->request_matrix("Preconditioner"), *solution, *rhs, tol, maxits);
 
   // Store the number of linear iterations required to
   // solve and the final residual.
