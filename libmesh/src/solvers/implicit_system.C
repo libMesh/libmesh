@@ -190,6 +190,32 @@ SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string& mat_name)
 
 
 
+const SparseMatrix<Number> * ImplicitSystem::request_matrix (const std::string& mat_name) const
+{
+  // Make sure the matrix exists
+  const_matrices_iterator pos = _matrices.find (mat_name);
+  
+  if (pos == _matrices.end())
+    return NULL;
+  
+  return pos->second;
+}
+
+
+
+SparseMatrix<Number> * ImplicitSystem::request_matrix (const std::string& mat_name)
+{
+  // Make sure the matrix exists
+  matrices_iterator pos = _matrices.find (mat_name);
+  
+  if (pos == _matrices.end())
+    return NULL;
+  
+  return pos->second;
+}
+
+
+
 const SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string& mat_name) const
 {
   // Make sure the matrix exists

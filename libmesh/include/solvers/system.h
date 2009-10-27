@@ -326,6 +326,32 @@ public:
   bool have_vector (const std::string& vec_name) const;
   
   /**
+   * @returns a const pointer to the vector if this \p System has a
+   * vector associated with the given name, \p NULL otherwise.
+   */
+  const NumericVector<Number> * request_vector (const std::string& vec_name) const;
+  
+  /**
+   * @returns a pointer to the vector if this \p System has a
+   * vector associated with the given name, \p NULL otherwise.
+   */
+  NumericVector<Number> * request_vector (const std::string& vec_name);
+  
+  /**
+   * @returns a const pointer to this system's @e additional vector
+   * number \p vec_num (where the vectors are counted starting with
+   * 0), or returns \p NULL if the system has no such vector.
+   */
+  const NumericVector<Number> * request_vector (const unsigned int vec_num) const;
+
+  /**
+   * @returns a writeable pointer to this system's @e additional
+   * vector number \p vec_num (where the vectors are counted starting
+   * with 0), or returns \p NULL if the system has no such vector.
+   */
+  NumericVector<Number> * request_vector (const unsigned int vec_num);
+
+  /**
    * @returns a const reference to this system's @e additional vector
    * named \p vec_name.  Access is only granted when the vector is already
    * properly initialized.
