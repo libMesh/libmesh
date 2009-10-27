@@ -548,6 +548,64 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
 
 
 
+const NumericVector<Number> * System::request_vector (const std::string& vec_name) const
+{
+  const_vectors_iterator pos = _vectors.find(vec_name);
+  
+  if (pos == _vectors.end())
+    return NULL;
+  
+  return pos->second;
+}
+
+
+
+NumericVector<Number> * System::request_vector (const std::string& vec_name)
+{
+  vectors_iterator pos = _vectors.find(vec_name);
+  
+  if (pos == _vectors.end())
+    return NULL;
+  
+  return pos->second;
+}
+
+
+
+const NumericVector<Number> * System::request_vector (const unsigned int vec_num) const
+{
+  const_vectors_iterator v = vectors_begin();
+  const_vectors_iterator v_end = vectors_end();
+  unsigned int num = 0;
+  while((num<vec_num) && (v!=v_end))
+    {
+      num++;
+      ++v;
+    }
+  if (v==v_end)
+    return NULL;
+  return v->second;
+}
+
+
+
+NumericVector<Number> * System::request_vector (const unsigned int vec_num)
+{
+  vectors_iterator v = vectors_begin();
+  vectors_iterator v_end = vectors_end();
+  unsigned int num = 0;
+  while((num<vec_num) && (v!=v_end))
+    {
+      num++;
+      ++v;
+    }
+  if (v==v_end)
+    return NULL;
+  return v->second;
+}
+
+
+
 const NumericVector<Number> & System::get_vector (const std::string& vec_name) const
 {
   // Make sure the vector exists

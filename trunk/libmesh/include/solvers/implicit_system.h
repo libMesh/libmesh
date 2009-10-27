@@ -128,6 +128,20 @@ public:
   bool have_matrix (const std::string& mat_name) const;
 
   /**
+   * @returns a const pointer to this system's @e additional matrix
+   * named \p mat_name, or returns \p NULL if no matrix by that name
+   * exists.
+   */
+  const SparseMatrix<Number> * request_matrix (const std::string& mat_name) const;
+
+  /**
+   * @returns a writable pointer to this system's @e additional matrix
+   * named \p mat_name, or returns \p NULL if no matrix by that name
+   * exists.
+   */
+  SparseMatrix<Number> * request_matrix (const std::string& mat_name);
+
+  /**
    * @returns a const reference to this system's @e additional matrix
    * named \p mat_name.  @e None of these matrices is involved in the 
    * solution process.  Access is only granted when the matrix is already
