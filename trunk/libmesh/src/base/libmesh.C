@@ -241,6 +241,10 @@ void _init (int &argc, char** & argv,
 
 int _close ()
 {
+  // We can't delete, finalize, etc. more than once without
+  // reinitializing in between
+  libmesh_assert(!libMesh::closed());
+
   // Delete reference counted singleton(s)
   delete remote_elem;
 
