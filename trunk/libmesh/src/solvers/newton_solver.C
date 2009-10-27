@@ -341,17 +341,12 @@ unsigned int NewtonSolver::solve()
         std::cout << "Linear solve starting, tolerance " 
                   << current_linear_tolerance << std::endl;
 
-      // Solve the linear system.  Two cases:
+      // Solve the linear system.
       const std::pair<unsigned int, Real> rval =
-        (_system.have_matrix("Preconditioner")) ?
-      // 1.) User-supplied preconditioner
-        linear_solver->solve (matrix, _system.get_matrix("Preconditioner"),
+        linear_solver->solve (matrix, _system.request_matrix("Preconditioner"),
                               linear_solution, rhs, current_linear_tolerance,
-                              max_linear_iterations) :
-      // 2.) Use system matrix for the preconditioner
-        linear_solver->solve (matrix, linear_solution, rhs,
-                              current_linear_tolerance, 
                               max_linear_iterations);
+
       // We may need to localize a parallel solution
       _system.update ();
       // The linear solver may not have fit our constraints exactly

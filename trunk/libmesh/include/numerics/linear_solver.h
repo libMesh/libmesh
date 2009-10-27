@@ -130,8 +130,7 @@ public:
   /**
    * This function calls the solver
    * "_solver_type" preconditioned with the
-   * "_preconditioner_type" preconditioner.  Note that this method
-   * will compute the preconditioner from the system matrix.
+   * "_preconditioner_type" preconditioner.
    */
   virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Matrix
 					       SparseMatrix<T>&,  // Preconditioning Matrix
@@ -139,6 +138,19 @@ public:
 					       NumericVector<T>&, // RHS vector
 					       const double,      // Stopping tolerance
 					       const unsigned int) = 0; // N. Iterations
+  
+  /**
+   * This function calls the solver "_solver_type" preconditioned with
+   * the "_preconditioner_type" preconditioner.  The preconditioning
+   * matrix is used if it is provided, or the system matrix is used if
+   * \p precond_matrix is null
+   */
+  std::pair<unsigned int, Real> solve (SparseMatrix<T>& matrix,
+				       SparseMatrix<T>* precond_matrix,
+				       NumericVector<T>&, // Solution vector
+				       NumericVector<T>&, // RHS vector
+				       const double,      // Stopping tolerance
+				       const unsigned int); // N. Iterations
   
 
 
@@ -165,6 +177,17 @@ public:
 					       const double,      // Stopping tolerance
 					       const unsigned int) = 0; // N. Iterations
   
+
+  /**
+   * This function solves a system whose matrix is a shell matrix, but
+   * an optional sparse matrix may be used as preconditioning matrix.
+   */
+  std::pair<unsigned int, Real> solve (const ShellMatrix<T>& matrix,
+				       const SparseMatrix<T>* precond_matrix,
+				       NumericVector<T>&, // Solution vector
+				       NumericVector<T>&, // RHS vector
+				       const double,      // Stopping tolerance
+				       const unsigned int); // N. Iterations
 
 
   /**
@@ -229,5 +252,41 @@ LinearSolver<T>::~LinearSolver ()
 {
   this->clear ();
 }
+
+
+
+template <typename T>
+inline
+std::pair<unsigned int, Real> 
+LinearSolver<T>::solve (SparseMatrix<T>&   mat,
+		        SparseMatrix<T>*   pc_mat,
+		        NumericVector<T>&  sol,
+		        NumericVector<T>&  rhs,
+		        const double       tol,
+		        const unsigned int n_iter)
+{
+  if (pc_mat)
+    return this->solve(mat, *pc_mat, sol, rhs, tol, n_iter);
+  else
+    return this->solve(mat, sol, rhs, tol, n_iter);
+}
+
+
+template <typename T>
+inline
+std::pair<unsigned int, Real> 
+LinearSolver<T>::solve (const ShellMatrix<T>&  mat,
+		        const SparseMatrix<T>* pc_mat,
+		        NumericVector<T>&      sol,
+		        NumericVector<T>&      rhs,
+		        const double           tol,
+		        const unsigned int     n_iter)
+{
+  if (pc_mat)
+    return this->solve(mat, *pc_mat, sol, rhs, tol, n_iter);
+  else
+    return this->solve(mat, sol, rhs, tol, n_iter);
+}
+
 
 #endif // #ifdef __solver_h__
