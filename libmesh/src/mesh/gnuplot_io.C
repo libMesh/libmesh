@@ -94,44 +94,50 @@ void GnuPlotIO::write_solution(const std::string& fname,
       << "reset\n"
       << "set title \"" << _title << "\"\n"
       << "set xlabel \"x\"\n"
-      << "set autoscale\n"
       << "set xtics nomirror\n";
-      
-  if(_grid)
+
+  // Loop over the elements to find the minimum and maximum x values,
+  // and also to find the element boundaries to write out as xtics
+  // if requested.
+  Real x_min, x_max;
+
+  // construct string for xtic positions at element edges
+  std::stringstream xtics_stream;
+
+  MeshBase::const_element_iterator it = mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end_it =
+    mesh.active_elements_end();
+
+  unsigned int count = 0;
+  unsigned int n_active_elem = mesh.n_active_elem();
+
+  for( ; it != end_it; ++it)
   {
-    // construct string for xtic positions at element edges
-    std::string xtics;
-    std::stringstream xtics_stream;
+    Elem* el = *it;
 
-    MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator end_it =
-      mesh.active_local_elements_end();
-
-    unsigned int count = 0;
-    unsigned int n_active_elem = mesh.n_active_elem();
-
-    for( ; it != end_it; ++it)
+    // if el is the left edge of the mesh, print its left node position
+    if(el->neighbor(0) == NULL)
     {
-      Elem* el = *it;
-      
-      // if el is the left edge of the mesh, print its left node position
-      if(el->neighbor(0) == NULL)
-      {
-        xtics_stream << "\"\" " << (*(el->get_node(0)))(0) << ", \\\n";
-      }
-      xtics_stream << "\"\" " << (*(el->get_node(1)))(0);
-
-      if(count+1 != n_active_elem)
-      {
-         xtics_stream << ", \\\n";
-      }
-      count++;
+      x_min = (*(el->get_node(0)))(0);
+      xtics_stream << "\"\" " << x_min << ", \\\n";
     }
-    xtics = xtics_stream.str();
-    
-  
-    out << "set x2tics (" << xtics << ")\nset grid noxtics noytics x2tics\n";
+    if(el->neighbor(1) == NULL)
+    {
+      x_max = (*(el->get_node(1)))(0);
+    }
+    xtics_stream << "\"\" " << (*(el->get_node(1)))(0);
+
+    if(count+1 != n_active_elem)
+    {
+        xtics_stream << ", \\\n";
+    }
+    count++;
   }
+
+  out << "set xrange [" << x_min << ":" << x_max << "]\n";
+
+  if(_grid)
+    out << "set x2tics (" << xtics_stream.str() << ")\nset grid noxtics noytics x2tics\n";
 
   if(_png_output)
   {
@@ -172,10 +178,9 @@ void GnuPlotIO::write_solution(const std::string& fname,
   map_type node_map;
 
 
-  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+  it  = mesh.active_elements_begin();
 
-  for ( ; it != end; ++it)
+  for ( ; it != end_it; ++it)
   {
     const Elem* elem = *it;
 
