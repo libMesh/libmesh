@@ -1,0 +1,195 @@
+
+
+// $Id$
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+#ifndef __qoi_set_h__
+#define __qoi_set_h__
+
+
+// C++ Includes   -----------------------------------
+#include <vector>
+
+// Local Includes -----------------------------------
+#include "libmesh_common.h"
+
+// Forward Declarations -----------------------------
+class System;
+
+  /**
+   * Data structure for specifying which Quantities of Interest
+   * should be calculated in an adjoint or a parameter sensitivity
+   * calculation.
+   */
+class QoISet
+{
+public: 
+  class iterator
+  {
+  public:
+    iterator(unsigned int i, std::vector<bool>& v) : _i(i), _vecbool(v)
+      {
+        while (_i < _vecbool.size() && !_vecbool[_i])
+          _i++;
+      }
+
+    unsigned int operator*() const { return _i; }
+
+    iterator& operator++()
+      {
+        do {
+          _i++;
+        } while (_i < _vecbool.size() && !_vecbool[_i]);
+        return *this;
+      }
+
+    iterator operator++(int) {
+      iterator it = *this;
+      ++(*this);
+      return it;
+    }
+
+    bool operator==(const iterator &other) const {
+      libmesh_assert(&_vecbool == &other._vecbool);
+      return _i == other._i;
+    }
+
+    bool operator!=(const iterator &other) const {
+      libmesh_assert(&_vecbool == &other._vecbool);
+      return _i != other._i;
+    }
+
+  private:
+
+    unsigned int _i;
+
+    std::vector<bool>& _vecbool;
+  };
+
+  /**
+   * Empty constructor: "calculate all QoIs in the System"
+   *
+   * No further changes to this special QoISet should be made;
+   * it doesn't even know how many QoIs your system has, it
+   * just knows to instruct a function to use all of them.
+   */
+  QoISet() {}
+
+  /**
+   * Default constructor: "calculate all QoIs in the System"
+   */
+  QoISet(const System &sys);
+
+  /**
+   * Constructor-from-vector-of-bool: "calculate the QoIs for which
+   * \p indices[q] is true"
+   */
+  QoISet(const std::vector<bool> &indices) : _indices(indices) {}
+
+  /**
+   * Constructor-from-vector: "calculate the listed QoIs"
+   */
+  QoISet(const std::vector<unsigned int> &indices);
+
+  /**
+   * Resets to "calculate all QoIs"
+   */
+  void clear() { _indices.clear(); }
+
+  /**
+   * Returns the number of QoIs that would be computed for the
+   * System \p sys
+   */
+  unsigned int size(const System& sys) const;
+
+  /**
+   * Add this indices to the set to be calculated
+   */
+  void add_indices(const std::vector<unsigned int> &indices);
+
+  /**
+   * Add this index to the set to be calculated
+   */
+  void add_index(unsigned int);
+
+  /**
+   * Remove these indices from the set to be calculated
+   */
+  void remove_indices(const std::vector<unsigned int> &indices);
+
+  /**
+   * Remove this index from the set to be calculated
+   */
+  void remove_index(unsigned int);
+
+  /**
+   * Return whether or not this index is in the set to be calculated
+   */
+  bool has_index(unsigned int) const;
+
+private: 
+  /**
+   * Interpret _indices.empty() to mean "calculate all indices"
+   */
+  std::vector<bool> _indices;
+};
+
+
+
+// ------------------------------------------------------------
+// QoISet inline methods
+
+
+
+inline
+QoISet::QoISet(const std::vector<unsigned int> &indices) 
+{
+  this->add_indices(indices);
+}
+
+
+
+inline
+void QoISet::add_index(unsigned int i)
+{
+  if (i >= _indices.size())
+    _indices.resize(i+1);
+  _indices[i] = true;
+}
+
+
+
+inline
+void QoISet::remove_index(unsigned int i)
+{
+  libmesh_assert(i < _indices.size());
+  _indices[i] = false;
+}
+
+
+
+inline
+bool QoISet::has_index(unsigned int i) const
+{
+  return (_indices.size() <= i || _indices[i]);
+}
+
+#endif // #define __qoi_set_h__

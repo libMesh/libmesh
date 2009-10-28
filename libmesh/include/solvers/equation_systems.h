@@ -231,12 +231,22 @@ public:
   /**
    * Call \p adjoint_solve on all the individual equation systems.
    *
-   * By default this function solves each equation system once,
+   * By default this function solves each system's adjoint once,
    * in the reverse order from that in which they were added.  For
    * more sophisticated decoupled problems the user may with to
    * override this behavior in a derived class.
    */
-  virtual void adjoint_solve ();
+  virtual void adjoint_solve (const QoISet& qoi_indices = QoISet());
+
+  /**
+   * Call \p sensitivity_solve on all the individual equation systems.
+   *
+   * By default this function solves each sensitivity system once,
+   * in the order in which in which they were added.  For
+   * more sophisticated decoupled problems the user may with to
+   * override this behavior in a derived class.
+   */
+  virtual void sensitivity_solve (const ParameterVector& parameters);
 
   /**
    * Fill the input vector \p var_names with the names

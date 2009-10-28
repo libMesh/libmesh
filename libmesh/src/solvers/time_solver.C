@@ -30,7 +30,7 @@ TimeSolver::TimeSolver (sys_type& s)
   : quiet (true),
     reduce_deltat_on_diffsolver_failure (0),
     _diff_solver (NULL),
-    _adjoint_solver (NULL),
+    _linear_solver (NULL),
     _system (s)
 {
 }
@@ -46,7 +46,7 @@ TimeSolver::~TimeSolver ()
 void TimeSolver::reinit ()
 {
   _diff_solver->reinit();
-  _adjoint_solver->reinit();
+  _linear_solver->reinit();
 }
 
 
@@ -58,11 +58,11 @@ void TimeSolver::init ()
   if (_diff_solver.get() == NULL)
     _diff_solver = DiffSolver::build(_system);
 
-  if (_adjoint_solver.get() == NULL)
-    _adjoint_solver = DiffSolver::build(_system);
+  if (_linear_solver.get() == NULL)
+    _linear_solver = DiffSolver::build(_system);
 
   _diff_solver->init();
-  _adjoint_solver->init();
+  _linear_solver->init();
 }
 
 
@@ -74,9 +74,16 @@ void TimeSolver::solve ()
 
 
 
-void TimeSolver::adjoint_solve ()
+void TimeSolver::sensitivity_solve (const ParameterVector& parameters)
 {
-  _adjoint_solver->adjoint_solve();
+  _linear_solver->sensitivity_solve(parameters);
+}
+
+
+
+void TimeSolver::adjoint_solve (const QoISet& qoi_indices)
+{
+  _linear_solver->adjoint_solve(qoi_indices);
 }
 
 

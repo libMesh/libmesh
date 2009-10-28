@@ -216,7 +216,8 @@ public:
    * Users may have to override this function for quantities of
    * interest that are not expressible as a sum of element qois.
    */
-  virtual void assemble_qoi ();
+  virtual void assemble_qoi
+    (const QoISet& indices = QoISet());
 
   /**
    * Runs a qoi derivative assembly loop over all elements, and if
@@ -225,7 +226,8 @@ public:
    * Users may have to override this function for quantities of
    * interest that are not expressible as a sum of element qois.
    */
-  virtual void assemble_qoi_derivative ();
+  virtual void assemble_qoi_derivative
+    (const QoISet& indices = QoISet());
 
   /**
    * If fe_reinit_during_postprocess is true (it is true by default), FE

@@ -27,6 +27,8 @@
 #include "equation_systems.h"
 #include "libmesh_logging.h"
 #include "numeric_vector.h" // for parameter sensitivity calcs
+#include "parameter_vector.h"
+#include "sensitivity_data.h"
 #include "sparse_matrix.h" // for get_transpose
 
 
@@ -72,6 +74,54 @@ void LinearImplicitSystem::reinit ()
   
   // initialize parent data
   Parent::reinit();  
+}
+
+
+
+void LinearImplicitSystem::assemble_residual_derivatives(const ParameterVector& parameters)
+{
+  const unsigned int Np = parameters.size();
+  Real deltap = TOLERANCE;
+
+  for (unsigned int p=0; p != Np; ++p)
+    {
+      NumericVector<Number> &sensitivity_rhs = this->add_sensitivity_rhs(p);
+
+      // R(p) = b(p) - A(p)*u(p)
+      //
+      // (partial R / partial p) =
+      // (partial b / partial p) - (partial A / partial p) * u
+      //
+      // Approximate -(partial R / partial p) by
+      // (b(p-dp) - A(p-dp)*u - b(p+dp) + A(p+dp)*u) / (2*dp)
+
+      Number old_parameter = *parameters[p];
+      *parameters[p] += deltap;
+
+      this->assemble();
+      this->rhs->close();
+      this->matrix->close();
+      sensitivity_rhs = *this->rhs;
+
+      // PETSc doesn't implement SGEMX, so neither does NumericVector,
+      // so here's a hackish workaround for v-=A*u:
+      sensitivity_rhs *= -1;
+      sensitivity_rhs.add_vector(*this->solution, *this->matrix);
+      sensitivity_rhs *= -1;
+
+      *parameters[p] = old_parameter + deltap;
+
+      this->assemble();
+      this->rhs->close();
+      this->matrix->close();
+      sensitivity_rhs -= *this->rhs;
+      sensitivity_rhs.add_vector(*this->solution, *this->matrix);
+
+      sensitivity_rhs /= (2*deltap);
+      sensitivity_rhs.close();
+
+      *parameters[p] = old_parameter;
+    }
 }
 
 
@@ -122,22 +172,66 @@ void LinearImplicitSystem::solve ()
 
 
 
-void LinearImplicitSystem::adjoint_solve ()
+void LinearImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
 {
-  // The adjoint_solve API (and all APIs using it) are about to see a
-  // series of non-backwards-compatible changes, primarily to add
-  // multiple-QoI support
-  libmesh_experimental();
+  if (this->assemble_before_solve)
+    {
+      // Assemble the linear system
+      this->assemble (); 
+
+      // But now assemble right hand sides with the residual's
+      // parameter derivatives
+      this->assemble_residual_derivatives(parameters);
+    }
+
+  // Get a reference to the EquationSystems
+  const EquationSystems& es =
+    this->get_equation_systems();
+  
+  // Get the user-specifiied linear solver tolerance
+  const Real tol            =
+    es.parameters.get<Real>("sensitivity solver tolerance");
+
+  // Get the user-specified maximum # of linear solver iterations
+  const unsigned int maxits =
+    es.parameters.get<unsigned int>("sensitivity solver maximum iterations");
+
+  // Our iteration counts and residuals will be sums of the individual
+  // results
+  _n_linear_iterations = 0;
+  _final_linear_residual = 0.0;
+  std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
+
+  // Solve the linear system.
+  SparseMatrix<Number> *pc = this->request_matrix("Preconditioner");
+  for (unsigned int p=0; p != parameters.size(); ++p)
+    {
+      rval = linear_solver->solve (*matrix, pc,
+				   this->get_sensitivity_solution(p),
+                                   this->get_sensitivity_rhs(p), tol, maxits);
+      _n_linear_iterations   += rval.first;
+      _final_linear_residual += rval.second;
+    }
+
+  // Our matrix is the *negative* of the Jacobian for b-A*u, so our
+  // solutions are all inverted
+  for (unsigned int p=0; p != parameters.size(); ++p)
+    {
+      this->get_sensitivity_solution(p) *= -1.0;
+    }
+}
+
+
+
+void LinearImplicitSystem::adjoint_solve (const QoISet &qoi_indices)
+{
+  const unsigned int Nq = this->qoi.size();
 
   // We currently don't support adjoint solves of shell matrices
   // FIXME - we should let shell matrices support
   // vector_transpose_mult so that we can use them here.
   if(_shell_matrix!=NULL)
     libmesh_not_implemented();
-
-  // Adding an adjoint_solution vector, allocate an adjoint_solution if it doesn't already exist 
-
-  NumericVector<Number> & adjoint_solution = System::add_vector("adjoint_solution");     
 
   if (this->assemble_before_solve)
     {
@@ -148,15 +242,13 @@ void LinearImplicitSystem::adjoint_solve ()
       matrix->get_transpose(*matrix);
 
       // Including of any separate preconditioner
-      if(this->have_matrix("Preconditioner"))
-        {
-          SparseMatrix<Number> &pre = this->get_matrix("Preconditioner");
-          pre.get_transpose(pre);
-        }
+      SparseMatrix<Number> *pc = this->request_matrix("Preconditioner");
+      if(pc)
+        pc->get_transpose(*pc);
 
-      // But now replace the right hand side with the quantity of
+      // But now replace the right hand sides with the quantity of
       // interest functional's derivative
-      this->assemble_qoi_derivative();
+      this->assemble_qoi_derivative(qoi_indices);
     }
 
   // Get a reference to the EquationSystems
@@ -171,41 +263,41 @@ void LinearImplicitSystem::adjoint_solve ()
   const unsigned int maxits =
     es.parameters.get<unsigned int>("adjoint solver maximum iterations");
 
-  // Solve the linear system.  Several cases:
+  // Our iteration counts and residuals will be sums of the individual
+  // results
+  _n_linear_iterations = 0;
+  _final_linear_residual = 0.0;
   std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
-  if(this->have_matrix("Preconditioner"))
-    {
-      // 3.) No shell matrix, but with user-supplied preconditioner
-      rval = linear_solver->solve (*matrix, this->get_matrix("Preconditioner"), adjoint_solution, *rhs, tol, maxits);
-    }
-  else
-    {
-      // 4.) No shell matrix, and use system matrix for the preconditioner
-      rval = linear_solver->solve (*matrix, adjoint_solution, *rhs, tol, maxits);
-    }
 
-  // Store the number of linear iterations required to
-  // solve and the final residual.
-  _n_linear_iterations   = rval.first;
-  _final_linear_residual = rval.second;
-    
-  // Stop logging the linear solve
-  // This gets done by the LinearSolver classes now [RHS]
-  // STOP_LOG("solve()", "System");
-
-  // Update the system after the solve
-  this->update();  
+  // Solve the linear system.
+  SparseMatrix<Number> *pc = this->request_matrix("Preconditioner");
+  for (unsigned int i=0; i != Nq; ++i)
+    if (qoi_indices.has_index(i))
+      {
+	rval = linear_solver->solve (*matrix, pc,
+				     this->add_adjoint_solution(i),
+                                     this->get_adjoint_rhs(i), tol, maxits);
+        _n_linear_iterations   += rval.first;
+        _final_linear_residual += rval.second;
+      }
 }
 
 
 
-void LinearImplicitSystem::qoi_parameter_sensitivity
-  (std::vector<Number *>& parameters,
-   std::vector<Number>&   sensitivities)
+void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matrix)
 {
-  // Get ready to fill in senstivities:
-  sensitivities.clear();
-  sensitivities.resize(parameters.size(), 0);
+  _shell_matrix = shell_matrix;
+}
+
+
+
+void LinearImplicitSystem::adjoint_qoi_parameter_sensitivity
+  (const QoISet&          qoi_indices,
+   const ParameterVector& parameters,
+   SensitivityData&       sensitivities)
+{
+  const unsigned int Np = parameters.size();
+  const unsigned int Nq = this->qoi.size();
 
   // An introduction to the problem:
   //
@@ -224,7 +316,10 @@ void LinearImplicitSystem::qoi_parameter_sensitivity
   // We first do an adjoint solve:
   // A^T * z = (partial q / partial u)
 
-  this->adjoint_solve();
+  this->adjoint_solve(qoi_indices);
+
+  // Get ready to fill in senstivities:
+  sensitivities.allocate_data(qoi_indices, *this, parameters);
 
   // We use the identities:
   // dq/dp = (partial q / partial p) + (partial q / partial u) *
@@ -237,24 +332,27 @@ void LinearImplicitSystem::qoi_parameter_sensitivity
   // Leading to our final formula:
   // dq/dp = (partial q / partial p) - z * (partial R / partial p)
 
-  for (unsigned int i=0; i != parameters.size(); ++i)
+  for (unsigned int j=0; j != parameters.size(); ++j)
     {
       // We currently get partial derivatives via central differencing
       Number delta_p = 1e-6;
 
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
 
-      Number old_parameter = *parameters[i];
+      Number old_parameter = *parameters[j];
       // Number old_qoi = this->qoi;
 
-      *parameters[i] = old_parameter - delta_p;
-      this->assemble_qoi();
-      Number qoi_minus = this->qoi;
+      *parameters[j] = old_parameter - delta_p;
+      this->assemble_qoi(qoi_indices);
+      std::vector<Number> qoi_minus = this->qoi;
 
-      *parameters[i] = old_parameter + delta_p;
-      this->assemble_qoi();
-      Number qoi_plus = this->qoi;
-      Number partialq_partialp = (qoi_plus - qoi_minus) / (2.*delta_p);
+      *parameters[j] = old_parameter + delta_p;
+      this->assemble_qoi(qoi_indices);
+      std::vector<Number> &qoi_plus = this->qoi;
+      std::vector<Number> partialq_partialp(Nq, 0);
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
 
       // (partial R / partial p) = (partial b / partial p) - 
       //                           (partial A / partial p) * u
@@ -272,7 +370,7 @@ void LinearImplicitSystem::qoi_parameter_sensitivity
       partialR_partialp->add_vector(*this->solution, *this->matrix);
       *partialR_partialp *= -1;
       
-      *parameters[i] = old_parameter - delta_p;
+      *parameters[j] = old_parameter - delta_p;
       this->assemble();
       this->rhs->close();
       this->matrix->close();
@@ -282,27 +380,94 @@ void LinearImplicitSystem::qoi_parameter_sensitivity
       *partialR_partialp /= (2.*delta_p);
 
       // Don't leave the parameter changed
-      *parameters[i] = old_parameter;
+      *parameters[j] = old_parameter;
 
-      sensitivities[i] = partialq_partialp -
-			 partialR_partialp->dot(this->get_adjoint_solution());
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          sensitivities[i][j] = partialq_partialp[i] -
+            partialR_partialp->dot(this->get_adjoint_solution(i));
     }
 
   // All parameters have been reset.
   // Don't leave the qoi or system changed - principle of least
   // surprise.
   this->assemble();
-  this->assemble_qoi();
   this->rhs->close();
   this->matrix->close();
+  this->assemble_qoi(qoi_indices);
 }
 
 
 
-void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matrix)
+void LinearImplicitSystem::forward_qoi_parameter_sensitivity
+  (const QoISet&          qoi_indices,
+   const ParameterVector& parameters,
+   SensitivityData&       sensitivities)
 {
-  _shell_matrix = shell_matrix;
+  const unsigned int Np = parameters.size();
+  const unsigned int Nq = this->qoi.size();
+
+  // An introduction to the problem:
+  //
+  // A(p)*u(p) = b(p), where x is determined implicitly.
+  // Residual R(u(p),p) := b(p) - A(p)*u(p)
+  // partial R / partial u = -A
+  //
+  // This implies that:
+  // d/dp(R) = 0
+  // (partial b / partial p) - 
+  // (partial A / partial p) * u -
+  // A * (partial u / partial p) = 0
+  // A * (partial u / partial p) = (partial R / partial p)
+  //   = (partial b / partial p) - (partial A / partial p) * u
+
+  // We first solve for (partial u / partial p) for each parameter:
+  // -A * (partial u / partial p) = - (partial R / partial p)
+
+  this->sensitivity_solve(parameters);
+
+  // Get ready to fill in senstivities:
+  sensitivities.allocate_data(qoi_indices, *this, parameters);
+
+  // We use the identity:
+  // dq/dp = (partial q / partial p) + (partial q / partial u) *
+  //         (partial u / partial p)
+ 
+  // We get (partial q / partial u) from the user
+  this->assemble_qoi_derivative(qoi_indices);
+ 
+  for (unsigned int j=0; j != Np; ++j)
+    {
+      // We currently get partial derivatives via central differencing
+      Number delta_p = 1e-6;
+
+      // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
+
+      Number old_parameter = *parameters[j];
+
+      *parameters[j] = old_parameter - delta_p;
+      this->assemble_qoi(qoi_indices);
+      std::vector<Number> qoi_minus = this->qoi;
+
+      *parameters[j] = old_parameter + delta_p;
+      this->assemble_qoi(qoi_indices);
+      std::vector<Number> &qoi_plus = this->qoi;
+      std::vector<Number> partialq_partialp(Nq, 0);
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
+
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          sensitivities[i][j] = partialq_partialp[i] +
+            this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(i));
+    }
+
+  // All parameters have been reset.
+  // Don't leave the qoi or system changed - principle of least
+  // surprise.
+  this->assemble();
+  this->rhs->close();
+  this->matrix->close();
+  this->assemble_qoi(qoi_indices);
 }
-
-
-

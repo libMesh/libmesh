@@ -656,6 +656,7 @@ void FEMContext::reinit(const FEMSystem &sys, Elem *e)
   // Initialize the per-element data for elem.
   sys.get_dof_map().dof_indices (elem, dof_indices);
   unsigned int n_dofs = dof_indices.size();
+  unsigned int n_qoi = sys.qoi.size();
 
   elem_solution.resize(n_dofs);
   if (sys.use_fixed_solution)
@@ -667,6 +668,11 @@ void FEMContext::reinit(const FEMSystem &sys, Elem *e)
   // These resize calls also zero out the residual and jacobian
   elem_residual.resize(n_dofs);
   elem_jacobian.resize(n_dofs, n_dofs);
+
+  elem_qoi_derivative.resize(n_qoi);
+  elem_qoi_subderivatives.resize(n_qoi);
+  for (unsigned int q=0; q != n_qoi; ++q)
+    elem_qoi_derivative[q].resize(n_dofs);
 
   // Initialize the per-variable data for elem.
   unsigned int sub_dofs = 0;
@@ -683,6 +689,10 @@ void FEMContext::reinit(const FEMSystem &sys, Elem *e)
 
       elem_subresiduals[i]->reposition
         (sub_dofs, dof_indices_var[i].size());
+
+      for (unsigned int q=0; q != n_qoi; ++q)
+        elem_qoi_subderivatives[q][i]->reposition
+          (sub_dofs, dof_indices_var[i].size());
 
       for (unsigned int j=0; j != i; ++j)
         {

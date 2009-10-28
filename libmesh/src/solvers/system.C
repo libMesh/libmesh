@@ -24,14 +24,16 @@
 
 
 // Local includes
-#include "system.h"
+#include "dof_map.h"
 #include "equation_systems.h"
 #include "libmesh_logging.h"
-#include "utility.h"
-#include "string_to_enum.h"
-#include "dof_map.h"
-#include "numeric_vector.h"
 #include "mesh_base.h"
+#include "numeric_vector.h"
+#include "parameter_vector.h"
+#include "qoi_set.h"
+#include "string_to_enum.h"
+#include "system.h"
+#include "utility.h"
 
 // includes for calculate_norm
 #include "fe_base.h"
@@ -349,13 +351,13 @@ void System::assemble ()
 
 
 
-void System::assemble_qoi ()
+void System::assemble_qoi (const QoISet& qoi_indices)
 {
   // Log how long the user's matrix assembly code takes
   START_LOG("assemble_qoi()", "System");
   
   // Call the user-specified quantity of interest function
-  this->user_QOI();
+  this->user_QOI(qoi_indices);
 
   // Stop logging the user code
   STOP_LOG("assemble_qoi()", "System");
@@ -363,16 +365,33 @@ void System::assemble_qoi ()
 
 
 
-void System::assemble_qoi_derivative ()
+void System::assemble_qoi_derivative (const QoISet& qoi_indices)
 {
   // Log how long the user's matrix assembly code takes
   START_LOG("assemble_qoi_derivative()", "System");
   
   // Call the user-specified quantity of interest function
-  this->user_QOI_derivative();
+  this->user_QOI_derivative(qoi_indices);
 
   // Stop logging the user code
   STOP_LOG("assemble_qoi_derivative()", "System");
+}
+
+
+
+void System::qoi_parameter_sensitivity
+  (const QoISet& qoi_indices,
+   const ParameterVector& parameters,
+   SensitivityData& sensitivities)
+{
+  // Forward sensitivities are more efficient for Nq > Np
+  if (qoi_indices.size(*this) > parameters.size())
+    forward_qoi_parameter_sensitivity(qoi_indices, parameters, sensitivities);
+  // Adjoint sensitivities are more efficient for Np > Nq,
+  // and an adjoint may be more reusable than a forward 
+  // solution sensitivity in the Np == Nq case.
+  else
+    adjoint_qoi_parameter_sensitivity(qoi_indices, parameters, sensitivities);
 }
 
 
@@ -692,17 +711,121 @@ const std::string& System::vector_name (const unsigned int vec_num)
 
 
 
-NumericVector<Number> & System::get_adjoint_solution ()
+NumericVector<Number> & System::add_sensitivity_solution (unsigned int i)
 {
-  // Get the adjoint solution using the get_vector function declared above
-  return this->get_vector("adjoint_solution");
+  OStringStream sensitivity_name;
+  sensitivity_name << "sensitivity_solution" << i;
+
+  return this->add_vector(sensitivity_name.str());
+}
+
+
+NumericVector<Number> & System::get_sensitivity_solution (unsigned int i)
+{
+  OStringStream sensitivity_name;
+  sensitivity_name << "sensitivity_solution" << i;
+
+  return this->get_vector(sensitivity_name.str());
 }
 
 
 
-const NumericVector<Number> & System::get_adjoint_solution () const
+const NumericVector<Number> & System::get_sensitivity_solution (unsigned int i) const
 {
-  return this->get_vector("adjoint_solution");
+  OStringStream sensitivity_name;
+  sensitivity_name << "sensitivity_solution" << i;
+
+  return this->get_vector(sensitivity_name.str());
+}
+
+
+
+NumericVector<Number> & System::add_adjoint_solution (unsigned int i)
+{
+  OStringStream adjoint_name;
+  adjoint_name << "adjoint_solution" << i;
+
+  return this->add_vector(adjoint_name.str());
+}
+
+
+
+NumericVector<Number> & System::get_adjoint_solution (unsigned int i)
+{
+  OStringStream adjoint_name;
+  adjoint_name << "adjoint_solution" << i;
+
+  return this->get_vector(adjoint_name.str());
+}
+
+
+
+const NumericVector<Number> & System::get_adjoint_solution (unsigned int i) const
+{
+  OStringStream adjoint_name;
+  adjoint_name << "adjoint_solution" << i;
+
+  return this->get_vector(adjoint_name.str());
+}
+
+
+
+NumericVector<Number> & System::add_adjoint_rhs (unsigned int i)
+{
+  OStringStream adjoint_rhs_name;
+  adjoint_rhs_name << "adjoint_rhs" << i;
+
+  return this->add_vector(adjoint_rhs_name.str());
+}
+
+
+
+NumericVector<Number> & System::get_adjoint_rhs (unsigned int i)
+{
+  OStringStream adjoint_rhs_name;
+  adjoint_rhs_name << "adjoint_rhs" << i;
+
+  return this->get_vector(adjoint_rhs_name.str());
+}
+
+
+
+const NumericVector<Number> & System::get_adjoint_rhs (unsigned int i) const
+{
+  OStringStream adjoint_rhs_name;
+  adjoint_rhs_name << "adjoint_rhs" << i;
+
+  return this->get_vector(adjoint_rhs_name.str());
+}
+
+
+
+NumericVector<Number> & System::add_sensitivity_rhs (unsigned int i)
+{
+  OStringStream sensitivity_rhs_name;
+  sensitivity_rhs_name << "sensitivity_rhs" << i;
+
+  return this->add_vector(sensitivity_rhs_name.str());
+}
+
+
+
+NumericVector<Number> & System::get_sensitivity_rhs (unsigned int i)
+{
+  OStringStream sensitivity_rhs_name;
+  sensitivity_rhs_name << "sensitivity_rhs" << i;
+
+  return this->get_vector(sensitivity_rhs_name.str());
+}
+
+
+
+const NumericVector<Number> & System::get_sensitivity_rhs (unsigned int i) const
+{
+  OStringStream sensitivity_rhs_name;
+  sensitivity_rhs_name << "sensitivity_rhs" << i;
+
+  return this->get_vector(sensitivity_rhs_name.str());
 }
 
 
@@ -1159,8 +1282,9 @@ void System::attach_constraint_function(void fptr(EquationSystems& es,
 
 
 
-void System::attach_QOI_function(void fptr(EquationSystems& es,
-					   const std::string& name))
+void System::attach_QOI_function(void fptr(EquationSystems&,
+					   const std::string&,
+                                           const QoISet&))
 {
   libmesh_assert (fptr != NULL);
   
@@ -1169,8 +1293,9 @@ void System::attach_QOI_function(void fptr(EquationSystems& es,
 
 
 
-void System::attach_QOI_derivative(void fptr(EquationSystems& es,
-					     const std::string& name))
+void System::attach_QOI_derivative(void fptr(EquationSystems&,
+					     const std::string&,
+                                             const QoISet&))
 {
   libmesh_assert (fptr != NULL);
   
@@ -1208,20 +1333,20 @@ void System::user_constrain ()
 
 
 
-void System::user_QOI ()
+void System::user_QOI (const QoISet& qoi_indices)
 {
   // Call the user-provided quantity of interest function, 
   // if it was provided
   if(_qoi_evaluate != NULL)
-    this->_qoi_evaluate(_equation_systems, this->name());
+    this->_qoi_evaluate(_equation_systems, this->name(), qoi_indices);
 }
 
 
 
-void System::user_QOI_derivative ()
+void System::user_QOI_derivative (const QoISet& qoi_indices)
 {
   // Call the user-provided quantity of interest derivative, 
   // if it was provided
   if(_qoi_evaluate_derivative != NULL)
-    this->_qoi_evaluate_derivative(_equation_systems, this->name());
+    this->_qoi_evaluate_derivative(_equation_systems, this->name(), qoi_indices);
 }

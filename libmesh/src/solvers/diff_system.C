@@ -21,6 +21,9 @@
 #include "diff_system.h"
 #include "dof_map.h"
 #include "numeric_vector.h"
+#include "parameter_vector.h"
+#include "qoi_set.h"
+#include "sensitivity_data.h"
 #include "time_solver.h"
 
 
@@ -102,6 +105,40 @@ void DifferentiableSystem::assemble ()
 
 
 
+void DifferentiableSystem::assemble_residual_derivatives(const ParameterVector& parameters)
+{
+  const unsigned int Np = parameters.size();
+  Real deltap = TOLERANCE;
+
+  for (unsigned int p=0; p != Np; ++p)
+    {
+      NumericVector<Number> &sensitivity_rhs = this->add_sensitivity_rhs(p);
+
+      // Approximate -(partial R / partial p) by
+      // (R(p-dp) - R(p+dp)) / (2*dp)
+
+      Number old_parameter = *parameters[p];
+      *parameters[p] -= deltap;
+
+      this->assembly(true, false);
+      this->rhs->close();
+      sensitivity_rhs = *this->rhs;
+
+      *parameters[p] = old_parameter + deltap;
+
+      this->assembly(true, false);
+      this->rhs->close();
+
+      sensitivity_rhs -= *this->rhs;
+      sensitivity_rhs /= (2*deltap);
+      sensitivity_rhs.close();
+
+      *parameters[p] = old_parameter;
+    }
+}
+
+
+
 void DifferentiableSystem::solve ()
 {
   time_solver->solve();
@@ -109,20 +146,27 @@ void DifferentiableSystem::solve ()
 
 
 
-void DifferentiableSystem::adjoint_solve ()
+void DifferentiableSystem::sensitivity_solve (const ParameterVector& parameters)
 {
-  time_solver->adjoint_solve();
+  time_solver->sensitivity_solve(parameters);
 }
 
 
 
-void DifferentiableSystem::qoi_parameter_sensitivity
-  (std::vector<Number *>& parameters,
-   std::vector<Number>&   sensitivities)
+void DifferentiableSystem::adjoint_solve (const QoISet& qoi_indices)
 {
-  // Get ready to fill in senstivities:
-  sensitivities.clear();
-  sensitivities.resize(parameters.size(), 0);
+  time_solver->adjoint_solve(qoi_indices);
+}
+
+
+
+void DifferentiableSystem::adjoint_qoi_parameter_sensitivity
+  (const QoISet& qoi_indices,
+   const ParameterVector& parameters,
+   SensitivityData& sensitivities)
+{
+  const unsigned int Np = parameters.size();
+  const unsigned int Nq = qoi.size();
 
   // An introduction to the problem:
   //
@@ -137,7 +181,10 @@ void DifferentiableSystem::qoi_parameter_sensitivity
   // We first do an adjoint solve:
   // J^T * z = (partial q / partial u)
 
-  this->adjoint_solve();
+  this->adjoint_solve(qoi_indices);
+
+  // Get ready to fill in senstivities:
+  sensitivities.allocate_data(qoi_indices, *this, parameters);
 
   // We use the identities:
   // dq/dp = (partial q / partial p) + (partial q / partial u) *
@@ -150,7 +197,7 @@ void DifferentiableSystem::qoi_parameter_sensitivity
   // Leading to our final formula:
   // dq/dp = (partial q / partial p) - z * (partial R / partial p)
 
-  for (unsigned int i=0; i != parameters.size(); ++i)
+  for (unsigned int j=0; j != Np; ++j)
     {
       // We currently get partial derivatives via central differencing
       Number delta_p = 1e-6;
@@ -158,22 +205,26 @@ void DifferentiableSystem::qoi_parameter_sensitivity
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
       // (partial R / partial p) ~= (rhs(p+dp) - rhs(p-dp))/(2*dp)
 
-      Number old_parameter = *parameters[i];
+      Number old_parameter = *parameters[j];
       // Number old_qoi = this->qoi;
 
-      *parameters[i] = old_parameter - delta_p;
-      this->assemble_qoi();
-      Number qoi_minus = this->qoi;
+      *parameters[j] = old_parameter - delta_p;
+      this->assemble_qoi(qoi_indices);
+      std::vector<Number> qoi_minus = this->qoi;
 
       this->assembly(true, false);
       this->rhs->close();
       AutoPtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
       *partialR_partialp *= -1;
 
-      *parameters[i] = old_parameter + delta_p;
-      this->assemble_qoi();
-      Number qoi_plus = this->qoi;
-      Number partialq_partialp = (qoi_plus - qoi_minus) / (2.*delta_p);
+      *parameters[j] = old_parameter + delta_p;
+      this->assemble_qoi(qoi_indices);
+      std::vector<Number>& qoi_plus = this->qoi;
+
+      std::vector<Number> partialq_partialp(Nq, 0);
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
 
       this->assembly(true, false);
       this->rhs->close();
@@ -181,10 +232,12 @@ void DifferentiableSystem::qoi_parameter_sensitivity
       *partialR_partialp /= (2.*delta_p);
 
       // Don't leave the parameter changed
-      *parameters[i] = old_parameter;
+      *parameters[j] = old_parameter;
 
-      sensitivities[i] = partialq_partialp -
-			 partialR_partialp->dot(this->get_adjoint_solution());
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          sensitivities[i][j] = partialq_partialp[i] -
+            partialR_partialp->dot(this->get_adjoint_solution(i));
     }
 
   // All parameters have been reset.
@@ -193,4 +246,78 @@ void DifferentiableSystem::qoi_parameter_sensitivity
   this->assembly(true, false);
   this->rhs->close();
   this->assemble_qoi();
+}
+
+
+
+void DifferentiableSystem::forward_qoi_parameter_sensitivity
+  (const QoISet& qoi_indices,
+   const ParameterVector& parameters,
+   SensitivityData& sensitivities)
+{
+  const unsigned int Np = parameters.size();
+  const unsigned int Nq = qoi.size();
+
+  // An introduction to the problem:
+  //
+  // Residual R(u(p),p) = 0
+  // partial R / partial u = J = system matrix
+  //
+  // This implies that:
+  // d/dp(R) = 0
+  // (partial R / partial p) + 
+  // (partial R / partial u) * (partial u / partial p) = 0
+
+  // We first solve for (partial u / partial p) for each parameter:
+  // J * (partial u / partial p) = - (partial R / partial p)
+
+  this->sensitivity_solve(parameters);
+
+  // Get ready to fill in senstivities:
+  sensitivities.allocate_data(qoi_indices, *this, parameters);
+
+  // We use the identity
+  // dq/dp = (partial q / partial p) + (partial q / partial u) *
+  //         (partial u / partial p)
+
+  // We get (partial q / partial u) from the user
+  this->assemble_qoi_derivative(qoi_indices);
+ 
+  for (unsigned int j=0; j != Np; ++j)
+    {
+      // We currently get partial derivatives via central differencing
+      Number delta_p = 1e-6;
+
+      // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
+
+      Number old_parameter = *parameters[j];
+
+      *parameters[j] = old_parameter - delta_p;
+      this->assemble_qoi(qoi_indices);
+      std::vector<Number> qoi_minus = this->qoi;
+
+      *parameters[j] = old_parameter + delta_p;
+      this->assemble_qoi(qoi_indices);
+      std::vector<Number>& qoi_plus = this->qoi;
+
+      std::vector<Number> partialq_partialp(Nq, 0);
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
+
+      // Don't leave the parameter changed
+      *parameters[j] = old_parameter;
+
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          sensitivities[i][j] = partialq_partialp[i] +
+            this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(i));
+    }
+
+  // All parameters have been reset.
+  // Don't leave the qoi or system changed - principle of least
+  // surprise.
+  this->assembly(true, false);
+  this->rhs->close();
+  this->assemble_qoi(qoi_indices);
 }

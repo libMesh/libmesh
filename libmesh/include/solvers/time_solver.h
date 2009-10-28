@@ -29,6 +29,7 @@
 #include "system_norm.h"
 #include "libmesh_common.h"
 #include "numeric_vector.h"
+#include "qoi_set.h"
 #include "reference_counted_object.h"
 
 // Forward Declarations
@@ -36,6 +37,7 @@ class DiffContext;
 class DiffSolver;
 class TimeSolver;
 class DifferentiableSystem;
+class ParameterVector;
 
 /**
  * This is a generic class that defines a solver to handle
@@ -93,12 +95,24 @@ public:
   virtual void solve ();
 
   /**
+   * This method solves for the sensitivity solution at the next
+   * timestep (or solves a steady sensitivity problem).  Usually we
+   * will only need to solve one linear system per timestep, but more
+   * complex subclasses may override this.
+   *
+   * FIXME: transient sensitivity solves are not yet implemented
+   */
+  virtual void sensitivity_solve (const ParameterVector& parameters);
+
+  /**
    * This method solves for the adjoint solution at the previous
    * timestep (or solves a steady adjoint problem).  Usually we will
    * only need to solve one linear system per timestep, but more
    * complex subclasses may override this.
+   *
+   * FIXME: transient adjoint solves are not yet implemented
    */
-  virtual void adjoint_solve ();
+  virtual void adjoint_solve (const QoISet& indices = QoISet());
 
   /**
    * This method advances the solution to the next timestep, after a
@@ -152,9 +166,9 @@ public:
   virtual AutoPtr<DiffSolver> &diff_solver() { return _diff_solver; }
 
   /**
-   * An implicit linear solver to use for adjoint problems.
+   * An implicit linear solver to use for adjoint and sensitivity problems.
    */
-  virtual AutoPtr<DiffSolver> &adjoint_solver() { return _adjoint_solver; }
+  virtual AutoPtr<DiffSolver> &linear_solver() { return _linear_solver; }
 
   /**
    * Print extra debugging information if quiet ==  false.
@@ -194,7 +208,7 @@ protected:
   /**
    * An implicit linear solver to use for adjoint problems.
    */
-  AutoPtr<DiffSolver> _adjoint_solver;
+  AutoPtr<DiffSolver> _linear_solver;
 
   /**
    * @returns a writeable reference to the system we are solving.

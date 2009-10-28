@@ -38,10 +38,20 @@ DiffContext::DiffContext (const DifferentiableSystem& sys) :
   if (sys.use_fixed_solution)
     elem_fixed_subsolutions.reserve(n_vars);
 
+  // If the user resizes sys.qoi, it will invalidate us
+  unsigned int n_qoi = sys.qoi.size();
+  elem_qoi.resize(n_qoi);
+  elem_qoi_derivative.resize(n_qoi);
+  elem_qoi_subderivatives.resize(n_qoi);
+  for (unsigned int q=0; q != n_qoi; ++q)
+    elem_qoi_subderivatives[q].reserve(n_vars);
+
   for (unsigned int i=0; i != n_vars; ++i)
     {
       elem_subsolutions.push_back(new DenseSubVector<Number>(elem_solution));
       elem_subresiduals.push_back(new DenseSubVector<Number>(elem_residual));
+      for (unsigned int q=0; q != n_qoi; ++q)
+        elem_qoi_subderivatives[q].push_back(new DenseSubVector<Number>(elem_qoi_derivative[q]));
       elem_subjacobians[i].reserve(n_vars);
 
       if (sys.use_fixed_solution)
@@ -62,6 +72,8 @@ DiffContext::~DiffContext ()
     {
       delete elem_subsolutions[i];
       delete elem_subresiduals[i];
+      for (unsigned int q=0; q != elem_qoi_subderivatives.size(); ++q)
+        delete elem_qoi_subderivatives[q][i];
       if (!elem_fixed_subsolutions.empty())
         delete elem_fixed_subsolutions[i];
 
