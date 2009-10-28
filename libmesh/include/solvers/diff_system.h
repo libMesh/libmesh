@@ -226,11 +226,11 @@ public:
    * Does any work that needs to be done on \p elem in a quantity of
    * interest assembly loop, outputting to elem_qoi.
    *
-   * Only qois listed in \p qoi_indices need to be assembled
-   * \p qoi_indices is NULL, in which case all qois should be assembled.
+   * Only qois included in the supplied \p QoISet need to be
+   * assembled.
    */
   virtual void element_qoi (DiffContext&, 
-                            const QoISet& qoi_indices)
+                            const QoISet&)
     {}
  
   /**
@@ -238,29 +238,34 @@ public:
    * interest derivative assembly loop, outputting to
    * elem_qoi_derivative
    *
-   * Only qois listed in \p qoi_indices need their derivatives assembled,
-   * unless \p qoi_indices is NULL, in which case all qoi derivatives
-   * should be assembled.
+   * Only qois included in the supplied \p QoISet need their
+   * derivatives assembled.
    */
   virtual void element_qoi_derivative (DiffContext&,
-                                       const QoISet& qoi_indices)
+                                       const QoISet&)
     {}
  
   /**
    * Does any work that needs to be done on \p side of \p elem in a
    * quantity of interest assembly loop, outputting to elem_qoi.
+   *
+   * Only qois included in the supplied \p QoISet need to be
+   * assembled.
    */
   virtual void side_qoi (DiffContext&,
-                         const QoISet& qoi_indices)
+                         const QoISet&)
     {}
  
   /**
    * Does any work that needs to be done on \p side of \p elem in a
    * quantity of interest derivative assembly loop, outputting to
    * elem_qoi_derivative.
+   *
+   * Only qois included in the supplied \p QoISet need their
+   * derivatives assembled.
    */
   virtual void side_qoi_derivative (DiffContext&,
-                                    const QoISet& qoi_indices)
+                                    const QoISet&)
     {}
  
   /**
