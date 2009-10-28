@@ -100,6 +100,19 @@ public:
   virtual void assemble ();
 
   /**
+   * Residual parameter derivative function.
+   *
+   * Uses finite differences by default.
+   *
+   * This will assemble the sensitivity rhs vectors to hold
+   * -(partial R / partial p_i), making them ready to solve
+   * the forward sensitivity equation.
+   *
+   * @e Can be overloaded in derived classes.
+   */
+  virtual void assemble_residual_derivatives (const ParameterVector& parameters);
+
+  /**
    * Evaluates \p matrix and/or \p rhs at the current iterate
    */
   virtual void assembly (bool get_residual, bool get_jacobian) = 0;
@@ -211,28 +224,44 @@ public:
  
   /**
    * Does any work that needs to be done on \p elem in a quantity of
-   * interest assembly loop, outputting to element_qoi.
+   * interest assembly loop, outputting to elem_qoi.
+   *
+   * Only qois listed in \p qoi_indices need to be assembled
+   * \p qoi_indices is NULL, in which case all qois should be assembled.
    */
-  virtual void element_qoi (DiffContext &) {}
+  virtual void element_qoi (DiffContext&, 
+                            const QoISet& qoi_indices)
+    {}
  
   /**
    * Does any work that needs to be done on \p elem in a quantity of
-   * interest derivative assembly loop, outputting to element_residual.
+   * interest derivative assembly loop, outputting to
+   * elem_qoi_derivative
+   *
+   * Only qois listed in \p qoi_indices need their derivatives assembled,
+   * unless \p qoi_indices is NULL, in which case all qoi derivatives
+   * should be assembled.
    */
-  virtual void element_qoi_derivative (DiffContext &) {}
+  virtual void element_qoi_derivative (DiffContext&,
+                                       const QoISet& qoi_indices)
+    {}
  
   /**
    * Does any work that needs to be done on \p side of \p elem in a
-   * quantity of interest assembly loop, outputting to element_qoi.
+   * quantity of interest assembly loop, outputting to elem_qoi.
    */
-  virtual void side_qoi (DiffContext &) {}
+  virtual void side_qoi (DiffContext&,
+                         const QoISet& qoi_indices)
+    {}
  
   /**
    * Does any work that needs to be done on \p side of \p elem in a
    * quantity of interest derivative assembly loop, outputting to
-   * element_residual.
+   * elem_qoi_derivative.
    */
-  virtual void side_qoi_derivative (DiffContext &) {}
+  virtual void side_qoi_derivative (DiffContext&,
+                                    const QoISet& qoi_indices)
+    {}
  
   /**
    * Tells the DiffSystem that variable var is evolving with
@@ -322,28 +351,61 @@ public:
   virtual void solve ();
  
   /**
-   * Invokes the adjoint solver associated with the system.  For
-   * steady state solvers, this will find x where dF/dx = q.  For
-   * transient solvers, this should integrate -dx/dt = dF/dx - q.
+   * Invokes the adjoint solver associated with the system, for
+   * quantities of interest q specified by \p qoi_indices.  For
+   * steady state solvers, this will find z where dF/du^T*z = dq/du.
+   * For transient solvers, this should integrate 
+   * -dz/dt = dF/du^T*z + dq/du.
    *
    * FIXME - transient adjoint solves are not yet implemented.
    */
-  virtual void adjoint_solve ();
+  virtual void adjoint_solve (const QoISet& qoi_indices = QoISet());
 
   /**
-   * Solves for the derivative of the system's quantity of interest q
-   * with respect to each parameter p in \p parameters.  Currently
-   * uses adjoint_solve, along with finite differenced derivatives
-   * (partial q / partial p) and (partial R / partial p).
+   * This method performs a solve on the linear sensitivity system,
+   * for parameters p in \p parameters.  For
+   * steady state solvers, this will find u_p where 
+   * dF/du*u_p = * -dF/dp.  For transient solvers, this should
+   * integrate one sensitivity time step.
+   *
+   * FIXME - transient sensitivity solves are not yet tested
+   */
+  virtual void sensitivity_solve (const ParameterVector &parameters);
+
+  /**
+   * Solves for the derivative of each of the system's quantities of
+   * interest q in \p qoi[qoi_indices] with respect to each parameter in 
+   * \p parameters, placing the result for qoi \p i and parameter \p j
+   * into \p sensitivities[i][j].
+   *
+   * Uses adjoint_solve() and the adjoint sensitivity method.
+   * 
+   * Currently uses finite differenced derivatives (partial q /
+   * partial p) and (partial R / partial p).
    *
    * FIXME - transient sensitivities are not yet implemented.
-   * TODO - Simultaneous sensitivity calculations for multiple QoIs
-   * are not yet implemented.  Analytic options for partial
-   * derivatives are not yet implemented.
    */
-  virtual void qoi_parameter_sensitivity (std::vector<Number *>& parameters,
-                                          std::vector<Number>& sensitivities);
- 
+  virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
+                                                  const ParameterVector& parameters,
+                                                  SensitivityData& sensitivities);
+
+  /**
+   * Solves for the derivative of each of the system's quantities of
+   * interest q in \p qoi[qoi_indices] with respect to each parameter in 
+   * \p parameters, placing the result for qoi \p i and parameter \p j
+   * into \p sensitivities[i][j].
+   *
+   * Uses sensitivity_solve() and the forward sensitivity method.
+   * 
+   * Currently uses finite differenced derivatives (partial q /
+   * partial p) and (partial R / partial p).
+   *
+   * FIXME - transient sensitivities are not yet implemented.
+   */
+  virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
+                                                  const ParameterVector& parameters,
+                                                  SensitivityData& sensitivities);
+  
   /**
    * A pointer to the solver object we're going to use.
    * This must be instantiated by the user before solving!

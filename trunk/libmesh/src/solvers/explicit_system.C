@@ -86,30 +86,28 @@ void ExplicitSystem::reinit ()
 
 
 
-void ExplicitSystem::assemble_qoi ()
+void ExplicitSystem::assemble_qoi (const QoISet& qoi_indices)
 {
-  libmesh_assert (rhs    != NULL);
-  libmesh_assert (rhs->initialized());
-
   // The user quantity of interest assembly gets to expect to
-  // accumulate on an initially zero value
-  qoi = 0;
+  // accumulate on initially zero values
+  for (unsigned int i=0; i != qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      qoi[i] = 0;
 
-  Parent::assemble_qoi ();
+  Parent::assemble_qoi (qoi_indices);
 }
 
 
 
-void ExplicitSystem::assemble_qoi_derivative ()
+void ExplicitSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
 {
-  libmesh_assert (rhs    != NULL);
-  libmesh_assert (rhs->initialized());
-
   // The user quantity of interest derivative assembly gets to expect
-  // to accumulate on an initially empty vector
-  rhs->zero ();
+  // to accumulate on initially zero vectors
+  for (unsigned int i=0; i != qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      this->add_adjoint_rhs(i).zero();
 
-  Parent::assemble_qoi_derivative ();
+  Parent::assemble_qoi_derivative (qoi_indices);
 }
 
 

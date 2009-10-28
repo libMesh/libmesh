@@ -483,7 +483,7 @@ void FEMSystem::postprocess ()
 
 
 
-void FEMSystem::assemble_qoi()
+void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
 {
   START_LOG("assemble_qoi()", "FEMSystem");
 
@@ -496,7 +496,9 @@ void FEMSystem::assemble_qoi()
 
   // the quantity of interest is assumed to be a sum of element and
   // side terms
-  qoi = 0;
+  for (unsigned int i=0; i != qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      qoi[i] = 0;
 
   // Loop over every active mesh element on this processor
   MeshBase::const_element_iterator el =
@@ -508,7 +510,7 @@ void FEMSystem::assemble_qoi()
     {
       _femcontext.reinit(*this, *el);
 
-      this->element_qoi(_femcontext);
+      this->element_qoi(_femcontext, qoi_indices);
 
       for (_femcontext.side = 0;
            _femcontext.side != _femcontext.elem->n_sides();
@@ -529,18 +531,20 @@ void FEMSystem::assemble_qoi()
               i->second->reinit(_femcontext.elem, _femcontext.side);
             }
 
-          this->side_qoi(_femcontext);
+          this->side_qoi(_femcontext, qoi_indices);
         }
     }
 
-  Parallel::sum(qoi);
+  Parallel::sum(_femcontext.elem_qoi);
+
+  this->qoi = _femcontext.elem_qoi;
 
   STOP_LOG("assemble_qoi()", "FEMSystem");
 }
 
 
 
-void FEMSystem::assemble_qoi_derivative()
+void FEMSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
 {
   START_LOG("assemble_qoi_derivative()", "FEMSystem");
 
@@ -551,8 +555,11 @@ void FEMSystem::assemble_qoi_derivative()
   AutoPtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
 
-  // In case there's already a rhs in use
-  rhs->zero();
+  // The quantity of interest derivative assembly accumulates on
+  // initially zero vectors
+  for (unsigned int i=0; i != qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      this->add_adjoint_rhs(i).zero();
 
   // Loop over every active mesh element on this processor
   MeshBase::const_element_iterator el =
@@ -564,7 +571,7 @@ void FEMSystem::assemble_qoi_derivative()
     {
       _femcontext.reinit(*this, *el);
 
-      this->element_qoi_derivative(_femcontext);
+      this->element_qoi_derivative(_femcontext, qoi_indices);
 
       for (_femcontext.side = 0;
            _femcontext.side != _femcontext.elem->n_sides();
@@ -585,14 +592,25 @@ void FEMSystem::assemble_qoi_derivative()
               i->second->reinit(_femcontext.elem, _femcontext.side);
             }
 
-          this->side_qoi_derivative(_femcontext);
+          this->side_qoi_derivative(_femcontext, qoi_indices);
         }
 
-      this->get_dof_map().constrain_element_vector
-        (_femcontext.elem_residual, _femcontext.dof_indices, false);
+      // We need some unmodified indices to use for constraining
+      // multiple vector
+      // FIXME - there should be a DofMap::constrain_element_vectors
+      // to do this more efficiently
+      std::vector<unsigned int> original_dofs = _femcontext.dof_indices;
 
-      this->rhs->add_vector (_femcontext.elem_residual,
-                             _femcontext.dof_indices);
+      for (unsigned int i=0; i != qoi.size(); ++i)
+        if (qoi_indices.has_index(i))
+          {
+            _femcontext.dof_indices = original_dofs;
+            this->get_dof_map().constrain_element_vector
+              (_femcontext.elem_qoi_derivative[i], _femcontext.dof_indices, false);
+
+            this->get_adjoint_rhs(i).add_vector
+              (_femcontext.elem_qoi_derivative[i], _femcontext.dof_indices);
+          }
     }
 
   STOP_LOG("assemble_qoi_derivative()", "FEMSystem");

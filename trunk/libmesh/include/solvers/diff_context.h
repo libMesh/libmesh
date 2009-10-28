@@ -137,6 +137,17 @@ public:
   DenseMatrix<Number> elem_jacobian;
 
   /**
+   * Element quantity of interest contributions
+   */
+  std::vector<Number> elem_qoi;
+
+  /**
+   * Element quantity of interest derivative contributions
+   */
+  std::vector<DenseVector<Number> > elem_qoi_derivative;
+  std::vector<std::vector<DenseSubVector<Number> *> > elem_qoi_subderivatives;
+
+  /**
    * Element residual subvectors and Jacobian submatrices
    */
   std::vector<DenseSubVector<Number> *> elem_subresiduals;

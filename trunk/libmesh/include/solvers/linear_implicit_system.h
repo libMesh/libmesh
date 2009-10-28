@@ -88,13 +88,29 @@ public:
    */
   virtual void reinit ();
    
-//   /**
-//    * Prepares \p matrix and \p _dof_map for matrix assembly.
-//    * Does not actually assemble anything.  For matrix assembly,
-//    * use the \p assemble() in derived classes.
-//    * @e Should be overloaded in derived classes.
-//    */
-//   virtual void assemble () { ImplicitSystem::assemble(); }
+  /**
+   * Residual parameter derivative function.
+   *
+   * Uses finite differences by default.
+   *
+   * For the linear system A*x=b, we define the residual
+   * R := b - A*x
+   *
+   * This should assemble the sensitivity rhs vectors to hold
+   * -(partial R / partial p_i), making them ready to solve
+   * the forward sensitivity equation.
+   *
+   * @e Can be overloaded in derived classes.
+   */
+  virtual void assemble_residual_derivatives (const ParameterVector& parameters);
+
+  /**
+   * Prepares \p matrix and \p _dof_map for matrix assembly.
+   * Does not actually assemble anything.  For matrix assembly,
+   * use the \p assemble() in derived classes.
+   * @e Should be overloaded in derived classes.
+   */
+  virtual void assemble () { ImplicitSystem::assemble(); }
  
   /**
    * Assembles & solves the linear system A*x=b. 
@@ -102,23 +118,49 @@ public:
   virtual void solve ();
  
   /**
-   * Assembles & solves the linear adjoint system A^T*x=q. 
+   * Assembles & solves the linear system (dR/du)*u_p = -dR/dp, for
+   * those parameters contained in \p parameters.
    */
-  virtual void adjoint_solve ();
+  virtual void sensitivity_solve (const ParameterVector& parameters);
  
   /**
-   * Solves for the derivative of the system's quantity of interest q
-   * with respect to each parameter p in \p parameters.  Currently
-   * uses adjoint_solve, along with finite differenced derivatives
-   * (partial q / partial p) and (partial (b-Ax) / partial p).
+   * Assembles & solves the linear system (dR/du)^T*z = dq/du, for
+   * those quantities of interest q specified by \p qoi_indices.
    *
-   * TODO - Simultaneous sensitivity calculations for multiple QoIs
-   * are not yet implemented.  Analytic options for partial
-   * derivatives are not yet implemented.
+   * Leave \p qoi_indices empty to solve all adjoint problems.
    */
-  virtual void qoi_parameter_sensitivity (std::vector<Number *>& parameters,
-                                          std::vector<Number>& sensitivities);
+  virtual void adjoint_solve (const QoISet& qoi_indices = QoISet());
  
+  /**
+   * Solves for the derivative of each of the system's quantities of
+   * interest q in \p qoi[qoi_indices] with respect to each parameter in 
+   * \p parameters, placing the result for qoi \p i and parameter \p j
+   * into \p sensitivities[i][j].
+   *
+   * Uses adjoint_solve() and the adjoint sensitivity method.
+   *
+   * Currently uses finite differenced derivatives 
+   * (partial q / partial p) and (partial (b-Ax) / partial p).
+   */
+  virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
+                                                  const ParameterVector& parameters,
+                                                  SensitivityData& sensitivities);
+ 
+  /**
+   * Solves for the derivative of each of the system's quantities of
+   * interest q in \p qoi[qoi_indices] with respect to each parameter in 
+   * \p parameters, placing the result for qoi \p i and parameter \p j
+   * into \p sensitivities[i][j].
+   *
+   * Uses the forward sensitivity method.
+   *
+   * Currently uses finite differenced derivatives 
+   * (partial q / partial p) and (partial (b-Ax) / partial p).
+   */
+  virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
+                                                  const ParameterVector& parameters,
+                                                  SensitivityData& sensitivities);
+  
   /**
    * @returns \p "LinearImplicit".  Helps in identifying
    * the system type in an equation system file.

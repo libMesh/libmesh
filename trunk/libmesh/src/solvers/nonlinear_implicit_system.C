@@ -28,6 +28,8 @@
 #include "linear_solver.h"
 #include "nonlinear_solver.h"
 #include "numeric_vector.h"
+#include "parameter_vector.h"
+#include "sensitivity_data.h"
 #include "sparse_matrix.h"
 
 // ------------------------------------------------------------
@@ -137,6 +139,51 @@ void NonlinearImplicitSystem::set_solver_parameters ()
 
 
 
+void NonlinearImplicitSystem::assemble_residual_derivatives(const ParameterVector& parameters)
+{
+  const unsigned int Np = parameters.size();
+  Real deltap = TOLERANCE;
+
+  for (unsigned int p=0; p != Np; ++p)
+    {
+      NumericVector<Number> &sensitivity_rhs = this->add_sensitivity_rhs(p);
+
+      // Approximate -(partial R / partial p) by
+      // (R(p-dp) - R(p+dp)) / (2*dp)
+
+      Number old_parameter = *parameters[p];
+      *parameters[p] -= deltap;
+
+      if (nonlinear_solver->residual != NULL)
+        nonlinear_solver->residual(*this->current_local_solution.get(), sensitivity_rhs);
+      else if (nonlinear_solver->matvec != NULL)
+        nonlinear_solver->matvec(*this->current_local_solution.get(), &sensitivity_rhs, NULL);
+      else
+        libmesh_error();
+      sensitivity_rhs.close();
+
+      *parameters[p] = old_parameter + deltap;
+
+      // We'll use rhs rather than allocating a new temporary vector
+
+      if (nonlinear_solver->residual != NULL)
+        nonlinear_solver->residual(*this->current_local_solution.get(), *this->rhs);
+      else if (nonlinear_solver->matvec != NULL)
+        nonlinear_solver->matvec(*this->current_local_solution.get(), this->rhs, NULL);
+      else
+        libmesh_error();
+      this->rhs->close();
+
+      sensitivity_rhs -= *this->rhs;
+      sensitivity_rhs /= (2*deltap);
+      sensitivity_rhs.close();
+
+      *parameters[p] = old_parameter;
+    }
+}
+
+
+
 void NonlinearImplicitSystem::solve ()
 {
   // Log how long the nonlinear solve takes.
@@ -164,20 +211,65 @@ void NonlinearImplicitSystem::solve ()
 
 
 
-void NonlinearImplicitSystem::adjoint_solve ()
+void NonlinearImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
 {
-  // The adjoint_solve API (and all APIs using it) are about to see a
-  // series of non-backwards-compatible changes, primarily to add
-  // multiple-QoI support
-  libmesh_experimental();
+  // Log how long the linear solve takes.
+  START_LOG("sensitivity_solve()", "System");
 
+  // The nonlinear system should now already be solved.
+  // Now assemble the corresponding sensitivity system.
+
+  if (this->assemble_before_solve)
+    {
+      // Build the Jacobian
+      if (nonlinear_solver->jacobian != NULL)
+        nonlinear_solver->jacobian (*current_local_solution.get(), *matrix);
+      else if (nonlinear_solver->matvec != NULL)
+        nonlinear_solver->matvec   (*current_local_solution.get(), NULL, matrix);
+      else libmesh_error();
+
+      // Reset and build the RHS from the residual derivatives
+      this->assemble_residual_derivatives(parameters);
+    }
+
+  // The sensitivity problem is linear, so we only use the nonlinear
+  // solver to get tolerances and the current jacobian from it.
+
+  this->set_solver_parameters();
+
+  AutoPtr<LinearSolver<Number> > linear_solver = LinearSolver<Number>::build();
+
+  // Our iteration counts and residuals will be sums of the individual
+  // results
+  _n_nonlinear_iterations = 0;
+  _final_nonlinear_residual = 0.0;
+  std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
+
+  // Solve the linear system.
+  SparseMatrix<Number> *pc = this->request_matrix("Preconditioner");
+  for (unsigned int p=0; p != parameters.size(); ++p)
+    {
+      rval = linear_solver->solve (*matrix, pc,
+                                   this->get_sensitivity_solution(p),
+                                   this->get_sensitivity_rhs(p),
+                                   nonlinear_solver->relative_residual_tolerance,
+                                   nonlinear_solver->max_linear_iterations);
+
+      _n_nonlinear_iterations   += rval.first;
+      _final_nonlinear_residual += rval.second;
+    }
+
+  // Stop logging the nonlinear solve
+  STOP_LOG("sensitivity_solve()", "System");
+}
+
+
+
+void NonlinearImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
+{
   // Log how long the nonlinear solve takes.
   START_LOG("adjoint_solve()", "System");
 
-  // Adding an adjoint_solution vector, allocate an adjoint_solution if it doesn't already exist
-  
-  NumericVector<Number> & adjoint_solution = System::add_vector("adjoint_solution");
-  
   // The nonlinear system should now already be solved.
   // Now assemble it's adjoint.
 
@@ -194,8 +286,7 @@ void NonlinearImplicitSystem::adjoint_solve ()
       matrix->get_transpose(*matrix);
 
       // Reset and build the RHS from the QOI derivative
-      rhs->zero();
-      this->assemble_qoi_derivative();
+      this->assemble_qoi_derivative(qoi_indices);
     }
 
   // The adjoint problem is linear, so we only use the nonlinear
@@ -205,16 +296,24 @@ void NonlinearImplicitSystem::adjoint_solve ()
 
   AutoPtr<LinearSolver<Number> > linear_solver = LinearSolver<Number>::build();
 
-  const std::pair<unsigned int, Real> rval =
-    linear_solver->solve (*matrix, adjoint_solution, *rhs,
-			   nonlinear_solver->relative_residual_tolerance,
-                           nonlinear_solver->max_linear_iterations);
+  // Our iteration counts and residuals will be sums of the individual
+  // results
+  _n_nonlinear_iterations = 0;
+  _final_nonlinear_residual = 0.0;
 
-  // Store the number of nonlinear iterations required to
-  // solve and the final residual.
-  _n_nonlinear_iterations   = rval.first;
-  _final_nonlinear_residual = rval.second;
-    
+  for (unsigned int i=0; i != this->qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      {
+        const std::pair<unsigned int, Real> rval =
+          linear_solver->solve (*matrix, this->add_adjoint_solution(i),
+                                 this->get_adjoint_rhs(i),
+			         nonlinear_solver->relative_residual_tolerance,
+                                 nonlinear_solver->max_linear_iterations);
+
+        _n_nonlinear_iterations   += rval.first;
+        _final_nonlinear_residual += rval.second;
+      }
+
   // Stop logging the nonlinear solve
   STOP_LOG("adjoint_solve()", "System");
 
@@ -224,13 +323,13 @@ void NonlinearImplicitSystem::adjoint_solve ()
 
 
 
-void NonlinearImplicitSystem::qoi_parameter_sensitivity
-  (std::vector<Number *>& parameters,
-   std::vector<Number>&   sensitivities)
+void NonlinearImplicitSystem::adjoint_qoi_parameter_sensitivity
+  (const QoISet&          qoi_indices,
+   const ParameterVector& parameters,
+   SensitivityData&       sensitivities)
 {
-  // Get ready to fill in senstivities:
-  sensitivities.clear();
-  sensitivities.resize(parameters.size(), 0);
+  const unsigned int Np = parameters.size();
+  const unsigned int Nq = qoi.size();
 
   // An introduction to the problem:
   //
@@ -245,7 +344,10 @@ void NonlinearImplicitSystem::qoi_parameter_sensitivity
   // We first do an adjoint solve:
   // J^T * z = (partial q / partial u)
 
-  this->adjoint_solve();
+  this->adjoint_solve(qoi_indices);
+
+  // Get ready to fill in senstivities:
+  sensitivities.allocate_data(qoi_indices, *this, parameters);
 
   // We use the identities:
   // dq/dp = (partial q / partial p) + (partial q / partial u) *
@@ -258,7 +360,7 @@ void NonlinearImplicitSystem::qoi_parameter_sensitivity
   // Leading to our final formula:
   // dq/dp = (partial q / partial p) - z * (partial R / partial p)
 
-  for (unsigned int i=0; i != parameters.size(); ++i)
+  for (unsigned int j=0; j != Np; ++j)
     {
       // We currently get partial derivatives via central differencing
       Number delta_p = 1e-6;
@@ -266,12 +368,12 @@ void NonlinearImplicitSystem::qoi_parameter_sensitivity
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
       // (partial R / partial p) ~= (rhs(p+dp) - rhs(p-dp))/(2*dp)
 
-      Number old_parameter = *parameters[i];
+      Number old_parameter = *parameters[j];
       // Number old_qoi = this->qoi;
 
-      *parameters[i] = old_parameter - delta_p;
-      this->assemble_qoi();
-      Number qoi_minus = this->qoi;
+      *parameters[j] = old_parameter - delta_p;
+      this->assemble_qoi(qoi_indices);
+      std::vector<Number> qoi_minus = this->qoi;
 
       this->assemble();
       this->rhs->close();
@@ -279,10 +381,14 @@ void NonlinearImplicitSystem::qoi_parameter_sensitivity
       AutoPtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
       *partialR_partialp *= -1;
 
-      *parameters[i] = old_parameter + delta_p;
-      this->assemble_qoi();
-      Number qoi_plus = this->qoi;
-      Number partialq_partialp = (qoi_plus - qoi_minus) / (2.*delta_p);
+      *parameters[j] = old_parameter + delta_p;
+      this->assemble_qoi(qoi_indices);
+      std::vector<Number>& qoi_plus = this->qoi;
+
+      std::vector<Number> partialq_partialp(Nq, 0);
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
 
       this->assemble();
       this->rhs->close();
@@ -291,17 +397,94 @@ void NonlinearImplicitSystem::qoi_parameter_sensitivity
       *partialR_partialp /= (2.*delta_p);
 
       // Don't leave the parameter changed
-      *parameters[i] = old_parameter;
+      *parameters[j] = old_parameter;
 
-      sensitivities[i] = partialq_partialp -
-			 partialR_partialp->dot(this->get_adjoint_solution());
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          sensitivities[i][j] = partialq_partialp[i] -
+            partialR_partialp->dot(this->get_adjoint_solution(i));
     }
 
   // All parameters have been reset.
   // Don't leave the qoi or system changed - principle of least
   // surprise.
   this->assemble();
-  this->assemble_qoi();
+  this->assemble_qoi(qoi_indices);
+  this->rhs->close();
+  this->matrix->close();
+}
+
+
+
+void NonlinearImplicitSystem::forward_qoi_parameter_sensitivity
+  (const QoISet&          qoi_indices,
+   const ParameterVector& parameters,
+   SensitivityData&       sensitivities)
+{
+  const unsigned int Np = parameters.size();
+  const unsigned int Nq = qoi.size();
+
+  // An introduction to the problem:
+  //
+  // Residual R(u(p),p) = 0
+  // partial R / partial u = J = system matrix
+  //
+  // This implies that:
+  // d/dp(R) = 0
+  // (partial R / partial p) + 
+  // (partial R / partial u) * (partial u / partial p) = 0
+
+  // We first solve for (partial u / partial p) for each parameter:
+  // J * (partial u / partial p) = - (partial R / partial p)
+
+  this->sensitivity_solve(parameters);
+
+  // Get ready to fill in senstivities:
+  sensitivities.allocate_data(qoi_indices, *this, parameters);
+
+  // We use the identity:
+  // dq/dp = (partial q / partial p) + (partial q / partial u) *
+  //         (partial u / partial p)
+ 
+  // We get (partial q / partial u) from the user
+  this->assemble_qoi_derivative(qoi_indices);
+
+  for (unsigned int j=0; j != Np; ++j)
+    {
+      // We currently get partial derivatives via central differencing
+      Number delta_p = 1e-6;
+
+      // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
+
+      Number old_parameter = *parameters[j];
+
+      *parameters[j] = old_parameter - delta_p;
+      this->assemble_qoi();
+      std::vector<Number> qoi_minus = this->qoi;
+
+      *parameters[j] = old_parameter + delta_p;
+      this->assemble_qoi();
+      std::vector<Number>& qoi_plus = this->qoi;
+
+      std::vector<Number> partialq_partialp(Nq, 0);
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
+
+      // Don't leave the parameter changed
+      *parameters[j] = old_parameter;
+
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          sensitivities[i][j] = partialq_partialp[i] +
+            this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(i));
+    }
+
+  // All parameters have been reset.
+  // Don't leave the qoi or system changed - principle of least
+  // surprise.
+  this->assemble();
+  this->assemble_qoi(qoi_indices);
   this->rhs->close();
   this->matrix->close();
 }

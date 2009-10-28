@@ -392,12 +392,22 @@ void EquationSystems::solve ()
 
 
  
-void EquationSystems::adjoint_solve ()
+void EquationSystems::sensitivity_solve (const ParameterVector& parameters)
+{
+  libmesh_assert (this->n_systems());
+
+  for (unsigned int i=0; i != this->n_systems(); ++i)
+    this->get_system(i).sensitivity_solve(parameters);
+}
+ 
+
+ 
+void EquationSystems::adjoint_solve (const QoISet& qoi_indices)
 {
   libmesh_assert (this->n_systems());
 
   for (unsigned int i=this->n_systems(); i != 0; --i)
-    this->get_system(i-1).adjoint_solve();
+    this->get_system(i-1).adjoint_solve(qoi_indices);
 }
  
 

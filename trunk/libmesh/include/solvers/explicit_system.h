@@ -91,31 +91,59 @@ public:
    * user qoi function.
    * @e Can be overloaded in derived classes.
    */
-  virtual void assemble_qoi ();
+  virtual void assemble_qoi
+    (const QoISet& qoi_indices = QoISet());
 
   /**
-   * Prepares \p rhs for quantity of interest derivative assembly,
+   * Prepares \p adjoint_rhs for quantity of interest derivative assembly,
    * then calls user qoi derivative function.
    * @e Can be overloaded in derived classes.
    */
-  virtual void assemble_qoi_derivative ();
+  virtual void assemble_qoi_derivative
+    (const QoISet& qoi_indices = QoISet());
  
+  /**
+   * Yells at any user who tried to solve for sensitivities without
+   * providing more than an explicit system assembly.
+   */
+  virtual void assemble_residual_derivatives (const ParameterVector&)
+    { libmesh_error(); }
+
   /**
    * Assembles & solves the linear system Ax=b. 
    */
   virtual void solve ();
  
   /**
+   * Yells at any user who tried to solve for sensitivities without
+   * providing more than an explicit system assembly.
+   */
+  virtual void sensitivity_solve (const ParameterVector&)
+    { libmesh_error(); }
+ 
+  /**
    * Yells at any user who tried to use an adjoint without
    * providing more than an explicit system assembly.
    */
-  virtual void adjoint_solve () { libmesh_error(); }
+  virtual void adjoint_solve (const QoISet&)
+    { libmesh_error(); }
  
   /**
    * Yells at any user who tried to calculate parameter sensitivities
    * without providing more than an explicit system assembly.
    */
-  virtual void qoi_parameter_sensitivity (std::vector<Number *>&, std::vector<Number>&)
+  virtual void adjoint_qoi_parameter_sensitivity (const QoISet&,
+                                                  const ParameterVector&,
+                                                  SensitivityData&)
+    { libmesh_error(); }
+
+  /**
+   * Yells at any user who tried to calculate parameter sensitivities
+   * without providing more than an explicit system assembly.
+   */
+  virtual void forward_qoi_parameter_sensitivity (const QoISet&,
+                                                  const ParameterVector&,
+                                                  SensitivityData&)
     { libmesh_error(); }
 
   /**

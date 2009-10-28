@@ -28,12 +28,13 @@
 
 // Local Includes
 #include "auto_ptr.h"
+#include "elem_range.h"
 #include "enum_xdr_mode.h"
 #include "fe_type.h"
 #include "libmesh_common.h"
+#include "qoi_set.h"
 #include "reference_counted_object.h"
 #include "system_norm.h"
-#include "elem_range.h"
 
 // Forward Declarations
 class System;
@@ -42,7 +43,9 @@ class MeshBase;
 class Xdr;
 class DofMap;
 class Parameters;
+class ParameterVector;
 class Point;
+class SensitivityData;
 template <typename T> class NumericVector;
 template <typename T> class VectorValue;
 typedef VectorValue<Number> NumberVectorValue;
@@ -129,15 +132,30 @@ public:
 
   /**
    * Calls user qoi function.
-   * @e Should be overloaded in derived classes.
+   * @e Can be overloaded in derived classes.
    */
-  virtual void assemble_qoi ();
+  virtual void assemble_qoi
+    (const QoISet &qoi_indices = QoISet());
  
   /**
    * Calls user qoi derivative function.
-   * @e Should be overloaded in derived classes.
+   * @e Can be overloaded in derived classes.
    */
-  virtual void assemble_qoi_derivative ();
+  virtual void assemble_qoi_derivative 
+    (const QoISet &qoi_indices = QoISet());
+ 
+  /**
+   * Calls residual parameter derivative function.
+   *
+   * Library subclasses use finite differences by default.
+   *
+   * This should assemble the sensitivity rhs vectors to hold
+   * -(partial R / partial p_i), making them ready to solve
+   * the forward sensitivity equation.
+   *
+   * @e Must be overloaded in derived classes.
+   */
+  virtual void assemble_residual_derivatives (const ParameterVector& parameters) = 0;
  
   /**
    * Solves the system.  Must be overloaded in derived systems.
@@ -145,18 +163,51 @@ public:
   virtual void solve () = 0;
   
   /**
-   * Solves the adjoint system.  Must be overloaded in derived systems.
+   * Solves the sensitivity system, for the provided parameters.
+   * Must be overloaded in derived systems.
    */
-  virtual void adjoint_solve () = 0;
+  virtual void sensitivity_solve (const ParameterVector& parameters) = 0;
   
   /**
-   * Solves for the derivative of the attached quantity of interest
-   * with respect to each parameter in \p parameters, placing each
-   * result in the corresponding entry of \p sensitivities.  Must be
-   * overloaded in derived systems.
+   * Solves the adjoint system, for the specified qoi indices, or for
+   * every qoi if \p qoi_indices is NULL.  Must be overloaded in
+   * derived systems.
    */
-  virtual void qoi_parameter_sensitivity (std::vector<Number *>& parameters, 
-                                          std::vector<Number>& sensitivities) = 0;
+  virtual void adjoint_solve (const QoISet& qoi_indices = QoISet()) = 0;
+  
+  /**
+   * Solves for the derivative of each of the system's quantities of
+   * interest q in \p qoi[qoi_indices] with respect to each parameter
+   * in \p parameters, placing the result for qoi \p i and parameter
+   * \p j into \p sensitivities[i][j].  
+   *
+   * Note that parameters is a const vector, not a vector-of-const;
+   * parameter values in this vector need to be mutable for finite
+   * differencing to work.
+   *
+   * Automatically chooses the forward method for problems with more
+   * quantities of interest than parameters, or the adjoint method
+   * otherwise.
+   */
+  virtual void qoi_parameter_sensitivity (const QoISet& qoi_indices,
+                                          const ParameterVector& parameters,
+                                          SensitivityData& sensitivities);
+  
+  /**
+   * Solves for parameter sensitivities using the adjoint method.
+   * Must be overloaded in derived systems.
+   */
+  virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
+                                                  const ParameterVector& parameters,
+                                                  SensitivityData& sensitivities) = 0;
+  
+  /**
+   * Solves for parameter sensitivities using the forward method.
+   * Must be overloaded in derived systems.
+   */
+  virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
+                                                  const ParameterVector& parameters,
+                                                  SensitivityData& sensitivities) = 0;
   
   /**
    * @returns \p true when the other system contains
@@ -386,16 +437,87 @@ public:
   const std::string & vector_name (const unsigned int vec_num);
 
   /**
-   * @returns a reference to the system's adjoint solution vector
-   * name adjoint_solution. Adjoint system needs to be solved first.
+   * @returns a reference to one of the system's adjoint solution
+   * vectors, by default the one corresponding to the first qoi.
+   * Creates the vector if it doesn't already exist.
    */
-  NumericVector<Number> & get_adjoint_solution();
+  NumericVector<Number> & add_adjoint_solution(unsigned int i=0);
 
   /**
-   * @returns a reference to the system's adjoint solution vector
-   * name adjoint_solution. Adjoint system needs to be solved first.
+   * @returns a reference to one of the system's adjoint solution
+   * vectors, by default the one corresponding to the first qoi.
    */
-  const NumericVector<Number> & get_adjoint_solution() const;
+  NumericVector<Number> & get_adjoint_solution(unsigned int i=0);
+
+  /**
+   * @returns a reference to one of the system's adjoint solution
+   * vectors, by default the one corresponding to the first qoi.
+   */
+  const NumericVector<Number> & get_adjoint_solution(unsigned int i=0) const;
+
+  /**
+   * @returns a reference to one of the system's solution sensitivity
+   * vectors, by default the one corresponding to the first parameter.
+   * Creates the vector if it doesn't already exist.
+   */
+  NumericVector<Number> & add_sensitivity_solution(unsigned int i=0);
+
+  /**
+   * @returns a reference to one of the system's solution sensitivity
+   * vectors, by default the one corresponding to the first parameter.
+   */
+  NumericVector<Number> & get_sensitivity_solution(unsigned int i=0);
+
+  /**
+   * @returns a reference to one of the system's solution sensitivity
+   * vectors, by default the one corresponding to the first parameter.
+   */
+  const NumericVector<Number> & get_sensitivity_solution(unsigned int i=0) const;
+
+  /**
+   * @returns a reference to one of the system's adjoint rhs
+   * vectors, by default the one corresponding to the first qoi.
+   * Creates the vector if it doesn't already exist.
+   */
+  NumericVector<Number> & add_adjoint_rhs(unsigned int i=0);
+
+  /**
+   * @returns a reference to one of the system's adjoint rhs
+   * vectors, by default the one corresponding to the first qoi.
+   * This what the user's QoI derivative code should assemble
+   * when setting up an adjoint problem
+   */
+  NumericVector<Number> & get_adjoint_rhs(unsigned int i=0);
+
+  /**
+   * @returns a reference to one of the system's adjoint rhs
+   * vectors, by default the one corresponding to the first qoi.
+   */
+  const NumericVector<Number> & get_adjoint_rhs(unsigned int i=0) const;
+
+  /**
+   * @returns a reference to one of the system's sensitivity rhs
+   * vectors, by default the one corresponding to the first parameter.
+   * Creates the vector if it doesn't already exist.
+   */
+  NumericVector<Number> & add_sensitivity_rhs(unsigned int i=0);
+
+  /**
+   * @returns a reference to one of the system's sensitivity rhs
+   * vectors, by default the one corresponding to the first parameter.
+   * By default these vectors are built by the library, using finite
+   * differences, when \p assemble_residual_derivatives() is called.
+   *
+   * When assembled, this vector should hold 
+   * -(partial R / partial p_i)
+   */
+  NumericVector<Number> & get_sensitivity_rhs(unsigned int i=0);
+
+  /**
+   * @returns a reference to one of the system's sensitivity rhs
+   * vectors, by default the one corresponding to the first parameter.
+   */
+  const NumericVector<Number> & get_sensitivity_rhs(unsigned int i=0) const;
 
   /**
    * @returns the number of vectors (in addition to the solution)
@@ -656,11 +778,12 @@ public:
 					     const std::string& name));
   
   /**
-   * Register a user function for evaluating a quantity of interest,
-   * whose value should be placed in \p System::qoi
+   * Register a user function for evaluating the quantities of interest,
+   * whose values should be placed in \p System::qoi
    */
   void attach_QOI_function (void fptr(EquationSystems& es,
-				      const std::string& name));
+				      const std::string& name,
+                                      const QoISet& qoi_indices));
   
   /**
    * Register a user function for evaluating derivatives of a quantity
@@ -668,7 +791,8 @@ public:
    * be placed in \p System::rhs
    */
   void attach_QOI_derivative (void fptr(EquationSystems& es,
-				        const std::string& name));
+				        const std::string& name,
+                                        const QoISet& qoi_indices));
   
   /**
    * Calls user's attached initialization function, or is overloaded by
@@ -692,13 +816,13 @@ public:
    * Calls user's attached quantity of interest function, or is
    * overloaded by the user in derived classes.
    */
-  virtual void user_QOI ();
+  virtual void user_QOI (const QoISet& qoi_indices);
 
   /**
    * Calls user's attached quantity of interest derivative function,
    * or is overloaded by the user in derived classes.
    */
-  virtual void user_QOI_derivative ();
+  virtual void user_QOI_derivative (const QoISet& qoi_indices);
 
   /**
    * Re-update the local values when the mesh has changed.
@@ -766,9 +890,12 @@ public:
   AutoPtr<NumericVector<Number> > current_local_solution;
 
   /**
-   * Value of the quantity of interest
+   * Values of the quantities of interest.  This vector needs
+   * to be both resized and filled by the user before any quantity of
+   * interest assembly is done and before any sensitivities are
+   * calculated.
    */
-  Number qoi;
+  std::vector<Number> qoi;
 
   /**
    * Fills the std::set with the degrees of freedom on the local
@@ -877,13 +1004,15 @@ private:
    * Function to evaluate quantity of interest
    */
   void (* _qoi_evaluate) (EquationSystems& es, 
-			  const std::string& name);
+			  const std::string& name,
+                          const QoISet& qoi_indices);
 
   /**
    * Function to evaluate quantity of interest derivative
    */
   void (* _qoi_evaluate_derivative) (EquationSystems& es, 
-			             const std::string& name);
+			             const std::string& name,
+                                     const QoISet& qoi_indices);
 
   /**
    * Data structure describing the relationship between

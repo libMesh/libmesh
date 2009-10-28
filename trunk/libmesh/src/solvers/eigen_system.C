@@ -219,14 +219,28 @@ void EigenSystem::solve ()
   
 }
 
-void EigenSystem::adjoint_solve() 
+void EigenSystem::sensitivity_solve (const ParameterVector&)
 {
   libmesh_not_implemented();
 }
 
-void EigenSystem::qoi_parameter_sensitivity
-  (std::vector<Number *>& parameters,
-   std::vector<Number>& sensitivities)
+void EigenSystem::adjoint_solve (const QoiSet&)
+{
+  libmesh_not_implemented();
+}
+
+void EigenSystem::adjoint_qoi_parameter_sensitivity
+  (const QoISet&,
+   const ParameterVector&
+   SensitivityData&)
+{
+  libmesh_not_implemented();
+}
+
+void EigenSystem::forward_qoi_parameter_sensitivity
+  (const QoISet&,
+   const ParameterVector&
+   SensitivityData&)
 {
   libmesh_not_implemented();
 }

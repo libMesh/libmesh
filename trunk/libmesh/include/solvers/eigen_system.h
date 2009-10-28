@@ -103,18 +103,28 @@ public:
    *
    * FIXME - eigensystem adjoint solutions are not yet implemented.
    */
-  virtual void adjoint_solve ();
+  virtual void adjoint_solve (const QoISet& qoi_indices = QoISet());
 
   /**
-   * Solves for the derivative of the system's quantity of interest q
-   * with respect to each parameter p in \p parameters.  Currently
-   * uses adjoint_solve, along with finite differenced derivatives
-   * (partial q / partial p) and (partial R / partial p).
+   * Solves the sensitivity eigen system
    *
+   * FIXME - eigensystem sensitivity solutions are not yet implemented.
+   */
+  virtual void sensitivity_solve (const ParameterVector parameters);
+
+  /**
    * FIXME - eigensystem sensitivities are not yet implemented.
    */
-  virtual void qoi_parameter_sensitivity (std::vector<Number *>& parameters,
-                                          std::vector<Number>& sensitivities);
+  virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
+                                                  const ParameterVector& parameters,
+                                                  SensitivityData& sensitivities);
+ 
+  /**
+   * FIXME - eigensystem sensitivities are not yet implemented.
+   */
+  virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
+                                                  const ParameterVector& parameters,
+                                                  SensitivityData& sensitivities);
  
   /**
    * Assembles the system matrix. 

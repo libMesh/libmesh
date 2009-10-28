@@ -22,6 +22,7 @@
 #include "dof_map.h"
 #include "libmesh_logging.h"
 #include "linear_solver.h"
+#include "parameter_vector.h"
 #include "petsc_diff_solver.h"
 #include "petsc_matrix.h"
 #include "petsc_vector.h"
@@ -284,13 +285,59 @@ unsigned int PetscDiffSolver::solve()
 
 
 
-unsigned int PetscDiffSolver::adjoint_solve()
+unsigned int PetscDiffSolver::sensitivity_solve(const ParameterVector& parameters)
 {
-  // The adjoint_solve API (and all APIs using it) are about to see a
-  // series of non-backwards-compatible changes, primarily to add
-  // multiple-QoI support
-  libmesh_experimental();
+  START_LOG("sensitivity_solve()", "PetscDiffSolver");
 
+  // Do DiffSystem assembly
+  _system.assembly(false, true);
+  _system.matrix->close();
+
+  // And assemble right hand sides with the residual's
+  // derivatives
+  _system.assemble_residual_derivatives(parameters);
+
+  // Then build something to solve the _linear_ system
+  AutoPtr<LinearSolver<Number> > linear_solver = LinearSolver<Number>::build();
+
+  // Our iteration counts and residuals will be sums of the individual
+  // results
+  unsigned int linear_steps = 0;
+  Real _final_residual = 0.0;
+  std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
+
+  // Solve the linear system.  Two cases:
+  SparseMatrix<Number> *pc = _system.request_matrix("Preconditioner");
+  for (unsigned int p=0; p != parameters.size(); ++p)
+    {
+      // 1.) User-supplied preconditioner
+      rval = linear_solver->solve (*_system.matrix, pc,
+	                           _system.get_sensitivity_solution(p),
+                                   _system.get_sensitivity_rhs(p),
+                                   relative_residual_tolerance,
+                                   max_linear_iterations);
+      linear_steps    += rval.first;
+      _final_residual += rval.second;
+    }
+
+  // The linear solver may not have fit our constraints exactly
+#ifdef LIBMESH_ENABLE_AMR
+  for (unsigned int p=0; p != parameters.size(); ++p)
+    _system.get_dof_map().enforce_constraints_exactly
+      (_system, &_system.get_sensitivity_solution(p));
+#endif
+
+  STOP_LOG("sensitivity_solve()", "PetscDiffSolver");
+
+  // FIXME - We'll worry about getting the solve result right later...
+  
+  return DiffSolver::CONVERGED_RELATIVE_RESIDUAL;
+}
+
+
+
+unsigned int PetscDiffSolver::adjoint_solve(const QoISet& qoi_indices)
+{
   START_LOG("adjoint_solve()", "PetscDiffSolver");
 
   // Do DiffSystem assembly
@@ -300,41 +347,45 @@ unsigned int PetscDiffSolver::adjoint_solve()
   // But take the adjoint
   _system.matrix->get_transpose(*_system.matrix);
 
-  if (_system.have_matrix("Preconditioner"))
-    {
-      SparseMatrix<Number> &pre = _system.get_matrix("Preconditioner");
-      pre.get_transpose(pre);
-    }
+  SparseMatrix<Number> *pc = _system.request_matrix("Preconditioner");
+  if(pc)
+    pc->get_transpose(*pc);
 
-  // And set the right hand side to the quantity of interest
-  // derivative
+  // And assemble right hand sides with the quantity of interest
+  // derivatives
   _system.assemble_qoi_derivative();
 
   // Then build something to solve the _linear_ system
   AutoPtr<LinearSolver<Number> > linear_solver = LinearSolver<Number>::build();
 
-  // Solve the linear system.  Two cases:
-  const std::pair<unsigned int, Real> rval =
-    (_system.have_matrix("Preconditioner")) ?
-  // 1.) User-supplied preconditioner
-    linear_solver->solve (*_system.matrix,
-                          _system.get_matrix("Preconditioner"),
-			  *_system.solution, *_system.rhs,
-                          relative_residual_tolerance,
-                          max_linear_iterations) :
-  // 2.) Use system matrix for the preconditioner
-    linear_solver->solve (*_system.matrix,
-                          *_system.solution, *_system.rhs,
-                          relative_residual_tolerance, 
-                          max_linear_iterations);
+  // Our iteration counts and residuals will be sums of the individual
+  // results
+  unsigned int linear_steps = 0;
+  Real _final_residual = 0.0;
+  std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
 
-  // We may need to localize a parallel solution
-  _system.update ();
+  // Solve the linear system.  Two cases:
+  for (unsigned int q=0; q != _system.qoi.size(); ++q)
+    if (qoi_indices.has_index(q))
+      {
+        // 1.) User-supplied preconditioner
+        rval = linear_solver->solve (*_system.matrix, pc,
+                                     _system.add_adjoint_solution(q),
+                                     _system.get_adjoint_rhs(q),
+                                     relative_residual_tolerance,
+                                     max_linear_iterations);
+        linear_steps    += rval.first;
+        _final_residual += rval.second;
+      }
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_AMR
-  _system.get_dof_map().enforce_constraints_exactly(_system);
+  for (unsigned int q=0; q != _system.qoi.size(); ++q)
+    if (qoi_indices.has_index(q))
+      _system.get_dof_map().enforce_constraints_exactly
+        (_system, &_system.get_adjoint_solution(q));
 #endif
+
 
   STOP_LOG("adjoint_solve()", "PetscDiffSolver");
 

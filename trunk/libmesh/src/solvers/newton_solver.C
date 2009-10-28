@@ -21,13 +21,14 @@
 #include "cmath" // For isnan(), when it's defined
 
 #include "diff_system.h"
+#include "dof_map.h"
 #include "equation_systems.h"
 #include "libmesh_logging.h"
 #include "linear_solver.h"
 #include "newton_solver.h"
 #include "numeric_vector.h"
+#include "parameter_vector.h"
 #include "sparse_matrix.h"
-#include "dof_map.h"
 
 // SIGN from Numerical Recipes
 template <typename T>
@@ -488,22 +489,76 @@ unsigned int NewtonSolver::solve()
 
 
 
-unsigned int NewtonSolver::adjoint_solve()
+unsigned int NewtonSolver::sensitivity_solve(const ParameterVector& parameters)
 {
-  // The adjoint_solve API (and all APIs using it) are about to see a
-  // series of non-backwards-compatible changes, primarily to add
-  // multiple-QoI support
-  libmesh_experimental();
+  START_LOG("sensitivity_solve()", "NewtonSolver");
 
+  if (!quiet)
+  std::cout << "Assembling the Sensitivity System" << std::endl;
+
+  // Do DiffSystem assembly
+  _system.assembly(false, true);
+  _system.matrix->close();
+
+  // And assemble right hand sides with the residual's parameter
+  // derivatives
+  _system.assemble_residual_derivatives(parameters);
+
+  if (!quiet)
+    std::cout << "Linear solve of Sensitivity System starting, tolerance " 
+	      << relative_residual_tolerance << ", max iterations "
+              << max_linear_iterations << std::endl;
+
+
+  // Our iteration counts and residuals will be sums of the individual
+  // results
+  unsigned int linear_steps = 0;
+  Real _final_residual = 0.0;
+  std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
+
+  // Solve the linear system.
+  SparseMatrix<Number> *pc = _system.request_matrix("Preconditioner");
+  for (unsigned int p=0; p != parameters.size(); ++p)
+    {
+      rval = linear_solver->solve (*_system.matrix, pc,
+	                           _system.get_sensitivity_solution(p),
+                                   _system.get_sensitivity_rhs(p),
+                                   relative_residual_tolerance,
+                                   max_linear_iterations);
+      linear_steps    += rval.first;
+      _final_residual += rval.second;
+    }
+
+  // The linear solver may not have fit our constraints exactly
+#ifdef LIBMESH_ENABLE_AMR
+  for (unsigned int p=0; p != parameters.size(); ++p)
+    _system.get_dof_map().enforce_constraints_exactly
+      (_system, &_system.get_sensitivity_solution(p));
+#endif
+
+  libmesh_assert(linear_steps <= max_linear_iterations * parameters.size());
+
+  if (!quiet)
+    std::cout << "Linear solve of Sensitivity System finished, step " << linear_steps
+	      << ", residual " << rval.second
+	      << std::endl;
+
+  STOP_LOG("sensitivity_solve()", "NewtonSolver");
+
+  // FIXME - We'll worry about getting the solve result right later...
+  
+  return DiffSolver::CONVERGED_RELATIVE_RESIDUAL;
+}
+
+
+
+unsigned int NewtonSolver::adjoint_solve(const QoISet& qoi_indices)
+{
   START_LOG("adjoint_solve()", "NewtonSolver");
 
   if (!quiet)
   std::cout << "Assembling the Adjoint System" << std::endl;
 
-  // Adding an adjoint_solution vector, allocate an adjoint_solution if it doesn't already exist
-
-  NumericVector<Number> & adjoint_solution = _system.add_vector("adjoint_solution");
-  
   // Do DiffSystem assembly
   _system.assembly(false, true);
   _system.matrix->close();
@@ -511,46 +566,48 @@ unsigned int NewtonSolver::adjoint_solve()
   // But take the adjoint
   _system.matrix->get_transpose(*_system.matrix);
 
-  if (_system.have_matrix("Preconditioner"))
-    {
-      SparseMatrix<Number> &pre = _system.get_matrix("Preconditioner");
-      pre.get_transpose(pre);
-    }
+  SparseMatrix<Number> *pc = _system.request_matrix("Preconditioner");
+  if (pc)
+    pc->get_transpose(*pc);
 
   // And set the right hand side to the quantity of interest's
   // derivative
-  _system.assemble_qoi_derivative();
+  _system.assemble_qoi_derivative(qoi_indices);
 
   if (!quiet)
     std::cout << "Linear solve of Adjoint System starting, tolerance " 
 	      << relative_residual_tolerance << ", max iterations "
               << max_linear_iterations << std::endl;
 
-  // Solve the linear system.  Two cases:
-  const std::pair<unsigned int, Real> rval =
-    (_system.have_matrix("Preconditioner")) ?
-  // 1.) User-supplied preconditioner
-    linear_solver->solve (*_system.matrix,
-                          _system.get_matrix("Preconditioner"),
-			  adjoint_solution, *_system.rhs,
-                          relative_residual_tolerance,
-                          max_linear_iterations) :
-  // 2.) Use system matrix for the preconditioner
-    linear_solver->solve (*_system.matrix,
-                          adjoint_solution, *_system.rhs,
-                          relative_residual_tolerance, 
-                          max_linear_iterations);
 
-  // We may need to localize a parallel solution
-  _system.update ();
+  // Our iteration counts and residuals will be sums of the individual
+  // results
+  unsigned int linear_steps = 0;
+  Real _final_residual = 0.0;
+  std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
+
+  // Solve the linear system.
+  for (unsigned int i=0; i != _system.qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      {
+        rval = linear_solver->solve (*_system.matrix, pc,
+	                             _system.add_adjoint_solution(i),
+                                     _system.get_adjoint_rhs(i),
+                                     relative_residual_tolerance,
+                                     max_linear_iterations);
+        linear_steps    += rval.first;
+        _final_residual += rval.second;
+      }
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_AMR
-  _system.get_dof_map().enforce_constraints_exactly(_system, &adjoint_solution);
+  for (unsigned int i=0; i != _system.qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      _system.get_dof_map().enforce_constraints_exactly
+        (_system, &_system.get_adjoint_solution(i));
 #endif
 
-  const unsigned int linear_steps = rval.first;
-  libmesh_assert(linear_steps <= max_linear_iterations);
+  libmesh_assert(linear_steps <= max_linear_iterations * _system.qoi.size());
 
   if (!quiet)
     std::cout << "Linear solve of Adjoint System finished, step " << linear_steps

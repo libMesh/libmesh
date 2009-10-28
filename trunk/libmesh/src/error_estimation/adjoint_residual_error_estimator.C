@@ -28,6 +28,7 @@
 #include "libmesh_logging.h"
 #include "numeric_vector.h"
 #include "system.h"
+#include "qoi_set.h"
 
 
 //-----------------------------------------------------------------
