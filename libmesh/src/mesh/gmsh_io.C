@@ -683,7 +683,7 @@ void GmshIO::write_mesh (std::ostream& out)
         // write the number of tags and
         // tag1 (physical entity), tag2 (geometric entity), and tag3 (partition entity)
         out << " 3 "
-            << (unsigned int)(elem->subdomain_id())
+            << static_cast<unsigned int>(elem->subdomain_id())
             << " 1 " 
             << (elem->processor_id()+1) << " ";
 
