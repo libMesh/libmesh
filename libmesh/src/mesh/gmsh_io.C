@@ -487,7 +487,7 @@ void GmshIO::read_mesh(std::istream& in)
                     }
 
                     // Finally, set the subdomain ID to physical
-                    elem->subdomain_id() = physical;
+		    elem->subdomain_id() = static_cast<subdomain_id_type>(physical);
                 } // if element.dim == dim
               // if this is a boundary
               else if (eletype.dim == dim-1)
@@ -681,11 +681,11 @@ void GmshIO::write_mesh (std::ostream& out)
         out << eletype.exptype;
 
         // write the number of tags and
-        // tag1 (physical entity), and tag2 (geometric entity)
-        out << " 3 1 1 ";
-
-        // write the partition the element belongs to
-        out << elem->processor_id()+1 << " ";
+        // tag1 (physical entity), tag2 (geometric entity), and tag3 (partition entity)
+        out << " 3 "
+            << (unsigned int)(elem->subdomain_id())
+            << " 1 " 
+            << (elem->processor_id()+1) << " ";
 
         // if there is a node translation table, use it
         if (eletype.nodes.size() > 0)
