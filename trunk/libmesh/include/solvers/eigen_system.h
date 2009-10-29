@@ -110,7 +110,7 @@ public:
    *
    * FIXME - eigensystem sensitivity solutions are not yet implemented.
    */
-  virtual void sensitivity_solve (const ParameterVector parameters);
+  virtual void sensitivity_solve (const ParameterVector& parameters);
 
   /**
    * FIXME - eigensystem sensitivities are not yet implemented.
