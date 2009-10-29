@@ -99,6 +99,13 @@ public:
   virtual void solve ();
 
   /**
+   * Calls residual parameter derivative function.
+   *
+   * FIXME - eigensystem adjoint solutions are not yet implemented.
+   */
+  virtual void assemble_residual_derivatives (const ParameterVector& parameters);
+
+  /**
    * Solves the adjoint eigen system
    *
    * FIXME - eigensystem adjoint solutions are not yet implemented.
