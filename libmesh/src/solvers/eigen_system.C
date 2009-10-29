@@ -220,12 +220,17 @@ void EigenSystem::solve ()
   
 }
 
+void EigenSystem::assemble_residual_derivatives (const ParameterVector&)
+{
+  libmesh_not_implemented();
+}
+
 void EigenSystem::sensitivity_solve (const ParameterVector&)
 {
   libmesh_not_implemented();
 }
 
-void EigenSystem::adjoint_solve (const QoiSet&)
+void EigenSystem::adjoint_solve (const QoISet&)
 {
   libmesh_not_implemented();
 }
