@@ -33,6 +33,7 @@
 #include "eigen_solver.h"
 #include "dof_map.h"
 #include "mesh.h"
+#include "qoi_set.h"
 
 
 // ------------------------------------------------------------
@@ -231,7 +232,7 @@ void EigenSystem::adjoint_solve (const QoiSet&)
 
 void EigenSystem::adjoint_qoi_parameter_sensitivity
   (const QoISet&,
-   const ParameterVector&
+   const ParameterVector&,
    SensitivityData&)
 {
   libmesh_not_implemented();
@@ -239,7 +240,7 @@ void EigenSystem::adjoint_qoi_parameter_sensitivity
 
 void EigenSystem::forward_qoi_parameter_sensitivity
   (const QoISet&,
-   const ParameterVector&
+   const ParameterVector&,
    SensitivityData&)
 {
   libmesh_not_implemented();
