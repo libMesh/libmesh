@@ -838,8 +838,9 @@ namespace Parallel
       }
   }
 
-  // Internal helper function to create vector<something_useable> from
-  // vector<bool> for compatibility with MPI byte operations
+  // Internal helper function to create vector<bool> from
+  // vector<something usable> for compatibility with MPI byte
+  // operations
   template <typename T>
   inline void unpack_vector_bool(const std::vector<T> &in,
 				 std::vector<bool> &out)
