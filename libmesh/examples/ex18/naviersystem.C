@@ -213,51 +213,54 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
           // Note that the Fp block is identically zero unless we are using
           // some kind of artificial compressibility scheme...
 
-          // Matrix contributions for the uu and vv couplings.
-          if (request_jacobian)
-            for (unsigned int j=0; j != n_u_dofs; j++)
-              {
-                Kuu(i,j) += JxW[qp] *
- /* convection term */      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
- /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
- /* Newton term     */       Reynolds*u_x*phi[i][qp]*phi[j][qp]);
+          if (request_jacobian && c.elem_solution_derivative)
+            {
+              libmesh_assert (c.elem_solution_derivative == 1.0);
 
-                Kuv(i,j) += JxW[qp] *
- /* Newton term     */      -Reynolds*u_y*phi[i][qp]*phi[j][qp];
+              // Matrix contributions for the uu and vv couplings.
+              for (unsigned int j=0; j != n_u_dofs; j++)
+                {
+                  Kuu(i,j) += JxW[qp] *
+   /* convection term */      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
+   /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
+   /* Newton term     */       Reynolds*u_x*phi[i][qp]*phi[j][qp]);
 
-                Kvv(i,j) += JxW[qp] *
- /* convection term */      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
- /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
- /* Newton term     */       Reynolds*v_y*phi[i][qp]*phi[j][qp]);
+                  Kuv(i,j) += JxW[qp] *
+   /* Newton term     */      -Reynolds*u_y*phi[i][qp]*phi[j][qp];
 
-                Kvu(i,j) += JxW[qp] * 
- /* Newton term     */      -Reynolds*v_x*phi[i][qp]*phi[j][qp];
-                if (dim == 3)
-                  {
-                    Kww(i,j) += JxW[qp] *
- /* convection term */          (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
- /* diffusion term  */           (dphi[i][qp]*dphi[j][qp]) -
- /* Newton term     */           Reynolds*w_z*phi[i][qp]*phi[j][qp]);
-                    Kuw(i,j) += JxW[qp] *
- /* Newton term     */      -Reynolds*u_z*phi[i][qp]*phi[j][qp];
-                    Kvw(i,j) += JxW[qp] *
- /* Newton term     */      -Reynolds*v_z*phi[i][qp]*phi[j][qp];
-                    Kwu(i,j) += JxW[qp] *
- /* Newton term     */      -Reynolds*w_x*phi[i][qp]*phi[j][qp];
-                    Kwv(i,j) += JxW[qp] *
- /* Newton term     */      -Reynolds*w_y*phi[i][qp]*phi[j][qp];
-                  }
-              }
+                  Kvv(i,j) += JxW[qp] *
+   /* convection term */      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
+   /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
+   /* Newton term     */       Reynolds*v_y*phi[i][qp]*phi[j][qp]);
 
-          // Matrix contributions for the up and vp couplings.
-          if (request_jacobian)
-            for (unsigned int j=0; j != n_p_dofs; j++)
-              {
-                Kup(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](0);
-                Kvp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](1);
-                if (dim == 3)
-                  Kwp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](2);
-              }
+                  Kvu(i,j) += JxW[qp] * 
+   /* Newton term     */      -Reynolds*v_x*phi[i][qp]*phi[j][qp];
+                  if (dim == 3)
+                    {
+                      Kww(i,j) += JxW[qp] *
+   /* convection term */          (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
+   /* diffusion term  */           (dphi[i][qp]*dphi[j][qp]) -
+   /* Newton term     */           Reynolds*w_z*phi[i][qp]*phi[j][qp]);
+                      Kuw(i,j) += JxW[qp] *
+   /* Newton term     */      -Reynolds*u_z*phi[i][qp]*phi[j][qp];
+                      Kvw(i,j) += JxW[qp] *
+   /* Newton term     */      -Reynolds*v_z*phi[i][qp]*phi[j][qp];
+                      Kwu(i,j) += JxW[qp] *
+   /* Newton term     */      -Reynolds*w_x*phi[i][qp]*phi[j][qp];
+                      Kwv(i,j) += JxW[qp] *
+   /* Newton term     */      -Reynolds*w_y*phi[i][qp]*phi[j][qp];
+                    }
+                }
+
+              // Matrix contributions for the up and vp couplings.
+              for (unsigned int j=0; j != n_p_dofs; j++)
+                {
+                  Kup(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](0);
+                  Kvp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](1);
+                  if (dim == 3)
+                    Kwp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](2);
+                }
+            }
         }
     } // end of the quadrature point qp-loop
   
@@ -317,14 +320,18 @@ bool NavierSystem::element_constraint (bool request_jacobian,
             Fp(i) += JxW[qp] * psi[i][qp] *
                      (grad_w(2));
 
-          if (request_jacobian)
-            for (unsigned int j=0; j != n_u_dofs; j++)
-              {
-                Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
-                Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
-                if (dim == 3)
-                  Kpw(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](2);
-              }
+          if (request_jacobian && c.elem_solution_derivative)
+            {
+              libmesh_assert (c.elem_solution_derivative == 1.0);
+
+              for (unsigned int j=0; j != n_u_dofs; j++)
+                {
+                  Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
+                  Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
+                  if (dim == 3)
+                    Kpw(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](2);
+                }
+            }
         }
     } // end of the quadrature point qp-loop
 
@@ -416,17 +423,21 @@ bool NavierSystem::side_constraint (bool request_jacobian,
             Fw(i) += JxW_side[qp] * penalty *
                      (w - w_value) * phi_side[i][qp];
 
-          if (request_jacobian)
-            for (unsigned int j=0; j != n_u_dofs; j++)
-              {
-                Kuu(i,j) += JxW_side[qp] * penalty *
-                            phi_side[i][qp] * phi_side[j][qp];
-                Kvv(i,j) += JxW_side[qp] * penalty *
-                            phi_side[i][qp] * phi_side[j][qp];
-                if (dim == 3)
-                  Kww(i,j) += JxW_side[qp] * penalty *
+          if (request_jacobian && c.elem_solution_derivative)
+            {
+              libmesh_assert (c.elem_solution_derivative == 1.0);
+
+              for (unsigned int j=0; j != n_u_dofs; j++)
+                {
+                  Kuu(i,j) += JxW_side[qp] * penalty *
                               phi_side[i][qp] * phi_side[j][qp];
-              }
+                  Kvv(i,j) += JxW_side[qp] * penalty *
+                              phi_side[i][qp] * phi_side[j][qp];
+                  if (dim == 3)
+                    Kww(i,j) += JxW_side[qp] * penalty *
+                                phi_side[i][qp] * phi_side[j][qp];
+                }
+            }
         }
     }
 
@@ -457,11 +468,13 @@ bool NavierSystem::side_constraint (bool request_jacobian,
       for (unsigned int i=0; i != n_p_dofs; i++)
         {
           Fp(i) += penalty * (p - p_value) * point_phi[i];
-          if (request_jacobian)
-            for (unsigned int j=0; j != n_p_dofs; j++)
-              {
+          if (request_jacobian && c.elem_solution_derivative)
+            {
+              libmesh_assert (c.elem_solution_derivative == 1.0);
+
+              for (unsigned int j=0; j != n_p_dofs; j++)
 		Kpp(i,j) += penalty * point_phi[i] * point_phi[j];
-              }
+            }
         }
     }
 
