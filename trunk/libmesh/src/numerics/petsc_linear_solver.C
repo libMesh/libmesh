@@ -23,6 +23,7 @@
 
 
 // C++ includes
+#include <string.h>
 
 // Local Includes
 #include "libmesh_logging.h"
@@ -149,10 +150,6 @@ void PetscLinearSolver<T>::init ()
       ierr = SLESGetPC        (_sles, &_pc);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
-      // Have the Krylov subspace method use our good initial guess rather than 0
-      ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
       
@@ -177,10 +174,6 @@ void PetscLinearSolver<T>::init ()
       ierr = KSPGetPC        (_ksp, &_pc);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-      // Have the Krylov subspace method use our good initial guess rather than 0
-      ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
 
@@ -202,6 +195,20 @@ void PetscLinearSolver<T>::init ()
 	       
 #endif
 	     
+      // Have the Krylov subspace method use our good initial guess
+      // rather than 0, unless the user requested a KSPType of
+      // preonly, which complains about initial guesses.
+      KSPType ksp_type;
+
+      ierr = KSPGetType (_ksp, &ksp_type);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      if (strcmp(ksp_type, "preonly"))
+        {
+          ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
+                 CHKERRABORT(libMesh::COMM_WORLD,ierr);
+        }
+      
       // Notify PETSc of location to store residual history.
       // This needs to be called before any solves, since
       // it sets the residual history length to zero.  The default
@@ -249,10 +256,6 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       ierr = SLESGetPC        (_sles, &_pc);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
-      // Have the Krylov subspace method use our good initial guess rather than 0
-      ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
       
@@ -285,10 +288,6 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       ierr = KSPSetOperators(_ksp, matrix->mat(), matrix->mat(),SAME_NONZERO_PATTERN);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);       
 
-      // Have the Krylov subspace method use our good initial guess rather than 0
-      ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
 
@@ -310,6 +309,20 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
 	       
 #endif
 	     
+      // Have the Krylov subspace method use our good initial guess
+      // rather than 0, unless the user requested a KSPType of
+      // preonly, which complains about initial guesses.
+      KSPType ksp_type;
+
+      ierr = KSPGetType (_ksp, &ksp_type);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      if (strcmp(ksp_type, "preonly"))
+        {
+          ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
+                 CHKERRABORT(libMesh::COMM_WORLD,ierr);
+        }
+      
       // Notify PETSc of location to store residual history.
       // This needs to be called before any solves, since
       // it sets the residual history length to zero.  The default
