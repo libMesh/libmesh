@@ -33,6 +33,7 @@
 #include "elem.h"
 #include "mesh_base.h"
 #include "mesh_tools.h"
+#include "parallel.h"
 #include "partitioner.h"
 #include "point_locator_base.h"
 
@@ -42,7 +43,6 @@
 // MeshBase class member functions
 MeshBase::MeshBase (unsigned int d) :
   boundary_info  (new BoundaryInfo(*this)),
-  _n_sbd         (1),
   _n_parts       (1),
   _dim           (d),
   _is_prepared   (false),
@@ -58,7 +58,6 @@ MeshBase::MeshBase (unsigned int d) :
 
 MeshBase::MeshBase (const MeshBase& other_mesh) :
   boundary_info  (new BoundaryInfo(*this)), // no copy constructor defined for BoundaryInfo?
-  _n_sbd         (other_mesh._n_sbd),
   _n_parts       (other_mesh._n_parts),
   _dim           (other_mesh._dim),
   _is_prepared   (other_mesh._is_prepared),
@@ -116,10 +115,6 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 
 void MeshBase::clear ()
 {
-  
-  // Reset the number of subdomains
-  _n_sbd  = 1;
-
   // Reset the number of partitions
   _n_parts = 1;
 
@@ -133,6 +128,29 @@ void MeshBase::clear ()
   this->clear_point_locator();
 }
 
+
+
+unsigned int MeshBase::n_subdomains() const
+{
+  // This requires an inspection on every processor
+  parallel_only();
+
+  const_element_iterator       el  = this->active_elements_begin();
+  const const_element_iterator end = this->active_elements_end(); 
+
+  std::set<unsigned int> subdomain_ids;
+  
+  for (; el!=end; ++el)
+    subdomain_ids.insert((*el)->subdomain_id());
+
+  // Some subdomains may only live on other processors
+  Parallel::set_union(subdomain_ids, 0);
+
+  unsigned int n_sbd_ids = subdomain_ids.size();
+  Parallel::broadcast(n_sbd_ids);
+
+  return n_sbd_ids;
+}
 
 
 unsigned int MeshBase::n_nodes_on_proc (const unsigned int proc_id) const

@@ -417,8 +417,7 @@ public:
    * physical processes are important.  The subdomain mapping is independent
    * from the parallel decomposition.
    */
-  unsigned int n_subdomains () const
-  { return _n_sbd; }
+  unsigned int n_subdomains () const;
 
   /**
    * Returns the number of partitions which have been defined via
@@ -665,13 +664,6 @@ public:
 
 
   
-  /**
-   * Returns a writeable reference to the number of subdomains.
-   */
-  unsigned int& set_n_subdomains ()
-  { return _n_sbd; }
-  
-  
 protected:
 
 
@@ -685,16 +677,6 @@ protected:
   unsigned int& set_n_partitions ()
   { return _n_parts; }
   
-  /**
-   * The number of subdomains the mesh has.
-   * **NOTE** Not to be confused with the number of paritions!
-   * The definition of subdomain can be anything the user wants,
-   * e.g. a solid region bounded by a liquid region could be
-   * referred to as subdomains 1 and 2, but those subdomains
-   * could be partitioned over many processors.
-   */
-  unsigned int _n_sbd;
-
   /**
    * The number of partitions the mesh has.  This is set by
    * the partitioners, and may not be changed directly by
