@@ -37,7 +37,8 @@ AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
   adjoint_already_solved(false),
   error_plot_suffix(),
   _primal_error_estimator(new PatchRecoveryErrorEstimator()),
-  _dual_error_estimator(new PatchRecoveryErrorEstimator())
+  _dual_error_estimator(new PatchRecoveryErrorEstimator()),
+  _qoi_set(QoISet())
 {
 }
 
@@ -60,7 +61,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
       // FIXME - we'll need to change a lot of APIs to make this trick
       // work with a const System...
       System&  system = const_cast<System&>(_system);
-      system.adjoint_solve();
+      system.adjoint_solve(_qoi_set);
     }
 
   // This bookkeeping should now be taken care of in subestimators
@@ -75,10 +76,27 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
   // // system.update();
 
   // Get a separate estimate of the dual problem error
-  ErrorVector dual_error_per_cell;
-  _dual_error_estimator->estimate_error
-    (_system, dual_error_per_cell, &(_system.get_adjoint_solution()),
-     estimate_parent_error);
+  ErrorVector total_dual_error_per_cell;
+
+  // Sum and weight this estimate based on our QoISet
+  for (unsigned int i = 0; i != _system.qoi.size(); ++i)
+    if (_qoi_set.has_index(i))
+      {
+        Real error_weight = _qoi_set.weight(i);
+
+        ErrorVector dual_error_per_cell;
+        _dual_error_estimator->estimate_error
+          (_system, dual_error_per_cell, &(_system.get_adjoint_solution(i)),
+           estimate_parent_error);
+
+        unsigned int error_size = dual_error_per_cell.size();
+        libmesh_assert(!total_dual_error_per_cell.size() ||
+                       total_dual_error_per_cell.size() == error_size);
+        total_dual_error_per_cell.resize(error_size);
+        for (unsigned int e = 0; e != error_size; ++e)
+          total_dual_error_per_cell[e] += 
+            error_weight * dual_error_per_cell[e];
+      }
 
   // Do some debugging plots if requested
   if (!error_plot_suffix.empty())
@@ -88,7 +106,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
       primal_out += error_plot_suffix;
       dual_out += error_plot_suffix;
       error_per_cell.plot_error(primal_out, _system.get_mesh());
-      dual_error_per_cell.plot_error(dual_out, _system.get_mesh());
+      total_dual_error_per_cell.plot_error(dual_out, _system.get_mesh());
     }
 
   // More bookkeeping for subestimators to do
@@ -103,7 +121,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
   // Weight the primal error by the dual error
   // FIXME: we ought to thread this
   for (unsigned int i=0; i != error_per_cell.size(); ++i)
-    error_per_cell[i] *= dual_error_per_cell[i];
+    error_per_cell[i] *= total_dual_error_per_cell[i];
 
   STOP_LOG("estimate_error()", "AdjointResidualErrorEstimator");
 }
