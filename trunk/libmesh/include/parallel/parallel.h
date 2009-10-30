@@ -2605,6 +2605,12 @@ namespace Parallel
   template <typename T>
   inline void sum(std::vector<T> &) {}
 
+  template <typename T>
+  inline void set_union(std::set<T> &data, const unsigned int root_id) {}
+
+  template <typename T>
+  inline void set_union(std::set<T> &data) {}
+
  //-------------------------------------------------------------------
   /**
    * Blocking message probe.  Allows information about a message to be 
