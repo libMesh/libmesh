@@ -92,7 +92,6 @@ void BoundaryInfo::sync (BoundaryMesh& boundary_mesh,
 		_boundary_ids.end(),
 		Fill(id_map));
     
-  boundary_mesh.set_n_subdomains() = id_map.size();
   boundary_mesh.set_n_partitions() = id_map.size();
 
 
@@ -207,7 +206,6 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
   // Re-create the boundary mesh.
   boundary_mesh.clear();
     
-  boundary_mesh.set_n_subdomains() = _mesh.n_subdomains();
   boundary_mesh.set_n_partitions() = _mesh.n_partitions();
 
   // Make individual copies of all the nodes in the current mesh

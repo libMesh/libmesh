@@ -5431,6 +5431,7 @@ src/mesh/mesh_base.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_tools.h\
     include/numerics/type_vector.h\
+    include/parallel/parallel.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
     include/utils/compare_types.h\
