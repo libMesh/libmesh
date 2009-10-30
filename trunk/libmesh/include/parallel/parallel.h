@@ -22,6 +22,7 @@
 #define __parallel_h__
 
 // System includes
+#include <set>
 #include <string>
 #include <vector>
 
@@ -427,6 +428,22 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Take set of local variables on each processor, and collect their
+   * union over all processors, replacing the set on processor 0.
+   */
+  template <typename T>
+  inline void set_union(std::set<T> &data, const unsigned int root_id);
+
+  //-------------------------------------------------------------------
+  /**
+   * Take set of local variables on each processor, and replace it
+   * with their union over all processors.
+   */
+  template <typename T>
+  inline void set_union(std::set<T> &data);
+
+  //-------------------------------------------------------------------
+  /**
    * Blocking message probe.  Allows information about a message to be 
    * examined before the message is actually received.
    */
@@ -515,6 +532,88 @@ namespace Parallel
 	  tag);
   }
 
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-send set to one processor with user-defined type.
+   */
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::set<T> &buf,
+		    const DataType &type,
+		    const int tag=0);
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-send set to one processor with user-defined type.
+   */
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::set<T> &buf,
+		    const DataType &type,
+		    request &req,
+		    const int tag=0);
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-send set to one processor where the communication type 
+   * is inferred from the template argument.
+   */
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::set<T> &buf,
+		    const int tag=0)
+  {
+    send (dest_processor_id,
+	  buf,
+	  datatype<T>(),
+	  tag);
+  }
+
+  // Function overloading for std::complex<>
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::set<std::complex<T> > &buf,
+		    const int tag=0)
+  {
+    send (dest_processor_id,
+	  buf,
+	  datatype<T>(),
+	  tag);
+  }
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-send set to one processor where the communication type 
+   * is inferred from the template argument.
+   */
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::set<T> &buf,
+		    request &req,
+		    const int tag=0)
+  {
+    send (dest_processor_id,
+	  buf,
+	  datatype<T>(),
+	  req,
+	  tag);
+  }
+
+  // Function overloading for std::complex<>
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::set<std::complex<T> > &buf,
+		    request &req,
+		    const int tag=0)
+  {
+    send (dest_processor_id,
+	  buf,
+	  datatype<T>(),
+	  req,
+	  tag);
+  }
 
   //-------------------------------------------------------------------
   /**
@@ -636,6 +735,87 @@ namespace Parallel
   template <typename T>
   inline void receive (const int src_processor_id,
 		       std::vector<std::complex<T> > &buf,
+		       request &req,
+		       const int tag=any_tag)
+  {
+    receive (src_processor_id,
+	     buf,
+	     datatype<T>(),
+	     req,
+	     tag);
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-receive set from one processor with user-defined type.
+   */
+  template <typename T>
+  inline Status receive (const int src_processor_id,
+		         std::set<T> &buf,
+		         const DataType &type,
+		         const int tag=any_tag);
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-receive set from one processor with user-defined type.
+   */
+  template <typename T>
+  inline void receive (const int src_processor_id,
+		       std::set<T> &buf,
+		       const DataType &type,
+		       request &req,
+		       const int tag=any_tag);
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-receive set from one processor where the communication type 
+   * is inferred from the template argument.
+   */
+  template <typename T>
+  inline Status receive (const int src_processor_id,
+		         std::set<T> &buf,
+		         const int tag=any_tag)
+  {
+    return receive (src_processor_id,
+		    buf,
+		    datatype<T>(),
+		    tag);
+  }
+
+  // Function overloading for std::complex<>
+  template <typename T>
+  inline Status receive (const int src_processor_id,
+		         std::set<std::complex<T> > &buf,
+		         const int tag=any_tag)
+  {
+    return receive (src_processor_id,
+		    buf,
+		    datatype<T>(),
+		    tag);
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-receive set from one processor where the communication type 
+   * is inferred from the template argument.
+   */
+  template <typename T>
+  inline void receive (const int src_processor_id,
+		       std::set<T> &buf,
+		       request &req,
+		       const int tag=any_tag)
+  {
+    receive (src_processor_id,
+	     buf,
+	     datatype<T>(),
+	     req,
+	     tag);
+  }
+
+  // Function overloading for std::complex<>
+  template <typename T>
+  inline void receive (const int src_processor_id,
+		       std::set<std::complex<T> > &buf,
 		       request &req,
 		       const int tag=any_tag)
   {
@@ -814,6 +994,15 @@ namespace Parallel
   template <typename T>
   inline void broadcast(std::vector<T> &data, const unsigned int root_id=0);
 
+
+  //-------------------------------------------------------------------
+  /**
+   * Take a local set and broadcast it to all processors.
+   * Optionally takes the \p root_id processor, which specifies
+   * the processor intiating the broadcast.
+   */
+  template <typename T>
+  inline void broadcast(std::set<T> &data, const unsigned int root_id=0);
 
 
   //-----------------------------------------------------------------------
@@ -1178,6 +1367,26 @@ namespace Parallel
 
 
 
+  template <typename T>
+  inline void set_union(std::set<T> &data, const unsigned int root_id)
+  {
+    std::vector<T> vecdata(data.begin(), data.end());
+    Parallel::gather(root_id, vecdata);
+    if (libMesh::processor_id() == root_id)
+      data.insert(vecdata.begin(), vecdata.end());
+  }
+
+
+
+  template <typename T>
+  inline void set_union(std::set<T> &data)
+  {
+    set_union(data, 0);
+    broadcast(data);
+  }
+
+
+
   inline status probe (const int src_processor_id,
 		       const int tag)
   {
@@ -1432,6 +1641,80 @@ namespace Parallel
   }
 
   
+
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::set<T> &buf,
+		    const DataType &type,
+		    const int tag)
+  {    
+    START_LOG("send()", "Parallel");
+
+    std::vector<T> vecbuf(buf.begin(), buf.end());
+    // Use Parallel::send() so we get its specialization(s)
+    Parallel::send(dest_processor_id, vecbuf, type, tag);
+
+    STOP_LOG("send()", "Parallel");
+  }
+
+
+
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::set<T> &buf,
+		    const DataType &type,
+		    request &req,
+		    const int tag)
+  {    
+    START_LOG("send()", "Parallel");
+
+    std::vector<T> vecbuf(buf.begin(), buf.end());
+    // Use Parallel::send() so we get its specialization(s)
+    Parallel::send(dest_processor_id, vecbuf, type, req, tag);
+
+    STOP_LOG("send()", "Parallel");
+  }
+
+
+
+  template <typename T>
+  inline Status receive (const int src_processor_id,
+		         std::set<T> &buf,
+		         const DataType &type,
+		         const int tag)
+  {
+    START_LOG("receive()", "Parallel");
+
+    std::vector<T> vecbuf;
+    // Use Parallel::receive() so we get its specialization(s)
+    Status status = Parallel::receive(src_processor_id, vecbuf, type, tag);
+    buf.assign(vecbuf.begin(), vecbuf.end());
+
+    STOP_LOG("receive()", "Parallel");
+
+    return status;
+  }
+
+
+
+  template <typename T>
+  inline void receive (const int src_processor_id,
+		       std::set<T> &buf,
+		       const DataType &type,
+		       request &req,
+		       const int tag)
+  {
+    START_LOG("receive()", "Parallel");
+
+    std::vector<T> vecbuf;
+    // Use Parallel::receive() so we get its specialization(s)
+    Parallel::receive(src_processor_id, vecbuf, type, req, tag);
+    buf.assign(vecbuf.begin(), vecbuf.end());
+
+    STOP_LOG("receive()", "Parallel");
+  }
+
+
 
   inline status wait (request &r)
   {
@@ -2271,6 +2554,33 @@ namespace Parallel
     STOP_LOG("broadcast()", "Parallel");
   }
 
+
+  template <typename T>
+  inline void broadcast (std::set<T> &data, const unsigned int root_id)
+  {
+    if (libMesh::n_processors() == 1)
+      {
+	libmesh_assert (libMesh::processor_id() == root_id);
+	return;
+      }
+
+    START_LOG("broadcast()", "Parallel");
+
+    std::vector<T> vecdata;
+    if (libMesh::processor_id() == root_id)
+      vecdata.assign(data.begin(), data.end());
+
+    unsigned int vecsize = vecdata.size();
+    Parallel::broadcast(vecsize, root_id);
+    if (libMesh::processor_id() != root_id)
+      vecdata.resize(vecsize);
+
+    Parallel::broadcast(vecdata, root_id);
+    if (libMesh::processor_id() != root_id)
+      data.assign(vecdata.begin(), vecdata.end());
+
+    STOP_LOG("broadcast()", "Parallel");
+  }
 
 #else // LIBMESH_HAVE_MPI
 
