@@ -90,6 +90,7 @@ dnl gcc, cc, and other C compilers.  Then sets the CC variable to the result.
 dnl --------------------------------------------------------------
 AC_PROG_CC([$CC_TRY_LIST])
 
+AC_PROG_FC()
 
 dnl --------------------------------------------------------------
 dnl Shared libraries - enabled by default
