@@ -29,6 +29,7 @@
 // Local Includes
 #include "auto_ptr.h"
 #include "error_estimator.h"
+#include "qoi_set.h"
 
 // Forward Declarations
 
@@ -63,14 +64,22 @@ public:
   ~AdjointResidualErrorEstimator() {}
 
   /**
-   * Access to the "subestimator" (default: Kelly) to use on the primal/forward solution
+   * Access to the "subestimator" (default: PatchRecovery) to use on
+   * the primal/forward solution
    */
   AutoPtr<ErrorEstimator> &primal_error_estimator() { return _primal_error_estimator; }
   
   /**
-   * Access to the "subestimator" (default: Kelly) to use on the dual/adjoint solution
+   * Access to the "subestimator" (default: PatchRecovery) to use on
+   * the dual/adjoint solution
    */
   AutoPtr<ErrorEstimator> &dual_error_estimator() { return _dual_error_estimator; }
+  
+  /**
+   * Access to the QoISet (default: weight all QoIs equally) to use
+   * when computing errors
+   */
+  QoISet &qoi_set() { return _qoi_set; }
   
   /**
    * Has the adjoint problem already been solved?  If the user sets
@@ -112,6 +121,11 @@ protected:
    * An error estimator for the adjoint problem
    */
   AutoPtr<ErrorEstimator> _dual_error_estimator;
+
+  /**
+   * A QoISet to handle cases with multiple QoIs available
+   */
+  QoISet _qoi_set;
 };
 
 

@@ -94,7 +94,8 @@ public:
   QoISet() {}
 
   /**
-   * Default constructor: "calculate all QoIs in the System"
+   * Default constructor: "calculate all QoIs in the System",
+   * "give every QoI weight 1.0"
    */
   QoISet(const System &sys);
 
@@ -105,14 +106,15 @@ public:
   QoISet(const std::vector<bool> &indices) : _indices(indices) {}
 
   /**
-   * Constructor-from-vector: "calculate the listed QoIs"
+   * Constructor-from-vector: "calculate the listed QoIs", "give every
+   * QoI weight 1.0"
    */
   QoISet(const std::vector<unsigned int> &indices);
 
   /**
-   * Resets to "calculate all QoIs"
+   * Resets to "calculate all QoIs, give every QoI weight 1.0"
    */
-  void clear() { _indices.clear(); }
+  void clear() { _indices.clear(); _weights.clear(); }
 
   /**
    * Returns the number of QoIs that would be computed for the
@@ -141,6 +143,16 @@ public:
   void remove_index(unsigned int);
 
   /**
+   * Set the weight for this index
+   */
+  void set_weight(unsigned int, Real);
+
+  /**
+   * Get the weight for this index (default 1.0)
+   */
+  Real weight(unsigned int) const;
+
+  /**
    * Return whether or not this index is in the set to be calculated
    */
   bool has_index(unsigned int) const;
@@ -150,6 +162,11 @@ private:
    * Interpret _indices.empty() to mean "calculate all indices"
    */
   std::vector<bool> _indices;
+
+  /**
+   * Interpret _weights.size() <= i to mean "weight i = 1.0"
+   */
+  std::vector<bool> _weights;
 };
 
 
@@ -190,6 +207,27 @@ inline
 bool QoISet::has_index(unsigned int i) const
 {
   return (_indices.size() <= i || _indices[i]);
+}
+
+
+
+inline
+void QoISet::set_weight(unsigned int i, Real w)
+{
+  if (_weights.size() <= i)
+    _weights.resize(i+1, 1.0);
+
+  _weights[i] = w;
+}
+
+
+
+inline
+Real QoISet::weight(unsigned int i) const
+{
+  if (_weights.size() <= i)
+    return 1.0;
+  return _weights[i];
 }
 
 #endif // #define __qoi_set_h__
