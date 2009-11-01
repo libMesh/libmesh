@@ -198,7 +198,7 @@ void PetscLinearSolver<T>::init ()
       // Have the Krylov subspace method use our good initial guess
       // rather than 0, unless the user requested a KSPType of
       // preonly, which complains about initial guesses.
-      KSPType ksp_type;
+      const KSPType ksp_type;
 
       ierr = KSPGetType (_ksp, &ksp_type);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -312,7 +312,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       // Have the Krylov subspace method use our good initial guess
       // rather than 0, unless the user requested a KSPType of
       // preonly, which complains about initial guesses.
-      KSPType ksp_type;
+      const KSPType ksp_type;
 
       ierr = KSPGetType (_ksp, &ksp_type);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
