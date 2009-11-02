@@ -440,6 +440,27 @@ bool Elem::contains_vertex_of(const Elem *e) const
 
 
 
+bool Elem::contains_edge_of(const Elem *e) const
+{
+  unsigned int num_contained_edges = 0;
+
+  // Our vertices are the first numbered nodes
+  for (unsigned int n = 0; n != e->n_vertices(); ++n)
+    {
+      if (this->contains_point(e->point(n)))
+	{
+	  num_contained_edges++;
+	  if(num_contained_edges>=2)
+	    {
+	      return true;
+	    }
+	}
+    }
+  return false;
+}
+
+
+
 void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
 {
   neighbor_set.clear();
@@ -486,6 +507,64 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
                       for (; child_it != child_end; ++child_it)
                         if (this->contains_vertex_of(*child_it) ||
                             (*child_it)->contains_vertex_of(this))
+                          neighbor_set.insert (*child_it);
+                    }
+#endif // #ifdef LIBMESH_ENABLE_AMR
+                }
+            }
+        }
+    }
+  while (old_size != neighbor_set.size());
+}
+
+
+
+void Elem::find_edge_neighbors(std::set<const Elem *> &neighbor_set) const
+{
+  neighbor_set.clear();
+  neighbor_set.insert(this);
+
+  unsigned int old_size;
+  do
+    {
+      old_size = neighbor_set.size();
+
+      // Loop over all the elements in the patch
+      std::set<const Elem*>::const_iterator       it  = neighbor_set.begin();
+      const std::set<const Elem*>::const_iterator end = neighbor_set.end();
+
+      for (; it != end; ++it)
+        {
+          const Elem* elem = *it;
+
+          for (unsigned int s=0; s<elem->n_sides(); s++)
+            {
+              const Elem* neighbor = elem->neighbor(s);
+              if (neighbor &&
+                  neighbor != remote_elem)    // we have a real neighbor on this side
+                {
+                  if (neighbor->active())                // ... if it is active
+                    {
+                      if (this->contains_edge_of(neighbor) // ... and touches us
+                          || neighbor->contains_edge_of(this))  
+                        neighbor_set.insert (neighbor);  // ... then add it
+                    }
+#ifdef LIBMESH_ENABLE_AMR
+                  else                                 // ... the neighbor is *not* active,
+                    {                                  // ... so add *all* neighboring
+                                                       // active children
+                      std::vector<const Elem*> active_neighbor_children;
+  
+                      neighbor->active_family_tree_by_neighbor
+                        (active_neighbor_children, elem);
+
+                      std::vector<const Elem*>::const_iterator
+                        child_it = active_neighbor_children.begin();
+                      const std::vector<const Elem*>::const_iterator
+                        child_end = active_neighbor_children.end();
+                      for (; child_it != child_end; ++child_it)
+                        if (this->contains_edge_of(*child_it) ||
+                            (*child_it)->contains_edge_of(this))
                           neighbor_set.insert (*child_it);
                     }
 #endif // #ifdef LIBMESH_ENABLE_AMR
