@@ -60,16 +60,17 @@ ex3.$(obj-suffix):\
     $(LIBMESH_DIR)/include/partitioning/partitioner.h\
     $(LIBMESH_DIR)/include/quadrature/quadrature.h\
     $(LIBMESH_DIR)/include/quadrature/quadrature_gauss.h\
-    $(LIBMESH_DIR)/include/solvers/equation_systems.h\
-    $(LIBMESH_DIR)/include/solvers/explicit_system.h\
-    $(LIBMESH_DIR)/include/solvers/frequency_system.h\
-    $(LIBMESH_DIR)/include/solvers/implicit_system.h\
-    $(LIBMESH_DIR)/include/solvers/linear_implicit_system.h\
-    $(LIBMESH_DIR)/include/solvers/newmark_system.h\
-    $(LIBMESH_DIR)/include/solvers/steady_system.h\
-    $(LIBMESH_DIR)/include/solvers/system.h\
-    $(LIBMESH_DIR)/include/solvers/system_norm.h\
-    $(LIBMESH_DIR)/include/solvers/transient_system.h\
+    $(LIBMESH_DIR)/include/systems/equation_systems.h\
+    $(LIBMESH_DIR)/include/systems/explicit_system.h\
+    $(LIBMESH_DIR)/include/systems/frequency_system.h\
+    $(LIBMESH_DIR)/include/systems/implicit_system.h\
+    $(LIBMESH_DIR)/include/systems/linear_implicit_system.h\
+    $(LIBMESH_DIR)/include/systems/newmark_system.h\
+    $(LIBMESH_DIR)/include/systems/qoi_set.h\
+    $(LIBMESH_DIR)/include/systems/steady_system.h\
+    $(LIBMESH_DIR)/include/systems/system.h\
+    $(LIBMESH_DIR)/include/systems/system_norm.h\
+    $(LIBMESH_DIR)/include/systems/transient_system.h\
     $(LIBMESH_DIR)/include/utils/compare_types.h\
     $(LIBMESH_DIR)/include/utils/mapvector.h\
     $(LIBMESH_DIR)/include/utils/o_string_stream.h\
