@@ -211,10 +211,23 @@ class Elem : public ReferenceCountedObject<Elem>,
   bool contains_vertex_of(const Elem *e) const;
 
   /**
+   * This function returns true iff an edge of \p e is contained in
+   * this element.  (Internally, this is done by checking whether at
+   * least two vertices of \p e are contained in this element).
+   */
+  bool contains_edge_of(const Elem *e) const;
+
+  /**
    * This function finds all elements which
    * touch the current element at any point
    */
   void find_point_neighbors(std::set<const Elem *> &neighbor_set) const;
+
+  /**
+   * This function finds all elements which touch the current element
+   * at any edge (more precisely, at at least two points).
+   */
+  void find_edge_neighbors(std::set<const Elem *> &neighbor_set) const;
 
   /**
    * Resets this element's neighbors' appropriate neighbor pointers
