@@ -562,6 +562,7 @@ INPUT                  = ./src/base \
                          ./src/partitioning \
                          ./src/quadrature \
                          ./src/solvers \
+                         ./src/systems \
                          ./src/utils \
                          ./include/base \
                          ./include/enums \
@@ -574,6 +575,7 @@ INPUT                  = ./src/base \
                          ./include/partitioning \
                          ./include/quadrature \
                          ./include/solvers \
+                         ./include/systems \
                          ./include/utils 
 
 # This tag can be used to specify the character encoding of the source files 
