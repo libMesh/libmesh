@@ -90,20 +90,6 @@ public:
    */
   virtual unsigned int solve ();
 
-  /**
-   * This method performs a sensitivity solve.  What occurs in
-   * this method will depend on the PETSc KSP settings.  See
-   * the PETSc documentation for more details.
-   */
-  virtual unsigned int sensitivity_solve (const ParameterVector& parameters);
-
-  /**
-   * This method performs an adjoint solve.  What occurs in
-   * this method will depend on the PETSc KSP settings.  See
-   * the PETSc documentation for more details.
-   */
-  virtual unsigned int adjoint_solve (const QoISet& indices = QoISet());
-
 protected:
 
   /**

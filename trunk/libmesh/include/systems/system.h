@@ -165,15 +165,23 @@ public:
   /**
    * Solves the sensitivity system, for the provided parameters.
    * Must be overloaded in derived systems.
+   *
+   * Returns a pair with the total number of linear iterations
+   * performed and the (sum of the) final residual norms
    */
-  virtual void sensitivity_solve (const ParameterVector& parameters) = 0;
+  virtual std::pair<unsigned int, Real>
+    sensitivity_solve (const ParameterVector& parameters) = 0;
   
   /**
    * Solves the adjoint system, for the specified qoi indices, or for
    * every qoi if \p qoi_indices is NULL.  Must be overloaded in
    * derived systems.
+   *
+   * Returns a pair with the total number of linear iterations
+   * performed and the (sum of the) final residual norms
    */
-  virtual void adjoint_solve (const QoISet& qoi_indices = QoISet()) = 0;
+  virtual std::pair<unsigned int, Real>
+    adjoint_solve (const QoISet& qoi_indices = QoISet()) = 0;
   
   /**
    * Solves for the derivative of each of the system's quantities of

@@ -100,20 +100,28 @@ public:
   virtual void assemble ();
 
   /**
-   * Residual parameter derivative function.
-   *
-   * Uses finite differences by default.
-   *
-   * This will assemble the sensitivity rhs vectors to hold
-   * -(partial R / partial p_i), making them ready to solve
-   * the forward sensitivity equation.
-   *
-   * @e Can be overloaded in derived classes.
+   * Returns a pointer to a linear solver appropriate for use in
+   * adjoint and/or sensitivity solves
    */
-  virtual void assemble_residual_derivatives (const ParameterVector& parameters);
+  virtual LinearSolver<Number> *get_linear_solver() const;
 
   /**
-   * Evaluates \p matrix and/or \p rhs at the current iterate
+   * Returns an integer corresponding to the upper iteration count
+   * limit and a Real corresponding to the convergence tolerance to
+   * be used in linear adjoint and/or sensitivity solves
+   */
+  virtual std::pair<unsigned int, Real>
+    get_linear_solve_parameters() const;
+
+  /**
+   * Releases a pointer to a linear solver acquired by 
+   * \p this->get_linear_solver()
+   */
+  virtual void release_linear_solver(LinearSolver<Number> *) const;
+
+  /**
+   * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
+   * as requested.
    */
   virtual void assembly (bool get_residual, bool get_jacobian) = 0;
 
@@ -355,62 +363,6 @@ public:
    */
   virtual void solve ();
  
-  /**
-   * Invokes the adjoint solver associated with the system, for
-   * quantities of interest q specified by \p qoi_indices.  For
-   * steady state solvers, this will find z where dF/du^T*z = dq/du.
-   * For transient solvers, this should integrate 
-   * -dz/dt = dF/du^T*z + dq/du.
-   *
-   * FIXME - transient adjoint solves are not yet implemented.
-   */
-  virtual void adjoint_solve (const QoISet& qoi_indices = QoISet());
-
-  /**
-   * This method performs a solve on the linear sensitivity system,
-   * for parameters p in \p parameters.  For
-   * steady state solvers, this will find u_p where 
-   * dF/du*u_p = * -dF/dp.  For transient solvers, this should
-   * integrate one sensitivity time step.
-   *
-   * FIXME - transient sensitivity solves are not yet tested
-   */
-  virtual void sensitivity_solve (const ParameterVector &parameters);
-
-  /**
-   * Solves for the derivative of each of the system's quantities of
-   * interest q in \p qoi[qoi_indices] with respect to each parameter in 
-   * \p parameters, placing the result for qoi \p i and parameter \p j
-   * into \p sensitivities[i][j].
-   *
-   * Uses adjoint_solve() and the adjoint sensitivity method.
-   * 
-   * Currently uses finite differenced derivatives (partial q /
-   * partial p) and (partial R / partial p).
-   *
-   * FIXME - transient sensitivities are not yet implemented.
-   */
-  virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
-                                                  const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities);
-
-  /**
-   * Solves for the derivative of each of the system's quantities of
-   * interest q in \p qoi[qoi_indices] with respect to each parameter in 
-   * \p parameters, placing the result for qoi \p i and parameter \p j
-   * into \p sensitivities[i][j].
-   *
-   * Uses sensitivity_solve() and the forward sensitivity method.
-   * 
-   * Currently uses finite differenced derivatives (partial q /
-   * partial p) and (partial R / partial p).
-   *
-   * FIXME - transient sensitivities are not yet implemented.
-   */
-  virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
-                                                  const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities);
-  
   /**
    * A pointer to the solver object we're going to use.
    * This must be instantiated by the user before solving!

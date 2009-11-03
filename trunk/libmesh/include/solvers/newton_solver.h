@@ -73,16 +73,6 @@ public:
   virtual unsigned int solve ();
 
   /**
-   * This method performs a sensitivity solve, using a Krylov method.
-   */
-  virtual unsigned int sensitivity_solve (const ParameterVector& parameters);
- 
-  /**
-   * This method performs an adjoint solve, using a Krylov method.
-   */
-  virtual unsigned int adjoint_solve (const QoISet& indices = QoISet());
-
-  /**
    * If this is set to true, the solver is forced to test the residual
    * after each Newton step, and to reduce the length of its steps
    * whenever necessary to avoid a residual increase.
