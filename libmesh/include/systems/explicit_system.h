@@ -118,15 +118,17 @@ public:
    * Yells at any user who tried to solve for sensitivities without
    * providing more than an explicit system assembly.
    */
-  virtual void sensitivity_solve (const ParameterVector&)
-    { libmesh_error(); }
+  virtual std::pair<unsigned int, Real>
+    sensitivity_solve (const ParameterVector&)
+      { libmesh_error(); }
  
   /**
    * Yells at any user who tried to use an adjoint without
    * providing more than an explicit system assembly.
    */
-  virtual void adjoint_solve (const QoISet&)
-    { libmesh_error(); }
+  virtual std::pair<unsigned int, Real>
+    adjoint_solve (const QoISet&)
+      { libmesh_error(); }
  
   /**
    * Yells at any user who tried to calculate parameter sensitivities

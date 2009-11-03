@@ -118,49 +118,23 @@ public:
   virtual void solve ();
  
   /**
-   * Assembles & solves the linear system (dR/du)*u_p = -dR/dp, for
-   * those parameters contained in \p parameters.
+   * Returns a pointer to a linear solver appropriate for use in
+   * adjoint and/or sensitivity solves
    */
-  virtual void sensitivity_solve (const ParameterVector& parameters);
- 
+  virtual LinearSolver<Number> *get_linear_solver() const;
+
   /**
-   * Assembles & solves the linear system (dR/du)^T*z = dq/du, for
-   * those quantities of interest q specified by \p qoi_indices.
-   *
-   * Leave \p qoi_indices empty to solve all adjoint problems.
+   * Releases a pointer to a linear solver acquired by 
+   * \p this->get_linear_solver()
    */
-  virtual void adjoint_solve (const QoISet& qoi_indices = QoISet());
- 
+  virtual void release_linear_solver(LinearSolver<Number> *) const;
+
   /**
-   * Solves for the derivative of each of the system's quantities of
-   * interest q in \p qoi[qoi_indices] with respect to each parameter in 
-   * \p parameters, placing the result for qoi \p i and parameter \p j
-   * into \p sensitivities[i][j].
-   *
-   * Uses adjoint_solve() and the adjoint sensitivity method.
-   *
-   * Currently uses finite differenced derivatives 
-   * (partial q / partial p) and (partial (b-Ax) / partial p).
+   * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
+   * as requested.
    */
-  virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
-                                                  const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities);
- 
-  /**
-   * Solves for the derivative of each of the system's quantities of
-   * interest q in \p qoi[qoi_indices] with respect to each parameter in 
-   * \p parameters, placing the result for qoi \p i and parameter \p j
-   * into \p sensitivities[i][j].
-   *
-   * Uses the forward sensitivity method.
-   *
-   * Currently uses finite differenced derivatives 
-   * (partial q / partial p) and (partial (b-Ax) / partial p).
-   */
-  virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
-                                                  const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities);
-  
+  virtual void assembly(bool get_residual, bool get_jacobian);
+
   /**
    * @returns \p "LinearImplicit".  Helps in identifying
    * the system type in an equation system file.

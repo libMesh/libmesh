@@ -95,20 +95,6 @@ public:
   virtual unsigned int solve () = 0;
 
   /**
-   * This method performs a solve on the linear sensitivity system.
-   * What occurs in this method will depend on the type 
-   * of solver.  See the subclasses for more details.  
-   */
-  virtual unsigned int sensitivity_solve (const ParameterVector& parameters) = 0;
-
-  /**
-   * This method performs a solve on the adjoint system.  
-   * What occurs in this method will depend on the type 
-   * of solver.  See the subclasses for more details.  
-   */
-  virtual unsigned int adjoint_solve (const QoISet& indices = QoISet()) = 0;
-
-  /**
    * @returns the number of "outer" (e.g. quasi-Newton) iterations
    * required by the last solve.
    */

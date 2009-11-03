@@ -46,7 +46,8 @@ TimeSolver::~TimeSolver ()
 void TimeSolver::reinit ()
 {
   _diff_solver->reinit();
-  _linear_solver->reinit();
+  _linear_solver->clear();
+  _linear_solver->init();
 }
 
 
@@ -59,7 +60,7 @@ void TimeSolver::init ()
     _diff_solver = DiffSolver::build(_system);
 
   if (_linear_solver.get() == NULL)
-    _linear_solver = DiffSolver::build(_system);
+    _linear_solver = LinearSolver<Number>::build();
 
   _diff_solver->init();
   _linear_solver->init();
@@ -70,20 +71,6 @@ void TimeSolver::init ()
 void TimeSolver::solve ()
 {
   _diff_solver->solve();
-}
-
-
-
-void TimeSolver::sensitivity_solve (const ParameterVector& parameters)
-{
-  _linear_solver->sensitivity_solve(parameters);
-}
-
-
-
-void TimeSolver::adjoint_solve (const QoISet& qoi_indices)
-{
-  _linear_solver->adjoint_solve(qoi_indices);
 }
 
 

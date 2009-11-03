@@ -28,6 +28,7 @@
 #include "explicit_system.h"
 
 // Forward declarations
+template <typename T> class LinearSolver;
 template <typename T> class SparseMatrix;
 
 
@@ -105,6 +106,105 @@ public:
    */
   virtual std::string system_type () const { return "Implicit"; }
 
+  /**
+   * Returns a pointer to a linear solver appropriate for use in
+   * adjoint and/or sensitivity solves
+   *
+   * In \p ImplicitSystem this just gives us a default LinearSolver;
+   * but it may be overridden in derived systems, e.g. to set solver
+   * parameters
+   */
+  virtual LinearSolver<Number> *get_linear_solver() const;
+
+  /**
+   * Returns an integer corresponding to the upper iteration count
+   * limit and a Real corresponding to the convergence tolerance to
+   * be used in linear adjoint and/or sensitivity solves
+   */
+  virtual std::pair<unsigned int, Real>
+    get_linear_solve_parameters() const;
+
+  /**
+   * Releases a pointer to a linear solver acquired by 
+   * \p this->get_linear_solver()
+   */
+  virtual void release_linear_solver(LinearSolver<Number> *) const;
+
+  /**
+   * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
+   * as requested.
+   *
+   * This is undefined in ImplicitSystem; subclasses each have their
+   * own way of handling assembly.
+   */
+  virtual void assembly(bool get_residual, bool get_jacobian)
+    { libmesh_error(); }
+
+  /**
+   * Residual parameter derivative function.
+   *
+   * Uses finite differences by default.
+   *
+   * This will assemble the sensitivity rhs vectors to hold
+   * -(partial R / partial p_i), making them ready to solve
+   * the forward sensitivity equation.
+   *
+   * @e Can be overloaded in derived classes.
+   */
+  virtual void assemble_residual_derivatives (const ParameterVector& parameters);
+
+  /**
+   * Assembles & solves the linear system(s) (dR/du)*u_p = -dR/dp, for
+   * those parameters contained within \p parameters.
+   *
+   * Returns a pair with the total number of linear iterations
+   * performed and the (sum of the) final residual norms
+   */
+  virtual std::pair<unsigned int, Real>
+    sensitivity_solve (const ParameterVector& parameters);
+ 
+  /**
+   * Assembles & solves the linear system (dR/du)^T*z = dq/du, for
+   * those quantities of interest q specified by \p qoi_indices.
+   *
+   * Leave \p qoi_indices empty to solve all adjoint problems.
+   *
+   * Returns a pair with the total number of linear iterations
+   * performed and the (sum of the) final residual norms
+   */
+  virtual std::pair<unsigned int, Real>
+    adjoint_solve (const QoISet& qoi_indices = QoISet());
+ 
+  /**
+   * Solves for the derivative of each of the system's quantities of
+   * interest q in \p qoi[qoi_indices] with respect to each parameter in 
+   * \p parameters, placing the result for qoi \p i and parameter \p j
+   * into \p sensitivities[i][j].
+   *
+   * Uses adjoint_solve() and the adjoint sensitivity method.
+   * 
+   * Currently uses finite differenced derivatives (partial q /
+   * partial p) and (partial R / partial p).
+   */
+  virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
+                                                  const ParameterVector& parameters,
+                                                  SensitivityData& sensitivities);
+
+  /**
+   * Solves for the derivative of each of the system's quantities of
+   * interest q in \p qoi[qoi_indices] with respect to each parameter in 
+   * \p parameters, placing the result for qoi \p i and parameter \p j
+   * into \p sensitivities[i][j].
+   *
+   * Uses the forward sensitivity method.
+   * 
+   * Currently uses finite differenced derivatives (partial q /
+   * partial p) and (partial R / partial p).
+   */
+  virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
+                                                  const ParameterVector& parameters,
+                                                  SensitivityData& sensitivities);
+  
   /**
    * Matrix iterator typedefs.
    */
