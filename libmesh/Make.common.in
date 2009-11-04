@@ -116,15 +116,21 @@ oprof-mode := off
 syn-mode   := off
 devel-mode := off
 
-#
+# Unless we find a valid or an unset METHOD 
+# variable, there's something wrong.
+mode := "INVALID"
+
 # If the user has no environment variable
 # called METHOD, he gets optimized mode.
 ifeq (x$(METHOD),x)
   METHOD := opt
 endif
 
-#
 # If METHOD=opt, compile in optimized mode.
+ifeq ($(METHOD),optimized)
+  METHOD := opt
+endif
+
 ifeq ($(METHOD),opt)
   opt-mode := on
   mode     := "optimized"
@@ -132,6 +138,10 @@ endif
 
 #
 # If METHOD=devel, compile in development mode.
+ifeq ($(METHOD),development)
+  METHOD := devel
+endif
+
 ifeq ($(METHOD),devel)
   devel-mode := on
   mode       := "development"
@@ -139,6 +149,9 @@ endif
 
 #
 # If METHOD=dbg, compile in debug mode.
+ifeq ($(METHOD),debug)
+  METHOD := dbg
+endif
 ifeq ($(METHOD),dbg)
   debug-mode := on
   mode       := "debug"
@@ -146,6 +159,12 @@ endif
 
 #
 # If METHOD=prof, compile in profiling mode
+ifeq ($(METHOD),profiling)
+  METHOD := pro
+endif
+ifeq ($(METHOD),prof)
+  METHOD := pro
+endif
 ifeq ($(METHOD),pro)
   prof-mode     := on
   mode          := "profiling"
@@ -154,9 +173,19 @@ endif
 
 #
 # If METHOD=oprof, compile in OProfile mode
+ifeq ($(METHOD),oprofile)
+  METHOD := oprof
+endif
 ifeq ($(METHOD),oprof)
   oprof-mode    := on
   mode          := "oprofile"
+endif
+
+# If the user had a METHOD variable we didn't
+# recognize, there's been some mistake.  Let's
+# yell at them.
+ifeq ($(mode),"INVALID")
+  $(error Invalid environment variable METHOD=$(METHOD) specified)
 endif
 
 # The file extension for object files.
