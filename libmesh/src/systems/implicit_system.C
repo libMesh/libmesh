@@ -291,6 +291,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
     {
       // Build the Jacobian
       this->assembly(false, true);
+      this->matrix->close();
 
       // Reset and build the RHS from the residual derivatives
       this->assemble_residual_derivatives(parameters);
@@ -350,6 +351,7 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
     {
       // Build the Jacobian
       this->assembly(false, true);
+      this->matrix->close();
 
       // Take the discrete adjoint
       matrix->get_transpose(*matrix);
@@ -414,11 +416,13 @@ void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parame
       *parameters[p] -= deltap;
 
       this->assembly(true, false);
+      this->rhs->close();
       sensitivity_rhs = *this->rhs;
 
       *parameters[p] = old_parameter + deltap;
 
       this->assembly(true, false);
+      this->rhs->close();
 
       sensitivity_rhs -= *this->rhs;
       sensitivity_rhs /= (2*deltap);
@@ -483,6 +487,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
       std::vector<Number> qoi_minus = this->qoi;
 
       this->assembly(true, false);
+      this->rhs->close();
       AutoPtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
       *partialR_partialp *= -1;
 
@@ -496,6 +501,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
           partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
 
       this->assembly(true, false);
+      this->rhs->close();
       *partialR_partialp += *this->rhs;
       *partialR_partialp /= (2.*delta_p);
 
@@ -513,6 +519,8 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
   // but we can restore them to a state consistent solution -
   // principle of least surprise.
   this->assembly(true, true);
+  this->rhs->close();
+  this->matrix->close();
   this->assemble_qoi(qoi_indices);
 }
 
@@ -587,6 +595,8 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
   // but we can restore them to a state consistent solution -
   // principle of least surprise.
   this->assembly(true, true);
+  this->rhs->close();
+  this->matrix->close();
   this->assemble_qoi(qoi_indices);
 }
 
