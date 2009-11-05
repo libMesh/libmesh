@@ -99,41 +99,6 @@ public:
   virtual void solve ();
 
   /**
-   * Calls residual parameter derivative function.
-   *
-   * FIXME - eigensystem adjoint solutions are not yet implemented.
-   */
-  virtual void assemble_residual_derivatives (const ParameterVector& parameters);
-
-  /**
-   * Solves the adjoint eigen system
-   *
-   * FIXME - eigensystem adjoint solutions are not yet implemented.
-   */
-  virtual void adjoint_solve (const QoISet& qoi_indices = QoISet());
-
-  /**
-   * Solves the sensitivity eigen system
-   *
-   * FIXME - eigensystem sensitivity solutions are not yet implemented.
-   */
-  virtual void sensitivity_solve (const ParameterVector& parameters);
-
-  /**
-   * FIXME - eigensystem sensitivities are not yet implemented.
-   */
-  virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
-                                                  const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities);
- 
-  /**
-   * FIXME - eigensystem sensitivities are not yet implemented.
-   */
-  virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
-                                                  const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities);
- 
-  /**
    * Assembles the system matrix. 
    */
   virtual void assemble ();

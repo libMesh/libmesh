@@ -103,51 +103,10 @@ public:
     (const QoISet& qoi_indices = QoISet());
  
   /**
-   * Yells at any user who tried to solve for sensitivities without
-   * providing more than an explicit system assembly.
-   */
-  virtual void assemble_residual_derivatives (const ParameterVector&)
-    { libmesh_error(); }
-
-  /**
    * Assembles & solves the linear system Ax=b. 
    */
   virtual void solve ();
  
-  /**
-   * Yells at any user who tried to solve for sensitivities without
-   * providing more than an explicit system assembly.
-   */
-  virtual std::pair<unsigned int, Real>
-    sensitivity_solve (const ParameterVector&)
-      { libmesh_error(); }
- 
-  /**
-   * Yells at any user who tried to use an adjoint without
-   * providing more than an explicit system assembly.
-   */
-  virtual std::pair<unsigned int, Real>
-    adjoint_solve (const QoISet&)
-      { libmesh_error(); }
- 
-  /**
-   * Yells at any user who tried to calculate parameter sensitivities
-   * without providing more than an explicit system assembly.
-   */
-  virtual void adjoint_qoi_parameter_sensitivity (const QoISet&,
-                                                  const ParameterVector&,
-                                                  SensitivityData&)
-    { libmesh_error(); }
-
-  /**
-   * Yells at any user who tried to calculate parameter sensitivities
-   * without providing more than an explicit system assembly.
-   */
-  virtual void forward_qoi_parameter_sensitivity (const QoISet&,
-                                                  const ParameterVector&,
-                                                  SensitivityData&)
-    { libmesh_error(); }
-
   /**
    * @returns \p "Explicit".  Helps in identifying
    * the system type in an equation system file.
