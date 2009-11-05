@@ -76,54 +76,6 @@ void LinearImplicitSystem::reinit ()
 
 
 
-void LinearImplicitSystem::assemble_residual_derivatives(const ParameterVector& parameters)
-{
-  const unsigned int Np = parameters.size();
-  Real deltap = TOLERANCE;
-
-  for (unsigned int p=0; p != Np; ++p)
-    {
-      NumericVector<Number> &sensitivity_rhs = this->add_sensitivity_rhs(p);
-
-      // R(p) = b(p) - A(p)*u(p)
-      //
-      // (partial R / partial p) =
-      // (partial b / partial p) - (partial A / partial p) * u
-      //
-      // Approximate -(partial R / partial p) by
-      // (b(p-dp) - A(p-dp)*u - b(p+dp) + A(p+dp)*u) / (2*dp)
-
-      Number old_parameter = *parameters[p];
-      *parameters[p] += deltap;
-
-      this->assemble();
-      this->rhs->close();
-      this->matrix->close();
-      sensitivity_rhs = *this->rhs;
-
-      // PETSc doesn't implement SGEMX, so neither does NumericVector,
-      // so here's a hackish workaround for v-=A*u:
-      sensitivity_rhs *= -1;
-      sensitivity_rhs.add_vector(*this->solution, *this->matrix);
-      sensitivity_rhs *= -1;
-
-      *parameters[p] = old_parameter + deltap;
-
-      this->assemble();
-      this->rhs->close();
-      this->matrix->close();
-      sensitivity_rhs -= *this->rhs;
-      sensitivity_rhs.add_vector(*this->solution, *this->matrix);
-
-      sensitivity_rhs /= (2*deltap);
-      sensitivity_rhs.close();
-
-      *parameters[p] = old_parameter;
-    }
-}
-
-
-
 void LinearImplicitSystem::solve ()
 {
   if (this->assemble_before_solve)
