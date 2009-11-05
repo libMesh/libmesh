@@ -476,6 +476,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
               dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
               dnl        Well, duh, when the tested value is computed...  OK when it
               dnl        was from an assignment.
+              PROFILING_FLAGS="-p"
               CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
               CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CXXFLAGS_DVL="$CXXFLAGS_DVL -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
@@ -501,6 +502,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
                 INTEL_AX_FLAG="-xW"
               fi
 
+              PROFILING_FLAGS="-p"
               CXXFLAGS_DBG="-Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
               CXXFLAGS_OPT="-Kc++eh -Krtti -O2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
               CXXFLAGS_DVL="$CXXFLAGS_DBG"
