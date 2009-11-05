@@ -155,7 +155,8 @@ public:
    *
    * @e Must be overloaded in derived classes.
    */
-  virtual void assemble_residual_derivatives (const ParameterVector& parameters) = 0;
+  virtual void assemble_residual_derivatives (const ParameterVector& parameters)
+    { libmesh_not_implemented(); }
  
   /**
    * Solves the system.  Must be overloaded in derived systems.
@@ -170,7 +171,8 @@ public:
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
-    sensitivity_solve (const ParameterVector& parameters) = 0;
+    sensitivity_solve (const ParameterVector& parameters)
+      { libmesh_not_implemented(); }
   
   /**
    * Solves the adjoint system, for the specified qoi indices, or for
@@ -181,7 +183,8 @@ public:
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
-    adjoint_solve (const QoISet& qoi_indices = QoISet()) = 0;
+    adjoint_solve (const QoISet& qoi_indices = QoISet())
+      { libmesh_not_implemented(); }
   
   /**
    * Solves for the derivative of each of the system's quantities of
@@ -207,7 +210,8 @@ public:
    */
   virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
                                                   const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities) = 0;
+                                                  SensitivityData& sensitivities)
+    { libmesh_not_implemented(); }
   
   /**
    * Solves for parameter sensitivities using the forward method.
@@ -215,7 +219,8 @@ public:
    */
   virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
                                                   const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities) = 0;
+                                                  SensitivityData& sensitivities)
+    { libmesh_not_implemented(); }
   
   /**
    * @returns \p true when the other system contains
