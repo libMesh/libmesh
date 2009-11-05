@@ -89,22 +89,6 @@ public:
   virtual void reinit ();
    
   /**
-   * Residual parameter derivative function.
-   *
-   * Uses finite differences by default.
-   *
-   * For the linear system A*x=b, we define the residual
-   * R := b - A*x
-   *
-   * This should assemble the sensitivity rhs vectors to hold
-   * -(partial R / partial p_i), making them ready to solve
-   * the forward sensitivity equation.
-   *
-   * @e Can be overloaded in derived classes.
-   */
-  virtual void assemble_residual_derivatives (const ParameterVector& parameters);
-
-  /**
    * Prepares \p matrix and \p _dof_map for matrix assembly.
    * Does not actually assemble anything.  For matrix assembly,
    * use the \p assemble() in derived classes.
