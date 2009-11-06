@@ -141,6 +141,14 @@ public:
   virtual void zero () = 0;    
 
   /**
+   * Creates a vector which has the same type, size and partitioning
+   * as this vector, but whose data is all zero.  Returns it in an \p
+   * AutoPtr.
+   * This must be overloaded in the derived classes.
+   */
+  virtual AutoPtr<NumericVector<T> > zero_clone () const = 0;
+  
+  /**
    * Creates a copy of this vector and returns it in an \p AutoPtr.
    * This must be overloaded in the derived classes.
    */

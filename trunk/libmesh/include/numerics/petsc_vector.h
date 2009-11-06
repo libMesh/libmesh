@@ -123,6 +123,13 @@ public:
   void zero ();    
 
   /**
+   * Creates a vector which has the same type, size and partitioning
+   * as this vector, but whose data is all zero.  Returns it in an \p
+   * AutoPtr.
+   */
+  virtual AutoPtr<NumericVector<T> > zero_clone () const;
+  
+  /**
    * Creates a copy of this vector and returns it in an \p AutoPtr.
    */
   AutoPtr<NumericVector<T> > clone () const;
@@ -933,6 +940,19 @@ void PetscVector<T>::zero ()
       ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
+}
+
+
+
+template <typename T>
+inline
+AutoPtr<NumericVector<T> > PetscVector<T>::zero_clone () const
+{
+  AutoPtr<NumericVector<T> > cloned_vector (new PetscVector<T>);
+
+  cloned_vector->init(*this);
+
+  return cloned_vector;
 }
 
 
