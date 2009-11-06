@@ -119,6 +119,13 @@ public:
   void zero ();    
 
   /**
+   * Creates a vector which has the same type, size and partitioning
+   * as this vector, but whose data is all zero.  Returns it in an \p
+   * AutoPtr.
+   */
+  virtual AutoPtr<NumericVector<T> > zero_clone () const;
+
+  /**
    * Creates a copy of this vector and returns it in an \p AutoPtr.
    */
   AutoPtr<NumericVector<T> > clone () const;
@@ -821,6 +828,19 @@ void EpetraVector<T>::zero ()
   libmesh_assert (this->initialized());
 
   _vec->PutScalar(0.0);
+}
+
+
+
+template <typename T>
+inline
+AutoPtr<NumericVector<T> > EpetraVector<T>::zero_clone () const
+{
+  AutoPtr<NumericVector<T> > cloned_vector (new EpetraVector<T>);
+
+  cloned_vector->init(*this);
+
+  return cloned_vector;
 }
 
 
