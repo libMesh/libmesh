@@ -740,6 +740,27 @@ const NumericVector<Number> & System::get_sensitivity_solution (unsigned int i) 
 
 
 
+NumericVector<Number> & System::add_weighted_sensitivity_solution ()
+{
+  return this->add_vector("weighted_sensitivity_solution");
+}
+
+
+
+NumericVector<Number> & System::get_weighted_sensitivity_solution ()
+{
+  return this->get_vector("weighted_sensitivity_solution");
+}
+
+
+
+const NumericVector<Number> & System::get_weighted_sensitivity_solution () const
+{
+  return this->get_vector("weighted_sensitivity_solution");
+}
+
+
+
 NumericVector<Number> & System::add_adjoint_solution (unsigned int i)
 {
   OStringStream adjoint_name;
@@ -764,6 +785,36 @@ const NumericVector<Number> & System::get_adjoint_solution (unsigned int i) cons
 {
   OStringStream adjoint_name;
   adjoint_name << "adjoint_solution" << i;
+
+  return this->get_vector(adjoint_name.str());
+}
+
+
+
+NumericVector<Number> & System::add_weighted_sensitivity_adjoint_solution (unsigned int i)
+{
+  OStringStream adjoint_name;
+  adjoint_name << "weighted_sensitivity_adjoint_solution" << i;
+
+  return this->get_vector(adjoint_name.str());
+}
+
+
+
+NumericVector<Number> & System::get_weighted_sensitivity_adjoint_solution (unsigned int i)
+{
+  OStringStream adjoint_name;
+  adjoint_name << "weighted_sensitivity_adjoint_solution" << i;
+
+  return this->get_vector(adjoint_name.str());
+}
+
+
+
+const NumericVector<Number> & System::get_weighted_sensitivity_adjoint_solution (unsigned int i) const
+{
+  OStringStream adjoint_name;
+  adjoint_name << "weighted_sensitivity_adjoint_solution" << i;
 
   return this->get_vector(adjoint_name.str());
 }
