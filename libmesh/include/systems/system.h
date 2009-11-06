@@ -153,7 +153,7 @@ public:
    * -(partial R / partial p_i), making them ready to solve
    * the forward sensitivity equation.
    *
-   * @e Must be overloaded in derived classes.
+   * This method is only implemented in some derived classes.
    */
   virtual void assemble_residual_derivatives (const ParameterVector& parameters)
     { libmesh_not_implemented(); }
@@ -169,11 +169,28 @@ public:
    *
    * Returns a pair with the total number of linear iterations
    * performed and the (sum of the) final residual norms
+   *
+   * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
     sensitivity_solve (const ParameterVector& parameters)
       { libmesh_not_implemented(); }
   
+  /**
+   * Assembles & solves the linear system(s) (dR/du)*u_w = sum(w_p*-dR/dp), for
+   * those parameters p contained within \p parameters weighted by the
+   * values w_p found within \p weights.
+   *
+   * Returns a pair with the total number of linear iterations
+   * performed and the (sum of the) final residual norms
+   *
+   * This method is only implemented in some derived classes.
+   */
+  virtual std::pair<unsigned int, Real>
+    weighted_sensitivity_solve (const ParameterVector& parameters,
+                                const ParameterVector& weights)
+      { libmesh_not_implemented(); }
+ 
   /**
    * Solves the adjoint system, for the specified qoi indices, or for
    * every qoi if \p qoi_indices is NULL.  Must be overloaded in
@@ -181,11 +198,33 @@ public:
    *
    * Returns a pair with the total number of linear iterations
    * performed and the (sum of the) final residual norms
+   *
+   * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
     adjoint_solve (const QoISet& qoi_indices = QoISet())
       { libmesh_not_implemented(); }
   
+  /**
+   * Assembles & solves the linear system(s) 
+   * (dR/du)^T*z_w = sum(w_p*(d^2q/dudp - d^2R/dudp*z)), for those
+   * parameters p contained within \p parameters, weighted by the
+   * values w_p found within \p weights.
+   *
+   * Assumes that adjoint_solve has already calculated z for each qoi
+   * in \p qoi_indices.
+   *
+   * Returns a pair with the total number of linear iterations
+   * performed and the (sum of the) final residual norms
+   *
+   * This method is only implemented in some derived classes.
+   */
+  virtual std::pair<unsigned int, Real>
+    weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
+                                        const ParameterVector& weights,
+                                        const QoISet& qoi_indices = QoISet())
+      { libmesh_not_implemented(); }
+ 
   /**
    * Solves for the derivative of each of the system's quantities of
    * interest q in \p qoi[qoi_indices] with respect to each parameter
@@ -199,6 +238,9 @@ public:
    * Automatically chooses the forward method for problems with more
    * quantities of interest than parameters, or the adjoint method
    * otherwise.
+   *
+   * This method is only usable in derived classes which overload
+   * an implementation.
    */
   virtual void qoi_parameter_sensitivity (const QoISet& qoi_indices,
                                           const ParameterVector& parameters,
@@ -206,7 +248,8 @@ public:
   
   /**
    * Solves for parameter sensitivities using the adjoint method.
-   * Must be overloaded in derived systems.
+   *
+   * This method is only implemented in some derived classes.
    */
   virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
                                                   const ParameterVector& parameters,
@@ -215,11 +258,30 @@ public:
   
   /**
    * Solves for parameter sensitivities using the forward method.
-   * Must be overloaded in derived systems.
+   *
+   * This method is only implemented in some derived classes.
    */
   virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
                                                   const ParameterVector& parameters,
                                                   SensitivityData& sensitivities)
+    { libmesh_not_implemented(); }
+  
+  /**
+   * For each of the system's quantities of interest q in 
+   * \p qoi[qoi_indices], and for a vector of parameters p, the
+   * parameter sensitivity Hessian H_ij is defined as 
+   * H_ij = (d^2 q)/(d p_i d p_j)
+   * The Hessian-vector product, for a vector v_k in parameter space, is
+   * S_j = H_jk v_k
+   * This product is the output of this method, where for each q_i,
+   * S_j is stored in \p sensitivities[i][j].  
+   *
+   * This method is only implemented in some derived classes.
+   */
+  virtual void qoi_parameter_hessian_vector_product(const QoISet& qoi_indices,
+                                                    const ParameterVector& parameters,
+                                                    const ParameterVector& vector,
+                                                    SensitivityData& product)
     { libmesh_not_implemented(); }
   
   /**
@@ -486,6 +548,47 @@ public:
    * vectors, by default the one corresponding to the first parameter.
    */
   const NumericVector<Number> & get_sensitivity_solution(unsigned int i=0) const;
+
+  /**
+   * @returns a reference to one of the system's weighted sensitivity
+   * adjoint solution vectors, by default the one corresponding to the
+   * first qoi.
+   * Creates the vector if it doesn't already exist.
+   */
+  NumericVector<Number> & add_weighted_sensitivity_adjoint_solution(unsigned int i=0);
+
+  /**
+   * @returns a reference to one of the system's weighted sensitivity
+   * adjoint solution vectors, by default the one corresponding to the
+   * first qoi.
+   */
+  NumericVector<Number> & get_weighted_sensitivity_adjoint_solution(unsigned int i=0);
+
+  /**
+   * @returns a reference to one of the system's weighted sensitivity
+   * adjoint solution vectors, by default the one corresponding to the
+   * first qoi.
+   */
+  const NumericVector<Number> & get_weighted_sensitivity_adjoint_solution(unsigned int i=0) const;
+
+  /**
+   * @returns a reference to the solution of the last weighted
+   * sensitivity solve
+   * Creates the vector if it doesn't already exist.
+   */
+  NumericVector<Number> & add_weighted_sensitivity_solution();
+
+  /**
+   * @returns a reference to the solution of the last weighted
+   * sensitivity solve
+   */
+  NumericVector<Number> & get_weighted_sensitivity_solution();
+
+  /**
+   * @returns a reference to the solution of the last weighted
+   * sensitivity solve
+   */
+  const NumericVector<Number> & get_weighted_sensitivity_solution() const;
 
   /**
    * @returns a reference to one of the system's adjoint rhs

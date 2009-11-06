@@ -164,6 +164,18 @@ public:
     sensitivity_solve (const ParameterVector& parameters);
  
   /**
+   * Assembles & solves the linear system(s) (dR/du)*u_w = sum(w_p*-dR/dp), for
+   * those parameters p contained within \p parameters weighted by the
+   * values w_p found within \p weights.
+   *
+   * Returns a pair with the total number of linear iterations
+   * performed and the (sum of the) final residual norms
+   */
+  virtual std::pair<unsigned int, Real>
+    weighted_sensitivity_solve (const ParameterVector& parameters,
+                                const ParameterVector& weights);
+ 
+  /**
    * Assembles & solves the linear system (dR/du)^T*z = dq/du, for
    * those quantities of interest q specified by \p qoi_indices.
    *
@@ -174,6 +186,23 @@ public:
    */
   virtual std::pair<unsigned int, Real>
     adjoint_solve (const QoISet& qoi_indices = QoISet());
+ 
+  /**
+   * Assembles & solves the linear system(s) 
+   * (dR/du)^T*z_w = sum(w_p*(d^2q/dudp - d^2R/dudp*z)), for those
+   * parameters p contained within \p parameters, weighted by the
+   * values w_p found within \p weights.
+   *
+   * Assumes that adjoint_solve has already calculated z for each qoi
+   * in \p qoi_indices.
+   *
+   * Returns a pair with the total number of linear iterations
+   * performed and the (sum of the) final residual norms
+   */
+  virtual std::pair<unsigned int, Real>
+    weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
+                                        const ParameterVector& weights,
+                                        const QoISet& qoi_indices = QoISet());
  
   /**
    * Solves for the derivative of each of the system's quantities of
@@ -204,6 +233,21 @@ public:
   virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
                                                   const ParameterVector& parameters,
                                                   SensitivityData& sensitivities);
+  
+  /**
+   * For each of the system's quantities of interest q in 
+   * \p qoi[qoi_indices], and for a vector of parameters p, the
+   * parameter sensitivity Hessian H_ij is defined as 
+   * H_ij = (d^2 q)/(d p_i d p_j)
+   * The Hessian-vector product, for a vector v_k in parameter space, is
+   * S_j = H_jk v_k
+   * This product is the output of this method, where for each q_i,
+   * S_j is stored in \p sensitivities[i][j].  
+   */
+  virtual void qoi_parameter_hessian_vector_product(const QoISet& qoi_indices,
+                                                    const ParameterVector& parameters,
+                                                    const ParameterVector& vector,
+                                                    SensitivityData& product);
   
   /**
    * Matrix iterator typedefs.

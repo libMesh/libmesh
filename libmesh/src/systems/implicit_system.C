@@ -400,6 +400,225 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
 
 
 
+std::pair<unsigned int, Real>
+ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
+                                                    const ParameterVector& weights,
+                                                    const QoISet& qoi_indices)
+{
+  // Log how long the linear solve takes.
+  START_LOG("weighted_sensitivity_adjoint_solve()", "ImplicitSystem");
+
+  // We currently get partial derivatives via central differencing
+  const Real delta_p = TOLERANCE;
+
+  // The forward system should now already be solved.
+  // The adjoint system should now already be solved.
+  // Now we're assembling a weighted sum of adjoint-adjoint systems:
+  //
+  // dR/du (u, sum_l(w_l*z^l)) = sum_l(w_l*(Q''_ul - R''_ul (u, z)))
+
+  // We'll assemble the rhs first, because the R'' term will require
+  // perturbing the jacobian
+
+  // We'll use temporary rhs vectors, because we haven't (yet) found
+  // any good reasons why users might want to save these:
+
+  std::vector<NumericVector<Number> *> temprhs(this->qoi.size());
+  for (unsigned int i=0; i != this->qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      temprhs[i] = this->rhs->zero_clone().release();
+
+  // We approximate the _l partial derivatives via a central
+  // differencing perturbation in the w_l direction:
+  //
+  // sum_l(w_l*v_l) ~= (v(p + dp*w_l*e_l) - v(p - dp*w_l*e_l))/(2*dp)
+
+  // PETSc doesn't implement SGEMX, so neither does NumericVector,
+  // so we want to avoid calculating f -= R'*z.  We'll thus evaluate
+  // the above equation by first adding -v(p+dp...), then multiplying
+  // the intermediate result vectors by -1, then adding -v(p-dp...),
+  // then finally dividing by 2*dp.
+
+  ParameterVector oldparameters, parameterperturbation;
+  parameters.deep_copy(oldparameters);
+  weights.deep_copy(parameterperturbation);
+  parameterperturbation *= delta_p;
+  parameters += parameterperturbation;
+
+  this->assembly(false, true);
+  this->matrix->close();
+
+  // Take the discrete adjoint, so that we can calculate R_u(u,z) with
+  // a matrix-vector product of R_u and z.
+  matrix->get_transpose(*matrix);
+
+  this->assemble_qoi_derivative(qoi_indices);
+  for (unsigned int i=0; i != this->qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      {
+        *(temprhs[i]) -= this->get_adjoint_rhs(i);
+        this->matrix->vector_mult_add(*(temprhs[i]), this->get_adjoint_solution(i));
+        *(temprhs[i]) *= -1.0;
+      }
+
+  oldparameters.value_copy(parameters);
+  parameterperturbation *= -1.0;
+  parameters += parameterperturbation;
+
+  this->assembly(false, true);
+  this->matrix->close();
+  matrix->get_transpose(*matrix);
+
+  this->assemble_qoi_derivative(qoi_indices);
+  for (unsigned int i=0; i != this->qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      {
+        *(temprhs[i]) -= this->get_adjoint_rhs(i);
+        this->matrix->vector_mult_add(*(temprhs[i]), this->get_adjoint_solution(i));
+        *(temprhs[i]) /= (2.0*delta_p);
+      }
+
+  // Finally, assemble the jacobian at the non-perturbed parameter
+  // values
+  oldparameters.value_copy(parameters);
+
+  if (this->assemble_before_solve)
+    {
+      // Build the Jacobian
+      this->assembly(false, true);
+      this->matrix->close();
+
+      // Take the discrete adjoint
+      matrix->get_transpose(*matrix);
+    }
+
+  // The weighted adjoint-adjoint problem is linear
+  LinearSolver<Number> *linear_solver = this->get_linear_solver();
+
+  // Our iteration counts and residuals will be sums of the individual
+  // results
+  std::pair<unsigned int, Real> solver_params =
+    this->get_linear_solve_parameters();
+  std::pair<unsigned int, Real> totalrval = std::make_pair(0,0.0);
+
+  for (unsigned int i=0; i != this->qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      {
+        const std::pair<unsigned int, Real> rval =
+          linear_solver->solve (*matrix, this->add_weighted_sensitivity_adjoint_solution(i),
+                                 *(temprhs[i]),
+                                 solver_params.second,
+                                 solver_params.first);
+
+        totalrval.first  += rval.first;
+        totalrval.second += rval.second;
+      }
+
+  this->release_linear_solver(linear_solver);
+
+  for (unsigned int i=0; i != this->qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      delete temprhs[i];
+
+  // The linear solver may not have fit our constraints exactly
+#ifdef LIBMESH_ENABLE_AMR
+  for (unsigned int i=0; i != this->qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      this->get_dof_map().enforce_constraints_exactly
+        (*this, &this->get_weighted_sensitivity_adjoint_solution(i));
+#endif
+
+  // Stop logging the nonlinear solve
+  STOP_LOG("weighted_sensitivity_adjoint_solve()", "ImplicitSystem");
+
+  return totalrval;
+}
+
+
+
+std::pair<unsigned int, Real>
+ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters,
+                                            const ParameterVector& weights)
+{
+  // Log how long the linear solve takes.
+  START_LOG("weighted_sensitivity_solve()", "ImplicitSystem");
+
+  // We currently get partial derivatives via central differencing
+  const Real delta_p = TOLERANCE;
+
+  // The forward system should now already be solved.
+
+  // Now we're assembling a weighted sum of sensitivity systems:
+  //
+  // dR/du (u, v)(sum(w_l*u'_l)) = -sum_l(w_l*R'_l (u, v)) forall v
+
+  // We'll assemble the rhs first, because the R' term will require
+  // perturbing the system, and some applications may not be able to
+  // assemble a perturbed residual without simultaneously constructing
+  // a perturbed jacobian.
+
+  // We approximate the _l partial derivatives via a central
+  // differencing perturbation in the w_l direction:
+  //
+  // sum_l(w_l*v_l) ~= (v(p + dp*w_l*e_l) - v(p - dp*w_l*e_l))/(2*dp)
+
+  ParameterVector oldparameters, parameterperturbation;
+  parameters.deep_copy(oldparameters);
+  weights.deep_copy(parameterperturbation);
+  parameterperturbation *= delta_p;
+  parameters += parameterperturbation;
+
+  this->assembly(true, false);
+  this->rhs->close();
+
+  AutoPtr<NumericVector<Number> > temprhs = this->rhs->clone();
+
+  oldparameters.value_copy(parameters);
+  parameterperturbation *= -1.0;
+  parameters += parameterperturbation;
+
+  this->assembly(true, false);
+  this->rhs->close();
+
+  *temprhs -= *(this->rhs);
+  *temprhs /= (2.0*delta_p);
+
+  // Finally, assemble the jacobian at the non-perturbed parameter
+  // values
+  oldparameters.value_copy(parameters);
+
+  // Build the Jacobian
+  this->assembly(false, true);
+  this->matrix->close();
+
+  // The weighted sensitivity problem is linear
+  LinearSolver<Number> *linear_solver = this->get_linear_solver();
+
+  std::pair<unsigned int, Real> solver_params =
+    this->get_linear_solve_parameters();
+
+  const std::pair<unsigned int, Real> rval =
+    linear_solver->solve (*matrix, this->add_weighted_sensitivity_solution(),
+                          *temprhs,
+                          solver_params.second,
+                          solver_params.first);
+
+  this->release_linear_solver(linear_solver);
+
+  // The linear solver may not have fit our constraints exactly
+#ifdef LIBMESH_ENABLE_AMR
+  this->get_dof_map().enforce_constraints_exactly
+    (*this, &this->get_weighted_sensitivity_solution());
+#endif
+
+  // Stop logging the nonlinear solve
+  STOP_LOG("weighted_sensitivity_solve()", "ImplicitSystem");
+
+  return rval;
+}
+
+
+
 void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parameters)
 {
   const unsigned int Np = parameters.size();
@@ -442,6 +661,9 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
   const unsigned int Np = parameters.size();
   const unsigned int Nq = qoi.size();
 
+  // We currently get partial derivatives via central differencing
+  const Real delta_p = TOLERANCE;
+
   // An introduction to the problem:
   //
   // Residual R(u(p),p) = 0
@@ -473,9 +695,6 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
 
   for (unsigned int j=0; j != Np; ++j)
     {
-      // We currently get partial derivatives via central differencing
-      Number delta_p = 1e-6;
-
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
       // (partial R / partial p) ~= (rhs(p+dp) - rhs(p-dp))/(2*dp)
 
@@ -534,6 +753,9 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
   const unsigned int Np = parameters.size();
   const unsigned int Nq = qoi.size();
 
+  // We currently get partial derivatives via central differencing
+  const Real delta_p = TOLERANCE;
+
   // An introduction to the problem:
   //
   // Residual R(u(p),p) = 0
@@ -561,9 +783,6 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
 
   for (unsigned int j=0; j != Np; ++j)
     {
-      // We currently get partial derivatives via central differencing
-      Number delta_p = 1e-6;
-
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
 
       Number old_parameter = *parameters[j];
@@ -597,6 +816,234 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
   this->assembly(true, true);
   this->rhs->close();
   this->matrix->close();
+  this->assemble_qoi(qoi_indices);
+}
+
+
+
+void ImplicitSystem::qoi_parameter_hessian_vector_product
+  (const QoISet& qoi_indices,
+   const ParameterVector& parameters,
+   const ParameterVector& vector,
+   SensitivityData& sensitivities)
+{
+  // We currently get partial derivatives via finite differencing
+  const Real delta_p = TOLERANCE;
+
+  const unsigned int Np = parameters.size();
+  const unsigned int Nq = qoi.size();
+
+  // For each quantity of interest q, the parameter sensitivity
+  // Hessian is defined as q''_{kl} = {d^2 q}/{d p_k d p_l}.
+  // Given a vector of parameter perturbation weights w_l, this
+  // function evaluates the hessian-vector product sum_l(q''_{kl}*w_l)
+  //
+  // We calculate it from values and partial derivatives of the
+  // quantity of interest function Q, solution u, adjoint solution z,
+  // parameter sensitivity adjoint solutions z^l, and residual R, as:
+  //
+  // sum_l(q''_{kl}*w_l) =
+  // sum_l(w_l * Q''_{kl}) + Q''_{uk}(u)*(sum_l(w_l u'_l)) -
+  // R'_k(u, sum_l(w_l*z^l)) - R'_{uk}(u,z)*(sum_l(w_l u'_l) -
+  // sum_l(w_l*R''_{kl}(u,z))
+  //
+  // See the adjoints model document for more details.
+
+  // We first do an adjoint solve to get z for each quantity of
+  // interest
+
+  this->adjoint_solve(qoi_indices);
+
+  // Get ready to fill in senstivities:
+  sensitivities.allocate_data(qoi_indices, *this, parameters);
+
+  // We can't solve for all the solution sensitivities u'_l or for all
+  // of the parameter sensitivity adjoint solutions z^l without
+  // requiring O(Nq*Np) linear solves.  So we'll solve directly for their
+  // weighted sum - this is just O(Nq) solves.
+
+  // First solve for sum_l(w_l u'_l).
+  this->weighted_sensitivity_solve(parameters, vector);
+
+  // Then solve for sum_l(w_l z^l).
+  this->weighted_sensitivity_adjoint_solve(parameters, vector, qoi_indices);
+
+  for (unsigned int k=0; k != Np; ++k)
+    {
+      // We approximate sum_l(w_l * Q''_{kl}) with a central
+      // differencing pertubation:
+      // sum_l(w_l * Q''_{kl}) ~= 
+      // (Q(p + dp*w_l*e_l + dp*e_k) - Q(p - dp*w_l*e_l + dp*e_k) -
+      // Q(p + dp*w_l*e_l - dp*e_k) + Q(p - dp*w_l*e_l - dp*e_k))/(4*dp)
+
+      // The sum(w_l*R''_kl) term requires the same sort of pertubation,
+      // and so we subtract it in at the same time:
+      // sum_l(w_l * R''_{kl}) ~= 
+      // (R(p + dp*w_l*e_l + dp*e_k) - R(p - dp*w_l*e_l + dp*e_k) -
+      // R(p + dp*w_l*e_l - dp*e_k) + R(p - dp*w_l*e_l - dp*e_k))/(4*dp)
+
+      ParameterVector oldparameters, parameterperturbation;
+      parameters.deep_copy(oldparameters);
+      vector.deep_copy(parameterperturbation);
+      parameterperturbation *= delta_p;
+      parameters += parameterperturbation;
+
+      Number old_parameter = *parameters[k];
+
+      *parameters[k] = old_parameter + delta_p;
+      this->assemble_qoi(qoi_indices);
+      this->assembly(true, false);
+      std::vector<Number> partial2q_term = this->qoi;
+      std::vector<Number> partial2R_term(this->qoi.size());
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          partial2R_term[i] = this->rhs->dot(this->get_adjoint_solution(i));
+
+      *parameters[k] = old_parameter - delta_p;
+      this->assemble_qoi(qoi_indices);
+      this->assembly(true, false);
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          {
+            partial2q_term[i] += this->qoi[i];
+            partial2R_term[i] += this->rhs->dot(this->get_adjoint_solution(i));
+          }
+
+      oldparameters.value_copy(parameters);
+      parameterperturbation *= -1.0;
+      parameters += parameterperturbation;
+
+      // Re-center old_parameter, which may be affected by vector
+      old_parameter = *parameters[k];
+
+      *parameters[k] = old_parameter + delta_p;
+      this->assemble_qoi(qoi_indices);
+      this->assembly(true, false);
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          {
+            partial2q_term[i] += this->qoi[i];
+            partial2R_term[i] += this->rhs->dot(this->get_adjoint_solution(i));
+          }
+
+      *parameters[k] = old_parameter - delta_p;
+      this->assemble_qoi(qoi_indices);
+      this->assembly(true, false);
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          {
+            partial2q_term[i] += this->qoi[i];
+            partial2R_term[i] += this->rhs->dot(this->get_adjoint_solution(i));
+          }
+
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          {
+            partial2q_term[i] /= (4. * delta_p);
+            partial2R_term[i] /= (4. * delta_p);
+          }
+
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          sensitivities[i][k] = partial2q_term[i];
+
+      // Don't leave the parameters changed
+      oldparameters.value_copy(parameters);
+
+      // Re-center old_parameter, which may have been affected by vector
+      old_parameter = *parameters[k];
+
+      // We get (partial q / partial u) from the user,
+      // but centrally difference it to get q_uk:
+      // (partial^2 q / partial u partial k)
+      // q_uk = (q_u(p+dp*e_k) - q_u(p-dp*e_k))/(2*dp)
+
+      // To avoid creating Nq temporary vectors, we add these terms to
+      // the sensitivities output one by one.
+      //
+      // FIXME: this is probably a bad order of operations for
+      // controlling floating point error.
+
+      *parameters[k] = old_parameter + delta_p;
+      this->assemble_qoi_derivative(qoi_indices);
+
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          sensitivities[i][k] += this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) / (2.*delta_p);
+ 
+      *parameters[k] = old_parameter - delta_p;
+      this->assemble_qoi_derivative(qoi_indices);
+
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          sensitivities[i][k] -= this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) / (2.*delta_p);
+
+      // We get R from the user,
+      // but centrally difference it to get R_k:
+      // (partial R / partial k)
+      // R_k*sum(w_l*z^l) = (R(p+dp*e_k)*sum(w_l*z^l) - R(p-dp*e_k)*sum(w_l*z^l))/(2*dp)
+      *parameters[k] = old_parameter + delta_p;
+      this->assembly(true, false);
+
+      std::vector<Number> partialR_term(this->qoi.size());
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          partialR_term[i] = this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i));
+
+      *parameters[k] = old_parameter - delta_p;
+      this->assembly(true, false);
+
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          {
+            partialR_term[i] -= this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i));
+            partialR_term[i] /= (2.*delta_p);
+
+            // We subtract since this term is negative
+            sensitivities[i][k] -= partialR_term[i];
+          }
+
+      // We get (partial R / partial u) from the user,
+      // but centrally difference it to get R_uk*z*sum(w_l*u'_l):
+      // (partial^2 R / partial u partial k)
+      // R_uk*z = (R_u(p+dp*e_k)*z*sum(w_l*u'_l) - R_u(p-dp*e_k)*z*sum(w_l*u'_l))/(2*dp)
+
+      // To avoid creating Nq temporary vectors, we again add these
+      // terms to the sensitivities output one by one.
+      //
+      // FIXME: this is probably a bad order of operations for
+      // controlling floating point error.
+
+      *parameters[k] = old_parameter + delta_p;
+      this->assembly(false, true);
+
+      // Use a single temporary vector for matrix-vector-vector products
+      AutoPtr<NumericVector<Number> > tempvec = this->get_weighted_sensitivity_solution().zero_clone();
+      this->matrix->vector_mult(*tempvec, this->get_weighted_sensitivity_solution());
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          {
+            // We subtract for the +dp component since this term is negative
+            sensitivities[i][k] -= 
+              this->get_adjoint_solution(i).dot(*tempvec) / (2.*delta_p);
+          }
+
+      *parameters[k] = old_parameter - delta_p;
+      this->assembly(false, true);
+
+      this->matrix->vector_mult(*tempvec, this->get_weighted_sensitivity_solution());
+      for (unsigned int i=0; i != Nq; ++i)
+        if (qoi_indices.has_index(i))
+          {
+            sensitivities[i][k] += 
+              this->get_adjoint_solution(i).dot(*tempvec) / (2.*delta_p);
+          }
+    }
+
+  // All parameters have been reset.
+  // Don't leave the qoi or system changed - principle of least
+  // surprise.
+  this->assembly(true, true);
   this->assemble_qoi(qoi_indices);
 }
 

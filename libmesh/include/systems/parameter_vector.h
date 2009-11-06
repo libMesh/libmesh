@@ -50,6 +50,25 @@ public:
   ParameterVector(const std::vector<Number *> &params) : _params(params) {}
 
   /**
+   * Deep copy constructor: the \p target will now own new copies of
+   * all the parameter values I'm pointing to
+   */
+  void deep_copy(ParameterVector &target) const;
+
+  /**
+   * Shallow copy constructor: the \p target will now point to all the
+   * parameter values I'm pointing to
+   */
+  void shallow_copy(ParameterVector &target) const;
+
+  /**
+   * Value copy method: the \p target, which should already have as
+   * many parameters as I do, will now have those parameters set to my
+   * values.
+   */
+  void value_copy(const ParameterVector &target) const;
+
+  /**
    * Resets to "no parameters"
    */
   void clear() { _params.clear(); }
@@ -75,8 +94,33 @@ public:
    */
   Number *& operator[](unsigned int i);
 
+  /**
+   * Multiplication operator; acts individually on each parameter.
+   */
+  ParameterVector& operator *= (const Number a);
+
+  /**
+   * Addition operator.  The parameter vector to be added in must
+   * have the same number of values.
+   */
+  ParameterVector& operator += (const ParameterVector& a);
+
+  /**
+   * Addition operator.  The parameter vector to be added in must
+   * have the same number of values.
+   */
+  const ParameterVector& operator += (const ParameterVector& a) const;
+
 private: 
+  /**
+   * Pointers to parameters which may exist elsewhere
+   */
   std::vector<Number *> _params;
+
+  /**
+   * Parameters which I own; e.g. as the result of a deep copy
+   */
+  std::vector<Number> _my_data;
 };
 
 
