@@ -685,7 +685,7 @@ private:
   unsigned int sys_number() const;
 
   /**
-   * @invalidates all active DofObject dofs for this system
+   * Invalidates all active DofObject dofs for this system
    */
   void invalidate_dofs(MeshBase& mesh) const;
 

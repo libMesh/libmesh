@@ -128,7 +128,7 @@ namespace MeshTools
 #endif // #ifdef LIBMESH_ENABLE_AMR
     
     /**
-     * @finds any boundary ids that are currently old_id,
+     * Finds any boundary ids that are currently old_id,
      * changes them to new_id
      */
     void change_boundary_id (MeshBase &mesh,

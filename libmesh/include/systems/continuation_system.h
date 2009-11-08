@@ -39,16 +39,17 @@ class NewtonSolver;
  * This class inherits from the FEMSystem.  It can be
  * used to do arclength continuation.  Most of the ideas and
  * the notation here come from HB Keller's 1977 paper:
- *
- * @InProceedings{Kell-1977,
- *  author = {H.~B.~Keller},
- *  title = {{Numerical solution of bifurcation and nonlinear eigenvalue problems}},
- *  booktitle = {Applications of Bifurcation Theory, P.~H.~Rabinowitz (ed.)},
- *  year = 1977,
- *  publisher = {Academic Press},
- *  pages = {359--389},
- *  notes = {QA 3 U45 No.\ 38 (PMA)}
- * }
+\verbatim
+@InProceedings{Kell-1977,
+  author = {H.~B.~Keller},
+  title = {{Numerical solution of bifurcation and nonlinear eigenvalue problems}},
+  booktitle = {Applications of Bifurcation Theory, P.~H.~Rabinowitz (ed.)},
+  year = 1977,
+  publisher = {Academic Press},
+  pages = {359--389},
+  notes = {QA 3 U45 No.\ 38 (PMA)}
+ }
+ \endverbatim
  *
  * @author John W. Peterson 2007
  */
@@ -348,18 +349,18 @@ private:
   NumericVector<Number>* previous_u;
 
   /**
-   * Temporary vector "y" ... stores -du/dlambda, the solution of Ay=G_{\lambda}.
+   * Temporary vector "y" ... stores -du/dlambda, the solution of \f$ Ay=G_{\lambda} \f$.
    */
   NumericVector<Number>* y;
 
   /**
    * Temporary vector "y_old" ... stores the previous value of -du/dlambda,
-   * which is the solution of Ay=G_{\lambda}.
+   * which is the solution of \f$ Ay=G_{\lambda} \f$.
    */
   NumericVector<Number>* y_old;
 
   /**
-   * Temporary vector "z" ... the solution of Az = -G
+   * Temporary vector "z" ... the solution of \f$ Az = -G \f$
    */
   NumericVector<Number>* z;
 
@@ -382,7 +383,7 @@ private:
   bool tangent_initialized;
 
   /**
-   * A pointer to the underlying Newton solver used by the DiffSystem.
+   * A pointer to the underlying Newton solver used by the \p DiffSystem.
    * From this pointer, we can get access to all the parameters and options
    * which are available to the "normal" Newton solver.
    */

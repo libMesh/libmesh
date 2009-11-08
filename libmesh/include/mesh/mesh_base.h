@@ -122,20 +122,20 @@ public:
   { return true; }
   
   /**
-   * @gathers all elements and nodes of the mesh onto
+   * Gathers all elements and nodes of the mesh onto
    * every processor
    */
   virtual void allgather () {}
   
   /**
-   * @when supported, deletes all nonlocal elements of the mesh
+   * When supported, deletes all nonlocal elements of the mesh
    * except for "ghosts" which touch a local element, and deletes
    * all nodes which are not part of a local or ghost element
    */
   virtual void delete_remote_elements () {}
   
   /**
-   * Returns the logical dimension of the mesh.
+   * @returns the logical dimension of the mesh.
    */
   unsigned int mesh_dimension () const
   { return static_cast<unsigned int>(_dim); }
