@@ -115,7 +115,7 @@ class Side : public SideType
   }
 
   /**
-   * @Sides effectively do not have sides, so don't even ask!
+   * Sides effectively do not have sides, so don't even ask!
    */
   virtual unsigned int n_sides () const 
   { libmesh_error(); return 0; }

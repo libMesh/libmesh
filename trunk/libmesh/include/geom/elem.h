@@ -531,7 +531,7 @@ class Elem : public ReferenceCountedObject<Elem>,
   Elem* parent ();
 
   /**
-   * @Sets the pointer to the element's parent.
+   * Sets the pointer to the element's parent.
    * Dangerous to use in high-level code.
    */
   void set_parent (Elem *p);

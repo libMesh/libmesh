@@ -197,7 +197,7 @@ public:
 				       NumericVector<T> &solution_in);
 
   /**
-   * @computes and returns the relative error ||A*x-lambda*x||/|lambda*x|
+   * @returns the relative error ||A*x-lambda*x||/|lambda*x|
    * of the ith eigenpair. (or the equivalent for a general eigenvalue problem)
    */                
   Real get_relative_error (unsigned int i);

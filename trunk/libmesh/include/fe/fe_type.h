@@ -126,7 +126,7 @@ public:
 #endif // ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
-   * @tests equality
+   * Tests equality
    */
   bool operator== (const FEType &f2) const
   {
@@ -141,7 +141,7 @@ public:
   }
 
   /**
-   * @an ordering to make FEType useful as a std::map key
+   * An ordering to make FEType useful as a std::map key
    */
   bool operator< (const FEType &f2) const
   {

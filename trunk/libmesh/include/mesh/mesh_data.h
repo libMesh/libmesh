@@ -210,7 +210,7 @@ public:
   const std::vector<Number>& get_data (const Node* node) const;
 
   /**
-   * @Sets all the data values associated with 
+   * Sets all the data values associated with 
    * the node \p node, overwriting any existing vector
    */
   void set_data (const Node* node, const std::vector<Number>& val);
@@ -288,7 +288,7 @@ public:
   const std::vector<Number>& get_data (const Elem* elem) const;
 
   /**
-   * @Sets all the data values associated with 
+   * Sets all the data values associated with 
    * the element \p elem, overwriting any existing vector
    */
   void set_data (const Elem* elem, const std::vector<Number> &val);

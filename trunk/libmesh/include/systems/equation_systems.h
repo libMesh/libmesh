@@ -364,7 +364,7 @@ public:
   MeshData & get_mesh_data();
 
   /**
-   * @serializes a distributed mesh and its associated
+   * Serializes a distributed mesh and its associated
    * degree of freedom numbering for all systems
    **/
   void allgather ();
