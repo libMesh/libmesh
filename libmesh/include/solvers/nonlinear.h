@@ -113,6 +113,7 @@ Nonlinear<T>::Nonlinear (EquationSystems& es) :
   _max_nl_steps (5),   // Default solver attributes
   _nl_tol       (1.e-6)
 {
+libmesh_deprecated();
 }
 
 
@@ -125,6 +126,7 @@ Nonlinear<T>::Nonlinear (EquationSystems& es,
   Nonlinear (es),
   T         (es, name, number)  // Call the base class constructor
 {
+libmesh_deprecated();
 }
 
 
@@ -133,6 +135,7 @@ template <class T>
 inline
 Nonlinear<T>::~Nonlinear ()
 {
+libmesh_deprecated();
 }
 
 

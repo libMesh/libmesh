@@ -144,6 +144,7 @@ Solver::Solver (EquationSystems& es) :
   _system (es),
   _mesh   (es.get_mesh())
 {
+libmesh_deprecated();
 }
 
 
