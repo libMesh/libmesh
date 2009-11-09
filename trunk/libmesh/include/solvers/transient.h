@@ -165,6 +165,7 @@ Transient<T>::Transient(EquationSystems& es) :
   _time_step      (0),
   _max_time_steps (5)
 {
+libmesh_deprecated();
 }
 
 
@@ -177,6 +178,7 @@ Transient<T>::Transient (EquationSystems& es,
   Transient (es),
   T         (es, name, number)
 {
+libmesh_deprecated();
 }
 
 

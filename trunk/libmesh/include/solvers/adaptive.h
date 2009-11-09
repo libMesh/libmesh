@@ -136,6 +136,7 @@ Adaptive<T>::Adaptive (EquationSystems& es) :
   _n_refinement_steps  (1),
   _max_refinement_level(100)
 {
+libmesh_deprecated();
 }
 
 
@@ -147,6 +148,7 @@ Adaptive<T>::Adaptive (EquationSystems& es,
   Adaptive (es),
   T        (es, name, number)
 {
+libmesh_deprecated();
 }
 
 
