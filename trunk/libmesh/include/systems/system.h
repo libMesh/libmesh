@@ -155,8 +155,7 @@ public:
    *
    * This method is only implemented in some derived classes.
    */
-  virtual void assemble_residual_derivatives (const ParameterVector& parameters)
-    { libmesh_not_implemented(); }
+  virtual void assemble_residual_derivatives (const ParameterVector& parameters);
  
   /**
    * Solves the system.  Must be overloaded in derived systems.
@@ -173,8 +172,7 @@ public:
    * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
-    sensitivity_solve (const ParameterVector& parameters)
-      { libmesh_not_implemented(); }
+    sensitivity_solve (const ParameterVector& parameters);
   
   /**
    * Assembles & solves the linear system(s) (dR/du)*u_w = sum(w_p*-dR/dp), for
@@ -188,8 +186,7 @@ public:
    */
   virtual std::pair<unsigned int, Real>
     weighted_sensitivity_solve (const ParameterVector& parameters,
-                                const ParameterVector& weights)
-      { libmesh_not_implemented(); }
+                                const ParameterVector& weights);
  
   /**
    * Solves the adjoint system, for the specified qoi indices, or for
@@ -202,8 +199,7 @@ public:
    * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
-    adjoint_solve (const QoISet& qoi_indices = QoISet())
-      { libmesh_not_implemented(); }
+    adjoint_solve (const QoISet& qoi_indices = QoISet());
   
   /**
    * Assembles & solves the linear system(s) 
@@ -222,8 +218,7 @@ public:
   virtual std::pair<unsigned int, Real>
     weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
                                         const ParameterVector& weights,
-                                        const QoISet& qoi_indices = QoISet())
-      { libmesh_not_implemented(); }
+                                        const QoISet& qoi_indices = QoISet());
  
   /**
    * Solves for the derivative of each of the system's quantities of
@@ -253,8 +248,7 @@ public:
    */
   virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
                                                   const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities)
-    { libmesh_not_implemented(); }
+                                                  SensitivityData& sensitivities);
   
   /**
    * Solves for parameter sensitivities using the forward method.
@@ -263,8 +257,7 @@ public:
    */
   virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
                                                   const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities)
-    { libmesh_not_implemented(); }
+                                                  SensitivityData& sensitivities);
   
   /**
    * For each of the system's quantities of interest q in 
@@ -281,8 +274,7 @@ public:
   virtual void qoi_parameter_hessian_vector_product(const QoISet& qoi_indices,
                                                     const ParameterVector& parameters,
                                                     const ParameterVector& vector,
-                                                    SensitivityData& product)
-    { libmesh_not_implemented(); }
+                                                    SensitivityData& product);
   
   /**
    * @returns \p true when the other system contains
@@ -1478,6 +1470,69 @@ System::const_vectors_iterator System::vectors_end () const
   return _vectors.end();
 }
 
+inline
+void System::assemble_residual_derivatives (const ParameterVector&)
+{
+  libmesh_not_implemented();
+}
 
+inline
+std::pair<unsigned int, Real>
+System::sensitivity_solve (const ParameterVector&)
+{
+  libmesh_not_implemented();
+}
+
+inline
+std::pair<unsigned int, Real>
+System::weighted_sensitivity_solve (const ParameterVector&,
+                                    const ParameterVector&)
+{
+  libmesh_not_implemented();
+}
+
+inline
+std::pair<unsigned int, Real>
+System::adjoint_solve (const QoISet&)
+{
+  libmesh_not_implemented();
+}
+
+inline
+std::pair<unsigned int, Real>
+System::weighted_sensitivity_adjoint_solve (const ParameterVector&,
+                                            const ParameterVector&,
+                                            const QoISet&)
+{
+  libmesh_not_implemented();
+}
+
+inline
+void
+System::adjoint_qoi_parameter_sensitivity (const QoISet&,
+                                           const ParameterVector&,
+                                           SensitivityData&)
+{
+  libmesh_not_implemented();
+}
+
+inline
+void
+System::forward_qoi_parameter_sensitivity (const QoISet&,
+                                           const ParameterVector&,
+                                           SensitivityData&)
+{
+  libmesh_not_implemented();
+}
+
+inline
+void
+System::qoi_parameter_hessian_vector_product(const QoISet&,
+                                             const ParameterVector&,
+                                             const ParameterVector&,
+                                             SensitivityData&)
+{
+  libmesh_not_implemented();
+}
 
 #endif // #define __system_h__
